@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <e1effdeb0611281348o4bf50145td6c4463e82da2618@mail.gmail.com>
-Date: Tue, 28 Nov 2006 18:48:03 -0300
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+From: "Dave Sweetser" <dave@sweetser.com>
+To: <bluez-devel@lists.sourceforge.net>
+Date: Tue, 28 Nov 2006 11:09:55 -0700
+Message-ID: <001901c71318$6913da00$0600a8c0@PC581820463305>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_14391_6128783.1164750483899"
-Subject: [Bluez-devel] [PATCH] Trusted devices
+Cc: Vicky Sweetser <vicky.sweetser@smartsensorsystems.com>,
+        Jay Johannes <jay.johannes@smartsensorsystems.com>,
+        Les Hammer <les.hammer@smartsensorsystems.com>
+Subject: [Bluez-devel] Question about BlueZ and RFCOMM
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,153 +17,78 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_14391_6128783.1164750483899
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi,
 
-Hi Marcel,
+I have a question about using RFCOMM on BlueZ.  Here is our system:
 
-This patch implements the funcionality that we discussed previously
-and fix some minor bugs:
+   
+    Linux system with    <-----over the air------->  CSR BC03-MM chip and
+    CSR-based USB dongle                             the STMicroelectronics 
+                                                     STR710 ARM
+Microprocessor
+                                                     ("micro")
 
-* new errors added
-* if the remote device is trusted reply directly instead of ask the
-authorization agent
-* fix case sensitive bug
 
-Comments?
-BR,
-Claudio
--- 
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+We want to use the BlueZ RFCOMM library.  On the microprocessor side, I'm
+using the serial
+port of the CSR Bluetooth chip so I am able to monitor the serial data
+stream between the
+CSR Bluetooth chip and the microprocessor ("micro").
 
-------=_Part_14391_6128783.1164750483899
-Content-Type: text/x-patch; name=trusted03.patch; charset=ANSI_X3.4-1968
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ev2uavbw
-Content-Disposition: attachment; filename="trusted03.patch"
+Most of the RFCOMM communication works fine.  On the micro side, I observe
+that the
+parameter negotiation happens OK and the RFCOMM connection is established.
+However,
+the data I try to send from the Linux system is never received by the micro.
+What
+happens instead is that the micro receives these commands from the Bluetooth
+chip
+(these are in CSR's format):
+                                RFC_CONTROL_IND
+                                RFC_RELEASE_IND
+                                RFC_CLOSE_IND
+                                DM_ACL_CLOSED_IND
 
-SW5kZXg6IGhjaWQvZGJ1cy1hcGkudHh0Cj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KUkNTIGZpbGU6IC9jdnNyb290L2Js
-dWV6L3V0aWxzL2hjaWQvZGJ1cy1hcGkudHh0LHYKcmV0cmlldmluZyByZXZpc2lvbiAxLjg3CmRp
-ZmYgLXUgLXIxLjg3IGRidXMtYXBpLnR4dAotLS0gaGNpZC9kYnVzLWFwaS50eHQJMjMgTm92IDIw
-MDYgMTk6NTA6MjUgLTAwMDAJMS44NworKysgaGNpZC9kYnVzLWFwaS50eHQJMjggTm92IDIwMDYg
-MjE6MzU6MTAgLTAwMDAKQEAgLTExNjMsMTYgKzExNjMsMjQgQEAKIAogCQkJTWFya3MgdGhlIHVz
-ZXIgYXMgdHJ1c3RlZC4KIAorCQkJUG9zc2libGUgZXJyb3JzOiBvcmcuYmx1ZXouRXJyb3IuSW52
-YWxpZEFyZ3VtZW50cworCQkJCQkgb3JnLmJsdWV6LkVycm9yLkFscmVhZHlFeGlzdHMKKwogCQli
-b29sZWFuIElzVHJ1c3RlZChzdHJpbmcgYWRkcmVzcykKIAogCQkJUmV0dXJucyB0cnVlIGlmIHRo
-ZSB1c2VyIGlzIHRydXN0ZWQgb3IgZmFsc2Ugb3RoZXJ3aXNlLgogCQkJVGhlIGFkZHJlc3MgcGFy
-YW1ldGVyIG11c3QgbWF0Y2ggb25lIG9mIHRoZQogCQkJY3VycmVudCB1c2VycyBvZiB0aGUgc2Vy
-dmljZS4KIAorCQkJUG9zc2libGUgZXJyb3JzOiBvcmcuYmx1ZXouRXJyb3IuSW52YWxpZEFyZ3Vt
-ZW50cworCiAJCXZvaWQgUmVtb3ZlVHJ1c3Qoc3RyaW5nIGFkZHJlc3MpCiAKIAkJCU1hcmtzIHRo
-ZSB1c2VyIGFzIG5vdCB0cnVzdGVkLgogCisJCQlQb3NzaWJsZSBlcnJvcnM6IG9yZy5ibHVlei5F
-cnJvci5JbnZhbGlkQXJndW1lbnRzCisJCQkJCSBvcmcuYmx1ZXouRXJyb3IuRG9lc05vdEV4aXN0
-CisKIFNpZ25hbHMJCXZvaWQgU3RhcnRlZCgpCiAKIAkJCVRoZSBvYmplY3QgcGF0aCBvZiB0aGlz
-IHNpZ25hbCBjb250YWlucyB3aGljaCBzZXJ2aWNlCkluZGV4OiBoY2lkL2RidXMtZXJyb3IuYwo9
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09ClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVlei91dGlscy9oY2lkL2RidXMtZXJyb3Iu
-Yyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4zMgpkaWZmIC11IC1yMS4zMiBkYnVzLWVycm9yLmMK
-LS0tIGhjaWQvZGJ1cy1lcnJvci5jCTEgTm92IDIwMDYgMTc6MTM6MTcgLTAwMDAJMS4zMgorKysg
-aGNpZC9kYnVzLWVycm9yLmMJMjggTm92IDIwMDYgMjE6MzU6MTAgLTAwMDAKQEAgLTI2OCw2ICsy
-NjgsMTcgQEAKIAlyZXR1cm4gZXJyb3JfYWxyZWFkeV9leGlzdHMoY29ubiwgbXNnLCAiQXVkaXQg
-YWxyZWFkeSBwZXJmb3JtZWQiKTsKIH0KIAorREJ1c0hhbmRsZXJSZXN1bHQgZXJyb3JfdHJ1c3Rl
-ZF9kZXZpY2VfYWxyZWFkeV9leGlzdHMoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdl
-ICptc2cpCit7CisJcmV0dXJuIGVycm9yX2FscmVhZHlfZXhpc3RzKGNvbm4sIG1zZywgIlRydXN0
-ZWQgZGV2aWNlIGFscmVhZHkgZXhpc3RzIik7Cit9CisKK0RCdXNIYW5kbGVyUmVzdWx0IGVycm9y
-X3RydXN0ZWRfZGV2aWNlX2RvZXNfbm90X2V4aXN0cyhEQnVzQ29ubmVjdGlvbiAqY29ubiwgREJ1
-c01lc3NhZ2UgKm1zZykKK3sKKwlyZXR1cm4gZXJyb3JfZG9lc19ub3RfZXhpc3QoY29ubiwgbXNn
-LCAiVHJ1c3RlZCBkZXZpY2UgZG9lcyBub3QgZXhpc3QiKTsKK30KKworCiBzdGF0aWMgY29uc3Qg
-Y2hhciAqc3Ryc2RwZXJyb3IoaW50IGVycikKIHsKIAlzd2l0Y2ggKGVycikgewpJbmRleDogaGNp
-ZC9kYnVzLWVycm9yLmgKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovdXRpbHMv
-aGNpZC9kYnVzLWVycm9yLmgsdgpyZXRyaWV2aW5nIHJldmlzaW9uIDEuMgpkaWZmIC11IC1yMS4y
-IGRidXMtZXJyb3IuaAotLS0gaGNpZC9kYnVzLWVycm9yLmgJMSBOb3YgMjAwNiAxNzoxMzoxNyAt
-MDAwMAkxLjIKKysrIGhjaWQvZGJ1cy1lcnJvci5oCTI4IE5vdiAyMDA2IDIxOjM1OjEwIC0wMDAw
-CkBAIC02Myw1ICs2Myw3IEBACiBEQnVzSGFuZGxlclJlc3VsdCBlcnJvcl9jb25uZWN0X2NhbmNl
-bGVkKERCdXNDb25uZWN0aW9uICpjb25uLCBEQnVzTWVzc2FnZSAqbXNnKTsKIERCdXNIYW5kbGVy
-UmVzdWx0IGVycm9yX3NkcF9mYWlsZWQoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdl
-ICptc2csIGludCBlcnIpOwogREJ1c0hhbmRsZXJSZXN1bHQgZXJyb3JfYXVkaXRfYWxyZWFkeV9l
-eGlzdHMoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdlICptc2cpOworREJ1c0hhbmRs
-ZXJSZXN1bHQgZXJyb3JfdHJ1c3RlZF9kZXZpY2VfYWxyZWFkeV9leGlzdHMoREJ1c0Nvbm5lY3Rp
-b24gKmNvbm4sIERCdXNNZXNzYWdlICptc2cpOworREJ1c0hhbmRsZXJSZXN1bHQgZXJyb3JfdHJ1
-c3RlZF9kZXZpY2VfZG9lc19ub3RfZXhpc3RzKERCdXNDb25uZWN0aW9uICpjb25uLCBEQnVzTWVz
-c2FnZSAqbXNnKTsKIAogI2VuZGlmIC8qIF9fQkxVRVpfREJVU19FUlJPUl9IICovCkluZGV4OiBo
-Y2lkL2RidXMtc2VjdXJpdHkuYwo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVlei91
-dGlscy9oY2lkL2RidXMtc2VjdXJpdHkuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS41NwpkaWZm
-IC11IC1yMS41NyBkYnVzLXNlY3VyaXR5LmMKLS0tIGhjaWQvZGJ1cy1zZWN1cml0eS5jCTIwIE5v
-diAyMDA2IDE4OjQ2OjI4IC0wMDAwCTEuNTcKKysrIGhjaWQvZGJ1cy1zZWN1cml0eS5jCTI4IE5v
-diAyMDA2IDIxOjM1OjExIC0wMDAwCkBAIC03NjEsNiArNzYxLDcgQEAKIHsKIAljb25zdCBjaGFy
-ICpzZXJ2aWNlX3BhdGgsICphZGFwdGVyX3BhdGgsICphZGRyZXNzLCAqYWN0aW9uOwogCXN0cnVj
-dCBzZXJ2aWNlX2FnZW50ICpzYWdlbnQ7CisJc3RydWN0IHNsaXN0ICpsOwogCiAJaWYgKCFkYnVz
-X21lc3NhZ2VfZ2V0X2FyZ3MobXNnLCBOVUxMLAogCQkJCURCVVNfVFlQRV9TVFJJTkcsICZzZXJ2
-aWNlX3BhdGgsCkBAIC03ODMsNiArNzg0LDEyIEBACiAJaWYgKHN0cmNtcChkYnVzX21lc3NhZ2Vf
-Z2V0X3NlbmRlcihtc2cpLCBzYWdlbnQtPmlkKSkKIAkJcmV0dXJuIGVycm9yX3JlamVjdGVkKGNv
-bm4sIG1zZyk7CiAKKwkvKiBDaGVjayBpdCBpcyBhIHRydXN0ZWQgZGV2aWNlICovCisJbCA9IHNs
-aXN0X2ZpbmQoc2FnZW50LT50cnVzdGVkX2RldmljZXMsIGFkZHJlc3MsIChjbXBfZnVuY190KSBz
-dHJjYXNlY21wKTsKKwlpZiAobCkKKwkJcmV0dXJuIHNlbmRfbWVzc2FnZV9hbmRfdW5yZWYoY29u
-biwKKwkJCQlkYnVzX21lc3NhZ2VfbmV3X21ldGhvZF9yZXR1cm4obXNnKSk7CisKIAlpZiAoIWRl
-ZmF1bHRfYXV0aF9hZ2VudCkKIAkJcmV0dXJuIGVycm9yX2F1dGhfYWdlbnRfZG9lc19ub3RfZXhp
-c3QoY29ubiwgbXNnKTsKIApJbmRleDogaGNpZC9kYnVzLXNlcnZpY2UuYwo9PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ClJD
-UyBmaWxlOiAvY3Zzcm9vdC9ibHVlei91dGlscy9oY2lkL2RidXMtc2VydmljZS5jLHYKcmV0cmll
-dmluZyByZXZpc2lvbiAxLjUzCmRpZmYgLXUgLXIxLjUzIGRidXMtc2VydmljZS5jCi0tLSBoY2lk
-L2RidXMtc2VydmljZS5jCTE3IE5vdiAyMDA2IDIyOjM2OjQ3IC0wMDAwCTEuNTMKKysrIGhjaWQv
-ZGJ1cy1zZXJ2aWNlLmMJMjggTm92IDIwMDYgMjE6MzU6MTEgLTAwMDAKQEAgLTU2MSw4ICs1NjEs
-NiBAQAogCURCdXNNZXNzYWdlICpyZXBseTsKIAljb25zdCBjaGFyICphZGRyZXNzOwogCi0JLyog
-RklYTUU6IE1pc3NpbmcgZGVmaW5lIHNlY3VyaXR5IHBvbGljeSAqLwotCiAJaWYgKCFkYnVzX21l
-c3NhZ2VfZ2V0X2FyZ3MobXNnLCBOVUxMLAogCQkJREJVU19UWVBFX1NUUklORywgJmFkZHJlc3Ms
-CiAJCQlEQlVTX1RZUEVfSU5WQUxJRCkpCkBAIC01NzEsOSArNTY5LDkgQEAKIAlpZiAoY2hlY2tf
-YWRkcmVzcyhhZGRyZXNzKSA8IDApCiAJCXJldHVybiBlcnJvcl9pbnZhbGlkX2FyZ3VtZW50cyhj
-b25uLCBtc2cpOwogCi0JbCA9IHNsaXN0X2ZpbmQoYWdlbnQtPnRydXN0ZWRfZGV2aWNlcywgYWRk
-cmVzcywgKGNtcF9mdW5jX3QpIHN0cmNtcCk7CisJbCA9IHNsaXN0X2ZpbmQoYWdlbnQtPnRydXN0
-ZWRfZGV2aWNlcywgYWRkcmVzcywgKGNtcF9mdW5jX3QpIHN0cmNhc2VjbXApOwogCWlmIChsKQot
-CQlyZXR1cm4gZXJyb3JfZmFpbGVkKGNvbm4sIG1zZywgRUlOVkFMKTsKKwkJcmV0dXJuIGVycm9y
-X3RydXN0ZWRfZGV2aWNlX2FscmVhZHlfZXhpc3RzKGNvbm4sIG1zZyk7CiAKIAlyZXBseSA9IGRi
-dXNfbWVzc2FnZV9uZXdfbWV0aG9kX3JldHVybihtc2cpOwogCWlmICghcmVwbHkpCkBAIC01OTgs
-NyArNTk2LDcgQEAKIAkJCURCVVNfVFlQRV9JTlZBTElEKSkKIAkJcmV0dXJuIGVycm9yX2ludmFs
-aWRfYXJndW1lbnRzKGNvbm4sIG1zZyk7CiAKLQlsID0gc2xpc3RfZmluZChhZ2VudC0+dHJ1c3Rl
-ZF9kZXZpY2VzLCBhZGRyZXNzLCAoY21wX2Z1bmNfdCkgc3RyY21wKTsKKwlsID0gc2xpc3RfZmlu
-ZChhZ2VudC0+dHJ1c3RlZF9kZXZpY2VzLCBhZGRyZXNzLCAoY21wX2Z1bmNfdCkgc3RyY2FzZWNt
-cCk7CiAJdHJ1c3RlZCA9IChsPyBUUlVFIDogRkFMU0UpOwogCiAJcmVwbHkgPSBkYnVzX21lc3Nh
-Z2VfbmV3X21ldGhvZF9yZXR1cm4obXNnKTsKQEAgLTYyMSwxNiArNjE5LDE0IEBACiAJY29uc3Qg
-Y2hhciAqYWRkcmVzczsKIAl2b2lkICpwYWRkcmVzczsKIAotCS8qIEZJWE1FOiBNaXNzaW5nIGRl
-ZmluZSBzZWN1cml0eSBwb2xpY3kgKi8KLQogCWlmICghZGJ1c19tZXNzYWdlX2dldF9hcmdzKG1z
-ZywgTlVMTCwKIAkJCURCVVNfVFlQRV9TVFJJTkcsICZhZGRyZXNzLAogCQkJREJVU19UWVBFX0lO
-VkFMSUQpKQogCQlyZXR1cm4gZXJyb3JfaW52YWxpZF9hcmd1bWVudHMoY29ubiwgbXNnKTsKIAot
-CWwgPSBzbGlzdF9maW5kKGFnZW50LT50cnVzdGVkX2RldmljZXMsIGFkZHJlc3MsIChjbXBfZnVu
-Y190KSBzdHJjbXApOworCWwgPSBzbGlzdF9maW5kKGFnZW50LT50cnVzdGVkX2RldmljZXMsIGFk
-ZHJlc3MsIChjbXBfZnVuY190KSBzdHJjYXNlY21wKTsKIAlpZiAoIWwpCi0JCXJldHVybiBlcnJv
-cl9pbnZhbGlkX2FyZ3VtZW50cyhjb25uLCBtc2cpOyAvKiBGSVhNRTogZmluZCBhIGJldHRlciBl
-cnJvciBuYW1lICovCisJCXJldHVybiBlcnJvcl90cnVzdGVkX2RldmljZV9kb2VzX25vdF9leGlz
-dHMoY29ubiwgbXNnKTsKIAogCXJlcGx5ID0gZGJ1c19tZXNzYWdlX25ld19tZXRob2RfcmV0dXJu
-KG1zZyk7CiAJaWYgKCFyZXBseSkK
-------=_Part_14391_6128783.1164750483899
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+I also observe that the Linux system, while connection is being established,
+is sending
+flow control messages (3, in my case) to the micro.  These are with a credit
+field of 
+4, 5 and 6 for the 3 flow control messages.
+
+Now to my question: Does the micro need to respond to these flow control
+messages in some
+                    manner to maintain the RFCOMM connection?  Currently the
+micro doesn't 
+                    respond to the flow control messages.
+
+If it is OK for the micro to not respond to the flow control messages, can
+someone help me
+understand what else might be causing the RFCOMM data to not be sent from
+the Linxu system
+and what might be causing the RFCOMM connection to be closed down?
+
+Thank you very much for your help!  Please let me know if I can provide
+additional information.
+
+Dave Sweetser
+
+P.S. I'm assuming my problem is independent of the version of Linux and also
+independent of the
+     version of BlueZ (which is the latest) -- if you need this information,
+however, just let me know.
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-------=_Part_14391_6128783.1164750483899
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-------=_Part_14391_6128783.1164750483899--
