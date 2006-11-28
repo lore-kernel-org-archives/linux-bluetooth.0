@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 28 Nov 2006 15:57:34 +0100 (CET)
-From: Peter Wippich <pewi@gw-instruments.de>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BAY108-F14D0E2C437D8EE10A1C0CF84E50@phx.gbl>
-Message-ID: <Pine.LNX.4.63.0611281554510.30196@redbean.intranet.gw-instruments.de>
-References: <BAY108-F14D0E2C437D8EE10A1C0CF84E50@phx.gbl>
-MIME-Version: 1.0
-Subject: Re: [Bluez-devel] connections
+Message-ID: <BAY108-F14D0E2C437D8EE10A1C0CF84E50@phx.gbl>
+From: "mark bernard" <mark_qp@hotmail.com>
+To: bluez-devel@lists.sourceforge.net
+Date: Tue, 28 Nov 2006 14:35:24 +0000
+Mime-Version: 1.0
+Subject: [Bluez-devel] connections
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,35 +18,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+hi,
+im trying to connect 7 devices on bluetooth, but i get stuck at 3 devices.
+the 4th device refuses to connect.
+http://by108fd.bay108.hotmail.msn.com/cgi-bin/compose?&curmbox=00000000%2d0000%2d0000%2d0000%2d000000000001&a=d56e940c65c89244b0be101733a1c79516289b6786b97bffd0ecea592e886438#
+Verzenden
+the message i got from hcidump is:
+
+>ACL data: handle 42 flags 0x02 dlen 12
+   L2CAP(s): Connect req: psm 4097 scid 0x0040
+< ACL data: handle 42 flags 0x02 dlen 16
+   L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0040 result 4 status 0
+         Connection refused - no resources available
+
+then it starts disconnecting this device.
+connection 3 devices works good, and i can send messages to every of them. 
+but connecting 4 or more will refuse the connection. "no resources 
+available", what does that mean? how can i fix that?
 
 
-Hi Mark, 
+Gr,
+mark
 
-
-On Tue, 28 Nov 2006, mark bernard wrote:
-
-> hi,
-> im trying to connect 7 devices on bluetooth, but i get stuck at 3 devices.
-> the 4th device refuses to connect.
-> http://by108fd.bay108.hotmail.msn.com/cgi-bin/compose?&curmbox=00000000%2d0000%2d0000%2d0000%2d000000000001&a=d56e940c65c89244b0be101733a1c79516289b6786b97bffd0ecea592e886438#
-> Verzenden
-> the message i got from hcidump is:
-
-No quite sure but it is a problem with your BT chip. It only allows 3 
-connection. If it is a CSR chip may be soembody has configured it to allow 
-only 3 ACL connections. You can find out using bccmd. There is a PS-key 
-named something like MAX_ACL_CONNECTIONS.
-
-Ciao, 
-
-Peter  
-
-
-
-|       Peter Wippich                   Voice: +49 30 46776411          |
-|       G&W Instruments GmbH            fax:   +49 30 46776419          |
-|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
-|       D-13355 Berlin  / Germany                                       |
+_________________________________________________________________
+Typ je SMS sneller binnen Messenger 
+http://join.msn.com/mobile-Messaging/overview
 
 
 -------------------------------------------------------------------------
