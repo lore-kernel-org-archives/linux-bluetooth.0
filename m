@@ -1,8 +1,8 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 MIME-Version: 1.0
-Date: Tue, 28 Nov 2006 10:52:19 -0700
-Message-ID: <77ADC7D0C96B1F44A924DC4E952A5E0E0123D10C@AZ25EXM01.gddsi.com>
-In-Reply-To: <77ADC7D0C96B1F44A924DC4E952A5E0E0123D103@AZ25EXM01.gddsi.com>
+Date: Tue, 28 Nov 2006 10:43:14 -0700
+Message-ID: <77ADC7D0C96B1F44A924DC4E952A5E0E0123D103@AZ25EXM01.gddsi.com>
+In-Reply-To: <1164687160.13955.9.camel@aeonflux.holtmann.net>
 From: "Turley, Scott-P27856" <Scott.Turley@gdc4s.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Trying to connect using a BCSP dongle
@@ -19,29 +19,11 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-When I type in:   hciattach ttyS0 any 115200
-
-It doesn't crash, but it doesn't work either.  I get a slew of:
-
-H4_recv:  Unknown HCI packet type c0
-H4_recv:  Unknown HCI packet type db
-...
-
--Scott
-
------Original Message-----
-From: bluez-users-bounces@lists.sourceforge.net
-[mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Turley,
-Scott-P27856
-Sent: Tuesday, November 28, 2006 10:43 AM
-To: BlueZ users
-Subject: Re: [Bluez-users] Trying to connect using a BCSP dongle
-
 I'm using kernel version 2.6.9-5.EL (kernel for RedHat Enterprise v4.0).
 Here's what shows up in /var/log/messages:
 
 Bluetooth:  HCI device and connection manager initialized
-Bluetooth:  HCI socket layer initialized
+Bluetooth:  HCI socket layer initialized 
 Bluetooth:  HCI UART driver ver 2.1
 Bluetooth:  HCI H4 protocol initialized
 Bluetooth:  HCI BCSP protocol initialized
@@ -78,18 +60,6 @@ Regards
 Marcel
 
 
-
-------------------------------------------------------------------------
--
-Take Surveys. Earn Cash. Influence the Future of IT Join
-SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDE
-V
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 ------------------------------------------------------------------------
 -
