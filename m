@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <20061128171141.74443.qmail@web39810.mail.mud.yahoo.com>
+Date: Tue, 28 Nov 2006 17:11:41 +0000 (GMT)
+From: Fabio PC <fabiofpc_trabalho@yahoo.com.br>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Date: Tue, 28 Nov 2006 10:43:14 -0700
-Message-ID: <77ADC7D0C96B1F44A924DC4E952A5E0E0123D103@AZ25EXM01.gddsi.com>
-In-Reply-To: <1164687160.13955.9.camel@aeonflux.holtmann.net>
-From: "Turley, Scott-P27856" <Scott.Turley@gdc4s.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Trying to connect using a BCSP dongle
+Subject: [Bluez-users] Compile Problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,70 +14,63 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1781916669=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I'm using kernel version 2.6.9-5.EL (kernel for RedHat Enterprise v4.0).
-Here's what shows up in /var/log/messages:
+--===============1781916669==
+Content-Type: multipart/alternative; boundary="0-1881173458-1164733901=:73084"
+Content-Transfer-Encoding: 8bit
 
-Bluetooth:  HCI device and connection manager initialized
-Bluetooth:  HCI socket layer initialized 
-Bluetooth:  HCI UART driver ver 2.1
-Bluetooth:  HCI H4 protocol initialized
-Bluetooth:  HCI BCSP protocol initialized
+--0-1881173458-1164733901=:73084
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-Then it hangs.
+Hi everybody! 
+   
+  I always compiled the avetana library without errors. Today I formated a machine and intall the OS (Debian) and bluez packages again. When I tried to compile the avetana, I get an error. I don't know if it is a change insome bluez library or something like that, but I don't know how to solve this problem. The error that I'm getting is: 
+  BlueZ.cpp:2492: error: invalid conversion from 'u_int8_t*' to 'char*'
+   
+  Does anoyone have any idea how to fix this problem? 
+   
+  Thanks in advance! 
+  Fábio
 
--Scott
+ 		
+---------------------------------
+ Yahoo! Search
+ Música para ver e ouvir: You're Beautiful, do James Blunt
+--0-1881173458-1164733901=:73084
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-
------Original Message-----
-From: bluez-users-bounces@lists.sourceforge.net
-[mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Marcel
-Holtmann
-Sent: Monday, November 27, 2006 9:13 PM
-To: BlueZ users
-Subject: Re: [Bluez-users] Trying to connect using a BCSP dongle
-
-Hi Scott,
-
-> I'm trying to connect a bluetooth module using the BCSP transport on a
-
-> Linux machine.
-> 
-> I have all my services running, but when I try notifying the Linux 
-> bluez stack that the transport will be bcsp using:
-> "hciattach ttyS0 bcsp", the Linux PC locks up.  I have to reboot to 
-> recover.
-
-which kernel version do you use. Can you call "dmesg -n 8" and try it
-again from the console to catch possible error messages from the kernel.
-
-Regards
-
-Marcel
+<div>Hi everybody! </div>  <div>&nbsp;</div>  <div>I&nbsp;always compiled&nbsp;the avetana library without errors. Today I formated a machine and&nbsp;intall the OS&nbsp;(Debian) and bluez packages again. When I tried to compile the avetana, I get an error.&nbsp;I don't know if it is a change insome bluez library or something like that, but I don't know how to solve this problem. The error that I'm getting is: </div>  <div>BlueZ.cpp:2492: error: invalid conversion from 'u_int8_t*' to 'char*'</div>  <div>&nbsp;</div>  <div>Does anoyone have any idea how to fix this problem? </div>  <div>&nbsp;</div>  <div>Thanks in advance! </div>  <div>Fábio</div><p>&#32;
+		<hr size=1> 
+Yahoo! Search<br> 
+Música para ver e ouvir: <a href="http://us.rd.yahoo.com/mail/br/tagline/search/video/*http://br.search.yahoo.com/search/video?p=james+blunt&ei=UTF-8&cv=g&x=wrt&vm=r&fr=intl-mail-br-b">You're Beautiful, do James Blunt</a>
+--0-1881173458-1164733901=:73084--
 
 
-
-------------------------------------------------------------------------
--
-Take Surveys. Earn Cash. Influence the Future of IT Join
-SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDE
-V
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+--===============1781916669==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1781916669==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1781916669==--
