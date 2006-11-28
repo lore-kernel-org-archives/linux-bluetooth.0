@@ -1,16 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 28 Nov 2006 11:58:00 +0100 (CET)
+Date: Tue, 28 Nov 2006 11:24:41 +0100 (CET)
 From: Peter Wippich <pewi@gw-instruments.de>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <456BCB6C.60908@xmission.com>
-Message-ID: <Pine.LNX.4.63.0611281157170.29749@redbean.intranet.gw-instruments.de>
-References: <456937F3.7090107@xmission.com>
-	<Pine.LNX.4.63.0611261450220.22808@redbean.intranet.gw-instruments.de>
-	<4569FD44.8050906@xmission.com>
-	<Pine.LNX.4.63.0611271115040.25903@redbean.intranet.gw-instruments.de>
-	<456B1D40.8040703@xmission.com> <456BCB6C.60908@xmission.com>
+To: Olivier Le Pogam <olepogam@free.fr>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <002801c7125f$7197b7f0$0100a8c0@kayleigh>
+Message-ID: <Pine.LNX.4.63.0611281118300.29749@redbean.intranet.gw-instruments.de>
+References: <002901c710a8$0eab3580$0100a8c0@kayleigh>
+	<1164536005.25914.8.camel@aeonflux.holtmann.net>
+	<002801c7125f$7197b7f0$0100a8c0@kayleigh>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] bccmd and usb/uart switching
+Subject: Re: [Bluez-devel] Master / Slave question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,16 +24,24 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
-Hi Brad, 
+Hi Olivier,
 
-> fwiw, it worked great to try pskey values out in ram before making them 
-> permanent.
-> 
-> http://bluetooth-alsa.sourceforge.net/embed.html
+>> lots of stuff deleted.....
 
-Congregulations ;-) 
+your problem is hardware / general Bluetooth / LM related. 
+
+Earlier BT implementations (and may be even actual) support only one slave 
+connection at a time. This is why the master slave switch was introduced !
+(I think with BT 1.0B). 
+Newer implementations MAY support up to two slave connections or at least 
+one Master and one Slave connection. 
+
+What hardware are you using ?
+
+Ciao, 
 
 Peter 
+
 
 
 |       Peter Wippich                   Voice: +49 30 46776411          |
