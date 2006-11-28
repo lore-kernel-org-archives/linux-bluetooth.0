@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <BAY108-F14D0E2C437D8EE10A1C0CF84E50@phx.gbl>
-From: "mark bernard" <mark_qp@hotmail.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Tue, 28 Nov 2006 14:35:24 +0000
-Mime-Version: 1.0
-Subject: [Bluez-devel] connections
+Message-ID: <e1effdeb0611280555m1aef46f5i33cd495290366daf@mail.gmail.com>
+Date: Tue, 28 Nov 2006 10:55:54 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-devel] [DBUS] Service - ListUsers and RemoveUser
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,32 +18,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-hi,
-im trying to connect 7 devices on bluetooth, but i get stuck at 3 devices.
-the 4th device refuses to connect.
-http://by108fd.bay108.hotmail.msn.com/cgi-bin/compose?&curmbox=00000000%2d0000%2d0000%2d0000%2d000000000001&a=d56e940c65c89244b0be101733a1c79516289b6786b97bffd0ecea592e886438#
-Verzenden
-the message i got from hcidump is:
+Hi,
 
->ACL data: handle 42 flags 0x02 dlen 12
-   L2CAP(s): Connect req: psm 4097 scid 0x0040
-< ACL data: handle 42 flags 0x02 dlen 16
-   L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0040 result 4 status 0
-         Connection refused - no resources available
+I have another question about the service interface methods. We
+discussed a lot of stuff in the last meeting, but I don't remember
+exactly how some methods should work.
 
-then it starts disconnecting this device.
-connection 3 devices works good, and i can send messages to every of them. 
-but connecting 4 or more will refuse the connection. "no resources 
-available", what does that mean? how can i fix that?
+ListUsers is a method to retrieve the connected devices related to a
+specific service. How it is possible track the current connected
+remote devices? I guess it should be tracked inside the hcid without
+any interaction with the service agent, right?
 
+RemoveUser removes a user of the service. If it is removed should it
+be automatically disconnected too?
 
-Gr,
-mark
-
-_________________________________________________________________
-Typ je SMS sneller binnen Messenger 
-http://join.msn.com/mobile-Messaging/overview
-
+BR,
+Claudio.
+-- 
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
