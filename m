@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <456BCB6C.60908@xmission.com>
-Date: Mon, 27 Nov 2006 22:38:52 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <456937F3.7090107@xmission.com>	<Pine.LNX.4.63.0611261450220.22808@redbean.intranet.gw-instruments.de>	<4569FD44.8050906@xmission.com>	<Pine.LNX.4.63.0611271115040.25903@redbean.intranet.gw-instruments.de>
-	<456B1D40.8040703@xmission.com>
-In-Reply-To: <456B1D40.8040703@xmission.com>
-Subject: Re: [Bluez-devel] bccmd and usb/uart switching
+In-Reply-To: <loom.20061126T213652-261@post.gmane.org>
+References: <loom.20061126T213652-261@post.gmane.org>
+Date: Tue, 28 Nov 2006 05:24:51 +0100
+Message-Id: <1164687891.13955.16.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] BECI
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,22 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Guys
+Hi Andreas,
 
->> Because you can realy damage your device (if you don't have SPI access) 
->> Marcel implemented bccmd "save". You realy should know what you're doing 
->> when using bccmd to change ps-keys on CSR chips.  
-> 
-> thanks for your help! I've decided it is too easy to get things wrong. I
-> am going to rewire things so I can have both usb and uart connected,
-> then make the pskey change in ram and softboot into uart mode.
+> is there any plan to support the upcoming BECI (Bluetooth Embedded Control 
+> Interface)? I know its not a working group at the moment but maybe next year.
 
-fwiw, it worked great to try pskey values out in ram before making them 
-permanent.
+I heard of this new interface, but unfortunately I haven't seen the
+specification, yet. However I am pretty sure that we are going to
+support it as soon as we have hardware to test it with.
 
-http://bluetooth-alsa.sourceforge.net/embed.html
+Regards
 
-Brad
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
