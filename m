@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 28 Nov 2006 17:30:29 +0100 (CET)
-From: Peter Wippich <pewi@gw-instruments.de>
-To: JOSERIVERAPONCE@terra.es,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <7349602.1164730774199.JavaMail.root@cps2>
-Message-ID: <Pine.LNX.4.63.0611281729070.30196@redbean.intranet.gw-instruments.de>
-References: <7349602.1164730774199.JavaMail.root@cps2>
+Message-ID: <7349602.1164730774199.JavaMail.root@cps2>
+Date: Tue, 28 Nov 2006 17:19:34 +0100 (MET)
+From: "JOSERIVERAPONCE@terra.es" <JOSERIVERAPONCE@terra.es>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] MSWindows com (serial) port sniffer?
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] MSWindows com (serial) port sniffer?
+Reply-To: JOSERIVERAPONCE@terra.es,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -17,37 +15,22 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-
-Hi, 
-
-> I want to know I you guys know of any good com (serial) port sniffer
-> because the MSWindows application that communicates with my phone uses 
-> a
-> virtual com port.
-Try portmon from sysinternals (www.sysinternals.com). Do not know if it is 
-still up, they were bought by M$.......
-
-Ciao, 
-
-Peter 
-
-
-|       Peter Wippich                   Voice: +49 30 46776411          |
-|       G&W Instruments GmbH            fax:   +49 30 46776419          |
-|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
-|       D-13355 Berlin  / Germany                                       |
-
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+U2luY2UgSSBkbyBub3QgZ2V0IHRvIGtub3cgYW55IGdvb2QgTVNXaW5kb3dzIGJsdWV0b290aCBw
+cm90b2NvbApzbmlmZmVyLgoKSSB3YW50IHRvIGtub3cgSSB5b3UgZ3V5cyBrbm93IG9mIGFueSBn
+b29kIGNvbSAoc2VyaWFsKSBwb3J0IHNuaWZmZXIKYmVjYXVzZSB0aGUgTVNXaW5kb3dzIGFwcGxp
+Y2F0aW9uIHRoYXQgY29tbXVuaWNhdGVzIHdpdGggbXkgcGhvbmUgdXNlcyAKYQp2aXJ0dWFsIGNv
+bSBwb3J0LgoKSm9zZQoKCgpQcnVlYmEgZWwgY29ycmVvIFRlcnJhICggaHR0cDovL3d3dy50ZXJy
+YS5lcy9jb3JyZW8gKTsgU2VndXJvLCByw6FwaWRvLCBmaWFibGUuCgoKLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LQpUYWtlIFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQKSm9p
+biBTb3VyY2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFu
+Y2UgdG8gc2hhcmUgeW91cgpvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdo
+IGJyaWVmIHN1cnZleXMgLSBhbmQgZWFybiBjYXNoCmh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVm
+YXVsdC5waHA/cGFnZT1qb2luLnBocCZwPXNvdXJjZWZvcmdlJkNJRD1ERVZERVYKX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGlu
+ZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNv
+dXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
