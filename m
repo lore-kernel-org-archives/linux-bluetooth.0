@@ -1,19 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 29 Nov 2006 13:11:24 +0100 (CET)
-From: Peter Wippich <pewi@gw-instruments.de>
-To: Olivier Le Pogam <olepogam@free.fr>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <001201c712e9$3ae9cfb0$3978f052@kayleigh>
-Message-ID: <Pine.LNX.4.63.0611291259350.1191@redbean.intranet.gw-instruments.de>
-References: <002901c710a8$0eab3580$0100a8c0@kayleigh>
-	<1164536005.25914.8.camel@aeonflux.holtmann.net>
-	<002801c7125f$7197b7f0$0100a8c0@kayleigh>
-	<Pine.LNX.4.63.0611281118300.29749@redbean.intranet.gw-instruments.de>
-	<000701c712dc$8e44ff20$3978f052@kayleigh>
-	<Pine.LNX.4.63.0611281215240.29749@redbean.intranet.gw-instruments.de>
-	<001201c712e9$3ae9cfb0$3978f052@kayleigh>
+Date: Wed, 29 Nov 2006 02:50:56 -0800 (PST)
+From: Sergey Krivov <krivov@yahoo.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1164791561.5071.5.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] Master / Slave question
+Message-ID: <600808.9254.qm@web31014.mail.mud.yahoo.com>
+Subject: [Bluez-devel] two concurrent a2dp connections
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -27,39 +19,108 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi,
 
-Salut Oli,
+i am trying to work with two a2dp streams at the same
+time. if i do it in the following way it works.
+first way (schematically,):
 
-> > For a server application like yours I would suggest to use the role
-> > switch feature in a more relaxed way. So, once a connection comes in try
-> > to do a role switch. If it succeed it is fine and you're able to accept an
-> > additional connection. If it fails you're out of resources but at least
-> > can service the current connection.
-> >
-> > However, if I understand it right you can not set this behaviour in
-> > hcid.conf. You have to implement it in your application.
-> 
-> What do you mean by implementing this in my application ? Is it
-> possible to manually deal with this in my server application ? Would you
-> have a location with examples ?
-> 
-Actualy, the only sample I'm aware of for such things is hcid. I've not 
-checked how it handles the case when lm master is set and the remote 
-device rejects the role switch. From the documentation I assume it will 
-cancel the connection, but this may be wrong. 
-Marcel ?? 
-If it just ignores a rejected role switch and keeps the connection you 
-have the behaviour I outlined above. 
-If it cancel the connection may be the easiest way is to modify hcid. 
-
-Peter
+lacp=[] # list of ACP
+stream1=connect(addr1)
+lacp.append(stream1)
+stream2=connect(addr2) 
+lacp.append(stream)
 
 
-|       Peter Wippich                   Voice: +49 30 46776411          |
-|       G&W Instruments GmbH            fax:   +49 30 46776419          |
-|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
-|       D-13355 Berlin  / Germany                                       |
+if i do it in a different way it does not.
+here i advertise a2dp just to get the address
+of the units. if i have more than two units the sound
+is destroyed completely.  
 
+second way (schematically):
+lacp=[]
+while true:
+    sock2,addr,port=advertise_a2dp()
+    avdtp_discover_abort(sock2)  
+    sock2.close()
+    lacp.append(connect(addr))
+
+using hcidump i found that in the first case the media
+packets are send more or less synchronously:
+grep of hcidump output gives:
+    L2CAP(d): cid 0x0041 len 621 [psm 0]
+    L2CAP(d): cid 0x0041 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x0041 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x0041 len 621 [psm 0]
+    L2CAP(d): cid 0x0041 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x0041 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x0041 len 621 [psm 0]
+    L2CAP(d): cid 0x0041 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x0041 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x0041 len 621 [psm 0]
+    L2CAP(d): cid 0x0041 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x0041 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+
+for the second case i get:
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+    L2CAP(d): cid 0x006b len 621 [psm 0]
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+    L2CAP(d): cid 0x0042 len 621 [psm 0]
+
+what might be the difference between the two cases.
+Didnt i set up some socket options? 
+Any help is appreciated!
+
+
+ 
+____________________________________________________________________________________
+Cheap talk?
+Check out Yahoo! Messenger's low PC-to-Phone call rates.
+http://voice.yahoo.com
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
