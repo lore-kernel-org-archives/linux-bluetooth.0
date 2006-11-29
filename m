@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <8f75d250611291439m6a26ca3en9261e81280a07985@mail.gmail.com>
-Date: Wed, 29 Nov 2006 23:39:29 +0100
-From: "Viktor Nagy" <viktor.nagy@gmail.com>
+Date: Wed, 29 Nov 2006 20:45:16 +0800
+From: amateur <ztl.post@gmail.com>
 To: bluez-users@lists.sourceforge.net
+Message-ID: <20061129124516.GD3364@163.com>
+References: <20061128171141.74443.qmail@web39810.mail.mud.yahoo.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] HID create error 2 (no such file or directory)
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20061128171141.74443.qmail@web39810.mail.mud.yahoo.com>
+Subject: Re: [Bluez-users] Compile Problem
+Reply-To: amateur <ztl.post@gmail.com>,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,23 +21,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hello!
+On Tue, Nov 28, 2006 at 05:11:41PM +0000, Fabio PC wrote:
+> Hi everybody! 
+>    
+>   I always compiled the avetana library without errors. Today I formated a machine and intall the OS (Debian) and bluez packages again. When I tried to compile the avetana, I get an error. I don't know if it is a change insome bluez library or something like that, but I don't know how to solve this problem. The error that I'm getting is: 
+>   BlueZ.cpp:2492: error: invalid conversion from 'u_int8_t*' to 'char*'
 
-I would like to use my sonyericsson k750 as a remote controller. The
-mobile knows HIDD, so I have allowed it. Now it seems that I can
-connect, but when I touch the buttons on the mobile nothing happens.
-In the syslog I get the following message: HID create error 2 (no such
-file or directory)
+Seems like there is a typo. u_int8_t could be uint8_t, just a guess.
+You can try it though.
 
-I used hcidump also. Given that its output is quite long, and I do not
-want to enerve you with it, you can read it at
-http://blog.educomm.hu/tmp/hcidump.txt
-
-I use Kubuntu Dapper Drake.
-
-Thanks for your help!
-
-V
+-- 
+You will be singled out for promotion in your work.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
