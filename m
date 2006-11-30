@@ -1,51 +1,44 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Mayank BATRA <mayank.batra@st.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Wed, 1 Nov 2006 09:39:10 +0530
-Message-ID: <000901c6fd6b$7fb42c00$9d0cc70a@dlh.st.com>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <456F27D9.9080303@xmission.com>
+Date: Thu, 30 Nov 2006 11:50:01 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-In-Reply-To: <d23110170610310630x3af9217by79d36cace3962009@mail.gmail.com>
-Subject: Re: [Bluez-devel] Host Controller to Host Flow Control
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <12311.89646.qm@web30509.mail.mud.yahoo.com>
+In-Reply-To: <12311.89646.qm@web30509.mail.mud.yahoo.com>
+Subject: Re: [Bluez-users] USB dongle failed to pair with headset
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Ulisses,
+gary
 
-> > I am wondering whether this code(i.e. controller to host 
-> >flow control) has
-> > been included in one of the -mh kernel patch.
-> > Can you please confirm?
-> 
-> I don't think so. You're probably confusing it with the L2CAP
-> retransmission and flow control patch that is included in the latest
-> -mh patches.
+> I just got a no name dongle(CSR chipset) which I
+> failed to pair with my headset. I have no problem
+> pairing the headset with my t68i and I have no problem
+> pairing with the t68i using the dongle.
 
-Of course I am not confused between the two.
-Just that I wanted to know whether the Host Flow control patch is inside a
--mh patch.
-So I think it is not there.
+if this is ubuntu (maybe debian too), make sure you install 
+bluez-passkey-gnome. It's a distro bug... he default hcid.conf needs it 
+but the package doesn't require it.
 
-Best Regards,
-
-Mayank
-
+Brad
 
 -------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
