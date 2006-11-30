@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Olivier =?ISO-8859-1?Q?Cr=EAte?= <tester@tester.ca>
-To: Douglas Ward <douglas.ward@prolly.org>
-Date: Thu, 30 Nov 2006 21:21:23 -0500
-Message-Id: <1164939683.18828.24.camel@TesterBox.tester.ca>
-Mime-Version: 1.0
-Cc: bluez-devel <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] mx5000tools 0.1
+From: Andrew Kohlsmith <akohlsmith-bluez@mixdown.ca>
+To: bluez-devel@lists.sourceforge.net
+Date: Thu, 30 Nov 2006 12:12:39 -0500
+References: <002901c710a8$0eab3580$0100a8c0@kayleigh>
+	<000701c712dc$8e44ff20$3978f052@kayleigh>
+	<Pine.LNX.4.63.0611281215240.29749@redbean.intranet.gw-instruments.de>
+In-Reply-To: <Pine.LNX.4.63.0611281215240.29749@redbean.intranet.gw-instruments.de>
+MIME-Version: 1.0
+Message-Id: <200611301212.39250.akohlsmith-bluez@mixdown.ca>
+Subject: Re: [Bluez-devel] Master / Slave question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,83 +18,38 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1241052020=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+On Tuesday 28 November 2006 06:34, Peter Wippich wrote:
+> You should try to get a newer BT 2.0 device. If I remember right the newer
+> CSR devices support two slaves at a time (at least they support one slave
+> and one Master connection simultaniously).
 
---===============1241052020==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="=-SlM0ma0iecfBBf9v+bkY"
+I'm confused; I thought the limitation was with early early BT 1.0B 
+implementations, but now you're saying that BT2.0 even has this limit?  I 
+can't, for example, have one BT dongle and work with 2, 3, 4 or more devices 
+at the same time?
 
+> For a server application like yours I would suggest to use the role
+> switch feature in a more relaxed way. So, once a connection comes in try
+> to do a role switch. If it succeed it is fine and you're able to accept an
+> additional connection. If it fails you're out of resources but at least
+> can service the current connection.
 
---=-SlM0ma0iecfBBf9v+bkY
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
+Interesting.  Always try to become a slave (i.e. let the phone be the master 
+if it'll let you), correct?
 
-Hi,
-
-I ported mx5000lib[1] .NET library to Linux and I made mx5000tools[2].=20
-
-It currently supports most operations that control the content of the
-screen. Only 2 operations that SetPoint does on windows are not
-supported, because I haven't managed to make them work. One is to
-display images, I can decode the sent data[3], but when I try re-sending
-the same data, it doesn't show up on the screen. The second is to change
-the content of the menus there again, the keyboard doesn't seem to be
-responsive to the commands that I send.
-
-It currently only works in HID mode because the bluez code does not yet
-support full HID with hiddev.
-
-I should have a homepage and a SVN tree for it soon, I'll post the
-address when I set it up.
-
-
-[1] http://sourceforge.net/projects/mx5000lib/
-[2] http://dev.gentoo.org/~tester/dist/mx5000tools-0.1.tar.gz
-[3] http://dev.gentoo.org/~tester/image-drawer.c
-
---=20
-Olivier Cr=EAte
-tester@tester.ca
-
---=-SlM0ma0iecfBBf9v+bkY
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (GNU/Linux)
-
-iD8DBQBFb5GjHTiOWk7ZorsRAss0AJ4lm8VcwIOHsItofaJk1zqUSRI2LwCdEtLq
-ifhF4lnoNv751PkWQOP/iyA=
-=70jR
------END PGP SIGNATURE-----
-
---=-SlM0ma0iecfBBf9v+bkY--
-
-
---===============1241052020==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Regards,
+Andrew
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1241052020==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1241052020==--
