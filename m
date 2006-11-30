@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <e1effdeb0611300428u732bd2bdj6692e6aa2a85c7b4@mail.gmail.com>
-Date: Thu, 30 Nov 2006 09:28:38 -0300
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <be976db60611291450t78556986s801891c24f0dff7c@mail.gmail.com>
+Message-ID: <1aef62250611300052p3ed2a9i1f8e1d236eb4957@mail.gmail.com>
+Date: Thu, 30 Nov 2006 09:52:52 +0100
+From: "David Stennett" <praefectus@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-References: <be976db60611291450t78556986s801891c24f0dff7c@mail.gmail.com>
-Subject: Re: [Bluez-users] sdp service name
+Subject: [Bluez-users] Hexadecimals (What are they really?)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,30 +18,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 11/29/06, Mark S. Townsley <mstownsley@gmail.com> wrote:
-> Hi:
->
-> I am looking into how to use sdptool to add "sp" service but name it as
-> "PWAccessP".
-> I can add "sp" but cannot figure out how to change the name to PWAccessP.
-> I have a device that searches for an "sp" service with that name.
->
-> Thanks in advance for any tips/pointers.
->
-> mark
->
+Group:
 
-Hi Mark,
+Over at Jellingspot (www.jellingspot.com), we have a client/server
+based location marketing server ... we'd just added (not yet released)
+"bluecasting" abilities to this server .... in short ... the server
+scans the area, and should send content to phones.  We have
+implemented hexadecimal discovery into the server, which basically
+finds the hexadecimal number of the BT device in question, and would
+send content to that phone garnered to that phone type ...
 
-Check the functions "add_sp"(utils/tools/sdptool.c) and
-"sdp_set_info_attr" "libs/src/sdp.c)
+My understanding was that each hexadecimal was unique for each phone
+type ... however, it appears that it's unique for each phone...
 
-Claudio.
+Can somebody tell me, precisely, if the hexadecimal is relates to
+specific phone type, phone chip, phone region, phone brand, or ????  I
+was under the impression I'd be able to at least tell if the phone
+would be a Nokia 7650 or 6600 .... is this type of bluepriting
+possible, or is this beyond what BT allows (or what has been
+implemented by device makers?)
 
--- 
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+Thanks!
+
+David Stennett
+Jellingspot Team
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
