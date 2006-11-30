@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <1aef62250611300052p3ed2a9i1f8e1d236eb4957@mail.gmail.com>
-Date: Thu, 30 Nov 2006 09:52:52 +0100
-From: "David Stennett" <praefectus@gmail.com>
-To: bluez-users@lists.sourceforge.net
+From: CIJOML <cijoml@volny.cz>
+To: bluez-users@lists.sf.net
+Date: Thu, 30 Nov 2006 08:52:29 +0100
 MIME-Version: 1.0
-Subject: [Bluez-users] Hexadecimals (What are they really?)
+Message-Id: <200611300852.29175.cijoml@volny.cz>
+Subject: [Bluez-users] MSI BToes 2.0 core revision
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,30 +18,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Group:
+Hello,
 
-Over at Jellingspot (www.jellingspot.com), we have a client/server
-based location marketing server ... we'd just added (not yet released)
-"bluecasting" abilities to this server .... in short ... the server
-scans the area, and should send content to phones.  We have
-implemented hexadecimal discovery into the server, which basically
-finds the hexadecimal number of the BT device in question, and would
-send content to that phone garnered to that phone type ...
+I just bought MSI BToes 2.0
 
-My understanding was that each hexadecimal was unique for each phone
-type ... however, it appears that it's unique for each phone...
+It's revision is 19.2 with chip BlueCore4-ROM
 
-Can somebody tell me, precisely, if the hexadecimal is relates to
-specific phone type, phone chip, phone region, phone brand, or ????  I
-was under the impression I'd be able to at least tell if the phone
-would be a Nokia 7650 or 6600 .... is this type of bluepriting
-possible, or is this beyond what BT allows (or what has been
-implemented by device makers?)
+It has general CSR HCI ID, so it works with XP SP2 without need of installing 
+any driver which is also gut.
 
-Thanks!
+But what surprised me a lot is that -ROM? Does it means that this dongle is 
+not flashable?
 
-David Stennett
-Jellingspot Team
+Thanks a lot for explanation
+
+Michal
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
