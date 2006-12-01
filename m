@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d66c3bdf0612020340r4b44e500i1a6c6ad6917875b7@mail.gmail.com>
-Date: Sat, 2 Dec 2006 03:40:21 -0800
-From: "Uichin (Eugene) Lee" <netssenger@gmail.com>
+From: Eberhard Hackl <eberhard.hackl@ise-hackl.at>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] data fragment
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Fri, 1 Dec 2006 16:03:02 +0100
+Message-Id: <200612011603.03063.eberhard.hackl@ise-hackl.at>
+Subject: [Bluez-users] BT connection problem
+Reply-To: eberhard.hackl@ise-hackl.at,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,34 +19,46 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi All,
 
-I have an urgent question. I'm sending a 2300B packet from one machine
-to another machine through L2CAP. I used hcidump to see the
-fragmentation in L2CAP.
+Hello,
 
-I looked at the kernel code, and realized that L2CAP uses "ACL_MTU" to
-do the fragmentation. hcidump at the sender side shows that
+I am working with SuSE 10.1 and try to copy photos from my Kodak Easy Share  
+camera to the computer. The kbluetoothd is started and the usb bluetooth 
+stick was found. 
+On sending data the pairing works fine. But after commiting the pin the camera 
+tells me that there is a connection error. After this the kbluetoothd stays 
+connected with the camera. 
+I have no problems to copy data (with obex) from the computer to the camera, 
+and also the copy of data from the camera to other devices is no problem. So 
+that means, that there is something wrong on my linux system. 
 
-< ACL data: handle 1 flags 0x01 dlen: 120
+Can anyone help me! I tried to find the problems with hcitool and hciconfig. 
+But there everything looks fine. Maybe I need a special service for the 
+camera...
 
-However, hcidump at the receiver side shows like this:
 
-> ACL data: handle 42 flags 0x01 dlen: 224
-=> 10 times +
-> ACL data: handle 42 flags 0x01 dlen: 64
+Thank's
+Eberhard
 
-Total 2304 (2300B payload + 4 bytes - CID/Length)
 
-What's happening here? At the lower layer (i.e., LMP), pack those
-packets and then create another ACL packet with length 224 (the size
-of  DM5 packet). It seems like LMP packs uppper level data packets
-into current baseband packet format. Is that true?
-
-Thank you.
 -- 
-Uichin (Eugene) Lee
-Ph.D. Student UCLA CS Dept.
+
+
+-------------------------------------------
+Eberhard Hackl
+I.S.E. Hackl
+(innovative software engineering)
+
+Steinebach 18
+6850 Dornbirn
+Austria
+
+-------------------------------------------
+fon: +43 (0)676 6222169
+fax: +43 (0)5572 394778
+homepage: www.ise-hackl.at
+mailto: eberhard.hackl@ise-hackl.at
+-------------------------------------------
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
