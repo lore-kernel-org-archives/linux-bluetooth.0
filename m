@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200612011448.32667.akohlsmith-bluez@benshaw.com>
-References: <200612011448.32667.akohlsmith-bluez@benshaw.com>
-Date: Sun, 03 Dec 2006 14:32:37 +0100
-Message-Id: <1165152757.19590.7.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] "promiscuous mode" for hci devices?
+Date: Fri, 1 Dec 2006 14:48:32 -0500
+MIME-Version: 1.0
+Message-Id: <200612011448.32667.akohlsmith-bluez@benshaw.com>
+Subject: [Bluez-devel] "promiscuous mode" for hci devices?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,21 +18,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Andrew,
+It'd be an analog to ethernet's promiscuous mode, where all frames received 
+are passed up the stack, instead of just the frames matching the devices MAC 
+addresses.
 
-> It'd be an analog to ethernet's promiscuous mode, where all frames received 
-> are passed up the stack, instead of just the frames matching the devices MAC 
-> addresses.
+Is there such a thing available in BlueZ?
 
-a Bluetooth chip doesn't receive any packets that are not meant for it.
-You must understand that Bluetooth works totally different than for
-example Ethernet or Wireless LAN.
-
-Regards
-
-Marcel
-
-
+-A.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
