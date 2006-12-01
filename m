@@ -1,9 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY117-F1856009F5F7FD75709425BBFDA0@phx.gbl>
-In-Reply-To: <1164979580.5290.4.camel@ODole-Ubuntu>
-From: "Kelvin Xu" <kyoxu@hotmail.com>
-To: bluez-users@lists.sourceforge.net
-Date: Fri, 01 Dec 2006 21:34:04 +0800
+From: Olivier Dole <olivier.dole@palmsource.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY117-F9D2CC50F1BBB92B421116BFDA0@phx.gbl>
+References: <BAY117-F9D2CC50F1BBB92B421116BFDA0@phx.gbl>
+Date: Fri, 01 Dec 2006 14:26:20 +0100
+Message-Id: <1164979580.5290.4.camel@ODole-Ubuntu>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users] PAN connection to a handphone
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -15,121 +16,46 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1019452201=="
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1019452201==
-Content-Type: text/plain; format=flowed
-
-
-Hi,
-
-I have read the article. My question if the PAN consisted of only my 
-computer and my handphone. Would i be able to access the internet through my 
-handphone which is GPRS enabled.
-
-Regards,
-Kelvin
-
->From: Olivier Dole <olivier.dole@palmsource.com>
->Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
->To: BlueZ users <bluez-users@lists.sourceforge.net>
->Subject: Re: [Bluez-users] PAN connection to a handphone
->Date: Fri, 01 Dec 2006 14:26:20 +0100
->
->Hello,
->
->this link: http://bluez.sourceforge.net/contrib/HOWTO-PAN will explain
->you howto to access Internet through your computer with PAN profile.
->
->Regards,
->
->Olivier
->Le vendredi 01 décembre 2006 ? 21:14 +0800, Kelvin Xu a écrit :
-> > Hi,
-> >
-> > I would like to connect to the internet through my handphone over 
->Bluetooth
-> > in my Linux Computer. I have tried that using the Windows OS in which i 
->just
-> > have to connect using the Network Access Profile without dialing to the
-> > network instead of using the Dial Up Networking.
-> >
-> > Does the PAN profile mention in Bluez serves the same purpose as the 
->Network
-> > Access Profile so that i could access the internet through the phone 
->after
-> > successfully connecting my phone and computer in a PAN. Or do i have to 
->do
-> > in through PPP and do the necessary dialling up after settiing up the 
->phone
-> > as a modem.
-> >
-> > I am using Fedora Core 5 and Sony Ericssion k800i which is GPRS enabled.
-> >
-> > Many Thanks
-> >
-> > Regards
-> > Kelvin
-> >
-> > _________________________________________________________________
-> > Find just what you are after with the more precise, more powerful new 
->MSN
-> > Search. http://search.msn.com.sg/ Try it now.
-> >
-> >
-> > 
->-------------------------------------------------------------------------
-> > Take Surveys. Earn Cash. Influence the Future of IT
-> > Join SourceForge.net's Techsay panel and you'll get the chance to share 
->your
-> > opinions on IT & business topics through brief surveys - and earn cash
-> > 
->http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
->-------------------------------------------------------------------------
->Take Surveys. Earn Cash. Influence the Future of IT
->Join SourceForge.net's Techsay panel and you'll get the chance to share 
->your
->opinions on IT & business topics through brief surveys - and earn cash
->http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
->_______________________________________________
->Bluez-users mailing list
->Bluez-users@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-users
-
-_________________________________________________________________
-Get an advanced look at the new version of Windows Live Messenger. 
-http://get.live.com/messenger/overview
-
-
-
---===============1019452201==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1019452201==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1019452201==--
+SGVsbG8sCgp0aGlzIGxpbms6IGh0dHA6Ly9ibHVlei5zb3VyY2Vmb3JnZS5uZXQvY29udHJpYi9I
+T1dUTy1QQU4gd2lsbCBleHBsYWluCnlvdSBob3d0byB0byBhY2Nlc3MgSW50ZXJuZXQgdGhyb3Vn
+aCB5b3VyIGNvbXB1dGVyIHdpdGggUEFOIHByb2ZpbGUuCgpSZWdhcmRzLAoKT2xpdmllcgpMZSB2
+ZW5kcmVkaSAwMSBkw6ljZW1icmUgMjAwNiDDoCAyMToxNCArMDgwMCwgS2VsdmluIFh1IGEgw6lj
+cml0IDoKPiBIaSwKPiAKPiBJIHdvdWxkIGxpa2UgdG8gY29ubmVjdCB0byB0aGUgaW50ZXJuZXQg
+dGhyb3VnaCBteSBoYW5kcGhvbmUgb3ZlciBCbHVldG9vdGggCj4gaW4gbXkgTGludXggQ29tcHV0
+ZXIuIEkgaGF2ZSB0cmllZCB0aGF0IHVzaW5nIHRoZSBXaW5kb3dzIE9TIGluIHdoaWNoIGkganVz
+dCAKPiBoYXZlIHRvIGNvbm5lY3QgdXNpbmcgdGhlIE5ldHdvcmsgQWNjZXNzIFByb2ZpbGUgd2l0
+aG91dCBkaWFsaW5nIHRvIHRoZSAKPiBuZXR3b3JrIGluc3RlYWQgb2YgdXNpbmcgdGhlIERpYWwg
+VXAgTmV0d29ya2luZy4KPiAKPiBEb2VzIHRoZSBQQU4gcHJvZmlsZSBtZW50aW9uIGluIEJsdWV6
+IHNlcnZlcyB0aGUgc2FtZSBwdXJwb3NlIGFzIHRoZSBOZXR3b3JrIAo+IEFjY2VzcyBQcm9maWxl
+IHNvIHRoYXQgaSBjb3VsZCBhY2Nlc3MgdGhlIGludGVybmV0IHRocm91Z2ggdGhlIHBob25lIGFm
+dGVyIAo+IHN1Y2Nlc3NmdWxseSBjb25uZWN0aW5nIG15IHBob25lIGFuZCBjb21wdXRlciBpbiBh
+IFBBTi4gT3IgZG8gaSBoYXZlIHRvIGRvIAo+IGluIHRocm91Z2ggUFBQIGFuZCBkbyB0aGUgbmVj
+ZXNzYXJ5IGRpYWxsaW5nIHVwIGFmdGVyIHNldHRpaW5nIHVwIHRoZSBwaG9uZSAKPiBhcyBhIG1v
+ZGVtLgo+IAo+IEkgYW0gdXNpbmcgRmVkb3JhIENvcmUgNSBhbmQgU29ueSBFcmljc3Npb24gazgw
+MGkgd2hpY2ggaXMgR1BSUyBlbmFibGVkLgo+IAo+IE1hbnkgVGhhbmtzCj4gCj4gUmVnYXJkcwo+
+IEtlbHZpbgo+IAo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fCj4gRmluZCBqdXN0IHdoYXQgeW91IGFyZSBhZnRlciB3aXRo
+IHRoZSBtb3JlIHByZWNpc2UsIG1vcmUgcG93ZXJmdWwgbmV3IE1TTiAKPiBTZWFyY2guIGh0dHA6
+Ly9zZWFyY2gubXNuLmNvbS5zZy8gVHJ5IGl0IG5vdy4KPiAKPiAKPiAtLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+Cj4gVGFrZSBTdXJ2ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9mIElUCj4g
+Sm9pbiBTb3VyY2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBj
+aGFuY2UgdG8gc2hhcmUgeW91cgo+IG9waW5pb25zIG9uIElUICYgYnVzaW5lc3MgdG9waWNzIHRo
+cm91Z2ggYnJpZWYgc3VydmV5cyAtIGFuZCBlYXJuIGNhc2gKPiBodHRwOi8vd3d3LnRlY2hzYXku
+Y29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCj4g
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KPiBCbHVlei11
+c2VycyBtYWlsaW5nIGxpc3QKPiBCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPiBo
+dHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2VycwoK
+Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0KVGFrZSBTdXJ2ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5jZSB0aGUg
+RnV0dXJlIG9mIElUCkpvaW4gU291cmNlRm9yZ2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91
+J2xsIGdldCB0aGUgY2hhbmNlIHRvIHNoYXJlIHlvdXIKb3BpbmlvbnMgb24gSVQgJiBidXNpbmVz
+cyB0b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0gYW5kIGVhcm4gY2FzaApodHRwOi8vd3d3
+LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9
+REVWREVWCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJs
+dWV6LXVzZXJzIG1haWxpbmcgbGlzdApCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQK
+aHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
