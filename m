@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
+Date: Fri, 1 Dec 2006 08:59:58 -0500
+From: Martin Stolle <mstoll@sus.mcgill.ca>
 To: bluez-devel@lists.sourceforge.net
-Date: Fri, 1 Dec 2006 10:33:06 -0500
-References: <002901c710a8$0eab3580$0100a8c0@kayleigh>
-	<200611301212.39250.akohlsmith-bluez@mixdown.ca>
-	<Pine.LNX.4.63.0612011415350.9177@redbean.intranet.gw-instruments.de>
-In-Reply-To: <Pine.LNX.4.63.0612011415350.9177@redbean.intranet.gw-instruments.de>
+Message-ID: <20061201135958.GA14926@sus.mcgill.ca>
+References: <1164939683.18828.24.camel@TesterBox.tester.ca>
+	<456FD9EE.1070000@prolly.org>
 MIME-Version: 1.0
-Message-Id: <200612011033.06755.akohlsmith-bluez@benshaw.com>
-Subject: Re: [Bluez-devel] Master / Slave question
+In-Reply-To: <456FD9EE.1070000@prolly.org>
+Subject: Re: [Bluez-devel] mx5000tools 0.1
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,25 +21,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Friday 01 December 2006 08:22, Peter Wippich wrote:
-> I think the confusion was caused by the limitations introduced with the
-> device roles: master and slave. So most modern devices support the
-> following:
->
-> Master with up to 7 slaves.
-> Master to (6 ?) slaves and Slave to 1 Master.
-> Slave to 2 Masters.
+How DID you get it into HCI mode?
 
-...
+Martin
 
-> No, the other way round. Always try to become a master to be able to
-> service additional connections and let the phone be the slave. See above
-> for the reason.
-
-Thank you for clearing this up.  I don't pretend to "get it" just yet, but 
-thank you again for taking the time to explain it.  :-)
-
--A.
+On Fri, Dec 01, 2006 at 02:29:50AM -0500, Douglas Ward wrote:
+> good work, i'll try it out tomorrow. maybe i can help figure out this 
+> image issue. I'd hate to be stuck in hid mode after all the searching i 
+> did to get the damn thing into hci mode though...
+> 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
