@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 1 Dec 2006 08:59:58 -0500
-From: Martin Stolle <mstoll@sus.mcgill.ca>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20061201135958.GA14926@sus.mcgill.ca>
-References: <1164939683.18828.24.camel@TesterBox.tester.ca>
-	<456FD9EE.1070000@prolly.org>
+Date: Fri, 1 Dec 2006 14:27:06 +0100 (CET)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BAY108-F9E1C2886FA8EB91A3A20384DA0@phx.gbl>
+Message-ID: <Pine.LNX.4.63.0612011423030.9177@redbean.intranet.gw-instruments.de>
+References: <BAY108-F9E1C2886FA8EB91A3A20384DA0@phx.gbl>
 MIME-Version: 1.0
-In-Reply-To: <456FD9EE.1070000@prolly.org>
-Subject: Re: [Bluez-devel] mx5000tools 0.1
+Subject: Re: [Bluez-devel] packet type
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,15 +20,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-How DID you get it into HCI mode?
 
-Martin
+Hi Mark, 
 
-On Fri, Dec 01, 2006 at 02:29:50AM -0500, Douglas Ward wrote:
-> good work, i'll try it out tomorrow. maybe i can help figure out this 
-> image issue. I'd hate to be stuck in hid mode after all the searching i 
-> did to get the damn thing into hci mode though...
-> 
+On Fri, 1 Dec 2006, mark bernard wrote:
+> hi,
+> is it possible to force bluez to use a self chosen packet type like DH5? or 
+> will it automatically switch to the best packet type?
+
+You can set a Mask which packets types the baseband is allowed to use (see 
+hcid.conf). However, from the allowed packet types the baseband chooses 
+which one it actually uses . Further, some basenband implementations seems 
+to interpret this "mask" differently (e.g. when you set the mask to DH5 
+the baseband also uses all smaller packet types). 
+
+Ciao, 
+ 
+Peter 
+
+
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
