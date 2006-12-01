@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY117-F9D2CC50F1BBB92B421116BFDA0@phx.gbl>
-From: "Kelvin Xu" <kyoxu@hotmail.com>
-To: bluez-users@lists.sourceforge.net
-Date: Fri, 01 Dec 2006 21:14:03 +0800
-Mime-Version: 1.0
-Subject: [Bluez-users] PAN connection to a handphone
+From: CIJOML <cijoml@volny.cz>
+To: bluez-users@lists.sf.net
+Date: Fri, 1 Dec 2006 11:13:57 +0100
+MIME-Version: 1.0
+Message-Id: <200612011113.57351.cijoml@volny.cz>
+Subject: [Bluez-users] iptraf doesn't list / gathers statistics for bnep0
+	interface
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,40 +15,36 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-2"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Marcel,
 
-I would like to connect to the internet through my handphone over Bluetooth 
-in my Linux Computer. I have tried that using the Windows OS in which i just 
-have to connect using the Network Access Profile without dialing to the 
-network instead of using the Dial Up Networking.
+I just noticed, that bnep0 doesn't gathers bnep0 statistics.
 
-Does the PAN profile mention in Bluez serves the same purpose as the Network 
-Access Profile so that i could access the internet through the phone after 
-successfully connecting my phone and computer in a PAN. Or do i have to do 
-in through PPP and do the necessary dialling up after settiing up the phone 
-as a modem.
+bnep0     Zapouzd=F8en=ED:Ethernet  HWadr 00:0D:88:XX:XX:XX
+          inet adr:192.168.56.1  V=B9esm=ECr:192.168.56.255 Maska:255.255.2=
+55.0
+          AKTIVOV=C1NO V=A9ESM=CCROV=C9_VYS=CDL=C1N=CD B=CC=AE=CD MULTICAST=
+  MTU:1500  Metrika:1
+          RX packets:2767 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:4494 errors:0 dropped:0 overruns:0 carrier:0
+          koliz=ED:0 d=E9lka odchoz=ED fronty:1000
+          RX bytes:164767 (160.9 KiB)  TX bytes:6557844 (6.2 MiB)
 
-I am using Fedora Core 5 and Sony Ericssion k800i which is GPRS enabled.
+Should this be fixed?
 
-Many Thanks
+thanks a lot
 
-Regards
-Kelvin
-
-_________________________________________________________________
-Find just what you are after with the more precise, more powerful new MSN 
-Search. http://search.msn.com.sg/ Try it now.
-
+Michal
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
