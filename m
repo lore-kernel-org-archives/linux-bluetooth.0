@@ -1,11 +1,9 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d1a198ae0612020905p4a923507me9a4fbaff9ff9b9e@mail.gmail.com>
-Date: Sat, 2 Dec 2006 18:05:52 +0100
-From: "=?UTF-8?Q?Kristoffer_Lund=C3=A9n?=" <kristoffer.lunden@gamemaker.nu>
-To: "Glen Rolle" <g.len@gmx.de>
-In-Reply-To: <20061202164846.252080@gmx.net>
+Date: Sat, 02 Dec 2006 17:48:46 +0100
+From: "Glen Rolle" <g.len@gmx.de>
+Message-ID: <20061202164846.252080@gmx.net>
 MIME-Version: 1.0
-References: <20061202164846.252080@gmx.net>
+To: kristoffer.lunden@gamemaker.nu
 Cc: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] DiNovo + Ubuntu edgy, hid2hci is not working
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -17,131 +15,55 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1602713724=="
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1602713724==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_13005_29612822.1165079152638"
+Hi,
 
-------=_Part_13005_29612822.1165079152638
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+I found your mail on the bluez mailing list that you have trouble switching=
+ your DiNovo to bluetooth mode. The problem is, that Logitech has changed I=
+Ds when releasing the Laser-version.
 
-SGVsbG8gR2xlbiwKCmF3ZXNvbWUuIFNpbXBseSBhd2Vzb21lLiA6KSBJJ20gaGFwcHkgYm90aCB0
-aGF0IHRoZXJlJ3MgYSBzb2x1dGlvbiBhbmQgdGhhdAp0aGVyZSBpcyBhbiBleHBsYW5hdGlvbiBm
-b3IgdGhpcyEKCkkgYWxzbyBob3BlIHRoaXMgbWFrZXMgaW50byBCbHVleiBzb29uZXIgcmF0aGVy
-IHRoYW4gbGF0ZXIsIGF0IGxlYXN0IG5vdyBJCm1pZ2h0IGJlIGFibGUgdG8gb3V0IGhvdyB0byBm
-aXggYSBwYXRjaGVkIHZlcnNpb24gZm9yIG15c2VsZiBpbiB0aGUKbWVhbnRpbWUuIDstKQoKQWdh
-aW4sIHRoYW5rcyBhIGJ1bmNoIGZvciB5b3VyIHJlcGx5IQoKLS0gU3RvZmZlCgpPbiAxMi8yLzA2
-LCBHbGVuIFJvbGxlIDxnLmxlbkBnbXguZGU+IHdyb3RlOgo+Cj4gSGksCj4KPiBJIGZvdW5kIHlv
-dXIgbWFpbCBvbiB0aGUgYmx1ZXogbWFpbGluZyBsaXN0IHRoYXQgeW91IGhhdmUgdHJvdWJsZQo+
-IHN3aXRjaGluZyB5b3VyIERpTm92byB0byBibHVldG9vdGggbW9kZS4gVGhlIHByb2JsZW0gaXMs
-IHRoYXQgTG9naXRlY2ggaGFzCj4gY2hhbmdlZCBJRHMgd2hlbiByZWxlYXNpbmcgdGhlIExhc2Vy
-LXZlcnNpb24uCj4KPiBUaGUgZm9sbG93aW5nIHBhdGNoIHdpbGwgc29sdmUgeW91ciBwcm9ibGVt
-LiAoQXQgbGVhc3QgSSBob3BlIHNvIDotKSApCj4KPiBJIGhhdmUgcG9zdGVkIHRoaXMgcGF0Y2gg
-dG8gdGhlIGRldmVsIGxpc3QgYnV0IGdvdCBubyByZWFjdGlvbiBmcm9tIHRoZQo+IHJlc3BvbnNp
-YmxlIHBlcnNvbnMuIFNvIEkgZG8gbm90IGtub3cgd2hldGhlciB0aGlzIHBhdGNoIHdpbGwgYmUg
-aW50ZWdyYXRlZAo+IGluIGJsdWV6IHNvbWUgZGF5Lgo+Cj4gR29vZCBsdWNrLAo+Cj4gRy5sZW4K
-Pgo+IC0tLSBoaWQyaGNpLmMuZGlub3ZvLmRpZmYgICAgICAgMjAwNi0xMC0wMSAyMjozOTo1NS4w
-MDAwMDAwMDAgKzAyMDAKPiArKysgdG9vbHMvaGlkMmhjaS5jICAgICAyMDA2LTEwLTAxIDIyOjQ1
-OjUwLjAwMDAwMDAwMCArMDIwMAo+IEBAIC0yMjMsNyArMjIzLDkgQEAKPiAgICAgICAgICB7IEhD
-SSwgMHgwNDZkLCAweGM3MDMsIHN3aXRjaF9sb2dpdGVjaCB9LAo+ICAgICAgICAgIHsgSENJLCAw
-eDA0NmQsIDB4YzcwNCwgc3dpdGNoX2xvZ2l0ZWNoIH0sCj4gICAgICAgICAgeyBIQ0ksIDB4MDQ2
-ZCwgMHhjNzA1LCBzd2l0Y2hfbG9naXRlY2ggfSwKPiAgICAgICAgICB7IEhDSSwgMHgwNDZkLCAw
-eGM3MGEsIHN3aXRjaF9sb2dpdGVjaCB9LCAgICAgICAvKiBMb2dpdGVjaAo+IGRpTm92byBtb3Vz
-ZSAqLwo+ICsgICAgICAgeyBIQ0ksIDB4MDQ2ZCwgMHhjNzBiLCBzd2l0Y2hfbG9naXRlY2ggfSwg
-ICAgICAgLyogTG9naXRlY2ggZGlOb3ZvCj4gTGFzZXIga2V5Ym9hcmQgKi8KPiArICAgICAgIHsg
-SENJLCAweDA0NmQsIDB4YzcwYywgc3dpdGNoX2xvZ2l0ZWNoIH0sICAgICAgIC8qIExvZ2l0ZWNo
-IGRpTm92bwo+IExhc2VyIG1vdXNlICovCj4gICAgICAgICAgeyBIQ0ksIDB4MDQ2ZCwgMHhjNzBl
-LCBzd2l0Y2hfbG9naXRlY2ggfSwgICAgICAgLyogbG9naXRlY2gKPiBkaU5vdm8ga2V5Ym9hcmQg
-Ki8KPiAgICAgICAgICB7IC0xIH0KPiAgIH07Cj4gLS0KPiBEZXIgR01YIFNtYXJ0U3VyZmVyIGhp
-bGZ0IGJpcyB6dSA3MCUgSWhyZXIgT25saW5la29zdGVuIHp1IHNwYXJlbiEKPiBJZGVhbCBmw7xy
-IE1vZGVtIHVuZCBJU0ROOiBodHRwOi8vd3d3LmdteC5uZXQvZGUvZ28vc21hcnRzdXJmZXIKPgoK
-CgotLSAKS3Jpc3RvZmZlciBMdW5kw6luCuKciSBrcmlzdG9mZmVyLmx1bmRlbkBnbWFpbC5jb20K
-4pyJIGtyaXN0b2ZmZXIubHVuZGVuQGdhbWVtYWtlci5udQpodHRwOi8vd3d3LmdhbWVtYWtlci5u
-dS8K4piOIDA3MDQgNDggOTggNzcK
-------=_Part_13005_29612822.1165079152638
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+The following patch will solve your problem. (At least I hope so :-) )
 
-SGVsbG8gR2xlbiwgPGJyPjxicj5hd2Vzb21lLiBTaW1wbHkgYXdlc29tZS4gOikgSSdtIGhhcHB5
-IGJvdGggdGhhdCB0aGVyZSdzIGEgc29sdXRpb24gYW5kIHRoYXQgdGhlcmUgaXMgYW4gZXhwbGFu
-YXRpb24gZm9yIHRoaXMhPGJyPjxicj5JIGFsc28gaG9wZSB0aGlzIG1ha2VzIGludG8gQmx1ZXog
-c29vbmVyIHJhdGhlciB0aGFuIGxhdGVyLCBhdCBsZWFzdCBub3cgSSBtaWdodCBiZSBhYmxlIHRv
-IG91dCBob3cgdG8gZml4IGEgcGF0Y2hlZCB2ZXJzaW9uIGZvciBteXNlbGYgaW4gdGhlIG1lYW50
-aW1lLiA7LSkKPGJyPjxicj5BZ2FpbiwgdGhhbmtzIGEgYnVuY2ggZm9yIHlvdXIgcmVwbHkhPGJy
-Pjxicj4tLSBTdG9mZmU8YnI+PGJyPjxkaXY+PHNwYW4gY2xhc3M9ImdtYWlsX3F1b3RlIj5PbiAx
-Mi8yLzA2LCA8YiBjbGFzcz0iZ21haWxfc2VuZGVybmFtZSI+R2xlbiBSb2xsZTwvYj4gJmx0Ozxh
-IGhyZWY9Im1haWx0bzpnLmxlbkBnbXguZGUiPmcubGVuQGdteC5kZTwvYT4mZ3Q7IHdyb3RlOjwv
-c3Bhbj4KPGJsb2NrcXVvdGUgY2xhc3M9ImdtYWlsX3F1b3RlIiBzdHlsZT0iYm9yZGVyLWxlZnQ6
-IDFweCBzb2xpZCByZ2IoMjA0LCAyMDQsIDIwNCk7IG1hcmdpbjogMHB0IDBwdCAwcHQgMC44ZXg7
-IHBhZGRpbmctbGVmdDogMWV4OyI+SGksPGJyPjxicj5JIGZvdW5kIHlvdXIgbWFpbCBvbiB0aGUg
-Ymx1ZXogbWFpbGluZyBsaXN0IHRoYXQgeW91IGhhdmUgdHJvdWJsZSBzd2l0Y2hpbmcgeW91ciBE
-aU5vdm8gdG8gYmx1ZXRvb3RoIG1vZGUuIFRoZSBwcm9ibGVtIGlzLCB0aGF0IExvZ2l0ZWNoIGhh
-cyBjaGFuZ2VkIElEcyB3aGVuIHJlbGVhc2luZyB0aGUgTGFzZXItdmVyc2lvbi4KPGJyPjxicj5U
-aGUgZm9sbG93aW5nIHBhdGNoIHdpbGwgc29sdmUgeW91ciBwcm9ibGVtLiAoQXQgbGVhc3QgSSBo
-b3BlIHNvIDotKSApPGJyPjxicj5JIGhhdmUgcG9zdGVkIHRoaXMgcGF0Y2ggdG8gdGhlIGRldmVs
-IGxpc3QgYnV0IGdvdCBubyByZWFjdGlvbiBmcm9tIHRoZSByZXNwb25zaWJsZSBwZXJzb25zLiBT
-byBJIGRvIG5vdCBrbm93IHdoZXRoZXIgdGhpcyBwYXRjaCB3aWxsIGJlIGludGVncmF0ZWQgaW4g
-Ymx1ZXogc29tZSBkYXkuCjxicj48YnI+R29vZCBsdWNrLDxicj48YnI+Ry5sZW48YnI+PGJyPi0t
-LSBoaWQyaGNpLmMuZGlub3ZvLmRpZmYmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsgMjAwNi0xMC0wMSAyMjozOTo1NS4wMDAwMDAwMDAgKzAyMDA8YnI+KysrIHRvb2xzL2hpZDJo
-Y2kuYyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyAyMDA2LTEwLTAxIDIyOjQ1OjUwLjAwMDAwMDAw
-MCArMDIwMDxicj5AQCAtMjIzLDcgKzIyMyw5IEBAPGJyPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyB7IEhDSSwgMHgwNDZkLCAweGM3MDMsIHN3aXRjaF9s
-b2dpdGVjaCB9LAo8YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-Jm5ic3A7IHsgSENJLCAweDA0NmQsIDB4YzcwNCwgc3dpdGNoX2xvZ2l0ZWNoIH0sPGJyPiZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyB7IEhDSSwgMHgwNDZk
-LCAweGM3MDUsIHN3aXRjaF9sb2dpdGVjaCB9LDxicj4mbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsm
-bmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgeyBIQ0ksIDB4MDQ2ZCwgMHhjNzBhLCBzd2l0Y2hfbG9n
-aXRlY2ggfSwmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgLyogTG9naXRlY2gg
-ZGlOb3ZvIG1vdXNlICovPGJyPiArJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7
-IHsgSENJLCAweDA0NmQsIDB4YzcwYiwgc3dpdGNoX2xvZ2l0ZWNoIH0sJm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IC8qIExvZ2l0ZWNoIGRpTm92byBMYXNlciBrZXlib2FyZCAq
-Lwo8YnI+ICsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgeyBIQ0ksIDB4MDQ2
-ZCwgMHhjNzBjLCBzd2l0Y2hfbG9naXRlY2ggfSwmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJz
-cDsmbmJzcDsgLyogTG9naXRlY2ggZGlOb3ZvIExhc2VyIG1vdXNlICovPGJyPiZuYnNwOyZuYnNw
-OyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyB7IEhDSSwgMHgwNDZkLCAweGM3
-MGUsIHN3aXRjaF9sb2dpdGVjaCB9LCZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNw
-OyAvKiBsb2dpdGVjaCBkaU5vdm8ga2V5Ym9hcmQgKi88YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5i
-c3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHsgLTEgfTxicj4mbmJzcDsmbmJzcDt9Ozxicj4t
-LTxicj4KRGVyIEdNWCBTbWFydFN1cmZlciBoaWxmdCBiaXMgenUgNzAlIElocmVyIE9ubGluZWtv
-c3RlbiB6dSBzcGFyZW4hPGJyPklkZWFsIGbDvHIgTW9kZW0gdW5kIElTRE46IDxhIGhyZWY9Imh0
-dHA6Ly93d3cuZ214Lm5ldC9kZS9nby9zbWFydHN1cmZlciI+aHR0cDovL3d3dy5nbXgubmV0L2Rl
-L2dvL3NtYXJ0c3VyZmVyPC9hPjxicj48L2Jsb2NrcXVvdGU+PC9kaXY+PGJyPjxiciBjbGVhcj0i
-YWxsIj4KPGJyPi0tIDxicj5LcmlzdG9mZmVyIEx1bmTDqW48YnI+4pyJIDxhIGhyZWY9Im1haWx0
-bzprcmlzdG9mZmVyLmx1bmRlbkBnbWFpbC5jb20iPmtyaXN0b2ZmZXIubHVuZGVuQGdtYWlsLmNv
-bTwvYT48YnI+4pyJIDxhIGhyZWY9Im1haWx0bzprcmlzdG9mZmVyLmx1bmRlbkBnYW1lbWFrZXIu
-bnUiPmtyaXN0b2ZmZXIubHVuZGVuQGdhbWVtYWtlci5udTwvYT48YnI+PGEgaHJlZj0iaHR0cDov
-L3d3dy5nYW1lbWFrZXIubnUvIj4KaHR0cDovL3d3dy5nYW1lbWFrZXIubnUvPC9hPjxicj7imI4g
-MDcwNCA0OCA5OCA3Nzxicj4K
-------=_Part_13005_29612822.1165079152638--
+I have posted this patch to the devel list but got no reaction from the res=
+ponsible persons. So I do not know whether this patch will be integrated in=
+ bluez some day.
 
+Good luck,
 
---===============1602713724==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+G.len
+
+--- hid2hci.c.dinovo.diff       2006-10-01 22:39:55.000000000 +0200
++++ tools/hid2hci.c     2006-10-01 22:45:50.000000000 +0200
+@@ -223,7 +223,9 @@
+         { HCI, 0x046d, 0xc703, switch_logitech },
+         { HCI, 0x046d, 0xc704, switch_logitech },
+         { HCI, 0x046d, 0xc705, switch_logitech },
+         { HCI, 0x046d, 0xc70a, switch_logitech },       /* Logitech diNovo=
+ mouse */
+ +       { HCI, 0x046d, 0xc70b, switch_logitech },       /* Logitech diNovo=
+ Laser keyboard */
+ +       { HCI, 0x046d, 0xc70c, switch_logitech },       /* Logitech diNovo=
+ Laser mouse */
+         { HCI, 0x046d, 0xc70e, switch_logitech },       /* logitech diNovo=
+ keyboard */
+         { -1 }
+  };
+-- =
+
+Der GMX SmartSurfer hilft bis zu 70% Ihrer Onlinekosten zu sparen! =
+
+Ideal f=FCr Modem und ISDN: http://www.gmx.net/de/go/smartsurfer
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1602713724==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1602713724==--
