@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <e1effdeb0611280457p51b5b9a4vdd003eb8e5f4efab@mail.gmail.com>
-References: <e1effdeb0611280457p51b5b9a4vdd003eb8e5f4efab@mail.gmail.com>
-Date: Sun, 03 Dec 2006 15:04:17 +0100
-Message-Id: <1165154657.19590.49.camel@localhost>
+In-Reply-To: <e1effdeb0611280555m1aef46f5i33cd495290366daf@mail.gmail.com>
+References: <e1effdeb0611280555m1aef46f5i33cd495290366daf@mail.gmail.com>
+Date: Sun, 03 Dec 2006 15:00:45 +0100
+Message-Id: <1165154445.19590.45.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [DBUS] Service Agent Security
+Subject: Re: [Bluez-devel] [DBUS] Service - ListUsers and RemoveUser
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,32 +22,23 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Claudio,
 
-> In the new service interface, hcid will work as a proxy routing
-> messages from/to clients to service agents. We added verifications
-> based on the message sender field in the hcid, but it is missing add
-> some security verification in the service agent side.  If someone
-> wants to send a message directly to the service agent it is possible!
-> eg:
-> dbus-send --system --dest=":1.5" --type=method_call --print-reply
-> /org/bluez/service_agent_12094 org.bluez.ServiceAgent.Start
+> I have another question about the service interface methods. We
+> discussed a lot of stuff in the last meeting, but I don't remember
+> exactly how some methods should work.
 > 
-> I started the investigation how avoid clients send messages directly
-> to the Service Agents. I don't think it's possible add rules in the
-> /etc/dbus-1/system.d/bluetooth.conf file to block that. Do you know
-> how create this rule? It is possible? (As long as I can remember our
-> last discussion, service agents will not have D-Bus configuration
-> files.)
-> 
-> Another option is let the Service Agent check this, I mean extract the
-> sender and only accept message from the hcid. We have the same problem
-> with authorization and passkey agents.
-> 
-> Comments? Is it really necessary check this or we can leave it open?
+> ListUsers is a method to retrieve the connected devices related to a
+> specific service. How it is possible track the current connected
+> remote devices? I guess it should be tracked inside the hcid without
+> any interaction with the service agent, right?
 
-I don't know how to create the rule, but the agent implementation should
-not be bothered at all. If we need to have a config file per agent, then
-this is also not a big problem. An agent that is serious about security
-will implement such config file.
+it should be done in hcid without interaction of the service agents if
+possible. Currently I have no idea on how we do this.
+
+> RemoveUser removes a user of the service. If it is removed should it
+> be automatically disconnected too?
+
+This depends on. If it has no permission to use any other service then
+it should be definitely disconnected.
 
 Regards
 
