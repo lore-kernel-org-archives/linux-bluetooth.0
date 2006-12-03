@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200612011113.57351.cijoml@volny.cz>
-References: <200612011113.57351.cijoml@volny.cz>
-Date: Sun, 03 Dec 2006 14:36:46 +0100
-Message-Id: <1165153006.19590.14.camel@localhost>
+In-Reply-To: <BAY117-F1856009F5F7FD75709425BBFDA0@phx.gbl>
+References: <BAY117-F1856009F5F7FD75709425BBFDA0@phx.gbl>
+Date: Sun, 03 Dec 2006 14:35:37 +0100
+Message-Id: <1165152937.19590.12.camel@localhost>
 Mime-Version: 1.0
-Cc: bluez-users@lists.sf.net
-Subject: Re: [Bluez-users] iptraf doesn't list / gathers statistics
-	for	bnep0 interface
+Subject: Re: [Bluez-users] PAN connection to a handphone
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,29 +16,33 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGkgTWljaGFsLAoKPiBJIGp1c3Qgbm90aWNlZCwgdGhhdCBibmVwMCBkb2Vzbid0IGdhdGhlcnMg
-Ym5lcDAgc3RhdGlzdGljcy4KPiAKPiBibmVwMCAgICAgWmFwb3V6ZMWZZW7DrTpFdGhlcm5ldCAg
-SFdhZHIgMDA6MEQ6ODg6WFg6WFg6WFgKPiAgICAgICAgICAgaW5ldCBhZHI6MTkyLjE2OC41Ni4x
-ICBWxaFlc23Em3I6MTkyLjE2OC41Ni4yNTUgTWFza2E6MjU1LjI1NS4yNTUuMAo+ICAgICAgICAg
-ICBBS1RJVk9Ww4FOTyBWxaBFU03EmlJPVsOJX1ZZU8ONTMOBTsONIELEmsW9w40gTVVMVElDQVNU
-ICBNVFU6MTUwMCAgTWV0cmlrYToxCj4gICAgICAgICAgIFJYIHBhY2tldHM6Mjc2NyBlcnJvcnM6
-MCBkcm9wcGVkOjAgb3ZlcnJ1bnM6MCBmcmFtZTowCj4gICAgICAgICAgIFRYIHBhY2tldHM6NDQ5
-NCBlcnJvcnM6MCBkcm9wcGVkOjAgb3ZlcnJ1bnM6MCBjYXJyaWVyOjAKPiAgICAgICAgICAga29s
-aXrDrTowIGTDqWxrYSBvZGNob3rDrSBmcm9udHk6MTAwMAo+ICAgICAgICAgICBSWCBieXRlczox
-NjQ3NjcgKDE2MC45IEtpQikgIFRYIGJ5dGVzOjY1NTc4NDQgKDYuMiBNaUIpCj4gCj4gU2hvdWxk
-IHRoaXMgYmUgZml4ZWQ/CgpvZiBjb3Vyc2UgdGhpcyBzaG91bGQgYmUgZml4ZWQgaWYgaXQgaXMg
-YSBidWcsIGJ1dCBhY3R1YWxseSBJIG5lZWQgdGhhdApvdXRwdXQgaW4gRW5nbGlzaC4gQ3plY2gg
-aXMgbm90IHJlYWxseSBoZWxwZnVsLgoKUmVnYXJkcwoKTWFyY2VsCgoKCi0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0KVGFrZSBTdXJ2ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9mIElUCkpv
-aW4gU291cmNlRm9yZ2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91J2xsIGdldCB0aGUgY2hh
-bmNlIHRvIHNoYXJlIHlvdXIKb3BpbmlvbnMgb24gSVQgJiBidXNpbmVzcyB0b3BpY3MgdGhyb3Vn
-aCBicmllZiBzdXJ2ZXlzIC0gYW5kIGVhcm4gY2FzaApodHRwOi8vd3d3LnRlY2hzYXkuY29tL2Rl
-ZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCl9fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxp
-bmcgbGlzdApCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5z
-b3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
+Hi Kelvin,
+
+> I have read the article. My question if the PAN consisted of only my 
+> computer and my handphone. Would i be able to access the internet through my 
+> handphone which is GPRS enabled.
+
+in general it is as simple as establishing a BNEP connection to your
+cellphone with pand and than run DHCP on the new bnep0 interface. You
+will have Internet access as long as you configured your phone and set
+the correct GPRS AP.
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
