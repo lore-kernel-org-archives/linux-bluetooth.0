@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200611300852.29175.cijoml@volny.cz>
-References: <200611300852.29175.cijoml@volny.cz>
-Date: Sun, 03 Dec 2006 14:47:39 +0100
-Message-Id: <1165153659.19590.28.camel@localhost>
+In-Reply-To: <1aef62250611300052p3ed2a9i1f8e1d236eb4957@mail.gmail.com>
+References: <1aef62250611300052p3ed2a9i1f8e1d236eb4957@mail.gmail.com>
+Date: Sun, 03 Dec 2006 14:46:38 +0100
+Message-Id: <1165153598.19590.26.camel@localhost>
 Mime-Version: 1.0
-Cc: bluez-users@lists.sf.net
-Subject: Re: [Bluez-users] MSI BToes 2.0 core revision
+Subject: Re: [Bluez-users] Hexadecimals (What are they really?)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,20 +20,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Michal,
+Hi David,
 
-> I just bought MSI BToes 2.0
+> Over at Jellingspot (www.jellingspot.com), we have a client/server
+> based location marketing server ... we'd just added (not yet released)
+> "bluecasting" abilities to this server .... in short ... the server
+> scans the area, and should send content to phones.  We have
+> implemented hexadecimal discovery into the server, which basically
+> finds the hexadecimal number of the BT device in question, and would
+> send content to that phone garnered to that phone type ...
 > 
-> It's revision is 19.2 with chip BlueCore4-ROM
+> My understanding was that each hexadecimal was unique for each phone
+> type ... however, it appears that it's unique for each phone...
 > 
-> It has general CSR HCI ID, so it works with XP SP2 without need of installing 
-> any driver which is also gut.
-> 
-> But what surprised me a lot is that -ROM? Does it means that this dongle is 
-> not flashable?
+> Can somebody tell me, precisely, if the hexadecimal is relates to
+> specific phone type, phone chip, phone region, phone brand, or ????  I
+> was under the impression I'd be able to at least tell if the phone
+> would be a Nokia 7650 or 6600 .... is this type of bluepriting
+> possible, or is this beyond what BT allows (or what has been
+> implemented by device makers?)
 
-yes. The -ROM means that this is a ROM based chip and you can't flash it
-with any other firmware. The -External are rare nowadays.
+I actually have no clue what you are talking about. I assume you are
+talking about the BD_ADDR of remote devices and in this case, you can't
+tell the brand or model from that 6 byte value. You can make some wild
+guesses, but that is basically it.
 
 Regards
 
