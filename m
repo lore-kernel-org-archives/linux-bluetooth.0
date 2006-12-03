@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <b5dccebe0612031030v75c15bf6o688a5b198d6d6bb5@mail.gmail.com>
-References: <b5dccebe0612031030v75c15bf6o688a5b198d6d6bb5@mail.gmail.com>
-Date: Sun, 03 Dec 2006 19:40:36 +0100
-Message-Id: <1165171236.19590.65.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Timeout for connections
+Message-ID: <b5dccebe0612031030v75c15bf6o688a5b198d6d6bb5@mail.gmail.com>
+Date: Sun, 3 Dec 2006 19:30:08 +0100
+From: "Mikael Lindqvist" <li.mikael.spam@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-users] Timeout for connections
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,39 +18,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mikael,
+Hello,
 
-> I would like to be able to set a timeout for service discoveries (and
-> eventually for rfcomm connections as well, but so far I've been
-> experimenting with service discoveries). For this I use non blocking
-> sockets by passing SDP_NON_BLOCKING to sdp_connect. Then I use select
-> with a timeout on the socket, and if it times out I call sdp_close.
-> 
-> The problem is that after I have done this I can't use the bluetooth
-> chip for other connections for some time. Dumping the traffic with
-> hcidump, I saw that this is because even though the l2cap socket is
-> closed, the bluetooth chip is still doing the connection in the
-> background. For this connection to actually get canceled the chip
-> needs to be sent a HCI_Create_Connection_Cancel command, but it is not
-> sent when the socket is closed.
+I would like to be able to set a timeout for service discoveries (and
+eventually for rfcomm connections as well, but so far I've been
+experimenting with service discoveries). For this I use non blocking
+sockets by passing SDP_NON_BLOCKING to sdp_connect. Then I use select
+with a timeout on the socket, and if it times out I call sdp_close.
 
-use a 2.6.19 kernel and this command will be sent.
+The problem is that after I have done this I can't use the bluetooth
+chip for other connections for some time. Dumping the traffic with
+hcidump, I saw that this is because even though the l2cap socket is
+closed, the bluetooth chip is still doing the connection in the
+background. For this connection to actually get canceled the chip
+needs to be sent a HCI_Create_Connection_Cancel command, but it is not
+sent when the socket is closed.
 
-> To work around this I made some code to send this command myself
-> before calling sdp_close. This works, but the problem is that you need
-> to be root to send the HCI_Create_Connection_Cancel command. The
-> implication being that if you want to set a timeout for service
-> discovery, you need to be root. And this can't be the case, am I
-> thinking wrong in some fundamental way?
+To work around this I made some code to send this command myself
+before calling sdp_close. This works, but the problem is that you need
+to be root to send the HCI_Create_Connection_Cancel command. The
+implication being that if you want to set a timeout for service
+discovery, you need to be root. And this can't be the case, am I
+thinking wrong in some fundamental way?
 
-Never ever do that this way. The kernel (and the kernel only) should
-control the ACL links.
+Or can this be considered a bug? shouldn't
+HCI_Create_Connection_Cancel be sent automatically on some lower level
+of bluez if you close an l2cap/rfcomm socket while it is connecting?
 
-Regards
+Or is there some other way to set a timeout for l2cap/rfcomm connections?
 
-Marcel
+Thanks in advance,
 
-
+Mikael
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
