@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BAY108-F9E1C2886FA8EB91A3A20384DA0@phx.gbl>
-References: <BAY108-F9E1C2886FA8EB91A3A20384DA0@phx.gbl>
-Date: Sun, 03 Dec 2006 14:37:57 +0100
-Message-Id: <1165153077.19590.16.camel@localhost>
+In-Reply-To: <200612011448.32667.akohlsmith-bluez@benshaw.com>
+References: <200612011448.32667.akohlsmith-bluez@benshaw.com>
+Date: Sun, 03 Dec 2006 14:32:37 +0100
+Message-Id: <1165152757.19590.7.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] packet type
+Subject: Re: [Bluez-devel] "promiscuous mode" for hci devices?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,14 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mark,
+Hi Andrew,
 
-> is it possible to force bluez to use a self chosen packet type like DH5? or 
-> will it automatically switch to the best packet type?
+> It'd be an analog to ethernet's promiscuous mode, where all frames received 
+> are passed up the stack, instead of just the frames matching the devices MAC 
+> addresses.
 
-unless for debugging, don't do this. Let the link manager choose the
-right package type, because it knows what works best. The general rule
-is to enable all available packet types.
+a Bluetooth chip doesn't receive any packets that are not meant for it.
+You must understand that Bluetooth works totally different than for
+example Ethernet or Wireless LAN.
 
 Regards
 
