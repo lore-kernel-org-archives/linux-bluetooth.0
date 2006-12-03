@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <c49421c50611291726g7256e94o3ec1283b19816cfd@mail.gmail.com>
-References: <c49421c50611291726g7256e94o3ec1283b19816cfd@mail.gmail.com>
-Date: Sun, 03 Dec 2006 14:49:37 +0100
-Message-Id: <1165153777.19590.31.camel@localhost>
+In-Reply-To: <200611300852.29175.cijoml@volny.cz>
+References: <200611300852.29175.cijoml@volny.cz>
+Date: Sun, 03 Dec 2006 14:47:39 +0100
+Message-Id: <1165153659.19590.28.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] estimating distance between two devices
+Cc: bluez-users@lists.sf.net
+Subject: Re: [Bluez-users] MSI BToes 2.0 core revision
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,23 +21,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Loreno,
+Hi Michal,
 
-> I need to someway estamate the distance between two bluetooth devices
-> already connected. I thought in using RSSI for this, but RSSI, as far
-> as I know, is not a mandatory feature of bluetooth. Besides, in the
-> tests I have made the scale of the RSSI measurements I got had not a
-> good sensibility as I moved. So now I am thinking on someway measuring
-> the rate of retransmissions for estimating this. 
+> I just bought MSI BToes 2.0
 > 
-> Well, my question is twofold: Does it make any sense the idea of
-> estimating the distance through the rate of retransmissions?? and,
-> does anybody would have some hint in this field??
+> It's revision is 19.2 with chip BlueCore4-ROM
+> 
+> It has general CSR HCI ID, so it works with XP SP2 without need of installing 
+> any driver which is also gut.
+> 
+> But what surprised me a lot is that -ROM? Does it means that this dongle is 
+> not flashable?
 
-you don't get this information without special vendor commands. The
-specification only allows you to use the RSSI and Link Quality value and
-while Link Quality is meant to be vendor specific, the RSSI is not, but
-its usage in various Bluetooth chips is different.
+yes. The -ROM means that this is a ROM based chip and you can't flash it
+with any other firmware. The -External are rare nowadays.
 
 Regards
 
