@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <d7dffb480611280055g6409c2ica54f78d3666674b@mail.gmail.com>
-References: <d7dffb480611280055g6409c2ica54f78d3666674b@mail.gmail.com>
-Date: Sun, 03 Dec 2006 15:05:28 +0100
-Message-Id: <1165154728.19590.51.camel@localhost>
+In-Reply-To: <e1effdeb0611280457p51b5b9a4vdd003eb8e5f4efab@mail.gmail.com>
+References: <e1effdeb0611280457p51b5b9a4vdd003eb8e5f4efab@mail.gmail.com>
+Date: Sun, 03 Dec 2006 15:04:17 +0100
+Message-Id: <1165154657.19590.49.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] RFCOMM connection problem
+Subject: Re: [Bluez-devel] [DBUS] Service Agent Security
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,23 +20,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Claudio,
 
->     I am new to BlueZ, and i downloaded bluez stack and i am runnig
-> test programs. I am running 'hstest.c'. It was working properly. It
-> was successfully opening both rfcomm com & sco connection and
-> audio(wave file) is redirecting to head set. But the problem is : 
+> In the new service interface, hcid will work as a proxy routing
+> messages from/to clients to service agents. We added verifications
+> based on the message sender field in the hcid, but it is missing add
+> some security verification in the service agent side.  If someone
+> wants to send a message directly to the service agent it is possible!
+> eg:
+> dbus-send --system --dest=":1.5" --type=method_call --print-reply
+> /org/bluez/service_agent_12094 org.bluez.ServiceAgent.Start
 > 
->        AT commands passed by headset are not captured at rfcomm
-> socket. Means if i press headset button, as of i understood, it should
-> sned 'AT+CKPD=200\r\n'. But it is not caputured at rfcomm socket in
-> the program, in the same way even volume controls(AT+VGS/M) also. I am
-> not able to get those AT commands from headset. Can anybody say where
-> i am wrong. 
+> I started the investigation how avoid clients send messages directly
+> to the Service Agents. I don't think it's possible add rules in the
+> /etc/dbus-1/system.d/bluetooth.conf file to block that. Do you know
+> how create this rule? It is possible? (As long as I can remember our
+> last discussion, service agents will not have D-Bus configuration
+> files.)
+> 
+> Another option is let the Service Agent check this, I mean extract the
+> sender and only accept message from the hcid. We have the same problem
+> with authorization and passkey agents.
+> 
+> Comments? Is it really necessary check this or we can leave it open?
 
-I have no idea on what you are trying to achieve or what's your problem.
-So you must be more specific. However remember that hstest.c is a test
-and example program and nothing you should use in production.
+I don't know how to create the rule, but the agent implementation should
+not be bothered at all. If we need to have a config file per agent, then
+this is also not a big problem. An agent that is serious about security
+will implement such config file.
 
 Regards
 
