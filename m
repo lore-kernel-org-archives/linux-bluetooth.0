@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <001901c71318$6913da00$0600a8c0@PC581820463305>
-References: <001901c71318$6913da00$0600a8c0@PC581820463305>
-Date: Sun, 03 Dec 2006 14:54:06 +0100
-Message-Id: <1165154046.19590.38.camel@localhost>
+In-Reply-To: <e1effdeb0611281348o4bf50145td6c4463e82da2618@mail.gmail.com>
+References: <e1effdeb0611281348o4bf50145td6c4463e82da2618@mail.gmail.com>
+Date: Sun, 03 Dec 2006 14:52:05 +0100
+Message-Id: <1165153925.19590.35.camel@localhost>
 Mime-Version: 1.0
-Cc: Vicky Sweetser <vicky.sweetser@smartsensorsystems.com>,
-        Jay Johannes <jay.johannes@smartsensorsystems.com>,
-        Les Hammer <les.hammer@smartsensorsystems.com>
-Subject: Re: [Bluez-devel] Question about BlueZ and RFCOMM
+Subject: Re: [Bluez-devel] [PATCH] Trusted devices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,59 +20,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Dave,
+Hi Claudio,
 
-> I have a question about using RFCOMM on BlueZ.  Here is our system:
+> This patch implements the funcionality that we discussed previously
+> and fix some minor bugs:
 > 
->    
->     Linux system with    <-----over the air------->  CSR BC03-MM chip and
->     CSR-based USB dongle                             the STMicroelectronics 
->                                                      STR710 ARM
-> Microprocessor
->                                                      ("micro")
-> 
-> 
-> We want to use the BlueZ RFCOMM library.  On the microprocessor side, I'm
-> using the serial
-> port of the CSR Bluetooth chip so I am able to monitor the serial data
-> stream between the
-> CSR Bluetooth chip and the microprocessor ("micro").
-> 
-> Most of the RFCOMM communication works fine.  On the micro side, I observe
-> that the
-> parameter negotiation happens OK and the RFCOMM connection is established.
-> However,
-> the data I try to send from the Linux system is never received by the micro.
-> What
-> happens instead is that the micro receives these commands from the Bluetooth
-> chip
-> (these are in CSR's format):
->                                 RFC_CONTROL_IND
->                                 RFC_RELEASE_IND
->                                 RFC_CLOSE_IND
->                                 DM_ACL_CLOSED_IND
-> 
-> I also observe that the Linux system, while connection is being established,
-> is sending
-> flow control messages (3, in my case) to the micro.  These are with a credit
-> field of 
-> 4, 5 and 6 for the 3 flow control messages.
-> 
-> Now to my question: Does the micro need to respond to these flow control
-> messages in some
->                     manner to maintain the RFCOMM connection?  Currently the
-> micro doesn't 
->                     respond to the flow control messages.
-> 
-> If it is OK for the micro to not respond to the flow control messages, can
-> someone help me
-> understand what else might be causing the RFCOMM data to not be sent from
-> the Linxu system
-> and what might be causing the RFCOMM connection to be closed down?
+> * new errors added
+> * if the remote device is trusted reply directly instead of ask the
+> authorization agent
+> * fix case sensitive bug
 
-these question should be towards CSR, because you have problems with
-their embedded RFCOMM stack. I have not enough insights to answer this
-properly.
+looks good to me. Please commit it to the CVS.
 
 Regards
 
