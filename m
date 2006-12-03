@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <8cd2fe3d0611272228h3f77ca5k277f5a3731df538d@mail.gmail.com>
-References: <8cd2fe3d0611272228h3f77ca5k277f5a3731df538d@mail.gmail.com>
-Date: Sun, 03 Dec 2006 15:06:51 +0100
-Message-Id: <1165154811.19590.54.camel@localhost>
+In-Reply-To: <d7dffb480611280055g6409c2ica54f78d3666674b@mail.gmail.com>
+References: <d7dffb480611280055g6409c2ica54f78d3666674b@mail.gmail.com>
+Date: Sun, 03 Dec 2006 15:05:28 +0100
+Message-Id: <1165154728.19590.51.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bluetooth application
+Subject: Re: [Bluez-devel] RFCOMM connection problem
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,13 +22,21 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-> i m doing my project porting linux on OMAP1510 and also
-> i want to enable any bluetooth device in linux platform.
-> so please give some guidlines on how to enable bluetooth device.
+>     I am new to BlueZ, and i downloaded bluez stack and i am runnig
+> test programs. I am running 'hstest.c'. It was working properly. It
+> was successfully opening both rfcomm com & sco connection and
+> audio(wave file) is redirecting to head set. But the problem is : 
+> 
+>        AT commands passed by headset are not captured at rfcomm
+> socket. Means if i press headset button, as of i understood, it should
+> sned 'AT+CKPD=200\r\n'. But it is not caputured at rfcomm socket in
+> the program, in the same way even volume controls(AT+VGS/M) also. I am
+> not able to get those AT commands from headset. Can anybody say where
+> i am wrong. 
 
-you must make sure that the Bluetooth kernel modules are available and
-that you have bluez-utils installed. The rest is OMAP specific and I
-simply can't tell you that, because I don't know.
+I have no idea on what you are trying to achieve or what's your problem.
+So you must be more specific. However remember that hstest.c is a test
+and example program and nothing you should use in production.
 
 Regards
 
