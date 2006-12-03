@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: eberhard.hackl@ise-hackl.at,
-        BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200612011603.03063.eberhard.hackl@ise-hackl.at>
-References: <200612011603.03063.eberhard.hackl@ise-hackl.at>
-Date: Sun, 03 Dec 2006 14:33:40 +0100
-Message-Id: <1165152820.19590.9.camel@localhost>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d66c3bdf0612020340r4b44e500i1a6c6ad6917875b7@mail.gmail.com>
+References: <d66c3bdf0612020340r4b44e500i1a6c6ad6917875b7@mail.gmail.com>
+Date: Sun, 03 Dec 2006 14:31:07 +0100
+Message-Id: <1165152667.19590.5.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] BT connection problem
+Subject: Re: [Bluez-users] data fragment
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,25 +20,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Eberhard,
+Hi Uichin,
 
-> I am working with SuSE 10.1 and try to copy photos from my Kodak Easy Share  
-> camera to the computer. The kbluetoothd is started and the usb bluetooth 
-> stick was found. 
-> On sending data the pairing works fine. But after commiting the pin the camera 
-> tells me that there is a connection error. After this the kbluetoothd stays 
-> connected with the camera. 
-> I have no problems to copy data (with obex) from the computer to the camera, 
-> and also the copy of data from the camera to other devices is no problem. So 
-> that means, that there is something wrong on my linux system. 
+> I have an urgent question. I'm sending a 2300B packet from one machine
+> to another machine through L2CAP. I used hcidump to see the
+> fragmentation in L2CAP.
 > 
-> Can anyone help me! I tried to find the problems with hcitool and hciconfig. 
-> But there everything looks fine. Maybe I need a special service for the 
-> camera...
+> I looked at the kernel code, and realized that L2CAP uses "ACL_MTU" to
+> do the fragmentation. hcidump at the sender side shows that
+> 
+> < ACL data: handle 1 flags 0x01 dlen: 120
+> 
+> However, hcidump at the receiver side shows like this:
+> 
+> > ACL data: handle 42 flags 0x01 dlen: 224
+> => 10 times +
+> > ACL data: handle 42 flags 0x01 dlen: 64
+> 
+> Total 2304 (2300B payload + 4 bytes - CID/Length)
+> 
+> What's happening here? At the lower layer (i.e., LMP), pack those
+> packets and then create another ACL packet with length 224 (the size
+> of  DM5 packet). It seems like LMP packs uppper level data packets
+> into current baseband packet format. Is that true?
 
-maybe, but I am not an expert when it comes to the KDE support for
-Bluetooth. However you can run "hcidump -X -V" as root and see what
-happens there.
+I can't give you a clear answer to that. This depends on how the
+firmware on the Bluetooth chip implements the HCI. Sometimes HCI and LMP
+packet size match, but that is not a must.
 
 Regards
 
