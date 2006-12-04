@@ -1,14 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <c303508f0612041519gbcd822du4b29745dbc05faf0@mail.gmail.com>
-Date: Mon, 4 Dec 2006 18:19:01 -0500
-From: "Axel Ruder" <axel.ruder@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1164687712.13955.13.camel@aeonflux.holtmann.net>
+Date: Mon, 4 Dec 2006 16:55:12 +0100 (CET)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200612041031.06996.akohlsmith-bluez@benshaw.com>
+Message-ID: <Pine.LNX.4.63.0612041647550.20046@redbean.intranet.gw-instruments.de>
+References: <200612011448.32667.akohlsmith-bluez@benshaw.com>
+	<200612040855.29496.akohlsmith-bluez@benshaw.com>
+	<1165241266.12640.30.camel@localhost>
+	<200612041031.06996.akohlsmith-bluez@benshaw.com>
 MIME-Version: 1.0
-References: <c303508f0611271806t6e5f0b31u4908ee4234b5e1ad@mail.gmail.com>
-	<1164687538.13955.11.camel@aeonflux.holtmann.net>
-	<1164687712.13955.13.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] Rfcomm kernel crashes (2.6.18.2)
+Subject: Re: [Bluez-devel] "promiscuous mode" for hci devices?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,97 +19,54 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0734038347=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0734038347==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_61025_30338397.1165274341962"
 
-------=_Part_61025_30338397.1165274341962
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi Andrew, 
 
-Hi Marcel,
+> That's what I was getting at; the device *does* see all communications, but 
+> unless there is a method to flip on the equivalent of ethernet's promiscuous 
+> mode, you'll never see anything not intended for you.  Your message suggests 
+> that there is no HCI call to do this, which puts me out of luck.
+> 
+> Have you seen or heard of anyone using two BT devices in a Linux box to 
+> achieve a "man-in-the-middle" type of monitoring system?
 
-thanks a lot! Both problems do not occur any more!
-That is great! Thanks!
+What you're looking for is a Bluetooth Sniffer. Such devices are 
+commercial available and you special low level firmware (never disclosed). 
 
-Axel
+However, your assumption is wrong that the device sees all traffic and 
+simply throw away everthing it is not interested in. 
 
-On 11/27/06, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Axel,
->
-> > > thanks again for your patch. It seems to have fixed the problem
-> > > partially.
-> > > I get a lot less frequent crashes, but unfortunately I now got this
-> > > new error:
-> >
-> > try the attached one.
->
-> actually that one was wrong. Please try this one.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share
-> your
-> opinions on IT & business topics through brief surveys - and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
->
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->
->
->
+To sniff a Bluetooth connection you need the hopping sequence of the 
+master. Unless you don't have this it is impossible to know which channel 
+is used by any two devices to communicate in a given time slot. Not to 
+mention encryption.... 
 
-------=_Part_61025_30338397.1165274341962
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+So even with a bluetooth sniffer you first need to synchronize to the 
+master of a bluetooth connection before you can extract anything useful. 
+Normaly this is done by connecting from the master to the sniffer as a 
+slave. 
 
-Hi Marcel,<br><br>thanks a lot! Both problems do not occur any more!<br>That is great! Thanks!<br><br>Axel<br><br><div><span class="gmail_quote">On 11/27/06, <b class="gmail_sendername">Marcel Holtmann</b> &lt;<a href="mailto:marcel@holtmann.org">
-marcel@holtmann.org</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hi Axel,<br><br>&gt; &gt; thanks again for your patch. It seems to have fixed the problem
-<br>&gt; &gt; partially.<br>&gt; &gt; I get a lot less frequent crashes, but unfortunately I now got this<br>&gt; &gt; new error:<br>&gt;<br>&gt; try the attached one.<br><br>actually that one was wrong. Please try this one.
-<br><br>Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>Take Surveys. Earn Cash. Influence the Future of IT<br>Join SourceForge.net's Techsay panel and you'll get the chance to share your
-<br>opinions on IT &amp; business topics through brief surveys - and earn cash<br><a href="http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV">http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV
-</a><br><br>_______________________________________________<br>Bluez-devel mailing list<br><a href="mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-devel">
-https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br><br><br><br></blockquote></div><br>
+Ciao, 
 
-------=_Part_61025_30338397.1165274341962--
+Peter  
 
 
---===============0734038347==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0734038347==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0734038347==--
