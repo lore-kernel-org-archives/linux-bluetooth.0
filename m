@@ -1,13 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45744CD0.7070101@xmission.com>
-Date: Mon, 04 Dec 2006 09:29:04 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <45739F16.1010204@ucsd.edu>
-In-Reply-To: <45739F16.1010204@ucsd.edu>
-Cc: ocampana@ucsd.edu
-Subject: Re: [Bluez-users] support for a2dp device
+In-Reply-To: <b5dccebe0612040036w43593c77xcb45bdef114ca95f@mail.gmail.com>
+References: <b5dccebe0612031030v75c15bf6o688a5b198d6d6bb5@mail.gmail.com>
+	<1165171236.19590.65.camel@localhost>
+	<b5dccebe0612031122h4d49b82ehb26400eb1e350437@mail.gmail.com>
+	<1165180510.19590.68.camel@localhost>
+	<b5dccebe0612040036w43593c77xcb45bdef114ca95f@mail.gmail.com>
+Date: Mon, 04 Dec 2006 09:45:21 +0100
+Message-Id: <1165221921.12640.11.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Timeout for connections
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,34 +24,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Ottavio
+Hi Mikael,
 
-> I'd like to buy this headphone
-> 
-> http://www.heliumdigital.com/shopping/shopexd.asp?id=65
+> I ended up creating a little helper program that I run suid root that
+> sets the Page Timeout on startup of my application. I also use this
+> program to set the local name and try to force the inquiry mode to get
+> RSSI. I have a feeling that you won't like hearing about this at all
+> and you will probably take the opportunity to tell me I should use
+> D-BUS. Something which I'm thinking about more and more. The problem
+> with D-BUS is just that there is no Obex service available, and I
+> don't want half my application using D-BUS and the other half not. So
+> then I'm thinking more and more about writing a D-BUS Obex service.
+> But before I do that it would be nice to get some feedback on the
+> thoughts I have for that API. Where would be a good place to get that
+> feedback? This mailing list is certanly one place, but what more is
+> there?
 
-they look nice. Some people have had problems with the solid
-around-the-back design cracking in the middle. The set ends up being
-more durable if they have a folding point in the middle. The bluespoon
-spider has that but the mic is not very sensitive so it only works in
-quiet environments.
+first of all, you should call "man hcid.conf" and check the options for
+setting the name and pageto. The inquiry mode is selected automatically
+with bluez-utils-3.x and it picks the best one of course. In case of
+Bluetooth 2.1 hardware this would mean of course extended inquiry. For
+the bluez-utils-2.x we had the inqmode option to do it manually.
 
-> 
-> I read this page
-> 
-> http://bluetooth-alsa.sourceforge.net/build.html
-> 
-> and I wasn't able to understand how good the support of Linux is.
-> 
-> Can I use both the speakers and microphone? I'd like to use it with
-> twinkle, a voip client, and therefore I need bidirectional audio.
+Even using D-Bus only for half of the tasks is still worth using D-Bus
+for whatever possible. You can actually script most of the stuff very
+easily with dbus-send or a small python program.
 
-I improved the docs for this question. Yes, you can use sco mode to do
-mono sound with speaker/mic. We are still working on nice integration
-with the voip apps though so answering, redial, etc are not working from
-the headset.
+And yes, I have plans for a simple OBEX service that allows you to
+handle incoming files, but also send files. However I have no idea when
+I will get around to write that service. Feel free to start with it.
 
-Brad
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
