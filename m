@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200612040855.29496.akohlsmith-bluez@benshaw.com>
+From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
+To: bluez-devel@lists.sourceforge.net
+Date: Mon, 4 Dec 2006 08:55:29 -0500
 References: <200612011448.32667.akohlsmith-bluez@benshaw.com>
 	<1165152757.19590.7.camel@localhost>
-	<200612040855.29496.akohlsmith-bluez@benshaw.com>
-Date: Mon, 04 Dec 2006 15:07:46 +0100
-Message-Id: <1165241266.12640.30.camel@localhost>
-Mime-Version: 1.0
+In-Reply-To: <1165152757.19590.7.camel@localhost>
+MIME-Version: 1.0
+Message-Id: <200612040855.29496.akohlsmith-bluez@benshaw.com>
 Subject: Re: [Bluez-devel] "promiscuous mode" for hci devices?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,34 +21,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Andrew,
+On Sunday 03 December 2006 08:32, Marcel Holtmann wrote:
+> a Bluetooth chip doesn't receive any packets that are not meant for it.
+> You must understand that Bluetooth works totally different than for
+> example Ethernet or Wireless LAN.
 
-> > a Bluetooth chip doesn't receive any packets that are not meant for it.
-> > You must understand that Bluetooth works totally different than for
-> > example Ethernet or Wireless LAN.
-> 
-> With all due respect, that simply cannot be true.  Any device in a shared 
-> medium would by its very nature have to receive all messages in order to 
-> determine whether a message was intended for it.
+With all due respect, that simply cannot be true.  Any device in a shared 
+medium would by its very nature have to receive all messages in order to 
+determine whether a message was intended for it.
 
-if you don't believe me, then feel free to check the specification. A
-Bluetooth device is not actively participating in any communication
-unless you create a piconet. If no piconet exists, then it only scans
-for inquiry and page beacons.
+Ethernet compares the received frame's recipient MAC address to its own.  
+Wifi's similar.  CAN and I2C do the same.  Hell, plain old ModBus does this 
+over RS485, albeit in software.  If BT doesn't have a standard command to do 
+this that's fine, and actually may have been intentionally removed as some 
+kind of security measure.  It seems unlikely that it's impossible, though, 
+and much like cellular phones, the method probably exists, but needs to be 
+reverse-engineered.
 
-This means that even if another piconet has been established right next
-to it, your passive device will ignore it. All chips are designed this
-way and unless you implement your own baseband, you don't see any of
-these beacons at all.
+That's a shame, since it'd make monitoring BT communications so much 
+easier.  :-)
 
-The radio, baseband and link manager are part of the Bluetooth chip and
-not accessible via the host operating system.
+Has anyone experimented with a box with two BT devices in it in order to 
+perform the equivalent man-in-the-middle type of monitoring?
 
-Regards
-
-Marcel
-
-
+-A.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
