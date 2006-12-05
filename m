@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45750E87.5040100@xmission.com>
-Date: Mon, 04 Dec 2006 23:15:35 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <8cd2fe3d0612042131l1335d831r3b3c4b85239624a9@mail.gmail.com>
+Date: Tue, 5 Dec 2006 11:01:34 +0530
+From: "ravindra kumar" <ravikinikeri@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <8cd2fe3d0612042131l1335d831r3b3c4b85239624a9@mail.gmail.com>
-In-Reply-To: <8cd2fe3d0612042131l1335d831r3b3c4b85239624a9@mail.gmail.com>
-Subject: [Bluez-devel] omap1510 Re:  bluetooth
+Subject: [Bluez-devel] bluetooth
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,24 +18,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-ravindra
+hi all...
 
-> This is ravindra currently doing my MS in real time embedded systems
-> in bangalore (india)...right now i m doin my project work.
-> title is "To develop bluetooth communication on OMAP1510 Innovator
-> development kit with the external bluetooth enabled device using linux
-> ( porting linux on OMAP1510)"
+This is ravindra currently doing my MS in real time embedded systems
+in bangalore (india)...right now i m doin my project work.
+title is "To develop bluetooth communication on OMAP1510 Innovator
+development kit with the external bluetooth enabled device using linux
+( porting linux on OMAP1510)"
 
-on the hardware side you'd likely be able to use a uart-connected 
-adapter like I did with gumstix:
-
-http://bluetooth-alsa.sourceforge.net/embed.html
-
-i'm not sure how your software build will look, but you should be able 
-to start with the linux sdk for your dev kit. It's best if you use linux 
-2.6 but 2.4 would probably work for basic bluetooth stuff.
-
-brad
+what type of bluetooth device has to be chose for communicating with
+the OMAP 1510.as we know that OMAP1510 will support bluetooth
+features..
+what will be the procedure  to follow for building bluetooth
+apllication and  i want to enable any external bluetooth device in
+linux platform.
+so please give some guidlines on how to enable bluetooth device.
+thank
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
