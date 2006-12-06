@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4577F18C.2010806@csr.com>
-Date: Thu, 07 Dec 2006 10:48:44 +0000
-From: Steven Singer <steven.singer@csr.com>
+Message-ID: <457734F2.30204@xmission.com>
+Date: Wed, 06 Dec 2006 14:24:02 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <BAY108-F14D0E2C437D8EE10A1C0CF84E50@phx.gbl>
-	<Pine.LNX.4.63.0611281554510.30196@redbean.intranet.gw-instruments.de>
-In-Reply-To: <Pine.LNX.4.63.0611281554510.30196@redbean.intranet.gw-instruments.de>
-Subject: Re: [Bluez-devel] connections
+References: <457655A2.6030001@xmission.com> <45772B71.5020505@vasmac.com>
+In-Reply-To: <45772B71.5020505@vasmac.com>
+Subject: Re: [Bluez-devel] org.bluez.Audio
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,22 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Peter Wippich wrote:
-> No quite sure but it is a problem with your BT chip. It only allows 3 
-> connection. If it is a CSR chip may be soembody has configured it to allow 
-> only 3 ACL connections. You can find out using bccmd. There is a PS-key 
-> named something like MAX_ACL_CONNECTIONS.
+Jose
 
-No. It's not a baseband issue. If it were, the connection would be
-rejected at the HCI level. Instead, the connection is being rejected at
-the L2CAP level indicating that the baseband was happy to accept the
-connection, but something that's nominally in the host has rejected it.
+> I think that bt.audiod should only handle the audio control portion.
+> The audio plugins should do direct bluetooth I/O.
 
-	- Steven
--- 
+I'll update the page then. I won't rule out having bt.audiod manage a 
+file descriptor for the sco channel and pass it around like Fabien did 
+in his daemon. Only one app could use the sco channel at a time.
 
+In the case of a2dp where we're already dealing with long latencies, I 
+would like to have bt.audiod mix, encode, and deliver the audio. The 
+challenge there is to keep the latency consistent so a video player 
+could accommodate it.
 
-To access the latest news from CSR copy this link into a web browser:  http://www.csr.com/email_sig.php
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
