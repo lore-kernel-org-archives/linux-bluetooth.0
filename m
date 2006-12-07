@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <457901E9.6070309@xmission.com>
-Date: Thu, 07 Dec 2006 23:10:49 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Date: Fri, 8 Dec 2006 02:37:07 +0800
+From: amateur <ztl.post@gmail.com>
+To: bluez-devel <bluez-devel@lists.sourceforge.net>
+Message-ID: <20061207183707.GA15790@163.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] alsa plugin querying stream states
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] on which level does hcidump work?
+Reply-To: amateur <ztl.post@gmail.com>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,43 +19,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hey
+I'm encountering a problem that the data I sent through a L2CAP socket
+on my local machine doesn't appear in the output of hcidump on the
+remote machine. But it does appear in the output of hcidump on my
+local machine.
 
-We can connect headsets from a gui and the plan is to have signals
-generated when that happens, but if an audio client is launched *after*
-the streams are opened or started, its plugin needs to be able to find
-out the state of things on startup so it can route audio properly.
+So I'm wondering on which level does hcidump work. Does it work on the
+host-dongle interface? What should I do if I want to monitor all the
+information pass through the host-dongle interface(HCI_USB?). Or can I
+make such an assumption that all the data showed in the output of
+hcidump were sent out through the radio? Can I make such a assumption
+that all the data received was showed up in the output of hcidump?
 
-This would mean some more methods unless you can see another way:
-
-                array{string} ListActiveStreams()
-
-                boolean IsHeadset(string stream)
-
-                        Return true if the stream represents a
-                        headset.
-
-                boolean IsSink(string stream)
-
-                        Return true if the stream represents
-                        A2DP headphones.
-
-                boolean IsPlaying(string stream)
-
-                        Return true if the stream is in a playing
-                        state.
-
-As long as these are here, we might simplify Connect to return both
-kinds of streams for combo headset/a2dp sets.
-
-		array{string} Connect(string bdaddr)
-
-then the array of streams returned can be queried by the methods above.
-
-I really hope we're converging on something... a really simple solution
-has been elusive.
-
-Brad
+-- 
+Be careful!  Is it classified?
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
