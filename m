@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 07 Dec 2006 16:10:56 +0000 (GMT)
-From: leconte.michel@cegetel.net
-To: bluez-users@lists.sourceforge.net
-Message-id: <f376804d3d0.45783d10@cegetel.net>
-MIME-version: 1.0
-Subject: [Bluez-users] Pairing-Authentication
+Message-ID: <45780585.5050502@softmonsters.com>
+Date: Thu, 07 Dec 2006 13:13:57 +0100
+From: Zsolt Barat <zsolt@softmonsters.com>
+MIME-Version: 1.0
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <45755127.6020907@softmonsters.com> <45773D8B.7020403@xmission.com>
+	<4577529E.7000304@softmonsters.com>
+In-Reply-To: <4577529E.7000304@softmonsters.com>
+Subject: Re: [Bluez-users] [PATCH] fix for kernel flow control patch mh7
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,59 +17,81 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1968011898=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1968011898==
-Content-type: text/html; charset=us-ascii
-Content-language: fr
-Content-transfer-encoding: quoted-printable
-Content-disposition: inline
+i tried also 2.6.18-mh8 now. it apllies cleanly and works. the order i
+applied the patches where:
+for gentoo:
+4410-suspend2-2.2.8-for-2.6.18.patch
+4411-x86_64-nosave.patch
 
-=3Cpre=3EHi all=2C=3Cbr=3E=3Cbr=3Eto understand the authentication proce=
-dure=2C I make=3Cbr=3Ea test between 2 entities designed by =22A=22 and =
-=22B=22=2E=3Cbr=3E=3Cbr=3E1=2E A connection is realized without authenti=
-cation between these two entities=2C (they never paired before) =3Cbr=3E=
-=3Cbr=3E2=2E Then entity =22A=22 launches an authentication request=2C=3C=
-br=3E=3Cbr=3E3=2E As they never paired no link key is available for the =
-link =22A=22-=22B=22=2C the pairing procedure =3Cbr=3E   works well (sam=
-e pin code at each side)=3Cbr=3E   =3Cbr=3E=3Cbr=3E4=2E I disconnect the=
- link =22A=22-=22B=22=2C I reconnect =22A=22 and =22B=22 without authent=
-ication=2C=3Cbr=3E=3Cbr=3E5=2E =22A=22 executes an authentication reques=
-t=2C=3Cbr=3E=3Cbr=3E=3Cbr=3EAt this time=2C the authentication procedure=
- doesn=27t need a pairing as a link key is available=2E=3Cbr=3E=3Cbr=3EM=
-y first question is what can I do to force the pairing before an authent=
-ication request  =3F=3Cbr=3EIn other word=2C where can I delete the link=
- key for the link =22A=22-=22B=22 in bluez =3F=3Cbr=3E=3Cbr=3E=3Cbr=3EMy=
- second question=2C is how to configure security in a pan network =3F=3C=
-br=3E=3Cbr=3ECan I set security at the L2CAP level with specific option =
-during the setsockopt =3F=3Cbr=3E=3Cbr=3E=3Cbr=3Ethanks in advance for a=
-ny help or suggestion=3Cbr=3E=3Cbr=3E=3Cbr=3EMichel=3C/pre=3E=3Cbr=3E=3C=
-br=3E=3Cbr=3E=3Cbr=3E---------------------------------------------------=
--------------=3Cbr=3E
+patch-2.6.18-mh8
+bluez-sco-flowcontrol-mh7.patch (without fix)
 
+the two gentoo patches forms the suspend2-source. if someone wants to
+build a non-suspen2/non-gentoo kernel he has to apply the two latest
+ones naturally.
+this would be the safest way to apply the flow-controll patch i think,
+since it implies the mh-patch-set.
 
---===============1968011898==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+regards
+
+zsolt
+
+Zsolt Barat schrieb:
+> Brad Midgley schrieb:
+>> Zsolt
+>>
+>>> attached is a trivially fixed version of the flow-control-patch mh7,
+>>> which could be found on
+>>> http://bluetooth-alsa.sf.net/bluez-sco-flowcontrol-mh7.patch
+>>> to work with gentoo-suspend2-sources and linux-2.6.18-vanilla.
+>>> i don't know which kernel-version it supposed to be apply.
+>>> would be nice to mention it on the website somewhere.
+>> I've linked to Fabien's latest submission and linked to the bluez patch 
+>> page. Fabien's patch is against -mh7 but I will try it against -mh8 to 
+>> se if there are any conflicts.
+> ah, ok now i understand. mh is an extra patch set. i thought mh is
+> already fabians private patch set.
+> then all is probably wrong.
+> nevertheless with the small fix above the flow-control patch applies
+> also against 2.6.18 with suspend2-patches and even to 2.6.18-vanilla.
+> if it has any use it's another question.
+> what i can say for sure is that with the flow-control-patch sco and the
+> alsa-plugin layer works. i had to figure out to do resampling and
+> channel-routing right to get it work. but it was after i applied the patch.
+> btw. the setup with the kernel module is much easier in this regard.
+> 
+>> It would be good to know if suspend2 patches complicate things. I don't 
+>> use suspend2 myself.
+> no, no complications so far. i think suspend2 doesn't touch this areas
+> where flow-control is involved. i have the kernel running on my notebook
+> since i posted the patch. suspend+resume works fine.
+> 
+> regards
+> 
+> zsolt
+> 
+> 
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys - and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1968011898==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1968011898==--
