@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: amateur <ztl.post@gmail.com>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20061208084508.GA3317@163.com>
-References: <20061208084508.GA3317@163.com>
-Date: Fri, 08 Dec 2006 11:24:31 +0100
-Message-Id: <1165573471.5529.24.camel@aeonflux.holtmann.net>
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20061207183707.GA15790@163.com>
+References: <20061207183707.GA15790@163.com>
+Date: Fri, 08 Dec 2006 11:23:54 +0100
+Message-Id: <1165573434.5529.22.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Cc: bluez-devel <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [Bluez-users] How to setup a reliable RFCOMM
-	connection
+Subject: Re: [Bluez-devel] on which level does hcidump work?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,14 +23,21 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-> How to setup a reliable RFCOMM connection, that is, a connection with
-> infinite flush timeout. I find the RFCOMM_LM_RELIABLE option in the
-> example program l2test.c. It compiles, but at runtime setsockopt with
-> RFCOMM_LM give me an error. I'm using kernel-2.4.21 patched by
-> patch-2.4.21-mh10. So what's the problem. Doesn't kernel-2.4.21-mh10
-> support RFCOMM_LM? If so, how can I setup a reliable RFCOMM connection?
+> I'm encountering a problem that the data I sent through a L2CAP socket
+> on my local machine doesn't appear in the output of hcidump on the
+> remote machine. But it does appear in the output of hcidump on my
+> local machine.
+> 
+> So I'm wondering on which level does hcidump work. Does it work on the
+> host-dongle interface? What should I do if I want to monitor all the
+> information pass through the host-dongle interface(HCI_USB?). Or can I
+> make such an assumption that all the data showed in the output of
+> hcidump were sent out through the radio? Can I make such a assumption
+> that all the data received was showed up in the output of hcidump?
 
-the RFCOMM channels are always reliable. No need for any other options.
+you see only HCI packets (hence the name). There is no real way to make
+sure the packet went over the air. In some cases you can make this
+assumption from other stuff that is going on.
 
 Regards
 
