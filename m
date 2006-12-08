@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <9ed2cedd0612080825l42882e3dr7a216b9bb8d9f308@mail.gmail.com>
-Date: Fri, 8 Dec 2006 17:25:45 +0100
-From: "Waldemar Rymarkiewicz" <waldemar.rymarkiewicz@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <45799129.7070406@xmission.com>
+Date: Fri, 08 Dec 2006 09:22:01 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] Are there any docs to BlueZ implementation?
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] rswitch in manpage
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,61 +14,31 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1556362609=="
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1556362609==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_73748_25044890.1165595145044"
-
-------=_Part_73748_25044890.1165595145044
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Can I find any technical docs concernig BlueZ implementation (what, where,
-data flow etc.)?  Is reverse engineering the only way to find out how the
-stuff works?
-I've  worked with Qualcomm BT stack (QBT) and wanna take a look what is
-going on in BlueZ. Unfortunately have not experience with linux kernel
-hacking :/ ....
-
-
-Thanks,
-Waldek
-
-------=_Part_73748_25044890.1165595145044
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<br>Can I find any technical docs concernig BlueZ implementation (what, where, data flow etc.)?&nbsp; Is reverse engineering the only way to find out how the stuff works?<br>I've&nbsp; worked with Qualcomm BT stack (QBT) and wanna take a look what is going on in BlueZ. Unfortunately have not experience with linux kernel hacking :/ ....
-<br><br><br>Thanks,<br>Waldek<br><br><br><br><br><br><br><br><br>
-
-------=_Part_73748_25044890.1165595145044--
-
-
---===============1556362609==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1556362609==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1556362609==--
+SGV5CgpJbiBwcmFjdGljZSBJIGZvdW5kIHRoYXQgZXZlbiB3aXRoIGxtIG1hc3RlciwgSSBoYWQg
+dG8gdGFrZSByc3dpdGNoIG91dCAKb2YgbHAgaW4gb3JkZXIgdG8gZGVueSByb2xlIHN3aXRjaGVz
+LiBUaGVyZSdzIHNvbWUgYW1iaWd1aXR5IGluIHRoZSAKaGNpZC5jb25mIGV4YW1wbGUncyBjb21t
+ZW50IGFuZCB0aGUgaGNpZC5jb25mIG1hbnBhZ2UuCgpJIHdvdWxkIHN1Ym1pdCBhIHBhdGNoIGlm
+IEkgdW5kZXJzdG9vZCB0aGUgaW50ZW5kZWQgaW50ZXJhY3Rpb24gYmV0d2VlbiAKdGhlc2UgdHdv
+IHNldHRpbmdzLgoKVGhlIGhjaWQuY29uZiBtYW5wYWdlIGhhcyB0aGlzIHRvIHNheSBhYm91dCBt
+YXN0ZXIgYW5kIHJzd2l0Y2g6CgpsbSBub25lfGFjY2VwdCxtYXN0ZXIKCm5vbmUgbWVhbnMgbm8g
+c3BlY2lmaWMgcG9saWN5LiBhY2NlcHQgbWVhbnMgYWx3YXlzIGFjY2VwdCBpbmNvbeKAkAppbmcg
+Y29ubmVjdGlvbnMuIG1hc3RlciBtZWFucyBiZWNvbWUgbWFzdGVyIG9uIGluY29taW5nIGNvbm5l
+Y+KAkAp0aW9ucyBhbmQgZGVueSByb2xlIHN3aXRjaCBvbiBvdXRnb2luZyBjb25uZWN0aW9ucy4K
+Ci4uLgpscCAgbm9uZXxyc3dpdGNoLGhvbGQsc25pZmYscGFyawoKcnN3aXRjaDogdGhpcyBpcyBh
+IG1vZGUgdGhhdCBlbmFibGVzIHJvbGUtc3dpdGNoIChtYXN0ZXIgPC0+CnNsYXZlKSBiZXR3ZWVu
+IHR3byBkZXZpY2VzIGluIGEgcGljb25ldC4gSXQgaXMgbm90IGNsZWFyIHdoZXRoZXIKdGhpcyBu
+ZWVkcyB0byBiZSBlbmFibGVkIGluIG9yZGVyIHRvIG1ha2UgdGhlICJsbSBtYXN0ZXIiIHNldOKA
+kAp0aW5nIHdvcmsgcHJvcGVybHkgb3Igbm90LgoKQnJhZAoKLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUYWtl
+IFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQKSm9pbiBTb3Vy
+Y2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFuY2UgdG8g
+c2hhcmUgeW91cgpvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdoIGJyaWVm
+IHN1cnZleXMgLSBhbmQgZWFybiBjYXNoCmh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVmYXVsdC5w
+aHA/cGFnZT1qb2luLnBocCZwPXNvdXJjZWZvcmdlJkNJRD1ERVZERVYKX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0
+CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZv
+cmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
