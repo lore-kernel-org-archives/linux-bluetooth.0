@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 08 Dec 2006 13:47:15 +0100
-Message-Id: <969792183@web.de>
-MIME-Version: 1.0
-From: Christian Gebhard <gebhard_christian@web.de>
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] latency problems
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <f376804d3d0.45783d10@cegetel.net>
+References: <f376804d3d0.45783d10@cegetel.net>
+Date: Fri, 08 Dec 2006 11:22:17 +0100
+Message-Id: <1165573337.5529.19.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Pairing-Authentication
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,45 +16,63 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-15"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Good Afternoon
+Hi,
 
-I have some problems concerning my round trip time using l2ping. I have two=
- PCs(kernel 2.6.17) each with a Bluegiga WT11 module connected via USB. Whe=
-n I use l2ping the round trip time is between 14ms and up to sometimes 65ms=
-. I also wrote  two programs that send and return numbers and count the tim=
-e between sending and receiving a number. Here the times are similar. Howev=
-er when I reduce the time between the pings the round trip time is a bit sh=
-orter.
+> to understand the authentication procedure, I make
+> a test between 2 entities designed by "A" and "B".
+> 
+> 1. A connection is realized without authentication between these two entities, (they never paired before) 
+> 
+> 2. Then entity "A" launches an authentication request,
+> 
+> 3. As they never paired no link key is available for the link "A"-"B", the pairing procedure 
+>    works well (same pin code at each side)
+>    
+> 
+> 4. I disconnect the link "A"-"B", I reconnect "A" and "B" without authentication,
+> 
+> 5. "A" executes an authentication request,
+> 
+> 
+> At this time, the authentication procedure doesn't need a pairing as a link key is available.
+> 
+> My first question is what can I do to force the pairing before an authentication request  ?
 
-My questions:
-   - are these times normal (average of 20ms)?
-   - are the "extremely" varying times normal? =
+you can always do security mode 3, but that is not recommended and has
+problems of its own. Check the mailing list for further details. It has
+been discussed multiple times.
 
-   - are the times dependent to the power management of the BT-module
+You can call HCI_Authentication_Requested any time. Even directly after
+the connection has been established, but I don't see any real need for
+it. Explain your use case.
 
-I would appreciate any help
+> In other word, where can I delete the link key for the link "A"-"B" in bluez ?
+
+Use the D-Bus interface and call the RemoveBonding method.
+
+> My second question, is how to configure security in a pan network ?
+
+Start with reading the pand manual page (man pand).
+
+> Can I set security at the L2CAP level with specific option during the setsockopt ?
+
+Yes. Check the l2test.c source code for an example.
 
 Regards
 
-Chris
-___________________________________________________________________________=
-___
-"Ein Herz f=FCr Kinder" - Ihre Spende hilft! Aktion: www.deutschlandsegelt.=
-de
-Unser Dankesch=F6n: Ihr Name auf dem Segel der 1. deutschen America's Cup-Y=
-acht!
+Marcel
+
 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
