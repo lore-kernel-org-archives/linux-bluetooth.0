@@ -1,10 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45799129.7070406@xmission.com>
-Date: Fri, 08 Dec 2006 09:22:01 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] rswitch in manpage
+Date: Fri, 8 Dec 2006 09:24:17 -0200
+From: Cris <ml133@netpole.com.br>
+To: bluez-devel@lists.sourceforge.net
+Message-Id: <20061208092417.89b3eeaf.ml133@netpole.com.br>
+In-Reply-To: <1165573006.5529.13.camel@aeonflux.holtmann.net>
+References: <20061206111617.d8f16a0c.ml133@netpole.com.br>
+	<1165412385.2756.52.camel@localhost>
+	<20061206131754.39cddee0.ml133@netpole.com.br>
+	<1165418898.2756.84.camel@localhost>
+	<20061206164914.6718738c.ml133@netpole.com.br>
+	<1165573006.5529.13.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] suggestion for device control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,31 +21,36 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGV5CgpJbiBwcmFjdGljZSBJIGZvdW5kIHRoYXQgZXZlbiB3aXRoIGxtIG1hc3RlciwgSSBoYWQg
-dG8gdGFrZSByc3dpdGNoIG91dCAKb2YgbHAgaW4gb3JkZXIgdG8gZGVueSByb2xlIHN3aXRjaGVz
-LiBUaGVyZSdzIHNvbWUgYW1iaWd1aXR5IGluIHRoZSAKaGNpZC5jb25mIGV4YW1wbGUncyBjb21t
-ZW50IGFuZCB0aGUgaGNpZC5jb25mIG1hbnBhZ2UuCgpJIHdvdWxkIHN1Ym1pdCBhIHBhdGNoIGlm
-IEkgdW5kZXJzdG9vZCB0aGUgaW50ZW5kZWQgaW50ZXJhY3Rpb24gYmV0d2VlbiAKdGhlc2UgdHdv
-IHNldHRpbmdzLgoKVGhlIGhjaWQuY29uZiBtYW5wYWdlIGhhcyB0aGlzIHRvIHNheSBhYm91dCBt
-YXN0ZXIgYW5kIHJzd2l0Y2g6CgpsbSBub25lfGFjY2VwdCxtYXN0ZXIKCm5vbmUgbWVhbnMgbm8g
-c3BlY2lmaWMgcG9saWN5LiBhY2NlcHQgbWVhbnMgYWx3YXlzIGFjY2VwdCBpbmNvbeKAkAppbmcg
-Y29ubmVjdGlvbnMuIG1hc3RlciBtZWFucyBiZWNvbWUgbWFzdGVyIG9uIGluY29taW5nIGNvbm5l
-Y+KAkAp0aW9ucyBhbmQgZGVueSByb2xlIHN3aXRjaCBvbiBvdXRnb2luZyBjb25uZWN0aW9ucy4K
-Ci4uLgpscCAgbm9uZXxyc3dpdGNoLGhvbGQsc25pZmYscGFyawoKcnN3aXRjaDogdGhpcyBpcyBh
-IG1vZGUgdGhhdCBlbmFibGVzIHJvbGUtc3dpdGNoIChtYXN0ZXIgPC0+CnNsYXZlKSBiZXR3ZWVu
-IHR3byBkZXZpY2VzIGluIGEgcGljb25ldC4gSXQgaXMgbm90IGNsZWFyIHdoZXRoZXIKdGhpcyBu
-ZWVkcyB0byBiZSBlbmFibGVkIGluIG9yZGVyIHRvIG1ha2UgdGhlICJsbSBtYXN0ZXIiIHNldOKA
-kAp0aW5nIHdvcmsgcHJvcGVybHkgb3Igbm90LgoKQnJhZAoKLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUYWtl
-IFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQKSm9pbiBTb3Vy
-Y2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFuY2UgdG8g
-c2hhcmUgeW91cgpvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdoIGJyaWVm
-IHN1cnZleXMgLSBhbmQgZWFybiBjYXNoCmh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVmYXVsdC5w
-aHA/cGFnZT1qb2luLnBocCZwPXNvdXJjZWZvcmdlJkNJRD1ERVZERVYKX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0
-CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZv
-cmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
+On Fri, 08 Dec 2006 11:16:45 +0100
+Marcel Holtmann <marcel@holtmann.org> wrote:
+
+> > > >   socket (AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+> > 	ioctl (sd, HCISETRAW, 1);
+> > 
+> this should work. However I never tried to emulate everything by myself
+> and maybe at some point we broke the raw mode. Check with a 2.6.19
+> kernel and post the "hcidump -X -V" from your tests. Include any code
+> that is needed to reproduce what you see.
+
+I'm working right now at another end; when I return to this spot,
+I'll test it again and come back here if the problem persists. The
+kernel used was 2.6.17 (debian-testing).
+
+Thanks,
+
+-- 
+Cris.
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
