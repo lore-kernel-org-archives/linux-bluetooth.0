@@ -1,17 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 8 Dec 2006 09:24:17 -0200
-From: Cris <ml133@netpole.com.br>
-To: bluez-devel@lists.sourceforge.net
-Message-Id: <20061208092417.89b3eeaf.ml133@netpole.com.br>
-In-Reply-To: <1165573006.5529.13.camel@aeonflux.holtmann.net>
-References: <20061206111617.d8f16a0c.ml133@netpole.com.br>
-	<1165412385.2756.52.camel@localhost>
-	<20061206131754.39cddee0.ml133@netpole.com.br>
-	<1165418898.2756.84.camel@localhost>
-	<20061206164914.6718738c.ml133@netpole.com.br>
-	<1165573006.5529.13.camel@aeonflux.holtmann.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: amateur <ztl.post@gmail.com>,
+        BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20061208084508.GA3317@163.com>
+References: <20061208084508.GA3317@163.com>
+Date: Fri, 08 Dec 2006 11:24:31 +0100
+Message-Id: <1165573471.5529.24.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] suggestion for device control
+Cc: bluez-devel <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [Bluez-users] How to setup a reliable RFCOMM
+	connection
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,25 +23,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Fri, 08 Dec 2006 11:16:45 +0100
-Marcel Holtmann <marcel@holtmann.org> wrote:
+Hi,
 
-> > > >   socket (AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-> > 	ioctl (sd, HCISETRAW, 1);
-> > 
-> this should work. However I never tried to emulate everything by myself
-> and maybe at some point we broke the raw mode. Check with a 2.6.19
-> kernel and post the "hcidump -X -V" from your tests. Include any code
-> that is needed to reproduce what you see.
+> How to setup a reliable RFCOMM connection, that is, a connection with
+> infinite flush timeout. I find the RFCOMM_LM_RELIABLE option in the
+> example program l2test.c. It compiles, but at runtime setsockopt with
+> RFCOMM_LM give me an error. I'm using kernel-2.4.21 patched by
+> patch-2.4.21-mh10. So what's the problem. Doesn't kernel-2.4.21-mh10
+> support RFCOMM_LM? If so, how can I setup a reliable RFCOMM connection?
 
-I'm working right now at another end; when I return to this spot,
-I'll test it again and come back here if the problem persists. The
-kernel used was 2.6.17 (debian-testing).
+the RFCOMM channels are always reliable. No need for any other options.
 
-Thanks,
+Regards
 
--- 
-Cris.
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
