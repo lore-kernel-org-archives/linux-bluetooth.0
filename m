@@ -1,14 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sat, 9 Dec 2006 09:29:37 +0800
-From: amateur <ztl.post@gmail.com>
+Date: Fri, 8 Dec 2006 19:46:34 +0100
+From: Jimmi <jimmi@bglug.it>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20061209012937.GA3119@163.com>
-References: <969792183@web.de>
+Message-ID: <20061208184634.GA6290@jimmi.home>
+References: <20060805103737.GB6035@jimmi.home> <44D489D5.2040509@schugy.de>
+	<20060805131519.GA6170@jimmi.home>
+	<20060817115818.GA6365@jimmi.home>
+	<20060828172022.GA5370@jimmi.home>
+	<20061208083051.GA6178@jimmi.home> <45798CE8.80502@xmission.com>
 MIME-Version: 1.0
-In-Reply-To: <969792183@web.de>
-Subject: Re: [Bluez-users] latency problems
-Reply-To: amateur <ztl.post@gmail.com>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <45798CE8.80502@xmission.com>
+Subject: Re: [Bluez-users] Again down with Jabra BT250V
+Reply-To: jimmi@bglug.it, BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,20 +24,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Fri, Dec 08, 2006 at 01:47:15PM +0100, Christian Gebhard wrote:
-> Good Afternoon
-> 
-> I have some problems concerning my round trip time using l2ping. I have two PCs(kernel 2.6.17) each with a Bluegiga WT11 module connected via USB. When I use l2ping the round trip time is between 14ms and up to sometimes 65ms. I also wrote  two programs that send and return numbers and count the time between sending and receiving a number. Here the times are similar. However when I reduce the time between the pings the round trip time is a bit shorter.
-> 
-> My questions:
->    - are these times normal (average of 20ms)?
->    - are the "extremely" varying times normal? 
->    - are the times dependent to the power management of the BT-module
-> 
+On 081206 alle 09:03, Brad Midgley wrote:
+> has anyone filed a bug with  ubuntu? bluetooth doesn't work out of the
+> box on edgy.
 
-I can not give any help unless you give the output of  hcidump -x -V 
-It sounds like that some retransmissions occured.
+Now there is:
+https://launchpad.net/distros/ubuntu/+source/bluez-btsco/+bug/75014
 
+;)
+-- 
+   ---         _   o       |     Sembra di sentirlo ancora dire al     |
+   / immi   ---  _/\_>     | mercante di liquori: tu che lo vendi cosa |
+(_/          -  O,> / O    |        ti compri di migliore? FdA         |
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
