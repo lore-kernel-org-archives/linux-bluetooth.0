@@ -1,13 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Martin =?ISO-8859-1?Q?R=F6hricht?= <ml@felicis.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <9ed2cedd0612080825l42882e3dr7a216b9bb8d9f308@mail.gmail.com>
-References: <9ed2cedd0612080825l42882e3dr7a216b9bb8d9f308@mail.gmail.com>
-Date: Sun, 10 Dec 2006 09:30:17 +0100
-Message-Id: <1165739418.5945.7.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Are there any docs to BlueZ implementation?
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Sat, 9 Dec 2006 09:50:00 +0800
+From: amateur <ztl.post@gmail.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>,
+        bluez-devel <bluez-devel@lists.sourceforge.net>
+Message-ID: <20061209015000.GD3119@163.com>
+References: <20061208084508.GA3317@163.com>
+	<1165573471.5529.24.camel@aeonflux.holtmann.net>
+MIME-Version: 1.0
+In-Reply-To: <1165573471.5529.24.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] [Bluez-users] How to setup a reliable RFCOMM
+	connection
+Reply-To: amateur <ztl.post@gmail.com>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -20,30 +24,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Waldek,
+On Fri, Dec 08, 2006 at 11:24:31AM +0100, Marcel Holtmann wrote:
+> Hi,
+> 
+> > How to setup a reliable RFCOMM connection, that is, a connection with
+> > infinite flush timeout. I find the RFCOMM_LM_RELIABLE option in the
+> > example program l2test.c. It compiles, but at runtime setsockopt with
+> > RFCOMM_LM give me an error. I'm using kernel-2.4.21 patched by
+> > patch-2.4.21-mh10. So what's the problem. Doesn't kernel-2.4.21-mh10
+> > support RFCOMM_LM? If so, how can I setup a reliable RFCOMM connection?
+> 
+> the RFCOMM channels are always reliable. No need for any other options.
+> 
+Does that mean that the Automatic Flush Timeout Timer for the L2CAP
+connection underlying the RFCOMM connection is set to 0xFFFF by
+default? And when does the RFCOMM_LM option introduced?
 
-Am Freitag, den 08.12.2006, 17:25 +0100 schrieb Waldemar Rymarkiewicz:
-> Can I find any technical docs concernig BlueZ implementation (what,
-> where, data flow etc.)?  Is reverse engineering the only way to find
-> out how the stuff works?
-> I've  worked with Qualcomm BT stack (QBT) and wanna take a look what
-> is going on in BlueZ. Unfortunately have not experience with linux
-> kernel hacking :/ .... 
-
-the implementation of L2CAP Flow Control Mode ended in a study thesis
-for my university. The thesis itself contains some information about my
-experiences in BlueZ kernel hacking and is written in English -- this
-may be worth a look:
-http://www.roehricht.info/files/studienarbeit_bluez.pdf
-
-Besides that it is rather hard to find BlueZ specific documentation.
-Mainly the source is the documentation. Anyway the source is easy to
-read once you got the basic understanding from the specification.
-You will mainly need the official specification as a reference. At the
-end of my thesis is a bibliography with some useful books that might
-help you, too.
-
-Martin
 
 
 -------------------------------------------------------------------------
