@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sat, 9 Dec 2006 09:50:00 +0800
+Date: Sat, 9 Dec 2006 09:48:07 +0800
 From: amateur <ztl.post@gmail.com>
-To: BlueZ users <bluez-users@lists.sourceforge.net>,
-        bluez-devel <bluez-devel@lists.sourceforge.net>
-Message-ID: <20061209015000.GD3119@163.com>
-References: <20061208084508.GA3317@163.com>
-	<1165573471.5529.24.camel@aeonflux.holtmann.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20061209014807.GC3119@163.com>
+References: <20061207183707.GA15790@163.com>
+	<1165573434.5529.22.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-In-Reply-To: <1165573471.5529.24.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] [Bluez-users] How to setup a reliable RFCOMM
-	connection
+In-Reply-To: <1165573434.5529.22.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] on which level does hcidump work?
 Reply-To: amateur <ztl.post@gmail.com>,
         BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -24,23 +22,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Fri, Dec 08, 2006 at 11:24:31AM +0100, Marcel Holtmann wrote:
+On Fri, Dec 08, 2006 at 11:23:54AM +0100, Marcel Holtmann wrote:
 > Hi,
 > 
-> > How to setup a reliable RFCOMM connection, that is, a connection with
-> > infinite flush timeout. I find the RFCOMM_LM_RELIABLE option in the
-> > example program l2test.c. It compiles, but at runtime setsockopt with
-> > RFCOMM_LM give me an error. I'm using kernel-2.4.21 patched by
-> > patch-2.4.21-mh10. So what's the problem. Doesn't kernel-2.4.21-mh10
-> > support RFCOMM_LM? If so, how can I setup a reliable RFCOMM connection?
+> > I'm encountering a problem that the data I sent through a L2CAP socket
+> > on my local machine doesn't appear in the output of hcidump on the
+> > remote machine. But it does appear in the output of hcidump on my
+> > local machine.
+> > 
+> > So I'm wondering on which level does hcidump work. Does it work on the
+> > host-dongle interface? What should I do if I want to monitor all the
+> > information pass through the host-dongle interface(HCI_USB?). Or can I
+> > make such an assumption that all the data showed in the output of
+> > hcidump were sent out through the radio? Can I make such a assumption
+> > that all the data received was showed up in the output of hcidump?
 > 
-> the RFCOMM channels are always reliable. No need for any other options.
+> you see only HCI packets (hence the name). There is no real way to make
+> sure the packet went over the air. In some cases you can make this
+> assumption from other stuff that is going on.
 > 
-Does that mean that the Automatic Flush Timeout Timer for the L2CAP
-connection underlying the RFCOMM connection is set to 0xFFFF by
-default? And when does the RFCOMM_LM option introduced?
+Then how can I make sure that the HCI ACL Packet sent by the Host is
+*really* received correctly by Host Controller? It seems like there
+doesn't exist any packet acknowlegment sent from the Host Controller.
+And there isn't a Command-Complete or Command-Status Event for HCI
+ACL Packet. So should I ensure that the HCI Transport Layer is reliable?
+I just want to make sure that the Packet I sent through HCI actually
+reached the Host Controller.
 
-
+-- 
+You will be given a post of trust and responsibility.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
