@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <e4f1f0110612091109r3a89fa38t96afa23c7167e9d4@mail.gmail.com>
-Date: Sat, 9 Dec 2006 19:09:16 +0000
-From: "jonny Linux" <jonnylinux@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Date: Sat, 9 Dec 2006 09:40:19 +0800
+From: amateur <ztl.post@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20061209014019.GB3119@163.com>
+References: <20061207065924.GA12888@163.com> <20061208090309.70aa7bef@nim.leo>
 MIME-Version: 1.0
-Subject: [Bluez-users] Has my passkey agent registered?
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20061208090309.70aa7bef@nim.leo>
+Subject: Re: [Bluez-users] what does the 'mh10' stand for as in
+	patch-2.4.21-mh10 ?
+Reply-To: amateur <ztl.post@gmail.com>,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,90 +18,80 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1657161665=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1657161665==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_79220_2448073.1165691356230"
+On Fri, Dec 08, 2006 at 09:03:09AM +0000, Paul LeoNerd Evans wrote:
+> On Thu, 7 Dec 2006 14:59:24 +0800
+> amateur <ztl.post@gmail.com> wrote:
+> 
+> > I have seen some kernel patch for bluetooth subsystem on the bluez
+> > homepage, which are named as patch-2.4.21-mh10.gz or so. What does the
+> > mh10 mean?
+> 
+> As is usual with personal patches on the kernel, it stands for the
+> initials of the maintainer; am[n] for Andrew Morten's tree, for example.
+> These ones stand for Marcel Holtmann. The 10 means it's the 10th version
+> of a patch for this kernel (2.4.21).
 
-------=_Part_79220_2448073.1165691356230
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+oh, I see. Thank you. 
 
-Hi,
+-- 
+"Good afternoon, madam.  How may I help you?"
 
-I'm trying to connect to my Lego Mindstorms NXT using bluez-libs and
-bluez-utils 3.7.
-I've tried various programs to connect, but I basically just need a
-/dev/rfcomm0, but no program seems to be able to use it.
+"Good afternoon.  I'd like a FrintArms HandCannon, please."
 
-I get the following message even when I have the passkey-agent from utils,
-or the gnome bluetooth-applet.
+"A--?  Oh, now, that's an awfully big gun for such a lovely lady.  I
+mean, not everybody thinks ladies should carry guns at all, though I
+say they have a right to.  But I think... I might... Let's have a look
+down here.  I might have just the thing for you.  Yes, here we are!
+Look at that, isn't it neat?  Now that is a FrintArms product as well,
+but it's what's called a laser -- a light-pistol some people call
+them.  Very small, as you see; fits easily into a pocket or bag; won't
+spoil the line of a jacket; and you won't feel you're lugging half a
+tonne of iron around with you.  We do a range of matching accessories,
+including -- if I may say so -- a rather saucy garter holster.  Wish I
+got to do the fitting for that!  Ha -- just my little joke.  And
+there's *even*... here we are -- this special presentation pack: gun,
+charged battery, charging unit, beautiful glider-hide shoulder holster
+with adjustable fitting and contrast stitching, and a discount on your
+next battery.  Full instructions, of course, and a voucher for free
+lessons at your local gun club or range.  Or there's the *special*
+presentation pack; it has all the other one's got but with *two*
+charged batteries and a night-sight, too.  Here, feel that -- don't
+worry, it's a dummy battery -- isn't it neat?  Feel how light it is?
+Smooth, see?  No bits to stick out and catch on your clothes, *and*
+beautifully balanced.  And of course the beauty of a laser is, there's
+no recoil.  Because it's shooting light, you see?  Beautiful gun,
+beautiful gun; my wife has one.  Really.  That's not a line, she
+really has.  Now, I can do you that one -- with a battery and a free
+charge -- for ninety-five; or the presentation pack on a special
+offer for one-nineteen; or this, the special presentation pack, for
+one-forty-nine."
 
-I've heard I should be able to find out if the passkey-agent is registered
-by reading the syslog. I use Fedora Core 5, but I don't know where that is -
-do I need to set a config file somewhere to tell bluez where to log to?
+"I'll take the special."
 
-Thanks,
+"Sound choice, madam, *sound* choice.  Now, do--?"
 
-Jonny
+"And a HandCannon, with the eighty-mill silencer, five GP clips, three
+six-five AP/wire-fl'echettes clips, two bipropellant HE clips, and a
+Special Projectile Pack if you have one -- the one with the embedding
+rounds, not the signalers.  I assume the night-sight on this toy is
+compatible?"
 
-HCI sniffer - Bluetooth packet analyzer ver 1.32
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:16:53:03:1D:31 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr 00:16:53:03:1D:31
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-    bdaddr 00:16:53:03:1D:31 key 918D88F4AB15B646C499779B3252344B
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-    status 0x00 bdaddr 00:16:53:03:1D:31
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x05 handle 11 bdaddr 00:16:53:03:1D:31 type ACL encrypt 0x00
-    Error: Authentication Failure
+"Aah... yes,  And how does madam wish to pay?"
 
-------=_Part_79220_2448073.1165691356230
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+She slapped her credit card on the counter.  "Eventually."
 
-Hi,<br><br>I'm trying to connect to my Lego Mindstorms NXT using bluez-libs and bluez-utils 3.7.<br>I've tried various programs to connect, but I basically just need a /dev/rfcomm0, but no program seems to be able to use it.
-<br><br>I get the following message even when I have the passkey-agent from utils, or the gnome bluetooth-applet.<br><br>I've heard I should be able to find out if the passkey-agent is registered by reading the syslog. I use Fedora Core 5, but I don't know where that is - do I need to set a config file somewhere to tell bluez where to log to?
-<br><br>Thanks,<br><br>Jonny<br><br>HCI sniffer - Bluetooth packet analyzer ver 1.32<br>device: hci0 snap_len: 1028 filter: 0xffffffff<br>&lt; HCI Command: Create Connection (0x01|0x0005) plen 13<br>&nbsp;&nbsp;&nbsp; bdaddr 00:16:53:03:1D:31 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-<br>&nbsp;&nbsp;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 DH5<br>&gt; HCI Event: Command Status (0x0f) plen 4<br>&nbsp;&nbsp;&nbsp; Create Connection (0x01|0x0005) status 0x00 ncmd 1<br>&gt; HCI Event: Link Key Request (0x17) plen 6<br>&nbsp;&nbsp;&nbsp; bdaddr 00:16:53:03:1D:31
-<br>&lt; HCI Command: Link Key Request Reply (0x01|0x000b) plen 22<br>&nbsp;&nbsp;&nbsp; bdaddr 00:16:53:03:1D:31 key 918D88F4AB15B646C499779B3252344B<br>&gt; HCI Event: Command Complete (0x0e) plen 10<br>&nbsp;&nbsp;&nbsp; Link Key Request Reply (0x01|0x000b) ncmd 1
-<br>&nbsp;&nbsp;&nbsp; status 0x00 bdaddr 00:16:53:03:1D:31<br>&gt; HCI Event: Connect Complete (0x03) plen 11<br>&nbsp;&nbsp;&nbsp; status 0x05 handle 11 bdaddr 00:16:53:03:1D:31 type ACL encrypt 0x00<br>&nbsp;&nbsp;&nbsp; Error: Authentication Failure<br><br>
-
-------=_Part_79220_2448073.1165691356230--
-
-
---===============1657161665==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+		-- Iain M. Banks, "Against a Dark Background"
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1657161665==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1657161665==--
