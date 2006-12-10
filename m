@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <457C2D1F.1050605@free.fr>
-Date: Sun, 10 Dec 2006 16:51:59 +0100
+Message-ID: <457C2D10.5040801@free.fr>
+Date: Sun, 10 Dec 2006 16:51:44 +0100
 From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] [RFC] : Bluez audio routing: introducing switch alsa
-	plugin
+References: <457655A2.6030001@xmission.com> <45772B71.5020505@vasmac.com>
+	<457734F2.30204@xmission.com>
+In-Reply-To: <457734F2.30204@xmission.com>
+Subject: Re: [Bluez-devel] org.bluez.Audio
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,37 +21,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-All,
+Hi Brad&Jose,
 
-I got here a suggestion for audio routing.
-I take here as assumption that it is a possibility that sco and a2dp
-plugins are different.
+> 
+>> I think that bt.audiod should only handle the audio control portion.
+>> The audio plugins should do direct bluetooth I/O.
+> 
+> I'll update the page then. I won't rule out having bt.audiod manage a 
+> file descriptor for the sco channel and pass it around like Fabien did 
+> in his daemon. Only one app could use the sco channel at a time.
 
-The idea is to bring in the picture a new plugin that i would call
-conveniently the 'switch' plugin.
-As its name suggests, its role would be to route to either one PCM
-stream or another PCM.
+Brad, i think the 'only on sco channel at a time argument' is not very
+pertinent, for two reasons:
+  * First, i'm not sure there is an added value to be able to mix sound
+channels to a sco headset.
+  * Second, if we think this is really needed, ALSA provides all
+required facilities to mix multiple streams to one (think to the dmix
+plugin). For your information, dmix is now on by default since alsa
+1.0.10 if i remember. Previously most cheap computers were only able to
+play one PCM stream at a time. While annoying,  that didn't kill anybody
+tought ;-)
 
-We could imagine that per default the plugin would route audio to wired
-PCM IO, and when notified that a alternate PCM is ready, would switch to
-this plugin.
-
-This would give sth like that:
-
-audio application --> switch plugin --> wired io PCM
-			|
-			|
-			----> bluetooth plugin --> bt.audiod
+> 
+> In the case of a2dp where we're already dealing with long latencies, I 
+> would like to have bt.audiod mix, encode, and deliver the audio. The 
+> challenge there is to keep the latency consistent so a video player 
+> could accommodate it.
+> 
+> Brad
+> 
 
 
-This is an audio routing suggestion that could be used for both SCO and
-A2DP.
-
-as usual, comments are welcomed,
-
-Cheers,
-
-Fabien
 
 
 -------------------------------------------------------------------------
