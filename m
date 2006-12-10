@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <457C2CF5.9040007@free.fr>
-Date: Sun, 10 Dec 2006 16:51:17 +0100
-From: Fabien Chevalier <fabchevalier@free.fr>
+Message-ID: <62aeb6380612100652u6bde1744xa4fbe85834fce240@mail.gmail.com>
+Date: Sun, 10 Dec 2006 22:52:47 +0800
+From: abionnnn <abionnnn@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <457655A2.6030001@xmission.com>
-In-Reply-To: <457655A2.6030001@xmission.com>
-Subject: Re: [Bluez-devel] org.bluez.Audio
+Subject: [Bluez-devel] API documentation...
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,31 +18,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad & Marcel,
+I'm sure this is asked a lot but, I'm been reading Albert Huang's
+thesis and I noticed that the BlueZ function hci_inquiry isn't
+completely described. Is there something I can read about it?
 
-I got a number of interrogations regarding the various methods/signals
-exposed here. I noticed a few things that won't work. To be able to
-pinpoint these issues one by one, i think there is a need to draw some
-diagrams that show the dynamic aspects of things. I'm gonna try drawing
-a few of those before the end of the year : hopefully i will find some
-spare time as i'm gonna be in hollidays from Xmas till new year...
+Thanks a lot!
 
-Cheers,
-
-Fabien
-
-> Marcel
-> 
-> I rewrote the dbus proposal. If what's here looks ok we can start
-> thinking about the named pipe, ipc, or whatever we use for sending audio
-> and file descriptors around.
-> 
-> http://bluetooth-alsa.sourceforge.net/future.html
-> 
-> Brad
-> 
-
-
+-abionnnn
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
