@@ -1,60 +1,48 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: amateur <ztl.post@gmail.com>,
         BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20061209014807.GC3119@163.com>
-References: <20061207183707.GA15790@163.com>
-	<1165573434.5529.22.camel@aeonflux.holtmann.net>
-	<20061209014807.GC3119@163.com>
-Date: Sun, 10 Dec 2006 13:41:11 +0100
-Message-Id: <1165754471.22251.17.camel@aeonflux.holtmann.net>
+In-Reply-To: <20061209015000.GD3119@163.com>
+References: <20061208084508.GA3317@163.com>
+	<1165573471.5529.24.camel@aeonflux.holtmann.net>
+	<20061209015000.GD3119@163.com>
+Date: Sun, 10 Dec 2006 13:39:32 +0100
+Message-Id: <1165754372.22251.14.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] on which level does hcidump work?
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Cc: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] [Bluez-devel] How to setup a reliable
+	RFCOMM	connection
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
+List-ID: <bluez-devel.lists.sourceforge.net>
 
 Hi,
 
-> > > I'm encountering a problem that the data I sent through a L2CAP socket
-> > > on my local machine doesn't appear in the output of hcidump on the
-> > > remote machine. But it does appear in the output of hcidump on my
-> > > local machine.
-> > > 
-> > > So I'm wondering on which level does hcidump work. Does it work on the
-> > > host-dongle interface? What should I do if I want to monitor all the
-> > > information pass through the host-dongle interface(HCI_USB?). Or can I
-> > > make such an assumption that all the data showed in the output of
-> > > hcidump were sent out through the radio? Can I make such a assumption
-> > > that all the data received was showed up in the output of hcidump?
+> > > How to setup a reliable RFCOMM connection, that is, a connection with
+> > > infinite flush timeout. I find the RFCOMM_LM_RELIABLE option in the
+> > > example program l2test.c. It compiles, but at runtime setsockopt with
+> > > RFCOMM_LM give me an error. I'm using kernel-2.4.21 patched by
+> > > patch-2.4.21-mh10. So what's the problem. Doesn't kernel-2.4.21-mh10
+> > > support RFCOMM_LM? If so, how can I setup a reliable RFCOMM connection?
 > > 
-> > you see only HCI packets (hence the name). There is no real way to make
-> > sure the packet went over the air. In some cases you can make this
-> > assumption from other stuff that is going on.
+> > the RFCOMM channels are always reliable. No need for any other options.
 > > 
-> Then how can I make sure that the HCI ACL Packet sent by the Host is
-> *really* received correctly by Host Controller? It seems like there
-> doesn't exist any packet acknowlegment sent from the Host Controller.
-> And there isn't a Command-Complete or Command-Status Event for HCI
-> ACL Packet. So should I ensure that the HCI Transport Layer is reliable?
-> I just want to make sure that the Packet I sent through HCI actually
-> reached the Host Controller.
+> Does that mean that the Automatic Flush Timeout Timer for the L2CAP
+> connection underlying the RFCOMM connection is set to 0xFFFF by
+> default? And when does the RFCOMM_LM option introduced?
 
-that is the job of the HCI transport layer and not the job of the host
-stack. The host stack simply assumes that the transport is reliable and
-handles packet loss etc.
-
-However ACL packets are bound to the HCI flow control and you will see
-the number of packets acknowledgment.
+this won't fly. The underlaying L2CAP connection must be reliable and so
+we are not using an automatic flush timeout at all for that channel.
+Please check the specification for details.
 
 Regards
 
@@ -68,6 +56,6 @@ Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
