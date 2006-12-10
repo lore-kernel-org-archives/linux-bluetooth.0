@@ -1,61 +1,59 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: amateur <ztl.post@gmail.com>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20061209015000.GD3119@163.com>
-References: <20061208084508.GA3317@163.com>
-	<1165573471.5529.24.camel@aeonflux.holtmann.net>
-	<20061209015000.GD3119@163.com>
-Date: Sun, 10 Dec 2006 13:39:32 +0100
-Message-Id: <1165754372.22251.14.camel@aeonflux.holtmann.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <45799129.7070406@xmission.com>
+References: <45799129.7070406@xmission.com>
+Date: Sun, 10 Dec 2006 13:38:04 +0100
+Message-Id: <1165754285.22251.12.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Cc: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] [Bluez-devel] How to setup a reliable
-	RFCOMM	connection
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
-List-ID: <bluez-devel.lists.sourceforge.net>
+Subject: Re: [Bluez-devel] rswitch in manpage
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="utf-8"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-
-> > > How to setup a reliable RFCOMM connection, that is, a connection with
-> > > infinite flush timeout. I find the RFCOMM_LM_RELIABLE option in the
-> > > example program l2test.c. It compiles, but at runtime setsockopt with
-> > > RFCOMM_LM give me an error. I'm using kernel-2.4.21 patched by
-> > > patch-2.4.21-mh10. So what's the problem. Doesn't kernel-2.4.21-mh10
-> > > support RFCOMM_LM? If so, how can I setup a reliable RFCOMM connection?
-> > 
-> > the RFCOMM channels are always reliable. No need for any other options.
-> > 
-> Does that mean that the Automatic Flush Timeout Timer for the L2CAP
-> connection underlying the RFCOMM connection is set to 0xFFFF by
-> default? And when does the RFCOMM_LM option introduced?
-
-this won't fly. The underlaying L2CAP connection must be reliable and so
-we are not using an automatic flush timeout at all for that channel.
-Please check the specification for details.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGkgQnJhZCwKCj4gSW4gcHJhY3RpY2UgSSBmb3VuZCB0aGF0IGV2ZW4gd2l0aCBsbSBtYXN0ZXIs
+IEkgaGFkIHRvIHRha2UgcnN3aXRjaCBvdXQgCj4gb2YgbHAgaW4gb3JkZXIgdG8gZGVueSByb2xl
+IHN3aXRjaGVzLiBUaGVyZSdzIHNvbWUgYW1iaWd1aXR5IGluIHRoZSAKPiBoY2lkLmNvbmYgZXhh
+bXBsZSdzIGNvbW1lbnQgYW5kIHRoZSBoY2lkLmNvbmYgbWFucGFnZS4KPiAKPiBJIHdvdWxkIHN1
+Ym1pdCBhIHBhdGNoIGlmIEkgdW5kZXJzdG9vZCB0aGUgaW50ZW5kZWQgaW50ZXJhY3Rpb24gYmV0
+d2VlbiAKPiB0aGVzZSB0d28gc2V0dGluZ3MuCj4gCj4gVGhlIGhjaWQuY29uZiBtYW5wYWdlIGhh
+cyB0aGlzIHRvIHNheSBhYm91dCBtYXN0ZXIgYW5kIHJzd2l0Y2g6Cj4gCj4gbG0gbm9uZXxhY2Nl
+cHQsbWFzdGVyCj4gCj4gbm9uZSBtZWFucyBubyBzcGVjaWZpYyBwb2xpY3kuIGFjY2VwdCBtZWFu
+cyBhbHdheXMgYWNjZXB0IGluY29t4oCQCj4gaW5nIGNvbm5lY3Rpb25zLiBtYXN0ZXIgbWVhbnMg
+YmVjb21lIG1hc3RlciBvbiBpbmNvbWluZyBjb25uZWPigJAKPiB0aW9ucyBhbmQgZGVueSByb2xl
+IHN3aXRjaCBvbiBvdXRnb2luZyBjb25uZWN0aW9ucy4KCnRoZSBsaW5rIG1vZGUgc2F5cyBpZiB5
+b3UgYWNjZXB0IGluY29taW5nIGNvbm5lY3Rpb24gYW5kIGlmIHRoZSBpbmNvbWluZwpjb25uZWN0
+aW9uIHNob3VsZCBiZSBzd2l0Y2hlZCB0byBtYXN0ZXIgb3Igbm90LiBUaGlzIGlzIG9ubHkgZm9y
+IHRoZQpwcm9jZXNzIG9mIGNyZWF0aW5nIHRoZSBjb25uZWN0aW9uLiBJdCBzYXlzIG5vdGhpbmcg
+YWJvdXQgdGhlIHJvbGUKc3dpdGNoaW5nIG9uY2UgdGhlIGNvbm5lY3Rpb24gaGFzIGJlZW4gY3Jl
+YXRlZC4KCj4gLi4uCj4gbHAgIG5vbmV8cnN3aXRjaCxob2xkLHNuaWZmLHBhcmsKPiAKPiByc3dp
+dGNoOiB0aGlzIGlzIGEgbW9kZSB0aGF0IGVuYWJsZXMgcm9sZS1zd2l0Y2ggKG1hc3RlciA8LT4K
+PiBzbGF2ZSkgYmV0d2VlbiB0d28gZGV2aWNlcyBpbiBhIHBpY29uZXQuIEl0IGlzIG5vdCBjbGVh
+ciB3aGV0aGVyCj4gdGhpcyBuZWVkcyB0byBiZSBlbmFibGVkIGluIG9yZGVyIHRvIG1ha2UgdGhl
+ICJsbSBtYXN0ZXIiIHNldOKAkAo+IHRpbmcgd29yayBwcm9wZXJseSBvciBub3QuCgpUaGUgZW5h
+YmxlcyB0aGUgcm9sZSBzd2l0Y2hpbmcgcGVyLXNlLiBBIGNvbm5lY3Rpb24gd2l0aG91dCByb2xl
+CnN3aXRjaGluZyBlbmFibGVkIG1ha2VzIHRoZSBsaW5rIG1hbmFnZXIgcmVqZWN0IGFueSByb2xl
+IHN3aXRjaGluZwpyZXF1ZXN0cy4gSXQgaXMgbGlrZSBub3QgaGF2aW5nIHJvbGUgc3dpdGNoaW5n
+IHN1cHBvcnQgYXQgYWxsLCBidXQgeW91CmNhbiBjb250cm9sIGl0IHBlciBjb25uZWN0aW9uL3Bp
+Y29uZXQuCgpBbmQgYWdhaW4sIHRoZSBsaW5rIG1vZGUgaXMgb25seSBhIHBvbGljeSBmb3IgdGhl
+IHRoZSB0aW1lIHdoZW4gdGhlCmNvbm5lY3Rpb24gd2lsbCBiZSBjcmVhdGVkLiBJdCBzYXlzIG5v
+dGhpbmcgYWJvdXQgaGFuZGxpbmcgcm9sZQpzd2l0Y2hpbmcgZm9yIHRoZSBsaWZlIHRpbWUgb2Yg
+YSBjb25uZWN0aW9uLgoKUmVnYXJkcwoKTWFyY2VsCgoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGFrZSBT
+dXJ2ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9mIElUCkpvaW4gU291cmNl
+Rm9yZ2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91J2xsIGdldCB0aGUgY2hhbmNlIHRvIHNo
+YXJlIHlvdXIKb3BpbmlvbnMgb24gSVQgJiBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBicmllZiBz
+dXJ2ZXlzIC0gYW5kIGVhcm4gY2FzaApodHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhw
+P3BhZ2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCl9fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApC
+bHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3Jn
+ZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
