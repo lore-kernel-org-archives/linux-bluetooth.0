@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Martin =?ISO-8859-1?Q?R=F6hricht?= <ml@felicis.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <E2B64452-537E-4E9E-BF57-54F2A7073BF4@mac.com>
-References: <E2B64452-537E-4E9E-BF57-54F2A7073BF4@mac.com>
-Date: Sun, 10 Dec 2006 13:33:07 +0100
-Message-Id: <1165753987.22251.6.camel@aeonflux.holtmann.net>
+In-Reply-To: <9ed2cedd0612080825l42882e3dr7a216b9bb8d9f308@mail.gmail.com>
+References: <9ed2cedd0612080825l42882e3dr7a216b9bb8d9f308@mail.gmail.com>
+Date: Sun, 10 Dec 2006 09:30:17 +0100
+Message-Id: <1165739418.5945.7.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Using BlueZ
+Subject: Re: [Bluez-devel] Are there any docs to BlueZ implementation?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,24 +20,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brian,
+Hi Waldek,
 
-> I would like to know if its possible to use the BlueZ stack with  
-> something that has a GPL incompatible license?  i.e. MPL?  I noticed  
-> that its GPL licensed which limits its usage with such projects.  Any  
-> alternatives?
+Am Freitag, den 08.12.2006, 17:25 +0100 schrieb Waldemar Rymarkiewicz:
+> Can I find any technical docs concernig BlueZ implementation (what,
+> where, data flow etc.)?  Is reverse engineering the only way to find
+> out how the stuff works?
+> I've  worked with Qualcomm BT stack (QBT) and wanna take a look what
+> is going on in BlueZ. Unfortunately have not experience with linux
+> kernel hacking :/ .... 
 
-if you have to link against the Bluetooth library, then the answer is
-no. If you only use the D-Bus interface of BlueZ, then you link against
-the D-Bus library and this one is LGPL, so that is no problem. However
-you should always double check with "ldd" what libraries are actually
-linked in or if you include header files from "bluetooth/*.h". Make sure
-you don't link against the Bluetooth library and you are good.
+the implementation of L2CAP Flow Control Mode ended in a study thesis
+for my university. The thesis itself contains some information about my
+experiences in BlueZ kernel hacking and is written in English -- this
+may be worth a look:
+http://www.roehricht.info/files/studienarbeit_bluez.pdf
 
-Regards
+Besides that it is rather hard to find BlueZ specific documentation.
+Mainly the source is the documentation. Anyway the source is easy to
+read once you got the basic understanding from the specification.
+You will mainly need the official specification as a reference. At the
+end of my thesis is a bibliography with some useful books that might
+help you, too.
 
-Marcel
-
+Martin
 
 
 -------------------------------------------------------------------------
