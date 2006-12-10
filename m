@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sun, 10 Dec 2006 15:31:33 +0300
-To: bluez-devel@lists.sourceforge.net
-From: Exe <bluez@messir.net>
-MIME-Version: 1.0
-Message-ID: <op.tkcfqvl6ciev1l@localhost>
-Subject: [Bluez-devel] pand: permission denied(13) ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: amateur <ztl.post@gmail.com>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20061209014807.GC3119@163.com>
+References: <20061207183707.GA15790@163.com>
+	<1165573434.5529.22.camel@aeonflux.holtmann.net>
+	<20061209014807.GC3119@163.com>
+Date: Sun, 10 Dec 2006 13:41:11 +0100
+Message-Id: <1165754471.22251.17.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] on which level does hcidump work?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,35 +23,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello, peoples, have a nice day.
+Hi,
 
-After one boot to the windoze I didn't able to connect my laptop to the  
-router via pand.
+> > > I'm encountering a problem that the data I sent through a L2CAP socket
+> > > on my local machine doesn't appear in the output of hcidump on the
+> > > remote machine. But it does appear in the output of hcidump on my
+> > > local machine.
+> > > 
+> > > So I'm wondering on which level does hcidump work. Does it work on the
+> > > host-dongle interface? What should I do if I want to monitor all the
+> > > information pass through the host-dongle interface(HCI_USB?). Or can I
+> > > make such an assumption that all the data showed in the output of
+> > > hcidump were sent out through the radio? Can I make such a assumption
+> > > that all the data received was showed up in the output of hcidump?
+> > 
+> > you see only HCI packets (hence the name). There is no real way to make
+> > sure the packet went over the air. In some cases you can make this
+> > assumption from other stuff that is going on.
+> > 
+> Then how can I make sure that the HCI ACL Packet sent by the Host is
+> *really* received correctly by Host Controller? It seems like there
+> doesn't exist any packet acknowlegment sent from the Host Controller.
+> And there isn't a Command-Complete or Command-Status Event for HCI
+> ACL Packet. So should I ensure that the HCI Transport Layer is reliable?
+> I just want to make sure that the Packet I sent through HCI actually
+> reached the Host Controller.
 
-This messages was appeared in log:
+that is the job of the HCI transport layer and not the job of the host
+stack. The host stack simply assumes that the transport is reliable and
+handles packet loss etc.
 
-  Dec 10 14:51:30 exelap hcid[19256]: Bluetooth HCI daemon
-Dec 10 14:51:30 exelap hcid[19256]: Starting security manager 0
-Dec 10 14:51:52 exelap pand[19263]: Bluetooth PAN daemon version 2.25
-Dec 10 14:51:52 exelap pand[19263]: Connecting to 00:10:60:A3:CA:6F
-Dec 10 14:51:55 exelap hci_acldata_packet: hci0 ACL packet for unknown  
-connection handle 11
-Dec 10 14:51:56 exelap hci_acldata_packet: hci0 ACL packet for unknown  
-connection handle 11
-Dec 10 14:51:56 exelap hci_acldata_packet: hci0 ACL packet for unknown  
-connection handle 11
-Dec 10 14:51:56 exelap hcid[19256]: link_key_request  
-(sba=00:16:CE:DF:1F:54, dba=00:10:60:A3:CA:6F)
-Dec 10 14:51:56 exelap pand[19263]: Connect to 00:10:60:A3:CA:6F failed.  
-Permission denied(13)
+However ACL packets are bound to the HCI flow control and you will see
+the number of packets acknowledgment.
 
-strace said that connect() returns ENOACCESS.
+Regards
 
-Google said nothing appropriate.
+Marcel
 
-The problem was solved by deletion of /var/lib/bluetooth/00:16:CE:DF:1F:54
 
-I don't understand what's went wrong, please explain me.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
