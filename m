@@ -1,60 +1,52 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sun, 10 Dec 2006 22:10:30 +0800
-From: amateur <ztl.post@gmail.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20061210141030.GA3730@163.com>
-References: <20061208084508.GA3317@163.com>
-	<1165573471.5529.24.camel@aeonflux.holtmann.net>
-	<20061209015000.GD3119@163.com>
-	<1165754372.22251.14.camel@aeonflux.holtmann.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Date: Sun, 10 Dec 2006 15:31:33 +0300
+To: bluez-devel@lists.sourceforge.net
+From: Exe <bluez@messir.net>
 MIME-Version: 1.0
-In-Reply-To: <1165754372.22251.14.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] [Bluez-devel] How to setup a reliable RFCOMM
-	connection
-Reply-To: amateur <ztl.post@gmail.com>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Message-ID: <op.tkcfqvl6ciev1l@localhost>
+Subject: [Bluez-devel] pand: permission denied(13) ?
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sun, Dec 10, 2006 at 01:39:32PM +0100, Marcel Holtmann wrote:
-> Hi,
-> 
-> > > > How to setup a reliable RFCOMM connection, that is, a connection with
-> > > > infinite flush timeout. I find the RFCOMM_LM_RELIABLE option in the
-> > > > example program l2test.c. It compiles, but at runtime setsockopt with
-> > > > RFCOMM_LM give me an error. I'm using kernel-2.4.21 patched by
-> > > > patch-2.4.21-mh10. So what's the problem. Doesn't kernel-2.4.21-mh10
-> > > > support RFCOMM_LM? If so, how can I setup a reliable RFCOMM connection?
-> > > 
-> > > the RFCOMM channels are always reliable. No need for any other options.
-> > > 
-> > Does that mean that the Automatic Flush Timeout Timer for the L2CAP
-> > connection underlying the RFCOMM connection is set to 0xFFFF by
-> > default? And when does the RFCOMM_LM option introduced?
-> 
-> this won't fly. The underlaying L2CAP connection must be reliable and so
-> we are not using an automatic flush timeout at all for that channel.
-> Please check the specification for details.
-In my understanding of the specification, the Automatic Flush Timeout
-is applied on a connection handle which corresponds to the ACL link.
-So does that mean once a RFCOMM connection is established, the
-automatic flush timeout would be disabled(to ensure link reliability)?
-Or that bluez doesn't use automatic flush timeout at all for all
-connections?
+Hello, peoples, have a nice day.
 
--- 
-He that is giddy thinks the world turns round.
-		-- William Shakespeare, "The Taming of the Shrew"
+After one boot to the windoze I didn't able to connect my laptop to the  
+router via pand.
+
+This messages was appeared in log:
+
+  Dec 10 14:51:30 exelap hcid[19256]: Bluetooth HCI daemon
+Dec 10 14:51:30 exelap hcid[19256]: Starting security manager 0
+Dec 10 14:51:52 exelap pand[19263]: Bluetooth PAN daemon version 2.25
+Dec 10 14:51:52 exelap pand[19263]: Connecting to 00:10:60:A3:CA:6F
+Dec 10 14:51:55 exelap hci_acldata_packet: hci0 ACL packet for unknown  
+connection handle 11
+Dec 10 14:51:56 exelap hci_acldata_packet: hci0 ACL packet for unknown  
+connection handle 11
+Dec 10 14:51:56 exelap hci_acldata_packet: hci0 ACL packet for unknown  
+connection handle 11
+Dec 10 14:51:56 exelap hcid[19256]: link_key_request  
+(sba=00:16:CE:DF:1F:54, dba=00:10:60:A3:CA:6F)
+Dec 10 14:51:56 exelap pand[19263]: Connect to 00:10:60:A3:CA:6F failed.  
+Permission denied(13)
+
+strace said that connect() returns ENOACCESS.
+
+Google said nothing appropriate.
+
+The problem was solved by deletion of /var/lib/bluetooth/00:16:CE:DF:1F:54
+
+I don't understand what's went wrong, please explain me.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
@@ -62,6 +54,6 @@ Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
