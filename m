@@ -1,14 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Mon, 11 Dec 2006 08:44:52 +0800
-From: amateur <ztl.post@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20061211004452.GA3167@163.com>
-References: <62aeb6380612100652u6bde1744xa4fbe85834fce240@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <62aeb6380612100652u6bde1744xa4fbe85834fce240@mail.gmail.com>
-Subject: Re: [Bluez-devel] API documentation...
-Reply-To: amateur <ztl.post@gmail.com>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+Mime-Version: 1.0 (Apple Message framework v752.3)
+In-Reply-To: <1165780166.11292.0.camel@localhost>
+References: <E2B64452-537E-4E9E-BF57-54F2A7073BF4@mac.com>
+	<1165753987.22251.6.camel@aeonflux.holtmann.net>
+	<0FA9D595-36DD-4499-92B1-7C7080955B55@mac.com>
+	<1165780166.11292.0.camel@localhost>
+Message-Id: <31B9A3BB-1F96-4AAE-BCE0-AE12D4742EEB@mac.com>
+From: Brian West <brian.west@mac.com>
+Date: Sun, 10 Dec 2006 13:52:47 -0600
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Using BlueZ
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,15 +23,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sun, Dec 10, 2006 at 10:52:47PM +0800, abionnnn wrote:
-> I'm sure this is asked a lot but, I'm been reading Albert Huang's
-Absolutely!
-> thesis and I noticed that the BlueZ function hci_inquiry isn't
-> completely described. Is there something I can read about it?
-The source code of bluez-utils/tools, there are a lot of examples.
-Though the meaning or usage of some socket options may not be so
-clear, most usual APIs are quite straightforward.
+>
+> depends on what you need to do. Describe your use case and I might be
+> able to tell you.
+>
+> Regards
+>
+> Marcel
+>
 
+
+We want to interface a bluetooth phone into freeswitch for making and  
+receving phone calls.
+
+/b
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
