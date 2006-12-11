@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Olivier Dole <olivier.dole@palmsource.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1165849386.20733.9.camel@localhost>
+In-Reply-To: <1165849102.5344.71.camel@ODole-Ubuntu>
 References: <1165849102.5344.71.camel@ODole-Ubuntu>
-	<1165849386.20733.9.camel@localhost>
-Date: Mon, 11 Dec 2006 16:09:02 +0100
-Message-Id: <1165849742.5344.75.camel@ODole-Ubuntu>
+Date: Mon, 11 Dec 2006 16:03:06 +0100
+Message-Id: <1165849386.20733.9.camel@localhost>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] PAN profile BUG?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -17,47 +16,41 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-VGhlIHByb2JsZW0gZnJvbSBteSBwb2ludCBvZiB2aWV3IGlzIHRoYXQgaWYgeW91IHJ1biBhIFBB
-TlUgc2VydmVyIChzbwpubyBuZWVkIG9mIEV0aGVybmV0IGJyaWRnaW5nKSwgeW91IG11c3Qgb25s
-eSBoYXZlIG9uZSBzbGF2ZSBhbmQgeW91IGFyZQphYmxlIHRvIGhhdmUgMiBzbGF2ZXMgKG9yIG1v
-cmUpIGNvbm5lY3RlZCB0byB0aGUgc2VydmVyLi4uIEV2ZW4gaWYgdGhhdAppcyBub3QgcmVhbGx5
-IGEgYnVnLCBpdCBkb2VzIG5vdCBzdHJpY3RseSBmb2xsb3cgUEFOIHNwZWNpZmljYXRpb25zLgoK
-TGUgbHVuZGkgMTEgZMOpY2VtYnJlIDIwMDYgw6AgMTY6MDMgKzAxMDAsIE1hcmNlbCBIb2x0bWFu
-biBhIMOpY3JpdCA6Cj4gSGkgT2xpdmllciwKPiAKPiA+IEkgd29yayBvbiBQQU4gcHJvZmlsZSBh
-bmQgdGhlcmUgaXMgbWF5YmUgYSBidWcgaWYgd2UgcmVmZXIgdG8gdGhlIHNwZWNzCj4gPiAoUEFO
-IHByb2ZpbGUgdjEuMCkuCj4gPiBJJ3ZlIHJ1biBhIFBBTlUgc2VydmVyIHdpdGggcGFuZCBkYWVt
-b24gb24gbXkgTGludXggbWFjaGluZSBhbmQgSSB3YXMKPiA+IGFibGUgdG8gY29ubmVjdCAyIGRp
-ZmZlcmVudCBkZXZpY2VzIHRvIHRoaXMgc2VydmVyLiBBbmQgYWNjb3JkaW5nIHRvIHRoZQo+ID4g
-c3BlY2lmaWNhdGlvbiAocGFnZSAxNSk6Cj4gPiAgICAgICAgIDIuMS4zIFBBTlUtUEFOVQo+ID4g
-ICAgICAgICBJbiB0aGlzIHNjZW5hcmlvLCBhIHBvaW50IHRvIHBvaW50IGNvbm5lY3Rpb24gYmV0
-d2VlbiB0d28gUEFOVXMKPiA+ICAgICAgICAgYWxsb3dzIGRpcmVjdCBjb21tdW5pY2F0aW9uIGJl
-dHdlZW4gdGhlc2UgdHdvIG5vZGVzIG9ubHkuCj4gPiAKPiA+IFNvIHRoZSBzZWNvbmQgY29ubmVj
-dGlvbiBzaG91bGQgZmFpbCwgaXNuJ3QgaXQgPyBJIHN1cHBvc2UgKG5vdCB0ZXN0IGl0KQo+ID4g
-dGhhdCB0aGUgc2FtZSBiZWhhdmlvciBvY2N1cnMgd2l0aCBHTiBvciBOQVAgcm9sZS4gSSBtZWFu
-IHRoYXQgeW91IGNhbgo+ID4gY29ubmVjdCBtb3JlIHRoYW4gNyBwZWVycyB0byB0aGUgc2VydmVy
-Lgo+IAo+IEkgY2FuJ3QgZm9sbG93IHlvdSBhbmQgSSBhbHNvIGRvbid0IHNlZSBhIHByb2JsZW0g
-aGVyZS4gRXZlcnl0aGluZwo+IGRlcGVuZHMgb24gdGhlIHdheSB5b3Ugc2V0dXAgdGhlIGJyaWRn
-ZSBvciB0aGUgcm91dGluZyBmb3IgdGhlIGJuZXAwCj4gRXRoZXJuZXQgZGV2aWNlcy4KPiAKPiBS
-ZWdhcmRzCj4gCj4gTWFyY2VsCj4gCj4gCj4gCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFRha2UgU3Vy
-dmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBvZiBJVAo+IEpvaW4gU291cmNl
-Rm9yZ2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91J2xsIGdldCB0aGUgY2hhbmNlIHRvIHNo
-YXJlIHlvdXIKPiBvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdoIGJyaWVm
-IHN1cnZleXMgLSBhbmQgZWFybiBjYXNoCj4gaHR0cDovL3d3dy50ZWNoc2F5LmNvbS9kZWZhdWx0
-LnBocD9wYWdlPWpvaW4ucGhwJnA9c291cmNlZm9yZ2UmQ0lEPURFVkRFVgo+IF9fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCj4gQmx1ZXotZGV2ZWwgbWFpbGlu
-ZyBsaXN0Cj4gQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cj4gaHR0cHM6Ly9saXN0
-cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwKCgotLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tClRha2UgU3VydmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBvZiBJ
-VApKb2luIFNvdXJjZUZvcmdlLm5ldCdzIFRlY2hzYXkgcGFuZWwgYW5kIHlvdSdsbCBnZXQgdGhl
-IGNoYW5jZSB0byBzaGFyZSB5b3VyCm9waW5pb25zIG9uIElUICYgYnVzaW5lc3MgdG9waWNzIHRo
-cm91Z2ggYnJpZWYgc3VydmV5cyAtIGFuZCBlYXJuIGNhc2gKaHR0cDovL3d3dy50ZWNoc2F5LmNv
-bS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhwJnA9c291cmNlZm9yZ2UmQ0lEPURFVkRFVgpfX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZlbCBt
-YWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlz
-dHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
+Hi Olivier,
+
+> I work on PAN profile and there is maybe a bug if we refer to the specs
+> (PAN profile v1.0).
+> I've run a PANU server with pand daemon on my Linux machine and I was
+> able to connect 2 different devices to this server. And according to the
+> specification (page 15):
+>         2.1.3 PANU-PANU
+>         In this scenario, a point to point connection between two PANUs
+>         allows direct communication between these two nodes only.
+> 
+> So the second connection should fail, isn't it ? I suppose (not test it)
+> that the same behavior occurs with GN or NAP role. I mean that you can
+> connect more than 7 peers to the server.
+
+I can't follow you and I also don't see a problem here. Everything
+depends on the way you setup the bridge or the routing for the bnep0
+Ethernet devices.
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
