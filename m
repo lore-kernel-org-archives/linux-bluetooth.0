@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <457E1F1C.8090606@xmission.com>
-Date: Mon, 11 Dec 2006 20:16:44 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45799129.7070406@xmission.com>
-	<1165754285.22251.12.camel@aeonflux.holtmann.net>
-In-Reply-To: <1165754285.22251.12.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] rswitch in manpage
+In-Reply-To: <1165849742.5344.75.camel@ODole-Ubuntu>
+References: <1165849102.5344.71.camel@ODole-Ubuntu>
+	<1165849386.20733.9.camel@localhost>
+	<1165849742.5344.75.camel@ODole-Ubuntu>
+Date: Mon, 11 Dec 2006 21:51:25 +0100
+Message-Id: <1165870285.20733.19.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] PAN profile BUG?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,38 +22,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Olivier,
+
+> The problem from my point of view is that if you run a PANU server (so
+> no need of Ethernet bridging), you must only have one slave and you are
+> able to have 2 slaves (or more) connected to the server... Even if that
+> is not really a bug, it does not strictly follow PAN specifications.
+
+so you wanna have a mode that stops listening on the PSM 15 when it has
+a bnep0 connection and starts again once this connection has been
+terminated. It is doable, but I am not sure if it is worth changing the
+source code this way and first you have to convince me that we would
+fail the qualification tests if we keep supporting this. Otherwise it is
+a nice feature of BlueZ, because all this UUID stuff in the BNEP
+specification is crap anyway.
+
+Regards
+
 Marcel
 
-> And again, the link mode is only a policy for the the time when the
-> connection will be created. It says nothing about handling role
-> switching for the life time of a connection.
 
-This is good information. Making the distinction in the manpage between
-establishing and established connections will make it more clear. Does
-this look ok?
-
-diff -u -r1.8 hcid.conf.5
---- hcid.conf.5 14 Nov 2006 18:22:37 -0000      1.8
-+++ hcid.conf.5 12 Dec 2006 03:02:41 -0000
-@@ -182,13 +182,15 @@
-
- \fInone\fP means no specific policy. \fIaccept\fP means always accept
- incoming connections. \fImaster\fP means become master on incoming
--connections and deny role switch on outgoing connections.
-+connections and deny role switch on outgoing connections during
-+connection establishment.
-
- .TP
- \fBlp\fP  none|rswitch,hold,sniff,park
-
- \fInone\fP means no specific policy. \fIrswitch\fP means allow role
--switch. \fIhold\fP means allow hold mode. \fIsniff\fP means allow
-+switch on established connections. \fIhold\fP means allow hold mode.
-+\fIsniff\fP means allow
- sniff mode. \fIpark\fP means allow park mode. Several options can be
- combined.
-
-Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
