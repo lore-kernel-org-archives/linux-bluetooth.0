@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <457D793F.6080504@xmission.com>
-Date: Mon, 11 Dec 2006 08:29:03 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Olivier Dole <olivier.dole@palmsource.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <457C2D1F.1050605@free.fr>
-In-Reply-To: <457C2D1F.1050605@free.fr>
-Subject: Re: [Bluez-devel] [RFC] : Bluez audio routing: introducing switch
- alsa	plugin
+In-Reply-To: <1165849386.20733.9.camel@localhost>
+References: <1165849102.5344.71.camel@ODole-Ubuntu>
+	<1165849386.20733.9.camel@localhost>
+Date: Mon, 11 Dec 2006 16:09:02 +0100
+Message-Id: <1165849742.5344.75.camel@ODole-Ubuntu>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] PAN profile BUG?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,34 +17,47 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fabien
-
-> The idea is to bring in the picture a new plugin that i would call
-> conveniently the 'switch' plugin.
-> As its name suggests, its role would be to route to either one PCM
-> stream or another PCM.
-
-This approach would be ok I think. It's an implementation detail.
-
-One motivation for this approach would be keeping a2dp and sco daemons 
-separate. Are you still interested in doing it that way?
-
-We have been running with the assumption that we will have a single 
-daemon for sco and a2dp. So Connect(addr) would attempt to make control 
-connections for both protocols. Does this become too difficult?
-
-Brad
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+VGhlIHByb2JsZW0gZnJvbSBteSBwb2ludCBvZiB2aWV3IGlzIHRoYXQgaWYgeW91IHJ1biBhIFBB
+TlUgc2VydmVyIChzbwpubyBuZWVkIG9mIEV0aGVybmV0IGJyaWRnaW5nKSwgeW91IG11c3Qgb25s
+eSBoYXZlIG9uZSBzbGF2ZSBhbmQgeW91IGFyZQphYmxlIHRvIGhhdmUgMiBzbGF2ZXMgKG9yIG1v
+cmUpIGNvbm5lY3RlZCB0byB0aGUgc2VydmVyLi4uIEV2ZW4gaWYgdGhhdAppcyBub3QgcmVhbGx5
+IGEgYnVnLCBpdCBkb2VzIG5vdCBzdHJpY3RseSBmb2xsb3cgUEFOIHNwZWNpZmljYXRpb25zLgoK
+TGUgbHVuZGkgMTEgZMOpY2VtYnJlIDIwMDYgw6AgMTY6MDMgKzAxMDAsIE1hcmNlbCBIb2x0bWFu
+biBhIMOpY3JpdCA6Cj4gSGkgT2xpdmllciwKPiAKPiA+IEkgd29yayBvbiBQQU4gcHJvZmlsZSBh
+bmQgdGhlcmUgaXMgbWF5YmUgYSBidWcgaWYgd2UgcmVmZXIgdG8gdGhlIHNwZWNzCj4gPiAoUEFO
+IHByb2ZpbGUgdjEuMCkuCj4gPiBJJ3ZlIHJ1biBhIFBBTlUgc2VydmVyIHdpdGggcGFuZCBkYWVt
+b24gb24gbXkgTGludXggbWFjaGluZSBhbmQgSSB3YXMKPiA+IGFibGUgdG8gY29ubmVjdCAyIGRp
+ZmZlcmVudCBkZXZpY2VzIHRvIHRoaXMgc2VydmVyLiBBbmQgYWNjb3JkaW5nIHRvIHRoZQo+ID4g
+c3BlY2lmaWNhdGlvbiAocGFnZSAxNSk6Cj4gPiAgICAgICAgIDIuMS4zIFBBTlUtUEFOVQo+ID4g
+ICAgICAgICBJbiB0aGlzIHNjZW5hcmlvLCBhIHBvaW50IHRvIHBvaW50IGNvbm5lY3Rpb24gYmV0
+d2VlbiB0d28gUEFOVXMKPiA+ICAgICAgICAgYWxsb3dzIGRpcmVjdCBjb21tdW5pY2F0aW9uIGJl
+dHdlZW4gdGhlc2UgdHdvIG5vZGVzIG9ubHkuCj4gPiAKPiA+IFNvIHRoZSBzZWNvbmQgY29ubmVj
+dGlvbiBzaG91bGQgZmFpbCwgaXNuJ3QgaXQgPyBJIHN1cHBvc2UgKG5vdCB0ZXN0IGl0KQo+ID4g
+dGhhdCB0aGUgc2FtZSBiZWhhdmlvciBvY2N1cnMgd2l0aCBHTiBvciBOQVAgcm9sZS4gSSBtZWFu
+IHRoYXQgeW91IGNhbgo+ID4gY29ubmVjdCBtb3JlIHRoYW4gNyBwZWVycyB0byB0aGUgc2VydmVy
+Lgo+IAo+IEkgY2FuJ3QgZm9sbG93IHlvdSBhbmQgSSBhbHNvIGRvbid0IHNlZSBhIHByb2JsZW0g
+aGVyZS4gRXZlcnl0aGluZwo+IGRlcGVuZHMgb24gdGhlIHdheSB5b3Ugc2V0dXAgdGhlIGJyaWRn
+ZSBvciB0aGUgcm91dGluZyBmb3IgdGhlIGJuZXAwCj4gRXRoZXJuZXQgZGV2aWNlcy4KPiAKPiBS
+ZWdhcmRzCj4gCj4gTWFyY2VsCj4gCj4gCj4gCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFRha2UgU3Vy
+dmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBvZiBJVAo+IEpvaW4gU291cmNl
+Rm9yZ2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91J2xsIGdldCB0aGUgY2hhbmNlIHRvIHNo
+YXJlIHlvdXIKPiBvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdoIGJyaWVm
+IHN1cnZleXMgLSBhbmQgZWFybiBjYXNoCj4gaHR0cDovL3d3dy50ZWNoc2F5LmNvbS9kZWZhdWx0
+LnBocD9wYWdlPWpvaW4ucGhwJnA9c291cmNlZm9yZ2UmQ0lEPURFVkRFVgo+IF9fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCj4gQmx1ZXotZGV2ZWwgbWFpbGlu
+ZyBsaXN0Cj4gQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cj4gaHR0cHM6Ly9saXN0
+cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwKCgotLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tClRha2UgU3VydmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBvZiBJ
+VApKb2luIFNvdXJjZUZvcmdlLm5ldCdzIFRlY2hzYXkgcGFuZWwgYW5kIHlvdSdsbCBnZXQgdGhl
+IGNoYW5jZSB0byBzaGFyZSB5b3VyCm9waW5pb25zIG9uIElUICYgYnVzaW5lc3MgdG9waWNzIHRo
+cm91Z2ggYnJpZWYgc3VydmV5cyAtIGFuZCBlYXJuIGNhc2gKaHR0cDovL3d3dy50ZWNoc2F5LmNv
+bS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhwJnA9c291cmNlZm9yZ2UmQ0lEPURFVkRFVgpfX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZlbCBt
+YWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlz
+dHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
