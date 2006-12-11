@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20061212105834.x3eldg01uvk8ss0o@machmail.machbrunei.com>
-Date: Tue, 12 Dec 2006 10:58:34 +0800
-From: biau@machbrunei.com
-To: bluez-users@lists.sf.net
-MIME-Version: 1.0
-Subject: [Bluez-users] How to install BlueZ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <eljkhc$d94$1@sea.gmane.org>
+References: <eljkhc$d94$1@sea.gmane.org>
+Date: Mon, 11 Dec 2006 21:53:06 +0100
+Message-Id: <1165870386.20733.22.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Support for Intellimouse for bluetooth
+	in	mainline kernel
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +21,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Dear,
+Hi Nicolas,
 
-I am a very new user to linux. I am currently using mandrake linux,  
-and i bought a USB bluetooth Adapter. I wondering how to install it  
-into the linux, and i found that people saying that BlueZ will be the  
-bluetooth stack for linux. So i download it, and actually...now i am  
-stuck...i cant find any setup.exe or install.exe inside... hmmm, i  
-knew that linux is a lot different from Windows, so i hope that if  
-possible, you can teach me on how to make my usb bluetooth work.
+> Is there any chance to see support for Microsoft Intellimouse Explorer
+> for Bluetooth integrated in mainline, with better support than "Boot
+> protocol" ? It has been supported for years by -mh and should be mature
+> enough to be proposed for mainline, isn't it ? I'm pretty sure many
+> users would enjoy that.
 
-thank you~
+actually we just split the HID parser into a independent subsystem, but
+the HIDP code hasn't been adjusted to use it right now. Feel free to
+send in a patch to do so.
 
-Best Regard,
-Wen Biau
+> BTW, any plan for a 2.6.19-mh ? ;)
+
+Don't know. Maybe when I have a little bit more free time.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
