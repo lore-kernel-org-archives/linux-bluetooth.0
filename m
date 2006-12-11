@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Olivier Dole <olivier.dole@palmsource.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Mon, 11 Dec 2006 15:58:22 +0100
-Message-Id: <1165849102.5344.71.camel@ODole-Ubuntu>
-Mime-Version: 1.0
-Subject: [Bluez-devel] PAN profile BUG?
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Mon, 11 Dec 2006 16:53:36 +0800
+From: amateur <ztl.post@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20061211085336.GA6065@163.com>
+References: <op.tkcfqvl6ciev1l@localhost>
+MIME-Version: 1.0
+In-Reply-To: <op.tkcfqvl6ciev1l@localhost>
+Subject: Re: [Bluez-devel] pand: permission denied(13) ?
+Reply-To: amateur <ztl.post@gmail.com>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,41 +21,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+On Sun, Dec 10, 2006 at 03:31:33PM +0300, Exe wrote:
+> Hello, peoples, have a nice day.
+> 
+> After one boot to the windoze I didn't able to connect my laptop to the  
+> router via pand.
+> 
+> This messages was appeared in log:
+> 
+>   Dec 10 14:51:30 exelap hcid[19256]: Bluetooth HCI daemon
+> Dec 10 14:51:30 exelap hcid[19256]: Starting security manager 0
+> Dec 10 14:51:52 exelap pand[19263]: Bluetooth PAN daemon version 2.25
+> Dec 10 14:51:52 exelap pand[19263]: Connecting to 00:10:60:A3:CA:6F
+> Dec 10 14:51:55 exelap hci_acldata_packet: hci0 ACL packet for unknown  
+> connection handle 11
+> Dec 10 14:51:56 exelap hci_acldata_packet: hci0 ACL packet for unknown  
+> connection handle 11
+> Dec 10 14:51:56 exelap hci_acldata_packet: hci0 ACL packet for unknown  
+> connection handle 11
+> Dec 10 14:51:56 exelap hcid[19256]: link_key_request  
+> (sba=00:16:CE:DF:1F:54, dba=00:10:60:A3:CA:6F)
+> Dec 10 14:51:56 exelap pand[19263]: Connect to 00:10:60:A3:CA:6F failed.  
+> Permission denied(13)
+> 
+> strace said that connect() returns ENOACCESS.
+> 
+> Google said nothing appropriate.
+> 
+> The problem was solved by deletion of /var/lib/bluetooth/00:16:CE:DF:1F:54
+> 
+> I don't understand what's went wrong, please explain me.
+Would you please give us the output of 
+	hcidump -X -V
+when you commit those actions ?
+That may could help.
 
-I work on PAN profile and there is maybe a bug if we refer to the specs
-(PAN profile v1.0).
-I've run a PANU server with pand daemon on my Linux machine and I was
-able to connect 2 different devices to this server. And according to the
-specification (page 15):
-        2.1.3 PANU-PANU
-        In this scenario, a point to point connection between two PANUs
-        allows direct communication between these two nodes only.
-
-So the second connection should fail, isn't it ? I suppose (not test it)
-that the same behavior occurs with GN or NAP role. I mean that you can
-connect more than 7 peers to the server.
-
-I have a look at pand source code and see that the changes require to
-fix this behavior is not completly trivial. A solution may be to use 2
-global variable: "max_connection" (which may be set to 1 or 7 if PANU or
-GN/NAP role is run) and "connected" to know the number of currently
-connected device to the server. Unfortunately fork() call prevent us
-from correctly keeping up to date the second variable. So I would have
-to replace fork() call by pthread_create() call to try to keep my 2nd
-variable up to date. And this lead to many changes in do_listen()
-function.
-So regarding that, I have two questions:
-- Can someone with more Bluetooth knowledge than me confirm that is a
-bug ?
-- Has anyone a better/simpler solution than me to fix this if that's
-really a bug. I can do the fix but I'd like to choose the best solution
-for everyone.
-
-Regards,
-
-Olivier DOLE
-
+-- 
+Your motives for doing whatever good deed you may have in mind will be
+misinterpreted by somebody.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
