@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Olivier Dole <olivier.dole@palmsource.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1165870285.20733.19.camel@localhost>
-References: <1165849102.5344.71.camel@ODole-Ubuntu>
-	<1165849386.20733.9.camel@localhost>
-	<1165849742.5344.75.camel@ODole-Ubuntu>
-	<1165870285.20733.19.camel@localhost>
-Date: Tue, 12 Dec 2006 10:00:13 +0100
-Message-Id: <1165914013.5344.82.camel@ODole-Ubuntu>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] PAN profile BUG?
+Message-ID: <457E5CB7.9030000@xmission.com>
+Date: Tue, 12 Dec 2006 00:39:35 -0700
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: Nel <nel14d@rediffmail.com>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <20061212040544.28695.qmail@webmail55.rediffmail.com>
+In-Reply-To: <20061212040544.28695.qmail@webmail55.rediffmail.com>
+Subject: Re: [Bluez-devel] No sound in bluetooth headset
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,40 +17,32 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGVsbG8gTWFyY2VsLAoKTGUgbHVuZGkgMTEgZMOpY2VtYnJlIDIwMDYgw6AgMjE6NTEgKzAxMDAs
-IE1hcmNlbCBIb2x0bWFubiBhIMOpY3JpdCA6Cj4gc28geW91IHdhbm5hIGhhdmUgYSBtb2RlIHRo
-YXQgc3RvcHMgbGlzdGVuaW5nIG9uIHRoZSBQU00gMTUgd2hlbiBpdCBoYXMKPiBhIGJuZXAwIGNv
-bm5lY3Rpb24gYW5kIHN0YXJ0cyBhZ2FpbiBvbmNlIHRoaXMgY29ubmVjdGlvbiBoYXMgYmVlbgo+
-IHRlcm1pbmF0ZWQuIEl0IGlzIGRvYWJsZSwgYnV0IEkgYW0gbm90IHN1cmUgaWYgaXQgaXMgd29y
-dGggY2hhbmdpbmcgdGhlCj4gc291cmNlIGNvZGUgdGhpcyB3YXkgYW5kIGZpcnN0IHlvdSBoYXZl
-IHRvIGNvbnZpbmNlIG1lIHRoYXQgd2Ugd291bGQKPiBmYWlsIHRoZSBxdWFsaWZpY2F0aW9uIHRl
-c3RzIGlmIHdlIGtlZXAgc3VwcG9ydGluZyB0aGlzLiBPdGhlcndpc2UgaXQgaXMKPiBhIG5pY2Ug
-ZmVhdHVyZSBvZiBCbHVlWiwgYmVjYXVzZSBhbGwgdGhpcyBVVUlEIHN0dWZmIGluIHRoZSBCTkVQ
-Cj4gc3BlY2lmaWNhdGlvbiBpcyBjcmFwIGFueXdheS4KPiAKPiBSZWdhcmRzCj4gCj4gTWFyY2Vs
-Cj4gCldlbGwgdGhlIHBvdGVudGlhbCBxdWFsaWZpY2F0aW9uIGZhaWx1cmUgb2YgcGFuZCBpcyBt
-eSBtYWluIHdvcnJ5LiBCdXQKdGhhdCdzIHRydWUgdGhhdCBJIGhhdmUgbm90IGhhZCBhIGxvb2sg
-YXQgdGVzdHMgcmVxdWlyZSBmb3IKcXVhbGlmaWNhdGlvbi4gU28gSSdsbCBpbnF1aXJlIGZvciBp
-dCwgYW5kIHdpbGwgZ2l2ZSB5b3UgbW9yZSBpbmZvIGFib3V0CnRoaXMgcG9pbnQuCgpSZWFncmRz
-LAoKT2xpdmllcgo+IAo+IAo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiBUYWtlIFN1cnZleXMuIEVhcm4g
-Q2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQKPiBKb2luIFNvdXJjZUZvcmdlLm5ldCdz
-IFRlY2hzYXkgcGFuZWwgYW5kIHlvdSdsbCBnZXQgdGhlIGNoYW5jZSB0byBzaGFyZSB5b3VyCj4g
-b3BpbmlvbnMgb24gSVQgJiBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0g
-YW5kIGVhcm4gY2FzaAo+IGh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVmYXVsdC5waHA/cGFnZT1q
-b2luLnBocCZwPXNvdXJjZWZvcmdlJkNJRD1ERVZERVYKPiBfX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fXwo+IEJsdWV6LWRldmVsIG1haWxpbmcgbGlzdAo+IEJs
-dWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9y
-Z2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUYWtl
-IFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQKSm9pbiBTb3Vy
-Y2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFuY2UgdG8g
-c2hhcmUgeW91cgpvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdoIGJyaWVm
-IHN1cnZleXMgLSBhbmQgZWFybiBjYXNoCmh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVmYXVsdC5w
-aHA/cGFnZT1qb2luLnBocCZwPXNvdXJjZWZvcmdlJkNJRD1ERVZERVYKX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0
-CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZv
-cmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
+Nel
+
+> Hello all,
+>     I am trying the new bluetooth-alsa plugin as mentioned
+> https://help.ubuntu.com/community/BluetoothAudio.
+> 
+>   All goes fine but while playing a file via "aplay" i get absolutely no
+> sound output.The previous way of a btsco kernel module worked out of the
+> box.
+> any pointers ???. ..
+
+it may be a limit of your adapter. I improved the docs above with the
+long troubleshooting list.
+
+Brad
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
