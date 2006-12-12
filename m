@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <457F70F8.6040309@xmission.com>
-Date: Tue, 12 Dec 2006 20:18:16 -0700
+Message-ID: <457F0FF2.6080600@xmission.com>
+Date: Tue, 12 Dec 2006 13:24:18 -0700
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] org.bluez.Audio and connections
+References: <457655A2.6030001@xmission.com>	<45772B71.5020505@vasmac.com>	<457734F2.30204@xmission.com>	<457C2D10.5040801@free.fr>	<457EDCBB.8080207@xmission.com>
+	<457F08B4.6050603@free.fr>
+In-Reply-To: <457F08B4.6050603@free.fr>
+Subject: Re: [Bluez-devel] org.bluez.Audio
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,53 +21,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel
+Fabien
 
-Can we go back and look at audio connection init & inspect? I proposed
-ListConnectedStreams and ways to examine each stream for profile and
-status... we may start up an audio app after the connection was already
-going so the app would have missed seeing the connect signals.
+> But what about A2DP ? Wouldn't it make sense to use ALSA mixing facility 
+> too ?
 
-Do these look ok?
-
- 	        array{string} ListAudioDevices()
-
-                        Returns list of bdaddrs for devices that
-                        report audio in their device class.
-
-                array{string} Connect(string bdaddr)
-
-                        Connects the headset/headphones using A2DP or
-                        HSP/HFP or both. Returns the array of streams
-                        representing the successful connections.
-
-                void Disconnect(string bdaddr)
-
-                        Disconnect all streams to the audio device.
-
-                array{string} ListConnectedStreams()
-
-                string StreamAddress(string stream)
-
-                        Returns the bdaddr the indicated stream
-                        connects to.
-
-                boolean IsHeadset(string stream)
-
-                        Return true if the stream represents a
-                        headset.
-
-                boolean IsSink(string stream)
-
-                        Return true if the stream represents
-                        headphones.
-
-                boolean IsPlaying(string stream)
-
-                        Return true if the stream is in a playing
-                        state.
-
-                boolean IsPaused(string stream)
+dmix essentially acts as an audio server. But it's not the only one we 
+should consider. I've been looking at pulseaudio to see if it fits in 
+the picture at all. Seems to handle sound adapters that come and go and 
+includes a sort of audio routing mechanism.
 
 Brad
 
