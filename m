@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <457EE1A3.5030700@siemens.com>
-References: <457EE1A3.5030700@siemens.com>
-Date: Tue, 12 Dec 2006 18:58:09 +0100
-Message-Id: <1165946289.21138.3.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] L2CAP: ECONNRESET
+Message-ID: <457EE1A3.5030700@siemens.com>
+Date: Tue, 12 Dec 2006 18:06:43 +0100
+From: Lukas Szemla <lukas.szemla@siemens.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] L2CAP: ECONNRESET
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,37 +18,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Lukas,
+Hi *,
+I have a problem with BlueZ when used with openOBEX. I've implemented 
+application for vCard receiving and every time the vCard is received, 
+the error on L2CAP level is signalled. This error takes place after the 
+vCard is sucessfully received (and no error on OBEX level is signaled to 
+me).
 
-> I have a problem with BlueZ when used with openOBEX. I've implemented 
-> application for vCard receiving and every time the vCard is received, 
-> the error on L2CAP level is signalled. This error takes place after the 
-> vCard is sucessfully received (and no error on OBEX level is signaled to 
-> me).
-> 
-> The error is ECONNRESET and is a result of
-> l2cap_chan_del(sk, ECONNRESET) call
-> in
-> l2cap_disconnect_req
-> This is called from l2cap_sig_channel after device sent 
-> L2CAP_DISCONN_REQ on 0x001 CID channel.
-> 
-> My question is why is the l2cap_chan_del(sk, ECONNRESET) is hard-wired 
-> in L2CAP_DISCONN_REQ request handling? Where is the problem and how can 
-> I get rid of it (on the OBEX level)? Should I never get 
-> L2CAP_DISCONN_REQ in normal operation mode?
-> I've tried several devices with the same result. My openOBEX is of 1.3, 
-> kernel 2.4.31 official one. I run the application on MIPS.
+The error is ECONNRESET and is a result of
+l2cap_chan_del(sk, ECONNRESET) call
+in
+l2cap_disconnect_req
+This is called from l2cap_sig_channel after device sent 
+L2CAP_DISCONN_REQ on 0x001 CID channel.
 
-you should start using a 2.6 kernel. The 2.4 series is not really
-supported anymore.
+My question is why is the l2cap_chan_del(sk, ECONNRESET) is hard-wired 
+in L2CAP_DISCONN_REQ request handling? Where is the problem and how can 
+I get rid of it (on the OBEX level)? Should I never get 
+L2CAP_DISCONN_REQ in normal operation mode?
+I've tried several devices with the same result. My openOBEX is of 1.3, 
+kernel 2.4.31 official one. I run the application on MIPS.
 
-And run "hcidump -X -V" to see what actually happens.
+I've added some traces in the kernel and I can post it here if somebody 
+finds this useful. I haven't done it now since this is a lot of bloody 
+stuff that is not the official one.
 
-Regards
+Any hint is greatly welcomed.
+Thanks in advance!
 
-Marcel
+-- 
+Best regards.
 
+LS.
 
 
 -------------------------------------------------------------------------
