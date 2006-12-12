@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d66c3bdf0612122152j119bba2ax800a477c6c72f80f@mail.gmail.com>
-Date: Tue, 12 Dec 2006 21:52:32 -0800
-From: "Uichin (Eugene) Lee" <netssenger@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <457F104A.3020508@sbox.tugraz.at>
+Date: Tue, 12 Dec 2006 21:25:46 +0100
+From: Hans Juergen Gamauf <gamauf@sbox.tugraz.at>
 MIME-Version: 1.0
-Subject: [Bluez-users] periodic inquiry mode.
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Problem with RFCOMM/Socket and security
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,40 +18,66 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+Hello to all!
 
-I need some more helps/comments with periodic inquiry mode. As Marcel
-told, I checked the D-Bus based API, which is assumed to be defined in
-HCID. I mainly want to use this for P2P applications, i.e., for
-content sharing/advertisement application, and thus minimizing peer
-discovery latency (or, symmetric discovery latency) is the key issue.
+I'm working with an Embedded System (Arm 9, Linux 2.6.17.3, Uart
+Bluetooth Module from Bluegiga WT11) with Bluez, but without using
+/etc/bluetooth/hcid.conf
+I'm starting it with
 
-It seems like the actual configuration in HCID is a bit absurd. It
-uses inquiry window length of 8, and min and max were set to 16 and 24
-respectively; i.e., by multiplying 1.28s, they are 20.48s and 30.72s.
-We need to WAIT8*1.28=10.24s to get a response.
+/usr/sbin/hciattach /dev/ttyS1 csr 115200
+/usr/sbin/hciconfig hci0 up
 
-It seems like nobody has been working on optimizing the periodic
-inquiry mode. I saw a number of papers, but they misunderstood the
-units of various parameters, and thus proposed their own schemes,
-which are yet another version of this "periodic inquiry mode." Some
-analysis work simplified the mode too much, thus failing to reflect
-the reality. (I tried, but it seems like it's non-trivial to exactly
-model the overall system).
+and can set it up using hciconfig (currently I only set the name)
 
-I'm actually working on optimizing the parameter configuration for
-"symmetric" peer discovery. What I found is that unless we're using
-Bluetooth v1.1, we need inquiry window size at most 2, and the min and
-max are set to [0, 2*1.28] (assuming that inquiry scan is adjusted
-accordingly). When I tested it with Bluetooth 2.0 (Broadcom chipset),
-the latency was less than 3 seconds, which is a pretty well match with
-simulation.
+Now I want to establish a simple RFCOMM-Socket-Connection between two of
+these systems through
 
-Any comments on this?
+////// Server
+_sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+loc_addr.rc_family = AF_BLUETOOTH;
+loc_addr.rc_bdaddr = *BDADDR_ANY;
+loc_addr.rc_channel = (uint8_t) 1;
+bind(_sock, (struct sockaddr *)&loc_addr, sizeof(loc_addr));
+listen(_sock, 1);
+_clientSock = accept(_sock, (struct sockaddr *)&rem_addr, (socklen_t*)&opt);
 
--- 
-Uichin (Eugene) Lee
-Ph.D. Student UCLA CS Dept.
+
+Everything works fine!
+
+
+But now I want to Authenticate and Encrypt this Connection, so I inserted
+
+opt = RFCOMM_LM_AUTH|RFCOMM_LM_ENCRYPT;
+setsockopt(_sock, SOL_RFCOMM, RFCOMM_LM, &opt, sizeof(opt));
+
+after creating the socket, both on the server and the client, but now
+the connection cannot be established, of course, the pin is missing
+but where can I introduce it? I have no hcid.conf, so no pin_helper and
+so on, is it possible to tell bluez the pin through this programm?
+
+
+
+
+
+One little other problem:
+I have many clients, and I want that only one connection at a time can
+be established, but when one client is talking to the server, the next
+client can establish it (connect returns 0) and can send the data, but I
+don't know who receives the data
+Is it possible to reject the connection from the server if he is dealing
+already a client?
+
+
+
+
+Thank you in advance!
+
+regards,
+
+Hans Juergen
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
