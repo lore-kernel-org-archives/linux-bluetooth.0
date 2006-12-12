@@ -1,6 +1,6 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <457F104A.3020508@sbox.tugraz.at>
-Date: Tue, 12 Dec 2006 21:25:46 +0100
+Message-ID: <457F0368.6050007@sbox.tugraz.at>
+Date: Tue, 12 Dec 2006 20:30:48 +0100
 From: Hans Juergen Gamauf <gamauf@sbox.tugraz.at>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
@@ -20,8 +20,8 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hello to all!
 
-I'm working with an Embedded System (Arm 9, Linux 2.6.17.3, Uart
-Bluetooth Module from Bluegiga WT11) with Bluez, but without using
+I'm working with an Embedded System (Arm 9, Linux 2.6.17.3, Uart 
+Bluetooth Module from Bluegiga WT11) with Bluez, but without using 
 /etc/bluetooth/hcid.conf
 I'm starting it with
 
@@ -30,7 +30,7 @@ I'm starting it with
 
 and can set it up using hciconfig (currently I only set the name)
 
-Now I want to establish a simple RFCOMM-Socket-Connection between two of
+Now I want to establish a simple RFCOMM-Socket-Connection between two of 
 these systems through
 
 ////// Server
@@ -51,9 +51,9 @@ But now I want to Authenticate and Encrypt this Connection, so I inserted
 opt = RFCOMM_LM_AUTH|RFCOMM_LM_ENCRYPT;
 setsockopt(_sock, SOL_RFCOMM, RFCOMM_LM, &opt, sizeof(opt));
 
-after creating the socket, both on the server and the client, but now
+after creating the socket, both on the server and the client, but now 
 the connection cannot be established, of course, the pin is missing
-but where can I introduce it? I have no hcid.conf, so no pin_helper and
+but where can I introduce it? I have no hcid.conf, so no pin_helper and 
 so on, is it possible to tell bluez the pin through this programm?
 
 
@@ -61,11 +61,11 @@ so on, is it possible to tell bluez the pin through this programm?
 
 
 One little other problem:
-I have many clients, and I want that only one connection at a time can
-be established, but when one client is talking to the server, the next
-client can establish it (connect returns 0) and can send the data, but I
+I have many clients, and I want that only one connection at a time can 
+be established, but when one client is talking to the server, the next 
+client can establish it (connect returns 0) and can send the data, but I 
 don't know who receives the data
-Is it possible to reject the connection from the server if he is dealing
+Is it possible to reject the connection from the server if he is dealing 
 already a client?
 
 
@@ -76,7 +76,6 @@ Thank you in advance!
 regards,
 
 Hans Juergen
-
 
 
 -------------------------------------------------------------------------
