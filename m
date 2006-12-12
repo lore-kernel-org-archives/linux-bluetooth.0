@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <457EDCBB.8080207@xmission.com>
-Date: Tue, 12 Dec 2006 09:45:47 -0700
+Message-ID: <457EDB42.1010803@xmission.com>
+Date: Tue, 12 Dec 2006 09:39:30 -0700
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <457655A2.6030001@xmission.com>
-	<45772B71.5020505@vasmac.com>	<457734F2.30204@xmission.com>
-	<457C2D10.5040801@free.fr>
-In-Reply-To: <457C2D10.5040801@free.fr>
-Subject: Re: [Bluez-devel] org.bluez.Audio
+References: <20061212040544.28695.qmail@webmail55.rediffmail.com>	<457E5CB7.9030000@xmission.com>
+	<24a5055d0612120229g466dfce0rd280111ef8bbfa1c@mail.gmail.com>
+In-Reply-To: <24a5055d0612120229g466dfce0rd280111ef8bbfa1c@mail.gmail.com>
+Subject: Re: [Bluez-devel] No sound in bluetooth headset
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,22 +21,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fabien
+Rahul
 
-> Brad, i think the 'only on sco channel at a time argument' is not very
-> pertinent, for two reasons:
->   * First, i'm not sure there is an added value to be able to mix sound
-> channels to a sco headset.
->   * Second, if we think this is really needed, ALSA provides all
-> required facilities to mix multiple streams to one (think to the dmix
-> plugin). For your information, dmix is now on by default since alsa
-> 1.0.10 if i remember. Previously most cheap computers were only able to
-> play one PCM stream at a time. While annoying,  that didn't kill anybody
-> tought ;-)
+> The fact that the btsco kernel module worked perfectly well is confusing
+> me more..
+> 
+> Any pointers ??
 
-maybe the documentation could use some improvement, but I'm in agreement
-with you. We should give the plugin its own file descriptor for the sco
-link.
+Fabien has a new release that I need to put in cvs. I will send an
+announcement to the list when I get that put together. It will probably
+be in a new cvs module.
 
 Brad
 
