@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20061213182927.15667.qmail@web8508.mail.in.yahoo.com>
-Date: Wed, 13 Dec 2006 18:29:27 +0000 (GMT)
-From: amol kulkarni <amol2126@yahoo.co.in>
-To: amateur <ztl.post@gmail.com>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20061213175757.GA9370@163.com>
+Date: Thu, 14 Dec 2006 01:57:57 +0800
+From: amateur <ztl.post@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20061213175757.GA9370@163.com>
+References: <20061213143415.21388.qmail@web8503.mail.in.yahoo.com>
 MIME-Version: 1.0
+In-Reply-To: <20061213143415.21388.qmail@web8503.mail.in.yahoo.com>
 Subject: Re: [Bluez-users] Help ,  Bluetooth dongle not scannig cell
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Reply-To: amateur <ztl.post@gmail.com>,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -20,57 +21,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-yup. Its bluetooth option is set on.
-Its getting scannned by other mobile phone, which I
-kept near to PC. My PC is not getting detected by
-either mobile phones.
-
-
---- amateur <ztl.post@gmail.com> wrote:
-
-> On Wed, Dec 13, 2006 at 02:34:15PM +0000, amol
-> kulkarni wrote:
-> > 
-> > Hi
-> > 
-> > I am trying to connect from PC(Mandrake
-> Linux-10.0)
-> > using the USB dongle.(USBBTC1A  USB : Class 1 USB
-> > Bluetooth adapter, Billionton) to Nokia 6600.
-> > 
-> > when I tries to scan , it gives following output.
-> > Its not showing the nokia phone.
-> > 
-> > [root@localhost a]# hcitool scan
-> > Scanning ...
-> > [root@localhost a]# hcitool scan
-> > Scanning ...
-> > [root@localhost a]#
-> > 
-> Have you setup your phone to be discoverable ?
+On Wed, Dec 13, 2006 at 02:34:15PM +0000, amol kulkarni wrote:
 > 
->
--------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get
-> the chance to share your
-> opinions on IT & business topics through brief
-> surveys - and earn cash
->
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+> Hi
 > 
-
-
-
-		
-__________________________________________________________
-Yahoo! India Answers: Share what you know. Learn something new
-http://in.answers.yahoo.com/
+> I am trying to connect from PC(Mandrake Linux-10.0)
+> using the USB dongle.(USBBTC1A  USB : Class 1 USB
+> Bluetooth adapter, Billionton) to Nokia 6600.
+> 
+> when I tries to scan , it gives following output.
+> Its not showing the nokia phone.
+> 
+> [root@localhost a]# hcitool scan
+> Scanning ...
+> [root@localhost a]# hcitool scan
+> Scanning ...
+> [root@localhost a]#
+> 
+Have you setup your phone to be discoverable ?
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
