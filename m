@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4434.195.146.105.162.1166011822.squirrel@mserv.smecno.net>
-Date: Wed, 13 Dec 2006 13:10:22 +0100 (CET)
-From: "Jan SVETLIK" <bluez-users-mailing-list@svetlik.net>
-To: Bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: Re: [Bluez-users] bluez and billionton pcbtc1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d66c3bdf0612122152j119bba2ax800a477c6c72f80f@mail.gmail.com>
+References: <d66c3bdf0612122152j119bba2ax800a477c6c72f80f@mail.gmail.com>
+Date: Wed, 13 Dec 2006 09:29:51 +0100
+Message-Id: <1165998591.23723.3.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] periodic inquiry mode.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,125 +20,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello all. A have too problem with PCMCIA Billiongton PCBTC1.
+Hi Uichin,
 
-root@r51:# cardctl insert
+> I need some more helps/comments with periodic inquiry mode. As Marcel
+> told, I checked the D-Bus based API, which is assumed to be defined in
+> HCID. I mainly want to use this for P2P applications, i.e., for
+> content sharing/advertisement application, and thus minimizing peer
+> discovery latency (or, symmetric discovery latency) is the key issue.
+> 
+> It seems like the actual configuration in HCID is a bit absurd. It
+> uses inquiry window length of 8, and min and max were set to 16 and 24
+> respectively; i.e., by multiplying 1.28s, they are 20.48s and 30.72s.
+> We need to WAIT8*1.28=10.24s to get a response.
+> 
+> It seems like nobody has been working on optimizing the periodic
+> inquiry mode. I saw a number of papers, but they misunderstood the
+> units of various parameters, and thus proposed their own schemes,
+> which are yet another version of this "periodic inquiry mode." Some
+> analysis work simplified the mode too much, thus failing to reflect
+> the reality. (I tried, but it seems like it's non-trivial to exactly
+> model the overall system).
+> 
+> I'm actually working on optimizing the parameter configuration for
+> "symmetric" peer discovery. What I found is that unless we're using
+> Bluetooth v1.1, we need inquiry window size at most 2, and the min and
+> max are set to [0, 2*1.28] (assuming that inquiry scan is adjusted
+> accordingly). When I tested it with Bluetooth 2.0 (Broadcom chipset),
+> the latency was less than 3 seconds, which is a pretty well match with
+> simulation.
 
-Dec 10 09:34:45 localhost kernel: pccard: PCMCIA card inserted into slot 0
-Dec 10 09:34:45 localhost kernel: pcmcia: registering new device pcmcia0.0
-Dec 10 09:34:45 localhost cardmgr[4761]: socket 0: Serial or Modem
-Dec 10 09:34:45 localhost kernel: ttyS2: detected caps 00000700 should be
-00000100
-Dec 10 09:34:45 localhost kernel: 0.0: ttyS2 at I/O 0x3100 (irq = 3) is a
-16C950/954
-Dec 10 09:34:46 localhost cardmgr[4761]: executing: './serial start ttyS2 2>&1'
-Dec 10 09:34:46 localhost cardmgr[4761]: + udev active, devices will be
-created in /dev/.static/dev/
+nobody said that our values are perfect, but we need to simply pick some
+to get this going. If you gonna propose different values, then I am fine
+with that and would like to simply change it. You can have a different
+set of parameters for each Bluetooth version, because hcid knows the
+version of the chip and its manufacturer. So if a Bluetooth 1.1 behaves
+different from a 2.0 and a Broadcom chip behaves different from a CSR
+chip, then we simply include a table of parameters and pick the best one
+at runtime.
 
+One extra thing you should keep in mind is however power consumption. It
+is not possible to always assume unlimited power.
 
+Regards
 
-root@r51:# cardctl info
-PRODID_1="BT-PCMCIA"
-PRODID_2="Card"
-PRODID_3=""
-PRODID_4=""
-MANFID=0279,950b
-FUNCID=2
+Marcel
 
-
-
-root@r51:# dump_cis
-Socket 0:
-  dev_info
-    NULL 0ns, 512b
-  manfid 0x0279, 0x950b
-  funcid serial_port [post]
-  serial_interface
-    uart 16550 [space/mark/odd/even] [5/6/7/8] [1/1.5/2]
-  vers_1 7.1, "BT-PCMCIA", "Card", "", ""
-  config base 0x00f8 mask 0x000f last_index 0x04
-  cftable_entry 0x01 [default]
-    [rdybsy]
-    Vcc Vnom 3300mV
-    io 0x03f8-0x0407 [lines=8] [8bit] [range]
-    irq mask 0xffff [level] [shared]
-  cftable_entry 0x02
-    io 0x0000-0x7fff [lines=15] [8bit]
-
-
-
-root@r51:# setserial /dev/ttyS2 baud_base 921600 (i tried 115200 and 6550 too)
-
-
-
-root@r51:#  hciattach -l
-any       0x0000,0x0000
-ericsson  0x0000,0x0000
-digi      0x0000,0x0000
-texas     0x0000,0x0000
-bcsp      0x0000,0x0000
-xircom    0x0105,0x080a
-csr       0x0000,0x0000
-bboxes    0x0160,0x0002
-swave     0x0000,0x0000
-st        0x0000,0x0000
-stlc2500  0x0000,0x0000
-picocard  0x025e,0x1000
-inventel  0x0000,0x0000
-comone    0xffff,0x0101
-tdk       0x0105,0x4254
-socket    0x0104,0x0096
-3com      0x0101,0x0041
-bt2000c   0x022d,0x2000
-zoom      0x0279,0x950b
-sitecom   0x0279,0x950b
-billionton0x0279,0x950b
-bcm2035   0x0a5c,0x2035
-
-
-
-root@r51:# hciattach ttyS2 billionton 115200  (i tried 115200 and 6550 too)
-BCSP initialization timed out
-
-
-
-root@r51:# hciattach ttyS2 bcsp 115200  (i tried 115200 and 6550 too)
-BCSP initialization timed out
-
-
-
-root@r51:# hciattach ttyS2 any 115200 (is OK, but dmesg :
-Dec 10 09:46:02 localhost kernel: hci_cmd_task: hci0 command tx timeout)
-
-
-
-root@r51:# hciconfig (after hciattach ttyS2 any 115200)
-hci0:   Type: UART
-        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
-        DOWN
-        RX bytes:0 acl:0 sco:0 events:0 errors:0
-        TX bytes:0 acl:0 sco:0 commands:0 errors:0
-
-
-
-root@r51:/etc/pcmcia# hciconfig hci0 up
-Can't init device hci0: Connection timed out (110)
-
-
-
-root@r51:# /etc/init.d/bluetooth start
-Starting bluetooth: hcid sdpd sdp_options rfcomm.
-
-Dec 10 09:51:15 localhost hcid[7057]: Bluetooth HCI daemon
-Dec 10 09:51:15 localhost hcid[7057]: Register path:/org/bluez fallback:1
-Dec 10 09:51:15 localhost sdpd[7059]: Bluetooth SDP daemon
-
-
-
-Bluetooth not running - what I do badly?
-
-Thanks.
-SJ
 
 
 -------------------------------------------------------------------------
