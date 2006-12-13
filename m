@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 14 Dec 2006 01:57:57 +0800
-From: amateur <ztl.post@gmail.com>
+Message-ID: <20061213143415.21388.qmail@web8503.mail.in.yahoo.com>
+Date: Wed, 13 Dec 2006 14:34:15 +0000 (GMT)
+From: amol kulkarni <amol2126@yahoo.co.in>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20061213175757.GA9370@163.com>
-References: <20061213143415.21388.qmail@web8503.mail.in.yahoo.com>
 MIME-Version: 1.0
-In-Reply-To: <20061213143415.21388.qmail@web8503.mail.in.yahoo.com>
-Subject: Re: [Bluez-users] Help ,  Bluetooth dongle not scannig cell
-Reply-To: amateur <ztl.post@gmail.com>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Help ,  Bluetooth dongle not scannig cell
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,24 +18,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Wed, Dec 13, 2006 at 02:34:15PM +0000, amol kulkarni wrote:
-> 
-> Hi
-> 
-> I am trying to connect from PC(Mandrake Linux-10.0)
-> using the USB dongle.(USBBTC1A  USB : Class 1 USB
-> Bluetooth adapter, Billionton) to Nokia 6600.
-> 
-> when I tries to scan , it gives following output.
-> Its not showing the nokia phone.
-> 
-> [root@localhost a]# hcitool scan
-> Scanning ...
-> [root@localhost a]# hcitool scan
-> Scanning ...
-> [root@localhost a]#
-> 
-Have you setup your phone to be discoverable ?
+
+Hi
+
+I am trying to connect from PC(Mandrake Linux-10.0)
+using the USB dongle.(USBBTC1A  USB : Class 1 USB
+Bluetooth adapter, Billionton) to Nokia 6600.
+
+when I tries to scan , it gives following output.
+Its not showing the nokia phone.
+
+[root@localhost a]# hcitool scan
+Scanning ...
+[root@localhost a]# hcitool scan
+Scanning ...
+[root@localhost a]#
+
+Will you plz help me?
+
+Thanks
+
+
+
+		
+__________________________________________________________
+Yahoo! India Answers: Share what you know. Learn something new
+http://in.answers.yahoo.com/
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
