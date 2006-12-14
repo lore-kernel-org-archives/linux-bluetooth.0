@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <458169FA.2040803@adamis.de>
-Date: Thu, 14 Dec 2006 16:12:58 +0100
-From: Mathias Adam <a1@adamis.de>
+Date: Thu, 14 Dec 2006 14:27:43 +0000 (GMT)
+From: amol kulkarni <amol2126@yahoo.co.in>
+To: amateur <ztl.post@gmail.com>,
+        BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20061214124309.GA3123@163.com>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <4434.195.146.105.162.1166011822.squirrel@mserv.smecno.net>
-In-Reply-To: <4434.195.146.105.162.1166011822.squirrel@mserv.smecno.net>
-Subject: Re: [Bluez-users] bluez and billionton pcbtc1
+Message-ID: <386920.16704.qm@web8508.mail.in.yahoo.com>
+Subject: Re: [Bluez-users] Help ,  Bluetooth dongle not scannig cell
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,37 +20,109 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+It's mandrake 10.0 with 2.6.3 kernel version
 
-Jan SVETLIK wrote:
-> Hello all. A have too problem with PCMCIA Billiongton PCBTC1.
+
+
+--- amateur <ztl.post@gmail.com> wrote:
+
+> On Wed, Dec 13, 2006 at 06:29:27PM +0000, amol
+> kulkarni wrote:
+> > yup. Its bluetooth option is set on.
+> > Its getting scannned by other mobile phone, which
+> I
+> > kept near to PC. My PC is not getting detected by
+> > either mobile phones.
+> What's the version of your kernel? Some 2.4 kernels
+> have a bug to give
+> you nothing for hcitool scan.
+> > 
+> > 
+> > --- amateur <ztl.post@gmail.com> wrote:
+> > 
+> > > On Wed, Dec 13, 2006 at 02:34:15PM +0000, amol
+> > > kulkarni wrote:
+> > > > 
+> > > > Hi
+> > > > 
+> > > > I am trying to connect from PC(Mandrake
+> > > Linux-10.0)
+> > > > using the USB dongle.(USBBTC1A  USB : Class 1
+> USB
+> > > > Bluetooth adapter, Billionton) to Nokia 6600.
+> > > > 
+> > > > when I tries to scan , it gives following
+> output.
+> > > > Its not showing the nokia phone.
+> > > > 
+> > > > [root@localhost a]# hcitool scan
+> > > > Scanning ...
+> > > > [root@localhost a]# hcitool scan
+> > > > Scanning ...
+> > > > [root@localhost a]#
+> > > > 
+> > > Have you setup your phone to be discoverable ?
+> > > 
+> > >
+> >
+>
+-------------------------------------------------------------------------
+> > > Take Surveys. Earn Cash. Influence the Future of
+> IT
+> > > Join SourceForge.net's Techsay panel and you'll
+> get
+> > > the chance to share your
+> > > opinions on IT & business topics through brief
+> > > surveys - and earn cash
+> > >
+> >
+>
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> > > _______________________________________________
+> > > Bluez-users mailing list
+> > > Bluez-users@lists.sourceforge.net
+> > >
+> >
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+> > > 
+> > 
+> > 
+> > 
+> > 		
+> >
+>
+__________________________________________________________
+> > Yahoo! India Answers: Share what you know. Learn
+> something new
+> > http://in.answers.yahoo.com/
+> -------------------------
 > 
-> root@r51:# cardctl insert
+> -- 
+> There was a phone call for you.
 > 
-> Dec 10 09:34:45 localhost kernel: pccard: PCMCIA card inserted into slot 0
-> Dec 10 09:34:45 localhost kernel: pcmcia: registering new device pcmcia0.0
-> Dec 10 09:34:45 localhost cardmgr[4761]: socket 0: Serial or Modem
-> Dec 10 09:34:45 localhost kernel: ttyS2: detected caps 00000700 should be
-> 00000100
-> Dec 10 09:34:45 localhost kernel: 0.0: ttyS2 at I/O 0x3100 (irq = 3) is a
-> 16C950/954
-> Dec 10 09:34:46 localhost cardmgr[4761]: executing: './serial start ttyS2 2>&1'
-> Dec 10 09:34:46 localhost cardmgr[4761]: + udev active, devices will be
-> created in /dev/.static/dev/
-[...]
-> root@r51:# hciattach ttyS2 billionton 115200  (i tried 115200 and 6550 too)
-> BCSP initialization timed out
-[...]
-> root@r51:# hciattach ttyS2 bcsp 115200  (i tried 115200 and 6550 too)
-> BCSP initialization timed out
+>
+-------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get
+> the chance to share your
+> opinions on IT & business topics through brief
+> surveys - and earn cash
+>
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
 
-as your card uses a 16C950/954 too you could try this kernel patch:
-http://www.adamis.de/linux/bt-socket.html
 
-Or simply try a kernel 2.4.
 
-Regards
-Mathias
+		
+__________________________________________________________
+Yahoo! India Answers: Share what you know. Learn something new
+http://in.answers.yahoo.com/
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
