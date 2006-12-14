@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <20061214204404.75141.qmail@web58803.mail.re1.yahoo.com>
-Date: Thu, 14 Dec 2006 12:44:04 -0800 (PST)
-From: Hiita Road <hittaroad@yahoo.com>
+Date: Thu, 14 Dec 2006 17:25:46 +0800
+From: amateur <ztl.post@gmail.com>
 To: bluez-devel@lists.sourceforge.net
+Message-ID: <20061214092546.GA6244@163.com>
+References: <1166076796.3984.9.camel@localhost>
 MIME-Version: 1.0
-Subject: [Bluez-devel] diagnosing 2000E card issues
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1166076796.3984.9.camel@localhost>
+Subject: Re: [Bluez-devel] Immediate disconnect after doing "hcitool cc"
+Reply-To: amateur <ztl.post@gmail.com>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,65 +17,63 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0238048874=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0238048874==
-Content-Type: multipart/alternative; boundary="0-324250681-1166129044=:74566"
-Content-Transfer-Encoding: 8bit
+On Thu, Dec 14, 2006 at 01:13:16AM -0500, Jon Barnett wrote:
+> hcidump -X -V results for a hcitool cc command:
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:12:EE:E0:AB:CA ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5 
+> > HCI Event: Command Status (0x0f) plen 4
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x00 handle 12 bdaddr 00:12:EE:E0:AB:CA type ACL encrypt 0x00
+> < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+>     handle 12
+> > HCI Event: Command Status (0x0f) plen 4
+>     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+> < HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+>     handle 12 policy 0x0f
+>     Link policy: RSWITCH HOLD SNIFF PARK 
+> > HCI Event: Read Remote Supported Features (0x0b) plen 11
+>     status 0x00 handle 12
+>     Features: 0xff 0xfd 0x29 0x78 0x18 0x18 0x00 0x80
+> > HCI Event: Command Complete (0x0e) plen 6
+>     Write Link Policy Settings (0x02|0x000d) ncmd 1
+>     status 0x00 handle 12
+> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+>     bdaddr 00:12:EE:E0:AB:CA mode 2 clkoffset 0x0000
+> > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> > HCI Event: Max Slots Change (0x1b) plen 3
+>     handle 12 slots 5
+> > HCI Event: Remote Name Req Complete (0x07) plen 255
+>     status 0x00 bdaddr 00:12:EE:E0:AB:CA name 'HBH-610a'
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>     handle 12 reason 0x13
+>     Reason: Remote User Terminated Connection
+> > HCI Event: Command Status (0x0f) plen 4
+>     Disconnect (0x01|0x0006) status 0x00 ncmd 1
+> > HCI Event: Disconn Complete (0x05) plen 4
+>     status 0x00 handle 12 reason 0x16
+>     Reason: Connection Terminated by Local Host
+> 
+How long does it takes for your computer to send the disconnect
+request? Maybe it is that bluez will automatically disconnect a
+connection after some idle time.
 
---0-324250681-1166129044=:74566
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-Hi
-
-I'm trying to get my ambicom 2000E based chipset CF card working, it  works with the 2.4 bt950_cs driver but no longer works with the new stuff for 2.6 (see archives here for more on those with same problem). The interface will never UP on 2.6.
-
-Anyway i've modified some of the init commands in hciattach so it will now UP and can be seen by other bluetooth devices. However try to do anything and it times out, and hciattach is locked up.
-
-I tried stepping into hcitool when doing a scan to see where it having the issue, its in hci_inquiry hci.c at ret = ioctl(dd, HCIINQUIRY, (unsigned long) buf);
-
-where it times out.
-
-Any suggestions on where I should check next? At the moment i'm just trying to ensure the serial port and the uart are using compatible settings, i'm not sure where to go from here.  Other than tearing into all kinds of other code like hci_uart or what have you.
-
-thanks
-
- 
----------------------------------
-Everyone is raving about the all-new Yahoo! Mail beta.
---0-324250681-1166129044=:74566
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-Hi<br><br>I'm trying to get my ambicom 2000E based chipset CF card working, it&nbsp; works with the 2.4 bt950_cs driver but no longer works with the new stuff for 2.6 (see archives here for more on those with same problem). The interface will never UP on 2.6.<br><br>Anyway i've modified some of the init commands in hciattach so it will now UP and can be seen by other bluetooth devices. However try to do anything and it times out, and hciattach is locked up.<br><br>I tried stepping into hcitool when doing a scan to see where it having the issue, its in hci_inquiry hci.c at ret = ioctl(dd, HCIINQUIRY, (unsigned long) buf);<br><br>where it times out.<br><br>Any suggestions on where I should check next? At the moment i'm just trying to ensure the serial port and the uart are using compatible settings, i'm not sure where to go from here.&nbsp; Other than tearing into all kinds of other code like hci_uart or what have you.<br><br>thanks<br><p>&#32;
-
-<hr size=1>Everyone is raving about <a href="http://us.rd.yahoo.com/evt=45083/*http://advision.webevents.yahoo.com/mailbeta">the all-new Yahoo! Mail beta.</a>
---0-324250681-1166129044=:74566--
-
-
---===============0238048874==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+An honest tale speeds best being plainly told.
+		-- William Shakespeare, "Henry VI"
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0238048874==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0238048874==--
