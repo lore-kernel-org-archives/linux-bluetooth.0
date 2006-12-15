@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4582A310.60905@jambit.com>
-Date: Fri, 15 Dec 2006 14:28:48 +0100
-From: =?ISO-8859-15?Q?Frank_Heimb=E4cher?= <frank.heimbaecher@jambit.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-References: <44F6B7AE.1030209@jambit.com>
-In-Reply-To: <44F6B7AE.1030209@jambit.com>
-Subject: [Bluez-users] How to use sbc.c of btsco?
+From: Olivier Dole <olivier.dole@palmsource.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <86538205C715094CB44B7EB1119B886B31D302@nts028.kuka.de>
+References: <86538205C715094CB44B7EB1119B886B31D302@nts028.kuka.de>
+Date: Fri, 15 Dec 2006 14:11:20 +0100
+Message-Id: <1166188280.5344.146.camel@ODole-Ubuntu>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] pand connection debug
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,40 +16,50 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Dear community
-
-I want to use the codec implemented in sbc.c in btsco. Is there a chance
-to get a documentation of the code? I understand so much that you call
-sbc_init() first, sbc_finish() at the end, and use sbc_decode() and
-sbc_encode() for converting.
-
-sbc_encode: It seems like you put pcm data on 'data' and get sbc data in
- 'sbc.data'. 'count' is not used in the function. How often must I call
-it? How do I know how much of 'data' is converted already?
-
-sbc_decode: Put sbc data on 'data' and you get pcm data in 'sbc.m.data'.
-Is that right? Must I always change the byte order like it is done in
-a2recv.c?
-
-Are there special things to do if I have a .wav file or do I just have
-to call the functions? I am just talking of the payload and not the headers.
-
-It would help me a lot if somebody could put me on the right track.
-
-Thanks a lot
-Frank
-
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGVsbG8sCgpUbyBzZWUgYm5lcDAgaW50ZXJmYWNlIHlvdSBoYXZlIHRvIGRvICJpZmNvbmZpZyAt
+YSIgYXMgdGhpcyBpbnRlcmZhY2UgaXMKbm90IHVwIGFuZCBjb25maWd1cmVkLgpUbyBhdXRvbWF0
+ZSBpbnRlcmZhY2UgY29uZmlndXJhdGlvbiwgY3JlYXRlIGFuIGV4ZWN1dGFibGUgZGV2LXVwIHNj
+cmlwdAphbmQgcGFzcyBpdCBhcyBhcmd1bWVudCB0byB5b3VyIGNvbW1hbmQgbGluZSBlLmcuCnBh
+bmQgLXIgTkFQIC1kIFBBTlUgLWMgeHh4IC11IC9wYXRoL3RvL2Rldi11cCAtbgp3aGVuIGRldi11
+cCBzY3JpcHQgaXMgY2FsbGVkIHdpdGggImJuZXAwIiBhcyBmaXJzdCBhcmd1bWVudCBhbmQgdGhl
+CnJlbW90ZSBibHVldG9vdGggYWRkcmVzcyAoeHh4KSBhcyBzZWNvbmQgb25lLgpzbyBhIHRyaXZp
+YWwgc2NyaXB0IG1heSBiZToKIyEvYmluL3NoCmlmY29uZmlnICQxIDE5Mi4xNjguMS4xIHVwCgpO
+b3RlOiB5b3UgbWF5IGFsc28gaGF2ZSB0byBlbmFibGUgc29tZSBOQVQgcnVsZXMgb24geW91ciBk
+ZXNrdG9wIHRvIGJlCmFibGUgdG8gYWNjZXNzIEludGVybmV0IGZyb20geW91ciBwaG9uZS4KClJl
+Z2FyZHMKCk9saXZpZXIKCkxlIHZlbmRyZWRpIDE1IGTDqWNlbWJyZSAyMDA2IMOgIDEyOjIxICsw
+MTAwLCBHb3JvbGwsIFRvcnN0ZW4gYSDDqWNyaXQgOgo+IEhpLAo+IAo+IGkgaGF2ZSBzdWNjZXNz
+ZnVsbHkgc2V0IHVwIGEgcGFuIGNvbm5lY3Rpb24gYmV0d2VlbiBteSBsYXB0b3AgYW5kIG15Cj4g
+aGFuZCBwaG9uZSB1c2luZyB0aGlzIGNvbW1hbmQ6Cj4gCj4gcGFuZCAtciBOQVAgLWQgUEFOVSAt
+YyB4eHggLW4KPiAKPiBJZiBJIHRyeSB0byBhY2Nlc3MgdGhlIGNvbm5lY3Rpb24gZnJvbSB0aGUg
+cGhvbmUgKGUuZy4gYnkgYnJvd3NlcikgaXQKPiBzYXlzIG5ldHdvcmsgY29ubmVjdGlvbiBlcnJv
+ci4gSW0gbm90IHN1cHJpc2VkLCBiZWNhdXNlIHRoZXJlIGlzCj4gbm90aGluZyBjb25maWd1cmVk
+LiBUaGUgcHJvYmxlbSBpczogaG93IHRvIGdldCBpbmZvcm1hdGlvbiBhYm91dCB0aGUKPiBibmVw
+IGludGVyZmFjZS4gSXZlIHJlYWQgdGhlIFBBTi1Ib3dUby4gQnV0IGl0IHNlZW1zIG91dGRhdGV0
+LAo+IGJlY2F1c2U6Cj4gCj4gLSB0aGVpciBpcyBubyBpbnRlcmZhY2Ugc2hvd24gY2FsbGluZyBp
+ZmNvbmZpZyAgCj4gLSB0aGVpciBpcyBubyAgL2V0Yy9zeXNjb25maWcgKGF0IGxlYXN0IGF0IG15
+IGRpc3RyaSwgd2hpY2ggaXMgdWJ1bnR1Cj4gNi4xMCkgCj4gLSB0aGVpciBpcyBubyAvZXRjL2Js
+dWV0b290aC9wYW4gZm9sZGVyIG9yIGRldi11cCBzY3JpcHQKPiAKPiBEb2VzIHNvbWVvbmUga25v
+dyBvZiBzb21lIG1vcmUgY3VycmVudCBpbmZvcm1hdGlvbiBvciBob3cgdG8gY29uZmlndXJlCj4g
+dGhpcyBjb25uZWN0aW9uPwo+IAo+IAo+IFRvcnN0ZW4KPiAKPiAtLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4g
+VGFrZSBTdXJ2ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9mIElUCj4gSm9p
+biBTb3VyY2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFu
+Y2UgdG8gc2hhcmUgeW91cgo+IG9waW5pb25zIG9uIElUICYgYnVzaW5lc3MgdG9waWNzIHRocm91
+Z2ggYnJpZWYgc3VydmV5cyAtIGFuZCBlYXJuIGNhc2gKPiBodHRwOi8vd3d3LnRlY2hzYXkuY29t
+L2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCj4gX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18gQmx1ZXotdXNlcnMg
+bWFpbGluZyBsaXN0IEJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldCBodHRwczovL2xp
+c3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2VycwoKCi0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0KVGFrZSBTdXJ2ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9m
+IElUCkpvaW4gU291cmNlRm9yZ2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91J2xsIGdldCB0
+aGUgY2hhbmNlIHRvIHNoYXJlIHlvdXIKb3BpbmlvbnMgb24gSVQgJiBidXNpbmVzcyB0b3BpY3Mg
+dGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0gYW5kIGVhcm4gY2FzaApodHRwOi8vd3d3LnRlY2hzYXku
+Y29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCl9f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJz
+IG1haWxpbmcgbGlzdApCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9s
+aXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
