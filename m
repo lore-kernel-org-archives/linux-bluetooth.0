@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Olivier Dole <olivier.dole@palmsource.com>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <86538205C715094CB44B7EB1119B886B31D302@nts028.kuka.de>
-References: <86538205C715094CB44B7EB1119B886B31D302@nts028.kuka.de>
-Date: Fri, 15 Dec 2006 14:11:20 +0100
-Message-Id: <1166188280.5344.146.camel@ODole-Ubuntu>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] pand connection debug
+MIME-Version: 1.0
+Date: Fri, 15 Dec 2006 12:21:26 +0100
+Message-ID: <86538205C715094CB44B7EB1119B886B31D302@nts028.kuka.de>
+From: "Goroll, Torsten" <Torsten.Goroll@kuka.de>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] pand connection debug
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,50 +14,124 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============0260891281=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGVsbG8sCgpUbyBzZWUgYm5lcDAgaW50ZXJmYWNlIHlvdSBoYXZlIHRvIGRvICJpZmNvbmZpZyAt
-YSIgYXMgdGhpcyBpbnRlcmZhY2UgaXMKbm90IHVwIGFuZCBjb25maWd1cmVkLgpUbyBhdXRvbWF0
-ZSBpbnRlcmZhY2UgY29uZmlndXJhdGlvbiwgY3JlYXRlIGFuIGV4ZWN1dGFibGUgZGV2LXVwIHNj
-cmlwdAphbmQgcGFzcyBpdCBhcyBhcmd1bWVudCB0byB5b3VyIGNvbW1hbmQgbGluZSBlLmcuCnBh
-bmQgLXIgTkFQIC1kIFBBTlUgLWMgeHh4IC11IC9wYXRoL3RvL2Rldi11cCAtbgp3aGVuIGRldi11
-cCBzY3JpcHQgaXMgY2FsbGVkIHdpdGggImJuZXAwIiBhcyBmaXJzdCBhcmd1bWVudCBhbmQgdGhl
-CnJlbW90ZSBibHVldG9vdGggYWRkcmVzcyAoeHh4KSBhcyBzZWNvbmQgb25lLgpzbyBhIHRyaXZp
-YWwgc2NyaXB0IG1heSBiZToKIyEvYmluL3NoCmlmY29uZmlnICQxIDE5Mi4xNjguMS4xIHVwCgpO
-b3RlOiB5b3UgbWF5IGFsc28gaGF2ZSB0byBlbmFibGUgc29tZSBOQVQgcnVsZXMgb24geW91ciBk
-ZXNrdG9wIHRvIGJlCmFibGUgdG8gYWNjZXNzIEludGVybmV0IGZyb20geW91ciBwaG9uZS4KClJl
-Z2FyZHMKCk9saXZpZXIKCkxlIHZlbmRyZWRpIDE1IGTDqWNlbWJyZSAyMDA2IMOgIDEyOjIxICsw
-MTAwLCBHb3JvbGwsIFRvcnN0ZW4gYSDDqWNyaXQgOgo+IEhpLAo+IAo+IGkgaGF2ZSBzdWNjZXNz
-ZnVsbHkgc2V0IHVwIGEgcGFuIGNvbm5lY3Rpb24gYmV0d2VlbiBteSBsYXB0b3AgYW5kIG15Cj4g
-aGFuZCBwaG9uZSB1c2luZyB0aGlzIGNvbW1hbmQ6Cj4gCj4gcGFuZCAtciBOQVAgLWQgUEFOVSAt
-YyB4eHggLW4KPiAKPiBJZiBJIHRyeSB0byBhY2Nlc3MgdGhlIGNvbm5lY3Rpb24gZnJvbSB0aGUg
-cGhvbmUgKGUuZy4gYnkgYnJvd3NlcikgaXQKPiBzYXlzIG5ldHdvcmsgY29ubmVjdGlvbiBlcnJv
-ci4gSW0gbm90IHN1cHJpc2VkLCBiZWNhdXNlIHRoZXJlIGlzCj4gbm90aGluZyBjb25maWd1cmVk
-LiBUaGUgcHJvYmxlbSBpczogaG93IHRvIGdldCBpbmZvcm1hdGlvbiBhYm91dCB0aGUKPiBibmVw
-IGludGVyZmFjZS4gSXZlIHJlYWQgdGhlIFBBTi1Ib3dUby4gQnV0IGl0IHNlZW1zIG91dGRhdGV0
-LAo+IGJlY2F1c2U6Cj4gCj4gLSB0aGVpciBpcyBubyBpbnRlcmZhY2Ugc2hvd24gY2FsbGluZyBp
-ZmNvbmZpZyAgCj4gLSB0aGVpciBpcyBubyAgL2V0Yy9zeXNjb25maWcgKGF0IGxlYXN0IGF0IG15
-IGRpc3RyaSwgd2hpY2ggaXMgdWJ1bnR1Cj4gNi4xMCkgCj4gLSB0aGVpciBpcyBubyAvZXRjL2Js
-dWV0b290aC9wYW4gZm9sZGVyIG9yIGRldi11cCBzY3JpcHQKPiAKPiBEb2VzIHNvbWVvbmUga25v
-dyBvZiBzb21lIG1vcmUgY3VycmVudCBpbmZvcm1hdGlvbiBvciBob3cgdG8gY29uZmlndXJlCj4g
-dGhpcyBjb25uZWN0aW9uPwo+IAo+IAo+IFRvcnN0ZW4KPiAKPiAtLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4g
-VGFrZSBTdXJ2ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9mIElUCj4gSm9p
-biBTb3VyY2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFu
-Y2UgdG8gc2hhcmUgeW91cgo+IG9waW5pb25zIG9uIElUICYgYnVzaW5lc3MgdG9waWNzIHRocm91
-Z2ggYnJpZWYgc3VydmV5cyAtIGFuZCBlYXJuIGNhc2gKPiBodHRwOi8vd3d3LnRlY2hzYXkuY29t
-L2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCj4gX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18gQmx1ZXotdXNlcnMg
-bWFpbGluZyBsaXN0IEJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldCBodHRwczovL2xp
-c3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2VycwoKCi0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0KVGFrZSBTdXJ2ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9m
-IElUCkpvaW4gU291cmNlRm9yZ2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91J2xsIGdldCB0
-aGUgY2hhbmNlIHRvIHNoYXJlIHlvdXIKb3BpbmlvbnMgb24gSVQgJiBidXNpbmVzcyB0b3BpY3Mg
-dGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0gYW5kIGVhcm4gY2FzaApodHRwOi8vd3d3LnRlY2hzYXku
-Y29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCl9f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJz
-IG1haWxpbmcgbGlzdApCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9s
-aXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
+This is a multi-part message in MIME format.
+
+--===============0260891281==
+content-class: urn:content-classes:message
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C7203B.2904371E"
+
+This is a multi-part message in MIME format.
+
+------_=_NextPart_001_01C7203B.2904371E
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+i have successfully set up a pan connection between my laptop and my =
+hand phone using this command:
+
+pand -r NAP -d PANU -c xxx -n
+
+If I try to access the connection from the phone (e.g. by browser) it =
+says network connection error. Im not suprised, because there is nothing =
+configured. The problem is: how to get information about the bnep =
+interface. Ive read the PAN-HowTo. But it seems outdatet, because:
+- their is no interface shown calling ifconfig=20
+- their is no  /etc/sysconfig (at least at my distri, which is ubuntu =
+6.10)
+- their is no /etc/bluetooth/pan folder or dev-up script
+
+Does someone know of some more current information or how to configure =
+this connection?
+
+
+Torsten
+
+
+------_=_NextPart_001_01C7203B.2904371E
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Diso-8859-1">
+<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
+6.0.6603.0">
+<TITLE>pand connection debug</TITLE>
+</HEAD>
+<BODY>
+<!-- Converted from text/rtf format -->
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">Hi,</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">i have successfully set up a pan =
+connection between my laptop and my hand phone using this =
+command:</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">pand -r NAP -d PANU -c xxx -n</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">If I try to access the connection from =
+the phone (e.g. by browser) it says network connection error. Im not =
+suprised, because there is nothing configured. The problem is: how to =
+get information about the bnep interface. Ive read the PAN-HowTo. But it =
+seems outdatet, because:</FONT></P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">- their is no interface shown calling =
+ifconfig </FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Arial">- their is no&nbsp; /etc/sysconfig (at =
+least at my distri, which is ubuntu 6.10)</FONT>
+
+<BR><FONT SIZE=3D2 FACE=3D"Arial">- their is no /etc/bluetooth/pan =
+folder or dev-up script</FONT>
+</P>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">Does someone know of some more current =
+information or how to configure this connection?</FONT>
+</P>
+<BR>
+
+<P><FONT SIZE=3D2 FACE=3D"Arial">Torsten</FONT>
+</P>
+
+</BODY>
+</HTML>
+------_=_NextPart_001_01C7203B.2904371E--
+
+
+--===============0260891281==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============0260891281==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0260891281==--
