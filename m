@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <be976db60612151534u714d0533h828a70b5d0b432e7@mail.gmail.com>
+Date: Fri, 15 Dec 2006 15:34:23 -0800
+From: "Mark S. Townsley" <mstownsley@gmail.com>
 To: bluez-users@lists.sourceforge.net
-From: Neil MacLeod <gmane@nmacleod.com>
-Date: Sat, 16 Dec 2006 02:25:00 +0000
-Message-ID: <elvlcl$drg$1@sea.gmane.org>
-Mime-Version: 1.0
-Subject: [Bluez-users] Nokia 770 / Sony Ericsson UIQ3 pairing / DUN problems
+MIME-Version: 1.0
+Subject: [Bluez-users] help with dund
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,31 +14,81 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1552402040=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi
+--===============1552402040==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_36953_15080828.1166225663797"
 
-I've got a problem pairing (sometimes) and establishing a DUN connection (sometimes) between a Nokia 770 (OS 2006 v2 - ie. Nov 06 RTM firmware) and Sony Ericsson W950i smartphone (Symbian UIQ 3). I've also tried to establish a connection using the very latest "Sardine" pre-release firmware but the behaviour is the same.
+------=_Part_36953_15080828.1166225663797
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-I've raised a bug entry in the Nokia 770 bugzilla (https://maemo.org/bugzilla/show_bug.cgi?id=865) and received some assitance from Johan Hedberg (for which I'm very grateful) but as is the way with the Nokia Bugzilla it's pretty much one-way traffic :(
+Hi:  I am trying to get a device to talk to my linux host running bluez.
+The device speaks AT command set, so I need dund to be enabled.  I can see a
+command named dund but I don't see it being launched even though my hcid is
+running.  I did 'sdptool add' both sp and dund.  When I do
+/etc/init.d/bluetooth status,
+I get, amount other things:
 
-I'd be really grateful if anyone could suggest what could be done to improve the BT connectivity between W950i and Nokia 770. Pairing fails sometimes, but once paired the phone may or may not accept a connection from the 770. It looks like it might be an issue on the 770, as executing "hciconfig hci0 reset" normally results in a successful connection however Johan suggests the problem could be on both ends.
+    rfcomm  (activated)
+        pand   (unused)
+        dund   (unused)
 
-The Nokia bugzilla entry is https://maemo.org/bugzilla/show_bug.cgi?id=865 - this entry contains output from hcidump, sdp-query and syslog. My biggest concern is that this bug is never addressed by Nokia, in which case I've got a quite expensive but useless (for internet connectivity!) phone.
+If I try to launch dund by hand, it would say "address already in use
+--cannot bind".
 
-Many (many!) thanks in advance! :)
+I see online that some configs needed to say
 
-Neil
+   DUND_DAEMON  enabled
 
+But I cannot quite figure out where to put that line or do I really need to
+use that line.
+Communication to/from that device is not running very smoothly.
+
+Is there any good doc/guide on how to use (and program) dund profile to talk
+to devices?
+
+Thanks
+
+Mark
+
+------=_Part_36953_15080828.1166225663797
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<br>Hi:&nbsp; I am trying to get a device to talk to my linux host running bluez.&nbsp; The device speaks AT command set, so I need dund to be enabled.&nbsp; I can see a command named dund but I don't see it being launched even though my hcid is running.&nbsp; I did 'sdptool add' both sp and dund.&nbsp; When I do /etc/init.d/bluetooth status,
+<br>I get, amount other things:&nbsp; <br><br>&nbsp;&nbsp;&nbsp; rfcomm&nbsp; (activated)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pand&nbsp;&nbsp; (unused)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; dund&nbsp;&nbsp; (unused)<br><br>If I try to launch dund by hand, it would say &quot;address already in use --cannot bind&quot;.
+<br><br>I see online that some configs needed to say<br><br>&nbsp;&nbsp; DUND_DAEMON&nbsp; enabled<br><br>But I cannot quite figure out where to put that line or do I really need to use that line.&nbsp; <br>Communication to/from that device is not running very smoothly.
+<br><br>Is there any good doc/guide on how to use (and program) dund profile to talk to devices?<br><br>Thanks<br><br>Mark<br>
+
+------=_Part_36953_15080828.1166225663797--
+
+
+--===============1552402040==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1552402040==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1552402040==--
