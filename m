@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <231dafb50612152211h1bc9ca42lade6687ac51c0@mail.gmail.com>
-Date: Fri, 15 Dec 2006 23:11:03 -0700
-From: "Dark Shadow" <shadowofdarkness@gmail.com>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] Trouble loading firmware with bcm203x
+From: Neil MacLeod <gmane@nmacleod.com>
+Date: Sat, 16 Dec 2006 02:25:00 +0000
+Message-ID: <elvlcl$drg$1@sea.gmane.org>
+Mime-Version: 1.0
+Subject: [Bluez-users] Nokia 770 / Sony Ericsson UIQ3 pairing / DUN problems
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +18,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I just bought a Bluetooth dongle that uses the Broadcom 4503 chipset
-and I am having trouble getting stable use out of it. I have got it to
-work twice before with the following steps
+Hi
 
-plug it in
-modprobe bcm203x
-hciconfig up
-hciconfig reset (hours of googling to find out this is required)
+I've got a problem pairing (sometimes) and establishing a DUN connection (sometimes) between a Nokia 770 (OS 2006 v2 - ie. Nov 06 RTM firmware) and Sony Ericsson W950i smartphone (Symbian UIQ 3). I've also tried to establish a connection using the very latest "Sardine" pre-release firmware but the behaviour is the same.
 
-My only problem is that the firmware loading works with the same
-chances as winning the lottery. How can I make it just work on the
-first try loading. After the firmware is loaded I can use the dongle
-fine. But it is rare to get that to work as can be seen by my trying
-for 3 hours last night till I just gave up.
+I've raised a bug entry in the Nokia 770 bugzilla (https://maemo.org/bugzilla/show_bug.cgi?id=865) and received some assitance from Johan Hedberg (for which I'm very grateful) but as is the way with the Nokia Bugzilla it's pretty much one-way traffic :(
 
-I am running Ubuntu Edgy and have tried using various kernel versions
-from 2.5.17-2.6.20-rc1
+I'd be really grateful if anyone could suggest what could be done to improve the BT connectivity between W950i and Nokia 770. Pairing fails sometimes, but once paired the phone may or may not accept a connection from the 770. It looks like it might be an issue on the 770, as executing "hciconfig hci0 reset" normally results in a successful connection however Johan suggests the problem could be on both ends.
+
+The Nokia bugzilla entry is https://maemo.org/bugzilla/show_bug.cgi?id=865 - this entry contains output from hcidump, sdp-query and syslog. My biggest concern is that this bug is never addressed by Nokia, in which case I've got a quite expensive but useless (for internet connectivity!) phone.
+
+Many (many!) thanks in advance! :)
+
+Neil
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
