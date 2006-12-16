@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <9ed2cedd0612150727k41b30a40r7cb95fdecef02a41@mail.gmail.com>
-References: <9ed2cedd0612150727k41b30a40r7cb95fdecef02a41@mail.gmail.com>
-Date: Sun, 17 Dec 2006 13:39:59 +0100
-Message-Id: <1166359199.6557.30.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] BleuZ status?
+Message-ID: <20061216083808.1567.qmail@web8515.mail.in.yahoo.com>
+Date: Sat, 16 Dec 2006 08:38:08 +0000 (GMT)
+From: amol kulkarni <amol2126@yahoo.co.in>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] Billionton bluetooth dongle not scanning cell
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,20 +18,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Waldemar,
+Hi
+ Working on bluetooth application , in that 
+ I am trying to connect from PC(Mandrake Linux-10.0
+kernel 2.6.3) using the USB dongle.(USBBTC1A  USB :
+Class 1 USB. Bluetooth adapter, Billionton) to Nokia
+6600.
+ 
+ when I tries to scan , it gives following output.
+ Its not showing the nokia phone.
+ 
+ [root@localhost a]# hcitool scan
+ Scanning ...
+ [root@localhost a]# hcitool scan
+ Scanning ...
+ [root@localhost a]#
 
-> I'm wondering is anywhere info who is working on what? Any detailed
-> info regarding existing implementation?  what is supported? what is
-> supposed to be supported? what  should be improved?
-
-not really. We worked on a lot of stuff in this year. Feel free to look
-up on it and write such a list. The ones I have are totally outdated.
-
-Regards
-
-Marcel
+Thanks
 
 
+
+
+Send free SMS to your Friends on Mobile from your Yahoo! Messenger. Download Now! http://messenger.yahoo.com/download.php
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
