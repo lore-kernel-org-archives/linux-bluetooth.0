@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <86538205C715094CB44B7EB1119B886B31D302@nts028.kuka.de>
-References: <86538205C715094CB44B7EB1119B886B31D302@nts028.kuka.de>
-Date: Sun, 17 Dec 2006 13:42:22 +0100
-Message-Id: <1166359342.6557.33.camel@aeonflux.holtmann.net>
+In-Reply-To: <Pine.LNX.4.62.0612151804360.28430@megatron.therowes.net>
+References: <Pine.LNX.4.62.0612151804360.28430@megatron.therowes.net>
+Date: Sun, 17 Dec 2006 13:38:53 +0100
+Message-Id: <1166359133.6557.28.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] pand connection debug
+Subject: Re: [Bluez-users] Verizon vx8100 Bluetooth DUN (Dial-Up) Problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,32 +20,63 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Torsten,
+Hi Mark,
 
-> i have successfully set up a pan connection between my laptop and my
-> hand phone using this command:
+> I've been (unsuccessfully) trying to get tethering to my Verizon LG vx8100 
+> (version 7 firmware) working over bluetooth for dial-up to PPP since I 
+> purchased the phone a couple months ago. The same chatscript works 
+> correctly over a USB data cable.
 > 
-> pand -r NAP -d PANU -c xxx -n
+> I enabled the BT DUN profile for the phone and since have been able to 
+> pair with it through a Airnet ABT201 BT adapter with the following OSs:
 > 
-> If I try to access the connection from the phone (e.g. by browser) it
-> says network connection error. Im not suprised, because there is
-> nothing configured. The problem is: how to get information about the
-> bnep interface. Ive read the PAN-HowTo. But it seems outdatet,
-> because:
+> Windows XP Home (MS bluetooh drivers)
+> Windows XP Home (BlueSoliel drivers)
+> Debian amd64 (2.6.16.2 custom compiled kernel)
+> Ubuntu Edgy Desktop (2.6.17-10-generic stock kernel, bluez-utils 3.7-1ubuntu4)
 > 
-> - their is no interface shown calling ifconfig  
-> - their is no  /etc/sysconfig (at least at my distri, which is ubuntu
-> 6.10) 
-> - their is no /etc/bluetooth/pan folder or dev-up script
+> The serial profile works correctly for BitPim and I can dial out over the 
+> DUN one without any problems (both OSs), but after my the PPP server 
+> displays the banner and presents the username prompt, I can proceed no 
+> further and the connection eventually times out. A ppp0 device does 
+> breifly get created, but is never assigned any IP address. I remember 
+> occasionally being able to send and have an 'm' (from my username) 
+> displayed.
 > 
-> Does someone know of some more current information or how to configure
-> this connection?
+> Trying to eliminate the different variables, I tried a different dial-up 
+> service I have an account with, the #777 Verizon service, picked up a 
+> D-Link DBT-120 adapter, tried Windows & tried another laptop - but had no 
+> luck with any of those attempts. I've iterated through some different flow 
+> control, port speed and parity combinations, but am by no means a modem 
+> expert.
+> 
+> Eventually I ended up eBaying a holster for the phone, and got a USB data 
+> cable along with it. Much to my surprise, dial-up worked correctly through 
+> the cable with the same chatscript after changing just the device. DUN 
+> works when paired with a co-worker's Verizon Razr, but I tried a different 
+> vx8100 & saw failure the same failures as well.
+> 
+> After taking a look at the PPP RFC, I'm starting to think that the problem 
+> is that the the initial LCP config request(s) are either not being sent or 
+> aren't being answered by the PPP server - the number of LCP config 
+> requests sent is always equal to the value specified for 
+> 'lcp-max-configure', unless I increase it high enough to the point where 
+> the remote ppp server hangs up on me.
+> 
+> If the requests aren't making it to the PPP server, I'm not sure where in 
+> the setup the problem might be occuring (bluetooh, ppp, phone, Verizon).
+> 
+> I've seen multiple posts on howardforums of folks successfully using their 
+> own ISP or the Verizon #777 service for dialup through BT DUN. Normally 
+> just the USB cable would be sufficient, but the main reason I picked up a 
+> vx8100 was to use my PDA BT connection with it so I could just take my 
+> Zaurus PDA with me to a sporting event or outdoors and be able to ssh in 
+> and respond to pages for work.
 
-every distribution is a little bit different when it comes to
-configuring the network interfaces. The Ubuntu is Debian based
-distribution and so you should do it the Debian way. You might simply
-call "man interfaces" and follow up on that. The bnep0 interfaces behave
-like every other hotplug network card.
+I really think that is has to do something with the PPP settings or the
+phone is simply plain broken when using Bluetooth. I have no real clue
+here. Sometimes you might have to play with some extra LCP settings for
+your provider, but sometimes it is plain luck.
 
 Regards
 
