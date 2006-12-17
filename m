@@ -1,13 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <elvlcl$drg$1@sea.gmane.org>
-References: <elvlcl$drg$1@sea.gmane.org>
-Date: Sun, 17 Dec 2006 13:34:40 +0100
-Message-Id: <1166358880.6557.25.camel@aeonflux.holtmann.net>
+In-Reply-To: <231dafb50612161256n34a1c123p13fd79870e12d265@mail.gmail.com>
+References: <231dafb50612152211h1bc9ca42lade6687ac51c0@mail.gmail.com>
+	<adf2d65c0612152357m5886f77coff5a7d227dd7d4e6@mail.gmail.com>
+	<1166262274.6557.1.camel@aeonflux.holtmann.net>
+	<231dafb50612160114y6ee8b889ibbe71cd96dbd79b9@mail.gmail.com>
+	<231dafb50612161256n34a1c123p13fd79870e12d265@mail.gmail.com>
+Date: Sun, 17 Dec 2006 13:20:18 +0100
+Message-Id: <1166358018.6557.17.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Nokia 770 / Sony Ericsson UIQ3 pairing /
-	DUN	problems
+Subject: Re: [Bluez-users] Trouble loading firmware with bcm203x
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,35 +24,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Neil,
+Hi,
 
-> I've got a problem pairing (sometimes) and establishing a DUN connection (sometimes) between a Nokia 770 (OS 2006 v2 - ie. Nov 06 RTM firmware) and Sony Ericsson W950i smartphone (Symbian UIQ 3). I've also tried to establish a connection using the very latest "Sardine" pre-release firmware but the behaviour is the same.
+> Could this be my problem.
+> http://web.archive.org/web/20050310013858/www.holtmann.org/linux/bluetooth/usb.html
 > 
-> I've raised a bug entry in the Nokia 770 bugzilla (https://maemo.org/bugzilla/show_bug.cgi?id=865) and received some assitance from Johan Hedberg (for which I'm very grateful) but as is the way with the Nokia Bugzilla it's pretty much one-way traffic :(
+> It says
+> Device       usb-ohci                   usb-uhci  	uhci
+> BCM 2033 no firmware load 	works 	         works but slow
 > 
-> I'd be really grateful if anyone could suggest what could be done to improve the BT connectivity between W950i and Nokia 770. Pairing fails sometimes, but once paired the phone may or may not accept a connection from the 770. It looks like it might be an issue on the 770, as executing "hciconfig hci0 reset" normally results in a successful connection however Johan suggests the problem could be on both ends.
 > 
-> The Nokia bugzilla entry is https://maemo.org/bugzilla/show_bug.cgi?id=865 - this entry contains output from hcidump, sdp-query and syslog. My biggest concern is that this bug is never addressed by Nokia, in which case I've got a quite expensive but useless (for internet connectivity!) phone.
+> I have looked and all my usb ports on my laptop and dekstop are ohci.
+> I have found a really old laptop that has a uhci port but none of my
+> live disks work because it is decreped hardware so when I find one I
+> will see if the firmware loads better.
 
-my wild guess would be that this phone has a similar problem as my
-Motorola RAZR V3x. If you use service search attribute request then it
-can't handle it, because that is not mandatory in the qualification.
-However it is mandatory to respond, but I think the Bluetooth part of
-the phone simply crashes at this point and leaves and unmaintained ACL
-link behind. The reset action on the Nokia 770 will clean this link and
-give the phone the chance to be able to reset itself. No matter what
-this phone is broken and it is not on the Linux software side.
+no it is not your problem. You simply don't have a BCM2033 and that was
+the only one needed the firmware download.
 
-Their might be an interop problem with the TI chip against the Philips
-chip for some strange reason, but you need a protocol analyzer to watch
-the LMP traffic. It could happen that a internal chip buffer on one side
-get overflooded by the response to the SDP request. It would be worth to
-see if you can reproduce this behavior with a CSR chip on normal PC
-hardware.
-
-Besides that, this phone should support PAN for Internet access and I
-advise you to actually use it. Then you only have to obtain everything
-via DHCP and you are good.
+Yours looks like an HID proxy mode device it might need some extra love
+to switch it from HID into HCI mode. However that is always a magic
+sequence and for some devices the reset=1 is fully enough. Some others
+need some crazy init command. I prefer you try a clean vanilla kernel
+and check if the /proc/bus/usb/devices shows a Bluetooth device.
+Otherwise you have to sniff what Windows is doing to init your device
+and it would be good if someone sends me one of these to have it in my
+device library.
 
 Regards
 
