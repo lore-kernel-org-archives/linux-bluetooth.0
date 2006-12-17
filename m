@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.62.0612151804360.28430@megatron.therowes.net>
-References: <Pine.LNX.4.62.0612151804360.28430@megatron.therowes.net>
-Date: Sun, 17 Dec 2006 13:38:53 +0100
-Message-Id: <1166359133.6557.28.camel@aeonflux.holtmann.net>
+In-Reply-To: <elvlcl$drg$1@sea.gmane.org>
+References: <elvlcl$drg$1@sea.gmane.org>
+Date: Sun, 17 Dec 2006 13:34:40 +0100
+Message-Id: <1166358880.6557.25.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Verizon vx8100 Bluetooth DUN (Dial-Up) Problem
+Subject: Re: [Bluez-users] Nokia 770 / Sony Ericsson UIQ3 pairing /
+	DUN	problems
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,63 +21,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mark,
+Hi Neil,
 
-> I've been (unsuccessfully) trying to get tethering to my Verizon LG vx8100 
-> (version 7 firmware) working over bluetooth for dial-up to PPP since I 
-> purchased the phone a couple months ago. The same chatscript works 
-> correctly over a USB data cable.
+> I've got a problem pairing (sometimes) and establishing a DUN connection (sometimes) between a Nokia 770 (OS 2006 v2 - ie. Nov 06 RTM firmware) and Sony Ericsson W950i smartphone (Symbian UIQ 3). I've also tried to establish a connection using the very latest "Sardine" pre-release firmware but the behaviour is the same.
 > 
-> I enabled the BT DUN profile for the phone and since have been able to 
-> pair with it through a Airnet ABT201 BT adapter with the following OSs:
+> I've raised a bug entry in the Nokia 770 bugzilla (https://maemo.org/bugzilla/show_bug.cgi?id=865) and received some assitance from Johan Hedberg (for which I'm very grateful) but as is the way with the Nokia Bugzilla it's pretty much one-way traffic :(
 > 
-> Windows XP Home (MS bluetooh drivers)
-> Windows XP Home (BlueSoliel drivers)
-> Debian amd64 (2.6.16.2 custom compiled kernel)
-> Ubuntu Edgy Desktop (2.6.17-10-generic stock kernel, bluez-utils 3.7-1ubuntu4)
+> I'd be really grateful if anyone could suggest what could be done to improve the BT connectivity between W950i and Nokia 770. Pairing fails sometimes, but once paired the phone may or may not accept a connection from the 770. It looks like it might be an issue on the 770, as executing "hciconfig hci0 reset" normally results in a successful connection however Johan suggests the problem could be on both ends.
 > 
-> The serial profile works correctly for BitPim and I can dial out over the 
-> DUN one without any problems (both OSs), but after my the PPP server 
-> displays the banner and presents the username prompt, I can proceed no 
-> further and the connection eventually times out. A ppp0 device does 
-> breifly get created, but is never assigned any IP address. I remember 
-> occasionally being able to send and have an 'm' (from my username) 
-> displayed.
-> 
-> Trying to eliminate the different variables, I tried a different dial-up 
-> service I have an account with, the #777 Verizon service, picked up a 
-> D-Link DBT-120 adapter, tried Windows & tried another laptop - but had no 
-> luck with any of those attempts. I've iterated through some different flow 
-> control, port speed and parity combinations, but am by no means a modem 
-> expert.
-> 
-> Eventually I ended up eBaying a holster for the phone, and got a USB data 
-> cable along with it. Much to my surprise, dial-up worked correctly through 
-> the cable with the same chatscript after changing just the device. DUN 
-> works when paired with a co-worker's Verizon Razr, but I tried a different 
-> vx8100 & saw failure the same failures as well.
-> 
-> After taking a look at the PPP RFC, I'm starting to think that the problem 
-> is that the the initial LCP config request(s) are either not being sent or 
-> aren't being answered by the PPP server - the number of LCP config 
-> requests sent is always equal to the value specified for 
-> 'lcp-max-configure', unless I increase it high enough to the point where 
-> the remote ppp server hangs up on me.
-> 
-> If the requests aren't making it to the PPP server, I'm not sure where in 
-> the setup the problem might be occuring (bluetooh, ppp, phone, Verizon).
-> 
-> I've seen multiple posts on howardforums of folks successfully using their 
-> own ISP or the Verizon #777 service for dialup through BT DUN. Normally 
-> just the USB cable would be sufficient, but the main reason I picked up a 
-> vx8100 was to use my PDA BT connection with it so I could just take my 
-> Zaurus PDA with me to a sporting event or outdoors and be able to ssh in 
-> and respond to pages for work.
+> The Nokia bugzilla entry is https://maemo.org/bugzilla/show_bug.cgi?id=865 - this entry contains output from hcidump, sdp-query and syslog. My biggest concern is that this bug is never addressed by Nokia, in which case I've got a quite expensive but useless (for internet connectivity!) phone.
 
-I really think that is has to do something with the PPP settings or the
-phone is simply plain broken when using Bluetooth. I have no real clue
-here. Sometimes you might have to play with some extra LCP settings for
-your provider, but sometimes it is plain luck.
+my wild guess would be that this phone has a similar problem as my
+Motorola RAZR V3x. If you use service search attribute request then it
+can't handle it, because that is not mandatory in the qualification.
+However it is mandatory to respond, but I think the Bluetooth part of
+the phone simply crashes at this point and leaves and unmaintained ACL
+link behind. The reset action on the Nokia 770 will clean this link and
+give the phone the chance to be able to reset itself. No matter what
+this phone is broken and it is not on the Linux software side.
+
+Their might be an interop problem with the TI chip against the Philips
+chip for some strange reason, but you need a protocol analyzer to watch
+the LMP traffic. It could happen that a internal chip buffer on one side
+get overflooded by the response to the SDP request. It would be worth to
+see if you can reproduce this behavior with a CSR chip on normal PC
+hardware.
+
+Besides that, this phone should support PAN for Internet access and I
+advise you to actually use it. Then you only have to obtain everything
+via DHCP and you are good.
 
 Regards
 
