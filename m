@@ -1,12 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: "Lauri Lubi" <lauri@lubi.se>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Mon, 18 Dec 2006 09:00:28 +0100
-Message-ID: <020201c7227a$94e3a590$9301a8c0@LUBI>
-MIME-Version: 1.0
+From: Jon Barnett <jbarnett@pobox.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1166359423.6557.35.camel@aeonflux.holtmann.net>
+References: <1166076796.3984.9.camel@localhost>
+	<20061214092546.GA6244@163.com>  <1166148309.3279.6.camel@localhost>
+	<1166359423.6557.35.camel@aeonflux.holtmann.net>
+Date: Sun, 17 Dec 2006 12:37:31 -0500
+Message-Id: <1166377051.6846.10.camel@localhost>
+Mime-Version: 1.0
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Immediate disconnect after doing "hcitool cc"
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Reply-To: jbarnett@pobox.com,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -15,90 +20,91 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: multipart/mixed; boundary="===============1179334703=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
 
-Is there more information available how the kernel creates an ACL
-connection? I have been reading source code for 2.6.13-15 but not seen
-anything about creating an ACL connection yet. Well, I am quite unfamiliar
-with the kernel source code.
-
-I have re-written some parts of hcitool so that it uses clock_offset and
-pscan_repetition_mode when ACL-connecting. Is kernel code more optimised
-that this?
-
-Q2: Any ideas for a good way to time kernel creating the ACL connection? So
-that to compare with a "hacked" hcitool.
-
-Mvh
-Lauri Lubi
-Mob +46 730 39 31 00
- =
+--===============1179334703==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="=-I9lxdaf1xiw+7sXsUjb3"
 
 
------Ursprungligt meddelande-----
-Fr=E5n: bluez-devel-bounces@lists.sourceforge.net
-[mailto:bluez-devel-bounces@lists.sourceforge.net] F=F6r Marcel Holtmann
-Skickat: den 17 december 2006 13:44
-Till: jbarnett@pobox.com; BlueZ development
-=C4mne: Re: [Bluez-devel] Immediate disconnect after doing "hcitool cc"
+--=-I9lxdaf1xiw+7sXsUjb3
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jon,
+Thanks for the response. I'm unsure about how the ACL is created and how
+I then do the auth to pair the devices. Is there any documentation as
+I've just been going through the list of quoted documentation at the
+bluez site and every thing I've read so far always talks about doing the
+cc?
 
-> No. The disconnect happens at most maybe a couple of seconds after the
-> cc command has completed. I've tried:
-> hcitool cc 00:12:EE:E0:AB:CA; hcitool auth 00:12:EE:E0:AB:CA
+I remember that with running btsco it would do all the pairing and
+prompt for the pin through the gnome-bluetooth applet. Is that what is
+meant by the kernel doing the low-level ACL? The only thing is I haven't
+looked back at compiling the code with kernel 2.6.19 - I think I had
+some problems compiling the device module against the kernel so I will
+need to review that again. It throws up an error - btsco.c:127: error:
+syntax error before "snd_card_t" as the first before a whole lot more
+warnings and errors.
 
-don't use "hcitool cc" for connecting devices. This command is not for
-general purpose use. Let the kernel create you low-level ACL, because it
-knows what to do.
+Cheers,
 
-Regards
+JonB.
 
-Marcel
+On Sun, 2006-12-17 at 13:43 +0100, Marcel Holtmann wrote:
+> Hi Jon,
+>=20
+> > No. The disconnect happens at most maybe a couple of seconds after the
+> > cc command has completed. I've tried:
+> > hcitool cc 00:12:EE:E0:AB:CA; hcitool auth 00:12:EE:E0:AB:CA
+>=20
+> don't use "hcitool cc" for connecting devices. This command is not for
+> general purpose use. Let the kernel create you low-level ACL, because it
+> knows what to do.
+>=20
+> Regards
+>=20
+> Marcel
 
+--=-I9lxdaf1xiw+7sXsUjb3
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
 
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+iD8DBQBFhYBbu2cEic/xsEARAoqRAJ4w5BbfmUwh9749hKagbYCVw26HtgCg11bp
+oRecnM1OgzRnyo08ih2epfY=
+=OF58
+-----END PGP SIGNATURE-----
 
--- =
-
-No virus found in this incoming message.
-Checked by AVG Free Edition.
-Version: 7.5.432 / Virus Database: 268.15.23/591 - Release Date: 2006-12-17
-15:17
- =
-
-
--- =
-
-No virus found in this outgoing message.
-Checked by AVG Free Edition.
-Version: 7.5.432 / Virus Database: 268.15.23/591 - Release Date: 2006-12-17
-15:17
- =
+--=-I9lxdaf1xiw+7sXsUjb3--
 
 
+
+--===============1179334703==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1179334703==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1179334703==--
