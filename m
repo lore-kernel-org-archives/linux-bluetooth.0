@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: amateur <ztl.post@gmail.com>,
+Date: Sun, 17 Dec 2006 10:20:39 +0800
+From: amateur <ztl.post@gmail.com>
+To: bluez-users <bluez-users@lists.sourceforge.net>
+Message-ID: <20061217022039.GA4238@163.com>
+MIME-Version: 1.0
+Subject: [Bluez-users] why does one need bluez-firmware ?
+Reply-To: amateur <ztl.post@gmail.com>,
         BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20061217022039.GA4238@163.com>
-References: <20061217022039.GA4238@163.com>
-Date: Sun, 17 Dec 2006 13:15:30 +0100
-Message-Id: <1166357730.6557.12.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] why does one need bluez-firmware ?
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -17,33 +15,24 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
-
-> I read on some web pages that one need bluez-firmware to be able to
-> operate the BroadCom 203x series bluetooth dongle correctly on a 2.4
-> kernel. So I am wondering what is the purpose of bluez-firmware? And
-> how does it work? 
-
-that is a misunderstanding. For the 2.6 kernel you use a kernel module
-to load the firmware. For 2.4 an extra USB application was needed. Both
-however need the firmware files.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SSByZWFkIG9uIHNvbWUgd2ViIHBhZ2VzIHRoYXQgb25lIG5lZWQgYmx1ZXotZmlybXdhcmUgdG8g
+YmUgYWJsZSB0bwpvcGVyYXRlIHRoZSBCcm9hZENvbSAyMDN4IHNlcmllcyBibHVldG9vdGggZG9u
+Z2xlIGNvcnJlY3RseSBvbiBhIDIuNAprZXJuZWwuIFNvIEkgYW0gd29uZGVyaW5nIHdoYXQgaXMg
+dGhlIHB1cnBvc2Ugb2YgYmx1ZXotZmlybXdhcmU/IEFuZApob3cgZG9lcyBpdCB3b3JrPyAKCkNh
+biBhbnlvbmUgZXhwbGFpbj8KCnRoYW5rcwoKLS0gChtbMzJt44CK5Lmm6L655LqL44CLG1ttChtb
+MzNt5L2c6ICF77ya5byg5LmUG1ttCuiwg+inkuaWrea4heeni++8jOW+geS6uuWAmuaIjOalvOOA
+ggrmmKXpo47lr7npnZLlhqLvvIznmb3ml6XokL3mooHlt57jgIIK5aSn5ryg5peg5YW16Zi777yM
+56m36L655pyJ5a6i5ri444CCCuiVg+aDheS8vOatpOawtO+8jOmVv+aEv+WQkeWNl+a1geOAggoK
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLQpUYWtlIFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBG
+dXR1cmUgb2YgSVQKSm9pbiBTb3VyY2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3Un
+bGwgZ2V0IHRoZSBjaGFuY2UgdG8gc2hhcmUgeW91cgpvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNz
+IHRvcGljcyB0aHJvdWdoIGJyaWVmIHN1cnZleXMgLSBhbmQgZWFybiBjYXNoCmh0dHA6Ly93d3cu
+dGVjaHNheS5jb20vZGVmYXVsdC5waHA/cGFnZT1qb2luLnBocCZwPXNvdXJjZWZvcmdlJkNJRD1E
+RVZERVYKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1
+ZXotdXNlcnMgbWFpbGluZyBsaXN0CkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApo
+dHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo=
