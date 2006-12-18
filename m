@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4586FF69.6010202@xmission.com>
-Date: Mon, 18 Dec 2006 13:51:53 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+From: Fernando Unzu <fernando@bluexare.org>
+To: bluez-devel@lists.sourceforge.net
+Date: Mon, 18 Dec 2006 14:12:11 +0100
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <24a5055d0612180213j56a6a7d1s832c981bb93d4a26@mail.gmail.com>
-In-Reply-To: <24a5055d0612180213j56a6a7d1s832c981bb93d4a26@mail.gmail.com>
-Subject: Re: [Bluez-devel] Setting of bluetooth address in asoundrc
+Message-Id: <200612181412.12059.fernando@bluexare.org>
+Subject: [Bluez-devel] About the process that listen...
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,25 +18,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Rahul
+Hi,
+I'm a developper from other project that works with Bluetooth.
+We are making a software that can send datas to other devices, like mobiles.
 
->    i would like to know whether is it possible to automatically set
-> bluetooth address in .asoundrc. Is there a way to set bluetooth address
-> in .asoundrc from outside. (eg. exporting a global variable). The reason
-> for this is that i have two bluetooth headsets. On switching the headset
-> i have to again edit the .asoundrc file. Instead if i can update the
-> .asoundrc from outside, i guess i could just write a script which finds
-> bluetooth address and sets it. but is this possible ??
+But sometimes, our device does not detect the mobile, what it means, the sent
+is not realized.
 
-I feel your pain. Yes, I think it would be scriptable. If it's a2dp
-you're using, the daemon can re-read the config on the fly but sco stuff
-will require a client restart.
+And we want to do the possibility taht each mobile, by requesting the device
+the information, it sends.
 
-The plan of course is to have a proper gui (the "audio routing gui" in
-http://bluetooth-alsa.sourceforge.net/future.html fwiw). I've been
-tinkering with pulseaudio to see how things might fit together.
+We don't know which process works listening the transmissions from other
+devices...
 
-Brad
+If the mobile try to associate the device, what does daemon treat that?
+And if the mobile try t send an mage (for example), is another daemon who
+treat this?
+
+I hope you understand me.
+
+What we want is when our device detect an incoming transmission (a try to
+associate, or to send an image...) from one mobile, it sends what we have
+prepared to be send.
+
+Tanks you very much.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
