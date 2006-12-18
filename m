@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Fernando Unzu <fernando@bluexare.org>
-To: bluez-devel@lists.sourceforge.net
-Date: Mon, 18 Dec 2006 14:12:11 +0100
-MIME-Version: 1.0
-Message-Id: <200612181412.12059.fernando@bluexare.org>
-Subject: [Bluez-devel] About the process that listen...
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <022d01c7228a$377febb0$9301a8c0@LUBI>
+References: <022d01c7228a$377febb0$9301a8c0@LUBI>
+Date: Mon, 18 Dec 2006 12:55:09 +0100
+Message-Id: <1166442909.23875.1.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Immediate disconnect after doing "hcitool cc"
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,30 +20,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-I'm a developper from other project that works with Bluetooth.
-We are making a software that can send datas to other devices, like mobiles.
+Hi Lauri,
 
-But sometimes, our device does not detect the mobile, what it means, the sent
-is not realized.
+> Well, I'm a man in a bad need of performance and have to create ACL
+> connections in the most optimized way. The current tests (hcidump) have
+> unfortunately showed that the Linux kernel (2.5.16) does make use of
+> pscan_repetition_mode, not sure about the clock_offset. Inquiry scan has
+> been done just seconds before connection attempts.
+> 
+> With this background I guess there are 2 ways out: messing with HCI directly
+> and taking the risk of kernel overriding me; or re-writing some
+> Bluetooth/sockets code in the kernel. Do you agree?
 
-And we want to do the possibility taht each mobile, by requesting the device
-the information, it sends.
+that is all crap. The kernel is the fastest way to create the ACL. There
+is no other way, because the kernel has all needed information and keeps
+them up-to-date. So don't even try to accomplish something that is
+impossible to achieve.
 
-We don't know which process works listening the transmissions from other
-devices...
+Regards
 
-If the mobile try to associate the device, what does daemon treat that?
-And if the mobile try t send an mage (for example), is another daemon who
-treat this?
+Marcel
 
-I hope you understand me.
 
-What we want is when our device detect an incoming transmission (a try to
-associate, or to send an image...) from one mobile, it sends what we have
-prepared to be send.
-
-Tanks you very much.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
