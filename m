@@ -1,17 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <231dafb50612172024r39a509bbncd5b98568063ce22@mail.gmail.com>
-Date: Sun, 17 Dec 2006 21:24:10 -0700
-From: "Dark Shadow" <shadowofdarkness@gmail.com>
+Message-ID: <be976db60612171724s40f8850dtefd626680321c21b@mail.gmail.com>
+Date: Sun, 17 Dec 2006 17:24:18 -0800
+From: "Mark S. Townsley" <mstownsley@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1166358018.6557.17.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-References: <231dafb50612152211h1bc9ca42lade6687ac51c0@mail.gmail.com>
-	<adf2d65c0612152357m5886f77coff5a7d227dd7d4e6@mail.gmail.com>
-	<1166262274.6557.1.camel@aeonflux.holtmann.net>
-	<231dafb50612160114y6ee8b889ibbe71cd96dbd79b9@mail.gmail.com>
-	<231dafb50612161256n34a1c123p13fd79870e12d265@mail.gmail.com>
-	<1166358018.6557.17.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] Trouble loading firmware with bcm203x
+Subject: [Bluez-users] proper dbus config for hcid
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,57 +14,88 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1769486822=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 12/17/06, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi,
->
-> > Could this be my problem.
-> > http://web.archive.org/web/20050310013858/www.holtmann.org/linux/bluetooth/usb.html
-> >
-> > It says
-> > Device       usb-ohci                   usb-uhci      uhci
-> > BCM 2033 no firmware load     works            works but slow
-> >
-> >
-> > I have looked and all my usb ports on my laptop and dekstop are ohci.
-> > I have found a really old laptop that has a uhci port but none of my
-> > live disks work because it is decreped hardware so when I find one I
-> > will see if the firmware loads better.
->
-> no it is not your problem. You simply don't have a BCM2033 and that was
-> the only one needed the firmware download.
->
-> Yours looks like an HID proxy mode device it might need some extra love
-> to switch it from HID into HCI mode. However that is always a magic
-> sequence and for some devices the reset=1 is fully enough. Some others
-> need some crazy init command. I prefer you try a clean vanilla kernel
-> and check if the /proc/bus/usb/devices shows a Bluetooth device.
-> Otherwise you have to sniff what Windows is doing to init your device
-> and it would be good if someone sends me one of these to have it in my
-> device library.
->
-> Regards
->
-> Marcel
->
-I will compile a vanilla kernel to test. I unfortunately can't test in
-Windows as I started single booting Linux years ago.
+--===============1769486822==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_10262_5538494.1166405058144"
 
-I really think mine needs a firmware upgrade because it has worked
-before after running modprobe bcm203x. One time using firmware from
-your package and one time I took a file called frmUpgrade.sys from the
-windows driver cd renamed it BCM2033-MD.hex and ran it through your
-hex2bin program to get a bin and used that. The frmUpgrade.sys
+------=_Part_10262_5538494.1166405058144
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi:
+
+I am on Fedora Linux and I am unable to get hcid to start.  It complains
+that it cannot communicate with DBUS:
+
+[root@localhost init.d]#   ps -ef | grep dbus
+root      2454  2406  0 16:45 ?        00:00:00 /usr/bin/ssh-agent
+/usr/bin/dbus-launch --exit-with-session gnome-session
+501       3137     1  0 17:14 ?        00:00:00 dbus-daemon --system
+root      3208  2703  0 17:20 pts/2    00:00:00 grep dbus
+[root@localhost init.d]# hcid -n
+hcid[3210]: Bluetooth HCI daemon
+hcid[3210]: Service could not become the primary owner.
+hcid[3210]: Unable to get on D-Bus
+[root@localhost init.d]#
+
+I already put in allow own = "*" in the dbus config. file.
+Am I missing a step?
+Thanks
+
+Mark
+
+------=_Part_10262_5538494.1166405058144
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<br>Hi:&nbsp; <br>
+<br>
+I am on Fedora Linux and I am unable to get hcid to start.&nbsp; It complains that it cannot communicate with DBUS:<br>
+<br>
+[root@localhost init.d]#&nbsp;&nbsp; ps -ef | grep dbus<br>
+root&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2454&nbsp; 2406&nbsp; 0 16:45 ?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 00:00:00 /usr/bin/ssh-agent /usr/bin/dbus-launch --exit-with-session gnome-session<br>
+501&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3137&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp; 0 17:14 ?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 00:00:00 dbus-daemon --system<br>
+root&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3208&nbsp; 2703&nbsp; 0 17:20 pts/2&nbsp;&nbsp;&nbsp; 00:00:00 grep dbus<br>
+[root@localhost init.d]# hcid -n<br>
+hcid[3210]: Bluetooth HCI daemon<br>
+hcid[3210]: Service could not become the primary owner.<br>
+hcid[3210]: Unable to get on D-Bus<br>
+[root@localhost init.d]#<br>
+<br>
+I already put in allow own = &quot;*&quot; in the dbus config. file.&nbsp; <br>
+Am I missing a step?<br>
+Thanks<br>
+<br>Mark<br><br>
+
+------=_Part_10262_5538494.1166405058144--
+
+
+--===============1769486822==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1769486822==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1769486822==--
