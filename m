@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Fernando Unzu <fernando@bluexare.org>
-To: bluez-users@lists.sourceforge.net
-Date: Mon, 18 Dec 2006 14:09:35 +0100
-MIME-Version: 1.0
-Message-Id: <200612181409.36061.fernando@bluexare.org>
-Subject: [Bluez-users] About the process that listen...
+From: Marcel Holtmann <marcel@holtmann.org>
+To: amateur <ztl.post@gmail.com>,
+        BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20061218104730.GA3296@163.com>
+References: <20061217022039.GA4238@163.com>
+	<1166357730.6557.12.camel@aeonflux.holtmann.net>
+	<20061218104730.GA3296@163.com>
+Date: Mon, 18 Dec 2006 12:55:46 +0100
+Message-Id: <1166442946.23875.3.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] why does one need bluez-firmware ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,27 +24,25 @@ Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi,
-I'm a developper from other project that works with Bluetooth.
-We are making a software that can send datas to other devices, like mobiles.
-But sometimes, our device does not detect the mobile, what it means, the sent 
-is not realized.
 
-And we want to do the possibility taht each mobile, by requesting the device 
-the information, it sends.
-We don't know which process works listening the transmissions from other 
-devices...
+> > > I read on some web pages that one need bluez-firmware to be able to
+> > > operate the BroadCom 203x series bluetooth dongle correctly on a 2.4
+> > > kernel. So I am wondering what is the purpose of bluez-firmware? And
+> > > how does it work? 
+> > 
+> > that is a misunderstanding. For the 2.6 kernel you use a kernel module
+> > to load the firmware. For 2.4 an extra USB application was needed. Both
+> > however need the firmware files.
+> 
+> And what is the purpose of bluez-firmware? How does it work?
 
-If the mobile try to associate the device, what does daemon treat that?
-And if the mobile try t send an mage (for example), is another daemon who 
-treat this?
+this package only contains the binary firmware blobs. Nothing more.
 
-I hope you understand me.
+Regards
 
-What we want is when our device detect an incoming transmission (a try to 
-associate, or to send an image...) from one mobile, it sends what we have 
-prepared to be send.
+Marcel
 
-Tanks you very much.
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
