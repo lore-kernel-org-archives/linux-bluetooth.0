@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20061218100538.29964.qmail@web52107.mail.yahoo.com>
-Date: Mon, 18 Dec 2006 02:05:38 -0800 (PST)
-From: Paolo Casaschi <kazavsky67-news@yahoo.com>
+Date: Mon, 18 Dec 2006 10:38:28 +0100
+From: Stefan Seyfried <seife@suse.de>
 To: bluez-users@lists.sourceforge.net
+Message-ID: <20061218093828.GD960@suse.de>
+References: <be976db60612171036i7281422dj3680b209a9f90e6@mail.gmail.com>
+	<20061218090305.GA960@suse.de>
 MIME-Version: 1.0
-Subject: [Bluez-users] snd_bt_sco, btsco and suspend/hibernate
+In-Reply-To: <20061218090305.GA960@suse.de>
+Subject: Re: [Bluez-users] dund and bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,44 +17,38 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+On Mon, Dec 18, 2006 at 10:03:05AM +0100, Stefan Seyfried wrote:
+> On Sun, Dec 17, 2006 at 10:36:31AM -0800, Mark S. Townsley wrote:
+> > Hi:  I would like to find out more about how DUN profile (and DUND daem=
+on)
+> > works with Bluez.
+> > Is there any config tutorial or programming tutorial about how to integ=
+rate
+> > DUN profile with Bluez?
+> =
 
-I'm using a bluetooth headset (via snd_bt_sco and btsco) with Ubuntu Edgy.
+> Marcel, these two files are in the SUSE package for quite some time.
+> Maybe they are good for upstream bluez-utils, too?
 
-Normally, I can talk with Skype using the bluetooth headset and everything works ok (thanks to some help from this list few weeks ago).
+Oops. Mentioning YaST does not help too much :-) I'll clean them up a bit
+and resend.
+-- =
 
-However, if I hibernate my laptop, then the bluetooth headset remains silent.
-I tried a few things, like:
-- adding /etc/init.d/bluetooth to the list of services to be restarted when suspending
-- adding snd_bt_sco to the list of modules to be unloaded/reloaded when suspending
-- combinations of the above
-
-I even tried to resume from suspend and then manually:
-- exit skype (the only program using the headset)
-- stop the /etc/init.d/bluetooth service
-- unload snd_bt_sco with "modprobe -r"
-- reload snd_bt_sco with "modprobe"
-- restart the /etc/init.d/bluetooth service
-- restart skyp
-- associate the bluetooth headset (the association btsco... does not show any error)
-Still the skype test call does not send any sound to the headset.
-
-Any suggestion how to make snd_bt_sco, /etc/init.d/bluetooth and btsco working after resuming from hibernate suspend?
-
--- Paolo
-
-
+Stefan Seyfried
+QA / R&D Team Mobile Devices        |              "Any ideas, John?"
+SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
