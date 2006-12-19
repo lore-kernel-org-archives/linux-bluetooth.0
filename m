@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <E1GwSh8-0003Te-Sf@mail.sourceforge.net>
-References: <E1GwSh8-0003Te-Sf@mail.sourceforge.net>
-Date: Tue, 19 Dec 2006 10:41:12 +0100
-Message-Id: <1166521272.29972.6.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Wireless devices
+MIME-Version: 1.0
+From: Zippo <zippo@oppiz.net>
+Date: Mon, 18 Dec 2006 19:18:47 -0500
+To: <Bluez-users@lists.sourceforge.net>
+Message-ID: <E1GwSh8-0003Te-Sf@mail.sourceforge.net>
+Subject: [Bluez-users] Wireless devices
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,23 +18,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+I am using a wireless bluetooth mouse and keyboard. I have to use the command
+& hidd --connect xx.xx.xx.xx
 
-> I am using a wireless bluetooth mouse and keyboard. I have to use the command
-> & hidd --connect xx.xx.xx.xx
-> 
-> To get each to connect and work. Once connected they work great. The issue is when they are idle for more then 30 minutes or so. They go to sleep to save the batteries and loose the connection. And I have to issue the command above again. Is this just a confgiure error for them not to be auto connected or is it that they are not peiring correctly? I'm lost with what todo.
+To get each to connect and work. Once connected they work great. The issue is when they are idle for more then 30 minutes or so. They go to sleep to save the batteries and loose the connection. And I have to issue the command above again. Is this just a confgiure error for them not to be auto connected or is it that they are not peiring correctly? I'm lost with what todo.
 
-they should try to reconnect once you press a key or move the mouse.
-Check with "hcidump -X -V" what's happening in that case. However to
-make Linux accept this incoming connection "hidd --server" must be
-running first.
+I am useig a 
+logitech mx900 bluetooth wireless mouse
+Logitech elite bluetooth keyboard
+And a logitech wireless.bluetooth USB hub.
 
-Regards
-
-Marcel
-
-
+Thanks for all your help 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
