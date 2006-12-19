@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 19 Dec 2006 12:57:37 +0200
-From: Tuomas Suutari <thsuut@utu.fi>
-In-reply-to: <1166524299.29972.24.camel@violet>
+Message-ID: <4587C1EA.5000607@nokia.com>
+Date: Tue, 19 Dec 2006 12:41:46 +0200
+From: Luciano Coelho <luciano.coelho@nokia.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-id: <200612191257.37628.thsuut@utu.fi>
-MIME-version: 1.0
-References: <200612191103.20942.thsuut@utu.fi>
-	<200612191147.39325.thsuut@utu.fi> <1166524299.29972.24.camel@violet>
+References: <200612191103.20942.thsuut@utu.fi>	<1166521154.29972.4.camel@violet>
+	<200612191147.39325.thsuut@utu.fi>
+	<1166524299.29972.24.camel@violet>
+In-Reply-To: <1166524299.29972.24.camel@violet>
 Subject: Re: [Bluez-devel] rfcomm_sock_sendmsg with len==0 (in Linux 2.6.18)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,22 +22,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 2006-12-19 Tuesday 12:31, Marcel Holtmann wrote:
-> that is really strange. A recent compiler should detect that err can
-> be used uninitialized.
+ext Marcel Holtmann wrote:
+> that is really strange. A recent compiler should detect that err can be
+> used uninitialized.
 
-It (gcc 4.1.1) didn't, maybe that's because it can't know if len is 
-always >0. Though it should have warned anyway.
+Yes, it *should* ;-) But I have noticed at least one case in which GCC 
+(version 3.4.4) doesn't recognize the use of uninitialized values... :-( 
+It happened when compiling an ugly piece of code with gotos and stuff 
+like that, but still...
 
-
-> How about the attached patch. Does it work for you?
-
-Yes. Now it returns 0 when called with len==0.
-
-Thanks.
-
--- 
-Tuomas Suutari | +358 50 3806983 | thsuut@utu.fi
+Cheers,
+Luca
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
