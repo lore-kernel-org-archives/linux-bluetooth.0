@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45884A49.5040702@glidos.net>
-Date: Tue, 19 Dec 2006 20:23:37 +0000
-From: Paul Gardiner <osronline@glidos.net>
+Message-ID: <45884188.1020000@gmail.com>
+Date: Tue, 19 Dec 2006 16:46:16 -0300
+From: Manuel Naranjo <naranjo.manuel@gmail.com>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <4587BB0E.2070909@glidos.net>
-	<1166523629.29972.18.camel@violet>	<4587DAEC.8000603@glidos.net>
-	<20061219153627.GJ7959@suse.de>
-In-Reply-To: <20061219153627.GJ7959@suse.de>
-Subject: Re: [Bluez-users] hcid.conf seemingly ignored
+References: <be976db60612191123s62dfa67egc3c937e63ae2031@mail.gmail.com>
+	<E34033EC-19D4-4112-A964-C656CA724290@gmail.com>
+In-Reply-To: <E34033EC-19D4-4112-A964-C656CA724290@gmail.com>
+Subject: Re: [Bluez-users] minicom over /dev/rfcomm0
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,91 +21,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Stefan Seyfried wrote:
-> On Tue, Dec 19, 2006 at 12:28:28PM +0000, Paul Gardiner wrote:
->> Marcel Holtmann wrote:
->>> Hi Paul,
->>>
->>>> I had my server (running SuSE 10.1) set up as a gateway for my PDA
->>>> following the advice in: 
->>>> http://wiki.xda-developers.com/index.php?pagename=bluetoothnetworking
->>>>
->>>> I've just swapped over to SuSE 10.2 which has bluesz 3.7-14 and
->>>> the set up no longer works.
->>>>
->>>> hciconfig says:
->>>>
->>>> hci0:   Type: USB
->>>>          BD Address: 00:09:DD:50:47:BB ACL MTU: 384:8 SCO MTU: 64:8
->>>>          UP RUNNING PSCAN
->>>>          RX bytes:401 acl:0 sco:0 events:18 errors:0
->>>>          TX bytes:317 acl:0 sco:0 commands:17 errors:0
->>>>
->>>> with ISCAN missing, although my hcid.conf file has  "iscan enable".
->>  >
->>> to make this work you need to set discovto to 0, because otherwise hcid
->>> will automatically switch you device into non-discoverable mode to
->>> protect you.
->>>
->>> You can of course install bluez-gnome and use bluetooth-properties to do
->>> this configuration with a shiny UI.
->> I can't get that to work. It seems very flaky. Sometimes I get INQUIRY
->> instead of PSCAN. Other times I get nothing.  I think the SuSE 10.2
->> installation may be messed up.  I've installed it on two computers
->> and had the same problems.
-> 
-> Hm. It works for me. I have not configured anything via YaST, but just with
-> bluetooth-applet and apitest (in the bluez-test package).
-> 
-> seife@strolchi:~> apitest GetMode
-> discoverable
-> seife@strolchi:~> apitest GetDiscoverableTimeout
-> 0
-> seife@strolchi:~> hciconfig -a
-> hci0:   Type: USB
->         BD Address: 00:50:F2:EA:6B:EF ACL MTU: 377:10 SCO MTU: 16:0
->         UP RUNNING PSCAN ISCAN
->         RX bytes:523488 acl:33305 sco:0 events:3021 errors:0
->         TX bytes:110032 acl:8249 sco:0 commands:180 errors:0
->         Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy: RSWITCH HOLD SNIFF PARK
->         Link mode: SLAVE ACCEPT
->         Name: 'BlueZ strolchi (0)'
->         Class: 0x3e010c
->         Service Classes: Networking, Rendering, Capturing, Object Transfer, Audio
->         Device Class: Computer, Laptop
->         HCI Ver: 1.2 (0x2) HCI Rev: 0x3 LMP Ver: 1.2 (0x2) LMP Subver: 0x800
->         Manufacturer: Broadcom Corporation (15)
-> 
->> For now I seem to be able to at least make progress by issuing:
->>
->>    hciconfig hci0 auth encryt
->>
->> and
->>
->>    hciconfig hci0 piscan
-> 
-> And this does not work with
-> 
-> 	apitest SetDiscoverableTimeout 0
-> 	apitest SetMode discoverable
-> 
-> ?
-> 
-> If this does not work, it sound not like a SUSE specific bug but like a
-> generic bug which we all would like to know about :-)
 
-Ok, that works. It gives me a way, other than hciconfig, to make the 
-device discoverable. Still a pity that hcid.conf isn't obeyed as in
-opensuse 10.1. That was simpler for my set up.
+>
+> You sure can.
+>
+> You can of course use the code provided by Manuel too but then your  
+> code won't work without rfcomm/bluetooth. The nice thing is that if  
+> you keep it generic you can test your application using any old  
+> serial connection. Or use a pipe in the filesystem etc..
+>   
+The idea with mine is that I needed to measure RSSI and wanted some 
+control over the BlueZ Stack :D
+> Caveat: I can't get mgetty to work by feeding it /dev/rfcommX though : 
+> ( It should work, must be one of those things ;)
+>
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys - and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>   
 
-The real problem now though, is whatever I do I can't get dund to
-respond.  Its a shame this was all working reliable back with 10.1.
-Now it looks like I'm not going to be able to get it going.
-
-Cheers,
-	Paul.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
