@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 19 Dec 2006 11:03:20 +0200
-From: Tuomas Suutari <thsuut@utu.fi>
-To: bluez-devel@lists.sourceforge.net
-Message-id: <200612191103.20942.thsuut@utu.fi>
-MIME-version: 1.0
-Subject: [Bluez-devel] rfcomm_sock_sendmsg with len==0 (in Linux 2.6.18)
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <4587315D.10703@aon.at>
+Date: Tue, 19 Dec 2006 01:25:01 +0100
+From: Johannes Hoerhan <jhoe@aon.at>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <4580168C.2060806@aon.at>	<1166359631.6557.37.camel@aeonflux.holtmann.net>
+	<loom.20061218T215536-830@post.gmane.org>
+In-Reply-To: <loom.20061218T215536-830@post.gmane.org>
+Subject: Re: [Bluez-devel] rfcomm kernel 2.6.19 probs
+Reply-To: jhoe@aon.at, BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,28 +21,11 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello.
+Hi, I am also using udev 103 - I did not check the udev events. With my 
+patch everything is working great now. If the information is needed I 
+will monitor udev with the non working version of tty.c.
 
-I've made a buffer for socket connections to use with C++ iostreams. 
-It's quite simple; just uses send and recv to fill and empty the buffer 
-when needed.
-
-It worked fine for a while, but yesterday some strange errors occured 
-with it. After few hours of debugging I found that code responsible was 
-using syscall send() to Bluetooth socket with buffer length set to 0. 
-Problem was that I assumed it to return either -1 on error or 0 when 
-success, but instead it returned positive values sometimes. 
-
-Ok, it was stupid calling send() with len==0 anyway, but still (at least 
-according to manual) send shouldn't return anything positive then. So I 
-traced what kernel code is responsible and found it's 
-rfcomm_sock_sendmsg() in net/bluetooth/rfcomm/sock.c. It returns 
-uninitialized variable err, if called with len==0.
-
-Simple fix is to initialize err to 0.
-
--- 
-Tuomas Suutari | +358 50 3806983 | thsuut@utu.fi
+  joho
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
