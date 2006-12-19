@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4587BB0E.2070909@glidos.net>
-Date: Tue, 19 Dec 2006 10:12:30 +0000
-From: Paul Gardiner <osronline@glidos.net>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] hcid.conf seemingly ignored
+In-Reply-To: <08C55293-7564-45BD-B18C-571EBC240FEC@gothpunk.com>
+References: <mailman.247983.1166465173.8777.bluez-users@lists.sourceforge.net>
+	<08C55293-7564-45BD-B18C-571EBC240FEC@gothpunk.com>
+Date: Tue, 19 Dec 2006 10:43:49 +0100
+Message-Id: <1166521429.29972.10.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] why does one need bluez-firmware ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,33 +21,48 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I had my server (running SuSE 10.1) set up as a gateway for my PDA
-following the advice in: 
-http://wiki.xda-developers.com/index.php?pagename=bluetoothnetworking
+Hi Steve,
 
-I've just swapped over to SuSE 10.2 which has bluesz 3.7-14 and
-the set up no longer works.
+> >>> I read on some web pages that one need bluez-firmware to be able to
+> >>> operate the BroadCom 203x series bluetooth dongle correctly on a 2.4
+> >>> kernel. So I am wondering what is the purpose of bluez-firmware? And
+> >>> how does it work?
+> >>
+> >> that is a misunderstanding. For the 2.6 kernel you use a kernel  
+> >> module
+> >> to load the firmware. For 2.4 an extra USB application was needed.  
+> >> Both
+> >> however need the firmware files.
+> >
+> > And what is the purpose of bluez-firmware? How does it work?
+> 
+> The USB dongles themselves are stupid and don't have operational  
+> firmware in them.
 
-hciconfig says:
+most of them actually do have the firmware in flash or RAM. Only a few
+need a firmware download before they can be used.
 
-hci0:   Type: USB
-         BD Address: 00:09:DD:50:47:BB ACL MTU: 384:8 SCO MTU: 64:8
-         UP RUNNING PSCAN
-         RX bytes:401 acl:0 sco:0 events:18 errors:0
-         TX bytes:317 acl:0 sco:0 commands:17 errors:0
+> It's a cost-saving measure. By using uploadable firmware, the  
+> manufacturer (Dlink, Linksys, whoever)
+> doesn't have to make a Windows version and a Mac version and a Linux  
+> version.
+> They just make one type of device and then ship the appropriate  
+> firmware blob on the drivers CD.
 
-with ISCAN missing, although my hcid.conf file has  "iscan enable".
+This is a generalization from the WiFi world and it is simply not true.
+Only a minor number of devices need a firmware download.
 
-I can use "hciconfig hci0 iscan" to fix that, but this all makes
-me think I'm doing something wrong.  If I change hcid.conf to have
-"pscan disable" that has no effect: still PSCAN is listed in
-the report from hciconfig. Its as though hcid.conf is being ignored.
+> So the real reason you need the BlueZ firmware is that the driver has  
+> to upload the right firmware(in this case, for Linux) into the
+> bluetooth module itself, otherwise it won't work.
 
-Any ideas?
+Just to make it clear. You are talking about a firmware download. You
+download firmware to the device. An upload would mean to extract the
+firmware from the device.
 
-Cheers,
-	Paul.
+Regards
 
+Marcel
 
 
 
