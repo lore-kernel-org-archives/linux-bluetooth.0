@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 20 Dec 2006 09:54:14 +0100
-From: Stefan Seyfried <seife@suse.de>
+Mime-Version: 1.0 (Apple Message framework v752.3)
+In-Reply-To: <be976db60612191226p7c4660a7q45d173717c81d634@mail.gmail.com>
+References: <be976db60612191123s62dfa67egc3c937e63ae2031@mail.gmail.com>
+	<E34033EC-19D4-4112-A964-C656CA724290@gmail.com>
+	<be976db60612191226p7c4660a7q45d173717c81d634@mail.gmail.com>
+Message-Id: <DA1C5D3D-6945-436C-9125-EA6822AF6107@gmail.com>
+From: Bas Schulte <basschulte@gmail.com>
+Date: Tue, 19 Dec 2006 21:39:21 +0100
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20061220085414.GA18455@suse.de>
-References: <4587BB0E.2070909@glidos.net> <1166523629.29972.18.camel@violet>
-	<4587DAEC.8000603@glidos.net> <20061219153627.GJ7959@suse.de>
-	<45884A49.5040702@glidos.net>
-MIME-Version: 1.0
-In-Reply-To: <45884A49.5040702@glidos.net>
-Subject: Re: [Bluez-users] hcid.conf seemingly ignored
+Subject: Re: [Bluez-users] minicom over /dev/rfcomm0
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,49 +18,65 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Tue, Dec 19, 2006 at 08:23:37PM +0000, Paul Gardiner wrote:
- =
+Hi,
 
-> Ok, that works. It gives me a way, other than hciconfig, to make the =
+On 19-dec-2006, at 21:26, Mark S. Townsley wrote:
 
-> device discoverable. Still a pity that hcid.conf isn't obeyed as in
-> opensuse 10.1. That was simpler for my set up.
+> Hi Bas:  thanks for your reply.
+>
+> So are you implying that if I do not go through RFCOMM and all the  
+> sockets stuff, I can
+> actually open /dev/rfcomm0 and get back a file descriptor just like  
+> any other serial port?
 
-Well, that's the price we are paying for progress.
-(and it escapes me how editing hcid.conf is easier than using
-bluetooth-applet once to set up the system :-))
+Yep. I actually just managed to get mgetty working ;)
 
-> The real problem now though, is whatever I do I can't get dund to
-> respond.  Its a shame this was all working reliable back with 10.1.
-> Now it looks like I'm not going to be able to get it going.
+Here's how:
 
-If the procedure explained in /usr/share/doc/packages/bluez-utils/README.du=
-nd
-does not work, please file a bugreport at bugzilla.novell.com so i can upda=
-te
-the documentation.
+# rfcomm listen 3 4
 
-Have fun,
+This creates /dev/rfcomm3, available on channel 4. It spits out  
+something like:
 
-    Stefan
+Waiting for connection on channel 4
+Press CTRL-C for hangup
 
--- =
+Just let this guy run.
 
-Stefan Seyfried
-QA / R&D Team Mobile Devices        |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
+Then start mgetty, in another terminal:
+
+# mgetty -r -b /dev/rfcomm3
+
+Before all of this, I did a "sdptool add --channel=4 SP" to let the  
+client know there's a Serial Port service on channel 4.
+
+ From another box, I connected to this channel and got a nice "login:  
+" prompt.
+
+Minor thing is that mgetty complains a bit about some ioctl's didn't  
+go right, I don't think it likes being started from the command line,  
+but it does work.
+
+I'd say this pretty much shows you can just use plain serial io  
+against these devices ;)
+
+I don't (yet) understand exactly how rfcomm works and in what state  
+it creates the device, for instance, "rfcomm bind ..." doesn't work.
+
+Cheers,
+
+Bas.
 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
