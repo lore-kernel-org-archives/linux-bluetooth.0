@@ -1,19 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <231dafb50612191055t546cc5dfh998f19f16bee5a48@mail.gmail.com>
-Date: Tue, 19 Dec 2006 11:55:35 -0700
-From: "Dark Shadow" <shadowofdarkness@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <231dafb50612172334y5245e853s25cf665dbe270ed7@mail.gmail.com>
-MIME-Version: 1.0
-References: <231dafb50612152211h1bc9ca42lade6687ac51c0@mail.gmail.com>
-	<adf2d65c0612152357m5886f77coff5a7d227dd7d4e6@mail.gmail.com>
-	<1166262274.6557.1.camel@aeonflux.holtmann.net>
-	<231dafb50612160114y6ee8b889ibbe71cd96dbd79b9@mail.gmail.com>
-	<231dafb50612161256n34a1c123p13fd79870e12d265@mail.gmail.com>
-	<1166358018.6557.17.camel@aeonflux.holtmann.net>
-	<231dafb50612172024r39a509bbncd5b98568063ce22@mail.gmail.com>
-	<231dafb50612172334y5245e853s25cf665dbe270ed7@mail.gmail.com>
-Subject: Re: [Bluez-users] Trouble loading firmware with bcm203x
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20061219174257.GN7959@suse.de>
+References: <4587BB0E.2070909@glidos.net> <1166523629.29972.18.camel@violet>
+	<4587DAEC.8000603@glidos.net> <20061219153627.GJ7959@suse.de>
+	<45880A1B.7030408@glidos.net> <20061219163126.GL7959@suse.de>
+	<4588201C.40702@glidos.net>  <20061219174257.GN7959@suse.de>
+Date: Tue, 19 Dec 2006 18:51:20 +0100
+Message-Id: <1166550680.7309.11.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] hcid.conf seemingly ignored
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -27,14 +23,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Would knowing that the box says if comes with the Widcomm bluetooth
-driver help figure this out. Also I got it to show 0a5c:2120 once with
-trying to use the firmware so you where right.
+Hi Stefan,
 
-You recommended sniffing it's startup in Windows. If I borrowed a
-laptop that had Windows installed would you be able to tell me what
-software to use to do that. Noting that I am a end user not a
-developer of software so it can't be to technical.
+> > Does this look like a good indicator of the cause of my problems?:
+> > 
+> > # apitest GetMode
+> > Traceback (most recent call last):
+> >    File "/usr/bin/apitest", line 3, in <module>
+> >      import dbus
+> > ImportError: No module named dbus
+> 
+> No. Just install the dbus-1-python package.
+> (yes, i deliberately made bluez-test not depend on dbus-1-python, but
+> i will think again about that :-)
+
+there is a good reason why apitest is only distributed and not
+installed. The name is way to common and unrelated to BlueZ ;)
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
