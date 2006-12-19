@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Tue, 19 Dec 2006 11:47:39 +0200
+From: Tuomas Suutari <thsuut@utu.fi>
+In-reply-to: <1166521154.29972.4.camel@violet>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200612181412.12059.fernando@bluexare.org>
-References: <200612181412.12059.fernando@bluexare.org>
-Date: Tue, 19 Dec 2006 10:48:47 +0100
-Message-Id: <1166521727.29972.15.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] About the process that listen...
+Message-id: <200612191147.39325.thsuut@utu.fi>
+MIME-version: 1.0
+References: <200612191103.20942.thsuut@utu.fi>
+	<1166521154.29972.4.camel@violet>
+Subject: Re: [Bluez-devel] rfcomm_sock_sendmsg with len==0 (in Linux 2.6.18)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,42 +21,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fernando,
+On 2006-12-19 Tuesday 11:39, Marcel Holtmann wrote:
+> > rfcomm_sock_sendmsg() in net/bluetooth/rfcomm/sock.c. It returns
+> > uninitialized variable err, if called with len==0.
+> >
+> > Simple fix is to initialize err to 0.
+>
+> this would only hide the real problem. It should only return err if
+> the sent is still 0. The return statement is
+>
+> 	return sent ? sent : err;
 
-> I'm a developper from other project that works with Bluetooth.
-> We are making a software that can send datas to other devices, like mobiles.
-> 
-> But sometimes, our device does not detect the mobile, what it means, the sent
-> is not realized.
-> 
-> And we want to do the possibility taht each mobile, by requesting the device
-> the information, it sends.
-> 
-> We don't know which process works listening the transmissions from other
-> devices...
-> 
-> If the mobile try to associate the device, what does daemon treat that?
-> And if the mobile try t send an mage (for example), is another daemon who
-> treat this?
-> 
-> I hope you understand me.
-> 
-> What we want is when our device detect an incoming transmission (a try to
-> associate, or to send an image...) from one mobile, it sends what we have
-> prepared to be send.
+Yep, exactly. It returns err, which isn't initialized, so it could be 
+positive.
 
-I think that I have a small idea on what you are trying to achieve.
-However you might have no idea on how Bluetooth actually works. This is
-not WiFi and things are different. You should get yourself a book about
-Bluetooth and understand how it works and then play with tools like
-l2test and rctest from the bluez-utils package. And of course have
-"hcidump -X -V" running all the time so you see what actually happens.
+Am I missing something?
 
-Regards
-
-Marcel
-
-
+-- 
+Tuomas Suutari | +358 50 3806983 | thsuut@utu.fi
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
