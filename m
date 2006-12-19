@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4588F340.3000003@idlum.be>
-Date: Wed, 20 Dec 2006 09:24:32 +0100
-From: Pierre-Yves Paulus <py@idlum.be>
+Message-ID: <458864F1.4070104@xmission.com>
+Date: Tue, 19 Dec 2006 15:17:21 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Switch virtual TTY (/dev/rfcomm0) to RAW mode
+References: <44F6B7AE.1030209@jambit.com>
+	<4582A310.60905@jambit.com>	<4583A020.2040808@xmission.com>
+	<4587D051.8080703@jambit.com>
+In-Reply-To: <4587D051.8080703@jambit.com>
+Subject: Re: [Bluez-devel] How to use sbc.c ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,63 +22,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Frank
 
-I'm writing a simple Java application which performs an OBEX push, using 
-a Java OBEX implementation, and not OpenOBEX "as usual".
+> What succeeded: With an older version of sbc.c I managed to encode a wav
+> file, send it over the air and receive it, decode it and write it in a
+> file. Well, it looks different than the original. In the original there
+> is some information in the first bytes like: "WAVEfmt", a long area with
+> zero bytes, then the characters "data" and then the data seems to begin.
+> I do not find this in my received file. Is there something else I have
+> to care about? Should I run sbcinfo and change sbc_init() according to
+> the results?
 
-All my application is making use of the DBus API to find the device, and 
-to get a virtual TTY (/dev/rfcommX) connected to the remote devices's 
-OPP channel. It is working very well.
+there is not a way to send metadata about the original wav over the a2dp
+stream. It sounds like you want a way to create a wav from the pcm
+received on the other side. You will have to use a conversion utility.
 
-However, before I can start the OBEX session over /dev/rfcommX, I've to 
-switch it into RAW mode, as I learnt it on this list previously. I think 
-I've got a problem at this step. I'm using the following piece of C code 
-to put /dev/rfcomm0 into RAW mode (from a JNI call):
+> The newest download of sbc.c from http://sbc.cvs.sourceforge.net/sbc/
+> under menu "CVS Browse" contains a simple bug, which lets the file
+> compile, but crash on runtime: In function _sbc_analyze_eight() the
+> array 't[8]' is referenced from t[1] to t[8], instead of t[0] to t[7].
 
-// Open the file (representing the virtual TTY)
-FILE *stream  = NULL;
-stream = fopen(filename, "r");
+fixed. thanks.
 
-if (!stream) {
-   printf("Unable to open file!\n");
-   exit(-1);
-}
-
-// Get its identifier
-int fid = fileno(stream);
-
-struct termio old_term;
-struct termio new_term;
-
-// Get the current config of the TTY
-if (ioctl(fid, TCGETA, &old_term) == -1) {
-   printf("ioctl get failed.\n");
-   exit(-2);
-}
-
-// Change what has to be.
-new_term = old_term;
-new_term.c_lflag &= ~ICANON;
-new_term.c_cc[VMIN] = 0;
-new_term.c_cc[VTIME] = 0;
-
-// Apply
-if (ioctl(fid, TCSETA, &new_term) == -1) {
-  printf("ioctl set failed.\n");
-  exit(-3);
-}
-
-// Close the file
-fclose(stream);
-
-Is it the right way to perform this, or am I doing something wrong 
-there? Needless to say I'm very new to this tty stuff, and may have done 
-something really stupid, in which case I would like to know it.
-
-Thanks in advance,
-Best Regards,
-Pierre-Yves
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
