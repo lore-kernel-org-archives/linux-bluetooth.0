@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4587D051.8080703@jambit.com>
-Date: Tue, 19 Dec 2006 12:43:13 +0100
-From: =?ISO-8859-1?Q?Frank_Heimb=E4cher?= <frank.heimbaecher@jambit.com>
-MIME-Version: 1.0
+Date: Tue, 19 Dec 2006 12:57:37 +0200
+From: Tuomas Suutari <thsuut@utu.fi>
+In-reply-to: <1166524299.29972.24.camel@violet>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44F6B7AE.1030209@jambit.com> <4582A310.60905@jambit.com>
-	<4583A020.2040808@xmission.com>
-In-Reply-To: <4583A020.2040808@xmission.com>
-Subject: [Bluez-devel] How to use sbc.c ?
+Message-id: <200612191257.37628.thsuut@utu.fi>
+MIME-version: 1.0
+References: <200612191103.20942.thsuut@utu.fi>
+	<200612191147.39325.thsuut@utu.fi> <1166524299.29972.24.camel@violet>
+Subject: Re: [Bluez-devel] rfcomm_sock_sendmsg with len==0 (in Linux 2.6.18)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,62 +21,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Thanks a lot, Brad.
+On 2006-12-19 Tuesday 12:31, Marcel Holtmann wrote:
+> that is really strange. A recent compiler should detect that err can
+> be used uninitialized.
 
-What succeeded: With an older version of sbc.c I managed to encode a wav
-file, send it over the air and receive it, decode it and write it in a
-file. Well, it looks different than the original. In the original there
-is some information in the first bytes like: "WAVEfmt", a long area with
-zero bytes, then the characters "data" and then the data seems to begin.
-I do not find this in my received file. Is there something else I have
-to care about? Should I run sbcinfo and change sbc_init() according to
-the results?
+It (gcc 4.1.1) didn't, maybe that's because it can't know if len is 
+always >0. Though it should have warned anyway.
 
-The newest download of sbc.c from http://sbc.cvs.sourceforge.net/sbc/
-under menu "CVS Browse" contains a simple bug, which lets the file
-compile, but crash on runtime: In function _sbc_analyze_eight() the
-array 't[8]' is referenced from t[1] to t[8], instead of t[0] to t[7].
 
-Thanks a lot
-Frank
+> How about the attached patch. Does it work for you?
 
-Brad Midgley schrieb:
-> Frank
-> 
-> fyi, I moved the reply to bluez-devel.
-> 
->> sbc_encode: It seems like you put pcm data on 'data' and get sbc data in
->>  'sbc.data'. 'count' is not used in the function. How often must I call
->> it? How do I know how much of 'data' is converted already?
-> 
-> the return value from sbc_encode is the number of bytes consumed. It's
-> true that count is not used properly. In fact we assume there is enough
-> data there to fill one sbc frame.
-> 
->> sbc_decode: Put sbc data on 'data' and you get pcm data in 'sbc.m.data'.
->> Is that right? Must I always change the byte order like it is done in
->> a2recv.c?
-> 
-> The swapping was to accommodate bugs in the audio driver's endian
-> processing on gumstix. You can ignore it.
-> 
->> Are there special things to do if I have a .wav file or do I just have
->> to call the functions? I am just talking of the payload and not the
->> headers.
-> 
-> be sure you init the encoder with the correct channels (1 or 2) and
-> sample rate. after that just be sure to pass enough data to sbc_encode
-> in each pass so it doesn't underrun.
-> 
->> It would help me a lot if somebody could put me on the right track.
-> 
-> Be sure you are using the separate sbc sourceforge project since that's
-> the version of the codec we are maintaining. Finally, we'd appreciate
-> any patches you come up with to improve the code documentation or even
-> more if you address any of the limitations. Documentation of course is a
-> problem, but there's also a todo list at the top of sbc.c.
-> 
-> Brad
+Yes. Now it returns 0 when called with len==0.
+
+Thanks.
+
+-- 
+Tuomas Suutari | +358 50 3806983 | thsuut@utu.fi
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
