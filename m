@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <458B1519.6020800@glidos.net>
-Date: Thu, 21 Dec 2006 23:13:29 +0000
-From: Paul Gardiner <osronline@glidos.net>
-MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <4587BB0E.2070909@glidos.net>	<1166523629.29972.18.camel@violet>	<4587DAEC.8000603@glidos.net>	<20061219153627.GJ7959@suse.de>	<45884A49.5040702@glidos.net>	<20061220085414.GA18455@suse.de>	<458904A1.5090508@glidos.net>	<20061220110457.GC20278@suse.de>
-	<4589BBF5.5090604@glidos.net>
-In-Reply-To: <4589BBF5.5090604@glidos.net>
-Subject: Re: [Bluez-users] hcid.conf seemingly ignored
+To: bluez-users@lists.sourceforge.net
+From: Neil MacLeod <gmane@nmacleod.com>
+Date: Thu, 21 Dec 2006 21:53:48 +0000
+Message-ID: <emevpc$fk7$1@sea.gmane.org>
+References: <elvlcl$drg$1@sea.gmane.org>	<1166358880.6557.25.camel@aeonflux.holtmann.net>	<em3vo7$2cs$1@sea.gmane.org>
+	<1166381765.6557.48.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+In-Reply-To: <1166381765.6557.48.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-users] Nokia 770 / Sony Ericsson UIQ3 pairing / DUN
+	problems
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,44 +22,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Paul Gardiner wrote:
-> Stefan Seyfried wrote:
->>>> If the procedure explained in /usr/share/doc/packages/bluez-utils/README.dund
->>>> does not work, please file a bugreport at bugzilla.novell.com so i can update
->>>> the documentation.
->>> Ok thanks. I'm not sure I have read that before. That may help a lot.
->> If it does not work, let me know so that i can fix the documentation.
+Marcel Holtmann wrote:
+> Hi Neil,
 > 
-> No, I still can't tease any response out of dund, whatever I do. I'm
-> seeing this in the logs:
-> 
-> Dec 20 22:15:22 plonty dund[13620]: Accept failed. Interrupted system 
-> call(4)
-> Dec 20 22:15:22 plonty pand[13617]: Accept failed. Interrupted system 
-> call(4)
-> Dec 20 22:16:58 plonty dund[13730]: Accept failed. Interrupted system 
-> call(4)
-> Dec 20 22:16:58 plonty pand[13727]: Accept failed. Interrupted system 
-> call(4)
-> 
-> 
-> Could that be anything to do with it.
+>>> my wild guess would be that this phone has a similar problem as my
+>>> Motorola RAZR V3x. If you use service search attribute request then it
+>>> can't handle it, because that is not mandatory in the qualification.
+>>> However it is mandatory to respond, but I think the Bluetooth part of
+>>> the phone simply crashes at this point and leaves and unmaintained ACL
+>>> link behind. The reset action on the Nokia 770 will clean this link and
+>>> give the phone the chance to be able to reset itself. No matter what
+>>> this phone is broken and it is not on the Linux software side.
+>>>
 
-I've since realised that these warnings are just part of bluez shutting 
-down, so nothing to do with my problem.
+Hi Marcel
 
-> I added the option "debug" to /etc/ppp/peers/dun, but I didn't
-> see any new output from that.
+Seems like you were spot on!
 
-So, is there any other way I can debug this problem?  I can get a
-trace from hcidump. Is there a way to get that to display the meaning
-of what is transmitted?
+Johan has provided a new build of sdp-query that performs separate Service Search and Service Attribute requests instead of a SSA request. The binary is an attachment in the previously mentioned bugzilla entry #865, and with the modified sdp-query the Nokia 770 connects without fail to the W950i.
 
-I really don't want to just give up, seeing as I had this working
-perfectly on whatever version of bluez ran under suse 10.1.  I
-can't believe the changes that went through bluez since then
-have made connecting a Qtek S100 to a linux box impossible.
-That would be a real backward step.
+I'm not sure what the next steps are now, it looks like the 770+W950i combination can work after applying a a fix to the BlueZ stack, but it's possible Johan has provided the fix merely to narrow down the problem. I guess the long term solution should be to fix the phone, but that may or may not be possible unless someone can contact the Symbian & Sony Ericsson developers (I wonder if they follow this newsgroup? :))
+
+Thanks to you and Johan for your help!
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
