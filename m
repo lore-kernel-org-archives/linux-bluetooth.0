@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <458BCA8D.5030001@jambit.com>
-Date: Fri, 22 Dec 2006 13:07:41 +0100
-From: Frank Heimbaecher <frank.heimbaecher@jambit.com>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44F6B7AE.1030209@jambit.com> <4582A310.60905@jambit.com>
-	<4583A020.2040808@xmission.com> <4587D051.8080703@jambit.com>
-In-Reply-To: <4587D051.8080703@jambit.com>
-Subject: Re: [Bluez-devel] How to use sbc.c ?
+Date: Fri, 22 Dec 2006 00:55:30 +0500
+From: Andrey Rahmatullin <wrar@altlinux.ru>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20061221195530.GD18112@wrars-comp.wrarsdomain>
+References: <20061221191520.GC18112@wrars-comp.wrarsdomain>
+	<1166729874.372.3.camel@violet>
+Mime-Version: 1.0
+In-Reply-To: <1166729874.372.3.camel@violet>
+Subject: Re: [Bluez-devel] [PATCH] bluez-gnome link fix
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,56 +17,106 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1064979752=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello
 
-I found out that sbc.c, as it is, works for big endian. On little endian
-machines you cannot recognize an audio file after encoding and decoding.
-So I changed the code a bit:
+--===============1064979752==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="XStn23h1fwudRqtG"
+Content-Disposition: inline
 
-sbc_decode():
-// fh 20.12.06: original source code assumes big endian
-// so we have to change the order of the following 2 statements
-*ptr++ = (s & 0x00ff);
-*ptr++ = (s & 0xff00) >> 8;
 
-sbc_encode():
-// fh 20.12.06: original source code assumes big endian
-// so we have to exchange [0] and [1] here
-int16_t s = (ptr[1] & 0xff) << 8 | (ptr[0] & 0xff);
+--XStn23h1fwudRqtG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Would it be a suggestion to work with a macro LITTLE_ENDIAN here?
+On Thu, Dec 21, 2006 at 08:37:54PM +0100, Marcel Holtmann wrote:
+> I need a more detailed explanation on why your fix is correct, because I
+> simply don't see it.
+gcc -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I/usr/include/glib=
+-2.0
+-I/usr/lib/glib-2.0/include   -DDBUS_API_SUBJECT_TO_CHANGE
+-I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/atk-1.0
+-I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/glib-2.0
+-I/usr/lib/glib-2.0/include   -pipe -Wall -O2 -march=3Dathlon -mtune=3Dathl=
+on-xp
+-D_FORTIFY_SOURCE=3D2   -o bluetooth-sendto  main.o -lgtk-x11-2.0 -lgdk-x11=
+-2.0
+-latk-1.0 -lgdk_pixbuf-2.0 -lm -lpangocairo-1.0 -lpango-1.0 -lcairo
+-lgobject-2.0 -lgmodule-2.0 -ldl -lglib-2.0   -ldbus-glib-1 -ldbus-1 -lglib=
+-2.0
+=2E./common/libcommon.a
 
-And very interesting for me: Are there other places in the code that
-need to be adapted to little endian? Because the result after decoding
-is still poor: volume is too low, speed is too high (probably data
-missing) and sound is quite shallow. When I write the resulting data to
-a file, it is smaller than the original.
+=2E./common/libcommon.a(manager.o): In function `update_adapter_list':
+manager.c:(.text+0x26a): undefined reference to `dbus_g_proxy_call'
+=2E./common/libcommon.a(manager.o): In function `bluetooth_manager_init':
+manager.c:(.text+0x306): undefined reference to `dbus_g_proxy_new_for_name'
+manager.c:(.text+0x332): undefined reference to `dbus_g_proxy_add_signal'
+manager.c:(.text+0x356): undefined reference to `dbus_g_proxy_connect_signa=
+l'
+manager.c:(.text+0x376): undefined reference to `dbus_g_proxy_add_signal'
+manager.c:(.text+0x39a): undefined reference to `dbus_g_proxy_connect_signa=
+l'
+=2E./common/libcommon.a(private.o): In function `bluetooth_get_connection':
+private.c:(.text+0x2c): undefined reference to `dbus_g_bus_get'
+collect2: ld returned 1 exit status
+make[2]: *** [bluetooth-sendto] Error 1
 
-Thanks for help
-Frank
 
--- 
-Dipl.-Inform. Frank Heimbaecher, Senior Software Architect
+If you use ld --as-needed (which is by default in some distributions), you
+should write all -l options after, not before .o files (and .a file is
+just a collection of .o) which use symbols from that -l libs, or they will
+be ignored.=20
 
-jambit Software Development & Management GmbH
-Nymphenburger Strasse 13-15, D-80335 Muenchen
+Note also that if -lfoo resolves to static lib, this behavior will be
+always the same even without --as-needed.
 
-http://www.jambit.com    where innovation works
+Normally if you use autotools, all that you need to do is writing your
+-lfoo to LDADD/LIBADD, not LDFLAGS. But if you link internal static libs
+to your binaries, you still need to check the order of -l and .a .
 
-Tel.: +49.89.45 2347-42
-Fax:  +49.89.45 2347-70
+--=20
+WBR, wRAR (ALT Linux Team)
 
+--XStn23h1fwudRqtG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iD8DBQFFiuayB4Vf7hFmt5URAuYwAJ443p/retlVrcNAYnwGxAs6sDmPTACg37IV
+18actFE9YJTXTk11LDWBDOA=
+=gOws
+-----END PGP SIGNATURE-----
+
+--XStn23h1fwudRqtG--
+
+
+--===============1064979752==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1064979752==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1064979752==--
