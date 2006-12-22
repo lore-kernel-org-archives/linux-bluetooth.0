@@ -1,16 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <458BBF13.3010300@glidos.net>
-Date: Fri, 22 Dec 2006 11:18:43 +0000
-From: Paul Gardiner <osronline@glidos.net>
+Date: Fri, 22 Dec 2006 12:06:11 +0100
+From: Stefan Seyfried <seife@suse.de>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20061222110611.GA9345@suse.de>
+References: <4587BB0E.2070909@glidos.net> <1166523629.29972.18.camel@violet>
+	<4587DAEC.8000603@glidos.net> <20061219153627.GJ7959@suse.de>
+	<45884A49.5040702@glidos.net> <20061220085414.GA18455@suse.de>
+	<458904A1.5090508@glidos.net> <20061220110457.GC20278@suse.de>
+	<4589BBF5.5090604@glidos.net> <458B1519.6020800@glidos.net>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <4587BB0E.2070909@glidos.net>
-	<1166523629.29972.18.camel@violet>	<4587DAEC.8000603@glidos.net>
-	<20061219153627.GJ7959@suse.de>	<45884A49.5040702@glidos.net>
-	<20061220085414.GA18455@suse.de>	<458904A1.5090508@glidos.net>
-	<20061220110457.GC20278@suse.de>	<4589BBF5.5090604@glidos.net>
-	<458B1519.6020800@glidos.net> <20061222110611.GA9345@suse.de>
-In-Reply-To: <20061222110611.GA9345@suse.de>
+In-Reply-To: <458B1519.6020800@glidos.net>
 Subject: Re: [Bluez-users] hcid.conf seemingly ignored
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,58 +20,49 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Stefan Seyfried wrote:
-> On Thu, Dec 21, 2006 at 11:13:29PM +0000, Paul Gardiner wrote:
->> Paul Gardiner wrote:
->>> Stefan Seyfried wrote:
->>>>> Ok thanks. I'm not sure I have read that before. That may help a lot.
->>>> If it does not work, let me know so that i can fix the documentation.
->>> No, I still can't tease any response out of dund, whatever I do. I'm
->>> seeing this in the logs:
-> 
-> Bad.
-> 
->> So, is there any other way I can debug this problem?  I can get a
->> trace from hcidump. Is there a way to get that to display the meaning
->> of what is transmitted?
->>
->> I really don't want to just give up, seeing as I had this working
->> perfectly on whatever version of bluez ran under suse 10.1.  I
->> can't believe the changes that went through bluez since then
->> have made connecting a Qtek S100 to a linux box impossible.
->> That would be a real backward step.
-> 
-> I also don't think we broke it on purpose :-)
+On Thu, Dec 21, 2006 at 11:13:29PM +0000, Paul Gardiner wrote:
+> Paul Gardiner wrote:
+> > Stefan Seyfried wrote:
+> >>> Ok thanks. I'm not sure I have read that before. That may help a lot.
+> >> If it does not work, let me know so that i can fix the documentation.
+> > =
 
-Sorry. I know I'm being a bit of a misery.  :-)
+> > No, I still can't tease any response out of dund, whatever I do. I'm
+> > seeing this in the logs:
 
-> I will try it out, and check if it works for me, but probably not before
-> the first week of next year.
+Bad.
 
-That would be brilliant, thanks.
+> So, is there any other way I can debug this problem?  I can get a
+> trace from hcidump. Is there a way to get that to display the meaning
+> of what is transmitted?
+> =
 
-BTW, lots of other things seem to be working or at least trying to.
-If I try ActiveSync via bluetooth from my S100, I get some sort of
-connection, and if running vnc at the time, I see a chat window
-appear on the server. The two devices are to some extent talking.
+> I really don't want to just give up, seeing as I had this working
+> perfectly on whatever version of bluez ran under suse 10.1.  I
+> can't believe the changes that went through bluez since then
+> have made connecting a Qtek S100 to a linux box impossible.
+> That would be a real backward step.
 
-Also, provided I issue the command "sdptool add DUN", the S100
-will consider the server as being a modem, its just that the
-attempt to connect always fails.
+I also don't think we broke it on purpose :-)
+I will try it out, and check if it works for me, but probably not before
+the first week of next year.
+-- =
 
-Cheers,
-     Paul.
+Stefan Seyfried
+QA / R&D Team Mobile Devices        |              "Any ideas, John?"
+SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
