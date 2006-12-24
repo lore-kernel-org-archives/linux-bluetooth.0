@@ -1,47 +1,32 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <457403C1.7010801@palmsource.com>
-References: <457403C1.7010801@palmsource.com>
-Date: Sun, 24 Dec 2006 14:49:42 +0100
-Message-Id: <1166968182.15485.10.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] authentification, encryption,
-	and secure	connection for rfcomm
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Return-Path: <linux-kernel-owner+marcel=40holtmann.org-S1751336AbWLXNnS@vger.kernel.org>
+Message-ID: <458E8407.1050504@gmail.com>
+Date: Sun, 24 Dec 2006 14:43:12 +0059
+From: Jiri Slaby <jirislaby@gmail.com>
+MIME-Version: 1.0
+To: Andrew Morton <akpm@osdl.org>
+CC: Pavel Machek <pavel@ucw.cz>, kernel list <linux-kernel@vger.kernel.org>,
+        marcel@holtmann.org, maxk@qualcomm.com,
+        bluez-devel@lists.sourceforge.net
+Subject: Re: ptrace() memory corruption?
+References: <20061223234305.GA1809@elf.ucw.cz>	<20061223235501.GA1740@elf.ucw.cz>	<20061224000150.GA1812@elf.ucw.cz>	<20061224000605.GA1768@elf.ucw.cz>	<20061224000753.GA1811@elf.ucw.cz>	<458DD459.2030209@gmail.com>	<458E69CB.6000107@gmail.com> <20061224042225.51a6619a.akpm@osdl.org>
+In-Reply-To: <20061224042225.51a6619a.akpm@osdl.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-kernel-owner@vger.kernel.org
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Frederic,
+Andrew Morton wrote:
+> On Sun, 24 Dec 2006 12:51:16 +0059
+> Jiri Slaby <jirislaby@gmail.com> wrote:
+> 
+>> [   58.674780] EFLAGS: 00010046   (2.6.20-rc1-mm1 #207)
+> 
+> please, test 2.6.20-rc2.  We applied a fix for this.
 
-> This patch adds command line options to rfcomm (--auth, --encrypt, 
-> --secure, --master) as in pand. It also updates the man page.
+It's working now.
 
-you actually forgot one close(sk) in the error path and the manual page
-changes are screwed up, but besides that patch is fine. I fixed this and
-committed it.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+thanks,
+-- 
+http://www.fi.muni.cz/~xslaby/            Jiri Slaby
+faculty of informatics, masaryk university, brno, cz
+e-mail: jirislaby gmail com, gpg pubkey fingerprint:
+B674 9967 0407 CE62 ACC8  22A0 32CC 55C3 39D4 7A7E
