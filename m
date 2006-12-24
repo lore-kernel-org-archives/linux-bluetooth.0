@@ -1,16 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Pavel Machek <pavel@ucw.cz>
-In-Reply-To: <20061223235501.GA1740@elf.ucw.cz>
-References: <20061223234305.GA1809@elf.ucw.cz>
-	<20061223235501.GA1740@elf.ucw.cz>
-Date: Sun, 24 Dec 2006 15:39:23 +0100
-Message-Id: <1166971163.15485.21.camel@violet>
+To: =?UTF-8?Q?=E9=AB=98_=E8=BF=8E=E5=AE=BE?= <netbuggao@hotmail.com>
+In-Reply-To: <BAY19-F224CD928D369420F0DAFACA9C30@phx.gbl>
+References: <BAY19-F224CD928D369420F0DAFACA9C30@phx.gbl>
+Date: Sun, 24 Dec 2006 15:34:30 +0100
+Message-Id: <1166970870.15485.19.camel@violet>
 Mime-Version: 1.0
-Cc: Andrew Morton <akpm@osdl.org>, bluez-devel@lists.sf.net,
-        kernel list <linux-kernel@vger.kernel.org>, maxk@qualcomm.com
-Subject: Re: [Bluez-devel] bluetooth memory corruption (was Re: ext3-related
-	crash in	2.6.20-rc1)
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] I have acquired the Core Spec 2.1,
+	can I develop it and patch	to bluez kernel?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,18 +22,12 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pavel,
+Hi,
 
-> > I got this nasty oops while playing with debugger. Not sure if that is
-> > related; it also might be something with bluetooth; I already know it
-> > corrupts memory during suspend, perhaps it corrupts memory in some
-> > error path?
-> 
-> Okay, I spoke too soon. bluetooth & suspend memory corruption was
-> _way_ harder to reproduce than expected. Took me 5-or-so-suspend
-> cycles... so it is probably unrelated to the previous crash.
+> I have acquired the Core Spec 2.1,can I develop it and patch to bluez 
+> kernel? 
 
-can you try to reproduce this with 2.6.20-rc2 as well.
+feel free to send in patches. We will review them.
 
 Regards
 
