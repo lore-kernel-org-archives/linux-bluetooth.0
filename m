@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <8cd2fe3d0612272054i6de4de3cga0f282d2586f2e42@mail.gmail.com>
-Date: Thu, 28 Dec 2006 10:24:09 +0530
-From: "ravindra kumar" <ravikinikeri@gmail.com>
-To: bluez-devel@lists.sf.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] regarding bluetooth
+Message-ID: <BAY117-F15DABBE18567416959A13BFC00@phx.gbl>
+From: "Kelvin Xu" <kyoxu@hotmail.com>
+To: bluez-devel@lists.sourceforge.net
+Date: Wed, 27 Dec 2006 21:36:06 +0800
+Mime-Version: 1.0
+Subject: [Bluez-devel] Installing Bluez-Util on ARM board
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,22 +18,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-hello all
+Dear all,
 
-This is ravindra currently doing my MS in real time embedded systems
- in bangalore (india)...right now i m doin my project work.
-title is "To develop bluetooth communication on OMAP1510 Innovator
- development kit with the external bluetooth enabled device using linux
-( porting linux on OMAP1510)"
-here i have ported linux on OMAP 1510 kit..as we know that OMAP1510
-kit supports bluetooth features..so i have to built bluetooth stack
-and port on to the OMAP1510 kit..so that the OMAP kit should
-enable[detect] the other external bluetooth device.. so i m struggling
-to build the bluetooth stack in linux platform..
-please help me regarding this..
-thank u..
+i have been trying to install Bluez-Util to my ARM board to no avail as i 
+could not get Dbus installed.
+May i know where can i download older versions of Bluez-Util that do not 
+have dependencies on D-Bus?
 
-Ravindra
+If anyone could help me with the cross compilation of D-Bus would also be 
+very much appreciated.
+I am correctly using a NFS mounted RFS for my ARM target board. I am 
+confused as to where to install the required Expat and DBus to on my target 
+board. So that the dependencies between them and Bluez would be resolved.
+
+Thank you
+
+Regards,
+Kelvin
+
+_________________________________________________________________
+Receive MSN Hotmail alerts over SMS! 
+http://en-asiasms.mobile.msn.com/ac.aspx?cid=1002
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
