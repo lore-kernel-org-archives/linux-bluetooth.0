@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <BAY117-F15DABBE18567416959A13BFC00@phx.gbl>
-From: "Kelvin Xu" <kyoxu@hotmail.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Wed, 27 Dec 2006 21:36:06 +0800
-Mime-Version: 1.0
-Subject: [Bluez-devel] Installing Bluez-Util on ARM board
+Date: Wed, 27 Dec 2006 11:18:30 +0100 (CET)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4f436aae0612262343j735ea868l8602d908760f7ce8@mail.gmail.com>
+Message-ID: <Pine.LNX.4.63.0612271116170.8572@redbean.intranet.gw-instruments.de>
+References: <4f436aae0612262343j735ea868l8602d908760f7ce8@mail.gmail.com>
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] no hci_uart.c ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,27 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Dear all,
 
-i have been trying to install Bluez-Util to my ARM board to no avail as i 
-could not get Dbus installed.
-May i know where can i download older versions of Bluez-Util that do not 
-have dependencies on D-Bus?
+Hi Choi, 
 
-If anyone could help me with the cross compilation of D-Bus would also be 
-very much appreciated.
-I am correctly using a NFS mounted RFS for my ARM target board. I am 
-confused as to where to install the required Expat and DBus to on my target 
-board. So that the dependencies between them and Bluez would be resolved.
+> Where is the low level serial hci driver ?
+> I can only find hci_ldisc.c...
 
-Thank you
+This is the one. BlueZ uses the system serial driver and a line discipline 
+for UART connected devices. 
 
-Regards,
-Kelvin
+Ciao, 
 
-_________________________________________________________________
-Receive MSN Hotmail alerts over SMS! 
-http://en-asiasms.mobile.msn.com/ac.aspx?cid=1002
+Peter 
+
+
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
 
 
 -------------------------------------------------------------------------
