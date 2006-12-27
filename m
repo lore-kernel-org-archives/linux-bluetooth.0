@@ -1,10 +1,20 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20061228064902.70882.qmail@web59104.mail.re1.yahoo.com>
-Date: Wed, 27 Dec 2006 22:49:02 -0800 (PST)
-From: jaeho lee <xefri@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <231dafb50612262201l1cb72c64xa98312e44b1394@mail.gmail.com>
+Date: Tue, 26 Dec 2006 23:01:49 -0700
+From: "Dark Shadow" <shadowofdarkness@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <231dafb50612191055t546cc5dfh998f19f16bee5a48@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] How to change defualt L2CAP mtu size?
+References: <231dafb50612152211h1bc9ca42lade6687ac51c0@mail.gmail.com>
+	<adf2d65c0612152357m5886f77coff5a7d227dd7d4e6@mail.gmail.com>
+	<1166262274.6557.1.camel@aeonflux.holtmann.net>
+	<231dafb50612160114y6ee8b889ibbe71cd96dbd79b9@mail.gmail.com>
+	<231dafb50612161256n34a1c123p13fd79870e12d265@mail.gmail.com>
+	<1166358018.6557.17.camel@aeonflux.holtmann.net>
+	<231dafb50612172024r39a509bbncd5b98568063ce22@mail.gmail.com>
+	<231dafb50612172334y5245e853s25cf665dbe270ed7@mail.gmail.com>
+	<231dafb50612191055t546cc5dfh998f19f16bee5a48@mail.gmail.com>
+Subject: Re: [Bluez-users] Trouble loading firmware with bcm203x
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,65 +24,29 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1839643507=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1839643507==
-Content-Type: multipart/alternative; boundary="0-407805476-1167288542=:69932"
-
---0-407805476-1167288542=:69932
-Content-Type: text/plain; charset=ascii
-Content-Transfer-Encoding: quoted-printable
-
-Hi all.=0AI know that the default L2CAP mtu size is 672  and I heard it can=
- be changed up to 65535. =0ASo I changed it 65535 and had double check it. =
-However, when I use "write function" in Network program, for example, "writ=
-e (Socket_s, message, 2048)". It doesn't work at all. Even though I changed=
- default mtu size, I only can use "write function" with size 672 , for exam=
-ple, "write (Socket_s, message, 672)". I don't know what's wrong. Is there =
-any advise?=0A=0A__________________________________________________=0ADo Yo=
-u Yahoo!?=0ATired of spam?  Yahoo! Mail has the best spam protection around=
- =0Ahttp://mail.yahoo.com 
---0-407805476-1167288542=:69932
-Content-Type: text/html; charset=ascii
-Content-Transfer-Encoding: quoted-printable
-
-<html><head><style type=3D"text/css"><!-- DIV {margin:0px;} --></style></he=
-ad><body><div style=3D"font-family:times new roman, new york, times, serif;=
-font-size:12pt"><DIV>Hi all.</DIV>=0A<DIV>I know that the default L2CAP mtu=
- size is 672&nbsp; and&nbsp;I heard it can be changed up to 65535. </DIV>=
-=0A<DIV>So I changed it 65535 and had double check it. However, when I use =
-"write function" in Network program, for example, "write (Socket_s, message=
-, 2048)". It doesn't work at all. Even though I changed default mtu size, I=
- only can use "write function" with size 672 , for example, "write (Socket_=
-s, message, 672)". I don't know what's wrong. Is there any advise?</DIV></d=
-iv><br>__________________________________________________<br>Do You Yahoo!?=
-<br>Tired of spam?  Yahoo! Mail has the best spam protection around <br>htt=
-p://mail.yahoo.com </body></html>
---0-407805476-1167288542=:69932--
-
-
---===============1839643507==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+On 12/19/06, Dark Shadow <shadowofdarkness@gmail.com> wrote:
+> Would knowing that the box says if comes with the Widcomm bluetooth
+> driver help figure this out. Also I got it to show 0a5c:2120 once with
+> trying to use the firmware so you where right.
+>
+> You recommended sniffing it's startup in Windows. If I borrowed a
+> laptop that had Windows installed would you be able to tell me what
+> software to use to do that. Noting that I am a end user not a
+> developer of software so it can't be to technical.
+>
+Please help, I still can't get regular use out of this dongle and
+can't afford a different one.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1839643507==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1839643507==--
