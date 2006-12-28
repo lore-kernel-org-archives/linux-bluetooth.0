@@ -1,13 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Thu, 28 Dec 2006 12:18:42 +0100 (CET)
-From: Peter Wippich <pewi@gw-instruments.de>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <56233.80.165.155.106.1167300847.squirrel@webmail10.pair.com>
-Message-ID: <Pine.LNX.4.63.0612281212140.12381@redbean.intranet.gw-instruments.de>
-References: <544bb7070612272338m3f130e00p22ee2f1b7f67d3cb@mail.gmail.com>
-	<56233.80.165.155.106.1167300847.squirrel@webmail10.pair.com>
-MIME-Version: 1.0
-Subject: Re: [Bluez-devel] bdaddr for CSR chipset - porting dificulties
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Pavel Machek <pavel@ucw.cz>
+In-Reply-To: <20061228084251.GB3955@ucw.cz>
+References: <20061223234305.GA1809@elf.ucw.cz>
+	<20061223235501.GA1740@elf.ucw.cz> <1166971163.15485.21.camel@violet>
+	<20061224234357.GA1817@elf.ucw.cz>  <20061228084251.GB3955@ucw.cz>
+Date: Thu, 28 Dec 2006 11:40:25 +0100
+Message-Id: <1167302425.2417.18.camel@violet>
+Mime-Version: 1.0
+Cc: Andrew Morton <akpm@osdl.org>, bluez-devel@lists.sf.net,
+        kernel list <linux-kernel@vger.kernel.org>, maxk@qualcomm.com
+Subject: Re: [Bluez-devel] bluetooth memory corruption (was Re: ext3-related
+	crash in	2.6.20-rc1)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,45 +25,46 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Pavel,
 
-Hi, 
-
-> > I've been working on porting bluez's bdaddr utility to mac, and I
-> > think I'm making pretty good progress.  After digging around the
-> > internals of IOBluetooth.framework, I've managed to, I think,
-> > replicate the behavior of bdaddr's csr_write_bd_addr and
-> > csr_reset_device.
-> >
-> > as far as I can tell, the command sent matches exactly what
-> > csr_write_bd_addr would have sent with transient=false and addr =
-> > 00-16-cb-1b-7e-ad.  Anyone see what I'm doing wrong?  Or even any clue
-> > what status 0x0009 is?
+> > > > > I got this nasty oops while playing with debugger. Not sure if that is
+> > > > > related; it also might be something with bluetooth; I already know it
+> > > > > corrupts memory during suspend, perhaps it corrupts memory in some
+> > > > > error path?
+> > > > 
+> > > > Okay, I spoke too soon. bluetooth & suspend memory corruption was
+> > > > _way_ harder to reproduce than expected. Took me 5-or-so-suspend
+> > > > cycles... so it is probably unrelated to the previous crash.
+> > > 
+> > > can you try to reproduce this with 2.6.20-rc2 as well.
+> > 
+> > (reproduced in another mail).
+> > 
+> >         _urb_queue_tail(__pending_q(husb, _urb->type), _urb);
+> >         err = usb_submit_urb(urb, GFP_ATOMIC);
+> >         if (err) {
+> >                 BT_ERR("%s tx submit failed urb %p type %d err %d",
+> >                                 husb->hdev->name, urb, _urb->type, err);
+> >                 _urb_unlink(_urb);
+> > 
+> >                 ~~~~~~~~~~~~~~~~~~
+> > 	 	 Do we need to remove urb from pending_q here?
+> > 
+> >                 _urb_queue_tail(__completed_q(husb, _urb->type), _urb);
+> >         } else
+> >                 atomic_inc(__pending_tx(husb, _urb->type));
+> > 
 > 
-> 
-> Status 0x0009 = PERMISSION_DENIED
-> 
-> I dont think you can change the bd_addr in the CSR chipset
-> via UART/USB HCI commmands, only via SPI.
-> Normally you only want to set the bd_addr during production.
-> 
+> Any news? Should I convert above idea to a patch? Or should I make
+> bluetooth suspend() routine return error so corruption is impossible
+> to hit?
 
-You can change it over the UART by using the bccmd util provided with 
-bluez utils. However, in the default configuration this will only change the 
-address in RAM, not permanently in flash. This is by intention because 
-normaly you're not expected to do this unless you own a block of OUI 
-numbers where you can take a valid address from. 
+to be honest, I have no idea. This code is way to ugly anyway.
 
-So, as Susanne already mentioned normaly only in production.  
+Regards
 
-Ciao, 
+Marcel
 
-Peter 
-
-
-|       Peter Wippich                   Voice: +49 30 46776411          |
-|       G&W Instruments GmbH            fax:   +49 30 46776419          |
-|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
-|       D-13355 Berlin  / Germany                                       |
 
 
 -------------------------------------------------------------------------
