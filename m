@@ -1,18 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <54530.80.165.155.106.1167386840.squirrel@webmail10.pair.com>
-In-Reply-To: <544bb7070612280942n6907d4e2u107654fd71310df4@mail.gmail.com>
-References: <544bb7070612272338m3f130e00p22ee2f1b7f67d3cb@mail.gmail.com>
-	<56233.80.165.155.106.1167300847.squirrel@webmail10.pair.com>
-	<Pine.LNX.4.63.0612281212140.12381@redbean.intranet.gw-instruments.de>
-	See http://spamassassin.org/tag/ for more details. Report problems to
-	http://sf.net/tracker/?func=add&group_id=1&atid=200001 0.0 RCVD_BY_IP
-	Received by mail server with no name
-	<544bb7070612280942n6907d4e2u107654fd71310df4@mail.gmail.com>
-Date: Fri, 29 Dec 2006 11:07:20 +0100 (CET)
-From: "Osted Software Development" <info@osted.dk>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Date: Fri, 29 Dec 2006 01:10:29 +0200
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20061228230903.GA3190@localhost.localdomain>
+References: <4593C480.5080806@nokia.com>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] bdaddr for CSR chipset - porting dificulties
+In-Reply-To: <4593C480.5080806@nokia.com>
+Subject: Re: [Bluez-devel] [PATCH] New RemoteDeviceDisconnectionRequested
+	signal implementation
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -26,61 +21,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
->>
->> Hi,
->>
->> > > I've been working on porting bluez's bdaddr utility to mac, and I
->> > > think I'm making pretty good progress.  After digging around the
->> > > internals of IOBluetooth.framework, I've managed to, I think,
->> > > replicate the behavior of bdaddr's csr_write_bd_addr and
->> > > csr_reset_device.
->> > >
->> > > as far as I can tell, the command sent matches exactly what
->> > > csr_write_bd_addr would have sent with transient=false and addr =
->> > > 00-16-cb-1b-7e-ad.  Anyone see what I'm doing wrong?  Or even any
->> clue
->> > > what status 0x0009 is?
->> >
->> >
->> > Status 0x0009 = PERMISSION_DENIED
->> >
->> > I dont think you can change the bd_addr in the CSR chipset
->> > via UART/USB HCI commmands, only via SPI.
->> > Normally you only want to set the bd_addr during production.
->> >
->>
->> You can change it over the UART by using the bccmd util provided with
->> bluez utils. However, in the default configuration this will only change
->> the
->> address in RAM, not permanently in flash. This is by intention because
->> normaly you're not expected to do this unless you own a block of OUI
->> numbers where you can take a valid address from.
->>
->> So, as Susanne already mentioned normaly only in production.
->>
->> Ciao,
->>
->> Peter
->> |
->> |       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de
->>
->>
-> But only UART, not USB?  I tried again with transient = true (word 7 =
-> 0x0008) and I still get a response with status 0x0009.
->
-> And yeah, I understand changing your BT address is generally a bad
-> idea.  This is just for research purposes.  I'm trying to get a Wii to
-> connect to a MacBook as if it were a Wii Remote and so far just
-> matching the device name/class has proved insufficient.  Current
-> theory is it will only connect to devices in Nintendo's OUI ranges.
->
+Hi Luca,
 
-You could check the pskey 509 Security_active, some manufactures
-enables this, and you can only disable it via SPI. If it is enabled,
-I assume [ not tested :-) ] this will prevent you from changing the bd_addr.
+On Thu, Dec 28, 2006, Luciano Coelho wrote:
+> As agreed last week, I've implemented a new D-Bus signal in hcid that 
+> allows upper-level applications to disconnect gracefuly before the ACL 
+> connection is terminated as a result of a call to RemoteDeviceDisconnect.
+> 
+> So, this is how it works: when the RemoteDeviceDisconnect is called, we 
+> send the new signal RemoteDeviceDisconnectionRequested(string bdaddr) 
+> and wait for 2 seconds before sending the disconnection command to the 
+> controller.  This enables the service implementations to disconnect in a 
+> nicer way, as specified in the profile specs (eg. in SIM Access Profile, 
+> a SIM_DISCONNECT_REQ can be sent by the client).
+> 
+> The change is not very big and should be backwards compatible, except 
+> for the fact that disconnections will take 2 seconds longer than before.
+> 
+> I also updated the documentation and the apitest script.
+> 
+> Please let me know what you think.
 
--Susanne
+Looks good to me.
 
+Johan
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
