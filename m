@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 29 Dec 2006 15:57:44 +0100
-Message-Id: <1007107986@web.de>
+Message-ID: <4593962A.6070303@sit.fraunhofer.de>
+Date: Thu, 28 Dec 2006 11:02:18 +0100
+From: "Matthias Ritscher,  Fraunhofer-Institut SIT" <matthias.ritscher@sit.fraunhofer.de>
 MIME-Version: 1.0
-From: Christian Gebhard <gebhard_christian@web.de>
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] SCO connection
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Encryption Key Length Negotiation & Link Key Type
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,152 +14,173 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-15"
+Content-Type: multipart/mixed; boundary="===============1265981615=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello to all
+This is a cryptographically signed message in MIME format.
 
-I am trying to set up a SCO connection between 2 PCs, one with kernel 2.6.1=
-8 and one with kernel 2.6.17. After several tries with sco-sockets I tried =
-the scotest program with which I have the same problems as with my own sock=
-et-program. The data seems to be sent (according to the output of hcidump -=
-X -V), but it is not received. I have two Bluegiga Dongles with a CSR Bluec=
-ore 4 External chip connected via USB to a USB2.0 PCI-Card in each PC.
+--===============1265981615==
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
+	micalg=sha1; boundary="------------ms030603030903010602060206"
 
-output of "hciconfig -a" (same with both PCs):
+This is a cryptographically signed message in MIME format.
 
-hci0:   Type: USB
-        BD Address: 00:07:80:81:A9:XX ACL MTU: 384:8 SCO MTU: 64:8
-        UP RUNNING PSCAN
-        RX bytes:684 acl:0 sco:0 events:22 errors:0
-        TX bytes:332 acl:0 sco:0 commands:21 errors:0
-        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: 'server-0'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing, Object Transfer,=
- Audio
-        Device Class: Computer, Uncategorized
-        HCI Ver: 2.0 (0x3) HCI Rev: 0xafa LMP Ver: 2.0 (0x3) LMP Subver: 0x=
-afa
-        Manufacturer: Cambridge Silicon Radio (10) =
+--------------ms030603030903010602060206
+Content-Type: multipart/mixed; boundary="------------060708070409000400010908"
+
+This is a multi-part message in MIME format.
+--------------060708070409000400010908
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 8bit
+
+Hi Bluez-List,
+
+1)
+I´m trying to get any information about the Encryption Key Negotiation 
+Process of paired Bluetooth devices (Laptop with Bluez-stack and a 
+Handheld Device). Using hcidump I could not receive any information 
+about this exchange which corresponds to that negotiation. I sniffed 
+communication exchange during pairing and communication transmission. 
+Encryption at the host is enabled in the hcid.conf file and can be seen 
+using "hcitool con".
+I´m interested in the length of the negotiated Encryption key Kc. Is 
+there any way to retrieve its length (or value) in the Bluez-stack ?
+
+2)
+The second issue I´m focussing in this request is the question: Is there 
+is a possibility in the Bluez-stack to "simulate" devices with light 
+memory or computing power ;-) ? This means, is there a possibility that 
+the Bluez-stack will use a Local Unit Key as Link Key proposal. I´m 
+interested, since the counterpart (Handheld Device) is supposed by 
+specification to accept Combination Keys as Link Keys only, and I want 
+to test it.
+
+Thanks for your attention,
+Matthias
 
 
-output of "hciconfig hci0 revision" (same with both PCs):
+--------------060708070409000400010908
+Content-Type: text/x-vcard; charset=utf-8;
+ name="matthias.ritscher.vcf"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="matthias.ritscher.vcf"
 
-hci0:   Type: USB
-        BD Address: 00:07:80:81:A9:XX ACL MTU: 384:8 SCO MTU: 64:8
-        Build 2810
-        Chip version: BlueCore4-External
-        Max key size: 56 bit
-        SCO mapping:  HCI
+begin:vcard
+fn:Matthias  Ritscher
+n:Ritscher;Matthias 
+org:Fraunhofer-Institut Sichere Informationstechnologie;Sichere mobile Systeme
+adr;quoted-printable;dom:;;Rheinstra=C3=9Fe 75;Darmstadt;;64295
+email;internet:matthias.ritscher@sit.fraunhofer.de
+tel;work:+49 (0) 6151 / 869 - 313
+tel;fax:+49 (0) 6151 / 869 - 224
+url:http://www.sit.fraunhofer.de
+version:2.1
+end:vcard
 
-If I use scotest on the sending PC appears the following:
 
-debian:/home/christian# ./scotest -s 00:07:80:81:A9:XX
-scotest[27090]: Connected [handle 46, class 0x000000]
-scotest[27090]: Sending ...
+--------------060708070409000400010908--
 
-on the receiving PC I get the following output:
+--------------ms030603030903010602060206
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-server:/home/cgebhard# ./scotest -r
-scotest[3851]: Waiting for connection ...
-scotest[3852]: Connect from 00:07:80:81:A9:B4 [handle 47, class 0x3e0100]
-scotest[3852]: Receiving ...
-scotest[3852]: 672 bytes in 0.00m speed 1328.44 kb
-scotest[3852]: 672 bytes in 0.00m speed 1515.59 kb
-scotest[3852]: 672 bytes in 0.00m speed 1488.10 kb
-scotest[3852]: 672 bytes in 0.00m speed 1481.38 kb
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIILdzCC
+BbUwggSdoAMCAQICAg7kMA0GCSqGSIb3DQEBBQUAME8xCzAJBgNVBAYTAkRFMRMwEQYDVQQK
+EwpGcmF1bmhvZmVyMSswKQYDVQQDEyJGcmF1bmhvZmVyLUdlc2VsbHNjaGFmdCBSb290LUNB
+IHYyMB4XDTA1MDkyNjEzNDMxN1oXDTA5MTIzMTIzMDAwMFowXTELMAkGA1UEBhMCREUxEzAR
+BgNVBAoTCkZyYXVuaG9mZXIxDDAKBgNVBAsTA1NJVDEPMA0GA1UECxMGUGVvcGxlMRowGAYD
+VQQDExFNYXR0aGlhcyBSaXRzY2hlcjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB
+ALyygzJc7Lt07rs9sbZWQKCIcLFwxIVhT0HFk2kmXE9MT+91aFy8wfpHtCMn34BA+g8Vh4vU
+8GDFhMExgolFgzK4UBm9wWi63FWHdsw8NehkUVgSiZFViNnObnZA+ycsX6beiWKpRiwfp667
+k/ceNuD28YOen42M5wrrZGAaV/Z97wf4ZTQcAC8cLWu4n0C7jhHrkfTUB/zMMSmvoUHe7Spr
+0jbh9SKvCGyOg51R5LWxODUxXyMuatao21H1VFF/KpNA3Jq1spy713w2bpzLoH76ANTOnPd4
+0BqVHtA7b0k5JpaJXc1qukXd90FHqB8Gh9ALOyrVoX5qDdgu6HdZ7VcCAwEAAaOCAoswggKH
+MIGfBglghkgBhvhCAQ0EgZEWgY5Tb2Z0d2FyZSBaZXJ0aWZpa2F0IGRlciBaZXJ0aWZpemll
+cnVuZ2luc3RhbnogKENBKSBkZXIgRnJhdW5ob2Zlci1HZXNlbGxzY2hhZnQgZS5WLiwgTXVl
+bmNoZW47IFd1cnplbHplcnRpZmlrYXQgdmlhIGh0dHBzOi8vcGtpLmZyYXVuaG9mZXIuZGUv
+ME0GCCsGAQUFBwEBBEEwPzA9BggrBgEFBQcwAYYxaHR0cDovL3BraS5mcmF1bmhvZmVyLmRl
+L0ZoRy1DQV92Ml9PQ1NQLVJlc3BvbmRlcjBIBgNVHR8EQTA/MD2gO6A5hjdodHRwOi8vcGtp
+LmZyYXVuaG9mZXIuZGUvRmhHLUNBLUNlcnRzL0ZoRy1DQV92Ml9DUkwuY3JsMAwGA1UdEwEB
+/wQCMAAwSgYDVR0SBEMwQYEkemVydGlmaXppZXJ1bmdzaW5zdGFuekBmcmF1bmhvZmVyLmRl
+hhlodHRwOi8vcGtpLmZyYXVuaG9mZXIuZGUvMC4GA1UdEQQnMCWBI21hdHRoaWFzLnJpdHNj
+aGVyQHNpdC5mcmF1bmhvZmVyLmRlMEwGA1UdIARFMEMwQQYLKwYBBAGGClACAQEwMjAwBggr
+BgEFBQcCARYkaHR0cDovL3BraS5mcmF1bmhvZmVyLmRlL3BvbGljeS5odG1sMCIGA1UdJQEB
+/wQYMBYGCCsGAQUFBwMEBgorBgEEAYI3CgMEMA4GA1UdDwEB/wQEAwIEMDAdBgNVHQ4EFgQU
+EXuz1847Khb8bCNE2/J7NNgOu7IwHwYDVR0jBBgwFoAUAMP872PCVigvUQt1Vv97BekcyfEw
+DQYJKoZIhvcNAQEFBQADggEBAEgwQmXNSdVsqus/ITj7DnBmpoJXkvExoPw2Ipol2vUs1EDG
+oJR9FSct1H6D+CkwxraWJev6yHhwy11qRjgOO2PBBcsPp8g7WWEUz8lM90SUR43iTUzwQZBf
+wNwREjt8Db+XAVtN5XrQ0k05EykPHi8rfuGdI9b7Sf/ICVZE1QjvtGvLTgnqriGfSs3vcNwa
+kRZN24eLosxyXM2qEt3eSuJ1IcFTJS+uxI6DM53Dqn+3hqP4MccJfiNXJKZV0aZtF7akRXqE
+NKROXLgfGMCncOIBTUB/ZeI54dbdtZuQmCL9jhzz/ZWdk/XyaWWgvnWCndG/CMgLKnAddsf4
+TfR8IDwwggW6MIIEoqADAgECAgIO4zANBgkqhkiG9w0BAQUFADBPMQswCQYDVQQGEwJERTET
+MBEGA1UEChMKRnJhdW5ob2ZlcjErMCkGA1UEAxMiRnJhdW5ob2Zlci1HZXNlbGxzY2hhZnQg
+Um9vdC1DQSB2MjAeFw0wNTA5MjYxMzQzMTZaFw0wOTEyMzEyMzAwMDBaMF0xCzAJBgNVBAYT
+AkRFMRMwEQYDVQQKEwpGcmF1bmhvZmVyMQwwCgYDVQQLEwNTSVQxDzANBgNVBAsTBlBlb3Bs
+ZTEaMBgGA1UEAxMRTWF0dGhpYXMgUml0c2NoZXIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw
+ggEKAoIBAQCUuZfxGDIw86q6XzbQUDd+2kacFpu3Oor/PWuXJ/ieH9j3KPCLtKsFRKn011mr
+QZ2qw2lE2NzcwdORchQxTm9fDsZJlUr2EUmPDsWPxzH/CMrLnEoiGTSu6OQDvuJ6Hc3QSLKw
+dZsMazP3pc/ET1O+9snlIv6Enno2fpkbYXPodcP7hWMwk6d5IAw8yRGGE5ZfE6DMi9Ouk83q
++k9u+5u1ejP9liKmf7EQO5vdnRBfdLBY0/8WvgeTIBZM2SeUgFuFkqBoAJ2Zdy3XpE5Oeslb
+2iBcfZuBFeOSIgberR+B4ej5WW44xeGXtrhuVDPWzOFZVBvqOBETtbgtkBcnFqwtAgMBAAGj
+ggKQMIICjDCBnwYJYIZIAYb4QgENBIGRFoGOU29mdHdhcmUgWmVydGlmaWthdCBkZXIgWmVy
+dGlmaXppZXJ1bmdpbnN0YW56IChDQSkgZGVyIEZyYXVuaG9mZXItR2VzZWxsc2NoYWZ0IGUu
+Vi4sIE11ZW5jaGVuOyBXdXJ6ZWx6ZXJ0aWZpa2F0IHZpYSBodHRwczovL3BraS5mcmF1bmhv
+ZmVyLmRlLzBNBggrBgEFBQcBAQRBMD8wPQYIKwYBBQUHMAGGMWh0dHA6Ly9wa2kuZnJhdW5o
+b2Zlci5kZS9GaEctQ0FfdjJfT0NTUC1SZXNwb25kZXIwSAYDVR0fBEEwPzA9oDugOYY3aHR0
+cDovL3BraS5mcmF1bmhvZmVyLmRlL0ZoRy1DQS1DZXJ0cy9GaEctQ0FfdjJfQ1JMLmNybDAM
+BgNVHRMBAf8EAjAAMEoGA1UdEgRDMEGBJHplcnRpZml6aWVydW5nc2luc3RhbnpAZnJhdW5o
+b2Zlci5kZYYZaHR0cDovL3BraS5mcmF1bmhvZmVyLmRlLzAuBgNVHREEJzAlgSNtYXR0aGlh
+cy5yaXRzY2hlckBzaXQuZnJhdW5ob2Zlci5kZTBMBgNVHSAERTBDMEEGCysGAQQBhgpQAgEB
+MDIwMAYIKwYBBQUHAgEWJGh0dHA6Ly9wa2kuZnJhdW5ob2Zlci5kZS9wb2xpY3kuaHRtbDAn
+BgNVHSUEIDAeBggrBgEFBQcDAgYIKwYBBQUHAwMGCCsGAQUFBwMEMA4GA1UdDwEB/wQEAwIG
+wDAdBgNVHQ4EFgQUWqO3wi9lVtnjHcHCBgGEEpowd7owHwYDVR0jBBgwFoAUAMP872PCVigv
+UQt1Vv97BekcyfEwDQYJKoZIhvcNAQEFBQADggEBAM4AgPzs+dBTMUHAhU2tbVadQByQ/IQh
+9L1rtHcemPMrTm35A37CBIdCesQ2NAF8w1n6yMDG/ot3N21rWNVCepAfPwjL7yU3+dIrIYMu
+g08bFHmEm4dkhpW24gT9v2yok64lHBSxZsvk5Qruam76kEunkhGq0ou8rDc4SyIXVUhEuy7Z
+kQrjhAyUHRZ4hkflJ+sjejT7DW85t/0fn1XXp5wnoJqVSD6jhkfufCm8s+7qcZL8sHNYNF09
+7EI6OIrW5WsxTe0MuWlZZaduuW1sxRq1OBDDyNJiUnY+pAtfjZNHqnJt6kReDwo3zJuQif/1
+W91WAK3ri9DOqDOx/azCU4sxggL/MIIC+wIBATBVME8xCzAJBgNVBAYTAkRFMRMwEQYDVQQK
+EwpGcmF1bmhvZmVyMSswKQYDVQQDEyJGcmF1bmhvZmVyLUdlc2VsbHNjaGFmdCBSb290LUNB
+IHYyAgIO4zAJBgUrDgMCGgUAoIIBfzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqG
+SIb3DQEJBTEPFw0wNjEyMjgxMDAyMThaMCMGCSqGSIb3DQEJBDEWBBRjv4XEbyjZJ+87VMXq
+m/rwqC18AjBSBgkqhkiG9w0BCQ8xRTBDMAoGCCqGSIb3DQMHMA4GCCqGSIb3DQMCAgIAgDAN
+BggqhkiG9w0DAgIBQDAHBgUrDgMCBzANBggqhkiG9w0DAgIBKDBkBgkrBgEEAYI3EAQxVzBV
+ME8xCzAJBgNVBAYTAkRFMRMwEQYDVQQKEwpGcmF1bmhvZmVyMSswKQYDVQQDEyJGcmF1bmhv
+ZmVyLUdlc2VsbHNjaGFmdCBSb290LUNBIHYyAgIO5DBmBgsqhkiG9w0BCRACCzFXoFUwTzEL
+MAkGA1UEBhMCREUxEzARBgNVBAoTCkZyYXVuaG9mZXIxKzApBgNVBAMTIkZyYXVuaG9mZXIt
+R2VzZWxsc2NoYWZ0IFJvb3QtQ0EgdjICAg7kMA0GCSqGSIb3DQEBAQUABIIBAIrkuAva/KTv
+d0d0GW+wAgeppkJ7sMQ1d/ylJHFtxu4z2IJEMhR7seE1fEu7EXW5ALsP5aL/pN0GC/2ldIqO
+/2qoj2ThqwTNtlPULZwY4UfUsY77pF7/2vAdMA3ZCSCrJShAqLMe8nuuFJHbFeOS90IGZA9P
+qMTkEAsKlA+hgcdYw6IBZZdbnpZ7dl31izY/maKUFIlHPvSeC3X+6JxxTEOb1ehn9nMSEYWE
+kdAM+YkU4NCJRWLkE6REVEmWwEnaDGoPaka/GWnS4QXxq58Mg/MkEZZY6VS1UGN5wJURMDGG
+KIzcmlwi1ll1ucvQSSnvUcRyr4fi1t3vFLp/esYVZ8cAAAAAAAA=
+--------------ms030603030903010602060206--
 
-...etc...
 
-the output of "hcidump -X -V for the sender:
-
-< SCO data: handle 46 dlen 64
-    0000: a2 02 00 00 a0 02 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  ................
-    0010: 7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  ................
-    0020: 7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  ................
-    0030: 7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  ................
-> SCO data: handle 46 dlen 48
-    0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-> SCO data: handle 46 dlen 48
-    0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-> SCO data: handle 46 dlen 48
-    0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-> SCO data: handle 46 dlen 48
-    0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-< SCO data: handle 46 dlen 64
-    0000: a3 02 00 00 a0 02 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  ................
-    0010: 7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  ................
-    0020: 7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  ................
-    0030: 7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  ................
-< SCO data: handle 46 dlen 64
-    0000: a4 02 00 00 a0 02 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  ................
-    0010: 7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  ................
-    0020: 7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  ................
-    0030: 7f 7f 7f 7f 7f 7f 7f 7f  7f 7f 7f 7f 7f 7f 7f 7f  ................
-> SCO data: handle 46 dlen 48
-    0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-    0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
-
-...etc...
-
-it seems as if now and then the data is sent, but the only data I see on th=
-e receiver with "hcidump -X -V is:
-
-> SCO data: handle 47 dlen 48
-    0000: ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  ................
-    0010: ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  ................
-    0020: ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  ................
-> SCO data: handle 47 dlen 48
-    0000: ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  ................
-    0010: ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  ................
-    0020: ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  ................
-> SCO data: handle 47 dlen 48
-    0000: ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  ................
-    0010: ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  ................
-    0020: ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  ................
-> SCO data: handle 47 dlen 48
-    0000: ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  ................
-    0010: ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  ................
-    0020: ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  ................
-
-...etc...
-
-it seems as if the data that was sent is not received.
-
-Do I maybe need a kernel patch like the "patch-2.6.18-mh8.gz" or is there a=
-nother problem. I am stuck with this since two weeks and don't know what to=
- do. But maybe that's because I started with Linux only 2 months ago^^. I w=
-ould be glad if someone could help me with this.
-
-Regards
-
-Chris
-_______________________________________________________________________
-Viren-Scan f=FCr Ihren PC! Jetzt f=FCr jeden. Sofort, online und kostenlos.
-Gleich testen! http://www.pc-sicherheit.web.de/freescan/?mc=3D022222
-
+--===============1265981615==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1265981615==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1265981615==--
