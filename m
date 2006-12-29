@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4595380D.3050004@xmission.com>
-Date: Fri, 29 Dec 2006 08:45:17 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <31e679430612290415h450d7783w2419171822aec5e9@mail.gmail.com>
+Date: Fri, 29 Dec 2006 08:15:25 -0400
+From: "Felipe Balbi" <felipebalbi@users.sourceforge.net>
+To: BlueZ <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <31e679430612290415h450d7783w2419171822aec5e9@mail.gmail.com>
-In-Reply-To: <31e679430612290415h450d7783w2419171822aec5e9@mail.gmail.com>
-Subject: Re: [Bluez-devel] Bluetooth 2.0
+Subject: [Bluez-devel] Bluetooth 2.0
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,19 +18,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Felipe
+Hello Guys,
 
-> I'm wondering if I could help the linux bluetooth subsystem by writing
-> code for the new Bluetooth 2.0 Spec. So, is there any project taking
-> care of this? Is there any activity for this?
+I'm wondering if I could help the linux bluetooth subsystem by writing
+code for the new Bluetooth 2.0 Spec. So, is there any project taking
+care of this? Is there any activity for this?
 
-There are some profiles that aren't implemented but 2.0 is mostly 
-covered. The esco transport isn't done fwiw--it was introduced back in 1.2.
+-- 
+Best Regards,
 
-Marcel has been working on features that will be in "Lisbon" (2.1?) like 
-simple pairing and extended inquiry.
+Felipe Balbi
+felipebalbi@users.sourceforge.net
+felipe.lima@indt.org.br
 
-Brad
+Nokia Institute of Technology - INdT
+Kernel Developers Team
+
++55 92 8127 0839
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
