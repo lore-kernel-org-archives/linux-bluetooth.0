@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <57346.66.27.92.145.1167534761.squirrel@acs-webmail.ucsd.edu>
-Date: Sat, 30 Dec 2006 19:12:41 -0800 (PST)
-From: mhendred@ucsd.edu
+Date: Sat, 30 Dec 2006 02:33:45 +0200
+From: Nerijus Baliunas <nerijus@users.sourceforge.net>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] avetana JSR-82 implementation
+Message-Id: <20061230003939.B156CE6AD9@mx-b.vdnet.lt>
+Subject: [Bluez-users] cannot find device
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,16 +19,57 @@ Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hello,
-I am new to this list. I was trying to install avetana's JSR-82
-implementation but I kept getting compilation errors. I did some research
-and found that avetana's implementation does not work with BlueZ v3.7,
-which of course is what i have :( I've been trying to get an earlier
-version of BlueZ ( < 3.7) but have found no luck. Developers at avetana
-don't seem to want to fix the problem anytime soon, so I was wondering if
-I could get the source to an earlier version of BlueZ, as I would like to
-start working on a project for school. Thanks and happy holidays!
 
--MMH
+My PDA used to find the device when I had Fedora Core 5, but cannot
+when I upgraded to FC6. hcid.conf is default from FC6 (bluez-utils-3.7-2):
+
+options {
+        autoinit yes;
+        security user;
+        pairing multi;
+        passkey "BlueZ";
+}
+device {
+        name "%h-%d";
+        class 0x120104;
+        #pkt_type DH1,DM1,HV1;
+        iscan enable; pscan enable;
+        lm accept;
+        lp rswitch,hold,sniff,park;
+}
+
+I launched bluetooth-properties and selected
+"Visible and connectable for other devices",
+"Make adapter invisible after" set to never.
+
+hciconfig -a
+hci0:	Type: USB
+	BD Address: 00:13:46:00:12:CB ACL MTU: 377:10 SCO MTU: 16:0
+	UP RUNNING PSCAN ISCAN AUTH ENCRYPT 
+	RX bytes:8639 acl:0 sco:0 events:249 errors:0
+	TX bytes:5296 acl:0 sco:0 commands:202 errors:0
+	Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+	Packet type: DM3 DM5 DH3 DH5 HV1 HV2 HV3 
+	Link policy: RSWITCH HOLD SNIFF PARK 
+	Link mode: SLAVE ACCEPT 
+	Name: 'xxx-0'
+	Class: 0x120104
+	Service Classes: Networking, Object Transfer
+	Device Class: Computer, Desktop workstation
+	HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x309
+	Manufacturer: Broadcom Corporation (15)
+
+Any ideas why PDA cannot find the device? I found in mailing list archives and tried
+unsuccessfully:
+apitest SetDiscoverableTimeout 0
+apitest SetMode discoverable
+
+"to make this work you need to set discovto to 0, because otherwise hcid
+will automatically switch you device into non-discoverable mode to
+protect you." - where do I need to set discovto to 0?
+
+Regards,
+Nerijus
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
