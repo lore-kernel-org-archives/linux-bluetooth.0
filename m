@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <544bb7070612301232m41910874h59249bd0b0e88774@mail.gmail.com>
-Date: Sat, 30 Dec 2006 12:32:15 -0800
-From: "Ian Rickard" <inioinio@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.63.0612301747480.20515@redbean.intranet.gw-instruments.de>
-MIME-Version: 1.0
+Date: Sat, 30 Dec 2006 17:50:38 +0100 (CET)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <544bb7070612280942n6907d4e2u107654fd71310df4@mail.gmail.com>
+Message-ID: <Pine.LNX.4.63.0612301747480.20515@redbean.intranet.gw-instruments.de>
 References: <544bb7070612272338m3f130e00p22ee2f1b7f67d3cb@mail.gmail.com>
 	<56233.80.165.155.106.1167300847.squirrel@webmail10.pair.com>
 	<Pine.LNX.4.63.0612281212140.12381@redbean.intranet.gw-instruments.de>
 	<544bb7070612280942n6907d4e2u107654fd71310df4@mail.gmail.com>
-	<Pine.LNX.4.63.0612301747480.20515@redbean.intranet.gw-instruments.de>
+MIME-Version: 1.0
 Subject: Re: [Bluez-devel] bdaddr for CSR chipset - porting dificulties
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -24,38 +23,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 12/30/06, Peter Wippich <pewi@gw-instruments.de> wrote:
->
-> Hi Ian,
->
-> On Thu, 28 Dec 2006, Ian Rickard wrote:
->
-> > But only UART, not USB?  I tried again with transient = true (word 7 =
-> > 0x0008) and I still get a response with status 0x0009.
-> The bccmd tool should also work over USB (have not tried it, but the code
-> is in place).
 
-Yeah, I'm think the problem is that Security_enable is set, preventing
-the bt_addr from being changed, even temporarily.  Reading pskey 509
-(decimal) returns 0x0001.
+Hi Ian, 
 
-> > And yeah, I understand changing your BT address is generally a bad
-> > idea.  This is just for research purposes.  I'm trying to get a Wii to
-> > connect to a MacBook as if it were a Wii Remote and so far just
-> > matching the device name/class has proved insufficient.  Current
-> > theory is it will only connect to devices in Nintendo's OUI ranges.
->
-> Have you checked the SDP service records required ??
+On Thu, 28 Dec 2006, Ian Rickard wrote:
 
->>From what I can tell, and I could be entirely wrong here, if the Wii
-was performing an SDP query, that would result in HCI activity.  In my
-tests I'm not seeing HCI activity beyond me putting the device into
-discoverable mode.
+> But only UART, not USB?  I tried again with transient = true (word 7 =
+> 0x0008) and I still get a response with status 0x0009.
+The bccmd tool should also work over USB (have not tried it, but the code 
+is in place). 
 
-My current plan of attack is to look for a USB dongle that uses the
-CSR chipset (since I already have working code for it) that either 1.
-ships without security_enable set or 2. I can get info on where the
-SPI interface is on the board.
+> And yeah, I understand changing your BT address is generally a bad
+> idea.  This is just for research purposes.  I'm trying to get a Wii to
+> connect to a MacBook as if it were a Wii Remote and so far just
+> matching the device name/class has proved insufficient.  Current
+> theory is it will only connect to devices in Nintendo's OUI ranges.
+
+Have you checked the SDP service records required ?? 
+
+Ciao, 
+
+Peter 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
