@@ -1,53 +1,73 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <456FD9EE.1070000@prolly.org>
-Date: Fri, 01 Dec 2006 02:29:50 -0500
-From: Douglas Ward <douglas.ward@prolly.org>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <45978B84.30408@glidos.net>
+Date: Sun, 31 Dec 2006 10:05:56 +0000
+From: Paul Gardiner <osronline@glidos.net>
 MIME-Version: 1.0
-To: =?UTF-8?B?T2xpdmllciBDcsOqdGU=?= <tester@tester.ca>
-References: <1164939683.18828.24.camel@TesterBox.tester.ca>
-In-Reply-To: <1164939683.18828.24.camel@TesterBox.tester.ca>
-Cc: bluez-devel <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] mx5000tools 0.1
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <20061230003939.B156CE6AD9@mx-b.vdnet.lt>
+In-Reply-To: <20061230003939.B156CE6AD9@mx-b.vdnet.lt>
+Subject: Re: [Bluez-users] cannot find device
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Z29vZCB3b3JrLCBpJ2xsIHRyeSBpdCBvdXQgdG9tb3Jyb3cuIG1heWJlIGkgY2FuIGhlbHAgZmln
-dXJlIG91dCB0aGlzIAppbWFnZSBpc3N1ZS4gSSdkIGhhdGUgdG8gYmUgc3R1Y2sgaW4gaGlkIG1v
-ZGUgYWZ0ZXIgYWxsIHRoZSBzZWFyY2hpbmcgaSAKZGlkIHRvIGdldCB0aGUgZGFtbiB0aGluZyBp
-bnRvIGhjaSBtb2RlIHRob3VnaC4uLgoKT2xpdmllciBDcsOqdGUgd3JvdGU6Cj4gSGksCj4KPiBJ
-IHBvcnRlZCBteDUwMDBsaWJbMV0gLk5FVCBsaWJyYXJ5IHRvIExpbnV4IGFuZCBJIG1hZGUgbXg1
-MDAwdG9vbHNbMl0uIAo+Cj4gSXQgY3VycmVudGx5IHN1cHBvcnRzIG1vc3Qgb3BlcmF0aW9ucyB0
-aGF0IGNvbnRyb2wgdGhlIGNvbnRlbnQgb2YgdGhlCj4gc2NyZWVuLiBPbmx5IDIgb3BlcmF0aW9u
-cyB0aGF0IFNldFBvaW50IGRvZXMgb24gd2luZG93cyBhcmUgbm90Cj4gc3VwcG9ydGVkLCBiZWNh
-dXNlIEkgaGF2ZW4ndCBtYW5hZ2VkIHRvIG1ha2UgdGhlbSB3b3JrLiBPbmUgaXMgdG8KPiBkaXNw
-bGF5IGltYWdlcywgSSBjYW4gZGVjb2RlIHRoZSBzZW50IGRhdGFbM10sIGJ1dCB3aGVuIEkgdHJ5
-IHJlLXNlbmRpbmcKPiB0aGUgc2FtZSBkYXRhLCBpdCBkb2Vzbid0IHNob3cgdXAgb24gdGhlIHNj
-cmVlbi4gVGhlIHNlY29uZCBpcyB0byBjaGFuZ2UKPiB0aGUgY29udGVudCBvZiB0aGUgbWVudXMg
-dGhlcmUgYWdhaW4sIHRoZSBrZXlib2FyZCBkb2Vzbid0IHNlZW0gdG8gYmUKPiByZXNwb25zaXZl
-IHRvIHRoZSBjb21tYW5kcyB0aGF0IEkgc2VuZC4KPgo+IEl0IGN1cnJlbnRseSBvbmx5IHdvcmtz
-IGluIEhJRCBtb2RlIGJlY2F1c2UgdGhlIGJsdWV6IGNvZGUgZG9lcyBub3QgeWV0Cj4gc3VwcG9y
-dCBmdWxsIEhJRCB3aXRoIGhpZGRldi4KPgo+IEkgc2hvdWxkIGhhdmUgYSBob21lcGFnZSBhbmQg
-YSBTVk4gdHJlZSBmb3IgaXQgc29vbiwgSSdsbCBwb3N0IHRoZQo+IGFkZHJlc3Mgd2hlbiBJIHNl
-dCBpdCB1cC4KPgo+Cj4gWzFdIGh0dHA6Ly9zb3VyY2Vmb3JnZS5uZXQvcHJvamVjdHMvbXg1MDAw
-bGliLwo+IFsyXSBodHRwOi8vZGV2LmdlbnRvby5vcmcvfnRlc3Rlci9kaXN0L214NTAwMHRvb2xz
-LTAuMS50YXIuZ3oKPiBbM10gaHR0cDovL2Rldi5nZW50b28ub3JnL350ZXN0ZXIvaW1hZ2UtZHJh
-d2VyLmMKPgo+ICAgCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUYWtlIFN1cnZleXMuIEVhcm4gQ2FzaC4g
-SW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQKSm9pbiBTb3VyY2VGb3JnZS5uZXQncyBUZWNoc2F5
-IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFuY2UgdG8gc2hhcmUgeW91cgpvcGluaW9ucyBv
-biBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdoIGJyaWVmIHN1cnZleXMgLSBhbmQgZWFybiBj
-YXNoCmh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVmYXVsdC5waHA/cGFnZT1qb2luLnBocCZwPXNv
-dXJjZWZvcmdlJkNJRD1ERVZERVYKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNv
-dXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5m
-by9ibHVlei1kZXZlbAo=
+Nerijus Baliunas wrote:
+> Hello,
+> 
+> My PDA used to find the device when I had Fedora Core 5, but cannot
+> when I upgraded to FC6. hcid.conf is default from FC6 (bluez-utils-3.7-2):
+ >
+ >    .
+ >    .
+ >    .
+ >
+> hciconfig -a
+> hci0:	Type: USB
+> 	BD Address: 00:13:46:00:12:CB ACL MTU: 377:10 SCO MTU: 16:0
+> 	UP RUNNING PSCAN ISCAN AUTH ENCRYPT 
+> 	RX bytes:8639 acl:0 sco:0 events:249 errors:0
+> 	TX bytes:5296 acl:0 sco:0 commands:202 errors:0
+> 	Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+> 	Packet type: DM3 DM5 DH3 DH5 HV1 HV2 HV3 
+> 	Link policy: RSWITCH HOLD SNIFF PARK 
+> 	Link mode: SLAVE ACCEPT 
+> 	Name: 'xxx-0'
+> 	Class: 0x120104
+> 	Service Classes: Networking, Object Transfer
+> 	Device Class: Computer, Desktop workstation
+> 	HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x309
+> 	Manufacturer: Broadcom Corporation (15)
+> 
+> Any ideas why PDA cannot find the device? I found in mailing list archives and tried
+> unsuccessfully:
+> apitest SetDiscoverableTimeout 0
+> apitest SetMode discoverable
+> 
+> "to make this work you need to set discovto to 0, because otherwise hcid
+> will automatically switch you device into non-discoverable mode to
+> protect you." - where do I need to set discovto to 0?
+
+I was me having similar problems, but it looks to be with a different
+cause, because hciconfig didn't list PSCAN and ISCAN in my case.
+
+Cheers,
+	Paul.
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
