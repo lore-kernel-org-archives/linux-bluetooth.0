@@ -1,71 +1,47 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: CIJOML <cijoml@volny.cz>
-To: bluez-users@lists.sf.net
-Date: Thu, 2 Nov 2006 08:30:33 +0100
-MIME-Version: 1.0
-Message-Id: <200611020830.33466.cijoml@volny.cz>
-Subject: [Bluez-users] How to setup BT keyboard operated by evdev device
-	driver?
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <BAY117-F8FCB480B6AED8A70E7014BFC40@phx.gbl>
+From: "Kelvin Xu" <kyoxu@hotmail.com>
+To: bluez-devel@lists.sourceforge.net
+Date: Sun, 31 Dec 2006 11:52:12 +0800
+Mime-Version: 1.0
+Subject: [Bluez-devel] BLuez-Util
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Dear all,
 
-how to set BT keyboard operated by evdev driver? If I do it so, som keys 
-returns wrong scancodes (arrow up for example).
-My keyboard si Microsoft BT desktop for Bluetooth first generation.
+i have been trying to install Bluez-Util to my ARM board to no avail as i
+could not get Dbus installed.
+May i know where can i download older versions of Bluez-Util that do not
+have dependencies on D-Bus?
 
-This setting I made for mouse, looks like works all buttons sends scancodes 
-1-6
+Is Bluez-Util necessary to get bluetooth working on embedded linux, such as 
+detecting any usb dongle and running pre-compiled bluetooth applications?
 
-Section "InputDevice"
-        Identifier              "Bluetooth Mouse"
-        Driver                  "evdev"
-        Option "Name"           "Bluetooth HID Boot Protocol Device"
-        Option          "SendCoreEvents"        "true"
-        Option  "Vendor"        "1118"
-        Option  "Product"       "124"
-EndSection
+Regards,
+Kelvin
 
-And this is for BT keyboard which returns wrong scancodes:
+_________________________________________________________________
+Receive MSN Hotmail alerts over SMS! 
+http://en-asiasms.mobile.msn.com/ac.aspx?cid=1002
 
-Section "InputDevice"
-        Identifier  "Bluetooth Keyboard"
-        #Driver      "kbd"
-	Driver      "evdev"
-        Option  "Name"  "Bluetooth HID Boot Protocol Device"
-        Option  "Vendor"        "1118"
-        Option  "Product"       "123"
-        Option      "XkbRules"  "xfree86"
-        Option      "XkbModel"  "pc105"
-        Option      "XkbLayout" "us"
-        #Option     "Xleds"     "1 2 3"
-        #Option     "XkbVariant"        "nodeadkeys"
-        #Option "evBits"  "+1"
-        #Option "keyBits" "~1-255 ~352-511"
-        #Option "Pass"    "3"
-EndSection
-
-Thanks a lot for your help
-
-Michal
 
 -------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
