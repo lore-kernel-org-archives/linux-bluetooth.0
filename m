@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4599D5BB.4070601@st.com>
+Date: Tue, 02 Jan 2007 09:17:07 +0530
+From: Mayank BATRA <mayank.batra@st.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4599D5BB.4070601@st.com>
 References: <31e679430612290415h450d7783w2419171822aec5e9@mail.gmail.com>
-	<4595380D.3050004@xmission.com>  <4599D5BB.4070601@st.com>
-Date: Tue, 02 Jan 2007 04:58:34 +0100
-Message-Id: <1167710314.30886.9.camel@violet>
-Mime-Version: 1.0
+	<4595380D.3050004@xmission.com>
+In-Reply-To: <4595380D.3050004@xmission.com>
 Subject: Re: [Bluez-devel] Bluetooth 2.0
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,39 +21,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mayank,
+Hi,
 
-> >> I'm wondering if I could help the linux bluetooth subsystem by writing
-> >> code for the new Bluetooth 2.0 Spec. So, is there any project taking
-> >> care of this? Is there any activity for this?
-> > 
-> > There are some profiles that aren't implemented but 2.0 is mostly 
-> > covered. The esco transport isn't done fwiw--it was introduced back in 1.2.
+Brad Midgley wrote:
+
+>> I'm wondering if I could help the linux bluetooth subsystem by writing
+>> code for the new Bluetooth 2.0 Spec. So, is there any project taking
+>> care of this? Is there any activity for this?
 > 
-> Don't think there are any new profiles as such.
-> The only difference between 1.2 and 2.0 is EDR.
+> There are some profiles that aren't implemented but 2.0 is mostly 
+> covered. The esco transport isn't done fwiw--it was introduced back in 1.2.
 
-and some minor corrections here and there.
+Don't think there are any new profiles as such.
+The only difference between 1.2 and 2.0 is EDR.
 
-> > Marcel has been working on features that will be in "Lisbon" (2.1?) like 
-> > simple pairing and extended inquiry.
-> 
-> Marcel, I was going through the 2.1 spec and was interested in working
-> on features such as Extended Inquiry, Simple Pairing, Sniff Subrating etc.
+> Marcel has been working on features that will be in "Lisbon" (2.1?) like 
+> simple pairing and extended inquiry.
 
-Actually the Extended Inquiry is already supported with current systems
-and it works quite well for the device name. The kernel basically has
-preliminary Sniff Subrating support, but the actual used values still
-need some tweaking to make use of it.
+Marcel, I was going through the 2.1 spec and was interested in working
+on features such as Extended Inquiry, Simple Pairing, Sniff Subrating etc.
 
-For Simple Pairing, I will wait until the final specification has been
-published. The basic support for Simple Pairing however is ready.
+Any starters?
 
-Regards
+Best Regards,
 
-Marcel
+Mayank
 
+---
+Random Quote Follows:
+All programmers want arrays!
 
+* TagZilla 0.066 * http://tagzilla.mozdev.org
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
