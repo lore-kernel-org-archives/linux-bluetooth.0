@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BAY117-F13C48B855ECD096F61965BFBA0@phx.gbl>
-References: <BAY117-F13C48B855ECD096F61965BFBA0@phx.gbl>
-Date: Tue, 02 Jan 2007 10:03:48 +0100
-Message-Id: <1167728628.30886.44.camel@violet>
+In-Reply-To: <6af20b8d0701020055v17590d3ax68180120496baa09@mail.gmail.com>
+References: <BAY117-F15DABBE18567416959A13BFC00@phx.gbl>
+	<6af20b8d0701012217u28b7c161p638cd32ee3287865@mail.gmail.com>
+	<1167719318.30886.28.camel@violet>
+	<6af20b8d0701020055v17590d3ax68180120496baa09@mail.gmail.com>
+Date: Tue, 02 Jan 2007 10:01:56 +0100
+Message-Id: <1167728516.30886.41.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Error Compiling Bluez-Util
+Subject: Re: [Bluez-devel] Installing Bluez-Util on ARM board
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,17 +25,14 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-> May i know what is hciattach.c used for?
+> It is good to hear that. Would you be kind enough to provide a link to
+> the dbus independant 
+> version of bluez on the official webpage. I think a lot of embedded
+> platform developers need
+> a dbus free bluez.
 
-it is needed for attaching serial port based Bluetooth chip to the
-system. It basically initializes the chip and attaches the UART line
-discipline.
-
-> The function uart_speed() returns an int however B230400 are not. i guess 
-> there are some files which declared them as integers.
-
-They are actually simple constants for the UART speed. Don't ask me why
-especially some of them are not defined for your system.
+actually you need to adapt D-Bus for your embedded system. Don't try to
+avoid it. All old bluez-utils-2.x package are no longer supported.
 
 Regards
 
