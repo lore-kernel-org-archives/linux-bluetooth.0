@@ -1,44 +1,50 @@
-Return-Path: <linux-kernel-owner+marcel=40holtmann.org-S1753724AbXABUrS@vger.kernel.org>
-Message-ID: <459AC472.4070303@gmail.com>
-Date: Tue, 02 Jan 2007 21:45:38 +0100
-From: Rene Herman <rene.herman@gmail.com>
-MIME-Version: 1.0
-To: Adrian Bunk <bunk@stusta.de>
-CC: Jens Axboe <jens.axboe@oracle.com>, Linus Torvalds <torvalds@osdl.org>,
-        Andrew Morton <akpm@osdl.org>,
+Return-Path: <bunk@stusta.de>
+Date: Tue, 2 Jan 2007 20:34:29 +0100
+From: Adrian Bunk <bunk@stusta.de>
+To: Jens Axboe <jens.axboe@oracle.com>
+Cc: Linus Torvalds <torvalds@osdl.org>, Andrew Morton <akpm@osdl.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Andrey Borzenkov <arvidjaar@mail.ru>,
         Robert Hancock <hancockr@shaw.ca>, "Rafael J. Wysocki" <rjw@sisk.pl>,
         pavel@suse.cz, linux-pm@osdl.org, Jean Delvare <khali@linux-fr.org>,
         "Eric W. Biederman" <ebiederm@xmission.com>,
         Vivek Goyal <vgoyal@in.ibm.com>, Marcel Holtmann <marcel@holtmann.org>,
-        bluez-devel@lists.sourceforge.net, Mark Lord <lkml@rtr.ca>,
-        Laurent Riffard <laurent.riffard@free.fr>,
+        bluez-devel@lists.sourceforge.net, Rene Herman <rene.herman@gmail.com>,
+        Mark Lord <lkml@rtr.ca>, Laurent Riffard <laurent.riffard@free.fr>,
         Christoph Hellwig <hch@lst.de>, petero2@telia.com
 Subject: Re: 2.6.20-rc3: known regressions with patches available (part 1)
-References: <Pine.LNX.4.64.0612311710430.4473@woody.osdl.org> <20070102192449.GV20714@stusta.de> <20070102192651.GM2483@kernel.dk> <20070102193429.GX20714@stusta.de>
-In-Reply-To: <20070102193429.GX20714@stusta.de>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Sender: linux-kernel-owner@vger.kernel.org
+Message-ID: <20070102193429.GX20714@stusta.de>
+References: <Pine.LNX.4.64.0612311710430.4473@woody.osdl.org> <20070102192449.GV20714@stusta.de> <20070102192651.GM2483@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20070102192651.GM2483@kernel.dk>
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Adrian Bunk wrote:
-
-> On Tue, Jan 02, 2007 at 08:26:52PM +0100, Jens Axboe wrote:
-
->> Patch is already merged in -git.
+On Tue, Jan 02, 2007 at 08:26:52PM +0100, Jens Axboe wrote:
+> On Tue, Jan 02 2007, Adrian Bunk wrote:
+> > Subject    : CFQ disk throughput halved
+> > References : http://lkml.org/lkml/2007/01/1/104
+> > Submitter  : Rene Herman <rene.herman@gmail.com>
+> >              Mark Lord <lkml@rtr.ca>
+> > Caused-By  : Jens Axboe <jens.axboe@oracle.com>
+> >              commit 719d34027e1a186e46a3952e8a24bf91ecc33837
+> > Handled-By : Jens Axboe <jens.axboe@oracle.com>
+> > Patch      : http://lkml.org/lkml/2007/1/2/75
+> > Status     : patch available
 > 
-> Thanks for this information, I missed this (as well as the merged SATA 
-> fix) since it isn't yet at the git mirrors.
+> Patch is already merged in -git.
 
-What's "-git" here? I just now pulled
+Thanks for this information, I missed this (as well as the merged SATA 
+fix) since it isn't yet at the git mirrors.
 
-git://git2.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git
+> Jens Axboe
 
-and it's not there.
+cu
+Adrian
 
-Otherwise, patch confirmed to work by me as well.
+-- 
 
-Cheers,
-Rene
-
+       "Is there not promise of rain?" Ling Tan asked suddenly out
+        of the darkness. There had been need of rain for many days.
+       "Only a promise," Lao Er said.
+                                       Pearl S. Buck - Dragon Seed
