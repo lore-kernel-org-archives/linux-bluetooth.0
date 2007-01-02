@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <BAY117-F19DD2587C30922B460977FBFBA0@phx.gbl>
-From: "Kelvin Xu" <kyoxu@hotmail.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Tue, 02 Jan 2007 15:31:42 +0800
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <6af20b8d0701012217u28b7c161p638cd32ee3287865@mail.gmail.com>
+References: <BAY117-F15DABBE18567416959A13BFC00@phx.gbl>
+	<6af20b8d0701012217u28b7c161p638cd32ee3287865@mail.gmail.com>
+Date: Tue, 02 Jan 2007 07:28:38 +0100
+Message-Id: <1167719318.30886.28.camel@violet>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Error Compiling Bluez-Util
+Subject: Re: [Bluez-devel] Installing Bluez-Util on ARM board
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,28 +21,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Dear all,
+Hi,
 
-When i was trying to compile Bluez-Util 3.7 in a scratchbox environment, i 
-ran into the following errors:
-In function 'uart_speed'
-hciattach.c:106: error:'B230400' undeclared (first use in this function)
-hciattach.c:108: error:'B460800' undeclared (first use in this function)
-..
-..
-..
-etc
+> You just need to search the web for bluez-2.x. The official website
+> doesn't provide
+> download for older versions. Wish you good luck! I'm also doing some
+> development
+> on arm platform regarding bluetooth. But there are some problems that
+> related to 
+> data transmission error. I'm really stuck in that. :(
 
-May i know whether i have missed out on any header files or any linking 
-problems
-I am trying to a arm target board.
+actually we provide the packages, but no easy links to find them ;)
 
-Regards,
-Kelvin
+Regards
 
-_________________________________________________________________
-Get an advanced look at the new version of Windows Live Messenger. 
-http://get.live.com/messenger/overview
+Marcel
+
 
 
 -------------------------------------------------------------------------
