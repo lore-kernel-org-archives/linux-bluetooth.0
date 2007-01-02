@@ -1,9 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <BAY117-F13C48B855ECD096F61965BFBA0@phx.gbl>
-In-Reply-To: <1167725485.30886.35.camel@violet>
-From: "Kelvin Xu" <kyoxu@hotmail.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Tue, 02 Jan 2007 16:53:41 +0800
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BAY117-F19DD2587C30922B460977FBFBA0@phx.gbl>
+References: <BAY117-F19DD2587C30922B460977FBFBA0@phx.gbl>
+Date: Tue, 02 Jan 2007 09:11:25 +0100
+Message-Id: <1167725485.30886.35.camel@violet>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Error Compiling Bluez-Util
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -19,64 +20,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Kelvin,
 
-May i know what is hciattach.c used for?
+> When i was trying to compile Bluez-Util 3.7 in a scratchbox environment, i 
+> ran into the following errors:
+> In function 'uart_speed'
+> hciattach.c:106: error:'B230400' undeclared (first use in this function)
+> hciattach.c:108: error:'B460800' undeclared (first use in this function)
+> ..
+> ..
+> ..
+> etc
+> 
+> May i know whether i have missed out on any header files or any linking 
+> problems
+> I am trying to a arm target board.
 
-The function uart_speed() returns an int however B230400 are not. i guess 
-there are some files which declared them as integers.
+I have no idea, but this error shouldn't happen. Do you actually need
+hciattach? If not, then you can disable its compilation or simple
+comment out these lines.
 
-Regards,
-Kelvin
+Regards
 
+Marcel
 
->From: Marcel Holtmann <marcel@holtmann.org>
->Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
->To: BlueZ development <bluez-devel@lists.sourceforge.net>
->Subject: Re: [Bluez-devel] Error Compiling Bluez-Util
->Date: Tue, 02 Jan 2007 09:11:25 +0100
->
->Hi Kelvin,
->
-> > When i was trying to compile Bluez-Util 3.7 in a scratchbox environment, 
->i
-> > ran into the following errors:
-> > In function 'uart_speed'
-> > hciattach.c:106: error:'B230400' undeclared (first use in this function)
-> > hciattach.c:108: error:'B460800' undeclared (first use in this function)
-> > ..
-> > ..
-> > ..
-> > etc
-> >
-> > May i know whether i have missed out on any header files or any linking
-> > problems
-> > I am trying to a arm target board.
->
->I have no idea, but this error shouldn't happen. Do you actually need
->hciattach? If not, then you can disable its compilation or simple
->comment out these lines.
->
->Regards
->
->Marcel
->
->
->
->-------------------------------------------------------------------------
->Take Surveys. Earn Cash. Influence the Future of IT
->Join SourceForge.net's Techsay panel and you'll get the chance to share 
->your
->opinions on IT & business topics through brief surveys - and earn cash
->http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-_________________________________________________________________
-Get MSN Messenger emoticons and display pictures here! 
-http://ilovemessenger.msn.com/?mkt=en-sg
 
 
 -------------------------------------------------------------------------
