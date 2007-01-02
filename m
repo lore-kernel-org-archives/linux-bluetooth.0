@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BAY117-F8FCB480B6AED8A70E7014BFC40@phx.gbl>
-References: <BAY117-F8FCB480B6AED8A70E7014BFC40@phx.gbl>
-Date: Tue, 02 Jan 2007 05:01:35 +0100
-Message-Id: <1167710495.30886.13.camel@violet>
+In-Reply-To: <4599D5BB.4070601@st.com>
+References: <31e679430612290415h450d7783w2419171822aec5e9@mail.gmail.com>
+	<4595380D.3050004@xmission.com>  <4599D5BB.4070601@st.com>
+Date: Tue, 02 Jan 2007 04:58:34 +0100
+Message-Id: <1167710314.30886.9.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] BLuez-Util
+Subject: Re: [Bluez-devel] Bluetooth 2.0
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,20 +21,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Kelvin,
+Hi Mayank,
 
-> i have been trying to install Bluez-Util to my ARM board to no avail as i
-> could not get Dbus installed.
-> May i know where can i download older versions of Bluez-Util that do not
-> have dependencies on D-Bus?
+> >> I'm wondering if I could help the linux bluetooth subsystem by writing
+> >> code for the new Bluetooth 2.0 Spec. So, is there any project taking
+> >> care of this? Is there any activity for this?
+> > 
+> > There are some profiles that aren't implemented but 2.0 is mostly 
+> > covered. The esco transport isn't done fwiw--it was introduced back in 1.2.
+> 
+> Don't think there are any new profiles as such.
+> The only difference between 1.2 and 2.0 is EDR.
 
-the bluez-utils-2.x packages don't have a mandatory dependency on D-Bus.
+and some minor corrections here and there.
 
-> Is Bluez-Util necessary to get bluetooth working on embedded linux, such as 
-> detecting any usb dongle and running pre-compiled bluetooth applications?
+> > Marcel has been working on features that will be in "Lisbon" (2.1?) like 
+> > simple pairing and extended inquiry.
+> 
+> Marcel, I was going through the 2.1 spec and was interested in working
+> on features such as Extended Inquiry, Simple Pairing, Sniff Subrating etc.
 
-In general you don't need bluez-utils, but without it, you life will be
-really hard to get Bluetooth going.
+Actually the Extended Inquiry is already supported with current systems
+and it works quite well for the device name. The kernel basically has
+preliminary Sniff Subrating support, but the actual used values still
+need some tweaking to make use of it.
+
+For Simple Pairing, I will wait until the final specification has been
+published. The basic support for Simple Pairing however is ready.
 
 Regards
 
