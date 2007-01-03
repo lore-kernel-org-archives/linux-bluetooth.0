@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: "Tom Lloyd" <thomaslloyd@yahoo.com>
-To: <bluez-devel@lists.sourceforge.net>
-Date: Wed, 3 Jan 2007 18:34:02 -0000
-Message-ID: <000301c72f65$be796e60$0300a8c0@2600xp>
+Message-ID: <1543.200.124.231.241.1167846814.squirrel@ceibo.fiec.espol.edu.ec>
+Date: Wed, 3 Jan 2007 12:53:34 -0500 (ECT)
+From: eduran@fiec.espol.edu.ec
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-devel] Btsco power consumption
+Subject: [Bluez-devel] [Fwd: how to install bluez utils]
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,26 +18,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello again,
+I installed Bluez libs but when I want to install bluez utils, I pasted
+the folder in the desktop
+opened a terminal and writed ./configure
+but i get it:
+for BLUEZ configure: error: Bluetooth library is required
 
-I am not sure if this is the right place to be sending this. You know that I
-have Ubuntu 6.10 (edgy) I got that wrong last time. I have the 0.5 version
-of btsco (I think anyways when I execute it with -v I get a message saying
-it is 0.42. I uninstalled version 0.42 but did not remove the kernel module
-before doing that. Could that cause a issue when installing 0.5. 
-
-Well I think I have version 0.5 of btsco working paired and talking on skype
-to my friends while pottering around the house. The problem I am
-experiencing is that the headset does not seem to go into standby or power
-saving after the headset is not in use. I have a Logitech HS08 v1.2. Should
-this be reported as a bug and who to also might someone have any ideas on a
-solution. Sometimes the headset seems to disconnect and go into standby and
-other times not. It is almost impossible to tell apart from a little beep
-after use. Even when I connect btsco it seems to draw on the batteries
-power. Is this just the way it works?
+Could Someone help me, please
 
 
-Tom  
 
 
 -------------------------------------------------------------------------
