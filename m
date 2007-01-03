@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <459BD2C1.8090208@xmission.com>
-Date: Wed, 03 Jan 2007 08:58:57 -0700
+Message-ID: <459BCF21.5020005@xmission.com>
+Date: Wed, 03 Jan 2007 08:43:29 -0700
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: jbarnett@pobox.com, BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <mailman.341782.1167746753.8777.bluez-devel@lists.sourceforge.net>
-	<1167793130.3356.17.camel@localhost>
-In-Reply-To: <1167793130.3356.17.camel@localhost>
-Subject: Re: [Bluez-devel] Problems with Dell BCM2045 USB device
+To: BlueZ development <bluez-devel@lists.sourceforge.net>,
+        thomaslloyd82@hotmail.com
+References: <003b01c72f45$bd503e30$0300a8c0@2600xp>
+In-Reply-To: <003b01c72f45$bd503e30$0300a8c0@2600xp>
+Subject: Re: [Bluez-devel] Compilation Problem Plugz
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,17 +21,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Jon
+Tom
 
-> new ALSA definitions. Adding the declaration:
-> #include <sound/typedefs.h>
-> fixed compiling the module.
+> a2dpd_dbus.c:31:28: error: dbus/dbus-glib.h: No such file or directory
+> a2dpd_dbus.c:32:37: error: dbus/dbus-glib-lowlevel.h: No such file or
+> directory
 
-adding this in breaks compilation under 2.6.17 so btsco would need an 
-interested volunteer to come up with the right precompiler condition.
-
-BCM2045 etc support has been rather hit-or-miss and I can't see what is 
-missing.
+you will need to install libdbus-1-dev and libdbus-glib-1-dev. I just 
+updated the build docs with these.
 
 Brad
 
