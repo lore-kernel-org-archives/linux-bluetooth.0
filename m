@@ -1,6 +1,6 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <459B960D.3020006@glidos.net>
-Date: Wed, 03 Jan 2007 11:39:57 +0000
+Message-ID: <459B9565.3060306@glidos.net>
+Date: Wed, 03 Jan 2007 11:37:09 +0000
 From: Paul Gardiner <osronline@glidos.net>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -29,22 +29,13 @@ Paul Gardiner wrote:
 > files in place, but didn't notice that dund was off by
 > default.  I'll post some new dumps with that corrected.
 
-This is a second dump of my S100 discovering Bluez, this
-time after issuing the command
-
-sdptool add DUN
-
-After this, the S100 will attempt to use my server as
-a modem:
+This is the dump of my S100 discovering Bluez. This is
+without a preceding call to "sdptool add DUN", and
+although the device is discovered, the S100 then
+refuses to use it as a modem:
 
 HCI sniffer - Bluetooth packet analyzer ver 1.33
 device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-     lap 0x9e8b33 len 6 num 0
- > HCI Event: Command Status (0x0f) plen 4
-     Inquiry (0x01|0x0001) status 0x00 ncmd 1
- > HCI Event: Inquiry Complete (0x01) plen 1
-     status 0x00
  > HCI Event: Connect Request (0x04) plen 10
      bdaddr 00:09:2D:08:BC:57 class 0x100114 type ACL
 < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
@@ -58,10 +49,10 @@ device: hci0 snap_len: 1028 filter: 0xffffffff
      handle 42
  > HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
      bdaddr 00:09:2D:08:BC:57 mode 1
- > HCI Event: Command Status (0x0f) plen 4
-     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
  > HCI Event: Max Slots Change (0x1b) plen 3
      handle 42 slots 5
+ > HCI Event: Command Status (0x0f) plen 4
+     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
  > HCI Event: Command Status (0x0f) plen 4
      Unknown (0x00|0x0000) status 0x00 ncmd 1
 < HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
@@ -73,9 +64,6 @@ device: hci0 snap_len: 1028 filter: 0xffffffff
 < HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
      handle 42 ptype 0xcc18
      Packet type: DM1 DM3 DM5 DH1 DH3 DH5
- > HCI Event: Read Remote Supported Features (0x0b) plen 11
-     status 0x00 handle 42
-     Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
  > HCI Event: Command Status (0x0f) plen 4
      Change Connection Packet Type (0x01|0x000f) status 0x00 ncmd 1
 < HCI Command: Remote Name Request (0x01|0x0019) plen 10
@@ -86,6 +74,9 @@ device: hci0 snap_len: 1028 filter: 0xffffffff
 3-DH5
  > HCI Event: Command Status (0x0f) plen 4
      Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+ > HCI Event: Read Remote Supported Features (0x0b) plen 11
+     status 0x00 handle 42
+     Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
  > HCI Event: Remote Name Req Complete (0x07) plen 255
      status 0x00 bdaddr 00:09:2D:08:BC:57 name 'Pocket_PC2'
  > HCI Event: PIN Code Request (0x16) plen 6
@@ -96,7 +87,7 @@ device: hci0 snap_len: 1028 filter: 0xffffffff
      PIN Code Request Reply (0x01|0x000d) ncmd 1
      status 0x00 bdaddr 00:09:2D:08:BC:57
  > HCI Event: Link Key Notification (0x18) plen 23
-     bdaddr 00:09:2D:08:BC:57 key 0B9ACB6B85E27429E31F00CA81593DAA type 0
+     bdaddr 00:09:2D:08:BC:57 key 8293311B9D50705254DBEBA5259F9851 type 0
  > HCI Event: Disconn Complete (0x05) plen 4
      status 0x00 handle 42 reason 0x13
      Reason: Remote User Terminated Connection
@@ -113,14 +104,14 @@ device: hci0 snap_len: 1028 filter: 0xffffffff
      handle 43
  > HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
      bdaddr 00:09:2D:08:BC:57 mode 1
- > HCI Event: Command Status (0x0f) plen 4
-     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
  > HCI Event: Max Slots Change (0x1b) plen 3
      handle 43 slots 5
+ > HCI Event: Command Status (0x0f) plen 4
+     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
  > ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 1 scid 0x005a
+     L2CAP(s): Connect req: psm 1 scid 0x0055
 < ACL data: handle 43 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x005a result 0 status 0
+     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0055 result 0 status 0
        Connection successful
  > HCI Event: Command Status (0x0f) plen 4
      Unknown (0x00|0x0000) status 0x00 ncmd 1
@@ -141,32 +132,32 @@ device: hci0 snap_len: 1028 filter: 0xffffffff
      status 0x00 handle 43 ptype 0xff1e
      Packet type: DM1 DM3 DM5 DH1 DH3 DH5 2-DH1 2-DH3 2-DH5 3-DH1 3-DH3 
 3-DH5
+ > HCI Event: Command Status (0x0f) plen 4
+     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+ > HCI Event: Read Remote Supported Features (0x0b) plen 11
+     status 0x00 handle 43
+     Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+ > HCI Event: Remote Name Req Complete (0x07) plen 255
+     status 0x00 bdaddr 00:09:2D:08:BC:57 name 'Pocket_PC2'
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
  > ACL data: handle 43 flags 0x02 dlen 16
      L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
        MTU 4096
 < ACL data: handle 43 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x005a flags 0x00 result 0 clen 0
+     L2CAP(s): Config rsp: scid 0x0055 flags 0x00 result 0 clen 0
        Success
 < ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Config req: dcid 0x005a flags 0x00 clen 0
- > HCI Event: Command Status (0x0f) plen 4
-     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+     L2CAP(s): Config req: dcid 0x0055 flags 0x00 clen 0
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
- > HCI Event: Read Remote Supported Features (0x0b) plen 11
-     status 0x00 handle 43
-     Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
  > ACL data: handle 43 flags 0x02 dlen 14
      L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
        Success
  > ACL data: handle 43 flags 0x02 dlen 17
  > ACL data: handle 43 flags 0x01 dlen 17
- > HCI Event: Remote Name Req Complete (0x07) plen 255
-     status 0x00 bdaddr 00:09:2D:08:BC:57 name 'Pocket_PC2'
  > ACL data: handle 43 flags 0x01 dlen 4
      L2CAP(d): cid 0x0040 len 34 [psm 1]
          SDP SSA Req: tid 0x0 len 0x1d
@@ -175,33 +166,33 @@ device: hci0 snap_len: 1028 filter: 0xffffffff
            aid(s) 0x0000 - 0xffff
            cont 00
 < ACL data: handle 43 flags 0x02 dlen 14
-     L2CAP(d): cid 0x005a len 10 [psm 1]
+     L2CAP(d): cid 0x0055 len 10 [psm 1]
          SDP SSA Rsp: tid 0x0 len 0x5
            count 2
            cont 00
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
  > ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Disconn req: dcid 0x0040 scid 0x005a
+     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0055
 < ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x005a
+     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0055
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
  > ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 1 scid 0x005b
+     L2CAP(s): Connect req: psm 1 scid 0x0056
 < ACL data: handle 43 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x005b result 0 status 0
+     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0056 result 0 status 0
        Connection successful
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 43 packets 1
  > ACL data: handle 43 flags 0x02 dlen 16
      L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
        MTU 4096
 < ACL data: handle 43 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x005b flags 0x00 result 0 clen 0
+     L2CAP(s): Config rsp: scid 0x0056 flags 0x00 result 0 clen 0
        Success
 < ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Config req: dcid 0x005b flags 0x00 clen 0
- > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 43 packets 1
+     L2CAP(s): Config req: dcid 0x0056 flags 0x00 clen 0
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
  > HCI Event: Number of Completed Packets (0x13) plen 5
@@ -219,22 +210,22 @@ device: hci0 snap_len: 1028 filter: 0xffffffff
            aid(s) 0x0000 - 0xffff
            cont 00
 < ACL data: handle 43 flags 0x02 dlen 14
-     L2CAP(d): cid 0x005b len 10 [psm 1]
+     L2CAP(d): cid 0x0056 len 10 [psm 1]
          SDP SSA Rsp: tid 0x0 len 0x5
            count 2
            cont 00
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 43 packets 1
  > ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Disconn req: dcid 0x0040 scid 0x005b
+     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0056
 < ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x005b
- > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 43 packets 1
+     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0056
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
  > ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 1 scid 0x005c
+     L2CAP(s): Connect req: psm 1 scid 0x0057
 < ACL data: handle 43 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x005c result 0 status 0
+     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0057 result 0 status 0
        Connection successful
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
@@ -242,10 +233,10 @@ device: hci0 snap_len: 1028 filter: 0xffffffff
      L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
        MTU 4096
 < ACL data: handle 43 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x005c flags 0x00 result 0 clen 0
+     L2CAP(s): Config rsp: scid 0x0057 flags 0x00 result 0 clen 0
        Success
 < ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Config req: dcid 0x005c flags 0x00 clen 0
+     L2CAP(s): Config req: dcid 0x0057 flags 0x00 clen 0
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
  > HCI Event: Number of Completed Packets (0x13) plen 5
@@ -262,48 +253,34 @@ device: hci0 snap_len: 1028 filter: 0xffffffff
            max 4088
            aid(s) 0x0000 - 0xffff
            cont 00
-< ACL data: handle 43 flags 0x02 dlen 96
-     L2CAP(d): cid 0x005c len 92 [psm 1]
-         SDP SSA Rsp: tid 0x0 len 0x57
-           count 84
-           record #0
-               aid 0x0000 (SrvRecHndl)
-                  uint 0x10004
-               aid 0x0001 (SrvClassIDList)
-                  < uuid-16 0x1103 (DUN) uuid-16 0x1201 (Networking) >
-               aid 0x0004 (ProtocolDescList)
-                  < < uuid-16 0x0100 (L2CAP) > <
-                  uuid-16 0x0003 (RFCOMM) uint 0x2 > >
-               aid 0x0005 (BrwGrpList)
-                  < uuid-16 0x1002 (PubBrwsGrp) >
-               aid 0x0009 (BTProfileDescList)
-                  < < uuid-16 0x1103 (DUN) uint 0x100 > >
-               aid 0x0100 (SrvName)
-                  str "Dial-Up Networking"
+< ACL data: handle 43 flags 0x02 dlen 14
+     L2CAP(d): cid 0x0057 len 10 [psm 1]
+         SDP SSA Rsp: tid 0x0 len 0x5
+           count 2
            cont 00
- > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 43 packets 1
  > ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Disconn req: dcid 0x0040 scid 0x005c
+     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0057
 < ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x005c
+     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0057
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
  > ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 1 scid 0x005d
+     L2CAP(s): Connect req: psm 1 scid 0x0058
 < ACL data: handle 43 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x005d result 0 status 0
+     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0058 result 0 status 0
        Connection successful
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 43 packets 1
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 43 packets 1
  > ACL data: handle 43 flags 0x02 dlen 16
      L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
        MTU 4096
 < ACL data: handle 43 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x005d flags 0x00 result 0 clen 0
+     L2CAP(s): Config rsp: scid 0x0058 flags 0x00 result 0 clen 0
        Success
 < ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Config req: dcid 0x005d flags 0x00 clen 0
- > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 43 packets 1
+     L2CAP(s): Config req: dcid 0x0058 flags 0x00 clen 0
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
  > HCI Event: Number of Completed Packets (0x13) plen 5
@@ -321,7 +298,7 @@ device: hci0 snap_len: 1028 filter: 0xffffffff
            aid(s) 0x0000 - 0xffff
            cont 00
 < ACL data: handle 43 flags 0x02 dlen 234
-     L2CAP(d): cid 0x005d len 230 [psm 1]
+     L2CAP(d): cid 0x0058 len 230 [psm 1]
          SDP SSA Rsp: tid 0x0 len 0xe1
            count 222
            record #0
@@ -356,15 +333,15 @@ device: hci0 snap_len: 1028 filter: 0xffffffff
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
  > ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Disconn req: dcid 0x0040 scid 0x005d
+     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0058
 < ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x005d
+     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0058
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
  > ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 1 scid 0x005e
+     L2CAP(s): Connect req: psm 1 scid 0x0059
 < ACL data: handle 43 flags 0x02 dlen 16
-     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x005e result 0 status 0
+     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0059 result 0 status 0
        Connection successful
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
@@ -372,17 +349,17 @@ device: hci0 snap_len: 1028 filter: 0xffffffff
      L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
        MTU 4096
 < ACL data: handle 43 flags 0x02 dlen 14
-     L2CAP(s): Config rsp: scid 0x005e flags 0x00 result 0 clen 0
+     L2CAP(s): Config rsp: scid 0x0059 flags 0x00 result 0 clen 0
        Success
 < ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Config req: dcid 0x005e flags 0x00 clen 0
- > HCI Event: Number of Completed Packets (0x13) plen 5
-     handle 43 packets 1
+     L2CAP(s): Config req: dcid 0x0059 flags 0x00 clen 0
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
  > ACL data: handle 43 flags 0x02 dlen 14
      L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
        Success
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 43 packets 1
  > ACL data: handle 43 flags 0x02 dlen 17
  > ACL data: handle 43 flags 0x01 dlen 17
  > ACL data: handle 43 flags 0x01 dlen 4
@@ -393,14 +370,14 @@ device: hci0 snap_len: 1028 filter: 0xffffffff
            aid(s) 0x0000 - 0xffff
            cont 00
 < ACL data: handle 43 flags 0x02 dlen 14
-     L2CAP(d): cid 0x005e len 10 [psm 1]
+     L2CAP(d): cid 0x0059 len 10 [psm 1]
          SDP SSA Rsp: tid 0x0 len 0x5
            count 2
            cont 00
  > ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Disconn req: dcid 0x0040 scid 0x005e
+     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0059
 < ACL data: handle 43 flags 0x02 dlen 12
-     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x005e
+     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0059
  > HCI Event: Number of Completed Packets (0x13) plen 5
      handle 43 packets 1
  > HCI Event: Number of Completed Packets (0x13) plen 5
