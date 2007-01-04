@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <459D10F6.8090509@uni-ulm.de>
-Date: Thu, 04 Jan 2007 15:36:38 +0100
-From: Siegbert Baude <siegbert.baude@uni-ulm.de>
-MIME-Version: 1.0
+Date: Thu, 4 Jan 2007 09:14:05 +0800
 To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] SBC codec, joint stereo mode
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20070104011404.GA3205@163.com>
+References: <1543.200.124.231.241.1167846814.squirrel@ceibo.fiec.espol.edu.ec>
+MIME-Version: 1.0
+In-Reply-To: <1543.200.124.231.241.1167846814.squirrel@ceibo.fiec.espol.edu.ec>
+From: amateur <ztl.post@gmail.com>
+Subject: Re: [Bluez-devel] [Fwd: how to install bluez utils]
+Reply-To: amateur <tlzhao@nudt.edu.cn>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,23 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+On Wed, Jan 03, 2007 at 12:53:34PM -0500, eduran@fiec.espol.edu.ec wrote:
+> I installed Bluez libs but when I want to install bluez utils, I pasted
+> the folder in the desktop
+> opened a terminal and writed ./configure
+> but i get it:
+> for BLUEZ configure: error: Bluetooth library is required
+> 
+> Could Someone help me, please
+I'm afraid your bluez-libs are not installed to the standard position,
+eg. /usr/lib, /usr/local/lib, /usr/include etc. You can always use the 
+gcc option -I and -L to specifiy where you have installed the
+libraries if you did have installed them.
 
-I have a question with regard to joint stereo mode in SBC. According to
-the A2DP spec. p. 53, sec. 12.4 "Syntax" in the frame_header there is
-one bit RFA after the join[sb] bits. In the example implementations of
-the SBC codec I got (one from TI, one from iAnywhere AV SDK, one from
-the ALSA-Bluetooth project), this bit is however never accounted for.
-Also in the sbc_test_14.sbc example you can download from bluetooth.org,
-I find at offset 04FB the beginning of the frame as 9C7F797BBC87, where
-the first bit of "87" should be this RFA bit (as this example uses 8
-subbands). P. 11, sec. 1.3.2.1 "RFA" however says, RFA bits should be
-set to zero, which is not the case for "87".
-
-So is this RFA bit actually used or not?
-
-Ciao
-Siegbert
+-- 
+Are you making all this up as you go along?
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
