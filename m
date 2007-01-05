@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45A02FA0.2040301@vxappliance.com>
-Date: Sat, 06 Jan 2007 15:24:16 -0800
-From: Mike Klein <mklein@vxappliance.com>
+Message-ID: <be976db60701051340yaaba457ybc8a992d9496c677@mail.gmail.com>
+Date: Fri, 5 Jan 2007 13:40:25 -0800
+From: "Mark S. Townsley" <mstownsley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Bluetooth hcid connect failure with FC6
+Subject: [Bluez-users] rfcomm command usage for binding to *any* device
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,27 +14,67 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============2121997472=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I have up to date bt packages and dmesg shows clean install/recognition
-of Logitech usb/bt dongle.
+--===============2121997472==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_30248_25109318.1168033225842"
 
-Yet when I check messages.log it shows "hci0 cannot connect" and hcidev
-shows no devices.
+------=_Part_30248_25109318.1168033225842
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-I have googled for an hour and it seems many have this issue and I see
-no solution.
+Hi:
 
-What do I need to do in order for bt support to work?
+I managed to issue this command:
+
+  rfcomm bind 0 <bt address> 4
+
+and I am able to get going any a connection to the remote device specified
+by the given bluetooth address.
+
+However, I am now in a situation that I do not always know the remote device
+ahead of time.  Is there a way to establish rfcomm binding on demand?  The
+remote device uses SPP so it is a serial port.
+
+Thanks
+
+Mark
+
+------=_Part_30248_25109318.1168033225842
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi:<br><br>I managed to issue this command:<br><br>&nbsp; rfcomm bind 0 &lt;bt address&gt; 4<br><br>and I am able to get going any a connection to the remote device specified by the given bluetooth address.<br><br>However, I am now in a situation that I do not always know the remote device ahead of time.&nbsp; Is there a way to establish rfcomm binding on demand?&nbsp; The remote device uses SPP so it is a serial port.
+<br><br>Thanks<br><br>Mark<br><br>
+
+------=_Part_30248_25109318.1168033225842--
+
+
+--===============2121997472==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============2121997472==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============2121997472==--
