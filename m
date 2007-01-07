@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <001301c732f6$4caf02b0$ab01a8c0@anakru>
-From: "Mohan Kashyap" <mohan@adamya.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Mon, 8 Jan 2007 13:11:18 +0545
+From: Nicolas =?iso-8859-1?q?L=E9cureuil?= <neoclust@mandriva.org>
+To: bluez-users@lists.sourceforge.net
+Date: Sun, 7 Jan 2007 13:25:48 +0100
 MIME-Version: 1.0
-Subject: [Bluez-users] TCP/IP Over Bluetooth
+Message-Id: <200701071325.53162.neoclust@mandriva.org>
+Subject: [Bluez-users] can't connect a sony vaio bluetooth mouse
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,57 +14,55 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1348288356=="
+Content-Type: multipart/mixed; boundary="===============1596674157=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+--===============1596674157==
+Content-Type: multipart/signed; boundary="nextPart27819567.CSmKDv2tYL";
+	protocol="application/pgp-signature"; micalg=pgp-sha1
+Content-Transfer-Encoding: 7bit
 
---===============1348288356==
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0010_01C73326.7BBC4BA0"
-
-This is a multi-part message in MIME format.
-
-------=_NextPart_000_0010_01C73326.7BBC4BA0
+--nextPart27819567.CSmKDv2tYL
 Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Hi ALL,
-
-We have our own BT stack. We are implementing "IP OVER BT" on linux. How =
-can we make the kernel to route TCP/IP Traffic over our BT stack ???
-
-Thanks ALL
-------=_NextPart_000_0010_01C73326.7BBC4BA0
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2800.1578" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi ALL,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>We have our own BT stack. We are =
-implementing "IP=20
-OVER BT" on linux. How can we make the kernel to route TCP/IP Traffic =
-over our=20
-BT stack ???</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Thanks ALL</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0010_01C73326.7BBC4BA0--
+Hi,
 
 
+i have in /var/log/message when i click on the mouse :
 
---===============1348288356==
+Jan  6 11:38:41 localhost hidd[1429]: HID create error 2 (No such file or
+directory)
+Jan  6 11:42:59 localhost hidd[1429]: HID create error 2 (No such file or
+directory)
+
+
+I use bluez 3.4.
+
+
+Someone have an idea ?
+
+Regards
+Nicolas
+
+--nextPart27819567.CSmKDv2tYL
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iD8DBQBFoObRYkQuJWWnTjkRAmwzAJ9QC5ftSF3u+i/OHqiTfEQ6Xi2hrQCgtRzB
+CF+0dAz64+T8P06XIG5jeX4=
+=EvMN
+-----END PGP SIGNATURE-----
+
+--nextPart27819567.CSmKDv2tYL--
+
+
+--===============1596674157==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -75,7 +73,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1348288356==
+--===============1596674157==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -86,4 +84,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1348288356==--
+--===============1596674157==--
