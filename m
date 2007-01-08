@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45A1BAFF.6020305@st.com>
-Date: Mon, 08 Jan 2007 09:01:11 +0530
-From: Mayank BATRA <mayank.batra@st.com>
+Message-ID: <45A1922B.4000708@xmission.com>
+Date: Sun, 07 Jan 2007 17:36:59 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: tom@ytram.com, BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <000501c731dd$9e7eec00$0cbbbac6@fte.local>
-In-Reply-To: <000501c731dd$9e7eec00$0cbbbac6@fte.local>
-Cc: thomaslloyd@yahoo.com
-Subject: Re: [Bluez-devel] Error: Unsupported LMP Parameter Value
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <20070107165812.44c7789b@ningauble.scrye.com>
+In-Reply-To: <20070107165812.44c7789b@ningauble.scrye.com>
+Subject: Re: [Bluez-devel] 2 plugz issues
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,44 +20,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Tom,
+Kevin
 
-> It would be helpful to see the HCI Command that resulted in the HCI Event.
-> Unfortunately that event is used for all mode changes and doesn't indicate
-> what mode was requested.
+> Or are they for something else? 
 
-Most probably it should be a request for sniff.
+they will apply to a recent kernel tree, but you may need the official
+bluez patch applied first. http://www.bluez.org/patches.html
 
-> If you've got a "Write Link Policy Settings" command in your trace it might
-> be helpful to see that as well.
-
-Actually the link policy settings are applicable only when the remote
-side requests for sniff/park/hold.
-
-Even if sniff mode is not enabled using write link policy settings
-command and still the host requests for sniff mode, it will not be
-rejected as long as the remote device has sniff mode enabled using the
-same command.
-
-> Sounds like the headset doesn't like the parameters in the power saving mode
-> request. 
-
-This is correct, the headset does not like the parameters in the sniff
-command.
-
-> Or, it could be that the headset doesn't support power saving mode
-> that is being requested, but I think that causes a different status to be
-> returned.
-
-Correct, this results in an error code "LMP PDU not allowed".
-
-Best Regards,
-
-Mayank
-
----
-Random Quote Follows:
-I fear explanations explanatory of things explained.
+brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
