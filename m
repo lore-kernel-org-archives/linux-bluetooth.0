@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 9 Jan 2007 04:04:28 +0200
-From: Nerijus Baliunas <nerijus@users.sourceforge.net>
+From: Damien Bardon <damien@bardon-net.fr>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Mon, 8 Jan 2007 22:36:21 +0100
+References: <200701081935.15944.damien@bardon-net.fr>
+	<20070108184535.GJ16663@suse.de>
+In-Reply-To: <20070108184535.GJ16663@suse.de>
 MIME-Version: 1.0
-References: <20061230003939.B156CE6AD9@mx-b.vdnet.lt>
-In-Reply-To: <20061230003939.B156CE6AD9@mx-b.vdnet.lt>
-Message-Id: <20070109020910.203B0E6AB0@mx-b.vdnet.lt>
-Subject: Re: [Bluez-users] cannot find device
+Message-Id: <200701082236.21496.damien@bardon-net.fr>
+Subject: Re: [Bluez-users] My device can't be detected by another one
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,72 +21,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
 
-found more info - https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=212825
-but running passkey-agent didn't help. I also noticed that even if I change
-class in hcid.conf, hciconfig hci0 down, service bluetooth restart,
-hciconfig -a still displays Class: 0x120100. Why?
-BTW, hcidump -X -V does not display anything when I search for devices from
-my Palm.
+Thanks a lot it is working I had to do :
+# apitest SetMode discoverable
 
-Nerijus
+This is not very convenient, it would be better if it was integrated to 
+kbluetoothd, or configurable with Yast... 
 
-On Sat, 30 Dec 2006 02:33:45 +0200 Nerijus Baliunas <nerijus@users.sourceforge.net> wrote:
+Cheers,
 
-> Hello,
-> 
-> My PDA used to find the device when I had Fedora Core 5, but cannot
-> when I upgraded to FC6. hcid.conf is default from FC6 (bluez-utils-3.7-2):
-> 
-> options {
->         autoinit yes;
->         security user;
->         pairing multi;
->         passkey "BlueZ";
-> }
-> device {
->         name "%h-%d";
->         class 0x120104;
->         #pkt_type DH1,DM1,HV1;
->         iscan enable; pscan enable;
->         lm accept;
->         lp rswitch,hold,sniff,park;
-> }
-> 
-> I launched bluetooth-properties and selected
-> "Visible and connectable for other devices",
-> "Make adapter invisible after" set to never.
-> 
-> hciconfig -a
-> hci0:	Type: USB
-> 	BD Address: 00:13:46:00:12:CB ACL MTU: 377:10 SCO MTU: 16:0
-> 	UP RUNNING PSCAN ISCAN AUTH ENCRYPT 
-> 	RX bytes:8639 acl:0 sco:0 events:249 errors:0
-> 	TX bytes:5296 acl:0 sco:0 commands:202 errors:0
-> 	Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-> 	Packet type: DM3 DM5 DH3 DH5 HV1 HV2 HV3 
-> 	Link policy: RSWITCH HOLD SNIFF PARK 
-> 	Link mode: SLAVE ACCEPT 
-> 	Name: 'xxx-0'
-> 	Class: 0x120104
-> 	Service Classes: Networking, Object Transfer
-> 	Device Class: Computer, Desktop workstation
-> 	HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x309
-> 	Manufacturer: Broadcom Corporation (15)
-> 
-> Any ideas why PDA cannot find the device? I found in mailing list archives and tried
-> unsuccessfully:
-> apitest SetDiscoverableTimeout 0
-> apitest SetMode discoverable
-> 
-> "to make this work you need to set discovto to 0, because otherwise hcid
-> will automatically switch you device into non-discoverable mode to
-> protect you." - where do I need to set discovto to 0?
-> 
-> Regards,
-> Nerijus
+Damien
 
+
+On Monday 08 January 2007 19:45, Stefan Seyfried wrote:
+> On Mon, Jan 08, 2007 at 07:35:15PM +0100, Damien Bardon wrote:
+> > perfectly detected, and I can see other devices and connect to them. The
+> > problem is that other devices (I have tried with two different mobile
+> > phones, one nokia and one samsung) can't see my device. Which means that
+> > for example, I can send a file from my laptop to my phone, but can't send
+> > a file from my phone to my laptop. My linux seems to be configured to be
+> > able to be detected, but I have probably missed something and I hope you
+> > can tell me what.
+>
+> Read /usr/share/doc/packages/bluez-utils/README.SUSE
+> If there are still problems, ask again.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
