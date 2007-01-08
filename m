@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <8cd2fe3d0701072149h61bb3fa3pedda49040b25c204@mail.gmail.com>
-Date: Mon, 8 Jan 2007 11:19:44 +0530
-From: "ravindra kumar" <ravikinikeri@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <8cd2fe3d0612272054i6de4de3cga0f282d2586f2e42@mail.gmail.com>
+Message-ID: <45A1BAFF.6020305@st.com>
+Date: Mon, 08 Jan 2007 09:01:11 +0530
+From: Mayank BATRA <mayank.batra@st.com>
 MIME-Version: 1.0
-References: <8cd2fe3d0612272054i6de4de3cga0f282d2586f2e42@mail.gmail.com>
-Subject: Re: [Bluez-devel] regarding bluetooth
+To: tom@ytram.com, BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <000501c731dd$9e7eec00$0cbbbac6@fte.local>
+In-Reply-To: <000501c731dd$9e7eec00$0cbbbac6@fte.local>
+Cc: thomaslloyd@yahoo.com
+Subject: Re: [Bluez-devel] Error: Unsupported LMP Parameter Value
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,74 +17,55 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0264996562=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0264996562==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_42684_1353377.1168235384882"
+Hi Tom,
 
-------=_Part_42684_1353377.1168235384882
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> It would be helpful to see the HCI Command that resulted in the HCI Event.
+> Unfortunately that event is used for all mode changes and doesn't indicate
+> what mode was requested.
 
-> hello all
->
-> This is ravindra currently doing my MS in real time embedded systems in
-> bangalore (india)...right now i m doin my project work.
-> title is "To develop bluetooth communication on OMAP1510 Innovator
-> development kit with the external bluetooth enabled device using linux (
-> porting linux on OMAP1510)"
-> here i have ported linux on OMAP 1510 kit..as we know that OMAP1510 kit
-> supports bluetooth features..so i have to built bluetooth stack and port on
-> to the OMAP1510 kit..so that the OMAP kit should enable[detect] the other
-> external bluetooth device..
+Most probably it should be a request for sniff.
 
-    so i m struggling to build the bluetooth stack in linux
-    platform..please tell me what r the bluez utilities,libraries have to be
-used
+> If you've got a "Write Link Policy Settings" command in your trace it might
+> be helpful to see that as well.
 
-> please help me regarding this..
-> thank u..
->
-> Ravindra
->
+Actually the link policy settings are applicable only when the remote
+side requests for sniff/park/hold.
 
-------=_Part_42684_1353377.1168235384882
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Even if sniff mode is not enabled using write link policy settings
+command and still the host requests for sniff mode, it will not be
+rejected as long as the remote device has sniff mode enabled using the
+same command.
 
-<br><div><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">hello all<br><br>This is ravindra currently doing my MS in real time embedded systems in bangalore (india)...right now i m doin my project work.
-<br>title is &quot;To develop bluetooth communication on OMAP1510 Innovator development kit with the external bluetooth enabled device using linux ( porting linux on OMAP1510)&quot;<br>here i have ported linux on OMAP 1510 kit..as we know that OMAP1510 kit supports bluetooth features..so i have to built bluetooth stack and port on to the OMAP1510 kit..so that the OMAP kit should enable[detect] the other external bluetooth device.. 
-</blockquote>&nbsp;&nbsp;&nbsp; so i m struggling to build the bluetooth stack in linux <br>&nbsp;&nbsp;&nbsp; platform..please tell me what r the bluez utilities,libraries have to be used<br><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-please help me regarding this..<br>thank u..<br><br>Ravindra<br></blockquote></div><br>
+> Sounds like the headset doesn't like the parameters in the power saving mode
+> request. 
 
-------=_Part_42684_1353377.1168235384882--
+This is correct, the headset does not like the parameters in the sniff
+command.
 
+> Or, it could be that the headset doesn't support power saving mode
+> that is being requested, but I think that causes a different status to be
+> returned.
 
---===============0264996562==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Correct, this results in an error code "LMP PDU not allowed".
+
+Best Regards,
+
+Mayank
+
+---
+Random Quote Follows:
+I fear explanations explanatory of things explained.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0264996562==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0264996562==--
