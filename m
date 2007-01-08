@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45A28E40.10705@idlum.be>
-Date: Mon, 08 Jan 2007 19:32:32 +0100
-From: Pierre-Yves Paulus <py@idlum.be>
+From: Daniel Gollub <dgollub@suse.de>
+To: bluez-devel@lists.sourceforge.net
+Date: Mon, 8 Jan 2007 18:37:04 +0100
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Accented characters in friendly name properly handled
-	in BlueZ?
+Message-Id: <200701081837.04388.dgollub@suse.de>
+Subject: [Bluez-devel] Should hcid wait for dbus daemon?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,17 +18,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Hi,
 
-I'm using the D-Bus API to get the friendly name of a terminal wich name 
-contains accented chars. In the String I get, each accented character 
-(eg not a 1-byte ASCII char) gets replaced by 2 chars, each with value 0x2e.
+the hcid daemon aborts when there is no dbus daemon running. What about 
+enhancing hcid to handle the case that the dbus daemon get started after 
+hcid. I know there are might be not many use cases. But at least i know one 
+case ;)
 
-Is the problem coming from BlueZ or from the D-Bus bindings layer? Where 
-should I look to get a clue?
+To avoid that there is another "unneeded" service running, i want to call only 
+the bluetooth init scripts when there is a bluetooth device plugged in. This 
+is done by a simple udev rule, which calls the bluetooth init script when the 
+device got plugged in.
 
-Best Regards,
-Pierre-Yves
+So there is no need to insserv or do any other stuff like running YaST or 
+something like that. Just turn on the bluetooth device or plug it in and the 
+bluetooth service get started by udev.
+
+The only problem is during boot. udev get started before the dbus daemon, and 
+will trigger the udev rule which calls the bluetooth init script. Then hcid 
+will fail because the dbus daemon isn't started in this early stage of boot.
+
+If the hcid would wait for the dbus daemon this wouldn't be a problem. At 
+least hcid can handle a dbus daemon restart, maybe we can enhance this.
+
+I know this can be also done in the bluetooth init script, but maybe someone 
+else insist on this enhancement.
+
+best regards,
+Daniel
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
