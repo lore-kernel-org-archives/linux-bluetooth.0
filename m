@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45A2927D.2030501@idlum.be>
-Date: Mon, 08 Jan 2007 19:50:37 +0100
-From: Pierre-Yves Paulus <py@idlum.be>
+Date: Mon, 8 Jan 2007 20:47:01 +0200
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20070108184701.GA12689@jh-mbp>
+References: <200701081837.04388.dgollub@suse.de>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45A28E40.10705@idlum.be> <20070108183907.GA12105@jh-mbp>
-In-Reply-To: <20070108183907.GA12105@jh-mbp>
-Subject: Re: [Bluez-devel] Accented characters in friendly name
- properly	handled in BlueZ?
+In-Reply-To: <200701081837.04388.dgollub@suse.de>
+Subject: Re: [Bluez-devel] Should hcid wait for dbus daemon?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,24 +20,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Johan,
+Hi Daniel,
 
-> On Mon, Jan 08, 2007, Pierre-Yves Paulus wrote:
->> I'm using the D-Bus API to get the friendly name of a terminal wich name 
->> contains accented chars. In the String I get, each accented character 
->> (eg not a 1-byte ASCII char) gets replaced by 2 chars, each with value 0x2e.
->>
->> Is the problem coming from BlueZ or from the D-Bus bindings layer? Where 
->> should I look to get a clue?
-> 
-> It's a bug in the validation code responsible for storing the 
-> friendly name. It has been fixed in the 3.8 release.
+On Mon, Jan 08, 2007, Daniel Gollub wrote:
+> If the hcid would wait for the dbus daemon this wouldn't be a problem. At 
+> least hcid can handle a dbus daemon restart, maybe we can enhance this.
 
-Thanks for the fast answer. I will upgrade soon then (am currently using 
-3.7).
+Sounds like a useful feature. It should be quite simple to implement too 
+since most of the required code already exists due to the dbus restart 
+detection support. Feel free to provide a patch for it :)
 
-Best Regards,
-Pierre-Yves
+Johan
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
