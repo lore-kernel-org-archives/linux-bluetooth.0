@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Daniel Gollub <dgollub@suse.de>
-To: bluez-devel@lists.sourceforge.net
-Date: Mon, 8 Jan 2007 18:37:04 +0100
+Message-ID: <45A23D10.8030002@free.fr>
+Date: Mon, 08 Jan 2007 13:46:08 +0100
+From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
-Message-Id: <200701081837.04388.dgollub@suse.de>
-Subject: [Bluez-devel] Should hcid wait for dbus daemon?
+To: BlueZ development <bluez-devel@lists.sourceforge.net>,
+        Brad Midgley <bmidgley@xmission.com>
+References: <20070107120608.05a65c7f@ningauble.scrye.com>
+	<45A174A7.3040707@xmission.com>
+In-Reply-To: <45A174A7.3040707@xmission.com>
+Subject: Re: [Bluez-devel] 2 plugz issues
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,34 +22,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Kevin,
+> 
+>> 2. Once I comment out that code from 1 above, my headset works fine and
+>> sounds ok. However, if I do anything that sends a DTMF from my sip
+>> phone (I am using twinkle) it causes twinkle to go into a 100% cpu
+>> spin, and once to totally lock up my machine. Any idea why DTMF would
+>> cause that? Is there any way I can test or get more info to track down
+>> the problem?
+> 
+> please try it with plugz/patches/sco-flowcontrol-v3.0.diff applied.
+> 
 
-the hcid daemon aborts when there is no dbus daemon running. What about 
-enhancing hcid to handle the case that the dbus daemon get started after 
-hcid. I know there are might be not many use cases. But at least i know one 
-case ;)
+I would second Brad remark. With an unpatched kernel you will experience 
+kernel crashes. The test you removed from the code was supposed to check 
+for the above kernel patch !! ;-)
 
-To avoid that there is another "unneeded" service running, i want to call only 
-the bluetooth init scripts when there is a bluetooth device plugged in. This 
-is done by a simple udev rule, which calls the bluetooth init script when the 
-device got plugged in.
+Btw, i would like to update the project documentation, to explicitely 
+say the kernel patch is mandatory.
 
-So there is no need to insserv or do any other stuff like running YaST or 
-something like that. Just turn on the bluetooth device or plug it in and the 
-bluetooth service get started by udev.
+Brad, how could i do this ? I noticed the web site content is available 
+in docs directory of plugz module. Is it enough to modify this directory 
+to update the web site ?
 
-The only problem is during boot. udev get started before the dbus daemon, and 
-will trigger the udev rule which calls the bluetooth init script. Then hcid 
-will fail because the dbus daemon isn't started in this early stage of boot.
+Cheers,
 
-If the hcid would wait for the dbus daemon this wouldn't be a problem. At 
-least hcid can handle a dbus daemon restart, maybe we can enhance this.
-
-I know this can be also done in the bluetooth init script, but maybe someone 
-else insist on this enhancement.
-
-best regards,
-Daniel
+Fabien
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
