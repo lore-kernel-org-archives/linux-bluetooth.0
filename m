@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Damien Bardon <damien@bardon-net.fr>
-To: Bluez-users@lists.sourceforge.net
-Date: Mon, 8 Jan 2007 19:35:15 +0100
-MIME-Version: 1.0
-Message-Id: <200701081935.15944.damien@bardon-net.fr>
-Subject: [Bluez-users] My device can't be detected by another one
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <2161615.1168251295635.JavaMail.tomcat@pne-ps2-sn2>
+Date: Mon, 8 Jan 2007 11:14:55 +0100 (MET)
+From: Daniel Malmgren <danielovictoria@telia.com>
+To: bluez-users@lists.sourceforge.net
+Mime-Version: 1.0
+Subject: [Bluez-users] Can't seem to find my bluetooth
+Reply-To: Daniel Malmgren <danielovictoria@telia.com>,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,52 +19,39 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi.
+I'm trying to get Bluetooth working on my Znote 6015WD laptop and I 
+don't really know where to start. I'm running Fedora Rawhide (x86_64). 
+I don't even know what bt chip the computer has (or how to find out). 
+Hcitool just says I haven't got any bluetooth device. Neither lspci nor 
+lsusb shows anything that seems relevant. From lshal all I get is the 
+following:
 
-Hello,
+udi = '/org/freedesktop/Hal/devices/platform_bluetooth'
+  info.udi = '/org/freedesktop/Hal/devices/platform_bluetooth'  
+(string)
+  linux.subsystem = 'platform'  (string)
+  linux.hotplug_type = 1  (0x1)  (int)
+  info.product = 'Platform Device (bluetooth)'  (string)
+  platform.id = 'bluetooth'  (string)
+  info.parent = '/org/freedesktop/Hal/devices/computer'  (string)
+  info.bus = 'platform'  (string)
+  linux.sysfs_path_device = '/sys/devices/platform/bluetooth'  
+(string)
+  linux.sysfs_path = '/sys/devices/platform/bluetooth'  (string)
 
-I have the following problem, I don't really know where to find a solution, 
-that is why I ask for your help. I have a Cambridge Silicon Radio, Ltd 
-Bluetooth Dongle (Bus 001 Device 017: ID 0a12:0001), regarding the list 
-here : http://www.wiili.org/index.php/Compatible_Bluetooth_Devices this 
-device should work with linux. I have an OpenSuse 10.2, and the device is 
-perfectly detected, and I can see other devices and connect to them. The 
-problem is that other devices (I have tried with two different mobile phones, 
-one nokia and one samsung) can't see my device. Which means that for example, 
-I can send a file from my laptop to my phone, but can't send a file from my 
-phone to my laptop. My linux seems to be configured to be able to be 
-detected, but I have probably missed something and I hope you can tell me 
-what.
+...which doesn't say me much. There is a led on the front of the 
+computer which is blue, which according to the manual means that 
+bluetooth is inactive, but I've got no idea of how to activate it. 
+Where do I start?
 
-Here is the content of /etc/bluetooth/hcid.conf
+Installed versions:
+bluez-libs 3.7
+bluez-utils 3.7
+bluez-hcidump 1.32
+bluez-gnome 0.6
 
-options {
-        autoinit yes;
-        security auto;
-
-        pairing multi;
-
-        passkey "0123";
-}
-
-device {
-        name "damienlap";
-
-        class 0x3e010c;
-
-        iscan enable;
-        pscan enable;
-
-        lm accept;
-
-        lp rswitch,hold,sniff,park;
-}
-
-Tell me if you need more details.
-
-Thanks a lot,
-
-Damien
-
+/Daniel
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
