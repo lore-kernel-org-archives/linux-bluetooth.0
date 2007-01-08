@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Daniel Gollub <dgollub@suse.de>
 To: bluez-devel@lists.sourceforge.net
-Date: Tue, 9 Jan 2007 01:01:11 +0100
+Date: Tue, 9 Jan 2007 00:41:53 +0100
 References: <200701081837.04388.dgollub@suse.de>
-	<20070108184701.GA12689@jh-mbp> <878xgd3xkv.fsf@tora.pca.it>
-In-Reply-To: <878xgd3xkv.fsf@tora.pca.it>
+	<20070108184701.GA12689@jh-mbp>
+In-Reply-To: <20070108184701.GA12689@jh-mbp>
 MIME-Version: 1.0
-Message-Id: <200701090101.11238.dgollub@suse.de>
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_CbtoFSINfhoQR6C"
+Message-Id: <200701090041.54299.dgollub@suse.de>
 Subject: Re: [Bluez-devel] Should hcid wait for dbus daemon?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -17,25 +19,100 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-T24gVHVlc2RheSAwOSBKYW51YXJ5IDIwMDcgMDA6MzEsIEx1Y2EgQ2FwZWxsbyB3cm90ZToKPiBT
-aG91bGRuJ3QgYmUgdGhlIGNvbnRyYXJ5PyDCoEkgbWVhbiwgb24gYSBjbGVhbiBEZWJpYW4gZXRj
-aCwgZXZlcnkKPiBkYnVzLWRlcGVuZGVudCBzZXJ2aWNlIGlzIHN0YXJ0ZWQgYnkgZGJ1czoKQnV0
-IHRoZW4gaGNpZCBnZXRzIGV2ZXJ5dGltZSBzdGFydGVkLCBldmVuIGlmIHRoZXJlIGlzIG5vIGJs
-dWV0b290aCBkb25nbGUgCmNvbm5lY3RlZC4gSSBndWVzcyB0aGVyZSBhcmUgc2V2ZXJhbCBwZW9w
-bGUgd2hpY2ggb25seSBjb25uZWN0IHRoZWlyIApibHVldG9vdGggZG9uZ2xlIG9uY2UgYSB3ZWVr
-LiBPciBtYXliZSBvbmx5IG9uY2UgYXQgYWxsIGFuZCBuZXZlciBhZ2Fpbi4KVGhpcyB3YXMgdGhl
-IG1haW4gaW50ZW50aW9uIHRvIHJ1biBvbmx5IHRoZSBibHVldG9vdGggZGFlbW9ucyBpZiBhbnkg
-ZGV2aWNlIGlzIApjb25uZWN0ZWQuCgpEYW5pZWwKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGFrZSBTdXJ2
-ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9mIElUCkpvaW4gU291cmNlRm9y
-Z2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91J2xsIGdldCB0aGUgY2hhbmNlIHRvIHNoYXJl
-IHlvdXIKb3BpbmlvbnMgb24gSVQgJiBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2
-ZXlzIC0gYW5kIGVhcm4gY2FzaApodHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3Bh
-Z2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCl9fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVl
-ei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5u
-ZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
+--Boundary-00=_CbtoFSINfhoQR6C
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+On Monday 08 January 2007 19:47, Johan Hedberg wrote:
+> Sounds like a useful feature. It should be quite simple to implement too
+> since most of the required code already exists due to the dbus restart
+> detection support. Feel free to provide a patch for it :)
+How often should the daemons try to connect? Or infinitely?
+If not infinitely, then configurable by command line parameter or fixed?
+
+Attachted is a _simple_ proof of concept patch which . It retries every 5 
+seconds. After #12 unsuccessfully dbus connect, it gives up and abort (as 
+before).
+
+Daniel
+
+--Boundary-00=_CbtoFSINfhoQR6C
+Content-Type: text/x-diff; charset="iso-8859-1";
+	name="bluez-utils-dbus-retry.diff"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename="bluez-utils-dbus-retry.diff"
+
+Index: common/dbus.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/common/dbus.c,v
+retrieving revision 1.2
+diff -u -p -r1.2 dbus.c
+--- common/dbus.c	13 Nov 2006 07:58:40 -0000	1.2
++++ common/dbus.c	8 Jan 2007 22:52:18 -0000
+@@ -39,6 +39,7 @@
+ #include "list.h"
+ 
+ #define DISPATCH_TIMEOUT	0
++#define MAX_DBUS_RETRY		12
+ 
+ static int name_listener_initialized = 0;
+ 
+@@ -485,13 +486,27 @@ static void dispatch_status_cb(DBusConne
+ 
+ DBusConnection *init_dbus(const char *name, void (*disconnect_cb)(void *), void *user_data)
+ {
++	int retry = 0;
+ 	struct disconnect_data *dc_data;
+ 	DBusConnection *conn;
+ 	DBusError err;
+ 
+ 	dbus_error_init(&err);
+ 
+-	conn = dbus_bus_get(DBUS_BUS_SYSTEM, &err);
++	do {
++		if (dbus_error_is_set(&err))
++			dbus_error_free(&err);
++
++		conn = dbus_bus_get(DBUS_BUS_SYSTEM, &err);
++		if (conn)
++			break;
++
++		if (!retry)
++			info("Can't connect to DBUS. Will retry %i times.", MAX_DBUS_RETRY);
++
++		usleep(5000000);
++		retry++;
++	} while (!conn && retry < MAX_DBUS_RETRY);
+ 
+ 	if (dbus_error_is_set(&err)) {
+ 		error("Can't connect to system message bus: %s", err.message);
+
+--Boundary-00=_CbtoFSINfhoQR6C
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--Boundary-00=_CbtoFSINfhoQR6C
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--Boundary-00=_CbtoFSINfhoQR6C--
