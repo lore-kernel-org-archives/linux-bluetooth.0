@@ -1,12 +1,21 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45A1922B.4000708@xmission.com>
-Date: Sun, 07 Jan 2007 17:36:59 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <20070107165812.44c7789b@ningauble.scrye.com>
-In-Reply-To: <20070107165812.44c7789b@ningauble.scrye.com>
-Subject: Re: [Bluez-devel] 2 plugz issues
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Adrian Bunk <bunk@stusta.de>
+In-Reply-To: <20070108002555.GP20714@stusta.de>
+References: <Pine.LNX.4.64.0701062216210.3661@woody.osdl.org>
+	<20070108002555.GP20714@stusta.de>
+Date: Mon, 08 Jan 2007 01:33:38 +0100
+Message-Id: <1168216418.12025.11.camel@violet>
+Mime-Version: 1.0
+Cc: Andrew Morton <akpm@osdl.org>, Ayaz Abdulla <aabdulla@nvidia.com>,
+        Michael Reske <micha@gmx.com>, Pavel Machek <pavel@ucw.cz>,
+        netdev@vger.kernel.org, gregkh@suse.de,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Robert Hancock <hancockr@shaw.ca>, Linus Torvalds <torvalds@osdl.org>,
+        Brice Goglin <brice@myri.com>, bluez-devel@lists.sf.net,
+        linux-pci@atrey.karlin.mff.cuni.cz, jgarzik@pobox.com
+Subject: Re: [Bluez-devel] 2.6.20-rc4: known regressions with patches
+	available
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,14 +29,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Kevin
+Hi Adrian,
 
-> Or are they for something else? 
+> This email lists some known regressions in 2.6.20-rc4 compared to 2.6.19
+> with patches available.
+> 
+> If you find your name in the Cc header, you are either submitter of one
+> of the bugs, maintainer of an affectected subsystem or driver, a patch
+> of you caused a breakage or I'm considering you in any other way possibly
+> involved with one or more of these issues.
+> 
+> Due to the huge amount of recipients, please trim the Cc when answering.
+> 
+> 
+> Subject    : bluetooth oopses because of multiple kobject_add()
+> References : http://lkml.org/lkml/2007/1/2/101
+> Submitter  : Pavel Machek <pavel@ucw.cz>
+> Handled-By : Marcel Holtmann <marcel@holtmann.org>
+> Patch      : http://lkml.org/lkml/2007/1/2/147
+> Status     : patch available
 
-they will apply to a recent kernel tree, but you may need the official
-bluez patch applied first. http://www.bluez.org/patches.html
+the patch has been forwarded to Dave Miller.
 
-brad
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
