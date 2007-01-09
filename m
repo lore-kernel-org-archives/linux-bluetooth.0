@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+From: Daniel Gollub <dgollub@suse.de>
+To: bluez-devel@lists.sourceforge.net
+Date: Tue, 9 Jan 2007 01:01:11 +0100
+References: <200701081837.04388.dgollub@suse.de>
+	<20070108184701.GA12689@jh-mbp> <878xgd3xkv.fsf@tora.pca.it>
+In-Reply-To: <878xgd3xkv.fsf@tora.pca.it>
 MIME-Version: 1.0
-Date: Mon, 8 Jan 2007 16:21:13 -0800
-Message-ID: <D8CE9CFA707C894180BAC8CDD154F8460AB03BC6@msiexch01.marvell.com>
-From: "Quinton Yuan" <qyuan@marvell.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] 1. Re: 2 plugz issues (Brad Midgley)
+Message-Id: <200701090101.11238.dgollub@suse.de>
+Subject: Re: [Bluez-devel] Should hcid wait for dbus daemon?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,68 +17,25 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-One more thing, warning message from ALSA is reported as
-** WARNING **: alsa_mmap_audio(): snd_pcm_mmap_commit returned 128,
-expected 417
-
-Thanks/Quinton
-
------Original Message-----
-From: Quinton Yuan 
-Sent: Monday, January 08, 2007 3:41 PM
-To: BlueZ development (bluez-devel@lists.sourceforge.net)
-Subject: 1. Re: 2 plugz issues (Brad Midgley)
-
-Hi, there
-
-I am new to the Bluez thing, thanks for the great work you guys have
-done !
-By following your documentation on project home page, I just installed
-latest plugz package on Fedora Core 6 (kernel 2.6.18-1.2869), basically
-both mono and stereo headset up running, except
-
-1. For mono headset, need to apply Kevin's change to make it work (will
-patch kernel later, but same question as Kevin, which kernel version
-this patch can be applied ?)
-
-2. For A2DP thing, audio quality sounds weird, I got lots of message as:
-  A2DPD[805.068]: a2dp_handler: Sound System dry!, 
-
-no matter what sample rate I use, audio seems being played back at very
-lower rate, however, same setup a2play works fine, any hint on this ? 
-
-Here is my system information
-bluez-libs-3.7-1
-bluez-libs-devel-3.7-1
-bluez-hcidump-1.32-1
-bluez-gnome-0.6-1.fc6
-bluez-utils-cups-3.7-2
-bluez-utils-3.7-2
-
-gnome-bluetooth-libs-0.7.0-11.fc6
-gnome-bluetooth-0.7.0-11.fc6
-nautilus-sendto-bluetooth-0.7.5.fc6
-
-alsa-lib-1.0.12-2.fc6
-alsa-lib-devel-1.0.12-2.fc6
-alsa-utils-1.0.12-3.fc6
-
-xmms 1.2.10
-
-Thanks in advance.
-
-Regards/Quinton
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+T24gVHVlc2RheSAwOSBKYW51YXJ5IDIwMDcgMDA6MzEsIEx1Y2EgQ2FwZWxsbyB3cm90ZToKPiBT
+aG91bGRuJ3QgYmUgdGhlIGNvbnRyYXJ5PyDCoEkgbWVhbiwgb24gYSBjbGVhbiBEZWJpYW4gZXRj
+aCwgZXZlcnkKPiBkYnVzLWRlcGVuZGVudCBzZXJ2aWNlIGlzIHN0YXJ0ZWQgYnkgZGJ1czoKQnV0
+IHRoZW4gaGNpZCBnZXRzIGV2ZXJ5dGltZSBzdGFydGVkLCBldmVuIGlmIHRoZXJlIGlzIG5vIGJs
+dWV0b290aCBkb25nbGUgCmNvbm5lY3RlZC4gSSBndWVzcyB0aGVyZSBhcmUgc2V2ZXJhbCBwZW9w
+bGUgd2hpY2ggb25seSBjb25uZWN0IHRoZWlyIApibHVldG9vdGggZG9uZ2xlIG9uY2UgYSB3ZWVr
+LiBPciBtYXliZSBvbmx5IG9uY2UgYXQgYWxsIGFuZCBuZXZlciBhZ2Fpbi4KVGhpcyB3YXMgdGhl
+IG1haW4gaW50ZW50aW9uIHRvIHJ1biBvbmx5IHRoZSBibHVldG9vdGggZGFlbW9ucyBpZiBhbnkg
+ZGV2aWNlIGlzIApjb25uZWN0ZWQuCgpEYW5pZWwKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGFrZSBTdXJ2
+ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9mIElUCkpvaW4gU291cmNlRm9y
+Z2UubmV0J3MgVGVjaHNheSBwYW5lbCBhbmQgeW91J2xsIGdldCB0aGUgY2hhbmNlIHRvIHNoYXJl
+IHlvdXIKb3BpbmlvbnMgb24gSVQgJiBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2
+ZXlzIC0gYW5kIGVhcm4gY2FzaApodHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3Bh
+Z2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCl9fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVl
+ei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5u
+ZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
