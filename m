@@ -1,21 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <1140.216.47.50.197.1168454364.squirrel@webmail.feline-soul.net>
-In-Reply-To: <1168450887.5241.2.camel@violet>
-References: <042F6BC7-A46A-4D9D-8810-1C66347B60C7@gmail.com>
-	<45A5105B.7050705@xmission.com>
-	<6D8DB734-3C02-4CED-80CE-F770D73FD6BA@gmail.com>
-	<45A51999.3010108@xmission.com>
-	<ABCE48BD-8B79-4C00-9ADE-B7DDB0940DE2@gmail.com>
-	<45A51EC4.4030803@glidos.net>
-	<076A94F3-C853-4A56-A4E1-5B5259353D5F@gmail.com>
-	<1168450887.5241.2.camel@violet>
-Date: Wed, 10 Jan 2007 11:39:24 -0700 (MST)
-From: "Bearcat M. Sandor" <linux@feline-soul.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Message-ID: <45A52F59.8070701@glidos.net>
+Date: Wed, 10 Jan 2007 18:24:25 +0000
+From: Paul Gardiner <osronline@glidos.net>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] What happened with pin_helper (hcid.conf)?
-Reply-To: linux@feline-soul.com,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <57c68ddc0701012354u4137d1d3s93b28cafaa53f849@mail.gmail.com>	<1167725398.30886.32.camel@violet>	<57c68ddc0701020016y29fafa8duf77494bb50ac6d75@mail.gmail.com>	<20070102081813.6a264b0e.ml133@netpole.com.br>	<57c68ddc0701020229w6ddfaab3yf989a8e3999cbd1@mail.gmail.com>	<20070102094414.f7b9cef1.ml133@netpole.com.br>	<57c68ddc0701020446y3a7e70edh74f6ea5e0b05d07f@mail.gmail.com>	<1167743069.30886.54.camel@violet>	<459A60A1.80906@glidos.net>	<1167745840.30886.77.camel@violet>	<459AC8B4.7090407@glidos.net>
+	<1167772692.30886.117.camel@violet> <459B947A.30803@glidos.net>
+In-Reply-To: <459B947A.30803@glidos.net>
+Subject: Re: [Bluez-users] Problems fooling my S100 into using Bluez as a
+ modem
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -28,46 +22,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-The reason this is being discussed to death is that there is no
-documention telling us how to apply a pass code. If you don't have
-documentation be prepared for things to be discussed.  Postings on a
-mailing list is not documentation.
+Paul Gardiner wrote:
+> Marcel Holtmann wrote:
+>> Check /sys/class/bluetooth/rfcomm that you really have a listening
+>> RFCOMM socket on the right channel after starting dund.
+> 
+> How do I check this?  In that directory I have "hci0", which is a soft
+> link, and three other files "l2cap", "rfcomm", "rfcomm_dlc".  How
+> do I check they are correct?
+> 
+> Also, I have to own up to something silly: when some of your
+> statements seemed to imply that most of this should work
+> without special configuration, I put the original config
+> files in place, but didn't notice that dund was off by
+> default.  I'll post some new dumps with that corrected.
 
-I realise that the bluez agent in gnome may be the desired way to go, but
-as a linux user surely you realise that not all of us use Gnome.  Since
-the bluez activity is happening at a lower level, i feel that the gui apps
-should be simply an optional interface to the process not the idea process
-itself.
+No chance someone can have a quick look at the three
+traces? (should be the messages that appear at the
+same level in this thread as this message)
 
-That said, thank you for the great work on this stack. It is very
-appreciated.
+I know its a lot to ask, but I so much want to have
+this working again, and there's no way forward
+without help.
 
-Bearcat M. Sandor
-> this has been discussed to death. Starting with bluez-utils-3.x the PIN
-> helper concept has been deprecated and you have to provide a passkey
-> agent. Nobody said that this agent has to use a display. Check the
-> example passkey-agent.c in the source code.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share
-> your
-> opinions on IT & business topics through brief surveys - and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
-
-
+Cheers,
+	Paul.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
