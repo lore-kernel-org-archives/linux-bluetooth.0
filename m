@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45A57506.4090705@odi.ch>
-Date: Thu, 11 Jan 2007 00:21:42 +0100
+Message-ID: <45A56361.5000004@odi.ch>
+Date: Wed, 10 Jan 2007 23:06:25 +0100
 From: =?ISO-8859-1?Q?Ortwin_Gl=FCck?= <odi@odi.ch>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Mighty Mouse data
+Subject: [Bluez-devel] Mighty Mouse
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,12 +18,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Additional information to my previous email:
+Dear hackers,
 
-I have made a table of the data sent by the MM and its meaning here:
-http://www.odi.ch/prog/macbookpro/index.php#11
+The scroll ball of my Bluetooth Mighty Mouse doesn't seem to work as it 
+should. As I understand the kernel/bluez architecture it is the job of 
+hidd to translate the data from the mouse into button events. Therefore 
+hidd would be the place to make the appropriate quirks.
 
-That should make it easy to patch the hidd.
+I see that there are specific quirks for the USB version of the Mighty 
+Mouse in the Kernel (usbhid.c, hid-core.c). But I don't see a way how 
+those could possibly be used for the bt version, as they are enabled by 
+looking at the USB device ID.
+
+Can you enlighten me as to if I am correct in my assumptions?
 
 Cheers
 
