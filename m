@@ -1,5 +1,8 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-In-Reply-To: <1140.216.47.50.197.1168454364.squirrel@webmail.feline-soul.net>
+To: bluez-users@lists.sourceforge.net
+From: David Armour <d.f.armour@shaw.ca>
+Date: Wed, 10 Jan 2007 18:38:22 +0000 (UTC)
+Message-ID: <loom.20070110T192126-772@post.gmane.org>
 References: <042F6BC7-A46A-4D9D-8810-1C66347B60C7@gmail.com>
 	<45A5105B.7050705@xmission.com>
 	<6D8DB734-3C02-4CED-80CE-F770D73FD6BA@gmail.com>
@@ -8,13 +11,10 @@ References: <042F6BC7-A46A-4D9D-8810-1C66347B60C7@gmail.com>
 	<45A51EC4.4030803@glidos.net>
 	<076A94F3-C853-4A56-A4E1-5B5259353D5F@gmail.com>
 	<1168450887.5241.2.camel@violet>
-	<1140.216.47.50.197.1168454364.squirrel@webmail.feline-soul.net>
-Mime-Version: 1.0 (Apple Message framework v752.3)
-Message-Id: <E9D5DBF2-043E-4FB5-B0FC-2BA008FD137A@gmail.com>
-From: Bas Schulte <basschulte@gmail.com>
-Date: Wed, 10 Jan 2007 19:56:56 +0100
-To: linux@feline-soul.com, BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] What happened with pin_helper (hcid.conf)?
+Mime-Version: 1.0
+Subject: Re: [Bluez-users]
+	=?utf-8?q?What_happened_with_pin=5Fhelper_=28hcid?=
+	=?utf-8?b?LmNvbmYpPw==?=
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -28,19 +28,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Marcel Holtmann <marcel <at> holtmann.org> writes:
+> 
+> Hi Bas,
+> > > Seems strange under Linux to have a low level service so
+> > > reliant on the presence of a desktop.
+> > Good point.
+> > I plan to use it on a box that doesn't even *have* a display or  
+> > keyboard ;)
+> 
+> this has been discussed to death. Starting with bluez-utils-3.x the PIN
+> helper concept has been deprecated and you have to provide a passkey
+> agent. Nobody said that this agent has to use a display. Check the
 
-On 10-jan-2007, at 19:39, Bearcat M. Sandor wrote:
+I'm subscribed to Bluez-users digest as well as gnome-bluetooth, 
+read this group on Gmane, and I would v. much like to know where 
+I could see that discussion...  
 
-> The reason this is being discussed to death is that there is no
-> documention telling us how to apply a pass code
+Admittedly, *following* it might well be a different thing, for 
+me, but I don't remember seeing references to the PIN helper 
+concept being deprecated. I have seen references on Ubuntu's 
+Users Mailing List that "pairing in edgy eft seems disabled or 
+at least inactive" but I don't know if that's just rumour. 
 
-Yep.
+I'm probably doing something horribly, horribly wrong. Any 
+info greatly appreciated.
 
-Problem now is that virtually every how-to flying around the 'net  
-will make sure people will stay in the dark for another year or so as  
-those all mention to put "pin_helper /usr/bin/something" etc. etc..
-
-The wonders of progress, eh?
+Regards.
 
 
 -------------------------------------------------------------------------
