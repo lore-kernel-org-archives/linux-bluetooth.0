@@ -1,13 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
-To: bluez-users@lists.sourceforge.net
-Date: Wed, 10 Jan 2007 12:12:51 -0500
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <076A94F3-C853-4A56-A4E1-5B5259353D5F@gmail.com>
 References: <042F6BC7-A46A-4D9D-8810-1C66347B60C7@gmail.com>
+	<45A5105B.7050705@xmission.com>
+	<6D8DB734-3C02-4CED-80CE-F770D73FD6BA@gmail.com>
 	<45A51999.3010108@xmission.com>
-	<1A3C202B-4795-4352-8B71-26F102A84F2E@gmail.com>
-In-Reply-To: <1A3C202B-4795-4352-8B71-26F102A84F2E@gmail.com>
-MIME-Version: 1.0
-Message-Id: <200701101212.51800.akohlsmith-bluez@benshaw.com>
+	<ABCE48BD-8B79-4C00-9ADE-B7DDB0940DE2@gmail.com>
+	<45A51EC4.4030803@glidos.net>
+	<076A94F3-C853-4A56-A4E1-5B5259353D5F@gmail.com>
+Date: Wed, 10 Jan 2007 18:41:27 +0100
+Message-Id: <1168450887.5241.2.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] What happened with pin_helper (hcid.conf)?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -22,16 +26,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Wednesday 10 January 2007 11:56 am, Bas Schulte wrote:
-> hcid complains when I do just that:
->
-> Jan 10 17:56:27 localhost hcid[8326]: Unknown option 'pin_helper'
-> line 26
+Hi Bas,
 
-I just use "passkey 0000;" and security auto.  It seems to be the New Way if 
-you don't want to use dbus.
+> > Seems strange under Linux to have a low level service so
+> > reliant on the presence of a desktop.
+> 
+> Good point.
+> 
+> I plan to use it on a box that doesn't even *have* a display or  
+> keyboard ;)
 
--A.
+this has been discussed to death. Starting with bluez-utils-3.x the PIN
+helper concept has been deprecated and you have to provide a passkey
+agent. Nobody said that this agent has to use a display. Check the
+example passkey-agent.c in the source code.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
