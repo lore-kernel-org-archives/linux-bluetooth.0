@@ -1,6 +1,7 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v752.3)
-In-Reply-To: <1168452016.5241.5.camel@violet>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <C67AA1DF-D588-4FA1-884F-526189E99EDA@gmail.com>
 References: <042F6BC7-A46A-4D9D-8810-1C66347B60C7@gmail.com>
 	<45A5105B.7050705@xmission.com>
 	<6D8DB734-3C02-4CED-80CE-F770D73FD6BA@gmail.com>
@@ -10,11 +11,9 @@ References: <042F6BC7-A46A-4D9D-8810-1C66347B60C7@gmail.com>
 	<076A94F3-C853-4A56-A4E1-5B5259353D5F@gmail.com>
 	<1168450887.5241.2.camel@violet>
 	<C67AA1DF-D588-4FA1-884F-526189E99EDA@gmail.com>
-	<1168452016.5241.5.camel@violet>
-Message-Id: <AA1286E0-BC8A-450B-B6E1-6C66289FD634@gmail.com>
-From: Bas Schulte <basschulte@gmail.com>
-Date: Wed, 10 Jan 2007 19:07:33 +0100
-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Wed, 10 Jan 2007 19:00:16 +0100
+Message-Id: <1168452016.5241.5.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] What happened with pin_helper (hcid.conf)?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -29,19 +28,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi Bas,
 
-On 10-jan-2007, at 19:00, Marcel Holtmann wrote:
+> > this has been discussed to death. Starting with bluez-utils-3.x the  
+> > PIN
+> > helper concept has been deprecated and you have to provide a passkey
+> > agent. Nobody said that this agent has to use a display. Check the
+> > example passkey-agent.c in the source code.
+> 
+> The word "over-engineering" is about to leave my mouth.... *oops*,  
+> nope, won't say it.
 
->> The word "over-engineering" is about to leave my mouth.... *oops*,
->> nope, won't say it.
->
-> once you realize the full picture behind it
+once you realize the full picture behind it, you might think otherwise.
+The change to a passkey agent concept and cleanly separating the
+handling of a pairing from the PIN input was a wise decision. Especially
+when the new Simple Pairing of Bluetooth 2.1 comes along.
 
-Yeah, you're most likely right, I was kidding ;)
+Regards
 
-BTW, the gprs connection that worked fine before the upgrade doesn't  
-work any longer. Another night of messing about to get it to work  
-again :(
+Marcel
+
 
 
 -------------------------------------------------------------------------
