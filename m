@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 11 Jan 2007 11:03:53 +0100
-From: Stefan Seyfried <seife@suse.de>
+Date: Wed, 10 Jan 2007 22:02:33 +0200
+From: Nerijus Baliunas <nerijus@users.sourceforge.net>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20070111100353.GC28547@suse.de>
-References: <042F6BC7-A46A-4D9D-8810-1C66347B60C7@gmail.com>
-	<45A5105B.7050705@xmission.com>
-	<6D8DB734-3C02-4CED-80CE-F770D73FD6BA@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <6D8DB734-3C02-4CED-80CE-F770D73FD6BA@gmail.com>
-Subject: Re: [Bluez-users] What happened with pin_helper (hcid.conf)?
+References: <20061230003939.B156CE6AD9@mx-b.vdnet.lt>
+	<20070109020910.203B0E6AB0@mx-b.vdnet.lt>
+In-Reply-To: <20070109020910.203B0E6AB0@mx-b.vdnet.lt>
+Message-Id: <20070110200248.D0D96E8F65@mx-b.vdnet.lt>
+Subject: Re: [Bluez-users] cannot find device
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,44 +17,91 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Wed, Jan 10, 2007 at 05:31:20PM +0100, Bas Schulte wrote:
-> =
+OK, it works now - I connected the same bluetooth adapter to another PC, and my Palm
+showed its name in Trusted devices list (and so I thought that Palm does not see adapter
+connected to my Linux PC). After I tried to connect to it, it changed its name to a correct
+one and now it works.
 
-> On 10-jan-2007, at 17:12, Brad Midgley wrote:
-> =
+Nerijus
 
-> > install bluez-passkey-gnome if this is ubuntu/debian (or the  =
+On Tue, 9 Jan 2007 04:04:28 +0200 Nerijus Baliunas <nerijus@users.sourceforge.net> wrote:
 
-> > equivalent
-> > package if not).
-> =
-
-> It's a headless debian box.
-> =
-
-> No solution for headless operation?
-
-Use ssh X-forwarding :-)
-
-Or compile the "passkey-agent" example application in the bluez-utils
-and use that.
--- =
-
-Stefan Seyfried
-QA / R&D Team Mobile Devices        |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
+> Hello,
+> 
+> found more info - https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=212825
+> but running passkey-agent didn't help. I also noticed that even if I change
+> class in hcid.conf, hciconfig hci0 down, service bluetooth restart,
+> hciconfig -a still displays Class: 0x120100. Why?
+> BTW, hcidump -X -V does not display anything when I search for devices from
+> my Palm.
+> 
+> Nerijus
+> 
+> On Sat, 30 Dec 2006 02:33:45 +0200 Nerijus Baliunas <nerijus@users.sourceforge.net> wrote:
+> 
+> > Hello,
+> > 
+> > My PDA used to find the device when I had Fedora Core 5, but cannot
+> > when I upgraded to FC6. hcid.conf is default from FC6 (bluez-utils-3.7-2):
+> > 
+> > options {
+> >         autoinit yes;
+> >         security user;
+> >         pairing multi;
+> >         passkey "BlueZ";
+> > }
+> > device {
+> >         name "%h-%d";
+> >         class 0x120104;
+> >         #pkt_type DH1,DM1,HV1;
+> >         iscan enable; pscan enable;
+> >         lm accept;
+> >         lp rswitch,hold,sniff,park;
+> > }
+> > 
+> > I launched bluetooth-properties and selected
+> > "Visible and connectable for other devices",
+> > "Make adapter invisible after" set to never.
+> > 
+> > hciconfig -a
+> > hci0:	Type: USB
+> > 	BD Address: 00:13:46:00:12:CB ACL MTU: 377:10 SCO MTU: 16:0
+> > 	UP RUNNING PSCAN ISCAN AUTH ENCRYPT 
+> > 	RX bytes:8639 acl:0 sco:0 events:249 errors:0
+> > 	TX bytes:5296 acl:0 sco:0 commands:202 errors:0
+> > 	Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+> > 	Packet type: DM3 DM5 DH3 DH5 HV1 HV2 HV3 
+> > 	Link policy: RSWITCH HOLD SNIFF PARK 
+> > 	Link mode: SLAVE ACCEPT 
+> > 	Name: 'xxx-0'
+> > 	Class: 0x120104
+> > 	Service Classes: Networking, Object Transfer
+> > 	Device Class: Computer, Desktop workstation
+> > 	HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x309
+> > 	Manufacturer: Broadcom Corporation (15)
+> > 
+> > Any ideas why PDA cannot find the device? I found in mailing list archives and tried
+> > unsuccessfully:
+> > apitest SetDiscoverableTimeout 0
+> > apitest SetMode discoverable
+> > 
+> > "to make this work you need to set discovto to 0, because otherwise hcid
+> > will automatically switch you device into non-discoverable mode to
+> > protect you." - where do I need to set discovto to 0?
+> > 
+> > Regards,
+> > Nerijus
 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
