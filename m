@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v752.3)
-In-Reply-To: <200701101212.51800.akohlsmith-bluez@benshaw.com>
+From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
+To: bluez-users@lists.sourceforge.net
+Date: Wed, 10 Jan 2007 12:12:51 -0500
 References: <042F6BC7-A46A-4D9D-8810-1C66347B60C7@gmail.com>
 	<45A51999.3010108@xmission.com>
 	<1A3C202B-4795-4352-8B71-26F102A84F2E@gmail.com>
-	<200701101212.51800.akohlsmith-bluez@benshaw.com>
-Message-Id: <A7F8D291-0C3C-41E5-9BE0-33FFEF0CC28C@gmail.com>
-From: Bas Schulte <basschulte@gmail.com>
-Date: Wed, 10 Jan 2007 18:54:32 +0100
-To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1A3C202B-4795-4352-8B71-26F102A84F2E@gmail.com>
+MIME-Version: 1.0
+Message-Id: <200701101212.51800.akohlsmith-bluez@benshaw.com>
 Subject: Re: [Bluez-users] What happened with pin_helper (hcid.conf)?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -23,20 +22,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-
-On 10-jan-2007, at 18:12, Andrew Kohlsmith wrote:
-
->> Jan 10 17:56:27 localhost hcid[8326]: Unknown option 'pin_helper'
->> line 26
+On Wednesday 10 January 2007 11:56 am, Bas Schulte wrote:
+> hcid complains when I do just that:
 >
-> I just use "passkey 0000;" and security auto.  It seems to be the  
-> New Way if
-> you don't want to use dbus.
+> Jan 10 17:56:27 localhost hcid[8326]: Unknown option 'pin_helper'
+> line 26
 
-I think I tried that but I think that works the other way around.  
-When entering the pin as specified in "passkey" on my phone, pairing  
-fails. Although that may be yet another problem.
+I just use "passkey 0000;" and security auto.  It seems to be the New Way if 
+you don't want to use dbus.
 
+-A.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
