@@ -1,14 +1,21 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45A52F59.8070701@glidos.net>
-Date: Wed, 10 Jan 2007 18:24:25 +0000
-From: Paul Gardiner <osronline@glidos.net>
-MIME-Version: 1.0
+Mime-Version: 1.0 (Apple Message framework v752.3)
+In-Reply-To: <1168452016.5241.5.camel@violet>
+References: <042F6BC7-A46A-4D9D-8810-1C66347B60C7@gmail.com>
+	<45A5105B.7050705@xmission.com>
+	<6D8DB734-3C02-4CED-80CE-F770D73FD6BA@gmail.com>
+	<45A51999.3010108@xmission.com>
+	<ABCE48BD-8B79-4C00-9ADE-B7DDB0940DE2@gmail.com>
+	<45A51EC4.4030803@glidos.net>
+	<076A94F3-C853-4A56-A4E1-5B5259353D5F@gmail.com>
+	<1168450887.5241.2.camel@violet>
+	<C67AA1DF-D588-4FA1-884F-526189E99EDA@gmail.com>
+	<1168452016.5241.5.camel@violet>
+Message-Id: <AA1286E0-BC8A-450B-B6E1-6C66289FD634@gmail.com>
+From: Bas Schulte <basschulte@gmail.com>
+Date: Wed, 10 Jan 2007 19:07:33 +0100
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <57c68ddc0701012354u4137d1d3s93b28cafaa53f849@mail.gmail.com>	<1167725398.30886.32.camel@violet>	<57c68ddc0701020016y29fafa8duf77494bb50ac6d75@mail.gmail.com>	<20070102081813.6a264b0e.ml133@netpole.com.br>	<57c68ddc0701020229w6ddfaab3yf989a8e3999cbd1@mail.gmail.com>	<20070102094414.f7b9cef1.ml133@netpole.com.br>	<57c68ddc0701020446y3a7e70edh74f6ea5e0b05d07f@mail.gmail.com>	<1167743069.30886.54.camel@violet>	<459A60A1.80906@glidos.net>	<1167745840.30886.77.camel@violet>	<459AC8B4.7090407@glidos.net>
-	<1167772692.30886.117.camel@violet> <459B947A.30803@glidos.net>
-In-Reply-To: <459B947A.30803@glidos.net>
-Subject: Re: [Bluez-users] Problems fooling my S100 into using Bluez as a
- modem
+Subject: Re: [Bluez-users] What happened with pin_helper (hcid.conf)?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,31 +29,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Paul Gardiner wrote:
-> Marcel Holtmann wrote:
->> Check /sys/class/bluetooth/rfcomm that you really have a listening
->> RFCOMM socket on the right channel after starting dund.
-> 
-> How do I check this?  In that directory I have "hci0", which is a soft
-> link, and three other files "l2cap", "rfcomm", "rfcomm_dlc".  How
-> do I check they are correct?
-> 
-> Also, I have to own up to something silly: when some of your
-> statements seemed to imply that most of this should work
-> without special configuration, I put the original config
-> files in place, but didn't notice that dund was off by
-> default.  I'll post some new dumps with that corrected.
 
-No chance someone can have a quick look at the three
-traces? (should be the messages that appear at the
-same level in this thread as this message)
+On 10-jan-2007, at 19:00, Marcel Holtmann wrote:
 
-I know its a lot to ask, but I so much want to have
-this working again, and there's no way forward
-without help.
+>> The word "over-engineering" is about to leave my mouth.... *oops*,
+>> nope, won't say it.
+>
+> once you realize the full picture behind it
 
-Cheers,
-	Paul.
+Yeah, you're most likely right, I was kidding ;)
+
+BTW, the gprs connection that worked fine before the upgrade doesn't  
+work any longer. Another night of messing about to get it to work  
+again :(
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
