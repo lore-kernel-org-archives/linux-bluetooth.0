@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-Id: <45A60E53.5301.0014.0@novell.com>
-Date: Thu, 11 Jan 2007 10:18:41 -0700
-From: "Olin Atkinson" <oatkinson@novell.com>
-To: <bluez-devel@lists.sourceforge.net>
-Mime-Version: 1.0
-Subject: [Bluez-devel] headsetd timing out connecting L2CAP socket to
-	headset after	turning off headset
+Message-ID: <45A5F6DD.7020904@palmsource.com>
+Date: Thu, 11 Jan 2007 09:35:41 +0100
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <44F6B7AE.1030209@jambit.com>	<4582A310.60905@jambit.com>	<4583A020.2040808@xmission.com>	<4587D051.8080703@jambit.com>	<458864F1.4070104@xmission.com>	<4589371F.2000507@palmsource.com>
+	<45A54D5B.8030001@xmission.com>
+In-Reply-To: <45A54D5B.8030001@xmission.com>
+Subject: Re: [Bluez-devel] How to use sbc.c ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,62 +17,340 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGVhZHNldGQgd29ya3MgZ3JlYXQgdW50aWwgSSB0dXJuIG9mZiBvciByZWNoYXJnZSBteSBoZWFk
-c2V0LiAgVGhlbiB3aGVuIEkgdHJ5IHRvIGNvbm5lY3QgaXQgYWdhaW4gaSBzdGFydCBnZXR0aW5n
-IHRoZSBmb2xsb3dpbmcgaW4gL3Zhci9sb2cvbWVzc2FnZXMuCkphbiAxMSAwODozOTozMCBvYXRr
-aW5zb24xIGhjaWRbMjA1M106IGxpbmtfa2V5X3JlcXVlc3QgKHNiYT0wMDoxNTpFOTo2NTo1Njoz
-NywgZGJhPTAwOjAzOjg5OjdCOjM4OkM2KQpKYW4gMTEgMDg6Mzk6NDIgb2F0a2luc29uMSBoZWFk
-c2V0ZFsxNzA4M106IENvbmZpZ3VyYXRpb24gcGhhc2UgZW5kZWQ6IHRhcmdldCBiZGFkZHIgaXMg
-MDA6MDM6ODk6N0I6Mzg6QzYsIHRpbWVvdXQgaXMgNjAwMCBtcwpKYW4gMTEgMDg6Mzk6NDIgb2F0
-a2luc29uMSBoZWFkc2V0ZFsxNzA4M106IENoYW5naW5nIHN0YXRlOiBJZGxlLS0+UGFnaW5nCgpB
-ZnRlciBhIHJlYm9vdCBpdCB3aWxsIG5vcm1hbGx5IHN0YXJ0IHdvcmtpbmcgYWdhaW4gYnV0IEkg
-ZG9uJ3Qgd2FudCB0byBoYXZlIHRvIGRvIGl0IGFsbCB0aGUgdGltZS4KCkkgaGF2ZSB0cmllZAog
-cm1tb2Qgc2NvCm1vZHByb2JlIHNjbwoKYW5kIGl0IHN0aWxsIGRvZXMgdGhlIHNhbWUgdGhpbmcg
-YnV0IEkgaGF2ZSB0byByZXN0YXJ0IGhlYWRzZXRkIHRvIGdldCBhbnl0aGluZyB0byBoYXBwZW4g
-YW5kIHRoZW4gaXQgc3RpbGwgZG9lcyB0aGUgc2FtZSB0aGluZy4KCkkgYW0gb24gU3VzZSAKU1VT
-RSBMaW51eCBFbnRlcnByaXNlIERlc2t0b3AgMTAgKGk1ODYpIHdoaWNoIGlzIGJhc2ljYWxseSBT
-VVNFIDEwLjEKVkVSU0lPTiA9IDEwCm9uIGtlcm5lbAoyLjYuMTYuMjEtMC4yNS1zbXAKCnJwbSAt
-cWEgfCBncmVwIGJsdWV6IHJldHVybnM6CmJsdWV6LWxpYnMtMi4yNC0xMi4zCmJsdWV6LXV0aWxz
-LTIuMjQtMTcuMwoKYW5kIG1vZGluZm8gc2NvIHJldHVybnM6CmZpbGVuYW1lOiAgICAgICAvbGli
-L21vZHVsZXMvMi42LjE2LjIxLTAuMjUtc21wL2tlcm5lbC9uZXQvYmx1ZXRvb3RoL3Njby5rbwph
-dXRob3I6ICAgICAgICAgTWF4aW0gS3Jhc255YW5za3kgPG1heGtAcXVhbGNvbW0uY29tPiwgTWFy
-Y2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9sdG1hbm4ub3JnPgpkZXNjcmlwdGlvbjogICAgQmx1ZXRv
-b3RoIFNDTyB2ZXIgMC41CnZlcnNpb246ICAgICAgICAwLjUKbGljZW5zZTogICAgICAgIEdQTAph
-bGlhczogICAgICAgICAgYnQtcHJvdG8tMgp2ZXJtYWdpYzogICAgICAgMi42LjE2LjIxLTAuMjUt
-c21wIFNNUCA1ODYgUkVHUEFSTSBnY2MtNC4xCnN1cHBvcnRlZDogICAgICB5ZXMKZGVwZW5kczog
-ICAgICAgIGJsdWV0b290aApzcmN2ZXJzaW9uOiAgICAgQjgwNUVCMDBCMjczMzVBNkMwRUZBQkUK
-CkkgYW0gcnVubmluZyBCbHVldG9vdGggaGVhZHNldCBkYWVtb24gdmVyc2lvbiAwLjQyCgpJIHRy
-aWVkIGNoZWNraW5nIG91dCBidWlsZGluZyBhbmQgaW5zdGFsbGluZyBzYmMgYW5kIHBsdWd6LiAg
-c2JjIGJ1aWx0IGFuZCBpbnN0YWxsZWQgZmluZSBidXQgcGx1Z3ogZmFpbGVkIHRvIGJ1aWxkIHdp
-dGggdGhlIGZvbGxvd2luZyBlcnJvcjoKCm1ha2VbM106IEVudGVyaW5nIGRpcmVjdG9yeSBgL3dp
-bmRvd3MvRC9wcm9qZWN0cy9ibHVldG9vdGhIZWFkc2V0LXByb2plY3RzL3BsdWd6L2Fsc2EtcGx1
-Z2lucy9oZWFkc2V0ZCcKaWYgZ2NjIC1ESEFWRV9DT05GSUdfSCAtSS4gLUkuIC1JLi4vLi4gICAg
-IC1XYWxsIC1PMiAtTVQgaGVhZHNldGQubyAtTUQgLU1QIC1NRiAiLmRlcHMvaGVhZHNldGQuVHBv
-IiAtYyAtbyBoZWFkc2V0ZC5vIGhlYWRzZXRkLmM7IFwKdGhlbiBtdiAtZiAiLmRlcHMvaGVhZHNl
-dGQuVHBvIiAiLmRlcHMvaGVhZHNldGQuUG8iOyBlbHNlIHJtIC1mICIuZGVwcy9oZWFkc2V0ZC5U
-cG8iOyBleGl0IDE7IGZpCmlmIGdjYyAtREhBVkVfQ09ORklHX0ggLUkuIC1JLiAtSS4uLy4uICAg
-ICAtV2FsbCAtTzIgLU1UIGRhZW1vbi5vIC1NRCAtTVAgLU1GICIuZGVwcy9kYWVtb24uVHBvIiAt
-YyAtbyBkYWVtb24ubyBkYWVtb24uYzsgXAp0aGVuIG12IC1mICIuZGVwcy9kYWVtb24uVHBvIiAi
-LmRlcHMvZGFlbW9uLlBvIjsgZWxzZSBybSAtZiAiLmRlcHMvZGFlbW9uLlRwbyI7IGV4aXQgMTsg
-ZmkKaWYgZ2NjIC1ESEFWRV9DT05GSUdfSCAtSS4gLUkuIC1JLi4vLi4gICAgIC1XYWxsIC1PMiAt
-TVQgc3RhdGVzLm8gLU1EIC1NUCAtTUYgIi5kZXBzL3N0YXRlcy5UcG8iIC1jIC1vIHN0YXRlcy5v
-IHN0YXRlcy5jOyBcCnRoZW4gbXYgLWYgIi5kZXBzL3N0YXRlcy5UcG8iICIuZGVwcy9zdGF0ZXMu
-UG8iOyBlbHNlIHJtIC1mICIuZGVwcy9zdGF0ZXMuVHBvIjsgZXhpdCAxOyBmaQpzdGF0ZXMuYzog
-SW4gZnVuY3Rpb24g4oCYaGVhZHNldElkbGVIYW5kbGVBcHBsQ29ublJlceKAmToKc3RhdGVzLmM6
-MzAwOiBlcnJvcjog4oCYU0RQX05PTl9CTE9DS0lOR+KAmSB1bmRlY2xhcmVkIChmaXJzdCB1c2Ug
-aW4gdGhpcyBmdW5jdGlvbikKc3RhdGVzLmM6MzAwOiBlcnJvcjogKEVhY2ggdW5kZWNsYXJlZCBp
-ZGVudGlmaWVyIGlzIHJlcG9ydGVkIG9ubHkgb25jZQpzdGF0ZXMuYzozMDA6IGVycm9yOiBmb3Ig
-ZWFjaCBmdW5jdGlvbiBpdCBhcHBlYXJzIGluLikKCgoKCgoKCgotLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRh
-a2UgU3VydmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBvZiBJVApKb2luIFNv
-dXJjZUZvcmdlLm5ldCdzIFRlY2hzYXkgcGFuZWwgYW5kIHlvdSdsbCBnZXQgdGhlIGNoYW5jZSB0
-byBzaGFyZSB5b3VyCm9waW5pb25zIG9uIElUICYgYnVzaW5lc3MgdG9waWNzIHRocm91Z2ggYnJp
-ZWYgc3VydmV5cyAtIGFuZCBlYXJuIGNhc2gKaHR0cDovL3d3dy50ZWNoc2F5LmNvbS9kZWZhdWx0
-LnBocD9wYWdlPWpvaW4ucGhwJnA9c291cmNlZm9yZ2UmQ0lEPURFVkRFVgpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxp
-c3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNl
-Zm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
+Brad,
+
+Thank you for answering, I was hesitating between precalculation or =
+
+custom tables.
+
+I've not been really deep into the codec now. It's not easy to follow as =
+
+the spec itself could be more clear.
+
+In my investigations, I got over a 64 bits version of the codec. I =
+
+tested it on pc and arm. It gave better results than the 32 bits : the =
+
+gain is better, the overflow do not occurs, there is still a bit of =
+
+background noise, but not more than the 32 bits and it may be the sample =
+
+file. It will probably consume a little bit more cpu, but I found this =
+
+was not really noticeable (at least on my hardware). But the library =
+
+could be changed according to needs.
+
+While this is not the best solution to the problem, I still think users =
+
+are complaining mainly about gain. So it could be possible to provide it =
+
+as default. What about you?
+
+Regards,
+Fr=E9d=E9ric.
+
+Brad Midgley a =E9crit :
+> Fr=E9d=E9ric
+>
+> Somehow this message went to my junk folder!
+>
+> The tables we have are different because we have changed the algorithm
+> over time and adapted the tables to avoid some computation. We also
+> split the tables as a result of how they are used.
+>
+> On top of that, we converted the values to integers which doesn't help
+> make it easy to follow.
+>
+> I hope it's not impossible to follow :(
+>
+> Brad
+>
+>   =
+
+>>>> The newest download of sbc.c from http://sbc.cvs.sourceforge.net/sbc/
+>>>> under menu "CVS Browse" contains a simple bug, which lets the file
+>>>> compile, but crash on runtime: In function _sbc_analyze_eight() the
+>>>> array 't[8]' is referenced from t[1] to t[8], instead of t[0] to t[7].
+>>>>     =
+
+>>>>         =
+
+>>> fixed. thanks.
+>>>   =
+
+>>>       =
+
+>> some values were missed so the sound is now larsenized ;)
+>> patch attached.
+>>
+>> BTW, I was looking for the tables specially Proto_4_40 and Proto_8_80
+>> from a2dp specifications.
+>> I suspect they are stored in sbc_proto_8_80m0 and sbc_proto_8_80m1.
+>> The values are not the same that in the spec. Do you know why?
+>>
+>>
+>> ------------------------------------------------------------------------
+>>
+>> ? Doxyfile
+>> ? Makefile
+>> ? Makefile.in
+>> ? aclocal.m4
+>> ? autom4te.cache
+>> ? config.guess
+>> ? config.h
+>> ? config.h.in
+>> ? config.log
+>> ? config.status
+>> ? config.sub
+>> ? configure
+>> ? debug
+>> ? depcomp
+>> ? install-sh
+>> ? libtool
+>> ? ltmain.sh
+>> ? missing
+>> ? sbc.kdevelop
+>> ? sbc.kdevelop.pcs
+>> ? sbc.kdevses
+>> ? sbc.pc
+>> ? stamp-h1
+>> ? include/Makefile
+>> ? include/Makefile.in
+>> ? lib/.deps
+>> ? lib/.libs
+>> ? lib/Makefile
+>> ? lib/Makefile.in
+>> ? lib/libsbc.la
+>> ? lib/sbc.lo
+>> ? src/.deps
+>> ? src/.libs
+>> ? src/Makefile
+>> ? src/Makefile.in
+>> ? src/sbcinfo
+>> Index: lib/sbc.c
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> RCS file: /cvsroot/sbc/sbc/lib/sbc.c,v
+>> retrieving revision 1.8
+>> diff -u -r1.8 sbc.c
+>> --- lib/sbc.c	19 Dec 2006 22:13:41 -0000	1.8
+>> +++ lib/sbc.c	20 Dec 2006 12:58:09 -0000
+>> @@ -892,84 +892,84 @@
+>>  	MULA(res, -_sbc_proto_8[21], in[75]);
+>>  	t[7] =3D SCALE8_STAGE1(res);
+>>  =
+
+>> -	MUL(res, _anamatrix8[0], t[1]);
+>> -	MULA(res, _anamatrix8[7], t[2]);
+>> -	MULA(res, _anamatrix8[2], t[3]);
+>> -	MULA(res, _anamatrix8[3], t[4]);
+>> -	MULA(res, _anamatrix8[6], t[5]);
+>> -	MULA(res, _anamatrix8[4], t[6]);
+>> -	MULA(res, _anamatrix8[1], t[7]);
+>> -	MULA(res, _anamatrix8[5], t[8]);
+>> +	MUL(res, _anamatrix8[0], t[0]);
+>> +	MULA(res, _anamatrix8[7], t[1]);
+>> +	MULA(res, _anamatrix8[2], t[2]);
+>> +	MULA(res, _anamatrix8[3], t[3]);
+>> +	MULA(res, _anamatrix8[6], t[4]);
+>> +	MULA(res, _anamatrix8[4], t[5]);
+>> +	MULA(res, _anamatrix8[1], t[6]);
+>> +	MULA(res, _anamatrix8[5], t[7]);
+>>  	out[0] =3D SCALE8_STAGE2(res);
+>>  =
+
+>> -	MUL(res, _anamatrix8[1], t[1]);
+>> -	MULA(res, _anamatrix8[7], t[2]);
+>> -	MULA(res, _anamatrix8[3], t[3]);
+>> -	MULA(res, -_anamatrix8[5], t[4]);
+>> -	MULA(res, -_anamatrix8[6], t[5]);
+>> -	MULA(res, -_anamatrix8[2], t[6]);
+>> -	MULA(res, -_anamatrix8[0], t[7]);
+>> -	MULA(res, -_anamatrix8[4], t[8]);
+>> +	MUL(res, _anamatrix8[1], t[0]);
+>> +	MULA(res, _anamatrix8[7], t[1]);
+>> +	MULA(res, _anamatrix8[3], t[2]);
+>> +	MULA(res, -_anamatrix8[5], t[3]);
+>> +	MULA(res, -_anamatrix8[6], t[4]);
+>> +	MULA(res, -_anamatrix8[2], t[5]);
+>> +	MULA(res, -_anamatrix8[0], t[6]);
+>> +	MULA(res, -_anamatrix8[4], t[7]);
+>>  	out[1] =3D SCALE8_STAGE2(res);
+>>  =
+
+>> -	MUL(res, -_anamatrix8[1], t[1]);
+>> -	MULA(res, _anamatrix8[7], t[2]);
+>> -	MULA(res, _anamatrix8[4], t[3]);
+>> -	MULA(res, -_anamatrix8[2], t[4]);
+>> -	MULA(res, -_anamatrix8[6], t[5]);
+>> -	MULA(res, _anamatrix8[5], t[6]);
+>> -	MULA(res, _anamatrix8[0], t[7]);
+>> -	MULA(res, _anamatrix8[3], t[8]);
+>> +	MUL(res, -_anamatrix8[1], t[0]);
+>> +	MULA(res, _anamatrix8[7], t[1]);
+>> +	MULA(res, _anamatrix8[4], t[2]);
+>> +	MULA(res, -_anamatrix8[2], t[3]);
+>> +	MULA(res, -_anamatrix8[6], t[4]);
+>> +	MULA(res, _anamatrix8[5], t[5]);
+>> +	MULA(res, _anamatrix8[0], t[6]);
+>> +	MULA(res, _anamatrix8[3], t[7]);
+>>  	out[2] =3D SCALE8_STAGE2(res);
+>>  =
+
+>> -	MUL(res, -_anamatrix8[0], t[1]);
+>> -	MULA(res, _anamatrix8[7], t[2]);
+>> -	MULA(res, _anamatrix8[5], t[3]);
+>> -	MULA(res, -_anamatrix8[4], t[4]);
+>> -	MULA(res, _anamatrix8[6], t[5]);
+>> -	MULA(res, _anamatrix8[3], t[6]);
+>> -	MULA(res, -_anamatrix8[1], t[7]);
+>> -	MULA(res, -_anamatrix8[2], t[8]);
+>> +	MUL(res, -_anamatrix8[0], t[0]);
+>> +	MULA(res, _anamatrix8[7], t[1]);
+>> +	MULA(res, _anamatrix8[5], t[2]);
+>> +	MULA(res, -_anamatrix8[4], t[3]);
+>> +	MULA(res, _anamatrix8[6], t[4]);
+>> +	MULA(res, _anamatrix8[3], t[5]);
+>> +	MULA(res, -_anamatrix8[1], t[6]);
+>> +	MULA(res, -_anamatrix8[2], t[7]);
+>>  	out[3] =3D SCALE8_STAGE2(res);
+>>  =
+
+>> -	MUL(res, -_anamatrix8[0], t[1]);
+>> -	MULA(res, _anamatrix8[7], t[2]);
+>> -	MULA(res, -_anamatrix8[5], t[3]);
+>> -	MULA(res, _anamatrix8[4], t[4]);
+>> -	MULA(res, _anamatrix8[6], t[5]);
+>> -	MULA(res, -_anamatrix8[3], t[6]);
+>> -	MULA(res, -_anamatrix8[1], t[7]);
+>> -	MULA(res, _anamatrix8[2], t[8]);
+>> +	MUL(res, -_anamatrix8[0], t[0]);
+>> +	MULA(res, _anamatrix8[7], t[1]);
+>> +	MULA(res, -_anamatrix8[5], t[2]);
+>> +	MULA(res, _anamatrix8[4], t[3]);
+>> +	MULA(res, _anamatrix8[6], t[4]);
+>> +	MULA(res, -_anamatrix8[3], t[5]);
+>> +	MULA(res, -_anamatrix8[1], t[6]);
+>> +	MULA(res, _anamatrix8[2], t[7]);
+>>  	out[4] =3D SCALE8_STAGE2(res);
+>>  =
+
+>> -	MUL(res, -_anamatrix8[1], t[1]);
+>> -	MULA(res, _anamatrix8[7], t[2]);
+>> -	MULA(res, -_anamatrix8[4], t[3]);
+>> -	MULA(res, _anamatrix8[2], t[4]);
+>> -	MULA(res, -_anamatrix8[6], t[5]);
+>> -	MULA(res, -_anamatrix8[5], t[6]);
+>> -	MULA(res, _anamatrix8[0], t[7]);
+>> -	MULA(res, -_anamatrix8[3], t[8]);
+>> +	MUL(res, -_anamatrix8[1], t[0]);
+>> +	MULA(res, _anamatrix8[7], t[1]);
+>> +	MULA(res, -_anamatrix8[4], t[2]);
+>> +	MULA(res, _anamatrix8[2], t[3]);
+>> +	MULA(res, -_anamatrix8[6], t[4]);
+>> +	MULA(res, -_anamatrix8[5], t[5]);
+>> +	MULA(res, _anamatrix8[0], t[6]);
+>> +	MULA(res, -_anamatrix8[3], t[7]);
+>>  	out[5] =3D SCALE8_STAGE2(res);
+>>  =
+
+>> -	MUL(res, _anamatrix8[1], t[1]);
+>> -	MULA(res, _anamatrix8[7], t[2]);
+>> -	MULA(res, -_anamatrix8[3], t[3]);
+>> -	MULA(res, _anamatrix8[5], t[4]);
+>> -	MULA(res, -_anamatrix8[6], t[5]);
+>> -	MULA(res, _anamatrix8[2], t[6]);
+>> -	MULA(res, -_anamatrix8[0], t[7]);
+>> -	MULA(res, _anamatrix8[4], t[8]);
+>> +	MUL(res, _anamatrix8[1], t[0]);
+>> +	MULA(res, _anamatrix8[7], t[1]);
+>> +	MULA(res, -_anamatrix8[3], t[2]);
+>> +	MULA(res, _anamatrix8[5], t[3]);
+>> +	MULA(res, -_anamatrix8[6], t[4]);
+>> +	MULA(res, _anamatrix8[2], t[5]);
+>> +	MULA(res, -_anamatrix8[0], t[6]);
+>> +	MULA(res, _anamatrix8[4], t[7]);
+>>  	out[6] =3D SCALE8_STAGE2(res);
+>>  =
+
+>> -	MUL(res, _anamatrix8[0], t[1]);
+>> -	MULA(res, _anamatrix8[7], t[2]);
+>> -	MULA(res, -_anamatrix8[2], t[3]);
+>> -	MULA(res, -_anamatrix8[3], t[4]);
+>> -	MULA(res, _anamatrix8[6], t[5]);
+>> -	MULA(res, -_anamatrix8[4], t[6]);
+>> -	MULA(res, _anamatrix8[1], t[7]);
+>> -	MULA(res, -_anamatrix8[5], t[8]);
+>> +	MUL(res, _anamatrix8[0], t[0]);
+>> +	MULA(res, _anamatrix8[7], t[1]);
+>> +	MULA(res, -_anamatrix8[2], t[2]);
+>> +	MULA(res, -_anamatrix8[3], t[3]);
+>> +	MULA(res, _anamatrix8[6], t[4]);
+>> +	MULA(res, -_anamatrix8[4], t[5]);
+>> +	MULA(res, _anamatrix8[1], t[6]);
+>> +	MULA(res, -_anamatrix8[5], t[7]);
+>>  	out[7] =3D SCALE8_STAGE2(res);
+>>  }
+>>  =
+
+>>
+>>
+>> ------------------------------------------------------------------------
+>>
+>> -------------------------------------------------------------------------
+>> Take Surveys. Earn Cash. Influence the Future of IT
+>> Join SourceForge.net's Techsay panel and you'll get the chance to share =
+your
+>> opinions on IT & business topics through brief surveys - and earn cash
+>> http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=
+=3DDEVDEV
+>>
+>>
+>> ------------------------------------------------------------------------
+>>
+>> _______________________________________________
+>> Bluez-devel mailing list
+>> Bluez-devel@lists.sourceforge.net
+>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>>     =
+
+>
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share y=
+our
+> opinions on IT & business topics through brief surveys - and earn cash
+> http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3D=
+DEVDEV
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>   =
+
+
+
+-- =
+
+Frederic
+
+Without the wind, the grass does not move.
+
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
