@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 12 Jan 2007 16:25:10 +0100
-From: Stefan Seyfried <seife@suse.de>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20070112152510.GB18535@suse.de>
-References: <200701081837.04388.dgollub@suse.de>
-	<20070108184701.GA12689@jh-mbp>
-	<200701090041.54299.dgollub@suse.de>
+From: Tim Chick <chick@computergeek.freeserve.co.uk>
+To: bluez-devel@lists.sourceforge.net
+Date: Thu, 11 Jan 2007 19:57:04 +0000
+References: <45A60E53.5301.0014.0@novell.com>
+In-Reply-To: <45A60E53.5301.0014.0@novell.com>
 MIME-Version: 1.0
-In-Reply-To: <200701090041.54299.dgollub@suse.de>
-Subject: Re: [Bluez-devel] Should hcid wait for dbus daemon?
+Message-Id: <200701111957.05431.chick@computergeek.freeserve.co.uk>
+Subject: Re: [Bluez-devel]
+	=?utf-8?q?headsetd_timing_out_connecting_L2CAP_sock?=
+	=?utf-8?q?et_to_headset_after=09turning_off_headset?=
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,106 +18,41 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Ping! :-)
-
-Any opinions on that approach? This fixes the hotplug issue for our users,
-but i want to stay as close to upstream as possible :-)
-
-On Tue, Jan 09, 2007 at 12:41:53AM +0100, Daniel Gollub wrote:
-> On Monday 08 January 2007 19:47, Johan Hedberg wrote:
-> > Sounds like a useful feature. It should be quite simple to implement too
-> > since most of the required code already exists due to the dbus restart
-> > detection support. Feel free to provide a patch for it :)
-> How often should the daemons try to connect? Or infinitely?
-> If not infinitely, then configurable by command line parameter or fixed?
-> =
-
-> Attachted is a _simple_ proof of concept patch which . It retries every 5 =
-
-> seconds. After #12 unsuccessfully dbus connect, it gives up and abort (as =
-
-> before).
-> =
-
-> Daniel
-
-> Index: common/dbus.c
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> RCS file: /cvsroot/bluez/utils/common/dbus.c,v
-> retrieving revision 1.2
-> diff -u -p -r1.2 dbus.c
-> --- common/dbus.c	13 Nov 2006 07:58:40 -0000	1.2
-> +++ common/dbus.c	8 Jan 2007 22:52:18 -0000
-> @@ -39,6 +39,7 @@
->  #include "list.h"
->  =
-
->  #define DISPATCH_TIMEOUT	0
-> +#define MAX_DBUS_RETRY		12
->  =
-
->  static int name_listener_initialized =3D 0;
->  =
-
-> @@ -485,13 +486,27 @@ static void dispatch_status_cb(DBusConne
->  =
-
->  DBusConnection *init_dbus(const char *name, void (*disconnect_cb)(void *=
-), void *user_data)
->  {
-> +	int retry =3D 0;
->  	struct disconnect_data *dc_data;
->  	DBusConnection *conn;
->  	DBusError err;
->  =
-
->  	dbus_error_init(&err);
->  =
-
-> -	conn =3D dbus_bus_get(DBUS_BUS_SYSTEM, &err);
-> +	do {
-> +		if (dbus_error_is_set(&err))
-> +			dbus_error_free(&err);
-> +
-> +		conn =3D dbus_bus_get(DBUS_BUS_SYSTEM, &err);
-> +		if (conn)
-> +			break;
-> +
-> +		if (!retry)
-> +			info("Can't connect to DBUS. Will retry %i times.", MAX_DBUS_RETRY);
-> +
-> +		usleep(5000000);
-
-here, a
-		sleep(5);
-might be easier to read :-)
-
-> +		retry++;
-> +	} while (!conn && retry < MAX_DBUS_RETRY);
->  =
-
->  	if (dbus_error_is_set(&err)) {
->  		error("Can't connect to system message bus: %s", err.message);
--- =
-
-Stefan Seyfried
-QA / R&D Team Mobile Devices        |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
-
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+T24gVGh1cnNkYXkgMTEgSmFudWFyeSAyMDA3IDE3OjE4LCBPbGluIEF0a2luc29uIHdyb3RlOgpP
+biBUaHVyc2RheSAxMSBKYW51YXJ5IDIwMDcgMTc6MTgsIHlvdSB3cm90ZToKPiBJIHRyaWVkIGNo
+ZWNraW5nIG91dCBidWlsZGluZyBhbmQgaW5zdGFsbGluZyBzYmMgYW5kIHBsdWd6LiAgc2JjIGJ1
+aWx0IGFuZAo+IGluc3RhbGxlZCBmaW5lIGJ1dCBwbHVneiBmYWlsZWQgdG8gYnVpbGQgd2l0aCB0
+aGUgZm9sbG93aW5nIGVycm9yOgo+Cj4gbWFrZVszXTogRW50ZXJpbmcgZGlyZWN0b3J5Cj4gYC93
+aW5kb3dzL0QvcHJvamVjdHMvYmx1ZXRvb3RoSGVhZHNldC1wcm9qZWN0cy9wbHVnei9hbHNhLXBs
+dWdpbnMvaGVhZHNldGQnCj4gaWYgZ2NjIC1ESEFWRV9DT05GSUdfSCAtSS4gLUkuIC1JLi4vLi4g
+ICAgIC1XYWxsIC1PMiAtTVQgaGVhZHNldGQubyAtTUQgLU1QCj4gLU1GICIuZGVwcy9oZWFkc2V0
+ZC5UcG8iIC1jIC1vIGhlYWRzZXRkLm8gaGVhZHNldGQuYzsgXCB0aGVuIG12IC1mCj4gIi5kZXBz
+L2hlYWRzZXRkLlRwbyIgIi5kZXBzL2hlYWRzZXRkLlBvIjsgZWxzZSBybSAtZiAiLmRlcHMvaGVh
+ZHNldGQuVHBvIjsKPiBleGl0IDE7IGZpIGlmIGdjYyAtREhBVkVfQ09ORklHX0ggLUkuIC1JLiAt
+SS4uLy4uICAgICAtV2FsbCAtTzIgLU1UCj4gZGFlbW9uLm8gLU1EIC1NUCAtTUYgIi5kZXBzL2Rh
+ZW1vbi5UcG8iIC1jIC1vIGRhZW1vbi5vIGRhZW1vbi5jOyBcIHRoZW4gbXYKPiAtZiAiLmRlcHMv
+ZGFlbW9uLlRwbyIgIi5kZXBzL2RhZW1vbi5QbyI7IGVsc2Ugcm0gLWYgIi5kZXBzL2RhZW1vbi5U
+cG8iOwo+IGV4aXQgMTsgZmkgaWYgZ2NjIC1ESEFWRV9DT05GSUdfSCAtSS4gLUkuIC1JLi4vLi4g
+ICAgIC1XYWxsIC1PMiAtTVQKPiBzdGF0ZXMubyAtTUQgLU1QIC1NRiAiLmRlcHMvc3RhdGVzLlRw
+byIgLWMgLW8gc3RhdGVzLm8gc3RhdGVzLmM7IFwgdGhlbiBtdgo+IC1mICIuZGVwcy9zdGF0ZXMu
+VHBvIiAiLmRlcHMvc3RhdGVzLlBvIjsgZWxzZSBybSAtZiAiLmRlcHMvc3RhdGVzLlRwbyI7Cj4g
+ZXhpdCAxOyBmaSBzdGF0ZXMuYzogSW4gZnVuY3Rpb24g4oCYaGVhZHNldElkbGVIYW5kbGVBcHBs
+Q29ublJlceKAmToKPiBzdGF0ZXMuYzozMDA6IGVycm9yOiDigJhTRFBfTk9OX0JMT0NLSU5H4oCZ
+IHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzCj4gZnVuY3Rpb24pIHN0YXRlcy5jOjMwMDog
+ZXJyb3I6IChFYWNoIHVuZGVjbGFyZWQgaWRlbnRpZmllciBpcyByZXBvcnRlZCBvbmx5Cj4gb25j
+ZSBzdGF0ZXMuYzozMDA6IGVycm9yOiBmb3IgZWFjaCBmdW5jdGlvbiBpdCBhcHBlYXJzIGluLikK
+PgpZb3UgbmVlZCBhIGxhdGVyIHZlcnNpb24gb2YgQmx1ZXotbGlicy4gVGhlIDMuOCB2ZXJzaW9u
+IGNvbXBpbGVzIHRoZSBwbHVneiAKc3R1ZmYgZmluZS4KCkNoZWVycywKVGltCgoKLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLQpUYWtlIFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2Yg
+SVQKSm9pbiBTb3VyY2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRo
+ZSBjaGFuY2UgdG8gc2hhcmUgeW91cgpvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0
+aHJvdWdoIGJyaWVmIHN1cnZleXMgLSBhbmQgZWFybiBjYXNoCmh0dHA6Ly93d3cudGVjaHNheS5j
+b20vZGVmYXVsdC5waHA/cGFnZT1qb2luLnBocCZwPXNvdXJjZWZvcmdlJkNJRD1ERVZERVYKX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwg
+bWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xp
+c3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
