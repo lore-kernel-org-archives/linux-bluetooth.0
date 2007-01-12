@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45A7AB19.50605@pracucci.com>
-Date: Fri, 12 Jan 2007 15:36:57 +0000
-From: Marco Pracucci <development@pracucci.com>
-MIME-Version: 1.0
-To: Bluez Users ML <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] ACL link creation in userspace
+Message-ID: <BAY24-F101CCE8EEAADDA4BCDC94DF8B00@phx.gbl>
+From: "Per O" <gupe275@hotmail.com>
+To: bluez-users@lists.sourceforge.net
+Date: Fri, 12 Jan 2007 14:28:26 +0100
+Mime-Version: 1.0
+Subject: [Bluez-users] MS Bluetooth keyboard with mh1 (2.6.19)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,35 +18,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Dear Marcel,
+Hi,
 
-I would like to receive your opinion about ACL link created in
-userspace. I know that you ever discourage the creation of an ACL link
-inside an application, but I would like to better understand the reasons.
+to be able to use the scrollwheel and multimedia buttons on my "Microsoft 
+Keyboard Elite for Bluetooth" I need to apply the -mh patch.
 
-I have an application that needs to read remote features, remote version
-and search for services (SDP). Bluez provides API to read remote
-features and version, but the application should pass the ACL handle as
-argument. So, I think there are just two solutions:
-1) Get the ACL handle (ioctl), if there is already an ACL link
-2) Create an ACL link (hci_create_connection), if no ACL link has been
-established yet
+The problem is that after the keyboard has gone into "standby" and I start 
+typing again, I am unable to change window, only the window that was active 
+when I resumed the keyboard is usable.
 
-I don't want to establish the ACL link more that 1 time for remote
-device, so I think that I must create the ACL link in userspace if there
-is no ACL already established. However, I get several errors that I
-suppose are collateral effects of this solution. For example, an error
-occours if there are 2 threads (in parallel) that:
-- hci_create_connection()
-- read remote features
-- read remote version
-- sdp_connect() error: Operation already in progress
+The only way to get out of this is to click on the middle mouse button, 
+which resumes normal operations..however this also pastes whatever is in the 
+clipboard..
 
-Can you explain me why I should not create an ACL link in userspace?
-Do you have any idea how to bypass this limitation?
+Anyone know what might be causing this?
 
-Thanks,
-Marco Pracucci
+Thanks
+Per
+
+_________________________________________________________________
+Don't just search. Find. Check out the new MSN Search! 
+http://search.msn.com/
 
 
 -------------------------------------------------------------------------
