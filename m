@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4f436aae0701120859o16d8f9cbxeaa75202b818a147@mail.gmail.com>
-Date: Fri, 12 Jan 2007 18:59:19 +0200
-From: "Choi Sonim" <choisonim@gmail.com>
-To: thomas.kear@gmail.com, "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200701120955.24082.thomas.kear@gmail.com>
-MIME-Version: 1.0
-References: <4f436aae0701110833m5aa4155bxbbc61920f5421f3c@mail.gmail.com>
-	<200701120955.24082.thomas.kear@gmail.com>
-Subject: Re: [Bluez-users] Profiles on Bluez
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <45A7AB19.50605@pracucci.com>
+References: <45A7AB19.50605@pracucci.com>
+Date: Fri, 12 Jan 2007 17:12:05 +0100
+Message-Id: <1168618325.14933.16.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] ACL link creation in userspace
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,81 +20,66 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Thomas,
+Hi Marco,
 
-Thank you for the help.
+> I would like to receive your opinion about ACL link created in
+> userspace. I know that you ever discourage the creation of an ACL link
+> inside an application, but I would like to better understand the reasons.
+> 
+> I have an application that needs to read remote features, remote version
+> and search for services (SDP). Bluez provides API to read remote
+> features and version, but the application should pass the ACL handle as
+> argument. So, I think there are just two solutions:
+> 1) Get the ACL handle (ioctl), if there is already an ACL link
+> 2) Create an ACL link (hci_create_connection), if no ACL link has been
+> established yet
+> 
+> I don't want to establish the ACL link more that 1 time for remote
+> device, so I think that I must create the ACL link in userspace if there
+> is no ACL already established. However, I get several errors that I
+> suppose are collateral effects of this solution. For example, an error
+> occours if there are 2 threads (in parallel) that:
+> - hci_create_connection()
+> - read remote features
+> - read remote version
+> - sdp_connect() error: Operation already in progress
+> 
+> Can you explain me why I should not create an ACL link in userspace?
+> Do you have any idea how to bypass this limitation?
 
-I also found that BlueZ supports PAN and BNEP inherently.
+every ACL and SCO connection needs its representation inside the kernel
+and the driver model. The upper layers like L2CAP rely on this being
+handled by the kernel. This is important for establishing a L2CAP and
+for terminating them. In the case no ACL link exists the kernel has to
+create one and if the last L2CAP terminates the kernel has to start the
+disconnect timer and if no other user comes along terminate the ACL link
+to not waste power on unused piconets. This is essential and must simply
+work. The only instance that can have full control over these things is
+the kernel itself. And as you already realized you have to avoid
+parallel use. The kernel is exactly doing this. The latest kernel
+releases even do more. In case the L2CAP create will be canceled before
+the ACL link establishment succeeds, the kernel automatically cancels
+this process. This then free the Bluetooth chip for other tasks which is
+really important since the chip can only to one page or inquiry
+operation at a time. Secondly the kernel automatically retries the
+connection establishment if the Bluetooth chip indicates it was busy.
+This involves watching out for inquiry and remote name events. This all
+together makes it wrong to establish any ACL link via raw HCI commands
+from the userspace. Even in the case of hcid we moved away from doing
+this at all. It is not suitable for the userspace to keep track. Instead
+we use the L2CAP raw socket to establish the ACL link. And if hcid is
+not doing it then certainly you shouldn't do it either.
 
-can I please ask about more profiles and protocols like goep, obex, spp, hid,
-dun, spp ?
+So if you wanna do a SDP search anyway, then it is totally stupid to
+create the ACL link first. The kernel will do it for you anyway and you
+shouldn't mess it. And btw. the so needed ACL handle can be retrieved
+via socket options on the L2CAP socket that is used by SDP.
 
-Are they supported ? by whom,where ?
+Regards
 
-Thanks again !!!!
-Choi.
+Marcel
 
-On 1/11/07, Thomas Kear <thomas.kear@gmail.com> wrote:
-> SCO (handsfree), A2DP and AVRCP are supported by the bluetooth-alsa driver
-> http://bluetooth-alsa.sourceforge.net
->
-> BPP, depending on which way you want to use it, is a bit of an issue at the
-> moment.  I haven't yet found a server that lets my PC accept print requests
-> from mobile devices and print them through CUPS.  However working the other
-> way, CUPS has a bluetooth backend that supports adding queues for bluetooth
-> printers (I believe using HCRP).
->
-> OPP and FTP are handled just fine by KDE's 'kdebluetooth' package, if you have
-> it installed, bluetooth:/ in a konqueror view should give you a device
-> listing, double clicking a device icon should display supported profiles, FTP
-> is called "OBEX File Transfer".  In OPP's case, sending a file from a device
-> to the PC should automatically open a dialogue to facilitate recieving it.
-> Sending files is as easy as right clicking them in a konqueror view and
-> selecting "Actions> Send with Bluetooth...".  Gnome's bluetooth utilities
-> should have similar funtionality, I cannot comment further as I've never used
-> them.
->
-> --Thomas
->
-> On Friday 12 January 2007 5:33 am, Choi Sonim wrote:
-> > Hello ppl!
-> >
-> > What Bluetooth profile do BlueZ support ?
-> > I found some OBEX utilities (which both gnome and kde provides),
-> > and the builtin BNEP support. but that;s it. no hands-free, bpp,
-> > opp,a2dp,ftp, nothing ?
-> >
-> > I know it is high-level and everything can be written on top of bluez
-> > but i wonder what is already supported ?
-> >
-> > Thank You ppl,
-> > Choi.
-> >
-> > -------------------------------------------------------------------------
-> > Take Surveys. Earn Cash. Influence the Future of IT
-> > Join SourceForge.net's Techsay panel and you'll get the chance to share
-> > your opinions on IT & business topics through brief surveys - and earn cash
-> > http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> opinions on IT & business topics through brief surveys - and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
->
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
->
->
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
