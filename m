@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45A7D8E0.20908@xmission.com>
-Date: Fri, 12 Jan 2007 11:52:16 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+Date: Fri, 12 Jan 2007 16:25:10 +0100
+From: Stefan Seyfried <seife@suse.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <44F6B7AE.1030209@jambit.com>	<4582A310.60905@jambit.com>	<4583A020.2040808@xmission.com>	<4587D051.8080703@jambit.com>	<458864F1.4070104@xmission.com>	<4589371F.2000507@palmsource.com>	<45A54D5B.8030001@xmission.com>
-	<45A5F6DD.7020904@palmsource.com>
-In-Reply-To: <45A5F6DD.7020904@palmsource.com>
-Subject: Re: [Bluez-devel] How to use sbc.c ?
+Message-ID: <20070112152510.GB18535@suse.de>
+References: <200701081837.04388.dgollub@suse.de>
+	<20070108184701.GA12689@jh-mbp>
+	<200701090041.54299.dgollub@suse.de>
+MIME-Version: 1.0
+In-Reply-To: <200701090041.54299.dgollub@suse.de>
+Subject: Re: [Bluez-devel] Should hcid wait for dbus daemon?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,43 +22,94 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fr=E9d=E9ric
+Ping! :-)
 
-> In my investigations, I got over a 64 bits version of the codec. I =
+Any opinions on that approach? This fixes the hotplug issue for our users,
+but i want to stay as close to upstream as possible :-)
 
-> tested it on pc and arm. It gave better results than the 32 bits : the =
-
-> gain is better, the overflow do not occurs, there is still a bit of =
-
-> background noise, but not more than the 32 bits and it may be the sample =
-
-> file. It will probably consume a little bit more cpu, but I found this =
-
-> was not really noticeable (at least on my hardware). But the library =
-
-> could be changed according to needs.
+On Tue, Jan 09, 2007 at 12:41:53AM +0100, Daniel Gollub wrote:
+> On Monday 08 January 2007 19:47, Johan Hedberg wrote:
+> > Sounds like a useful feature. It should be quite simple to implement too
+> > since most of the required code already exists due to the dbus restart
+> > detection support. Feel free to provide a patch for it :)
+> How often should the daemons try to connect? Or infinitely?
+> If not infinitely, then configurable by command line parameter or fixed?
 > =
 
-> While this is not the best solution to the problem, I still think users =
+> Attachted is a _simple_ proof of concept patch which . It retries every 5 =
 
-> are complaining mainly about gain. So it could be possible to provide it =
+> seconds. After #12 unsuccessfully dbus connect, it gives up and abort (as =
 
-> as default. What about you?
+> before).
+> =
 
-We have confirmation that this stuff can be done in 32 bits but it is
-more work to get it right. I thought I was getting close back when I was
-working on it last but couldn't get over those volume/overflow problems.
-I do think the decoder was working ok in 32 bits at least.
+> Daniel
 
-We used to run everything in 64 bits. btsco/sbc would have the cvs
-history showing the older stuff.
+> Index: common/dbus.c
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> RCS file: /cvsroot/bluez/utils/common/dbus.c,v
+> retrieving revision 1.2
+> diff -u -p -r1.2 dbus.c
+> --- common/dbus.c	13 Nov 2006 07:58:40 -0000	1.2
+> +++ common/dbus.c	8 Jan 2007 22:52:18 -0000
+> @@ -39,6 +39,7 @@
+>  #include "list.h"
+>  =
 
-How about if we create a separate cvs module like "sbc64" that contains
-libsbc with a 64-bit encoder? I don't like having the implementations
-together with a bunch of conditional code choosing one over the other.
-That was really ugly and too easy to break.
+>  #define DISPATCH_TIMEOUT	0
+> +#define MAX_DBUS_RETRY		12
+>  =
 
-Brad
+>  static int name_listener_initialized =3D 0;
+>  =
+
+> @@ -485,13 +486,27 @@ static void dispatch_status_cb(DBusConne
+>  =
+
+>  DBusConnection *init_dbus(const char *name, void (*disconnect_cb)(void *=
+), void *user_data)
+>  {
+> +	int retry =3D 0;
+>  	struct disconnect_data *dc_data;
+>  	DBusConnection *conn;
+>  	DBusError err;
+>  =
+
+>  	dbus_error_init(&err);
+>  =
+
+> -	conn =3D dbus_bus_get(DBUS_BUS_SYSTEM, &err);
+> +	do {
+> +		if (dbus_error_is_set(&err))
+> +			dbus_error_free(&err);
+> +
+> +		conn =3D dbus_bus_get(DBUS_BUS_SYSTEM, &err);
+> +		if (conn)
+> +			break;
+> +
+> +		if (!retry)
+> +			info("Can't connect to DBUS. Will retry %i times.", MAX_DBUS_RETRY);
+> +
+> +		usleep(5000000);
+
+here, a
+		sleep(5);
+might be easier to read :-)
+
+> +		retry++;
+> +	} while (!conn && retry < MAX_DBUS_RETRY);
+>  =
+
+>  	if (dbus_error_is_set(&err)) {
+>  		error("Can't connect to system message bus: %s", err.message);
+-- =
+
+Stefan Seyfried
+QA / R&D Team Mobile Devices        |              "Any ideas, John?"
+SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
