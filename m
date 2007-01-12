@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <1d1502880701122216v187542ecx45af28f4da86323e@mail.gmail.com>
-Date: Sat, 13 Jan 2007 11:46:19 +0530
-From: "Prabhunath G" <prabhunath@gmail.com>
+Date: Sat, 13 Jan 2007 00:21:29 +0100
+From: Michael Mauch <michael.mauch@gmx.de>
 To: bluez-users@lists.sourceforge.net
+Message-ID: <20070112232129.GD15727@elmicha>
+References: <4f436aae0701110833m5aa4155bxbbc61920f5421f3c@mail.gmail.com>
+	<200701120955.24082.thomas.kear@gmail.com>
+	<4f436aae0701120859o16d8f9cbxeaa75202b818a147@mail.gmail.com>
+	<200701130925.10232.thomas.kear@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_55556_8000714.1168668979621"
-Subject: [Bluez-users] Object Push from Nokia N93 to BlueZ fails
+In-Reply-To: <200701130925.10232.thomas.kear@gmail.com>
+Subject: Re: [Bluez-users] Profiles on Bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,324 +19,50 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0695437681=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-------=_Part_55556_8000714.1168668979621
-Content-Type: multipart/alternative;
-	boundary="----=_Part_55557_15400953.1168668979621"
 
-------=_Part_55557_15400953.1168668979621
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+--===============0695437681==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="IS0zKkzwUGydFO0o"
 Content-Disposition: inline
 
-Dear All,
 
- I am doing an experiment to transfer file from Cellphones to Linux over BT
-using BlueZ stack available in Linux.
+--IS0zKkzwUGydFO0o
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Object Push from Nokia 93 to BlueZ fails.
+Thomas Kear wrote:
 
-1) I am able to push a file from Motorola to Linux BlueZ.
+> Someone else will have to fill in the details about DUN, bluez provides a=
+=20
+> binary called 'dund', but I don't have a clue how it works.
 
-2) But I am unable to push a file from Nokia N93 to Linux BlueZ.
+It is used for dial-up networking (LAP (LAN Access over PPP)), either
+with --listen as a server, or with --connect as a client. See e.g.
+http://synce.sourceforge.net/synce/bluetooth.php
 
-Error message displayed on Nokia 93 is "Unable to Connect".
-
-Can anyone help me, in identifying what's going wrong from the log attached
-below? Since I am new to BT, I am not yet become expert in understanding the
-BT protocol. There is something going wrong from Linux BlueZ stack, when
-Nokia
-cellphone is sending file transfer request.
-
-3) I also tried transferring files from Linux to Nokia, which works fine.
-
-HciDumps for both the file pushes are given below
-
-Note : I added a service OPUSH using "sdptool add OPUSH"
-
-Linux Kernel : 2.6.18.1
-BlueZ tools :   bluez-libs-3.7
-                     bluez-utils-3.7
-                     openobex-1.3
-                     obexftp-0.21
-
-I have attached a Advik Bluetooth USB dongle
-
-Note : File transfers work between Nokia 93 and MotoQ and also
-          File transfers work between Nokia 93 and BlueSoleil on WinXP
-
-Attached are the 2 logs with names: Nokia_to_BlueZ
-                                                     MotoQ_to_BlueZ
-
-
-
-Thanks,
-Prabhu
-
-------=_Part_55557_15400953.1168668979621
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Regards...
+		Michael
+--IS0zKkzwUGydFO0o
+Content-Type: application/pgp-signature
 Content-Disposition: inline
 
-Dear All, <br><br>&nbsp;I am doing an experiment to transfer file from Cellphones to Linux over BT<br>using BlueZ stack available in Linux.<br><br>Object Push from Nokia 93 to BlueZ fails.<br><br>1) I am able to push a file from Motorola to Linux BlueZ.
-<br><br>2) But I am unable to push a file from Nokia N93 to Linux BlueZ.<br><br>Error message displayed on Nokia 93 is &quot;Unable to Connect&quot;.<br><br>Can anyone help me, in identifying what&#39;s going wrong from the log attached
-<br>below? Since I am new to BT, I am not yet become expert in understanding the<br>BT protocol. There is something going wrong from Linux BlueZ stack, when Nokia<br>cellphone is sending file transfer request.<br><br>3) I also tried transferring files from Linux to Nokia, which works fine.
-<br><br>HciDumps for both the file pushes are given below<br><br>Note : I added a service OPUSH using &quot;sdptool add OPUSH&quot;<br><br>Linux Kernel : <a href="http://2.6.18.1">2.6.18.1</a><br>BlueZ tools :&nbsp;&nbsp; bluez-libs-3.7
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bluez-utils-3.7<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; openobex-1.3<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; obexftp-0.21<br><br>I have attached a <span style="font-weight: bold;">Advik</span> Bluetooth USB dongle<br><br>Note : File transfers work between Nokia 93 and MotoQ and also
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; File transfers work between Nokia 93 and BlueSoleil on WinXP<br><br>Attached are the 2 logs with names: Nokia_to_BlueZ<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MotoQ_to_BlueZ<br><br><br><br>Thanks,
-<br>Prabhu<br><br>
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
 
-------=_Part_55557_15400953.1168668979621--
+iD8DBQFFqBf5oNcTzNZ75u0RAohFAJ0RSNBu0RGC7zDcxnNLD9whhLE8EgCfW9EB
+3jVWd6QTxSIdiP6AOLzVt7Q=
+=fQWE
+-----END PGP SIGNATURE-----
 
-------=_Part_55556_8000714.1168668979621
-Content-Type: text/plain; name=Nokia_to_BlueZ.txt; charset=ANSI_X3.4-1968
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ewvn9043
-Content-Disposition: attachment; filename="Nokia_to_BlueZ.txt"
+--IS0zKkzwUGydFO0o--
 
-TG9ncyBmb3IgTm9raWEgdG8gTGludXggQmx1ZVoNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tDQoNCkhDSSBzbmlmZmVyIC0gQmx1ZXRvb3RoIHBhY2tldCBhbmFseXplciB2ZXIgMS4zMw0K
-ZGV2aWNlOiBoY2kwIHNuYXBfbGVuOiAxMDI4IGZpbHRlcjogMHhmZmZmZmZmZg0KPiBIQ0kgRXZl
-bnQ6IENvbm5lY3QgUmVxdWVzdCAoMHgwNCkgcGxlbiAxMA0KPCBIQ0kgQ29tbWFuZDogQWNjZXB0
-IENvbm5lY3Rpb24gUmVxdWVzdCAoMHgwMXwweDAwMDkpIHBsZW4gNw0KPiBIQ0kgRXZlbnQ6IENv
-bW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQNCj4gSENJIEV2ZW50OiBDb25uZWN0IENvbXBsZXRl
-ICgweDAzKSBwbGVuIDExDQo8IEhDSSBDb21tYW5kOiBSZWFkIFJlbW90ZSBTdXBwb3J0ZWQgRmVh
-dHVyZXMgKDB4MDF8MHgwMDFiKSBwbGVuIDINCj4gSENJIEV2ZW50OiBNYXggU2xvdHMgQ2hhbmdl
-ICgweDFiKSBwbGVuIDMNCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0
-DQo+IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gMTINCiAgICBMMkNBUChzKTog
-Q29ubmVjdCByZXE6IHBzbSAxIHNjaWQgMHgwMDQwDQo8IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFn
-cyAweDAyIGRsZW4gMTYNCiAgICBMMkNBUChzKTogQ29ubmVjdCByc3A6IGRjaWQgMHgwMDQwIHNj
-aWQgMHgwMDQwIHJlc3VsdCAwIHN0YXR1cyAwDQogICAgICBDb25uZWN0aW9uIHN1Y2Nlc3NmdWwN
-CjwgSENJIENvbW1hbmQ6IFdyaXRlIExpbmsgUG9saWN5IFNldHRpbmdzICgweDAyfDB4MDAwZCkg
-cGxlbiA0DQo+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiA2DQo8IEhD
-SSBDb21tYW5kOiBDaGFuZ2UgQ29ubmVjdGlvbiBQYWNrZXQgVHlwZSAoMHgwMXwweDAwMGYpIHBs
-ZW4gNA0KPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQNCj4gSENJIEV2
-ZW50OiBDb25uZWN0aW9uIFBhY2tldCBUeXBlIENoYW5nZWQgKDB4MWQpIHBsZW4gNQ0KPiBIQ0kg
-RXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1DQo+IEFDTCBk
-YXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gMTANCiAgICBMMkNBUChzKTogSW5mbyByZXE6
-IHR5cGUgMg0KPCBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDEyDQogICAgTDJD
-QVAocyk6IEluZm8gcnNwOiB0eXBlIDIgcmVzdWx0IDENCiAgICAgIE5vdCBzdXBwb3J0ZWQNCj4g
-SENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQ0KPiBB
-Q0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDEyDQogICAgTDJDQVAocyk6IENvbmZp
-ZyByZXE6IGRjaWQgMHgwMDQwIGZsYWdzIDB4MDAgY2xlbiAwDQo8IEFDTCBkYXRhOiBoYW5kbGUg
-MSBmbGFncyAweDAyIGRsZW4gMTQNCiAgICBMMkNBUChzKTogQ29uZmlnIHJzcDogc2NpZCAweDAw
-NDAgZmxhZ3MgMHgwMCByZXN1bHQgMCBjbGVuIDANCiAgICAgIFN1Y2Nlc3MNCjwgQUNMIGRhdGE6
-IGhhbmRsZSAxIGZsYWdzIDB4MDIgZGxlbiAxMg0KICAgIEwyQ0FQKHMpOiBDb25maWcgcmVxOiBk
-Y2lkIDB4MDA0MCBmbGFncyAweDAwIGNsZW4gMA0KPiBIQ0kgRXZlbnQ6IFJlYWQgUmVtb3RlIFN1
-cHBvcnRlZCBGZWF0dXJlcyAoMHgwYikgcGxlbiAxMQ0KPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBD
-b21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1DQo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENv
-bXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUNCj4gQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdz
-IDB4MDIgZGxlbiAxNw0KPiBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMSBkbGVuIDENCiAg
-ICBMMkNBUChzKTogQ29uZmlnIHJzcDogc2NpZCAweDAwNDAgZmxhZ3MgMHgwMCByZXN1bHQgMCBj
-bGVuIDQNCiAgICAgIFN1Y2Nlc3MNCiAgICAgIE1UVSA2NzINCj4gQUNMIGRhdGE6IGhhbmRsZSAx
-IGZsYWdzIDB4MDIgZGxlbiAxNw0KICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxlbiAxMyBbcHNt
-IDFdDQogICAgICAgIFNEUCBTUyBSZXE6IHRpZCAweDEgbGVuIDB4OA0KICAgICAgICAgIHBhdCB1
-dWlkLTE2IDB4MTEwNSAoT0JFWE9ialB1c2gpDQogICAgICAgICAgbWF4IDY1NTM1DQogICAgICAg
-ICAgY29udCAwMA0KPCBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDE4DQogICAg
-TDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDE0IFtwc20gMV0NCiAgICAgICAgU0RQIFNTIFJzcDog
-dGlkIDB4MSBsZW4gMHg5DQogICAgICAgICAgY291bnQgMQ0KICAgICAgICAgIGhhbmRsZSAweDEw
-MDAxDQogICAgICAgICAgY29udCAwMA0KPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQg
-UGFja2V0cyAoMHgxMykgcGxlbiA1DQo+IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRs
-ZW4gMTcNCj4gQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4MDEgZGxlbiA0DQogICAgTDJDQVAo
-ZCk6IGNpZCAweDAwNDAgbGVuIDE3IFtwc20gMV0NCiAgICAgICAgU0RQIFNBIFJlcTogdGlkIDB4
-MiBsZW4gMHhjDQogICAgICAgICAgaGFuZGxlIDB4MTAwMDENCiAgICAgICAgICBtYXggMTAyNA0K
-ICAgICAgICAgIGFpZChzKSAweDAwMDQgKFByb3RvY29sRGVzY0xpc3QpDQogICAgICAgICAgY29u
-dCAwMA0KPCBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDM2DQogICAgTDJDQVAo
-ZCk6IGNpZCAweDAwNDAgbGVuIDMyIFtwc20gMV0NCiAgICAgICAgU0RQIFNBIFJzcDogdGlkIDB4
-MiBsZW4gMHgxYg0KICAgICAgICAgIGNvdW50IDI0DQogICAgICAgICAgYWlkIDB4MDAwNCAoUHJv
-dG9jb2xEZXNjTGlzdCkNCiAgICAgICAgICAgICA8IDwgdXVpZC0xNiAweDAxMDAgKEwyQ0FQKSA+
-IDwNCiAgICAgICAgICAgICB1dWlkLTE2IDB4MDAwMyAoUkZDT01NKSB1aW50IDB4OSA+IDwNCiAg
-ICAgICAgICAgICB1dWlkLTE2IDB4MDAwOCAoT0JFWCkgPiA+DQogICAgICAgICAgY29udCAwMA0K
-PiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1DQo+
-IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gMTINCiAgICBMMkNBUChzKTogQ29u
-bmVjdCByZXE6IHBzbSAzIHNjaWQgMHgwMDQxDQo8IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAw
-eDAyIGRsZW4gMTYNCiAgICBMMkNBUChzKTogQ29ubmVjdCByc3A6IGRjaWQgMHgwMDQxIHNjaWQg
-MHgwMDQxIHJlc3VsdCAwIHN0YXR1cyAwDQogICAgICBDb25uZWN0aW9uIHN1Y2Nlc3NmdWwNCj4g
-SENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQ0KPiBB
-Q0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDEyDQogICAgTDJDQVAocyk6IENvbmZp
-ZyByZXE6IGRjaWQgMHgwMDQxIGZsYWdzIDB4MDAgY2xlbiAwDQo8IEFDTCBkYXRhOiBoYW5kbGUg
-MSBmbGFncyAweDAyIGRsZW4gMTQNCiAgICBMMkNBUChzKTogQ29uZmlnIHJzcDogc2NpZCAweDAw
-NDEgZmxhZ3MgMHgwMCByZXN1bHQgMCBjbGVuIDANCiAgICAgIFN1Y2Nlc3MNCjwgQUNMIGRhdGE6
-IGhhbmRsZSAxIGZsYWdzIDB4MDIgZGxlbiAxNg0KICAgIEwyQ0FQKHMpOiBDb25maWcgcmVxOiBk
-Y2lkIDB4MDA0MSBmbGFncyAweDAwIGNsZW4gNA0KICAgICAgTVRVIDEwMTMNCj4gSENJIEV2ZW50
-OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQ0KPiBIQ0kgRXZlbnQ6
-IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1DQo+IEFDTCBkYXRhOiBo
-YW5kbGUgMSBmbGFncyAweDAyIGRsZW4gMTgNCiAgICBMMkNBUChzKTogQ29uZmlnIHJzcDogc2Np
-ZCAweDAwNDEgZmxhZ3MgMHgwMCByZXN1bHQgMCBjbGVuIDQNCiAgICAgIFN1Y2Nlc3MNCiAgICAg
-IE1UVSA2NzINCj4gQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4MDIgZGxlbiA4DQogICAgTDJD
-QVAoZCk6IGNpZCAweDAwNDEgbGVuIDQgW3BzbSAzXQ0KICAgICAgUkZDT01NKHMpOiBTQUJNOiBj
-ciAxIGRsY2kgMCBwZiAxIGlsZW4gMCBmY3MgMHgxYw0KPCBBQ0wgZGF0YTogaGFuZGxlIDEgZmxh
-Z3MgMHgwMiBkbGVuIDgNCiAgICBMMkNBUChkKTogY2lkIDB4MDA0MSBsZW4gNCBbcHNtIDNdDQog
-ICAgICBSRkNPTU0ocyk6IFVBOiBjciAxIGRsY2kgMCBwZiAxIGlsZW4gMCBmY3MgMHhkNw0KPiBI
-Q0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1DQo+IEFD
-TCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gMTgNCiAgICBMMkNBUChkKTogY2lkIDB4
-MDA0MSBsZW4gMTQgW3BzbSAzXQ0KICAgICAgUkZDT01NKHMpOiBQTiBDTUQ6IGNyIDEgZGxjaSAw
-IHBmIDAgaWxlbiAxMCBmY3MgMHg3MCBtY2NfbGVuIDgNCiAgICAgIGRsY2kgMTggZnJhbWVfdHlw
-ZSAwIGNyZWRpdF9mbG93IDE1IHByaSAwIGFja190aW1lciAwDQogICAgICBmcmFtZV9zaXplIDY2
-NyBtYXhfcmV0cmFucyAwIGNyZWRpdHMgMw0KPCBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgw
-MiBkbGVuIDgNCiAgICBMMkNBUChkKTogY2lkIDB4MDA0MSBsZW4gNCBbcHNtIDNdDQogICAgICBS
-RkNPTU0ocyk6IERNOiBjciAxIGRsY2kgMTggcGYgMSBpbGVuIDAgZmNzIDB4MTgNCj4gSENJIEV2
-ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQ0KPiBBQ0wgZGF0
-YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDEyDQogICAgTDJDQVAocyk6IERpc2Nvbm4gcmVx
-OiBkY2lkIDB4MDA0MSBzY2lkIDB4MDA0MQ0KPCBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgw
-MiBkbGVuIDEyDQogICAgTDJDQVAocyk6IERpc2Nvbm4gcnNwOiBkY2lkIDB4MDA0MSBzY2lkIDB4
-MDA0MQ0KPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxl
-biA1DQo+IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gMTINCiAgICBMMkNBUChz
-KTogRGlzY29ubiByZXE6IGRjaWQgMHgwMDQwIHNjaWQgMHgwMDQwDQo8IEFDTCBkYXRhOiBoYW5k
-bGUgMSBmbGFncyAweDAyIGRsZW4gMTINCiAgICBMMkNBUChzKTogRGlzY29ubiByc3A6IGRjaWQg
-MHgwMDQwIHNjaWQgMHgwMDQwDQo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNr
-ZXRzICgweDEzKSBwbGVuIDUNCjwgSENJIENvbW1hbmQ6IERpc2Nvbm5lY3QgKDB4MDF8MHgwMDA2
-KSBwbGVuIDMNCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0DQo+IEhD
-SSBFdmVudDogRGlzY29ubiBDb21wbGV0ZSAoMHgwNSkgcGxlbiA0DQoNCi0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tDQoNCg==
-------=_Part_55556_8000714.1168668979621
-Content-Type: text/plain; name=MotoQ_to_BlueZ.txt; charset=ANSI_X3.4-1968
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ewvn9hh3
-Content-Disposition: attachment; filename="MotoQ_to_BlueZ.txt"
 
-TG9ncyBmb3IgTW90b3JvbGEgdG8gTGludXggQmx1ZVoNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLQ0KDQpIQ0kgc25pZmZlciAtIEJsdWV0b290aCBwYWNrZXQgYW5hbHl6ZXIgdmVy
-IDEuMzMNCmRldmljZTogaGNpMCBzbmFwX2xlbjogMTAyOCBmaWx0ZXI6IDB4ZmZmZmZmZmYNCj4g
-SENJIEV2ZW50OiBDb25uZWN0IFJlcXVlc3QgKDB4MDQpIHBsZW4gMTANCjwgSENJIENvbW1hbmQ6
-IEFjY2VwdCBDb25uZWN0aW9uIFJlcXVlc3QgKDB4MDF8MHgwMDA5KSBwbGVuIDcNCj4gSENJIEV2
-ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0DQo+IEhDSSBFdmVudDogQ29ubmVjdCBD
-b21wbGV0ZSAoMHgwMykgcGxlbiAxMQ0KPCBIQ0kgQ29tbWFuZDogUmVhZCBSZW1vdGUgU3VwcG9y
-dGVkIEZlYXR1cmVzICgweDAxfDB4MDAxYikgcGxlbiAyDQo+IEhDSSBFdmVudDogQ29tbWFuZCBT
-dGF0dXMgKDB4MGYpIHBsZW4gNA0KPCBIQ0kgQ29tbWFuZDogV3JpdGUgTGluayBQb2xpY3kgU2V0
-dGluZ3MgKDB4MDJ8MHgwMDBkKSBwbGVuIDQNCj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBsZXRl
-ICgweDBlKSBwbGVuIDYNCjwgSENJIENvbW1hbmQ6IENoYW5nZSBDb25uZWN0aW9uIFBhY2tldCBU
-eXBlICgweDAxfDB4MDAwZikgcGxlbiA0DQo+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0dXMgKDB4
-MGYpIHBsZW4gNA0KPiBIQ0kgRXZlbnQ6IE1heCBTbG90cyBDaGFuZ2UgKDB4MWIpIHBsZW4gMw0K
-PiBBQ0wgZGF0YTogaGFuZGxlIDUgZmxhZ3MgMHgwMiBkbGVuIDEyDQogICAgTDJDQVAocyk6IENv
-bm5lY3QgcmVxOiBwc20gMSBzY2lkIDB4MDA0Mg0KPCBBQ0wgZGF0YTogaGFuZGxlIDUgZmxhZ3Mg
-MHgwMiBkbGVuIDE2DQogICAgTDJDQVAocyk6IENvbm5lY3QgcnNwOiBkY2lkIDB4MDA0MCBzY2lk
-IDB4MDA0MiByZXN1bHQgMCBzdGF0dXMgMA0KICAgICAgQ29ubmVjdGlvbiBzdWNjZXNzZnVsDQo+
-IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUNCj4g
-QUNMIGRhdGE6IGhhbmRsZSA1IGZsYWdzIDB4MDIgZGxlbiAxNw0KPiBBQ0wgZGF0YTogaGFuZGxl
-IDUgZmxhZ3MgMHgwMSBkbGVuIDMNCiAgICBMMkNBUChzKTogQ29uZmlnIHJlcTogZGNpZCAweDAw
-NDAgZmxhZ3MgMHgwMCBjbGVuIDgNCiAgICAgIE1UVSA1MTIgRmx1c2hUTyA2NTUzNQ0KPCBBQ0wg
-ZGF0YTogaGFuZGxlIDUgZmxhZ3MgMHgwMiBkbGVuIDE0DQogICAgTDJDQVAocyk6IENvbmZpZyBy
-c3A6IHNjaWQgMHgwMDQyIGZsYWdzIDB4MDAgcmVzdWx0IDAgY2xlbiAwDQogICAgICBTdWNjZXNz
-DQo8IEFDTCBkYXRhOiBoYW5kbGUgNSBmbGFncyAweDAyIGRsZW4gMTINCiAgICBMMkNBUChzKTog
-Q29uZmlnIHJlcTogZGNpZCAweDAwNDIgZmxhZ3MgMHgwMCBjbGVuIDANCj4gSENJIEV2ZW50OiBN
-YXggU2xvdHMgQ2hhbmdlICgweDFiKSBwbGVuIDMNCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29t
-cGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQ0KPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21w
-bGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1DQo+IEFDTCBkYXRhOiBoYW5kbGUgNSBmbGFncyAw
-eDAyIGRsZW4gMTQNCiAgICBMMkNBUChzKTogQ29uZmlnIHJzcDogc2NpZCAweDAwNDAgZmxhZ3Mg
-MHgwMCByZXN1bHQgMCBjbGVuIDANCiAgICAgIFN1Y2Nlc3MNCj4gQUNMIGRhdGE6IGhhbmRsZSA1
-IGZsYWdzIDB4MDIgZGxlbiAxNw0KICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxlbiAxMyBbcHNt
-IDFdDQogICAgICAgIFNEUCBTUyBSZXE6IHRpZCAweDAgbGVuIDB4OA0KICAgICAgICAgIHBhdCB1
-dWlkLTE2IDB4MTAwMiAoUHViQnJ3c0dycCkNCiAgICAgICAgICBtYXggMjANCiAgICAgICAgICBj
-b250IDAwDQo8IEFDTCBkYXRhOiBoYW5kbGUgNSBmbGFncyAweDAyIGRsZW4gMTgNCiAgICBMMkNB
-UChkKTogY2lkIDB4MDA0MiBsZW4gMTQgW3BzbSAxXQ0KICAgICAgICBTRFAgU1MgUnNwOiB0aWQg
-MHgwIGxlbiAweDkNCiAgICAgICAgICBjb3VudCAxDQogICAgICAgICAgaGFuZGxlIDB4MTAwMDAN
-CiAgICAgICAgICBjb250IDAwDQo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNr
-ZXRzICgweDEzKSBwbGVuIDUNCj4gSENJIEV2ZW50OiBSZWFkIFJlbW90ZSBTdXBwb3J0ZWQgRmVh
-dHVyZXMgKDB4MGIpIHBsZW4gMTENCj4gQUNMIGRhdGE6IGhhbmRsZSA1IGZsYWdzIDB4MDIgZGxl
-biAyMw0KICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxlbiAxOSBbcHNtIDFdDQogICAgICAgIFNE
-UCBTQSBSZXE6IHRpZCAweDEgbGVuIDB4ZQ0KICAgICAgICAgIGhhbmRsZSAweDEwMDAwDQogICAg
-ICAgICAgbWF4IDQ5Ng0KICAgICAgICAgIGFpZChzKSAweDAwMDAgLSAweGZmZmYNCiAgICAgICAg
-ICBjb250IDAwDQo8IEFDTCBkYXRhOiBoYW5kbGUgNSBmbGFncyAweDAyIGRsZW4gOTYNCiAgICBM
-MkNBUChkKTogY2lkIDB4MDA0MiBsZW4gOTIgW3BzbSAxXQ0KICAgICAgICBTRFAgU0EgUnNwOiB0
-aWQgMHgxIGxlbiAweDU3DQogICAgICAgICAgY291bnQgODQNCiAgICAgICAgICBhaWQgMHgwMDAw
-IChTcnZSZWNIbmRsKQ0KICAgICAgICAgICAgIHVpbnQgMHgxMDAwMA0KICAgICAgICAgIGFpZCAw
-eDAwMDEgKFNydkNsYXNzSURMaXN0KQ0KICAgICAgICAgICAgIDwgdXVpZC0xNiAweDExMDYgKE9C
-RVhPYmpUcm5zZikgPg0KICAgICAgICAgIGFpZCAweDAwMDQgKFByb3RvY29sRGVzY0xpc3QpDQog
-ICAgICAgICAgICAgPCA8IHV1aWQtMTYgMHgwMTAwIChMMkNBUCkgPiA8DQogICAgICAgICAgICAg
-dXVpZC0xNiAweDAwMDMgKFJGQ09NTSkgdWludCAweGEgPiA8DQogICAgICAgICAgICAgdXVpZC0x
-NiAweDAwMDggKE9CRVgpID4gPg0KICAgICAgICAgIGFpZCAweDAwMDUgKEJyd0dycExpc3QpDQog
-ICAgICAgICAgICAgPCB1dWlkLTE2IDB4MTAwMiAoUHViQnJ3c0dycCkgPg0KICAgICAgICAgIGFp
-ZCAweDAwMDkgKEJUUHJvZmlsZURlc2NMaXN0KQ0KICAgICAgICAgICAgIDwgPCB1dWlkLTE2IDB4
-MTEwNiAoT0JFWE9ialRybnNmKSB1aW50IDB4MTAwID4gPg0KICAgICAgICAgIGFpZCAweDAxMDAg
-KFNydk5hbWUpDQogICAgICAgICAgICAgc3RyICJPQkVYIEZpbGUgVHJhbnNmZXIiDQogICAgICAg
-ICAgY29udCAwMA0KPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgx
-MykgcGxlbiA1DQo+IEFDTCBkYXRhOiBoYW5kbGUgNSBmbGFncyAweDAyIGRsZW4gMTINCiAgICBM
-MkNBUChzKTogRGlzY29ubiByZXE6IGRjaWQgMHgwMDQwIHNjaWQgMHgwMDQyDQo8IEFDTCBkYXRh
-OiBoYW5kbGUgNSBmbGFncyAweDAyIGRsZW4gMTINCiAgICBMMkNBUChzKTogRGlzY29ubiByc3A6
-IGRjaWQgMHgwMDQwIHNjaWQgMHgwMDQyDQo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRl
-ZCBQYWNrZXRzICgweDEzKSBwbGVuIDUNCj4gSENJIEV2ZW50OiBEaXNjb25uIENvbXBsZXRlICgw
-eDA1KSBwbGVuIDQNCj4gSENJIEV2ZW50OiBDb25uZWN0IFJlcXVlc3QgKDB4MDQpIHBsZW4gMTAN
-CjwgSENJIENvbW1hbmQ6IEFjY2VwdCBDb25uZWN0aW9uIFJlcXVlc3QgKDB4MDF8MHgwMDA5KSBw
-bGVuIDcNCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0DQo+IEhDSSBF
-dmVudDogQ29ubmVjdCBDb21wbGV0ZSAoMHgwMykgcGxlbiAxMQ0KPCBIQ0kgQ29tbWFuZDogUmVh
-ZCBSZW1vdGUgU3VwcG9ydGVkIEZlYXR1cmVzICgweDAxfDB4MDAxYikgcGxlbiAyDQo+IEhDSSBF
-dmVudDogTWF4IFNsb3RzIENoYW5nZSAoMHgxYikgcGxlbiAzDQo+IEhDSSBFdmVudDogQ29tbWFu
-ZCBTdGF0dXMgKDB4MGYpIHBsZW4gNA0KPCBIQ0kgQ29tbWFuZDogV3JpdGUgTGluayBQb2xpY3kg
-U2V0dGluZ3MgKDB4MDJ8MHgwMDBkKSBwbGVuIDQNCj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBs
-ZXRlICgweDBlKSBwbGVuIDYNCjwgSENJIENvbW1hbmQ6IENoYW5nZSBDb25uZWN0aW9uIFBhY2tl
-dCBUeXBlICgweDAxfDB4MDAwZikgcGxlbiA0DQo+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0dXMg
-KDB4MGYpIHBsZW4gNA0KPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxldGUgKDB4MGUpIHBsZW4g
-Ng0KPCBIQ0kgQ29tbWFuZDogQ2hhbmdlIENvbm5lY3Rpb24gUGFja2V0IFR5cGUgKDB4MDF8MHgw
-MDBmKSBwbGVuIDQNCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0DQo+
-IEhDSSBFdmVudDogQ29ubmVjdGlvbiBQYWNrZXQgVHlwZSBDaGFuZ2VkICgweDFkKSBwbGVuIDUN
-Cj4gQUNMIGRhdGE6IGhhbmRsZSA2IGZsYWdzIDB4MDIgZGxlbiAxMg0KICAgIEwyQ0FQKHMpOiBD
-b25uZWN0IHJlcTogcHNtIDEgc2NpZCAweDAwNDMNCjwgQUNMIGRhdGE6IGhhbmRsZSA2IGZsYWdz
-IDB4MDIgZGxlbiAxNg0KICAgIEwyQ0FQKHMpOiBDb25uZWN0IHJzcDogZGNpZCAweDAwNDAgc2Np
-ZCAweDAwNDMgcmVzdWx0IDAgc3RhdHVzIDANCiAgICAgIENvbm5lY3Rpb24gc3VjY2Vzc2Z1bA0K
-PiBIQ0kgRXZlbnQ6IE1heCBTbG90cyBDaGFuZ2UgKDB4MWIpIHBsZW4gMw0KPiBIQ0kgRXZlbnQ6
-IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1DQo+IEFDTCBkYXRhOiBo
-YW5kbGUgNiBmbGFncyAweDAyIGRsZW4gMTcNCj4gQUNMIGRhdGE6IGhhbmRsZSA2IGZsYWdzIDB4
-MDEgZGxlbiAzDQogICAgTDJDQVAocyk6IENvbmZpZyByZXE6IGRjaWQgMHgwMDQwIGZsYWdzIDB4
-MDAgY2xlbiA4DQogICAgICBNVFUgNTEyIEZsdXNoVE8gNjU1MzUNCjwgQUNMIGRhdGE6IGhhbmRs
-ZSA2IGZsYWdzIDB4MDIgZGxlbiAxNA0KICAgIEwyQ0FQKHMpOiBDb25maWcgcnNwOiBzY2lkIDB4
-MDA0MyBmbGFncyAweDAwIHJlc3VsdCAwIGNsZW4gMA0KICAgICAgU3VjY2Vzcw0KPCBBQ0wgZGF0
-YTogaGFuZGxlIDYgZmxhZ3MgMHgwMiBkbGVuIDEyDQogICAgTDJDQVAocyk6IENvbmZpZyByZXE6
-IGRjaWQgMHgwMDQzIGZsYWdzIDB4MDAgY2xlbiAwDQo+IEhDSSBFdmVudDogUmVhZCBSZW1vdGUg
-U3VwcG9ydGVkIEZlYXR1cmVzICgweDBiKSBwbGVuIDExDQo+IEhDSSBFdmVudDogTnVtYmVyIG9m
-IENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUNCj4gSENJIEV2ZW50OiBOdW1iZXIgb2Yg
-Q29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQ0KPiBBQ0wgZGF0YTogaGFuZGxlIDYgZmxh
-Z3MgMHgwMiBkbGVuIDE0DQogICAgTDJDQVAocyk6IENvbmZpZyByc3A6IHNjaWQgMHgwMDQwIGZs
-YWdzIDB4MDAgcmVzdWx0IDAgY2xlbiAwDQogICAgICBTdWNjZXNzDQo+IEFDTCBkYXRhOiBoYW5k
-bGUgNiBmbGFncyAweDAyIGRsZW4gMTcNCiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4gMTMg
-W3BzbSAxXQ0KICAgICAgICBTRFAgU1MgUmVxOiB0aWQgMHgwIGxlbiAweDgNCiAgICAgICAgICBw
-YXQgdXVpZC0xNiAweDExMDYgKE9CRVhPYmpUcm5zZikNCiAgICAgICAgICBtYXggMjANCiAgICAg
-ICAgICBjb250IDAwDQo8IEFDTCBkYXRhOiBoYW5kbGUgNiBmbGFncyAweDAyIGRsZW4gMTgNCiAg
-ICBMMkNBUChkKTogY2lkIDB4MDA0MyBsZW4gMTQgW3BzbSAxXQ0KICAgICAgICBTRFAgU1MgUnNw
-OiB0aWQgMHgwIGxlbiAweDkNCiAgICAgICAgICBjb3VudCAxDQogICAgICAgICAgaGFuZGxlIDB4
-MTAwMDANCiAgICAgICAgICBjb250IDAwDQo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRl
-ZCBQYWNrZXRzICgweDEzKSBwbGVuIDUNCj4gQUNMIGRhdGE6IGhhbmRsZSA2IGZsYWdzIDB4MDIg
-ZGxlbiAyMw0KICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxlbiAxOSBbcHNtIDFdDQogICAgICAg
-IFNEUCBTQSBSZXE6IHRpZCAweDEgbGVuIDB4ZQ0KICAgICAgICAgIGhhbmRsZSAweDEwMDAwDQog
-ICAgICAgICAgbWF4IDQ5Ng0KICAgICAgICAgIGFpZChzKSAweDAwMDAgLSAweGZmZmYNCiAgICAg
-ICAgICBjb250IDAwDQogICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDE5IFtwc20gMV0NCiAg
-ICAgICAgU0RQIFNBIFJlcTogdGlkIDB4MSBsZW4gMHhlDQogICAgICAgICAgaGFuZGxlIDB4MTAw
-MDANCiAgICAgICAgICBtYXggNDk2DQogICAgICAgICAgYWlkKHMpIDB4MDAwMCAtIDB4ZmZmZg0K
-ICAgICAgICAgIGNvbnQgMDANCjwgQUNMIGRhdGE6IGhhbmRsZSA2IGZsYWdzIDB4MDIgZGxlbiA5
-Ng0KICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQzIGxlbiA5MiBbcHNtIDFdDQogICAgICAgIFNEUCBT
-QSBSc3A6IHRpZCAweDEgbGVuIDB4NTcNCiAgICAgICAgICBjb3VudCA4NA0KICAgICAgICAgIGFp
-ZCAweDAwMDAgKFNydlJlY0huZGwpDQogICAgICAgICAgICAgdWludCAweDEwMDAwDQogICAgICAg
-ICAgYWlkIDB4MDAwMSAoU3J2Q2xhc3NJRExpc3QpDQogICAgICAgICAgICAgPCB1dWlkLTE2IDB4
-MTEwNiAoT0JFWE9ialRybnNmKSA+DQogICAgICAgICAgYWlkIDB4MDAwNCAoUHJvdG9jb2xEZXNj
-TGlzdCkNCiAgICAgICAgICAgICA8IDwgdXVpZC0xNiAweDAxMDAgKEwyQ0FQKSA+IDwNCiAgICAg
-ICAgICAgICB1dWlkLTE2IDB4MDAwMyAoUkZDT01NKSB1aW50IDB4YSA+IDwNCiAgICAgICAgICAg
-ICB1dWlkLTE2IDB4MDAwOCAoT0JFWCkgPiA+DQogICAgICAgICAgYWlkIDB4MDAwNSAoQnJ3R3Jw
-TGlzdCkNCiAgICAgICAgICAgICA8IHV1aWQtMTYgMHgxMDAyIChQdWJCcndzR3JwKSA+DQogICAg
-ICAgICAgYWlkIDB4MDAwOSAoQlRQcm9maWxlRGVzY0xpc3QpDQogICAgICAgICAgICAgPCA8IHV1
-aWQtMTYgMHgxMTA2IChPQkVYT2JqVHJuc2YpIHVpbnQgMHgxMDAgPiA+DQogICAgICAgICAgYWlk
-IDB4MDEwMCAoU3J2TmFtZSkNCiAgICAgICAgICAgICBzdHIgIk9CRVggRmlsZSBUcmFuc2ZlciIN
-CiAgICAgICAgICBjb250IDAwDQo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNr
-ZXRzICgweDEzKSBwbGVuIDUNCj4gQUNMIGRhdGE6IGhhbmRsZSA2IGZsYWdzIDB4MDIgZGxlbiAx
-Mg0KICAgIEwyQ0FQKHMpOiBEaXNjb25uIHJlcTogZGNpZCAweDAwNDAgc2NpZCAweDAwNDMNCjwg
-QUNMIGRhdGE6IGhhbmRsZSA2IGZsYWdzIDB4MDIgZGxlbiAxMg0KICAgIEwyQ0FQKHMpOiBEaXNj
-b25uIHJzcDogZGNpZCAweDAwNDAgc2NpZCAweDAwNDMNCj4gSENJIEV2ZW50OiBOdW1iZXIgb2Yg
-Q29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQ0KPiBBQ0wgZGF0YTogaGFuZGxlIDYgZmxh
-Z3MgMHgwMiBkbGVuIDEyDQogICAgTDJDQVAocyk6IENvbm5lY3QgcmVxOiBwc20gMyBzY2lkIDB4
-MDA0NA0KPCBBQ0wgZGF0YTogaGFuZGxlIDYgZmxhZ3MgMHgwMiBkbGVuIDE2DQogICAgTDJDQVAo
-cyk6IENvbm5lY3QgcnNwOiBkY2lkIDB4MDA0MCBzY2lkIDB4MDA0NCByZXN1bHQgMCBzdGF0dXMg
-MA0KICAgICAgQ29ubmVjdGlvbiBzdWNjZXNzZnVsDQo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENv
-bXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUNCj4gQUNMIGRhdGE6IGhhbmRsZSA2IGZsYWdz
-IDB4MDIgZGxlbiAxNg0KICAgIEwyQ0FQKHMpOiBDb25maWcgcmVxOiBkY2lkIDB4MDA0MCBmbGFn
-cyAweDAwIGNsZW4gNA0KICAgICAgTVRVIDE2OTENCjwgQUNMIGRhdGE6IGhhbmRsZSA2IGZsYWdz
-IDB4MDIgZGxlbiAxNA0KICAgIEwyQ0FQKHMpOiBDb25maWcgcnNwOiBzY2lkIDB4MDA0NCBmbGFn
-cyAweDAwIHJlc3VsdCAwIGNsZW4gMA0KICAgICAgU3VjY2Vzcw0KPCBBQ0wgZGF0YTogaGFuZGxl
-IDYgZmxhZ3MgMHgwMiBkbGVuIDE2DQogICAgTDJDQVAocyk6IENvbmZpZyByZXE6IGRjaWQgMHgw
-MDQ0IGZsYWdzIDB4MDAgY2xlbiA0DQogICAgICBNVFUgMTAxMw0KPiBIQ0kgRXZlbnQ6IE51bWJl
-ciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1DQoNCg==
-------=_Part_55556_8000714.1168668979621
+--===============0695437681==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -344,7 +73,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-------=_Part_55556_8000714.1168668979621
+--===============0695437681==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -355,4 +84,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-------=_Part_55556_8000714.1168668979621--
+--===============0695437681==--
