@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45ABCBF4.3030003@xmission.com>
-Date: Mon, 15 Jan 2007 11:46:12 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45ABC674.6000402@xmission.com> <1168886146.31200.12.camel@violet>
-In-Reply-To: <1168886146.31200.12.camel@violet>
+In-Reply-To: <45ABC674.6000402@xmission.com>
+References: <45ABC674.6000402@xmission.com>
+Date: Mon, 15 Jan 2007 19:35:46 +0100
+Message-Id: <1168886146.31200.12.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] no-install clients in sbc project
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,20 +20,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Brad,
+
+> Is there a better way to put sbcenc and sbcdec into the sbc project and
+> have them link than this? It seems a little underhanded to link libsbc.a
+> this way:
+> 
+> Index: src/Makefile.am
+> ===================================================================
+> RCS file: /cvsroot/sbc/sbc/src/Makefile.am,v
+> retrieving revision 1.3
+> diff -u -r1.3 Makefile.am
+> --- src/Makefile.am     18 Feb 2006 22:19:47 -0000      1.3
+> +++ src/Makefile.am     15 Jan 2007 18:20:44 -0000
+> @@ -1,4 +1,6 @@
+> 
+> -bin_PROGRAMS = sbcinfo
+> +bin_PROGRAMS = sbcinfo sbcenc sbcdec
+> +sbcenc_LDADD = ../lib/.libs/libsbc.a
+> +sbcdec_LDADD = ../lib/.libs/libsbc.a
+> 
+>  MAINTAINERCLEANFILES = Makefile.in
+
+that is totally wrong. Tell me what you are trying to achieve and I tell
+you the autoconf/automake trick.
+
+Regards
+
 Marcel
 
-> that is totally wrong. Tell me what you are trying to achieve and I tell
-> you the autoconf/automake trick.
 
-I thought so.
-
-I want to put sbcenc and sbcdec into the sbc module (I don't care where)
-so 'make' will rebuild them against libsbc.a whenever I've changed a
-part of the codec. I use these two over and over when working on the codec.
-
-The idea is sbcenc/dec will never be installed anywhere.
-
-Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
