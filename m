@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <45ABC826.10404@xmission.com>
+Date: Mon, 15 Jan 2007 11:29:58 -0700
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45ABC674.6000402@xmission.com>
-References: <45ABC674.6000402@xmission.com>
-Date: Mon, 15 Jan 2007 19:35:46 +0100
-Message-Id: <1168886146.31200.12.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] no-install clients in sbc project
+References: <200701150257.21542.bluez-devel@huitl.de>	<45AB5679.8050606@palmsource.com>
+	<200701151909.39305.bluez-devel@huitl.de>
+In-Reply-To: <200701151909.39305.bluez-devel@huitl.de>
+Subject: Re: [Bluez-devel] a2dpd: audio connection breaks every 300 seconds
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,36 +21,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad,
+Robert
 
-> Is there a better way to put sbcenc and sbcdec into the sbc project and
-> have them link than this? It seems a little underhanded to link libsbc.a
-> this way:
-> 
-> Index: src/Makefile.am
-> ===================================================================
-> RCS file: /cvsroot/sbc/sbc/src/Makefile.am,v
-> retrieving revision 1.3
-> diff -u -r1.3 Makefile.am
-> --- src/Makefile.am     18 Feb 2006 22:19:47 -0000      1.3
-> +++ src/Makefile.am     15 Jan 2007 18:20:44 -0000
-> @@ -1,4 +1,6 @@
-> 
-> -bin_PROGRAMS = sbcinfo
-> +bin_PROGRAMS = sbcinfo sbcenc sbcdec
-> +sbcenc_LDADD = ../lib/.libs/libsbc.a
-> +sbcdec_LDADD = ../lib/.libs/libsbc.a
-> 
->  MAINTAINERCLEANFILES = Makefile.in
+> On the other hand, why is a scan able to interfere with communication? Is this 
+> behavior by design (because the hardware can only either scan or send/receive 
+> data)?
 
-that is totally wrong. Tell me what you are trying to achieve and I tell
-you the autoconf/automake trick.
+a scan hijacks the radio briefly and I believe there is no way around it.
 
-Regards
+there's one unrelated thing you could try. Do you have any other
+bluetooth devices? I had to force my computer to be master in hcid.conf:
 
-Marcel
+lm accept,master;
+lp hold,sniff,park;
 
+otherwise moving the bluetooth mouse or using bluetooth dun would
+interrupt a2dp.
 
+brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
