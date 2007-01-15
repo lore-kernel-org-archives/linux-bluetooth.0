@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45ABC674.6000402@xmission.com>
-Date: Mon, 15 Jan 2007 11:22:44 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Robert Huitl <bluez-devel@huitl.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] no-install clients in sbc project
+Date: Mon, 15 Jan 2007 19:09:38 +0100
+References: <200701150257.21542.bluez-devel@huitl.de>
+	<45AB5679.8050606@palmsource.com>
+In-Reply-To: <45AB5679.8050606@palmsource.com>
+MIME-Version: 1.0
+Message-Id: <200701151909.39305.bluez-devel@huitl.de>
+Subject: Re: [Bluez-devel] a2dpd: audio connection breaks every 300 seconds
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,39 +17,42 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel,
+Hi Fr=E9d=E9ric,
 
-Is there a better way to put sbcenc and sbcdec into the sbc project and
-have them link than this? It seems a little underhanded to link libsbc.a
-this way:
+> Do you have another program using BlueZ?
 
-Index: src/Makefile.am
-===================================================================
-RCS file: /cvsroot/sbc/sbc/src/Makefile.am,v
-retrieving revision 1.3
-diff -u -r1.3 Makefile.am
---- src/Makefile.am     18 Feb 2006 22:19:47 -0000      1.3
-+++ src/Makefile.am     15 Jan 2007 18:20:44 -0000
-@@ -1,4 +1,6 @@
+That's it! Some program is periodically scanning for bluetooth devices. Whe=
+n I =
 
--bin_PROGRAMS = sbcinfo
-+bin_PROGRAMS = sbcinfo sbcenc sbcdec
-+sbcenc_LDADD = ../lib/.libs/libsbc.a
-+sbcdec_LDADD = ../lib/.libs/libsbc.a
+run "hcitool scan" manually, I immediately get the choking sound and the =
 
- MAINTAINERCLEANFILES = Makefile.in
+write() call fails.
 
-Brad
+I will have to investigate what program is the culprit here. hcid and =
+
+kde-bluetooth come to my mind.
+
+On the other hand, why is a scan able to interfere with communication? Is t=
+his =
+
+behavior by design (because the hardware can only either scan or send/recei=
+ve =
+
+data)?
+
+Regards,
+  Robert
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
