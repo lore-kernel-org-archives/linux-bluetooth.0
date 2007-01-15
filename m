@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200701150802.45350.akohlsmith-bluez@benshaw.com>
-References: <200701150802.45350.akohlsmith-bluez@benshaw.com>
-Date: Mon, 15 Jan 2007 14:24:14 +0100
-Message-Id: <1168867454.5728.8.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] bluez and dbus - how to turn on discovery?
+Date: Mon, 15 Jan 2007 08:02:45 -0500
+MIME-Version: 1.0
+Message-Id: <200701150802.45350.akohlsmith-bluez@benshaw.com>
+Subject: [Bluez-users] bluez and dbus - how to turn on discovery?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,48 +18,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Andrew,
+I've seen it in this list, but I can't find it now.
 
-> dbus is such a hairy pain in the ass, I hope that my opinion of it changes 
-> once I understand it more.
-> 
-> I would have thought that using a dbus "browser" such as kdbus I would have 
-> found a method to turn discovery on and off, as well as a bunch of other 
-> things.  However, browsing the system bus it I see
-> 
-> :1.0/org/bluez as an object (with nothing else)
-> org.bluez/org/bluez as an object (again with nothing else)
-> 
-> There isn't anything interesting in the session bus (at least not relating to 
-> Bluez, although I wasn't expecting to find anything.)
-> 
-> There is also an org.freedesktop.DBus interface in both the system and session 
-> busses with a ton of crap under it, but nothing bluez-related.
-> 
-> I haven't found much in the way of documentation on how to use this, yet we're 
-> all expected to use it.  Can someone assist in giving perhaps a crash course 
-> in controlling bluez through dbus?
+dbus is such a hairy pain in the ass, I hope that my opinion of it changes 
+once I understand it more.
 
-the session bus is not used by BlueZ at all. We only use the system bus.
+I would have thought that using a dbus "browser" such as kdbus I would have 
+found a method to turn discovery on and off, as well as a bunch of other 
+things.  However, browsing the system bus it I see
 
-I never used kdbus and so I can't tell you if that would work or not. I
-always use the native interface from C or from Python. Some people use
-dbus-send, but I can't remember the syntax.
+:1.0/org/bluez as an object (with nothing else)
+org.bluez/org/bluez as an object (again with nothing else)
 
-So in general if your adapter has been found you should see org
-org.bluez/org/bluez/hci0 object with the org.bluez.Adapter interface.
-This interface on this path provides a SetMode method that can be used
-to change the mode from "connectable" to "discoverable".
+There isn't anything interesting in the session bus (at least not relating to 
+Bluez, although I wasn't expecting to find anything.)
 
-Since you speak about kdbus, I assume you don't use GNOME, but in that
-case you could install bluez-gnome and use the bluetooth-properties
-program to change the setting.
+There is also an org.freedesktop.DBus interface in both the system and session 
+busses with a ton of crap under it, but nothing bluez-related.
 
-Regards
+I haven't found much in the way of documentation on how to use this, yet we're 
+all expected to use it.  Can someone assist in giving perhaps a crash course 
+in controlling bluez through dbus?
 
-Marcel
-
-
+-A.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
