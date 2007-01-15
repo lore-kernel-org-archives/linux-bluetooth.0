@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
-To: bluez-users@lists.sourceforge.net
-Date: Mon, 15 Jan 2007 10:33:36 -0500
-References: <200701150802.45350.akohlsmith-bluez@benshaw.com>
-	<1168867454.5728.8.camel@violet>
-In-Reply-To: <1168867454.5728.8.camel@violet>
-MIME-Version: 1.0
-Message-Id: <200701151033.37304.akohlsmith-bluez@benshaw.com>
-Subject: Re: [Bluez-users] bluez and dbus - how to turn on discovery?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Daniel Malmgren <danielovictoria@telia.com>,
+        BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <2161615.1168251295635.JavaMail.tomcat@pne-ps2-sn2>
+References: <2161615.1168251295635.JavaMail.tomcat@pne-ps2-sn2>
+Date: Mon, 15 Jan 2007 14:32:05 +0100
+Message-Id: <1168867925.5728.16.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Can't seem to find my bluetooth
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,47 +21,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Monday 15 January 2007 8:24 am, Marcel Holtmann wrote:
-> the session bus is not used by BlueZ at all. We only use the system bus.
+Hi Daniel,
 
-Right, I figured that.  :-)
+> I'm trying to get Bluetooth working on my Znote 6015WD laptop and I 
+> don't really know where to start. I'm running Fedora Rawhide (x86_64). 
+> I don't even know what bt chip the computer has (or how to find out). 
+> Hcitool just says I haven't got any bluetooth device. Neither lspci nor 
+> lsusb shows anything that seems relevant. From lshal all I get is the 
+> following:
+> 
+> udi = '/org/freedesktop/Hal/devices/platform_bluetooth'
+>   info.udi = '/org/freedesktop/Hal/devices/platform_bluetooth'  
+> (string)
+>   linux.subsystem = 'platform'  (string)
+>   linux.hotplug_type = 1  (0x1)  (int)
+>   info.product = 'Platform Device (bluetooth)'  (string)
+>   platform.id = 'bluetooth'  (string)
+>   info.parent = '/org/freedesktop/Hal/devices/computer'  (string)
+>   info.bus = 'platform'  (string)
+>   linux.sysfs_path_device = '/sys/devices/platform/bluetooth'  
+> (string)
+>   linux.sysfs_path = '/sys/devices/platform/bluetooth'  (string)
+> 
+> ...which doesn't say me much. There is a led on the front of the 
+> computer which is blue, which according to the manual means that 
+> bluetooth is inactive, but I've got no idea of how to activate it. 
+> Where do I start?
 
-> So in general if your adapter has been found you should see org
-> org.bluez/org/bluez/hci0 object with the org.bluez.Adapter interface.
-> This interface on this path provides a SetMode method that can be used
-> to change the mode from "connectable" to "discoverable".
+these are generic information that are always present. You need to find
+the hardware switch to enable your Bluetooth module and then it will
+show up in lsusb.
 
-dbus-send --system --dest=org.freedesktop.DBus --print-reply=1 /org/freedesktop/DBus 
-org.freedesktop.DBus.ListNames
-   array [
-      org.freedesktop.DBus      :1.4      org.bluez      :1.9      :1.11   ]
+Regards
 
-I only have an org.bluez interface.  No org.bluez.Adapter, even though hci0 is 
-up and running great (hcid is running, and hidd is running, my BT mouse works 
-great)
+Marcel
 
-> Since you speak about kdbus, I assume you don't use GNOME, but in that
-> case you could install bluez-gnome and use the bluetooth-properties
-> program to change the setting.
 
-*nods* it looks like kdbus is working fine, as the dbus-send call itself is 
-returning the exact same info... I just don't have a org.bluez.Adapter 
-interface, nor do I have any hci0 object path.
-
-Talking with the guys in FreeNode's #dbus channel too they say that this kind 
-of return code is an error:
-
-$ dbus-send --system --dest=org.bluez --print-reply=1 /org/bluez/hci0 
-org.freedesktop.DBus.Introspectable.Introspect
-   <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 
-1.0//EN"
-"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
-$
-
-(/org/bluez also sends the exact same response) -- they claim that running 
-that should give me some methods/interfaces, a child node or an error.
-
--A.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
