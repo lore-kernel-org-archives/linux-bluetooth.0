@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <45ABCF7B.7000506@xmission.com>
+Date: Mon, 15 Jan 2007 12:01:15 -0700
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200701081837.04388.dgollub@suse.de>
-References: <200701081837.04388.dgollub@suse.de>
-Date: Mon, 15 Jan 2007 14:30:26 +0100
-Message-Id: <1168867826.5728.14.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Should hcid wait for dbus daemon?
+References: <200701150257.21542.bluez-devel@huitl.de>	<200701151909.39305.bluez-devel@huitl.de>	<45ABC826.10404@xmission.com>
+	<200701151351.03730.akohlsmith-bluez@benshaw.com>
+In-Reply-To: <200701151351.03730.akohlsmith-bluez@benshaw.com>
+Subject: Re: [Bluez-devel] a2dpd: audio connection breaks every 300 seconds
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,43 +21,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Daniel,
+Andrew
 
-> the hcid daemon aborts when there is no dbus daemon running. What about 
-> enhancing hcid to handle the case that the dbus daemon get started after 
-> hcid. I know there are might be not many use cases. But at least i know one 
-> case ;)
-> 
-> To avoid that there is another "unneeded" service running, i want to call only 
-> the bluetooth init scripts when there is a bluetooth device plugged in. This 
-> is done by a simple udev rule, which calls the bluetooth init script when the 
-> device got plugged in.
-> 
-> So there is no need to insserv or do any other stuff like running YaST or 
-> something like that. Just turn on the bluetooth device or plug it in and the 
-> bluetooth service get started by udev.
-> 
-> The only problem is during boot. udev get started before the dbus daemon, and 
-> will trigger the udev rule which calls the bluetooth init script. Then hcid 
-> will fail because the dbus daemon isn't started in this early stage of boot.
-> 
-> If the hcid would wait for the dbus daemon this wouldn't be a problem. At 
-> least hcid can handle a dbus daemon restart, maybe we can enhance this.
-> 
-> I know this can be also done in the bluetooth init script, but maybe someone 
-> else insist on this enhancement.
+> What about making the driver a little smarter?  perhaps having some kind 
+> of "realtime" (poor choice of word perhaps) that prevents things from taking 
+> over the radio like this if an application is using it?
 
-I don't think that it is a good idea to have udev start daemons. My
-understanding is that udev is for creating device nodes or init
-hardware. In case of BlueZ it must start a number of daemons to have a
-fully working Bluetooth setup. This task is better done by systems like
-upstart which handle dependencies.
+Quality of Service would be a better choice of phrase. There are
+rumblings about QOS improvements but I don't know much about it.
 
-Regards
-
-Marcel
-
-
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
