@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
 To: bluez-users@lists.sourceforge.net
-Date: Mon, 15 Jan 2007 11:08:14 -0500
+Date: Mon, 15 Jan 2007 10:33:36 -0500
 References: <200701150802.45350.akohlsmith-bluez@benshaw.com>
 	<1168867454.5728.8.camel@violet>
 In-Reply-To: <1168867454.5728.8.camel@violet>
 MIME-Version: 1.0
-Message-Id: <200701151108.14727.akohlsmith-bluez@benshaw.com>
+Message-Id: <200701151033.37304.akohlsmith-bluez@benshaw.com>
 Subject: Re: [Bluez-users] bluez and dbus - how to turn on discovery?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -22,19 +22,44 @@ Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 On Monday 15 January 2007 8:24 am, Marcel Holtmann wrote:
-> I never used kdbus and so I can't tell you if that would work or not. I
-> always use the native interface from C or from Python. Some people use
-> dbus-send, but I can't remember the syntax.
+> the session bus is not used by BlueZ at all. We only use the system bus.
 
-For the archives, this is how you do it with dbus-send:
+Right, I figured that.  :-)
+
+> So in general if your adapter has been found you should see org
+> org.bluez/org/bluez/hci0 object with the org.bluez.Adapter interface.
+> This interface on this path provides a SetMode method that can be used
+> to change the mode from "connectable" to "discoverable".
+
+dbus-send --system --dest=org.freedesktop.DBus --print-reply=1 /org/freedesktop/DBus 
+org.freedesktop.DBus.ListNames
+   array [
+      org.freedesktop.DBus      :1.4      org.bluez      :1.9      :1.11   ]
+
+I only have an org.bluez interface.  No org.bluez.Adapter, even though hci0 is 
+up and running great (hcid is running, and hidd is running, my BT mouse works 
+great)
+
+> Since you speak about kdbus, I assume you don't use GNOME, but in that
+> case you could install bluez-gnome and use the bluetooth-properties
+> program to change the setting.
+
+*nods* it looks like kdbus is working fine, as the dbus-send call itself is 
+returning the exact same info... I just don't have a org.bluez.Adapter 
+interface, nor do I have any hci0 object path.
+
+Talking with the guys in FreeNode's #dbus channel too they say that this kind 
+of return code is an error:
 
 $ dbus-send --system --dest=org.bluez --print-reply=1 /org/bluez/hci0 
-org.bluez.Adapter.SetMode string:discoverable
+org.freedesktop.DBus.Introspectable.Introspect
+   <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 
+1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+$
 
-Howver... I see no hci0, I see no methods (i.e. Adapter isn't there, SetMode 
-isn't there)...  it looks like the bluez 3.7 release does not have any kind 
-of introspection or way of seeing what it provides programmatically.  Is this 
-true?
+(/org/bluez also sends the exact same response) -- they claim that running 
+that should give me some methods/interfaces, a child node or an error.
 
 -A.
 
