@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1d1502880701122216v187542ecx45af28f4da86323e@mail.gmail.com>
-References: <1d1502880701122216v187542ecx45af28f4da86323e@mail.gmail.com>
-Date: Mon, 15 Jan 2007 14:27:30 +0100
-Message-Id: <1168867650.5728.11.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Object Push from Nokia N93 to BlueZ fails
+From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
+To: bluez-users@lists.sourceforge.net
+Date: Mon, 15 Jan 2007 11:08:14 -0500
+References: <200701150802.45350.akohlsmith-bluez@benshaw.com>
+	<1168867454.5728.8.camel@violet>
+In-Reply-To: <1168867454.5728.8.camel@violet>
+MIME-Version: 1.0
+Message-Id: <200701151108.14727.akohlsmith-bluez@benshaw.com>
+Subject: Re: [Bluez-users] bluez and dbus - how to turn on discovery?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,41 +21,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+On Monday 15 January 2007 8:24 am, Marcel Holtmann wrote:
+> I never used kdbus and so I can't tell you if that would work or not. I
+> always use the native interface from C or from Python. Some people use
+> dbus-send, but I can't remember the syntax.
 
->  I am doing an experiment to transfer file from Cellphones to Linux
-> over BT
-> using BlueZ stack available in Linux.
-> 
-> Object Push from Nokia 93 to BlueZ fails.
-> 
-> 1) I am able to push a file from Motorola to Linux BlueZ. 
-> 
-> 2) But I am unable to push a file from Nokia N93 to Linux BlueZ.
-> 
-> Error message displayed on Nokia 93 is "Unable to Connect".
-> 
-> Can anyone help me, in identifying what's going wrong from the log
-> attached 
-> below? Since I am new to BT, I am not yet become expert in
-> understanding the
-> BT protocol. There is something going wrong from Linux BlueZ stack,
-> when Nokia
-> cellphone is sending file transfer request.
-> 
-> 3) I also tried transferring files from Linux to Nokia, which works
-> fine. 
-> 
-> HciDumps for both the file pushes are given below
+For the archives, this is how you do it with dbus-send:
 
-the MotoQ dump doesn't show any OBEX nor RFCOMM activity. The Nokia dump
-indicates that no RFCOMM server is listening on channel 9.
+$ dbus-send --system --dest=org.bluez --print-reply=1 /org/bluez/hci0 
+org.bluez.Adapter.SetMode string:discoverable
 
-Regards
+Howver... I see no hci0, I see no methods (i.e. Adapter isn't there, SetMode 
+isn't there)...  it looks like the bluez 3.7 release does not have any kind 
+of introspection or way of seeing what it provides programmatically.  Is this 
+true?
 
-Marcel
-
-
+-A.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
