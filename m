@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Daniel Malmgren <danielovictoria@telia.com>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2161615.1168251295635.JavaMail.tomcat@pne-ps2-sn2>
-References: <2161615.1168251295635.JavaMail.tomcat@pne-ps2-sn2>
-Date: Mon, 15 Jan 2007 14:32:05 +0100
-Message-Id: <1168867925.5728.16.camel@violet>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200701150802.45350.akohlsmith-bluez@benshaw.com>
+References: <200701150802.45350.akohlsmith-bluez@benshaw.com>
+Date: Mon, 15 Jan 2007 14:24:14 +0100
+Message-Id: <1168867454.5728.8.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Can't seem to find my bluetooth
+Subject: Re: [Bluez-users] bluez and dbus - how to turn on discovery?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,36 +20,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Daniel,
+Hi Andrew,
 
-> I'm trying to get Bluetooth working on my Znote 6015WD laptop and I 
-> don't really know where to start. I'm running Fedora Rawhide (x86_64). 
-> I don't even know what bt chip the computer has (or how to find out). 
-> Hcitool just says I haven't got any bluetooth device. Neither lspci nor 
-> lsusb shows anything that seems relevant. From lshal all I get is the 
-> following:
+> dbus is such a hairy pain in the ass, I hope that my opinion of it changes 
+> once I understand it more.
 > 
-> udi = '/org/freedesktop/Hal/devices/platform_bluetooth'
->   info.udi = '/org/freedesktop/Hal/devices/platform_bluetooth'  
-> (string)
->   linux.subsystem = 'platform'  (string)
->   linux.hotplug_type = 1  (0x1)  (int)
->   info.product = 'Platform Device (bluetooth)'  (string)
->   platform.id = 'bluetooth'  (string)
->   info.parent = '/org/freedesktop/Hal/devices/computer'  (string)
->   info.bus = 'platform'  (string)
->   linux.sysfs_path_device = '/sys/devices/platform/bluetooth'  
-> (string)
->   linux.sysfs_path = '/sys/devices/platform/bluetooth'  (string)
+> I would have thought that using a dbus "browser" such as kdbus I would have 
+> found a method to turn discovery on and off, as well as a bunch of other 
+> things.  However, browsing the system bus it I see
 > 
-> ...which doesn't say me much. There is a led on the front of the 
-> computer which is blue, which according to the manual means that 
-> bluetooth is inactive, but I've got no idea of how to activate it. 
-> Where do I start?
+> :1.0/org/bluez as an object (with nothing else)
+> org.bluez/org/bluez as an object (again with nothing else)
+> 
+> There isn't anything interesting in the session bus (at least not relating to 
+> Bluez, although I wasn't expecting to find anything.)
+> 
+> There is also an org.freedesktop.DBus interface in both the system and session 
+> busses with a ton of crap under it, but nothing bluez-related.
+> 
+> I haven't found much in the way of documentation on how to use this, yet we're 
+> all expected to use it.  Can someone assist in giving perhaps a crash course 
+> in controlling bluez through dbus?
 
-these are generic information that are always present. You need to find
-the hardware switch to enable your Bluetooth module and then it will
-show up in lsusb.
+the session bus is not used by BlueZ at all. We only use the system bus.
+
+I never used kdbus and so I can't tell you if that would work or not. I
+always use the native interface from C or from Python. Some people use
+dbus-send, but I can't remember the syntax.
+
+So in general if your adapter has been found you should see org
+org.bluez/org/bluez/hci0 object with the org.bluez.Adapter interface.
+This interface on this path provides a SetMode method that can be used
+to change the mode from "connectable" to "discoverable".
+
+Since you speak about kdbus, I assume you don't use GNOME, but in that
+case you could install bluez-gnome and use the bluetooth-properties
+program to change the setting.
 
 Regards
 
