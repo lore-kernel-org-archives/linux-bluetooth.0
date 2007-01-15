@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Robert Huitl <bluez-devel@huitl.de>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Date: Mon, 15 Jan 2007 20:10:54 +0100
-Message-Id: <200701152010.54996.bluez-devel@huitl.de>
-Subject: [Bluez-devel] a2dpd and mplayer - any chance to get it working?
-	[resent]
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200701081837.04388.dgollub@suse.de>
+References: <200701081837.04388.dgollub@suse.de>
+Date: Mon, 15 Jan 2007 14:30:26 +0100
+Message-Id: <1168867826.5728.14.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Should hcid wait for dbus daemon?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,27 +20,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Daniel,
 
-I was wondering whether it is possible to make the a2dp alsa plugin supply 
-correct audio timing to applications like MPlayer. Right now, MPlayer does 
-not work with a2dpd because it relies on the audio driver to report accurate 
-audio timing information (or something like that).
+> the hcid daemon aborts when there is no dbus daemon running. What about 
+> enhancing hcid to handle the case that the dbus daemon get started after 
+> hcid. I know there are might be not many use cases. But at least i know one 
+> case ;)
+> 
+> To avoid that there is another "unneeded" service running, i want to call only 
+> the bluetooth init scripts when there is a bluetooth device plugged in. This 
+> is done by a simple udev rule, which calls the bluetooth init script when the 
+> device got plugged in.
+> 
+> So there is no need to insserv or do any other stuff like running YaST or 
+> something like that. Just turn on the bluetooth device or plug it in and the 
+> bluetooth service get started by udev.
+> 
+> The only problem is during boot. udev get started before the dbus daemon, and 
+> will trigger the udev rule which calls the bluetooth init script. Then hcid 
+> will fail because the dbus daemon isn't started in this early stage of boot.
+> 
+> If the hcid would wait for the dbus daemon this wouldn't be a problem. At 
+> least hcid can handle a dbus daemon restart, maybe we can enhance this.
+> 
+> I know this can be also done in the bluetooth init script, but maybe someone 
+> else insist on this enhancement.
 
-If a2dpd could measure the delay introduced on the wireless transport, it 
-might be possible to supply timing information to media players. The player 
-could then sync the video to the audio data, so there should be no delay at 
-all between audio and video playback.
+I don't think that it is a good idea to have udev start daemons. My
+understanding is that udev is for creating device nodes or init
+hardware. In case of BlueZ it must start a number of daemons to have a
+fully working Bluetooth setup. This task is better done by systems like
+upstart which handle dependencies.
 
-Is there something I am missing?
-What changes to the alsa plugin would be necessary?
+Regards
 
-Even if the delay can't be determined exactly, we could just fake that 
-information MPlayer is missing, so that a2dpd at least worked together with 
-MPlayer (with a small delay, maybe)?
+Marcel
 
-Regards,
-  Robert
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
