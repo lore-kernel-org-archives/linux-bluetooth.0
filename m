@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d23110170701160502l158c445dwd84a5876ce553820@mail.gmail.com>
-Date: Tue, 16 Jan 2007 10:02:09 -0300
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200701151033.37304.akohlsmith-bluez@benshaw.com>
+Date: Sun, 14 Jan 2007 16:35:59 -0800 (PST)
+From: George Manousakis <geomanous@yahoo.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-References: <200701150802.45350.akohlsmith-bluez@benshaw.com>
-	<1168867454.5728.8.camel@violet>
-	<200701151033.37304.akohlsmith-bluez@benshaw.com>
-Subject: Re: [Bluez-users] bluez and dbus - how to turn on discovery?
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <108051.71949.qm@web31705.mail.mud.yahoo.com>
+Subject: [Bluez-users] asterisk+chan_bluetooth+Nokia6310i->one way voice
+Reply-To: geomanous@mycosmos.gr,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -22,33 +19,63 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 1/15/07, Andrew Kohlsmith <akohlsmith-bluez@benshaw.com> wrote:
-> dbus-send --system --dest=org.freedesktop.DBus --print-reply=1 /org/freedesktop/DBus
-> org.freedesktop.DBus.ListNames
->    array [
->       org.freedesktop.DBus      :1.4      org.bluez      :1.9      :1.11   ]
->
-> I only have an org.bluez interface.
+I managed to install a system with the following
+configuration:
 
-Sorry, but this org.bluez is not an interface, but the bluez service.
+debian sarge, 2.6.8-k7, with all the must have files
+to compile and install asterisk.1.0.10.
 
-> Talking with the guys in FreeNode's #dbus channel too they say that this kind
-> of return code is an error:
->
-> $ dbus-send --system --dest=org.bluez --print-reply=1 /org/bluez/hci0
-> org.freedesktop.DBus.Introspectable.Introspect
->    <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection
-> 1.0//EN"
-> "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
-> $
->
-> (/org/bluez also sends the exact same response) -- they claim that running
-> that should give me some methods/interfaces, a child node or an error.
+Everything worked fine, the compile was a success, all
+the features were installed and i have the following
+config:
 
-Yep, hcid is not answering the Introspect calls with the interface
-methods and their signatures.
+/etc/asterisk/bluetooth.conf
+[general]
+rfchannel_ag = 13
+interface = 0
+;; A Nokia 6310i
+[XX:XX:XX:XX:XX:XX]
+name        = Nokia
+type        = AG
+channel     = 13
+autoconnect = yes
 
--- Ulisses
+/etc/asterisk/sip.conf
+[05435]
+type=friend
+username=05435
+callerid="05435" <05435>
+host=dynamic
+nat=no
+canreinvite=no
+context=sip
+allow=gsm
+allow=ulaw
+allow=alaw
+
+/etc/asterisk/extensions.conf
+[sip]
+exten => 05439,1,Dial(BLT/Nokia/XXXXXXXXXX)
+
+
+When i dial 05439 from the sip phone the gsm phones
+dials the preferred number as i should and the dial is
+bridged as it should.
+The problem is that the sip's voice is transmitted to
+the gsm end but the voice of the gsm guy is not
+forward to the sip phone. It's an one way
+communication.
+
+I'm using the stable versions of sarge reciprocities.
+
+Thanks 
+
+
+ 
+____________________________________________________________________________________
+Don't pick lemons.
+See all the new 2007 cars at Yahoo! Autos.
+http://autos.yahoo.com/new_cars.html 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
