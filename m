@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45AB5679.8050606@palmsource.com>
-Date: Mon, 15 Jan 2007 11:24:57 +0100
+Message-ID: <45AB5463.80503@palmsource.com>
+Date: Mon, 15 Jan 2007 11:16:03 +0100
 From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <200701150257.21542.bluez-devel@huitl.de>
-In-Reply-To: <200701150257.21542.bluez-devel@huitl.de>
-Subject: Re: [Bluez-devel] a2dpd: audio connection breaks every 300 seconds
+References: <200701150305.07478.bluez-devel@huitl.de>
+In-Reply-To: <200701150305.07478.bluez-devel@huitl.de>
+Subject: Re: [Bluez-devel] a2dpd: cmdplay fails: "No such application:
+ 'amarok player play'"
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,31 +21,79 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Robert,
+Hi,
+The command line is restricted to one program (dcop) and one parameter =
 
- > A2DPD[155.135]: a2dp_transfer_raw: Wrote -1 not 603 bytes.
+(amarok player play). You can overcome this issue by doing a shell =
 
-The write call returned EAGAIN, so we should resend the data after a while.
+script taking one parameter which will it turn execute your program =
 
- > I attached the complete logfile. It was created by a slightly =
-
-modified version
- > of a2dpd that tries to resend the data several times (with 1/10/20 us
- > delay) - to no avail.
-
-It should succeed if you wait long enough. Set the delay to 2000 and do =
-
-more tries (like 1000). Unfortunately, waiting too much will lead to =
-
-gaps in the sound when this happen.
-
-I think the cause is elsewhere, could you send us the hcidump -V log?
-Do you have another program using BlueZ? Another headset to try?
-You could try a shorter bitpool (say 32) if your headset supports it to =
-
-save some bandwith.
+using whatever parameters you want.
 
 Fr=E9d=E9ric
+
+Robert Huitl a =E9crit :
+> Hi again,
+>
+> the cmd* functions do not work for me:
+> cmdplay=3Ddcop amarok player play
+>
+> When I press the play button, the following line is print (from somewhere =
+
+> inside the execlp() call):
+> No such application: 'amarok player play'
+>
+> I hacked around this problem by using system() instead of execlp():
+>
+> Index: a2dpd_ipc.c
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> RCS file: /cvsroot/bluetooth-alsa/plugz/alsa-plugins/a2dpd/a2dpd_ipc.c,v
+> retrieving revision 1.3
+> diff -u -r1.3 a2dpd_ipc.c
+> --- a2dpd_ipc.c 12 Jan 2007 16:34:01 -0000      1.3
+> +++ a2dpd_ipc.c 15 Jan 2007 02:02:15 -0000
+> @@ -384,8 +384,10 @@
+>                                  close_server_socket_on_fork();
+>
+>                                  // Replace children with new process
+> -                                i =3D execlp(command, command, argv[0], =
+NULL);
+> -                                DBG("execlp failed %s=3D%d (errno=3D%d:%=
+s)", cmd, =
+
+> i, errno, strerror(errno));
+> +                                system(cmd);
+> +                                exit(0);
+>                                  break;
+>                          case -1:
+>                                  // failed
+>
+>
+> Regards,
+>   Robert
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share y=
+our
+> opinions on IT & business topics through brief surveys - and earn cash
+> http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3D=
+DEVDEV
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>   =
+
+
+
+-- =
+
+Frederic
+
+Without the wind, the grass does not move.
 
 
 -------------------------------------------------------------------------
