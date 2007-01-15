@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Robert Huitl <bluez-devel@huitl.de>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Mon, 15 Jan 2007 20:23:47 +0100
-References: <200701150257.21542.bluez-devel@huitl.de>
-	<200701151909.39305.bluez-devel@huitl.de>
-	<45ABC826.10404@xmission.com>
-In-Reply-To: <45ABC826.10404@xmission.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Message-Id: <200701152023.47802.bluez-devel@huitl.de>
-Subject: Re: [Bluez-devel] a2dpd: audio connection breaks every 300 seconds
+Date: Mon, 15 Jan 2007 20:10:54 +0100
+Message-Id: <200701152010.54996.bluez-devel@huitl.de>
+Subject: [Bluez-devel] a2dpd and mplayer - any chance to get it working?
+	[resent]
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,31 +19,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Monday 15 January 2007 19:29, Brad Midgley wrote:
-> Robert
->
-> > On the other hand, why is a scan able to interfere with communication? Is
-> > this behavior by design (because the hardware can only either scan or
-> > send/receive data)?
->
-> a scan hijacks the radio briefly and I believe there is no way around it.
->
-> there's one unrelated thing you could try. Do you have any other
-> bluetooth devices? I had to force my computer to be master in hcid.conf:
->
-> lm accept,master;
-> lp hold,sniff,park;
+Hi,
 
-I already have these lines in hcid.conf. I had an rswitch in the link policy, 
-but removing it does not change.
+I was wondering whether it is possible to make the a2dp alsa plugin supply 
+correct audio timing to applications like MPlayer. Right now, MPlayer does 
+not work with a2dpd because it relies on the audio driver to report accurate 
+audio timing information (or something like that).
 
-But I found the program scanning every 300 seconds. This is a feature of 
-kbluetoothd, disabling it results in perfectly gapless playback.
+If a2dpd could measure the delay introduced on the wireless transport, it 
+might be possible to supply timing information to media players. The player 
+could then sync the video to the audio data, so there should be no delay at 
+all between audio and video playback.
 
-Thanks to everyone on this list helping me to get those issues sorted out. Now 
-I'm quite happy with my headset :)
+Is there something I am missing?
+What changes to the alsa plugin would be necessary?
 
-Robert
+Even if the delay can't be determined exactly, we could just fake that 
+information MPlayer is missing, so that a2dpd at least worked together with 
+MPlayer (with a small delay, maybe)?
+
+Regards,
+  Robert
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
