@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Mon, 15 Jan 2007 13:51:03 -0500
-References: <200701150257.21542.bluez-devel@huitl.de>
-	<200701151909.39305.bluez-devel@huitl.de>
-	<45ABC826.10404@xmission.com>
-In-Reply-To: <45ABC826.10404@xmission.com>
+Message-ID: <45ABCBF4.3030003@xmission.com>
+Date: Mon, 15 Jan 2007 11:46:12 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Message-Id: <200701151351.03730.akohlsmith-bluez@benshaw.com>
-Subject: Re: [Bluez-devel] a2dpd: audio connection breaks every 300 seconds
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <45ABC674.6000402@xmission.com> <1168886146.31200.12.camel@violet>
+In-Reply-To: <1168886146.31200.12.camel@violet>
+Subject: Re: [Bluez-devel] no-install clients in sbc project
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,27 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Monday 15 January 2007 1:29 pm, Brad Midgley wrote:
-> a scan hijacks the radio briefly and I believe there is no way around it.
+Marcel
 
-What about making the driver a little smarter?  perhaps having some kind 
-of "realtime" (poor choice of word perhaps) that prevents things from taking 
-over the radio like this if an application is using it?
+> that is totally wrong. Tell me what you are trying to achieve and I tell
+> you the autoconf/automake trick.
 
-> there's one unrelated thing you could try. Do you have any other
-> bluetooth devices? I had to force my computer to be master in hcid.conf:
->
-> lm accept,master;
-> lp hold,sniff,park;
->
-> otherwise moving the bluetooth mouse or using bluetooth dun would
-> interrupt a2dp.
+I thought so.
 
-This is interesting... I'm still going over the email that Marcel and Steven 
-sent about a month ago detailing the lowlevel BT radio details.  Very, very 
-good reading.
+I want to put sbcenc and sbcdec into the sbc module (I don't care where)
+so 'make' will rebuild them against libsbc.a whenever I've changed a
+part of the codec. I use these two over and over when working on the codec.
 
--A.
+The idea is sbcenc/dec will never be installed anywhere.
+
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
