@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45AD232F.30104@glidos.net>
-Date: Tue, 16 Jan 2007 19:10:39 +0000
-From: Paul Gardiner <osronline@glidos.net>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Problems fooling my S100 into using Bluez as a modem
+In-Reply-To: <2e9fc96f0701160623i44199950u8005dc70a9176975@mail.gmail.com>
+References: <1d1502880701122216v187542ecx45af28f4da86323e@mail.gmail.com>
+	<1168867650.5728.11.camel@violet>
+	<2e9fc96f0701160623i44199950u8005dc70a9176975@mail.gmail.com>
+Date: Tue, 16 Jan 2007 15:30:00 +0100
+Message-Id: <1168957800.8918.20.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Object Push from Nokia N93 to BlueZ fails
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,38 +22,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Paul Gardiner wrote:
- > Paul Gardiner wrote:
- > No chance someone can have a quick look at the three
- > traces? (should be the messages that appear at the
- > same level in this thread as this message)
- >
- > I know its a lot to ask, but I so much want to have
- > this working again, and there's no way forward
- > without help.
+Hi Parbhu,
 
-That'll be a no then, I guess. :-(
+>          I started the rfcomm to listen on channel 9. Now, when I
+> transfer file from Nokia N93 to my 
+>          PC. 
+>           It hangs. hcidump will give a segmentation fault. 
+>           My configuration :
+> http://gprabhunath.googlepages.com/bluez_conf
+> 
+>           hcidump : http://gprabhunath.googlepages.com/home
+>          
+>           I did the following. 
+>           * Edited rfcomm.conf and hcid.conf (Ref: My configuration) 
+>           * started hcid and sdpd (service bluetooth start)
+>           * started rfcomm to listen on channel 9 (rfcomm -i hci0
+> listen 2 9)
+>           * started obexftpd (obexftpd -b -c /tmp/inbox)
 
-Anyway, here's another strange thing that might
-be an indicator of what's wrong: ps alx shows me
+you should only use obexftpd and not "rfcommm listen". The rfcomm
+command will only create a TTY on successful connect, but then don't do
+the needed OBEX connection for the push.
 
-   /usr/bin/dund --listen --persist --msdun call dun
+Regards
+
+Marcel
 
 
-suggesting that dund is running and happy, but
-
-sdp://localhost lists
-
-Obex Push Server
-KBSerialChat
-KDE Bemused
-LAN Access Point
-
-and that's it. No Dial Up Networking.  Why would
-that be?
-
-Cheers,
-	Paul.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
