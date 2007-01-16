@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45AC4952.6060001@xmission.com>
-Date: Mon, 15 Jan 2007 20:41:06 -0700
+Message-ID: <45AC3A4F.7030408@xmission.com>
+Date: Mon, 15 Jan 2007 19:37:03 -0700
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <D8CE9CFA707C894180BAC8CDD154F8460AD538BE@msiexch01.marvell.com>
-	<Pine.LNX.4.64.0701152257480.8201@cherokee.spacecom.si>
-In-Reply-To: <Pine.LNX.4.64.0701152257480.8201@cherokee.spacecom.si>
-Subject: Re: [Bluez-devel] a2dpd xmms and hbh-ds970
+References: <7ff566830701151639u5d62348dx4042e23361f028b1@mail.gmail.com>
+In-Reply-To: <7ff566830701151639u5d62348dx4042e23361f028b1@mail.gmail.com>
+Subject: Re: [Bluez-devel] Build problem with plugz
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,44 +16,35 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Mitja
+Kelly
 
-> I recently got myslef a HBH-DS970 headset and yesterday I tryed it with =
+I think you'll need newer bluez libraries & dev packages.
 
-> latest CVS version of plugz on FC6. It works great with VLC, but not with =
+Brad
 
-> xmms or a2play. With xmms it is really sped up, I tryed setting it to =
+> I'm having a problem compiling plugz:
+> 
+> gcc -DHAVE_CONFIG_H -I. -I../..     -Wall -O2 -MT states.o -MD -MP -MF
+> .deps/states.Tpo -c -o states.o states.c
+> states.c: In function 'headsetIdleHandleApplConnReq':
+> states.c:300: error: 'SDP_NON_BLOCKING' undeclared (first use in this function)
+> states.c:300: error: (Each undeclared identifier is reported only once
+> states.c:300: error: for each function it appears in.)
+> make[3]: *** [states.o] Error 1
+> 
+> This was after the CVS pull.  I'm building on Gentoo, kernel 2.6.19.2.
+> 
 
-> lower frequency but it did not solve the issue, with a2play it is choppy =
-
-> and just a little bit faster than it should be. I tryed it with Level 1 =
-
-> BC4-external and Anycom USB-250 with latest firmware and the resoults are =
-
-> the same, it should be some issue with headset. Do you perhaps have =
-
-> any idea, where should I look, to fix it for xmms, as it is strange that =
-
-> in VLC the sound of mp3s and movies is perfect? Oh and AVRCP in xmms =
-
-> works.
-
-it sounds like a sample rate conversion issue. maybe xmms is expecting
-the plugin to handle a rate it can't really do. Fr=E9d=E9ric might have more
-ideas.
-
-brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
