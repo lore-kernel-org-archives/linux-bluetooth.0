@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45AE6C85.90803@free.fr>
-Date: Wed, 17 Jan 2007 19:35:49 +0100
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <200701150326.46855.bluez-devel@huitl.de>
-	<7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EBF@eumonex01.palmsource.com>
-In-Reply-To: <7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EBF@eumonex01.palmsource.com>
-Subject: Re: [Bluez-devel] RE : a2dpd and mplayer - any chance to get it
-	working?
+In-Reply-To: <45AE62FB.2080608@yandex.ru>
+References: <45AE62FB.2080608@yandex.ru>
+Date: Wed, 17 Jan 2007 19:16:23 +0100
+Message-Id: <1169057783.5484.1.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] hcitool cc in kernel 2.6.19 and 20 doesn't work.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,33 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frederic, i think can help you for the second part:
+Hi Max,
 
->  I was wondering about alsa plugins :
-> xmms relies on alsa timing to play, so in the plugin, there is a sleep() call, this will wait a little bit until it is time to retievre new data.
-> But it seems some players (like mplayer) wants to do their own timing or at least don't want to sleep. They need to use that time to do some decoding instead. If you sleep too long, the decoding will be defered and the sound or movie will be broken.
-> 
-> Is there a rule to distinguish? Or some magic value to sleep?
+> I kernel 2.6.17 all work fine, but on 2.6.19 and 2.6.20 I have a trouble:
+> "hcitool scan" find my device, but "hcitool cc bt_address" print 
+> "Connection timed out".
 
-The key idea is that ALSA applications expect ALSA to run on a hardware 
-device that implements a ring buffer as a mean of transferring data from 
-  ALSA to the device.
-This ring buffer is divided into small chunks, called 'periods'.
-ALSA API is expected to block the caller when the ring buffer is full, 
-and unblock it when some room is freed. The size of the buffer, as well 
-as the period size is up to the application to select so that it best 
-fits its needs.
+actually the "hcitool cc" was never meant for daily use. The kernel will
+create ACL links when needed. So it usage is not a good idea at all and
+that the latest kernel makes it unusable is actually expected.
 
-What you've done in the a2dp pcm plugin(if i understood well) is to 
-throttle the application using sleep. But that does not emulate the ring 
-buffer behaviour well enough, so it breaks MPlayer. :-(
+Regards
 
-Some more details can be found here : 
-http://www.alsa-project.org/alsa-doc/alsa-lib/pcm.html
+Marcel
 
-Cheers,
 
-Fabien
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
