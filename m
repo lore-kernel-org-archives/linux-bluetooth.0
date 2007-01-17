@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4f436aae0701172208l7ac85a75tc592fa15d1b57f8@mail.gmail.com>
-Date: Thu, 18 Jan 2007 08:08:53 +0200
-From: "Choi Sonim" <choisonim@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Subject: [Bluez-devel] /sys/devices/platform/bluetooth
+Message-Id: <45AE1BFE.5301.0014.0@novell.com>
+Date: Wed, 17 Jan 2007 12:55:18 -0700
+From: "Olin Atkinson" <oatkinson@novell.com>
+To: <bluez-devel@lists.sourceforge.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] I got plugz to compile but now there is no sound
+	on the	headset after connecting
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,16 +19,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-hello to all,
+Wait, I lied.  The command line is giving the following output:
 
-Where is the code that does the platform registration to this device :
-/sys/devices/platform/bluetooth
-?
 
-I don't find it...
+DEBUG(pid=7544): _snd_pcm_sco_open: Starting pcm_sco_headset plugin.
+DEBUG(pid=7544): _snd_pcm_sco_open: Open mode is for Playback.
+ALSA lib pcm_sco.c:533:(_snd_pcm_sco_open) Unknown field max_periods
+aplay: main:550: audio open error: Invalid argument
+oatkinson@oatkinson1:/windows/D/projects/gspcav1-20060925> aplay -v
+Aborted by signal Interrupt...
 
-thank you a lot
-Choi.
+
+Any ideas how best to debug the problem?
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
