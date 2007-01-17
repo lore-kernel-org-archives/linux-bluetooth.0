@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-Id: <45AE1538.5301.0014.0@novell.com>
-Date: Wed, 17 Jan 2007 12:26:24 -0700
-From: "Olin Atkinson" <oatkinson@novell.com>
-To: <bluez-devel@lists.sourceforge.net>
-Mime-Version: 1.0
-Subject: [Bluez-devel] I got plugz to compile but now there is no sound on
-	the	headset after connecting
+Message-ID: <45AE75CB.6050202@xmission.com>
+Date: Wed, 17 Jan 2007 12:15:23 -0700
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <200701150326.46855.bluez-devel@huitl.de>	<7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EBF@eumonex01.palmsource.com>
+	<45AE6C85.90803@free.fr>
+In-Reply-To: <45AE6C85.90803@free.fr>
+Subject: Re: [Bluez-devel] RE : a2dpd and mplayer - any chance to get
+	it	working?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,32 +22,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I got plugz to compile by building bluez-libs but now after I connect I cannot get any audio to the headset.
+Guys
 
-after i run headsetd I run
-aplay -B 1000000 -D headset /home/oatkinson/audiobuff.wav
+> What you've done in the a2dp pcm plugin(if i understood well) is to 
+> throttle the application using sleep. But that does not emulate the ring 
+> buffer behaviour well enough, so it breaks MPlayer. :-(
 
-All I get in /var/log/messages is
+although vlc works, maybe it is using the same execution thread for both 
+audio and video and getting i/o blocked. when I switch it to a2dp on an 
+older machine, full-motion video goes from smooth to very choppy. this 
+is using the 32-bit codec so it shouldn't take that much cpu.
 
+is this just a design problem with alsa that should be worked around in 
+players?
 
-Jan 17 10:37:13 oatkinson1 hcid[1955]: link_key_request (sba=00:15:E9:65:56:37, dba=00:03:89:7B:38:C6)
-Jan 17 10:37:46 oatkinson1 su: (to root) oatkinson on /dev/pts/2
-
-Jan 17 10:40:03 oatkinson1 headsetd[5508]: Bluetooth headset daemon version 0.5
-Jan 17 10:40:03 oatkinson1 headsetd[5508]: Incoming RFCOMM hs connection from 00:03:89:7B:38:C6 accepted
-Jan 17 10:40:03 oatkinson1 headsetd[5508]: Changing state: Idle-->Connected
-Jan 17 10:41:20 oatkinson1 headsetd[5508]: Headset disconnected as RFCOMM socket died
-Jan 17 10:41:20 oatkinson1 headsetd[5508]: Changing state: Connected-->Idle
-Jan 17 10:41:26 oatkinson1 hcid[1955]: link_key_request (sba=00:15:E9:65:56:37, dba=00:03:89:7B:38:C6)
-Jan 17 10:41:27 oatkinson1 headsetd[5508]: Incoming RFCOMM hs connection from 00:03:89:7B:38:C6 accepted
-Jan 17 10:41:27 oatkinson1 headsetd[5508]: Changing state: Idle-->Connected
-Jan 17 11:17:30 oatkinson1 syslog-ng[2509]: STATS: dropped 0
-Jan 17 11:17:56 oatkinson1 zmd: ShutdownManager (WARN): Preparing to sleep...
-Jan 17 11:17:56 oatkinson1 zmd: ShutdownManager (WARN): Going to sleep, waking up at 01/18/2007 10:07:56
-Jan 17 12:17:31 oatkinson1 syslog-ng[2509]: STATS: dropped 0
- 
-
-Any ideas how best to debug the problem?
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
