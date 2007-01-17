@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45AE62FB.2080608@yandex.ru>
-Date: Wed, 17 Jan 2007 20:55:07 +0300
-From: Max <maxsoftpage@yandex.ru>
+From: Robert Huitl <bluez-devel@huitl.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Wed, 17 Jan 2007 15:56:54 +0100
+References: <7ff566830701151639u5d62348dx4042e23361f028b1@mail.gmail.com>
+	<45ADAC30.1090501@xmission.com>
+	<7ff566830701170323y6c6b70adk76152963cb4c0dce@mail.gmail.com>
+In-Reply-To: <7ff566830701170323y6c6b70adk76152963cb4c0dce@mail.gmail.com>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] hcitool cc in kernel 2.6.19 and 20 doesn't work.
+Message-Id: <200701171556.54882.bluez-devel@huitl.de>
+Subject: Re: [Bluez-devel] Build problem with plugz
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,74 +22,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I kernel 2.6.17 all work fine, but on 2.6.19 and 2.6.20 I have a trouble:
-"hcitool scan" find my device, but "hcitool cc bt_address" print 
-"Connection timed out".
-I turn on debugging in bluetooth module and get following in log:
+Hi Kelly,
 
-ON KERNEL 2.6.17, then connect to device work
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-...
-Jan 17 18:47:40 darkstar kernel: hci_cs_create_conn: hci0 status 0x0 
-bdaddr B9:12:D0:37:12:00 conn 00000000
-Jan 17 18:47:40 darkstar kernel: hci_conn_add: hci0 dst B9:12:D0:37:12:00
-Jan 17 18:47:40 darkstar kernel: hci_rx_task: hci0
-Jan 17 18:47:40 darkstar kernel: hci_event_packet: hci0 evt 0x3
-Jan 17 18:47:40 darkstar kernel: hci_conn_complete_evt: hci0
-Jan 17 18:47:40 darkstar kernel: hci_send_cmd: hci0 ogf 0x2 ocf 0xd plen 4
-Jan 17 18:47:40 darkstar kernel: hci_send_cmd: skb len 7
-Jan 17 18:47:40 darkstar kernel: hci_cmd_task: hci0 cmd 1
-Jan 17 18:47:40 darkstar kernel: hci_send_frame: hci0 type 1 len 7
-Jan 17 18:47:40 darkstar kernel: hci_rx_task: hci0
-Jan 17 18:47:40 darkstar kernel: hci_event_packet: hci0 evt 0xe
-Jan 17 18:47:40 darkstar kernel: hci_cc_link_policy: hci0 ocf 0xd
-Jan 17 18:47:40 darkstar kernel: hci_cc_link_policy: hci0: Command 
-complete: ogf LINK_POLICY ocf d
-...
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+> > > I'm using Bluez libs 2.25 which auto-generates the dev includes
+> >
+> > it needs 3.5 or newer iirc.
+>
+> Filed a bug in Gentoo to get it bumped to 3.8, filed as a blocker.
 
+Just use version 3.7 which is available in the LiquidX overlay.
 
-ON KERNEL 2.6.19, then connect doesn't work
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-...
-Jan 17 19:02:44 darkstar kernel: hci_cs_create_conn: hci0 status 0x0 
-bdaddr B9:12:D0:37:12:00 conn 00000000
-Jan 17 19:02:44 darkstar kernel: hci_conn_add: hci0 dst B9:12:D0:37:12:00
-Jan 17 19:02:44 darkstar kernel: hci_conn_add_sysfs: conn d7577800
-Jan 17 19:02:44 darkstar kernel: hci_dev_get: 0
-Jan 17 19:02:44 darkstar kernel: hci_dev_get: 0
-Jan 17 19:02:44 darkstar kernel: hci_dev_do_close: hci0 d6192400
-Jan 17 19:02:44 darkstar kernel: hci_req_cancel: hci0 err 0x13
-Jan 17 19:02:44 darkstar kernel: inquiry_cache_flush: cache d6192520
-Jan 17 19:02:44 darkstar kernel: hci_conn_hash_flush: hdev hci0
-Jan 17 19:02:44 darkstar kernel: hci_conn_del: hci0 conn d7577800 handle 0
-Jan 17 19:02:44 darkstar kernel: hci_conn_del_sysfs: conn d7577800
-Jan 17 19:02:44 darkstar kernel: __hci_request: hci0 start
-Jan 17 19:02:44 darkstar kernel: hci_reset_req: hci0 0
-Jan 17 19:02:44 darkstar kernel: hci_send_cmd: hci0 ogf 0x3 ocf 0x3 plen 0
-Jan 17 19:02:44 darkstar kernel: hci_send_cmd: skb len 3
-Jan 17 19:02:44 darkstar kernel: hci_cmd_task: hci0 cmd 1
-Jan 17 19:02:44 darkstar kernel: hci_send_frame: hci0 type 1 len 3
-Jan 17 19:02:44 darkstar kernel: hci_rx_task: hci0
-Jan 17 19:02:44 darkstar kernel: hci_event_packet: hci0 evt 0xe
-Jan 17 19:02:44 darkstar kernel: hci_cc_host_ctl: hci0 ocf 0x3
-Jan 17 19:02:44 darkstar kernel: hci_req_complete: hci0 result 0x00
-Jan 17 19:02:44 darkstar kernel: __hci_request: hci0 end: err 0
-Jan 17 19:02:44 darkstar kernel: hci_dev_get: 0
-...
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-I have installed bluez-libs-3.8  bluez-utils-3.8. Usb bluetooth device 
-on laptop (from hal):
-  usb_device.product = 'KY-BT100 Bluetooth Adapter'
-  info.vendor = 'Integrated System Solution Corp.'
-Device to connect are different: nokia phone and pocket pc.
-
-Thanks,
-Max_L
-
-
-
+Robert
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
