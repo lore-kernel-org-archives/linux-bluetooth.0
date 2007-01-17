@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <2e9fc96f0701171943ma29a819h25f37c527879e0b6@mail.gmail.com>
-Date: Thu, 18 Jan 2007 09:13:30 +0530
+Message-ID: <2e9fc96f0701170803k2fc9b253vf62bf4abaa515d74@mail.gmail.com>
+Date: Wed, 17 Jan 2007 21:33:26 +0530
 From: "Prabhu nath" <gprabhunath@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <2901C10BB197244AA66A0F9352B3840B022C3807@Mail03.quanta.corp>
+In-Reply-To: <1168957800.8918.20.camel@violet>
 MIME-Version: 1.0
-References: <2901C10BB197244AA66A0F9352B3840B022C3807@Mail03.quanta.corp>
-Subject: Re: [Bluez-users] bluez-utils install
+References: <1d1502880701122216v187542ecx45af28f4da86323e@mail.gmail.com>
+	<1168867650.5728.11.camel@violet>
+	<2e9fc96f0701160623i44199950u8005dc70a9176975@mail.gmail.com>
+	<1168957800.8918.20.camel@violet>
+Subject: Re: [Bluez-users] Object Push from Nokia N93 to BlueZ fails
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,116 +19,109 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1309698346=="
+Content-Type: multipart/mixed; boundary="===============1535454094=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1309698346==
+--===============1535454094==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_44214_30759898.1169091810124"
+	boundary="----=_Part_19950_32778056.1169049806664"
 
-------=_Part_44214_30759898.1169091810124
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+------=_Part_19950_32778056.1169049806664
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-V2hlbiB5b3UgaW5zdGFsbCBibHVlei1saWJzIHdpdGggcHJlZml4PS91c3IvbG9jYWwsIHRoZW4g
-aXQgd291bGQgaGF2ZQpjb3BpZWQgYmx1ZXoucGMgaW4gL3Vzci9sb2NhbC9saWIvcGtnY29uZmln
-LgpOb3csIHdoZW4gaW5zdGFsbGluZyBhbGwgb3RoZXIgdXRpbHMgd2hpY2ggbWFrZSB1c2Ugb2Yg
-Ymx1ZXotbGlicyBsaWJyYXJ5LCB1Cm5lZWQgdG8gZXhwb3J0IHRoaXMgbGlicmFyeS4KVHJ5ICJl
-eHBvcnQgUEtHX0NPTkZJR19QQVRIPS91c3IvbG9jYWwvbGliL3BrZ2NvbmZpZyIKCi1QcmFiaHUK
-CgoKT24gMS8xOC8wNywgemFjay5jaGllbkBxdWFudGF0dy5jb20gPHphY2suY2hpZW5AcXVhbnRh
-dHcuY29tPiB3cm90ZToKPgo+ICBEZWFyIFNpciwKPgo+IEkgbWV0IGEgaW5zdGFsbCBwcm9ibGVt
-IGFib3V0IGJsdWV6IHRvb2xzLiBJIGdvdCB0aGUgbGlicyBhbmQgdG9vbCgKPiBibHVlei11dGls
-cy0zLjgudGFyLnRhciwgYmx1ZXotbGlicy0zLjgudGFyLnRhciwKPiBibHVlei1oY2lkdW1wLTEu
-MzMudGFyLnRhcuKApikgZnJvbSBibHVleiBvcGVuIHNvdXJjZSBzaXRlLCB0aGVuIEkgaW5zdGFs
-bGVkCj4gdGhlIGJsdWV6LWxpYnMgZmlyc3QuCj4KPiBBZnRlciBzdWNjZXNzZnVsbHkgaW5zdGFs
-bGluZyBibHVlei1saWJzLCBJIGNvbnRpbnVlZCB0byBpbnN0YWxsCj4gYmx1ZXotdXRpbHMsIGJ1
-dCBpdCBmYWlsZWQgYXQgY29uZmlnIHN0YWdlLiBUaGUgZXJyb3IgbWVzc2FnZSBpcyAiY2hlY2tp
-bmcKPiBmb3IgQkxVRVouLi4gY29uZmlndXJlOiBlcnJvcjogQmx1ZXRvb3RoIGxpYnJhcnkgaXMg
-cmVxdWlyZWQiLgo+Cj4gVGhlIHNhbWUgc2l0dWF0aW9uIG9jY3VycmVkIGFzIEkgaW5zdGFsbGVk
-IGJsdWV6LWhjaWR1bXAuIEkgZG9uJ3Qga25vdyBob3cKPiB0byBzb2x2ZSBpdCwgaG9wZSBzb21l
-b25lIGNhbiBoZWxwIG1lLiBUaGFua3MuCj4KPgo+Cj4gQmVzdCBSZWdhcmRzLAo+Cj4gWmFjawo+
-Cj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLQo+IFRha2UgU3VydmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2Ug
-dGhlIEZ1dHVyZSBvZiBJVAo+IEpvaW4gU291cmNlRm9yZ2UubmV0J3MgVGVjaHNheSBwYW5lbCBh
-bmQgeW91J2xsIGdldCB0aGUgY2hhbmNlIHRvIHNoYXJlCj4geW91cgo+IG9waW5pb25zIG9uIElU
-ICYgYnVzaW5lc3MgdG9waWNzIHRocm91Z2ggYnJpZWYgc3VydmV5cyAtIGFuZCBlYXJuIGNhc2gK
-PiBodHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmcD1zb3Vy
-Y2Vmb3JnZSZDSUQ9REVWREVWCj4KPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXwo+IEJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdAo+IEJsdWV6LXVzZXJzQGxp
-c3RzLnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3Rz
-L2xpc3RpbmZvL2JsdWV6LXVzZXJzCj4KPgo+Cg==
-------=_Part_44214_30759898.1169091810124
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: base64
+Hi Marcel,
+          This time I am running only obexftpd, I even tried by removing all
+conf from rfcomm.conf but No Luck, I am running into same issue, Yet again I
+am not able to push file from Nokia to BlueZ, but I am able to Push file
+from Motorola to BlueZ.
+
+hcidump :- Nokia_to_BlueZ :
+http://brochevarevarura.googlepages.com/n93_to_bluez
+
+hcidump :- Moto_to_BlueZ :
+http://brochevarevarura.googlepages.com/motoq_to_bluez
+
+Thanks,
+Prabhu
+
+
+
+On 1/16/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Parbhu,
+>
+> >          I started the rfcomm to listen on channel 9. Now, when I
+> > transfer file from Nokia N93 to my
+> >          PC.
+> >           It hangs. hcidump will give a segmentation fault.
+> >           My configuration :
+> > http://gprabhunath.googlepages.com/bluez_conf
+> >
+> >           hcidump : http://gprabhunath.googlepages.com/home
+> >
+> >           I did the following.
+> >           * Edited rfcomm.conf and hcid.conf (Ref: My configuration)
+> >           * started hcid and sdpd (service bluetooth start)
+> >           * started rfcomm to listen on channel 9 (rfcomm -i hci0
+> > listen 2 9)
+> >           * started obexftpd (obexftpd -b -c /tmp/inbox)
+>
+> you should only use obexftpd and not "rfcommm listen". The rfcomm
+> command will only create a TTY on successful connect, but then don't do
+> the needed OBEX connection for the push.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share
+> your
+> opinions on IT & business topics through brief surveys - and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+
+------=_Part_19950_32778056.1169049806664
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-PGRpdj5XaGVuIHlvdSBpbnN0YWxsIGJsdWV6LWxpYnMgd2l0aCBwcmVmaXg9L3Vzci9sb2NhbCwg
-dGhlbiBpdCB3b3VsZCBoYXZlIGNvcGllZCBibHVlei5wYyBpbiAvdXNyL2xvY2FsL2xpYi9wa2dj
-b25maWcuIDwvZGl2Pgo8ZGl2Pk5vdywgd2hlbiBpbnN0YWxsaW5nIGFsbCBvdGhlciB1dGlscyB3
-aGljaCBtYWtlIHVzZSBvZiBibHVlei1saWJzIGxpYnJhcnksIHUgbmVlZCB0byBleHBvcnQgdGhp
-cyBsaWJyYXJ5LiA8L2Rpdj4KPGRpdj5UcnkgJnF1b3Q7ZXhwb3J0IFBLR19DT05GSUdfUEFUSD0v
-dXNyL2xvY2FsL2xpYi9wa2djb25maWcmcXVvdDs8L2Rpdj4KPGRpdj4mbmJzcDs8L2Rpdj4KPGRp
-dj4tUHJhYmh1PC9kaXY+CjxkaXY+PGJyPjxicj4mbmJzcDs8L2Rpdj4KPGRpdj48c3BhbiBjbGFz
-cz0iZ21haWxfcXVvdGUiPk9uIDEvMTgvMDcsIDxiIGNsYXNzPSJnbWFpbF9zZW5kZXJuYW1lIj48
-YSBocmVmPSJtYWlsdG86emFjay5jaGllbkBxdWFudGF0dy5jb20iPnphY2suY2hpZW5AcXVhbnRh
-dHcuY29tPC9hPjwvYj4gJmx0OzxhIGhyZWY9Im1haWx0bzp6YWNrLmNoaWVuQHF1YW50YXR3LmNv
-bSI+emFjay5jaGllbkBxdWFudGF0dy5jb208L2E+Jmd0OyB3cm90ZToKPC9zcGFuPgo8YmxvY2tx
-dW90ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJQQURESU5HLUxFRlQ6IDFleDsgTUFSR0lO
-OiAwcHggMHB4IDBweCAwLjhleDsgQk9SREVSLUxFRlQ6ICNjY2MgMXB4IHNvbGlkIj4KPGRpdiBs
-YW5nPSJaSC1UVyIgdmxpbms9InB1cnBsZSIgbGluaz0iYmx1ZSI+CjxkaXYgc3R5bGU9IkxBWU9V
-VC1HUklEOiAgMThwdCBub25lIj4KPHA+PGZvbnQgZmFjZT0iQXJpYWwiIHNpemU9IjEiPjxzcGFu
-IGxhbmc9IkVOLVVTIiBzdHlsZT0iRk9OVC1TSVpFOiA5cHQ7IEZPTlQtRkFNSUxZOiBBcmlhbCI+
-RGVhciBTaXIsPC9zcGFuPjwvZm9udD48L3A+CjxwPjxmb250IGZhY2U9IkFyaWFsIiBzaXplPSIx
-Ij48c3BhbiBsYW5nPSJFTi1VUyIgc3R5bGU9IkZPTlQtU0laRTogOXB0OyBGT05ULUZBTUlMWTog
-QXJpYWwiPkkgbWV0IGEgaW5zdGFsbCBwcm9ibGVtIGFib3V0IGJsdWV6IHRvb2xzLiBJIGdvdCB0
-aGUgbGlicyBhbmQgdG9vbChibHVlei11dGlscy0zLjgudGFyLnRhciwgYmx1ZXotbGlicy0zLjgu
-dGFyLnRhciwgYmx1ZXotaGNpZHVtcC0xLjMzLnRhci50YXLigKYKKSBmcm9tIGJsdWV6IG9wZW4g
-c291cmNlIHNpdGUsIHRoZW4gSSBpbnN0YWxsZWQgdGhlIGJsdWV6LWxpYnMgZmlyc3QuPC9zcGFu
-PjwvZm9udD48L3A+CjxwPjxmb250IGZhY2U9IkFyaWFsIiBzaXplPSIxIj48c3BhbiBsYW5nPSJF
-Ti1VUyIgc3R5bGU9IkZPTlQtU0laRTogOXB0OyBGT05ULUZBTUlMWTogQXJpYWwiPkFmdGVyIHN1
-Y2Nlc3NmdWxseSBpbnN0YWxsaW5nIGJsdWV6LWxpYnMsIEkgY29udGludWVkIHRvIGluc3RhbGwg
-Ymx1ZXotdXRpbHMsIGJ1dCBpdCBmYWlsZWQgYXQgY29uZmlnIHN0YWdlLiBUaGUgZXJyb3IgbWVz
-c2FnZSBpcwo8Zm9udCBjb2xvcj0icmVkIj48c3BhbiBzdHlsZT0iQ09MT1I6IHJlZCI+ICJjaGVj
-a2luZyBmb3IgQkxVRVouLi4gY29uZmlndXJlOiBlcnJvcjogQmx1ZXRvb3RoIGxpYnJhcnkgaXMg
-cmVxdWlyZWQiPC9zcGFuPjwvZm9udD48Zm9udCBjb2xvcj0iYmxhY2siPjxzcGFuIHN0eWxlPSJD
-T0xPUjogYmxhY2siPi48L3NwYW4+PC9mb250Pjwvc3Bhbj48L2ZvbnQ+PC9wPgo8cD48Zm9udCBm
-YWNlPSJBcmlhbCIgY29sb3I9ImJsYWNrIiBzaXplPSIxIj48c3BhbiBsYW5nPSJFTi1VUyIgc3R5
-bGU9IkZPTlQtU0laRTogOXB0OyBDT0xPUjogYmxhY2s7IEZPTlQtRkFNSUxZOiBBcmlhbCI+VGhl
-IHNhbWUgc2l0dWF0aW9uIG9jY3VycmVkIGFzIEkgaW5zdGFsbGVkIGJsdWV6LWhjaWR1bXAuIEkg
-ZG9uJ3Qga25vdyBob3cgdG8gc29sdmUgaXQsIGhvcGUgc29tZW9uZSBjYW4gaGVscCBtZS4gVGhh
-bmtzLgo8L3NwYW4+PC9mb250PjwvcD4KPHA+PGZvbnQgZmFjZT0iQXJpYWwiIGNvbG9yPSJibGFj
-ayIgc2l6ZT0iMSI+PHNwYW4gbGFuZz0iRU4tVVMiIHN0eWxlPSJGT05ULVNJWkU6IDlwdDsgQ09M
-T1I6IGJsYWNrOyBGT05ULUZBTUlMWTogQXJpYWwiPiZuYnNwOzwvc3Bhbj48L2ZvbnQ+PC9wPgo8
-cD48Zm9udCBmYWNlPSJBcmlhbCIgY29sb3I9ImJsYWNrIiBzaXplPSIxIj48c3BhbiBsYW5nPSJF
-Ti1VUyIgc3R5bGU9IkZPTlQtU0laRTogOXB0OyBDT0xPUjogYmxhY2s7IEZPTlQtRkFNSUxZOiBB
-cmlhbCI+QmVzdCBSZWdhcmRzLDwvc3Bhbj48L2ZvbnQ+PC9wPgo8cD48Zm9udCBmYWNlPSJBcmlh
-bCIgY29sb3I9ImJsYWNrIiBzaXplPSIxIj48c3BhbiBsYW5nPSJFTi1VUyIgc3R5bGU9IkZPTlQt
-U0laRTogOXB0OyBDT0xPUjogYmxhY2s7IEZPTlQtRkFNSUxZOiBBcmlhbCI+WmFjayA8L3NwYW4+
-PC9mb250PjwvcD48L2Rpdj48L2Rpdj48YnI+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo8YnI+VGFrZSBTdXJ2
-ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9mIElUPGJyPkpvaW4gU291cmNl
-Rm9yZ2UubmV0JiMzOTtzIFRlY2hzYXkgcGFuZWwgYW5kIHlvdSYjMzk7bGwgZ2V0IHRoZSBjaGFu
-Y2UgdG8gc2hhcmUgeW91cjxicj5vcGluaW9ucyBvbiBJVCAmYW1wOyBidXNpbmVzcyB0b3BpY3Mg
-dGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0gYW5kIGVhcm4gY2FzaAo8YnI+PGEgb25jbGljaz0icmV0
-dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiIGhyZWY9Imh0dHA6Ly93
-d3cudGVjaHNheS5jb20vZGVmYXVsdC5waHA/cGFnZT1qb2luLnBocCZhbXA7cD1zb3VyY2Vmb3Jn
-ZSZhbXA7Q0lEPURFVkRFViIgdGFyZ2V0PSJfYmxhbmsiPmh0dHA6Ly93d3cudGVjaHNheS5jb20v
-ZGVmYXVsdC5waHA/cGFnZT1qb2luLnBocCZhbXA7cD1zb3VyY2Vmb3JnZSZhbXA7Q0lEPURFVkRF
-Vgo8L2E+PGJyPjxicj5fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXzxicj5CbHVlei11c2VycyBtYWlsaW5nIGxpc3Q8YnI+PGEgb25jbGljaz0icmV0dXJuIHRv
-cC5qcy5PcGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiIGhyZWY9Im1haWx0bzpCbHVlei11
-c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQiPkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdl
-Lm5ldAo8L2E+PGJyPjxhIG9uY2xpY2s9InJldHVybiB0b3AuanMuT3BlbkV4dExpbmsod2luZG93
-LGV2ZW50LHRoaXMpIiBocmVmPSJodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9s
-aXN0aW5mby9ibHVlei11c2VycyIgdGFyZ2V0PSJfYmxhbmsiPmh0dHBzOi8vbGlzdHMuc291cmNl
-Zm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzPC9hPjxicj48YnI+PGJyPjwvYmxv
-Y2txdW90ZT4KPC9kaXY+PGJyPgo=
-------=_Part_44214_30759898.1169091810124--
+<div>Hi Marcel, </div>
+<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This time I am running only obexftpd,&nbsp;I even tried by removing all conf from rfcomm.conf but No Luck, I am running into same issue, Yet again I am not able to push file from Nokia to BlueZ, but I am able to Push file from Motorola to BlueZ. 
+</div>
+<div>&nbsp;</div>
+<div>hcidump :- Nokia_to_BlueZ : <a href="http://brochevarevarura.googlepages.com/n93_to_bluez">http://brochevarevarura.googlepages.com/n93_to_bluez</a></div>
+<div>&nbsp;</div>
+<div>hcidump :- Moto_to_BlueZ : <a href="http://brochevarevarura.googlepages.com/motoq_to_bluez">http://brochevarevarura.googlepages.com/motoq_to_bluez</a></div>
+<div>&nbsp;</div>
+<div>Thanks,</div>
+<div>Prabhu</div>
+<div><br><br>&nbsp;</div>
+<div><span class="gmail_quote">On 1/16/07, <b class="gmail_sendername">Marcel Holtmann</b> &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:</span>
+<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">Hi Parbhu,<br><br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;I started the rfcomm to listen on channel 9. Now, when I<br>&gt; transfer file from Nokia N93 to my
+<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PC.<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; It hangs. hcidump will give a segmentation fault.<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; My configuration :<br>&gt; <a href="http://gprabhunath.googlepages.com/bluez_conf">http://gprabhunath.googlepages.com/bluez_conf
+</a><br>&gt;<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; hcidump : <a href="http://gprabhunath.googlepages.com/home">http://gprabhunath.googlepages.com/home</a><br>&gt;<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I did the following.<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Edited rfcomm.conf and 
+hcid.conf (Ref: My configuration)<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * started hcid and sdpd (service bluetooth start)<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * started rfcomm to listen on channel 9 (rfcomm -i hci0<br>&gt; listen 2 9)<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * started obexftpd (obexftpd -b -c /tmp/inbox)
+<br><br>you should only use obexftpd and not &quot;rfcommm listen&quot;. The rfcomm<br>command will only create a TTY on successful connect, but then don&#39;t do<br>the needed OBEX connection for the push.<br><br>Regards
+<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>Take Surveys. Earn Cash. Influence the Future of IT<br>Join SourceForge.net&#39;s Techsay panel and you&#39;ll get the chance to share your
+<br>opinions on IT &amp; business topics through brief surveys - and earn cash<br><a href="http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV">http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV
+</a><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">
+https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquote></div><br>
+
+------=_Part_19950_32778056.1169049806664--
 
 
---===============1309698346==
+--===============1535454094==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -136,7 +132,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1309698346==
+--===============1535454094==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -147,4 +143,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1309698346==--
+--===============1535454094==--
