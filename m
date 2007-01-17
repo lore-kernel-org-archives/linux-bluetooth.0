@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Robert Huitl <bluez-devel@huitl.de>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Wed, 17 Jan 2007 19:05:53 +0100
-References: <200701150326.46855.bluez-devel@huitl.de>
-	<7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EBF@eumonex01.palmsource.com>
-In-Reply-To: <7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EBF@eumonex01.palmsource.com>
+Message-ID: <45AE62FB.2080608@yandex.ru>
+Date: Wed, 17 Jan 2007 20:55:07 +0300
+From: Max <maxsoftpage@yandex.ru>
 MIME-Version: 1.0
-Message-Id: <200701171905.53515.bluez-devel@huitl.de>
-Subject: Re: [Bluez-devel] a2dpd and mplayer - any chance to get it working?
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] hcitool cc in kernel 2.6.19 and 20 doesn't work.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,61 +18,74 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Wednesday 17 January 2007 08:03, Frederic Dalleau wrote:
-> Robert,
-> The sound is ok in mplayer! But the movie is a bit slow :D ...
+I kernel 2.6.17 all work fine, but on 2.6.19 and 2.6.20 I have a trouble:
+"hcitool scan" find my device, but "hcitool cc bt_address" print 
+"Connection timed out".
+I turn on debugging in bluetooth module and get following in log:
 
-Yes exactly :)
-And then it prints that message about slow CPU, buggy sound drivers, etc.
+ON KERNEL 2.6.17, then connect to device work
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+...
+Jan 17 18:47:40 darkstar kernel: hci_cs_create_conn: hci0 status 0x0 
+bdaddr B9:12:D0:37:12:00 conn 00000000
+Jan 17 18:47:40 darkstar kernel: hci_conn_add: hci0 dst B9:12:D0:37:12:00
+Jan 17 18:47:40 darkstar kernel: hci_rx_task: hci0
+Jan 17 18:47:40 darkstar kernel: hci_event_packet: hci0 evt 0x3
+Jan 17 18:47:40 darkstar kernel: hci_conn_complete_evt: hci0
+Jan 17 18:47:40 darkstar kernel: hci_send_cmd: hci0 ogf 0x2 ocf 0xd plen 4
+Jan 17 18:47:40 darkstar kernel: hci_send_cmd: skb len 7
+Jan 17 18:47:40 darkstar kernel: hci_cmd_task: hci0 cmd 1
+Jan 17 18:47:40 darkstar kernel: hci_send_frame: hci0 type 1 len 7
+Jan 17 18:47:40 darkstar kernel: hci_rx_task: hci0
+Jan 17 18:47:40 darkstar kernel: hci_event_packet: hci0 evt 0xe
+Jan 17 18:47:40 darkstar kernel: hci_cc_link_policy: hci0 ocf 0xd
+Jan 17 18:47:40 darkstar kernel: hci_cc_link_policy: hci0: Command 
+complete: ogf LINK_POLICY ocf d
+...
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-> If you plugin is the pcm.!default, then you can workaround the problem by
-> outputting audio to esound instead of alsa (see mplayer preferences). Not
-> the best, but worked for me. +/- helped having perfect synchronisation with
-> movie.
 
-Nice. I will try this, but actually I'd rather not have another sound daemon 
-(artsd is causing enough problems...)
+ON KERNEL 2.6.19, then connect doesn't work
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+...
+Jan 17 19:02:44 darkstar kernel: hci_cs_create_conn: hci0 status 0x0 
+bdaddr B9:12:D0:37:12:00 conn 00000000
+Jan 17 19:02:44 darkstar kernel: hci_conn_add: hci0 dst B9:12:D0:37:12:00
+Jan 17 19:02:44 darkstar kernel: hci_conn_add_sysfs: conn d7577800
+Jan 17 19:02:44 darkstar kernel: hci_dev_get: 0
+Jan 17 19:02:44 darkstar kernel: hci_dev_get: 0
+Jan 17 19:02:44 darkstar kernel: hci_dev_do_close: hci0 d6192400
+Jan 17 19:02:44 darkstar kernel: hci_req_cancel: hci0 err 0x13
+Jan 17 19:02:44 darkstar kernel: inquiry_cache_flush: cache d6192520
+Jan 17 19:02:44 darkstar kernel: hci_conn_hash_flush: hdev hci0
+Jan 17 19:02:44 darkstar kernel: hci_conn_del: hci0 conn d7577800 handle 0
+Jan 17 19:02:44 darkstar kernel: hci_conn_del_sysfs: conn d7577800
+Jan 17 19:02:44 darkstar kernel: __hci_request: hci0 start
+Jan 17 19:02:44 darkstar kernel: hci_reset_req: hci0 0
+Jan 17 19:02:44 darkstar kernel: hci_send_cmd: hci0 ogf 0x3 ocf 0x3 plen 0
+Jan 17 19:02:44 darkstar kernel: hci_send_cmd: skb len 3
+Jan 17 19:02:44 darkstar kernel: hci_cmd_task: hci0 cmd 1
+Jan 17 19:02:44 darkstar kernel: hci_send_frame: hci0 type 1 len 3
+Jan 17 19:02:44 darkstar kernel: hci_rx_task: hci0
+Jan 17 19:02:44 darkstar kernel: hci_event_packet: hci0 evt 0xe
+Jan 17 19:02:44 darkstar kernel: hci_cc_host_ctl: hci0 ocf 0x3
+Jan 17 19:02:44 darkstar kernel: hci_req_complete: hci0 result 0x00
+Jan 17 19:02:44 darkstar kernel: __hci_request: hci0 end: err 0
+Jan 17 19:02:44 darkstar kernel: hci_dev_get: 0
+...
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-> Brad,
->  I was wondering about alsa plugins :
-> xmms relies on alsa timing to play, so in the plugin, there is a sleep()
-> call, this will wait a little bit until it is time to retievre new data.
-> But it seems some players (like mplayer) wants to do their own timing or at
-> least don't want to sleep. They need to use that time to do some decoding
-> instead. If you sleep too long, the decoding will be defered and the sound
-> or movie will be broken.
+I have installed bluez-libs-3.8  bluez-utils-3.8. Usb bluetooth device 
+on laptop (from hal):
+  usb_device.product = 'KY-BT100 Bluetooth Adapter'
+  info.vendor = 'Integrated System Solution Corp.'
+Device to connect are different: nokia phone and pocket pc.
 
-You are talking about this code, aren't you?
+Thanks,
+Max_L
 
-static snd_pcm_sframes_t a2dp_transfer2(snd_pcm_ioplug_t * io, char *buf, 
-int32_t datatoread)
-[...]
-  // The data are sent to the daemon that act as a proxy thus we double 
-transfer delay to compensate latency
-  a2dp_timer_notifyframe(&a2dp->TimerInfos);
-  delay = a2dp_timer_sleep(&a2dp->TimerInfos, 4*A2DPTIMERPREDELAY);
 
-Without really knowing what I was doing, I removed the a2dp_timer_sleep call. 
-The result: mplayer plays the video as fast as possible (sound was broken, of 
-course).
 
-So maybe this delay is too long (however decreasing the delay did not improve 
-things) or should not be there at all.
-
-> Is there a rule to distinguish? Or some magic value to sleep?
-
-I had a look at the io->nonblock variable and compared its value while playing 
-with mplayer and play (part of sox), but it's 0 for both.
-
-However, mplayer audio output devices implement a function
-/* delay in seconds between first and last sample in buffer */
-static float get_delay(void)
-
-This function basically calls snd_pcm_delay(), which can be implemented in the 
-a2dp io plugin. Mplayer calls this function quite frequently, maybe this is 
-how it knows when to write new audio samples.
-
-Robert
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
