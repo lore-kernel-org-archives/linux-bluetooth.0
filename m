@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45AFB36A.4040702@free.fr>
-Date: Thu, 18 Jan 2007 18:50:34 +0100
+Message-ID: <45AFB30F.6040809@free.fr>
+Date: Thu, 18 Jan 2007 18:49:03 +0100
 From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <200701150326.46855.bluez-devel@huitl.de>	<7A6DA545D7FDCC4B93DB651FDBC1EDDE4E6EBF@eumonex01.palmsource.com>	<45AE6C85.90803@free.fr>
-	<45AE75CB.6050202@xmission.com>
-In-Reply-To: <45AE75CB.6050202@xmission.com>
-Subject: Re: [Bluez-devel] RE : a2dpd and mplayer - any chance to
-	get	it	working?
+References: <45AE1BFE.5301.0014.0@novell.com>
+In-Reply-To: <45AE1BFE.5301.0014.0@novell.com>
+Subject: Re: [Bluez-devel] I got plugz to compile but now there is no sound
+ on the	headset after connecting
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,24 +21,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Brad Midgley wrote:
-> Guys
+Olin Atkinson wrote:
+> Wait, I lied.  The command line is giving the following output:
 > 
->> What you've done in the a2dp pcm plugin(if i understood well) is to 
->> throttle the application using sleep. But that does not emulate the ring 
->> buffer behaviour well enough, so it breaks MPlayer. :-(
 > 
-> although vlc works, maybe it is using the same execution thread for both 
-> audio and video and getting i/o blocked. when I switch it to a2dp on an 
-> older machine, full-motion video goes from smooth to very choppy. this 
-> is using the 32-bit codec so it shouldn't take that much cpu.
+> DEBUG(pid=7544): _snd_pcm_sco_open: Starting pcm_sco_headset plugin.
+> DEBUG(pid=7544): _snd_pcm_sco_open: Open mode is for Playback.
+> ALSA lib pcm_sco.c:533:(_snd_pcm_sco_open) Unknown field max_periods
+> aplay: main:550: audio open error: Invalid argument
+> oatkinson@oatkinson1:/windows/D/projects/gspcav1-20060925> aplay -v
+> Aborted by signal Interrupt...
 > 
-> is this just a design problem with alsa that should be worked around in 
-> players?
 
-
-I would rather vote for a bug in a2dp plugin. ;-)
-Btw, did you try with sco plugin ? Is it better ?
+Hi Olin, the provided asound.conf was bogus, this is now fixed in CVS.
 
 Cheers,
 
