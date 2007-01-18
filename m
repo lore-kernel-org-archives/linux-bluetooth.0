@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4f436aae0701172208l7ac85a75tc592fa15d1b57f8@mail.gmail.com>
-References: <4f436aae0701172208l7ac85a75tc592fa15d1b57f8@mail.gmail.com>
-Date: Thu, 18 Jan 2007 09:13:39 +0100
-Message-Id: <1169108019.6853.1.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] /sys/devices/platform/bluetooth
+Message-ID: <4f436aae0701172208l7ac85a75tc592fa15d1b57f8@mail.gmail.com>
+Date: Thu, 18 Jan 2007 08:08:53 +0200
+From: "Choi Sonim" <choisonim@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-devel] /sys/devices/platform/bluetooth
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,18 +18,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+hello to all,
 
-> Where is the code that does the platform registration to this device :
-> /sys/devices/platform/bluetooth
+Where is the code that does the platform registration to this device :
+/sys/devices/platform/bluetooth
+?
 
-you find it in net/bluetooth/hci_sysfs.c in the kernel source code.
+I don't find it...
 
-Regards
-
-Marcel
-
-
+thank you a lot
+Choi.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
