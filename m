@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45AF6BFA.3050005@gmail.com>
-Date: Thu, 18 Jan 2007 14:45:46 +0200
-From: Mikko Saarnivala <msaarniv@gmail.com>
+Message-ID: <57c68ddc0701172344u2a31497egb13f496ba10f9d37@mail.gmail.com>
+Date: Thu, 18 Jan 2007 13:14:30 +0530
+From: "siddhant tewari" <siddhant.tewari@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <2901C10BB197244AA66A0F9352B3840B022C3807@Mail03.quanta.corp>
 MIME-Version: 1.0
-To: BLUEZ-USERS <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] rfcomm and receiving incoming connections
+References: <2901C10BB197244AA66A0F9352B3840B022C3807@Mail03.quanta.corp>
+Subject: Re: [Bluez-users] bluez-utils install
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,47 +16,136 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1700257212=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+--===============1700257212==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_84810_5946705.1169106270877"
 
-Hi,
+------=_Part_84810_5946705.1169106270877
+Content-Type: text/plain; charset=BIG5; format=flowed
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
 
-I'm quite new to using the Bluez-stack and tools associated with it so I 
-could use some help with a problem that I'm facing. This might be a 
-trivial task to perform, but for some reason I haven't been able to make 
-it work.
+aGksCiAgIFlvdSBoYXZlIHRvIG1ha2Ugc3VyZSB0aGF0IGJsdWV6IGluc3RhbGxhdGlvbiBpcyB2
+aXNpYmxlIHRvIHBrZy1jb25maWcuCkZvciB0aGF0IHUgY2FuIHRha2UgZWl0aGVyIHN0ZXBzIDot
+CgppKSBlbnN1cmUgYmx1ZXogd2FzIGluc3RhbGxlZCBhdCBzdGFuZGFyZCBwYXRocy4gaS5lLiBp
+dHMgbGlicmFyaWVzIGFyZSBhdAovdXNyL2xpYiAobm9ybWFsbHkgaXQgZ29lcyBhdCAvdXNyL2xv
+Y2FsL2xpYikKaWkpIHNldCBQS0dfQ09ORklHX1BBVEggdG8gd2hlcmUgIGJsdWV0b290aC5wYyBs
+aWVzIChtb3N0IHByb2JhYmx5IGluIHRoZQpmb2xkZXIgL3Vzci9sb2NhbC9saWIKCmJlc3QgcmVn
+YXJkcwpzaWRkaGFudAoKT24gMS8xOC8wNywgemFjay5jaGllbkBxdWFudGF0dy5jb20gPHphY2su
+Y2hpZW5AcXVhbnRhdHcuY29tPiB3cm90ZToKPgo+ICBEZWFyIFNpciwKPgo+IEkgbWV0IGEgaW5z
+dGFsbCBwcm9ibGVtIGFib3V0IGJsdWV6IHRvb2xzLiBJIGdvdCB0aGUgbGlicyBhbmQgdG9vbCgK
+PiBibHVlei11dGlscy0zLjgudGFyLnRhciwgYmx1ZXotbGlicy0zLjgudGFyLnRhciwKPiBibHVl
+ei1oY2lkdW1wLTEuMzMudGFyLnRhcqFLKSBmcm9tIGJsdWV6IG9wZW4gc291cmNlIHNpdGUsIHRo
+ZW4gSSBpbnN0YWxsZWQKPiB0aGUgYmx1ZXotbGlicyBmaXJzdC4KPgo+IEFmdGVyIHN1Y2Nlc3Nm
+dWxseSBpbnN0YWxsaW5nIGJsdWV6LWxpYnMsIEkgY29udGludWVkIHRvIGluc3RhbGwKPiBibHVl
+ei11dGlscywgYnV0IGl0IGZhaWxlZCBhdCBjb25maWcgc3RhZ2UuIFRoZSBlcnJvciBtZXNzYWdl
+IGlzICJjaGVja2luZwo+IGZvciBCTFVFWi4uLiBjb25maWd1cmU6IGVycm9yOiBCbHVldG9vdGgg
+bGlicmFyeSBpcyByZXF1aXJlZCIuCj4KPiBUaGUgc2FtZSBzaXR1YXRpb24gb2NjdXJyZWQgYXMg
+SSBpbnN0YWxsZWQgYmx1ZXotaGNpZHVtcC4gSSBkb24ndCBrbm93IGhvdwo+IHRvIHNvbHZlIGl0
+LCBob3BlIHNvbWVvbmUgY2FuIGhlbHAgbWUuIFRoYW5rcy4KPgo+Cj4KPiBCZXN0IFJlZ2FyZHMs
+Cj4KPiBaYWNrCj4KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gVGFrZSBTdXJ2ZXlzLiBFYXJuIENhc2gu
+IEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9mIElUCj4gSm9pbiBTb3VyY2VGb3JnZS5uZXQncyBUZWNo
+c2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFuY2UgdG8gc2hhcmUKPiB5b3VyCj4gb3Bp
+bmlvbnMgb24gSVQgJiBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0gYW5k
+IGVhcm4gY2FzaAo+IGh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVmYXVsdC5waHA/cGFnZT1qb2lu
+LnBocCZwPXNvdXJjZWZvcmdlJkNJRD1ERVZERVYKPgo+IF9fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fCj4gQmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0Cj4gQmx1
+ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cj4gaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3Jn
+ZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMKPgo+Cj4K
+------=_Part_84810_5946705.1169106270877
+Content-Type: text/html; charset=BIG5
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
 
-I have a PC which has a USB BT dongle (Linksys, works fine) and a 
-separate device which when powered automatically tries to connect into 
-which ever BT device within range and simply starts to send measurement 
-data. I managed to accept the connection using kbluetoothd but I need to 
-do the same thing without using the KDE specific stuff (Gnome 
-applications are also out of the question).
+aGksPGJyPiZuYnNwOyZuYnNwOyBZb3UgaGF2ZSB0byBtYWtlIHN1cmUgdGhhdCBibHVleiBpbnN0
+YWxsYXRpb24gaXMgdmlzaWJsZSB0byBwa2ctY29uZmlnLiBGb3IgdGhhdCB1IGNhbiB0YWtlIGVp
+dGhlciBzdGVwcyA6LTxicj48YnI+aSkgZW5zdXJlIGJsdWV6IHdhcyBpbnN0YWxsZWQgYXQgc3Rh
+bmRhcmQgcGF0aHMuIGkuZS4gaXRzIGxpYnJhcmllcyBhcmUgYXQgL3Vzci9saWIgKG5vcm1hbGx5
+IGl0IGdvZXMgYXQgL3Vzci9sb2NhbC9saWIpCjxicj5paSkgc2V0IFBLR19DT05GSUdfUEFUSCB0
+byB3aGVyZSZuYnNwOyBibHVldG9vdGgucGMgbGllcyAobW9zdCBwcm9iYWJseSBpbiB0aGUgZm9s
+ZGVyIC91c3IvbG9jYWwvbGliPGJyPjxicj5iZXN0IHJlZ2FyZHM8YnI+c2lkZGhhbnQ8YnI+PGJy
+PjxkaXY+PHNwYW4gY2xhc3M9ImdtYWlsX3F1b3RlIj5PbiAxLzE4LzA3LCA8YiBjbGFzcz0iZ21h
+aWxfc2VuZGVybmFtZSI+PGEgaHJlZj0ibWFpbHRvOnphY2suY2hpZW5AcXVhbnRhdHcuY29tIj4K
+emFjay5jaGllbkBxdWFudGF0dy5jb208L2E+PC9iPiAmbHQ7PGEgaHJlZj0ibWFpbHRvOnphY2su
+Y2hpZW5AcXVhbnRhdHcuY29tIj56YWNrLmNoaWVuQHF1YW50YXR3LmNvbTwvYT4mZ3Q7IHdyb3Rl
+Ojwvc3Bhbj48YmxvY2txdW90ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJib3JkZXItbGVm
+dDogMXB4IHNvbGlkIHJnYigyMDQsIDIwNCwgMjA0KTsgbWFyZ2luOiAwcHQgMHB0IDBwdCAwLjhl
+eDsgcGFkZGluZy1sZWZ0OiAxZXg7Ij4KCgoKCgoKCgoKPGRpdiBsaW5rPSJibHVlIiB2bGluaz0i
+cHVycGxlIiBsYW5nPSJaSC1UVyI+Cgo8ZGl2IHN0eWxlPSIiPgoKPHA+PGZvbnQgZmFjZT0iQXJp
+YWwiIHNpemU9IjEiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6IDlwdDsgZm9udC1mYW1pbHk6IEFy
+aWFsOyIgbGFuZz0iRU4tVVMiPkRlYXIgU2lyLDwvc3Bhbj48L2ZvbnQ+PC9wPgoKPHA+PGZvbnQg
+ZmFjZT0iQXJpYWwiIHNpemU9IjEiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6IDlwdDsgZm9udC1m
+YW1pbHk6IEFyaWFsOyIgbGFuZz0iRU4tVVMiPkkgbWV0IGEgaW5zdGFsbCBwcm9ibGVtIGFib3V0
+IGJsdWV6IHRvb2xzLiBJIGdvdCB0aGUKbGlicyBhbmQgdG9vbChibHVlei11dGlscy0zLjgudGFy
+LnRhciwgYmx1ZXotbGlicy0zLjgudGFyLnRhciwgYmx1ZXotaGNpZHVtcC0xLjMzLnRhci50YXKh
+SykKZnJvbSBibHVleiBvcGVuIHNvdXJjZSBzaXRlLCB0aGVuIEkgaW5zdGFsbGVkIHRoZSBibHVl
+ei1saWJzIGZpcnN0Ljwvc3Bhbj48L2ZvbnQ+PC9wPgoKPHA+PGZvbnQgZmFjZT0iQXJpYWwiIHNp
+emU9IjEiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6IDlwdDsgZm9udC1mYW1pbHk6IEFyaWFsOyIg
+bGFuZz0iRU4tVVMiPkFmdGVyIHN1Y2Nlc3NmdWxseSBpbnN0YWxsaW5nIGJsdWV6LWxpYnMsIEkg
+Y29udGludWVkCnRvIGluc3RhbGwgYmx1ZXotdXRpbHMsIGJ1dCBpdCBmYWlsZWQgYXQgY29uZmln
+IHN0YWdlLiBUaGUgZXJyb3IgbWVzc2FnZSBpczxmb250IGNvbG9yPSJyZWQiPjxzcGFuIHN0eWxl
+PSJjb2xvcjogcmVkOyI+ICJjaGVja2luZyBmb3IgQkxVRVouLi4gY29uZmlndXJlOiBlcnJvcjoK
+Qmx1ZXRvb3RoIGxpYnJhcnkgaXMgcmVxdWlyZWQiPC9zcGFuPjwvZm9udD48Zm9udCBjb2xvcj0i
+YmxhY2siPjxzcGFuIHN0eWxlPSJjb2xvcjogYmxhY2s7Ij4uPC9zcGFuPjwvZm9udD48L3NwYW4+
+PC9mb250PjwvcD4KCjxwPjxmb250IGNvbG9yPSJibGFjayIgZmFjZT0iQXJpYWwiIHNpemU9IjEi
+PjxzcGFuIHN0eWxlPSJmb250LXNpemU6IDlwdDsgZm9udC1mYW1pbHk6IEFyaWFsOyBjb2xvcjog
+YmxhY2s7IiBsYW5nPSJFTi1VUyI+VGhlIHNhbWUgc2l0dWF0aW9uIG9jY3VycmVkCmFzIEkgaW5z
+dGFsbGVkIGJsdWV6LWhjaWR1bXAuIEkgZG9uJ3Qga25vdyBob3cgdG8gc29sdmUgaXQsIGhvcGUg
+c29tZW9uZSBjYW4KaGVscCBtZS4gVGhhbmtzLjwvc3Bhbj48L2ZvbnQ+PC9wPgoKPHA+PGZvbnQg
+Y29sb3I9ImJsYWNrIiBmYWNlPSJBcmlhbCIgc2l6ZT0iMSI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6
+ZTogOXB0OyBmb250LWZhbWlseTogQXJpYWw7IGNvbG9yOiBibGFjazsiIGxhbmc9IkVOLVVTIj4m
+bmJzcDs8L3NwYW4+PC9mb250PjwvcD4KCjxwPjxmb250IGNvbG9yPSJibGFjayIgZmFjZT0iQXJp
+YWwiIHNpemU9IjEiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6IDlwdDsgZm9udC1mYW1pbHk6IEFy
+aWFsOyBjb2xvcjogYmxhY2s7IiBsYW5nPSJFTi1VUyI+QmVzdCBSZWdhcmRzLDwvc3Bhbj48L2Zv
+bnQ+PC9wPgoKPHA+PGZvbnQgY29sb3I9ImJsYWNrIiBmYWNlPSJBcmlhbCIgc2l6ZT0iMSI+PHNw
+YW4gc3R5bGU9ImZvbnQtc2l6ZTogOXB0OyBmb250LWZhbWlseTogQXJpYWw7IGNvbG9yOiBibGFj
+azsiIGxhbmc9IkVOLVVTIj5aYWNrIDwvc3Bhbj48L2ZvbnQ+PC9wPgoKPC9kaXY+Cgo8L2Rpdj4K
+CgoKPGJyPi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS08YnI+VGFrZSBTdXJ2ZXlzLiBFYXJuIENhc2guIEluZmx1
+ZW5jZSB0aGUgRnV0dXJlIG9mIElUPGJyPkpvaW4gU291cmNlRm9yZ2UubmV0JiMzOTtzIFRlY2hz
+YXkgcGFuZWwgYW5kIHlvdSYjMzk7bGwgZ2V0IHRoZSBjaGFuY2UgdG8gc2hhcmUgeW91cgo8YnI+
+b3BpbmlvbnMgb24gSVQgJmFtcDsgYnVzaW5lc3MgdG9waWNzIHRocm91Z2ggYnJpZWYgc3VydmV5
+cyAtIGFuZCBlYXJuIGNhc2g8YnI+PGEgb25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGlu
+ayh3aW5kb3csZXZlbnQsdGhpcykiIGhyZWY9Imh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVmYXVs
+dC5waHA/cGFnZT1qb2luLnBocCZhbXA7cD1zb3VyY2Vmb3JnZSZhbXA7Q0lEPURFVkRFViIgdGFy
+Z2V0PSJfYmxhbmsiPgpodHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9p
+bi5waHAmYW1wO3A9c291cmNlZm9yZ2UmYW1wO0NJRD1ERVZERVY8L2E+PGJyPjxicj5fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXzxicj5CbHVlei11c2VycyBt
+YWlsaW5nIGxpc3Q8YnI+PGEgb25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5k
+b3csZXZlbnQsdGhpcykiIGhyZWY9Im1haWx0bzpCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3Jn
+ZS5uZXQiPgpCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQ8L2E+PGJyPjxhIG9uY2xp
+Y2s9InJldHVybiB0b3AuanMuT3BlbkV4dExpbmsod2luZG93LGV2ZW50LHRoaXMpIiBocmVmPSJo
+dHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2VycyIg
+dGFyZ2V0PSJfYmxhbmsiPmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3Rp
+bmZvL2JsdWV6LXVzZXJzCjwvYT48YnI+PGJyPjxicj48L2Jsb2NrcXVvdGU+PC9kaXY+PGJyPgo=
+------=_Part_84810_5946705.1169106270877--
 
-Question: how do I set up the Bluez system so that
-1) it is listening for incoming rfcomm connections from a specific BT 
-interface (say hci0) without needing to define the BT address of the 
-device that tries to connect
-2) find out what is the BT address of the device that is trying to connect
-3) enters PIN automatically for example from a file
 
-I've been trying to follow some of the instructions from the web but 
-they seem to be slightly off the mark when comparing to the stuff that 
-I'm trying.
-
-Help would be _very_ much appreciated and thanks in advance.
-
--- 
-MjS
+--===============1700257212==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1700257212==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1700257212==--
