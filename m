@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+From: Fernando Unzu <fernando@bluexare.org>
 To: bluez-users@lists.sourceforge.net
-From: Andres <ortiz_a@telefonica.net>
-Date: Thu, 18 Jan 2007 23:11:27 +0000 (UTC)
-Message-ID: <loom.20070119T000915-349@post.gmane.org>
-Mime-Version: 1.0
-Subject: [Bluez-users] problems installing bluez-utils
+Date: Thu, 18 Jan 2007 17:42:18 +0100
+MIME-Version: 1.0
+Message-Id: <200701181742.18824.fernando@bluexare.org>
+Subject: [Bluez-users] Caugth the pairing event
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,15 +19,25 @@ Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hello,
+I'm working by searching the mode of caught the pairing event with my PC from 
+one mobile.
 
-I have successfully installed bluez-libs, but when I try to install bluez-utils,
-even ./configure goes ok, make command shows a lot of errors.
+With the rfcomm I have achieved to know when an OBEX connection is gone to be 
+realized (for example).
 
-Could anybody help me?
+But the pairing event I think it is not controlled by rfcomm.
 
-Thank you.
+It is so?
 
+In the sdptool I haven't found the service that offers that (or is not a 
+service?)
 
+I can caugth a general event by checking hci, but I think is not an optimal 
+solution.
+I want to program a solution, and I wish to know which protocol works with 
+pairing.
+
+Thanks very much.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
