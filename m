@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45B1CF57.4010802@glidos.net>
-Date: Sat, 20 Jan 2007 08:14:15 +0000
-From: Paul Gardiner <osronline@glidos.net>
-MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <45AD232F.30104@glidos.net> <45AF7265.4050806@glidos.net>
-In-Reply-To: <45AF7265.4050806@glidos.net>
-Subject: Re: [Bluez-users] Problems fooling my S100 into using Bluez as a
- modem (Solved)
+To: bluez-users@lists.sourceforge.net
+From: Andres <ortiz_a@telefonica.net>
+Date: Fri, 19 Jan 2007 23:26:12 +0000 (UTC)
+Message-ID: <loom.20070120T002212-956@post.gmane.org>
+References: <loom.20070119T000915-349@post.gmane.org>
+	<57c68ddc0701182021h7b9ed313t5cdf667250aa66da@mail.gmail.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] problems installing bluez-utils
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,30 +20,69 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Paul Gardiner wrote:
-> Paul Gardiner wrote:
->> Paul Gardiner wrote:
->> Anyway, here's another strange thing that might
->> be an indicator of what's wrong: ps alx shows me
->>
->>    /usr/bin/dund --listen --persist --msdun call dun
->>
->>
->> suggesting that dund is running and happy, but
->>
->> sdp://localhost lists
->>
->> Obex Push Server
->> KBSerialChat
->> KDE Bemused
->> LAN Access Point
->>
->> and that's it. No Dial Up Networking.  Why would
->> that be?
+Thank you for reply.
 
-All that was needed was to supply dund with the --dialup
-option in place of the --listen option.  All works
-perfectly again now.
+
+sdp-xml.c:36:27: bluetooth/sdp.h: No such file or directory
+sdp-xml.c:37:31: bluetooth/sdp_lib.h: No such file or directory
+In file included from sdp-xml.c:41:
+sdp-xml.h:28:27: bluetooth/sdp.h: No such file or directory
+In file included from sdp-xml.c:41:
+sdp-xml.h:33: error: parse error before '*' token
+sdp-xml.h:34: error: parse error before ')' token
+sdp-xml.h:36: warning: type defaults to `int' 
+in declaration of `sdp_xml_parse_nil'
+sdp-xml.h:36: warning: data definition has no 
+type or storage class
+sdp-xml.h:37: error: parse error before '*' token
+sdp-xml.h:37: warning: type defaults to `int' in 
+declaration of `sdp_xml_parse_text'
+sdp-xml.h:37: warning: data definition has no 
+type or storage class
+sdp-xml.h:38: error: parse error before '*' token
+sdp-xml.h:38: warning: type defaults to `int' 
+in declaration of `sdp_xml_parse_url'
+sdp-xml.h:38: warning: data definition has no 
+type or storage class
+sdp-xml.h:39: error: parse error before '*' token
+sdp-xml.h:39: error: parse error before "uint8_t"
+sdp-xml.h:39: warning: type defaults to `int' in 
+declaration of `sdp_xml_parse_int'
+sdp-xml.h:39: warning: data definition has no 
+type or storage class
+sdp-xml.h:40: error: parse error before '*' token
+sdp-xml.h:40: warning: type defaults to `int' 
+in declaration of `sdp_xml_parse_uuid'
+sdp-xml.h:40: warning: data definition has no 
+type or storage class
+sdp-xml.h:42: error: parse error before '*' token
+sdp-xml.h:42: warning: type defaults to `int' in 
+declaration of
+`sdp_xml_parse_record'
+sdp-xml.h:42: warning: data definition has no 
+type or storage class
+sdp-xml.c:46: error: parse error before '*' token
+sdp-xml.c:47: error: parse error before ')' token
+sdp-xml.c:54: error: parse error before "if"
+sdp-xml.c:62: error: `i' undeclared here 
+(not in a function)
+sdp-xml.c:62: warning: type defaults to `int' 
+in declaration of `next_indent'
+sdp-xml.c:62: error: conflicting types 
+for `next_indent'
+sdp-xml.c:52: error: previous declaration 
+of `next_indent'
+sdp-xml.c:62: warning: data definition has 
+no type or storage class
+sdp-xml.c:63: error: parse error before '}' token
+make[2]: *** [sdp-xml.o] Interrupt
+make[1]: *** [all-recursive] Interrupt
+make: *** [all] Interrupt
+
+
+
+
+Thank you.
 
 
 
