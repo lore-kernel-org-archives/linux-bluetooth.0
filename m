@@ -1,10 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Message-ID: <45B03C7E.000044.16122@bj163app38.163.com>
-Date: Fri, 19 Jan 2007 11:35:26 +0800 (CST)
-From: "=?gb2312?B?t8nM7Nbt?=" <wjs-198209@163.com>
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Plugz  Building Problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Choi Sonim <choisonim@gmail.com>
+In-Reply-To: <4f436aae0701181559h63b7d509n5dc73c55353d8c79@mail.gmail.com>
+References: <4f436aae0701172208l7ac85a75tc592fa15d1b57f8@mail.gmail.com>
+	<1169108019.6853.1.camel@violet>
+	<4f436aae0701181523y55ad36bdu9645c786a252c04e@mail.gmail.com>
+	<1169164343.6853.7.camel@violet>
+	<4f436aae0701181559h63b7d509n5dc73c55353d8c79@mail.gmail.com>
+Date: Fri, 19 Jan 2007 02:02:50 +0100
+Message-Id: <1169168570.6853.10.camel@violet>
+Mime-Version: 1.0
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] /sys/devices/platform/bluetooth
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,212 +21,53 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0995460250=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Choi,
 
---===============0995460250==
-Content-Type: Multipart/Alternative;
-	boundary="Boundary-=_QSSWnPFtBAiWJZyhYdaPUAVjQzPJ"
+> > > > > Where is the code that does the platform registration to this device :
+> > > > > /sys/devices/platform/bluetooth
+> > > >
+> > > > you find it in net/bluetooth/hci_sysfs.c in the kernel source code.
+> > >
+> > > What is the purpose of the bluetooth platform device (and bus and class..) ?
+> > >
+> > > I guess that bluetooth devices would prefer to register themselves as children
+> > > of their true bus (like USB or PCI or even serial) so when the system goes
+> > > to suspend, their suspend function will be called before their father's
+> > > (the true hardware bus of our bluetooth device).
+> >
+> > if they do have a physical parent. Some devices like virtual HCI or
+> > serial based chips don't have a physical parent.
+> 
+> About the serial based chips -
+> I'm sure they would like their suspend function to be called before the
+> serial uart driver's suspend, so for them to set device parent to the
+> serial device
+> can be a benefit too, no ?
 
+if you write a chip specific driver then yes. For all line discipline
+based ones at the moment, you are simply out of luck.
 
---Boundary-=_QSSWnPFtBAiWJZyhYdaPUAVjQzPJ
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: quoted-printable
+> About the virtual HCI - I really don't know what are them, can you please
+> explain this ?
 
-Hello ,everybody!
+You can emulate a HCI host device in userspace using hciemu.
 
-I am a newbie of bluez.I have downloaded plugz from cvs repository inform=
-ed on site http://bluetooth-alsa.sourceforge.net/build.html.when I built =
-sbc project I found bootstrap cound not run on my fc6 system directly.It =
-printed the following error message:bash: ./bootstrap: /bin/sh^M: bad int=
-erpreter: =C3=BB=D3=D0=C4=C7=B8=F6=CE=C4=BC=FE=BB=F2=C4=BF=C2=BC, then I =
-tried to run every commands in bootstrap one by one and It generated conf=
-igure script .The problem also existed when building plugz.So I built sbc=
- project successfully at last.However,I had another trouble when I built =
-plugz.After I ran configure to generate correspording files make had erro=
-rs:
+Regards
 
-make  all-recursive
-make[1]: Entering directory `/download/bluetooth-alsa/plugz'
-Making all in avdtp
-make[2]: Entering directory `/download/bluetooth-alsa/plugz/avdtp'
-/bin/sh ../libtool --tag=3DCC --mode=3Dlink gcc -I/usr/include -Wall -O2 =
-  -o avtest  avtest.o -lbluetooth libavdtp.a -lbluetooth -lasound -lm -ld=
-l -lpthread -lbluetooth
-: command not found1:=20
-: command not found3:=20
-: command not found0:=20
-/bin/sed=A3=BA-e =B1=ED=B4=EF=CA=BD #1=A3=AC=D7=D6=B7=FB 10=A3=BAunknown =
-option to `s'
-: command not found4:=20
-: command not found8:=20
-: command not found3:=20
-: command not found4:=20
-=2E./libtool: line 409: syntax error near unexpected token `elif'
-'./libtool: line 409: `elif test "X$1" =3D X--fallback-echo; then
-make[2]: *** [avtest] =B4=ED=CE=F3 2
-make[2]: Leaving directory `/download/bluetooth-alsa/plugz/avdtp'
-make[1]: *** [all-recursive] =B4=ED=CE=F3 1
-make[1]: Leaving directory `/download/bluetooth-alsa/plugz'
-make: *** [all] =B4=ED=CE=F3 2.
-
-I tried to run libtool script generated by configure following hints.It p=
-rints the errors message as well:
-: command not found
-: command not found
-: command not found
-/bin/sed=A3=BA-e =B1=ED=B4=EF=CA=BD #1=A3=AC=D7=D6=B7=FB 10=A3=BAunknown =
-option to `s'
-: command not found
-: command not found
-: command not found
-: command not found
-libtool: line 409: syntax error near unexpected token `elif'
-'ibtool: line 409: `elif test "X$1" =3D X--fallback-echo; then
-
-So I found out that the problem was the libtool script.Then I found out t=
-here was another libtool script in /usr/bin which was installed in libtoo=
-l-1.5.22-6.1 package and it's different from the libtool generated by con=
-figure ,and then  I replaced libtool by /usr/bin/libtool and make ran smo=
-othly.The make masseges in the end is
-
-(cd .libs && rm -f libasound_module_ctl_sco.so.0 && ln -s libasound_modul=
-e_ctl_sco.so.0.0.0 libasound_module_ctl_sco.so.0)
-(cd .libs && rm -f libasound_module_ctl_sco.so && ln -s libasound_module_=
-ctl_sco.so.0.0.0 libasound_module_ctl_sco.so)
-ar cru .libs/libasound_module_ctl_sco.a  ctl_sco.o
-ranlib .libs/libasound_module_ctl_sco.a
-creating libasound_module_ctl_sco.la
-(cd .libs && rm -f libasound_module_ctl_sco.la && ln -s ../libasound_modu=
-le_ctl_sco.la libasound_module_ctl_sco.la)
-make[3]: Leaving directory `/download/bluetooth-alsa/plugz/alsa-plugins'
-make[2]: Leaving directory `/download/bluetooth-alsa/plugz/alsa-plugins'
-make[2]: Entering directory `/download/bluetooth-alsa/plugz'
-make[2]: Nothing to be done for `all-am'.
-make[2]: Leaving directory `/download/bluetooth-alsa/plugz'
-make[1]: Leaving directory `/download/bluetooth-alsa/plugz'
+Marcel
 
 
-However I found there is no sample.a2dprc file in subdirectory alsa-plugi=
-ns after make install finished,so I counldn't continue to install plugz f=
-ollowing instuction on the site http://bluetooth-alsa.sourceforge.net/bui=
-ld.html.
-I am sorry for wasting your time for my unbearably long description.I que=
-stions are :
-what difference is there between the two libtools,one of which is install=
-ed in libtool-1.5.22-6.1 and the other of which is generated by plugz ?ha=
-ve I built plugz successully by replacement of libtool  ?can it work with=
- this ?How can I complete the installation ?and is plugz able to embed in=
- arm s3c2440.
-
-Thank you in advance!I am so grateful for your reply since I don't know w=
-hat to do now!
-
-
-                                                                         =
-                   Yours Jimscene Wang
-
-
---Boundary-=_QSSWnPFtBAiWJZyhYdaPUAVjQzPJ
-Content-Type: text/html; charset="gb2312"
-Content-Transfer-Encoding: quoted-printable
-
-Hello ,everybody!<br><br>I am a newbie of bluez.I have downloaded plugz f=
-rom cvs repository informed on site http://bluetooth-alsa.sourceforge.net=
-/build.html.when I built sbc project I found bootstrap cound not run on m=
-y fc6 system directly.It printed the following error message:bash: ./boot=
-strap: /bin/sh^M: bad interpreter: =C3=BB=D3=D0=C4=C7=B8=F6=CE=C4=BC=FE=BB=
-=F2=C4=BF=C2=BC, then I tried to run every commands in bootstrap one by o=
-ne and It generated configure script .The problem also existed when build=
-ing plugz.So I built sbc project successfully at last.However,I had anoth=
-er trouble when I built plugz.After I ran configure to generate correspor=
-ding files make had errors:<br><br>make&nbsp; all-recursive<br>make[1]: E=
-ntering directory `/download/bluetooth-alsa/plugz'<br>Making all in avdtp=
-<br>make[2]: Entering directory `/download/bluetooth-alsa/plugz/avdtp'<br=
->/bin/sh ../libtool --tag=3DCC --mode=3Dlink gcc -I/usr/include -Wall -O2=
-&nbsp;&nbsp; -o avtest&nbsp; avtest.o -lbluetooth libavdtp.a -lbluetooth =
--lasound -lm -ldl -lpthread -lbluetooth<br>: command not found1: <br>: co=
-mmand not found3: <br>: command not found0: <br>/bin/sed=A3=BA-e =B1=ED=B4=
-=EF=CA=BD #1=A3=AC=D7=D6=B7=FB 10=A3=BAunknown option to `s'<br>: command=
- not found4: <br>: command not found8: <br>: command not found3: <br>: co=
-mmand not found4: <br>../libtool: line 409: syntax error near unexpected =
-token `elif'<br>'./libtool: line 409: `elif test "X$1" =3D X--fallback-ec=
-ho; then<br>make[2]: *** [avtest] =B4=ED=CE=F3 2<br>make[2]: Leaving dire=
-ctory `/download/bluetooth-alsa/plugz/avdtp'<br>make[1]: *** [all-recursi=
-ve] =B4=ED=CE=F3 1<br>make[1]: Leaving directory `/download/bluetooth-als=
-a/plugz'<br>make: *** [all] =B4=ED=CE=F3 2.<br><br>I tried to run libtool=
- script generated by configure following hints.It prints the errors messa=
-ge as well:<br>: command not found<br>: command not found<br>: command no=
-t found<br>/bin/sed=A3=BA-e =B1=ED=B4=EF=CA=BD #1=A3=AC=D7=D6=B7=FB 10=A3=
-=BAunknown option to `s'<br>: command not found<br>: command not found<br=
->: command not found<br>: command not found<br>libtool: line 409: syntax =
-error near unexpected token `elif'<br>'ibtool: line 409: `elif test "X$1"=
- =3D X--fallback-echo; then<br><br>So I found out that the problem was th=
-e libtool script.Then I found out there was another libtool script in /us=
-r/bin which was installed in libtool-1.5.22-6.1 package and it's differen=
-t from the libtool generated by configure ,and then&nbsp; I replaced libt=
-ool by /usr/bin/libtool and make ran smoothly.The make masseges in the en=
-d is<br><br>(cd .libs &amp;&amp; rm -f libasound_module_ctl_sco.so.0 &amp=
-;&amp; ln -s libasound_module_ctl_sco.so.0.0.0 libasound_module_ctl_sco.s=
-o.0)<br>(cd .libs &amp;&amp; rm -f libasound_module_ctl_sco.so &amp;&amp;=
- ln -s libasound_module_ctl_sco.so.0.0.0 libasound_module_ctl_sco.so)<br>=
-ar cru .libs/libasound_module_ctl_sco.a&nbsp; ctl_sco.o<br>ranlib .libs/l=
-ibasound_module_ctl_sco.a<br>creating libasound_module_ctl_sco.la<br>(cd =
-=2Elibs &amp;&amp; rm -f libasound_module_ctl_sco.la &amp;&amp; ln -s ../=
-libasound_module_ctl_sco.la libasound_module_ctl_sco.la)<br>make[3]: Leav=
-ing directory `/download/bluetooth-alsa/plugz/alsa-plugins'<br>make[2]: L=
-eaving directory `/download/bluetooth-alsa/plugz/alsa-plugins'<br>make[2]=
-: Entering directory `/download/bluetooth-alsa/plugz'<br>make[2]: Nothing=
- to be done for `all-am'.<br>make[2]: Leaving directory `/download/blueto=
-oth-alsa/plugz'<br>make[1]: Leaving directory `/download/bluetooth-alsa/p=
-lugz'<br><br><br>However I found there is no sample.a2dprc file in subdir=
-ectory alsa-plugins after make install finished,so I counldn't continue t=
-o install plugz following instuction on the site http://bluetooth-alsa.so=
-urceforge.net/build.html.<br>I am sorry for wasting your time for my unbe=
-arably long description.I questions are :<br>what difference is there bet=
-ween the two libtools,one of which is installed in libtool-1.5.22-6.1 and=
- the other of which is generated by plugz ?have I built plugz successully=
- by replacement of libtool&nbsp; ?can it work with this ?How can I comple=
-te the installation ?and is plugz able to embed in arm s3c2440.<br><br>Th=
-ank you in advance!I am so grateful for your reply since I don't know wha=
-t to do now!<br><br><br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp=
-; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&n=
-bsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp=
-;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&n=
-bsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp=
-;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &n=
-bsp;&nbsp;&nbsp; &nbsp;Yours Jimscene Wang<br><br><div id=3D"spnSign"></d=
-iv><br><!-- footer --><br><hr>
-<a style=3D"font-size:12px;line-height:15px; color:#000; text-decoration:=
-none" href=3D"http://www.126.com/" target=3D"_blank">=B6=C0=BC=D2=A3=A1=CD=
-=F8=D2=D73G=C3=E2=B7=D1=D3=CA=A3=AC=BB=B9=D4=F9=CB=CD280=D5=D7=CD=F8=C5=CC=
- <span style=3D"font-family:Tahoma; text-decoration:underline; color:blue=
-">www.126.com</span> </a>
---Boundary-=_QSSWnPFtBAiWJZyhYdaPUAVjQzPJ--
-
-
---===============0995460250==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0995460250==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0995460250==--
