@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4f436aae0701191104h376e9e89mca6769544b257e29@mail.gmail.com>
-Date: Fri, 19 Jan 2007 21:04:48 +0200
-From: "Choi Sonim" <choisonim@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Message-ID: <45B0F289.9030601@palmsource.com>
+Date: Fri, 19 Jan 2007 17:32:09 +0100
+From: =?UTF-8?B?RnLDqWTDqXJpYyBEQUxMRUFV?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] loading of hci_uart.ko
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <D8CE9CFA707C894180BAC8CDD154F8460AE9CE93@msiexch01.marvell.com>
+In-Reply-To: <D8CE9CFA707C894180BAC8CDD154F8460AE9CE93@msiexch01.marvell.com>
+Subject: Re: [Bluez-devel] Plugz issue
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,27 +16,35 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-hi all,
-
-I want to ask.
-when I do "hciattach /dev/ttyS0 any", somehow the needed module
-hci_uart.ko is loaded.
-I looked in hciattach.c but I do not see how is it done.
-can u please help me here ?
-
-thank you very much all
-choi.
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+UXVpbnRvbiwKPgo+IFRoYW5rcywKPgo+ICAgIDEuIFRoaXMgZmxhZyBzdGlsbCBkb2VzbuKAmXQg
+d29yayBvbiBteSBzeXN0ZW0sCj4KSSBqdXN0IHRyaWVkIGEyZHBkIGZyb20gcGx1Z3ogbGF0ZXN0
+IGN2cyBhbmQgbWFkZSBzdXJlIHRoZSBmbGFncz0xIGlzIAp3b3JraW5nLgpCYXNlZCBvbiB0aGF0
+LCBteSBndWVzcyBpcyB0aGF0IHlvdSBtb2RpZmllZCB0aGUgd3JvbmcgZmlsZS4gQXJlIHdlIG9r
+IAp0aGF0IHRoZSBmaWxlIGlzIGxvY2F0ZWQgYXQgICRIT01FLy5hMmRwcmMKSWYgeW91IGFyZSB1
+c2luZyB0aGUgZGFlbW9uIHVuZGVyIGFub3RoZXIgdXNlciB0aGFuIHlvdXIgZGVza3RvcCB1c2Vy
+IApmb3IgZXhhbXBsZSAoc2F5IHJvb3QpLCB0aGUgcmMgZmlsZSB3b3VsZCBiZSBpbiB0aGUgaG9t
+ZSBkaXJlY3Rvcnkgb2YgCnRoYXQgdXNlcikgb3IgeW91IGNvdWxkIHVzZSB0aGUgLWYgb3B0aW9u
+LiBUaGUgZGFlbW9uIGRvbid0IG5lZWQgcm9vdCAKcHJpdmlsZWdlcy4KPgo+ICAgIDQuIFhNTVMg
+cGxheWJhY2sgc3BlZWQgaXNzdWUgc2VlbXMgdGllZCB0byBNTUFQIG1vZGUgZW5hYmxlZCwKPiAg
+ICAgICBkaXNhYmxlIHRoaXMgbW9kZSB3aWxsIGdldCB0aGUgcmlnaHQgcGxheWJhY2sgc3BlZWQs
+IGhvd2V2ZXIsCj4gICAgICAgYXVkaW8gc3RpbGwgYnJlYWsgIGV2ZXJ5IDIgb3IgMyBzZWNvbmRz
+LCBhbnkgY3VlIGZvciB0aGlzID8KPgpBdWRpbyBicmVha3MgYXJlIG1vc3RseSBoYXJkd2FyZSBy
+ZWxhdGVkIDogSSBoYWQgZGlmZmVyZW50IGNhdXNlcyA6Ci0gSW5zdWZmaWNpZW50IGJhbmR3aXRo
+IChmb3IgZXhlbXBsZSwgc2VyaWFsIGFkYXB0ZXJzIHNldCBhdCAxMTVrLCBvciAKc2JjYml0cG9v
+bCB0b28gYmlnKQotIEhlYWRzZXQgZG9uJ3QgbGlrZSB0aGUgc2JjYml0cG9vbCB3ZSBwcm92aWRl
+LgotIEJhZCBhZGFwdGVyIChJIGhhdmUgb25lIHRoYXQgZG9lcyB0aGlzIHdpdGggYSBiZGFkZHIg
+aW9mIDExOjExOjExOjExLi4uKQoKU28gYXMgQnJhZCBhc2tlZCA6IHdoYXQgaGVhZHNldCBkbyB5
+b3UgdXNlPwoKQlIsIEZyw6lkw6lyaWMKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRha2UgU3VydmV5cy4g
+RWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBvZiBJVApKb2luIFNvdXJjZUZvcmdlLm5l
+dCdzIFRlY2hzYXkgcGFuZWwgYW5kIHlvdSdsbCBnZXQgdGhlIGNoYW5jZSB0byBzaGFyZSB5b3Vy
+Cm9waW5pb25zIG9uIElUICYgYnVzaW5lc3MgdG9waWNzIHRocm91Z2ggYnJpZWYgc3VydmV5cyAt
+IGFuZCBlYXJuIGNhc2gKaHR0cDovL3d3dy50ZWNoc2F5LmNvbS9kZWZhdWx0LnBocD9wYWdlPWpv
+aW4ucGhwJnA9c291cmNlZm9yZ2UmQ0lEPURFVkRFVgpfX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2
+ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xp
+c3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
