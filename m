@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <b5dccebe0701190517t50869e29y4fcacda8475db035@mail.gmail.com>
-References: <b5dccebe0701190517t50869e29y4fcacda8475db035@mail.gmail.com>
-Date: Fri, 19 Jan 2007 16:17:43 +0100
-Message-Id: <1169219863.29458.10.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] BlueZ on other platforms
+Message-ID: <b5dccebe0701190517t50869e29y4fcacda8475db035@mail.gmail.com>
+Date: Fri, 19 Jan 2007 14:17:20 +0100
+From: "Mikael Lindqvist" <li.mikael.spam@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-users] BlueZ on other platforms
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,25 +18,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mikael,
+Hello,
 
-> Is it possible to get bluez to work on other platforms than Linux? I'm
-> asking because it's a real good bluetooth stack and that's a rare
-> thing... So technically it's not bluez, but bluez-libs. So what about
-> 
-> Bluez on Mac?
-> Bluez on Windows?
-> Bluez on Cygwin on Windows?
+Is it possible to get bluez to work on other platforms than Linux? I'm
+asking because it's a real good bluetooth stack and that's a rare
+thing... So technically it's not bluez, but bluez-libs. So what about
 
-non of that will work. The Bluetooth library depends on kernel
-structures and one of the big advantages of BlueZ is the native
-integration with the socket API.
+Bluez on Mac?
+Bluez on Windows?
+Bluez on Cygwin on Windows?
 
-Regards
-
-Marcel
-
-
+-- Mikael
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
