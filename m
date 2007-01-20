@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <b5dccebe0701200259i156f623ci1fc12159affbd2f4@mail.gmail.com>
-Date: Sat, 20 Jan 2007 11:59:02 +0100
-From: "Mikael Lindqvist" <li.mikael.spam@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1169219863.29458.10.camel@violet>
+Message-ID: <45B1CF57.4010802@glidos.net>
+Date: Sat, 20 Jan 2007 08:14:15 +0000
+From: Paul Gardiner <osronline@glidos.net>
 MIME-Version: 1.0
-References: <b5dccebe0701190517t50869e29y4fcacda8475db035@mail.gmail.com>
-	<1169219863.29458.10.camel@violet>
-Subject: Re: [Bluez-users] BlueZ on other platforms
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <45AD232F.30104@glidos.net> <45AF7265.4050806@glidos.net>
+In-Reply-To: <45AF7265.4050806@glidos.net>
+Subject: Re: [Bluez-users] Problems fooling my S100 into using Bluez as a
+ modem (Solved)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,34 +21,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 1/19/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Mikael,
->
-> > Is it possible to get bluez to work on other platforms than Linux? I'm
-> > asking because it's a real good bluetooth stack and that's a rare
-> > thing... So technically it's not bluez, but bluez-libs. So what about
-> >
-> > Bluez on Mac?
-> > Bluez on Windows?
-> > Bluez on Cygwin on Windows?
->
-> non of that will work. The Bluetooth library depends on kernel
-> structures and one of the big advantages of BlueZ is the native
-> integration with the socket API.
->
-> Regards
->
-> Marcel
->
+Paul Gardiner wrote:
+> Paul Gardiner wrote:
+>> Paul Gardiner wrote:
+>> Anyway, here's another strange thing that might
+>> be an indicator of what's wrong: ps alx shows me
+>>
+>>    /usr/bin/dund --listen --persist --msdun call dun
+>>
+>>
+>> suggesting that dund is running and happy, but
+>>
+>> sdp://localhost lists
+>>
+>> Obex Push Server
+>> KBSerialChat
+>> KDE Bemused
+>> LAN Access Point
+>>
+>> and that's it. No Dial Up Networking.  Why would
+>> that be?
 
-Ok,
+All that was needed was to supply dund with the --dialup
+option in place of the --listen option.  All works
+perfectly again now.
 
-So not even for Cygwin? How difficult would this be to add? I.e. how
-big parts of bluez would have to be rewritten and how much could be
-reused to make it work on cygwin (I suppose this would be layered on
-top of the Microsoft bluetooth stack)?
 
--- Mikael
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
