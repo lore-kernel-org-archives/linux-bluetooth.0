@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: =?iso-8859-1?Q?M=E5ns_Rullg=E5rd?= <mru@inprovide.com>
-Date: Sun, 21 Jan 2007 18:23:54 +0000
-Message-ID: <yw1x4pqk44sl.fsf@thrashbarg.inprovide.com>
+Message-ID: <2b1fa7660701201327i4db22eb8ya5d61ab753d761b2@mail.gmail.com>
+Date: Sun, 21 Jan 2007 10:27:16 +1300
+From: "Thomas Kear" <thomas.kear@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200701201418.16897.akohlsmith-asterisk@benshaw.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-=-="
-Subject: [Bluez-devel] [PATCH] make 64-bit headsetd work with 32-bit clients
+References: <7ff566830701191602k43dc1f66wed1e7c0d31b28452@mail.gmail.com>
+	<200701201418.16897.akohlsmith-asterisk@benshaw.com>
+Subject: Re: [Bluez-devel] Spam in the channel...
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,99 +17,48 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---=-=-=
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
+This would be about the third or fourth time since I've been
+subscribed to this (and the bluez-user) list that this has been
+suggested and nothing has yet been done about it :(
 
-The attached patch makes headsetd and the ALSA PCM plugin use
-fixed-width types in the IPC data structures.  Without this, a 32-bit
-client will not work with a 64-bit headsetd and vice versa because of
-the different sizes of the 'long' type.
+--Thomas
 
---=20
-M=E5ns Rullg=E5rd
-mru@inprovide.com
+On 21/01/07, Andrew Kohlsmith <akohlsmith-asterisk@benshaw.com> wrote:
+> On Friday 19 January 2007 7:02 pm, Kelly Price wrote:
+> > Anyone able to tweak the list to prevent all this spam comming in?
+>
+> I think the biggest thing would simply to make it so that posting is
+> restricted to subscribers.  I am not sure why this hasn't been done.
+>
+> -A.
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys - and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
---=-=-=
-Content-Type: text/x-patch
-Content-Disposition: attachment; filename=headset-32-64bit.patch
 
-Index: alsa-plugins/pcm_sco.c
-===================================================================
-RCS file: /cvsroot/bluetooth-alsa/plugz/alsa-plugins/pcm_sco.c,v
-retrieving revision 1.2
-diff -u -r1.2 pcm_sco.c
---- alsa-plugins/pcm_sco.c	28 Dec 2006 12:52:37 -0000	1.2
-+++ alsa-plugins/pcm_sco.c	21 Jan 2007 16:05:30 -0000
-@@ -24,6 +24,7 @@
- #include <sys/un.h>
- #include <unistd.h>
- #include <errno.h>
-+#include <stdint.h>
- 
- #include <alsa/asoundlib.h>
- #include <alsa/pcm_external.h>
-@@ -85,8 +86,8 @@
- 	unsigned char type;
- 	union {
- 		bdaddr_t     bdaddr;	               /* PKT_TYPE_CFG_BDADDR        */
--		long         timeout;                  /* PKT_TYPE_CFG_PAGINGTIMEOUT */
--		int	     errorcode;		       /* PKT_TYPE_ERROR_IND        */
-+		int32_t      timeout;                  /* PKT_TYPE_CFG_PAGINGTIMEOUT */
-+		int32_t	     errorcode;		       /* PKT_TYPE_ERROR_IND        */
- 	};
- } ipc_packet_t;
- 
-Index: alsa-plugins/headsetd/states.c
-===================================================================
-RCS file: /cvsroot/bluetooth-alsa/plugz/alsa-plugins/headsetd/states.c,v
-retrieving revision 1.2
-diff -u -r1.2 states.c
---- alsa-plugins/headsetd/states.c	28 Dec 2006 12:52:38 -0000	1.2
-+++ alsa-plugins/headsetd/states.c	21 Jan 2007 16:05:30 -0000
-@@ -34,6 +34,7 @@
- #include <stdlib.h>
- #include <errno.h>
- #include <syslog.h>
-+#include <stdint.h>
- 
- #include <config.h>
- #include "states.h"
-@@ -59,8 +60,8 @@
- 	unsigned char type;
- 	union {
- 		bdaddr_t     bdaddr;	               /* PKT_TYPE_CFG_BDADDR        */
--		long         timeout;                  /* PKT_TYPE_CFG_PAGINGTIMEOUT */
--		int	     errorcode;		       /* PKT_TYPE_ERROR_IND         */
-+		int32_t      timeout;                  /* PKT_TYPE_CFG_PAGINGTIMEOUT */
-+		int32_t	     errorcode;		       /* PKT_TYPE_ERROR_IND         */
- 	};
- } ipc_packet_t;
- 
-
---=-=-=
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+Thomas Kear
+thomas.kear@gmail.com
++6421996496
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---=-=-=
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---=-=-=--
