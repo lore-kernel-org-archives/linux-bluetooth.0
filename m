@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45B402E4.5090905@appstate.edu>
-Date: Sun, 21 Jan 2007 19:18:44 -0500
-From: Kinney Baughman <baughmankr@appstate.edu>
-MIME-Version: 1.0
+From: Tobias Lorenz <tobias.lorenz@gmx.net>
 To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Trying to install bluetooth headset on Mandriva for
-	Skype
+Date: Sun, 21 Jan 2007 22:54:44 +0100
+MIME-Version: 1.0
+Message-Id: <200701212254.45812.tobias.lorenz@gmx.net>
+Subject: [Bluez-devel] try_to_freeze implicit declaration
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,23 +20,38 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-Have been following the instructions from here:
+I use linux-2.6.19.2. When trying to compile the snd-bt-sco kernel module, I got the following errors:
 
-http://bluetooth-alsa.sourceforge.net/build.html
+<<< snip
+root@laptop:/usr/src/downloads/bluetooth-alsa/btsco/kernel# LANG=C make
+make[1]: Entering directory `/usr/src/linux-2.6.19'
+  CC [M]  /usr/src/downloads/bluetooth-alsa/btsco/kernel/btsco.o
+/usr/src/downloads/bluetooth-alsa/btsco/kernel/btsco.c: In function 'snd_card_bt_sco_thread':
+/usr/src/downloads/bluetooth-alsa/btsco/kernel/btsco.c:911: warning: implicit declaration of function 'try_to_freeze'
+  LD [M]  /usr/src/downloads/bluetooth-alsa/btsco/kernel/snd-bt-sco.o
+  Building modules, stage 2.
+  MODPOST 1 modules
+WARNING: "try_to_freeze" [/usr/src/downloads/bluetooth-alsa/btsco/kernel/snd-bt-sco.ko] undefined!
+  CC      /usr/src/downloads/bluetooth-alsa/btsco/kernel/snd-bt-sco.mod.o
+  LD [M]  /usr/src/downloads/bluetooth-alsa/btsco/kernel/snd-bt-sco.ko
+make[1]: Leaving directory `/usr/src/linux-2.6.19'
+<<< snap
 
-Have had success at every step until:
+This is due to the missing "#include <linux/freezer.h>". I found this by looking at other kernel files using the try_to_freeze function. This following patch corrects the problem:
 
-cp alsa-plugins/sample.a2dprc ~/.a2dprc
+<<< snip
+root@laptop:/usr/src/downloads/bluetooth-alsa/btsco/kernel# cvs diff btsco.c
+Index: btsco.c
+===================================================================
+RCS file: /cvsroot/bluetooth-alsa/btsco/kernel/btsco.c,v
+retrieving revision 1.15
+diff -r1.15 btsco.c
+56a57
+> #include <linux/freezer.h>
+<<< snap
 
-But there is no "alsa-plugins/sample.a2dprc" in the "plugz" directory to 
-copy.
-
-Can someone post what a "sample.a2dprc" should look like?
-
-Thanks.
-
--- 
-Kinney
+Bye,
+  Toby
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
