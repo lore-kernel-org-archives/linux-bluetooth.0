@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Fernando Unzu <fernando@bluexare.org>
-To: bluez-devel@lists.sourceforge.net
-Date: Mon, 22 Jan 2007 13:42:26 +0100
+Message-ID: <45B4966D.2090207@palmsource.com>
+Date: Mon, 22 Jan 2007 11:48:13 +0100
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
-Message-Id: <200701221342.26815.fernando@bluexare.org>
-Subject: [Bluez-devel] About the pairing event
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <45B4093B.4000901@appstate.edu>
+In-Reply-To: <45B4093B.4000901@appstate.edu>
+Subject: Re: [Bluez-devel] Still trying to install bluetooth headset on
+ Mandriva 2007 for Skype
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,28 +21,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
-I'm working by searching the mode of caught the pairing event with my PC from 
-one mobile.
+Hi,
+> A2DPD[596.961]: a2dpd_signal_init: OK
+> Segmentation fault
+>   
+Strange,
+could you run it through gdb?
+I updated the cvs :
+you need to
+cvs update
+configure --enable-debug=yes
+make
+make install
+gdb a2dpd
 
-With the rfcomm I have achieved to know when an OBEX connection is gone to be 
-realized (for example).
+press 'r'
+when it crashes type  'bt' then give us full output.
 
-But the pairing event I think it is not controlled by rfcomm.
+Anyone else seeing this?
 
-It is so?
+Thanks,
 
-In the sdptool I haven't found the service that offers that (or is not a 
-service?)
+-- 
+Frederic
 
-I can caugth a general event by checking hci, but I think is not an optimal 
-solution.
+Without the wind, the grass does not move.
 
-The hcid caugth this event, but I don't know how to modify its code to 
-optimize my requirements.
-Could anybody help me?
-
-Thanks very much.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
