@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d23110170701221014l69b9cb8ek7a86da49be03b93e@mail.gmail.com>
-Date: Mon, 22 Jan 2007 15:14:44 -0300
+Message-ID: <d23110170701221011p6864ed70w7b44d1680418a7f2@mail.gmail.com>
+Date: Mon, 22 Jan 2007 15:11:13 -0300
 From: "Ulisses Furquim" <ulissesf@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200701221342.26815.fernando@bluexare.org>
+In-Reply-To: <7e36c64c0701220253s44310558u2852907a596821fc@mail.gmail.com>
 MIME-Version: 1.0
-References: <200701221342.26815.fernando@bluexare.org>
-Subject: Re: [Bluez-devel] About the pairing event
+References: <7e36c64c0701220253s44310558u2852907a596821fc@mail.gmail.com>
+Subject: Re: [Bluez-devel] rfomm
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,13 +20,11 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 1/22/07, Fernando Unzu <fernando@bluexare.org> wrote:
-> I'm working by searching the mode of caught the pairing event with my PC from
-> one mobile.
-> Could anybody help me?
+On 1/22/07, shantibhushan sale <shantibhushan.sale@gmail.com> wrote:
+>  I m in need of Rfcomm server/client examples.
+>  Can you help me in this regard?
 
-Sorry, but I didn't quite understand what you're trying to do. Do you
-care to explain so we can help you?
+Take a look at rctest.c from bluez-utils under the test/ directory.
 
 Regards,
 
