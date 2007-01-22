@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45B4041D.20507@appstate.edu>
-Date: Sun, 21 Jan 2007 19:23:57 -0500
+Message-ID: <45B402E4.5090905@appstate.edu>
+Date: Sun, 21 Jan 2007 19:18:44 -0500
 From: Kinney Baughman <baughmankr@appstate.edu>
 MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Cancel that ... sort of
+Subject: [Bluez-devel] Trying to install bluetooth headset on Mandriva for
+	Skype
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,14 +19,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-There must be a Murphy's law somewhere that says: "You never find the 
-answer to your question until you ask the experts in a public forum".
+Hi,
 
-At any rate, I just found "sample.a2dprc" not in "alsa-plugins" but in 
-"alsa-plugins/a2dpd/".
+Have been following the instructions from here:
 
-Still it might be good to adjust the instructions to reflect either one 
-or the other path for newbies as misfortunate as I.
+http://bluetooth-alsa.sourceforge.net/build.html
+
+Have had success at every step until:
+
+cp alsa-plugins/sample.a2dprc ~/.a2dprc
+
+But there is no "alsa-plugins/sample.a2dprc" in the "plugz" directory to 
+copy.
+
+Can someone post what a "sample.a2dprc" should look like?
 
 Thanks.
 
