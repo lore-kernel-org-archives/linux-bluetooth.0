@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d23110170701221011p6864ed70w7b44d1680418a7f2@mail.gmail.com>
-Date: Mon, 22 Jan 2007 15:11:13 -0300
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <7e36c64c0701220253s44310558u2852907a596821fc@mail.gmail.com>
+Message-ID: <45B4BEC7.6010203@palmsource.com>
+Date: Mon, 22 Jan 2007 14:40:23 +0100
+From: =?UTF-8?B?RnLDqWTDqXJpYyBEQUxMRUFV?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
-References: <7e36c64c0701220253s44310558u2852907a596821fc@mail.gmail.com>
-Subject: Re: [Bluez-devel] rfomm
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <45B4093B.4000901@appstate.edu> <45B4966D.2090207@palmsource.com>
+	<45B4BC05.1010203@appstate.edu>
+In-Reply-To: <45B4BC05.1010203@appstate.edu>
+Subject: Re: [Bluez-devel] Still trying to install bluetooth headset on
+ Mandriva 2007 for Skype
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,26 +18,37 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 1/22/07, shantibhushan sale <shantibhushan.sale@gmail.com> wrote:
->  I m in need of Rfcomm server/client examples.
->  Can you help me in this regard?
-
-Take a look at rctest.c from bluez-utils under the test/ directory.
-
-Regards,
-
--- Ulisses
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+UnVuIHRoZSBjb21tYW5kcyBpbiB0aGUgbWFpbiBwbHVneiBmb2xkZXIgd2hlcmUgdGhlIGJvb3Rz
+dHJhcCBhbmQgCmNvbmZpZ3VyZSBzY3JpcHQgYXJlIGxvY2F0ZWQuCk9yIHlvdSBjb3VsZCBlcmFz
+ZSB5b3VyIGN1cnJlbnQgcGx1Z3ogZGlyZWN0b3J5IGFuZCB0aGVuIHJlZG8gdGhlIHdob2xlIApp
+bnN0YWxsIHByb2NlZHVyZS4KCktpbm5leSBCYXVnaG1hbiBhIMOpY3JpdCA6Cj4gRnLDqWTDqXJp
+YyBEQUxMRUFVIHdyb3RlOgo+ICAgCj4+IEhpLAo+PiAgICAgCj4+PiBBMkRQRFs1OTYuOTYxXTog
+YTJkcGRfc2lnbmFsX2luaXQ6IE9LCj4+PiBTZWdtZW50YXRpb24gZmF1bHQKPj4+ICAgCj4+PiAg
+ICAgICAKPj4gU3RyYW5nZSwKPj4gY291bGQgeW91IHJ1biBpdCB0aHJvdWdoIGdkYj8KPj4gSSB1
+cGRhdGVkIHRoZSBjdnMgOgo+PiB5b3UgbmVlZCB0bwo+PiBjdnMgdXBkYXRlCj4+IGNvbmZpZ3Vy
+ZSAtLWVuYWJsZS1kZWJ1Zz15ZXMKPj4gbWFrZQo+PiBtYWtlIGluc3RhbGwKPj4gZ2RiIGEyZHBk
+Cj4+Cj4+IHByZXNzICdyJwo+PiB3aGVuIGl0IGNyYXNoZXMgdHlwZSAgJ2J0JyB0aGVuIGdpdmUg
+dXMgZnVsbCBvdXRwdXQuCj4+Cj4+IEFueW9uZSBlbHNlIHNlZWluZyB0aGlzPwo+Pgo+PiBUaGFu
+a3MsCj4+Cj4+ICAgICAKPgo+IEknbSBuZXcgdG8gQ1ZTLgo+Cj4gSSByYW4gdGhlICJjdnMgdXBk
+YXRlIiBpbiB0aGUgImFsc2EtcGx1Z2lucyIgZm9sZGVyIGZpcnN0Lgo+Cj4gQSAiQ1ZTIiBmb2xk
+ZXIgd2FzIGNyZWF0ZWQgYnV0IG5vICJjb25maWd1cmUiIGZpbGUuICBBbmQsIG9mIGNvdXJzZSwg
+SSAKPiBnZXQgYSAiY29uZmlndXJlOiBjb21tYW5kIG5vdCBmb3VuZCIgd2hlbiBJIHRyeSB0byBy
+dW4gY29uZmlndXJlLgo+Cj4gUmVhbGl6aW5nIEkgc2hvdWxkIHByb2JhYmx5IGJlIGluIGEgbmV3
+IGZvbGRlciwgSSBtb3ZlZCBhbGwgdGhlIG5ld2x5IAo+IGNyZWF0ZWQgZmlsZXMgdG8gYSBuZXcg
+Zm9sZGVyIGFuZCByYW4gImN2cyB1cGRhdGUiIGFnYWluLgo+Cj4gU2FtZSBvdXRjb21lLgo+Cj4g
+R3Vlc3MgSSBuZWVkIGEgbGl0dGxlIG1vcmUgaGFuZCBob2xkaW5nIGhlcmUuCj4KPiBTb3JyeS4K
+Pgo+ICAgCgoKLS0gCkZyZWRlcmljCgpXaXRob3V0IHRoZSB3aW5kLCB0aGUgZ3Jhc3MgZG9lcyBu
+b3QgbW92ZS4KCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRha2UgU3VydmV5cy4gRWFybiBDYXNoLiBJbmZs
+dWVuY2UgdGhlIEZ1dHVyZSBvZiBJVApKb2luIFNvdXJjZUZvcmdlLm5ldCdzIFRlY2hzYXkgcGFu
+ZWwgYW5kIHlvdSdsbCBnZXQgdGhlIGNoYW5jZSB0byBzaGFyZSB5b3VyCm9waW5pb25zIG9uIElU
+ICYgYnVzaW5lc3MgdG9waWNzIHRocm91Z2ggYnJpZWYgc3VydmV5cyAtIGFuZCBlYXJuIGNhc2gK
+aHR0cDovL3d3dy50ZWNoc2F5LmNvbS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhwJnA9c291cmNl
+Zm9yZ2UmQ0lEPURFVkRFVgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNl
+Zm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2Js
+dWV6LWRldmVsCg==
