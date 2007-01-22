@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45B4BC05.1010203@appstate.edu>
-Date: Mon, 22 Jan 2007 08:28:37 -0500
-From: Kinney Baughman <baughmankr@appstate.edu>
+Message-ID: <45B4B192.8070707@free.fr>
+Date: Mon, 22 Jan 2007 13:44:02 +0100
+From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45B4093B.4000901@appstate.edu> <45B4966D.2090207@palmsource.com>
-In-Reply-To: <45B4966D.2090207@palmsource.com>
-Subject: Re: [Bluez-devel] Still trying to install bluetooth headset on
- Mandriva 2007 for Skype
+References: <yw1x4pqk44sl.fsf@thrashbarg.inprovide.com>
+In-Reply-To: <yw1x4pqk44sl.fsf@thrashbarg.inprovide.com>
+Subject: Re: [Bluez-devel] [PATCH] make 64-bit headsetd work with 32-bit
+	clients
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,31 +17,103 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-RnLDqWTDqXJpYyBEQUxMRUFVIHdyb3RlOgo+IEhpLAo+PiBBMkRQRFs1OTYuOTYxXTogYTJkcGRf
-c2lnbmFsX2luaXQ6IE9LCj4+IFNlZ21lbnRhdGlvbiBmYXVsdAo+PiAgIAo+IFN0cmFuZ2UsCj4g
-Y291bGQgeW91IHJ1biBpdCB0aHJvdWdoIGdkYj8KPiBJIHVwZGF0ZWQgdGhlIGN2cyA6Cj4geW91
-IG5lZWQgdG8KPiBjdnMgdXBkYXRlCj4gY29uZmlndXJlIC0tZW5hYmxlLWRlYnVnPXllcwo+IG1h
-a2UKPiBtYWtlIGluc3RhbGwKPiBnZGIgYTJkcGQKPiAKPiBwcmVzcyAncicKPiB3aGVuIGl0IGNy
-YXNoZXMgdHlwZSAgJ2J0JyB0aGVuIGdpdmUgdXMgZnVsbCBvdXRwdXQuCj4gCj4gQW55b25lIGVs
-c2Ugc2VlaW5nIHRoaXM/Cj4gCj4gVGhhbmtzLAo+IAoKSSdtIG5ldyB0byBDVlMuCgpJIHJhbiB0
-aGUgImN2cyB1cGRhdGUiIGluIHRoZSAiYWxzYS1wbHVnaW5zIiBmb2xkZXIgZmlyc3QuCgpBICJD
-VlMiIGZvbGRlciB3YXMgY3JlYXRlZCBidXQgbm8gImNvbmZpZ3VyZSIgZmlsZS4gIEFuZCwgb2Yg
-Y291cnNlLCBJIApnZXQgYSAiY29uZmlndXJlOiBjb21tYW5kIG5vdCBmb3VuZCIgd2hlbiBJIHRy
-eSB0byBydW4gY29uZmlndXJlLgoKUmVhbGl6aW5nIEkgc2hvdWxkIHByb2JhYmx5IGJlIGluIGEg
-bmV3IGZvbGRlciwgSSBtb3ZlZCBhbGwgdGhlIG5ld2x5IApjcmVhdGVkIGZpbGVzIHRvIGEgbmV3
-IGZvbGRlciBhbmQgcmFuICJjdnMgdXBkYXRlIiBhZ2Fpbi4KClNhbWUgb3V0Y29tZS4KCkd1ZXNz
-IEkgbmVlZCBhIGxpdHRsZSBtb3JlIGhhbmQgaG9sZGluZyBoZXJlLgoKU29ycnkuCgotLSAKS2lu
-bmV5IEJhdWdobWFuCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRha2UgU3VydmV5cy4gRWFybiBDYXNoLiBJ
-bmZsdWVuY2UgdGhlIEZ1dHVyZSBvZiBJVApKb2luIFNvdXJjZUZvcmdlLm5ldCdzIFRlY2hzYXkg
-cGFuZWwgYW5kIHlvdSdsbCBnZXQgdGhlIGNoYW5jZSB0byBzaGFyZSB5b3VyCm9waW5pb25zIG9u
-IElUICYgYnVzaW5lc3MgdG9waWNzIHRocm91Z2ggYnJpZWYgc3VydmV5cyAtIGFuZCBlYXJuIGNh
-c2gKaHR0cDovL3d3dy50ZWNoc2F5LmNvbS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhwJnA9c291
-cmNlZm9yZ2UmQ0lEPURFVkRFVgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291
-cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZv
-L2JsdWV6LWRldmVsCg==
+
+Thanks you for this, i applied it to CVS.
+
+Cheers,
+
+Fabien
+
+> The attached patch makes headsetd and the ALSA PCM plugin use
+> fixed-width types in the IPC data structures.  Without this, a 32-bit
+> client will not work with a 64-bit headsetd and vice versa because of
+> the different sizes of the 'long' type.
+> 
+> 
+> 
+> ------------------------------------------------------------------------
+> 
+> Index: alsa-plugins/pcm_sco.c
+> ===================================================================
+> RCS file: /cvsroot/bluetooth-alsa/plugz/alsa-plugins/pcm_sco.c,v
+> retrieving revision 1.2
+> diff -u -r1.2 pcm_sco.c
+> --- alsa-plugins/pcm_sco.c	28 Dec 2006 12:52:37 -0000	1.2
+> +++ alsa-plugins/pcm_sco.c	21 Jan 2007 16:05:30 -0000
+> @@ -24,6 +24,7 @@
+>  #include <sys/un.h>
+>  #include <unistd.h>
+>  #include <errno.h>
+> +#include <stdint.h>
+>  
+>  #include <alsa/asoundlib.h>
+>  #include <alsa/pcm_external.h>
+> @@ -85,8 +86,8 @@
+>  	unsigned char type;
+>  	union {
+>  		bdaddr_t     bdaddr;	               /* PKT_TYPE_CFG_BDADDR        */
+> -		long         timeout;                  /* PKT_TYPE_CFG_PAGINGTIMEOUT */
+> -		int	     errorcode;		       /* PKT_TYPE_ERROR_IND        */
+> +		int32_t      timeout;                  /* PKT_TYPE_CFG_PAGINGTIMEOUT */
+> +		int32_t	     errorcode;		       /* PKT_TYPE_ERROR_IND        */
+>  	};
+>  } ipc_packet_t;
+>  
+> Index: alsa-plugins/headsetd/states.c
+> ===================================================================
+> RCS file: /cvsroot/bluetooth-alsa/plugz/alsa-plugins/headsetd/states.c,v
+> retrieving revision 1.2
+> diff -u -r1.2 states.c
+> --- alsa-plugins/headsetd/states.c	28 Dec 2006 12:52:38 -0000	1.2
+> +++ alsa-plugins/headsetd/states.c	21 Jan 2007 16:05:30 -0000
+> @@ -34,6 +34,7 @@
+>  #include <stdlib.h>
+>  #include <errno.h>
+>  #include <syslog.h>
+> +#include <stdint.h>
+>  
+>  #include <config.h>
+>  #include "states.h"
+> @@ -59,8 +60,8 @@
+>  	unsigned char type;
+>  	union {
+>  		bdaddr_t     bdaddr;	               /* PKT_TYPE_CFG_BDADDR        */
+> -		long         timeout;                  /* PKT_TYPE_CFG_PAGINGTIMEOUT */
+> -		int	     errorcode;		       /* PKT_TYPE_ERROR_IND         */
+> +		int32_t      timeout;                  /* PKT_TYPE_CFG_PAGINGTIMEOUT */
+> +		int32_t	     errorcode;		       /* PKT_TYPE_ERROR_IND         */
+>  	};
+>  } ipc_packet_t;
+>  
+> 
+> 
+> ------------------------------------------------------------------------
+> 
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys - and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> 
+> 
+> ------------------------------------------------------------------------
+> 
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
