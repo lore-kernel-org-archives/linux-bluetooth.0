@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <be976db60701230741o6b5f95a0yc45b2594e329c541@mail.gmail.com>
-Date: Tue, 23 Jan 2007 07:41:43 -0800
-From: "Mark S. Townsley" <mstownsley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Date: Tue, 23 Jan 2007 21:46:12 +0800 (CST)
+From: KS H <kspam1234@yahoo.com.hk>
+To: Bluez <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] RFCOMM disconnect
+Message-ID: <341704.68311.qm@web53305.mail.yahoo.com>
+Subject: [Bluez-users] pin code
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,42 +14,49 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1796997606=="
+Content-Type: multipart/mixed; boundary="===============0218206894=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1796997606==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_229674_33063014.1169566903977"
+--===============0218206894==
+Content-Type: multipart/alternative; boundary="0-1054544052-1169559972=:68311"
+Content-Transfer-Encoding: 8bit
 
-------=_Part_229674_33063014.1169566903977
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+--0-1054544052-1169559972=:68311
+Content-Type: text/plain; charset=big5
+Content-Transfer-Encoding: 8bit
 
-Hi:
+Dear
 
-Is there any way I can get the status of an RFCOMM socket connection to
-detect whether it is still alive or it has been disconnected somehow?  In my
-application (in C++), I need to stay on top of the status of the RFCOMM
-connection and do something if it is no longer active for some reasons
+I cross compile the bluez3.8 and try to setup the bluetooth in arm. I connect the arm with CSR BC03 with BCSP configuration. I am able to make the Bluez discoverable and try to pair bluez. however i found that there is no pin respond from Bluez. So i try to configure bluez using hcid.
 
-Thanks
+> hcid -n -f /etc/bluetooth/hcid.conf
 
-Mark
+it return
 
-------=_Part_229674_33063014.1169566903977
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+hcid[481]: Can't connect to system message bus: Failed to connect to socket /usr/local/var/run/dbus/system_bus_socket:  No such file or directory
+hcid[481]: Unable to get on D-Bus
 
-Hi:<br><br>Is there any way I can get the status of an RFCOMM socket connection to detect whether it is still alive or it has been disconnected somehow?&nbsp; In my application (in C++), I need to stay on top of the status of the RFCOMM connection and do something if it is no longer active for some reasons
-<br><br>Thanks<br><br>Mark<br>
+My question
+1. where can I found the missing file and what is that used for?
+2. Is there any method to repsond the pin request other than using hcid
 
-------=_Part_229674_33063014.1169566903977--
+Regards
+SH
+
+ _______________________________________
+ YM - 離線訊息
+ 就算你沒有上網，你的朋友仍可以留下訊息給你，當你上網時就能立即看到，任何說話都冇走失。
+ http://messenger.yahoo.com.hk
+--0-1054544052-1169559972=:68311
+Content-Type: text/html; charset=big5
+Content-Transfer-Encoding: 8bit
+
+Dear<br><br>I cross compile the bluez3.8 and try to setup the bluetooth in arm. I connect the arm with CSR BC03 with BCSP configuration. I am able to make the Bluez discoverable and try to pair bluez. however i found that there is no pin respond from Bluez. So i try to configure bluez using hcid.<br><br>&gt; hcid -n -f /etc/bluetooth/hcid.conf<br><br>it return<br><br>hcid[481]: Can't connect to system message bus: Failed to connect to socket /usr/local/var/run/dbus/system_bus_socket:&nbsp; No such file or directory<br>hcid[481]: Unable to get on D-Bus<br><br>My question<br>1. where can I found the missing file and what is that used for?<br>2. Is there any method to repsond the pin request other than using hcid<br><br>Regards<br>SH<br><p>&#32;_______________________________________<br> YM - 離線訊息<br> 就算你沒有上網，你的朋友仍可以留下訊息給你，當你上網時就能立即看到，任何說話都冇走失。<br> http://messenger.yahoo.com.hk
+--0-1054544052-1169559972=:68311--
 
 
---===============1796997606==
+--===============0218206894==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -60,7 +67,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1796997606==
+--===============0218206894==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -71,4 +78,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1796997606==--
+--===============0218206894==--
