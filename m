@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <a481fbf0701231319m5987a96cwe8ae5723cfb51091@mail.gmail.com>
-Date: Tue, 23 Jan 2007 16:19:24 -0500
-From: "Raymond Ingles" <sorceror171@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <45B661F6.8010703@csr.com>
+Date: Tue, 23 Jan 2007 19:28:54 +0000
+From: Steven Singer <steven.singer@csr.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] PAN vs. RFCOMM/PPP speeds?
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <001e01c73b12$ea34afc0$9301a8c0@LUBI>
+In-Reply-To: <001e01c73b12$ea34afc0$9301a8c0@LUBI>
+Subject: Re: [Bluez-users] HCI version
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +20,49 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I've got my Treo 650 connecting to my computer over Bluetooth by
-following guides like: http://www.linuxjournal.com/article/8185
+Lauri Lubi wrote:
+>         HCI Ver: 1.2 (0x2) HCI Rev: 0x7a6 LMP Ver: 1.2 (0x2) LMP Subver: 0x7a6
+> 
+> Is HCI Ver the same as supported Bluetooth version?
 
- It works and the speed is acceptable. However, from what I understand
-it's basically using PPP over RFCOMM over Bluetooth - which seems like
-a bit much in terms of overhead - and appears to be limited to
-115,200Kbps. I wonder if trying to use a PAN connection (perhaps the
-NAP configuration in the PAN HOWTO) would bypass some of the overhead?
+Yes it is. Or, at least, it's supposed to be.
 
- I couldn't find anything directly commenting on this. My tinkering
-time is limited (three kids, one on the way, etc.) so I'm reluctant to
-play with PAN unless I was reasonably sure it would be worth it.
+Sadly, this dongle reports the wrong spec version. The firmware (0x07a6)
+is BT 2.0 + EDR compliant, it just the dongle reports itself as just
+BT 1.2 compliant.
 
- Thanks in advance for any information y'all can provide.
+I'm sure this firmware reported itself as 2.0 + EDR when we shipped it.
+
+We did add the ability for the firmware to spoof its spec version to
+work round a problem in some host stacks where they were rejecting
+devices complaint to a later version of the spec than that to which the
+stack had been written. Since a 2.0 + EDR device will work quite happily
+with a 1.2 stack (there are no new HCI events) this was an easy
+workaround. It's possible that the dongle manufacturer is shipping this
+device with spoofing enabled because it was being bundled with such a
+host stack.
+
+The problem should be easily remedied by resetting the PS key
+HCI_LMP_LOCAL_VERSION back to its default value of 0x0303, though, in
+practice, it shouldn't make any difference. All this key does is change
+what version the dongle reports to the stack not how the firmware
+behaves. No devices or host stacks are meant to use the version number to
+change their behaviour, they're meant to use the supported features. This
+device will continue give EDR performance even without this change and
+BlueZ should treat it as having 2.0 + EDR features. If you're intending to
+use this dongle with a host stack that might be upset by a 2.0 + EDR device,
+you should leave this PS key alone.
+
+If you want to know whether 2.0 + EDR features are really supported then
+look at the supported features, not the version.
+
+	- Steven
+-- 
+
+
+To access the latest news from CSR copy this link into a web browser:  http://www.csr.com/email_sig.php
+
+To get further information regarding CSR, please visit our Investor Relations page at http://ir.csr.com/csr/about/overview
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
