@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d23110170701231315p7a32e9f3w57a2db4260f0529c@mail.gmail.com>
-Date: Tue, 23 Jan 2007 18:15:13 -0300
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <be976db60701230742m39c586c3sc7c37ec691631ed0@mail.gmail.com>
-MIME-Version: 1.0
-References: <be976db60701230742m39c586c3sc7c37ec691631ed0@mail.gmail.com>
-Subject: Re: [Bluez-devel] checking RFCOMM status
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+To: bluez-devel@lists.sourceforge.net
+From: Michel Brabants <michel.brabants@euphonynet.be>
+Date: Tue, 23 Jan 2007 20:20:45 +0100
+Message-ID: <ep5n6d$ccq$1@sea.gmane.org>
+References: <200701150305.07478.bluez-devel@huitl.de>
+	<45AB5463.80503@palmsource.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] a2dpd: cmdplay fails: "No such application:
+	'amarok player play'"
+Reply-To: michel.brabants@euphonynet.be,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -16,26 +18,70 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 1/23/07, Mark S. Townsley <mstownsley@gmail.com> wrote:
->  Is there any way I can get the status of an RFCOMM socket connection to
-> detect whether it is still alive or it has been disconnected somehow?  In my
-> application (in C++), I need to stay on top of the status of the RFCOMM
-> connection and do something if it is no longer active for some reasons
-
-You can use select() or poll() on the socket to know which events occurred.
-
--- Ulisses
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SGV5LAoKSSBjb21waWxlZCB0aGUgYWxzYS1ibHVldG9vdGggc29mdHdhcmUgZnJvbSBjdnMgYXQg
+MjIvMS0yMDA3ICh5ZXN0ZXJkYXkpLkknbQp0cnlpbmcgdG8gdXNlIGF2cmNwLCBob3dldmVyIGl0
+IGlzbid0IHdvcmtpbmcgZm9yIG1lLiBhMmRwZCBpcyByZWNlaXZpbmcKdGhlIGNvbW1hbmRzIGFu
+ZCBmb3JraW5nIHRoZSBjb21tYW5kcyBJIHdhbnQgaXQgdG8gZm9yaywgYnV0IGl0IGRvZXNuJ3Qg
+ZG8Kc2VlbWluZ2x5IC4uLiBJIHRyaWVkIHRoZSAiZGNvcCBhbWFyb2sgLi4uIi1jb21tYW5kcyBh
+bmQKdGhlICJhbWFyb2sgLS1uZXh0Ii1jb21tYW5kIGFuZCBib3RoIGRvbid0IHdvcmsuIEhvd2V2
+ZXIsIEkgZG9uJ3Qgc2VlIGFueQplcnJvcnMgYWxzbyAuLi4gSXMgdGhlcmUgYW55IG11ciBlZGVi
+dWctb3V0cHV0IHRoYXQgSSBjYW4gZW5hYmxlPwpIZXJlIGlzIHdoYXQgSSBzZWUgYXQgdGhlIG1v
+bWVudDoKCkEyRFBEWzAxOC45MTddOiBhMmRwX2hhbmRsZV9hdnJjcF9tZXNzYWdlOiBhdnJjcF9m
+b3J3YXJkIERPV04KQTJEUERbMDE4LjkxN106IGEyZHBkX3NpZ25hbF9jb21tYW5kOiBhdnJjcF9m
+b3J3YXJkCkEyRFBEWzAxOC45MTddOiBhMmRwX2hhbmRsZV9hdnJjcF9tZXNzYWdlOiBbbmV4dF0g
+YW1hcm9rIC0tbmV4dApBMkRQRFswMTguOTE4XTogY2xvc2Vfc2VydmVyX3NvY2tldF9vbl9mb3Jr
+OiBDbG9zaW5nIHNlcnZlciBzb2NrZXQgOApBMkRQRFswMTguOTE4XTogYXN5bmNfcnVuX3Byb2Nl
+c3M6IEZvcmtlZCBhbWFyb2sgLS1uZXh0CkEyRFBEWzAxOS4wMDRdOiBhMmRwX2hhbmRsZV9hdnJj
+cF9tZXNzYWdlOiBhdnJjcF9mb3J3YXJkIFVQCkEyRFBEWzAxOS4wMDRdOiBhMmRwZF9zaWduYWxf
+Y29tbWFuZDogYXZyY3BfZm9yd2FyZAoKR3JlZXRpbmdzIGFuZCB0aGFuayB5b3UsCgpNaWNoZWwK
+CkZyw6lkw6lyaWMgREFMTEVBVSB3cm90ZToKCj4gSGksCj4gVGhlIGNvbW1hbmQgbGluZSBpcyBy
+ZXN0cmljdGVkIHRvIG9uZSBwcm9ncmFtIChkY29wKSBhbmQgb25lIHBhcmFtZXRlcgo+IChhbWFy
+b2sgcGxheWVyIHBsYXkpLiBZb3UgY2FuIG92ZXJjb21lIHRoaXMgaXNzdWUgYnkgZG9pbmcgYSBz
+aGVsbAo+IHNjcmlwdCB0YWtpbmcgb25lIHBhcmFtZXRlciB3aGljaCB3aWxsIGl0IHR1cm4gZXhl
+Y3V0ZSB5b3VyIHByb2dyYW0KPiB1c2luZyB3aGF0ZXZlciBwYXJhbWV0ZXJzIHlvdSB3YW50Lgo+
+IAo+IEZyw6lkw6lyaWMKPiAKPiBSb2JlcnQgSHVpdGwgYSDDqWNyaXQgOgo+PiBIaSBhZ2FpbiwK
+Pj4KPj4gdGhlIGNtZCogZnVuY3Rpb25zIGRvIG5vdCB3b3JrIGZvciBtZToKPj4gY21kcGxheT1k
+Y29wIGFtYXJvayBwbGF5ZXIgcGxheQo+Pgo+PiBXaGVuIEkgcHJlc3MgdGhlIHBsYXkgYnV0dG9u
+LCB0aGUgZm9sbG93aW5nIGxpbmUgaXMgcHJpbnQgKGZyb20gc29tZXdoZXJlCj4+IGluc2lkZSB0
+aGUgZXhlY2xwKCkgY2FsbCk6Cj4+IE5vIHN1Y2ggYXBwbGljYXRpb246ICdhbWFyb2sgcGxheWVy
+IHBsYXknCj4+Cj4+IEkgaGFja2VkIGFyb3VuZCB0aGlzIHByb2JsZW0gYnkgdXNpbmcgc3lzdGVt
+KCkgaW5zdGVhZCBvZiBleGVjbHAoKToKPj4KPj4gSW5kZXg6IGEyZHBkX2lwYy5jCj4+ID09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT0KPj4gUkNTIGZpbGU6IC9jdnNyb290L2JsdWV0b290aC1hbHNhL3BsdWd6L2Fsc2EtcGx1
+Z2lucy9hMmRwZC9hMmRwZF9pcGMuYyx2Cj4+IHJldHJpZXZpbmcgcmV2aXNpb24gMS4zCj4+IGRp
+ZmYgLXUgLXIxLjMgYTJkcGRfaXBjLmMKPj4gLS0tIGEyZHBkX2lwYy5jIDEyIEphbiAyMDA3IDE2
+OjM0OjAxIC0wMDAwICAgICAgMS4zCj4+ICsrKyBhMmRwZF9pcGMuYyAxNSBKYW4gMjAwNyAwMjow
+MjoxNSAtMDAwMAo+PiBAQCAtMzg0LDggKzM4NCwxMCBAQAo+PiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBjbG9zZV9zZXJ2ZXJfc29ja2V0X29uX2ZvcmsoKTsKPj4KPj4gICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgLy8gUmVwbGFjZSBjaGlsZHJlbiB3aXRoIG5ldyBw
+cm9jZXNzCj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGkgPSBleGVjbHAoY29t
+bWFuZCwgY29tbWFuZCwgYXJndlswXSwKPj4gTlVMTCk7Cj4+IC0gICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIERCRygiZXhlY2xwIGZhaWxlZCAlcz0lZCAoZXJybm89JWQ6JXMpIiwKPj4g
+Y21kLCBpLCBlcnJubywgc3RyZXJyb3IoZXJybm8pKTsKPj4gKyAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgc3lzdGVtKGNtZCk7Cj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIGV4aXQoMCk7Cj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJyZWFrOwo+
+PiAgICAgICAgICAgICAgICAgICAgICAgICAgY2FzZSAtMToKPj4gICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgLy8gZmFpbGVkCj4+Cj4+Cj4+IFJlZ2FyZHMsCj4+ICAgUm9iZXJ0Cj4+
+Cj4+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0KPj4gVGFrZSBTdXJ2ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5j
+ZSB0aGUgRnV0dXJlIG9mIElUCj4+IEpvaW4gU291cmNlRm9yZ2UubmV0J3MgVGVjaHNheSBwYW5l
+bCBhbmQgeW91J2xsIGdldCB0aGUgY2hhbmNlIHRvIHNoYXJlCj4+IHlvdXIgb3BpbmlvbnMgb24g
+SVQgJiBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0gYW5kIGVhcm4KPj4g
+Y2FzaAo+PiBodHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAm
+cD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCj4+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fIEJsdWV6LWRldmVsIG1haWxpbmcgbGlzdAo+PiBCbHVlei1kZXZl
+bEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPj4gaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQv
+bGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwKPj4gICAKPiAKPiAKCgoKLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LQpUYWtlIFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQKSm9p
+biBTb3VyY2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFu
+Y2UgdG8gc2hhcmUgeW91cgpvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdo
+IGJyaWVmIHN1cnZleXMgLSBhbmQgZWFybiBjYXNoCmh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVm
+YXVsdC5waHA/cGFnZT1qb2luLnBocCZwPXNvdXJjZWZvcmdlJkNJRD1ERVZERVYKX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGlu
+ZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNv
+dXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
