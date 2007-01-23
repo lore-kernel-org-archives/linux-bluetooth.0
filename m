@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45B661F6.8010703@csr.com>
-Date: Tue, 23 Jan 2007 19:28:54 +0000
-From: Steven Singer <steven.singer@csr.com>
+Message-ID: <be976db60701230741o6b5f95a0yc45b2594e329c541@mail.gmail.com>
+Date: Tue, 23 Jan 2007 07:41:43 -0800
+From: "Mark S. Townsley" <mstownsley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <001e01c73b12$ea34afc0$9301a8c0@LUBI>
-In-Reply-To: <001e01c73b12$ea34afc0$9301a8c0@LUBI>
-Subject: Re: [Bluez-users] HCI version
+Subject: [Bluez-users] RFCOMM disconnect
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,60 +14,61 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1796997606=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Lauri Lubi wrote:
->         HCI Ver: 1.2 (0x2) HCI Rev: 0x7a6 LMP Ver: 1.2 (0x2) LMP Subver: 0x7a6
-> 
-> Is HCI Ver the same as supported Bluetooth version?
+--===============1796997606==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_229674_33063014.1169566903977"
 
-Yes it is. Or, at least, it's supposed to be.
+------=_Part_229674_33063014.1169566903977
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Sadly, this dongle reports the wrong spec version. The firmware (0x07a6)
-is BT 2.0 + EDR compliant, it just the dongle reports itself as just
-BT 1.2 compliant.
+Hi:
 
-I'm sure this firmware reported itself as 2.0 + EDR when we shipped it.
+Is there any way I can get the status of an RFCOMM socket connection to
+detect whether it is still alive or it has been disconnected somehow?  In my
+application (in C++), I need to stay on top of the status of the RFCOMM
+connection and do something if it is no longer active for some reasons
 
-We did add the ability for the firmware to spoof its spec version to
-work round a problem in some host stacks where they were rejecting
-devices complaint to a later version of the spec than that to which the
-stack had been written. Since a 2.0 + EDR device will work quite happily
-with a 1.2 stack (there are no new HCI events) this was an easy
-workaround. It's possible that the dongle manufacturer is shipping this
-device with spoofing enabled because it was being bundled with such a
-host stack.
+Thanks
 
-The problem should be easily remedied by resetting the PS key
-HCI_LMP_LOCAL_VERSION back to its default value of 0x0303, though, in
-practice, it shouldn't make any difference. All this key does is change
-what version the dongle reports to the stack not how the firmware
-behaves. No devices or host stacks are meant to use the version number to
-change their behaviour, they're meant to use the supported features. This
-device will continue give EDR performance even without this change and
-BlueZ should treat it as having 2.0 + EDR features. If you're intending to
-use this dongle with a host stack that might be upset by a 2.0 + EDR device,
-you should leave this PS key alone.
+Mark
 
-If you want to know whether 2.0 + EDR features are really supported then
-look at the supported features, not the version.
+------=_Part_229674_33063014.1169566903977
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-	- Steven
--- 
+Hi:<br><br>Is there any way I can get the status of an RFCOMM socket connection to detect whether it is still alive or it has been disconnected somehow?&nbsp; In my application (in C++), I need to stay on top of the status of the RFCOMM connection and do something if it is no longer active for some reasons
+<br><br>Thanks<br><br>Mark<br>
+
+------=_Part_229674_33063014.1169566903977--
 
 
-To access the latest news from CSR copy this link into a web browser:  http://www.csr.com/email_sig.php
-
-To get further information regarding CSR, please visit our Investor Relations page at http://ir.csr.com/csr/about/overview
+--===============1796997606==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1796997606==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1796997606==--
