@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: "Lauri Lubi" <lauri@lubi.se>
-To: <bluez-devel@lists.sourceforge.net>
-Date: Tue, 23 Jan 2007 12:03:38 +0100
-Message-ID: <000001c73ede$232d4660$0409a8c0@LUBI>
-MIME-Version: 1.0
-Subject: [Bluez-devel] HCI version
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20070123094120.GA79734@salmon.maths.tcd.ie>
+References: <20070123094120.GA79734@salmon.maths.tcd.ie>
+Date: Tue, 23 Jan 2007 10:51:01 +0100
+Message-Id: <1169545861.11260.31.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] SDP: deleting service record attributes
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,48 +16,24 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Steve,
 
-Does anybody know the meaning of HCI version in hciconfig =96a ?
-I have a dongle
-(http://www.globalsat.com.tw/eng/product_detail_00000057.htm) which should
-be Bluetooth 2.0 + EDR. This is what is says on Globalsats homepage and in
-Bluetooth Qualified Product Listing Notice from SGS.
+> I've noticed that service_update_req() in sdpd/service.c doesn't allow
+> previously-set attributes to be removed from a service record, only
+> new attributes to be added or existing ones updated.
+> 
+> The attached patch (against CVS) clears an existing service record's 
+> attributes before reading a new set from an SDP_SVC_UPDATE_REQ message.
 
-BUT:
-# hciconfig hci0 version
-hci0:=A0=A0 Type: USB
-=A0=A0=A0=A0=A0=A0=A0 BD Address: 00:0D:B5:21:02:54 ACL MTU: 384:8 SCO MTU:=
- 64:8
-=A0=A0=A0=A0=A0=A0=A0 HCI Ver: 1.2 (0x2) HCI Rev: 0x7a6 LMP Ver: 1.2 (0x2) =
-LMP Subver:
-0x7a6
-=A0=A0=A0=A0=A0=A0=A0 Manufacturer: Cambridge Silicon Radio (10)
+the patch has been committed to the CVS. Thanks.
 
-Is HCI Ver the same as supported Bluetooth version?
+Regards
 
-
-
-Mvh
-Lauri Lubi
-Lubi Datakonsult
-Tel +46 (0) 174 40416
-Mob +46 (0) 730 39 31 00
-lauri@lubi.se
-
-
-
--- =
-
-No virus found in this outgoing message.
-Checked by AVG Free Edition.
-Version: 7.5.432 / Virus Database: 268.17.4/644 - Release Date: 2007-01-22
-07:30
- =
+Marcel
 
 
 
@@ -63,8 +41,7 @@ Version: 7.5.432 / Virus Database: 268.17.4/644 - Release Date: 2007-01-22
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
