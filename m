@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000001c73ede$232d4660$0409a8c0@LUBI>
-References: <000001c73ede$232d4660$0409a8c0@LUBI>
-Date: Tue, 23 Jan 2007 12:24:02 +0100
-Message-Id: <1169551442.11260.35.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] HCI version
+From: "Lauri Lubi" <lauri@lubi.se>
+To: <bluez-devel@lists.sourceforge.net>
+Date: Tue, 23 Jan 2007 12:03:38 +0100
+Message-ID: <000001c73ede$232d4660$0409a8c0@LUBI>
+MIME-Version: 1.0
+Subject: [Bluez-devel] HCI version
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,29 +14,58 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGksCgo+IERvZXMgYW55Ym9keSBrbm93IHRoZSBtZWFuaW5nIG9mIEhDSSB2ZXJzaW9uIGluIGhj
-aWNvbmZpZyDigJNhID8KPiBJIGhhdmUgYSBkb25nbGUKPiAoaHR0cDovL3d3dy5nbG9iYWxzYXQu
-Y29tLnR3L2VuZy9wcm9kdWN0X2RldGFpbF8wMDAwMDA1Ny5odG0pIHdoaWNoIHNob3VsZAo+IGJl
-IEJsdWV0b290aCAyLjAgKyBFRFIuIFRoaXMgaXMgd2hhdCBpcyBzYXlzIG9uIEdsb2JhbHNhdHMg
-aG9tZXBhZ2UgYW5kIGluCj4gQmx1ZXRvb3RoIFF1YWxpZmllZCBQcm9kdWN0IExpc3RpbmcgTm90
-aWNlIGZyb20gU0dTLgo+IAo+IEJVVDoKPiAjIGhjaWNvbmZpZyBoY2kwIHZlcnNpb24KPiBoY2kw
-OiAgIFR5cGU6IFVTQgo+ICAgICAgICAgQkQgQWRkcmVzczogMDA6MEQ6QjU6MjE6MDI6NTQgQUNM
-IE1UVTogMzg0OjggU0NPIE1UVTogNjQ6OAo+ICAgICAgICAgSENJIFZlcjogMS4yICgweDIpIEhD
-SSBSZXY6IDB4N2E2IExNUCBWZXI6IDEuMiAoMHgyKSBMTVAgU3VidmVyOgo+IDB4N2E2Cj4gICAg
-ICAgICBNYW51ZmFjdHVyZXI6IENhbWJyaWRnZSBTaWxpY29uIFJhZGlvICgxMCkKPiAKPiBJcyBI
-Q0kgVmVyIHRoZSBzYW1lIGFzIHN1cHBvcnRlZCBCbHVldG9vdGggdmVyc2lvbj8KCmNoZWNrICJo
-Y2ljb25maWcgaGNpMCBmZWF0dXJlcyIgaWYgRURSIGlzIHN1cHBvcnRlZC4gT3RoZXJ3aXNlIGl0
-IGlzCnJlYWxseSBvbmx5IGEgMS4yIGRldmljZS4KClJlZ2FyZHMKCk1hcmNlbAoKCgotLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tClRha2UgU3VydmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBv
-ZiBJVApKb2luIFNvdXJjZUZvcmdlLm5ldCdzIFRlY2hzYXkgcGFuZWwgYW5kIHlvdSdsbCBnZXQg
-dGhlIGNoYW5jZSB0byBzaGFyZSB5b3VyCm9waW5pb25zIG9uIElUICYgYnVzaW5lc3MgdG9waWNz
-IHRocm91Z2ggYnJpZWYgc3VydmV5cyAtIGFuZCBlYXJuIGNhc2gKaHR0cDovL3d3dy50ZWNoc2F5
-LmNvbS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhwJnA9c291cmNlZm9yZ2UmQ0lEPURFVkRFVgpf
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZl
-bCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8v
-bGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
+Hi,
+
+Does anybody know the meaning of HCI version in hciconfig =96a ?
+I have a dongle
+(http://www.globalsat.com.tw/eng/product_detail_00000057.htm) which should
+be Bluetooth 2.0 + EDR. This is what is says on Globalsats homepage and in
+Bluetooth Qualified Product Listing Notice from SGS.
+
+BUT:
+# hciconfig hci0 version
+hci0:=A0=A0 Type: USB
+=A0=A0=A0=A0=A0=A0=A0 BD Address: 00:0D:B5:21:02:54 ACL MTU: 384:8 SCO MTU:=
+ 64:8
+=A0=A0=A0=A0=A0=A0=A0 HCI Ver: 1.2 (0x2) HCI Rev: 0x7a6 LMP Ver: 1.2 (0x2) =
+LMP Subver:
+0x7a6
+=A0=A0=A0=A0=A0=A0=A0 Manufacturer: Cambridge Silicon Radio (10)
+
+Is HCI Ver the same as supported Bluetooth version?
+
+
+
+Mvh
+Lauri Lubi
+Lubi Datakonsult
+Tel +46 (0) 174 40416
+Mob +46 (0) 730 39 31 00
+lauri@lubi.se
+
+
+
+-- =
+
+No virus found in this outgoing message.
+Checked by AVG Free Edition.
+Version: 7.5.432 / Virus Database: 268.17.4/644 - Release Date: 2007-01-22
+07:30
+ =
+
+
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
