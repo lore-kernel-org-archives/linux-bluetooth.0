@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45B57230.70407@appstate.edu>
-Date: Mon, 22 Jan 2007 21:25:52 -0500
-From: Kinney Baughman <baughmankr@appstate.edu>
+Message-ID: <be976db60701221642w1a2ff16wd8f51f44e4db3185@mail.gmail.com>
+Date: Mon, 22 Jan 2007 16:42:02 -0800
+From: "Mark S. Townsley" <mstownsley@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45B4093B.4000901@appstate.edu> <45B4966D.2090207@palmsource.com>
-	<45B4BC05.1010203@appstate.edu> <45B4BEC7.6010203@palmsource.com>
-In-Reply-To: <45B4BEC7.6010203@palmsource.com>
-Subject: Re: [Bluez-devel] Still trying to install bluetooth headset on
- Mandriva 2007 for Skype
+Subject: [Bluez-devel] SPP connections
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,63 +14,78 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============0424297556=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-RnLDqWTDqXJpYyBEQUxMRUFVIHdyb3RlOgo+IFJ1biB0aGUgY29tbWFuZHMgaW4gdGhlIG1haW4g
-cGx1Z3ogZm9sZGVyIHdoZXJlIHRoZSBib290c3RyYXAgYW5kIAo+IGNvbmZpZ3VyZSBzY3JpcHQg
-YXJlIGxvY2F0ZWQuCj4gT3IgeW91IGNvdWxkIGVyYXNlIHlvdXIgY3VycmVudCBwbHVneiBkaXJl
-Y3RvcnkgYW5kIHRoZW4gcmVkbyB0aGUgd2hvbGUgCj4gaW5zdGFsbCBwcm9jZWR1cmUuCgpPSy4g
-IEknbSBmaW5hbGx5IGJhY2sgaG9tZSBhbmQgaGF2ZSBzdGFydGVkIG92ZXIgd2l0aCBjdnMgY2hl
-Y2tvdXQgZm9yIApwbHVnei4KCj4gS2lubmV5IEJhdWdobWFuIGEgw6ljcml0IDoKPj4gRnLDqWTD
-qXJpYyBEQUxMRUFVIHdyb3RlOgo+PiAgIAo+Pj4gSGksCj4+PiAgICAgCj4+Pj4gQTJEUERbNTk2
-Ljk2MV06IGEyZHBkX3NpZ25hbF9pbml0OiBPSwo+Pj4+IFNlZ21lbnRhdGlvbiBmYXVsdAo+Pj4+
-ICAgCj4+Pj4gICAgICAgCj4+PiBTdHJhbmdlLAo+Pj4gY291bGQgeW91IHJ1biBpdCB0aHJvdWdo
-IGdkYj8KPj4+IEkgdXBkYXRlZCB0aGUgY3ZzIDoKPj4+IHlvdSBuZWVkIHRvCj4+PiBjdnMgdXBk
-YXRlCj4+PiBjb25maWd1cmUgLS1lbmFibGUtZGVidWc9eWVzCj4+PiBtYWtlCj4+PiBtYWtlIGlu
-c3RhbGwKCkF0IHRoaXMgc3RlcCwgSSBydW4gaW50byBwcm9ibGVtcy4gIEhlcmUgYXJlIHRoZSBs
-YXN0IGZldyBsaW5lcyBvZiAKb3V0cHV0IHN0YXJ0aW5nIHdpdGggd2hlcmUgdGhpbmdzIHN0YXJ0
-IGdvaW5nIHdyb25nOgo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PQp0ZXN0IC16ICIvdXNyL2xvY2FsL2xpYi9hbHNhLWxpYiIgfHwgbWtkaXIgLXAgLS0g
-IC91c3IvbG9jYWwvbGliL2Fsc2EtbGliIgogIC9iaW4vc2ggLi4vLi4vbGlidG9vbCAtLW1vZGU9
-aW5zdGFsbCAvdXNyL2Jpbi9pbnN0YWxsIC1jIAonbGliYXNvdW5kX21vZHVsZV9wY21fYTJkcGQu
-bGEnIAonL3Vzci9sb2NhbC9saWIvYWxzYS1saWIvbGliYXNvdW5kX21vZHVsZV9wY21fYTJkcGQu
-bGEnCmxpYnRvb2w6IGluc3RhbGw6IGVycm9yOiBjYW5ub3QgaW5zdGFsbCBgbGliYXNvdW5kX21v
-ZHVsZV9wY21fYTJkcGQubGEnIAp0byBhIGRpcmVjdG9yeSBub3QgZW5kaW5nIGluIC91c3IvbGli
-L2Fsc2EtbGliCiAgL2Jpbi9zaCAuLi8uLi9saWJ0b29sIC0tbW9kZT1pbnN0YWxsIC91c3IvYmlu
-L2luc3RhbGwgLWMgCidsaWJhc291bmRfbW9kdWxlX2N0bF9hMmRwZC5sYScgCicvdXNyL2xvY2Fs
-L2xpYi9hbHNhLWxpYi9saWJhc291bmRfbW9kdWxlX2N0bF9hMmRwZC5sYScKbGlidG9vbDogaW5z
-dGFsbDogZXJyb3I6IGNhbm5vdCBpbnN0YWxsIGBsaWJhc291bmRfbW9kdWxlX2N0bF9hMmRwZC5s
-YScgCnRvIGEgZGlyZWN0b3J5IG5vdCBlbmRpbmcgaW4gL3Vzci9saWIvYWxzYS1saWIKbWFrZVsz
-XTogKioqIFtpbnN0YWxsLWFsc2FMVExJQlJBUklFU10gRXJyb3IgMQptYWtlWzNdOiBMZWF2aW5n
-IGRpcmVjdG9yeSBgL3Zhci9kbC9wbHVnei9hbHNhLXBsdWdpbnMvYTJkcGQnCm1ha2VbMl06ICoq
-KiBbaW5zdGFsbC1hbV0gRXJyb3IgMgptYWtlWzJdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci9k
-bC9wbHVnei9hbHNhLXBsdWdpbnMvYTJkcGQnCm1ha2VbMV06ICoqKiBbaW5zdGFsbC1yZWN1cnNp
-dmVdIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvZGwvcGx1Z3ovYWxz
-YS1wbHVnaW5zJwptYWtlOiAqKiogW2luc3RhbGwtcmVjdXJzaXZlXSBFcnJvciAxCj09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CgpJ
-IHRvb2sgYSBsb29rIGF0ICIvdXNyL2xvY2FsL2xpYiIgYW5kICIvdXNyL2xpYiIgYW5kIHRoZXkg
-Ym90aCBoYXZlIAoiYWxzYS1saWIiIGRpcmVjdG9yaWVzLiAgQm90aCBhcmUgb3duZWQsIHdyaXRl
-YWJsZSBhbmQgZXhlY3V0YWJsZSBieSAKcm9vdCBhcyB5b3UgY2FuIHNlZSBiZWxvdzoKLS0KW3Jv
-b3RAdG93ZXJdIFsyMToxOV0gW35dOiBsbCAvdXNyL2xpYi8KdG90YWwgMzIyOTg2CmRyd3hyLXhy
-LXggIDMgcm9vdCByb290ICAgICAxMDI0IEphbiAyMiAyMTowOSBhbHNhLWxpYi8KZHJ3eHIteHIt
-eCAgMyByb290IHJvb3QgICAgIDEwMjQgT2N0IDIyIDEzOjAxIGFvLwpkcnd4ci14ci14ICAyIHJv
-b3Qgcm9vdCAgICAgMjA0OCBPY3QgMjIgMTM6MzYgYXBhY2hlLwotLQpbcm9vdEB0b3dlcl0gWzIx
-OjIyXSBbfl06IGxsIC91c3IvbG9jYWwvbGliLwp0b3RhbCAyODExMQpkcnd4ci14ci14ICAyIHJv
-b3Qgcm9vdCAgICAgMTAyNCBKYW4gMjIgMjE6MTEgYWxzYS1saWIvCmRyd3hyLXhyLXggIDUgcm9v
-dCByb290ICAgICAxMDI0IE5vdiAxMSAxNDoxOCBndGstMi4wLwoKU28gSSBkb24ndCB1bmRlcnN0
-YW5kIHdoeSB3ZSdyZSBnZXR0aW5nIHRoYXQgcGFydGljdWxhciBlcnJvciBtZXNzYWdlLgoKPj4+
-IGdkYiBhMmRwZAo+Pj4KPj4+IHByZXNzICdyJwo+Pj4gd2hlbiBpdCBjcmFzaGVzIHR5cGUgICdi
-dCcgdGhlbiBnaXZlIHVzIGZ1bGwgb3V0cHV0LgoKSSBkaWRuJ3QgZXZlbiBib3RoZXIgdG8gcnVu
-IHRoZXNlIGNvbW1hbmRzIHlldCB1bnRpbCBJIGdldCBwYXN0IHRoZSAKcHJldmlvdXMgZXJyb3Jz
-LgoKVGhhbmtzIGZvciB5b3VyIGhlbHAuCgotLSAKS2lubmV5IEJhdWdobWFuCgotLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tClRha2UgU3VydmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBvZiBJ
-VApKb2luIFNvdXJjZUZvcmdlLm5ldCdzIFRlY2hzYXkgcGFuZWwgYW5kIHlvdSdsbCBnZXQgdGhl
-IGNoYW5jZSB0byBzaGFyZSB5b3VyCm9waW5pb25zIG9uIElUICYgYnVzaW5lc3MgdG9waWNzIHRo
-cm91Z2ggYnJpZWYgc3VydmV5cyAtIGFuZCBlYXJuIGNhc2gKaHR0cDovL3d3dy50ZWNoc2F5LmNv
-bS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhwJnA9c291cmNlZm9yZ2UmQ0lEPURFVkRFVgpfX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZlbCBt
-YWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlz
-dHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
+--===============0424297556==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_216811_31030983.1169512922671"
+
+------=_Part_216811_31030983.1169512922671
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Dear All
+
+I have a program and listen for connections from a device that uses SPP.  My
+program just opens RFCOMM socket and waits for connection to come in.  The
+device that connects into my program has a connection LED indicating a
+successful connections.
+
+I have noticed that if close my RFCOMM socket, even if I stop my listener
+process, the connection LED on the device remains lit.  The only thing I get
+it to not lit (and thus indicates that it is giving up on that connection)
+is to remove my USB bluetooth dongle.
+
+Is there anyway I can do a full disconnect on SPP?
+
+Thanks
+
+Mark
+
+------=_Part_216811_31030983.1169512922671
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Dear All<br><br>I have a program and listen for connections from a device that uses
+SPP.&nbsp; My program just opens RFCOMM socket and waits for connection to
+come in.&nbsp; The device that connects into my program has a connection LED
+indicating a successful connections.<br>
+<br>
+I have noticed that if close my RFCOMM socket, even if I stop my
+listener process, the connection LED on the device remains lit.&nbsp; The
+only thing I get it to not lit (and thus indicates that it is giving up
+on that connection) is to remove my USB bluetooth dongle.<br>
+<br>
+Is there anyway I can do a full disconnect on SPP?<br>
+<br>Thanks<br><br>Mark<br><br>
+
+------=_Part_216811_31030983.1169512922671--
+
+
+--===============0424297556==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============0424297556==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0424297556==--
