@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4f436aae0701240637j30d2fc59q8613b65c3a15a28f@mail.gmail.com>
-Date: Wed, 24 Jan 2007 16:37:23 +0200
-From: "Choi Sonim" <choisonim@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Message-ID: <45B7397F.80107@palmsource.com>
+Date: Wed, 24 Jan 2007 11:48:31 +0100
+From: =?UTF-8?B?RnLDqWTDqXJpYyBEQUxMRUFV?= <frederic.dalleau@palmsource.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] what is socket option HCI_FILTER ?
+To: michel.brabants@euphonynet.be,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <200701150305.07478.bluez-devel@huitl.de>	<45AB5463.80503@palmsource.com>
+	<ep5n6d$ccq$1@sea.gmane.org>
+In-Reply-To: <ep5n6d$ccq$1@sea.gmane.org>
+Subject: Re: [Bluez-devel] a2dpd: cmdplay fails: "No such
+ application:	'amarok player play'"
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,67 +19,38 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0669438558=="
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0669438558==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_4903_29438438.1169649443846"
-
-------=_Part_4903_29438438.1169649443846
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-hello,
-
-please, what is the hci filters ?
-i see hcitool set them up before sending a command.
-
-what is the hci filter do ?
-
-thank you all
-choi
-
-------=_Part_4903_29438438.1169649443846
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div>hello,</div>
-<div>&nbsp;</div>
-<div>please, what is the hci filters ?</div>
-<div>i see hcitool set them up before sending a command.</div>
-<div>&nbsp;</div>
-<div>what is the hci filter do ?</div>
-<div>&nbsp;</div>
-<div>thank you all</div>
-<div>choi</div>
-
-------=_Part_4903_29438438.1169649443846--
-
-
---===============0669438558==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0669438558==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0669438558==--
+SGVsbG8sCgpJdCBzZWVtcyB0byBmb3JrIGNvcnJlY3RseSBhbmQgYW1hcm9rIGRvIG5vdCBkaXNw
+bGF5IGFueSBlcnJvcnMuIEkgCnN1Z2dlc3QgeW91IHRyeSB0aGUgJ2FtYXJvayAtLW5leHQnIGZy
+b20gdGhlIHNhbWUgc2hlbGwgeW91IHN0YXJ0ZWQgYTJkcCAKZnJvbSB0byBtYWtlIHN1cmUgaWYg
+aXQgZWZmZWN0aXZlbHkgd29yay4KTm93IGlmIHlvdSByZXRyaWV2ZSB0aGUgbGF0ZXN0IGN2cywg
+dGhlIGRjb3Agc3R5bGUgY29tbWFuZCB3aWxsIHdvcmsgCihzZWUgc2FtcGxlLmEyZHByYykuCgpN
+aWNoZWwgQnJhYmFudHMgYSDDqWNyaXQgOgo+IEhleSwKPgo+IEkgY29tcGlsZWQgdGhlIGFsc2Et
+Ymx1ZXRvb3RoIHNvZnR3YXJlIGZyb20gY3ZzIGF0IDIyLzEtMjAwNyAoeWVzdGVyZGF5KS5JJ20K
+PiB0cnlpbmcgdG8gdXNlIGF2cmNwLCBob3dldmVyIGl0IGlzbid0IHdvcmtpbmcgZm9yIG1lLiBh
+MmRwZCBpcyByZWNlaXZpbmcKPiB0aGUgY29tbWFuZHMgYW5kIGZvcmtpbmcgdGhlIGNvbW1hbmRz
+IEkgd2FudCBpdCB0byBmb3JrLCBidXQgaXQgZG9lc24ndCBkbwo+IHNlZW1pbmdseSAuLi4gSSB0
+cmllZCB0aGUgImRjb3AgYW1hcm9rIC4uLiItY29tbWFuZHMgYW5kCj4gdGhlICJhbWFyb2sgLS1u
+ZXh0Ii1jb21tYW5kIGFuZCBib3RoIGRvbid0IHdvcmsuIEhvd2V2ZXIsIEkgZG9uJ3Qgc2VlIGFu
+eQo+IGVycm9ycyBhbHNvIC4uLiBJcyB0aGVyZSBhbnkgbXVyIGVkZWJ1Zy1vdXRwdXQgdGhhdCBJ
+IGNhbiBlbmFibGU/Cj4gSGVyZSBpcyB3aGF0IEkgc2VlIGF0IHRoZSBtb21lbnQ6Cj4KPiBBMkRQ
+RFswMTguOTE3XTogYTJkcF9oYW5kbGVfYXZyY3BfbWVzc2FnZTogYXZyY3BfZm9yd2FyZCBET1dO
+Cj4gQTJEUERbMDE4LjkxN106IGEyZHBkX3NpZ25hbF9jb21tYW5kOiBhdnJjcF9mb3J3YXJkCj4g
+QTJEUERbMDE4LjkxN106IGEyZHBfaGFuZGxlX2F2cmNwX21lc3NhZ2U6IFtuZXh0XSBhbWFyb2sg
+LS1uZXh0Cj4gQTJEUERbMDE4LjkxOF06IGNsb3NlX3NlcnZlcl9zb2NrZXRfb25fZm9yazogQ2xv
+c2luZyBzZXJ2ZXIgc29ja2V0IDgKPiBBMkRQRFswMTguOTE4XTogYXN5bmNfcnVuX3Byb2Nlc3M6
+IEZvcmtlZCBhbWFyb2sgLS1uZXh0Cj4gQTJEUERbMDE5LjAwNF06IGEyZHBfaGFuZGxlX2F2cmNw
+X21lc3NhZ2U6IGF2cmNwX2ZvcndhcmQgVVAKPiBBMkRQRFswMTkuMDA0XTogYTJkcGRfc2lnbmFs
+X2NvbW1hbmQ6IGF2cmNwX2ZvcndhcmQKPgo+ICAgCgpGcsOpZMOpcmljCgoKLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLQpUYWtlIFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQK
+Sm9pbiBTb3VyY2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBj
+aGFuY2UgdG8gc2hhcmUgeW91cgpvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJv
+dWdoIGJyaWVmIHN1cnZleXMgLSBhbmQgZWFybiBjYXNoCmh0dHA6Ly93d3cudGVjaHNheS5jb20v
+ZGVmYXVsdC5waHA/cGFnZT1qb2luLnBocCZwPXNvdXJjZWZvcmdlJkNJRD1ERVZERVYKX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFp
+bGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3Rz
+LnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
