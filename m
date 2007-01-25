@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <2e9fc96f0701252145x71b8810tfa22948c5a9e63d8@mail.gmail.com>
-Date: Fri, 26 Jan 2007 11:15:18 +0530
-From: "Prabhu nath" <gprabhunath@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <341704.68311.qm@web53305.mail.yahoo.com>
+Message-ID: <32812.130.234.167.175.1169734246.squirrel@webmail3.cc.jyu.fi>
+Date: Thu, 25 Jan 2007 16:10:46 +0200 (EET)
+From: "Tuukka Puranen" <tupepura@cc.jyu.fi>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-References: <341704.68311.qm@web53305.mail.yahoo.com>
-Subject: Re: [Bluez-users] pin code
+Subject: [Bluez-users] Failing to connect to some devices
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,154 +14,244 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0795090545=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0795090545==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_124727_14158054.1169790318964"
+Hi,
 
-------=_Part_124727_14158054.1169790318964
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+I have searched for this issue but so far found no working solution.
 
-WW91IGhhdmUgdG8gY3Jvc3MtY29tcGlsZSBkYnVzLTEuMCwgYW5kIHN0YXJ0IGRidXMtZGFlbW9u
-IGJlZm9yZSBleGVjdXRpbmcKaGNpZC4KZGJ1cy1kYWVtb24gLS1zeXN0ZW0KCldoaWxlIGNyb3Nz
-LWNvbXBpbGluZyBkYnVzLTEuMCBhbmQgYmx1ZXotdXRpbHMsIHBhc3MgdGhlIGZvbGxvd2luZwpw
-YXJhbWV0ZXJzIGZvciB0aGUgY29uZmlndXJlIHNjcmlwdC4KLS1sb2NhbHN0YXRlZGlyPS92YXIg
-LS1zeXNjb25mZGlyPS9ldGMKCk9uY2UgeW91IGRvIHRoaXMsIGJ5IGRlZmF1bHQgaGNpZCB3aWxs
-IGxvb2sgZm9yIGhjaWQuY29uZiBpbiAvZXRjL2JsdWV0b290aApkaXJlY3RvcnkuCgoKKldhcm5p
-bmcqLiBUYWtlIGEgYmFja3VwIG9mIC9ldGMvZGJ1cy0xIGFuZCAvZXRjL2JsdWV0b290aCwgYmVj
-YXVzZSB0aGlzCndpbGwgb3ZlcndyaXRlIHRoZSBwcmV2aW91cyBjb25maWcsIHdoaWNoIHdhcyBh
-bHJlYWR5IHByZXNlbnQgaW4gdXIgc3lzdGVtLgoKUnVuIG1ha2UgaW5zdGFsbCBmb3IgZGJ1cywg
-YW5kIHUgbmVlZCBub3QgcnVuIG1ha2UgaW5zdGFsbCBmb3IgYmx1ZXotdXRpbHMuClUgY2FuIGRp
-cmVjdGx5IGNvcHkgdGhlIGhjaWQuY29uZiBhbmQgYmx1ZS1oY2lkLmNvbmYgdG8gL2V0Yy9ibHVl
-dG9vdGggYW5kCi9ldGMvZGJ1cy0xL3N5c3RlbS5kIGRpcmVjdG9yeSByZXNwZWN0aXZlbHkuCgpO
-b3csIHdoZW4gdSBzdGFydCBkYnVzLWRhZW1vbiAtLXN5c3RlbSwgaXQgd2lsbCBjcmVhdGUgYSBz
-eXN0ZW1fYnVzX3NvY2tldAppbiAvdmFyL3J1bi9kYnVzIGFuZCBpdCB3aWxsIGNyZWF0ZSBhIG1l
-c3NhZ2UucGlkIGluIC92YXIvcnVuLy4KCm5leHQsIHdoZW4gdSBzdGFydCBoY2lkLCB1IHNob3Vs
-ZCBub3QgZ2V0IHByb2JsZW0uCgotUHJhYmh1CgoKCgpPbiAxLzIzLzA3LCBLUyBIIDxrc3BhbTEy
-MzRAeWFob28uY29tLmhrPiB3cm90ZToKPgo+IERlYXIKPgo+IEkgY3Jvc3MgY29tcGlsZSB0aGUg
-Ymx1ZXozLjggYW5kIHRyeSB0byBzZXR1cCB0aGUgYmx1ZXRvb3RoIGluIGFybS4gSQo+IGNvbm5l
-Y3QgdGhlIGFybSB3aXRoIENTUiBCQzAzIHdpdGggQkNTUCBjb25maWd1cmF0aW9uLiBJIGFtIGFi
-bGUgdG8gbWFrZSB0aGUKPiBCbHVleiBkaXNjb3ZlcmFibGUgYW5kIHRyeSB0byBwYWlyIGJsdWV6
-LiBob3dldmVyIGkgZm91bmQgdGhhdCB0aGVyZSBpcyBubwo+IHBpbiByZXNwb25kIGZyb20gQmx1
-ZXouIFNvIGkgdHJ5IHRvIGNvbmZpZ3VyZSBibHVleiB1c2luZyBoY2lkLgo+Cj4gPiBoY2lkIC1u
-IC1mIC9ldGMvYmx1ZXRvb3RoL2hjaWQuY29uZgo+Cj4gaXQgcmV0dXJuCj4KPiBoY2lkWzQ4MV06
-IENhbid0IGNvbm5lY3QgdG8gc3lzdGVtIG1lc3NhZ2UgYnVzOiBGYWlsZWQgdG8gY29ubmVjdCB0
-bwo+IHNvY2tldCAvdXNyL2xvY2FsL3Zhci9ydW4vZGJ1cy9zeXN0ZW1fYnVzX3NvY2tldDogIE5v
-IHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKPiBoY2lkWzQ4MV06IFVuYWJsZSB0byBnZXQgb24gRC1C
-dXMKPgo+IE15IHF1ZXN0aW9uCj4gMS4gd2hlcmUgY2FuIEkgZm91bmQgdGhlIG1pc3NpbmcgZmls
-ZSBhbmQgd2hhdCBpcyB0aGF0IHVzZWQgZm9yPwo+IDIuIElzIHRoZXJlIGFueSBtZXRob2QgdG8g
-cmVwc29uZCB0aGUgcGluIHJlcXVlc3Qgb3RoZXIgdGhhbiB1c2luZyBoY2lkCj4KPiBSZWdhcmRz
-Cj4gU0gKPgo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IFlNIC0g
-6Zui57ea6KiK5oGvCj4g5bCx566X5L2g5rKS5pyJ5LiK57ay77yM5L2g55qE5pyL5Y+L5LuN5Y+v
-5Lul55WZ5LiL6KiK5oGv57Wm5L2g77yM55W25L2g5LiK57ay5pmC5bCx6IO956uL5Y2z55yL5Yiw
-77yM5Lu75L2V6Kqq6Kmx6YO95YaH6LWw5aSx44CCCj4gaHR0cDovL21lc3Nlbmdlci55YWhvby5j
-b20uaGsKPgo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiBUYWtlIFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5m
-bHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQKPiBKb2luIFNvdXJjZUZvcmdlLm5ldCdzIFRlY2hzYXkg
-cGFuZWwgYW5kIHlvdSdsbCBnZXQgdGhlIGNoYW5jZSB0byBzaGFyZQo+IHlvdXIKPiBvcGluaW9u
-cyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdoIGJyaWVmIHN1cnZleXMgLSBhbmQgZWFy
-biBjYXNoCj4gaHR0cDovL3d3dy50ZWNoc2F5LmNvbS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhw
-JnA9c291cmNlZm9yZ2UmQ0lEPURFVkRFVgo+Cj4gX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX18KPiBCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKPiBCbHVlei11
-c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5l
-dC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo+Cj4KPgo=
-------=_Part_124727_14158054.1169790318964
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+I have several mobile phones (Nokia 6630, Sony Ericsson P900, Nokia 7610,
+Nokia 6600) to which I am trying to connect from a program on a Fedora
+machine via Bluetooth dongle. The connection is established
+programmatically and based on known bluetooth addresses of the phones. All
+devices are also found if inquiried, and the client service is found from
+all devices. The program is able to connect to client program on both 6630
+and 7610, but when trying to connect to the service on 6600 the connection
+responds with "Connection refused". With P900 this happens when I have
+entered a pin-code (no other phone even asks for one).
 
-PGRpdj5Zb3UgaGF2ZSB0byBjcm9zcy1jb21waWxlIGRidXMtMS4wLCBhbmQgc3RhcnQgZGJ1cy1k
-YWVtb24gYmVmb3JlIGV4ZWN1dGluZyBoY2lkLiA8L2Rpdj4KPGRpdj5kYnVzLWRhZW1vbiAtLXN5
-c3RlbTwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2PldoaWxlIGNyb3NzLWNvbXBpbGluZyBk
-YnVzLTEuMCBhbmQgYmx1ZXotdXRpbHMsIHBhc3MgdGhlIGZvbGxvd2luZyBwYXJhbWV0ZXJzIGZv
-ciB0aGUgY29uZmlndXJlIHNjcmlwdC48L2Rpdj4KPGRpdj4tLWxvY2Fsc3RhdGVkaXI9L3ZhciAt
-LXN5c2NvbmZkaXI9L2V0YzwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2Pk9uY2UgeW91IGRv
-IHRoaXMsIGJ5IGRlZmF1bHQgaGNpZCB3aWxsIGxvb2sgZm9yIGhjaWQuY29uZiBpbiAvZXRjL2Js
-dWV0b290aCBkaXJlY3RvcnkuIDwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2PiZuYnNwOzwv
-ZGl2Pgo8ZGl2PjxzdHJvbmc+V2FybmluZzwvc3Ryb25nPi4gVGFrZSBhIGJhY2t1cCBvZiAvZXRj
-L2RidXMtMSBhbmQgL2V0Yy9ibHVldG9vdGgsIGJlY2F1c2UgdGhpcyB3aWxsIG92ZXJ3cml0ZSB0
-aGUgcHJldmlvdXMgY29uZmlnLCB3aGljaCZuYnNwO3dhcyBhbHJlYWR5IHByZXNlbnQgaW4gdXIg
-c3lzdGVtLjwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2PlJ1biBtYWtlIGluc3RhbGwgZm9y
-IGRidXMsIGFuZCB1IG5lZWQgbm90IHJ1biBtYWtlIGluc3RhbGwgZm9yIGJsdWV6LXV0aWxzLiBV
-IGNhbiBkaXJlY3RseSBjb3B5IHRoZSBoY2lkLmNvbmYgYW5kIGJsdWUtaGNpZC5jb25mIHRvIC9l
-dGMvYmx1ZXRvb3RoIGFuZCAvZXRjL2RidXMtMS9zeXN0ZW0uZCBkaXJlY3RvcnkgcmVzcGVjdGl2
-ZWx5LjwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2Pk5vdywgd2hlbiB1IHN0YXJ0IGRidXMt
-ZGFlbW9uIC0tc3lzdGVtLCBpdCB3aWxsIGNyZWF0ZSBhIHN5c3RlbV9idXNfc29ja2V0IGluIC92
-YXIvcnVuL2RidXMgYW5kIGl0IHdpbGwgY3JlYXRlIGEgbWVzc2FnZS5waWQgaW4gL3Zhci9ydW4v
-LiA8L2Rpdj4KPGRpdj4mbmJzcDs8L2Rpdj4KPGRpdj5uZXh0LCB3aGVuIHUgc3RhcnQgaGNpZCwg
-dSBzaG91bGQgbm90IGdldCBwcm9ibGVtLjwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2Pi1Q
-cmFiaHU8L2Rpdj4KPGRpdj4mbmJzcDs8L2Rpdj4KPGRpdj48YnI+PGJyPiZuYnNwOzwvZGl2Pgo8
-ZGl2PjxzcGFuIGNsYXNzPSJnbWFpbF9xdW90ZSI+T24gMS8yMy8wNywgPGIgY2xhc3M9ImdtYWls
-X3NlbmRlcm5hbWUiPktTIEg8L2I+ICZsdDs8YSBocmVmPSJtYWlsdG86a3NwYW0xMjM0QHlhaG9v
-LmNvbS5oayI+a3NwYW0xMjM0QHlhaG9vLmNvbS5oazwvYT4mZ3Q7IHdyb3RlOjwvc3Bhbj4KPGJs
-b2NrcXVvdGUgY2xhc3M9ImdtYWlsX3F1b3RlIiBzdHlsZT0iUEFERElORy1MRUZUOiAxZXg7IE1B
-UkdJTjogMHB4IDBweCAwcHggMC44ZXg7IEJPUkRFUi1MRUZUOiAjY2NjIDFweCBzb2xpZCI+RGVh
-cjxicj48YnI+SSBjcm9zcyBjb21waWxlIHRoZSBibHVlejMuOCBhbmQgdHJ5IHRvIHNldHVwIHRo
-ZSBibHVldG9vdGggaW4gYXJtLiBJIGNvbm5lY3QgdGhlIGFybSB3aXRoIENTUiBCQzAzIHdpdGgg
-QkNTUCBjb25maWd1cmF0aW9uLiBJIGFtIGFibGUgdG8gbWFrZSB0aGUgQmx1ZXogZGlzY292ZXJh
-YmxlIGFuZCB0cnkgdG8gcGFpciBibHVlei4gaG93ZXZlciBpIGZvdW5kIHRoYXQgdGhlcmUgaXMg
-bm8gcGluIHJlc3BvbmQgZnJvbSBCbHVlei4gU28gaSB0cnkgdG8gY29uZmlndXJlIGJsdWV6IHVz
-aW5nIGhjaWQuCjxicj48YnI+Jmd0OyBoY2lkIC1uIC1mIC9ldGMvYmx1ZXRvb3RoL2hjaWQuY29u
-Zjxicj48YnI+aXQgcmV0dXJuPGJyPjxicj5oY2lkWzQ4MV06IENhbiYjMzk7dCBjb25uZWN0IHRv
-IHN5c3RlbSBtZXNzYWdlIGJ1czogRmFpbGVkIHRvIGNvbm5lY3QgdG8gc29ja2V0IC91c3IvbG9j
-YWwvdmFyL3J1bi9kYnVzL3N5c3RlbV9idXNfc29ja2V0OiZuYnNwOyBObyBzdWNoIGZpbGUgb3Ig
-ZGlyZWN0b3J5Cjxicj5oY2lkWzQ4MV06IFVuYWJsZSB0byBnZXQgb24gRC1CdXM8YnI+PGJyPk15
-IHF1ZXN0aW9uPGJyPjEuIHdoZXJlIGNhbiBJIGZvdW5kIHRoZSBtaXNzaW5nIGZpbGUgYW5kIHdo
-YXQgaXMgdGhhdCB1c2VkIGZvcj88YnI+Mi4gSXMgdGhlcmUgYW55IG1ldGhvZCB0byByZXBzb25k
-IHRoZSBwaW4gcmVxdWVzdCBvdGhlciB0aGFuIHVzaW5nIGhjaWQ8YnI+PGJyPlJlZ2FyZHM8YnI+
-U0g8YnI+CjxzcGFuIGNsYXNzPSJhZCI+CjxwPl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fXzxicj5ZTSAtIOmboue3muioiuaBrzxicj7lsLHnrpfkvaDmspLmnInkuIrntrLv
-vIzkvaDnmoTmnIvlj4vku43lj6/ku6XnlZnkuIvoqIrmga/ntabkvaDvvIznlbbkvaDkuIrntrLm
-mYLlsLHog73nq4vljbPnnIvliLDvvIzku7vkvZXoqqroqbHpg73lhofotbDlpLHjgII8YnI+PGEg
-b25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiIGhy
-ZWY9Imh0dHA6Ly9tZXNzZW5nZXIueWFob28uY29tLmhrLyIgdGFyZ2V0PSJfYmxhbmsiPmh0dHA6
-Ly9tZXNzZW5nZXIueWFob28uY29tLmhrCjwvYT4gPC9wPjwvc3Bhbj48YnI+LS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLTxicj5UYWtlIFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2Yg
-SVQ8YnI+Sm9pbiBTb3VyY2VGb3JnZS5uZXQmIzM5O3MgVGVjaHNheSBwYW5lbCBhbmQgeW91JiMz
-OTtsbCBnZXQgdGhlIGNoYW5jZSB0byBzaGFyZSB5b3VyCjxicj5vcGluaW9ucyBvbiBJVCAmYW1w
-OyBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0gYW5kIGVhcm4gY2FzaDxi
-cj48YSBvbmNsaWNrPSJyZXR1cm4gdG9wLmpzLk9wZW5FeHRMaW5rKHdpbmRvdyxldmVudCx0aGlz
-KSIgaHJlZj0iaHR0cDovL3d3dy50ZWNoc2F5LmNvbS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhw
-JmFtcDtwPXNvdXJjZWZvcmdlJmFtcDtDSUQ9REVWREVWIiB0YXJnZXQ9Il9ibGFuayI+Cmh0dHA6
-Ly93d3cudGVjaHNheS5jb20vZGVmYXVsdC5waHA/cGFnZT1qb2luLnBocCZhbXA7cD1zb3VyY2Vm
-b3JnZSZhbXA7Q0lEPURFVkRFVjwvYT48YnI+PGJyPl9fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fPGJyPkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdDxicj48YSBv
-bmNsaWNrPSJyZXR1cm4gdG9wLmpzLk9wZW5FeHRMaW5rKHdpbmRvdyxldmVudCx0aGlzKSIgaHJl
-Zj0ibWFpbHRvOkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldCI+CkJsdWV6LXVzZXJz
-QGxpc3RzLnNvdXJjZWZvcmdlLm5ldDwvYT48YnI+PGEgb25jbGljaz0icmV0dXJuIHRvcC5qcy5P
-cGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiIGhyZWY9Imh0dHBzOi8vbGlzdHMuc291cmNl
-Zm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzIiB0YXJnZXQ9Il9ibGFuayI+aHR0
-cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMKPC9h
-Pjxicj48YnI+PGJyPjwvYmxvY2txdW90ZT48L2Rpdj48YnI+Cg==
-------=_Part_124727_14158054.1169790318964--
+The authentication (which shouldn't be happening, there is no need for
+this) seems to fail for some reason. What I do not know, is why it happens
+only on P900 (and propably 6600). I have tried to change hcid.conf and
+every pin code file I came upon, but nothing seems to help.
+
+I'd like to know is there a way to completely disable the authentication
+or  set a default passkey for outgoing connections so that I can easily
+connect to given bluetooth address programmatically.
+
+Here's the hcidump from P900:
+
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr 00:0A:D9:EB:70:2E ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Connect Complete (0x03) plen 11
+< ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+    handle 41 policy 0x0f
+    Link policy: RSWITCH HOLD SNIFF PARK
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> HCI Event: Command Complete (0x0e) plen 6
+> HCI Event: Max Slots Change (0x1b) plen 3
+> ACL data: handle 41 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0050 scid 0x0040 result 1 status 2
+> ACL data: handle 41 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0050 scid 0x0040 result 0 status 0
+< ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x0050 flags 0x00 clen 0
+> ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
+< ACL data: handle 41 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0050 flags 0x00 result 0 clen 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 41 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+< ACL data: handle 41 flags 0x02 dlen 38
+    L2CAP(d): cid 0x0050 len 34 [psm 1]
+        SDP SSA Req: tid 0x0 len 0x1d
+          pat uuid-128 38be1fb8-9980-11d9-8bde-f66bad1e3f3a
+          max 65535
+          aid(s) 0x0000 - 0xffff
+          cont 00
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 41 flags 0x02 dlen 17
+> ACL data: handle 41 flags 0x01 dlen 17
+> ACL data: handle 41 flags 0x01 dlen 17
+> ACL data: handle 41 flags 0x01 dlen 17
+> ACL data: handle 41 flags 0x01 dlen 17
+> ACL data: handle 41 flags 0x01 dlen 12
+    L2CAP(d): cid 0x0040 len 93 [psm 1]
+        SDP SSA Rsp: tid 0x0 len 0x58
+          count 85
+          record #0
+              aid 0x0000 (SrvRecHndl)
+                 uint 0x1000a
+              aid 0x0001 (SrvClassIDList)
+                 < uuid-128 38be1fb8-9980-11d9-8bde-f66bad1e3f3a uuid-16
+0x1101 (SP) >
+              aid 0x0004 (ProtocolDescList)
+                 < < uuid-16 0x0100 (L2CAP) > <
+                 uuid-16 0x0003 (RFCOMM) uint 0x5 > >
+              aid 0x0006 (LangBaseAttrIDList)
+                 < uint 0x656e uint 0x6a uint 0x100 >
+              aid 0x0100 (SrvName)
+                 str "in-TISU Leaf"
+          cont 00
+< ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0050 scid 0x0040
+< ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0041
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0050 scid 0x0040
+> ACL data: handle 41 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0051 scid 0x0041 result 1 status 2
+> ACL data: handle 41 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0051 scid 0x0041 result 0 status 0
+< ACL data: handle 41 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0051 flags 0x00 clen 4
+      MTU 1013
+> ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 0
+< ACL data: handle 41 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0051 flags 0x00 result 0 clen 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 41 flags 0x02 dlen 17
+> ACL data: handle 41 flags 0x01 dlen 1
+    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
+      MTU 672
+< ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0051 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+< ACL data: handle 41 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0051 len 14 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+      dlci 10 frame_type 0 credit_flow 15 pri 7 ack_timer 0
+      frame_size 667 max_retrans 0 credits 7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 41 flags 0x02 dlen 17
+> ACL data: handle 41 flags 0x01 dlen 1
+    L2CAP(d): cid 0x0041 len 14 [psm 3]
+      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+      dlci 10 frame_type 0 credit_flow 14 pri 7 ack_timer 0
+      frame_size 667 max_retrans 0 credits 3
+< ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0051 len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 10 pf 1 ilen 0 fcs 0x8c
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): DM: cr 1 dlci 10 pf 1 ilen 0 fcs 0xa6
+< ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0051 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
+< ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0051 scid 0x0041
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 41 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0051 scid 0x0041
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+    handle 41 reason 0x13
+    Reason: Remote User Teminated Connection
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Disconn Complete (0x05) plen 4
 
 
---===============0795090545==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+And here's (considerably shorter for some reason) from 7610:
+
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr 00:0E:ED:1E:88:E0 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Connect Complete (0x03) plen 11
+< ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+    handle 41 policy 0x0f
+    Link policy: RSWITCH HOLD SNIFF PARK
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> HCI Event: Command Complete (0x0e) plen 6
+> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+> HCI Event: Max Slots Change (0x1b) plen 3
+> ACL data: handle 41 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0040 result 1 status 2
+> ACL data: handle 41 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0040 result 0 status 0
+< ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
+< ACL data: handle 41 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 41 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+< ACL data: handle 41 flags 0x02 dlen 38
+    L2CAP(d): cid 0x0041 len 34 [psm 1]
+        SDP SSA Req: tid 0x0 len 0x1d
+          pat uuid-128 38be1fb8-9980-11d9-8bde-f66bad1e3f3a
+          max 65535
+          aid(s) 0x0000 - 0xffff
+          cont 00
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 41 flags 0x02 dlen 17
+> ACL data: handle 41 flags 0x01 dlen 17
+> ACL data: handle 41 flags 0x01 dlen 17
+> ACL data: handle 41 flags 0x01 dlen 17
+> ACL data: handle 41 flags 0x01 dlen 17
+> ACL data: handle 41 flags 0x01 dlen 12
+    L2CAP(d): cid 0x0040 len 93 [psm 1]
+        SDP SSA Rsp: tid 0x0 len 0x58
+          count 85
+          record #0
+              aid 0x0000 (SrvRecHndl)
+                 uint 0x10006
+              aid 0x0001 (SrvClassIDList)
+                 < uuid-128 38be1fb8-9980-11d9-8bde-f66bad1e3f3a uuid-16
+0x1101 (SP) >
+              aid 0x0004 (ProtocolDescList)
+                 < < uuid-16 0x0100 (L2CAP) > <
+                 uuid-16 0x0003 (RFCOMM) uint 0x3 > >
+              aid 0x0006 (LangBaseAttrIDList)
+                 < uint 0x656e uint 0x6a uint 0x100 >
+              aid 0x0100 (SrvName)
+                 str "in-TISU Leaf"
+          cont 00
+< ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0040
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0040
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+    handle 41 reason 0x13
+    Reason: Remote User Teminated Connection
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Disconn Complete (0x05) plen 4
+
+Tuukka
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0795090545==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0795090545==--
