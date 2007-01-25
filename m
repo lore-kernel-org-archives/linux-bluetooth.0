@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <32812.130.234.167.175.1169734246.squirrel@webmail3.cc.jyu.fi>
-Date: Thu, 25 Jan 2007 16:10:46 +0200 (EET)
-From: "Tuukka Puranen" <tupepura@cc.jyu.fi>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] Failing to connect to some devices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <80236d750701250229u61cbb820v929b8d0ad6ae3fb9@mail.gmail.com>
+References: <80236d750701250229u61cbb820v929b8d0ad6ae3fb9@mail.gmail.com>
+Date: Thu, 25 Jan 2007 11:42:06 +0100
+Message-Id: <1169721726.9197.39.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] multithread / multi process use
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,232 +20,88 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Emanuele,
 
-I have searched for this issue but so far found no working solution.
+> Using 2 threads or 2 process for reading a name of a 2 remote devices
+> at same time reports always the same name.
+> Is this a bug or the hci functions in library do not support
+> concurrent use ? 
+> (using 2.6.19 kernel on FC6 and bluez libs 3.7.1)
+> 
+> This is a simply way to reproduce this:
+> 
+> open a 2 shells and issue 2 commands at same time 
+> 
+> hcitool name <bdaddress of a device close to you> 
+> 
+> they both report the same name
+> 
+> here an HCI dump of what's happening
+> 
+> 2007-01-25 11:15:06.093319 < HCI Command: Remote Name Request (0x01|
+> 0x0019) plen 10
+>     bdaddr 00:0A:28:DF:2B:D8 mode 2 clkoffset 0x0000 
+> 2007-01-25 11:15:06.114456 > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> 2007-01-25 11:15:06.712794 < HCI Command: Remote Name Request (0x01|
+> 0x0019) plen 10 
+>     bdaddr 00:17:4B:D3:9F:5B mode 2 clkoffset 0x0000
+> 2007-01-25 11:15:06.717442 > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 0
+> 2007-01-25 11:15:07.238429 > HCI Event: Remote Name Req Complete
+> (0x07) plen 255
+>     status 0x00 bdaddr 00:0A:28:DF:2B:D8 name 'Seleso'
+> 2007-01-25 11:15:07.239434 > HCI Event: Command Status (0x0f) plen 4
+>     Unknown (0x00|0x0000) status 0x00 ncmd 1 
+> 2007-01-25 11:15:10.151342 > HCI Event: Remote Name Req Complete
+> (0x07) plen 255
+>     status 0x00 bdaddr 00:17:4B:D3:9F:5B name 'Wince'
+> 
+> the second event with the second name is tracked but never reported
+> back to the caller cause the unknown event received. 
+> so i see the name 'Seleso' as result on both the shells 
+> 
+> this is the behaviour if I use the 2 command sequentially they works
+> fine.
+> 
+> hcitool name 00:0A:28:DF:2B:D8
+> 
+> 2007-01-25 11:19:51.930394 < HCI Command: Remote Name Request (0x01|
+> 0x0019) plen 10
+>     bdaddr 00:0A:28:DF:2B:D8 mode 2 clkoffset 0x0000
+> 2007-01-25 11:19:51.951520 > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1 
+> 2007-01-25 11:19:52.199514 > HCI Event: Remote Name Req Complete
+> (0x07) plen 255
+>     status 0x00 bdaddr 00:0A:28:DF:2B:D8 name 'Seleso'
+> 
+> hcitool name 00:17:4B:D3:9F:5B
+> 
+> 2007-01-25 11:20:39.520967 < HCI Command: Remote Name Request (0x01|
+> 0x0019) plen 10
+>     bdaddr 00:17:4B:D3:9F:5B mode 2 clkoffset 0x0000
+> 2007-01-25 11:20:39.542195 > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1 
+> 2007-01-25 11:20:43.358090 > HCI Event: Remote Name Req Complete
+> (0x07) plen 255
+>     status 0x00 bdaddr 00:17:4B:D3:9F:5B name 'Wince'
+> 
+> 
+> 
+> 
+> Since I need to use search names and search services (FAX especially)
+> on a multi-threaded application i'd like to know if is this possible
+> or somewhere there is a issue that prevent this. 
 
-I have several mobile phones (Nokia 6630, Sony Ericsson P900, Nokia 7610,
-Nokia 6600) to which I am trying to connect from a program on a Fedora
-machine via Bluetooth dongle. The connection is established
-programmatically and based on known bluetooth addresses of the phones. All
-devices are also found if inquiried, and the client service is found from
-all devices. The program is able to connect to client program on both 6630
-and 7610, but when trying to connect to the service on 6600 the connection
-responds with "Connection refused". With P900 this happens when I have
-entered a pin-code (no other phone even asks for one).
+actually this is a known bug and basically not really fixable except
+doing a massive rework of the HCI API. You are better off to use the
+D-Bus interface to get the remote names. It will automatically take of
+this for you and also do caching of the names.
 
-The authentication (which shouldn't be happening, there is no need for
-this) seems to fail for some reason. What I do not know, is why it happens
-only on P900 (and propably 6600). I have tried to change hcid.conf and
-every pin code file I came upon, but nothing seems to help.
+Regards
 
-I'd like to know is there a way to completely disable the authentication
-or  set a default passkey for outgoing connections so that I can easily
-connect to given bluetooth address programmatically.
+Marcel
 
-Here's the hcidump from P900:
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:0A:D9:EB:70:2E ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Connect Complete (0x03) plen 11
-< ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-    handle 41 policy 0x0f
-    Link policy: RSWITCH HOLD SNIFF PARK
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> HCI Event: Command Complete (0x0e) plen 6
-> HCI Event: Max Slots Change (0x1b) plen 3
-> ACL data: handle 41 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0050 scid 0x0040 result 1 status 2
-> ACL data: handle 41 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0050 scid 0x0040 result 0 status 0
-< ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0050 flags 0x00 clen 0
-> ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-< ACL data: handle 41 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0050 flags 0x00 result 0 clen 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 41 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-< ACL data: handle 41 flags 0x02 dlen 38
-    L2CAP(d): cid 0x0050 len 34 [psm 1]
-        SDP SSA Req: tid 0x0 len 0x1d
-          pat uuid-128 38be1fb8-9980-11d9-8bde-f66bad1e3f3a
-          max 65535
-          aid(s) 0x0000 - 0xffff
-          cont 00
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 41 flags 0x02 dlen 17
-> ACL data: handle 41 flags 0x01 dlen 17
-> ACL data: handle 41 flags 0x01 dlen 17
-> ACL data: handle 41 flags 0x01 dlen 17
-> ACL data: handle 41 flags 0x01 dlen 17
-> ACL data: handle 41 flags 0x01 dlen 12
-    L2CAP(d): cid 0x0040 len 93 [psm 1]
-        SDP SSA Rsp: tid 0x0 len 0x58
-          count 85
-          record #0
-              aid 0x0000 (SrvRecHndl)
-                 uint 0x1000a
-              aid 0x0001 (SrvClassIDList)
-                 < uuid-128 38be1fb8-9980-11d9-8bde-f66bad1e3f3a uuid-16
-0x1101 (SP) >
-              aid 0x0004 (ProtocolDescList)
-                 < < uuid-16 0x0100 (L2CAP) > <
-                 uuid-16 0x0003 (RFCOMM) uint 0x5 > >
-              aid 0x0006 (LangBaseAttrIDList)
-                 < uint 0x656e uint 0x6a uint 0x100 >
-              aid 0x0100 (SrvName)
-                 str "in-TISU Leaf"
-          cont 00
-< ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0050 scid 0x0040
-< ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 3 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0050 scid 0x0040
-> ACL data: handle 41 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0051 scid 0x0041 result 1 status 2
-> ACL data: handle 41 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0051 scid 0x0041 result 0 status 0
-< ACL data: handle 41 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0051 flags 0x00 clen 4
-      MTU 1013
-> ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 0
-< ACL data: handle 41 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0051 flags 0x00 result 0 clen 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 41 flags 0x02 dlen 17
-> ACL data: handle 41 flags 0x01 dlen 1
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
-      MTU 672
-< ACL data: handle 41 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0051 len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 41 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-< ACL data: handle 41 flags 0x02 dlen 18
-    L2CAP(d): cid 0x0051 len 14 [psm 3]
-      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
-      dlci 10 frame_type 0 credit_flow 15 pri 7 ack_timer 0
-      frame_size 667 max_retrans 0 credits 7
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 41 flags 0x02 dlen 17
-> ACL data: handle 41 flags 0x01 dlen 1
-    L2CAP(d): cid 0x0041 len 14 [psm 3]
-      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
-      dlci 10 frame_type 0 credit_flow 14 pri 7 ack_timer 0
-      frame_size 667 max_retrans 0 credits 3
-< ACL data: handle 41 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0051 len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 10 pf 1 ilen 0 fcs 0x8c
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 41 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-      RFCOMM(s): DM: cr 1 dlci 10 pf 1 ilen 0 fcs 0xa6
-< ACL data: handle 41 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0051 len 4 [psm 3]
-      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
-< ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0051 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 41 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-> ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0051 scid 0x0041
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-    handle 41 reason 0x13
-    Reason: Remote User Teminated Connection
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Disconn Complete (0x05) plen 4
-
-
-And here's (considerably shorter for some reason) from 7610:
-
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:0E:ED:1E:88:E0 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Connect Complete (0x03) plen 11
-< ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-    handle 41 policy 0x0f
-    Link policy: RSWITCH HOLD SNIFF PARK
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> HCI Event: Command Complete (0x0e) plen 6
-> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
-> HCI Event: Max Slots Change (0x1b) plen 3
-> ACL data: handle 41 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0040 result 1 status 2
-> ACL data: handle 41 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0040 result 0 status 0
-< ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-< ACL data: handle 41 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 41 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-< ACL data: handle 41 flags 0x02 dlen 38
-    L2CAP(d): cid 0x0041 len 34 [psm 1]
-        SDP SSA Req: tid 0x0 len 0x1d
-          pat uuid-128 38be1fb8-9980-11d9-8bde-f66bad1e3f3a
-          max 65535
-          aid(s) 0x0000 - 0xffff
-          cont 00
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 41 flags 0x02 dlen 17
-> ACL data: handle 41 flags 0x01 dlen 17
-> ACL data: handle 41 flags 0x01 dlen 17
-> ACL data: handle 41 flags 0x01 dlen 17
-> ACL data: handle 41 flags 0x01 dlen 17
-> ACL data: handle 41 flags 0x01 dlen 12
-    L2CAP(d): cid 0x0040 len 93 [psm 1]
-        SDP SSA Rsp: tid 0x0 len 0x58
-          count 85
-          record #0
-              aid 0x0000 (SrvRecHndl)
-                 uint 0x10006
-              aid 0x0001 (SrvClassIDList)
-                 < uuid-128 38be1fb8-9980-11d9-8bde-f66bad1e3f3a uuid-16
-0x1101 (SP) >
-              aid 0x0004 (ProtocolDescList)
-                 < < uuid-16 0x0100 (L2CAP) > <
-                 uuid-16 0x0003 (RFCOMM) uint 0x3 > >
-              aid 0x0006 (LangBaseAttrIDList)
-                 < uint 0x656e uint 0x6a uint 0x100 >
-              aid 0x0100 (SrvName)
-                 str "in-TISU Leaf"
-          cont 00
-< ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 41 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0040
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-    handle 41 reason 0x13
-    Reason: Remote User Teminated Connection
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Disconn Complete (0x05) plen 4
-
-Tuukka
 
 
 -------------------------------------------------------------------------
