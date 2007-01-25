@@ -1,11 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <9555d9ef0701271011x1be2b3a6l15642142312d971d@mail.gmail.com>
-Date: Sat, 27 Jan 2007 20:11:41 +0200
-From: "=?ISO-8859-1?Q?yunus_=F6zen?=" <saltukbugrahan@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] fedora core 6 and bluez
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+From: Michel Brabants <michel.brabants@euphonynet.be>
+Date: Thu, 25 Jan 2007 20:02:46 +0100
+Message-ID: <epausm$2mu$1@sea.gmane.org>
+References: <200701150305.07478.bluez-devel@huitl.de>	<45AB5463.80503@palmsource.com>
+	<ep5n6d$ccq$1@sea.gmane.org> <45B7397F.80107@palmsource.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] a2dpd: cmdplay fails: "No such
+	application:	'amarok player play'"
+Reply-To: michel.brabants@euphonynet.be,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,76 +18,57 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0244910878=="
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0244910878==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_48941_20603296.1169921501238"
-
-------=_Part_48941_20603296.1169921501238
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi all,
-
-I have a fedora core 6 installed laptop. My "uname -r" output is
-here :"2.6.18-1.2798.fc6".
-
-I have tried to write some program with these includes :
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/hci.h>
-#include <bluetooth/hci_lib.h>
-
-When I try to compile it by gcc I see these error messages :
-bluez01.c:5:33: error: bluetooth/bluetooth.h: No such file or directory
-bluez01.c:6:27: error: bluetooth/hci.h: No such file or directory
-bluez01.c:7:31: error: bluetooth/hci_lib.h: No such file or directory
-
-What can I do now?
-
-Thanks,
-Saltuk.
-
-------=_Part_48941_20603296.1169921501238
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi all,<br><br>I have a fedora core 6 installed laptop. My &quot;uname -r&quot; output is <br>here :&quot;2.6.18-1.2798.fc6&quot;.<br><br>I have tried to write some program with these includes : <br>#include &lt;stdio.h&gt;
-<br>#include &lt;stdlib.h&gt;<br>#include &lt;unistd.h&gt;<br>#include &lt;sys/socket.h&gt;<br>#include &lt;bluetooth/bluetooth.h&gt;<br>#include &lt;bluetooth/hci.h&gt;<br>#include &lt;bluetooth/hci_lib.h&gt;<br><br>When I try to compile it by gcc I see these error messages :
-<br>bluez01.c:5:33: error: bluetooth/bluetooth.h: No such file or directory<br>bluez01.c:6:27: error: bluetooth/hci.h: No such file or directory<br>bluez01.c:7:31: error: bluetooth/hci_lib.h: No such file or directory<br>
-<br>What can I do now?<br><br>Thanks,<br>Saltuk.<br>
-
-------=_Part_48941_20603296.1169921501238--
-
-
---===============0244910878==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0244910878==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0244910878==--
+SGVsbG8sCgpJIGNvbXBpbGVkIGEyZHBkIHllc3RlcmRheSBJIHRoaW5rLiBBbnl3YXksIHRoZSB2
+ZXJzaW9uIHdhc24ndCB0aGUgcHJvYmxlbQp3aXRoICJhbWFyb2sgLS1uZXh0Ii4gSSBoYWQgdG8g
+ZmlsbCBpbiB0aGUgY29tcGxldGUgcGF0aCB0byB0aGUgZXhhY3V0YWJsZS4KU28gaXQgc2hvdWxk
+IGhhdmUgYmVlbiAiL29wdC9rZGUvYmluL2FtYXJvayAtLW5leHQiIGZvciBtZS4gSSdtIHVzaW5n
+IHRoZQpkY29wLWNvbW1hbmRzIG5vdyBhbnl3YXksIGJ1dCBhbHNvIHdpdGggdGhlIGZ1bGwgcGF0
+aCBmcm9tIHRoZQpyb290LWRpcmVjdG9yeS4gVGh1cywgIi9vcHQva2RlL2Jpbi9kY29wIC4uLiIu
+IFRoaXMgd29ya3MuIFRoZXJlIGlzIG5vClBBVEgtdmFyaWFibGUgZGVmaW5lZCBmb3IgdGhlIG5l
+dyBwcm9jZXNzL3RocmVhZC8uLi4KClRoYW5rIHlvdSBhbmQgZ3JlZXRpbmdzLAoKTWljaGVsCgpG
+csOpZMOpcmljIERBTExFQVUgd3JvdGU6Cgo+IEhlbGxvLAo+IAo+IEl0IHNlZW1zIHRvIGZvcmsg
+Y29ycmVjdGx5IGFuZCBhbWFyb2sgZG8gbm90IGRpc3BsYXkgYW55IGVycm9ycy4gSQo+IHN1Z2dl
+c3QgeW91IHRyeSB0aGUgJ2FtYXJvayAtLW5leHQnIGZyb20gdGhlIHNhbWUgc2hlbGwgeW91IHN0
+YXJ0ZWQgYTJkcAo+IGZyb20gdG8gbWFrZSBzdXJlIGlmIGl0IGVmZmVjdGl2ZWx5IHdvcmsuCj4g
+Tm93IGlmIHlvdSByZXRyaWV2ZSB0aGUgbGF0ZXN0IGN2cywgdGhlIGRjb3Agc3R5bGUgY29tbWFu
+ZCB3aWxsIHdvcmsKPiAoc2VlIHNhbXBsZS5hMmRwcmMpLgo+IAo+IE1pY2hlbCBCcmFiYW50cyBh
+IMOpY3JpdCA6Cj4+IEhleSwKPj4KPj4gSSBjb21waWxlZCB0aGUgYWxzYS1ibHVldG9vdGggc29m
+dHdhcmUgZnJvbSBjdnMgYXQgMjIvMS0yMDA3Cj4+ICh5ZXN0ZXJkYXkpLkknbSB0cnlpbmcgdG8g
+dXNlIGF2cmNwLCBob3dldmVyIGl0IGlzbid0IHdvcmtpbmcgZm9yIG1lLgo+PiBhMmRwZCBpcyBy
+ZWNlaXZpbmcgdGhlIGNvbW1hbmRzIGFuZCBmb3JraW5nIHRoZSBjb21tYW5kcyBJIHdhbnQgaXQg
+dG8KPj4gZm9yaywgYnV0IGl0IGRvZXNuJ3QgZG8gc2VlbWluZ2x5IC4uLiBJIHRyaWVkIHRoZSAi
+ZGNvcCBhbWFyb2sKPj4gLi4uIi1jb21tYW5kcyBhbmQgdGhlICJhbWFyb2sgLS1uZXh0Ii1jb21t
+YW5kIGFuZCBib3RoIGRvbid0IHdvcmsuCj4+IEhvd2V2ZXIsIEkgZG9uJ3Qgc2VlIGFueSBlcnJv
+cnMgYWxzbyAuLi4gSXMgdGhlcmUgYW55IG11ciBlZGVidWctb3V0cHV0Cj4+IHRoYXQgSSBjYW4g
+ZW5hYmxlPyBIZXJlIGlzIHdoYXQgSSBzZWUgYXQgdGhlIG1vbWVudDoKPj4KPj4gQTJEUERbMDE4
+LjkxN106IGEyZHBfaGFuZGxlX2F2cmNwX21lc3NhZ2U6IGF2cmNwX2ZvcndhcmQgRE9XTgo+PiBB
+MkRQRFswMTguOTE3XTogYTJkcGRfc2lnbmFsX2NvbW1hbmQ6IGF2cmNwX2ZvcndhcmQKPj4gQTJE
+UERbMDE4LjkxN106IGEyZHBfaGFuZGxlX2F2cmNwX21lc3NhZ2U6IFtuZXh0XSBhbWFyb2sgLS1u
+ZXh0Cj4+IEEyRFBEWzAxOC45MThdOiBjbG9zZV9zZXJ2ZXJfc29ja2V0X29uX2Zvcms6IENsb3Np
+bmcgc2VydmVyIHNvY2tldCA4Cj4+IEEyRFBEWzAxOC45MThdOiBhc3luY19ydW5fcHJvY2Vzczog
+Rm9ya2VkIGFtYXJvayAtLW5leHQKPj4gQTJEUERbMDE5LjAwNF06IGEyZHBfaGFuZGxlX2F2cmNw
+X21lc3NhZ2U6IGF2cmNwX2ZvcndhcmQgVVAKPj4gQTJEUERbMDE5LjAwNF06IGEyZHBkX3NpZ25h
+bF9jb21tYW5kOiBhdnJjcF9mb3J3YXJkCj4+Cj4+ICAgCj4gCj4gRnLDqWTDqXJpYwo+IAo+IAo+
+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0KPiBUYWtlIFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRo
+ZSBGdXR1cmUgb2YgSVQKPiBKb2luIFNvdXJjZUZvcmdlLm5ldCdzIFRlY2hzYXkgcGFuZWwgYW5k
+IHlvdSdsbCBnZXQgdGhlIGNoYW5jZSB0byBzaGFyZQo+IHlvdXIgb3BpbmlvbnMgb24gSVQgJiBi
+dXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0gYW5kIGVhcm4KPiBjYXNoCj4g
+aHR0cDovL3d3dy50ZWNoc2F5LmNvbS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhwJnA9c291cmNl
+Zm9yZ2UmQ0lEPURFVkRFVgo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fIEJsdWV6LWRldmVsIG1haWxpbmcgbGlzdAo+IEJsdWV6LWRldmVsQGxpc3RzLnNv
+dXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3Rp
+bmZvL2JsdWV6LWRldmVsCgoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGFrZSBTdXJ2ZXlzLiBFYXJuIENh
+c2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9mIElUCkpvaW4gU291cmNlRm9yZ2UubmV0J3MgVGVj
+aHNheSBwYW5lbCBhbmQgeW91J2xsIGdldCB0aGUgY2hhbmNlIHRvIHNoYXJlIHlvdXIKb3Bpbmlv
+bnMgb24gSVQgJiBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0gYW5kIGVh
+cm4gY2FzaApodHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAm
+cD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0
+cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlz
+dGluZm8vYmx1ZXotZGV2ZWwK
