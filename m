@@ -1,15 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <2e9fc96f0701262232t10d635cl450acb9e74133644@mail.gmail.com>
-Date: Sat, 27 Jan 2007 12:02:33 +0530
-From: "Prabhu nath" <gprabhunath@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20070126151002.69793.qmail@web53314.mail.yahoo.com>
+Message-ID: <51857.192.168.0.144.1169835822.squirrel@www.neiff.com.ar>
+Date: Fri, 26 Jan 2007 15:23:42 -0300 (ART)
+From: "Matias Neiff" <webmaster@neiff.com.ar>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-References: <2e9fc96f0701252145x71b8810tfa22948c5a9e63d8@mail.gmail.com>
-	<20070126151002.69793.qmail@web53314.mail.yahoo.com>
-Subject: [Bluez-users]
-	=?BIG5?B?UmU6IFtCbHVlei11c2Vyc10gpl7C0KFHIFJlOiBwaW4gY29kZQ==?=
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Connection timed out ?
+Reply-To: mneiff@sroot.com.ar, BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,256 +14,164 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1906943370=="
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1906943370==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_4330_30256835.1169879553265"
+Hello all, when attempt to connect to me my cellphone (or my
+macbook) it seems that it will not work.
 
-------=_Part_4330_30256835.1169879553265
-Content-Type: text/plain; charset=BIG5; format=flowed
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+root@server1:~# hcitool cc 00:16:75:B3:6D:37
+root@server1:~# hcitool con
+Connections:
+root@server1:~#
 
-T24gMS8yNi8wNywgS1MgSCA8a3NwYW0xMjM0QHlhaG9vLmNvbS5oaz4gd3JvdGU6Cj4KPiBIaQo+
-Cj4gSSBmb2xsb3cgdGhlIGNvbmZpZ3VyZSBkZXNjcmliZWQuIFdoZW4gSSBleGVjdXQgJ2RidXMt
-ZGFlbW9uIC0tc3lzdGVtJwo+IGl0IHJldHVybgo+Cj4gRmFpbGVkIHRvIHN0YXJ0IG1lc3NhZ2Ug
-YnVzOiBDb3VsZCBub3QgZ2V0IFVJRCBhbmQgR0lEIGZvciB1c2VybmFtZQo+ICJtZXNzYWdlYnVz
-Igo+IFdoYXQgaXMgdGhhdCBtZWFuPwoKCjxwcmFiaHU+IFUgaGF2ZSB0byBjcmVhdGUgYSB1c2Vy
-bmFtZSBieSBuYW1lICptZXNzYWdlYnVzKiA8cHJhYmh1PiAgICMKYWRkdXNlciAtRCAtSCBtZXNz
-YWdlYnVzCgphbmQgYWxzbyB0aGVyZSBpcyBubyBibHVlLWhjaWQuY29uZiBpbiBoY2lkIGZvbGRl
-cgo+IGJ1dCBJIGZvdW5kIGEgZmlsZSBjYWxsIGJsdWV0b290aC5jb25mLiBpcyB0aGF0IHRoZSBz
-YW1lIGZpbGUgeW91IHNhaWQKCgo8cHJhYmh1PiBTb3JyeSBpdCBpcyBibHVlei1oY2lkLmNvbmZS
-ZWdhcmRzCgpTSAoqUHJhYmh1IG5hdGggPGdwcmFiaHVuYXRoQGdtYWlsLmNvbT4qILuhoUcKCj4g
-IFlvdSBoYXZlIHRvIGNyb3NzLWNvbXBpbGUgZGJ1cy0xLjAsIGFuZCBzdGFydCBkYnVzLWRhZW1v
-biBiZWZvcmUKPiBleGVjdXRpbmcgaGNpZC4KPiBkYnVzLWRhZW1vbiAtLXN5c3RlbQo+Cj4gV2hp
-bGUgY3Jvc3MtY29tcGlsaW5nIGRidXMtMS4wIGFuZCBibHVlei11dGlscywgcGFzcyB0aGUgZm9s
-bG93aW5nCj4gcGFyYW1ldGVycyBmb3IgdGhlIGNvbmZpZ3VyZSBzY3JpcHQuCj4gLS1sb2NhbHN0
-YXRlZGlyPS92YXIgLS1zeXNjb25mZGlyPS9ldGMKPgo+IE9uY2UgeW91IGRvIHRoaXMsIGJ5IGRl
-ZmF1bHQgaGNpZCB3aWxsIGxvb2sgZm9yIGhjaWQuY29uZiBpbgo+IC9ldGMvYmx1ZXRvb3RoIGRp
-cmVjdG9yeS4KPgo+Cj4gKldhcm5pbmcqLiBUYWtlIGEgYmFja3VwIG9mIC9ldGMvZGJ1cy0xIGFu
-ZCAvZXRjL2JsdWV0b290aCwgYmVjYXVzZSB0aGlzCj4gd2lsbCBvdmVyd3JpdGUgdGhlIHByZXZp
-b3VzIGNvbmZpZywgd2hpY2ggd2FzIGFscmVhZHkgcHJlc2VudCBpbiB1ciBzeXN0ZW0uCj4KPiBS
-dW4gbWFrZSBpbnN0YWxsIGZvciBkYnVzLCBhbmQgdSBuZWVkIG5vdCBydW4gbWFrZSBpbnN0YWxs
-IGZvcgo+IGJsdWV6LXV0aWxzLiBVIGNhbiBkaXJlY3RseSBjb3B5IHRoZSBoY2lkLmNvbmYgYW5k
-IGJsdWUtaGNpZC5jb25mIHRvCj4gL2V0Yy9ibHVldG9vdGggYW5kIC9ldGMvZGJ1cy0xL3N5c3Rl
-bS5kIGRpcmVjdG9yeSByZXNwZWN0aXZlbHkuCj4KPiBOb3csIHdoZW4gdSBzdGFydCBkYnVzLWRh
-ZW1vbiAtLXN5c3RlbSwgaXQgd2lsbCBjcmVhdGUgYSBzeXN0ZW1fYnVzX3NvY2tldAo+IGluIC92
-YXIvcnVuL2RidXMgYW5kIGl0IHdpbGwgY3JlYXRlIGEgbWVzc2FnZS5waWQgaW4gL3Zhci9ydW4v
-Lgo+Cj4gbmV4dCwgd2hlbiB1IHN0YXJ0IGhjaWQsIHUgc2hvdWxkIG5vdCBnZXQgcHJvYmxlbS4K
-Pgo+IC1QcmFiaHUKPgo+Cj4KPgo+IE9uIDEvMjMvMDcsIEtTIEggPGtzcGFtMTIzNEB5YWhvby5j
-b20uaGs+IHdyb3RlOgo+ID4KPiA+IERlYXIKPiA+Cj4gPiBJIGNyb3NzIGNvbXBpbGUgdGhlIGJs
-dWV6My44IGFuZCB0cnkgdG8gc2V0dXAgdGhlIGJsdWV0b290aCBpbiBhcm0uIEkKPiA+IGNvbm5l
-Y3QgdGhlIGFybSB3aXRoIENTUiBCQzAzIHdpdGggQkNTUCBjb25maWd1cmF0aW9uLiBJIGFtIGFi
-bGUgdG8gbWFrZSB0aGUKPiA+IEJsdWV6IGRpc2NvdmVyYWJsZSBhbmQgdHJ5IHRvIHBhaXIgYmx1
-ZXouIGhvd2V2ZXIgaSBmb3VuZCB0aGF0IHRoZXJlIGlzIG5vCj4gPiBwaW4gcmVzcG9uZCBmcm9t
-IEJsdWV6LiBTbyBpIHRyeSB0byBjb25maWd1cmUgYmx1ZXogdXNpbmcgaGNpZC4KPiA+Cj4gPiA+
-IGhjaWQgLW4gLWYgL2V0Yy9ibHVldG9vdGgvaGNpZC5jb25mCj4gPgo+ID4gaXQgcmV0dXJuCj4g
-Pgo+ID4gaGNpZFs0ODFdOiBDYW4ndCBjb25uZWN0IHRvIHN5c3RlbSBtZXNzYWdlIGJ1czogRmFp
-bGVkIHRvIGNvbm5lY3QgdG8KPiA+IHNvY2tldCAvdXNyL2xvY2FsL3Zhci9ydW4vZGJ1cy9zeXN0
-ZW1fYnVzX3NvY2tldDogIE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKPiA+Cj4gPiBoY2lkWzQ4
-MV06IFVuYWJsZSB0byBnZXQgb24gRC1CdXMKPiA+Cj4gPiBNeSBxdWVzdGlvbgo+ID4gMS4gd2hl
-cmUgY2FuIEkgZm91bmQgdGhlIG1pc3NpbmcgZmlsZSBhbmQgd2hhdCBpcyB0aGF0IHVzZWQgZm9y
-Pwo+ID4gMi4gSXMgdGhlcmUgYW55IG1ldGhvZCB0byByZXBzb25kIHRoZSBwaW4gcmVxdWVzdCBv
-dGhlciB0aGFuIHVzaW5nIGhjaWQKPiA+Cj4gPiBSZWdhcmRzCj4gPiBTSAo+ID4gX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCj4gPiBZTSAtIML3vXWwVK6nCj4gPiC0Trri
-p0GoU6azpFe69KFBp0GquqpCpM2ktKVppUivZKRVsFSup7W5p0GhQbftp0GkV7r0rsm0Tq/gpd+n
-WazdqOyhQaX0pvO7objcs6PJTqirpaKhQwo+ID4gaHR0cDovL21lc3Nlbmdlci55YWhvby5jb20u
-aGsKPiA+Cj4gPgo+ID4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+ID4gVGFrZSBTdXJ2ZXlzLiBFYXJuIENh
-c2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9mIElUCj4gPiBKb2luIFNvdXJjZUZvcmdlLm5ldCdz
-IFRlY2hzYXkgcGFuZWwgYW5kIHlvdSdsbCBnZXQgdGhlIGNoYW5jZSB0byBzaGFyZQo+ID4geW91
-cgo+ID4gb3BpbmlvbnMgb24gSVQgJiBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2
-ZXlzIC0gYW5kIGVhcm4gY2FzaAo+ID4KPiA+IGh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVmYXVs
-dC5waHA/cGFnZT1qb2luLnBocCZwPXNvdXJjZWZvcmdlJkNJRD1ERVZERVYKPiA+Cj4gPiBfX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+ID4gQmx1ZXotdXNl
-cnMgbWFpbGluZyBsaXN0Cj4gPiBCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPiA+
-IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJz
-Cj4gPgo+ID4KPiA+Cj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFRha2UgU3VydmV5cy4gRWFybiBDYXNo
-LiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBvZiBJVAo+IEpvaW4gU291cmNlRm9yZ2UubmV0J3MgVGVj
-aHNheSBwYW5lbCBhbmQgeW91J2xsIGdldCB0aGUgY2hhbmNlIHRvIHNoYXJlCj4geW91cgo+IG9w
-aW5pb25zIG9uIElUICYgYnVzaW5lc3MgdG9waWNzIHRocm91Z2ggYnJpZWYgc3VydmV5cyAtIGFu
-ZCBlYXJuIGNhc2gKPgo+IGh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVmYXVsdC5waHA/cGFnZT1q
-b2luLnBocCZwPXNvdXJjZWZvcmdlJkNJRD1ERVZERVZfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwo+IEJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdAo+IEJsdWV6
-LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2Uu
-bmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCj4KPgo+IF9fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fXwo+IFlNIC0gwve9dbBUrqcKPiC0Trrip0GoU6azpFe69KFBp0Gq
-uqpCpM2ktKVppUivZKRVsFSup7W5p0GhQbftp0GkV7r0rsm0Tq/gpd+nWazdqOyhQaX0pvO7objc
-s6PJTqirpaKhQwo+IGh0dHA6Ly9tZXNzZW5nZXIueWFob28uY29tLmhrCj4KPiAtLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tCj4gVGFrZSBTdXJ2ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9m
-IElUCj4gSm9pbiBTb3VyY2VGb3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0
-IHRoZSBjaGFuY2UgdG8gc2hhcmUKPiB5b3VyCj4gb3BpbmlvbnMgb24gSVQgJiBidXNpbmVzcyB0
-b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0gYW5kIGVhcm4gY2FzaAo+IGh0dHA6Ly93d3cu
-dGVjaHNheS5jb20vZGVmYXVsdC5waHA/cGFnZT1qb2luLnBocCZwPXNvdXJjZWZvcmdlJkNJRD1E
-RVZERVYKPgo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Cj4gQmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0Cj4gQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9y
-Z2UubmV0Cj4gaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1
-ZXotdXNlcnMKPgo+Cj4K
-------=_Part_4330_30256835.1169879553265
-Content-Type: text/html; charset=BIG5
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+After trying much I see which in fact it works, but only for few seconds.
 
-PGJyPjxicj4KPGRpdj48c3BhbiBjbGFzcz0iZ21haWxfcXVvdGUiPk9uIDEvMjYvMDcsIDxiIGNs
-YXNzPSJnbWFpbF9zZW5kZXJuYW1lIj5LUyBIPC9iPiAmbHQ7PGEgaHJlZj0ibWFpbHRvOmtzcGFt
-MTIzNEB5YWhvby5jb20uaGsiPmtzcGFtMTIzNEB5YWhvby5jb20uaGs8L2E+Jmd0OyB3cm90ZTo8
-L3NwYW4+CjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9IlBBRERJTkctTEVG
-VDogMWV4OyBNQVJHSU46IDBweCAwcHggMHB4IDAuOGV4OyBCT1JERVItTEVGVDogI2NjYyAxcHgg
-c29saWQiPkhpIDxicj48YnI+SSBmb2xsb3cgdGhlIGNvbmZpZ3VyZSBkZXNjcmliZWQuIFdoZW4g
-SSBleGVjdXQgJiMzOTtkYnVzLWRhZW1vbiAtLXN5c3RlbSYjMzk7PGJyPml0IHJldHVybiA8YnI+
-Cjxicj5GYWlsZWQgdG8gc3RhcnQgbWVzc2FnZSBidXM6IENvdWxkIG5vdCBnZXQgVUlEIGFuZCBH
-SUQgZm9yIHVzZXJuYW1lICZxdW90O21lc3NhZ2VidXMmcXVvdDs8YnI+V2hhdCBpcyB0aGF0IG1l
-YW4/PC9ibG9ja3F1b3RlPgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2PiZsdDtwcmFiaHUmZ3Q7IFUg
-aGF2ZSB0byBjcmVhdGUgYSB1c2VybmFtZSBieSBuYW1lIDxlbT5tZXNzYWdlYnVzPC9lbT4gCjxk
-aXY+Jmx0O3ByYWJodSZndDsmbmJzcDsmbmJzcDsgIyBhZGR1c2VyIC1EIC1IIG1lc3NhZ2VidXM8
-L2Rpdj48L2Rpdj48YnI+CjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9IlBB
-RERJTkctTEVGVDogMWV4OyBNQVJHSU46IDBweCAwcHggMHB4IDAuOGV4OyBCT1JERVItTEVGVDog
-I2NjYyAxcHggc29saWQiPmFuZCBhbHNvIHRoZXJlIGlzIG5vIGJsdWUtaGNpZC5jb25mIGluIGhj
-aWQgZm9sZGVyPGJyPmJ1dCBJIGZvdW5kIGEgZmlsZSBjYWxsIGJsdWV0b290aC5jb25mLiBpcyB0
-aGF0IHRoZSBzYW1lIGZpbGUgeW91IHNhaWQKPC9ibG9ja3F1b3RlPgo8ZGl2PiZuYnNwOzwvZGl2
-Pgo8ZGl2PiZsdDtwcmFiaHUmZ3Q7IFNvcnJ5IGl0IGlzIGJsdWV6LWhjaWQuY29uZlJlZ2FyZHM8
-YnI+PGJyPlNIPGJyPjxiPjxpPlByYWJodSBuYXRoICZsdDs8YSBvbmNsaWNrPSJyZXR1cm4gdG9w
-LmpzLk9wZW5FeHRMaW5rKHdpbmRvdyxldmVudCx0aGlzKSIgaHJlZj0ibWFpbHRvOmdwcmFiaHVu
-YXRoQGdtYWlsLmNvbSIgdGFyZ2V0PSJfYmxhbmsiPmdwcmFiaHVuYXRoQGdtYWlsLmNvbQo8L2E+
-Jmd0OzwvaT48L2I+ILuhoUcgPC9kaXY+CjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIg
-c3R5bGU9IlBBRERJTkctTEVGVDogMWV4OyBNQVJHSU46IDBweCAwcHggMHB4IDAuOGV4OyBCT1JE
-RVItTEVGVDogI2NjYyAxcHggc29saWQiPgo8YmxvY2txdW90ZSBzdHlsZT0iUEFERElORy1MRUZU
-OiA1cHg7IE1BUkdJTi1MRUZUOiA1cHg7IEJPUkRFUi1MRUZUOiByZ2IoMTYsMTYsMjU1KSAycHgg
-c29saWQiPgo8ZGl2PllvdSBoYXZlIHRvIGNyb3NzLWNvbXBpbGUgZGJ1cy0xLjAsIGFuZCBzdGFy
-dCBkYnVzLWRhZW1vbiBiZWZvcmUgZXhlY3V0aW5nIGhjaWQuIDwvZGl2Pgo8ZGl2PmRidXMtZGFl
-bW9uIC0tc3lzdGVtPC9kaXY+CjxkaXY+Jm5ic3A7PC9kaXY+CjxkaXY+V2hpbGUgY3Jvc3MtY29t
-cGlsaW5nIGRidXMtMS4wIGFuZCBibHVlei11dGlscywgcGFzcyB0aGUgZm9sbG93aW5nIHBhcmFt
-ZXRlcnMgZm9yIHRoZSBjb25maWd1cmUgc2NyaXB0LjwvZGl2Pgo8ZGl2Pi0tbG9jYWxzdGF0ZWRp
-cj0vdmFyIC0tc3lzY29uZmRpcj0vZXRjPC9kaXY+CjxkaXY+Jm5ic3A7PC9kaXY+CjxkaXY+T25j
-ZSB5b3UgZG8gdGhpcywgYnkgZGVmYXVsdCBoY2lkIHdpbGwgbG9vayBmb3IgaGNpZC5jb25mIGlu
-IC9ldGMvYmx1ZXRvb3RoIGRpcmVjdG9yeS4gPC9kaXY+CjxkaXY+Jm5ic3A7PC9kaXY+CjxkaXY+
-Jm5ic3A7PC9kaXY+CjxkaXY+PHN0cm9uZz5XYXJuaW5nPC9zdHJvbmc+LiBUYWtlIGEgYmFja3Vw
-IG9mIC9ldGMvZGJ1cy0xIGFuZCAvZXRjL2JsdWV0b290aCwgYmVjYXVzZSB0aGlzIHdpbGwgb3Zl
-cndyaXRlIHRoZSBwcmV2aW91cyBjb25maWcsIHdoaWNoJm5ic3A7d2FzIGFscmVhZHkgcHJlc2Vu
-dCBpbiB1ciBzeXN0ZW0uPC9kaXY+CjxkaXY+Jm5ic3A7PC9kaXY+CjxkaXY+UnVuIG1ha2UgaW5z
-dGFsbCBmb3IgZGJ1cywgYW5kIHUgbmVlZCBub3QgcnVuIG1ha2UgaW5zdGFsbCBmb3IgYmx1ZXot
-dXRpbHMuIFUgY2FuIGRpcmVjdGx5IGNvcHkgdGhlIGhjaWQuY29uZiBhbmQgYmx1ZS1oY2lkLmNv
-bmYgdG8gL2V0Yy9ibHVldG9vdGggYW5kIC9ldGMvZGJ1cy0xL3N5c3RlbS5kIGRpcmVjdG9yeSBy
-ZXNwZWN0aXZlbHkuPC9kaXY+CjxkaXY+Jm5ic3A7PC9kaXY+CjxkaXY+Tm93LCB3aGVuIHUgc3Rh
-cnQgZGJ1cy1kYWVtb24gLS1zeXN0ZW0sIGl0IHdpbGwgY3JlYXRlIGEgc3lzdGVtX2J1c19zb2Nr
-ZXQgaW4gL3Zhci9ydW4vZGJ1cyBhbmQgaXQgd2lsbCBjcmVhdGUgYSBtZXNzYWdlLnBpZCBpbiAv
-dmFyL3J1bi8uIDwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2Pm5leHQsIHdoZW4gdSBzdGFy
-dCBoY2lkLCB1IHNob3VsZCBub3QgZ2V0IHByb2JsZW0uPC9kaXY+CjxkaXY+Jm5ic3A7PC9kaXY+
-CjxkaXY+LVByYWJodTwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2Pjxicj48YnI+Jm5ic3A7
-PC9kaXY+CjxkaXY+PHNwYW4gY2xhc3M9ImdtYWlsX3F1b3RlIj5PbiAxLzIzLzA3LCA8YiBjbGFz
-cz0iZ21haWxfc2VuZGVybmFtZSI+S1MgSDwvYj4gJmx0OzxhIG9uY2xpY2s9InJldHVybiB0b3Au
-anMuT3BlbkV4dExpbmsod2luZG93LGV2ZW50LHRoaXMpIiBocmVmPSJtYWlsdG86a3NwYW0xMjM0
-QHlhaG9vLmNvbS5oayIgdGFyZ2V0PSJfYmxhbmsiPmtzcGFtMTIzNEB5YWhvby5jb20uaGs8L2E+
-CiZndDsgd3JvdGU6PC9zcGFuPiAKPGJsb2NrcXVvdGUgY2xhc3M9ImdtYWlsX3F1b3RlIiBzdHls
-ZT0iUEFERElORy1MRUZUOiAxZXg7IE1BUkdJTjogMHB4IDBweCAwcHggMC44ZXg7IEJPUkRFUi1M
-RUZUOiByZ2IoMjA0LDIwNCwyMDQpIDFweCBzb2xpZCI+RGVhcjxicj48YnI+SSBjcm9zcyBjb21w
-aWxlIHRoZSBibHVlejMuOCBhbmQgdHJ5IHRvIHNldHVwIHRoZSBibHVldG9vdGggaW4gYXJtLiBJ
-IGNvbm5lY3QgdGhlIGFybSB3aXRoIENTUiBCQzAzIHdpdGggQkNTUCBjb25maWd1cmF0aW9uLiBJ
-IGFtIGFibGUgdG8gbWFrZSB0aGUgQmx1ZXogZGlzY292ZXJhYmxlIGFuZCB0cnkgdG8gcGFpciBi
-bHVlei4gaG93ZXZlciBpIGZvdW5kIHRoYXQgdGhlcmUgaXMgbm8gcGluIHJlc3BvbmQgZnJvbSBC
-bHVlei4gU28gaSB0cnkgdG8gY29uZmlndXJlIGJsdWV6IHVzaW5nIGhjaWQuIAo8YnI+PGJyPiZn
-dDsgaGNpZCAtbiAtZiAvZXRjL2JsdWV0b290aC9oY2lkLmNvbmY8YnI+PGJyPml0IHJldHVybjxi
-cj48YnI+aGNpZFs0ODFdOiBDYW4mIzM5O3QgY29ubmVjdCB0byBzeXN0ZW0gbWVzc2FnZSBidXM6
-IEZhaWxlZCB0byBjb25uZWN0IHRvIHNvY2tldCAvdXNyL2xvY2FsL3Zhci9ydW4vZGJ1cy9zeXN0
-ZW1fYnVzX3NvY2tldDombmJzcDsgTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeSAKPGJyPmhjaWRb
-NDgxXTogVW5hYmxlIHRvIGdldCBvbiBELUJ1czxicj48YnI+TXkgcXVlc3Rpb248YnI+MS4gd2hl
-cmUgY2FuIEkgZm91bmQgdGhlIG1pc3NpbmcgZmlsZSBhbmQgd2hhdCBpcyB0aGF0IHVzZWQgZm9y
-Pzxicj4yLiBJcyB0aGVyZSBhbnkgbWV0aG9kIHRvIHJlcHNvbmQgdGhlIHBpbiByZXF1ZXN0IG90
-aGVyIHRoYW4gdXNpbmcgaGNpZDxicj48YnI+UmVnYXJkczxicj5TSDxicj4KPHNwYW4+CjxkaXY+
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fPGJyPllNIC0gwve9dbBUrqc8
-YnI+tE664qdBqFOms6RXuvShQadBqrqqQqTNpLSlaaVIr2SkVbBUrqe1uadBoUG37adBpFe69K7J
-tE6v4KXfp1ms3ajsoUGl9Kbzu6G43LOjyU6oq6WioUM8YnI+PGEgb25jbGljaz0icmV0dXJuIHRv
-cC5qcy5PcGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiIGhyZWY9Imh0dHA6Ly9tZXNzZW5n
-ZXIueWFob28uY29tLmhrLyIgdGFyZ2V0PSJfYmxhbmsiPgpodHRwOi8vbWVzc2VuZ2VyLnlhaG9v
-LmNvbS5oayA8L2E+PC9kaXY+PC9zcGFuPjxicj4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPGJyPlRha2UgU3Vy
-dmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBvZiBJVDxicj5Kb2luIFNvdXJj
-ZUZvcmdlLm5ldCYjMzk7cyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UmIzM5O2xsIGdldCB0aGUgY2hh
-bmNlIHRvIHNoYXJlIHlvdXIgCjxicj5vcGluaW9ucyBvbiBJVCAmYW1wOyBidXNpbmVzcyB0b3Bp
-Y3MgdGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0gYW5kIGVhcm4gY2FzaDxicj48YSBvbmNsaWNrPSJy
-ZXR1cm4gdG9wLmpzLk9wZW5FeHRMaW5rKHdpbmRvdyxldmVudCx0aGlzKSIgaHJlZj0iaHR0cDov
-L3d3dy50ZWNoc2F5LmNvbS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhwJmFtcDtwPXNvdXJjZWZv
-cmdlJmFtcDtDSUQ9REVWREVWIiB0YXJnZXQ9Il9ibGFuayI+Cmh0dHA6Ly93d3cudGVjaHNheS5j
-b20vZGVmYXVsdC5waHA/cGFnZT1qb2luLnBocCZhbXA7cD1zb3VyY2Vmb3JnZSZhbXA7Q0lEPURF
-VkRFVjwvYT48YnI+PGJyPl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fPGJyPkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdDxicj48YSBvbmNsaWNrPSJyZXR1cm4g
-dG9wLmpzLk9wZW5FeHRMaW5rKHdpbmRvdyxldmVudCx0aGlzKSIgaHJlZj0ibWFpbHRvOkJsdWV6
-LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldCIgdGFyZ2V0PSJfYmxhbmsiPgpCbHVlei11c2Vy
-c0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQ8L2E+PGJyPjxhIG9uY2xpY2s9InJldHVybiB0b3AuanMu
-T3BlbkV4dExpbmsod2luZG93LGV2ZW50LHRoaXMpIiBocmVmPSJodHRwczovL2xpc3RzLnNvdXJj
-ZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2VycyIgdGFyZ2V0PSJfYmxhbmsiPmh0
-dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzIAo8
-L2E+PGJyPjxicj48YnI+PC9ibG9ja3F1b3RlPjwvZGl2Pjxicj4tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPGJy
-PlRha2UgU3VydmV5cy4gRWFybiBDYXNoLiBJbmZsdWVuY2UgdGhlIEZ1dHVyZSBvZiBJVDxicj5K
-b2luIFNvdXJjZUZvcmdlLm5ldCYjMzk7cyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UmIzM5O2xsIGdl
-dCB0aGUgY2hhbmNlIHRvIHNoYXJlIHlvdXIKPGJyPm9waW5pb25zIG9uIElUICZhbXA7IGJ1c2lu
-ZXNzIHRvcGljcyB0aHJvdWdoIGJyaWVmIHN1cnZleXMgLSBhbmQgZWFybiBjYXNoPGJyPjxhIG9u
-Y2xpY2s9InJldHVybiB0b3AuanMuT3BlbkV4dExpbmsod2luZG93LGV2ZW50LHRoaXMpIiBocmVm
-PSJodHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmYW1wO3A9
-c291cmNlZm9yZ2UmYW1wO0NJRD1ERVZERVZfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXyIgdGFyZ2V0PSJfYmxhbmsiPgpodHRwOi8vd3d3LnRlY2hzYXkuY29t
-L2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAmYW1wO3A9c291cmNlZm9yZ2UmYW1wO0NJRD1ERVZE
-RVZfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXzwvYT48YnI+
-Qmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0PGJyPjxhIG9uY2xpY2s9InJldHVybiB0b3AuanMuT3Bl
-bkV4dExpbmsod2luZG93LGV2ZW50LHRoaXMpIiBocmVmPSJtYWlsdG86Qmx1ZXotdXNlcnNAbGlz
-dHMuc291cmNlZm9yZ2UubmV0IiB0YXJnZXQ9Il9ibGFuayI+CkJsdWV6LXVzZXJzQGxpc3RzLnNv
-dXJjZWZvcmdlLm5ldDwvYT48YnI+PGEgb25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGlu
-ayh3aW5kb3csZXZlbnQsdGhpcykiIGhyZWY9Imh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0
-L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzIiB0YXJnZXQ9Il9ibGFuayI+aHR0cHM6Ly9saXN0
-cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMKPC9hPjxicj48L2Js
-b2NrcXVvdGU+PHNwYW4gY2xhc3M9ImFkIj48YnI+CjxwPl9fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXzxicj5ZTSAtIML3vXWwVK6nPGJyPrROuuKnQahTprOkV7r0oUGnQaq6
-qkKkzaS0pWmlSK9kpFWwVK6ntbmnQaFBt+2nQaRXuvSuybROr+Cl36dZrN2o7KFBpfSm87uhuNyz
-o8lOqKuloqFDPGJyPjxhIG9uY2xpY2s9InJldHVybiB0b3AuanMuT3BlbkV4dExpbmsod2luZG93
-LGV2ZW50LHRoaXMpIiBocmVmPSJodHRwOi8vbWVzc2VuZ2VyLnlhaG9vLmNvbS5oay8iIHRhcmdl
-dD0iX2JsYW5rIj5odHRwOi8vbWVzc2VuZ2VyLnlhaG9vLmNvbS5oawo8L2E+IDwvcD48L3NwYW4+
-PGJyPi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS08YnI+VGFrZSBTdXJ2ZXlzLiBFYXJuIENhc2guIEluZmx1ZW5j
-ZSB0aGUgRnV0dXJlIG9mIElUPGJyPkpvaW4gU291cmNlRm9yZ2UubmV0JiMzOTtzIFRlY2hzYXkg
-cGFuZWwgYW5kIHlvdSYjMzk7bGwgZ2V0IHRoZSBjaGFuY2UgdG8gc2hhcmUgeW91cgo8YnI+b3Bp
-bmlvbnMgb24gSVQgJmFtcDsgYnVzaW5lc3MgdG9waWNzIHRocm91Z2ggYnJpZWYgc3VydmV5cyAt
-IGFuZCBlYXJuIGNhc2g8YnI+PGEgb25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3
-aW5kb3csZXZlbnQsdGhpcykiIGhyZWY9Imh0dHA6Ly93d3cudGVjaHNheS5jb20vZGVmYXVsdC5w
-aHA/cGFnZT1qb2luLnBocCZhbXA7cD1zb3VyY2Vmb3JnZSZhbXA7Q0lEPURFVkRFViIgdGFyZ2V0
-PSJfYmxhbmsiPgpodHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5w
-aHAmYW1wO3A9c291cmNlZm9yZ2UmYW1wO0NJRD1ERVZERVY8L2E+PGJyPjxicj5fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXzxicj5CbHVlei11c2VycyBtYWls
-aW5nIGxpc3Q8YnI+PGEgb25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5kb3cs
-ZXZlbnQsdGhpcykiIGhyZWY9Im1haWx0bzpCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5u
-ZXQiPgpCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQ8L2E+PGJyPjxhIG9uY2xpY2s9
-InJldHVybiB0b3AuanMuT3BlbkV4dExpbmsod2luZG93LGV2ZW50LHRoaXMpIiBocmVmPSJodHRw
-czovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2VycyIgdGFy
-Z2V0PSJfYmxhbmsiPmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZv
-L2JsdWV6LXVzZXJzCjwvYT48YnI+PGJyPjxicj48L2Jsb2NrcXVvdGU+PC9kaXY+PGJyPgo=
-------=_Part_4330_30256835.1169879553265--
+root@server1:~# hcitool cc 00:16:75:B3:6D:37 && hcitool con
+Connections:
+        < ACL 00:16:75:B3:6D:37 handle 1 state 1 lm MASTER
 
+If attempt run a command like this
 
---===============1906943370==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+root@server1:~# hcitool cc 00:16:75:B3:6D:37 && hcitool auth
+00:16:75:B3:6D:37
+HCI authentication request failed: Connection timed out
+
+But the cellphone askme for the PIN, after  2 seconds the PIN request
+disappears.
+
+Anyone is the device to which try to connect I get this
+
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+    handle 1 reason 0x13
+    Reason: Remote User Terminated Connection
+
+This is the complete hcidump
+--------------------------hcidump-----------------------
+HCI sniffer - Bluetooth packet analyzer ver 1.33
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr 00:16:75:B3:6D:37 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+    Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 1 bdaddr 00:16:75:B3:6D:37 type ACL encrypt 0x00
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+    handle 1
+> HCI Event: Max Slots Change (0x1b) plen 3
+    handle 1 slots 5
+> HCI Event: Command Status (0x0f) plen 4
+    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+    handle 1 policy 0x0f
+    Link policy: RSWITCH HOLD SNIFF PARK
+> HCI Event: Command Complete (0x0e) plen 6
+    Write Link Policy Settings (0x02|0x000d) ncmd 1
+    status 0x00 handle 1
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:16:75:B3:6D:37 mode 2 clkoffset 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> HCI Event: Connection Packet Type Changed (0x1d) plen 5
+    status 0x00 handle 1 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Read Remote Supported Features (0x0b) plen 11
+    status 0x00 handle 1
+    Features: 0xff 0xff 0x0d 0x00 0x00 0x00 0x00 0x00
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+    status 0x00 bdaddr 00:16:75:B3:6D:37 name 'Matias Neiff'
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+    handle 1 reason 0x13
+    Reason: Remote User Terminated Connection
+> HCI Event: Command Status (0x0f) plen 4
+    Disconnect (0x01|0x0006) status 0x00 ncmd 1
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 1 reason 0x16
+    Reason: Connection Terminated by Local Host
+---------------------------------------------------------------------------=
+--
+And my hcid.conf
+------------------------------hcid.conf----------------------------------
+#
+# HCI daemon configuration file.
+#
+
+# HCId options
+options {
+        # Automatically initialize new devices
+        autoinit yes;
+
+        # Security Manager mode
+        #   none - Security manager disabled
+        #   auto - Use local PIN for incoming connections
+        #   user - Always ask user for a PIN
+        #
+        security auto;
+
+        # Pairing mode
+        #   none  - Pairing disabled
+        #   multi - Allow pairing with already paired devices
+        #   once  - Pair once and deny successive attempts
+        pairing multi;
+
+        # Default PIN code for incoming connections
+        passkey "9660";
+}
+
+# Default settings for HCI devices
+device {
+        # Local device name
+        #   %d - device id
+        #   %h - host name
+        name "SROOT";
+
+        # Local device class
+        class 0xff0100;
+
+        # Default packet type
+#       pkt_type DH1,DM1,HV1;
+
+        # Inquiry and Page scan
+        iscan enable; pscan enable;
+
+        # Default link mode
+        #   none   - no specific policy
+        #   accept - always accept incoming connections
+        #   master - become master on incoming connections,
+        #            deny role switch on outgoing connections
+        lm master;
+
+        # Default link policy
+        #   none    - no specific policy
+        #   rswitch - allow role switch
+        #   hold    - allow hold mode
+        #   sniff   - allow sniff mode
+        #   park    - allow park mode
+        lp rswitch,hold,sniff,park;
+# Authentication and Encryption (Security Mode 3)
+auth enable;
+encrypt enable;
+}
+---------------------------------------------------------------------------=
+--
+
+I was looking for all sides and I have been long time trying to make work
+this.
+Any aid will very thanked.
+
+Greetings
+Mat=EDas Neiff
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1906943370==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1906943370==--
