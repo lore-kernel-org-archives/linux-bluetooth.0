@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <2e9fc96f0701252321k59b0320cld9eef725a6cc06ac@mail.gmail.com>
-Date: Fri, 26 Jan 2007 12:51:17 +0530
+Message-ID: <2e9fc96f0701252145x71b8810tfa22948c5a9e63d8@mail.gmail.com>
+Date: Fri, 26 Jan 2007 11:15:18 +0530
 From: "Prabhu nath" <gprabhunath@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <341704.68311.qm@web53305.mail.yahoo.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] Obex File Transfers between Nokia and BlueZ
+References: <341704.68311.qm@web53305.mail.yahoo.com>
+Subject: Re: [Bluez-users] pin code
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,84 +16,135 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0621895603=="
+Content-Type: multipart/mixed; boundary="===============0795090545=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0621895603==
+--===============0795090545==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_125581_18906108.1169796077858"
+	boundary="----=_Part_124727_14158054.1169790318964"
 
-------=_Part_125581_18906108.1169796077858
+------=_Part_124727_14158054.1169790318964
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
 Content-Disposition: inline
 
-Dear All,
-           This is the 2nd time I am posting the question with more
-experiments and more logs.
-           Has anyone tried obex file transfers between Nokia and BlueZ.
-I tried with following Nokia series. In all of these I was not able to Push
-a file from the Cell Phone to my Computer with BlueZ. I can push/pull a file
-from BlueZ to Cell Phone
-Nokia 6260
-Nokia 6681
-Nokia N80
-Nokia E61
-Nokia N93.
-
-On the contrary, Object Push works well with MotoQ.
-
-Here is the configuration of BlueZ :
-                   http://brochevarevarura.googlepages.com/bluezconf
-
-Logs of Obj. Push from Nokia to BlueZ :
-                   http://brochevarevarura.googlepages.com/N93_to_BlueZ.htm
-
-Logs of Obj. Push from MotoQ to BlueZ :
-                  http://brochevarevarura.googlepages.com/MotoQ_to_BlueZ.htm
-Observation :
-              In case of MotoQ, L2CAP is connection is getting disconnected
-after SDP
-              negotiation and again reconnecting for the Obex file
-transfer.
-              whereas In case of Nokia, L2CAP connection is not getting
-disconnected after SDP
-              Negotiation.
-
-This comparision is based on Observation, but I am not aware of rationale
-behind this behaviour.
-
-If anyone has successfully tried out Object Push from Nokia, can you please
-get me the configuration and the operation.
-Appreciate your help in fishing out the problem.
-
-Thanks,
-Prabhu
-
-------=_Part_125581_18906108.1169796077858
+WW91IGhhdmUgdG8gY3Jvc3MtY29tcGlsZSBkYnVzLTEuMCwgYW5kIHN0YXJ0IGRidXMtZGFlbW9u
+IGJlZm9yZSBleGVjdXRpbmcKaGNpZC4KZGJ1cy1kYWVtb24gLS1zeXN0ZW0KCldoaWxlIGNyb3Nz
+LWNvbXBpbGluZyBkYnVzLTEuMCBhbmQgYmx1ZXotdXRpbHMsIHBhc3MgdGhlIGZvbGxvd2luZwpw
+YXJhbWV0ZXJzIGZvciB0aGUgY29uZmlndXJlIHNjcmlwdC4KLS1sb2NhbHN0YXRlZGlyPS92YXIg
+LS1zeXNjb25mZGlyPS9ldGMKCk9uY2UgeW91IGRvIHRoaXMsIGJ5IGRlZmF1bHQgaGNpZCB3aWxs
+IGxvb2sgZm9yIGhjaWQuY29uZiBpbiAvZXRjL2JsdWV0b290aApkaXJlY3RvcnkuCgoKKldhcm5p
+bmcqLiBUYWtlIGEgYmFja3VwIG9mIC9ldGMvZGJ1cy0xIGFuZCAvZXRjL2JsdWV0b290aCwgYmVj
+YXVzZSB0aGlzCndpbGwgb3ZlcndyaXRlIHRoZSBwcmV2aW91cyBjb25maWcsIHdoaWNoIHdhcyBh
+bHJlYWR5IHByZXNlbnQgaW4gdXIgc3lzdGVtLgoKUnVuIG1ha2UgaW5zdGFsbCBmb3IgZGJ1cywg
+YW5kIHUgbmVlZCBub3QgcnVuIG1ha2UgaW5zdGFsbCBmb3IgYmx1ZXotdXRpbHMuClUgY2FuIGRp
+cmVjdGx5IGNvcHkgdGhlIGhjaWQuY29uZiBhbmQgYmx1ZS1oY2lkLmNvbmYgdG8gL2V0Yy9ibHVl
+dG9vdGggYW5kCi9ldGMvZGJ1cy0xL3N5c3RlbS5kIGRpcmVjdG9yeSByZXNwZWN0aXZlbHkuCgpO
+b3csIHdoZW4gdSBzdGFydCBkYnVzLWRhZW1vbiAtLXN5c3RlbSwgaXQgd2lsbCBjcmVhdGUgYSBz
+eXN0ZW1fYnVzX3NvY2tldAppbiAvdmFyL3J1bi9kYnVzIGFuZCBpdCB3aWxsIGNyZWF0ZSBhIG1l
+c3NhZ2UucGlkIGluIC92YXIvcnVuLy4KCm5leHQsIHdoZW4gdSBzdGFydCBoY2lkLCB1IHNob3Vs
+ZCBub3QgZ2V0IHByb2JsZW0uCgotUHJhYmh1CgoKCgpPbiAxLzIzLzA3LCBLUyBIIDxrc3BhbTEy
+MzRAeWFob28uY29tLmhrPiB3cm90ZToKPgo+IERlYXIKPgo+IEkgY3Jvc3MgY29tcGlsZSB0aGUg
+Ymx1ZXozLjggYW5kIHRyeSB0byBzZXR1cCB0aGUgYmx1ZXRvb3RoIGluIGFybS4gSQo+IGNvbm5l
+Y3QgdGhlIGFybSB3aXRoIENTUiBCQzAzIHdpdGggQkNTUCBjb25maWd1cmF0aW9uLiBJIGFtIGFi
+bGUgdG8gbWFrZSB0aGUKPiBCbHVleiBkaXNjb3ZlcmFibGUgYW5kIHRyeSB0byBwYWlyIGJsdWV6
+LiBob3dldmVyIGkgZm91bmQgdGhhdCB0aGVyZSBpcyBubwo+IHBpbiByZXNwb25kIGZyb20gQmx1
+ZXouIFNvIGkgdHJ5IHRvIGNvbmZpZ3VyZSBibHVleiB1c2luZyBoY2lkLgo+Cj4gPiBoY2lkIC1u
+IC1mIC9ldGMvYmx1ZXRvb3RoL2hjaWQuY29uZgo+Cj4gaXQgcmV0dXJuCj4KPiBoY2lkWzQ4MV06
+IENhbid0IGNvbm5lY3QgdG8gc3lzdGVtIG1lc3NhZ2UgYnVzOiBGYWlsZWQgdG8gY29ubmVjdCB0
+bwo+IHNvY2tldCAvdXNyL2xvY2FsL3Zhci9ydW4vZGJ1cy9zeXN0ZW1fYnVzX3NvY2tldDogIE5v
+IHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKPiBoY2lkWzQ4MV06IFVuYWJsZSB0byBnZXQgb24gRC1C
+dXMKPgo+IE15IHF1ZXN0aW9uCj4gMS4gd2hlcmUgY2FuIEkgZm91bmQgdGhlIG1pc3NpbmcgZmls
+ZSBhbmQgd2hhdCBpcyB0aGF0IHVzZWQgZm9yPwo+IDIuIElzIHRoZXJlIGFueSBtZXRob2QgdG8g
+cmVwc29uZCB0aGUgcGluIHJlcXVlc3Qgb3RoZXIgdGhhbiB1c2luZyBoY2lkCj4KPiBSZWdhcmRz
+Cj4gU0gKPgo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IFlNIC0g
+6Zui57ea6KiK5oGvCj4g5bCx566X5L2g5rKS5pyJ5LiK57ay77yM5L2g55qE5pyL5Y+L5LuN5Y+v
+5Lul55WZ5LiL6KiK5oGv57Wm5L2g77yM55W25L2g5LiK57ay5pmC5bCx6IO956uL5Y2z55yL5Yiw
+77yM5Lu75L2V6Kqq6Kmx6YO95YaH6LWw5aSx44CCCj4gaHR0cDovL21lc3Nlbmdlci55YWhvby5j
+b20uaGsKPgo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiBUYWtlIFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5m
+bHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQKPiBKb2luIFNvdXJjZUZvcmdlLm5ldCdzIFRlY2hzYXkg
+cGFuZWwgYW5kIHlvdSdsbCBnZXQgdGhlIGNoYW5jZSB0byBzaGFyZQo+IHlvdXIKPiBvcGluaW9u
+cyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdoIGJyaWVmIHN1cnZleXMgLSBhbmQgZWFy
+biBjYXNoCj4gaHR0cDovL3d3dy50ZWNoc2F5LmNvbS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhw
+JnA9c291cmNlZm9yZ2UmQ0lEPURFVkRFVgo+Cj4gX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX18KPiBCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKPiBCbHVlei11
+c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5l
+dC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo+Cj4KPgo=
+------=_Part_124727_14158054.1169790318964
 Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
 Content-Disposition: inline
 
-<div>Dear All,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This is the 2nd time I am posting the question with more experiments and more logs.&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Has anyone tried obex file transfers between Nokia and BlueZ. <br>I tried with following Nokia series. In all of these I was not able to Push a file from the Cell Phone to my Computer with BlueZ. I can push/pull a file from BlueZ to Cell Phone
-<br>Nokia 6260<br>Nokia 6681 <br>Nokia N80<br>Nokia E61 <br>Nokia N93. </div>
-<p>On the contrary, Object Push works well with MotoQ. </p>
-<p>Here is the configuration of BlueZ : <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="http://brochevarevarura.googlepages.com/bluezconf">http://brochevarevarura.googlepages.com/bluezconf</a></p>
-<p>Logs of Obj. Push from Nokia to BlueZ : <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="http://brochevarevarura.googlepages.com/N93_to_BlueZ.htm">http://brochevarevarura.googlepages.com/N93_to_BlueZ.htm</a></p>
-<p>Logs of Obj. Push from MotoQ to BlueZ : <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="http://brochevarevarura.googlepages.com/MotoQ_to_BlueZ.htm">http://brochevarevarura.googlepages.com/MotoQ_to_BlueZ.htm</a></p>
-<div>Observation : <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In case of MotoQ, L2CAP is connection is getting disconnected after SDP&nbsp;&nbsp;&nbsp; </div>
-<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; negotiation and again reconnecting for the Obex file transfer.&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; whereas In case of Nokia, L2CAP connection is not getting disconnected after SDP </div>
-<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Negotiation. </div>
-<div>&nbsp;</div>
-<div>This comparision is&nbsp;based on Observation, but I am not aware of rationale behind this behaviour.</div>
-<p>If anyone has successfully tried out Object Push from Nokia, can you please get me the configuration and the operation.<br>Appreciate your help in fishing out the problem.</p>
-<p>Thanks,<br>Prabhu</p>
+PGRpdj5Zb3UgaGF2ZSB0byBjcm9zcy1jb21waWxlIGRidXMtMS4wLCBhbmQgc3RhcnQgZGJ1cy1k
+YWVtb24gYmVmb3JlIGV4ZWN1dGluZyBoY2lkLiA8L2Rpdj4KPGRpdj5kYnVzLWRhZW1vbiAtLXN5
+c3RlbTwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2PldoaWxlIGNyb3NzLWNvbXBpbGluZyBk
+YnVzLTEuMCBhbmQgYmx1ZXotdXRpbHMsIHBhc3MgdGhlIGZvbGxvd2luZyBwYXJhbWV0ZXJzIGZv
+ciB0aGUgY29uZmlndXJlIHNjcmlwdC48L2Rpdj4KPGRpdj4tLWxvY2Fsc3RhdGVkaXI9L3ZhciAt
+LXN5c2NvbmZkaXI9L2V0YzwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2Pk9uY2UgeW91IGRv
+IHRoaXMsIGJ5IGRlZmF1bHQgaGNpZCB3aWxsIGxvb2sgZm9yIGhjaWQuY29uZiBpbiAvZXRjL2Js
+dWV0b290aCBkaXJlY3RvcnkuIDwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2PiZuYnNwOzwv
+ZGl2Pgo8ZGl2PjxzdHJvbmc+V2FybmluZzwvc3Ryb25nPi4gVGFrZSBhIGJhY2t1cCBvZiAvZXRj
+L2RidXMtMSBhbmQgL2V0Yy9ibHVldG9vdGgsIGJlY2F1c2UgdGhpcyB3aWxsIG92ZXJ3cml0ZSB0
+aGUgcHJldmlvdXMgY29uZmlnLCB3aGljaCZuYnNwO3dhcyBhbHJlYWR5IHByZXNlbnQgaW4gdXIg
+c3lzdGVtLjwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2PlJ1biBtYWtlIGluc3RhbGwgZm9y
+IGRidXMsIGFuZCB1IG5lZWQgbm90IHJ1biBtYWtlIGluc3RhbGwgZm9yIGJsdWV6LXV0aWxzLiBV
+IGNhbiBkaXJlY3RseSBjb3B5IHRoZSBoY2lkLmNvbmYgYW5kIGJsdWUtaGNpZC5jb25mIHRvIC9l
+dGMvYmx1ZXRvb3RoIGFuZCAvZXRjL2RidXMtMS9zeXN0ZW0uZCBkaXJlY3RvcnkgcmVzcGVjdGl2
+ZWx5LjwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2Pk5vdywgd2hlbiB1IHN0YXJ0IGRidXMt
+ZGFlbW9uIC0tc3lzdGVtLCBpdCB3aWxsIGNyZWF0ZSBhIHN5c3RlbV9idXNfc29ja2V0IGluIC92
+YXIvcnVuL2RidXMgYW5kIGl0IHdpbGwgY3JlYXRlIGEgbWVzc2FnZS5waWQgaW4gL3Zhci9ydW4v
+LiA8L2Rpdj4KPGRpdj4mbmJzcDs8L2Rpdj4KPGRpdj5uZXh0LCB3aGVuIHUgc3RhcnQgaGNpZCwg
+dSBzaG91bGQgbm90IGdldCBwcm9ibGVtLjwvZGl2Pgo8ZGl2PiZuYnNwOzwvZGl2Pgo8ZGl2Pi1Q
+cmFiaHU8L2Rpdj4KPGRpdj4mbmJzcDs8L2Rpdj4KPGRpdj48YnI+PGJyPiZuYnNwOzwvZGl2Pgo8
+ZGl2PjxzcGFuIGNsYXNzPSJnbWFpbF9xdW90ZSI+T24gMS8yMy8wNywgPGIgY2xhc3M9ImdtYWls
+X3NlbmRlcm5hbWUiPktTIEg8L2I+ICZsdDs8YSBocmVmPSJtYWlsdG86a3NwYW0xMjM0QHlhaG9v
+LmNvbS5oayI+a3NwYW0xMjM0QHlhaG9vLmNvbS5oazwvYT4mZ3Q7IHdyb3RlOjwvc3Bhbj4KPGJs
+b2NrcXVvdGUgY2xhc3M9ImdtYWlsX3F1b3RlIiBzdHlsZT0iUEFERElORy1MRUZUOiAxZXg7IE1B
+UkdJTjogMHB4IDBweCAwcHggMC44ZXg7IEJPUkRFUi1MRUZUOiAjY2NjIDFweCBzb2xpZCI+RGVh
+cjxicj48YnI+SSBjcm9zcyBjb21waWxlIHRoZSBibHVlejMuOCBhbmQgdHJ5IHRvIHNldHVwIHRo
+ZSBibHVldG9vdGggaW4gYXJtLiBJIGNvbm5lY3QgdGhlIGFybSB3aXRoIENTUiBCQzAzIHdpdGgg
+QkNTUCBjb25maWd1cmF0aW9uLiBJIGFtIGFibGUgdG8gbWFrZSB0aGUgQmx1ZXogZGlzY292ZXJh
+YmxlIGFuZCB0cnkgdG8gcGFpciBibHVlei4gaG93ZXZlciBpIGZvdW5kIHRoYXQgdGhlcmUgaXMg
+bm8gcGluIHJlc3BvbmQgZnJvbSBCbHVlei4gU28gaSB0cnkgdG8gY29uZmlndXJlIGJsdWV6IHVz
+aW5nIGhjaWQuCjxicj48YnI+Jmd0OyBoY2lkIC1uIC1mIC9ldGMvYmx1ZXRvb3RoL2hjaWQuY29u
+Zjxicj48YnI+aXQgcmV0dXJuPGJyPjxicj5oY2lkWzQ4MV06IENhbiYjMzk7dCBjb25uZWN0IHRv
+IHN5c3RlbSBtZXNzYWdlIGJ1czogRmFpbGVkIHRvIGNvbm5lY3QgdG8gc29ja2V0IC91c3IvbG9j
+YWwvdmFyL3J1bi9kYnVzL3N5c3RlbV9idXNfc29ja2V0OiZuYnNwOyBObyBzdWNoIGZpbGUgb3Ig
+ZGlyZWN0b3J5Cjxicj5oY2lkWzQ4MV06IFVuYWJsZSB0byBnZXQgb24gRC1CdXM8YnI+PGJyPk15
+IHF1ZXN0aW9uPGJyPjEuIHdoZXJlIGNhbiBJIGZvdW5kIHRoZSBtaXNzaW5nIGZpbGUgYW5kIHdo
+YXQgaXMgdGhhdCB1c2VkIGZvcj88YnI+Mi4gSXMgdGhlcmUgYW55IG1ldGhvZCB0byByZXBzb25k
+IHRoZSBwaW4gcmVxdWVzdCBvdGhlciB0aGFuIHVzaW5nIGhjaWQ8YnI+PGJyPlJlZ2FyZHM8YnI+
+U0g8YnI+CjxzcGFuIGNsYXNzPSJhZCI+CjxwPl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fXzxicj5ZTSAtIOmboue3muioiuaBrzxicj7lsLHnrpfkvaDmspLmnInkuIrntrLv
+vIzkvaDnmoTmnIvlj4vku43lj6/ku6XnlZnkuIvoqIrmga/ntabkvaDvvIznlbbkvaDkuIrntrLm
+mYLlsLHog73nq4vljbPnnIvliLDvvIzku7vkvZXoqqroqbHpg73lhofotbDlpLHjgII8YnI+PGEg
+b25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiIGhy
+ZWY9Imh0dHA6Ly9tZXNzZW5nZXIueWFob28uY29tLmhrLyIgdGFyZ2V0PSJfYmxhbmsiPmh0dHA6
+Ly9tZXNzZW5nZXIueWFob28uY29tLmhrCjwvYT4gPC9wPjwvc3Bhbj48YnI+LS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLTxicj5UYWtlIFN1cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2Yg
+SVQ8YnI+Sm9pbiBTb3VyY2VGb3JnZS5uZXQmIzM5O3MgVGVjaHNheSBwYW5lbCBhbmQgeW91JiMz
+OTtsbCBnZXQgdGhlIGNoYW5jZSB0byBzaGFyZSB5b3VyCjxicj5vcGluaW9ucyBvbiBJVCAmYW1w
+OyBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0gYW5kIGVhcm4gY2FzaDxi
+cj48YSBvbmNsaWNrPSJyZXR1cm4gdG9wLmpzLk9wZW5FeHRMaW5rKHdpbmRvdyxldmVudCx0aGlz
+KSIgaHJlZj0iaHR0cDovL3d3dy50ZWNoc2F5LmNvbS9kZWZhdWx0LnBocD9wYWdlPWpvaW4ucGhw
+JmFtcDtwPXNvdXJjZWZvcmdlJmFtcDtDSUQ9REVWREVWIiB0YXJnZXQ9Il9ibGFuayI+Cmh0dHA6
+Ly93d3cudGVjaHNheS5jb20vZGVmYXVsdC5waHA/cGFnZT1qb2luLnBocCZhbXA7cD1zb3VyY2Vm
+b3JnZSZhbXA7Q0lEPURFVkRFVjwvYT48YnI+PGJyPl9fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fPGJyPkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdDxicj48YSBv
+bmNsaWNrPSJyZXR1cm4gdG9wLmpzLk9wZW5FeHRMaW5rKHdpbmRvdyxldmVudCx0aGlzKSIgaHJl
+Zj0ibWFpbHRvOkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldCI+CkJsdWV6LXVzZXJz
+QGxpc3RzLnNvdXJjZWZvcmdlLm5ldDwvYT48YnI+PGEgb25jbGljaz0icmV0dXJuIHRvcC5qcy5P
+cGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiIGhyZWY9Imh0dHBzOi8vbGlzdHMuc291cmNl
+Zm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzIiB0YXJnZXQ9Il9ibGFuayI+aHR0
+cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMKPC9h
+Pjxicj48YnI+PGJyPjwvYmxvY2txdW90ZT48L2Rpdj48YnI+Cg==
+------=_Part_124727_14158054.1169790318964--
 
-------=_Part_125581_18906108.1169796077858--
 
-
---===============0621895603==
+--===============0795090545==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -102,7 +155,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0621895603==
+--===============0795090545==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -113,4 +166,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0621895603==--
+--===============0795090545==--
