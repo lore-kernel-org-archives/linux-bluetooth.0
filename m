@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45BBFD5A.6040000@appstate.edu>
-Date: Sat, 27 Jan 2007 20:33:14 -0500
-From: Kinney Baughman <baughmankr@appstate.edu>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45B4093B.4000901@appstate.edu> <45B4966D.2090207@palmsource.com>
-	<45B4BC05.1010203@appstate.edu>
-In-Reply-To: <45B4BC05.1010203@appstate.edu>
-Subject: Re: [Bluez-devel] Still trying to install bluetooth headset on
- Mandriva 2007 for Skype
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+From: "Florian Schaefer" <listbox@netego.de>
+To: bluez-devel@lists.sourceforge.net
+Date: Sat, 27 Jan 2007 19:39:37 +0100
+Message-Id: <E1HAsSn-0000V7-5M@washu.netego.de>
+Subject: [Bluez-devel] aplay freezes with headsetd
+Reply-To: Florian Schaefer <listbox@netego.de>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,91 +15,167 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============1104413582=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-S2lubmV5IEJhdWdobWFuIHdyb3RlOgo+IEZyw6lkw6lyaWMgREFMTEVBVSB3cm90ZToKCk1lcmNp
-LCBGcmVkZXJpYy4gIFBvdXIgdG91dCB2b3RyZSBhaWRlLgoKPj4gSGksCj4+PiBBMkRQRFs1OTYu
-OTYxXTogYTJkcGRfc2lnbmFsX2luaXQ6IE9LCj4+PiBTZWdtZW50YXRpb24gZmF1bHQKPj4+ICAg
-Cj4+IFN0cmFuZ2UsCj4+IGNvdWxkIHlvdSBydW4gaXQgdGhyb3VnaCBnZGI/Cj4+IEkgdXBkYXRl
-ZCB0aGUgY3ZzIDoKPj4geW91IG5lZWQgdG8KPj4gY3ZzIHVwZGF0ZQo+PiBjb25maWd1cmUgLS1l
-bmFibGUtZGVidWc9eWVzCj4+IG1ha2UKPj4gbWFrZSBpbnN0YWxsCj4+IGdkYiBhMmRwZAo+Pgo+
-PiBwcmVzcyAncicKPj4gd2hlbiBpdCBjcmFzaGVzIHR5cGUgICdidCcgdGhlbiBnaXZlIHVzIGZ1
-bGwgb3V0cHV0LgoKSnVzdCBub3cgZ290IHNvbWUgdGltZSB0byBjb250aW51ZSB3aXRoIHRoaXMg
-cHJvamVjdC4gIFNvcnJ5IGZvciB0aGUgCnNldmVyYWwgZGF5IGRlbGF5LgoKT0suICBUaGFua3Mg
-dG8gRnJlZGVyaWMsIEkndmUgbWFuYWdlZCB0byBnZXQgdG8gdGhlIGZpbmFsIHN0ZXAuICBBcyAK
-cmVxdWVzdGVkLCBoZXJlIGlzIHRoZSBvdXRwdXQgZnJvbSAiZ2RiIGEyZHBkIjoKCj09PT09PT09
-PT09PT09PT09PT09PQoKW3Jvb3RAdG93ZXJdIFsyMDoyM10gWy92YXIvZGwvcGx1Z3pdOiBnZGIg
-YTJkcGQKR05VIGdkYiA2LjMtOG1kdjIwMDcuMCAoTWFuZHJpdmEgTGludXggcmVsZWFzZSAyMDA3
-LjApCkNvcHlyaWdodCAyMDA0IEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbiwgSW5jLgpHREIgaXMg
-ZnJlZSBzb2Z0d2FyZSwgY292ZXJlZCBieSB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2Us
-IGFuZCB5b3UgYXJlCndlbGNvbWUgdG8gY2hhbmdlIGl0IGFuZC9vciBkaXN0cmlidXRlIGNvcGll
-cyBvZiBpdCB1bmRlciBjZXJ0YWluIApjb25kaXRpb25zLgpUeXBlICJzaG93IGNvcHlpbmciIHRv
-IHNlZSB0aGUgY29uZGl0aW9ucy4KVGhlcmUgaXMgYWJzb2x1dGVseSBubyB3YXJyYW50eSBmb3Ig
-R0RCLiAgVHlwZSAic2hvdyB3YXJyYW50eSIgZm9yIGRldGFpbHMuClRoaXMgR0RCIHdhcyBjb25m
-aWd1cmVkIGFzICJpNTg2LW1hbmRyaXZhLWxpbnV4LWdudSIuLi5Vc2luZyBob3N0IApsaWJ0aHJl
-YWRfZGIgbGlicmFyeSAiL2xpYi9pNjg2L2xpYnRocmVhZF9kYi5zby4xIi4KCihnZGIpIHIKU3Rh
-cnRpbmcgcHJvZ3JhbTogL3Vzci9iaW4vYTJkcGQKUmVhZGluZyBzeW1ib2xzIGZyb20gc2hhcmVk
-IG9iamVjdCByZWFkIGZyb20gdGFyZ2V0IG1lbW9yeS4uLmRvbmUuCkxvYWRlZCBzeXN0ZW0gc3Vw
-cGxpZWQgRFNPIGF0IDB4YmZmZmUwMDAKW1RocmVhZCBkZWJ1Z2dpbmcgdXNpbmcgbGlidGhyZWFk
-X2RiIGVuYWJsZWRdCltOZXcgVGhyZWFkIC0xMjEyNzAwOTkyIChMV1AgMTE1NDUpXQpBMkRQRFs0
-NTIuNzYyXTogbWFrZV9kYWVtb25fcHJvY2VzczogKGVycm5vPTI6Tm8gc3VjaCBmaWxlIG9yIApk
-aXJlY3RvcnkpYTJkcGQgW0phbiAyMiAyMDA3IDIxOjA5OjA4XSBzdGFydGluZyAuLi4KQTJEUERb
-NDUyLjc3MF06IGluaXRfdWlucHV0OiAoZXJybm89MjpObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5
-KUNhbm5vdCAKb3BlbiAvZGV2L2lucHV0L3VpbnB1dApBMkRQRFs0NTIuNzcwXTogbWFpbjogL3Vz
-ci9iaW4vYTJkcGQgYWRkcj0gdGltZXI9NDAwMCB1cyBbSmFuIDIyIDIwMDcgCjIxOjA5OjE0XQpB
-MkRQRFs0NTIuNzcwXTogYTJkcGRfc2lnbmFsX2luaXQ6CkEyRFBEWzQ1Mi43NzFdOiBhMmRwZF9z
-aWduYWxfaW5pdDogKGVycm5vPTI6Tm8gc3VjaCBmaWxlIG9yIApkaXJlY3RvcnkpR2V0dGluZyBv
-biBEQlVTCltOZXcgVGhyZWFkIC0xMjA4NDk3MjQ4IChMV1AgMTE1NDgpXQpBMkRQRFs0NTIuODIz
-XTogYTJkcGRfc2lnbmFsX2luaXQ6IE9LCkEyRFBEWzQ1Mi44MjNdOiBhZGRfYXZydGc6CkEyRFBE
-WzQ1Mi44MjRdOiBhMmRwZF90aHJlYWRfaGFuZGxlcjogUmVnaXN0ZXJpbmcgb2JqZWN0IHBhdGg6
-IAovY29tL2FjY2Vzcy9hMmRwZApBMkRQRFs0NTIuODI0XTogYTJkcGRfdGhyZWFkX2hhbmRsZXI6
-IEFjcXVpcmluZyBzZXJ2aWNlOiBjb20uYWNjZXNzLmEyZHBkCkEyRFBEWzQ1Mi44MjddOiBhMmRw
-ZF90aHJlYWRfaGFuZGxlcjogUnVubmluZyAuLi4KQTJEUERbNDUyLjgyN106IGFkZF9hMnNvdXJj
-ZToKQTJEUERbNDUyLjgyOF06IG1haW5fbG9vcDoKQTJEUERbNDUyLjgyOF06IG1ha2Vfc2VydmVy
-X3NvY2tldDoKQTJEUERbNDUyLjgyOF06IGJ0YTJkcGRldmljZW5ldzoKQTJEUERbNDUyLjgyOF06
-IGEyZHBkX3NpZ25hbF9zZXRfc29ja2V0OiBTaWduYWwgc29ja2V0IHNldCB0byAxMgpbTmV3IFRo
-cmVhZCAtMTIwODUxMzYzMiAoTFdQIDExNTQ5KV0KQTJEUERbNDUyLjgyOV06IGEyZHBkX3NpZ25h
-bF9zdGF0ZTogRGlzY29ubmVjdGVkCkEyRFBEWzQ1Mi44MzBdOiBhMmRwX2FsbG9jOiAoZXJybm89
-MjpObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5KQpBMkRQRFs0NTIuODMwXTogYTJkcF9hbGxvYzog
-KGEyZHAgPSAweDgwOGRjZDApCkEyRFBEWzQ1Mi44MzBdOiBhMmRwX25ldzogLCA0NDEwMApBMkRQ
-RFs0NTIuODMwXTogYTJkcF9uZXc6IFN0YXRlIEFWRFRQX1NUQVRFX0RJU0NPTk5FQ1RFRApBMkRQ
-RFs0NTIuODMwXTogYWxzYV9uZXc6CkEyRFBEWzQ1Mi44MzFdOiBhbHNhX25ldzogRnJhbWUgcmF0
-ZSBpcyA0NDEwMApbTmV3IFRocmVhZCAtMTIwODUzMDAxNiAoTFdQIDExNTUwKV0KQTJEUERbNDUy
-LjgzOV06IGF2cmNwX2xpc3RlbmVyOiBhdnJjcDogQWNjZXB0aW5nIGluY29taW5nIGNvbm5lY3Rp
-b24KQTJEUERbNDUyLjg1MF06IGF2cmNwX2xpc3RlbmVyOiAoZXJybm89NDpJbnRlcnJ1cHRlZCBz
-eXN0ZW0gY2FsbClTaWduYWwgCnJlY2VpdmVkIGluIHBvbGwKQTJEUERbNDUyLjg1MV06IGFsc2Ff
-bmV3OiBzbmRfcGNtX29wZW4oKT09MQpBMkRQRFs0NTIuODUxXTogYWxzYV9uZXc6IHNuZF9wY21f
-aHdfcGFyYW1zX21hbGxvYygpPT0xCkEyRFBEWzQ1Mi44NTJdOiBhbHNhX25ldzogc25kX3BjbV9o
-d19wYXJhbXNfYW55KCk9PTEKQTJEUERbNDUyLjg1Ml06IGFsc2FfbmV3OiBzbmRfcGNtX2h3X3Bh
-cmFtc19zZXRfYWNjZXNzKCk9PTEKQTJEUERbNDUyLjg1Ml06IGFsc2FfbmV3OiBzbmRfcGNtX2h3
-X3BhcmFtc19zZXRfZm9ybWF0KCk9PTEKQTJEUERbNDUyLjg1Ml06IGFsc2FfbmV3OiBzbmRfcGNt
-X2h3X3BhcmFtc19zZXRfcmF0ZSgpPT0xCkEyRFBEWzQ1Mi44NTJdOiBhbHNhX25ldzogc25kX3Bj
-bV9od19wYXJhbXNfc2V0X2NoYW5uZWxzKCk9PTEKQTJEUERbNDUyLjg1M106IGFsc2FfbmV3OiBz
-bmRfcGNtX2h3X3BhcmFtcygpPT0xCkEyRFBEWzQ1Mi44NTNdOiBhbHNhX25ldzogc25kX3BjbV9w
-cmVwYXJlKCk9PTEKQTJEUERbNDUyLjg1M106IGFsc2FfbmV3OiBwYXJhbXMgZnJlZWQKQTJEUERb
-NDUyLjg1M106IGFsc2FfbmV3OiByZXR1cm5pbmcgMHg4MDg2ZDQ4CkEyRFBEWzQ1Mi44NTNdOiBz
-Y29fbmV3OgpBMkRQRFs0NTIuODUzXTogc2NvX25ldzogU3RhdGUgU0NPX1NUQVRFX0RJU0NPTk5F
-Q1RFRApBMkRQRFs0NTIuODUzXTogc2NvX3N0YXRlX2Rpc2Nvbm5lY3Q6IEZpbHRlcmluZyBzdGF0
-ZSA6IGFscmVhZHkgZGlzY29ubmVjdGVkCkEyRFBEWzQ1Mi44NTNdOiBhMmRwX2hhbmRsZXI6IEJs
-dWV0b290aCBEZXZpY2UgU2V0dGluZ3MgWzQ0MTAwIGh6LCAyIApjaGFubmVscywgMTYgYml0c10K
-IAoKPT09PT09PT09PT09PT09PT09PT09CgpPbmNlIGFnYWluLCBJIGFwcHJlY2lhdGUgYWxsIHlv
-dXIgaGVscC4KCj4gCj4gSSdtIG5ldyB0byBDVlMuCj4gCj4gSSByYW4gdGhlICJjdnMgdXBkYXRl
-IiBpbiB0aGUgImFsc2EtcGx1Z2lucyIgZm9sZGVyIGZpcnN0Lgo+IAo+IEEgIkNWUyIgZm9sZGVy
-IHdhcyBjcmVhdGVkIGJ1dCBubyAiY29uZmlndXJlIiBmaWxlLiAgQW5kLCBvZiBjb3Vyc2UsIEkg
-Cj4gZ2V0IGEgImNvbmZpZ3VyZTogY29tbWFuZCBub3QgZm91bmQiIHdoZW4gSSB0cnkgdG8gcnVu
-IGNvbmZpZ3VyZS4KPiAKPiBSZWFsaXppbmcgSSBzaG91bGQgcHJvYmFibHkgYmUgaW4gYSBuZXcg
-Zm9sZGVyLCBJIG1vdmVkIGFsbCB0aGUgbmV3bHkgCj4gY3JlYXRlZCBmaWxlcyB0byBhIG5ldyBm
-b2xkZXIgYW5kIHJhbiAiY3ZzIHVwZGF0ZSIgYWdhaW4uCj4gCj4gU2FtZSBvdXRjb21lLgo+IAo+
-IEd1ZXNzIEkgbmVlZCBhIGxpdHRsZSBtb3JlIGhhbmQgaG9sZGluZyBoZXJlLgo+IAo+IFNvcnJ5
-Lgo+IAoKCi0tIApLaW5uZXkKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGFrZSBTdXJ2ZXlzLiBFYXJuIENh
-c2guIEluZmx1ZW5jZSB0aGUgRnV0dXJlIG9mIElUCkpvaW4gU291cmNlRm9yZ2UubmV0J3MgVGVj
-aHNheSBwYW5lbCBhbmQgeW91J2xsIGdldCB0aGUgY2hhbmNlIHRvIHNoYXJlIHlvdXIKb3Bpbmlv
-bnMgb24gSVQgJiBidXNpbmVzcyB0b3BpY3MgdGhyb3VnaCBicmllZiBzdXJ2ZXlzIC0gYW5kIGVh
-cm4gY2FzaApodHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5waHAm
-cD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0
-cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlz
-dGluZm8vYmx1ZXotZGV2ZWwK
+--===============1104413582==
+Content-Type: multipart/signed;
+	boundary="=-=---==-=-=--==-====-=====--=-===--==-=-";
+	micalg=pgp-sha1; protocol="application/pgp-signature"
+Content-Disposition: inline
+
+--=-=---==-=-=--==-====-=====--=-===--==-=-
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+I'm currently trying to get my "Logitech Mobile Pro II" headset connected
+to my Debian box using the new and shiny headsetd. It seems that I get a
+connection between my notebook and the headset when starting a test run
+of aplay (the speaker of the headset is activated and emits some quiet
+static sounds) but that's all that happens. Aplay will just kind of
+freezes and that's it.
+
+But now the information in more order (my CVS checkouts are from today):
+
+root@washu:~ # hciconfig -a
+hci0:	Type: USB
+	BD Address: 00:02:78:3D:18:DD ACL MTU: 1017:8 SCO MTU: 64:0
+	UP RUNNING PSCAN=20
+	RX bytes:397591 acl:21 sco:7760 events:50 errors:0
+	TX bytes:806 acl:21 sco:0 commands:30 errors:0
+	Features: 0xff 0xff 0x8d 0xfe 0x9b 0xfd 0x00 0x80
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3=20
+	Link policy: RSWITCH HOLD SNIFF PARK=20
+	Link mode: SLAVE ACCEPT=20
+	Name: 'washu'
+	Class: 0x3e0100
+	Service Classes: Networking, Rendering, Capturing, Object
+Transfer, Audio
+	Device Class: Computer, Uncategorized
+	HCI Ver: 2.0 (0x3) HCI Rev: 0x20dc LMP Ver: 2.0 (0x3) LMP Subver:
+0x415c
+	Manufacturer: Broadcom Corporation (15)
+
+florian@washu:~ # /opt/bluetooth-alsa/bin/headsetd -n
+headsetd[1808]: Bluetooth headset daemon version 0.5
+[*** headset switched on ***]
+headsetd[1808]: Incoming RFCOMM hs connection from 00:0D:44:5C:A7:69
+accepted
+headsetd[1808]: Changing state: Idle-->Connected
+[*** aplay started ***]
+headsetd[1808]: Changing state: Connected-->Ready
+headsetd[1808]: Changing state: Ready-->Opening
+headsetd[1808]: SCO channel opened handle=3D0x0001 mtu=3D64
+headsetd[1808]: Changing state: Opening-->Streaming
+[*** this is where aplay hangs ***]
+
+florian@washu:~ # aplay -B 1000000 -Dheadset
+/usr/share/sounds/alsa/Front_Left.wav=20
+DEBUG(pid=3D1897): _snd_pcm_sco_open: Starting pcm_sco_headset plugin.
+DEBUG(pid=3D1897): _snd_pcm_sco_open: Open mode is for Playback.
+DEBUG(pid=3D1897): _snd_pcm_sco_open: opened as ioplug=3D0x805c778,
+pcm=3D0x805c8b0, i
+oplug->callback =3D 0xb7acc7e0
+Playing WAVE '/usr/share/sounds/alsa/Noise.wav' : Signed 16 bit Little
+Endian, R
+ate 48000 Hz, Mono
+Warning: rate is not accurate (requested =3D 48000Hz, got =3D 8000Hz)
+	 please, try the plug plugin (-Dplug:headset)
+DEBUG(pid=3D1897): sco_headset_hw_params: period_count =3D 200
+DEBUG(pid=3D1897): sco_headset_prepare: Preparing with io->period_size =3D
+24, io->b
+uffer_size =3D 4800
+DEBUG(pid=3D1897): sco_headset_pointer: returning bt_headset->hw_ptr=3D0
+DEBUG(pid=3D1897): sco_headset_write: areas->step=3D16, areas->first=3D0,
+offset=3D0, si
+ze=3D24, io->nonblock=3D0
+DEBUG(pid=3D1897): sco_headset_write: returning 24
+DEBUG(pid=3D1897): sco_headset_pointer: returning bt_headset->hw_ptr=3D24
+DEBUG(pid=3D1897): sco_headset_write: areas->step=3D16, areas->first=3D0,
+offset=3D0, si
+ze=3D24, io->nonblock=3D0
+DEBUG(pid=3D1897): sco_headset_write: returning 24
+DEBUG(pid=3D1897): sco_headset_pointer: returning bt_headset->hw_ptr=3D48
+DEBUG(pid=3D1897): sco_headset_write: areas->step=3D16, areas->first=3D0,
+offset=3D0, si
+ze=3D24, io->nonblock=3D0
+[*** many more of those lines ***]
+DEBUG(pid=3D1897): sco_headset_write: returning 24
+DEBUG(pid=3D1897): sco_headset_pointer: returning bt_headset->hw_ptr=3D4776
+DEBUG(pid=3D1897): sco_headset_write: areas->step=3D16, areas->first=3D0,
+offset=3D0, si
+ze=3D24, io->nonblock=3D0
+DEBUG(pid=3D1897): sco_headset_write: returning 24
+DEBUG(pid=3D1897): sco_headset_pointer: returning bt_headset->hw_ptr=3D0
+DEBUG(pid=3D1897): sco_headset_write: areas->step=3D16, areas->first=3D0,
+offset=3D0, si
+ze=3D24, io->nonblock=3D0
+[*** this is where aplay hangs ***]
+
+Here I here, that the speaker has been switched on, but all I hear is
+static.
+
+root@washu:~ # hcidump -X -V
+[*** shows a lot of stuff all the time similar to: ***]
+> SCO data: handle 1 dlen 48
+    0000: f1 ff 57 ff 39 ff bb ff  bb ff 28 ff 0d ff 83 ff=20
+=2E.W.9.....(.....
+    0010: c0 ff 72 ff 4d ff b3 ff  1b 00 0e 00 cc ff 13 00=20
+=2E.r.M...........
+    0020: 7e 00 37 01 3d 01 30 01  46 01 59 01 37 02 00 02=20
+~.7.=3D.0.F.Y.7...
+
+The output of hcidump continued even after aplay didn't do anything
+anymore.
+
+I already tried to use the btsco method: Slightly different debug output,
+but the same net result.
+
+Any ideas?
+
+Ciao
+Florian=
+
+
+--=-=---==-=-=--==-====-=====--=-===--==-=-
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+Comment: Get my DSA key from: www.netego.de/hpc?p=download&l=en
+
+iD8DBQBFu5xv+2lxodi1OoURAvb9AJ9+H3AGgsJ4Sp99RA1hPxYt2iv10gCZAdL7
+K1VH+sIC14zEW67fCfBUvJw=
+=BM8y
+-----END PGP SIGNATURE-----
+
+--=-=---==-=-=--==-====-=====--=-===--==-=---
+
+
+
+--===============1104413582==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1104413582==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1104413582==--
