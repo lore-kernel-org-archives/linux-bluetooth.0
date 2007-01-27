@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <2e9fc96f0701270326g37539095s2c533407439ec8bc@mail.gmail.com>
-Date: Sat, 27 Jan 2007 16:56:13 +0530
-From: "Prabhu nath" <gprabhunath@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20070127035832.4aecaae8@localhost.localdomain>
-MIME-Version: 1.0
+Date: Sat, 27 Jan 2007 03:58:32 -0800
+From: Andres Vargas - zodman <zod@linuxmerida.org>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20070127035832.4aecaae8@localhost.localdomain>
+In-Reply-To: <2e9fc96f0701252321k59b0320cld9eef725a6cc06ac@mail.gmail.com>
 References: <2e9fc96f0701252321k59b0320cld9eef725a6cc06ac@mail.gmail.com>
-	<20070127035832.4aecaae8@localhost.localdomain>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] Obex File Transfers between Nokia and BlueZ
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -17,67 +16,81 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1025288698=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1025288698==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_7342_8598255.1169897173033"
-
-------=_Part_7342_8598255.1169897173033
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-I enabled piscan and again no luck.
-I am able to push from BlueZ to Nokia, but vice-versa is not possible. i.e.
-Pushing an object/file from Nokia to BlueZ. I do the following on the NOkia
-cell phone to push a file.
-
-Select an image, and options->send->via Bluetooth->Select BT Device.
-Once I do, the messsage, sending failed is displayed on the cell phone.
-
--Prabhu
-
-------=_Part_7342_8598255.1169897173033
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div>I enabled piscan and again no luck.</div>
-<div>I am able to push from BlueZ to Nokia, but vice-versa is not possible. i.e. Pushing an object/file from Nokia to BlueZ. I do the following on the NOkia cell phone to push a file. </div>
-<div>&nbsp;</div>
-<div>Select an image, and options-&gt;send-&gt;via Bluetooth-&gt;Select BT Device.</div>
-<div>Once I do,&nbsp;the messsage, sending failed is displayed on the cell phone. </div>
-<div>&nbsp;</div>
-<div>-Prabhu</div>
-<div>&nbsp;</div>
-<div><br>&nbsp;</div>
-
-------=_Part_7342_8598255.1169897173033--
+try enable piscan on your bt
 
 
---===============1025288698==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+# hciconfig hci0 piscan
+
+i have a nokia 6670 and i push files with ..
+
+
+#  ussp-push 00:02:5B:00:A5:A5@12 file file
+
+your  OBEX Object Push is on channel 9 try with 
+
+#  ussp-push 00:02:5B:00:A5:A5@9 file file
+
+
+
+
+On Fri, 26 Jan 2007 12:51:17 +0530
+"Prabhu nath" <gprabhunath@gmail.com> wrote:
+
+> Dear All,
+>            This is the 2nd time I am posting the question with more
+> experiments and more logs.
+>            Has anyone tried obex file transfers between Nokia and BlueZ.
+> I tried with following Nokia series. In all of these I was not able to Push
+> a file from the Cell Phone to my Computer with BlueZ. I can push/pull a file
+> from BlueZ to Cell Phone
+> Nokia 6260
+> Nokia 6681
+> Nokia N80
+> Nokia E61
+> Nokia N93.
+> 
+> On the contrary, Object Push works well with MotoQ.
+> 
+> Here is the configuration of BlueZ :
+>                    http://brochevarevarura.googlepages.com/bluezconf
+> 
+> Logs of Obj. Push from Nokia to BlueZ :
+>                    http://brochevarevarura.googlepages.com/N93_to_BlueZ.htm
+> 
+> Logs of Obj. Push from MotoQ to BlueZ :
+>                   http://brochevarevarura.googlepages.com/MotoQ_to_BlueZ.htm
+> Observation :
+>               In case of MotoQ, L2CAP is connection is getting disconnected
+> after SDP
+>               negotiation and again reconnecting for the Obex file
+> transfer.
+>               whereas In case of Nokia, L2CAP connection is not getting
+> disconnected after SDP
+>               Negotiation.
+> 
+> This comparision is based on Observation, but I am not aware of rationale
+> behind this behaviour.
+> 
+> If anyone has successfully tried out Object Push from Nokia, can you please
+> get me the configuration and the operation.
+> Appreciate your help in fishing out the problem.
+> 
+> Thanks,
+> Prabhu
+
+
+-- 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1025288698==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1025288698==--
