@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45BD532E.8@xmission.com>
-Date: Sun, 28 Jan 2007 18:51:42 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <45BD2150.4030102@vxappliance.com>
+Date: Sun, 28 Jan 2007 14:18:56 -0800
+From: Mike Klein <mklein@vxappliance.com>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <45BD2150.4030102@vxappliance.com>
-In-Reply-To: <45BD2150.4030102@vxappliance.com>
-Subject: Re: [Bluez-users] How to route all sound to bluetooth audio device?
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] How to route all sound to bluetooth audio device?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,19 +18,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Mike
+I was able to get bluetooth sound out via aplayer? with a special
+parameter...but I would think there would be general setting in
+Preferences->Audio to do something like pick a different device for audio.
 
-> I was able to get bluetooth sound out via aplayer? with a special
-> parameter...but I would think there would be general setting in
-> Preferences->Audio to do something like pick a different device for audio.
+When I load bt...I get additional mixer panel in the gnome alsa mixer?
+for bluetooth...but there's no selection to force sound to this device.
 
-assuming you mean a2dp... iirc, in .asoundrc, it's
+Am I missing something or is this functionality still somewhat hit/miss?
+I am using latest Ubuntu release.
 
-pcm.!default {
- type a2dpd
-}
 
-brad
+thanks in advance...
+
+mike klein
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
