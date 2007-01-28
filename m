@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sun, 28 Jan 2007 12:28:31 -0800 (PST)
-From: Imran Siddique <imran_stdu@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <ef9938ec0701271830p6f171d9cu892458220baa9362@mail.gmail.com>
+Date: Sat, 27 Jan 2007 21:30:34 -0500
+From: "Albert Huang" <albert@csail.mit.edu>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <80236d750701250229u61cbb820v929b8d0ad6ae3fb9@mail.gmail.com>
 MIME-Version: 1.0
-Message-ID: <545015.6254.qm@web37701.mail.mud.yahoo.com>
-Subject: [Bluez-users] poll() problem ...
+References: <80236d750701250229u61cbb820v929b8d0ad6ae3fb9@mail.gmail.com>
+Subject: Re: [Bluez-users] multithread / multi process use
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,68 +16,112 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0849966492=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0849966492==
-Content-Type: multipart/alternative; boundary="0-1865991597-1170016111=:6254"
-Content-Transfer-Encoding: 8bit
+I think the proper thing to do here is to have your application use
+the D-Bus API, which should do the right thing across multiple
+processes.  Maybe someone else who's more in touch with hcid can give
+more details.
 
---0-1865991597-1170016111=:6254
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+-albert
 
-HI,
-
-   I am making a assignment 'file transfer using Bluetooth on hci layer'. I take code from hci.c. The problem is sometime my program works perfectly and transfer file successful. But most of the time it failed. 
-Sender sends the Handshake packet and on Receiving side it receives. Receiver sends HACK to Sender but didn't receive anything. Means
-
-n = poll(&p, 1, timeout)
-
-n goes to 0. and the error is ETIMEDOUT. 
-But the same program works fine sometime.
-I am getting sick from this problem. 
-I also try with different and same timeout values. but it doesn't effect in anyway.
-
-Please help me.
-
-Regards,
-
- 
----------------------------------
-TV dinner still cooling?
-Check out "Tonight's Picks" on Yahoo! TV.
---0-1865991597-1170016111=:6254
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-HI,<br><br>&nbsp;&nbsp; I am making a assignment 'file transfer using Bluetooth on hci layer'. I take code from hci.c. The problem is sometime my program works perfectly and transfer file successful. But most of the time it failed. <br>Sender sends the Handshake packet and on Receiving side it receives. Receiver sends HACK to Sender but didn't receive anything. Means<br><br>n = poll(&amp;p, 1, timeout)<br><br>n goes to 0. and the error is ETIMEDOUT. <br>But the same program works fine sometime.<br>I am getting sick from this problem. <br>I also try with different and same timeout values. but it doesn't effect in anyway.<br><br>Please help me.<br><br>Regards,<br><p>&#32;
-
-<hr size=1>TV dinner still cooling?<br><a href="http://us.rd.yahoo.com/evt=49979/*http://tv.yahoo.com/">Check out "Tonight's Picks"</a> on Yahoo! TV.
---0-1865991597-1170016111=:6254--
-
-
---===============0849966492==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+On 1/25/07, Emanuele Novelli <ema.novelli@gmail.com> wrote:
+> Hello I'm new here, I searched for this issue but found nothing.
+>
+> Using 2 threads or 2 process for reading a name of a 2 remote devices at
+> same time reports always the same name.
+> Is this a bug or the hci functions in library do not support concurrent use
+> ?
+> (using 2.6.19 kernel on FC6 and bluez libs 3.7.1)
+>
+> This is a simply way to reproduce this:
+>
+> open a 2 shells and issue 2 commands at same time
+>
+> hcitool name <bdaddress of a device close to you>
+>
+> they both report the same name
+>
+> here an HCI dump of what's happening
+>
+> 2007-01-25 11:15:06.093319 < HCI Command: Remote Name Request (0x01|0x0019)
+> plen 10
+>     bdaddr 00:0A:28:DF:2B:D8 mode 2 clkoffset 0x0000
+> 2007-01-25 11:15:06.114456 > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> 2007-01-25 11:15:06.712794 < HCI Command: Remote Name Request (0x01|0x0019)
+> plen 10
+>     bdaddr 00:17:4B:D3:9F:5B mode 2 clkoffset 0x0000
+> 2007-01-25 11:15:06.717442 > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 0
+> 2007-01-25 11:15:07.238429 > HCI Event: Remote Name Req Complete (0x07) plen
+> 255
+>     status 0x00 bdaddr 00:0A:28:DF:2B:D8 name 'Seleso'
+> 2007-01-25 11:15:07.239434 > HCI Event: Command Status (0x0f) plen 4
+>     Unknown (0x00|0x0000) status 0x00 ncmd 1
+> 2007-01-25 11:15:10.151342 > HCI Event: Remote Name Req Complete (0x07) plen
+> 255
+>     status 0x00 bdaddr 00:17:4B:D3:9F:5B name 'Wince'
+>
+> the second event with the second name is tracked but never reported back to
+> the caller cause the unknown event received.
+> so i see the name 'Seleso' as result on both the shells
+>
+> this is the behaviour if I use the 2 command sequentially they works fine.
+>
+> hcitool name 00:0A:28:DF:2B:D8
+>
+> 2007-01-25 11:19:51.930394 < HCI Command: Remote Name Request (0x01|0x0019)
+> plen 10
+>     bdaddr 00:0A:28:DF:2B:D8 mode 2 clkoffset 0x0000
+> 2007-01-25 11:19:51.951520 > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> 2007-01-25 11:19:52.199514 > HCI Event: Remote Name Req Complete (0x07) plen
+> 255
+>     status 0x00 bdaddr 00:0A:28:DF:2B:D8 name 'Seleso'
+>
+> hcitool name 00:17:4B:D3:9F:5B
+>
+> 2007-01-25 11:20:39.520967 < HCI Command: Remote Name Request (0x01|0x0019)
+> plen 10
+>     bdaddr 00:17:4B:D3:9F:5B mode 2 clkoffset 0x0000
+> 2007-01-25 11:20:39.542195 > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> 2007-01-25 11:20:43.358090 > HCI Event: Remote Name Req Complete (0x07) plen
+> 255
+>     status 0x00 bdaddr 00:17:4B:D3:9F:5B name 'Wince'
+>
+>
+>
+>
+> Since I need to use search names and search services (FAX especially) on a
+> multi-threaded application i'd like to know if is this possible or somewhere
+> there is a issue that prevent this.
+>
+>
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys - and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+>
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>
+>
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0849966492==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0849966492==--
