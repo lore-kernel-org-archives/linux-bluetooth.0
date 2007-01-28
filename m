@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <ef9938ec0701271830p6f171d9cu892458220baa9362@mail.gmail.com>
-Date: Sat, 27 Jan 2007 21:30:34 -0500
+Message-ID: <ef9938ec0701271824i65a6a58ejf43d3b02cffe6dff@mail.gmail.com>
+Date: Sat, 27 Jan 2007 21:24:02 -0500
 From: "Albert Huang" <albert@csail.mit.edu>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <80236d750701250229u61cbb820v929b8d0ad6ae3fb9@mail.gmail.com>
+In-Reply-To: <2e9fc96f0701270326g37539095s2c533407439ec8bc@mail.gmail.com>
 MIME-Version: 1.0
-References: <80236d750701250229u61cbb820v929b8d0ad6ae3fb9@mail.gmail.com>
-Subject: Re: [Bluez-users] multithread / multi process use
+References: <2e9fc96f0701252321k59b0320cld9eef725a6cc06ac@mail.gmail.com>
+	<20070127035832.4aecaae8@localhost.localdomain>
+	<2e9fc96f0701270326g37539095s2c533407439ec8bc@mail.gmail.com>
+Subject: Re: [Bluez-users] Obex File Transfers between Nokia and BlueZ
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,85 +22,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I think the proper thing to do here is to have your application use
-the D-Bus API, which should do the right thing across multiple
-processes.  Maybe someone else who's more in touch with hcid can give
-more details.
+Are you sure you're actually running an obex server?  If you're using
+fedora, then you can use the obexserver that comes with
+gnome-bluetooth.  From the foot menu thing, you should find a menu
+option that allows you to receive files via bluetooth.  If your
+machine is advertising OPUSH but you're not actually running a server,
+then it's not going to work.  If you ever used the sdptool command,
+then you probably did something wrong.  This is a fairly standard
+usage of bluez and nokia phones.
 
 -albert
 
-On 1/25/07, Emanuele Novelli <ema.novelli@gmail.com> wrote:
-> Hello I'm new here, I searched for this issue but found nothing.
+On 1/27/07, Prabhu nath <gprabhunath@gmail.com> wrote:
+> I enabled piscan and again no luck.
+> I am able to push from BlueZ to Nokia, but vice-versa is not possible. i.e.
+> Pushing an object/file from Nokia to BlueZ. I do the following on the NOkia
+> cell phone to push a file.
 >
-> Using 2 threads or 2 process for reading a name of a 2 remote devices at
-> same time reports always the same name.
-> Is this a bug or the hci functions in library do not support concurrent use
-> ?
-> (using 2.6.19 kernel on FC6 and bluez libs 3.7.1)
+> Select an image, and options->send->via Bluetooth->Select BT Device.
+> Once I do, the messsage, sending failed is displayed on the cell phone.
 >
-> This is a simply way to reproduce this:
->
-> open a 2 shells and issue 2 commands at same time
->
-> hcitool name <bdaddress of a device close to you>
->
-> they both report the same name
->
-> here an HCI dump of what's happening
->
-> 2007-01-25 11:15:06.093319 < HCI Command: Remote Name Request (0x01|0x0019)
-> plen 10
->     bdaddr 00:0A:28:DF:2B:D8 mode 2 clkoffset 0x0000
-> 2007-01-25 11:15:06.114456 > HCI Event: Command Status (0x0f) plen 4
->     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> 2007-01-25 11:15:06.712794 < HCI Command: Remote Name Request (0x01|0x0019)
-> plen 10
->     bdaddr 00:17:4B:D3:9F:5B mode 2 clkoffset 0x0000
-> 2007-01-25 11:15:06.717442 > HCI Event: Command Status (0x0f) plen 4
->     Remote Name Request (0x01|0x0019) status 0x00 ncmd 0
-> 2007-01-25 11:15:07.238429 > HCI Event: Remote Name Req Complete (0x07) plen
-> 255
->     status 0x00 bdaddr 00:0A:28:DF:2B:D8 name 'Seleso'
-> 2007-01-25 11:15:07.239434 > HCI Event: Command Status (0x0f) plen 4
->     Unknown (0x00|0x0000) status 0x00 ncmd 1
-> 2007-01-25 11:15:10.151342 > HCI Event: Remote Name Req Complete (0x07) plen
-> 255
->     status 0x00 bdaddr 00:17:4B:D3:9F:5B name 'Wince'
->
-> the second event with the second name is tracked but never reported back to
-> the caller cause the unknown event received.
-> so i see the name 'Seleso' as result on both the shells
->
-> this is the behaviour if I use the 2 command sequentially they works fine.
->
-> hcitool name 00:0A:28:DF:2B:D8
->
-> 2007-01-25 11:19:51.930394 < HCI Command: Remote Name Request (0x01|0x0019)
-> plen 10
->     bdaddr 00:0A:28:DF:2B:D8 mode 2 clkoffset 0x0000
-> 2007-01-25 11:19:51.951520 > HCI Event: Command Status (0x0f) plen 4
->     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> 2007-01-25 11:19:52.199514 > HCI Event: Remote Name Req Complete (0x07) plen
-> 255
->     status 0x00 bdaddr 00:0A:28:DF:2B:D8 name 'Seleso'
->
-> hcitool name 00:17:4B:D3:9F:5B
->
-> 2007-01-25 11:20:39.520967 < HCI Command: Remote Name Request (0x01|0x0019)
-> plen 10
->     bdaddr 00:17:4B:D3:9F:5B mode 2 clkoffset 0x0000
-> 2007-01-25 11:20:39.542195 > HCI Event: Command Status (0x0f) plen 4
->     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> 2007-01-25 11:20:43.358090 > HCI Event: Remote Name Req Complete (0x07) plen
-> 255
->     status 0x00 bdaddr 00:17:4B:D3:9F:5B name 'Wince'
->
->
->
->
-> Since I need to use search names and search services (FAX especially) on a
-> multi-threaded application i'd like to know if is this possible or somewhere
-> there is a issue that prevent this.
+> -Prabhu
 >
 >
 >
