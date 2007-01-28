@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4f436aae0701280715x72e4430n5c072dc0067555b8@mail.gmail.com>
-References: <4f436aae0701280715x72e4430n5c072dc0067555b8@mail.gmail.com>
-Date: Sun, 28 Jan 2007 22:48:07 +0100
-Message-Id: <1170020887.4630.20.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] hciattach <--> hcid
+Message-ID: <45BCFC2F.6090203@free.fr>
+Date: Sun, 28 Jan 2007 20:40:31 +0100
+From: Fabien Chevalier <fabchevalier@free.fr>
+MIME-Version: 1.0
+To: Florian Schaefer <listbox@netego.de>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <E1HAsSn-0000V7-5M@washu.netego.de>
+	<E1HBB3Y-0000YF-QI@washu.netego.de>
+In-Reply-To: <E1HBB3Y-0000YF-QI@washu.netego.de>
+Subject: Re: [Bluez-devel] aplay freezes with headsetd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,22 +22,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Choi,
+Hi Florian,
 
-> when I do hciattach, i see that hcid automatically add the new device,
-> and when i send -SIGTERM to hciattach, i see that hcid removed the device.
+Could you give me the output of
+'hciconfig -a' once you have done the
+'modprobe hci_usb force_scofix' ?
+
+Cheers,
+
+Fabien
+
+> root@washu:~ # hciconfig hci0 revision
+> hci0:	Type: USB
+> 	BD Address: 00:02:78:3D:18:DD ACL MTU: 1017:8 SCO MTU: 64:0
+> 	Firmware 220.65 / 92
 > 
-> how does hcid knows about all these changes ?
-> where is the communication ?
-
-the kernel will tell hcid when a new host adapter has been attached or
-removed from the system.
-
-Regards
-
-Marcel
-
-
+> I already tried to load hci_usb via "modprobe hci_usb force_scofix" as
+> advised by the contact website but that didn't change anything. I'm using
+> linux kernel 2.6.19 with the "plugz/patches/sco-flowcontrol-v3.0.diff"
+> patches here.
+> 
+> Does anyone have positive or negative experiences with this Broadcom
+> adapter?
+> Anything else I might try?
+> 
+> Ciao
+> Florian
+> 
+>
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
