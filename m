@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45BDCE90.5070906@st.com>
-Date: Mon, 29 Jan 2007 16:08:08 +0530
-From: Mayank BATRA <mayank.batra@st.com>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <D8CE9CFA707C894180BAC8CDD154F8460B033014@msiexch01.marvell.com>	<45B5AD79.8020104@st.com>
-	<1169573111.5861.12.camel@violet>
-In-Reply-To: <1169573111.5861.12.camel@violet>
-Subject: Re: [Bluez-devel] hcidump EDR packet type
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Choi Sonim <choisonim@gmail.com>
+In-Reply-To: <4f436aae0701290157h3ac80220t801fffccdc2b8a8c@mail.gmail.com>
+References: <4f436aae0701191104h376e9e89mca6769544b257e29@mail.gmail.com>
+	<1169235297.29458.19.camel@violet>
+	<4f436aae0701290157h3ac80220t801fffccdc2b8a8c@mail.gmail.com>
+Date: Mon, 29 Jan 2007 11:05:45 +0100
+Message-Id: <1170065145.15389.117.camel@violet>
+Mime-Version: 1.0
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] loading of hci_uart.ko
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,39 +23,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Choi,
 
-> actually it is totally wrong. Sending the 3-DH5 bit only means that you
-> wanna enable DM1 and all EDR packets except 3-DH5, because setting that
-> bit means you disable that packet type. The corresponding response
-> should be DM1 + 3-DH5 bit set.
+> > > when I do "hciattach /dev/ttyS0 any", somehow the needed module
+> > > hci_uart.ko is loaded.
+> > > I looked in hciattach.c but I do not see how is it done ?
+> >
+> > # modinfo hci_uart
+> > alias:          tty-ldisc-15
+> >
+> > It tells the kernel to load this module if any application request the
+> > line discipline 15.
 > 
-> Since this is custom firmware, it is interpreting the bitmask of the
-> change connection packet type in the wrong way.
-> 
-> And to be clear on this, I don't care about the packet mask at all and
-> nobody should mess with it (except for testing). Let the link manager
-> decide which packet type to use. BlueZ can't make any intelligent
-> decision on which is the best packet type. It doesn't know anything
-> about the piconet it is using besides its handle.
+> can you please elaborate on this ? when the app request the HCI line
+> discipline, how does the kernel knows it need to look for alias tty-ldisc-15 ?
+> does it then run modprobe ?
+> what code is responsible for that ?
 
-OK. But my question is why display different packet lists in the command
-and event?
-< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
-    handle 1 ptype 0x2000
-    Packet type: 3-DH5
+the kernel actually doesn't care what's the module name of module
+providing the line discipline 15. It simply requests the loading of the
+module and the userspace (insmod/modprobe) has to resolve this.
 
-...
+Regards
 
-> HCI Event: Connection Packet Type Changed (0x1d) plen 5
-    status 0x00 handle 1 ptype 0x1306
-    Packet type: 2-DH1 2-DH3 2-DH5 3-DH1 3-DH3
+Marcel
 
-Both of them should show the same packet list. Isn't it?
 
-Best Regards,
-
-Mayank
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
