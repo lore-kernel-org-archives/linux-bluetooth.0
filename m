@@ -1,49 +1,66 @@
-Return-Path: <ohadbc@gmail.com>
-Message-ID: <4f436aae0701290242u18e4c35bocac8a8e9afeaa7b0@mail.gmail.com>
-Date: Mon, 29 Jan 2007 12:42:09 +0200
-From: "Choi Sonim" <choisonim@gmail.com>
-Sender: ohadbc@gmail.com
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: [Bluez-devel] loading of hci_uart.ko
-Cc: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1170065145.15389.117.camel@violet>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <45BDCE90.5070906@st.com>
+Date: Mon, 29 Jan 2007 16:08:08 +0530
+From: Mayank BATRA <mayank.batra@st.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-References: <4f436aae0701191104h376e9e89mca6769544b257e29@mail.gmail.com>
-	 <1169235297.29458.19.camel@violet>
-	 <4f436aae0701290157h3ac80220t801fffccdc2b8a8c@mail.gmail.com>
-	 <1170065145.15389.117.camel@violet>
-List-ID: <bluez-devel.lists.sourceforge.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <D8CE9CFA707C894180BAC8CDD154F8460B033014@msiexch01.marvell.com>	<45B5AD79.8020104@st.com>
+	<1169573111.5861.12.camel@violet>
+In-Reply-To: <1169573111.5861.12.camel@violet>
+Subject: Re: [Bluez-devel] hcidump EDR packet type
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 1/29/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Choi,
->
-> > > > when I do "hciattach /dev/ttyS0 any", somehow the needed module
-> > > > hci_uart.ko is loaded.
-> > > > I looked in hciattach.c but I do not see how is it done ?
-> > >
-> > > # modinfo hci_uart
-> > > alias:          tty-ldisc-15
-> > >
-> > > It tells the kernel to load this module if any application request the
-> > > line discipline 15.
-> >
-> > can you please elaborate on this ? when the app request the HCI line
-> > discipline, how does the kernel knows it need to look for alias tty-ldisc-15 ?
-> > does it then run modprobe ?
-> > what code is responsible for that ?
->
-> the kernel actually doesn't care what's the module name of module
-> providing the line discipline 15. It simply requests the loading of the
-> module and the userspace (insmod/modprobe) has to resolve this.
+Hi Marcel,
 
-thank you very much
-choi
+> actually it is totally wrong. Sending the 3-DH5 bit only means that you
+> wanna enable DM1 and all EDR packets except 3-DH5, because setting that
+> bit means you disable that packet type. The corresponding response
+> should be DM1 + 3-DH5 bit set.
+> 
+> Since this is custom firmware, it is interpreting the bitmask of the
+> change connection packet type in the wrong way.
+> 
+> And to be clear on this, I don't care about the packet mask at all and
+> nobody should mess with it (except for testing). Let the link manager
+> decide which packet type to use. BlueZ can't make any intelligent
+> decision on which is the best packet type. It doesn't know anything
+> about the piconet it is using besides its handle.
 
->
-> Regards
->
-> Marcel
->
->
->
+OK. But my question is why display different packet lists in the command
+and event?
+< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+    handle 1 ptype 0x2000
+    Packet type: 3-DH5
+
+...
+
+> HCI Event: Connection Packet Type Changed (0x1d) plen 5
+    status 0x00 handle 1 ptype 0x1306
+    Packet type: 2-DH1 2-DH3 2-DH5 3-DH1 3-DH3
+
+Both of them should show the same packet list. Isn't it?
+
+Best Regards,
+
+Mayank
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys - and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
