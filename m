@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: "Collin R. Mulliner" <collin@betaversion.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Mon, 29 Jan 2007 22:10:13 +0100
-Message-Id: <1170105013.16628.16.camel@panic>
+In-Reply-To: <D8CE9CFA707C894180BAC8CDD154F8460B248D91@msiexch01.marvell.com>
+References: <D8CE9CFA707C894180BAC8CDD154F8460B248D91@msiexch01.marvell.com>
+Date: Mon, 29 Jan 2007 19:06:20 +0100
+Message-Id: <1170093980.15389.214.camel@violet>
 Mime-Version: 1.0
-Subject: [Bluez-devel] hidd using report mode as default instead of boot
-	mode?
+Subject: Re: [Bluez-devel] Bluez-devel Digest, Vol 9, Issue 99
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,18 +20,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel and other,
+Hi Quinton,
 
-is my observation right that hidd (now) uses report mode instead of boot
-mode like it did some time ago?
+> Sorry for the confusion, I would like to confirm that
+> 
+> 1. First display is right from hcidump, 
+> 	HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+> 	handle 1 ptype 0x2000
+> 	Packet type: 3-DH5
+> 
+> 	However, the problem for this is we just disabled the 3-DH5
+> packet type, instead of enabling it, whose function is reversed among
+> BDR and EDR
+> 
+> 2. Second display is wrong which is caused firmware
 
-Collin
+the hcidump can have bugs, but in general it is a stupid program that
+only decodes the binary HCI packets into human readable format. Feel
+free to disable the verbose decoding (-V switch) and decode the binary
+hex data by yourself to confirm it.
 
---
-Collin R. Mulliner <collin@betaversion.net>
-BETAVERSiON Systems [www.betaversion.net]
-info/pgp: finger collin@betaversion.net
-90% of being smart is knowing what you're dumb at!
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
