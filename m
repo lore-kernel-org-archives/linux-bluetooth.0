@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20070123154203.GA30435@salmon.maths.tcd.ie>
-References: <20070123154203.GA30435@salmon.maths.tcd.ie>
-Date: Wed, 31 Jan 2007 12:25:47 +0100
-Message-Id: <1170242747.6121.24.camel@violet>
+To: Oliver Neukum <oliver@neukum.name>
+In-Reply-To: <200701301713.01942.oliver@neukum.name>
+References: <200701301135.53178.oliver@neukum.name>
+	<1170154328.27519.27.camel@violet>
+	<200701301713.01942.oliver@neukum.name>
+Date: Tue, 30 Jan 2007 17:21:09 +0100
+Message-Id: <1170174069.27519.67.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] marshalling SDP_URL_STR
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>,
+        linux-kernel@vger.kernel.org, maxk@qualcomm.com
+Subject: Re: [Bluez-devel] trouble with sysfs and bluetooth
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,19 +24,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Steve,
+Hi Oliver,
 
-> It looks as if these types aren't being marshalled properly in the SDP
-> library. (They should be treated identically to SDP_TEXT_STR.)
+> > do you see them also with the plain vanilla 2.6.20-rc6 kernel or are
+> > these only coming up in Greg's tree?
 > 
-> The current code causes 1 byte too many to be allocated to them in the
-> marshalled form which results in garbage when it is read out of the
-> buffer.
-> 
-> The attached patch treats them the same as SDP_TEXT_STR, aside from the
-> DTD of course.
+> they are limited to Greg's tree.
 
-are you sure that this doesn't break anything?
+my first guess would that there is something wrong with Greg's tree or
+that one of this patches changes some behavior of the driver model.
 
 Regards
 
