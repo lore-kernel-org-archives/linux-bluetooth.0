@@ -1,16 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <ef9938ec0701301415u4f27bad8i3f165beaafb6161e@mail.gmail.com>
-Date: Tue, 30 Jan 2007 17:15:59 -0500
+Message-ID: <ef9938ec0701301404o42c00599mf12770f8141027f4@mail.gmail.com>
+Date: Tue, 30 Jan 2007 17:04:42 -0500
 From: "Albert Huang" <albert@csail.mit.edu>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <80236d750701300639w59ec30f0n7eeeca203a513be5@mail.gmail.com>
+In-Reply-To: <2e9fc96f0701290848j39544depaad1def88a36d161@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_127875_3336327.1170195359258"
-References: <80236d750701250229u61cbb820v929b8d0ad6ae3fb9@mail.gmail.com>
-	<ef9938ec0701271830p6f171d9cu892458220baa9362@mail.gmail.com>
-	<80236d750701300639w59ec30f0n7eeeca203a513be5@mail.gmail.com>
-Subject: Re: [Bluez-users] multithread / multi process use
+References: <2e9fc96f0701252321k59b0320cld9eef725a6cc06ac@mail.gmail.com>
+	<20070127035832.4aecaae8@localhost.localdomain>
+	<2e9fc96f0701270326g37539095s2c533407439ec8bc@mail.gmail.com>
+	<ef9938ec0701271824i65a6a58ejf43d3b02cffe6dff@mail.gmail.com>
+	<2e9fc96f0701290848j39544depaad1def88a36d161@mail.gmail.com>
+Subject: Re: [Bluez-users] Obex File Transfers between Nokia and BlueZ
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,74 +20,121 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-------=_Part_127875_3336327.1170195359258
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+obexftpd is old and outdated.  Additionally, I think it hardcodes the
+RFCOMM channel number to 10, so if you're going to use it, you'll
+probably need to use sdptool --channel=10 instead of --channel=9.
+It's better if you use an obex server that does SDP registration
+automatically.  I think collin mulliner's sobexsrv does this, although
+I haven't tried it myself.
+http://www.mulliner.org/bluetooth/sobexsrv.php
 
-> 1 .can the daemon  hci manage simultenous requests from variuos
-> process/threads without problem ?
-
-yes.  Currently, if one process attempts to start a device inquiry
-while one is already in progress, then hcid will raise a DBusException
-and refuse to honor the second request.  The second process may still
-listen for discovery and name lookup events.
-
-> 2 .where I can find some api docs(if any) about the hcid ?
-
-current document exists, but is difficult to find and not very
-beginner friendly.  Downoad the bluez-utils source and look in
-hcid/dbus-api.txt  You can use the attached python script as a
-starting point.  It's not terribly elegant about detecting when an
-inquiry is already in process, but I don't think that hcid is sending
-standardized error codes in its exceptions...
+In the past, I've had success with obexserver (
+http://packages.debian.org/stable/comm/obexserver ) which is just as
+old and outdated as obexftpd, but it works.  To use obexserver, you'll
+also need to register a service with sdptool:  sdptool add
+--channel=10 OPUSH ; obexserver.
 
 -albert
 
-------=_Part_127875_3336327.1170195359258
-Content-Type: text/x-python; name="inquiry-with-names.py"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="inquiry-with-names.py"
-X-Attachment-Id: f_exkw5a7c
-
-aW1wb3J0IGdvYmplY3QKaW1wb3J0IGRidXMKCmltcG9ydCBkYnVzLmdsaWIKCmRlZiBvblJlbW90
-ZU5hbWVVcGRhdGVkKCBhZGRyZXNzLCBuYW1lICk6CiAgICBwcmludCBhZGRyZXNzLCBuYW1lLmVu
-Y29kZSgidXRmLTgiKQoKZGVmIG9uRGlzY292ZXJ5Q29tcGxldGVkKCk6CiAgICBwcmludCAiZGlz
-Y292ZXJ5IGNvbXBsZXRlZCIKICAgIG1haW5sb29wLnF1aXQoKQoKYnVzID0gZGJ1cy5TeXN0ZW1C
-dXMoKQpibHVleiA9IGJ1cy5nZXRfb2JqZWN0KCdvcmcuYmx1ZXonLCAnL29yZy9ibHVleicpCm1h
-bmFnZXIgPSBkYnVzLkludGVyZmFjZShibHVleiwgJ29yZy5ibHVlei5NYW5hZ2VyJykKb2JqID0g
-YnVzLmdldF9vYmplY3QoJ29yZy5ibHVleicsIG1hbmFnZXIuRGVmYXVsdEFkYXB0ZXIoKSkKYWRh
-cHRlciA9IGRidXMuSW50ZXJmYWNlKG9iaiwgJ29yZy5ibHVlei5BZGFwdGVyJykKdHJ5OiAKICAg
-IGFkYXB0ZXIuRGlzY292ZXJEZXZpY2VzKCkKZXhjZXB0IGRidXMuREJ1c0V4Y2VwdGlvbiwgZToK
-ICAgIGlmIGUuYXJnc1swXSA9PSAiRGlzY292ZXIgaW4gcHJvZ3Jlc3MiOiAKICAgICAgICBwcmlu
-dCAiaGNpZCByZXBvcnRzIGV4aXN0aW5nIGRldmljZSBkaXNjb3ZlcnkgYWxyZWFkeSBpbiBwcm9n
-cmVzcy4iCgphZGFwdGVyLmNvbm5lY3RfdG9fc2lnbmFsKCAnRGlzY292ZXJ5Q29tcGxldGVkJywg
-b25EaXNjb3ZlcnlDb21wbGV0ZWQgKQphZGFwdGVyLmNvbm5lY3RfdG9fc2lnbmFsKCAnUmVtb3Rl
-TmFtZVVwZGF0ZWQnLCBvblJlbW90ZU5hbWVVcGRhdGVkICkKCm1haW5sb29wID0gZ29iamVjdC5N
-YWluTG9vcCgpCm1haW5sb29wLnJ1bigpCg==
-------=_Part_127875_3336327.1170195359258
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+On 1/29/07, Prabhu nath <gprabhunath@gmail.com> wrote:
+> Oops.. I am running an headless Linux (without X). Is there obex-server
+> which will work without X.  I browsed over to get obexserver-apps, which is
+> no more works for latest openobex lib.
+>
+> I am using obexftpd, I am not sure why it is not working for Nokia but works
+> for MotoQ.
+>
+>
+> Thanks,
+> Prabhu
+>
+>
+>
+>
+> On 1/28/07, Albert Huang <albert@csail.mit.edu> wrote:
+> > Are you sure you're actually running an obex server?  If you're using
+> > fedora, then you can use the obexserver that comes with
+> > gnome-bluetooth.  From the foot menu thing, you should find a menu
+> > option that allows you to receive files via bluetooth.  If your
+> > machine is advertising OPUSH but you're not actually running a server,
+> > then it's not going to work.  If you ever used the sdptool command,
+> > then you probably did something wrong.  This is a fairly standard
+> > usage of bluez and nokia phones.
+> >
+> > -albert
+> >
+> > On 1/27/07, Prabhu nath <gprabhunath@gmail.com> wrote:
+> > > I enabled piscan and again no luck.
+> > > I am able to push from BlueZ to Nokia, but vice-versa is not possible.
+> i.e.
+> > > Pushing an object/file from Nokia to BlueZ. I do the following on the
+> NOkia
+> > > cell phone to push a file.
+> > >
+> > > Select an image, and options->send->via Bluetooth->Select BT Device.
+> > > Once I do, the messsage, sending failed is displayed on the cell phone.
+> > >
+> > > -Prabhu
+> > >
+> > >
+> > >
+> > >
+> -------------------------------------------------------------------------
+> > > Take Surveys. Earn Cash. Influence the Future of IT
+> > > Join SourceForge.net's Techsay panel and you'll get the chance to share
+> your
+> > > opinions on IT & business topics through brief surveys - and earn cash
+> > >
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> > >
+> > > _______________________________________________
+> > > Bluez-users mailing list
+> > > Bluez-users@lists.sourceforge.net
+> > >
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> > >
+> > >
+> > >
+> >
+> >
+> -------------------------------------------------------------------------
+> > Take Surveys. Earn Cash. Influence the Future of IT
+> > Join SourceForge.net's Techsay panel and you'll get the chance to share
+> your
+> > opinions on IT & business topics through brief surveys - and earn cash
+> >
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >
+>
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys - and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+>
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>
+>
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-------=_Part_127875_3336327.1170195359258
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
-------=_Part_127875_3336327.1170195359258--
