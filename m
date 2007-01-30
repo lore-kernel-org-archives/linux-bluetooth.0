@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: paivakil@gmail.com (Mahesh T. Pai)
-Date: Wed, 31 Jan 2007 02:40:06 +0530
-Message-ID: <87tzy89q6p.fsf@nandini.home>
-Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-=-="
-Subject: [Bluez-users] 'hcitool scan' failing
+Message-ID: <80236d750701300639w59ec30f0n7eeeca203a513be5@mail.gmail.com>
+Date: Tue, 30 Jan 2007 15:39:45 +0100
+From: "Emanuele Novelli" <ema.novelli@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <ef9938ec0701271830p6f171d9cu892458220baa9362@mail.gmail.com>
+MIME-Version: 1.0
+References: <80236d750701250229u61cbb820v929b8d0ad6ae3fb9@mail.gmail.com>
+	<ef9938ec0701271830p6f171d9cu892458220baa9362@mail.gmail.com>
+Subject: Re: [Bluez-users] multithread / multi process use
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,201 +17,187 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0885668257=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---=-=-=
+--===============0885668257==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_24552_7512467.1170167985311"
+
+------=_Part_24552_7512467.1170167985311
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Well I maybe I could try this, just 2 questions:
+
+1 .can the daemon  hci manage simultenous requests from variuos
+process/threads without problem ?
+
+2 .where I can find some api docs(if any) about the hcid ?
+
+2007/1/28, Albert Huang <albert@csail.mit.edu>:
+>
+> I think the proper thing to do here is to have your application use
+> the D-Bus API, which should do the right thing across multiple
+> processes.  Maybe someone else who's more in touch with hcid can give
+> more details.
+>
+> -albert
+>
+> On 1/25/07, Emanuele Novelli <ema.novelli@gmail.com> wrote:
+> > Hello I'm new here, I searched for this issue but found nothing.
+> >
+> > Using 2 threads or 2 process for reading a name of a 2 remote devices at
+> > same time reports always the same name.
+> > Is this a bug or the hci functions in library do not support concurrent
+> use
+> > ?
+> > (using 2.6.19 kernel on FC6 and bluez libs 3.7.1)
+> >
+> > This is a simply way to reproduce this:
+> >
+> > open a 2 shells and issue 2 commands at same time
+> >
+> > hcitool name <bdaddress of a device close to you>
+> >
+> > they both report the same name
+> >
+> > here an HCI dump of what's happening
+> >
+> > 2007-01-25 11:15:06.093319 < HCI Command: Remote Name Request
+> (0x01|0x0019)
+> > plen 10
+> >     bdaddr 00:0A:28:DF:2B:D8 mode 2 clkoffset 0x0000
+> > 2007-01-25 11:15:06.114456 > HCI Event: Command Status (0x0f) plen 4
+> >     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> > 2007-01-25 11:15:06.712794 < HCI Command: Remote Name Request
+> (0x01|0x0019)
+> > plen 10
+> >     bdaddr 00:17:4B:D3:9F:5B mode 2 clkoffset 0x0000
+> > 2007-01-25 11:15:06.717442 > HCI Event: Command Status (0x0f) plen 4
+> >     Remote Name Request (0x01|0x0019) status 0x00 ncmd 0
+> > 2007-01-25 11:15:07.238429 > HCI Event: Remote Name Req Complete (0x07)
+> plen
+> > 255
+> >     status 0x00 bdaddr 00:0A:28:DF:2B:D8 name 'Seleso'
+> > 2007-01-25 11:15:07.239434 > HCI Event: Command Status (0x0f) plen 4
+> >     Unknown (0x00|0x0000) status 0x00 ncmd 1
+> > 2007-01-25 11:15:10.151342 > HCI Event: Remote Name Req Complete (0x07)
+> plen
+> > 255
+> >     status 0x00 bdaddr 00:17:4B:D3:9F:5B name 'Wince'
+> >
+> > the second event with the second name is tracked but never reported back
+> to
+> > the caller cause the unknown event received.
+> > so i see the name 'Seleso' as result on both the shells
+> >
+> > this is the behaviour if I use the 2 command sequentially they works
+> fine.
+> >
+> > hcitool name 00:0A:28:DF:2B:D8
+> >
+> > 2007-01-25 11:19:51.930394 < HCI Command: Remote Name Request
+> (0x01|0x0019)
+> > plen 10
+> >     bdaddr 00:0A:28:DF:2B:D8 mode 2 clkoffset 0x0000
+> > 2007-01-25 11:19:51.951520 > HCI Event: Command Status (0x0f) plen 4
+> >     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> > 2007-01-25 11:19:52.199514 > HCI Event: Remote Name Req Complete (0x07)
+> plen
+> > 255
+> >     status 0x00 bdaddr 00:0A:28:DF:2B:D8 name 'Seleso'
+> >
+> > hcitool name 00:17:4B:D3:9F:5B
+> >
+> > 2007-01-25 11:20:39.520967 < HCI Command: Remote Name Request
+> (0x01|0x0019)
+> > plen 10
+> >     bdaddr 00:17:4B:D3:9F:5B mode 2 clkoffset 0x0000
+> > 2007-01-25 11:20:39.542195 > HCI Event: Command Status (0x0f) plen 4
+> >     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> > 2007-01-25 11:20:43.358090 > HCI Event: Remote Name Req Complete (0x07)
+> plen
+> > 255
+> >     status 0x00 bdaddr 00:17:4B:D3:9F:5B name 'Wince'
+> >
+> >
+> >
+> >
+> > Since I need to use search names and search services (FAX especially) on
+> a
+> > multi-threaded application i'd like to know if is this possible or
+> somewhere
+> > there is a issue that prevent this.
+> >
+> >
+> >
+> >
+> -------------------------------------------------------------------------
+> > Take Surveys. Earn Cash. Influence the Future of IT
+> > Join SourceForge.net's Techsay panel and you'll get the chance to share
+> your
+> > opinions on IT & business topics through brief surveys - and earn cash
+> >
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> >
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >
+> >
+> >
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share
+> your
+> opinions on IT & business topics through brief surveys - and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+
+------=_Part_24552_7512467.1170167985311
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Well I maybe I could try this, just 2 questions:<br><br>1 .can the daemon&nbsp; hci manage simultenous requests from variuos process/threads without problem ?<br><br>2 .where I can find some api docs(if any) about the hcid ?<br>
+<br><div><span class="gmail_quote">2007/1/28, Albert Huang &lt;<a href="mailto:albert@csail.mit.edu">albert@csail.mit.edu</a>&gt;:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+I think the proper thing to do here is to have your application use<br>the D-Bus API, which should do the right thing across multiple<br>processes.&nbsp;&nbsp;Maybe someone else who&#39;s more in touch with hcid can give<br>more details.
+<br><br>-albert<br><br>On 1/25/07, Emanuele Novelli &lt;<a href="mailto:ema.novelli@gmail.com">ema.novelli@gmail.com</a>&gt; wrote:<br>&gt; Hello I&#39;m new here, I searched for this issue but found nothing.<br>&gt;<br>&gt; Using 2 threads or 2 process for reading a name of a 2 remote devices at
+<br>&gt; same time reports always the same name.<br>&gt; Is this a bug or the hci functions in library do not support concurrent use<br>&gt; ?<br>&gt; (using 2.6.19 kernel on FC6 and bluez libs 3.7.1)<br>&gt;<br>&gt; This is a simply way to reproduce this:
+<br>&gt;<br>&gt; open a 2 shells and issue 2 commands at same time<br>&gt;<br>&gt; hcitool name &lt;bdaddress of a device close to you&gt;<br>&gt;<br>&gt; they both report the same name<br>&gt;<br>&gt; here an HCI dump of what&#39;s happening
+<br>&gt;<br>&gt; 2007-01-25 11:15:06.093319 &lt; HCI Command: Remote Name Request (0x01|0x0019)<br>&gt; plen 10<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; bdaddr 00:0A:28:DF:2B:D8 mode 2 clkoffset 0x0000<br>&gt; 2007-01-25 11:15:06.114456 &gt; HCI Event: Command Status (0x0f) plen 4
+<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; Remote Name Request (0x01|0x0019) status 0x00 ncmd 1<br>&gt; 2007-01-25 11:15:06.712794 &lt; HCI Command: Remote Name Request (0x01|0x0019)<br>&gt; plen 10<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; bdaddr 00:17:4B:D3:9F:5B mode 2 clkoffset 0x0000
+<br>&gt; 2007-01-25 11:15:06.717442 &gt; HCI Event: Command Status (0x0f) plen 4<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; Remote Name Request (0x01|0x0019) status 0x00 ncmd 0<br>&gt; 2007-01-25 11:15:07.238429 &gt; HCI Event: Remote Name Req Complete (0x07) plen
+<br>&gt; 255<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; status 0x00 bdaddr 00:0A:28:DF:2B:D8 name &#39;Seleso&#39;<br>&gt; 2007-01-25 11:15:07.239434 &gt; HCI Event: Command Status (0x0f) plen 4<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; Unknown (0x00|0x0000) status 0x00 ncmd 1<br>&gt; 2007-01-25 11:15:
+10.151342 &gt; HCI Event: Remote Name Req Complete (0x07) plen<br>&gt; 255<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; status 0x00 bdaddr 00:17:4B:D3:9F:5B name &#39;Wince&#39;<br>&gt;<br>&gt; the second event with the second name is tracked but never reported back to
+<br>&gt; the caller cause the unknown event received.<br>&gt; so i see the name &#39;Seleso&#39; as result on both the shells<br>&gt;<br>&gt; this is the behaviour if I use the 2 command sequentially they works fine.<br>&gt;
+<br>&gt; hcitool name 00:0A:28:DF:2B:D8<br>&gt;<br>&gt; 2007-01-25 11:19:51.930394 &lt; HCI Command: Remote Name Request (0x01|0x0019)<br>&gt; plen 10<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; bdaddr 00:0A:28:DF:2B:D8 mode 2 clkoffset 0x0000<br>&gt; 2007-01-25 11:19:
+51.951520 &gt; HCI Event: Command Status (0x0f) plen 4<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; Remote Name Request (0x01|0x0019) status 0x00 ncmd 1<br>&gt; 2007-01-25 11:19:52.199514 &gt; HCI Event: Remote Name Req Complete (0x07) plen<br>&gt; 255<br>
+&gt;&nbsp;&nbsp;&nbsp;&nbsp; status 0x00 bdaddr 00:0A:28:DF:2B:D8 name &#39;Seleso&#39;<br>&gt;<br>&gt; hcitool name 00:17:4B:D3:9F:5B<br>&gt;<br>&gt; 2007-01-25 11:20:39.520967 &lt; HCI Command: Remote Name Request (0x01|0x0019)<br>&gt; plen 10
+<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; bdaddr 00:17:4B:D3:9F:5B mode 2 clkoffset 0x0000<br>&gt; 2007-01-25 11:20:39.542195 &gt; HCI Event: Command Status (0x0f) plen 4<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; Remote Name Request (0x01|0x0019) status 0x00 ncmd 1<br>&gt; 2007-01-25 11:20:
+43.358090 &gt; HCI Event: Remote Name Req Complete (0x07) plen<br>&gt; 255<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; status 0x00 bdaddr 00:17:4B:D3:9F:5B name &#39;Wince&#39;<br>&gt;<br>&gt;<br>&gt;<br>&gt;<br>&gt; Since I need to use search names and search services (FAX especially) on a
+<br>&gt; multi-threaded application i&#39;d like to know if is this possible or somewhere<br>&gt; there is a issue that prevent this.<br>&gt;<br>&gt;<br>&gt;<br>&gt; -------------------------------------------------------------------------
+<br>&gt; Take Surveys. Earn Cash. Influence the Future of IT<br>&gt; Join SourceForge.net&#39;s Techsay panel and you&#39;ll get the chance to share your<br>&gt; opinions on IT &amp; business topics through brief surveys - and earn cash
+<br>&gt; <a href="http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV">http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV</a><br>&gt;<br>&gt; _______________________________________________
+<br>&gt; Bluez-users mailing list<br>&gt; <a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a><br>&gt; <a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users
+</a><br>&gt;<br>&gt;<br>&gt;<br><br>-------------------------------------------------------------------------<br>Take Surveys. Earn Cash. Influence the Future of IT<br>Join SourceForge.net&#39;s Techsay panel and you&#39;ll get the chance to share your
+<br>opinions on IT &amp; business topics through brief surveys - and earn cash<br><a href="http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV">http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV
+</a><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">
+https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquote></div><br>
+
+------=_Part_24552_7512467.1170167985311--
 
 
-I  am trying to  set up  bluetooth networking  on two  systems running
-debian  unstable. One  is an  i386 and  other is  running  amd64.  The
-OS/software is otherwise identical for both systems.
-
-The USB dongles are detected, and  show up in output of 'hcitool dev';
-but neither  system picks up signals  from the other  - `hcitool scan'
-simply fails.
-
-Here is  is relevant output from  the i386 machine (no  network to the
-amd64 machine, obviously)
-
-Kernel version is 2.6.18-3-686 #1 SMP (it is a single processor
-machine, just in case it is relevant.)
-
-# lsmod |grep blue
-bluetooth              45732  8 bnep,rfcomm,l2cap,hci_usb
-
-# lsmod |grep usb
-hci_usb                16028  2
-bluetooth              45732  8 bnep,rfcomm,l2cap,hci_usb
-usbcore               112676  3 hci_usb,uhci_hcd
-
-# lsusb
-lsusb
-Bus 001 Device 002: ID 1131:1001 Integrated System Solution Corp. KY-BT100 Bluetooth Adapter
-Bus 001 Device 001: ID 0000:0000
-
-(device ID is same on both systems)
-
-Contents of /proc/bus/usb/devices is
-
-
-T:  Bus=01 Lev=00 Prnt=00 Port=00 Cnt=00 Dev#=  1 Spd=12  MxCh= 2
-B:  Alloc= 27/900 us ( 3%), #Int=  1, #Iso=  2
-D:  Ver= 1.10 Cls=09(hub  ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=0000 ProdID=0000 Rev= 2.06
-S:  Manufacturer=Linux 2.6.18-3-686 uhci_hcd
-S:  Product=UHCI Host Controller
-S:  SerialNumber=0000:00:07.2
-C:* #Ifs= 1 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 1 Cls=09(hub  ) Sub=00 Prot=00 Driver=hub
-E:  Ad=81(I) Atr=03(Int.) MxPS=   2 Ivl=255ms
-
-T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=16 #Cfgs=  1
-P:  Vendor=1131 ProdID=1001 Rev= 3.73
-S:  Product=ISSCBTA
-C:* #Ifs= 3 Cfg#= 1 Atr=c0 MxPwr=  0mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 2 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
-
-
-Output of /proc/devices is
-
-Character devices:
-  1 mem
-  2 pty
-  3 ttyp
-  4 /dev/vc/0
-  4 tty
-  4 ttyS
-  5 /dev/tty
-  5 /dev/console
-  5 /dev/ptmx
-  6 lp
-  7 vcs
- 10 misc
- 13 input
- 14 sound
- 29 fb
- 99 ppdev
-116 alsa
-128 ptm
-136 pts
-180 usb
-189 usb_device
-216 rfcomm
-226 drm
-
-Block devices:
-  1 ramdisk
-  2 fd
-  3 ide0
- 22 ide1
-
-I have attached a file which is the output of hcidump -w (as desired
-in the archives).
-
-Out put of hciconfig -a is:-
-
-hci0:   Type: USB
-        BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 48:10
-        UP RUNNING PSCAN ISCAN
-        RX bytes:2473 acl:0 sco:0 events:62 errors:0
-        TX bytes:983 acl:0 sco:0 commands:58 errors:0
-        Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: HOLD SNIFF PARK
-        Link mode: MASTER
-        Name: 'nandini.home-0'
-        Class: 0x3e0104
-        Service Classes: Networking, Rendering, Capturing, Object Transfer, Audio
-        Device Class: Computer, Desktop workstation
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe LMP Ver: 1.2 (0x2) LMP Subver: 0x1fe
-        Manufacturer: Integrated System Solution Corp. (57)
-
-
-On the amd64 system, the `Link Mode:' entry is `SLAVE ACCEPT', which I
-believe  is the  the way  it should  be. RSWITCH  is disabled  in Link
-Policy   line.  (I   have  been   playing  around   a  lot   with  the
-configuration.)
-
-Other USB devices work fine on both systems. (printer, digital camera,
-a nokia 3100 phone which will not work with gnokii... etc)
-
-For the amd64 machine, I checked the Mother board manufacturer's site
-for bios updates, and find that 4 later versions are
-available. (Again, just in case the info is relevant - thinking of
-bios upgrades because dmesg complains of losing clock ticks _and_ some
-thing about bios handoff failure.).
-
-Here is something which may be relevant in the logs:-
-
-Jan 31 00:26:14 nandini pand[7138]: Accept failed. Interrupted system call(4)
-Jan 31 00:26:14 nandini pand[7138]: Service record unregistration failed.
-Jan 31 00:27:38 nandini pand[8330]: Accept failed. Interrupted system call(4)
-Jan 31 00:27:38 nandini pand[8330]: Service record unregistration failed.
-Jan 31 00:28:45 nandini pand[8357]: Accept failed. Interrupted system call(4)
-
-(on later occassion - after a reboot).
-
-hcid[8383]: Can't open system message bus connection:
-+Failed to connect to socket /var/run/dbus/system_bus_socket: No such file or
-+directory
-Jan 31 01:32:06 nandini hcid[8383]: D-Bus failed to register /org/bluez/hci0
-+object
-
-[Where am I | what is] going wrong?
-
-
---=-=-=
-Content-Type: application/octet-stream
-Content-Disposition: attachment; filename=noremotedevice.log
-Content-Transfer-Encoding: base64
-
-CQAAAKeXv0W2YwEAAQEEBTOLnggABwABAKeXv0X0awEABA8EAAEBBAQAAQCxl79FAxUFAAQBAQAJ
-AAAAy5e/Rb0OCQABAQQFM4ueBgAHAAEAy5e/RT4eCQAEDwQAAQEEBAABANOXv0XmOQQABAEBAAkA
-AAD3mL9FvToJAAEBBAUzi54GAAcAAQD3mL9Fz0cJAAQPBAABAQQEAAEA/5i/RZRfBAAEAQEACQAA
-ACOav0UeVwkAAQEEBTOLngYABwABACOav0WqZQkABA8EAAEBBAQAAQArmr9FWYEEAAQBAQAJAAAA
-T5u/RW9zCQABAQQFM4ueBgAHAAEAT5u/RbJ/CQAEDwQAAQEEBAABAFebv0VllwQABAEBAAkAAAB7
-nL9Fs8gJAAEBBAUzi54GAAcAAQB7nL9FL9gJAAQPBAABAQQEAAEAg5y/Rb3zBAAEAQEACQAAAKed
-v0U46gkAAQEEBTOLngYABwABAKedv0UL+gkABA8EAAEBBAQAAQCvnb9F3BEFAAQBAQAJAAAA056/
-RZ5CCgABAQQFM4ueBgAHAAEA056/RT9SCgAEDwQAAQEEBAABANuev0UmagUABAEBAAkAAAD/n79F
-MF8KAAEBBAUzi54GAAcAAQD/n79FMWwKAAQPBAABAQQEAAEAB6C/RQCIBQAEAQEACQAAACuhv0Xb
-egoAAQEEBTOLngYABwABACuhv0UOigoABA8EAAEBBAQAAQAzob9F16EFAAQBAQAJAAAAV6K/ReCW
-CgABAQQFM4ueBgAHAAEAV6K/RSakCgAEDwQAAQEEBAABAF+iv0WwvwUABAEBAAkAAAA6o79FcM8E
-AAEBBAUzi54IAAcAAQA6o79FCN8EAAQPBAABAQQEAAEARKO/RR+ECAAEAQEACQAAAIOjv0VwsgoA
-AQEEBTOLngYABwABAIOjv0XcwQoABA8EAAEBBAQAAQCLo79Fn9kFAAQBAQA=
---=-=-=
-
- 
-(PS:- I am not subscribed - I use the gmane archives).
-
--- 
- Mahesh T. Pai <<>> http://paivakil.blogspot.com/
-Free Software - it is free as in FREEDOM
-
---=-=-=
+--===============0885668257==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -220,7 +208,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---=-=-=
+--===============0885668257==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -231,4 +219,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---=-=-=--
+--===============0885668257==--
