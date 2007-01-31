@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: paivakil@gmail.com (Mahesh T. Pai)
-Date: Wed, 31 Jan 2007 22:47:59 +0530
-Message-ID: <87mz3zi08o.fsf@nandini.home>
+Message-ID: <a481fbf0701310730n136e6bd0x2371ff37272e098f@mail.gmail.com>
+Date: Wed, 31 Jan 2007 10:30:15 -0500
+From: "Raymond Ingles" <sorceror171@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <87tzy89q6p.fsf@nandini.home>
+MIME-Version: 1.0
 References: <87tzy89q6p.fsf@nandini.home>
-	<a481fbf0701310730n136e6bd0x2371ff37272e098f@mail.gmail.com>
-Mime-Version: 1.0
 Subject: Re: [Bluez-users] 'hcitool scan' failing
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -20,34 +20,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-"Raymond Ingles" <sorceror171@gmail.com> writes:
+On 1/30/07, Mahesh T. Pai <paivakil@gmail.com> wrote:
+>
+> I  am trying to  set up  bluetooth networking  on two  systems running
+> debian  unstable. One  is an  i386 and  other is  running  amd64.  The
+> OS/software is otherwise identical for both systems.
 
-> On 1/30/07, Mahesh T. Pai <paivakil@gmail.com> wrote:
-
-> Bus 001 Device 024: ID 1131:1001 Integrated System Solution Corp.
-> KY-BT100 Bluetooth Adapter
+> Bus 001 Device 002: ID 1131:1001 Integrated System Solution Corp. KY-BT100 Bluetooth Adapter
+[...]
+> Out put of hciconfig -a is:-
 >
 > hci0:   Type: USB
->         BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 64:10
->
->  Note my BD address is also "11:11:11:11:11:11". These cheap dongles
-> appear to all have the same BD address. That will cause problems if
-> two of them are in range of each other; it's similar to having to
+>         BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 48:10
 
-Well, I have verified that the mac addreses are different. The dongles
-are from different vendors.
+ Here's the corresponding output on my system:
 
-And, some time back, I had got `hcitool scan' to detect the dongles,
-but after a reboot, they no longer get each other. The only thing I
-remember doing was to reconfigure libbluetooth2.
+Bus 001 Device 024: ID 1131:1001 Integrated System Solution Corp.
+KY-BT100 Bluetooth Adapter
 
-And I cannot find the bnep0 nr rfcomm0 interfaces, though the relevant
-modules are loaded in the kernel.
+hci0:   Type: USB
+        BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 64:10
 
--- 
- Mahesh T. Pai <<>> http://paivakil.blogspot.com/
-REVOLUTION, n. An abrupt change in the form of misgovernment.
+ Note my BD address is also "11:11:11:11:11:11". These cheap dongles
+appear to all have the same BD address. That will cause problems if
+two of them are in range of each other; it's similar to having to
+Ethernet cards on the same network with the same MAC address. This is
+a violation of the Bluetooth spec - those IDs are supposed to be
+unique. I suppose you get what you pay for.
 
+ If the BD address is the same for both machines, I don't think it's
+going to be possible to get them to talk to each other. They should be
+able to talk to other devices with other, unique BD addresses, but
+they will get seriously confused trying to communicate with each
+other.
+
+ Some Ethernet cards allow you to change their MAC address; anyone
+know of a way to change a dongle's BD address?
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
