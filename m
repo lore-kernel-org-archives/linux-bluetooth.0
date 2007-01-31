@@ -1,51 +1,51 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: CIJOML <cijoml@volny.cz>
-To: bluez-users@lists.sf.net
-Date: Fri, 1 Dec 2006 11:13:57 +0100
-MIME-Version: 1.0
-Message-Id: <200612011113.57351.cijoml@volny.cz>
-Subject: [Bluez-users] iptraf doesn't list / gathers statistics for bnep0
-	interface
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-2"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20070123154203.GA30435@salmon.maths.tcd.ie>
+References: <20070123154203.GA30435@salmon.maths.tcd.ie>
+Date: Wed, 31 Jan 2007 12:25:47 +0100
+Message-Id: <1170242747.6121.24.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] marshalling SDP_URL_STR
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Steve,
 
-I just noticed, that bnep0 doesn't gathers bnep0 statistics.
+> It looks as if these types aren't being marshalled properly in the SDP
+> library. (They should be treated identically to SDP_TEXT_STR.)
+> 
+> The current code causes 1 byte too many to be allocated to them in the
+> marshalled form which results in garbage when it is read out of the
+> buffer.
+> 
+> The attached patch treats them the same as SDP_TEXT_STR, aside from the
+> DTD of course.
 
-bnep0     Zapouzd=F8en=ED:Ethernet  HWadr 00:0D:88:XX:XX:XX
-          inet adr:192.168.56.1  V=B9esm=ECr:192.168.56.255 Maska:255.255.2=
-55.0
-          AKTIVOV=C1NO V=A9ESM=CCROV=C9_VYS=CDL=C1N=CD B=CC=AE=CD MULTICAST=
-  MTU:1500  Metrika:1
-          RX packets:2767 errors:0 dropped:0 overruns:0 frame:0
-          TX packets:4494 errors:0 dropped:0 overruns:0 carrier:0
-          koliz=ED:0 d=E9lka odchoz=ED fronty:1000
-          RX bytes:164767 (160.9 KiB)  TX bytes:6557844 (6.2 MiB)
+are you sure that this doesn't break anything?
 
-Should this be fixed?
+Regards
 
-thanks a lot
+Marcel
 
-Michal
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys - and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
