@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <a481fbf0701311057v61babe8em5e0708b4df2fa825@mail.gmail.com>
-References: <a481fbf0701311057v61babe8em5e0708b4df2fa825@mail.gmail.com>
-Date: Wed, 31 Jan 2007 20:07:15 +0100
-Message-Id: <1170270435.6121.83.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Support for random BT USB dongles?
+Message-ID: <a481fbf0701311057v61babe8em5e0708b4df2fa825@mail.gmail.com>
+Date: Wed, 31 Jan 2007 13:57:21 -0500
+From: "Raymond Ingles" <sorceror171@gmail.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-users] Support for random BT USB dongles?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,21 +18,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Raymond,
+ I've got a Class 2 dongle that works fine with Bluez and I've been
+pleased with it. However, I'd like better range and I see some cheap
+Class 1 dongles on eBay. My question is, how likely is it that some
+random USB dongle will work with Bluez?
 
->  I've got a Class 2 dongle that works fine with Bluez and I've been
-> pleased with it. However, I'd like better range and I see some cheap
-> Class 1 dongles on eBay. My question is, how likely is it that some
-> random USB dongle will work with Bluez?
+ How standardized is the interface to such devices? Is it like USB
+Mass Storage that works practically anywhere, or is it more
+idiosyncratic?
 
-it actually will, but I still advise people to get a CSR BlueCore4 based
-dongle. They simply still work best.
-
-Regards
-
-Marcel
-
-
+ Thanks for any advice you may have...
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
