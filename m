@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Paul Brook <paul@codesourcery.com>
-To: bluez-devel@lists.sf.net
-Date: Thu, 1 Feb 2007 14:54:02 +0000
+From: Fernando Unzu <fernando@bluexare.org>
+To: bluez-devel@lists.sourceforge.net
+Date: Thu, 1 Feb 2007 11:59:20 +0100
 MIME-Version: 1.0
-Message-Id: <200702011454.02418.paul@codesourcery.com>
-Subject: [Bluez-devel] Celluon CL800BT laserkey keyboard
+Message-Id: <200702011159.21531.fernando@bluexare.org>
+Subject: [Bluez-devel] About hci_inquiry (Num_Responses)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,15 +18,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I've recently obtained a Celluon CL800BT "Laserkey" bluetooth keyboard.
-I notice that fakehid.c has partial support for this device. It's initialized, 
-but the protocol decoding bits seem to be missing.
+Hello,
+I'm playing with hci_inquiry function and I have realizedthat Num_Responses, 
+who is passed like an argument to the function, does not do wath I want.
 
-Before I start reverse-engineering the protocol, is anyone already wokring on 
-this, or have any relevant information? Has anyone asked Celluon for protocol 
-documentation?
+I thought that this value told how many devices are scanned until the scanning 
+stopped.
+But this value tells how many devices "respond" the scan message (so one same 
+device can "respond" several times).
 
-Paul
+With the hcidump I have realized on that.
+
+I have realized this issue because I put this value to 7, for example, and 7 
+seconds to the len, but, without find the 7 devices, and without spend all 
+the time, the inquiry returns and saying only 3 devices found (for example).
+
+There is any way to solve this? Or is the implementation of this function to 
+do so...
+
+There is any solution? Can I, in any way, say the hci_inquiry to stop the scan 
+only when 7 (f.e) different devices respond, or only the unique solution is 
+to scan for over 40 or more devices, and find all devices, although others 
+respond several times...
+
+Can anybody tell me where is the hci_inquiry code to take a study?
+
+Thank you.
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
