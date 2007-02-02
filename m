@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <5b9417770702011934l7874d0d3ma50369b2c06a6fdc@mail.gmail.com>
-Date: Thu, 1 Feb 2007 21:34:18 -0600
+Message-ID: <5b9417770702011828lae2f2e2ra2769c75a6b8c049@mail.gmail.com>
+Date: Thu, 1 Feb 2007 20:28:09 -0600
 From: "John H." <mistamaila@gmail.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] can't get rfcomm connect to not "host is down"
+Subject: [Bluez-users] Trying to get PAND working with Moto Q,
+	regular BT transfer works
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +19,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Moto Q
+I got konqueror bluetooth:/// working fine, but not PAND
 
-hcitool inq
-Inquiring ...
-        00:1A:77:ED:D1:97       clock offset: 0x46b5    class: 0x72020c
+fc6 machine
+Bus 005 Device 009: ID 0a12:0001 Cambridge Silicon Radio, Ltd
+Bluetooth Dongle (HCI mode)
 
+PAND options on desktop are
+PANDARGS='--listen --role NAP --master --persist'
 
-rfcomm connect 00:1A:77:ED:D1:97 1
-Can't connect RFCOMM socket: Host is down
-
-
-can't connect happens after about 10 seconds.
-
-What to do?
+When i tell moto Q to search for PAN device, it says it cannot find one???
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
