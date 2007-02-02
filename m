@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <5b9417770702020026n1254c6e8gee05dbcb0cae1f44@mail.gmail.com>
-Date: Fri, 2 Feb 2007 02:26:15 -0600
+Message-ID: <5b9417770702012251n4fe995ach13def6d2f0780e66@mail.gmail.com>
+Date: Fri, 2 Feb 2007 00:51:53 -0600
 From: "John H." <mistamaila@gmail.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] PANd set up on Moto Q,
-	but how to access it from desktop?
+Subject: [Bluez-users] using bluetooth phone as a modem: wvdial says "not
+	responding"
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,12 +19,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I have pand working thanks to help in #bluez, and my moto Q sees it
-under it's PAND settings, however, it does not seem that you can set
-the IP on the moto Q for PAN.
+Moto Q with Sprint....
 
-So my question is, now that I am on a PAN between Desktop and moto Q,
-how do I access the moto Q from desktop through PAN?
+
+rfcomm connect 0 00:1A:77:ED1:97 1
+Connected /dev/rfcomm0 to 00:1A:77:ED1:97 on channel 1
+Press CTRL-C for hangup
+
+
+wvdial
+--> WvDial: Internet dialer version 1.54.0
+--> Warning: section [Dialer Defaults] does not exist in wvdial.conf.
+--> Cannot get information for serial port.
+--> Initializing modem.
+--> Sending: ATZ
+--> Sending: ATQ0
+--> Re-Sending: ATZ
+--> Modem not responding.
+
+
+any ideas?
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
