@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 02 Feb 2007 10:49:06 -0500
-From: Walt Shekrota <wshekrota@optonline.net>
-To: bluez-users@lists.sourceforge.net, wshekrota@optonline.net
-Message-id: <200702021049.06882.wshekrota@optonline.net>
-MIME-version: 1.0
-Subject: [Bluez-users] Ubuntu 6.06 and bluez setup problem?
+Date: Fri, 2 Feb 2007 10:31:51 -0500 (EST)
+From: Bob Dony <rdony@uoguelph.ca>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <Pine.LNX.4.64.0702020941290.16632@muskoka.eos.uoguelph.ca>
+MIME-Version: 1.0
+Subject: [Bluez-users] A2DP (Bluetooth ALSA) - almost there
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,148 +18,131 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Many things appear to work from install with the 6.06 Ubuntu's. I think bluez 
-is probably no exception. I have been having some problem that is subtle. It 
-relates to the utility starting up in client space and SDP server 
-responding "invalid exchange".
-Please see the pertinent listings below I hope I have included what you need.
-Any help or direction greatly appreciated.
-I have two dongles the one used here is Cellink BTA-3120 .... also have the 
-trendnet TBW-102UB.
+Hi folks,
 
--Walt
+Please excuse the request for a bit of help here from a newbie (to Bluez 
+that is...)
 
-====
+I think I have everything installed according to the websites (see below). 
+My problem is that I can't seem to get any sound through my HP BT-headset. 
+I've used both
+# sox bell.au -t alsa a2dpd
+and xmms with the Alsa plug-in Audio device to a2dpd
+and they play without complaint.  While I'm playing, the headset blue LED 
+switches to slow flashing, indicating a successful connection (I had 
+paired earlier & set the PIN).  My output of a2dpd while I'm playing
+in xmms is:
 
-Kubuntu 6.06
+A2DPD[784.525]: main_loop: New client 16
+A2DPD[784.525]: main_loop: Got index 0
+A2DPD[784.525]: poll_incoming_clients_sockets: PLAYBACK thread client_index=0, socket=16, id=0 started (44100 Hz, 2 channels, 16 bits)
+A2DPD[784.526]: a2dp_state_connect: State AVDTP_STATEX_SDP_CONNECTING
+A2DPD[784.526]: a2dpd_signal_state: Connecting 00:0D:44:2A:39:45
+A2DPD[784.527]: a2dp_state_machine: Role is INITIATOR
+A2DPD[784.527]: a2dp_state_machine: State AVDTP_STATEX_SDP_CONNECTING_WAIT
+A2DPD[784.923]: a2dp_state_machine: SDP connection terminated
+A2DPD[784.947]: get_avdtp_psm: Parsing results
+A2DPD[784.947]: get_avdtp_psm: Record
+A2DPD[784.947]: get_avdtp_psm: Service Search OK
+A2DPD[784.976]: get_avdtp_psm: Checking non spec audio
+A2DPD[784.977]: a2dp_state_machine: Found psm 25
+A2DPD[784.977]: a2dp_state_machine: State AVDTP_STATEX_CTL_CONNECTING
+A2DPD[784.977]: a2dp_state_machine: Socket is 17
+A2DPD[784.977]: a2dp_state_machine: State AVDTP_STATEX_CTL_CONNECTING_WAIT
+A2DPD[784.979]: a2dp_handler: Sound stream dry
+A2DPD[785.051]: a2dp_state_machine: State AVDTP_STATE_IDLE
+A2DPD[785.054]: a2dp_state_machine: State AVDTP_STATEX_DISCOVERING
+A2DPD[785.057]: a2dp_state_machine: State AVDTP_STATEX_DISCOVERING_RESP
+A2DPD[785.071]: a2dp_handler: Sound stream dry
+A2DPD[785.100]: a2dp_handle_avdtp_message: Read non command packet (msgtype=MESSAGE_TYPE_ACCEPT,signal=AVDTP_DISCOVER)
+A2DPD[785.100]: a2dp_state_machine: AVDTP_DISCOVER success
+A2DPD[785.100]: a2dp_state_machine: State AVDTP_STATEX_GETTING_CAPABILITIES
+A2DPD[785.103]: a2dp_state_machine: Getting capabilities for SEID=1
+A2DPD[785.103]: a2dp_state_machine: State AVDTP_STATEX_GETTING_CAPABILITIES_RESP
+A2DPD[785.129]: a2dp_handle_avdtp_message: Read non command packet (msgtype=MESSAGE_TYPE_ACCEPT,signal=AVDTP_GET_CAPABILITIES)
+A2DPD[785.129]: a2dp_state_machine: AVDTP_GET_CAPABILITIES success for seid 1
+A2DPD[785.129]: a2dp_state_machine: servcap_cap=1, servcap_len=0,
+A2DPD[785.129]: a2dp_state_machine: cap_type=7, length=6
+A2DPD[785.129]: a2dp_state_machine: media_type=0, codec=0
+A2DPD[785.129]: a2dp_state_machine: State AVDTP_STATEX_SETTING_CONFIGURATION
+A2DPD[785.132]: a2dp_state_machine: State AVDTP_STATEX_SETTING_CONFIGURATION_RESP
+A2DPD[785.164]: a2dp_handle_avdtp_message: Read non command packet (msgtype=MESSAGE_TYPE_ACCEPT,signal=AVDTP_SET_CONFIGURATION)
+A2DPD[785.164]: a2dp_state_machine: AVDTP_SET_CONFIGURATION success
+A2DPD[785.164]: a2dp_state_machine: State AVDTP_STATEX_STREAM_OPENING
+A2DPD[785.167]: a2dp_state_machine: State AVDTP_STATEX_STREAM_OPENING_RESP
+A2DPD[785.167]: a2dp_handler: Sound stream dry
+A2DPD[785.196]: a2dp_handle_avdtp_message: Read non command packet (msgtype=MESSAGE_TYPE_ACCEPT,signal=AVDTP_OPEN)
+A2DPD[785.196]: a2dp_state_machine: AVDTP_OPEN success
+A2DPD[785.196]: a2dp_state_machine: State AVDTP_STATE_CONFIGURED
+A2DPD[785.199]: a2dp_state_machine: State AVDTP_STATEX_STREAM_CONNECTING
+A2DPD[785.202]: a2dp_state_machine: Socket is 18
+A2DPD[785.202]: a2dp_state_machine: State AVDTP_STATEX_STREAM_CONNECTING_WAIT
+A2DPD[785.243]: a2dp_state_machine: Stream connected
+A2DPD[785.243]: a2dp_state_machine: State AVDTP_STATE_OPEN_START_STREAMING
+A2DPD[785.246]: a2dp_state_machine: State AVDTP_STATEX_STREAM_STARTING
+A2DPD[785.248]: a2dpd_signal_state: Connected 00:0D:44:2A:39:45
+A2DPD[785.248]: a2dp_state_machine: State AVDTP_STATEX_STREAM_STARTING_WAIT
+A2DPD[785.263]: a2dp_handler: Sound stream dry
+A2DPD[785.275]: a2dp_handle_avdtp_message: Read non command packet (msgtype=MESSAGE_TYPE_ACCEPT,signal=AVDTP_START)
+A2DPD[785.275]: a2dp_state_machine: AVDTP_START success
+A2DPD[785.275]: a2dp_state_machine: State AVDTP_STATE_STREAMING
+A2DPD[785.280]: avrcp_listener: socket 19: Connection from 45:39:2A:44:0D:00, mtu=672
+A2DPD[785.359]: a2dp_handler: Sound stream dry
+A2DPD[785.455]: a2dp_handler: Sound stream dry
+A2DPD[785.550]: a2dp_handler: Sound stream dry
+A2DPD[785.646]: a2dp_handler: Sound stream dry
+A2DPD[785.742]: a2dp_handler: Sound stream dry
+A2DPD[785.838]: a2dp_handler: Sound stream dry
+A2DPD[785.934]: a2dp_handler: Sound stream dry
+A2DPD[786.029]: a2dp_handler: Sound stream dry
+A2DPD[786.125]: a2dp_handler: Sound stream dry
+...
 
-First I insert the dongle and view the dmesg as below.
-Then I setup the headset leaving it waiting to pair.
-On my kde desktop I get the message "not paired" in a popup.
-Could it be the setup of the  file hcid.conf? (also below)
 
-hcitool scan
-Scanning ...
-        00:03:89:F7:A9:78       320Plantronics
+My particulars:
 
-hciconfig -a revision
-hci0:   Type: USB
-        BD Address: 00:0A:94:12:E1:D3 ACL MTU: 120:20 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:159 acl:0 sco:0 events:19 errors:0
-        TX bytes:73 acl:0 sco:0 commands:17 errors:0
-        Features: 0xff 0xff 0x05 0x38 0x18 0x18 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: ''
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x757
-        Manufacturer: Silicon Wave (11)
+Fedora Core 6
 
-dmesg
-[17179629.580000] Bluetooth: Core ver 2.8
-[17179629.580000] NET: Registered protocol family 31
-[17179629.580000] Bluetooth: HCI device and connection manager initialized
-[17179629.580000] Bluetooth: HCI socket layer initialized
-[17179629.612000] Bluetooth: L2CAP ver 2.8
-[17179629.612000] Bluetooth: L2CAP socket layer initialized
-[17179629.620000] Bluetooth: RFCOMM socket layer initialized
-[17179629.620000] Bluetooth: RFCOMM TTY layer initialized
-[17179629.620000] Bluetooth: RFCOMM ver 1.7
-[17179739.600000] usb 3-1: new full speed USB device using uhci_hcd and 
-address 2
-[17179741.132000] Bluetooth: HCI USB driver ver 2.9
-[17179741.136000] usbcore: registered new driver hci_usb
+gnome-bluetooth-libs-0.7.0-11.fc6
+bluez-hcidump-1.32-1
+bluez-utils-3.7-2
+bluez-libs-3.7-1
+bluez-utils-cups-3.7-2
+gnome-bluetooth-0.7.0-11.fc6
 
+Bluetooth ALSA packages (libsbc & plugz) downloaded and built according to:
+http://bluetooth-alsa.sourceforge.net/build.html
 
-uname -a
-Linux kubuntu 2.6.15-27-686 #1 SMP PREEMPT Sat Sep 16 02:13:27 UTC 2006 i686 
-GNU/Linux
+# hcitool info 00:0D:44:2A:39:45
+Requesting information ...
+         BD Address:  00:0D:44:2A:39:45
+         Device Name: BT-Headphones
+         LMP Version: 1.2 (0x2) LMP Subversion: 0x3d
+         Manufacturer: Zeevo, Inc. (18)
+         Features: 0xff 0x07 0x04 0x78 0x18 0x18 0x00 0x00
+                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                 <timing accuracy> <role switch> <hold mode> <sniff mode>
+                 <park state> <RSSI> <channel quality> <power control>
+                 <enhanced iscan> <interlaced iscan> <interlaced pscan>
+                 <inquiry with RSSI> <AFH cap. slave> <AFH class. slave>
+                 <AFH cap. master> <AFH class. master>
 
-btsco -v 00:03:89:F7:A9:78
-btsco v0.42
-Device is 1:0
-Error: Failed to connect to SDP server: Invalid exchange
-Assuming channel 2
+The bottom of my .a2dprc:
+# Your bluetooth headset address
+address=00:0D:44:2A:39:45
 
-Voice setting: 0x0060
-Can't connect RFCOMM channel: Invalid exchange
+# Address of your alsa output (default : plughw:0,0) you have to know what to do
+alsaoutput=
 
-cat /proc/asound/cards
-0 [I82801DBICH4   ]: ICH4 - Intel 82801DB-ICH4
-                     Intel 82801DB-ICH4 with ALC202 at 0xe0000c00, irq 217
-1 [Headset        ]: Bluetooth SCO - BT Headset
-                     BT Headset 1
-
-
-/etc/bluetooth/hcid.conf
-#
-# HCI daemon configuration file.
-#
-
-# HCId options
-options {
-	# Automatically initialize new devices
-	autoinit yes;
-
-	# Security Manager mode
-	#   none - Security manager disabled
-	#   auto - Use local PIN for incoming connections
-	#   user - Always ask user for a PIN
-	#
-	security user; 
-
-	# Pairing mode
-	#   none  - Pairing disabled
-	#   multi - Allow pairing with already paired devices
-	#   once  - Pair once and deny successive attempts
-	pairing multi;
-
-	# PIN helper
-	pin_helper /usr/bluez-pin
-
-	# D-Bus PIN helper
-	#dbus_pin_helper;
+And my .asoundrc:
+pcm.a2dpd {
+     type a2dpd
 }
 
-# Default settings for HCI devices
-device {
-	# Local device name
-	#   %d - device id
-	#   %h - host name
-	name "%h-%d";
 
-	# Local device class
-	class 0x3e0100;
-# class 0x100;
-	# Default packet type
-	#pkt_type DH1,DM1,HV1;
+Any other info needed?
 
-	# Inquiry and Page scan
-	iscan enable; pscan enable;
-
-	# Default link mode
-	#   none   - no specific policy 
-	#   accept - always accept incoming connections
-	#   master - become master on incoming connections,
-	#            deny role switch on outgoing connections
-	lm accept;
-
-	# Default link policy
-	#   none    - no specific policy
-	#   rswitch - allow role switch
-	#   hold    - allow hold mode
-	#   sniff   - allow sniff mode
-	#   park    - allow park mode
-	lp rswitch,hold,sniff,park;
-
-	# Authentication and Encryption (Security Mode 3)
-auth disable;
-encrypt disable;
-}
+Any pointers would be appreciated.
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
