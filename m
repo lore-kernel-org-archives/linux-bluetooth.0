@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <45C387D6.5040603@felton.felton.ca.us>
+Date: Fri, 02 Feb 2007 10:49:58 -0800
+From: Robert Lewis <rll@felton.felton.ca.us>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-From: paivakil@gmail.com (Mahesh T. Pai)
-Date: Sat, 03 Feb 2007 01:44:32 +0530
-Message-ID: <87veikco5z.fsf@nandini.home>
-References: <87tzy89q6p.fsf@nandini.home>
-	<a481fbf0701310730n136e6bd0x2371ff37272e098f@mail.gmail.com>
-	<87mz3zi08o.fsf@nandini.home>
-	<a481fbf0701311034w5648610bxa86cc16dd8e79a9e@mail.gmail.com>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] 'hcitool scan' failing
+Subject: [Bluez-users] Blue tooth headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,23 +18,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-"Raymond Ingles" <sorceror171@gmail.com> writes:
+I have a bluetooth headset with microphone.
+It works fine on XP.  I have bluetooth turned
+on the YaST hardware control panel.
 
-> further, I'm still a newbie myself at this. Do you have any other
-> bluetooth devices that you can successfully detect with those dongles,
-> as a test?
+lsusb shows:
+Bus 004 Device 002: ID 0b7a:0100 Zeevo, Inc.
 
-Tested; working with more than one device (both mobiles - one a Sony
-Ericsonn, and other a Motorola A920.
+I am on SUSE 10.2  with kernel 2.6.18.2-34-default
 
-I also cannot get to use rfcomm0 or bnep0 interfaces up. 
+Previous releases of SUSE did not recognize the
+above USB bluetooth dongle.  However, I now  see
+Bluetooth Audio Dongle   show up in both Skype
+devices and in Kmix via ALSA.
 
+However, even though the headset sync's up with
+the dongle I don't get any audio.  Skype reports:
+Problem with sound device.
 
--- 
- Mahesh T. Pai <<>> http://paivakil.blogspot.com/
-The trouble with the world is that the stupid are cocksure
-and the intelligent are full of doubt.
---Bertrand Russell
+hcitool scan        (reports)
+Device is not available: No such device
+
+Any suggestions on how to get this working?
+
+Cheers,
+Bob
+
 
 
 -------------------------------------------------------------------------
