@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45C43542.3060907@gmail.com>
-Date: Sat, 03 Feb 2007 02:09:54 -0500
-From: "JP Freeley (GMAIL-NYC)" <jpf321@gmail.com>
+Message-ID: <5b9417770702022258m314e8acbta6962a0e979eb01e@mail.gmail.com>
+Date: Sat, 3 Feb 2007 00:58:15 -0600
+From: "John H." <mistamaila@gmail.com>
+To: Bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] a2dp and multiple headsets
+Subject: [Bluez-devel] PAND and moto q
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,17 +18,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Pardon me if a FAQ or OT...
+Hi, I am running fc6 and have a moto Q i want to be on a PAN with.
 
-Is there a limit as to how many simultaneous headsets can be streaming 
-audio?
-Does anyone have suggestions about configurations, hardware, software to 
-stream to multiple headsets?
-I'm looking to "broadcast" stream to about 35 headsets simultaneously.
+If I run pand with...
 
-Thanks,
+--listen --role GN --master --persist
 
-jpf
+the moto Q can add it to its PAN, however, there are no options for it
+to set it's IP and what not.
+
+So, once my PC and the moto Q are on same PAN, how do I interact with Q?
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
