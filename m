@@ -1,6 +1,6 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45C5490C.5090703@gmail.com>
-Date: Sat, 03 Feb 2007 21:46:36 -0500
+Message-ID: <45C541B8.8030804@gmail.com>
+Date: Sat, 03 Feb 2007 21:15:20 -0500
 From: "JP Freeley (GMAIL-NYC)" <jpf321@gmail.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -18,32 +18,21 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0524642123=="
+Content-Type: multipart/mixed; boundary="===============1423656635=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 This is a multi-part message in MIME format.
---===============0524642123==
+--===============1423656635==
 Content-Type: multipart/alternative;
-	boundary="------------080404060709040302090304"
+	boundary="------------080902040105040901070006"
 
 This is a multi-part message in MIME format.
---------------080404060709040302090304
+--------------080902040105040901070006
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 
-brad --
-
-last question....if I indeed wanted to install 35 transmitters and 35 
-headsets, as crazy as that may sound, must I then worry about RF 
-interference in the room?
-
-you said "you'd never reach 35" and I'm not sure what my "limiting 
-factor would be"... is it RF interference?
-
-in general, how many BT radios (frequency-wise) can exist in a single room?
-
-thanks,
+got it .. thanks again.
 
 jpf
 
@@ -72,7 +61,7 @@ Brad Midgley wrote:
 >
 >   
 
---------------080404060709040302090304
+--------------080902040105040901070006
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 
@@ -82,19 +71,7 @@ Content-Transfer-Encoding: 7bit
   <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
 </head>
 <body bgcolor="#ffffff" text="#000000">
-brad --<br>
-<br>
-last question....if I indeed wanted to install 35 transmitters and 35
-headsets, as crazy as that may sound, must I then worry about RF
-interference in the room? <br>
-<br>
-you said "you'd never reach 35" and I'm not sure what my "limiting
-factor would be"... is it RF interference? <br>
-<br>
-in general, how many BT radios (frequency-wise) can exist in a single
-room?<br>
-<br>
-thanks, <br>
+got it .. thanks again. <br>
 <br>
 jpf<br>
 <br>
@@ -129,10 +106,10 @@ Bluez-devel mailing list
 </body>
 </html>
 
---------------080404060709040302090304--
+--------------080902040105040901070006--
 
 
---===============0524642123==
+--===============1423656635==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -143,7 +120,7 @@ Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier.
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0524642123==
+--===============1423656635==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -154,4 +131,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============0524642123==--
+--===============1423656635==--
