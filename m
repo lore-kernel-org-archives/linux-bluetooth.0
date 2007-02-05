@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45C71E02.5010803@sawicz.net>
-Date: Mon, 05 Feb 2007 13:07:30 +0100
-From: =?UTF-8?B?TWljaGHFgiBTYXdpY3o=?= <michal@sawicz.net>
+From: Fernando Unzu <fernando@bluexare.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Mon, 5 Feb 2007 10:08:32 +0100
+References: <200702011159.21531.fernando@bluexare.org>
+	<e1effdeb0702010940p62d29955o5d64caf71cb68aeb@mail.gmail.com>
+In-Reply-To: <e1effdeb0702010940p62d29955o5d64caf71cb68aeb@mail.gmail.com>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Headsetd "fallback" device
+Message-Id: <200702051008.32983.fernando@bluexare.org>
+Subject: Re: [Bluez-devel] About hci_inquiry (Num_Responses)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,154 +17,41 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1171027963=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a cryptographically signed message in MIME format.
 
---===============1171027963==
-Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
-	micalg=sha1; boundary="------------ms080509000301040002070301"
+> Hi Fernando,
+>
+> You can filter the HCI Inquiry Result Event, check the event content
+> and send the inquiry cancel command when you want(after 7 different
+> responses).
+>
+> Another approach is develop an application using the BlueZ D-Bus API.
+> Using the method DiscoverDevicesWithoutNameResolving/CancelDiscovery
+> and filtering for RemoteDeviceFound signals it is possible get the
+> result that you want.
+>
+> BR,
+> Claudio.
 
-This is a cryptographically signed message in MIME format.
+I have been studying the security code (in which it can be the function 
+inquiry result, and anothers, but I have not known how I can do it.
 
---------------ms080509000301040002070301
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+I don't know how I can check if the device is discovered already.
+Who have this information?
+And, how can I avoid this repeated device to include in the information of 
+devices that have responded?
 
-I just thought about something like that... There should be a
-possibility in headsetd or maybe the plugz, that would switch to a
-fallback device, if the headset can't be connected (it's switched off or
-whatever). The way it's working now - dropping the stream to /dev/null
-or wherever is not a wanted behavior, when someone calls You on a softpho=
-ne.
-
-
---=20
-Cheers,
-Micha=C5=82 Sawicz
-
-
---------------ms080509000301040002070301
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-IEZSRUUgaGVhZCBvdmVyIHRvIGh0dHA6Ly93d3cuQ0FjZXJ0Lm9yZzAyBggrBgEFBQcBAQQm
-MCQwIgYIKwYBBQUHMAGGFmh0dHA6Ly9vY3NwLmNhY2VydC5vcmcwHAYDVR0RBBUwE4ERbWlj
-aGFsQHNhd2ljei5uZXQwDQYJKoZIhvcNAQEFBQADggIBACRHvL4ShgoCZE+Mr7TSeMhpwsHw
-o4/2E2FuMaet7inaNWhwzcluCkq3FrLgzrsOnz2p5iyUU1B4ZQr32zvpHBNvKawEZbNMGC8w
-6FyZ6Il7g+K95bB8M2a3mQzkv6KgwnFpKztPd8moelW0wtGqGDeZVmkEmRNbOagpsUbq20cC
-DqNMCRj44f7aVM5ro2SXuyEgQZ4jFC6UkErHuaShDFnUbLH6Ue53h4Ki2P4v21VZicMyUBDF
-Sb3mx9b8vhBy4tD+BU9lBQIRYrvZFVgRBrzpAQTwgerxf+Fs5mTxWNEhmKqUbHBuCi6pghZn
-sze7PGFIopyQkAmRZng760qcNuzL1l33UqvYVSTiF7lo+AATmw4hyglwMLS/8Y0ZDq5OabyA
-OATQZA9vH5Adtu8tvpM+aZsjmZfSxPSvbD2O/vvgaq8fAQ4JJmsu8SZCyN93ckvFyUt9D4GQ
-hCGzIBAFLeTA3pQKnsFNHsRpJSwpAc2BldaeFcpP0Kmqpy075px4X3sIhu8jy7z1UXwpEwBv
-HQr8gfzF0j6pES3r24KyAJtxC+hMOafl6rRmElp0pmZZZdQBpMjFuMXBos8/qJ2tHobS/r1J
-848Gr4vyKxgpD9S7CbV0HpQyog0Y1v6dSaJGJSCz1dJi5tOkpb1hykKf+aK6ykSXH3yai0z5
-csTJ0jaNMIIGCDCCA/CgAwIBAgIBATANBgkqhkiG9w0BAQQFADB5MRAwDgYDVQQKEwdSb290
-IENBMR4wHAYDVQQLExVodHRwOi8vd3d3LmNhY2VydC5vcmcxIjAgBgNVBAMTGUNBIENlcnQg
-U2lnbmluZyBBdXRob3JpdHkxITAfBgkqhkiG9w0BCQEWEnN1cHBvcnRAY2FjZXJ0Lm9yZzAe
-Fw0wNTEwMTQwNzM2NTVaFw0zMzAzMjgwNzM2NTVaMFQxFDASBgNVBAoTC0NBY2VydCBJbmMu
-MR4wHAYDVQQLExVodHRwOi8vd3d3LkNBY2VydC5vcmcxHDAaBgNVBAMTE0NBY2VydCBDbGFz
-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
-K4/NiAgd6Jg3i+crfJXkJIVYAAAAAAAA
---------------ms080509000301040002070301--
-
-
---===============1171027963==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Thank you for the help
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier.
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============1171027963==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1171027963==--
