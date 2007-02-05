@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45C7C6DF.20106@killesreiter.de>
-Date: Tue, 06 Feb 2007 01:07:59 +0100
-From: Gerhard Killesreiter <gerhard@killesreiter.de>
-MIME-Version: 1.0
+Date: Mon, 05 Feb 2007 18:03:10 -0500
+From: Walt Shekrota <innkeep@capital.net>
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] headset /SCO / plugz
+Message-id: <200702051803.10789.innkeep@capital.net>
+MIME-version: 1.0
+Subject: [Bluez-users] Ubuntu 6.06 and bluez setup problem?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,36 +18,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi there!
+how do I determine the proper class as used in hcid.conf
+and channel as used in rfcomm.conf?
 
-Since I never got to work my headset with the old btsco method I decided 
-to try the new plugz method. However that method isn't well documented 
-and everything I found through google referred to the old method.
+I think I have found my problem but can't confirm it yet.
+I have 2 dongles 
+one a Cellink BTA-3120 (not a 3000) so probably the manaufacturer has changed 
+the chipset
+another a trendnet 102ub
+I thought this should work being it is listed in the Holtmann feature list?
+Perhaps in later revisions they too changed chipset?
+Or are only some of these dongles listed in the feature list usable for Linux? 
+If so how do you tell?
+At any rate I've chickened out before I have a box of useless dongles I'll go 
+for the DBT-120 at proper revision to be sure.
 
-What I have:
+If someone could kindly post some info or a confirmation I might be right it 
+would be helpful. I've got to say this is one of the most difficult areas in 
+the linux user arena. Somehow it has to be made more simple. 
 
-1) usb bluetooth dongle (CSR chip):
-Bus 002 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth 
-Dongle (HCI mode)
+Possibly supporting more chipsets would help. Is this a future work item?
 
-2) bluetooth headset:         00:0D:44:2F:CC:A3       Logitech HS02-V07
-
-3) I've found the install instructions! 
-http://bluetooth-alsa.sourceforge.net/build.html
-
-4) I've built and installed sbc and plugz.
-
-5) I am running Kernel 2.6.19.2 with the patch from plugz applied (also 
-suspend2) on Debian etch.
-
-6) now what? a2dpd doesn't show up in my output choices in xmms, 
-"headset" shows up as a choice for the mixer device, but not the general 
-output device.
-
-I am pretty sure I am missing something obvious, but what?
-
-Cheers,
-	Gerhard
+Thanks.
+-Walt
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
