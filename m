@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <e29894ca0702050455l24a8eb99pf654d277a5524015@mail.gmail.com>
-Date: Mon, 5 Feb 2007 14:55:04 +0200
-From: "=?ISO-8859-1?Q?Marc-Andr=E9_Lureau?=" <marcandre.lureau@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45C71E02.5010803@sawicz.net>
+Message-ID: <45C71E02.5010803@sawicz.net>
+Date: Mon, 05 Feb 2007 13:07:30 +0100
+From: =?UTF-8?B?TWljaGHFgiBTYXdpY3o=?= <michal@sawicz.net>
 MIME-Version: 1.0
-References: <45C71E02.5010803@sawicz.net>
-Subject: Re: [Bluez-devel] Headsetd "fallback" device
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] Headsetd "fallback" device
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,79 +14,135 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1799485461=="
+Content-Type: multipart/mixed; boundary="===============1171027963=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1799485461==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_23481_21977434.1170680104526"
+This is a cryptographically signed message in MIME format.
 
-------=_Part_23481_21977434.1170680104526
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+--===============1171027963==
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
+	micalg=sha1; boundary="------------ms080509000301040002070301"
+
+This is a cryptographically signed message in MIME format.
+
+--------------ms080509000301040002070301
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+I just thought about something like that... There should be a
+possibility in headsetd or maybe the plugz, that would switch to a
+fallback device, if the headset can't be connected (it's switched off or
+whatever). The way it's working now - dropping the stream to /dev/null
+or wherever is not a wanted behavior, when someone calls You on a softpho=
+ne.
+
+
+--=20
+Cheers,
+Micha=C5=82 Sawicz
+
+
+--------------ms080509000301040002070301
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
-Content-Disposition: inline
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-T24gMi81LzA3LCBNaWNoYbMgU2F3aWN6IDxtaWNoYWxAc2F3aWN6Lm5ldD4gd3JvdGU6Cj4KPiBJ
-IGp1c3QgdGhvdWdodCBhYm91dCBzb21ldGhpbmcgbGlrZSB0aGF0Li4uIFRoZXJlIHNob3VsZCBi
-ZSBhCj4gcG9zc2liaWxpdHkgaW4gaGVhZHNldGQgb3IgbWF5YmUgdGhlIHBsdWd6LCB0aGF0IHdv
-dWxkIHN3aXRjaCB0byBhCj4gZmFsbGJhY2sgZGV2aWNlLCBpZiB0aGUgaGVhZHNldCBjYW4ndCBi
-ZSBjb25uZWN0ZWQgKGl0J3Mgc3dpdGNoZWQgb2ZmIG9yCj4gd2hhdGV2ZXIpLiBUaGUgd2F5IGl0
-J3Mgd29ya2luZyBub3cgLSBkcm9wcGluZyB0aGUgc3RyZWFtIHRvIC9kZXYvbnVsbAo+IG9yIHdo
-ZXJldmVyIGlzIG5vdCBhIHdhbnRlZCBiZWhhdmlvciwgd2hlbiBzb21lb25lIGNhbGxzIFlvdSBv
-biBhCj4gc29mdHBob25lLgoKClRoaXMga2luZCBvZiBzdHVmZiBhcmUgdXBwZXIgbGV2ZWwgbWFu
-YWdlbWVudC4gRXZlbiBBTFNBIGRvIG5vdCBoYW5kbGUgdGhpcwpwcm9wZXJseSAoaWYgeW91IHBs
-dWcvdW5wbHVnIGEgdXNiIGRldmljZSkuIFRoYXQncyB3aHkgYWxsIHRoZSBtYWpvcgpkaXN0cmli
-dXRpb25zIHdpbGwgc2hpcCB3aXRoIFB1bHNlQXVkaW8gaW5zdGFsbGVkLgoKTXkgUE9WIGlzIHRo
-YXQgd2UgbmVlZCB0byBmb2N1cyBvbiB0aGUgaW8gYXVkaW8gc3RyZWFtIGludGVyZmFjZSBhbmQg
-cHJvdmlkZQphIHN0YW5kYXJkIExpbnV4IGRldmljZSAod2l0aCBIQUwgYW5kIEFMU0EpLiBUaGUg
-dW5kZXJseWluZyBoZWFkc2V0L2F1ZGlvCmRldmljZSBjYW4gYmUgYWNjZXNzaWJsZSBhcyBhbnkg
-c2ltcGxlIHBjbSBkZXZpY2UgKHdpdGggcmVzc291cmNlCmNvbnN0cmFpbnRzIHRoYXQgYWxyZWFk
-eSBleGlzdHMpLgoKTWl4aW5nLCByb3V0aW5nLCBkZXZpY2UgYWJzdHJhY3Rpb24sIHNhbXBsZSBy
-YXRlIGNvbnZlcnNpb24gYW5kIGV2ZW4KZW5jb2RpbmcuLi4gc2hvdWxkIGJlIGhhbmRsZWQgYnkg
-dXBwZXIgbGV2ZWwgYXBwbGljYXRpb25zLgoKSWYgeW91IHdhbnQgdG8gam9pbiB0aGUgZGVzaWdu
-IGRpc2N1c3Npb24sIHdlIGNvdWxkIGhhdmUgYSBGQVEgaW4gdGhlCmh0dHA6Ly93aWtpLmJsdWV6
-Lm9yZy93aWtpL0F1ZGlvIHdpa2kuIFBsZWFzZSBmZWVsIGZyZWUgdG8gYWRkIHlvdXIKY29tbWVu
-dHMmcXVlc3Rpb25zIHRoZXJlICh0aGlzIGlzIHN0aWxsIHZlcnkgKmRyYWZ0eSogYnR3KQoKUmVn
-YXJkcywKLS0gCk1hcmMtQW5kcukgTHVyZWF1LCBHU21hcnRNaXgK
-------=_Part_23481_21977434.1170680104526
-Content-Type: text/html; charset=ISO-8859-2
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+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
+IEZSRUUgaGVhZCBvdmVyIHRvIGh0dHA6Ly93d3cuQ0FjZXJ0Lm9yZzAyBggrBgEFBQcBAQQm
+MCQwIgYIKwYBBQUHMAGGFmh0dHA6Ly9vY3NwLmNhY2VydC5vcmcwHAYDVR0RBBUwE4ERbWlj
+aGFsQHNhd2ljei5uZXQwDQYJKoZIhvcNAQEFBQADggIBACRHvL4ShgoCZE+Mr7TSeMhpwsHw
+o4/2E2FuMaet7inaNWhwzcluCkq3FrLgzrsOnz2p5iyUU1B4ZQr32zvpHBNvKawEZbNMGC8w
+6FyZ6Il7g+K95bB8M2a3mQzkv6KgwnFpKztPd8moelW0wtGqGDeZVmkEmRNbOagpsUbq20cC
+DqNMCRj44f7aVM5ro2SXuyEgQZ4jFC6UkErHuaShDFnUbLH6Ue53h4Ki2P4v21VZicMyUBDF
+Sb3mx9b8vhBy4tD+BU9lBQIRYrvZFVgRBrzpAQTwgerxf+Fs5mTxWNEhmKqUbHBuCi6pghZn
+sze7PGFIopyQkAmRZng760qcNuzL1l33UqvYVSTiF7lo+AATmw4hyglwMLS/8Y0ZDq5OabyA
+OATQZA9vH5Adtu8tvpM+aZsjmZfSxPSvbD2O/vvgaq8fAQ4JJmsu8SZCyN93ckvFyUt9D4GQ
+hCGzIBAFLeTA3pQKnsFNHsRpJSwpAc2BldaeFcpP0Kmqpy075px4X3sIhu8jy7z1UXwpEwBv
+HQr8gfzF0j6pES3r24KyAJtxC+hMOafl6rRmElp0pmZZZdQBpMjFuMXBos8/qJ2tHobS/r1J
+848Gr4vyKxgpD9S7CbV0HpQyog0Y1v6dSaJGJSCz1dJi5tOkpb1hykKf+aK6ykSXH3yai0z5
+csTJ0jaNMIIGCDCCA/CgAwIBAgIBATANBgkqhkiG9w0BAQQFADB5MRAwDgYDVQQKEwdSb290
+IENBMR4wHAYDVQQLExVodHRwOi8vd3d3LmNhY2VydC5vcmcxIjAgBgNVBAMTGUNBIENlcnQg
+U2lnbmluZyBBdXRob3JpdHkxITAfBgkqhkiG9w0BCQEWEnN1cHBvcnRAY2FjZXJ0Lm9yZzAe
+Fw0wNTEwMTQwNzM2NTVaFw0zMzAzMjgwNzM2NTVaMFQxFDASBgNVBAoTC0NBY2VydCBJbmMu
+MR4wHAYDVQQLExVodHRwOi8vd3d3LkNBY2VydC5vcmcxHDAaBgNVBAMTE0NBY2VydCBDbGFz
+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
+K4/NiAgd6Jg3i+crfJXkJIVYAAAAAAAA
+--------------ms080509000301040002070301--
 
-PGJyPjxkaXY+PHNwYW4gY2xhc3M9ImdtYWlsX3F1b3RlIj5PbiAyLzUvMDcsIDxiIGNsYXNzPSJn
-bWFpbF9zZW5kZXJuYW1lIj5NaWNoYbMgU2F3aWN6PC9iPiAmbHQ7PGEgaHJlZj0ibWFpbHRvOm1p
-Y2hhbEBzYXdpY3oubmV0Ij5taWNoYWxAc2F3aWN6Lm5ldDwvYT4mZ3Q7IHdyb3RlOjwvc3Bhbj48
-YmxvY2txdW90ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJib3JkZXItbGVmdDogMXB4IHNv
-bGlkIHJnYigyMDQsIDIwNCwgMjA0KTsgbWFyZ2luOiAwcHQgMHB0IDBwdCAwLjhleDsgcGFkZGlu
-Zy1sZWZ0OiAxZXg7Ij4KSSBqdXN0IHRob3VnaHQgYWJvdXQgc29tZXRoaW5nIGxpa2UgdGhhdC4u
-LiBUaGVyZSBzaG91bGQgYmUgYTxicj5wb3NzaWJpbGl0eSBpbiBoZWFkc2V0ZCBvciBtYXliZSB0
-aGUgcGx1Z3osIHRoYXQgd291bGQgc3dpdGNoIHRvIGE8YnI+ZmFsbGJhY2sgZGV2aWNlLCBpZiB0
-aGUgaGVhZHNldCBjYW4mIzM5O3QgYmUgY29ubmVjdGVkIChpdCYjMzk7cyBzd2l0Y2hlZCBvZmYg
-b3I8YnI+d2hhdGV2ZXIpLiBUaGUgd2F5IGl0JiMzOTtzIHdvcmtpbmcgbm93IC0gZHJvcHBpbmcg
-dGhlIHN0cmVhbSB0byAvZGV2L251bGwKPGJyPm9yIHdoZXJldmVyIGlzIG5vdCBhIHdhbnRlZCBi
-ZWhhdmlvciwgd2hlbiBzb21lb25lIGNhbGxzIFlvdSBvbiBhIHNvZnRwaG9uZS48L2Jsb2NrcXVv
-dGU+PGRpdj48YnI+VGhpcyBraW5kIG9mIHN0dWZmIGFyZSB1cHBlciBsZXZlbCBtYW5hZ2VtZW50
-LiBFdmVuIEFMU0EgZG8gbm90IGhhbmRsZSB0aGlzIHByb3Blcmx5IChpZiB5b3UgcGx1Zy91bnBs
-dWcgYSB1c2IgZGV2aWNlKS4gVGhhdCYjMzk7cyB3aHkgYWxsIHRoZSBtYWpvciBkaXN0cmlidXRp
-b25zIHdpbGwgc2hpcCB3aXRoIFB1bHNlQXVkaW8gaW5zdGFsbGVkLiAKPGJyPjxicj5NeSBQT1Yg
-aXMgdGhhdCB3ZSBuZWVkIHRvIGZvY3VzIG9uIHRoZSBpbyBhdWRpbyBzdHJlYW0gaW50ZXJmYWNl
-IGFuZCBwcm92aWRlIGEgc3RhbmRhcmQgTGludXggZGV2aWNlICh3aXRoIEhBTCBhbmQgQUxTQSku
-IFRoZSB1bmRlcmx5aW5nIGhlYWRzZXQvYXVkaW8gZGV2aWNlIGNhbiBiZSBhY2Nlc3NpYmxlIGFz
-IGFueSBzaW1wbGUgcGNtIGRldmljZSAod2l0aCByZXNzb3VyY2UgY29uc3RyYWludHMgdGhhdCBh
-bHJlYWR5IGV4aXN0cykuCjxicj48YnI+TWl4aW5nLCByb3V0aW5nLCBkZXZpY2UgYWJzdHJhY3Rp
-b24sIHNhbXBsZSByYXRlIGNvbnZlcnNpb24gYW5kIGV2ZW4gZW5jb2RpbmcuLi4gc2hvdWxkIGJl
-IGhhbmRsZWQgYnkgdXBwZXIgbGV2ZWwgYXBwbGljYXRpb25zLjxicj48L2Rpdj48YnI+SWYgeW91
-IHdhbnQgdG8gam9pbiB0aGUgZGVzaWduIGRpc2N1c3Npb24sIHdlIGNvdWxkIGhhdmUgYSBGQVEg
-aW4gdGhlIDxhIGhyZWY9Imh0dHA6Ly93aWtpLmJsdWV6Lm9yZy93aWtpL0F1ZGlvIj4KaHR0cDov
-L3dpa2kuYmx1ZXoub3JnL3dpa2kvQXVkaW88L2E+IHdpa2kuIFBsZWFzZSBmZWVsIGZyZWUgdG8g
-YWRkIHlvdXIgY29tbWVudHMmYW1wO3F1ZXN0aW9ucyB0aGVyZSAodGhpcyBpcyBzdGlsbCB2ZXJ5
-ICpkcmFmdHkqIGJ0dyk8YnI+PGJyPlJlZ2FyZHMsPGJyPjwvZGl2Pi0tIDxicj5NYXJjLUFuZHLp
-IEx1cmVhdSwgR1NtYXJ0TWl4Cg==
-------=_Part_23481_21977434.1170680104526--
 
-
---===============1799485461==
+--===============1171027963==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -99,7 +153,7 @@ Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier.
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============1799485461==
+--===============1171027963==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -110,4 +164,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1799485461==--
+--===============1171027963==--
