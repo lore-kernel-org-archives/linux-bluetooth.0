@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Fernando Unzu <fernando@bluexare.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Mon, 5 Feb 2007 10:08:32 +0100
-References: <200702011159.21531.fernando@bluexare.org>
-	<e1effdeb0702010940p62d29955o5d64caf71cb68aeb@mail.gmail.com>
-In-Reply-To: <e1effdeb0702010940p62d29955o5d64caf71cb68aeb@mail.gmail.com>
+Message-ID: <45C6E241.4000508@idlum.be>
+Date: Mon, 05 Feb 2007 08:52:33 +0100
+From: Pierre-Yves Paulus <py@idlum.be>
 MIME-Version: 1.0
-Message-Id: <200702051008.32983.fernando@bluexare.org>
-Subject: Re: [Bluez-devel] About hci_inquiry (Num_Responses)
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] Configure timeout before NoReply error is fired?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,30 +18,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hello,
 
-> Hi Fernando,
->
-> You can filter the HCI Inquiry Result Event, check the event content
-> and send the inquiry cancel command when you want(after 7 different
-> responses).
->
-> Another approach is develop an application using the BlueZ D-Bus API.
-> Using the method DiscoverDevicesWithoutNameResolving/CancelDiscovery
-> and filtering for RemoteDeviceFound signals it is possible get the
-> result that you want.
->
-> BR,
-> Claudio.
+After a DBus call to the method Connect(string address, string service) 
+from the RFCOMM hierarchy (eg to a phone's OPP Server), a NoReply error 
+is sent roughly after 15s if user does not accept the connection.
 
-I have been studying the security code (in which it can be the function 
-inquiry result, and anothers, but I have not known how I can do it.
+Is it possible to change the length of that timeout? Where is its 
+duration specified?
 
-I don't know how I can check if the device is discovered already.
-Who have this information?
-And, how can I avoid this repeated device to include in the information of 
-devices that have responded?
+Thanks,
+Best Regards.
 
-Thank you for the help
+Pierre-Yves
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
