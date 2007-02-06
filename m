@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Mark Hellman <markhellman@techie.com>
-Date: Tue, 06 Feb 2007 13:06:29 +0000
-Message-ID: <eq9ugs$63s$1@sea.gmane.org>
-References: <1170700026.3240.56.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Plugz with Dell inbuilt-BT
+Message-ID: <5b9417770702052240o19583b4ev2167b689246663b6@mail.gmail.com>
+Date: Tue, 6 Feb 2007 00:40:10 -0600
+From: "John H." <mistamaila@gmail.com>
+To: bluez-users@lists.sourceforge.net, Bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] How to use BT DUN? Getting errors on Dialing
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,23 +18,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Jon Barnett wrote:
+Sprint motorola Q.
 
-> The only problem is that skype can't use the plugz device as it doesn't
-> recognize it  - since it doesn't do detection of available pcm devices.
+In XP, can dial #777 with bluetooth DUN and internet connects/works
+fine, but in Linux, despite creating rfcomm device....
 
->>From a user's perspective that is, in my opinion, the main problem with
-using plugz instead of btsco. Skype and Ekiga are the reasons why 90% of
-users want to install plugz.
 
-Is this an ALSA limitation, or isn't Skype using the right functions from
-the ALSA's API to enumerate all available devices? Who must be fixes: Skype
-of ALSA?
-Could some developer enlighten us on this issue?
+wvdial
+--> WvDial: Internet dialer version 1.54.0
+--> Warning: section [Dialer Defaults] does not exist in wvdial.conf.
+--> Cannot get information for serial port.
+--> Initializing modem.
+--> Sending: ATZ
+--> Sending: ATQ0
+--> Re-Sending: ATZ
+--> Modem not responding.
 
-Thanks,
-Mark
 
+what to do?  rfcomm was created, it even prompted me to pair the
+device, and konqueror bluetooth:/// works fine
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
