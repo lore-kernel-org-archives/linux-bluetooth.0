@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <5b9417770702061247u4b1d8e70t106fa07a8d220369@mail.gmail.com>
-Date: Tue, 6 Feb 2007 14:47:34 -0600
-From: "John H." <mistamaila@gmail.com>
-To: bluez-users@lists.sourceforge.net, Bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] how to encrypt rfcomm being binded automatically?
+To: bluez-users@lists.sourceforge.net
+From: paivakil@gmail.com (Mahesh T. Pai)
+Date: Tue, 06 Feb 2007 21:38:38 +0530
+Message-ID: <8764afs1yx.fsf@nandini.home>
+References: <20070124212526.2de68b62@localhost.localdomain>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] hcid behing a hub usb
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,14 +19,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This all works, on boot, etc, but how to encrypt traffic automatically?
+Andres Vargas - zodman <zod@linuxmerida.org> writes:
 
-rfcomm0 {
- bind yes;
- device 00:1A:77:ED:D1:97;
- channel 4;
- comment "Motorola Q";
-}
+> im using a usb-hub and get some errors with hcid...
+> and im conect the bluetooh on mi usb-hub with my mouse-usb ... 
+
+I read somewhere (while trying to solve my own problem) that bluez
+does not work with usb-hubs. 
+
+> lagrutadelzod:/home/andy# lsusb 
+> Bus 001 Device 029: ID 1131:1001 Integrated System Solution Corp. KY-BT100 Bluetooth Adapter
+
+> lagrutadelzod:/home/andy# hciconfig  -a
+> hci0:   Type: USB
+>         BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 48:10
+
+And that makes you the third person (including me) to report a device
+with the same macid on this list.
+
+-- 
+ Mahesh T. Pai <<>> http://paivakil.blogspot.com/
+Copying an idea is plagiarism. Copying many ideas
+from many authors is RESEARCH.
+
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
