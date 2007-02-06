@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <5b9417770702052027x6e7ae09dla5108ce12ccafb97@mail.gmail.com>
-Date: Mon, 5 Feb 2007 22:27:30 -0600
-From: "John H." <mistamaila@gmail.com>
-To: bluez-users@lists.sourceforge.net, Bluez-devel@lists.sourceforge.net
+Message-ID: <45C7FFD2.9080300@xmission.com>
+Date: Mon, 05 Feb 2007 21:10:58 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] How to use dund to get internet streaming to pda
-	phone?
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <45C7C6DF.20106@killesreiter.de>
+In-Reply-To: <45C7C6DF.20106@killesreiter.de>
+Subject: Re: [Bluez-users] headset /SCO / plugz
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,19 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I have sprint broadband for my phone(power vision) and I was told by
-pdanet people(which let you use internet from your phone to your
-computer without getting an extra computer data plan) that it would
-support linux if I used bluetooth DUN.
+Gerhard
 
-This is my problem... konqueror bluetooth:/// works fine, but all the
-bluetooth dun/dund howtos talk about getting your pda to use your
-computer's connection, and i want to do vice versa.
+> 6) now what? a2dpd doesn't show up in my output choices in xmms, 
+> "headset" shows up as a choice for the mixer device, but not the general 
+> output device.
 
-I have a moto Q
+I have to type
+ a2dpd
+  or
+ headset
+freehand in the device choice in xmms. It's true it doesn't find it
+automatically and we've tried to document that.
 
-pdanet is
-http://www.junefabrics.com/pdanet/
+What does your .asoundrc have in it?
+
+Brad
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
