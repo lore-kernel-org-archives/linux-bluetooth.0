@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 To: bluez-users@lists.sourceforge.net
 From: paivakil@gmail.com (Mahesh T. Pai)
-Date: Tue, 06 Feb 2007 21:38:38 +0530
-Message-ID: <8764afs1yx.fsf@nandini.home>
-References: <20070124212526.2de68b62@localhost.localdomain>
+Date: Tue, 06 Feb 2007 21:30:56 +0530
+Message-ID: <87abzrs2br.fsf@nandini.home>
+References: <20070129170251.sk0sks40888wgsgs@www.webmail4.com>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] hcid behing a hub usb
+Subject: Re: [Bluez-users] bnep0 not appearing in list of devices
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,28 +19,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Andres Vargas - zodman <zod@linuxmerida.org> writes:
+"robert@infotility.com" <robert@infotility.com> writes:
 
-> im using a usb-hub and get some errors with hcid...
-> and im conect the bluetooh on mi usb-hub with my mouse-usb ... 
+> I am trying to get a PC with a Bluetooth USB dongle
+> to talk to a BT-enabled small device (a Gumstix computer).
+> I know it's possible because I had it working last week. (Sigh)
+>
+> I am working off the notes on this page:
+> http://fedoranews.org/contributors/muhammad_al_ismail/bluetooth/
+> The PC is running CentOS 4.3.
+>
+> I am (I think) following the instructions, but bnep0 does
+> not appear on the list of devices returned by ifconfig
 
-I read somewhere (while trying to solve my own problem) that bluez
-does not work with usb-hubs. 
+I think bnep0 comes up when a link is established.
 
-> lagrutadelzod:/home/andy# lsusb 
-> Bus 001 Device 029: ID 1131:1001 Integrated System Solution Corp. KY-BT100 Bluetooth Adapter
+> (neither on the server nor on the client).
+> So that makes the stuff about assigning addresses, etc,
+> irrelevant.
+>
+> What is it that causes bnep0 to show up?
+> Is there some particular program that must be run to
 
-> lagrutadelzod:/home/andy# hciconfig  -a
-> hci0:   Type: USB
->         BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 48:10
-
-And that makes you the third person (including me) to report a device
-with the same macid on this list.
 
 -- 
  Mahesh T. Pai <<>> http://paivakil.blogspot.com/
-Copying an idea is plagiarism. Copying many ideas
-from many authors is RESEARCH.
+It's not the software that's free; it's you.
 
 
 -------------------------------------------------------------------------
