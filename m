@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45CA1BE6.5040907@pracucci.com>
-Date: Wed, 07 Feb 2007 18:35:18 +0000
-From: Marco Pracucci <development@pracucci.com>
-MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <20070207102742.gs40wgg8coc4048w@www.webmail4.com>
+Date: Wed, 07 Feb 2007 10:27:42 -0700
+From: "robert@infotility.com" <robert@infotility.com>
+To: Xamindar <junkxamindar@gmail.com>
 References: <45CA05A6.5000808@gmail.com>
-	<20070207102742.gs40wgg8coc4048w@www.webmail4.com>
-In-Reply-To: <20070207102742.gs40wgg8coc4048w@www.webmail4.com>
+In-Reply-To: <45CA05A6.5000808@gmail.com>
+MIME-Version: 1.0
+Cc: bluez-users@lists.sourceforge.net
 Subject: Re: [Bluez-users] Is this list dead?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,13 +21,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Quoting Xamindar <junkxamindar@gmail.com>:
 
-> Not dead, but certainly low-traffic.
-Where is Marcel?
-It's strage that it does not answer.
+> Is this list dead? I just joined yesterday and the only two emails I
+> have gotten are spam messages. Someone please respond if this list is
+> still being used. I have a problem with DUN on bluetooth and I am hoping
+> someone here can help me.
 
-Marco
+Not dead, but certainly low-traffic.
 
+best
+Robert Dodier
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
