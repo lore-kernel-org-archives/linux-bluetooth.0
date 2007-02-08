@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45CB57A7.1050505@killesreiter.de>
-Date: Thu, 08 Feb 2007 18:02:31 +0100
-From: Gerhard Killesreiter <gerhard@killesreiter.de>
+From: CIJOML <cijoml@volny.cz>
+To: bluez-users@lists.sourceforge.net
+Date: Thu, 8 Feb 2007 15:00:07 +0100
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <45C7C6DF.20106@killesreiter.de>
-	<45C7FFD2.9080300@xmission.com>	<45C83D70.9030900@killesreiter.de>
-	<45CA5412.9070702@killesreiter.de>
-In-Reply-To: <45CA5412.9070702@killesreiter.de>
-Subject: Re: [Bluez-users] headset /SCO / plugz
+Message-Id: <200702081500.07792.cijoml@volny.cz>
+Subject: [Bluez-users] Logitech MediaPad HOWTO send info to display
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,55 +18,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Gerhard Killesreiter wrote:
-> Gerhard Killesreiter wrote:
->> Brad Midgley wrote:
->>> Gerhard
->>>
->>>> 6) now what? a2dpd doesn't show up in my output choices in xmms, 
->>>> "headset" shows up as a choice for the mixer device, but not the 
->>>> general output device.
->>> I have to type
->>>  a2dpd
->>>   or
->>>  headset
->>> freehand in the device choice in xmms. It's true it doesn't find it
->>> automatically and we've tried to document that.
->>>
->>
->> Ok, tried that, but it still doesn't work.
->>
->> Set to a2dpd and ran a2dpd:
+Hi all,
 
-Ok, I've given up on a2dpd and tried headsetd for SCO (what I wanted to 
-do anyway): It works!
+I would like to know how to send some text (sensors stats the best and system 
+load) to the display on this MediaPad. I think Marcel made some work a year 
+ago in this direction, but I see no sources...
 
-My problem apparently was that hibernating the laptop didn't allow 
-usb/alsa/bluetooth to work properly after waking up the machine. 
-Switching the headset on/off also seems to help. I've now added all usb 
-modules to the hibernate blacklist and will see if it still works after 
-the next hibernation.
+Any help?
 
-I have booted and headsetd will now work, I can direct sound output to 
-my headset as given on the "build" page and I can also record sound from 
-the microphone doing:
+Thanks a lot
 
-arecord -D headset --format=S16_LE blah.wav
-
-My problem is now that most apps don't allow for specific sound options 
-on the command line. I am thinking of skype and krut 
-(http://sourceforge.net/projects/krut/). Is there a way to make the 
-headset the default alsa device?
-
-(later)
-
-Apparently, the answer is yes and I need to modify my .asoundrc file. 
-Does anybody have a copy that works in such a way that when the headset 
-is available it is the default and in other cases the normal speaker/micro?
-
-
-Cheers,
-	Gerhard
+Michal
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
