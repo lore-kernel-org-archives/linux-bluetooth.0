@@ -1,10 +1,18 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <b5dccebe0702090241w797ff03fk8dc41eb2e8881015@mail.gmail.com>
-Date: Fri, 9 Feb 2007 11:41:04 +0100
-From: "Mikael Lindqvist" <li.mikael.spam@gmail.com>
+Date: Thu, 8 Feb 2007 22:03:39 +0200
+From: Anssi Saari <anssi.saari@modeemi.fi>
 To: bluez-users@lists.sourceforge.net
+Message-ID: <20070208200339.GA15750@jolt.modeemi.cs.tut.fi>
+References: <45CA05A6.5000808@gmail.com>
+	<20070207102742.gs40wgg8coc4048w@www.webmail4.com>
+	<45CA1BE6.5040907@pracucci.com> <45CA257C.9020904@gmail.com>
+	<5b9417770702071127t4dcc7835h2e860b7992e2bb0c@mail.gmail.com>
+	<45CA29F7.6070607@gmail.com>
+	<5b9417770702071206t733f7c64s966c9249f7eadf28@mail.gmail.com>
+	<45CA47A8.5000109@gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] phone model and link manager version
+In-Reply-To: <45CA47A8.5000109@gmail.com>
+Subject: Re: [Bluez-users] Is this list dead? Here is my problem...
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,35 +26,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+On Wed, Feb 07, 2007 at 01:42:00PM -0800, Xamindar wrote:
+> John H. wrote:
+> > Yes, it looks as though you do.  Can you do a regular rfcomm connect?
+> > What if you use rfcomm1?
+> >   
+> What is a regular rfcomm connect?  On the console it just gives me errors.
+ 
+That would be rfcomm connect hci0 00:12:56:5A:92:59 8
 
-I wonder if there is any correlation between the Link Manager Protocol
-(LMP) Subversion and the model of a bluetooth phone. I mean, if I find
-out the LMP subversion of a remote device with for example hcitool,
-like this:
-
-sudo hcitool info <bdaddr>
-
-Requesting information ...
-...
-LMP Version: 1.2 (0x2) LMP Subversion: 0x41c
-
-Can this subversion be used to identify the model of the phone?
-
-If not, can it be used to suggest that the phone is any of a small set
-of models?
-
-If firmware updates are being made on the phone, will that affect the
-LMP subversion?
-
-What process inside a phone manufacturer company decide that a
-Bluetooth chip with a certain LMP subversion ends up in a specific
-model? Is it just related to when the phone happened to be produced or
-is it somehow related to the model?
-
-Thanks in advance!
-
--- Mikael
+Maybe you need to remove that weird stuff from rfcomm.conf first too. And what
+about pairing, you haven't said anything about it?
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
