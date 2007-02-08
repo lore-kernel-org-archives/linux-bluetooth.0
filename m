@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <a481fbf0702080546y4fca67batd6268b161282f89e@mail.gmail.com>
-Date: Thu, 8 Feb 2007 08:46:23 -0500
-From: "Raymond Ingles" <sorceror171@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <9da2dbd10702080018l24985d3eoeb2a9bf8309bbad7@mail.gmail.com>
+Message-ID: <45CAE519.8020702@gmail.com>
+Date: Thu, 08 Feb 2007 00:53:45 -0800
+From: Xamindar <junkxamindar@gmail.com>
 MIME-Version: 1.0
-References: <9da2dbd10702080018l24985d3eoeb2a9bf8309bbad7@mail.gmail.com>
-Subject: Re: [Bluez-users] How to BLUETOOTH setup
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <45CA05A6.5000808@gmail.com>
+	<45CA257C.9020904@gmail.com>	<5b9417770702071127t4dcc7835h2e860b7992e2bb0c@mail.gmail.com>	<45CA29F7.6070607@gmail.com>	<5b9417770702071206t733f7c64s966c9249f7eadf28@mail.gmail.com>	<45CA47A8.5000109@gmail.com>	<5b9417770702071950g51f03979m21e636a53f4c0900@mail.gmail.com>	<45CAA4A5.9070400@gmail.com>	<5b9417770702072115n10392b6fo99f2eb60086e887b@mail.gmail.com>	<45CABF7E.8050908@gmail.com>
+	<5b9417770702072216m788bcf85i657e0c03c344f2f9@mail.gmail.com>
+In-Reply-To: <5b9417770702072216m788bcf85i657e0c03c344f2f9@mail.gmail.com>
+Subject: Re: [Bluez-users] Is this list dead? Here is my problem...
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,19 +22,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 2/8/07, Vishal Gaurav <vishalgaurav01@gmail.com> wrote:
-> Hi,
-> I am just installed kubuntu,I am new bie on linux.How can i setup bluetooth
-> device to connect internet.Please tell me step by step.I am new bie.
+John H. wrote:
+> Try unplugging the usb cable and turning off phone then back on... it
+> might also be worth your while to remove, in bluetooth settings, a
+> reference on your phone to your computer.
+>
+> Then, just to be safe, put it in discovery mode and if there's a
+> setting for "allow other computers to connect," do that.
+>
+> But really, before all of this, please let us know if konqueror
+> bluetooth:/// can access your phone.
+>   
+Only kde programs I use are k3b and amarok.  I really hope I don't have
+to go through the trouble of installing kde to get bluetooth working.  I
+may have to do that though, it seems kde has far superior bluetooth
+support.  I'll consider it.
 
- What bluetooth device? Are you trying to:
-
- 1. Connect *from* your computer *through* a phone to the Internet?
- 2. Connect *from* your phone *through* a computer to the Internet?
- 3. Connect *from* your computer *through* another computer to the Internet?
- 4. Something else yet?
-
- Once we know what you're trying to do, we might be able to suggest something...
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
