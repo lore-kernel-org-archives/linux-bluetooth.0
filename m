@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: CIJOML <cijoml@volny.cz>
-To: bluez-users@lists.sourceforge.net
-Date: Thu, 8 Feb 2007 15:00:07 +0100
+Message-ID: <a481fbf0702080546y4fca67batd6268b161282f89e@mail.gmail.com>
+Date: Thu, 8 Feb 2007 08:46:23 -0500
+From: "Raymond Ingles" <sorceror171@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <9da2dbd10702080018l24985d3eoeb2a9bf8309bbad7@mail.gmail.com>
 MIME-Version: 1.0
-Message-Id: <200702081500.07792.cijoml@volny.cz>
-Subject: [Bluez-users] Logitech MediaPad HOWTO send info to display
+References: <9da2dbd10702080018l24985d3eoeb2a9bf8309bbad7@mail.gmail.com>
+Subject: Re: [Bluez-users] How to BLUETOOTH setup
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,17 +20,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi all,
+On 2/8/07, Vishal Gaurav <vishalgaurav01@gmail.com> wrote:
+> Hi,
+> I am just installed kubuntu,I am new bie on linux.How can i setup bluetooth
+> device to connect internet.Please tell me step by step.I am new bie.
 
-I would like to know how to send some text (sensors stats the best and system 
-load) to the display on this MediaPad. I think Marcel made some work a year 
-ago in this direction, but I see no sources...
+ What bluetooth device? Are you trying to:
 
-Any help?
+ 1. Connect *from* your computer *through* a phone to the Internet?
+ 2. Connect *from* your phone *through* a computer to the Internet?
+ 3. Connect *from* your computer *through* another computer to the Internet?
+ 4. Something else yet?
 
-Thanks a lot
-
-Michal
+ Once we know what you're trying to do, we might be able to suggest something...
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
