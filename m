@@ -1,20 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <5b9417770702081109r22d806fci366f0b01a678be73@mail.gmail.com>
-Date: Thu, 8 Feb 2007 13:09:16 -0600
-From: "John H." <mistamaila@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <45CAE519.8020702@gmail.com>
+Message-ID: <9da2dbd10702081038w2116ea35k4af9e54a167c83a2@mail.gmail.com>
+Date: Fri, 9 Feb 2007 00:08:21 +0530
+From: "Vishal Gaurav" <vishalgaurav01@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-References: <45CA05A6.5000808@gmail.com> <45CA29F7.6070607@gmail.com>
-	<5b9417770702071206t733f7c64s966c9249f7eadf28@mail.gmail.com>
-	<45CA47A8.5000109@gmail.com>
-	<5b9417770702071950g51f03979m21e636a53f4c0900@mail.gmail.com>
-	<45CAA4A5.9070400@gmail.com>
-	<5b9417770702072115n10392b6fo99f2eb60086e887b@mail.gmail.com>
-	<45CABF7E.8050908@gmail.com>
-	<5b9417770702072216m788bcf85i657e0c03c344f2f9@mail.gmail.com>
-	<45CAE519.8020702@gmail.com>
-Subject: Re: [Bluez-users] Is this list dead? Here is my problem...
+Subject: [Bluez-users] Bluetooth setup
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,48 +14,56 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0349097407=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-It does, but that's not the point.  I want to see if bluetooth is
-working at all between your pc and the phone.
+--===============0349097407==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_20238_9671913.1170959901480"
 
-On 2/8/07, Xamindar <junkxamindar@gmail.com> wrote:
-> John H. wrote:
-> > Try unplugging the usb cable and turning off phone then back on... it
-> > might also be worth your while to remove, in bluetooth settings, a
-> > reference on your phone to your computer.
-> >
-> > Then, just to be safe, put it in discovery mode and if there's a
-> > setting for "allow other computers to connect," do that.
-> >
-> > But really, before all of this, please let us know if konqueror
-> > bluetooth:/// can access your phone.
-> >
-> Only kde programs I use are k3b and amarok.  I really hope I don't have
-> to go through the trouble of installing kde to get bluetooth working.  I
-> may have to do that though, it seems kde has far superior bluetooth
-> support.  I'll consider it.
->
->
-> -------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job easier.
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+------=_Part_20238_9671913.1170959901480
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+I am just instaled Kubuntu on my desktop.I am new linux user.Can some one
+know how can i setup bluetooth device with my phone to connect
+internet.Please help me.
+
+-- 
+Vishal Gaurav
+
+------=_Part_20238_9671913.1170959901480
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+I am just instaled Kubuntu on my desktop.I am new linux user.Can some one know how can i setup bluetooth device with my phone to connect internet.Please help me.<br clear="all"><br>-- <br>Vishal Gaurav 
+
+------=_Part_20238_9671913.1170959901480--
+
+
+--===============0349097407==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier.
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0349097407==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0349097407==--
