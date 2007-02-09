@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Yuriy Vikulov <vikulov@rscenter.ru>
-Date: Mon, 12 Feb 2007 10:54:27 +0000 (UTC)
-Message-ID: <loom.20070212T114641-211@post.gmane.org>
-Mime-Version: 1.0
-Subject: [Bluez-devel] concurrent inquiring and sending data
+Date: Fri, 9 Feb 2007 12:43:08 +0100
+From: Stefan Seyfried <seife@suse.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20070209114308.GA16231@suse.de>
+References: <45CC5281.9090209@voelkers.org>
+MIME-Version: 1.0
+In-Reply-To: <45CC5281.9090209@voelkers.org>
+Subject: Re: [Bluez-devel] Two sticks for a developer
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,52 +16,45 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello
+On Fri, Feb 09, 2007 at 11:52:49AM +0100, jan wrote:
+> Hi,
+> =
 
-I'm developing an application using bluez. 
-It must search devices and send them data(files).
+> after buying three different bluetooth sticks i have one running.
+> One of the others is not recognized as a bt stick, the other generates =
 
-i'm using one bluetooth dongle for searching 
-and some dongles for sending.
 
-i've found code which do search anisochronous.
-it works fine.
+Send this one to Marcel
 
-but when application tries to connect 
-to device for sending it often says 
-error "File descriptor in bad state"
+> many annoying messages about unknown sco packages in the syslog (>1000/mi=
+n)
 
-i've searched in this mailing 
-list about it and found that connecting 
-simultaneously is not possible
-that's why this error comes
+This one can probably be fixed by using
+modprobe hci_usb isoc=3D1
+and if that works, Marcel will ask you some details so he can blacklist
+the device :-)
 
-I have questions, please, if somebody knows, tell me 
+> To whom should i send them for development purposes? It will be a gift :-)
 
-1. can inquiring at one dongle 
-   disturb connecting at another dongle?
+If everything else fails, send them to me ;-) No, just kidding.
+-- =
 
-2. if connecting is being maden at different dongles
-   can they conflict with each other?
-
-3. How can i avoid this situation without patching 
-   kernel( or may be it has been already done at 
-   some versions of kernel)?
-
-Best Regards,
-Yuriy
-
+Stefan Seyfried
+QA / R&D Team Mobile Devices        |              "Any ideas, John?"
+SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
 
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier.
+Get stuff done quickly with pre-integrated technology to make your job easi=
+er.
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
+21642
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
