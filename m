@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45CC5281.9090209@voelkers.org>
-Date: Fri, 09 Feb 2007 11:52:49 +0100
-From: jan <jan@voelkers.org>
-MIME-Version: 1.0
+Message-ID: <b5dccebe0702090245o53dd36cwb62836b7d2b234d2@mail.gmail.com>
+Date: Fri, 9 Feb 2007 11:45:07 +0100
+From: "Mikael Lindqvist" <li.mikael.spam@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Two sticks for a developer
+MIME-Version: 1.0
+Subject: [Bluez-devel] phone model and link manager version
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,18 +18,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hello,
 
-after buying three different bluetooth sticks i have one running.
-One of the others is not recognized as a bt stick, the other generates 
-many annoying messages about unknown sco packages in the syslog (>1000/min)
+I wonder if there is you think there is any correlation between the
+Link Manager Protocol
+(LMP) Subversion and the model of a bluetooth phone. I mean, if I find
+out the LMP subversion of a remote device with for example hcitool,
+like this:
 
-To whom should i send them for development purposes? It will be a gift :-)
+sudo hcitool info <bdaddr>
 
-Jan
+Requesting information ...
+...
+LMP Version: 1.2 (0x2) LMP Subversion: 0x41c
 
--- 
-I am a manual worm. Copy me please.
+Can this subversion be used to identify the model of the phone?
+
+If not, can it be used to suggest that the phone is any of a small set
+of models?
+
+If firmware updates are being made on the phone, will that affect the
+LMP subversion?
+
+What process inside a phone manufacturer company decide that a
+Bluetooth chip with a certain LMP subversion ends up in a specific
+model? Is it just related to when the phone happened to be produced or
+is it somehow related to the model?
+
+Thanks in advance!
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
