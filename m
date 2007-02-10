@@ -1,13 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45CE4EF7.5060604@gmail.com>
-Date: Sat, 10 Feb 2007 15:02:15 -0800
-From: Xamindar <junkxamindar@gmail.com>
+Date: Sat, 10 Feb 2007 01:16:53 +0100
+From: Michael Mauch <michael.mauch@gmx.de>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20070210001653.GE18643@elmicha>
+References: <45CA05A6.5000808@gmail.com>
+	<20070207102742.gs40wgg8coc4048w@www.webmail4.com>
+	<45CA1BE6.5040907@pracucci.com> <45CA257C.9020904@gmail.com>
+	<5b9417770702071127t4dcc7835h2e860b7992e2bb0c@mail.gmail.com>
+	<45CA29F7.6070607@gmail.com>
+	<5b9417770702071206t733f7c64s966c9249f7eadf28@mail.gmail.com>
+	<45CA47A8.5000109@gmail.com>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <45CA05A6.5000808@gmail.com>	<20070207102742.gs40wgg8coc4048w@www.webmail4.com>	<45CA1BE6.5040907@pracucci.com>
-	<45CA257C.9020904@gmail.com>	<5b9417770702071127t4dcc7835h2e860b7992e2bb0c@mail.gmail.com>	<45CA29F7.6070607@gmail.com>	<5b9417770702071206t733f7c64s966c9249f7eadf28@mail.gmail.com>	<45CA47A8.5000109@gmail.com>
-	<20070210001653.GE18643@elmicha>
-In-Reply-To: <20070210001653.GE18643@elmicha>
+In-Reply-To: <45CA47A8.5000109@gmail.com>
 Subject: Re: [Bluez-users] Is this list dead? Here is my problem...
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -22,104 +26,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Michael Mauch wrote:
-> Xamindar wrote:
->
->   
->> John H. wrote:
->>     
->>> Yes, it looks as though you do.  Can you do a regular rfcomm connect?
->>> What if you use rfcomm1?
->>>   
->>>       
->> What is a regular rfcomm connect?  On the console it just gives me errors.
->>
->> white-rabbit xamindar # rfcomm
->> rfcomm1: 00:12:56:5A:92:59 channel 8 clean
->> white-rabbit xamindar # rfcomm connect 1
->> Can't create RFCOMM TTY: Address already in use
->> white-rabbit xamindar #
->>     
->
-> You don't want to use "rfcomm connect". You already bound channel 8 on
-> your phone to /dev/rfcomm1 (probably in rfcomm.conf). That means that
-> rfcommd is waiting for a program that uses /dev/rfcomm1 like a serial
-> device.
->
-> Just use /dev/rfcomm1 with minicom and try sending some "AT" commands to
-> your phone, like "ATI", "ATI1" and so on.
->
-> In case you're not familiar with minicom: start "minicom -s rfcomm1" and
-> change the "Serial port setup" -> "Serial Device" to /dev/rfcomm1.
-> "Save setup as rfcomm1" and "exit from Minicom".
->
-> Now start "minicom rfcomm1". If your phone is too slow answering
-> bluetooth connection and minicom says "cannot open /dev/rfcomm1", just
-> try it again and again a few times.
->
-> If that works, use wvdial, kppp, gkdial or networkmanager to connect
-> using /dev/rfcomm1 (instead of /dev/modem, /dev/ttyS0).
->
-> Regards...
-> 		Michael
->
->   
-Hey thanks!  That has helped me out a lot.  It seems it works.  I guess
-maybe "Gnome ppp" is too stupid to be able to use rfcomm.  Here is the
-results of minicom:
+Xamindar wrote:
 
+> John H. wrote:
+> > Yes, it looks as though you do.  Can you do a regular rfcomm connect?
+> > What if you use rfcomm1?
+> >   
+> What is a regular rfcomm connect?  On the console it just gives me errors.
+> 
+> white-rabbit xamindar # rfcomm
+> rfcomm1: 00:12:56:5A:92:59 channel 8 clean
+> white-rabbit xamindar # rfcomm connect 1
+> Can't create RFCOMM TTY: Address already in use
+> white-rabbit xamindar #
 
-Welcome to minicom 2.2
+You don't want to use "rfcomm connect". You already bound channel 8 on
+your phone to /dev/rfcomm1 (probably in rfcomm.conf). That means that
+rfcommd is waiting for a program that uses /dev/rfcomm1 like a serial
+device.
 
-OPTIONS: I18n
-Compiled on Feb  9 2007, 18:15:58.
-Port /dev/rfcomm0
+Just use /dev/rfcomm1 with minicom and try sending some "AT" commands to
+your phone, like "ATI", "ATI1" and so on.
 
-                 Press CTRL-A Z for help on special keys     
-                                                             
-AT S7=45 S0=0 L1 V1 X4 &c1 E1 Q0                             
-OK                                                           
-ATI                                                          
-Manufacturer: LG ELECTRONICS
-Model: 226
-Revision: CU500-MSM32701001-V10c-Aug-03-2006-CW-US  1  [Aug 03 2006
-13:00:00]
-IMEI: 010851007552410
-+GCAP: +CGSM,+DS,+ES
+In case you're not familiar with minicom: start "minicom -s rfcomm1" and
+change the "Serial port setup" -> "Serial Device" to /dev/rfcomm1.
+"Save setup as rfcomm1" and "exit from Minicom".
 
-OK
+Now start "minicom rfcomm1". If your phone is too slow answering
+bluetooth connection and minicom says "cannot open /dev/rfcomm1", just
+try it again and again a few times.
 
-RING
+If that works, use wvdial, kppp, gkdial or networkmanager to connect
+using /dev/rfcomm1 (instead of /dev/modem, /dev/ttyS0).
 
-RING
-
-RING
-
-RING
-
-I think the "RING" happens when someone calls my phone, interesting.
-Gnome ppp still refuses to use the device though.  I will install kppp
-and try that as it is the one that worked on my friends computer.  Gnome
-ppp reports the following when trying to connect or dial:
-
---> Ignoring malformed input line: ";Do NOT edit this file by hand!"
---> WvDial: Internet dialer version 1.56
---> Cannot open /dev/rfcomm0: Device or resource busy
---> Cannot open /dev/rfcomm0: Device or resource busy
---> Cannot open /dev/rfcomm0: Device or resource busy
-
-> -------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support web services, security?
-> Get stuff done quickly with pre-integrated technology to make your job easier.
-> Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-> http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->   
-
+Regards...
+		Michael
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
