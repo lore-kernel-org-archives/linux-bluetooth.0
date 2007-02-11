@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45D03F5E.8040009@yahoo.com.au>
-Date: Mon, 12 Feb 2007 11:20:14 +0100
-From: bluez.mexon@spamgourmet.com
-MIME-Version: 1.0
+Date: Sun, 11 Feb 2007 12:19:06 -0800 (PST)
+From: tim culwins <mail0123456789101112@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Shopping advice: bluetooth 2.0 USB dongle with CSR
-	chipset?
+MIME-Version: 1.0
+Message-ID: <294019.42469.qm@web31708.mail.mud.yahoo.com>
+Subject: [Bluez-users] installing latest bluez on edgy?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,23 +18,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+is there a binary i can dl?
 
-I'm looking for a Bluetooth 2.0 USB dongle, preferably Class 1.  But I
-really want it to be a CSR chipset, because I want the "HID proxy"
-feature (http://times.usefulinc.com/2004/06/12-hidproxy).  I've found a
-couple of likely-looking devices, but finding out what chipset they are
-is really hard:
+or a tutorial on compiling?
 
-http://www.aiptek.com.tw/english/product/bluetooth/bluetooth_usb_dongle.htm
-http://catalog.belkin.com/IWCatProductPage.process?Product_Id=273100
+Thanks
 
-Does anyone know how I can be reasonably sure what chipset I'm getting
-before I buy?  Or maybe someone has a suitable device and can verify the
-chipset for me?
 
-Thanks for any help,
-Mat
+also i frequently have to type:
+
+dbus-send --system --dest=org.bluez /org/bluez/hci0
+org.bluez.Adapter.SetMode string:discoverable
+
+is there a way to make it so i dont have to type this
+all the time?
+
+
+ 
+____________________________________________________________________________________
+Don't pick lemons.
+See all the new 2007 cars at Yahoo! Autos.
+http://autos.yahoo.com/new_cars.html 
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
