@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <52950c3f0702110835g10106667jd8034fc66536aa7c@mail.gmail.com>
-Date: Sun, 11 Feb 2007 11:35:42 -0500
-From: "Timur Alperovich" <timur.alperovich@gmail.com>
-To: bluez-users@lists.sourceforge.net
+From: "Homayoun Ahmed" <asgc54@dsl.pipex.com>
+To: <bluez-users@lists.sourceforge.net>
+Date: Sun, 11 Feb 2007 03:09:03 -0000
+Message-ID: <00ac01c74d89$fd224b90$0302a8c0@homayounpc>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_72788_33377280.1171211742822"
-Subject: [Bluez-users] connect() returns "Operation already in progress"
+Subject: [Bluez-users] erros on running hcid -n
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,194 +14,191 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============1134420846=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-------=_Part_72788_33377280.1171211742822
+This is a multi-part message in MIME format.
+
+--===============1134420846==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_72789_8957347.1171211742822"
+	boundary="----=_NextPart_000_00AD_01C74D89.FD224B90"
 
-------=_Part_72789_8957347.1171211742822
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_00AD_01C74D89.FD224B90
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
-Hi there,
+Hi guys I was wondering if anyone can help me when I run hcid -n I get the
+following messages
 
-I'm trying to write a simple client/server application to communicate
-between a Motorola A780 phone and a bluetooth usb dongle. Interestingly
-enough when I run the server application on my laptop, to which the dongle
-is attached, the client application on the phone returns "Operation already
-in progress" when connect is called. On the other hand, when I run the
-server on the phone and connect from my laptop, it works fine. What could be
-causing this?
+ 
 
-The usb dongle is a Targus ACB10US, with broadcom chipset. The device on the
-Motorola phone is a Broadcom BCM2035.
+hcid[2098]: Bluetooth HCI daemon
 
-I attached the code for the server and client programs.
+hcid[2098]: Starting security manager 0
 
-Thank you,
-Timur
+hcid[2098]: Sending read scan enable command failed: Connection timed out
+(110)
 
-------=_Part_72789_8957347.1171211742822
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+hcid[2098]: Sending getting name command failed: Connection timed out (110)
 
-Hi there,<br><br>I&#39;m trying to write a simple client/server application to communicate between a Motorola A780 phone and a bluetooth usb dongle. Interestingly enough when I run the server application on my laptop, to which the dongle is attached, the client application on the phone returns &quot;Operation already in progress&quot; when connect is called. On the other hand, when I run the server on the phone and connect from my laptop, it works fine. What could be causing this? 
-<br><br>The usb dongle is a Targus ACB10US, with broadcom chipset. The device on the Motorola phone is a Broadcom BCM2035.<br><br>I attached the code for the server and client programs.<br><br>Thank you,<br>Timur<br>
+hcid[2098]: Getting name failed with status 0x36
 
-------=_Part_72789_8957347.1171211742822--
+ 
 
-------=_Part_72788_33377280.1171211742822
-Content-Type: text/x-c++src; name="client.cc"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="client.cc"
-X-Attachment-Id: f_ey1p8fso
+when I try to pair my phone and machine ( vmware of fedora core 5) the phone
+asks fore a pin which is handled but my phone reports that it is unable to
+pair to my machine. 
 
-LyogUHJvb2Ygb2YgY29uY2VwdCBibHVldG9vdGggYXBwbGljYXRpb24KICogZm9yIHRoZSBBNzgw
-IHBob25lLiBUaGUgY2xpZW50IHNlYXJjaGVzIGZvcgogKiB0aGUgYmx1ZXRvb3RoIGRldmljZSB0
-byBhc3NvY2lhdGUgd2l0aCBieQogKiBuYW1lIGFuZCB0aGVuIGluaXRpYXRlcyB0aGUgY29ubmVj
-dGlvbiBvbgogKiB0aGUgc3BlY2lmaWVkIHBvcnQvY2hhbm5lbCAodXNlIDEgZm9yIG5vdykuCiAq
-CiAqIEluIHRoZSBmdXR1cmUgc2hvdWxkIGltcGxlbWVudCBhIG1lY2hhbmlzbSBmb3IKICogc2Vj
-dXJlIGlkZW50aWZpY2F0aW9uIG9mIHRoZSBjbGllbnQuCiAqCiAqIENsaWVudCB0byBiZSBydW4g
-b24gdGhlIHBob25lLgogKiBUaW11ciBBbHBlcm92aWNoLCAyMDA3CiAqCiAqIFRoYW5rIHlvdSB0
-byBBbGJlcnQgSHVhbmcgZm9yIHRoZSBibHVldG9vdGggcHJvZ3JhbW1pbmcgZ3VpZGUuCiAqLwoK
-I2luY2x1ZGUgPGJsdWV0b290aC9ibHVldG9vdGguaD4KI2luY2x1ZGUgPGJsdWV0b290aC9oY2ku
-aD4KI2luY2x1ZGUgPGJsdWV0b290aC9oY2lfbGliLmg+CiNpbmNsdWRlIDxibHVldG9vdGgvcmZj
-b21tLmg+CiNpbmNsdWRlIDxzeXMvc29ja2V0Lmg+CiNpbmNsdWRlIDx1bmlzdGQuaD4KI2luY2x1
-ZGUgPGlvc3RyZWFtPgojaW5jbHVkZSA8ZXJybm8uaD4KI2luY2x1ZGUgPGVycm9yLmg+CgojZGVm
-aW5lIFNDQU5fTEVOICAgIDUKI2RlZmluZSBfX0xBUFRPUAojaWZuZGVmIF9fTEFQVE9QCiNkZWZp
-bmUgU0VSVkVSX05BTUUgIlRhcmd1cy1MYXB0b3AiCiNlbHNlCiNkZWZpbmUgU0VSVkVSX05BTUUg
-IkJyb2FkY29tIEJDTTIwMzUiCiNlbmRpZgojZGVmaW5lIE1BWF9SU1AgICAgIDI1NQojZGVmaW5l
-IENIQU5ORUwgICAgIDEKCnVzaW5nIG5hbWVzcGFjZSBzdGQ7CgppbnQgbWFpbihpbnQgYXJnYywg
-Y2hhcioqIGFyZ3YpewogIC8vIHNjYW4gZm9yIHRoZSBkZXZpY2UKICBpbnF1aXJ5X2luZm8gKmlp
-ID0gTlVMTDsKICBjaGFyIG5hbWVbNDBdID0gezB9OwoKICBpbnQgZGV2X2lkID0gaGNpX2dldF9y
-b3V0ZShOVUxMKTsKICBpbnQgc29jayA9IGhjaV9vcGVuX2RldihkZXZfaWQpOwoKICBpZihkZXZf
-aWQgPCAwIHx8IHNvY2sgPCAwKQogICAgZXJyb3IoMSwgZXJybm8sICJlcnJvciBjcmVhdGluZyBh
-IHNvY2tldCIpOwoKICBpbnQgZmxhZ3MgPSBJUkVRX0NBQ0hFX0ZMVVNIOwogIGlpID0gKGlucXVp
-cnlfaW5mbyopbWFsbG9jKE1BWF9SU1AgKiBzaXplb2YoaW5xdWlyeV9pbmZvKSk7CgogIGludCBu
-dW1fcnNwID0gaGNpX2lucXVpcnkoZGV2X2lkLCBTQ0FOX0xFTiwgTUFYX1JTUCwgTlVMTCwgJmlp
-LCBmbGFncyk7CiAgaWYoIG51bV9yc3AgPCAwICkgcGVycm9yKCJoY2lfaW5xdWlyeSIpOwoKICBz
-dHJ1Y3Qgc29ja2FkZHJfcmMgYWRkciA9IHswfTsKICBmb3IgKGludCBpID0gMDsgaSA8IG51bV9y
-c3A7IGkrKykgewogICAgbWVtc2V0KG5hbWUsIDAsIHNpemVvZihuYW1lKSk7CiAgICBoY2lfcmVh
-ZF9yZW1vdGVfbmFtZShzb2NrLCAmKGlpK2kpLT5iZGFkZHIsIHNpemVvZihuYW1lKSwgbmFtZSwg
-MCk7CiAgICBuYW1lWzM5XSA9ICdcMCc7CiAgICBpZighc3RyY21wKG5hbWUsIFNFUlZFUl9OQU1F
-KSl7CiAgICAgIGNvdXQgPDwgIm1hdGNoIGZvdW5kOiAiIDw8IG5hbWUgPDwgZW5kbDsKICAgICAg
-YmFjcHkoJmFkZHIucmNfYmRhZGRyLCAmKGlpK2kpLT5iZGFkZHIpOwogICAgICBicmVhazsKICAg
-IH0KICAgIGVsc2UgY291dCA8PCAibm8gbWF0Y2g6ICIgPDwgbmFtZSA8PCBlbmRsOwogIH0KICBm
-cmVlKGlpKTsKICBjbG9zZShzb2NrKTsKCiAgY291dCA8PCAiY2xvc2VkIHNvY2siIDw8IGVuZGw7
-CgogIGNoYXIgYWRkcmVzc1sxOV0gPSB7MH07CiAgYmEyc3RyKCZhZGRyLnJjX2JkYWRkciwgYWRk
-cmVzcyk7CiAgY291dCA8PCAiYWRkcmVzcyB0byB1c2U6ICIgPDwgYWRkcmVzcyA8PCBlbmRsOwoK
-ICBpZighYmFjbXAoJmFkZHIucmNfYmRhZGRyLCBCREFERFJfQU5ZKSkKICAgIHJldHVybiAwOwoK
-ICAvLyBoYXZlIHRoZSBhZGRyZXNzLiBjb25uZWN0CiAgc29jayA9IHNvY2tldChBRl9CTFVFVE9P
-VEgsIFNPQ0tfU1RSRUFNLCBCVFBST1RPX1JGQ09NTSk7CiAgYWRkci5yY19mYW1pbHkgPSBBRl9C
-TFVFVE9PVEg7CiAgYWRkci5yY19jaGFubmVsID0gQ0hBTk5FTDsKCiAgY291dCA8PCAiZ3JhYmJl
-ZCBhIHNvY2tldCIgPDwgZW5kbDsKCiAgaWYoY29ubmVjdChzb2NrLCAoc3RydWN0IHNvY2thZGRy
-KikgJmFkZHIsIHNpemVvZihhZGRyKSkgPCAwKQogICAgZXJyb3IoMSwgZXJybm8sICJlcnJvciBj
-b25uZWN0aW5nIik7CiAgCiAgY291dCA8PCAiY29ubmVjdGVkIiA8PCBlbmRsOwoKICAvLyBzZW5k
-IGFuZCByZWNlaXZlIGEgbWVzc2FnZQogIGNoYXIgbXNnWzUwXSA9IHswfTsKICBzdHJjcHkobXNn
-LCAiSGVsbG9Xb3JsZFwwIik7CiAgaW50IGJ5dGVzID0gc2VuZChzb2NrLCBtc2csIDExLCAwKTsK
-ICBjb3V0IDw8ICJzZW50ICIgPDwgYnl0ZXMgPDwgIiAiIDw8IG1zZyA8PCBlbmRsOwoKICBtZW1z
-ZXQobXNnLCAwLCA1MCk7CgogIGJ5dGVzID0gcmVhZChzb2NrLCBtc2csIDE2KTsKICBjb3V0IDw8
-ICJyZWNlaXZlZDogIiA8PCBieXRlcyA8PCAiICIgPDwgbXNnIDw8IGVuZGw7CiAgCiAgY2xvc2Uo
-c29jayk7CgogIHJldHVybiAwOwp9Cg==
-------=_Part_72788_33377280.1171211742822
-Content-Type: text/x-c++src; name="server.cc"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="server.cc"
-X-Attachment-Id: f_ey1p8o09
+ 
 
-LyogUHJvb2Ygb2YgY29uY2VwdCBhcHBsaWNhdGlvbgogKiB0byBpbnRlcmFjdCBiZXR3ZWVuIGEg
-bW90b3JvbGEgQTc4MCBwaG9uZQogKiBhbmQgYSBibHVldG9vdGggZGV2aWNlIGxvY2F0ZWQgb24g
-YSBsYXB0b3AKICogKG9yIGluIHRoZSBmdXR1cmUgYSBndW1zdGljaykuCiAqCiAqIFRoZSBhcHBs
-aWNhdGlvbiBjcmVhdHMgYSBzZXJ2aWNlIHRocmVhZCBmb3IgZWFjaAogKiBjb25uZWN0aW9uOyBt
-YWludGFpbnMgYSBsaXN0IG9mIGNvbm5lY3Rpb25zIChjYW4gYmUgdXNlZCAKICogZm9yIGxvZ2dp
-bmcgcHVycG9zZXMpOyBwcmludHMgdGhlIGRhdGEgdHJhbnNtaXR0ZWQgKHdpbGwgY2hhbmdlCiAq
-IHRvIG1vcmUgZnVuY3Rpb25hbGl0eSk7IGFsc28sIHNlbmRzIGEgY2hhbGxlbmdlIHRvIHRoZSBj
-bGllbnQuIAogKiBXcml0dGVuIGluIEMrKyBhbmQgbGlua2VkIGFnYWluc3QgdGhlIGxpYmJsdWV0
-b290aC5zby4xIAogKiBwcm92aWRlZCBpbiB0aGUgYmx1ZXogcGFja2FnZS4KICoKICogQXV0aG9y
-OiBUaW11ciBBbHBlcm92aWNoLCAyMDA3CiAqLwoKI2luY2x1ZGUgPGxpc3Q+CiNpbmNsdWRlIDxz
-eXMvc29ja2V0Lmg+CiNpbmNsdWRlIDxpb3N0cmVhbT4KI2luY2x1ZGUgPGJsdWV0b290aC9ibHVl
-dG9vdGguaD4KI2luY2x1ZGUgPGJsdWV0b290aC9yZmNvbW0uaD4KI2luY2x1ZGUgPGJsdWV0b290
-aC9oY2kuaD4KI2luY2x1ZGUgPGJsdWV0b290aC9oY2lfbGliLmg+CiNpbmNsdWRlIDx1bmlzdGQu
-aD4KI2luY2x1ZGUgPGVycm9yLmg+CiNpbmNsdWRlIDxlcnJuby5oPgojaW5jbHVkZSA8c2lnbmFs
-Lmg+CgojZGVmaW5lIENIQU5ORUwgMQojZGVmaW5lIENPTk5fUVVFVUUgIDEwCiNkZWZpbmUgVEhS
-RUFEX01FTSAgMTAyNCoxMDI0CgojZGVmaW5lIF9fUFRIUkVBRAoKdXNpbmcgbmFtZXNwYWNlIHN0
-ZDsKCnN0cnVjdCBub2RlewogIGNoYXIgYWRkcmVzc1sxOF07CiAgY2hhciBuYW1lWzMxXTsKfTsK
-CnN0cnVjdCBzZXJ2aWNlewogIGludCBzb2NrOwogIGludCBjbGllbnRfaWQ7Cn07CgpsaXN0PHN0
-cnVjdCBub2RlKj4gY2xpZW50czsKI2lmZGVmIF9fUFRIUkVBRApwdGhyZWFkX211dGV4X3QqIG5v
-ZGVfbGlzdDsKI2VuZGlmCgpzdGF0aWMgdm9pZCBzZXJ2aWNlX3JlcXVlc3QoaW50IHNvY2spOwpz
-dGF0aWMgdm9pZCBxdWl0X2hhbmRsZShpbnQgc2lnbm8pOwpzdGF0aWMgdm9pZCBjbGVhbl91cCgp
-OwoKdHlwZWRlZiB2b2lkKiAoKmZ1bmMpKHZvaWQqKTsKdHlwZWRlZiB1bnNpZ25lZCBpbnQgdWlu
-dDsKCi8vIHZhcmlhYmxlIGZvciBmb3JjaW5nIHRvIHF1aXQKYm9vbCBmb3JjZV9xdWl0ID0gZmFs
-c2U7CgppbnQgbWFpbihpbnQgYXJnYywgY2hhcioqIGFyZ3YpewogIC8vIHN3aXRjaCBzdGF0ZW1l
-bnQgb24gYXJndi9hcmdjIGluIHRoZSBmdXR1cmUKICBpbnQgY2hhbm5lbCA9IENIQU5ORUw7CiAg
-CiAgc3RydWN0IHNvY2thZGRyX3JjIGxvY19hZGRyLCByZW1fYWRkcjsKICBpbnQgc29jazsKICBp
-bnQgY2xpZW50X3NvY2s7CiAgaW50IGFkZHJfc2l6ZSA9IHNpemVvZihyZW1fYWRkcik7CgogIC8v
-IGNyZWF0ZSBhIHNvY2tldAogIGlmKChzb2NrID0gc29ja2V0KEFGX0JMVUVUT09USCwgU09DS19T
-VFJFQU0sIEJUUFJPVE9fUkZDT01NKSkgPCAwKQogICAgZXJyb3IoMSwgZXJybm8sICJlcnJvciBv
-Y2N1cmVkOiAlZFxuIiwgZXJybm8pOwoKICAvLyBiaW5kIHRvIGFuIGF2YWlsYWJsZSBhZGFwdGVy
-CiAgbG9jX2FkZHIucmNfZmFtaWx5ID0gQUZfQkxVRVRPT1RIOwogIGxvY19hZGRyLnJjX2JkYWRk
-ciA9ICpCREFERFJfQU5ZOwogIGxvY19hZGRyLnJjX2NoYW5uZWwgPSAodWludDhfdCkgY2hhbm5l
-bDsKICAKICBpZihiaW5kKHNvY2ssIChzdHJ1Y3Qgc29ja2FkZHIqKSAmbG9jX2FkZHIsIHNpemVv
-Zihsb2NfYWRkcikpIDwgMCkKICAgIGVycm9yKDEsIGVycm5vLCAiZXJyb3Igb2NjdXJlZFxuIik7
-CgogICNpZmRlZiBfX1BUSFJFQUQKICAvLyBzZXR1cCBwdGhyZWFkX2F0dHIKICBwdGhyZWFkX2F0
-dHJfdCBhdHRyOwogIHB0aHJlYWRfYXR0cl9pbml0KCZhdHRyKTsKICBwdGhyZWFkX2F0dHJfc2V0
-c3RhY2tzaXplKCZhdHRyLCBUSFJFQURfTUVNKTsKICBwdGhyZWFkX2F0dHJfc2V0ZGV0YWNoc3Rh
-dGUoJmF0dHIsIFBUSFJFQURfQ1JFQVRFX0RFVEFDSEVEKTsKICBwdGhyZWFkX3QgaGFuZGxlOwoK
-ICAvLyBpbml0aWFsaXplIHRoZSBub2RlIGxpc3QgbG9jawogIG5vZGVfbGlzdCA9IG5ldyBwdGhy
-ZWFkX211dGV4X3QoKTsKICBwdGhyZWFkX211dGV4X2luaXQobm9kZV9saXN0LCBOVUxMKTsKICAj
-ZW5kaWYKCiAgLy8gaWdub3JlIGRyb3BwZWQgY29ubmVjdGlvbnMKICBzaWduYWwoU0lHUElQRSwg
-U0lHX0lHTik7CiAgc2lnbmFsKFNJR0hVUCwgU0lHX0lHTik7CgogIC8vIHJlZ2lzdGVyIGEgY2xl
-YW4gdXAgaGFuZGxlcgogIHN0cnVjdCBzaWdhY3Rpb24gc2lnbmFsX2FjdGlvbjsKICBzaWdlbXB0
-eXNldCgmc2lnbmFsX2FjdGlvbi5zYV9tYXNrKTsKICBzaWdhZGRzZXQoJnNpZ25hbF9hY3Rpb24u
-c2FfbWFzaywgU0lHVEVSTSk7CiAgc2lnYWRkc2V0KCZzaWduYWxfYWN0aW9uLnNhX21hc2ssIFNJ
-R0lOVCk7CiAgc2lnYWRkc2V0KCZzaWduYWxfYWN0aW9uLnNhX21hc2ssIFNJR1FVSVQpOwogIHNp
-Z25hbF9hY3Rpb24uc2FfZmxhZ3MgPSAwOwoKICBzaWduYWxfYWN0aW9uLnNhX2hhbmRsZXIgPSBx
-dWl0X2hhbmRsZTsKICBzaWdhY3Rpb24oU0lHVEVSTSwgJnNpZ25hbF9hY3Rpb24sIDApOwoKICBz
-aWduYWxfYWN0aW9uLnNhX2hhbmRsZXIgPSBxdWl0X2hhbmRsZTsKICBzaWdhY3Rpb24oU0lHSU5U
-LCAmc2lnbmFsX2FjdGlvbiwgMCk7CgogIHNpZ25hbF9hY3Rpb24uc2FfaGFuZGxlciA9IHF1aXRf
-aGFuZGxlOwogIHNpZ2FjdGlvbihTSUdRVUlULCAmc2lnbmFsX2FjdGlvbiwgMCk7CiAgCiAgLy8g
-c3RhcnQgbGlzdGVuaW5nCiAgbGlzdGVuKHNvY2ssIENPTk5fUVVFVUUpOwoKICBjb3V0IDw8ICJT
-ZXJ2ZXIgc3RhcnRlZCFcbiI7CgogIC8vIHdoaWxlIGxvb3AgdG8gYWNjZXB0IGNvbm5lY3Rpb25z
-CiAgd2hpbGUoIWZvcmNlX3F1aXQpewogICAgLy8gYWNjZXB0IGEgY29ubmVjdGlvbgogICAgaWYo
-KGNsaWVudF9zb2NrID0gYWNjZXB0KHNvY2ssIChzdHJ1Y3Qgc29ja2FkZHIqKSAmcmVtX2FkZHIs
-IChzb2NrbGVuX3QqKSAmYWRkcl9zaXplKSkgPCAwKQogICAgICBlcnJvcigwLCBlcnJubywgImNv
-bm5lY3Rpb24gZXJyb3Igb2NjdXJlZFxuIik7CiAgICAKICAgIC8vIHNwYXduIHRoZSB0aHJlYWQg
-YW5kIHRoZW4gYWRkIHRoZSBjbGllbnQgdG8gdGhlIGxpc3QKICAgICNpZmRlZiBfX1BUSFJFQUQK
-ICAgIHB0aHJlYWRfY3JlYXRlKCZoYW5kbGUsICZhdHRyLCAoZnVuYykgKnNlcnZpY2VfcmVxdWVz
-dCwgKHZvaWQgKikgY2xpZW50X3NvY2spOwogICAgI2VuZGlmCiAgICAjaWZuZGVmIF9fUFRIUkVB
-RAogICAgc2VydmljZV9yZXF1ZXN0KGNsaWVudF9zb2NrKTsKICAgICNlbmRpZgoKICAgIHN0cnVj
-dCBub2RlKiB0ZW1wID0gbmV3IHN0cnVjdCBub2RlKCk7CiAgICBiYTJzdHIoJnJlbV9hZGRyLnJj
-X2JkYWRkciwgdGVtcC0+YWRkcmVzcyk7CiAgICBpZihoY2lfcmVhZF9yZW1vdGVfbmFtZShzb2Nr
-LCAmcmVtX2FkZHIucmNfYmRhZGRyLCBzaXplb2YodGVtcC0+bmFtZSksIHRlbXAtPm5hbWUsIDAp
-IDwgMCkKICAgICAgc3RyY3B5KHRlbXAtPm5hbWUsICJ1bmtub3duXDAiKTsKICAgICNpZmRlZiBf
-X1BUSFJFQUQKICAgIHB0aHJlYWRfbXV0ZXhfbG9jayhub2RlX2xpc3QpOwogICAgI2VuZGlmCiAg
-ICBjbGllbnRzLnB1c2hfYmFjayh0ZW1wKTsKICAgICNpZmRlZiBfX1BUSFJFQUQKICAgIHB0aHJl
-YWRfbXV0ZXhfdW5sb2NrKG5vZGVfbGlzdCk7CiAgICAjZW5kaWYKICB9CgogIC8vIGZyZWUgbWVt
-b3J5IHVzZWQKICBjbGVhbl91cCgpOwoKICByZXR1cm4gMDsKfQoKLyogc2VydmljZV9yZXF1ZXN0
-KGludCBzb2NrKSAtLSBoYW5kbGVzIGEgcmVxdWVzdCB3aGVuIGl0IGNvbWVzIGluCiAqIHJlc3Bv
-bnNpYmxlIGZvciBuZWdvdGlhdGluZyB3aXRoIHRoZSBjbGllbnQgYW5kIGVzdGFibGlzaGluZyBp
-dHNlbGYKICogYXMgdGhlIHNlcnZlci4gQWNjZXB0cyB0aGUgdG9rZW4gZnJvbSB0aGUgY2xpZW50
-IGFmdGVyIHRoYXQgcG9pbnQuCiAqIEN1cnJlbnRseSwgYWNjZXB0cyBhIHN0cmluZyBvZiB0ZXh0
-IGFuZCBwcmludHMgaXQgdG8gc3Rkb3V0OyB0aGVuCiAqIHNlbmRzIGEgc3RyaW5nIG9mIHRleHQg
-dG8gdGhlIGNsaWVudCBhbmQgdGhlbiBxdWl0cy4KICovCnZvaWQgc2VydmljZV9yZXF1ZXN0KGlu
-dCBzb2NrKXsKICAvLyByZWFkIGluIDExIGJ5dGVzIChIZWxsb1dvcmxkXDApCiAgY2hhciBtc2db
-MjU1XSA9IHswfTsKICBpbnQgYnl0ZXMgPSByZWFkKHNvY2ssIG1zZywgMTEpOwogIGNvdXQgPDwg
-ImluY29taW5nOiAiIDw8IG1zZyA8PCBlbmRsOwoKICBtZW1zZXQobXNnLCAwLCAyNTUpOwoKICAv
-LyBzZW5kIHRoZSBjbGllbnQgYSBtZXNzYWdlCiAgc3RyY3B5KG1zZywgIkdvb2RieWUgbmV3Ymll
-IVwwIik7CiAgYnl0ZXMgPSBzZW5kKHNvY2ssIG1zZywgMTYsIDApOwoKICBjbG9zZShzb2NrKTsK
-fQoKLy8gZXhpdCBoYW5kbGVyCnN0YXRpYyB2b2lkIHF1aXRfaGFuZGxlKGludCBzaWdubyl7CiAg
-Zm9yY2VfcXVpdCA9IHRydWU7Cn0KCi8vIGZyZWUgdGhlIG1lbW9yeSB1c2VkIGJ5IHRoZSBsaXN0
-CnN0YXRpYyB2b2lkIGNsZWFuX3VwKCl7CiAgLy8gY2xlYW4gdGhlIGxpc3QKICAjaWZkZWYgX19Q
-VEhSRUFECiAgcHRocmVhZF9tdXRleF9sb2NrKG5vZGVfbGlzdCk7CiAgI2VuZGlmCiAgZm9yKHVp
-bnQgaSA9IDA7IGkgPCBjbGllbnRzLnNpemUoKTsgaSsrKXsKICAgIGRlbGV0ZSBjbGllbnRzLmZy
-b250KCk7CiAgICBjbGllbnRzLnBvcF9mcm9udCgpOwogIH0KICAjaWZkZWYgX19QVEhSRUFECiAg
-cHRocmVhZF9tdXRleF91bmxvY2sobm9kZV9saXN0KTsKICBkZWxldGUgbm9kZV9saXN0OwogICNl
-bmRpZgogIHJldHVybjsKfQo=
-------=_Part_72788_33377280.1171211742822
+Is it due to the errors that appear whe starting up hcid. I have looked up
+the error on google and have fond nothing. 
+
+ 
+
+Could someone please help me 
+
+ 
+
+Thank you
+
+
+------=_NextPart_000_00AD_01C74D89.FD224B90
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
+xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns=3D"http://www.w3.org/TR/REC-html40">
+
+<head>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered medium)">
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:Arial;
+	color:windowtext;}
+@page Section1
+	{size:595.3pt 841.9pt;
+	margin:72.0pt 90.0pt 72.0pt 90.0pt;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+
+</head>
+
+<body lang=3DEN-GB link=3Dblue vlink=3Dpurple>
+
+<div class=3DSection1>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Hi guys I was wondering if anyone can help me when I =
+run
+hcid &#8211;n I get the following messages<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>hcid[2098]: Bluetooth HCI =
+daemon<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>hcid[2098]: Starting security manager =
+0<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>hcid[2098]: Sending read scan enable command failed:
+Connection timed out (110)<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>hcid[2098]: Sending getting name command failed: =
+Connection
+timed out (110)<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>hcid[2098]: Getting name failed with status =
+0x36<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>when I try to pair my phone and machine ( vmware of =
+fedora
+core 5) the phone asks fore a pin which is handled but my phone reports =
+that it
+is unable to pair to my machine. <o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Is it due to the errors that appear whe starting up =
+hcid. I
+have looked up the error on google and have fond nothing. =
+<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Could someone please help me =
+<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Thank you<o:p></o:p></span></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+------=_NextPart_000_00AD_01C74D89.FD224B90--
+
+
+
+--===============1134420846==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -214,7 +209,7 @@ Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier.
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-------=_Part_72788_33377280.1171211742822
+--===============1134420846==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -225,4 +220,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-------=_Part_72788_33377280.1171211742822--
+--===============1134420846==--
