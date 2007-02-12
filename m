@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <2EB6297382462046A9427D7324788A4801A3898D@MCLNEXVS06.resource.ds.bah.com>
-References: <2EB6297382462046A9427D7324788A4801A3898D@MCLNEXVS06.resource.ds.bah.com>
-Date: Mon, 12 Feb 2007 20:33:11 +0100
-Message-Id: <1171308791.11774.6.camel@violet>
+In-Reply-To: <20070209114308.GA16231@suse.de>
+References: <45CC5281.9090209@voelkers.org> <20070209114308.GA16231@suse.de>
+Date: Mon, 12 Feb 2007 20:41:38 +0100
+Message-Id: <1171309299.11774.18.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Oops with multiple hcitool commands
+Subject: Re: [Bluez-devel] Two sticks for a developer
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,21 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Richard,
+Hi Stefan,
 
-> I am building a project that will use multiple HCI devices on a single
-> Linux PC. I have a USB hub, and several Linksys Bluetooth dongles. On
-> my PC I open two terminal windows and then run the following commands:
->  
-> window 1#  hcitool -i hci0 info 00:18:C5:2C:5E:C2
-> window 2#  hcitool -i hci1 info 00:18:C5:2C:5E:C2
->  
-> The two commands must run simultaneously. Just these two commands run
-> quickly one after the other will almost always cause the oops. The
-> problem does not occur if the two hcitool info commands are examining
-> different remote devices. You must go after the same remote device.
+> > many annoying messages about unknown sco packages in the syslog (>1000/min)
+> 
+> This one can probably be fixed by using
+> modprobe hci_usb isoc=1
 
-please post the oops message from the kernel.
+actually it would be isoc=0.
+
+> and if that works, Marcel will ask you some details so he can blacklist
+> the device :-)
+
+Show me lsusb and my guess is that I already blacklisted this one in the
+latest kernel version.
 
 Regards
 
