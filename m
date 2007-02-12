@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200702071644.02277.fernando@bluexare.org>
-References: <200702071644.02277.fernando@bluexare.org>
-Date: Mon, 12 Feb 2007 20:44:21 +0100
-Message-Id: <1171309461.11774.22.camel@violet>
+In-Reply-To: <200702061513.32173.denis.kenzior@trolltech.com>
+References: <200702061513.32173.denis.kenzior@trolltech.com>
+Date: Mon, 12 Feb 2007 20:49:04 +0100
+Message-Id: <1171309744.11774.24.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Pairing event in a module
+Subject: Re: [Bluez-devel] [PATCH] Minor issues with sdp-xml
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,29 +20,11 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fernando,
+Hi Denis,
 
-> I'm trying to develop an application that works with mobil devices.
-> 
-> I want to caugth the pairing event to do some things...
-> 
-> Only I need the device address of it, when the device pairs to me.
-> 
-> I have been seen the code, but I don't know how I can integrate to my module.
-> 
-> The link_key_notify shows when a device have paired with me, but how can 
-> I "listen" until the launch of this method?
-> How I can listen the EVT_LINK_KEY_NOTIFY event?
-> 
-> Which method launch this events??
-> 
-> I have seen that io_security_event do something with this events when they are 
-> launched, but..., Who launch them?
-> 
-> Or, if i can listen these envets, It would be sufficient for me.
+> This patch fixes up a couple of minor bugs I found.
 
-use the D-Bus API and listend to BondingCreated signals. Playing on the
-low-level HCI is not a good idea at all.
+the patch has been committed to the CVS. Thanks.
 
 Regards
 
