@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <52950c3f0702110835g10106667jd8034fc66536aa7c@mail.gmail.com>
-References: <52950c3f0702110835g10106667jd8034fc66536aa7c@mail.gmail.com>
-Date: Mon, 12 Feb 2007 20:38:06 +0100
-Message-Id: <1171309086.11774.13.camel@violet>
+In-Reply-To: <294019.42469.qm@web31708.mail.mud.yahoo.com>
+References: <294019.42469.qm@web31708.mail.mud.yahoo.com>
+Date: Mon, 12 Feb 2007 20:36:11 +0100
+Message-Id: <1171308971.11774.11.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] connect() returns "Operation already in progress"
+Subject: Re: [Bluez-users] installing latest bluez on edgy?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,17 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Timur,
+Hi Tim,
 
-> I'm trying to write a simple client/server application to communicate
-> between a Motorola A780 phone and a bluetooth usb dongle.
-> Interestingly enough when I run the server application on my laptop,
-> to which the dongle is attached, the client application on the phone
-> returns "Operation already in progress" when connect is called. On the
-> other hand, when I run the server on the phone and connect from my
-> laptop, it works fine. What could be causing this? 
+> is there a binary i can dl?
+> 
+> or a tutorial on compiling?
 
-run "hcidump -X -V" to see what is causing this error message.
+not that I know of. However it is straight forward and you should check
+the README of the source first.
+
+> also i frequently have to type:
+> 
+> dbus-send --system --dest=org.bluez /org/bluez/hci0
+> org.bluez.Adapter.SetMode string:discoverable
+> 
+> is there a way to make it so i dont have to type this
+> all the time?
+
+This has been extensively discussed. Check the mailing list archive or
+use the configuration applet from bluez-gnome.
 
 Regards
 
