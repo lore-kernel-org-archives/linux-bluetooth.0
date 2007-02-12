@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20070209114308.GA16231@suse.de>
-References: <45CC5281.9090209@voelkers.org> <20070209114308.GA16231@suse.de>
-Date: Mon, 12 Feb 2007 20:41:38 +0100
-Message-Id: <1171309299.11774.18.camel@violet>
+In-Reply-To: <200702040015.38566.paul@codesourcery.com>
+References: <200702040015.38566.paul@codesourcery.com>
+Date: Mon, 12 Feb 2007 20:58:47 +0100
+Message-Id: <1171310327.11774.31.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Two sticks for a developer
+Subject: Re: [Bluez-devel] [patch] Celluon CL800TB keryboard support
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,20 +20,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Stefan,
+Hi Paul,
 
-> > many annoying messages about unknown sco packages in the syslog (>1000/min)
-> 
-> This one can probably be fixed by using
-> modprobe hci_usb isoc=1
+> The attached patch implements support for the Celluon CL800BT keyboard. It 
+> adds decoding of the data received to the current non-functional framework in 
+> the fakehid driver. It currently only implements keyboard 
+> functionality, "mouse mode" data is ignored.
 
-actually it would be isoc=0.
-
-> and if that works, Marcel will ask you some details so he can blacklist
-> the device :-)
-
-Show me lsusb and my guess is that I already blacklisted this one in the
-latest kernel version.
+the patch has been committed to the CVS. Thanks.
 
 Regards
 
