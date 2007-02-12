@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Nicolas =?ISO-8859-1?Q?L=E9cureuil?= <neoclust@mandriva.org>
-In-Reply-To: <200702041511.32706.neoclust@mandriva.org>
-References: <200702041511.32706.neoclust@mandriva.org>
-Date: Mon, 12 Feb 2007 20:51:22 +0100
-Message-Id: <1171309882.11774.29.camel@violet>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <00ac01c74d89$fd224b90$0302a8c0@homayounpc>
+References: <00ac01c74d89$fd224b90$0302a8c0@homayounpc>
+Date: Mon, 12 Feb 2007 20:40:12 +0100
+Message-Id: <1171309212.11774.16.camel@violet>
 Mime-Version: 1.0
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Missing passkey-agent on latest bluez-utils ( 3.9
-	)
+Subject: Re: [Bluez-users] erros on running hcid -n
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,30 +16,30 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Nicolas,
-
-> i am trying to compile bluez-utils 3.9 but i can't  pass to have 
-> passkey-agent.
-> Does someone know where is it now  ?
-
-it has been moved to the daemon/ directory.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easier.
-Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGksCgo+IEkgd2FzIHdvbmRlcmluZyBpZiBhbnlvbmUgY2FuIGhlbHAgbWUgd2hlbiBJIHJ1biBo
+Y2lkIOKAk24gSSBnZXQgdGhlCj4gZm9sbG93aW5nIG1lc3NhZ2VzCj4gCj4gIAo+IAo+IGhjaWRb
+MjA5OF06IEJsdWV0b290aCBIQ0kgZGFlbW9uCj4gCj4gaGNpZFsyMDk4XTogU3RhcnRpbmcgc2Vj
+dXJpdHkgbWFuYWdlciAwCj4gCj4gaGNpZFsyMDk4XTogU2VuZGluZyByZWFkIHNjYW4gZW5hYmxl
+IGNvbW1hbmQgZmFpbGVkOiBDb25uZWN0aW9uIHRpbWVkCj4gb3V0ICgxMTApCj4gCj4gaGNpZFsy
+MDk4XTogU2VuZGluZyBnZXR0aW5nIG5hbWUgY29tbWFuZCBmYWlsZWQ6IENvbm5lY3Rpb24gdGlt
+ZWQgb3V0Cj4gKDExMCkKPiAKPiBoY2lkWzIwOThdOiBHZXR0aW5nIG5hbWUgZmFpbGVkIHdpdGgg
+c3RhdHVzIDB4MzYKCnRoaXMgc2hvdWxkIGJlIGFsbCBmaXhlZCB3aXRoIGJsdWV6LXV0aWxzLTMu
+OS4gVHJ5IHRoYXQgdmVyc2lvbi4KCj4gd2hlbiBJIHRyeSB0byBwYWlyIG15IHBob25lIGFuZCBt
+YWNoaW5lICggdm13YXJlIG9mIGZlZG9yYSBjb3JlIDUpIHRoZQo+IHBob25lIGFza3MgZm9yZSBh
+IHBpbiB3aGljaCBpcyBoYW5kbGVkIGJ1dCBteSBwaG9uZSByZXBvcnRzIHRoYXQgaXQgaXMKPiB1
+bmFibGUgdG8gcGFpciB0byBteSBtYWNoaW5lLiAKClRyeSBhIEZlZG9yYSBDb3JlIDYgYW5kIGxv
+Z2luIGludG8gYSBzZXNzaW9uLiBJdCBzaG91bGQgc2hvdyBhbiBpbnB1dApkaWFsb2cuCgpSZWdh
+cmRzCgpNYXJjZWwKCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpVc2luZyBUb21jYXQgYnV0IG5lZWQgdG8g
+ZG8gbW9yZT8gTmVlZCB0byBzdXBwb3J0IHdlYiBzZXJ2aWNlcywgc2VjdXJpdHk/CkdldCBzdHVm
+ZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUtaW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRvIG1ha2UgeW91
+ciBqb2IgZWFzaWVyLgpEb3dubG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2
+LjEuMC4xIGJhc2VkIG9uIEFwYWNoZSBHZXJvbmltbwpodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5u
+ZXQvc2VsP2NtZD1sbmsma2lkPTEyMDcwOSZiaWQ9MjYzMDU3JmRhdD0xMjE2NDIKX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotdXNlcnMgbWFpbGlu
+ZyBsaXN0CkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNv
+dXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo=
