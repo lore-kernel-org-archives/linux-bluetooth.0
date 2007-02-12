@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <00ac01c74d89$fd224b90$0302a8c0@homayounpc>
-References: <00ac01c74d89$fd224b90$0302a8c0@homayounpc>
-Date: Mon, 12 Feb 2007 20:40:12 +0100
-Message-Id: <1171309212.11774.16.camel@violet>
+In-Reply-To: <52950c3f0702110835g10106667jd8034fc66536aa7c@mail.gmail.com>
+References: <52950c3f0702110835g10106667jd8034fc66536aa7c@mail.gmail.com>
+Date: Mon, 12 Feb 2007 20:38:06 +0100
+Message-Id: <1171309086.11774.13.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] erros on running hcid -n
+Subject: Re: [Bluez-users] connect() returns "Operation already in progress"
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,30 +16,34 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGksCgo+IEkgd2FzIHdvbmRlcmluZyBpZiBhbnlvbmUgY2FuIGhlbHAgbWUgd2hlbiBJIHJ1biBo
-Y2lkIOKAk24gSSBnZXQgdGhlCj4gZm9sbG93aW5nIG1lc3NhZ2VzCj4gCj4gIAo+IAo+IGhjaWRb
-MjA5OF06IEJsdWV0b290aCBIQ0kgZGFlbW9uCj4gCj4gaGNpZFsyMDk4XTogU3RhcnRpbmcgc2Vj
-dXJpdHkgbWFuYWdlciAwCj4gCj4gaGNpZFsyMDk4XTogU2VuZGluZyByZWFkIHNjYW4gZW5hYmxl
-IGNvbW1hbmQgZmFpbGVkOiBDb25uZWN0aW9uIHRpbWVkCj4gb3V0ICgxMTApCj4gCj4gaGNpZFsy
-MDk4XTogU2VuZGluZyBnZXR0aW5nIG5hbWUgY29tbWFuZCBmYWlsZWQ6IENvbm5lY3Rpb24gdGlt
-ZWQgb3V0Cj4gKDExMCkKPiAKPiBoY2lkWzIwOThdOiBHZXR0aW5nIG5hbWUgZmFpbGVkIHdpdGgg
-c3RhdHVzIDB4MzYKCnRoaXMgc2hvdWxkIGJlIGFsbCBmaXhlZCB3aXRoIGJsdWV6LXV0aWxzLTMu
-OS4gVHJ5IHRoYXQgdmVyc2lvbi4KCj4gd2hlbiBJIHRyeSB0byBwYWlyIG15IHBob25lIGFuZCBt
-YWNoaW5lICggdm13YXJlIG9mIGZlZG9yYSBjb3JlIDUpIHRoZQo+IHBob25lIGFza3MgZm9yZSBh
-IHBpbiB3aGljaCBpcyBoYW5kbGVkIGJ1dCBteSBwaG9uZSByZXBvcnRzIHRoYXQgaXQgaXMKPiB1
-bmFibGUgdG8gcGFpciB0byBteSBtYWNoaW5lLiAKClRyeSBhIEZlZG9yYSBDb3JlIDYgYW5kIGxv
-Z2luIGludG8gYSBzZXNzaW9uLiBJdCBzaG91bGQgc2hvdyBhbiBpbnB1dApkaWFsb2cuCgpSZWdh
-cmRzCgpNYXJjZWwKCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpVc2luZyBUb21jYXQgYnV0IG5lZWQgdG8g
-ZG8gbW9yZT8gTmVlZCB0byBzdXBwb3J0IHdlYiBzZXJ2aWNlcywgc2VjdXJpdHk/CkdldCBzdHVm
-ZiBkb25lIHF1aWNrbHkgd2l0aCBwcmUtaW50ZWdyYXRlZCB0ZWNobm9sb2d5IHRvIG1ha2UgeW91
-ciBqb2IgZWFzaWVyLgpEb3dubG9hZCBJQk0gV2ViU3BoZXJlIEFwcGxpY2F0aW9uIFNlcnZlciB2
-LjEuMC4xIGJhc2VkIG9uIEFwYWNoZSBHZXJvbmltbwpodHRwOi8vc2VsLmFzLXVzLmZhbGthZy5u
-ZXQvc2VsP2NtZD1sbmsma2lkPTEyMDcwOSZiaWQ9MjYzMDU3JmRhdD0xMjE2NDIKX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotdXNlcnMgbWFpbGlu
-ZyBsaXN0CkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNv
-dXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo=
+Hi Timur,
+
+> I'm trying to write a simple client/server application to communicate
+> between a Motorola A780 phone and a bluetooth usb dongle.
+> Interestingly enough when I run the server application on my laptop,
+> to which the dongle is attached, the client application on the phone
+> returns "Operation already in progress" when connect is called. On the
+> other hand, when I run the server on the phone and connect from my
+> laptop, it works fine. What could be causing this? 
+
+run "hcidump -X -V" to see what is causing this error message.
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+Using Tomcat but need to do more? Need to support web services, security?
+Get stuff done quickly with pre-integrated technology to make your job easier.
+Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
