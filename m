@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <b5dccebe0702090245o53dd36cwb62836b7d2b234d2@mail.gmail.com>
-References: <b5dccebe0702090245o53dd36cwb62836b7d2b234d2@mail.gmail.com>
-Date: Mon, 12 Feb 2007 20:42:38 +0100
-Message-Id: <1171309358.11774.20.camel@violet>
+In-Reply-To: <200702071644.02277.fernando@bluexare.org>
+References: <200702071644.02277.fernando@bluexare.org>
+Date: Mon, 12 Feb 2007 20:44:21 +0100
+Message-Id: <1171309461.11774.22.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] phone model and link manager version
+Subject: Re: [Bluez-devel] Pairing event in a module
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,36 +20,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mikael,
+Hi Fernando,
 
-> I wonder if there is you think there is any correlation between the
-> Link Manager Protocol
-> (LMP) Subversion and the model of a bluetooth phone. I mean, if I find
-> out the LMP subversion of a remote device with for example hcitool,
-> like this:
+> I'm trying to develop an application that works with mobil devices.
 > 
-> sudo hcitool info <bdaddr>
+> I want to caugth the pairing event to do some things...
 > 
-> Requesting information ...
-> ...
-> LMP Version: 1.2 (0x2) LMP Subversion: 0x41c
+> Only I need the device address of it, when the device pairs to me.
 > 
-> Can this subversion be used to identify the model of the phone?
+> I have been seen the code, but I don't know how I can integrate to my module.
 > 
-> If not, can it be used to suggest that the phone is any of a small set
-> of models?
+> The link_key_notify shows when a device have paired with me, but how can 
+> I "listen" until the launch of this method?
+> How I can listen the EVT_LINK_KEY_NOTIFY event?
 > 
-> If firmware updates are being made on the phone, will that affect the
-> LMP subversion?
+> Which method launch this events??
 > 
-> What process inside a phone manufacturer company decide that a
-> Bluetooth chip with a certain LMP subversion ends up in a specific
-> model? Is it just related to when the phone happened to be produced or
-> is it somehow related to the model?
+> I have seen that io_security_event do something with this events when they are 
+> launched, but..., Who launch them?
+> 
+> Or, if i can listen these envets, It would be sufficient for me.
 
-on some phones yes, on others no. The value is Bluetooth chip
-manufacturer specific and nowadays doesn't tell you any details about
-the phone.
+use the D-Bus API and listend to BondingCreated signals. Playing on the
+low-level HCI is not a good idea at all.
 
 Regards
 
