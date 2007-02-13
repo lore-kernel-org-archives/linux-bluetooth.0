@@ -1,15 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <57c68ddc0702122257r230f45eeo75b4bca9b81796e7@mail.gmail.com>
-Date: Tue, 13 Feb 2007 12:27:04 +0530
+Message-ID: <57c68ddc0702122156l30de071bu2c56559628a6ac92@mail.gmail.com>
+Date: Tue, 13 Feb 2007 11:26:52 +0530
 From: "siddhant tewari" <siddhant.tewari@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1169301946.30356.7.camel@violet>
 MIME-Version: 1.0
-References: <b5dccebe0701190517t50869e29y4fcacda8475db035@mail.gmail.com>
-	<1169219863.29458.10.camel@violet>
-	<b5dccebe0701200259i156f623ci1fc12159affbd2f4@mail.gmail.com>
-	<1169301946.30356.7.camel@violet>
-Subject: Re: [Bluez-users] BlueZ on other platforms
+Subject: [Bluez-users] Problem in doing Obex push though multiple connection
+	using single adapter
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,98 +15,148 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0080194816=="
+Content-Type: multipart/mixed; boundary="===============0640923370=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0080194816==
+--===============0640923370==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_62598_23294327.1171349824947"
+	boundary="----=_Part_62266_30723375.1171346212562"
 
-------=_Part_62598_23294327.1171349824947
+------=_Part_62266_30723375.1171346212562
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi Marcel,
-    i would like to port bluez on windows .... Marcel can you guide me how
-to do that or at least outline the steps and give threads abt how to
-proceed.
+hi,
+   This is the part of code i am using to perform obex push on two
+simultaneous connections.The behavior is that while sending through one of
+the connections progress in the other process gets stopped and sometimes
+causes error.  Please tell me whether my method is correct or not.I provide
+the bt addr of the remote devices and their obex push channel via command
+line.
 
-regards
+
+int main(int argc,char **argv)
+{
+    bdaddr_t sourceBdAddr;
+    int pid,counter;
+    str2ba("80:48:40:B0:A2:02",&sourceBdAddr);
+    for (counter = 0;counter < 2;++counter)
+    {
+        if ((pid = fork()) == 0)
+        {
+            bdaddr_t destBdAddr;
+            struct rfcomm_dev_req req;
+            char tempBuf[20];
+            int ctl;
+            int err;
+            int dev = counter;
+            int returnVal;
+            extern char* addressName;
+            str2ba(argv[dev*2 + 1],&destBdAddr);
+            addressName = strdup(argv[dev*2 +1]);
+            //sprintf(addressName,"%s",argv[dev*2 + 1]);
+            printf ("Sending file to %s\n",argv[dev*2 + 1]);
+            ctl = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_RFCOMM);
+            if (ctl < 0) {
+                perror("Can't open RFCOMM control socket");
+                exit(1);
+            }
+            req.dev_id = dev;
+            req.flags = 0;
+            bacpy(&req.src, &sourceBdAddr);
+            bacpy(&req.dst, &destBdAddr);
+            req.channel = atoi (argv[dev*2 + 2]);
+            sprintf(tempBuf,"/dev/rfcomm%d",dev);
+            //mknod(tempBuf,S_IFCHR,req.dev_id);
+            {
+                char cmdBuf[256];
+                remove (tempBuf);
+                sprintf(cmdBuf,"mknod %s c 216 %d",tempBuf,dev);
+                if (system(cmdBuf) != 0 )
+                {
+                    fprintf(stderr,"\nError in executng mknod\n");
+                    exit(1);
+                }
+            }
+            err = ioctl(ctl, RFCOMMCREATEDEV, &req);
+            if (err == EOPNOTSUPP)
+                fprintf(stderr, "RFCOMM TTY support not available\n");
+            else if (err < 0)
+            {
+                perror("Can't create device");
+            }
+            returnVal = obex_push(tempBuf,"tf.jpg");
+
+            memset(&req, 0, sizeof(req));
+            req.dev_id = dev;
+            err = ioctl(ctl, RFCOMMRELEASEDEV, &req);
+            if (err < 0)
+            {
+                perror("Can't release device");
+                exit(1);
+            }
+            close(ctl);
+            if (returnVal ==0)
+                printf("Sending file to %s successfull\n",argv[dev*2 + 1]);
+            else
+                printf("Sending file to %s unsuccessfull\n",argv[dev*2 +
+1]);
+            exit (0);
+        }
+    }
+    wait();
+}
+
+
+
+thanks
+
 siddhant
 
-On 1/20/07, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Mikel,
->
-> > > > Is it possible to get bluez to work on other platforms than Linux?
-> I'm
-> > > > asking because it's a real good bluetooth stack and that's a rare
-> > > > thing... So technically it's not bluez, but bluez-libs. So what
-> about
-> > > >
-> > > > Bluez on Mac?
-> > > > Bluez on Windows?
-> > > > Bluez on Cygwin on Windows?
-> > >
-> > > non of that will work. The Bluetooth library depends on kernel
-> > > structures and one of the big advantages of BlueZ is the native
-> > > integration with the socket API.
-> >
-> > So not even for Cygwin? How difficult would this be to add? I.e. how
-> > big parts of bluez would have to be rewritten and how much could be
-> > reused to make it work on cygwin (I suppose this would be layered on
-> > top of the Microsoft bluetooth stack)?
->
-> this all depends on what's your goal and how your applications look
-> like. The best emulation would be of course our D-Bus based API, but
-> even that is a lot of work. A native emulation of BlueZ is not realistic
-> from my point of view. Feel free to prove me wrong.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share
-> your
-> opinions on IT & business topics through brief surveys - and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
-
-------=_Part_62598_23294327.1171349824947
+------=_Part_62266_30723375.1171346212562
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-<div>Hi Marcel,</div>
-<div>&nbsp;&nbsp;&nbsp; i would like to port bluez on windows .... Marcel can you guide me how to do that or at least outline the steps and give threads abt how to proceed. </div>
+<div>hi,</div>
+<div>&nbsp;&nbsp; This is the part of code i am using to perform obex push on two simultaneous connections.The behavior is that while sending through one of the&nbsp;connections progress in the other process gets stopped and sometimes causes error. &nbsp;Please tell me whether my method is correct or 
+not.I provide the bt addr of the remote devices and their obex push channel via command line.</div>
 <div>&nbsp;</div>
-<div>regards</div>
-<div>siddhant<br>&nbsp;</div>
-<div><span class="gmail_quote">On 1/20/07, <b class="gmail_sendername">Marcel Holtmann</b> &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:</span>
-<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">Hi Mikel,<br><br>&gt; &gt; &gt; Is it possible to get bluez to work on other platforms than Linux? I&#39;m
-<br>&gt; &gt; &gt; asking because it&#39;s a real good bluetooth stack and that&#39;s a rare<br>&gt; &gt; &gt; thing... So technically it&#39;s not bluez, but bluez-libs. So what about<br>&gt; &gt; &gt;<br>&gt; &gt; &gt; Bluez on Mac?
-<br>&gt; &gt; &gt; Bluez on Windows?<br>&gt; &gt; &gt; Bluez on Cygwin on Windows?<br>&gt; &gt;<br>&gt; &gt; non of that will work. The Bluetooth library depends on kernel<br>&gt; &gt; structures and one of the big advantages of BlueZ is the native
-<br>&gt; &gt; integration with the socket API.<br>&gt;<br>&gt; So not even for Cygwin? How difficult would this be to add? I.e. how<br>&gt; big parts of bluez would have to be rewritten and how much could be<br>&gt; reused to make it work on cygwin (I suppose this would be layered on
-<br>&gt; top of the Microsoft bluetooth stack)?<br><br>this all depends on what&#39;s your goal and how your applications look<br>like. The best emulation would be of course our D-Bus based API, but<br>even that is a lot of work. A native emulation of BlueZ is not realistic
-<br>from my point of view. Feel free to prove me wrong.<br><br>Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>Take Surveys. Earn Cash. Influence the Future of IT
-<br>Join SourceForge.net&#39;s Techsay panel and you&#39;ll get the chance to share your<br>opinions on IT &amp; business topics through brief surveys - and earn cash<br><a href="http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV">
-http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV</a><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net
-</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquote></div><br>
+<div>
+<p class="MsoPlainText" style="MARGIN: 0in 0in 0pt"><font face="Courier New" size="2">int main(int argc,char **argv)<br>{<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp; </span>bdaddr_t sourceBdAddr;<br><span style="mso-spacerun: yes">
+&nbsp;&nbsp;&nbsp; </span>int pid,counter;<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp; </span>str2ba(&quot;80:48:40:B0:A2:02&quot;,&amp;sourceBdAddr);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp; </span>for (counter = 0;counter &lt; 2;++counter)<br>
+<span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp; </span>{<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>if ((pid = fork()) == 0) <br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>{<br><span style="mso-spacerun: yes">&nbsp;&nbsp; </span><span style="mso-spacerun: yes">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>bdaddr_t destBdAddr;<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>struct rfcomm_dev_req req;<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>char tempBuf[20];<br><span style="mso-spacerun: yes">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>int ctl;<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>int err;<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>int dev = counter;<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>int returnVal;
+<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>extern char* addressName;<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>str2ba(argv[dev*2 + 1],&amp;destBdAddr);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</span>addressName = strdup(argv[dev*2 +1]);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>//sprintf(addressName,&quot;%s&quot;,argv[dev*2 + 1]);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>printf (&quot;Sending file to %s\n&quot;,argv[dev*2 + 1]);
+<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>ctl = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_RFCOMM);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>if (ctl &lt; 0) {<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</span>perror(&quot;Can&#39;t open RFCOMM control socket&quot;);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>exit(1);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>}<br><span style="mso-spacerun: yes">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>req.dev_id = dev;<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>req.flags = 0;<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>bacpy(&amp;req.src, &amp;sourceBdAddr);<br><span style="mso-spacerun: yes">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>bacpy(&amp;req.dst, &amp;destBdAddr);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>req.channel = atoi (argv[dev*2 + 2]);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>sprintf(tempBuf,&quot;/dev/rfcomm%d&quot;,dev);
+<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>//mknod(tempBuf,S_IFCHR,req.dev_id);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>{<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>char cmdBuf[256];
+<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>remove (tempBuf);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp; </span><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>sprintf(cmdBuf,&quot;mknod %s c 216 %d&quot;,tempBuf,dev);
+<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>if (system(cmdBuf) != 0 )<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>{<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>fprintf(stderr,&quot;\nError in executng mknod\n&quot;);
+<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>exit(1);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>}<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>}<br><span style="mso-spacerun: yes">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>err = ioctl(ctl, RFCOMMCREATEDEV, &amp;req);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>if (err == EOPNOTSUPP)<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+</span>fprintf(stderr, &quot;RFCOMM TTY support not available\n&quot;);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>else if (err &lt; 0)<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>{<br><span style="mso-spacerun: yes">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>perror(&quot;Can&#39;t create device&quot;);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>}<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>returnVal = obex_push(tempBuf,&quot;tf.jpg&quot;);
+<br><br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>memset(&amp;req, 0, sizeof(req));<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>req.dev_id = dev;<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>err = ioctl(ctl, RFCOMMRELEASEDEV, &amp;req);
+<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>if (err &lt; 0)<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>{<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>perror(&quot;Can&#39;t release device&quot;);
+<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>exit(1);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>}<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>close(ctl);<br><span style="mso-spacerun: yes">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>if (returnVal ==0)<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>printf(&quot;Sending file to %s successfull\n&quot;,argv[dev*2 + 1]);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>else
+<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>printf(&quot;Sending file to %s unsuccessfull\n&quot;,argv[dev*2 + 1]);<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>exit (0);<br><span style="mso-spacerun: yes">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>}<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp; </span>}<br><span style="mso-spacerun: yes">&nbsp;&nbsp;&nbsp; </span>wait();<br>}</font><br></p>
+<p class="MsoPlainText" style="MARGIN: 0in 0in 0pt">&nbsp;</p>
+<p class="MsoPlainText" style="MARGIN: 0in 0in 0pt">thanks</p>
+<p class="MsoPlainText" style="MARGIN: 0in 0in 0pt">siddhant</p></div>
 
-------=_Part_62598_23294327.1171349824947--
+------=_Part_62266_30723375.1171346212562--
 
 
---===============0080194816==
+--===============0640923370==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -121,7 +167,7 @@ Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier.
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============0080194816==
+--===============0640923370==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -132,4 +178,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0080194816==--
+--===============0640923370==--
