@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <dcbc35340702131508m11f35e92hb912ccc1a3d087a0@mail.gmail.com>
-Date: Tue, 13 Feb 2007 23:08:32 +0000
-From: "=?ISO-8859-1?Q?Paulo_Gon=E7alves?=" <paf.goncalves@gmail.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] help installing bluez 3.9
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <45d1e66413baa@wp.pl>
+References: <45d1e66413baa@wp.pl>
+Date: Tue, 13 Feb 2007 17:29:06 +0100
+Message-Id: <1171384146.23580.31.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] connection problem between samsung mobile
+	phone	nad bluez 3.8in slackware 11
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,150 +17,88 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2046370265=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============2046370265==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_110952_7077561.1171408112248"
+Hi Miroslaw,
 
-------=_Part_110952_7077561.1171408112248
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+> I have problem with connection between my usb bluetooth and 
+> samsung sgh -x680. I have installed slackware 11 with bluez 3.8 (lib and utils). for essy diagnostic I sending for you output same commands 
+> and comments 
+>  
+> lsusb :
+> 
+> Bus 2 Device 2: ID 1131:1001 Integrated System Solution Corp. KY-BT100 Bluetooth Adapter
+> 
+> hciconfig -a 
+> 
+> hci0:   Type: USB
+>         BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 48:10
+>         UP RUNNING PSCAN
+>         RX bytes:7001 acl:10 sco:0 events:265 errors:0
+>         TX bytes:1665 acl:10 sco:0 commands:110 errors:0
+>         Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: MASTER
+>         Name: 'BlueZ (0)'
+>         Class: 0x3e0100
+>         Service Classes: Networking, Rendering, Capturing, Object Transfer, Audio
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe LMP Ver: 1.2 (0x2) LMP Subver: 0x1fe
+>         Manufacturer: Integrated System Solution Corp. (57)
+> hcitool scan
+> Scanning ...
+> 
+>         00:17:D5:47:4E:88       Mir
+> 
+> hcid and spdp demon I have started by rc.bluetooth script from /etc/rc.d
+> 
+> my mobile phone hasn't seen my usb bluetooth 
+> When I have tried connect to my phone I haven't got any error  but this link hasn't work . 
+> command l2ping to phone work very well.
+> 
+> hcitool con
+> Connections:
+> 
+> 
+> 
+> I see my phon by kbluetooth but
+> when I try connect by kbluetoothd -> "OBEX file transfer" (hcidump work in beckground) my phone askin my about pin. I write pin from my hcid.conf section passkey "1111"; and security auto but connection broken becous I see on my phone "pin invaide"
+> 
+> output hcidump -X -V
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 1 packets 1
+> > HCI Event: PIN Code Request (0x16) plen 6
+>     bdaddr 00:17:D5:47:4E:88
+> < HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+>     bdaddr 00:17:D5:47:4E:88
+> > HCI Event: Command Complete (0x0e) plen 10
+>     PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
+>     status 0x00 bdaddr 00:17:D5:47:4E:88
+> > HCI Event: Auth Complete (0x06) plen 3
+>     status 0x06 handle 1
+>     Error: PIN or Key Missing
+> 
+> 
+> Could you tell me where is problem ?
 
-Hi!
+you might wanna check the syslog. My guess is that you don't have a
+passkey agent running.
 
-I just installed bluez 3.9 (patched the kernel and build the modules,
-installed bluez-libs-3.9 and bluez-utils-3.9)
-but i can't find the script to start|stop|restart the service
-(/etc/init.d/bluetooth).
-Where can I find it ?
+Regards
 
-After i finish the instalation i checked that the modules ware loaded:
-root@xxxx:~/bluez-utils-3.9# lsmod
-Module                  Size  Used by    Not tainted
-bnep                    8020   0  (autoclean)
-l2cap                  15120   0  (autoclean) [bnep]
-hci_usb                 8376   0  (unused)
-bluez                  27812   1  [bnep l2cap hci_usb]
-
-so i run hciconfig:
-root@xxxx:/etc/bluetooth# /usr/sbin/hciconfig -a
-hci0:   Type: USB
- BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
- DOWN
- RX bytes:0 acl:0 sco:0 events:0 errors:0
- TX bytes:0 acl:0 sco:0 commands:0 errors:0
-
-but where is the BD Address ?
-and all the other data that i saw in some examples
-
-then i run the pan daemon:
-root@dell:/etc/bluetooth# pand -s -M --role=3DNAP -n
-pand[18321]: Bluetooth PAN daemon version 3.9
-pand[18321]: Failed to connect to the local SDP server. No such file or
-directory(2)
-
-is this error normal ?
-
-I hope someone can help me.
-Thanks,
-
-    Paulo Gon=E7alves
-
-
-PS: output from 'cat /proc/bus/usb/devices':
-D:  Ver=3D 2.00 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
-P:  Vendor=3D0df6 ProdID=3D2200 Rev=3D19.58
-S:  Product=3DSitecom USB bluetooth2.0 class 2 dongle CN-512
-
-------=_Part_110952_7077561.1171408112248
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-<div>Hi!</div>
-<div>&nbsp;</div>
-<div>I just installed bluez 3.9 (patched the kernel and build the modules, =
-installed bluez-libs-3.9 and bluez-utils-3.9) </div>
-<div>but i can&#39;t find the script to start|stop|restart the service (/et=
-c/init.d/bluetooth).</div>
-<div>Where can I find it ?</div>
-<div>&nbsp;</div>
-<div>After i finish the instalation i checked that the modules ware loaded:=
-</div>
-<div><a href=3D"mailto:root@xxxx:~/bluez-utils-3.9">root@xxxx:~/bluez-utils=
--3.9</a># lsmod<br>Module&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Size&nbsp; Used by&nbs=
-p;&nbsp;&nbsp; Not tainted<br>bnep&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8=
-020&nbsp;&nbsp; 0&nbsp; (autoclean)<br>l2cap&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 151=
-20&nbsp;&nbsp; 0&nbsp; (autoclean) [bnep]
-<br>hci_usb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
-p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8376&nbsp;&nbsp; 0&nbsp; (unused)<br>bluez=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp;&nbsp; 27812&nbsp;&nbsp; 1&nbsp; [bnep l2cap hci_usb]<=
-/div>
-<div>&nbsp;</div>
-<div>so i run hciconfig:</div>
-<div><a href=3D"mailto:root@xxxx:/etc/bluetooth">root@xxxx:/etc/bluetooth</=
-a># /usr/sbin/hciconfig -a&nbsp;&nbsp;&nbsp; <br>hci0:&nbsp;&nbsp; Type: US=
-B<br>&nbsp;BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0<br>&nbsp=
-;DOWN <br>&nbsp;RX bytes:0 acl:0 sco:0 events:0 errors:0
-<br>&nbsp;TX bytes:0 acl:0 sco:0 commands:0 errors:0</div>
-<div>&nbsp;</div>
-<div>but where is the BD Address ?</div>
-<div>and all the other data that i saw in&nbsp;some examples</div>
-<div>&nbsp;</div>
-<div>then i run the pan daemon:</div>
-<div><a href=3D"mailto:root@dell:/etc/bluetooth">root@dell:/etc/bluetooth</=
-a># pand -s -M --role=3DNAP -n<br>pand[18321]: Bluetooth PAN daemon version=
- 3.9<br>pand[18321]: Failed to connect to the local SDP server. No such fil=
-e or directory(2)
-</div>
-<div>&nbsp;</div>
-<div>is this error normal ?</div>
-<div>&nbsp;</div>
-<div>I hope someone can help me.</div>
-<div>Thanks,</div>
-<div>&nbsp;</div>
-<div>&nbsp;&nbsp;&nbsp; Paulo Gon=E7alves</div>
-<div>&nbsp;</div>
-<div>&nbsp;</div>
-<div>PS: output from &#39;cat /proc/bus/usb/devices&#39;:</div>
-<div>D:&nbsp; Ver=3D 2.00 Cls=3De0(unk. ) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfg=
-s=3D&nbsp; 1<br>P:&nbsp; Vendor=3D0df6 ProdID=3D2200 Rev=3D19.58<br>S:&nbsp=
-; Product=3DSitecom USB bluetooth2.0 class 2 dongle CN-512</div>
-<div>&nbsp;</div>
-<div>&nbsp;</div>
-<div>&nbsp;</div>
-
-------=_Part_110952_7077561.1171408112248--
+Marcel
 
 
---===============2046370265==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
 Get stuff done quickly with pre-integrated technology to make your job easier.
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
 http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
---===============2046370265==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============2046370265==--
