@@ -1,11 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 13 Feb 2007 10:18:22 +0100
-From: =?ISO-8859-2?Q?Miros=B3aw_Malach?= <m.malach@wp.pl>
-To: bluez-users <bluez-users@lists.sourceforge.net>
-Message-ID: <45d1825e17b9b@wp.pl>
+Message-ID: <57c68ddc0702122257r230f45eeo75b4bca9b81796e7@mail.gmail.com>
+Date: Tue, 13 Feb 2007 12:27:04 +0530
+From: "siddhant tewari" <siddhant.tewari@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1169301946.30356.7.camel@violet>
 MIME-Version: 1.0
-Subject: [Bluez-users] connection problem between samsung mobile phone nad
- bluez 3.8in slackware 11
+References: <b5dccebe0701190517t50869e29y4fcacda8475db035@mail.gmail.com>
+	<1169219863.29458.10.camel@violet>
+	<b5dccebe0701200259i156f623ci1fc12159affbd2f4@mail.gmail.com>
+	<1169301946.30356.7.camel@violet>
+Subject: Re: [Bluez-users] BlueZ on other platforms
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,93 +19,117 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-2"
+Content-Type: multipart/mixed; boundary="===============0080194816=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hello
-I have problem with connection between my usb bluetooth and =
+--===============0080194816==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_62598_23294327.1171349824947"
 
-samsung sgh -x680. I have installed slackware 11 with bluez 3.8 (lib and ut=
-ils). for easy diagnostic I sending for you output same commands =
+------=_Part_62598_23294327.1171349824947
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-and comments =
+Hi Marcel,
+    i would like to port bluez on windows .... Marcel can you guide me how
+to do that or at least outline the steps and give threads abt how to
+proceed.
 
- =
+regards
+siddhant
 
-lsusb :
+On 1/20/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Mikel,
+>
+> > > > Is it possible to get bluez to work on other platforms than Linux?
+> I'm
+> > > > asking because it's a real good bluetooth stack and that's a rare
+> > > > thing... So technically it's not bluez, but bluez-libs. So what
+> about
+> > > >
+> > > > Bluez on Mac?
+> > > > Bluez on Windows?
+> > > > Bluez on Cygwin on Windows?
+> > >
+> > > non of that will work. The Bluetooth library depends on kernel
+> > > structures and one of the big advantages of BlueZ is the native
+> > > integration with the socket API.
+> >
+> > So not even for Cygwin? How difficult would this be to add? I.e. how
+> > big parts of bluez would have to be rewritten and how much could be
+> > reused to make it work on cygwin (I suppose this would be layered on
+> > top of the Microsoft bluetooth stack)?
+>
+> this all depends on what's your goal and how your applications look
+> like. The best emulation would be of course our D-Bus based API, but
+> even that is a lot of work. A native emulation of BlueZ is not realistic
+> from my point of view. Feel free to prove me wrong.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share
+> your
+> opinions on IT & business topics through brief surveys - and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
-Bus 2 Device 2: ID 1131:1001 Integrated System Solution Corp. KY-BT100 Blue=
-tooth Adapter
+------=_Part_62598_23294327.1171349824947
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-hciconfig -a =
+<div>Hi Marcel,</div>
+<div>&nbsp;&nbsp;&nbsp; i would like to port bluez on windows .... Marcel can you guide me how to do that or at least outline the steps and give threads abt how to proceed. </div>
+<div>&nbsp;</div>
+<div>regards</div>
+<div>siddhant<br>&nbsp;</div>
+<div><span class="gmail_quote">On 1/20/07, <b class="gmail_sendername">Marcel Holtmann</b> &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:</span>
+<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">Hi Mikel,<br><br>&gt; &gt; &gt; Is it possible to get bluez to work on other platforms than Linux? I&#39;m
+<br>&gt; &gt; &gt; asking because it&#39;s a real good bluetooth stack and that&#39;s a rare<br>&gt; &gt; &gt; thing... So technically it&#39;s not bluez, but bluez-libs. So what about<br>&gt; &gt; &gt;<br>&gt; &gt; &gt; Bluez on Mac?
+<br>&gt; &gt; &gt; Bluez on Windows?<br>&gt; &gt; &gt; Bluez on Cygwin on Windows?<br>&gt; &gt;<br>&gt; &gt; non of that will work. The Bluetooth library depends on kernel<br>&gt; &gt; structures and one of the big advantages of BlueZ is the native
+<br>&gt; &gt; integration with the socket API.<br>&gt;<br>&gt; So not even for Cygwin? How difficult would this be to add? I.e. how<br>&gt; big parts of bluez would have to be rewritten and how much could be<br>&gt; reused to make it work on cygwin (I suppose this would be layered on
+<br>&gt; top of the Microsoft bluetooth stack)?<br><br>this all depends on what&#39;s your goal and how your applications look<br>like. The best emulation would be of course our D-Bus based API, but<br>even that is a lot of work. A native emulation of BlueZ is not realistic
+<br>from my point of view. Feel free to prove me wrong.<br><br>Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>Take Surveys. Earn Cash. Influence the Future of IT
+<br>Join SourceForge.net&#39;s Techsay panel and you&#39;ll get the chance to share your<br>opinions on IT &amp; business topics through brief surveys - and earn cash<br><a href="http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV">
+http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV</a><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net
+</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquote></div><br>
 
-
-hci0:   Type: USB
-        BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 48:10
-        UP RUNNING PSCAN
-        RX bytes:7001 acl:10 sco:0 events:265 errors:0
-        TX bytes:1665 acl:10 sco:0 commands:110 errors:0
-        Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: MASTER
-        Name: 'BlueZ (0)'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing, Object Transfer,=
- Audio
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe LMP Ver: 1.2 (0x2) LMP Subver: 0x=
-1fe
-        Manufacturer: Integrated System Solution Corp. (57)
-hcitool scan
-Scanning ...
-
-        00:17:D5:47:4E:88       Mir  - this is my mobile phone
-
-hcid and spdp demon I have started by rc.bluetooth script from /etc/rc.d
-
-my mobile phone hasn't seen my usb bluetooth =
-
-When I have tried connect to my phone I haven't got any error  but this lin=
-k hasn't work . =
-
-command l2ping to phone work very well.
-
-hcitool con
-Connections:
-
-Could you tell me weher is problem ?
-
-kind regards =
-
-Miroslaw Malach
+------=_Part_62598_23294327.1171349824947--
 
 
-
- =
-
-
-
-
-
-
-----------------------------------------------------
-W stylu Joanny Brodzik.
-Zobacz jak ubiera si=EA prawdziwa gwiazda! Kliknij:
-http://klik.wp.pl/?adr=3Dhttp%3A%2F%2Fadv.reklama.wp.pl%2Fas%2Fd69.html&sid=
-=3D1018
-
-
+--===============0080194816==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
-Get stuff done quickly with pre-integrated technology to make your job easi=
-er.
+Get stuff done quickly with pre-integrated technology to make your job easier.
 Download IBM WebSphere Application Server v.1.0.1 based on Apache Geronimo
-http://sel.as-us.falkag.net/sel?cmd=3Dlnk&kid=3D120709&bid=3D263057&dat=3D1=
-21642
+http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
+--===============0080194816==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0080194816==--
