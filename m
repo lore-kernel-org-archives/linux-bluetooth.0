@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Ludovic Drolez <ldrolez@debian.org>
-Date: Tue, 13 Feb 2007 18:44:42 +0000 (UTC)
-Message-ID: <loom.20070213T193254-288@post.gmane.org>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Small bugfix for dund
+Date: Tue, 13 Feb 2007 20:07:09 +0100
+From: Stefan Seyfried <seife@suse.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20070213190709.GC14202@suse.de>
+References: <45CC5281.9090209@voelkers.org> <20070209114308.GA16231@suse.de>
+	<1171309299.11774.18.camel@violet>
+MIME-Version: 1.0
+In-Reply-To: <1171309299.11774.18.camel@violet>
+Subject: Re: [Bluez-devel] Two sticks for a developer
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,34 +21,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi !
+On Mon, Feb 12, 2007 at 08:41:38PM +0100, Marcel Holtmann wrote:
+> Hi Stefan,
+> 
+> > > many annoying messages about unknown sco packages in the syslog (>1000/min)
+> > 
+> > This one can probably be fixed by using
+> > modprobe hci_usb isoc=1
+> 
+> actually it would be isoc=0.
 
-Sometimes, dund fails with the following error:
- dund[15658]: RFCOMM TTY creation failed. No such file or directory(2)
+Oops. Lucky me, i have all my adapters already blacklisted, so i did not need
+this parameter for a long time now ;-)
+-- 
+Stefan Seyfried
 
-That's because, udev does not have the time to create the device.
-I've found in dund's code that dund waits, at most, 30*100us for the device to
-become readable. I think that the author made a typo here, and that 30*100ms is
-much more appropriate (see the patch below).
-
-Cheers,
-
-   Ludovic.
-
-========= patch
---- bluez-utils-3.7.orig/dund/dun.c
-+++ bluez-utils-3.7/dund/dun.c
-@@ -213,7 +213,7 @@
-                if (stat(tty, &st) < 0) {
-                        snprintf(tty, size, "/dev/rfcomm%d", id);
-                        if (try--) {
--                               usleep(100);
-+                               usleep(100000);
-                                continue;
-                        }
- 
-======== end patch
-
+"Any ideas, John?"
+"Well, surrounding them's out." 
 
 -------------------------------------------------------------------------
 Using Tomcat but need to do more? Need to support web services, security?
