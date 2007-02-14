@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Fernando Unzu <fernando@bluexare.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Wed, 14 Feb 2007 11:36:42 +0100
-References: <200702071644.02277.fernando@bluexare.org>
-	<1171309461.11774.22.camel@violet>
-In-Reply-To: <1171309461.11774.22.camel@violet>
+Message-ID: <45D2C8B3.8050102@xmission.com>
+Date: Wed, 14 Feb 2007 01:30:43 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Message-Id: <200702141136.42898.fernando@bluexare.org>
-Subject: Re: [Bluez-devel] Pairing event in a module
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <9da483cb0702121756l3541cc58u690e518940035b11@mail.gmail.com>	<45D138AF.3040708@xmission.com>
+	<9da483cb0702130106s3c76315g2c57fd4f1017ad23@mail.gmail.com>
+In-Reply-To: <9da483cb0702130106s3c76315g2c57fd4f1017ad23@mail.gmail.com>
+Subject: Re: [Bluez-devel] Successes and failures with
+	btsco/bluez	respectively
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,66 +18,36 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Mike
 
+fwiw, it may be that something somewhere has regressed. I can't get 
+totally smooth audio through btsco-0.5 or cvs plugz (a2dpd or a2dpd2). 
+It doesn't have to be in our driver, especially since my previously 
+working btsco-0.5 plugin doesn't work right. It could be in the kernel 
+or bluez or my config. I haven't held things constant with a control 
+configuration unfortunately :(
 
-El Lunes, 12 de Febrero de 2007 20:44, Marcel Holtmann escribi=F3:
-> Hi Fernando,
->
-> > I'm trying to develop an application that works with mobil devices.
-> >
-> > I want to caugth the pairing event to do some things...
-> >
-> > Only I need the device address of it, when the device pairs to me.
-> >
-> > I have been seen the code, but I don't know how I can integrate to my
-> > module.
-> >
-> > The link_key_notify shows when a device have paired with me, but how can
-> > I "listen" until the launch of this method?
-> > How I can listen the EVT_LINK_KEY_NOTIFY event?
-> >
-> > Which method launch this events??
-> >
-> > I have seen that io_security_event do something with this events when
-> > they are launched, but..., Who launch them?
-> >
-> > Or, if i can listen these envets, It would be sufficient for me.
->
-> use the D-Bus API and listend to BondingCreated signals. Playing on the
-> low-level HCI is not a good idea at all.
->
-> Regards
->
-> Marcel
+My best result is in using my spider set, plugz from cvs, a2dpd plugin, 
+totem and a .asoundrc with
 
-You have all the reason saying that works with low-level HCI is not a good =
+pcm.!default {
+type a2dpd
+}
 
-idea, jejej (although I have develop a non perfect solution).
+but I'm still getting occasional pauses in the stream. totem using 
+a2dpd2 resulted in audio playing too fast with gaps of silence.
 
-But if you inform me something about where I can find information about D-B=
-us, =
-
-and where I can see the api, the code or the functions that uses...., I wou=
-ld =
-
-be thankfull and try to understand and learn about it.
-Now, I don't know a lot about D-Bus.
-
-Thank you very much,
-
-Fernando
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
