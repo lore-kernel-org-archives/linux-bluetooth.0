@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45D3F804.5030601@mojo-working.com>
-Date: Wed, 14 Feb 2007 22:04:52 -0800
-From: Art Rothstein <art@mojo-working.com>
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Date: Thu, 15 Feb 2007 10:21:56 +1000
 MIME-Version: 1.0
-To: Bluez-devel <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Role switch: Detecting, predicting, preventing
+Message-Id: <200702151021.56853.denis.kenzior@trolltech.com>
+Subject: [Bluez-devel] dbus-sdp & find_pending_connect
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,45 +18,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I am running two BTPROTO_RFCOMM applications on a PC with Ubuntu 2.6.17-11-386, 
-each bound to its own USB dongle.  One is a client, the other a server.  Both 
-use the existing link mode settings of SLAVE ACCEPT.  Yet an Accept Connection 
-Request (traced with hcidump) shows Role Master, and the client receives a Role 
-Change.
+Marcel,
 
-If I put the same application, with the same USB dongles, on a PC running 
-Xubuntu 2.6.17-10-generic, the server's Accept Connection Request shows Role 
-Slave, and the Role Change packet does not flow.
+I'd like to understand why all SDP related functions in dbus-sdp.c call the 
+find_pending_connect function?
 
-My questions:
+Effectively this guards against simultaneous SDP connection attempts to the 
+same remote device.  My understanding is that BlueZ does not have any 
+limitations against multiple simultaneous connections to the same device, and 
+neither does the BlueZ sdp daemon.  Commenting out find_pending_connect, I 
+can run up to 6 simultaneous SDP queries to another BlueZ implementation 
+(this is because sdpd has a queue of up to 5 connections.)  So this leads me 
+to wonder why hcid is not allowing this particular case?
 
-(1) What causes the role switch?
+-Denis
 
-(2) Can I detect the role switch programmatically after it has occurred?  Both 
-hci_devinfo and getsockopt( s, SOL_RFCOMM, RFCOMM_LM, ...  ) claim the server is 
-still a slave.
 
-(3) Can I predict the role switch before it occurs?  Again, hci_devinfo and 
-getsockopt provide no clues.
-
-(4) Can I programmatically instruct the 2.6.17-11-386 server not to perform the 
-role switch?  If hci_devinfo is already set to SLAVE, calling 
-ioctl(HCISETLINKMODE) sounds unpromising.
-
-What makes the role switch interesting, and undesirable, is that several 
-Bluetooth devices (all devices with link manager 1.x?) are limited to two slave 
-connections.  A third Create Connection fails with Command Disallowed, reflected 
-to the Linux client application as "File descriptor in bad state".
-
-As for motivation, I plan to use one Linux PC with lots of dongles to model the 
-behavior of a large piconet.  A configuration that includes PCs running 
-Microsoft's stack, or Macs running Apple's stack, is stuck with the role switch, 
-but there are lots of configurations that use only peer-friendly devices.
------
-McKinley Systems
-San Francisco
-415-827-7575
-http://www.mojo-working.com
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
