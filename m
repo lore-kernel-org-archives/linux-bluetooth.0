@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: thomas.kear@gmail.com,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200702151229.33228.thomas.kear@gmail.com>
-References: <9da483cb0702141500j3c907539x586fe211ad179d76@mail.gmail.com>
-	<200702151229.33228.thomas.kear@gmail.com>
-Date: Thu, 15 Feb 2007 09:24:30 +0100
-Message-Id: <1171527870.28302.22.camel@violet>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <7e36c64c0702142221q65923c81hec2239bc699a9787@mail.gmail.com>
+References: <7e36c64c0702142221q65923c81hec2239bc699a9787@mail.gmail.com>
+Date: Thu, 15 Feb 2007 09:19:12 +0100
+Message-Id: <1171527552.28302.15.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] aaaaaargh spam
+Subject: Re: [Bluez-devel] syncml
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,22 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Thomas,
+Hi,
 
-> > Is there any way sourceforge can curtail all this bloody spam on the list?
-> 
-> Cue the 5th (or so) discussion about this topic in just a few short months.  
-> Usually the direction these threads take is toward list posting being closed 
-> so only list subscribers can post to the list.  Hasn't happened yet though.
+> Can i get any information here abt syncml?
 
-to make this clear once and for all. Write to the Sourceforge guys and
-complain about the spam. I have no way to add spam filters to the
-mailing list.
+no.
 
-The bluez-users mailing list is now closed for subscribers, but for
-bluez-devel this is not an option. This mailing list is listed in the
-MAINTAINERS file of the Linux kernel and meant to be an open mailing
-list.
+>  Any refernce source codes available?
+
+Check www.opensync.org.
 
 Regards
 
