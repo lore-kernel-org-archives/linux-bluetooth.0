@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45D3F804.5030601@mojo-working.com>
-References: <45D3F804.5030601@mojo-working.com>
-Date: Thu, 15 Feb 2007 09:18:06 +0100
-Message-Id: <1171527486.28302.14.camel@violet>
+In-Reply-To: <200702151021.56853.denis.kenzior@trolltech.com>
+References: <200702151021.56853.denis.kenzior@trolltech.com>
+Date: Thu, 15 Feb 2007 09:10:55 +0100
+Message-Id: <1171527055.28302.8.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Role switch: Detecting, predicting, preventing
+Subject: Re: [Bluez-devel] dbus-sdp & find_pending_connect
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,55 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Art,
+Hi Denis,
 
-> I am running two BTPROTO_RFCOMM applications on a PC with Ubuntu 2.6.17-11-386, 
-> each bound to its own USB dongle.  One is a client, the other a server.  Both 
-> use the existing link mode settings of SLAVE ACCEPT.  Yet an Accept Connection 
-> Request (traced with hcidump) shows Role Master, and the client receives a Role 
-> Change.
+> I'd like to understand why all SDP related functions in dbus-sdp.c call the 
+> find_pending_connect function?
 > 
-> If I put the same application, with the same USB dongles, on a PC running 
-> Xubuntu 2.6.17-10-generic, the server's Accept Connection Request shows Role 
-> Slave, and the Role Change packet does not flow.
-> 
-> My questions:
-> 
-> (1) What causes the role switch?
+> Effectively this guards against simultaneous SDP connection attempts to the 
+> same remote device.  My understanding is that BlueZ does not have any 
+> limitations against multiple simultaneous connections to the same device, and 
+> neither does the BlueZ sdp daemon.  Commenting out find_pending_connect, I 
+> can run up to 6 simultaneous SDP queries to another BlueZ implementation 
+> (this is because sdpd has a queue of up to 5 connections.)  So this leads me 
+> to wonder why hcid is not allowing this particular case?
 
-no idea for your case. I need to see your code and hcidump first.
-
-> (2) Can I detect the role switch programmatically after it has occurred?  Both 
-> hci_devinfo and getsockopt( s, SOL_RFCOMM, RFCOMM_LM, ...  ) claim the server is 
-> still a slave.
-
-You need to check hci_conn_info.
-
-> (3) Can I predict the role switch before it occurs?  Again, hci_devinfo and 
-> getsockopt provide no clues.
-
-No.
-
-> (4) Can I programmatically instruct the 2.6.17-11-386 server not to perform the 
-> role switch?  If hci_devinfo is already set to SLAVE, calling 
-> ioctl(HCISETLINKMODE) sounds unpromising.
-
-Not that I know of. The slave mode is passive and an active MASTER wins.
-However you can disable the role switch link policy, but be aware of
-that this might cause other problems.
-
-> What makes the role switch interesting, and undesirable, is that several 
-> Bluetooth devices (all devices with link manager 1.x?) are limited to two slave 
-> connections.  A third Create Connection fails with Command Disallowed, reflected 
-> to the Linux client application as "File descriptor in bad state".
-> 
-> As for motivation, I plan to use one Linux PC with lots of dongles to model the 
-> behavior of a large piconet.  A configuration that includes PCs running 
-> Microsoft's stack, or Macs running Apple's stack, is stuck with the role switch, 
-> but there are lots of configurations that use only peer-friendly devices.
-
-Large piconets have never been easy and even if BlueZ supports multiple
-dongles on one host, there might be some drawbacks because of this.
+actually I have no idea and I didn't write that piece of code. There
+shouldn't be any limitations, but not all remote SDP implementation can
+deal with concurrent requests and so we have to be careful.
 
 Regards
 
