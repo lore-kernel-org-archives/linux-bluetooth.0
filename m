@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200702151021.56853.denis.kenzior@trolltech.com>
-References: <200702151021.56853.denis.kenzior@trolltech.com>
-Date: Thu, 15 Feb 2007 09:10:55 +0100
-Message-Id: <1171527055.28302.8.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] dbus-sdp & find_pending_connect
+Message-ID: <7e36c64c0702142221q65923c81hec2239bc699a9787@mail.gmail.com>
+Date: Thu, 15 Feb 2007 11:51:38 +0530
+From: "shantibhushan sale" <shantibhushan.sale@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] syncml
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,39 +14,52 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1912951327=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+--===============1912951327==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_65780_29869838.1171520498924"
 
-> I'd like to understand why all SDP related functions in dbus-sdp.c call the 
-> find_pending_connect function?
-> 
-> Effectively this guards against simultaneous SDP connection attempts to the 
-> same remote device.  My understanding is that BlueZ does not have any 
-> limitations against multiple simultaneous connections to the same device, and 
-> neither does the BlueZ sdp daemon.  Commenting out find_pending_connect, I 
-> can run up to 6 simultaneous SDP queries to another BlueZ implementation 
-> (this is because sdpd has a queue of up to 5 connections.)  So this leads me 
-> to wonder why hcid is not allowing this particular case?
+------=_Part_65780_29869838.1171520498924
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-actually I have no idea and I didn't write that piece of code. There
-shouldn't be any limitations, but not all remote SDP implementation can
-deal with concurrent requests and so we have to be careful.
+Can i get any information here abt syncml?
+ Any refernce source codes available?
 
-Regards
+------=_Part_65780_29869838.1171520498924
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Marcel
+Can i get any information here abt syncml?<br>&nbsp;Any refernce source codes available?<br>
+
+------=_Part_65780_29869838.1171520498924--
 
 
+--===============1912951327==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1912951327==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1912951327==--
