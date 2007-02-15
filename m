@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Fernando Unzu <fernando@bluexare.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Thu, 15 Feb 2007 10:20:10 +0100
-References: <200702071644.02277.fernando@bluexare.org>
-	<200702141136.42898.fernando@bluexare.org>
-	<1171449902.14869.3.camel@violet>
-In-Reply-To: <1171449902.14869.3.camel@violet>
+Message-ID: <9da483cb0702150116i26044caieb542012c3471332@mail.gmail.com>
+Date: Thu, 15 Feb 2007 02:16:08 -0700
+From: "Mike Hodson" <mystica@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1171527870.28302.22.camel@violet>
 MIME-Version: 1.0
-Message-Id: <200702151020.11388.fernando@bluexare.org>
-Subject: Re: [Bluez-devel] Pairing event in a module
+References: <9da483cb0702141500j3c907539x586fe211ad179d76@mail.gmail.com>
+	<200702151229.33228.thomas.kear@gmail.com>
+	<1171527870.28302.22.camel@violet>
+Subject: Re: [Bluez-devel] aaaaaargh spam
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,64 +18,30 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
-
-Thanks for the fast response.
-
-I have realized that i'm using an old version of bluez, because of that, I =
-
-don't have knowledge about this signals and functions.
-
-Now, I have the newest version, and I look the signals you told me.
-
-Thank you very much, I wish to advance faster now.
-
-Thanks
-
-Fernando
-
-
-El Mi=E9rcoles, 14 de Febrero de 2007 11:45, Marcel Holtmann escribi=F3:
-> Hi Fernando,
+On 2/15/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Thomas,
+> to make this clear once and for all. Write to the Sourceforge guys and
+> complain about the spam. I have no way to add spam filters to the
+> mailing list.
 >
-> > You have all the reason saying that works with low-level HCI is not a
-> > good idea, jejej (although I have develop a non perfect solution).
-> >
-> > But if you inform me something about where I can find information about
-> > D-Bus, and where I can see the api, the code or the functions that
-> > uses...., I would be thankfull and try to understand and learn about it.
-> > Now, I don't know a lot about D-Bus.
->
-> the source contains a dbus-api.txt document that lists all methods and
-> signals.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share
-> your opinions on IT & business topics through brief surveys-and earn cash
-> http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3D=
-DEVDEV
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+And I did just that, submitted a "excessive spam" support ticket to
+their support system. We'll see if anything comes of it ...
+
+And, I'm still planning to re-test my spider with the newest build,
+but I've been busy :)
+
+
+Mike
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
