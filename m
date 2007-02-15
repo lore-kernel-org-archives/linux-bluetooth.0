@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45D4ED2D.7060706@mojo-working.com>
-Date: Thu, 15 Feb 2007 15:30:53 -0800
-From: Art Rothstein <art@mojo-working.com>
+Message-ID: <45D4DFDD.7010306@appstate.edu>
+Date: Thu, 15 Feb 2007 17:34:05 -0500
+From: Kinney Baughman <baughmankr@appstate.edu>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45D3F804.5030601@mojo-working.com>
-	<1171527486.28302.14.camel@violet>
-In-Reply-To: <1171527486.28302.14.camel@violet>
-Subject: Re: [Bluez-devel] Role switch: Detecting, predicting, preventing
+References: <9da483cb0702141500j3c907539x586fe211ad179d76@mail.gmail.com>
+	<200702151229.33228.thomas.kear@gmail.com>
+	<1171527870.28302.22.camel@violet>
+	<9da483cb0702150116i26044caieb542012c3471332@mail.gmail.com>
+In-Reply-To: <9da483cb0702150116i26044caieb542012c3471332@mail.gmail.com>
+Subject: Re: [Bluez-devel] aaaaaargh spam
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,17 +23,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I have incorporated your hci_conn_info test into a minimal test case derived 
-from my application.  You can find source, executable, and hcidump traces at 
-http://65.104.11.121/TwoAdapters .  Both cases were run on the same desktop PC, 
-with the same two USB dongles.  The client adapter was a Motorola PC850, and the 
-server an IOGear GBU211.  Both run LM 1.2 on a member of the Broadcom 2035 
-family.  The -386 traces were run with Ubuntu 2.6.17-11-386 installed on a hard 
-disk.  The -generic traces were run with Ubuntu 2.6.17-10-generic, booted from 
-the Ubuntu 6.10 live CD.  As before, hciconfig always reports SLAVE ACCEPT, and 
-the role change flows in the -386 case.
+Mike Hodson wrote:
+> On 2/15/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Thomas,
+>> to make this clear once and for all. Write to the Sourceforge guys and
+>> complain about the spam. I have no way to add spam filters to the
+>> mailing list.
+>>
+> And I did just that, submitted a "excessive spam" support ticket to
+> their support system. We'll see if anything comes of it ...
+> 
+> And, I'm still planning to re-test my spider with the newest build,
+> but I've been busy :)
 
-Thanks very much for your help.
+At the risk of promising more than I can deliver, the list runs on 
+Mailman.  I run that on my server.  I'll take a look at the code and see 
+if there's a way to trap on certain patterns in the spam posts that come 
+through.  I've been deleting them but I'll start saving them and see 
+what kind of patterns can be discerned.  Maybe we can catch at least 
+some of what comes through.
+
+-- 
+Kinney
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
