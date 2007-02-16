@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Thu, 15 Feb 2007 22:51:21 -0500
-References: <9da483cb0702141500j3c907539x586fe211ad179d76@mail.gmail.com>
-	<200702151229.33228.thomas.kear@gmail.com>
-	<1171527870.28302.22.camel@violet>
-In-Reply-To: <1171527870.28302.22.camel@violet>
-MIME-Version: 1.0
-Message-Id: <200702152251.21242.akohlsmith-bluez@benshaw.com>
-Subject: Re: [Bluez-devel] aaaaaargh spam
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <45D4FB7F.6090301@unternet.org>
+References: <45D4FB7F.6090301@unternet.org>
+Date: Fri, 16 Feb 2007 03:00:23 +0100
+Message-Id: <1171591223.7583.33.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] sdpd in polling loop on disconnect
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,16 +20,49 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thursday 15 February 2007 3:24 am, Marcel Holtmann wrote:
-> The bluez-users mailing list is now closed for subscribers, but for
-> bluez-devel this is not an option. This mailing list is listed in the
-> MAINTAINERS file of the Linux kernel and meant to be an open mailing
-> list.
+Hi Frank,
 
-I'm not a mailman expert, but I'd be surprised if there isn't a "confirm your 
-post if you're a nonsubscriber" option somewhere...
+> Is there anyone else here who has seen sdpd run away in a tight poll()
+> loop when a connected device drops the connection? I can more or less
+> reliably get sdpd go mad poll()ing and hogging the CPU by walking out of
+> range, turning off Bluetooth on the (ngage) phone, sending crap to the
+> serial port service on the phone, etc.
+> 
+> An almost surefire way to get this behaviour to occur goes as follows:
+> 
+> (assumption: paired phone, serial port bound to /dev/rfcomm3)
+> 
+> cat /dev/rfcomm3 (phone wakes up and wants OK)
+> echo blah > /dev/rfcomm3 (ditto)
+> usually sdpd will now start eating the CPU. Attaching gdb does not show
+> much more than that it is looping in g_main_loop_run:
+> 
+> Program received signal SIGUSR2, User defined signal 2.
+> 0x00e1a402 in __kernel_vsyscall ()
+> (gdb) bt
+> #0  0x00e1a402 in __kernel_vsyscall ()
+> #1  0x008c2cfb in poll () from /lib/libc.so.6
+> #2  0x0046b453 in ?? () from /lib/libglib-2.0.so.0
+> #3  0x0046b7c9 in g_main_loop_run () from /lib/libglib-2.0.so.0
+> #4  0x80001800 in main (argc=1, argv=Cannot access memory at address 0x7
+> ) at main.c:147
+> 
+> It loops in g_main_context_check(), repeatedly calling
+> g_io_channel_get_buffer_condition() as if it still believes there is
+> some data left to be read. I will look further into this but I'd like to
+> hear whether I'm the only one with these problems...
 
--A.
+if this is bluez-utils-3.9 you might wanna try to compile it with
+--enable-glib to use the system Glib. It might be possible that our
+eglib has some kind of bad. In case of using the Glib system library, I
+think you discovered a real bug in sdpd. Do you see the same issue if
+you don't start sdpd and use hcid -s instead.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
