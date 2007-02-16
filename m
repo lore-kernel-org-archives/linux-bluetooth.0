@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 16 Feb 2007 11:44:51 +0200
-From: Anssi Saari <anssi.saari@modeemi.fi>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20070216094451.GA7005@jolt.modeemi.cs.tut.fi>
-References: <Pine.LNX.4.64.0702122031580.2496@cherokee.spacecom.si>
-	<45D2FC34.9040303@yahoo.com.au>
-MIME-Version: 1.0
-In-Reply-To: <45D2FC34.9040303@yahoo.com.au>
-Subject: Re: [Bluez-users] Shopping advice: bluetooth 2.0 USB dongle with
-	CSR chipset?
+In-Reply-To: <005901c7518f$5d1048f0$c301a8c0@Bahubali>
+References: <005901c7518f$5d1048f0$c301a8c0@Bahubali>
+Date: Fri, 16 Feb 2007 09:28:35 +0100
+Message-Id: <1171614515.7583.36.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] BlueZ information
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,15 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Wed, Feb 14, 2007 at 01:10:28PM +0100, bluez.mexon@spamgourmet.com wrote:
- 
->  I'm slightly nervous that what I've bought is a "DN-3008M1", not a
-> "DN-3008", but I guess that's the kind of model number variation you
-> always get.
- 
-Have you received this yet? I'd like to hear some experiences. With a
-little searching I found a source for the Toshiba adapter here in Finland,
-but I thought why not go for a class 1 device?
+Hi Vikram,
+> 
+> I am very new to BlueZ. Can I get API document or full source,which
+> will help me to develop some applications on BlueZ.
+
+the C API is not fully documented, but for L2CAP and RFCOMM you simply
+follow socket programming and the example code of l2test and rctest. For
+the D-Bus interface you can find a dbus-api.txt in the bluez-utils
+package. And sure you can get the source code. Simple download it.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
