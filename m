@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45D58DDF.5020902@yahoo.com.au>
-Date: Fri, 16 Feb 2007 11:56:31 +0100
-From: bluez.mexon@spamgourmet.com
+Date: Fri, 16 Feb 2007 11:44:51 +0200
+From: Anssi Saari <anssi.saari@modeemi.fi>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <20070216094451.GA7005@jolt.modeemi.cs.tut.fi>
+References: <Pine.LNX.4.64.0702122031580.2496@cherokee.spacecom.si>
+	<45D2FC34.9040303@yahoo.com.au>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-References: <Pine.LNX.4.64.0702122031580.2496@cherokee.spacecom.si>	<45D2FC34.9040303@yahoo.com.au>
-	<20070216094451.GA7005@jolt.modeemi.cs.tut.fi>
-In-Reply-To: <20070216094451.GA7005@jolt.modeemi.cs.tut.fi>
+In-Reply-To: <45D2FC34.9040303@yahoo.com.au>
 Subject: Re: [Bluez-users] Shopping advice: bluetooth 2.0 USB dongle with
 	CSR chipset?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -22,20 +22,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Anssi Saari - anssi.saari@modeemi.fi wrote:
-> On Wed, Feb 14, 2007 at 01:10:28PM +0100, bluez.mexon@spamgourmet.com wrote:
->  
->>  I'm slightly nervous that what I've bought is a "DN-3008M1", not a
->> "DN-3008", but I guess that's the kind of model number variation you
->> always get.
->  
-> Have you received this yet? I'd like to hear some experiences. With a
-> little searching I found a source for the Toshiba adapter here in Finland,
-> but I thought why not go for a class 1 device?
-
-Not yet, I expect it to arrive next week.  And I might not have time to
-properly play with it until the weekend after.  But I'll be sure to give
-a report.
+On Wed, Feb 14, 2007 at 01:10:28PM +0100, bluez.mexon@spamgourmet.com wrote:
+ 
+>  I'm slightly nervous that what I've bought is a "DN-3008M1", not a
+> "DN-3008", but I guess that's the kind of model number variation you
+> always get.
+ 
+Have you received this yet? I'd like to hear some experiences. With a
+little searching I found a source for the Toshiba adapter here in Finland,
+but I thought why not go for a class 1 device?
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
