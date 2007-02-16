@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 16 Feb 2007 17:50:31 -0800 (PST)
-From: tim culwins <mail0123456789101112@yahoo.com>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1171308971.11774.11.camel@violet>
+Message-ID: <45D58DDF.5020902@yahoo.com.au>
+Date: Fri, 16 Feb 2007 11:56:31 +0100
+From: bluez.mexon@spamgourmet.com
 MIME-Version: 1.0
-Message-ID: <717992.61399.qm@web31711.mail.mud.yahoo.com>
-Subject: Re: [Bluez-users] installing latest bluez on edgy?
+To: bluez-users@lists.sourceforge.net
+References: <Pine.LNX.4.64.0702122031580.2496@cherokee.spacecom.si>	<45D2FC34.9040303@yahoo.com.au>
+	<20070216094451.GA7005@jolt.modeemi.cs.tut.fi>
+In-Reply-To: <20070216094451.GA7005@jolt.modeemi.cs.tut.fi>
+Subject: Re: [Bluez-users] Shopping advice: bluetooth 2.0 USB dongle with
+	CSR chipset?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,70 +22,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-can you tell me what repository i can find bluez-gnome
-in for ubuntu edgy?
+Anssi Saari - anssi.saari@modeemi.fi wrote:
+> On Wed, Feb 14, 2007 at 01:10:28PM +0100, bluez.mexon@spamgourmet.com wrote:
+>  
+>>  I'm slightly nervous that what I've bought is a "DN-3008M1", not a
+>> "DN-3008", but I guess that's the kind of model number variation you
+>> always get.
+>  
+> Have you received this yet? I'd like to hear some experiences. With a
+> little searching I found a source for the Toshiba adapter here in Finland,
+> but I thought why not go for a class 1 device?
 
-and also how i launch the applet?
-
-thanks
-
-
---- Marcel Holtmann <marcel@holtmann.org> wrote:
-
-> Hi Tim,
-> 
-> > is there a binary i can dl?
-> > 
-> > or a tutorial on compiling?
-> 
-> not that I know of. However it is straight forward
-> and you should check
-> the README of the source first.
-> 
-> > also i frequently have to type:
-> > 
-> > dbus-send --system --dest=org.bluez
-> /org/bluez/hci0
-> > org.bluez.Adapter.SetMode string:discoverable
-> > 
-> > is there a way to make it so i dont have to type
-> this
-> > all the time?
-> 
-> This has been extensively discussed. Check the
-> mailing list archive or
-> use the configuration applet from bluez-gnome.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
->
--------------------------------------------------------------------------
-> Using Tomcat but need to do more? Need to support
-> web services, security?
-> Get stuff done quickly with pre-integrated
-> technology to make your job easier.
-> Download IBM WebSphere Application Server v.1.0.1
-> based on Apache Geronimo
->
-http://sel.as-us.falkag.net/sel?cmd=lnk&kid=120709&bid=263057&dat=121642
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
-
-
-
- 
-____________________________________________________________________________________
-Get your own web address.  
-Have a HUGE year through Yahoo! Small Business.
-http://smallbusiness.yahoo.com/domains/?p=BESTDEAL
+Not yet, I expect it to arrive next week.  And I might not have time to
+properly play with it until the weekend after.  But I'll be sure to give
+a report.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
