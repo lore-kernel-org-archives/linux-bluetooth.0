@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 16 Feb 2007 18:16:51 +0100
-From: Stefan Seyfried <seife@suse.de>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20070216171651.GB883@suse.de>
-References: <5b9417770702160825s6a7fce2frf6a197389d8a4855@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <5b9417770702160825s6a7fce2frf6a197389d8a4855@mail.gmail.com>
-Subject: Re: [Bluez-devel] PLEASE IMPLEMENT SPAM CONTROLS!
+In-Reply-To: <200702152251.21242.akohlsmith-bluez@benshaw.com>
+References: <9da483cb0702141500j3c907539x586fe211ad179d76@mail.gmail.com>
+	<200702151229.33228.thomas.kear@gmail.com>
+	<1171527870.28302.22.camel@violet>
+	<200702152251.21242.akohlsmith-bluez@benshaw.com>
+Date: Fri, 16 Feb 2007 09:31:35 +0100
+Message-Id: <1171614695.7583.39.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] aaaaaargh spam
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,32 +19,34 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Fri, Feb 16, 2007 at 10:25:10AM -0600, John H. wrote:
-> Please, can't you just make it to where only members can post?
+Hi Andrew,
 
-No. Not if it is listed as contact in the MAINTAINERS file.
-Discuss whatever you want, it won't help.
+> > The bluez-users mailing list is now closed for subscribers, but for
+> > bluez-devel this is not an option. This mailing list is listed in the
+> > MAINTAINERS file of the Linux kernel and meant to be an open mailing
+> > list.
+> 
+> I'm not a mailman expert, but I'd be surprised if there isn't a "confirm your 
+> post if you're a nonsubscriber" option somewhere...
 
-And i have gotten much more useless mails from this "STOP ZE SP=C4M!"
-thread than from spamers directly.
--- =
+the whole point is to have this mailing list open, because non-BlueZ
+people will forward kernel related stuff. It will stay open.
 
-Stefan Seyfried
+Regards
 
-"Any ideas, John?"
-"Well, surrounding them's out." =
+Marcel
+
 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
