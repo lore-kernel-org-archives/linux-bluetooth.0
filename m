@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <365120.6639.qm@web31709.mail.mud.yahoo.com>
-References: <365120.6639.qm@web31709.mail.mud.yahoo.com>
-Date: Sat, 17 Feb 2007 19:07:46 +0100
-Message-Id: <1171735666.9069.1.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] ./configure tells me dbus is required
+Date: Sat, 17 Feb 2007 10:05:16 -0800 (PST)
+From: tim culwins <mail0123456789101112@yahoo.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Message-ID: <365120.6639.qm@web31709.mail.mud.yahoo.com>
+Subject: [Bluez-users] ./configure tells me dbus is required
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,23 +18,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Tim,
+im trying to compile the latest bluez. and when i run
+./configure i get 
+checking for DBUS... no
+configure: error: dbus > 0.35 is required
 
-> im trying to compile the latest bluez. and when i run
-> ./configure i get 
-> checking for DBUS... no
-> configure: error: dbus > 0.35 is required
-> 
-> but when i look in synaptic it tells me i have version
-> .9
+but when i look in synaptic it tells me i have version
+.9
 
-you need to install the development files of D-Bus, too.
-
-Regards
-
-Marcel
+any thoughts?
 
 
+
+ 
+____________________________________________________________________________________
+Do you Yahoo!?
+Everyone is raving about the all-new Yahoo! Mail beta.
+http://new.mail.yahoo.com
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
