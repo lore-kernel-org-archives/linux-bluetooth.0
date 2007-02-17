@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <001601c7527f$86d86000$c301a8c0@Bahubali>
-From: "vikram" <vikram.bidkar@adamya.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Sat, 17 Feb 2007 16:06:30 +0530
+Message-ID: <45D6DA8B.4060405@sneakemail.com>
+Date: Sat, 17 Feb 2007 11:35:55 +0100
+From: =?ISO-8859-1?Q?Peter_Valdemar_M=F8rch?= <swp5jhu02@sneakemail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] BlueZ full source
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Request FAQ entries: (need for) passkey-agent +
+ replug dongle for it to work...
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,105 +15,59 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0354012886=="
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+Hi there,
 
---===============0354012886==
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0011_01C752AD.96081380"
+Thanks for great software. It rocks when its configured right. Which
+took some time - at least for me.
 
-This is a multi-part message in MIME format.
+First, I spent a long time wondering why `hcitool scan` was empty /
+didn't show any output other than "Scanning ..."
 
-------=_NextPart_000_0011_01C752AD.96081380
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+I had plugged in my brand new Bluetooth USB dongle and seen that it
+loaded the USB and bluetooth drivers! Great! Then I installed and
+bluez-utils and gnokii. `hcitool scan` kept showing empty output until I
+unplugged and reconnected the dongle!!! How was I to know *that*? I
+remember struggling with this before and also tearing my hair out when I
+discovered it back then... :D I found several questions about this (with
+some suggestions about pin_helper!! ) but no good answers/solutions.
 
-Hi all,
+Next, I spent *forever* trying to get pin_helper to work on my new
+installation! And it didn't because I'm using 3.X versions. There are
+*so* many posts out there talking about pin_helper, that I didn't even
+question that they all might be invalid.
 
-Thank you Marcel,
+Somewhere along the line I discovered Marcel Holtmann mentioning =
 
-I have downloaded BlueZ from www.BlueZ.org It contains "Libs" and =
-"Utils" directory.
-/BlueZ/Libs contain bluetooth.c,hci.c and sdp.c files what are these?
-yes test programs in Utils directory are helpful.I am trying to build =
-and run the test programs in Utils directory.
-But agin I am not finding full source for BlueZ(HCI,L2CAP,RFCOM ..etc =
-sources).
-If you know from where I can download full source for BlueZ, please tell =
-me.
+something about passkey-agent. 3 minutes later all was working fine.
 
-Thanks,
+I've now spent almost 5 hours getting a new bluetooth dongle and my
+phone to communicate, even though I already had a laptop working with
+bluez setup right next to it.
 
-Regards,
-Vikram
-------=_NextPart_000_0011_01C752AD.96081380
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+May I please suggest that these two be added as FAQs?
+(At the very least, I'll now be able to find these two valuable tips in
+the mailing list archives next time! :D)
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2800.1586" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi all,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Thank you Marcel,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I have downloaded BlueZ from <A=20
-href=3D"http://www.BlueZ.org">www.BlueZ.org</A> It contains "Libs" and =
-"Utils"=20
-directory.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>/BlueZ/Libs contain bluetooth.c,hci.c =
-and sdp.c=20
-files what are these?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>yes test programs in Utils directory =
-are helpful.I=20
-am trying to build and run the test programs in Utils =
-directory.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>But agin I am not finding full source =
-for=20
-BlueZ(HCI,L2CAP,RFCOM ..etc sources).</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>If you know from where I can download =
-full source=20
-for BlueZ, please tell me.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Thanks,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Regards,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Vikram</FONT></DIV></BODY></HTML>
+Ciao, and thanks for great code!
 
-------=_NextPart_000_0011_01C752AD.96081380--
+Peter
 
+-- =
 
-
---===============0354012886==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Peter Valdemar M=F8rch
+http://www.morch.com
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0354012886==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0354012886==--
