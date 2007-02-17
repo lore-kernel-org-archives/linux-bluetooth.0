@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <7ff566830702161809g3549664aob33b7d2b9fc2a7ac@mail.gmail.com>
+Message-ID: <7ff566830702161809g3549664aob33b7d2b9fc2a7ac@mail.gmail.com>
+Date: Fri, 16 Feb 2007 21:09:29 -0500
+From: "Kelly Price" <strredwolf@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20070216193039.GA21723@suse.de>
+MIME-Version: 1.0
 References: <5b9417770702161119k29faadd4p64bd042c7fc8c50a@mail.gmail.com>
 	<20070216193039.GA21723@suse.de>
-	<7ff566830702161809g3549664aob33b7d2b9fc2a7ac@mail.gmail.com>
-Date: Sat, 17 Feb 2007 11:39:41 +0100
-Message-Id: <1171708781.27519.5.camel@violet>
-Mime-Version: 1.0
 Subject: Re: [Bluez-devel] spam controls
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,60 +21,53 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Kelly,
+On 2/16/07, Stefan Seyfried <seife@suse.de> wrote:
+> Because this list is in the MAINTAINERS file of the linux kernel, listed
+> as contact for the bluez subsystem:
+>
+> BLUETOOTH SUBSYSTEM
+> P:      Marcel Holtmann
+> M:      marcel@holtmann.org
+> P:      Maxim Krasnyansky
+> M:      maxk@qualcomm.com
+> L:      bluez-devel@lists.sf.net
+> W:      http://bluez.sf.net
+> W:      http://www.bluez.org
+> W:      http://www.holtmann.org/linux/bluetooth/
+> T:      git kernel.org:/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6.git
+> S:      Maintained
+>
 
-> > Because this list is in the MAINTAINERS file of the linux kernel, listed
-> > as contact for the bluez subsystem:
-> >
-> > BLUETOOTH SUBSYSTEM
-> > P:      Marcel Holtmann
-> > M:      marcel@holtmann.org
-> > P:      Maxim Krasnyansky
-> > M:      maxk@qualcomm.com
-> > L:      bluez-devel@lists.sf.net
-> > W:      http://bluez.sf.net
-> > W:      http://www.bluez.org
-> > W:      http://www.holtmann.org/linux/bluetooth/
-> > T:      git kernel.org:/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6.git
-> > S:      Maintained
-> >
-> 
-> Wait a min... from the kernel sources MAINTAINERS file (usually
-> located in /usr/src/linux/):
-> 
-> **BEGIN QUOTE**
-> P: Person
-> M: Mail patches to
-> L: Mailing list that is relevant to this area
-> W: Web-page with status/info
-> T: SCM tree type and location.  Type is one of: git, hg, quilt.
-> S: Status, one of the following:
-> **END QUOTE**
-> 
-> If I'm reading the MAINTAINERS file correctly, the persons of contact
-> are Marcel and Maxim.  The development list is recognized as such, and
-> the websites are listed.  There is no requirement that the list be
-> open for everyone and their mother to post to, and it's only common
-> sense that subscription information be made availible (which it is on
-> the web site, it's how I subscribed).
-> 
-> I'm of the position that if you're looking to send in a patch, you at
-> least send it to Marcel and Maxim; you more likely join the list and
-> send it through there.  The most intelligent would check the archives
-> to see if it's been fixed already before getting involved.  Only an
-> moron would spam all three email addresses with a patch; only an idiot
-> would spam dribble to all three.  Unfortunately, spammers have been
-> observed to be idiots.
+Wait a min... from the kernel sources MAINTAINERS file (usually
+located in /usr/src/linux/):
 
-that is wrong. People CC the mailing list when they do changes and there
-is no need that people like Andrew Morton, Adrian Bunk etc. have to
-subscribe to it first. And I want it this way. Period.
+**BEGIN QUOTE**
+P: Person
+M: Mail patches to
+L: Mailing list that is relevant to this area
+W: Web-page with status/info
+T: SCM tree type and location.  Type is one of: git, hg, quilt.
+S: Status, one of the following:
+**END QUOTE**
 
-Regards
+If I'm reading the MAINTAINERS file correctly, the persons of contact
+are Marcel and Maxim.  The development list is recognized as such, and
+the websites are listed.  There is no requirement that the list be
+open for everyone and their mother to post to, and it's only common
+sense that subscription information be made availible (which it is on
+the web site, it's how I subscribed).
 
-Marcel
+I'm of the position that if you're looking to send in a patch, you at
+least send it to Marcel and Maxim; you more likely join the list and
+send it through there.  The most intelligent would check the archives
+to see if it's been fixed already before getting involved.  Only an
+moron would spam all three email addresses with a patch; only an idiot
+would spam dribble to all three.  Unfortunately, spammers have been
+observed to be idiots.
 
-
+-- 
+Kelly "STrRedWolf" Price
+http://strredwolf.furrynet.com
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
