@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sun, 18 Feb 2007 13:29:49 +0100
-From: Michael Mauch <michael.mauch@gmx.de>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20070218122948.GA4968@elmicha>
-References: <1171735666.9069.1.camel@violet>
-	<743295.39090.qm@web31708.mail.mud.yahoo.com>
+Date: Sat, 17 Feb 2007 10:50:39 -0800 (PST)
+From: tim culwins <mail0123456789101112@yahoo.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1171735666.9069.1.camel@violet>
 MIME-Version: 1.0
-In-Reply-To: <743295.39090.qm@web31708.mail.mud.yahoo.com>
+Message-ID: <743295.39090.qm@web31708.mail.mud.yahoo.com>
 Subject: Re: [Bluez-users] ./configure tells me dbus is required
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,21 +19,60 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-tim culwins wrote:
+Thanks,
+   So I ran make install and everything seemed to
+work. However now when I look in synaptic it tells me
+that 3.7 is still installed. How can I tell if 3.9 is
+working?
 
->    So I ran make install and everything seemed to
-> work. However now when I look in synaptic it tells me
-> that 3.7 is still installed. How can I tell if 3.9 is
-> working?
+Thanks,
 
-If you installed from source and did not make a package (.deb), your
-package manager cannot know.
+--- Marcel Holtmann <marcel@holtmann.org> wrote:
 
-Tell synaptic to uninstall 3.7, then run "make install" again to be sure
-that everything from 3.9 is installed.
+> Hi Tim,
+> 
+> > im trying to compile the latest bluez. and when i
+> run
+> > ./configure i get 
+> > checking for DBUS... no
+> > configure: error: dbus > 0.35 is required
+> > 
+> > but when i look in synaptic it tells me i have
+> version
+> > .9
+> 
+> you need to install the development files of D-Bus,
+> too.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+>
+-------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get
+> the chance to share your
+> opinions on IT & business topics through brief
+> surveys-and earn cash
+>
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
 
-Regards...
-		Michael
+
+
+ 
+____________________________________________________________________________________
+Don't pick lemons.
+See all the new 2007 cars at Yahoo! Autos.
+http://autos.yahoo.com/new_cars.html 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
