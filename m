@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <001601c7527f$86d86000$c301a8c0@Bahubali>
-References: <001601c7527f$86d86000$c301a8c0@Bahubali>
-Date: Sat, 17 Feb 2007 11:43:26 +0100
-Message-Id: <1171709006.27519.9.camel@violet>
+In-Reply-To: <45D6DA8B.4060405@sneakemail.com>
+References: <45D6DA8B.4060405@sneakemail.com>
+Date: Sat, 17 Feb 2007 11:42:30 +0100
+Message-Id: <1171708950.27519.7.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] BlueZ full source
+Subject: Re: [Bluez-users] Request FAQ entries: (need for) passkey-agent
+	+	replug dongle for it to work...
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,19 +21,40 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Vikram,
+Hi Peter,
 
-> I have downloaded BlueZ from www.BlueZ.org It contains "Libs" and
-> "Utils" directory.
-> /BlueZ/Libs contain bluetooth.c,hci.c and sdp.c files what are these?
-> yes test programs in Utils directory are helpful.I am trying to build
-> and run the test programs in Utils directory.
-> But agin I am not finding full source for BlueZ(HCI,L2CAP,RFCOM ..etc
-> sources).
-> If you know from where I can download full source for BlueZ, please
-> tell me.
+> Thanks for great software. It rocks when its configured right. Which
+> took some time - at least for me.
+> 
+> First, I spent a long time wondering why `hcitool scan` was empty /
+> didn't show any output other than "Scanning ..."
+> 
+> I had plugged in my brand new Bluetooth USB dongle and seen that it
+> loaded the USB and bluetooth drivers! Great! Then I installed and
+> bluez-utils and gnokii. `hcitool scan` kept showing empty output until I
+> unplugged and reconnected the dongle!!! How was I to know *that*? I
+> remember struggling with this before and also tearing my hair out when I
+> discovered it back then... :D I found several questions about this (with
+> some suggestions about pin_helper!! ) but no good answers/solutions.
+> 
+> Next, I spent *forever* trying to get pin_helper to work on my new
+> installation! And it didn't because I'm using 3.X versions. There are
+> *so* many posts out there talking about pin_helper, that I didn't even
+> question that they all might be invalid.
+> 
+> Somewhere along the line I discovered Marcel Holtmann mentioning 
+> something about passkey-agent. 3 minutes later all was working fine.
+> 
+> I've now spent almost 5 hours getting a new bluetooth dongle and my
+> phone to communicate, even though I already had a laptop working with
+> bluez setup right next to it.
+> 
+> May I please suggest that these two be added as FAQs?
+> (At the very least, I'll now be able to find these two valuable tips in
+> the mailing list archives next time! :D)
 
-try www.kernel.org :)
+actually you might wanna write an article for the wiki by yourself.
+Check out wiki.bluez.org and feel free to extend the information.
 
 Regards
 
