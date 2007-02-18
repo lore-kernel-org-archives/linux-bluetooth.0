@@ -1,57 +1,52 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45D873BC.2050305@yahoo.com.au>
-Date: Sun, 18 Feb 2007 16:41:48 +0100
-From: bluez.mexon@spamgourmet.com
+Return-Path: <ohadbc@gmail.com>
+Message-ID: <4f436aae0702180546o4c7a7c58x3028230c1f33878e@mail.gmail.com>
+Date: Sun, 18 Feb 2007 15:46:02 +0200
+From: "Choi Sonim" <choisonim@gmail.com>
+Sender: ohadbc@gmail.com
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] immediate unsolicited disconnect after hcitool cc
+Cc: "Marcel Holtmann" <marcel@holtmann.org>
+In-Reply-To: <1171802646.26794.6.camel@violet>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-References: <45D7173C.6090108@yahoo.com.au>
-	<CE5216C10C83944D9FD37B65CD33F3970CF472@mplex01.mpl.access-company.com>
-In-Reply-To: <CE5216C10C83944D9FD37B65CD33F3970CF472@mplex01.mpl.access-company.com>
-Subject: Re: [Bluez-devel] bluetooth-alsa: ALSA doesn't recognise a2dpd?
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+References: <4f436aae0702180425r2abd39e7q2842ef50e585e67a@mail.gmail.com>
+	 <1171802646.26794.6.camel@violet>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Frederic Dalleau - Frederic.Dalleau@access-company.com wrote:
->> But in XMMS I don't get an "a2dpd" option for ALSA output.
-> =
+hi Marcel,
 
-> Hi, just type it manually a2dpd.
-> Maybe the doc could be less ambigous!
-> Fr=E9d=E9ric
+On 2/18/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Choi,
+>
+> > after I do "hcitool cc xx:xx:xx:xx:xx:xx" I have a connection
+> > I can see with "hcitool con" but after one or two seconds I can
+> > see in hcidump that an HCI disconnect command is sent and
+> > the connection is disconnected.
+>
+> don't use this command for piconet creation. Use higher layer like L2CAP
+> and RFCOMM. The kernel will create the needed ACL link for you and take
+> fully care of it.
 
-This doesn't work for me either.  I typed "a2dpd" and selected software
-mixer.  When I press play, the frequency band thing shows a solid
-horizontal black line, so it looks like it's just unable to write any
-data out.
+are there command line utilities I can use to test file transfers
+(like in OPP or FTP) ?
 
-So I tried running XMMS off the command line, and it prints this at startup:
+thank you very very much for the help
+choi
 
-Message: device: a2dpd
-
-** WARNING **: alsa_setup_mixer(): Failed to find mixer element: PCM
-
-When I press play, it doesn't print anything more.
-
-I would have expected that if a2dpd had properly registered itself with
-ALSA, it would be available as an auto-detected audio device, wouldn't it?
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys-and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
