@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: slompf <2crazy4you@gmx.de>
+Date: Sun, 18 Feb 2007 13:29:49 +0100
+From: Michael Mauch <michael.mauch@gmx.de>
 To: bluez-users@lists.sourceforge.net
-Date: Sun, 18 Feb 2007 16:01:31 +0100
-Message-Id: <1171810891.14328.15.camel@armageddon>
-Mime-Version: 1.0
-Subject: [Bluez-users] pand + dev-up
+Message-ID: <20070218122948.GA4968@elmicha>
+References: <1171735666.9069.1.camel@violet>
+	<743295.39090.qm@web31708.mail.mud.yahoo.com>
+MIME-Version: 1.0
+In-Reply-To: <743295.39090.qm@web31708.mail.mud.yahoo.com>
+Subject: Re: [Bluez-users] ./configure tells me dbus is required
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,41 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+tim culwins wrote:
 
-im connecting my SE M600i using pand. The commands are:
+>    So I ran make install and everything seemed to
+> work. However now when I look in synaptic it tells me
+> that 3.7 is still installed. How can I tell if 3.9 is
+> working?
 
-pand -c bt_addr -r NAP -d PANU
-ifconfig bnep0 ip_for_bnep
+If you installed from source and did not make a package (.deb), your
+package manager cannot know.
 
-That works so far.
+Tell synaptic to uninstall 3.7, then run "make install" again to be sure
+that everything from 3.9 is installed.
 
-Now i would like to automate the ifconfig. In the man page there are to
-possibilities to do that. First with the -u option, second by
-using /etc/bluetooth/pan/dev-up. Both seem not to work.
-
-1.) If I try the first possibility, with:
-pand -c bt_addr -r NAP -d PANU -u /path/script.sh
-,nothing happens, but the bnep interface is shown by ifconfig -a. So I
-would have to type 
-ifconfig bnep0 ip_for_bnep 
-by hand. It seems the script has not been started, because if I write
-sth like 
-echo foo> tempDat.txt
-the file does not appear too.
-
-2.) If I dont use the -u option the same symptoms are showing.
-
-My script does only contain one line:
-ifconfig bnep0 ip_for_bnep <or> ifconfig $1 ip_for_bnep
-
-
-Any idea what Im doing wrong?
-
-Reagards
-Torsten
-
-
+Regards...
+		Michael
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
