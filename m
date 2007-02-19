@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45D9E0ED.8090700@yahoo.com.au>
-Date: Mon, 19 Feb 2007 18:39:57 +0100
-From: bluez.mexon@spamgourmet.com
+Message-ID: <45D91EC2.5000201@xmission.com>
+Date: Sun, 18 Feb 2007 20:51:30 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] hid2hci fails: broken pipe
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <5b9417770702181902v287f5d44uc513b4d8bc8f1a79@mail.gmail.com>
+In-Reply-To: <5b9417770702181902v287f5d44uc513b4d8bc8f1a79@mail.gmail.com>
+Subject: Re: [Bluez-devel] if using bluetooth DUN,
+	how to get best performance?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,30 +21,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+John
 
-My Digitus DN-3008 arrived in the post today, so I tried it out.  I
-managed to get it to the same level of workingness as my DBT-120, i.e.,
-I can use my bluetooth mighty mouse with the thing, if I first run
-"hidd" manually.  The next step is to switch it into HID mode with
-hid2hci.  But this is failing with the error message:
+> I am using bluetooth DUN on an EVDO network, but it's not that fast.
+> Is there anything I should do to maximize the speed I get?
+> 
+> like, should i leave it at 230000 baud, or increase it to something else, etc.
 
-aeon:~# hid2hci -1
-Switching device 0a12:0001 to HID mode failed (Broken pipe)
+it depends a lot on the phone. The pocketpc phones I've tried were 
+notoriously bad at the data rate (and also tend to drop the connection 
+at random)
 
-Can anyone suggest why this isn't working?  What pipe?  What's it
-talking to a pipe for in the first place?
+the best phone was a e815 but verizon seems to have messed up dun on it. 
+it was getting 600kbps in urban areas. the 700p I have now gets around 
+400kbps.
 
-I also tried disabling bluez completely and rebooting, in case some
-daemon was lurking around somewhere preventing the device from being
-switched out from underneath it.  But that didn't help.
+evdo quality varies a bit... some areas I never got better than 300kbps 
+even with the motorola.
 
-This is under Debian etch.  hid2hci --version doesn't seem to be
-accepted, so I can't say what version it is, but bluez-utils is version
-3.7-1.
+my serial baud rate is set to 460800 but that doesn't seem to really matter.
 
-Thanks for any help,
-Mat
+brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
