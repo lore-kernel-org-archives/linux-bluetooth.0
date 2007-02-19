@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45DA144F.1090506@unternet.org>
+Date: Mon, 19 Feb 2007 23:28:16 +0200
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20070219212816.GA13138@jh-mbp>
 References: <45D4FB7F.6090301@unternet.org>
 	<1171591223.7583.33.camel@aeonflux.holtmann.net>
 	<45DA01EC.4050007@unternet.org> <1171917193.26567.51.camel@violet>
 	<45DA144F.1090506@unternet.org>
-Date: Mon, 19 Feb 2007 22:31:36 +0100
-Message-Id: <1171920696.26567.63.camel@violet>
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <45DA144F.1090506@unternet.org>
 Subject: Re: [Bluez-devel] sdpd in polling loop on disconnect
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -25,6 +25,8 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Frank,
 
+On Mon, Feb 19, 2007, Frank de Lange wrote:
+> Marcel Holtmann wrote:
 > >> Attached: patch for sdpd (adds G_IO_HUP|G_IO_ERR to watched conditions 
 > >> on g_io_channels)
 > > 
@@ -34,13 +36,11 @@ Hi Frank,
 > Even better. Did he also check the other watchers for similar problems? 
 > As said there are several of them which only look for G_IO_IN events.
 
-feel free to double-check the CVS. However they should all be fixed now.
+I tried to check all places that used g_io_add_watch so hopefully there 
+shouldn't be any issues left. Feel free to check the CVS though as it's 
+not impossible that I've missed some place.
 
-Regards
-
-Marcel
-
-
+Johan
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
