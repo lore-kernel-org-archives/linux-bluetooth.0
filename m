@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45DA1863.1000103@unternet.org>
-Date: Mon, 19 Feb 2007 22:36:35 +0100
-From: Frank de Lange <bluez-f@unternet.org>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45D4FB7F.6090301@unternet.org>	<1171591223.7583.33.camel@aeonflux.holtmann.net>	<45DA01EC.4050007@unternet.org>	<1171917193.26567.51.camel@violet>
-	<45DA144F.1090506@unternet.org>
 In-Reply-To: <45DA144F.1090506@unternet.org>
+References: <45D4FB7F.6090301@unternet.org>
+	<1171591223.7583.33.camel@aeonflux.holtmann.net>
+	<45DA01EC.4050007@unternet.org> <1171917193.26567.51.camel@violet>
+	<45DA144F.1090506@unternet.org>
+Date: Mon, 19 Feb 2007 22:31:36 +0100
+Message-Id: <1171920696.26567.63.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] sdpd in polling loop on disconnect
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,32 +23,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Frank de Lange wrote:
-> Marcel Holtmann wrote:
->>> Attached: patch for sdpd (adds G_IO_HUP|G_IO_ERR to watched conditions 
->>> on g_io_channels)
->> thanks for the patch, but that should be already fixed in the CVS. Johan
->> found this during the UPF testing last week.
+Hi Frank,
+
+> >> Attached: patch for sdpd (adds G_IO_HUP|G_IO_ERR to watched conditions 
+> >> on g_io_channels)
+> > 
+> > thanks for the patch, but that should be already fixed in the CVS. Johan
+> > found this during the UPF testing last week.
 > 
 > Even better. Did he also check the other watchers for similar problems? 
 > As said there are several of them which only look for G_IO_IN events.
-> 
-> Cheers//Frank
-> 
 
-Replying to my own message here... I checked current CVS for the above 
-and found a few remaining occurrences of listening watchers which don't 
-care for HUP:
+feel free to double-check the CVS. However they should all be fixed now.
 
-utils/daemon/echo.c:176
-utils/hcid/main.c:782
-utils/input/server.c:233
-utils/test/hciemu.c:1331
-utils/transfer/server.c:108
+Regards
 
-Are these accounted for as being 'safe'?
+Marcel
 
-Cheers//Frank
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
