@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <5b9417770702191013x63a8ebfdu7cefaf3e781b0f86@mail.gmail.com>
-Date: Mon, 19 Feb 2007 12:13:08 -0600
-From: "John H." <mistamaila@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45D91EC2.5000201@xmission.com>
-MIME-Version: 1.0
-References: <5b9417770702181902v287f5d44uc513b4d8bc8f1a79@mail.gmail.com>
-	<45D91EC2.5000201@xmission.com>
-Subject: Re: [Bluez-devel] if using bluetooth DUN,
-	how to get best performance?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <45D9E0ED.8090700@yahoo.com.au>
+References: <45D9E0ED.8090700@yahoo.com.au>
+Date: Mon, 19 Feb 2007 18:54:19 +0100
+Message-Id: <1171907659.26567.29.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] hid2hci fails: broken pipe
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,47 +20,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-well, when using pdanet's software in xp and usb connection, i got over 800kb/s
-when using bt dun in XP, i got 160kb/s
+Hi Mat,
 
-I am assuming it was roughly the same speed in linux DUN.  I don't see
-them fixing their software itself to run on linux any time soon, so i
-am probably stuck with BT DUN as opposed to USB dun in linux, so i was
-wondering if there was anything i could do.
+> My Digitus DN-3008 arrived in the post today, so I tried it out.  I
+> managed to get it to the same level of workingness as my DBT-120, i.e.,
+> I can use my bluetooth mighty mouse with the thing, if I first run
+> "hidd" manually.  The next step is to switch it into HID mode with
+> hid2hci.  But this is failing with the error message:
+> 
+> aeon:~# hid2hci -1
+> Switching device 0a12:0001 to HID mode failed (Broken pipe)
+> 
+> Can anyone suggest why this isn't working?  What pipe?  What's it
+> talking to a pipe for in the first place?
 
-On 2/18/07, Brad Midgley <bmidgley@xmission.com> wrote:
-> John
->
-> > I am using bluetooth DUN on an EVDO network, but it's not that fast.
-> > Is there anything I should do to maximize the speed I get?
-> >
-> > like, should i leave it at 230000 baud, or increase it to something else, etc.
->
-> it depends a lot on the phone. The pocketpc phones I've tried were
-> notoriously bad at the data rate (and also tend to drop the connection
-> at random)
->
-> the best phone was a e815 but verizon seems to have messed up dun on it.
-> it was getting 600kbps in urban areas. the 700p I have now gets around
-> 400kbps.
->
-> evdo quality varies a bit... some areas I never got better than 300kbps
-> even with the motorola.
->
-> my serial baud rate is set to 460800 but that doesn't seem to really matter.
->
-> brad
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> opinions on IT & business topics through brief surveys-and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+it doesn't mean that it actually failed to switch the adapter. It might
+have simply worked. The error messages from the USB subsystem are kinda
+strange, but somehow expected since the device will disconnect from the
+bus.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
