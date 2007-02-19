@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 19 Feb 2007 10:51:45 +0100
-From: Florian Ragwitz <rafl@debian.org>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20070219095145.GA1828@perldition.org>
 MIME-Version: 1.0
-Subject: [Bluez-users] hcidump segfault
+Date: Mon, 19 Feb 2007 10:31:13 +0100
+Message-ID: <77958D3F4480D34A99F9D8759B56D550453ACB@deblnrd04msx.sielearn.net>
+In-reply-to: <1171874475.26567.5.camel@violet>
+From: "Hofmann, Marco" <marco.hofmann@technik-akademie.de>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Bluetooth passkey and encryption
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,82 +15,85 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1840413549=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi Marcel
 
---===============1840413549==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="6TrnltStXW4iwmi0"
-Content-Disposition: inline
+I checked with hcidump and received the following message:
+
+> HCI Event: PIN Code Request (0x16) plen 6
+    bdaddr 00:11:B1:A1:68:2B
+< HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+    bdaddr 00:11:B1:A1:68:2B
+> HCI Event: Command Complete (0x0e) plen 10
+    PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
+    status 0x06 bdaddr 00:11:B1:A1:68:2B
+    Error: PIN or Key Missing
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x06 handle 7 bdaddr 00:11:B1:A1:68:2B type ACL encrypt 0x00
+    Error: PIN or Key Missing 
+
+I set a key under the option passkey in the hcid.conf. So if that key is
+not used, where would I have to set this key?
+
+Sincerely,
+Marco.
+
+-----Original Message-----
+From: bluez-users-bounces@lists.sourceforge.net
+[mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Marcel
+Holtmann
+Sent: Monday, February 19, 2007 9:41 AM
+To: BlueZ users
+Subject: Re: [Bluez-users] Bluetooth passkey and encryption
+
+Hi Marco,
+
+> For a project in my school I need to connect a Debian Linux Server via
+> Bluetooth to a serial Bluetooth dongle. It is important that a
+> connection can be established using only the command line. I use the
+> bluez-utils 3.7 on a debian unstable (kernel 2.6.17).
+> Without enabling any security functions the connection can be
+> established without a problem. As soon as encryption and PIN are
+enabled
+> a connection can not be established. I have checked the settings in
+the
+> hcid.conf according to various How-Tos to enable encryption and PIN. I
+> always receive an Input/Output error.
+> Doing the pairing with a graphical tool like kbluetoothd is possible
+> with encryption and PIN. So it is possible and the devices work. I am
+> just frustrated that I am obviously missing something somewhere. If
+> anyone could help that would be great.
+
+check with "hcidump -X -V" and look at the syslog for errors from hcid.
+
+Regards
+
+Marcel
 
 
---6TrnltStXW4iwmi0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-Hello,
-
-I'm trying to sync a Sony Ericsson W810i mobile using wammu over
-bluetooth. Scanning for the device works fine, but when trying to
-connect wammu hangs. I tried to debug that problem using hcidump and
-saw it segfaulting after telling wammu to connect. Therefor I think the
-problem is caused by something other than the wammu/gammu code or my
-local bluetooth configuration.
-
-Maybe someone can help me sort out the above problems? [1]Here you will
-find the hcidump output of a wammu session which first scans for the
-device and then tries to connect to it. What other information might be
-useful?
-
-1. http://files.perldition.org/wammu.hcidump
-
-
-TIA,
-Flo
-
---=20
-BOFH excuse #25:
-Decreasing electron flux
-
---6TrnltStXW4iwmi0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.1 (GNU/Linux)
-
-iD8DBQFF2XMxdC8qQo5jWl4RAh+5AJ4vcjElQeKq80Ar8EPAOYARfVsaCQCeK/pl
-/AqC3Lx41UZFHBkKeO2O0QQ=
-=Ukwx
------END PGP SIGNATURE-----
-
---6TrnltStXW4iwmi0--
-
-
---===============1840413549==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+------------------------------------------------------------------------
+-
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share
+your
+opinions on IT & business topics through brief surveys-and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDE
+V
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1840413549==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1840413549==--
