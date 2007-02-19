@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <77958D3F4480D34A99F9D8759B56D550453ACB@deblnrd04msx.sielearn.net>
-References: <77958D3F4480D34A99F9D8759B56D550453ACB@deblnrd04msx.sielearn.net>
-Date: Mon, 19 Feb 2007 11:19:19 +0100
-Message-Id: <1171880359.26567.12.camel@violet>
+In-Reply-To: <20070219095145.GA1828@perldition.org>
+References: <20070219095145.GA1828@perldition.org>
+Date: Mon, 19 Feb 2007 11:18:14 +0100
+Message-Id: <1171880294.26567.9.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluetooth passkey and encryption
+Subject: Re: [Bluez-users] hcidump segfault
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,28 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marco,
+Hi Florian,
 
-> I checked with hcidump and received the following message:
-> 
-> > HCI Event: PIN Code Request (0x16) plen 6
->     bdaddr 00:11:B1:A1:68:2B
-> < HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
->     bdaddr 00:11:B1:A1:68:2B
-> > HCI Event: Command Complete (0x0e) plen 10
->     PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
->     status 0x06 bdaddr 00:11:B1:A1:68:2B
->     Error: PIN or Key Missing
-> > HCI Event: Connect Complete (0x03) plen 11
->     status 0x06 handle 7 bdaddr 00:11:B1:A1:68:2B type ACL encrypt 0x00
->     Error: PIN or Key Missing 
-> 
-> I set a key under the option passkey in the hcid.conf. So if that key is
-> not used, where would I have to set this key?
+> I'm trying to sync a Sony Ericsson W810i mobile using wammu over
+> bluetooth. Scanning for the device works fine, but when trying to
+> connect wammu hangs. I tried to debug that problem using hcidump and
+> saw it segfaulting after telling wammu to connect. Therefor I think the
+> problem is caused by something other than the wammu/gammu code or my
+> local bluetooth configuration.
 
-the passkey option is only used on incoming connection and only if
-security auto has been selected. For all the rest you have to run a
-passkey agent. Check the mailing list archives for details.
+a segfault of hcidump means nothing. It is a stupid protocol analyzer
+and fully passive. I am pretty sure that the wammu OBEX code is at fault
+here.
 
 Regards
 
