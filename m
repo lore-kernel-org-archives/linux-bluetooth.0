@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Per Thomas Jahr <perja@extern.uio.no>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Mon, 19 Feb 2007 22:18:45 +0100
-Message-Id: <1171919925.4936.9.camel@localhost.localdomain>
-Mime-Version: 1.0
-Subject: [Bluez-users] How to tell if EDR is used?
+From: Sascha Turczyk <Sascha.Turczyk@gmx.de>
+To: bluez-users@lists.sourceforge.net
+Date: Mon, 19 Feb 2007 20:20:48 +0100
+MIME-Version: 1.0
+Message-Id: <200702192020.49437.Sascha.Turczyk@gmx.de>
+Subject: [Bluez-users] Epox Presenter BT-PM01B: How to use buttons?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,71 +14,115 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hello,
 
-I'm doing file transfers from my computer to my phone, but I'm not sure
-if it's using EDR or not. Is there some way I can find this out by using
-f.ex. hcitool, hciconfig or some other tool during the file transfer? 
+I want to use this presenter under Linux: Kubuntu 6.10 Edgy Eft. But it doe=
+s =
 
-I use obexftp for the file transfer and both ends should support
-Bluetooth 2 + EDR.
+not work. Perhaps somebody can help me.
+First of all I shortly tell you, what I have done so far to get this thing =
+to =
 
-BTW: where do I find the explanation for the "Features" bytes?
-
-My computer:
-
-# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:02:XX:XX:XX:XX ACL MTU: 1017:8 SCO MTU: 64:0
-        UP RUNNING PSCAN 
-        RX bytes:246878 acl:12503 sco:0 events:6411 errors:0
-        TX bytes:13069645 acl:25366 sco:0 commands:45 errors:0
-        Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-        Link policy: RSWITCH HOLD SNIFF PARK 
-        Link mode: SLAVE ACCEPT 
-        Name: 'delphi-0'
-        Class: 0x120104
-        Service Classes: Networking, Object Transfer
-        Device Class: Computer, Desktop workstation
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x4000 LMP Ver: 2.0 (0x3) LMP Subver: 0x430e
-        Manufacturer: Broadcom Corporation (15)
+work.
 
 
-My phone (Sony Ericsson K800i):
+Using the bluezutils I can find the presenter and even connect to it.
 
-# hcitool info 00:19:XX:XX:XX:XX
+"quote"
+
+sascha@Sascha-Notebook:~$ hcitool scan
+Scanning ...
+        <baddr>       Presenter 838995 =
+
+
+sascha@Sascha-Notebook:~$ sudo hcitool cc <baddr> =
+
+
+sascha@Sascha-Notebook:~$ hcitool info <baddr>
 Requesting information ...
-        BD Address:  00:19:XX:XX:XX:XX
-        LMP Version: 2.0 (0x3) LMP Subversion: 0x520
-        Manufacturer: ST Microelectronics (48)
-        Features: 0xff 0xeb 0x8d 0xfe 0x9b 0xe9 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offset> 
-                <timing accuracy> <role switch> <hold mode> <sniff mode> 
-                <park state> <RSSI> <SCO link> <HV3 packets> <u-law log> 
-                <A-law log> <CVSD> <power control> <transparent SCO> 
-                <broadcast encrypt> <EDR ACL 2 Mbps> <EDR ACL 3 Mbps> 
-                <enhanced iscan> <interlaced iscan> <interlaced pscan> 
-                <inquiry with RSSI> <extended SCO> <EV4 packets> <EV5 packets> 
-                <AFH cap. slave> <AFH class. slave> <3-slot EDR ACL> 
-                <5-slot EDR ACL> <AFH cap. master> <EDR eSCO 2 Mbps> 
-                <EDR eSCO 3 Mbps> <3-slot EDR eSCO> 
+        BD Address:  <baddr>
+        Device Name: Presenter 838995
+        LMP Version: 1.1 (0x1) LMP Subversion: 0x436
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+ sascha@Sascha-Notebook:~$ hcitool con
+Connections:
+        < ACL <baddr> handle 41 state 1 lm MASTER
+               <park state> <RSSI> <channel quality> <SCO link> <HV2 packet=
+s>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
+                <power control> <transparent SCO>
+
+"quote end"
+
+But the buttons do not work, so I cannot use the epox presenter.
+Then I searched in the internet and found the webpage
+
+http://www.holtmann.org/linux/bluetooth/epox.html
+
+There you can download a software especially written to use this presenter =
+
+under linux. One has to compile this software with some scripts coming alon=
+g =
+
+with the download.
+But the problem is, that this software uses some old packages which I canno=
+t =
+
+install =
 
 
+"quote"
 
-Thanks
-Per Thomas
+*cut some uninteresting stuff*
+checking for libsdp... no
+configure: error: SDP library not found.
+                Please compile and install bluez-sdp package.
 
+
+sascha@Sascha-Notebook:~/Downloads/epox-presenter-0.2$ sudo apt-get install =
+
+bluez-sdp
+Password:
+Paketlisten werden gelesen... Fertig
+Abh=E4ngigkeitsbaum wird aufgebaut
+Reading state information... Fertig
+Paket bluez-sdp ist nicht verf=FCgbar, wird aber von einem anderen
+Paket referenziert. Das kann hei=DFen, dass das Paket fehlt, dass es veralt=
+et
+ist oder nur aus einer anderen Quelle verf=FCgbar ist.
+Doch die folgenden Pakete ersetzen es:
+  bluez-utils
+E: Paket bluez-sdp hat keinen Installationskandidaten =
+
+
+"quote end"
+
+Sorry for the german text. But apt-get says, that this bluez-sdp is too old=
+, =
+
+Now one has to use "bluez-utilz" which I have already installed on my =
+
+computer.
+
+Does anyone have an idea how I can get this Presenter finally work?
+
+Thanks a lot
+
+Sascha
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
