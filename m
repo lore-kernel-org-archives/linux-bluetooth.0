@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <57c68ddc0702190128n149fa456if5bc854aca1574a0@mail.gmail.com>
-References: <57c68ddc0702190128n149fa456if5bc854aca1574a0@mail.gmail.com>
-Date: Mon, 19 Feb 2007 11:45:36 +0100
-Message-Id: <1171881936.26567.14.camel@violet>
+In-Reply-To: <77958D3F4480D34A99F9D8759B56D550453ACB@deblnrd04msx.sielearn.net>
+References: <77958D3F4480D34A99F9D8759B56D550453ACB@deblnrd04msx.sielearn.net>
+Date: Mon, 19 Feb 2007 11:19:19 +0100
+Message-Id: <1171880359.26567.12.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Help needed for setting up multiple
-	connection	using single bluetooth adapter
+Subject: Re: [Bluez-users] Bluetooth passkey and encryption
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,33 +20,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Siddhant,
+Hi Marco,
 
->    I have already posted few mails regarding before ,also tried
-> different things at my end  , but things didnt went anywhere. Now
-> setting up and using this feature has become a necessity for my
-> project so i would be making more effort from now on. 
+> I checked with hcidump and received the following message:
 > 
-> The first question that i have is  ---- What is the procedure for
-> doing such a thing , till now what i have tried can be summarized as
-> below :- 
+> > HCI Event: PIN Code Request (0x16) plen 6
+>     bdaddr 00:11:B1:A1:68:2B
+> < HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
+>     bdaddr 00:11:B1:A1:68:2B
+> > HCI Event: Command Complete (0x0e) plen 10
+>     PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
+>     status 0x06 bdaddr 00:11:B1:A1:68:2B
+>     Error: PIN or Key Missing
+> > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x06 handle 7 bdaddr 00:11:B1:A1:68:2B type ACL encrypt 0x00
+>     Error: PIN or Key Missing 
 > 
-> i) Fork two different processes. 
-> 
-> ii) For each process establish RFCOMM connection via socket call.
-> 
-> iii) For each RFCOMM port perform OBEX_PUSH by registering a custom
-> protocol.
-> 
-> The above method works fine for single process but when in multiply
-> process mode few unexpected things happen which are :- 
-> 
-> i) Sometimes one process waits for the other to get completed.
-> ii) One of the processes errors out.
+> I set a key under the option passkey in the hcid.conf. So if that key is
+> not used, where would I have to set this key?
 
-first of all run "hcidump -X -V" to see what actually happens with the
-Bluetooth adapter and second, you have to get the forking and process
-handling right. Otherwise you better use an event loop.
+the passkey option is only used on incoming connection and only if
+security auto has been selected. For all the rest you have to run a
+passkey agent. Check the mailing list archives for details.
 
 Regards
 
