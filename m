@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Sascha Turczyk <Sascha.Turczyk@gmx.de>
-To: bluez-users@lists.sourceforge.net
-Date: Mon, 19 Feb 2007 20:20:48 +0100
+Date: Mon, 19 Feb 2007 10:16:38 -0800 (PST)
+From: tim culwins <mail0123456789101112@yahoo.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1171907811.26567.32.camel@violet>
 MIME-Version: 1.0
-Message-Id: <200702192020.49437.Sascha.Turczyk@gmx.de>
-Subject: [Bluez-users] Epox Presenter BT-PM01B: How to use buttons?
+Message-ID: <753606.99460.qm@web31704.mail.mud.yahoo.com>
+Subject: Re: [Bluez-users] mouse wont connect...
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,115 +15,76 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+awesome it works. thanks for all the help. i had to
+kill the hidd server from system monitor. run hidd
+--search then run hidd --server.
 
-I want to use this presenter under Linux: Kubuntu 6.10 Edgy Eft. But it doe=
-s =
+--- Marcel Holtmann <marcel@holtmann.org> wrote:
 
-not work. Perhaps somebody can help me.
-First of all I shortly tell you, what I have done so far to get this thing =
-to =
-
-work.
-
-
-Using the bluezutils I can find the presenter and even connect to it.
-
-"quote"
-
-sascha@Sascha-Notebook:~$ hcitool scan
-Scanning ...
-        <baddr>       Presenter 838995 =
-
-
-sascha@Sascha-Notebook:~$ sudo hcitool cc <baddr> =
-
-
-sascha@Sascha-Notebook:~$ hcitool info <baddr>
-Requesting information ...
-        BD Address:  <baddr>
-        Device Name: Presenter 838995
-        LMP Version: 1.1 (0x1) LMP Subversion: 0x436
-        Manufacturer: Cambridge Silicon Radio (10)
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-                <3-slot packets> <5-slot packets> <encryption> <slot offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
- sascha@Sascha-Notebook:~$ hcitool con
-Connections:
-        < ACL <baddr> handle 41 state 1 lm MASTER
-               <park state> <RSSI> <channel quality> <SCO link> <HV2 packet=
-s>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
-                <power control> <transparent SCO>
-
-"quote end"
-
-But the buttons do not work, so I cannot use the epox presenter.
-Then I searched in the internet and found the webpage
-
-http://www.holtmann.org/linux/bluetooth/epox.html
-
-There you can download a software especially written to use this presenter =
-
-under linux. One has to compile this software with some scripts coming alon=
-g =
-
-with the download.
-But the problem is, that this software uses some old packages which I canno=
-t =
-
-install =
+> Hi Tim,
+> 
+> > ok i ran sudo hidd --server and it tells me 
+> > Can't listen on HID control channel: Address
+> already
+> > in use
+> > 
+> > i assume that means its already running.
+> > 
+> > but now im getting a different hcidump, looks like
+> its
+> > connecting but then something is terminating the
+> > connection...
+> 
+> you need a successful hidd --search first, because
+> otherwise the HID
+> server will reject any connections. This is a
+> security measurement. You
+> can check with /sys/class/bluetooth/l2cap if the PSM
+> 17 and 19 are in
+> use before starting hidd --server and the place to
+> automatically start
+> that daemon is /etc/default/bluetooth if you use
+> Debian or Ubuntu.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+>
+-------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get
+> the chance to share your
+> opinions on IT & business topics through brief
+> surveys-and earn cash
+>
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
 
 
-"quote"
 
-*cut some uninteresting stuff*
-checking for libsdp... no
-configure: error: SDP library not found.
-                Please compile and install bluez-sdp package.
-
-
-sascha@Sascha-Notebook:~/Downloads/epox-presenter-0.2$ sudo apt-get install =
-
-bluez-sdp
-Password:
-Paketlisten werden gelesen... Fertig
-Abh=E4ngigkeitsbaum wird aufgebaut
-Reading state information... Fertig
-Paket bluez-sdp ist nicht verf=FCgbar, wird aber von einem anderen
-Paket referenziert. Das kann hei=DFen, dass das Paket fehlt, dass es veralt=
-et
-ist oder nur aus einer anderen Quelle verf=FCgbar ist.
-Doch die folgenden Pakete ersetzen es:
-  bluez-utils
-E: Paket bluez-sdp hat keinen Installationskandidaten =
-
-
-"quote end"
-
-Sorry for the german text. But apt-get says, that this bluez-sdp is too old=
-, =
-
-Now one has to use "bluez-utilz" which I have already installed on my =
-
-computer.
-
-Does anyone have an idea how I can get this Presenter finally work?
-
-Thanks a lot
-
-Sascha
+ 
+____________________________________________________________________________________
+Food fight? Enjoy some healthy debate 
+in the Yahoo! Answers Food & Drink Q&A.
+http://answers.yahoo.com/dir/?link=list&sid=396545367
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
