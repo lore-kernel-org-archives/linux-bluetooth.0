@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <a72d33330702201537q4c10e56el8f82339427faf9aa@mail.gmail.com>
-Date: Wed, 21 Feb 2007 00:37:46 +0100
-From: "Ma Begaj" <derliebegott@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <4f436aae0702201137g12c4dfd0k96201c2f2f38df26@mail.gmail.com>
+Date: Tue, 20 Feb 2007 21:37:08 +0200
+From: "Choi Sonim" <choisonim@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4f436aae0702192256p8fb5182web7a3aa633eb1025@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] Headset connected, but no sound in XMMS, mplayer etc
+References: <4f436aae0702192256p8fb5182web7a3aa633eb1025@mail.gmail.com>
+Subject: [Bluez-users] bluez-utils-3.9 compilation error
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,81 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+hello.
 
-my headset (jabra v250, mono headset with mic) is working with btsco,
-but sound could be better and I wanted to try to use plugz. I have a
-thinkpad with built in bluetooth.
+I try to build bluez-utils but I get errors.
+I do ./configure with no problems.
+but in the make I get these errors:
 
-I compiled sbc & plugz from latest cvs with bluez 3.9 and kernel
-2.6.19.1, because cvs cannot be compiled with kernel 2.6.20.
+libhciserver.a(dbus-common.o): In function `unregister_sdp_record':
+dbus-common.c:(.text+0x90): undefined reference to
+`sdp_device_record_unregister_binary'
+libhciserver.a(dbus-common.o): In function `register_sdp_binary':
+dbus-common.c:(.text+0x106): undefined reference to
+`sdp_device_record_register_binary'
+collect2: ld returned 1 exit status
 
-I did everything as described on
-http://bluetooth-alsa.sourceforge.net/build.html and everything was
-ok. I started xmms, type in "a2dpd" for alsa device and I was asked
-for a pin code. xmms was playing but I was not able to hear anything.
-no application was able to play sound. This is the output of "a2dpd":
+dows anyone have any clue ?
 
-------------------------------------------
-
-A2DPD[355.083]: main_loop: New client 11
-A2DPD[355.083]: main_loop: Got index 0
-A2DPD[355.084]: stream_client_state_streamingsetup: PLAYBACK thread
-client_index=0, socket=11, id=0 started (44100 Hz, 2 channels, 16
-bits)
-A2DPD[355.085]: a2dp_state_connect: State AVDTP_STATEX_SDP_CONNECTING
-A2DPD[355.115]: a2dp_state_machine: Role is INITIATOR
-A2DPD[355.116]: a2dp_state_machine: (errno=115:Operation now in
-progress)SDP connection on socket 12
-A2DPD[355.116]: a2dp_state_machine: State AVDTP_STATEX_SDP_CONNECTING_WAIT
-A2DPD[355.117]: a2dpd_signal_state: Connecting 00:07:A4:28:E3:5C
-A2DPD[360.127]: a2dp_state_machine: SDP connection terminated
-A2DPD[360.169]: get_avdtp_psm: Service Search record empty.
-A2DPD[360.169]: get_avdtp_psm: Service Search OK
-A2DPD[360.198]: get_avdtp_psm: Checking non spec audio
-A2DPD[360.198]: a2dp_state_machine: Found psm 25
-A2DPD[360.198]: a2dp_state_machine: State AVDTP_STATEX_CTL_CONNECTING
-A2DPD[360.198]: a2dp_state_machine: Socket is 12
-A2DPD[360.198]: a2dp_state_machine: (errno=115:Operation now in
-progress)State AVDTP_STATEX_CTL_CONNECTING_WAIT
-A2DPD[360.229]: a2dp_state_machine: (errno=111:Connection refused)CTL
-connection failed
-A2DPD[360.229]: a2dp_state_machine: State AVDTP_STATEX_DISCONNECTING
-A2DPD[360.237]: a2dp_disconnect:
-A2DPD[360.237]: a2dp_stream_stop: Closing stream socket -1
-A2DPD[360.237]: a2dp_stream_stop: Closed
-A2DPD[360.237]: a2dp_stream_stop: State AVDTP_STATE_IDLE
-A2DPD[360.237]: a2dp_disconnect: Closing ctl socket 12
-A2DPD[360.237]: close_socket: Closing 12
-A2DPD[360.237]: a2dp_disconnect: Closed
-A2DPD[360.237]: a2dp_disconnect: State AVDTP_STATE_DISCONNECTED
-A2DPD[360.237]: a2dpd_signal_state: Disconnected
-A2DPD[360.237]: a2dp_state_connect: State AVDTP_STATEX_SDP_CONNECTING
-A2DPD[360.237]: a2dp_state_machine: Role is INITIATOR
-A2DPD[360.237]: a2dp_state_machine: (errno=115:Operation now in
-progress)SDP connection on socket 12
-A2DPD[360.237]: a2dp_state_machine: State AVDTP_STATEX_SDP_CONNECTING_WAIT
-A2DPD[360.237]: a2dpd_signal_state: Connecting 00:07:A4:28:E3:5C
-A2DPD[360.311]: a2dp_state_machine: SDP connection terminated
-A2DPD[360.338]: get_avdtp_psm: Service Search record empty.
-A2DPD[360.338]: get_avdtp_psm: Service Search OK
-A2DPD[360.369]: get_avdtp_psm: Checking non spec audio
-A2DPD[360.369]: a2dp_state_machine: Found psm 25
-A2DPD[360.369]: a2dp_state_machine: State AVDTP_STATEX_CTL_CONNECTING
-A2DPD[360.369]: a2dp_state_machine: Socket is 12
-A2DPD[360.369]: a2dp_state_machine: (errno=115:Operation now in
-progress)State AVDTP_STATEX_CTL_CONNECTING_WAIT
-
---------------------------------------
-
-and so on ...
-
-I also tried to record sound with "rec -d a2dpd" but a2dpd did not react.
-
-
-any ideas? thanks a lot.
-
-M.
+thanks a lot
+choi
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
