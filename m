@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45DB87B6.60100@xmission.com>
-Date: Tue, 20 Feb 2007 16:43:50 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <45DB19E9.5080709@access-company.com>
+Date: Tue, 20 Feb 2007 16:55:21 +0100
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?= <frederic.dalleau@access-company.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <5b9417770702181902v287f5d44uc513b4d8bc8f1a79@mail.gmail.com>	<45D91EC2.5000201@xmission.com>	<5b9417770702191013x63a8ebfdu7cefaf3e781b0f86@mail.gmail.com>	<45DA6241.8030507@xmission.com>
-	<5b9417770702200044k290111f0m880d009c17f6f577@mail.gmail.com>
-In-Reply-To: <5b9417770702200044k290111f0m880d009c17f6f577@mail.gmail.com>
-Subject: Re: [Bluez-devel] if using bluetooth DUN,
-	how to get best performance?
+Subject: [Bluez-devel] pan profile sdp record
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,24 +18,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-John
+Hi,
 
-> I am using the moto Q with sprint, and pdanet.  It doesn't work
-> without pdanet, and pdanet also lets me use it without using the modem
-> plan.  Is it the pdanet software that may be limiting bandwidth?
+I've been looking at pan profile and saw some mandatory fields in the 
+sdp records were missing.
+The problem is that these fields are user dependent. How to set them?
 
->>>well, when using pdanet's software in xp and usb connection, i got over 800kb/s
->>>when using bt dun in XP, i got 160kb/s
+Security Description, NetAccessType and MaxNetAccessRate.
 
-With the experiment with xp, you've basically isolated the bt dun
-problem to be in the pocketpc stack. So you should start posting on the
-pocketpc forums to see where that problem is.
+There are several issues to the problem :
+- patching pand is easy but some more options are needed to customize 
+fields (unless good defaults exists)
+- using 'sdptool add' then 'sdptool set attr' is a bit unreadable
+- patching sdptool with more arguments?
+- using the dbus xml api still requires to patch pand or sdptool.
+- Other?
 
-On the linux side, you could try out PAN if you have a way for the Q to
-serve internet using pan. I am very interested to know if this works any
-better.
+Is there a prefered way to do so?
 
-Brad
+Regards,
+
+-- 
+Frederic
+
+Without the wind, the grass does not move.
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
