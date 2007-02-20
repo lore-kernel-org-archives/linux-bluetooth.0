@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <b9c3b3cf0702210031j128eaed0p2d0cbee303215fc3@mail.gmail.com>
-Date: Wed, 21 Feb 2007 09:31:01 +0100
-From: "Ion Jaureguialzo Sarasola" <widemos@gmail.com>
+Message-ID: <a72d33330702201537q4c10e56el8f82339427faf9aa@mail.gmail.com>
+Date: Wed, 21 Feb 2007 00:37:46 +0100
+From: "Ma Begaj" <derliebegott@gmail.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] Microsoft Wireless Presenter for Notebook 8000 and
-	Macbook Internal Bluetooth
+Subject: [Bluez-users] Headset connected, but no sound in XMMS, mplayer etc
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,121 +14,92 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1248687765=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1248687765==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_133_698271.1172046661235"
+Hi,
 
-------=_Part_133_698271.1172046661235
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+my headset (jabra v250, mono headset with mic) is working with btsco,
+but sound could be better and I wanted to try to use plugz. I have a
+thinkpad with built in bluetooth.
 
-Hi, and using this combination and I can get the mouse working under Ubuntu
-Feisty Fawn Herd4, but the wheel, and extra buttons are not seen by the
-system.
+I compiled sbc & plugz from latest cvs with bluez 3.9 and kernel
+2.6.19.1, because cvs cannot be compiled with kernel 2.6.20.
 
-I've tried to watch events which reach to /dev/input/event3 (where the mouse
-is supposed to be) and can only see the events produced by left, right and
-wheel-click. Also mouse movement is detected. Any other button, including
-presentation buttons don't work.
+I did everything as described on
+http://bluetooth-alsa.sourceforge.net/build.html and everything was
+ok. I started xmms, type in "a2dpd" for alsa device and I was asked
+for a pin code. xmms was playing but I was not able to hear anything.
+no application was able to play sound. This is the output of "a2dpd":
 
-My system's lspci:
+------------------------------------------
 
-00:00.0 Host bridge: Intel Corporation Mobile 945GM/PM/GMS/940GML and 945GT
-Express Memory Controller Hub (rev 03)
-00:02.0 VGA compatible controller: Intel Corporation Mobile 945GM/GMS/940GML
-Express Integrated Graphics Controller (rev 03)
-00:02.1 Display controller: Intel Corporation Mobile 945GM/GMS/940GML
-Express Integrated Graphics Controller (rev 03)
-00:07.0 Performance counters: Intel Corporation Unknown device 27a3 (rev 03)
-00:1b.0 Audio device: Intel Corporation 82801G (ICH7 Family) High Definition
-Audio Controller (rev 02)
-00:1c.0 PCI bridge: Intel Corporation 82801G (ICH7 Family) PCI Express Port
-1 (rev 02)
-00:1c.1 PCI bridge: Intel Corporation 82801G (ICH7 Family) PCI Express Port
-2 (rev 02)
-00:1d.0 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #1
-(rev 02)
-00:1d.1 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #2
-(rev 02)
-00:1d.2 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #3
-(rev 02)
-00:1d.3 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #4
-(rev 02)
-00:1d.7 USB Controller: Intel Corporation 82801G (ICH7 Family) USB2 EHCI
-Controller (rev 02)
-00:1e.0 PCI bridge: Intel Corporation 82801 Mobile PCI Bridge (rev e2)
-00:1f.0 ISA bridge: Intel Corporation 82801GBM (ICH7-M) LPC Interface Bridge
-(rev 02)
-00:1f.1 IDE interface: Intel Corporation 82801G (ICH7 Family) IDE Controller
-(rev 02)
-00:1f.2 IDE interface: Intel Corporation 82801GBM/GHM (ICH7 Family) Serial
-ATA Storage Controller IDE (rev 02)
-00:1f.3 SMBus: Intel Corporation 82801G (ICH7 Family) SMBus Controller (rev
-02)
-01:00.0 Ethernet controller: Marvell Technology Group Ltd. 88E8053 PCI-E
-Gigabit Ethernet Controller (rev 22)
-02:00.0 Network controller: Atheros Communications, Inc. Unknown device 0024
-(rev 01)
-03:03.0 FireWire (IEEE 1394): Agere Systems FW323 (rev 61)Linux macbook
-2.6.20-8-generic #2 SMP Tue Feb 13 05:18:42 UTC 2007 i686 GNU/Linux
+A2DPD[355.083]: main_loop: New client 11
+A2DPD[355.083]: main_loop: Got index 0
+A2DPD[355.084]: stream_client_state_streamingsetup: PLAYBACK thread
+client_index=0, socket=11, id=0 started (44100 Hz, 2 channels, 16
+bits)
+A2DPD[355.085]: a2dp_state_connect: State AVDTP_STATEX_SDP_CONNECTING
+A2DPD[355.115]: a2dp_state_machine: Role is INITIATOR
+A2DPD[355.116]: a2dp_state_machine: (errno=115:Operation now in
+progress)SDP connection on socket 12
+A2DPD[355.116]: a2dp_state_machine: State AVDTP_STATEX_SDP_CONNECTING_WAIT
+A2DPD[355.117]: a2dpd_signal_state: Connecting 00:07:A4:28:E3:5C
+A2DPD[360.127]: a2dp_state_machine: SDP connection terminated
+A2DPD[360.169]: get_avdtp_psm: Service Search record empty.
+A2DPD[360.169]: get_avdtp_psm: Service Search OK
+A2DPD[360.198]: get_avdtp_psm: Checking non spec audio
+A2DPD[360.198]: a2dp_state_machine: Found psm 25
+A2DPD[360.198]: a2dp_state_machine: State AVDTP_STATEX_CTL_CONNECTING
+A2DPD[360.198]: a2dp_state_machine: Socket is 12
+A2DPD[360.198]: a2dp_state_machine: (errno=115:Operation now in
+progress)State AVDTP_STATEX_CTL_CONNECTING_WAIT
+A2DPD[360.229]: a2dp_state_machine: (errno=111:Connection refused)CTL
+connection failed
+A2DPD[360.229]: a2dp_state_machine: State AVDTP_STATEX_DISCONNECTING
+A2DPD[360.237]: a2dp_disconnect:
+A2DPD[360.237]: a2dp_stream_stop: Closing stream socket -1
+A2DPD[360.237]: a2dp_stream_stop: Closed
+A2DPD[360.237]: a2dp_stream_stop: State AVDTP_STATE_IDLE
+A2DPD[360.237]: a2dp_disconnect: Closing ctl socket 12
+A2DPD[360.237]: close_socket: Closing 12
+A2DPD[360.237]: a2dp_disconnect: Closed
+A2DPD[360.237]: a2dp_disconnect: State AVDTP_STATE_DISCONNECTED
+A2DPD[360.237]: a2dpd_signal_state: Disconnected
+A2DPD[360.237]: a2dp_state_connect: State AVDTP_STATEX_SDP_CONNECTING
+A2DPD[360.237]: a2dp_state_machine: Role is INITIATOR
+A2DPD[360.237]: a2dp_state_machine: (errno=115:Operation now in
+progress)SDP connection on socket 12
+A2DPD[360.237]: a2dp_state_machine: State AVDTP_STATEX_SDP_CONNECTING_WAIT
+A2DPD[360.237]: a2dpd_signal_state: Connecting 00:07:A4:28:E3:5C
+A2DPD[360.311]: a2dp_state_machine: SDP connection terminated
+A2DPD[360.338]: get_avdtp_psm: Service Search record empty.
+A2DPD[360.338]: get_avdtp_psm: Service Search OK
+A2DPD[360.369]: get_avdtp_psm: Checking non spec audio
+A2DPD[360.369]: a2dp_state_machine: Found psm 25
+A2DPD[360.369]: a2dp_state_machine: State AVDTP_STATEX_CTL_CONNECTING
+A2DPD[360.369]: a2dp_state_machine: Socket is 12
+A2DPD[360.369]: a2dp_state_machine: (errno=115:Operation now in
+progress)State AVDTP_STATEX_CTL_CONNECTING_WAIT
 
-And my kernel version:
+--------------------------------------
 
-Linux macbook 2.6.20-8-generic #2 SMP Tue Feb 13 05:18:42 UTC 2007 i686
-GNU/Linux
+and so on ...
 
-Suggestions?
-
--- 
-Ion Jaureguialzo Sarasola
-widemos@gmail.com
-Vitoria-Gasteiz
-Spain
-
-------=_Part_133_698271.1172046661235
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi, and using this combination and I can get the mouse working under Ubuntu Feisty Fawn Herd4, but the wheel, and extra buttons are not seen by the system.<br><br>I&#39;ve tried to watch events which reach to /dev/input/event3 (where the mouse is supposed to be) and can only see the events produced by left, right and wheel-click. Also mouse movement is detected. Any other button, including presentation buttons don&#39;t work.
-<br><br>My system&#39;s lspci:<br><br>00:00.0 Host bridge: Intel Corporation Mobile 945GM/PM/GMS/940GML and 945GT Express Memory Controller Hub (rev 03)<br>00:02.0 VGA compatible controller: Intel Corporation Mobile 945GM/GMS/940GML Express Integrated Graphics Controller (rev 03)
-<br>00:02.1 Display controller: Intel Corporation Mobile 945GM/GMS/940GML Express Integrated Graphics Controller (rev 03)<br>00:07.0 Performance counters: Intel Corporation Unknown device 27a3 (rev 03)<br>00:1b.0 Audio device: Intel Corporation 82801G (ICH7 Family) High Definition Audio Controller (rev 02)
-<br>00:1c.0 PCI bridge: Intel Corporation 82801G (ICH7 Family) PCI Express Port 1 (rev 02)<br>00:1c.1 PCI bridge: Intel Corporation 82801G (ICH7 Family) PCI Express Port 2 (rev 02)<br>00:1d.0 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #1 (rev 02)
-<br>00:1d.1 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #2 (rev 02)<br>00:1d.2 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #3 (rev 02)<br>00:1d.3 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #4 (rev 02)
-<br>00:1d.7 USB Controller: Intel Corporation 82801G (ICH7 Family) USB2 EHCI Controller (rev 02)<br>00:1e.0 PCI bridge: Intel Corporation 82801 Mobile PCI Bridge (rev e2)<br>00:1f.0 ISA bridge: Intel Corporation 82801GBM (ICH7-M) LPC Interface Bridge (rev 02)
-<br>00:1f.1 IDE interface: Intel Corporation 82801G (ICH7 Family) IDE Controller (rev 02)<br>00:1f.2 IDE interface: Intel Corporation 82801GBM/GHM (ICH7 Family) Serial ATA Storage Controller IDE (rev 02)<br>00:1f.3 SMBus: Intel Corporation 82801G (ICH7 Family) SMBus Controller (rev 02)
-<br>01:00.0 Ethernet controller: Marvell Technology Group Ltd. 88E8053 PCI-E Gigabit Ethernet Controller (rev 22)<br>02:00.0 Network controller: Atheros Communications, Inc. Unknown device 0024 (rev 01)<br>03:03.0 FireWire (IEEE 1394): Agere Systems FW323 (rev 61)Linux macbook 
-2.6.20-8-generic #2 SMP Tue Feb 13 05:18:42 UTC 2007 i686 GNU/Linux<br><br clear="all">And my kernel version:<br><br>Linux macbook 2.6.20-8-generic #2 SMP Tue Feb 13 05:18:42 UTC 2007 i686 GNU/Linux<br><br>Suggestions?<br>
-<br>-- <br>Ion Jaureguialzo Sarasola<br><a href="mailto:widemos@gmail.com">widemos@gmail.com</a><br>Vitoria-Gasteiz<br>Spain
-
-------=_Part_133_698271.1172046661235--
+I also tried to record sound with "rec -d a2dpd" but a2dpd did not react.
 
 
---===============1248687765==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+any ideas? thanks a lot.
+
+M.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1248687765==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1248687765==--
