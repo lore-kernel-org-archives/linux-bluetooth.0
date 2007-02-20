@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Wed, 21 Feb 2007 10:33:15 +1000
-References: <45DB19E9.5080709@access-company.com>
-In-Reply-To: <45DB19E9.5080709@access-company.com>
+Message-ID: <45DB87B6.60100@xmission.com>
+Date: Tue, 20 Feb 2007 16:43:50 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Message-Id: <200702211033.15862.denis.kenzior@trolltech.com>
-Subject: [Bluez-devel] Service API
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <5b9417770702181902v287f5d44uc513b4d8bc8f1a79@mail.gmail.com>	<45D91EC2.5000201@xmission.com>	<5b9417770702191013x63a8ebfdu7cefaf3e781b0f86@mail.gmail.com>	<45DA6241.8030507@xmission.com>
+	<5b9417770702200044k290111f0m880d009c17f6f577@mail.gmail.com>
+In-Reply-To: <5b9417770702200044k290111f0m880d009c17f6f577@mail.gmail.com>
+Subject: Re: [Bluez-devel] if using bluetooth DUN,
+	how to get best performance?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,29 +22,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel,
+John
 
-I noticed in 3.9 the service API start/stop relies on the hcid to exec 
-application that provides the service.  For external services, the start/stop 
-functionality is essentially gone.  
+> I am using the moto Q with sprint, and pdanet.  It doesn't work
+> without pdanet, and pdanet also lets me use it without using the modem
+> plan.  Is it the pdanet software that may be limiting bandwidth?
 
-This makes it hard to support such daemons as pand, dund, or anything that 
-takes command line options, etc.  It also makes it difficult to support inetd 
-style daemons which handle multiple services at once (this is a fairly 
-typical use-case in the embedded world) 
+>>>well, when using pdanet's software in xp and usb connection, i got over 800kb/s
+>>>when using bt dun in XP, i got 160kb/s
 
-Would it be useful to have such use-cases available?  For instance, KDE has 
-its own inetd style framework for services.  So if starting/stopping service 
-behavior is not uniform, it might lead to fragmentation.
+With the experiment with xp, you've basically isolated the bt dun
+problem to be in the pocketpc stack. So you should start posting on the
+pocketpc forums to see where that problem is.
 
-Another point I'd like to bring up is the setting of encryption / 
-authentication options.  This seems like it should be part of the service 
-framework API instead of being a command line option to each individual 
-daemon. 
+On the linux side, you could try out PAN if you have a way for the Q to
+serve internet using pan. I am very interested to know if this works any
+better.
 
-What are your thoughts?
-
--Denis
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
