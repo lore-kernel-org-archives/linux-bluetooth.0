@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4f436aae0702201137g12c4dfd0k96201c2f2f38df26@mail.gmail.com>
-Date: Tue, 20 Feb 2007 21:37:08 +0200
-From: "Choi Sonim" <choisonim@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4f436aae0702192256p8fb5182web7a3aa633eb1025@mail.gmail.com>
+Message-ID: <45DAC692.9030704@wershofen.de>
+Date: Tue, 20 Feb 2007 10:59:46 +0100
+From: Wolfgang Wershofen <wolfgang@wershofen.de>
 MIME-Version: 1.0
-References: <4f436aae0702192256p8fb5182web7a3aa633eb1025@mail.gmail.com>
-Subject: [Bluez-users] bluez-utils-3.9 compilation error
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Using Headset-buttons without btsco. Possible?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,24 +18,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hello.
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-I try to build bluez-utils but I get errors.
-I do ./configure with no problems.
-but in the make I get these errors:
+Hi,
 
-libhciserver.a(dbus-common.o): In function `unregister_sdp_record':
-dbus-common.c:(.text+0x90): undefined reference to
-`sdp_device_record_unregister_binary'
-libhciserver.a(dbus-common.o): In function `register_sdp_binary':
-dbus-common.c:(.text+0x106): undefined reference to
-`sdp_device_record_register_binary'
-collect2: ld returned 1 exit status
+in the past few days, I spent a lot of time testing how to run my
+bluetooth headset best for telephony.
 
-dows anyone have any clue ?
+I got both ways basically working - plugz and btsco. With btsco, I also
+managed to use the headset button to answer or end phone calls, but I
+experienced unbearable long delays when answering incoming calls (my
+voice is heard with more than a second delay. Doesn't happen on outbound
+calls - strange enough), so this seems not to be an option for me.
 
-thanks a lot
-choi
+My question now is: Is it possible to get the headset buttons working
+with plugz - at least to receive and end a phone call?
+
+thx
+Wolfgang
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+Comment: Using GnuPG with SUSE - http://enigmail.mozdev.org
+
+iD8DBQFF2saSgUafbxFH+p8RAluXAKDSgiRVawt4acqHnq3HXluJ0o0x/ACfTk3i
+6vN6AwkkMpTZc3cgBRrKFM0=
+=fWjH
+-----END PGP SIGNATURE-----
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
