@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4f436aae0702192256p8fb5182web7a3aa633eb1025@mail.gmail.com>
-Date: Tue, 20 Feb 2007 08:56:48 +0200
-From: "Choi Sonim" <choisonim@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Message-ID: <45DA6241.8030507@xmission.com>
+Date: Mon, 19 Feb 2007 19:51:45 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] bluez-utils-3.9 compilation error
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <5b9417770702181902v287f5d44uc513b4d8bc8f1a79@mail.gmail.com>	<45D91EC2.5000201@xmission.com>
+	<5b9417770702191013x63a8ebfdu7cefaf3e781b0f86@mail.gmail.com>
+In-Reply-To: <5b9417770702191013x63a8ebfdu7cefaf3e781b0f86@mail.gmail.com>
+Subject: Re: [Bluez-devel] if using bluetooth DUN,
+	how to get best performance?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,21 +22,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-hello.
-I get this in the 'make' phase:
+John
 
-libhciserver.a(dbus-common.o): In function `unregister_sdp_record':
-dbus-common.c:(.text+0x90): undefined reference to
-`sdp_device_record_unregister_binary'
-libhciserver.a(dbus-common.o): In function `register_sdp_binary':
-dbus-common.c:(.text+0x106): undefined reference to
-`sdp_device_record_register_binary'
-collect2: ld returned 1 exit status
+> well, when using pdanet's software in xp and usb connection, i got over 800kb/s
+> when using bt dun in XP, i got 160kb/s
+> 
+> I am assuming it was roughly the same speed in linux DUN.  I don't see
+> them fixing their software itself to run on linux any time soon, so i
+> am probably stuck with BT DUN as opposed to USB dun in linux, so i was
+> wondering if there was anything i could do.
 
-dows anyone have any clue ?
+which phone are you using? do you use pdanet for bt dun or a native dun
+service?
 
-thanks a lot
-choi
+in my experience, pocketpc runs bt dun nowhere near the bluetooth
+bandwidth ceiling. It probably doesn't make any difference if you find a
+phone with bt2.0+edr. Their performance just stinks. The numbers you
+mention are not surprising.
+
+sometimes it crosses the line from poor performance to simply buggy. I
+was consistently locking up the sprint 6700 when using a linux dun
+client. I'm not sure if there's anything we can do from bluez to help
+the situation. I took the phone back.
+
+brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
