@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45DAC692.9030704@wershofen.de>
-Date: Tue, 20 Feb 2007 10:59:46 +0100
+Message-ID: <45DAC336.1080806@wershofen.de>
+Date: Tue, 20 Feb 2007 10:45:26 +0100
 From: Wolfgang Wershofen <wolfgang@wershofen.de>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Using Headset-buttons without btsco. Possible?
+Subject: [Bluez-users] plugz: snd_pcm_hw_params_set_rate(8287) failed:
+	Invalid argument
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,27 +24,44 @@ Hash: SHA1
 
 Hi,
 
-in the past few days, I spent a lot of time testing how to run my
-bluetooth headset best for telephony.
+I'm rather new to using bluetooth devices but I successfully managed to
+get my headset running using plugz. I use it for telephony purposes with
+twinkle (http://www.twinklephone.com).
 
-I got both ways basically working - plugz and btsco. With btsco, I also
-managed to use the headset button to answer or end phone calls, but I
-experienced unbearable long delays when answering incoming calls (my
-voice is heard with more than a second delay. Doesn't happen on outbound
-calls - strange enough), so this seems not to be an option for me.
+I am able to hear people and talk to them during the phone call without
+problems, but I can't hear the ringtone created by twinkle on my
+headset. In the log files, I find the following error message:
 
-My question now is: Is it possible to get the headset buttons working
-with plugz - at least to receive and end a phone call?
+snd_pcm_hw_params_set_rate(8287) failed: Invalid argument
+
+After that message, twinkle stops generation of the ringtone and I am
+left in silence until the phone line is established.
+In most cases, I will miss the first words from the other side, because
+the headset daemon returned to idle state while I was waiting and has to
+get back to streaming mode upon call reception.
+
+I'm running on 64-bit OpenSuSE 10.2 with kernel 2.6.18 (SCO-patch
+applied). bluez-libs and bluez-utils is at 3.7, alsa at 1.0.13.
+I got bluetooth-alsa from CVS on Feb, 6th and installed it as described.
+My Dongle is a Level-One MDU-0005 (CSR chipset) and I have to different
+headsets, a JABRA BT-200 and a B-Speech Vitac. The Problem occurs with
+both of them.
+
+I don't know, if this is a plugz issue or a twinkle issue and I didn't
+find anything related on the net.
+
+Any hints on this?
 
 thx
 Wolfgang
+
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.5 (GNU/Linux)
 Comment: Using GnuPG with SUSE - http://enigmail.mozdev.org
 
-iD8DBQFF2saSgUafbxFH+p8RAluXAKDSgiRVawt4acqHnq3HXluJ0o0x/ACfTk3i
-6vN6AwkkMpTZc3cgBRrKFM0=
-=fWjH
+iD8DBQFF2sM1gUafbxFH+p8RAp+1AKDaRylwPpiQR2mlGSUt3ZiT91bXGgCghV48
+5lzHLc20qtgfpyVfwPmrGjw=
+=SJbk
 -----END PGP SIGNATURE-----
 
 -------------------------------------------------------------------------
