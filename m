@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45D9F9DC.1030606@yahoo.com.au>
-References: <45D9E0ED.8090700@yahoo.com.au>
-	<1171907659.26567.29.camel@violet>  <45D9F9DC.1030606@yahoo.com.au>
-Date: Wed, 21 Feb 2007 13:13:29 +0100
-Message-Id: <1172060009.7403.17.camel@violet>
+In-Reply-To: <4f436aae0702192256p8fb5182web7a3aa633eb1025@mail.gmail.com>
+References: <4f436aae0702192256p8fb5182web7a3aa633eb1025@mail.gmail.com>
+Date: Wed, 21 Feb 2007 13:07:35 +0100
+Message-Id: <1172059655.7403.9.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] hid2hci fails: broken pipe
+Subject: Re: [Bluez-devel] bluez-utils-3.9 compilation error
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,62 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mat,
+Hi Choi,
 
-> >> aeon:~# hid2hci -1
-> >> Switching device 0a12:0001 to HID mode failed (Broken pipe)
-> >>
-> >> Can anyone suggest why this isn't working?  What pipe?  What's it
-> >> talking to a pipe for in the first place?
-> > 
-> > it doesn't mean that it actually failed to switch the adapter. It might
-> > have simply worked. The error messages from the USB subsystem are kinda
-> > strange, but somehow expected since the device will disconnect from the
-> > bus.
+> I get this in the 'make' phase:
 > 
-> OK, maybe I've misunderstood something.  As I understand it, putting the
->  dongle into HID mode should ask the dongle to pretend to be a USB hub
-> with a mouse (and/or keyboard) attached.  So if it works, the effect
-> should be that my mouse keeps working even when the bluetooth stack
-> isn't running.
+> libhciserver.a(dbus-common.o): In function `unregister_sdp_record':
+> dbus-common.c:(.text+0x90): undefined reference to
+> `sdp_device_record_unregister_binary'
+> libhciserver.a(dbus-common.o): In function `register_sdp_binary':
+> dbus-common.c:(.text+0x106): undefined reference to
+> `sdp_device_record_register_binary'
+> collect2: ld returned 1 exit status
 > 
-> If that's right, and I run hid2hci -1 as above, my mouse should
-> "disconnect" from X as a bluetooth mouse and then "reconnect" as a fake
-> USB mouse, and so I should find that my mouse continues working
-> (possibly after a short delay).  However, I should then find that if I
-> stop the bluetooth system, the mouse still works.  I would also expect
-> that lsusb would show a bluetooth mouse attached somehow.
-> 
-> In fact when I run hid2hci, the mouse still works, but when I stop
-> bluetooth the mouse stops working too.  This seems to me to be still in
-> HCI mode.  The fact that lsusb still reports:
-> 
-> Bus 002 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
-> Dongle (HCI mode)
-> 
-> ...seems to back this up.  The mouse continues to not work until I both
-> bring up bluetooth again and run hidd by hand.
-> 
-> I can cope with this for a mouse, but I was hoping to follow up with a
-> keyboard, and for that it's really important that I'm able to enter
-> stuff into GRUB and the BIOS before the bluetooth stack is loaded.  I'm
-> hoping to experiment with the mouse first before I invest in a keyboard too.
+> dows anyone have any clue ?
 
-then something is broken here. Can't tell your what, but it should work.
-
-> First, is there any way I can tell, really and for sure, whether the
-> dongle is in HCI or HID mode?
-
-Look at lsusb. In case of CSR chips this is 100% sure.
-
-> Second, I'm a little confused about how this "HID proxy" thing works
-> anyway.  How does the dongle remember which mouse and keyboard it's
-> paired with after the power is switched off?  Does it have a little bit
-> of flash on board that remembers the last paired device or something?
-> Or have I completely misunderstood what this feature is for?
-
-That is the magic in the dongle HID software. It parses HID devices in
-the background when it is in HCI mode.
+the ChangeLog file clearly states that you need an appropriate
+bluez-libs installation.
 
 Regards
 
