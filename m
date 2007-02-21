@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Per Thomas Jahr <perja@extern.uio.no>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1172059735.7403.11.camel@violet>
-References: <1171919925.4936.9.camel@localhost.localdomain>
-	<1172059735.7403.11.camel@violet>
-Date: Wed, 21 Feb 2007 12:43:41 +0000
-Message-Id: <1172061821.31353.60.camel@localhost.localdomain>
+In-Reply-To: <b9c3b3cf0702210031j128eaed0p2d0cbee303215fc3@mail.gmail.com>
+References: <b9c3b3cf0702210031j128eaed0p2d0cbee303215fc3@mail.gmail.com>
+Date: Wed, 21 Feb 2007 13:14:26 +0100
+Message-Id: <1172060066.7403.19.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] How to tell if EDR is used?
+Subject: Re: [Bluez-users] Microsoft Wireless Presenter for Notebook
+	8000	and Macbook Internal Bluetooth
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,21 +21,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Wed, 2007-02-21 at 13:08 +0100, Marcel Holtmann wrote:
-> Hi Per Thomas,
-> 
-> > I'm doing file transfers from my computer to my phone, but I'm not sure
-> > if it's using EDR or not. Is there some way I can find this out by using
-> > f.ex. hcitool, hciconfig or some other tool during the file transfer? 
-> 
-> the EDR is activated by default. You actually have to manually
-> deactivate it.
+Hi Ion,
 
-OK. Then there is something else wrong - the transfer is very slow. Do
-you have any hints or tips for how to debug the problem?
+> and using this combination and I can get the mouse working under
+> Ubuntu Feisty Fawn Herd4, but the wheel, and extra buttons are not
+> seen by the system.
 
--- 
-Per Thomas
+you need patch-2.6.20-mh1 which will turn on report mode instead of boot
+mode only.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
