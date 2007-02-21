@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45DC5C3C.4070002@odi.ch>
-Date: Wed, 21 Feb 2007 15:50:36 +0100
-From: =?ISO-8859-1?Q?Ortwin_Gl=FCck?= <odi@odi.ch>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] boot vs. report protocol
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Choi Sonim <choisonim@gmail.com>
+In-Reply-To: <4f436aae0702210418t94fc550l4fffe1088588bed5@mail.gmail.com>
+References: <4f436aae0702192256p8fb5182web7a3aa633eb1025@mail.gmail.com>
+	<1172059655.7403.9.camel@violet>
+	<4f436aae0702210418t94fc550l4fffe1088588bed5@mail.gmail.com>
+Date: Wed, 21 Feb 2007 13:51:02 +0100
+Message-Id: <1172062262.7403.21.camel@violet>
+Mime-Version: 1.0
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] bluez-utils-3.9 compilation error
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,36 +23,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Choi,
 
-In net/bluetooth/core.c there is:
+> > > libhciserver.a(dbus-common.o): In function `unregister_sdp_record':
+> > > dbus-common.c:(.text+0x90): undefined reference to
+> > > `sdp_device_record_unregister_binary'
+> > > libhciserver.a(dbus-common.o): In function `register_sdp_binary':
+> > > dbus-common.c:(.text+0x106): undefined reference to
+> > > `sdp_device_record_register_binary'
+> > > collect2: ld returned 1 exit status
+> > >
+> > > dows anyone have any clue ?
+> >
+> > the ChangeLog file clearly states that you need an appropriate
+> > bluez-libs installation.
+> 
+> but i did built the bluez-libs-3.9 before. they were installed to /usr/local/lib
+> and I did export LD_LIBRARY_PATH=/usr/local/lib.
+> should I do anything more ?
 
-	if (session->input) {
-		hidp_send_ctrl_message(session,
-			HIDP_TRANS_SET_PROTOCOL | HIDP_PROTO_BOOT, NULL, 0);
-		session->flags |= (1 << HIDP_BOOT_PROTOCOL_MODE);
+then you have 3.7 or older installed somewhere and it tries to link
+against that version.
 
-		session->leds = 0xff;
-		hidp_input_event(session->input, EV_LED, 0, 0);
-	}
+Regards
 
+Marcel
 
-which effectively sets the boot protocol for all input devices. To
-support some scroll wheel mice they need to be put into report mode, though:
-
-	if (session->input) {
-		hidp_send_ctrl_message(session,
-			HIDP_TRANS_SET_PROTOCOL | HIDP_PROTO_REPORT, NULL, 0);
-
-		session->leds = 0xff;
-		hidp_input_event(session->input, EV_LED, 0, 0);
-	}
-
-I assume that's safe. Solaris for instance, initializes all devices in
-report mode by default. It never even tries boot protocol.
-
-Maybe it would make sense to have a userspace interface to switch the
-mode from within hidd.
 
 
 -------------------------------------------------------------------------
