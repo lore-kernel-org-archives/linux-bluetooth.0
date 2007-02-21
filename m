@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Per Thomas Jahr <perja@extern.uio.no>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1172061821.31353.60.camel@localhost.localdomain>
+In-Reply-To: <1172059735.7403.11.camel@violet>
 References: <1171919925.4936.9.camel@localhost.localdomain>
 	<1172059735.7403.11.camel@violet>
-	<1172061821.31353.60.camel@localhost.localdomain>
-Date: Wed, 21 Feb 2007 13:52:15 +0100
-Message-Id: <1172062335.7403.23.camel@violet>
+Date: Wed, 21 Feb 2007 12:43:41 +0000
+Message-Id: <1172061821.31353.60.camel@localhost.localdomain>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users] How to tell if EDR is used?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -22,25 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Per Thomas,
-
-> > > I'm doing file transfers from my computer to my phone, but I'm not sure
-> > > if it's using EDR or not. Is there some way I can find this out by using
-> > > f.ex. hcitool, hciconfig or some other tool during the file transfer? 
-> > 
-> > the EDR is activated by default. You actually have to manually
-> > deactivate it.
+On Wed, 2007-02-21 at 13:08 +0100, Marcel Holtmann wrote:
+> Hi Per Thomas,
 > 
-> OK. Then there is something else wrong - the transfer is very slow. Do
-> you have any hints or tips for how to debug the problem?
+> > I'm doing file transfers from my computer to my phone, but I'm not sure
+> > if it's using EDR or not. Is there some way I can find this out by using
+> > f.ex. hcitool, hciconfig or some other tool during the file transfer? 
+> 
+> the EDR is activated by default. You actually have to manually
+> deactivate it.
 
-my guess is that it is the phone. It still needs a CPU that can handle
-these data rates.
+OK. Then there is something else wrong - the transfer is very slow. Do
+you have any hints or tips for how to debug the problem?
 
-Regards
-
-Marcel
-
+-- 
+Per Thomas
 
 
 -------------------------------------------------------------------------
