@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Wolfgang Wershofen <wolfgang@wershofen.de>
-To: bluez-users@lists.sourceforge.net
-Date: Thu, 22 Feb 2007 00:27:28 +0100
-References: <45DAC336.1080806@wershofen.de>
-In-Reply-To: <45DAC336.1080806@wershofen.de>
-MIME-Version: 1.0
-Message-Id: <200702220027.28783.wolfgang@wershofen.de>
-Subject: Re: [Bluez-users] plugz: snd_pcm_hw_params_set_rate(8287) failed:
-	Invalid argument
+From: Marcel Holtmann <marcel@holtmann.org>
+To: CIJOML <cijoml@volny.cz>
+In-Reply-To: <200702212224.47446.cijoml@volny.cz>
+References: <200702212224.47446.cijoml@volny.cz>
+Date: Wed, 21 Feb 2007 23:06:39 +0100
+Message-Id: <1172095599.7403.45.camel@violet>
+Mime-Version: 1.0
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] Phis in /proc/bus/input/devices same for all
+	devices?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,67 +18,68 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Am Dienstag, 20. Februar 2007 schrieb Wolfgang Wershofen:
-> Hi,
->
-> I'm rather new to using bluetooth devices but I successfully managed to
-> get my headset running using plugz. I use it for telephony purposes with
-> twinkle (http://www.twinklephone.com).
->
-> I am able to hear people and talk to them during the phone call without
-> problems, but I can't hear the ringtone created by twinkle on my
-> headset. In the log files, I find the following error message:
->
-> snd_pcm_hw_params_set_rate(8287) failed: Invalid argument
->
-(...)
-> I don't know, if this is a plugz issue or a twinkle issue and I didn't
-> find anything related on the net.
+Hi Michal,
 
-Meanwhile, I got an answer from the author of twinkle as follows:
+> I use 2.6.20-mh1 patch and would like to differ devices based on Phis, but it 
+> is the same for all devices??
+> 
+> I: Bus=0005 Vendor=045e Product=007c Version=0035
+> N: Name="Microsoft Five Button Mouse"
+> P: Phys=00:0D:88:8E:AB:2F
+> S: Sysfs=/class/input/input19
+> H: Handlers=mouse1 event6
+> B: EV=7
+> B: KEY=1f0000 0 0 0 0 0 0 0 0
+> B: REL=103
+> 
+> I: Bus=0005 Vendor=045e Product=007b Version=0039
+> N: Name="Microsoft Bluetooth keyboard"
+> P: Phys=00:0D:88:8E:AB:2F
+> S: Sysfs=/class/input/input20
+> H: Handlers=kbd event7
+> B: EV=12000b
+> B: KEY=10f80 44007 ffe01878 800d7ff febeffdf f3cfffff ffffffff fffffffe
+> B: ABS=700 0
+> B: LED=107
+> 
+> I: Bus=0005 Vendor=046d Product=b3e3 Version=2503
+> N: Name="Logitech Bluetooth Mediapad"
+> P: Phys=00:0D:88:8E:AB:2F
+> S: Sysfs=/class/input/input21
+> H: Handlers=kbd event8
+> B: EV=12000f
+> B: KEY=7fff 2c3027 bf004440 0 0 1 10f80 8807c007 ffe67bfa d9415fff febeffdf 
+> ffefffff ffffffff fffffffe
+> B: REL=40
+> B: ABS=301 0
+> B: LED=1f
+> 
+> Shouldn't be there it's BDADDR?
 
----- < snip > -----------------------------------------------------------
-This error shows that setting the soundcard to an exact sample
-rate of 8287 fails (this sample rate comes from ringback.wav).
-Twinkle uses this call to set an exact rate:
+please post this question to LKML. I am not sure that is the right
+approach. Currently we fill in phys and uniq like this:
 
-err =3D snd_pcm_hw_params_set_rate (pcm_ptr, hw_params, sample_rate, 0)
+        strncpy(hid->phys, batostr(&src), 64);
+        strncpy(hid->uniq, batostr(&dst), 64);
 
-This happens on some soundcard and is not fatal, as Twinkle
-next instructs the soundcard to pick a lower sampe rate
-that it can suppor with this call:
+Maybe the input or HID subsystem should be changed to also export the
+uniq values to udev.
 
-err =3D snd_pcm_hw_params_set_rate (pcm_ptr, hw_params, sample_rate, -1)
+Regards
 
-The -1 argument indicates that =A0the soundcard may pick a lower
-sample rate. It seems that your alsa does not accept this parameter.
----- < snap > -----------------------------------------------------------
+Marcel
 
-I got around this problem by supplying twinkle with a wav audio file with =
 
-exactly 8000 Hz sample rate and now it works.
-
-But the question still remains: Why is the setting of a sample rate not =
-
-possible with plugz?
-
-cu
-Wolfgang
-
--- =
-
-Geek by nature - Linux by choice
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
