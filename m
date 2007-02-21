@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ Hackers <bluez-devel@lists.sourceforge.net>
-Date: Thu, 22 Feb 2007 01:05:51 +0000
-Message-Id: <1172106351.3760.29.camel@cookie.hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <45DC6F15.8010908@access-company.com>
+References: <45DC6F15.8010908@access-company.com>
+Date: Wed, 21 Feb 2007 20:45:29 +0100
+Message-Id: <1172087129.7403.42.camel@violet>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Fax using Bluetooth, no FAX profile
+Subject: Re: [Bluez-devel] [patch]  updates rfcomm man page
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,18 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Heya,
+Hi Frederic,
 
-I was looking at whether it was possible to use a Bluetooth mobile phone
-to send a fax. But I realised my phone doesn't have the FAX profile,
-only a Serial Port one. Is it possible at all to send Faxes using this
-(ie. would be dependent on the phone implementing +ATFCLASS properly),
-or I shouldn't even think about it?
+> This patch updates rfcomm man page!
 
-Cheers
+patch has been committed to the CVS with a minor spelling fix :)
 
--- 
-Bastien Nocera <hadess@hadess.net> 
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
