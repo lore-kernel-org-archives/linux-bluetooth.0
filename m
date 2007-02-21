@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4f436aae0702192256p8fb5182web7a3aa633eb1025@mail.gmail.com>
-References: <4f436aae0702192256p8fb5182web7a3aa633eb1025@mail.gmail.com>
-Date: Wed, 21 Feb 2007 13:07:35 +0100
-Message-Id: <1172059655.7403.9.camel@violet>
+In-Reply-To: <45DB19E9.5080709@access-company.com>
+References: <45DB19E9.5080709@access-company.com>
+Date: Wed, 21 Feb 2007 13:06:55 +0100
+Message-Id: <1172059615.7403.7.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bluez-utils-3.9 compilation error
+Subject: Re: [Bluez-devel] pan profile sdp record
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,22 +20,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Choi,
+Hi Frederic,
 
-> I get this in the 'make' phase:
+> I've been looking at pan profile and saw some mandatory fields in the 
+> sdp records were missing.
+> The problem is that these fields are user dependent. How to set them?
 > 
-> libhciserver.a(dbus-common.o): In function `unregister_sdp_record':
-> dbus-common.c:(.text+0x90): undefined reference to
-> `sdp_device_record_unregister_binary'
-> libhciserver.a(dbus-common.o): In function `register_sdp_binary':
-> dbus-common.c:(.text+0x106): undefined reference to
-> `sdp_device_record_register_binary'
-> collect2: ld returned 1 exit status
+> Security Description, NetAccessType and MaxNetAccessRate.
 > 
-> dows anyone have any clue ?
+> There are several issues to the problem :
+> - patching pand is easy but some more options are needed to customize 
+> fields (unless good defaults exists)
 
-the ChangeLog file clearly states that you need an appropriate
-bluez-libs installation.
+we need good default values and some extra parameters to change them. I
+am all for this way.
+
+> - using 'sdptool add' then 'sdptool set attr' is a bit unreadable
+> - patching sdptool with more arguments?
+
+No. These sdptool commands are only for debugging purpose.
+
+> - using the dbus xml api still requires to patch pand or sdptool.
+
+Won't really help. It only moves the problem to another tool.
 
 Regards
 
