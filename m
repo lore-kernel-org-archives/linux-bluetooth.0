@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200702211033.15862.denis.kenzior@trolltech.com>
-References: <45DB19E9.5080709@access-company.com>
-	<200702211033.15862.denis.kenzior@trolltech.com>
-Date: Wed, 21 Feb 2007 10:20:54 +0100
-Message-Id: <1172049654.10798.45.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Service API
+From: "tommaso mirante" <tommaso.mirante@virgilio.it>
+To: <bluez-devel@lists.sourceforge.net>
+Date: Wed, 21 Feb 2007 06:51:57 +0100
+Message-ID: <000001c7557c$696aa190$0132a8c0@elsagsecurity.it>
+MIME-Version: 1.0
+Subject: [Bluez-devel] why i not am able to activate  serial service
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,109 +14,155 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1495976688=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+This is a multi-part message in MIME format.
 
-> I noticed in 3.9 the service API start/stop relies on the hcid to exec 
-> application that provides the service.  For external services, the start/stop 
-> functionality is essentially gone.  
-> 
-> This makes it hard to support such daemons as pand, dund, or anything that 
-> takes command line options, etc.  It also makes it difficult to support inetd 
-> style daemons which handle multiple services at once (this is a fairly 
-> typical use-case in the embedded world) 
-> 
-> Would it be useful to have such use-cases available?  For instance, KDE has 
-> its own inetd style framework for services.  So if starting/stopping service 
-> behavior is not uniform, it might lead to fragmentation.
+--===============1495976688==
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0001_01C75584.CB2F0990"
 
-the ServiceAgent abstraction that I came up with was flexible, but it
-ended up to be a little bit too complex. It also had the problem that we
-couldn't have service information unless the daemon was running. So the
-approach was to re-work this while keeping org.bluez.Service mostly
-unchanged. So org.bluez.Service is meant for the UI to show information
-about the current installed/running services. It only focus is the UI
-and it should not be used by the services itself.
+This is a multi-part message in MIME format.
 
-The starting and stopping of services is actually done by executing the
-service binary or killing it. This is a more Unix like approach and it
-keeps the service a lot more simpler since you don't have to worry about
-additional callbacks. So in general you only start a service once and
-then it will be running forever. The starting normally happens if the
-autostart parameter is set to true or if ActivateService() is called by
-a client application. The additional Start() and Stop() methods from the
-org.bluez.Service interface are only for the UI and in general not
-needed at all. It has been designed this way to give hcid full control
-on what is currently running on the system and have a generic way of
-providing this information.
+------=_NextPart_000_0001_01C75584.CB2F0990
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-For debugging purpose we added the external service definition. Mainly
-we did this so we can easily run services through gdb or valgrind. It
-might also useful for other cases, but this was not the main intention.
-And in case of external services the start/stop functionality doesn't
-work and this is done on purpose.
+Hallo 
 
-When migrating all the daemons to services, the command line parameters
-have to be removed. Initially we had command line parameters in the
-service description file, but in the end we removed them along with the
-path name of the binary. Keep in mind that these are no longer daemons,
-they are services. All command line options these services might have a
-purely for debugging purpose. So for all other options they have to be
-read from a configuration file or even better made accessible via D-Bus.
+I was able ( i suppose)  to install package and to scan for available mac
+addresses around.
 
-For embedded use cases, I think the current approach gives you all
-freedom you need. Services can be started automatically or on-demand
-when they are needed. You can also start them manually or even make them
-external and take full control of them by yourself. With the separation
-of service registration and SDP records, you can even have a service
-that has no strings attached with hcid.
+Now i need to activate a serial link with  a pc via bluetooth.
 
-In the long term even the Unix socket used by sdpd will be removed since
-the SDP server can now made part of hcid and SDP record registration is
-possible over D-Bus. This will remove another daemon and another IPC
-mechanism.
+Have you any instruction to have a Minicom-hyperlink session?.
 
-The inetd style approach makes only sense for RFCOMM based services. And
-actually only for Serial Port Profile based services. For stuff like
-Headset Profile or File Transfer we wanna have highly integrated general
-services that provide a nice D-Bus API. So for the Serial Port Profile
-the current plan is to create a serial service that provides this kind
-of functionality, but then is fully controlled via D-Bus.
+I activated rfcomm0 and changing session (alt f2) a activated minicom on
+/dev/rfcom0.
 
-> Another point I'd like to bring up is the setting of encryption / 
-> authentication options.  This seems like it should be part of the service 
-> framework API instead of being a command line option to each individual 
-> daemon. 
+The same i tryed to do on windows trying to activate hyperlink on com8 port
+( that is the donale serial port) but i was not able to send nothing from a
+side to the other. 
 
-The thing that has been left as experimental in the last release is the
-authorization framework. This actually highly depends on the service
-framework and so we had to stabilize that one first. The advantage of
-having all servers (also externals) registered via hcid, we can have a
-unique authorization callback and an AuthorizationAgent in userspace for
-the UI. Both doesn't have to know any details about the service itself
-and thus we can make this fully generic.
-
-For the encryption and authentication, we might better rely on the
-socket options and extend them. The kernel knows best in most cases how
-to handle this within the protocol integration. I am also not willing to
-commit to any API regarding this until the Bluetooth 2.1 specification
-and Simple Pairing has been finally released.
-
-Regards
-
-Marcel
+Waiting help thanks
 
 
+------=_NextPart_000_0001_01C75584.CB2F0990
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
+xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns=3D"http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Dus-ascii">
+<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered medium)">
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:Arial;
+	color:windowtext;}
+@page Section1
+	{size:595.3pt 841.9pt;
+	margin:72.0pt 90.0pt 72.0pt 90.0pt;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+
+</head>
+
+<body lang=3DIT link=3Dblue vlink=3Dpurple>
+
+<div class=3DSection1>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Hallo <o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>I was able ( i suppose) &nbsp;to install package and =
+to scan
+for available mac addresses around.<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Now i need to activate a serial link with&nbsp; a pc =
+via
+bluetooth.<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Have you any instruction to have a Minicom-hyperlink
+session?.<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>I activated rfcomm0 and changing session (alt f2) a
+activated minicom on /dev/rfcom0.<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>The same i tryed to do on windows trying to activate
+hyperlink on com8 port ( that is the donale serial port) but i was not =
+able to
+send nothing from a side to the other. <o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Waiting help thanks<o:p></o:p></span></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+------=_NextPart_000_0001_01C75584.CB2F0990--
+
+
+
+
+--===============1495976688==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1495976688==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1495976688==--
