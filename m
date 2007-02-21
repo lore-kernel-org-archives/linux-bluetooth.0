@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45DC5C3C.4070002@odi.ch>
-References: <45DC5C3C.4070002@odi.ch>
-Date: Wed, 21 Feb 2007 16:08:05 +0100
-Message-Id: <1172070485.7403.29.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] boot vs. report protocol
+Message-ID: <45DC5C3C.4070002@odi.ch>
+Date: Wed, 21 Feb 2007 15:50:36 +0100
+From: =?ISO-8859-1?Q?Ortwin_Gl=FCck?= <odi@odi.ch>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] boot vs. report protocol
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,42 +18,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Ortwin,
+Hi,
 
-> In net/bluetooth/core.c there is:
-> 
-> 	if (session->input) {
-> 		hidp_send_ctrl_message(session,
-> 			HIDP_TRANS_SET_PROTOCOL | HIDP_PROTO_BOOT, NULL, 0);
-> 		session->flags |= (1 << HIDP_BOOT_PROTOCOL_MODE);
-> 
-> 		session->leds = 0xff;
-> 		hidp_input_event(session->input, EV_LED, 0, 0);
-> 	}
-> 
-> 
-> which effectively sets the boot protocol for all input devices. To
-> support some scroll wheel mice they need to be put into report mode, though:
-> 
-> 	if (session->input) {
-> 		hidp_send_ctrl_message(session,
-> 			HIDP_TRANS_SET_PROTOCOL | HIDP_PROTO_REPORT, NULL, 0);
-> 
-> 		session->leds = 0xff;
-> 		hidp_input_event(session->input, EV_LED, 0, 0);
-> 	}
-> 
-> I assume that's safe. Solaris for instance, initializes all devices in
-> report mode by default. It never even tries boot protocol.
+In net/bluetooth/core.c there is:
 
-you assumption is wrong. The flags variable doesn't change anything. You
-might wanna try 2.6.20-mh1 which is the first one that includes the
-official report mode support.
+	if (session->input) {
+		hidp_send_ctrl_message(session,
+			HIDP_TRANS_SET_PROTOCOL | HIDP_PROTO_BOOT, NULL, 0);
+		session->flags |= (1 << HIDP_BOOT_PROTOCOL_MODE);
 
-Regards
+		session->leds = 0xff;
+		hidp_input_event(session->input, EV_LED, 0, 0);
+	}
 
-Marcel
 
+which effectively sets the boot protocol for all input devices. To
+support some scroll wheel mice they need to be put into report mode, though:
+
+	if (session->input) {
+		hidp_send_ctrl_message(session,
+			HIDP_TRANS_SET_PROTOCOL | HIDP_PROTO_REPORT, NULL, 0);
+
+		session->leds = 0xff;
+		hidp_input_event(session->input, EV_LED, 0, 0);
+	}
+
+I assume that's safe. Solaris for instance, initializes all devices in
+report mode by default. It never even tries boot protocol.
+
+Maybe it would make sense to have a userspace interface to switch the
+mode from within hidd.
 
 
 -------------------------------------------------------------------------
