@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <b9c3b3cf0702210031j128eaed0p2d0cbee303215fc3@mail.gmail.com>
-References: <b9c3b3cf0702210031j128eaed0p2d0cbee303215fc3@mail.gmail.com>
-Date: Wed, 21 Feb 2007 13:14:26 +0100
-Message-Id: <1172060066.7403.19.camel@violet>
+In-Reply-To: <200702192020.49437.Sascha.Turczyk@gmx.de>
+References: <200702192020.49437.Sascha.Turczyk@gmx.de>
+Date: Wed, 21 Feb 2007 13:10:19 +0100
+Message-Id: <1172059819.7403.13.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Microsoft Wireless Presenter for Notebook
-	8000	and Macbook Internal Bluetooth
+Subject: Re: [Bluez-users] Epox Presenter BT-PM01B: How to use buttons?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,14 +20,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Ion,
+Hi Sascha,
 
-> and using this combination and I can get the mouse working under
-> Ubuntu Feisty Fawn Herd4, but the wheel, and extra buttons are not
-> seen by the system.
+> I want to use this presenter under Linux: Kubuntu 6.10 Edgy Eft. But it does 
+> not work. Perhaps somebody can help me.
+> First of all I shortly tell you, what I have done so far to get this thing to 
+> work.
 
-you need patch-2.6.20-mh1 which will turn on report mode instead of boot
-mode only.
+it is enough to call "hidd --connect <bdaddr>".
 
 Regards
 
