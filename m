@@ -1,18 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <5b9417770702201830t4e8dc0a3ie29fa0b89a597fa4@mail.gmail.com>
-Date: Tue, 20 Feb 2007 20:30:20 -0600
-From: "John H." <mistamaila@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45DB87B6.60100@xmission.com>
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
+To: bluez-devel@lists.sourceforge.net
+Date: Wed, 21 Feb 2007 10:33:15 +1000
+References: <45DB19E9.5080709@access-company.com>
+In-Reply-To: <45DB19E9.5080709@access-company.com>
 MIME-Version: 1.0
-References: <5b9417770702181902v287f5d44uc513b4d8bc8f1a79@mail.gmail.com>
-	<45D91EC2.5000201@xmission.com>
-	<5b9417770702191013x63a8ebfdu7cefaf3e781b0f86@mail.gmail.com>
-	<45DA6241.8030507@xmission.com>
-	<5b9417770702200044k290111f0m880d009c17f6f577@mail.gmail.com>
-	<45DB87B6.60100@xmission.com>
-Subject: Re: [Bluez-devel] if using bluetooth DUN,
-	how to get best performance?
+Message-Id: <200702211033.15862.denis.kenzior@trolltech.com>
+Subject: [Bluez-devel] Service API
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -26,49 +20,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-brad, unfortunately, I have gotten ZERO help on bluez lists about PAN,
-never once eliciting even a reply:(
+Marcel,
 
-I have gotten my device to connect to pand on my desktop and say it's
-on the "pan" now, but do not know anything else I can do beyond that.
-You cannot seem to set the IP on the device itself.
+I noticed in 3.9 the service API start/stop relies on the hcid to exec 
+application that provides the service.  For external services, the start/stop 
+functionality is essentially gone.  
 
-not that it matters, but the actual name of the device is a
-smartphone, as pocketpc software does not seem to work for this
-device.  that being said, is it possible for a registry change to fix
-the problem, or should i contact motorola and ask them if they "limit"
-bandwidth in BTDUN?
+This makes it hard to support such daemons as pand, dund, or anything that 
+takes command line options, etc.  It also makes it difficult to support inetd 
+style daemons which handle multiple services at once (this is a fairly 
+typical use-case in the embedded world) 
 
-On 2/20/07, Brad Midgley <bmidgley@xmission.com> wrote:
-> John
->
-> > I am using the moto Q with sprint, and pdanet.  It doesn't work
-> > without pdanet, and pdanet also lets me use it without using the modem
-> > plan.  Is it the pdanet software that may be limiting bandwidth?
->
-> >>>well, when using pdanet's software in xp and usb connection, i got over 800kb/s
-> >>>when using bt dun in XP, i got 160kb/s
->
-> With the experiment with xp, you've basically isolated the bt dun
-> problem to be in the pocketpc stack. So you should start posting on the
-> pocketpc forums to see where that problem is.
->
-> On the linux side, you could try out PAN if you have a way for the Q to
-> serve internet using pan. I am very interested to know if this works any
-> better.
->
-> Brad
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> opinions on IT & business topics through brief surveys-and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+Would it be useful to have such use-cases available?  For instance, KDE has 
+its own inetd style framework for services.  So if starting/stopping service 
+behavior is not uniform, it might lead to fragmentation.
+
+Another point I'd like to bring up is the setting of encryption / 
+authentication options.  This seems like it should be part of the service 
+framework API instead of being a command line option to each individual 
+daemon. 
+
+What are your thoughts?
+
+-Denis
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
