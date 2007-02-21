@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200702192020.49437.Sascha.Turczyk@gmx.de>
-References: <200702192020.49437.Sascha.Turczyk@gmx.de>
-Date: Wed, 21 Feb 2007 13:10:19 +0100
-Message-Id: <1172059819.7403.13.camel@violet>
+In-Reply-To: <1171919925.4936.9.camel@localhost.localdomain>
+References: <1171919925.4936.9.camel@localhost.localdomain>
+Date: Wed, 21 Feb 2007 13:08:55 +0100
+Message-Id: <1172059735.7403.11.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Epox Presenter BT-PM01B: How to use buttons?
+Subject: Re: [Bluez-users] How to tell if EDR is used?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,14 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Sascha,
+Hi Per Thomas,
 
-> I want to use this presenter under Linux: Kubuntu 6.10 Edgy Eft. But it does 
-> not work. Perhaps somebody can help me.
-> First of all I shortly tell you, what I have done so far to get this thing to 
-> work.
+> I'm doing file transfers from my computer to my phone, but I'm not sure
+> if it's using EDR or not. Is there some way I can find this out by using
+> f.ex. hcitool, hciconfig or some other tool during the file transfer? 
 
-it is enough to call "hidd --connect <bdaddr>".
+the EDR is activated by default. You actually have to manually
+deactivate it.
+
+> BTW: where do I find the explanation for the "Features" bytes?
+
+>>From the Bluetooth specification.
 
 Regards
 
