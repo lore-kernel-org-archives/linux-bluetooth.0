@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <001001c755ae$d755e6b0$c301a8c0@Bahubali>
-From: "vikram" <vikram.bidkar@adamya.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Wed, 21 Feb 2007 17:22:57 +0530
+Message-ID: <b9c3b3cf0702210031j128eaed0p2d0cbee303215fc3@mail.gmail.com>
+Date: Wed, 21 Feb 2007 09:31:01 +0100
+From: "Ion Jaureguialzo Sarasola" <widemos@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] dbus-glib-1 was not found
+Subject: [Bluez-users] Microsoft Wireless Presenter for Notebook 8000 and
+	Macbook Internal Bluetooth
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,114 +15,102 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0556605089=="
+Content-Type: multipart/mixed; boundary="===============1248687765=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
-
---===============0556605089==
+--===============1248687765==
 Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_000D_01C755DC.EE10C130"
+	boundary="----=_Part_133_698271.1172046661235"
 
-This is a multi-part message in MIME format.
+------=_Part_133_698271.1172046661235
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-------=_NextPart_000_000D_01C755DC.EE10C130
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Hi, and using this combination and I can get the mouse working under Ubuntu
+Feisty Fawn Herd4, but the wheel, and extra buttons are not seen by the
+system.
 
-Hi All,
+I've tried to watch events which reach to /dev/input/event3 (where the mouse
+is supposed to be) and can only see the events produced by left, right and
+wheel-click. Also mouse movement is detected. Any other button, including
+presentation buttons don't work.
 
-I am trying to Build and run the test programs from utils. for that I =
-carried out following steps.
+My system's lspci:
 
-1) Run ./configure --prefix=3D/usr
-and make && make install from ..\BlueZ\libs\bluez-libs-3.9 and =
-successfully installed BlueZ.
+00:00.0 Host bridge: Intel Corporation Mobile 945GM/PM/GMS/940GML and 945GT
+Express Memory Controller Hub (rev 03)
+00:02.0 VGA compatible controller: Intel Corporation Mobile 945GM/GMS/940GML
+Express Integrated Graphics Controller (rev 03)
+00:02.1 Display controller: Intel Corporation Mobile 945GM/GMS/940GML
+Express Integrated Graphics Controller (rev 03)
+00:07.0 Performance counters: Intel Corporation Unknown device 27a3 (rev 03)
+00:1b.0 Audio device: Intel Corporation 82801G (ICH7 Family) High Definition
+Audio Controller (rev 02)
+00:1c.0 PCI bridge: Intel Corporation 82801G (ICH7 Family) PCI Express Port
+1 (rev 02)
+00:1c.1 PCI bridge: Intel Corporation 82801G (ICH7 Family) PCI Express Port
+2 (rev 02)
+00:1d.0 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #1
+(rev 02)
+00:1d.1 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #2
+(rev 02)
+00:1d.2 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #3
+(rev 02)
+00:1d.3 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #4
+(rev 02)
+00:1d.7 USB Controller: Intel Corporation 82801G (ICH7 Family) USB2 EHCI
+Controller (rev 02)
+00:1e.0 PCI bridge: Intel Corporation 82801 Mobile PCI Bridge (rev e2)
+00:1f.0 ISA bridge: Intel Corporation 82801GBM (ICH7-M) LPC Interface Bridge
+(rev 02)
+00:1f.1 IDE interface: Intel Corporation 82801G (ICH7 Family) IDE Controller
+(rev 02)
+00:1f.2 IDE interface: Intel Corporation 82801GBM/GHM (ICH7 Family) Serial
+ATA Storage Controller IDE (rev 02)
+00:1f.3 SMBus: Intel Corporation 82801G (ICH7 Family) SMBus Controller (rev
+02)
+01:00.0 Ethernet controller: Marvell Technology Group Ltd. 88E8053 PCI-E
+Gigabit Ethernet Controller (rev 22)
+02:00.0 Network controller: Atheros Communications, Inc. Unknown device 0024
+(rev 01)
+03:03.0 FireWire (IEEE 1394): Agere Systems FW323 (rev 61)Linux macbook
+2.6.20-8-generic #2 SMP Tue Feb 13 05:18:42 UTC 2007 i686 GNU/Linux
 
-2)Successfully installed D-Bus 1.0.2 from www.freedesktop.com.
+And my kernel version:
 
-3) run ./configure --prefix=3D/usr --mandir=3D/usr/share/man \
-  --sysconfdir=3D/etc --localstatedir=3D/var --libexecdir=3D/lib
-from ..\BlueZ\utils\bluez-utils-3.9
+Linux macbook 2.6.20-8-generic #2 SMP Tue Feb 13 05:18:42 UTC 2007 i686
+GNU/Linux
 
-but I am getting following errors.
+Suggestions?
 
-> Package dbus-glib-1 was not found
-> package openobex was not found
-> Package opensync-1.0 was not found
-> Package libusb not found
+-- 
+Ion Jaureguialzo Sarasola
+widemos@gmail.com
+Vitoria-Gasteiz
+Spain
 
-4) run make && make istall from ..\BlueZ\utils\bluez-utils-3.9. and got =
-following error.
-"undefined referance to XML_Stopparser"
+------=_Part_133_698271.1172046661235
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Please suggest me solution.
+Hi, and using this combination and I can get the mouse working under Ubuntu Feisty Fawn Herd4, but the wheel, and extra buttons are not seen by the system.<br><br>I&#39;ve tried to watch events which reach to /dev/input/event3 (where the mouse is supposed to be) and can only see the events produced by left, right and wheel-click. Also mouse movement is detected. Any other button, including presentation buttons don&#39;t work.
+<br><br>My system&#39;s lspci:<br><br>00:00.0 Host bridge: Intel Corporation Mobile 945GM/PM/GMS/940GML and 945GT Express Memory Controller Hub (rev 03)<br>00:02.0 VGA compatible controller: Intel Corporation Mobile 945GM/GMS/940GML Express Integrated Graphics Controller (rev 03)
+<br>00:02.1 Display controller: Intel Corporation Mobile 945GM/GMS/940GML Express Integrated Graphics Controller (rev 03)<br>00:07.0 Performance counters: Intel Corporation Unknown device 27a3 (rev 03)<br>00:1b.0 Audio device: Intel Corporation 82801G (ICH7 Family) High Definition Audio Controller (rev 02)
+<br>00:1c.0 PCI bridge: Intel Corporation 82801G (ICH7 Family) PCI Express Port 1 (rev 02)<br>00:1c.1 PCI bridge: Intel Corporation 82801G (ICH7 Family) PCI Express Port 2 (rev 02)<br>00:1d.0 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #1 (rev 02)
+<br>00:1d.1 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #2 (rev 02)<br>00:1d.2 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #3 (rev 02)<br>00:1d.3 USB Controller: Intel Corporation 82801G (ICH7 Family) USB UHCI #4 (rev 02)
+<br>00:1d.7 USB Controller: Intel Corporation 82801G (ICH7 Family) USB2 EHCI Controller (rev 02)<br>00:1e.0 PCI bridge: Intel Corporation 82801 Mobile PCI Bridge (rev e2)<br>00:1f.0 ISA bridge: Intel Corporation 82801GBM (ICH7-M) LPC Interface Bridge (rev 02)
+<br>00:1f.1 IDE interface: Intel Corporation 82801G (ICH7 Family) IDE Controller (rev 02)<br>00:1f.2 IDE interface: Intel Corporation 82801GBM/GHM (ICH7 Family) Serial ATA Storage Controller IDE (rev 02)<br>00:1f.3 SMBus: Intel Corporation 82801G (ICH7 Family) SMBus Controller (rev 02)
+<br>01:00.0 Ethernet controller: Marvell Technology Group Ltd. 88E8053 PCI-E Gigabit Ethernet Controller (rev 22)<br>02:00.0 Network controller: Atheros Communications, Inc. Unknown device 0024 (rev 01)<br>03:03.0 FireWire (IEEE 1394): Agere Systems FW323 (rev 61)Linux macbook 
+2.6.20-8-generic #2 SMP Tue Feb 13 05:18:42 UTC 2007 i686 GNU/Linux<br><br clear="all">And my kernel version:<br><br>Linux macbook 2.6.20-8-generic #2 SMP Tue Feb 13 05:18:42 UTC 2007 i686 GNU/Linux<br><br>Suggestions?<br>
+<br>-- <br>Ion Jaureguialzo Sarasola<br><a href="mailto:widemos@gmail.com">widemos@gmail.com</a><br>Vitoria-Gasteiz<br>Spain
 
-Regards,
-Vikram
-------=_NextPart_000_000D_01C755DC.EE10C130
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2800.1586" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi All,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I am trying to Build and run the test =
-programs from=20
-utils. for that I carried out following steps.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>1) Run ./configure =
---prefix=3D/usr<BR>and make=20
-&amp;&amp; make install from ..\BlueZ\libs\bluez-libs-3.9 and =
-successfully=20
-installed BlueZ.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>2)Successfully installed D-Bus 1.0.2 =
-from <A=20
-href=3D"http://www.freedesktop.com">www.freedesktop.com</A>.</FONT></DIV>=
-
-<DIV>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>3) run ./configure --prefix=3D/usr=20
---mandir=3D/usr/share/man \<BR>&nbsp;&nbsp;--sysconfdir=3D/etc =
---localstatedir=3D/var=20
---libexecdir=3D/lib<BR>from ..\BlueZ\utils\bluez-utils-3.9</FONT></DIV>
-<DIV>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>but I am getting following =
-errors.</FONT></DIV>
-<DIV>&nbsp;</DIV>
-<DIV><FONT face=3DArial color=3D#ff0000 size=3D2>&gt; Package =
-dbus-glib-1 was not=20
-found<BR>&gt; package openobex was not found<BR>&gt; Package =
-opensync-1.0 was=20
-not found<BR>&gt; Package libusb not found</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>4) run make &amp;&amp; make istall from =
-
-..\BlueZ\utils\bluez-utils-3.9. and got following error.<BR><FONT=20
-color=3D#ff0000>"undefined referance to =
-XML_Stopparser"</FONT></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Please suggest me =
-solution.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Regards,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Vikram</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_000D_01C755DC.EE10C130--
+------=_Part_133_698271.1172046661235--
 
 
-
---===============0556605089==
+--===============1248687765==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -132,7 +121,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0556605089==
+--===============1248687765==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -143,4 +132,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0556605089==--
+--===============1248687765==--
