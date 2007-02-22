@@ -1,9 +1,9 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 21 Feb 2007 17:05:42 -0500
-From: Walt Shekrota <penguinacity@yahoo.com>
+Date: Wed, 21 Feb 2007 16:15:50 -0800 (PST)
+From: walt shekrota <penguinacity@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Message-id: <200702211705.42373.penguinacity@yahoo.com>
-MIME-version: 1.0
+MIME-Version: 1.0
+Message-ID: <522785.39828.qm@web62315.mail.re1.yahoo.com>
 Subject: [Bluez-users] plantronics 320 working minor problems
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -20,10 +20,14 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi,
 
-I posted ealier under another id but your list penalizes those who's provider 
-does not respond appropriately with a postmaster address. Mine is 
-optonline.net and they control most of the NY NYC and LI area.
-Funny they would keep us from posting. Trying to get the provider to 
+I posted ealier under another id but your list
+penalizes those who's provider 
+does not respond appropriately with a postmaster
+address. Mine is 
+optonline.net and they control most of the NY NYC and
+LI area.
+Funny they would keep us from posting. Trying to get
+the provider to 
 understand is like feeding a duck nails.
 
 So now to my problems.
@@ -41,15 +45,18 @@ options {
 
         # Security Manager mode
         #   none - Security manager disabled
-        #   auto - Use local PIN for incoming connections
+        #   auto - Use local PIN for incoming
+connections
         #   user - Always ask user for a PIN
         #
         security user;
 
         # Pairing mode
         #   none  - Pairing disabled
-        #   multi - Allow pairing with already paired devices
-        #   once  - Pair once and deny successive attempts
+        #   multi - Allow pairing with already paired
+devices
+        #   once  - Pair once and deny successive
+attempts
         pairing multi;
 
         # PIN helper
@@ -67,8 +74,8 @@ device {
         name "BlueZ (%d)";
 
         # Local device class
-#       class 0x3e0100;
-        class 0x200404;
+        class 0x3e0100;
+        
         # Default packet type
         pkt_type DH1,DM1,HV1;
 
@@ -77,9 +84,12 @@ device {
 
         # Default link mode
         #   none   - no specific policy 
-        #   accept - always accept incoming connections
-        #   master - become master on incoming connections,
-        #            deny role switch on outgoing connections
+        #   accept - always accept incoming
+connections
+        #   master - become master on incoming
+connections,
+        #            deny role switch on outgoing
+connections
         lm accept;
 
         # Default link policy
@@ -90,7 +100,8 @@ device {
         #   park    - allow park mode
         lp rswitch,hold,sniff,park;
 
-        # Authentication and Encryption (Security Mode 3)
+        # Authentication and Encryption (Security Mode
+3)
         auth enable;
         encrypt enable;
 }
@@ -116,36 +127,48 @@ rfcomm0 {
 
  hciconfig -a revision
  hci0:   Type: USB
-         BD Address: 00:13:46:47:67:F4 ACL MTU: 192:8 SCO MTU: 64:8
+         BD Address: 00:13:46:47:67:F4 ACL MTU: 192:8
+SCO MTU: 64:8
          UP RUNNING PSCAN ISCAN AUTH ENCRYPT
-         RX bytes:68484755 acl:2206 sco:1341684 events:2384 errors:0
-         TX bytes:68389547 acl:2179 sco:1340183 commands:112 errors:1
-         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+         RX bytes:68484755 acl:2206 sco:1341684
+events:2384 errors:0
+         TX bytes:68389547 acl:2179 sco:1340183
+commands:112 errors:1
+         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00
+0x00
          Packet type: DM1 DH1 HV1
          Link policy: RSWITCH HOLD SNIFF PARK
          Link mode: SLAVE ACCEPT
          Name: 'BlueZ (0)'
          Class: 0x3e0100
-         Service Classes: Networking, Rendering, Capturing
+         Service Classes: Networking, Rendering,
+Capturing
          Device Class: Computer, Uncategorized
-         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 
+         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver:
+1.1 (0x1) LMP Subver: 
 0x20d
          Manufacturer: Cambridge Silicon Radio (10)
 
  hcitool inq
 Inquiring ...
-        00:03:89:F7:A9:78       clock offset: 0x40ac    class: 0x200404
+        00:03:89:F7:A9:78       clock offset: 0x40ac  
+ class: 0x200404
 
  hcitool scan
 Scanning ...
         00:03:89:F7:A9:78       320Plantronics
 
 using btsco-0.5
-I use it frequently mostly so I could understand the quirks.
-With the headset waiting connect never happens the first time.
+I use it frequently mostly so I could understand the
+quirks.
+With the headset waiting connect never happens the
+first time.
 btsco -v  <addr> 
 just fails out with only an RFCOMM message
 second time it connects....
+This is a consistant behavior at every headset
+poweron/connect.
+
 Here is a log of this:
 
 btsco -v 00:03:89:F7:A9:78
@@ -163,17 +186,28 @@ Voice setting: 0x0060
 RFCOMM channel 1 connected
 Using interface hci0
 
-I notice that even once connected I have to frequently hit the button on the 
-headset once to get sound thus dropping the channel I guess making it 
-available.
-This probably relates to a problem after a call when channel dropped and 
-headset is in standby. Frequently if its a long time in standby I have 
+I notice that even once connected I have to frequently
+hit the button on the 
+headset once to get sound thus dropping the channel I
+guess making it 
+available. But then sometimes it works without this.
+This probably relates to a problem after a call when
+channel dropped and 
+headset is in standby. Frequently if its a long time
+in standby I have 
 trouble.
 Sometimes the only out is stop/start alsa.
 
 Any ideas for these symptoms.
 Thanks!
 -Walt
+
+
+ 
+____________________________________________________________________________________
+Finding fabulous fares is fun.  
+Let Yahoo! FareChase search your favorite travel sites to find flight and hotel bargains.
+http://farechase.yahoo.com/promo-generic-14795097
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
