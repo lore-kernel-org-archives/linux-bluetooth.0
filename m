@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1172187093.10673.17.camel@cookie.hadess.net>
-References: <1172187093.10673.17.camel@cookie.hadess.net>
-Date: Sat, 24 Feb 2007 16:43:49 +0100
-Message-Id: <1172331829.11537.14.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Another bluez-gnome patch
+Message-ID: <45DED83A.2020701@yahoo.com.au>
+Date: Fri, 23 Feb 2007 13:04:10 +0100
+From: bluez.mexon@spamgourmet.com
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+References: <45D9E0ED.8090700@yahoo.com.au>	<1171907659.26567.29.camel@violet>
+	<45D9F9DC.1030606@yahoo.com.au>	<1172060009.7403.17.camel@violet>
+	<45DD2E5E.1060703@yahoo.com.au>	<1172127123.14885.2.camel@violet>
+	<45DE8544.4010900@yahoo.com.au> <1172214440.28266.4.camel@violet>
+In-Reply-To: <1172214440.28266.4.camel@violet>
+Subject: Re: [Bluez-devel] hid2hci fails: broken pipe
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,44 +23,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Marcel Holtmann - marcel@holtmann.org wrote:
 
-> Here's an updated patch for the bluez-gnome applet and properties:
-> - Use HAL to determine the device class, if HAL is available
+> don't ask me. It is kinda hard to find a BlueCore4-External dongle these
+> days. And I actually need some where you can flash new firmware into it.
+> If anyone find a reliable source of these, I would buy at least a
+> handful. The best ones _were_ the Level1 things, because they used a
+> high quality flash chip. However the new ones have ROM chips as well.
 
-I added this part to the CVS now. However we need another GConf setting
-that allows the user to control if HAL should be used or not.
+OK, well, that sucks.
 
-The properties dialog needs a setting to control the HAL usage and show
-or hide the class of device box according to it.
+I wrote an email begging Level1 to re-introduce a Bluecore4-ext model,
+and an email to CSR asking for a list of manufacturers who use
+Bluecore4-ext in their USB dongles.  I don't expect either to produce
+any useful result, but hey, you've gotta speak to be heard.  In the
+meantime, I guess I'm sticking with wires.
 
-> - Fix translation of scanning mode changes (modes weren't translated at
-> all, and the string used could only be used in English)
-
-Fixed that and did a little rewording.
-
-> - Don't show the notification bubble when switching the bluetooth device
-> on/off, and we're only showing the icon if a device is present. The icon
-> appearing/disappearing should be enough
-
-We need to show when it goes back into connectable mode, because that
-happens if you use the discoverable timeout.
-
-> - Fix excessive markup in the properties labels
-
-Done a little bit different, but with the same result.
-
-> Once you've accepted this patch, my next step is to implement the
-> software enable/disable for laptops in the applet (that would use HAL as
-> well).
-
-I really like to see that. We need that feature.
-
-Regards
-
-Marcel
-
-
+Thanks for your help, that clarified a lot of things.
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
