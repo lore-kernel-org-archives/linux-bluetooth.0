@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY117-F34E1C6DE97697902591ADBF8E0@phx.gbl>
+Message-ID: <BAY117-F3707F8B10D59DC54A8549CBF8E0@phx.gbl>
+In-Reply-To: <1172214519.28266.6.camel@violet>
 From: "Kelvin Xu" <kyoxu@hotmail.com>
 To: bluez-users@lists.sourceforge.net
-Date: Fri, 23 Feb 2007 17:01:56 +0800
+Date: Fri, 23 Feb 2007 16:37:44 +0800
 Mime-Version: 1.0
-Subject: [Bluez-users] Bluez config on ARM
+Subject: Re: [Bluez-users] PIN request for embedded Bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,37 +19,61 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi,
 
-Dear all,
-
-I am currently running Bluez on a ARM board. The hciconfig does not seems to 
-be reading from the hcid.conf file. How do i current this?
-
-Below is the output of my hciconfig -a
-
-hci0:   Type: USB
-        BD Address: 00:15:E9:7B:A0:B9 ACL MTU: 377:10 SCO MTU: 16:0
-        UP RUNNING PSCAN ISCAN
-        RX bytes:702 acl:0 sco:0 events:23 errors:0
-        TX bytes:83 acl:0 sco:0 commands:23 errors:0
-        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy:
-        Link mode: SLAVE ACCEPT
-        Name: 'Broadcom BCM2035'
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x2788 LMP Ver: 1.2 (0x2) LMP Subver: 
-0x309
-        Manufacturer: Broadcom Corporation (15)
+I do not quite understand what u meant by using passkey-agent.c example. 
+Could you elaborate a bit? Do you meant that i have to compile the file 
+separately?/
 
 Regards,
 Kelvin
 
+
+>From: Marcel Holtmann <marcel@holtmann.org>
+>Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+>To: BlueZ users <bluez-users@lists.sourceforge.net>
+>Subject: Re: [Bluez-users] PIN request for embedded Bluez
+>Date: Fri, 23 Feb 2007 08:08:39 +0100
+>
+>Hi Kelvin,
+>
+> > I have install Bluez on my ARM-board. I managed to partly established a 
+>PAN
+> > connection to my mobile phone. However, i could not finish the 
+>connection as
+> > my phone would require my board to respond to its PIN authentification.
+> >
+> > I have no problem doing that on a Fedora Core 5 computer, as there will 
+>be a
+> > prompt for the PIN.
+> > There are however no prompt for a text-based Linux. How do i respond to 
+>the
+> > challenge PIN in such an environment?
+>
+>when running a bluez-utils-3.x you can use the passkey-agent.c example
+>to enter the PIN via command line or you can easily write a program by
+>yourself.
+>
+>Regards
+>
+>Marcel
+>
+>
+>
+>-------------------------------------------------------------------------
+>Take Surveys. Earn Cash. Influence the Future of IT
+>Join SourceForge.net's Techsay panel and you'll get the chance to share 
+>your
+>opinions on IT & business topics through brief surveys-and earn cash
+>http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+>_______________________________________________
+>Bluez-users mailing list
+>Bluez-users@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-users
+
 _________________________________________________________________
-Get an advanced look at the new version of Windows Live Messenger. 
-http://get.live.com/messenger/overview
+Receive MSN Hotmail alerts over SMS! 
+http://en-asiasms.mobile.msn.com/ac.aspx?cid=1002
 
 
 -------------------------------------------------------------------------
