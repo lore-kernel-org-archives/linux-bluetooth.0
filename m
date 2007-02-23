@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY117-F15C565B7A1429116FE75BCBF8E0@phx.gbl>
-From: "Kelvin Xu" <kyoxu@hotmail.com>
+Date: Thu, 22 Feb 2007 21:06:12 -0500
+From: Walt Shekrota <penguinacity@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Date: Fri, 23 Feb 2007 14:53:21 +0800
-Mime-Version: 1.0
-Subject: [Bluez-users] PIN request for embedded Bluez
+Message-id: <200702222106.12976.penguinacity@yahoo.com>
+MIME-version: 1.0
+Subject: Re: [Bluez-users] plantronics 320 working minor problems
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,26 +18,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Dear all.
+I think I have an answer to having to invoke  btsco twice.
+Per the Plantronics instructions my headset is in pairing mode with a long 
+press.
 
-I have install Bluez on my ARM-board. I managed to partly established a PAN 
-connection to my mobile phone. However, i could not finish the connection as 
-my phone would require my board to respond to its PIN authentification.
+However I find that if after I have done this I give it a short press 
+Then call btsco it connects perfect on the first call.
 
-I have no problem doing that on a Fedora Core 5 computer, as there will be a 
-prompt for the PIN.
-There are however no prompt for a text-based Linux. How do i respond to the 
-challenge PIN in such an environment?
+So is their document lying about pairing mode or does bluez require another 
+signal? Or maybe the headset is trying to connect in some master mode and the 
+additional short press says disconnect leaving it waiting?
 
-Thanks for any advice given
+Is there a document somewhere on the web that describes the interaction of the 
+daemons for bluez?
 
-Regards,
-Kelvin
-
-_________________________________________________________________
-Get MSN Messenger emoticons and display pictures here! 
-http://ilovemessenger.msn.com/?mkt=en-sg
-
+Thanks.
+-Walt
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
