@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45DE8544.4010900@yahoo.com.au>
-References: <45D9E0ED.8090700@yahoo.com.au>
-	<1171907659.26567.29.camel@violet> <45D9F9DC.1030606@yahoo.com.au>
-	<1172060009.7403.17.camel@violet> <45DD2E5E.1060703@yahoo.com.au>
-	<1172127123.14885.2.camel@violet>  <45DE8544.4010900@yahoo.com.au>
-Date: Fri, 23 Feb 2007 08:07:20 +0100
-Message-Id: <1172214440.28266.4.camel@violet>
-Mime-Version: 1.0
+Message-ID: <45DE8544.4010900@yahoo.com.au>
+Date: Fri, 23 Feb 2007 07:10:12 +0100
+From: bluez.mexon@spamgourmet.com
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+References: <45D9E0ED.8090700@yahoo.com.au>	<1171907659.26567.29.camel@violet>
+	<45D9F9DC.1030606@yahoo.com.au>	<1172060009.7403.17.camel@violet>
+	<45DD2E5E.1060703@yahoo.com.au> <1172127123.14885.2.camel@violet>
+In-Reply-To: <1172127123.14885.2.camel@violet>
 Subject: Re: [Bluez-devel] hid2hci fails: broken pipe
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -23,59 +22,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Marcel Holtmann - marcel@holtmann.org wrote:
 
-> > wait a second. You don't even know if it is a HID proxy dongle. You
-> > should run "hciconfig hci0 revision" as root. If this is a ROM version
-> > then it is not HID proxy. And even if it is an External version, you
-> > still need to have to correct unified firmware and the correct boot
-> > parameter to make it come up in HID mode first.
-> ...
-> > You need a BlueCore External to have HID proxy support. The ROM versions
-> > are all HCI only.
-> 
-> Aw man, I tried.  I really tried.  Look here:
-> 
-> http://sourceforge.net/mailarchive/forum.php?thread_id=31657125&forum_id=1883
-> 
-> Didn't I try?  Yes, I tried.  And it didn't bloody help, did it?
-> 
-> aeon:~# hciconfig hci0 revision
-> hci0:   Type: USB
->         BD Address: XX:XX:XX:XX:XX:XX ACL MTU: 192:8 SCO MTU: 64:8
->         HCI 18.2.1
->         Chip version: BlueCore3-ROM
->         Max key size: 128 bit
->         SCO mapping:  HCI
-> 
-> There it is, in black and white.  It's the ROM version.  I guess a
-> DN-3008M1 really is completely different to a DN-3008.  That or New
-> Zealand websites are evil and shouldn't be trusted.
-> 
-> So OK, maybe you can tell me.  I would like to buy a USB Bluetooth
-> dongle that does the HID proxy thing, preferably 2.0, preferably class
-> 1.  Do you know where I might be able to buy such a thing?
+> wait a second. You don't even know if it is a HID proxy dongle. You
+> should run "hciconfig hci0 revision" as root. If this is a ROM version
+> then it is not HID proxy. And even if it is an External version, you
+> still need to have to correct unified firmware and the correct boot
+> parameter to make it come up in HID mode first.
+...
+> You need a BlueCore External to have HID proxy support. The ROM versions
+> are all HCI only.
 
-don't ask me. It is kinda hard to find a BlueCore4-External dongle these
-days. And I actually need some where you can flash new firmware into it.
-If anyone find a reliable source of these, I would buy at least a
-handful. The best ones _were_ the Level1 things, because they used a
-high quality flash chip. However the new ones have ROM chips as well.
+Aw man, I tried.  I really tried.  Look here:
 
-> And also: boot parameter?  Do you mean a Linux boot parameter or another
-> setting that goes on the flash of the dongle?  Because if it's the
-> former, that would invalidate the whole point of HID proxy, wouldn't it?
+http://sourceforge.net/mailarchive/forum.php?thread_id=31657125&forum_id=1883
 
-The CSR unified firmware has a boot parameter where you can tell it to
-boot up in HID mode or HCI mode (and some other modes). In general every
-unified firmware is HID proxy capable. You might simply have to switch
-it on.
+Didn't I try?  Yes, I tried.  And it didn't bloody help, did it?
 
-Regards
+aeon:~# hciconfig hci0 revision
+hci0:   Type: USB
+        BD Address: XX:XX:XX:XX:XX:XX ACL MTU: 192:8 SCO MTU: 64:8
+        HCI 18.2.1
+        Chip version: BlueCore3-ROM
+        Max key size: 128 bit
+        SCO mapping:  HCI
 
-Marcel
+There it is, in black and white.  It's the ROM version.  I guess a
+DN-3008M1 really is completely different to a DN-3008.  That or New
+Zealand websites are evil and shouldn't be trusted.
 
+So OK, maybe you can tell me.  I would like to buy a USB Bluetooth
+dongle that does the HID proxy thing, preferably 2.0, preferably class
+1.  Do you know where I might be able to buy such a thing?
 
+And also: boot parameter?  Do you mean a Linux boot parameter or another
+setting that goes on the flash of the dongle?  Because if it's the
+former, that would invalidate the whole point of HID proxy, wouldn't it?
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
