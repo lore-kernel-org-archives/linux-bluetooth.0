@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY117-F15C565B7A1429116FE75BCBF8E0@phx.gbl>
-References: <BAY117-F15C565B7A1429116FE75BCBF8E0@phx.gbl>
-Date: Fri, 23 Feb 2007 08:08:39 +0100
-Message-Id: <1172214519.28266.6.camel@violet>
+Message-ID: <BAY117-F15C565B7A1429116FE75BCBF8E0@phx.gbl>
+From: "Kelvin Xu" <kyoxu@hotmail.com>
+To: bluez-users@lists.sourceforge.net
+Date: Fri, 23 Feb 2007 14:53:21 +0800
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] PIN request for embedded Bluez
+Subject: [Bluez-users] PIN request for embedded Bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,25 +18,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Kelvin,
+Dear all.
 
-> I have install Bluez on my ARM-board. I managed to partly established a PAN 
-> connection to my mobile phone. However, i could not finish the connection as 
-> my phone would require my board to respond to its PIN authentification.
-> 
-> I have no problem doing that on a Fedora Core 5 computer, as there will be a 
-> prompt for the PIN.
-> There are however no prompt for a text-based Linux. How do i respond to the 
-> challenge PIN in such an environment?
+I have install Bluez on my ARM-board. I managed to partly established a PAN 
+connection to my mobile phone. However, i could not finish the connection as 
+my phone would require my board to respond to its PIN authentification.
 
-when running a bluez-utils-3.x you can use the passkey-agent.c example
-to enter the PIN via command line or you can easily write a program by
-yourself.
+I have no problem doing that on a Fedora Core 5 computer, as there will be a 
+prompt for the PIN.
+There are however no prompt for a text-based Linux. How do i respond to the 
+challenge PIN in such an environment?
 
-Regards
+Thanks for any advice given
 
-Marcel
+Regards,
+Kelvin
 
+_________________________________________________________________
+Get MSN Messenger emoticons and display pictures here! 
+http://ilovemessenger.msn.com/?mkt=en-sg
 
 
 -------------------------------------------------------------------------
