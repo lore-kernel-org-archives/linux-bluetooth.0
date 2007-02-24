@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1172331829.11537.14.camel@violet>
+In-Reply-To: <1172187093.10673.17.camel@cookie.hadess.net>
 References: <1172187093.10673.17.camel@cookie.hadess.net>
-	<1172331829.11537.14.camel@violet>
-Date: Sat, 24 Feb 2007 17:11:58 +0000
-Message-Id: <1172337118.31852.10.camel@cookie.hadess.net>
+Date: Sat, 24 Feb 2007 16:43:49 +0100
+Message-Id: <1172331829.11537.14.camel@violet>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Another bluez-gnome patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -21,57 +20,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sat, 2007-02-24 at 16:43 +0100, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > Here's an updated patch for the bluez-gnome applet and properties:
-> > - Use HAL to determine the device class, if HAL is available
-> 
-> I added this part to the CVS now. However we need another GConf setting
-> that allows the user to control if HAL should be used or not.
-> 
-> The properties dialog needs a setting to control the HAL usage and show
-> or hide the class of device box according to it.
+Hi Bastien,
 
-That sounds like over-engineering to me. What is the use case of the
-applet? If it's only going to be used on desktops, what's the matter
-with leaving the HAL support on? If the applet is to be used in embedded
-systems, surely those systems would make mofidications to the applet to
-fit their usage, and could turn off HAL support.
+> Here's an updated patch for the bluez-gnome applet and properties:
+> - Use HAL to determine the device class, if HAL is available
 
-> > - Fix translation of scanning mode changes (modes weren't translated at
-> > all, and the string used could only be used in English)
-> 
-> Fixed that and did a little rewording.
+I added this part to the CVS now. However we need another GConf setting
+that allows the user to control if HAL should be used or not.
 
-Cool.
+The properties dialog needs a setting to control the HAL usage and show
+or hide the class of device box according to it.
 
-> > - Don't show the notification bubble when switching the bluetooth device
-> > on/off, and we're only showing the icon if a device is present. The icon
-> > appearing/disappearing should be enough
-> 
-> We need to show when it goes back into connectable mode, because that
-> happens if you use the discoverable timeout.
+> - Fix translation of scanning mode changes (modes weren't translated at
+> all, and the string used could only be used in English)
 
-Then we should save the mode before the change of mode_changed signal,
-and only popup the notification if the previous mode was discoverable.
+Fixed that and did a little rewording.
 
-> > - Fix excessive markup in the properties labels
-> 
-> Done a little bit different, but with the same result.
+> - Don't show the notification bubble when switching the bluetooth device
+> on/off, and we're only showing the icon if a device is present. The icon
+> appearing/disappearing should be enough
 
-OK.
+We need to show when it goes back into connectable mode, because that
+happens if you use the discoverable timeout.
 
-> > Once you've accepted this patch, my next step is to implement the
-> > software enable/disable for laptops in the applet (that would use HAL as
-> > well).
-> 
-> I really like to see that. We need that feature.
+> - Fix excessive markup in the properties labels
 
-Cool, I'll get onto that in the near future, hopefully.
+Done a little bit different, but with the same result.
 
--- 
-Bastien Nocera <hadess@hadess.net> 
+> Once you've accepted this patch, my next step is to implement the
+> software enable/disable for laptops in the applet (that would use HAL as
+> well).
+
+I really like to see that. We need that feature.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
