@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200702251110.07289.penguinacity@yahoo.com>
-References: <200702251110.07289.penguinacity@yahoo.com>
-Date: Mon, 26 Feb 2007 00:47:27 +0100
-Message-Id: <1172447247.20450.9.camel@violet>
+In-Reply-To: <20070225202324.26b0f039.fotopiper@o2.pl>
+References: <20070225202324.26b0f039.fotopiper@o2.pl>
+Date: Mon, 26 Feb 2007 00:45:43 +0100
+Message-Id: <1172447143.20450.6.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] current Bluez document describing
+Subject: Re: [Bluez-users] Passkey-agent and pin list.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,21 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Walt,
+Hi,
 
-> There is a lot of outdated doc out there for this. It has even been admitted 
-> here.
-> What is the current sanctioned webpage or document that describes it?
+> i've decided to go for bluez 3.9.. and even found a way to operate
+> it ;) especially as the example pass-agent is concerned... yet I would
+> like to have more or less the same fect as with the 2.X releses and a
+> pin_helper...
+> A passkey-agent that would read a file with device addresses and pins,
+> and used the passkey from the list.
+> Does anyone has an idea how to acheve suc trick?
 
-BlueZ itself changed quite a lot in the last two years. Feel free to use
-wiki.bluez.org to create some state of the art documentation.
-
-> or what does rfcomm do and how
-> what is the device named in rfcomm.conf? (the dongle?)
-> Maybe the comment might say that if it is.
-> Saying 'the device' is rather obtuse.
-
-No idea what's your question. Be more specific.
+you simply write such a passkey agent. This makes this interface so
+great, because the agent is really simple to replace with your own code.
+You can even write this in Python or Perl (actually any language with a
+D-Bus binding).
 
 Regards
 
