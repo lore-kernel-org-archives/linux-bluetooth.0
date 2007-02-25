@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY117-F34E1C6DE97697902591ADBF8E0@phx.gbl>
-References: <BAY117-F34E1C6DE97697902591ADBF8E0@phx.gbl>
-Date: Mon, 26 Feb 2007 00:52:53 +0100
-Message-Id: <1172447573.20450.20.camel@violet>
+In-Reply-To: <45DECF51.2020901@pracucci.com>
+References: <45DECF51.2020901@pracucci.com>
+Date: Mon, 26 Feb 2007 00:51:33 +0100
+Message-Id: <1172447493.20450.17.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluez config on ARM
+Subject: Re: [Bluez-users] Timeout on sdp_connect()
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,14 +20,12 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Kelvin,
+Hi Marco,
 
-> I am currently running Bluez on a ARM board. The hciconfig does not seems to 
-> be reading from the hcid.conf file. How do i current this?
+> I would like to set a timeout on sdp_connect(), because the default 
+> socket timeout is too high for my application. Is there any way to do it?
 
-the reason for that might be that it is hciconfig. Start hcid, because
-that is the daemon the config is for. Otherwise it would be named
-hciconfig.conf, wouldn't it.
+my guess is that you wanna modify the page timeout. Look up on that.
 
 Regards
 
