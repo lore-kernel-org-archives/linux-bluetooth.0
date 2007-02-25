@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY117-F3707F8B10D59DC54A8549CBF8E0@phx.gbl>
-References: <BAY117-F3707F8B10D59DC54A8549CBF8E0@phx.gbl>
-Date: Mon, 26 Feb 2007 00:54:54 +0100
-Message-Id: <1172447694.20450.23.camel@violet>
+In-Reply-To: <BAY117-F34E1C6DE97697902591ADBF8E0@phx.gbl>
+References: <BAY117-F34E1C6DE97697902591ADBF8E0@phx.gbl>
+Date: Mon, 26 Feb 2007 00:52:53 +0100
+Message-Id: <1172447573.20450.20.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] PIN request for embedded Bluez
+Subject: Re: [Bluez-users] Bluez config on ARM
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,12 +22,12 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi Kelvin,
 
-> I do not quite understand what u meant by using passkey-agent.c example. 
-> Could you elaborate a bit? Do you meant that i have to compile the file 
-> separately?/
+> I am currently running Bluez on a ARM board. The hciconfig does not seems to 
+> be reading from the hcid.conf file. How do i current this?
 
-it will be compiled, but not installed. It is example code. It is not
-meant for daily use. It is meant for learning and demonstration purpose.
+the reason for that might be that it is hciconfig. Start hcid, because
+that is the daemon the config is for. Otherwise it would be named
+hciconfig.conf, wouldn't it.
 
 Regards
 
