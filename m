@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Yunus =?ISO-8859-1?Q?=D6zen?= <yunus@yunus.gen.tr>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1172402064.3020.6.camel@localhost.localdomain>
+In-Reply-To: <D299A7A94D00F12.54EFE86A2B@broadview.com>
 References: <D299A7A94D00F12.54EFE86A2B@broadview.com>
-	<1172402064.3020.6.camel@localhost.localdomain>
-Date: Mon, 26 Feb 2007 00:49:15 +0100
-Message-Id: <1172447355.20450.12.camel@violet>
+Date: Sun, 25 Feb 2007 13:14:24 +0200
+Message-Id: <1172402064.3020.6.camel@localhost.localdomain>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Kernel Module
+Subject: [Bluez-devel] Kernel Module
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,23 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Yunus,
+Hi,
 
-> I want to write a kernel module and use some bluez commands those
-> included in the kernel. 
-> 
-> I will use it some experimental cases. 
-> 
-> Is it possible to use bluez commands in kernel modules? If so, how can I
-> do it?
+I want to write a kernel module and use some bluez commands those
+included in the kernel. 
 
-of course it is possible, but for what strange reason you might wanna
-find yourself writing a kernel module. Explain what you are planning to
-do and I might can give you a more detailed answer. I am not psychic.
+I will use it some experimental cases. 
 
-Regards
+Is it possible to use bluez commands in kernel modules? If so, how can I
+do it?
 
-Marcel
+Regards,
+Yunus.
+
+
 
 
 
