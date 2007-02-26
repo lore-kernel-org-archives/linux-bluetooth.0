@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 26 Feb 2007 02:20:11 -0800 (PST)
-From: Bluezapper <enigma_enu@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Message-ID: <359735.71388.qm@web43141.mail.sp1.yahoo.com>
-Subject: [Bluez-users] Rococo and Bluez
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <752642.79554.qm@web31711.mail.mud.yahoo.com>
+References: <752642.79554.qm@web31711.mail.mud.yahoo.com>
+Date: Mon, 26 Feb 2007 10:36:54 +0100
+Message-Id: <1172482614.27370.11.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] tryig to get bluetooth keyboad to work
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,65 +16,76 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0693500166=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0693500166==
-Content-Type: multipart/alternative; boundary="0-293413230-1172485211=:71388"
-Content-Transfer-Encoding: 8bit
+Hi Tim,
 
---0-293413230-1172485211=:71388
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+> Thanks for the response.
+> 
+> Heres my hciconfig right after it locks up.
+> 
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 2 packets 1
+> > ACL data: handle 2 flags 0x02 dlen 18
+>     L2CAP(s): Config rsp: scid 0x0041 flags 0x00
+> result 0 clen 4
+>       Success
+>       MTU 48 
+> > HCI Event: QoS Setup Complete (0x0d) plen 21
+>     status 0x00 handle 2 flags 0
+>     Service type: 1
+>     Token rate: 0
+>     Peak bandwith: 0
+>     Latency: 11250
+>     Delay variation: -1
+> < ACL data: handle 2 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x0041 len 10 [psm 19]
+>       HIDP: Data: Output report
+>       0000: 01 00 00 00 00 00 00 00  00               
+>        .........
+> < ACL data: handle 2 flags 0x02 dlen 7
+>     L2CAP(d): cid 0x0041 len 3 [psm 19]
+>       HIDP: Data: Output report
+>       0000: 02 00                                     
+>        ..
+> < ACL data: handle 2 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x0041 len 10 [psm 19]
+>       HIDP: Data: Output report
+>       0000: 05 00 00 00 00 00 00 00  00               
+>        .........
+> < ACL data: handle 2 flags 0x02 dlen 8
+>     L2CAP(d): cid 0x0041 len 4 [psm 19]
+>       HIDP: Data: Output report
+>       0000: 06 00 00                                  
+>        ...
+> < ACL data: handle 2 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x0041 len 10 [psm 19]
+>       HIDP: Data: Output report
+>       0000: 05 00 00 00 00 00 00 00  00               
+>        .........
+> > ACL data: handle 2 flags 0x02 dlen 14
+>     L2CAP(d): cid 0x0041 len 10 [psm 19]
+>       HIDP: Data: Input report
+>       0000: 05 44 7c 72 d3 c9 03 00  00               
+>        .D|r.....
 
-Hi,
- 
- I am a newbie in this group.I am interested in developing bluetooth applications in Java. Can I use Bluez protocol stack and Rococo development kit together for making my applications.
- 
- Also I would like to know from the users in this group whether they are using any IDE for writing their C programs or you do it with a text editor.
- 
- I am using Ubuntu(Dapper Drake).
- 
- thanks in advance for your replies and suggestions,
- 
- regards,
- 
- bluezapper.
- 
----------------------------------
-Expecting? Get great news right away with email Auto-Check.
-Try the Yahoo! Mail Beta.
---0-293413230-1172485211=:71388
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+you might wanna try a 2.6.20-mh1 kernel. That has full report mode
+support and might make it work without issues.
 
-Hi,<br> <br> I am a newbie in this group.I am interested in developing bluetooth applications in Java. Can I use Bluez protocol stack and Rococo development kit together for making my applications.<br> <br> Also I would like to know from the users in this group whether they are using any IDE for writing their C programs or you do it with a text editor.<br> <br> I am using Ubuntu(Dapper Drake).<br> <br> thanks in advance for your replies and suggestions,<br> <br> regards,<br> <br> bluezapper.<p>&#32;
+Regards
 
-<hr size=1>Expecting? Get great news right away with <a href="http://us.rd.yahoo.com/evt=49982/*http://advision.webevents.yahoo.com/mailbeta/newmail_tools.html">email Auto-Check.</a><br>Try the <a href="http://us.rd.yahoo.com/evt=49982/*http://advision.webevents.yahoo.com/mailbeta/newmail_tools.html">Yahoo! Mail Beta.</a>
---0-293413230-1172485211=:71388--
+Marcel
 
 
---===============0693500166==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0693500166==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0693500166==--
