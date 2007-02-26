@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45E2A115.7080306@yahoo.com.au>
-Date: Mon, 26 Feb 2007 09:57:57 +0100
-From: bluez.mexon@spamgourmet.com
+Message-ID: <45E2A6C5.3070205@pracucci.com>
+Date: Mon, 26 Feb 2007 09:22:13 +0000
+From: Marco Pracucci <development@pracucci.com>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Does anyone have the Apple DBT-120 firmware update?
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <45DECF51.2020901@pracucci.com> <1172447493.20450.17.camel@violet>
+In-Reply-To: <1172447493.20450.17.camel@violet>
+Subject: Re: [Bluez-users] Timeout on sdp_connect()
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,30 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I'm trying to update the firmware on a D-Link DBT-120 USB dongle
-(revision B2), as described in these web pages:
+Hi Marcel,
+>> I would like to set a timeout on sdp_connect(), because the default 
+>> socket timeout is too high for my application. Is there any way to do it?
+>>     
+>
+> my guess is that you wanna modify the page timeout. Look up on that.
+>   
+No.
+Sometimes it happens that the paging is done successfully but, for any 
+reason, the L2CAP connection to the remote SDP server fails with a 
+"Connection timeout". This could happen when the remote device exits 
+from the coverage area of the device that created the connection. 
+However, the default timeout is too high for my application, so I would 
+like to decrease it. Is there any way to do it?
 
-http://www.holtmann.org/linux/bluetooth/dfu.html
-http://times.usefulinc.com/2004/06/12-hidproxy
+Thanks,
+Marco Pracucci
 
-Both point to the original version of the Bluetooth update on Apple's
-site, which is now a broken link.  Instead, Apple has version 1.2,
-available here:
-
-http://www.apple.com/support/downloads/bluetoothfirmwareupdater12.html
-
-But I'm supposed to be looking for a file called "GenericCSR.dfu", and
-there isn't anything remotely like that in the archive as far as I can tell.
-
-So could some kind soul do one of the following:
-
-* Send me a copy of GenericCSR.dfu,
-* Send me a copy of the older UDIF image from Apple that has the update
-inside,
-* Point me to a place where I can download either of the above?
-
-Thanks for any help,
-Mat
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
