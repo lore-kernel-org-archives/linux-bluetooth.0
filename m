@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1172337927.11537.19.camel@violet>
-References: <1172187093.10673.17.camel@cookie.hadess.net>
-	<1172331829.11537.14.camel@violet>
-	<1172337118.31852.10.camel@cookie.hadess.net>
-	<1172337927.11537.19.camel@violet>
-Date: Mon, 26 Feb 2007 01:03:41 +0000
-Message-Id: <1172451821.31852.28.camel@cookie.hadess.net>
+In-Reply-To: <1162906121.19652.97.camel@ODole-Ubuntu>
+References: <1162463647.19652.28.camel@ODole-Ubuntu>
+	<1162463886.19652.31.camel@ODole-Ubuntu>
+	<1162906121.19652.97.camel@ODole-Ubuntu>
+Date: Mon, 26 Feb 2007 01:11:33 +0100
+Message-Id: <1172448693.20450.30.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Another bluez-gnome patch
+Subject: Re: [Bluez-devel] Proposal: patch for pand
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,59 +22,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hey Marcel,
+Hi Olivier,
 
-On Sat, 2007-02-24 at 18:25 +0100, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > > > Here's an updated patch for the bluez-gnome applet and properties:
-> > > > - Use HAL to determine the device class, if HAL is available
-> > > 
-> > > I added this part to the CVS now. However we need another GConf setting
-> > > that allows the user to control if HAL should be used or not.
-> > > 
-> > > The properties dialog needs a setting to control the HAL usage and show
-> > > or hide the class of device box according to it.
-> > 
-> > That sounds like over-engineering to me. What is the use case of the
-> > applet? If it's only going to be used on desktops, what's the matter
-> > with leaving the HAL support on? If the applet is to be used in embedded
-> > systems, surely those systems would make mofidications to the applet to
-> > fit their usage, and could turn off HAL support.
-> 
-> it is not over-engineered for people that don't have the HAL formfactor
-> setting to be used as base for the Bluetooth class of device. It also
-> makes the properties application simpler since it doesn't have to check
-> for HAL at all. It simply only sets a GConf value and applet acts
-> depending on this value.
+> really nobody is interested by this feature and so by this patch ?
+> what a shame :(
 
-I still don't understand why you would want to give the user the choice
-of using HAL or not. If it's there, use it! The information is always
-available (it's given out by the BIOS/firmware), and if it's not
-accurate, it can be overridden using an .fdi file.
+I totally overlooked that one. If you don't get an accept or reject
+reply from me, then post it again. I must have been simply busy. Anyhow,
+the patch has been committed to the CVS now.
 
-What does the user gain from being able to enable/disable HAL support
-themselves?
+Regards
 
-> > > > - Don't show the notification bubble when switching the bluetooth device
-> > > > on/off, and we're only showing the icon if a device is present. The icon
-> > > > appearing/disappearing should be enough
-> > > 
-> > > We need to show when it goes back into connectable mode, because that
-> > > happens if you use the discoverable timeout.
-> > 
-> > Then we should save the mode before the change of mode_changed signal,
-> > and only popup the notification if the previous mode was discoverable.
-> 
-> Good idea. Was actually to lazy to do it by myself. Then we can also
-> change the wording to discoverable/non-discoverable.
+Marcel
 
-I'll try and fix that then.
-
-Cheers
-
--- 
-Bastien Nocera <hadess@hadess.net> 
 
 
 -------------------------------------------------------------------------
