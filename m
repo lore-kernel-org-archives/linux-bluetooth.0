@@ -1,14 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1162906121.19652.97.camel@ODole-Ubuntu>
-References: <1162463647.19652.28.camel@ODole-Ubuntu>
-	<1162463886.19652.31.camel@ODole-Ubuntu>
-	<1162906121.19652.97.camel@ODole-Ubuntu>
-Date: Mon, 26 Feb 2007 01:11:33 +0100
-Message-Id: <1172448693.20450.30.camel@violet>
+In-Reply-To: <45DD67FD.8050307@access-company.com>
+References: <45DB19E9.5080709@access-company.com>
+	<1172059615.7403.7.camel@violet> <45DC675F.8010508@access-company.com>
+	<1172073075.7403.37.camel@violet> <45DC766D.1000903@access-company.com>
+	<1172077056.7403.40.camel@violet> <45DD67FD.8050307@access-company.com>
+Date: Mon, 26 Feb 2007 01:01:03 +0100
+Message-Id: <1172448064.20450.26.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Proposal: patch for pand
+Subject: Re: [Bluez-devel] pan profile sdp record
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,14 +23,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Olivier,
+Hi Frederic,
 
-> really nobody is interested by this feature and so by this patch ?
-> what a shame :(
+> > for an initial patch, I think we only change sdp.c with appropriate
+> > default values to make it specification conform. 
+> >   
+> Here is new patch proposal.
 
-I totally overlooked that one. If you don't get an accept or reject
-reply from me, then post it again. I must have been simply busy. Anyhow,
-the patch has been committed to the CVS now.
+the patch has been committed to the CVS. Thanks.
 
 Regards
 
