@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1172502119.4742.13.camel@bnocera.surrey.redhat.com>
+In-Reply-To: <1172500627.4742.10.camel@bnocera.surrey.redhat.com>
 References: <1172500627.4742.10.camel@bnocera.surrey.redhat.com>
-	<1172502119.4742.13.camel@bnocera.surrey.redhat.com>
-Content-Type: multipart/mixed; boundary="=-xgGudZScJDGB9xEiepj3"
-Date: Mon, 26 Feb 2007 16:36:32 +0000
-Message-Id: <1172507792.4742.22.camel@bnocera.surrey.redhat.com>
+Content-Type: multipart/mixed; boundary="=-UC4KsqkwnviRFyaIOZxE"
+Date: Mon, 26 Feb 2007 15:01:59 +0000
+Message-Id: <1172502119.4742.13.camel@bnocera.surrey.redhat.com>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] More bluez-gnome patches
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -22,46 +21,33 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---=-xgGudZScJDGB9xEiepj3
+--=-UC4KsqkwnviRFyaIOZxE
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-On Mon, 2007-02-26 at 15:01 +0000, Bastien Nocera wrote:
-> On Mon, 2007-02-26 at 14:37 +0000, Bastien Nocera wrote:
-> > Heya,
-> > 
-> > It's i18n this time. More UI fixes to get decent translatable strings
-> > for translators (they don't like markup and extraneous linefeeds in the
-> > translations, and even less sentences created by concatenating 2 bits of
-> > a sentence).
-> > 
-> > I removed linefeeds from g_printerr, as they should already be added by
+On Mon, 2007-02-26 at 14:37 +0000, Bastien Nocera wrote:
+> Heya,
 > 
-> I was wrong there. g_printerr just prints to stderr, I re-added the
-> linefeeds, but removed them from the translations, as they are debug
-> information, not end-user messages.
+> It's i18n this time. More UI fixes to get decent translatable strings
+> for translators (they don't like markup and extraneous linefeeds in the
+> translations, and even less sentences created by concatenating 2 bits of
+> a sentence).
 > 
-> > the glib code. I also added the properties dialogue to be translated.
-> 
-> Fixed the coding style (ie. removed spaces before braces).
+> I removed linefeeds from g_printerr, as they should already be added by
 
-Updated patch attached, it does all the above, plus:
-- Use the GConfEntry in GConf "changed" callbacks, and clean up some of
-that code
-- Remember the old adapter mode when it changes, so that we can say "set
-to non-discoverable" when changing from discoverable to connectable.
-- Don't use "== TRUE", as TRUE is defined as !FALSE, so TRUE isn't
-defined as a particular value.
+I was wrong there. g_printerr just prints to stderr, I re-added the
+linefeeds, but removed them from the translations, as they are debug
+information, not end-user messages.
+
+> the glib code. I also added the properties dialogue to be translated.
+
+Fixed the coding style (ie. removed spaces before braces).
 
 Cheers
 
---=-xgGudZScJDGB9xEiepj3
-Content-Disposition: attachment;
-	filename*0=bluez-gnome-i18n-fixes+gconf-cleanups+popup-text-changes.patc;
-	filename*1=h
-Content-Type: text/x-patch;
-	name=bluez-gnome-i18n-fixes+gconf-cleanups+popup-text-changes.patch;
-	charset=UTF-8
+--=-UC4KsqkwnviRFyaIOZxE
+Content-Disposition: attachment; filename=bluez-gnome-i18n-fixes-2.patch
+Content-Type: text/x-patch; name=bluez-gnome-i18n-fixes-2.patch; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Index: applet/main.c
@@ -70,25 +56,8 @@ RCS file: /cvsroot/bluez/gnome/applet/main.c,v
 retrieving revision 1.55
 diff -u -p -r1.55 main.c
 --- applet/main.c	25 Feb 2007 18:44:17 -0000	1.55
-+++ applet/main.c	26 Feb 2007 16:30:52 -0000
-@@ -59,7 +59,15 @@ static int volatile registered_auth	= 0;
- 
- static DBusGConnection *conn;
- 
--static gboolean use_hal = TRUE;
-+static gboolean use_hal = FALSE;
-+
-+static GList *adapter_list = NULL;
-+
-+struct adapter_data {
-+	char *path;
-+	int attached;
-+	char *old_mode;
-+};
- 
- typedef enum {
- 	ICON_POLICY_NEVER,
-@@ -231,7 +239,9 @@ static void passkey_dialog(const char *p
++++ applet/main.c	26 Feb 2007 14:59:48 -0000
+@@ -231,7 +231,9 @@ static void passkey_dialog(const char *p
  	GtkWidget *label;
  	GtkWidget *entry;
  	GtkWidget *table;
@@ -98,7 +67,7 @@ diff -u -p -r1.55 main.c
  
  	input = g_try_malloc0(sizeof(*input));
  	if (!input)
-@@ -289,14 +299,22 @@ static void passkey_dialog(const char *p
+@@ -289,14 +291,22 @@ static void passkey_dialog(const char *p
  	gtk_table_attach(GTK_TABLE(table), image, 0, 1, 0, 5,
  						GTK_SHRINK, GTK_FILL, 0, 0);
  
@@ -123,17 +92,17 @@ diff -u -p -r1.55 main.c
  
  	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
  
-@@ -306,14 +324,17 @@ static void passkey_dialog(const char *p
+@@ -306,14 +316,17 @@ static void passkey_dialog(const char *p
  
  	gtk_widget_set_size_request(GTK_WIDGET(label), 280, -1);
  
 -	gtk_table_attach(GTK_TABLE(table), label, 1, 2, 1, 2,
 -			GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 4);
 +	gtk_container_add(GTK_CONTAINER(vbox), label);
-+
-+	vbox = gtk_vbox_new(FALSE, 6);
  
 -	label = gtk_label_new(_("\nEnter passkey for authentication:"));
++	vbox = gtk_vbox_new(FALSE, 6);
++
 +	label = gtk_label_new(_("Enter passkey for authentication:"));
  
  	gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.0);
@@ -145,7 +114,7 @@ diff -u -p -r1.55 main.c
  				GTK_EXPAND | GTK_FILL, GTK_SHRINK, 0, 0);
  
  	entry = gtk_entry_new();
-@@ -329,16 +350,14 @@ static void passkey_dialog(const char *p
+@@ -329,16 +342,14 @@ static void passkey_dialog(const char *p
  	g_signal_connect(G_OBJECT(entry), "changed",
  				G_CALLBACK(changed_callback), input);
  
@@ -164,7 +133,7 @@ diff -u -p -r1.55 main.c
  
  	input_list = g_list_append(input_list, input);
  
-@@ -357,6 +376,7 @@ static void confirm_dialog(const char *p
+@@ -357,6 +368,7 @@ static void confirm_dialog(const char *p
  	GtkWidget *image;
  	GtkWidget *label;
  	GtkWidget *table;
@@ -172,7 +141,7 @@ diff -u -p -r1.55 main.c
  	gchar *markup;
  	struct input_data *input;
  
-@@ -393,9 +413,9 @@ static void confirm_dialog(const char *p
+@@ -393,9 +405,9 @@ static void confirm_dialog(const char *p
  	button = gtk_dialog_add_button(GTK_DIALOG(dialog),
  					GTK_STOCK_YES, GTK_RESPONSE_YES);
  
@@ -184,7 +153,7 @@ diff -u -p -r1.55 main.c
  	gtk_table_set_col_spacings(GTK_TABLE(table), 20);
  
  	gtk_container_set_border_width(GTK_CONTAINER(table), 12);
-@@ -410,11 +430,14 @@ static void confirm_dialog(const char *p
+@@ -410,11 +422,14 @@ static void confirm_dialog(const char *p
  	gtk_table_attach(GTK_TABLE(table), image, 0, 1, 0, 5,
  						GTK_SHRINK, GTK_FILL, 0, 0);
  
@@ -200,7 +169,7 @@ diff -u -p -r1.55 main.c
  				GTK_EXPAND | GTK_FILL, GTK_SHRINK, 0, 0);
  
  	label = gtk_label_new(device);
-@@ -427,14 +450,17 @@ static void confirm_dialog(const char *p
+@@ -427,14 +442,17 @@ static void confirm_dialog(const char *p
  
  	gtk_widget_set_size_request(GTK_WIDGET(label), 260, -1);
  
@@ -222,7 +191,7 @@ diff -u -p -r1.55 main.c
  				GTK_EXPAND | GTK_FILL, GTK_SHRINK, 0, 0);
  
  	label = gtk_label_new(NULL);
-@@ -447,8 +473,7 @@ static void confirm_dialog(const char *p
+@@ -447,8 +465,7 @@ static void confirm_dialog(const char *p
  
  	gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.0);
  
@@ -232,7 +201,7 @@ diff -u -p -r1.55 main.c
  
  	input_list = g_list_append(input_list, input);
  
-@@ -467,7 +492,7 @@ static void auth_dialog(const char *path
+@@ -467,7 +484,7 @@ static void auth_dialog(const char *path
  	GtkWidget *image;
  	GtkWidget *label;
  	GtkWidget *table;
@@ -241,7 +210,7 @@ diff -u -p -r1.55 main.c
  	struct input_data *input;
  
  	input = g_try_malloc0(sizeof(*input));
-@@ -544,8 +569,11 @@ static void auth_dialog(const char *path
+@@ -544,8 +561,11 @@ static void auth_dialog(const char *path
  
  	label = gtk_label_new(NULL);
  
@@ -255,7 +224,7 @@ diff -u -p -r1.55 main.c
  
  	gtk_label_set_markup(GTK_LABEL(label), markup);
  
-@@ -696,7 +724,7 @@ static gboolean passkey_agent_request(Pa
+@@ -696,7 +716,7 @@ static gboolean passkey_agent_request(Pa
  {
  	DBusGProxy *object;
  	const char *adapter = NULL, *name = NULL;
@@ -264,7 +233,7 @@ diff -u -p -r1.55 main.c
  
  	object = dbus_g_proxy_new_for_name(conn, "org.bluez",
  						path, "org.bluez.Adapter");
-@@ -718,9 +746,11 @@ static gboolean passkey_agent_request(Pa
+@@ -718,9 +738,11 @@ static gboolean passkey_agent_request(Pa
  
  	passkey_dialog(path, address, device, context);
  
@@ -279,7 +248,7 @@ diff -u -p -r1.55 main.c
  	g_free(device);
  
  	show_notification(adapter ? adapter : _("Bluetooth device"),
-@@ -737,7 +767,7 @@ static gboolean passkey_agent_confirm(Pa
+@@ -737,7 +759,7 @@ static gboolean passkey_agent_confirm(Pa
  {
  	DBusGProxy *object;
  	const char *adapter = NULL, *name = NULL;
@@ -288,7 +257,7 @@ diff -u -p -r1.55 main.c
  
  	object = dbus_g_proxy_new_for_name(conn, "org.bluez",
  						path, "org.bluez.Adapter");
-@@ -759,9 +789,9 @@ static gboolean passkey_agent_confirm(Pa
+@@ -759,9 +781,9 @@ static gboolean passkey_agent_confirm(Pa
  
  	confirm_dialog(path, address, value, device, context);
  
@@ -301,7 +270,7 @@ diff -u -p -r1.55 main.c
  	g_free(device);
  
  	show_notification(adapter ? adapter : _("Bluetooth device"),
-@@ -871,7 +901,7 @@ static gboolean auth_agent_authorize(Pas
+@@ -871,7 +893,7 @@ static gboolean auth_agent_authorize(Pas
  {
  	DBusGProxy *object;
  	const char *adapter = NULL, *name = NULL;
@@ -310,7 +279,7 @@ diff -u -p -r1.55 main.c
  
  	if (auto_authorize == TRUE) {
  		dbus_g_method_return(context);
-@@ -904,9 +934,9 @@ static gboolean auth_agent_authorize(Pas
+@@ -904,9 +926,9 @@ static gboolean auth_agent_authorize(Pas
  
  	auth_dialog(path, address, service, uuid, device, profile, context);
  
@@ -323,92 +292,7 @@ diff -u -p -r1.55 main.c
  	g_free(device);
  
  	show_notification(adapter ? adapter : _("Bluetooth device"),
-@@ -1071,42 +1101,55 @@ static void bonding_removed(DBusGProxy *
- 	g_free(text);
- }
- 
-+static void
-+set_new_mode (struct adapter_data *adapter, const char *mode)
-+{
-+	g_free (adapter->old_mode);
-+	adapter->old_mode = g_strdup (mode);
-+}
-+
- static void mode_changed(DBusGProxy *object,
- 				const char *mode, gpointer user_data)
- {
--	const char *adapter = NULL;
--	gchar *text;
-+	struct adapter_data *adapter = (struct adapter_data *) user_data;
-+	const char *adapter_name = NULL;
-+	const char *text;
- 
- 	if (icon_policy == ICON_POLICY_PRESENT) {
--		if (g_str_equal(mode, "off") == TRUE)
-+		if (g_str_equal(mode, "off") == TRUE) {
-+			set_new_mode(adapter, mode);
-+			return;
-+		}
-+		if (g_str_equal(adapter->old_mode, "off")
-+		    && g_str_equal(mode, "connectable")) {
-+			set_new_mode(adapter, mode);
- 			return;
-+		}
- 	}
- 
--	if (g_str_equal(mode, "off") == TRUE)
--		text = g_strdup_printf(_("Device has been switched off"));
--	else if (g_str_equal(mode, "connectable") == TRUE)
--		text = g_strdup_printf(_("Device has been made connectable"));
--	else if (g_str_equal (mode, "discoverable") == TRUE)
--		text = g_strdup_printf(_("Device has been made discoverable"));
--	else
-+	if (g_str_equal(mode, "off") != FALSE) {
-+		text = N_("Device has been switched off");
-+	} else if (g_str_equal(mode, "connectable") != FALSE
-+		   && g_str_equal(adapter->old_mode, "discoverable") != FALSE) {
-+		text = N_("Device has been made non-discoverable");
-+	} else if (g_str_equal(mode, "connectable") != FALSE) {
-+		text = N_("Device has been made connectable");
-+	} else if (g_str_equal (mode, "discoverable") != FALSE) {
-+		text = N_("Device has been made discoverable");
-+	} else {
-+		set_new_mode(adapter, mode);
- 		return;
-+	}
- 
- 	dbus_g_proxy_call(object, "GetName", NULL, G_TYPE_INVALID,
--				G_TYPE_STRING, &adapter, G_TYPE_INVALID);
-+				G_TYPE_STRING, &adapter_name, G_TYPE_INVALID);
- 
--	show_notification(adapter ? adapter : _("Bluetooth device"),
--							text, 3000, NULL);
-+	show_notification(adapter_name ? adapter_name : _("Bluetooth device"),
-+							_(text), 3000, NULL);
- 
--	g_free(text);
-+	set_new_mode(adapter, mode);
- }
- 
--static GList *adapter_list = NULL;
--
--struct adapter_data {
--	char *path;
--	int attached;
--};
--
- static void adapter_free(gpointer data, gpointer user_data)
- {
- 	struct adapter_data *adapter = data;
-@@ -1114,6 +1157,7 @@ static void adapter_free(gpointer data, 
- 	adapter_list = g_list_remove(adapter_list, adapter);
- 
- 	g_free(adapter->path);
-+	g_free(adapter->old_mode);
- 	g_free(adapter);
- }
- 
-@@ -1186,7 +1230,7 @@ static void adapter_setup(gpointer data,
+@@ -1186,7 +1208,7 @@ static void adapter_setup(gpointer data,
  
  	if (strcmp(formfactor, "laptop") && strcmp(formfactor, "desktop")) {
  		/* We don't know anything else */
@@ -417,7 +301,7 @@ diff -u -p -r1.55 main.c
  	}
  
  	object = dbus_g_proxy_new_for_name(conn, "org.bluez",
-@@ -1202,7 +1246,7 @@ static void adapter_setup(gpointer data,
+@@ -1202,7 +1224,7 @@ static void adapter_setup(gpointer data,
  	dbus_g_proxy_call(object, "SetMinorClass", NULL,
  		G_TYPE_STRING, formfactor, G_TYPE_INVALID, G_TYPE_INVALID);
  
@@ -426,38 +310,7 @@ diff -u -p -r1.55 main.c
  }
  #endif
  
-@@ -1211,6 +1255,7 @@ static void add_adapter(const char *path
- 	GList *list;
- 	DBusGProxy *object;
- 	struct adapter_data *adapter;
-+	const char *old_mode;
- 
- 	list = g_list_find_custom(adapter_list, path, adapter_compare);
- 	if (list && list->data) {
-@@ -1241,7 +1286,7 @@ static void add_adapter(const char *path
- 					G_TYPE_STRING, G_TYPE_INVALID);
- 
- 	dbus_g_proxy_connect_signal(object, "ModeChanged",
--				G_CALLBACK(mode_changed), NULL, NULL);
-+				G_CALLBACK(mode_changed), adapter, NULL);
- 
- 	dbus_g_proxy_add_signal(object, "BondingCreated",
- 					G_TYPE_STRING, G_TYPE_INVALID);
-@@ -1254,6 +1299,13 @@ static void add_adapter(const char *path
- 
- 	dbus_g_proxy_connect_signal(object, "BondingRemoved",
- 				G_CALLBACK(bonding_removed), NULL, NULL);
-+
-+	old_mode = NULL;
-+	dbus_g_proxy_call(object, "GetMode", NULL,
-+			  G_TYPE_INVALID, G_TYPE_STRING,
-+			  &old_mode, G_TYPE_INVALID);
-+	if (old_mode != NULL)
-+		set_new_mode(adapter, old_mode);
- }
- 
- static void adapter_added(DBusGProxy *object,
-@@ -1412,7 +1464,7 @@ static void settings_callback(GObject *w
+@@ -1412,7 +1434,7 @@ static void settings_callback(GObject *w
  	const char *command = "bluetooth-properties";
  
  	if (!g_spawn_command_line_async(command, NULL))
@@ -466,63 +319,7 @@ diff -u -p -r1.55 main.c
  }
  
  static void activate_callback(GObject *widget, gpointer user_data)
-@@ -1465,27 +1517,34 @@ static GConfEnumStringPair icon_policy_e
- static void gconf_callback(GConfClient *client, guint cnxn_id,
- 					GConfEntry *entry, gpointer user_data)
- {
--	if (gconf_entry_get_value(entry) == NULL)
-+	GConfValue *value;
-+
-+	value = gconf_entry_get_value(entry);
-+	if (value == NULL)
- 		return;
- 
- 	if (strcmp(entry->key, PREF_USE_HAL) == 0) {
--		use_hal = gconf_client_get_bool(client, entry->key, NULL);
--
- #ifdef HAVE_HAL
-+		use_hal = gconf_value_get_bool (value);
-+
- 		if (use_hal == TRUE)
- 			g_list_foreach(adapter_list, adapter_setup, NULL);
--#endif
-+
-+		return;
-+#else
-+		use_hal = FALSE;
-+		return;
-+#endif /* HAVE_HAL */
- 	}
- 
- 	if (strcmp(entry->key, PREF_ICON_POLICY) == 0) {
- 		gboolean visible;
--		char *str;
-+		const char *str;
- 
--		str = gconf_client_get_string(client, entry->key, NULL);
-+		str = gconf_value_get_string (value);
- 		if (str) {
- 			gconf_string_to_enum(icon_policy_enum_map,
- 							str, &icon_policy);
--			g_free(str);
- 		}
- 
- 		visible = gtk_status_icon_get_visible(statusicon);
-@@ -1498,10 +1557,12 @@ static void gconf_callback(GConfClient *
- 			visible = attached_adapters() > 0 ? TRUE : FALSE;
- 
- 		gtk_status_icon_set_visible(statusicon, visible);
-+
-+		return;
- 	}
- 
- 	if (strcmp(entry->key, PREF_AUTO_AUTHORIZE) == 0)
--		auto_authorize = gconf_client_get_bool(client, entry->key, NULL);
-+		auto_authorize = gconf_value_get_bool (value);
- }
- 
- int main(int argc, char *argv[])
-@@ -1521,7 +1582,7 @@ int main(int argc, char *argv[])
+@@ -1521,7 +1543,7 @@ int main(int argc, char *argv[])
  
  	conn = dbus_g_bus_get(DBUS_BUS_SYSTEM, &error);
  	if (error != NULL) {
@@ -531,23 +328,13 @@ diff -u -p -r1.55 main.c
  							error->message);
  		g_error_free(error);
  		exit(EXIT_FAILURE);
-@@ -1529,7 +1590,9 @@ int main(int argc, char *argv[])
- 
- 	gconf = gconf_client_get_default();
- 
-+#ifdef HAVE_HAL
- 	use_hal = gconf_client_get_bool(gconf, PREF_USE_HAL, NULL);
-+#endif
- 
- 	str = gconf_client_get_string(gconf, PREF_ICON_POLICY, NULL);
- 	if (str) {
 Index: po/POTFILES.in
 ===================================================================
 RCS file: /cvsroot/bluez/gnome/po/POTFILES.in,v
 retrieving revision 1.2
 diff -u -p -r1.2 POTFILES.in
 --- po/POTFILES.in	20 Aug 2006 01:40:44 -0000	1.2
-+++ po/POTFILES.in	26 Feb 2007 16:30:52 -0000
++++ po/POTFILES.in	26 Feb 2007 14:59:48 -0000
 @@ -1,2 +1,3 @@
  applet/main.c
 +properties/main.c
@@ -558,7 +345,7 @@ RCS file: /cvsroot/bluez/gnome/properties/main.c,v
 retrieving revision 1.33
 diff -u -p -r1.33 main.c
 --- properties/main.c	26 Feb 2007 10:46:50 -0000	1.33
-+++ properties/main.c	26 Feb 2007 16:30:52 -0000
++++ properties/main.c	26 Feb 2007 14:59:49 -0000
 @@ -186,12 +186,12 @@ static GtkWidget *create_label(const gch
  
  static void create_general(void)
@@ -781,62 +568,7 @@ diff -u -p -r1.33 main.c
  
  	adapter->combo = combobox;
  
-@@ -1589,42 +1608,40 @@ static DBusGProxy *setup_dbus(void)
- static void gconf_callback(GConfClient *client, guint cnxn_id,
- 					GConfEntry *entry, gpointer user_data)
- {
--	if (gconf_entry_get_value(entry) == NULL)
-+	GConfValue *value;
-+
-+	value = gconf_entry_get_value(entry);
-+	if (value == NULL)
- 		return;
- 
- 	if (strcmp(entry->key, PREF_USE_HAL) == 0) {
--		gboolean value;
--
--		value = gconf_client_get_bool(client, entry->key, NULL);
--
- 		if (!button_usehal)
- 			return;
- 
--		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button_usehal), value);
-+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button_usehal),
-+					     gconf_value_get_bool(value));
-+		return;
- 	}
- 
- 	if (strcmp(entry->key, PREF_ICON_POLICY) == 0) {
--		char *str;
-+		const char *str;
- 
--		str = gconf_client_get_string(client, entry->key, NULL);
-+		str = gconf_value_get_string(value);
- 		if (str) {
- 			gconf_string_to_enum(icon_policy_enum_map,
- 							str, &icon_policy);
--			g_free(str);
- 		}
- 
- 		update_icon_policy(NULL);
-+		return;
- 	}
- 
- 	if (strcmp(entry->key, PREF_AUTO_AUTHORIZE) == 0) {
--		gboolean value;
--
--		value = gconf_client_get_bool(client, entry->key, NULL);
--
- 		if (!button_autoauth)
- 			return;
- 
--		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button_autoauth), value);
-+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button_autoauth),
-+					     gconf_value_get_bool(value));
- 	}
- }
- 
-@@ -1642,7 +1659,7 @@ int main(int argc, char *argv[])
+@@ -1642,7 +1661,7 @@ int main(int argc, char *argv[])
  
  	conn = dbus_g_bus_get(DBUS_BUS_SYSTEM, &error);
  	if (error != NULL) {
@@ -851,7 +583,7 @@ RCS file: /cvsroot/bluez/gnome/proximity/main.c,v
 retrieving revision 1.23
 diff -u -p -r1.23 main.c
 --- proximity/main.c	11 Feb 2007 21:36:19 -0000	1.23
-+++ proximity/main.c	26 Feb 2007 16:30:52 -0000
++++ proximity/main.c	26 Feb 2007 14:59:49 -0000
 @@ -514,7 +514,7 @@ int main(int argc, char *argv[])
  
  	conn = dbus_g_bus_get(DBUS_BUS_SYSTEM, &error);
@@ -862,7 +594,7 @@ diff -u -p -r1.23 main.c
  		g_error_free(error);
  		exit(EXIT_FAILURE);
 
---=-xgGudZScJDGB9xEiepj3
+--=-UC4KsqkwnviRFyaIOZxE
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -873,7 +605,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---=-xgGudZScJDGB9xEiepj3
+--=-UC4KsqkwnviRFyaIOZxE
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -884,4 +616,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-xgGudZScJDGB9xEiepj3--
+--=-UC4KsqkwnviRFyaIOZxE--
