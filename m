@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <45E2A6C5.3070205@pracucci.com>
-References: <45DECF51.2020901@pracucci.com>
-	<1172447493.20450.17.camel@violet>  <45E2A6C5.3070205@pracucci.com>
-Date: Mon, 26 Feb 2007 10:25:26 +0100
-Message-Id: <1172481926.27370.6.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Timeout on sdp_connect()
+Message-ID: <45E2A6D1.6020407@yahoo.com.au>
+Date: Mon, 26 Feb 2007 10:22:25 +0100
+From: bluez.mexon@spamgourmet.com
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+References: <Pine.LNX.4.64.0702122031580.2496@cherokee.spacecom.si>	<45D2FC34.9040303@yahoo.com.au>
+	<20070216094451.GA7005@jolt.modeemi.cs.tut.fi>
+	<45D58DDF.5020902@yahoo.com.au>
+In-Reply-To: <45D58DDF.5020902@yahoo.com.au>
+Subject: Re: [Bluez-users] Shopping advice: bluetooth 2.0 USB dongle with
+	CSR chipset?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,40 +19,73 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marco,
-
-> >> I would like to set a timeout on sdp_connect(), because the default 
-> >> socket timeout is too high for my application. Is there any way to do it?
-> >
-> > my guess is that you wanna modify the page timeout. Look up on that.
-> >   
-> No.
-> Sometimes it happens that the paging is done successfully but, for any 
-> reason, the L2CAP connection to the remote SDP server fails with a 
-> "Connection timeout". This could happen when the remote device exits 
-> from the coverage area of the device that created the connection. 
-> However, the default timeout is too high for my application, so I would 
-> like to decrease it. Is there any way to do it?
-
-if I remember correctly then this is hardcoded into the SDP part of the
-Bluetooth library.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+TWF0dGhldyBFeG9uIHdyb3RlOgo+IEFuc3NpIFNhYXJpIC0gYW5zc2kuc2FhcmlAbW9kZWVtaS5m
+aSB3cm90ZToKPj4gT24gV2VkLCBGZWIgMTQsIDIwMDcgYXQgMDE6MTA6MjhQTSArMDEwMCwgYmx1
+ZXoubWV4b25Ac3BhbWdvdXJtZXQuY29tIHdyb3RlOgo+PiAgCj4+PiAgSSdtIHNsaWdodGx5IG5l
+cnZvdXMgdGhhdCB3aGF0IEkndmUgYm91Z2h0IGlzIGEgIkROLTMwMDhNMSIsIG5vdCBhCj4+PiAi
+RE4tMzAwOCIsIGJ1dCBJIGd1ZXNzIHRoYXQncyB0aGUga2luZCBvZiBtb2RlbCBudW1iZXIgdmFy
+aWF0aW9uIHlvdQo+Pj4gYWx3YXlzIGdldC4KPj4gIAo+PiBIYXZlIHlvdSByZWNlaXZlZCB0aGlz
+IHlldD8gSSdkIGxpa2UgdG8gaGVhciBzb21lIGV4cGVyaWVuY2VzLiBXaXRoIGEKPj4gbGl0dGxl
+IHNlYXJjaGluZyBJIGZvdW5kIGEgc291cmNlIGZvciB0aGUgVG9zaGliYSBhZGFwdGVyIGhlcmUg
+aW4gRmlubGFuZCwKPj4gYnV0IEkgdGhvdWdodCB3aHkgbm90IGdvIGZvciBhIGNsYXNzIDEgZGV2
+aWNlPwo+IAo+IE5vdCB5ZXQsIEkgZXhwZWN0IGl0IHRvIGFycml2ZSBuZXh0IHdlZWsuICBBbmQg
+SSBtaWdodCBub3QgaGF2ZSB0aW1lIHRvCj4gcHJvcGVybHkgcGxheSB3aXRoIGl0IHVudGlsIHRo
+ZSB3ZWVrZW5kIGFmdGVyLiAgQnV0IEknbGwgYmUgc3VyZSB0byBnaXZlCj4gYSByZXBvcnQuCgpX
+ZWxsLCBpZiB5b3Ugd2FudCBteSBleHBlcmllbmNlcyBoZXJlIHRoZXkgYXJlOgoKTXkgZXhwZXJp
+ZW5jZXMgd2VyZSBiYWQuICBCYWQgYmFkIGJhZGRpdHkgYmFkLgoKRmlyc3Qgb2YgYWxsLCBJIHJh
+dGhlciBzdHVwaWRseSBkaWRuJ3Qgbm90aWNlIHRoYXQgdGhlIEROLTMwMDggaXMgYQpCbHVldG9v
+dGggMS4xIGRldmljZSwgbm90IEJsdWV0b290aCAyLjAuICBJZiBJJ2Qgbm90aWNlZCB0aGF0LCBJ
+J2QgbmV2ZXIKaGF2ZSBib3VnaHQgaXQuICBCdXQgdGhlcmUgeW91IGdvLCB3ZSBhbGwgbWFrZSBt
+aXN0YWtlcy4KClNlY29uZCBvZiBhbGwsIGFmdGVyIG11Y2ggYm90aGVyaW5nIG9mIE1hcmNlbCBI
+b2x0bWFubiwgSSBmaWd1cmVkIG91dAp0aGF0IGl0J3Mgbm90IGFuIGV4dGVybmFsIGZsYXNoIHZl
+cnNpb24gb2YgQmx1ZWNvcmUgZWl0aGVyLiAgVGhpcyBtZWFucwp0aGF0IEhJRCBwcm94eSBjYW5u
+b3QgcG9zc2libHkgd29yaywgZXZlbiBpZiB0aGUgY2hpcHNldCB0aGVvcmV0aWNhbGx5CnN1cHBv
+cnRzIGl0LiAgSSBkb24ndCBrbm93IHdoZXRoZXIgdGhpcyBpcyBiZWNhdXNlIEkgYm91Z2h0IGEK
+IkROLTMwMDhNMSIgaW5zdGVhZCBvZiBhICJETi0zMDA4Iiwgb3Igd2hldGhlciB0aGF0IE5ldyBa
+ZWFsYW5kIHdlYnNpdGUKd2FzIGp1c3QgbHlpbmcsIGJ1dCBJJ20gbm90IGdvaW5nIHRvIHNpbmsg
+YW5vdGhlciDigqwyMCBmaW5kaW5nIG91dC4KCkluZGVlZCwgaXQgc2VlbXMgdGhhdCBub3dhZGF5
+cyAqbm8tb25lKiBib3RoZXJzIG1ha2luZyBCbHVldG9vdGggZG9uZ2xlcwp3aXRoIGJ1aWx0LWlu
+IGZsYXNoLiAgUHJlc3VtYWJseSB0aGlzIGlzIGJlY2F1c2UgaXQgZ3JlYXRseSBpbmNyZWFzZXMK
+dGhlIGNvc3Qgb2YgbWFudWZhY3R1cmluZywgd2hpbGUgb25seSBhIHZhbmlzaGluZ2x5IHNtYWxs
+IG51bWJlciBvZgpjdXN0b21lcnMgYXJlIGdvaW5nIHRvIHRoaW5rIHRvIGFzayB3aGV0aGVyIHRo
+aXMgYmx1ZXRvb3RoIGtleWJvYXJkCnRoYXQncyBmb3Igc2FsZSBjYW4gYmUgdXNlZCB0byBhbHRl
+ciBCSU9TIHNldHRpbmdzLiAgU28gYmFzaWNhbGx5IEknbQphc2tpbmcgZm9yIHRoZSBpbXBvc3Np
+YmxlIGhlcmUuCgpNeSBwbGFuIEIgaXMgdG8gdHJ5IHRvIHJlZmxhc2ggbXkgZXhpc3RpbmcgREJU
+LTEyMCBzbyB0aGF0IGl0J2xsIHN1cHBvcnQKdGhlIEhJRCBwcm94eSBmZWF0dXJlLiAgQnV0IHNp
+bmNlIHRoZSB1cGRhdGVkIGZpcm13YXJlIHdhcyBhcHBhcmVudGx5Cm9ubHkgZXZlciBhdmFpbGFi
+bGUgZnJvbSBBcHBsZSwgYW5kIHRoZXkgb25seSBwcm92aWRlZCB0aGUgZmlybXdhcmUKaW5zaWRl
+IGEgZGlzayBpbWFnZSB0aGF0IGNhbiBvbmx5IGJlIGV4dHJhY3RlZCBvbiBhIE1hY2ludG9zaCwg
+YW5kIHNpbmNlCnRoZXkndmUgbm93IGFwcGFyZW50bHkgcmVtb3ZlZCBldmVuIHRoYXQgZGlzayBp
+bWFnZSBmcm9tIHRoZWlyIHdlYnNpdGUsCmFuZCBzaW5jZSB0aGUgd2hvbGUgcHJvY2VzcyBpcyBx
+dWl0ZSBwb3NzaWJseSBnb2luZyB0byBraWxsIHRoZSBkb25nbGUKcGVybWFuZW50bHkgaW4gYW55
+IGNhc2UsIHRoaXMgaXMgbGlrZWx5IHRvIHByb3ZlIGltcG9zc2libGUgdG9vLgoKSSdtIGEgbGl0
+dGxlIHNob2NrZWQgYnkgdGhpcy4gIFlvdSBjYW4ndCBnbyBhcm91bmQgc2VsbGluZyBCbHVldG9v
+dGgKa2V5Ym9hcmRzIHRvIHBlb3BsZSB3aXRob3V0IHdhcm5pbmcgdGhlbSB0aGF0IHRoZXkgc3Rp
+bGwgbmVlZCBhIHdpcmVkCmtleWJvYXJkIGluIGNhc2UgdGhleSBnZXQgaW50byB0cm91YmxlIGFu
+ZCBuZWVkIHRvIHVzZSB0aGVpciBXaW5kb3dzIENECm9yIHNvbWV0aGluZy4gIFRoYXQncyBqdXN0
+IHNldHRpbmcgcGVvcGxlIHVwIGZvciBwYWluIGFuZCBzdWZmZXJpbmcsCmV2ZW4gYmV5b25kIHRo
+ZSBjb25mdXNpb24gYW5kIGNvbXBsaWNhdGlvbiBpbmhlcmVudCB0byBCbHVldG9vdGggaXRzZWxm
+LgogQW5kIGhlcmUgd2UgaGF2ZSBhIHNpbXBsZSBzb2x1dGlvbiB0aGF0IGNvdWxkIGN1dCB0aHJv
+dWdoIHRoZSB3aG9sZQpwcm9ibGVtLCBhbmQgaXQncyBhY3RpdmVseSBiZWluZyB3aXRoZHJhd24g
+YmVjYXVzZSBjcmFwIHNlbGxzIGJldHRlcgp0aGFuIHF1YWxpdHkuICBCbHVldG9vdGggaXMgZG9v
+bWVkIGlmIHRoaXMgaXMgd2hhdCdzIGdvaW5nIHRvIGdldCBwdXNoZWQKb3V0IHRvIGNvbnN1bWVy
+cy4KCkJ1dCBhbnl3YXkuICBJZiB5b3UncmUgZ29pbmcgdG8gYnV5IGEgVVNCIEJsdWV0b290aCBk
+b25nbGUgYW5kIHdhbnQgdG8KdXNlIEhJRCBwcm94eSwgbWFrZSBzdXJlIHlvdSBydW4gImhjaWNv
+bmZpZyBoY2kwIHJldmlzaW9uIiBhbmQgbWFrZSBzdXJlCnRoYXQgaXQgZG9lc24ndCBzYXkgIkNo
+aXAgdmVyc2lvbjogQmx1ZUNvcmUzLVJPTSIuICBBbmQgaWYgeW91IGZpbmQgYQpzb3VyY2Ugb2Yg
+ZG9uZ2xlcyB0aGF0IHNheSAiQmx1ZUNvcmU0LUV4dGVybmFsIiwgcGxlYXNlIGxldCB0aGUgbGlz
+dCBrbm93Li4uCgpodHRwOi8vc291cmNlZm9yZ2UubmV0L21haWxhcmNoaXZlL2ZvcnVtLnBocD90
+aHJlYWRfaWQ9MzE2ODUzMjImZm9ydW1faWQ9MTg4MQoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUYWtlIFN1
+cnZleXMuIEVhcm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQKSm9pbiBTb3VyY2VG
+b3JnZS5uZXQncyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFuY2UgdG8gc2hh
+cmUgeW91cgpvcGluaW9ucyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdoIGJyaWVmIHN1
+cnZleXMtYW5kIGVhcm4gY2FzaApodHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3Bh
+Z2U9am9pbi5waHAmcD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCl9fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdApCbHVl
+ei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5u
+ZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
