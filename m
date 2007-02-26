@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45E3B6DF.4000008@xmission.com>
-Date: Mon, 26 Feb 2007 21:43:11 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Date: Mon, 26 Feb 2007 02:20:11 -0800 (PST)
+From: Bluezapper <enigma_enu@yahoo.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <Pine.LNX.4.64.0702122031580.2496@cherokee.spacecom.si>	<45D2FC34.9040303@yahoo.com.au>	<20070216094451.GA7005@jolt.modeemi.cs.tut.fi>	<45D58DDF.5020902@yahoo.com.au>
-	<45E2A6D1.6020407@yahoo.com.au>
-In-Reply-To: <45E2A6D1.6020407@yahoo.com.au>
-Subject: Re: [Bluez-users] Shopping advice: bluetooth 2.0 USB dongle with
- CSR chipset?
+Message-ID: <359735.71388.qm@web43141.mail.sp1.yahoo.com>
+Subject: [Bluez-users] Rococo and Bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,30 +14,65 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0693500166=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hey
+--===============0693500166==
+Content-Type: multipart/alternative; boundary="0-293413230-1172485211=:71388"
+Content-Transfer-Encoding: 8bit
 
-> that it doesn't say "Chip version: BlueCore3-ROM".  And if you find a
-> source of dongles that say "BlueCore4-External", please let the list know...
+--0-293413230-1172485211=:71388
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-I've noticed these getting harder to find too.
+Hi,
+ 
+ I am a newbie in this group.I am interested in developing bluetooth applications in Java. Can I use Bluez protocol stack and Rococo development kit together for making my applications.
+ 
+ Also I would like to know from the users in this group whether they are using any IDE for writing their C programs or you do it with a text editor.
+ 
+ I am using Ubuntu(Dapper Drake).
+ 
+ thanks in advance for your replies and suggestions,
+ 
+ regards,
+ 
+ bluezapper.
+ 
+---------------------------------
+Expecting? Get great news right away with email Auto-Check.
+Try the Yahoo! Mail Beta.
+--0-293413230-1172485211=:71388
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-fwiw the only -ext I have is the wt11-a-hci bluetooth module from
-semiconductorstore.com. you still have to add a regulator and a usb
-connector. It would be best if you could find someone integrating this
-module or talk someone into laying it out for batchpcb.com
+Hi,<br> <br> I am a newbie in this group.I am interested in developing bluetooth applications in Java. Can I use Bluez protocol stack and Rococo development kit together for making my applications.<br> <br> Also I would like to know from the users in this group whether they are using any IDE for writing their C programs or you do it with a text editor.<br> <br> I am using Ubuntu(Dapper Drake).<br> <br> thanks in advance for your replies and suggestions,<br> <br> regards,<br> <br> bluezapper.<p>&#32;
 
-brad
+<hr size=1>Expecting? Get great news right away with <a href="http://us.rd.yahoo.com/evt=49982/*http://advision.webevents.yahoo.com/mailbeta/newmail_tools.html">email Auto-Check.</a><br>Try the <a href="http://us.rd.yahoo.com/evt=49982/*http://advision.webevents.yahoo.com/mailbeta/newmail_tools.html">Yahoo! Mail Beta.</a>
+--0-293413230-1172485211=:71388--
+
+
+--===============0693500166==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============0693500166==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0693500166==--
