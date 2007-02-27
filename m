@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <52950c3f0702271456i50da8e9dj3f298ff62eb375dc@mail.gmail.com>
-Date: Tue, 27 Feb 2007 17:56:32 -0500
-From: "Timur Alperovich" <timur.alperovich@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <758601.98585.qm@web62314.mail.re1.yahoo.com>
+Message-ID: <3d3168e50702271354k38405a87kb464eff0ccabfa5e@mail.gmail.com>
+Date: Tue, 27 Feb 2007 22:54:07 +0100
+From: "=?ISO-8859-2?Q?Micha=B3_Majchrowicz?=" <mmajchrowicz@gmail.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <3d3168e50702271202i719f1f7fjd2fb22b105f951f8@mail.gmail.com>
 MIME-Version: 1.0
-References: <4f436aae0702271216y1afc8a96q1107f7627971552e@mail.gmail.com>
-	<758601.98585.qm@web62314.mail.re1.yahoo.com>
-Subject: Re: [Bluez-users] current Bluez document describing
+References: <3d3168e50702270853u31b66304w5e95b23386a88a54@mail.gmail.com>
+	<20070227122248.z4cs4s8ocsg0ow0w@www.webmail4.com>
+	<3d3168e50702271202i719f1f7fjd2fb22b105f951f8@mail.gmail.com>
+Subject: [Bluez-users] Fwd:  Problem with PAN. Bnep doesn't work ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,108 +18,104 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0179141434=="
+Content-Type: multipart/mixed; boundary="===============0302105588=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0179141434==
+--===============0302105588==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_4387_26296310.1172616992128"
+	boundary="----=_Part_24355_13938817.1172613247293"
 
-------=_Part_4387_26296310.1172616992128
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+------=_Part_24355_13938817.1172613247293
+Content-Type: text/plain; charset=ISO-8859-13; format=flowed
+Content-Transfer-Encoding: base64
 Content-Disposition: inline
 
-Hi there,
-
-When I was figuring out how to program some network apps over bluetooth the
-following guide seemed to be pretty helpful:
-http://people.csail.mit.edu/albert/bluez-intro/
-
-Hope that helps,
-Timur
-
-On 2/27/07, walt shekrota <penguinacity@yahoo.com> wrote:
->
-> >> There is a lot of outdated doc out there for this. It has even been
-> admitted
-> >> here.
-> >> What is the current sanctioned webpage or document that describes it?
->
-> >BlueZ itself changed quite a lot in the last two years. Feel free to use
-> >wiki.bluez.org to create some state of the art documentation.
->
-> Well this is an official place I guess but it has little?
-> I am not suggesting who should but thought an official place might
-> contain at least the most recent pertinant info.
-> To tell me to do it is a chicken/egg thing I know nothing.
-> :)
->
-> >> or what does rfcomm do and how
-> >>what is the device named in rfcomm.conf? (the dongle?)
-> >>Maybe the comment might say that if it is.
-> >> Saying 'the device' is rather obtuse.
->
-> >No idea what's your question. Be more specific.
->
-> Ok rfcomm is the transport protocol?
-> In the conf file does the 'device' describe the otherside ie headset,
-> phone etc?
-> or is it the address of dongle?
-> It says just 'device' as comment in rfcomm.conf!
-> To use a headset with my computer and a bt dongle does it require this
-> device be
-> defined in that file?
->
-> Thanks for any help. This may not thread I still did not get the email.
-> -Walt
->
-> ------------------------------
-> Don't be flakey. Get Yahoo! Mail for Mobile<http://us.rd.yahoo.com/evt=43909/*http://mobile.yahoo.com/mail>and
-> always stay connected<http://us.rd.yahoo.com/evt=43909/*http://mobile.yahoo.com/mail>to friends.
->
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share
-> your
-> opinions on IT & business topics through brief surveys-and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
-
-------=_Part_4387_26296310.1172616992128
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+LS0tLS0tLS0tLSBGb3J3YXJkZWQgbWVzc2FnZSAtLS0tLS0tLS0tCkZyb206IE1pY2hh+SBNYWpj
+aHJvd2ljeiA8bW1hamNocm93aWN6QGdtYWlsLmNvbT4KRGF0ZTogMjAwNy0wMi0yNyAyMTowMgpT
+dWJqZWN0OiBSZTogW0JsdWV6LXVzZXJzXSBQcm9ibGVtIHdpdGggUEFOLiBCbmVwIGRvZXNuJ3Qg
+d29yayA/ClRvOiAicm9iZXJ0QGluZm90aWxpdHkuY29tIiA8cm9iZXJ0QGluZm90aWxpdHkuY29t
+PgoKVGhlcmUgaXMgbm8gZXJyb3IgaW4gL3Zhci9sb2cvbWVzc2FnZXMKbDJwaW5nIE1BQyBhZGRy
+ZXMgb2YgbWFjaGluZSB3b3JrcwpoY2l0b29sIHNjYW4gd29ya3MgcGVyZmVjbHkKc2RwdG9vbCBi
+cm93c2Ugc2hvdyB0aGlzOgpCcm93c2luZyA2Njo1NTo0NDozMzoyMjoxMSAuLi4KU2VydmljZSBO
+YW1lOiBOZXR3b3JrIEFjY2VzcyBQb2ludApTZXJ2aWNlIFJlY0hhbmRsZTogMHgxMDAwMApTZXJ2
+aWNlIENsYXNzIElEIExpc3Q6CiAgIk5ldHdvcmsgQWNjZXNzIFBvaW50IiAoMHgxMTE2KQpQcm90
+b2NvbCBEZXNjcmlwdG9yIExpc3Q6CiAgIkwyQ0FQIiAoMHgwMTAwKQogICAgUFNNOiAxNQogICJC
+TkVQIiAoMHgwMDBmKQogICAgVmVyc2lvbjogMHgwMTAwCiAgICBTRVExNjogODAwIDgwNgpQcm9m
+aWxlIERlc2NyaXB0b3IgTGlzdDoKICAiTmV0d29yayBBY2Nlc3MgUG9pbnQiICgweDExMTYpCiAg
+ICBWZXJzaW9uOiAweDAxMDAKQXMgSSBzYWlkIGJlZm9yZS4gVGhlcmUgaXMgbm8gaW5kaWNhdGlv
+biBvZiBlcnJvciwgYnV0IHRoZXJlIGhhcyB0byBiZSBzb21lCmVycm9yIDooClJlZ2FyZHMgTWlj
+aGFlbC4KCjIwMDcvMi8yNywgcm9iZXJ0QGluZm90aWxpdHkuY29tIDxyb2JlcnRAaW5mb3RpbGl0
+eS5jb20+Ogo+Cj4gUXVvdGluZyBNaWNoYbMgTWFqY2hyb3dpY3ogPG1tYWpjaHJvd2ljekBnbWFp
+bC5jb20+Ogo+Cj4gPiBIaSBJIGhhdmUgYSBwcm9ibGVtIHdpdGggUEFOLgo+ID4gSSBoYXZlIHN1
+Y2Nlc2Z1bGx5IGNvbmZpZ3VyZWQgcGFuZCBjb25uZWN0aW9uCj4gPiBvbiBzZXZlcjoKPiA+ICBw
+YW5kIC1sCj4gPiBibmVwMCAxMToyMjozMzo0NDo1NTo2NiBOQVAKPiA+IG9uIGNsaWVudDoKPiA+
+IHBhbmQgLWwKPiA+IGJuZXAwIDY2OjU1OjQ0OjMzOjIyOjExIE5BUAo+ID4gd2hlcmUgNjY6NTUu
+Li4uIGlzIE1BQyBvZiBzZXJ2ZXIgYW5kIDExOjIyLi4uLiBpcyBNQUMgb2YgY2xpZW50Lgo+Cj4g
+TWljaGFlbCwgdGhlIHByb2JsZW0gY291bGQgYmUgYW55IG9uZSBvZiBhIG51bWJlciBvZiB0aGlu
+Z3MuLi4KPiBUbyBoZWxwIHdpdGggdHJhY2tpbmcgZG93biB0aGUgc291cmNlIG9mIHRoZSBlcnJv
+ciwgdHJ5IHRoZXNlIHByb2dyYW1zOgo+IHNkcHRvb2wgYnJvd3NlCj4gbDJwaW5nIHh4Lnh4Lnh4
+Lnh4Cj4gaGNpdG9vbCBzY2FuCj4KPiBzaG91bGQgYWxsIHNob3cgc29tZXRoaW5nLgo+IEFsc28g
+dHJ5IHRhaWwgLWYgL3Zhci9sb2cvbWVzc2FnZXMKPiB0byBzZWUgaWYgdGhlIGtlcm5lbCB3cml0
+ZXMgc29tZXRoaW5nIHRoZXJlLgo+Cj4gU29ycnkgSSBjYW4ndCBiZSBtb3JlIGhlbHBmdWwuIExl
+dCB1cyBrbm93IGhvdyBpdCBnb2VzLgo+Cj4gUm9iZXJ0IERvZGllcgo+Cg==
+------=_Part_24355_13938817.1172613247293
+Content-Type: text/html; charset=ISO-8859-13
+Content-Transfer-Encoding: base64
 Content-Disposition: inline
 
-Hi there,<br><br>When I was figuring out how to program some network apps over bluetooth the following guide seemed to be pretty helpful: <a href="http://people.csail.mit.edu/albert/bluez-intro/">http://people.csail.mit.edu/albert/bluez-intro/
-</a><br><br>Hope that helps,<br>Timur<br><br><div><span class="gmail_quote">On 2/27/07, <b class="gmail_sendername">walt shekrota</b> &lt;<a href="mailto:penguinacity@yahoo.com">penguinacity@yahoo.com</a>&gt; wrote:</span>
-<blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">&gt;&gt; There is a lot of outdated doc out there for this. It has even been admitted <br>   &gt;&gt; here.
-<br>   &gt;&gt; What is the current sanctioned webpage or document that describes it?<br>   <br> &gt;BlueZ itself changed quite a lot in the last two years. Feel free to use<br>   &gt;<a href="http://wiki.bluez.org" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">
-wiki.bluez.org</a> to create some state of the art documentation.<br>   <br> Well this is an official place I guess but it has little?<br> I am not suggesting who should but thought an official place might <br> contain at least the most recent pertinant info.
-<br> To tell me to do it is a chicken/egg thing I know nothing.<br> :)<br> <br>   &gt;&gt; or what does rfcomm do and how<br>   &gt;&gt;what is the device named in rfcomm.conf? (the dongle?)<br>   &gt;&gt;Maybe the comment might say that if it is.
-<br>   &gt;&gt; Saying &#39;the device&#39; is rather obtuse.<br>   <br>   &gt;No idea what&#39;s your question. Be more specific.<br> <br> Ok rfcomm is the transport protocol?<br> In the conf file does the
- &#39;device&#39; describe the otherside ie headset, phone etc?<br> or is it the address of dongle?<br> It says just &#39;device&#39; as comment in rfcomm.conf!<br> To use a headset with my computer and a bt dongle does it require this device be 
-<br> defined in that file?<br> <br> Thanks for any help. This may not thread I still did not get the email.<br><span class="sg"> -Walt<br></span><span class="ad">  <p> 
+PGJyPjxicj4tLS0tLS0tLS0tIEZvcndhcmRlZCBtZXNzYWdlIC0tLS0tLS0tLS08YnI+PHNwYW4g
+Y2xhc3M9ImdtYWlsX3F1b3RlIj5Gcm9tOiA8YiBjbGFzcz0iZ21haWxfc2VuZGVybmFtZSI+TWlj
+aGH5IE1hamNocm93aWN6PC9iPiAmbHQ7PGEgaHJlZj0ibWFpbHRvOm1tYWpjaHJvd2ljekBnbWFp
+bC5jb20iPm1tYWpjaHJvd2ljekBnbWFpbC5jb208L2E+Jmd0Ozxicj5EYXRlOiAyMDA3LTAyLTI3
+IDIxOjAyCjxicj5TdWJqZWN0OiBSZTogW0JsdWV6LXVzZXJzXSBQcm9ibGVtIHdpdGggUEFOLiBC
+bmVwIGRvZXNuJiMzOTt0IHdvcmsgPzxicj5UbzogJnF1b3Q7PGEgaHJlZj0ibWFpbHRvOnJvYmVy
+dEBpbmZvdGlsaXR5LmNvbSI+cm9iZXJ0QGluZm90aWxpdHkuY29tPC9hPiZxdW90OyAmbHQ7PGEg
+aHJlZj0ibWFpbHRvOnJvYmVydEBpbmZvdGlsaXR5LmNvbSI+cm9iZXJ0QGluZm90aWxpdHkuY29t
+CjwvYT4mZ3Q7PGJyPjxicj48L3NwYW4+VGhlcmUgaXMgbm8gZXJyb3IgaW4gL3Zhci9sb2cvbWVz
+c2FnZXM8YnI+bDJwaW5nIE1BQyBhZGRyZXMgb2YgbWFjaGluZSB3b3Jrczxicj5oY2l0b29sIHNj
+YW4gd29ya3MgcGVyZmVjbHk8YnI+c2RwdG9vbCBicm93c2Ugc2hvdyB0aGlzOjxicj5Ccm93c2lu
+ZyA2Njo1NTo0NDozMzoyMjoxMSAuLi48YnI+U2VydmljZSBOYW1lOiBOZXR3b3JrIEFjY2VzcyBQ
+b2ludAo8YnI+U2VydmljZSBSZWNIYW5kbGU6IDB4MTAwMDAKPGJyPlNlcnZpY2UgQ2xhc3MgSUQg
+TGlzdDo8YnI+Jm5ic3A7ICZxdW90O05ldHdvcmsgQWNjZXNzIFBvaW50JnF1b3Q7ICgweDExMTYp
+PGJyPlByb3RvY29sIERlc2NyaXB0b3IgTGlzdDo8YnI+Jm5ic3A7ICZxdW90O0wyQ0FQJnF1b3Q7
+ICgweDAxMDApPGJyPiZuYnNwOyZuYnNwOyZuYnNwOyBQU006IDE1PGJyPiZuYnNwOyAmcXVvdDtC
+TkVQJnF1b3Q7ICgweDAwMGYpPGJyPiZuYnNwOyZuYnNwOyZuYnNwOyBWZXJzaW9uOiAweDAxMDA8
+YnI+Jm5ic3A7Jm5ic3A7Jm5ic3A7IFNFUTE2OiA4MDAgODA2Cjxicj5Qcm9maWxlIERlc2NyaXB0
+b3IgTGlzdDo8YnI+Jm5ic3A7ICZxdW90O05ldHdvcmsgQWNjZXNzIFBvaW50JnF1b3Q7ICgweDEx
+MTYpPGJyPiZuYnNwOyZuYnNwOyZuYnNwOyBWZXJzaW9uOiAweDAxMDA8YnI+QXMgSSBzYWlkIGJl
+Zm9yZS4gVGhlcmUgaXMgbm8gaW5kaWNhdGlvbiBvZiBlcnJvciwgYnV0IHRoZXJlIGhhcyB0byBi
+ZSBzb21lIGVycm9yIDooPGJyPlJlZ2FyZHMgTWljaGFlbC48YnI+PGJyPjxkaXY+PHNwYW4gY2xh
+c3M9ImdtYWlsX3F1b3RlIj4KCjIwMDcvMi8yNywgPGEgaHJlZj0ibWFpbHRvOnJvYmVydEBpbmZv
+dGlsaXR5LmNvbSIgdGFyZ2V0PSJfYmxhbmsiIG9uY2xpY2s9InJldHVybiB0b3AuanMuT3BlbkV4
+dExpbmsod2luZG93LGV2ZW50LHRoaXMpIj5yb2JlcnRAaW5mb3RpbGl0eS5jb208L2E+ICZsdDs8
+YSBocmVmPSJtYWlsdG86cm9iZXJ0QGluZm90aWxpdHkuY29tIiB0YXJnZXQ9Il9ibGFuayIgb25j
+bGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiPgpyb2Jl
+cnRAaW5mb3RpbGl0eS5jb208L2E+Jmd0Ozo8L3NwYW4+PGRpdj48c3BhbiBjbGFzcz0iZSIgaWQ9
+InFfMTExMDRjYzYzNzM4ZGYzZF8xIj48YmxvY2txdW90ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0
+eWxlPSJib3JkZXItbGVmdDogMXB4IHNvbGlkIHJnYigyMDQsIDIwNCwgMjA0KTsgbWFyZ2luOiAw
+cHQgMHB0IDBwdCAwLjhleDsgcGFkZGluZy1sZWZ0OiAxZXg7Ij4KUXVvdGluZyBNaWNoYbMgTWFq
+Y2hyb3dpY3ogJmx0OzxhIGhyZWY9Im1haWx0bzptbWFqY2hyb3dpY3pAZ21haWwuY29tIiB0YXJn
+ZXQ9Il9ibGFuayIgb25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5kb3csZXZl
+bnQsdGhpcykiPm1tYWpjaHJvd2ljekBnbWFpbC5jb208L2E+Jmd0Ozo8YnI+PGJyPiZndDsgSGkg
+SSBoYXZlIGEgcHJvYmxlbSB3aXRoIFBBTi48YnI+Jmd0OyBJIGhhdmUgc3VjY2VzZnVsbHkgY29u
+ZmlndXJlZCBwYW5kIGNvbm5lY3Rpb24KPGJyPiZndDsgb24gc2V2ZXI6PGJyPiZndDsmbmJzcDsm
+bmJzcDtwYW5kIC1sCjxicj4mZ3Q7IGJuZXAwIDExOjIyOjMzOjQ0OjU1OjY2IE5BUDxicj4mZ3Q7
+IG9uIGNsaWVudDo8YnI+Jmd0OyBwYW5kIC1sPGJyPiZndDsgYm5lcDAgNjY6NTU6NDQ6MzM6MjI6
+MTEgTkFQPGJyPiZndDsgd2hlcmUgNjY6NTUuLi4uIGlzIE1BQyBvZiBzZXJ2ZXIgYW5kIDExOjIy
+Li4uLiBpcyBNQUMgb2YgY2xpZW50Ljxicj48YnI+TWljaGFlbCwgdGhlIHByb2JsZW0gY291bGQg
+YmUgYW55IG9uZSBvZiBhIG51bWJlciBvZiB0aGluZ3MuLi4KPGJyPlRvIGhlbHAgd2l0aCB0cmFj
+a2luZyBkb3duIHRoZSBzb3VyY2Ugb2YgdGhlIGVycm9yLCB0cnkgdGhlc2UgcHJvZ3JhbXM6PGJy
+PnNkcHRvb2wgYnJvd3NlPGJyPmwycGluZyB4eC54eC54eC54eDxicj5oY2l0b29sIHNjYW48YnI+
+PGJyPnNob3VsZCBhbGwgc2hvdyBzb21ldGhpbmcuPGJyPkFsc28gdHJ5IHRhaWwgLWYgL3Zhci9s
+b2cvbWVzc2FnZXM8YnI+dG8gc2VlIGlmIHRoZSBrZXJuZWwgd3JpdGVzIHNvbWV0aGluZyB0aGVy
+ZS4KPGJyPjxicj5Tb3JyeSBJIGNhbiYjMzk7dCBiZSBtb3JlIGhlbHBmdWwuIExldCB1cyBrbm93
+IGhvdyBpdCBnb2VzLjxicj48YnI+Um9iZXJ0IERvZGllcjxicj48L2Jsb2NrcXVvdGU+PC9zcGFu
+PjwvZGl2PjwvZGl2Pjxicj4K
+------=_Part_24355_13938817.1172613247293--
 
-</p><hr size="1">Don&#39;t be flakey. <a href="http://us.rd.yahoo.com/evt=43909/*http://mobile.yahoo.com/mail" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">Get Yahoo! Mail for Mobile</a> and <br>
-<a href="http://us.rd.yahoo.com/evt=43909/*http://mobile.yahoo.com/mail" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">always stay connected</a> to friends.<p></p></span><br>-------------------------------------------------------------------------
-<br>Take Surveys. Earn Cash. Influence the Future of IT<br>Join SourceForge.net&#39;s Techsay panel and you&#39;ll get the chance to share your<br>opinions on IT &amp; business topics through brief surveys-and earn cash<br>
-<a onclick="return top.js.OpenExtLink(window,event,this)" href="http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV" target="_blank">http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV
-</a><br>_______________________________________________<br>Bluez-users mailing list<br><a onclick="return top.js.OpenExtLink(window,event,this)" href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net
-</a><br><a onclick="return top.js.OpenExtLink(window,event,this)" href="https://lists.sourceforge.net/lists/listinfo/bluez-users" target="_blank">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br><br></blockquote>
-</div><br>
 
-------=_Part_4387_26296310.1172616992128--
-
-
---===============0179141434==
+--===============0302105588==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -129,7 +126,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0179141434==
+--===============0302105588==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -140,4 +137,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0179141434==--
+--===============0302105588==--
