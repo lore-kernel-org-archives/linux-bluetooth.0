@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4f436aae0702270210j640b9d9xc30335856bcfcf1d@mail.gmail.com>
-Date: Tue, 27 Feb 2007 12:10:13 +0200
-From: "Choi Sonim" <choisonim@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Message-ID: <45E3B6DF.4000008@xmission.com>
+Date: Mon, 26 Feb 2007 21:43:11 -0700
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] pairing from bluez
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <Pine.LNX.4.64.0702122031580.2496@cherokee.spacecom.si>	<45D2FC34.9040303@yahoo.com.au>	<20070216094451.GA7005@jolt.modeemi.cs.tut.fi>	<45D58DDF.5020902@yahoo.com.au>
+	<45E2A6D1.6020407@yahoo.com.au>
+In-Reply-To: <45E2A6D1.6020407@yahoo.com.au>
+Subject: Re: [Bluez-users] Shopping advice: bluetooth 2.0 USB dongle with
+ CSR chipset?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,15 +22,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hello all,
+hey
 
-how can i initiate pairing from bluez ?
-even when I send a file using kbtobexclient, there is no
-pairing proces..
-is there an application for initiating pairing ?
+> that it doesn't say "Chip version: BlueCore3-ROM".  And if you find a
+> source of dongles that say "BlueCore4-External", please let the list know...
 
-thank you all
-choi
+I've noticed these getting harder to find too.
+
+fwiw the only -ext I have is the wt11-a-hci bluetooth module from
+semiconductorstore.com. you still have to add a regulator and a usb
+connector. It would be best if you could find someone integrating this
+module or talk someone into laying it out for batchpcb.com
+
+brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
