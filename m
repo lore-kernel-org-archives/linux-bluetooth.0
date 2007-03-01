@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45E7067F.5010606@ozob.net>
-Date: Thu, 01 Mar 2007 10:59:43 -0600
-From: Gene Imes <ebi7@ozob.net>
+Message-ID: <50563.71.108.25.50.1172789534.squirrel@mail.corecoding.com>
+Date: Thu, 1 Mar 2007 14:52:14 -0800 (PST)
+From: "Chris Monahan" <chris@corecoding.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: list - bluez-users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] audio
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] BCM2045 loading issue
+Reply-To: chris@corecoding.com,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,14 +19,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Does anyone know of a way to send audio from laptop to home 
-entertainment system via bluetooth?
-
-Thanks,
+Thanks to Timur, I got my BCM2045 working. But in order to get it to work,
+I have to run hciconfig hci0 down and restart the bluetooth daemon
+everytime. I'm not sure if this is a distrobution or driver problem, but
+is there a way around this? Do I have to edit my /etc/bluetooth/ config
+files?
 
 
 -- 
-Gene Imes ============================= ozob.net
+Christopher Monahan
+Chief Technology Officer
+Core Coding (http://www.corecoding.com)
+chris@corecoding.com
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
