@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY135-F171176FB88B018246CA11B8800@phx.gbl>
-From: "Vincent Yau" <v_yau3@hotmail.com>
-To: bluez-users@lists.sourceforge.net
-Date: Thu, 01 Mar 2007 17:29:42 +0000
-Mime-Version: 1.0
-Subject: [Bluez-users] PIN Exchange Question
+Message-ID: <45E6F4C2.2030608@xmission.com>
+Date: Thu, 01 Mar 2007 08:44:02 -0700
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] dun performance
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,21 +18,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Guys
 
-Dear All:
+I think this is useful to bluez users since bluez can uncover problems
+in other stacks.
 
-I have setup bluez to use a pin helper that I put in.  It works great to 
-facilitate pin exchange during initial phase of pairing.
+fwiw, I've switched from using a verizon treo 700p to get mobile
+internet to a cingular/att razr v3xx. All you need to know to set this
+up: the dial string is *99# and you can leave the "access point" blank
+if you are using this with a Nokia 770/n800. Leave the auth settings
+blank too.
 
-I want to make it more interactive.  For example, can I get feedback from 
-the request device if a pin I send down is correct or not.  Is there a way 
-to get such a feedback from within my pin helper?
+It's interesting to review the kinds of data rates I've seen using
+bluetooth dun from a linux laptop as I go from phone to phone and
+carrier to carrier:
 
-thanks
+    * moto razr v3xx (cingular, umts) 550kbps
+    * treo 700p (verizon, evdo) 400kbps
+    * moto e815 (verizon, evdo) >600kbps
+    * ppc 6700 (sprint, evdo) phone crashed hard when starting DUN
+    * samsung i730 (verizon, evdo) ~130kbps randomly drops connection
+    * samsung i730 (verizon, 1xrtt) ~130kbps
+    * moto v710 (verizon, 1xrtt) ~130kbps
+    * nokia ngage (tmobile, gprs) ~45kbps
 
---Vince
+The e815 is the only phone that might have been hitting the ceiling for
+bluetooth throughput. Don't listen to salespeople who say bluetooth
+dialup cannot perform well. This myth is in part fueled by the fact that
+MS has such poor performance in its stack. Apparently MS has not
+addressed its bluetooth performance problems in any WM5 devices either.
+Stay away from those things if you need DUN.
 
-
+Brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
