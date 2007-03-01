@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <50788.71.108.25.50.1172776181.squirrel@mail.corecoding.com>
-Date: Thu, 1 Mar 2007 11:09:41 -0800 (PST)
-From: "Chris Monahan" <chris@corecoding.com>
+Message-ID: <BAY135-F171176FB88B018246CA11B8800@phx.gbl>
+From: "Vincent Yau" <v_yau3@hotmail.com>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] Broadcom BCM2045 support?
-Reply-To: chris@corecoding.com,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Thu, 01 Mar 2007 17:29:42 +0000
+Mime-Version: 1.0
+Subject: [Bluez-users] PIN Exchange Question
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,17 +18,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Do the bluez drivers/modules support the BCM2045 yet? I see BCM2033 firmware.
-I have a Dell E1705 Laptop which has the Dell 355 Bluetooth. Any
-information would be awesome.
+
+Dear All:
+
+I have setup bluez to use a pin helper that I put in.  It works great to 
+facilitate pin exchange during initial phase of pairing.
+
+I want to make it more interactive.  For example, can I get feedback from 
+the request device if a pin I send down is correct or not.  Is there a way 
+to get such a feedback from within my pin helper?
+
+thanks
+
+--Vince
 
 
-
--- 
-Christopher Monahan
-Chief Technology Officer
-Core Coding (http://www.corecoding.com)
-chris@corecoding.com
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
