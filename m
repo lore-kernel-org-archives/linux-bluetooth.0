@@ -1,42 +1,78 @@
-Return-Path: <cebbert@redhat.com>
-Message-ID: <45E6F530.6000503@redhat.com>
-Date: Thu, 01 Mar 2007 10:45:52 -0500
-From: Chuck Ebbert <cebbert@redhat.com>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <ddea76ce0703010739pb2a20bbwd21988dafda55ae1@mail.gmail.com>
+Date: Thu, 1 Mar 2007 15:39:55 +0000
+From: "Meenakshi Seeballack" <meena2010@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: bluez-devel@lists.sourceforge.net
-Subject: bluetooth: Another blacklisted device (based on BCM2035)
-Content-Type: multipart/mixed;
- boundary="------------050505010306040501080800"
-List-ID: <bluez-devel.lists.sourceforge.net>
+Subject: [Bluez-devel] Help: installing bluez stack!
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============1850686428=="
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------050505010306040501080800
-Content-Type: text/plain; charset=ISO-8859-1
+--===============1850686428==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_14639_12088943.1172763595423"
+
+------=_Part_14639_12088943.1172763595423
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
+I think I need to start from scratch to get the bluetooth folder in
+/usr/inlcude. So I downloaded these libraries:
+bluez-libs-3.9.tar.gz<http://www.bluez.org/redirect.php?url=http%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-libs-3.9.tar.gz>
+bluez-utils-3.9.tar.gz<http://www.bluez.org/redirect.php?url=http%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-utils-3.9.tar.gz>
+bluez-firmware-1.2.tar.gz<http://www.bluez.org/redirect.php?url=http%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-firmware-1.2.tar.gz>
+bluez-hcidump-1.34.tar.gz<http://www.bluez.org/redirect.php?url=http%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-hcidump-1.34.tar.gz>
+bluez-gnome-0.6.tar.gz<http://www.bluez.org/redirect.php?url=http%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-gnome-0.6.tar.gz>
 
---------------050505010306040501080800
-Content-Type: text/plain;
- name="linux-2.6-20_bluetooth_broadcom_quirk.patch"
+and saved them onto my desktop. Please guide me in my next steps as i am a
+novice to Linux (just installed FC6)?
+
+------=_Part_14639_12088943.1172763595423
+Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="linux-2.6-20_bluetooth_broadcom_quirk.patch"
+Content-Disposition: inline
 
-From: Andy Shevchenko <andy@smile.org.ua>
-Yet another blacklisted Bluetooth device (based on BCM2035)
+I think I need to start from scratch to get the bluetooth folder in /usr/inlcude. So I downloaded these libraries:<br><a href="http://www.bluez.org/redirect.php?url=http%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-libs-3.9.tar.gz" onmouseover="window.status=&#39;http://bluez.sf.net/download/bluez-libs-3.9.tar.gz&#39;; return true;" onmouseout="window.status=&#39;&#39;; return true;">
+bluez-libs-3.9.tar.gz</a><br><a href="http://www.bluez.org/redirect.php?url=http%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-utils-3.9.tar.gz" onmouseover="window.status=&#39;http://bluez.sf.net/download/bluez-utils-3.9.tar.gz&#39;; return true;" onmouseout="window.status=&#39;&#39;; return true;">
+bluez-utils-3.9.tar.gz</a><br><a href="http://www.bluez.org/redirect.php?url=http%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-firmware-1.2.tar.gz" onmouseover="window.status=&#39;http://bluez.sf.net/download/bluez-firmware-1.2.tar.gz&#39;; return true;" onmouseout="window.status=&#39;&#39;; return true;">
+bluez-firmware-1.2.tar.gz</a><br><a href="http://www.bluez.org/redirect.php?url=http%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-hcidump-1.34.tar.gz" onmouseover="window.status=&#39;http://bluez.sf.net/download/bluez-hcidump-1.34.tar.gz&#39;; return true;" onmouseout="window.status=&#39;&#39;; return true;">
+bluez-hcidump-1.34.tar.gz</a><br><a href="http://www.bluez.org/redirect.php?url=http%3A%2F%2Fbluez.sf.net%2Fdownload%2Fbluez-gnome-0.6.tar.gz" onmouseover="window.status=&#39;http://bluez.sf.net/download/bluez-gnome-0.6.tar.gz&#39;; return true;" onmouseout="window.status=&#39;&#39;; return true;">
+bluez-gnome-0.6.tar.gz</a><br><br>and saved them onto my desktop. Please guide me in my next steps as i am a novice to Linux (just installed FC6)?<br>
 
-Signed-off-by: Andy Shevchenko <andy@smile.org.ua>
+------=_Part_14639_12088943.1172763595423--
 
---- a/drivers/bluetooth/hci_usb.c
-+++ b/drivers/bluetooth/hci_usb.c
-@@ -111,6 +111,7 @@ static struct usb_device_id blacklist_ids[] = {
- 	{ USB_DEVICE(0x0a5c, 0x2033), .driver_info = HCI_IGNORE },
- 
- 	/* Broadcom BCM2035 */
-+	{ USB_DEVICE(0x0a5c, 0x2035), .driver_info = HCI_RESET | HCI_WRONG_SCO_MTU },
- 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = HCI_RESET | HCI_WRONG_SCO_MTU },
- 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = HCI_BCM92035 },
- 
 
---------------050505010306040501080800--
+--===============1850686428==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys-and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1850686428==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1850686428==--
