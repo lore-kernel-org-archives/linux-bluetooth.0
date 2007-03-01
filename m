@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45E6F4C2.2030608@xmission.com>
-Date: Thu, 01 Mar 2007 08:44:02 -0700
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <ddea76ce0703010630y5a29fc97rf24578716ed5b00b@mail.gmail.com>
+Date: Thu, 1 Mar 2007 14:30:52 +0000
+From: "Meenakshi Seeballack" <meena2010@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] dun performance
+Subject: [Bluez-users] Missing Bluetooth header file
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,49 +14,96 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============2099009781=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Guys
+--===============2099009781==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_14287_12017667.1172759452267"
 
-I think this is useful to bluez users since bluez can uncover problems
-in other stacks.
+------=_Part_14287_12017667.1172759452267
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-fwiw, I've switched from using a verizon treo 700p to get mobile
-internet to a cingular/att razr v3xx. All you need to know to set this
-up: the dial string is *99# and you can leave the "access point" blank
-if you are using this with a Nokia 770/n800. Leave the auth settings
-blank too.
+Hello,
+I am new to the linux world and I have installed Eclipse, with CDT.
+I am running the simplescan code off this website
+http://people.csail.mit.edu/albert/bluez-intro/c401.html
+and I am getting these errors:
+simplescan.c:6:33: error: bluetooth/bluetooth.h: No such file or directory
+simplescan.c :7:27: error: bluetooth/hci.h: No such file or directory
+simplescan.c:8:31: error: bluetooth/hci_lib.h: No such file or directory
+simplescan.c : In function 'main':
+simplescan.c:12: error: 'inquiry_info' undeclared (first use in this
+function)
+simplescan.c:12: error: (Each undeclared identifier is reported only once
+simplescan.c:12: error: for each function it appears in.)
+simplescan.c:12: error: 'ii' undeclared (first use in this function)
+simplescan.c:28: error: 'IREQ_CACHE_FLUSH' undeclared (first use in this
+function)
+simplescan.c:29: error: expected expression before ')' token
+simplescan.c:36: warning: incompatible implicit declaration of built-in
+function 'memset'
+simplescan.c:39: warning: incompatible implicit declaration of built-in
+function 'strcpy'
+simplescan.c:46:2: warning: no newline at end of file
 
-It's interesting to review the kinds of data rates I've seen using
-bluetooth dun from a linux laptop as I go from phone to phone and
-carrier to carrier:
+I can see these header files:
+/usr/src/kernels/2.6.19-1.2911.fc6-i686/include/net/bluetooth/bluetooth.h
+/usr/src/kernels/2.6.19-1.2911.fc6-i686/include/net/bluetooth/hci.h
+/usr/src/kernels/2.6.19-1.2911.fc6-i686 /include/net/bluetooth/hci_core.h
+/usr/src/kernels/2.6.19-1.2911.fc6-i686/include/net/bluetooth/l2cap.h
+/usr/src/kernels/2.6.19-1.2911.fc6-i686/include/net/bluetooth/rfcomm.h
+/usr/src/kernels/2.6.19-1.2911.fc6-i686 /include/net/bluetooth/sco.h
 
-    * moto razr v3xx (cingular, umts) 550kbps
-    * treo 700p (verizon, evdo) 400kbps
-    * moto e815 (verizon, evdo) >600kbps
-    * ppc 6700 (sprint, evdo) phone crashed hard when starting DUN
-    * samsung i730 (verizon, evdo) ~130kbps randomly drops connection
-    * samsung i730 (verizon, 1xrtt) ~130kbps
-    * moto v710 (verizon, 1xrtt) ~130kbps
-    * nokia ngage (tmobile, gprs) ~45kbps
+Where is the hci_lib.h header file? Can anyone please assist me?
+Meena
 
-The e815 is the only phone that might have been hitting the ceiling for
-bluetooth throughput. Don't listen to salespeople who say bluetooth
-dialup cannot perform well. This myth is in part fueled by the fact that
-MS has such poor performance in its stack. Apparently MS has not
-addressed its bluetooth performance problems in any WM5 devices either.
-Stay away from those things if you need DUN.
+------=_Part_14287_12017667.1172759452267
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Brad
+Hello,<br>I am new to the linux world and I have installed Eclipse, with CDT.<br>I am running the simplescan code off this website <a href="http://people.csail.mit.edu/albert/bluez-intro/c401.html" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">
+http://people.csail.mit.edu/albert/bluez-intro/c401.html
+</a> and I am getting these errors:<br><span style="font-weight: bold;">simplescan.c:6:33: error: bluetooth/bluetooth.h: No such file or directory</span><br style="font-weight: bold;"><span style="font-weight: bold;">simplescan.c
+
+:7:27: error: bluetooth/hci.h: No such file or directory</span><br style="font-weight: bold;"><span style="font-weight: bold;">simplescan.c:8:31: error: bluetooth/hci_lib.h: No such file or directory</span><br>simplescan.c
+
+: In function &#39;main&#39;:<br>simplescan.c:12: error: &#39;inquiry_info&#39; undeclared (first use in this function)<br>simplescan.c:12: error: (Each undeclared identifier is reported only once<br>simplescan.c:12: error: for each function it appears in.)
+<br>simplescan.c:12: error: &#39;ii&#39; undeclared (first use in this function)<br>simplescan.c:28: error: &#39;IREQ_CACHE_FLUSH&#39; undeclared (first use in this function)<br>simplescan.c:29: error: expected expression before &#39;)&#39; token
+<br>simplescan.c:36: warning: incompatible implicit declaration of built-in function &#39;memset&#39;<br>simplescan.c:39: warning: incompatible implicit declaration of built-in function &#39;strcpy&#39;<br>simplescan.c:46:2: warning: no newline at end of file
+<br><br>I can see these header files:<br>/usr/src/kernels/2.6.19-1.2911.fc6-i686/include/net/bluetooth/bluetooth.h<br><div id="mb_0">/usr/src/kernels/2.6.19-1.2911.fc6-i686/include/net/bluetooth/hci.h<br>/usr/src/kernels/2.6.19-
+1.2911.fc6-i686
+/include/net/bluetooth/hci_core.h<br>/usr/src/kernels/2.6.19-1.2911.fc6-i686/include/net/bluetooth/l2cap.h<br>/usr/src/kernels/2.6.19-1.2911.fc6-i686/include/net/bluetooth/rfcomm.h<br>/usr/src/kernels/2.6.19-1.2911.fc6-i686
+
+/include/net/bluetooth/sco.h<br><br>Where is the hci_lib.h header file? Can anyone please assist me?<br>Meena</div>
+
+------=_Part_14287_12017667.1172759452267--
+
+
+--===============2099009781==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============2099009781==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============2099009781==--
