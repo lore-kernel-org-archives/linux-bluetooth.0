@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <45E86076.8090900@mojo-working.com>
+Date: Fri, 02 Mar 2007 09:35:50 -0800
+From: Art Rothstein <art@mojo-working.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <57c68ddc0702282245x777b63e0la3156781ed55804f@mail.gmail.com>
-References: <57c68ddc0702282245x777b63e0la3156781ed55804f@mail.gmail.com>
-Date: Sat, 03 Mar 2007 12:31:40 +0100
-Message-Id: <1172921500.24446.10.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] rfcomm channel and ioctl
+References: <45D3F804.5030601@mojo-working.com>
+	<1171527486.28302.14.camel@violet>
+In-Reply-To: <1171527486.28302.14.camel@violet>
+Subject: Re: [Bluez-devel] Role switch: Detecting, predicting, preventing
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,21 +21,8 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Siddhant,
-
->    Can someone tell me about tutorial describing how rfcomm and ioct
-> work in linux and about the underlying structure in kernel.
-
-no such thing exists. However RFCOMM programming is like programming
-TCP/IP and the rctest.c and attest.c files have code examples. The ioctl
-of RFCOMM are only needed for virtual TTY devices. Check the rfcomm
-utility source code to see how they work.
-
-Regards
-
-Marcel
-
-
+It's been two weeks since I staged my source code and traces.  Did I provide 
+insufficient information, or do I need to be more patient?
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
