@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY135-F171176FB88B018246CA11B8800@phx.gbl>
-References: <BAY135-F171176FB88B018246CA11B8800@phx.gbl>
-Date: Sat, 03 Mar 2007 12:29:25 +0100
-Message-Id: <1172921365.24446.7.camel@aeonflux.holtmann.net>
+In-Reply-To: <763473.59482.qm@web43138.mail.sp1.yahoo.com>
+References: <763473.59482.qm@web43138.mail.sp1.yahoo.com>
+Date: Sat, 03 Mar 2007 12:27:33 +0100
+Message-Id: <1172921253.24446.5.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] PIN Exchange Question
+Subject: Re: [Bluez-users] Bluez source code
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,17 +20,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Vince,
+Hi,
 
-> I have setup bluez to use a pin helper that I put in.  It works great to 
-> facilitate pin exchange during initial phase of pairing.
-> 
-> I want to make it more interactive.  For example, can I get feedback from 
-> the request device if a pin I send down is correct or not.  Is there a way 
-> to get such a feedback from within my pin helper?
+> Where can find the Bluez source code to get a better understanding as
+> I want to write some sample applications. I have sucessfuly installed
+> all the Bluez packages and they work well. I am using Ubuntu
+> 6.06(Dapper Drake).
 
-you have to use the new D-Bus based API in conjunction with the passkey
-agent interface. Check dbus-api.txt inside the bluez-utils source.
+check www.bluez.org and www.kernel.org.
 
 Regards
 
