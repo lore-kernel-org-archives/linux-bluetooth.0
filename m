@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3d3168e50702281449o6789ad6j199d6f7a654e3e37@mail.gmail.com>
-References: <3d3168e50702281449o6789ad6j199d6f7a654e3e37@mail.gmail.com>
-Date: Sat, 03 Mar 2007 12:32:28 +0100
-Message-Id: <1172921548.24446.12.camel@aeonflux.holtmann.net>
+In-Reply-To: <BAY135-F171176FB88B018246CA11B8800@phx.gbl>
+References: <BAY135-F171176FB88B018246CA11B8800@phx.gbl>
+Date: Sat, 03 Mar 2007 12:29:25 +0100
+Message-Id: <1172921365.24446.7.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluetooth - ping problem.
+Subject: Re: [Bluez-users] PIN Exchange Question
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,19 +20,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Michael,
+Hi Vince,
 
-> I have new information about this problem. The connectin between two
-> linux boxes
-> is correct according to wireshark both boxes send to each other ARP
-> packets
-> and answers for it. But if any of the send ping packet there is no
-> pong answer. 
-> Does anyone know what is the reason ? As I've written before there is
-> no error
-> in the logs and there is no firewall.
+> I have setup bluez to use a pin helper that I put in.  It works great to 
+> facilitate pin exchange during initial phase of pairing.
+> 
+> I want to make it more interactive.  For example, can I get feedback from 
+> the request device if a pin I send down is correct or not.  Is there a way 
+> to get such a feedback from within my pin helper?
 
-not without seeing the output of "hcidump -X -V".
+you have to use the new D-Bus based API in conjunction with the passkey
+agent interface. Check dbus-api.txt inside the bluez-utils source.
 
 Regards
 
