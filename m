@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45EAAB70.60302@apnet.pl>
-Date: Sun, 04 Mar 2007 12:20:16 +0100
-From: milosz danielewski <master@apnet.pl>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] sdp_uuid32_to_uuid128, lack of declaration
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <57c68ddc0702282245x777b63e0la3156781ed55804f@mail.gmail.com>
+References: <57c68ddc0702282245x777b63e0la3156781ed55804f@mail.gmail.com>
+Date: Sat, 03 Mar 2007 12:31:40 +0100
+Message-Id: <1172921500.24446.10.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] rfcomm channel and ioctl
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,12 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Why there are no sdp_uuid32_to_uuid128 declaration in sdp_lib.h
-(bluez-libs-devel 3.7.1)? It would be useful, but in such situation I
-cannot use it...
+Hi Siddhant,
 
-regards
-milosz danielewski
+>    Can someone tell me about tutorial describing how rfcomm and ioct
+> work in linux and about the underlying structure in kernel.
+
+no such thing exists. However RFCOMM programming is like programming
+TCP/IP and the rctest.c and attest.c files have code examples. The ioctl
+of RFCOMM are only needed for virtual TTY devices. Check the rfcomm
+utility source code to see how they work.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
