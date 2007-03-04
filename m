@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sun, 4 Mar 2007 21:58:38 +0000 (GMT)
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <ef9938ec0703041247w7c058342rb37cc8ea494687f@mail.gmail.com>
+Date: Sun, 4 Mar 2007 15:47:45 -0500
+From: "Albert Huang" <albert@csail.mit.edu>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <45EAAB70.60302@apnet.pl>
 MIME-Version: 1.0
-Message-Id: <1173045518.989564.4714.nullmailer@galant.ukfsn.org>
-From: Iain Hibbert <plunky@rya-online.net>
-Subject: [Bluez-devel] Link Mode
+References: <45EAAB70.60302@apnet.pl>
+Subject: Re: [Bluez-devel] sdp_uuid32_to_uuid128, lack of declaration
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,34 +20,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-   I am trying to write a compatible equivalent to the Link Mode socket
-options API for NetBSD, and I wonder if somebody can clarify some things
-for me since I can't find any documentation about this.
+How about these?
 
-I assume that RFCOMM_LM and L2CAP_LM are essentially the same, the
-following bits are defined:
+uuid_t *sdp_uuid32_create(uuid_t *uuid, uint32_t data);
+uuid_t *sdp_uuid_to_uuid128(uuid_t *uuid);
 
-_LM_MASTER
-	means we prefer to be master of the baseband link
 
-_LM_AUTH
-	means we want the baseband link to be authenticated
-
-_LM_ENCRYPT
-	means we want the baseband link to be encrypted
-
-_LM_TRUSTED
-	this seems unused, is there an intention?
-
-_LM_RELIABLE
-	signal error on unreliable link (means disconnect?)
-
-_LM_SECURE
-	is this somehow different than (_LM_AUTH | _LM_ENCRYPT)?
-
-thanks,
-iain
+On 3/4/07, milosz danielewski <master@apnet.pl> wrote:
+> Why there are no sdp_uuid32_to_uuid128 declaration in sdp_lib.h
+> (bluez-libs-devel 3.7.1)? It would be useful, but in such situation I
+> cannot use it...
+>
+> regards
+> milosz danielewski
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys-and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
