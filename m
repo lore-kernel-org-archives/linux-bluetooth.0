@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY117-F18EFD8ECC30C22E9C1FE4ABF870@phx.gbl>
-References: <BAY117-F18EFD8ECC30C22E9C1FE4ABF870@phx.gbl>
-Date: Sun, 04 Mar 2007 18:36:50 +0100
-Message-Id: <1173029811.5752.11.camel@aeonflux.holtmann.net>
+In-Reply-To: <721148.87368.qm@web31712.mail.mud.yahoo.com>
+References: <721148.87368.qm@web31712.mail.mud.yahoo.com>
+Date: Sun, 04 Mar 2007 03:59:18 +0100
+Message-Id: <1172977158.5752.3.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] pin code
+Subject: Re: [Bluez-users] patch failed...
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,26 +20,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Kelvin,
+Hi Tim,
 
-> i am faced with the sam problems as KS H. I have also cross compiled dBus 
-> and Bluez Util for ARM using Scratchbox.
-> I followed the similar steps provided by Prabhu. However, I do not have the 
-> message.pid entry in /var/run but have an additional "pid" entry in 
-> /var/run/dbus.
+> thanks for the help,
 > 
-> And when i try to execute hcid i received the following error:
-> # hcid -n -f /etc/bluetooth/hcid.conf
-> hcid[790]: Bluetooth HCI daemon
-> hcid[790]: Can't open system message bus connection: Failed to connect to 
-> socket /var/run/dbus/system_bus_socket: Connection refused
-> hcid[790]: Unable to get on D-Bus
+> ok i tried again using the kernel form
+> http://www.kernel.org/
+> and still get this:
 > 
-> Please advice. Thank you
+> sudo zcat patch-2.6.20-mh1.gz | patch -p
+> patch: option requires an argument -- p
+> patch: Try `patch --help' for more information.
+> root@arc:/usr/src/linux# sudo zcat patch-2.6.20-mh1.gz
+> | patch -p1
+> patching file drivers/bluetooth/bcm203x.c
+> patching file drivers/bluetooth/bfusb.c
+> patching file drivers/bluetooth/bt3c_cs.c
+> patching file Makefile
+> Hunk #1 FAILED at 1.
+> 1 out of 1 hunk FAILED -- saving rejects to file
+> Makefile.rej
+> patching file net/bluetooth/hci_core.c
+> patching file net/bluetooth/hidp/core.c
+> patching file net/bluetooth/hidp/hidp.h
+> patching file net/bluetooth/hidp/Kconfig
+> patching file net/bluetooth/hidp/sock.c
+> root@arc:/usr/src/linux# 
 
-this can mean two things. Either the system bus is not running or the
-security settings for hcid to claim the org.bluez namespace are not
-correctly set.
+can't be. The patch has been build with a script against 2.6.20 and will
+apply perfectly.
 
 Regards
 
