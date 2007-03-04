@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45EAAB70.60302@apnet.pl>
-References: <45EAAB70.60302@apnet.pl>
-Date: Sun, 04 Mar 2007 18:31:09 +0100
-Message-Id: <1173029470.5752.6.camel@aeonflux.holtmann.net>
+To: Mark Lord <lkml@rtr.ca>
+In-Reply-To: <45EAE1D6.10900@rtr.ca>
+References: <45EADD78.1030300@rtr.ca>  <45EAE1D6.10900@rtr.ca>
+Date: Sun, 04 Mar 2007 18:33:36 +0100
+Message-Id: <1173029616.5752.9.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] sdp_uuid32_to_uuid128, lack of declaration
+Cc: Andrew Morton <akpm@osdl.org>,
+        "David S. Miller" <davem@sunset.davemloft.net>,
+        Linux Kernel <linux-kernel@vger.kernel.org>, bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] [Regression] Bluetooth RFComm: using it locks up
+	the machine
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,16 +24,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Milosz,
+Hi Mark,
 
-> Why there are no sdp_uuid32_to_uuid128 declaration in sdp_lib.h
-> (bluez-libs-devel 3.7.1)? It would be useful, but in such situation I
-> cannot use it...
+> > Any attempt to open/use a bluetooth rfcomm device locks up
+> > scheduling completely on my machine.
+> > 
+> > Interrupts (ping, alt-sysrq) seem to be alive, but nothing else.
+> > 
+> > This was working fine in 2.6.20, broken now in 2.6.21-rc2-git*
+> 
+> Further info:  Reverting this change (below) fixes it:
+> 
+> | author	Marcel Holtmann <marcel@holtmann.org>
+> | 	 Sat, 17 Feb 2007 22:58:57 +0000 (23:58 +0100)
+> | committer	David S. Miller <davem@sunset.davemloft.net>
+> | 	 Mon, 26 Feb 2007 19:42:41 +0000 (11:42 -0800)
+> | commit	c1a3313698895d8ad4760f98642007bf236af2e8
+> | tree	337a876f727061362b6a169f8759849c105b8f7a	tree | snapshot
+> | parent	f5ffd4620aba9e55656483ae1ef5c79ba81f5403	commit | diff
+> | 
+> | [Bluetooth] Make use of device_move() for RFCOMM TTY devices
+> | 
+> | In the case of bound RFCOMM TTY devices the parent is not available
+> | before its usage. So when opening a RFCOMM TTY device, move it to
+> | the corresponding ACL device as a child. When closing the device,
+> | move it back to the virtual device tree.
+> | Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> 
+> Specifically, I reverted these changes, below, to fix it:
 
-I think that is simply because nobody needed them before. Feel free to
-implement them and send a patch. However UUID32 is the most unused UUID
-type. In general you should either use UUID16 for well known profile and
-service identifiers or UUID128 for your own identifiers.
+please post these information to the Linux kernel mailing list, because
+I think that must be an issue with the device_move() API. I tested this
+successfully with a Quad G5 and it was working as expected.
 
 Regards
 
