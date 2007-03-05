@@ -1,52 +1,51 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Return-Path: <linux-kernel-owner+marcel=40holtmann.org-S933191AbXCELp3@vger.kernel.org>
+Subject: Re: [1/6] 2.6.21-rc2: known regressions
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <57c68ddc0703050126n2696b8a7h7a4d36f605e6d2cc@mail.gmail.com>
-References: <57c68ddc0702282245x777b63e0la3156781ed55804f@mail.gmail.com>
-	<1172921500.24446.10.camel@aeonflux.holtmann.net>
-	<57c68ddc0703050126n2696b8a7h7a4d36f605e6d2cc@mail.gmail.com>
-Date: Mon, 05 Mar 2007 13:50:27 +0100
-Message-Id: <1173099028.6638.21.camel@aeonflux.holtmann.net>
+To: Greg KH <greg@kroah.com>
+Cc: Mark Lord <lkml@rtr.ca>, Adrian Bunk <bunk@stusta.de>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Sid Boyce <g3vbv@blueyonder.co.uk>, Pavel Machek <pavel@ucw.cz>,
+        linux-pm@lists.osdl.org, maxk@qualcomm.com,
+        bluez-devel@lists.sourceforge.net, Matt Mackall <mpm@selenic.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Albert Hopkins <kernel@marduk.letterboxes.org>,
+        Ayaz Abdulla <aabdulla@nvidia.com>, Jeff Garzik <jeff@garzik.org>,
+        netdev@vger.kernel.org
+In-Reply-To: <20070305043443.GA29158@kroah.com>
+References: <Pine.LNX.4.64.0702272105220.12485@woody.linux-foundation.org>
+	 <20070305015031.GF3441@stusta.de> <45EB961D.6030808@rtr.ca>
+	 <20070305043443.GA29158@kroah.com>
+Content-Type: text/plain
+Date: Mon, 05 Mar 2007 13:42:04 +0100
+Message-Id: <1173098524.6638.19.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] rfcomm channel and ioctl
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Sender: linux-kernel-owner@vger.kernel.org
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Siddhant,
+Hi Greg,
 
->           Thanks very much for the reply ... rfcomm sockets are
-> working perfectly .... rctest.c  example really eased out the things
-> for me. 
+> > >Subject    : Bluetooth RFComm locks up the machine  (device_move() related)
+> > >References : http://lkml.org/lkml/2007/3/4/64
+> > >Submitter  : Mark Lord <lkml@rtr.ca>
+> > >Caused-By  : Marcel Holtmann <marcel@holtmann.org>
+> > >             commit c1a3313698895d8ad4760f98642007bf236af2e8
+> > >Status     : unknown
+> > 
+> > A 2-line patch exists for fs/sysfs/dir.c to address this.
+> > Waiting on Greg to apply it or substitute something prettier.  ;)
 > 
->            I would like to contribute for the bluez development , if
-> thats possible please suggest ways in which i can do that , may be for
-> the start i can fix small bugs with known solution. 
+> I want to see if Marcel agrees with it, as he did the original patch in
+> that area.
 
-go ahead and start working on things. Post whatever you have to the
-mailing list for review.
+I am not deep enough in the sysfs code to tell you if Mark's change it
+correct or not. It looks however fully reasonable to me. From the higher
+level perspective of the device_move() usage the RFCOMM code looks
+correct and has been tested before I submitted it for inclusion.
 
 Regards
 
 Marcel
 
 
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
