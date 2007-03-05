@@ -1,75 +1,103 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Mon, 05 Mar 2007 16:46:17 +0000
-Message-Id: <1173113177.23027.34.camel@bnocera.surrey.redhat.com>
-Mime-Version: 1.0
-Subject: [Bluez-devel] More thoughts on bluez-gnome
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Return-Path: <jikos@jikos.cz>
+Date: Mon, 5 Mar 2007 16:33:51 +0100 (CET)
+From: Jiri Kosina <jikos@jikos.cz>
+To: Mark Lord <lkml@rtr.ca>
+cc: Greg KH <gregkh@suse.de>, Linux Kernel <linux-kernel@vger.kernel.org>,
+        bluez-devel@lists.sourceforge.net, marcel@holtmann.org,
+        Andrew Morton <akpm@osdl.org>,
+        "David S. Miller" <davem@sunset.davemloft.net>
+Subject: Re: [PATCH] Fix 2.6.21 rfcomm lockups (2.6.21 regression)
+In-Reply-To: <45EB0F69.5070002@rtr.ca>
+Message-ID: <Pine.LNX.4.64.0703051619540.17096@twin.jikos.cz>
+References: <45EADD78.1030300@rtr.ca> <45EAE1D6.10900@rtr.ca> <45EB0814.5030306@rtr.ca>
+ <45EB0F69.5070002@rtr.ca>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Heya,
+On Sun, 4 Mar 2007, Mark Lord wrote:
 
-I was taking a look at the bluez-gnome source code on Friday, and this
-week-end, as well as the interface in general.
+> This patch prevents total system lockup when using rfcomm devices.
 
-I wanted to know what the target use of the bluetooth-applet (and
--properties) was.
+I acknowledge that this patch fixes lockup for me too.
 
-The sort of thing that I'd like to see in a GNOME bluetooth applet:
-- remove class of device drop-down menus (made a GConf-only option if
-really necessary).
-- add some integration into HAL (Software on/off, state restoration
-after sleep)
-- always display the bluetooth icon if a bluetooth device is present,
-grayed out if the device is disabled (see above), removed if no adapter
-is present at all
-- more integration into existing GNOME software (gnome-vfs2-obexftp to
-browse phones with Nautilus, gnome-obex-send and gnome-obex-server to
-send and receive files).
-
-The applet and the properties windows could also use a lot of cleanup,
-codewise, to follow the GNOME style a bit more closely (separate the
-auth/passkey code, make the "applet" into an object, use Glade when
-possible to generate the interface).
-
-Finally, I'd like to see convenience dialogues (as currently badly
-implemented in gnome-bluetooth) for selecting particular Bluetooth
-devices. Something aking to MacOS X' Bluetooth UI classes:
-http://developer.apple.com/documentation/DeviceDrivers/Reference/IOBluetoothUI/index.html
-and
-http://developer.apple.com/documentation/DeviceDrivers/Conceptual/Bluetooth/BT_Bluetooth_On_MOSX/chapter_3_section_7.html#//apple_ref/doc/uid/TP30000997-CH215-TPXREF110
-
-If the plan of bluez-gnome is to cater for the advanced Bluetooth
-user[1], or the users of desktops other than GNOME, then I think I'll
-move my focus onto bringing functionality to gnome-bluetooth instead.
-
-Otherwise, I'd kindly request a CVS account so that my trivial cleanups
-can get in faster.
-
-Cheers
-
-[1]: who wants to enable his bluetooth adapters as routers, need to be
-able to enable/disable notification area icons, or change device
-classes, etc.
+When debugging this, I also came across a different bug (spotted by 
+lockdep). Is the patch below applicable?
 
 
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+From: Jiri Kosina <jkosina@suse.cz>
+
+[Bluetooth] Fix socket locking in hci_sock_dev_event()
+
+hci_sock_dev_event() uses bh_lock_sock() to lock the socket lock.
+This is not deadlock-safe against locking of the same socket lock in
+l2cap_connect_cfm() from softirq context. In addition to that,
+hci_sock_dev_event() doesn't seem to be called from softirq context,
+so it is safe to use lock_sock()/release_sock() instead.
+
+The lockdep warning can be triggered on my T42p simply by switching
+the Bluetooth off by the keyboard button.
+
+=================================
+[ INFO: inconsistent lock state ]
+2.6.21-rc2 #4
+---------------------------------
+inconsistent {in-softirq-W} -> {softirq-on-W} usage.
+khubd/156 [HC0[0]:SC0[0]:HE1:SE1] takes:
+ (slock-AF_BLUETOOTH){-+..}, at: [<e0ca5520>] hci_sock_dev_event+0xa8/0xc5 [bluetooth]
+{in-softirq-W} state was registered at:
+  [<c012d1db>] mark_lock+0x59/0x414
+  [<e0cef688>] l2cap_connect_cfm+0x4e/0x11f [l2cap]
+  [<c012dfd7>] __lock_acquire+0x3e5/0xb99
+  [<e0cef688>] l2cap_connect_cfm+0x4e/0x11f [l2cap]
+  [<c012e7f2>] lock_acquire+0x67/0x81
+  [<e0cef688>] l2cap_connect_cfm+0x4e/0x11f [l2cap]
+  [<c036ee72>] _spin_lock+0x29/0x34
+  [<e0cef688>] l2cap_connect_cfm+0x4e/0x11f [l2cap]
+  [<e0cef688>] l2cap_connect_cfm+0x4e/0x11f [l2cap]
+  [<e0ca17c3>] hci_send_cmd+0x126/0x14f [bluetooth]
+  [<e0ca4ce4>] hci_event_packet+0x729/0xebd [bluetooth]
+  [<e0ca205b>] hci_rx_task+0x2a/0x20f [bluetooth]
+  [<e0ca209d>] hci_rx_task+0x6c/0x20f [bluetooth]
+  [<c012d7be>] trace_hardirqs_on+0x10d/0x14e
+  [<c011ac85>] tasklet_action+0x3d/0x68
+  [<c011abba>] __do_softirq+0x41/0x92
+  [<c011ac32>] do_softirq+0x27/0x3d
+  [<c0105134>] do_IRQ+0x7b/0x8f
+  [<c0103dec>] common_interrupt+0x24/0x34
+  [<c0103df6>] common_interrupt+0x2e/0x34
+  [<c0248e65>] acpi_processor_idle+0x1b3/0x34a
+  [<c0248e68>] acpi_processor_idle+0x1b6/0x34a
+  [<c010232b>] cpu_idle+0x39/0x4e
+  [<c04bab0c>] start_kernel+0x372/0x37a
+  [<c04ba42b>] unknown_bootoption+0x0/0x202
+  [<ffffffff>] 0xffffffff
+
+Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+---
+ net/bluetooth/hci_sock.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index f928d2b..71f5cfb 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -656,7 +656,7 @@ static int hci_sock_dev_event(struct not
+ 		/* Detach sockets from device */
+ 		read_lock(&hci_sk_list.lock);
+ 		sk_for_each(sk, node, &hci_sk_list.head) {
+-			bh_lock_sock(sk);
++			lock_sock(sk);
+ 			if (hci_pi(sk)->hdev == hdev) {
+ 				hci_pi(sk)->hdev = NULL;
+ 				sk->sk_err = EPIPE;
+@@ -665,7 +665,7 @@ static int hci_sock_dev_event(struct not
+ 
+ 				hci_dev_put(hdev);
+ 			}
+-			bh_unlock_sock(sk);
++			release_sock(sk);
+ 		}
+ 		read_unlock(&hci_sk_list.lock);
+ 	}
