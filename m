@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <001901c75fa8$fdcb6be0$a201a8c0@veecee>
-From: "Mohan Kashyap" <mohan@adamya.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Tue, 6 Mar 2007 10:06:16 +0530
+Date: Mon, 5 Mar 2007 12:41:34 -0800 (PST)
+From: walt shekrota <penguinacity@yahoo.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] Device Inquiry
+Message-ID: <190537.59911.qm@web62311.mail.re1.yahoo.com>
+Subject: [Bluez-users] Bluez and Alsa vs OSS!
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,69 +14,42 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0896500566=="
+Content-Type: multipart/mixed; boundary="===============0067832192=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+--===============0067832192==
+Content-Type: multipart/alternative; boundary="0-1196144331-1173127294=:59911"
+Content-Transfer-Encoding: 8bit
 
---===============0896500566==
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0016_01C75FD7.14735AA0"
+--0-1196144331-1173127294=:59911
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-This is a multi-part message in MIME format.
+I have my headset working reasonably with a kernel that has Alsa enabled but not the OSS emulation ie I do not have a /dev/dsp sym link. Works good.
+ Now I decided I needed the OSS enabled as there are some older apps I cannot use without the emulation. I redid the kernel and came up with it. The proper OSS device sym links show up in dev and work properly yet the whole headset discovery issue goes out the window. Alsa appears to work fine
+ When invoking btsco it discovers the proper card and device but the open fails saying device does not exist.
+ Does anyone know this issue?
+ 
+ Thanks for any help.
+ -Walt
+ 
+ 
+---------------------------------
+Now that's room service! Choose from over 150,000 hotels 
+in 45,000 destinations on Yahoo! Travel to find your fit.
+--0-1196144331-1173127294=:59911
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-------=_NextPart_000_0016_01C75FD7.14735AA0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+I have my headset working reasonably with a kernel that has Alsa enabled but not the OSS emulation ie I do not have a /dev/dsp sym link. Works good.<br> Now I decided I needed the OSS enabled as there are some older apps I cannot use without the emulation. I redid the kernel and came up with it. The proper OSS device sym links show up in dev and work properly yet the whole headset discovery issue goes out the window. Alsa appears to work fine<br> When invoking btsco it discovers the proper card and device but the open fails saying device does not exist.<br> Does anyone know this issue?<br> <br> Thanks for any help.<br> -Walt<br> <p>&#32;
 
- I am a new bie to BLUEZ. Presently doing a test program for device =
-Inquiry. I have attached an dongle to USB Port 0 and running a test =
-program, but am getting an error as....
-
-Device not found......
-
-The test program is a below.
-    dev_id =3D hci_get_route(NULL);
-    sock =3D hci_open_dev( dev_id );
-
-Kindly Help.
-------=_NextPart_000_0016_01C75FD7.14735AA0
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2800.1578" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>&nbsp;I am a new bie to BLUEZ. =
-Presently doing a=20
-test program for device Inquiry. I have attached an dongle to USB Port 0 =
-and=20
-running a test program, but am getting an error as....</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Device not found......</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>The test program is a =
-below.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>&nbsp;&nbsp;&nbsp; dev_id =3D=20
-hci_get_route(NULL);<BR>&nbsp;&nbsp;&nbsp; sock =3D hci_open_dev( dev_id =
-
-);</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Kindly Help.</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0016_01C75FD7.14735AA0--
+<hr size=1>Now that's room service! <a href="http://travel.yahoo.com/hotelsearchpage;_ylc=X3oDMTFtaTIzNXVjBF9TAzk3NDA3NTg5BF9zAzI3MTk0ODEEcG9zAzIEc2VjA21haWx0YWdsaW5lBHNsawNxMS0wNw--
+">Choose from over 150,000 hotels <br>in 45,000 destinations on Yahoo! Travel</a> to find your fit.
+--0-1196144331-1173127294=:59911--
 
 
-
---===============0896500566==
+--===============0067832192==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -87,7 +60,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0896500566==
+--===============0067832192==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -98,4 +71,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0896500566==--
+--===============0067832192==--
