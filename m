@@ -1,103 +1,52 @@
-Return-Path: <jikos@jikos.cz>
-Date: Mon, 5 Mar 2007 16:33:51 +0100 (CET)
-From: Jiri Kosina <jikos@jikos.cz>
-To: Mark Lord <lkml@rtr.ca>
-cc: Greg KH <gregkh@suse.de>, Linux Kernel <linux-kernel@vger.kernel.org>,
-        bluez-devel@lists.sourceforge.net, marcel@holtmann.org,
-        Andrew Morton <akpm@osdl.org>,
-        "David S. Miller" <davem@sunset.davemloft.net>
-Subject: Re: [PATCH] Fix 2.6.21 rfcomm lockups (2.6.21 regression)
-In-Reply-To: <45EB0F69.5070002@rtr.ca>
-Message-ID: <Pine.LNX.4.64.0703051619540.17096@twin.jikos.cz>
-References: <45EADD78.1030300@rtr.ca> <45EAE1D6.10900@rtr.ca> <45EB0814.5030306@rtr.ca>
- <45EB0F69.5070002@rtr.ca>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <57c68ddc0703050126n2696b8a7h7a4d36f605e6d2cc@mail.gmail.com>
+References: <57c68ddc0702282245x777b63e0la3156781ed55804f@mail.gmail.com>
+	<1172921500.24446.10.camel@aeonflux.holtmann.net>
+	<57c68ddc0703050126n2696b8a7h7a4d36f605e6d2cc@mail.gmail.com>
+Date: Mon, 05 Mar 2007 13:50:27 +0100
+Message-Id: <1173099028.6638.21.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] rfcomm channel and ioctl
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sun, 4 Mar 2007, Mark Lord wrote:
+Hi Siddhant,
 
-> This patch prevents total system lockup when using rfcomm devices.
+>           Thanks very much for the reply ... rfcomm sockets are
+> working perfectly .... rctest.c  example really eased out the things
+> for me. 
+> 
+>            I would like to contribute for the bluez development , if
+> thats possible please suggest ways in which i can do that , may be for
+> the start i can fix small bugs with known solution. 
 
-I acknowledge that this patch fixes lockup for me too.
+go ahead and start working on things. Post whatever you have to the
+mailing list for review.
 
-When debugging this, I also came across a different bug (spotted by 
-lockdep). Is the patch below applicable?
+Regards
+
+Marcel
 
 
 
-From: Jiri Kosina <jkosina@suse.cz>
-
-[Bluetooth] Fix socket locking in hci_sock_dev_event()
-
-hci_sock_dev_event() uses bh_lock_sock() to lock the socket lock.
-This is not deadlock-safe against locking of the same socket lock in
-l2cap_connect_cfm() from softirq context. In addition to that,
-hci_sock_dev_event() doesn't seem to be called from softirq context,
-so it is safe to use lock_sock()/release_sock() instead.
-
-The lockdep warning can be triggered on my T42p simply by switching
-the Bluetooth off by the keyboard button.
-
-=================================
-[ INFO: inconsistent lock state ]
-2.6.21-rc2 #4
----------------------------------
-inconsistent {in-softirq-W} -> {softirq-on-W} usage.
-khubd/156 [HC0[0]:SC0[0]:HE1:SE1] takes:
- (slock-AF_BLUETOOTH){-+..}, at: [<e0ca5520>] hci_sock_dev_event+0xa8/0xc5 [bluetooth]
-{in-softirq-W} state was registered at:
-  [<c012d1db>] mark_lock+0x59/0x414
-  [<e0cef688>] l2cap_connect_cfm+0x4e/0x11f [l2cap]
-  [<c012dfd7>] __lock_acquire+0x3e5/0xb99
-  [<e0cef688>] l2cap_connect_cfm+0x4e/0x11f [l2cap]
-  [<c012e7f2>] lock_acquire+0x67/0x81
-  [<e0cef688>] l2cap_connect_cfm+0x4e/0x11f [l2cap]
-  [<c036ee72>] _spin_lock+0x29/0x34
-  [<e0cef688>] l2cap_connect_cfm+0x4e/0x11f [l2cap]
-  [<e0cef688>] l2cap_connect_cfm+0x4e/0x11f [l2cap]
-  [<e0ca17c3>] hci_send_cmd+0x126/0x14f [bluetooth]
-  [<e0ca4ce4>] hci_event_packet+0x729/0xebd [bluetooth]
-  [<e0ca205b>] hci_rx_task+0x2a/0x20f [bluetooth]
-  [<e0ca209d>] hci_rx_task+0x6c/0x20f [bluetooth]
-  [<c012d7be>] trace_hardirqs_on+0x10d/0x14e
-  [<c011ac85>] tasklet_action+0x3d/0x68
-  [<c011abba>] __do_softirq+0x41/0x92
-  [<c011ac32>] do_softirq+0x27/0x3d
-  [<c0105134>] do_IRQ+0x7b/0x8f
-  [<c0103dec>] common_interrupt+0x24/0x34
-  [<c0103df6>] common_interrupt+0x2e/0x34
-  [<c0248e65>] acpi_processor_idle+0x1b3/0x34a
-  [<c0248e68>] acpi_processor_idle+0x1b6/0x34a
-  [<c010232b>] cpu_idle+0x39/0x4e
-  [<c04bab0c>] start_kernel+0x372/0x37a
-  [<c04ba42b>] unknown_bootoption+0x0/0x202
-  [<ffffffff>] 0xffffffff
-
-Signed-off-by: Jiri Kosina <jkosina@suse.cz>
----
- net/bluetooth/hci_sock.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index f928d2b..71f5cfb 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -656,7 +656,7 @@ static int hci_sock_dev_event(struct not
- 		/* Detach sockets from device */
- 		read_lock(&hci_sk_list.lock);
- 		sk_for_each(sk, node, &hci_sk_list.head) {
--			bh_lock_sock(sk);
-+			lock_sock(sk);
- 			if (hci_pi(sk)->hdev == hdev) {
- 				hci_pi(sk)->hdev = NULL;
- 				sk->sk_err = EPIPE;
-@@ -665,7 +665,7 @@ static int hci_sock_dev_event(struct not
- 
- 				hci_dev_put(hdev);
- 			}
--			bh_unlock_sock(sk);
-+			release_sock(sk);
- 		}
- 		read_unlock(&hci_sk_list.lock);
- 	}
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys-and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
