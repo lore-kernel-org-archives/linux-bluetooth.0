@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45EC7338.5030901@apnet.pl>
-Date: Mon, 05 Mar 2007 20:44:56 +0100
-From: milosz danielewski <master@apnet.pl>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45EAAB70.60302@apnet.pl>	<1173029470.5752.6.camel@aeonflux.holtmann.net>	<loom.20070305T200231-670@post.gmane.org>
-	<1173126164.6638.90.camel@aeonflux.holtmann.net>
-In-Reply-To: <1173126164.6638.90.camel@aeonflux.holtmann.net>
+In-Reply-To: <loom.20070305T200231-670@post.gmane.org>
+References: <45EAAB70.60302@apnet.pl>
+	<1173029470.5752.6.camel@aeonflux.holtmann.net>
+	<loom.20070305T200231-670@post.gmane.org>
+Date: Mon, 05 Mar 2007 21:22:44 +0100
+Message-Id: <1173126164.6638.90.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] sdp_uuid32_to_uuid128, lack of declaration
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,14 +22,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
->>  As far, as I can see it's already implemented, just not exposed in header file.
-> then send a patch to fix this. Sounds like a really simple bug.
+Hi Milosz,
 
- As I am newbie here, what's the policy of sending patches? Should I
-send it to bluez-devel list, or directly to you or whatever?
+> > > Why there are no sdp_uuid32_to_uuid128 declaration in sdp_lib.h
+> > > (bluez-libs-devel 3.7.1)? It would be useful, but in such situation I
+> > > cannot use it...
+> > 
+> > I think that is simply because nobody needed them before. Feel free to
+> > implement them and send a patch.
+> 
+>  As far, as I can see it's already implemented, just not exposed in header file.
+> 
+> > However UUID32 is the most unused UUID
+> > type. In general you should either use UUID16 for well known profile and
+> > service identifiers or UUID128 for your own identifiers.
+> 
+>  I've started to implement jsr82. When I create java object representing UUID
+> it's most convenient to pass 16 byte array from native C to Java. So, when I
+> iterate over service attributes, have to properly convert SDP_UUID32 to uuid128.
+> That's why I need to use sdp_uuid32_to_uuid128 (which is already implemented and
+> working). Only problem is ugly warning "implicit declaration".
 
-milosz danielewski
+then send a patch to fix this. Sounds like a really simple bug.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
