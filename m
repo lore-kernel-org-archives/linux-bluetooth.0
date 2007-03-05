@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <45EC7338.5030901@apnet.pl>
+Date: Mon, 05 Mar 2007 20:44:56 +0100
+From: milosz danielewski <master@apnet.pl>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45EC7338.5030901@apnet.pl>
-References: <45EAAB70.60302@apnet.pl>
-	<1173029470.5752.6.camel@aeonflux.holtmann.net>
-	<loom.20070305T200231-670@post.gmane.org>
+References: <45EAAB70.60302@apnet.pl>	<1173029470.5752.6.camel@aeonflux.holtmann.net>	<loom.20070305T200231-670@post.gmane.org>
 	<1173126164.6638.90.camel@aeonflux.holtmann.net>
-	<45EC7338.5030901@apnet.pl>
-Date: Mon, 05 Mar 2007 21:50:26 +0100
-Message-Id: <1173127826.6638.98.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+In-Reply-To: <1173126164.6638.90.camel@aeonflux.holtmann.net>
 Subject: Re: [Bluez-devel] sdp_uuid32_to_uuid128, lack of declaration
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -24,22 +21,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Milosz,
+Marcel Holtmann wrote:
+>>  As far, as I can see it's already implemented, just not exposed in header file.
+> then send a patch to fix this. Sounds like a really simple bug.
 
-> >>  As far, as I can see it's already implemented, just not exposed in header file.
-> > then send a patch to fix this. Sounds like a really simple bug.
-> 
->  As I am newbie here, what's the policy of sending patches? Should I
-> send it to bluez-devel list, or directly to you or whatever?
+ As I am newbie here, what's the policy of sending patches? Should I
+send it to bluez-devel list, or directly to you or whatever?
 
-create a unified diff with your changes against the latest CVS code and
-send it to the BlueZ developer mailing list.
-
-Regards
-
-Marcel
-
-
+milosz danielewski
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
