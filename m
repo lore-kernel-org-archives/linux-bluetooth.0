@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="=-U95OZfoBOoXiWm17T2P0"
-Date: Tue, 06 Mar 2007 12:43:32 +0000
-Message-Id: <1173185012.10237.7.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Simple typo fix for bluez-utils
+Message-ID: <becc9d2c0703052336h55d9db5l625fde2def8e0f30@mail.gmail.com>
+Date: Tue, 6 Mar 2007 08:36:34 +0100
+From: "Andrea Carlevato" <andrea.carlevatoml@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>,
+        bluez-devel-request@lists.sourceforge.net,
+        bluez-users-request@lists.sourceforge.net
+In-Reply-To: <becc9d2c0703050623v671d632bv9e58fb5628b4e450@mail.gmail.com>
+MIME-Version: 1.0
+References: <becc9d2c0703050623v671d632bv9e58fb5628b4e450@mail.gmail.com>
+Subject: [Bluez-devel] BTSCO module loading FAILED !!!
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,41 +18,56 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============1374715441=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+--===============1374715441==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_69592_8407855.1173166594586"
 
---=-U95OZfoBOoXiWm17T2P0
-Content-Type: text/plain
+------=_Part_69592_8407855.1173166594586
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Patch attached
--- 
-Bastien Nocera <hadess@hadess.net> 
+Hi to all,
+a am trying to enable BTSCO on an arm device where i have
+a completely monolitic kernel (with alsa and bluetooth support).
 
---=-U95OZfoBOoXiWm17T2P0
-Content-Disposition: attachment; filename=bluez-utils-typo.patch
-Content-Type: text/x-patch; name=bluez-utils-typo.patch; charset=ISO-8859-1
+I have enable modules support and compiled btsco module
+for my tree, but when i try "insmod snd-bt-sco.mod.ok" i get:
+
+insmod: cannot insert `snd-bt-sco.ko': Unknown symbol in module (-1): No
+such fi
+le or directory
+
+I tried with btsco 0.5, 0.42, 0.41 : same problem..
+
+Note: i ve seen that, compiling my kernel module, i get
+Warning: "snd_hwdep_new" undefine.
+Could be this the issue ? But i can't find any option in my menuconfig to
+enable it!
+
+
+Can anyone help me ??
+
+thank you
+
+------=_Part_69592_8407855.1173166594586
+Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Index: hcid/dbus-api.txt
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus-api.txt,v
-retrieving revision 1.107
-diff -u -p -r1.107 dbus-api.txt
---- hcid/dbus-api.txt	5 Mar 2007 14:43:04 -0000	1.107
-+++ hcid/dbus-api.txt	6 Mar 2007 12:45:26 -0000
-@@ -827,7 +827,7 @@ Methods		string GetAddress()
- 			includes an inquiry procedure and remote device name
- 			resolving.
- 
--			On start up this process will generate a DiscoveryStart
-+			On start up this process will generate a DiscoveryStarted
- 			signal and then return RemoteDeviceFound and also
- 			RemoteNameUpdated signals. If the procedure has been
- 			finished an DiscoveryCompleted signal will be sent.
+<span class="gmail_quote"></span>Hi to all,<br>a am trying to enable BTSCO on an arm device where i have<br>a completely monolitic kernel (with alsa and bluetooth support).<br><br>I have enable modules support and compiled btsco module
+<br>for my tree, but when i try &quot;insmod 
+snd-bt-sco.mod.ok&quot; i get:<br><br>insmod: cannot insert `snd-bt-sco.ko&#39;: Unknown symbol in module (-1): No such fi<br>le or directory<br><br>I tried with btsco 0.5, 0.42, 0.41 : same problem..<br><br>Note: i ve seen that, compiling my kernel module, i get 
+<br>Warning: &quot;snd_hwdep_new&quot; undefine. <br>Could be this the issue ? But i can&#39;t find any option in my menuconfig to enable it!<br><br><br>Can anyone help me ??<br><br>thank you<br><br>
 
---=-U95OZfoBOoXiWm17T2P0
+------=_Part_69592_8407855.1173166594586--
+
+
+--===============1374715441==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -60,7 +78,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---=-U95OZfoBOoXiWm17T2P0
+--===============1374715441==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -71,4 +89,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-U95OZfoBOoXiWm17T2P0--
+--===============1374715441==--
