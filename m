@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45ED2A30.3020302@wershofen.de>
-Date: Tue, 06 Mar 2007 09:45:36 +0100
-From: Wolfgang Wershofen <wolfgang@wershofen.de>
+Message-ID: <f21e7dc80703052319k3e5093betc310e52deab3085f@mail.gmail.com>
+Date: Tue, 6 Mar 2007 09:19:40 +0200
+From: "Choi Sonim" <choisonim@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <f21e7dc80703052319k3e5093betc310e52deab3085f@mail.gmail.com>
-In-Reply-To: <f21e7dc80703052319k3e5093betc310e52deab3085f@mail.gmail.com>
-Subject: Re: [Bluez-users] A2DP - how ?
+Subject: [Bluez-users] A2DP - how ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,40 +14,61 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0456166771=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+--===============0456166771==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_46373_29462233.1173165580696"
 
-Choi Sonim schrieb:
-> hi.
->  
-> how do I use A2DP with bluez ? I have A2DP headset...
->  
+------=_Part_46373_29462233.1173165580696
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Did you read this?
+hi.
 
-http://bluetooth-alsa.sourceforge.net/build.html
+how do I use A2DP with bluez ? I have A2DP headset...
 
-hth
-Wolfgang
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (GNU/Linux)
-Comment: Using GnuPG with SUSE - http://enigmail.mozdev.org
+thank you
+choi
 
-iD8DBQFF7SowgUafbxFH+p8RAiwEAKDFWVXtt+weiqpM3Nvb5U637r9Q/ACeItAH
-kM8dCnh0w2qfxENi+Eu1C6E=
-=L4eI
------END PGP SIGNATURE-----
+------=_Part_46373_29462233.1173165580696
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<div>hi.</div>
+<div>&nbsp;</div>
+<div>how do I use A2DP with bluez ? I have A2DP headset...</div>
+<div>&nbsp;</div>
+<div>thank you</div>
+<div>choi</div>
+
+------=_Part_46373_29462233.1173165580696--
+
+
+--===============0456166771==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============0456166771==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0456166771==--
