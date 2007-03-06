@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 6 Mar 2007 16:15:27 -0800 (PST)
-From: tim culwins <mail0123456789101112@yahoo.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1172977158.5752.3.camel@aeonflux.holtmann.net>
-MIME-Version: 1.0
-Message-ID: <82281.25127.qm@web31713.mail.mud.yahoo.com>
-Subject: Re: [Bluez-users] patch failed...
+In-Reply-To: <1173198739.25660.0.camel@localhost>
+References: <1173198739.25660.0.camel@localhost>
+Date: Tue, 06 Mar 2007 19:49:33 +0100
+Message-Id: <1173206973.11247.19.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Cc: bluez-users@lists.sf.net
+Subject: Re: [Bluez-users] bcm2045 issue
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,79 +21,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-well, im using 2.6.20.1. will the patch work on this
-version?
-if not where can i find the correct version of the
-kernel?
+Hi Jeffrey,
 
-if i have the correct version what could i be doing
-wrong?
+> I'm not sure if this is supposed to work yet or not, but I'm having
+> trouble getting a Dell Wireless 355 module (AKA BCM2045) working in an
+> e1705 under Gentoo. Here is the error message generated upon 'modprobe
+> hci_usb':
 
-Thanks
+load the hci_usb driver with the module parameter reset=1.
 
---- Marcel Holtmann <marcel@holtmann.org> wrote:
+Regards
 
-> Hi Tim,
-> 
-> > thanks for the help,
-> > 
-> > ok i tried again using the kernel form
-> > http://www.kernel.org/
-> > and still get this:
-> > 
-> > sudo zcat patch-2.6.20-mh1.gz | patch -p
-> > patch: option requires an argument -- p
-> > patch: Try `patch --help' for more information.
-> > root@arc:/usr/src/linux# sudo zcat
-> patch-2.6.20-mh1.gz
-> > | patch -p1
-> > patching file drivers/bluetooth/bcm203x.c
-> > patching file drivers/bluetooth/bfusb.c
-> > patching file drivers/bluetooth/bt3c_cs.c
-> > patching file Makefile
-> > Hunk #1 FAILED at 1.
-> > 1 out of 1 hunk FAILED -- saving rejects to file
-> > Makefile.rej
-> > patching file net/bluetooth/hci_core.c
-> > patching file net/bluetooth/hidp/core.c
-> > patching file net/bluetooth/hidp/hidp.h
-> > patching file net/bluetooth/hidp/Kconfig
-> > patching file net/bluetooth/hidp/sock.c
-> > root@arc:/usr/src/linux# 
-> 
-> can't be. The patch has been build with a script
-> against 2.6.20 and will
-> apply perfectly.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> 
->
--------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get
-> the chance to share your
-> opinions on IT & business topics through brief
-> surveys-and earn cash
->
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
+Marcel
 
 
-
- 
-____________________________________________________________________________________
-TV dinner still cooling? 
-Check out "Tonight's Picks" on Yahoo! TV.
-http://tv.yahoo.com/
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
