@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <9da483cb0703061450i78cbaf95ibc797d27486f5beb@mail.gmail.com>
-Date: Tue, 6 Mar 2007 15:50:22 -0700
-From: "Mike Hodson" <mystica@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Subject: [Bluez-devel] Success with current cvs and amarok
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1173185012.10237.7.camel@cookie.hadess.net>
+References: <1173185012.10237.7.camel@cookie.hadess.net>
+Date: Tue, 06 Mar 2007 15:38:27 +0100
+Message-Id: <1173191907.11247.6.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Simple typo fix for bluez-utils
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,19 +20,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I just wanted to report a near 100% success with amarok and the
-current cvs bluez, to the point where its working to switch songs and
-everything. :)
+Hi Bastien,
 
-The one thing I think I may not have noticed before, mostly due to the
-music i was testing with: techno/dance music. I think there is a very
-slight timing / pitch change every now and then.  However ,as i
-mentioned I do listen to dance music a lot and i honestly thought it
-was part of the dj mixing. :)
+> Patch attached
 
-Good work so far, and I am reconsidering my use of xmms as a media player
+patch has been committed. Thanks.
 
-Mike
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
