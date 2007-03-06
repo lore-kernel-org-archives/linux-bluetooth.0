@@ -1,14 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <becc9d2c0703052336h55d9db5l625fde2def8e0f30@mail.gmail.com>
-Date: Tue, 6 Mar 2007 08:36:34 +0100
-From: "Andrea Carlevato" <andrea.carlevatoml@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>,
-        bluez-devel-request@lists.sourceforge.net,
-        bluez-users-request@lists.sourceforge.net
-In-Reply-To: <becc9d2c0703050623v671d632bv9e58fb5628b4e450@mail.gmail.com>
+Message-ID: <9da483cb0703052034o1b638df3mde7dab20730d539@mail.gmail.com>
+Date: Mon, 5 Mar 2007 21:34:44 -0700
+From: "Mike Hodson" <mystica@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <45D2C8B3.8050102@xmission.com>
 MIME-Version: 1.0
-References: <becc9d2c0703050623v671d632bv9e58fb5628b4e450@mail.gmail.com>
-Subject: [Bluez-devel] BTSCO module loading FAILED !!!
+References: <9da483cb0702121756l3541cc58u690e518940035b11@mail.gmail.com>
+	<45D138AF.3040708@xmission.com>
+	<9da483cb0702130106s3c76315g2c57fd4f1017ad23@mail.gmail.com>
+	<45D2C8B3.8050102@xmission.com>
+Subject: Re: [Bluez-devel] Successes and failures with btsco/bluez
+	respectively
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,75 +20,58 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1374715441=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1374715441==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_69592_8407855.1173166594586"
-
-------=_Part_69592_8407855.1173166594586
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi to all,
-a am trying to enable BTSCO on an arm device where i have
-a completely monolitic kernel (with alsa and bluetooth support).
-
-I have enable modules support and compiled btsco module
-for my tree, but when i try "insmod snd-bt-sco.mod.ok" i get:
-
-insmod: cannot insert `snd-bt-sco.ko': Unknown symbol in module (-1): No
-such fi
-le or directory
-
-I tried with btsco 0.5, 0.42, 0.41 : same problem..
-
-Note: i ve seen that, compiling my kernel module, i get
-Warning: "snd_hwdep_new" undefine.
-Could be this the issue ? But i can't find any option in my menuconfig to
-enable it!
+On 2/14/07, Brad Midgley <bmidgley@xmission.com> wrote:
+> Mike
+>
+> fwiw, it may be that something somewhere has regressed. I can't get
+> totally smooth audio through btsco-0.5 or cvs plugz (a2dpd or a2dpd2).
+> It doesn't have to be in our driver, especially since my previously
+> working btsco-0.5 plugin doesn't work right. It could be in the kernel
+> or bluez or my config. I haven't held things constant with a control
+> configuration unfortunately :(
+>
+> My best result is in using my spider set, plugz from cvs, a2dpd plugin,
+> totem and a .asoundrc with
+>
+> pcm.!default {
+> type a2dpd
+> }
+>
+> but I'm still getting occasional pauses in the stream. totem using
+> a2dpd2 resulted in audio playing too fast with gaps of silence.
+>
+> Brad
 
 
-Can anyone help me ??
+Well, I finally had time/money to get a better bluetooth dongle, a
+bluespoon (CSR) 2.0/EDR.  My old one's lack of adaptive frequency
+hopping limited my range quite a lot compared to what i was able to
+get with my BT 1.2 phone. The new dongle improves that immensely.
+Also: current plugz cvs works perfectly well, no skipping/weird audio
+pitch/dropouts when using mplayer to play back mp3 files. I am still
+getting no sound when using a2dpd as a plugin for xmms.
 
-thank you
+One thing of note, I am no longer able to run a2dpd as a user, and im
+wondering what I need to change... i know i got it working once, but
+now i get:
 
-------=_Part_69592_8407855.1173166594586
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+A2DPD[21:23:25.748]: a2dp_make_listen_socket: (errno=13:Permission
+denied)Cannot bind socket 6 for psm 25
 
-<span class="gmail_quote"></span>Hi to all,<br>a am trying to enable BTSCO on an arm device where i have<br>a completely monolitic kernel (with alsa and bluetooth support).<br><br>I have enable modules support and compiled btsco module
-<br>for my tree, but when i try &quot;insmod 
-snd-bt-sco.mod.ok&quot; i get:<br><br>insmod: cannot insert `snd-bt-sco.ko&#39;: Unknown symbol in module (-1): No such fi<br>le or directory<br><br>I tried with btsco 0.5, 0.42, 0.41 : same problem..<br><br>Note: i ve seen that, compiling my kernel module, i get 
-<br>Warning: &quot;snd_hwdep_new&quot; undefine. <br>Could be this the issue ? But i can&#39;t find any option in my menuconfig to enable it!<br><br><br>Can anyone help me ??<br><br>thank you<br><br>
+Other than these problems, it works fine when i run a2dpd as root.
 
-------=_Part_69592_8407855.1173166594586--
-
-
---===============1374715441==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Mike
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1374715441==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1374715441==--
