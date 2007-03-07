@@ -1,6 +1,6 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45EF24C7.4070600@thebmwz3.co.uk>
-Date: Wed, 07 Mar 2007 20:47:03 +0000
+Message-ID: <45EF24B7.70908@thebmwz3.co.uk>
+Date: Wed, 07 Mar 2007 20:46:47 +0000
 From: Andy <andy@thebmwz3.co.uk>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
@@ -111,12 +111,13 @@ Thanks in advance
 
 -- 
 Andy
-e: andy @ thebmwz3.co.uk
-e: andy @ broadcast-tech.co.uk
+e: andy@thebmwz3.co.uk
+e: andy@broadcast-tech.co.uk
 
 w: http://www.thebmwz3.co.uk
 w: http://www.broadcast-tech.co.uk
 
+msn: andybrown21@hotmail.com
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
