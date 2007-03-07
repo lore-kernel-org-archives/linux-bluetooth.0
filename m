@@ -1,15 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Tim Chick <chick@computergeek.freeserve.co.uk>
+From: Bastien Nocera <hadess@hadess.net>
 To: bluez-devel@lists.sourceforge.net
-Date: Wed, 7 Mar 2007 00:42:13 +0000
-References: <9da483cb0703061450i78cbaf95ibc797d27486f5beb@mail.gmail.com>
-	<200703062308.06182.chick@computergeek.freeserve.co.uk>
-	<CE5216C10C83944D9FD37B65CD33F3970CF481@mplex01.mpl.access-company.com>
-In-Reply-To: <CE5216C10C83944D9FD37B65CD33F3970CF481@mplex01.mpl.access-company.com>
-MIME-Version: 1.0
-Message-Id: <200703070042.14210.chick@computergeek.freeserve.co.uk>
-Cc: Frederic Dalleau <Frederic.Dalleau@access-company.com>
-Subject: Re: [Bluez-devel] Success with current cvs and amarok
+Date: Wed, 07 Mar 2007 00:27:13 +0000
+Message-Id: <1173227233.10237.44.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: [Bluez-devel] non-ASCII chars in device names
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,24 +18,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Wednesday 07 March 2007 00:24, Frederic Dalleau wrote:
-> > > I just wanted to report a near 100% success with amarok and the
-> > > current cvs bluez, to the point where its working to switch songs and
-> >
-> > If you are using a CSR based headset it will bend the pitch if the input
-> > queue is getting too full or empty. So the headset doesn't like the data
-> > timing.
->
-> Hi, I believe (I hope) Mike is talking about a2dp which is digital and so
-> the pitch can not be modified. But it is possibly a bug in the timing. Are
-> there some traces that could be related to the moment where you feel the
-> pitch change?
+Heya,
 
-I was talking about a2dp as well - the headset will shift the pitch to correct 
-buffer problems, using the built in dsp!
+I got this report for gnome-bluetooth some time ago:
+http://bugzilla.gnome.org/show_bug.cgi?id=380408
 
-Cheers,
-Tim
+I fixed the problem altogether by replacing this code by D-Bus code
+calling hcid. The problem is that the name of the device only shows up
+the very first time the device is discovered, and it seems to me that
+the cache is busted:
+
+In hcid/storage.c:
+        for (i = 0; i < 248 && name[i]; i++)
+                if ((unsigned char) name[i] < 32 || name[i] == 127)
+                        str[i] = '.';
+                else
+                        str[i] = name[i];
+
+Why? If the data is correct UTF-8, it could be saved as-is in the file,
+minus any tabs, unbreakable spaces, or line feeds.
+
+-- 
+Bastien Nocera <hadess@hadess.net> 
 
 
 -------------------------------------------------------------------------
