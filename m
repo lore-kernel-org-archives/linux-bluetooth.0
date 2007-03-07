@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 08 Mar 2007 08:13:29 +0100
-From: =?iso-8859-1?Q?=22Hans-J=FCrgen_Lange=22?= <Hans-Juergen.Lange@gmx.de>
-In-Reply-To: <45EF24B7.70908@thebmwz3.co.uk>
-Message-ID: <20070308071329.32910@gmx.net>
+Message-ID: <45EF3A94.4040007@thebmwz3.co.uk>
+Date: Wed, 07 Mar 2007 22:20:04 +0000
+From: Andy <andy@thebmwz3.co.uk>
 MIME-Version: 1.0
-References: <45EF24B7.70908@thebmwz3.co.uk>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <45EF24C7.4070600@thebmwz3.co.uk>
+	<CE5216C10C83944D9FD37B65CD33F3970CF48D@mplex01.mpl.access-company.com>
+In-Reply-To: <CE5216C10C83944D9FD37B65CD33F3970CF48D@mplex01.mpl.access-company.com>
 Subject: Re: [Bluez-users] pand, bnep0 and no traffic flow
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -20,20 +21,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+Thanks for the hint Frederic, but yep its allowing ICMP ping's as it 
+does on all other interfaces.
 
-the interface on server a has only pscan enabled. change it to pscan/iscan
-hciconfig <ifcname> piscan
+cat /proc/sys/net/ipv4/icmp_echo_ignore_all
+0
 
-BR
+(I also try SSH and HTTP to be sure and nothing passes the bluetooth link)
 
--------- Original-Nachricht --------
-Datum: Wed, 07 Mar 2007 20:46:47 +0000
-Von: Andy <andy@thebmwz3.co.uk>
-An: bluez-users@lists.sourceforge.net
-CC: 
-Betreff: [Bluez-users] pand, bnep0 and no traffic flow
+Regards,
+-- 
+Andy
+e: andy@thebmwz3.co.uk
+e: andy@broadcast-tech.co.uk
 
+w: http://www.thebmwz3.co.uk
+w: http://www.broadcast-tech.co.uk
+
+
+
+Frederic Dalleau wrote:
+> Your kernel is probably configured to not answer ping incoming request.
+> look in /proc/sys/net/ipv4/
+> 
+> -----Original Message-----
+> From: bluez-users-bounces@lists.sourceforge.net on behalf of Andy
+> Sent: Wed 3/7/2007 12:47 PM
+> To: bluez-users@lists.sourceforge.net
+> Subject: [Bluez-users] pand, bnep0 and no traffic flow
+>  
 > Hi all,
 > I'm trying to figure out where things are going wrong with my connection 
 > here.
@@ -124,31 +140,7 @@ Betreff: [Bluez-users] pand, bnep0 and no traffic flow
 > almost there!
 > 
 > Thanks in advance
-> 
-> -- 
-> Andy
-> e: andy@thebmwz3.co.uk
-> e: andy@broadcast-tech.co.uk
-> 
-> w: http://www.thebmwz3.co.uk
-> w: http://www.broadcast-tech.co.uk
-> 
-> msn: andybrown21@hotmail.com
-> 
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share
-> your
-> opinions on IT & business topics through brief surveys-and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
--- 
-Ist Ihr Browser Vista-kompatibel? Jetzt die neuesten 
-Browser-Versionen downloaden: http://www.gmx.net/de/go/browser
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
