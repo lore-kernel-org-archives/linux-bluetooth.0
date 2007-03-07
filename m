@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Jon Barnett <jbarnett@pobox.com>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <mailman.164002.1173227580.20110.bluez-devel@lists.sourceforge.net>
-References: <mailman.164002.1173227580.20110.bluez-devel@lists.sourceforge.net>
-Date: Wed, 07 Mar 2007 11:42:23 -0500
-Message-Id: <1173285743.4194.10.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Ekiga pwlib patch for plugz operation
-Reply-To: jbarnett@pobox.com,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Date: Wed, 7 Mar 2007 14:43:12 -0000
+Message-ID: <FF11924F0CDB2942BF2AA160F1FE33A10743D1@rocsrv01.Rococo.local>
+From: "Michael Nairn" <michael.nairn@rococosoft.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Proposed additions to D-Bus API
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -17,99 +14,200 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0876421316=="
+Content-Type: multipart/mixed; boundary="===============0107784502=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+This is a multi-part message in MIME format.
 
---===============0876421316==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="=-KAgS/uow3MMpRpAaj4jc"
+--===============0107784502==
+Content-class: urn:content-classes:message
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C760C6.EEB58BC7"
 
+This is a multi-part message in MIME format.
 
---=-KAgS/uow3MMpRpAaj4jc
-Content-Type: text/plain
+------_=_NextPart_001_01C760C6.EEB58BC7
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 
-Version 1.10.4 of pwlib has some slight changes in the sound_alsa.cxx
-code so the old plugz patch doesn't work any more. I think the new patch sh=
-ould
-look something like this.
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
---- plugins/sound_alsa/sound_alsa.cxx.old       2007-02-04 16:21:32.0000000=
-00 -0500
-+++ plugins/sound_alsa/sound_alsa.cxx   2007-03-07 11:17:06.000000000 -0500
-@@ -284,6 +284,8 @@
-     for (PINDEX j =3D 0 ; j < playback_devices.GetSize () ; j++)=20
-       devices +=3D playback_devices.GetKeyAt (j);
-   }
-+
-+  devices +=3D "Bluetooth headset";
-  =20
-   return devices;
- }
-@@ -331,6 +333,10 @@
-     real_device_name =3D "default";
-     card_nr =3D -2;
-   }
-+  else if(_device =3D=3D "Bluetooth headset") {
-+    real_device_name =3D "headset";
-+    card_nr =3D -3;
-+  }
-   else {
+Hi,
 =20
-   if ((_dir =3D=3D Recorder && capture_devices.IsEmpty ())
-@@ -841,10 +847,15 @@
-   if (!os_handle)
-     return FALSE;
+I am currently in the process of writing a JSR82 implementation that
+uses the Bluez D-Bus API. However, there is some functionality missing
+from the API which we would require in order to write a full JSR82
+compliant implementation.
 =20
--  if (card_nr =3D=3D -2)
-+  if (card_nr =3D=3D -2) {
-     card_name =3D "default";
--  else
-+  }
-+  else if(card_nr =3D=3D -3) {
-+    card_name =3D "headset";
-+  }=20
-+  else {
-     card_name =3D "hw:" + PString (card_nr);
-+  }
+We require that the D-Bus API allow us to do the following:
 =20
-   //allocate simple id
-   snd_mixer_selem_id_alloca (&sid);
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
+ * Return the integer value of the class of dev (hci_read_class_of_dev)
+ * Set the service classes of the device
+ * Return if role switching is supported
+ * Return is inquiry scanning allowed during a connection
+ * Return is page scanning allowed during connection
+ * Update the service record
+=20
+Acl link related:
+ * Check link is authenticated
+ * Authenticate Link
+ * Check link is encrypted
+ * Encrypt link
+ * Is master
+=20
+=20
+For some of the above, they can be easily implemented by adding
+additional functions to dbus-adapter.c and dbus-database.c. Something
+along the following lines:
+=20
+ * Add additional functions to dbus-adapter.c:
+adapter_get_inquiry_scan; adapter_get_page_scan;
+adapter_get_role_switch; adapter_get_device_class and
+adapter_set_service_classes
+ * Add additional functions to dbus-database.c: update_service_record =20
+=20
+Regarding authentication and encryption, I noticed that this has been
+mentioned on previous posts. Is there current work going on into this?
+=20
+Any feedback/suggestions on the above would be appreciated. I have
+already had a go at implementing some of the above, what is the process
+for submitting changes to Bluez? Is it just a matter of posting it to
+this mailing list?
+=20
+Thanks,
+Michael
+=20
+=20
+=20
 
-Submitted for consideration.
+------_=_NextPart_001_01C760C6.EEB58BC7
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Cheers,
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Dus-ascii">
+<META content=3D"MSHTML 6.00.6000.16414" name=3DGENERATOR></HEAD>
+<BODY>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D773501311-07032007>Hi,</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D773501311-07032007></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D773501311-07032007>I =
+am&nbsp;currently=20
+in the process of writing a JSR82 implementation that&nbsp;uses the =
+Bluez D-Bus=20
+API. However, there is some functionality missing from the =
+API&nbsp;which we=20
+would&nbsp;require in order to write a full JSR82 compliant=20
+implementation.</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D773501311-07032007></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D773501311-07032007>We =
+require that the=20
+D-Bus API allow us to do the following:</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D773501311-07032007></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D773501311-07032007>&nbsp;* Return the=20
+integer value of the class of dev =
+(hci_read_class_of_dev)</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D773501311-07032007>&nbsp;* Set the=20
+service classes of the device</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D773501311-07032007>&nbsp;* Return if=20
+role switching is supported</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D773501311-07032007>&nbsp;* Return is=20
+inquiry scanning allowed during a connection</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D773501311-07032007>&nbsp;* Return is=20
+page scanning allowed during connection</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D773501311-07032007>&nbsp;* Update the=20
+service record</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D773501311-07032007></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D773501311-07032007>Acl =
+link=20
+related:</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D773501311-07032007>&nbsp;* Check link=20
+is authenticated</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D773501311-07032007>&nbsp;* Authenticate=20
+Link</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D773501311-07032007>&nbsp;* Check link=20
+is encrypted</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D773501311-07032007>&nbsp;* Encrypt=20
+link</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D773501311-07032007>&nbsp;* Is=20
+master</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D773501311-07032007></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D773501311-07032007></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D773501311-07032007>For =
+some of the=20
+above, they can be easily implemented by adding additional functions to=20
+dbus-adapter.c and dbus-database.c. Something along the following=20
+lines:</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D773501311-07032007></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN =
+class=3D773501311-07032007>&nbsp;* Add=20
+additional functions to dbus-adapter.c:&nbsp;<FONT face=3D"Times New =
+Roman"=20
+size=3D3> <FONT face=3DArial size=3D2>adapter_get_inquiry_scan; =
+adapter_get_page_scan;=20
+adapter_get_role_switch; adapter_get_device_class and=20
+adapter_set_service_classes</FONT></FONT></SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D773501311-07032007><SPAN=20
+class=3D773501311-07032007>&nbsp;* Add additional functions to =
+dbus-database.c:=20
+update_service_record&nbsp;<FONT face=3D"Times New Roman" size=3D3>=20
+</FONT></SPAN></SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D773501311-07032007><SPAN=20
+class=3D773501311-07032007></SPAN></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D773501311-07032007><SPAN=20
+class=3D773501311-07032007>Regarding authentication and encryption, I =
+noticed that=20
+this has been mentioned&nbsp;on previous posts. Is there current work =
+going on=20
+into this?</SPAN></SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D773501311-07032007><SPAN=20
+class=3D773501311-07032007></SPAN></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D773501311-07032007><SPAN=20
+class=3D773501311-07032007>Any feedback/suggestions on the above would =
+be=20
+appreciated. I have already had a go at implementing some of the above, =
+what is=20
+the process for submitting changes to&nbsp;Bluez? Is it just a matter of =
+posting=20
+it to this mailing list?</SPAN></SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D773501311-07032007><SPAN=20
+class=3D773501311-07032007></SPAN></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D773501311-07032007><SPAN=20
+class=3D773501311-07032007>Thanks,</SPAN></SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D773501311-07032007><SPAN=20
+class=3D773501311-07032007>Michael</SPAN></SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D773501311-07032007>&nbsp;</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D773501311-07032007></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D773501311-07032007></SPAN></FONT>&nbsp;</DIV></BODY></HTML>
 
-JonB
-
---=-KAgS/uow3MMpRpAaj4jc
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
-
-iD8DBQBF7utvu2cEic/xsEARAjm5AKCSAIbvGzgRz3jbVQ9r6qsyLWkaGACaA1D8
-q5sTy6qp9bPmvRDCmkc3eRU=
-=fj8N
------END PGP SIGNATURE-----
-
---=-KAgS/uow3MMpRpAaj4jc--
+------_=_NextPart_001_01C760C6.EEB58BC7--
 
 
-
---===============0876421316==
+--===============0107784502==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -120,7 +218,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0876421316==
+--===============0107784502==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -131,4 +229,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============0876421316==--
+--===============0107784502==--
