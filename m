@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45F07155.7080201@killesreiter.de>
-Date: Thu, 08 Mar 2007 21:25:57 +0100
-From: Gerhard Killesreiter <gerhard@killesreiter.de>
+Message-ID: <be976db60703081101p78084e24g2bd5f076fcee82a2@mail.gmail.com>
+Date: Thu, 8 Mar 2007 11:01:07 -0800
+From: "Mark S. Townsley" <mstownsley@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <45EFC3C7.2060802@redhat.com>
-In-Reply-To: <45EFC3C7.2060802@redhat.com>
-Subject: Re: [Bluez-users] Headsetd, skype and bluetooth headsets.
+Subject: [Bluez-users] DBUS and Bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,52 +14,66 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1728473930=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Alan Conway wrote:
-> Trying to get a plantronics 510s headset working with skype (among other 
-> things) and I'm tantalizingly close. Hopefully someone can help close 
-> the gap.
-> 
-> I go the headset working for input and output with headsetd and headset 
-> plug-in: aplay and arecord -D headset working A-OK - my .asoundrc 
-> attached. Then I tried aoss skype - it *almost* worked. I could hear OK 
-> thru the headset but my voice was weirdly distorted and unrecognizable. 
-> I decided to recompile off the CVS head and now nothing works I get
->  ALSA lib pcm_sco.c:532:(_snd_pcm_sco_open) Unknown field max_periods
-> 
-> Probably I have some mish-mash of versions installed, it's too late at 
-> night.
-> 
-> So what I'd like to know to speed my quest tomorrow:
-> * In CVS there are multiple headsetd and alsa-plugins under plugz, btsco 
-> and alsa-plugin-sco. Which is the right one?
-> * Maybe the distortion indicates some transformation of sound formats is 
-> needed - any hints as to what it might be?
-> * Is there a better way than aoss for skype? It only shows alsa hardware 
-> devices in it's menus, I haven't found a way to make it use a PCM.
-> * Any other  tips on what might be going wrong, or better ways to 
-> approach this?
-> 
-> I'll be happy to post my solution to the list if that's useful.
+--===============1728473930==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_253669_18866615.1173380467535"
 
-Yes, please. I had to get a cable headset in order to use skype. I could 
-hear sound and record sound through the bt headset (logitech), but skype 
-  would only get me a beep and nothing more.
+------=_Part_253669_18866615.1173380467535
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-aoss didn't work either, maybe I shoudl try it again...
+Hi:
 
-Cheers,
-	Gerhard
+I read that Bluez hcid requires DBUS to be up and running to function
+properly.  Is that correct?
+
+I would like to also play with the Bluez DBUS API.  I found  the API guide
+but would like to know if there is anything special
+config entries I need to make inside the DBUS config file.  Can someone
+point me to the proper DBUS config  file for Bluez to
+function properly?
+
+thanks.
+
+
+Mark
+
+------=_Part_253669_18866615.1173380467535
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi:<br><br>I read that Bluez hcid requires DBUS to be up and running to function properly.&nbsp; Is that correct?<br><br>I would like to also play with the Bluez DBUS API.&nbsp; I found&nbsp; the API guide but would like to know if there is anything special
+<br>config entries I need to make inside the DBUS config file.&nbsp; Can someone point me to the proper DBUS config&nbsp; file for Bluez to<br>function properly?<br>&nbsp;<br>thanks.<br><br><br>Mark<br>
+
+------=_Part_253669_18866615.1173380467535--
+
+
+--===============1728473930==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1728473930==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1728473930==--
