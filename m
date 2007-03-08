@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45EFC3C7.2060802@redhat.com>
-Date: Thu, 08 Mar 2007 03:05:27 -0500
-From: Alan Conway <aconway@redhat.com>
+Date: Thu, 08 Mar 2007 08:13:29 +0100
+From: =?iso-8859-1?Q?=22Hans-J=FCrgen_Lange=22?= <Hans-Juergen.Lange@gmx.de>
+In-Reply-To: <45EF24B7.70908@thebmwz3.co.uk>
+Message-ID: <20070308071329.32910@gmx.net>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Content-Type: multipart/mixed; boundary="------------030103080705040308070400"
-Subject: [Bluez-users] Headsetd, skype and bluetooth headsets.
+References: <45EF24B7.70908@thebmwz3.co.uk>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] pand, bnep0 and no traffic flow
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,121 +16,146 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------030103080705040308070400
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Hello,
 
-Trying to get a plantronics 510s headset working with skype (among other 
-things) and I'm tantalizingly close. Hopefully someone can help close 
-the gap.
+the interface on server a has only pscan enabled. change it to pscan/iscan
+hciconfig <ifcname> piscan
 
-I go the headset working for input and output with headsetd and headset 
-plug-in: aplay and arecord -D headset working A-OK - my .asoundrc 
-attached. Then I tried aoss skype - it *almost* worked. I could hear OK 
-thru the headset but my voice was weirdly distorted and unrecognizable. 
-I decided to recompile off the CVS head and now nothing works I get
-  ALSA lib pcm_sco.c:532:(_snd_pcm_sco_open) Unknown field max_periods
+BR
 
-Probably I have some mish-mash of versions installed, it's too late at 
-night.
+-------- Original-Nachricht --------
+Datum: Wed, 07 Mar 2007 20:46:47 +0000
+Von: Andy <andy@thebmwz3.co.uk>
+An: bluez-users@lists.sourceforge.net
+CC: 
+Betreff: [Bluez-users] pand, bnep0 and no traffic flow
 
-So what I'd like to know to speed my quest tomorrow:
- * In CVS there are multiple headsetd and alsa-plugins under plugz, 
-btsco and alsa-plugin-sco. Which is the right one?
- * Maybe the distortion indicates some transformation of sound formats 
-is needed - any hints as to what it might be?
- * Is there a better way than aoss for skype? It only shows alsa 
-hardware devices in it's menus, I haven't found a way to make it use a PCM.
- * Any other  tips on what might be going wrong, or better ways to 
-approach this?
+> Hi all,
+> I'm trying to figure out where things are going wrong with my connection 
+> here.
+> Server A has /usr/bin/pand --listen -M --role=NAP
+> Server B has pand --connect 00:02:72:B2:EF:21
+> 
+> The two initiate the connection, and create the bnep0 interface. I set 
+> the IP addresses
+> ifconfig bnep0 10.0.0.1 netmask 255.255.255.0
+> ifconfig bnep0 10.0.0.2 netmask 255.255.255.0
+> respectively, and neither can ping each other.
+> 
+> Checking the interface on server B, I see TX packets (pinging to server 
+> A) but no RX packets. And on server A I see RX packets and no TX packets.
+> 
+> I started to think this was networking related, so disabled all iptables 
+> firewalls (flushed, then all rules set to PERMIT) but still nothing
+> When pings are running from B to A I see this (hcidump on server A):
+>  > ACL data: handle 41 flags 0x02 dlen 17
+>  > ACL data: handle 41 flags 0x01 dlen 17
+>  > ACL data: handle 41 flags 0x01 dlen 7
+>      L2CAP(d): cid 0x0040 len 37 [psm 0]
+>  > ACL data: handle 41 flags 0x02 dlen 17
+>  > ACL data: handle 41 flags 0x01 dlen 17
+>  > ACL data: handle 41 flags 0x01 dlen 7
+>      L2CAP(d): cid 0x0040 len 37 [psm 0]
+>  > ACL data: handle 41 flags 0x02 dlen 17
+>  > ACL data: handle 41 flags 0x01 dlen 17
+>  > ACL data: handle 41 flags 0x01 dlen 7
+>      L2CAP(d): cid 0x0040 len 37 [psm 0]
+> 
+> 
+> Server A:
+> hciconfig -a
+> hci0:   Type: USB
+>          BD Address: 00:02:72:B2:EF:DF ACL MTU: 192:8 SCO MTU: 64:8
+>          UP RUNNING PSCAN
+>          RX bytes:3347915 acl:39829 sco:0 events:100518 errors:0
+>          TX bytes:1048399 acl:24626 sco:0 commands:34394 errors:0
+>          Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>          Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>          Link policy: RSWITCH HOLD SNIFF PARK
+>          Link mode: SLAVE ACCEPT
+>          Name: 'geostat'
+>          Class: 0x3e0100
+>          Service Classes: Networking, Rendering, Capturing, Object 
+> Transfer, Audio
+>          Device Class: Computer, Uncategorized
+>          HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP 
+> Subver: 0x20d
+>          Manufacturer: Cambridge Silicon Radio (10)
+> 
+> ip route
+> 192.168.55.0/24 dev eth0  proto kernel  scope link  src 192.168.55.1
+> 10.0.0.0/24 dev bnep0  proto kernel  scope link  src 10.0.0.2
+> default via 192.168.55.252 dev eth0
+> 
+> 
+> 
+> Server B:
+>   hciconfig -a
+> hci0:   Type: USB
+>          BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 64:10
+>          UP RUNNING PSCAN ISCAN
+>          RX bytes:17351 acl:251 sco:0 events:569 errors:0
+>          TX bytes:24822 acl:464 sco:0 commands:37 errors:0
+>          Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
+>          Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>          Link policy:
+>          Link mode: SLAVE ACCEPT
+>          Name: 'ISSCBTA'
+>          Class: 0x000000
+>          Service Classes: Unspecified
+>          Device Class: Miscellaneous,
+>          HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe LMP Ver: 1.2 (0x2) LMP 
+> Subver: 0x1fe
+>          Manufacturer: Integrated System Solution Corp. (57)
+> 
+> ip route
+> 192.168.55.0/24 dev eth0  proto kernel  scope link  src 192.168.55.71
+> 10.0.0.0/24 dev bnep0  proto kernel  scope link  src 10.0.0.1
+> default via 192.168.55.1 dev eth0
+> 
+> (they are both linked via ethernet at present also, so disregard the 
+> eth0 links)
+> 
+> Can anyone suggest what I can try to get this working please? It seems 
+> almost there!
+> 
+> Thanks in advance
+> 
+> -- 
+> Andy
+> e: andy@thebmwz3.co.uk
+> e: andy@broadcast-tech.co.uk
+> 
+> w: http://www.thebmwz3.co.uk
+> w: http://www.broadcast-tech.co.uk
+> 
+> msn: andybrown21@hotmail.com
+> 
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share
+> your
+> opinions on IT & business topics through brief surveys-and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-I'll be happy to post my solution to the list if that's useful.
-
-Thanks,
-Alan.
-
---------------030103080705040308070400
-Content-Type: text/plain;
- name=".asoundrc"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename=".asoundrc"
-
-pcm.headset {
-	type plug;
-	slave.pcm "hw_headset";
-}
-
-pcm.hw_headset {
-	@args [BDADDR TIMEOUT MAX_PERIODS]
-	
-	# The Bluetooth device address for target headset, used for Audio Gateway (PC) initiated connections
-        # Please note that this value is ignored when the connection is Headset initiated
-	@args.BDADDR {
-		type string
-		default "00:03:89:95:9C:83" # Put your HS address here
-	}
-
-	# This value represents how long we will try to reach the headset, until we give up.
-	# Value is in milliseconds
-	@args.TIMEOUT {
-		type integer
-		default 6000
-	}
-
-	# This is the size of the buffer used to queue Voice packets. Value must be between 
-	# 2 and 334 (~ 1 second). Default value is 2 buffers, which works well most of the
-        # time, and has the advantage of giving us an ultra low delay
-	@args.MAX_PERIODS {		
-		type integer
-		default 334
-	}
-
-	type        sco
-	bdaddr      $BDADDR
-	timeout     $TIMEOUT
-	max_periods $MAX_PERIODS
-}
-
-ctl.headset {
-	type sco
-}
-
-pcm.a2dpd {
-        type a2dpd
-}
-
-# Use headset via aoss emulation for skype.
-
-pcm.dsp0 {
-   type plug
-   slave.pcm "hw_headset"      
-}
-
---------------030103080705040308070400
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+Ist Ihr Browser Vista-kompatibel? Jetzt die neuesten 
+Browser-Versionen downloaden: http://www.gmx.net/de/go/browser
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---------------030103080705040308070400
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---------------030103080705040308070400--
