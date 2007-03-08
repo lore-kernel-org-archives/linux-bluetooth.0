@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <be976db60703081101p78084e24g2bd5f076fcee82a2@mail.gmail.com>
-Date: Thu, 8 Mar 2007 11:01:07 -0800
-From: "Mark S. Townsley" <mstownsley@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <45EFCCC9.4090908@thebmwz3.co.uk>
+Date: Thu, 08 Mar 2007 08:43:53 +0000
+From: Andy Brown <andy@thebmwz3.co.uk>
 MIME-Version: 1.0
-Subject: [Bluez-users] DBUS and Bluez
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <45EF24B7.70908@thebmwz3.co.uk> <20070308071329.32910@gmx.net>
+In-Reply-To: <20070308071329.32910@gmx.net>
+Subject: Re: [Bluez-users] pand, bnep0 and no traffic flow
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,66 +16,159 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1728473930=="
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1728473930==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_253669_18866615.1173380467535"
+Thanks for that, I've made that change so the server is now showing:
+hci0:   Type: USB
+         BD Address: 00:02:72:B2:EF:DF ACL MTU: 192:8 SCO MTU: 64:8
+         UP RUNNING PSCAN ISCAN
+         RX bytes:3469781 acl:40952 sco:0 events:104252 errors:0
+         TX bytes:1084252 acl:25246 sco:0 commands:35803 errors:0
 
-------=_Part_253669_18866615.1173380467535
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+but still no luck.
 
-Hi:
+I have also checked and on the client and server, I have done an rfcomm =
 
-I read that Bluez hcid requires DBUS to be up and running to function
-properly.  Is that correct?
+bind to a bluetooth GPS and that works fine, so the adapters are =
 
-I would like to also play with the Bluez DBUS API.  I found  the API guide
-but would like to know if there is anything special
-config entries I need to make inside the DBUS config file.  Can someone
-point me to the proper DBUS config  file for Bluez to
-function properly?
+definately functioning correctly.
 
-thanks.
+Regards,
+
+Andy
 
 
-Mark
 
-------=_Part_253669_18866615.1173380467535
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hans-J=FCrgen Lange wrote:
+> Hello,
+> =
 
-Hi:<br><br>I read that Bluez hcid requires DBUS to be up and running to function properly.&nbsp; Is that correct?<br><br>I would like to also play with the Bluez DBUS API.&nbsp; I found&nbsp; the API guide but would like to know if there is anything special
-<br>config entries I need to make inside the DBUS config file.&nbsp; Can someone point me to the proper DBUS config&nbsp; file for Bluez to<br>function properly?<br>&nbsp;<br>thanks.<br><br><br>Mark<br>
+> the interface on server a has only pscan enabled. change it to pscan/iscan
+> hciconfig <ifcname> piscan
+> =
 
-------=_Part_253669_18866615.1173380467535--
+> BR
+> =
 
+> -------- Original-Nachricht --------
+> Datum: Wed, 07 Mar 2007 20:46:47 +0000
+> Von: Andy <andy@thebmwz3.co.uk>
+> An: bluez-users@lists.sourceforge.net
+> CC: =
 
---===============1728473930==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> Betreff: [Bluez-users] pand, bnep0 and no traffic flow
+> =
+
+>> Hi all,
+>> I'm trying to figure out where things are going wrong with my connection =
+
+>> here.
+>> Server A has /usr/bin/pand --listen -M --role=3DNAP
+>> Server B has pand --connect 00:02:72:B2:EF:21
+>>
+>> The two initiate the connection, and create the bnep0 interface. I set =
+
+>> the IP addresses
+>> ifconfig bnep0 10.0.0.1 netmask 255.255.255.0
+>> ifconfig bnep0 10.0.0.2 netmask 255.255.255.0
+>> respectively, and neither can ping each other.
+>>
+>> Checking the interface on server B, I see TX packets (pinging to server =
+
+>> A) but no RX packets. And on server A I see RX packets and no TX packets.
+>>
+>> I started to think this was networking related, so disabled all iptables =
+
+>> firewalls (flushed, then all rules set to PERMIT) but still nothing
+>> When pings are running from B to A I see this (hcidump on server A):
+>>  > ACL data: handle 41 flags 0x02 dlen 17
+>>  > ACL data: handle 41 flags 0x01 dlen 17
+>>  > ACL data: handle 41 flags 0x01 dlen 7
+>>      L2CAP(d): cid 0x0040 len 37 [psm 0]
+>>  > ACL data: handle 41 flags 0x02 dlen 17
+>>  > ACL data: handle 41 flags 0x01 dlen 17
+>>  > ACL data: handle 41 flags 0x01 dlen 7
+>>      L2CAP(d): cid 0x0040 len 37 [psm 0]
+>>  > ACL data: handle 41 flags 0x02 dlen 17
+>>  > ACL data: handle 41 flags 0x01 dlen 17
+>>  > ACL data: handle 41 flags 0x01 dlen 7
+>>      L2CAP(d): cid 0x0040 len 37 [psm 0]
+>>
+>>
+>> Server A:
+>> hciconfig -a
+>> hci0:   Type: USB
+>>          BD Address: 00:02:72:B2:EF:DF ACL MTU: 192:8 SCO MTU: 64:8
+>>          UP RUNNING PSCAN
+>>          RX bytes:3347915 acl:39829 sco:0 events:100518 errors:0
+>>          TX bytes:1048399 acl:24626 sco:0 commands:34394 errors:0
+>>          Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>>          Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>>          Link policy: RSWITCH HOLD SNIFF PARK
+>>          Link mode: SLAVE ACCEPT
+>>          Name: 'geostat'
+>>          Class: 0x3e0100
+>>          Service Classes: Networking, Rendering, Capturing, Object =
+
+>> Transfer, Audio
+>>          Device Class: Computer, Uncategorized
+>>          HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP =
+
+>> Subver: 0x20d
+>>          Manufacturer: Cambridge Silicon Radio (10)
+>>
+>> ip route
+>> 192.168.55.0/24 dev eth0  proto kernel  scope link  src 192.168.55.1
+>> 10.0.0.0/24 dev bnep0  proto kernel  scope link  src 10.0.0.2
+>> default via 192.168.55.252 dev eth0
+>>
+>>
+>>
+>> Server B:
+>>   hciconfig -a
+>> hci0:   Type: USB
+>>          BD Address: 11:11:11:11:11:11 ACL MTU: 678:8 SCO MTU: 64:10
+>>          UP RUNNING PSCAN ISCAN
+>>          RX bytes:17351 acl:251 sco:0 events:569 errors:0
+>>          TX bytes:24822 acl:464 sco:0 commands:37 errors:0
+>>          Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
+>>          Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>>          Link policy:
+>>          Link mode: SLAVE ACCEPT
+>>          Name: 'ISSCBTA'
+>>          Class: 0x000000
+>>          Service Classes: Unspecified
+>>          Device Class: Miscellaneous,
+>>          HCI Ver: 1.2 (0x2) HCI Rev: 0x1fe LMP Ver: 1.2 (0x2) LMP =
+
+>> Subver: 0x1fe
+>>          Manufacturer: Integrated System Solution Corp. (57)
+>>
+>> ip route
+>> 192.168.55.0/24 dev eth0  proto kernel  scope link  src 192.168.55.71
+>> 10.0.0.0/24 dev bnep0  proto kernel  scope link  src 10.0.0.1
+>> default via 192.168.55.1 dev eth0
+>>
+>> (they are both linked via ethernet at present also, so disregard the =
+
+>> eth0 links)
+>>
+>> Can anyone suggest what I can try to get this working please? It seems =
+
+>> almost there!
+>>
+>> Thanks in advance
+>>
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1728473930==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1728473930==--
