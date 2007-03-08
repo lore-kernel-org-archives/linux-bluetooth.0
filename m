@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45F0CE06.3030405@redhat.com>
-Date: Thu, 08 Mar 2007 22:01:26 -0500
-From: Alan Conway <aconway@redhat.com>
+Message-ID: <45F08496.8000806@wershofen.de>
+Date: Thu, 08 Mar 2007 22:48:06 +0100
+From: Wolfgang Wershofen <wolfgang@wershofen.de>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <45EFC3C7.2060802@redhat.com>
-In-Reply-To: <45EFC3C7.2060802@redhat.com>
-Content-Type: multipart/mixed; boundary="------------040602080803030704090500"
-Subject: Re: [Bluez-users] Headsetd, skype and bluetooth headsets.
+To: BlueZ users <bluez-users@lists.sourceforge.net>,
+        twinklephone@yahoogroups.com
+Subject: [Bluez-users] headsetd(plugz) vs. btsco - My experiences with BT
+	telephony
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,166 +16,106 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------040602080803030704090500
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-Trying to use a plantronics 510s with skype.
+Hi all,
 
-Update on my attempts, I've established the setup that almost works. By 
-almost works I mean:
-- aplay, arecord -D headset work, quality is fine for telephone use.
-- aoss skype almost works: I can hear the test call clearly, I can 
-record a message but when it is played back my voice is garbled beyond 
-recognition.
+I'm using a bluetooth headset for telephony since about one month now
+and like to share my experiences with those interested.
 
-My next step is to fiddle with pcm settings - I've seen .asoundrc 
-scripts for skype and dmix that do conversions between 8 and 16 bit 
-formats and other stuff I know nothing about (but am afraid I'm gonna 
-learn). Here are the details of how I got this far:
+As I said, I use the headset purely for telephony and I managed to
+completely replace my "normal" phone with my PC but it has been a long way.
 
-== DETAILS: based on btsco/docs/build.html from CVS, slightly modified.
+I'm running on 64-bit OpenSuSE 10.2 with kernel 2.6.18. bluez-libs and
+bluez-utils is at 3.7, alsa at 1.0.13.
+I got bluetooth-alsa from CVS on Feb, 6th and installed it as described.
+My Dongle is a Level-One MDU-0005 (CSR chipset) and the headset is a
+JABRA BT-200. I also previously used a B-Speech Vitac Headset/Dongle
+bundle and a Belkin dongle but none of them was working 100% with bluez.
+So it seems still to be true, that one should look out for CSR-chipset
+equiped hardware to run bluetooth under Linux.
 
-install libsbc:
+My telephony setup is based on Asterisk running on the same machine
+connected via a Fritzcard ISDN PCI card to the public network and I'm
+using twinkle as softphone. This setup works perfect when using cabled
+earphones and micro on the interal (Intel) soundcard, but I'd like to
+keep my desktop free from cables - the mess on it is yet enough without
+them ;-)
 
-Note: When asking for a password simply press Enter.
+The first few days after I managed to get bluetooth basically working, I
+decided to use the headsetd daemon instead of btsco because I
+experienced serious delays with the latter.
 
-cvs -d:pserver:anonymous@sbc.cvs.sourceforge.net:/cvsroot/sbc login
-cvs -d:pserver:anonymous@sbc.cvs.sourceforge.net:/cvsroot/sbc co sbc
-cd sbc
-./bootstrap
-./configure --prefix=/usr
-make
-sudo make install
+With headsetd, I was able to hear and speak without problems on most
+phone calls, but I also received complaints about a deafening loud white
+noise on the far end of the line after the call was established. I
+managed to reproduce this once or twice with another phone in my house,
+but I have no clue what is causing this noise. It's absolutely
+unpredictable and occurs randomly. Has anyone encountered this problem,
+too? If so, I'd like to know about it and what may be done to prevent
+this. Any idea?
 
-install bstco:
+As I didn't want to bother my colleagues and friends with loud white
+noise, I soon switched to btsco and the kernel module snd_bt_sco. With
+this, you have two options to choose from: Either use the OSS device
+/dev/dsp1 or the corresponding ALSA device (in my case: plughw:1,0 BT
+headset (BT SCO PCM))
+With both of them, there are issues with access rights at least with
+opensuse. To use /dev/dsp1, I have to chmod it to 666, but then I still
+can't run btsco as normal user. To achieve this, I also have to 666 the
+newly created devices in /dev/snd after loading snd_bt_sco.
 
-cvs 
--d:pserver:anonymous@bluetooth-alsa.cvs.sourceforge.net:/cvsroot/bluetooth-alsa 
-login
-cvs 
--d:pserver:anonymous@bluetooth-alsa.cvs.sourceforge.net:/cvsroot/bluetooth-alsa 
-co btsco
-cd btsco
-./bootstrap
-# Note I added CFLAGS in ./configure. Without them the plugin emits
-# a torrent of debug messages that slow it down and ruin the sound quality.
-# -NDEBUG is essential, -03 is just for good luck.
-./configure --prefix=/usr --enable-alsaplugin CFLAGS="-NDEBUG -03"
-make
-sudo make install
+As mentioned earlier, I encountered delays when using btsco. When I
+receive a call, then my voice is heard noticably later than I talk and
+this leads to some confusion. The effect is unbearable when using
+/dev/dsp1 (delay well over one second) and almost gone when using the
+ALSA-device. On outgoing calls, I never had any delay - one this I still
+don't understand...
 
-** Using from skype
-My .asoundrc is copied from btsco/alsa-plugins/asound.conf with the
-headset address replaced by my own and the following addition for aoss:
+So, using the kernel module snd_bt_sco with btsco and the corresponding
+ALSA device for me is the configuration, that works. I never encountered
+that loud white noise anymore since I switched to btsco and the delay
+with the ALSA-device is absolutely tolerable. In addition, btsco allows
+me to use the headset buttons to receive and end a call.
 
-# Use headset via aoss emulation for skype.
+I still have to write some startup scripts to get everything working
+without manual intervention, but basically all is working well. Maybe a
+wrapper script for btsco would be neccessary to check, if btsco is up
+and running and restart it, if not. Sometimes, btsco looses the channel
+and then silently dies. twinkle doesn't recognize a missing connection
+to the headset and I then get a connected phone call without being able
+to hear or talk to the other end. :-(
 
-pcm.dsp0 {
-   type plug
-   slave.pcm "hw_headset"     
-}
-
-Full .asoundrc attached. Run skype as "aoss skype" (you need alsa-oss 
-package installed.)
+So far for my experiences. I hope this will be helpful for others. I'd
+be glad to receive some feedback and/or hints for improvements. Thx for
+your time.
 
 
-== NOTES
+cu
+Wolfgang
 
-The instructions at http://bluetooth-alsa.sourceforge.net/build.html did 
-*not* work for me. The plugz version of the plugin requires a different 
-.asoundrc (based on plugz/asound.conf) but aplay -D headset gave me:
 
-[aconway@scooter plugz]$ aplay -D headset /usr/share/sounds/startup3.wav
-Playing WAVE '/usr/share/sounds/startup3.wav' : Signed 16 bit Little 
-Endian, Rate 44100 Hz, Stereo
-aplay: set_params:909: Channels count non available
 
-Cheers,
-Alan.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+Comment: Using GnuPG with SUSE - http://enigmail.mozdev.org
 
---------------040602080803030704090500
-Content-Type: text/plain;
- name=".asoundrc"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename=".asoundrc"
-
-pcm.headset {
-	type plug;
-	slave.pcm "hw_headset";
-}
-
-pcm.hw_headset {
-	@args [BDADDR TIMEOUT MAX_PERIODS]
-	
-	# The Bluetooth device address for target headset, used for Audio Gateway (PC) initiated connections
-        # Please note that this value is ignored when the connection is Headset initiated
-	@args.BDADDR {
-		type string
-		default "00:03:89:95:9C:83" # Put your HS address here
-	}
-
-	# This value represents how long we will try to reach the headset, until we give up.
-	# Value is in milliseconds
-	@args.TIMEOUT {
-		type integer
-		default 6000
-	}
-
-	# This is the size of the buffer used to queue Voice packets. Value must be between 
-	# 2 and 334 (~ 1 second). Default value is 2 buffers, which works well most of the
-        # time, and has the advantage of giving us an ultra low delay
-	@args.MAX_PERIODS {		
-		type integer
-		default 334
-	}
-
-	type        sco
-	bdaddr      $BDADDR
-	timeout     $TIMEOUT
-	max_periods $MAX_PERIODS
-}
-
-ctl.headset {
-	type sco
-}
-
-pcm.a2dpd {
-        type a2dpd
-}
-
-# Use headset via aoss emulation for skype.
-
-pcm.dsp0 {
-   type plug
-   slave.pcm "hw_headset"      
-}
-
---------------040602080803030704090500
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+iD8DBQFF8ISWgUafbxFH+p8RAmlbAJ4mDnQXpI7cbsRgLxBOL9im9EI1mQCdFHHm
+B4wjHgFXX4jdAjdwpoZyXt4=
+=Xdlf
+-----END PGP SIGNATURE-----
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---------------040602080803030704090500
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---------------040602080803030704090500--
