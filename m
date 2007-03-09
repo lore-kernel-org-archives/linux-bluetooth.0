@@ -1,166 +1,45 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45F16630.9000606@access-company.com>
-Date: Fri, 09 Mar 2007 14:50:40 +0100
-From: Frederic Danis <frederic.danis@access-company.com>
-MIME-Version: 1.0
+Return-Path: <SRS0+4f1e0d28af8560107a14+1293+infradead.org+dwmw2@pentafluge.srs.infradead.org>
+Subject: Re: [Bluez-devel] HID disconnect oops with 2.6.21-rc3
+From: David Woodhouse <dwmw2@infradead.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="------------020800070500040703030207"
-Subject: [Bluez-devel] RemoteNameRequested signal during discovery patch
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Cc: marcel@holtmann.org
+In-Reply-To: <1173430940.3461.557.camel@pmac.infradead.org>
+References: <1173429077.3461.554.camel@pmac.infradead.org>
+	 <1173430940.3461.557.camel@pmac.infradead.org>
+Content-Type: text/plain
+Date: Fri, 09 Mar 2007 11:13:49 +0000
+Message-Id: <1173438829.3461.585.camel@pmac.infradead.org>
+Mime-Version: 1.0
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-This is a multi-part message in MIME format.
---------------020800070500040703030207
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+On Fri, 2007-03-09 at 09:02 +0000, David Woodhouse wrote:
+> 0xc01ccf04 is in class_uevent (drivers/base/class.c:388).
+> 383                     return 0;
+> 384
+> 385             /* add device, backing this class device (deprecated) */
+> 386             path = kobject_get_path(&dev->kobj, GFP_KERNEL);
+> 387
+> 388             add_uevent_var(envp, num_envp, cur_index, buffer, buffer_size,
+> 389                            cur_len, "PHYSDEVPATH=%s", path);
+> 390             kfree(path);
+> 391
+> 392             if (dev->bus)
 
-Hello,
+Reverting commits f5ffd4620aba9e55656483ae1ef5c79ba81f5403 and
+e1aaadd4d8162a2c33e41dd5a72234ea4d3b014f (my first suspects) didn't fix
+the oops. It just makes it looks like this instead:
 
-I wrote a little patch to add a DBus signal when a remote name is asked 
-by the service daemon during discovery, so discovery applications can 
-display this information to user.
-
-Regards
-
-Fred
+NIP [C001890C] strlen+0x4/0x18
+LR [C012C760] kobject_get_path+0x34/0xc4
+Call Trace:
+[EEFCFE80] [C0092884] __kmalloc_track_caller+0x144/0x164 (unreliable)
+[EEFCFEA0] [C01CCF04] class_uevent+0x48/0x1c0
+[EEFCFEE0] [C012CED8] kobject_uevent_env+0x278/0x490
+[EEFCFF30] [C01CC6A0] class_device_del+0x178/0x1a0
+[EEFCFF50] [C01CC6E0] class_device_unregister+0x18/0x30
+[EEFCFF70] [C021DD38] input_unregister_device+0x13c/0x178
+[EEFCFF90] [F25CF490] hidp_session+0x4d8/0x50c [hidp]
+[EEFCFFF0] [C0013F7C] kernel_thread+0x44/0x60
 
 -- 
------------------------------------------------
-It is not by improving the oil lamp that one invents the electric bulb!
------------------------------------------------
-Danis Frederic                   Access Company
-Software engineer
-Mail : mailto:frederic.danis@access-company.com
------------------------------------------------
-
-
---------------020800070500040703030207
-Content-Type: text/plain;
- name="hcid_name_requested_signal.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="hcid_name_requested_signal.patch"
-
-? hcid/.deps
-? hcid/.libs
-? hcid/Makefile
-? hcid/Makefile.in
-? hcid/hcid
-? hcid/lexer.c
-? hcid/parser.c
-? hcid/parser.h
-Index: hcid/dbus-api.txt
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus-api.txt,v
-retrieving revision 1.108
-diff -u -r1.108 dbus-api.txt
---- hcid/dbus-api.txt	6 Mar 2007 13:37:39 -0000	1.108
-+++ hcid/dbus-api.txt	9 Mar 2007 11:14:46 -0000
-@@ -1021,6 +1021,11 @@
- 			This signal will be sent every time the service daemon
- 			tries to resolve a remote and this fails.
- 
-+		void RemoteNameRequested(string address)
-+
-+			This signal will be sent every time the service daemon
-+			tries to resolve a remote name during discovery.
-+
- 		void RemoteAliasChanged(string address, string alias)
- 
- 			After changing an alias with SetRemoteAlias this
-Index: hcid/dbus-hci.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus-hci.c,v
-retrieving revision 1.16
-diff -u -r1.16 dbus-hci.c
---- hcid/dbus-hci.c	26 Feb 2007 14:13:50 -0000	1.16
-+++ hcid/dbus-hci.c	9 Mar 2007 11:14:47 -0000
-@@ -1005,7 +1005,7 @@
- 
- 	/* send at least one request or return failed if the list is empty */
- 	do {
--		DBusMessage *failed_signal = NULL;
-+		DBusMessage *signal = NULL;
- 		struct remote_dev_info *dev = l->data;
- 		char *peer_addr;
- 		bdaddr_t tmp;
-@@ -1023,7 +1023,7 @@
- 		if (hci_send_req(dd, &rq, 500) < 0) {
- 			error("Unable to send the HCI remote name request: %s (%d)",
- 						strerror(errno), errno);
--			failed_signal = dev_signal_factory(adapter->dev_id,
-+			signal = dev_signal_factory(adapter->dev_id,
- 						"RemoteNameFailed",
- 						DBUS_TYPE_STRING, &peer_addr,
- 						DBUS_TYPE_INVALID);
-@@ -1032,21 +1032,30 @@
- 		if (rp.status) {
- 			error("Remote name request failed with status 0x%02x",
- 					rp.status);
--			failed_signal = dev_signal_factory(adapter->dev_id,
-+			signal = dev_signal_factory(adapter->dev_id,
- 						"RemoteNameFailed",
- 						DBUS_TYPE_STRING, &peer_addr,
- 						DBUS_TYPE_INVALID);
- 		}
- 
--		free(peer_addr);
--
--		if (!failed_signal) {
-+		if (!signal) {
- 			req_sent = 1;
--			break;
-+			/* if we are in discovery, inform application of getting name */
-+			if (adapter->discov_type & (STD_INQUIRY | PERIODIC_INQUIRY)) {
-+				signal = dev_signal_factory(adapter->dev_id,
-+							"RemoteNameRequested",
-+							DBUS_TYPE_STRING, &peer_addr,
-+							DBUS_TYPE_INVALID);
-+			} else {
-+				free(peer_addr);
-+				break;
-+			}
- 		}
- 
--		send_message_and_unref(connection, failed_signal);
--		failed_signal = NULL;
-+		free(peer_addr);
-+
-+		send_message_and_unref(connection, signal);
-+		signal = NULL;
- 
- 		/* if failed, request the next element */
- 		/* remove the element from the list */
-
---------------020800070500040703030207
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---------------020800070500040703030207
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---------------020800070500040703030207--
+dwmw2
