@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45F176B0.3090507@idlum.be>
-Date: Fri, 09 Mar 2007 16:01:04 +0100
-From: Pierre-Yves Paulus <py@idlum.be>
+Message-ID: <45F16630.9000606@access-company.com>
+Date: Fri, 09 Mar 2007 14:50:40 +0100
+From: Frederic Danis <frederic.danis@access-company.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Problem with RFCOMM kernel module
+Content-Type: multipart/mixed; boundary="------------020800070500040703030207"
+Subject: [Bluez-devel] RemoteNameRequested signal during discovery patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,78 +15,152 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+This is a multi-part message in MIME format.
+--------------020800070500040703030207
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+
 Hello,
 
-On a Debian "testing" box running stock debian 2.6.18-3-486 kernel, I 
-sometimes get this in my syslog:
+I wrote a little patch to add a DBus signal when a remote name is asked 
+by the service daemon during discovery, so discovery applications can 
+display this information to user.
 
-kernel: Bluetooth: RFCOMM socket layer initialized
-kernel: Bluetooth: RFCOMM TTY layer initialized
-kernel: Bluetooth: RFCOMM ver 1.8
-kernel: kobject_add failed for rfcomm0 with -EEXIST, don't try to 
-register things with the same name in the same directory.
-kernel:  [<c01a99d3>] kobject_add+0x12e/0x154
-kernel:  [<c020186b>] class_device_add+0x9b/0x3a6
-kernel:  [<c01a977d>] kobject_get+0xf/0x13
-kernel:  [<c0201bfd>] class_device_create+0x77/0x96
-kernel:  [<c01eafcb>] tty_register_device+0xa0/0xab
-kernel:  [<c01ac3c1>] sprintf+0x1d/0x20
-kernel:  [<c82d9520>] rfcomm_dev_ioctl+0x215/0x47a [rfcomm]
-kernel:  [<c82d86f4>] rfcomm_sock_ioctl+0x1c/0x2b [rfcomm]
-kernel:  [<c021adf8>] sock_ioctl+0x198/0x1ba
-kernel:  [<c021ac60>] sock_ioctl+0x0/0x1ba
-kernel:  [<c0156bea>] do_ioctl+0x16/0x42
-kernel:  [<c0156df9>] vfs_ioctl+0x1e3/0x1f1
-kernel:  [<c021c219>] sys_socketcall+0x9f/0x177
-kernel:  [<c0156e51>] sys_ioctl+0x4a/0x61
-kernel:  [<c0102a47>] syscall_call+0x7/0xb
+Regards
 
-When it does happen, BT related operations are pretty much screwed up 
-until next reboot. For background purposes, the box runs a custom 
-application which makes use of Bluez through the DBus bindings, mainly 
-to get /dev/rfcommX sockets to various devices, and sending data to them.
+Fred
 
-What's happening? How to prevent it?
-
-Also, I all the time(obviously when the app is running) get a lot of 
-statements like the followings:
-
-l2cap_recv_acldata: Unexpected continuation frame (len 0)
-l2cap_recv_acldata: Unexpected continuation frame (len 0)
-l2cap_recv_acldata: Unexpected continuation frame (len 0)
-l2cap_recv_acldata: Unexpected continuation frame (len 0)
-l2cap_recv_acldata: Unexpected continuation frame (len 0)
-l2cap_recv_acldata: Unexpected continuation frame (len 0)
-l2cap_recv_acldata: Unexpected continuation frame (len 0)
-hci_acldata_packet: hci1 ACL packet for unknown connection handle 11
-hci_acldata_packet: hci1 ACL packet for unknown connection handle 11
-hci_acldata_packet: hci1 ACL packet for unknown connection handle 11
-hci_acldata_packet: hci1 ACL packet for unknown connection handle 11
-hci_acldata_packet: hci1 ACL packet for unknown connection handle 11
-hci_acldata_packet: hci1 ACL packet for unknown connection handle 11
-l2cap_recv_acldata: Unexpected continuation frame (len 0)
-l2cap_recv_acldata: Unexpected continuation frame (len 0)
+-- 
+-----------------------------------------------
+It is not by improving the oil lamp that one invents the electric bulb!
+-----------------------------------------------
+Danis Frederic                   Access Company
+Software engineer
+Mail : mailto:frederic.danis@access-company.com
+-----------------------------------------------
 
 
-What do they mean? What's happening there?
+--------------020800070500040703030207
+Content-Type: text/plain;
+ name="hcid_name_requested_signal.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="hcid_name_requested_signal.patch"
 
+? hcid/.deps
+? hcid/.libs
+? hcid/Makefile
+? hcid/Makefile.in
+? hcid/hcid
+? hcid/lexer.c
+? hcid/parser.c
+? hcid/parser.h
+Index: hcid/dbus-api.txt
+===================================================================
+RCS file: /cvsroot/bluez/utils/hcid/dbus-api.txt,v
+retrieving revision 1.108
+diff -u -r1.108 dbus-api.txt
+--- hcid/dbus-api.txt	6 Mar 2007 13:37:39 -0000	1.108
++++ hcid/dbus-api.txt	9 Mar 2007 11:14:46 -0000
+@@ -1021,6 +1021,11 @@
+ 			This signal will be sent every time the service daemon
+ 			tries to resolve a remote and this fails.
+ 
++		void RemoteNameRequested(string address)
++
++			This signal will be sent every time the service daemon
++			tries to resolve a remote name during discovery.
++
+ 		void RemoteAliasChanged(string address, string alias)
+ 
+ 			After changing an alias with SetRemoteAlias this
+Index: hcid/dbus-hci.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/hcid/dbus-hci.c,v
+retrieving revision 1.16
+diff -u -r1.16 dbus-hci.c
+--- hcid/dbus-hci.c	26 Feb 2007 14:13:50 -0000	1.16
++++ hcid/dbus-hci.c	9 Mar 2007 11:14:47 -0000
+@@ -1005,7 +1005,7 @@
+ 
+ 	/* send at least one request or return failed if the list is empty */
+ 	do {
+-		DBusMessage *failed_signal = NULL;
++		DBusMessage *signal = NULL;
+ 		struct remote_dev_info *dev = l->data;
+ 		char *peer_addr;
+ 		bdaddr_t tmp;
+@@ -1023,7 +1023,7 @@
+ 		if (hci_send_req(dd, &rq, 500) < 0) {
+ 			error("Unable to send the HCI remote name request: %s (%d)",
+ 						strerror(errno), errno);
+-			failed_signal = dev_signal_factory(adapter->dev_id,
++			signal = dev_signal_factory(adapter->dev_id,
+ 						"RemoteNameFailed",
+ 						DBUS_TYPE_STRING, &peer_addr,
+ 						DBUS_TYPE_INVALID);
+@@ -1032,21 +1032,30 @@
+ 		if (rp.status) {
+ 			error("Remote name request failed with status 0x%02x",
+ 					rp.status);
+-			failed_signal = dev_signal_factory(adapter->dev_id,
++			signal = dev_signal_factory(adapter->dev_id,
+ 						"RemoteNameFailed",
+ 						DBUS_TYPE_STRING, &peer_addr,
+ 						DBUS_TYPE_INVALID);
+ 		}
+ 
+-		free(peer_addr);
+-
+-		if (!failed_signal) {
++		if (!signal) {
+ 			req_sent = 1;
+-			break;
++			/* if we are in discovery, inform application of getting name */
++			if (adapter->discov_type & (STD_INQUIRY | PERIODIC_INQUIRY)) {
++				signal = dev_signal_factory(adapter->dev_id,
++							"RemoteNameRequested",
++							DBUS_TYPE_STRING, &peer_addr,
++							DBUS_TYPE_INVALID);
++			} else {
++				free(peer_addr);
++				break;
++			}
+ 		}
+ 
+-		send_message_and_unref(connection, failed_signal);
+-		failed_signal = NULL;
++		free(peer_addr);
++
++		send_message_and_unref(connection, signal);
++		signal = NULL;
+ 
+ 		/* if failed, request the next element */
+ 		/* remove the element from the list */
 
-Thanks in advance,
-Best Regards
-
-Pierre-Yves Paulus
-
+--------------020800070500040703030207
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--------------020800070500040703030207
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--------------020800070500040703030207--
