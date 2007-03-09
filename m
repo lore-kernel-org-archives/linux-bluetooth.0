@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45F1A28D.7070502@xmission.com>
-Date: Fri, 09 Mar 2007 11:08:13 -0700
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <45F08496.8000806@wershofen.de>
-In-Reply-To: <45F08496.8000806@wershofen.de>
-Subject: Re: [Bluez-users] headsetd(plugz) vs. btsco - My experiences with
- BT	telephony
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Fri, 9 Mar 2007 10:34:15 -0600
+From: Igor Chudov <ichudov@Algebra.Com>
+To: BlueZ Users <bluez-users@lists.sourceforge.net>
+Message-ID: <20070309163415.GA4400@manifold.algebra.com>
+Mime-Version: 1.0
+Subject: [Bluez-users] Are my expectations reasonable?
+Reply-To: ichudov@Algebra.Com, BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,16 +18,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Wolfgang
+I have a Linux laptop running Fedora Core 6. I also have a Motorola
+V557 cell phone. See 
 
-Did you patch your kernel with the flowcontrol patch (plugz/patches)? It 
-might help the loud noise. Are you trying a recent version of plugz?
+     http://www.motorola.com/motoinfo/product/details.jsp?globalObjectId=100
 
-It sounds like you may have an audio server introducing latency with 
-btsco. It's more likely to happen with btsco accidentally since it shows 
-up as a "real" alsa kernel device.
+I would like to be able to do the following:
 
-Brad
+1) Use my phone as a modem via Bluetooth, for the linux box
+2) Connect my phone to the linux box to download ringontes, blah blah
+
+Is that possible with bluez? I am subrscribed to this list and would
+like to participate meaningfully. I am in my 12th year of using
+linux. 
+
+i
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
