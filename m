@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45F18561.7040005@idlum.be>
-Date: Fri, 09 Mar 2007 17:03:45 +0100
+Message-ID: <45F176B0.3090507@idlum.be>
+Date: Fri, 09 Mar 2007 16:01:04 +0100
 From: Pierre-Yves Paulus <py@idlum.be>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45F176B0.3090507@idlum.be>
-In-Reply-To: <45F176B0.3090507@idlum.be>
-Subject: Re: [Bluez-devel] Problem with RFCOMM kernel module
+Subject: [Bluez-devel] Problem with RFCOMM kernel module
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,42 +18,67 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I just got a kernel crash on the same box. Here is the trace I was able 
-to gather (was connected per ssh and this suddenly appeared). No screen 
-was connected to the box at the time of the crash, I connected one, and 
-there was some more info. There is a pic of the screen there if it may 
-help: http://img409.imageshack.us/my.php?image=kernelcrashif0.jpg
+Hello,
 
-In userspace, there was (as for my previous message) only hcid running, 
-and obviously my app performing dbus calls to it.
+On a Debian "testing" box running stock debian 2.6.18-3-486 kernel, I 
+sometimes get this in my syslog:
 
-Message from syslogd@p2a at Fri Mar  9 15:47:40 2007 ...
-kernel: Oops: 0000 [#1]
-kernel: CPU:    0
-kernel: EIP is at rfcomm_tty_chars_in_buffer+0x6/0x18 [rfcomm]
-kernel: eax: 00000000   ebx: c6c51800   ecx: 00000000   edx: c773f000
-kernel: esi: 00000000   edi: c5c1e4a0   ebp: c6c5180c   esp: c3837c08
-kernel: ds: 007b   es: 007b   ss: 0068
-kernel: Process hcid (pid: 16185, ti=c3836000 task=c2f87ab0 
-task.ti=c3836000)
-kernel: Stack: c01ef32b c01ef253 c6c51800 c5c1e4a0 c01eb873 00000000 
-00000000 c3837eb0
-kernel:        c5c1e4a0 c3837e98 c01574aa c3837fb0 080808f0 08080920 
-00000000 c3837e98
-kernel:        c3837e98 c3837e98 c3837ed0 00000000 c0157f5e 00000000 
-00000000 00000008
-kernel: Call Trace:
-kernel: Code: 8b 98 70 01 00 00 8b 43 3c 8b 48 48 8b 50 54 85 d2 75 02 
-b2 01 8b 43 60 0f af ca 29 c1 89 c8 79 02 31 c0 5b c3 8b 80 70 01 00 00 
-<8b> 50 3c 8d 42 0c 39 42 0c 75 03 31 c0 c3 8b 42 48 c3
-c3 c3 31
-kernel: EIP: [<c82d6d50>] rfcomm_tty_chars_in_buffer+0x6/0x18 [rfcomm] 
-SS:ESP 0068:c3837c08
+kernel: Bluetooth: RFCOMM socket layer initialized
+kernel: Bluetooth: RFCOMM TTY layer initialized
+kernel: Bluetooth: RFCOMM ver 1.8
+kernel: kobject_add failed for rfcomm0 with -EEXIST, don't try to 
+register things with the same name in the same directory.
+kernel:  [<c01a99d3>] kobject_add+0x12e/0x154
+kernel:  [<c020186b>] class_device_add+0x9b/0x3a6
+kernel:  [<c01a977d>] kobject_get+0xf/0x13
+kernel:  [<c0201bfd>] class_device_create+0x77/0x96
+kernel:  [<c01eafcb>] tty_register_device+0xa0/0xab
+kernel:  [<c01ac3c1>] sprintf+0x1d/0x20
+kernel:  [<c82d9520>] rfcomm_dev_ioctl+0x215/0x47a [rfcomm]
+kernel:  [<c82d86f4>] rfcomm_sock_ioctl+0x1c/0x2b [rfcomm]
+kernel:  [<c021adf8>] sock_ioctl+0x198/0x1ba
+kernel:  [<c021ac60>] sock_ioctl+0x0/0x1ba
+kernel:  [<c0156bea>] do_ioctl+0x16/0x42
+kernel:  [<c0156df9>] vfs_ioctl+0x1e3/0x1f1
+kernel:  [<c021c219>] sys_socketcall+0x9f/0x177
+kernel:  [<c0156e51>] sys_ioctl+0x4a/0x61
+kernel:  [<c0102a47>] syscall_call+0x7/0xb
 
-What happened?
+When it does happen, BT related operations are pretty much screwed up 
+until next reboot. For background purposes, the box runs a custom 
+application which makes use of Bluez through the DBus bindings, mainly 
+to get /dev/rfcommX sockets to various devices, and sending data to them.
 
-Best Regards,
+What's happening? How to prevent it?
+
+Also, I all the time(obviously when the app is running) get a lot of 
+statements like the followings:
+
+l2cap_recv_acldata: Unexpected continuation frame (len 0)
+l2cap_recv_acldata: Unexpected continuation frame (len 0)
+l2cap_recv_acldata: Unexpected continuation frame (len 0)
+l2cap_recv_acldata: Unexpected continuation frame (len 0)
+l2cap_recv_acldata: Unexpected continuation frame (len 0)
+l2cap_recv_acldata: Unexpected continuation frame (len 0)
+l2cap_recv_acldata: Unexpected continuation frame (len 0)
+hci_acldata_packet: hci1 ACL packet for unknown connection handle 11
+hci_acldata_packet: hci1 ACL packet for unknown connection handle 11
+hci_acldata_packet: hci1 ACL packet for unknown connection handle 11
+hci_acldata_packet: hci1 ACL packet for unknown connection handle 11
+hci_acldata_packet: hci1 ACL packet for unknown connection handle 11
+hci_acldata_packet: hci1 ACL packet for unknown connection handle 11
+l2cap_recv_acldata: Unexpected continuation frame (len 0)
+l2cap_recv_acldata: Unexpected continuation frame (len 0)
+
+
+What do they mean? What's happening there?
+
+
+Thanks in advance,
+Best Regards
+
 Pierre-Yves Paulus
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
