@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45F18755.7040307@exon.dyndns.org>
-Date: Fri, 09 Mar 2007 17:12:05 +0100
-From: bluez.mexon@spamgourmet.com
+Message-ID: <45F18561.7040005@idlum.be>
+Date: Fri, 09 Mar 2007 17:03:45 +0100
+From: Pierre-Yves Paulus <py@idlum.be>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] a2dpd produces choppy audio with Digitus dongle,
-	OK with D-Link
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <45F176B0.3090507@idlum.be>
+In-Reply-To: <45F176B0.3090507@idlum.be>
+Subject: Re: [Bluez-devel] Problem with RFCOMM kernel module
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,201 +20,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I followed the suggestion to try alsaplayer instead of XMMS, and managed 
-to get a2dpd working.  XMMS, aplay, ESD, and Xine all fail, but at least 
-I can prove that things work in principle.
+I just got a kernel crash on the same box. Here is the trace I was able 
+to gather (was connected per ssh and this suddenly appeared). No screen 
+was connected to the box at the time of the crash, I connected one, and 
+there was some more info. There is a pic of the screen there if it may 
+help: http://img409.imageshack.us/my.php?image=kernelcrashif0.jpg
 
-However, when I try using my Digitus DN-3008M1 instead of my D-Link 
-DBT-120, the sound is choppy, alternating half a second of sound with at 
-least a second of silence, making it unusable.
+In userspace, there was (as for my previous message) only hcid running, 
+and obviously my app performing dbus calls to it.
 
-Does anyone know what causes the choppiness?  On the host side, the 
-configuration is identical.  The Digitus dongle is a CSR chipset, which 
-is supposed to be the good stuff:
+Message from syslogd@p2a at Fri Mar  9 15:47:40 2007 ...
+kernel: Oops: 0000 [#1]
+kernel: CPU:    0
+kernel: EIP is at rfcomm_tty_chars_in_buffer+0x6/0x18 [rfcomm]
+kernel: eax: 00000000   ebx: c6c51800   ecx: 00000000   edx: c773f000
+kernel: esi: 00000000   edi: c5c1e4a0   ebp: c6c5180c   esp: c3837c08
+kernel: ds: 007b   es: 007b   ss: 0068
+kernel: Process hcid (pid: 16185, ti=c3836000 task=c2f87ab0 
+task.ti=c3836000)
+kernel: Stack: c01ef32b c01ef253 c6c51800 c5c1e4a0 c01eb873 00000000 
+00000000 c3837eb0
+kernel:        c5c1e4a0 c3837e98 c01574aa c3837fb0 080808f0 08080920 
+00000000 c3837e98
+kernel:        c3837e98 c3837e98 c3837ed0 00000000 c0157f5e 00000000 
+00000000 00000008
+kernel: Call Trace:
+kernel: Code: 8b 98 70 01 00 00 8b 43 3c 8b 48 48 8b 50 54 85 d2 75 02 
+b2 01 8b 43 60 0f af ca 29 c1 89 c8 79 02 31 c0 5b c3 8b 80 70 01 00 00 
+<8b> 50 3c 8d 42 0c 39 42 0c 75 03 31 c0 c3 8b 42 48 c3
+c3 c3 31
+kernel: EIP: [<c82d6d50>] rfcomm_tty_chars_in_buffer+0x6/0x18 [rfcomm] 
+SS:ESP 0068:c3837c08
 
-hci0:   Type: USB
-         BD Address: XX:XX:XX:XX:XX:XX ACL MTU: 192:8 SCO MTU: 64:8
-         HCI 18.2.1
-         Chip version: BlueCore3-ROM
-         Max key size: 128 bit
-         SCO mapping:  HCI
+What happened?
 
-Attached is a big chunk of the error messages a2dpd prints out.  It 
-looks bad, but I don't have the faintest clue what it all means.
-
-Thanks for any help,
-Mat
-
-A2DPD[16:42:52.033]: a2dp_state_machine: Too many answer for AVDTP_CLOSE
-A2DPD[16:42:52.033]: a2dp_state_machine: State AVDTP_STATEX_DISCONNECTING
-A2DPD[16:42:52.033]: a2dp_disconnect:
-A2DPD[16:42:52.033]: a2dp_stream_stop: Closing stream socket 13
-A2DPD[16:42:52.033]: close_socket: Closing 13
-A2DPD[16:42:52.033]: a2dp_stream_stop: Closed
-A2DPD[16:42:52.033]: a2dp_stream_stop: State AVDTP_STATE_IDLE
-A2DPD[16:42:52.033]: a2dp_disconnect: Closing ctl socket 12
-A2DPD[16:42:52.034]: close_socket: Closing 12
-A2DPD[16:42:52.034]: a2dp_disconnect: Closed
-A2DPD[16:42:52.034]: a2dp_disconnect: State AVDTP_STATE_DISCONNECTED
-A2DPD[16:42:52.034]: a2dpd_signal_state: Disconnected
-A2DPD[16:42:52.034]: a2dp_state_connect: State AVDTP_STATEX_SDP_CONNECTING
-A2DPD[16:42:52.034]: a2dp_state_machine: Role is INITIATOR
-A2DPD[16:42:52.034]: a2dp_state_machine: SDP connection on socket 12
-A2DPD[16:42:52.034]: a2dp_state_machine: State 
-AVDTP_STATEX_SDP_CONNECTING_WAIT
-A2DPD[16:42:52.034]: a2dpd_signal_state: Connecting XX:XX:XX:XX:XX:XX
-A2DPD[16:42:55.158]: a2dp_state_machine: SDP connection terminated
-A2DPD[16:42:55.234]: get_avdtp_psm: Parsing results
-A2DPD[16:42:55.234]: get_avdtp_psm: Record
-A2DPD[16:42:55.234]: get_avdtp_psm: Service Search OK
-A2DPD[16:42:55.273]: get_avdtp_psm: Checking non spec audio
-A2DPD[16:42:55.273]: a2dp_state_machine: Found psm 25
-A2DPD[16:42:55.273]: a2dp_state_machine: State AVDTP_STATEX_CTL_CONNECTING
-A2DPD[16:42:55.273]: a2dp_state_machine: Socket is 12
-A2DPD[16:42:55.273]: a2dp_state_machine: State 
-AVDTP_STATEX_CTL_CONNECTING_WAIT
-A2DPD[16:42:55.362]: poll_error: POLLHUP detected on socket 14
-A2DPD[16:42:55.362]: close_socket: Closing 14
-A2DPD[16:42:55.477]: a2dp_state_machine: State AVDTP_STATE_IDLE
-A2DPD[16:42:55.533]: a2dp_state_machine: State AVDTP_STATEX_DISCOVERING
-A2DPD[16:42:55.533]: a2dp_state_machine: State AVDTP_STATEX_DISCOVERING_RESP
-A2DPD[16:42:55.581]: a2dp_handle_avdtp_message: Read non command packet 
-(msgtype=MESSAGE_TYPE_ACCEPT,signal=AVDTP_DISCOVER)
-A2DPD[16:42:55.581]: a2dp_state_machine: AVDTP_DISCOVER success
-A2DPD[16:42:55.581]: a2dp_state_machine: State 
-AVDTP_STATEX_GETTING_CAPABILITIES
-A2DPD[16:42:55.614]: a2dp_state_machine: Getting capabilities for SEID=1
-A2DPD[16:42:55.614]: a2dp_state_machine: State 
-AVDTP_STATEX_GETTING_CAPABILITIES_RESP
-A2DPD[16:42:55.685]: a2dp_handle_avdtp_message: Read non command packet 
-(msgtype=MESSAGE_TYPE_ACCEPT,signal=AVDTP_GET_CAPABILITIES)
-A2DPD[16:42:55.685]: a2dp_state_machine: AVDTP_GET_CAPABILITIES success 
-for seid 1
-A2DPD[16:42:55.685]: a2dp_state_machine: servcap_cap=1, servcap_len=0,
-A2DPD[16:42:55.685]: a2dp_state_machine: cap_type=7, length=6
-A2DPD[16:42:55.685]: a2dp_state_machine: media_type=0, codec=0
-A2DPD[16:42:55.685]: a2dp_state_machine: A2DPD  Prefered bitpool 32
-A2DPD[16:42:55.685]: a2dp_state_machine: Device Prefered bitpool 2 -> 32
-A2DPD[16:42:55.685]: a2dp_state_machine: A2DPD  Selected bitpool 32
-A2DPD[16:42:55.685]: a2dp_state_machine: State 
-AVDTP_STATEX_SETTING_CONFIGURATION
-A2DPD[16:42:55.704]: a2dp_state_machine: State 
-AVDTP_STATEX_SETTING_CONFIGURATION_RESP
-A2DPD[16:42:58.000]: a2dp_state_machine: Too many answer for 
-AVDTP_SET_CONFIGURATION
-A2DPD[16:42:58.000]: a2dp_state_machine: State AVDTP_STATEX_DISCONNECTING
-A2DPD[16:42:58.067]: a2dp_disconnect:
-A2DPD[16:42:58.067]: a2dp_stream_stop: Closing stream socket -1
-A2DPD[16:42:58.068]: a2dp_stream_stop: Closed
-A2DPD[16:42:58.068]: a2dp_stream_stop: State AVDTP_STATE_IDLE
-A2DPD[16:42:58.068]: a2dp_disconnect: Closing ctl socket 12
-A2DPD[16:42:58.068]: close_socket: Closing 12
-A2DPD[16:42:58.068]: a2dp_disconnect: Closed
-A2DPD[16:42:58.068]: a2dp_disconnect: State AVDTP_STATE_DISCONNECTED
-A2DPD[16:42:58.068]: a2dpd_signal_state: Disconnected
-A2DPD[16:42:58.069]: a2dp_state_connect: State AVDTP_STATEX_SDP_CONNECTING
-A2DPD[16:42:58.069]: a2dp_state_machine: Role is INITIATOR
-A2DPD[16:42:58.069]: a2dp_state_machine: SDP connection on socket 12
-A2DPD[16:42:58.069]: a2dp_state_machine: State 
-AVDTP_STATEX_SDP_CONNECTING_WAIT
-A2DPD[16:42:58.069]: a2dpd_signal_state: Connecting XX:XX:XX:XX:XX:XX
-A2DPD[16:42:59.469]: a2dp_state_machine: SDP connection terminated
-A2DPD[16:42:59.539]: get_avdtp_psm: Parsing results
-A2DPD[16:42:59.539]: get_avdtp_psm: Record
-A2DPD[16:42:59.539]: get_avdtp_psm: Service Search OK
-A2DPD[16:42:59.581]: get_avdtp_psm: Checking non spec audio
-A2DPD[16:42:59.581]: a2dp_state_machine: Found psm 25
-A2DPD[16:42:59.581]: a2dp_state_machine: State AVDTP_STATEX_CTL_CONNECTING
-A2DPD[16:42:59.582]: a2dp_state_machine: Socket is 12
-A2DPD[16:42:59.582]: a2dp_state_machine: State 
-AVDTP_STATEX_CTL_CONNECTING_WAIT
-A2DPD[16:42:59.799]: a2dp_state_machine: State AVDTP_STATE_IDLE
-A2DPD[16:42:59.846]: a2dp_state_machine: State AVDTP_STATEX_DISCOVERING
-A2DPD[16:42:59.846]: a2dp_state_machine: State AVDTP_STATEX_DISCOVERING_RESP
-A2DPD[16:42:59.927]: a2dp_handle_avdtp_message: Read non command packet 
-(msgtype=MESSAGE_TYPE_ACCEPT,signal=AVDTP_DISCOVER)
-A2DPD[16:42:59.927]: a2dp_state_machine: AVDTP_DISCOVER success
-A2DPD[16:42:59.927]: a2dp_state_machine: State 
-AVDTP_STATEX_GETTING_CAPABILITIES
-A2DPD[16:42:59.930]: a2dp_state_machine: Getting capabilities for SEID=1
-A2DPD[16:42:59.930]: a2dp_state_machine: State 
-AVDTP_STATEX_GETTING_CAPABILITIES_RESP
-A2DPD[16:43:00.039]: a2dp_handle_avdtp_message: Read non command packet 
-(msgtype=MESSAGE_TYPE_ACCEPT,signal=AVDTP_GET_CAPABILITIES)
-A2DPD[16:43:00.039]: a2dp_state_machine: AVDTP_GET_CAPABILITIES success 
-for seid 1
-A2DPD[16:43:00.039]: a2dp_state_machine: servcap_cap=1, servcap_len=0,
-A2DPD[16:43:00.039]: a2dp_state_machine: cap_type=7, length=6
-A2DPD[16:43:00.039]: a2dp_state_machine: media_type=0, codec=0
-A2DPD[16:43:00.039]: a2dp_state_machine: A2DPD  Prefered bitpool 32
-A2DPD[16:43:00.039]: a2dp_state_machine: Device Prefered bitpool 2 -> 32
-A2DPD[16:43:00.039]: a2dp_state_machine: A2DPD  Selected bitpool 32
-A2DPD[16:43:00.039]: a2dp_state_machine: State 
-AVDTP_STATEX_SETTING_CONFIGURATION
-A2DPD[16:43:00.085]: a2dp_state_machine: State 
-AVDTP_STATEX_SETTING_CONFIGURATION_RESP
-A2DPD[16:43:00.230]: a2dp_handle_avdtp_message: Read non command packet 
-(msgtype=MESSAGE_TYPE_ACCEPT,signal=AVDTP_SET_CONFIGURATION)
-A2DPD[16:43:00.230]: a2dp_state_machine: AVDTP_SET_CONFIGURATION success
-A2DPD[16:43:00.230]: a2dp_state_machine: State AVDTP_STATEX_STREAM_OPENING
-A2DPD[16:43:00.265]: a2dp_state_machine: State 
-AVDTP_STATEX_STREAM_OPENING_RESP
-A2DPD[16:43:00.337]: a2dp_handle_avdtp_message: Read non command packet 
-(msgtype=MESSAGE_TYPE_ACCEPT,signal=AVDTP_OPEN)
-A2DPD[16:43:00.337]: a2dp_state_machine: AVDTP_OPEN success
-A2DPD[16:43:00.337]: a2dp_state_machine: State AVDTP_STATE_CONFIGURED
-A2DPD[16:43:00.353]: a2dp_state_machine: State 
-AVDTP_STATEX_STREAM_CONNECTING
-A2DPD[16:43:00.353]: a2dp_state_machine: Socket is 13
-A2DPD[16:43:00.353]: a2dp_state_machine: State 
-AVDTP_STATEX_STREAM_CONNECTING_WAIT
-A2DPD[16:43:00.600]: a2dp_state_machine: Stream connected
-A2DPD[16:43:00.600]: get_socket_omtu: Socket 13 imtu=672, omtu=895, 
-flush_to=65535
-A2DPD[16:43:00.600]: a2dp_state_machine: State 
-AVDTP_STATE_OPEN_START_STREAMING
-A2DPD[16:43:00.637]: a2dp_state_machine: State AVDTP_STATEX_STREAM_STARTING
-A2DPD[16:43:00.637]: a2dpd_signal_state: Connected XX:XX:XX:XX:XX:XX
-A2DPD[16:43:00.638]: a2dp_state_machine: State 
-AVDTP_STATEX_STREAM_STARTING_WAIT
-A2DPD[16:43:00.861]: a2dp_handle_avdtp_message: Read non command packet 
-(msgtype=MESSAGE_TYPE_ACCEPT,signal=AVDTP_START)
-A2DPD[16:43:00.861]: a2dp_state_machine: AVDTP_START success
-A2DPD[16:43:00.861]: a2dp_state_machine: State AVDTP_STATE_STREAMING
-A2DPD[16:43:03.508]: a2dp_transfer_raw: Wrote -1 not 849 bytes (sbc.len=76)
-A2DPD[16:43:03.508]: transfer_outgoing_packets: Error in transfer 
-(transfer=-1)
-A2DPD[16:43:03.508]: a2dp_state_disconnect: State 
-AVDTP_STATEX_STREAM_CLOSING
-A2DPD[16:43:03.561]: a2dp_state_machine: State 
-AVDTP_STATEX_STREAM_CLOSING_WAIT
-A2DPD[16:43:03.562]: a2dpd_signal_state: Connecting XX:XX:XX:XX:XX:XX
-A2DPD[16:43:05.736]: get_socket_omtu: Socket 9 imtu=672, omtu=0, 
-flush_to=65535
-A2DPD[16:43:05.737]: avrcp_state_machine: socket 14: Connection from 
-DB:AF:82:89:03:00, mtu=610 accepted at index 0
-A2DPD[16:43:06.011]: a2dp_state_machine: Too many answer for AVDTP_CLOSE
-A2DPD[16:43:06.011]: a2dp_state_machine: State AVDTP_STATEX_DISCONNECTING
-A2DPD[16:43:06.011]: a2dp_disconnect:
-A2DPD[16:43:06.011]: a2dp_stream_stop: Closing stream socket 13
-A2DPD[16:43:06.011]: close_socket: Closing 13
-A2DPD[16:43:06.011]: a2dp_stream_stop: Closed
-A2DPD[16:43:06.011]: a2dp_stream_stop: State AVDTP_STATE_IDLE
-A2DPD[16:43:06.011]: a2dp_disconnect: Closing ctl socket 12
-A2DPD[16:43:06.011]: close_socket: Closing 12
-A2DPD[16:43:06.011]: a2dp_disconnect: Closed
-A2DPD[16:43:06.011]: a2dp_disconnect: State AVDTP_STATE_DISCONNECTED
-A2DPD[16:43:06.011]: a2dpd_signal_state: Disconnected
-A2DPD[16:43:06.011]: a2dp_state_connect: State AVDTP_STATEX_SDP_CONNECTING
-A2DPD[16:43:06.011]: a2dp_state_machine: Role is INITIATOR
-A2DPD[16:43:06.011]: a2dp_state_machine: SDP connection on socket 12
-A2DPD[16:43:06.011]: a2dp_state_machine: State 
-AVDTP_STATEX_SDP_CONNECTING_WAIT
-A2DPD[16:43:06.011]: a2dpd_signal_state: Connecting XX:XX:XX:XX:XX:XX
-A2DPD[16:43:08.917]: a2dp_state_machine: SDP connection terminated
-A2DPD[16:43:08.988]: get_avdtp_psm: Parsing results
-A2DPD[16:43:08.988]: get_avdtp_psm: Record
-A2DPD[16:43:08.988]: get_avdtp_psm: Service Search OK
+Best Regards,
+Pierre-Yves Paulus
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
