@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sun, 11 Mar 2007 13:32:23 -0700
-From: Matt Zimmerman <mdz@ubuntu.com>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20070311203223.GP8187@alcor.net>
+Message-ID: <45F40969.7020201@yahoo.com.au>
+Date: Sun, 11 Mar 2007 14:51:37 +0100
+From: bluez.mexon@spamgourmet.com
 MIME-Version: 1.0
-Subject: [Bluez-users] Plantronics 510 headset: playback partially works,
-	but not recording
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Adventures with a class 1 dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,66 +18,65 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I'm attempting to get my Plantronics 510 headset talking to my desktop PC.
-I'm using:
+Since I was asked to report my experiences with my new Digitus DN-3008M1...
 
-- Ubuntu Feisty
-- bluez 3.9
-- Linux 2.6.20 + sco-flowcontrol-v3.0.diff
-- This USB dongle: Bus 003 Device 009: ID 1131:1001 Integrated System Solution Corp. KY-BT100 Bluetooth Adapter
+The reason I was after a class 1 dongle is because I have a pair of
+Plantronics 590A headphones, which come with their own audio-only
+dongle, and the range is rather less than I would like.  They probably
+reach to around 7 metres, but at that range you have to hold your head
+in exactly the right position to hear anything.  I was hoping that a
+class 1 dongle would have a longer range.
 
-and the example .asoundrc from CVS, modified to set the MAC address for my headset.
+Of course, Bluez's A2DP support is still experimental, and the whole
+field of audio under Linux is such a horrible broken mess anyway, I was
+under no illusions that this would be any kind of good solution.  This
+was just to future-proof myself.  Maybe one day the various warring
+tribes that comprise audio development under Linux will wipe each other
+out in a nuclear holocaust and a new civilisation will arise from the
+ashes, at which point my class 1 USB dongle might start to be useful.
 
-Playback seems to be mostly working.  I can play short sounds to the headset
-using aplay.  I tried playing a song (resampled to 8kHz mono) as a test, but
-it cuts out periodically, approximately once per second.  I hear about 0.25
-seconds of audio followed by 0.75 seconds of silence, etc.  I'm not sure
-whether this is due to aplay or a problem with the bluetooth setup; is this
-expected to work?
+In the meantime, I was interested to know exactly what range I could get
+out of my headset.  Everyone knows that class 2 devices can talk to each
+other over a range of "10 metres" (a "metre" being a unit of length used
+only by radio equipment manufacturers, measuring about a foot), and that
+class 1 devices can talk to each over a range of "100 metres".  But
+what's the range between a class 2 device and a class 1 device?  If my
+class 1 device is sending the bulk of the data, should I be getting
+class 1 range?  What about the ACK packets?  It seemed worth experimenting.
 
-Recording with arecord doesn't work at all.  When I try, I get this from hcidump:
+So, the results.  As I say, the dongle that comes with the Plantronics
+590A achieved about 7m (real metres, not radio-equipment-manufacturer
+fluffy pink fantasy metres).
 
-< HCI Command: Add SCO Connection (0x01|0x0007) plen 4
-    handle 1 ptype 0x00e0
-    Packet type: HV1 HV2 HV3 
-> HCI Event: Command Status (0x0f) plen 4
-    Add SCO Connection (0x01|0x0007) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 2 bdaddr 00:03:89:97:13:9E type SCO encrypt 0x01
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr 00:03:89:97:13:9E mode 2 clkoffset 0x0000
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> ACL data: handle 1 flags 0x02 dlen 19
-    L2CAP(d): cid 0x0041 len 15 [psm 0]
-< ACL data: handle 1 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0043 len 10 [psm 0]
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr 00:03:89:97:13:9E name 'PLT  510'
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 1 packets 1
-> ACL data: handle 1 flags 0x02 dlen 19
-    L2CAP(d): cid 0x0041 len 15 [psm 0]
-< ACL data: handle 1 flags 0x02 dlen 14
-    L2CAP(d): cid 0x0043 len 10 [psm 0]
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 1 packets 1
+My old DBT-120 (revision B2), of which I had high hopes, performed
+atrociously, getting maybe 3m.  I bought two of these dongles years ago,
+back when I thought bluetooth might compete with wifi for home
+networking.  I got similar terrible results then as well, making them
+useless for their intended purpose.  I now use a DBT-120 with my
+bluetooth mouse, which obviously can happily stay within range.
 
-and this from headsetd:
+And my new Digitus DN-3008M1 class 1 dongle got... drum roll please...
+about 10m.  That is, the actual distance depended heavily on how many
+intervening walls and things were in the way.  Between my computer and
+bedroom, about 9m and a few intervening walls, it performed OK, although
+would still cut out if I had my head facing in the wrong direction.  It
+managed to broadcast through two intervening floors, but cut out when I
+went into the cellar.
 
-Mar 11 13:27:45 localhost headsetd[779]: Changing state: Connected-->Ready
-Mar 11 13:27:45 localhost headsetd[779]: Changing state: Ready-->Opening
-Mar 11 13:27:46 localhost headsetd[779]: SCO channel opened handle=0x0002 mtu=48
-Mar 11 13:27:46 localhost headsetd[779]: Changing state: Opening-->Streaming
+So the conclusion:
 
-The headset beeps and its LED flashes more quickly to tell me that it's
-recording (as expected; it does both with my phone), but no data is received
-by arecord.
+* Don't believe the lies about "10m" and "100m".
 
-Has anyone else seen behaviour like this?  How can I diagnose the problem?
+* A class 2 dongle is adequate when the devices are in the same room.
 
--- 
- - mdz
+* A class 1 dongle is adequate when the devices are in the same house.
+Assuming it's a fairly small house.
+
+* Anything more than that, you need the class 0 dongle, which glows
+white-hot during operation and knocks migrating birds out of the sky.
+
+All in all, I'd consider that a good result.  Now if only there was a 
+class 1 dongle that supported HID proxy...
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
