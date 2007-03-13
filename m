@@ -1,130 +1,120 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: =?iso-8859-1?q?Barth=E9l=E9my_Lemaire?= <barthelemy.lemaire@fpms.ac.be>
-To: Bluez-devel@lists.sourceforge.net
-Date: Tue, 13 Mar 2007 15:54:12 +0100
+Return-Path: <sitelist-bounces@lists.sourceforge.net>
+Subject: Bluez-devel post from cornelia.huck@de.ibm.com requires approval
+From: bluez-devel-owner@lists.sourceforge.net
+To: bluez-devel-owner@lists.sourceforge.net
 MIME-Version: 1.0
-Message-Id: <200703131554.12347.barthelemy.lemaire@fpms.ac.be>
-Subject: [Bluez-devel] Communicating with a Bluetooth Module - SPP profile
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Content-Type: multipart/mixed; boundary="===============1997588271=="
+Message-ID: <mailman.197717.1173792569.20110.bluez-devel@lists.sourceforge.net>
+Date: Tue, 13 Mar 2007 06:29:29 -0700
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Sender: sitelist-bounces@lists.sourceforge.net
+Errors-To: sitelist-bounces@lists.sourceforge.net
 
-Hello,
+--===============1997588271==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-I would like to communicate with a PROMI-ESD-02 Bluetooth module. It suppor=
-ts =
+As list administrator, your authorization is requested for the
+following mailing list posting:
 
-the following Bluetooth protocols
-- RFCOMM
-- L2CAP =
+    List:    Bluez-devel@lists.sourceforge.net
+    From:    cornelia.huck@de.ibm.com
+    Subject: Re: [2/6] 2.6.21-rc3: known regressions
+    Reason:  Too many recipients to the message
 
-- SDP
-The following profiles are accepted : =
+At your convenience, visit:
 
-- General Acces Profile
-- SPP
+    https://lists.sourceforge.net/lists/admindb/bluez-devel
+        
+to approve or deny the request.
 
-In order to use the SPP, I coded a little program (see below).
+--===============1997588271==
+Content-Type: message/rfc822
+MIME-Version: 1.0
 
-Basically, it does a fork: the father process launchs the rfcomm program =
+Received: from sc8-sf-mx2-b.sourceforge.net ([10.3.1.92]
+	helo=mail.sourceforge.net)
+	by sc8-sf-list2-new.sourceforge.net with esmtp (Exim 4.43)
+	id 1HR73r-0005rU-BZ
+	for bluez-devel@lists.sourceforge.net; Tue, 13 Mar 2007 06:29:07 -0700
+Received: from mtagate4.de.ibm.com ([195.212.29.153])
+	by mail.sourceforge.net with esmtps (TLSv1:AES256-SHA:256)
+	(Exim 4.44) id 1HR73r-0005jd-W5
+	for bluez-devel@lists.sourceforge.net; Tue, 13 Mar 2007 06:29:09 -0700
+Received: from d12nrmr1607.megacenter.de.ibm.com
+	(d12nrmr1607.megacenter.de.ibm.com [9.149.167.49])
+	by mtagate4.de.ibm.com (8.13.8/8.13.8) with ESMTP id l2DDSwAM102906
+	for <bluez-devel@lists.sf.net>; Tue, 13 Mar 2007 13:28:58 GMT
+Received: from d12av02.megacenter.de.ibm.com (d12av02.megacenter.de.ibm.com
+	[9.149.165.228])
+	by d12nrmr1607.megacenter.de.ibm.com (8.13.8/8.13.8/NCO v8.3) with
+	ESMTP id l2DDSv7a1999064
+	for <bluez-devel@lists.sf.net>; Tue, 13 Mar 2007 14:28:57 +0100
+Received: from d12av02.megacenter.de.ibm.com (loopback [127.0.0.1])
+	by d12av02.megacenter.de.ibm.com (8.12.11.20060308/8.13.3) with ESMTP
+	id l2DDSv7u018592
+	for <bluez-devel@lists.sf.net>; Tue, 13 Mar 2007 14:28:57 +0100
+Received: from gondolin.boeblingen.de.ibm.com (gondolin.boeblingen.de.ibm.com
+	[9.152.198.14])
+	by d12av02.megacenter.de.ibm.com (8.12.11.20060308/8.12.11) with ESMTP
+	id l2DDSuRV018581; Tue, 13 Mar 2007 14:28:56 +0100
+Date: Tue, 13 Mar 2007 14:30:34 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+To: Adrian Bunk <bunk@stusta.de>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton
+	<akpm@linux-foundation.org>, Linux Kernel Mailing List
+	<linux-kernel@vger.kernel.org>, Pavel Machek <pavel@ucw.cz>, Marcel
+	Holtmann <marcel@holtmann.org>,
+	maxk@qualcomm.com, bluez-devel@lists.sf.net, Mark Lord <lkml@rtr.ca>
+Subject: Re: [2/6] 2.6.21-rc3: known regressions
+Message-ID: <20070313143034.77425af4@gondolin.boeblingen.de.ibm.com>
+In-Reply-To: <20070313125003.GS18731@stusta.de>
+References: <Pine.LNX.4.64.0703062050570.5963@woody.linux-foundation.org>
+	<20070313125003.GS18731@stusta.de>
+Organization: IBM Deutschland Entwicklung GmbH
+X-Mailer: Claws Mail 2.8.0 (GTK+ 2.8.20; i486-pc-linux-gnu)
+X-Legal: IBM Deutschland Entwicklung GmbH Vorsitzender des Aufsichtsrats:
+	Johann Weihen =?ISO-8859-15?Q?Gesch=E4ftsf=FChrung:?= Herbert Kircher
+	Sitz der Gesellschaft: =?ISO-8859-15?Q?B=F6blingen?= Registergericht:
+	Amtsgericht Stuttgart, HRB 243294
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Score: 0.0 (/)
+X-Spam-Report: Spam Filtering performed by sourceforge.net.
+	See http://spamassassin.org/tag/ for more details.
+	Report problems to
+	http://sf.net/tracker/?func=add&group_id=1&atid=200001
 
-(rfcomm connect ...) while the son process connects, after 2 seconds, to =
+On Tue, 13 Mar 2007 13:50:03 +0100,
+Adrian Bunk <bunk@stusta.de> wrote:
 
-the /dev/rfcomm0 special file (open system call) and writes to it the =
+> Subject    : ThinkPad X60: bluetooth hardlocks
+> References : http://lkml.org/lkml/2007/3/2/85
+> Submitter  : Pavel Machek <pavel@ucw.cz>
+> Handled-By : Marcel Holtmann <marcel@holtmann.org>
+> Status     : unknown
 
-string "hello" (write system call) .
-
-When this program is launched , it does its job, but I need to launch it in=
- a =
-
-perl CGI script (exec ./program;). In this last case, there is a problem : =
-it =
-
-seems that the rfcomm program connects to the bluetooth module and then =
-
-immediately disconnects, preventing the son process from sending the "hello=
-" =
-
-writing to the module.
-
-So, I have several questions :
-
-1) Is this method  the best coding practice in C to communicate via the SPP =
-
-with a Bluetooth module? =
+Does this still happen with -rc3? I'd have thought Mark's patch in
+0de1517e23c2e28d58a6344b97a120596ea200bb fixed that...
 
 
-2) If not, how can I achieve this more efficiently ?(i.e. could you point t=
-o a =
+--===============1997588271==
+Content-Type: message/rfc822
+MIME-Version: 1.0
 
-example of best coding practice?)
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: confirm 2792222b2b3c780ee69b050e2765181946e85f69
+Sender: bluez-devel-request@lists.sourceforge.net
+From: bluez-devel-request@lists.sourceforge.net
 
-Thanks in advance,
-
-Best regards,
-
-Barth=E9l=E9my Lemaire
-
-***
-int
-main(int argc, char *argv[])
-{
-        if (argc !=3D 2)
-        {
-                printf("USAGE : %s BDADDR\n\n", argv[0]);
-                exit(-1);
-        }
-        int pid, ret, fd, i;
-
-        pid =3D fork();
-        assert(pid >=3D 0);
-        if (pid =3D=3D 0)
-        {
-
-                sleep(2);
-                printf("Lancement du fils ...\n");
-                printf("Ouverture du port s=E9rie\n");
-                fd =3D ouverture();
-                assert(fd > 0);
-                printf("Envoi d'une cha=EEne de caract=E8res\n");
-                envoi(fd, "hello", 5);
-                fermeture(fd);
-                kill(getppid(), SIGINT);
-        } else
-        {
-                /* P=E8re */
-                printf("Lancement du p=E8re ...\n");
-                ret =3D execl("/usr/bin/rfcomm", "rfcomm", "connect", PORTS=
-ERIE,
-                            argv[1], "1", (char *) NULL);
-                assert(ret > 0);
-                wait(NULL);
-                ret =3D execl("/usr/bin/rfcomm", "rfcomm", "release",
-                            PORTSERIE);
-                assert(ret > 0);
-        }
-        return EXIT_SUCCESS;
-}                               /* ----------  end of function =
-
-main  ---------- */
-***
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+If you reply to this message, keeping the Subject: header intact,
+Mailman will discard the held message.  Do this if the message is
+spam.  If you reply to this message and include an Approved: header
+with the list password in it, the message will be approved for posting
+to the list.  The Approved: header can also appear in the first line
+of the body of the reply.
+--===============1997588271==--
