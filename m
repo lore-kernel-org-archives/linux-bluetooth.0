@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45F8ECF6.5000400@yahoo.com.au>
-Date: Thu, 15 Mar 2007 07:51:34 +0100
-From: bluez.mexon@spamgourmet.com
-MIME-Version: 1.0
+From: Igor Chudov <ichudov@Algebra.Com>
+Message-Id: <200703150019.l2F0JDxL032191@manifold.algebra.com>
 To: bluez-users@lists.sourceforge.net
-References: <200703150019.l2F0JDxL032191@manifold.algebra.com>
-In-Reply-To: <200703150019.l2F0JDxL032191@manifold.algebra.com>
-Subject: Re: [Bluez-users] FOLLOWUP -- finally,
- PPP over Bluetooth/Cell Phone WORKS!
+Date: Wed, 14 Mar 2007 19:19:13 -0500
+Subject: [Bluez-users] FOLLOWUP -- finally,
+	the PPP over Bluetooth/Cell Phone WORKS!
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,31 +14,48 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Igor Chudov - ichudov@Algebra.Com wrote:
+[This message has also been posted to comp.os.linux.misc,comp.os.linux.networking .]
+[Cc: to bluez-user mailing list]
 
-> PS my next plan is to make my laptop into a wifi station so that other
-> people (my wife) could connect to me on the train, while my laptop is
-> connected to Cingular via cell phone. 
+I have finally made my linux laptop connect to internet using my cell
+phone. 
 
-Off-topic, I know, but...
+I resolved the problem of cell phone and laptop not seeing one
+another, by means of gnome-phone-manager. After the initial handshake
+and exchange of PIN, they would recognize one another.
 
-Do you know whether or not your laptop actually *can* function as a wifi
-access point?  Because as far as I know, most can't.  I know I've tried
-to do this and run into problems.  Instead, if you've got two wifi
-devices that you want to talk to each other directly, you're supposed to
-use "ad-hoc mode".  However, this also has many problems, and most
-device manufacturers seem to treat ad-hoc mode as a kind of
-embarrassment they'd rather not talk about.  Whenever you depart from
-the established script of "computers with wifi adapters talking to a
-dedicated, fixed, wired access point", you tend to find yourself
-somewhat alone and helpless.
+After that, I write a ppp script to connect to Cingular. Struggled for
+a few hours with the issue of cingular dropping me instantly after
+authentication. 
 
-Apologies if you know all this already, just felt that I should warn you
-in case you didn't know what you were in for.
+Turns out that the customer service rep dummy with whom I spoke
+yesterday, put me on a wrong plan and I was not provisioned for a cell
+phone modem connection. After 20 minutes of trying to convince a
+similarly clueless rep to let me talk to someone more knowledgeable
+(she was trying to prove to me that I could not use my cell phone as a
+modem), I was connected to a more knowledgeable rep who put me on the
+right plan.
+
+After that, voila, everything is working just fine. I get IP addresses
+assigned, routing works, everything is fine. I will add my bluetooth
+to my autodiscover network script. This script makes sure that my
+laptop finds the best possible internet connection (home ethernet,
+home wifi, work ethernet, and now Cingular) all by itself without icon
+clicking and other nonsense. 
+
+Big kudos go to the BlueZ team and to authors of gnome-phone-manager. 
+
+Thank you guys!
+
+i
+PS my next plan is to make my laptop into a wifi station so that other
+people (my wife) could connect to me on the train, while my laptop is
+connected to Cingular via cell phone. 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
