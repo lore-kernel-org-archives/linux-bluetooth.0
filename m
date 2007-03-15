@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45F9601A.1060007@idlum.be>
-Date: Thu, 15 Mar 2007 16:02:50 +0100
-From: Pierre-Yves Paulus <py@idlum.be>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45F176B0.3090507@idlum.be> <45F18561.7040005@idlum.be>
-	<45F8FD55.1050702@idlum.be>
-In-Reply-To: <45F8FD55.1050702@idlum.be>
-Subject: Re: [Bluez-devel] Problem with RFCOMM kernel module
+In-Reply-To: <464194a50703150639u7d4869b7h76f5185fef01f2da@mail.gmail.com>
+References: <464194a50703150639u7d4869b7h76f5185fef01f2da@mail.gmail.com>
+Date: Thu, 15 Mar 2007 15:53:36 +0100
+Message-Id: <1173970416.7461.7.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Is LMP implemented in BlueZ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,23 +20,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Hi,
 
-I got several kernel Oops'es similar to the one I described before since 
-my last message.
+> I am currently doing my bachelor's dissertation about creating an
+> alternative Bluetooth authentication and key exchange scheme, using
+> public key crypto, and would like to know whether I should build on
+> top of the Bluetooth protocol stack or I can actually add code inside
+> the LMP.  I have looked thorough the code in the BlueZ kernel module
+> and  In bluez -libs package and I'm left with the impression that the
+> link manager and the LMP are part of the Bluetooth device's firmware,
+> while the HCI asks it to initiate specific LMP transactions. So my
+> question is whether LMP is a software component implemented by BlueZ
+> on a computer or it's a firmware component on the Bluetooth receiver
+> connected to the computer. I'd be thankful if somebody can clarify
+> that for me. 
 
-I'm definitely not knowledgeable in that kernel matter, but would be 
-more than happy if I can give more information, or perform some 
-operations (more details? run some debbugger software? ...? just ask) on 
-my computer if that can help someone to better understand what's the 
-cause of those errors, which are more than problematic (I experience 
-various problems with virtual ttys (/dev/rfcommX) after such an Oops has 
-happened, and only a reboot solves them... until next Oops)
+the LMP implementation is part of the firmware inside the Bluetooth
+chip.
 
-Please let me know what to do.
+Regards
 
-Best Regards,
-Pierre-Yves Paulus
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
