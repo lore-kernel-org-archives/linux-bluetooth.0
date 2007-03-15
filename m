@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <45F92629.4070207@endian.se>
+Date: Thu, 15 Mar 2007 11:55:37 +0100
+From: =?ISO-8859-1?Q?Richard_R=F6jfors?= <richard.rojfors@endian.se>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45F92629.4070207@endian.se>
-References: <45F92629.4070207@endian.se>
-Date: Thu, 15 Mar 2007 14:01:41 +0100
-Message-Id: <1173963701.6941.53.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Inquiry response containing RSSI
+Subject: [Bluez-devel] Inquiry response containing RSSI
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,30 +18,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Richard,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> I want to do inquiries that contains rssi in the response. (I know it
-> requires bluetooth >= 1.2).
-> I have a such dongle from CSR. I bluez from 2.6.20.1 and bluez-libs 3.9
-> btw. I set the inquiry mode to 1 using the bluez-libs function
-> hci_write_inquiry_mode.
-> 
-> The interesting thing is that the RSSI makes it up to the inquiry cache
-> inside the hci_module, but the interface (hci_inquiry, called by ioctl)
-> only uses the struct inquiry_info, which does not contain RSSI.
-> 
-> So I was thinking of a way to support this, could be to introduce
-> another more generic IOCTL. Which returns the struct
-> inquiry_info_with_rssi, or rather a struct of a new type which is the
-> combination of struct inquiry_info_with_rssi and struct inquiry_info.
+Hi everyone,
 
-use the new D-Bus based API. It takes care of everything for you.
+Thanks for developing this stack, it works very well I must say!
 
-Regards
+But I have ran into a small limitation:
+I want to do inquiries that contains rssi in the response. (I know it
+requires bluetooth >= 1.2).
+I have a such dongle from CSR. I bluez from 2.6.20.1 and bluez-libs 3.9
+btw. I set the inquiry mode to 1 using the bluez-libs function
+hci_write_inquiry_mode.
 
-Marcel
+The interesting thing is that the RSSI makes it up to the inquiry cache
+inside the hci_module, but the interface (hci_inquiry, called by ioctl)
+only uses the struct inquiry_info, which does not contain RSSI.
 
+So I was thinking of a way to support this, could be to introduce
+another more generic IOCTL. Which returns the struct
+inquiry_info_with_rssi, or rather a struct of a new type which is the
+combination of struct inquiry_info_with_rssi and struct inquiry_info.
 
+What do you think?
+
+- --
+Richard
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (Darwin)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iD8DBQFF+SYp9yPqN8x056cRAm7ZAKClpMbse3jCc7eVVxVSUIEsUXHLbwCfWKJx
+wmUt/xXy6yZIrI3gNTcNqjQ=
+=KE3K
+-----END PGP SIGNATURE-----
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
