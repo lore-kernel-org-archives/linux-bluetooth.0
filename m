@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <BAY135-F92F7BB3CB583DBE9AAD04B8710@phx.gbl>
+From: "Vincent Yau" <v_yau3@hotmail.com>
 To: bluez-users@lists.sourceforge.net
-From: "Vladimir Vasilev" <vladimir_v@asenovgrad.net>
-MIME-Version: 1.0
-Date: Sat, 17 Mar 2007 19:04:33 +0200
-Message-ID: <op.tpce1vcu80yvcu@zaska>
-Subject: [Bluez-users] help compilling bluez-utils 3.9
+Date: Fri, 16 Mar 2007 23:50:41 +0000
+Mime-Version: 1.0
+Subject: [Bluez-users] dbus connection failed
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,40 +19,32 @@ Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 
+Hi:
 
-Hi folks
+I am trying to use the DBUS API in my pin exchange script.  I got a DBUS 
+connection error when I execute this line:
 
-I have some problems compilling bluez-utils 3.9 (latest official)
-The configure script does not get me an error, so my next step is "make"\
-Here is the error:
+   DBusConnection *conn = dbus_bus_get(DBUS_BUS_SYSTEM, &err);
+
+When I print out err.message, I got a bunch of non-printable character so I 
+could not quite figure out what the error is.
+
+However, I took the same DBUS line and put in a stand-alone program and it 
+works fine.
+
+In my /etc/dbus-1/system.d, there is bluetooh.conf which is identifcal to 
+the config that ships with Bluez.  I even explicitly include bluetooth.conf 
+in my /etc/dbus-1/system.conf file.
+
+I tried Bluez-Utils 3.7 and 3.9 and with the same results.
+
+Is there any special trick to connect to DBUS system bus from within Bluez?
+
+thanks
+
+--v
 
 
-make[2]: Entering directory `/home/vladimir/programs/bluez-utils-3.9/hcid'
-make  all-am
-make[3]: Entering directory `/home/vladimir/programs/bluez-utils-3.9/hcid'
-/bin/sh ../libtool --tag=CC --mode=link gcc -I/usr/include/dbus-1.0  
--I/usr/lib/dbus-1.0/include   -I../eglib -Wall -O2 -D_FORTIFY_SOURCE=2    
--o hcid  main.o libhciserver.a ../sdpd/libsdpserver.a  
-../common/libhelper.a ../eglib/libeglib.la -L/lib -ldbus-1   -lbluetooth    
--lexpat
-gcc -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include -I../eglib -Wall  
--O2 -D_FORTIFY_SOURCE=2 -o hcid main.o  libhciserver.a  
-../sdpd/libsdpserver.a ../common/libhelper.a ../eglib/.libs/libeglib.a  
--L/lib -ldbus-1 -lbluetooth /usr/lib/libexpat.so
-libhciserver.a(dbus-common.o): In function `unregister_sdp_record':
-dbus-common.c:(.text+0x90): undefined reference to  
-`sdp_device_record_unregister_binary'
-libhciserver.a(dbus-common.o): In function `register_sdp_binary':
-dbus-common.c:(.text+0x106): undefined reference to  
-`sdp_device_record_register_binary'
-collect2: ld returned 1 exit status
-make[3]: *** [hcid] Error 1
-make[3]: Leaving directory `/home/vladimir/programs/bluez-utils-3.9/hcid'
-make[2]: *** [all] Error 2
-make[2]: Leaving directory `/home/vladimir/programs/bluez-utils-3.9/hcid'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/home/vladimir/programs/bluez-utils-3.9'
-make: *** [all] Error 2
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
