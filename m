@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <52950c3f0703161049y3aa36ebeiaea30c0cc30c84f1@mail.gmail.com>
-Date: Fri, 16 Mar 2007 13:49:29 -0400
-From: "Timur Alperovich" <timur.alperovich@gmail.com>
+Message-ID: <c49421c50703151747p68921f33n95a9b82247e515e1@mail.gmail.com>
+Date: Thu, 15 Mar 2007 21:47:45 -0300
+From: "Loreno Oliveira" <lorenooliveira@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <ddea76ce0703152326g73ec4815n4c0e3045fb846b32@mail.gmail.com>
 MIME-Version: 1.0
-References: <ddea76ce0703152326g73ec4815n4c0e3045fb846b32@mail.gmail.com>
-Subject: Re: [Bluez-users] HELP with Input Manager Hierarchy,
-	BlueZ D-Bus API!!!
+Subject: [Bluez-users] error compiling code that uses dbus
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,101 +14,269 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1665728158=="
+Content-Type: multipart/mixed; boundary="===============1077112011=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1665728158==
+--===============1077112011==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_85398_19027472.1174067369838"
+	boundary="----=_Part_84518_6763240.1174006065121"
 
-------=_Part_85398_19027472.1174067369838
+------=_Part_84518_6763240.1174006065121
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-If you are trying to use the PDA to connect to a pc over bluetooth, why not
-use rfcomm to establish teh connection? After that you can send/receive
-packets, much like using tcp sockets. Look at this guide for some details:
-http://people.csail.mit.edu/albert/bluez-intro/
+Hi there,
 
-Timur
+i am trying to compile a simple program, from some presentation of Marcell,
+but it seems that the dbus headers are someway broken.
 
-On 3/16/07, Meenakshi Seeballack <meena2010@gmail.com> wrote:
->
-> Hello,
->
-> No one has come back to me on the devel and user mailing lists.
->
-> I am trying to use the BlueZ D-Bus API and have come across http://wiki.bluez.org/wiki/Input
-> which states that "The Bluetooth Input daemon provides an interface to
-> access Bluetooth Human Interface Devices. The Manager interface provides
-> methods to list, create and remove input devices objects. The Device
-> interface provides methods to retrieve device information, connect and
-> disconnect"
->
-> I am trying to develop for the Nokia 770 - the idea is to use the PDA as a
-> mouse to control another bluetooth-enabled PC.
->
-> Code-wise:
-> - establish a bluetooth connection (via dbus?) I am unsure of how to use
-> dbus to establish a bluetooth connection.
-> - sending data (the mouse movements), via packets?, via HID Profile? Once
-> I get at this point I believe I do not need to worry about the other end
-> receiving the information since the other PC would have the bluetooth
-> connection established and would reflect the data sent.
->
-> Would someone please HELP???
->
-> Thanks and regards,
->
-> Meena
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share
-> your
-> opinions on IT & business topics through brief surveys-and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
+The program is:
 
-------=_Part_85398_19027472.1174067369838
+#include <stdio.h>
+#include <stdlib.h>
+#include <dbus/dbus.h>
+
+int main( int argc, char **argv ) {
+    return 0;
+}
+
+
+Yes, there is no body in the program, just the #include. When I compile this
+code I get:
+
+/usr/include/dbus/dbus.h:33:33: error: dbus/dbus-arch-deps.h: No such file
+or directory
+/usr/include/dbus/dbus-types.h:33: error: 'dbus_uint32_t' does not name a
+type
+/usr/include/dbus/dbus-types.h:35: error: 'dbus_uint32_t' does not name a
+type
+/usr/include/dbus/dbus-errors.h:66: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-errors.h:68: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-address.h:35: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:49: error: 'dbus_uint32_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:85: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:88: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:90: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:93: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:95: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:98: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:100: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:103: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:106: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:111: error: 'dbus_bool_t' has not been
+declared
+/usr/include/dbus/dbus-message.h:112: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:113: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:116: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:119: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:121: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:123: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:125: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:127: error: 'dbus_uint32_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:128: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:130: error: 'dbus_uint32_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:133: error: 'dbus_bool_t' has not been
+declared
+/usr/include/dbus/dbus-message.h:134: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:136: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:139: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:142: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:145: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:149: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:155: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:157: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:158: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:174: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:177: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:181: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:185: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:189: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:193: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:194: error: variable or field
+'dbus_message_free_data_slot' declared void
+/usr/include/dbus/dbus-message.h:194: error: 'dbus_int32_t' was not declared
+in this scope
+/usr/include/dbus/dbus-message.h:194: error: 'slot_p' was not declared in
+this scope
+/usr/include/dbus/dbus-message.h:195: error: 'dbus_bool_t' does not name a
+type
+/usr/include/dbus/dbus-message.h:200: error: 'dbus_int32_t' has not been
+declared
+/usr/include/dbus/dbus-connection.h:62: error: typedef 'dbus_bool_t' is
+initialized (use __typeof__ instead)
+/usr/include/dbus/dbus-connection.h:62: error: 'DBusAddWatchFunction' was
+not declared in this scope
+/usr/include/dbus/dbus-connection.h:62: error: expected ',' or ';' before
+'(' token
+/usr/include/dbus/dbus-connection.h:118: error: 'dbus_uint32_t' has not been
+declared
+/usr/include/dbus/dbus-connection.h:128: error: 'DBusAddWatchFunction' has
+not been declared
+/usr/include/dbus/dbus-connection.h:187: error: 'dbus_int32_t' was not
+declared in this scope
+/usr/include/dbus/dbus-connection.h:187: error: 'slot_p' was not declared in
+this scope
+/usr/include/dbus/dbus-connection.h:188: error: variable or field
+'dbus_connection_free_data_slot' declared void
+/usr/include/dbus/dbus-connection.h:188: error: 'dbus_int32_t' was not
+declared in this scope
+/usr/include/dbus/dbus-connection.h:188: error: 'slot_p' was not declared in
+this scope
+/usr/include/dbus/dbus-connection.h:190: error: 'dbus_int32_t' has not been
+declared
+/usr/include/dbus/dbus-connection.h:194: error: 'dbus_int32_t' has not been
+declared
+/usr/include/dbus/dbus-connection.h:212: error: 'dbus_uint32_t' has not been
+declared
+/usr/include/dbus/dbus-bus.h:60: error: 'dbus_uint32_t' has not been
+declared
+/usr/include/dbus/dbus-bus.h:61: error: 'dbus_uint32_t' has not been
+declared
+/usr/include/dbus/dbus-pending-call.h:47: error: 'dbus_int32_t' was not
+declared in this scope
+/usr/include/dbus/dbus-pending-call.h:47: error: 'slot_p' was not declared
+in this scope
+/usr/include/dbus/dbus-pending-call.h:48: error: variable or field
+'dbus_pending_call_free_data_slot' declared void
+/usr/include/dbus/dbus-pending-call.h:48: error: 'dbus_int32_t' was not
+declared in this scope
+/usr/include/dbus/dbus-pending-call.h:48: error: 'slot_p' was not declared
+in this scope
+/usr/include/dbus/dbus-pending-call.h:50: error: 'dbus_int32_t' has not been
+declared
+/usr/include/dbus/dbus-pending-call.h:54: error: 'dbus_int32_t' has not been
+declared
+/usr/include/dbus/dbus-server.h:55: error: 'DBusAddWatchFunction' has not
+been declared
+/usr/include/dbus/dbus-server.h:69: error: 'dbus_int32_t' was not declared
+in this scope
+/usr/include/dbus/dbus-server.h:69: error: 'slot_p' was not declared in this
+scope
+/usr/include/dbus/dbus-server.h:70: error: variable or field
+'dbus_server_free_data_slot' declared void
+/usr/include/dbus/dbus-server.h:70: error: 'dbus_int32_t' was not declared
+in this scope
+/usr/include/dbus/dbus-server.h:70: error: 'slot_p' was not declared in this
+scope
+
+My "uname -a" returns:
+
+loreno@teckiller:Testes$ uname -a
+Linux teckiller 2.6.15-28-386 #1 PREEMPT Thu Feb 1 15:51:56 UTC 2007 i686
+GNU/Linux
+loreno@teckiller:Testes$
+
+My installed dbus-related pakages are:
+
+loreno@teckiller:Testes$ dpkg --list | grep dbus
+ii  dbus                                   0.60-6ubuntu8.1
+simple interprocess messaging system
+ii  dbus-1-utils                           0.60-6ubuntu8.1
+simple interprocess messaging system (utilit
+ii  libdbus-1-2                            0.60-6ubuntu8.1
+simple interprocess messaging system
+ii  libdbus-1-dev                          0.60-6ubuntu8.1
+simple interprocess messaging system (develo
+ii  libdbus-glib-1-2                       0.60-6ubuntu8.1
+simple interprocess messaging system (GLib-b
+ii  libdbus-glib-1-dev                     0.60-6ubuntu8.1
+simple interprocess messaging system (GLib i
+ii  python2.4-dbus                         0.60-6ubuntu8.1
+simple interprocess messaging system (Python
+loreno@teckiller:Testes$
+
+
+Does anybody can give me some direction over what I am doing wrong here??
+
+Thanks for any help!
+
+Loreno
+
+------=_Part_84518_6763240.1174006065121
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-If you are trying to use the PDA to connect to a pc over bluetooth, why not use rfcomm to establish teh connection? After that you can send/receive packets, much like using tcp sockets. Look at this guide for some details: 
-<a href="http://people.csail.mit.edu/albert/bluez-intro/">http://people.csail.mit.edu/albert/bluez-intro/</a><br><br>Timur<br><br><div><span class="gmail_quote">On 3/16/07, <b class="gmail_sendername">Meenakshi Seeballack
-</b> &lt;<a href="mailto:meena2010@gmail.com">meena2010@gmail.com</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hello,
-<br><br>No one has come back to me on the devel and user mailing
-lists.<br><br>I am trying to use the BlueZ D-Bus API and have come across <a href="http://wiki.bluez.org/wiki/Input" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">http://wiki.bluez.org/wiki/Input
-</a> which states that &quot;The Bluetooth Input daemon provides an interface to access Bluetooth
-Human Interface Devices. The Manager interface provides methods to
-list, create and remove input devices objects. The Device interface
-provides methods to retrieve device information, connect and disconnect&quot;<span><br><br></span><span>I
-am trying to develop for the Nokia 770 - the idea is to use the PDA as
-a mouse to control another bluetooth-enabled PC. <br><br></span>Code-wise:<br>- establish a bluetooth connection (via dbus?) I am <span style="text-decoration: underline;">
-unsure of how to use dbus to establish a bluetooth connection.</span><br>-
-sending data (the mouse movements), via packets?, via HID Profile? Once
-I get at this point I believe I do not need to worry about the other
-end receiving the information since the other PC would have the
-bluetooth connection established and would reflect the data sent.
-<br><br>Would someone please HELP???<br><br>Thanks and regards,<br><br>Meena<br>
-<br>-------------------------------------------------------------------------<br>Take Surveys. Earn Cash. Influence the Future of IT<br>Join SourceForge.net&#39;s Techsay panel and you&#39;ll get the chance to share your
-<br>opinions on IT &amp; business topics through brief surveys-and earn cash<br><a onclick="return top.js.OpenExtLink(window,event,this)" href="http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV" target="_blank">
-http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV</a><br>_______________________________________________<br>Bluez-users mailing list<br><a onclick="return top.js.OpenExtLink(window,event,this)" href="mailto:Bluez-users@lists.sourceforge.net">
-Bluez-users@lists.sourceforge.net</a><br><a onclick="return top.js.OpenExtLink(window,event,this)" href="https://lists.sourceforge.net/lists/listinfo/bluez-users" target="_blank">https://lists.sourceforge.net/lists/listinfo/bluez-users
-</a><br><br></blockquote></div><br>
+Hi there,<br><br>i am trying to compile a simple program, from some presentation of Marcell, but it seems that the dbus headers are someway broken.<br><br>The program is:<br><br>#include &lt;stdio.h&gt;<br>#include &lt;stdlib.h
+&gt;<br>#include &lt;dbus/dbus.h&gt;<br><br>int main( int argc, char **argv ) {<br>&nbsp;&nbsp;&nbsp; return 0;<br>}<br><br><br>Yes, there is no body in the program, just the #include. When I compile this code I get:<br><br>/usr/include/dbus/dbus.h:33:33: error: dbus/dbus-
+arch-deps.h: No such file or directory<br>/usr/include/dbus/dbus-types.h:33: error: 'dbus_uint32_t' does not name a type<br>/usr/include/dbus/dbus-types.h:35: error: 'dbus_uint32_t' does not name a type<br>/usr/include/dbus/dbus-
+errors.h:66: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-errors.h:68: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-address.h:35: error: 'dbus_bool_t' does not name a type<br>
+/usr/include/dbus/dbus-message.h:49: error: 'dbus_uint32_t' does not name a type<br>/usr/include/dbus/dbus-message.h:85: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:88: error: 'dbus_bool_t' does not name a type
+<br>/usr/include/dbus/dbus-message.h:90: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:93: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:95: error: 'dbus_bool_t' does not name a type
+<br>/usr/include/dbus/dbus-message.h:98: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:100: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:103: error: 'dbus_bool_t' does not name a type
+<br>/usr/include/dbus/dbus-message.h:106: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:111: error: 'dbus_bool_t' has not been declared<br>/usr/include/dbus/dbus-message.h:112: error: 'dbus_bool_t' does not name a type
+<br>/usr/include/dbus/dbus-message.h:113: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:116: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:119: error: 'dbus_bool_t' does not name a type
+<br>/usr/include/dbus/dbus-message.h:121: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:123: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:125: error: 'dbus_bool_t' does not name a type
+<br>/usr/include/dbus/dbus-message.h:127: error: 'dbus_uint32_t' does not name a type<br>/usr/include/dbus/dbus-message.h:128: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:130: error: 'dbus_uint32_t' does not name a type
+<br>/usr/include/dbus/dbus-message.h:133: error: 'dbus_bool_t' has not been declared<br>/usr/include/dbus/dbus-message.h:134: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:136: error: 'dbus_bool_t' does not name a type
+<br>/usr/include/dbus/dbus-message.h:139: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:142: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:145: error: 'dbus_bool_t' does not name a type
+<br>/usr/include/dbus/dbus-message.h:149: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:155: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:157: error: 'dbus_bool_t' does not name a type
+<br>/usr/include/dbus/dbus-message.h:158: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:174: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:177: error: 'dbus_bool_t' does not name a type
+<br>/usr/include/dbus/dbus-message.h:181: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:185: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:189: error: 'dbus_bool_t' does not name a type
+<br>/usr/include/dbus/dbus-message.h:193: error: 'dbus_bool_t' does not name a type<br>/usr/include/dbus/dbus-message.h:194: error: variable or field 'dbus_message_free_data_slot' declared void<br>/usr/include/dbus/dbus-message.h
+:194: error: 'dbus_int32_t' was not declared in this scope<br>/usr/include/dbus/dbus-message.h:194: error: 'slot_p' was not declared in this scope<br>/usr/include/dbus/dbus-message.h:195: error: 'dbus_bool_t' does not name a type
+<br>/usr/include/dbus/dbus-message.h:200: error: 'dbus_int32_t' has not been declared<br>/usr/include/dbus/dbus-connection.h:62: error: typedef 'dbus_bool_t' is initialized (use __typeof__ instead)<br>/usr/include/dbus/dbus-
+connection.h:62: error: 'DBusAddWatchFunction' was not declared in this scope<br>/usr/include/dbus/dbus-connection.h:62: error: expected ',' or ';' before '(' token<br>/usr/include/dbus/dbus-connection.h:118: error: 'dbus_uint32_t' has not been declared
+<br>/usr/include/dbus/dbus-connection.h:128: error: 'DBusAddWatchFunction' has not been declared<br>/usr/include/dbus/dbus-connection.h:187: error: 'dbus_int32_t' was not declared in this scope<br>/usr/include/dbus/dbus-connection.h
+:187: error: 'slot_p' was not declared in this scope<br>/usr/include/dbus/dbus-connection.h:188: error: variable or field 'dbus_connection_free_data_slot' declared void<br>/usr/include/dbus/dbus-connection.h:188: error: 'dbus_int32_t' was not declared in this scope
+<br>/usr/include/dbus/dbus-connection.h:188: error: 'slot_p' was not declared in this scope<br>/usr/include/dbus/dbus-connection.h:190: error: 'dbus_int32_t' has not been declared<br>/usr/include/dbus/dbus-connection.h:194: error: 'dbus_int32_t' has not been declared
+<br>/usr/include/dbus/dbus-connection.h:212: error: 'dbus_uint32_t' has not been declared<br>/usr/include/dbus/dbus-bus.h:60: error: 'dbus_uint32_t' has not been declared<br>/usr/include/dbus/dbus-bus.h:61: error: 'dbus_uint32_t' has not been declared
+<br>/usr/include/dbus/dbus-pending-call.h:47: error: 'dbus_int32_t' was not declared in this scope<br>/usr/include/dbus/dbus-pending-call.h:47: error: 'slot_p' was not declared in this scope<br>/usr/include/dbus/dbus-pending-call.h
+:48: error: variable or field 'dbus_pending_call_free_data_slot' declared void<br>/usr/include/dbus/dbus-pending-call.h:48: error: 'dbus_int32_t' was not declared in this scope<br>/usr/include/dbus/dbus-pending-call.h:48: error: 'slot_p' was not declared in this scope
+<br>/usr/include/dbus/dbus-pending-call.h:50: error: 'dbus_int32_t' has not been declared<br>/usr/include/dbus/dbus-pending-call.h:54: error: 'dbus_int32_t' has not been declared<br>/usr/include/dbus/dbus-server.h:55: error: 'DBusAddWatchFunction' has not been declared
+<br>/usr/include/dbus/dbus-server.h:69: error: 'dbus_int32_t' was not declared in this scope<br>/usr/include/dbus/dbus-server.h:69: error: 'slot_p' was not declared in this scope<br>/usr/include/dbus/dbus-server.h:70: error: variable or field 'dbus_server_free_data_slot' declared void
+<br>/usr/include/dbus/dbus-server.h:70: error: 'dbus_int32_t' was not declared in this scope<br>/usr/include/dbus/dbus-server.h:70: error: 'slot_p' was not declared in this scope<br><br>My &quot;uname -a&quot; returns:<br>
+<br>loreno@teckiller:Testes$ uname -a<br>Linux teckiller 2.6.15-28-386 #1 PREEMPT Thu Feb 1 15:51:56 UTC 2007 i686 GNU/Linux<br>loreno@teckiller:Testes$<br><br>My installed dbus-related pakages are:<br><br>loreno@teckiller
+:Testes$ dpkg --list | grep dbus<br>ii&nbsp; dbus&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.60-6ubuntu8.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; simple interprocess messaging system<br>ii&nbsp; dbus-1-utils&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.60-6ubuntu8.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; simple interprocess messaging system (utilit
+<br>ii&nbsp; libdbus-1-2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.60-6ubuntu8.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; simple interprocess messaging system<br>ii&nbsp; libdbus-1-dev&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.60-6ubuntu8.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; simple interprocess messaging system (develo
+<br>ii&nbsp; libdbus-glib-1-2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.60-6ubuntu8.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; simple interprocess messaging system (GLib-b<br>ii&nbsp; libdbus-glib-1-dev&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.60-6ubuntu8.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; simple interprocess messaging system (GLib i
+<br>ii&nbsp; python2.4-dbus&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.60-6ubuntu8.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; simple interprocess messaging system (Python<br>loreno@teckiller:Testes$<br><br><br>Does anybody can give me some direction over what I am doing wrong here??
+<br><br>Thanks for any help!<br><br>Loreno<br>
 
-------=_Part_85398_19027472.1174067369838--
+------=_Part_84518_6763240.1174006065121--
 
 
---===============1665728158==
+--===============1077112011==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -122,7 +287,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1665728158==
+--===============1077112011==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -133,4 +298,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1665728158==--
+--===============1077112011==--
