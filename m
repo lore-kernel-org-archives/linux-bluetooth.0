@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <45FE5DA1.5010706@enteos.it>
-Date: Mon, 19 Mar 2007 10:53:37 +0100
-From: Livio Tenze <livio.tenze@enteos.it>
-MIME-Version: 1.0
+Message-ID: <f045cde30703181333t6e9c1f39v5937ef483ac2b0a8@mail.gmail.com>
+Date: Sun, 18 Mar 2007 13:33:51 -0700
+From: "kyle cronan" <kyle@pbx.org>
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] headset problem...
+MIME-Version: 1.0
+Subject: [Bluez-users] Billionton pc card fails with "BCSP initialization
+	timed out"
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,33 +19,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi all,
+Hi,
 
-I am starting to use bluez 3.9 and now I am testing the headset
-connection. I found in bluez-utils/audio a daemon named
-bluetoothd-service-headset. I thought it was similar to the old hstest.
-I tested this daemon: it recognizes the headset but I am not able to use
-the sco channel. Moreover the -o and -i options of the daemon seem not
-to work.
-When I try to call
+I have a bluetooth PC card made by Billionton, which I believe uses
+the CSR chip and the BCSP protocol.  pccardctl shows the hardware ID
+as 0279-950B, same as in the 'hciattach -l' list under billionton.
+Anyway, I got this card working before, when I was using Gentoo, but
+now I have Fedora Core 6 and I'm not having any luck so far.  Though I
+have no idea what could be different about my new distro.
 
-bluetoothd-service-headset -c 1 -o pippo 00:03:89:75:36:7F
-the program answers
+When I insert the card, dmesg shows a new serial device at /dev/ttyS0.
+ I then try
 
-headset[802]: Bluetooth headset service daemon
-headset[802]: add_ag_record: got record id 0x10000
-bluetoothd-service-headset: headset.c:1549: audio_headset_open_output:
-Assertion `hs->output' failed.
-Aborted
+hciattach /dev/ttyS0 billionton
 
-May you help me? How can I use the headset connection?
-Thanks in advance!
+but I get the "BCSP initialization timed out" message.  I've searched
+and searched for info on this problem, and found a number of
+suggestions (although mostly regarding the CF version of the card +
+linux PDAs).  One of these was to set the baud_base to 921600 with
+setserial--that didn't change anything.  I also found a page that
+suggested patching the 2.6 kernel to allow the 16c950 to be set to the
+nonstandard baudrate 230400.  But I downloaded the sources rpm for my
+kernel and I see that it already has this patch.
 
-Livius
+I've also tried various baudrate options for the hciattach program,
+and specifying bcsp directly instead of using the "billionton"
+bluetooth device type.  There don't seem to be any error messages or
+anything else relevant in my logs.  The kernel version is 2.6.20.
 
+Any suggestions would be most appreciated!
 
-
-
+Kyle Cronan
+<kyle@pbx.org>
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
