@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <45FF1D5B.7030403@sportlaan.adsl.utwente.nl>
-Date: Mon, 19 Mar 2007 23:31:39 +0000
-From: Berend Dekens <cyberwizzard@sportlaan.adsl.utwente.nl>
+From: Daniel Rindt <drindt@mx-solutions.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Mon, 19 Mar 2007 14:44:15 +0100
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Use SCO links to a phone
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-Id: <200703191444.22480.drindt@mx-solutions.de>
+Subject: [Bluez-devel] transfer Files to phone, shorten the scan time
+Reply-To: drindt@mx-solutions.de,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,43 +15,69 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0890808806=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi everyone,
+--===============0890808806==
+Content-Type: multipart/signed; boundary="nextPart3113428.RKsCk7kJJN";
+	protocol="application/pgp-signature"; micalg=pgp-sha1
+Content-Transfer-Encoding: 7bit
 
-Maybe I'm barking up the wrong tree here but I'm trying to link my phone
-with my pc (trying to build a carpc so the computer will act as a 
-carkit) and I found some old tool somewhere that generates a handfree
-connection, but its old and broken. Then I found alsa-bluetooth and gave
-that a whirl.
+--nextPart3113428.RKsCk7kJJN
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Even though that project seems to ride in the right direction (at least
-there is talk about SCO -voice- connections) I can't figure out what I
-should use and how to set it up. The main problem besides having to set
-up the SCO link, is that I need access to the rfcomm part of channel 3
-(HF) as well because I need to parse status data, be able to answer
-calls and initiate them.
+Hello List Readers,
 
-I've googled my ass off but it looks like I'm one of the few people on
-the planet who are trying to figure this out: SCO support is in the
-kernel but I can't find a single guide (not one!) that actually seems to
-do something with the SCO module...
+i search for a code example where i can simply send a file to a phone, the=
+=20
+btadress from the phone is known.=20
+The second i want to know is, how to shorten the scanning time? I see that=
+=20
+the: length  =3D 8;	/* ~10 seconds */ but when i choose a smaller lenght fo=
+r=20
+instance 4 the devices never found. It is not possible to scan faster?
 
-It could ofcourse be that I don't need the alsa-bluetooth stuff at all
-but after spending roughly 140 hours of reading and experimenting I'm
-throwing in the towel...
+Thanks in advance.
+Daniel
 
-Cheers,
-Berend Dekens
+--nextPart3113428.RKsCk7kJJN
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQBF/pO2XpNwE9507IoRApgVAJ9tUBiy1M/UIHZM3lLvAJ4HgT2asgCdHgcL
+N7H2+QyDf/mGOOQarUCd3Oo=
+=3yYr
+-----END PGP SIGNATURE-----
+
+--nextPart3113428.RKsCk7kJJN--
+
+
+--===============0890808806==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============0890808806==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0890808806==--
