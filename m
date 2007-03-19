@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: David Stark <dave@davidstark.name>
+Message-ID: <45FF12E2.2010003@xmission.com>
+Date: Mon, 19 Mar 2007 16:46:58 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <45FF1D5B.7030403@sportlaan.adsl.utwente.nl>
 References: <45FF1D5B.7030403@sportlaan.adsl.utwente.nl>
-Date: Mon, 19 Mar 2007 22:52:03 +0000
-Message-Id: <1174344724.30217.6.camel@cronus.homenet>
-Mime-Version: 1.0
+In-Reply-To: <45FF1D5B.7030403@sportlaan.adsl.utwente.nl>
 Subject: Re: [Bluez-devel] Use SCO links to a phone
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,9 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Mon, 2007-03-19 at 23:31 +0000, Berend Dekens wrote:
-> Hi everyone,
-> 
+Berend
+
+I'm not sure if there's code out there yet but selfone is a modern
+attempt on maemo. I really should put together a list of headset apps on
+bluetooth-alsa since this is a faq. Let me know if you find anything
+that is worth mentioning.
+
+Brad
+
 > Maybe I'm barking up the wrong tree here but I'm trying to link my phone
 > with my pc (trying to build a carpc so the computer will act as a 
 > carkit) and I found some old tool somewhere that generates a handfree
@@ -47,14 +53,16 @@ On Mon, 2007-03-19 at 23:31 +0000, Berend Dekens wrote:
 > 
 > Cheers,
 > Berend Dekens
-
-Hi.
-
-I may be barking down the wrong tree, so to speak, but I think all the
-functionality you need is present in gammu, and whenever I've used gammu
-over rfcomm, it's been fine on channel 1.
-
-Dave
+> 
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys-and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------------------------
