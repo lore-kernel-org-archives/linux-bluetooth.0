@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <45FE7A34.8040504@wershofen.de>
+Date: Mon, 19 Mar 2007 12:55:32 +0100
+From: Wolfgang Wershofen <wolfgang@wershofen.de>
 MIME-Version: 1.0
-Date: Mon, 19 Mar 2007 13:38:59 +0100
-Message-ID: <6039B3E28F85164B82BBABFD30D98DDE013EC5C4@vilh303a.ww011.siemens.net>
-From: "Koestering, Nina (EXT)" <nina.koestering.ext@siemensvdo.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] How to set the encryptions key size?
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <45FE5DA1.5010706@enteos.it>
+In-Reply-To: <45FE5DA1.5010706@enteos.it>
+Subject: Re: [Bluez-users] headset problem...
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +20,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi, 
- 
-is there a way to specify the encryption key size? Is it possible to
-enforce an encryption with a 128-bit key? I found out that there is a
-method to get the encryption key size, but I didn't find a way to set
-the key size.
-Could you please give me some advice? Thanks in advance.
- 
-Best regards
-Nina
- 
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
+Livio Tenze schrieb:
+> 
+> May you help me? How can I use the headset connection?
+> Thanks in advance!
 
+I'm using bluetooth-alsa for my headset (see
+http://bluetooth-alsa.sourceforge.net )
 
+Maybe that is an option for you?
+
+hth
+Wolfgang
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+Comment: Using GnuPG with SUSE - http://enigmail.mozdev.org
+
+iD8DBQFF/no0gUafbxFH+p8RAj8wAKChQXrKCH2PyBp3pRAXoOaAsuuRHwCgm4KZ
+QeG6m05z+mVu6JT//C9ZK3I=
+=lm3K
+-----END PGP SIGNATURE-----
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
