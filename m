@@ -1,289 +1,54 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Return-Path: <jikos@jikos.cz>
+Date: Wed, 21 Mar 2007 22:40:36 +0100 (CET)
+From: Jiri Kosina <jikos@jikos.cz>
+To: Kevin Baradon <kevin.baradon@gmail.com>
+cc: linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+        bluez-devel@lists.sourceforge.net, Amedee Van Gasse <amedee@amedee.be>
+Subject: Re: BUG: at drivers/hid/hid-core.c:778 implement() with bluetooth
+ keyboard/mouse
+In-Reply-To: <200703211923.04651.Kevin.Baradon@gmail.com>
+Message-ID: <Pine.LNX.4.64.0703212231230.5030@twin.jikos.cz>
+References: <200703211923.04651.Kevin.Baradon@gmail.com>
 MIME-Version: 1.0
-Date: Thu, 22 Mar 2007 08:42:20 -0300
-Message-ID: <C2674109C0E9C54F978B233D4EFE41500139F219@VNTSERVER06.venturus.local>
-From: "Carlos Mazieri" <carlos.mazieri@venturus.org.br>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Multicast problem: is it possible receive Multicast
-	packets from device, on sending, the device does not see any packet
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2062006090=="
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-This is a multi-part message in MIME format.
+On Wed, 21 Mar 2007, Kevin Baradon wrote:
 
---===============2062006090==
-Content-class: urn:content-classes:message
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C76C77.2693EDDD"
+> Hello everybody,
+> [1.] One line summary of the problem :
+> "BUG: at drivers/hid/hid-core.c:778 implement()" message in logs when booting 
+> with bluetooth keyboard + mouse.
+> [2.] Full description of the problem/report :
+> During bootup, warnings (see below) are emitted in system log. 
+> Hardware : 
+> - P4 3.06MHz
+> - Logitech Cordless MX Desktop for Bluetooth (keyboard + mouse with an USB 
+> bluetooth adapter).
 
-This is a multi-part message in MIME format.
+(relevant CCs added)
 
-------_=_NextPart_001_01C76C77.2693EDDD
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Hi Kevin,
 
-Hi guys,
+there have been similar reports previously, all with recent Logitech 
+dongles. See for example [1].
 
-=20
+The bug is triggered by hid2hci when it tries to switch the Bluetooth 
+dongle from HID to HCI mode. Most probably Logitech has changed the 
+sequence that is needed to switch the dongle.
 
-I am working in a mobile application that set a multicast address to
-exchange information by using UDP sockets.
+hid2hci has hardcoded reports that it uses to switch the dongle between 
+HID and HCI modes. These reports are vendor-specific and are not described 
+in report descriptor, therefore it's non-trivial to know what new pieces 
+of hardware are expecting.
 
-=20
+Marcel, did you by any chance have time to look at the dump that Amedee 
+catched using usbsnoop some time ago? [2]
 
-I am using a Sony Ericssom mobile to test it.
+Thanks.
 
-=20
+[1] http://lkml.org/lkml/2007/2/16/215
+[2] http://www.mail-archive.com/linux-kernel@vger.kernel.org/msg128743.html
 
-It works fine under windows using Microsoft Bluetooh stack, my BT
-adaptor is a TDK  04bf:0319.
-
-=20
-
-Under Linux, I just can send packets into my PC, I can not receive any
-packet in my mobile.
-
-=20
-
-I am doing:
-
-=20
-
-   pand -listen -role NAP -autozap
-
-=20
-
-   pand -connect <my-mobile-addr>
-
- =20
-
-   pand -connect <my-mobile-addr> // twice I do not know why
-
-=20
-
-   ifconfig bnep0 196.254.200.2 netmask 255.255.0.0          ( also have
-tried zcip )
-
-=20
-
-=20
-
-Could you guys help me?
-
-=20
-
-Thanks in advance,
-
-Carlos
-
-=20
-
-
-------_=_NextPart_001_01C76C77.2693EDDD
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-<html xmlns:v=3D"urn:schemas-microsoft-com:vml" =
-xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
-xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
-xmlns=3D"http://www.w3.org/TR/REC-html40">
-
-<head>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
-<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered medium)">
-<style>
-<!--
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0in;
-	margin-bottom:.0001pt;
-	font-size:12.0pt;
-	font-family:"Times New Roman";}
-a:link, span.MsoHyperlink
-	{color:blue;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{color:purple;
-	text-decoration:underline;}
-span.EmailStyle17
-	{mso-style-type:personal-compose;
-	font-family:Arial;
-	color:windowtext;}
-@page Section1
-	{size:8.5in 11.0in;
-	margin:1.0in 1.25in 1.0in 1.25in;}
-div.Section1
-	{page:Section1;}
--->
-</style>
-
-</head>
-
-<body lang=3DEN-US link=3Dblue vlink=3Dpurple>
-
-<div class=3DSection1>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Hi guys,<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>I am working in a mobile application that set a =
-multicast
-address to exchange information by using UDP =
-sockets.<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>I am using a Sony Ericssom mobile to test =
-it.<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>It works fine under windows using Microsoft Bluetooh =
-stack,
-my BT adaptor is a TDK &nbsp;04bf:0319.<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Under Linux, I just can send packets into my PC, I =
-can not
-receive any packet in my mobile.<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>I am doing:<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>&nbsp;&nbsp; pand &#8211;listen &#8211;role NAP
-&#8211;autozap<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>&nbsp;&nbsp; pand &#8211;connect =
-&lt;my-mobile-addr&gt;<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>&nbsp; <o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>&nbsp;&nbsp; pand &#8211;connect =
-&lt;my-mobile-addr&gt; //
-twice I do not know why<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>&nbsp;&nbsp; ifconfig bnep0 196.254.200.2 netmask
-255.255.0.0&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;( also =
-have
-tried zcip )<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Could you guys help me?<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Thanks in advance,<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Carlos<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-</div>
-
-</body>
-
-</html>
-
-------_=_NextPart_001_01C76C77.2693EDDD--
-
-
---===============2062006090==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============2062006090==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============2062006090==--
+-- 
+Jiri Kosina
