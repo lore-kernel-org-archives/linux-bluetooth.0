@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46014CE0.60408@xmission.com>
-Date: Wed, 21 Mar 2007 09:18:56 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <4601565D.6080206@sportlaan.adsl.utwente.nl>
+Date: Wed, 21 Mar 2007 15:59:25 +0000
+From: Berend Dekens <cyberwizzard@sportlaan.adsl.utwente.nl>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45FE8B0B.20500@xmission.com>
-	<1174486267.15638.25.camel@aeonflux.holtmann.net>
-In-Reply-To: <1174486267.15638.25.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] new sco flowcontrol patch
+References: <fd77e5b50703210739v1e5dab17kdce02bc1cc386900@mail.gmail.com>
+In-Reply-To: <fd77e5b50703210739v1e5dab17kdce02bc1cc386900@mail.gmail.com>
+Subject: Re: [Bluez-devel] Computer as Bluetooth Headset
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,15 +20,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-> The biggest thing however is hci_sched_sco(). This function is ugly as
-> hell and basically unreadable. Please use break or continue instead of
-> cascaded if clauses.
+I've been playing with the alsa-bluetooth driver and it sorta works
+(btsco) but its rather ment as a solution to talk to headsets rather
+then mobile phones (which is what I assume you want).
 
-ok I will work on it and submit another patch this week.
+I'm also looking for a solution for this but so far - no luck...
 
-Brad
+
+Asif Khan wrote:
+> Is there any way to make a computer act like a bluetooth headset?
+> 
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iD8DBQFGAVZd/cbsyMl8CRsRAmzgAJ9TdXsIKUqeTw+vzRnu9qMgmMldcgCglqjs
+qmboqhYndI0lBsiolqU7KTA=
+=uiJa
+-----END PGP SIGNATURE-----
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
