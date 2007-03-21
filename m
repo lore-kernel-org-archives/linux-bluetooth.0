@@ -1,16 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20070320223643.d8cbc3f6.akpm@linux-foundation.org>
-References: <20070319205623.299d0378.akpm@linux-foundation.org>
-	<1174433034.62033.16.camel@localhost>
-	<20070320223643.d8cbc3f6.akpm@linux-foundation.org>
-Date: Wed, 21 Mar 2007 15:12:50 +0100
-Message-Id: <1174486370.15638.29.camel@aeonflux.holtmann.net>
+In-Reply-To: <20070321125445.GC10594@strauss.suse.de>
+References: <20070321125445.GC10594@strauss.suse.de>
+Date: Wed, 21 Mar 2007 15:12:04 +0100
+Message-Id: <1174486324.15638.27.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Cc: linux-wireless@vger.kernel.org, Zan Lynx <zlynx@acm.org>,
-        reiserfs-dev@namesys.com, linux-kernel@vger.kernel.org
-Subject: Re: [Bluez-devel] 2.6.21-rc4-mm1
+Subject: Re: [Bluez-devel] SCO flow control patch mainline?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,13 +20,12 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Andrew,
+Hi Bernhard,
 
-> >       * Freezes immediately if I allow Bluetooth to configure.
-> 
-> cc bluez-devel
+> why is the 'SCO flow control patch' not mainline? Are there any plans
+> to push it mainline?
 
-is the -mm specific or does this also happens with 2.6.21-rc4?
+because it is not ready for mainline.
 
 Regards
 
