@@ -1,54 +1,60 @@
-Return-Path: <jikos@jikos.cz>
-Date: Wed, 21 Mar 2007 22:40:36 +0100 (CET)
-From: Jiri Kosina <jikos@jikos.cz>
-To: Kevin Baradon <kevin.baradon@gmail.com>
-cc: linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-        bluez-devel@lists.sourceforge.net, Amedee Van Gasse <amedee@amedee.be>
-Subject: Re: BUG: at drivers/hid/hid-core.c:778 implement() with bluetooth
- keyboard/mouse
-In-Reply-To: <200703211923.04651.Kevin.Baradon@gmail.com>
-Message-ID: <Pine.LNX.4.64.0703212231230.5030@twin.jikos.cz>
-References: <200703211923.04651.Kevin.Baradon@gmail.com>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <46015990.0@lwfinger.net>
+Date: Wed, 21 Mar 2007 11:13:04 -0500
+From: Larry Finger <larry.finger@lwfinger.net>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-List-ID: <bluez-devel.lists.sourceforge.net>
+To: Zan Lynx <zlynx@acm.org>
+References: <20070319205623.299d0378.akpm@linux-foundation.org>	<1174433034.62033.16.camel@localhost>
+	<20070320223643.d8cbc3f6.akpm@linux-foundation.org>
+In-Reply-To: <20070320223643.d8cbc3f6.akpm@linux-foundation.org>
+Cc: reiserfs-dev@namesys.com, bluez-devel@lists.sourceforge.net,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [Bluez-devel] 2.6.21-rc4-mm1
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Wed, 21 Mar 2007, Kevin Baradon wrote:
+Andrew Morton wrote:
+> On Tue, 20 Mar 2007 17:23:54 -0600 Zan Lynx <zlynx@acm.org> wrote:
+> 
+>> On Mon, 2007-03-19 at 20:56 -0800, Andrew Morton wrote:
+>>> Temporarily at
+>>>
+>>>   http://userweb.kernel.org/~akpm/2.6.21-rc4-mm1/
+>>>
+>>> Will appear later at
+>>>
+>>>   ftp://ftp.kernel.org/pub/linux/kernel/people/akpm/patches/2.6/2.6.21-rc4/2.6.21-rc4-mm1/
+>> First impressions:
+>> Several of the same bugs as rc3-mm*:
+>>       * Freezes immediately if I touch the wlan0 device after loading
+>>         the new Broadcom wireless driver.
 
-> Hello everybody,
-> [1.] One line summary of the problem :
-> "BUG: at drivers/hid/hid-core.c:778 implement()" message in logs when booting 
-> with bluetooth keyboard + mouse.
-> [2.] Full description of the problem/report :
-> During bootup, warnings (see below) are emitted in system log. 
-> Hardware : 
-> - P4 3.06MHz
-> - Logitech Cordless MX Desktop for Bluetooth (keyboard + mouse with an USB 
-> bluetooth adapter).
+--snip--
 
-(relevant CCs added)
+>> 02:02.0 Network controller: Broadcom Corporation BCM4303 802.11b Wireless LAN Controller (rev 02)
 
-Hi Kevin,
+I'm a little confused. The bcm43xx-mac80211 driver does not handle 802.11b devices, and the
+bcm43xx-softmac driver should not freeze. Which one was configured here?
 
-there have been similar reports previously, all with recent Logitech 
-dongles. See for example [1].
+Larry
 
-The bug is triggered by hid2hci when it tries to switch the Bluetooth 
-dongle from HID to HCI mode. Most probably Logitech has changed the 
-sequence that is needed to switch the dongle.
-
-hid2hci has hardcoded reports that it uses to switch the dongle between 
-HID and HCI modes. These reports are vendor-specific and are not described 
-in report descriptor, therefore it's non-trivial to know what new pieces 
-of hardware are expecting.
-
-Marcel, did you by any chance have time to look at the dump that Amedee 
-catched using usbsnoop some time ago? [2]
-
-Thanks.
-
-[1] http://lkml.org/lkml/2007/2/16/215
-[2] http://www.mail-archive.com/linux-kernel@vger.kernel.org/msg128743.html
-
--- 
-Jiri Kosina
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys-and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
