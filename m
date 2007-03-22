@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <003501c76d0e$ddcb33c0$c301a8c0@Bahubali>
-From: "vikram" <vikram.bidkar@adamya.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Fri, 23 Mar 2007 11:18:19 +0530
+Date: Wed, 21 Mar 2007 21:57:52 -0700
+From: Matt Zimmerman <mdz@ubuntu.com>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20070322045752.GM7472@alcor.net>
+References: <20070311203223.GP8187@alcor.net>
+	<20070311205548.GQ8187@alcor.net> <45F58229.50403@redhat.com>
+	<20070322031835.GJ7472@alcor.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] add spp service, problem
+In-Reply-To: <20070322031835.GJ7472@alcor.net>
+Subject: Re: [Bluez-users] Plantronics 510 headset: playback partially works,
+	but not recording
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,99 +19,41 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1129125743=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+On Wed, Mar 21, 2007 at 08:18:35PM -0700, Matt Zimmerman wrote:
+> On Mon, Mar 12, 2007 at 12:39:05PM -0400, Alan Conway wrote:
+> > Matt Zimmerman wrote:
+> > > I found an example which used aplay -B 1000000, and that fixes the
+> > > stuttering.  Still no luck yet on recording.
+> > I'm trying to get a similar setup to work, here's my previos post with 
+> > my status so far, would love to hear of any breakthroughs you make:
+> 
+> Thanks for sharing your experience.
+> 
+> > Trying to use a plantronics 510s with skype.
+> > 
+> > Update on my attempts, I've established the setup that almost works. By 
+> > almost works I mean:
+> > - aplay, arecord -D headset work, quality is fine for telephone use.
+> 
+> Interesting, so recording works for you?  I wonder what's different about
+> your setup.
 
---===============1129125743==
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0032_01C76D3C.F5B76250"
+Could you send me an hcidump -V trace of you capturing with arecord?  I'd
+like to compare it to what I see here.
 
-This is a multi-part message in MIME format.
-
-------=_NextPart_000_0032_01C76D3C.F5B76250
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-Hi=20
-
-I am trying to add spp service, but I am getting "Filed to connect to =
-local SDP server".
-
-"session" value i.e. return value of sdp_connect is zero.
-I am getting error for following line of code.
-
-session =3D sdp_connect(BDADDR_ANY, BDADDR_LOCAL, SDP_RETRY_IF_BUSY);
-
-Please suggest what could be the problem.
-
-Regards,
-Vikram
-------=_NextPart_000_0032_01C76D3C.F5B76250
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2800.1586" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>
-<DIV><FONT face=3DArial size=3D2>Hi </FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I am trying to add spp service, but I =
-am getting=20
-"Filed to connect to local SDP server".</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>"session" value i.e. return value of =
-sdp_connect is=20
-zero.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>I am getting error for&nbsp;following =
-line of=20
-code.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>session =3D sdp_connect(BDADDR_ANY, =
-BDADDR_LOCAL,=20
-SDP_RETRY_IF_BUSY);</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Please suggest what could be the=20
-problem.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Regards,</FONT></DIV>
-<DIV><FONT face=3DArial =
-size=3D2>Vikram</FONT></DIV></FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0032_01C76D3C.F5B76250--
-
-
-
---===============1129125743==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+ - mdz
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1129125743==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1129125743==--
