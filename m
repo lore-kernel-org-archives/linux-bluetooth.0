@@ -1,59 +1,70 @@
-Return-Path: <zlynx@acm.org>
-Subject: Re: [Bluez-devel] 2.6.21-rc4-mm1
+Return-Path: <linux-kernel-owner+marcel=40holtmann.org-S933926AbXCWTkn@vger.kernel.org>
+Subject: Re: 2.6.21-rc4-mm1
 From: Zan Lynx <zlynx@acm.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>,
-        linux-kernel@vger.kernel.org
-In-Reply-To: <1174486370.15638.29.camel@aeonflux.holtmann.net>
+To: Larry Finger <larry.finger@lwfinger.net>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
+        linux-wireless@vger.kernel.org, bluez-devel@lists.sourceforge.net,
+        reiserfs-dev@namesys.com
+In-Reply-To: <46015990.0@lwfinger.net>
 References: <20070319205623.299d0378.akpm@linux-foundation.org>
 	 <1174433034.62033.16.camel@localhost>
 	 <20070320223643.d8cbc3f6.akpm@linux-foundation.org>
-	 <1174486370.15638.29.camel@aeonflux.holtmann.net>
-Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-sucEl6uUGBYi+kYCiXwt"
-Date: Fri, 23 Mar 2007 13:45:54 -0600
-Message-Id: <1174679154.289400.22.camel@localhost>
+	 <46015990.0@lwfinger.net>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-T9xAHRaGXU5aa4okKXwV"
+Date: Fri, 23 Mar 2007 13:40:32 -0600
+Message-Id: <1174678832.289400.16.camel@localhost>
 Mime-Version: 1.0
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 
---=-sucEl6uUGBYi+kYCiXwt
+--=-T9xAHRaGXU5aa4okKXwV
 Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2007-03-21 at 15:12 +0100, Marcel Holtmann wrote:
-> Hi Andrew,
+On Wed, 2007-03-21 at 11:13 -0500, Larry Finger wrote:
+> Andrew Morton wrote:
+> > On Tue, 20 Mar 2007 17:23:54 -0600 Zan Lynx <zlynx@acm.org> wrote:
+> >> First impressions:
+> >> Several of the same bugs as rc3-mm*:
+> >>       * Freezes immediately if I touch the wlan0 device after loading
+> >>         the new Broadcom wireless driver.
 >=20
-> > >       * Freezes immediately if I allow Bluetooth to configure.
-> >=20
-> > cc bluez-devel
+> --snip--
 >=20
-> is the -mm specific or does this also happens with 2.6.21-rc4?
+> >> 02:02.0 Network controller: Broadcom Corporation BCM4303 802.11b Wirel=
+ess LAN Controller (rev 02)
+>=20
+> I'm a little confused. The bcm43xx-mac80211 driver does not handle 802.11=
+b devices, and the
+> bcm43xx-softmac driver should not freeze. Which one was configured here?
 
-Bluetooth works now, so it isn't entirely -mm's fault. =20
+It may have partly been a problem of having half of softmac and half
+devicescape.  I'm not entirely sure what udev did.
 
-I applied a posted patch for the Sonic Silicon Backplane.  I also set
-all the older BCM43xx driver modules to N, and my freeze with wireless
-went away.
+I tried a patch for the Sonic Silicon that was posted and I turned off
+all the configuration for the softmac driver.
 
-On this laptop (a Compaq R3000) the Bluetooth and the wireless are
-controlled by the same front panel button, so I wonder if they are
-related in other ways as well.
+It isn't crashing right now but 802.11 isn't working either.  I may get
+a chance this weekend to try some things with it, and some different
+firmware sets.
 
-If I get a chance to play with it this weekend I will see if I can
-isolate the change that fixes/breaks it.
+If the new bcm43xx drivers do not support 802.11b at all and never will,
+I missed the documentation.  Someone should add that to Kconfig.
 --=20
 Zan Lynx <zlynx@acm.org>
 
---=-sucEl6uUGBYi+kYCiXwt
+--=-T9xAHRaGXU5aa4okKXwV
 Content-Type: application/pgp-signature; name=signature.asc
 Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2.0.3 (GNU/Linux)
 
-iD8DBQBGBC5yG8fHaOLTWwgRAlVtAKCSCnUhdf8C7zpWj4jSq8yWkmh+5QCfR6p6
-d98lBKF95LpOMJRkXkEpZ8c=
-=0Z65
+iD8DBQBGBC0wG8fHaOLTWwgRAjx2AKCV/CK0iBVpck/IjTXzpqEuxdykUwCeNS6N
+r3/AJOR7cLYuU2WHk6F+ZSU=
+=dMzn
 -----END PGP SIGNATURE-----
 
---=-sucEl6uUGBYi+kYCiXwt--
+--=-T9xAHRaGXU5aa4okKXwV--
+
