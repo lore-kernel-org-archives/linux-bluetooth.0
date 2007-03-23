@@ -1,45 +1,59 @@
-Return-Path: <linux-kernel-owner+marcel=40holtmann.org-S934045AbXCXBtt@vger.kernel.org>
-Message-ID: <460483B5.70808@lwfinger.net>
-Date: Fri, 23 Mar 2007 20:49:41 -0500
-From: Larry Finger <larry.finger@lwfinger.net>
-MIME-Version: 1.0
-To: Zan Lynx <zlynx@acm.org>
-CC: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
-        linux-wireless@vger.kernel.org, bluez-devel@lists.sourceforge.net,
-        reiserfs-dev@namesys.com
-Subject: Re: 2.6.21-rc4-mm1
-References: <20070319205623.299d0378.akpm@linux-foundation.org>	 <1174433034.62033.16.camel@localhost>	 <20070320223643.d8cbc3f6.akpm@linux-foundation.org>	 <46015990.0@lwfinger.net> <1174678832.289400.16.camel@localhost>
-In-Reply-To: <1174678832.289400.16.camel@localhost>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <zlynx@acm.org>
+Subject: Re: [Bluez-devel] 2.6.21-rc4-mm1
+From: Zan Lynx <zlynx@acm.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>,
+        linux-kernel@vger.kernel.org
+In-Reply-To: <1174486370.15638.29.camel@aeonflux.holtmann.net>
+References: <20070319205623.299d0378.akpm@linux-foundation.org>
+	 <1174433034.62033.16.camel@localhost>
+	 <20070320223643.d8cbc3f6.akpm@linux-foundation.org>
+	 <1174486370.15638.29.camel@aeonflux.holtmann.net>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-sucEl6uUGBYi+kYCiXwt"
+Date: Fri, 23 Mar 2007 13:45:54 -0600
+Message-Id: <1174679154.289400.22.camel@localhost>
+Mime-Version: 1.0
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Zan Lynx wrote:
-> 
-> It may have partly been a problem of having half of softmac and half
-> devicescape.  I'm not entirely sure what udev did.
-> 
-> I tried a patch for the Sonic Silicon that was posted and I turned off
-> all the configuration for the softmac driver.
-> 
-> It isn't crashing right now but 802.11 isn't working either.  I may get
-> a chance this weekend to try some things with it, and some different
-> firmware sets.
 
-That is my experience with a 4311. It does the open authentication and associates, but the WPA
-authentication step times out and I never get connected.
+--=-sucEl6uUGBYi+kYCiXwt
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-> If the new bcm43xx drivers do not support 802.11b at all and never will,
-> I missed the documentation.  Someone should add that to Kconfig.
+On Wed, 2007-03-21 at 15:12 +0100, Marcel Holtmann wrote:
+> Hi Andrew,
+>=20
+> > >       * Freezes immediately if I allow Bluetooth to configure.
+> >=20
+> > cc bluez-devel
+>=20
+> is the -mm specific or does this also happens with 2.6.21-rc4?
 
-Yes it should. Until bcm43xx-mac80211 got picked up by -mm, it was only used within the bcm43xx
-group and that was understood in that circle. It has just been decided that the softmac version of
-the driver will be renamed bcm4301 and be converted to use mac80211. When bcm43xx-mac80211 goes
-mainline, bcm4301 will be restricted to 802.11b-only cards. That is the way we will support the
-older cards. The reason for a separate driver is that the bcm4301 and bcm4303 do not have sufficient
-memory to run the latest firmware (V4), and bcm43xx-mac80211 only uses that firmware; whereas
-bcm4301 will use the older V3 firmware.
+Bluetooth works now, so it isn't entirely -mm's fault. =20
 
-Larry
+I applied a posted patch for the Sonic Silicon Backplane.  I also set
+all the older BCM43xx driver modules to N, and my freeze with wireless
+went away.
 
+On this laptop (a Compaq R3000) the Bluetooth and the wireless are
+controlled by the same front panel button, so I wonder if they are
+related in other ways as well.
 
+If I get a chance to play with it this weekend I will see if I can
+isolate the change that fixes/breaks it.
+--=20
+Zan Lynx <zlynx@acm.org>
+
+--=-sucEl6uUGBYi+kYCiXwt
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.3 (GNU/Linux)
+
+iD8DBQBGBC5yG8fHaOLTWwgRAlVtAKCSCnUhdf8C7zpWj4jSq8yWkmh+5QCfR6p6
+d98lBKF95LpOMJRkXkEpZ8c=
+=0Z65
+-----END PGP SIGNATURE-----
+
+--=-sucEl6uUGBYi+kYCiXwt--
