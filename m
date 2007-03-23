@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sat, 24 Mar 2007 13:57:04 +0100
-From: Benjamin Hase <benjamin.hase@web.de>
+Message-ID: <dd9d8d5f0703230910i82d16a9hd1360356c266ff9e@mail.gmail.com>
+Date: Fri, 23 Mar 2007 11:10:51 -0500
+From: "Adorayaz Adrian" <okhimalaya@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <45EF24B7.70908@thebmwz3.co.uk>
-References: <45EF24B7.70908@thebmwz3.co.uk>
-Mime-Version: 1.0
-Message-Id: <20070324125513.CBCC84546C1@can03.de>
-Subject: Re: [Bluez-users] pand, bnep0 and no traffic flow
+MIME-Version: 1.0
+Subject: [Bluez-users] upgrade bluez module with the latest one by using
+	patch-2.6.20-mh1.gz?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,43 +15,68 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0902177371=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Am Wed, 07 Mar 2007 20:46:47 +0000
-schrieb Andy <andy@thebmwz3.co.uk>:
+--===============0902177371==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_179127_619872.1174666251630"
 
-Hi Andy,
+------=_Part_179127_619872.1174666251630
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> I'm trying to figure out where things are going wrong with my connection 
-> here.
-> Server A has /usr/bin/pand --listen -M --role=NAP
-> Server B has pand --connect 00:02:72:B2:EF:21
-> 
-> The two initiate the connection, and create the bnep0 interface. I set 
-> the IP addresses
-> ifconfig bnep0 10.0.0.1 netmask 255.255.255.0
-> ifconfig bnep0 10.0.0.2 netmask 255.255.255.0
-> respectively, and neither can ping each other.
-> 
+Hello,
+My linux box has kenel 2.6.9.
+I'd like to upgrade bluez module with the latest one by using
+patch-2.6.20-mh1.gz.
+Can I apply that patch to my kernel directly?
+Otherwise, should I find and install patch-2.6.9-mh1.gz, then
+patch-2.6.9-mh2.gz, ... up to patch-2.6.20-mh1.gz?
 
-I had a similar setup and the same problem. pand -l shows a connection,
-l2ping is okay, but not an ICMP-ping.
-The solution for me was to use another Bluetooth-dongle. The new one is
-with a Bluecore 4 chipset, no problems. I tried the same setup with the
-other dongle: Same problem as before -- it looks like a problem with the
-hardware.
+Thanks a lot.
 
-HTH
-Benjamin
+------=_Part_179127_619872.1174666251630
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<br>
+Hello,<br>
+My linux box has kenel 2.6.9.<br>
+I&#39;d like to upgrade bluez module with the latest one by using patch-2.6.20-mh1.gz.<br>
+Can I apply that patch to my kernel directly?<br>
+Otherwise, should I find and install patch-2.6.9-mh1.gz, then patch-2.6.9-mh2.gz, ... up to patch-2.6.20-mh1.gz?<br>
+<br>
+Thanks a lot.<br>
+<br>
+<br>
+
+------=_Part_179127_619872.1174666251630--
+
+
+--===============0902177371==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============0902177371==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0902177371==--
