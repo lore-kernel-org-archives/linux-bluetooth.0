@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <dd9d8d5f0703230910i82d16a9hd1360356c266ff9e@mail.gmail.com>
-Date: Fri, 23 Mar 2007 11:10:51 -0500
-From: "Adorayaz Adrian" <okhimalaya@gmail.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] upgrade bluez module with the latest one by using
-	patch-2.6.20-mh1.gz?
+From: Jeffrey Bridge <jeffrey+bluez@firehead.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1173206973.11247.19.camel@aeonflux.holtmann.net>
+References: <1173198739.25660.0.camel@localhost>
+	<1173206973.11247.19.camel@aeonflux.holtmann.net>
+Date: Fri, 23 Mar 2007 09:51:26 -0600
+Message-Id: <1174665086.20624.0.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] bcm2045 issue
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,68 +17,37 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0902177371=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0902177371==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_179127_619872.1174666251630"
+Hi Marcel,
 
-------=_Part_179127_619872.1174666251630
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+On Tue, 2007-03-06 at 19:49 +0100, Marcel Holtmann wrote:
+> Hi Jeffrey,
+> 
+> > I'm not sure if this is supposed to work yet or not, but I'm having
+> > trouble getting a Dell Wireless 355 module (AKA BCM2045) working in an
+> > e1705 under Gentoo. Here is the error message generated upon 'modprobe
+> > hci_usb':
+> 
+> load the hci_usb driver with the module parameter reset=1.
 
-Hello,
-My linux box has kenel 2.6.9.
-I'd like to upgrade bluez module with the latest one by using
-patch-2.6.20-mh1.gz.
-Can I apply that patch to my kernel directly?
-Otherwise, should I find and install patch-2.6.9-mh1.gz, then
-patch-2.6.9-mh2.gz, ... up to patch-2.6.20-mh1.gz?
+It still gets the same result with reset=1:
 
-Thanks a lot.
+hci_cmd_task: hci0 command tx timeout
+hci_usb_intr_rx_submit: hci0 intr rx submit failed urb ffff81004d45faa8
+err -28
 
-------=_Part_179127_619872.1174666251630
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Jeff
 
-<br>
-Hello,<br>
-My linux box has kenel 2.6.9.<br>
-I&#39;d like to upgrade bluez module with the latest one by using patch-2.6.20-mh1.gz.<br>
-Can I apply that patch to my kernel directly?<br>
-Otherwise, should I find and install patch-2.6.9-mh1.gz, then patch-2.6.9-mh2.gz, ... up to patch-2.6.20-mh1.gz?<br>
-<br>
-Thanks a lot.<br>
-<br>
-<br>
-
-------=_Part_179127_619872.1174666251630--
-
-
---===============0902177371==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0902177371==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0902177371==--
