@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <380-22007312614145425@M2W012.mail2web.com>
-From: "vikram.bidkar@adamya.com" <vikram.bidkar@adamya.com>
+Date: Mon, 26 Mar 2007 11:41:38 +0300 (EEST)
+From: Martin Fluch <fluch@rock.helsinki.fi>
 To: bluez-users@lists.sourceforge.net
-Date: Mon, 26 Mar 2007 10:14:54 -0400
+Message-ID: <Pine.LNX.4.64.0703261141240.2782@localhost.localdomain>
 MIME-Version: 1.0
-Subject: [Bluez-users] problem in starting hcid
-Reply-To: vikram.bidkar@adamya.com,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Nokia Headset BH-900?
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -15,46 +14,96 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi All,
+Hi!
 
-I am not able to start "hcid" i.e. If I run ./hcid from
-bluez-utils-3.9/hcid.
+Does anyone have success with connecting to the Nokia Headset BH-900?
 
-I am getting following error.
+I'm running I quite recent Debian system (unstable) and have no problems to 
+connect to my phone via bluez/hcitool/hkbluetoothd etc. But I am unable to get 
+a connection to my headset.
 
-Mar 30 16:50:51 Netravathi hcid[18586]: Bluetooth HCI daemon
-Mar 30 16:50:51 Netravathi hcid[18586]: Can't connect to system message
-bus: Failed to connect to socket /usr/local/var/run/dbus/system_bus_socket:
-No such file or directory
-Mar 30 16:50:51 Netravathi hcid[18586]: Unable to get on D-Bus.
+seneca:~# hcitool scan
+Scanning ...
+         00:13:70:3E:CA:09       Nokia BH-900
 
-I could start SDP server succefully.
+...which is my headset.
 
-I think I am getting Sygmentation fault for
-"sdp_set_access_protos(spp_info[0].record, aproto);",because I have not
-started hcid successfully.
+seneca:~# hcitool cc 00:13:70:3E:CA:09 ; hcitool auth 00:13:70:3E:CA:09
 
-Please any buddy suggest me how to come out of this problem
+...which then makes KBluetoothD pop up with a pin request window. But even 
+before I manage to enter the pin "0000" there I get in the syslog the following 
+messages:
 
-Regards,
-Vikram
+Mar 26 11:23:34 localhost hcid[4962]: link_key_request (sba=00:80:98:34:65:1D, 
+dba=00:13:70:3E:CA:09)
+Mar 26 11:23:34 localhost hcid[4962]: pin_code_request (sba=00:80:98:34:65:1D, 
+dba=00:13:70:3E:CA:09)
+Mar 26 11:23:34 localhost hcid[4962]: Calling PasskeyAgent.Request: name=:1.7, 
+path=/org/bluez/passkey_agent_4989
+Mar 26 11:23:36 localhost hcid[4962]: PasskeyAgent.Request(/org/bluez/hci0, 
+00:13:70:3E:CA:09) was canceled
 
---------------------------------------------------------------------
-mail2web.com - Microsoft=AE Exchange solutions from a leading provider -
-http://link.mail2web.com/Business/Exchange
+:-/
 
+And then after some waiting hcitool aborts with the message:
+
+    HCI authentication request failed: Connection timed out
+
+:-/
+
+My /etc/bluetooth/hcid.conf file looks like:
+
+options {
+ 	autoinit yes;
+ 	security auto;
+ 	pairing multi;
+ 	passkey "0000";
+}
+device {
+ 	name "Seneca";
+ 	class 0x7e0100;
+ 	iscan enable; pscan enable;
+ 	lm accept;
+ 	lp rswitch,hold,sniff,park;
+}
+
+And the info obtained from hcitools about the headset is:
+
+seneca:~# hcitool info 00:13:70:3E:CA:09
+Requesting information ...
+         BD Address:  00:13:70:3E:CA:09
+         Device Name: Nokia BH-900
+         LMP Version: 2.0 (0x3) LMP Subversion: 0xa5b
+         Manufacturer: Cambridge Silicon Radio (10)
+         Features: 0xff 0xff 0x8b 0xf8 0x18 0x18 0x00 0x80
+                 <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                 <timing accuracy> <role switch> <hold mode> <sniff mode>
+                 <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
+                 <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
+                 <transparent SCO> <broadcast encrypt> <enhanced iscan>
+                 <interlaced iscan> <interlaced pscan> <inquiry with RSSI>
+                 <extended SCO> <AFH cap. slave> <AFH class. slave>
+                 <AFH cap. master> <AFH class. master> <extended features>
+
+I use hcitool ver 3.7 and a plain but self compiled Linux 2.6.20.3 kernel. And 
+as said before, connecting to my Nokia 6131 works wonderfull.
+
+I tried to google for some information about the usage of the  Nokia HB-900 
+under linux and bluze but didn't find any results on the web. :-/
+
+Any ideas?
+- Martin
 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
