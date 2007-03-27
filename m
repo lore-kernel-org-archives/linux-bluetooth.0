@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200703261935.12536.dgollub@suse.de>
-References: <200703261935.12536.dgollub@suse.de>
-Date: Tue, 27 Mar 2007 11:26:36 +0200
-Message-Id: <1174987596.5815.34.camel@violet>
+In-Reply-To: <5507471E39EB104DAAF9F2CEC7A2AD496AA5D6@IACSMX8.isc.iac>
+References: <5507471E39EB104DAAF9F2CEC7A2AD496AA5D6@IACSMX8.isc.iac>
+Date: Tue, 27 Mar 2007 11:18:31 +0200
+Message-Id: <1174987111.5815.30.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Avoid install of daemon manpage if daemon
-	is	disabled
+Subject: Re: [Bluez-devel] Is A2DP removed from bluez-utils-3.9?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,13 +20,12 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Daniel,
+Hi Wang,
 
-> simple patch for $subject is attachted.
+> Is A2DP removed from bluez-utils-3.9? 
 
-good catch, but the patch is wrong. You also have to modify EXTRA_DIST.
-Otherwise a call to "make dist" is no longer including the manual pages
-in the tarball. I fixed that and committed the patch.
+if you are talking about the non-working and unmaintained code, then the
+answer is yes. We are working on a better solution.
 
 Regards
 
