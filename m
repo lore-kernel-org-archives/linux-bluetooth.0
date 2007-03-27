@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <192792.80995.qm@web43141.mail.sp1.yahoo.com>
-References: <192792.80995.qm@web43141.mail.sp1.yahoo.com>
-Date: Tue, 27 Mar 2007 11:27:49 +0200
-Message-Id: <1174987669.5815.38.camel@violet>
+To: vikram.bidkar@adamya.com, BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <380-22007312614145425@M2W012.mail2web.com>
+References: <380-22007312614145425@M2W012.mail2web.com>
+Date: Tue, 27 Mar 2007 11:27:08 +0200
+Message-Id: <1174987628.5815.36.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Getting properties of bluetooth device
+Subject: Re: [Bluez-users] problem in starting hcid
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,14 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Vikram,
 
-> I am searching for a command to read the properties of a Bluetooth
-> device in the Bluez library.I am using C. Something similar to
-> "hcitool inq" or "hciconfig" .
+> I am not able to start "hcid" i.e. If I run ./hcid from
+> bluez-utils-3.9/hcid.
+> 
+> I am getting following error.
+> 
+> Mar 30 16:50:51 Netravathi hcid[18586]: Bluetooth HCI daemon
+> Mar 30 16:50:51 Netravathi hcid[18586]: Can't connect to system message
+> bus: Failed to connect to socket /usr/local/var/run/dbus/system_bus_socket:
+> No such file or directory
+> Mar 30 16:50:51 Netravathi hcid[18586]: Unable to get on D-Bus.
 
-you should use the D-Bus based API (see dbus-api.txt) for retrieving
-these kind of information.
+you need to fix this error. Make sure that the D-Bus system bus has been
+started.
 
 Regards
 
