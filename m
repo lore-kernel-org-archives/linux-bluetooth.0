@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <007901c77124$06df3040$9d0cc70a@dlh.st.com>
-References: <007901c77124$06df3040$9d0cc70a@dlh.st.com>
-Date: Wed, 28 Mar 2007 12:42:13 +0200
-Message-Id: <1175078533.5815.127.camel@violet>
+Date: Wed, 28 Mar 2007 12:30:23 +0200
+From: Marc Haber <mh+bluez-devel@zugschlus.de>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20070328103023.GB29829@torres.zugschlus.de>
+References: <20070328063625.GA25229@torres.zugschlus.de>
+	<200703280910.06616.chick@computergeek.freeserve.co.uk>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] hcid returning "Device or resource busy"?
+In-Reply-To: <200703280910.06616.chick@computergeek.freeserve.co.uk>
+Subject: Re: [Bluez-devel] SCO headsetd: "appli closed connection"
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,45 +21,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mayank,
+On Wed, Mar 28, 2007 at 09:10:05AM +0100, Tim Chick wrote:
+> On Wednesday 28 March 2007 07:36, Marc Haber wrote:
+> > I am trying to use a Jabra BT 330 with ALSA. My system is Debian
+> > unstable, running Liux 2.6.20.4 patched with the SCO timing patch.
+> > Last night, I was able to do a single VoIP call using twinkle, and
+> > then things stopped working.
+>
+> Try putting the headset into pairing mode again, that fixed it for me. Don't 
+> know why though!
 
-> > > > HCI Event: Command Status (0x0f) plen 4
-> > > >     Remote Name Request Cancel (0x01|0x001a) status 0x01 ncmd 1
-> > > >     Error: Unknown HCI Command
-> > > 
-> > > Looks like a BT1.1 dongle to me since Remote Name Request Cancel was
-> > > introduced after that.
-> > > And since the device is not yet finished paging during the 
-> > remote name
-> > > request, it disallows the Inquiry Command.
-> > > 
-> > > Solution: Get yourself a dongle > BT1.1 !
-> > 
-> > actually it was the Create Connection Cancel that was introduced with
-> > Bluetooth 1.2. The Remote Name Request Cancel was always 
-> > present, but it
-> > seems we have a chip that doesn't support it.
-> 
-> You are right as well as wrong. Both Remote Name Request Cancel and 
-> Create Connection Cancel were introduced in BT1.2. Please check (I've
-> done that already!).
+This only causes the PIN dialog to pop up when trying to connect, and
+after giving the PIN the behavior is as reported in my original message.
 
-I don't have the Bluetooth 1.1 specification at hand. I was pretty sure
-that the Remote Name Request Cancel was always present since I only
-added a dependency against Bluetooth 1.2 for the Create Connection
-Cancel support I added to the kernel lately.
+Greetings
+Marc
 
-> And since this is not an optional command it is impossible to have a
-> BT1.2 chip which doesn't support this command.
-
-You wish. I have seen chips where the set of supported HCI commands is
-limited. Remember there is no real HCI qualification.
-
-Regards
-
-Marcel
-
-
+-- 
+-----------------------------------------------------------------------------
+Marc Haber         | "I don't trust Computers. They | Mailadresse im Header
+Mannheim, Germany  |  lose things."    Winona Ryder | Fon: *49 621 72739834
+Nordisch by Nature |  How to make an American Quilt | Fax: *49 621 72739835
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
