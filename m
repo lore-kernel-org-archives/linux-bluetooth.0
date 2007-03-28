@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <460C24E2.7040809@thebmwz3.co.uk>
-Date: Thu, 29 Mar 2007 21:43:14 +0100
-From: Andy <andy@thebmwz3.co.uk>
-MIME-Version: 1.0
+Message-ID: <187c15580703281446p1732a40eifdce3dc4c1261789@mail.gmail.com>
+Date: Wed, 28 Mar 2007 22:46:50 +0100
+From: "=?ISO-8859-1?Q?Lu=EDs_Sousa?=" <llsousa@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Pairing without dbus
+MIME-Version: 1.0
+Subject: [Bluez-users] Paired with Nokia phone but not connected
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,45 +14,61 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi All,
-I'm having some major problems on a CF-based linux system based on Debian.
-Basically, I need to do a pairing without using DBUS/passkey-agent, so 
-want to somehow populate the linkkeys file manually.
-Can anyone advise on how to do this? (I have the address of the device, 
-and the pin it requires to pair).
+Hi all,
 
-The reason is that on the basic install I've got bluetooth utils are 
-broken, and without compilers, etc I cannot build working copies, so 
-continually get:
+I'm using Debian testing with:
+||/ Name           Version        Description
++++-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D-=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+ii  bluez-firmware 1.2-1          Firmware for Bluetooth devices
+ii  bluez-utils    3.7-1          Bluetooth tools and daemons
+ii  dbus           1.0.2-1        simple interprocess messaging system
+ii  gammu          1.08.00-1      Mobile phone management utility
+ii  libbluetooth2  3.7-1          Library to use the BlueZ Linux Bluetooth =
+sta
+ii  libc6          2.3.6.ds1-13   GNU C Library: Shared libraries
+ii  libdbus-1-3    1.0.2-1        simple interprocess messaging system
+ii  libusb-0.1-4   0.1.12-5       userspace USB programming library
+ii  lsb-base       3.1-23.1       Linux Standard Base 3.1 init script funct=
+ion
+ii  makedev        2.3.1-83       creates device files in /dev
+ii  module-init-to 3.3-pre4-2     tools for managing Linux kernel modules
+ii  modutils       2.4.27.0-6     Linux module utilities
+ii  udev           0.105-4        /dev/ and hotplug management daemon
+ii  bluez-gnome    0.6-1          Bluetooth utilities for GNOME
 
-Mar 29 17:20:29 voyage hcid[3247]: pin_code_request 
-(sba=00:15:83:xx:xx:xx, dba=00:80:37:xx:xx:xx)
-Mar 29 17:20:29 voyage hcid[3247]: Calling PasskeyAgent.Request: 
-name=:1.6, path=/org/bluez/passke
-Mar 29 17:20:29 voyage hcid[3247]: Passkey agent replied with an error: 
-org.freedesktop.DBus.Errorhod "Request" with signature "ss" on interface 
-"org.bluez.PasskeyAgent" doesn't exist
+My hardware is a USB Dongle Bluetooth D-Link DBT-122 and a Nokia 6230.
 
+I can't set passkey with error:
+Can't register passkey agent
+Passkey agent already exists
+process 5391: Applications must not close shared connections - see
+dbus_connection_close() docs. This is a bug in the application.
 
-Can anyone advise on how to generate the linkkeys file manually? It's 
-the 128-bit code that I've not found the information on how to create!
+My .gammurc is:
+port =3D <Mobile MAC Address>
+model =3D 6230
+connection =3D bluerffbus
 
-Thanks in advance.
+When running gammu --identify bluez-gnome pops up a window to enter a
+password to pair mobile and PC. The pairing works but can't connect
+after. It just says disconneted!
 
--- 
-Andy
-e: andy @ thebmwz3.co.uk
+Can someone help me with this?
 
+Thanks in advance,
+Lu=EDs Sousa
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
