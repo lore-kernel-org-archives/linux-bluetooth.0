@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ Hackers <bluez-devel@lists.sourceforge.net>
-Date: Wed, 28 Mar 2007 10:16:48 +0100
-Message-Id: <1175073408.15698.97.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Subject: [Bluez-devel] hcid returning "Device or resource busy"?
+From: Tim Chick <chick@computergeek.freeserve.co.uk>
+To: bluez-devel@lists.sourceforge.net
+Date: Wed, 28 Mar 2007 09:10:05 +0100
+References: <20070328063625.GA25229@torres.zugschlus.de>
+In-Reply-To: <20070328063625.GA25229@torres.zugschlus.de>
+MIME-Version: 1.0
+Message-Id: <200703280910.06616.chick@computergeek.freeserve.co.uk>
+Subject: Re: [Bluez-devel] SCO headsetd: "appli closed connection"
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,30 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Heya,
+On Wednesday 28 March 2007 07:36, Marc Haber wrote:
+> I am trying to use a Jabra BT 330 with ALSA. My system is Debian
+> unstable, running Liux 2.6.20.4 patched with the SCO timing patch.
+> Last night, I was able to do a single VoIP call using twinkle, and
+> then things stopped working.
+>
+Try putting the headset into pairing mode again, that fixed it for me. Don't 
+know why though!
 
-I've been wondering why my devices weren't showing up in
-nautilus-sendto, and it looks like DiscoverDevices doesn't work. Here's
-the snippet of code:
-
-        dbus_g_proxy_call (object, "DiscoverDevices", &e,
-                           G_TYPE_INVALID, G_TYPE_INVALID);
-        if (e != NULL) {
-                g_warning ("Couldn't start discovery: %s: %s",
-                           dbus_g_error_get_name (e), e->message);
-                g_error_free (e);
-        }
-
-I do a list ListBondings before that on the same object, so I know that
-it works. But I still get that error:
-Couldn't start discovery: org.bluez.Error.Failed: Device or resource busy
-
-I'm using bluez-utils 3.9
-
-Cheers
-
--- 
-Bastien Nocera <hadess@hadess.net> 
+Tim
 
 
 -------------------------------------------------------------------------
