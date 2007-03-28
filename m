@@ -1,8 +1,9 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <20070328152757.62286.qmail@web52302.mail.re2.yahoo.com>
-Date: Wed, 28 Mar 2007 08:27:57 -0700 (PDT)
+Message-ID: <20070328150519.21340.qmail@web52303.mail.re2.yahoo.com>
+Date: Wed, 28 Mar 2007 08:05:19 -0700 (PDT)
 From: Aarti Kumar <akmr2000@yahoo.com>
-To: Bluez-devel@lists.sourceforge.net
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1175088059.5815.139.camel@violet>
 MIME-Version: 1.0
 Subject: [Bluez-devel] L2CAP: ECONNRESET is set for every l2cap disconnect.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -17,6 +18,7 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
+
 
 I am sure if this issue has been discussed before or
 not. 
@@ -67,11 +69,20 @@ Aarti.
 
 
 
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> 
+
+
+
  
 ____________________________________________________________________________________
-Finding fabulous fares is fun.  
-Let Yahoo! FareChase search your favorite travel sites to find flight and hotel bargains.
-http://farechase.yahoo.com/promo-generic-14795097
+No need to miss a message. Get email on-the-go 
+with Yahoo! Mail for Mobile. Get started.
+http://mobile.yahoo.com/mail 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
