@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <20070328152757.62286.qmail@web52302.mail.re2.yahoo.com>
+Date: Wed, 28 Mar 2007 08:27:57 -0700 (PDT)
+From: Aarti Kumar <akmr2000@yahoo.com>
+To: Bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Date: Wed, 28 Mar 2007 13:30:01 -0700
-Message-ID: <5FD5754DDBA0B1499B5A0B4BB5419485CD0D36@fmsmsx411.amr.corp.intel.com>
-From: "Allyn, Mark A" <mark.a.allyn@intel.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Bluetooth Audio question
+Subject: [Bluez-devel] L2CAP: ECONNRESET is set for every l2cap disconnect.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,36 +18,60 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello:
+I am sure if this issue has been discussed before or
+not. 
+
+Is it necessary to the set the struct sock->err value
+to ECONNRESET when l2cap disconnect request is
+received from remote device ?
+
+l2cap_disconnect_req function sets the error value in
+sock structure by calling l2cap_chan_del(sk,
+ECONNRESET) every time l2cap connection is
+disconnected.
+
+This might lead to some loss of data at receiver side
+in case of fast sender and slow receiver. 
+
+The sender will send l2cap packets and disconnects. 
+
+The receiver side will read the packets, but once
+l2cap disconnect is received, even though there is
+data in sk_buff, the bt_sock_recvmsg will return 0 as
+skb_recv_datagram will return NULL. 
+
+Can we set the value to ECONNRESET only in case of
+error condition and for the normal disconnect set it
+to 0 by calling l2cap_chan_del(sk,0) from
+l2cap_disconnect_req ?
+
+So if error field is not set in sock structure,
+bt_sock_recvmsg will return data bytes till sk_buff is
+empty and which case 0 will be returned. This will
+prevent any data loss.
+
+Also if the user wants to know when socket
+disconnected, POLLHUP will be set for sock fd so after
+disconnect happens and there is data to be read both
+POLLHUP and POLLIN will set.
+If we set sock err field then user will not be able to
+retrieve data from sk_buff, even if POLLLIN is set.
+
+I am using 2.6 kernel.
+
+Thanks,
+Aarti.
+
+
+
+
+
+
  
-I am working on getting the plugz bluetooth audio working with a 
-headset that my user wants to work with skype.
- 
-I cannot use btsco because it causes kernel oopses with Alsa 1.0.14rc3
-and it
-appears that there are structural changes that happened in Alsa, but not
-the
-btsco daemon or the snd-bt-sco kernel modules.
-
-I am assuming that no more work is done to maintain the btsco /
-snd-bt-sco 
-infrastructure. Is this correct?
-
-I looked at the notes on using plugz and sbc. 
-
-I am a bit confused. You mention a kernel patch. Is this needed for 
-using btsco or using plugz? I thought that by using all user space
-communication between the bluetooth and the Alsa, we don't have to worry
-about any kernel stuff. What is the kernel patch all about? My site uses
-
-the 2.6.17.13 kernel.  
-
-Do any of you know if there are any issues using plugz with a bluetooth 
-headset (for talking and listening with Skype) with Alsa 1.0.14rc3?
-
-Thank you
-
-Mark Allyn
+____________________________________________________________________________________
+Finding fabulous fares is fun.  
+Let Yahoo! FareChase search your favorite travel sites to find flight and hotel bargains.
+http://farechase.yahoo.com/promo-generic-14795097
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
