@@ -1,7 +1,7 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 MIME-Version: 1.0
-Date: Wed, 28 Mar 2007 14:17:54 -0700
-Message-ID: <5FD5754DDBA0B1499B5A0B4BB5419485CD0DD4@fmsmsx411.amr.corp.intel.com>
+Date: Wed, 28 Mar 2007 14:16:49 -0700
+Message-ID: <5FD5754DDBA0B1499B5A0B4BB5419485CD0DD2@fmsmsx411.amr.corp.intel.com>
 In-Reply-To: <460AD4A7.9050409@xmission.com>
 From: "Allyn, Mark A" <mark.a.allyn@intel.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
@@ -19,12 +19,7 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Thanks for the note. I do have a question; does anyone have the btsco
-working for alsa
-1.0.14rc3? I am getting a kernel oops (null pointer) at the call to
-snd_card_bt_sco_playback_open.
-
-Mark
+ 
 
 -----Original Message-----
 From: bluez-devel-bounces@lists.sourceforge.net
