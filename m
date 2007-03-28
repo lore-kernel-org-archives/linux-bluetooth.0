@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Mayank BATRA <mayank.batra@st.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Wed, 28 Mar 2007 15:59:54 +0530
-Message-ID: <007901c77124$06df3040$9d0cc70a@dlh.st.com>
-MIME-Version: 1.0
-In-Reply-To: <1175077084.5815.123.camel@violet>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <007801c77120$bb936640$9d0cc70a@dlh.st.com>
+References: <007801c77120$bb936640$9d0cc70a@dlh.st.com>
+Date: Wed, 28 Mar 2007 12:18:04 +0200
+Message-Id: <1175077084.5815.123.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] hcid returning "Device or resource busy"?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,35 +20,57 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel, 
+Hi Mayank,
 
-> > > HCI Event: Command Status (0x0f) plen 4
-> > >     Remote Name Request Cancel (0x01|0x001a) status 0x01 ncmd 1
-> > >     Error: Unknown HCI Command
+> > > > I've been wondering why my devices weren't showing up in
+> > > > nautilus-sendto, and it looks like DiscoverDevices 
+> > doesn't work. Here's
+> > > > the snippet of code:
+> > > > 
+> > > >         dbus_g_proxy_call (object, "DiscoverDevices", &e,
+> > > >                            G_TYPE_INVALID, G_TYPE_INVALID);
+> > > >         if (e != NULL) {
+> > > >                 g_warning ("Couldn't start discovery: %s: %s",
+> > > >                            dbus_g_error_get_name (e), e->message);
+> > > >                 g_error_free (e);
+> > > >         }
+> > > > 
+> > > > I do a list ListBondings before that on the same object, 
+> > so I know that
+> > > > it works. But I still get that error:
+> > > > Couldn't start discovery: org.bluez.Error.Failed: Device 
+> > or resource busy
+> > > 
+> > > please run "hcidump -X -V" to see what happens on the HCI 
+> > layer. Do you
+> > > have running anything else at the same time.
 > > 
-> > Looks like a BT1.1 dongle to me since Remote Name Request Cancel was
-> > introduced after that.
-> > And since the device is not yet finished paging during the 
-> remote name
-> > request, it disallows the Inquiry Command.
-> > 
-> > Solution: Get yourself a dongle > BT1.1 !
+> > Nope, not doing anything else, apart from having the applet 
+> > running, let
+> > me attach the hcidump output.
 > 
-> actually it was the Create Connection Cancel that was introduced with
-> Bluetooth 1.2. The Remote Name Request Cancel was always 
-> present, but it
-> seems we have a chip that doesn't support it.
+> [...]
+> 
+> > HCI Event: Command Status (0x0f) plen 4
+> >     Remote Name Request Cancel (0x01|0x001a) status 0x01 ncmd 1
+> >     Error: Unknown HCI Command
+> 
+> Looks like a BT1.1 dongle to me since Remote Name Request Cancel was
+> introduced after that.
+> And since the device is not yet finished paging during the remote name
+> request, it disallows the Inquiry Command.
+> 
+> Solution: Get yourself a dongle > BT1.1 !
 
-You are right as well as wrong. Both Remote Name Request Cancel and 
-Create Connection Cancel were introduced in BT1.2. Please check (I've
-done that already!).
+actually it was the Create Connection Cancel that was introduced with
+Bluetooth 1.2. The Remote Name Request Cancel was always present, but it
+seems we have a chip that doesn't support it.
 
-And since this is not an optional command it is impossible to have a
-BT1.2 chip which doesn't support this command.
+Bastien, what does "hciconfig hci0 version" tells you?
 
-Best Regards,
+Regards
 
-Mayank
+Marcel
 
 
 
