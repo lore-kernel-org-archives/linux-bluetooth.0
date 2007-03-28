@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1175073408.15698.97.camel@cookie.hadess.net>
-References: <1175073408.15698.97.camel@cookie.hadess.net>
-Date: Wed, 28 Mar 2007 11:28:39 +0200
-Message-Id: <1175074119.5815.118.camel@violet>
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ Hackers <bluez-devel@lists.sourceforge.net>
+Date: Wed, 28 Mar 2007 10:16:48 +0100
+Message-Id: <1175073408.15698.97.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] hcid returning "Device or resource busy"?
+Subject: [Bluez-devel] hcid returning "Device or resource busy"?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,31 +18,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Heya,
 
-> I've been wondering why my devices weren't showing up in
-> nautilus-sendto, and it looks like DiscoverDevices doesn't work. Here's
-> the snippet of code:
-> 
->         dbus_g_proxy_call (object, "DiscoverDevices", &e,
->                            G_TYPE_INVALID, G_TYPE_INVALID);
->         if (e != NULL) {
->                 g_warning ("Couldn't start discovery: %s: %s",
->                            dbus_g_error_get_name (e), e->message);
->                 g_error_free (e);
->         }
-> 
-> I do a list ListBondings before that on the same object, so I know that
-> it works. But I still get that error:
-> Couldn't start discovery: org.bluez.Error.Failed: Device or resource busy
+I've been wondering why my devices weren't showing up in
+nautilus-sendto, and it looks like DiscoverDevices doesn't work. Here's
+the snippet of code:
 
-please run "hcidump -X -V" to see what happens on the HCI layer. Do you
-have running anything else at the same time.
+        dbus_g_proxy_call (object, "DiscoverDevices", &e,
+                           G_TYPE_INVALID, G_TYPE_INVALID);
+        if (e != NULL) {
+                g_warning ("Couldn't start discovery: %s: %s",
+                           dbus_g_error_get_name (e), e->message);
+                g_error_free (e);
+        }
 
-Regards
+I do a list ListBondings before that on the same object, so I know that
+it works. But I still get that error:
+Couldn't start discovery: org.bluez.Error.Failed: Device or resource busy
 
-Marcel
+I'm using bluez-utils 3.9
 
+Cheers
+
+-- 
+Bastien Nocera <hadess@hadess.net> 
 
 
 -------------------------------------------------------------------------
