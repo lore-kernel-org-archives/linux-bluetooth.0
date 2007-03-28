@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1175077084.5815.123.camel@violet>
-References: <007801c77120$bb936640$9d0cc70a@dlh.st.com>
-	<1175077084.5815.123.camel@violet>
-Date: Wed, 28 Mar 2007 13:34:08 +0100
-Message-Id: <1175085249.2996.1.camel@dhcp-1-148.fab.redhat.com>
+In-Reply-To: <007901c77124$06df3040$9d0cc70a@dlh.st.com>
+References: <007901c77124$06df3040$9d0cc70a@dlh.st.com>
+Date: Wed, 28 Mar 2007 12:42:13 +0200
+Message-Id: <1175078533.5815.127.camel@violet>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] hcid returning "Device or resource busy"?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -21,38 +20,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Wed, 2007-03-28 at 12:18 +0200, Marcel Holtmann wrote:
-<snip>
-> > > HCI Event: Command Status (0x0f) plen 4
-> > >     Remote Name Request Cancel (0x01|0x001a) status 0x01 ncmd 1
-> > >     Error: Unknown HCI Command
+Hi Mayank,
+
+> > > > HCI Event: Command Status (0x0f) plen 4
+> > > >     Remote Name Request Cancel (0x01|0x001a) status 0x01 ncmd 1
+> > > >     Error: Unknown HCI Command
+> > > 
+> > > Looks like a BT1.1 dongle to me since Remote Name Request Cancel was
+> > > introduced after that.
+> > > And since the device is not yet finished paging during the 
+> > remote name
+> > > request, it disallows the Inquiry Command.
+> > > 
+> > > Solution: Get yourself a dongle > BT1.1 !
 > > 
-> > Looks like a BT1.1 dongle to me since Remote Name Request Cancel was
-> > introduced after that.
-> > And since the device is not yet finished paging during the remote name
-> > request, it disallows the Inquiry Command.
-> > 
-> > Solution: Get yourself a dongle > BT1.1 !
+> > actually it was the Create Connection Cancel that was introduced with
+> > Bluetooth 1.2. The Remote Name Request Cancel was always 
+> > present, but it
+> > seems we have a chip that doesn't support it.
 > 
-> actually it was the Create Connection Cancel that was introduced with
-> Bluetooth 1.2. The Remote Name Request Cancel was always present, but it
-> seems we have a chip that doesn't support it.
-> 
-> Bastien, what does "hciconfig hci0 version" tells you?
+> You are right as well as wrong. Both Remote Name Request Cancel and 
+> Create Connection Cancel were introduced in BT1.2. Please check (I've
+> done that already!).
 
-Same device, different machine (the dongle followed me to the office):
+I don't have the Bluetooth 1.1 specification at hand. I was pretty sure
+that the Remote Name Request Cancel was always present since I only
+added a dependency against Bluetooth 1.2 for the Create Connection
+Cancel support I added to the kernel lately.
 
-$ hciconfig hci0 version
-hci0:   Type: USB
-        BD Address: 00:08:F4:00:43:8D ACL MTU: 192:8 SCO MTU: 64:8
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver:
-0x20d
-        Manufacturer: Cambridge Silicon Radio (10)
+> And since this is not an optional command it is impossible to have a
+> BT1.2 chip which doesn't support this command.
 
-I hope there's at least some way to get it working. I'd rather not have
-to have another dongle just because hcid doesn't like it :)
+You wish. I have seen chips where the set of supported HCI commands is
+limited. Remember there is no real HCI qualification.
 
-Cheers
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
