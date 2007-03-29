@@ -1,7 +1,7 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1175174654.15698.160.camel@cookie.hadess.net>
+In-Reply-To: <1175170837.5815.194.camel@violet>
 References: <007801c77120$bb936640$9d0cc70a@dlh.st.com>
 	<1175077084.5815.123.camel@violet>
 	<1175085249.2996.1.camel@dhcp-1-148.fab.redhat.com>
@@ -10,9 +10,8 @@ References: <007801c77120$bb936640$9d0cc70a@dlh.st.com>
 	<1175088059.5815.139.camel@violet>
 	<1175170710.15698.156.camel@cookie.hadess.net>
 	<1175170837.5815.194.camel@violet>
-	<1175174654.15698.160.camel@cookie.hadess.net>
-Date: Thu, 29 Mar 2007 18:16:42 +0200
-Message-Id: <1175185002.5815.201.camel@violet>
+Date: Thu, 29 Mar 2007 14:24:14 +0100
+Message-Id: <1175174654.15698.160.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] hcid returning "Device or resource busy"?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -28,43 +27,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
-
-> > > Shouldn't it return org.bluez.Error.InProgress instead in that case?
-> > 
-> > it is a different operation that is in progress.
+On Thu, 2007-03-29 at 14:20 +0200, Marcel Holtmann wrote:
+> Hi Bastien,
+<snip>
+> > Shouldn't it return org.bluez.Error.InProgress instead in that case?
 > 
-> Ha. The documentation could do with a bit of rewording for that error
-> (it's not clear that InProgress is when the *same* operation that one
-> tried to perform is already running).
+> it is a different operation that is in progress.
 
-I agree. That needs a little bit better wording. In some cases we might
-even have some bugs in the code.
+Ha. The documentation could do with a bit of rewording for that error
+(it's not clear that InProgress is when the *same* operation that one
+tried to perform is already running).
 
-> > > > You can wait for the completed RemoteNameUpdated or RemoteNameFailed
-> > > > signals before actually starting the DiscoverDevices procedure. However
-> > > > in case of devices out of range this might not be a good idea.
-> > > 
-> > > The problem is that I don't know for which devices hcid will try to go
-> > > and fetch the names for.
-> > > 
-> > > Also, the doc for ListRemoteDevices should mention the fact that it
-> > > might perform remote operations, as it's not really clear from the doc
-> > > right now.
+> > > You can wait for the completed RemoteNameUpdated or RemoteNameFailed
+> > > signals before actually starting the DiscoverDevices procedure. However
+> > > in case of devices out of range this might not be a good idea.
 > > 
-> > Actually ListRemoteDevices is not doing it. It happens when you call
-> > GetRemoteName while you are adding it to your list.
+> > The problem is that I don't know for which devices hcid will try to go
+> > and fetch the names for.
+> > 
+> > Also, the doc for ListRemoteDevices should mention the fact that it
+> > might perform remote operations, as it's not really clear from the doc
+> > right now.
 > 
-> Oh, my mistake. I'll fix my code then :)
+> Actually ListRemoteDevices is not doing it. It happens when you call
+> GetRemoteName while you are adding it to your list.
 
-Not your mistake. This should actually work. However we added a
-GetRemoteInfo method lately that allows you to retrieve all known
-information about a device as a dictionary.
+Oh, my mistake. I'll fix my code then :)
 
-Regards
-
-Marcel
-
+-- 
+Bastien Nocera <hadess@hadess.net> 
 
 
 -------------------------------------------------------------------------
