@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <460B708B.5060302@access-company.com>
-Date: Thu, 29 Mar 2007 09:53:47 +0200
-From: Frederic Dalleau <frederic.dalleau@access-company.com>
+From: Mayank BATRA <mayank.batra@st.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Thu, 29 Mar 2007 11:28:16 +0530
+Message-ID: <002801c771c7$3e9f3400$9d0cc70a@dlh.st.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45EF0B04.2080303@xmission.com>
-	<200703101746.46586.bluez-devel@huitl.de>
-In-Reply-To: <200703101746.46586.bluez-devel@huitl.de>
-Subject: Re: [Bluez-devel] sbc encoder work
+In-Reply-To: <1175086057.5815.132.camel@violet>
+Subject: Re: [Bluez-devel] hcid returning "Device or resource busy"?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,46 +19,74 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Marcel, 
 
-I agree, the sound has better gain and do not break at high volumes.
-I have not noticed the clicks you talked about but I only have done a 
-quick test.
+> > > > > HCI Event: Command Status (0x0f) plen 4
+> > > > >     Remote Name Request Cancel (0x01|0x001a) status 
+> 0x01 ncmd 1
+> > > > >     Error: Unknown HCI Command
+> > > > 
+> > > > Looks like a BT1.1 dongle to me since Remote Name 
+> > > > Request Cancel was
+> > > > introduced after that.
+> > > > And since the device is not yet finished paging during 
+> > > > the remote name
+> > > > request, it disallows the Inquiry Command.
+> > > > 
+> > > > Solution: Get yourself a dongle > BT1.1 !
+> > > 
+> > > actually it was the Create Connection Cancel that was 
+> > > introduced with
+> > > Bluetooth 1.2. The Remote Name Request Cancel was always 
+> > > present, but it
+> > > seems we have a chip that doesn't support it.
+> > > 
+> > > Bastien, what does "hciconfig hci0 version" tells you?
+> > 
+> > Same device, different machine (the dongle followed me to 
+> > the office):
+> > 
+> > $ hciconfig hci0 version
+> > hci0:   Type: USB
+> >         BD Address: 00:08:F4:00:43:8D ACL MTU: 192:8 SCO MTU: 64:8
+> >         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 
+> > (0x1) LMP Subver:
+> > 0x20d
+> >         Manufacturer: Cambridge Silicon Radio (10)
+> > 
 
-Frederic
+So, this confirms that it is indeed a BT1.1 device and hence does not
+recognize the Remote Name Request Cancel command.
 
+> > I hope there's at least some way to get it working. I'd 
+> > rather not have
+> > to have another dongle just because hcid doesn't like it :)
+> 
+> the problem is that the baseband is busy with the remote name request.
+> It has to page the remote device for getting the name and in that case
+> you simply can't run an inquiry. All currently available 
+> Bluetooth chips have this limitation.
+> 
+> Main question is why we have the remote name request just before you
+> wanna start the inquiry. What D-Bus methods are you actually calling
+in
+> what order? I think you constructed a use case that we never tested.
 
-Robert Huitl wrote:
-> Hi,
->
->   
->> I just committed some contributions to the sbc encoder to improve the
->> quality and volume of the audio. Please help us test this. We'll need
->> test files if you find something that doesn't work.
->>
->> Thanks to Walter Guerra and Alexsandro Santos for their work on this.
->>     
->
-> Very nice work! I have the new code running for half an hour now with no 
-> issues and greatly improved volume. There are some clicks occasionally, but 
-> no more than I had with the old code (maybe even less). I have some sound 
-> file that used to produce more clicks than any other, but cannot remember its 
-> name at the moment. I will try it as soon as I remember... :)
->
-> Robert
->
->
->
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> opinions on IT & business topics through brief surveys-and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->   
+But actually, the sequence of HCI commands issued is correct. First, a
+remote
+name request is issued. Then, since an inquiry is required, the remote
+name
+request is cancelled. Thus, paging should stop and inquiry should be
+possible.
+I think this use case should work with BT1.2 devices and above.
+
+But you are right, maybe some workaround should be present in order to
+be
+compatible with BT1.1 devices as well.
+
+Best Regards,
+
+Mayank
 
 
 -------------------------------------------------------------------------
