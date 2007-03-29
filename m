@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Mayank BATRA <mayank.batra@st.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Thu, 29 Mar 2007 11:28:16 +0530
-Message-ID: <002801c771c7$3e9f3400$9d0cc70a@dlh.st.com>
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Thu, 29 Mar 2007 11:23:53 +1000
 MIME-Version: 1.0
-In-Reply-To: <1175086057.5815.132.camel@violet>
-Subject: Re: [Bluez-devel] hcid returning "Device or resource busy"?
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_pUxCGwr3p1jKpNi"
+Message-Id: <200703291123.53675.denis.kenzior@trolltech.com>
+Subject: [Bluez-devel] [PATCH] STLC2500 Baud Rate & Address Setting
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,86 +16,343 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel, 
+--Boundary-00=_pUxCGwr3p1jKpNi
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> > > > > HCI Event: Command Status (0x0f) plen 4
-> > > > >     Remote Name Request Cancel (0x01|0x001a) status 
-> 0x01 ncmd 1
-> > > > >     Error: Unknown HCI Command
-> > > > 
-> > > > Looks like a BT1.1 dongle to me since Remote Name 
-> > > > Request Cancel was
-> > > > introduced after that.
-> > > > And since the device is not yet finished paging during 
-> > > > the remote name
-> > > > request, it disallows the Inquiry Command.
-> > > > 
-> > > > Solution: Get yourself a dongle > BT1.1 !
-> > > 
-> > > actually it was the Create Connection Cancel that was 
-> > > introduced with
-> > > Bluetooth 1.2. The Remote Name Request Cancel was always 
-> > > present, but it
-> > > seems we have a chip that doesn't support it.
-> > > 
-> > > Bastien, what does "hciconfig hci0 version" tells you?
-> > 
-> > Same device, different machine (the dongle followed me to 
-> > the office):
-> > 
-> > $ hciconfig hci0 version
-> > hci0:   Type: USB
-> >         BD Address: 00:08:F4:00:43:8D ACL MTU: 192:8 SCO MTU: 64:8
-> >         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 
-> > (0x1) LMP Subver:
-> > 0x20d
-> >         Manufacturer: Cambridge Silicon Radio (10)
-> > 
+Marcel,
 
-So, this confirms that it is indeed a BT1.1 device and hence does not
-recognize the Remote Name Request Cancel command.
+The following patch does two things:
 
-> > I hope there's at least some way to get it working. I'd 
-> > rather not have
-> > to have another dongle just because hcid doesn't like it :)
-> 
-> the problem is that the baseband is busy with the remote name request.
-> It has to page the remote device for getting the name and in that case
-> you simply can't run an inquiry. All currently available 
-> Bluetooth chips have this limitation.
-> 
-> Main question is why we have the remote name request just before you
-> wanna start the inquiry. What D-Bus methods are you actually calling
-in
-> what order? I think you constructed a use case that we never tested.
+- Adds support for setting the baud rate on the STLC2500.
+- Adds another optional argument to hciattach for use with stlc2500/bgb2xx 
+devices that require initialization of the bdaddr.  Basically if you specify 
+this option on the command line, the address specified will be used during 
+stlc2500/bgb2xx initialization.  Otherwise a default will be used.  The 
+manpage has been updated as well.
 
-But actually, the sequence of HCI commands issued is correct. First, a
-remote
-name request is issued. Then, since an inquiry is required, the remote
-name
-request is cancelled. Thus, paging should stop and inquiry should be
-possible.
-I think this use case should work with BT1.2 devices and above.
+Let me know if there are any issues!
 
-But you are right, maybe some workaround should be present in order to
-be
-compatible with BT1.1 devices as well.
+-Denis
 
-Best Regards,
+--Boundary-00=_pUxCGwr3p1jKpNi
+Content-Type: text/x-diff; charset="us-ascii"; name="hciattach_stlc2500.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename="hciattach_stlc2500.patch"
 
-Mayank
+Index: hciattach.8
+===================================================================
+RCS file: /cvsroot/bluez/utils/tools/hciattach.8,v
+retrieving revision 1.4
+diff -u -5 -r1.4 hciattach.8
+--- hciattach.8	1 Jun 2006 18:36:20 -0000	1.4
++++ hciattach.8	29 Mar 2007 01:17:10 -0000
+@@ -9,10 +9,11 @@
+ .IR timeout \|]
+ .I tty
+ .IR type \||\| id
+ .I speed
+ .I flow
++.I bdaddr
+ .SH DESCRIPTION
+ .LP
+ Hciattach is used to attach a serial UART to the Bluetooth stack as HCI
+ transport interface.
+ .SH OPTIONS
+@@ -103,9 +104,19 @@
+ .B flow
+ set by default. To force no flow control use
+ .B noflow
+ instead.
+ 
++.TP
++.I bdaddr
++The 
++.I bdaddr
++specifies the Bluetooth Address to use.  Some devices (like the STLC2500) 
++do not store the Bluetooth address in hardware memory.  Instead it must 
++be uploaded during the initialization process.  If this argument
++is specified, then the address will be used to initialize the device.
++Otherwise, a default address will be used.
++
+ .SH AUTHORS
+ Written by Maxim Krasnyansky <maxk@qualcomm.com>
+ .PP
+ Manual page by Nils Faerber <nils@kernelconcepts.de>
+Index: hciattach.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/tools/hciattach.c,v
+retrieving revision 1.43
+diff -u -5 -r1.43 hciattach.c
+--- hciattach.c	17 Jan 2007 12:31:42 -0000	1.43
++++ hciattach.c	29 Mar 2007 01:17:11 -0000
+@@ -66,10 +66,11 @@
+ 	int  proto;
+ 	int  init_speed;
+ 	int  speed;
+ 	int  flags;
+ 	int  (*init) (int fd, struct uart_t *u, struct termios *ti);
++	char *bdaddr;
+ };
+ 
+ #define FLOW_CTL	0x0001
+ 
+ static volatile sig_atomic_t __io_canceled = 0;
+@@ -828,23 +829,98 @@
+ extern int stlc2500_init(int fd, bdaddr_t *bdaddr);
+ 
+ static int stlc2500(int fd, struct uart_t *u, struct termios *ti)
+ {
+ 	bdaddr_t bdaddr;
++	struct timespec tm = {0, 50000};
++	char cmd[5];
++	unsigned char resp[10];
++	int n;
++	int i;
+ 
+-	str2ba("00:80:E1:00:AB:BA", &bdaddr);
++	/* STLC2500 Set Baud Rate stuff */
++	/* We should set the baud rate first, so the firmware download */
++	/* goes much faster */
++
++	/* STLC2500 Seems to support the Ericsson set baud rate stuff */
++	/* It should also support the ST Set Baud Rate command */
++	/* (as in st() function above, but those commands never succeed */
++	cmd[0] = HCI_COMMAND_PKT;
++	cmd[1] = 0x09;
++	cmd[2] = 0xfc;
++	cmd[3] = 0x01;
+ 
+-	return stlc2500_init(fd, &bdaddr);
++	switch (u->speed) {
++	case 57600:
++		cmd[4] = 0x03;
++		break;
++	case 115200:
++		cmd[4] = 0x02;
++		break;
++	case 230400:
++		cmd[4] = 0x01;
++		break;
++	case 460800:
++		cmd[4] = 0x00;
++		break;
++	case 921600:
++		cmd[4] = 0x20;
++		break;
++	default:
++		cmd[4] = 0x02;
++		u->speed = 115200;
++		break;
++	}
++
++#ifdef STLC2500_DEBUG
++	fprintf(stderr, "Sending Baud Rate %02x\n", cmd[4]);
++#endif
++	/* Send initialization command */
++	if (write(fd, cmd, 5) != 5) {
++		perror("Failed to write init command");
++		return -1;
++	}
++
++	/* Need to wait here to give a chance for the device to set baud */
++	/* But no more than 0.5 seconds */
++	usleep(200000);
++
++#ifdef STLC2500_DEBUG
++	fprintf(stderr, "Setting speed\n");
++#endif
++	if (set_speed(fd, ti, u->speed) < 0) {
++		perror("Can't set baud rate");
++		return -1;
++	}
++
++#ifdef STLC2500_DEBUG
++	fprintf(stderr, "Speed set...\n");
++#endif
++
++	/* Read reply */
++	if ((n = read_hci_event(fd, resp, 10)) < 0) {
++		fprintf(stderr, "Failed to set baud rate on chip\n");
++		return -1;
++	}
++
++#ifdef STLC2500_DEBUG
++	for (i = 0; i < n; i++) {
++		fprintf(stderr, "resp[%d] = %02x\n", i, resp[i]);
++	}
++#endif
++
++	str2ba(u->bdaddr, &bdaddr);
++	return stlc2500_init(fd, &bdaddr, u->flags & FLOW_CTL);
+ }
+ 
+ extern int bgb2xx_init(int fd, bdaddr_t *bdaddr);
+ 
+ static int bgb2xx(int fd, struct uart_t *u, struct termios *ti)
+ {
+ 	bdaddr_t bdaddr;
+ 
+-	str2ba("BD:B2:10:00:AB:BA", &bdaddr);
++	str2ba(u->bdaddr, &bdaddr);
+ 
+ 	return bgb2xx_init(fd, &bdaddr);
+ }
+ 
+ /*
+@@ -964,73 +1040,73 @@
+ 
+ 	return 0;
+ }
+ 
+ struct uart_t uart[] = {
+-	{ "any",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL     },
+-	{ "ericsson",   0x0000, 0x0000, HCI_UART_H4,   57600,  115200, FLOW_CTL, ericsson },
+-	{ "digi",       0x0000, 0x0000, HCI_UART_H4,   9600,   115200, FLOW_CTL, digi     },
+-	{ "texas",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, texas    },
++	{ "any",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
++	{ "ericsson",   0x0000, 0x0000, HCI_UART_H4,   57600,  115200, FLOW_CTL, ericsson, NULL },
++	{ "digi",       0x0000, 0x0000, HCI_UART_H4,   9600,   115200, FLOW_CTL, digi, NULL     },
++	{ "texas",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, texas, NULL    },
+ 
+-	{ "bcsp",       0x0000, 0x0000, HCI_UART_BCSP, 115200, 115200, 0,        bcsp     },
++	{ "bcsp",       0x0000, 0x0000, HCI_UART_BCSP, 115200, 115200, 0,        bcsp, NULL     },
+ 
+ 	/* Xircom PCMCIA cards: Credit Card Adapter and Real Port Adapter */
+-	{ "xircom",     0x0105, 0x080a, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL     },
++	{ "xircom",     0x0105, 0x080a, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
+ 
+ 	/* CSR Casira serial adapter or BrainBoxes serial dongle (BL642) */
+-	{ "csr",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, csr      },
++	{ "csr",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, csr, NULL      },
+ 
+ 	/* BrainBoxes PCMCIA card (BL620) */
+-	{ "bboxes",     0x0160, 0x0002, HCI_UART_H4,   115200, 460800, FLOW_CTL, csr      },
++	{ "bboxes",     0x0160, 0x0002, HCI_UART_H4,   115200, 460800, FLOW_CTL, csr, NULL      },
+ 
+ 	/* Silicon Wave kits */
+-	{ "swave",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, swave    },
++	{ "swave",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, swave, NULL    },
+ 
+ 	/* ST Microelectronics minikits based on STLC2410/STLC2415 */
+-	{ "st",         0x0000, 0x0000, HCI_UART_H4,    57600, 115200, FLOW_CTL, st       },
++	{ "st",         0x0000, 0x0000, HCI_UART_H4,    57600, 115200, FLOW_CTL, st, NULL       },
+ 
+ 	/* ST Microelectronics minikits based on STLC2500 */
+-	{ "stlc2500",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, stlc2500 },
++	{ "stlc2500",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, stlc2500, "00:80:E1:00:AB:BA"  },
+ 
+ 	/* Philips generic Ericsson IP core based */
+-	{ "philips",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL     },
++	{ "philips",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
+ 
+ 	/* Philips BGB2xx Module */
+-	{ "bgb2xx",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, bgb2xx   },
++	{ "bgb2xx",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, bgb2xx, "BD:B2:10:00:AB:BA"   },
+ 
+ 	/* Sphinx Electronics PICO Card */
+-	{ "picocard",   0x025e, 0x1000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL     },
++	{ "picocard",   0x025e, 0x1000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
+ 
+ 	/* Inventel BlueBird Module */
+-	{ "inventel",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL     },
++	{ "inventel",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
+ 
+ 	/* COM One Platinium Bluetooth PC Card */
+-	{ "comone",     0xffff, 0x0101, HCI_UART_BCSP, 115200, 115200, 0,        bcsp     },
++	{ "comone",     0xffff, 0x0101, HCI_UART_BCSP, 115200, 115200, 0,        bcsp, NULL     },
+ 
+ 	/* TDK Bluetooth PC Card and IBM Bluetooth PC Card II */
+-	{ "tdk",        0x0105, 0x4254, HCI_UART_BCSP, 115200, 115200, 0,        bcsp     },
++	{ "tdk",        0x0105, 0x4254, HCI_UART_BCSP, 115200, 115200, 0,        bcsp, NULL     },
+ 
+ 	/* Socket Bluetooth CF Card (Rev G) */
+-	{ "socket",     0x0104, 0x0096, HCI_UART_BCSP, 230400, 230400, 0,        bcsp     },
++	{ "socket",     0x0104, 0x0096, HCI_UART_BCSP, 230400, 230400, 0,        bcsp, NULL     },
+ 
+ 	/* 3Com Bluetooth Card (Version 3.0) */
+-	{ "3com",       0x0101, 0x0041, HCI_UART_H4,   115200, 115200, FLOW_CTL, csr      },
++	{ "3com",       0x0101, 0x0041, HCI_UART_H4,   115200, 115200, FLOW_CTL, csr, NULL      },
+ 
+ 	/* AmbiCom BT2000C Bluetooth PC/CF Card */
+-	{ "bt2000c",    0x022d, 0x2000, HCI_UART_H4,    57600, 460800, FLOW_CTL, csr      },
++	{ "bt2000c",    0x022d, 0x2000, HCI_UART_H4,    57600, 460800, FLOW_CTL, csr, NULL      },
+ 
+ 	/* Zoom Bluetooth PCMCIA Card */
+-	{ "zoom",       0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        bcsp     },
++	{ "zoom",       0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        bcsp, NULL     },
+ 
+ 	/* Sitecom CN-504 PCMCIA Card */
+-	{ "sitecom",    0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        bcsp     },
++	{ "sitecom",    0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        bcsp, NULL     },
+ 
+ 	/* Billionton PCBTC1 PCMCIA Card */
+-	{ "billionton", 0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        bcsp     },
++	{ "billionton", 0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        bcsp, NULL     },
+ 
+ 	/* Broadcom BCM2035 */
+-	{ "bcm2035",    0x0A5C, 0x2035, HCI_UART_H4,   115200, 115200, 0,        bcm2035  },
++	{ "bcm2035",    0x0A5C, 0x2035, HCI_UART_H4,   115200, 115200, 0,        bcm2035, NULL  },
+ 
+ 	{ NULL, 0 }
+ };
+ 
+ struct uart_t * get_by_id(int m_id, int p_id)
+@@ -1126,11 +1202,11 @@
+ 
+ static void usage(void)
+ {
+ 	printf("hciattach - HCI UART driver initialization utility\n");
+ 	printf("Usage:\n");
+-	printf("\thciattach [-n] [-p] [-b] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow]\n");
++	printf("\thciattach [-n] [-p] [-b] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow] [bdaddr]\n");
+ 	printf("\thciattach -l\n");
+ }
+ 
+ int main(int argc, char *argv[])
+ {
+@@ -1225,10 +1301,14 @@
+ 			if (!strcmp("flow", argv[optind]))
+ 				u->flags |=  FLOW_CTL;
+ 			else
+ 				u->flags &= ~FLOW_CTL;
+ 			break;
++
++		case 4:
++			u->bdaddr = argv[optind];
++			break;
+ 		}
+ 	}
+ 
+ 	if (!u) {
+ 		fprintf(stderr, "Unknown device type or id\n");
 
+--Boundary-00=_pUxCGwr3p1jKpNi
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--Boundary-00=_pUxCGwr3p1jKpNi
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--Boundary-00=_pUxCGwr3p1jKpNi--
