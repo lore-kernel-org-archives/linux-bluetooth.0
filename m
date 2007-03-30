@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Sumeet Verma <sumeet.verma@st.com>
-Date: Fri, 30 Mar 2007 05:46:36 +0000 (UTC)
-Message-ID: <loom.20070330T074518-49@post.gmane.org>
-Mime-Version: 1.0
-Subject: [Bluez-users] hcid not working - bluez 3.9
+From: Sumeet VERMA <sumeet.verma@st.com>
+To: <bluez-users@lists.sf.net>
+Date: Fri, 30 Mar 2007 12:04:23 +0530
+Message-ID: <00b101c77295$74ada8a0$8935c70a@dlh.st.com>
+MIME-Version: 1.0
+Subject: [Bluez-users] XML_StopParser undefined reference- compilation error
+	bluez-utils-3.9
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,35 +19,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+
 Hi
-I have been trying to bring up bluez-utils-3.9 and hcid is not working. It 
-says 
+I am getting a compiler error while building bluez-utils-3.9. 
+The log is here:-
 
-[root@dlhl0330 tools]# hcid -n
-hcid[29560]: Bluetooth HCI daemon
-hcid[29560]: Can't connect to system message bus: Failed to connect to 
-socket /usr/local/var/run/dbus/system_bus_socket: No such file or directory
-hcid[29560]: Unable to get on D-Bus
+make[3]: Entering directory `/home/vsumeet/bluez/3.9/bluez-utils-3.9/hcid'
+/bin/sh ../libtool --tag=CC --mode=link gcc -I/usr/local/include  
+-I/usr/local/include/dbus-1.0 -I/usr/local/lib/dbus-1.0/include  
+-DDBUS_API_SUBJECT_TO_CHANGE -I../eglib -Wall -O2 -D_FORTIFY_SOURCE=2   -o hcid
+ main.o libhciserver.a ../sdpd/libsdpserver.a ../common/libhelper.a 
+../eglib/libeglib.la -L/usr/local/lib -ldbus-1   -L/usr/local/lib -lbluetooth  
+-lexpat
+gcc -I/usr/local/include -I/usr/local/include/dbus-1.0
+-I/usr/local/lib/dbus-1.0/include -DDBUS_API_SUBJECT_TO_CHANGE -I../eglib 
+-Wall -O2 -D_FORTIFY_SOURCE=2 -o hcid main.o  libhciserver.a ../sdpd/libsdpserver.a
+../common/libhelper.a ../eglib/.libs/libeglib.a -L/usr/local/lib
+/usr/local/lib/libdbus-1.so -lnsl /usr/local/lib/libbluetooth.so 
+/usr/lib/libexpat.so   -Wl,--rpath -Wl,/usr/local/lib -Wl,--rpath -Wl,/usr/local/lib
+../common/libhelper.a(sdp-expat.o)(.text+0x227): In function
+`convert_xml_to_sdp_start':
+: undefined reference to `XML_StopParser' 
+collect2: ld returned 1 exit status
+make[3]: *** [hcid] Error 1
+make[3]: Leaving directory `/home/vsumeet/bluez/3.9/bluez-utils-3.9/hcid'
+make[2]: *** [all] Error 2
+make[2]: Leaving directory `/home/vsumeet/bluez/3.9/bluez- utils-3.9/hcid'
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory `/home/vsumeet/bluez/3.9/bluez-utils-3.9'
+make: *** [all] Error 2
 
-I have looked into the mailing list and followed the mentioned procedure. I 
-have installed dbus-0.61 and started the system bus by calling dbus-launch
+I have checked the expat library is present. 
+The version is libexpat.so.0.5.0
+Do you know why is it not able to link?
 
-[root@dlhl0330 dbus]# dbus-launch
-DBUS_SESSION_BUS_ADDRESS='unix:abstract=/tmp/dbus-
-BcAG8pbfI2,guid=adea0b46b6c8607cd9bc4162ffe90200';
-DBUS_SESSION_BUS_PID=29606;
-[root@dlhl0330 dbus]#
-
-I can see the dbus-daemon running when is do ps -e
-
-system_bus_socket is present at the location /var/run/dbus/system_bus_socket 
-Is there any way I can configure hcid to take the system_bus_socket 
-from /var/run/dbus instead of /usr/local/var/run/dbus
-
-Please suggest.
-
-
-Sumeet
+Thanks 
+Sumeet 
 
 
 -------------------------------------------------------------------------
