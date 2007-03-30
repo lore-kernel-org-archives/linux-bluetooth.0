@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <460D3FAE.6040901@access-company.com>
+Date: Fri, 30 Mar 2007 18:49:50 +0200
+From: Frederic Danis <frederic.danis@access-company.com>
 MIME-Version: 1.0
-Date: Fri, 30 Mar 2007 15:13:09 -0700
-Message-ID: <5FD5754DDBA0B1499B5A0B4BB5419485D069B9@fmsmsx411.amr.corp.intel.com>
-From: "Allyn, Mark A" <mark.a.allyn@intel.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Question on Plugz SCO Kernel Patch
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <45F16630.9000606@access-company.com>	<460D363F.9010709@access-company.com>
+	<1175271188.5815.225.camel@violet>
+In-Reply-To: <1175271188.5815.225.camel@violet>
+Subject: Re: [Bluez-devel] RemoteNameRequested signal during discovery patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,109 +17,68 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1964611265=="
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+Hello Marcel,
 
---===============1964611265==
-Content-class: urn:content-classes:message
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C77318.9A128CF1"
+This allows discovery applications to inform user when a device name is bei=
+ng retrieved (changing icon or displaying something like "getting name ..."=
+ in front =
 
-This is a multi-part message in MIME format.
+of the remote device icon). This offers a better user experience because us=
+er is informed of discovery process.
 
-------_=_NextPart_001_01C77318.9A128CF1
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Regards
 
-Hello:
-=20
-I looked at the latest plugz cvs checkout (as of Friday, March 30) and I
-notice
-that there are several files in the patches subdirectory. The README
-file
-only refers to sco-flowcontrol-v3.0.diff, which is a patch for 2.6.19.
-=20
-What is sco-flowcontrol-v.4.0.diff?
-=20
-I tried it against my 2.6.20 kernel and it broke.
-=20
-Thanks
-=20
-Mark Allyn
+Fred
 
-------_=_NextPart_001_01C77318.9A128CF1
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Marcel Holtmann a =E9crit :
+> Hi Frederic,
+> =
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Dus-ascii">
-<META content=3D"MSHTML 6.00.2900.2963" name=3DGENERATOR></HEAD>
-<BODY>
-<DIV><SPAN class=3D414460822-30032007><FONT face=3DArial=20
-size=3D2>Hello:</FONT></SPAN></DIV>
-<DIV><SPAN class=3D414460822-30032007><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D414460822-30032007><FONT face=3DArial size=3D2>I =
-looked at the=20
-latest plugz cvs checkout (as of Friday, March 30) and I=20
-notice</FONT></SPAN></DIV>
-<DIV><SPAN class=3D414460822-30032007><FONT face=3DArial size=3D2>that =
-there are=20
-several files in the patches subdirectory. The README =
-file</FONT></SPAN></DIV>
-<DIV><SPAN class=3D414460822-30032007><FONT face=3DArial size=3D2>only =
-refers to=20
-sco-flowcontrol-v3.0.diff, which is a patch for =
-2.6.19.</FONT></SPAN></DIV>
-<DIV><SPAN class=3D414460822-30032007><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D414460822-30032007><FONT face=3DArial size=3D2>What =
-is=20
-sco-flowcontrol-v.4.0.diff?</FONT></SPAN></DIV>
-<DIV><SPAN class=3D414460822-30032007><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D414460822-30032007><FONT face=3DArial size=3D2>I =
-tried it against=20
-my 2.6.20 kernel and it broke.</FONT></SPAN></DIV>
-<DIV><SPAN class=3D414460822-30032007><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D414460822-30032007><FONT face=3DArial=20
-size=3D2>Thanks</FONT></SPAN></DIV>
-<DIV><SPAN class=3D414460822-30032007><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D414460822-30032007><FONT face=3DArial size=3D2>Mark=20
-Allyn</FONT></SPAN></DIV></BODY></HTML>
+>> A new version of the patch.
+>> Are you okay with it ?
+> =
 
-------_=_NextPart_001_01C77318.9A128CF1--
+> the patch looks okay to me. However I prefer if Claudio or Johan can
+> have an additional look.
+> =
 
+> My question is why this signal is actually needed. Please elaborate on
+> the use cases of this signal.
+> =
 
---===============1964611265==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> Regards
+> =
+
+> Marcel
+> =
+
+> =
+
+> =
+
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share y=
+our
+> opinions on IT & business topics through brief surveys-and earn cash
+> http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3D=
+DEVDEV
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1964611265==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1964611265==--
