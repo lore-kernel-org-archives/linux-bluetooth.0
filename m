@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Christoph Burger-Scheidlin <andersin@freenet.de>
-To: bluez-users@lists.sourceforge.net
-Date: Fri, 30 Mar 2007 23:17:37 +0100
-MIME-Version: 1.0
-Message-Id: <200703302317.37908.andersin@freenet.de>
-Subject: [Bluez-users] Logitech diNovo Desktop: keyboard keys and Mouse
-	buttons
+From: Malte Steiner <steiner@mobileart.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY124-W15053C673FC32A41B2AF00F0630@phx.gbl>
+References: <BAY124-W15053C673FC32A41B2AF00F0630@phx.gbl>
+Date: Fri, 30 Mar 2007 21:45:49 +0200
+Message-Id: <1175283949.5851.3.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Multithread Service Discovery
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,23 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello all,
+Am Freitag, den 30.03.2007, 19:33 +0000 schrieb Robert Rawlins:
+> Hello Chaps,
+>  
+> I'm currently running a C program for service discovery on a list of
+> devices. The function loops through the list elements and performs an
+> SDP enquiry on each device and returns the results to the screen, but
+> I'm finding that if i get a slow device in the list it can hold things
+> up a little, and in general it would be fantastic to hit all the
+> devices with an enquiry simultaneously.
 
-I have a logitech diNovo desktop and connect it directly to my bluetooth 
-adapter in my laptop. I noticed that the F11, F12 and the Refresh button do 
-not work and are not reported by xev. However, hciconfig shows an increase in 
-the RX bytes and acl counters. Does this mean that the keyboard transmits 
-data to the computer? I want to find out if the keyboard is transmitting a 
-keycode, can someone point me to some resources that tell me how to listen in 
-on the traffic.
+Multithreading is possible, I use the OpenThreads library to do so for
+the same reasons. Attention, OpenThreads is OO and C++ so you might look
+for another solution like pthreads.
 
-I have a similar issue with the mouse buttons, i.e. that they report the same 
-buttons to xev and an evtest program. I want to figure out how to see what 
-the mouse is actually reporting.
+Cheers,
 
-Thanks you,
+Malte
 
-Christoph Burger-Scheidlin
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
