@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <002801c771c7$3e9f3400$9d0cc70a@dlh.st.com>
-References: <002801c771c7$3e9f3400$9d0cc70a@dlh.st.com>
-Date: Sat, 31 Mar 2007 15:56:59 +0200
-Message-Id: <1175349419.5815.274.camel@violet>
+In-Reply-To: <20070328152757.62286.qmail@web52302.mail.re2.yahoo.com>
+References: <20070328152757.62286.qmail@web52302.mail.re2.yahoo.com>
+Date: Sat, 31 Mar 2007 15:55:29 +0200
+Message-Id: <1175349329.5815.271.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] hcid returning "Device or resource busy"?
+Subject: Re: [Bluez-devel] L2CAP: ECONNRESET is set for every
+	l2cap	disconnect.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,39 +21,56 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mayank,
+Hi Aarti,
 
-> > > I hope there's at least some way to get it working. I'd 
-> > > rather not have
-> > > to have another dongle just because hcid doesn't like it :)
-> > 
-> > the problem is that the baseband is busy with the remote name request.
-> > It has to page the remote device for getting the name and in that case
-> > you simply can't run an inquiry. All currently available 
-> > Bluetooth chips have this limitation.
-> > 
-> > Main question is why we have the remote name request just before you
-> > wanna start the inquiry. What D-Bus methods are you actually calling
-> in
-> > what order? I think you constructed a use case that we never tested.
+> I am sure if this issue has been discussed before or
+> not. 
+
+it hasn't been discussed. I would remember it.
+
+> Is it necessary to the set the struct sock->err value
+> to ECONNRESET when l2cap disconnect request is
+> received from remote device ?
 > 
-> But actually, the sequence of HCI commands issued is correct. First, a
-> remote
-> name request is issued. Then, since an inquiry is required, the remote
-> name
-> request is cancelled. Thus, paging should stop and inquiry should be
-> possible.
-> I think this use case should work with BT1.2 devices and above.
+> l2cap_disconnect_req function sets the error value in
+> sock structure by calling l2cap_chan_del(sk,
+> ECONNRESET) every time l2cap connection is
+> disconnected.
+
+This is actually the correct behavior since the remote side is about to
+terminate the connection. There is no more data pending. All data after
+this command is invalid anyway.
+
+> This might lead to some loss of data at receiver side
+> in case of fast sender and slow receiver. 
+
+This has been always a problem of L2CAP since flow control is missing.
+
+> The sender will send l2cap packets and disconnects. 
 > 
-> But you are right, maybe some workaround should be present in order to
-> be
-> compatible with BT1.1 devices as well.
+> The receiver side will read the packets, but once
+> l2cap disconnect is received, even though there is
+> data in sk_buff, the bt_sock_recvmsg will return 0 as
+> skb_recv_datagram will return NULL. 
+> 
+> Can we set the value to ECONNRESET only in case of
+> error condition and for the normal disconnect set it
+> to 0 by calling l2cap_chan_del(sk,0) from
+> l2cap_disconnect_req ?
+> 
+> So if error field is not set in sock structure,
+> bt_sock_recvmsg will return data bytes till sk_buff is
+> empty and which case 0 will be returned. This will
+> prevent any data loss.
+> 
+> Also if the user wants to know when socket
+> disconnected, POLLHUP will be set for sock fd so after
+> disconnect happens and there is data to be read both
+> POLLHUP and POLLIN will set.
+> If we set sock err field then user will not be able to
+> retrieve data from sk_buff, even if POLLLIN is set.
 
-we need a workaround for Bluetooth 1.1 devices. However I have no idea
-what we can actually do to make this work.
-
-My idea is to not actively request names when not in discovery mode.
-That would actually fix this cases.
+Provide a patch and a test program and I will have a look at it.
 
 Regards
 
