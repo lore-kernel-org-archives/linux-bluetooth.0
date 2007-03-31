@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sat, 31 Mar 2007 18:25:30 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20070331152530.GA12829@jh-mbp>
-References: <45F16630.9000606@access-company.com>
-	<460D363F.9010709@access-company.com>
-	<1175271188.5815.225.camel@violet>
-MIME-Version: 1.0
-In-Reply-To: <1175271188.5815.225.camel@violet>
-Subject: Re: [Bluez-devel] RemoteNameRequested signal during discovery patch
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <002801c771c7$3e9f3400$9d0cc70a@dlh.st.com>
+References: <002801c771c7$3e9f3400$9d0cc70a@dlh.st.com>
+Date: Sat, 31 Mar 2007 15:56:59 +0200
+Message-Id: <1175349419.5815.274.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] hcid returning "Device or resource busy"?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,18 +20,45 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Mayank,
 
-On Fri, Mar 30, 2007, Marcel Holtmann wrote:
-> > A new version of the patch.
-> > Are you okay with it ?
+> > > I hope there's at least some way to get it working. I'd 
+> > > rather not have
+> > > to have another dongle just because hcid doesn't like it :)
+> > 
+> > the problem is that the baseband is busy with the remote name request.
+> > It has to page the remote device for getting the name and in that case
+> > you simply can't run an inquiry. All currently available 
+> > Bluetooth chips have this limitation.
+> > 
+> > Main question is why we have the remote name request just before you
+> > wanna start the inquiry. What D-Bus methods are you actually calling
+> in
+> > what order? I think you constructed a use case that we never tested.
 > 
-> the patch looks okay to me. However I prefer if Claudio or Johan can
-> have an additional look.
+> But actually, the sequence of HCI commands issued is correct. First, a
+> remote
+> name request is issued. Then, since an inquiry is required, the remote
+> name
+> request is cancelled. Thus, paging should stop and inquiry should be
+> possible.
+> I think this use case should work with BT1.2 devices and above.
+> 
+> But you are right, maybe some workaround should be present in order to
+> be
+> compatible with BT1.1 devices as well.
 
-Looks good to me.
+we need a workaround for Bluetooth 1.1 devices. However I have no idea
+what we can actually do to make this work.
 
-Johan
+My idea is to not actively request names when not in discovery mode.
+That would actually fix this cases.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
