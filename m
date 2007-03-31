@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1175283949.5851.3.camel@localhost>
-References: <BAY124-W15053C673FC32A41B2AF00F0630@phx.gbl>
-	<1175283949.5851.3.camel@localhost>
-Date: Sat, 31 Mar 2007 15:44:29 +0200
-Message-Id: <1175348669.5815.251.camel@violet>
+In-Reply-To: <200703302317.37908.andersin@freenet.de>
+References: <200703302317.37908.andersin@freenet.de>
+Date: Sat, 31 Mar 2007 15:36:18 +0200
+Message-Id: <1175348178.5815.244.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Multithread Service Discovery
+Subject: Re: [Bluez-users] Logitech diNovo Desktop: keyboard keys and
+	Mouse	buttons
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,29 +21,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Malte,
+Hi Christoph,
 
-> > I'm currently running a C program for service discovery on a list of
-> > devices. The function loops through the list elements and performs an
-> > SDP enquiry on each device and returns the results to the screen, but
-> > I'm finding that if i get a slow device in the list it can hold things
-> > up a little, and in general it would be fantastic to hit all the
-> > devices with an enquiry simultaneously.
+> I have a logitech diNovo desktop and connect it directly to my bluetooth 
+> adapter in my laptop. I noticed that the F11, F12 and the Refresh button do 
+> not work and are not reported by xev. However, hciconfig shows an increase in 
+> the RX bytes and acl counters. Does this mean that the keyboard transmits 
+> data to the computer? I want to find out if the keyboard is transmitting a 
+> keycode, can someone point me to some resources that tell me how to listen in 
+> on the traffic.
 > 
-> Multithreading is possible, I use the OpenThreads library to do so for
-> the same reasons. Attention, OpenThreads is OO and C++ so you might look
-> for another solution like pthreads.
+> I have a similar issue with the mouse buttons, i.e. that they report the same 
+> buttons to xev and an evtest program. I want to figure out how to see what 
+> the mouse is actually reporting.
 
-if you have a recent kernel then this might work since the kernel queues
-the page requests. However in general a simultaneous service discovery
-(or name resolving for that matter) is not possible. The chips baseband
-can only page one remote device at a time. So even if it looks like
-simultaneous service discovery. It is not. The kernel serializes it for
-you and this means the same page timeout problems appear when devices
-are out of range.
-
-The only way to speed this up is to change the page timeout value of the
-Bluetooth chip.
+when you call hidd and it shows boot-protocol, then this is no wonder.
+You need a Linux kernel with HID report mode enabled HIDP module. You
+might wanna try the latest 2.6.21-rc5 kernel.
 
 Regards
 
