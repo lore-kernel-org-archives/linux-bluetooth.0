@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <187c15580703281446p1732a40eifdce3dc4c1261789@mail.gmail.com>
-References: <187c15580703281446p1732a40eifdce3dc4c1261789@mail.gmail.com>
-Date: Sat, 31 Mar 2007 15:51:50 +0200
-Message-Id: <1175349110.5815.267.camel@violet>
+In-Reply-To: <c49421c50703292018r4a1fb72fpc47f1339fa1f2939@mail.gmail.com>
+References: <c49421c50703292018r4a1fb72fpc47f1339fa1f2939@mail.gmail.com>
+Date: Sat, 31 Mar 2007 15:48:55 +0200
+Message-Id: <1175348935.5815.262.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Paired with Nokia phone but not connected
+Subject: Re: [Bluez-users] problem reading rssi
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,26 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Luis,
+Hi Loreno,
 
-> My hardware is a USB Dongle Bluetooth D-Link DBT-122 and a Nokia 6230.
-> 
-> I can't set passkey with error:
-> Can't register passkey agent
-> Passkey agent already exists
-> process 5391: Applications must not close shared connections - see
-> dbus_connection_close() docs. This is a bug in the application.
-> 
-> My .gammurc is:
-> port = <Mobile MAC Address>
-> model = 6230
-> connection = bluerffbus
-> 
-> When running gammu --identify bluez-gnome pops up a window to enter a
-> password to pair mobile and PC. The pairing works but can't connect
-> after. It just says disconneted!
+> I am having some headache for reading the rssi of a remote device. The
+> code bellow insists in returning 0 to the "rssi" variable when I try
+> to read the rssi of a connected Nokia 770. If I run the same code for
+> a connected desktop, then a non zero value is returned. For
+> complicating even more, if I run "hcitool clkoff <addr>" when
+> connected to the 770, then a non zero value is also returned. 
 
-run "hcidump -X -V" as root to see what happens.
+it depends on the local adapter you use and the Bluetooth chip in the
+remote device. Some devices don't report the correct RSSI value. It
+seems they always return 0.
 
 Regards
 
