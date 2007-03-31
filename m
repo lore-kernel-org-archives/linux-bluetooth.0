@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5FD5754DDBA0B1499B5A0B4BB5419485D44D28@fmsmsx411.amr.corp.intel.com>
-References: <5FD5754DDBA0B1499B5A0B4BB5419485D44D28@fmsmsx411.amr.corp.intel.com>
-Date: Sat, 31 Mar 2007 15:35:15 +0200
-Message-Id: <1175348115.5815.242.camel@violet>
+In-Reply-To: <ddea76ce0703310111m6c21fda1g45495830909c91d9@mail.gmail.com>
+References: <ddea76ce0703310111m6c21fda1g45495830909c91d9@mail.gmail.com>
+Date: Sat, 31 Mar 2007 15:34:15 +0200
+Message-Id: <1175348055.5815.239.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Plugz SCO Patches submitted to the
-	kernel	developers?
+Subject: Re: [Bluez-devel] BlueZ API, HID profile, socket programming
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,17 +20,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mark,
+Hi Meenakshi,
 
-> Have the plugz SCO kernel patches (sco-flowcontrol-v3.0.diff) beed
-> submitted to the kernel team
-> so that it can be included in the upstream kernel? If so, do we yet
-> know which kernel it is
-> supposed to be in?
+> I am developing for the Nokia 770 - the idea is to use the PDA as a
+> mouse to
+> control another bluetooth-enabled PC.
+> At this point I have opened a socket via L2CAP (Logical Link Control
+> and
+> Adaptation Protocol). How do I test if the socket is working? 
+> I am sorry if this is a stupid question but I am new to linux,C and
+> socket
+> programming :(
 
-I got a re-worked patch from Brad two weeks ago. This one still needs
-testing and some cleanup. However in general this patch is meant to go
-upstream.
+you have to implement the HID device part (not provided by BlueZ at the
+moment). So you have to have two listen sockets on PSM 17 and 19 and you
+need the appropriate SDP service record that contains the HID descriptor
+and other HID related settings. Check the HID specification for more
+details.
 
 Regards
 
