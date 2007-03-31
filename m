@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <c49421c50703292018r4a1fb72fpc47f1339fa1f2939@mail.gmail.com>
-References: <c49421c50703292018r4a1fb72fpc47f1339fa1f2939@mail.gmail.com>
-Date: Sat, 31 Mar 2007 15:48:55 +0200
-Message-Id: <1175348935.5815.262.camel@violet>
+In-Reply-To: <00b101c77295$74ada8a0$8935c70a@dlh.st.com>
+References: <00b101c77295$74ada8a0$8935c70a@dlh.st.com>
+Date: Sat, 31 Mar 2007 15:47:40 +0200
+Message-Id: <1175348860.5815.259.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] problem reading rssi
+Cc: bluez-users@lists.sf.net
+Subject: Re: [Bluez-users] XML_StopParser undefined reference-
+	compilation	error bluez-utils-3.9
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,18 +22,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Loreno,
+Hi Sumeet,
 
-> I am having some headache for reading the rssi of a remote device. The
-> code bellow insists in returning 0 to the "rssi" variable when I try
-> to read the rssi of a connected Nokia 770. If I run the same code for
-> a connected desktop, then a non zero value is returned. For
-> complicating even more, if I run "hcitool clkoff <addr>" when
-> connected to the 770, then a non zero value is also returned. 
+> I am getting a compiler error while building bluez-utils-3.9. 
+> The log is here:-
+> 
+> make[3]: Entering directory `/home/vsumeet/bluez/3.9/bluez-utils-3.9/hcid'
+> /bin/sh ../libtool --tag=CC --mode=link gcc -I/usr/local/include  
+> -I/usr/local/include/dbus-1.0 -I/usr/local/lib/dbus-1.0/include  
+> -DDBUS_API_SUBJECT_TO_CHANGE -I../eglib -Wall -O2 -D_FORTIFY_SOURCE=2   -o hcid
+>  main.o libhciserver.a ../sdpd/libsdpserver.a ../common/libhelper.a 
+> ../eglib/libeglib.la -L/usr/local/lib -ldbus-1   -L/usr/local/lib -lbluetooth  
+> -lexpat
+> gcc -I/usr/local/include -I/usr/local/include/dbus-1.0
+> -I/usr/local/lib/dbus-1.0/include -DDBUS_API_SUBJECT_TO_CHANGE -I../eglib 
+> -Wall -O2 -D_FORTIFY_SOURCE=2 -o hcid main.o  libhciserver.a ../sdpd/libsdpserver.a
+> ../common/libhelper.a ../eglib/.libs/libeglib.a -L/usr/local/lib
+> /usr/local/lib/libdbus-1.so -lnsl /usr/local/lib/libbluetooth.so 
+> /usr/lib/libexpat.so   -Wl,--rpath -Wl,/usr/local/lib -Wl,--rpath -Wl,/usr/local/lib
+> ../common/libhelper.a(sdp-expat.o)(.text+0x227): In function
+> `convert_xml_to_sdp_start':
+> : undefined reference to `XML_StopParser' 
+> collect2: ld returned 1 exit status
+> make[3]: *** [hcid] Error 1
+> make[3]: Leaving directory `/home/vsumeet/bluez/3.9/bluez-utils-3.9/hcid'
+> make[2]: *** [all] Error 2
+> make[2]: Leaving directory `/home/vsumeet/bluez/3.9/bluez- utils-3.9/hcid'
+> make[1]: *** [all-recursive] Error 1
+> make[1]: Leaving directory `/home/vsumeet/bluez/3.9/bluez-utils-3.9'
+> make: *** [all] Error 2
+> 
+> I have checked the expat library is present. 
+> The version is libexpat.so.0.5.0
+> Do you know why is it not able to link?
 
-it depends on the local adapter you use and the Bluetooth chip in the
-remote device. Some devices don't report the correct RSSI value. It
-seems they always return 0.
+I have no idea. It works perfectly fine for me. However you can use
+--disable-expat to compile it without XML support. In this case the
+D-Bus methods that take XML as input will be disabled.
 
 Regards
 
