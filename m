@@ -1,96 +1,209 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <1ab01fb50702282041o36bdbf55mfa073858cc9e5c77@mail.gmail.com>
-Date: Thu, 1 Mar 2007 10:11:28 +0530
-From: "Vikas Sinha" <compuvikas@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <57c68ddc0702280731j1470f59bj2f4cba52ecd6229f@mail.gmail.com>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+From: Christoph Burger-Scheidlin <andersin@freenet.de>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Sat, 31 Mar 2007 23:10:56 +0100
+References: <200703302317.37908.andersin@freenet.de>
+	<1175348178.5815.244.camel@violet>
+In-Reply-To: <1175348178.5815.244.camel@violet>
 MIME-Version: 1.0
-References: <57c68ddc0702280731j1470f59bj2f4cba52ecd6229f@mail.gmail.com>
-Subject: Re: [Bluez-devel] how to create rfcomm channel
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0628842750=="
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_wxtDG4uxYlAAtj7"
+Message-Id: <200703312310.56438.andersin@freenet.de>
+Subject: Re: [Bluez-users]
+	=?iso-8859-1?q?Logitech_diNovo_Desktop=3A_keyboard_?=
+	=?iso-8859-1?q?keys_and_Mouse=09buttons?=
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0628842750==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_23853_21163826.1172724088175"
-
-------=_Part_23853_21163826.1172724088175
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: text/plain;
+  charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi Siddhant
+On Saturday 31 March 2007, Marcel Holtmann wrote:
+> > [Logitech diNovo Keyboard does not report Fn+F11, Fn+F12 and Refresh to
+> > xev, the mouse does not report all buttons]
 
-http://www-md.e-technik.uni-rostock.de/ma/hm27/uebung_hnp_2004/documentation/bluez-2.10-html/
-you can have a look to these files containing bluez reference code. What
-exactly you want to do?
+> when you call hidd and it shows boot-protocol, then this is no wonder.
+> You need a Linux kernel with HID report mode enabled HIDP module. You
+> might wanna try the latest 2.6.21-rc5 kernel.
 
+Currently I am running 2.6.20 (with Ubuntu patches) with the mh1 patch applied 
+to it. I am not sure, if the keyboard is in boot-protocol mode. The syslog 
+message is:
 
+hidd[3632]: New HID device 00:07:61:3C:31:3C (Logitech Bluetooth Keyboard),
 
+hidd reports:
+00:07:61:3C:31:3C Logitech Bluetooth Keyboard [046d:b307] connected
 
-On 2/28/07, siddhant tewari <siddhant.tewari@gmail.com> wrote:
->
-> hi,
->    I would like to know is there any api for c language that can create
-> rfcomm channel.
->
-> regards
-> siddhant
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share
-> your
-> opinions on IT & business topics through brief surveys-and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->
+Since my original email, I have figured out that the mouse problem is mainly 
+due to using the /dev/input/mice interface, however, even when switching to 
+evdev, the buttons above and below my scroll wheel do report the same button 
+press (button 4 and 5 respectively).
 
+I have attached dumps made with hcidump of the traffic of all my mouse buttons 
+and of the keys that are not working in the hope that this information is 
+useful.
 
--- 
-Impossible
-itself contain
-I M Possible
+Christoph
 
-Vikas
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="keyboard-FnF11.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="keyboard-FnF11.dump"
 
-------=_Part_23853_21163826.1172724088175
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+DwABAN/XDka1OgAAAiogCgAGAEEAoQO2AQAADwABAN/XDkaPrQMAAiogCgAGAEEAoQMAAAAA
 
-Hi Siddhant<br>
-<br>
-<a href="http://www-md.e-technik.uni-rostock.de/ma/hm27/uebung_hnp_2004/documentation/bluez-2.10-html/">http://www-md.e-technik.uni-rostock.de/ma/hm27/uebung_hnp_2004/documentation/bluez-2.10-html/</a><br>
-you can have a look to these files containing bluez reference code. What exactly you want to do? <br>
-<br>
-<br>
-<br><br><div><span class="gmail_quote">On 2/28/07, <b class="gmail_sendername">siddhant tewari</b> &lt;<a href="mailto:siddhant.tewari@gmail.com">siddhant.tewari@gmail.com</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-hi,<br>&nbsp;&nbsp; I would like to know is there any api for c language that can create rfcomm channel.<br><br>regards<br><span class="sg">siddhant<br>
-</span><br>-------------------------------------------------------------------------<br>Take Surveys. Earn Cash. Influence the Future of IT<br>Join SourceForge.net&#39;s Techsay panel and you&#39;ll get the chance to share your
-<br>opinions on IT &amp; business topics through brief surveys-and earn cash<br><a onclick="return top.js.OpenExtLink(window,event,this)" href="http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV" target="_blank">
-http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV</a><br>_______________________________________________<br>Bluez-devel mailing list<br><a onclick="return top.js.OpenExtLink(window,event,this)" href="mailto:Bluez-devel@lists.sourceforge.net">
-Bluez-devel@lists.sourceforge.net</a><br><a onclick="return top.js.OpenExtLink(window,event,this)" href="https://lists.sourceforge.net/lists/listinfo/bluez-devel" target="_blank">https://lists.sourceforge.net/lists/listinfo/bluez-devel
-</a><br><br></blockquote></div><br><br clear="all"><br>-- <br>Impossible <br>itself contain <br>I M Possible<br><br>Vikas
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="mouse-buttonUp.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="mouse-buttonUp.dump"
 
-------=_Part_23853_21163826.1172724088175--
+EgABAB7cDkb3tQgAAi0gDQAJAEEAoQIAAAAAAQAAEgABAB7cDkblUQsAAi0gDQAJAEEAoQIAAAAA
+AAAA
 
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="mouse-leftButton.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="mouse-leftButton.dump"
 
---===============0628842750==
+EgABABWmDUb8wgMAAi0gDQAJAEEAoQIBAAAAAAAAEgABABWmDUbsjwUAAi0gDQAJAEEAoQIAAAAA
+AAAA
+
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="mouse-middleButton.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="mouse-middleButton.dump"
+
+EgABACmmDUZQGwEAAi0gDQAJAEEAoQIEAAAAAAAAEgABACmmDUZgMAQAAi0gDQAJAEEAoQIAAAAA
+AAAA
+
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="mouse-rightButton.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="mouse-rightButton.dump"
+
+EgABAB6mDUbNdAMAAi0gDQAJAEEAoQICAAAAAAAAEgABAB6mDUY7igQAAi0gDQAJAEEAoQIAAAAA
+AAAA
+
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="mouse-thumbBack.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="mouse-thumbBack.dump"
+
+EgABAGWmDUYpGgkAAi0gDQAJAEEAoQIIAAAAAAAAEgABAGWmDUYlhwsAAi0gDQAJAEEAoQIAAAAA
+AAAA
+
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="mouse-buttonDown.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="mouse-buttonDown.dump"
+
+EgABACncDkbv5QAAAi0gDQAJAEEAoQIAAAAA/wAAEgABACncDkYafAIAAi0gDQAJAEEAoQIAAAAA
+AAAA
+
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="mouse-thumbForward.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="mouse-thumbForward.dump"
+
+EgABAF6mDUaRCQIAAi0gDQAJAEEAoQIQAAAAAAAAEgABAF6mDUZk/wQAAi0gDQAJAEEAoQIAAAAA
+AAAA
+
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="keyboard-FnF12.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="keyboard-FnF12.dump"
+
+DwABAEXXDkY4xAkAAiogCgAGAEEAoQO3AQAADwABAEXXDkZ/KwsAAiogCgAGAEEAoQMAAAAA
+
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="mouse-thumbSelect.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="mouse-thumbSelect.dump"
+
+EgABAG6mDUa8QQUAAi0gDQAJAEEAoQIgAAAAAAAAEgABAG6mDUaQ5QcAAi0gDQAJAEEAoQIAAAAA
+AAAA
+
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="mouse-wheelDown.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="mouse-wheelDown.dump"
+
+EgABAD+mDUbMRwQAAi0gDQAJAEEAoQIAAAAA/wAA
+
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="mouse-wheelLeft.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="mouse-wheelLeft.dump"
+
+EgABAEemDUZ3eQwAAi0gDQAJAEEAoQIAAAAAAP8AEgABAEimDUaVZwAAAi0gDQAJAEEAoQIAAAAA
+AAAA
+
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="mouse-wheelRight.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="mouse-wheelRight.dump"
+
+EgABAFCmDUZ0fwsAAi0gDQAJAEEAoQIAAAAAAAEAEgABAFCmDUacYQ4AAi0gDQAJAEEAoQIAAAAA
+AAAA
+
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="keyboard-Refresh.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="keyboard-Refresh.dump"
+
+DwABAGTXDkbSXAgAAiogCgAGAEEAoQMAAAAA
+
+--Boundary-00=_wxtDG4uxYlAAtj7
+Content-Type: application/octet-stream;
+  name="mouse-wheelUp.dump"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="mouse-wheelUp.dump"
+
+EgABADemDUbB/AkAAi0gDQAJAEEAoQIAAAAAAQAA
+
+--Boundary-00=_wxtDG4uxYlAAtj7
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -101,15 +214,15 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0628842750==
+--Boundary-00=_wxtDG4uxYlAAtj7
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0628842750==--
+--Boundary-00=_wxtDG4uxYlAAtj7--
