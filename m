@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200703302317.37908.andersin@freenet.de>
-References: <200703302317.37908.andersin@freenet.de>
-Date: Sat, 31 Mar 2007 15:36:18 +0200
-Message-Id: <1175348178.5815.244.camel@violet>
+In-Reply-To: <ddea76ce0703310624h7db4f1d1n689ea1ed2062b382@mail.gmail.com>
+References: <ddea76ce0703310624h7db4f1d1n689ea1ed2062b382@mail.gmail.com>
+Date: Sat, 31 Mar 2007 15:32:05 +0200
+Message-Id: <1175347925.5815.236.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Logitech diNovo Desktop: keyboard keys and
-	Mouse	buttons
+Subject: Re: [Bluez-users] BlueZ, testing socket
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,23 +20,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Christoph,
+Hi Meenakshi,
 
-> I have a logitech diNovo desktop and connect it directly to my bluetooth 
-> adapter in my laptop. I noticed that the F11, F12 and the Refresh button do 
-> not work and are not reported by xev. However, hciconfig shows an increase in 
-> the RX bytes and acl counters. Does this mean that the keyboard transmits 
-> data to the computer? I want to find out if the keyboard is transmitting a 
-> keycode, can someone point me to some resources that tell me how to listen in 
-> on the traffic.
+> This code below connects to the server socket and selects the protocol
+> to be used (L2CAP), opens the socket for that protocol, creates a
+> bluetooth address object and sets its port to the PSM and binds the
+> socket to this address, tells the sockets to listen for incoming
+> connections, creates a blank socket and pass it to the listening
+> socket through accept (When this call completes the socket passed in a
+> parameter is now fully connected and can be used to send and receive
+> data) 
 > 
-> I have a similar issue with the mouse buttons, i.e. that they report the same 
-> buttons to xev and an evtest program. I want to figure out how to see what 
-> the mouse is actually reporting.
+> QUESTION: How do I test this socket works? I want to send a messge
+> like "Hello World". Please help...anyone
 
-when you call hidd and it shows boot-protocol, then this is no wonder.
-You need a Linux kernel with HID report mode enabled HIDP module. You
-might wanna try the latest 2.6.21-rc5 kernel.
+you should have a look at l2test.c and rctest.c from bluez-utils.
+However the simple answer is to use read() and write() on that specific
+socket descriptor.
 
 Regards
 
