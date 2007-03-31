@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20070328152757.62286.qmail@web52302.mail.re2.yahoo.com>
-References: <20070328152757.62286.qmail@web52302.mail.re2.yahoo.com>
-Date: Sat, 31 Mar 2007 15:55:29 +0200
-Message-Id: <1175349329.5815.271.camel@violet>
+In-Reply-To: <200703291123.53675.denis.kenzior@trolltech.com>
+References: <200703291123.53675.denis.kenzior@trolltech.com>
+Date: Sat, 31 Mar 2007 15:50:56 +0200
+Message-Id: <1175349056.5815.265.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] L2CAP: ECONNRESET is set for every
-	l2cap	disconnect.
+Subject: Re: [Bluez-devel] [PATCH] STLC2500 Baud Rate & Address Setting
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,56 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Aarti,
+Hi Denis,
 
-> I am sure if this issue has been discussed before or
-> not. 
-
-it hasn't been discussed. I would remember it.
-
-> Is it necessary to the set the struct sock->err value
-> to ECONNRESET when l2cap disconnect request is
-> received from remote device ?
+> The following patch does two things:
 > 
-> l2cap_disconnect_req function sets the error value in
-> sock structure by calling l2cap_chan_del(sk,
-> ECONNRESET) every time l2cap connection is
-> disconnected.
-
-This is actually the correct behavior since the remote side is about to
-terminate the connection. There is no more data pending. All data after
-this command is invalid anyway.
-
-> This might lead to some loss of data at receiver side
-> in case of fast sender and slow receiver. 
-
-This has been always a problem of L2CAP since flow control is missing.
-
-> The sender will send l2cap packets and disconnects. 
+> - Adds support for setting the baud rate on the STLC2500.
+> - Adds another optional argument to hciattach for use with stlc2500/bgb2xx 
+> devices that require initialization of the bdaddr.  Basically if you specify 
+> this option on the command line, the address specified will be used during 
+> stlc2500/bgb2xx initialization.  Otherwise a default will be used.  The 
+> manpage has been updated as well.
 > 
-> The receiver side will read the packets, but once
-> l2cap disconnect is received, even though there is
-> data in sk_buff, the bt_sock_recvmsg will return 0 as
-> skb_recv_datagram will return NULL. 
-> 
-> Can we set the value to ECONNRESET only in case of
-> error condition and for the normal disconnect set it
-> to 0 by calling l2cap_chan_del(sk,0) from
-> l2cap_disconnect_req ?
-> 
-> So if error field is not set in sock structure,
-> bt_sock_recvmsg will return data bytes till sk_buff is
-> empty and which case 0 will be returned. This will
-> prevent any data loss.
-> 
-> Also if the user wants to know when socket
-> disconnected, POLLHUP will be set for sock fd so after
-> disconnect happens and there is data to be read both
-> POLLHUP and POLLIN will set.
-> If we set sock err field then user will not be able to
-> retrieve data from sk_buff, even if POLLLIN is set.
+> Let me know if there are any issues!
 
-Provide a patch and a test program and I will have a look at it.
+the patch looks good. However please swap these two:
+
+        int  (*init) (int fd, struct uart_t *u, struct termios *ti);
++       char *bdaddr;
+
+The callbacks should come always last in a structure.
 
 Regards
 
