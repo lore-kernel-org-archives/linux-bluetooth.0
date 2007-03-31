@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <80236d750703270544g12df0f26w2547ed8cc4a3649@mail.gmail.com>
-References: <80236d750703270300y3497df0et16f6f1a1d3ce53e0@mail.gmail.com>
-	<1174991523.5815.41.camel@violet>
-	<80236d750703270544g12df0f26w2547ed8cc4a3649@mail.gmail.com>
-Date: Sat, 31 Mar 2007 16:00:23 +0200
-Message-Id: <1175349623.5815.279.camel@violet>
+In-Reply-To: <187c15580703281446p1732a40eifdce3dc4c1261789@mail.gmail.com>
+References: <187c15580703281446p1732a40eifdce3dc4c1261789@mail.gmail.com>
+Date: Sat, 31 Mar 2007 15:51:50 +0200
+Message-Id: <1175349110.5815.267.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] clearing remote name cache
+Subject: Re: [Bluez-users] Paired with Nokia phone but not connected
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,32 +20,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Emanuele,
+Hi Luis,
 
-> Ok thanks for  answer,  I'd like  more info about this. 
->  Are  2.1 compliance dongles already available on the market for end
-> users? 
+> My hardware is a USB Dongle Bluetooth D-Link DBT-122 and a Nokia 6230.
+> 
+> I can't set passkey with error:
+> Can't register passkey agent
+> Passkey agent already exists
+> process 5391: Applications must not close shared connections - see
+> dbus_connection_close() docs. This is a bug in the application.
+> 
+> My .gammurc is:
+> port = <Mobile MAC Address>
+> model = 6230
+> connection = bluerffbus
+> 
+> When running gammu --identify bluez-gnome pops up a window to enter a
+> password to pair mobile and PC. The pairing works but can't connect
+> after. It just says disconneted!
 
-no. However in most cases a firmware update for the BlueCore4 chips is
-fully enough. So my guess is that Apple will update their built-in
-dongles once the specification has been made public.
-
-> And even if I'll got one of those I guess the remote devices should be
-> 2.1 too to answer to an extended inquiry.
-
-You need to have both sides support extended inquiry and the host stack
-must set the new attributes to make this work. BlueZ is already doing
-this if it finds a Bluetooth 2.1 dongle.
-
-> What about the Bluez support about the new features of Bluetooth 2.1?
-> (both low level HCI api and D-bus) 
-
-The extended inquiry is fully support. For the D-Bus API you see
-actually no difference since all this stuff is hidden. However it works
-perfectly fine.
-
-The support for simple pairing from Bluetooth 2.1 has not been published
-and will only be published once the specification is public.
+run "hcidump -X -V" as root to see what happens.
 
 Regards
 
