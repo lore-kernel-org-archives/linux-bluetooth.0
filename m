@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200703291123.53675.denis.kenzior@trolltech.com>
-References: <200703291123.53675.denis.kenzior@trolltech.com>
-Date: Sat, 31 Mar 2007 15:50:56 +0200
-Message-Id: <1175349056.5815.265.camel@violet>
+In-Reply-To: <5FD5754DDBA0B1499B5A0B4BB5419485D069B9@fmsmsx411.amr.corp.intel.com>
+References: <5FD5754DDBA0B1499B5A0B4BB5419485D069B9@fmsmsx411.amr.corp.intel.com>
+Date: Sat, 31 Mar 2007 15:37:14 +0200
+Message-Id: <1175348234.5815.246.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] STLC2500 Baud Rate & Address Setting
+Subject: Re: [Bluez-devel] Question on Plugz SCO Kernel Patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,25 +20,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Hi Mark,
 
-> The following patch does two things:
-> 
-> - Adds support for setting the baud rate on the STLC2500.
-> - Adds another optional argument to hciattach for use with stlc2500/bgb2xx 
-> devices that require initialization of the bdaddr.  Basically if you specify 
-> this option on the command line, the address specified will be used during 
-> stlc2500/bgb2xx initialization.  Otherwise a default will be used.  The 
-> manpage has been updated as well.
-> 
-> Let me know if there are any issues!
+> I looked at the latest plugz cvs checkout (as of Friday, March 30) and
+> I notice
+> that there are several files in the patches subdirectory. The README
+> file
+> only refers to sco-flowcontrol-v3.0.diff, which is a patch for 2.6.19.
+>  
+> What is sco-flowcontrol-v.4.0.diff?
 
-the patch looks good. However please swap these two:
-
-        int  (*init) (int fd, struct uart_t *u, struct termios *ti);
-+       char *bdaddr;
-
-The callbacks should come always last in a structure.
+it is a cleanup version against the latest 2.6.21-rc kernels. I
+requested some code cleanup and of course it must apply against the
+upstream kernel.
 
 Regards
 
