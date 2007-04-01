@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200703312310.56438.andersin@freenet.de>
-References: <200703302317.37908.andersin@freenet.de>
-	<1175348178.5815.244.camel@violet>
-	<200703312310.56438.andersin@freenet.de>
-Date: Sun, 01 Apr 2007 09:05:49 +0200
-Message-Id: <1175411149.23136.69.camel@aeonflux.holtmann.net>
+In-Reply-To: <BAY124-W139C835870F41AFA3D794AF0620@phx.gbl>
+References: <BAY124-W139C835870F41AFA3D794AF0620@phx.gbl>
+Date: Sun, 01 Apr 2007 09:01:55 +0200
+Message-Id: <1175410915.23136.64.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Logitech diNovo Desktop: keyboard keys
-	and	Mouse	buttons
+Subject: Re: [Bluez-users] Multithread Service Discovery
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,40 +20,45 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Christoph,
+Hi Robert,
 
-> > > [Logitech diNovo Keyboard does not report Fn+F11, Fn+F12 and Refresh to
-> > > xev, the mouse does not report all buttons]
-> 
-> > when you call hidd and it shows boot-protocol, then this is no wonder.
-> > You need a Linux kernel with HID report mode enabled HIDP module. You
-> > might wanna try the latest 2.6.21-rc5 kernel.
-> 
-> Currently I am running 2.6.20 (with Ubuntu patches) with the mh1 patch applied 
-> to it. I am not sure, if the keyboard is in boot-protocol mode. The syslog 
-> message is:
-> 
-> hidd[3632]: New HID device 00:07:61:3C:31:3C (Logitech Bluetooth Keyboard),
-> 
-> hidd reports:
-> 00:07:61:3C:31:3C Logitech Bluetooth Keyboard [046d:b307] connected
-> 
-> Since my original email, I have figured out that the mouse problem is mainly 
-> due to using the /dev/input/mice interface, however, even when switching to 
-> evdev, the buttons above and below my scroll wheel do report the same button 
-> press (button 4 and 5 respectively).
-> 
-> I have attached dumps made with hcidump of the traffic of all my mouse buttons 
-> and of the keys that are not working in the hope that this information is 
-> useful.
+> I spent some time this afternoon playing around with multithreading an
+> SDP enquiry, whilst i've almost got it working, when i use the loop to
+> initiate the threads they all seem to get their arguments mixed up, so
+> when i loop through the join i get the wrong details returned, they
+> all list the same mac address but with different channels,
+> unfortunately i'm away from my code at the moment so cant post any
+> samples.
+>  
+> Basically i'm trying to do a device discovery, and then SDP each of
+> the devices to obtain the obex channel, which i can then use to push a
+> file to, and i'm looking to have it do this as quickly as possible.
 
-the binary dumps are not really useful. Make them with "hcidump -X -V"
-and copy only the text into an email with comments.
+if you only have one Bluetooth adapter then you have to do SDP service
+search for one device at a time. There is no other way. You can't do
+this simultaneous. Period. And explained why.
 
-However it looks like you are using the HID report mode and so any non
-interpreted key code is a problem of the HID subsystem. This means that
-this email actually should be send to LKML. To make sense out of it you
-have to include the HID descriptor. Use sdptool to get it.
+> What would you recommend the best method for something like this? At
+> the moment i'm using a C program, a large amount of the code from it
+> is stripped out of an excellent article written by Albert Huang found
+> here http://people.csail.mit.edu/albert/bluez-intro/c401.html.
+>  
+> I note that a lot of people recently have been talking about the D-Bus
+> API, is this something i should perhaps be using? does it suite my
+> requirements?
+
+The D-Bus API makes this a lot easier since it takes care of all the
+stuff that otherwise you have to think about. For example the different
+Bluetooth versions etc. You can also sort the device list after inquiry
+via the RSSI to check the devices near by you first.
+ 
+> I've looked through the API documentation and it appears to have some
+> excellent functions, however as novice C programmer, I'm a little bit
+> lost as to where i might start with integrating the API into my
+> application.
+
+The bluez-utils source package contains enough examples on how to use
+D-Bus within C code. However it is faster to use it from within Python.
 
 Regards
 
