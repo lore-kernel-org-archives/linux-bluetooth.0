@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <30ed240e0704020327v6003dd05v22c659c4e8103e87@mail.gmail.com>
-Date: Mon, 2 Apr 2007 20:27:11 +1000
-From: "Brett Owen Rees VK2TMG " <breree@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <4610D098.1030805@access-company.com>
+Date: Mon, 02 Apr 2007 11:44:56 +0200
+From: Frederic Dalleau <frederic.dalleau@access-company.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] problems with getting Plantronics M1000 to pair on
-	Ubuntu system
+To: bluez development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Running bluez on vmware?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,28 +18,81 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello all,
+Hi All,
 
-I am new to this list and to Bluetooth. I have a Plantronics M1000
-headset and a Belkin USB dongle. The headset works ok with my Nokia
-phone, and it worked _once_ with my Ubuntu 6.06 system but now refuses
-to work. When it worked I could use aplay and arec to play and record
-from the device and all seemed good. However, if I run hcitool scan
-now I can see that the pairing mode at the headset eventually times
-out. I tried deleting the files in /var/lib/bluetooth/_mac_address_
-and restarting the daemons but still no go.
 
-What I am trying to achieve is to build a wireless vox headset to my
-HF ham radio - with the linux box performing compression and vox, as
-well as DSP processing of the receive audio - however, I am finding it
-hard just getting started.  Any help is greatly appreciated.
+A coworker is now working on running bluez over vmware. As a part of 
+that, he is trying to get a Bluetooth dongle to work (the same dongle 
+we've been using three weeks ago).
 
-Thanks,
-Brett
+For far there seem to be a strange "hang" problem of hcid. It seems it 
+does not complete the initialization of the device.
 
--- 
-===============
-Brett Rees VK2TMG
+I hope some of you might be able to provide some pointers on this issue, 
+so I'll present you what he's been able to come up so far.
+
+Setup:
+
+- BT dongle is connected through a USB 1.1 HUB. This is because vmware 
+supports only USB1.1 devices (more info is here: 
+http://kb.vmware.com/KanisaPlatform/Publishing/612/774_f.SAL_Public.html )
+
+- it is possible to see the device in /proc/bus/usb/devices (its the 
+second device, has multiple interfaces):
+- After connecting the device it is possible to see two instances of 
+hcid. One is stuck in non-interruptible io/sleep (it will stay like that 
+until the device is disconnected):
+
+/proc/bus/usb # ps w | grep hcid
+ 2411 root        724 S   /usr/sbin/hcid -f /etc/bluetooth/hcid.conf
+ 2423 root        224 D   /usr/sbin/hcid -f /etc/bluetooth/hcid.conf
+
+~ # hciconfig hci0 -a
+hci0:   Type: USB
+        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
+        DOWN
+        RX bytes:14 acl:0 sco:0 events:1 errors:0
+        TX bytes:6 acl:0 sco:0 commands:2 errors:0
+
+~ # hciconfig hci0 up
+
+The command does not return (at least for a few minutes).
+When I disconnect the device, the following error is displayed (before 
+the prompt is displayed again):
+
+Can't init device hci0: Input/output error (5)
+
+
+- syslog output for connecting the dongle :
+
+Mar 27 12:48:07 Device user.info kernel: usb 1-1: new full speed USB 
+device using uhci_hcd and address 5
+Mar 27 12:48:08 Device user.info kernel: usb 1-1: configuration #1 
+chosen from 1 choice
+Mar 27 12:48:08 Device daemon.info hcid[2411]: HCI dev 0 registered
+Mar 27 12:48:08 Device daemon.info hcid[2411]: Register 
+path:/org/bluez/hci0 fallback:0
+Mar 27 10:51:29 Device syslog.info -- MARK --
+
+- syslog output after disconnecting:
+
+Mar 27 13:02:20 Device user.info kernel: usb 1-1: USB disconnect, address 5
+Mar 27 13:02:21 Device daemon.info hcid[2411]: HCI dev 0 unregistered
+Mar 27 13:02:21 Device daemon.info hcid[2411]: Unregister 
+path:/org/bluez/hci0
+Mar 27 13:02:21 Device daemon.info hcid[2411]: Device hci0 has been removed
+Mar 27 13:02:21 Device daemon.err hcid[2423]: Can't init device hci0: 
+Connection timed out (110)
+
+One trace appears when the device is unplugged :
+hci_usb_intr_rx_submit: hci0 intr rx submit failed urb c3d70bd4 err -19
+
+Any pointer is welcome,
+
+Best regards,
+
+Frederic
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
