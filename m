@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <b621074b0704020400r2e1500d5u4972031e010a05e5@mail.gmail.com>
-References: <b621074b0704020400r2e1500d5u4972031e010a05e5@mail.gmail.com>
-Date: Mon, 02 Apr 2007 13:03:16 +0200
-Message-Id: <1175511796.5815.329.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Usage of fcntl for non blocking mode...
+From: Sumeet VERMA <sumeet.verma@st.com>
+To: <bluez-users@lists.sf.net>
+Date: Mon, 2 Apr 2007 17:00:04 +0530
+Message-ID: <00e001c7751a$42c932f0$8935c70a@dlh.st.com>
+MIME-Version: 1.0
+Subject: [Bluez-users] hcidump-1.34 startup problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,35 +18,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Tushar,
+Hi 
+I am using bluez-hcidump-1.34.
+Its installed properly but when I try to run it , it gives and error
 
-> I'm getting some problem while using Bluez hci function calls. The
-> pseudo code is as under:
-> 
-> ...
-> devId = hci_devid(addr);
-> sock = hci_open_dev(devId);
-> ...
-> fcntl(sock, F_SETFL, O_NONBLOCK); /** whats the problem ??? */
-> ...
-> hci_read_local_name(sock, size, name, 0)
-> ....
-> 
-> 
-> If I comment call to fcntl()  , I get correct name of device by using
-> hci_read_local_name() function. 
-> But if the call is made to fcntl(),  subsequent  calls of hci_*
-> function does not work properly. In fact hci_read_local_name()
-> returns  null name.  
-> Any idea what is the problem with usage of  fcntl() this way ?
+[root@dlhl0330 3.9]# hcidump -X -V
+hcidump: error while loading shared libraries: libbluetooth.so.2: cannot open shared object file. No such file or directory
+[root@dlhl0330 3.9]#
 
-I never tried to have a non-blocking HCI socket. And I have no idea why
-you actually need it. It is better to use the D-Bus API anyway.
+libluetooth.so.2->libbluetooth.so.2.5.0 in /usr/local/lib
 
-Regards
+Regards,
 
-Marcel
-
+Sumeet 
 
 
 -------------------------------------------------------------------------
