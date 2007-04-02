@@ -1,9 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 03 Apr 2007 10:21:33 +1200
-To: "bluez-devel@lists.sourceforge.net" <bluez-devel@lists.sourceforge.net>
-From: "Jasper Mackenzie" <jasper@treshna.com>
+Message-ID: <46116CA8.20008@xmission.com>
+Date: Mon, 02 Apr 2007 14:50:48 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Message-ID: <op.tp6gd7zomz9ilx@rayleigh>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <op.tp58g0h8mz9ilx@rayleigh>
+In-Reply-To: <op.tp58g0h8mz9ilx@rayleigh>
 Subject: Re: [Bluez-devel] Help getting Plugz going
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -18,48 +20,45 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Thanks Brad,
+Jasper
 
-> fwiw, I made some improvements and put a line in the asound.conf that
+> The I did see this, but it left me with a few questions that I couldnt  
+> resolve:
+>   "If you base your .asoundrc on the example alsa-plugins/asound.conf from  
+> cvs,
+>    you can edit it and add your SCO headset address. Then change the alsa d
+>    evice in xmms to headset and run /usr/bin/headsetd.
+>    You should be able to use the headset at this point"
+> 
+> I dont have the .asoundrc from cvs, just the example provided with the  
+> bluetooth-alsa source,
+>   and looking at the file i wasn't sure where to add the headset adress,
+> also
+> I started /usr/bin/headsetd but what then?
+
+fwiw, I made some improvements and put a line in the asound.conf that 
 should help you see where to put the address.
 
-That did the trick.
-  AsI was testing over ssh I cant hear if audio actually came out or not.
-If tomorrow when I go and try it for real and no sound comes out the  
-headset, asre there any other things I can try to get it to work?
+> Do i need to connect the headset with hcitool cc <addr>, i did this with  
+> no success
+> Is the idea that headsetd, like with hidd, connects automatically when it  
+> sees the headset?
+>   Sorry Ime not sure how to connect once headsetd is running.
 
-mplayer spat out the following as it played, is this normal?:
+headsetd will connect on demand when you use the audio device.
 
-DEBUG: _snd_pcm_sco_open: Starting pcm_sco plugin.
-DEBUG: _snd_pcm_sco_open: Open mode is for Playback.
-DEBUG: _snd_pcm_sco_open: opened as ioplug=0x8544588, pcm=0x85446c8,  
-ioplug->callback = 0xb7f3e740
-DEBUG: sco_prepare: Preparing with io->period_size = 24, io->buffer_size =  
-48
-AO: [alsa] 8000Hz 1ch s16le (2 bytes per sample)
-Video: no video
-Starting playback...
-DEBUG: sco_pointer: returning bt_headset->hw_ptr=0
-DEBUG: sco_pointer: returning bt_headset->hw_ptr=0
-DEBUG: sco_write: areas->step=16, areas->first=0, offset=0, size=48,  
-io->nonblock=0
-DEBUG: sco_write: time: seconds=1175551211 nseconds=475464284
-DEBUG: sco_write: returning 24
-DEBUG: sco_start:
-DEBUG: sco_pointer: returning bt_headset->hw_ptr=24
-DEBUG: sco_write: areas->step=16, areas->first=0, offset=24, size=24,  
-io->nonblock=0
-DEBUG: sco_write: time: seconds=1175551211 nseconds=476009046
-DEBUG: sco_write: returning 24
-etc...
+after your address is in .asoundrc, you can launch an alsa client and 
+set the alsa device to "headset" and try to use it. see the build page. 
+most clients don't let you easily choose this device.
 
-> most clients don't let you easily choose this device.
+> Are there any diagnostics that i can run to get an idea where the process  
+> is failing?
 
-  Is there any workaround for Skype, the only application she wants this  
-for? Like a virtual device or something?
-I cant even find a .skype directory, sneaky skype
+hcidump -X -V will have a lot of output, but in the dump you'll find the 
+occasional gem to figure out what is happening. I run it, try to do the 
+operation that is failing, then stop the dump and examine its output.
 
-Jasper
+brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
