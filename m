@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <004a01c77526$59aebf60$c301a8c0@Bahubali>
-From: "vikram" <vikram.bidkar@adamya.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Mon, 2 Apr 2007 18:26:34 +0530
+Message-ID: <e1effdeb0704020514j39031a5cq8a74247e13614434@mail.gmail.com>
+Date: Mon, 2 Apr 2007 09:14:42 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <009501c774ef$78f86920$8935c70a@dlh.st.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] ./hcid problem
+References: <1175348763.5815.256.camel@violet>
+	<009501c774ef$78f86920$8935c70a@dlh.st.com>
+Subject: Re: [Bluez-users] hcid not working - bluez 3.9
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,83 +17,102 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1588693039=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+On 4/2/07, Sumeet VERMA <sumeet.verma@st.com> wrote:
+> Hi Marcel,
+> How would I know that the system bus is up and running? Basically I think
+> the problem is the socket system_bus_socket is created in /var/run/dbus
+> instead of /usr/local/var/run/dbus.
+>
+> I tried to configure the dbus-0.61 package with the following string
+>
+> ./configure --prefix=/usr/local --disable-gtk --disable-selinux
+> --with-session-socket-dir=/usr/local/var/run/dbus
+> --with-dbus-user=messagebus --with-test-socket-dir=/usr/local/var/run/dbus
+> But still it doesn't work.
+>
+> Any pointers?
+>
+> Regards,
+>
+> Sumeet
 
---===============1588693039==
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0047_01C77554.71535DA0"
+Hi Sumeet,
 
-This is a multi-part message in MIME format.
+Here are my message BUS processes  running:
 
-------=_NextPart_000_0047_01C77554.71535DA0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+1001      4725     1  0 08:36 ?        00:00:00 /usr/bin/dbus-daemon
+--fork --print-pid 8 --print-address 6 --session
+104       6791     1  0 09:07 ?        00:00:00 /usr/bin/dbus-daemon --system
 
-Hi All,
+Check the following lock file in order to verify if the system BUS is running:
+/var/run/dbus/pid
 
-I am getting following error message when
-I run ./hcid
+Remove this file if the system message BUS is not running and execute
+"dbus-daemon --system"
 
-"Could not become the primary owner of org.bluez"
-"Unable to get on D-Bus"
-
-Any budy know the solution.
-
-Regards,
-Vikram
-------=_NextPart_000_0047_01C77554.71535DA0
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.2800.1586" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi All,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV>I am getting following error message when<BR>I run =
-./hcid<BR><BR>"Could not=20
-become the primary owner of org.bluez"<BR>"Unable to get on D-Bus"</DIV>
-<DIV>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Any budy know the =
-solution.</FONT><BR></DIV>
-<DIV><FONT face=3DArial size=3D2>Regards,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Vikram</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0047_01C77554.71535DA0--
+BR,
+Claudio.
+-- 
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
 
-
---===============1588693039==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> -----Original Message-----
+> From: bluez-users-bounces@lists.sourceforge.net
+> [mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Marcel
+> Holtmann
+> Sent: Saturday, March 31, 2007 7:16 PM
+> To: BlueZ users
+> Subject: Re: [Bluez-users] hcid not working - bluez 3.9
+>
+> Hi Sumeet,
+>
+> > I have been trying to bring up bluez-utils-3.9 and hcid is not
+> > working. It says
+> >
+> > [root@dlhl0330 tools]# hcid -n
+> > hcid[29560]: Bluetooth HCI daemon
+> > hcid[29560]: Can't connect to system message bus: Failed to connect to
+> > socket /usr/local/var/run/dbus/system_bus_socket: No such file or
+> > directory
+> > hcid[29560]: Unable to get on D-Bus
+> >
+> > I have looked into the mailing list and followed the mentioned
+> > procedure. I have installed dbus-0.61 and started the system bus by
+> > calling dbus-launch
+> >
+> > [root@dlhl0330 dbus]# dbus-launch
+> > DBUS_SESSION_BUS_ADDRESS='unix:abstract=/tmp/dbus-
+> > BcAG8pbfI2,guid=adea0b46b6c8607cd9bc4162ffe90200';
+> > DBUS_SESSION_BUS_PID=29606;
+> > [root@dlhl0330 dbus]#
+> >
+> > I can see the dbus-daemon running when is do ps -e
+> >
+> > system_bus_socket is present at the location
+> > /var/run/dbus/system_bus_socket Is there any way I can configure hcid
+> > to take the system_bus_socket from /var/run/dbus instead of
+> > /usr/local/var/run/dbus
+>
+> the session bus is not the same as the system bus. You need a running system
+> bus for hcid. And normally your distribution ensures that it is setup
+> correctly.
+>
+> Regards
+>
+> Marcel
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1588693039==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1588693039==--
