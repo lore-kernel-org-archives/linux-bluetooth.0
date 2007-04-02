@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 03 Apr 2007 07:30:26 +1200
-To: bluez-devel <bluez-devel@lists.sourceforge.net>
-From: "Jasper Mackenzie" <jasper@treshna.com>
-MIME-Version: 1.0
-Message-ID: <op.tp58g0h8mz9ilx@rayleigh>
-Subject: Re: [Bluez-devel] Help getting Plugz going
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4604B9F2.5040808@xmission.com>
+References: <45FE8B0B.20500@xmission.com>
+	<1174486267.15638.25.camel@aeonflux.holtmann.net>
+	<4604B9F2.5040808@xmission.com>
+Date: Mon, 02 Apr 2007 17:36:38 +0200
+Message-Id: <1175528198.5815.362.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] new sco flowcontrol patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,41 +22,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Brad,
 
-Cheers Brad,
-> it sounds like you didn't see this one
-> http://bluetooth-alsa.sourceforge.net/build.html
+> > The biggest thing however is hci_sched_sco(). This function is ugly as
+> > hell and basically unreadable. Please use break or continue instead of
+> > cascaded if clauses. I am not gonna review this piece of the patch until
+> > that is fixed.
+> 
+> I fixed a few whitespace problems and changed hci_sched_sco so it didn't 
+> get deep into nested if's. How does it look now?
 
-The I did see this, but it left me with a few questions that I couldnt  
-resolve:
-  "If you base your .asoundrc on the example alsa-plugins/asound.conf from  
-cvs,
-   you can edit it and add your SCO headset address. Then change the alsa d
-   evice in xmms to headset and run /usr/bin/headsetd.
-   You should be able to use the headset at this point"
+please also fix the other coding style issues. Some comments and a lot
+of if clauses are violating the whitespace requirements. It is "if ("
+and not "if(". It is also "(char *) &val" and not "(char *)&val".
 
-I dont have the .asoundrc from cvs, just the example provided with the  
-bluetooth-alsa source,
-  and looking at the file i wasn't sure where to add the headset adress,
-also
-I started /usr/bin/headsetd but what then?
-Do i need to connect the headset with hcitool cc <addr>, i did this with  
-no success
-Is the idea that headsetd, like with hidd, connects automatically when it  
-sees the headset?
-  Sorry Ime not sure how to connect once headsetd is running.
+And the code in sco_sock_queue_rcv_skb() is bad. We don't initialize
+variables if not really needed. In this case if skb_queue_len() check
+fails simply call return -ENOMEM. Strip the label and call return 0 at
+the end of the function. Don't make the code more complex than it
+actually is.
 
-Are there any diagnostics that i can run to get an idea where the process  
-is failing?
+And no forward declaration of sco_sock_queue_rcv_skb() if not really
+needed.
 
-> also, the sco flowcontrol patch should be applied even if you are using
-the btsco method.
+Why are we using SCO_TXBUFS and not reuse SO_SNDBUF since the value is
+directly mapped to sk_sndbuf. Same applies to sk_rcvbuf.
 
-I did, it didnt make too much difference.
+And why do we have to do "c->tx_timer.function = hci_sco_tx_timer" over
+and over again. Isn't it enough if we set the timer function once after
+init of the timer.
 
-Thank you.
+Regards
 
-Jasper
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
