@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY124-W295176865528AD17A86AF3F0600@phx.gbl>
-From: Robert Rawlins <robert_rawlins@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Mon, 2 Apr 2007 07:41:19 +0000
+From: Sumeet VERMA <sumeet.verma@st.com>
+To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
+Date: Mon, 2 Apr 2007 11:53:47 +0530
+Message-ID: <009501c774ef$78f86920$8935c70a@dlh.st.com>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] Pyhton - ImportError: No module named dbus
+In-Reply-To: <1175348763.5815.256.camel@violet>
+Subject: Re: [Bluez-users] hcid not working - bluez 3.9
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,98 +15,91 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1783350009=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1783350009==
-Content-Type: multipart/alternative;
-	boundary="_fab741a6-15f7-4757-8cd3-efd2b6a85fd5_"
+Hi Marcel,
+How would I know that the system bus is up and running? Basically I think
+the problem is the socket system_bus_socket is created in /var/run/dbus
+instead of /usr/local/var/run/dbus.
 
---_fab741a6-15f7-4757-8cd3-efd2b6a85fd5_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+I tried to configure the dbus-0.61 package with the following string
 
-Hello Guys,
-=20
-A little bit of an update on this situation. I've installed the dbus-glib p=
-ackage for my slackware build and i've also compiled and installed dbus-pyt=
-hon-0.80.2 from source using the usual './configure', 'make' ,'make install=
-' method. I got a few 'warnings' during the installation, but it appears to=
- have run to completion without an error.
-=20
-I'm still getting this error when i try and run my python file though, is t=
-here anything else that i'm missing?
-=20
-Thanks,
-=20
-Rob
-_________________________________________________________________
-Try Live.com - your fast, personalized homepage with all the things you car=
-e about in one place.
-http://www.live.com/getstarted=
+./configure --prefix=/usr/local --disable-gtk --disable-selinux
+--with-session-socket-dir=/usr/local/var/run/dbus
+--with-dbus-user=messagebus --with-test-socket-dir=/usr/local/var/run/dbus 
+But still it doesn't work.
 
---_fab741a6-15f7-4757-8cd3-efd2b6a85fd5_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Any pointers?
 
-<html>
-<head>
-<style>
-P
-{
-margin:0px;
-padding:0px
-}
-body
-{
-FONT-SIZE: 10pt;
-FONT-FAMILY:Tahoma
-}
-</style>
-</head>
-<body>Hello Guys,<BR>
-&nbsp;<BR>
-A little bit of an update on this situation. I've installed the dbus-glib p=
-ackage for my slackware build and i've also compiled and installed dbus-pyt=
-hon-0.80.2 from source using the usual './configure', 'make' ,'make install=
-' method. I got a few 'warnings' during the installation, but it appears to=
- have run to completion without an error.<BR>
-&nbsp;<BR>
-I'm still getting this error when i try and run my python file though, is t=
-here anything else that i'm missing?<BR>
-&nbsp;<BR>
-Thanks,<BR>
-&nbsp;<BR>
-Rob<BR><br /><hr />Express yourself instantly with Windows Live Messenger, =
-the future of MSN Messenger! <a href=3D'http://imagine-msn.com/messenger/la=
-unch/en-GB/' target=3D'_new'>Windows Live Messenger, the future of MSN Mess=
-enger!</a></body>
-</html>=
+Regards,
 
---_fab741a6-15f7-4757-8cd3-efd2b6a85fd5_--
+Sumeet 
+-----Original Message-----
+From: bluez-users-bounces@lists.sourceforge.net
+[mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Marcel
+Holtmann
+Sent: Saturday, March 31, 2007 7:16 PM
+To: BlueZ users
+Subject: Re: [Bluez-users] hcid not working - bluez 3.9
+
+Hi Sumeet,
+
+> I have been trying to bring up bluez-utils-3.9 and hcid is not 
+> working. It says
+> 
+> [root@dlhl0330 tools]# hcid -n
+> hcid[29560]: Bluetooth HCI daemon
+> hcid[29560]: Can't connect to system message bus: Failed to connect to 
+> socket /usr/local/var/run/dbus/system_bus_socket: No such file or 
+> directory
+> hcid[29560]: Unable to get on D-Bus
+> 
+> I have looked into the mailing list and followed the mentioned 
+> procedure. I have installed dbus-0.61 and started the system bus by 
+> calling dbus-launch
+> 
+> [root@dlhl0330 dbus]# dbus-launch
+> DBUS_SESSION_BUS_ADDRESS='unix:abstract=/tmp/dbus-
+> BcAG8pbfI2,guid=adea0b46b6c8607cd9bc4162ffe90200';
+> DBUS_SESSION_BUS_PID=29606;
+> [root@dlhl0330 dbus]#
+> 
+> I can see the dbus-daemon running when is do ps -e
+> 
+> system_bus_socket is present at the location 
+> /var/run/dbus/system_bus_socket Is there any way I can configure hcid 
+> to take the system_bus_socket from /var/run/dbus instead of 
+> /usr/local/var/run/dbus
+
+the session bus is not the same as the system bus. You need a running system
+bus for hcid. And normally your distribution ensures that it is setup
+correctly.
+
+Regards
+
+Marcel
 
 
---===============1783350009==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+
+-------------------------------------------------------------------------
+Take Surveys. Earn Cash. Influence the Future of IT Join SourceForge.net's
+Techsay panel and you'll get the chance to share your opinions on IT &
+business topics through brief surveys-and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1783350009==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1783350009==--
