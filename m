@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Mon, 02 Apr 2007 23:12:48 +1200
-To: bluez-devel@lists.sourceforge.net
-From: "Jasper Mackenzie" <jasper@treshna.com>
-MIME-Version: 1.0
-Message-ID: <op.tp5lfmu1mz9ilx@rayleigh>
-Subject: [Bluez-devel] Help getting Plugz going
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4610DF4D.4040003@access-company.com>
+References: <4610D098.1030805@access-company.com>
+	<1175510111.5815.310.camel@violet>
+	<4610DF4D.4040003@access-company.com>
+Date: Mon, 02 Apr 2007 12:54:54 +0200
+Message-Id: <1175511294.5815.327.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Running bluez on vmware?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,48 +22,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Gidday.
+Hi Frederic,
 
-I am trying to get a JABRA BT135 working on my mums laptop with limited  
-success.
+> Aside from vmware, we also tried qemu and the dongle was working, but it 
+> was very slow. The whole emulator was locked and reacted from time to 
+> time, thus we could do a discovery in 5 minutes... We were told this was 
+> a qemu issue which used blocking IO, but an irda usb device was working 
+> correctly.
 
-Currently the older btsco way is 1/2 working, with mic working, poor  
-quality, but working.
-  The 'speaker' bit ... reciving audio is not working, as in theres no  
-sound just a faint hiss, that starts and stops when the audio starts and  
-stops, with beeps from the headest at appropriate times to indicate that  
-it was recieving audio.
-  btsco was run and compiled as per the Download and build instructions.
+depends on how the IrDA dongles works. If it only uses bulk endpoints
+than this is quite clear. Bluetooth uses an interrupt endpoint for the
+HCI events and this includes command status and command complete to
+report the number of completed packets.
 
-Due to the poor recording quality and the lack of playback, i figured that  
-plugz would be the way to go.
+I never looked at the details of the Qemu implementation, but if it
+doesn't use the async URB interface then you have problems. VMware is
+using this interface and normally works quite good. You might wanna
+simply try out VMware Workstation 6.0 beta something.
 
-I googled as much as i could for a more comprehensive howto on install ing  
-and running Plugz, but only returned howtos for the btsco method,
-Hence I am asking for help as to how to setup Plugz for an almost idiot.
+Regards
 
-What I tried:
-  almost built from source, until i saw that debian has a bluetooth-alsa  
-package (Debian Unstable)
-copied .asoundrc to the home and root directories, ran headsetd -n
-then tried to connect to the headset via various methods. Sorry dont have  
-the box on hand, so i cant say what exact command i used to try and  
-connect to the headset, but none of them produced any output from  
-headsetd, and none produced any audio in te headset.
+Marcel
 
-I wasnt sure whether or not I was to put the mac address of the headset in  
-the asoundrc file or not, and if so where. it looked like these things  
-were inherited from environmental variables.
 
-so major concerns: what to do with asoundrc, how to run headsetd, and  
-connect to headset.
-
-The bluetooth adaptor is a D-Link cf card in a pcmcia converter, it is the  
-HCI type (CSR) .. sorry all from crappy memory)
-
-TIA
-
-Jasper
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
