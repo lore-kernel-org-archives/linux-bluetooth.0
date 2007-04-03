@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4612C2CB.7060905@xmission.com>
-Date: Tue, 03 Apr 2007 15:10:35 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <45EF0B04.2080303@xmission.com>
-	<200703101746.46586.bluez-devel@huitl.de>
-In-Reply-To: <200703101746.46586.bluez-devel@huitl.de>
-Subject: Re: [Bluez-devel] sbc encoder work
+In-Reply-To: <4612C15D.2080900@xmission.com>
+References: <45FE8B0B.20500@xmission.com>
+	<1174486267.15638.25.camel@aeonflux.holtmann.net>
+	<4604B9F2.5040808@xmission.com> <1175528198.5815.362.camel@violet>
+	<4612C15D.2080900@xmission.com>
+Date: Tue, 03 Apr 2007 23:08:47 +0200
+Message-Id: <1175634527.5815.409.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] new sco flowcontrol patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,22 +23,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Robert
+Hi Brad,
 
-> Very nice work! I have the new code running for half an hour now with no 
-> issues and greatly improved volume. There are some clicks occasionally, but 
-> no more than I had with the old code (maybe even less). I have some sound 
-> file that used to produce more clicks than any other, but cannot remember its 
-> name at the moment. I will try it as soon as I remember... :)
+> > And why do we have to do "c->tx_timer.function = hci_sco_tx_timer" over
+> > and over again. Isn't it enough if we set the timer function once after
+> > init of the timer.
+> 
+> should this happen directly inside hci_conn.c or through something like 
+> a notification?
+> 
+> To use it in hci_conn I'd want to move the definition of the function 
+> there too but that may not be the right fit.
 
-I've tried creating audio files that produce the click but everything I
-have works fine.
+actually hci_sco_tx_timer() should be in hci_conn.c. There is no need to
+put that into hci_core.c and make this so complex.
 
-Can you contact me offlist so I can get one of the problematic audio
-files from you?
+Regards
 
-thanks
-Brad
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
