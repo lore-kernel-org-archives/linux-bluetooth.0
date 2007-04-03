@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4612C15D.2080900@xmission.com>
+Date: Tue, 03 Apr 2007 15:04:29 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4612C15D.2080900@xmission.com>
-References: <45FE8B0B.20500@xmission.com>
-	<1174486267.15638.25.camel@aeonflux.holtmann.net>
-	<4604B9F2.5040808@xmission.com> <1175528198.5815.362.camel@violet>
-	<4612C15D.2080900@xmission.com>
-Date: Tue, 03 Apr 2007 23:08:47 +0200
-Message-Id: <1175634527.5815.409.camel@violet>
-Mime-Version: 1.0
+References: <45FE8B0B.20500@xmission.com>	<1174486267.15638.25.camel@aeonflux.holtmann.net>	<4604B9F2.5040808@xmission.com>
+	<1175528198.5815.362.camel@violet>
+In-Reply-To: <1175528198.5815.362.camel@violet>
 Subject: Re: [Bluez-devel] new sco flowcontrol patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -23,24 +21,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad,
-
-> > And why do we have to do "c->tx_timer.function = hci_sco_tx_timer" over
-> > and over again. Isn't it enough if we set the timer function once after
-> > init of the timer.
-> 
-> should this happen directly inside hci_conn.c or through something like 
-> a notification?
-> 
-> To use it in hci_conn I'd want to move the definition of the function 
-> there too but that may not be the right fit.
-
-actually hci_sco_tx_timer() should be in hci_conn.c. There is no need to
-put that into hci_core.c and make this so complex.
-
-Regards
-
 Marcel
+
+> And why do we have to do "c->tx_timer.function = hci_sco_tx_timer" over
+> and over again. Isn't it enough if we set the timer function once after
+> init of the timer.
+
+should this happen directly inside hci_conn.c or through something like 
+a notification?
+
+To use it in hci_conn I'd want to move the definition of the function 
+there too but that may not be the right fit.
+
+Brad
+
 
 
 
