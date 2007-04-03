@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <46128D1E.2050609@xmission.com>
+Date: Tue, 03 Apr 2007 11:21:34 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20070331152530.GA12829@jh-mbp>
-References: <45F16630.9000606@access-company.com>
-	<460D363F.9010709@access-company.com>
-	<1175271188.5815.225.camel@violet> <20070331152530.GA12829@jh-mbp>
-Date: Tue, 03 Apr 2007 21:05:56 +0200
-Message-Id: <1175627156.5815.402.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] RemoteNameRequested signal during discovery patch
+References: <30ed240e0704030441o2bf1033fjd48ee48126da20f@mail.gmail.com>
+In-Reply-To: <30ed240e0704030441o2bf1033fjd48ee48126da20f@mail.gmail.com>
+Subject: Re: [Bluez-devel] problems with getting Plan tronics M1000 to pair
+ on Ubuntu system
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,22 +21,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Johan,
+Brett
 
-> > > A new version of the patch.
-> > > Are you okay with it ?
-> > 
-> > the patch looks okay to me. However I prefer if Claudio or Johan can
-> > have an additional look.
-> 
-> Looks good to me.
+> I tried pairing and then tried a connect - do I have a PIN issue?
 
-feel free to commit it to the CVS then.
+i got something similar when bluez-passkey-gnome needed to be installed
 
-Regards
-
-Marcel
-
+brad
 
 
 -------------------------------------------------------------------------
