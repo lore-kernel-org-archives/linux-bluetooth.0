@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <4611B40A.901@redhat.com>
+Date: Mon, 02 Apr 2007 21:55:22 -0400
+From: Alan Conway <aconway@redhat.com>
 MIME-Version: 1.0
-Date: Tue, 3 Apr 2007 16:50:33 +0100
-Message-ID: <0DD4EA5DCF754A409C4E182C758C37F33DE1BF@tigris.empics.co.uk>
-From: "Steve Drew" <steve.drew@paphotos.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Bluetooth parings on dual-boot
+To: BlueZ users <bluez-users@lists.sourceforge.net>, mdz@ubuntu.com
+References: <20070311203223.GP8187@alcor.net>	<20070311205548.GQ8187@alcor.net>
+	<45F58229.50403@redhat.com>	<20070322031835.GJ7472@alcor.net>
+	<20070322045752.GM7472@alcor.net>
+In-Reply-To: <20070322045752.GM7472@alcor.net>
+Content-Type: multipart/mixed; boundary="------------010101030007020300070001"
+Subject: Re: [Bluez-users] Plantronics 510 headset: playback partially works,
+ but not recording
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,122 +20,2916 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1795654824=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 This is a multi-part message in MIME format.
+--------------010101030007020300070001
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
---===============1795654824==
-Content-class: urn:content-classes:message
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C77607.CD690C2C"
+Matt Zimmerman wrote:
+>>> Update on my attempts, I've established the setup that almost works. By 
+>>> almost works I mean:
+>>> - aplay, arecord -D headset work, quality is fine for telephone use.
+>>>       
+>> Interesting, so recording works for you?  I wonder what's different about
+>> your setup.
+>>     
+>
+> Could you send me an hcidump -V trace of you capturing with arecord?  I'd
+> like to compare it to what I see here.
+>
+>   
+Attached. This is based on the plugz headsetd updated from CVS today. 
+Seems to work fine with aplay/arecord for short segments. I haven't 
+tried it for long periods, I found the btsco daemon works for a few 
+seconds with skype and then falls over. I haven't made any headway using 
+headsetd with skype as yet. Tried with aoss and it sends skype into a 
+80% CPU tailspin. I noticed some comments about kernel patches, which I 
+haven't applied - next step.
 
-This is a multi-part message in MIME format.
+Any breakthroughs at your end?
 
-------_=_NextPart_001_01C77607.CD690C2C
+Cheers,
+Alan.
+
+
+--------------010101030007020300070001
 Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ name="hcidump-V.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="hcidump-V.txt"
 
-Hi,
-=20
-I'm having a problem with my dual boot laptop, and my google skills seem
-to be failing me, was wondering if anyone had come across this before or
-had any suggestions.
-=20
-The laptops are dual booting XP (sp2) and SuSE 10.2 ( 2.6.18.2 kernel,
-bluez 3.7.14)
-=20
-The phone (Nokia 6680) pairs and work correctly for dial up networking,
-but once it has been paired for use under XP, it has to be repaired
-under Linux (and vice versa).=20
-=20
-The laptop has a different Bluetooth hostname under XP and SuSE, but the
-problem still occurs. Is there anyway round this, or am I going to have
-to do this due to the same Bluetooth MAC of the adapter in the laptop?
-=20
-I've also used the same key when pairing the phone under XP and SusE but
-again the problem occurs.=20
-=20
-Any suggestions etc gratefully received.=20
-=20
-Thanks
-=20
-steve
-=20
+[aconway@scooter plugz]$ sudo /usr/sbin/hcidump -V
+HCI sniffer - Bluetooth packet analyzer ver 1.32
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr 00:03:89:95:9C:83 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 
+> HCI Event: Command Status (0x0f) plen 4
+    Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> HCI Event: Role Change (0x12) plen 8
+    status 0x00 bdaddr 00:03:89:95:9C:83 role 0x01
+    Role: Slave
+> HCI Event: Link Key Request (0x17) plen 6
+    bdaddr 00:03:89:95:9C:83
+< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+    bdaddr 00:03:89:95:9C:83 key 9C41F25A23B0BCFC83C46577F77F7E6D
+> HCI Event: Command Complete (0x0e) plen 10
+    Link Key Request Reply (0x01|0x000b) ncmd 1
+    status 0x00 bdaddr 00:03:89:95:9C:83
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 6 bdaddr 00:03:89:95:9C:83 type ACL encrypt 0x01
+< ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+    handle 6
+> HCI Event: Command Status (0x0f) plen 4
+    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+    handle 6 policy 0x0f
+    Link policy: RSWITCH HOLD SNIFF PARK 
+> HCI Event: Command Complete (0x0e) plen 6
+    Write Link Policy Settings (0x02|0x000d) ncmd 1
+    status 0x00 handle 6
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:03:89:95:9C:83 mode 2 clkoffset 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6 packets 1
+> ACL data: handle 6 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x005a scid 0x0040 result 1 status 2
+      Connection pending - Authorization pending
+> HCI Event: Read Remote Supported Features (0x0b) plen 11
+    status 0x00 handle 6
+    Features: 0xbc 0xe8 0x01 0x00 0x18 0x18 0x00 0x00
+> ACL data: handle 6 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x005a scid 0x0040 result 0 status 0
+      Connection successful
+< ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x005a flags 0x00 clen 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6 packets 1
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+    status 0x00 bdaddr 00:03:89:95:9C:83 name 'PLT 510 v.G'
+> ACL data: handle 6 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+> ACL data: handle 6 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 48 
+< ACL data: handle 6 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x005a flags 0x00 result 0 clen 4
+      Success
+      MTU 48 
+< ACL data: handle 6 flags 0x02 dlen 24
+    L2CAP(d): cid 0x005a len 20 [psm 1]
+        SDP SSA Req: tid 0x0 len 0xf
+          pat uuid-16 0x1108 (Headset)
+          max 65535
+          aid(s) 0x0000 - 0xffff
+          cont 00
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6 packets 2
+> ACL data: handle 6 flags 0x02 dlen 27
+> ACL data: handle 6 flags 0x01 dlen 25
+    L2CAP(d): cid 0x0040 len 48 [psm 1]
+        SDP SSA Rsp: tid 0x0 len 0x2b
+          count 38
+          cont 02 00 30
+< ACL data: handle 6 flags 0x02 dlen 26
+    L2CAP(d): cid 0x005a len 22 [psm 1]
+        SDP SSA Req: tid 0x1 len 0x11
+          pat uuid-16 0x1108 (Headset)
+          max 65535
+          aid(s) 0x0000 - 0xffff
+          cont 02 00 30
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6 packets 1
+> ACL data: handle 6 flags 0x02 dlen 27
+> ACL data: handle 6 flags 0x01 dlen 25
+    L2CAP(d): cid 0x0040 len 48 [psm 1]
+        SDP SSA Rsp: tid 0x1 len 0x2b
+          count 38
+          cont 02 00 0A
+< ACL data: handle 6 flags 0x02 dlen 26
+    L2CAP(d): cid 0x005a len 22 [psm 1]
+        SDP SSA Req: tid 0x2 len 0x11
+          pat uuid-16 0x1108 (Headset)
+          max 65535
+          aid(s) 0x0000 - 0xffff
+          cont 02 00 0A
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6 packets 1
+> ACL data: handle 6 flags 0x02 dlen 22
+    L2CAP(d): cid 0x0040 len 18 [psm 1]
+        SDP SSA Rsp: tid 0x2 len 0xd
+          count 10
+          record #0
+              aid 0x0000 (SrvRecHndl)
+                 uint 0x10000
+              aid 0x0001 (SrvClassIDList)
+                 < uuid-16 0x1108 (Headset) uuid-16 0x1203 (Audio) >
+              aid 0x0004 (ProtocolDescList)
+                 < < uuid-16 0x0100 (L2CAP) > <
+                 uuid-16 0x0003 (RFCOMM) uint 0x1 > >
+              aid 0x0006 (LangBaseAttrIDList)
+                 < uint 0x656e uint 0x6a uint 0x100 >
+              aid 0x0009 (BTProfileDescList)
+                 < < uuid-16 0x1108 (Headset) uint 0x100 > >
+              aid 0x0100 (SrvName)
+                 str "Headset"
+              aid 0x0302 (unknown)
+                 bool 0x1
+          cont 00
+< ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x005a scid 0x0040
+< ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0041
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6 packets 2
+> ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x005a scid 0x0040
+> ACL data: handle 6 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x005b scid 0x0041 result 1 status 2
+      Connection pending - Authorization pending
+> ACL data: handle 6 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x005b scid 0x0041 result 0 status 0
+      Connection successful
+< ACL data: handle 6 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x005b flags 0x00 clen 4
+      MTU 1013 
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6 packets 1
+> ACL data: handle 6 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
+      Success
+> ACL data: handle 6 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
+      MTU 1013 
+< ACL data: handle 6 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x005b flags 0x00 result 0 clen 4
+      Success
+      MTU 1013 
+< ACL data: handle 6 flags 0x02 dlen 8
+    L2CAP(d): cid 0x005b len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c 
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6 packets 2
+> ACL data: handle 6 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7 
+< ACL data: handle 6 flags 0x02 dlen 18
+    L2CAP(d): cid 0x005b len 14 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+      dlci 2 frame_type 0 credit_flow 15 pri 7 ack_timer 0
+      frame_size 1008 max_retrans 0 credits 7
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6 packets 1
+> ACL data: handle 6 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0041 len 14 [psm 3]
+      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+      dlci 2 frame_type 0 credit_flow 14 pri 7 ack_timer 0
+      frame_size 127 max_retrans 0 credits 0
+< ACL data: handle 6 flags 0x02 dlen 8
+    L2CAP(d): cid 0x005b len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x59 
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6 packets 1
+> ACL data: handle 6 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92 
+< ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(d): cid 0x005b len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 0 b2 0 b3 0 len 0
+< HCI Command: Add SCO Connection (0x01|0x0007) plen 4
+    handle 6 ptype 0x00e0
+    Packet type: HV1 HV2 HV3 
+> HCI Event: Command Status (0x0f) plen 4
+    Add SCO Connection (0x01|0x0007) status 0x00 ncmd 1
+> ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0041 len 8 [psm 3]
+      RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 0 b2 0 b3 0 len 0
+< ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(d): cid 0x005b len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 0 b2 0 b3 0 len 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6 packets 2
+> ACL data: handle 6 flags 0x02 dlen 12
+    L2CAP(d): cid 0x0041 len 8 [psm 3]
+      RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+      dlci 2 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 0 b2 0 b3 0 len 0
+< ACL data: handle 6 flags 0x02 dlen 9
+    L2CAP(d): cid 0x005b len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 2 pf 1 ilen 0 fcs 0x86 credits 33
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 1 bdaddr 00:03:89:95:9C:83 type SCO encrypt 0x01
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:03:89:95:9C:83 mode 2 clkoffset 0x0000
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6 packets 1
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> ACL data: handle 6 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0041 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 0 fcs 0x5c credits 15
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+    status 0x00 bdaddr 00:03:89:95:9C:83 name 'PLT 510 v.G'
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> ACL data: handle 6 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0041 len 14 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 2 pf 0 ilen 10 fcs 0x40 
+< ACL data: handle 6 flags 0x02 dlen 14
+    L2CAP(d): cid 0x005b len 10 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 6 fcs 0x9a 
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6 packets 1
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> ACL data: handle 6 flags 0x02 dlen 19
+    L2CAP(d): cid 0x0041 len 15 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 2 pf 1 ilen 10 fcs 0x5c credits 1
+< ACL data: handle 6 flags 0x02 dlen 14
+    L2CAP(d): cid 0x005b len 10 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 6 fcs 0x9a 
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 6 packets 1
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+    handle 1 reason 0x13
+    Reason: Remote User Terminated Connection
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> HCI Event: Command Status (0x0f) plen 4
+    Disconnect (0x01|0x0006) status 0x00 ncmd 1
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> SCO data: handle 1 dlen 48
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 1 reason 0x16
+    Reason: Connection Terminated by Local Host
+sudo /usr/sbin/hcidump -V1
 
-------_=_NextPart_001_01C77607.CD690C2C
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Dus-ascii">
-<META content=3D"MSHTML 6.00.2900.3059" name=3DGENERATOR></HEAD>
-<BODY>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial=20
-size=3D2>Hi,</FONT></SPAN></DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial size=3D2>I'm =
-having a problem=20
-with my dual boot laptop, and my google skills seem to be failing me, =
-was=20
-wondering if anyone had come across this before or had any=20
-suggestions.</FONT></SPAN></DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial size=3D2>The =
-laptops are dual=20
-booting XP (sp2)&nbsp;and SuSE 10.2 ( 2.6.18.2 kernel, bluez=20
-3.7.14)</FONT></SPAN></DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial size=3D2>The =
-phone (Nokia=20
-6680) pairs and work correctly for dial up networking, but once it has =
-been=20
-paired for use under XP,&nbsp;it has to be repaired under Linux (and =
-vice=20
-versa). </FONT></SPAN></DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial size=3D2>The =
-laptop has a=20
-different Bluetooth hostname under XP and SuSE, but the problem still =
-occurs. Is=20
-there anyway round this, or am I going to have to do this due to the =
-same=20
-Bluetooth MAC of the adapter in the laptop?</FONT></SPAN></DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial size=3D2>I've =
-also used the=20
-same key when pairing the phone under XP and SusE but again the problem =
-occurs.=20
-</FONT></SPAN></DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial size=3D2>Any =
-suggestions etc=20
-gratefully received. </FONT></SPAN></DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial=20
-size=3D2>Thanks</FONT></SPAN></DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial=20
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D782155313-03042007><FONT face=3DArial=20
-size=3D2>steve</FONT></SPAN></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV></BODY></HTML>
-
-------_=_NextPart_001_01C77607.CD690C2C--
-
-
---===============1795654824==
+--------------010101030007020300070001
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -140,7 +2940,7 @@ Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1795654824==
+--------------010101030007020300070001
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -151,4 +2951,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1795654824==--
+--------------010101030007020300070001--
