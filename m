@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <80236d750704050226m1563a49dw74214b6e847c495e@mail.gmail.com>
-Date: Thu, 5 Apr 2007 11:26:46 +0200
-From: "Emanuele Novelli" <ema.novelli@gmail.com>
-To: Bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] reading RSSI value with D-Bus Api
+From: Malte Steiner <steiner@mobileart.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1175411263.23136.71.camel@aeonflux.holtmann.net>
+References: <1175260794.6213.18.camel@localhost>
+	<1175348709.5815.253.camel@violet> <1175355822.6290.3.camel@localhost>
+	<1175411263.23136.71.camel@aeonflux.holtmann.net>
+Date: Wed, 04 Apr 2007 15:05:41 +0200
+Message-Id: <1175691941.6411.7.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] belkin dongle trouble
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,93 +18,32 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1412828425=="
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1412828425==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_41029_16356545.1175765206242"
-
-------=_Part_41029_16356545.1175765206242
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hello,
-reading another post here, I saw Marcel hinted to use the inquiry from D-Bus
-API to sort the devices by their RSSI so I tried a simple test
-
-this is the part of code I'm using
-...
-
- if (dbus_message_is_signal(msg, "org.bluez.Adapter",
-"RemoteDeviceFound")) {
-          printf ("Remote Device Found Signal Received\n");
-
-             while (dbus_message_iter_get_arg_type(&iter)  !=
-DBUS_TYPE_INVALID)  {
-                 switch (dbus_message_iter_get_arg_type(&item)) {
-                     case DBUS_TYPE_STRING:  /* first pameter bdaddress */
-                      .....
-
-                     break;
-                     case DBUS_TYPE_UINT32: /* second parameter class of
-device */
-                     ........
-                    break;
-
-                     case DBUS_TYPE_INT16: /* rssi */
-                         dbus_message_iter_get_basic(&args, &rssi);
-                         printf("rssi: %d\n", rssi);
-                         break;
-
-......
-
-
-
-Now the problem is: I can read the bdaddress and the device class good, but
-the RSSI values I get from variuous devices are negatives (the are in range
--40 -90 usually). I read somewhere RSSI should range from 0 to 255 so maybe
-I'm doing something wrong ? api says the type RSSI is int16 not uint16 so I
-used a signed variable.
-
-------=_Part_41029_16356545.1175765206242
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hello,<br>reading another post here, I saw Marcel hinted to use the inquiry from D-Bus API to sort the devices by their RSSI so I tried a simple test<br><br>this is the part of code I&#39;m using<br>...<br><br>&nbsp;if (dbus_message_is_signal(msg, &quot;
-org.bluez.Adapter&quot;,&nbsp;&nbsp;&nbsp; &quot;RemoteDeviceFound&quot;)) {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; printf (&quot;Remote Device Found Signal Received\n&quot;);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; while (dbus_message_iter_get_arg_type(&amp;iter)&nbsp; !=&nbsp; DBUS_TYPE_INVALID)&nbsp; {
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; switch (dbus_message_iter_get_arg_type(&amp;item)) {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; case DBUS_TYPE_STRING:&nbsp; /* first pameter bdaddress */<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; ..... &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;  
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; break;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; case DBUS_TYPE_UINT32: /* second parameter class of device */<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ........ <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break;&nbsp;  <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; case DBUS_TYPE_INT16: /* rssi */
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; dbus_message_iter_get_basic(&amp;args, &amp;rssi);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; printf(&quot;rssi: %d\n&quot;, rssi);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; break;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>......<br><br>
-<br><br>Now the problem is: I can read the bdaddress and the device class good, but the RSSI values I get from variuous devices are negatives (the are in range -40 -90 usually). I read somewhere RSSI should range from 0 to 255 so maybe I&#39;m doing something wrong ? api says the type RSSI is int16 not uint16 so I used a signed variable.
-<br><br><br>
-
-------=_Part_41029_16356545.1175765206242--
-
-
---===============1412828425==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1412828425==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1412828425==--
+SGVsbG8sIEkgZGFyZSB0byBhc2tlIEJlbGtpbmcgc3VwcG9ydCBhYm91dCB0aGUgY2hhbmdlcyBi
+ZXR3ZWVuIHRoZQpvbGRlciBhbmQgdGhlIG5ldyBub24gd29ya2luZyBzdGlja3MsIHRoaXMgaXMg
+d2hhdCBJIGdvdCwgaXMgdGhlcmUgYW55CnZhbHVhYmxlIGluZm9ybWF0aW9uIGluIGl0PyBJdHMg
+YnJva2VuIEdlcm1hbi4uLiBidXQgSSB0aGluayBpdCBzYXlzCnRoYXQgdGhlIHdvcmtpbmcgb25l
+cyBhcmUgZmxhc2ggYmFzZWQgd2hpbGUgdGhlIG5ldyBvbmVzIGdvdCBhIFJPTToKQW50d29ydCB2
+b24gQmVsa2luCiAgICAgICAgICAgICAgICAgICAgQXByIDMgMjAwNyAxNTo1MQoKU2VociBnZWVo
+cnRlciBIZXJyIFN0ZWluZXIsCgp2aWVsZW4gRGFuayBmw7xyIElocmUgRW1haWwuIERlciB1bnRl
+cnNjaGllZCBiZWkgZGVuIFZvcmdhZW5nZXJuIGlzdCBkYXMKZGllc2UgRmxhc2ggYmFzaWVydCB3
+YXJlbiB1bmQgZGllIERFMSBST00gYmFzaWVydC4gRGEga29lbm5lbiBrZWluZQp3ZWl0ZXJlIGhp
+bGZlIGFuYmlldGVuLgoKCgpGw7xyIHdlaXRlcmUgRnJhZ2VuIHN0ZWhlbiB3aXIgSWhuZW4gZ2Vy
+bmUgdm9uIE1vbnRhZyBiaXMgRnJlaXRhZyBpbiBkZXIKWmVpdCB2b24gOTozMCBiaXMgMTg6MzAg
+enVyIFZlcmbDvGd1bmcuIAoKTWl0IGZyZXVuZGxpY2hlbiBHcsO8w59lbiwKCkphbiBNdWVuc3Rl
+cgoKQmVsa2luIFRlY2huaWNhbCBTdXBwb3J0CkV4cHJlc3MgQnVzaW5lc3MgUGFyawpTaGlwdG9u
+IFdheQpSdXNoZGVuCk5OMTAgNkdMCkVuZ2xhbmQKCjA4NDUgNjA3IDc3ODcgVW5pdGVkIEtpbmdk
+b20gJiBOSQowMTgwIDUwMDU3MDkgRGV1dHNjaGxhbmQKMDgyMCAyMDA3NjYgw5ZzdGVycmVpY2gg
+CjA4NDggMDAwMjE5IFNjaHdlaXoKCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUYWtlIFN1cnZleXMuIEVh
+cm4gQ2FzaC4gSW5mbHVlbmNlIHRoZSBGdXR1cmUgb2YgSVQKSm9pbiBTb3VyY2VGb3JnZS5uZXQn
+cyBUZWNoc2F5IHBhbmVsIGFuZCB5b3UnbGwgZ2V0IHRoZSBjaGFuY2UgdG8gc2hhcmUgeW91cgpv
+cGluaW9ucyBvbiBJVCAmIGJ1c2luZXNzIHRvcGljcyB0aHJvdWdoIGJyaWVmIHN1cnZleXMtYW5k
+IGVhcm4gY2FzaApodHRwOi8vd3d3LnRlY2hzYXkuY29tL2RlZmF1bHQucGhwP3BhZ2U9am9pbi5w
+aHAmcD1zb3VyY2Vmb3JnZSZDSUQ9REVWREVWCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdApCbHVlei11c2Vyc0Bs
+aXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMv
+bGlzdGluZm8vYmx1ZXotdXNlcnMK
