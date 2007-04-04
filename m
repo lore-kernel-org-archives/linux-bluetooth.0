@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 04 Apr 2007 14:38:36 +0200
-From: "Harald Kubota" <hkubota@gmx.net>
-Message-ID: <20070404123836.132910@gmx.net>
+Message-ID: <c49421c50704032126w37d37d47sb027ba219d9062cd@mail.gmail.com>
+Date: Wed, 4 Apr 2007 01:26:31 -0300
+From: "Loreno Oliveira" <lorenooliveira@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] dfutool  - does not work for me
+Subject: [Bluez-users] strange? behaviour reading rssi
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,45 +14,68 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1218292943=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+--===============1218292943==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_22075_27238350.1175660791629"
 
-How is dfutool supposed to work?
+------=_Part_22075_27238350.1175660791629
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-# dfutool -d /dev/bus/usb/005/025 archive abc
-Can't find any DFU devices
+Hi Marcell and list,
 
-this says it all. Does not work to read the current firmware from the USB device (a bluetooth dongle).
-Without -d parameter strace shows /dev/bus/usb/ being scanned, but that does not help either.
+I am faced with a strange (at least to me) behaviour. The scenario is: I
+have three devices close each other. Two desktops (A and B) with dongles 2.0and
+1.2 respectively, and a Nokia 770 Internet Tablet (C) with 1.2 interface.
 
-Bluetooth by itself (e.g. pairing with stereo headphones) works.
+B and C can read non zero values for RSSI form each other. In the same way,
+A and B can read RSSI from each other. However, A and C don't (a zero value
+is returned).
 
-lsusb shows:
+Is this behaviour expected??
 
-Bus 005 Device 027: ID 04dd:90f2 Sharp Corp.
-Bus 005 Device 025: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
-Bus 005 Device 001: ID 0000:0000
-Bus 004 Device 002: ID 046d:c50e Logitech, Inc. MX-1000 Cordless Mouse Receiver
-Bus 004 Device 001: ID 0000:0000
-Bus 003 Device 001: ID 0000:0000
-Bus 002 Device 001: ID 0000:0000
-Bus 001 Device 001: ID 0000:0000
 
-So what's the syntax to get the firmware out and put new firmware on it?
-According to www.remote-exploit.org updating the CSR Bluetooth dongle works, but it might be device dependent (maybe mine does not support this at all), or I must not have hci module loaded. The man page of dfutool is not very helpful (no example), and even Google does not show up any example except Atmel microcontrollers and cell phones, neither applies here.
+Regards,
 
-Harald
+Loreno
 
+------=_Part_22075_27238350.1175660791629
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi Marcell and list,<br><br>I am faced with a strange (at least to me) behaviour. The scenario is: I have three devices close each other. Two desktops (A and B) with dongles 2.0 and 1.2 respectively, and a Nokia 770 Internet Tablet (C) with 
+1.2 interface.<br><br>B and C can read non zero values for RSSI form each other. In the same way, A and B can read RSSI from each other. However, A and C don&#39;t (a zero value is returned). <br><br>Is this behaviour expected??
+<br><br><br>Regards,<br><br>Loreno<br>
+
+------=_Part_22075_27238350.1175660791629--
+
+
+--===============1218292943==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+--===============1218292943==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1218292943==--
