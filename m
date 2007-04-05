@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Thu, 5 Apr 2007 11:43:24 +0200
-From: Stefan Seyfried <seife@suse.de>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20070405094324.GA9948@suse.de>
-MIME-Version: 1.0
-Subject: [Bluez-devel] Microsoft Bluetooth Keyboard, "missinig" keys
+In-Reply-To: <4614A31C.4010806@free2move.net>
+References: <4614A31C.4010806@free2move.net>
+Date: Thu, 05 Apr 2007 11:31:26 +0200
+Message-Id: <1175765486.5815.598.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] How to set packet-type and role from source-code?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,27 +20,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Markus,
 
-i got one of those:
+> I need to set SCO packet type to HV1 as well as I'd like to specify
+> that my device should be the "master" in a SCO connection. I known
+> that I can do this from the command-line using the hci* utilities, but
+> I'd like to set the packet-types to a known state when I initialize my
+> application (from code) and I'm sorry to say that I cannot find how to
+> go about and to that...
+> 
+> It has to be possible, but I've search through the hci_lib but without
+> success - yet ;)
+> Could someone point me in the right direction?
 
-http://www.microsoft.com/hardware/mouseandkeyboard/productdetails.aspx?pid=033
+since hciconfig and hcitool can do it, you might wanna have a look at
+their source code and see how they handle it.
 
-and it works pretty well with 2.6.21rc5, even most of the previously
-unhandled "silver" keys around the main keyboard and the wheel work fine.
-However, some of the silver keys do not work. They show up neither with
-showkey nor with evtest.
+However I can't advise you to play with the packet types at all. Leave
+them as they are. The link manager of the Bluetooth chip knows best what
+to do and what packet type to choose.
 
-I can see they do transmit something with hcidump -X -V.
+Regards
 
-So the question is: what information do i need to supply (and to whom :-)
-to make all the keys work?
+Marcel
 
--- 
-Stefan Seyfried
 
-"Any ideas, John?"
-"Well, surrounding them's out." 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
