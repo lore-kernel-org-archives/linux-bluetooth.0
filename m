@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4615D6C2.8080301@xmission.com>
-Date: Thu, 05 Apr 2007 23:12:34 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <e1effdeb0704051111x2a26674bx866114aad1bf6f0@mail.gmail.com>
+Date: Thu, 5 Apr 2007 15:11:34 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BAY107-F11C9029CAA2F0071A01144D8650@phx.gbl>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <5FD5754DDBA0B1499B5A0B4BB5419485D8E1FC@fmsmsx411.amr.corp.intel.com>
-In-Reply-To: <5FD5754DDBA0B1499B5A0B4BB5419485D8E1FC@fmsmsx411.amr.corp.intel.com>
-Subject: Re: [Bluez-devel] Plugz and btsco
+References: <BAY107-F11C9029CAA2F0071A01144D8650@phx.gbl>
+Subject: Re: [Bluez-devel] intercept new authentication events
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,27 +20,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Mark
+On 4/5/07, Adolfo Bulfoni <iaquintovski@hotmail.com> wrote:
+> Hi Marcel
+> thanks for your quick reply.
+>
+> I've checked the passkey-agent util program  in /bluez-utils/daemon/ and if
+> I try running it, an error message comes up saying there is already a
+> passkey agent running on my PC.
+> How can I intercept the events sent by this agent? What are the functions
+> that need to be called to get the output events from it?
+> A "dirty" workaround for my app might be to tail the /var/log/syslog file,
+> where the pin_code_request event is logged, together with the remote device
+> address. But I'd prefer a cleaner solution.
+> Thanks in advance,
+> regards
+>
+> Adolfo
+>
 
-> I want to make sure, if I use the plugz (with headsetd and a2dpd), I do
-> not need to
-> have the btsco daemon nor the snd_bt_sco device. Is that correct?
+Hi Adolfo,
 
-it is correct that you don't need them
+You can develop your own passkey agent. Here is a brief description
+how the passkey agent works:
+http://wiki.bluez.org/wiki/Security
 
-> I am attempting to use skype with a bluetooth headset. I am not seeing
-> the device 
-> in the menu on skype.
 
-it will not appear in the list. you have to type in the dev name or
-close skype and edit the config file
-
-> I tried using alsa's aplay, but I am getting an error saying:
-> 'channels count non available'.
-
-what command line? what does .asoundrc look like?
-
-brad
+BR,
+Claudio
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
