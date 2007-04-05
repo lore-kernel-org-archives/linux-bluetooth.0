@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4614A31C.4010806@free2move.net>
-References: <4614A31C.4010806@free2move.net>
-Date: Thu, 05 Apr 2007 11:31:26 +0200
-Message-Id: <1175765486.5815.598.camel@violet>
+In-Reply-To: <BAY107-F1712202F8AB9BFB5AC45CBD8650@phx.gbl>
+References: <BAY107-F1712202F8AB9BFB5AC45CBD8650@phx.gbl>
+Date: Thu, 05 Apr 2007 11:29:51 +0200
+Message-Id: <1175765391.5815.595.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] How to set packet-type and role from source-code?
+Subject: Re: [Bluez-devel] intercept new authentication events
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,25 +20,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Markus,
+Hi Adolfo,
 
-> I need to set SCO packet type to HV1 as well as I'd like to specify
-> that my device should be the "master" in a SCO connection. I known
-> that I can do this from the command-line using the hci* utilities, but
-> I'd like to set the packet-types to a known state when I initialize my
-> application (from code) and I'm sorry to say that I cannot find how to
-> go about and to that...
-> 
-> It has to be possible, but I've search through the hci_lib but without
-> success - yet ;)
-> Could someone point me in the right direction?
+> Hi guys, I'm developing a java apps that exploits the BlueZ stack via JNI 
+> and some C functions.
+> Now, I'd like that my app intercept the event that happens when a new remote 
+> device wants to authenticate itself with my bt dongle (i.e. wants to trigger 
+> the pair procedure).
+> I've searched in the hcitool.c file and found and found the function:
+> static int conn_list(int s, int dev_id, long arg)
+> that prints all the active connections from and to my bt dongle. But this 
+> function is not what I'm looking for, since it is not a callback function 
+> and most important it prints out all the connections (including data ones).
+> Does exist a way to know if a new remote device want to pair with my bt 
+> dongle? And if so, what are the functions I need to look at?
 
-since hciconfig and hcitool can do it, you might wanna have a look at
-their source code and see how they handle it.
-
-However I can't advise you to play with the packet types at all. Leave
-them as they are. The link manager of the Bluetooth chip knows best what
-to do and what packet type to choose.
+you can register a default passkey agent via D-Bus and then you know
+when a device wants to pair. Otherwise there are no hooks.
 
 Regards
 
