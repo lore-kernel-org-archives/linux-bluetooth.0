@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Thu, 5 Apr 2007 11:43:24 +0200
+From: Stefan Seyfried <seife@suse.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20070405094324.GA9948@suse.de>
-References: <20070405094324.GA9948@suse.de>
-Date: Thu, 05 Apr 2007 11:45:33 +0200
-Message-Id: <1175766333.5815.612.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Microsoft Bluetooth Keyboard, "missinig" keys
+Message-ID: <20070405094324.GA9948@suse.de>
+MIME-Version: 1.0
+Subject: [Bluez-devel] Microsoft Bluetooth Keyboard, "missinig" keys
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,31 +18,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Stefan,
+Hi,
 
-> i got one of those:
-> 
-> http://www.microsoft.com/hardware/mouseandkeyboard/productdetails.aspx?pid=033
-> 
-> and it works pretty well with 2.6.21rc5, even most of the previously
-> unhandled "silver" keys around the main keyboard and the wheel work fine.
-> However, some of the silver keys do not work. They show up neither with
-> showkey nor with evtest.
-> 
-> I can see they do transmit something with hcidump -X -V.
-> 
-> So the question is: what information do i need to supply (and to whom :-)
-> to make all the keys work?
+i got one of those:
 
-we might have to add another quirk to make this work. Mainly the same as
-for the USB version of this one. Ask the HID maintainer, because I am
-not really familiar with all these quirks.
+http://www.microsoft.com/hardware/mouseandkeyboard/productdetails.aspx?pid=033
 
-Regards
+and it works pretty well with 2.6.21rc5, even most of the previously
+unhandled "silver" keys around the main keyboard and the wheel work fine.
+However, some of the silver keys do not work. They show up neither with
+showkey nor with evtest.
 
-Marcel
+I can see they do transmit something with hcidump -X -V.
 
+So the question is: what information do i need to supply (and to whom :-)
+to make all the keys work?
 
+-- 
+Stefan Seyfried
+
+"Any ideas, John?"
+"Well, surrounding them's out." 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
