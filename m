@@ -1,13 +1,20 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 06 Apr 2007 06:18:17 +0200
-From: "Harald Kubota" <hkubota@gmx.net>
-In-Reply-To: <1175765581.5815.601.camel@violet>
-Message-ID: <20070406041817.177760@gmx.net>
+Message-ID: <3d3168e50704051209x3a8d6e71ia2621c90b1d3a38d@mail.gmail.com>
+Date: Thu, 5 Apr 2007 21:09:39 +0200
+From: "=?ISO-8859-2?Q?Micha=B3_Majchrowicz?=" <mmajchrowicz@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1175799497.5815.637.camel@violet>
 MIME-Version: 1.0
-References: <20070404123836.132910@gmx.net> <1175765581.5815.601.camel@violet>
-To: BlueZ users <bluez-users@lists.sourceforge.net>,
-        bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] dfutool  - does not work for me
+References: <3d3168e50704050420g3063bec4p67ccc742ab19e0bb@mail.gmail.com>
+	<1175772422.5815.626.camel@violet>
+	<3d3168e50704050736p3b243dc3tc9bc084cc983bc8e@mail.gmail.com>
+	<3d3168e50704050743u7b2b95d3q1120a628955b6bfe@mail.gmail.com>
+	<1175794717.5815.633.camel@violet>
+	<3d3168e50704051128m619b5c8bl1cbc9fd6873936d3@mail.gmail.com>
+	<1175797939.5815.635.camel@violet>
+	<3d3168e50704051139i3b1ed712qa6fe86af4645b24b@mail.gmail.com>
+	<1175799497.5815.637.camel@violet>
+Subject: Re: [Bluez-users] Random MAC/MAC Spoofing.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,20 +28,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel,
+Okay. Thanks.
+I wil contact the guy :)
 
-> However you might wanna check
-> first with "hciconfig hci0 revision" that you dongle doesn't use a ROM
-> chip. In that case DFU is not available.
-
-hciconfig says:
-
-Chip version: BlueCore4-ROM
-
-I think that means it's not working. And it would explain why dfutool did not work at all.
-Gotta find another one :-)
-
-Harald (going to Akihabara today)
+On 4/5/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Michal,
+>
+> > Is it ossible that I bought two broken dongles and before the guy sold
+> > them (without openning ) he knew that they will work in this way ?
+>
+> no. The Bluetooth device address _must_ be unique.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys-and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
