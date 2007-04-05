@@ -1,10 +1,7 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <3d3168e50704051209x3a8d6e71ia2621c90b1d3a38d@mail.gmail.com>
-Date: Thu, 5 Apr 2007 21:09:39 +0200
-From: "=?ISO-8859-2?Q?Micha=B3_Majchrowicz?=" <mmajchrowicz@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1175799497.5815.637.camel@violet>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <3d3168e50704051139i3b1ed712qa6fe86af4645b24b@mail.gmail.com>
 References: <3d3168e50704050420g3063bec4p67ccc742ab19e0bb@mail.gmail.com>
 	<1175772422.5815.626.camel@violet>
 	<3d3168e50704050736p3b243dc3tc9bc084cc983bc8e@mail.gmail.com>
@@ -13,7 +10,9 @@ References: <3d3168e50704050420g3063bec4p67ccc742ab19e0bb@mail.gmail.com>
 	<3d3168e50704051128m619b5c8bl1cbc9fd6873936d3@mail.gmail.com>
 	<1175797939.5815.635.camel@violet>
 	<3d3168e50704051139i3b1ed712qa6fe86af4645b24b@mail.gmail.com>
-	<1175799497.5815.637.camel@violet>
+Date: Thu, 05 Apr 2007 20:58:17 +0200
+Message-Id: <1175799497.5815.637.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] Random MAC/MAC Spoofing.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -28,33 +27,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Okay. Thanks.
-I wil contact the guy :)
+Hi Michal,
 
-On 4/5/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Michal,
->
-> > Is it ossible that I bought two broken dongles and before the guy sold
-> > them (without openning ) he knew that they will work in this way ?
->
-> no. The Bluetooth device address _must_ be unique.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> Take Surveys. Earn Cash. Influence the Future of IT
-> Join SourceForge.net's Techsay panel and you'll get the chance to share your
-> opinions on IT & business topics through brief surveys-and earn cash
-> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+> Is it ossible that I bought two broken dongles and before the guy sold
+> them (without openning ) he knew that they will work in this way ?
+
+no. The Bluetooth device address _must_ be unique.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
