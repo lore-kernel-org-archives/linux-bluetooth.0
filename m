@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <BAY107-F11C9029CAA2F0071A01144D8650@phx.gbl>
-From: "Adolfo Bulfoni" <iaquintovski@hotmail.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Thu, 05 Apr 2007 17:07:21 +0200
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] intercept new authentication events
+MIME-Version: 1.0
+Date: Thu, 5 Apr 2007 07:14:15 -0700
+Message-ID: <5FD5754DDBA0B1499B5A0B4BB5419485D8E1FC@fmsmsx411.amr.corp.intel.com>
+From: "Allyn, Mark A" <mark.a.allyn@intel.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Plugz and btsco
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,43 +14,45 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel
-thanks for your quick reply.
-
-I've checked the passkey-agent util program  in /bluez-utils/daemon/ and if =
-
-I try running it, an error message comes up saying there is already a =
-
-passkey agent running on my PC.
-How can I intercept the events sent by this agent? What are the functions =
-
-that need to be called to get the output events from it?
-A "dirty" workaround for my app might be to tail the /var/log/syslog file, =
-
-where the pin_code_request event is logged, together with the remote device =
-
-address. But I'd prefer a cleaner solution.
-Thanks in advance,
-regards
-
-Adolfo
-
-_________________________________________________________________
-Ami i Quiz? Mettiti alla prova con Duell Live=85Gratis su Messenger! =
-
-http://specials.it.msn.com/DuelLive.aspx
-
+Folks:
+ 
+I want to make sure, if I use the plugz (with headsetd and a2dpd), I do
+not need to
+have the btsco daemon nor the snd_bt_sco device. Is that correct?
+ 
+I am attempting to use skype with a bluetooth headset. I am not seeing
+the device 
+in the menu on skype.
+ 
+I tried using alsa's aplay, but I am getting an error saying:
+'channels count non available'.
+ 
+I tried googling, but the only emails I see are from those who have 
+installed btsco as well as plugz.
+ 
+This is why I am a little confused.
+ 
+I don't want to use btsco because there seems to be problems with the
+kernel driver
+snd-bt-sco with the 1.0.14rc3 series of alsa drivers (kernel oopses).
+ 
+Has anyone sucessfuly used skype with plugz and headsetd / a2dpd without
+either the
+btsco daemon or the snd-bt-sco kernel driver?
+ 
+Thank you
+ 
+Mark Allyn
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
-VDEV
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
