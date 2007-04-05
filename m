@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+From: Mayank BATRA <mayank.batra@st.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Thu, 5 Apr 2007 15:32:26 +0530
+Message-ID: <008c01c77769$838ff6b0$9d0cc70a@dlh.st.com>
 MIME-Version: 1.0
-Date: Thu, 5 Apr 2007 07:14:15 -0700
-Message-ID: <5FD5754DDBA0B1499B5A0B4BB5419485D8E1FC@fmsmsx411.amr.corp.intel.com>
-From: "Allyn, Mark A" <mark.a.allyn@intel.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Plugz and btsco
+In-Reply-To: <4614C6B7.9040008@free2move.net>
+Subject: Re: [Bluez-devel] How to set packet-type and role from source-code?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,35 +19,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Folks:
- 
-I want to make sure, if I use the plugz (with headsetd and a2dpd), I do
-not need to
-have the btsco daemon nor the snd_bt_sco device. Is that correct?
- 
-I am attempting to use skype with a bluetooth headset. I am not seeing
-the device 
-in the menu on skype.
- 
-I tried using alsa's aplay, but I am getting an error saying:
-'channels count non available'.
- 
-I tried googling, but the only emails I see are from those who have 
-installed btsco as well as plugz.
- 
-This is why I am a little confused.
- 
-I don't want to use btsco because there seems to be problems with the
-kernel driver
-snd-bt-sco with the 1.0.14rc3 series of alsa drivers (kernel oopses).
- 
-Has anyone sucessfuly used skype with plugz and headsetd / a2dpd without
-either the
-btsco daemon or the snd-bt-sco kernel driver?
- 
-Thank you
- 
-Mark Allyn
+Hi Markus ,
+
+> If I connect multiple SCO connections from my embedded platform, will
+the packet-types dynamically adjust when I add a second and even third
+SCO connection? This is why I though I had to specifically set
+packet-type to HV1... Could you (or someone that feel for it) just
+confirm my thoughts? ;)
+
+First of all you can have only one HV1 SCO link at a time. If you want
+three, use HV3. This is because an HV1 packet carries only 10 bytes of
+data. Thus in order to have a 64 Kbps HV1 link, SCO packets will have to
+be sent every second slot (Tsco = 2) => there is no room for another SCO
+link. 64 Kbps HV1 SCO link will cover 100% bluetooth bandwidth. Whereas
+HV3 packet carries 30 bytes of data => you can maintain (theoretically
+atleast) 3 SCO Links.
+
+Best Regards,
+
+Mayank
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
