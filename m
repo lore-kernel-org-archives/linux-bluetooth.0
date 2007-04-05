@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <80236d750704050236u1e346ea4l54efbbd808955e56@mail.gmail.com>
-Date: Thu, 5 Apr 2007 11:36:14 +0200
-From: "Emanuele Novelli" <ema.novelli@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1175765322.5815.594.camel@violet>
-MIME-Version: 1.0
-References: <80236d750704050226m1563a49dw74214b6e847c495e@mail.gmail.com>
-	<1175765322.5815.594.camel@violet>
-Subject: Re: [Bluez-users] reading RSSI value with D-Bus Api
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20070404123836.132910@gmx.net>
+References: <20070404123836.132910@gmx.net>
+Date: Thu, 05 Apr 2007 11:33:01 +0200
+Message-Id: <1175765581.5815.601.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] dfutool  - does not work for me
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,70 +16,33 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1396848557=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1396848557==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_41110_14606336.1175765774806"
+Hi Harald,
 
-------=_Part_41110_14606336.1175765774806
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> How is dfutool supposed to work?
+> 
+> # dfutool -d /dev/bus/usb/005/025 archive abc
+> Can't find any DFU devices
 
-Hi Marcel,
+simply run "dfutool archive file.dfu". However you might wanna check
+first with "hciconfig hci0 revision" that you dongle doesn't use a ROM
+chip. In that case DFU is not available.
 
-I'm referring to this function (from bluez dbus-api) where the rssi
-parameter is int16
+Regards
 
-----
-void RemoteDeviceFound(string address, uint32 class, int16 rssi)
-
-            This signal will be send every time an inquiry result
-            has been found by the service daemon. In general they
-            only appear during a device discovery.
-----
-
-you posted in another thread you can use that value to check how close is
-the remote device to the dongle who does inquiry. Maybe I'm wrong and that's
-not the correct value to check for this purpose?
-Anyway the third parameter I read with the snipped code I posted is
-negative.
-
-------=_Part_41110_14606336.1175765774806
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi Marcel,<br><br>I&#39;m referring to this function (from bluez dbus-api) where the rssi parameter is int16<br><br>----<br>void RemoteDeviceFound(string address, uint32 class, int16 rssi)<br><br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; This signal will be send every time an inquiry result
-<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; has been found by the service daemon. In general they<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; only appear during a device discovery.<br>----<br><br>you posted in another thread you can use that value to check how close is the remote device to the dongle who does inquiry. Maybe I&#39;m wrong and that&#39;s not the correct value to check for this purpose?
-<br>Anyway the third parameter I read with the snipped code I posted is negative.<br><br>
-
-------=_Part_41110_14606336.1175765774806--
+Marcel
 
 
---===============1396848557==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1396848557==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1396848557==--
