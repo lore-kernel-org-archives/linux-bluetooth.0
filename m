@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <46150ADA.1000503@gmx.de>
-Date: Thu, 05 Apr 2007 16:42:34 +0200
-From: "S. Vandersee" <seb42@gmx.de>
+Message-ID: <3d3168e50704050736p3b243dc3tc9bc084cc983bc8e@mail.gmail.com>
+Date: Thu, 5 Apr 2007 16:36:17 +0200
+From: "=?ISO-8859-2?Q?Micha=B3_Majchrowicz?=" <mmajchrowicz@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1175772422.5815.626.camel@violet>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] raw mode
+References: <3d3168e50704050420g3063bec4p67ccc742ab19e0bb@mail.gmail.com>
+	<1175772422.5815.626.camel@violet>
+Subject: Re: [Bluez-users] Random MAC/MAC Spoofing.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,24 +21,56 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Dear list,
+Hi.
+The guy in the store said it has this kind of feature.
+And I bought two dongles and both worked the same :)
+Regards Michal.
 
-if I simply change the product ID of my CSR dongle from
-0a12:0001 to 0a12:0002 hciconfig will report "RAW" as device
-mode after rebooting:
-hci0:	Type: USB
-	BD Address: 00:16:41:18:7A:8C ACL MTU: 0:0 SCO MTU: 0:0
-	UP RUNNING RAW
-	RX bytes:66 acl:0 sco:0 events:0 errors:0
-	TX bytes:15 acl:0 sco:0 commands:5 errors:0
+lapek ~ # hciconfig -a
+hci0:   Type: USB
+        BD Address: 20:C1:20:6F:50:40 ACL MTU: 1017:8 SCO MTU: 64:0
+        UP RUNNING PSCAN ISCAN AUTH ENCRYPT
+        RX bytes:8348377 acl:42729 sco:0 events:4630 errors:0
+        TX bytes:1619750 acl:17283 sco:0 commands:28 errors:0
+        Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: ACCEPT MASTER
+        Name: 'Lapek new :D'
+        Class: 0x3e0100
+        Service Classes: Networking, Rendering, Capturing
+        Device Class: Computer, Uncategorized
+        HCI Ver: 2.0 (0x3) HCI Rev: 0x3000 LMP Ver: 2.0 (0x3) LMP Subver: 0x420b
+        Manufacturer: Broadcom Corporation (15)
 
 
-Does the Bluetooth drivers only assume it must be a raw mode
-because of the product ID? Or is there a "real" raw mode detected?
-And if there is such a raw mode how can raw frames be retrieved?
-Thanks!
-
-Sebastian
+On 4/5/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Michal,
+>
+> > I have a small problem. I bought Bluetooth USB dongle and it has
+> > annoying feature. Everytime I plug it in/out it has different mac
+> > address :( Is there any way to turn this feature off? Or maybe there
+> > is some way to change mac address? Like with eth inferfaces?
+>
+> that is not a feature. That is a broken dongle. You actually need to
+> return it to the store. However first show me "hciconfig -a".
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share your
+> opinions on IT & business topics through brief surveys-and earn cash
+> http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
