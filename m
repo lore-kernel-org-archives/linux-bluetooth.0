@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 6 Apr 2007 03:24:29 -0700 (PDT)
-From: Mahtab Hossain <mahtab_hossain2002@yahoo.com>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <80236d750704050236u1e346ea4l54efbbd808955e56@mail.gmail.com>
+Message-ID: <30ed240e0704052149h66404c13l8683e54dbb12a07e@mail.gmail.com>
+Date: Fri, 6 Apr 2007 14:49:31 +1000
+From: "Brett Owen Rees VK2TMG " <breree@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Message-ID: <574272.50665.qm@web50511.mail.re2.yahoo.com>
-Subject: Re: [Bluez-users] reading RSSI value with D-Bus Api
+Subject: [Bluez-users] best low-pain Bluez development platform?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,86 +14,40 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0439180097=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0439180097==
-Content-Type: multipart/alternative; boundary="0-1174760184-1175855069=:50665"
-Content-Transfer-Encoding: 8bit
+Hello All,
 
---0-1174760184-1175855069=:50665
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+I have a concept for an app with a headset and want to use linux as my
+development platform. Unfortunately, I am having problems with just
+getting my dongle to talk to my headset, and only got it working once
+with Ubuntu 6.06 LTS and then it would not pair any more. I tried
+deleting link keys etc but it just never would work.
 
-Hi Emanuele,
-Sometimes, the Bluetooth module vendor provides absolute signal strength (like Wi-Fi) rather than the relative RSSI value indicated in Bluetooth Spec. I had one dongle which did just that. You may need to send your inquiry to them as well if it's really the case.
+So, I plugged in another disk and installed Gentoo on it. Still no
+luck - I am having problems with rfcomm somehow despite following the
+instructions and building a new kernel etc. I've been working with
+Linux since kernel 0.97 and don't consider myself a newbie but it
+seems that in the world of Bluetooth I am ......
 
-Thanks
-Mahtab
+So - what distros are developers using? What distro do you recommend
+to get me up and running? Any help would be appreciated.
 
-Emanuele Novelli <ema.novelli@gmail.com> wrote: Hi Marcel,
+Thanks,
+Brett
 
-I'm referring to this function (from bluez dbus-api) where the rssi parameter is int16
-
-----
-void RemoteDeviceFound(string address, uint32 class, int16 rssi)
-
-            This signal will be send every time an inquiry result 
-            has been found by the service daemon. In general they
-            only appear during a device discovery.
-----
-
-you posted in another thread you can use that value to check how close is the remote device to the dongle who does inquiry. Maybe I'm wrong and that's not the correct value to check for this purpose? 
-Anyway the third parameter I read with the snipped code I posted is negative.
-
- -------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
-
- 
----------------------------------
-No need to miss a message. Get email on-the-go 
-with Yahoo! Mail for Mobile. Get started.
---0-1174760184-1175855069=:50665
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-Hi Emanuele,<br>Sometimes, the Bluetooth module vendor provides absolute signal strength (like Wi-Fi) rather than the relative RSSI value indicated in Bluetooth Spec. I had one dongle which did just that. You may need to send your inquiry to them as well if it's really the case.<br><br>Thanks<br>Mahtab<br><br><b><i>Emanuele Novelli &lt;ema.novelli@gmail.com&gt;</i></b> wrote:<blockquote class="replbq" style="border-left: 2px solid rgb(16, 16, 255); margin-left: 5px; padding-left: 5px;"> Hi Marcel,<br><br>I'm referring to this function (from bluez dbus-api) where the rssi parameter is int16<br><br>----<br>void RemoteDeviceFound(string address, uint32 class, int16 rssi)<br><br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; This signal will be send every time an inquiry result <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; has been found by the service daemon. In general they<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; only appear during
- a device discovery.<br>----<br><br>you posted in another thread you can use that value to check how close is the remote device to the dongle who does inquiry. Maybe I'm wrong and that's not the correct value to check for this purpose? <br>Anyway the third parameter I read with the snipped code I posted is negative.<br><br> -------------------------------------------------------------------------<br>Take Surveys. Earn Cash. Influence the Future of IT<br>Join SourceForge.net's Techsay panel and you'll get the chance to share your<br>opinions on IT &amp; business topics through brief surveys-and earn cash<br>http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV_______________________________________________<br>Bluez-users mailing list<br>Bluez-users@lists.sourceforge.net<br>https://lists.sourceforge.net/lists/listinfo/bluez-users<br></blockquote><br><p>&#32;
-
-<hr size=1>No need to miss a message. <a href="http://us.rd.yahoo.com/evt=43910/*http://mobile.yahoo.com/mail
-">Get email on-the-go </a><br>with Yahoo! Mail for Mobile. <a href="http://us.rd.yahoo.com/evt=43910/*http://mobile.yahoo.com/mail
-">Get started.</a>
---0-1174760184-1175855069=:50665--
-
-
---===============0439180097==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+===============
+Brett Rees VK2TMG
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0439180097==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0439180097==--
