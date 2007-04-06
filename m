@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 6 Apr 2007 03:45:10 -0700 (PDT)
-From: Mahtab Hossain <mahtab_hossain2002@yahoo.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <80236d750704050236u1e346ea4l54efbbd808955e56@mail.gmail.com>
-MIME-Version: 1.0
-Message-ID: <741183.81968.qm@web50507.mail.re2.yahoo.com>
-Subject: Re: [Bluez-users] reading RSSI value with D-Bus Api
+In-Reply-To: <20070406041817.177760@gmx.net>
+References: <20070404123836.132910@gmx.net>
+	<1175765581.5815.601.camel@violet>  <20070406041817.177760@gmx.net>
+Date: Fri, 06 Apr 2007 12:42:35 +0200
+Message-Id: <1175856155.5815.647.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] dfutool  - does not work for me
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,85 +17,38 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0958793772=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0958793772==
-Content-Type: multipart/alternative; boundary="0-317612412-1175856310=:81968"
-Content-Transfer-Encoding: 8bit
+Hi Harald,
 
---0-317612412-1175856310=:81968
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+> > However you might wanna check
+> > first with "hciconfig hci0 revision" that you dongle doesn't use a ROM
+> > chip. In that case DFU is not available.
+> 
+> hciconfig says:
+> 
+> Chip version: BlueCore4-ROM
+> 
+> I think that means it's not working. And it would explain why dfutool did not work at all.
+> Gotta find another one :-)
 
-Hi Emanuele,
-Sometimes, the Bluetooth module vendor provides absolute signal strength (like Wi-Fi) rather than the relative RSSI value indicated in Bluetooth Spec. I had one dongle which did just that. You may need to send your inquiry to them as well if it's really the case.
+if you find a BlueCore4-External dongle, tell the list. We could need
+some.
 
-Thanks
-Mahtab
+Regards
 
-Emanuele Novelli <ema.novelli@gmail.com> wrote: Hi Marcel,
-
-I'm referring to this function (from bluez dbus-api) where the rssi parameter is int16
-
-----
-void RemoteDeviceFound(string address, uint32 class, int16 rssi)
-
-            This signal will be send every time an inquiry result 
-            has been found by the service daemon. In general they
-            only appear during a device discovery.
-----
-
-you posted in another thread you can use that value to check how close is the remote device to the dongle who does inquiry. Maybe I'm wrong and that's not the correct value to check for this purpose? 
-Anyway the third parameter I read with the snipped code I posted is negative.
-
- -------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Marcel
 
 
-  
----------------------------------
-Looking for earth-friendly autos? 
- Browse Top Cars by "Green Rating" at Yahoo! Autos' Green Center.  
---0-317612412-1175856310=:81968
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-Hi Emanuele,<br>Sometimes, the Bluetooth module vendor provides absolute signal strength (like Wi-Fi) rather than the relative RSSI value indicated in Bluetooth Spec. I had one dongle which did just that. You may need to send your inquiry to them as well if it's really the case.<br><br>Thanks<br>Mahtab<br><br><b><i>Emanuele Novelli &lt;ema.novelli@gmail.com&gt;</i></b> wrote:<blockquote class="replbq" style="border-left: 2px solid rgb(16, 16, 255); margin-left: 5px; padding-left: 5px;"> Hi Marcel,<br><br>I'm referring to this function (from bluez dbus-api) where the rssi parameter is int16<br><br>----<br>void RemoteDeviceFound(string address, uint32 class, int16 rssi)<br><br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; This signal will be send every time an inquiry result <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; has been found by the service daemon. In general they<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; only appear during
- a device discovery.<br>----<br><br>you posted in another thread you can use that value to check how close is the remote device to the dongle who does inquiry. Maybe I'm wrong and that's not the correct value to check for this purpose? <br>Anyway the third parameter I read with the snipped code I posted is negative.<br><br> -------------------------------------------------------------------------<br>Take Surveys. Earn Cash. Influence the Future of IT<br>Join SourceForge.net's Techsay panel and you'll get the chance to share your<br>opinions on IT &amp; business topics through brief surveys-and earn cash<br>http://www.techsay.com/default.php?page=join.php&amp;p=sourceforge&amp;CID=DEVDEV_______________________________________________<br>Bluez-users mailing list<br>Bluez-users@lists.sourceforge.net<br>https://lists.sourceforge.net/lists/listinfo/bluez-users<br></blockquote><br><p>&#32;
-
-
- <hr size=1>Looking for earth-friendly autos? <br> <a href="http://autos.yahoo.com/green_center/;_ylc=X3oDMTE4MGw4Z2hlBF9TAzk3MTA3MDc2BHNlYwNtYWlsdGFncwRzbGsDZ3JlZW5jZW50ZXI-">Browse Top Cars by "Green Rating"</a> at Yahoo! Autos' Green Center.  
---0-317612412-1175856310=:81968--
-
-
---===============0958793772==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0958793772==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0958793772==--
