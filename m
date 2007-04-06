@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <38338cf00704060129s58b6f929ib16844d072b5e96e@mail.gmail.com>
-Date: Fri, 6 Apr 2007 16:29:41 +0800
-From: "=?GB2312?B?zfW9+s6w?=" <yibanbano@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <4615D7F4.4040401@xmission.com>
+Date: Thu, 05 Apr 2007 23:17:40 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] about the bluez kernel patch
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <200701150326.46855.bluez-devel@huitl.de>	<200703271139.42015.Tim.Chick@csr.com>	<46091D10.7070809@access-company.com>	<200703271501.49792.chick@computergeek.freeserve.co.uk>
+	<4614BA5D.5010701@access-company.com>
+In-Reply-To: <4614BA5D.5010701@access-company.com>
+Subject: Re: [Bluez-devel] Question about poll() - was Re: a2dpd and mplayer
+ - any chance to get it working?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,71 +18,27 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1493187416=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1493187416==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_4506_19009262.1175848181406"
+Frederic
 
-------=_Part_4506_19009262.1175848181406
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> If poll(x,y,1) is replaced by usleep(1); poll(x,y,0) then cpu usage fall 
+> back to 0.
 
-Dear all:
-I want to find the bluez kernel patch about 2.6.14-mh2 and 2.6.18-mh2.
-in www.bluez.org/news.htm we can see there have been released,but i
-can't find in http://www.holtmann.org/linux/kernel/.
-and i can't google it .
-who can give me an address for download the bluez kernel patch?
-thanks for your help.
+poll is returning immediately either with an error or with one of your
+conditions met. what is in revents after the return? what conditions are
+you interested in?
 
-
- walson
-
-2007.4.6
-
-------=_Part_4506_19009262.1175848181406
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div>Dear all:</div>
-<div>I&nbsp;want to find the bluez kernel patch about 2.6.14-mh2 and 2.6.18-mh2.&nbsp; </div>
-<div>in <a href="http://www.bluez.org/news.htm">www.bluez.org/news.htm</a> we can see there have been released,but i </div>
-<div>can&#39;t find in <a href="http://www.holtmann.org/linux/kernel/">http://www.holtmann.org/linux/kernel/</a>.</div>
-<div>and i can&#39;t google it .</div>
-<div>who can give me an address for download the bluez kernel patch?</div>
-<div>thanks for your help.</div>
-<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;walson </div>
-<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2007.4.6</div>
-
-------=_Part_4506_19009262.1175848181406--
-
-
---===============1493187416==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
 http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============1493187416==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1493187416==--
