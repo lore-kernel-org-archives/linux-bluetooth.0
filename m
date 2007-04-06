@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4615D7F4.4040401@xmission.com>
-Date: Thu, 05 Apr 2007 23:17:40 -0600
+Message-ID: <4615D6C2.8080301@xmission.com>
+Date: Thu, 05 Apr 2007 23:12:34 -0600
 From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <200701150326.46855.bluez-devel@huitl.de>	<200703271139.42015.Tim.Chick@csr.com>	<46091D10.7070809@access-company.com>	<200703271501.49792.chick@computergeek.freeserve.co.uk>
-	<4614BA5D.5010701@access-company.com>
-In-Reply-To: <4614BA5D.5010701@access-company.com>
-Subject: Re: [Bluez-devel] Question about poll() - was Re: a2dpd and mplayer
- - any chance to get it working?
+References: <5FD5754DDBA0B1499B5A0B4BB5419485D8E1FC@fmsmsx411.amr.corp.intel.com>
+In-Reply-To: <5FD5754DDBA0B1499B5A0B4BB5419485D8E1FC@fmsmsx411.amr.corp.intel.com>
+Subject: Re: [Bluez-devel] Plugz and btsco
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,14 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Frederic
+Mark
 
-> If poll(x,y,1) is replaced by usleep(1); poll(x,y,0) then cpu usage fall 
-> back to 0.
+> I want to make sure, if I use the plugz (with headsetd and a2dpd), I do
+> not need to
+> have the btsco daemon nor the snd_bt_sco device. Is that correct?
 
-poll is returning immediately either with an error or with one of your
-conditions met. what is in revents after the return? what conditions are
-you interested in?
+it is correct that you don't need them
+
+> I am attempting to use skype with a bluetooth headset. I am not seeing
+> the device 
+> in the menu on skype.
+
+it will not appear in the list. you have to type in the dev name or
+close skype and edit the config file
+
+> I tried using alsa's aplay, but I am getting an error saying:
+> 'channels count non available'.
+
+what command line? what does .asoundrc look like?
 
 brad
 
