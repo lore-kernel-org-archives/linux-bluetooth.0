@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <2bf8a3380704091001j59941c4fia4aaf4c6d8a0d5be@mail.gmail.com>
-Date: Mon, 9 Apr 2007 14:01:07 -0300
-From: "Bruno Cavaler Ghisi" <brunogh@gmail.com>
-To: bluez-users@lists.sourceforge.net
+From: Sumeet VERMA <sumeet.verma@st.com>
+To: <bluez-users@lists.sf.net>
+Date: Mon, 9 Apr 2007 16:56:09 +0530
+Message-ID: <008d01c77a99$df6baff0$8935c70a@dlh.st.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] Doubts related to BlueZ and JSR-82
+Subject: Re: [Bluez-users] hcidump-1.34 startup problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +18,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+ Hi 
+I found the solution to this problem . hcidump was taking the libraries from /lib/libbluet....
+My library was installed in /usr/local/lib. I copied the libbluetooth library to /lib and it worked.
 
-I am developing some stuff using jsr-82 and I would like to try it in
-a jse application under Linux.
+Regards,
+Sumeet 
+-----Original Message-----
+From: sumeet verma [mailto:sumeet.verma@st.com] 
+Sent: Monday, April 02, 2007 5:00 PM
+To: bluez-users@lists.sf.net
+Subject: hcidump-1.34 startup problem
 
-I read about the BlueZ protocol stack and I have installed its
-packages, however I do not know if I just need to have it in order to
-the app work, because I read about other things like Impronto, Avetana
-and I got confused... All of these are bluetooth protocol stacks? Will
-I need anything else to run my application? Does anybody has any good
-link about it?
+Hi
+I am using bluez-hcidump-1.34.
+Its installed properly but when I try to run it , it gives and error
 
-Thanks in advance.
-Bruno
+[root@dlhl0330 3.9]# hcidump -X -V
+hcidump: error while loading shared libraries: libbluetooth.so.2: cannot open shared object file. No such file or directory [root@dlhl0330 3.9]#
+
+libluetooth.so.2->libbluetooth.so.2.5.0 in /usr/local/lib
+
+Regards,
+
+Sumeet 
+
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
