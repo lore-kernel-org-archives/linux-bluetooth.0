@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <e1effdeb0704100437vb26836r20d1f4d5a198a489@mail.gmail.com>
-Date: Tue, 10 Apr 2007 08:37:52 -0300
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <2645.30405.qm@web54612.mail.yahoo.com>
+Message-ID: <461B4E88.9010801@gmail.com>
+Date: Tue, 10 Apr 2007 12:44:56 +0400
+From: Sergey Smirnov <svs1957@gmail.com>
 MIME-Version: 1.0
-References: <2645.30405.qm@web54612.mail.yahoo.com>
-Subject: Re: [Bluez-devel] hci_rssi command
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] btsco: Operation not supported
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,43 +18,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 4/7/07, Carlos Araujo <karlos_barros@yahoo.com.br> wrote:
-> I'm developing a location aplication using bluetooth, then I'll use the
-> bluez, but I didn't find any documment description of its API. I'll use the
-> power level of the received signal to perform this task. I've had headaches
-> trying perform a hci_rssi command. Then I'd like a code example of using
-> hci_rssi command or how to perform an inquiry with rssi. Could you help me.
->
->  thanks
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->
+Zaurus 750(ARM), Socket CF BT, kernel 2.6.20.2, btsco 0.5 (show btsco v0.42)
+Modules sco and snd-bt-sco loaded, alsamixer -c1 show BT Headset.
+./btsco  -v    00:0F:DE:3E:AE:12
+btsco v0.42
+Device is 1:0
+Voice setting: 0x0060
+RFCOMM channel 1 connected
+Using interface hci0
+recieved AT*ECBP=?
+recieved AT+CLIP=1
+recieved AT+CSCS="UTF-8"
+recieved AT+CLAN?                <-(here start mplayer -ao alsa:device=hw=1.0 music.mp3)
+speaker volume: 3 mic volume: 1
+i/o needed: connecting sco...
+Can't connect SCO audio channel
+: Operation not supported
 
-Hi Carlos,
-
-there are some D-Bus API docs available at:
-http://wiki.bluez.org
-http://wiki.bluez.org/wiki/Architecture
-http://wiki.bluez.org/wiki/Adapter
-
-you can use c, python, perl, c# or any language that supports D-Bus
-bindings to start a device discover procedure. Check the python codes
-utils/test/apitest and utils/dbusdef.py, there are some API usage
-examples.
-
-Run the dbus-monitor and check the output of the following line:
-python -i dbusdef.py
->>>adapter.DiscoverDevices()
-
-BR,
-Claudio.
--- 
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+I did the same on my notebook. It's work correct.
+Can anybody help me?
+Thanks in advance.
+--
+Sergey
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
