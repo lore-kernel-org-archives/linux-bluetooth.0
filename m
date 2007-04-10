@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Per Thomas Jahr <perja@extern.uio.no>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Tue, 10 Apr 2007 17:18:29 +0200
-Message-Id: <1176218309.28200.198.camel@pc047.qadoc.oslo.opera.com>
+In-Reply-To: <62204.80.109.89.243.1176201047.squirrel@webmail.uni-ak.ac.at>
+References: <62204.80.109.89.243.1176201047.squirrel@webmail.uni-ak.ac.at>
+Date: Tue, 10 Apr 2007 16:22:46 +0200
+Message-Id: <1176214966.18096.2.camel@violet>
 Mime-Version: 1.0
-Subject: [Bluez-users] A2DP - using a mobile as source?
+Subject: Re: [Bluez-users] RecHandle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,16 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Gerhard,
 
-Does anyone know if it's possible to use the a2dpd program for streaming
-audio from a mobile (Sony Ericsson K800i) to an Alsa output on the PC?
->>From what I could read, most of the usages were the other way around
-(using a Bluetooth headset with a PC f.ex.).
+> I'm writing start/stop scripts for bluetooth services.
+> Assuming I want to run several servises of the same type and stop them
+> later on. How can I make a difference between the related sdpd records
+> easily? Unfotunately  'sdptool add' does not provide the RecHandle.
 
-Thanks
--- 
-Per Thomas
+don't even do it this way. The services should register the records by
+themself and all of the ones included in bluez-utils do so.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
