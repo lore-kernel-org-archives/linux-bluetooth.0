@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <60881.80.109.89.243.1176233471.squirrel@webmail.uni-ak.ac.at>
+Message-ID: <60881.80.109.89.243.1176233471.squirrel@webmail.uni-ak.ac.at>
+In-Reply-To: <1176214966.18096.2.camel@violet>
 References: <62204.80.109.89.243.1176201047.squirrel@webmail.uni-ak.ac.at>
 	<1176214966.18096.2.camel@violet>
-	<60881.80.109.89.243.1176233471.squirrel@webmail.uni-ak.ac.at>
-Date: Tue, 10 Apr 2007 21:34:10 +0200
-Message-Id: <1176233650.18096.22.camel@violet>
-Mime-Version: 1.0
+Date: Tue, 10 Apr 2007 21:31:11 +0200 (CEST)
+From: gerhard.ramsebner@uni-ak.ac.at
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
 Subject: Re: [Bluez-users] RecHandle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -22,26 +21,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Gerhard,
+Hi Marcel,
 
-> >> I'm writing start/stop scripts for bluetooth services.
-> >> Assuming I want to run several servises of the same type and stop them
-> >> later on. How can I make a difference between the related sdpd records
-> >> easily? Unfotunately  'sdptool add' does not provide the RecHandle.
-> >
-> > don't even do it this way. The services should register the records by
-> > themself and all of the ones included in bluez-utils do so.
-> >
-> 
-> Well, rfcomm does not. Or is there something wrong with mine?
+>> I'm writing start/stop scripts for bluetooth services.
+>> Assuming I want to run several servises of the same type and stop them
+>> later on. How can I make a difference between the related sdpd records
+>> easily? Unfotunately  'sdptool add' does not provide the RecHandle.
+>
+> don't even do it this way. The services should register the records by
+> themself and all of the ones included in bluez-utils do so.
+>
 
-that is true, but RFCOMM is also not a service implementation. However
-feel free to send in patches if you think it is useful.
-
-Regards
-
-Marcel
-
+Well, rfcomm does not. Or is there something wrong with mine?
 
 
 -------------------------------------------------------------------------
