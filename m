@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <60881.80.109.89.243.1176233471.squirrel@webmail.uni-ak.ac.at>
-In-Reply-To: <1176214966.18096.2.camel@violet>
-References: <62204.80.109.89.243.1176201047.squirrel@webmail.uni-ak.ac.at>
-	<1176214966.18096.2.camel@violet>
-Date: Tue, 10 Apr 2007 21:31:11 +0200 (CEST)
-From: gerhard.ramsebner@uni-ak.ac.at
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Message-ID: <461BB6A4.6070100@access-company.com>
+Date: Tue, 10 Apr 2007 18:09:08 +0200
+From: Frederic Dalleau <frederic.dalleau@access-company.com>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] RecHandle
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <1176218309.28200.198.camel@pc047.qadoc.oslo.opera.com>
+In-Reply-To: <1176218309.28200.198.camel@pc047.qadoc.oslo.opera.com>
+Subject: Re: [Bluez-users] A2DP - using a mobile as source?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,29 +16,33 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi,
 
->> I'm writing start/stop scripts for bluetooth services.
->> Assuming I want to run several servises of the same type and stop them
->> later on. How can I make a difference between the related sdpd records
->> easily? Unfotunately  'sdptool add' does not provide the RecHandle.
->
-> don't even do it this way. The services should register the records by
-> themself and all of the ones included in bluez-utils do so.
->
+Per Thomas Jahr wrote:
+> Does anyone know if it's possible to use the a2dpd program for streaming
+> audio from a mobile (Sony Ericsson K800i) to an Alsa output on the PC?
+>   =
 
-Well, rfcomm does not. Or is there something wrong with mine?
+A2dpd do not have this role but there is a program a2recv that does what =
+
+you want.
+I think it is available in btsco-0.5 tarball on sourceforge or look for =
+
+btsco module in cvs.
+
+Fr=E9d=E9ric
 
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
