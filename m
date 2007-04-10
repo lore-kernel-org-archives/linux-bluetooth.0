@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <461B7E3A.4030008@sportlaan.adsl.utwente.nl>
-Date: Tue, 10 Apr 2007 14:08:26 +0200
-From: Berend Dekens <cyberwizzard@sportlaan.adsl.utwente.nl>
+Message-ID: <e1effdeb0704100437vb26836r20d1f4d5a198a489@mail.gmail.com>
+Date: Tue, 10 Apr 2007 08:37:52 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <2645.30405.qm@web54612.mail.yahoo.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <461B4E88.9010801@gmail.com>
-In-Reply-To: <461B4E88.9010801@gmail.com>
-Subject: Re: [Bluez-devel] btsco: Operation not supported
+References: <2645.30405.qm@web54612.mail.yahoo.com>
+Subject: Re: [Bluez-devel] hci_rssi command
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,13 +20,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Make sure you have sco support in your kernel, as a module or compiled 
-in. Don't forget to load the module..
+On 4/7/07, Carlos Araujo <karlos_barros@yahoo.com.br> wrote:
+> I'm developing a location aplication using bluetooth, then I'll use the
+> bluez, but I didn't find any documment description of its API. I'll use the
+> power level of the received signal to perform this task. I've had headaches
+> trying perform a hci_rssi command. Then I'd like a code example of using
+> hci_rssi command or how to perform an inquiry with rssi. Could you help me.
+>
+>  thanks
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+>
 
-FYI: I have my share of trouble with SCO audio links so I have no clue 
-what else you can do :)
+Hi Carlos,
 
-Berend
+there are some D-Bus API docs available at:
+http://wiki.bluez.org
+http://wiki.bluez.org/wiki/Architecture
+http://wiki.bluez.org/wiki/Adapter
+
+you can use c, python, perl, c# or any language that supports D-Bus
+bindings to start a device discover procedure. Check the python codes
+utils/test/apitest and utils/dbusdef.py, there are some API usage
+examples.
+
+Run the dbus-monitor and check the output of the following line:
+python -i dbusdef.py
+>>>adapter.DiscoverDevices()
+
+BR,
+Claudio.
+-- 
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
