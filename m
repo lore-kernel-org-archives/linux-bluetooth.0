@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <461C92CC.9060300@gmail.com>
-Date: Wed, 11 Apr 2007 11:48:28 +0400
-From: Sergey Smirnov <svs1957@gmail.com>
+From: Mayank BATRA <mayank.batra@st.com>
+To: "'Sergey Smirnov'" <svs1957@gmail.com>
+Date: Wed, 11 Apr 2007 13:10:02 +0530
+Message-ID: <004601c77c0c$9d682b50$9d0cc70a@dlh.st.com>
 MIME-Version: 1.0
-To: Mayank BATRA <mayank.batra@st.com>
-References: <004501c77c0b$dc64da70$9d0cc70a@dlh.st.com>
-In-Reply-To: <004501c77c0b$dc64da70$9d0cc70a@dlh.st.com>
-Cc: bluez-devel@lists.sourceforge.net
+In-Reply-To: <461C8F1E.5080800@gmail.com>
+Cc: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] btsco: Operation not supported
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,55 +20,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I have the same problem with bluez-utils 3.7
-Then I compile version 3.9.
-I think that problem in hcid.
-I can stop it only by kill -9
+> On PDA:
+> hciconfig hci0 features
+> hci0:   Type: PCCARD
+>         BD Address: 00:E0:03:25:7C:36 ACL MTU: 340:4 SCO MTU: 64:8
+>         Features: 0xbf 0x00 0x20 0x00 0x00 0x00 0x00 0x00
+>                 <3-slot packets> <5-slot packets> 
+> <encryption> <slot offset>
+>                 <timing accuracy> <role switch> <sniff mode>
+> On notebook:
+> hciconfig hci0 features
+> hci0:   Type: USB
+>         BD Address: 00:09:DD:10:02:C2 ACL MTU: 192:8 SCO MTU: 64:8
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>                 <3-slot packets> <5-slot packets> 
+> <encryption> <slot offset>
+>                 <timing accuracy> <role switch> <hold mode> 
+> <sniff mode>
+>                 <park state> <RSSI> <channel quality> <SCO 
+> link> <HV2 packets>
+>                 <HV3 packets> <u-law log> <A-law log> <CVSD> 
+> <paging scheme>
+>                 <power control> <transparent SCO>
+> 
+> There is no <SCO link> on PDA! Is it possible to change features?
 
-I have Socket CF BT card on PDA. I'll try to find information is it support SCO.
-Thanks
+Correct. Your PDA does not support SCO links. See my previous mail.
+It is simply not possible to change the features of a bluetooth device.
 
-Mayank BATRA wrote:
->> Here hciconfig -a
->> hci0:   Type: PCCARD
->>         BD Address: 00:E0:03:25:7C:36 ACL MTU: 340:4 SCO MTU: 0:0
->>         UP RUNNING PSCAN ISCAN
->>         RX bytes:204 acl:0 sco:0 events:15 errors:0
->>         TX bytes:382 acl:0 sco:0 commands:15 errors:0
->>         Features: 0xbf 0x00 0x20 0x00 0x00 0x00 0x00 0x00
->>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1
->>         Link policy: RSWITCH HOLD SNIFF PARK
->>         Link mode: SLAVE ACCEPT
->>         Name: 'svs-zaurus-0'
->>         Class: 0x3e0100
->>         Service Classes: Networking, Rendering, Capturing, 
->> Object Transfer, Audio
->>         Device Class: Computer, Uncategorized
->>         HCI Ver: 1.1 (0x1) HCI Rev: 0x0 LMP Ver: 1.1 (0x1) 
->> LMP Subver: 0x21a
->>         Manufacturer: Nokia Mobile Phones (1)
-> 
-> It took me a while to understand this confusing situation.
-> 
-> The reason for this behaviour is very simple.
-> Have a look at the Features of your device: 0xbf 0x00 0x20 0x00 0x00
-> 0x00 0x00 0x00
-> Here, byte 0 is 0xbf, byte 1 is 0x00. If you decode these numbers from
-> the bluetooth specs, bit 3 of byte 1 stands for SCO link. In your case
-> it is 0 which means your device does not support SCO links at all. Get
-> yourself a new dongle :(
-> Now you would ask me why does the packet type shows HV1? This is because
-> HV1 is mandatory if the device supports SCO link. So this is just a
-> mistake done by hciconfig. It should report HV1 packet type only if SCO
-> link bit is 1. In case it is 0 do not mention HV1.
-> 
-> Hope this helps.
-> 
-> Best Regards,
-> 
-> Mayank
-> 
-> 
+Best Regards,
+
+Mayank
 
 
 -------------------------------------------------------------------------
