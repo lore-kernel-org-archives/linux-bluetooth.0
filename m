@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <461C9C23.5070804@gmail.com>
-Date: Wed, 11 Apr 2007 12:28:19 +0400
-From: Sergey Smirnov <svs1957@gmail.com>
+From: Mayank BATRA <mayank.batra@st.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Wed, 11 Apr 2007 13:51:10 +0530
+Message-ID: <005101c77c12$5c842c50$9d0cc70a@dlh.st.com>
 MIME-Version: 1.0
-To: Mayank BATRA <mayank.batra@st.com>
-References: <004601c77c0c$9d682b50$9d0cc70a@dlh.st.com>
-In-Reply-To: <004601c77c0c$9d682b50$9d0cc70a@dlh.st.com>
-Cc: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] btsco: Operation not supported
+In-Reply-To: <461C995B.4020601@free2move.net>
+Subject: Re: [Bluez-devel] Troubles with mulitple SCO connections (duplex)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,41 +19,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I have Socket CF Rev. F BT card. Bad luck. It doesn't support SCO :(
-Mayank BATRA wrote:
->> On PDA:
->> hciconfig hci0 features
->> hci0:   Type: PCCARD
->>         BD Address: 00:E0:03:25:7C:36 ACL MTU: 340:4 SCO MTU: 64:8
->>         Features: 0xbf 0x00 0x20 0x00 0x00 0x00 0x00 0x00
->>                 <3-slot packets> <5-slot packets> 
->> <encryption> <slot offset>
->>                 <timing accuracy> <role switch> <sniff mode>
->> On notebook:
->> hciconfig hci0 features
->> hci0:   Type: USB
->>         BD Address: 00:09:DD:10:02:C2 ACL MTU: 192:8 SCO MTU: 64:8
->>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
->>                 <3-slot packets> <5-slot packets> 
->> <encryption> <slot offset>
->>                 <timing accuracy> <role switch> <hold mode> 
->> <sniff mode>
->>                 <park state> <RSSI> <channel quality> <SCO 
->> link> <HV2 packets>
->>                 <HV3 packets> <u-law log> <A-law log> <CVSD> 
->> <paging scheme>
->>                 <power control> <transparent SCO>
->>
->> There is no <SCO link> on PDA! Is it possible to change features?
-> 
-> Correct. Your PDA does not support SCO links. See my previous mail.
-> It is simply not possible to change the features of a bluetooth device.
-> 
-> Best Regards,
-> 
-> Mayank
-> 
-> 
+> For what it's worth;
+	
+> After having cross-compiled to my embedded system and leaving the
+USB-dongle solution behind, everything now works like a breeze and I now
+have a BT device hosting running 2 SCO connections and 3 RF_COMM sockets
+simultaneously.
+	
+And what packet types are these two SCO connectionis using now?
+
+-Mayank
 
 
 -------------------------------------------------------------------------
