@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <461DDBA9.9080804@xmission.com>
-Date: Thu, 12 Apr 2007 01:11:37 -0600
-From: Brad Midgley <bmidgley@xmission.com>
-MIME-Version: 1.0
+From: Per Thomas Jahr <perja@extern.uio.no>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <1176218309.28200.198.camel@pc047.qadoc.oslo.opera.com>	<461BB6A4.6070100@access-company.com>
-	<1176359832.22896.12.camel@pc047.qadoc.oslo.opera.com>
-In-Reply-To: <1176359832.22896.12.camel@pc047.qadoc.oslo.opera.com>
+In-Reply-To: <461BB6A4.6070100@access-company.com>
+References: <1176218309.28200.198.camel@pc047.qadoc.oslo.opera.com>
+	<461BB6A4.6070100@access-company.com>
+Date: Thu, 12 Apr 2007 08:37:12 +0200
+Message-Id: <1176359832.22896.12.camel@pc047.qadoc.oslo.opera.com>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] A2DP - using a mobile as source?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,19 +21,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+On Tue, 2007-04-10 at 18:09 +0200, Frederic Dalleau wrote:
+> Hi,
+> 
+> Per Thomas Jahr wrote:
+> > Does anyone know if it's possible to use the a2dpd program for streaming
+> > audio from a mobile (Sony Ericsson K800i) to an Alsa output on the PC?
+> >   
+> A2dpd do not have this role but there is a program a2recv that does what 
+> you want.
+> I think it is available in btsco-0.5 tarball on sourceforge or look for 
+> btsco module in cvs.
+
+Thank you - it works! I'm not sure of how useful this is, but it's very
+cool.
+
+I had to modify the source a bit. Also I will implement the missing
+parts of the protocol (f.ex. a "suspend stream" is issued when I change
+tracks). I guess I will post the code somewhere when I'm finished (or
+commit it to cvs).
+
+Thanks
+-- 
 Per Thomas
 
-> I had to modify the source a bit. Also I will implement the missing
-> parts of the protocol (f.ex. a "suspend stream" is issued when I change
-> tracks). I guess I will post the code somewhere when I'm finished
-
-please send a patch here or even better bluez-devel.
-
-a2recv is sort of without a home right now since it wasn't in the list
-of stuff to get taken up into plugz. we may work it into the bluez utils
-before long though.
-
-brad
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
