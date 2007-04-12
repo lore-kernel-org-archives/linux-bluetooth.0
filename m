@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v752.3)
-In-Reply-To: <mailman.71469.1176402297.5558.bluez-users@lists.sourceforge.net>
-References: <mailman.71469.1176402297.5558.bluez-users@lists.sourceforge.net>
-Message-Id: <9751F607-624A-4386-9353-6D988055180C@kenliew.org>
-From: Kenneth Liew <kenliew@kenliew.org>
-Date: Fri, 13 Apr 2007 07:34:21 +0800
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] Bluez-users Digest, Vol 12, Issue 12
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <EE780E457BC23344B61438FE3608F16E022CA348@MCLNEXVS07.resource.ds.bah.com>
+References: <EE780E457BC23344B61438FE3608F16E022CA348@MCLNEXVS07.resource.ds.bah.com>
+Date: Fri, 13 Apr 2007 00:50:13 +0200
+Message-Id: <1176418213.7049.42.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Sdptool: how to add a UUID value to the
+	service	class ID list
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,40 +21,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-That's true.  Obex is 2 way.
+Hi Anthony,
 
-In that case, is there such things as Bluetooth signal repeaters?
-which will amplify the signal from the class2 phone to the class 1
-receiver??
+> I am trying to figure out how to change/add a UUID to the service class
+> ID list.  My research pointed me to using the Linux application
+> "sdptool".  The command I am using is:  "sdptool -i hci0 setattr 0x10001
+> 0x0001 UUID_Address" but to no avail.  
+> 
+> Q1:  Is "0x0001" the right handle for a service class ID list?
+> Q2:  What is the format for the "UUID_Address" listed above, is it-
+>      1.  {7C45BBBC-55C0-11D9-A188-0050BAEB61CD}
+>      2.  7C45BBBC-55C0-11D9-A188-0050BAEB61CD
+>      3.  7C45BBBC55C011D9A1880050BAEB61CD
+> Q3:  Any other suggestions about how I can accomplish changing the value
+> of the service class ID list? (I am trying to add a UUID)
+> Q4:  Is there a better tool/command to use than "sdptool"?
 
---ken
+actually you should fix the code that adds the wrong SDP service record
+instead of messing around with it later on.
 
-> Message: 2
-> Date: Thu, 12 Apr 2007 14:40:05 +0530
-> From: "siddhant tewari" <siddhant.tewari@gmail.com>
-> Subject: Re: [Bluez-users] using class 1 dongle
-> To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-> Message-ID:
-> 	<57c68ddc0704120210y19335f9eyaeb6fa2838adb88a@mail.gmail.com>
-> Content-Type: text/plain; charset="iso-8859-1"
->
-> what i think is that for any kind of transfer to take place (for  
-> e.g. via
-> obex push or obex ftp profile) both way handshakes are necessary to
-> instantiate the transfer ....
->
->
->   Just curious, in this case, the class 2 Bdshannot transmit
->
->> power to class 1 BT as the distance is way out of range, but
->> can class 1 BT transmit files to class 2 BT?  since to class
->> 1 BT the class 2 phone is in range?
->>
->> --ken
->>
->
-> End of Bluez-users Digest, Vol 12, Issue 12
-> *******************************************
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
