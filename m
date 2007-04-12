@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <2bf8a3380704121124t70285f8oe2b1678d69648319@mail.gmail.com>
+Date: Thu, 12 Apr 2007 15:24:42 -0300
+From: "Bruno Cavaler Ghisi" <brunogh@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <b621074b0704102122t9a942c6v7ee44d03ea342d33@mail.gmail.com>
 MIME-Version: 1.0
-Date: Thu, 12 Apr 2007 18:40:08 -0400
-Message-ID: <EE780E457BC23344B61438FE3608F16E022CA348@MCLNEXVS07.resource.ds.bah.com>
-From: "Scott, Anthony" <scott_anthony@bah.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Sdptool: how to add a UUID value to the service class
-	ID list
+References: <2bf8a3380704091001j59941c4fia4aaf4c6d8a0d5be@mail.gmail.com>
+	<2bf8a3380704101510q7bdbe0ep7fd39473a5dae73@mail.gmail.com>
+	<b621074b0704102122t9a942c6v7ee44d03ea342d33@mail.gmail.com>
+Subject: Re: [Bluez-users] Doubts related to BlueZ and JSR-82
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,32 +18,109 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I am trying to figure out how to change/add a UUID to the service class
-ID list.  My research pointed me to using the Linux application
-"sdptool".  The command I am using is:  "sdptool -i hci0 setattr 0x10001
-0x0001 UUID_Address" but to no avail.  
+I have installed BlueZ but I do not know which java library I could
+use to communicate with it. I have heard about JBlueZ, is it good? Any
+other suggestions?
 
-Q1:  Is "0x0001" the right handle for a service class ID list?
-Q2:  What is the format for the "UUID_Address" listed above, is it-
-     1.  {7C45BBBC-55C0-11D9-A188-0050BAEB61CD}
-     2.  7C45BBBC-55C0-11D9-A188-0050BAEB61CD
-     3.  7C45BBBC55C011D9A1880050BAEB61CD
-Q3:  Any other suggestions about how I can accomplish changing the value
-of the service class ID list? (I am trying to add a UUID)
-Q4:  Is there a better tool/command to use than "sdptool"?
+Thanks,
+Bruno
 
-Warm regards,
-Anthony
+2007/4/11, Tushar Paturde <tusharpaturde@gmail.com>:
+> Hi Bruno,
+> Bluez library give you access to your bluetooth hardware . So if your blu=
+ez
+> library calls are working and ur jsr82 implementation is using Bluez libr=
+ary
+> functions it should work for u.
+> As I understand Impronto, Avetana gives complete solution for JSR82
+> including native library.
+> Impronto internally uses Bluez library only.
+>
+>
+> regards,
+> Tushar
+>
+>
+> On 4/11/07, Bruno Cavaler Ghisi <brunogh@gmail.com > wrote:
+> >
+> > Just explaining better... will I need any other lib in the application
+> > classpath to work?
+> >
+> > Thanks,
+> >
+> > 2007/4/9, Bruno Cavaler Ghisi <brunogh@gmail.com>:
+> > > Hi,
+> > >
+> > > I am developing some stuff using jsr-82 and I would like to try it in
+> > > a jse application under Linux.
+> > >
+> > > I read about the BlueZ protocol stack and I have installed its
+> > > packages, however I do not know if I just need to have it in order to
+> > > the app work, because I read about other things like Impronto, Avetana
+> > > and I got confused... All of these are bluetooth protocol stacks? Will
+> > > I need anything else to run my application? Does anybody has any good
+> > > link about it?
+> > >
+> > > Thanks in advance.
+> > > Bruno
+> > >
+> >
+> >
+> > --
+> > Bruno Cavaler Ghisi
+> > Graduando de Sistemas de Informa=E7=E3o
+> > Universidade Federal de Santa Catarina
+> >
+> >
+> -------------------------------------------------------------------------
+> > Take Surveys. Earn Cash. Influence the Future of IT
+> > Join SourceForge.net's Techsay panel and you'll get the chance to share
+> your
+> > opinions on IT & business topics through brief surveys-and earn cash
+> >
+> http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3D=
+DEVDEV
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >
+>
+>
+>
+> --
+> Tushar Paturde
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share y=
+our
+> opinions on IT & business topics through brief surveys-and earn cash
+> http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3D=
+DEVDEV
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>
+
+
+-- =
+
+Bruno Cavaler Ghisi
+Graduando de Sistemas de Informa=E7=E3o
+Universidade Federal de Santa Catarina
 
 -------------------------------------------------------------------------
 Take Surveys. Earn Cash. Influence the Future of IT
 Join SourceForge.net's Techsay panel and you'll get the chance to share your
 opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
+http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3DDE=
+VDEV
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
