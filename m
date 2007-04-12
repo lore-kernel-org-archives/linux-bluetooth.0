@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <1d49725d0704140901v7f778dd5tbe1b4fdfaef44430@mail.gmail.com>
-Date: Sat, 14 Apr 2007 12:01:58 -0400
-From: "Donnie Smith" <cwiid@abstrakraft.org>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] Error connecting after inquiry
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1d49725d0704121242j7a278668gbea98b7bbc145b0b@mail.gmail.com>
+References: <1d49725d0704121242j7a278668gbea98b7bbc145b0b@mail.gmail.com>
+Date: Thu, 12 Apr 2007 22:13:59 +0200
+Message-Id: <1176408839.7049.35.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Error connecting after inquiry
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,55 +16,45 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0200860640=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0200860640==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_36193_5814197.1176566518018"
+Hi Donnie,
 
-------=_Part_36193_5814197.1176566518018
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> We've narrowed the problem down to the hci_remote_name call - if we
+> filter on device class alone, and never request the name, the
+> connection works.  Are there any connections opened by hci_remote_name
+> that need to be explicitly closed?  Would checking device class alone
+> be sufficient?  From what I've read, device class is determined by
+> capabilities, and isn't guaranteed to be unique to the Wiimote. 
 
-Ok, the name is now only checked for devices that pass the class filter.
-Is there any way to ensure the baseband connection is closed?
+the remote name request creates a temporary baseband connection and in
+that case no other connection request will succeed. Reducing the timeout
+for the remote name function is not helping here since it won't send the
+remote name cancel in case of a timeout. This is probably a bug in the
+library, but also not easy to handle since that command is not always
+available.
 
-Thanks,
-Donnie
+So first of all you should only request the name for devices with the
+correct class (since the others don't matter at all). Then you need to
+use a bigger timeout. The name request can take some time. The baseband
+needs to page the other side.
 
-------=_Part_36193_5814197.1176566518018
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Other than that you can add a sleep(1) re-try the connect if it failed.
 
-Ok, the name is now only checked for devices that pass the class filter.<br>Is there any way to ensure the baseband connection is closed?<br><br>Thanks,<br>Donnie<br>
+Regards
 
-------=_Part_36193_5814197.1176566518018--
+Marcel
 
 
---===============0200860640==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
---===============0200860640==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+Take Surveys. Earn Cash. Influence the Future of IT
+Join SourceForge.net's Techsay panel and you'll get the chance to share your
+opinions on IT & business topics through brief surveys-and earn cash
+http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0200860640==--
