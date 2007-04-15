@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <003001c77fdc$5fcf6af0$9b01a8c0@LiYong>
-From: "YongLi" <sdliyong@gmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Mon, 16 Apr 2007 12:04:37 +0800
+Message-ID: <46227438.5070800@gmail.com>
+Date: Sun, 15 Apr 2007 20:51:36 +0200
+From: None <hujumuju@gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] ISSC Bluetooth dongle + GPS receiver problem
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Problem with dialup connection after bluez update
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,87 +14,156 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0003267703=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0003267703==
-Content-Type: text/plain;
-	charset="gb2312"
-Content-Transfer-Encoding: base64
+Hello.
 
-SGVsbG8gQWxsLA0KDQpJIGFtIHRlc3RpbmcgdGhlIElTU0MgQmx1ZXRvb3RoIGRvbmdsZSBvbiBt
-eSBBUk0gcGxhdGZvcm0uIEkgYW0gdXNpbmcgTGludXggMi42LjE2IGtlcm5lbCBhbmQgYmx1ZXot
-dXRpbHMgMy45LiBJIGNhbiBjb25uZWN0IHRvIGEgQmx1ZXRvb3RoIGhlYWRwaG9uZS4gSG93ZXZl
-ciwgaWYgSSBjb25uZWN0IHRoZSBVU0IgZG9uZ2xlIHRvIGEgQmx1ZXRvb3RoIEdQUyByZWNlaXZl
-ciwgdGhlIGNvbm5lY3Rpb24gaXMgYnJva2VuIHNvbWV0aW1lcy4gSSBwZXJmb3JtZWQgdGhlIGJl
-bG93IHN0ZXBzOg0KDQoxLiBJbnNlcnQgdGhlIElTU0MgVVNCIGRvbmdsZSB0byBVU0IgcG9ydA0K
-Mi4gcnVuIGNvbW1hbmQgImhjaWNvbmZpZyBoY2kwIHVwIg0KMy4gcnVuIGNvbW1hbmQgImhjaXRv
-b2wgc2NhbiINCjQuIHRoZSBkb25nbGUgZmluZCB0aGUgR1BTIHJlY2VpdmVyIGFuZCBvdXRwdXQg
-dGhlIGJlbG93IG1lc3NhZ2U6IA0KU2Nhbm5pbmcgLi4uDQogICAgICAgIDAwOjBCOjBEOjc2OjE0
-OkZFICAgICAgIEJULUdQUw0KNS4gcnVuIGNvbW1hbmQgInJmY29tbSBiaW5kIHJmY29tbTAgMDA6
-MEI6MEQ6NzY6MTQ6RkUiDQo2LiBydW4gY29tbWFuZCAiY2F0IC9kZXYvcmZjb21tMCINCg0KSSBj
-YW4gZ2V0IHRoZSBncHMgaW5mb3JtYXRpb24gbGlrZSB0aGF0OiANCiRHUEdTQSxBLDEsLCwsLCws
-LCwsLCwsLCwqMUUNCg0KJEdQUk1DLDAzNDQxNS43ODEsViwsLCwsLCwxNjA0MDcsLCxOKjQwDQoN
-CiRHUEdHQSwwMzQ0MTYuNzY5LCwsLCwwLDAwLCwsTSwwLjAsTSwsMDAwMCo1QQ0KDQokR1BHU0Es
-QSwxLCwsLCwsLCwsLCwsLCwsKjFFDQoNCkhvd2V2ZXIsIHRoZSBjb25uZWN0aW9uIGlzIGJyb2tl
-biBhZnRlciBhIHJhbmRvbSB0aW1lLiBJZiBJIHJ1biB0aGUgaGNpZHVtcCAteCBjb21tYW5kIG9u
-IGFub3RoZXIgdGVybWluYWwsIHRoZSBlcnJvciBtZXNzYWdlIGlzOg0KPiBIQ0kgRXZlbnQ6IE51
-bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1DQogIDAxIDAxIDAwIDAxIDAw
-IA0KPiBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDE3DQogICAgTDJDQVAoZCk6
-IGNpZCAweDAwNDAgbGVuIDEzIFtwc20gM10NCiAgICAgIFJGQ09NTShkKTogVUlIOiBjciAwIGRs
-Y2kgMiBwZiAwIGlsZW4gOSBmY3MgMHg0MCANCiAgICAgIDQ3IDUwIDQ3IDQ3IDQxIDJDIDMwIDMz
-IDM0IA0KPCBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDkNCiAgICBMMkNBUChk
-KTogY2lkIDB4MDA0MCBsZW4gNSBbcHNtIDNdDQogICAgICBSRkNPTU0oZCk6IFVJSDogY3IgMSBk
-bGNpIDIgcGYgMCBpbGVuIDEgZmNzIDB4OWEgDQogICAgICA0NyANCj4gQUNMIGRhdGE6IGhhbmRs
-ZSAxIGZsYWdzIDB4MDIgZGxlbiAxNw0KICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxlbiAxMyBb
-cHNtIDNdDQogICAgICBSRkNPTU0oZCk6IFVJSDogY3IgMCBkbGNpIDIgcGYgMCBpbGVuIDkgZmNz
-IDB4NDAgDQogICAgICAzNCAzMyAzNiAyRSAzNyAzOCAzMSAyQyAyQyANCjwgQUNMIGRhdGE6IGhh
-bmRsZSAxIGZsYWdzIDB4MDIgZGxlbiA5DQogICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDUg
-W3BzbSAzXQ0KICAgICAgUkZDT01NKGQpOiBVSUg6IGNyIDEgZGxjaSAyIHBmIDAgaWxlbiAxIGZj
-cyAweDlhIA0KICAgICAgNTAgDQo8IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4g
-OQ0KICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxlbiA1IFtwc20gM10NCiAgICAgIFJGQ09NTShk
-KTogVUlIOiBjciAxIGRsY2kgMiBwZiAwIGlsZW4gMSBmY3MgMHg5YSANCiAgICAgIDQ3IA0KPCBB
-Q0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDkNCiAgICBMMkNBUChkKTogY2lkIDB4
-MDA0MCBsZW4gNSBbcHNtIDNdDQogICAgICBSRkNPTU0oZCk6IFVJSDogY3IgMSBkbGNpIDIgcGYg
-MCBpbGVuIDEgZmNzIDB4OWEgDQogICAgICA0NyANCjwgQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdz
-IDB4MDIgZGxlbiA5DQogICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDUgW3BzbSAzXQ0KICAg
-ICAgUkZDT01NKGQpOiBVSUg6IGNyIDEgZGxjaSAyIHBmIDAgaWxlbiAxIGZjcyAweDlhIA0KICAg
-ICAgNDEgDQo8IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gOQ0KICAgIEwyQ0FQ
-KGQpOiBjaWQgMHgwMDQwIGxlbiA1IFtwc20gM10NCiAgICAgIFJGQ09NTShkKTogVUlIOiBjciAx
-IGRsY2kgMiBwZiAwIGlsZW4gMSBmY3MgMHg5YSANCiAgICAgIDJDIA0KPCBBQ0wgZGF0YTogaGFu
-ZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDkNCiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4gNSBb
-cHNtIDNdDQogICAgICBSRkNPTU0oZCk6IFVJSDogY3IgMSBkbGNpIDIgcGYgMCBpbGVuIDEgZmNz
-IDB4OWEgDQogICAgICAzMCANCjwgQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4MDIgZGxlbiA5
-DQogICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDUgW3BzbSAzXQ0KICAgICAgUkZDT01NKGQp
-OiBVSUg6IGNyIDEgZGxjaSAyIHBmIDAgaWxlbiAxIGZjcyAweDlhIA0KICAgICAgMzMgDQo8IEhD
-SSBDb21tYW5kOiBSZXNldCAoMHgwM3wweDAwMDMpIHBsZW4gMA0KUmVjZWl2ZSBmYWlsZWQ6IEJy
-b2tlbiBwaXBlDQoNCkl0IHNlZW1zIHRoYXQgdGhlIElTU0MgQlQgZG9uZ2xlIGlzIGluY29tcGF0
-aWJsZSB3aXRoIEJsdWVaLCBhbnlvbmUgZW5jb3VudGVycyB0aGUgc2FtZSBpc3N1ZT8NCg0KVGhh
-bmtzICENCg0KVHlsZXIgTGkNCg0KDQo=
+I updated bluez packages (bluetooth 3.7-1ubuntu4, bluez-utils 
+3.7-1ubuntu4, libbluetooth 3.7-1) on my ubuntu box, and now dialup 
+connection with my Pocket Pc device cannot be established. It was 
+working like a charm before.
+
+After many problems i have found a way to make my box discoverable and 
+pairable, so i can pair my pocket pc and linux box.
+
+Anyway, i cannot established dialup connection - dund is not responding 
+at all, but it is running and listening(?)
+
+root@abc:/etc/ppp/peers# ps aux|grep dund
+root      2952  0.0  0.4   1660   484 ?        Ss   20:34   0:00 
+/usr/bin/dund --listen call dun-mda-bt
+
+dun-mda-bt is located in /etc/ppp/peers/dun-mda-bt and contains:
+
+root@pajonk:/etc/ppp/peers# cat /etc/ppp/peers/dun-mda-bt
+115200
+local
+noipdefault
+connect "/etc/ppp/at-cmd.pl -v"
+noauth
+nodefaultroute
+192.168.1.1:192.168.1.10
+ms-dns 192.168.1.1
+debug
+
+Pocket pc tries to connect but gives an error after 5 seconds. There are 
+no syslog and messages log entries when trying to establish connection 
+so i don't have any info for debuging.
+
+SDPD is offering dun profile:
+
+Browsing FF:FF:FF:00:00:00 ...
+Service Name: LAN Access Point
+Service RecHandle: 0x10000
+Service Class ID List:
+   "LAN Access Using PPP" (0x1102)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 1
+Profile Descriptor List:
+   "LAN Access Using PPP" (0x1102)
+     Version: 0x0100
+
+Service Name: Dial-Up Networking
+Service RecHandle: 0x10001
+Service Class ID List:
+   "Dialup Networking" (0x1103)
+   "Generic Networking" (0x1201)
+Protocol Descriptor List:
+   "L2CAP" (0x0100)
+   "RFCOMM" (0x0003)
+     Channel: 2
+Profile Descriptor List:
+   "Dialup Networking" (0x1103)
+     Version: 0x0100
+
+
+My dongle is configures this way:
+
+hci0:   Type: USB
+         BD Address: xx:xx:xx:xx:xx:xx ACL MTU: 192:8 SCO MTU: 64:8
+         UP RUNNING PSCAN ISCAN
+         RX bytes:323041 acl:507 sco:0 events:30529 errors:0
+         TX bytes:17719 acl:494 sco:0 commands:410 errors:0
+
+hcid.conf:
+
+#
+# HCI daemon configuration file.
+#
+
+# HCId options
+options {
+         # Automatically initialize new devices
+         autoinit yes;
+
+         # Security Manager mode
+         #   none - Security manager disabled
+         #   auto - Use local PIN for incoming connections
+         #   user - Always ask user for a PIN
+         #
+         security auto;
+
+         # Pairing mode
+         #   none  - Pairing disabled
+         #   multi - Allow pairing with already paired devices
+         #   once  - Pair once and deny successive attempts
+         pairing multi;
+
+         # Default PIN code for incoming connections
+         passkey "1234";
+}
+
+# Default settings for HCI devices
+device {
+
+         discovto 0;
+
+         # Local device name
+         #   %d - device id
+         #   %h - host name
+         name "%h-%d";
+
+         # Local device class
+         class 0x100;
+
+         # Default packet type
+         #pkt_type DH1,DM1,HV1;
+
+         # Inquiry and Page scan
+         iscan enable; pscan enable;
+
+         # Default link mode
+         #   none   - no specific policy
+         #   accept - always accept incoming connections
+         #   master - become master on incoming connections,
+         #            deny role switch on outgoing connections
+         lm accept,master;
+
+         # Default link policy
+         #   none    - no specific policy
+         #   rswitch - allow role switch
+         #   hold    - allow hold mode
+         #   sniff   - allow sniff mode
+         #   park    - allow park mode
+         lp rswitch,hold,sniff,park;
+}
+
+
+Thanks for any help!
 
 
 
---===============0003267703==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0003267703==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0003267703==--
