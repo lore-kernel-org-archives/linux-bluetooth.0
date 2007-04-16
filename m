@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <b621074b0704160159pc7e4f6l65e849875d0ab676@mail.gmail.com>
-References: <b621074b0704160159pc7e4f6l65e849875d0ab676@mail.gmail.com>
-Date: Mon, 16 Apr 2007 14:41:12 +0200
-Message-Id: <1176727272.30165.2.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Where does the Bluez stores registered services?
+From: Sumeet VERMA <sumeet.verma@st.com>
+To: <bluez-users@lists.sf.net>
+Date: Mon, 16 Apr 2007 16:44:53 +0530
+Message-ID: <004201c78018$75a7a540$8935c70a@dlh.st.com>
+MIME-Version: 1.0
+Subject: [Bluez-users] Pairing problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,34 +14,55 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Tushar,
-
-> I had registered one btl2cap service  using Bluez api's . Even after
-> stopping the service it is still returned by service discovery done
-> from another device. I would like to know where is the registry of
-> these services maintained by bluez library.  Also how can I modify
-> this services registry ? 
-
-if the service record doesn't disappear, then your code is wrong. You
-have used persistent SDP records. Don't do that. And it is even better
-to register the service records over D-Bus.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGkKSSBoYXZlIHdyaXR0ZW4gYSBIRiBHVyBhcHBsaWNhdGlvbiBidXQgSSBjYW5ub3QgcGFpciB1
+c2luZyB0aGUgcGFzc2tleSBhZ2VudC4gSSBhbSB1c2luZyBibHVlei0zLjkuIFdoZW4gSSB1c2Ug
+cGluX2hlbHBlciBjb25jZXB0IGluIGJsdWV6LTIuMjUgaXQgd29ya3MgZmluZS4gSSBzdGFydGVk
+IHRoZSBwYXNza2V5IGFnZW50IHVzaW5nCiMgcGFzc2tleSAtLWRlZmF1bHQgMDAwMAoKRG8gSSBo
+YXZlIHRvIGluc3RhbGwgYmx1ZXotZ25vbWUtMC42IGZvciBzZWN1cml0eSBvcGVyYXRpbnMuIElz
+IHRoZXJlIHNvbWUgb3RoZXIgd2F5IHdoZXJlIEkgZG9u4oCZdCBnZXQgYSBwcm9tcHQgZm9yIHBp
+biBrZXkgYW5kIGFwcGxpY2F0aW9uIHVzZXMgc29tZSBkZWZhdWx0IHBpbiBrZXkgKDAwMDApLgoK
+QlRXIEkgdHJpZWQgcHV0dGluZyBlbnRyeSBpbnRvIHRoZSAvdmFyL2xpYi9ibHVldG9vdGgvMDA6
+ODA6ZTE6YWE6MzM6NDQvcGluY29kZXMsIGJ1dCBJIGRvZXNuJ3Qgd29yay4gClRoZSBhcHBsaWNh
+dGlvbnMgZ2V0cyBzdHVjayBhdCBQSU4gQ29kZSBSZXF1ZXN0LiBBbmQgdGhlbiByZmNvbW0gY29u
+bmVjdGlvbiB0aW1lcyBvdXQuIEhjaWQgZG9lc24ndCB0YWtlIHZhbHVlIG9mIHBhc3NrZXkgZnJv
+bSBoY2lkLmNvbmYKCmhjaWR1bXAgbG9nIGlzIGJlbG93Oi0KICAgIGhhbmRsZSAxIHBhY2tldHMg
+MQo8IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gOAogICAgTDJDQVAoZCk6IGNp
+ZCAweDAwNDAgbGVuIDQgW3BzbSAzXQogICAgICBSRkNPTU0ocyk6IFNBQk06IGNyIDEgZGxjaSAw
+IHBmIDEgaWxlbiAwIGZjcyAweDFjIAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQ
+YWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhhbmRsZSAxIHBhY2tldHMgMQo+IEFDTCBkYXRhOiBo
+YW5kbGUgMSBmbGFncyAweDAyIGRsZW4gOAogICAgTDJDQVAoZCk6IGNpZCAweDAwNDEgbGVuIDQg
+W3BzbSAzXQogICAgICBSRkNPTU0ocyk6IFVBOiBjciAxIGRsY2kgMCBwZiAxIGlsZW4gMCBmY3Mg
+MHhkNyAKPCBBQ0wgZGF0YTogaGFuZGxlIDEgZmxhZ3MgMHgwMiBkbGVuIDE4CiAgICBMMkNBUChk
+KTogY2lkIDB4MDA0MCBsZW4gMTQgW3BzbSAzXQogICAgICBSRkNPTU0ocyk6IFBOIENNRDogY3Ig
+MSBkbGNpIDAgcGYgMCBpbGVuIDEwIGZjcyAweDcwIG1jY19sZW4gOAogICAgICBkbGNpIDIgZnJh
+bWVfdHlwZSAwIGNyZWRpdF9mbG93IDE1IHByaSA3IGFja190aW1lciAwCiAgICAgIGZyYW1lX3Np
+emUgMTAwOCBtYXhfcmV0cmFucyAwIGNyZWRpdHMgNwo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENv
+bXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhhbmRsZSAxIHBhY2tldHMgMQo+IEFD
+TCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gMTgKICAgIEwyQ0FQKGQpOiBjaWQgMHgw
+MDQxIGxlbiAxNCBbcHNtIDNdCiAgICAgIFJGQ09NTShzKTogUE4gUlNQOiBjciAwIGRsY2kgMCBw
+ZiAwIGlsZW4gMTAgZmNzIDB4YWEgbWNjX2xlbiA4CiAgICAgIGRsY2kgMiBmcmFtZV90eXBlIDAg
+Y3JlZGl0X2Zsb3cgMTQgcHJpIDcgYWNrX3RpbWVyIDAKICAgICAgZnJhbWVfc2l6ZSAxMDA4IG1h
+eF9yZXRyYW5zIDAgY3JlZGl0cyAxCjwgQUNMIGRhdGE6IGhhbmRsZSAxIGZsYWdzIDB4MDIgZGxl
+biA4CiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4gNCBbcHNtIDNdCiAgICAgIFJGQ09NTShz
+KTogU0FCTTogY3IgMSBkbGNpIDIgcGYgMSBpbGVuIDAgZmNzIDB4NTkgCj4gSENJIEV2ZW50OiBO
+dW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQogICAgaGFuZGxlIDEgcGFj
+a2V0cyAxCj4gSENJIEV2ZW50OiBQSU4gQ29kZSBSZXF1ZXN0ICgweDE2KSBwbGVuIDYKICAgIGJk
+YWRkciAwMDowMzozNTowMDpBQTpBQQo8IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRs
+ZW4gOAogICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDQgW3BzbSAzXQogICAgICBSRkNPTU0o
+cyk6IERJU0M6IGNyIDEgZGxjaSAyIHBmIDEgaWxlbiAwIGZjcyAweGI4IAo8IEFDTCBkYXRhOiBo
+YW5kbGUgMSBmbGFncyAweDAyIGRsZW4gOAogICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVuIDQg
+W3BzbSAzXQogICAgICBSRkNPTU0ocyk6IERJU0M6IGNyIDEgZGxjaSAwIHBmIDEgaWxlbiAwIGZj
+cyAweGZkIAo8IEFDTCBkYXRhOiBoYW5kbGUgMSBmbGFncyAweDAyIGRsZW4gMTIKICAgIEwyQ0FQ
+KHMpOiBEaXNjb25uIHJlcTogZGNpZCAweDAwNDAgc2NpZCAweDAwNDEKClN1bWVldCAKCgotLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieSBEQjIgRXhwcmVz
+cwpEb3dubG9hZCBEQjIgRXhwcmVzcyBDIC0gdGhlIEZSRUUgdmVyc2lvbiBvZiBEQjIgZXhwcmVz
+cyBhbmQgdGFrZQpjb250cm9sIG9mIHlvdXIgWE1MLiBObyBsaW1pdHMuIEp1c3QgZGF0YS4gQ2xp
+Y2sgdG8gZ2V0IGl0IG5vdy4KaHR0cDovL3NvdXJjZWZvcmdlLm5ldC9wb3dlcmJhci9kYjIvCl9f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJz
+IG1haWxpbmcgbGlzdApCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9s
+aXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
