@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <57c68ddc0704160608p5daa06b8o73bad2bdb8a4fda@mail.gmail.com>
-References: <57c68ddc0704160608p5daa06b8o73bad2bdb8a4fda@mail.gmail.com>
-Date: Mon, 16 Apr 2007 15:45:30 +0200
-Message-Id: <1176731130.30165.26.camel@aeonflux.holtmann.net>
+In-Reply-To: <004201c78018$75a7a540$8935c70a@dlh.st.com>
+References: <004201c78018$75a7a540$8935c70a@dlh.st.com>
+Date: Mon, 16 Apr 2007 15:44:12 +0200
+Message-Id: <1176731052.30165.24.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] problem using two bluetooth dongles together
+Cc: bluez-users@lists.sf.net
+Subject: Re: [Bluez-users] Pairing problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,39 +17,36 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
-
->     I am using bluez on arm single board computer and i am facing this
-> strange problem. 
-> 
-> When i am using only one bluetooth dongle , hciconfig correctly
-> reports the bluetooth address of the dongle but when i insert a second
-> dongle then the second dongles bt address is reported as
-> 00:00:00:00:00:00 . 
-> 
-> Both the dongles individually work fine.
-> 
-> Can anyone tell me what can be the cause for such a problem ????
-
-never tried it on ARM machines. Check the output of dmesg. Maybe your
-USB stack has a problem on ARM. Do you run the latest 2.6 kernel?
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGkgU3VtZWV0LAoKPiBJIGhhdmUgd3JpdHRlbiBhIEhGIEdXIGFwcGxpY2F0aW9uIGJ1dCBJIGNh
+bm5vdCBwYWlyIHVzaW5nIHRoZSBwYXNza2V5IGFnZW50LiBJIGFtIHVzaW5nIGJsdWV6LTMuOS4g
+V2hlbiBJIHVzZSBwaW5faGVscGVyIGNvbmNlcHQgaW4gYmx1ZXotMi4yNSBpdCB3b3JrcyBmaW5l
+LiBJIHN0YXJ0ZWQgdGhlIHBhc3NrZXkgYWdlbnQgdXNpbmcKPiAjIHBhc3NrZXkgLS1kZWZhdWx0
+IDAwMDAKPiAKPiBEbyBJIGhhdmUgdG8gaW5zdGFsbCBibHVlei1nbm9tZS0wLjYgZm9yIHNlY3Vy
+aXR5IG9wZXJhdGlucy4gSXMgdGhlcmUgc29tZSBvdGhlciB3YXkgd2hlcmUgSSBkb27igJl0IGdl
+dCBhIHByb21wdCBmb3IgcGluIGtleSBhbmQgYXBwbGljYXRpb24gdXNlcyBzb21lIGRlZmF1bHQg
+cGluIGtleSAoMDAwMCkuCj4gCj4gQlRXIEkgdHJpZWQgcHV0dGluZyBlbnRyeSBpbnRvIHRoZSAv
+dmFyL2xpYi9ibHVldG9vdGgvMDA6ODA6ZTE6YWE6MzM6NDQvcGluY29kZXMsIGJ1dCBJIGRvZXNu
+J3Qgd29yay4gCj4gVGhlIGFwcGxpY2F0aW9ucyBnZXRzIHN0dWNrIGF0IFBJTiBDb2RlIFJlcXVl
+c3QuIEFuZCB0aGVuIHJmY29tbSBjb25uZWN0aW9uIHRpbWVzIG91dC4gSGNpZCBkb2Vzbid0IHRh
+a2UgdmFsdWUgb2YgcGFzc2tleSBmcm9tIGhjaWQuY29uZgoKdGhlIHBhc3NrZXkgdmFsdWUgaW4g
+aGNpZC5jb25mIGlzIG9ubHkgZm9yIGluY29taW5nIGNvbm5lY3Rpb25zIGFuZCB5b3UKbmVlZCB0
+byBhZGp1c3QgdGhlIHNlY3VyaXR5IHNldHRpbmcuIEhvd2V2ZXIgdXNpbmcgdGhlIGF1dG8gc2V0
+dGluZwptaWdodCByZXN1bHQgaW4gYSBzZWN1cml0eSBpc3N1ZSBzaW5jZSB5b3Ugbm93IGhhdmUg
+YSBmaXhlZCBQSU4uCgpVc2luZyB0aGUgcGluY29kZXMgZmlsZSB3b24ndCB3b3JrIHVudGlsIHlv
+dSBoYXZlIGEgcGFzc2tleSBhZ2VudApydW5uaW5nIHNpbmNlIGl0IHdpbGwgYXNrIHRoZSBhZ2Vu
+dCBmb3IgY29uZmlybWF0aW9uLgoKQ2hlY2sgc3lzbG9nIG91dHB1dCBmb3IgYW55IGVycm9yIG1l
+c3NhZ2VzIGZyb20gaGNpZC4gSXQgd2lsbCB0ZWxsIHlvdQp3aGF0IGlzIGdvaW5nIG9uIGFuZCB3
+aGF0IGlzIHdyb25nLiBBbHNvIG1ha2Ugc3VyZSB0aGF0IGhjaWQgaXMgYWN0dWFsbHkKcnVubmlu
+Zy4KClJlZ2FyZHMKCk1hcmNlbAoKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWls
+IGlzIHNwb25zb3JlZCBieSBEQjIgRXhwcmVzcwpEb3dubG9hZCBEQjIgRXhwcmVzcyBDIC0gdGhl
+IEZSRUUgdmVyc2lvbiBvZiBEQjIgZXhwcmVzcyBhbmQgdGFrZQpjb250cm9sIG9mIHlvdXIgWE1M
+LiBObyBsaW1pdHMuIEp1c3QgZGF0YS4gQ2xpY2sgdG8gZ2V0IGl0IG5vdy4KaHR0cDovL3NvdXJj
+ZWZvcmdlLm5ldC9wb3dlcmJhci9kYjIvCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdApCbHVlei11c2Vyc0BsaXN0
+cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlz
+dGluZm8vYmx1ZXotdXNlcnMK
