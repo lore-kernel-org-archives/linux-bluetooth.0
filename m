@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Volker Christian <Volker.Christian@fh-hagenberg.at>
-To: bluez-devel@lists.sourceforge.net
+Date: Mon, 16 Apr 2007 00:35:35 -0700
+From: Brandon Philips <brandon@ifup.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20070416073535.GA4122@ifup.org>
+References: <20070415095728.GA6212@ifup.org> <46227051.5040002@xmission.com>
 MIME-Version: 1.0
-Date: Mon, 16 Apr 2007 20:36:15 +0200
-Message-Id: <200704162036.15543.Volker.Christian@fh-hagenberg.at>
-Subject: [Bluez-devel] Bug in hcid prevents naming of devices by means of
-	the bluetooth-address of a device
+In-Reply-To: <46227051.5040002@xmission.com>
+Subject: Re: [Bluez-devel] Unable to set number of SCO buffers : please
+	upgrade your Kernel !
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,39 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+On 12:34 Sun 15 Apr 2007, Brad Midgley wrote:
+> Brandon
+> 
+> cvs update your plugz to head and it should work.
 
-the man-page of hcid.conf describes how to configure more than one bluetooth 
-devices installed on one machine.
-It says:
-----------------------
-nn:nn:nn:nn:nn:nn
+Thanks- it seems the Debian package in unstable was a few revisions
+behind.
 
-              Parameters  specified  within  this  section  will  be
-              applied  to  the  device  with  this  device bluetooth
-              address. All other parameters  are  applied  from  the
-              default section.
-----------------------
-This is broken in the current (3.9) and previous version of the bluez-utils. 
-The current debian-package is also affected.
+Now I have mplayer playing great- mpd is broken though.  It connects to
+my headset but then quickly dies.  I will have to ping the developers on
+that.
 
-Following patch to main.c of the hcid fixis this problem:
+Thanks!
 
---- main.c-orig 2007-04-16 20:23:41.000000000 +0200
-+++ main.c      2007-04-16 20:22:30.000000000 +0200
-@@ -124,7 +124,7 @@
-        struct hci_dev_info di;
-
-        /* First try to get BD_ADDR based settings ... */
--       if (!hci_devinfo(hdev, &di) < 0) {
-+       if (!(hci_devinfo(hdev, &di) < 0)) {
-                char addr[18];
-                ba2str(&di.bdaddr, addr);
-                device_opts = find_device_opts(addr);
-
-
-best regards
-voc
+	Brandon
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
