@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4625B4FC.9000006@tlau.org>
-Date: Tue, 17 Apr 2007 23:04:44 -0700
-From: Tessa Lau <tlau@tlau.org>
-MIME-Version: 1.0
+Message-ID: <aabc802d0704171206p5d3a8e5bj671040eb1e07f624@mail.gmail.com>
+Date: Tue, 17 Apr 2007 21:06:57 +0200
+From: "pony parker" <ponyshake@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] "Can't get conn info" error pairing Treo with
-	Bluetooth dongle
+MIME-Version: 1.0
+Subject: [Bluez-users] how many multiple bluetooth devices
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,58 +14,63 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============2027221676=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I'm running Ubuntu Edgy.  I'm trying to pair a Treo 700p with the Linux 
-box via a USB Bluetooth dongle:
+--===============2027221676==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_22525_17886016.1176836817249"
 
-    Bus 004 Device 011: ID 1131:1001 Integrated System Solution Corp. 
-KY-BT100 Bluetooth Adapter
+------=_Part_22525_17886016.1176836817249
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Linux seems to recognize the Bluetooth adapter.  Hciconfig reports it as 
-device hci0:
+hi,
 
-hci0:   Type: USB
-        BD Address: 00:11:67:4F:E7:FF ACL MTU: 678:8 SCO MTU: 64:10
-        UP RUNNING PSCAN ISCAN
-        RX bytes:2934 acl:0 sco:0 events:180 errors:0
-        TX bytes:2041 acl:0 sco:0 commands:99 errors:0
+i'm a newbie on this list. i read in your faqs that linux supports multiple
+devices but found nowhere an information how many at the same time. i'm
+working on my diploma project and need to connect 30 bluetooth headsets
+simultaneously to the computer where incoming sound from the headsets' mics
+gets distorted and played back via the headsets amplified speakers. does
+anybody know  how many headsets i can run simultaneuosly on linux?
 
-In /etc/bluetooth/hcid.conf, I have the following settings:
+thanks*
+cheers
+lucina
 
-options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        passkey "XXXXX";
-}
+------=_Part_22525_17886016.1176836817249
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-When I initiate pairing from the Treo, it prompts me for a PIN and then 
-immediately says that it's unable to add my computer to the trusted 
-security list.  I see the following error in my daemon.log:
+hi,<br><br>i&#39;m a newbie on this list. i read in your faqs that linux supports multiple devices but found nowhere an information how many at the same time. i&#39;m working on my diploma project and need to connect 30 bluetooth headsets simultaneously to the computer where incoming sound from the headsets&#39; mics gets distorted and played back via the headsets amplified speakers. does anybody know&nbsp; how many headsets i can run simultaneuosly on linux?
+<br><br>thanks*<br>cheers<br>lucina<br><br><br>
 
-Apr 17 22:41:23 localhost hcid[4203]: Device hci0 has been activated
-Apr 17 22:41:42 localhost hcid[4203]: pin_code_request 
-(sba=00:11:67:4F:E7:FF, dba=00:07:E0:B9:8A:4A)
-Apr 17 22:41:42 localhost hcid[4203]: Can't get conn info: No such file 
-or directory (2)
+------=_Part_22525_17886016.1176836817249--
 
- From looking at the code in hcid/security.c:358, it looks like this 
-error occurs when the ioctl call returns ENOENT (No such file or 
-directory).  What does this mean?  What file or directory is it looking 
-for?  What else can I try to triage this problem?
 
-Thanks in advance,
---Tessa
+--===============2027221676==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============2027221676==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============2027221676==--
