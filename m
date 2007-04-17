@@ -1,11 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Sumeet VERMA <sumeet.verma@st.com>
-To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
-Date: Tue, 17 Apr 2007 12:46:41 +0530
-Message-ID: <00b801c780c0$5974c710$8935c70a@dlh.st.com>
+Message-ID: <57c68ddc0704162156p342351e0m402325c729c19662@mail.gmail.com>
+Date: Tue, 17 Apr 2007 10:26:27 +0530
+From: "siddhant tewari" <siddhant.tewari@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1176744531.30165.40.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-In-Reply-To: <1176731052.30165.24.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] Pairing problem
+References: <57c68ddc0704160608p5daa06b8o73bad2bdb8a4fda@mail.gmail.com>
+	<1176731130.30165.26.camel@aeonflux.holtmann.net>
+	<57c68ddc0704160741y7399f051rd3aaf6fe885cd57c@mail.gmail.com>
+	<1176737786.30165.29.camel@aeonflux.holtmann.net>
+	<57c68ddc0704160904u559bfc86n2933b86640a434a0@mail.gmail.com>
+	<1176744531.30165.40.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-users] problem using two bluetooth dongles together
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,75 +21,111 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============1660847401=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGkgTWFyY2VsIAo+IHRoZSBwYXNza2V5IHZhbHVlIGluIGhjaWQuY29uZiBpcyBvbmx5IGZvciBp
-bmNvbWluZyBjb25uZWN0aW9ucyBhbmQgeW91IG5lZWQgdG8gYWRqdXN0IHRoZSBzZWN1cml0eSBz
-ZXR0aW5nLiBIb3dldmVyIHVzaW5nIHRoZSBhdXRvIHNldHRpbmcgbWlnaHQgcmVzdWx0ID4gaW4g
-YSBzZWN1cml0eSBpc3N1ZSBzaW5jZSB5b3Ugbm93IGhhdmUgYSBmaXhlZCBQSU4uCldoYXQgc2Vj
-dXJpdHkgc2V0dGluZyBhZGp1c3RtZW50IGRvIEkgbmVlZCB0byBtYWtlPwpJIHN0YXJ0ZWQgdGhl
-IHNlY3VyaXR5IG1hbmFnZXIgIyBoY2ljb25maWcgaGNpMCBzZWNtZ3IKSSBhbSB1c2luZyAidXNl
-ciIgc2V0dGluZyBpbiBoY2lkLmNvbmYKCj5Vc2luZyB0aGUgcGluY29kZXMgZmlsZSB3b24ndCB3
-b3JrIHVudGlsIHlvdSBoYXZlIGEgcGFzc2tleSBhZ2VudCBydW5uaW5nIHNpbmNlIGl0IHdpbGwg
-YXNrIHRoZSBhZ2VudCBmb3IgY29uZmlybWF0aW9uLgpJIGhhdmUgdGhlIHBhc3NrZXktYWdlbnQg
-cnVubmluZyBidXQgc3RpbGwgdGhlIGhjdWR1bXAgLVggLVYgbG9nIGlzIHN0dWNrIGF0IHBpbiBj
-b2RlIHJlcXVlc3QuIEkgcnVuIHBhc3NrZXktYWdlbnQgYXMgCiMgLi9ibHVlei11dGlscy0zLjkv
-ZGFlbW9uL3Bhc3NrZXktYWdlbnQgLS1kZWZhdWx0IDAwMDAKCkkgaGF2ZSBub3cgaW5zdGFsbGVk
-IGJsdWV6LWdub21lLTAuNiBhbHNvLiBXYXMgaXQgcmVxdWlyZWQ/IAoKaGNpZCBpcyBkZWZpbml0
-ZWx5IHJ1bm5pbmcuIFN5c2xvZyBtZXNzYWdlcyBhcmUgaGVyZTotCkFwciAxNyAwODo0MzozNSBk
-bGhsMDMzMCBoY2lkWzI5NzQ0XTogQmx1ZXRvb3RoIEhDSSBkYWVtb24KQXByIDE3IDA4OjQzOjM1
-IGRsaGwwMzMwIGhjaWRbMjk3NDRdOiBIQ0kgZGV2IDAgcmVnaXN0ZXJlZApBcHIgMTcgMDg6NDM6
-MzUgZGxobDAzMzAgaGNpZFsyOTc0NF06IEhDSSBkZXYgMCBhbHJlYWR5IHVwCkFwciAxNyAwODo0
-MzozNSBkbGhsMDMzMCBoY2lkWzI5NzQ0XTogRGV2aWNlIGhjaTAgaGFzIGJlZW4gYWRkZWQKQXBy
-IDE3IDA4OjQzOjM1IGRsaGwwMzMwIGhjaWRbMjk3NDRdOiBTdGFydGluZyBzZWN1cml0eSBtYW5h
-Z2VyIDAKQXByIDE3IDA4OjQzOjM1IGRsaGwwMzMwIGhjaWRbMjk3NDRdOiBEZXZpY2UgaGNpMCBo
-YXMgYmVlbiBhY3RpdmF0ZWQKQXByIDE3IDA4OjQzOjM1IGRsaGwwMzMwIGhjaWRbMjk3NDRdOiBy
-ZXR1cm5fbGlua19rZXlzIChzYmE9MDA6ODA6RTE6QUE6MzM6NDQsIGRiYT0wMDowMDowMDowMDow
-MDowMCkKQXByIDE3IDA4OjQ1OjA0IGRsaGwwMzMwIGhjaWRbMjk3NDRdOiBwaW5fY29kZV9yZXF1
-ZXN0IChzYmE9MDA6ODA6RTE6QUE6MzM6NDQsIGRiYT0wMDowMzozNTowMDpBQTpBQSkKQXByIDE3
-IDA4OjU1OjQ4IGRsaGwwMzMwIGhjaWRbMjk3NDRdOiBEZWZhdWx0IHBhc3NrZXkgYWdlbnQgKDox
-LjIsIC9vcmcvYmx1ZXovcGFzc2tleV9hZ2VudF8zMDMzMikgcmVnaXN0ZXJlZAoKUmVnYXJkcywK
-U3VtZWV0IAotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQpGcm9tOiBibHVlei11c2Vycy1ib3Vu
-Y2VzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldCBbbWFpbHRvOmJsdWV6LXVzZXJzLWJvdW5jZXNAbGlz
-dHMuc291cmNlZm9yZ2UubmV0XSBPbiBCZWhhbGYgT2YgTWFyY2VsIEhvbHRtYW5uClNlbnQ6IE1v
-bmRheSwgQXByaWwgMTYsIDIwMDcgNzoxNCBQTQpUbzogQmx1ZVogdXNlcnMKQ2M6IGJsdWV6LXVz
-ZXJzQGxpc3RzLnNmLm5ldApTdWJqZWN0OiBSZTogW0JsdWV6LXVzZXJzXSBQYWlyaW5nIHByb2Js
-ZW0KCkhpIFN1bWVldCwKCj4gSSBoYXZlIHdyaXR0ZW4gYSBIRiBHVyBhcHBsaWNhdGlvbiBidXQg
-SSBjYW5ub3QgcGFpciB1c2luZyB0aGUgcGFzc2tleSAKPiBhZ2VudC4gSSBhbSB1c2luZyBibHVl
-ei0zLjkuIFdoZW4gSSB1c2UgcGluX2hlbHBlciBjb25jZXB0IGluIAo+IGJsdWV6LTIuMjUgaXQg
-d29ya3MgZmluZS4gSSBzdGFydGVkIHRoZSBwYXNza2V5IGFnZW50IHVzaW5nICMgcGFzc2tleSAK
-PiAtLWRlZmF1bHQgMDAwMAo+IAo+IERvIEkgaGF2ZSB0byBpbnN0YWxsIGJsdWV6LWdub21lLTAu
-NiBmb3Igc2VjdXJpdHkgb3BlcmF0aW5zLiBJcyB0aGVyZSBzb21lIG90aGVyIHdheSB3aGVyZSBJ
-IGRvbuKAmXQgZ2V0IGEgcHJvbXB0IGZvciBwaW4ga2V5IGFuZCBhcHBsaWNhdGlvbiB1c2VzIHNv
-bWUgZGVmYXVsdCBwaW4ga2V5ICgwMDAwKS4KPiAKPiBCVFcgSSB0cmllZCBwdXR0aW5nIGVudHJ5
-IGludG8gdGhlIC92YXIvbGliL2JsdWV0b290aC8wMDo4MDplMTphYTozMzo0NC9waW5jb2Rlcywg
-YnV0IEkgZG9lc24ndCB3b3JrLiAKPiBUaGUgYXBwbGljYXRpb25zIGdldHMgc3R1Y2sgYXQgUElO
-IENvZGUgUmVxdWVzdC4gQW5kIHRoZW4gcmZjb21tIAo+IGNvbm5lY3Rpb24gdGltZXMgb3V0LiBI
-Y2lkIGRvZXNuJ3QgdGFrZSB2YWx1ZSBvZiBwYXNza2V5IGZyb20gCj4gaGNpZC5jb25mCgp0aGUg
-cGFzc2tleSB2YWx1ZSBpbiBoY2lkLmNvbmYgaXMgb25seSBmb3IgaW5jb21pbmcgY29ubmVjdGlv
-bnMgYW5kIHlvdSBuZWVkIHRvIGFkanVzdCB0aGUgc2VjdXJpdHkgc2V0dGluZy4gSG93ZXZlciB1
-c2luZyB0aGUgYXV0byBzZXR0aW5nIG1pZ2h0IHJlc3VsdCBpbiBhIHNlY3VyaXR5IGlzc3VlIHNp
-bmNlIHlvdSBub3cgaGF2ZSBhIGZpeGVkIFBJTi4KClVzaW5nIHRoZSBwaW5jb2RlcyBmaWxlIHdv
-bid0IHdvcmsgdW50aWwgeW91IGhhdmUgYSBwYXNza2V5IGFnZW50IHJ1bm5pbmcgc2luY2UgaXQg
-d2lsbCBhc2sgdGhlIGFnZW50IGZvciBjb25maXJtYXRpb24uCgpDaGVjayBzeXNsb2cgb3V0cHV0
-IGZvciBhbnkgZXJyb3IgbWVzc2FnZXMgZnJvbSBoY2lkLiBJdCB3aWxsIHRlbGwgeW91IHdoYXQg
-aXMgZ29pbmcgb24gYW5kIHdoYXQgaXMgd3JvbmcuIEFsc28gbWFrZSBzdXJlIHRoYXQgaGNpZCBp
-cyBhY3R1YWxseSBydW5uaW5nLgoKUmVnYXJkcwoKTWFyY2VsCgoKCi0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K
-VGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5IERCMiBFeHByZXNzIERvd25sb2FkIERC
-MiBFeHByZXNzIEMgLSB0aGUgRlJFRSB2ZXJzaW9uIG9mIERCMiBleHByZXNzIGFuZCB0YWtlIGNv
-bnRyb2wgb2YgeW91ciBYTUwuIE5vIGxpbWl0cy4gSnVzdCBkYXRhLiBDbGljayB0byBnZXQgaXQg
-bm93LgpodHRwOi8vc291cmNlZm9yZ2UubmV0L3Bvd2VyYmFyL2RiMi8KX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0
-CkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZv
-cmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2VycwoKCi0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhp
-cyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5IERCMiBFeHByZXNzCkRvd25sb2FkIERCMiBF
-eHByZXNzIEMgLSB0aGUgRlJFRSB2ZXJzaW9uIG9mIERCMiBleHByZXNzIGFuZCB0YWtlCmNvbnRy
-b2wgb2YgeW91ciBYTUwuIE5vIGxpbWl0cy4gSnVzdCBkYXRhLiBDbGljayB0byBnZXQgaXQgbm93
-LgpodHRwOi8vc291cmNlZm9yZ2UubmV0L3Bvd2VyYmFyL2RiMi8KX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0CkJs
-dWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdl
-Lm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo=
+--===============1660847401==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_65016_28218511.1176785787362"
+
+------=_Part_65016_28218511.1176785787362
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+hi Marcel,
+               Thanks for the advice , will surely port to 2.6 kernel.
+regards
+siddhant
+
+On 4/16/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Siddhant,
+>
+> >     I will try to upgrade to 2.6 kernel but since this is arm Single
+> > Board Computer , i am not sure about the effort and time  that would
+> > be required to do so.
+> >
+> > I have another observation to share with you .
+> >
+> > When using two dongle , if i put hci0 down by hciconfig hci0 down
+> > and then put hci1 up by hciconfig  hci1 up
+> > then hciconfig returns correct address for the second adapter as well.
+> >
+> > Also if i try to put hci1 up  without putting hci0 down then same
+> > thing
+> >  ----- "cannot contact hci1 connection timed out" message appears.
+> >
+> > Please reply if you can give me some hints about whats happening after
+> > going through the above observation.
+>
+> I am pretty sure that is the USB subsystem. Since when you down the
+> adapter all URBs will be canceled. So you can try to change the
+> constants for the number of URBs in hci_usb.h and recompile your kernel.
+> You can also try to disable ISOC transfers (SCO support for the driver)
+> and see if that takes the bandwidth pressure from the USB bus.
+>
+> However, the 2.6 USB subsystem is really the way to go. No effort on
+> porting to 2.6 is wasted.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by DB2 Express
+> Download DB2 Express C - the FREE version of DB2 express and take
+> control of your XML. No limits. Just data. Click to get it now.
+> http://sourceforge.net/powerbar/db2/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+
+------=_Part_65016_28218511.1176785787362
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+hi Marcel,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Thanks for the advice , will surely port to 2.6 kernel.<br>regards<br>siddhant<br><br><div><span class="gmail_quote">On 4/16/07, <b class="gmail_sendername">Marcel Holtmann</b> &lt;<a href="mailto:marcel@holtmann.org">
+marcel@holtmann.org</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hi Siddhant,<br><br>&gt;&nbsp;&nbsp;&nbsp;&nbsp; I will try to upgrade to 
+2.6 kernel but since this is arm Single<br>&gt; Board Computer , i am not sure about the effort and time&nbsp;&nbsp;that would<br>&gt; be required to do so.<br>&gt;<br>&gt; I have another observation to share with you .<br>&gt;<br>
+&gt; When using two dongle , if i put hci0 down by hciconfig hci0 down<br>&gt; and then put hci1 up by hciconfig&nbsp;&nbsp;hci1 up<br>&gt; then hciconfig returns correct address for the second adapter as well.<br>&gt;<br>&gt; Also if i try to put hci1 up&nbsp;&nbsp;without putting hci0 down then same
+<br>&gt; thing<br>&gt;&nbsp;&nbsp;----- &quot;cannot contact hci1 connection timed out&quot; message appears.<br>&gt;<br>&gt; Please reply if you can give me some hints about whats happening after<br>&gt; going through the above observation.
+<br><br>I am pretty sure that is the USB subsystem. Since when you down the<br>adapter all URBs will be canceled. So you can try to change the<br>constants for the number of URBs in hci_usb.h and recompile your kernel.<br>
+You can also try to disable ISOC transfers (SCO support for the driver)<br>and see if that takes the bandwidth pressure from the USB bus.<br><br>However, the 2.6 USB subsystem is really the way to go. No effort on<br>porting to 
+2.6 is wasted.<br><br>Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>This SF.net email is sponsored by DB2 Express<br>Download DB2 Express C - the FREE version of DB2 express and take
+<br>control of your XML. No limits. Just data. Click to get it now.<br><a href="http://sourceforge.net/powerbar/db2/">http://sourceforge.net/powerbar/db2/</a><br>_______________________________________________<br>Bluez-users mailing list
+<br><a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users</a>
+<br></blockquote></div><br>
+
+------=_Part_65016_28218511.1176785787362--
+
+
+--===============1660847401==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+--===============1660847401==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1660847401==--
