@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Sumeet VERMA <sumeet.verma@st.com>
-To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
-Date: Tue, 17 Apr 2007 16:53:14 +0530
-Message-ID: <00ef01c780e2$ca850d30$8935c70a@dlh.st.com>
+Message-ID: <BAY124-W7A720958317EB2F33E1C8F0510@phx.gbl>
+From: Robert Rawlins <robert_rawlins@hotmail.com>
+To: <bluez-users@lists.sourceforge.net>
+Date: Tue, 17 Apr 2007 09:22:48 +0000
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] Pairing problem
+Subject: [Bluez-users] Python ObexPush
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,86 +14,93 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============1203148635=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGkgTWFyY2VsCkkgd2FzIGFibGUgdG8gZG8gdGhlIHBhaXJpbmcuIFdoYXQgSSBkaWQgOi0gCkkg
-c2V0IHRoZSBzZWN1cml0eSBvcHRpb24gaW4gaGNpZC5jb25mIGFzIGF1dG8uClRoZXJlIGlzIGFu
-b3RoZXIgZmlsZSAvZXRjL2JsdWV0b290aC9waW4gd2hlcmUgSSB3cml0ZSAiMDAwMCIKSSBraWxs
-IHRoZSBoY2lkIGFuZCBzdGFydCBhZ2Fpbi4gTWFrZSBzdXJlIHRoZSBzZWNtZ3IgaXMgbm90IHJ1
-bm5pbmcgaS5lLiAKIyBoY2ljb25maWcgaGNpMCBub3NlY21ncgoKTm93IHdoZW4gSSBkbyB0aGUg
-cGFpcmluZywgaXQgaXMgc3VjY2Vzc2Z1bC4KCkJ1dCBJIHN0aWxsIGRvbid0IHVuZGVyc3RhbmQg
-dGhlIHJvbGUgb2YgcGFzc2tleS1hZ2VudD8gVGhpcyB3YXkgSSBkaWRuJ3QgbmVlZCBpdCBhdCBh
-bGwuClRoYW5rcywKCgpTdW1lZXQgCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tCkZyb206IHN1
-bWVldCB2ZXJtYSBbbWFpbHRvOnN1bWVldC52ZXJtYUBzdC5jb21dIApTZW50OiBUdWVzZGF5LCBB
-cHJpbCAxNywgMjAwNyAxMjo0NyBQTQpUbzogJ0JsdWVaIHVzZXJzJwpTdWJqZWN0OiBSRTogW0Js
-dWV6LXVzZXJzXSBQYWlyaW5nIHByb2JsZW0KCkhpIE1hcmNlbCAKPiB0aGUgcGFzc2tleSB2YWx1
-ZSBpbiBoY2lkLmNvbmYgaXMgb25seSBmb3IgaW5jb21pbmcgY29ubmVjdGlvbnMgYW5kIHlvdSBu
-ZWVkIHRvIGFkanVzdCB0aGUgc2VjdXJpdHkgc2V0dGluZy4gSG93ZXZlciB1c2luZyB0aGUgYXV0
-byBzZXR0aW5nIG1pZ2h0IHJlc3VsdCA+IGluIGEgc2VjdXJpdHkgaXNzdWUgc2luY2UgeW91IG5v
-dyBoYXZlIGEgZml4ZWQgUElOLgpXaGF0IHNlY3VyaXR5IHNldHRpbmcgYWRqdXN0bWVudCBkbyBJ
-IG5lZWQgdG8gbWFrZT8KSSBzdGFydGVkIHRoZSBzZWN1cml0eSBtYW5hZ2VyICMgaGNpY29uZmln
-IGhjaTAgc2VjbWdyCkkgYW0gdXNpbmcgInVzZXIiIHNldHRpbmcgaW4gaGNpZC5jb25mCgo+VXNp
-bmcgdGhlIHBpbmNvZGVzIGZpbGUgd29uJ3Qgd29yayB1bnRpbCB5b3UgaGF2ZSBhIHBhc3NrZXkg
-YWdlbnQgcnVubmluZyBzaW5jZSBpdCB3aWxsIGFzayB0aGUgYWdlbnQgZm9yIGNvbmZpcm1hdGlv
-bi4KSSBoYXZlIHRoZSBwYXNza2V5LWFnZW50IHJ1bm5pbmcgYnV0IHN0aWxsIHRoZSBoY3VkdW1w
-IC1YIC1WIGxvZyBpcyBzdHVjayBhdCBwaW4gY29kZSByZXF1ZXN0LiBJIHJ1biBwYXNza2V5LWFn
-ZW50IGFzIAojIC4vYmx1ZXotdXRpbHMtMy45L2RhZW1vbi9wYXNza2V5LWFnZW50IC0tZGVmYXVs
-dCAwMDAwCgpJIGhhdmUgbm93IGluc3RhbGxlZCBibHVlei1nbm9tZS0wLjYgYWxzby4gV2FzIGl0
-IHJlcXVpcmVkPyAKCmhjaWQgaXMgZGVmaW5pdGVseSBydW5uaW5nLiBTeXNsb2cgbWVzc2FnZXMg
-YXJlIGhlcmU6LQpBcHIgMTcgMDg6NDM6MzUgZGxobDAzMzAgaGNpZFsyOTc0NF06IEJsdWV0b290
-aCBIQ0kgZGFlbW9uCkFwciAxNyAwODo0MzozNSBkbGhsMDMzMCBoY2lkWzI5NzQ0XTogSENJIGRl
-diAwIHJlZ2lzdGVyZWQKQXByIDE3IDA4OjQzOjM1IGRsaGwwMzMwIGhjaWRbMjk3NDRdOiBIQ0kg
-ZGV2IDAgYWxyZWFkeSB1cApBcHIgMTcgMDg6NDM6MzUgZGxobDAzMzAgaGNpZFsyOTc0NF06IERl
-dmljZSBoY2kwIGhhcyBiZWVuIGFkZGVkCkFwciAxNyAwODo0MzozNSBkbGhsMDMzMCBoY2lkWzI5
-NzQ0XTogU3RhcnRpbmcgc2VjdXJpdHkgbWFuYWdlciAwCkFwciAxNyAwODo0MzozNSBkbGhsMDMz
-MCBoY2lkWzI5NzQ0XTogRGV2aWNlIGhjaTAgaGFzIGJlZW4gYWN0aXZhdGVkCkFwciAxNyAwODo0
-MzozNSBkbGhsMDMzMCBoY2lkWzI5NzQ0XTogcmV0dXJuX2xpbmtfa2V5cyAoc2JhPTAwOjgwOkUx
-OkFBOjMzOjQ0LCBkYmE9MDA6MDA6MDA6MDA6MDA6MDApCkFwciAxNyAwODo0NTowNCBkbGhsMDMz
-MCBoY2lkWzI5NzQ0XTogcGluX2NvZGVfcmVxdWVzdCAoc2JhPTAwOjgwOkUxOkFBOjMzOjQ0LCBk
-YmE9MDA6MDM6MzU6MDA6QUE6QUEpCkFwciAxNyAwODo1NTo0OCBkbGhsMDMzMCBoY2lkWzI5NzQ0
-XTogRGVmYXVsdCBwYXNza2V5IGFnZW50ICg6MS4yLCAvb3JnL2JsdWV6L3Bhc3NrZXlfYWdlbnRf
-MzAzMzIpIHJlZ2lzdGVyZWQKClJlZ2FyZHMsClN1bWVldCAKLS0tLS1PcmlnaW5hbCBNZXNzYWdl
-LS0tLS0KRnJvbTogYmx1ZXotdXNlcnMtYm91bmNlc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQgW21h
-aWx0bzpibHVlei11c2Vycy1ib3VuY2VzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldF0gT24gQmVoYWxm
-IE9mIE1hcmNlbCBIb2x0bWFubgpTZW50OiBNb25kYXksIEFwcmlsIDE2LCAyMDA3IDc6MTQgUE0K
-VG86IEJsdWVaIHVzZXJzCkNjOiBibHVlei11c2Vyc0BsaXN0cy5zZi5uZXQKU3ViamVjdDogUmU6
-IFtCbHVlei11c2Vyc10gUGFpcmluZyBwcm9ibGVtCgpIaSBTdW1lZXQsCgo+IEkgaGF2ZSB3cml0
-dGVuIGEgSEYgR1cgYXBwbGljYXRpb24gYnV0IEkgY2Fubm90IHBhaXIgdXNpbmcgdGhlIHBhc3Nr
-ZXkgCj4gYWdlbnQuIEkgYW0gdXNpbmcgYmx1ZXotMy45LiBXaGVuIEkgdXNlIHBpbl9oZWxwZXIg
-Y29uY2VwdCBpbiAKPiBibHVlei0yLjI1IGl0IHdvcmtzIGZpbmUuIEkgc3RhcnRlZCB0aGUgcGFz
-c2tleSBhZ2VudCB1c2luZyAjIHBhc3NrZXkgCj4gLS1kZWZhdWx0IDAwMDAKPiAKPiBEbyBJIGhh
-dmUgdG8gaW5zdGFsbCBibHVlei1nbm9tZS0wLjYgZm9yIHNlY3VyaXR5IG9wZXJhdGlucy4gSXMg
-dGhlcmUgc29tZSBvdGhlciB3YXkgd2hlcmUgSSBkb27igJl0IGdldCBhIHByb21wdCBmb3IgcGlu
-IGtleSBhbmQgYXBwbGljYXRpb24gdXNlcyBzb21lIGRlZmF1bHQgcGluIGtleSAoMDAwMCkuCj4g
-Cj4gQlRXIEkgdHJpZWQgcHV0dGluZyBlbnRyeSBpbnRvIHRoZSAvdmFyL2xpYi9ibHVldG9vdGgv
-MDA6ODA6ZTE6YWE6MzM6NDQvcGluY29kZXMsIGJ1dCBJIGRvZXNuJ3Qgd29yay4gCj4gVGhlIGFw
-cGxpY2F0aW9ucyBnZXRzIHN0dWNrIGF0IFBJTiBDb2RlIFJlcXVlc3QuIEFuZCB0aGVuIHJmY29t
-bSAKPiBjb25uZWN0aW9uIHRpbWVzIG91dC4gSGNpZCBkb2Vzbid0IHRha2UgdmFsdWUgb2YgcGFz
-c2tleSBmcm9tIAo+IGhjaWQuY29uZgoKdGhlIHBhc3NrZXkgdmFsdWUgaW4gaGNpZC5jb25mIGlz
-IG9ubHkgZm9yIGluY29taW5nIGNvbm5lY3Rpb25zIGFuZCB5b3UgbmVlZCB0byBhZGp1c3QgdGhl
-IHNlY3VyaXR5IHNldHRpbmcuIEhvd2V2ZXIgdXNpbmcgdGhlIGF1dG8gc2V0dGluZyBtaWdodCBy
-ZXN1bHQgaW4gYSBzZWN1cml0eSBpc3N1ZSBzaW5jZSB5b3Ugbm93IGhhdmUgYSBmaXhlZCBQSU4u
-CgpVc2luZyB0aGUgcGluY29kZXMgZmlsZSB3b24ndCB3b3JrIHVudGlsIHlvdSBoYXZlIGEgcGFz
-c2tleSBhZ2VudCBydW5uaW5nIHNpbmNlIGl0IHdpbGwgYXNrIHRoZSBhZ2VudCBmb3IgY29uZmly
-bWF0aW9uLgoKQ2hlY2sgc3lzbG9nIG91dHB1dCBmb3IgYW55IGVycm9yIG1lc3NhZ2VzIGZyb20g
-aGNpZC4gSXQgd2lsbCB0ZWxsIHlvdSB3aGF0IGlzIGdvaW5nIG9uIGFuZCB3aGF0IGlzIHdyb25n
-LiBBbHNvIG1ha2Ugc3VyZSB0aGF0IGhjaWQgaXMgYWN0dWFsbHkgcnVubmluZy4KClJlZ2FyZHMK
-Ck1hcmNlbAoKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3Jl
-ZCBieSBEQjIgRXhwcmVzcyBEb3dubG9hZCBEQjIgRXhwcmVzcyBDIC0gdGhlIEZSRUUgdmVyc2lv
-biBvZiBEQjIgZXhwcmVzcyBhbmQgdGFrZSBjb250cm9sIG9mIHlvdXIgWE1MLiBObyBsaW1pdHMu
-IEp1c3QgZGF0YS4gQ2xpY2sgdG8gZ2V0IGl0IG5vdy4KaHR0cDovL3NvdXJjZWZvcmdlLm5ldC9w
-b3dlcmJhci9kYjIvCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fCkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdApCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3Jn
-ZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXot
-dXNlcnMKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBi
-eSBEQjIgRXhwcmVzcwpEb3dubG9hZCBEQjIgRXhwcmVzcyBDIC0gdGhlIEZSRUUgdmVyc2lvbiBv
-ZiBEQjIgZXhwcmVzcyBhbmQgdGFrZQpjb250cm9sIG9mIHlvdXIgWE1MLiBObyBsaW1pdHMuIEp1
-c3QgZGF0YS4gQ2xpY2sgdG8gZ2V0IGl0IG5vdy4KaHR0cDovL3NvdXJjZWZvcmdlLm5ldC9wb3dl
-cmJhci9kYjIvCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-CkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdApCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5u
-ZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNl
-cnMK
+--===============1203148635==
+Content-Type: multipart/alternative;
+	boundary="_771085e6-a4d9-4ad1-9aa5-6ffd8ab5b2c4_"
+
+--_771085e6-a4d9-4ad1-9aa5-6ffd8ab5b2c4_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Hello Guys,
+=20
+I'm looking for the most efficient way to push a file over obex from my pyt=
+hon application, until recently i was using ussp-push from bash, but though=
+t now I'm in python there is perhaps a more efficient way to push it.
+=20
+Obviously I'm running the latest build of the OpenObex platform, is there a=
+n easy way to interact with that from python to push the file?
+=20
+Thanks for any advice,
+=20
+Rob
+_________________________________________________________________
+Try Live.com: where your online world comes together - with news, sports, w=
+eather, and much more.
+http://www.live.com/getstarted=
+
+--_771085e6-a4d9-4ad1-9aa5-6ffd8ab5b2c4_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<style>
+P
+{
+margin:0px;
+padding:0px
+}
+body
+{
+FONT-SIZE: 10pt;
+FONT-FAMILY:Tahoma
+}
+</style>
+</head>
+<body>Hello Guys,<BR>
+&nbsp;<BR>
+I'm looking for the most efficient way to push a file over obex from my pyt=
+hon application, until recently i was using ussp-push from bash, but though=
+t now I'm in python there is perhaps a more efficient way to push it.<BR>
+&nbsp;<BR>
+Obviously I'm running the latest build of the OpenObex platform, is there a=
+n easy way to interact with that from python to push the file?<BR>
+&nbsp;<BR>
+Thanks for any advice,<BR>
+&nbsp;<BR>
+Rob<BR><br /><hr />With Live Spaces email straight to your blog. Upload jok=
+es, photos and more. It's free! <a href=3D'http://specials.uk.msn.com/space=
+s/default.aspx ' target=3D'_new'>It's free!</a></body>
+</html>=
+
+--_771085e6-a4d9-4ad1-9aa5-6ffd8ab5b2c4_--
+
+
+--===============1203148635==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+--===============1203148635==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1203148635==--
