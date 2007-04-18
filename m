@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <00b801c780c0$5974c710$8935c70a@dlh.st.com>
-References: <00b801c780c0$5974c710$8935c70a@dlh.st.com>
-Date: Thu, 19 Apr 2007 01:43:35 +0200
-Message-Id: <1176939815.6741.37.camel@aeonflux.holtmann.net>
+In-Reply-To: <BAY124-W7A720958317EB2F33E1C8F0510@phx.gbl>
+References: <BAY124-W7A720958317EB2F33E1C8F0510@phx.gbl>
+Date: Thu, 19 Apr 2007 01:42:17 +0200
+Message-Id: <1176939737.6741.34.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Pairing problem
+Subject: Re: [Bluez-users] Python ObexPush
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,23 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Sumeet,
+Hi Robert,
 
-> > the passkey value in hcid.conf is only for incoming connections and you need to adjust the security setting. However using the auto setting might result > in a security issue since you now have a fixed PIN.
-> What security setting adjustment do I need to make?
-> I started the security manager # hciconfig hci0 secmgr
-> I am using "user" setting in hcid.conf
+> I'm looking for the most efficient way to push a file over obex from
+> my python application, until recently i was using ussp-push from bash,
+> but thought now I'm in python there is perhaps a more efficient way to
+> push it.
+>  
+> Obviously I'm running the latest build of the OpenObex platform, is
+> there an easy way to interact with that from python to push the file?
 
-don't enable the kernel secmgr. It doesn't work.
-
-> >Using the pincodes file won't work until you have a passkey agent running since it will ask the agent for confirmation.
-> I have the passkey-agent running but still the hcudump -X -V log is stuck at pin code request. I run passkey-agent as 
-> # ./bluez-utils-3.9/daemon/passkey-agent --default 0000
-> 
-> I have now installed bluez-gnome-0.6 also. Was it required? 
-
-No. The only thing you need is a default passkey agent. The bluez-gnome
-provides one, but you can also use the passkey-agent.c example.
+at some point we might have Python binding for OpenOBEX or a nice D-Bus
+enabled OBEX daemon. Currently I can't think of anything.
 
 Regards
 
