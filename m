@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1d49725d0704140901v7f778dd5tbe1b4fdfaef44430@mail.gmail.com>
-References: <1d49725d0704140901v7f778dd5tbe1b4fdfaef44430@mail.gmail.com>
-Date: Thu, 19 Apr 2007 01:49:15 +0200
-Message-Id: <1176940155.6741.44.camel@aeonflux.holtmann.net>
+To: Volker Christian <Volker.Christian@fh-hagenberg.at>
+In-Reply-To: <200704162326.45143.Volker.Christian@fh-hagenberg.at>
+References: <200704162036.15543.Volker.Christian@fh-hagenberg.at>
+	<1176756867.30191.6.camel@aeonflux.holtmann.net>
+	<200704162326.45143.Volker.Christian@fh-hagenberg.at>
+Date: Thu, 19 Apr 2007 01:41:30 +0200
+Message-Id: <1176939690.6741.32.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Error connecting after inquiry
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Bug in hcid prevents naming of devices
+	by	means	of the bluetooth-address of a device
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,21 +24,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Donnie,
+Hi Volker,
 
-> Ok, the name is now only checked for devices that pass the class
-> filter.
-> Is there any way to ensure the baseband connection is closed?
+> > > the man-page of hcid.conf describes how to configure more than one
+> > > bluetooth devices installed on one machine.
+> > > It says:
+> > > ----------------------
+> > > nn:nn:nn:nn:nn:nn
+> > >
+> > >               Parameters  specified  within  this  section  will  be
+> > >               applied  to  the  device  with  this  device bluetooth
+> > >               address. All other parameters  are  applied  from  the
+> > >               default section.
+> > > ----------------------
+> > > This is broken in the current (3.9) and previous version of the
+> > > bluez-utils. The current debian-package is also affected.
+> > >
+> > > Following patch to main.c of the hcid fixis this problem:
+> > >
+> > > --- main.c-orig 2007-04-16 20:23:41.000000000 +0200
+> > > +++ main.c      2007-04-16 20:22:30.000000000 +0200
+> > > @@ -124,7 +124,7 @@
+> > >         struct hci_dev_info di;
+> > >
+> > >         /* First try to get BD_ADDR based settings ... */
+> > > -       if (!hci_devinfo(hdev, &di) < 0) {
+> > > +       if (!(hci_devinfo(hdev, &di) < 0)) {
+> > >                 char addr[18];
+> > >                 ba2str(&di.bdaddr, addr);
+> > >                 device_opts = find_device_opts(addr);
+> >
+> > does "if (hci_devinfo(hdev, &di) == 0) {" also work for you?
+> Yes, it also works, and it has to work. As i remember correctly, the return 
+> value of hci_devinfo is the return value of an ioctl-call which succeeds 
+> (return value 0). So hci_devinfo(...) == 0 does the job also.
 
-I might have to fix that inside the kernel. A remote name complete event
-should trigger a re-iteration of pending connect requests. This is not
-simple. However you can call a remote name cancel command before
-actually connecting to the device.
-
-However the best for you is to use a high timeout for the name request
-function. This will ensure that you catch the remote name complete
-events and not abort before that. Use the values we use in hcitool,
-because they are this long for a reason.
+this code is readable, the other version was twisting my mind. Patch is
+in the CVS now.
 
 Regards
 
