@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <a481fbf0704190615w581acd8eg14a809b9d81fcaba@mail.gmail.com>
-Date: Thu, 19 Apr 2007 09:15:31 -0400
-From: "Raymond Ingles" <sorceror171@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <c49421c50704190516n2d23c01ep4df69fa9d6b9ff29@mail.gmail.com>
+Message-ID: <ddea76ce0704190530i7f37f0bbm3bcec61f5dee2b08@mail.gmail.com>
+Date: Thu, 19 Apr 2007 13:30:03 +0100
+From: "Meenakshi Seeballack" <meena2010@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-References: <c49421c50704131206m19108a6ctc86461e05137570e@mail.gmail.com>
-	<c49421c50704190516n2d23c01ep4df69fa9d6b9ff29@mail.gmail.com>
-Subject: Re: [Bluez-users] reducing dongle coverage area
+Subject: [Bluez-users] application using bluez, uml diagrams
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,33 +14,56 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1795937302=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 4/19/07, Loreno Oliveira <lorenooliveira@gmail.com> wrote:
+--===============1795937302==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_98310_15100981.1176985803459"
 
-> > is there any way to reduce the coverage area of a bluetooth dongle?
+------=_Part_98310_15100981.1176985803459
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
- There's only two ways to do that - reduce the transmission power
-(which I don't think is possible, but I'm not an expert) or else block
-the signal. Anything that blocks Wifi should block Bluetooth, as they
-use the same frequency range.
+Hello all,
+Would anyone know of websites with examples of bluetooth UML diagrams, like
+sequence diagrams which would visually show the interactions during service
+discovery?
+Thank you all in advance,
+Meena
 
- A quick Google for "wifi bluetooth shield" turned up a few things:
+------=_Part_98310_15100981.1176985803459
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
- http://www.forcefieldwireless.com/products.html
- http://www.globalgadgetuk.com/wireless.htm
+Hello all,<br>Would anyone know of websites with examples of bluetooth UML diagrams, like sequence diagrams which would visually show the interactions during service discovery?<br>Thank you all in advance,<br>Meena<br>
 
- A more determined search on your part would would probably turn up
-more options. Good luck!
+------=_Part_98310_15100981.1176985803459--
+
+
+--===============1795937302==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1795937302==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1795937302==--
