@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <20070419150753.z9s8rdwzc0koogwc@tern.doc.ic.ac.uk>
-Date: Thu, 19 Apr 2007 15:07:53 +0100
-From: ps104@doc.ic.ac.uk
-To: bluez-users@lists.sourceforge.net
+Message-ID: <a481fbf0704190615w581acd8eg14a809b9d81fcaba@mail.gmail.com>
+Date: Thu, 19 Apr 2007 09:15:31 -0400
+From: "Raymond Ingles" <sorceror171@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <c49421c50704190516n2d23c01ep4df69fa9d6b9ff29@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] PSMs
+References: <c49421c50704131206m19108a6ctc86461e05137570e@mail.gmail.com>
+	<c49421c50704190516n2d23c01ep4df69fa9d6b9ff29@mail.gmail.com>
+Subject: Re: [Bluez-users] reducing dongle coverage area
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,15 +21,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I am writing a program using bluez l2cap connections however if I set  
-the PSM to anything
-apart from 0x1001 (ie. loc_addr.l2_psm = htobs(0x1001)) I constantly  
-receive blank
-messages of length 0 across the connection. Any ideas?
+On 4/19/07, Loreno Oliveira <lorenooliveira@gmail.com> wrote:
 
-Thanks,
-Phil
+> > is there any way to reduce the coverage area of a bluetooth dongle?
 
+ There's only two ways to do that - reduce the transmission power
+(which I don't think is possible, but I'm not an expert) or else block
+the signal. Anything that blocks Wifi should block Bluetooth, as they
+use the same frequency range.
+
+ A quick Google for "wifi bluetooth shield" turned up a few things:
+
+ http://www.forcefieldwireless.com/products.html
+ http://www.globalgadgetuk.com/wireless.htm
+
+ A more determined search on your part would would probably turn up
+more options. Good luck!
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
