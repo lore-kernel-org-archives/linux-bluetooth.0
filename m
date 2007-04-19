@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4626FF17.3010801@tlau.org>
-Date: Wed, 18 Apr 2007 22:33:11 -0700
-From: Tessa Lau <tlau@tlau.org>
-MIME-Version: 1.0
+Date: Wed, 18 Apr 2007 18:19:53 -0700 (PDT)
+From: walt shekrota <penguinacity@yahoo.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <4625B4FC.9000006@tlau.org>
-	<1176939398.6741.24.camel@aeonflux.holtmann.net>
-In-Reply-To: <1176939398.6741.24.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] "Can't get conn info" error pairing
- Treo	with	Bluetooth dongle
+In-Reply-To: <1176939477.6741.26.camel@aeonflux.holtmann.net>
+MIME-Version: 1.0
+Message-ID: <619708.58049.qm@web62305.mail.re1.yahoo.com>
+Subject: Re: [Bluez-users] security block
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,225 +15,121 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2060611143=="
+Content-Type: multipart/mixed; boundary="===============1561656311=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---===============2060611143==
-Content-Type: multipart/alternative;
-	boundary="------------020408010807060505080405"
+--===============1561656311==
+Content-Type: multipart/alternative; boundary="0-1213338629-1176945593=:58049"
+Content-Transfer-Encoding: 8bit
 
-This is a multi-part message in MIME format.
---------------020408010807060505080405
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+--0-1213338629-1176945593=:58049
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
 Hi Marcel,
+I'm a little lost why it gets it. I think some indirect reason is why pin is neg reply. '0000' is the right pin!
 
-Here's the output from hcidump:
+swordfish bluetooth # sdptool browse
+Inquiring ...
+Browsing 00:19:1F:29:E0:4C ...
 
-HCI sniffer - Bluetooth packet analyzer ver 1.32
-device: hci0 snap_len: 1028 filter: 0xffffffff
- > HCI Event: Connect Request (0x04) plen 10
-    bdaddr 00:07:E0:B9:8A:4A class 0x70020c type ACL
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-    bdaddr 00:07:E0:B9:8A:4A role 0x00
-    Role: Master
- > HCI Event: Command Status (0x0f) plen 4
-    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
- > HCI Event: Connect Complete (0x03) plen 11
-    status 0x21 handle 1 bdaddr 00:07:E0:B9:8A:4A type ACL encrypt 0x00
-    Error: Role Change Not Allowed
- > HCI Event: Max Slots Change (0x1b) plen 3
-    handle 1 slots 5
- > HCI Event: Connection Packet Type Changed (0x1d) plen 5
-    status 0x00 handle 1 ptype 0xcc18
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
- > HCI Event: PIN Code Request (0x16) plen 6
-    bdaddr 00:07:E0:B9:8A:4A
+
+This is the last 25% or so of the hcidump. you can see the pin refusal and the security block at the end. This is after pairing and running btsco for headset address.
+
+
+> ACL data: handle 41 flags 0x02 dlen 22
+    L2CAP(d): cid 0x0040 len 18 [psm 1]
+        SDP SSA Rsp: tid 0x2 len 0xd
+          count 10
+          record #0
+              aid 0x0000 (SrvRecHndl)
+                 uint 0x10001
+              aid 0x0001 (SrvClassIDList)
+                 < uuid-16 0x1108 (Headset) uuid-16 0x1203 (Audio) >
+              aid 0x0004 (ProtocolDescList)
+                 < < uuid-16 0x0100 (L2CAP) > <
+                 uuid-16 0x0003 (RFCOMM) uint 0x2 > >
+              aid 0x0006 (LangBaseAttrIDList)
+                 < uint 0x656e uint 0x6a uint 0x100 >
+              aid 0x0009 (BTProfileDescList)
+                 < < uuid-16 0x1108 (Headset) uint 0x100 > >
+              aid 0x0100 (SrvName)
+                 str "Headset"
+              aid 0x0302 (unknown)
+                 bool 0x1
+          cont 00
+< ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0042 scid 0x0040
+< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+> HCI Event: Command Complete (0x0e) plen 6
+    Read Voice Setting (0x03|0x0025) ncmd 1
+    status 0x00 voice setting 0x0060
+< ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0041
+> ACL data: handle 41 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0042 scid 0x0040
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 41 packets 1
+> ACL data: handle 41 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0043 scid 0x0041 result 1 status 2
+      Connection pending - Authorization pending
+> HCI Event: PIN Code Request (0x16) plen 6
+    bdaddr 00:19:1F:29:E0:4C
 < HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
-    bdaddr 00:07:E0:B9:8A:4A
- > HCI Event: Command Complete (0x0e) plen 10
+    bdaddr 00:19:1F:29:E0:4C
+> HCI Event: Command Complete (0x0e) plen 10
     PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
-    status 0x00 bdaddr 00:07:E0:B9:8A:4A
- > HCI Event: Auth Complete (0x06) plen 3
-    status 0x06 handle 1
-    Error: PIN or Key Missing
- > HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 1 reason 0x13
+    status 0x00 bdaddr 00:19:1F:29:E0:4C
+> ACL data: handle 41 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0041 result 3 status 0
+      Connection refused - security block
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 41 reason 0x13
     Reason: Remote User Terminated Connection
 
+=========================================
 
-I am typing my PIN into the Treo when prompted, and it is the same one 
-that I specified in the hcid.conf.
+Here is the tail of the log itself.
 
---Tessa
+snd-bt-sco: playback_open
+snd-bt-sco: prepare ok bps: 16000 size: 5462 count: 24
+snd-bt-sco: prepare ok bps: 16000 size: 5462 count: 24
+snd-bt-sco: playback_trigger 1
+snd-bt-sco: setting playback to bspcm
+snd-bt-sco: capture_open
+snd-bt-sco: capture_prepare
+snd-bt-sco: prepare ok bps: 16000 size: 5462 count: 24
+snd-bt-sco: capture_prepare
+snd-bt-sco: prepare ok bps: 16000 size: 5462 count: 24
+snd-bt-sco: capture_trigger 1
+snd-bt-sco: setting capture to bspcm
+Bluetooth: SCO (Voice Link) ver 0.5
+Bluetooth: SCO socket layer initialized
+snd-bt-sco: capture_trigger 0
+snd-bt-sco: setting capture to NULL
+snd-bt-sco: playback_trigger 0
+snd-bt-sco: setting playback to NULL
+snd-bt-sco: Disposing of previous socket count 3
+snd-bt-sco: file_count is 1 (expected 3)
+snd-bt-sco: playback_open
+snd-bt-sco: prepare ok bps: 16000 size: 5462 count: 24
+snd-bt-sco: prepare ok bps: 16000 size: 5462 count: 24
+snd-bt-sco: playback_trigger 1
+snd-bt-sco: setting playback to bspcm
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 44
+snd-bt-sco: Disposing of previous socket count 1
+hci_scodata_packet: hci0 SCO packet for unknown connection handle 49
 
-Marcel Holtmann wrote:
-> Hi Tessa,
->
->   
->> I'm running Ubuntu Edgy.  I'm trying to pair a Treo 700p with the Linux 
->> box via a USB Bluetooth dongle:
->>
->>     Bus 004 Device 011: ID 1131:1001 Integrated System Solution Corp. 
->> KY-BT100 Bluetooth Adapter
->>
->> Linux seems to recognize the Bluetooth adapter.  Hciconfig reports it as 
->> device hci0:
->>
->> hci0:   Type: USB
->>         BD Address: 00:11:67:4F:E7:FF ACL MTU: 678:8 SCO MTU: 64:10
->>         UP RUNNING PSCAN ISCAN
->>         RX bytes:2934 acl:0 sco:0 events:180 errors:0
->>         TX bytes:2041 acl:0 sco:0 commands:99 errors:0
->>
->> In /etc/bluetooth/hcid.conf, I have the following settings:
->>
->> options {
->>         autoinit yes;
->>         security auto;
->>         pairing multi;
->>         passkey "XXXXX";
->> }
->>
->> When I initiate pairing from the Treo, it prompts me for a PIN and then 
->> immediately says that it's unable to add my computer to the trusted 
->> security list.  I see the following error in my daemon.log:
->>
->> Apr 17 22:41:23 localhost hcid[4203]: Device hci0 has been activated
->> Apr 17 22:41:42 localhost hcid[4203]: pin_code_request 
->> (sba=00:11:67:4F:E7:FF, dba=00:07:E0:B9:8A:4A)
->> Apr 17 22:41:42 localhost hcid[4203]: Can't get conn info: No such file 
->> or directory (2)
->>
->>  From looking at the code in hcid/security.c:358, it looks like this 
->> error occurs when the ioctl call returns ENOENT (No such file or 
->> directory).  What does this mean?  What file or directory is it looking 
->> for?  What else can I try to triage this problem?
->>     
->
-> please run "hcidump -X -V" to see what is going on.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by DB2 Express
-> Download DB2 Express C - the FREE version of DB2 express and take
-> control of your XML. No limits. Just data. Click to get it now.
-> http://sourceforge.net/powerbar/db2/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->   
+Marcel Holtmann <marcel@holtmann.org> wrote: Hi Walt,
 
---------------020408010807060505080405
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+> Can anyone explain what might be the condition when l2cap responds
+> with 'security block' as seen in the sniffer?
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
-</head>
-<body bgcolor="#ffffff" text="#000000">
-Hi Marcel,<br>
-<br>
-Here's the output from hcidump:<br>
-<br>
-HCI sniffer - Bluetooth packet analyzer ver 1.32<br>
-device: hci0 snap_len: 1028 filter: 0xffffffff<br>
-&gt; HCI Event: Connect Request (0x04) plen 10<br>
-&nbsp;&nbsp;&nbsp; bdaddr 00:07:E0:B9:8A:4A class 0x70020c type ACL<br>
-&lt; HCI Command: Accept Connection Request (0x01|0x0009) plen 7<br>
-&nbsp;&nbsp;&nbsp; bdaddr 00:07:E0:B9:8A:4A role 0x00<br>
-&nbsp;&nbsp;&nbsp; Role: Master<br>
-&gt; HCI Event: Command Status (0x0f) plen 4<br>
-&nbsp;&nbsp;&nbsp; Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1<br>
-&gt; HCI Event: Connect Complete (0x03) plen 11<br>
-&nbsp;&nbsp;&nbsp; status 0x21 handle 1 bdaddr 00:07:E0:B9:8A:4A type ACL encrypt 0x00<br>
-&nbsp;&nbsp;&nbsp; Error: Role Change Not Allowed<br>
-&gt; HCI Event: Max Slots Change (0x1b) plen 3<br>
-&nbsp;&nbsp;&nbsp; handle 1 slots 5<br>
-&gt; HCI Event: Connection Packet Type Changed (0x1d) plen 5<br>
-&nbsp;&nbsp;&nbsp; status 0x00 handle 1 ptype 0xcc18<br>
-&nbsp;&nbsp;&nbsp; Packet type: DM1 DM3 DM5 DH1 DH3 DH5 <br>
-&gt; HCI Event: PIN Code Request (0x16) plen 6<br>
-&nbsp;&nbsp;&nbsp; bdaddr 00:07:E0:B9:8A:4A<br>
-&lt; HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6<br>
-&nbsp;&nbsp;&nbsp; bdaddr 00:07:E0:B9:8A:4A<br>
-&gt; HCI Event: Command Complete (0x0e) plen 10<br>
-&nbsp;&nbsp;&nbsp; PIN Code Request Negative Reply (0x01|0x000e) ncmd 1<br>
-&nbsp;&nbsp;&nbsp; status 0x00 bdaddr 00:07:E0:B9:8A:4A<br>
-&gt; HCI Event: Auth Complete (0x06) plen 3<br>
-&nbsp;&nbsp;&nbsp; status 0x06 handle 1<br>
-&nbsp;&nbsp;&nbsp; Error: PIN or Key Missing<br>
-&gt; HCI Event: Disconn Complete (0x05) plen 4<br>
-&nbsp;&nbsp;&nbsp; status 0x00 handle 1 reason 0x13<br>
-&nbsp;&nbsp;&nbsp; Reason: Remote User Terminated Connection<br>
-<br>
-<br>
-I am typing my PIN into the Treo when prompted, and it is the same one
-that I specified in the hcid.conf.<br>
-<br>
---Tessa<br>
-<br>
-Marcel Holtmann wrote:
-<blockquote cite="mid1176939398.6741.24.camel@aeonflux.holtmann.net"
- type="cite">
-  <pre wrap="">Hi Tessa,
-
-  </pre>
-  <blockquote type="cite">
-    <pre wrap="">I'm running Ubuntu Edgy.  I'm trying to pair a Treo 700p with the Linux 
-box via a USB Bluetooth dongle:
-
-    Bus 004 Device 011: ID 1131:1001 Integrated System Solution Corp. 
-KY-BT100 Bluetooth Adapter
-
-Linux seems to recognize the Bluetooth adapter.  Hciconfig reports it as 
-device hci0:
-
-hci0:   Type: USB
-        BD Address: 00:11:67:4F:E7:FF ACL MTU: 678:8 SCO MTU: 64:10
-        UP RUNNING PSCAN ISCAN
-        RX bytes:2934 acl:0 sco:0 events:180 errors:0
-        TX bytes:2041 acl:0 sco:0 commands:99 errors:0
-
-In /etc/bluetooth/hcid.conf, I have the following settings:
-
-options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        passkey "XXXXX";
-}
-
-When I initiate pairing from the Treo, it prompts me for a PIN and then 
-immediately says that it's unable to add my computer to the trusted 
-security list.  I see the following error in my daemon.log:
-
-Apr 17 22:41:23 localhost hcid[4203]: Device hci0 has been activated
-Apr 17 22:41:42 localhost hcid[4203]: pin_code_request 
-(sba=00:11:67:4F:E7:FF, dba=00:07:E0:B9:8A:4A)
-Apr 17 22:41:42 localhost hcid[4203]: Can't get conn info: No such file 
-or directory (2)
-
- From looking at the code in hcid/security.c:358, it looks like this 
-error occurs when the ioctl call returns ENOENT (No such file or 
-directory).  What does this mean?  What file or directory is it looking 
-for?  What else can I try to triage this problem?
-    </pre>
-  </blockquote>
-  <pre wrap=""><!---->
-please run "hcidump -X -V" to see what is going on.
+this can have multiple reasons. Check "hcidump -X -V" and also look at
+the syslog messages from hcid.
 
 Regards
 
@@ -248,21 +141,38 @@ Marcel
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
-<a class="moz-txt-link-freetext" href="http://sourceforge.net/powerbar/db2/">http://sourceforge.net/powerbar/db2/</a>
+http://sourceforge.net/powerbar/db2/
 _______________________________________________
 Bluez-users mailing list
-<a class="moz-txt-link-abbreviated" href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a>
-<a class="moz-txt-link-freetext" href="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users</a>
-
-  </pre>
-</blockquote>
-</body>
-</html>
-
---------------020408010807060505080405--
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
---===============2060611143==
+       
+---------------------------------
+Ahhh...imagining that irresistible "new car" smell?
+ Check outnew cars at Yahoo! Autos.
+--0-1213338629-1176945593=:58049
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+Hi Marcel,<br>I'm a little lost why it gets it. I think some indirect reason is why pin is neg reply. '0000' is the right pin!<br><br>swordfish bluetooth # sdptool browse<br>Inquiring ...<br>Browsing 00:19:1F:29:E0:4C ...<br><br><br>This is the last 25% or so of the hcidump. you can see the pin refusal and the security block at the end. This is after pairing and running btsco for headset address.<br><br><br>&gt; ACL data: handle 41 flags 0x02 dlen 22<br>&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0040 len 18 [psm 1]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SDP SSA Rsp: tid 0x2 len 0xd<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; count 10<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; record #0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; aid 0x0000 (SrvRecHndl)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; uint
+ 0x10001<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; aid 0x0001 (SrvClassIDList)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt; uuid-16 0x1108 (Headset) uuid-16 0x1203 (Audio) &gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; aid 0x0004 (ProtocolDescList)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt; &lt; uuid-16 0x0100 (L2CAP) &gt; &lt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; uuid-16 0x0003 (RFCOMM) uint 0x2 &gt; &gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; aid 0x0006 (LangBaseAttrIDList)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt; uint 0x656e uint 0x6a uint 0x100
+ &gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; aid 0x0009 (BTProfileDescList)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt; &lt; uuid-16 0x1108 (Headset) uint 0x100 &gt; &gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; aid 0x0100 (SrvName)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; str "Headset"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; aid 0x0302 (unknown)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bool 0x1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cont 00<br>&lt; ACL data: handle 41 flags 0x02 dlen 12<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Disconn req: dcid 0x0042 scid 0x0040<br>&lt; HCI Command: Read Voice Setting (0x03|0x0025) plen 0<br>&gt; HCI Event: Number of Completed
+ Packets (0x13) plen 5<br>&nbsp;&nbsp;&nbsp; handle 41 packets 1<br>&gt; HCI Event: Command Complete (0x0e) plen 6<br>&nbsp;&nbsp;&nbsp; Read Voice Setting (0x03|0x0025) ncmd 1<br>&nbsp;&nbsp;&nbsp; status 0x00 voice setting 0x0060<br>&lt; ACL data: handle 41 flags 0x02 dlen 12<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Connect req: psm 3 scid 0x0041<br>&gt; ACL data: handle 41 flags 0x02 dlen 12<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Disconn rsp: dcid 0x0042 scid 0x0040<br>&gt; HCI Event: Number of Completed Packets (0x13) plen 5<br>&nbsp;&nbsp;&nbsp; handle 41 packets 1<br>&gt; ACL data: handle 41 flags 0x02 dlen 16<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Connect rsp: dcid 0x0043 scid 0x0041 result 1 status 2<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Connection pending - Authorization pending<br>&gt; HCI Event: PIN Code Request (0x16) plen 6<br>&nbsp;&nbsp;&nbsp; bdaddr 00:19:1F:29:E0:4C<br>&lt; HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6<br>&nbsp;&nbsp;&nbsp; bdaddr
+ 00:19:1F:29:E0:4C<br>&gt; HCI Event: Command Complete (0x0e) plen 10<br>&nbsp;&nbsp;&nbsp; PIN Code Request Negative Reply (0x01|0x000e) ncmd 1<br>&nbsp;&nbsp;&nbsp; status 0x00 bdaddr 00:19:1F:29:E0:4C<br>&gt; ACL data: handle 41 flags 0x02 dlen 16<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0041 result 3 status 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Connection refused - security block<br>&gt; HCI Event: Disconn Complete (0x05) plen 4<br>&nbsp;&nbsp;&nbsp; status 0x00 handle 41 reason 0x13<br>&nbsp;&nbsp;&nbsp; Reason: Remote User Terminated Connection<br><br>=========================================<br><br>Here is the tail of the log itself.<br><br>snd-bt-sco: playback_open<br>snd-bt-sco: prepare ok bps: 16000 size: 5462 count: 24<br>snd-bt-sco: prepare ok bps: 16000 size: 5462 count: 24<br>snd-bt-sco: playback_trigger 1<br>snd-bt-sco: setting playback to bspcm<br>snd-bt-sco: capture_open<br>snd-bt-sco: capture_prepare<br>snd-bt-sco: prepare ok bps:
+ 16000 size: 5462 count: 24<br>snd-bt-sco: capture_prepare<br>snd-bt-sco: prepare ok bps: 16000 size: 5462 count: 24<br>snd-bt-sco: capture_trigger 1<br>snd-bt-sco: setting capture to bspcm<br>Bluetooth: SCO (Voice Link) ver 0.5<br>Bluetooth: SCO socket layer initialized<br>snd-bt-sco: capture_trigger 0<br>snd-bt-sco: setting capture to NULL<br>snd-bt-sco: playback_trigger 0<br>snd-bt-sco: setting playback to NULL<br>snd-bt-sco: Disposing of previous socket count 3<br>snd-bt-sco: file_count is 1 (expected 3)<br>snd-bt-sco: playback_open<br>snd-bt-sco: prepare ok bps: 16000 size: 5462 count: 24<br>snd-bt-sco: prepare ok bps: 16000 size: 5462 count: 24<br>snd-bt-sco: playback_trigger 1<br>snd-bt-sco: setting playback to bspcm<br>hci_scodata_packet: hci0 SCO packet for unknown connection handle 44<br>snd-bt-sco: Disposing of previous socket count 1<br>hci_scodata_packet: hci0 SCO packet for unknown connection handle 49<br><br><b><i>Marcel Holtmann
+ &lt;marcel@holtmann.org&gt;</i></b> wrote:<blockquote class="replbq" style="border-left: 2px solid rgb(16, 16, 255); margin-left: 5px; padding-left: 5px;"> Hi Walt,<br><br>&gt; Can anyone explain what might be the condition when l2cap responds<br>&gt; with 'security block' as seen in the sniffer?<br><br>this can have multiple reasons. Check "hcidump -X -V" and also look at<br>the syslog messages from hcid.<br><br>Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>This SF.net email is sponsored by DB2 Express<br>Download DB2 Express C - the FREE version of DB2 express and take<br>control of your XML. No limits. Just data. Click to get it now.<br>http://sourceforge.net/powerbar/db2/<br>_______________________________________________<br>Bluez-users mailing list<br>Bluez-users@lists.sourceforge.net<br>https://lists.sourceforge.net/lists/listinfo/bluez-users<br></blockquote><br><p>&#32;
+
+
+
+      <hr size=1>Ahhh...imagining that irresistible "new car" smell?<br> Check out
+<a href="http://us.rd.yahoo.com/evt=48245/*http://autos.yahoo.com/new_cars.html;_ylc=X3oDMTE1YW1jcXJ2BF9TAzk3MTA3MDc2BHNlYwNtYWlsdGFncwRzbGsDbmV3LWNhcnM-">new cars at Yahoo! Autos.</a>
+
+--0-1213338629-1176945593=:58049--
+
+
+--===============1561656311==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -273,7 +183,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============2060611143==
+--===============1561656311==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -284,4 +194,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============2060611143==--
+--===============1561656311==--
