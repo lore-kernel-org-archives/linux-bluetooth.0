@@ -1,93 +1,203 @@
-Return-Path: <jikos@jikos.cz>
-Date: Mon, 23 Apr 2007 23:56:39 +0200 (CEST)
-From: Jiri Kosina <jikos@jikos.cz>
-To: Jeremy Fitzhardinge <jeremy@goop.org>
-cc: Greg KH <gregkh@suse.de>, Marcel Holtmann <marcel@holtmann.org>,
-        maxk@qualcomm.com, bluez-devel@lists.sourceforge.net,
-        Cedric Le Goater <clg@fr.ibm.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: 2.6.21-rc7: BUG: sleeping function called from invalid context
- at net/core/sock.c:1523
-In-Reply-To: <462D1B09.9050005@goop.org>
-Message-ID: <Pine.LNX.4.64.0704232257090.20657@twin.jikos.cz>
-References: <462D1B09.9050005@goop.org>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <fc27e74b0704231450g3933020dpbdecea853437bbc8@mail.gmail.com>
+Date: Tue, 24 Apr 2007 03:20:06 +0530
+From: "list subscribe" <develnewbie@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-List-ID: <bluez-devel.lists.sourceforge.net>
+Content-Type: multipart/mixed;
+	boundary="----=_Part_13167_23503052.1177365006151"
+Subject: [Bluez-devel] [PATCH] Dynamic Alternate settings patch (hci_usb.c)
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Mon, 23 Apr 2007, Jeremy Fitzhardinge wrote:
+------=_Part_13167_23503052.1177365006151
+Content-Type: multipart/alternative;
+	boundary="----=_Part_13168_13029259.1177365006151"
 
-> I got this on resume; it looks like a Bluetooth and/or USB problem.
-> PM: Removing info for No Bus:hci0
-> BUG: sleeping function called from invalid context at net/core/sock.c:1523
-> in_atomic():1, irqs_disabled():0
-> 1 lock held by khubd/180:
->  #0:  (old_style_rw_init#2){-.-?}, at: [<f88c5816>] hci_sock_dev_event+0x42/0xc5 [bluetooth]
->  [<c01091b5>] show_trace_log_lvl+0x1a/0x30
->  [<c010980c>] show_trace+0x12/0x14
->  [<c01098cb>] dump_stack+0x16/0x18
->  [<c0124191>] __might_sleep+0xe5/0xeb
->  [<c0309ece>] lock_sock_nested+0x1d/0xc4
->  [<f88c587b>] hci_sock_dev_event+0xa7/0xc5 [bluetooth]
->  [<c037c8d2>] notifier_call_chain+0x20/0x3c
->  [<c037c915>] atomic_notifier_call_chain+0x27/0x50
->  [<f88c1a55>] hci_notify+0x12/0x14 [bluetooth]
->  [<f88c2626>] hci_unregister_dev+0x4c/0x65 [bluetooth]
->  [<f89f5d38>] hci_usb_disconnect+0x42/0x6f [hci_usb]
->  [<c02d7e49>] usb_unbind_interface+0x33/0x69
->  [<c028f3fa>] __device_release_driver+0x74/0x90
->  [<c028f870>] device_release_driver+0x33/0x4b
->  [<c028ee0f>] bus_remove_device+0x73/0x82
->  [<c028d412>] device_del+0x169/0x1cf
->  [<c02d5c00>] usb_disable_device+0x62/0xc2
->  [<c02d2807>] usb_disconnect+0x95/0x114
->  [<c02d34d8>] hub_thread+0x2e2/0x99b
->  [<c013c8f7>] kthread+0xb5/0xe2
->  [<c0108d97>] kernel_thread_helper+0x7/0x10
->  =======================
-> PM: Removing info for usb:4-1:1.0
+------=_Part_13168_13029259.1177365006151
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-OK, this probably started happening since b40df5743. Before that commit, 
-hci_sock_dev_event() used bh_lock_sock() to lock the corresponding struct 
-sock. This was obviously buggy - not deadlock safe against 
-l2cap_connect_cfm() from softirq context.
+Hi,
 
-This however introduced another problem - hci_sock_dev_event() is now 
-obviously being triggered (for HCI_DEV_UNREG event, when suspending) in 
-atomic context with preemption disabled. This is what lock_sock_nested() 
-complains about, as it is allowed to sleep inside __lock_sock(), waiting 
-for the lock owner.
+As per the discussion on #bluez channel , I am attaching a patch which
+dynamically manages the the alternate settings for SCO channels.
+The patch includes the following :
 
-Hmm, *sigh*. I guess the patch below fixes the problem, but it is a 
-masterpiece in the field of ugliness. And I am not sure whether it is 
-completely correct either. Are there any immediate ideas for better 
-solution with respect to how struct sock locking works?
+1. It declares a work queue(config_work), which is scheduled when
+             1. There is a change in number of SCO channels OR
+             2. There is a change in the Voice setting.
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 71f5cfb..c5c93cd 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -656,7 +656,10 @@ static int hci_sock_dev_event(struct notifier_block *this, unsigned long event,
- 		/* Detach sockets from device */
- 		read_lock(&hci_sk_list.lock);
- 		sk_for_each(sk, node, &hci_sk_list.head) {
--			lock_sock(sk);
-+			if (in_atomic())
-+				bh_lock_sock(sk);
-+			else
-+				lock_sock(sk);
- 			if (hci_pi(sk)->hdev == hdev) {
- 				hci_pi(sk)->hdev = NULL;
- 				sk->sk_err = EPIPE;
-@@ -665,7 +668,10 @@ static int hci_sock_dev_event(struct notifier_block *this, unsigned long event,
- 
- 				hci_dev_put(hdev);
- 			}
--			release_sock(sk);
-+			if (in_atomic())
-+				bh_unlock_sock(sk);
-+			else
-+				release_sock(sk);
- 		}
- 		read_unlock(&hci_sk_list.lock);
- 	}
+2. On invocation it determines the alternate setting based on the table
+given in HCI - usb spec docs. The  table is also mentioned  in the patch.
+
+3. It then empties all the queued isochronous URBs , except those which are
+already submitted.
+
+4. It then sets the alternate setting by calling   usb_set_interface().
+
+I have tested this patch using "scotest".
+I am using 2.6.21-rc7 with sco-flowcontrol-v4.2.diff patch.
+
+Let me know if  any changes are necessary.
+Any suggestions are welcome.
+
+
+
+Alok.
+
+------=_Part_13168_13029259.1177365006151
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi, <br><br>As per the discussion on #bluez channel , I am attaching a
+patch which dynamically manages the the alternate settings for SCO
+channels.<br>The patch includes the following :<br><br>1. It declares a work queue(config_work), which is scheduled when<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1. There is a change in number of SCO channels OR <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2. There is a change in the Voice setting.
+<br><br>2.
+On invocation it determines the alternate setting based on the table
+given in HCI - usb spec docs. The&nbsp;&nbsp;table is also mentioned&nbsp;&nbsp;in the
+patch. <br><br>3. It then empties all the queued isochronous URBs , except those which are already submitted. <br><br>4. It then sets the alternate setting by calling&nbsp;&nbsp; usb_set_interface().<br> <br>I have tested this patch using &quot;scotest&quot;. 
+<br>I am using 2.6.21-rc7 with sco-flowcontrol-v4.2.diff patch. <br><br>Let me know if&nbsp;&nbsp;any changes are necessary. <br>Any suggestions are welcome. <br><br><br><br>Alok.&nbsp; <br>
+
+------=_Part_13168_13029259.1177365006151--
+
+------=_Part_13167_23503052.1177365006151
+Content-Type: application/octet-stream; name=alternate-setting-patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f0vgmrxq
+Content-Disposition: attachment; filename="alternate-setting-patch"
+
+LS0tIGhjaV91c2IuYy5vcmlnCTIwMDctMDQtMTYgMTk6Mzc6NDEuMDAwMDAwMDAwICswNTMwCisr
+KyBoY2lfdXNiLmMJMjAwNy0wNC0yNCAwMTo0MTozMS4wMDAwMDAwMDAgKzA1MzAKQEAgLTQ3LDYg
+KzQ3LDggQEAKIAogI2luY2x1ZGUgPGxpbnV4L3VzYi5oPgogCisjaW5jbHVkZSA8bGludXgvd29y
+a3F1ZXVlLmg+CisKICNpbmNsdWRlIDxuZXQvYmx1ZXRvb3RoL2JsdWV0b290aC5oPgogI2luY2x1
+ZGUgPG5ldC9ibHVldG9vdGgvaGNpX2NvcmUuaD4KIApAQCAtNTcsNiArNTksMjEgQEAKICNkZWZp
+bmUgQlRfREJHKEQuLi4pCiAjZW5kaWYKIAorLyogVGhlIG51bWJlciBvZiBTQ08gY2hhbm5lbHMg
+ICovCitpbnQgTm9TY289MDsKKy8qIFRoZSAgVm9pY2Ugc2V0dGluZyAgKi8KK19fdTE2IFZvY1Nl
+dHRpbmc9MDsKKy8qIGlmIGJpdD0wLGl0cyA4Yml0IGVuY29kaW5nIGVsc2UgaXRzIDE2Yml0ICov
+CitfX3UxNiBiaXQgPSAweDIwOworCitzdHJ1Y3QgaGNpX3VzYiAqaFVTQjsgCitzdHJ1Y3QgdXNi
+X2RldmljZSAqdXNiZGV2aWNlOyAKK3N0cnVjdCB1c2JfaW50ZXJmYWNlICppc29jSWZhY2U7Cisv
+KiBUaGUgV29ya3F1ZSBGdW5jdGlvbiAqLworc3RhdGljIHZvaWQgc2V0X2FsdGVybmF0ZV9jb25m
+aWcoc3RydWN0IHdvcmtfc3RydWN0ICp3b3JrKTsKK3N0YXRpYyBERUNMQVJFX1dPUksoY29uZmln
+X3dvcmssIHNldF9hbHRlcm5hdGVfY29uZmlnKTsKKworCiAjaWZuZGVmIENPTkZJR19CVF9IQ0lV
+U0JfWkVST19QQUNLRVQKICN1bmRlZiAgVVJCX1pFUk9fUEFDS0VUCiAjZGVmaW5lIFVSQl9aRVJP
+X1BBQ0tFVCAwCkBAIC04NDAsNiArODU3LDEwIEBACiBzdGF0aWMgdm9pZCBoY2lfdXNiX25vdGlm
+eShzdHJ1Y3QgaGNpX2RldiAqaGRldiwgdW5zaWduZWQgaW50IGV2dCkKIHsKIAlCVF9EQkcoIiVz
+IGV2dCAlZCIsIGhkZXYtPm5hbWUsIGV2dCk7CisJTm9TY28gPSBoZGV2LT5jb25uX2hhc2guc2Nv
+X251bTsKKwlWb2NTZXR0aW5nID0gaGRldi0+dm9pY2Vfc2V0dGluZzsKKwloVVNCID0gKHN0cnVj
+dCBoY2lfdXNiICopIGhkZXYtPmRyaXZlcl9kYXRhOworCXNjaGVkdWxlX3dvcmsoJmNvbmZpZ193
+b3JrKTsKIH0KIAogc3RhdGljIGludCBoY2lfdXNiX3Byb2JlKHN0cnVjdCB1c2JfaW50ZXJmYWNl
+ICppbnRmLCBjb25zdCBzdHJ1Y3QgdXNiX2RldmljZV9pZCAqaWQpCkBAIC04NTQsNyArODc1LDcg
+QEAKIAlzdHJ1Y3QgaGNpX3VzYiAqaHVzYjsKIAlzdHJ1Y3QgaGNpX2RldiAqaGRldjsKIAlpbnQg
+aSwgZSwgc2l6ZSwgaXNvY19pZm51bSwgaXNvY19hbHRzOwotCisJdXNiZGV2aWNlID0gaW50ZXJm
+YWNlX3RvX3VzYmRldihpbnRmKTsKIAlCVF9EQkcoInVkZXYgJXAgaW50ZiAlcCIsIHVkZXYsIGlu
+dGYpOwogCiAJaWYgKCFpZC0+ZHJpdmVyX2luZm8pIHsKQEAgLTkyNiw5ICs5NDcsMTEgQEAKIAlp
+c29jX2lmbnVtID0gMTsKIAogI2lmZGVmIENPTkZJR19CVF9IQ0lVU0JfU0NPCi0JaWYgKGlzb2Mg
+JiYgIShpZC0+ZHJpdmVyX2luZm8gJiAoSENJX0JST0tFTl9JU09DIHwgSENJX1NOSUZGRVIpKSkK
+KwlpZiAoaXNvYyAmJiAhKGlkLT5kcml2ZXJfaW5mbyAmIChIQ0lfQlJPS0VOX0lTT0MgfCBIQ0lf
+U05JRkZFUikpKXsKIAkJaXNvY19pZmFjZSA9IHVzYl9pZm51bV90b19pZih1ZGV2LCBpc29jX2lm
+bnVtKTsKLQorICAgCQkgaXNvY0lmYWNlID0gdXNiX2lmbnVtX3RvX2lmKHVkZXYsIGlzb2NfaWZu
+dW0pOworCX0KKwkKIAlpZiAoaXNvY19pZmFjZSkgewogCQlpbnQgYTsKIAkJc3RydWN0IHVzYl9o
+b3N0X2VuZHBvaW50ICppc29jX291dF9lcCA9IE5VTEw7CkBAIC0xMTQyLDYgKzExNjUsMTIxIEBA
+CiAJcmV0dXJuIDA7CiB9CiAKKworLypTZXQgdGhlIGFsdGVybmF0ZSBzZXR0aW5nIGJhc2VkIG9u
+IHRoZSBudW1iZXIgb2YgU0NPIGNoYW5uZWxzIGFuZCB0aGUKKyAgdm9pY2Ugc2V0dGluZy5UaGlz
+IGZ1bmN0aW9uIGlzIGludm9rZWQgd2hlbiB0aGVyZSBpcyBhIGNoYW5nZSBpbiBOdW1iZXIgb2YK
+KyAgU0NPIGNoYW5uZWxzIG9yIHdoZW4gdGhlIHZvaWNlIGVuY29kaW5nIGNoYW5nZXMuKi8KK3N0
+YXRpYyB2b2lkIHNldF9hbHRlcm5hdGVfY29uZmlnKHN0cnVjdCB3b3JrX3N0cnVjdCAqd29yaykK
+K3sKKwlpbnQgaXNvY0lmbnVtPTEsIGlzb2NBbHQ9MDsKKwlzdHJ1Y3QgdXNiX2hvc3RfZW5kcG9p
+bnQgICplcDsKKwlzdHJ1Y3QgdXNiX2hvc3RfaW50ZXJmYWNlICp1aWY7CisJc3RydWN0IF91cmIg
+Kl91cmIsKl90bXA7CisJc3RydWN0IF91cmJfcXVldWUgKnEgPSAmaFVTQi0+cGVuZGluZ19xW2lz
+b2NdOworCXVuc2lnbmVkIGxvbmcgZmxhZ3M7CisJYXRvbWljX3QgdGVtcDsvKkhvbGRzIHRoZSBu
+dW1iZXIgb2YgVVJCcyB3ZSBuZWVkIHRvIHNraXAod2hpY2ggYXJlIHN1Ym1pdHRlZCkqLworCXN0
+cnVjdCBsaXN0X2hlYWQgaW5wcm9jZXNzOy8qVGhpcyBsaXN0IGhvbGRzIHRoZSBhbHJlYWR5IHN1
+Ym1pdHRlZCBVUkJzICovCisgICAgCisJLypDaGFuZ2UgdGhlIGFsdGVybmF0ZSBzZXR0aW5nIG9u
+bHkgaWYgdGhlIG51bWJlciBvZiBTQ08gY2hhbm5lbHMgYXJlIG1vcmUgdGhhbiAxICovCisJaWYo
+Tm9TY28gPiAwKXsKKwkJLyogVGhlIGFsdGVybmF0ZSBzZXR0aW5nIHNlbGVjdGlvbiBpcyBiYXNl
+ZCBvbiB0aGUgZm9sbG93aW5nIHRhYmxlICovCisJCS8qICAgTm8uIG9mIFNDTyBjaGFubmVscyAg
+ICBCaXQtRW5jb2RpbmcgICAgQWx0ZXJuYXRlIFNldHRpbmcgICBNYXguIFBhY2tldCBTaXplICov
+CisJCS8qICAgICAgICAgICAxICAgICAgICAgICAgICAgICA4Yml0ICAgICAgICAgICAgICAgICAx
+ICAgICAgICAgICAgICAgICAgOSAqLworCQkvKiAgICAgICAgICAgMSAgICAgICAgICAgICAgICAx
+NmJpdCAgICAgICAgICAgICAgICAgMiAgICAgICAgICAgICAgICAgMTcgKi8KKwkJLyogICAgICAg
+ICAgIDIgICAgICAgICAgICAgICAgIDhiaXQgICAgICAgICAgICAgICAgIDIgICAgICAgICAgICAg
+ICAgIDE3ICovCisJCS8qICAgICAgICAgICAyICAgICAgICAgICAgICAgIDE2Yml0ICAgICAgICAg
+ICAgICAgICA0ICAgICAgICAgICAgICAgICAzMyAqLworCQkvKiAgICAgICAgICAgMyAgICAgICAg
+ICAgICAgICAgOGJpdCAgICAgICAgICAgICAgICAgMyAgICAgICAgICAgICAgICAgMjUgKi8KKwkJ
+LyogICAgICAgICAgIDMgICAgICAgICAgICAgICAgMTZiaXQgICAgICAgICAgICAgICAgIDUgICAg
+ICAgICAgICAgICAgIDQ5ICovCisJCXN3aXRjaChOb1NjbykKKwkJeworCQljYXNlIDE6CisJCQlp
+ZihWb2NTZXR0aW5nICYmIGJpdCkKKwkJCQlpc29jQWx0PTI7CisJCQllbHNlCisJCQkJaXNvY0Fs
+dD0xOworCQkJYnJlYWs7CisJCWNhc2UgMjoKKwkJCWlmKFZvY1NldHRpbmcgJiYgYml0KQorCQkJ
+CWlzb2NBbHQ9NDsKKwkJCWVsc2UKKwkJCQlpc29jQWx0PTI7CisJCQlicmVhazsKKwkJY2FzZSAz
+OgorCQkJaWYoVm9jU2V0dGluZyAmJiBiaXQpCisJCQkJaXNvY0FsdD01OworCQkJZWxzZQorCQkJ
+CWlzb2NBbHQ9MzsKKwkJCWJyZWFrOworCQl9CisKKwkJLypTdG9wIEN1cnJlbnQgVFggKi8KKwkJ
+Y2xlYXJfYml0KEhDSV9VU0JfVFhfV0FLRVVQLCAmaFVTQi0+c3RhdGUpOworCQlJTklUX0xJU1Rf
+SEVBRCgmaW5wcm9jZXNzKTsKKwkJdGVtcCA9IGhVU0ItPnBlbmRpbmdfdHhbaXNvY107CisJCS8q
+ICBXZSBjYW5ub3QgcHVyZ2UgVVJCcyB3aGljaCBoYXZlIGJlZW4gc3VibWl0dGVkLiBpbnByb2Nl
+c3MgaXMgYSAqLworCQkvKiAgdGVtcG9yYXJ5IGxpc3Qgd2hpY2ggaG9sZHMgdGhlIGN1cnJlbnRs
+eSBzdWJtaXR0ZWQgVVJCcy4gKi8KKwkJLyogIFRoaXMgbGlzdCBpcyBsYXRlciBtZXJnZWQgd2l0
+aCB0aGUgZW1wdHllZCBwZW5kaW5nIHF1ZXVlLiAgKi8KKyAgIAorCQl3aGlsZSAoKF91cmIgPSBf
+dXJiX2RlcXVldWUocSkpKSB7CisJCQkvKkRlcXVldWUgYWxsIHRoZSBzdWJtaXR0ZWQgVVJCcyBh
+bmQgcHV0IHRoZW0gaW4gdGhlIHRlbXBvcmFyeSBsaXN0Ki8gIAorCQkJaWYoIWF0b21pY19kZWNf
+YW5kX3Rlc3QoJnRlbXApKXsKKwkJCQlfdXJiLT5xdWV1ZSA9IHE7CisJCQkJbGlzdF9hZGQoJl91
+cmItPmxpc3QsICZpbnByb2Nlc3MpOworCQkJfQorCQkJZWxzZXsKKwkJCQkvKlVubGluayBhbGwg
+dGhlIHJlc3Qgb2YgVVJCcyBhbmQgcHV0IHRoZW0gaW50byB0aGUgY29tcGxldGVkIHF1ZXVlLiov
+CisJCQkJX3VyYl91bmxpbmsoX3VyYik7CisJCQkJX3VyYl9xdWV1ZV90YWlsKF9fY29tcGxldGVk
+X3EoaFVTQixIQ0lfU0NPREFUQV9QS1QpLCBfdXJiKTsKKwkJCX0KKwkJfQorCQkvKm1lcmdlIHRo
+ZSBpbnByb2Nlc3MgcXVldWUgd2l0aCB0aGUgcGVuZGluZyBxdWV1ZSovCisJCXNwaW5fbG9ja19p
+cnFzYXZlKCZxLT5sb2NrLCBmbGFncyk7CisJCWxpc3RfZm9yX2VhY2hfZW50cnlfc2FmZShfdXJi
+LCBfdG1wLCAmaW5wcm9jZXNzLCBsaXN0KSB7CisJCQlsaXN0X21vdmVfdGFpbCgmX3VyYi0+bGlz
+dCwgJnEtPmhlYWQpOworCQl9CisJCXNwaW5fdW5sb2NrX2lycXJlc3RvcmUoJnEtPmxvY2ssIGZs
+YWdzKTsKKyAgICAKKwkJLyogU2V0IHRoZSBzZXR0aW5nIGFuZCB0aGUgaW4vb3V0IGVuZHBvaW50
+cyAqLworCQlpZiAoaXNvY0lmYWNlKSB7CisJCQlpbnQgZTsKKwkJCXN0cnVjdCB1c2JfaG9zdF9l
+bmRwb2ludCAqb3V0ID0gTlVMTDsKKwkJCXN0cnVjdCB1c2JfaG9zdF9lbmRwb2ludCAqaW4gPSBO
+VUxMOworCQkJdWlmID0gJmlzb2NJZmFjZS0+YWx0c2V0dGluZ1tpc29jQWx0XTsKKwkJCWZvciAo
+ZSA9IDA7IGUgPCB1aWYtPmRlc2MuYk51bUVuZHBvaW50czsgZSsrKSB7CisJCQkJZXAgPSAmdWlm
+LT5lbmRwb2ludFtlXTsKKwkJCQlzd2l0Y2ggKGVwLT5kZXNjLmJtQXR0cmlidXRlcyAmIFVTQl9F
+TkRQT0lOVF9YRkVSVFlQRV9NQVNLKSB7CisJCQkJY2FzZSBVU0JfRU5EUE9JTlRfWEZFUl9JU09D
+OgorCQkJCQlpZiAoZXAtPmRlc2MuYkVuZHBvaW50QWRkcmVzcyAmIFVTQl9ESVJfSU4pCisJCQkJ
+CQlpbiAgPSBlcDsKKwkJCQkJZWxzZQorCQkJCQkJb3V0ID0gZXA7CisJCQkJCWJyZWFrOworCQkJ
+CX0KKwkJCX0KKwkJCisJCQlpZiAoIWluIHx8ICFvdXQpCisJCQkJQlRfREJHKCJJc29jIGVuZHBv
+aW50cyBub3QgZm91bmQiKTsKKwkJCWVsc2UgeworCQkJCUJUX0RCRygiaXNvYyBpZm51bSAlZCBh
+bHRzICVkIiwgaXNvY0lmbnVtLCBpc29jQWx0KTsKKwkJCQlpZiAodXNiX3NldF9pbnRlcmZhY2Uo
+dXNiZGV2aWNlLCBpc29jSWZudW0sIGlzb2NBbHQpKSB7CisJCQkJCUJUX0VSUigiQ2FuJ3Qgc2V0
+IGlzb2MgaW50ZXJmYWNlIHNldHRpbmdzIik7CisJCQkJCWhVU0ItPmlzb2NfaWZhY2UgPSBpc29j
+SWZhY2U7CisJCQkJCXVzYl9kcml2ZXJfcmVsZWFzZV9pbnRlcmZhY2UoJmhjaV91c2JfZHJpdmVy
+LCBpc29jSWZhY2UpOworCQkJCQloVVNCLT5pc29jX2lmYWNlID0gTlVMTDsKKwkJCQl9IGVsc2Ug
+eworCQkJCQloVVNCLT5pc29jX2lmYWNlICA9IGlzb2NJZmFjZTsKKwkJCQkJaFVTQi0+aXNvY19p
+bl9lcCAgPSBpbjsKKwkJCQkJaFVTQi0+aXNvY19vdXRfZXAgID0gb3V0OworCQkJCX0KKwkJCX0K
+KwkJfQorCQlzZXRfYml0KEhDSV9VU0JfVFhfV0FLRVVQLCAmaFVTQi0+c3RhdGUpOworCX0KKwor
+fQorICAKKworCiBzdGF0aWMgc3RydWN0IHVzYl9kcml2ZXIgaGNpX3VzYl9kcml2ZXIgPSB7CiAJ
+Lm5hbWUJCT0gImhjaV91c2IiLAogCS5wcm9iZQkJPSBoY2lfdXNiX3Byb2JlLAo=
+------=_Part_13167_23503052.1177365006151
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+------=_Part_13167_23503052.1177365006151
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_13167_23503052.1177365006151--
