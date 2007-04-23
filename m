@@ -1,10 +1,18 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 23 Apr 2007 09:49:30 -0700 (PDT)
-From: Bluezapper <enigma_enu@yahoo.com>
-To: Bluez Users <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Message-ID: <419284.19431.qm@web43138.mail.sp1.yahoo.com>
-Subject: [Bluez-users] Bluez source code doubt
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <462C9FA4.6040303@gmail.com>
+References: <12a679470704221147v13b00925vf41dead8dc98ed24@mail.gmail.com>
+	<c49421c50704221228x4fdd2ea1uda37debc07f6bc3e@mail.gmail.com>
+	<462BDFE9.7010001@gmail.com>
+	<c49421c50704221536g1e696aeaj8d97c10a84e3f98a@mail.gmail.com>
+	<462BE48E.8000000@gmail.com>
+	<1177302354.6644.120.camel@aeonflux.holtmann.net>
+	<462C9FA4.6040303@gmail.com>
+Date: Mon, 23 Apr 2007 18:09:52 +0200
+Message-Id: <1177344592.6644.185.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Max number of RFCOMM connections?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,72 +22,37 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2014446660=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============2014446660==
-Content-Type: multipart/alternative; boundary="0-321732730-1177346970=:19431"
-Content-Transfer-Encoding: 8bit
+Hi Manuel,
 
---0-321732730-1177346970=:19431
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+> > the answer is quite simple. Per ACL link between two devices you can
+> > have 30 RFCOMM connections and another 30 one initiated by the other
+> > device. Every piconet can have 7 ACL links and so you can do the math by
+> > yourself.
+> >   
+> I'm a bit confused :S. I thought you could only open 7 ACL on each 
+> device. So according to you I can get 7 ACL and then open up to 60 
+> RFCOMM over it right?. I guess the bandwidth will be divided between all 
+> those connections mhh it will be definitely to slow :D.
 
-Hi,
+actually the bandwidth or 1 Mbit or 3 Mbit in case of EDR will also
+divided between the 7 ACL links. And yes, the bandwidth will be shared.
 
-I am sorry if this question is silly. I am new to Bluez and C socket programming. I was going through the bluez source code but did not understand the following statements from hcitool.c:
+Regards
 
-if (hci_read_remote_version(dd, handle, &version, 20000) == 0)
-
-if (hci_read_remote_name(dd, &bdaddr, sizeof(name), name, 25000)== 0)
-
-
-What are the numbers "25000" or "20000" in these statements and I see that they are different for different statments sometimes compared to less than zero or equal to zero ??
-
-
-thanks in advance for your replies,
-
-Marco.
-
-       
----------------------------------
-Ahhh...imagining that irresistible "new car" smell?
- Check outnew cars at Yahoo! Autos.
---0-321732730-1177346970=:19431
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-Hi,<br><br>I am sorry if this question is silly. I am new to Bluez and C socket programming. I was going through the bluez source code but did not understand the following statements from hcitool.c:<br><br>if (hci_read_remote_version(dd, handle, &amp;version, 20000) == 0)<br><br>if (hci_read_remote_name(dd, &amp;bdaddr, sizeof(name), name, 25000)== 0)<br><br><br>What are the numbers "25000" or "20000" in these statements and I see that they are different for different statments sometimes compared to less than zero or equal to zero ??<br><br><br>thanks in advance for your replies,<br><br>Marco.<br><p>&#32;
+Marcel
 
 
-
-      <hr size=1>Ahhh...imagining that irresistible "new car" smell?<br> Check out
-<a href="http://us.rd.yahoo.com/evt=48245/*http://autos.yahoo.com/new_cars.html;_ylc=X3oDMTE1YW1jcXJ2BF9TAzk3MTA3MDc2BHNlYwNtYWlsdGFncwRzbGsDbmV3LWNhcnM-">new cars at Yahoo! Autos.</a>
-
---0-321732730-1177346970=:19431--
-
-
---===============2014446660==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============2014446660==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============2014446660==--
