@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <462C9FA4.6040303@gmail.com>
-Date: Mon, 23 Apr 2007 08:59:32 -0300
-From: Manuel Naranjo <naranjo.manuel@gmail.com>
-MIME-Version: 1.0
+Date: Mon, 23 Apr 2007 12:18:38 +0200
+From: Stefan Seyfried <seife@suse.de>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <12a679470704221147v13b00925vf41dead8dc98ed24@mail.gmail.com>	<c49421c50704221228x4fdd2ea1uda37debc07f6bc3e@mail.gmail.com>	<462BDFE9.7010001@gmail.com>	<c49421c50704221536g1e696aeaj8d97c10a84e3f98a@mail.gmail.com>	<462BE48E.8000000@gmail.com>
-	<1177302354.6644.120.camel@aeonflux.holtmann.net>
-In-Reply-To: <1177302354.6644.120.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] Max number of RFCOMM connections?
+Message-ID: <20070423101838.GF8944@suse.de>
+References: <c38065090704221038ia8dacc9i84818502e76ecb67@mail.gmail.com>
+	<200704222139.42500.cijoml@volny.cz>
+	<c38065090704221456s3194f809vaf65418873f6f9ff@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <c38065090704221456s3194f809vaf65418873f6f9ff@mail.gmail.com>
+Subject: Re: [Bluez-users] Can't connect to Freedom Input Mini Duo keyboard
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,18 +22,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel
-> the answer is quite simple. Per ACL link between two devices you can
-> have 30 RFCOMM connections and another 30 one initiated by the other
-> device. Every piconet can have 7 ACL links and so you can do the math by
-> yourself.
->   
-I'm a bit confused :S. I thought you could only open 7 ACL on each 
-device. So according to you I can get 7 ACL and then open up to 60 
-RFCOMM over it right?. I guess the bandwidth will be divided between all 
-those connections mhh it will be definitely to slow :D.
-Thanks,
-Manuel
+On Sun, Apr 22, 2007 at 04:56:35PM -0500, Philip S. Trasatti Jr. wrote:
+> Thanks for the response. Still doesn't work.
+> 
+> hidd is running with the --server and --master options
+> 
+> When I run hidd the second time I get...
+> 
+> # hidd --connect 00:0B:0D:6F:7F:88
+> Can't create HID control channel: Connection reset by peer
+
+did you press the "connect" button on the keyboard? I always connect
+keyboards / mice by (with hidd --server already running):
+
+- hidd --search (as root)
+- then press the connect button on the keyboard / mouse and pressing
+  some keys / moving the mouse, to see once it is connected.
+
+and this has worked fine for me all the time.
+-- 
+Stefan Seyfried
+
+"Any ideas, John?"
+"Well, surrounding them's out." 
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
