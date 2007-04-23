@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <fc27e74b0704231450g3933020dpbdecea853437bbc8@mail.gmail.com>
-Date: Tue, 24 Apr 2007 03:20:06 +0530
-From: "list subscribe" <develnewbie@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_13167_23503052.1177365006151"
-Subject: [Bluez-devel] [PATCH] Dynamic Alternate settings patch (hci_usb.c)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <462C61F2.7020402@access-company.com>
+References: <4628C688.8060101@access-company.com>
+	<462C61F2.7020402@access-company.com>
+Date: Mon, 23 Apr 2007 18:13:13 +0200
+Message-Id: <1177344793.6644.187.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] SIM Access Profile Server and Client
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,188 +17,38 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_13167_23503052.1177365006151
-Content-Type: multipart/alternative;
-	boundary="----=_Part_13168_13029259.1177365006151"
+Hi Frederic,
 
-------=_Part_13168_13029259.1177365006151
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> > I was wondering about SIM Access Profile. Is there some existing 
+> > implementation of it?
+> > I found that maemo sap client is not open, is that still true? Also, 
+> > someone wrote a client.
+> > I'm more interested in server side, but anything that could help testing 
+> > is ok.
+> >   
+> No answers ? This is really unfortunate.
+> I can't believe nobody has tried something !
 
-Hi,
+once I have some more time, I might look into having a SIM access server
+for the OpenMoko platform, but that is not high priority on my todo
+list.
 
-As per the discussion on #bluez channel , I am attaching a patch which
-dynamically manages the the alternate settings for SCO channels.
-The patch includes the following :
+Regards
 
-1. It declares a work queue(config_work), which is scheduled when
-             1. There is a change in number of SCO channels OR
-             2. There is a change in the Voice setting.
-
-2. On invocation it determines the alternate setting based on the table
-given in HCI - usb spec docs. The  table is also mentioned  in the patch.
-
-3. It then empties all the queued isochronous URBs , except those which are
-already submitted.
-
-4. It then sets the alternate setting by calling   usb_set_interface().
-
-I have tested this patch using "scotest".
-I am using 2.6.21-rc7 with sco-flowcontrol-v4.2.diff patch.
-
-Let me know if  any changes are necessary.
-Any suggestions are welcome.
+Marcel
 
 
-
-Alok.
-
-------=_Part_13168_13029259.1177365006151
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi, <br><br>As per the discussion on #bluez channel , I am attaching a
-patch which dynamically manages the the alternate settings for SCO
-channels.<br>The patch includes the following :<br><br>1. It declares a work queue(config_work), which is scheduled when<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1. There is a change in number of SCO channels OR <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2. There is a change in the Voice setting.
-<br><br>2.
-On invocation it determines the alternate setting based on the table
-given in HCI - usb spec docs. The&nbsp;&nbsp;table is also mentioned&nbsp;&nbsp;in the
-patch. <br><br>3. It then empties all the queued isochronous URBs , except those which are already submitted. <br><br>4. It then sets the alternate setting by calling&nbsp;&nbsp; usb_set_interface().<br> <br>I have tested this patch using &quot;scotest&quot;. 
-<br>I am using 2.6.21-rc7 with sco-flowcontrol-v4.2.diff patch. <br><br>Let me know if&nbsp;&nbsp;any changes are necessary. <br>Any suggestions are welcome. <br><br><br><br>Alok.&nbsp; <br>
-
-------=_Part_13168_13029259.1177365006151--
-
-------=_Part_13167_23503052.1177365006151
-Content-Type: application/octet-stream; name=alternate-setting-patch
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_f0vgmrxq
-Content-Disposition: attachment; filename="alternate-setting-patch"
-
-LS0tIGhjaV91c2IuYy5vcmlnCTIwMDctMDQtMTYgMTk6Mzc6NDEuMDAwMDAwMDAwICswNTMwCisr
-KyBoY2lfdXNiLmMJMjAwNy0wNC0yNCAwMTo0MTozMS4wMDAwMDAwMDAgKzA1MzAKQEAgLTQ3LDYg
-KzQ3LDggQEAKIAogI2luY2x1ZGUgPGxpbnV4L3VzYi5oPgogCisjaW5jbHVkZSA8bGludXgvd29y
-a3F1ZXVlLmg+CisKICNpbmNsdWRlIDxuZXQvYmx1ZXRvb3RoL2JsdWV0b290aC5oPgogI2luY2x1
-ZGUgPG5ldC9ibHVldG9vdGgvaGNpX2NvcmUuaD4KIApAQCAtNTcsNiArNTksMjEgQEAKICNkZWZp
-bmUgQlRfREJHKEQuLi4pCiAjZW5kaWYKIAorLyogVGhlIG51bWJlciBvZiBTQ08gY2hhbm5lbHMg
-ICovCitpbnQgTm9TY289MDsKKy8qIFRoZSAgVm9pY2Ugc2V0dGluZyAgKi8KK19fdTE2IFZvY1Nl
-dHRpbmc9MDsKKy8qIGlmIGJpdD0wLGl0cyA4Yml0IGVuY29kaW5nIGVsc2UgaXRzIDE2Yml0ICov
-CitfX3UxNiBiaXQgPSAweDIwOworCitzdHJ1Y3QgaGNpX3VzYiAqaFVTQjsgCitzdHJ1Y3QgdXNi
-X2RldmljZSAqdXNiZGV2aWNlOyAKK3N0cnVjdCB1c2JfaW50ZXJmYWNlICppc29jSWZhY2U7Cisv
-KiBUaGUgV29ya3F1ZSBGdW5jdGlvbiAqLworc3RhdGljIHZvaWQgc2V0X2FsdGVybmF0ZV9jb25m
-aWcoc3RydWN0IHdvcmtfc3RydWN0ICp3b3JrKTsKK3N0YXRpYyBERUNMQVJFX1dPUksoY29uZmln
-X3dvcmssIHNldF9hbHRlcm5hdGVfY29uZmlnKTsKKworCiAjaWZuZGVmIENPTkZJR19CVF9IQ0lV
-U0JfWkVST19QQUNLRVQKICN1bmRlZiAgVVJCX1pFUk9fUEFDS0VUCiAjZGVmaW5lIFVSQl9aRVJP
-X1BBQ0tFVCAwCkBAIC04NDAsNiArODU3LDEwIEBACiBzdGF0aWMgdm9pZCBoY2lfdXNiX25vdGlm
-eShzdHJ1Y3QgaGNpX2RldiAqaGRldiwgdW5zaWduZWQgaW50IGV2dCkKIHsKIAlCVF9EQkcoIiVz
-IGV2dCAlZCIsIGhkZXYtPm5hbWUsIGV2dCk7CisJTm9TY28gPSBoZGV2LT5jb25uX2hhc2guc2Nv
-X251bTsKKwlWb2NTZXR0aW5nID0gaGRldi0+dm9pY2Vfc2V0dGluZzsKKwloVVNCID0gKHN0cnVj
-dCBoY2lfdXNiICopIGhkZXYtPmRyaXZlcl9kYXRhOworCXNjaGVkdWxlX3dvcmsoJmNvbmZpZ193
-b3JrKTsKIH0KIAogc3RhdGljIGludCBoY2lfdXNiX3Byb2JlKHN0cnVjdCB1c2JfaW50ZXJmYWNl
-ICppbnRmLCBjb25zdCBzdHJ1Y3QgdXNiX2RldmljZV9pZCAqaWQpCkBAIC04NTQsNyArODc1LDcg
-QEAKIAlzdHJ1Y3QgaGNpX3VzYiAqaHVzYjsKIAlzdHJ1Y3QgaGNpX2RldiAqaGRldjsKIAlpbnQg
-aSwgZSwgc2l6ZSwgaXNvY19pZm51bSwgaXNvY19hbHRzOwotCisJdXNiZGV2aWNlID0gaW50ZXJm
-YWNlX3RvX3VzYmRldihpbnRmKTsKIAlCVF9EQkcoInVkZXYgJXAgaW50ZiAlcCIsIHVkZXYsIGlu
-dGYpOwogCiAJaWYgKCFpZC0+ZHJpdmVyX2luZm8pIHsKQEAgLTkyNiw5ICs5NDcsMTEgQEAKIAlp
-c29jX2lmbnVtID0gMTsKIAogI2lmZGVmIENPTkZJR19CVF9IQ0lVU0JfU0NPCi0JaWYgKGlzb2Mg
-JiYgIShpZC0+ZHJpdmVyX2luZm8gJiAoSENJX0JST0tFTl9JU09DIHwgSENJX1NOSUZGRVIpKSkK
-KwlpZiAoaXNvYyAmJiAhKGlkLT5kcml2ZXJfaW5mbyAmIChIQ0lfQlJPS0VOX0lTT0MgfCBIQ0lf
-U05JRkZFUikpKXsKIAkJaXNvY19pZmFjZSA9IHVzYl9pZm51bV90b19pZih1ZGV2LCBpc29jX2lm
-bnVtKTsKLQorICAgCQkgaXNvY0lmYWNlID0gdXNiX2lmbnVtX3RvX2lmKHVkZXYsIGlzb2NfaWZu
-dW0pOworCX0KKwkKIAlpZiAoaXNvY19pZmFjZSkgewogCQlpbnQgYTsKIAkJc3RydWN0IHVzYl9o
-b3N0X2VuZHBvaW50ICppc29jX291dF9lcCA9IE5VTEw7CkBAIC0xMTQyLDYgKzExNjUsMTIxIEBA
-CiAJcmV0dXJuIDA7CiB9CiAKKworLypTZXQgdGhlIGFsdGVybmF0ZSBzZXR0aW5nIGJhc2VkIG9u
-IHRoZSBudW1iZXIgb2YgU0NPIGNoYW5uZWxzIGFuZCB0aGUKKyAgdm9pY2Ugc2V0dGluZy5UaGlz
-IGZ1bmN0aW9uIGlzIGludm9rZWQgd2hlbiB0aGVyZSBpcyBhIGNoYW5nZSBpbiBOdW1iZXIgb2YK
-KyAgU0NPIGNoYW5uZWxzIG9yIHdoZW4gdGhlIHZvaWNlIGVuY29kaW5nIGNoYW5nZXMuKi8KK3N0
-YXRpYyB2b2lkIHNldF9hbHRlcm5hdGVfY29uZmlnKHN0cnVjdCB3b3JrX3N0cnVjdCAqd29yaykK
-K3sKKwlpbnQgaXNvY0lmbnVtPTEsIGlzb2NBbHQ9MDsKKwlzdHJ1Y3QgdXNiX2hvc3RfZW5kcG9p
-bnQgICplcDsKKwlzdHJ1Y3QgdXNiX2hvc3RfaW50ZXJmYWNlICp1aWY7CisJc3RydWN0IF91cmIg
-Kl91cmIsKl90bXA7CisJc3RydWN0IF91cmJfcXVldWUgKnEgPSAmaFVTQi0+cGVuZGluZ19xW2lz
-b2NdOworCXVuc2lnbmVkIGxvbmcgZmxhZ3M7CisJYXRvbWljX3QgdGVtcDsvKkhvbGRzIHRoZSBu
-dW1iZXIgb2YgVVJCcyB3ZSBuZWVkIHRvIHNraXAod2hpY2ggYXJlIHN1Ym1pdHRlZCkqLworCXN0
-cnVjdCBsaXN0X2hlYWQgaW5wcm9jZXNzOy8qVGhpcyBsaXN0IGhvbGRzIHRoZSBhbHJlYWR5IHN1
-Ym1pdHRlZCBVUkJzICovCisgICAgCisJLypDaGFuZ2UgdGhlIGFsdGVybmF0ZSBzZXR0aW5nIG9u
-bHkgaWYgdGhlIG51bWJlciBvZiBTQ08gY2hhbm5lbHMgYXJlIG1vcmUgdGhhbiAxICovCisJaWYo
-Tm9TY28gPiAwKXsKKwkJLyogVGhlIGFsdGVybmF0ZSBzZXR0aW5nIHNlbGVjdGlvbiBpcyBiYXNl
-ZCBvbiB0aGUgZm9sbG93aW5nIHRhYmxlICovCisJCS8qICAgTm8uIG9mIFNDTyBjaGFubmVscyAg
-ICBCaXQtRW5jb2RpbmcgICAgQWx0ZXJuYXRlIFNldHRpbmcgICBNYXguIFBhY2tldCBTaXplICov
-CisJCS8qICAgICAgICAgICAxICAgICAgICAgICAgICAgICA4Yml0ICAgICAgICAgICAgICAgICAx
-ICAgICAgICAgICAgICAgICAgOSAqLworCQkvKiAgICAgICAgICAgMSAgICAgICAgICAgICAgICAx
-NmJpdCAgICAgICAgICAgICAgICAgMiAgICAgICAgICAgICAgICAgMTcgKi8KKwkJLyogICAgICAg
-ICAgIDIgICAgICAgICAgICAgICAgIDhiaXQgICAgICAgICAgICAgICAgIDIgICAgICAgICAgICAg
-ICAgIDE3ICovCisJCS8qICAgICAgICAgICAyICAgICAgICAgICAgICAgIDE2Yml0ICAgICAgICAg
-ICAgICAgICA0ICAgICAgICAgICAgICAgICAzMyAqLworCQkvKiAgICAgICAgICAgMyAgICAgICAg
-ICAgICAgICAgOGJpdCAgICAgICAgICAgICAgICAgMyAgICAgICAgICAgICAgICAgMjUgKi8KKwkJ
-LyogICAgICAgICAgIDMgICAgICAgICAgICAgICAgMTZiaXQgICAgICAgICAgICAgICAgIDUgICAg
-ICAgICAgICAgICAgIDQ5ICovCisJCXN3aXRjaChOb1NjbykKKwkJeworCQljYXNlIDE6CisJCQlp
-ZihWb2NTZXR0aW5nICYmIGJpdCkKKwkJCQlpc29jQWx0PTI7CisJCQllbHNlCisJCQkJaXNvY0Fs
-dD0xOworCQkJYnJlYWs7CisJCWNhc2UgMjoKKwkJCWlmKFZvY1NldHRpbmcgJiYgYml0KQorCQkJ
-CWlzb2NBbHQ9NDsKKwkJCWVsc2UKKwkJCQlpc29jQWx0PTI7CisJCQlicmVhazsKKwkJY2FzZSAz
-OgorCQkJaWYoVm9jU2V0dGluZyAmJiBiaXQpCisJCQkJaXNvY0FsdD01OworCQkJZWxzZQorCQkJ
-CWlzb2NBbHQ9MzsKKwkJCWJyZWFrOworCQl9CisKKwkJLypTdG9wIEN1cnJlbnQgVFggKi8KKwkJ
-Y2xlYXJfYml0KEhDSV9VU0JfVFhfV0FLRVVQLCAmaFVTQi0+c3RhdGUpOworCQlJTklUX0xJU1Rf
-SEVBRCgmaW5wcm9jZXNzKTsKKwkJdGVtcCA9IGhVU0ItPnBlbmRpbmdfdHhbaXNvY107CisJCS8q
-ICBXZSBjYW5ub3QgcHVyZ2UgVVJCcyB3aGljaCBoYXZlIGJlZW4gc3VibWl0dGVkLiBpbnByb2Nl
-c3MgaXMgYSAqLworCQkvKiAgdGVtcG9yYXJ5IGxpc3Qgd2hpY2ggaG9sZHMgdGhlIGN1cnJlbnRs
-eSBzdWJtaXR0ZWQgVVJCcy4gKi8KKwkJLyogIFRoaXMgbGlzdCBpcyBsYXRlciBtZXJnZWQgd2l0
-aCB0aGUgZW1wdHllZCBwZW5kaW5nIHF1ZXVlLiAgKi8KKyAgIAorCQl3aGlsZSAoKF91cmIgPSBf
-dXJiX2RlcXVldWUocSkpKSB7CisJCQkvKkRlcXVldWUgYWxsIHRoZSBzdWJtaXR0ZWQgVVJCcyBh
-bmQgcHV0IHRoZW0gaW4gdGhlIHRlbXBvcmFyeSBsaXN0Ki8gIAorCQkJaWYoIWF0b21pY19kZWNf
-YW5kX3Rlc3QoJnRlbXApKXsKKwkJCQlfdXJiLT5xdWV1ZSA9IHE7CisJCQkJbGlzdF9hZGQoJl91
-cmItPmxpc3QsICZpbnByb2Nlc3MpOworCQkJfQorCQkJZWxzZXsKKwkJCQkvKlVubGluayBhbGwg
-dGhlIHJlc3Qgb2YgVVJCcyBhbmQgcHV0IHRoZW0gaW50byB0aGUgY29tcGxldGVkIHF1ZXVlLiov
-CisJCQkJX3VyYl91bmxpbmsoX3VyYik7CisJCQkJX3VyYl9xdWV1ZV90YWlsKF9fY29tcGxldGVk
-X3EoaFVTQixIQ0lfU0NPREFUQV9QS1QpLCBfdXJiKTsKKwkJCX0KKwkJfQorCQkvKm1lcmdlIHRo
-ZSBpbnByb2Nlc3MgcXVldWUgd2l0aCB0aGUgcGVuZGluZyBxdWV1ZSovCisJCXNwaW5fbG9ja19p
-cnFzYXZlKCZxLT5sb2NrLCBmbGFncyk7CisJCWxpc3RfZm9yX2VhY2hfZW50cnlfc2FmZShfdXJi
-LCBfdG1wLCAmaW5wcm9jZXNzLCBsaXN0KSB7CisJCQlsaXN0X21vdmVfdGFpbCgmX3VyYi0+bGlz
-dCwgJnEtPmhlYWQpOworCQl9CisJCXNwaW5fdW5sb2NrX2lycXJlc3RvcmUoJnEtPmxvY2ssIGZs
-YWdzKTsKKyAgICAKKwkJLyogU2V0IHRoZSBzZXR0aW5nIGFuZCB0aGUgaW4vb3V0IGVuZHBvaW50
-cyAqLworCQlpZiAoaXNvY0lmYWNlKSB7CisJCQlpbnQgZTsKKwkJCXN0cnVjdCB1c2JfaG9zdF9l
-bmRwb2ludCAqb3V0ID0gTlVMTDsKKwkJCXN0cnVjdCB1c2JfaG9zdF9lbmRwb2ludCAqaW4gPSBO
-VUxMOworCQkJdWlmID0gJmlzb2NJZmFjZS0+YWx0c2V0dGluZ1tpc29jQWx0XTsKKwkJCWZvciAo
-ZSA9IDA7IGUgPCB1aWYtPmRlc2MuYk51bUVuZHBvaW50czsgZSsrKSB7CisJCQkJZXAgPSAmdWlm
-LT5lbmRwb2ludFtlXTsKKwkJCQlzd2l0Y2ggKGVwLT5kZXNjLmJtQXR0cmlidXRlcyAmIFVTQl9F
-TkRQT0lOVF9YRkVSVFlQRV9NQVNLKSB7CisJCQkJY2FzZSBVU0JfRU5EUE9JTlRfWEZFUl9JU09D
-OgorCQkJCQlpZiAoZXAtPmRlc2MuYkVuZHBvaW50QWRkcmVzcyAmIFVTQl9ESVJfSU4pCisJCQkJ
-CQlpbiAgPSBlcDsKKwkJCQkJZWxzZQorCQkJCQkJb3V0ID0gZXA7CisJCQkJCWJyZWFrOworCQkJ
-CX0KKwkJCX0KKwkJCisJCQlpZiAoIWluIHx8ICFvdXQpCisJCQkJQlRfREJHKCJJc29jIGVuZHBv
-aW50cyBub3QgZm91bmQiKTsKKwkJCWVsc2UgeworCQkJCUJUX0RCRygiaXNvYyBpZm51bSAlZCBh
-bHRzICVkIiwgaXNvY0lmbnVtLCBpc29jQWx0KTsKKwkJCQlpZiAodXNiX3NldF9pbnRlcmZhY2Uo
-dXNiZGV2aWNlLCBpc29jSWZudW0sIGlzb2NBbHQpKSB7CisJCQkJCUJUX0VSUigiQ2FuJ3Qgc2V0
-IGlzb2MgaW50ZXJmYWNlIHNldHRpbmdzIik7CisJCQkJCWhVU0ItPmlzb2NfaWZhY2UgPSBpc29j
-SWZhY2U7CisJCQkJCXVzYl9kcml2ZXJfcmVsZWFzZV9pbnRlcmZhY2UoJmhjaV91c2JfZHJpdmVy
-LCBpc29jSWZhY2UpOworCQkJCQloVVNCLT5pc29jX2lmYWNlID0gTlVMTDsKKwkJCQl9IGVsc2Ug
-eworCQkJCQloVVNCLT5pc29jX2lmYWNlICA9IGlzb2NJZmFjZTsKKwkJCQkJaFVTQi0+aXNvY19p
-bl9lcCAgPSBpbjsKKwkJCQkJaFVTQi0+aXNvY19vdXRfZXAgID0gb3V0OworCQkJCX0KKwkJCX0K
-KwkJfQorCQlzZXRfYml0KEhDSV9VU0JfVFhfV0FLRVVQLCAmaFVTQi0+c3RhdGUpOworCX0KKwor
-fQorICAKKworCiBzdGF0aWMgc3RydWN0IHVzYl9kcml2ZXIgaGNpX3VzYl9kcml2ZXIgPSB7CiAJ
-Lm5hbWUJCT0gImhjaV91c2IiLAogCS5wcm9iZQkJPSBoY2lfdXNiX3Byb2JlLAo=
-------=_Part_13167_23503052.1177365006151
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
-------=_Part_13167_23503052.1177365006151
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-------=_Part_13167_23503052.1177365006151--
