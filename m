@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <462E3E94.3040408@access-company.com>
+Date: Tue, 24 Apr 2007 19:29:56 +0200
+From: Frederic Danis <frederic.danis@access-company.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <462E3E94.3040408@access-company.com>
-References: <45F16630.9000606@access-company.com>
-	<460D363F.9010709@access-company.com>	<1175271188.5815.225.camel@violet>
+References: <45F16630.9000606@access-company.com>	<460D363F.9010709@access-company.com>	<1175271188.5815.225.camel@violet>
 	<20070331152530.GA12829@jh-mbp> <1175627156.5815.402.camel@violet>
-	<462E3E94.3040408@access-company.com>
-Date: Tue, 24 Apr 2007 20:20:02 +0200
-Message-Id: <1177438802.14980.4.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+In-Reply-To: <1175627156.5815.402.camel@violet>
 Subject: Re: [Bluez-devel] RemoteNameRequested signal during discovery patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,22 +17,54 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frederic,
+Hi Johan,
 
-> I can not submit this patch into cvs (no access other than anonymous).
-> Can you do it please ?
+I can not submit this patch into cvs (no access other than anonymous).
+Can you do it please ?
 
-your patch has been committed to the CVS now. Thanks.
+Thanks
 
-Regards
+Fred
 
-Marcel
+Marcel Holtmann a =E9crit :
+> Hi Johan,
+> =
 
+>>>> A new version of the patch.
+>>>> Are you okay with it ?
+>>> the patch looks okay to me. However I prefer if Claudio or Johan can
+>>> have an additional look.
+>> Looks good to me.
+> =
 
+> feel free to commit it to the CVS then.
+> =
+
+> Regards
+> =
+
+> Marcel
+> =
+
+> =
+
+> =
+
+> -------------------------------------------------------------------------
+> Take Surveys. Earn Cash. Influence the Future of IT
+> Join SourceForge.net's Techsay panel and you'll get the chance to share y=
+our
+> opinions on IT & business topics through brief surveys-and earn cash
+> http://www.techsay.com/default.php?page=3Djoin.php&p=3Dsourceforge&CID=3D=
+DEVDEV
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
