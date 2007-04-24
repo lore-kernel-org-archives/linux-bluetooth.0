@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <6849c8890704240209q46c5ec3ai47241251f7142ebf@mail.gmail.com>
-Date: Tue, 24 Apr 2007 10:09:44 +0100
-From: TJ <tj.trevelyan@gmail.com>
+Message-ID: <b92d97be0704232057m648388a9w1748fe6312d25164@mail.gmail.com>
+Date: Tue, 24 Apr 2007 13:27:12 +0930
+From: "Adam Dixon" <adamtdixon@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <6849c8890704200342k23f7e54ckaf0920197c4e5e1a@mail.gmail.com>
 MIME-Version: 1.0
-References: <6849c8890704200342k23f7e54ckaf0920197c4e5e1a@mail.gmail.com>
-Subject: [Bluez-users] A2DPD fails to init with a2dp_make_listen_socket:
-	(errno=13:Permission denied)Cannot bind socket
+Subject: [Bluez-users] headset and input noise
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,87 +18,81 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi (Third attempt to reach the list),
+Hello All.
 
-While I have got headsetd working fine, but I can't get a2dpd to run.
-It gives the following messages:
+I have bluetooth going on my laptop, and have got btsco working with
+my X3 micro bt headset. However I get mass static / noise from the
+input randomly.
+I have reproduced on skype, twinkle and now on arecord. So currently I
+dont want to use it for the phone (its intended use).
 
-A2DPD[17:06:13.085]: init_ipc: Selected IPC: unix, addr=127.0.0.1,
-bcst=127.0.0.255, port=21453
-A2DPD[17:06:13.085]: make_daemon_process: a2dpd [Apr 17 2007 09:46:05]
-starting ...
-A2DPD[17:06:13.085]: main: (errno=9:Bad file descriptor)a2dpd
-addr=00:13:17:C5:39:94 timer=4000 us [Apr 17 2007 09:46:12]
-A2DPD[17:06:13.085]: a2dpd_signal_init: Getting on DBUS
-A2DPD[17:06:13.086]: a2dpd_signal_init: Installing watch
-A2DPD[17:06:13.086]: add_dbus_watch: Added watch 0 0x809b960 disabled
-A2DPD[17:06:13.086]: add_dbus_watch: Added watch 1 0x809b988 enabled
-A2DPD[17:06:13.086]: a2dpd_signal_init: Registering object
-path: /com/access/a2dpd
-A2DPD[17:06:13.086]: a2dpd_signal_init: Acquiring service: com.access.a2dpd
-A2DPD[17:06:13.087]: a2dpd_signal_init: OK
-A2DPD[17:06:13.087]: a2dpd_signal_init: OK
-A2DPD[17:06:13.087]: a2dpd_register_sdp: OK
-A2DPD[17:06:13.087]: add_avrtg:
-A2DPD[17:06:13.088]: add_a2source:
-A2DPD[17:06:13.088]: main_loop:
-A2DPD[17:06:13.088]: make_server_socket:
-A2DPD[17:06:13.088]: a2dp_make_listen_socket: (errno=13:Permission
-denied)Cannot bind socket 6 for psm 25
-A2DPD[17:06:13.088]: main_loop: Cannot get AVDTP socket
-A2DPD[17:06:14.091]: main_loop:
-A2DPD[17:06:14.091]: make_server_socket:
-A2DPD[17:06:14.091]: main_loop: (errno=98:Address already in use)Cannot get
-UNIX socket
-A2DPD[17:06:15.095]: main_loop:
-A2DPD[17:06:15.095]: make_server_socket:
-A2DPD[17:06:15.095]: main_loop: (errno=98:Address already in use)Cannot get
-UNIX socket
-A2DPD[17:06:16.099]: main_loop:
-A2DPD[17:06:16.099]: make_server_socket:
-A2DPD[17:06:16.099]: main_loop: (errno=98:Address already in use)Cannot get
-UNIX socket
+I have searched the list, and found some people having reference the
+'noise', but found no clear fix.
 
-This is from CVS on 2007-04-17, I did an update today (2007-04-19) but there
-doesn't seem to be any changes.
+I followed a guide to get everything installed and this is how I bring
+up my headset;
+hcitool cc 00:0F:79:04:7A:11
+modprobe snd_bt_sco  (not done if already loaded)
+hciconfig hci0 voice 0x0060
+btsco 00:0F:79:04:7A:11
 
-Using libsbc 0.0cvs20070327-1 (Debian testing package)
+Has anyone had this problem and know how to get around it? As I am
+very happy with it other wise. If anyone could lend a hand that would
+be great.
 
-This is on Debian testing with bluez-utils 3.7-1, linux kernel 2.6.20.
-
-I should say that I installed plugz into my home directory and I run all the
-daemons as my user not root. I have PATH, LD_*, etc setup and I created
-symlinks in /usr/lib/alsa-lib to the files in the alsa-lib under my home
-dir, since I didn't know how else to tell ALSA where to look.
+Adam
 
 
-On a more positive note here is an asoundrc to give you a headset volume
-control in the alsa mixer:
 
-pcm.!default {
-        type softvol
-        slave {
-                pcm "headset"
-        }
+Some information;
 
-        control {
-                name "Bluetooth Headset"
-                card 0
-                count 1
-        }
-}
+btsco v0.5c
 
-Add this to the asoundrc shipped with plugz, you don't have to call
-it !default. You can now use any alsa mixer app to control volume (and so
-create key bindings). Obviously this means you can disable soft mixer in
-xmms and tell it to use "Bluetooth Headset".
+uname -a
+Linux dixon 2.6.20-1.2933.fc6 #1 SMP Mon Mar 19 11:00:19 EDT 2007
+x86_64 x86_64 x86_64 GNU/Linux
 
-Make sure that the control name (here "Bluetooth Headset") doesn't already
-exist in your mixer as a real (hw) control.
+hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:1A:6B:1E:E9:A6 ACL MTU: 384:8 SCO MTU: 64:8
+        UP RUNNING PSCAN
+        RX bytes:6909425 acl:20 sco:135398 events:111 errors:0
+        TX bytes:6889503 acl:18 sco:135074 commands:57 errors:5
+        Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'dixon-0'
+        Class: 0x120104
+        Service Classes: Networking, Object Transfer
+        Device Class: Computer, Desktop workstation
+        HCI Ver: 2.0 (0x3) HCI Rev: 0xdd2 LMP Ver: 2.0 (0x3) LMP Subver: 0xdd2
+        Manufacturer: Cambridge Silicon Radio (10)
 
-Thanks for any help.
+hciconfig hci0 revision
+hci0:   Type: USB
+        BD Address: 00:1A:6B:1E:E9:A6 ACL MTU: 384:8 SCO MTU: 64:8
+        Build 3538
+        Chip version: BlueCore4-External
+        Max key size: 56 bit
+        SCO mapping:  HCI
 
-Thorben.
+hcitool scan
+Scanning ...
+        00:0F:79:04:7A:11       X3 micro
+
+ hcitool info 00:0F:79:04:7A:11
+Requesting information ...
+        BD Address:  00:0F:79:04:7A:11
+        Device Name: X3 micro
+        LMP Version: 1.2 (0x2) LMP Subversion: 0x610
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xfc 0xff 0x0f 0x00 0x08 0x08 0x00 0x00
+                <encryption> <slot offset> <timing accuracy> <role switch>
+                <hold mode> <sniff mode> <park state> <RSSI> <channel quality>
+                <SCO link> <HV2 packets> <HV3 packets> <u-law log> <A-law log>
+                <CVSD> <paging scheme> <power control> <transparent SCO>
+                <AFH cap. slave> <AFH cap. master>
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
