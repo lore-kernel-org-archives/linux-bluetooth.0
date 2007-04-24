@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 24 Apr 2007 06:02:39 -0700 (PDT)
-From: walt shekrota <penguinacity@yahoo.com>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <b92d97be0704232057m648388a9w1748fe6312d25164@mail.gmail.com>
 MIME-Version: 1.0
-Message-ID: <904725.56342.qm@web62313.mail.re1.yahoo.com>
-Subject: Re: [Bluez-users] headset and input noise
+Date: Tue, 24 Apr 2007 13:36:34 +0300
+Message-ID: <F8B9B12641FB6B4FAC761BDEF9D63B040B1703C2@tlv-ex-01.adprod.bmc.com>
+From: "Cohen, Nimrod" <Nimrod_Cohen@bmc.com>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] can't l2ping to local device
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,140 +14,152 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0423674304=="
+Content-Type: multipart/mixed; boundary="===============1862904400=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0423674304==
-Content-Type: multipart/alternative; boundary="0-1733945936-1177419759=:56342"
-Content-Transfer-Encoding: 8bit
+This is a multi-part message in MIME format.
 
---0-1733945936-1177419759=:56342
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+--===============1862904400==
+Content-class: urn:content-classes:message
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C7865C.770F3E83"
 
-Hi,
- 
- may sound silly but did you mute 'line' in alsamixer? If you have a device it can
- cause static. I have a TV card. You may have a capture builtin your laptop.
- 
- -Walt
+This is a multi-part message in MIME format.
 
-Adam Dixon <adamtdixon@gmail.com> wrote: Hello All.
+------_=_NextPart_001_01C7865C.770F3E83
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-I have bluetooth going on my laptop, and have got btsco working with
-my X3 micro bt headset. However I get mass static / noise from the
-input randomly.
-I have reproduced on skype, twinkle and now on arecord. So currently I
-dont want to use it for the phone (its intended use).
+Hi
 
-I have searched the list, and found some people having reference the
-'noise', but found no clear fix.
+i can't l2ping to the local device .. "can't connect : no route to host"
 
-I followed a guide to get everything installed and this is how I bring
-up my headset;
-hcitool cc 00:0F:79:04:7A:11
-modprobe snd_bt_sco  (not done if already loaded)
-hciconfig hci0 voice 0x0060
-btsco 00:0F:79:04:7A:11
+l2ping to remote device work=20
 
-Has anyone had this problem and know how to get around it? As I am
-very happy with it other wise. If anyone could lend a hand that would
-be great.
+my system is fedora 6 & bluez 3.9=20
 
-Adam
+hciconfig -a show the device hci0 ...
+
+=20
+
+any idea=20
+
+=20
+
+nimco=20
+
+=20
 
 
+------_=_NextPart_001_01C7865C.770F3E83
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Some information;
+<html xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
+xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns=3D"http://www.w3.org/TR/REC-html40">
 
-btsco v0.5c
+<head>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered medium)">
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+p
+	{mso-margin-top-alt:auto;
+	margin-right:0in;
+	mso-margin-bottom-alt:auto;
+	margin-left:0in;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:Arial;
+	color:windowtext;}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
 
-uname -a
-Linux dixon 2.6.20-1.2933.fc6 #1 SMP Mon Mar 19 11:00:19 EDT 2007
-x86_64 x86_64 x86_64 GNU/Linux
+</head>
 
-hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:1A:6B:1E:E9:A6 ACL MTU: 384:8 SCO MTU: 64:8
-        UP RUNNING PSCAN
-        RX bytes:6909425 acl:20 sco:135398 events:111 errors:0
-        TX bytes:6889503 acl:18 sco:135074 commands:57 errors:5
-        Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'dixon-0'
-        Class: 0x120104
-        Service Classes: Networking, Object Transfer
-        Device Class: Computer, Desktop workstation
-        HCI Ver: 2.0 (0x3) HCI Rev: 0xdd2 LMP Ver: 2.0 (0x3) LMP Subver: 0xdd2
-        Manufacturer: Cambridge Silicon Radio (10)
+<body lang=3DEN-US link=3Dblue vlink=3Dpurple>
 
-hciconfig hci0 revision
-hci0:   Type: USB
-        BD Address: 00:1A:6B:1E:E9:A6 ACL MTU: 384:8 SCO MTU: 64:8
-        Build 3538
-        Chip version: BlueCore4-External
-        Max key size: 56 bit
-        SCO mapping:  HCI
+<div class=3DSection1>
 
-hcitool scan
-Scanning ...
-        00:0F:79:04:7A:11       X3 micro
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>Hi<o:p></o:p></span></font></p>
 
- hcitool info 00:0F:79:04:7A:11
-Requesting information ...
-        BD Address:  00:0F:79:04:7A:11
-        Device Name: X3 micro
-        LMP Version: 1.2 (0x2) LMP Subversion: 0x610
-        Manufacturer: Cambridge Silicon Radio (10)
-        Features: 0xfc 0xff 0x0f 0x00 0x08 0x08 0x00 0x00
-                   
-                  
-  
-                    
-                 
- 
- 
-                 
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>i can't l2ping to the local device ..&nbsp;&#8220;can&#8217;t =
+connect : no route to
+host&#8221;<o:p></o:p></span></font></p>
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>l2ping to remote device work <o:p></o:p></span></font></p>
 
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>my system is fedora 6 &amp; bluez 3.9 =
+<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>hciconfig -a show the device hci0 =
+...<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>&nbsp;<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>any idea <o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>&nbsp;<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Times New Roman"><span =
+style=3D'font-size:
+12.0pt'>nimco&nbsp;<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+------_=_NextPart_001_01C7865C.770F3E83--
 
 
 
-
-       
----------------------------------
-Ahhh...imagining that irresistible "new car" smell?
- Check outnew cars at Yahoo! Autos.
---0-1733945936-1177419759=:56342
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-Hi,<br> <br> may sound silly but did you mute 'line' in alsamixer? If you have a device it can<br> cause static. I have a TV card. You may have a capture builtin your laptop.<br> <br> -Walt<br><br><b><i>Adam Dixon &lt;adamtdixon@gmail.com&gt;</i></b> wrote:<blockquote class="replbq" style="border-left: 2px solid rgb(16, 16, 255); margin-left: 5px; padding-left: 5px;"> Hello All.<br><br>I have bluetooth going on my laptop, and have got btsco working with<br>my X3 micro bt headset. However I get mass static / noise from the<br>input randomly.<br>I have reproduced on skype, twinkle and now on arecord. So currently I<br>dont want to use it for the phone (its intended use).<br><br>I have searched the list, and found some people having reference the<br>'noise', but found no clear fix.<br><br>I followed a guide to get everything installed and this is how I bring<br>up my headset;<br>hcitool cc 00:0F:79:04:7A:11<br>modprobe snd_bt_sco  (not done if already loaded)<br>hciconfig hci0
- voice 0x0060<br>btsco 00:0F:79:04:7A:11<br><br>Has anyone had this problem and know how to get around it? As I am<br>very happy with it other wise. If anyone could lend a hand that would<br>be great.<br><br>Adam<br><br><br><br>Some information;<br><br>btsco v0.5c<br><br>uname -a<br>Linux dixon 2.6.20-1.2933.fc6 #1 SMP Mon Mar 19 11:00:19 EDT 2007<br>x86_64 x86_64 x86_64 GNU/Linux<br><br>hciconfig -a<br>hci0:   Type: USB<br>        BD Address: 00:1A:6B:1E:E9:A6 ACL MTU: 384:8 SCO MTU: 64:8<br>        UP RUNNING PSCAN<br>        RX bytes:6909425 acl:20 sco:135398 events:111 errors:0<br>        TX bytes:6889503 acl:18 sco:135074 commands:57 errors:5<br>        Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80<br>        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3<br>        Link policy: RSWITCH HOLD SNIFF PARK<br>        Link mode: SLAVE ACCEPT<br>        Name: 'dixon-0'<br>        Class: 0x120104<br>        Service Classes: Networking, Object Transfer<br>        Device
- Class: Computer, Desktop workstation<br>        HCI Ver: 2.0 (0x3) HCI Rev: 0xdd2 LMP Ver: 2.0 (0x3) LMP Subver: 0xdd2<br>        Manufacturer: Cambridge Silicon Radio (10)<br><br>hciconfig hci0 revision<br>hci0:   Type: USB<br>        BD Address: 00:1A:6B:1E:E9:A6 ACL MTU: 384:8 SCO MTU: 64:8<br>        Build 3538<br>        Chip version: BlueCore4-External<br>        Max key size: 56 bit<br>        SCO mapping:  HCI<br><br>hcitool scan<br>Scanning ...<br>        00:0F:79:04:7A:11       X3 micro<br><br> hcitool info 00:0F:79:04:7A:11<br>Requesting information ...<br>        BD Address:  00:0F:79:04:7A:11<br>        Device Name: X3 micro<br>        LMP Version: 1.2 (0x2) LMP Subversion: 0x610<br>        Manufacturer: Cambridge Silicon Radio (10)<br>        Features: 0xfc 0xff 0x0f 0x00 0x08 0x08 0x00 0x00<br>                <encryption> <slot offset=""> <timing accuracy=""> <role switch=""><br>                <hold mode=""> <sniff mode=""> <park state=""> <RSSI> <channel
- quality=""><br>                <SCO link=""> <HV2 packets=""> <HV3 packets=""> <u-law log=""> <A-law log=""><br>                <CVSD> <paging scheme=""> <power control=""> <transparent sco=""><br>                <AFH cap="" slave=""> <AFH cap="" master=""><br><br>-------------------------------------------------------------------------<br>This SF.net email is sponsored by DB2 Express<br>Download DB2 Express C - the FREE version of DB2 express and take<br>control of your XML. No limits. Just data. Click to get it now.<br>http://sourceforge.net/powerbar/db2/<br>_______________________________________________<br>Bluez-users mailing list<br>Bluez-users@lists.sourceforge.net<br>https://lists.sourceforge.net/lists/listinfo/bluez-users<br></AFH></AFH></transparent></power></paging></CVSD></A-law></u-law></HV3></HV2></SCO></channel></RSSI></park></sniff></hold></role></timing></slot></encryption></blockquote><br><p>&#32;
-
-
-
-      <hr size=1>Ahhh...imagining that irresistible "new car" smell?<br> Check out
-<a href="http://us.rd.yahoo.com/evt=48245/*http://autos.yahoo.com/new_cars.html;_ylc=X3oDMTE1YW1jcXJ2BF9TAzk3MTA3MDc2BHNlYwNtYWlsdGFncwRzbGsDbmV3LWNhcnM-">new cars at Yahoo! Autos.</a>
-
---0-1733945936-1177419759=:56342--
-
-
---===============0423674304==
+--===============1862904400==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -159,7 +170,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0423674304==
+--===============1862904400==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -170,4 +181,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0423674304==--
+--===============1862904400==--
