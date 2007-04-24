@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 24 Apr 2007 20:55:49 +0200
+Date: Tue, 24 Apr 2007 20:48:26 +0200
 From: Marc Haber <mh+bluez-devel@zugschlus.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20070424185549.GE6853@torres.zugschlus.de>
-References: <5FD5754DDBA0B1499B5A0B4BB5419485D8E1FC@fmsmsx411.amr.corp.intel.com>
+Message-ID: <20070424184826.GD6853@torres.zugschlus.de>
+References: <20070415095728.GA6212@ifup.org>
 Mime-Version: 1.0
-In-Reply-To: <5FD5754DDBA0B1499B5A0B4BB5419485D8E1FC@fmsmsx411.amr.corp.intel.com>
-Subject: Re: [Bluez-devel] Plugz and btsco
+In-Reply-To: <20070415095728.GA6212@ifup.org>
+Subject: Re: [Bluez-devel] Unable to set number of SCO buffers : please
+	upgrade your Kernel !
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,26 +21,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, Apr 05, 2007 at 07:14:15AM -0700, Allyn, Mark A wrote:
-> I want to make sure, if I use the plugz (with headsetd and a2dpd), I do
-> not need to
-> have the btsco daemon nor the snd_bt_sco device. Is that correct?
->  
-> I am attempting to use skype with a bluetooth headset. I am not seeing
-> the device 
-> in the menu on skype.
->  
-> I tried using alsa's aplay, but I am getting an error saying:
-> 'channels count non available'.
+On Sun, Apr 15, 2007 at 02:57:29AM -0700, Brandon Philips wrote:
+> I am running 2.6.21-rc6 with sco-flowcontrol-v4.2.diff applied and I am
+> getting the following error when trying to use my Platronics 640
+> headset.  The computer is a Thinkpad x60s running Debian unstable.
 
-Pardon me for jumping in: My headset does not yet work ("ALSA lib
-pcm_sco.c:277:(sco_headset_hw_params) Unable to set number of SCO
-buffers : please upgrade your Kernel !" while running kernel 2.6.20.7,
-but my system does not crash even if I do not have the SCO flow
-control patch applied.
+I have exactly the same issue on a hp notebook, also running Debian
+unstable. I exported current CVS HEAD, applied the Debian .diff and
+built a local package, and I still have the same problem. Only that
+the "Unable to set number of SCO buffers" error message now has
+pcm_sco.c:277 as line number.
 
-Can this "Unable to set number of SCO buffers" error be related to
-having an unpatched kernel?
+Any more hints?
 
 Greetings
 Marc
