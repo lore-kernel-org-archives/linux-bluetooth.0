@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <fc27e74b0704241130pd5970d6x8e32d1a02ad4e274@mail.gmail.com>
-References: <fc27e74b0704241130pd5970d6x8e32d1a02ad4e274@mail.gmail.com>
-Date: Tue, 24 Apr 2007 20:35:46 +0200
-Message-Id: <1177439746.14980.10.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Correct ordering of Sco packets
+Message-ID: <fc27e74b0704241130pd5970d6x8e32d1a02ad4e274@mail.gmail.com>
+Date: Wed, 25 Apr 2007 00:00:23 +0530
+From: "list subscribe" <develnewbie@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-devel] Correct ordering of Sco packets
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,26 +18,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Marcel,
+I didn't understand the point you made regarding the SCO packets being
+interleaved  by the hci usb driver.
 
-> I didn't understand the point you made regarding the SCO packets being
-> interleaved  by the hci usb driver.
-> 
-> You mentioned that this is not the job of the transport driver and The
-> Bluetooth core
->  has to take care of the correct ordering.
-> 
-> how does the bluetooth core maintain this interleaving ?
+You mentioned that this is not the job of the transport driver and The
+Bluetooth core
+ has to take care of the correct ordering.
 
-every SCO packet has a handle to identify the SCO connection it belongs
-to. With the SCO flow control patch this should not be a problem at all
-actually. However I leave that to somebody else to verify.
-
-Regards
-
-Marcel
+how does the bluetooth core maintain this interleaving ?
 
 
+Thanks,
+Alok.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
