@@ -1,16 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 25 Apr 2007 09:56:03 +0400
-From: John Frankish <frankish@dubai.oilfield.slb.com>
-In-reply-to: <462E0A15.1070707@xmission.com>
+Date: Tue, 24 Apr 2007 20:55:49 +0200
+From: Marc Haber <mh+bluez-devel@zugschlus.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-id: <7.0.1.0.2.20070425095009.03d963a8@dubai.oilfield.slb.com>
-MIME-version: 1.0
-References: <7.0.1.0.2.20070422102711.03d6a030@dubai.oilfield.slb.com>
-	<462B9264.7030604@xmission.com>
-	<7.0.1.0.2.20070423075933.03d4a650@dubai.oilfield.slb.com>
-	<462E0A15.1070707@xmission.com>
-Subject: Re: [Bluez-devel] Unable to set number of SCO buffers : please
- upgrade your Kernel !
+Message-ID: <20070424185549.GE6853@torres.zugschlus.de>
+References: <5FD5754DDBA0B1499B5A0B4BB5419485D8E1FC@fmsmsx411.amr.corp.intel.com>
+Mime-Version: 1.0
+In-Reply-To: <5FD5754DDBA0B1499B5A0B4BB5419485D8E1FC@fmsmsx411.amr.corp.intel.com>
+Subject: Re: [Bluez-devel] Plugz and btsco
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,48 +20,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Brad,
+On Thu, Apr 05, 2007 at 07:14:15AM -0700, Allyn, Mark A wrote:
+> I want to make sure, if I use the plugz (with headsetd and a2dpd), I do
+> not need to
+> have the btsco daemon nor the snd_bt_sco device. Is that correct?
+>  
+> I am attempting to use skype with a bluetooth headset. I am not seeing
+> the device 
+> in the menu on skype.
+>  
+> I tried using alsa's aplay, but I am getting an error saying:
+> 'channels count non available'.
 
-Whilst it's reasonably difficult to move to a newer kernel in DSL-N, 
-the main reason for making plugz work on this kernel is that I can 
-then make it available as a DSL-N extension for many others to use.
+Pardon me for jumping in: My headset does not yet work ("ALSA lib
+pcm_sco.c:277:(sco_headset_hw_params) Unable to set number of SCO
+buffers : please upgrade your Kernel !" while running kernel 2.6.20.7,
+but my system does not crash even if I do not have the SCO flow
+control patch applied.
 
-I tried the diff2 patch on my kernel - it ran with about 5 failures, 
-4 of which I added manually. After reboot, I had the same SCO buffers 
-error message. I wonder - does plugz need a certain version revision 
-of bluez-utils or will it work with any version? I am using 
-bluez-utils 2.15 as I cannot make the "pin" part of things work on 
-DSL-N with later versions.
+Can this "Unable to set number of SCO buffers" error be related to
+having an unpatched kernel?
 
-Where would Fabien have put the earlier SCO patch?
+Greetings
+Marc
 
-Thanks
-John
-
-At 17:45 24-04-07, you wrote:
->John
->
-> > The earliest patch in the cvs is v2.0 for 2.6.18-mh7 - given that I
-> > have 2.6.12 (DSL-N is like Knoppix, you cannot easily update the
-> > kernel), is there a patch archive somewhere with a patch closer to my
-> > kernel or do I need to try and apply the patch "manually"?
->
->Fabien may have submitted an early patch that is closer to your kernel
->but rather than backport or dig in the archives I suggest you consider
->trying a newer kernel.
->
->Brad
->
->-------------------------------------------------------------------------
->This SF.net email is sponsored by DB2 Express
->Download DB2 Express C - the FREE version of DB2 express and take
->control of your XML. No limits. Just data. Click to get it now.
->http://sourceforge.net/powerbar/db2/
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
+-- 
+-----------------------------------------------------------------------------
+Marc Haber         | "I don't trust Computers. They | Mailadresse im Header
+Mannheim, Germany  |  lose things."    Winona Ryder | Fon: *49 621 72739834
+Nordisch by Nature |  How to make an American Quilt | Fax: *49 3221 2323190
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
