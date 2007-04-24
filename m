@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: TJ <tj.trevelyan@gmail.com>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Wed, 25 Apr 2007 10:00:47 +0100
-References: <6849c8890704200342k23f7e54ckaf0920197c4e5e1a@mail.gmail.com>
-	<6849c8890704240209q46c5ec3ai47241251f7142ebf@mail.gmail.com>
-	<462DD3B5.8060702@access-company.com>
+Message-ID: <b92d97be0704241617x18ce730x3d319020ba935c33@mail.gmail.com>
+Date: Wed, 25 Apr 2007 08:47:33 +0930
+From: "Adam Dixon" <adamtdixon@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <462E042D.5060405@xmission.com>
 MIME-Version: 1.0
-Message-Id: <20070425090159.8C29EF5533@mail1.norse.ukerna.ac.uk>
-Subject: Re: [Bluez-users] A2DPD fails to init with a2dp_make_listen_socket:
-	(errno=13:Permission denied)Cannot bind socket
+References: <b92d97be0704232057m648388a9w1748fe6312d25164@mail.gmail.com>
+	<462E042D.5060405@xmission.com>
+Subject: Re: [Bluez-users] headset and input noise
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,19 +21,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hello Walt, Brad.
 
-> Hi,
-> thank you for the softvol trick.
-> It looks like you already have a2dpd running.
-> maybe killall a2dpd before could help
-> 
+> may sound silly but did you mute 'line' in alsamixer? If you have a device it can
+> cause static. I have a TV card. You may have a capture builtin your laptop.
 
-No, it's definitely not already running. Its not listed in ps -Af, and I
-have even rebooted. headsetd is not running either.
+I have not muted the linein (my laptop has onboard line in) - this
+might be something to look into.
 
-Thorben
+On 4/24/07, Brad Midgley <bmidgley@xmission.com> wrote:
+> are you using the sco flowcontrol kernel patch from the plugz module
+> under the patches directory?
+>
+> brad
 
+I have seen mention this flow control patch. However I see no help in
+applying it. I have FC6 and kernel source installed, do I just apply
+the file using patch to my sources? then recompile plugz and sbc? or
+is there more to do than that?
+
+Some quick steps on outlining how to apply the patch would be really
+appreciated, I have googled and found no-such blog or howto. Ive only
+ever used patch on a single file also - which adds to my confusion.
+And is it V4.2 that I use?
+
+Thanks allot for any help.
+
+Adam
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
