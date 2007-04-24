@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <fc27e74b0704241130pd5970d6x8e32d1a02ad4e274@mail.gmail.com>
-Date: Wed, 25 Apr 2007 00:00:23 +0530
-From: "list subscribe" <develnewbie@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Subject: [Bluez-devel] Correct ordering of Sco packets
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <462E3E94.3040408@access-company.com>
+References: <45F16630.9000606@access-company.com>
+	<460D363F.9010709@access-company.com>	<1175271188.5815.225.camel@violet>
+	<20070331152530.GA12829@jh-mbp> <1175627156.5815.402.camel@violet>
+	<462E3E94.3040408@access-company.com>
+Date: Tue, 24 Apr 2007 20:20:02 +0200
+Message-Id: <1177438802.14980.4.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] RemoteNameRequested signal during discovery patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,19 +23,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel,
-I didn't understand the point you made regarding the SCO packets being
-interleaved  by the hci usb driver.
+Hi Frederic,
 
-You mentioned that this is not the job of the transport driver and The
-Bluetooth core
- has to take care of the correct ordering.
+> I can not submit this patch into cvs (no access other than anonymous).
+> Can you do it please ?
 
-how does the bluetooth core maintain this interleaving ?
+your patch has been committed to the CVS now. Thanks.
+
+Regards
+
+Marcel
 
 
-Thanks,
-Alok.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
