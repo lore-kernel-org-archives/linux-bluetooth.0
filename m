@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 24 Apr 2007 20:48:26 +0200
-From: Marc Haber <mh+bluez-devel@zugschlus.de>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20070424184826.GD6853@torres.zugschlus.de>
-References: <20070415095728.GA6212@ifup.org>
+In-Reply-To: <fc27e74b0704240413v5b6e2e80h7b2feb40d27de686@mail.gmail.com>
+References: <fc27e74b0704240413v5b6e2e80h7b2feb40d27de686@mail.gmail.com>
+Date: Tue, 24 Apr 2007 20:38:43 +0200
+Message-Id: <1177439923.14980.14.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-In-Reply-To: <20070415095728.GA6212@ifup.org>
-Subject: Re: [Bluez-devel] Unable to set number of SCO buffers : please
-	upgrade your Kernel !
+Subject: Re: [Bluez-devel] [PATCH]Dynamic Alternate Setting patch	(hci_usb.c)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,27 +20,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sun, Apr 15, 2007 at 02:57:29AM -0700, Brandon Philips wrote:
-> I am running 2.6.21-rc6 with sco-flowcontrol-v4.2.diff applied and I am
-> getting the following error when trying to use my Platronics 640
-> headset.  The computer is a Thinkpad x60s running Debian unstable.
+Hi,
 
-I have exactly the same issue on a hp notebook, also running Debian
-unstable. I exported current CVS HEAD, applied the Debian .diff and
-built a local package, and I still have the same problem. Only that
-the "Unable to set number of SCO buffers" error message now has
-pcm_sco.c:277 as line number.
+> As per the discussion on #bluez channel , I am attaching a patch which
+> dynamically manages the the alternate settings for SCO channels.
+> The patch includes the following :
+> 
+> 1. It declares a work queue(config_work), which is scheduled when
+>              1. There is a change in number of SCO channels OR 
+>              2. There is a change in the Voice setting. 
+> 
+> 2. On invocation it determines the alternate setting based on the
+> table given in HCI - usb spec docs. The  table is also mentioned  in
+> the patch. 
+> 
+> 3. It then empties all the queued isochronous URBs , except those
+> which are already submitted. 
+> 
+> 4. It then sets the alternate setting by calling
+> usb_set_interface().
+> 
+> I have tested this patch using "scotest". 
+> I am using 2.6.21-rc7 with sco-flowcontrol-v4.2.diff patch. 
+> 
+> Let me know if  any changes are necessary. 
 
-Any more hints?
+having global static variables doesn't work. It will break horrible in
+case you attach a second Bluetooth dongle. Also the voice setting is
+stored in hci_dev and always present. So no need to copy these
+information. What you need to store is the current alternate setting and
+then calculate the new one. Change the setting and then store it.
 
-Greetings
-Marc
+Regards
 
--- 
------------------------------------------------------------------------------
-Marc Haber         | "I don't trust Computers. They | Mailadresse im Header
-Mannheim, Germany  |  lose things."    Winona Ryder | Fon: *49 621 72739834
-Nordisch by Nature |  How to make an American Quilt | Fax: *49 3221 2323190
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
