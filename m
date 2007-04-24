@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <b92d97be0704241617x18ce730x3d319020ba935c33@mail.gmail.com>
-Date: Wed, 25 Apr 2007 08:47:33 +0930
-From: "Adam Dixon" <adamtdixon@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <462E042D.5060405@xmission.com>
-MIME-Version: 1.0
-References: <b92d97be0704232057m648388a9w1748fe6312d25164@mail.gmail.com>
-	<462E042D.5060405@xmission.com>
-Subject: Re: [Bluez-users] headset and input noise
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <F8B9B12641FB6B4FAC761BDEF9D63B040B1703C2@tlv-ex-01.adprod.bmc.com>
+References: <F8B9B12641FB6B4FAC761BDEF9D63B040B1703C2@tlv-ex-01.adprod.bmc.com>
+Date: Tue, 24 Apr 2007 18:03:46 +0200
+Message-Id: <1177430626.6644.216.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] can't l2ping to local device
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,44 +16,20 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello Walt, Brad.
-
-> may sound silly but did you mute 'line' in alsamixer? If you have a device it can
-> cause static. I have a TV card. You may have a capture builtin your laptop.
-
-I have not muted the linein (my laptop has onboard line in) - this
-might be something to look into.
-
-On 4/24/07, Brad Midgley <bmidgley@xmission.com> wrote:
-> are you using the sco flowcontrol kernel patch from the plugz module
-> under the patches directory?
->
-> brad
-
-I have seen mention this flow control patch. However I see no help in
-applying it. I have FC6 and kernel source installed, do I just apply
-the file using patch to my sources? then recompile plugz and sbc? or
-is there more to do than that?
-
-Some quick steps on outlining how to apply the patch would be really
-appreciated, I have googled and found no-such blog or howto. Ive only
-ever used patch on a single file also - which adds to my confusion.
-And is it V4.2 that I use?
-
-Thanks allot for any help.
-
-Adam
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGksCgo+IGkgY2FuJ3QgbDJwaW5nIHRvIHRoZSBsb2NhbCBkZXZpY2UgLi4g4oCcY2Fu4oCZdCBj
+b25uZWN0IDogbm8gcm91dGUgdG8KPiBob3N04oCdCj4gCj4gbDJwaW5nIHRvIHJlbW90ZSBkZXZp
+Y2Ugd29yayAKCkJsdWV0b290aCBoYXMgbm8gbG9vcGJhY2sgZGV2aWNlLiBTbyB5b3UgY2FuJ3Qg
+ZXN0YWJsaXNoIGNvbm5lY3Rpb25zIHRvCnlvdXIgbG9jYWwgZGV2aWNlIGZyb20geW91ciBsb2Nh
+bCBkZXZpY2UuCgpSZWdhcmRzCgpNYXJjZWwKCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5l
+dCBlbWFpbCBpcyBzcG9uc29yZWQgYnkgREIyIEV4cHJlc3MKRG93bmxvYWQgREIyIEV4cHJlc3Mg
+QyAtIHRoZSBGUkVFIHZlcnNpb24gb2YgREIyIGV4cHJlc3MgYW5kIHRha2UKY29udHJvbCBvZiB5
+b3VyIFhNTC4gTm8gbGltaXRzLiBKdXN0IGRhdGEuIENsaWNrIHRvIGdldCBpdCBub3cuCmh0dHA6
+Ly9zb3VyY2Vmb3JnZS5uZXQvcG93ZXJiYXIvZGIyLwpfX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fXwpCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNl
+cnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xp
+c3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
