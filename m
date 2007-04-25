@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <463003F7.3090302@evdebs.org>
-Date: Wed, 25 Apr 2007 21:44:23 -0400
-From: Adam Goode <adam@evdebs.org>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] basic printing profile server?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200704260838.54803.denis.kenzior@trolltech.com>
+References: <200704260742.40197.denis.kenzior@trolltech.com>
+	<200704260838.54803.denis.kenzior@trolltech.com>
+Date: Thu, 26 Apr 2007 01:09:28 +0200
+Message-Id: <1177542568.14980.47.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] STLC2500 Baud Rate & Address Setting
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,24 +21,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Denis,
 
-I was wondering if anyone has worked on a basic printing profile server 
-for Linux? By server, I mean a way that phones or other small devices 
-can send jobs to a Linux desktop host which would then print through 
-CUPS (or lpd, etc.).
+> Disregard previous, can't keep my patches straight.
+> 
+> Here is the good one.
 
-It seems like a missing piece, since CUPS can already print to bluetooth 
-printers.
+your patch has been committed to the CVS. Thanks.
 
-My new phone supports printing of SMS messages and photos, so before I 
-try writing a server for it, I wanted to check to see if someone has 
-done it.
+Regards
+
+Marcel
 
 
-Thanks,
-
-Adam
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
