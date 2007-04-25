@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <12a679470704251042n135b2a4dt2e5a8dcca04c48d3@mail.gmail.com>
-Date: Wed, 25 Apr 2007 18:42:02 +0100
-From: "=?ISO-8859-1?Q?Jos=E9_Pedro_Saraiva?=" <nocive@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Subject: [Bluez-users] do SDP queries and HCI scans count as ACL?
+Date: Wed, 25 Apr 2007 18:48:06 +0300
+From: Mikko Tuumanen <mijutu@utu.fi>
+To: bluez-users@lists.sourceforge.net
+Message-id: <20070425154806.GG7988@sorvankyla.yok.utu.fi>
+MIME-version: 1.0
+Subject: [Bluez-users] More than two incoming rfcomm connections?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,61 +14,66 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0095226252=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0095226252==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_51616_28132053.1177522922379"
+Hello.
 
-------=_Part_51616_28132053.1177522922379
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+I just wrote this little program to serve gps data to
+several cellular phones:
 
-Knowing that each hci device suports 7 ACL, do SDP queries and hci scans
-count as ACL when performed, even momentarely?
+http://users.utu.fi/mijutu/src/gpsBtHub/
 
-Thanks in advance
+I wrote it because typical bluetooth gps devices will
+only accept one connection at a time.
 
+First I register an sdp service:
+sdptool add --handle=0x003 --channel=1 SP
 
-Best regards,
+And then run this program that will 
+connect to a gpsd (http://gpsd.berlios.de/) and
+socket, bind, listen and accept 
+incoming connections to rfcommchannel 1. 
+After each successful accept, a new thread is
+created for the client and accept is attempted again.
 
-Jos=E9 Pedro
+The program works fine except I can only connect two
+clients at a time.
 
-------=_Part_51616_28132053.1177522922379
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+For example I can connect one "bluetooth serial chat"
+and one phone and when I try to connect another kbtserialchat,
+I get "Connection error (112)."
 
-Knowing that each hci device suports 7 ACL, do SDP queries and hci scans co=
-unt as ACL when performed, even momentarely?<br><br>Thanks in advance<br><b=
-r><br>Best regards,<br><br>Jos=E9 Pedro<br>
+When the 3rd client tries to connect, the accept on
+server doesn't return.
 
-------=_Part_51616_28132053.1177522922379--
+What's happening here? I could guess that
+that this method is creating a new piconet for
+each incoming connection and this Cambridge Silicon Radio
+bluetooth dongle can only be slave in two.
+Am I close to the truth here?
 
+If I do a role switch with hcitool for each client connection,
+I can connect at least five clients. I didn't try more,
+because I ran out of bluetooth devices.
 
---===============0095226252==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+And finally my problem was solved by changing
+"lm accept" to "lm master" in /etc/bluetooth/hcid.conf
+But since I already wrote this message, I'll send it anyway. :-)
+
+What is the meaning of the handle that is given to sdptool?
+
+Would it be possible to do the role switch without root privileges in my
+program if I didn't want to "lm master" in hcid.conf ?
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0095226252==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0095226252==--
