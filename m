@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 25 Apr 2007 18:48:06 +0300
-From: Mikko Tuumanen <mijutu@utu.fi>
+Message-ID: <462F60AB.2070603@tesbv.com>
+Date: Wed, 25 Apr 2007 16:07:39 +0200
+From: mercier <bertrand.mercier@tesbv.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Message-id: <20070425154806.GG7988@sorvankyla.yok.utu.fi>
-MIME-version: 1.0
-Subject: [Bluez-users] More than two incoming rfcomm connections?
+Subject: [Bluez-users] Porting BlueZ on ARM926 + headset and mobile and
+	camera profile management
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,55 +19,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello.
+Hello,
 
-I just wrote this little program to serve gps data to
-several cellular phones:
+QUESTION1 : has BlueZ already ported on ARM926 processor ?
 
-http://users.utu.fi/mijutu/src/gpsBtHub/
+QUESTION2 : does BlueZ manage generic profiles like 
+GenericAccessProfile, SDAP, GAVDP, AVRCP ?
 
-I wrote it because typical bluetooth gps devices will
-only accept one connection at a time.
+QUESTION3 : does BlueZ manage SPP profile ?
 
-First I register an sdp service:
-sdptool add --handle=0x003 --channel=1 SP
+QUESTION4 : does BlueZ manage the profiles needed for a headset and for 
+a mobile phone (I believe HFP, A2DP, HSP profiles) ?
 
-And then run this program that will 
-connect to a gpsd (http://gpsd.berlios.de/) and
-socket, bind, listen and accept 
-incoming connections to rfcommchannel 1. 
-After each successful accept, a new thread is
-created for the client and accept is attempted again.
+QUESTION5 : does BlueZ manage the profiles needed for a camera (I 
+believe BIP or VDP profiles) ?
 
-The program works fine except I can only connect two
-clients at a time.
+thank you very much
 
-For example I can connect one "bluetooth serial chat"
-and one phone and when I try to connect another kbtserialchat,
-I get "Connection error (112)."
-
-When the 3rd client tries to connect, the accept on
-server doesn't return.
-
-What's happening here? I could guess that
-that this method is creating a new piconet for
-each incoming connection and this Cambridge Silicon Radio
-bluetooth dongle can only be slave in two.
-Am I close to the truth here?
-
-If I do a role switch with hcitool for each client connection,
-I can connect at least five clients. I didn't try more,
-because I ran out of bluetooth devices.
-
-And finally my problem was solved by changing
-"lm accept" to "lm master" in /etc/bluetooth/hcid.conf
-But since I already wrote this message, I'll send it anyway. :-)
-
-What is the meaning of the handle that is given to sdptool?
-
-Would it be possible to do the role switch without root privileges in my
-program if I didn't want to "lm master" in hcid.conf ?
-
+best regards
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
