@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Thu, 26 Apr 2007 07:42:40 +1000
+Message-ID: <fc27e74b0704251424k32e3173eud439d5edeb64f148@mail.gmail.com>
+Date: Thu, 26 Apr 2007 02:54:07 +0530
+From: "list subscribe" <develnewbie@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_Qt8LGHthakKMevk"
-Message-Id: <200704260742.40197.denis.kenzior@trolltech.com>
-Subject: [Bluez-devel] [PATCH] STLC2500 Baud Rate & Address Setting
+Content-Type: multipart/mixed;
+	boundary="----=_Part_49527_25093510.1177536247674"
+Subject: [Bluez-devel] Modified patch (Dynamic Alternate Setting)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,313 +19,127 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---Boundary-00=_Qt8LGHthakKMevk
-Content-Type: text/plain;
-  charset="us-ascii"
+------=_Part_49527_25093510.1177536247674
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 Marcel,
 
-Don't know if you missed a previous submission, but here's the fixed STCL2500 
-baud rate patch again.
+I have made the changes u suggested.
+Take a look and let me know.
 
--Denis
+Thanks,
+Alok.
 
---Boundary-00=_Qt8LGHthakKMevk
-Content-Type: text/x-diff; charset="us-ascii"; name="hciattach_stlc2500.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="hciattach_stlc2500.patch"
+------=_Part_49527_25093510.1177536247674
+Content-Type: application/octet-stream; name=alternate-setting-patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f0yamci3
+Content-Disposition: attachment; filename="alternate-setting-patch"
 
-Index: hciattach.8
-===================================================================
-RCS file: /cvsroot/bluez/utils/tools/hciattach.8,v
-retrieving revision 1.4
-diff -u -5 -r1.4 hciattach.8
---- hciattach.8	1 Jun 2006 18:36:20 -0000	1.4
-+++ hciattach.8	1 Apr 2007 22:58:32 -0000
-@@ -9,10 +9,11 @@
- .IR timeout \|]
- .I tty
- .IR type \||\| id
- .I speed
- .I flow
-+.I bdaddr
- .SH DESCRIPTION
- .LP
- Hciattach is used to attach a serial UART to the Bluetooth stack as HCI
- transport interface.
- .SH OPTIONS
-@@ -103,9 +104,19 @@
- .B flow
- set by default. To force no flow control use
- .B noflow
- instead.
- 
-+.TP
-+.I bdaddr
-+The 
-+.I bdaddr
-+specifies the Bluetooth Address to use.  Some devices (like the STLC2500) 
-+do not store the Bluetooth address in hardware memory.  Instead it must 
-+be uploaded during the initialization process.  If this argument
-+is specified, then the address will be used to initialize the device.
-+Otherwise, a default address will be used.
-+
- .SH AUTHORS
- Written by Maxim Krasnyansky <maxk@qualcomm.com>
- .PP
- Manual page by Nils Faerber <nils@kernelconcepts.de>
-Index: hciattach.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/tools/hciattach.c,v
-retrieving revision 1.43
-diff -u -5 -r1.43 hciattach.c
---- hciattach.c	17 Jan 2007 12:31:42 -0000	1.43
-+++ hciattach.c	1 Apr 2007 22:58:33 -0000
-@@ -65,10 +65,11 @@
- 	int  p_id;
- 	int  proto;
- 	int  init_speed;
- 	int  speed;
- 	int  flags;
-+	char *bdaddr;
- 	int  (*init) (int fd, struct uart_t *u, struct termios *ti);
- };
- 
- #define FLOW_CTL	0x0001
- 
-@@ -828,23 +829,98 @@
- extern int stlc2500_init(int fd, bdaddr_t *bdaddr);
- 
- static int stlc2500(int fd, struct uart_t *u, struct termios *ti)
- {
- 	bdaddr_t bdaddr;
-+	struct timespec tm = {0, 50000};
-+	char cmd[5];
-+	unsigned char resp[10];
-+	int n;
-+	int i;
- 
--	str2ba("00:80:E1:00:AB:BA", &bdaddr);
-+	/* STLC2500 Set Baud Rate stuff */
-+	/* We should set the baud rate first, so the firmware download */
-+	/* goes much faster */
-+
-+	/* STLC2500 Seems to support the Ericsson set baud rate stuff */
-+	/* It should also support the ST Set Baud Rate command */
-+	/* (as in st() function above, but those commands never succeed */
-+	cmd[0] = HCI_COMMAND_PKT;
-+	cmd[1] = 0x09;
-+	cmd[2] = 0xfc;
-+	cmd[3] = 0x01;
- 
--	return stlc2500_init(fd, &bdaddr);
-+	switch (u->speed) {
-+	case 57600:
-+		cmd[4] = 0x03;
-+		break;
-+	case 115200:
-+		cmd[4] = 0x02;
-+		break;
-+	case 230400:
-+		cmd[4] = 0x01;
-+		break;
-+	case 460800:
-+		cmd[4] = 0x00;
-+		break;
-+	case 921600:
-+		cmd[4] = 0x20;
-+		break;
-+	default:
-+		cmd[4] = 0x02;
-+		u->speed = 115200;
-+		break;
-+	}
-+
-+#ifdef STLC2500_DEBUG
-+	fprintf(stderr, "Sending Baud Rate %02x\n", cmd[4]);
-+#endif
-+	/* Send initialization command */
-+	if (write(fd, cmd, 5) != 5) {
-+		perror("Failed to write init command");
-+		return -1;
-+	}
-+
-+	/* Need to wait here to give a chance for the device to set baud */
-+	/* But no more than 0.5 seconds */
-+	usleep(200000);
-+
-+#ifdef STLC2500_DEBUG
-+	fprintf(stderr, "Setting speed\n");
-+#endif
-+	if (set_speed(fd, ti, u->speed) < 0) {
-+		perror("Can't set baud rate");
-+		return -1;
-+	}
-+
-+#ifdef STLC2500_DEBUG
-+	fprintf(stderr, "Speed set...\n");
-+#endif
-+
-+	/* Read reply */
-+	if ((n = read_hci_event(fd, resp, 10)) < 0) {
-+		fprintf(stderr, "Failed to set baud rate on chip\n");
-+		return -1;
-+	}
-+
-+#ifdef STLC2500_DEBUG
-+	for (i = 0; i < n; i++) {
-+		fprintf(stderr, "resp[%d] = %02x\n", i, resp[i]);
-+	}
-+#endif
-+
-+	str2ba(u->bdaddr, &bdaddr);
-+	return stlc2500_init(fd, &bdaddr, u->flags & FLOW_CTL);
- }
- 
- extern int bgb2xx_init(int fd, bdaddr_t *bdaddr);
- 
- static int bgb2xx(int fd, struct uart_t *u, struct termios *ti)
- {
- 	bdaddr_t bdaddr;
- 
--	str2ba("BD:B2:10:00:AB:BA", &bdaddr);
-+	str2ba(u->bdaddr, &bdaddr);
- 
- 	return bgb2xx_init(fd, &bdaddr);
- }
- 
- /*
-@@ -964,73 +1040,73 @@
- 
- 	return 0;
- }
- 
- struct uart_t uart[] = {
--	{ "any",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL     },
--	{ "ericsson",   0x0000, 0x0000, HCI_UART_H4,   57600,  115200, FLOW_CTL, ericsson },
--	{ "digi",       0x0000, 0x0000, HCI_UART_H4,   9600,   115200, FLOW_CTL, digi     },
--	{ "texas",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, texas    },
-+	{ "any",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
-+	{ "ericsson",   0x0000, 0x0000, HCI_UART_H4,   57600,  115200, FLOW_CTL, ericsson, NULL },
-+	{ "digi",       0x0000, 0x0000, HCI_UART_H4,   9600,   115200, FLOW_CTL, digi, NULL     },
-+	{ "texas",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, texas, NULL    },
- 
--	{ "bcsp",       0x0000, 0x0000, HCI_UART_BCSP, 115200, 115200, 0,        bcsp     },
-+	{ "bcsp",       0x0000, 0x0000, HCI_UART_BCSP, 115200, 115200, 0,        bcsp, NULL     },
- 
- 	/* Xircom PCMCIA cards: Credit Card Adapter and Real Port Adapter */
--	{ "xircom",     0x0105, 0x080a, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL     },
-+	{ "xircom",     0x0105, 0x080a, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
- 
- 	/* CSR Casira serial adapter or BrainBoxes serial dongle (BL642) */
--	{ "csr",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, csr      },
-+	{ "csr",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, csr, NULL      },
- 
- 	/* BrainBoxes PCMCIA card (BL620) */
--	{ "bboxes",     0x0160, 0x0002, HCI_UART_H4,   115200, 460800, FLOW_CTL, csr      },
-+	{ "bboxes",     0x0160, 0x0002, HCI_UART_H4,   115200, 460800, FLOW_CTL, csr, NULL      },
- 
- 	/* Silicon Wave kits */
--	{ "swave",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, swave    },
-+	{ "swave",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, swave, NULL    },
- 
- 	/* ST Microelectronics minikits based on STLC2410/STLC2415 */
--	{ "st",         0x0000, 0x0000, HCI_UART_H4,    57600, 115200, FLOW_CTL, st       },
-+	{ "st",         0x0000, 0x0000, HCI_UART_H4,    57600, 115200, FLOW_CTL, st, NULL       },
- 
- 	/* ST Microelectronics minikits based on STLC2500 */
--	{ "stlc2500",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, stlc2500 },
-+	{ "stlc2500",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, stlc2500, "00:80:E1:00:AB:BA"  },
- 
- 	/* Philips generic Ericsson IP core based */
--	{ "philips",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL     },
-+	{ "philips",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
- 
- 	/* Philips BGB2xx Module */
--	{ "bgb2xx",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, bgb2xx   },
-+	{ "bgb2xx",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, bgb2xx, "BD:B2:10:00:AB:BA"   },
- 
- 	/* Sphinx Electronics PICO Card */
--	{ "picocard",   0x025e, 0x1000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL     },
-+	{ "picocard",   0x025e, 0x1000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
- 
- 	/* Inventel BlueBird Module */
--	{ "inventel",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL     },
-+	{ "inventel",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
- 
- 	/* COM One Platinium Bluetooth PC Card */
--	{ "comone",     0xffff, 0x0101, HCI_UART_BCSP, 115200, 115200, 0,        bcsp     },
-+	{ "comone",     0xffff, 0x0101, HCI_UART_BCSP, 115200, 115200, 0,        bcsp, NULL     },
- 
- 	/* TDK Bluetooth PC Card and IBM Bluetooth PC Card II */
--	{ "tdk",        0x0105, 0x4254, HCI_UART_BCSP, 115200, 115200, 0,        bcsp     },
-+	{ "tdk",        0x0105, 0x4254, HCI_UART_BCSP, 115200, 115200, 0,        bcsp, NULL     },
- 
- 	/* Socket Bluetooth CF Card (Rev G) */
--	{ "socket",     0x0104, 0x0096, HCI_UART_BCSP, 230400, 230400, 0,        bcsp     },
-+	{ "socket",     0x0104, 0x0096, HCI_UART_BCSP, 230400, 230400, 0,        bcsp, NULL     },
- 
- 	/* 3Com Bluetooth Card (Version 3.0) */
--	{ "3com",       0x0101, 0x0041, HCI_UART_H4,   115200, 115200, FLOW_CTL, csr      },
-+	{ "3com",       0x0101, 0x0041, HCI_UART_H4,   115200, 115200, FLOW_CTL, csr, NULL      },
- 
- 	/* AmbiCom BT2000C Bluetooth PC/CF Card */
--	{ "bt2000c",    0x022d, 0x2000, HCI_UART_H4,    57600, 460800, FLOW_CTL, csr      },
-+	{ "bt2000c",    0x022d, 0x2000, HCI_UART_H4,    57600, 460800, FLOW_CTL, csr, NULL      },
- 
- 	/* Zoom Bluetooth PCMCIA Card */
--	{ "zoom",       0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        bcsp     },
-+	{ "zoom",       0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        bcsp, NULL     },
- 
- 	/* Sitecom CN-504 PCMCIA Card */
--	{ "sitecom",    0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        bcsp     },
-+	{ "sitecom",    0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        bcsp, NULL     },
- 
- 	/* Billionton PCBTC1 PCMCIA Card */
--	{ "billionton", 0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        bcsp     },
-+	{ "billionton", 0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        bcsp, NULL     },
- 
- 	/* Broadcom BCM2035 */
--	{ "bcm2035",    0x0A5C, 0x2035, HCI_UART_H4,   115200, 115200, 0,        bcm2035  },
-+	{ "bcm2035",    0x0A5C, 0x2035, HCI_UART_H4,   115200, 115200, 0,        bcm2035, NULL  },
- 
- 	{ NULL, 0 }
- };
- 
- struct uart_t * get_by_id(int m_id, int p_id)
-@@ -1126,11 +1202,11 @@
- 
- static void usage(void)
- {
- 	printf("hciattach - HCI UART driver initialization utility\n");
- 	printf("Usage:\n");
--	printf("\thciattach [-n] [-p] [-b] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow]\n");
-+	printf("\thciattach [-n] [-p] [-b] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow] [bdaddr]\n");
- 	printf("\thciattach -l\n");
- }
- 
- int main(int argc, char *argv[])
- {
-@@ -1225,10 +1301,14 @@
- 			if (!strcmp("flow", argv[optind]))
- 				u->flags |=  FLOW_CTL;
- 			else
- 				u->flags &= ~FLOW_CTL;
- 			break;
-+
-+		case 4:
-+			u->bdaddr = argv[optind];
-+			break;
- 		}
- 	}
- 
- 	if (!u) {
- 		fprintf(stderr, "Unknown device type or id\n");
+ZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2hjaV91c2IuYyBiL2RyaXZlcnMvYmx1ZXRv
+b3RoL2hjaV91c2IuYwppbmRleCA0MDZhZjU3Li4zNzQyYWI3IDEwMDY0NAotLS0gYS9kcml2ZXJz
+L2JsdWV0b290aC9oY2lfdXNiLmMKKysrIGIvZHJpdmVycy9ibHVldG9vdGgvaGNpX3VzYi5jCkBA
+IC01Niw2ICs1Niw4IEBACiAjdW5kZWYgIEJUX0RCRwogI2RlZmluZSBCVF9EQkcoRC4uLikKICNl
+bmRpZgorLyogVGhlIFdvcmtxdWUgRnVuY3Rpb24gKi8KK3N0YXRpYyB2b2lkIHNldF9hbHRlcm5h
+dGVfY29uZmlnKHN0cnVjdCB3b3JrX3N0cnVjdCAqd29yayk7CiAKICNpZm5kZWYgQ09ORklHX0JU
+X0hDSVVTQl9aRVJPX1BBQ0tFVAogI3VuZGVmICBVUkJfWkVST19QQUNLRVQKQEAgLTg0MCw2ICs4
+NDIsNyBAQCBzdGF0aWMgdm9pZCBoY2lfdXNiX2Rlc3RydWN0KHN0cnVjdCBoY2lfZGV2ICpoZGV2
+KQogc3RhdGljIHZvaWQgaGNpX3VzYl9ub3RpZnkoc3RydWN0IGhjaV9kZXYgKmhkZXYsIHVuc2ln
+bmVkIGludCBldnQpCiB7CiAJQlRfREJHKCIlcyBldnQgJWQiLCBoZGV2LT5uYW1lLCBldnQpOwor
+CXNjaGVkdWxlX3dvcmsoJmhkZXYtPnNldHRpbmdfd29yayk7CiB9CiAKIHN0YXRpYyBpbnQgaGNp
+X3VzYl9wcm9iZShzdHJ1Y3QgdXNiX2ludGVyZmFjZSAqaW50ZiwgY29uc3Qgc3RydWN0IHVzYl9k
+ZXZpY2VfaWQgKmlkKQpAQCAtMTAwNyw2ICsxMDEwLDcgQEAgc3RhdGljIGludCBoY2lfdXNiX3By
+b2JlKHN0cnVjdCB1c2JfaW50ZXJmYWNlICppbnRmLCBjb25zdCBzdHJ1Y3QgdXNiX2RldmljZV9p
+ZAogCiAJaGRldi0+b3duZXIgPSBUSElTX01PRFVMRTsKIAorICAgIElOSVRfV09SSygmaGRldi0+
+c2V0dGluZ193b3JrLHNldF9hbHRlcm5hdGVfY29uZmlnKTsKIAlpZiAocmVzZXQgfHwgaWQtPmRy
+aXZlcl9pbmZvICYgSENJX1JFU0VUKQogCQlzZXRfYml0KEhDSV9RVUlSS19SRVNFVF9PTl9JTklU
+LCAmaGRldi0+cXVpcmtzKTsKIApAQCAtMTE0Miw2ICsxMTQ2LDEyOCBAQCBzdGF0aWMgaW50IGhj
+aV91c2JfcmVzdW1lKHN0cnVjdCB1c2JfaW50ZXJmYWNlICppbnRmKQogCXJldHVybiAwOwogfQog
+CisKKy8qU2V0IHRoZSBhbHRlcm5hdGUgc2V0dGluZyBiYXNlZCBvbiB0aGUgbnVtYmVyIG9mIFND
+TyBjaGFubmVscyBhbmQgdGhlCisgIHZvaWNlIHNldHRpbmcuVGhpcyBmdW5jdGlvbiBpcyBpbnZv
+a2VkIHdoZW4gdGhlcmUgaXMgYSBjaGFuZ2UgaW4gTnVtYmVyIG9mCisgIFNDTyBjaGFubmVscyBv
+ciB3aGVuIHRoZSB2b2ljZSBlbmNvZGluZyBjaGFuZ2VzLiovCitzdGF0aWMgdm9pZCBzZXRfYWx0
+ZXJuYXRlX2NvbmZpZyhzdHJ1Y3Qgd29ya19zdHJ1Y3QgKndvcmspCit7CisKKyAgc3RydWN0IGhj
+aV9kZXYgKmhkZXYgPSBjb250YWluZXJfb2Yod29yaywgc3RydWN0IGhjaV9kZXYsIHNldHRpbmdf
+d29yayk7CisgIHN0cnVjdCBoY2lfdXNiICpoVVNCID0gKHN0cnVjdCBoY2lfdXNiICopIGhkZXYt
+PmRyaXZlcl9kYXRhOworICAKKy8qIGlmIGJpdD0wLGl0cyA4Yml0IGVuY29kaW5nIGVsc2UgaXRz
+IDE2Yml0ICovCitfX3UxNiBiaXQgPSAweDIwOworc3RydWN0IHVzYl9pbnRlcmZhY2UgKmlzb2NJ
+ZmFjZTsKKyAgaW50IGlzb2NJZm51bT0xLCBpc29jQWx0PTA7CisJc3RydWN0IHVzYl9ob3N0X2Vu
+ZHBvaW50ICAqZXA7CisJc3RydWN0IHVzYl9ob3N0X2ludGVyZmFjZSAqdWlmOworCXN0cnVjdCBf
+dXJiICpfdXJiLCpfdG1wOworCXN0cnVjdCBfdXJiX3F1ZXVlICpxID0gJmhVU0ItPnBlbmRpbmdf
+cVtpc29jXTsKKwl1bnNpZ25lZCBsb25nIGZsYWdzOworCWF0b21pY190IHRlbXA7LypIb2xkcyB0
+aGUgbnVtYmVyIG9mIFVSQnMgd2UgbmVlZCB0byBza2lwKHdoaWNoIGFyZSBzdWJtaXR0ZWQpKi8K
+KwlzdHJ1Y3QgbGlzdF9oZWFkIGlucHJvY2VzczsvKlRoaXMgbGlzdCBob2xkcyB0aGUgYWxyZWFk
+eSBzdWJtaXR0ZWQgVVJCcyAqLworICAgIAorCS8qQ2hhbmdlIHRoZSBhbHRlcm5hdGUgc2V0dGlu
+ZyBvbmx5IGlmIHRoZSBudW1iZXIgb2YgU0NPIGNoYW5uZWxzIGFyZSBtb3JlIHRoYW4gMSAqLwor
+CWlmKGhkZXYtPmNvbm5faGFzaC5zY29fbnVtID4gMCl7CisJCS8qIFRoZSBhbHRlcm5hdGUgc2V0
+dGluZyBzZWxlY3Rpb24gaXMgYmFzZWQgb24gdGhlIGZvbGxvd2luZyB0YWJsZSAqLworCQkvKiAg
+IE5vLiBvZiBTQ08gY2hhbm5lbHMgICAgQml0LUVuY29kaW5nICAgIEFsdGVybmF0ZSBTZXR0aW5n
+ICAgTWF4LiBQYWNrZXQgU2l6ZSAqLworCQkvKiAgICAgICAgICAgMSAgICAgICAgICAgICAgICAg
+OGJpdCAgICAgICAgICAgICAgICAgMSAgICAgICAgICAgICAgICAgIDkgKi8KKwkJLyogICAgICAg
+ICAgIDEgICAgICAgICAgICAgICAgMTZiaXQgICAgICAgICAgICAgICAgIDIgICAgICAgICAgICAg
+ICAgIDE3ICovCisJCS8qICAgICAgICAgICAyICAgICAgICAgICAgICAgICA4Yml0ICAgICAgICAg
+ICAgICAgICAyICAgICAgICAgICAgICAgICAxNyAqLworCQkvKiAgICAgICAgICAgMiAgICAgICAg
+ICAgICAgICAxNmJpdCAgICAgICAgICAgICAgICAgNCAgICAgICAgICAgICAgICAgMzMgKi8KKwkJ
+LyogICAgICAgICAgIDMgICAgICAgICAgICAgICAgIDhiaXQgICAgICAgICAgICAgICAgIDMgICAg
+ICAgICAgICAgICAgIDI1ICovCisJCS8qICAgICAgICAgICAzICAgICAgICAgICAgICAgIDE2Yml0
+ICAgICAgICAgICAgICAgICA1ICAgICAgICAgICAgICAgICA0OSAqLworCQlzd2l0Y2goaGRldi0+
+Y29ubl9oYXNoLnNjb19udW0pCisJCXsKKwkJY2FzZSAxOgorCQkJaWYoaGRldi0+dm9pY2Vfc2V0
+dGluZyAmJiBiaXQpCisJCQkJaXNvY0FsdD0yOworCQkJZWxzZQorCQkJCWlzb2NBbHQ9MTsKKwkJ
+CWJyZWFrOworCQljYXNlIDI6CisJCQlpZihoZGV2LT52b2ljZV9zZXR0aW5nICYmIGJpdCkKKwkJ
+CQlpc29jQWx0PTQ7CisJCQllbHNlCisJCQkJaXNvY0FsdD0yOworCQkJYnJlYWs7CisJCWNhc2Ug
+MzoKKwkJCWlmKGhkZXYtPnZvaWNlX3NldHRpbmcgJiYgYml0KQorCQkJCWlzb2NBbHQ9NTsKKwkJ
+CWVsc2UKKwkJCQlpc29jQWx0PTM7CisJCQlicmVhazsKKwkJfQorCisJCS8qU3RvcCBDdXJyZW50
+IFRYICovCisJCWNsZWFyX2JpdChIQ0lfVVNCX1RYX1dBS0VVUCwgJmhVU0ItPnN0YXRlKTsKKwkJ
+SU5JVF9MSVNUX0hFQUQoJmlucHJvY2Vzcyk7CisJCXRlbXAgPSBoVVNCLT5wZW5kaW5nX3R4W2lz
+b2NdOworCQkvKiAgV2UgY2Fubm90IHB1cmdlIFVSQnMgd2hpY2ggaGF2ZSBiZWVuIHN1Ym1pdHRl
+ZC4gaW5wcm9jZXNzIGlzIGEgKi8KKwkJLyogIHRlbXBvcmFyeSBsaXN0IHdoaWNoIGhvbGRzIHRo
+ZSBjdXJyZW50bHkgc3VibWl0dGVkIFVSQnMuICovCisJCS8qICBUaGlzIGxpc3QgaXMgbGF0ZXIg
+bWVyZ2VkIHdpdGggdGhlIGVtcHR5ZWQgcGVuZGluZyBxdWV1ZS4gICovCisgICAKKwkJd2hpbGUg
+KChfdXJiID0gX3VyYl9kZXF1ZXVlKHEpKSkgeworCQkJLypEZXF1ZXVlIGFsbCB0aGUgc3VibWl0
+dGVkIFVSQnMgYW5kIHB1dCB0aGVtIGluIHRoZSB0ZW1wb3JhcnkgbGlzdCovICAKKwkJCWlmKCFh
+dG9taWNfZGVjX2FuZF90ZXN0KCZ0ZW1wKSl7CisJCQkJX3VyYi0+cXVldWUgPSBxOworCQkJCWxp
+c3RfYWRkKCZfdXJiLT5saXN0LCAmaW5wcm9jZXNzKTsKKwkJCX0KKwkJCWVsc2V7CisJCQkJLypV
+bmxpbmsgYWxsIHRoZSByZXN0IG9mIFVSQnMgYW5kIHB1dCB0aGVtIGludG8gdGhlIGNvbXBsZXRl
+ZCBxdWV1ZS4qLworCQkJCV91cmJfdW5saW5rKF91cmIpOworCQkJCV91cmJfcXVldWVfdGFpbChf
+X2NvbXBsZXRlZF9xKGhVU0IsSENJX1NDT0RBVEFfUEtUKSwgX3VyYik7CisJCQl9CisJCX0KKwkJ
+LyptZXJnZSB0aGUgaW5wcm9jZXNzIHF1ZXVlIHdpdGggdGhlIHBlbmRpbmcgcXVldWUqLworCQlz
+cGluX2xvY2tfaXJxc2F2ZSgmcS0+bG9jaywgZmxhZ3MpOworCQlsaXN0X2Zvcl9lYWNoX2VudHJ5
+X3NhZmUoX3VyYiwgX3RtcCwgJmlucHJvY2VzcywgbGlzdCkgeworCQkJbGlzdF9tb3ZlX3RhaWwo
+Jl91cmItPmxpc3QsICZxLT5oZWFkKTsKKwkJfQorCQlzcGluX3VubG9ja19pcnFyZXN0b3JlKCZx
+LT5sb2NrLCBmbGFncyk7CisJCWlzb2NJZmFjZSA9IHVzYl9pZm51bV90b19pZihoVVNCLT51ZGV2
+LCBpc29jSWZudW0pOworCQkvKiBTZXQgdGhlIHNldHRpbmcgYW5kIHRoZSBpbi9vdXQgZW5kcG9p
+bnRzICovCisJCWlmIChpc29jSWZhY2UpIHsKKwkJCWludCBlOworCQkJc3RydWN0IHVzYl9ob3N0
+X2VuZHBvaW50ICpvdXQgPSBOVUxMOworCQkJc3RydWN0IHVzYl9ob3N0X2VuZHBvaW50ICppbiA9
+IE5VTEw7CisJCQl1aWYgPSAmaXNvY0lmYWNlLT5hbHRzZXR0aW5nW2lzb2NBbHRdOworCQkJZm9y
+IChlID0gMDsgZSA8IHVpZi0+ZGVzYy5iTnVtRW5kcG9pbnRzOyBlKyspIHsKKwkJCQllcCA9ICZ1
+aWYtPmVuZHBvaW50W2VdOworCQkJCXN3aXRjaCAoZXAtPmRlc2MuYm1BdHRyaWJ1dGVzICYgVVNC
+X0VORFBPSU5UX1hGRVJUWVBFX01BU0spIHsKKwkJCQljYXNlIFVTQl9FTkRQT0lOVF9YRkVSX0lT
+T0M6CisJCQkJCWlmIChlcC0+ZGVzYy5iRW5kcG9pbnRBZGRyZXNzICYgVVNCX0RJUl9JTikKKwkJ
+CQkJCWluICA9IGVwOworCQkJCQllbHNlCisJCQkJCQlvdXQgPSBlcDsKKwkJCQkJYnJlYWs7CisJ
+CQkJfQorCQkJfQorCQkKKwkJCWlmICghaW4gfHwgIW91dCkKKwkJCQlCVF9EQkcoIklzb2MgZW5k
+cG9pbnRzIG5vdCBmb3VuZCIpOworCQkJZWxzZSB7CisJCQkJQlRfREJHKCJpc29jIGlmbnVtICVk
+IGFsdHMgJWQiLCBpc29jSWZudW0sIGlzb2NBbHQpOworCQkJCWlmICh1c2Jfc2V0X2ludGVyZmFj
+ZShoVVNCLT51ZGV2LGlzb2NJZm51bSwgaXNvY0FsdCkpIHsKKwkJCQkJQlRfRVJSKCJDYW4ndCBz
+ZXQgaXNvYyBpbnRlcmZhY2Ugc2V0dGluZ3MiKTsKKwkJCQkJaFVTQi0+aXNvY19pZmFjZSA9IGlz
+b2NJZmFjZTsKKwkJCQkJdXNiX2RyaXZlcl9yZWxlYXNlX2ludGVyZmFjZSgmaGNpX3VzYl9kcml2
+ZXIsIGhVU0ItPmlzb2NfaWZhY2UpOworCQkJCQloVVNCLT5pc29jX2lmYWNlID0gTlVMTDsKKwkJ
+CQl9IGVsc2UgeworCQkJCSAgICAgICAgaFVTQi0+aXNvY19pZmFjZSAgPSBpc29jSWZhY2U7CisJ
+CQkJCWhVU0ItPmlzb2NfaW5fZXAgID0gaW47CisJCQkJCWhVU0ItPmlzb2Nfb3V0X2VwICA9IG91
+dDsKKwkJCQl9CisJCQl9CisJCX0KKwkJc2V0X2JpdChIQ0lfVVNCX1RYX1dBS0VVUCwgJmhVU0It
+PnN0YXRlKTsKKwl9CisKK30KKyAgCisKKwogc3RhdGljIHN0cnVjdCB1c2JfZHJpdmVyIGhjaV91
+c2JfZHJpdmVyID0gewogCS5uYW1lCQk9ICJoY2lfdXNiIiwKIAkucHJvYmUJCT0gaGNpX3VzYl9w
+cm9iZSwKZGlmZiAtLWdpdCBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5oIGIvaW5j
+bHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmgKaW5kZXggOGE1N2I3ZC4uZjA2MDI4OCAxMDA2
+NDQKLS0tIGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmgKKysrIGIvaW5jbHVkZS9u
+ZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmgKQEAgLTExMCw2ICsxMTAsNyBAQCBzdHJ1Y3QgaGNpX2Rl
+diB7CiAJc3RydWN0IHNrX2J1ZmZfaGVhZAlyYXdfcTsKIAlzdHJ1Y3Qgc2tfYnVmZl9oZWFkCWNt
+ZF9xOwogCisgICAgICAgIHN0cnVjdCB3b3JrX3N0cnVjdCAgICAgIHNldHRpbmdfd29yazsKIAlz
+dHJ1Y3Qgc2tfYnVmZgkJKnNlbnRfY21kOwogCiAJc3RydWN0IHNlbWFwaG9yZQlyZXFfbG9jazsK
 
---Boundary-00=_Qt8LGHthakKMevk
+------=_Part_49527_25093510.1177536247674
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -336,7 +150,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---Boundary-00=_Qt8LGHthakKMevk
+------=_Part_49527_25093510.1177536247674
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -347,4 +161,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---Boundary-00=_Qt8LGHthakKMevk--
+------=_Part_49527_25093510.1177536247674--
