@@ -1,16 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <b92d97be0704272144m715e02bj8be217a328e62ed0@mail.gmail.com>
-Date: Sat, 28 Apr 2007 14:14:50 +0930
-From: "Adam Dixon" <adamtdixon@gmail.com>
+Message-ID: <a72d33330704261041x375653d6ia0af61b82085bca5@mail.gmail.com>
+Date: Thu, 26 Apr 2007 19:41:55 +0200
+From: "Ma Begaj" <derliebegott@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <a72d33330704260237l10d76906ma50d45cb9e0f0fb8@mail.gmail.com>
 MIME-Version: 1.0
-References: <b92d97be0704232057m648388a9w1748fe6312d25164@mail.gmail.com>
-	<462E042D.5060405@xmission.com>
-	<b92d97be0704252225n13cb3b04q8ffd2554270d224c@mail.gmail.com>
-	<463052D2.3090800@xmission.com>
-	<a72d33330704260237l10d76906ma50d45cb9e0f0fb8@mail.gmail.com>
-Subject: Re: [Bluez-users] headset and input noise
+Subject: Re: [Bluez-users] Headsetd, skype and bluetooth headsets.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,65 +18,155 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
-I have followed this guide to build kernel rpm in fedora vs
-kernel-2.6.20-1.2944.fc6.src.rpm - I like Ma am struggling to get the
-patch applied ok.
-For those interested ( http://www.howtoforge.com/kernel_compilation_fedora )
+Did you or someone else solve this problem?
 
-I get the following error when building from the edited spec file.
-+ echo 'Patch #8 (sco-flowcontrol-v4.2.diff):'
-+ patch -p1 -s
-error: Bad exit status from /var/tmp/rpm-tmp.12170 (%prep)
-    Bad exit status from /var/tmp/rpm-tmp.12170 (%prep)
+I have the same problem. I applied the latest kernel patch (v4.2) with
+the latest vanilla kernel 2.6.21.
 
-I defined the patch as %patch8 -p1 ( I dont know if p1 is a suitable
-argument - but all other patches used p1. Is this right?)
+I have Jabra 250v, sound is ok with aplay and arecord, hearing in
+skype is ok,  but my recorded voice (echo123) is "garbled beyond
+recognition".
 
-Does this patch only work against an older kernel ? Or do I need to
-place the patch in a later number. Any hints? Even if just hints to
-get more debug from this process would be nice.
+Thanks
 
-Thanks allot,
-Adam
+M.
 
-On 4/26/07, Ma Begaj <derliebegott@gmail.com> wrote:
-> 2007/4/26, Brad Midgley <bmidgley@xmission.com>:
-> >
-> > >> are you using the sco flowcontrol kernel patch from the plugz module
-> > >> under the patches directory?
-> > >
-> >
-> > making a distro-friendly custom kernel differs from distro to distro, so
-> > search around for fedora guides on doing a custom kernel. I don't use
-> > fedora so I don't know.
-> >
-> > Brad
->
-> Hi,
->
-> I tried yesterday to patch my kernel with the
-> plugz/patches/sco....v4.2.diff  and v.4-1. No chance for patch to
-> succeed.
->
-> I tried version 4.2 with 2.6.20.6, but a half of the patch did not
-> work. I tried it with 2.6.21-rc7, again with half of the patch skipped
-> ...
->
-> Everything was tested with vanilla kernel without any other patches.
->
-> M.
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by DB2 Express
-> Download DB2 Express C - the FREE version of DB2 express and take
-> control of your XML. No limits. Just data. Click to get it now.
-> http://sourceforge.net/powerbar/db2/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+
+Alan Conway wrote:
+
+---- quote ---
+Trying to use a plantronics 510s with skype.
+
+
+
+Update on my attempts, I've established the setup that almost works. By
+almost works I mean:
+- aplay, arecord -D headset work, quality is fine for telephone use.
+- aoss skype almost works: I can hear the test call clearly, I can
+record a message but when it is played back my voice is garbled beyond
+recognition.
+
+My next step is to fiddle with pcm settings - I've seen .asoundrc
+scripts for skype and dmix that do conversions between 8 and 16 bit
+formats and other stuff I know nothing about (but am afraid I'm gonna
+learn). Here are the details of how I got this far:
+
+== DETAILS: based on btsco/docs/build.html from CVS, slightly modified.
+
+install libsbc:
+
+Note: When asking for a password simply press Enter.
+
+cvs -d:pserver:anonymous <at> sbc.cvs.sourceforge.net:/cvsroot/sbc login
+cvs -d:pserver:anonymous <at> sbc.cvs.sourceforge.net:/cvsroot/sbc co sbc
+cd sbc
+./bootstrap
+./configure --prefix=/usr
+make
+sudo make install
+
+install bstco:
+
+cvs
+-d:pserver:anonymous <at>
+bluetooth-alsa.cvs.sourceforge.net:/cvsroot/bluetooth-alsa
+login
+cvs
+-d:pserver:anonymous <at>
+bluetooth-alsa.cvs.sourceforge.net:/cvsroot/bluetooth-alsa
+co btsco
+cd btsco
+./bootstrap
+# Note I added CFLAGS in ./configure. Without them the plugin emits
+# a torrent of debug messages that slow it down and ruin the sound quality.
+# -NDEBUG is essential, -03 is just for good luck.
+./configure --prefix=/usr --enable-alsaplugin CFLAGS="-NDEBUG -03"
+make
+sudo make install
+
+** Using from skype
+My .asoundrc is copied from btsco/alsa-plugins/asound.conf with the
+headset address replaced by my own and the following addition for aoss:
+
+# Use headset via aoss emulation for skype.
+
+pcm.dsp0 {
+   type plug
+   slave.pcm "hw_headset"
+}
+
+Full .asoundrc attached. Run skype as "aoss skype" (you need alsa-oss
+package installed.)
+
+== NOTES
+
+The instructions at http://bluetooth-alsa.sourceforge.net/build.html did
+*not* work for me. The plugz version of the plugin requires a different
+.asoundrc (based on plugz/asound.conf) but aplay -D headset gave me:
+
+[aconway <at> scooter plugz]$ aplay -D headset /usr/share/sounds/startup3.wav
+Playing WAVE '/usr/share/sounds/startup3.wav' : Signed 16 bit Little
+Endian, Rate 44100 Hz, Stereo
+aplay: set_params:909: Channels count non available
+
+Cheers,
+Alan.
+
+pcm.headset {
+	type plug;
+	slave.pcm "hw_headset";
+}
+
+pcm.hw_headset {
+	 <at> args [BDADDR TIMEOUT MAX_PERIODS]
+	
+	# The Bluetooth device address for target headset, used for Audio
+Gateway (PC) initiated connections
+        # Please note that this value is ignored when the connection
+is Headset initiated
+	 <at> args.BDADDR {
+		type string
+		default "00:03:89:95:9C:83" # Put your HS address here
+	}
+
+	# This value represents how long we will try to reach the headset,
+until we give up.
+	# Value is in milliseconds
+	 <at> args.TIMEOUT {
+		type integer
+		default 6000
+	}
+
+	# This is the size of the buffer used to queue Voice packets. Value
+must be between
+	# 2 and 334 (~ 1 second). Default value is 2 buffers, which works
+well most of the
+        # time, and has the advantage of giving us an ultra low delay
+	 <at> args.MAX_PERIODS {		
+		type integer
+		default 334
+	}
+
+	type        sco
+	bdaddr      $BDADDR
+	timeout     $TIMEOUT
+	max_periods $MAX_PERIODS
+}
+
+ctl.headset {
+	type sco
+}
+
+pcm.a2dpd {
+        type a2dpd
+}
+
+# Use headset via aoss emulation for skype.
+
+pcm.dsp0 {
+   type plug
+   slave.pcm "hw_headset"
+}
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
