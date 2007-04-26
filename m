@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4034.124.243.174.189.1177582757.squirrel@ice-gw.trolltech.com.au>
-In-Reply-To: <00cd01c787cc$44fda460$8935c70a@dlh.st.com>
-References: <200704261519.30004.denis.kenzior@trolltech.com>
-	<00cd01c787cc$44fda460$8935c70a@dlh.st.com>
-Date: Thu, 26 Apr 2007 20:19:17 +1000 (EST)
-From: dkenzior@trolltech.com
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+From: Sumeet VERMA <sumeet.verma@st.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Thu, 26 Apr 2007 11:59:39 +0530
+Message-ID: <00cd01c787cc$44fda460$8935c70a@dlh.st.com>
 MIME-Version: 1.0
+In-Reply-To: <200704261519.30004.denis.kenzior@trolltech.com>
 Subject: Re: [Bluez-devel] Esco implementation patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,34 +19,89 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Sumeet,
+Denis
+Actually when the ADD_SCO_CONNECTION is not supported a command complete is
+generated with the status 0x01 (Unknown HCI Command). The controller doesn't
+know about this command at all. If the controller had known about this
+command then it will generate a command status with suitable status code.
 
-Yep you are correct.  However what I'm trying to say is that if the
-adapter is Bluetooth 1.2+ compatible and implements Add Sco Connection for
-backward compatibility, then the faster eSCO alternative will never be
-used.  Most of the Bluetooth 1.2+ USB adapters I've had experience with,
-do implement the Add Sco command for backward compatibility.
+Regards,
+Sumeet 
+-----Original Message-----
+From: bluez-devel-bounces@lists.sourceforge.net
+[mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf Of Denis
+KENZIOR
+Sent: Thursday, April 26, 2007 10:49 AM
+To: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Esco implementation patch
 
-Shouldn't we try to query the Adapter version first and then use the
-commands which are appropriate?
+I'm concerned about the ADD_SCO addition to the hci_cc_link_ctl function.
+The Version 2.0 + EDR page 617 specifies that:
+
+"no Command Complete event will be sent by the Controller to indicate that
+this command has been completed...."
+
+To me that means that Add Sco should never trigger the hci_cc_link_ctl
+function?
 
 -Denis
 
-> Denis
-> Actually when the ADD_SCO_CONNECTION is not supported a command complete
-> is
-> generated with the status 0x01 (Unknown HCI Command). The controller
-> doesn't
-> know about this command at all. If the controller had known about this
-> command then it will generate a command status with suitable status code.
+On Thursday 26 April 2007 14:56, Sumeet VERMA wrote:
+> Hi Marcel
+> Sorry for the mistake. Please find a single diff attached.
 >
 > Regards,
 > Sumeet
+> -----Original Message-----
+> From: bluez-devel-bounces@lists.sourceforge.net
+> [mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf Of Marcel 
+> Holtmann
+> Sent: Wednesday, April 25, 2007 1:14 PM
+> To: BlueZ development
+> Subject: Re: [Bluez-devel] Esco implementation patch
+>
+> Hi Sumeet,
+>
+> > I have done an implementation of esco in bluez kernel. I have 
+> > hardcoded
+>
+> the settings of eSCO connection at the moment (packet type EV3).
+>
+> > Please review it and feel free to make modifications. This is 
+> > working fine
+>
+> on my side. I changed the 2.6.20 kernel code.
+>
+> your patch is reverse and please don't send separate patches for each
+file.
+> Create a big diff that includes all changes.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> ----------------------------------------------------------------------
+> --- This SF.net email is sponsored by DB2 Express Download DB2 Express 
+> C - the FREE version of DB2 express and take control of your XML. No 
+> limits. Just data. Click to get it now.
+> http://sourceforge.net/powerbar/db2/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express Download DB2 Express C - the
+FREE version of DB2 express and take control of your XML. No limits. Just
+data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-
------------------------------------------
-Trolltech ASA, Sandakerveien 116, PO Box 4332, Nydalen NO-0402 Oslo, Norway
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
