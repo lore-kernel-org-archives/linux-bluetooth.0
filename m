@@ -1,16 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <12a679470704251707g86562dj39f9510f6860ea0c@mail.gmail.com>
-References: <12a679470704251042n135b2a4dt2e5a8dcca04c48d3@mail.gmail.com>
-	<1177528103.14980.23.camel@aeonflux.holtmann.net>
-	<12a679470704251637m527f0f07n93a47886752d4d70@mail.gmail.com>
-	<1177545208.14980.58.camel@aeonflux.holtmann.net>
-	<12a679470704251707g86562dj39f9510f6860ea0c@mail.gmail.com>
-Date: Thu, 26 Apr 2007 19:26:31 +0200
-Message-Id: <1177608391.14980.102.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] do SDP queries and HCI scans count as ACL?
+Message-ID: <a72d33330704260237l10d76906ma50d45cb9e0f0fb8@mail.gmail.com>
+Date: Thu, 26 Apr 2007 11:37:16 +0200
+From: "Ma Begaj" <derliebegott@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <463052D2.3090800@xmission.com>
+MIME-Version: 1.0
+References: <b92d97be0704232057m648388a9w1748fe6312d25164@mail.gmail.com>
+	<462E042D.5060405@xmission.com>
+	<b92d97be0704252225n13cb3b04q8ffd2554270d224c@mail.gmail.com>
+	<463052D2.3090800@xmission.com>
+Subject: Re: [Bluez-users] headset and input noise
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,23 +23,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Jose,
+2007/4/26, Brad Midgley <bmidgley@xmission.com>:
+>
+> >> are you using the sco flowcontrol kernel patch from the plugz module
+> >> under the patches directory?
+> >
+>
+> making a distro-friendly custom kernel differs from distro to distro, so
+> search around for fedora guides on doing a custom kernel. I don't use
+> fedora so I don't know.
+>
+> Brad
 
->         if you use 2 different host adapters, then of course it works.
-> 
-> Weird... I'm getting "Inquiry failed: Device or resource busy" error
-> messages when performing hci scan with hci0 and sdp queries with hci1
-> while doing file pushes with the two devices. I'm probably doing
-> something wrong then... :S 
+Hi,
 
-I am pretty sure that you do something wrong. This really works without
-any problems.
+I tried yesterday to patch my kernel with the
+plugz/patches/sco....v4.2.diff  and v.4-1. No chance for patch to
+succeed.
 
-Regards
+I tried version 4.2 with 2.6.20.6, but a half of the patch did not
+work. I tried it with 2.6.21-rc7, again with half of the patch skipped
+...
 
-Marcel
+Everything was tested with vanilla kernel without any other patches.
 
-
+M.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
