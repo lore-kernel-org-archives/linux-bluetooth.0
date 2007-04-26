@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <463052D2.3090800@xmission.com>
-Date: Thu, 26 Apr 2007 01:20:50 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <b92d97be0704252225n13cb3b04q8ffd2554270d224c@mail.gmail.com>
+Date: Thu, 26 Apr 2007 14:55:13 +0930
+From: "Adam Dixon" <adamtdixon@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <462E042D.5060405@xmission.com>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <b92d97be0704232057m648388a9w1748fe6312d25164@mail.gmail.com>	<462E042D.5060405@xmission.com>
-	<b92d97be0704252225n13cb3b04q8ffd2554270d224c@mail.gmail.com>
-In-Reply-To: <b92d97be0704252225n13cb3b04q8ffd2554270d224c@mail.gmail.com>
+References: <b92d97be0704232057m648388a9w1748fe6312d25164@mail.gmail.com>
+	<462E042D.5060405@xmission.com>
 Subject: Re: [Bluez-users] headset and input noise
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,20 +21,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hello again,
+
+Muting line-in did nothing.
+
+On 4/24/07, Brad Midgley <bmidgley@xmission.com> wrote:
+> are you using the sco flowcontrol kernel patch from the plugz module
+> under the patches directory?
+
+I cannot find any help on how to apply this patch to my kernel. I run
+fc6 - can you provide a short step guide or perhaps a link to some
+info that can assist me ?
+
+Thanks.
 Adam
-
->> are you using the sco flowcontrol kernel patch from the plugz module
->> under the patches directory?
-> 
-> I cannot find any help on how to apply this patch to my kernel. I run
-> fc6 - can you provide a short step guide or perhaps a link to some
-> info that can assist me ?
-
-making a distro-friendly custom kernel differs from distro to distro, so
-search around for fedora guides on doing a custom kernel. I don't use
-fedora so I don't know.
-
-Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
