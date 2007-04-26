@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <00cd01c787cc$44fda460$8935c70a@dlh.st.com>
-References: <00cd01c787cc$44fda460$8935c70a@dlh.st.com>
-Date: Thu, 26 Apr 2007 21:40:50 +0200
-Message-Id: <1177616450.14980.117.camel@aeonflux.holtmann.net>
+In-Reply-To: <F8B9B12641FB6B4FAC761BDEF9D63B040C9FEE38@tlv-ex-01.adprod.bmc.com>
+References: <F8B9B12641FB6B4FAC761BDEF9D63B040C9FEE38@tlv-ex-01.adprod.bmc.com>
+Date: Thu, 26 Apr 2007 19:30:17 +0200
+Message-Id: <1177608617.14980.108.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Esco implementation patch
+Subject: Re: [Bluez-devel] tcs-bin
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,23 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Sumeet,
+Hi Nimco,
 
-> Actually when the ADD_SCO_CONNECTION is not supported a command complete is
-> generated with the status 0x01 (Unknown HCI Command). The controller doesn't
-> know about this command at all. If the controller had known about this
-> command then it will generate a command status with suitable status code.
+> Where can I find docs/examples  about howto implement tcs-bin in c
+> with bluez
 
-I reviewed that patch and the current attempt to support eSCO is wrong
-and eSCO shouldn't be an alternate if SCO fails. In case the LMP_ESCO
-features bit is set, then we should always use the new eSCO commands to
-setup the audio link. Only in case of Bluetooth 1.1 adapters and earlier
-we fall back to the old SCO setup. My understanding is that the new eSCO
-setup routine of Bluetooth 1.2 chips or later can handle the remote
-Bluetooth 1.1 devices without problems.
-
-Please also use le32 for 32-bit size variables in HCI commands and
-events. Don't diff *.mod.c files. These are auto-generated.
+I did an implementation a long time ago, but can't find the code right
+now. However TCS-BIN can use the L2CAP socket interface directly. It is
+quite simple. Check l2test.c for an example on how to use it. Getting
+the SCO interaction correct is the bigger problem.
 
 Regards
 
