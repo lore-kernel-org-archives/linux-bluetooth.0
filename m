@@ -1,12 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20070425154806.GG7988@sorvankyla.yok.utu.fi>
-References: <20070425154806.GG7988@sorvankyla.yok.utu.fi>
-Date: Thu, 26 Apr 2007 19:27:41 +0200
-Message-Id: <1177608461.14980.104.camel@aeonflux.holtmann.net>
+In-Reply-To: <12a679470704251707g86562dj39f9510f6860ea0c@mail.gmail.com>
+References: <12a679470704251042n135b2a4dt2e5a8dcca04c48d3@mail.gmail.com>
+	<1177528103.14980.23.camel@aeonflux.holtmann.net>
+	<12a679470704251637m527f0f07n93a47886752d4d70@mail.gmail.com>
+	<1177545208.14980.58.camel@aeonflux.holtmann.net>
+	<12a679470704251707g86562dj39f9510f6860ea0c@mail.gmail.com>
+Date: Thu, 26 Apr 2007 19:26:31 +0200
+Message-Id: <1177608391.14980.102.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] More than two incoming rfcomm connections?
+Subject: Re: [Bluez-users] do SDP queries and HCI scans count as ACL?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,34 +24,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mikko,
+Hi Jose,
 
-> I just wrote this little program to serve gps data to
-> several cellular phones:
+>         if you use 2 different host adapters, then of course it works.
 > 
-> http://users.utu.fi/mijutu/src/gpsBtHub/
-> 
-> I wrote it because typical bluetooth gps devices will
-> only accept one connection at a time.
-> 
-> First I register an sdp service:
-> sdptool add --handle=0x003 --channel=1 SP
-> 
-> And then run this program that will 
-> connect to a gpsd (http://gpsd.berlios.de/) and
-> socket, bind, listen and accept 
-> incoming connections to rfcommchannel 1. 
-> After each successful accept, a new thread is
-> created for the client and accept is attempted again.
-> 
-> The program works fine except I can only connect two
-> clients at a time.
-> 
-> For example I can connect one "bluetooth serial chat"
-> and one phone and when I try to connect another kbtserialchat,
-> I get "Connection error (112)."
+> Weird... I'm getting "Inquiry failed: Device or resource busy" error
+> messages when performing hci scan with hci0 and sdp queries with hci1
+> while doing file pushes with the two devices. I'm probably doing
+> something wrong then... :S 
 
-run "hcidump -X -V" to see what is going on.
+I am pretty sure that you do something wrong. This really works without
+any problems.
 
 Regards
 
