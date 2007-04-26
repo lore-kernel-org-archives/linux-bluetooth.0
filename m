@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <00f601c787f3$1e555520$8935c70a@dlh.st.com>
-References: <00f601c787f3$1e555520$8935c70a@dlh.st.com>
-Date: Thu, 26 Apr 2007 16:19:37 +0200
-Message-Id: <1177597177.14980.71.camel@aeonflux.holtmann.net>
+In-Reply-To: <00f501c787ee$b8c876a0$8935c70a@dlh.st.com>
+References: <00f501c787ee$b8c876a0$8935c70a@dlh.st.com>
+Date: Thu, 26 Apr 2007 16:18:39 +0200
+Message-Id: <1177597119.14980.69.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Low Power mode in bluez
+Subject: Re: [Bluez-devel] Esco implementation patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,12 +22,14 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Sumeet,
 
-> Is there any plan to implement low power modes in bluez? I am using a device which using a USB to UART driver (prolific).
-> 
-> If no, then can you give me some pointers about the implementation? Where should I start from and some links from where I can get some help.
+> Yes I think that's a good idea. I think the change required is very minimal.
+> In sco.c whether I create a SCO or ESCO link depends on the version which is
+> readily available in hci_dev structure. Its just a matter of adding a
+> conditional statement (if else). Maybe I can also to check the feature bit
+> mask. I will try this.
 
-the sniff mode support has been implemented. All other modes are
-useless.
+don't use the version information. Use the features bits and check for
+the LMP_ESCO bit.
 
 Regards
 
