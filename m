@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <7ff566830704251913l1935e8d7p3c71d8d0d1c888fa@mail.gmail.com>
-Date: Wed, 25 Apr 2007 22:13:13 -0400
-From: "Kelly Price" <strredwolf@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <463003F7.3090302@evdebs.org>
+Message-ID: <463003F7.3090302@evdebs.org>
+Date: Wed, 25 Apr 2007 21:44:23 -0400
+From: Adam Goode <adam@evdebs.org>
 MIME-Version: 1.0
-References: <463003F7.3090302@evdebs.org>
-Subject: Re: [Bluez-devel] basic printing profile server?
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] basic printing profile server?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,18 +18,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 4/25/07, Adam Goode <adam@evdebs.org> wrote:
-> I was wondering if anyone has worked on a basic printing profile server
-> for Linux? By server, I mean a way that phones or other small devices
-> can send jobs to a Linux desktop host which would then print through
-> CUPS (or lpd, etc.).
->
+Hi,
 
-I'm intrested myself.
+I was wondering if anyone has worked on a basic printing profile server 
+for Linux? By server, I mean a way that phones or other small devices 
+can send jobs to a Linux desktop host which would then print through 
+CUPS (or lpd, etc.).
 
--- 
-Kelly "STrRedWolf" Price
-http://strredwolf.furrynet.com
+It seems like a missing piece, since CUPS can already print to bluetooth 
+printers.
+
+My new phone supports printing of SMS messages and photos, so before I 
+try writing a server for it, I wanted to check to see if someone has 
+done it.
+
+
+Thanks,
+
+Adam
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
