@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1177702819.14980.136.camel@aeonflux.holtmann.net>
+In-Reply-To: <1177538646.14980.26.camel@aeonflux.holtmann.net>
 References: <fc27e74b0704251424k32e3173eud439d5edeb64f148@mail.gmail.com>
 	<1177538646.14980.26.camel@aeonflux.holtmann.net>
-	<1177702819.14980.136.camel@aeonflux.holtmann.net>
-Content-Type: multipart/mixed; boundary="=-ULn/TBP6fPxqGPe4mGR+"
-Date: Fri, 27 Apr 2007 22:10:04 +0200
-Message-Id: <1177704604.14980.138.camel@aeonflux.holtmann.net>
+Content-Type: multipart/mixed; boundary="=-fG4lBLJsuSmY/xMiXEPF"
+Date: Fri, 27 Apr 2007 21:40:19 +0200
+Message-Id: <1177702819.14980.136.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Modified patch (Dynamic Alternate Setting)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -23,44 +22,38 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---=-ULn/TBP6fPxqGPe4mGR+
+--=-fG4lBLJsuSmY/xMiXEPF
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
 Hi,
 
-> > > I have made the changes u suggested.
-> > > Take a look and let me know.
-> > 
-> > please fix the coding style of your additions. This patch is unreadable
-> > in this state. No forward declarations and no heavy nesting.
+> > I have made the changes u suggested.
+> > Take a look and let me know.
 > 
-> the following patch follows more my understanding how this should look
-> like. However the attached patch doesn't contain the code for stopping
-> and resubmitting the ISOC URBs.
+> please fix the coding style of your additions. This patch is unreadable
+> in this state. No forward declarations and no heavy nesting.
 
-attached is a revised patch that improves the case where
-CONFIG_BT_HCIUSB_SCO is not set.
+the following patch follows more my understanding how this should look
+like. However the attached patch doesn't contain the code for stopping
+and resubmitting the ISOC URBs.
 
 Regards
 
 Marcel
 
 
---=-ULn/TBP6fPxqGPe4mGR+
+--=-fG4lBLJsuSmY/xMiXEPF
 Content-Disposition: attachment; filename=patch
 Content-Type: text/x-patch; name=patch; charset=utf-8
 Content-Transfer-Encoding: 7bit
 
 diff --git a/drivers/bluetooth/hci_usb.c b/drivers/bluetooth/hci_usb.c
-index 406af57..0727f68 100644
+index 406af57..b668476 100644
 --- a/drivers/bluetooth/hci_usb.c
 +++ b/drivers/bluetooth/hci_usb.c
-@@ -837,10 +837,50 @@ static void hci_usb_destruct(struct hci_dev *hdev)
- 	kfree(husb);
- }
+@@ -839,7 +839,41 @@ static void hci_usb_destruct(struct hci_dev *hdev)
  
-+#ifdef CONFIG_BT_HCIUSB_SCO
  static void hci_usb_notify(struct hci_dev *hdev, unsigned int evt)
  {
 +	struct hci_usb *husb = (struct hci_usb *) hdev->driver_data;
@@ -98,16 +91,10 @@ index 406af57..0727f68 100644
 +	husb->isoc_alts = husb->pend_alts;
 +
 +	write_unlock(&husb->completion_lock);
-+}
-+#else
-+static void hci_usb_notify(struct hci_dev *hdev, unsigned int evt)
-+{
  }
-+#endif
  
  static int hci_usb_probe(struct usb_interface *intf, const struct usb_device_id *id)
- {
-@@ -974,7 +1014,14 @@ static int hci_usb_probe(struct usb_interface *intf, const struct usb_device_id
+@@ -974,6 +1008,11 @@ static int hci_usb_probe(struct usb_interface *intf, const struct usb_device_id
  				husb->isoc_out_ep = isoc_out_ep;
  			}
  		}
@@ -117,16 +104,22 @@ index 406af57..0727f68 100644
 +
 +		usb_set_interface(udev, isoc_ifnum, husb->isoc_alts);
  	}
-+
-+	INIT_WORK(&husb->work, set_isoc_alternate);
  #endif
  
- 	rwlock_init(&husb->completion_lock);
+@@ -994,6 +1033,8 @@ static int hci_usb_probe(struct usb_interface *intf, const struct usb_device_id
+ 
+ 	husb->hdev = hdev;
+ 
++	INIT_WORK(&husb->work, set_isoc_alternate);
++
+ 	hdev->type = HCI_USB;
+ 	hdev->driver_data = husb;
+ 	SET_HCIDEV_DEV(hdev, &intf->dev);
 diff --git a/drivers/bluetooth/hci_usb.h b/drivers/bluetooth/hci_usb.h
-index 963fc55..fbe0954 100644
+index 963fc55..f1a7934 100644
 --- a/drivers/bluetooth/hci_usb.h
 +++ b/drivers/bluetooth/hci_usb.h
-@@ -102,17 +102,26 @@ struct hci_usb {
+@@ -102,9 +102,9 @@ struct hci_usb {
  	struct hci_dev		*hdev;
  
  	unsigned long		state;
@@ -138,25 +131,23 @@ index 963fc55..fbe0954 100644
  	struct usb_host_endpoint	*bulk_in_ep;
  	struct usb_host_endpoint	*bulk_out_ep;
  	struct usb_host_endpoint	*intr_in_ep;
- 
- 	struct usb_interface		*isoc_iface;
-+
-+#ifdef CONFIG_BT_HCIUSB_SCO
+@@ -113,8 +113,14 @@ struct hci_usb {
  	struct usb_host_endpoint	*isoc_out_ep;
  	struct usb_host_endpoint	*isoc_in_ep;
  
-+	int			isoc_ifnum;
-+	int			isoc_alts;
-+	int			pend_alts;
-+
-+	struct work_struct	work;
-+#endif
++	int				isoc_ifnum;
++	int				isoc_alts;
++	int				pend_alts;
 +
  	__u8			ctrl_req;
  
++	struct work_struct	work;
++
  	struct sk_buff_head	transmit_q[4];
+ 	struct sk_buff		*reassembly[4];		/* Reassembly buffers */
+ 
 
---=-ULn/TBP6fPxqGPe4mGR+
+--=-fG4lBLJsuSmY/xMiXEPF
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -167,7 +158,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---=-ULn/TBP6fPxqGPe4mGR+
+--=-fG4lBLJsuSmY/xMiXEPF
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -178,4 +169,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-ULn/TBP6fPxqGPe4mGR+--
+--=-fG4lBLJsuSmY/xMiXEPF--
