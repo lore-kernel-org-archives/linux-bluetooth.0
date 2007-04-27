@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Sumeet VERMA <sumeet.verma@st.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Fri, 27 Apr 2007 13:20:25 +0530
-Message-ID: <016001c788a0$b7b229c0$8935c70a@dlh.st.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_NextPart_000_0161_01C788CE.D16A65C0"
-In-Reply-To: <1177616450.14980.117.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] Esco implementation patch
+Content-Type: multipart/mixed; boundary="----_=_NextPart_001_01C78893.E3BDE0AC"
+Date: Fri, 27 Apr 2007 08:18:36 +0200
+Message-ID: <CE5216C10C83944D9FD37B65CD33F3970CF4CD@mplex01.mpl.access-company.com>
+References: <463151D2.1040805@jlab.org> <4631762B.9060704@xmission.com>
+From: "Frederic Dalleau" <Frederic.Dalleau@access-company.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] RE :  Plugz, a2dpd, and a2dpd2 strangeness
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,393 +21,133 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 This is a multi-part message in MIME format.
 
-------=_NextPart_000_0161_01C788CE.D16A65C0
+------_=_NextPart_001_01C78893.E3BDE0AC
 Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Marcel
-I have corrected the mistakes. Please review the attached patch and let me
-know if this is fine. 
+Brad,
+> I guess he is talking about sending sound from plugins to alsa instead =
+of bt=20
+> enablealsaredirect=3D1
 
-Regards,
-Sumeet 
------Original Message-----
-From: bluez-devel-bounces@lists.sourceforge.net
-[mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf Of Marcel
-Holtmann
-Sent: Friday, April 27, 2007 1:11 AM
-To: BlueZ development
-Subject: Re: [Bluez-devel] Esco implementation patch
+Chris
+> hcidump -X -V shows no traffic except briefly when those chirps occur.
+I understand you have sound through alsa but not through a2dp, and only =
+occasional chirps?
+What headset/adapter is it? Did you start hcidump before a2dpd?
+Make sure to use 44100hz 16bits samples.
+I need the full a2dpd -g output or enabledebug=3D1 in a2dprc to help =
+more.
+Use pcm_a2dpd if it gives good result through alsa.
 
-Hi Sumeet,
+Frederic
 
-> Actually when the ADD_SCO_CONNECTION is not supported a command 
-> complete is generated with the status 0x01 (Unknown HCI Command). The 
-> controller doesn't know about this command at all. If the controller 
-> had known about this command then it will generate a command status with
-suitable status code.
+-------- Message d'origine--------
+De: bluez-devel-bounces@lists.sourceforge.net de la part de Brad Midgley
+Date: ven. 27/04/2007 06:03
+=C0: BlueZ development
+Objet : Re: [Bluez-devel] Plugz, a2dpd, and a2dpd2 strangeness
+=20
+Chris
 
-I reviewed that patch and the current attempt to support eSCO is wrong and
-eSCO shouldn't be an alternate if SCO fails. In case the LMP_ESCO features
-bit is set, then we should always use the new eSCO commands to setup the
-audio link. Only in case of Bluetooth 1.1 adapters and earlier we fall back
-to the old SCO setup. My understanding is that the new eSCO setup routine of
-Bluetooth 1.2 chips or later can handle the remote Bluetooth 1.1 devices
-without problems.
+> With pcm_a2dpd2 I have jumpy, very sped up sound from the headphones =
+and=20
+> plenty of traffic through hcidump. Alsa redirect sounds about the same =
 
-Please also use le32 for 32-bit size variables in HCI commands and events.
-Don't diff *.mod.c files. These are auto-generated.
+> as the headphones, but the daemon gives the following errors:
 
-Regards
+I'm not following you here. What's the difference between using
+pcm_a2dpd2 and the "alsa redirect"? I didn't catch what "same as the
+headphones" was referring to either.
 
-Marcel
-
+Brad
 
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express Download DB2 Express C - the
-FREE version of DB2 express and take control of your XML. No limits. Just
-data. Click to get it now.
+
+-------------------------------------------------------------------------=
+
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-------=_NextPart_000_0161_01C788CE.D16A65C0
-Content-Type: application/octet-stream;
-	name="esco.2.patch"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
-	filename="esco.2.patch"
 
-diff -ru ../orig/include/hci_core.h ../escopatch/include/hci_core.h=0A=
---- ../orig/include/hci_core.h	2007-04-18 11:18:02.000000000 +0530=0A=
-+++ ../escopatch/include/hci_core.h	2007-04-27 08:57:18.000000000 +0530=0A=
-@@ -308,6 +308,7 @@=0A=
- void hci_acl_connect(struct hci_conn *conn);=0A=
- void hci_acl_disconn(struct hci_conn *conn, __u8 reason);=0A=
- void hci_add_sco(struct hci_conn *conn, __u16 handle);=0A=
-+void hci_add_esco(struct hci_conn *conn, __u16 handle);=0A=
- =0A=
- struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t =
-*dst);=0A=
- int    hci_conn_del(struct hci_conn *conn);=0A=
-diff -ru ../orig/include/hci.h ../escopatch/include/hci.h=0A=
---- ../orig/include/hci.h	2007-04-18 11:18:02.000000000 +0530=0A=
-+++ ../escopatch/include/hci.h	2007-04-27 08:58:23.000000000 +0530=0A=
-@@ -138,6 +138,7 @@=0A=
- /* Baseband links */=0A=
- #define SCO_LINK	0x00=0A=
- #define ACL_LINK	0x01=0A=
-+#define ESCO_LINK	0x02=0A=
- =0A=
- /* LMP features */=0A=
- #define LMP_3SLOT	0x01=0A=
-@@ -337,6 +338,28 @@=0A=
- 	__le16   pkt_type;=0A=
- } __attribute__ ((packed));=0A=
- =0A=
-+#define OCF_SETUP_SYNC_CONN	0x0028=0A=
-+struct hci_cp_setup_sync_conn {=0A=
-+	__le16	handle;=0A=
-+	__le32	tx_bw;=0A=
-+	__le32	rx_bw;=0A=
-+	__le16	max_latency;=0A=
-+	__le16	voice_setting;=0A=
-+	__u8 	retx_effort;=0A=
-+	__le16	pkt_type;	=0A=
-+} __attribute__ ((packed));=0A=
-+=0A=
-+#define OCF_ACCEPT_SYNC_CONN	0x0029=0A=
-+struct hci_cp_accept_sync_conn {=0A=
-+	bdaddr_t bdaddr;=0A=
-+	__le32	tx_bw;=0A=
-+	__le32	rx_bw;=0A=
-+	__le16	max_latency;=0A=
-+	__le16	content_format;=0A=
-+	__u8	retx_effort;=0A=
-+	__le16	pkt_type;	=0A=
-+} __attribute__ ((packed));=0A=
-+=0A=
- #define OCF_INQUIRY		0x0001=0A=
- struct hci_cp_inquiry {=0A=
- 	__u8     lap[3];=0A=
-@@ -662,6 +685,19 @@=0A=
- 	__le16   max_local_timeout;=0A=
- } __attribute__ ((packed));=0A=
- =0A=
-+#define HCI_EV_SYNC_CONN_COMPLETE  0x2C=0A=
-+struct hci_ev_sync_conn_complete {=0A=
-+	__u8	status;=0A=
-+	__le16	handle;=0A=
-+	bdaddr_t bdaddr;=0A=
-+	__u8	link_type;=0A=
-+	__u8	tx_interval;=0A=
-+	__u8	retx_window;=0A=
-+	__le16	rx_pkt_len;=0A=
-+	__le16	tx_pkt_len;=0A=
-+	__u8	air_mode;=0A=
-+} __attribute__ ((packed));=0A=
-+=0A=
- /* Internal events generated by Bluetooth stack */=0A=
- #define HCI_EV_STACK_INTERNAL	0xFD=0A=
- struct hci_ev_stack_internal {=0A=
-diff -ru ../orig/src/hci_conn.c ../escopatch/src/hci_conn.c=0A=
---- ../orig/src/hci_conn.c	2007-04-18 11:16:53.000000000 +0530=0A=
-+++ ../escopatch/src/hci_conn.c	2007-04-27 09:08:32.000000000 +0530=0A=
-@@ -130,6 +130,27 @@=0A=
- 	hci_send_cmd(hdev, OGF_LINK_CTL, OCF_ADD_SCO, sizeof(cp), &cp);=0A=
- }=0A=
- =0A=
-+void hci_add_esco(struct hci_conn *conn, __u16 handle)=0A=
-+{=0A=
-+	struct hci_dev *hdev =3D conn->hdev;=0A=
-+	struct hci_cp_setup_sync_conn cp;=0A=
-+=0A=
-+	BT_DBG("%p", conn);=0A=
-+=0A=
-+	conn->state =3D BT_CONNECT;=0A=
-+	conn->out =3D 1;=0A=
-+=0A=
-+	cp.handle =3D __cpu_to_le16(handle);=0A=
-+	cp.tx_bw =3D __cpu_to_le32(0x00001f40);=0A=
-+	cp.rx_bw =3D __cpu_to_le32(0x00001f40);=0A=
-+	cp.max_latency =3D __cpu_to_le16(0xffff);=0A=
-+	cp.voice_setting =3D __cpu_to_le16(hdev->voice_setting);=0A=
-+	cp.retx_effort =3D 0x00;=0A=
-+	cp.pkt_type =3D __cpu_to_le16(0x03c8); //EV3 as per spec Corev2.0+EDR=0A=
-+=0A=
-+	hci_send_cmd(hdev, OGF_LINK_CTL, OCF_SETUP_SYNC_CONN, sizeof(cp), &cp);=0A=
-+}=0A=
-+=0A=
- static void hci_conn_timeout(unsigned long arg)=0A=
- {=0A=
- 	struct hci_conn *conn =3D (void *) arg;=0A=
-@@ -221,7 +242,7 @@=0A=
- =0A=
- 	del_timer(&conn->disc_timer);=0A=
- =0A=
--	if (conn->type =3D=3D SCO_LINK) {=0A=
-+	if ((conn->type =3D=3D SCO_LINK) || (conn->type =3D=3D ESCO_LINK))  { =0A=
- 		struct hci_conn *acl =3D conn->link;=0A=
- 		if (acl) {=0A=
- 			acl->link =3D NULL;=0A=
-@@ -314,13 +335,22 @@=0A=
- 	if (acl->state =3D=3D BT_OPEN || acl->state =3D=3D BT_CLOSED)=0A=
- 		hci_acl_connect(acl);=0A=
- =0A=
--	if (type =3D=3D SCO_LINK) {=0A=
-+	if ((type =3D=3D SCO_LINK) || (type =3D=3D ESCO_LINK)) { =0A=
- 		struct hci_conn *sco;=0A=
- =0A=
--		if (!(sco =3D hci_conn_hash_lookup_ba(hdev, SCO_LINK, dst))) {=0A=
--			if (!(sco =3D hci_conn_add(hdev, SCO_LINK, dst))) {=0A=
--				hci_conn_put(acl);=0A=
--				return NULL;=0A=
-+		if(type =3D=3D SCO_LINK) { =0A=
-+			if (!(sco =3D hci_conn_hash_lookup_ba(hdev, SCO_LINK, dst))) {=0A=
-+				if (!(sco =3D hci_conn_add(hdev, SCO_LINK, dst))) { =0A=
-+					hci_conn_put(acl);=0A=
-+					return NULL;=0A=
-+				}=0A=
-+			}=0A=
-+		} else {=0A=
-+			if (!(sco =3D hci_conn_hash_lookup_ba(hdev, ESCO_LINK, dst))) {=0A=
-+				if (!(sco =3D hci_conn_add(hdev, ESCO_LINK, dst))) {=0A=
-+					hci_conn_put(acl);=0A=
-+					return NULL;=0A=
-+				}=0A=
- 			}=0A=
- 		}=0A=
- 		acl->link =3D sco;=0A=
-@@ -329,8 +359,12 @@=0A=
- 		hci_conn_hold(sco);=0A=
- =0A=
- 		if (acl->state =3D=3D BT_CONNECTED && =0A=
--				(sco->state =3D=3D BT_OPEN || sco->state =3D=3D BT_CLOSED))=0A=
--			hci_add_sco(sco, acl->handle);=0A=
-+				(sco->state =3D=3D BT_OPEN || sco->state =3D=3D BT_CLOSED)) {=0A=
-+			if(type =3D=3D SCO_LINK) =0A=
-+				hci_add_sco(sco, acl->handle); =0A=
-+			else =0A=
-+				hci_add_esco(sco, acl->handle); =0A=
-+		}=0A=
- =0A=
- 		return sco;=0A=
- 	} else {=0A=
-diff -ru ../orig/src/hci_event.c ../escopatch/src/hci_event.c=0A=
---- ../orig/src/hci_event.c	2007-04-18 11:16:53.000000000 +0530=0A=
-+++ ../escopatch/src/hci_event.c	2007-04-27 09:13:18.000000000 +0530=0A=
-@@ -453,6 +453,33 @@=0A=
- 	case OCF_CREATE_CONN:=0A=
- 		hci_cs_create_conn(hdev, status);=0A=
- 		break;=0A=
-+	=0A=
-+	case OCF_SETUP_SYNC_CONN:=0A=
-+                if (status) {=0A=
-+                        struct hci_conn *acl, *sco;=0A=
-+                        struct hci_cp_setup_sync_conn *cp =3D =
-hci_sent_cmd_data(hdev, OGF_LINK_CTL, OCF_SETUP_SYNC_CONN);=0A=
-+                        __u16 handle;=0A=
-+=0A=
-+                        if (!cp)=0A=
-+                                break;=0A=
-+=0A=
-+                        handle =3D __le16_to_cpu(cp->handle);=0A=
-+=0A=
-+                        BT_DBG("%s SETUP Sync Conn error: handle %d =
-status 0x%x", hdev->name, handle, status);=0A=
-+=0A=
-+                        hci_dev_lock(hdev);=0A=
-+=0A=
-+                        acl =3D hci_conn_hash_lookup_handle(hdev, =
-handle);=0A=
-+                        if (acl && (sco =3D acl->link)) {=0A=
-+                                sco->state =3D BT_CLOSED;=0A=
-+=0A=
-+                                hci_proto_connect_cfm(sco, status);=0A=
-+                                hci_conn_del(sco);=0A=
-+                        }=0A=
-+=0A=
-+                        hci_dev_unlock(hdev);=0A=
-+                }=0A=
-+                break;=0A=
- =0A=
- 	case OCF_ADD_SCO:=0A=
- 		if (status) {=0A=
-@@ -1126,6 +1153,70 @@=0A=
- 	hci_dev_unlock(hdev);=0A=
- }=0A=
- =0A=
-+/* Synchronous Connection Complete Event */=0A=
-+static inline void hci_sync_conn_complete_evt(struct hci_dev *hdev, =
-struct sk_buff *skb)=0A=
-+{=0A=
-+	struct hci_ev_sync_conn_complete *ev =3D (struct =
-hci_ev_sync_conn_complete *) skb->data;=0A=
-+	struct hci_conn *conn;=0A=
-+=0A=
-+	BT_DBG("%s status %d", hdev->name, ev->status);=0A=
-+=0A=
-+	hci_dev_lock(hdev);=0A=
-+	conn =3D hci_conn_hash_lookup_ba(hdev, ev->link_type, &ev->bdaddr);=0A=
-+	if (!conn) {=0A=
-+                hci_dev_unlock(hdev);=0A=
-+                return;=0A=
-+        }=0A=
-+=0A=
-+        if (!ev->status) {=0A=
-+                conn->handle =3D __le16_to_cpu(ev->handle);=0A=
-+                conn->state  =3D BT_CONNECTED;=0A=
-+=0A=
-+=0A=
-+                if (test_bit(HCI_AUTH, &hdev->flags))=0A=
-+                        conn->link_mode |=3D HCI_LM_AUTH;=0A=
-+=0A=
-+                if (test_bit(HCI_ENCRYPT, &hdev->flags))=0A=
-+                        conn->link_mode |=3D HCI_LM_ENCRYPT;=0A=
-+=0A=
-+                /* Set packet type for incoming connection */=0A=
-+                if (!conn->out) {=0A=
-+                        struct hci_cp_change_conn_ptype cp;=0A=
-+                        cp.handle =3D ev->handle;=0A=
-+                        cp.pkt_type =3D (conn->type =3D=3D ACL_LINK) ?=0A=
-+                                __cpu_to_le16(hdev->pkt_type & =
-ACL_PTYPE_MASK):=0A=
-+                                __cpu_to_le16(hdev->pkt_type & =
-SCO_PTYPE_MASK);=0A=
-+			=0A=
-+                        hci_send_cmd(hdev, OGF_LINK_CTL,=0A=
-+                                OCF_CHANGE_CONN_PTYPE, sizeof(cp), &cp);=0A=
-+                } else {=0A=
-+	                /* Update disconnect timer */=0A=
-+                        hci_conn_hold(conn);=0A=
-+                        hci_conn_put(conn);=0A=
-+                }=0A=
-+        } else=0A=
-+                conn->state =3D BT_CLOSED;=0A=
-+=0A=
-+	if (conn->type =3D=3D ACL_LINK) {=0A=
-+                struct hci_conn *sco =3D conn->link;=0A=
-+                if (sco) {=0A=
-+                        if (!ev->status) {=0A=
-+                                hci_add_sco(sco, conn->handle);=0A=
-+			}=0A=
-+                        else {=0A=
-+                                hci_proto_connect_cfm(sco, ev->status);=0A=
-+                                hci_conn_del(sco);=0A=
-+                        }=0A=
-+                }=0A=
-+        }=0A=
-+=0A=
-+        hci_proto_connect_cfm(conn, ev->status);=0A=
-+        if (ev->status)=0A=
-+                hci_conn_del(conn);=0A=
-+=0A=
-+        hci_dev_unlock(hdev);=0A=
-+}=0A=
-+=0A=
- void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)=0A=
- {=0A=
- 	struct hci_event_hdr *hdr =3D (struct hci_event_hdr *) skb->data;=0A=
-@@ -1161,7 +1252,7 @@=0A=
- 	case HCI_EV_CONN_REQUEST:=0A=
- 		hci_conn_request_evt(hdev, skb);=0A=
- 		break;=0A=
--=0A=
-+	=0A=
- 	case HCI_EV_CONN_COMPLETE:=0A=
- 		hci_conn_complete_evt(hdev, skb);=0A=
- 		break;=0A=
-@@ -1218,6 +1309,10 @@=0A=
- 		hci_sniff_subrate_evt(hdev, skb);=0A=
- 		break;=0A=
- =0A=
-+	case HCI_EV_SYNC_CONN_COMPLETE:=0A=
-+		hci_sync_conn_complete_evt(hdev, skb);=0A=
-+		break;=0A=
-+=0A=
- 	case HCI_EV_CMD_STATUS:=0A=
- 		cs =3D (struct hci_ev_cmd_status *) skb->data;=0A=
- 		skb_pull(skb, sizeof(cs));=0A=
-diff -ru ../orig/src/sco.c ../escopatch/src/sco.c=0A=
---- ../orig/src/sco.c	2007-04-18 11:16:53.000000000 +0530=0A=
-+++ ../escopatch/src/sco.c	2007-04-27 09:06:17.000000000 +0530=0A=
-@@ -200,7 +200,10 @@=0A=
- =0A=
- 	err =3D -ENOMEM;=0A=
- =0A=
--	hcon =3D hci_connect(hdev, SCO_LINK, dst);=0A=
-+	if(hdev->features[3] & 0x80) //LMP eSCO feature bit=0A=
-+		hcon =3D hci_connect(hdev, ESCO_LINK, dst);=0A=
-+	else =0A=
-+		hcon =3D hci_connect(hdev, SCO_LINK, dst); =0A=
- 	if (!hcon)=0A=
- 		goto done;=0A=
- =0A=
-@@ -846,7 +849,7 @@=0A=
- {=0A=
- 	BT_DBG("hcon %p bdaddr %s status %d", hcon, batostr(&hcon->dst), =
-status);=0A=
- =0A=
--	if (hcon->type !=3D SCO_LINK)=0A=
-+	if ((hcon->type !=3D SCO_LINK) && (hcon->type !=3D ESCO_LINK)) =0A=
- 		return 0;=0A=
- =0A=
- 	if (!status) {=0A=
-@@ -865,7 +868,7 @@=0A=
- {=0A=
- 	BT_DBG("hcon %p reason %d", hcon, reason);=0A=
- =0A=
--	if (hcon->type !=3D SCO_LINK)=0A=
-+	if ((hcon->type !=3D SCO_LINK) && (hcon->type !=3D ESCO_LINK)) =0A=
- 		return 0;=0A=
- =0A=
- 	sco_conn_del(hcon, bt_err(reason));=0A=
+------_=_NextPart_001_01C78893.E3BDE0AC
+Content-Type: application/ms-tnef;
+	name="winmail.dat"
+Content-Transfer-Encoding: base64
 
-------=_NextPart_000_0161_01C788CE.D16A65C0
+eJ8+IiUGAQaQCAAEAAAAAAABAAEAAQeQBgAIAAAA5AQAAAAAAADoAAEIgAcAGAAAAElQTS5NaWNy
+b3NvZnQgTWFpbC5Ob3RlADEIAQ2ABAACAAAAAgACAAEEgAEAOAAAAFJFIDogW0JsdWV6LWRldmVs
+XSBQbHVneiwgYTJkcGQsIGFuZCBhMmRwZDIgc3RyYW5nZW5lc3MAuhIBBYADAA4AAADXBwQAGwAI
+ABIAJAAFAEABASCAAwAOAAAA1wcEABsACAASACQABQBAAQEJgAEAIQAAADhBN0Y1QjlEOTlERDVC
+NDVCQUIyQkFFMzRDMjU5OUI2AH4HAQOQBgAUDQAAOQAAAAMAJgAAAAAAAwA2AAAAAABAADkArOC9
+45OIxwEeAD0AAQAAAAEAAAAAAAAAAgFHAAEAAAA4AAAAYz1VUzthPSA7cD1BY2Nlc3MtQ29tcGFu
+eTtsPU1QTEVYMDEtMDcwNDI3MDYxODM2Wi0zNjg3MgAeAEkAAQAAADcAAABSZTogW0JsdWV6LWRl
+dmVsXSBQbHVneiwgYTJkcGQsIGFuZCBhMmRwZDIgc3RyYW5nZW5lc3MAAEAATgCAx74SgYjHAR4A
+WgABAAAAKgAAAGJsdWV6LWRldmVsLWJvdW5jZXNAbGlzdHMuc291cmNlZm9yZ2UubmV0AAAAAgFb
+AAEAAABxAAAAAAAAAIErH6S+oxAZnW4A3QEPVAIAAAAAYmx1ZXotZGV2ZWwtYm91bmNlc0BsaXN0
+cy5zb3VyY2Vmb3JnZS5uZXQAU01UUABibHVlei1kZXZlbC1ib3VuY2VzQGxpc3RzLnNvdXJjZWZv
+cmdlLm5ldAAAAAACAVwAAQAAAC8AAABTTVRQOkJMVUVaLURFVkVMLUJPVU5DRVNATElTVFMuU09V
+UkNFRk9SR0UuTkVUAAAeAF0AAQAAAA0AAABCcmFkIE1pZGdsZXkAAAAAAgFeAAEAAABAAAAAAAAA
+AIErH6S+oxAZnW4A3QEPVAIAAAAAQnJhZCBNaWRnbGV5AFNNVFAAYm1pZGdsZXlAeG1pc3Npb24u
+Y29tAAIBXwABAAAAGwAAAFNNVFA6Qk1JREdMRVlAWE1JU1NJT04uQ09NAAAeAGYAAQAAAAUAAABT
+TVRQAAAAAB4AZwABAAAAKgAAAGJsdWV6LWRldmVsLWJvdW5jZXNAbGlzdHMuc291cmNlZm9yZ2Uu
+bmV0AAAAHgBoAAEAAAAFAAAAU01UUAAAAAAeAGkAAQAAABYAAABibWlkZ2xleUB4bWlzc2lvbi5j
+b20AAAAeAHAAAQAAADgAAABSRSA6IFtCbHVlei1kZXZlbF0gUGx1Z3osIGEyZHBkLCBhbmQgYTJk
+cGQyIHN0cmFuZ2VuZXNzAAIBcQABAAAAGwAAAAHHiIHjn5XJ2Ln4BU9djMgK4qLQZvgABBU4pAAe
+AHQAAQAAABIAAABCbHVlWiBkZXZlbG9wbWVudAAAAB4AGgwBAAAAEQAAAEZyZWRlcmljIERhbGxl
+YXUAAAAAHgAdDgEAAAA4AAAAUkUgOiBbQmx1ZXotZGV2ZWxdIFBsdWd6LCBhMmRwZCwgYW5kIGEy
+ZHBkMiBzdHJhbmdlbmVzcwACAQkQAQAAAAQFAAAABQAAJggAAExaRnUTA64ZAwAKAHJjcGcxMjXi
+MgNDdGV4BUEBAwH3TwqAAqQD4wIAY2gKwHPwZXQwIAcTAoAP8wBQfwRWCFUHshHFDlEDARDHMvcG
+AAbDEcUzBEYQyRLbEdPbCO8J9zsYvw4wNRHCDGDOYwBQCwkBZDM2EVALpsAgQnJhZCwKogqAYD4g
+SSBnClAEEWiUZSAEACABkGxrC4A8ZyABoAhgBUARIG5krR+CcwhgIEAgA1IgC1AsdWcLgB8hbx+w
+bHMeYR8AAIAOsB2wIG9mvCBiBUEd9QnwAaBsIpCLIhEYwWkYwGN0PRuTcwqECoBDaAUQELAd9WgA
+Y2lkdW1wIC2KWCbwViAQaG93BCB6biHgdB2gASAN4COgeBRjZQUxYgiBZmx5bCB3HuADoHQncBEg
+IIsQ4CSAcAQgb2NjCHD+Lh3kHmAgwQSQInAAcCDg5nkIYB7QYXYe8CCkKbDrA2AhcGgh9GIf8SfA
+BUDhLQcyZHAsH7Ag0QIgeykxKoFhAJACIAdAKgU/fR3kVxDwBUAe4B2wESEvHR2wYQUwEyEfEWl0
+P3wgRCagLAMrsQAgJndiLwEQBbAe8C7SZDDVTWFeayyBCHAe8CHRdSnhNAA0MTAwaHogMXw2YjLA
+BCAiICbQI/BzHSrXbgngLOIe8GZ1bN8DIDTTJvAfoB/hcB/xBbF3I7QBAC3QZyTQIkEuw3L3KFAh
+0R7gbCbgBGAYwCrVwlUp4XBjbV85dAaQmzKxHnBpLHAEIGdvBHD2IBjANeBsLjkiESrVHeTeRhjB
+BnEA4CUJLUKFBdBJHqFhZx7wZCcFsGmNIYFlQoYd5ERlOiLwmQpBei0BACxwbC0f0WJuKJBzQGwE
+ADdgLu8goTvwNHJDYC44kAVAAQD+IAtgIUAzokfhHZIF0Cagemcj8HlEpTFgRREscG4ALiAyNy8w
+NC8BAdAwNyAwNjowoxXQJQQnYzBFIEIKQeZaR9FFwW9wB4ACMB3kWE9iakexRSBSRRFbo0xSRYVd
+IFAhYXovEf804i8UNNMU4CJwHaAfkAnw3x6hHeQjJSW5HeZXMsAtYK89lxTgHmAsU2omwXkvEKUs
+cHIpQHNwOLF1JuD3IKk44jGScCdwUWEvIx3m/zfBAjAvoSLgJ/YtBiaFSnD+QSISJFYglFfRH9M4
+4jeR/x7wHeYv8Fb9LxAt0jjiMiD+ZQRgA6A+lDjjBvAYUAPwLx+RBJADYBEQOiT6SSf/ITAuEmBo
+LBMEkDzQU5AxUX4nXbQgUAEgY6FGMTRRdP53CeE2UR+BHeRT+SvSOOJ2IiIDJFYiMuAeYCBQZOxu
+JwVAL+B0EOApUTFh3iJc012kHeRXSCIpUF2h3xjAZNEFEB+RIdFlU7EEkP9Aex2SJPpBz3AvcT9y
+T3Nf7R3kVCogBkFGR5NfcAtw/wMgHxFV0AIgIKAYwSLwKUBkREIU4EV4O+BRd0T7J4AvgG8ioXb5
+EsAm8DjT8EZSRUVVcjACIsJ28v8OwHj0ZzM1oR3kBaACMANgjwMgItEsEQXAWE1MSnC2TiHgRoBt
+N1FKcEo2YJ9HwTFgQGASwEaAY2shwq9DYAVAPmEnwHcq1WgCQNBwOi8vRu0vdjBlgARyYgrAL2Ri
+Mi/9HeRfg2+Ef4VKbcVFWDyQ/3WxH4JGgoZfRn9Hg4BoYVB/gRCJX4Hji4OLcwuAAhAvC0VJJPp9
+j1AeADUQAQAAAEgAAAA8Q0U1MjE2QzEwQzgzOTQ0RDlGRDM3QjY1Q0QzM0YzOTcwQ0Y0Q0RAbXBs
+ZXgwMS5tcGwuYWNjZXNzLWNvbXBhbnkuY29tPgAeADkQAQAAADwAAAA8NDYzMTUxRDIuMTA0MDgw
+NUBqbGFiLm9yZz4gPDQ2MzE3NjJCLjkwNjA3MDRAeG1pc3Npb24uY29tPgAeAEcQAQAAAA8AAABt
+ZXNzYWdlL3JmYzgyMgAACwDyEAEAAAAfAPMQAQAAAHwAAABSAEUAIAAlADMAQQAgAFsAQgBsAHUA
+ZQB6AC0AZABlAHYAZQBsAF0AIABQAGwAdQBnAHoALAAgAGEAMgBkAHAAZAAsACAAYQBuAGQAIABh
+ADIAZABwAGQAMgAgAHMAdAByAGEAbgBnAGUAbgBlAHMAcwAuAEUATQBMAAAACwD2EAAAAABAAAcw
+8Q2AOJKIxwFAAAgwEGrH45OIxwEDAN4/r28AAAMA8T8MBAAAHgD4PwEAAAARAAAARnJlZGVyaWMg
+RGFsbGVhdQAAAAACAfk/AQAAAF8AAAAAAAAA3KdAyMBCEBq0uQgAKy/hggEAAAAAAAAAL089QUND
+RVNTLUNPTVBBTlkvT1U9TU9OVFBFTExJRVIvQ049UkVDSVBJRU5UUy9DTj1GUkVERVJJQy5EQUxM
+RUFVAAAeAPo/AQAAABUAAABTeXN0ZW0gQWRtaW5pc3RyYXRvcgAAAAACAfs/AQAAAB4AAAAAAAAA
+3KdAyMBCEBq0uQgAKy/hggEAAAAAAAAALgAAAAMA/T/kBAAAAwAZQAAAAAADABpAAAAAAAMAHUAA
+AAAAAwAeQAAAAAAeADBAAQAAABEAAABGUkVERVJJQy5EQUxMRUFVAAAAAB4AMUABAAAAEQAAAEZS
+RURFUklDLkRBTExFQVUAAAAAHgAyQAEAAAAqAAAAYmx1ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5z
+b3VyY2Vmb3JnZS5uZXQAAAAeADNAAQAAABYAAABibWlkZ2xleUB4bWlzc2lvbi5jb20AAAAeADhA
+AQAAABEAAABGUkVERVJJQy5EQUxMRUFVAAAAAB4AOUABAAAAAgAAAC4AAAADAHZA/////wsAKQAA
+AAAACwAjAAAAAAADAAYQP5ZVPAMABxD7BAAAAwAQEAAAAAADABEQAAAAAB4ACBABAAAAZQAAAEJS
+QUQsSUdVRVNTSEVJU1RBTEtJTkdBQk9VVFNFTkRJTkdTT1VOREZST01QTFVHSU5TVE9BTFNBSU5T
+VEVBRE9GQlRFTkFCTEVBTFNBUkVESVJFQ1Q9MUNIUklTSENJRFVNUC0AAAAAAgF/AAEAAABIAAAA
+PENFNTIxNkMxMEM4Mzk0NEQ5RkQzN0I2NUNEMzNGMzk3MENGNENEQG1wbGV4MDEubXBsLmFjY2Vz
+cy1jb21wYW55LmNvbT4Aiag=
+
+------_=_NextPart_001_01C78893.E3BDE0AC
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -419,7 +158,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
-------=_NextPart_000_0161_01C788CE.D16A65C0
+------_=_NextPart_001_01C78893.E3BDE0AC
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -430,4 +169,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-------=_NextPart_000_0161_01C788CE.D16A65C0--
+------_=_NextPart_001_01C78893.E3BDE0AC--
