@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Sumeet VERMA <sumeet.verma@st.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Fri, 27 Apr 2007 09:50:05 +0530
-Message-ID: <014201c78883$55aec980$8935c70a@dlh.st.com>
+Message-ID: <4631762B.9060704@xmission.com>
+Date: Thu, 26 Apr 2007 22:03:55 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-In-Reply-To: <1177608335.14980.100.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] basic printing profile server?
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <463151D2.1040805@jlab.org>
+In-Reply-To: <463151D2.1040805@jlab.org>
+Subject: Re: [Bluez-devel] Plugz, a2dpd, and a2dpd2 strangeness
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,61 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi
-I have seen the dump of a printing application for Nokia phones (Nokia
-6600). Its developed by nokia and HP collectively. It asks for BPP. However
-it wont work with your device if you don't support
-application/vnd.pwg-multiplexed doc format. Same goes with Nokia N Series.
+Chris
 
-Regards,
-Sumeet 
------Original Message-----
-From: bluez-devel-bounces@lists.sourceforge.net
-[mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf Of Marcel
-Holtmann
-Sent: Thursday, April 26, 2007 10:56 PM
-To: BlueZ development
-Subject: Re: [Bluez-devel] basic printing profile server?
+> With pcm_a2dpd2 I have jumpy, very sped up sound from the headphones and 
+> plenty of traffic through hcidump. Alsa redirect sounds about the same 
+> as the headphones, but the daemon gives the following errors:
 
-Hi Adam,
+I'm not following you here. What's the difference between using
+pcm_a2dpd2 and the "alsa redirect"? I didn't catch what "same as the
+headphones" was referring to either.
 
-> I was wondering if anyone has worked on a basic printing profile 
-> server for Linux? By server, I mean a way that phones or other small 
-> devices can send jobs to a Linux desktop host which would then print 
-> through CUPS (or lpd, etc.).
+Brad
 
-there have been ideas about it, but I can't recall an actual implementation.
-However it might happen that INdT starts working on something like this in
-the future.
-
-> It seems like a missing piece, since CUPS can already print to 
-> bluetooth printers.
-
-The CUPS plugin can only print via HCRP and Serial Port Profile.
-
-> My new phone supports printing of SMS messages and photos, so before I 
-> try writing a server for it, I wanted to check to see if someone has 
-> done it.
-
-There are many printing profiles around. You should check which one the
-phone actually uses. Run "hcidump -X -V" and look for the profile UUID it
-requests.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express Download DB2 Express C - the
-FREE version of DB2 express and take control of your XML. No limits. Just
-data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------------------------
