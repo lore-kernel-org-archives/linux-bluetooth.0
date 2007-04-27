@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <fc27e74b0704271336x57138c9dh538109968496731@mail.gmail.com>
-Date: Sat, 28 Apr 2007 02:06:24 +0530
-From: "list subscribe" <develnewbie@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_80268_25023216.1177706184690"
-Subject: [Bluez-devel] Alternate Settings patch- The logic and cleaned patch.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1177702819.14980.136.camel@aeonflux.holtmann.net>
+References: <fc27e74b0704251424k32e3173eud439d5edeb64f148@mail.gmail.com>
+	<1177538646.14980.26.camel@aeonflux.holtmann.net>
+	<1177702819.14980.136.camel@aeonflux.holtmann.net>
+Content-Type: multipart/mixed; boundary="=-ULn/TBP6fPxqGPe4mGR+"
+Date: Fri, 27 Apr 2007 22:10:04 +0200
+Message-Id: <1177704604.14980.138.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Modified patch (Dynamic Alternate Setting)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,148 +22,141 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_80268_25023216.1177706184690
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+
+--=-ULn/TBP6fPxqGPe4mGR+
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
-Marcel,
+Hi,
 
-I am not an expert in USB. But this is my understanding and logic for
-the ISOC URBs.
+> > > I have made the changes u suggested.
+> > > Take a look and let me know.
+> > 
+> > please fix the coding style of your additions. This patch is unreadable
+> > in this state. No forward declarations and no heavy nesting.
+> 
+> the following patch follows more my understanding how this should look
+> like. However the attached patch doesn't contain the code for stopping
+> and resubmitting the ISOC URBs.
 
-Once the alternate setting routine is invoked (either a SCO connection
-is adder/removed) the Pending Queue is in the following state-
+attached is a revised patch that improves the case where
+CONFIG_BT_HCIUSB_SCO is not set.
 
-a. Some of the urbs are already sumbitted.
-b. Some of the urbs are to be submitted.
+Regards
 
-For the type "b" URBs (URBs which are to be submitted ) i remove them
-directly from the Pending Queue and put them in the Completed Queue.
-So that they can be directly reused later.
-
- Since the 'tx complete" routine for a already submitted URB is going
-to be called     asyncronously we just can't  move them to the
-completed Queue. Because the "Tx completed" routine moves the
-corresponding _urb to the completed routine. (refer
-hci_usb_tx_complete).
-
-So here is what i do (Once I am in my routine):
-1. I temporarily move the submitted URBs to a temporary list.
-2. I move the type "b" URBs to the completed list .
-3. I move the URBs from temporary list back to the Pending Queue.
-
-So now my pending Queue looks like this:
-URBs which were already submitted (which once transmitted,will call
-their TX Complete function, which moves the corresponding _urb to the
-completed Queue).
-Followed by the NEW URBs, which follow the new alternate settings.
-Let me know if this makes sense.
-
-i am attaching a cleaned up patch .
+Marcel
 
 
-Thanks,
-Alok.
+--=-ULn/TBP6fPxqGPe4mGR+
+Content-Disposition: attachment; filename=patch
+Content-Type: text/x-patch; name=patch; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-------=_Part_80268_25023216.1177706184690
-Content-Type: application/octet-stream; name=alternate-setting-patch
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_f10cs9q6
-Content-Disposition: attachment; filename="alternate-setting-patch"
+diff --git a/drivers/bluetooth/hci_usb.c b/drivers/bluetooth/hci_usb.c
+index 406af57..0727f68 100644
+--- a/drivers/bluetooth/hci_usb.c
++++ b/drivers/bluetooth/hci_usb.c
+@@ -837,10 +837,50 @@ static void hci_usb_destruct(struct hci_dev *hdev)
+ 	kfree(husb);
+ }
+ 
++#ifdef CONFIG_BT_HCIUSB_SCO
+ static void hci_usb_notify(struct hci_dev *hdev, unsigned int evt)
+ {
++	struct hci_usb *husb = (struct hci_usb *) hdev->driver_data;
++	unsigned long flags;
++	int new_alts;
++
+ 	BT_DBG("%s evt %d", hdev->name, evt);
++
++	new_alts = hdev->conn_hash.sco_num;
++
++	if (hdev->voice_setting & 0x0020) {
++		new_alts *= 2;
++		if (new_alts > 5)
++			new_alts = 5;
++	}
++
++	write_lock_irqsave(&husb->completion_lock, flags);
++
++	if (new_alts != husb->isoc_alts) {
++		husb->pend_alts = new_alts;
++		schedule_work(&husb->work);
++	}
++
++	write_unlock_irqrestore(&husb->completion_lock, flags);
++}
++
++static void set_isoc_alternate(struct work_struct *work)
++{
++	struct hci_usb *husb = container_of(work, struct hci_usb, work);
++
++	write_lock(&husb->completion_lock);
++
++	usb_set_interface(husb->udev, husb->isoc_ifnum, husb->pend_alts);
++
++	husb->isoc_alts = husb->pend_alts;
++
++	write_unlock(&husb->completion_lock);
++}
++#else
++static void hci_usb_notify(struct hci_dev *hdev, unsigned int evt)
++{
+ }
++#endif
+ 
+ static int hci_usb_probe(struct usb_interface *intf, const struct usb_device_id *id)
+ {
+@@ -974,7 +1014,14 @@ static int hci_usb_probe(struct usb_interface *intf, const struct usb_device_id
+ 				husb->isoc_out_ep = isoc_out_ep;
+ 			}
+ 		}
++
++		husb->isoc_ifnum = isoc_ifnum;
++		husb->isoc_alts  = 0;
++
++		usb_set_interface(udev, isoc_ifnum, husb->isoc_alts);
+ 	}
++
++	INIT_WORK(&husb->work, set_isoc_alternate);
+ #endif
+ 
+ 	rwlock_init(&husb->completion_lock);
+diff --git a/drivers/bluetooth/hci_usb.h b/drivers/bluetooth/hci_usb.h
+index 963fc55..fbe0954 100644
+--- a/drivers/bluetooth/hci_usb.h
++++ b/drivers/bluetooth/hci_usb.h
+@@ -102,17 +102,26 @@ struct hci_usb {
+ 	struct hci_dev		*hdev;
+ 
+ 	unsigned long		state;
+-	
++
+ 	struct usb_device	*udev;
+-	
++
+ 	struct usb_host_endpoint	*bulk_in_ep;
+ 	struct usb_host_endpoint	*bulk_out_ep;
+ 	struct usb_host_endpoint	*intr_in_ep;
+ 
+ 	struct usb_interface		*isoc_iface;
++
++#ifdef CONFIG_BT_HCIUSB_SCO
+ 	struct usb_host_endpoint	*isoc_out_ep;
+ 	struct usb_host_endpoint	*isoc_in_ep;
+ 
++	int			isoc_ifnum;
++	int			isoc_alts;
++	int			pend_alts;
++
++	struct work_struct	work;
++#endif
++
+ 	__u8			ctrl_req;
+ 
+ 	struct sk_buff_head	transmit_q[4];
 
-ZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2hjaV91c2IuYyBiL2RyaXZlcnMvYmx1ZXRv
-b3RoL2hjaV91c2IuYwppbmRleCA0MDZhZjU3Li5lMWE2YjQ5IDEwMDY0NAotLS0gYS9kcml2ZXJz
-L2JsdWV0b290aC9oY2lfdXNiLmMKKysrIGIvZHJpdmVycy9ibHVldG9vdGgvaGNpX3VzYi5jCkBA
-IC0xOTQsNiArMTk0LDEyMCBAQCBzdGF0aWMgdm9pZCBoY2lfdXNiX3R4X2NvbXBsZXRlKHN0cnVj
-dCB1cmIgKnVyYik7CiAjZGVmaW5lIF9fY29tcGxldGVkX3EoaHVzYiwgdHlwZSkgKCZodXNiLT5j
-b21wbGV0ZWRfcVt0eXBlLTFdKQogI2RlZmluZSBfX3RyYW5zbWl0X3EoaHVzYiwgdHlwZSkgICgm
-aHVzYi0+dHJhbnNtaXRfcVt0eXBlLTFdKQogI2RlZmluZSBfX3JlYXNzZW1ibHkoaHVzYiwgdHlw
-ZSkgIChodXNiLT5yZWFzc2VtYmx5W3R5cGUtMV0pCisvKlNldCB0aGUgYWx0ZXJuYXRlIHNldHRp
-bmcgYmFzZWQgb24gdGhlIG51bWJlciBvZiBTQ08gY2hhbm5lbHMgYW5kIHRoZQorICB2b2ljZSBz
-ZXR0aW5nLlRoaXMgZnVuY3Rpb24gaXMgaW52b2tlZCB3aGVuIHRoZXJlIGlzIGEgY2hhbmdlIGlu
-IE51bWJlciBvZgorICBTQ08gY2hhbm5lbHMgb3Igd2hlbiB0aGUgdm9pY2UgZW5jb2RpbmcgY2hh
-bmdlcy4qLworLyogVGhlIGFsdGVybmF0ZSBzZXR0aW5nIHNlbGVjdGlvbiBpcyBiYXNlZCBvbiB0
-aGUgZm9sbG93aW5nIHRhYmxlICovCisvKiAgIE5vLiBvZiBTQ08gY2hhbm5lbHMgICAgQml0LUVu
-Y29kaW5nICAgIEFsdGVybmF0ZSBTZXR0aW5nICAgTWF4LiBQYWNrZXQgU2l6ZSAqLworLyogICAg
-ICAgICAgIDEgICAgICAgICAgICAgICAgIDhiaXQgICAgICAgICAgICAgICAgIDEgICAgICAgICAg
-ICAgICAgICA5ICovCisvKiAgICAgICAgICAgMSAgICAgICAgICAgICAgICAxNmJpdCAgICAgICAg
-ICAgICAgICAgMiAgICAgICAgICAgICAgICAgMTcgKi8KKy8qICAgICAgICAgICAyICAgICAgICAg
-ICAgICAgICA4Yml0ICAgICAgICAgICAgICAgICAyICAgICAgICAgICAgICAgICAxNyAqLworLyog
-ICAgICAgICAgIDIgICAgICAgICAgICAgICAgMTZiaXQgICAgICAgICAgICAgICAgIDQgICAgICAg
-ICAgICAgICAgIDMzICovCisvKiAgICAgICAgICAgMyAgICAgICAgICAgICAgICAgOGJpdCAgICAg
-ICAgICAgICAgICAgMyAgICAgICAgICAgICAgICAgMjUgKi8KKy8qICAgICAgICAgICAzICAgICAg
-ICAgICAgICAgIDE2Yml0ICAgICAgICAgICAgICAgICA1ICAgICAgICAgICAgICAgICA0OSAqLwor
-CitzdGF0aWMgdm9pZCBzZXRfYWx0ZXJuYXRlX2NvbmZpZyhzdHJ1Y3Qgd29ya19zdHJ1Y3QgKndv
-cmspCit7CisJc3RydWN0IGhjaV9kZXYgKmhkZXYgPSBjb250YWluZXJfb2Yod29yaywgc3RydWN0
-IGhjaV9kZXYsIHNldHRpbmdfd29yayk7CisJc3RydWN0IGhjaV91c2IgKmhVU0IgPSAoc3RydWN0
-IGhjaV91c2IgKikgaGRldi0+ZHJpdmVyX2RhdGE7CisJc3RydWN0IHVzYl9pbnRlcmZhY2UgKmlz
-b2NJZmFjZTsKKwlzdHJ1Y3QgdXNiX2hvc3RfZW5kcG9pbnQgICplcDsKKwlzdHJ1Y3QgdXNiX2hv
-c3RfaW50ZXJmYWNlICp1aWY7CisJc3RydWN0IHVzYl9ob3N0X2VuZHBvaW50ICpvdXQgPSBOVUxM
-OworCXN0cnVjdCB1c2JfaG9zdF9lbmRwb2ludCAqaW4gPSBOVUxMOyAgICAKKwlzdHJ1Y3QgX3Vy
-YiAqX3VyYiwqX3RtcDsKKwlzdHJ1Y3QgX3VyYl9xdWV1ZSAqcSA9ICZoVVNCLT5wZW5kaW5nX3Fb
-aXNvY107CisJc3RydWN0IGxpc3RfaGVhZCBpbnByb2Nlc3M7CisJX191MTYgYml0ID0gMHgyMDsK
-KwlpbnQgaXNvY0lmbnVtPTEsIGlzb2NBbHQ9MCxlOworCXVuc2lnbmVkIGxvbmcgZmxhZ3M7CisJ
-YXRvbWljX3QgdGVtcDsKKworCS8qQ2hhbmdlIHRoZSBhbHRlcm5hdGUgc2V0dGluZyBvbmx5IGlm
-IHRoZSBudW1iZXIgb2YgU0NPIGNoYW5uZWxzIGFyZSBtb3JlIHRoYW4gMSAqLworCWlmKGhkZXYt
-PmNvbm5faGFzaC5zY29fbnVtID09IDApCisJCXJldHVybjsKKworCXN3aXRjaChoZGV2LT5jb25u
-X2hhc2guc2NvX251bSkKKwl7CisJY2FzZSAxOgorCQlpZihoZGV2LT52b2ljZV9zZXR0aW5nICYm
-IGJpdCkKKwkJCWlzb2NBbHQ9MjsKKwkJZWxzZQorCQkJaXNvY0FsdD0xOworCQlicmVhazsKKwlj
-YXNlIDI6CisJCWlmKGhkZXYtPnZvaWNlX3NldHRpbmcgJiYgYml0KQorCQkJaXNvY0FsdD00Owor
-CQllbHNlCisJCQlpc29jQWx0PTI7CisJCWJyZWFrOworCWNhc2UgMzoKKwkJaWYoaGRldi0+dm9p
-Y2Vfc2V0dGluZyAmJiBiaXQpCisJCQlpc29jQWx0PTU7CisJCWVsc2UKKwkJCWlzb2NBbHQ9MzsK
-KwkJYnJlYWs7CisJfQorCisJLypTdG9wIEN1cnJlbnQgVFggKi8KKwljbGVhcl9iaXQoSENJX1VT
-Ql9UWF9XQUtFVVAsICZoVVNCLT5zdGF0ZSk7CisJSU5JVF9MSVNUX0hFQUQoJmlucHJvY2Vzcyk7
-CisJdGVtcCA9IGhVU0ItPnBlbmRpbmdfdHhbaXNvY107CisKKwl3aGlsZSAoKF91cmIgPSBfdXJi
-X2RlcXVldWUocSkpKSB7CisJCS8qRGVxdWV1ZSBhbGwgdGhlIHN1Ym1pdHRlZCBVUkJzIGFuZCBw
-dXQgdGhlbSBpbiB0aGUgdGVtcG9yYXJ5IGxpc3QqLyAgCisJCWlmKCFhdG9taWNfZGVjX2FuZF90
-ZXN0KCZ0ZW1wKSl7CisJCQlfdXJiLT5xdWV1ZSA9IHE7CisJCQlsaXN0X2FkZCgmX3VyYi0+bGlz
-dCwgJmlucHJvY2Vzcyk7CisJCX0KKwkJZWxzZXsKKwkJCS8qVW5saW5rIGFsbCB0aGUgcmVzdCBv
-ZiBVUkJzIGFuZCBwdXQgdGhlbSBpbnRvIHRoZSBjb21wbGV0ZWQgcXVldWUuKi8KKwkJCV91cmJf
-dW5saW5rKF91cmIpOworCQkJX3VyYl9xdWV1ZV90YWlsKF9fY29tcGxldGVkX3EoaFVTQixIQ0lf
-U0NPREFUQV9QS1QpLCBfdXJiKTsKKwkJfQorCX0KKwkvKm1lcmdlIHRoZSBpbnByb2Nlc3MgcXVl
-dWUgd2l0aCB0aGUgcGVuZGluZyBxdWV1ZSovCisJc3Bpbl9sb2NrX2lycXNhdmUoJnEtPmxvY2ss
-IGZsYWdzKTsKKwlsaXN0X2Zvcl9lYWNoX2VudHJ5X3NhZmUoX3VyYiwgX3RtcCwgJmlucHJvY2Vz
-cywgbGlzdCkgeworCQlsaXN0X21vdmVfdGFpbCgmX3VyYi0+bGlzdCwgJnEtPmhlYWQpOworCX0K
-KwlzcGluX3VubG9ja19pcnFyZXN0b3JlKCZxLT5sb2NrLCBmbGFncyk7CisJaXNvY0lmYWNlID0g
-dXNiX2lmbnVtX3RvX2lmKGhVU0ItPnVkZXYsIGlzb2NJZm51bSk7CisKKwkvKlNldCB0aGUgc2V0
-dGluZyBhbmQgdGhlIGluL291dCBlbmRwb2ludHMgKi8KKwlpZiAoaXNvY0lmYWNlKSB7CisJCXVp
-ZiA9ICZpc29jSWZhY2UtPmFsdHNldHRpbmdbaXNvY0FsdF07CisJCWZvciAoZSA9IDA7IGUgPCB1
-aWYtPmRlc2MuYk51bUVuZHBvaW50czsgZSsrKSB7CisJCQllcCA9ICZ1aWYtPmVuZHBvaW50W2Vd
-OworCQkJc3dpdGNoIChlcC0+ZGVzYy5ibUF0dHJpYnV0ZXMgJiBVU0JfRU5EUE9JTlRfWEZFUlRZ
-UEVfTUFTSykgeworCQkJY2FzZSBVU0JfRU5EUE9JTlRfWEZFUl9JU09DOgorCQkJCWlmIChlcC0+
-ZGVzYy5iRW5kcG9pbnRBZGRyZXNzICYgVVNCX0RJUl9JTikKKwkJCQkJaW4gID0gZXA7CisJCQkJ
-ZWxzZQorCQkJCQlvdXQgPSBlcDsKKwkJCQlicmVhazsKKwkJCX0KKwkJfQorCQkKKwkJaWYgKCFp
-biB8fCAhb3V0KQorCQkJQlRfREJHKCJJc29jIGVuZHBvaW50cyBub3QgZm91bmQiKTsKKwkJZWxz
-ZSB7CisJCQlCVF9EQkcoImlzb2MgaWZudW0gJWQgYWx0cyAlZCIsIGlzb2NJZm51bSwgaXNvY0Fs
-dCk7CisJCQlpZiAodXNiX3NldF9pbnRlcmZhY2UoaFVTQi0+dWRldixpc29jSWZudW0sIGlzb2NB
-bHQpKSB7CisJCQkJQlRfRVJSKCJDYW4ndCBzZXQgaXNvYyBpbnRlcmZhY2Ugc2V0dGluZ3MiKTsK
-KwkJCQloVVNCLT5pc29jX2lmYWNlID0gaXNvY0lmYWNlOworCQkJCXVzYl9kcml2ZXJfcmVsZWFz
-ZV9pbnRlcmZhY2UoJmhjaV91c2JfZHJpdmVyLCBoVVNCLT5pc29jX2lmYWNlKTsKKwkJCQloVVNC
-LT5pc29jX2lmYWNlID0gTlVMTDsKKwkJCX0gZWxzZSB7CisJCQkJaFVTQi0+aXNvY19pZmFjZSAg
-PSBpc29jSWZhY2U7CisJCQkJaFVTQi0+aXNvY19pbl9lcCAgPSBpbjsKKwkJCQloVVNCLT5pc29j
-X291dF9lcCAgPSBvdXQ7CisJCQl9CisJCX0KKwl9CisJc2V0X2JpdChIQ0lfVVNCX1RYX1dBS0VV
-UCwgJmhVU0ItPnN0YXRlKTsKKwkKK30KIAogc3RhdGljIGlubGluZSBzdHJ1Y3QgX3VyYiAqX19n
-ZXRfY29tcGxldGVkKHN0cnVjdCBoY2lfdXNiICpodXNiLCBpbnQgdHlwZSkKIHsKQEAgLTg0MCw2
-ICs5NTQsNyBAQCBzdGF0aWMgdm9pZCBoY2lfdXNiX2Rlc3RydWN0KHN0cnVjdCBoY2lfZGV2ICpo
-ZGV2KQogc3RhdGljIHZvaWQgaGNpX3VzYl9ub3RpZnkoc3RydWN0IGhjaV9kZXYgKmhkZXYsIHVu
-c2lnbmVkIGludCBldnQpCiB7CiAJQlRfREJHKCIlcyBldnQgJWQiLCBoZGV2LT5uYW1lLCBldnQp
-OworCXNjaGVkdWxlX3dvcmsoJmhkZXYtPnNldHRpbmdfd29yayk7CiB9CiAKIHN0YXRpYyBpbnQg
-aGNpX3VzYl9wcm9iZShzdHJ1Y3QgdXNiX2ludGVyZmFjZSAqaW50ZiwgY29uc3Qgc3RydWN0IHVz
-Yl9kZXZpY2VfaWQgKmlkKQpAQCAtMTAwNyw2ICsxMTIyLDcgQEAgc3RhdGljIGludCBoY2lfdXNi
-X3Byb2JlKHN0cnVjdCB1c2JfaW50ZXJmYWNlICppbnRmLCBjb25zdCBzdHJ1Y3QgdXNiX2Rldmlj
-ZV9pZAogCiAJaGRldi0+b3duZXIgPSBUSElTX01PRFVMRTsKIAorICAgIElOSVRfV09SSygmaGRl
-di0+c2V0dGluZ193b3JrLHNldF9hbHRlcm5hdGVfY29uZmlnKTsKIAlpZiAocmVzZXQgfHwgaWQt
-PmRyaXZlcl9pbmZvICYgSENJX1JFU0VUKQogCQlzZXRfYml0KEhDSV9RVUlSS19SRVNFVF9PTl9J
-TklULCAmaGRldi0+cXVpcmtzKTsKIApkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3Ro
-L2hjaV9jb3JlLmggYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaAppbmRleCBiZDli
-ZTdhLi5hYTFlOTEzIDEwMDY0NAotLS0gYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUu
-aAorKysgYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaApAQCAtMTEwLDYgKzExMCw3
-IEBAIHN0cnVjdCBoY2lfZGV2IHsKIAlzdHJ1Y3Qgc2tfYnVmZl9oZWFkCXJhd19xOwogCXN0cnVj
-dCBza19idWZmX2hlYWQJY21kX3E7CiAKKwlzdHJ1Y3Qgd29ya19zdHJ1Y3QgICAgICBzZXR0aW5n
-X3dvcms7CiAJc3RydWN0IHNrX2J1ZmYJCSpzZW50X2NtZDsKIAogCXN0cnVjdCBzZW1hcGhvcmUJ
-cmVxX2xvY2s7Cg==
-------=_Part_80268_25023216.1177706184690
+--=-ULn/TBP6fPxqGPe4mGR+
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -171,7 +167,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
-------=_Part_80268_25023216.1177706184690
+--=-ULn/TBP6fPxqGPe4mGR+
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -182,4 +178,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-------=_Part_80268_25023216.1177706184690--
+--=-ULn/TBP6fPxqGPe4mGR+--
