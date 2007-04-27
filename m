@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46320811.10802@jlab.org>
-Date: Fri, 27 Apr 2007 10:26:25 -0400
-From: Chris Carlin <carlin@jlab.org>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <463151D2.1040805@jlab.org> <4631762B.9060704@xmission.com>
-In-Reply-To: <4631762B.9060704@xmission.com>
-Subject: Re: [Bluez-devel] Plugz, a2dpd, and a2dpd2 strangeness
+Date: Fri, 27 Apr 2007 10:10:25 +0200
+From: Ismael Valladolid Torres <ivalladt@punkass.com>
+In-reply-to: <1177608150.14980.96.camel@aeonflux.holtmann.net>
+To: bluez-devel@lists.sourceforge.net
+Message-id: <20070427081025.GP16131@punkass.com>
+MIME-version: 1.0
+References: <20070426142849.GJ16131@punkass.com>
+	<1177608150.14980.96.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] Links to developement info
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,56 +17,72 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1893681867=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Brad Midgley wrote:
->> With pcm_a2dpd2 I have jumpy, very sped up sound from the headphones and 
->> plenty of traffic through hcidump. Alsa redirect sounds about the same 
->> as the headphones, but the daemon gives the following errors:
-> 
-> I'm not following you here. What's the difference between using
-> pcm_a2dpd2 and the "alsa redirect"? I didn't catch what "same as the
-> headphones" was referring to either.
 
-In retrospect I think I wasn't clear about pcm_a2dpd and pcm_a2dpd2. By 
-those I meant the alsa plugins (libasound_module_pcm_a2dpd[2].so) as 
-opposed to the similarly named daemon and NOT a definition in my .asoundrc.
+--===============1893681867==
+Content-type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary=HrsILUyxNtiOryfc
+Content-disposition: inline
 
-The "alsa redirect" meant setting enableredirectalsa=1 in .a2dprc. I 
-gather that this causes the a2dpd system to spit sound back out through 
-alsa to speakers instead of through a bluetooth connection.
 
-To restate more clearly (maybe) I'll give you a chart:
+--HrsILUyxNtiOryfc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-a2dpd plugin ("type a2dpd" in .asoundrc):
-	bluetooth headphones (enableredirect=0 in .a2dprc):
-		occasional chirps
-		almost no traffic through hcidump
-		flags=1 only gives info upon occurrance of chirps
-	normal computer speakers (enableredirect=1):
-		music sounds fine
-a2dpd2 plugin ("type a2dpd2"):
-	bluetooth headphones (enableredirect=0):
-		garbled, sped up sound
-		plenty of hcidump traffic
-		flags=1 reports once a second or so
-	normal computer speakers (enableredirect=1):
-		garbled, sped up sound
-		ring buffer full messages spew forth
+Marcel Holtmann escribe:
+> actually the bluez-utils source code contains a lot of example code. So
+> have a look at l2test.c, rctest.c, attest.c and others.
 
-An interesting thing to me is that enableredirect, if it does what I 
-think it does, seems to show a non-bluetooth problem...
+Do you recommend CVS, or source code packaged for Debian unstable is
+new enough?
 
-~Chris
+Cordially, Ismael
+--=20
+Ismael Valladolid Torres  m. +34679156321
+La media hostia           j. ivalladt@gmail.com
+
+http://lamediahostia.blogspot.com/
+
+--HrsILUyxNtiOryfc
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFGMa/x59Nokt5yGvQRAhBBAJ9711/QLZEiX1anjhTN1amgwDOqFACfdZw/
+tDivErV4PGx5MehtPuZJClk=
+=0QoT
+-----END PGP SIGNATURE-----
+
+--HrsILUyxNtiOryfc--
+
+
+--===============1893681867==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1893681867==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1893681867==--
