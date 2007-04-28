@@ -1,10 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <46352605.1030600@lijer.nl>
-Date: Mon, 30 Apr 2007 01:11:01 +0200
-From: Henkie <henkie_bluez@lijer.nl>
+Message-ID: <a72d33330704280322k60729456j997c7cd4235327b6@mail.gmail.com>
+Date: Sat, 28 Apr 2007 12:22:02 +0200
+From: "Ma Begaj" <derliebegott@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <b92d97be0704272144m715e02bj8be217a328e62ed0@mail.gmail.com>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Nokia 6230i / ipaq h2200
+References: <b92d97be0704232057m648388a9w1748fe6312d25164@mail.gmail.com>
+	<462E042D.5060405@xmission.com>
+	<b92d97be0704252225n13cb3b04q8ffd2554270d224c@mail.gmail.com>
+	<463052D2.3090800@xmission.com>
+	<a72d33330704260237l10d76906ma50d45cb9e0f0fb8@mail.gmail.com>
+	<b92d97be0704272144m715e02bj8be217a328e62ed0@mail.gmail.com>
+Subject: Re: [Bluez-users] headset and input noise
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,41 +25,9 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+patch v.4.2 is working perfectly ok with the latest vanilla kernel 2.6.21.
 
-i have an ipaq h2200 with linux installed on it. This device isnt able
-to pair with my nokia 6230i phone (for "security reasons").
-
-I understand this has something to do with the bluetooth chipset.
-Is there a workaround available? In winCE this problem was fixed by an
-update.
-
-http://h20000.www2.hp.com/bizsupport/TechSupport/SoftwareDescription.jsp?lang=en&cc=us&prodTypeId=215348&prodSeriesId=322908&swItem=PSG_I21093-105126&prodNameId=100773&swEnvOID=1087&swLang=8&taskId=135&mode=4&idx=2
-
-I tested this update today, and it worked, my phone was able to pair
-with winCE.
-
-
-
-$ hciconfig -a
-hci0:   Type: UART
-        BD Address: 00:04:3E:83:58:72 ACL MTU: 678:8 SCO MTU: 120:1
-        UP RUNNING PSCAN
-        RX bytes:3855 acl:27 sco:0 events:111 errors:0
-        TX bytes:1378 acl:25 sco:0 commands:48 errors:0
-        Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ (0)'
-        Class: 0x120112
-        Service Classes: Networking, Object Transfer
-        Device Class: Computer, Handheld
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x8d LMP Ver: 1.1 (0x1) LMP Subver: 0x8d
-        Manufacturer: Zeevo, Inc. (18)
-
-
-	gr. Henkie
+M.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
