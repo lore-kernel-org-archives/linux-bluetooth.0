@@ -1,14 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Klaus <projectu@gmail.com>
-Date: Sun, 29 Apr 2007 16:17:10 +0000 (UTC)
-Message-ID: <loom.20070429T175311-236@post.gmane.org>
-References: <20070415095728.GA6212@ifup.org>
-	<20070424184826.GD6853@torres.zugschlus.de>
-	<loom.20070429T141323-596@post.gmane.org>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Unable to set number of SCO buffers : please
-	upgrade your Kernel !
+Date: Sun, 29 Apr 2007 18:07:48 +0400
+From: John Frankish <frankish@dubai.oilfield.slb.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-id: <7.0.1.0.2.20070429173621.03b9d4e8@dubai.oilfield.slb.com>
+MIME-version: 1.0
+Subject: [Bluez-devel] Fwd: Re: Fwd: Re: Unable to set number of SCO
+ buffers	: please upgrade your Kernel !
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,102 +19,159 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Klaus <projectu <at> gmail.com> writes:
-> 
-> In plugz/../pcm_sco.c: sco_headset_hw_params(), 
->    setsockopt(...,SOL_SCO,...) is called, but it fails with ENOPROTOOPT
-> "Protocol not available".
-> 
->    setsockopt() for protocol level SOL_SCO is implemented in the kernel in
-> net/bluetooth/sco.c: sco_sock_setsockopt(), but this function only does one
-> thing - it returns ENOPROTOOPT:
+Reiner,
 
-If the method isn't implemented in the kernel, then IMHO, the obvious thing to
-do is to remove the offending calls to setsockopt() from pcm_sco.c.
+Thanks for the "xhost +" suggestion - unfortunately it didn't help...
 
-And - surprice surprice, it works - there is sound in the headset. But the joy
-is short.
+I pasted some details below in case it helps somebody suggest where I 
+might be going wrong.
 
-----
- $ mplayer -ao alsa:device=headset ~/eyes_on_me.ogg
-[...]
-Playing /home/kp/eyes_on_me.ogg.
-Audio file file format detected.
-[...]
+Regards
+John
+
+Case 1 - hcid.conf/security = user: Whether I use my phone or bt 
+headset, with bluez-utils 3.9, hcid just sits there waiting for a pin 
+pop-up that doesn't happen. I had this problem with bluez-utils 2.15 
+but at least I could set a pin-helper to fashion a work-around.
+
+# hcid -n [security=user - pin request via hcitool cc/auth 
+00:0A:D9:E8:4A:65, xhost +]
+hcid[2745]: Bluetooth HCI daemon
+hcid[2745]: HCI dev 0 registered
+hcid[2745]: HCI dev 0 already up
+hcid[2745]: Device hci0 has been added
+hcid[2745]: Starting security manager 0
+hcid[2745]: Device hci0 has been activated
+hcid[2745]: link_key_request (sba=00:10:C6:56:F4:9F, dba=00:0A:D9:E8:4A:65)
+hcid[2745]: pin_code_request (sba=00:10:C6:56:F4:9F, dba=00:0A:D9:E8:4A:65)
+[then nothing]
+
+Case 2 - hcid.conf/security = auto: I can initiate a connection with 
+my phone and pair my machine using the local pin in hcid.conf. Maybe 
+I'm missing the logic here, but when my bt headset is put into 
+pairing mode, shouldn't hcid recognise this and use the local pin in 
+hcid? In practise, hcid sits there waiting for me to enter a pin on 
+the bt headset which of course is not possible.
+
+# hcid -n [security=auto, connection from phone]
+hcid[2776]: Bluetooth HCI daemon
+hcid[2776]: HCI dev 0 registered
+hcid[2776]: HCI dev 0 already up
+hcid[2776]: Device hci0 has been added
+hcid[2776]: Starting security manager 0
+hcid[2776]: Device hci0 has been activated
+hcid[2776]: pin_code_request (sba=00:10:C6:56:F4:9F, dba=00:0A:D9:E8:4A:65)
+hcid[2776]: link_key_notify (sba=00:10:C6:56:F4:9F, dba=00:0A:D9:E8:4A:65)
+[paired OK]
+
+# hcid -n [security=auto, headset in pairing mode]
+hcid[7423]: Bluetooth HCI daemon
+hcid[7423]: HCI dev 0 registered
+hcid[7423]: HCI dev 0 already up
+hcid[7423]: Device hci0 has been added
+hcid[7423]: Starting security manager 0
+hcid[7423]: Device hci0 has been activated
+
+nothing happens, so then
+
+# hcitool cc 00:12:EE:A6:1D:F4
+# hcitool auth 00:12:EE:A6:1D:F4
+HCI authentication request failed: Input/output error
+
+hcid[7423]: link_key_request (sba=00:10:C6:56:F4:9F, dba=00:12:EE:A6:1D:F4)
+hcid[7423]: pin_code_request (sba=00:10:C6:56:F4:9F, dba=00:12:EE:A6:1D:F4)
+
+
+One thing I noticed with plugz and bluez-utils 2.15 is that when I 
+try to play music to the headset, it automatically pairs (via the 
+pin-helper I presume) but no music appears due to the sco buffers problem.
+
+# mplayer -ao alsa:device=headset /.../music.mp3
+...
+alsa-init: 1 soundcard found, using: headset
+ALSA lib pcm_sco.c:273:(sco_headset_hw_params) Unable to set number 
+of SCO buffers : please upgrade your Kernel !
+alsa-init: unable to set hw-parameters: Invalid argument
+alsa-init: pcm prepare error: Input/output error
+alsa: 8000 Hz/1 channels/2 bpf/768 bytes buffer/Signed 16 bit Little Endian
 AO: [alsa] 8000Hz 1ch s16le (2 bytes per sample)
+Building audio filter chain for 44100Hz/2ch/s16le -> 8000Hz/1ch/s16le...
 Video: no video
-Starting playback...
-A: 334.3 (05:34.3) of 333.0 (05:33.0)  1.2%        
-----
+Starting playback...[but no sound]
 
-mplayer stops playing after a few sec, and then after another few secs this
-happens:
 
-pingus kernel: invalid opcode: 0000 [#1]
-[...]
+When I try this with plugz and bluez-utils 3.9, the initial 
+connection is rejected but this is not echoed by hcid...
 
-In syslog it looks like this:
-----
-Apr 29 17:01:00 pingus headsetd[3175]: Bluetooth headset daemon version 0.5
-Apr 29 17:01:17 pingus headsetd[3175]: Configuration phase ended: target bdaddr
-is 00:02:76:80:27:1F, timeout is 6000 ms
-Apr 29 17:01:17 pingus headsetd[3175]: Changing state: Idle-->Paging
-Apr 29 17:01:18 pingus headsetd[3175]: Changing state: Paging-->Connecting
-Apr 29 17:01:18 pingus hcid[2230]: link_key_request (sba=00:01:53:00:CF:08,
-dba=00:02:76:80:27:1F)
-Apr 29 17:01:18 pingus headsetd[3175]: Changing state: Connecting-->Ready
-Apr 29 17:01:18 pingus kernel: Bluetooth: SCO (Voice Link) ver 0.5
-Apr 29 17:01:18 pingus kernel: Bluetooth: SCO socket layer initialized
-Apr 29 17:01:18 pingus headsetd[3175]: Changing state: Ready-->Opening
-Apr 29 17:01:19 pingus headsetd[3175]: SCO channel opened handle=0x002d mtu=64
-Apr 29 17:01:19 pingus headsetd[3175]: Changing state: Opening-->Streaming
-Apr 29 17:01:26 pingus headsetd[3175]: Appli closed socket
-Apr 29 17:01:26 pingus headsetd[3175]: Changing state: Streaming-->Zombie
-Apr 29 17:01:30 pingus headsetd[3175]: Nobody uses SCO channel anymore, 
-  closing it.
-Apr 29 17:01:30 pingus headsetd[3175]: Changing state: Zombie-->Connected
-Apr 29 17:01:30 pingus kernel: hci_scodata_packet: hci0 SCO packet for unknown
-  connection handle 45
-Apr 29 17:01:30 pingus last message repeated 2 times
-Apr 29 17:01:45 pingus kernel: usb 1-1: USB disconnect, address 3
-Apr 29 17:01:45 pingus kernel: __tx_submit: hci0 tx submit failed urb c1e722bc
-  type 3 err -19
-Apr 29 17:01:45 pingus kernel: __tx_submit: hci0 tx submit failed urb c1e722bc
-  type 3 err -19
-Apr 29 17:01:45 pingus kernel: slab error in verify_redzone_free(): cache
-  `size-512': memory outside object was overwritten
-Apr 29 17:01:45 pingus kernel:  [<c04061e9>] show_trace_log_lvl+0x1a/0x2f
-Apr 29 17:01:45 pingus kernel:  [<c04067ad>] show_trace+0x12/0x14
-Apr 29 17:01:45 pingus kernel:  [<c0406831>] dump_stack+0x16/0x18
-Apr 29 17:01:45 pingus kernel:  [<c04791e6>] __slab_error+0x29/0x2b
-Apr 29 17:01:45 pingus kernel:  [<c047979a>] cache_free_debugcheck+0xa9/0x19d
-Apr 29 17:01:45 pingus kernel:  [<c0479ae0>] kfree+0x74/0xc2
-Apr 29 17:01:45 pingus kernel:  [<e098d34b>] hci_usb_close+0xc2/0x121 [hci_usb]
-Apr 29 17:01:45 pingus kernel:  [<e098dd0e>] hci_usb_disconnect+0x2a/0x6f
-   [hci_usb]
-Apr 29 17:01:45 pingus kernel:  [<c057a61e>] usb_unbind_interface+0x30/0x63
-Apr 29 17:01:45 pingus kernel:  [<c05628ba>] __device_release_driver+0x74/0x90
-Apr 29 17:01:45 pingus kernel:  [<c0562d39>] device_release_driver+0x35/0x4c
-Apr 29 17:01:45 pingus kernel:  [<c05622c7>] bus_remove_device+0x73/0x82
-Apr 29 17:01:45 pingus kernel:  [<c056090e>] device_del+0x16e/0x1d2
-Apr 29 17:01:45 pingus kernel:  [<c057840c>] usb_disable_device+0x5f/0xbc
-Apr 29 17:01:45 pingus kernel:  [<c057514b>] usb_disconnect+0x9a/0x119
-Apr 29 17:01:45 pingus kernel:  [<c0575df2>] hub_thread+0x2e2/0x992
-Apr 29 17:01:45 pingus kernel:  [<c043832b>] kthread+0xb3/0xdc
-Apr 29 17:01:45 pingus kernel:  [<c0405cd3>] kernel_thread_helper+0x7/0x10
-Apr 29 17:01:45 pingus kernel:  =======================
-Apr 29 17:01:45 pingus kernel: c0c27ca5: redzone 1:0x5a5a5a5a, 
-  redzone 2:0x46c05ac8.
-Apr 29 17:01:45 pingus kernel: ------------[ cut here ]------------
-Apr 29 17:01:45 pingus kernel: kernel BUG at mm/slab.c:2877!
-Apr 29 17:01:45 pingus kernel: invalid opcode: 0000 [#1]
-Apr 29 17:01:45 pingus kernel: SMP 
-Apr 29 17:01:45 pingus kernel: last sysfs file:
-/devices/pci0000:00/0000:00:02.0/usb1/idVendor
-[...]
-----
+# mplayer -ao alsa:device=headset /.../music.mp3
+...
+Building audio filter chain for 44100Hz/2ch/s16le -> 0Hz/0ch/??...
+alsa-init: 1 soundcard found, using: headset
+ALSA lib pcm_sco.c:561:(_snd_pcm_sco_open) Socket connection returned 
+Connection refused
+alsa-init: playback open error: Connection refused
+Could not open/initialize audio device -> no sound.
+Audio: no sound
+Video: no video
 
-Klaus
+# hcid -n [security=auto, headset in pairing mode]
+hcid[2776]: Bluetooth HCI daemon
+hcid[2776]: HCI dev 0 registered
+hcid[2776]: HCI dev 0 already up
+hcid[2776]: Device hci0 has been added
+hcid[2776]: Starting security manager 0
+hcid[2776]: Device hci0 has been activated
+[but no link_key/pin_code_request??]
+
+------------------------
+
+>Date: Sun, 29 Apr 2007 10:23:48 +0200
+>From: Reiner Klenk <pdq808@t-online.de>
+>Subject: Re: [Bluez-devel] Fwd: Re: Unable to set number of SCO buffers :
+>         please upgrade your Kernel !
+>Sender: bluez-devel-bounces@lists.sourceforge.net
+>To: BlueZ development <bluez-devel@lists.sourceforge.net>
+>Reply-to: BlueZ development <bluez-devel@lists.sourceforge.net>
+>Message-id: <1177835028.16681.8.camel@grappa>
+>Content-type: text/plain; charset=us-ascii
+>Content-transfer-encoding: 7bit
+>List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+>List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+>  <mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+>List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+>  <mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+>List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+>List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+>List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+>Original-recipient: rfc822;frankish@dubai.oilfield.slb.com
+>
+>On Sun, 2007-04-29 at 09:08 +0400, John Frankish wrote:
+>
+> > 2. I compiled bluez-libs/bluez-utils 3.9 to see if plugz would work
+> > better with this - I ran into the same pin problem as before in that
+> > I don't get a pin pop-up on my machine. If I set security to auto in
+> > hcid.conf then I can pair with my cell phone since I can enter a pin
+> > on the phone but this does not work with a bluetooth headset since I
+> > cannot enter a pin and hcid just sits there waiting...
+>I have seen something like this, where the problem appeared to be that
+>the pin helper could not pop up its window due to authorization failure.
+>If this is the case, it helps to "xhost +".
+>
+>Hth,
+>Reiner
+>--
+>debb1046 (gmail, gtalk, jabber.org, ekiga.net, last.fm, skype)
+>
+>
+>-------------------------------------------------------------------------
+>This SF.net email is sponsored by DB2 Express
+>Download DB2 Express C - the FREE version of DB2 express and take
+>control of your XML. No limits. Just data. Click to get it now.
+>http://sourceforge.net/powerbar/db2/
+>_______________________________________________
+>Bluez-devel mailing list
+>Bluez-devel@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------------------------
