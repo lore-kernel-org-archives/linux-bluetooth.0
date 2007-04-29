@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Klaus <projectu@gmail.com>
-Date: Sun, 29 Apr 2007 20:58:49 +0000 (UTC)
-Message-ID: <loom.20070429T224443-848@post.gmane.org>
+Message-ID: <4634C553.6080400@xmission.com>
+Date: Sun, 29 Apr 2007 10:18:27 -0600
+From: Brad Midgley <bmidgley@xmission.com>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
 References: <20070415095728.GA6212@ifup.org>	<20070424184826.GD6853@torres.zugschlus.de>
 	<loom.20070429T141323-596@post.gmane.org>
-	<4634C553.6080400@xmission.com>
-Mime-Version: 1.0
+In-Reply-To: <loom.20070429T141323-596@post.gmane.org>
 Subject: Re: [Bluez-devel] Unable to set number of SCO buffers : please
-	upgrade your Kernel !
+ upgrade your Kernel !
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,25 +22,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Brad Midgley <bmidgley <at> xmission.com> writes:
+Klaus
+
+> In plugz/../pcm_sco.c: sco_headset_hw_params(), 
+>    setsockopt(...,SOL_SCO,...) is called, but it fails with ENOPROTOOPT
+> "Protocol not available".
 > 
-> you're looking at the upatched sco.c or maybe one hunk failed.
-> sco-flowcontrol-v4.2.diff has changes for setsockopt() around line 550.
+>    setsockopt() for protocol level SOL_SCO is implemented in the kernel in
+> net/bluetooth/sco.c: sco_sock_setsockopt(), but this function only does one
+> thing - it returns ENOPROTOOPT:
+> 
+> ...
+>         switch (optname) {
+>         default:
+>                 err = -ENOPROTOOPT;
+>                 break;
+>         }
+> ...
+> 
+> I am a bit curious - how can this work for anybody?
 
-hrmp, my fault! You are so right, and everything is working fine with the patch! 
+you're looking at the upatched sco.c or maybe one hunk failed.
+sco-flowcontrol-v4.2.diff has changes for setsockopt() around line 550.
 
-Now I just have to figure out how to use the headset from Ekiga.
- 
-(If you are curious, then I had updated my Fedora kernel-2.6.spec file with the
-patch - but forgot the %patchxxx to actually enable the patch).
+we did actually change the constants for the setsockopt call, but if you
+have a recently updated plugz it should actually try both the old and
+new constants.
 
-
-Thanks, Klaus
-
-
-
-
-
+brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
