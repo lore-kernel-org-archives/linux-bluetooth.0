@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Klaus <projectu@gmail.com>
-Date: Sun, 29 Apr 2007 12:34:38 +0000 (UTC)
-Message-ID: <loom.20070429T141323-596@post.gmane.org>
-References: <20070415095728.GA6212@ifup.org>
-	<20070424184826.GD6853@torres.zugschlus.de>
+From: Reiner Klenk <pdq808@t-online.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <7.0.1.0.2.20070429085827.03de8030@dubai.oilfield.slb.com>
+References: <7.0.1.0.2.20070429085827.03de8030@dubai.oilfield.slb.com>
+Date: Sun, 29 Apr 2007 10:23:48 +0200
+Message-Id: <1177835028.16681.8.camel@grappa>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel]
-	=?utf-8?q?Unable_to_set_number_of_SCO_buffers_=3A_p?=
-	=?utf-8?q?lease=09upgrade_your_Kernel_!?=
+Subject: Re: [Bluez-devel] Fwd: Re: Unable to set number of SCO buffers
+	:	please upgrade your Kernel !
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,40 +21,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marc Haber <mh+bluez-devel <at> zugschlus.de> writes:
-[...]
-> I still have the same problem. Only that
-> the "Unable to set number of SCO buffers" error message now has
-> pcm_sco.c:277 as line number.
+On Sun, 2007-04-29 at 09:08 +0400, John Frankish wrote:
 
-I have the same problem on 2.6.21 with the patch applied.
+> 2. I compiled bluez-libs/bluez-utils 3.9 to see if plugz would work 
+> better with this - I ran into the same pin problem as before in that 
+> I don't get a pin pop-up on my machine. If I set security to auto in 
+> hcid.conf then I can pair with my cell phone since I can enter a pin 
+> on the phone but this does not work with a bluetooth headset since I 
+> cannot enter a pin and hcid just sits there waiting...
+I have seen something like this, where the problem appeared to be that
+the pin helper could not pop up its window due to authorization failure.
+If this is the case, it helps to "xhost +".
 
-I looked a little into the problem and it appears that everything is actually
-working as it is intended - but that doesn't help us much.
-
-In plugz/../pcm_sco.c: sco_headset_hw_params(), 
-   setsockopt(...,SOL_SCO,...) is called, but it fails with ENOPROTOOPT
-"Protocol not available".
-
-   setsockopt() for protocol level SOL_SCO is implemented in the kernel in
-net/bluetooth/sco.c: sco_sock_setsockopt(), but this function only does one
-thing - it returns ENOPROTOOPT:
-
-...
-        switch (optname) {
-        default:
-                err = -ENOPROTOOPT;
-                break;
-        }
-...
-
-I am a bit curious - how can this work for anybody?
-
-BR, Klaus
-
-
-
-
+Hth,
+Reiner
+-- 
+debb1046 (gmail, gtalk, jabber.org, ekiga.net, last.fm, skype)
 
 
 -------------------------------------------------------------------------
