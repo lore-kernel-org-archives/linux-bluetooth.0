@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Stanislav Brabec <sbrabec@suse.cz>
-To: bluez-devel@lists.sourceforge.net
-Date: Mon, 30 Apr 2007 17:16:41 +0200
-Message-Id: <1177946201.5443.59.camel@hammer.suse.cz>
-Mime-Version: 1.0
-Subject: [Bluez-devel] bluez-gnome: No GUI way to switch from "off" mode
+Message-ID: <bd5b16740704300324i5f4f527aq50777d136e7a108f@mail.gmail.com>
+Date: Mon, 30 Apr 2007 13:24:24 +0300
+From: "Ohad Ben-Cohen" <ohad@bencohen.org>
+To: "Sumeet VERMA" <sumeet.verma@st.com>
+In-Reply-To: <4f436aae0704300204s36b603faia97cb5c6452e425c@mail.gmail.com>
+MIME-Version: 1.0
+References: <1177597177.14980.71.camel@aeonflux.holtmann.net>
+	<01fc01c78ae5$c0c5c980$8935c70a@dlh.st.com>
+	<4f436aae0704300204s36b603faia97cb5c6452e425c@mail.gmail.com>
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Low Power mode in bluez
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,51 +19,28 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-2"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hallo.
+Hi Sumeet,
 
-I am just curious, whether no chance to enable Bluetooth from the GNOME
-Bluetooth is deliberate or not. I guess, that it is not deliberate.
+> From: Sumeet VERMA <sumeet.verma@st.com>
+>
+> I meant deep sleep modes by low power modes. I think I would need some
+> support in bluetooth transport layer for that.
 
-How to reproduce:
-1. apitest SetMode off
-2. Run bluetooth-properties.
-3. Mode selection is completely shaded out and there is no way to enable
-   Bluetooth.
+I'm not so sure what is it that you need, but it sounds like the kernel patch
+I sent earlier today might be of interest to you; The patch implements
+deep sleep
+modes via transport layer manipulations (the patch is actually a new
+HCI line discipline protocol).
 
-Proposed change:
-- Convert "Mode of operation" radio buttons to checkboxes.
-- "Other devices can connect":
-  Will never be shaded out.
-  If it is off: Mode is off.
-  If it is on, than "Visible and connectable for other devices" is
-    unshaded.
-- "Visible and connectable for other devices":
-  If it is unshaded and off: Mode is connectable
-  If it is unshaded and on: Mode is discoverable and "Make adapter
-    invisible after" is unshaded.
+These deep sleep modes are part of TI's HCILL runtime power management
+UART protocol.
 
-Is it more acceptable behavior?
-
-Reference:
-Bluetooth in GNOME does not work in default installation
-https://bugzilla.novell.com/show_bug.cgi?id=3D226137
-
--- =
-
-Best Regards / S pozdravem,
-
-Stanislav Brabec
-software developer
----------------------------------------------------------------------
-SUSE LINUX, s. r. o.                          e-mail: sbrabec@suse.cz
-Lihovarsk=E1 1060/12                            tel: +420 284 028 966
-190 00 Praha 9                                fax: +420 284 028 951
-Czech Republic                                http://www.suse.cz/
-
+BR,
+Ohad.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
