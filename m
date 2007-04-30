@@ -1,731 +1,337 @@
-Return-Path: <ohad@bencohen.org>
-From: Ohad Ben-Cohen <ohad@bencohen.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH 2.6.21] Bluetooth: add support for TI's HCILL UART protocol
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 MIME-Version: 1.0
-Cc: bluez-devel@lists.sourceforge.net
-Date: Mon, 30 Apr 2007 11:40:45 -0400
-Message-Id: <200704301140.46336.ohad@bencohen.org>
+Date: Mon, 30 Apr 2007 15:02:36 +0800
+Message-ID: <36BC62FC45C4E949B13C20DEFA8617D504F42BFB@zmy16exm62.ds.mot.com>
+From: "GAO LIANG-TAO-W20048" <l.t.gao@motorola.com>
+To: <bluez-devel@lists.sourceforge.net>
+Cc: Singer Catherine-CSINGER1 <CSINGER1@motorola.com>,
+        Jin Hong-Lei-W19971 <hong-lei.jin@motorola.com>,
+        Saeed Faisal-EFS015 <faisal.saeed@motorola.com>
+Subject: [Bluez-devel] Report a bug against "l2cap_conf_output()" in
+	"net/bluetooth/l2cap.c"
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0538687606=="
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
+
+This is a multi-part message in MIME format.
+
+--===============0538687606==
+Content-class: urn:content-classes:message
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C78AF5.8962EECE"
+
+This is a multi-part message in MIME format.
+
+------_=_NextPart_001_01C78AF5.8962EECE
 Content-Type: text/plain;
-  charset="iso-8859-1"
-List-ID: <bluez-devel.lists.sourceforge.net>
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-From: Ohad Ben-Cohen <ohad@bencohen.org>
+=20
 
-Add support for Texas Instruments' HCI Low Level (HCILL) UART Bluetooth
-protocol. HCILL is a runtime power management extension to H4,
-which is widely used by TI's BRF63xx Bluetooth chips.
+Hi,
 
-Signed-off-by: Ohad Ben-Cohen <ohad@bencohen.org>
+=20
 
----
- drivers/bluetooth/Kconfig     |   10 +
- drivers/bluetooth/Makefile    |    1 +
- drivers/bluetooth/hci_ldisc.c |   11 +
- drivers/bluetooth/hci_ll.c    |  502 +++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/hci_ll.h    |   81 +++++++
- drivers/bluetooth/hci_uart.h  |   14 +-
- 6 files changed, 616 insertions(+), 3 deletions(-)
- create mode 100644 drivers/bluetooth/hci_ll.c
- create mode 100644 drivers/bluetooth/hci_ll.h
+I want to report a bug against "l2cap_conf_output()" in BlueZ kernel
+code "net/bluetooth/l2cap.c":
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index b9fbe6e..02be474 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -55,6 +55,16 @@ config BT_HCIUART_BCSP
- 
- 	  Say Y here to compile support for HCI BCSP protocol.
- 
-+config BT_HCIUART_LL
-+	bool "HCILL protocol support"
-+	depends on BT_HCIUART
-+	help
-+	  HCILL (HCI Low Level) is a serial protocol for communication
-+	  between Bluetooth device and host. This protocol is required for
-+	  serial Bluetooth devices that are based on Texas Instruments' BRF chips.
-+
-+	  Say Y here to compile support for HCILL protocol.
-+
- config BT_HCIBCM203X
- 	tristate "HCI BCM203x USB driver"
- 	depends on USB
-diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-index 08c10e1..a543dfc 100644
---- a/drivers/bluetooth/Makefile
-+++ b/drivers/bluetooth/Makefile
-@@ -16,4 +16,5 @@ obj-$(CONFIG_BT_HCIBTUART)	+= btuart_cs.o
- hci_uart-y				:= hci_ldisc.o
- hci_uart-$(CONFIG_BT_HCIUART_H4)	+= hci_h4.o
- hci_uart-$(CONFIG_BT_HCIUART_BCSP)	+= hci_bcsp.o
-+hci_uart-$(CONFIG_BT_HCIUART_LL)	+= hci_ll.o
- hci_uart-objs				:= $(hci_uart-y)
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 0f4203b..b1e7201 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -479,6 +479,9 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file * file,
- 			return hu->proto->id;
- 		return -EUNATCH;
- 
-+	case HCIUARTGETDEVICE:
-+		return hu->hdev->id;
-+
- 	default:
- 		err = n_tty_ioctl(tty, file, cmd, arg);
- 		break;
-@@ -541,6 +544,10 @@ static int __init hci_uart_init(void)
- #ifdef CONFIG_BT_HCIUART_BCSP
- 	bcsp_init();
- #endif
-+#ifdef CONFIG_BT_HCIUART_LL
-+	ll_init();
-+#endif
-+
- 	
- 	return 0;
- }
-@@ -555,6 +562,10 @@ static void __exit hci_uart_exit(void)
- #ifdef CONFIG_BT_HCIUART_BCSP
- 	bcsp_deinit();
- #endif
-+#ifdef CONFIG_BT_HCIUART_LL
-+	ll_deinit();
-+#endif
-+
- 
- 	/* Release tty registration of line discipline */
- 	if ((err = tty_unregister_ldisc(N_HCI)))
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-new file mode 100644
-index 0000000..c17d9b9
---- /dev/null
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -0,0 +1,502 @@
-+/*
-+ *  Texas Instruments' Bluetooth HCILL UART protocol
-+ *
-+ *  HCILL (HCI Low Level) is a Texas Instruments' run-time
-+ *  power management extension to H4.
-+ *
-+ *  Copyright (C) 2007 Texas Instruments, Inc.
-+ *
-+ *  Written by Ohad Ben-Cohen <ohad@bencohen.org>
-+ *
-+ *  Acknowledgements:
-+ *  This file is based on hci_h4.c, which was written
-+ *  by Maxim Krasnyansky and Marcel Holtmann.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2
-+ *  as published by the Free Software Foundation
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+ *
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+
-+#include <linux/init.h>
-+#include <linux/sched.h>
-+#include <linux/types.h>
-+#include <linux/fcntl.h>
-+#include <linux/interrupt.h>
-+#include <linux/ptrace.h>
-+#include <linux/poll.h>
-+
-+#include <linux/slab.h>
-+#include <linux/tty.h>
-+#include <linux/errno.h>
-+#include <linux/string.h>
-+#include <linux/signal.h>
-+#include <linux/ioctl.h>
-+#include <linux/skbuff.h>
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+
-+#include "hci_uart.h"
-+#include "hci_ll.h"
-+
-+/*
-+ * Builds and sends an HCILL command packet.
-+ * These are very simple packets with only 1 cmd byte
-+ */
-+static int send_hcill_cmd(u8 cmd, struct hci_uart *hu)
-+{
-+	int err = 0;
-+	struct sk_buff *skb = NULL;
-+	struct ll_struct *ll = hu->priv;
-+	struct hcill_cmd *hcill_packet;
-+
-+	BT_DBG("hu %p cmd 0x%x", hu, cmd);
-+
-+	/* allocate packet */
-+	skb = bt_skb_alloc(1, GFP_ATOMIC);
-+	if (!skb) {
-+		BT_ERR("cannot allocate memory for HCILL packet");
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+
-+	/* prepare packet */
-+	hcill_packet = (struct hcill_cmd *) skb_put(skb, 1);
-+	hcill_packet->cmd = cmd;
-+	skb->dev = (void *) hu->hdev;
-+
-+	/* send packet */
-+	skb_queue_tail(&ll->txq, skb);
-+out:
-+	return err;
-+}
-+
-+/* Initialize protocol */
-+static int ll_open(struct hci_uart *hu)
-+{
-+	struct ll_struct *ll;
-+
-+	BT_DBG("hu %p", hu);
-+
-+	ll = kzalloc(sizeof(*ll), GFP_ATOMIC);
-+	if (!ll)
-+		return -ENOMEM;
-+
-+	skb_queue_head_init(&ll->txq);
-+	skb_queue_head_init(&ll->tx_wait_q);
-+	spin_lock_init(&ll->hcill_lock);
-+
-+	ll->hcill_state = HCILL_AWAKE;
-+
-+	hu->priv = ll;
-+
-+	/* BRF on Platform: Assert N_SHUTDOWN here */
-+
-+	return 0;
-+}
-+
-+/* Flush protocol data */
-+static int ll_flush(struct hci_uart *hu)
-+{
-+	struct ll_struct *ll = hu->priv;
-+
-+	BT_DBG("hu %p", hu);
-+
-+	skb_queue_purge(&ll->tx_wait_q);
-+	skb_queue_purge(&ll->txq);
-+
-+	return 0;
-+}
-+
-+/* Close protocol */
-+static int ll_close(struct hci_uart *hu)
-+{
-+	struct ll_struct *ll = hu->priv;
-+
-+	BT_DBG("hu %p", hu);
-+
-+	/* BRF on Platform: De-assert N_SHUTDOWN here */
-+
-+	skb_queue_purge(&ll->tx_wait_q);
-+	skb_queue_purge(&ll->txq);
-+
-+	if (ll->rx_skb)
-+		kfree_skb(ll->rx_skb);
-+
-+	hu->priv = NULL;
-+
-+	kfree(ll);
-+
-+	return 0;
-+}
-+
-+/*
-+ * internal function, which does commong work of device wake up:
-+ * 1. places all pending packets (waiting in tx_wait_q list) in txq list.
-+ * 2. changes internal state to HCILL_AWAKE.
-+ * Note: assumes that hcill_lock spinlock is taken. shouldn't be called otherwise!
-+ */
-+static void __ll_do_awake(struct ll_struct *ll)
-+{
-+	struct sk_buff* skb = NULL;
-+
-+	while((skb = skb_dequeue(&ll->tx_wait_q)))
-+		skb_queue_tail(&ll->txq, skb);
-+
-+	ll->hcill_state = HCILL_AWAKE;
-+}
-+
-+/*
-+ * Called upon a wake-up-indication from the device
-+ */
-+static void ll_device_want_to_wakeup(struct hci_uart *hu)
-+{
-+	unsigned long flags;
-+	struct ll_struct *ll = hu->priv;
-+
-+	BT_DBG("hu %p", hu);
-+
-+	/* lock hcill state */
-+	spin_lock_irqsave(&ll->hcill_lock, flags);
-+
-+	switch (ll->hcill_state) {
-+	case HCILL_ASLEEP:
-+		/* acknowledge device wake up */
-+		if (send_hcill_cmd(HCILL_WAKE_UP_ACK, hu) < 0) {
-+			BT_ERR("cannot acknowledge device wake up");
-+			goto out;
-+		}
-+		break;
-+	case HCILL_ASLEEP_TO_AWAKE:
-+		/*
-+		 * this state means that a wake-up-indication
-+		 * is already on its way to the device,
-+		 * and will serve as the required wake-up-ack
-+		 */
-+		BT_DBG("dual wake-up-indication");
-+		break;
-+	default:
-+		/* any other state are illegal */
-+		BT_ERR("received HCILL_WAKE_UP_IND in state %ld", ll->hcill_state);
-+		break;
-+	}
-+
-+	/* send pending packets and change state to HCILL_AWAKE */
-+	__ll_do_awake(ll);
-+
-+out:
-+	spin_unlock_irqrestore(&ll->hcill_lock, flags);
-+
-+	/* actually send the packets */
-+	hci_uart_tx_wakeup(hu);
-+}
-+
-+/*
-+ * Called upon a sleep-indication from the device
-+ */
-+static void ll_device_want_to_sleep(struct hci_uart *hu)
-+{
-+	unsigned long flags;
-+	struct ll_struct *ll = hu->priv;
-+
-+	BT_DBG("hu %p", hu);
-+
-+	/* lock hcill state */
-+	spin_lock_irqsave(&ll->hcill_lock, flags);
-+
-+	/* sanity check */
-+	if (ll->hcill_state != HCILL_AWAKE)
-+		BT_ERR("ERR hcill: HCILL_GO_TO_SLEEP_IND in state %ld", ll->hcill_state);
-+
-+	/* acknowledge device sleep */
-+	if (send_hcill_cmd(HCILL_GO_TO_SLEEP_ACK ,hu) < 0) {
-+		BT_ERR("cannot acknowledge device sleep");
-+		goto out;
-+	}
-+
-+	/* update state */
-+	ll->hcill_state = HCILL_ASLEEP;
-+
-+out:
-+	spin_unlock_irqrestore(&ll->hcill_lock, flags);
-+
-+	/* actually send the sleep ack packet */
-+	hci_uart_tx_wakeup(hu);
-+}
-+
-+/*
-+ * Called upon wake-up-acknowledgement from the device
-+ */
-+static void ll_device_woke_up(struct hci_uart *hu)
-+{
-+	unsigned long flags;
-+	struct ll_struct *ll = hu->priv;
-+
-+	BT_DBG("hu %p", hu);
-+
-+	/* lock hcill state */
-+	spin_lock_irqsave(&ll->hcill_lock, flags);
-+
-+	/* sanity check */
-+	if (ll->hcill_state != HCILL_ASLEEP_TO_AWAKE)
-+		BT_ERR("received HCILL_WAKE_UP_ACK in state %ld", ll->hcill_state);
-+
-+	/* send pending packets and change state to HCILL_AWAKE */
-+	__ll_do_awake(ll);
-+
-+	spin_unlock_irqrestore(&ll->hcill_lock, flags);
-+
-+	/* actually send the packets */
-+	hci_uart_tx_wakeup(hu);
-+}
-+
-+/* Enqueue frame for transmittion (padding, crc, etc) */
-+/* may be called from two simultaneous tasklets */
-+static int ll_enqueue(struct hci_uart *hu, struct sk_buff *skb)
-+{
-+	unsigned long flags = 0;
-+	struct ll_struct *ll = hu->priv;
-+
-+	BT_DBG("hu %p skb %p", hu, skb);
-+
-+	/* Prepend skb with frame type */
-+	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
-+
-+	/* lock hcill state */
-+	spin_lock_irqsave(&ll->hcill_lock, flags);
-+
-+	/* act according to current state */
-+	switch (ll->hcill_state) {
-+	case HCILL_AWAKE:
-+		BT_DBG("device awake, sending normally");
-+		skb_queue_tail(&ll->txq, skb);
-+		break;
-+	case HCILL_ASLEEP:
-+		BT_DBG("device asleep, waking up and queueing packet");
-+		/* save packet for later */
-+		skb_queue_tail(&ll->tx_wait_q, skb);
-+		/* awake device */
-+		if (send_hcill_cmd(HCILL_WAKE_UP_IND, hu) < 0) {
-+			BT_ERR("cannot wake up device");
-+			break;
-+		}
-+		ll->hcill_state = HCILL_ASLEEP_TO_AWAKE;
-+		break;
-+	case HCILL_ASLEEP_TO_AWAKE:
-+		BT_DBG("device waking up, queueing packet");
-+		/* transient state; just keep packet for later */
-+		skb_queue_tail(&ll->tx_wait_q, skb);
-+		break;
-+	default:
-+		BT_ERR("packet lost - device is in illegal state: %ld", ll->hcill_state);
-+		kfree_skb(skb);
-+		break;
-+	}
-+
-+	spin_unlock_irqrestore(&ll->hcill_lock, flags);
-+
-+	return 0;
-+}
-+
-+static inline int ll_check_data_len(struct ll_struct *ll, int len)
-+{
-+	register int room = skb_tailroom(ll->rx_skb);
-+
-+	BT_DBG("len %d room %d", len, room);
-+
-+	if (!len) {
-+		hci_recv_frame(ll->rx_skb);
-+	} else if (len > room) {
-+		BT_ERR("Data length is too large");
-+		kfree_skb(ll->rx_skb);
-+	} else {
-+		ll->rx_state = HCILL_W4_DATA;
-+		ll->rx_count = len;
-+		return len;
-+	}
-+
-+	ll->rx_state = HCILL_W4_PACKET_TYPE;
-+	ll->rx_skb   = NULL;
-+	ll->rx_count = 0;
-+
-+	return 0;
-+}
-+
-+/* Recv data */
-+static int ll_recv(struct hci_uart *hu, void *data, int count)
-+{
-+	struct ll_struct *ll = hu->priv;
-+	register char *ptr;
-+	struct hci_event_hdr *eh;
-+	struct hci_acl_hdr   *ah;
-+	struct hci_sco_hdr   *sh;
-+	register int len, type, dlen;
-+
-+	BT_DBG("hu %p count %d rx_state %ld rx_count %ld", hu, count, ll->rx_state, ll->rx_count);
-+
-+	ll_dbg_data(data, count);
-+
-+	ptr = data;
-+	while (count) {
-+		if (ll->rx_count) {
-+			len = min_t(unsigned int, ll->rx_count, count);
-+			memcpy(skb_put(ll->rx_skb, len), ptr, len);
-+			ll->rx_count -= len; count -= len; ptr += len;
-+
-+			if (ll->rx_count)
-+				continue;
-+
-+			switch (ll->rx_state) {
-+			case HCILL_W4_DATA:
-+				BT_DBG("Complete data");
-+				hci_recv_frame(ll->rx_skb);
-+
-+				ll->rx_state = HCILL_W4_PACKET_TYPE;
-+				ll->rx_skb = NULL;
-+				continue;
-+
-+			case HCILL_W4_EVENT_HDR:
-+				eh = (struct hci_event_hdr *) ll->rx_skb->data;
-+
-+				BT_DBG("Event header: evt 0x%2.2x plen %d", eh->evt, eh->plen);
-+
-+				ll_check_data_len(ll, eh->plen);
-+				continue;
-+
-+			case HCILL_W4_ACL_HDR:
-+				ah = (struct hci_acl_hdr *) ll->rx_skb->data;
-+				dlen = __le16_to_cpu(ah->dlen);
-+
-+				BT_DBG("ACL header: dlen %d", dlen);
-+
-+				ll_check_data_len(ll, dlen);
-+				continue;
-+
-+			case HCILL_W4_SCO_HDR:
-+				sh = (struct hci_sco_hdr *) ll->rx_skb->data;
-+
-+				BT_DBG("SCO header: dlen %d", sh->dlen);
-+
-+				ll_check_data_len(ll, sh->dlen);
-+				continue;
-+			}
-+		}
-+
-+		/* HCILL_W4_PACKET_TYPE */
-+		switch (*ptr) {
-+		case HCI_EVENT_PKT:
-+			BT_DBG("Event packet");
-+			ll->rx_state = HCILL_W4_EVENT_HDR;
-+			ll->rx_count = HCI_EVENT_HDR_SIZE;
-+			type = HCI_EVENT_PKT;
-+			break;
-+
-+		case HCI_ACLDATA_PKT:
-+			BT_DBG("ACL packet");
-+			ll->rx_state = HCILL_W4_ACL_HDR;
-+			ll->rx_count = HCI_ACL_HDR_SIZE;
-+			type = HCI_ACLDATA_PKT;
-+			break;
-+
-+		case HCI_SCODATA_PKT:
-+			BT_DBG("SCO packet");
-+			ll->rx_state = HCILL_W4_SCO_HDR;
-+			ll->rx_count = HCI_SCO_HDR_SIZE;
-+			type = HCI_SCODATA_PKT;
-+			break;
-+
-+		/* HCILL signals */
-+		case HCILL_GO_TO_SLEEP_IND:
-+			BT_DBG("HCILL_GO_TO_SLEEP_IND packet");
-+			ll_device_want_to_sleep(hu);
-+			ptr++; count--;
-+			continue;
-+
-+		case HCILL_GO_TO_SLEEP_ACK:
-+			/* shouldn't happen */
-+			BT_ERR("received HCILL_GO_TO_SLEEP_ACK (in state %ld)", ll->hcill_state);
-+			ptr++; count--;
-+			continue;
-+
-+		case HCILL_WAKE_UP_IND:
-+			BT_DBG("HCILL_WAKE_UP_IND packet");
-+			ll_device_want_to_wakeup(hu);
-+			ptr++; count--;
-+			continue;
-+
-+		case HCILL_WAKE_UP_ACK:
-+			BT_DBG("HCILL_WAKE_UP_ACK packet");
-+			ll_device_woke_up(hu);
-+			ptr++; count--;
-+			continue;
-+
-+		default:
-+			BT_ERR("Unknown HCI packet type %2.2x", (__u8)*ptr);
-+			hu->hdev->stat.err_rx++;
-+			ptr++; count--;
-+			continue;
-+		};
-+
-+		ptr++; count--;
-+
-+		/* Allocate packet */
-+		ll->rx_skb = bt_skb_alloc(HCI_MAX_FRAME_SIZE, GFP_ATOMIC);
-+		if (!ll->rx_skb) {
-+			BT_ERR("Can't allocate mem for new packet");
-+			ll->rx_state = HCILL_W4_PACKET_TYPE;
-+			ll->rx_count = 0;
-+			return 0;
-+		}
-+
-+		ll->rx_skb->dev = (void *) hu->hdev;
-+		bt_cb(ll->rx_skb)->pkt_type = type;
-+	}
-+
-+	return count;
-+}
-+
-+static struct sk_buff *ll_dequeue(struct hci_uart *hu)
-+{
-+	struct ll_struct *ll = hu->priv;
-+	return skb_dequeue(&ll->txq);
-+}
-+
-+static struct hci_uart_proto llp = {
-+	.id		= HCI_UART_LL,
-+	.open		= ll_open,
-+	.close		= ll_close,
-+	.recv		= ll_recv,
-+	.enqueue	= ll_enqueue,
-+	.dequeue	= ll_dequeue,
-+	.flush		= ll_flush,
-+};
-+
-+int ll_init(void)
-+{
-+	int err = hci_uart_register_proto(&llp);
-+
-+	if (!err)
-+		BT_INFO("HCILL protocol initialized");
-+	else
-+		BT_ERR("HCILL protocol registration failed");
-+
-+	return err;
-+}
-+
-+int ll_deinit(void)
-+{
-+	return hci_uart_unregister_proto(&llp);
-+}
-diff --git a/drivers/bluetooth/hci_ll.h b/drivers/bluetooth/hci_ll.h
-new file mode 100644
-index 0000000..47d4a14
---- /dev/null
-+++ b/drivers/bluetooth/hci_ll.h
-@@ -0,0 +1,81 @@
-+/*
-+ *  Texas Instruments' Bluetooth HCILL UART protocol
-+ *
-+ *  HCILL (HCI Low Level) is a Texas Instruments' run-time
-+ *  power management extension to H4.
-+ *
-+ *  Copyright (C) 2007 Texas Instruments, Inc.
-+ *
-+ *  Written by Ohad Ben-Cohen <ohad@bencohen.org>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2
-+ *  as published by the Free Software Foundation
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+ *
-+ */
-+#ifndef __BLUETOOTH_HCI_LL_H
-+#define __BLUETOOTH_HCI_LL_H
-+
-+#ifdef CONFIG_BT_HCILL_DEBUG
-+/* useful at times albeit a little ugly */
-+static inline void ll_dbg_data(void *data, int count)
-+{
-+	int i;
-+	char buf[256] = {0};
-+
-+	for (i = 0; i < count && i < (sizeof(buf) - 1); i++)
-+		sprintf(buf + i * 3, "%2.2x ", ((unsigned char *) data)[i]);
-+
-+	BT_DBG("%s", buf);
-+}
-+#else
-+static inline void ll_dbg_data(void *data, int count) {}
-+#undef  BT_DBG
-+#define BT_DBG( A... )
-+#endif
-+
-+/* HCILL commands */
-+#define HCILL_GO_TO_SLEEP_IND	0x30
-+#define HCILL_GO_TO_SLEEP_ACK	0x31
-+#define HCILL_WAKE_UP_IND	0x32
-+#define HCILL_WAKE_UP_ACK	0x33
-+
-+/* HCILL receiver States */
-+#define HCILL_W4_PACKET_TYPE	0
-+#define HCILL_W4_EVENT_HDR	1
-+#define HCILL_W4_ACL_HDR	2
-+#define HCILL_W4_SCO_HDR	3
-+#define HCILL_W4_DATA		4
-+
-+/* HCILL states */
-+enum hcill_states_e {
-+	HCILL_ASLEEP,
-+	HCILL_ASLEEP_TO_AWAKE,
-+	HCILL_AWAKE,
-+	HCILL_AWAKE_TO_ASLEEP
-+};
-+
-+struct hcill_cmd {
-+	u8	cmd;
-+} __attribute__((packed));
-+
-+struct ll_struct {
-+	unsigned long rx_state;
-+	unsigned long rx_count;
-+	struct sk_buff *rx_skb;
-+	struct sk_buff_head txq;
-+	spinlock_t hcill_lock;		/* HCILL state lock	*/
-+	unsigned long hcill_state;	/* HCILL power state	*/
-+	struct sk_buff_head tx_wait_q;	/* HCILL wait queue	*/
-+};
-+
-+#endif /* __BLUETOOTH_HCI_UART_H */
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index b250e67..30f9f29 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -28,16 +28,18 @@
- #endif
- 
- /* Ioctls */
--#define HCIUARTSETPROTO	_IOW('U', 200, int)
--#define HCIUARTGETPROTO	_IOR('U', 201, int)
-+#define HCIUARTSETPROTO		_IOW('U', 200, int)
-+#define HCIUARTGETPROTO		_IOR('U', 201, int)
-+#define HCIUARTGETDEVICE	_IOR('U', 202, int)
- 
- /* UART protocols */
--#define HCI_UART_MAX_PROTO	4
-+#define HCI_UART_MAX_PROTO	5
- 
- #define HCI_UART_H4	0
- #define HCI_UART_BCSP	1
- #define HCI_UART_3WIRE	2
- #define HCI_UART_H4DS	3
-+#define HCI_UART_LL	4
- 
- struct hci_uart;
- 
-@@ -84,3 +86,9 @@ int h4_deinit(void);
- int bcsp_init(void);
- int bcsp_deinit(void);
- #endif
-+
-+#ifdef CONFIG_BT_HCIUART_LL
-+int ll_init(void);
-+int ll_deinit(void);
-+#endif
-+
--- 
-1.5.0.6
+    if (pi->conf_mtu < pi->omtu) {
+
+       l2cap_add_conf_opt(ptr, L2CAP_CONF_MTU, 2, pi->omtu);
+
+       result =3D L2CAP_CONF_UNACCEPT;
+
+    } else {
+
+       pi->omtu =3D pi->conf_mtu;
+
+    }
+
+I think it's wrong to enlarge the outgoing MTU value (by calling
+"pi->omtu =3D pi->conf_mtu") when device B gets the MTU in device A's
+configuration request. In fact, Page 1006/1200 of Bluetooth SPEC v1.2 or
+Page 1038/1230 of Bluetooth SPEC v2.0 EDR both require a minimum of the
+"If the remote device sends a positive configuration response it shall
+include the actual MTU to be used on this channel for traffic flowing
+into the local device. This is the minimum of the MTU in the
+configuration request and the outgoing MTU capability of the device
+sending the configuration response." Here I consider the original
+"pi->omtu" as the "outgoing MTU capability".
+
+=20
+
+I suggest to remove the "else" clause, and to apply l2cap_add_conf_opt()
+to both cases:
+
+    l2cap_add_conf_opt(ptr, L2CAP_CONF_MTU, 2, pi->omtu);
+
+    if (pi->conf_mtu < pi->omtu) {
+
+       result =3D L2CAP_CONF_UNACCEPT;
+
+    }
+
+=20
+
+Regards,
+
+Gao Liangtao
+
+=20
+
+
+------_=_NextPart_001_01C78AF5.8962EECE
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
+xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns=3D"http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Dus-ascii">
+<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered medium)">
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:SimSun;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+@font-face
+	{font-family:SimSun;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	font-size:10.5pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Courier New";
+	color:windowtext;
+	font-weight:normal;
+	font-style:normal;
+	text-decoration:none none;}
+ /* Page Definitions */
+ @page Section1
+	{size:595.3pt 841.9pt;
+	margin:70.9pt 36.85pt 36.85pt 70.9pt;
+	layout-grid:15.6pt;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+
+</head>
+
+<body lang=3DZH-CN link=3Dblue vlink=3Dpurple =
+style=3D'text-justify-trim:punctuation'>
+
+<div class=3DSection1 style=3D'layout-grid:15.6pt'>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:"Courier =
+New"'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:"Courier =
+New"'>Hi,<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:"Courier =
+New"'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:"Courier New"'>I want to report a =
+bug
+against &#8220;l2cap_conf_output()&#8221; in BlueZ kernel code =
+&#8220;net/bluetooth/l2cap.c&#8221;:<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><i><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:"Courier =
+New";font-style:italic'>&nbsp;&nbsp;&nbsp; if
+(pi-&gt;conf_mtu &lt; pi-&gt;omtu) {<o:p></o:p></span></font></i></p>
+
+<p class=3DMsoNormal><i><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:"Courier =
+New";font-style:italic'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+l2cap_add_conf_opt(ptr,
+L2CAP_CONF_MTU, 2, pi-&gt;omtu);<o:p></o:p></span></font></i></p>
+
+<p class=3DMsoNormal><i><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:"Courier =
+New";font-style:italic'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; result
+=3D L2CAP_CONF_UNACCEPT;<o:p></o:p></span></font></i></p>
+
+<p class=3DMsoNormal><i><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:"Courier =
+New";font-style:italic'>&nbsp;&nbsp;&nbsp; }
+else {<o:p></o:p></span></font></i></p>
+
+<p class=3DMsoNormal><b><i><font size=3D2 color=3Dred face=3D"Courier =
+New"><span
+lang=3DEN-US style=3D'font-size:10.0pt;font-family:"Courier =
+New";color:red;
+font-weight:bold;font-style:italic'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+</span></font></i></b><b><i><font
+size=3D2 color=3Dred face=3D"Courier New"><span lang=3DFR =
+style=3D'font-size:10.0pt;
+font-family:"Courier =
+New";color:red;font-weight:bold;font-style:italic'>pi-&gt;omtu
+=3D pi-&gt;conf_mtu;<o:p></o:p></span></font></i></b></p>
+
+<p class=3DMsoNormal><i><font size=3D2 face=3D"Courier New"><span =
+lang=3DFR
+style=3D'font-size:10.0pt;font-family:"Courier =
+New";font-style:italic'>&nbsp;&nbsp;&nbsp; </span></font></i><i><font
+size=3D2 face=3D"Courier New"><span lang=3DEN-US =
+style=3D'font-size:10.0pt;font-family:
+"Courier New";font-style:italic'>}<o:p></o:p></span></font></i></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:"Courier New"'>I think it&#8217;s =
+wrong to
+enlarge the outgoing MTU value (by calling &#8220;pi-&gt;omtu =3D =
+pi-&gt;conf_mtu&#8221;)
+when device B gets the MTU in device A&#8217;s configuration request. In =
+fact, Page
+1006/1200 of Bluetooth SPEC v1.2 or Page 1038/1230 of Bluetooth SPEC =
+v2.0 EDR both
+require a minimum of the &nbsp;&#8220;</span></font><font size=3D3
+face=3D"Courier New"><span lang=3DEN-US =
+style=3D'font-size:12.0pt;font-family:"Courier New"'>If
+the remote device sends a positive configuration response it shall =
+include the
+actual MTU to be used on this channel for traffic flowing into the local
+device. This is the minimum of the MTU in the configuration request and =
+the
+outgoing MTU capability of the device sending the configuration =
+response.&#8221;
+Here I consider the original &#8220;pi-&gt;omtu&#8221; as the =
+&#8220;outgoing
+MTU capability&#8221;.<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D3 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:12.0pt;font-family:"Courier =
+New"'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:"Courier New"'>I suggest to =
+<b><font
+color=3Dred><span style=3D'color:red;font-weight:bold'>remove the =
+&#8220;else&#8221;
+clause, and to apply l2cap_add_conf_opt() to both =
+cases:</span></font></b><o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><i><font size=3D2 color=3Dnavy face=3D"Courier =
+New"><span
+lang=3DEN-US style=3D'font-size:10.0pt;font-family:"Courier =
+New";color:navy;
+font-style:italic'>&nbsp;&nbsp;&nbsp; l2cap_add_conf_opt(ptr, =
+L2CAP_CONF_MTU,
+2, pi-&gt;omtu);<o:p></o:p></span></font></i></p>
+
+<p class=3DMsoNormal><i><font size=3D2 color=3Dnavy face=3D"Courier =
+New"><span
+lang=3DEN-US style=3D'font-size:10.0pt;font-family:"Courier =
+New";color:navy;
+font-style:italic'>&nbsp;&nbsp;&nbsp; if (pi-&gt;conf_mtu &lt; =
+pi-&gt;omtu) {<o:p></o:p></span></font></i></p>
+
+<p class=3DMsoNormal><i><font size=3D2 color=3Dnavy face=3D"Courier =
+New"><span
+lang=3DEN-US style=3D'font-size:10.0pt;font-family:"Courier =
+New";color:navy;
+font-style:italic'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; result =3D
+L2CAP_CONF_UNACCEPT;<o:p></o:p></span></font></i></p>
+
+<p class=3DMsoNormal><i><font size=3D2 color=3Dnavy face=3D"Courier =
+New"><span
+lang=3DEN-US style=3D'font-size:10.0pt;font-family:"Courier =
+New";color:navy;
+font-style:italic'>&nbsp;&nbsp;&nbsp; }<o:p></o:p></span></font></i></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:"Courier =
+New"'><o:p>&nbsp;</o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:"Courier =
+New"'>Regards,<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:"Courier New"'>Gao =
+Liangtao<o:p></o:p></span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3D"Courier New"><span =
+lang=3DEN-US
+style=3D'font-size:10.0pt;font-family:"Courier =
+New"'><o:p>&nbsp;</o:p></span></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+------_=_NextPart_001_01C78AF5.8962EECE--
+
+
+--===============0538687606==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+--===============0538687606==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0538687606==--
