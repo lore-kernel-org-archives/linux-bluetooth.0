@@ -1,537 +1,124 @@
 Return-Path: <ohad@bencohen.org>
 From: Ohad Ben-Cohen <ohad@bencohen.org>
 To: Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH bluez-utils] add support for Texas Instruments' BRF63xx chips
+Subject: [PATCH 2.6.21] Bluetooth: add support for TI's HCILL UART protocol
 MIME-Version: 1.0
 Cc: bluez-devel@lists.sourceforge.net
-Date: Mon, 30 Apr 2007 11:39:44 -0400
-Message-Id: <200704301139.44842.ohad@bencohen.org>
+Date: Mon, 30 Apr 2007 11:40:45 -0400
+Message-Id: <200704301140.46336.ohad@bencohen.org>
 Content-Type: text/plain;
   charset="iso-8859-1"
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Introduces initializing procedures for Texas Instruments' BRF63xx chips.
-These procedures take care of:
-1. Loading TI's init script
-2. Setting up HCILL, TI's runtime power-management UART protocol
+From: Ohad Ben-Cohen <ohad@bencohen.org>
 
-An additional, tiny feature, which proved useful for
-stress checkings, is added to l2test: random delays.
+Add support for Texas Instruments' HCI Low Level (HCILL) UART Bluetooth
+protocol. HCILL is a runtime power management extension to H4,
+which is widely used by TI's BRF63xx Bluetooth chips.
 
-The patch is against the current CVS tree of bluez-utils.
+Signed-off-by: Ohad Ben-Cohen <ohad@bencohen.org>
+
 ---
- test/l2test.c        |   22 +++-
- tools/Makefile.am    |    2 +-
- tools/hciattach.8    |    3 +
- tools/hciattach.c    |  154 ++++++++++++---------
- tools/hciattach.h    |   73 ++++++++++
- tools/hciattach_ti.c |  382 ++++++++++++++++++++++++++++++++++++++++++++++++++
- tools/hciattach_ti.h |  107 ++++++++++++++
- 7 files changed, 673 insertions(+), 70 deletions(-)
- create mode 100644 tools/hciattach.h
- create mode 100644 tools/hciattach_ti.c
- create mode 100644 tools/hciattach_ti.h
+ drivers/bluetooth/Kconfig     |   10 +
+ drivers/bluetooth/Makefile    |    1 +
+ drivers/bluetooth/hci_ldisc.c |   11 +
+ drivers/bluetooth/hci_ll.c    |  502 +++++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/hci_ll.h    |   81 +++++++
+ drivers/bluetooth/hci_uart.h  |   14 +-
+ 6 files changed, 616 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/bluetooth/hci_ll.c
+ create mode 100644 drivers/bluetooth/hci_ll.h
 
-diff --git a/test/l2test.c b/test/l2test.c
-index 733c052..08745f1 100644
---- a/test/l2test.c
-+++ b/test/l2test.c
-@@ -84,6 +84,9 @@ static int count = 1;
- /* Default delay after sending count number of frames */
- static unsigned long delay = 0;
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index b9fbe6e..02be474 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -55,6 +55,16 @@ config BT_HCIUART_BCSP
  
-+/* Default delay random switch  (0 is off, else is on) */
-+static int random_delay = 0;
+ 	  Say Y here to compile support for HCI BCSP protocol.
+ 
++config BT_HCIUART_LL
++	bool "HCILL protocol support"
++	depends on BT_HCIUART
++	help
++	  HCILL (HCI Low Level) is a serial protocol for communication
++	  between Bluetooth device and host. This protocol is required for
++	  serial Bluetooth devices that are based on Texas Instruments' BRF chips.
 +
- static char *filename = NULL;
- 
- static int flowctl = 0;
-@@ -580,10 +583,16 @@ static void recv_mode(int sk)
- 	}
- }
- 
-+static double double_random(void)
-+{
-+	return ((double)rand())/((double)RAND_MAX);
-+}
++	  Say Y here to compile support for HCILL protocol.
 +
- static void do_send(int sk)
- {
- 	uint32_t seq;
- 	int i, fd, len;
-+	unsigned long tmp_delay;
+ config BT_HCIBCM203X
+ 	tristate "HCI BCM203x USB driver"
+ 	depends on USB
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 08c10e1..a543dfc 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -16,4 +16,5 @@ obj-$(CONFIG_BT_HCIBTUART)	+= btuart_cs.o
+ hci_uart-y				:= hci_ldisc.o
+ hci_uart-$(CONFIG_BT_HCIUART_H4)	+= hci_h4.o
+ hci_uart-$(CONFIG_BT_HCIUART_BCSP)	+= hci_bcsp.o
++hci_uart-$(CONFIG_BT_HCIUART_LL)	+= hci_ll.o
+ hci_uart-objs				:= $(hci_uart-y)
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 0f4203b..b1e7201 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -479,6 +479,9 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file * file,
+ 			return hu->proto->id;
+ 		return -EUNATCH;
  
- 	syslog(LOG_INFO, "Sending ...");
- 
-@@ -615,8 +624,10 @@ static void do_send(int sk)
- 			exit(1);
- 		}
- 
--		if (num_frames && delay && count && !(seq % count))
--			usleep(delay);
-+		if (num_frames && delay && count && !(seq % count)) {
-+			tmp_delay = random_delay?delay*double_random():delay;
-+			usleep(tmp_delay);
-+		}
- 	}
- }
- 
-@@ -814,6 +825,7 @@ static void usage(void)
- 		"\t[-N num] send num frames (default = infinite)\n"
- 		"\t[-C num] send num frames before delay (default = 1)\n"
- 		"\t[-D milliseconds] delay after sending num frames (default = 0)\n"
-+		"\t[-Z] random delay between 0 to the value that is set using -D\n"
- 		"\t[-R] reliable mode\n"
- 		"\t[-G] use connectionless channel (datagram)\n"
- 		"\t[-F] enable flow control\n"
-@@ -830,7 +842,7 @@ int main(int argc, char *argv[])
- 
- 	bacpy(&bdaddr, BDADDR_ANY);
- 
--	while ((opt=getopt(argc,argv,"rdscuwmnxyzb:i:P:I:O:B:N:L:C:D:RGFAESM")) != EOF) {
-+	while ((opt=getopt(argc,argv,"rdscuwmnxyzb:i:P:I:O:B:N:L:C:D:ZRGFAESM")) != EOF) {
- 		switch(opt) {
- 		case 'r':
- 			mode = RECV;
-@@ -953,6 +965,10 @@ int main(int argc, char *argv[])
- 			socktype = SOCK_DGRAM;
- 			break;
- 
-+		case 'Z':
-+			random_delay = 1;
-+			break;
++	case HCIUARTGETDEVICE:
++		return hu->hdev->id;
 +
- 		default:
- 			usage();
- 			exit(1);
-diff --git a/tools/Makefile.am b/tools/Makefile.am
-index 0ebb351..75142da 100644
---- a/tools/Makefile.am
-+++ b/tools/Makefile.am
-@@ -37,7 +37,7 @@ bin_PROGRAMS = hcitool l2ping sdptool ciptool $(dfutool_programs)
- 
- noinst_PROGRAMS = hcisecfilter ppporc
- 
--hciattach_SOURCES = hciattach.c hciattach_st.c
-+hciattach_SOURCES = hciattach.c hciattach_st.c hciattach_ti.c
- hciattach_LDADD = @BLUEZ_LIBS@
- 
- hciconfig_SOURCES = hciconfig.c csr.h csr.c
-diff --git a/tools/hciattach.8 b/tools/hciattach.8
-index f9d295e..62f773f 100644
---- a/tools/hciattach.8
-+++ b/tools/hciattach.8
-@@ -69,6 +69,9 @@ Silicon Wave kits
- .TP
- .B bcsp
- Serial adapters using CSR chips with BCSP serial protocol
-+.TP
-+.B texas
-+Texas Instruments' BRF 63xx chips with HCILL serial protocol
- .RE
- 
- Supported IDs are (manufacturer id, product id)
-diff --git a/tools/hciattach.c b/tools/hciattach.c
-index 776035e..9f59717 100644
---- a/tools/hciattach.c
-+++ b/tools/hciattach.c
-@@ -47,31 +47,8 @@
- #include <bluetooth/hci.h>
- #include <bluetooth/hci_lib.h>
- 
--#ifndef N_HCI
--#define N_HCI	15
--#endif
--
--#define HCIUARTSETPROTO _IOW('U', 200, int)
--#define HCIUARTGETPROTO _IOR('U', 201, int)
--
--#define HCI_UART_H4	0
--#define HCI_UART_BCSP	1
--#define HCI_UART_3WIRE	2
--#define HCI_UART_H4DS	3
--
--struct uart_t {
--	char *type;
--	int  m_id;
--	int  p_id;
--	int  proto;
--	int  init_speed;
--	int  speed;
--	int  flags;
--	char *bdaddr;
--	int  (*init) (int fd, struct uart_t *u, struct termios *ti);
--};
--
--#define FLOW_CTL	0x0001
-+#include "hciattach.h"
-+#include "hciattach_ti.h"
- 
- static volatile sig_atomic_t __io_canceled = 0;
- 
-@@ -124,7 +101,7 @@ static int uart_speed(int s)
- 	}
- }
- 
--static int set_speed(int fd, struct termios *ti, int speed)
-+int set_speed(int fd, struct termios *ti, int speed)
- {
- 	cfsetospeed(ti, uart_speed(speed));
- 	return tcsetattr(fd, TCSANOW, ti);
-@@ -133,7 +110,7 @@ static int set_speed(int fd, struct termios *ti, int speed)
- /* 
-  * Read an HCI event from the given file descriptor.
-  */
--static int read_hci_event(int fd, unsigned char* buf, int size) 
-+int read_hci_event(int fd, unsigned char* buf, int size)
- {
- 	int remain, r;
- 	int count = 0;
-@@ -258,15 +235,41 @@ static int digi(int fd, struct uart_t *u, struct termios *ti)
+ 	default:
+ 		err = n_tty_ioctl(tty, file, cmd, arg);
+ 		break;
+@@ -541,6 +544,10 @@ static int __init hci_uart_init(void)
+ #ifdef CONFIG_BT_HCIUART_BCSP
+ 	bcsp_init();
+ #endif
++#ifdef CONFIG_BT_HCIUART_LL
++	ll_init();
++#endif
++
+ 	
  	return 0;
  }
- 
-+static int texas_continue_script(int fd, struct uart_t *u, struct termios *ti)
-+{
-+	int dev_id, dd, ret = 0;
-+
-+	sleep(1);
-+
-+	dev_id = ioctl(fd, HCIUARTGETDEVICE, 0);
-+	if (dev_id < 0) {
-+		perror("cannot get device id");
-+		return -1;
-+	}
-+
-+	DPRINTF("\nAdded device hci%d\n", dev_id);
-+
-+	dd = hci_open_dev(dev_id);
-+	if (dd < 0) {
-+		perror("HCI device open failed");
-+		return -1;
-+	}
-+
-+	ret = brf_do_script(dd, u, ti, NULL);
-+
-+	hci_close_dev(dd);
-+
-+	return ret;
-+}
-+
- static int texas(int fd, struct uart_t *u, struct termios *ti)
- {
- 	struct timespec tm = {0, 50000};
- 	char cmd[4];
--	unsigned char resp[100];		/* Response */
-+	unsigned char resp[100] = {0};
-+	const char *bts_file;
- 	int n;
- 
--	memset(resp,'\0', 100);
--
- 	/* It is possible to get software version with manufacturer specific 
- 	   HCI command HCI_VS_TI_Version_Number. But the only thing you get more
- 	   is if this is point-to-point or point-to-multipoint module */
-@@ -284,7 +287,7 @@ static int texas(int fd, struct uart_t *u, struct termios *ti)
- 			return -1;
- 		}
- 		if (n < 4) {
--			fprintf(stderr, "Wanted to write 4 bytes, could only write %d. Stop\n", n);
-+			fprintf(stderr, "Failed to send command (sent %d/4 bytes\n", n);
- 			return -1;
- 		}
- 
-@@ -298,17 +301,21 @@ static int texas(int fd, struct uart_t *u, struct termios *ti)
- 	} while (resp[4] != cmd[1] && resp[5] != cmd[2]);
- 
- 	/* Verify manufacturer */
--	if ((resp[11] & 0xFF) != 0x0d)
--		fprintf(stderr,"WARNING : module's manufacturer is not Texas Instrument\n");
-+	if (! is_it_texas(resp)) {
-+		fprintf(stderr,"ERROR: module's manufacturer is not Texas Instruments\n");
-+		return -1;
-+	}
- 
--	/* Print LMP version */
--	fprintf(stderr, "Texas module LMP version : 0x%02x\n", resp[10] & 0xFF);
-+	fprintf(stderr, "Found Texas Instruments chip, Welcome !\n");
- 
--	/* Print LMP subversion */
--	fprintf(stderr, "Texas module LMP sub-version : 0x%02x%02x\n", resp[14] & 0xFF, resp[13] & 0xFF);
-+	bts_file = get_firmware_name(resp);
-+	fprintf(stderr, "Firmware file : %s\n", bts_file);
-+
-+	n = brf_do_script( fd, u, ti, bts_file);
- 
- 	nanosleep(&tm, NULL);
--	return 0;
-+
-+	return n;
- }
- 
- static int read_check(int fd, void *buf, int count)
-@@ -1040,69 +1047,71 @@ static int bcm2035(int fd, struct uart_t *u, struct termios *ti)
- }
- 
- struct uart_t uart[] = {
--	{ "any",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
--	{ "ericsson",   0x0000, 0x0000, HCI_UART_H4,   57600,  115200, FLOW_CTL, NULL, ericsson },
--	{ "digi",       0x0000, 0x0000, HCI_UART_H4,   9600,   115200, FLOW_CTL, NULL, digi     },
--	{ "texas",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, texas    },
-+	{ "any",        0x0000, 0x0000, HCI_UART_H4, 0, 115200, 115200, FLOW_CTL, NULL, NULL, NULL     },
-+	{ "ericsson",   0x0000, 0x0000, HCI_UART_H4, 0, 57600,  115200, FLOW_CTL, NULL, ericsson, NULL },
-+	{ "digi",       0x0000, 0x0000, HCI_UART_H4, 0, 9600,   115200, FLOW_CTL, NULL, digi, NULL     },
- 
--	{ "bcsp",       0x0000, 0x0000, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
-+	/* Texas Instruments BRF63xx modules */
-+	{ "texas",      0x0000, 0x0000, HCI_UART_LL, BRF_DEEP_SLEEP_OPCODE, 115200, 115200, FLOW_CTL, NULL, texas, texas_continue_script    },
-+
-+	{ "bcsp",       0x0000, 0x0000, HCI_UART_BCSP, 0, 115200, 115200, 0,        NULL, bcsp, NULL     },
- 
- 	/* Xircom PCMCIA cards: Credit Card Adapter and Real Port Adapter */
--	{ "xircom",     0x0105, 0x080a, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
-+	{ "xircom",     0x0105, 0x080a, HCI_UART_H4, 0, 115200, 115200, FLOW_CTL, NULL, NULL, NULL     },
- 
- 	/* CSR Casira serial adapter or BrainBoxes serial dongle (BL642) */
--	{ "csr",        0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, csr      },
-+	{ "csr",        0x0000, 0x0000, HCI_UART_H4, 0, 115200, 115200, FLOW_CTL, NULL, csr, NULL      },
- 
- 	/* BrainBoxes PCMCIA card (BL620) */
--	{ "bboxes",     0x0160, 0x0002, HCI_UART_H4,   115200, 460800, FLOW_CTL, NULL, csr      },
-+	{ "bboxes",     0x0160, 0x0002, HCI_UART_H4, 0, 115200, 460800, FLOW_CTL, NULL, csr, NULL      },
- 
- 	/* Silicon Wave kits */
--	{ "swave",      0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, swave    },
-+	{ "swave",      0x0000, 0x0000, HCI_UART_H4, 0, 115200, 115200, FLOW_CTL, NULL, swave, NULL    },
- 
- 	/* ST Microelectronics minikits based on STLC2410/STLC2415 */
--	{ "st",         0x0000, 0x0000, HCI_UART_H4,    57600, 115200, FLOW_CTL, NULL, st       },
-+	{ "st",         0x0000, 0x0000, HCI_UART_H4, 0, 57600, 115200, FLOW_CTL, NULL, st, NULL       },
- 
- 	/* ST Microelectronics minikits based on STLC2500 */
--	{ "stlc2500",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, "00:80:E1:00:AB:BA", stlc2500  },
-+	{ "stlc2500",   0x0000, 0x0000, HCI_UART_H4, 0, 115200, 115200, FLOW_CTL, "00:80:E1:00:AB:BA", stlc2500, NULL  },
- 
- 	/* Philips generic Ericsson IP core based */
--	{ "philips",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
-+	{ "philips",    0x0000, 0x0000, HCI_UART_H4, 0, 115200, 115200, FLOW_CTL, NULL, NULL, NULL     },
- 
- 	/* Philips BGB2xx Module */
--	{ "bgb2xx",    0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, "BD:B2:10:00:AB:BA", bgb2xx   },
-+	{ "bgb2xx",    0x0000, 0x0000, HCI_UART_H4, 0, 115200, 115200, FLOW_CTL, "BD:B2:10:00:AB:BA", bgb2xx, NULL   },
- 
- 	/* Sphinx Electronics PICO Card */
--	{ "picocard",   0x025e, 0x1000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
-+	{ "picocard",   0x025e, 0x1000, HCI_UART_H4, 0, 115200, 115200, FLOW_CTL, NULL, NULL, NULL     },
- 
- 	/* Inventel BlueBird Module */
--	{ "inventel",   0x0000, 0x0000, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, NULL     },
-+	{ "inventel",   0x0000, 0x0000, HCI_UART_H4, 0, 115200, 115200, FLOW_CTL, NULL, NULL, NULL     },
- 
- 	/* COM One Platinium Bluetooth PC Card */
--	{ "comone",     0xffff, 0x0101, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
-+	{ "comone",     0xffff, 0x0101, HCI_UART_BCSP, 0, 115200, 115200, 0,        NULL, bcsp, NULL     },
- 
- 	/* TDK Bluetooth PC Card and IBM Bluetooth PC Card II */
--	{ "tdk",        0x0105, 0x4254, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
-+	{ "tdk",        0x0105, 0x4254, HCI_UART_BCSP, 0, 115200, 115200, 0,        NULL, bcsp, NULL     },
- 
- 	/* Socket Bluetooth CF Card (Rev G) */
--	{ "socket",     0x0104, 0x0096, HCI_UART_BCSP, 230400, 230400, 0,        NULL, bcsp     },
-+	{ "socket",     0x0104, 0x0096, HCI_UART_BCSP, 0, 230400, 230400, 0,        NULL, bcsp, NULL     },
- 
- 	/* 3Com Bluetooth Card (Version 3.0) */
--	{ "3com",       0x0101, 0x0041, HCI_UART_H4,   115200, 115200, FLOW_CTL, NULL, csr      },
-+	{ "3com",       0x0101, 0x0041, HCI_UART_H4, 0, 115200, 115200, FLOW_CTL, NULL, csr, NULL      },
- 
- 	/* AmbiCom BT2000C Bluetooth PC/CF Card */
--	{ "bt2000c",    0x022d, 0x2000, HCI_UART_H4,    57600, 460800, FLOW_CTL, NULL, csr      },
-+	{ "bt2000c",    0x022d, 0x2000, HCI_UART_H4, 0, 57600, 460800, FLOW_CTL, NULL, csr, NULL      },
- 
- 	/* Zoom Bluetooth PCMCIA Card */
--	{ "zoom",       0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
-+	{ "zoom",       0x0279, 0x950b, HCI_UART_BCSP, 0, 115200, 115200, 0,        NULL, bcsp, NULL     },
- 
- 	/* Sitecom CN-504 PCMCIA Card */
--	{ "sitecom",    0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
-+	{ "sitecom",    0x0279, 0x950b, HCI_UART_BCSP, 0, 115200, 115200, 0,        NULL, bcsp, NULL     },
- 
- 	/* Billionton PCBTC1 PCMCIA Card */
--	{ "billionton", 0x0279, 0x950b, HCI_UART_BCSP, 115200, 115200, 0,        NULL, bcsp     },
-+	{ "billionton", 0x0279, 0x950b, HCI_UART_BCSP, 0, 115200, 115200, 0,        NULL, bcsp, NULL     },
- 
- 	/* Broadcom BCM2035 */
--	{ "bcm2035",    0x0A5C, 0x2035, HCI_UART_H4,   115200, 115200, 0,        NULL, bcm2035  },
-+	{ "bcm2035",    0x0A5C, 0x2035, HCI_UART_H4, 0, 115200, 115200, 0,        NULL, bcm2035, NULL  },
- 
- 	{ NULL, 0 }
- };
-@@ -1195,6 +1204,9 @@ int init_uart(char *dev, struct uart_t *u, int send_break)
- 		return -1;
- 	}
- 
-+	if (u->init_post && u->init_post(fd, u, &ti) < 0)
-+		return -1;
-+
- 	return fd;
- }
- 
-@@ -1202,7 +1214,7 @@ static void usage(void)
- {
- 	printf("hciattach - HCI UART driver initialization utility\n");
- 	printf("Usage:\n");
--	printf("\thciattach [-n] [-p] [-b] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow] [bdaddr]\n");
-+	printf("\thciattach [-n] [-p] [-b] [-g device_param] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow] [bdaddr]\n");
- 	printf("\thciattach -l\n");
- }
- 
-@@ -1210,8 +1222,9 @@ int main(int argc, char *argv[])
- {
- 	struct uart_t *u = NULL;
- 	int detach, printpid, opt, i, n, ld, err;
--	int to = 5; 
-+	int to = 10;
- 	int init_speed = 0;
-+	__u16 device_param = 0;
- 	int send_break = 0;
- 	pid_t pid;
- 	struct sigaction sa;
-@@ -1221,7 +1234,7 @@ int main(int argc, char *argv[])
- 	detach = 1;
- 	printpid = 0;
- 
--	while ((opt=getopt(argc, argv, "bnpt:s:l")) != EOF) {
-+	while ((opt=getopt(argc, argv, "bnpt:g:s:l")) != EOF) {
- 		switch(opt) {
- 		case 'b':
- 			send_break = 1;
-@@ -1239,6 +1252,10 @@ int main(int argc, char *argv[])
- 			to = atoi(optarg);
- 			break;
- 
-+		case 'g':
-+			device_param = (__u16)strtol(optarg, NULL, 16);
-+			break;
-+
- 		case 's':
- 			init_speed = atoi(optarg);
- 			break;
-@@ -1318,12 +1335,17 @@ int main(int argc, char *argv[])
- 	if (init_speed)
- 		u->init_speed = init_speed;
- 
-+	/* If user specified a device parameter, use that instead of
-+	   the hardware's default */
-+	if (device_param)
-+		u->device_param = device_param;
-+
- 	memset(&sa, 0, sizeof(sa));
- 	sa.sa_flags   = SA_NOCLDSTOP;
- 	sa.sa_handler = sig_alarm;
- 	sigaction(SIGALRM, &sa, NULL);
- 
--	/* 5 seconds should be enough for initialization */
-+	/* 10 seconds should be enough for initialization */
- 	alarm(to);
- 
- 	n = init_uart(dev, u, send_break);
-diff --git a/tools/hciattach.h b/tools/hciattach.h
-new file mode 100644
-index 0000000..c90045a
---- /dev/null
-+++ b/tools/hciattach.h
-@@ -0,0 +1,73 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2000-2001  Qualcomm Incorporated
-+ *  Copyright (C) 2002-2003  Maxim Krasnyansky <maxk@qualcomm.com>
-+ *  Copyright (C) 2002-2007  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifndef __HCIATTACH_H
-+#define __HCIATTACH_H
-+
-+#include <termios.h>
-+#include <unistd.h>
-+#include <sys/ioctl.h>
-+#include <linux/types.h>
-+
-+#ifdef HCIATTACH_DEBUG
-+#define DPRINTF(x...)	printf(x)
-+#else
-+#define DPRINTF(x...)
+@@ -555,6 +562,10 @@ static void __exit hci_uart_exit(void)
+ #ifdef CONFIG_BT_HCIUART_BCSP
+ 	bcsp_deinit();
+ #endif
++#ifdef CONFIG_BT_HCIUART_LL
++	ll_deinit();
 +#endif
 +
-+#ifndef N_HCI
-+#define N_HCI	15
-+#endif
-+
-+#define HCIUARTSETPROTO _IOW('U', 200, int)
-+#define HCIUARTGETPROTO _IOR('U', 201, int)
-+#define HCIUARTGETDEVICE _IOR('U', 202, int)
-+
-+#define HCI_UART_H4	0
-+#define HCI_UART_BCSP	1
-+#define HCI_UART_3WIRE	2
-+#define HCI_UART_H4DS	3
-+#define HCI_UART_LL	4
-+
-+struct uart_t {
-+	char *type;
-+	int  m_id;
-+	int  p_id;
-+	int  proto;
-+	__u16 device_param;
-+	int  init_speed;
-+	int  speed;
-+	int  flags;
-+	char *bdaddr;
-+	int  (*init) (int fd, struct uart_t *u, struct termios *ti);
-+	int  (*init_post) (int fd, struct uart_t *u, struct termios *ti);
-+};
-+
-+#define FLOW_CTL	0x0001
-+
-+int set_speed(int fd, struct termios *ti, int speed);
-+int read_hci_event(int fd, unsigned char* buf, int size);
-+
-+#endif /* __HCIATTACH_H */
-diff --git a/tools/hciattach_ti.c b/tools/hciattach_ti.c
+ 
+ 	/* Release tty registration of line discipline */
+ 	if ((err = tty_unregister_ldisc(N_HCI)))
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
 new file mode 100644
-index 0000000..d460599
+index 0000000..c17d9b9
 --- /dev/null
-+++ b/tools/hciattach_ti.c
-@@ -0,0 +1,382 @@
++++ b/drivers/bluetooth/hci_ll.c
+@@ -0,0 +1,502 @@
 +/*
-+ *  Init procedures for Texas Instruments's chips
++ *  Texas Instruments' Bluetooth HCILL UART protocol
 + *
-+ *  BlueZ - Bluetooth protocol stack for Linux
++ *  HCILL (HCI Low Level) is a Texas Instruments' run-time
++ *  power management extension to H4.
 + *
 + *  Copyright (C) 2007 Texas Instruments, Inc.
 + *
 + *  Written by Ohad Ben-Cohen <ohad@bencohen.org>
 + *
-+ *  This program is free software; you can redistribute it and/or modify it
-+ *  under the terms of the GNU General Public License version 2 as published by
-+ *  the Free Software Foundation.
++ *  Acknowledgements:
++ *  This file is based on hci_h4.c, which was written
++ *  by Maxim Krasnyansky and Marcel Holtmann.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License version 2
++ *  as published by the Free Software Foundation
 + *
 + *  This program is distributed in the hope that it will be useful,
 + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -540,386 +127,502 @@ index 0000000..d460599
 + *
 + *  You should have received a copy of the GNU General Public License
 + *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + *
 + */
 +
-+#include <stdio.h>
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <signal.h>
-+#include <syslog.h>
-+#include <limits.h>
-+#include <termios.h>
-+#include <time.h>
-+#include <sys/time.h>
-+#include <sys/poll.h>
-+#include <sys/param.h>
-+#include <sys/ioctl.h>
-+#include <sys/socket.h>
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/hci.h>
-+#include <bluetooth/hci_lib.h>
++#include <linux/module.h>
++#include <linux/kernel.h>
 +
-+#include "hciattach.h"
-+#include "hciattach_ti.h"
++#include <linux/init.h>
++#include <linux/sched.h>
++#include <linux/types.h>
++#include <linux/fcntl.h>
++#include <linux/interrupt.h>
++#include <linux/ptrace.h>
++#include <linux/poll.h>
 +
-+FILE *bts_load_script(const char* file_name, __u32* version)
++#include <linux/slab.h>
++#include <linux/tty.h>
++#include <linux/errno.h>
++#include <linux/string.h>
++#include <linux/signal.h>
++#include <linux/ioctl.h>
++#include <linux/skbuff.h>
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++
++#include "hci_uart.h"
++#include "hci_ll.h"
++
++/*
++ * Builds and sends an HCILL command packet.
++ * These are very simple packets with only 1 cmd byte
++ */
++static int send_hcill_cmd(u8 cmd, struct hci_uart *hu)
 +{
-+	struct bts_header header;
-+	FILE* fp;
++	int err = 0;
++	struct sk_buff *skb = NULL;
++	struct ll_struct *ll = hu->priv;
++	struct hcill_cmd *hcill_packet;
 +
-+	fp = fopen(file_name, "rb");
-+	if (!fp) {
-+		perror("can't open firmware file");
++	BT_DBG("hu %p cmd 0x%x", hu, cmd);
++
++	/* allocate packet */
++	skb = bt_skb_alloc(1, GFP_ATOMIC);
++	if (!skb) {
++		BT_ERR("cannot allocate memory for HCILL packet");
++		err = -ENOMEM;
 +		goto out;
 +	}
 +
-+	if (1 != fread(&header, sizeof(struct bts_header), 1, fp)) {
-+		perror("can't read firmware file");
-+		goto errclose;
-+	}
++	/* prepare packet */
++	hcill_packet = (struct hcill_cmd *) skb_put(skb, 1);
++	hcill_packet->cmd = cmd;
++	skb->dev = (void *) hu->hdev;
 +
-+	if (header.magic != FILE_HEADER_MAGIC) {
-+		fprintf(stderr, "%s not a legal TI firmware file\n", file_name);
-+		goto errclose;
-+	}
-+
-+	if (NULL != version)
-+		*version = header.version;
-+
-+	goto out;
-+
-+errclose:
-+	fclose(fp);
-+	fp = NULL;
++	/* send packet */
++	skb_queue_tail(&ll->txq, skb);
 +out:
-+	return fp;
++	return err;
 +}
 +
-+unsigned long bts_fetch_action(FILE* fp,
-+				unsigned char* action_buf,
-+				unsigned long buf_size,
-+				__u16* action_type)
++/* Initialize protocol */
++static int ll_open(struct hci_uart *hu)
 +{
-+	struct bts_action action_hdr;
-+	unsigned long nread;
++	struct ll_struct *ll;
 +
-+	if (!fp)
-+		return 0;
++	BT_DBG("hu %p", hu);
 +
-+	if (1 != fread(&action_hdr, sizeof(struct bts_action), 1, fp))
-+		return 0;
++	ll = kzalloc(sizeof(*ll), GFP_ATOMIC);
++	if (!ll)
++		return -ENOMEM;
 +
-+	if (action_hdr.size > buf_size) {
-+		fprintf(stderr, "bts_next_action: not enough space to read next action\n");
-+		return 0;
-+	}
++	skb_queue_head_init(&ll->txq);
++	skb_queue_head_init(&ll->tx_wait_q);
++	spin_lock_init(&ll->hcill_lock);
 +
-+	nread = fread(action_buf, sizeof(__u8), action_hdr.size, fp);
-+	if (nread != (action_hdr.size)) {
-+		fprintf(stderr, "bts_next_action: fread failed to read next action\n");
-+		return 0;
-+	}
++	ll->hcill_state = HCILL_AWAKE;
 +
-+	*action_type = action_hdr.type;
++	hu->priv = ll;
 +
-+	return nread * sizeof(__u8);
-+}
-+
-+void bts_unload_script(FILE* fp)
-+{
-+	if (fp)
-+		fclose(fp);
-+}
-+
-+int is_it_texas(const __u8 *respond)
-+{
-+	__u16 manufacturer_id;
-+
-+	manufacturer_id = MAKEWORD(respond[11], respond[12]);
-+
-+	return TI_MANUFACTURER_ID == manufacturer_id ? 1 : 0;
-+}
-+
-+const char *get_firmware_name(const __u8 *respond)
-+{
-+	static char firmware_file_name[PATH_MAX] = {0};
-+	__u16 version = 0, chip = 0, min_ver = 0, maj_ver = 0;
-+
-+	version = MAKEWORD(respond[13], respond[14]);
-+	chip =  (version & 0x7C00) >> 10;
-+	min_ver = (version & 0x007F);
-+	maj_ver = (version & 0x0380) >> 7;
-+
-+	if (version & 0x8000)
-+		maj_ver |= 0x0008;
-+
-+	sprintf(firmware_file_name, FIRMWARE_DIRECTORY "TIInit_%d.%d.%d.bts", chip, maj_ver, min_ver);
-+
-+	return firmware_file_name;
-+}
-+
-+static void brf_delay(struct bts_action_delay *delay)
-+{
-+	usleep(1000*delay->msec);
-+}
-+
-+static int brf_set_serial_params(struct bts_action_serial *serial_action,
-+				int fd,
-+				struct uart_t *u,
-+				struct termios *ti)
-+{
-+	fprintf(stderr, "texas: changing baud rate to %u, flow control to %u\n",
-+				serial_action->baud, serial_action->flow_control );
-+	tcflush(fd, TCIOFLUSH);
-+
-+	if (serial_action->flow_control)
-+		ti->c_cflag |= CRTSCTS;
-+	else
-+		ti->c_cflag &= ~CRTSCTS;
-+
-+	if (tcsetattr(fd, TCSANOW, ti) < 0) {
-+		perror("Can't set port settings");
-+		return -1;
-+	}
-+
-+	u->speed = serial_action->baud;
-+
-+	tcflush(fd, TCIOFLUSH);
-+
-+	if (set_speed(fd, ti, serial_action->baud) < 0) {
-+		perror("Can't set baud rate");
-+		return -1;
-+	}
++	/* BRF on Platform: Assert N_SHUTDOWN here */
 +
 +	return 0;
 +}
 +
-+static int brf_send_command_socket(int fd, struct bts_action_send* send_action)
++/* Flush protocol data */
++static int ll_flush(struct hci_uart *hu)
 +{
-+	char response[1024] = {0};
-+	hci_command_hdr *cmd = (hci_command_hdr *) send_action->data;
-+	uint16_t opcode = cmd->opcode;
++	struct ll_struct *ll = hu->priv;
 +
-+	struct hci_request rq;
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf    = cmd_opcode_ogf(opcode);
-+	rq.ocf    = cmd_opcode_ocf(opcode);
-+	rq.event  = EVT_CMD_COMPLETE;
-+	rq.cparam = &send_action->data[3];
-+	rq.clen   = send_action->data[2];
-+	rq.rparam = response;
-+	rq.rlen   = sizeof(response);
++	BT_DBG("hu %p", hu);
 +
-+	if (hci_send_req(fd, &rq, 15) < 0) {
-+		perror("Cannot send hci command to socket");
-+		return -1;
-+	}
-+
-+	/* verify success */
-+	if (response[0]) {
-+		errno = EIO;
-+		return -1;
-+	}
++	skb_queue_purge(&ll->tx_wait_q);
++	skb_queue_purge(&ll->txq);
 +
 +	return 0;
 +}
 +
-+static int brf_send_command_file(int fd, struct bts_action_send* send_action, long size)
++/* Close protocol */
++static int ll_close(struct hci_uart *hu)
 +{
-+	unsigned char response[1024] = {0};
-+	long ret = 0;
++	struct ll_struct *ll = hu->priv;
 +
-+	/* send command */
-+	if (size != write(fd, send_action, size)) {
-+		perror("Texas: Failed to write action command");
-+		return -1;
-+	}
++	BT_DBG("hu %p", hu);
 +
-+	/* read response */
-+	ret = read_hci_event(fd, response, sizeof(response));
-+	if (ret < 0) {
-+		perror("texas: failed to read command response");
-+		return -1;
-+	}
++	/* BRF on Platform: De-assert N_SHUTDOWN here */
 +
-+	/* verify success */
-+	if (ret < 7 || 0 != response[6]) {
-+		fprintf( stderr, "TI init command failed.\n" );
-+		errno = EIO;
-+		return -1;
-+	}
++	skb_queue_purge(&ll->tx_wait_q);
++	skb_queue_purge(&ll->txq);
++
++	if (ll->rx_skb)
++		kfree_skb(ll->rx_skb);
++
++	hu->priv = NULL;
++
++	kfree(ll);
 +
 +	return 0;
 +}
 +
-+
-+static int brf_send_command(int fd, struct bts_action_send* send_action, long size, int hcill_installed)
++/*
++ * internal function, which does commong work of device wake up:
++ * 1. places all pending packets (waiting in tx_wait_q list) in txq list.
++ * 2. changes internal state to HCILL_AWAKE.
++ * Note: assumes that hcill_lock spinlock is taken. shouldn't be called otherwise!
++ */
++static void __ll_do_awake(struct ll_struct *ll)
 +{
-+	int ret = 0;
-+	char *fixed_action;
++	struct sk_buff* skb = NULL;
 +
-+	/* remove packet type when giving to socket API */
-+	if (hcill_installed) {
-+		fixed_action = ((char *) send_action) + 1;
-+		ret = brf_send_command_socket(fd, (struct bts_action_send *) fixed_action);
-+	} else {
-+		ret = brf_send_command_file(fd, send_action, size);
-+	}
++	while((skb = skb_dequeue(&ll->tx_wait_q)))
++		skb_queue_tail(&ll->txq, skb);
 +
-+	return ret;
++	ll->hcill_state = HCILL_AWAKE;
 +}
 +
-+static int brf_do_action(	__u16 brf_type, __u8 *brf_action,
-+				long brf_size, int fd,
-+				struct uart_t *u, struct termios *ti,
-+				int hcill_installed)
++/*
++ * Called upon a wake-up-indication from the device
++ */
++static void ll_device_want_to_wakeup(struct hci_uart *hu)
 +{
-+	int ret = 0;
++	unsigned long flags;
++	struct ll_struct *ll = hu->priv;
 +
-+	switch (brf_type) {
-+	case ACTION_SEND_COMMAND:
-+		DPRINTF("W");
-+		ret = brf_send_command(fd, (struct bts_action_send*) brf_action, brf_size, hcill_installed);
++	BT_DBG("hu %p", hu);
++
++	/* lock hcill state */
++	spin_lock_irqsave(&ll->hcill_lock, flags);
++
++	switch (ll->hcill_state) {
++	case HCILL_ASLEEP:
++		/* acknowledge device wake up */
++		if (send_hcill_cmd(HCILL_WAKE_UP_ACK, hu) < 0) {
++			BT_ERR("cannot acknowledge device wake up");
++			goto out;
++		}
 +		break;
-+	case ACTION_WAIT_EVENT:
-+		DPRINTF("R");
-+		break;
-+	case ACTION_SERIAL:
-+		DPRINTF("S");
-+		ret = brf_set_serial_params((struct bts_action_serial *) brf_action, fd, u, ti);
-+		break;
-+	case ACTION_DELAY:
-+		DPRINTF("D");
-+		brf_delay((struct bts_action_delay *) brf_action);
-+		break;
-+	case ACTION_REMARKS:
-+		DPRINTF("C");
++	case HCILL_ASLEEP_TO_AWAKE:
++		/*
++		 * this state means that a wake-up-indication
++		 * is already on its way to the device,
++		 * and will serve as the required wake-up-ack
++		 */
++		BT_DBG("dual wake-up-indication");
 +		break;
 +	default:
-+		fprintf(stderr, "brf_init: unknown firmware action type (%d)\n", brf_type);
++		/* any other state are illegal */
++		BT_ERR("received HCILL_WAKE_UP_IND in state %ld", ll->hcill_state);
 +		break;
 +	}
 +
-+	return ret;
++	/* send pending packets and change state to HCILL_AWAKE */
++	__ll_do_awake(ll);
++
++out:
++	spin_unlock_irqrestore(&ll->hcill_lock, flags);
++
++	/* actually send the packets */
++	hci_uart_tx_wakeup(hu);
 +}
 +
 +/*
-+ * tests whether a given brf action is a HCI_VS_Sleep_Mode_Configurations cmd
++ * Called upon a sleep-indication from the device
 + */
-+static int brf_action_is_deep_sleep(struct uart_t *u, __u8 *brf_action, long brf_size, __u16 brf_type)
++static void ll_device_want_to_sleep(struct hci_uart *hu)
 +{
-+	__u16 opcode;
++	unsigned long flags;
++	struct ll_struct *ll = hu->priv;
 +
-+	if (brf_type != ACTION_SEND_COMMAND)
-+		return 0;
++	BT_DBG("hu %p", hu);
 +
-+	if (brf_size < 3)
-+		return 0;
++	/* lock hcill state */
++	spin_lock_irqsave(&ll->hcill_lock, flags);
 +
-+	if (brf_action[0] != HCI_COMMAND_PKT)
-+		return 0;
++	/* sanity check */
++	if (ll->hcill_state != HCILL_AWAKE)
++		BT_ERR("ERR hcill: HCILL_GO_TO_SLEEP_IND in state %ld", ll->hcill_state);
 +
-+	/* HCI data is little endian */
-+	opcode = brf_action[1] | (brf_action[2] << 8);
++	/* acknowledge device sleep */
++	if (send_hcill_cmd(HCILL_GO_TO_SLEEP_ACK ,hu) < 0) {
++		BT_ERR("cannot acknowledge device sleep");
++		goto out;
++	}
 +
-+	if (opcode != u->device_param)
-+		return 0;
++	/* update state */
++	ll->hcill_state = HCILL_ASLEEP;
 +
-+	/* action is deep sleep configuration command ! */
-+	return 1;
++out:
++	spin_unlock_irqrestore(&ll->hcill_lock, flags);
++
++	/* actually send the sleep ack packet */
++	hci_uart_tx_wakeup(hu);
 +}
 +
 +/*
-+ * This function is called twice.
-+ * The first time it is called, it loads the brf script, and executes its
-+ * commands until it reaches a deep sleep command (or its end).
-+ * The second time it is called, it assumes HCILL protocol is set up,
-+ * and sends rest of brf script via the supplied socket.
++ * Called upon wake-up-acknowledgement from the device
 + */
-+int brf_do_script(int fd, struct uart_t *u, struct termios *ti, const char *bts_file)
++static void ll_device_woke_up(struct hci_uart *hu)
 +{
-+	int ret = 0,  hcill_installed = bts_file ? 0 : 1;
-+	__u32 vers;
-+	static FILE *brf_script_file = NULL;
-+	static __u8 brf_action[256];
-+	static long brf_size;
-+	static __u16 brf_type;
++	unsigned long flags;
++	struct ll_struct *ll = hu->priv;
 +
-+	/* is it the first time we are called ? */
-+	if (0 == hcill_installed) {
-+		DPRINTF("Sending script to serial device\n");
-+		brf_script_file = bts_load_script(bts_file, &vers );
-+		if (!brf_script_file) {
-+			fprintf(stderr, "Warning: cannot find BTS file: %s\n",
-+					bts_file);
-+			return 0;
++	BT_DBG("hu %p", hu);
++
++	/* lock hcill state */
++	spin_lock_irqsave(&ll->hcill_lock, flags);
++
++	/* sanity check */
++	if (ll->hcill_state != HCILL_ASLEEP_TO_AWAKE)
++		BT_ERR("received HCILL_WAKE_UP_ACK in state %ld", ll->hcill_state);
++
++	/* send pending packets and change state to HCILL_AWAKE */
++	__ll_do_awake(ll);
++
++	spin_unlock_irqrestore(&ll->hcill_lock, flags);
++
++	/* actually send the packets */
++	hci_uart_tx_wakeup(hu);
++}
++
++/* Enqueue frame for transmittion (padding, crc, etc) */
++/* may be called from two simultaneous tasklets */
++static int ll_enqueue(struct hci_uart *hu, struct sk_buff *skb)
++{
++	unsigned long flags = 0;
++	struct ll_struct *ll = hu->priv;
++
++	BT_DBG("hu %p skb %p", hu, skb);
++
++	/* Prepend skb with frame type */
++	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
++
++	/* lock hcill state */
++	spin_lock_irqsave(&ll->hcill_lock, flags);
++
++	/* act according to current state */
++	switch (ll->hcill_state) {
++	case HCILL_AWAKE:
++		BT_DBG("device awake, sending normally");
++		skb_queue_tail(&ll->txq, skb);
++		break;
++	case HCILL_ASLEEP:
++		BT_DBG("device asleep, waking up and queueing packet");
++		/* save packet for later */
++		skb_queue_tail(&ll->tx_wait_q, skb);
++		/* awake device */
++		if (send_hcill_cmd(HCILL_WAKE_UP_IND, hu) < 0) {
++			BT_ERR("cannot wake up device");
++			break;
++		}
++		ll->hcill_state = HCILL_ASLEEP_TO_AWAKE;
++		break;
++	case HCILL_ASLEEP_TO_AWAKE:
++		BT_DBG("device waking up, queueing packet");
++		/* transient state; just keep packet for later */
++		skb_queue_tail(&ll->tx_wait_q, skb);
++		break;
++	default:
++		BT_ERR("packet lost - device is in illegal state: %ld", ll->hcill_state);
++		kfree_skb(skb);
++		break;
++	}
++
++	spin_unlock_irqrestore(&ll->hcill_lock, flags);
++
++	return 0;
++}
++
++static inline int ll_check_data_len(struct ll_struct *ll, int len)
++{
++	register int room = skb_tailroom(ll->rx_skb);
++
++	BT_DBG("len %d room %d", len, room);
++
++	if (!len) {
++		hci_recv_frame(ll->rx_skb);
++	} else if (len > room) {
++		BT_ERR("Data length is too large");
++		kfree_skb(ll->rx_skb);
++	} else {
++		ll->rx_state = HCILL_W4_DATA;
++		ll->rx_count = len;
++		return len;
++	}
++
++	ll->rx_state = HCILL_W4_PACKET_TYPE;
++	ll->rx_skb   = NULL;
++	ll->rx_count = 0;
++
++	return 0;
++}
++
++/* Recv data */
++static int ll_recv(struct hci_uart *hu, void *data, int count)
++{
++	struct ll_struct *ll = hu->priv;
++	register char *ptr;
++	struct hci_event_hdr *eh;
++	struct hci_acl_hdr   *ah;
++	struct hci_sco_hdr   *sh;
++	register int len, type, dlen;
++
++	BT_DBG("hu %p count %d rx_state %ld rx_count %ld", hu, count, ll->rx_state, ll->rx_count);
++
++	ll_dbg_data(data, count);
++
++	ptr = data;
++	while (count) {
++		if (ll->rx_count) {
++			len = min_t(unsigned int, ll->rx_count, count);
++			memcpy(skb_put(ll->rx_skb, len), ptr, len);
++			ll->rx_count -= len; count -= len; ptr += len;
++
++			if (ll->rx_count)
++				continue;
++
++			switch (ll->rx_state) {
++			case HCILL_W4_DATA:
++				BT_DBG("Complete data");
++				hci_recv_frame(ll->rx_skb);
++
++				ll->rx_state = HCILL_W4_PACKET_TYPE;
++				ll->rx_skb = NULL;
++				continue;
++
++			case HCILL_W4_EVENT_HDR:
++				eh = (struct hci_event_hdr *) ll->rx_skb->data;
++
++				BT_DBG("Event header: evt 0x%2.2x plen %d", eh->evt, eh->plen);
++
++				ll_check_data_len(ll, eh->plen);
++				continue;
++
++			case HCILL_W4_ACL_HDR:
++				ah = (struct hci_acl_hdr *) ll->rx_skb->data;
++				dlen = __le16_to_cpu(ah->dlen);
++
++				BT_DBG("ACL header: dlen %d", dlen);
++
++				ll_check_data_len(ll, dlen);
++				continue;
++
++			case HCILL_W4_SCO_HDR:
++				sh = (struct hci_sco_hdr *) ll->rx_skb->data;
++
++				BT_DBG("SCO header: dlen %d", sh->dlen);
++
++				ll_check_data_len(ll, sh->dlen);
++				continue;
++			}
 +		}
 +
-+		fprintf( stderr, "Loaded BTS script version %u\n", vers );
-+
-+		brf_size = bts_fetch_action(	brf_script_file,
-+						brf_action,
-+						sizeof(brf_action),
-+						&brf_type );
-+		if (brf_size == 0) {
-+			fprintf(stderr, "Warning: BTS file is empty !");
-+			return 0;
-+		}
-+	}
-+	else {
-+		DPRINTF("Sending script to bluetooth socket\n");
-+	}
-+
-+	/* execute current action and continue to parse brf script file */
-+	while (brf_size != 0) {
-+		ret = brf_do_action(	brf_type, brf_action, brf_size,
-+					fd, u, ti, hcill_installed);
-+		if (ret == -1)
++		/* HCILL_W4_PACKET_TYPE */
++		switch (*ptr) {
++		case HCI_EVENT_PKT:
++			BT_DBG("Event packet");
++			ll->rx_state = HCILL_W4_EVENT_HDR;
++			ll->rx_count = HCI_EVENT_HDR_SIZE;
++			type = HCI_EVENT_PKT;
 +			break;
 +
-+		brf_size = bts_fetch_action(	brf_script_file,
-+						brf_action,
-+						sizeof(brf_action),
-+						&brf_type );
++		case HCI_ACLDATA_PKT:
++			BT_DBG("ACL packet");
++			ll->rx_state = HCILL_W4_ACL_HDR;
++			ll->rx_count = HCI_ACL_HDR_SIZE;
++			type = HCI_ACLDATA_PKT;
++			break;
 +
-+		/* if this is the first time we run (no HCILL yet) */
-+		/* and a deep sleep command is encountered */
-+		/* we exit */
-+		if (	0 == hcill_installed &&
-+			brf_action_is_deep_sleep(u, brf_action,
-+						brf_size, brf_type))
++		case HCI_SCODATA_PKT:
++			BT_DBG("SCO packet");
++			ll->rx_state = HCILL_W4_SCO_HDR;
++			ll->rx_count = HCI_SCO_HDR_SIZE;
++			type = HCI_SCODATA_PKT;
++			break;
++
++		/* HCILL signals */
++		case HCILL_GO_TO_SLEEP_IND:
++			BT_DBG("HCILL_GO_TO_SLEEP_IND packet");
++			ll_device_want_to_sleep(hu);
++			ptr++; count--;
++			continue;
++
++		case HCILL_GO_TO_SLEEP_ACK:
++			/* shouldn't happen */
++			BT_ERR("received HCILL_GO_TO_SLEEP_ACK (in state %ld)", ll->hcill_state);
++			ptr++; count--;
++			continue;
++
++		case HCILL_WAKE_UP_IND:
++			BT_DBG("HCILL_WAKE_UP_IND packet");
++			ll_device_want_to_wakeup(hu);
++			ptr++; count--;
++			continue;
++
++		case HCILL_WAKE_UP_ACK:
++			BT_DBG("HCILL_WAKE_UP_ACK packet");
++			ll_device_woke_up(hu);
++			ptr++; count--;
++			continue;
++
++		default:
++			BT_ERR("Unknown HCI packet type %2.2x", (__u8)*ptr);
++			hu->hdev->stat.err_rx++;
++			ptr++; count--;
++			continue;
++		};
++
++		ptr++; count--;
++
++		/* Allocate packet */
++		ll->rx_skb = bt_skb_alloc(HCI_MAX_FRAME_SIZE, GFP_ATOMIC);
++		if (!ll->rx_skb) {
++			BT_ERR("Can't allocate mem for new packet");
++			ll->rx_state = HCILL_W4_PACKET_TYPE;
++			ll->rx_count = 0;
 +			return 0;
++		}
++
++		ll->rx_skb->dev = (void *) hu->hdev;
++		bt_cb(ll->rx_skb)->pkt_type = type;
 +	}
 +
-+	bts_unload_script(brf_script_file);
-+	brf_script_file = NULL;
-+	DPRINTF("\n");
-+
-+	return ret;
++	return count;
 +}
-diff --git a/tools/hciattach_ti.h b/tools/hciattach_ti.h
++
++static struct sk_buff *ll_dequeue(struct hci_uart *hu)
++{
++	struct ll_struct *ll = hu->priv;
++	return skb_dequeue(&ll->txq);
++}
++
++static struct hci_uart_proto llp = {
++	.id		= HCI_UART_LL,
++	.open		= ll_open,
++	.close		= ll_close,
++	.recv		= ll_recv,
++	.enqueue	= ll_enqueue,
++	.dequeue	= ll_dequeue,
++	.flush		= ll_flush,
++};
++
++int ll_init(void)
++{
++	int err = hci_uart_register_proto(&llp);
++
++	if (!err)
++		BT_INFO("HCILL protocol initialized");
++	else
++		BT_ERR("HCILL protocol registration failed");
++
++	return err;
++}
++
++int ll_deinit(void)
++{
++	return hci_uart_unregister_proto(&llp);
++}
+diff --git a/drivers/bluetooth/hci_ll.h b/drivers/bluetooth/hci_ll.h
 new file mode 100644
-index 0000000..8836bbc
+index 0000000..47d4a14
 --- /dev/null
-+++ b/tools/hciattach_ti.h
-@@ -0,0 +1,107 @@
++++ b/drivers/bluetooth/hci_ll.h
+@@ -0,0 +1,81 @@
 +/*
-+ *  BlueZ - Bluetooth protocol stack for Linux
++ *  Texas Instruments' Bluetooth HCILL UART protocol
 + *
-+ *  required procedures for initializing TI's BRF chips.
++ *  HCILL (HCI Low Level) is a Texas Instruments' run-time
++ *  power management extension to H4.
 + *
 + *  Copyright (C) 2007 Texas Instruments, Inc.
 + *
 + *  Written by Ohad Ben-Cohen <ohad@bencohen.org>
 + *
-+ *  This program is free software; you can redistribute it and/or modify it
-+ *  under the terms of the GNU General Public License version 2 as published by
-+ *  the Free Software Foundation.
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License version 2
++ *  as published by the Free Software Foundation
 + *
 + *  This program is distributed in the hope that it will be useful,
 + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -928,92 +631,101 @@ index 0000000..8836bbc
 + *
 + *  You should have received a copy of the GNU General Public License
 + *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 + *
 + */
++#ifndef __BLUETOOTH_HCI_LL_H
++#define __BLUETOOTH_HCI_LL_H
 +
-+#ifndef __HCIATTACH_TI_H
-+#define __HCIATTACH_TI_H
++#ifdef CONFIG_BT_HCILL_DEBUG
++/* useful at times albeit a little ugly */
++static inline void ll_dbg_data(void *data, int count)
++{
++	int i;
++	char buf[256] = {0};
 +
-+#include <linux/types.h>
-+#include <unistd.h>
-+#include <termios.h>
++	for (i = 0; i < count && i < (sizeof(buf) - 1); i++)
++		sprintf(buf + i * 3, "%2.2x ", ((unsigned char *) data)[i]);
 +
-+#include "hciattach.h"
-+
-+#ifndef MAKEWORD
-+#define MAKEWORD(a, b)      ((__u16)(((__u8)(a)) | ((__u16)((__u8)(b))) << 8))
++	BT_DBG("%s", buf);
++}
++#else
++static inline void ll_dbg_data(void *data, int count) {}
++#undef  BT_DBG
++#define BT_DBG( A... )
 +#endif
 +
-+#define TI_MANUFACTURER_ID		13
++/* HCILL commands */
++#define HCILL_GO_TO_SLEEP_IND	0x30
++#define HCILL_GO_TO_SLEEP_ACK	0x31
++#define HCILL_WAKE_UP_IND	0x32
++#define HCILL_WAKE_UP_ACK	0x33
 +
-+#define FIRMWARE_DIRECTORY 		"/lib/firmware/"
++/* HCILL receiver States */
++#define HCILL_W4_PACKET_TYPE	0
++#define HCILL_W4_EVENT_HDR	1
++#define HCILL_W4_ACL_HDR	2
++#define HCILL_W4_SCO_HDR	3
++#define HCILL_W4_DATA		4
 +
-+#define ACTION_SEND_COMMAND		1
-+#define ACTION_WAIT_EVENT		2
-+#define ACTION_SERIAL			3
-+#define ACTION_DELAY			4
-+#define ACTION_RUN_SCRIPT		5
-+#define ACTION_REMARKS			6
++/* HCILL states */
++enum hcill_states_e {
++	HCILL_ASLEEP,
++	HCILL_ASLEEP_TO_AWAKE,
++	HCILL_AWAKE,
++	HCILL_AWAKE_TO_ASLEEP
++};
 +
-+#define BRF_DEEP_SLEEP_OPCODE_BYTE_1 	0x0c
-+#define BRF_DEEP_SLEEP_OPCODE_BYTE_2 	0xfd
-+#define BRF_DEEP_SLEEP_OPCODE		\
-+	(BRF_DEEP_SLEEP_OPCODE_BYTE_1 |(BRF_DEEP_SLEEP_OPCODE_BYTE_2 << 8))
++struct hcill_cmd {
++	u8	cmd;
++} __attribute__((packed));
 +
-+#define FILE_HEADER_MAGIC   		0x42535442
++struct ll_struct {
++	unsigned long rx_state;
++	unsigned long rx_count;
++	struct sk_buff *rx_skb;
++	struct sk_buff_head txq;
++	spinlock_t hcill_lock;		/* HCILL state lock	*/
++	unsigned long hcill_state;	/* HCILL power state	*/
++	struct sk_buff_head tx_wait_q;	/* HCILL wait queue	*/
++};
 +
-+/*
-+ * BRF Firmware header
-+ */
-+struct bts_header {
-+	__u32	magic;
-+	__u32	version;
-+	__u8	future[24];
-+	__u8	actions[0];
-+}__attribute__ ((packed));
++#endif /* __BLUETOOTH_HCI_UART_H */
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index b250e67..30f9f29 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -28,16 +28,18 @@
+ #endif
+ 
+ /* Ioctls */
+-#define HCIUARTSETPROTO	_IOW('U', 200, int)
+-#define HCIUARTGETPROTO	_IOR('U', 201, int)
++#define HCIUARTSETPROTO		_IOW('U', 200, int)
++#define HCIUARTGETPROTO		_IOR('U', 201, int)
++#define HCIUARTGETDEVICE	_IOR('U', 202, int)
+ 
+ /* UART protocols */
+-#define HCI_UART_MAX_PROTO	4
++#define HCI_UART_MAX_PROTO	5
+ 
+ #define HCI_UART_H4	0
+ #define HCI_UART_BCSP	1
+ #define HCI_UART_3WIRE	2
+ #define HCI_UART_H4DS	3
++#define HCI_UART_LL	4
+ 
+ struct hci_uart;
+ 
+@@ -84,3 +86,9 @@ int h4_deinit(void);
+ int bcsp_init(void);
+ int bcsp_deinit(void);
+ #endif
 +
-+/*
-+ * BRF Actions structure
-+ */
-+struct bts_action {
-+	__u16	type;
-+	__u16	size;
-+	__u8	data[0];
-+} __attribute__ ((packed));
++#ifdef CONFIG_BT_HCIUART_LL
++int ll_init(void);
++int ll_deinit(void);
++#endif
 +
-+struct bts_action_send
-+{
-+	__u8 data[0];
-+} __attribute__ ((packed));
-+
-+struct bts_action_wait
-+{
-+	__u32 msec;
-+	__u32 size;
-+	__u8 data[0];
-+}__attribute__ ((packed));
-+
-+struct bts_action_delay
-+{
-+	__u32 msec;
-+}__attribute__ ((packed));
-+
-+struct bts_action_serial
-+{
-+	__u32 baud;
-+	__u32 flow_control;
-+}__attribute__ ((packed));
-+
-+FILE *bts_load_script(const char* file_name, __u32* version);
-+unsigned long bts_fetch_action( FILE* fp, unsigned char* action_buf,
-+				unsigned long buf_size, __u16* action_type);
-+void bts_unload_script(FILE* fp);
-+const char * get_firmware_name(const __u8* respond);
-+int brf_do_script(	int fd, struct uart_t *u, struct termios *ti,
-+			const char *bts_file);
-+int is_it_texas(const __u8* respond);
-+
-+#endif /* __HCIATTACH_TI_H */
 -- 
 1.5.0.6
