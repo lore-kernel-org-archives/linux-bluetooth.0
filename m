@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <463755ED.6080205@gmx.net>
-Date: Tue, 01 May 2007 23:59:57 +0900
-From: Harald Kubota <hkubota@gmx.net>
-MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <20070430050627.1445.qmail@web37915.mail.mud.yahoo.com>
-In-Reply-To: <20070430050627.1445.qmail@web37915.mail.mud.yahoo.com>
-Subject: Re: [Bluez-users] Sony PS3 remote on PS3
+From: Sean <sean@mailcan.com>
+To: Bluez-users <bluez-users@lists.sourceforge.net>
+Date: Tue, 01 May 2007 14:46:20 -0700
+Message-Id: <1178055980.6346.7.camel@bridgetek.localhost>
+Mime-Version: 1.0
+Subject: [Bluez-users] headsetd input distorted and high pitch
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,14 +18,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Anand Karimpuzha wrote:
-> I have been trying to get the Sony PS3 remote working with bluetooth 
-> and evdev, and so far I have been successful in getting it paired.
+Hello,
+  I recently compiled a new 2.6.20 kernel with the sco-flowcontrol-v4.1
+patch and am attempting to get headsetd working correctly.   Using aplay
+and arecord, I can play and record sound.  However the recorded sound is
+very distorted and high pitched.  Playback is fine.  To double check
+things, I compiled and installed btsco and the snd_bt_sco kernel module
+and using this method the recorded sound is normal.  I would prefer to
+use headsetd as btsco causes occasional kernel panics for me and also
+like the fact that it is a userspace program.
 
-Whoa! What is the PIN to use? I tried to do the same, but without pin 
-it's kind'a difficult to pair.
+  Can anyone provide some guidance in troubleshooting this?  
 
-Harald
+PS. I tried to search the mail archives, but sourceforge keeps timing
+out :|
+
+Thanks,
+- Sean
 
 
 -------------------------------------------------------------------------
