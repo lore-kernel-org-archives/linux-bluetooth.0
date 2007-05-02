@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 2 May 2007 06:35:21 -0700 (PDT)
-From: Anand Karimpuzha <fanofanne@yahoo.com>
+Date: Wed, 2 May 2007 10:52:58 +0100
+From: Peter Stephenson <pws@csr.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Message-ID: <263463.70441.qm@web37905.mail.mud.yahoo.com>
-Subject: Re: [Bluez-users] Sony PS3 remote on PS3
+Message-Id: <20070502105258.18bf397b.pws@csr.com>
+In-Reply-To: <be976db60705011301r50289c43hc117c35deae39dc9@mail.gmail.com>
+References: <be976db60705011301r50289c43hc117c35deae39dc9@mail.gmail.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] signal strength, link quality and transmit power
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,45 +16,71 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1726498661=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1726498661==
-Content-Type: multipart/alternative; boundary="0-350340915-1178112921=:70441"
+"Mark S. Townsley" <mstownsley@gmail.com> wrote:
+> I am trying to interpret the values return from reading a connection's
+> signal strength, link quality and transmit power.
 
---0-350340915-1178112921=:70441
-Content-Type: text/plain; charset=ascii
+These are all determined in the device, so you may get a different
+range of results from different manufacturers.
 
-No pin required. 
+Signal strength is output power received locally from a remote device
+(see note below).
 
-I am using ubuntu feisty and the associated bluez packages (with the latest ps3 kernel from git)
+Link quality is some estimate (it's allowed to be anything) to tell you
+how successfully data is getting through.  CSR has always used bit
+error rates for the estimate; this is very common.  We don't
+*guarantee* anything more than a higher number means we think the link
+is better.  However, it turns out that up to now we've always done it
+the same way and Marcel has a table at
+http://www.holtmann.org/linux/bluetooth/csr.html to convert to actual
+bit error rate.
 
-hidd --search lets me connect to the sony bd remote (holding start+enter for 5 seconds). I am able to see that key presses result in hex events in hcidump.
+I'm not sure where you're getting the information on transmit power
+from, but in most contexts it refers to the power at which the local
+station is sending, probably in dBm (see below).  Hence it tells you
+how loudly the device you have thinks it needs to shout to be heard.
+(In fact, on devices where the transmit power changes, this is
+signalled from the far end, which measures its own RSSI and requests
+the originator to increase or decrease power.)
 
-bthid seems to let me translate key presses better than hid, I am still trying to figure out the right translation sequence.
+> For example, I would sometimes get rssi values in the negative.  What
+> does that mean?
 
-Thats where I am at.  Maybe someone can help tell me if this is the right direction.
+Normally, RSSI values are measured in dBm; this is a logarithmic scale
+such that 1 mW of power is 0 dBm, while 10 mW is 10 dBm and 0.1 mW is
+-10 dBm, etc.  (Try going into a shop and asking for a 50 dBm light
+bulb.)
 
-I'd like to get this working with lirc (which apparently can listen to an event interface) if possible.
+However, you need to be cautious in interpreting RSSI values if you're
+getting the usual status read out supplied over HCI: it doesn't
+tell you the *actual* RSSI, it tells you how much above or below the
+"golden range", i.e. the preferred range of "good" signals, the value
+is. So it's not actually in dBm; a negative value indicates it's so
+many dB's "too quiet" for the chip to be happy, and a positive value so
+many dB's "too loud".
 
-Anand
+RSSIs from inquiry results (rather than as reported during connections)
+are in straight dBm, on the other hand.
 
------ Original Message ----
-From: Harald Kubota <hkubota@gmx.net>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Sent: Tuesday, May 1, 2007 9:59:57 AM
-Subject: Re: [Bluez-users] Sony PS3 remote on PS3
+> And in general, are higher values on these parameters indicate a
+> better connection quality?
 
-Anand Karimpuzha wrote:
-> I have been trying to get the Sony PS3 remote working with bluetooth 
-> and evdev, and so far I have been successful in getting it paired.
+For the first two, broadly yes.  What *exactly* they're telling you
+is a more complicated matter.
 
-Whoa! What is the PIN to use? I tried to do the same, but without pin 
-it's kind'a difficult to pair.
+-- 
+Peter Stephenson <pws@csr.com>                  Software Engineer
+CSR PLC, Churchill House, Cambridge Business Park, Cowley Road
+Cambridge, CB4 0WZ, UK                          Tel: +44 (0)1223 692070
 
-Harald
 
+To access the latest news from CSR copy this link into a web browser:  http://www.csr.com/email_sig.php
+
+To get further information regarding CSR, please visit our Investor Relations page at http://ir.csr.com/csr/about/overview
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
@@ -63,49 +91,3 @@ _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
-
-
-
-
-
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
---0-350340915-1178112921=:70441
-Content-Type: text/html; charset=ascii
-
-<html><head><style type="text/css"><!-- DIV {margin:0px;} --></style></head><body><div style="font-family:times new roman, new york, times, serif;font-size:12pt"><div style="font-family: times new roman,new york,times,serif; font-size: 12pt;">No pin required. <br><br>I am using ubuntu feisty and the associated bluez packages (with the latest ps3 kernel from git)<br><br>hidd --search lets me connect to the sony bd remote (holding start+enter for 5 seconds). I am able to see that key presses result in hex events in hcidump.<br><br>bthid seems to let me translate key presses better than hid, I am still trying to figure out the right translation sequence.<br><br>Thats where I am at.&nbsp; Maybe someone can help tell me if this is the right direction.<br><br>I'd like to get this working with lirc (which apparently can listen to an event interface) if possible.<br><br>Anand<br><br><div style="font-family: times new roman,new york,times,serif; font-size: 12pt;">----- Original
- Message ----<br>From: Harald Kubota &lt;hkubota@gmx.net&gt;<br>To: BlueZ users &lt;bluez-users@lists.sourceforge.net&gt;<br>Sent: Tuesday, May 1, 2007 9:59:57 AM<br>Subject: Re: [Bluez-users] Sony PS3 remote on PS3<br><br><div>Anand Karimpuzha wrote:<br>&gt; I have been trying to get the Sony PS3 remote working with bluetooth <br>&gt; and evdev, and so far I have been successful in getting it paired.<br><br>Whoa! What is the PIN to use? I tried to do the same, but without pin <br>it's kind'a difficult to pair.<br><br>Harald<br><br><br>-------------------------------------------------------------------------<br>This SF.net email is sponsored by DB2 Express<br>Download DB2 Express C - the FREE version of DB2 express and take<br>control of your XML. No limits. Just data. Click to get it now.<br><a target="_blank" href="http://sourceforge.net/powerbar/db2/">http://sourceforge.net/powerbar/db2/</a><br>_______________________________________________<br>Bluez-users mailing
- list<br>Bluez-users@lists.sourceforge.net<br><a target="_blank" href="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></div></div><br></div></div><br>
-
-      <hr size=1>Ahhh...imagining that irresistible "new car" smell?<br> Check out
-<a href="http://us.rd.yahoo.com/evt=48245/*http://autos.yahoo.com/new_cars.html;_ylc=X3oDMTE1YW1jcXJ2BF9TAzk3MTA3MDc2BHNlYwNtYWlsdGFncwRzbGsDbmV3LWNhcnM-">new cars at Yahoo! Autos.</a>
-</body></html>
---0-350340915-1178112921=:70441--
-
-
---===============1726498661==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
---===============1726498661==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1726498661==--
