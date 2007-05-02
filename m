@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <cd3ff4f20705022352u3451a87eub2e03a33f7bcf535@mail.gmail.com>
-Date: Thu, 3 May 2007 10:52:48 +0400
-From: heecks <heecks@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Date: Wed, 2 May 2007 06:35:21 -0700 (PDT)
+From: Anand Karimpuzha <fanofanne@yahoo.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] Device not detected (HP nx9420 / Kubuntu Feisty)
+Message-ID: <263463.70441.qm@web37905.mail.mud.yahoo.com>
+Subject: Re: [Bluez-users] Sony PS3 remote on PS3
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,82 +14,45 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1726498661=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+--===============1726498661==
+Content-Type: multipart/alternative; boundary="0-350340915-1178112921=:70441"
 
-I can't see my bluetooth device on my HP nx9420 laptop with Kubuntu
-Feisty 7.04. Everything works well under Windows.
+--0-350340915-1178112921=:70441
+Content-Type: text/plain; charset=ascii
 
-Here are some informations :
+No pin required. 
 
-xav@xav-laptop:/$ uname -a
-Linux xav-laptop 2.6.20-15-generic #2 SMP Sun Apr 15 07:36:31 UTC 2007
-i686 GNU/Linux
+I am using ubuntu feisty and the associated bluez packages (with the latest ps3 kernel from git)
 
-xav@xav-laptop:/$ hciconfig -a
+hidd --search lets me connect to the sony bd remote (holding start+enter for 5 seconds). I am able to see that key presses result in hex events in hcidump.
 
-xav@xav-laptop:/$ hcitool scan
-Device is not available: No such device
+bthid seems to let me translate key presses better than hid, I am still trying to figure out the right translation sequence.
 
-xav@xav-laptop:/$ hcitool inq
-Inquiring ...
-Inquiry failed.: No such device
+Thats where I am at.  Maybe someone can help tell me if this is the right direction.
 
-xav@xav-laptop:/$ hcitool dev
-Devices:
+I'd like to get this working with lirc (which apparently can listen to an event interface) if possible.
 
-xav@xav-laptop:/$ lsusb
-Bus 002 Device 001: ID 0000:0000
-Bus 003 Device 002: ID 1267:0210 Logic3 / SpectraVideo plc
-Bus 003 Device 001: ID 0000:0000
-Bus 005 Device 001: ID 0000:0000
-Bus 004 Device 001: ID 0000:0000
-Bus 001 Device 001: ID 0000:0000
+Anand
 
-xav@xav-laptop:/$ lspci | grep USB
-00:1d.0 USB Controller: Intel Corporation 82801G (ICH7 Family) USB
-UHCI #1 (rev 01)
-00:1d.1 USB Controller: Intel Corporation 82801G (ICH7 Family) USB
-UHCI #2 (rev 01)
-00:1d.2 USB Controller: Intel Corporation 82801G (ICH7 Family) USB
-UHCI #3 (rev 01)
-00:1d.3 USB Controller: Intel Corporation 82801G (ICH7 Family) USB
-UHCI #4 (rev 01)
-00:1d.7 USB Controller: Intel Corporation 82801G (ICH7 Family) USB2
-EHCI Controller (rev 01)
+----- Original Message ----
+From: Harald Kubota <hkubota@gmx.net>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Sent: Tuesday, May 1, 2007 9:59:57 AM
+Subject: Re: [Bluez-users] Sony PS3 remote on PS3
 
-xav@xav-laptop:/$ lsmod | egrep "hci|blue"
-bluetooth              55908  4 rfcomm,l2cap
-sdhci                  18700  0
-mmc_core               26756  1 sdhci
-ahci                   22020  3
-libata                125720  3 ata_piix,ata_generic,ahci
-uhci_hcd               25360  0
-ohci1394               36528  0
-ieee1394              299448  2 sbp2,ohci1394
-ehci_hcd               34188  0
-usbcore               134280  4 usbhid,uhci_hcd,ehci_hcd
+Anand Karimpuzha wrote:
+> I have been trying to get the Sony PS3 remote working with bluetooth 
+> and evdev, and so far I have been successful in getting it paired.
 
-xav@xav-laptop:/$ dmesg | grep Blue
-[   45.348000] Bluetooth: Core ver 2.11
-[   45.348000] Bluetooth: HCI device and connection manager initialized
-[   45.348000] Bluetooth: HCI socket layer initialized
-[   45.528000] Bluetooth: L2CAP ver 2.8
-[   45.528000] Bluetooth: L2CAP socket layer initialized
-[   45.584000] Bluetooth: RFCOMM socket layer initialized
-[   45.584000] Bluetooth: RFCOMM TTY layer initialized
-[   45.584000] Bluetooth: RFCOMM ver 1.8
+Whoa! What is the PIN to use? I tried to do the same, but without pin 
+it's kind'a difficult to pair.
 
+Harald
 
-I'm stucked here... What can I do ?
-
-Thank you for your time.
-Regards.
---
-Xavier
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
@@ -100,3 +63,49 @@ _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+
+
+
+
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
+--0-350340915-1178112921=:70441
+Content-Type: text/html; charset=ascii
+
+<html><head><style type="text/css"><!-- DIV {margin:0px;} --></style></head><body><div style="font-family:times new roman, new york, times, serif;font-size:12pt"><div style="font-family: times new roman,new york,times,serif; font-size: 12pt;">No pin required. <br><br>I am using ubuntu feisty and the associated bluez packages (with the latest ps3 kernel from git)<br><br>hidd --search lets me connect to the sony bd remote (holding start+enter for 5 seconds). I am able to see that key presses result in hex events in hcidump.<br><br>bthid seems to let me translate key presses better than hid, I am still trying to figure out the right translation sequence.<br><br>Thats where I am at.&nbsp; Maybe someone can help tell me if this is the right direction.<br><br>I'd like to get this working with lirc (which apparently can listen to an event interface) if possible.<br><br>Anand<br><br><div style="font-family: times new roman,new york,times,serif; font-size: 12pt;">----- Original
+ Message ----<br>From: Harald Kubota &lt;hkubota@gmx.net&gt;<br>To: BlueZ users &lt;bluez-users@lists.sourceforge.net&gt;<br>Sent: Tuesday, May 1, 2007 9:59:57 AM<br>Subject: Re: [Bluez-users] Sony PS3 remote on PS3<br><br><div>Anand Karimpuzha wrote:<br>&gt; I have been trying to get the Sony PS3 remote working with bluetooth <br>&gt; and evdev, and so far I have been successful in getting it paired.<br><br>Whoa! What is the PIN to use? I tried to do the same, but without pin <br>it's kind'a difficult to pair.<br><br>Harald<br><br><br>-------------------------------------------------------------------------<br>This SF.net email is sponsored by DB2 Express<br>Download DB2 Express C - the FREE version of DB2 express and take<br>control of your XML. No limits. Just data. Click to get it now.<br><a target="_blank" href="http://sourceforge.net/powerbar/db2/">http://sourceforge.net/powerbar/db2/</a><br>_______________________________________________<br>Bluez-users mailing
+ list<br>Bluez-users@lists.sourceforge.net<br><a target="_blank" href="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></div></div><br></div></div><br>
+
+      <hr size=1>Ahhh...imagining that irresistible "new car" smell?<br> Check out
+<a href="http://us.rd.yahoo.com/evt=48245/*http://autos.yahoo.com/new_cars.html;_ylc=X3oDMTE1YW1jcXJ2BF9TAzk3MTA3MDc2BHNlYwNtYWlsdGFncwRzbGsDbmV3LWNhcnM-">new cars at Yahoo! Autos.</a>
+</body></html>
+--0-350340915-1178112921=:70441--
+
+
+--===============1726498661==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+--===============1726498661==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1726498661==--
