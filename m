@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Thu, 3 May 2007 15:24:06 +1000
-References: <001501c78d3c$dd4f3ba0$9d0cc70a@dlh.st.com>
-	<200705031500.06707.denis.kenzior@trolltech.com>
-	<1178169412.6891.36.camel@violet>
-In-Reply-To: <1178169412.6891.36.camel@violet>
+From: Mayank BATRA <mayank.batra@st.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Thu, 3 May 2007 10:53:55 +0530
+Message-ID: <001601c78d43$3f03d710$9d0cc70a@dlh.st.com>
 MIME-Version: 1.0
-Message-Id: <200705031524.10794.denis.kenzior@trolltech.com>
+In-Reply-To: <1178169412.6891.36.camel@violet>
 Subject: Re: [Bluez-devel] Esco implementation patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,26 +19,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel,
+Hi Marcel,
 
-> don't worry about packet types. This is the link managers job. Enable as
-> much packet types as possible.
+On Thursday, May 03, 2007 10:47 AM +0530, Marcel Holtmann wrote:
+>>> How about the 2-EV* and 3-EV* packet types? The spec says that a 0
+>>> for these bits means they have been enabled. Shouldn't you also
+>>> check for their support in the feature mask?
+>> 
+>> Good question.  I'm not entirely sure of this, however I did not
+>> interpret the specification in this manner.  All it says is that
+>> there is a specific feature mask to disable 2-EV and 3-EV packets. 
+>> There is nothing to say whether or not they are explicitly enabled. 
+>> Also the examples in the specification use the esco feature masks in
+>> the same manner as I do.  So I would assume that if EV3 support is
+>> not enabled, then 2-EV3 and 3-EV3 packets will not be used by the
+>> controller as well.  However, I could be wrong. 
+> 
+> don't worry about packet types. This is the link managers job. Enable
+> as much packet types as possible.
 
-OK, that is what I thought as well.
-
->
-> No. It is the difference between using Accept Connection Request or
-> Accept Synchronous Connection Request. In the first case it has to fall
-> back to SCO since it has no further information on how to negotiate an
-> eSCO link.
-
-This is strange, because I would send an accept_sync_conn, get a 
-sync_conn_complete_event and the link_type would be 0x0 (SCO) when connecting 
-to an unpatched BlueZ box.  Again, I imagine more testing is required.
+But you'll fall into trouble if the local controller does not support
+the packet type that you've enabled.
+In Denis' case it worked because the device supported the 2-EV* and
+3-EV* packet types and he "accidentaly" enabled them.
+Why not check their support in the feature mask as well?
 
 Regards,
 
--Denis
+Mayank
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
