@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200705031500.06707.denis.kenzior@trolltech.com>
+Date: Thu, 3 May 2007 15:00:05 +1000
 References: <001501c78d3c$dd4f3ba0$9d0cc70a@dlh.st.com>
-	<200705031500.06707.denis.kenzior@trolltech.com>
-Date: Thu, 03 May 2007 07:16:52 +0200
-Message-Id: <1178169412.6891.36.camel@violet>
-Mime-Version: 1.0
+In-Reply-To: <001501c78d3c$dd4f3ba0$9d0cc70a@dlh.st.com>
+MIME-Version: 1.0
+Message-Id: <200705031500.06707.denis.kenzior@trolltech.com>
 Subject: Re: [Bluez-devel] Esco implementation patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,47 +20,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Mayank,
 
-> > How about the 2-EV* and 3-EV* packet types? The spec says that a 0 for
-> > these bits means they have been enabled. Shouldn't you also check for their
-> > support in the feature mask?
-> 
-> Good question.  I'm not entirely sure of this, however I did not interpret the 
-> specification in this manner.  All it says is that there is a specific 
-> feature mask to disable 2-EV and 3-EV packets.  There is nothing to say 
-> whether or not they are explicitly enabled.  Also the examples in the 
-> specification use the esco feature masks in the same manner as I do.  So I 
-> would assume that if EV3 support is not enabled, then 2-EV3 and 3-EV3 packets 
-> will not be used by the controller as well.  However, I could be wrong.
+> How about the 2-EV* and 3-EV* packet types? The spec says that a 0 for
+> these bits means they have been enabled. Shouldn't you also check for their
+> support in the feature mask?
 
-don't worry about packet types. This is the link managers job. Enable as
-much packet types as possible.
+Good question.  I'm not entirely sure of this, however I did not interpret the 
+specification in this manner.  All it says is that there is a specific 
+feature mask to disable 2-EV and 3-EV packets.  There is nothing to say 
+whether or not they are explicitly enabled.  Also the examples in the 
+specification use the esco feature masks in the same manner as I do.  So I 
+would assume that if EV3 support is not enabled, then 2-EV3 and 3-EV3 packets 
+will not be used by the controller as well.  However, I could be wrong.
 
-> > > I've tested it on several machines here, including eSco->eSco
-> > > connection, eSco->sco connection for both incoming and outgoing
-> > > scenarios, everything seems fine, however I'm sure more testing is
-> > > required.
-> >
-> > How did you mangage to set up an eSCO since you are using only HV* packet
-> > types (ESCO_PTYPE_MASK)? Or is it because the 2-EV* and 3-EV* bits are "0"
-> > thus the controller thinks you want to enable those packet types?
-> 
-> Well, it comes down to what the controller labels as an eSCO connection.  E.g. 
-> the link_type returned in the connection complete and sync connection 
-> complete events.  Doing BlueZ<->BlueZ which both use the patch, I get 
-> link_type of eSCO.  Doing BlueZ<->BlueZ with one end not using the patch, I 
-> get a link_type of SCO.  Perhaps it is the particular hardware I'm using?
+>
+> > I've tested it on several machines here, including eSco->eSco
+> > connection, eSco->sco connection for both incoming and outgoing
+> > scenarios, everything seems fine, however I'm sure more testing is
+> > required.
+>
+> How did you mangage to set up an eSCO since you are using only HV* packet
+> types (ESCO_PTYPE_MASK)? Or is it because the 2-EV* and 3-EV* bits are "0"
+> thus the controller thinks you want to enable those packet types?
 
-No. It is the difference between using Accept Connection Request or
-Accept Synchronous Connection Request. In the first case it has to fall
-back to SCO since it has no further information on how to negotiate an
-eSCO link.
+Well, it comes down to what the controller labels as an eSCO connection.  E.g. 
+the link_type returned in the connection complete and sync connection 
+complete events.  Doing BlueZ<->BlueZ which both use the patch, I get 
+link_type of eSCO.  Doing BlueZ<->BlueZ with one end not using the patch, I 
+get a link_type of SCO.  Perhaps it is the particular hardware I'm using?
 
-Regards
+Setup is a STLC2500 serial device connected to a BT1.2 USB dongle on a 
+non-patched kernel and a BT 2.0 USB dongle on a patched kernel.
 
-Marcel
-
+Regards,
+-Denis
 
 
 -------------------------------------------------------------------------
