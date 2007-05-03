@@ -1,14 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1178213140.2227.22.camel@hammer.suse.cz>
-References: <1177946201.5443.59.camel@hammer.suse.cz>
-	<200704302138.18170.dgollub@suse.de>
-	<1178213140.2227.22.camel@hammer.suse.cz>
-Date: Fri, 04 May 2007 00:32:17 +0100
-Message-Id: <1178235137.3158.177.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bluez-gnome: No GUI way to switch from "off" mode
+Message-ID: <fc27e74b0705031417r13305045h801e45018334eda7@mail.gmail.com>
+Date: Fri, 4 May 2007 02:47:15 +0530
+From: "list subscribe" <develnewbie@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1177704604.14980.138.camel@aeonflux.holtmann.net>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_38605_10864635.1178227035508"
+References: <fc27e74b0704251424k32e3173eud439d5edeb64f148@mail.gmail.com>
+	<1177538646.14980.26.camel@aeonflux.holtmann.net>
+	<1177702819.14980.136.camel@aeonflux.holtmann.net>
+	<1177704604.14980.138.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] Modified patch (Dynamic Alternate Setting)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,48 +21,176 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, 2007-05-03 at 19:25 +0200, Stanislav Brabec wrote:
-> Daniel Gollub wrote:
-> 
-> > Not quite sure if this was intended or not ... attachted is the suggested 
-> > change by Stanislav.
-> 
-> Here is an alternative patch. The same improvement but different GUI
-> (see attached screenshots). I have changed second checkbox label.
-> 
-> Please decide what looks more intuitive and check-in.
+------=_Part_38605_10864635.1178227035508
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-This should optionally (ie. if HAL is available at compile and run-time)
-use the new HAL API that allows to enable/disable builtin Bluetooth
-devices completely (ie. not just not configured to accept anything, but
-completely disabled, unplugged, and not consuming one bit of power).
+Marcel,
 
-The HAL API is pretty straight forward:
-http://people.freedesktop.org/~david/hal-spec/hal-spec.html#device-properties-killswitch
-and
-http://people.freedesktop.org/~david/hal-spec/hal-spec.html#interface-device-killswitch
+Added the urb  part  to your patch.
+Take a look.
 
-It's implemented for Sony and Dell laptops, with another opened RFE for
-IBM laptops:
-http://bugs.freedesktop.org/show_bug.cgi?id=10053
+On 4/28/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi,
+>
+> > > > I have made the changes u suggested.
+> > > > Take a look and let me know.
+> > >
+> > > please fix the coding style of your additions. This patch is unreadable
+> > > in this state. No forward declarations and no heavy nesting.
+> >
+> > the following patch follows more my understanding how this should look
+> > like. However the attached patch doesn't contain the code for stopping
+> > and resubmitting the ISOC URBs.
+>
+> attached is a revised patch that improves the case where
+> CONFIG_BT_HCIUSB_SCO is not set.
+>
+> Regards
+>
+> Marcel
+>
 
-It should be dead-easy to implement for someone with access to an IBM
-laptop (unlike me).
+Thanks,
+Alok.
 
--- 
-Bastien Nocera <hadess@hadess.net> 
+------=_Part_38605_10864635.1178227035508
+Content-Type: application/octet-stream; name=alternate-setting-patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f18z4iho
+Content-Disposition: attachment; filename="alternate-setting-patch"
 
+ZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2hjaV91c2IuYyBiL2RyaXZlcnMvYmx1ZXRv
+b3RoL2hjaV91c2IuYwppbmRleCA0MDZhZjU3Li45MDAxZDhkIDEwMDY0NAotLS0gYS9kcml2ZXJz
+L2JsdWV0b290aC9oY2lfdXNiLmMKKysrIGIvZHJpdmVycy9ibHVldG9vdGgvaGNpX3VzYi5jCkBA
+IC04MzcsMTEgKzgzNywxMTQgQEAgc3RhdGljIHZvaWQgaGNpX3VzYl9kZXN0cnVjdChzdHJ1Y3Qg
+aGNpX2RldiAqaGRldikKIAlrZnJlZShodXNiKTsKIH0KIAorI2lmZGVmIENPTkZJR19CVF9IQ0lV
+U0JfU0NPCiBzdGF0aWMgdm9pZCBoY2lfdXNiX25vdGlmeShzdHJ1Y3QgaGNpX2RldiAqaGRldiwg
+dW5zaWduZWQgaW50IGV2dCkKIHsKKwlzdHJ1Y3QgaGNpX3VzYiAqaHVzYiA9IChzdHJ1Y3QgaGNp
+X3VzYiAqKSBoZGV2LT5kcml2ZXJfZGF0YTsKKwl1bnNpZ25lZCBsb25nIGZsYWdzOworCWludCBu
+ZXdfYWx0czsKKwogCUJUX0RCRygiJXMgZXZ0ICVkIiwgaGRldi0+bmFtZSwgZXZ0KTsKKwluZXdf
+YWx0cyA9IGhkZXYtPmNvbm5faGFzaC5zY29fbnVtOworCisJaWYoaGRldi0+dm9pY2Vfc2V0dGlu
+ZyAmIDB4MDAyMCl7CisJCW5ld19hbHRzICo9IDI7CisJCWlmKG5ld19hbHRzID4gNSkKKwkJCW5l
+d19hbHRzID0gNTsKKwl9CisJd3JpdGVfbG9ja19pcnFzYXZlKCZodXNiLT5jb21wbGV0aW9uX2xv
+Y2ssIGZsYWdzKTsKKworCWlmKG5ld19hbHRzICE9IGh1c2ItPmN1cnJfaXNvY19hbHRzKXsKKwkJ
+aHVzYi0+bmV3X2lzb2NfYWx0cyA9IG5ld19hbHRzOworCQlzY2hlZHVsZV93b3JrKCZodXNiLT53
+b3JrKTsKKwl9CisKKwl3cml0ZV91bmxvY2tfaXJxcmVzdG9yZSgmaHVzYi0+Y29tcGxldGlvbl9s
+b2NrLCBmbGFncyk7IAorICAgIAogfQogCitzdGF0aWMgdm9pZCBzZXRfaXNvY19hbHRlcm5hdGUo
+c3RydWN0IHdvcmtfc3RydWN0ICp3b3JrKQoreworCXN0cnVjdCBoY2lfdXNiICpodXNiID0gY29u
+dGFpbmVyX29mKHdvcmssIHN0cnVjdCBoY2lfdXNiLCB3b3JrKTsKKwlzdHJ1Y3QgX3VyYiAqX3Vy
+YiwgKl90bXA7CisJc3RydWN0IF91cmJfcXVldWUgKnEgPSAmaHVzYi0+cGVuZGluZ19xW2lzb2Nd
+OworCS8qVGhpcyBsaXN0IGhvbGRzIHRoZSBhbHJlYWR5IHN1Ym1pdHRlZCBVUkJzICovCisJc3Ry
+dWN0IGxpc3RfaGVhZCBpbnByb2Nlc3M7CisJdW5zaWduZWQgbG9uZyBmbGFnczsKKwkvKkhvbGRz
+IHRoZSBudW1iZXIgb2YgVVJCcyB3ZSBuZWVkIHRvIHNraXAod2hpY2ggYXJlIHN1Ym1pdHRlZCkg
+Ki8KKwlhdG9taWNfdCB0ZW1wOworCWludCBpc29jX2lmbnVtPTEsZTsKKworCXN0cnVjdCB1c2Jf
+aW50ZXJmYWNlICppc29jSWZhY2U7CisJc3RydWN0IHVzYl9ob3N0X2VuZHBvaW50ICplcDsKKwlz
+dHJ1Y3QgdXNiX2hvc3RfaW50ZXJmYWNlICp1aWY7CisJc3RydWN0IHVzYl9ob3N0X2VuZHBvaW50
+ICpvdXQgPSBOVUxMOworCXN0cnVjdCB1c2JfaG9zdF9lbmRwb2ludCAqaW4gPSBOVUxMOworCisJ
+SU5JVF9MSVNUX0hFQUQoJmlucHJvY2Vzcyk7CisJdGVtcCA9IGh1c2ItPnBlbmRpbmdfdHhbaXNv
+Y107CisJCisJd3JpdGVfbG9jaygmaHVzYi0+Y29tcGxldGlvbl9sb2NrKTsKKworCXdoaWxlICgo
+X3VyYiA9IF91cmJfZGVxdWV1ZShxKSkpIHsKKwkJLypEZXF1ZXVlIGFsbCB0aGUgc3VibWl0dGVk
+IFVSQnMgYW5kIHB1dCB0aGVtIGluIHRoZSB0ZW1wb3JhcnkgbGlzdCAqLworCQlpZiAoIWF0b21p
+Y19kZWNfYW5kX3Rlc3QoJnRlbXApKSB7CisJCQlfdXJiLT5xdWV1ZSA9IHE7CisJCQlsaXN0X2Fk
+ZCgmX3VyYi0+bGlzdCwgJmlucHJvY2Vzcyk7CisJCX0gZWxzZSB7CisJCQkvKlVubGluayBhbGwg
+dGhlIHJlc3Qgb2YgVVJCcyBhbmQgcHV0IHRoZW0gaW50byB0aGUgY29tcGxldGVkIHF1ZXVlLiAq
+LworCQkJX3VyYl91bmxpbmsoX3VyYik7CisJCQlfdXJiX3F1ZXVlX3RhaWwoX19jb21wbGV0ZWRf
+cShodXNiLCBIQ0lfU0NPREFUQV9QS1QpLAorCQkJCQlfdXJiKTsKKwkJfQorCX0KKwkvKm1lcmdl
+IHRoZSBpbnByb2Nlc3MgcXVldWUgd2l0aCB0aGUgcGVuZGluZyBxdWV1ZSAqLworCXNwaW5fbG9j
+a19pcnFzYXZlKCZxLT5sb2NrLCBmbGFncyk7CisJbGlzdF9mb3JfZWFjaF9lbnRyeV9zYWZlKF91
+cmIsIF90bXAsICZpbnByb2Nlc3MsIGxpc3QpIHsKKwkJbGlzdF9tb3ZlX3RhaWwoJl91cmItPmxp
+c3QsICZxLT5oZWFkKTsKKwl9CisJc3Bpbl91bmxvY2tfaXJxcmVzdG9yZSgmcS0+bG9jaywgZmxh
+Z3MpOworCWNsZWFyX2JpdChIQ0lfVVNCX1RYX1dBS0VVUCwgJmh1c2ItPnN0YXRlKTsKKwlpc29j
+SWZhY2UgPSB1c2JfaWZudW1fdG9faWYoaHVzYi0+dWRldiwgaXNvY19pZm51bSk7IAorCQorCS8q
+IFNldCB0aGUgc2V0dGluZyBhbmQgdGhlIGluL291dCBlbmRwb2ludHMgKi8KKwlpZiAoaXNvY0lm
+YWNlKSB7CisJCXVpZiA9ICZpc29jSWZhY2UtPmFsdHNldHRpbmdbaHVzYi0+bmV3X2lzb2NfYWx0
+c107CisJCWZvciAoZSA9IDA7IGUgPCB1aWYtPmRlc2MuYk51bUVuZHBvaW50czsgZSsrKSB7CisJ
+CQllcCA9ICZ1aWYtPmVuZHBvaW50W2VdOworCQkJc3dpdGNoIChlcC0+ZGVzYy5ibUF0dHJpYnV0
+ZXMgJiBVU0JfRU5EUE9JTlRfWEZFUlRZUEVfTUFTSykgeworCQkJY2FzZSBVU0JfRU5EUE9JTlRf
+WEZFUl9JU09DOgorCQkJCWlmIChlcC0+ZGVzYy5iRW5kcG9pbnRBZGRyZXNzICYgVVNCX0RJUl9J
+TikKKwkJCQkJaW4gPSBlcDsKKwkJCQllbHNlCisJCQkJCW91dCA9IGVwOworCQkJCWJyZWFrOwor
+CQkJfQorCQl9CisJCWlmICghaW4gfHwgIW91dCkKKwkJCUJUX0RCRygiSXNvYyBlbmRwb2ludHMg
+bm90IGZvdW5kIik7CisJCWVsc2UgeworCQkJQlRfREJHKCJpc29jIGlmbnVtICVkIGFsdHMgJWQi
+LCBpc29jSWZudW0sIGh1c2ItPm5ld19pc29jX2FsdHMpOworCisJCQlpZiAodXNiX3NldF9pbnRl
+cmZhY2UoaHVzYi0+dWRldiwgaXNvY19pZm51bSwgaHVzYi0+bmV3X2lzb2NfYWx0cykpIHsKKwkJ
+CQlCVF9FUlIoIkNhbid0IHNldCBpc29jIGludGVyZmFjZSBzZXR0aW5ncyIpOworCQkJCWh1c2It
+Pmlzb2NfaWZhY2UgPSBpc29jSWZhY2U7CisJCQkJdXNiX2RyaXZlcl9yZWxlYXNlX2ludGVyZmFj
+ZSgmaGNpX3VzYl9kcml2ZXIsaHVzYi0+aXNvY19pZmFjZSk7CisJCQkJaHVzYi0+aXNvY19pZmFj
+ZSA9IE5VTEw7CisJCQl9IGVsc2UgeworCQkJCWh1c2ItPmlzb2NfaWZhY2UgPSBpc29jSWZhY2U7
+CisJCQkJaHVzYi0+aXNvY19pbl9lcCA9IGluOworCQkJCWh1c2ItPmlzb2Nfb3V0X2VwID0gb3V0
+OworCQkJCWh1c2ItPmN1cnJfaXNvY19hbHRzID0gaHVzYi0+bmV3X2lzb2NfYWx0czsKKwkJCX0K
+KwkJfQorCX0KKworCXNldF9iaXQoSENJX1VTQl9UWF9XQUtFVVAsICZodXNiLT5zdGF0ZSk7CisJ
+d3JpdGVfdW5sb2NrKCZodXNiLT5jb21wbGV0aW9uX2xvY2spOworfQorI2VuZGlmCisKIHN0YXRp
+YyBpbnQgaGNpX3VzYl9wcm9iZShzdHJ1Y3QgdXNiX2ludGVyZmFjZSAqaW50ZiwgY29uc3Qgc3Ry
+dWN0IHVzYl9kZXZpY2VfaWQgKmlkKQogewogCXN0cnVjdCB1c2JfZGV2aWNlICp1ZGV2ID0gaW50
+ZXJmYWNlX3RvX3VzYmRldihpbnRmKTsKQEAgLTg1Myw3ICs5NTYsNyBAQCBzdGF0aWMgaW50IGhj
+aV91c2JfcHJvYmUoc3RydWN0IHVzYl9pbnRlcmZhY2UgKmludGYsIGNvbnN0IHN0cnVjdCB1c2Jf
+ZGV2aWNlX2lkCiAJc3RydWN0IHVzYl9pbnRlcmZhY2UgKmlzb2NfaWZhY2U7CiAJc3RydWN0IGhj
+aV91c2IgKmh1c2I7CiAJc3RydWN0IGhjaV9kZXYgKmhkZXY7Ci0JaW50IGksIGUsIHNpemUsIGlz
+b2NfaWZudW0sIGlzb2NfYWx0czsKKwlpbnQgaSwgZSwgc2l6ZSwgaXNvY19pZm51bTsKIAogCUJU
+X0RCRygidWRldiAlcCBpbnRmICVwIiwgdWRldiwgaW50Zik7CiAKQEAgLTkyMiw3ICsxMDI1LDcg
+QEAgc3RhdGljIGludCBoY2lfdXNiX3Byb2JlKHN0cnVjdCB1c2JfaW50ZXJmYWNlICppbnRmLCBj
+b25zdCBzdHJ1Y3QgdXNiX2RldmljZV9pZAogCS8qIEZpbmQgaXNvY2hyb25vdXMgZW5kcG9pbnRz
+IHRoYXQgd2UgY2FuIHVzZSAqLwogCXNpemUgPSAwOyAKIAlpc29jX2lmYWNlID0gTlVMTDsKLQlp
+c29jX2FsdHMgID0gMDsKKwlodXNiLT5jdXJyX2lzb2NfYWx0cyAgPSAwOwogCWlzb2NfaWZudW0g
+PSAxOwogCiAjaWZkZWYgQ09ORklHX0JUX0hDSVVTQl9TQ08KQEAgLTk0Niw3ICsxMDQ5LDcgQEAg
+c3RhdGljIGludCBoY2lfdXNiX3Byb2JlKHN0cnVjdCB1c2JfaW50ZXJmYWNlICppbnRmLCBjb25z
+dCBzdHJ1Y3QgdXNiX2RldmljZV9pZAogCQkJCQkJYnJlYWs7CiAJCQkJCXNpemUgPSBsZTE2X3Rv
+X2NwdShlcC0+ZGVzYy53TWF4UGFja2V0U2l6ZSk7CiAKLQkJCQkJaXNvY19hbHRzID0gdWlmLT5k
+ZXNjLmJBbHRlcm5hdGVTZXR0aW5nOworCQkJCQlodXNiLT5jdXJyX2lzb2NfYWx0cyA9IHVpZi0+
+ZGVzYy5iQWx0ZXJuYXRlU2V0dGluZzsKIAogCQkJCQlpZiAoZXAtPmRlc2MuYkVuZHBvaW50QWRk
+cmVzcyAmIFVTQl9ESVJfSU4pCiAJCQkJCQlpc29jX2luX2VwICA9IGVwOwpAQCAtOTYwLDEwICsx
+MDYzLDEwIEBAIHN0YXRpYyBpbnQgaGNpX3VzYl9wcm9iZShzdHJ1Y3QgdXNiX2ludGVyZmFjZSAq
+aW50ZiwgY29uc3Qgc3RydWN0IHVzYl9kZXZpY2VfaWQKIAkJaWYgKCFpc29jX2luX2VwIHx8ICFp
+c29jX291dF9lcCkKIAkJCUJUX0RCRygiSXNvYyBlbmRwb2ludHMgbm90IGZvdW5kIik7CiAJCWVs
+c2UgewotCQkJQlRfREJHKCJpc29jIGlmbnVtICVkIGFsdHMgJWQiLCBpc29jX2lmbnVtLCBpc29j
+X2FsdHMpOworCQkJQlRfREJHKCJpc29jIGlmbnVtICVkIGFsdHMgJWQiLCBpc29jX2lmbnVtLCBo
+dXNiLT5jdXJyX2lzb2NfYWx0cyk7CiAJCQlpZiAodXNiX2RyaXZlcl9jbGFpbV9pbnRlcmZhY2Uo
+JmhjaV91c2JfZHJpdmVyLCBpc29jX2lmYWNlLCBodXNiKSAhPSAwKQogCQkJCUJUX0VSUigiQ2Fu
+J3QgY2xhaW0gaXNvYyBpbnRlcmZhY2UiKTsKLQkJCWVsc2UgaWYgKHVzYl9zZXRfaW50ZXJmYWNl
+KHVkZXYsIGlzb2NfaWZudW0sIGlzb2NfYWx0cykpIHsKKwkJCWVsc2UgaWYgKHVzYl9zZXRfaW50
+ZXJmYWNlKHVkZXYsIGlzb2NfaWZudW0sIGh1c2ItPmN1cnJfaXNvY19hbHRzKSkgewogCQkJCUJU
+X0VSUigiQ2FuJ3Qgc2V0IGlzb2MgaW50ZXJmYWNlIHNldHRpbmdzIik7CiAJCQkJaHVzYi0+aXNv
+Y19pZmFjZSA9IGlzb2NfaWZhY2U7CiAJCQkJdXNiX2RyaXZlcl9yZWxlYXNlX2ludGVyZmFjZSgm
+aGNpX3VzYl9kcml2ZXIsIGlzb2NfaWZhY2UpOwpAQCAtOTc1LDYgKzEwNzgsNyBAQCBzdGF0aWMg
+aW50IGhjaV91c2JfcHJvYmUoc3RydWN0IHVzYl9pbnRlcmZhY2UgKmludGYsIGNvbnN0IHN0cnVj
+dCB1c2JfZGV2aWNlX2lkCiAJCQl9CiAJCX0KIAl9CisJSU5JVF9XT1JLKCZodXNiLT53b3JrLHNl
+dF9pc29jX2FsdGVybmF0ZSk7CiAjZW5kaWYKIAogCXJ3bG9ja19pbml0KCZodXNiLT5jb21wbGV0
+aW9uX2xvY2spOwpkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvaGNpX3VzYi5oIGIvZHJp
+dmVycy9ibHVldG9vdGgvaGNpX3VzYi5oCmluZGV4IDk2M2ZjNTUuLmM5ZmJmMGUgMTAwNjQ0Ci0t
+LSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2hjaV91c2IuaAorKysgYi9kcml2ZXJzL2JsdWV0b290aC9o
+Y2lfdXNiLmgKQEAgLTEwOCwxMSArMTA4LDE0IEBAIHN0cnVjdCBoY2lfdXNiIHsKIAlzdHJ1Y3Qg
+dXNiX2hvc3RfZW5kcG9pbnQJKmJ1bGtfaW5fZXA7CiAJc3RydWN0IHVzYl9ob3N0X2VuZHBvaW50
+CSpidWxrX291dF9lcDsKIAlzdHJ1Y3QgdXNiX2hvc3RfZW5kcG9pbnQJKmludHJfaW5fZXA7Ci0K
+KyNpZmRlZiBDT05GSUdfQlRfSENJVVNCX1NDTwogCXN0cnVjdCB1c2JfaW50ZXJmYWNlCQkqaXNv
+Y19pZmFjZTsKIAlzdHJ1Y3QgdXNiX2hvc3RfZW5kcG9pbnQJKmlzb2Nfb3V0X2VwOwogCXN0cnVj
+dCB1c2JfaG9zdF9lbmRwb2ludAkqaXNvY19pbl9lcDsKLQorCXN0cnVjdCB3b3JrX3N0cnVjdCAg
+ICAgICAgICAgd29yazsKKwlpbnQgY3Vycl9pc29jX2FsdHM7CisJaW50IG5ld19pc29jX2FsdHM7
+CisjZW5kaWYKIAlfX3U4CQkJY3RybF9yZXE7CiAKIAlzdHJ1Y3Qgc2tfYnVmZl9oZWFkCXRyYW5z
+bWl0X3FbNF07Cg==
+------=_Part_38605_10864635.1178227035508
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+------=_Part_38605_10864635.1178227035508
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_38605_10864635.1178227035508--
