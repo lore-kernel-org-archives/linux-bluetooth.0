@@ -1,55 +1,76 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <463A38C2.80403@mojo-working.com>
-Date: Thu, 03 May 2007 12:32:18 -0700
-From: Art Rothstein <holtmann@mojo-working.com>
+Date: Thu, 3 May 2007 12:25:01 +0200 (CEST)
+From: Ignacio Maeztu <imaeztui@yahoo.es>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: Bluez-users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] hcitool info dropped feature details between versions
-	3.7 and 3.9?
+Message-ID: <513258.65715.qm@web28004.mail.ukl.yahoo.com>
+Subject: [Bluez-users] (no subject)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
 List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1606872264=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I recently upgraded my Ubuntu distro from 6.10 to 7.04.  This included an
-hcitool upgrade from 3.7 to 3.9.  Remote device information is now missing the
-details on device features, e.g.,
+--===============1606872264==
+Content-Type: multipart/alternative; boundary="0-145157493-1178187901=:65715"
+Content-Transfer-Encoding: 8bit
 
-Features: 0xff 0xff 0x2d 0xf8 0x1b 0x18 0x00 0x80
-         <3-slot packets> <5-slot packets> <encryption> <slot offset>
-         <timing accuracy> <role switch> <hold mode> <sniff mode>
-         <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
-         <HV3 packets> <u-law log> <A-law log> <CVSD> <power control>
-         <transparent SCO> <enhanced iscan> <interlaced iscan>
-         <interlaced pscan> <inquiry with RSSI> <extended SCO>
-         <EV4 packets> <EV5 packets> <AFH cap. slave>
-         <AFH class. slave> <AFH cap. master> <AFH class. master>
-                           <extended features>
+--0-145157493-1178187901=:65715
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-Is this intentional?  Is there another way to get this information from existing
-utilities?
------
-McKinley Systems
-San Francisco
-415-827-7575
-http://www.mojo-working.com
+Hi!!
+
+Can I use BlueZ in Cygwin running on Windows as opertive System?
+
+Thanks
+
+Cheers
+
+       
+---------------------------------
+
+LLama Gratis a cualquier PC del Mundo.
+Llamadas a fijos y móviles desde 1 céntimo por minuto.
+http://es.voice.yahoo.com
+--0-145157493-1178187901=:65715
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+Hi!!<br><br>Can I use BlueZ in Cygwin running on Windows as opertive System?<br><br>Thanks<br><br>Cheers<br><p>&#32;
 
 
+      <hr size=1><br><font face="Verdana" size="-2">LLama Gratis a cualquier PC del Mundo.<br>Llamadas a fijos y móviles desde 1 céntimo por minuto.<br><a href="http://us.rd.yahoo.com/mail/es/tagline/messenger/*http://es.voice.yahoo.com/">http://es.voice.yahoo.com</a></font>
+--0-145157493-1178187901=:65715--
+
+
+--===============1606872264==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1606872264==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1606872264==--
