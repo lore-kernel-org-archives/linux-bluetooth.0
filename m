@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200705031357.04459.denis.kenzior@trolltech.com>
-References: <016001c788a0$b7b229c0$8935c70a@dlh.st.com>
-	<1178018694.25217.8.camel@violet>
-	<200705031357.04459.denis.kenzior@trolltech.com>
-Date: Thu, 03 May 2007 07:25:28 +0200
-Message-Id: <1178169928.6891.39.camel@violet>
-Mime-Version: 1.0
+Date: Thu, 3 May 2007 15:24:06 +1000
+References: <001501c78d3c$dd4f3ba0$9d0cc70a@dlh.st.com>
+	<200705031500.06707.denis.kenzior@trolltech.com>
+	<1178169412.6891.36.camel@violet>
+In-Reply-To: <1178169412.6891.36.camel@violet>
+MIME-Version: 1.0
+Message-Id: <200705031524.10794.denis.kenzior@trolltech.com>
 Subject: Re: [Bluez-devel] Esco implementation patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,32 +22,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Marcel,
 
-> Here's a modified patch that implements eSCO sockets, including incoming SCO 
-> connections.  This was a merge of my previous work for the 2.4 series of 
-> kernels, so some variables might be named differently than in your patch.
+> don't worry about packet types. This is the link managers job. Enable as
+> much packet types as possible.
 
-please make sure you use my naming of variables. Otherwise it is too
-much confusion. And please create a patch relative to this one so I can
-actually review it. And please keep hci_setup_sync(). Doing the
-separation this way it more logical than hacking up hci_add_sco(). The
-function that decides which command to use should be hci_connect().
+OK, that is what I thought as well.
 
-> > this patch is incomplete. It doesn't handle incoming eSCO connections
-> > and it can't handle SCO audio packets over HCI when a real eSCO
-> > connection has been established.
-> 
-> Why do you say this? What is required in order to get eSCO packets flowing?
+>
+> No. It is the difference between using Accept Connection Request or
+> Accept Synchronous Connection Request. In the first case it has to fall
+> back to SCO since it has no further information on how to negotiate an
+> eSCO link.
 
-If you have type == ESCO_LINK then the kernel doesn't send these packets
-over the transport layer.
+This is strange, because I would send an accept_sync_conn, get a 
+sync_conn_complete_event and the link_type would be 0x0 (SCO) when connecting 
+to an unpatched BlueZ box.  Again, I imagine more testing is required.
 
-Regards
+Regards,
 
-Marcel
-
-
+-Denis
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
