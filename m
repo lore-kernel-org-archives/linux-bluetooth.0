@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <463A38C2.80403@mojo-working.com>
-References: <463A38C2.80403@mojo-working.com>
-Date: Fri, 04 May 2007 08:30:34 +0200
-Message-Id: <1178260234.25425.16.camel@violet>
+In-Reply-To: <be976db60705031450u6c22eebfj50ffe8d91d8b6f88@mail.gmail.com>
+References: <be976db60705031450u6c22eebfj50ffe8d91d8b6f88@mail.gmail.com>
+Date: Fri, 04 May 2007 08:29:35 +0200
+Message-Id: <1178260175.25425.14.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] hcitool info dropped feature details
-	between	versions 3.7 and 3.9?
+Subject: Re: [Bluez-users] hciconfig delkey question
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,27 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Art,
+Hi Mark,
 
-> I recently upgraded my Ubuntu distro from 6.10 to 7.04.  This included an
-> hcitool upgrade from 3.7 to 3.9.  Remote device information is now missing the
-> details on device features, e.g.,
+> I am trying to delete a linkkey by way of 'hciconfig delkey <btaddr>'
+> where <btaddr> is the bluetooth address linkkey that I want to remove.
+> I can see that there is a directory under /var/lib/bluetooth in the
+> same name as <btaddr>.   I execute the command and hciconfig returns
+> the same lines as if I run it with no argument (returning info about
+> my only hci interface, hci0).  And I can still see <btaddr> directory
+> under /var/lib/bluetooth. 
 > 
-> Features: 0xff 0xff 0x2d 0xf8 0x1b 0x18 0x00 0x80
->          <3-slot packets> <5-slot packets> <encryption> <slot offset>
->          <timing accuracy> <role switch> <hold mode> <sniff mode>
->          <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
->          <HV3 packets> <u-law log> <A-law log> <CVSD> <power control>
->          <transparent SCO> <enhanced iscan> <interlaced iscan>
->          <interlaced pscan> <inquiry with RSSI> <extended SCO>
->          <EV4 packets> <EV5 packets> <AFH cap. slave>
->          <AFH class. slave> <AFH cap. master> <AFH class. master>
->                            <extended features>
-> 
-> Is this intentional?  Is there another way to get this information from existing
-> utilities?
+> Am I missing something about how this command should behave?  I was
+> expecting that after the command, the directory
+> under /var/lib/bluetooth/<btaddr> would be removed.
 
-I don't see what is missing.
+the delkey option deletes a key from the Bluetooth chip and not the host
+filesystem. Use the D-Bus API method RemoveBonding() for that.
 
 Regards
 
