@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1178235137.3158.177.camel@cookie.hadess.net>
-References: <1177946201.5443.59.camel@hammer.suse.cz>
-	<200704302138.18170.dgollub@suse.de>
-	<1178213140.2227.22.camel@hammer.suse.cz>
-	<1178235137.3158.177.camel@cookie.hadess.net>
-Date: Fri, 04 May 2007 08:45:52 +0200
-Message-Id: <1178261152.25425.32.camel@violet>
+To: Jiri Kosina <jkosina@suse.cz>
+In-Reply-To: <Pine.LNX.4.64.0705021144291.21227@twin.jikos.cz>
+References: <Pine.LNX.4.64.0705021144291.21227@twin.jikos.cz>
+Date: Fri, 04 May 2007 08:41:53 +0200
+Message-Id: <1178260913.25425.27.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bluez-gnome: No GUI way to switch from "off" mode
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+        bluez-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org
+Subject: Re: [Bluez-devel] [PATCH] Bluetooth: postpone hci_dev unregistration
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,38 +22,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Hi Jiri,
 
-> > > Not quite sure if this was intended or not ... attachted is the suggested 
-> > > change by Stanislav.
-> > 
-> > Here is an alternative patch. The same improvement but different GUI
-> > (see attached screenshots). I have changed second checkbox label.
-> > 
-> > Please decide what looks more intuitive and check-in.
+> (I sent this a week ago but it seems to have got lost in other noise, 
+> resending)
 > 
-> This should optionally (ie. if HAL is available at compile and run-time)
-> use the new HAL API that allows to enable/disable builtin Bluetooth
-> devices completely (ie. not just not configured to accept anything, but
-> completely disabled, unplugged, and not consuming one bit of power).
+> From: Jiri Kosina <jkosina@suse.cz>
 > 
-> The HAL API is pretty straight forward:
-> http://people.freedesktop.org/~david/hal-spec/hal-spec.html#device-properties-killswitch
-> and
-> http://people.freedesktop.org/~david/hal-spec/hal-spec.html#interface-device-killswitch
+> Bluetooth: postpone hci_dev unregistration
+>     
+> Commit b40df57 substituted bh_lock_sock() in hci_sock_dev_event() for 
+> lock_sock() when unregistering HCI device, in order to prevent deadlock 
+> against locking in l2cap_connect_cfm() from softirq context.
+>     
+> This however introduces another problem - hci_sock_dev_event() for 
+> HCI_DEV_UNREG can also be triggered in atomic context, in which calling 
+> lock_sock() is not safe as it could sleep. Reported by Jeremy Fitzhardinge 
+> at http://lkml.org/lkml/2007/4/23/271
 > 
-> It's implemented for Sony and Dell laptops, with another opened RFE for
-> IBM laptops:
-> http://bugs.freedesktop.org/show_bug.cgi?id=10053
-> 
-> It should be dead-easy to implement for someone with access to an IBM
-> laptop (unlike me).
+> This patch moves the detaching of sockets from hci_device into workqueue, 
+> so that lock_sock() can be used safely. This requires movement of 
+> deallocation of hci_dev - deallocating device just after 
+> hci_unregister_dev() would be too soon, as it could happen before the 
+> workqueue has been run.
 
-the off operation doesn't make any real sense for desktop system. It is
-mainly there for embedded systems without HAL or where the kernel driver
-has to put the device into deep-sleep mode.
-
-An integration with HAL's killswitch is the correct way.
+I saw the report on LKML, but I am not really comfortable with this
+approach. It feels like an ugly hack. This needs more thinking and I
+think that simplifying the looking between HCI and L2CAP should be the
+goal.
 
 Regards
 
