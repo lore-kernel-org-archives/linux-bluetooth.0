@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Sumeet VERMA <sumeet.verma@st.com>
-To: "'Ohad Ben-Cohen'" <ohad@bencohen.org>
-Date: Fri, 4 May 2007 16:57:35 +0530
-Message-ID: <032e01c78e3f$374b8b10$8935c70a@dlh.st.com>
+From: Daniel Gollub <dgollub@suse.de>
+To: bluez-devel@lists.sourceforge.net
+Date: Fri, 4 May 2007 11:41:57 +0200
+References: <200705021525.07661.dgollub@suse.de>
+	<1178260779.25425.24.camel@violet>
+In-Reply-To: <1178260779.25425.24.camel@violet>
 MIME-Version: 1.0
-In-Reply-To: <bd5b16740704300324i5f4f527aq50777d136e7a108f@mail.gmail.com>
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Low Power mode in bluez
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_m/vOGqwvlBuYuO2"
+Message-Id: <200705041141.58326.dgollub@suse.de>
+Subject: Re: [Bluez-devel] [PATCH] Input Service support for phones
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,58 +19,83 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Ohad
-I saw the patch you sent. In the application hciattach, I see that you read
-the commands from a script file and send it to the controller. If you see a
-deep sleep command you stop the execution of the script and return.
-My question is how does the device wake up and how do you put the device in
-deep sleep mode after the initialization is done. I mean do you check for
-any activity on the bluetooth link and if there is no activity (say for 10
-sec) you send the command to put your device in deep sleep mode.Is this done
-in the uart driver?
+--Boundary-00=_m/vOGqwvlBuYuO2
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-With the code you send I think once the hciattach is started, the device may
-go into deep sleep mode. But if it wakes up, it will not go into deep sleep
-mode again (atleast not from the application/stack). 
+On Friday 04 May 2007, Marcel Holtmann wrote:
+> a subpath == "phone" is fully enough. Don't make it more complicated
+> than it needs to be.
 
-Regards,
-Sumeet 
------Original Message-----
-From: Ohad Ben-Cohen [mailto:ohad@bencohen.org] 
-Sent: Monday, April 30, 2007 3:54 PM
-To: Sumeet VERMA
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] Low Power mode in bluez
+full ack. Adapted patch attachted.
 
-Hi Sumeet,
+best regards,
+Daniel
 
-> From: Sumeet VERMA <sumeet.verma@st.com>
->
-> I meant deep sleep modes by low power modes. I think I would need some 
-> support in bluetooth transport layer for that.
+--Boundary-00=_m/vOGqwvlBuYuO2
+Content-Type: text/x-diff; charset="iso-8859-1";
+	name="bluez-utils_input_phone_major.diff"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="bluez-utils_input_phone_major.diff"
 
-I'm not so sure what is it that you need, but it sounds like the kernel
-patch I sent earlier today might be of interest to you; The patch implements
-deep sleep modes via transport layer manipulations (the patch is actually a
-new HCI line discipline protocol).
+Index: input/device.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/input/device.c,v
+retrieving revision 1.43
+diff -u -p -r1.43 device.c
+--- input/device.c	18 Apr 2007 19:33:34 -0000	1.43
++++ input/device.c	4 May 2007 09:39:22 -0000
+@@ -195,6 +195,9 @@ static const char *create_input_path(uin
+ 	static int next_id = 0;
+ 
+ 	switch (major) {
++	case 0x02: /* Phone */	
++		strcpy(subpath, "phone");	
++		break;
+ 	case 0x04: /* Audio */
+ 		switch (minor) {
+ 		/* FIXME: Testing required */
+Index: input/manager.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/input/manager.c,v
+retrieving revision 1.22
+diff -u -p -r1.22 manager.c
+--- input/manager.c	18 Apr 2007 19:33:34 -0000	1.22
++++ input/manager.c	4 May 2007 09:39:22 -0000
+@@ -800,6 +800,7 @@ static DBusHandlerResult create_device(D
+ 
+ 	switch (cls & 0x1f00) {
+ 		case 0x0500: /* Peripheral */
++		case 0x0200: /* Phone */
+ 			if (get_handles(pr, pnp_uuid, pnp_handle_reply) < 0) {
+ 				pending_req_free(pr);
+ 				return err_not_supported(conn, msg);
 
-These deep sleep modes are part of TI's HCILL runtime power management UART
-protocol.
-
-BR,
-Ohad.
-
+--Boundary-00=_m/vOGqwvlBuYuO2
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--Boundary-00=_m/vOGqwvlBuYuO2
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--Boundary-00=_m/vOGqwvlBuYuO2--
