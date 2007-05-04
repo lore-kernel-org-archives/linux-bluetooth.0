@@ -1,14 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ohad Ben-Cohen <ohad@bencohen.org>
-In-Reply-To: <200704301139.44842.ohad@bencohen.org>
-References: <200704301139.44842.ohad@bencohen.org>
-Date: Fri, 04 May 2007 08:49:56 +0200
-Message-Id: <1178261396.25425.35.camel@violet>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1178235137.3158.177.camel@cookie.hadess.net>
+References: <1177946201.5443.59.camel@hammer.suse.cz>
+	<200704302138.18170.dgollub@suse.de>
+	<1178213140.2227.22.camel@hammer.suse.cz>
+	<1178235137.3158.177.camel@cookie.hadess.net>
+Date: Fri, 04 May 2007 08:45:52 +0200
+Message-Id: <1178261152.25425.32.camel@violet>
 Mime-Version: 1.0
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [PATCH bluez-utils] add support for Texas
-	Instruments' BRF63xx	chips
+Subject: Re: [Bluez-devel] bluez-gnome: No GUI way to switch from "off" mode
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,22 +23,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Ohad,
+Hi Bastien,
 
-> Introduces initializing procedures for Texas Instruments' BRF63xx chips.
-> These procedures take care of:
-> 1. Loading TI's init script
-> 2. Setting up HCILL, TI's runtime power-management UART protocol
+> > > Not quite sure if this was intended or not ... attachted is the suggested 
+> > > change by Stanislav.
+> > 
+> > Here is an alternative patch. The same improvement but different GUI
+> > (see attached screenshots). I have changed second checkbox label.
+> > 
+> > Please decide what looks more intuitive and check-in.
+> 
+> This should optionally (ie. if HAL is available at compile and run-time)
+> use the new HAL API that allows to enable/disable builtin Bluetooth
+> devices completely (ie. not just not configured to accept anything, but
+> completely disabled, unplugged, and not consuming one bit of power).
+> 
+> The HAL API is pretty straight forward:
+> http://people.freedesktop.org/~david/hal-spec/hal-spec.html#device-properties-killswitch
+> and
+> http://people.freedesktop.org/~david/hal-spec/hal-spec.html#interface-device-killswitch
+> 
+> It's implemented for Sony and Dell laptops, with another opened RFE for
+> IBM laptops:
+> http://bugs.freedesktop.org/show_bug.cgi?id=10053
+> 
+> It should be dead-easy to implement for someone with access to an IBM
+> laptop (unlike me).
 
-patch looks good, but needs some major cleanups. Especially the header
-file stuff needs fixing. However without hardware to test this with, I
-am not going to touch it.
+the off operation doesn't make any real sense for desktop system. It is
+mainly there for embedded systems without HAL or where the kernel driver
+has to put the device into deep-sleep mode.
 
-> An additional, tiny feature, which proved useful for
-> stress checkings, is added to l2test: random delays.
-
-Please never combine totally unrelated things into one big patch. This
-needs to be a separate patch.
+An integration with HAL's killswitch is the correct way.
 
 Regards
 
