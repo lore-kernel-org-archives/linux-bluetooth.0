@@ -1,15 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: "=?ISO-8859-2?Q?Tomasz_Chili=F1ski?=" <tomasz.chilinski@chilan.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Fri, 4 May 2007 10:49:17 +0200
-Message-Id: <20070504084720.M21573@chilan.com>
-In-Reply-To: <1178260119.25425.12.camel@violet>
-References: <20070503214340.M20676@chilan.com>
-	<1178260119.25425.12.camel@violet>
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Fri, 4 May 2007 17:36:30 +1000
+References: <016001c788a0$b7b229c0$8935c70a@dlh.st.com>
+	<200705031357.04459.denis.kenzior@trolltech.com>
+	<1178169928.6891.39.camel@violet>
+In-Reply-To: <1178169928.6891.39.camel@violet>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=OPENWEBMAIL_ATT_0.290685382574829"
-Subject: [Bluez-devel] kernel 2.6.21 btsco 0.50 patch
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_/JuOGj7v6qIJQuP"
+Message-Id: <200705041736.31072.denis.kenzior@trolltech.com>
+Subject: Re: [Bluez-devel] Esco implementation patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,252 +23,288 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
-
-------=OPENWEBMAIL_ATT_0.290685382574829
+--Boundary-00=_/JuOGj7v6qIJQuP
 Content-Type: text/plain;
-	charset=iso-8859-2
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Hello.
+Marcel,
 
-There are minor problems with btsco kernel module with linux versions
-above 2.6.20.x, for now with 2.6.21.x.
-The attachment is a solution for all problems.
-PS. I have also made diff with typedefs taken from kernel <=2.6.20.x,
-but I think we should avoid include files dependencies...
+> please make sure you use my naming of variables. Otherwise it is too
+> much confusion. And please create a patch relative to this one so I can
+> actually review it. And please keep hci_setup_sync(). Doing the
+> separation this way it more logical than hacking up hci_add_sco(). The
+> function that decides which command to use should be hci_connect().
 
-Bests, Tomasz Chilinski
+Attached is a patch against yours.
 
-------=OPENWEBMAIL_ATT_0.290685382574829
-Content-Type: application/octet-stream;
-	name="btsco-0.50-2.6.21-withouttypedefs.diff"
+Can you point me in the right direction with regard to adding ESCO packets to 
+be transported over HCI?
+
+Also, I noticed that SCO connections are accepted regardless of whether a SCO 
+socket is open or not.  Is this intended?
+
+-Denis
+
+--Boundary-00=_/JuOGj7v6qIJQuP
+Content-Type: text/x-diff; charset="iso-8859-1";
+	name="esco-patch-marcels-changes.patch"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
-	filename="btsco-0.50-2.6.21-withouttypedefs.diff"
-Content-Transfer-Encoding: base64
+	filename="esco-patch-marcels-changes.patch"
 
-ZGlmZiAtdU5yIGJ0c2NvLTAuNTAub3JpZy9rZXJuZWwvYnRzY28uYyBidHNjby0wLjUwL2tlcm5l
-bC9idHNjby5jCi0tLSBidHNjby0wLjUwLm9yaWcva2VybmVsL2J0c2NvLmMJMjAwNy0wNS0wMyAy
-Mjo0OTo1Ni4wMDAwMDAwMDAgKzAyMDAKKysrIGJ0c2NvLTAuNTAva2VybmVsL2J0c2NvLmMJMjAw
-Ny0wNS0wMyAyMzoyODozNi4zMzI5OTA5MTMgKzAyMDAKQEAgLTEyNCwxMyArMTI4LDEzIEBACiB9
-IHNuZF9jYXJkX2J0X3Njb19pbmZvX3Q7CiAKIHR5cGVkZWYgc3RydWN0IHNuZF9jYXJkX2J0X3Nj
-byB7Ci0Jc25kX2NhcmRfdCAqY2FyZDsKKwlzdHJ1Y3Qgc25kX2NhcmQgKmNhcmQ7CiAJc3Bpbmxv
-Y2tfdCBtaXhlcl9sb2NrOwogCWludCBtaXhlcl92b2x1bWVbTUlYRVJfQUREUl9MQVNUICsgMV07
-CiAjaWZkZWYgRFlOQU1JQ19DT01QUkVTU0lPTgotCXNuZF9rY29udHJvbF90ICptaXhlcl9jb250
-cm9sc1tNSVhFUl9BRERSX0xBU1QgKyAyICsgMV07CS8qIGFsc28gbG9vcGJhY2sgYW5kIGFnYyAq
-LworCXN0cnVjdCBzbmRfa2NvbnRyb2wgKm1peGVyX2NvbnRyb2xzW01JWEVSX0FERFJfTEFTVCAr
-IDIgKyAxXTsJLyogYWxzbyBsb29wYmFjayBhbmQgYWdjICovCiAjZWxzZQotCXNuZF9rY29udHJv
-bF90ICptaXhlcl9jb250cm9sc1tNSVhFUl9BRERSX0xBU1QgKyAyIF07CS8qIGFsc28gbG9vcGJh
-Y2sgKi8KKwlzdHJ1Y3Qgc25kX2tjb250cm9sICptaXhlcl9jb250cm9sc1tNSVhFUl9BRERSX0xB
-U1QgKyAyIF07CS8qIGFsc28gbG9vcGJhY2sgKi8KICNlbmRpZgogCXZvbGF0aWxlIGludCBsb29w
-YmFjazsKICNpZmRlZiBEWU5BTUlDX0NPTVBSRVNTSU9OCkBAIC0xNjgsMTUgKzE3MiwxNSBAQAog
-CXVuc2lnbmVkIGludCBwY21fYnBzOwkvKiBieXRlcyBwZXIgc2Vjb25kICovCiAJdW5zaWduZWQg
-aW50IHBjbV9pcnFfcG9zOwkvKiBJUlEgcG9zaXRpb24gKi8KIAl1bnNpZ25lZCBpbnQgcGNtX2J1
-Zl9wb3M7CS8qIHBvc2l0aW9uIGluIGJ1ZmZlciAqLwotCXNuZF9wY21fc3Vic3RyZWFtX3QgKnN1
-YnN0cmVhbTsKKwlzdHJ1Y3Qgc25kX3BjbV9zdWJzdHJlYW0gKnN1YnN0cmVhbTsKIH0gc25kX2Nh
-cmRfYnRfc2NvX3BjbV90OwogCi1zdGF0aWMgc25kX2NhcmRfdCAqc25kX2J0X3Njb19jYXJkc1tT
-TkRSVl9DQVJEU10gPSBTTkRSVl9ERUZBVUxUX1BUUjsKK3N0YXRpYyBzdHJ1Y3Qgc25kX2NhcmQg
-KnNuZF9idF9zY29fY2FyZHNbU05EUlZfQ0FSRFNdID0gU05EUlZfREVGQVVMVF9QVFI7CiAKLXN0
-YXRpYyBpbnQgc25kX2NhcmRfYnRfc2NvX3BsYXliYWNrX3RyaWdnZXIoc25kX3BjbV9zdWJzdHJl
-YW1fdCAqCitzdGF0aWMgaW50IHNuZF9jYXJkX2J0X3Njb19wbGF5YmFja190cmlnZ2VyKHN0cnVj
-dCBzbmRfcGNtX3N1YnN0cmVhbSAqCiAJCQkJCSAgICBzdWJzdHJlYW0sIGludCBjbWQpCiB7Ci0J
-c25kX3BjbV9ydW50aW1lX3QgKnJ1bnRpbWUgPSBzdWJzdHJlYW0tPnJ1bnRpbWU7CisJc3RydWN0
-IHNuZF9wY21fcnVudGltZSAqcnVudGltZSA9IHN1YnN0cmVhbS0+cnVudGltZTsKIAlzbmRfY2Fy
-ZF9idF9zY29fcGNtX3QgKmJzcGNtID0gcnVudGltZS0+cHJpdmF0ZV9kYXRhOwogCXNuZF9jYXJk
-X2J0X3Njb190ICpidF9zY28gPSBzbmRfcGNtX3N1YnN0cmVhbV9jaGlwKHN1YnN0cmVhbSk7CiAK
-QEAgLTE5NCwxMCArMTk4LDEwIEBACiAJcmV0dXJuIDA7CiB9CiAKLXN0YXRpYyBpbnQgc25kX2Nh
-cmRfYnRfc2NvX2NhcHR1cmVfdHJpZ2dlcihzbmRfcGNtX3N1YnN0cmVhbV90ICoKK3N0YXRpYyBp
-bnQgc25kX2NhcmRfYnRfc2NvX2NhcHR1cmVfdHJpZ2dlcihzdHJ1Y3Qgc25kX3BjbV9zdWJzdHJl
-YW0gKgogCQkJCQkgICBzdWJzdHJlYW0sIGludCBjbWQpCiB7Ci0Jc25kX3BjbV9ydW50aW1lX3Qg
-KnJ1bnRpbWUgPSBzdWJzdHJlYW0tPnJ1bnRpbWU7CisJc3RydWN0IHNuZF9wY21fcnVudGltZSAq
-cnVudGltZSA9IHN1YnN0cmVhbS0+cnVudGltZTsKIAlzbmRfY2FyZF9idF9zY29fcGNtX3QgKmJz
-cGNtID0gcnVudGltZS0+cHJpdmF0ZV9kYXRhOwogCXNuZF9jYXJkX2J0X3Njb190ICpidF9zY28g
-PSBzbmRfcGNtX3N1YnN0cmVhbV9jaGlwKHN1YnN0cmVhbSk7CiAKQEAgLTIxNSw5ICsyMTksOSBA
-QAogCXJldHVybiAwOwogfQogCi1zdGF0aWMgaW50IHNuZF9jYXJkX2J0X3Njb19wY21fcHJlcGFy
-ZShzbmRfcGNtX3N1YnN0cmVhbV90ICogc3Vic3RyZWFtKQorc3RhdGljIGludCBzbmRfY2FyZF9i
-dF9zY29fcGNtX3ByZXBhcmUoc3RydWN0IHNuZF9wY21fc3Vic3RyZWFtICogc3Vic3RyZWFtKQog
-ewotCXNuZF9wY21fcnVudGltZV90ICpydW50aW1lID0gc3Vic3RyZWFtLT5ydW50aW1lOworCXN0
-cnVjdCBzbmRfcGNtX3J1bnRpbWUgKnJ1bnRpbWUgPSBzdWJzdHJlYW0tPnJ1bnRpbWU7CiAJc25k
-X2NhcmRfYnRfc2NvX3BjbV90ICpic3BjbSA9IHJ1bnRpbWUtPnByaXZhdGVfZGF0YTsKIAl1bnNp
-Z25lZCBpbnQgYnBzOwogCkBAIC0yMzYsMTIgKzI0MCwxMiBAQAogCXJldHVybiAwOwogfQogCi1z
-dGF0aWMgaW50IHNuZF9jYXJkX2J0X3Njb19wbGF5YmFja19wcmVwYXJlKHNuZF9wY21fc3Vic3Ry
-ZWFtX3QgKiBzdWJzdHJlYW0pCitzdGF0aWMgaW50IHNuZF9jYXJkX2J0X3Njb19wbGF5YmFja19w
-cmVwYXJlKHN0cnVjdCBzbmRfcGNtX3N1YnN0cmVhbSAqIHN1YnN0cmVhbSkKIHsKIAlyZXR1cm4g
-c25kX2NhcmRfYnRfc2NvX3BjbV9wcmVwYXJlKHN1YnN0cmVhbSk7CiB9CiAKLXN0YXRpYyBpbnQg
-c25kX2NhcmRfYnRfc2NvX2NhcHR1cmVfcHJlcGFyZShzbmRfcGNtX3N1YnN0cmVhbV90ICogc3Vi
-c3RyZWFtKQorc3RhdGljIGludCBzbmRfY2FyZF9idF9zY29fY2FwdHVyZV9wcmVwYXJlKHN0cnVj
-dCBzbmRfcGNtX3N1YnN0cmVhbSAqIHN1YnN0cmVhbSkKIHsKIAlkcHJpbnRrKCJjYXB0dXJlX3By
-ZXBhcmVcbiIpOwogCXJldHVybiBzbmRfY2FyZF9idF9zY29fcGNtX3ByZXBhcmUoc3Vic3RyZWFt
-KTsKQEAgLTMxMSwyNCArMzE1LDI0IEBACiB9CiAKIHN0YXRpYyBzbmRfcGNtX3VmcmFtZXNfdAot
-c25kX2NhcmRfYnRfc2NvX3BsYXliYWNrX3BvaW50ZXIoc25kX3BjbV9zdWJzdHJlYW1fdCAqIHN1
-YnN0cmVhbSkKK3NuZF9jYXJkX2J0X3Njb19wbGF5YmFja19wb2ludGVyKHN0cnVjdCBzbmRfcGNt
-X3N1YnN0cmVhbSAqIHN1YnN0cmVhbSkKIHsKLQlzbmRfcGNtX3J1bnRpbWVfdCAqcnVudGltZSA9
-IHN1YnN0cmVhbS0+cnVudGltZTsKKwlzdHJ1Y3Qgc25kX3BjbV9ydW50aW1lICpydW50aW1lID0g
-c3Vic3RyZWFtLT5ydW50aW1lOwogCXNuZF9jYXJkX2J0X3Njb19wY21fdCAqYnNwY20gPSBydW50
-aW1lLT5wcml2YXRlX2RhdGE7CiAKIAlyZXR1cm4gYnl0ZXNfdG9fZnJhbWVzKHJ1bnRpbWUsIGJz
-cGNtLT5wY21fYnVmX3Bvcyk7CiB9CiAKIHN0YXRpYyBzbmRfcGNtX3VmcmFtZXNfdAotc25kX2Nh
-cmRfYnRfc2NvX2NhcHR1cmVfcG9pbnRlcihzbmRfcGNtX3N1YnN0cmVhbV90ICogc3Vic3RyZWFt
-KQorc25kX2NhcmRfYnRfc2NvX2NhcHR1cmVfcG9pbnRlcihzdHJ1Y3Qgc25kX3BjbV9zdWJzdHJl
-YW0gKiBzdWJzdHJlYW0pCiB7Ci0Jc25kX3BjbV9ydW50aW1lX3QgKnJ1bnRpbWUgPSBzdWJzdHJl
-YW0tPnJ1bnRpbWU7CisJc3RydWN0IHNuZF9wY21fcnVudGltZSAqcnVudGltZSA9IHN1YnN0cmVh
-bS0+cnVudGltZTsKIAlzbmRfY2FyZF9idF9zY29fcGNtX3QgKmJzcGNtID0gcnVudGltZS0+cHJp
-dmF0ZV9kYXRhOwogCiAJcmV0dXJuIGJ5dGVzX3RvX2ZyYW1lcyhydW50aW1lLCBic3BjbS0+cGNt
-X2J1Zl9wb3MpOwogfQogCi1zdGF0aWMgc25kX3BjbV9oYXJkd2FyZV90IHNuZF9jYXJkX2J0X3Nj
-b19wbGF5YmFjayA9IHsKK3N0YXRpYyBzdHJ1Y3Qgc25kX3BjbV9oYXJkd2FyZSBzbmRfY2FyZF9i
-dF9zY29fcGxheWJhY2sgPSB7CiAJLmluZm8gPSAoU05EUlZfUENNX0lORk9fTU1BUCB8IFNORFJW
-X1BDTV9JTkZPX0lOVEVSTEVBVkVEIHwKIAkJIFNORFJWX1BDTV9JTkZPX01NQVBfVkFMSUQpLAog
-CS5mb3JtYXRzID0gU05EUlZfUENNX0ZNVEJJVF9TMTZfTEUsCkBAIC0zNDUsNyArMzQ5LDcgQEAK
-IAkuZmlmb19zaXplID0gMCwKIH07CiAKLXN0YXRpYyBzbmRfcGNtX2hhcmR3YXJlX3Qgc25kX2Nh
-cmRfYnRfc2NvX2NhcHR1cmUgPSB7CitzdGF0aWMgc3RydWN0IHNuZF9wY21faGFyZHdhcmUgc25k
-X2NhcmRfYnRfc2NvX2NhcHR1cmUgPSB7CiAJLmluZm8gPSAoU05EUlZfUENNX0lORk9fTU1BUCB8
-IFNORFJWX1BDTV9JTkZPX0lOVEVSTEVBVkVEIHwKIAkJIFNORFJWX1BDTV9JTkZPX01NQVBfVkFM
-SUQpLAogCS5mb3JtYXRzID0gU05EUlZfUENNX0ZNVEJJVF9TMTZfTEUsCkBAIC0zNjIsMTUgKzM2
-NiwxNSBAQAogCS5maWZvX3NpemUgPSAwLAogfTsKIAotc3RhdGljIHZvaWQgc25kX2NhcmRfYnRf
-c2NvX3J1bnRpbWVfZnJlZShzbmRfcGNtX3J1bnRpbWVfdCAqIHJ1bnRpbWUpCitzdGF0aWMgdm9p
-ZCBzbmRfY2FyZF9idF9zY29fcnVudGltZV9mcmVlKHN0cnVjdCBzbmRfcGNtX3J1bnRpbWUgKiBy
-dW50aW1lKQogewogCXNuZF9jYXJkX2J0X3Njb19wY21fdCAqYnNwY20gPSBydW50aW1lLT5wcml2
-YXRlX2RhdGE7CiAJa2ZyZWUoYnNwY20pOwogfQogCi1zdGF0aWMgaW50IHNuZF9jYXJkX2J0X3Nj
-b19wbGF5YmFja19vcGVuKHNuZF9wY21fc3Vic3RyZWFtX3QgKiBzdWJzdHJlYW0pCitzdGF0aWMg
-aW50IHNuZF9jYXJkX2J0X3Njb19wbGF5YmFja19vcGVuKHN0cnVjdCBzbmRfcGNtX3N1YnN0cmVh
-bSAqIHN1YnN0cmVhbSkKIHsKLQlzbmRfcGNtX3J1bnRpbWVfdCAqcnVudGltZSA9IHN1YnN0cmVh
-bS0+cnVudGltZTsKKwlzdHJ1Y3Qgc25kX3BjbV9ydW50aW1lICpydW50aW1lID0gc3Vic3RyZWFt
-LT5ydW50aW1lOwogCXNuZF9jYXJkX2J0X3Njb19wY21fdCAqYnNwY207CiAJc25kX2NhcmRfYnRf
-c2NvX3QgKmJ0X3NjbyA9IHNuZF9wY21fc3Vic3RyZWFtX2NoaXAoc3Vic3RyZWFtKTsKIApAQCAt
-NDAxLDkgKzQwNSw5IEBACiAJcmV0dXJuIDA7CiB9CiAKLXN0YXRpYyBpbnQgc25kX2NhcmRfYnRf
-c2NvX2NhcHR1cmVfb3BlbihzbmRfcGNtX3N1YnN0cmVhbV90ICogc3Vic3RyZWFtKQorc3RhdGlj
-IGludCBzbmRfY2FyZF9idF9zY29fY2FwdHVyZV9vcGVuKHN0cnVjdCBzbmRfcGNtX3N1YnN0cmVh
-bSAqIHN1YnN0cmVhbSkKIHsKLQlzbmRfcGNtX3J1bnRpbWVfdCAqcnVudGltZSA9IHN1YnN0cmVh
-bS0+cnVudGltZTsKKwlzdHJ1Y3Qgc25kX3BjbV9ydW50aW1lICpydW50aW1lID0gc3Vic3RyZWFt
-LT5ydW50aW1lOwogCXNuZF9jYXJkX2J0X3Njb19wY21fdCAqYnNwY207CiAJc25kX2NhcmRfYnRf
-c2NvX3QgKmJ0X3NjbyA9IHNuZF9wY21fc3Vic3RyZWFtX2NoaXAoc3Vic3RyZWFtKTsKIApAQCAt
-NDM1LDkgKzQzOSw5IEBACiAJcmV0dXJuIDA7CiB9CiAKLXN0YXRpYyBpbnQgc25kX2NhcmRfYnRf
-c2NvX3BsYXliYWNrX2Nsb3NlKHNuZF9wY21fc3Vic3RyZWFtX3QgKiBzdWJzdHJlYW0pCitzdGF0
-aWMgaW50IHNuZF9jYXJkX2J0X3Njb19wbGF5YmFja19jbG9zZShzdHJ1Y3Qgc25kX3BjbV9zdWJz
-dHJlYW0gKiBzdWJzdHJlYW0pCiB7Ci0Jc25kX3BjbV9ydW50aW1lX3QgKnJ1bnRpbWUgPSBzdWJz
-dHJlYW0tPnJ1bnRpbWU7CisJc3RydWN0IHNuZF9wY21fcnVudGltZSAqcnVudGltZSA9IHN1YnN0
-cmVhbS0+cnVudGltZTsKIAlzbmRfY2FyZF9idF9zY29fdCAqYnRfc2NvID0gc25kX3BjbV9zdWJz
-dHJlYW1fY2hpcChzdWJzdHJlYW0pOwogCiAJc25kX2Fzc2VydChidF9zY28tPnBsYXliYWNrID09
-IE5VTEwsOwpAQCAtNDU3LDkgKzQ2MSw5IEBACiAJcmV0dXJuIDA7CiB9CiAKLXN0YXRpYyBpbnQg
-c25kX2NhcmRfYnRfc2NvX2NhcHR1cmVfY2xvc2Uoc25kX3BjbV9zdWJzdHJlYW1fdCAqIHN1YnN0
-cmVhbSkKK3N0YXRpYyBpbnQgc25kX2NhcmRfYnRfc2NvX2NhcHR1cmVfY2xvc2Uoc3RydWN0IHNu
-ZF9wY21fc3Vic3RyZWFtICogc3Vic3RyZWFtKQogewotCXNuZF9wY21fcnVudGltZV90ICpydW50
-aW1lID0gc3Vic3RyZWFtLT5ydW50aW1lOworCXN0cnVjdCBzbmRfcGNtX3J1bnRpbWUgKnJ1bnRp
-bWUgPSBzdWJzdHJlYW0tPnJ1bnRpbWU7CiAJc3RydWN0IHNuZF9jYXJkX2J0X3NjbyAqYnRfc2Nv
-ID0KIAkgICAgKHN0cnVjdCBzbmRfY2FyZF9idF9zY28gKilzdWJzdHJlYW0tPnByaXZhdGVfZGF0
-YTsKIApAQCAtNDgwLDcgKzQ4NCw3IEBACiAJcmV0dXJuIDA7CiB9CiAKLXN0YXRpYyBzbmRfcGNt
-X29wc190IHNuZF9jYXJkX2J0X3Njb19wbGF5YmFja19vcHMgPSB7CitzdGF0aWMgc3RydWN0IHNu
-ZF9wY21fb3BzIHNuZF9jYXJkX2J0X3Njb19wbGF5YmFja19vcHMgPSB7CiAJLm9wZW4gPSBzbmRf
-Y2FyZF9idF9zY29fcGxheWJhY2tfb3BlbiwKIAkuY2xvc2UgPSBzbmRfY2FyZF9idF9zY29fcGxh
-eWJhY2tfY2xvc2UsCiAJLmlvY3RsID0gc25kX3BjbV9saWJfaW9jdGwsCkBAIC00ODksNyArNDkz
-LDcgQEAKIAkucG9pbnRlciA9IHNuZF9jYXJkX2J0X3Njb19wbGF5YmFja19wb2ludGVyLAogfTsK
-IAotc3RhdGljIHNuZF9wY21fb3BzX3Qgc25kX2NhcmRfYnRfc2NvX2NhcHR1cmVfb3BzID0gewor
-c3RhdGljIHN0cnVjdCBzbmRfcGNtX29wcyBzbmRfY2FyZF9idF9zY29fY2FwdHVyZV9vcHMgPSB7
-CiAJLm9wZW4gPSBzbmRfY2FyZF9idF9zY29fY2FwdHVyZV9vcGVuLAogCS5jbG9zZSA9IHNuZF9j
-YXJkX2J0X3Njb19jYXB0dXJlX2Nsb3NlLAogCS5pb2N0bCA9IHNuZF9wY21fbGliX2lvY3RsLApA
-QCAtNTAwLDcgKzUwNCw3IEBACiAKIHN0YXRpYyBpbnQgX19pbml0IHNuZF9jYXJkX2J0X3Njb19w
-Y20oc25kX2NhcmRfYnRfc2NvX3QgKiBidF9zY28pCiB7Ci0Jc25kX3BjbV90ICpwY207CisJc3Ry
-dWN0IHNuZF9wY20gKnBjbTsKIAlpbnQgZXJyOwogCiAJaWYgKChlcnIgPQpAQCAtNTIyLDggKzUy
-Niw4IEBACiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC5nZXQgPSBzbmRfYnRfc2Nv
-X3ZvbHVtZV9nZXQsIC5wdXQgPSBzbmRfYnRfc2NvX3ZvbHVtZV9wdXQsIFwKICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIC5wcml2YXRlX3ZhbHVlID0gYWRkciB9CiAKLXN0YXRpYyBpbnQgc25kX2J0X3Njb192b2x1
-bWVfaW5mbyhzbmRfa2NvbnRyb2xfdCAqIGtjb250cm9sLAotCQkJCSAgc25kX2N0bF9lbGVtX2lu
-Zm9fdCAqIHVpbmZvKQorc3RhdGljIGludCBzbmRfYnRfc2NvX3ZvbHVtZV9pbmZvKHN0cnVjdCBz
-bmRfa2NvbnRyb2wgKiBrY29udHJvbCwKKwkJCQkgIHN0cnVjdCBzbmRfY3RsX2VsZW1faW5mbyAq
-IHVpbmZvKQogewogCXVpbmZvLT50eXBlID0gU05EUlZfQ1RMX0VMRU1fVFlQRV9JTlRFR0VSOwog
-CXVpbmZvLT5jb3VudCA9IDE7CkBAIC01MzIsOCArNTM2LDggQEAKIAlyZXR1cm4gMDsKIH0KIAot
-c3RhdGljIGludCBzbmRfYnRfc2NvX3ZvbHVtZV9nZXQoc25kX2tjb250cm9sX3QgKiBrY29udHJv
-bCwKLQkJCQkgc25kX2N0bF9lbGVtX3ZhbHVlX3QgKiB1Y29udHJvbCkKK3N0YXRpYyBpbnQgc25k
-X2J0X3Njb192b2x1bWVfZ2V0KHN0cnVjdCBzbmRfa2NvbnRyb2wgKiBrY29udHJvbCwKKwkJCQkg
-c3RydWN0IHNuZF9jdGxfZWxlbV92YWx1ZSAqIHVjb250cm9sKQogewogCXNuZF9jYXJkX2J0X3Nj
-b190ICpidF9zY28gPSBzbmRfa2NvbnRyb2xfY2hpcChrY29udHJvbCk7CiAJdW5zaWduZWQgbG9u
-ZyBmbGFnczsKQEAgLTU0NSw4ICs1NDksOCBAQAogCXJldHVybiAwOwogfQogCi1zdGF0aWMgaW50
-IHNuZF9idF9zY29fdm9sdW1lX3B1dChzbmRfa2NvbnRyb2xfdCAqIGtjb250cm9sLAotCQkJCSBz
-bmRfY3RsX2VsZW1fdmFsdWVfdCAqIHVjb250cm9sKQorc3RhdGljIGludCBzbmRfYnRfc2NvX3Zv
-bHVtZV9wdXQoc3RydWN0IHNuZF9rY29udHJvbCAqIGtjb250cm9sLAorCQkJCSBzdHJ1Y3Qgc25k
-X2N0bF9lbGVtX3ZhbHVlICogdWNvbnRyb2wpCiB7CiAJc25kX2NhcmRfYnRfc2NvX3QgKmJ0X3Nj
-byA9IHNuZF9rY29udHJvbF9jaGlwKGtjb250cm9sKTsKIAl1bnNpZ25lZCBsb25nIGZsYWdzOwpA
-QCAtNTcxLDggKzU3NSw4IEBACiAJcmV0dXJuIGNoYW5nZWQ7CiB9CiAKLXN0YXRpYyBpbnQgc25k
-X2J0X3Njb19ib29sZWFuX2luZm8oc25kX2tjb250cm9sX3QgKiBrY29udHJvbCwKLQkJCQkgICBz
-bmRfY3RsX2VsZW1faW5mb190ICogdWluZm8pCitzdGF0aWMgaW50IHNuZF9idF9zY29fYm9vbGVh
-bl9pbmZvKHN0cnVjdCBzbmRfa2NvbnRyb2wgKiBrY29udHJvbCwKKwkJCQkgICBzdHJ1Y3Qgc25k
-X2N0bF9lbGVtX2luZm8gKiB1aW5mbykKIHsKIAl1aW5mby0+dHlwZSA9IFNORFJWX0NUTF9FTEVN
-X1RZUEVfQk9PTEVBTjsKIAl1aW5mby0+Y291bnQgPSAxOwpAQCAtNTgxLDggKzU4NSw4IEBACiAJ
-cmV0dXJuIDA7CiB9CiAKLXN0YXRpYyBpbnQgc25kX2J0X3Njb19sb29wYmFja19nZXQoc25kX2tj
-b250cm9sX3QgKiBrY29udHJvbCwKLQkJCQkgICBzbmRfY3RsX2VsZW1fdmFsdWVfdCAqIHVjb250
-cm9sKQorc3RhdGljIGludCBzbmRfYnRfc2NvX2xvb3BiYWNrX2dldChzdHJ1Y3Qgc25kX2tjb250
-cm9sICoga2NvbnRyb2wsCisJCQkJICAgc3RydWN0IHNuZF9jdGxfZWxlbV92YWx1ZSAqIHVjb250
-cm9sKQogewogCXNuZF9jYXJkX2J0X3Njb190ICpidF9zY28gPSBzbmRfa2NvbnRyb2xfY2hpcChr
-Y29udHJvbCk7CiAJdW5zaWduZWQgbG9uZyBmbGFnczsKQEAgLTU5Myw4ICs1OTcsOCBAQAogCXJl
-dHVybiAwOwogfQogCi1zdGF0aWMgaW50IHNuZF9idF9zY29fbG9vcGJhY2tfcHV0KHNuZF9rY29u
-dHJvbF90ICoga2NvbnRyb2wsCi0JCQkJICAgc25kX2N0bF9lbGVtX3ZhbHVlX3QgKiB1Y29udHJv
-bCkKK3N0YXRpYyBpbnQgc25kX2J0X3Njb19sb29wYmFja19wdXQoc3RydWN0IHNuZF9rY29udHJv
-bCAqIGtjb250cm9sLAorCQkJCSAgIHN0cnVjdCBzbmRfY3RsX2VsZW1fdmFsdWUgKiB1Y29udHJv
-bCkKIHsKIAlzbmRfY2FyZF9idF9zY29fdCAqYnRfc2NvID0gc25kX2tjb250cm9sX2NoaXAoa2Nv
-bnRyb2wpOwogCXVuc2lnbmVkIGxvbmcgZmxhZ3M7CkBAIC02MTEsOCArNjE1LDggQEAKIH0KIAog
-I2lmZGVmIERZTkFNSUNfQ09NUFJFU1NJT04KLXN0YXRpYyBpbnQgc25kX2J0X3Njb19hZ2NfZ2V0
-KHNuZF9rY29udHJvbF90ICoga2NvbnRyb2wsCi0JCQkJICAgc25kX2N0bF9lbGVtX3ZhbHVlX3Qg
-KiB1Y29udHJvbCkKK3N0YXRpYyBpbnQgc25kX2J0X3Njb19hZ2NfZ2V0KHN0cnVjdCBzbmRfa2Nv
-bnRyb2wgKiBrY29udHJvbCwKKwkJCQkgICBzdHJ1Y3Qgc25kX2N0bF9lbGVtX3ZhbHVlICogdWNv
-bnRyb2wpCiB7CiAJc25kX2NhcmRfYnRfc2NvX3QgKmJ0X3NjbyA9IHNuZF9rY29udHJvbF9jaGlw
-KGtjb250cm9sKTsKIAl1bnNpZ25lZCBsb25nIGZsYWdzOwpAQCAtNjIzLDggKzYyNyw4IEBACiAJ
-cmV0dXJuIDA7CiB9CiAKLXN0YXRpYyBpbnQgc25kX2J0X3Njb19hZ2NfcHV0KHNuZF9rY29udHJv
-bF90ICoga2NvbnRyb2wsCi0JCQkJICAgc25kX2N0bF9lbGVtX3ZhbHVlX3QgKiB1Y29udHJvbCkK
-K3N0YXRpYyBpbnQgc25kX2J0X3Njb19hZ2NfcHV0KHN0cnVjdCBzbmRfa2NvbnRyb2wgKiBrY29u
-dHJvbCwKKwkJCQkgICBzdHJ1Y3Qgc25kX2N0bF9lbGVtX3ZhbHVlICogdWNvbnRyb2wpCiB7CiAJ
-c25kX2NhcmRfYnRfc2NvX3QgKmJ0X3NjbyA9IHNuZF9rY29udHJvbF9jaGlwKGtjb250cm9sKTsK
-IAl1bnNpZ25lZCBsb25nIGZsYWdzOwpAQCAtNjQxLDkgKzY0NSw5IEBACiB9CiAjZW5kaWYKIAot
-I2RlZmluZSBCVF9TQ09fQ09OVFJPTFMgKHNpemVvZihzbmRfYnRfc2NvX2NvbnRyb2xzKS9zaXpl
-b2Yoc25kX2tjb250cm9sX25ld190KSkKKyNkZWZpbmUgQlRfU0NPX0NPTlRST0xTIChzaXplb2Yo
-c25kX2J0X3Njb19jb250cm9scykvc2l6ZW9mKHN0cnVjdCBzbmRfa2NvbnRyb2xfbmV3KSkKIAot
-c3RhdGljIHNuZF9rY29udHJvbF9uZXdfdCBzbmRfYnRfc2NvX2NvbnRyb2xzW10gPSB7CitzdGF0
-aWMgc3RydWN0IHNuZF9rY29udHJvbF9uZXcgc25kX2J0X3Njb19jb250cm9sc1tdID0gewogCUJU
-X1NDT19WT0xVTUUoIk1hc3RlciBWb2x1bWUiLCAwLCBNSVhFUl9BRERSX01BU1RFUiksCiAJQlRf
-U0NPX1ZPTFVNRSgiTWljIFZvbHVtZSIsIDAsIE1JWEVSX0FERFJfTUlDKSwKIAl7LmlmYWNlID0g
-U05EUlZfQ1RMX0VMRU1fSUZBQ0VfTUlYRVIsCkBAIC02NjcsNyArNjcxLDcgQEAKIAogaW50IF9f
-aW5pdCBzbmRfY2FyZF9idF9zY29fbmV3X21peGVyKHNuZF9jYXJkX2J0X3Njb190ICogYnRfc2Nv
-KQogewotCXNuZF9jYXJkX3QgKmNhcmQgPSBidF9zY28tPmNhcmQ7CisJc3RydWN0IHNuZF9jYXJk
-ICpjYXJkID0gYnRfc2NvLT5jYXJkOwogCiAJdW5zaWduZWQgaW50IGlkeDsKIAlpbnQgZXJyOwpA
-QCAtNjg2LDE3ICs2OTAsMTcgQEAKIAlyZXR1cm4gMDsKIH0KIAotc3RhdGljIGludCBzbmRfY2Fy
-ZF9idF9vcGVuKHNuZF9od2RlcF90ICogaHcsIHN0cnVjdCBmaWxlICpmaWxlKQorc3RhdGljIGlu
-dCBzbmRfY2FyZF9idF9vcGVuKHN0cnVjdCBzbmRfaHdkZXAgKiBodywgc3RydWN0IGZpbGUgKmZp
-bGUpCiB7CiAJcmV0dXJuIDA7CiB9CiAKLXN0YXRpYyBpbnQgc25kX2NhcmRfYnRfcmVsZWFzZShz
-bmRfaHdkZXBfdCAqIGh3LCBzdHJ1Y3QgZmlsZSAqZmlsZSkKK3N0YXRpYyBpbnQgc25kX2NhcmRf
-YnRfcmVsZWFzZShzdHJ1Y3Qgc25kX2h3ZGVwICogaHcsIHN0cnVjdCBmaWxlICpmaWxlKQogewog
-CXJldHVybiAwOwogfQogCi1zdGF0aWMgaW50IHNuZF9jYXJkX2J0X2lvY3RsKHNuZF9od2RlcF90
-ICogaHcsIHN0cnVjdCBmaWxlICpmaWxlLAorc3RhdGljIGludCBzbmRfY2FyZF9idF9pb2N0bChz
-dHJ1Y3Qgc25kX2h3ZGVwICogaHcsIHN0cnVjdCBmaWxlICpmaWxlLAogCQkJICAgICB1bnNpZ25l
-ZCBpbnQgY21kLCB1bnNpZ25lZCBsb25nIGFyZykKIHsKIAlzbmRfY2FyZF9idF9zY29fdCAqYnRf
-c2NvID0gaHctPmNhcmQtPnByaXZhdGVfZGF0YTsKQEAgLTc1MCw3ICs3NTQsNyBAQAogCXJldHVy
-biBlcnI7CiB9CiAKLXN0YXRpYyBsb25nIHNuZF9jYXJkX2J0X3dyaXRlKHNuZF9od2RlcF90ICog
-aHcsIGNvbnN0IGNoYXIgKmJ1ZiwgbG9uZyBjb3VudCwKK3N0YXRpYyBsb25nIHNuZF9jYXJkX2J0
-X3dyaXRlKHN0cnVjdCBzbmRfaHdkZXAgKiBodywgY29uc3QgY2hhciAqYnVmLCBsb25nIGNvdW50
-LAogCQkJICAgICAgbG9mZl90ICogb2Zmc2V0KQogewogCXNuZF9jYXJkX2J0X3Njb190ICpidF9z
-Y28gPSBody0+Y2FyZC0+cHJpdmF0ZV9kYXRhOwpAQCAtNzg1LDcgKzc4OSw3IEBACiAJcmV0dXJu
-IHJldHZhbDsKIH0KIAotc3RhdGljIGxvbmcgc25kX2NhcmRfYnRfcmVhZChzbmRfaHdkZXBfdCAq
-IGh3LCBjaGFyICpidWYsIGxvbmcgY291bnQsCitzdGF0aWMgbG9uZyBzbmRfY2FyZF9idF9yZWFk
-KHN0cnVjdCBzbmRfaHdkZXAgKiBodywgY2hhciAqYnVmLCBsb25nIGNvdW50LAogCQkJICAgICBs
-b2ZmX3QgKiBvZmZzZXQpCiB7CiAJc25kX2NhcmRfYnRfc2NvX3QgKmJ0X3NjbyA9IGh3LT5jYXJk
-LT5wcml2YXRlX2RhdGE7CkBAIC04MzksNyArODQzLDcgQEAKIAlyZXR1cm4gcmV0dmFsOwogfQog
-Ci1zdGF0aWMgdW5zaWduZWQgaW50IHNuZF9jYXJkX2J0X3BvbGwoc25kX2h3ZGVwX3QgKiBodywK
-K3N0YXRpYyB1bnNpZ25lZCBpbnQgc25kX2NhcmRfYnRfcG9sbChzdHJ1Y3Qgc25kX2h3ZGVwICog
-aHcsCiAJCQkJICAgICBzdHJ1Y3QgZmlsZSAqZmlsZSwgcG9sbF90YWJsZSAqIHdhaXQpCiB7CiAJ
-c25kX2NhcmRfYnRfc2NvX3QgKmJ0X3NjbyA9IGh3LT5jYXJkLT5wcml2YXRlX2RhdGE7CkBAIC04
-NjMsNyArODY3LDcgQEAKIAogc3RhdGljIGludCBzbmRfY2FyZF9idF9zY29fdGhyZWFkKHZvaWQg
-KmRhdGEpCiB7Ci0Jc25kX2NhcmRfdCAqY2FyZCA9IChzbmRfY2FyZF90ICopIGRhdGE7CisJc3Ry
-dWN0IHNuZF9jYXJkICpjYXJkID0gKHN0cnVjdCBzbmRfY2FyZCAqKSBkYXRhOwogCXNuZF9jYXJk
-X2J0X3Njb190ICpidF9zY28gPSBjYXJkLT5wcml2YXRlX2RhdGE7CiAJc3RydWN0IHNvY2tldCAq
-c29jazsKIAlpbnQgbGVuOwpAQCAtMTExNyw3ICsxMTIxLDcgQEAKIAljb21wbGV0ZV9hbmRfZXhp
-dCgmYnRfc2NvLT50aHJlYWRfZG9uZSwgMCk7CiB9CiAKLXN0YXRpYyB2b2lkIHNuZF9jYXJkX2J0
-X3ByaXZhdGVfZnJlZShzbmRfY2FyZF90ICogY2FyZCkKK3N0YXRpYyB2b2lkIHNuZF9jYXJkX2J0
-X3ByaXZhdGVfZnJlZShzdHJ1Y3Qgc25kX2NhcmQgKiBjYXJkKQogewogCXNuZF9jYXJkX2J0X3Nj
-b190ICpidF9zY28gPSBjYXJkLT5wcml2YXRlX2RhdGE7CiAKQEAgLTExMzksMTAgKzExNDMsMTAg
-QEAKIAogc3RhdGljIGludCBfX2luaXQgc25kX2NhcmRfYnRfc2NvX3Byb2JlKGludCBkZXYpCiB7
-Ci0Jc25kX2NhcmRfdCAqY2FyZDsKKwlzdHJ1Y3Qgc25kX2NhcmQgKmNhcmQ7CiAJc25kX2NhcmRf
-YnRfc2NvX3QgKmJ0X3NjbzsKIAlpbnQgZXJyOwotCXNuZF9od2RlcF90ICpodzsKKwlzdHJ1Y3Qg
-c25kX2h3ZGVwICpodzsKIAogCWNhcmQgPQogCSAgICBzbmRfY2FyZF9uZXcoaW5kZXhbZGV2XSwg
-U05EUlZfREVGQVVMVF9TVFIxLAo=
+diff -p -U5 -r linux-2.6.21.1/include/net/bluetooth/hci.h linux-2.6.21.1-dkenzior/include/net/bluetooth/hci.h
+--- linux-2.6.21.1/include/net/bluetooth/hci.h	2007-05-04 13:30:11.000000000 +1000
++++ linux-2.6.21.1-dkenzior/include/net/bluetooth/hci.h	2007-05-04 13:54:53.000000000 +1000
+@@ -135,10 +135,15 @@ enum {
+ #define ESCO_HV3	0x0004
+ #define ESCO_EV3	0x0008
+ #define ESCO_EV4	0x0010
+ #define ESCO_EV5	0x0020
+ 
++/* Some devices seem to have trouble establishing EV* packet connections */
++/* with other devices.  For this reason we mask out the eSCO packets */ 
++/* for now.  Might need to address this later */
++#define ESCO_PTYPE_MASK	(ESCO_HV1 | ESCO_HV2 | ESCO_HV3)
++
+ /* ACL flags */
+ #define ACL_CONT		0x01
+ #define ACL_START		0x02
+ #define ACL_ACTIVE_BCAST	0x04
+ #define ACL_PICO_BCAST		0x08
+diff -p -U5 -r linux-2.6.21.1/net/bluetooth/hci_conn.c linux-2.6.21.1-dkenzior/net/bluetooth/hci_conn.c
+--- linux-2.6.21.1/net/bluetooth/hci_conn.c	2007-05-04 13:33:00.000000000 +1000
++++ linux-2.6.21.1-dkenzior/net/bluetooth/hci_conn.c	2007-05-04 14:02:57.000000000 +1000
+@@ -138,11 +138,11 @@ void hci_setup_sync(struct hci_conn *con
+ 
+ 	conn->state = BT_CONNECT;
+ 	conn->out = 1;
+ 
+ 	cp.handle   = cpu_to_le16(handle);
+-	cp.pkt_type = cpu_to_le16(hdev->esco_type);
++	cp.pkt_type = cpu_to_le16(hdev->esco_type & ESCO_PTYPE_MASK);
+ 
+ 	cp.tx_bandwidth   = cpu_to_le32(0x00001f40);
+ 	cp.rx_bandwidth   = cpu_to_le32(0x00001f40);
+ 	cp.max_latency    = cpu_to_le16(0xffff);
+ 	cp.voice_setting  = cpu_to_le16(hdev->voice_setting);
+diff -p -U5 -r linux-2.6.21.1/net/bluetooth/hci_event.c linux-2.6.21.1-dkenzior/net/bluetooth/hci_event.c
+--- linux-2.6.21.1/net/bluetooth/hci_event.c	2007-05-04 13:30:11.000000000 +1000
++++ linux-2.6.21.1-dkenzior/net/bluetooth/hci_event.c	2007-05-04 15:47:15.000000000 +1000
+@@ -369,10 +369,11 @@ static void hci_cc_info_param(struct hci
+ 		if (hdev->features[4] & LMP_EV5)
+ 			hdev->esco_type |= ESCO_EV5;
+ 
+ 		BT_DBG("%s: features 0x%x 0x%x 0x%x", hdev->name,
+ 				lf->features[0], lf->features[1], lf->features[2]);
++		BT_DBG("%s: eSco packets: 0x%x", hdev->name, hdev->esco_type);
+ 
+ 		break;
+ 
+ 	case OCF_READ_BUFFER_SIZE:
+ 		bs = (struct hci_rp_read_buffer_size *) skb->data;
+@@ -756,11 +757,10 @@ static inline void hci_conn_request_evt(
+ 	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, ev->link_type);
+ 
+ 	if (mask & HCI_LM_ACCEPT) {
+ 		/* Connection accepted */
+ 		struct hci_conn *conn;
+-		struct hci_cp_accept_conn_req cp;
+ 
+ 		hci_dev_lock(hdev);
+ 		conn = hci_conn_hash_lookup_ba(hdev, ev->link_type, &ev->bdaddr);
+ 		if (!conn) {
+ 			if (!(conn = hci_conn_add(hdev, ev->link_type, &ev->bdaddr))) {
+@@ -771,27 +771,55 @@ static inline void hci_conn_request_evt(
+ 		}
+ 		memcpy(conn->dev_class, ev->dev_class, 3);
+ 		conn->state = BT_CONNECT;
+ 		hci_dev_unlock(hdev);
+ 
+-		bacpy(&cp.bdaddr, &ev->bdaddr);
++		if ((ev->link_type == ACL_LINK) || (!lmp_esco_capable(hdev))) {
++			struct hci_cp_accept_conn_req cp;
++			bacpy(&cp.bdaddr, &ev->bdaddr);
+ 
+-		if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
+-			cp.role = 0x00; /* Become master */
+-		else
+-			cp.role = 0x01; /* Remain slave */
++			if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
++				cp.role = 0x00; /* Become master */
++			else
++				cp.role = 0x01; /* Remain slave */
+ 
+-		hci_send_cmd(hdev, OGF_LINK_CTL,
+-				OCF_ACCEPT_CONN_REQ, sizeof(cp), &cp);
++			hci_send_cmd(hdev, OGF_LINK_CTL,
++					OCF_ACCEPT_CONN_REQ, sizeof(cp), &cp);
++		} else {
++			/* Send the Accept Sync Connection Command */
++			struct hci_cp_accept_sync_conn_req cp;
++			
++			bacpy(&cp.bdaddr, &ev->bdaddr);
++			cp.pkt_type = __cpu_to_le16(hdev->esco_type & ESCO_PTYPE_MASK);
++			cp.tx_bandwidth = __cpu_to_le32(0x00001f40);
++			cp.rx_bandwidth = __cpu_to_le32(0x00001f40);
++			cp.max_latency = __cpu_to_le16(0xffff);
++			cp.content_format = __cpu_to_le16(hdev->voice_setting);
++			cp.retrans_effort = 0xff;
++
++			hci_send_cmd(hdev, OGF_LINK_CTL,
++					OCF_ACCEPT_SYNC_CONN_REQ, sizeof(cp), &cp);
++		}
+ 	} else {
+ 		/* Connection rejected */
+-		struct hci_cp_reject_conn_req cp;
+ 
+-		bacpy(&cp.bdaddr, &ev->bdaddr);
+-		cp.reason = 0x0f;
+-		hci_send_cmd(hdev, OGF_LINK_CTL,
+-				OCF_REJECT_CONN_REQ, sizeof(cp), &cp);
++		if ((ev->link_type == ACL_LINK) || (!lmp_esco_capable(hdev))) {
++			struct hci_cp_reject_conn_req cp;
++
++			bacpy(&cp.bdaddr, &ev->bdaddr);
++			cp.reason = 0x0f;
++			hci_send_cmd(hdev, OGF_LINK_CTL,
++					OCF_REJECT_CONN_REQ, sizeof(cp), &cp);
++		} else {
++			struct hci_cp_reject_sync_conn_req cp;
++			
++			bacpy(&cp.bdaddr, &ev->bdaddr);
++			cp.reason = 0x0f;
++
++			hci_send_cmd(hdev, OGF_LINK_CTL,
++					OCF_REJECT_SYNC_CONN_REQ, sizeof(cp), &cp);
++		}
+ 	}
+ }
+ 
+ /* Connect Complete */
+ static inline void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -878,10 +906,60 @@ static inline void hci_conn_complete_evt
+ 		hci_acl_connect(pend);
+ 
+ 	hci_dev_unlock(hdev);
+ }
+ 
++/* eSCO Connect Complete */
++static inline void hci_sync_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct hci_ev_sync_conn_complete *ev = (struct hci_ev_sync_conn_complete *) skb->data;
++	struct hci_conn *conn;
++
++	BT_DBG("%s", hdev->name);
++
++	hci_dev_lock(hdev);
++
++	/* There are two possibilities here.  We establish an outgoing ESCO link and get */
++	/* back a SCO link.  Or we got a connect request with a SCO/ESCO link type and */
++	/* arrived here once it was established */
++	conn = hci_conn_hash_lookup_ba(hdev, ESCO_LINK, &ev->bdaddr);
++	if (!conn) {
++		/* Incoming SCO case */
++		conn = hci_conn_hash_lookup_ba(hdev, SCO_LINK, &ev->bdaddr);
++		if (!conn) {
++			hci_dev_unlock(hdev);
++			return;
++		}
++
++		if (conn->out) {
++			BT_DBG("ended up with a SCO link");
++			hci_conn_del(conn);
++			hci_dev_unlock(hdev);
++			return;
++		}
++	}
++
++	if (!ev->status) {
++		conn->handle = __le16_to_cpu(ev->handle);
++		conn->type = ev->link_type;
++		conn->state  = BT_CONNECTED;
++
++		if (conn->out) {
++			/* Update disconnect timer */
++			hci_conn_hold(conn);
++			hci_conn_put(conn);
++		}
++	} else
++		conn->state = BT_CLOSED;
++
++	hci_proto_connect_cfm(conn, ev->status);
++	if (ev->status)
++		hci_conn_del(conn);
++
++	hci_dev_unlock(hdev);
++}
++
+ /* Disconnect Complete */
+ static inline void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_disconn_complete *ev = (struct hci_ev_disconn_complete *) skb->data;
+ 	struct hci_conn *conn;
+@@ -1157,40 +1235,10 @@ static inline void hci_pscan_rep_mode_ev
+ 	}
+ 
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-/* Synchronous Connection Complete Event */
+-static inline void hci_sync_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+-{
+-	struct hci_ev_sync_conn_complete *ev = (struct hci_ev_sync_conn_complete *) skb->data;
+-	struct hci_conn *conn;
+-
+-	BT_DBG("%s status %d", hdev->name, ev->status);
+-
+-	hci_dev_lock(hdev);
+-
+-	conn = hci_conn_hash_lookup_ba(hdev, ESCO_LINK, &ev->bdaddr);
+-	if (!conn) {
+-		hci_dev_unlock(hdev);
+-		return;
+-	}
+-
+-	if (!ev->status) {
+-		conn->handle = __le16_to_cpu(ev->handle);
+-		conn->type   = ev->link_type;
+-		conn->state  = BT_CONNECTED;
+-	} else
+-		conn->state = BT_CLOSED;
+-
+-	hci_proto_connect_cfm(conn, ev->status);
+-	if (ev->status)
+-		hci_conn_del(conn);
+-
+-	hci_dev_unlock(hdev);
+-}
+-
+ /* Sniff Subrate */
+ static inline void hci_sniff_subrate_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_sniff_subrate *ev = (struct hci_ev_sniff_subrate *) skb->data;
+ 	struct hci_conn *conn;
+diff -p -U5 -r linux-2.6.21.1/net/bluetooth/sco.c linux-2.6.21.1-dkenzior/net/bluetooth/sco.c
+--- linux-2.6.21.1/net/bluetooth/sco.c	2007-05-04 13:30:11.000000000 +1000
++++ linux-2.6.21.1-dkenzior/net/bluetooth/sco.c	2007-05-04 13:33:31.000000000 +1000
+@@ -838,10 +838,13 @@ done:
+ /* ----- SCO interface with lower layer (HCI) ----- */
+ static int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 type)
+ {
+ 	BT_DBG("hdev %s, bdaddr %s", hdev->name, batostr(bdaddr));
+ 
++	if (type != SCO_LINK && type != ESCO_LINK)
++		return 0;
++
+ 	/* Always accept connection */
+ 	return HCI_LM_ACCEPT;
+ }
+ 
+ static int sco_connect_cfm(struct hci_conn *hcon, __u8 status)
 
-------=OPENWEBMAIL_ATT_0.290685382574829
+--Boundary-00=_/JuOGj7v6qIJQuP
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -278,7 +315,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
-------=OPENWEBMAIL_ATT_0.290685382574829
+--Boundary-00=_/JuOGj7v6qIJQuP
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -289,4 +326,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-------=OPENWEBMAIL_ATT_0.290685382574829--
+--Boundary-00=_/JuOGj7v6qIJQuP--
