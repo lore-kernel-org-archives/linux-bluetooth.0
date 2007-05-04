@@ -1,16 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Ohad Ben-Cohen <ohad@bencohen.org>
-In-Reply-To: <bd5b16740705040630o58f22ddfi39b6399092c1677a@mail.gmail.com>
-References: <200704301140.46336.ohad@bencohen.org>
-	<1178261528.25425.38.camel@violet>
-	<bd5b16740705040630o58f22ddfi39b6399092c1677a@mail.gmail.com>
-Date: Fri, 04 May 2007 16:30:50 +0200
-Message-Id: <1178289050.25425.50.camel@violet>
-Mime-Version: 1.0
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [PATCH 2.6.21] Bluetooth: add support for TI's
-	HCILL UART	protocol
+From: "=?ISO-8859-2?Q?Tomasz_Chili=F1ski?=" <tomasz.chilinski@chilan.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Fri, 4 May 2007 16:12:57 +0200
+Message-Id: <20070504141123.M13137@chilan.com>
+In-Reply-To: <463B3D17.50307@xmission.com>
+References: <20070503214340.M20676@chilan.com>	<1178260119.25425.12.camel@violet>
+	<20070504084720.M21573@chilan.com> <463B3D17.50307@xmission.com>
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] kernel 2.6.21 btsco 0.50 patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,55 +21,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Ohad,
+On Fri, 04 May 2007 08:03:03 -0600, Brad Midgley wrote
+> Tomasz
 
-> > please explain the usefulness of HCIUARTGETDEVICE to me.
-> 
-> Most of the initializing commands should be (and thus are) sent normally,
-> before the new device is added (and notification is sent to hcid).
-> 
-> But, there is one initialization command (deep sleep configuration),
-> which must be sent _after_ the HCILL protocol is set.
-> 
-> This command is signalling the device that it can start initiating deep sleep.
-> The device may immediate request to do so, so the HCILL protocol must
-> already be there to receive this request.
-> 
-> That's why I let hciattach do its HCIUARTSETPROTO, and only then
-> I send the remaining init commands.
-> 
-> But, at this stage, in order to send commands to the device,
-> I must use Bluez' sockets interface, and for that I must know the device
-> number (for hci_open_dev).
-> 
-> In order to be able to easily know the hci device number, I have
-> added HCIUARTGETDEVICE.
-> 
-> If there's a better way of knowing the hci device number please tell me.
+Brad
 
-this sounds reasonable and could be useful for other transport protocols
-as well. Please create a separate patch for it, because it has nothing
-to do with the HCILL support.
-
-However I have some concerns when hcid autoinits devices and you send
-extra commands at the same time. They get queued inside the kernel, but
-it make produce dead locks for some chips. I have to play a little bit
-with it, but the general idea is not bad.
-
-> > And the ll_dbg_data() has to go away. On LKML they discussing a generic
-> > hexdump function. I could accept the usage of that, but no crazy own
-> > debug routine in the kernel code.
+> > There are minor problems with btsco kernel module with linux versions
+> > above 2.6.20.x, for now with 2.6.21.x.
+> > The attachment is a solution for all problems.
+> > PS. I have also made diff with typedefs taken from kernel <=2.6.20.x,
+> > but I think we should avoid include files dependencies...
 > 
-> Of course :)
-> I am aware of Randy's hexdumper, and once it will be merged I will make
-> use of it.
+> this should still build and work with older kernels, right?
 
-Until it is merged, this has to go away.
+Yes.
 
-Regards
+> brad
 
-Marcel
-
+Tomasz.
 
 
 -------------------------------------------------------------------------
