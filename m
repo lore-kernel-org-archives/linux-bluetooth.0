@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jiri Kosina <jkosina@suse.cz>
-In-Reply-To: <Pine.LNX.4.64.0705021144291.21227@twin.jikos.cz>
-References: <Pine.LNX.4.64.0705021144291.21227@twin.jikos.cz>
-Date: Fri, 04 May 2007 08:41:53 +0200
-Message-Id: <1178260913.25425.27.camel@violet>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200705021525.07661.dgollub@suse.de>
+References: <200705021525.07661.dgollub@suse.de>
+Date: Fri, 04 May 2007 08:39:39 +0200
+Message-Id: <1178260779.25425.24.camel@violet>
 Mime-Version: 1.0
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-        bluez-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org
-Subject: Re: [Bluez-devel] [PATCH] Bluetooth: postpone hci_dev unregistration
+Subject: Re: [Bluez-devel] [PATCH] Input Service support for phones
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,34 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jiri,
+Hi Daniel,
 
-> (I sent this a week ago but it seems to have got lost in other noise, 
-> resending)
-> 
-> From: Jiri Kosina <jkosina@suse.cz>
-> 
-> Bluetooth: postpone hci_dev unregistration
->     
-> Commit b40df57 substituted bh_lock_sock() in hci_sock_dev_event() for 
-> lock_sock() when unregistering HCI device, in order to prevent deadlock 
-> against locking in l2cap_connect_cfm() from softirq context.
->     
-> This however introduces another problem - hci_sock_dev_event() for 
-> HCI_DEV_UNREG can also be triggered in atomic context, in which calling 
-> lock_sock() is not safe as it could sleep. Reported by Jeremy Fitzhardinge 
-> at http://lkml.org/lkml/2007/4/23/271
-> 
-> This patch moves the detaching of sockets from hci_device into workqueue, 
-> so that lock_sock() can be used safely. This requires movement of 
-> deallocation of hci_dev - deallocating device just after 
-> hci_unregister_dev() would be too soon, as it could happen before the 
-> workqueue has been run.
+> attachted is a simple patch for the input service, which allows (again - 
+> changed since 3.9 release) using a phone as input device. Current code only 
+> allows devices with major class of "Peripheral" and "Fake Input" 
+> (Audio/Video).
 
-I saw the report on LKML, but I am not really comfortable with this
-approach. It feels like an ugly hack. This needs more thinking and I
-think that simplifying the looking between HCI and L2CAP should be the
-goal.
+a subpath == "phone" is fully enough. Don't make it more complicated
+than it needs to be.
 
 Regards
 
