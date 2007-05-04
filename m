@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Ohad Ben-Cohen <ohad@bencohen.org>
-In-Reply-To: <200704301140.46336.ohad@bencohen.org>
-References: <200704301140.46336.ohad@bencohen.org>
-Date: Fri, 04 May 2007 08:52:08 +0200
-Message-Id: <1178261528.25425.38.camel@violet>
+In-Reply-To: <200704301139.44842.ohad@bencohen.org>
+References: <200704301139.44842.ohad@bencohen.org>
+Date: Fri, 04 May 2007 08:49:56 +0200
+Message-Id: <1178261396.25425.35.camel@violet>
 Mime-Version: 1.0
 Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [PATCH 2.6.21] Bluetooth: add support for TI's
-	HCILL UART	protocol
+Subject: Re: [Bluez-devel] [PATCH bluez-utils] add support for Texas
+	Instruments' BRF63xx	chips
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,15 +24,20 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Ohad,
 
-> Add support for Texas Instruments' HCI Low Level (HCILL) UART Bluetooth
-> protocol. HCILL is a runtime power management extension to H4,
-> which is widely used by TI's BRF63xx Bluetooth chips.
+> Introduces initializing procedures for Texas Instruments' BRF63xx chips.
+> These procedures take care of:
+> 1. Loading TI's init script
+> 2. Setting up HCILL, TI's runtime power-management UART protocol
 
-please explain the usefulness of HCIUARTGETDEVICE to me.
+patch looks good, but needs some major cleanups. Especially the header
+file stuff needs fixing. However without hardware to test this with, I
+am not going to touch it.
 
-And the ll_dbg_data() has to go away. On LKML they discussing a generic
-hexdump function. I could accept the usage of that, but no crazy own
-debug routine in the kernel code.
+> An additional, tiny feature, which proved useful for
+> stress checkings, is added to l2test: random delays.
+
+Please never combine totally unrelated things into one big patch. This
+needs to be a separate patch.
 
 Regards
 
