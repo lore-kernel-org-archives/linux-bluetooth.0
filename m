@@ -1,51 +1,95 @@
-Return-Path: <ohad@bencohen.org>
-Message-ID: <bd5b16740705040630o58f22ddfi39b6399092c1677a@mail.gmail.com>
-Date: Fri, 4 May 2007 16:30:06 +0300
-From: "Ohad Ben-Cohen" <ohad@bencohen.org>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: [PATCH 2.6.21] Bluetooth: add support for TI's HCILL UART protocol
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1178261528.25425.38.camel@violet>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+From: Daniel Gollub <dgollub@suse.de>
+To: bluez-devel@lists.sourceforge.net
+Date: Fri, 4 May 2007 14:31:23 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-References: <200704301140.46336.ohad@bencohen.org>
-	 <1178261528.25425.38.camel@violet>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_ceyOGHO8ApOUsr6"
+Message-Id: <200705041431.24251.dgollub@suse.de>
+Subject: [Bluez-devel] [PATCH] apitest -
+	dbus.decorators.explicitly_pass_message is obsolete
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+--Boundary-00=_ceyOGHO8ApOUsr6
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-On 5/4/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> please explain the usefulness of HCIUARTGETDEVICE to me.
+Hi,
 
-Most of the initializing commands should be (and thus are) sent normally,
-before the new device is added (and notification is sent to hcid).
+apitest is broken with dbus python bindings in version 0.80.1. The  call of 
+dbus.decorators.explictly_pass_message is the problem. explicity_pass_message 
+got removed from the dbus python bindings:
 
-But, there is one initialization command (deep sleep configuration),
-which must be sent _after_ the HCILL protocol is set.
+Date:   Thu Dec 7 18:37:58 2006 +0000
 
-This command is signalling the device that it can start initiating deep sleep.
-The device may immediate request to do so, so the HCILL protocol must
-already be there to receive this request.
+    dbus/decorators: Remove explicitly_pass_message
 
-That's why I let hciattach do its HCIUARTSETPROTO, and only then
-I send the remaining init commands.
+ dbus/decorators.py |   21 +--------------------
+ 1 files changed, 1 insertions(+), 20 deletions(-)
 
-But, at this stage, in order to send commands to the device,
-I must use Bluez' sockets interface, and for that I must know the device
-number (for hci_open_dev).
 
-In order to be able to easily know the hci device number, I have
-added HCIUARTGETDEVICE.
+Fix attachted.
 
-If there's a better way of knowing the hci device number please tell me.
+best regards,
+Daniel
 
-> And the ll_dbg_data() has to go away. On LKML they discussing a generic
-> hexdump function. I could accept the usage of that, but no crazy own
-> debug routine in the kernel code.
+--Boundary-00=_ceyOGHO8ApOUsr6
+Content-Type: text/x-diff; charset="us-ascii";
+	name="bluez-utils-3.9-apitest-dbus.diff"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="bluez-utils-3.9-apitest-dbus.diff"
 
-Of course :)
-I am aware of Randy's hexdumper, and once it will be merged I will make
-use of it.
+--- test/apitest
++++ test/apitest
+@@ -179,7 +179,6 @@
+         for cmd in dev_cmds:
+             print '\t%s' % cmd
+ 
+-    @dbus.decorators.explicitly_pass_message
+     def dev_signal_handler(*args, **keywords):
+         dbus_message = keywords["dbus_message"]
+         print '%s - %s: ' % (dbus_message.get_member(), dbus_message.get_path()),
+@@ -187,7 +186,6 @@
+             print '%s   ' % arg,
+         print
+ 
+-    @dbus.decorators.explicitly_pass_message
+     def mgr_signal_handler(*args, **keywords):
+         dbus_message = keywords["dbus_message"]
+         print '%s: ' % dbus_message.get_member()
 
-Thanks,
-Ohad.
+--Boundary-00=_ceyOGHO8ApOUsr6
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+--Boundary-00=_ceyOGHO8ApOUsr6
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--Boundary-00=_ceyOGHO8ApOUsr6--
