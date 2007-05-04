@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <463BA912.5020907@mojo-working.com>
-Date: Fri, 04 May 2007 14:43:46 -0700
+Message-ID: <463B9136.6090704@mojo-working.com>
+Date: Fri, 04 May 2007 13:01:58 -0700
 From: Art Rothstein <holtmann@mojo-working.com>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <463A38C2.80403@mojo-working.com>
-	<1178260234.25425.16.camel@violet>
-In-Reply-To: <1178260234.25425.16.camel@violet>
-Subject: Re: [Bluez-users] hcitool info dropped feature
- details	between	versions 3.7 and 3.9?
+References: <cd3ff4f20705022352u3451a87eub2e03a33f7bcf535@mail.gmail.com>	<1178260678.25425.22.camel@violet>
+	<cd3ff4f20705040646p34f61cb1l8d0cae7c665e0caa@mail.gmail.com>
+In-Reply-To: <cd3ff4f20705040646p34f61cb1l8d0cae7c665e0caa@mail.gmail.com>
+Subject: Re: [Bluez-users] hcitool info dropped feature details between
+ versions 3.7 and 3.9?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,38 +22,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+ > I don't see what is missing.
+
 More information:  The omission occurs only in a VMWare VM.  The command behaves 
 properly when run natively.  The VMWare Workstation version is current, at 
 5.5.4-44386, and VMWare Tools are installed.
 
 I suppose this puts me in finger-pointing territory.
-
-Marcel Holtmann wrote:
-> Hi Art,
-> 
->> I recently upgraded my Ubuntu distro from 6.10 to 7.04.  This included an
->> hcitool upgrade from 3.7 to 3.9.  Remote device information is now missing the
->> details on device features, e.g.,
->>
->> Features: 0xff 0xff 0x2d 0xf8 0x1b 0x18 0x00 0x80
->>          <3-slot packets> <5-slot packets> <encryption> <slot offset>
->>          <timing accuracy> <role switch> <hold mode> <sniff mode>
->>          <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
->>          <HV3 packets> <u-law log> <A-law log> <CVSD> <power control>
->>          <transparent SCO> <enhanced iscan> <interlaced iscan>
->>          <interlaced pscan> <inquiry with RSSI> <extended SCO>
->>          <EV4 packets> <EV5 packets> <AFH cap. slave>
->>          <AFH class. slave> <AFH cap. master> <AFH class. master>
->>                            <extended features>
->>
->> Is this intentional?  Is there another way to get this information from existing
->> utilities?
-> 
-> I don't see what is missing.
-> 
-> Regards
-> 
-> Marcel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
