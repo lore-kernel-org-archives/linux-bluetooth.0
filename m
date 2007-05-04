@@ -1,11 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 04 May 2007 11:18:58 +0400
-From: John Frankish <frankish@dubai.oilfield.slb.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-id: <7.0.1.0.2.20070504111014.03bd2950@dubai.oilfield.slb.com>
-MIME-version: 1.0
-Subject: [Bluez-devel] Fwd: Fwd: Re: Fwd: Re: Unable to set number of SCO
- buffers	: please upgrade your Kernel !
+In-Reply-To: <36BC62FC45C4E949B13C20DEFA8617D504F42BFB@zmy16exm62.ds.mot.com>
+References: <36BC62FC45C4E949B13C20DEFA8617D504F42BFB@zmy16exm62.ds.mot.com>
+Date: Fri, 04 May 2007 08:55:32 +0200
+Message-Id: <1178261732.25425.41.camel@violet>
+Mime-Version: 1.0
+Cc: Singer Catherine-CSINGER1 <CSINGER1@motorola.com>,
+        Jin Hong-Lei-W19971 <hong-lei.jin@motorola.com>,
+        Saeed Faisal-EFS015 <faisal.saeed@motorola.com>
+Subject: Re: [Bluez-devel] Report a bug against "l2cap_conf_output()"
+	in	"net/bluetooth/l2cap.c"
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,254 +20,36 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-After realising that make install did not copy the bluez-utils 3.9 
-passkey-agent to the operating system, I made some more progress with 
-connecting to my bluetooth headset:
-
-window 1
--------------
-# passkey-agent --default 0000
-[next line appears after hcitool cc/auth in window 2]
-Passkey request for device 00:12:EE:A6:1D:F4
-
-window 2
--------------
-# hcitool cc 00:12:EE:A6:1D:F4
-# hcitool auth 00:12:EE:A6:1D:F4
-
-
-window 3
--------------
-# hcid -n
-hcid[2785]: Bluetooth HCI daemon
-hcid[2785]: HCI dev 0 registered
-hcid[2785]: HCI dev 0 already up
-hcid[2785]: Device hci0 has been added
-hcid[2785]: Starting security manager 0
-hcid[2785]: Device hci0 has been activated
-[next line appears after passkey-agent command in window 1]
-hcid[2785]: Default passkey agent (:1.2, 
-/org/bluez/passkey_agent_2867) registered
-[next lines appear after hcitool cc/auth in window 2]
-hcid[2785]: link_key_request (sba=00:10:C6:56:F4:9F, dba=00:12:EE:A6:1D:F4)
-hcid[2785]: pin_code_request (sba=00:10:C6:56:F4:9F, dba=00:12:EE:A6:1D:F4)
-hcid[2785]: link_key_notify (sba=00:10:C6:56:F4:9F, dba=00:12:EE:A6:1D:F4)
-
-After the "link_key_notify" line from hcid my headset switches from 
-pairing mode to standby, so I presume it is paired, but...
-
-# mplayer -ao alsa:device=headset /.../music.mp3
-alsa-init: 1 soundcard found, using: headset
-ALSA lib pcm_sco.c:561:(_snd_pcm_sco_open) Socket connection returned 
-Connection refused
-alsa-init: playback open error: Connection refused
-Could not open/initialize audio device -> no sound.
-
-Since the headset is paired, I don't understand why the plugz 
-connection is refused - does anybody have any ideas?
-
-Regards
-John
-
->Date: Sun, 29 Apr 2007 18:07:48 +0400
->From: John Frankish <frankish@dubai.oilfield.slb.com>
->Subject: [Bluez-devel] Fwd: Re: Fwd: Re: Unable to set number of SCO 
->buffers    :
->  please upgrade your Kernel !
->Sender: bluez-devel-bounces@lists.sourceforge.net
->To: BlueZ development <bluez-devel@lists.sourceforge.net>
->Reply-to: BlueZ development <bluez-devel@lists.sourceforge.net>
->Message-id: <7.0.1.0.2.20070429173621.03b9d4e8@dubai.oilfield.slb.com>
->Content-type: text/plain; charset=us-ascii
->Content-transfer-encoding: 7bit
->List-Post: <mailto:bluez-devel@lists.sourceforge.net>
->List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
->  <mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
->List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
->  <mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
->List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
->List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
->List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
->Original-recipient: rfc822;frankish@dubai.oilfield.slb.com
->
->Reiner,
->
->Thanks for the "xhost +" suggestion - unfortunately it didn't help...
->
->I pasted some details below in case it helps somebody suggest where I
->might be going wrong.
->
->Regards
->John
->
->Case 1 - hcid.conf/security = user: Whether I use my phone or bt
->headset, with bluez-utils 3.9, hcid just sits there waiting for a pin
->pop-up that doesn't happen. I had this problem with bluez-utils 2.15
->but at least I could set a pin-helper to fashion a work-around.
->
-># hcid -n [security=user - pin request via hcitool cc/auth
->00:0A:D9:E8:4A:65, xhost +]
->hcid[2745]: Bluetooth HCI daemon
->hcid[2745]: HCI dev 0 registered
->hcid[2745]: HCI dev 0 already up
->hcid[2745]: Device hci0 has been added
->hcid[2745]: Starting security manager 0
->hcid[2745]: Device hci0 has been activated
->hcid[2745]: link_key_request (sba=00:10:C6:56:F4:9F, dba=00:0A:D9:E8:4A:65)
->hcid[2745]: pin_code_request (sba=00:10:C6:56:F4:9F, dba=00:0A:D9:E8:4A:65)
->[then nothing]
->
->Case 2 - hcid.conf/security = auto: I can initiate a connection with
->my phone and pair my machine using the local pin in hcid.conf. Maybe
->I'm missing the logic here, but when my bt headset is put into
->pairing mode, shouldn't hcid recognise this and use the local pin in
->hcid? In practise, hcid sits there waiting for me to enter a pin on
->the bt headset which of course is not possible.
->
-># hcid -n [security=auto, connection from phone]
->hcid[2776]: Bluetooth HCI daemon
->hcid[2776]: HCI dev 0 registered
->hcid[2776]: HCI dev 0 already up
->hcid[2776]: Device hci0 has been added
->hcid[2776]: Starting security manager 0
->hcid[2776]: Device hci0 has been activated
->hcid[2776]: pin_code_request (sba=00:10:C6:56:F4:9F, dba=00:0A:D9:E8:4A:65)
->hcid[2776]: link_key_notify (sba=00:10:C6:56:F4:9F, dba=00:0A:D9:E8:4A:65)
->[paired OK]
->
-># hcid -n [security=auto, headset in pairing mode]
->hcid[7423]: Bluetooth HCI daemon
->hcid[7423]: HCI dev 0 registered
->hcid[7423]: HCI dev 0 already up
->hcid[7423]: Device hci0 has been added
->hcid[7423]: Starting security manager 0
->hcid[7423]: Device hci0 has been activated
->
->nothing happens, so then
->
-># hcitool cc 00:12:EE:A6:1D:F4
-># hcitool auth 00:12:EE:A6:1D:F4
->HCI authentication request failed: Input/output error
->
->hcid[7423]: link_key_request (sba=00:10:C6:56:F4:9F, dba=00:12:EE:A6:1D:F4)
->hcid[7423]: pin_code_request (sba=00:10:C6:56:F4:9F, dba=00:12:EE:A6:1D:F4)
->
->
->One thing I noticed with plugz and bluez-utils 2.15 is that when I
->try to play music to the headset, it automatically pairs (via the
->pin-helper I presume) but no music appears due to the sco buffers problem.
->
-># mplayer -ao alsa:device=headset /.../music.mp3
->...
->alsa-init: 1 soundcard found, using: headset
->ALSA lib pcm_sco.c:273:(sco_headset_hw_params) Unable to set number
->of SCO buffers : please upgrade your Kernel !
->alsa-init: unable to set hw-parameters: Invalid argument
->alsa-init: pcm prepare error: Input/output error
->alsa: 8000 Hz/1 channels/2 bpf/768 bytes buffer/Signed 16 bit Little Endian
->AO: [alsa] 8000Hz 1ch s16le (2 bytes per sample)
->Building audio filter chain for 44100Hz/2ch/s16le -> 8000Hz/1ch/s16le...
->Video: no video
->Starting playback...[but no sound]
->
->
->When I try this with plugz and bluez-utils 3.9, the initial
->connection is rejected but this is not echoed by hcid...
->
-># mplayer -ao alsa:device=headset /.../music.mp3
->...
->Building audio filter chain for 44100Hz/2ch/s16le -> 0Hz/0ch/??...
->alsa-init: 1 soundcard found, using: headset
->ALSA lib pcm_sco.c:561:(_snd_pcm_sco_open) Socket connection returned
->Connection refused
->alsa-init: playback open error: Connection refused
->Could not open/initialize audio device -> no sound.
->Audio: no sound
->Video: no video
->
-># hcid -n [security=auto, headset in pairing mode]
->hcid[2776]: Bluetooth HCI daemon
->hcid[2776]: HCI dev 0 registered
->hcid[2776]: HCI dev 0 already up
->hcid[2776]: Device hci0 has been added
->hcid[2776]: Starting security manager 0
->hcid[2776]: Device hci0 has been activated
->[but no link_key/pin_code_request??]
->
->------------------------
->
-> >Date: Sun, 29 Apr 2007 10:23:48 +0200
-> >From: Reiner Klenk <pdq808@t-online.de>
-> >Subject: Re: [Bluez-devel] Fwd: Re: Unable to set number of SCO buffers :
-> >         please upgrade your Kernel !
-> >Sender: bluez-devel-bounces@lists.sourceforge.net
-> >To: BlueZ development <bluez-devel@lists.sourceforge.net>
-> >Reply-to: BlueZ development <bluez-devel@lists.sourceforge.net>
-> >Message-id: <1177835028.16681.8.camel@grappa>
-> >Content-type: text/plain; charset=us-ascii
-> >Content-transfer-encoding: 7bit
-> >List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-> >List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-> >  <mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-> >List-Unsubscribe: 
-> <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-> >  <mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-> >List-Archive: 
-> <http://sourceforge.net/mailarchive/forum.php?forum=bluez-devel>
-> >List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-> >List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-> >Original-recipient: rfc822;frankish@dubai.oilfield.slb.com
-> >
-> >On Sun, 2007-04-29 at 09:08 +0400, John Frankish wrote:
-> >
-> > > 2. I compiled bluez-libs/bluez-utils 3.9 to see if plugz would work
-> > > better with this - I ran into the same pin problem as before in that
-> > > I don't get a pin pop-up on my machine. If I set security to auto in
-> > > hcid.conf then I can pair with my cell phone since I can enter a pin
-> > > on the phone but this does not work with a bluetooth headset since I
-> > > cannot enter a pin and hcid just sits there waiting...
-> >I have seen something like this, where the problem appeared to be that
-> >the pin helper could not pop up its window due to authorization failure.
-> >If this is the case, it helps to "xhost +".
-> >
-> >Hth,
-> >Reiner
-> >--
-> >debb1046 (gmail, gtalk, jabber.org, ekiga.net, last.fm, skype)
-> >
-> >
-> >-------------------------------------------------------------------------
-> >This SF.net email is sponsored by DB2 Express
-> >Download DB2 Express C - the FREE version of DB2 express and take
-> >control of your XML. No limits. Just data. Click to get it now.
-> >http://sourceforge.net/powerbar/db2/
-> >_______________________________________________
-> >Bluez-devel mailing list
-> >Bluez-devel@lists.sourceforge.net
-> >https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->
->-------------------------------------------------------------------------
->This SF.net email is sponsored by DB2 Express
->Download DB2 Express C - the FREE version of DB2 express and take
->control of your XML. No limits. Just data. Click to get it now.
->http://sourceforge.net/powerbar/db2/
->_______________________________________________
->Bluez-devel mailing list
->Bluez-devel@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SGksCgo+IAo+IEkgd2FudCB0byByZXBvcnQgYSBidWcgYWdhaW5zdCDigJxsMmNhcF9jb25mX291
+dHB1dCgp4oCdIGluIEJsdWVaIGtlcm5lbAo+IGNvZGUg4oCcbmV0L2JsdWV0b290aC9sMmNhcC5j
+4oCdOgo+IAo+ICAgICBpZiAocGktPmNvbmZfbXR1IDwgcGktPm9tdHUpIHsKPiAKPiAgICAgICAg
+bDJjYXBfYWRkX2NvbmZfb3B0KHB0ciwgTDJDQVBfQ09ORl9NVFUsIDIsIHBpLT5vbXR1KTsKPiAK
+PiAgICAgICAgcmVzdWx0ID0gTDJDQVBfQ09ORl9VTkFDQ0VQVDsKPiAKPiAgICAgfSBlbHNlIHsK
+PiAKPiAgICAgICAgcGktPm9tdHUgPSBwaS0+Y29uZl9tdHU7Cj4gCj4gICAgIH0KPiAKPiBJIHRo
+aW5rIGl04oCZcyB3cm9uZyB0byBlbmxhcmdlIHRoZSBvdXRnb2luZyBNVFUgdmFsdWUgKGJ5IGNh
+bGxpbmcKPiDigJxwaS0+b210dSA9IHBpLT5jb25mX210deKAnSkgd2hlbiBkZXZpY2UgQiBnZXRz
+IHRoZSBNVFUgaW4gZGV2aWNlIEHigJlzCj4gY29uZmlndXJhdGlvbiByZXF1ZXN0LiBJbiBmYWN0
+LCBQYWdlIDEwMDYvMTIwMCBvZiBCbHVldG9vdGggU1BFQyB2MS4yCj4gb3IgUGFnZSAxMDM4LzEy
+MzAgb2YgQmx1ZXRvb3RoIFNQRUMgdjIuMCBFRFIgYm90aCByZXF1aXJlIGEgbWluaW11bSBvZgo+
+IHRoZSAg4oCcSWYgdGhlIHJlbW90ZSBkZXZpY2Ugc2VuZHMgYSBwb3NpdGl2ZSBjb25maWd1cmF0
+aW9uIHJlc3BvbnNlIGl0Cj4gc2hhbGwgaW5jbHVkZSB0aGUgYWN0dWFsIE1UVSB0byBiZSB1c2Vk
+IG9uIHRoaXMgY2hhbm5lbCBmb3IgdHJhZmZpYwo+IGZsb3dpbmcgaW50byB0aGUgbG9jYWwgZGV2
+aWNlLiBUaGlzIGlzIHRoZSBtaW5pbXVtIG9mIHRoZSBNVFUgaW4gdGhlCj4gY29uZmlndXJhdGlv
+biByZXF1ZXN0IGFuZCB0aGUgb3V0Z29pbmcgTVRVIGNhcGFiaWxpdHkgb2YgdGhlIGRldmljZQo+
+IHNlbmRpbmcgdGhlIGNvbmZpZ3VyYXRpb24gcmVzcG9uc2Uu4oCdIEhlcmUgSSBjb25zaWRlciB0
+aGUgb3JpZ2luYWwKPiDigJxwaS0+b210deKAnSBhcyB0aGUg4oCcb3V0Z29pbmcgTVRVIGNhcGFi
+aWxpdHnigJ0uCgpJIG5lZWQgbW9yZSBkZXRhaWxzIGZyb20geW91LCBiZWNhdXNlIEkgZG9uJ3Qg
+c2VlIHRoZSBpc3N1ZSBoZXJlLiBUaGUKTVRVcyAob3V0cHV0ICsgaW5wdXQpIGZvciBMMkNBUCBh
+cmUgbmVnb3RpYXRlZCBpbiBib3RoIGRpcmVjdGlvbnMuCgpSZWdhcmRzCgpNYXJjZWwKCgoKLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnkgREIyIEV4cHJl
+c3MKRG93bmxvYWQgREIyIEV4cHJlc3MgQyAtIHRoZSBGUkVFIHZlcnNpb24gb2YgREIyIGV4cHJl
+c3MgYW5kIHRha2UKY29udHJvbCBvZiB5b3VyIFhNTC4gTm8gbGltaXRzLiBKdXN0IGRhdGEuIENs
+aWNrIHRvIGdldCBpdCBub3cuCmh0dHA6Ly9zb3VyY2Vmb3JnZS5uZXQvcG93ZXJiYXIvZGIyLwpf
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZl
+bCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8v
+bGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
