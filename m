@@ -1,83 +1,50 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <beb7688e0705051018o4e44994al22d18d11bd7d50f@mail.gmail.com>
-Date: Sat, 5 May 2007 13:18:36 -0400
-From: "Chris Spencer" <chrisspen@gmail.com>
+Return-Path: <vitervo@nokia.com>
+From: Ville Tervo <ville.tervo@nokia.com>
 To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] Unable to Compile Plugz
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Cc: marcel@holtmann.org, Ville Tervo <ville.tervo@nokia.com>
+Subject: [PATCH 2/2] [BLUETOOTH] Disconnect l2cap connection after last dlc
+Date: Fri,  4 May 2007 19:43:12 +0300
+Message-Id: <11782969921054-git-send-email-ville.tervo@nokia.com>
+In-Reply-To: <11782969921523-git-send-email-ville.tervo@nokia.com>
+References: <20070504163843.GI5925@null.research.nokia.com>
+ <11782969921523-git-send-email-ville.tervo@nokia.com>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi,
+Rfcomm spec says that the device closing the last connection (DLC) on a
+particular session is responsible for closing the multiplexer by closing the
+corresponding L2CAP channel.
 
-I've been trying to compile Plugz as described at
-http://bluetooth-alsa.sourceforge.net/build.html but I've been getting
-the error "Bluetooth header files not found". How do I fix this? The
-full console text is below.
+Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+---
+ net/bluetooth/rfcomm/core.c |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
-Thanks,
-Chris
-
-[plugz]$ ./bootstrap
-configure.in: installing `./install-sh'
-configure.in: installing `./missing'
-alsa-plugins/Makefile.am: installing `./depcomp'
-alsa-plugins/a2dpd/Makefile.am: installing `./compile'
-configure.in:95: installing `./config.guess'
-configure.in:95: installing `./config.sub'
-[plugz]$ ./configure --prefix=/usr --sysconfdir=/etc
-checking for a BSD-compatible install... /usr/bin/install -c
-checking whether build environment is sane... yes
-checking for gawk... gawk
-checking whether make sets $(MAKE)... yes
-checking for gcc... gcc
-checking for C compiler default output file name... a.out
-checking whether the C compiler works... yes
-checking whether we are cross compiling... no
-checking for suffix of executables...
-checking for suffix of object files... o
-checking whether we are using the GNU C compiler... yes
-checking whether gcc accepts -g... yes
-checking for gcc option to accept ANSI C... none needed
-checking for style of include used by make... GNU
-checking dependency style of gcc... gcc3
-checking for a BSD-compatible install... /usr/bin/install -c
-checking for ranlib... ranlib
-checking how to run the C preprocessor... gcc -E
-checking for egrep... grep -E
-checking for ANSI C header files... yes
-checking for sys/types.h... yes
-checking for sys/stat.h... yes
-checking for stdlib.h... yes
-checking for string.h... yes
-checking for memory.h... yes
-checking for strings.h... yes
-checking for inttypes.h... yes
-checking for stdint.h... yes
-checking for unistd.h... yes
-checking bluetooth/bluetooth.h usability... no
-checking bluetooth/bluetooth.h presence... no
-checking for bluetooth/bluetooth.h... no
-configure: error: Bluetooth header files not found
-[plugz]$ make
-make: *** No targets specified and no makefile found.  Stop.
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 94f4573..80c1c1e 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1058,6 +1058,12 @@ static int rfcomm_recv_ua(struct rfcomm_session *s, u8 dlci)
+ 		case BT_DISCONN:
+ 			d->state = BT_CLOSED;
+ 			__rfcomm_dlc_close(d, 0);
++
++			if (list_empty(&s->dlcs)) {
++				s->state = BT_DISCONN;
++				rfcomm_send_disc(s, 0);
++			}
++
+ 			break;
+ 		}
+ 	} else {
+@@ -1067,6 +1073,9 @@ static int rfcomm_recv_ua(struct rfcomm_session *s, u8 dlci)
+ 			s->state = BT_CONNECTED;
+ 			rfcomm_process_connect(s);
+ 			break;
++		case BT_DISCONN:
++			rfcomm_session_put(s);
++			break;
+ 		}
+ 	}
+ 	return 0;
+-- 
+1.5.1.1
