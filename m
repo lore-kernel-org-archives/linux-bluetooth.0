@@ -1,16 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <36BC62FC45C4E949B13C20DEFA8617D504F42BFB@zmy16exm62.ds.mot.com>
-References: <36BC62FC45C4E949B13C20DEFA8617D504F42BFB@zmy16exm62.ds.mot.com>
-Date: Fri, 04 May 2007 08:55:32 +0200
-Message-Id: <1178261732.25425.41.camel@violet>
+To: Ohad Ben-Cohen <ohad@bencohen.org>
+In-Reply-To: <200704301140.46336.ohad@bencohen.org>
+References: <200704301140.46336.ohad@bencohen.org>
+Date: Fri, 04 May 2007 08:52:08 +0200
+Message-Id: <1178261528.25425.38.camel@violet>
 Mime-Version: 1.0
-Cc: Singer Catherine-CSINGER1 <CSINGER1@motorola.com>,
-        Jin Hong-Lei-W19971 <hong-lei.jin@motorola.com>,
-        Saeed Faisal-EFS015 <faisal.saeed@motorola.com>
-Subject: Re: [Bluez-devel] Report a bug against "l2cap_conf_output()"
-	in	"net/bluetooth/l2cap.c"
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] [PATCH 2.6.21] Bluetooth: add support for TI's
+	HCILL UART	protocol
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,36 +18,34 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGksCgo+IAo+IEkgd2FudCB0byByZXBvcnQgYSBidWcgYWdhaW5zdCDigJxsMmNhcF9jb25mX291
-dHB1dCgp4oCdIGluIEJsdWVaIGtlcm5lbAo+IGNvZGUg4oCcbmV0L2JsdWV0b290aC9sMmNhcC5j
-4oCdOgo+IAo+ICAgICBpZiAocGktPmNvbmZfbXR1IDwgcGktPm9tdHUpIHsKPiAKPiAgICAgICAg
-bDJjYXBfYWRkX2NvbmZfb3B0KHB0ciwgTDJDQVBfQ09ORl9NVFUsIDIsIHBpLT5vbXR1KTsKPiAK
-PiAgICAgICAgcmVzdWx0ID0gTDJDQVBfQ09ORl9VTkFDQ0VQVDsKPiAKPiAgICAgfSBlbHNlIHsK
-PiAKPiAgICAgICAgcGktPm9tdHUgPSBwaS0+Y29uZl9tdHU7Cj4gCj4gICAgIH0KPiAKPiBJIHRo
-aW5rIGl04oCZcyB3cm9uZyB0byBlbmxhcmdlIHRoZSBvdXRnb2luZyBNVFUgdmFsdWUgKGJ5IGNh
-bGxpbmcKPiDigJxwaS0+b210dSA9IHBpLT5jb25mX210deKAnSkgd2hlbiBkZXZpY2UgQiBnZXRz
-IHRoZSBNVFUgaW4gZGV2aWNlIEHigJlzCj4gY29uZmlndXJhdGlvbiByZXF1ZXN0LiBJbiBmYWN0
-LCBQYWdlIDEwMDYvMTIwMCBvZiBCbHVldG9vdGggU1BFQyB2MS4yCj4gb3IgUGFnZSAxMDM4LzEy
-MzAgb2YgQmx1ZXRvb3RoIFNQRUMgdjIuMCBFRFIgYm90aCByZXF1aXJlIGEgbWluaW11bSBvZgo+
-IHRoZSAg4oCcSWYgdGhlIHJlbW90ZSBkZXZpY2Ugc2VuZHMgYSBwb3NpdGl2ZSBjb25maWd1cmF0
-aW9uIHJlc3BvbnNlIGl0Cj4gc2hhbGwgaW5jbHVkZSB0aGUgYWN0dWFsIE1UVSB0byBiZSB1c2Vk
-IG9uIHRoaXMgY2hhbm5lbCBmb3IgdHJhZmZpYwo+IGZsb3dpbmcgaW50byB0aGUgbG9jYWwgZGV2
-aWNlLiBUaGlzIGlzIHRoZSBtaW5pbXVtIG9mIHRoZSBNVFUgaW4gdGhlCj4gY29uZmlndXJhdGlv
-biByZXF1ZXN0IGFuZCB0aGUgb3V0Z29pbmcgTVRVIGNhcGFiaWxpdHkgb2YgdGhlIGRldmljZQo+
-IHNlbmRpbmcgdGhlIGNvbmZpZ3VyYXRpb24gcmVzcG9uc2Uu4oCdIEhlcmUgSSBjb25zaWRlciB0
-aGUgb3JpZ2luYWwKPiDigJxwaS0+b210deKAnSBhcyB0aGUg4oCcb3V0Z29pbmcgTVRVIGNhcGFi
-aWxpdHnigJ0uCgpJIG5lZWQgbW9yZSBkZXRhaWxzIGZyb20geW91LCBiZWNhdXNlIEkgZG9uJ3Qg
-c2VlIHRoZSBpc3N1ZSBoZXJlLiBUaGUKTVRVcyAob3V0cHV0ICsgaW5wdXQpIGZvciBMMkNBUCBh
-cmUgbmVnb3RpYXRlZCBpbiBib3RoIGRpcmVjdGlvbnMuCgpSZWdhcmRzCgpNYXJjZWwKCgoKLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnkgREIyIEV4cHJl
-c3MKRG93bmxvYWQgREIyIEV4cHJlc3MgQyAtIHRoZSBGUkVFIHZlcnNpb24gb2YgREIyIGV4cHJl
-c3MgYW5kIHRha2UKY29udHJvbCBvZiB5b3VyIFhNTC4gTm8gbGltaXRzLiBKdXN0IGRhdGEuIENs
-aWNrIHRvIGdldCBpdCBub3cuCmh0dHA6Ly9zb3VyY2Vmb3JnZS5uZXQvcG93ZXJiYXIvZGIyLwpf
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZl
-bCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8v
-bGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
+Hi Ohad,
+
+> Add support for Texas Instruments' HCI Low Level (HCILL) UART Bluetooth
+> protocol. HCILL is a runtime power management extension to H4,
+> which is widely used by TI's BRF63xx Bluetooth chips.
+
+please explain the usefulness of HCIUARTGETDEVICE to me.
+
+And the ll_dbg_data() has to go away. On LKML they discussing a generic
+hexdump function. I could accept the usage of that, but no crazy own
+debug routine in the kernel code.
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
