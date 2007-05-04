@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <cd3ff4f20705030313r136c9089t351b4404f2ecb803@mail.gmail.com>
-References: <cd3ff4f20705030313r136c9089t351b4404f2ecb803@mail.gmail.com>
-Date: Fri, 04 May 2007 08:37:00 +0200
-Message-Id: <1178260620.25425.20.camel@violet>
+In-Reply-To: <513258.65715.qm@web28004.mail.ukl.yahoo.com>
+References: <513258.65715.qm@web28004.mail.ukl.yahoo.com>
+Date: Fri, 04 May 2007 08:31:00 +0200
+Message-Id: <1178260260.25425.18.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] website : ml archives links are broken
+Subject: Re: [Bluez-users] (no subject)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,12 +20,11 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Ignacio,
 
-> In the website (http://www.bluez.org/lists.html), the links to the
-> sourceforge mailing lists archives are broken.
+> Can I use BlueZ in Cygwin running on Windows as opertive System?
 
-stupid SourceForge. Fixed the links now.
+the simply answer is NO.
 
 Regards
 
