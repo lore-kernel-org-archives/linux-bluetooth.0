@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <be976db60705062054j514e959dhdecaa306719640ab@mail.gmail.com>
-Date: Sun, 6 May 2007 20:54:38 -0700
-From: "Mark S. Townsley" <mstownsley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+From: CIJOML <cijoml@volny.cz>
+To: linux-kernel@vger.kernel.org, marcel@holtmann.de,
+        bluez-users@lists.sourceforge.net
+Date: Mon, 7 May 2007 00:05:33 +0200
 MIME-Version: 1.0
-Subject: [Bluez-users] org.bluez was not provided by any .service files
+Message-Id: <200705070005.33834.cijoml@volny.cz>
+Subject: [Bluez-users] OOPS when swsusp/resume when connected to the
+	internet via BT and GPRS
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,69 +16,74 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0099879848=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0099879848==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_17138_22962778.1178510078549"
+Hi all,
 
-------=_Part_17138_22962778.1178510078549
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+today I experienced OOPS when connected via BT/GPRS to the internet, then 
+swsup and resumed with dongle in HID proxy mode. Please see details in dmesg 
+log:
 
-Hi:
+Restarting tasks ... <6>usb 3-1: USB disconnect, address 3
+done.
+BUG: unable to handle kernel NULL pointer dereference at virtual address 
+00000008
+ printing eip:
+c018db5d
+*pde = 00000000
+Oops: 0000 [#1]
+PREEMPT
+Modules linked in: ppp_deflate zlib_deflate bsd_comp ppp_async ppp_generic 
+slhc usbhid nls_iso8859_1 nls_cp437 vfat fat sg
+sr_mod sd_mod usb_storage bnep rfcomm hidp l2cap lp fuse eeprom hci_usb 
+bluetooth 8250_pci 8250 serial_core snd_intel8x0 sn
+d_intel8x0m snd_ac97_codec wlan_scan_sta ac97_bus ath_rate_sample nsc_ircc 
+snd_pcm ide_cd ath_pci wlan ath_hal(P) 8139too m
+ii snd_timer snd irda ehci_hcd psmouse pcspkr i2c_i801 iTCO_wdt 
+iTCO_vendor_support rtc cdrom parport_pc parport snd_page_a
+lloc uhci_hcd crc_ccitt
+CPU:    0
+EIP:    0060:[<c018db5d>]    Tainted: P       VLI
+EFLAGS: 00010282   (2.6.21 #3)
+EIP is at sysfs_move_dir+0x3e/0x117
+eax: 00000000   ebx: efd7df40   ecx: f79a1e7c   edx: c1b88940
+esi: c1b91e28   edi: 00000000   ebp: c1b88940   esp: f79a1e50
+ds: 007b   es: 007b   fs: 00d8  gs: 0033  ss: 0068
+Process pppd (pid: 6550, ti=f79a0000 task=f29d6ab0 task.ti=f79a0000)
+Stack: c03475a4 f7f86e68 00000000 fffffff4 efd7df40 f7f86e68 fffffff4 c1b88940
+       c01d27ec f12a5240 c0347596 efd7df40 f12a5240 f12a5240 00000000 00000000
+       f7f86e00 00000000 c1b88940 c023c984 f7f86e68 f7f36640 ef67b000 00000000
+Call Trace:
+ [<c01d27ec>] kobject_move+0xaf/0xfa
+ [<c023c984>] device_move+0x49/0xd7
+ [<fcb54bb3>] rfcomm_tty_close+0x23/0x7a [rfcomm]
+ [<c021957a>] release_dev+0x1df/0x5e7
+ [<c01b8eb9>] inode_has_perm+0x66/0x6e
+ [<c0166469>] __posix_lock_file_conf+0x44e/0x48b
+ [<c01b8f4a>] file_has_perm+0x89/0x91
+ [<c0219991>] tty_release+0xf/0x18
+ [<c015a3c7>] __fput+0x96/0x15e
+ [<c0157fba>] filp_close+0x51/0x58
+ [<c0158f65>] sys_close+0x75/0xbf
+ [<c0103cd8>] syscall_call+0x7/0xb
+ =======================
+Code: 40 30 eb 0b a1 a0 79 42 c0 8b 40 14 8b 40 38 89 44 24 08 85 d2 74 05 8b 
+72 30 eb 0b a1 a0 79 42 c0 8b 40 14 8b 70 38
+8b 7c 24 08 <8b> 47 08 31 ff 3b 46 08 0f 84 c1 00 00 00 8b 54 24 08 8b 42 08
+EIP: [<c018db5d>] sysfs_move_dir+0x3e/0x117 SS:ESP 0068:f79a1e50
 
-I am trying to make use of the some Bluez-DBUS APIs.  Whatever I tried, I
-got back a reply saying:
+Thanks for fixing this issue
 
-   The name org.bluez was not provided by any .service files
-
-I checked and I see proper config files under /etc/dbus-1/system.d.
-I do not, however, have any .service files under /etc/bluetooth.  Is that
-the problem?  If so, where can I find some examples of .service files,
-particuarly one that can provide org.bluez?
-
-thanks
-
-Mark
-
-------=_Part_17138_22962778.1178510078549
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi:<br><br>I am trying to make use of the some Bluez-DBUS APIs.&nbsp; Whatever I tried, I got back a reply saying:<br><br>&nbsp;&nbsp; The name org.bluez was not provided by any .service files<br><br>I checked and I see proper config files under /etc/dbus-1/system.d.
-<br>I do not, however, have any .service files under /etc/bluetooth.&nbsp;
-Is that the problem?&nbsp; If so, where can I find some examples of .service
-files,<br>particuarly one that can provide org.bluez?<br><br>thanks<br><span class="sg"><br>Mark
-</span>
-
-------=_Part_17138_22962778.1178510078549--
-
-
---===============0099879848==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Michal
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0099879848==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0099879848==--
