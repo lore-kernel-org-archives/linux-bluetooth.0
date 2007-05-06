@@ -1,98 +1,105 @@
-Return-Path: <ohad@bencohen.org>
-From: Ohad Ben-Cohen <ohad@bencohen.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH bluez-utils] add random delays to l2test
-MIME-Version: 1.0
-Date: Sun, 6 May 2007 10:31:38 -0400
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200705061031.38762.ohad@bencohen.org>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Date: Sun, 06 May 2007 07:42:20 +0400
+From: John Frankish <frankish@dubai.oilfield.slb.com>
+In-reply-to: <beb7688e0705051018o4e44994al22d18d11bd7d50f@mail.gmail.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-id: <7.0.1.0.2.20070506074127.03b19b00@dubai.oilfield.slb.com>
+MIME-version: 1.0
+References: <beb7688e0705051018o4e44994al22d18d11bd7d50f@mail.gmail.com>
+Subject: Re: [Bluez-devel] Unable to Compile Plugz
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Add random delays to l2test.
-Useful for stress tests.
+Chris,
 
-The patch is against the current CVS tree of bluez-utils.
+You need to compile bluez-libs and/or bluez-utils to get the required 
+header files.
 
----
- test/l2test.c |   22 +++++++++++++++++++---
- 1 files changed, 19 insertions(+), 3 deletions(-)
- mode change 100644 => 100755 test/l2test.c
+Regards
+John
 
-diff --git a/test/l2test.c b/test/l2test.c
-old mode 100644
-new mode 100755
-index 733c052..08745f1
---- a/test/l2test.c
-+++ b/test/l2test.c
-@@ -84,6 +84,9 @@ static int count = 1;
- /* Default delay after sending count number of frames */
- static unsigned long delay = 0;
- 
-+/* Default delay random switch  (0 is off, else is on) */
-+static int random_delay = 0;
-+
- static char *filename = NULL;
- 
- static int flowctl = 0;
-@@ -580,10 +583,16 @@ static void recv_mode(int sk)
- 	}
- }
- 
-+static double double_random(void)
-+{
-+	return ((double)rand())/((double)RAND_MAX);
-+}
-+
- static void do_send(int sk)
- {
- 	uint32_t seq;
- 	int i, fd, len;
-+	unsigned long tmp_delay;
- 
- 	syslog(LOG_INFO, "Sending ...");
- 
-@@ -615,8 +624,10 @@ static void do_send(int sk)
- 			exit(1);
- 		}
- 
--		if (num_frames && delay && count && !(seq % count))
--			usleep(delay);
-+		if (num_frames && delay && count && !(seq % count)) {
-+			tmp_delay = random_delay?delay*double_random():delay;
-+			usleep(tmp_delay);
-+		}
- 	}
- }
- 
-@@ -814,6 +825,7 @@ static void usage(void)
- 		"\t[-N num] send num frames (default = infinite)\n"
- 		"\t[-C num] send num frames before delay (default = 1)\n"
- 		"\t[-D milliseconds] delay after sending num frames (default = 0)\n"
-+		"\t[-Z] random delay between 0 to the value that is set using -D\n"
- 		"\t[-R] reliable mode\n"
- 		"\t[-G] use connectionless channel (datagram)\n"
- 		"\t[-F] enable flow control\n"
-@@ -830,7 +842,7 @@ int main(int argc, char *argv[])
- 
- 	bacpy(&bdaddr, BDADDR_ANY);
- 
--	while ((opt=getopt(argc,argv,"rdscuwmnxyzb:i:P:I:O:B:N:L:C:D:RGFAESM")) != EOF) {
-+	while ((opt=getopt(argc,argv,"rdscuwmnxyzb:i:P:I:O:B:N:L:C:D:ZRGFAESM")) != EOF) {
- 		switch(opt) {
- 		case 'r':
- 			mode = RECV;
-@@ -953,6 +965,10 @@ int main(int argc, char *argv[])
- 			socktype = SOCK_DGRAM;
- 			break;
- 
-+		case 'Z':
-+			random_delay = 1;
-+			break;
-+
- 		default:
- 			usage();
- 			exit(1);
--- 
-1.5.0.6
+At 21:18 05-05-07, you wrote:
+>Hi,
+>
+>I've been trying to compile Plugz as described at
+>http://bluetooth-alsa.sourceforge.net/build.html but I've been getting
+>the error "Bluetooth header files not found". How do I fix this? The
+>full console text is below.
+>
+>Thanks,
+>Chris
+>
+>[plugz]$ ./bootstrap
+>configure.in: installing `./install-sh'
+>configure.in: installing `./missing'
+>alsa-plugins/Makefile.am: installing `./depcomp'
+>alsa-plugins/a2dpd/Makefile.am: installing `./compile'
+>configure.in:95: installing `./config.guess'
+>configure.in:95: installing `./config.sub'
+>[plugz]$ ./configure --prefix=/usr --sysconfdir=/etc
+>checking for a BSD-compatible install... /usr/bin/install -c
+>checking whether build environment is sane... yes
+>checking for gawk... gawk
+>checking whether make sets $(MAKE)... yes
+>checking for gcc... gcc
+>checking for C compiler default output file name... a.out
+>checking whether the C compiler works... yes
+>checking whether we are cross compiling... no
+>checking for suffix of executables...
+>checking for suffix of object files... o
+>checking whether we are using the GNU C compiler... yes
+>checking whether gcc accepts -g... yes
+>checking for gcc option to accept ANSI C... none needed
+>checking for style of include used by make... GNU
+>checking dependency style of gcc... gcc3
+>checking for a BSD-compatible install... /usr/bin/install -c
+>checking for ranlib... ranlib
+>checking how to run the C preprocessor... gcc -E
+>checking for egrep... grep -E
+>checking for ANSI C header files... yes
+>checking for sys/types.h... yes
+>checking for sys/stat.h... yes
+>checking for stdlib.h... yes
+>checking for string.h... yes
+>checking for memory.h... yes
+>checking for strings.h... yes
+>checking for inttypes.h... yes
+>checking for stdint.h... yes
+>checking for unistd.h... yes
+>checking bluetooth/bluetooth.h usability... no
+>checking bluetooth/bluetooth.h presence... no
+>checking for bluetooth/bluetooth.h... no
+>configure: error: Bluetooth header files not found
+>[plugz]$ make
+>make: *** No targets specified and no makefile found.  Stop.
+>
+>-------------------------------------------------------------------------
+>This SF.net email is sponsored by DB2 Express
+>Download DB2 Express C - the FREE version of DB2 express and take
+>control of your XML. No limits. Just data. Click to get it now.
+>http://sourceforge.net/powerbar/db2/
+>_______________________________________________
+>Bluez-devel mailing list
+>Bluez-devel@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
