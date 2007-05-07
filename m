@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <1ab01fb50705062337h27e492e1k96fb7acba7481b98@mail.gmail.com>
-Date: Mon, 7 May 2007 12:07:33 +0530
-From: "Vikas Sinha" <compuvikas@gmail.com>
+Message-ID: <be976db60705062056x4aa390f8r7b0c82b4b4cb9941@mail.gmail.com>
+Date: Sun, 6 May 2007 20:56:30 -0700
+From: "Mark S. Townsley" <mstownsley@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1608.190.30.192.53.1178493815.squirrel@www.y2knetworks.com.ar>
 MIME-Version: 1.0
-References: <mailman.10877.1178436722.11342.bluez-devel@lists.sourceforge.net>
-	<1608.190.30.192.53.1178493815.squirrel@www.y2knetworks.com.ar>
-Subject: Re: [Bluez-devel] Services Discovering
+Subject: [Bluez-devel] DBUS API and .service files (org.bluez not provided
+	by any .service files)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,86 +15,50 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1801310182=="
+Content-Type: multipart/mixed; boundary="===============0500829421=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1801310182==
+--===============0500829421==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_86297_22456929.1178519853222"
+	boundary="----=_Part_17151_606220.1178510190761"
 
-------=_Part_86297_22456929.1178519853222
+------=_Part_17151_606220.1178510190761
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-hi Mauricio,
-Check out the code for sdptool.c . It use browse() to browse all service
-found in any device. Actually when we do browse it get a link-list which
-need to browse each list inside list.  There is a magic number 0xffff to get
-all service. use it.
+Hi:
 
+I am trying to make use of the some Bluez-DBUS APIs.  Whatever I tried, I
+got back a reply saying:
 
+   The name org.bluez was not provided by any .service files
 
-On 5/7/07, msaglietto@y2knetworks.com.ar <msaglietto@y2knetworks.com.ar>
-wrote:
->
-> Hi,
->     I was looking a way  to get all the services of a bluetooth device.And
-> found this that can help me ...
-> http://people.csail.mit.edu/albert/bluez-intro/x601.html
-> But still if use this method i have to have a list of all UUID  then i was
-> wondering if there is another method or at least there is a list of all
-> UUID somewhere.
->
-> Regards,
-> Mauricio
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by DB2 Express
-> Download DB2 Express C - the FREE version of DB2 express and take
-> control of your XML. No limits. Just data. Click to get it now.
-> http://sourceforge.net/powerbar/db2/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+I checked and I see proper config files under /etc/dbus-1/system.d.
+I do not, however, have any .service files under /etc/bluetooth.  Is that
+the problem?  If so, where can I find some examples of .service files,
+particuarly one that can provide org.bluez?
 
+thanks
 
+Mark
 
--- 
-Impossible
-itself contain
-I M Possible
-
-Vikas
-
-------=_Part_86297_22456929.1178519853222
+------=_Part_17151_606220.1178510190761
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-hi Mauricio,<br>
-Check out the code for sdptool.c . It use browse() to browse all
-service found in any device. Actually when we do browse it get a
-link-list which need to browse each list inside list.&nbsp; There is a
-magic number 0xffff to get all service. use it.<br>
-<br>
-<br><br><div><span class="gmail_quote">On 5/7/07, <b class="gmail_sendername"><a href="mailto:msaglietto@y2knetworks.com.ar">msaglietto@y2knetworks.com.ar</a></b> &lt;<a href="mailto:msaglietto@y2knetworks.com.ar">msaglietto@y2knetworks.com.ar
-</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hi,<br>&nbsp;&nbsp;&nbsp;&nbsp;I was looking a way&nbsp;&nbsp;to get all the services of a bluetooth 
-device.And<br>found this that can help me ...<br><a href="http://people.csail.mit.edu/albert/bluez-intro/x601.html">http://people.csail.mit.edu/albert/bluez-intro/x601.html</a><br>But still if use this method i have to have a list of all UUID&nbsp;&nbsp;then i was
-<br>wondering if there is another method or at least there is a list of all<br>UUID somewhere.<br><br>Regards,<br>Mauricio<br><br><br><br>-------------------------------------------------------------------------<br>This SF.net
- email is sponsored by DB2 Express<br>Download DB2 Express C - the FREE version of DB2 express and take<br>control of your XML. No limits. Just data. Click to get it now.<br><a href="http://sourceforge.net/powerbar/db2/">
-http://sourceforge.net/powerbar/db2/</a><br>_______________________________________________<br>Bluez-devel mailing list<br><a href="mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-devel">
-https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br></blockquote></div><br><br clear="all"><br>-- <br>Impossible <br>itself contain <br>I M Possible<br><br>Vikas
+Hi:<br><br>I am trying to make use of the some Bluez-DBUS APIs.&nbsp; Whatever I tried, I got back a reply saying:<br><br>&nbsp;&nbsp; The name org.bluez was not provided by any .service files<br><br>I checked and I see proper config files under /etc/dbus-1/system.d.
+<br>I do not, however, have any .service files under /etc/bluetooth.&nbsp;
+Is that the problem?&nbsp; If so, where can I find some examples of .service
+files,<br>particuarly one that can provide org.bluez?<br><br>thanks<br><span class="sg"><br>Mark
+</span>
 
-------=_Part_86297_22456929.1178519853222--
+------=_Part_17151_606220.1178510190761--
 
 
---===============1801310182==
+--===============0500829421==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -107,7 +69,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1801310182==
+--===============0500829421==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -118,4 +80,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1801310182==--
+--===============0500829421==--
