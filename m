@@ -1,16 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: CIJOML <cijoml@volny.cz>
-To: "Michal Piotrowski" <michal.k.k.piotrowski@gmail.com>,
-        linux-kernel@vger.kernel.org, marcel@holtmann.de,
-        bluez-users@lists.sourceforge.net
-Date: Mon, 7 May 2007 07:04:29 +0200
-References: <200705070005.33834.cijoml@volny.cz>
-	<6bffcb0e0705061534l4cdd2496w8e2e2a0606f17f2e@mail.gmail.com>
-In-Reply-To: <6bffcb0e0705061534l4cdd2496w8e2e2a0606f17f2e@mail.gmail.com>
+Message-ID: <be976db60705062054j514e959dhdecaa306719640ab@mail.gmail.com>
+Date: Sun, 6 May 2007 20:54:38 -0700
+From: "Mark S. Townsley" <mstownsley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Message-Id: <200705070704.30361.cijoml@volny.cz>
-Subject: Re: [Bluez-users] OOPS when swsusp/resume when connected to the
-	internet via BT and GPRS
+Subject: [Bluez-users] org.bluez was not provided by any .service files
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,86 +14,69 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============0099879848=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGkgTWljaGFsLAoKbXkga2VybmVsIGlzIHRhaW50ZWQgd2l0aCBtYWR3aWZpIG9wZW5zb3VyY2Ug
-ZHJpdmVyIDopLiBPbmx5IGJpbmFyeSBwYXJ0IGlzIAphdGhfaGFsIG1vZHVsZSwgd2hpY2ggZG9l
-c24ndCBoYXZlIGFueXRoaW5rIHRvIGRvIHdpdGggdGhpcyBwYXJ0IG9mIGtlcm5lbC4KQXRoX2hh
-bCBpcyBkb2luZyBSRiBwYXJ0IG9mIGNhcmQgdG8gcHJvdGVjdCBvdGhlcnMgdHVuZS90cmFuc21p
-dCBpbiBvdGhlciAKZnJlcXVlbmN5IHRoYW4gMi41LzUuOEdIeiAoV2lmaSA4MDIuMTFhL2IvZyku
-CgpNeSBrZXJuZWwgaXMgMTAwJSBvcGVuc291cmNlIDopCgpBbmQgQlRXIHRoaXMgaGFwcGVucyBh
-bHNvIHdpdGggbWFkd2lmaSBrZXJuZWwgbW9kdWxlcyB1bmxvYWRlZC4KCkJlc3QgcmVnYXJkcwoK
-TWljaGFsCgoKRG5lIHBvbmTEm2zDrSAwNyBrdsSbdGVuIDIwMDcgMDA6MzQganN0ZSBuYXBzYWwo
-YSk6Cj4gSGkgTWljaGFsLAo+Cj4gT24gMDcvMDUvMDcsIENJSk9NTCA8Y2lqb21sQHZvbG55LmN6
-PiB3cm90ZToKPiA+IEhpIGFsbCwKPiA+Cj4gPiB0b2RheSBJIGV4cGVyaWVuY2VkIE9PUFMgd2hl
-biBjb25uZWN0ZWQgdmlhIEJUL0dQUlMgdG8gdGhlIGludGVybmV0LCB0aGVuCj4gPiBzd3N1cCBh
-bmQgcmVzdW1lZCB3aXRoIGRvbmdsZSBpbiBISUQgcHJveHkgbW9kZS4gUGxlYXNlIHNlZSBkZXRh
-aWxzIGluCj4gPiBkbWVzZyBsb2c6Cj4gPgo+ID4gUmVzdGFydGluZyB0YXNrcyAuLi4gPDY+dXNi
-IDMtMTogVVNCIGRpc2Nvbm5lY3QsIGFkZHJlc3MgMwo+ID4gZG9uZS4KPiA+IEJVRzogdW5hYmxl
-IHRvIGhhbmRsZSBrZXJuZWwgTlVMTCBwb2ludGVyIGRlcmVmZXJlbmNlIGF0IHZpcnR1YWwgYWRk
-cmVzcwo+ID4gMDAwMDAwMDgKPiA+ICBwcmludGluZyBlaXA6Cj4gPiBjMDE4ZGI1ZAo+ID4gKnBk
-ZSA9IDAwMDAwMDAwCj4gPiBPb3BzOiAwMDAwIFsjMV0KPiA+IFBSRUVNUFQKPiA+IE1vZHVsZXMg
-bGlua2VkIGluOiBwcHBfZGVmbGF0ZSB6bGliX2RlZmxhdGUgYnNkX2NvbXAgcHBwX2FzeW5jCj4g
-PiBwcHBfZ2VuZXJpYyBzbGhjIHVzYmhpZCBubHNfaXNvODg1OV8xIG5sc19jcDQzNyB2ZmF0IGZh
-dCBzZwo+ID4gc3JfbW9kIHNkX21vZCB1c2Jfc3RvcmFnZSBibmVwIHJmY29tbSBoaWRwIGwyY2Fw
-IGxwIGZ1c2UgZWVwcm9tIGhjaV91c2IKPiA+IGJsdWV0b290aCA4MjUwX3BjaSA4MjUwIHNlcmlh
-bF9jb3JlIHNuZF9pbnRlbDh4MCBzbgo+ID4gZF9pbnRlbDh4MG0gc25kX2FjOTdfY29kZWMgd2xh
-bl9zY2FuX3N0YSBhYzk3X2J1cyBhdGhfcmF0ZV9zYW1wbGUKPiA+IG5zY19pcmNjIHNuZF9wY20g
-aWRlX2NkIGF0aF9wY2kgd2xhbiBhdGhfaGFsKFApIDgxMzl0b28gbQo+ID4gaWkgc25kX3RpbWVy
-IHNuZCBpcmRhIGVoY2lfaGNkIHBzbW91c2UgcGNzcGtyIGkyY19pODAxIGlUQ09fd2R0Cj4gPiBp
-VENPX3ZlbmRvcl9zdXBwb3J0IHJ0YyBjZHJvbSBwYXJwb3J0X3BjIHBhcnBvcnQgc25kX3BhZ2Vf
-YQo+ID4gbGxvYyB1aGNpX2hjZCBjcmNfY2NpdHQKPiA+IENQVTogICAgMAo+ID4gRUlQOiAgICAw
-MDYwOls8YzAxOGRiNWQ+XSAgICBUYWludGVkOiBQICAgICAgIFZMSQo+Cj4gWW91IGFyZSB1c2lu
-ZyB0YWludGVkIGtlcm5lbC4KPgo+ICIgICAgV2hlbiB5b3UgYXJlIHVzaW5nIGEgYmluYXJ5IGRy
-aXZlciwgdGhlIGtlcm5lbCBpcyAidGFpbnRlZCIsCj4gd2hpY2ggbWVhbnMgdGhhdCB0aGUgc291
-cmNlCj4gb2YgcG9zc2libGUgcHJvYmxlbXMgbWF5IGJlIHVucmVsYXRlZCB0byB0aGUga2VybmVs
-IGNvZGUgKHNlZQo+IGh0dHBzOi8vc2VjdXJlLXN1cHBvcnQuCj4gbm92ZWxsLmNvbS9LYW5pc2FQ
-bGF0Zm9ybS9QdWJsaXNoaW5nLzI1MC8zNTgyNzUwX2YuU0FMX1B1YmxpYy5odG1sIGZvciBtb3Jl
-Cj4gZGUtIHRhaWxzKS4gWW91IGNhbiBjaGVjayB3aGV0aGVyIG9yIG5vdCB0aGUga2VybmVsIHdh
-cyB0YWludGVkIHdoZW4gdGhlCj4gcHJvYmxlbSBvY2N1cmVkIGJ5Cj4gbG9va2luZyBhdCB0aGUg
-Y29ycmVzcG9uZGluZyBlcnJvciBtZXNzYWdlLiBJZiBjYW4geW91IHNlZSBzb21ldGhpbmcKPiBz
-aW1pbGFyIHRvIHRoZSBmb2xsb3dpbmcKPiBsaW5lOgo+IEVJUDogICAgICAwMDYwOls8YzA0NmM3
-YzM+XSAgICAgICAgIFRhaW50ZWQ6IFAgICAgICBWTEkKPiAodGhlIHdvcmQgVGFpbnRlZCBpcyBj
-cnVjaWFsIGhlcmUpLCB0aGUga2VybmVsIHdhcyB0YWludGVkIGFuZCBtb3N0Cj4gcHJvYmFibHkg
-dGhlIGtlcm5lbAo+IGRldmVsb3BlcnMgd2lsbCBub3QgYmUgYWJsZSB0byBoZWxwIHlvdS4gSW4g
-dGhhdCBjYXNlIHlvdSBzaG91bGQgdHJ5Cj4gdG8gcmVwcm9kdWNlIHRoZSBwcm9ibGVtCj4gd2l0
-aG91dCB0aGUgYmluYXJ5IGRyaXZlciBsb2FkZWQuIE1vcmVvdmVyLCBpZiB0aGUgcHJvYmxlbSBk
-b2VzIG5vdAo+IG9jY3VyIHdpdGhvdXQgaXQsIHlvdQo+IHNob3VsZCBzZW5kIGEgYnVnIHJlcG9y
-dCB0byB0aGUgY3JlYXRvcnMgb2YgdGhlIGJpbmFyeSBkcml2ZXIgYW5kIGFzawo+IHRoZW0gdG8g
-76yBeCBpdC4iCj4KPiAtLSBMaW51eCBLZXJuZWwgVGVzdGVyJ3MgR3VpZGUKPgo+ID4gRUZMQUdT
-OiAwMDAxMDI4MiAgICgyLjYuMjEgIzMpCj4gPiBFSVAgaXMgYXQgc3lzZnNfbW92ZV9kaXIrMHgz
-ZS8weDExNwo+ID4gZWF4OiAwMDAwMDAwMCAgIGVieDogZWZkN2RmNDAgICBlY3g6IGY3OWExZTdj
-ICAgZWR4OiBjMWI4ODk0MAo+ID4gZXNpOiBjMWI5MWUyOCAgIGVkaTogMDAwMDAwMDAgICBlYnA6
-IGMxYjg4OTQwICAgZXNwOiBmNzlhMWU1MAo+ID4gZHM6IDAwN2IgICBlczogMDA3YiAgIGZzOiAw
-MGQ4ICBnczogMDAzMyAgc3M6IDAwNjgKPiA+IFByb2Nlc3MgcHBwZCAocGlkOiA2NTUwLCB0aT1m
-NzlhMDAwMCB0YXNrPWYyOWQ2YWIwIHRhc2sudGk9Zjc5YTAwMDApCj4gPiBTdGFjazogYzAzNDc1
-YTQgZjdmODZlNjggMDAwMDAwMDAgZmZmZmZmZjQgZWZkN2RmNDAgZjdmODZlNjggZmZmZmZmZjQK
-PiA+IGMxYjg4OTQwIGMwMWQyN2VjIGYxMmE1MjQwIGMwMzQ3NTk2IGVmZDdkZjQwIGYxMmE1MjQw
-IGYxMmE1MjQwIDAwMDAwMDAwCj4gPiAwMDAwMDAwMCBmN2Y4NmUwMCAwMDAwMDAwMCBjMWI4ODk0
-MCBjMDIzYzk4NCBmN2Y4NmU2OCBmN2YzNjY0MCBlZjY3YjAwMAo+ID4gMDAwMDAwMDAgQ2FsbCBU
-cmFjZToKPiA+ICBbPGMwMWQyN2VjPl0ga29iamVjdF9tb3ZlKzB4YWYvMHhmYQo+ID4gIFs8YzAy
-M2M5ODQ+XSBkZXZpY2VfbW92ZSsweDQ5LzB4ZDcKPiA+ICBbPGZjYjU0YmIzPl0gcmZjb21tX3R0
-eV9jbG9zZSsweDIzLzB4N2EgW3JmY29tbV0KPiA+ICBbPGMwMjE5NTdhPl0gcmVsZWFzZV9kZXYr
-MHgxZGYvMHg1ZTcKPiA+ICBbPGMwMWI4ZWI5Pl0gaW5vZGVfaGFzX3Blcm0rMHg2Ni8weDZlCj4g
-PiAgWzxjMDE2NjQ2OT5dIF9fcG9zaXhfbG9ja19maWxlX2NvbmYrMHg0NGUvMHg0OGIKPiA+ICBb
-PGMwMWI4ZjRhPl0gZmlsZV9oYXNfcGVybSsweDg5LzB4OTEKPiA+ICBbPGMwMjE5OTkxPl0gdHR5
-X3JlbGVhc2UrMHhmLzB4MTgKPiA+ICBbPGMwMTVhM2M3Pl0gX19mcHV0KzB4OTYvMHgxNWUKPiA+
-ICBbPGMwMTU3ZmJhPl0gZmlscF9jbG9zZSsweDUxLzB4NTgKPiA+ICBbPGMwMTU4ZjY1Pl0gc3lz
-X2Nsb3NlKzB4NzUvMHhiZgo+ID4gIFs8YzAxMDNjZDg+XSBzeXNjYWxsX2NhbGwrMHg3LzB4Ygo+
-ID4gID09PT09PT09PT09PT09PT09PT09PT09Cj4gPiBDb2RlOiA0MCAzMCBlYiAwYiBhMSBhMCA3
-OSA0MiBjMCA4YiA0MCAxNCA4YiA0MCAzOCA4OSA0NCAyNCAwOCA4NSBkMiA3NAo+ID4gMDUgOGIg
-NzIgMzAgZWIgMGIgYTEgYTAgNzkgNDIgYzAgOGIgNDAgMTQgOGIgNzAgMzgKPiA+IDhiIDdjIDI0
-IDA4IDw4Yj4gNDcgMDggMzEgZmYgM2IgNDYgMDggMGYgODQgYzEgMDAgMDAgMDAgOGIgNTQgMjQg
-MDggOGIgNDIKPiA+IDA4IEVJUDogWzxjMDE4ZGI1ZD5dIHN5c2ZzX21vdmVfZGlyKzB4M2UvMHgx
-MTcgU1M6RVNQIDAwNjg6Zjc5YTFlNTAKPiA+Cj4gPiBUaGFua3MgZm9yIGZpeGluZyB0aGlzIGlz
-c3VlCj4gPgo+ID4gTWljaGFsCj4KPiBSZWdhcmRzLAo+IE1pY2hhbAoKLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnkgREIyIEV4cHJlc3MKRG93bmxvYWQg
-REIyIEV4cHJlc3MgQyAtIHRoZSBGUkVFIHZlcnNpb24gb2YgREIyIGV4cHJlc3MgYW5kIHRha2UK
-Y29udHJvbCBvZiB5b3VyIFhNTC4gTm8gbGltaXRzLiBKdXN0IGRhdGEuIENsaWNrIHRvIGdldCBp
-dCBub3cuCmh0dHA6Ly9zb3VyY2Vmb3JnZS5uZXQvcG93ZXJiYXIvZGIyLwpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei11c2VycyBtYWlsaW5nIGxp
-c3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNl
-Zm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
+--===============0099879848==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_17138_22962778.1178510078549"
+
+------=_Part_17138_22962778.1178510078549
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi:
+
+I am trying to make use of the some Bluez-DBUS APIs.  Whatever I tried, I
+got back a reply saying:
+
+   The name org.bluez was not provided by any .service files
+
+I checked and I see proper config files under /etc/dbus-1/system.d.
+I do not, however, have any .service files under /etc/bluetooth.  Is that
+the problem?  If so, where can I find some examples of .service files,
+particuarly one that can provide org.bluez?
+
+thanks
+
+Mark
+
+------=_Part_17138_22962778.1178510078549
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi:<br><br>I am trying to make use of the some Bluez-DBUS APIs.&nbsp; Whatever I tried, I got back a reply saying:<br><br>&nbsp;&nbsp; The name org.bluez was not provided by any .service files<br><br>I checked and I see proper config files under /etc/dbus-1/system.d.
+<br>I do not, however, have any .service files under /etc/bluetooth.&nbsp;
+Is that the problem?&nbsp; If so, where can I find some examples of .service
+files,<br>particuarly one that can provide org.bluez?<br><br>thanks<br><span class="sg"><br>Mark
+</span>
+
+------=_Part_17138_22962778.1178510078549--
+
+
+--===============0099879848==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+--===============0099879848==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0099879848==--
