@@ -1,81 +1,66 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1178639244.2824.40.camel@pmac.infradead.org>
-References: <463F7386.6050900@am.sony.com>
-	<1178608551.8628.52.camel@aeonflux.holtmann.net>
-	<1178622391.2824.34.camel@pmac.infradead.org>
-	<1178630359.8628.63.camel@aeonflux.holtmann.net>
-	<1178639244.2824.40.camel@pmac.infradead.org>
-Date: Tue, 08 May 2007 18:43:21 +0200
-Message-Id: <1178642601.8628.67.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Cc: Geoff Levand <geoffrey.levand@am.sony.com>, bluez-devel@lists.sf.net,
-        maxk@qualcomm.com
-Subject: Re: [Bluez-devel] [RFC] PS3 Bluetooth quirk for HCI_FLT_CLEAR_ALL
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Return-Path: <jikos@jikos.cz>
+Date: Tue, 8 May 2007 18:23:57 +0200 (CEST)
+From: Jiri Kosina <jikos@jikos.cz>
+To: Satyam Sharma <satyam.sharma@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+cc: chris@pcburn.com, linux-kernel@vger.kernel.org,
+        bluez-devel@lists.sourceforge.net, netdev@vger.kernel.org
+Subject: Re: Getting make net/built-in.o Error with 2.6.21.1 Build
+In-Reply-To: <a781481a0705080905l609dc925s93357e6eb0d4c318@mail.gmail.com>
+Message-ID: <Pine.LNX.4.64.0705081815130.16923@twin.jikos.cz>
+References: <463FB6B0.3070005@pcburn.com>  <a781481a0705071725i1d802dfejbcdaca4ab0a1ff55@mail.gmail.com>
+  <Pine.LNX.4.64.0705081740550.16923@twin.jikos.cz>
+ <a781481a0705080905l609dc925s93357e6eb0d4c318@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi David,
+On Tue, 8 May 2007, Satyam Sharma wrote:
 
-> [root@ps3 ~]# hciconfig hci0 revision
-> hci0:   Type: USB
->         BD Address: 00:13:A9:79:09:C3 ACL MTU: 384:8 SCO MTU: 64:8
->         Build 3608
->         Chip version: Unknown
->         Max key size: 128 bit
->         SCO mapping:  HCI
+> Sure, my aim here was to only solve the _build breakage_ by fixing the 
+> Kconfig for this module (that used code from another kernel module 
+> without listing it in its dependencies). If, as you say, the real 
+> solution is that we should actually be taking out the offending call to 
+> the other module itself, then please go ahead -- I don't know much about 
+> the Bluetooth / HIDP subsytem anyway.
 
-the chip version is unknown. That is strange. I need to modify bccmd to
-read the raw value of the chip version. Can you quickly poke around the
-hciconfig code to get me the raw value of it.
+Converting the hid-ff drivers to be also transport-independent is on my 
+TODO list, but it didn't happen yet.
 
-> [root@ps3 ~]# bccmd builddef
-> Build definitions:
-> 0x0009 - TRANSPORT_BCSP
-> 0x000a - TRANSPORT_H4
-> 0x000b - TRANSPORT_USB
-> 0x000d - MAX_CRYPT_KEY_LEN_128
-> 0x0012 - REQUIRE_8MBIT
-> 0x0013 - RADIOTEST
-> 0x0015 - INSTALL_FLASH
-> 0x0016 - INSTALL_EEPROM
-> 0x0017 - INSTALL_COMBO_DOT11
-> 0x001d - CHIP_BASE_BC3
-> 0x0020 - INSTALL_HCI_MODULE
-> 0x002a - BT_VER_1_2
-> 0x0031 - CHIP_BASE_BC4
-> [root@ps3 ~]# bccmd buildname
-> Build name: sly_8hci_fl_bt2.0_tachikoma-rc29_encr128_tachikoma
-> 2006-10-16
+Marcel - are you aware of any devices currently supported by USB HID 
+force-feedback code, which have a bluetooth version, please? 
 
-This looks like a specific firmware build. Need to investigate what is
-so special about it.
-
-Can you dfutool archive it for me.
-
-Regards
-
-Marcel
+I'd propose the patch below, until I make the usbhid force-feedback code 
+transport independent. Thanks.
 
 
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+From: Jiri Kosina <jkosina@suse.cz>
+
+[Bluetooth] HIDP - don't initialize force feedback
+
+The current implementation of force feedback for HID devices is 
+USB-transport only and therefore calling hid_ff_init() from hidp code is 
+not going to work (plus it creates unwanted dependency of hidp on usbhid). 
+Remove the hid_ff_init() until either the hid-ff is made 
+transport-independent, or at least support for bluetooth transport is 
+added.
+
+Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index d342e89..3e77e81 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -737,10 +737,8 @@ static inline void hidp_setup_hid(struct
+ 	list_for_each_entry(report, &hid->report_enum[HID_FEATURE_REPORT].report_list, list)
+ 		hidp_send_report(session, report);
+ 
+-	if (hidinput_connect(hid) == 0) {
++	if (hidinput_connect(hid) == 0)
+ 		hid->claimed |= HID_CLAIMED_INPUT;
+-		hid_ff_init(hid);
+-	}
+ }
+ 
+ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock, struct socket *intr_sock)
