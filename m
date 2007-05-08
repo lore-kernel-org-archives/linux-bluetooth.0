@@ -1,20 +1,18 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jiri Kosina <jikos@jikos.cz>
-In-Reply-To: <Pine.LNX.4.64.0705081815130.16923@twin.jikos.cz>
-References: <463FB6B0.3070005@pcburn.com>
-	<a781481a0705071725i1d802dfejbcdaca4ab0a1ff55@mail.gmail.com>
-	<Pine.LNX.4.64.0705081740550.16923@twin.jikos.cz>
-	<a781481a0705080905l609dc925s93357e6eb0d4c318@mail.gmail.com>
-	<Pine.LNX.4.64.0705081815130.16923@twin.jikos.cz>
-Date: Tue, 08 May 2007 18:48:32 +0200
-Message-Id: <1178642912.8628.70.camel@aeonflux.holtmann.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1178639244.2824.40.camel@pmac.infradead.org>
+References: <463F7386.6050900@am.sony.com>
+	<1178608551.8628.52.camel@aeonflux.holtmann.net>
+	<1178622391.2824.34.camel@pmac.infradead.org>
+	<1178630359.8628.63.camel@aeonflux.holtmann.net>
+	<1178639244.2824.40.camel@pmac.infradead.org>
+Date: Tue, 08 May 2007 18:43:21 +0200
+Message-Id: <1178642601.8628.67.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Cc: Satyam Sharma <satyam.sharma@gmail.com>, chris@pcburn.com,
-        bluez-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [Bluez-devel] Getting make net/built-in.o Error with 2.6.21.1
-	Build
+Cc: Geoff Levand <geoffrey.levand@am.sony.com>, bluez-devel@lists.sf.net,
+        maxk@qualcomm.com
+Subject: Re: [Bluez-devel] [RFC] PS3 Bluetooth quirk for HCI_FLT_CLEAR_ALL
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -28,47 +26,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jiri,
+Hi David,
 
-> > Sure, my aim here was to only solve the _build breakage_ by fixing the 
-> > Kconfig for this module (that used code from another kernel module 
-> > without listing it in its dependencies). If, as you say, the real 
-> > solution is that we should actually be taking out the offending call to 
-> > the other module itself, then please go ahead -- I don't know much about 
-> > the Bluetooth / HIDP subsytem anyway.
-> 
-> Converting the hid-ff drivers to be also transport-independent is on my 
-> TODO list, but it didn't happen yet.
-> 
-> Marcel - are you aware of any devices currently supported by USB HID 
-> force-feedback code, which have a bluetooth version, please? 
+> [root@ps3 ~]# hciconfig hci0 revision
+> hci0:   Type: USB
+>         BD Address: 00:13:A9:79:09:C3 ACL MTU: 384:8 SCO MTU: 64:8
+>         Build 3608
+>         Chip version: Unknown
+>         Max key size: 128 bit
+>         SCO mapping:  HCI
 
-I haven't looked at all details for the PS3 controller, but that might
-be the first one. In theory they can and at some point they will enter
-the market.
+the chip version is unknown. That is strange. I need to modify bccmd to
+read the raw value of the chip version. Can you quickly poke around the
+hciconfig code to get me the raw value of it.
 
-> I'd propose the patch below, until I make the usbhid force-feedback code 
-> transport independent. Thanks.
-> 
-> 
-> 
-> From: Jiri Kosina <jkosina@suse.cz>
-> 
-> [Bluetooth] HIDP - don't initialize force feedback
-> 
-> The current implementation of force feedback for HID devices is 
-> USB-transport only and therefore calling hid_ff_init() from hidp code is 
-> not going to work (plus it creates unwanted dependency of hidp on usbhid). 
-> Remove the hid_ff_init() until either the hid-ff is made 
-> transport-independent, or at least support for bluetooth transport is 
-> added.
-> 
-> Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+> [root@ps3 ~]# bccmd builddef
+> Build definitions:
+> 0x0009 - TRANSPORT_BCSP
+> 0x000a - TRANSPORT_H4
+> 0x000b - TRANSPORT_USB
+> 0x000d - MAX_CRYPT_KEY_LEN_128
+> 0x0012 - REQUIRE_8MBIT
+> 0x0013 - RADIOTEST
+> 0x0015 - INSTALL_FLASH
+> 0x0016 - INSTALL_EEPROM
+> 0x0017 - INSTALL_COMBO_DOT11
+> 0x001d - CHIP_BASE_BC3
+> 0x0020 - INSTALL_HCI_MODULE
+> 0x002a - BT_VER_1_2
+> 0x0031 - CHIP_BASE_BC4
+> [root@ps3 ~]# bccmd buildname
+> Build name: sly_8hci_fl_bt2.0_tachikoma-rc29_encr128_tachikoma
+> 2006-10-16
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+This looks like a specific firmware build. Need to investigate what is
+so special about it.
 
-Under the condition that you remember to put it back once a generic FF
-exists.
+Can you dfutool archive it for me.
 
 Regards
 
