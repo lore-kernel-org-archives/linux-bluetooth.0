@@ -1,11 +1,20 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4641EFF2.5090903@idlum.be>
-Date: Wed, 09 May 2007 17:59:46 +0200
-From: Pierre-Yves Paulus <py@idlum.be>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] "ACL Connection Already Exists" while using only DBus
-	calls
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Geoff Levand <geoffrey.levand@am.sony.com>
+In-Reply-To: <4641331E.1070408@am.sony.com>
+References: <463F7386.6050900@am.sony.com>
+	<1178608551.8628.52.camel@aeonflux.holtmann.net>
+	<1178622391.2824.34.camel@pmac.infradead.org>
+	<1178630359.8628.63.camel@aeonflux.holtmann.net>
+	<1178639244.2824.40.camel@pmac.infradead.org>
+	<1178642601.8628.67.camel@aeonflux.holtmann.net>
+	<4640FF63.8070403@am.sony.com>  <4641331E.1070408@am.sony.com>
+Date: Wed, 09 May 2007 09:02:16 +0200
+Message-Id: <1178694136.8628.82.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Cc: dwmw2@infradead.org, BlueZ development <bluez-devel@lists.sourceforge.net>,
+        bluez-devel@lists.sf.net, maxk@qualcomm.com
+Subject: Re: [Bluez-devel] [RFC] PS3 Bluetooth quirk for HCI_FLT_CLEAR_ALL
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,57 +28,122 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Hi Geoff,
 
-I've a system with several dongles, which are driven by a custom app, 
-using only DBus calls to hcid.
+> >>> [root@ps3 ~]# hciconfig hci0 revision
+> >>> hci0:   Type: USB
+> >>>         BD Address: 00:13:A9:79:09:C3 ACL MTU: 384:8 SCO MTU: 64:8
+> >>>         Build 3608
+> >>>         Chip version: Unknown
+> >>>         Max key size: 128 bit
+> >>>         SCO mapping:  HCI
+> > 
+> > hci0:   Type: USB
+> >         BD Address: 00:13:A9:73:1F:0D ACL MTU: 384:8 SCO MTU: 64:8
+> >         Build 3608
+> >         Chip version: Unknown (4h)
+> >         Max key size: 128 bit
+> >         SCO mapping:  HCI
+> > 
+> >> 
+> >> the chip version is unknown. That is strange. I need to modify bccmd to
+> >> read the raw value of the chip version. Can you quickly poke around the
+> >> hciconfig code to get me the raw value of it.
+> >> 
+> >>> [root@ps3 ~]# bccmd builddef
+> >>> Build definitions:
+> >>> 0x0009 - TRANSPORT_BCSP
+> >>> 0x000a - TRANSPORT_H4
+> >>> 0x000b - TRANSPORT_USB
+> >>> 0x000d - MAX_CRYPT_KEY_LEN_128
+> >>> 0x0012 - REQUIRE_8MBIT
+> >>> 0x0013 - RADIOTEST
+> >>> 0x0015 - INSTALL_FLASH
+> >>> 0x0016 - INSTALL_EEPROM
+> >>> 0x0017 - INSTALL_COMBO_DOT11
+> >>> 0x001d - CHIP_BASE_BC3
+> >>> 0x0020 - INSTALL_HCI_MODULE
+> >>> 0x002a - BT_VER_1_2
+> >>> 0x0031 - CHIP_BASE_BC4
+> >>> [root@ps3 ~]# bccmd buildname
+> >>> Build name: sly_8hci_fl_bt2.0_tachikoma-rc29_encr128_tachikoma
+> >>> 2006-10-16
+> >> 
+> >> This looks like a specific firmware build. Need to investigate what is
+> >> so special about it.
+> >> 
+> >> Can you dfutool archive it for me.
+> > 
+> > The device seems to disconnect when you try to read
+> > the firmware.  I get this when I try:
+> > 
+> > [root@ps3-nfs ~]# dfutool archive ps3.dfu
+> > Available devices with DFU support:
+> > 
+> >          1) Bus 002 Device 003: ID 054c:0267 Interface 3
+> > 
+> > Select device (abort with 0): 1
+> > 
+> > Can't identify device with DFU mode
+> > 
+> > And see this in the log:
+> > 
+> > May  8 15:50:07 ps3-nfs kernel: usb 2-2: reset high speed USB device using ps3-ehci-driver and address 3
+> > May  8 15:50:07 ps3-nfs kernel: usb 2-2: USB disconnect, address 3
+> > May  8 15:50:07 ps3-nfs hcid[2286]: HCI dev 0 down
+> > May  8 15:50:07 ps3-nfs hcid[2286]: Device hci0 has been disabled
+> > May  8 15:50:07 ps3-nfs hcid[2286]: HCI dev 0 unregistered
+> > May  8 15:50:07 ps3-nfs hcid[2286]: Unregister path: /org/bluez/hci0
+> > May  8 15:50:07 ps3-nfs hcid[2286]: Device hci0 has been removed
+> > 
+> > Any suggestions?
+> 
+> There seems to be some trouble in dfutool...  Others tried it with
+> the same results.  I'll look at it some more tomorrow.
 
-Using dongle hci4, I connected to a device, performed some operations, 
-and disconnected:
+alternatively you can try dfu-util from the openmoko.org project. I
+never did, but it should work just quite fine.
 
-2007-05-09 17:11:23,997 hci4  < HCI Command: Disconnect (0x01|0x0006) plen 3
-2007-05-09 17:11:23,997 hci4      handle 11 reason 0x13
-2007-05-09 17:11:23,997 hci4      Reason: Remote User Terminated Connection
-2007-05-09 17:11:23,999 hci4  > HCI Event: Command Status (0x0f) plen 4
-2007-05-09 17:11:23,999 hci4      Disconnect (0x01|0x0006) status 0x00 
-ncmd 1
-2007-05-09 17:11:24,031 hci4  > HCI Event: Disconn Complete (0x05) plen 4
-2007-05-09 17:11:24,031 hci4      status 0x00 handle 11 reason 0x16
-2007-05-09 17:11:24,032 hci4      Reason: Connection Terminated by Local 
-Host
+> *** glibc detected *** dfutool: double free or corruption (fasttop): 
+> 0x08016080 
+> ***
+> ======= Backtrace: =========
+> /lib/libc.so.6[0x7ed0394]
+> /lib/libc.so.6(cfree+0xc8)[0x7ed05e8]
+> /usr/lib/libusb-0.1.so.4(usb_close+0x3c)[0x7fd87ec]
+> dfutool[0x8002840]
+> dfutool[0x8002ba4]
+> dfutool[0x8003640]
+> /lib/libc.so.6[0x7e6fd4c]
+> /lib/libc.so.6(__libc_start_main+0x144)[0x7e6ff74]
+> ======= Memory map: ========
+> 00100000-00103000 r-xp 00100000 00:00 0 
+> 07e52000-07fb1000 r-xp 00000000 2a:02 693780 /lib/libc-2.5.so
+> 07fb1000-07fbe000 ---p 0015f000 2a:02 693780 /lib/libc-2.5.so
+> 07fbe000-07fc2000 r--p 0016c000 2a:02 693780 /lib/libc-2.5.so
+> 07fc2000-07fc3000 rw-p 00170000 2a:02 693780 /lib/libc-2.5.so
+> 07fc3000-07fc6000 rw-p 07fc3000 00:00 0 
+> 07fd6000-07fde000 r-xp 00000000 2a:02 1021105 /usr/lib/libusb-0.1.so.4.4.4
+> 07fde000-07fee000 ---p 00008000 2a:02 1021105 /usr/lib/libusb-0.1.so.4.4.4
+> 07fee000-07ff0000 rw-p 00008000 2a:02 1021105 /usr/lib/libusb-0.1.so.4.4.4
+> 08000000-08006000 r-xp 00000000 2a:02 281135 /usr/bin/dfutool
+> 08015000-08016000 rw-p 00005000 2a:02 281135 /usr/bin/dfutool
+> 08016000-08037000 rwxp 08016000 00:00 0 [heap]
+> 0ffc0000-0ffde000 r-xp 00000000 2a:02 693779 /lib/ld-2.5.so
+> 0ffef000-0fff0000 r--p 0001f000 2a:02 693779 /lib/ld-2.5.so
+> 0fff0000-0fff1000 rw-p 00020000 2a:02 693779 /lib/ld-2.5.so
+> f7fce000-f7fcf000 rw-p f7fce000 00:00 0 
+> f7ffc000-f7fff000 rw-p f7ffc000 00:00 0 
+> ffc89000-ffc9e000 rw-p ffc89000 00:00 0 [stack]
+> Aborted
 
-A very few seconds later,  the app tried to reconnect (requesting a SDP 
-record) using another dongle, hci3. And I got that error:
+I have seen this one before. I think it is a libusb bug.
 
-2007-05-09 17:11:26,892 hci3  < HCI Command: Create Connection 
-(0x01|0x0005) plen 13
-2007-05-09 17:11:26,892 hci3      bdaddr 00:60:57:BB:4D:92 ptype 0xcc18 
-rswitch 0x00 clkoffset 0x0000
-2007-05-09 17:11:26,892 hci3      Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-2007-05-09 17:11:26,908 hci3  > HCI Event: Command Status (0x0f) plen 4
-2007-05-09 17:11:26,908 hci3      Create Connection (0x01|0x0005) status 
-0x0b ncmd 1
-2007-05-09 17:11:26,908 hci3      Error: ACL Connection Already Exists
+Regards
 
-It tried again 30s latter, with the same result.
+Marcel
 
 
-2007-05-09 17:11:56,623 hci3  < HCI Command: Create Connection 
-(0x01|0x0005) plen 13
-2007-05-09 17:11:56,623 hci3      bdaddr 00:60:57:BB:4D:92 ptype 0xcc18 
-rswitch 0x00 clkoffset 0x0000
-2007-05-09 17:11:56,623 hci3      Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-2007-05-09 17:11:56,638 hci3  > HCI Event: Command Status (0x0f) plen 4
-2007-05-09 17:11:56,638 hci3      Create Connection (0x01|0x0005) status 
-0x0b ncmd 1
-2007-05-09 17:11:56,638 hci3      Error: ACL Connection Already Exists
-
-At that point, I did shut the application down.
-
-How can such a thing happen?
-
-Thanks in advance,
-Best Regards
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
