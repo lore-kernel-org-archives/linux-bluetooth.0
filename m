@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4641EA96.7070204@tao-group.com>
-Date: Wed, 09 May 2007 16:36:54 +0100
-From: David Given <dg@tao-group.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <4641DA61.8040709@tao-group.com>	<1178722356.8628.96.camel@aeonflux.holtmann.net>	<4641E662.6080303@tao-group.com>
-	<1178724426.8628.102.camel@aeonflux.holtmann.net>
-In-Reply-To: <1178724426.8628.102.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] API documentation?
+In-Reply-To: <12a679470705090826i1eabfa23u4baf752459935d8c@mail.gmail.com>
+References: <12a679470705090826i1eabfa23u4baf752459935d8c@mail.gmail.com>
+Date: Wed, 09 May 2007 17:30:01 +0200
+Message-Id: <1178724601.8628.105.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Multiple HCI devices,
+	howto make only one device	discoverable?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,24 +21,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-[...]
-> you choice, but that way is deprecated and might go away at any point in
-> the future.
+Hi Jose,
 
-My device doesn't *have* D-Bus.
+> With several HCI devices connected, is it possible to make only one of
+> them discoverable through hcid.conf or any other method?
 
-Actually, I forgot to mention that I can also use hcilib (as it's just a thin
-wrapper over the ioctl layer). The only documentation for that appears to be
-the header file...
+you can (and actually should) use D-Bus for this. Check the mailing list
+archive for examples or use the bluez-gnome provided applet.
 
--- 
-David Given
-dg@tao-group.com
+Regards
 
-This message is subject to Tao's e-mail terms ( http://e.tao-group.com/1 )
-Tao Group Ltd, 62/63 Suttons Business Park, Suttons Park Avenue,
-Reading, Berkshire RG6 1AZ. Registered in England, number 2722079
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
