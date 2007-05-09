@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <12a679470705091155t235c9fbajc5dfa0e114a68597@mail.gmail.com>
-Date: Wed, 9 May 2007 19:55:14 +0100
-From: "=?ISO-8859-1?Q?Jos=E9_Pedro_Saraiva?=" <nocive@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1178724601.8628.105.camel@aeonflux.holtmann.net>
+Message-ID: <46420306.8020509@tao-group.com>
+Date: Wed, 09 May 2007 18:21:10 +0100
+From: David Given <dg@tao-group.com>
 MIME-Version: 1.0
-References: <12a679470705090826i1eabfa23u4baf752459935d8c@mail.gmail.com>
-	<1178724601.8628.105.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] Multiple HCI devices,
-	howto make only one device discoverable?
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <4641DA61.8040709@tao-group.com>	<1178722356.8628.96.camel@aeonflux.holtmann.net>	<4641E662.6080303@tao-group.com>	<1178724426.8628.102.camel@aeonflux.holtmann.net>	<4641EA96.7070204@tao-group.com>	<1178726532.8628.107.camel@aeonflux.holtmann.net>
+	<be976db60705090927n71d22c0an5116c8a1323ed3a3@mail.gmail.com>
+In-Reply-To: <be976db60705090927n71d22c0an5116c8a1323ed3a3@mail.gmail.com>
+Subject: Re: [Bluez-users] API documentation?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,75 +17,60 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1677337481=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1677337481==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_47389_9939654.1178736914889"
+Mark S. Townsley wrote:
+[...]
+> I tried to search online but could not find any answer.  I searched the
+> archive, nothing comes up.   Can you provide your expertise on this one?
+> What are these .service files?  How can I make one for org.bluez?
 
-------=_Part_47389_9939654.1178736914889
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+I'm using a Ubuntu Feisty, which is only a few weeks old; bluez-utils appears
+to be the critical package, containing hcid (that seems to do the work) and
+/etc/dbus-1/system.d/bluetooth.conf (that declares the Bluetooth service). I
+can't find any documentation describing how to set all this up, though...
 
-Hi Marcel,
+[...]
+> On 5/9/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> to be quite frankly, then don't ask me about it. If you wanna screw with
+>> your system you are on your own.
 
-you can (and actually should) use D-Bus for this. Check the mailing list
-> archive for examples or use the bluez-gnome provided applet.
+You seem not to have much experience with embedded systems.
 
+On my system, there are two instances of dbus-daemon occupying 432 pages and
+304 pages respectively, an instance of dbus-launch with 244, and an instance
+of hcid with 348. There are also two *more* instances of dbus-daemon, but they
+may be specific to the user and so irrelevant. Even so, that's still a total
+of 1328 pages, or 5312kB.
 
-I've browsed the archive but don't know exactly what to search for.
-Can you point me to an article where I might find answers to my questions?
-'Cause I don't really understand what D-Bus is for.
+That's just not *reasonable* on a system with low memory, especially since
+Bluetooth will be the only thing that uses it.
 
-Sorry for my ignorance and thanks once more for the support.
+Since all this code is going to have to go through the kernel interface anyway
+to get anything done, it's far more appropriate to use that instead.
+Particularly since there's a helpful library, hcilib, that wraps the kernel
+interface and makes it easy to use. (And which, BTW, is recommended by all the
+tutorial code I've been able to find.)
 
+I was hoping that someone would be able to point me at the document that
+specifies what this interface actually *is*.
 
-Jos=E9 Pedro
+-- 
+David Given
+dg@tao-group.com
 
-------=_Part_47389_9939654.1178736914889
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi Marcel,<br><br><div><blockquote class=3D"gmail_quote" style=3D"border-le=
-ft: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: =
-1ex;">you can (and actually should) use D-Bus for this. Check the mailing l=
-ist
-<br>archive for examples or use the bluez-gnome provided applet.</blockquot=
-e><div><br>I&#39;ve browsed the archive but don&#39;t know exactly what to =
-search for.<br>Can you point me to an article where I might find answers to=
- my
-questions? <br>&#39;Cause I don&#39;t really understand what D-Bus is for.<=
-br><br>Sorry
-for my ignorance and thanks once more for the support.<br></div><br><br></d=
-iv>Jos=E9 Pedro<br>
-
-------=_Part_47389_9939654.1178736914889--
-
-
---===============1677337481==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+This message is subject to Tao's e-mail terms ( http://e.tao-group.com/1 )
+Tao Group Ltd, 62/63 Suttons Business Park, Suttons Park Avenue,
+Reading, Berkshire RG6 1AZ. Registered in England, number 2722079
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1677337481==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1677337481==--
