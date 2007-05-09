@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <57c68ddc0705090547n6a42e1f3w67c3e9857f691c28@mail.gmail.com>
-Date: Wed, 9 May 2007 18:17:29 +0530
-From: "siddhant tewari" <siddhant.tewari@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Message-ID: <464192EC.6090604@a1.net>
+Date: Wed, 09 May 2007 11:22:52 +0200
+From: Patrick Steiner <patrick.steiner@a1.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] determining mobile type through bluetooth inquiry
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <463EEAA8.3080706@a1.net> <46417C35.8010906@a1.net>
+In-Reply-To: <46417C35.8010906@a1.net>
+Subject: Re: [Bluez-users] Bluetooth only works after restart from Windows
+ (dell wireless 350 problem)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,56 +17,54 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0056932826=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0056932826==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_127525_3814157.1178714849322"
-
-------=_Part_127525_3814157.1178714849322
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 hi,
-   Can i get the mobile information like blue tooth stack its using or  os
-which is running through any of bluetooth inquiries.
 
-regards
-siddhant
+after hours of work i finally get the bluetooth working with linux!
 
-------=_Part_127525_3814157.1178714849322
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+the problem is a defect? firmware with the preinstalled windows vista 
+notebook.
 
-hi,<br>&nbsp;&nbsp; Can i get the mobile information like blue tooth stack its using or&nbsp; os&nbsp; which is running through any of bluetooth inquiries.<br><br>regards<br>siddhant<br>
+i have now updated to another firmware after that bluetooth work without 
+any problems. :-)
 
-------=_Part_127525_3814157.1178714849322--
+an here is a step by step howto. use this on you own risk.
+
+- download the latest bluetooth drivers for windows XP for the d420 
+currently this is R117967.exe
+- extract it anywhere is used c:\dell\drivers\R117967
+- run dfu.exe (from c:\dell\drivers\R117967\2kxp\dfu\ this takes some 
+minutes.
+- after that blutooth should work in linux but it dont work anymore in 
+vista ;-)
+- this can be fixed by installing the windows xp drivers 
+(c:\dell\drivers\R117967\2kxp\setup.exe).
+- after that you have to install the new version of the toshiba 
+bluetooth stack (dell uses this one)
+  from http://aps.toshiba-tro.de/bluetooth/pages/download.php
+
+the only problem i found out is that the new software is only a 30 day 
+test version.
+but perhaps dell could be so nice and fix this problem. ;-)
 
 
---===============0056932826==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+another way could be to get the working firmware and upload it via the 
+dfutool (bluez-utlils). but i don't have tested this yet.
+
+hope this helps other users.
+
+regards,
+ patrick
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0056932826==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0056932826==--
