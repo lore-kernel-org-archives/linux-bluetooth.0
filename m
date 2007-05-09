@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4641DA61.8040709@tao-group.com>
-References: <4641DA61.8040709@tao-group.com>
-Date: Wed, 09 May 2007 16:52:36 +0200
-Message-Id: <1178722356.8628.96.camel@aeonflux.holtmann.net>
+In-Reply-To: <57c68ddc0705090547n6a42e1f3w67c3e9857f691c28@mail.gmail.com>
+References: <57c68ddc0705090547n6a42e1f3w67c3e9857f691c28@mail.gmail.com>
+Date: Wed, 09 May 2007 16:52:53 +0200
+Message-Id: <1178722373.8628.98.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] API documentation?
+Subject: Re: [Bluez-users] determining mobile type through bluetooth inquiry
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,21 +20,12 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi David,
+Hi,
 
-> I'm trying to write a Bluetooth interface layer for another API, targeting
-> Bluez as the backend. Unfortunately I don't seem to be able to find any API
-> documentation for how to drive Bluez. I've managed to reverse engineer a fair
-> amount of it by studying the header files and the source code for libbluetooth
-> and bluez-utils, but this is only getting me so far.
-> 
-> (Currently, I'm trying to figure out how to turn discoverability on and off on
-> the local machine. This appears to be harder than it looks.)
-> 
-> I don't suppose someone can tell me where all this is documented?
+>    Can i get the mobile information like blue tooth stack its using or
+> os  which is running through any of bluetooth inquiries.
 
-check the dbus-api.txt document inside the bluez-utils source, because
-it provides D-Bus methods for all common tasks.
+it is not possible.
 
 Regards
 
