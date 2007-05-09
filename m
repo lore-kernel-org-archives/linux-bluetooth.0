@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <464192EC.6090604@a1.net>
-Date: Wed, 09 May 2007 11:22:52 +0200
+Message-ID: <46417C35.8010906@a1.net>
+Date: Wed, 09 May 2007 09:45:57 +0200
 From: Patrick Steiner <patrick.steiner@a1.net>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <463EEAA8.3080706@a1.net> <46417C35.8010906@a1.net>
-In-Reply-To: <46417C35.8010906@a1.net>
+References: <463EEAA8.3080706@a1.net>
+In-Reply-To: <463EEAA8.3080706@a1.net>
 Subject: Re: [Bluez-users] Bluetooth only works after restart from Windows
  (dell wireless 350 problem)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -21,43 +21,87 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hi,
+Patrick Steiner wrote:
+> hi,
+>
+> i have a dell d420 now for a few days, but bluetooth wont work.
+>
+> bluetooth isnt available if i start the notebook, but if i restart the 
+> notebook from a windows (where bluetooth works) bluetooth works out of 
+> the box.
+> this problem is also confirmed on a dell d620 notebook.
+>
+> any ideas how i can fix this problem?
+>
+> regards,
+>  patrick
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by DB2 Express
+> Download DB2 Express C - the FREE version of DB2 express and take
+> control of your XML. No limits. Just data. Click to get it now.
+> http://sourceforge.net/powerbar/db2/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>   
+i did some testing so i found out something more about the problem.
 
-after hours of work i finally get the bluetooth working with linux!
+i have got a dell d420 notebook (with windows vista preinstalled)
+and a dell d620 notebook (with windows xp preinstalled)
 
-the problem is a defect? firmware with the preinstalled windows vista 
-notebook.
+both devices have got a dell wireless 250 bluetooth device inside.
 
-i have now updated to another firmware after that bluetooth work without 
-any problems. :-)
+if i boot a ubuntu 7.04 live-cd bluetooth works out of the box on the 
+dell d620 (xp)
 
-an here is a step by step howto. use this on you own risk.
+hci0:    Type: USB
+    BD Address: 00:16:41:DD:57:39 ACL MTU: 384:8 SCO MTU: 64:8
+    UP RUNNING PSCAN ISCAN
+    RX bytes:685 acl:0 sco:0 events:21 errors:0
+    TX bytes:326 acl:0 sco:0 commands:20 errors:0
+    Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+    Link policy: RSWITCH HOLD SNIFF PARK
+    Link mode: SLAVE ACCEPT
+    Name: 'ubuntu-0'
+    Class: 0x3e0100
+    Service Classes: Networking, Rendering, Capturing, Object Transfer, 
+Audio
+    Device Class: Computer, Uncategorized
+    HCI Ver: 2.0 (0x3) HCI Rev: 0x976 LMP Ver: 2.0 (0x3) LMP Subver: 0x976
+    Manufacturer: Cambridge Silicon Radio (10)
 
-- download the latest bluetooth drivers for windows XP for the d420 
-currently this is R117967.exe
-- extract it anywhere is used c:\dell\drivers\R117967
-- run dfu.exe (from c:\dell\drivers\R117967\2kxp\dfu\ this takes some 
-minutes.
-- after that blutooth should work in linux but it dont work anymore in 
-vista ;-)
-- this can be fixed by installing the windows xp drivers 
-(c:\dell\drivers\R117967\2kxp\setup.exe).
-- after that you have to install the new version of the toshiba 
-bluetooth stack (dell uses this one)
-  from http://aps.toshiba-tro.de/bluetooth/pages/download.php
+if i boot ubuntu 7.04 live-cd bluetooth doesnt work. hciconfig -a doesnt 
+shown any device.
+after rebooting into windows vista and rebooting back (no power off) 
+with the live-cd hciconfig -a shows something.
+and bluetooth works.
 
-the only problem i found out is that the new software is only a 30 day 
-test version.
-but perhaps dell could be so nice and fix this problem. ;-)
+hci0:    Type: USB
+    BD Address: 00:1A:6B:11:6B:0C ACL MTU: 384:8 SCO MTU: 64:8
+    UP RUNNING PSCAN ISCAN
+    RX bytes:593 acl:0 sco:0 events:37 errors:0
+    TX bytes:323 acl:0 sco:0 commands:19 errors:0
+    Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+    Link policy: RSWITCH HOLD SNIFF PARK
+    Link mode: SLAVE ACCEPT
+    Name: 'MOONY1'
+    Class: 0x12010c
+    Service Classes: Networking, Object Transfer
+    Device Class: Computer, Laptop
+    HCI Ver: 2.0 (0x3) HCI Rev: 0xdd2 LMP Ver: 2.0 (0x3) LMP Subver: 0xdd2
+    Manufacturer: Cambridge Silicon Radio (10)
 
 
-another way could be to get the working firmware and upload it via the 
-dfutool (bluez-utlils). but i don't have tested this yet.
-
-hope this helps other users.
+so this can only be a fireware problem or?
 
 regards,
  patrick
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
