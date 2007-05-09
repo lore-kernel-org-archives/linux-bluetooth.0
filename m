@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4641E574.6050903@pagestation.com>
-Date: Wed, 09 May 2007 11:15:00 -0400
-From: Jerry Geis <geisj@pagestation.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] bluetooth on centos 5  and gnome
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4641DA61.8040709@tao-group.com>
+References: <4641DA61.8040709@tao-group.com>
+Date: Wed, 09 May 2007 16:52:36 +0200
+Message-Id: <1178722356.8628.96.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] API documentation?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,24 +20,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi David,
 
-I am trying to get my bluetooth mouse paired to my hp dv9000 laptop.
+> I'm trying to write a Bluetooth interface layer for another API, targeting
+> Bluez as the backend. Unfortunately I don't seem to be able to find any API
+> documentation for how to drive Bluez. I've managed to reverse engineer a fair
+> amount of it by studying the header files and the source code for libbluetooth
+> and bluez-utils, but this is only getting me so far.
+> 
+> (Currently, I'm trying to figure out how to turn discoverability on and off on
+> the local machine. This appears to be harder than it looks.)
+> 
+> I don't suppose someone can tell me where all this is documented?
 
-I have gnome running on centos 5. I see the bluetooth icon in the upper 
-right,
-I click the checkbox for "discoverable", I turn my mouse into discoverable
-mode also and I see nothing. Nothing pops up showing any bluetooth 
-devices or
-asking for pin numbers or anything.
+check the dbus-api.txt document inside the bluez-utils source, because
+it provides D-Bus methods for all common tasks.
 
-What am I not doing?
+Regards
 
-I have restarted the bluetooth server and the hid service and still nothing.
+Marcel
 
-Any suggestion are appreciated.
 
-Jerry
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
