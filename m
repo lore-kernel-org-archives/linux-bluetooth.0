@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <12a679470705090826i1eabfa23u4baf752459935d8c@mail.gmail.com>
-References: <12a679470705090826i1eabfa23u4baf752459935d8c@mail.gmail.com>
-Date: Wed, 09 May 2007 17:30:01 +0200
-Message-Id: <1178724601.8628.105.camel@aeonflux.holtmann.net>
+In-Reply-To: <4641E662.6080303@tao-group.com>
+References: <4641DA61.8040709@tao-group.com>
+	<1178722356.8628.96.camel@aeonflux.holtmann.net>
+	<4641E662.6080303@tao-group.com>
+Date: Wed, 09 May 2007 17:27:06 +0200
+Message-Id: <1178724426.8628.102.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Multiple HCI devices,
-	howto make only one device	discoverable?
+Subject: Re: [Bluez-users] API documentation?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,13 +22,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Jose,
+Hi David,
 
-> With several HCI devices connected, is it possible to make only one of
-> them discoverable through hcid.conf or any other method?
+> > check the dbus-api.txt document inside the bluez-utils source, because
+> > it provides D-Bus methods for all common tasks.
+> 
+> Unfortunately D-Bus isn't any use to me; I'm really looking for the sockets API.
 
-you can (and actually should) use D-Bus for this. Check the mailing list
-archive for examples or use the bluez-gnome provided applet.
+you choice, but that way is deprecated and might go away at any point in
+the future.
 
 Regards
 
