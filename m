@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <12a679470705090826i1eabfa23u4baf752459935d8c@mail.gmail.com>
-Date: Wed, 9 May 2007 16:26:56 +0100
-From: "=?ISO-8859-1?Q?Jos=E9_Pedro_Saraiva?=" <nocive@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Message-ID: <4641E662.6080303@tao-group.com>
+Date: Wed, 09 May 2007 16:18:58 +0100
+From: David Given <dg@tao-group.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] Multiple HCI devices,
-	howto make only one device discoverable?
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <4641DA61.8040709@tao-group.com>
+	<1178722356.8628.96.camel@aeonflux.holtmann.net>
+In-Reply-To: <1178722356.8628.96.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-users] API documentation?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,61 +17,31 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2040672420=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============2040672420==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_44449_5625044.1178724416594"
+Marcel Holtmann wrote:
+[...]
+> check the dbus-api.txt document inside the bluez-utils source, because
+> it provides D-Bus methods for all common tasks.
 
-------=_Part_44449_5625044.1178724416594
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Unfortunately D-Bus isn't any use to me; I'm really looking for the sockets API.
 
-Hi,
+-- 
+David Given
+dg@tao-group.com
 
-With several HCI devices connected, is it possible to make only one of them
-discoverable through hcid.conf or any other method?
-
-
-Regards,
-
-Jos=E9 Pedro
-
-------=_Part_44449_5625044.1178724416594
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi,<br><br>With several HCI devices connected, is it possible to make only =
-one of them discoverable through hcid.conf or any other method?<br><br><br>=
-Regards,<br><br>Jos=E9 Pedro<br>
-
-------=_Part_44449_5625044.1178724416594--
-
-
---===============2040672420==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+This message is subject to Tao's e-mail terms ( http://e.tao-group.com/1 )
+Tao Group Ltd, 62/63 Suttons Business Park, Suttons Park Avenue,
+Reading, Berkshire RG6 1AZ. Registered in England, number 2722079
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============2040672420==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============2040672420==--
