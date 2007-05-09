@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4641F43B.6070803@idlum.be>
-Date: Wed, 09 May 2007 18:18:03 +0200
+Message-ID: <4641EFF2.5090903@idlum.be>
+Date: Wed, 09 May 2007 17:59:46 +0200
 From: Pierre-Yves Paulus <py@idlum.be>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <462F8FCE.3090102@idlum.be>
-	<1177528066.14980.21.camel@aeonflux.holtmann.net>
-In-Reply-To: <1177528066.14980.21.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] Extremely slow SDP extraction from phone
+Subject: [Bluez-devel] "ACL Connection Already Exists" while using only DBus
+	calls
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,82 +19,57 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hello,
 
-Hi Marcel,
+I've a system with several dongles, which are driven by a custom app, 
+using only DBus calls to hcid.
 
->> Problem is that I sometimes encounter very long delays to extract a 
->> record using its handle.
-> 
-> we should implement a disconnect timeout for the SDP session. It makes
-> sense to keep the SDP session open for subsequent SDP request. However
-> this hasn't been implemented right now.
+Using dongle hci4, I connected to a device, performed some operations, 
+and disconnected:
 
-If I'm not mistaken, you're talking about keeping the SDP session, which 
-  takes place on the L2CAP layer. But the delays I encounter and I'm 
-talking about here are not related to time being lost establishing the 
-L2CAP connection, as you can see it in the log I attached to me previous 
-mail. See this example below (it is extracted from the very same log):
+2007-05-09 17:11:23,997 hci4  < HCI Command: Disconnect (0x01|0x0006) plen 3
+2007-05-09 17:11:23,997 hci4      handle 11 reason 0x13
+2007-05-09 17:11:23,997 hci4      Reason: Remote User Terminated Connection
+2007-05-09 17:11:23,999 hci4  > HCI Event: Command Status (0x0f) plen 4
+2007-05-09 17:11:23,999 hci4      Disconnect (0x01|0x0006) status 0x00 
+ncmd 1
+2007-05-09 17:11:24,031 hci4  > HCI Event: Disconn Complete (0x05) plen 4
+2007-05-09 17:11:24,031 hci4      status 0x00 handle 11 reason 0x16
+2007-05-09 17:11:24,032 hci4      Reason: Connection Terminated by Local 
+Host
 
-We just extracted a record, so SDP session gets disconnected:
+A very few seconds later,  the app tried to reconnect (requesting a SDP 
+record) using another dongle, hci3. And I got that error:
 
-[...]
-09:53:23,593 hci1  < ACL data: handle 11 flags 0x02 dlen 12
-09:53:23,595 hci1      L2CAP(s): Disconn req: dcid 0x007b scid 0x0040
-09:53:23,597 hci1  > ACL data: handle 11 flags 0x02 dlen 12
-09:53:23,599 hci1      L2CAP(s): Disconn rsp: dcid 0x007b scid 0x0040
+2007-05-09 17:11:26,892 hci3  < HCI Command: Create Connection 
+(0x01|0x0005) plen 13
+2007-05-09 17:11:26,892 hci3      bdaddr 00:60:57:BB:4D:92 ptype 0xcc18 
+rswitch 0x00 clkoffset 0x0000
+2007-05-09 17:11:26,892 hci3      Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+2007-05-09 17:11:26,908 hci3  > HCI Event: Command Status (0x0f) plen 4
+2007-05-09 17:11:26,908 hci3      Create Connection (0x01|0x0005) status 
+0x0b ncmd 1
+2007-05-09 17:11:26,908 hci3      Error: ACL Connection Already Exists
 
-Disconnect done, now we reconnect for the next one:
+It tried again 30s latter, with the same result.
 
-09:53:23,601 hci1  < ACL data: handle 11 flags 0x02 dlen 12
-09:53:23,603 hci1      L2CAP(s): Connect req: psm 1 scid 0x0040
-09:53:23,605 hci1  > ACL data: handle 11 flags 0x02 dlen 16
-09:53:23,607 hci1      L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0040 
-result 1 status 2
-09:53:23,609 hci1        Connection pending - Authorization pending
-09:53:23,632 hci1  > ACL data: handle 11 flags 0x02 dlen 16
-09:53:23,634 hci1      L2CAP(s): Connect rsp: dcid 0x007c scid 0x0040 
-result 0 status 0
-09:53:23,636 hci1        Connection successful
-09:53:23,638 hci1  < ACL data: handle 11 flags 0x02 dlen 12
-09:53:23,640 hci1      L2CAP(s): Config req: dcid 0x007c flags 0x00 clen 0
-09:53:23,644 hci1  > ACL data: handle 11 flags 0x02 dlen 12
-09:53:23,646 hci1      L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-09:53:23,648 hci1  < ACL data: handle 11 flags 0x02 dlen 14
-09:53:23,650 hci1      L2CAP(s): Config rsp: scid 0x007c flags 0x00 
-result 0 clen 0
-09:53:23,651 hci1        Success
-09:53:23,654 hci1  > HCI Event: Number of Completed Packets (0x13) plen 5
-09:53:23,655 hci1      handle 11 packets 4
-09:53:23,659 hci1  > ACL data: handle 11 flags 0x02 dlen 14
-09:53:23,672 hci1      L2CAP(s): Config rsp: scid 0x0040 flags 0x00 
-result 0 clen 0
-09:53:23,674 hci1        Success
-09:53:23,676 hci1  < ACL data: handle 11 flags 0x02 dlen 23
-09:53:23,678 hci1      L2CAP(d): cid 0x007c len 19 [psm 1]
-09:53:23,680 hci1          SDP SA Req: tid 0x0 len 0xe
-09:53:23,681 hci1            handle 0x10000
-09:53:23,683 hci1            max 65535
-09:53:23,685 hci1            aid(s) 0x0000 - 0xffff
-09:53:23,687 hci1            cont 00
-09:53:23,841 hci1  > HCI Event: Number of Completed Packets (0x13) plen 5
-09:53:23,843 hci1      handle 11 packets 1
 
-At this point connection is established, and our request for the next 
-record has been sent: the whole process took only about 250ms.
+2007-05-09 17:11:56,623 hci3  < HCI Command: Create Connection 
+(0x01|0x0005) plen 13
+2007-05-09 17:11:56,623 hci3      bdaddr 00:60:57:BB:4D:92 ptype 0xcc18 
+rswitch 0x00 clkoffset 0x0000
+2007-05-09 17:11:56,623 hci3      Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+2007-05-09 17:11:56,638 hci3  > HCI Event: Command Status (0x0f) plen 4
+2007-05-09 17:11:56,638 hci3      Create Connection (0x01|0x0005) status 
+0x0b ncmd 1
+2007-05-09 17:11:56,638 hci3      Error: ACL Connection Already Exists
 
-09:53:33,837 hci1  > ACL data: handle 11 flags 0x02 dlen 101
-09:53:33,850 hci1      L2CAP(d): cid 0x0040 len 97 [psm 1]
-09:53:33,851 hci1          SDP SA Rsp: tid 0x0 len 0x5c
-09:53:33,853 hci1            count 89
-[...]
+At that point, I did shut the application down.
 
-But as you can see, we have to wait for about 10s for the data to start 
-to come. This is the unexpected and very unconstant delay I'm talking 
-about.
+How can such a thing happen?
 
-What's happening there?
-
-Pierre-Yves
+Thanks in advance,
+Best Regards
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
