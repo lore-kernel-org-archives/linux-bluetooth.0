@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <e96e9eeb0705100523q62fde54r9bc674da0ac822f5@mail.gmail.com>
-References: <e96e9eeb0705100523q62fde54r9bc674da0ac822f5@mail.gmail.com>
-Date: Thu, 10 May 2007 15:10:28 +0200
-Message-Id: <1178802628.25565.121.camel@aeonflux.holtmann.net>
+In-Reply-To: <200705100719.36399.akohlsmith-bluez@benshaw.com>
+References: <4641DA61.8040709@tao-group.com>
+	<1178780976.25565.6.camel@aeonflux.holtmann.net>
+	<1178784111.10803.27.camel@localhost.localdomain>
+	<200705100719.36399.akohlsmith-bluez@benshaw.com>
+Date: Thu, 10 May 2007 14:57:57 +0200
+Message-Id: <1178801877.25565.114.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users] API documentation?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -20,39 +23,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Voni,
+Hi Andrew,
 
-> >This would be my response as well.  Marcel has purposely made it difficult to
-> >locate older versions of BlueZ in the (IMO) misguided attempt to force
-> >everyone to test and use the new stuff.
+> > all. Most probably, the footprint is too large for memory-restricted
+> > systems. Because of that and the fact there are very few (if any)
+> > projects for embedded systems that use d-bus it's hardly worth the
+> > effort to port it. Bluez has worked quite well for embedded systems with
+> > older versions, but since it ignores the demands of embedded systems
+> > it's probably better to use a different bluetooth stack.
 > 
-> I think i found it :
-> 
-> http://bluez.sf.net/download/bluez-utils-2.10.tar.gz
-> http://bluez.sf.net/download/bluez-libs-2.10.tar.gz
+> This would be my response as well.  Marcel has purposely made it difficult to 
+> locate older versions of BlueZ in the (IMO) misguided attempt to force 
+> everyone to test and use the new stuff.  I can see WHY he's chosen to use 
+> d-bus, but yes; it's seems to be unsuitable for light embedded systems and 
+> you're probably better off with another stack.  There aren't many uses for a 
+> message bus in small embedded systems.
 
-the latest 2.x release is actually 2.25 and there exists a
-bluez-announce mailing list. Maybe time to subscribe to it.
-
-> >d-bus, but yes; it's seems to be unsuitable for light embedded systems and
-> >you're probably better off with another stack.  There aren't many uses for a
-> >message bus in small embedded systems.
-> 
-> hmm going for a nother stack is no option for most of the projects
-> because Bluez has become a standard.
-
-And D-Bus has become a standard, too. And not only for the desktop. It
-has been successfully used in various embedded projects. And yes I know
-that embedded describes a lot of systems. If you go really really small
-and D-Bus causes troubles then please fix D-Bus.
-
-> but.
-> maybe a fork of the bluez user space application is a good solution.
-> get rid of the dbus dependancies.
-
-Be my guest, but once you see the functional difference between 2.x and
-3.x generation you might really wanna use 3.x and its D-Bus API. It
-became really nice, easy and simple in the last two years.
+D-Bus is the solution for a generic IPC between applications or daemons
+and the size of the system doesn't matter. I never said that D-Bus is
+perfect, but it is time that all the embedded people that complain about
+D-Bus actually start fixing it. Believe it or not, D-Bus is the way to
+go for shrinking the memory footprint in your embedded systems, because
+all applications will use the same IPC.
 
 Regards
 
