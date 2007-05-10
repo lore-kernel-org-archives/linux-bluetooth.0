@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4642CD6D.4020904@telnet-ri.es>
-Date: Thu, 10 May 2007 09:44:45 +0200
-From: David Beamonte <dbeamonte@telnet-ri.es>
+Message-ID: <4642BB47.6000609@idlum.be>
+Date: Thu, 10 May 2007 08:27:19 +0200
+From: Pierre-Yves Paulus <py@idlum.be>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] LMX9830 driver
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <4642007E.5030803@idlum.be>
+	<d89ddf300705091650w787619eap2ecd667b3c4ace33@mail.gmail.com>
+In-Reply-To: <d89ddf300705091650w787619eap2ecd667b3c4ace33@mail.gmail.com>
+Subject: Re: [Bluez-devel] How to completely reset a dongle from software?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,30 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hello Brad,
 
-We have included a National LMX9830 module in a new design. The 
-communication between the chip and the microprocessor is via UART and we 
-have also connected the audio channels of the chip to the processor, so 
-that we can use the SCO link.
+>     Is there a way to perform a full reset of a USB dongle without
+>     unplugging it, but having the very same effects than if it was
+>     physically unplugged and plugged back again?
+> 
+> 
+> if it is a csr chip, you can enable bccmd in bluez-utils and use it to 
+> reset the chip. It might take two attempts to actually reset.
 
-It's the first time we use bluetooth modules in our designs, and so, we 
-are open to any kind of suggestion on how to work on this.
+Very interesting. Unfortunately, the dongles I'm working with at the 
+moment are all broadcom-based. Does the same tool/functionnality exist 
+for this brand of devices?
 
-At first sight, it seems that we should use the UART(H4) driver, but we 
-are not really sure if the commands to communicate to the chip are 
-standard or not. I think that we will probably need to develop some kind 
-of a driver.
-
-Please, we would really appreciate some help about how to start working 
-with this chip.
-
-Regards,
-
-David
-
-
-
+Pierre-Yves
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
