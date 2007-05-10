@@ -1,41 +1,28 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4645FD54.4060508@mojo-working.com>
-Date: Sat, 12 May 2007 10:45:56 -0700
-From: Art Rothstein <holtmann@mojo-working.com>
-MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <463A38C2.80403@mojo-working.com>	<1178260234.25425.16.camel@violet>
-	<463BA912.5020907@mojo-working.com>
-In-Reply-To: <463BA912.5020907@mojo-working.com>
-Subject: Re: [Bluez-users] hcitool info dropped feature
- details	between	versions 3.7 and 3.9?
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Return-Path: <linux-kernel-owner+marcel=40holtmann.org-S1757414AbXEKM31@vger.kernel.org>
+Date: Thu, 10 May 2007 15:33:09 +0000
+From: Pavel Machek <pavel@ucw.cz>
+To: CIJOML <cijoml@volny.cz>
+Cc: linux-kernel@vger.kernel.org, marcel@holtmann.de,
+        bluez-users@lists.sourceforge.net
+Subject: Re: OOPS when swsusp/resume when connected to the internet via BT and GPRS
+Message-ID: <20070510153308.GD4052@ucw.cz>
+References: <200705070005.33834.cijoml@volny.cz>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <200705070005.33834.cijoml@volny.cz>
+Sender: linux-kernel-owner@vger.kernel.org
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Probes in a custom build of hcitool narrow the error to a status return of 18 
-(HCI_INVALID_PARAMETERS?) from an hci_send_req call with command 
-OCF_READ_REMOTE_FEATURES. As a newbie to Linux, I don't yet know how to follow 
-the problem into kernel mode.
+Hi!
 
-Cross-posted to:
-http://www.vmware.com/community/thread.jspa?threadID=84352
+> today I experienced OOPS when connected via BT/GPRS to the internet, then 
+> swsup and resumed with dongle in HID proxy mode. Please see details in dmesg 
+> log:
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+I have had similar problems --but never quite repeatable. I believe I
+even have patch somewhere, but I was not able to properly test it.
+
+							Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
