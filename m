@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4642D045.60007@access-company.com>
-Date: Thu, 10 May 2007 09:56:53 +0200
-From: Frederic Dalleau <frederic.dalleau@access-company.com>
+Message-ID: <4642CD6D.4020904@telnet-ri.es>
+Date: Thu, 10 May 2007 09:44:45 +0200
+From: David Beamonte <dbeamonte@telnet-ri.es>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] non persistent sdp records
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] LMX9830 driver
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,23 +20,27 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-Until today, I was using non persistent sdp records like this
+We have included a National LMX9830 module in a new design. The 
+communication between the chip and the microprocessor is via UART and we 
+have also connected the audio channels of the chip to the processor, so 
+that we can use the SCO link.
 
-sdp_connect()
-sdp_record_alloc()
-sdp_record_register()
-sdp_record_free()
-[Bluetooth profile executing]
-sdp_close()
+It's the first time we use bluetooth modules in our designs, and so, we 
+are open to any kind of suggestion on how to work on this.
 
-Recently, I found my sdp records were accumulating each time I 
-reregistered them, even if the sdp session was closed.
-I saw this on bluez 3.9 but not on bluez 3.7.
+At first sight, it seems that we should use the UART(H4) driver, but we 
+are not really sure if the commands to communicate to the chip are 
+standard or not. I think that we will probably need to develop some kind 
+of a driver.
 
-Does this mean all sdp records are now persistent or was I doing bad 
-thing since the beginning or something else?
+Please, we would really appreciate some help about how to start working 
+with this chip.
 
-Frederic
+Regards,
+
+David
+
+
 
 
 -------------------------------------------------------------------------
