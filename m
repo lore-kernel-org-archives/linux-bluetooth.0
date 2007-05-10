@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
-To: bluez-users@lists.sourceforge.net
-Date: Thu, 10 May 2007 07:19:36 -0400
-References: <4641DA61.8040709@tao-group.com>
-	<1178780976.25565.6.camel@aeonflux.holtmann.net>
-	<1178784111.10803.27.camel@localhost.localdomain>
-In-Reply-To: <1178784111.10803.27.camel@localhost.localdomain>
+Message-ID: <4642EAA9.4060604@idlum.be>
+Date: Thu, 10 May 2007 11:49:29 +0200
+From: Pierre-Yves Paulus <py@idlum.be>
 MIME-Version: 1.0
-Message-Id: <200705100719.36399.akohlsmith-bluez@benshaw.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <4641DA61.8040709@tao-group.com>	<1178722356.8628.96.camel@aeonflux.holtmann.net>	<4641E662.6080303@tao-group.com>	<1178724426.8628.102.camel@aeonflux.holtmann.net>	<4641EA96.7070204@tao-group.com>	<1178726532.8628.107.camel@aeonflux.holtmann.net>	<be976db60705090927n71d22c0an5116c8a1323ed3a3@mail.gmail.com>	<7D2A6046-AC66-4992-9875-28101C52FA20@gmail.com>
+	<be976db60705092103r60702f19hbbafe4c5534777b4@mail.gmail.com>
+In-Reply-To: <be976db60705092103r60702f19hbbafe4c5534777b4@mail.gmail.com>
 Subject: Re: [Bluez-users] API documentation?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -22,32 +21,90 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Thursday 10 May 2007 4:01 am, Erwin Authried wrote:
-> Until now, it seems that nobody has ported d-bus to uClinux. Doing that
-> isn't trivial, because there are several uses of fork() that isn't
-> available in uClinux. In openwrt, there isn't any mention of d-bus at
+Hello,
 
-Actually, I built dbus-libs and most of dbus-utils under m68knommu without too 
-much trouble; Now I did have some manual hacking to do, and there were a few 
-tools which did not build, but I did get hciattach, hciconfig, hcitool and 
-hcid built.  I could have sworn I had the sdp and pan utils too, but my build 
-environment is a bit of a mess these days.
+I suppose your hcid is running as root, and you checked its output to 
+ensure it can properly "grab" the org.bluez names for himself, and that 
+there is no error at that point.
 
-> all. Most probably, the footprint is too large for memory-restricted
-> systems. Because of that and the fact there are very few (if any)
-> projects for embedded systems that use d-bus it's hardly worth the
-> effort to port it. Bluez has worked quite well for embedded systems with
-> older versions, but since it ignores the demands of embedded systems
-> it's probably better to use a different bluetooth stack.
+Regards,
+Pierre-Yves
 
-This would be my response as well.  Marcel has purposely made it difficult to 
-locate older versions of BlueZ in the (IMO) misguided attempt to force 
-everyone to test and use the new stuff.  I can see WHY he's chosen to use 
-d-bus, but yes; it's seems to be unsuitable for light embedded systems and 
-you're probably better off with another stack.  There aren't many uses for a 
-message bus in small embedded systems.
 
--A.
+
+Mark S. Townsley wrote:
+> Hi Johan:
+> 
+> If you have a DBUS client that is working making use of some Bluez-DBUS 
+> API, can I take a look at it as example?
+> 
+> I am using C and just to confirm, I also went to the Python-Bluez 
+> binding making use of the DBUS API.  And I got the same error message.
+> 
+> If it is a config issue, I would like to know what I should be putting 
+> into my dbus.conf and hcid.conf? 
+> Thanks
+> 
+> 
+> On 5/9/07, *Johan Hedberg* <johan.hedberg@gmail.com 
+> <mailto:johan.hedberg@gmail.com>> wrote:
+> 
+>     Hi Mark,
+> 
+>     On May 9, 2007, at 19:27, Mark S. Townsley wrote:
+>      > I am trying to follow your advice and use the D-BUS API instead of
+>      > the low-level HCI API.
+>      > However, no matter which D-BUS method I issued, I got back this
+>     error:
+>      >
+>      >    The name org.bluez was not provided by any .service files
+>      >
+>      > I tried to search online but could not find any answer.  I searched
+>      > the archive, nothing comes up.   Can you provide your expertise on
+>      > this one?  What are these .service files?  How can I make one for
+>      > org.bluez?
+> 
+>     I'm kind of surprised you haven't figured this out already. All you
+>     need is a running hcid process, and you need to use the system bus
+>     (it's not clear from your description whether you used the session or
+>     the system bus). hcid provides the D-Bus well known name org.bluez on
+>     the system bus. Because your D-Bus client doesn't find org.bluez
+>     (i.e. hcid is not running) it tries to see if it is activatable but
+>     does not find any .service file which would describe how to activate
+>     it (because hcid is not meant to be activated by D-Bus, but should
+>     e.g. be run from an init script).
+> 
+>     Johan
+> 
+> 
+>     -------------------------------------------------------------------------
+>     This SF.net email is sponsored by DB2 Express
+>     Download DB2 Express C - the FREE version of DB2 express and take
+>     control of your XML. No limits. Just data. Click to get it now.
+>     http://sourceforge.net/powerbar/db2/
+>     _______________________________________________
+>     Bluez-users mailing list
+>     Bluez-users@lists.sourceforge.net
+>     <mailto:Bluez-users@lists.sourceforge.net>
+>     https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+> 
+> 
+> ------------------------------------------------------------------------
+> 
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by DB2 Express
+> Download DB2 Express C - the FREE version of DB2 express and take
+> control of your XML. No limits. Just data. Click to get it now.
+> http://sourceforge.net/powerbar/db2/
+> 
+> 
+> ------------------------------------------------------------------------
+> 
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
