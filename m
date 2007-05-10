@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <96dff5a60705101349x2db6046au7e7e0f9b6bfe0060@mail.gmail.com>
-Date: Thu, 10 May 2007 16:49:21 -0400
-From: "Mo.Shahin" <mohamed.shaheen@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <96dff5a60705101348q2360471aw7bbe009fdcf87c56@mail.gmail.com>
+Message-ID: <464370B2.40303@xmission.com>
+Date: Thu, 10 May 2007 13:21:22 -0600
+From: Brad Midgley <bmidgley@xmission.com>
 MIME-Version: 1.0
-References: <96dff5a60705101348q2360471aw7bbe009fdcf87c56@mail.gmail.com>
-Subject: [Bluez-devel] Looking for a developer
+To: Fabien Chevalier <fabchevalier@free.fr>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] combining libalsa & dbus
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,59 +15,35 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0145127695=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0145127695==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_125547_21945522.1178830161693"
+Fabien,
 
-------=_Part_125547_21945522.1178830161693
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+I hope you're having a nice break from your hobby stuff. Can I ask you
+to think about it a little bit to work through something? You've worked
+with the alsa plugin api well enough to maybe help with a problem...
 
-Hi all,
-I'm looking for a developer to develop a bluetooth application over Linux
-something like www.futurlink.com
-If you can help, please drop me an email.
-Many thanks
-Mo.
+Marcel wants a reworked alsa plugin to go into bluez utils, but it needs
+to be a proper dbus client. That would mean the dbus calls would have to
+be self-contained right in the alsa plugin. Do you think we could pull
+that off? I'm worried that the nature of the calls into the plugin would
+make it impossible to have it also listening to dbus.
 
-------=_Part_125547_21945522.1178830161693
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+On top of everything else, Marcel prefers multiprogramming to be done
+via select(), nonblocking calls, etc and not threads.
 
-<span class="gmail_quote"></span>Hi all,<br>I&#39;m looking for a developer to develop a bluetooth application over Linux something like <a href="http://www.futurlink.com" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">
-www.futurlink.com</a><br>If you can help, please drop me an email.<br>Many thanks<br><span class="sg">
-Mo.<br>
-</span>
+Any ideas?
 
-------=_Part_125547_21945522.1178830161693--
-
-
---===============0145127695==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0145127695==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0145127695==--
