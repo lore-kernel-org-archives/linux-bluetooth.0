@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <464370B2.40303@xmission.com>
-Date: Thu, 10 May 2007 13:21:22 -0600
-From: Brad Midgley <bmidgley@xmission.com>
+Message-ID: <464338E7.9080902@access-company.com>
+Date: Thu, 10 May 2007 17:23:19 +0200
+From: Frederic Dalleau <frederic.dalleau@access-company.com>
 MIME-Version: 1.0
-To: Fabien Chevalier <fabchevalier@free.fr>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] combining libalsa & dbus
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <4642D045.60007@access-company.com>	<1178789626.25565.71.camel@aeonflux.holtmann.net>	<4642E92C.6030604@access-company.com>
+	<1178791415.25565.83.camel@aeonflux.holtmann.net>
+In-Reply-To: <1178791415.25565.83.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] non persistent sdp records
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,24 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fabien,
+Marcel Holtmann wrote:
+> actually using the standalone is a race condition. You should really
+> consider switching to hcid -s. It also saves you some memory footprint.
+>   
+Well, I'm lazy, I would like not to rewrite code...
+>> We will probably consider dbus as is sounds much easier, but it is 
+>> important to be able to do as much as what can be done through sdp api.
+>>     
+> Why?
+>   
+I wasn't clear, I meant having no regression in regards to what we 
+actually use, doing exactly the same sdp records we have in pand, a2dpd, ...
 
-I hope you're having a nice break from your hobby stuff. Can I ask you
-to think about it a little bit to work through something? You've worked
-with the alsa plugin api well enough to maybe help with a problem...
+Frederic
 
-Marcel wants a reworked alsa plugin to go into bluez utils, but it needs
-to be a proper dbus client. That would mean the dbus calls would have to
-be self-contained right in the alsa plugin. Do you think we could pull
-that off? I'm worried that the nature of the calls into the plugin would
-make it impossible to have it also listening to dbus.
-
-On top of everything else, Marcel prefers multiprogramming to be done
-via select(), nonblocking calls, etc and not threads.
-
-Any ideas?
-
-Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
