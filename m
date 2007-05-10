@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4642E92C.6030604@access-company.com>
+Date: Thu, 10 May 2007 11:43:08 +0200
+From: Frederic Dalleau <frederic.dalleau@access-company.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4642E92C.6030604@access-company.com>
 References: <4642D045.60007@access-company.com>
 	<1178789626.25565.71.camel@aeonflux.holtmann.net>
-	<4642E92C.6030604@access-company.com>
-Date: Thu, 10 May 2007 12:03:35 +0200
-Message-Id: <1178791415.25565.83.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+In-Reply-To: <1178789626.25565.71.camel@aeonflux.holtmann.net>
 Subject: Re: [Bluez-devel] non persistent sdp records
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,22 +21,54 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frederic,
+Marcel,
+Thanks for answer. I'm using standalone sdpd.
+We will probably consider dbus as is sounds much easier, but it is 
+important to be able to do as much as what can be done through sdp api.
+Frederic
 
-> Thanks for answer. I'm using standalone sdpd.
-
-actually using the standalone is a race condition. You should really
-consider switching to hcid -s. It also saves you some memory footprint.
-
-> We will probably consider dbus as is sounds much easier, but it is 
-> important to be able to do as much as what can be done through sdp api.
-
-Why?
-
-Regards
-
-Marcel
-
+Marcel Holtmann wrote:
+> Hi Frederic,
+>
+>   
+>> Until today, I was using non persistent sdp records like this
+>>
+>> sdp_connect()
+>> sdp_record_alloc()
+>> sdp_record_register()
+>> sdp_record_free()
+>> [Bluetooth profile executing]
+>> sdp_close()
+>>
+>> Recently, I found my sdp records were accumulating each time I 
+>> reregistered them, even if the sdp session was closed.
+>> I saw this on bluez 3.9 but not on bluez 3.7.
+>>
+>> Does this mean all sdp records are now persistent or was I doing bad 
+>> thing since the beginning or something else?
+>>     
+>
+> this sounds like a bug. Do you use standalone sdpd or hcid with -s?
+>
+> You might wanna consider to use D-Bus to register the records since
+> bluez-utils-3.10 is ready to be pushed out now.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by DB2 Express
+> Download DB2 Express C - the FREE version of DB2 express and take
+> control of your XML. No limits. Just data. Click to get it now.
+> http://sourceforge.net/powerbar/db2/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>   
 
 
 -------------------------------------------------------------------------
