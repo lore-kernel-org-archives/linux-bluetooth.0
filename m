@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4642CD6D.4020904@telnet-ri.es>
-References: <4642CD6D.4020904@telnet-ri.es>
-Date: Thu, 10 May 2007 11:34:53 +0200
-Message-Id: <1178789693.25565.73.camel@aeonflux.holtmann.net>
+In-Reply-To: <4642D045.60007@access-company.com>
+References: <4642D045.60007@access-company.com>
+Date: Thu, 10 May 2007 11:33:46 +0200
+Message-Id: <1178789626.25565.71.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] LMX9830 driver
+Subject: Re: [Bluez-devel] non persistent sdp records
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,24 +20,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi David,
+Hi Frederic,
 
-> We have included a National LMX9830 module in a new design. The 
-> communication between the chip and the microprocessor is via UART and we 
-> have also connected the audio channels of the chip to the processor, so 
-> that we can use the SCO link.
+> Until today, I was using non persistent sdp records like this
 > 
-> It's the first time we use bluetooth modules in our designs, and so, we 
-> are open to any kind of suggestion on how to work on this.
+> sdp_connect()
+> sdp_record_alloc()
+> sdp_record_register()
+> sdp_record_free()
+> [Bluetooth profile executing]
+> sdp_close()
 > 
-> At first sight, it seems that we should use the UART(H4) driver, but we 
-> are not really sure if the commands to communicate to the chip are 
-> standard or not. I think that we will probably need to develop some kind 
-> of a driver.
+> Recently, I found my sdp records were accumulating each time I 
+> reregistered them, even if the sdp session was closed.
+> I saw this on bluez 3.9 but not on bluez 3.7.
+> 
+> Does this mean all sdp records are now persistent or was I doing bad 
+> thing since the beginning or something else?
 
-unless you use some vendor specific deep-sleep things, the H4 driver
-should be fine. However you might need to adapt hciattach for the module
-initialization.
+this sounds like a bug. Do you use standalone sdpd or hcid with -s?
+
+You might wanna consider to use D-Bus to register the records since
+bluez-utils-3.10 is ready to be pushed out now.
 
 Regards
 
