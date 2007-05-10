@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Andrew Kohlsmith <akohlsmith-bluez@benshaw.com>
 To: bluez-users@lists.sourceforge.net
-Date: Thu, 10 May 2007 09:47:59 -0400
-References: <e96e9eeb0705100523q62fde54r9bc674da0ac822f5@mail.gmail.com>
-In-Reply-To: <e96e9eeb0705100523q62fde54r9bc674da0ac822f5@mail.gmail.com>
+Date: Thu, 10 May 2007 09:44:39 -0400
+References: <4641DA61.8040709@tao-group.com>
+	<200705100719.36399.akohlsmith-bluez@benshaw.com>
+	<1178801877.25565.114.camel@aeonflux.holtmann.net>
+In-Reply-To: <1178801877.25565.114.camel@aeonflux.holtmann.net>
 MIME-Version: 1.0
-Message-Id: <200705100947.59821.akohlsmith-bluez@benshaw.com>
+Message-Id: <200705100944.39791.akohlsmith-bluez@benshaw.com>
 Subject: Re: [Bluez-users] API documentation?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -20,24 +22,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Thursday 10 May 2007 8:23 am, Voni Hakau wrote:
-> sounds like no-fun to me. but hey, if you can post the solution for this
-> you will probably help a lot of people.
+On Thursday 10 May 2007 8:57 am, Marcel Holtmann wrote:
+> D-Bus is the solution for a generic IPC between applications or daemons
+> and the size of the system doesn't matter. I never said that D-Bus is
+> perfect, but it is time that all the embedded people that complain about
+> D-Bus actually start fixing it. Believe it or not, D-Bus is the way to
+> go for shrinking the memory footprint in your embedded systems, because
+> all applications will use the same IPC.
 
-It wasn't really all that difficult, as it does use the autoconf system, and 
-autoconf is generally pretty good about cross-compilation.  Most of my 
-troubles came due to vfork(), but that wasn't difficult to fix, and also due 
-to my build environment being ... wonky.  :-)
+I understand your reasons for using D-Bus; I really do.  It's a pain in the 
+ass to try and maintain more than one IPC mechanism for any project, BlueZ or 
+otherwise.  I honestly don't fault you at all for selecting D-Bus, and my 
+aside from my recognition of it elegantly solving a particular problem for 
+you, I also tend to think that if you're using bluetooth you've likely got 
+enough memory for a full-blown message bus such as D-Bus as well.  
+Complaining about the requirement for D-Bus for BlueZ is kind of like 
+complaining about the need for the TCP part of the IP stack if all you're 
+using is UDP and ICMP.
 
-> hmm going for a nother stack is no option for most of the projects
-> because Bluez has become a standard.
-> but.
-> maybe a fork of the bluez user space application is a good solution.
-> get rid of the dbus dependancies.
+Having said that, I tend to complain about D-Bus because it's so goddamned 
+convoluted, even for a regular desktop application.  I am chalking that up 
+mostly to my own ignorance on the use of and architecture of the message bus.
 
-See my other post about perhaps a better solution being "dbus-lite" -- an 
-API-matched library which strips away all of the magic and essentially gives 
-you a bare-bones IPC that lines up as good as possible to the dbus API.
+I disagree, however, that it's the bees' knees when it comes to unifying IPC 
+in all circumstances.  For many applications, both embedded and not, there is 
+absolutely NO NEED for an abstraction layer this "thick" -- I don't give a 
+rat's ass for introspection, data typing, nor any of the loftier goals that 
+D-Bus addresses.  IOCTLs are more than enough for most of my applications, 
+and the fact that they change from time to time... who cares?  Embedded 
+systems don't evolve nor do they get updated anywhere NEAR as quickly as 
+desktops.  When something changes it's because of a damn good reason, not 
+because of "hey wow, there's a new version out!"  Besides that, I get by, as 
+many others do, with FAR lighter IPC mechanisms, including passing pointers 
+around to shared data structures.
+
+As I review what I've written here, I find myself idly wondering about 
+a "dbus-lite" -- a very thin emulation of the D-Bus API which strips away 
+everything that makes D-Bus so cool and lets us smaller guys put this issue 
+to rest once and for all.
 
 -A.
 
