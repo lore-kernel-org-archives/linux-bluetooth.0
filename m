@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <1ab01fb50705102156m49fd5576sb0b4ef3751699991@mail.gmail.com>
-Date: Fri, 11 May 2007 10:26:30 +0530
-From: "Vikas Sinha" <compuvikas@gmail.com>
-To: Bluez-devel@lists.sourceforge.net
+Message-ID: <96dff5a60705101349x2db6046au7e7e0f9b6bfe0060@mail.gmail.com>
+Date: Thu, 10 May 2007 16:49:21 -0400
+From: "Mo.Shahin" <mohamed.shaheen@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <96dff5a60705101348q2360471aw7bbe009fdcf87c56@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] What is the maximum data transfer rate
+References: <96dff5a60705101348q2360471aw7bbe009fdcf87c56@mail.gmail.com>
+Subject: [Bluez-devel] Looking for a developer
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,62 +16,40 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1052524700=="
+Content-Type: multipart/mixed; boundary="===============0145127695=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1052524700==
+--===============0145127695==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_176158_4038748.1178859390091"
+	boundary="----=_Part_125547_21945522.1178830161693"
 
-------=_Part_176158_4038748.1178859390091
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+------=_Part_125547_21945522.1178830161693
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi Marcel,
-I have created a small file pusher on kernel 2.6-9, with
-bluez-utils-2.10-2.1, bluez-libs-2.10-2, bluez-bluefw-1.0-6,
-bluez-libs-devel-2.10-2. Can u tell me what is the maximum data transfer
-rate can be achived by this setup. Right now i am getting very less speed. I
-tried with rfcomm as well as obex push.  With obex push i am able to
-transfer files to  136.6 Kbps i.e. ~17KBps with rfcomm nothing more. It
-takes 1 minute for 1MB data to transfer. But if I am not wrong according to
-Bluetooth spec. 2.0 we can get up to 3 Mbps. any idea how can we increase
-it.  I have tested with al most all devices having BT spec 2.0
+Hi all,
+I'm looking for a developer to develop a bluetooth application over Linux
+something like www.futurlink.com
+If you can help, please drop me an email.
+Many thanks
+Mo.
 
-
-
--- 
-Impossible
-itself contain
-I M Possible
-
-Vikas
-
-------=_Part_176158_4038748.1178859390091
-Content-Type: text/html; charset=ISO-8859-1
+------=_Part_125547_21945522.1178830161693
+Content-Type: text/html; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi Marcel, <br>
-I have created a small file pusher on kernel 2.6-9, with
-bluez-utils-2.10-2.1, bluez-libs-2.10-2, bluez-bluefw-1.0-6,
-bluez-libs-devel-2.10-2. Can u tell me what is the maximum data
-transfer rate can be achived by this setup. Right now i am getting very
-less speed. I tried with rfcomm as well as obex push.&nbsp; With obex
-push i am able to transfer files to&nbsp; 136.6 Kbps i.e. ~17KBps with
-rfcomm nothing more. It takes 1 minute for 1MB data to transfer. But if
-I am not wrong according to Bluetooth spec. 2.0 we can get up to 3
-Mbps. any idea how can we increase it.&nbsp; I have tested with al most
-all devices having BT spec 2.0<br>
-<br>
-<br clear="all"><br>-- <br>Impossible <br>itself contain <br>I M Possible<br><br>Vikas
+<span class="gmail_quote"></span>Hi all,<br>I&#39;m looking for a developer to develop a bluetooth application over Linux something like <a href="http://www.futurlink.com" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">
+www.futurlink.com</a><br>If you can help, please drop me an email.<br>Many thanks<br><span class="sg">
+Mo.<br>
+</span>
 
-------=_Part_176158_4038748.1178859390091--
+------=_Part_125547_21945522.1178830161693--
 
 
---===============1052524700==
+--===============0145127695==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -80,7 +60,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1052524700==
+--===============0145127695==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -91,4 +71,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1052524700==--
+--===============0145127695==--
