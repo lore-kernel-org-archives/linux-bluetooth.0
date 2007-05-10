@@ -1,6 +1,6 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <be976db60705092103r60702f19hbbafe4c5534777b4@mail.gmail.com>
-Date: Wed, 9 May 2007 21:03:18 -0700
+Message-ID: <be976db60705092058r3d9217f4i49e80872160e91ad@mail.gmail.com>
+Date: Wed, 9 May 2007 20:58:09 -0700
 From: "Mark S. Townsley" <mstownsley@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 In-Reply-To: <7D2A6046-AC66-4992-9875-28101C52FA20@gmail.com>
@@ -23,30 +23,34 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0454446355=="
+Content-Type: multipart/mixed; boundary="===============1793878217=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0454446355==
+--===============1793878217==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_77608_15292257.1178769798534"
+	boundary="----=_Part_77576_33339845.1178769489488"
 
-------=_Part_77608_15292257.1178769798534
+------=_Part_77576_33339845.1178769489488
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 Hi Johan:
 
-If you have a DBUS client that is working making use of some Bluez-DBUS API,
-can I take a look at it as example?
+Thanks for your reply.  I am using the system bus on my client.
+And I have both DBus and hcid running.    I am using all the low-level HCI
+calls and they are working fine.  That is until I want to check linkkeys and
+remove some myself.  The HCI method does not remove for me.  And Marcel
+suggest using DBUS API HasBonding().
+So my DBUS is running all along.  My hcid is running all along.  And inside
+my code, I am asking for system bus also.
 
-I am using C and just to confirm, I also went to the Python-Bluez binding
-making use of the DBUS API.  And I got the same error message.
-
-If it is a config issue, I would like to know what I should be putting into
-my dbus.conf and hcid.conf?
+I will try to attach my code later but I am doing/checking all that you have
+mentioned.
 Thanks
+
+Mark
 
 
 On 5/9/07, Johan Hedberg <johan.hedberg@gmail.com> wrote:
@@ -89,15 +93,15 @@ On 5/9/07, Johan Hedberg <johan.hedberg@gmail.com> wrote:
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
 >
 
-------=_Part_77608_15292257.1178769798534
+------=_Part_77576_33339845.1178769489488
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi Johan:<br><br>If you have a DBUS client that is working making use of some Bluez-DBUS API, can I take a look at it as example?<br><br>I am using C and just to confirm, I also went to the Python-Bluez binding making use of the DBUS API.&nbsp; And I got the same error message.
-<br><br>If it is a config issue, I would like to know what I should be putting into my dbus.conf and hcid.conf?&nbsp; <br>Thanks<br><br><br><div><span class="gmail_quote">On 5/9/07, <b class="gmail_sendername">Johan Hedberg</b>
- &lt;<a href="mailto:johan.hedberg@gmail.com">johan.hedberg@gmail.com</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hi Mark,
-<br><br>On May 9, 2007, at 19:27, Mark S. Townsley wrote:<br>&gt; I am trying to follow your advice and use the D-BUS API instead of<br>&gt; the low-level HCI API.<br>&gt; However, no matter which D-BUS method I issued, I got back this error:
+Hi Johan:<br><br>Thanks for your reply.&nbsp; I am using the system bus on my client.<br>And I have both DBus and hcid running.&nbsp;&nbsp;&nbsp; I am using all the low-level HCI calls and they are working fine.&nbsp; That is until I want to check linkkeys and remove some myself.&nbsp; The HCI method does not remove for me.&nbsp; And Marcel suggest using DBUS API HasBonding().
+<br>So my DBUS is running all along.&nbsp; My hcid is running all along.&nbsp; And inside my code, I am asking for system bus also.<br><br>I will try to attach my code later but I am doing/checking all that you have mentioned.<br>Thanks
+<br><br>Mark<br><br><br><div><span class="gmail_quote">On 5/9/07, <b class="gmail_sendername">Johan Hedberg</b> &lt;<a href="mailto:johan.hedberg@gmail.com">johan.hedberg@gmail.com</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+Hi Mark,<br><br>On May 9, 2007, at 19:27, Mark S. Townsley wrote:<br>&gt; I am trying to follow your advice and use the D-BUS API instead of<br>&gt; the low-level HCI API.<br>&gt; However, no matter which D-BUS method I issued, I got back this error:
 <br>&gt;<br>&gt;&nbsp;&nbsp;&nbsp;&nbsp;The name org.bluez was not provided by any .service files<br>&gt;<br>&gt; I tried to search online but could not find any answer.&nbsp;&nbsp;I searched<br>&gt; the archive, nothing comes up.&nbsp;&nbsp; Can you provide your expertise on
 <br>&gt; this one?&nbsp;&nbsp;What are these .service files?&nbsp;&nbsp;How can I make one for<br>&gt; org.bluez?<br><br>I&#39;m kind of surprised you haven&#39;t figured this out already. All you<br>need is a running hcid process, and you need to use the system bus
 <br>(it&#39;s not clear from your description whether you used the session or<br>the system bus). hcid provides the D-Bus well known name org.bluez on<br>the system bus. Because your D-Bus client doesn&#39;t find org.bluez
@@ -106,10 +110,10 @@ Hi Johan:<br><br>If you have a DBUS client that is working making use of some Bl
 <br><a href="http://sourceforge.net/powerbar/db2/">http://sourceforge.net/powerbar/db2/</a><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net">
 Bluez-users@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquote></div><br>
 
-------=_Part_77608_15292257.1178769798534--
+------=_Part_77576_33339845.1178769489488--
 
 
---===============0454446355==
+--===============1793878217==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -120,7 +124,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0454446355==
+--===============1793878217==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -131,4 +135,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0454446355==--
+--===============1793878217==--
