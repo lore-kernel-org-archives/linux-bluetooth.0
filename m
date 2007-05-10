@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4642D045.60007@access-company.com>
+Date: Thu, 10 May 2007 09:56:53 +0200
+From: Frederic Dalleau <frederic.dalleau@access-company.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4642D045.60007@access-company.com>
-References: <4642D045.60007@access-company.com>
-Date: Thu, 10 May 2007 11:33:46 +0200
-Message-Id: <1178789626.25565.71.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] non persistent sdp records
+Subject: [Bluez-devel] non persistent sdp records
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,33 +18,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frederic,
+Hi,
 
-> Until today, I was using non persistent sdp records like this
-> 
-> sdp_connect()
-> sdp_record_alloc()
-> sdp_record_register()
-> sdp_record_free()
-> [Bluetooth profile executing]
-> sdp_close()
-> 
-> Recently, I found my sdp records were accumulating each time I 
-> reregistered them, even if the sdp session was closed.
-> I saw this on bluez 3.9 but not on bluez 3.7.
-> 
-> Does this mean all sdp records are now persistent or was I doing bad 
-> thing since the beginning or something else?
+Until today, I was using non persistent sdp records like this
 
-this sounds like a bug. Do you use standalone sdpd or hcid with -s?
+sdp_connect()
+sdp_record_alloc()
+sdp_record_register()
+sdp_record_free()
+[Bluetooth profile executing]
+sdp_close()
 
-You might wanna consider to use D-Bus to register the records since
-bluez-utils-3.10 is ready to be pushed out now.
+Recently, I found my sdp records were accumulating each time I 
+reregistered them, even if the sdp session was closed.
+I saw this on bluez 3.9 but not on bluez 3.7.
 
-Regards
+Does this mean all sdp records are now persistent or was I doing bad 
+thing since the beginning or something else?
 
-Marcel
-
+Frederic
 
 
 -------------------------------------------------------------------------
