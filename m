@@ -1,13 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <464370B2.40303@xmission.com>
-References: <464370B2.40303@xmission.com>
-Date: Fri, 11 May 2007 10:26:21 +0200
-Message-Id: <1178871981.2820.10.camel@aeonflux.holtmann.net>
+In-Reply-To: <464338E7.9080902@access-company.com>
+References: <4642D045.60007@access-company.com>
+	<1178789626.25565.71.camel@aeonflux.holtmann.net>
+	<4642E92C.6030604@access-company.com>
+	<1178791415.25565.83.camel@aeonflux.holtmann.net>
+	<464338E7.9080902@access-company.com>
+Date: Fri, 11 May 2007 10:24:00 +0200
+Message-Id: <1178871840.2820.6.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Cc: Fabien Chevalier <fabchevalier@free.fr>
-Subject: Re: [Bluez-devel] combining libalsa & dbus
+Subject: Re: [Bluez-devel] non persistent sdp records
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,26 +24,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad,
+Hi Frederic,
 
-> I hope you're having a nice break from your hobby stuff. Can I ask you
-> to think about it a little bit to work through something? You've worked
-> with the alsa plugin api well enough to maybe help with a problem...
-> 
-> Marcel wants a reworked alsa plugin to go into bluez utils, but it needs
-> to be a proper dbus client. That would mean the dbus calls would have to
-> be self-contained right in the alsa plugin. Do you think we could pull
-> that off? I'm worried that the nature of the calls into the plugin would
-> make it impossible to have it also listening to dbus.
+> > actually using the standalone is a race condition. You should really
+> > consider switching to hcid -s. It also saves you some memory footprint.
+> >   
+> Well, I'm lazy, I would like not to rewrite code...
 
-actually I was not planning on using D-Bus to handle the communication
-of the plugin with the actual Bluetooth audio server. We will have a
-small and lightweight proprietary protocol for that. It is a special
-case and since we have to use native Unix socket specific calls anyway
-to send the socket descriptors it makes sense.
+actually for this you don't have to rewrite anything. Simply use
+--disable-sdpd and then then call hcid -s on startup. That gives you the
+same SDP API as before. Except you have one daemon less to start and you
+no longer have race-conditions between hcid and sdpd.
 
-On the other hand, I don't see how you can integrate the D-Bus mainloop
-nicely into an ALSA plugin.
+> >> We will probably consider dbus as is sounds much easier, but it is 
+> >> important to be able to do as much as what can be done through sdp api.
+> >>     
+> > Why?
+> >   
+> I wasn't clear, I meant having no regression in regards to what we 
+> actually use, doing exactly the same sdp records we have in pand, a2dpd, ...
+
+Since pand and sdpd will be removed at some point (don't worry, they
+will be around for quite some time), you might seriously consider the
+D-Bus API.
+
+Anyhow, I think you found a real bug and might wanna fix the persistent
+versus non-persistent SDP record creation.
 
 Regards
 
