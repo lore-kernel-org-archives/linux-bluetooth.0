@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <46447D58.2090300@telnet-ri.es>
+Date: Fri, 11 May 2007 16:27:36 +0200
+From: David Beamonte <dbeamonte@telnet-ri.es>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <46447D58.2090300@telnet-ri.es>
-References: <4642CD6D.4020904@telnet-ri.es>
-	<1178789693.25565.73.camel@aeonflux.holtmann.net>
-	<4642E9F3.9000501@telnet-ri.es>  <46447D58.2090300@telnet-ri.es>
-Date: Fri, 11 May 2007 16:29:32 +0200
-Message-Id: <1178893772.2820.20.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+References: <4642CD6D.4020904@telnet-ri.es>	<1178789693.25565.73.camel@aeonflux.holtmann.net>
+	<4642E9F3.9000501@telnet-ri.es>
+In-Reply-To: <4642E9F3.9000501@telnet-ri.es>
 Subject: Re: [Bluez-devel] LMX9830 driver
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -18,22 +17,190 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============2132098647=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi David,
+This is a multi-part message in MIME format.
+--===============2132098647==
+Content-Type: multipart/alternative;
+	boundary="------------010400000701050600000804"
 
-> We have realized that LMX9830 doesn't have HCI controller. The
-> communicating with the chip is via an specific set of commands, and
-> so, the HCI drivers and hciattach are not suitable for us.
-> 
-> We guess that we must develop our own driver that substitutes HCI
-> driver, but we are not sure where we should start working. I would
-> like to know if there's any effort done in this way in the BlueZ
-> development.
+This is a multi-part message in MIME format.
+--------------010400000701050600000804
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
 
-National never sent me any development hardware and so no.
+Hi,
+
+We have realized that LMX9830 doesn't have HCI controller. The 
+communicating with the chip is via an specific set of commands, and so, 
+the HCI drivers and hciattach are not suitable for us.
+
+We guess that we must develop our own driver that substitutes HCI 
+driver, but we are not sure where we should start working. I would like 
+to know if there's any effort done in this way in the BlueZ development.
+
+We are open to any suggestion or hint that can gives us some light to 
+this matter.
+
+Regards,
+
+David
+
+
+
+David Beamonte wrote:
+
+> Thanks Marcel,
+>
+> What I know about the device is that its command interface (UART) uses 
+> a frame protocol, with start and end delimiters of frames, frame ids 
+> and so on. I understand from your words that this is the standard way 
+> to communicate and that all devices have the same set of commands.
+>
+> Anyway, I will check what you mention about hciattach. Is there any 
+> kind of documentation on how to do this, or I must dig into the code?
+>
+> Thanks again,
+>
+> David
+>
+>
+> Marcel Holtmann wrote:
+>
+>>Hi David,
+>>
+>>  
+>>
+>>>We have included a National LMX9830 module in a new design. The 
+>>>communication between the chip and the microprocessor is via UART and we 
+>>>have also connected the audio channels of the chip to the processor, so 
+>>>that we can use the SCO link.
+>>>
+>>>It's the first time we use bluetooth modules in our designs, and so, we 
+>>>are open to any kind of suggestion on how to work on this.
+>>>
+>>>At first sight, it seems that we should use the UART(H4) driver, but we 
+>>>are not really sure if the commands to communicate to the chip are 
+>>>standard or not. I think that we will probably need to develop some kind 
+>>>of a driver.
+>>>    
+>>>
+>>
+>>unless you use some vendor specific deep-sleep things, the H4 driver
+>>should be fine. However you might need to adapt hciattach for the module
+>>initialization.
+>>
+>>Regards
+>>
+>>Marcel
+>>
+>>
+>>
+>>-------------------------------------------------------------------------
+>>This SF.net email is sponsored by DB2 Express
+>>Download DB2 Express C - the FREE version of DB2 express and take
+>>control of your XML. No limits. Just data. Click to get it now.
+>>http://sourceforge.net/powerbar/db2/
+>>_______________________________________________
+>>Bluez-devel mailing list
+>>Bluez-devel@lists.sourceforge.net
+>>https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>>
+>>  
+>>
+>------------------------------------------------------------------------
+>
+>-------------------------------------------------------------------------
+>This SF.net email is sponsored by DB2 Express
+>Download DB2 Express C - the FREE version of DB2 express and take
+>control of your XML. No limits. Just data. Click to get it now.
+>http://sourceforge.net/powerbar/db2/
+>
+>------------------------------------------------------------------------
+>
+>_______________________________________________
+>Bluez-devel mailing list
+>Bluez-devel@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>  
+>
+
+--------------010400000701050600000804
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">
+  <title></title>
+</head>
+<body text="#000000" bgcolor="#ffffff">
+Hi,<br>
+<br>
+We have realized that LMX9830 doesn't have HCI controller. The
+communicating with the chip is via an specific set of commands, and so,
+the HCI drivers and hciattach are not suitable for us.<br>
+<br>
+We guess that we must develop our own driver that substitutes HCI
+driver, but we are not sure where we should start working. I would like
+to know if there's any effort done in this way in the BlueZ development.<br>
+<br>
+We are open to any suggestion or hint that can gives us some light to
+this matter.<br>
+<br>
+Regards,<br>
+<br>
+David<br>
+<br>
+<br>
+<br>
+David Beamonte wrote:<br>
+<blockquote type="cite" cite="mid4642E9F3.9000501@telnet-ri.es">
+  <meta http-equiv="Content-Type" content="text/html;">
+  <title></title>
+Thanks Marcel,<br>
+  <br>
+What I know about the device is that its command interface (UART) uses
+a frame protocol, with start and end delimiters of frames, frame ids
+and so on. I understand from your words that this is the standard way
+to communicate and that all devices have the same set of commands.<br>
+  <br>
+Anyway, I will check what you mention about hciattach. Is there any
+kind of documentation on how to do this, or I must dig into the code?<br>
+  <br>
+Thanks again,<br>
+  <br>
+David<br>
+  <br>
+  <br>
+Marcel Holtmann wrote:<br>
+  <blockquote type="cite"
+ cite="mid1178789693.25565.73.camel@aeonflux.holtmann.net">
+    <pre wrap="">Hi David,
+
+  </pre>
+    <blockquote type="cite">
+      <pre wrap="">We have included a National LMX9830 module in a new design. The 
+communication between the chip and the microprocessor is via UART and we 
+have also connected the audio channels of the chip to the processor, so 
+that we can use the SCO link.
+
+It's the first time we use bluetooth modules in our designs, and so, we 
+are open to any kind of suggestion on how to work on this.
+
+At first sight, it seems that we should use the UART(H4) driver, but we 
+are not really sure if the commands to communicate to the chip are 
+standard or not. I think that we will probably need to develop some kind 
+of a driver.
+    </pre>
+    </blockquote>
+    <pre wrap=""><!---->
+unless you use some vendor specific deep-sleep things, the H4 driver
+should be fine. However you might need to adapt hciattach for the module
+initialization.
 
 Regards
 
@@ -45,8 +212,59 @@ Marcel
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
+<a class="moz-txt-link-freetext"
+ href="http://sourceforge.net/powerbar/db2/">http://sourceforge.net/powerbar/db2/</a>
+_______________________________________________
+Bluez-devel mailing list
+<a class="moz-txt-link-abbreviated"
+ href="mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourceforge.net</a>
+<a class="moz-txt-link-freetext"
+ href="https://lists.sourceforge.net/lists/listinfo/bluez-devel">https://lists.sourceforge.net/lists/listinfo/bluez-devel</a>
+
+  </pre>
+  </blockquote>
+  <pre wrap="">
+<hr width="90%" size="4">
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+<a class="moz-txt-link-freetext" href="http://sourceforge.net/powerbar/db2/">http://sourceforge.net/powerbar/db2/</a></pre>
+  <pre wrap="">
+<hr width="90%" size="4">
+_______________________________________________
+Bluez-devel mailing list
+<a class="moz-txt-link-abbreviated" href="mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourceforge.net</a>
+<a class="moz-txt-link-freetext" href="https://lists.sourceforge.net/lists/listinfo/bluez-devel">https://lists.sourceforge.net/lists/listinfo/bluez-devel</a>
+  </pre>
+</blockquote>
+</body>
+</html>
+
+--------------010400000701050600000804--
+
+
+
+--===============2132098647==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============2132098647==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============2132098647==--
