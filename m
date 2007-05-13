@@ -1,15 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <cd3ff4f20705132259s3d89d245o7a81ffd90728e320@mail.gmail.com>
-Date: Mon, 14 May 2007 09:59:44 +0400
-From: heecks <heecks@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <dc98d8d90705122121h1424a33ao8f1048661d24c421@mail.gmail.com>
-MIME-Version: 1.0
-References: <cd3ff4f20705022352u3451a87eub2e03a33f7bcf535@mail.gmail.com>
-	<1178260678.25425.22.camel@violet>
-	<cd3ff4f20705040646p34f61cb1l8d0cae7c665e0caa@mail.gmail.com>
-	<dc98d8d90705122121h1424a33ao8f1048661d24c421@mail.gmail.com>
-Subject: Re: [Bluez-users] Device not detected (HP nx9420 / Kubuntu Feisty)
+To: bluez-users@lists.sourceforge.net
+From: Dick <dm@chello.nl>
+Date: Sun, 13 May 2007 11:59:46 +0000 (UTC)
+Message-ID: <loom.20070513T135336-907@post.gmane.org>
+Mime-Version: 1.0
+Subject: [Bluez-users] dbus.DBusException:
+	org.bluez.input.Error.AlreadyExists: Input Already exists
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,26 +19,53 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 5/13/07, Paul Webster <pjwebster@gmail.com> wrote:
-> > > looks like you have to find the rfkill switch to enable the Bluetooth
-> > > USB dongle inside your computer.
->
-> I believe Marcel was refering to the physical switch on your laptop.
-> While I can't vouch for other models, the button on my HP zd8000
-> serves to physically disconnect the built-in USB bluetooth device (ie
-> it is not software controlled). The fact that your WiFi works in this
-> state is a little confusing, as usually I get both or none when
-> pressing the button, but again, my model is different.
+Hi all,
 
-On this laptop, there is only one physical switch. By default, it
-enables / disables wifi *and* bluetooth. However, bluetooth and wifi
-can be enabled/disabled independently with a win32 HP software. So it
-seems to be possible to have one without the other.
+I'm trying the new input service with my Logitech dinovo desktop but I can't get
+it working. I've read http://wiki.bluez.org/wiki/HOWTO/InputDevices and
+manufactured/stolen the following python script:
 
-Marcel, were you refering to the physical switch ?
+import dbus
+bus = dbus.SystemBus()
+bmgr = dbus.Interface(bus.get_object('org.bluez', '/org/bluez'),
+'org.bluez.Manager')
+bus_id = bmgr.ActivateService('input')
 
--- 
-Xavier
+# All input messages should be sent to this address
+print bus_id
+
+imgr = dbus.Interface(bus.get_object(bus_id, '/org/bluez/input'),
+'org.bluez.input.Manager')
+
+# device creation
+#path = imgr.CreateDevice('00:07:61:69:27:XX')
+path = imgr.CreateDevice('00:07:61:68:CA:XX')
+idev = dbus.Interface (bus.get_object(bus_id, path), 'org.bluez.input.Device')
+
+# host initiated connection
+print idev.GetName()
+idev.Connect()
+
+This results in:
+
+:1.30
+Logitech Bluetooth Keyboard
+Traceback (most recent call last):
+  File "test.py", line 19, in ?
+    idev.Connect()
+  File "//usr/lib/python2.4/site-packages/dbus/proxies.py", line 169, in __call__
+    reply_message = self._connection.send_message_with_reply_and_block(message,
+timeout)
+dbus.DBusException: org.bluez.input.Error.ConnectionAttemptFailed: Host is down
+
+I've tried some fiddling with the connect button and rm-/insmod-ed hidp (from
+linux-2.6.21).
+
+Could someone please give me some hints?
+
+Thanks,
+Dick
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
