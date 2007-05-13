@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <432beae0705121900q237f835ahf6d2ac63c619415@mail.gmail.com>
+Date: Sat, 12 May 2007 19:00:05 -0700
+From: "Justin Patrin" <papercrane@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <432beae0705121846x7b181d3fm180205dfa783e975@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="----_=_NextPart_001_01C7951D.498B3FD0"
-Date: Sun, 13 May 2007 07:08:41 +0200
-Message-ID: <CE5216C10C83944D9FD37B65CD33F3970CF4D2@mplex01.mpl.access-company.com>
-References: <4646071D.6020303@gentoo.org>
-From: "Frederic Dalleau" <Frederic.Dalleau@access-company.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] RE : a2dpd getting into an endless loop when it fails
-	to get a socket and not dying on CTRL+c
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <432beae0705121846x7b181d3fm180205dfa783e975@mail.gmail.com>
+Subject: Re: [Bluez-devel] Problems connecting to a bluetooth headset
+Reply-To: papercrane@reversefold.com,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -17,109 +17,180 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+On 5/12/07, Justin Patrin <papercrane@gmail.com> wrote:
+> I just got a Plantronics Pulsar 260 headset which supports A2DP,
+> AVRCP, and the headset protocols. I've successfully used it for a2dp
+> on Mac OS X 10.4 with some hacks[1]. I have also paired it with
+> various cell phones and tested the headset functionality. However, I
+> cann't get it to pair or work at all with Linux. I have tested only
+> with a Linksys USBBT100 USB adapter so far. I will be getting 2 belkin
+> adapters soon as well that I will try with.
+>
+> I have tried everything I can think of and searched high and low on
+> the internet but have found no help. Here's various info which may
+> help:
+>
+> # hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:0C:41:E2:18:BC ACL MTU: 192:8 SCO MTU: 64:8
+>         UP RUNNING PSCAN
+>         RX bytes:1701 acl:0 sco:0 events:56 errors:0
+>         TX bytes:458 acl:0 sco:0 commands:34 errors:0
+>         Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'BlueZ (0)'
+>         Class: 0x3e0100
+>         Service Classes: Networking, Rendering, Capturing, Object
+> Transfer, Audio
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1) LMP Subver: 0x20d
+>         Manufacturer: Cambridge Silicon Radio (10)
+> # hcitool scan
+> Scanning ...
+>         00:03:89:C4:04:6F       260Plantronics
 
-------_=_NextPart_001_01C7951D.498B3FD0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+# hcitool info 00:03:89:C4:04:6F
+Requesting information ...
+        BD Address:  00:03:89:C4:04:6F
+        Device Name: 260Plantronics
+        LMP Version: 2.0 (0x3) LMP Subversion: 0xb12
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
+                <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <park state> <RSSI> <channel quality> <SCO link> <HV2 packets>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
+                <power control> <transparent SCO> <broadcast encrypt>
+                <enhanced iscan> <interlaced iscan> <interlaced pscan>
+                <inquiry with RSSI> <AFH cap. slave> <AFH class. slave>
+                <AFH cap. master> <AFH class. master> <extended features>
 
-> Basically it seems to go into an endless loop when it can't get the
-> socket and I must then kill it with kill -9 <pid>.
+> # hcitool cc 00:03:89:C4:04:6F
+> # hcitool conn
+> Connections:
+>         < ACL 00:03:89:C4:04:6F handle 42 state 1 lm MASTER
+> # hcitool conn
+> Connections:
+> #
+>
+> Yes, no output with hcitool cc. hcitool conn shows a connection right
+> after the cc but not right after that. I have tried setting the pin in
+> /etc/hcid.conf and tried setting the pin_helper to a shell script
+> which just outputs PIN:0000 (the pin for the headset). The output of
+> hcitool cc doesn't change whether the headset is in discovery mode or
+> not. If the headset isn't on hcitool "hangs" and then gives an I/O
+> error, as I'd expect.
+>
+> Running a2dpd, with the instructions on the site[2] as a user gives me
+> binding errors and doesn't respond to Ctrl-C (I have to kill -9 the
+> process).
+> # a2dpd
+> A2DPD[18:44:14.787]: init_ipc: Selected IPC: unix, addr=127.0.0.1,
+> bcst=127.0.0.255, port=21453
+> A2DPD[18:44:14.787]: make_daemon_process: a2dpd [May 12 2007 13:56:48]
+> starting ...
+> A2DPD[18:44:14.787]: main: (errno=13:Permission denied)a2dpd
+> addr=00:03:89:C4:04:6F timer=4000 us [May 12 2007 13:56:53]
+> A2DPD[18:44:14.787]: a2dpd_signal_init: Getting on DBUS
+> A2DPD[18:44:14.788]: a2dpd_signal_init: Installing watch
+> A2DPD[18:44:14.788]: add_dbus_watch: Added watch 0 0x80a17c0 disabled
+> A2DPD[18:44:14.789]: add_dbus_watch: Added watch 1 0x80a17e8 enabled
+> A2DPD[18:44:14.789]: a2dpd_signal_init: Registering object path:
+> /com/access/a2dpd
+> A2DPD[18:44:14.789]: a2dpd_signal_init: Acquiring service: com.access.a2dpd
+> A2DPD[18:44:14.789]: a2dpd_signal_init: OK
+> A2DPD[18:44:14.789]: a2dpd_signal_init: OK
+> A2DPD[18:44:14.789]: a2dpd_register_sdp: Start
+> A2DPD[18:44:14.789]: add_avrtg:
+> A2DPD[18:44:14.790]: add_a2source:
+> A2DPD[18:44:14.790]: a2dpd_register_sdp: OK
+> A2DPD[18:44:14.790]: main_loop:
+> A2DPD[18:44:14.790]: make_server_socket:
+> A2DPD[18:44:14.790]: a2dp_make_listen_socket: (errno=13:Permission
+> denied)Cannot bind socket 6 for psm 25
+> A2DPD[18:44:14.790]: main_loop: Cannot get AVDTP socket
+> A2DPD[18:44:15.798]: main_loop:
+> A2DPD[18:44:15.798]: make_server_socket:
+> A2DPD[18:44:15.798]: main_loop: (errno=98:Address already in
+> use)Cannot get UNIX socket
+> A2DPD[18:44:16.806]: main_loop:
+> A2DPD[18:44:16.806]: make_server_socket:
+> A2DPD[18:44:16.806]: main_loop: (errno=98:Address already in
+> use)Cannot get UNIX socket
+>
+> Running a2dpd as root (with the config files copied) shows everything
+> disconnecting:
+> # a2dpd
+> A2DPD[18:45:01.307]: init_ipc: Selected IPC: unix, addr=127.0.0.1,
+> bcst=127.0.0.255, port=21453
+> A2DPD[18:45:01.307]: make_daemon_process: a2dpd [May 12 2007 13:56:48]
+> starting ...
+> A2DPD[18:45:01.308]: main: (errno=9:Bad file descriptor)a2dpd
+> addr=00:03:89:C4:04:6F timer=4000 us [May 12 2007 13:56:53]
+> A2DPD[18:45:01.308]: a2dpd_signal_init: Getting on DBUS
+> A2DPD[18:45:01.309]: a2dpd_signal_init: Installing watch
+> A2DPD[18:45:01.309]: add_dbus_watch: Added watch 0 0x80a17c0 disabled
+> A2DPD[18:45:01.309]: add_dbus_watch: Added watch 1 0x80a17e8 enabled
+> A2DPD[18:45:01.309]: a2dpd_signal_init: Registering object path:
+> /com/access/a2dpd
+> A2DPD[18:45:01.309]: a2dpd_signal_init: Acquiring service: com.access.a2dpd
+> A2DPD[18:45:01.310]: a2dpd_signal_init: OK
+> A2DPD[18:45:01.310]: a2dpd_signal_init: OK
+> A2DPD[18:45:01.310]: a2dpd_register_sdp: Start
+> A2DPD[18:45:01.310]: add_avrtg:
+> A2DPD[18:45:01.310]: add_a2source:
+> A2DPD[18:45:01.310]: a2dpd_register_sdp: OK
+> A2DPD[18:45:01.311]: main_loop:
+> A2DPD[18:45:01.311]: make_server_socket:
+> A2DPD[18:45:01.311]: bta2dpdevicenew:
+> A2DPD[18:45:01.311]: a2dpd_signal_address_changed: 00:03:89:C4:04:6F
+> A2DPD[18:45:01.311]: a2dpd_signal_set_socket: Signal socket set to 7
+> A2DPD[18:45:01.312]: a2dpd_signal_state: Disconnected
+> A2DPD[18:45:01.312]: a2dp_alloc:
+> A2DPD[18:45:01.312]: a2dp_alloc: (a2dp = 0x80a5158)
+> A2DPD[18:45:01.312]: a2dp_new: 00:03:89:C4:04:6F, 44100
+> A2DPD[18:45:01.312]: a2dp_new: State AVDTP_STATE_DISCONNECTED
+> A2DPD[18:45:01.312]: alsa_new:
+> A2DPD[18:45:01.312]: alsa_new: device=plughw:0,0, framerate=44100
+> A2DPD[18:45:01.312]: alsa_new: State ALSA_STATE_DISCONNECTED
+> A2DPD[18:45:01.312]: alsa_new: returning 0x80a72e0
+> A2DPD[18:45:01.312]: sco_new:
+> A2DPD[18:45:01.313]: sco_new: State SCO_STATE_DISCONNECTED
+> A2DPD[18:45:01.313]: sco_state_disconnect: Filtering state : already
+> disconnected
+> A2DPD[18:45:01.313]: main_loop: Bluetooth Device Settings [44100 hz, 2
+> channels, 16 bits]
+> A2DPD[18:45:01.313]: avrcp_new: Listening for AVRCP on socket 9
+> A2DPD[18:45:01.313]: avrcp_new: 0x80a73f0
+>
+> The same things happen whether I run these on my Gentoo Athlon system
+> or my Sharp Zaurus (arm). Both have bluez-utils/libs-3.9 and sbc and
+> plugz from cvs.
+>
+>
+> [1] http://david.connolly.name/blog/hub/mac/2007/02/23/Stereo-Bluetooth-Profile-A2DP-on-Mac-OS-X-Tiger.html
+> [2] http://bluetooth-alsa.sourceforge.net/build.html
+>
+> --
+> Justin Patrin
+>
 
-Try to run it as root to get the sockets.
- You'll need to run your player as root too.
- It can't figure why these sockets are failing until I get a computer =
-doing it.
 
-Regards,
-Frederic
-
-
-
-------_=_NextPart_001_01C7951D.498B3FD0
-Content-Type: application/ms-tnef;
-	name="winmail.dat"
-Content-Transfer-Encoding: base64
-
-eJ8+IhcFAQaQCAAEAAAAAAABAAEAAQeQBgAIAAAA5AQAAAAAAADoAAEIgAcAGAAAAElQTS5NaWNy
-b3NvZnQgTWFpbC5Ob3RlADEIAQ2ABAACAAAAAgACAAEEgAEAbAAAAFJFIDogW0JsdWV6LWRldmVs
-XSBhMmRwZCBnZXR0aW5nIGludG8gYW4gZW5kbGVzcyBsb29wIHdoZW4gaXQgZmFpbHMgdG8gZ2V0
-IGEgc29ja2V0IGFuZCBub3QgZHlpbmcgb24gQ1RSTCtjACAlAQWAAwAOAAAA1wcFAA0ABwAIACkA
-AAAoAQEggAMADgAAANcHBQANAAcADAAWAAAAGQEBCYABACEAAAA3NEM3RDhFN0VGNUJBNzQ1OUIy
-NUVCRkYxQzVCMTA0MQBmBwEDkAYAmAoAADkAAAADACYAAAAAAAMANgAAAAAAQAA5AIVjysUclccB
-HgA9AAEAAAABAAAAAAAAAAIBRwABAAAAOAAAAGM9VVM7YT0gO3A9QWNjZXNzLUNvbXBhbnk7bD1N
-UExFWDAxLTA3MDUxMzA1MTIyMlotNDE2ODYAHgBJAAEAAABnAAAAW0JsdWV6LWRldmVsXSBhMmRw
-ZCBnZXR0aW5nIGludG8gYW4gZW5kbGVzcyBsb29wIHdoZW4gaXQgZmFpbHMgdG8gZ2V0IGEgc29j
-a2V0IGFuZCBub3QgZHlpbmcgb24gQ1RSTCtjAABAAE4AgAylOcOUxwEeAFoAAQAAACoAAABibHVl
-ei1kZXZlbC1ib3VuY2VzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAAAAAIBWwABAAAAcQAAAAAAAACB
-Kx+kvqMQGZ1uAN0BD1QCAAAAAGJsdWV6LWRldmVsLWJvdW5jZXNAbGlzdHMuc291cmNlZm9yZ2Uu
-bmV0AFNNVFAAYmx1ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQAAAAAAgFc
-AAEAAAAvAAAAU01UUDpCTFVFWi1ERVZFTC1CT1VOQ0VTQExJU1RTLlNPVVJDRUZPUkdFLk5FVAAA
-HgBdAAEAAAANAAAAUGV0dGVyaSBS5HR5AAAAAAIBXgABAAAAQAAAAAAAAACBKx+kvqMQGZ1uAN0B
-D1QCAAAAAFBldHRlcmkgUuR0eQBTTVRQAGJldGVsZ2V1c2VAZ2VudG9vLm9yZwACAV8AAQAAABsA
-AABTTVRQOkJFVEVMR0VVU0VAR0VOVE9PLk9SRwAAHgBmAAEAAAAFAAAAU01UUAAAAAAeAGcAAQAA
-ACoAAABibHVlei1kZXZlbC1ib3VuY2VzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAAAAB4AaAABAAAA
-BQAAAFNNVFAAAAAAHgBpAAEAAAAWAAAAYmV0ZWxnZXVzZUBnZW50b28ub3JnAAAAHgBwAAEAAABs
-AAAAUkUgOiBbQmx1ZXotZGV2ZWxdIGEyZHBkIGdldHRpbmcgaW50byBhbiBlbmRsZXNzIGxvb3Ag
-d2hlbiBpdCBmYWlscyB0byBnZXQgYSBzb2NrZXQgYW5kIG5vdCBkeWluZyBvbiBDVFJMK2MAAgFx
-AAEAAAAbAAAAAceUw0fOA0bInU4jRhC1Sb3VByI1cgAWX39zAB4AdAABAAAAIgAAAGJsdWV6LWRl
-dmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAAAAB4AGgwBAAAAEQAAAEZyZWRlcmljIERhbGxlYXUA
-AAAAHgAdDgEAAABsAAAAUkUgOiBbQmx1ZXotZGV2ZWxdIGEyZHBkIGdldHRpbmcgaW50byBhbiBl
-bmRsZXNzIGxvb3Agd2hlbiBpdCBmYWlscyB0byBnZXQgYSBzb2NrZXQgYW5kIG5vdCBkeWluZyBv
-biBDVFJMK2MAAgEJEAEAAACQAQAAjAEAAHACAABMWkZ1NAt6igMACgByY3BnMTI14jIDQ3RleAVB
-AQMB9/8KgAKkA+QHEwKAD/MAUARWPwhVB7IRJQ5RAwECAGNo4QrAc2V0MgYABsMRJfYzBEYTtzAS
-LBEzCO8J97Y7GB8OMDURIgxgYwBQMwsJAWQzNhZQC6YgPhggQmEN0QdAbHkgJmkFQBQQZW0EIHRv
-fCBnHlALgB5BA5EJ8GQObAeQBCAXsG9wIHdOaAnwHaIdUG4nBUBnPxQgHjAgAAqiCoAc8HNvDGNr
-IOEAcGQgSSDYbXVzIPMDoGsDEAMgDx2xA/AhECMkLTkgPGBwaWQ+LiFEIURU5nIdkB5BcnUgIx0g
-JgBfH7Ag8R5RIOQhtXMk1SDqWQhgJyNRbgngIlAl5Wp5CGEgC1F5EoEmiG/FKCZJIFZmaWcIcCeQ
-fx/wJcEgABQQJ6Ye4CyRZqULcGwLgGcgJiB0AxGbInAg0mEgYANwcHUOsDkFwGRvLmIdsCTbUmXS
-ZwsRcywhREYYIQZxFwDgJPkhRH0z8B4ANRABAAAASAAAADxDRTUyMTZDMTBDODM5NDREOUZEMzdC
-NjVDRDMzRjM5NzBDRjREMkBtcGxleDAxLm1wbC5hY2Nlc3MtY29tcGFueS5jb20+AB4AORABAAAA
-HgAAADw0NjQ2MDcxRC42MDIwMzAzQGdlbnRvby5vcmc+AAAAHgBHEAEAAAAPAAAAbWVzc2FnZS9y
-ZmM4MjIAAAsA8hABAAAAHwDzEAEAAADoAAAAUgBFACAAJQAzAEEAIABbAEIAbAB1AGUAegAtAGQA
-ZQB2AGUAbABdACAAYQAyAGQAcABkACAAZwBlAHQAdABpAG4AZwAgAGkAbgB0AG8AIABhAG4AIABl
-AG4AZABsAGUAcwBzACAAbABvAG8AcAAgAHcAaABlAG4AIABpAHQAIABmAGEAaQBsAHMAIAB0AG8A
-IABnAGUAdAAgAGEAIABzAG8AYwBrAGUAdAAgAGEAbgBkACAAbgBvAHQAIABkAHkAaQBuAGcAIABv
-AG4AIABDAFQAUgBMACUAMgBCAGMALgBFAE0ATAAAAAsA9hAAAAAAQAAHMCwByMUclccBQAAIMI0r
-l0kdlccBAwDeP69vAAADAPE/DAQAAB4A+D8BAAAAEQAAAEZyZWRlcmljIERhbGxlYXUAAAAAAgH5
-PwEAAABfAAAAAAAAANynQMjAQhAatLkIACsv4YIBAAAAAAAAAC9PPUFDQ0VTUy1DT01QQU5ZL09V
-PU1PTlRQRUxMSUVSL0NOPVJFQ0lQSUVOVFMvQ049RlJFREVSSUMuREFMTEVBVQAAHgD6PwEAAAAV
-AAAAU3lzdGVtIEFkbWluaXN0cmF0b3IAAAAAAgH7PwEAAAAeAAAAAAAAANynQMjAQhAatLkIACsv
-4YIBAAAAAAAAAC4AAAADAP0/5AQAAAMAGUAAAAAAAwAaQAAAAAADAB1AAAAAAAMAHkAAAAAAHgAw
-QAEAAAARAAAARlJFREVSSUMuREFMTEVBVQAAAAAeADFAAQAAABEAAABGUkVERVJJQy5EQUxMRUFV
-AAAAAB4AMkABAAAAKgAAAGJsdWV6LWRldmVsLWJvdW5jZXNAbGlzdHMuc291cmNlZm9yZ2UubmV0
-AAAAHgAzQAEAAAAWAAAAYmV0ZWxnZXVzZUBnZW50b28ub3JnAAAAHgA4QAEAAAARAAAARlJFREVS
-SUMuREFMTEVBVQAAAAAeADlAAQAAAAIAAAAuAAAAAwB2QP////8LACkAAAAAAAsAIwAAAAAAAwAG
-EGgyaLgDAAcQ6QAAAAMAEBABAAAAAwAREAAAAAAeAAgQAQAAAGUAAABCQVNJQ0FMTFlJVFNFRU1T
-VE9HT0lOVE9BTkVORExFU1NMT09QV0hFTklUQ0FOVEdFVFRIRVNPQ0tFVEFORElNVVNUVEhFTktJ
-TExJVFdJVEhLSUxMLTk8UElEVFJZVE9SVU5JAAAAAAIBfwABAAAASAAAADxDRTUyMTZDMTBDODM5
-NDREOUZEMzdCNjVDRDMzRjM5NzBDRjREMkBtcGxleDAxLm1wbC5hY2Nlc3MtY29tcGFueS5jb20+
-AIac
-
-------_=_NextPart_001_01C7951D.498B3FD0
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+Justin Patrin
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
-------_=_NextPart_001_01C7951D.498B3FD0
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-------_=_NextPart_001_01C7951D.498B3FD0--
