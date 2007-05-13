@@ -1,17 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <432beae0705122315rf180f5cj9c8a84a451f7cd04@mail.gmail.com>
-Date: Sat, 12 May 2007 23:15:48 -0700
-From: "Justin Patrin" <papercrane@gmail.com>
-To: "Frederic Dalleau" <Frederic.Dalleau@access-company.com>
-In-Reply-To: <CE5216C10C83944D9FD37B65CD33F3970CF4D3@mplex01.mpl.access-company.com>
 MIME-Version: 1.0
-References: <432beae0705121846x7b181d3fm180205dfa783e975@mail.gmail.com>
-	<432beae0705121900q237f835ahf6d2ac63c619415@mail.gmail.com>
-	<CE5216C10C83944D9FD37B65CD33F3970CF4D3@mplex01.mpl.access-company.com>
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] RE :  Problems connecting to a bluetooth headset
-Reply-To: papercrane@reversefold.com,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+Content-Type: multipart/mixed; boundary="----_=_NextPart_001_01C79520.A5A9519B"
+Date: Sun, 13 May 2007 07:36:25 +0200
+Message-ID: <CE5216C10C83944D9FD37B65CD33F3970CF4D4@mplex01.mpl.access-company.com>
+References: <46465CE6.8090407@jlab.org>
+From: "Frederic Dalleau" <Frederic.Dalleau@access-company.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] RE :  A2DP reconnections and scanning
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -20,131 +16,112 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 5/12/07, Frederic Dalleau <Frederic.Dalleau@access-company.com> wrote:
->
-> > A2DPD[18:45:01.312]: a2dp_new: 00:03:89:C4:04:6F, 44100
-> > A2DPD[18:45:01.312]: a2dp_new: State AVDTP_STATE_DISCONNECTED
->
-> Hi,
->
-> The default is not to connect until there is an audio stream.
-> As long as a2dpd do not connect, the pairing wil not be requested.
-> Start your media player with pcm.a2dpd as output and
-> or try the following commands :
-> a2dpd_ctl Connect
->
+This is a multi-part message in MIME format.
 
-I did try doing a connect as well but had forgotten that part. Here's
-the output from a2dpd when I try connecting.
-
-A2DPD[22:57:27.590]: a2dpd_handler_func:
-A2DPD[22:57:27.590]: a2dpd_dbus_Connect: Begin
-A2DPD[22:57:27.590]: a2dpd_dbus_Connect: OK
-A2DPD[22:57:27.590]: pollfd_cb_ctl_socket: Processing 'c' 99
-A2DPD[22:57:27.590]: a2dp_state_connect: State AVDTP_STATEX_SDP_CONNECTING
-A2DPD[22:57:27.590]: a2dp_state_machine: Role is INITIATOR
-A2DPD[22:57:27.590]: a2dp_state_machine: (errno=115:Operation now in
-progress)SDP connection on socket 10
-A2DPD[22:57:27.590]: a2dp_state_machine: State AVDTP_STATEX_SDP_CONNECTING_WAIT
-A2DPD[22:57:27.590]: a2dpd_signal_state: Connecting 00:03:89:C4:04:6F
-A2DPD[22:57:28.454]: a2dp_state_machine: SDP connection terminated
-A2DPD[22:57:28.528]: get_avdtp_psm: Parsing results
-A2DPD[22:57:28.528]: get_avdtp_psm: Record
-A2DPD[22:57:28.528]: get_avdtp_psm: Service Search OK
-A2DPD[22:57:28.557]: get_avdtp_psm: Checking non spec audio
-A2DPD[22:57:28.557]: a2dp_state_machine: Found psm 25
-A2DPD[22:57:28.557]: a2dp_state_machine: State AVDTP_STATEX_CTL_CONNECTING
-A2DPD[22:57:28.557]: a2dp_state_machine: Socket is 10
-A2DPD[22:57:28.557]: a2dp_state_machine: (errno=115:Operation now in
-progress)State AVDTP_STATEX_CTL_CONNECTING_WAIT
-A2DPD[22:57:28.786]: a2dp_state_machine: (errno=111:Connection
-refused)CTL connection failed
-A2DPD[22:57:28.786]: a2dp_state_machine: State AVDTP_STATEX_DISCONNECTING
-A2DPD[22:57:28.786]: a2dp_disconnect:
-A2DPD[22:57:28.786]: a2dp_stream_stop: Closing stream socket 0
-A2DPD[22:57:28.786]: a2dp_stream_stop: Closed
-A2DPD[22:57:28.786]: a2dp_stream_stop: State AVDTP_STATE_IDLE
-A2DPD[22:57:28.786]: a2dp_disconnect: Closing ctl socket 10
-A2DPD[22:57:28.786]: a2dp_disconnect: Closed
-A2DPD[22:57:28.786]: a2dp_disconnect: State AVDTP_STATE_DISCONNECTED
-A2DPD[22:57:28.786]: a2dpd_signal_state: Disconnected
+------_=_NextPart_001_01C79520.A5A9519B
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
 
-I've also tried to run vlc and got timeouts. I ran vlc with:
-# vlc --aout alsa --alsadev a2dpd file.mp3
-and I get a bunch of:
-[00000302] alsa audio output error: write failed (Broken pipe)
+> Everything seems to work as expected except that every four seconds =
+A2DP=20
+> gives the following error message, disconnects from the headphones,=20
+> reconnects, and continues playing.
+> a2dp_transfer_raw: Wrote -1 not 613 bytes (sbc.len=3D100)
 
-and a2dpd outputs this:
+What bitpool are you using? Try a smaller value.
+Are you still using rate=3D32000?
 
-A2DPD[23:08:33.811]: sco_new:
-A2DPD[23:08:33.811]: sco_new: State SCO_STATE_DISCONNECTED
-A2DPD[23:08:33.811]: sco_state_disconnect: Filtering state : already
-disconnected
-A2DPD[23:08:33.811]: main_loop: Bluetooth Device Settings [44100 hz, 2
-channels, 16 bits]
-A2DPD[23:08:33.812]: avrcp_new: Listening for AVRCP on socket 9
-A2DPD[23:08:33.812]: avrcp_new: 0x80a73f0
-A2DPD[23:08:52.620]: pollfd_cb_sockfd: Client 10 got index 0
-A2DPD[23:08:52.620]: pollfd_cb_clients: Client 0: Error detected
-(err=1, toc=1, err=0, hup=1)
-A2DPD[23:08:52.620]: disconnect_client:
-A2DPD[23:08:52.644]: pollfd_cb_sockfd: Client 10 got index 0
-A2DPD[23:08:52.644]: stream_client_state_streamingsetup: PLAYBACK
-thread client_index=0, socket=10, id=0 started (44100 Hz, 2 channels,
-16 bits, ring 16384, threshold 16384)
+> An earlier post at =
+http://thread.gmane.org/gmane.linux.bluez.devel/10682=20
+> seemed to describe this closely
 
-and then this over and over:
+I don't think it's a scanning: a scan takes can take longer than that.
+Unfortunately, this sounds a2dpd only.
 
-A2DPD[23:08:52.872]: a2dp_state_connect: State AVDTP_STATEX_SDP_CONNECTING
-A2DPD[23:08:52.872]: a2dp_state_machine: Role is INITIATOR
-A2DPD[23:08:52.872]: a2dp_state_machine: (errno=115:Operation now in
-progress)SDP connection on socket 11
-A2DPD[23:08:52.872]: a2dp_state_machine: State AVDTP_STATEX_SDP_CONNECTING_WAIT
-A2DPD[23:08:52.872]: a2dpd_signal_state: Connecting 00:03:89:C4:04:6F
-A2DPD[23:08:53.472]: a2dp_state_machine: SDP connection terminated
-A2DPD[23:08:53.554]: get_avdtp_psm: Parsing results
-A2DPD[23:08:53.554]: get_avdtp_psm: Record
-A2DPD[23:08:53.554]: get_avdtp_psm: Service Search OK
-A2DPD[23:08:53.586]: get_avdtp_psm: Checking non spec audio
-A2DPD[23:08:53.586]: a2dp_state_machine: Found psm 25
-A2DPD[23:08:53.586]: a2dp_state_machine: State AVDTP_STATEX_CTL_CONNECTING
-A2DPD[23:08:53.587]: a2dp_state_machine: Socket is 11
-A2DPD[23:08:53.587]: a2dp_state_machine: (errno=115:Operation now in
-progress)State AVDTP_STATEX_CTL_CONNECTING_WAIT
-A2DPD[23:08:53.852]: a2dp_state_machine: (errno=111:Connection
-refused)CTL connection failed
-A2DPD[23:08:53.852]: a2dp_state_machine: State AVDTP_STATEX_DISCONNECTING
-A2DPD[23:08:53.852]: a2dp_disconnect:
-A2DPD[23:08:53.852]: a2dp_stream_stop: Closing stream socket 0
-A2DPD[23:08:53.852]: a2dp_stream_stop: Closed
-A2DPD[23:08:53.852]: a2dp_stream_stop: State AVDTP_STATE_IDLE
-A2DPD[23:08:53.852]: a2dp_disconnect: Closing ctl socket 11
-A2DPD[23:08:53.852]: a2dp_disconnect: Closed
-A2DPD[23:08:53.852]: a2dp_disconnect: State AVDTP_STATE_DISCONNECTED
-A2DPD[23:08:53.852]: a2dpd_signal_state: Disconnected
+Frederic
 
+------_=_NextPart_001_01C79520.A5A9519B
+Content-Type: application/ms-tnef;
+	name="winmail.dat"
+Content-Transfer-Encoding: base64
 
-> But nothing will be heard if no media is sent.
->
+eJ8+IhoFAQaQCAAEAAAAAAABAAEAAQeQBgAIAAAA5AQAAAAAAADoAAEIgAcAGAAAAElQTS5NaWNy
+b3NvZnQgTWFpbC5Ob3RlADEIAQ2ABAACAAAAAgACAAEEgAEAMwAAAFJFIDogW0JsdWV6LWRldmVs
+XSBBMkRQIHJlY29ubmVjdGlvbnMgYW5kIHNjYW5uaW5nAI0RAQWAAwAOAAAA1wcFAA0ABwAkABkA
+AAA0AQEggAMADgAAANcHBQANAAcAJAAZAAAANAEBCYABACEAAAAwNkEyQjYwRTFBOTU0NzQ3QUQ2
+OEQxNTRBMjAyNDMwRgD/BgEDkAYARAoAADkAAAADACYAAAAAAAMANgAAAAAAQAA5AJtRqaUglccB
+HgA9AAEAAAABAAAAAAAAAAIBRwABAAAAOAAAAGM9VVM7YT0gO3A9QWNjZXNzLUNvbXBhbnk7bD1N
+UExFWDAxLTA3MDUxMzA1MzYyNVotNDE2ODgAHgBJAAEAAAAuAAAAW0JsdWV6LWRldmVsXSBBMkRQ
+IHJlY29ubmVjdGlvbnMgYW5kIHNjYW5uaW5nAAAAQABOAAC3a1v2lMcBHgBaAAEAAAAqAAAAYmx1
+ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQAAAACAVsAAQAAAHEAAAAAAAAA
+gSsfpL6jEBmdbgDdAQ9UAgAAAABibHVlei1kZXZlbC1ib3VuY2VzQGxpc3RzLnNvdXJjZWZvcmdl
+Lm5ldABTTVRQAGJsdWV6LWRldmVsLWJvdW5jZXNAbGlzdHMuc291cmNlZm9yZ2UubmV0AAAAAAIB
+XAABAAAALwAAAFNNVFA6QkxVRVotREVWRUwtQk9VTkNFU0BMSVNUUy5TT1VSQ0VGT1JHRS5ORVQA
+AB4AXQABAAAADQAAAENocmlzIENhcmxpbgAAAAACAV4AAQAAADoAAAAAAAAAgSsfpL6jEBmdbgDd
+AQ9UAgAAAABDaHJpcyBDYXJsaW4AU01UUABjYXJsaW5AamxhYi5vcmcAAAACAV8AAQAAABUAAABT
+TVRQOkNBUkxJTkBKTEFCLk9SRwAAAAAeAGYAAQAAAAUAAABTTVRQAAAAAB4AZwABAAAAKgAAAGJs
+dWV6LWRldmVsLWJvdW5jZXNAbGlzdHMuc291cmNlZm9yZ2UubmV0AAAAHgBoAAEAAAAFAAAAU01U
+UAAAAAAeAGkAAQAAABAAAABjYXJsaW5AamxhYi5vcmcAHgBwAAEAAAAzAAAAUkUgOiBbQmx1ZXot
+ZGV2ZWxdIEEyRFAgcmVjb25uZWN0aW9ucyBhbmQgc2Nhbm5pbmcAAAIBcQABAAAAGwAAAAHHlPZi
+Oqm8BDbbhkCQl42RlHdFMWcACien8QAeAHQAAQAAABIAAABCbHVlWiBkZXZlbG9wbWVudAAAAB4A
+GgwBAAAAEQAAAEZyZWRlcmljIERhbGxlYXUAAAAAHgAdDgEAAAAzAAAAUkUgOiBbQmx1ZXotZGV2
+ZWxdIEEyRFAgcmVjb25uZWN0aW9ucyBhbmQgc2Nhbm5pbmcAAAIBCRABAAAAgwIAAH8CAAB+AwAA
+TFpGdbAloOUDAAoAcmNwZzEyNeIyA0N0ZXgFQQEDAff/CoACpAPkBxMCgA/zAFAEVj8IVQeyESUO
+UQMBAgBjaOEKwHNldDIGAAbDESX2MwRGE7cwEiwRMwjvCfe2OxgfDjA1ESIMYGMAUPMLCQFkMzYW
+UAumCuMKgBA+IEV2BJB5dGhJC4BnIBQQZW0EIHSIbyB3BbBrIGEEIC0OwHAFkA6wZB8hY2WrBTEd
+wGEFQGUdgiACECcIcB4RBaBuZBCxMkQyUBznZ2kdgB5haGX9INFsF7AD8B3xBJADYAXAAQeBc2Fn
+ZSwgZPsEACFRbh9hBCADUiLTIvDwYWRwaAIgB5AkkBz2vxggJOYkkABwH6AhUXQLgFcKUAQgC1F5
+HeEuHPZhojImMF90cgBxZgSQwl8qQHc6IFcDYA6wICAtMSBuKzAgNjAxMyBiHbAHkShzEGJjLmwJ
+8D0xMCwwKRz0HPRXIEJiaTh0cG8G8B7wGCAgeRkIYCB1AJAd8D8gVL0gsWEeEADAI0ASgXYHQO8K
+UClVBxAvBHMocCNAL1RjJzAgUGU9MwHQLSA/my1aHVBBA6AmEHJsEnIvLpAx8B7wBUBoAkBwOpwv
+Lx3AGCAmIC5nA4FzMPAFsGcvNlQ0oCiQeDIuCjJ6LgEAHYBsL/ktEDY4FEAc9h4iH5EegbsBAATy
+YiMAHcEEIGMXsGkUEGx5LVpJJKACICdvIBILgB7gLnAnBCAwEWM/AHADAB3wKvA9NB5wYWv7B5E+
+JiAXsB3wEoEgMT5BMyBBKVVVbgIQACB1bu8ywTsgJJA6g3MIYCFyKeLfH6ACIDsgKVUc9EYYIQZx
+CwDgHQN9RNAAHgA1EAEAAABIAAAAPENFNTIxNkMxMEM4Mzk0NEQ5RkQzN0I2NUNEMzNGMzk3MENG
+NEQ0QG1wbGV4MDEubXBsLmFjY2Vzcy1jb21wYW55LmNvbT4AHgA5EAEAAAAcAAAAPDQ2NDY1Q0U2
+LjgwOTA0MDdAamxhYi5vcmc+AB4ARxABAAAADwAAAG1lc3NhZ2UvcmZjODIyAAALAPIQAQAAAB8A
+8xABAAAAcgAAAFIARQAgACUAMwBBACAAWwBCAGwAdQBlAHoALQBkAGUAdgBlAGwAXQAgAEEAMgBE
+AFAAIAByAGUAYwBvAG4AbgBlAGMAdABpAG8AbgBzACAAYQBuAGQAIABzAGMAYQBuAG4AaQBuAGcA
+LgBFAE0ATAAAAAAACwD2EAAAAABAAAcwaTDWAB+VxwFAAAgw/9qypSCVxwEDAN4/r28AAAMA8T8M
+BAAAHgD4PwEAAAARAAAARnJlZGVyaWMgRGFsbGVhdQAAAAACAfk/AQAAAF8AAAAAAAAA3KdAyMBC
+EBq0uQgAKy/hggEAAAAAAAAAL089QUNDRVNTLUNPTVBBTlkvT1U9TU9OVFBFTExJRVIvQ049UkVD
+SVBJRU5UUy9DTj1GUkVERVJJQy5EQUxMRUFVAAAeAPo/AQAAABUAAABTeXN0ZW0gQWRtaW5pc3Ry
+YXRvcgAAAAACAfs/AQAAAB4AAAAAAAAA3KdAyMBCEBq0uQgAKy/hggEAAAAAAAAALgAAAAMA/T/k
+BAAAAwAZQAAAAAADABpAAAAAAAMAHUAAAAAAAwAeQAAAAAAeADBAAQAAABEAAABGUkVERVJJQy5E
+QUxMRUFVAAAAAB4AMUABAAAAEQAAAEZSRURFUklDLkRBTExFQVUAAAAAHgAyQAEAAAAqAAAAYmx1
+ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQAAAAeADNAAQAAABAAAABjYXJs
+aW5AamxhYi5vcmcAHgA4QAEAAAARAAAARlJFREVSSUMuREFMTEVBVQAAAAAeADlAAQAAAAIAAAAu
+AAAAAwB2QP////8LACkAAAAAAAsAIwAAAAAAAwAGEBm0LI0DAAcQvwEAAAMAEBABAAAAAwAREAAA
+AAAeAAgQAQAAAGUAAABFVkVSWVRISU5HU0VFTVNUT1dPUktBU0VYUEVDVEVERVhDRVBUVEhBVEVW
+RVJZRk9VUlNFQ09ORFNBMkRQR0lWRVNUSEVGT0xMT1dJTkdFUlJPUk1FU1NBR0UsRElTQ09OTkVD
+AAAAAAIBfwABAAAASAAAADxDRTUyMTZDMTBDODM5NDREOUZEMzdCNjVDRDMzRjM5NzBDRjRENEBt
+cGxleDAxLm1wbC5hY2Nlc3MtY29tcGFueS5jb20+AE6G
 
-And nothing was heard except for a few low beeps from the headset. So
-it is getting *something*....I'll see if the manual has any info on
-what the bleeps and bloops mean.
-
--- 
-Justin Patrin
+------_=_NextPart_001_01C79520.A5A9519B
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+------_=_NextPart_001_01C79520.A5A9519B
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------_=_NextPart_001_01C79520.A5A9519B--
