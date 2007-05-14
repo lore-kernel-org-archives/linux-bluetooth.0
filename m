@@ -1,10 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <57c68ddc0705140948v39b44ecfx73da523c9006d66e@mail.gmail.com>
-Date: Mon, 14 May 2007 22:18:45 +0530
-From: "siddhant tewari" <siddhant.tewari@gmail.com>
+Message-ID: <cd3ff4f20705132259s3d89d245o7a81ffd90728e320@mail.gmail.com>
+Date: Mon, 14 May 2007 09:59:44 +0400
+From: heecks <heecks@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <dc98d8d90705122121h1424a33ao8f1048661d24c421@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] error in calling sdp_connect
+References: <cd3ff4f20705022352u3451a87eub2e03a33f7bcf535@mail.gmail.com>
+	<1178260678.25425.22.camel@violet>
+	<cd3ff4f20705040646p34f61cb1l8d0cae7c665e0caa@mail.gmail.com>
+	<dc98d8d90705122121h1424a33ao8f1048661d24c421@mail.gmail.com>
+Subject: Re: [Bluez-users] Device not detected (HP nx9420 / Kubuntu Feisty)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,74 +19,37 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1457805050=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1457805050==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_175601_13386494.1179161325917"
+On 5/13/07, Paul Webster <pjwebster@gmail.com> wrote:
+> > > looks like you have to find the rfkill switch to enable the Bluetooth
+> > > USB dongle inside your computer.
+>
+> I believe Marcel was refering to the physical switch on your laptop.
+> While I can't vouch for other models, the button on my HP zd8000
+> serves to physically disconnect the built-in USB bluetooth device (ie
+> it is not software controlled). The fact that your WiFi works in this
+> state is a little confusing, as usually I get both or none when
+> pressing the button, but again, my model is different.
 
-------=_Part_175601_13386494.1179161325917
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+On this laptop, there is only one physical switch. By default, it
+enables / disables wifi *and* bluetooth. However, bluetooth and wifi
+can be enabled/disabled independently with a win32 HP software. So it
+seems to be possible to have one without the other.
 
-Hi,
-   While executing the code
+Marcel, were you refering to the physical switch ?
 
-sess = sdp_connect(&interface, bdaddr, SDP_RETRY_IF_BUSY);
- if (!sess)
-        {
-                //session cannot be established
-                //need to quit
-                //if(globalData.debug)
-                msg_print("Session Cannot be established with BT ADDR
-....\nquitting .....\n");
-                return -1;
-                //break;
-                //sleep(2);
-        }
-i am getting error message "Seesion Cannot be established with BT ADDR" too
-often ,although the device is scanned properly and is well within the dongle
-reach.What can be the possible reasons for this.
-
-regards
-siddhant
-
-------=_Part_175601_13386494.1179161325917
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi,<br>&nbsp;&nbsp; While executing the code <br><br>sess = sdp_connect(&amp;interface, bdaddr, SDP_RETRY_IF_BUSY);<br>&nbsp;if (!sess)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //session cannot be established <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //need to quit<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //if(globalData.debug) <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msg_print(&quot;Session Cannot be established with BT ADDR ....\nquitting .....\n&quot;);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return -1;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //break;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //sleep(2);
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>i am getting error message &quot;Seesion Cannot be established with BT ADDR&quot; too often ,although the device is scanned properly and is well within the dongle reach.What can be the possible reasons for this.
-<br><br>regards<br>siddhant<br>&nbsp;<br>
-
-------=_Part_175601_13386494.1179161325917--
-
-
---===============1457805050==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+Xavier
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1457805050==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1457805050==--
