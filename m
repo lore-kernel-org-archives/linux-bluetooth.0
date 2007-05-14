@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <loom.20070513T135336-907@post.gmane.org>
-References: <loom.20070513T135336-907@post.gmane.org>
-Date: Mon, 14 May 2007 19:07:09 +0200
-Message-Id: <1179162429.13351.63.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users]
-	dbus.DBusException:	org.bluez.input.Error.AlreadyExists:
-	Input Already exists
+Message-ID: <57c68ddc0705140948v39b44ecfx73da523c9006d66e@mail.gmail.com>
+Date: Mon, 14 May 2007 22:18:45 +0530
+From: "siddhant tewari" <siddhant.tewari@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-users] error in calling sdp_connect
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,68 +14,74 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1457805050=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Dick,
+--===============1457805050==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_175601_13386494.1179161325917"
 
-> I'm trying the new input service with my Logitech dinovo desktop but I can't get
-> it working. I've read http://wiki.bluez.org/wiki/HOWTO/InputDevices and
-> manufactured/stolen the following python script:
-> 
-> import dbus
-> bus = dbus.SystemBus()
-> bmgr = dbus.Interface(bus.get_object('org.bluez', '/org/bluez'),
-> 'org.bluez.Manager')
-> bus_id = bmgr.ActivateService('input')
-> 
-> # All input messages should be sent to this address
-> print bus_id
-> 
-> imgr = dbus.Interface(bus.get_object(bus_id, '/org/bluez/input'),
-> 'org.bluez.input.Manager')
-> 
-> # device creation
-> #path = imgr.CreateDevice('00:07:61:69:27:XX')
-> path = imgr.CreateDevice('00:07:61:68:CA:XX')
-> idev = dbus.Interface (bus.get_object(bus_id, path), 'org.bluez.input.Device')
-> 
-> # host initiated connection
-> print idev.GetName()
-> idev.Connect()
-> 
-> This results in:
-> 
-> :1.30
-> Logitech Bluetooth Keyboard
-> Traceback (most recent call last):
->   File "test.py", line 19, in ?
->     idev.Connect()
->   File "//usr/lib/python2.4/site-packages/dbus/proxies.py", line 169, in __call__
->     reply_message = self._connection.send_message_with_reply_and_block(message,
-> timeout)
-> dbus.DBusException: org.bluez.input.Error.ConnectionAttemptFailed: Host is down
-> 
-> I've tried some fiddling with the connect button and rm-/insmod-ed hidp (from
-> linux-2.6.21).
-> 
-> Could someone please give me some hints?
+------=_Part_175601_13386494.1179161325917
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-no need to call Connect(), because HID devices will re-connect to you.
+Hi,
+   While executing the code
 
-Regards
+sess = sdp_connect(&interface, bdaddr, SDP_RETRY_IF_BUSY);
+ if (!sess)
+        {
+                //session cannot be established
+                //need to quit
+                //if(globalData.debug)
+                msg_print("Session Cannot be established with BT ADDR
+....\nquitting .....\n");
+                return -1;
+                //break;
+                //sleep(2);
+        }
+i am getting error message "Seesion Cannot be established with BT ADDR" too
+often ,although the device is scanned properly and is well within the dongle
+reach.What can be the possible reasons for this.
 
-Marcel
+regards
+siddhant
+
+------=_Part_175601_13386494.1179161325917
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi,<br>&nbsp;&nbsp; While executing the code <br><br>sess = sdp_connect(&amp;interface, bdaddr, SDP_RETRY_IF_BUSY);<br>&nbsp;if (!sess)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //session cannot be established <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //need to quit<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //if(globalData.debug) <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msg_print(&quot;Session Cannot be established with BT ADDR ....\nquitting .....\n&quot;);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return -1;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //break;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //sleep(2);
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>i am getting error message &quot;Seesion Cannot be established with BT ADDR&quot; too often ,although the device is scanned properly and is well within the dongle reach.What can be the possible reasons for this.
+<br><br>regards<br>siddhant<br>&nbsp;<br>
+
+------=_Part_175601_13386494.1179161325917--
 
 
+--===============1457805050==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1457805050==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1457805050==--
