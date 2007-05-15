@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 16 May 2007 02:18:49 +0200
-From: Andreas =?ISO-8859-1?Q?B=F6hler?= <andy.boehler@gmx.at>
+From: Tim Chick <chick@computergeek.freeserve.co.uk>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20070516021849.199f3034@localhost.local>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Revive Dead Dongle
+Date: Tue, 15 May 2007 22:20:57 +0100
+References: <5b9417770705141014w20611f52v50526f928501803c@mail.gmail.com>
+	<200705150200.43977.bluez-devel@huitl.de>
+	<200705152222.11641.bluez-devel@huitl.de>
+In-Reply-To: <200705152222.11641.bluez-devel@huitl.de>
+MIME-Version: 1.0
+Message-Id: <200705152220.58038.chick@computergeek.freeserve.co.uk>
+Subject: Re: [Bluez-devel] skype and bluetooth
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,29 +22,43 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hey, =
+On Tuesday 15 May 2007 21:22, Robert Huitl wrote:
+> Okay after some debugging I know what the problem is.
+> 2.) Offering more sampling rates than 8 kHz would be nice to have, but I'm
+> not familiar with the design philosophies around ALSA. It's probably not a
+> good idea to implement resampling in each and every sound plugin like
+> pcm_sco. Does ALSA have some resampling facilities that can be plugged in
+> between an application and a plugin? Maybe some magic lines in .asoundrc?
+>
+I do this with a2dp, I'm sure the same could apply to sco.
+I use an .asoundrc file which looks like this:
 
+pcm.a2dpd {
+=A0=A0=A0=A0=A0=A0=A0=A0type a2dpd
+}
 
-I tried upgrading the Firmware of my CSR-based D-Link DBT-120 B3.
-Unfortunately, the upgrade seems to have failed: The D-Link's light
-don't light up anymore and no USB-device is detected when plugging
-in the device.
+pcm.rs0 {
+=A0=A0=A0=A0=A0=A0=A0=A0type plug
+=A0=A0=A0=A0=A0=A0=A0=A0slave {
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0pcm "a2dpd"
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0rate 44100
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0format S16_LE
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0channels 2
+=A0=A0=A0=A0=A0=A0=A0=A0}
+}
 
-Is there a known way to force the Dongle to boot into DFU-Mode? Or
-is it hopelessly flashed to death?
+pcm.!default {
+=A0=A0=A0=A0=A0=A0=A0=A0type plug
+=A0=A0=A0=A0=A0=A0=A0=A0slave.pcm "rs0"
+}
 
-Thanks, =
+----
 
+It will resample the audio given to the a2dp plugin so it is always 44.1kHz.
 
-greetings, =
+Cheers,
+Tim
 
-andy
-
--- =
-
-Andreas B=F6hler
-andy (dot) boehler (at) gmx (dot) at
-http://klasseonline.dyndns.org
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
