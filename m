@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4649CC21.2070701@idlum.be>
+Date: Tue, 15 May 2007 17:05:05 +0200
+From: Pierre-Yves Paulus <py@idlum.be>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <6669365c0705150801g1868b3c4v40c59eba01e6e832@mail.gmail.com>
-References: <6669365c0705150801g1868b3c4v40c59eba01e6e832@mail.gmail.com>
-Date: Tue, 15 May 2007 17:31:41 +0200
-Message-Id: <1179243101.10069.23.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] BCM2035 on UART at speeds higher than 230400
+Subject: [Bluez-devel] Error.InProgress forever after DBus timeout on
+	GetRemoteServiceHandles
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,32 +19,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Daniel,
+Hello,
 
-> I am working on bluetooth support for the Motorola EZX platform
-> (a780/e680 phones) and i am unable to hciattach bcm2035 at baud rates
-> higher than 230400.
-> 
-> I reverse engineered the original firmware and found that it uses a
-> different argument to the hci command that sets the baud rate when
-> setting 460800 and 921600, i have changed hciattach.c and it works at
-> full speed for me now.
-> 
-> What i want to know is if anyone is using this chip at rates higher
-> than 230400 before submiting my patch, so it doesnt break anyone else
-> work. Currently i know that the EZX platform and most Palm handhelds
-> use this chip on the UART port. My patch works for EZX and i am
-> waiting feedback from the hackndev guys about the palms. 
-> 
-> My patch also adds support for setting the bdaddr on chip init,
-> otherwise this chip gets 00:00:00:00:00:00.
+I perform a call on GetRemoteServiceHandles. For some reason it fails 
+with a DBus timeout. After it has happened, each subsequent call to 
+GetRemoteServiceHandles about this device result in a Error.InProgress.
 
-post your patch and I will integrate it.
+More precisely, my code tried it 36 times over about 7 minutes, and it 
+failed that way each time.
 
-Regards
+What should I do in such a case? It should somehow effectively timeout, 
+or there should be a way to cancel it. I didn't find any in the 
+dbus-api.txt file.
 
-Marcel
-
+Thanks in advance,
+Best Regards
 
 
 -------------------------------------------------------------------------
