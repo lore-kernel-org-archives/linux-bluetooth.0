@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <6669365c0705150801g1868b3c4v40c59eba01e6e832@mail.gmail.com>
-Date: Tue, 15 May 2007 15:01:09 +0000
-From: "Daniel Ribeiro" <drwyrm@gmail.com>
-To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-devel] BCM2035 on UART at speeds higher than 230400
+Date: Tue, 15 May 2007 18:54:34 +0800
+Message-ID: <36BC62FC45C4E949B13C20DEFA8617D5054D2C7C@zmy16exm62.ds.mot.com>
+References: <AF7E222731C6614DAB496712B5768F2401EB332C@ct11exm65.ds.mot.com>  
+From: "GAO LIANG-TAO-W20048" <l.t.gao@motorola.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Report a bug against "l2cap_conf_output()"
+	in"net/bluetooth/l2cap.c"
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,78 +16,95 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0554340765=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0554340765==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_2909_16183326.1179241269301"
+Hi Marcel,
 
-------=_Part_2909_16183326.1179241269301
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Sorry for getting back late.
 
-Hi all.
+I think you omitted the local outgoing MTU. The original code will
+enlarge the outgoing MTU value, but the Bluetooth SPEC expects a minimum
+of the MTU in the config request and the local outgoing MTU.
 
-I am working on bluetooth support for the Motorola EZX platform (a780/e680
-phones) and i am unable to hciattach bcm2035 at baud rates higher than
-230400.
+For example, if Device B starts an L2CAP service with incoming MTU 512,
+and an L2CAP client on Device A claiming an outgoing MTU 53 tries to
+connect to the service; the service on B sends configuration request to
+the BlueZ stack on A with MTU 512, then A shall sends back a positive
+response to B with the MTU 53 (not 512 as BlueZ actually does). In fact
+this example is from a JSR82 MTU test case.
 
-I reverse engineered the original firmware and found that it uses a
-different argument to the hci command that sets the baud rate when setting
-460800 and 921600, i have changed hciattach.c and it works at full speed for
-me now.
+Here's the whole paragraph in page 1038 (of the total 1230) in Bluetooth
+SPEC Core_v2.0_EDR.pdf:
+"If the remote device sends a positive configuration response it shall
+include the actual MTU to be used on this channel for traffic flowing
+into the local device. This is the minimum of the MTU in the
+configuration request and the outgoing MTU capability of the device
+sending the configuration response. The new agreed value (the default
+value in a future re-configuration) is the value specified in the
+request."
 
-What i want to know is if anyone is using this chip at rates higher than
-230400 before submiting my patch, so it doesnt break anyone else work.
-Currently i know that the EZX platform and most Palm handhelds use this chip
-on the UART port. My patch works for EZX and i am waiting feedback from the
-hackndev guys about the palms.
+My understanding is that the MTU can be increased in no cases. Please
+let me know your consideration of this paragraph.
 
-My patch also adds support for setting the bdaddr on chip init, otherwise
-this chip gets 00:00:00:00:00:00.
-
-Thank you in advance.
-
--- 
-EOF
-
-Daniel Ribeiro
-
-------=_Part_2909_16183326.1179241269301
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi all.<br><br>I am working on bluetooth support for the Motorola EZX platform (a780/e680 phones) and i am unable to hciattach bcm2035 at baud rates higher than 230400.<br><br>I reverse engineered the original firmware and found that it uses a different argument to the hci command that sets the baud rate when setting 460800 and 921600, i have changed 
-hciattach.c and it works at full speed for me now.<br><br>What i want to know is if anyone is using this chip at rates higher than 230400 before submiting my patch, so it doesnt break anyone else work. Currently i know that the EZX platform and most Palm handhelds use this chip on the UART port. My patch works for EZX and i am waiting feedback from the hackndev guys about the palms.
-<br><br>My patch also adds support for setting the bdaddr on chip init, otherwise this chip gets 00:00:00:00:00:00.<br><br>Thank you in advance.<br clear="all"><br>-- <br>EOF<br><br>Daniel Ribeiro
-
-------=_Part_2909_16183326.1179241269301--
+Thanks
+Gao Liangtao
 
 
---===============0554340765==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-----Original Message-----
+From: Marcel Holtmann [mailto:marcel@holtmann.org] 
+Sent: Friday, May 04, 2007 1:56 AM
+To: BlueZ development
+Cc: Singer Catherine-CSINGER1; Jin Hong-Lei-W19971; Saeed Faisal-EFS015
+Subject: Re: [Bluez-devel] Report a bug against "l2cap_conf_output()"
+in"net/bluetooth/l2cap.c"
+
+Hi,
+
+> 
+> I want to report a bug against "l2cap_conf_output()" in BlueZ kernel 
+> code "net/bluetooth/l2cap.c":
+> 
+>     if (pi->conf_mtu < pi->omtu) {
+> 
+>        l2cap_add_conf_opt(ptr, L2CAP_CONF_MTU, 2, pi->omtu);
+> 
+>        result = L2CAP_CONF_UNACCEPT;
+> 
+>     } else {
+> 
+>        pi->omtu = pi->conf_mtu;
+> 
+>     }
+> 
+> I think it's wrong to enlarge the outgoing MTU value (by calling 
+> "pi->omtu = pi->conf_mtu") when device B gets the MTU in device A's 
+> configuration request. In fact, Page 1006/1200 of Bluetooth SPEC v1.2 
+> or Page 1038/1230 of Bluetooth SPEC v2.0 EDR both require a minimum of
+
+> the  "If the remote device sends a positive configuration response it 
+> shall include the actual MTU to be used on this channel for traffic 
+> flowing into the local device. This is the minimum of the MTU in the 
+> configuration request and the outgoing MTU capability of the device 
+> sending the configuration response." Here I consider the original 
+> "pi->omtu" as the "outgoing MTU capability".
+
+I need more details from you, because I don't see the issue here. The
+MTUs (output + input) for L2CAP are negotiated in both directions.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0554340765==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0554340765==--
