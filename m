@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4645991F.2060107@gnome.hu>
-References: <4645991F.2060107@gnome.hu>
-Date: Tue, 15 May 2007 12:02:11 +0200
-Message-Id: <1179223331.10069.4.camel@violet>
+In-Reply-To: <d4060d560705150247g46030f61sa080f4485ab28d85@mail.gmail.com>
+References: <d4060d560705150247g46030f61sa080f4485ab28d85@mail.gmail.com>
+Date: Tue, 15 May 2007 11:58:38 +0200
+Message-Id: <1179223118.10069.2.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Hungarian translation of bluez-gnome
+Subject: Re: [Bluez-devel] Can i get address of device who is
+	doing	discovery?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,15 +21,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Gabor,
+Hi Rupesh,
 
-> Here is a hungarian translation for bluez-gnome:
-> 
-> http://librarian.launchpad.net/7609540/hu.po
-> 
-> Please include it in the following releases.
+>   I want to get address of a device who is doing discovery. (while my
+> local device is responding to discovey) I know that while doing
+> discovery a device sends a FHS packet which contains its address and
+> clock information. 
+>   But i dont know how to hack code to extract its BD Adress.
 
-I committed it to the CVS. Please make sure that is stays up-to-date.
+it is impossible to do that with the HCI interface.
 
 Regards
 
