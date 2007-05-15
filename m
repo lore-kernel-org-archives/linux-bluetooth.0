@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Tim Chick <chick@computergeek.freeserve.co.uk>
-To: bluez-devel@lists.sourceforge.net
-Date: Tue, 15 May 2007 22:20:57 +0100
+From: Robert Huitl <bluez-devel@huitl.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Tue, 15 May 2007 22:22:11 +0200
 References: <5b9417770705141014w20611f52v50526f928501803c@mail.gmail.com>
 	<200705150200.43977.bluez-devel@huitl.de>
-	<200705152222.11641.bluez-devel@huitl.de>
-In-Reply-To: <200705152222.11641.bluez-devel@huitl.de>
+In-Reply-To: <200705150200.43977.bluez-devel@huitl.de>
 MIME-Version: 1.0
-Message-Id: <200705152220.58038.chick@computergeek.freeserve.co.uk>
+Message-Id: <200705152222.11641.bluez-devel@huitl.de>
 Subject: Re: [Bluez-devel] skype and bluetooth
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -18,47 +17,44 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Tuesday 15 May 2007 21:22, Robert Huitl wrote:
-> Okay after some debugging I know what the problem is.
-> 2.) Offering more sampling rates than 8 kHz would be nice to have, but I'm
-> not familiar with the design philosophies around ALSA. It's probably not a
-> good idea to implement resampling in each and every sound plugin like
-> pcm_sco. Does ALSA have some resampling facilities that can be plugged in
-> between an application and a plugin? Maybe some magic lines in .asoundrc?
->
-I do this with a2dp, I'm sure the same could apply to sco.
-I use an .asoundrc file which looks like this:
+Okay after some debugging I know what the problem is.
 
-pcm.a2dpd {
-=A0=A0=A0=A0=A0=A0=A0=A0type a2dpd
-}
+On Dienstag, 15. Mai 2007, Robert Huitl wrote:
+> 1) Skype tries to use a sample format that is not supported at all or
 
-pcm.rs0 {
-=A0=A0=A0=A0=A0=A0=A0=A0type plug
-=A0=A0=A0=A0=A0=A0=A0=A0slave {
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0pcm "a2dpd"
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0rate 44100
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0format S16_LE
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0channels 2
-=A0=A0=A0=A0=A0=A0=A0=A0}
-}
+Skype uses the sample format SND_PCM_FORMAT_S16_LE which is supported by the 
+pcm_sco plugin, but it also requests a sampling rate of 48 KHz, which is not.
 
-pcm.!default {
-=A0=A0=A0=A0=A0=A0=A0=A0type plug
-=A0=A0=A0=A0=A0=A0=A0=A0slave.pcm "rs0"
-}
+Having patched alsa-lib to trace the calls to snd_pcm_hw_params_set_rate*(), I 
+get the following output when I try to initiate a call:
 
-----
+DEBUG: snd_pcm_hw_params_set_rate_near(48000)
+DEBUG: snd_pcm_hw_params_set_rate(48000)
+[pause]
+DEBUG: snd_pcm_hw_params_set_rate(48000)
+[error message appears]
 
-It will resample the audio given to the a2dp plugin so it is always 44.1kHz.
+When I change SCO_RATE in pcm_sco.c from 8000 to 48000 and set the headset as 
+the input device only, Skype goes past the "problem with audio" message (the 
+recorded sound is garbage, of course).
 
-Cheers,
-Tim
+So to conclude,
+1.) 48 kHz is, to say the least, a rather high value for sampling from a 
+microphone. This is probably not intended by Skype and might just very well 
+be a bug as it's an alpha version.
 
+2.) Offering more sampling rates than 8 kHz would be nice to have, but I'm not 
+familiar with the design philosophies around ALSA. It's probably not a good 
+idea to implement resampling in each and every sound plugin like pcm_sco. 
+Does ALSA have some resampling facilities that can be plugged in between an 
+application and a plugin? Maybe some magic lines in .asoundrc?
+
+Regards,
+  Robert
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
