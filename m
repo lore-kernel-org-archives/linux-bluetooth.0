@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <7376BC9FD0C11A4CA373508199DEED1802E35A89@de01exm65.ds.mot.com>
-References: <7376BC9FD0C11A4CA373508199DEED1802E35A89@de01exm65.ds.mot.com>
-Date: Wed, 16 May 2007 17:43:07 +0200
-Message-Id: <1179330187.10069.82.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Contributor Agreement/Copyright Assignment
+MIME-Version: 1.0
+Date: Wed, 16 May 2007 11:08:42 -0400
+Message-ID: <7376BC9FD0C11A4CA373508199DEED1802E35A89@de01exm65.ds.mot.com>
+From: "Bhutani Meeta-W19091" <Meeta.Bhutani@motorola.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Contributor Agreement/Copyright Assignment
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,20 +18,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Meeta,
+Motorola would like to understand if Bluez has a contributor agreement
+(or a copyright assignment agreement) that is posted somewhere ? We are
+investigating what would be needed from a legal standpoint to possibly
+contribute in the future.
 
-> Motorola would like to understand if Bluez has a contributor agreement
-> (or a copyright assignment agreement) that is posted somewhere ? We are
-> investigating what would be needed from a legal standpoint to possibly
-> contribute in the future.
-
-the only thing that is needed, is that your source code will be released
-under GPL.
-
-Regards
-
-Marcel
-
+Thanks & Regards
+Meeta Bhutani
 
 
 -------------------------------------------------------------------------
