@@ -1,12 +1,18 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <464B2C25.20302@pracucci.com>
-References: <464B2C25.20302@pracucci.com>
-Date: Thu, 17 May 2007 09:55:37 +0200
-Message-Id: <1179388537.10069.117.camel@violet>
+To: bluez-users@lists.sourceforge.net
+From: Dick <dm@chello.nl>
+Date: Wed, 16 May 2007 18:03:34 +0000 (UTC)
+Message-ID: <loom.20070516T200232-169@post.gmane.org>
+References: <loom.20070513T135336-907@post.gmane.org>
+	<1179162429.13351.63.camel@violet>
+	<loom.20070515T190851-57@post.gmane.org>
+	<1179250065.10069.30.camel@violet>
+	<loom.20070515T203009-183@post.gmane.org>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] sdpd concurrent connections
+Subject: Re: [Bluez-users]
+	=?utf-8?q?dbus=2EDBusException=3A=09org=2Ebluez=2Ei?=
+	=?utf-8?q?nput=2EError=2EAlreadyExists=3A=09Input=09Already=09exis?=
+	=?utf-8?q?ts?=
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,20 +26,7 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marco,
-
-> I have a computer with 4 bluetooth adapters that runs sdp daemon. I have 
-> experienced some problems when remote devices concurrent connect to the 
-> sdp daemon, that seems to serve just the first connection. May you 
-> explain me if sdpd is able to manage concurrent connections?
-
-there should be no problem like this. However try with "hcid -s" instead
-of using sdpd.
-
-Regards
-
-Marcel
-
+Okay problem solved with bluez-utils 3.10.1, thanks!
 
 
 -------------------------------------------------------------------------
