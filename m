@@ -1,49 +1,45 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Fernando Unzu <fernando@bluexare.org>
-To: bluez-devel@lists.sourceforge.net
-Date: Wed, 16 May 2007 12:35:51 +0200
+Return-Path: <jikos@jikos.cz>
+Date: Wed, 16 May 2007 11:29:45 +0200 (CEST)
+From: Jiri Kosina <jikos@jikos.cz>
+To: Satyam Sharma <satyam.sharma@gmail.com>
+cc: Marcel Holtmann <marcel@holtmann.org>, Greg KH <gregkh@suse.de>,
+        Jeremy Fitzhardinge <jeremy@goop.org>, maxk@qualcomm.com,
+        bluez-devel@lists.sourceforge.net, Cedric Le Goater <clg@fr.ibm.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        netdev@vger.kernel.org
+Subject: Re: 2.6.21-rc7: BUG: sleeping function called from invalid context
+ at net/core/sock.c:1523
+In-Reply-To: <a781481a0705110629n7c7130c1x3a89fa958b271f20@mail.gmail.com>
+Message-ID: <Pine.LNX.4.64.0705161124030.25986@twin.jikos.cz>
+References: <462D1B09.9050005@goop.org>  <Pine.LNX.4.64.0704232257090.20657@twin.jikos.cz>
+  <Pine.LNX.4.64.0704261625410.20657@twin.jikos.cz>
+ <a781481a0705110629n7c7130c1x3a89fa958b271f20@mail.gmail.com>
 MIME-Version: 1.0
-Message-Id: <200705161235.51289.fernando@bluexare.org>
-Subject: [Bluez-devel] How I can select between 2 bluetooth devices?
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hello,
-I'm working in an application that scans for bluetooth devices and send some 
-content to they...
+On Fri, 11 May 2007, Satyam Sharma wrote:
 
-Due to several issues, I need to separate the action scan and send between two 
-devices...
+> (later)
+> I Googled a bit to see if this problem was faced elsewhere in the kernel
+> too. Saw the following commit by Ingo Molnar
+> (9883a13c72dbf8c518814b6091019643cdb34429):
+> -	lock_sock(sock->sk);
+> +	local_bh_disable();
+> +	bh_lock_sock_nested(sock->sk);
+> 	rc = selinux_netlbl_socket_setsid(sock, sksec->sid);
+> -	release_sock(sock->sk);
+> +	bh_unlock_sock(sock->sk);
+> +	local_bh_enable();
+> Is it _really_ *this* simple?
 
-I have the code for doing this in one bluetooth device, and I don't know very 
-well how it works, but I have read it some times...
+Hi Satyam,
 
-But I don't find where i can select which bluetooth device I want to use to 
-doing one method or other...
+actually this *seems* to be proper solution also for our case, thanks for 
+pointing this out. I will think about it once again, do some more tests 
+with this locking scheme, and will let you know.
 
-I have seen that "OBEX_Init" creates a handle to manage the conection..., but 
-it can be select which bluetooth device select for doing this handle?
+Thanks,
 
-Thank you very much and I hope somebody understand me.
-
-Fernando
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-- 
+Jiri Kosina
