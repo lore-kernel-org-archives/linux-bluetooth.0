@@ -1,103 +1,106 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <5b9417770705151926i669b708fw295afd90fbc52855@mail.gmail.com>
-Date: Tue, 15 May 2007 21:26:44 -0500
-From: "John H." <mistamaila@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200705160221.27516.bluez-devel@huitl.de>
+Return-Path: <l.t.gao@motorola.com>
 MIME-Version: 1.0
-References: <5b9417770705141014w20611f52v50526f928501803c@mail.gmail.com>
-	<200705152222.11641.bluez-devel@huitl.de>
-	<200705152220.58038.chick@computergeek.freeserve.co.uk>
-	<200705160221.27516.bluez-devel@huitl.de>
-Subject: Re: [Bluez-devel] skype and bluetooth
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
-
-Did you have to use the kernel patch?  I am trying to get h700 working
-with skype without patching kernel.
+Content-Type: text/plain;
+	charset="us-ascii"
+Subject: RE: [Bluez-devel] Report a bug against "l2cap_conf_output()" in"net/bluetooth/l2cap.c"
+Date: Wed, 16 May 2007 09:40:22 +0800
+Message-ID: <36BC62FC45C4E949B13C20DEFA8617D5054D2D29@zmy16exm62.ds.mot.com>
+References: <AF7E222731C6614DAB496712B5768F2401EB332C@ct11exm65.ds.mot.com>   
+From: "GAO LIANG-TAO-W20048" <l.t.gao@motorola.com>
+Cc: <bluez-devel@lists.sourceforge.net>, <marcel@holtmann.org>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
 
-On 5/15/07, Robert Huitl <bluez-devel@huitl.de> wrote:
-> On Dienstag, 15. Mai 2007, you wrote:
-> > On Tuesday 15 May 2007 21:22, Robert Huitl wrote:
-> > > Okay after some debugging I know what the problem is.
-> > > 2.) Offering more sampling rates than 8 kHz would be nice to have, but
-> > > I'm not familiar with the design philosophies around ALSA. It's probably
-> > > not a good idea to implement resampling in each and every sound plugin
-> > > like pcm_sco. Does ALSA have some resampling facilities that can be
-> > > plugged in between an application and a plugin? Maybe some magic lines in
-> > > .asoundrc?
-> >
-> > I do this with a2dp, I'm sure the same could apply to sco.
-> > I use an .asoundrc file which looks like this:
->
-> Thanks a lot for this configuration. I got Skype running with it, even though
-> it's freezing almost always when I call the echo test service (and both input
-> and output are set to headset-sco-resample). But in a few cases it actually
-> worked very nicely.
->
-> However, if only input _or_ output is set to the headset device, it's quite
-> stable. So recording is fine, playback is fine, but both of them at a time
-> freeze Skype.
->
-> For reference, this is my .asoundrc:
->
-> pcm.headset-sco-resample {
->         type plug
->         slave {
->                 pcm "headset-sco"
->                 rate 8000
->                 format S16_LE
->                 channels 1
->         }
-> }
-> pcm.headset-sco {
->         @args [BDADDR TIMEOUT]
->         @args.BDADDR {
->                 type string
->                 default "xx:xx:xx:xx:xx:xx" # Put your HS address here
->         }
->         @args.TIMEOUT {
->                 type integer
->                 default 6000
->         }
->         type        sco
->         bdaddr      $BDADDR
->         timeout     $TIMEOUT
-> }
->
-> Might be some problem with ALSA, though.
->
-> Regards,
->   Robert
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by DB2 Express
-> Download DB2 Express C - the FREE version of DB2 express and take
-> control of your XML. No limits. Just data. Click to get it now.
-> http://sourceforge.net/powerbar/db2/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+Hi Marcel,
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Are you simply ignoring my "bug" report? Dislike my email?
+
+It's not an easy talk with you. I'm afraid my membership will be wrongly
+disabled again after this email.
+
+Regards,
+Gao
+
+-----Original Message-----
+From: GAO LIANG-TAO-W20048=20
+Sent: Tuesday, May 15, 2007 6:55 PM
+To: bluez-devel@lists.sourceforge.net
+Subject: RE: [Bluez-devel] Report a bug against "l2cap_conf_output()"
+in"net/bluetooth/l2cap.c"
+
+Hi Marcel,
+
+Sorry for getting back late.
+
+I think you omitted the local outgoing MTU. The original code will
+enlarge the outgoing MTU value, but the Bluetooth SPEC expects a minimum
+of the MTU in the config request and the local outgoing MTU.
+
+For example, if Device B starts an L2CAP service with incoming MTU 512,
+and an L2CAP client on Device A claiming an outgoing MTU 53 tries to
+connect to the service; the service on B sends configuration request to
+the BlueZ stack on A with MTU 512, then A shall sends back a positive
+response to B with the MTU 53 (not 512 as BlueZ actually does). In fact
+this example is from a JSR82 MTU test case.
+
+Here's the whole paragraph in page 1038 (of the total 1230) in Bluetooth
+SPEC Core_v2.0_EDR.pdf:
+"If the remote device sends a positive configuration response it shall
+include the actual MTU to be used on this channel for traffic flowing
+into the local device. This is the minimum of the MTU in the
+configuration request and the outgoing MTU capability of the device
+sending the configuration response. The new agreed value (the default
+value in a future re-configuration) is the value specified in the
+request."
+
+My understanding is that the MTU can be increased in no cases. Please
+let me know your consideration of this paragraph.
+
+Thanks
+Gao Liangtao
+
+
+-----Original Message-----
+From: Marcel Holtmann [mailto:marcel@holtmann.org]=20
+Sent: Friday, May 04, 2007 1:56 AM
+To: BlueZ development
+Cc: Singer Catherine-CSINGER1; Jin Hong-Lei-W19971; Saeed Faisal-EFS015
+Subject: Re: [Bluez-devel] Report a bug against "l2cap_conf_output()"
+in"net/bluetooth/l2cap.c"
+
+Hi,
+
+>=20
+> I want to report a bug against "l2cap_conf_output()" in BlueZ kernel=20
+> code "net/bluetooth/l2cap.c":
+>=20
+>     if (pi->conf_mtu < pi->omtu) {
+>=20
+>        l2cap_add_conf_opt(ptr, L2CAP_CONF_MTU, 2, pi->omtu);
+>=20
+>        result =3D L2CAP_CONF_UNACCEPT;
+>=20
+>     } else {
+>=20
+>        pi->omtu =3D pi->conf_mtu;
+>=20
+>     }
+>=20
+> I think it's wrong to enlarge the outgoing MTU value (by calling=20
+> "pi->omtu =3D pi->conf_mtu") when device B gets the MTU in device A's=20
+> configuration request. In fact, Page 1006/1200 of Bluetooth SPEC v1.2=20
+> or Page 1038/1230 of Bluetooth SPEC v2.0 EDR both require a minimum of
+
+> the  "If the remote device sends a positive configuration response it=20
+> shall include the actual MTU to be used on this channel for traffic=20
+> flowing into the local device. This is the minimum of the MTU in the=20
+> configuration request and the outgoing MTU capability of the device=20
+> sending the configuration response." Here I consider the original=20
+> "pi->omtu" as the "outgoing MTU capability".
+
+I need more details from you, because I don't see the issue here. The
+MTUs (output + input) for L2CAP are negotiated in both directions.
+
+Regards
+
+Marcel
