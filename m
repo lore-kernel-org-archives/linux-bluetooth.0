@@ -1,15 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Fernando Unzu <fernando@bluexare.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Fri, 18 May 2007 12:19:55 +0200
-References: <200705161235.51289.fernando@bluexare.org>
-	<1179394491.14671.37.camel@panic>
-	<1ab01fb50705170355t727d3b60s818d3a643305ad8b@mail.gmail.com>
-In-Reply-To: <1ab01fb50705170355t727d3b60s818d3a643305ad8b@mail.gmail.com>
+Message-ID: <464C7616.9070900@nnytech.net>
+Date: Thu, 17 May 2007 11:34:46 -0400
+From: John Feig <feig@nnytech.net>
 MIME-Version: 1.0
-Message-Id: <200705181219.55212.fernando@bluexare.org>
-Subject: Re: [Bluez-devel] How I can select between 2 bluetooth devices?
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <200705170207.52710.bluez-devel@huitl.de>	<d89ddf300705162042j1850b997wd069bae29e813d29@mail.gmail.com>
+	<200705171521.38889.bluez-devel@huitl.de>
+In-Reply-To: <200705171521.38889.bluez-devel@huitl.de>
+Subject: [Bluez-devel]  Frequent headset disconnects
+Reply-To: feig@nnytech.net,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,164 +18,72 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-15"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I think all you said to me will be very usefull.
+Hello,
+I've been using the a2dpd app for a couple of weeks now, and really like 
+it. I have a few issues though, with the main one being that after a 
+couple of minutes of playback, my headphones (HT820) turn off, I turn 
+them back on, and playback continues. I use these things long periods of 
+time with my iPod and a Jabra a2dp adapter, I can listen for hours on an 
+a2dp connection with those without interruption (aside from the 
+occasional phone call). But within a couple of minutes using the a2dpd 
+app (and amarok or mplayer), the connection gets really choppy, then 
+drops out, and I have to turn _on_ my headphones. As you might guess, 
+this is a show stopper for me, as I can't really enjoy listening to 
+music wirelessly if I can't get through an entire song without turning 
+my headphones back on.
 
-Thank you very much, Colin, Vikas.
+Any ideas on why this is happening would be helpful, as right now, I 
+don't even know where to start looking. Here's the output when it fails:
 
-Soon I implement the new solution you propose.
+A2DPD[11:10:02.275]: a2dp_transfer_raw: Wrote -1 not 603 bytes (sbc.len=118)
+A2DPD[11:10:02.275]: transfer_outgoing_packets: Error in transfer 
+(transfer=-1)
+A2DPD[11:10:02.275]: a2dp_state_disconnect: State 
+AVDTP_STATEX_STREAM_CLOSING
+A2DPD[11:10:02.275]: a2dp_state_machine: State 
+AVDTP_STATEX_STREAM_CLOSING_WAIT
+A2DPD[11:10:02.275]: a2dpd_signal_state: Connecting 00:07:A4:B8:68:8F
+A2DPD[11:10:05.005]: a2dp_state_machine: Too many answer for AVDTP_CLOSE
+A2DPD[11:10:05.005]: a2dp_state_machine: State AVDTP_STATEX_DISCONNECTING
+A2DPD[11:10:05.005]: a2dp_disconnect:
+A2DPD[11:10:05.005]: a2dp_stream_stop: Closing stream socket 12
+A2DPD[11:10:05.005]: a2dp_stream_stop: Closed
+A2DPD[11:10:05.005]: a2dp_stream_stop: State AVDTP_STATE_IDLE
+A2DPD[11:10:05.005]: a2dp_disconnect: Closing ctl socket 10
+A2DPD[11:10:05.005]: a2dp_disconnect: Closed
+A2DPD[11:10:05.005]: a2dp_disconnect: State AVDTP_STATE_DISCONNECTED
+A2DPD[11:10:05.005]: a2dpd_signal_state: Disconnected
+A2DPD[11:10:05.005]: a2dp_state_connect: State AVDTP_STATEX_SDP_CONNECTING
+A2DPD[11:10:05.005]: a2dp_state_machine: Role is INITIATOR
+A2DPD[11:10:05.005]: a2dp_state_machine: SDP connection on socket 10
+A2DPD[11:10:05.005]: a2dp_state_machine: State 
+AVDTP_STATEX_SDP_CONNECTING_WAIT
+A2DPD[11:10:05.005]: a2dpd_signal_state: Connecting 00:07:A4:B8:68:8F
+A2DPD[11:10:11.515]: a2dp_state_machine: SDP connection terminated
+A2DPD[11:10:11.515]: a2dp_state_machine: (errno=110:Connection timed 
+out)SDP connection failed
+A2DPD[11:10:11.515]: a2dp_state_machine: State AVDTP_STATEX_DISCONNECTING
+A2DPD[11:10:11.515]: a2dp_disconnect:
+A2DPD[11:10:11.516]: a2dp_stream_stop: Closing stream socket -1
+A2DPD[11:10:11.516]: a2dp_stream_stop: Closed
+A2DPD[11:10:11.516]: a2dp_stream_stop: State AVDTP_STATE_IDLE
+A2DPD[11:10:11.516]: a2dp_disconnect: Closing ctl socket -1
+A2DPD[11:10:11.516]: a2dp_disconnect: Closed
+A2DPD[11:10:11.516]: a2dp_disconnect: State AVDTP_STATE_DISCONNECTED
+A2DPD[11:10:11.516]: a2dpd_signal_state: Disconnected
+A2DPD[11:10:11.523]: a2dp_state_connect: State AVDTP_STATEX_SDP_CONNECTING
+A2DPD[11:10:11.524]: a2dp_state_machine: Role is INITIATOR
+A2DPD[11:10:11.524]: a2dp_state_machine: SDP connection on socket 10
+A2DPD[11:10:11.524]: a2dp_state_machine: State 
+AVDTP_STATEX_SDP_CONNECTING_WAIT
+A2DPD[11:10:11.524]: a2dpd_signal_state: Connecting 00:07:A4:B8:68:8F
 
-Thanks a lot.
-
-
-El Jueves, 17 de Mayo de 2007 12:55, Vikas Sinha escribi=F3:
-> I think Collin said is right ,
-> See for scanning u need to have hci layer api while for file transfer u
-> need OBEX.
-> for scanning bind device before calling scan function.
-> hci_inquiry(iDevId, iSECOND, iMAXDEV, NULL, &inqinfo, IREQ_CACHE_FLUSH))
-> This DevId is device Id(file descriptor).
->
-> while for File sending u can call
-> handle =3D __obex_connect(devid, addr, timeout, &err);
-> here again devid is FD .
->
-> so by this u can differentiate 2 dongles.
->
-> On 5/17/07, Collin R. Mulliner <collin@betaversion.net> wrote:
-> > you can do this in a very simple way, just do the connect by hand (bind
-> > to a specific bluetooth device before connect) then pass the file
-> > descriptor to the OBEX library. OBEX will run in normal FD (file
-> > descriptor) mode then. For this to work you also need to do the sdp
-> > lookup yourself, but this is easy.
-> >
-> > Collin
-> >
-> > On Thu, 2007-05-17 at 10:18 +0200, Fernando Unzu wrote:
-> > > Hi Vikas,
-> > > Yes, this is I want to achieve.
-> > >
-> > > I don't understand very well the code, but I uses OBEX_GetUserData,
-> > > OBEX_HandleInput, OBEX_CancelRequest, OBEX_ObjectNew, OBEX_Delete,
-> > > OBEX_TransportConnect and more like these, and in all of them I use a
-> >
-> > Handle,
-> >
-> > > created by OBEX_Init (OBEX_TRANS_BLUETOOTH, obex_event, 0).
-> > >
-> > > So I Think this is the way..., but I don't know if it is, or how to
-> >
-> > do...
-> >
-> > > in other functions I use hci_create_connection to create the handle, I
-> >
-> > think.
-> >
-> > > How you can see, I don't understand good the code.
-> > >
-> > > How I can separate the two dongles to doing separated functions?
-> > >
-> > > Thanks a lot,
-> > > Fernando
-> > >
-> > > El Jueves, 17 de Mayo de 2007 07:05, Vikas Sinha escribi=F3:
-> > > > Hi, Fernando
-> > > >
-> > > > If i am not wrong u have 2 Dongles and u want to use one for scan a=
-nd
-> >
-> > other
-> >
-> > > > for file send... ??
-> > > >
-> > > > am I right ...
-> > > >
-> > > > On 5/16/07, Fernando Unzu <fernando@bluexare.org> wrote:
-> > > > > Hello,
-> > > > > I'm working in an application that scans for bluetooth devices and
-> >
-> > send
-> >
-> > > > > some
-> > > > > content to they...
-> > > > >
-> > > > > Due to several issues, I need to separate the action scan and send
-> > > > > between two
-> > > > > devices...
-> > > > >
-> > > > > I have the code for doing this in one bluetooth device, and I don=
-'t
-> >
-> > know
-> >
-> > > > > very
-> > > > > well how it works, but I have read it some times...
-> > > > >
-> > > > > But I don't find where i can select which bluetooth device I want
-> > > > > to
-> >
-> > use
-> >
-> > > > > to
-> > > > > doing one method or other...
-> > > > >
-> > > > > I have seen that "OBEX_Init" creates a handle to manage the
-> >
-> > conection...,
-> >
-> > > > > but
-> > > > > it can be select which bluetooth device select for doing this
-> >
-> > handle?
-> >
-> > > > > Thank you very much and I hope somebody understand me.
-> > > > >
-> > > > > Fernando
-> >
-> > -----------------------------------------------------------------------=
---
-> >
-> > > > > This SF.net email is sponsored by DB2 Express
-> > > > > Download DB2 Express C - the FREE version of DB2 express and take
-> > > > > control of your XML. No limits. Just data. Click to get it now.
-> > > > > http://sourceforge.net/powerbar/db2/
-> > > > > _______________________________________________
-> > > > > Bluez-devel mailing list
-> > > > > Bluez-devel@lists.sourceforge.net
-> > > > > https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> >
-> > -----------------------------------------------------------------------=
---
-> >
-> > > This SF.net email is sponsored by DB2 Express
-> > > Download DB2 Express C - the FREE version of DB2 express and take
-> > > control of your XML. No limits. Just data. Click to get it now.
-> > > http://sourceforge.net/powerbar/db2/
-> > > _______________________________________________
-> > > Bluez-devel mailing list
-> > > Bluez-devel@lists.sourceforge.net
-> > > https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> >
-> > --
-> > Collin R. Mulliner <collin@betaversion.net>
-> > BETAVERSiON Systems [www.betaversion.net]
-> > info/pgp: finger collin@betaversion.net
-> > Life is hard, but unfair!
-> >
-> >
-> > -----------------------------------------------------------------------=
---
-> > This SF.net email is sponsored by DB2 Express
-> > Download DB2 Express C - the FREE version of DB2 express and take
-> > control of your XML. No limits. Just data. Click to get it now.
-> > http://sourceforge.net/powerbar/db2/
-> > _______________________________________________
-> > Bluez-devel mailing list
-> > Bluez-devel@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Thank you, I appreciate your help,
+John
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
