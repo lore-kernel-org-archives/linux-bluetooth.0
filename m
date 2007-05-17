@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 18 May 2007 11:24:41 +0200
-From: Ismael Valladolid Torres <ivalladt@punkass.com>
-In-reply-to: <1179419354.10069.144.camel@violet>
-To: bluez-users@lists.sourceforge.net
-Message-id: <20070518092441.GE3629@punkass.com>
-MIME-version: 1.0
-References: <464C8133.9010901@gmail.com> <1179419354.10069.144.camel@violet>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <464C8133.9010901@gmail.com>
+References: <464C8133.9010901@gmail.com>
+Date: Thu, 17 May 2007 18:29:13 +0200
+Message-Id: <1179419354.10069.144.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] How do I enable rfcomm?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -16,75 +16,33 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0538285870=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi,
 
---===============0538285870==
-Content-type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="B4IIlcmfBL/1gGOG"
-Content-disposition: inline
+> I installed the blues-3.10 version in Gentoo but it doesn't start the 
+> rfcomm stuff.  I have rfcomm.conf set up to bind to my phone.  It used 
+> to work before with a previous version and I am pretty sure I just don't 
+> have the config set to enable it this time around.  Where do I set that?
 
+the next bluez-utils release will provide a nice D-Bus interface to make
+that a lot easier and deprecate the use of rfcomm at all. Until then
+simply call "rfcomm bind all".
 
---B4IIlcmfBL/1gGOG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Regards
 
-Marcel Holtmann escribe:
-> the next bluez-utils release will provide a nice D-Bus interface to make
-> that a lot easier and deprecate the use of rfcomm at all. Until then
-> simply call "rfcomm bind all".
-
-Then you can use "rfcomm -a" or simply "rfcomm" to check whether
-they've been binded properly.
-
-Take into account that "bind" and "connect" are different verbs!
-
-Cordially, Ismael
---=20
-Ismael Valladolid Torres  m. +34679156321
-La media hostia           j. ivalladt@gmail.com
-
-http://lamediahostia.blogspot.com/
-
---B4IIlcmfBL/1gGOG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
-
-iD8DBQFGTXDZ59Nokt5yGvQRAtWEAJ9Rus0bHyLVir97a5HRt52/p6eTngCgnBDA
-aahg5lQrsceS+2wOtS9UD+0=
-=ZWCB
------END PGP SIGNATURE-----
-
---B4IIlcmfBL/1gGOG--
+Marcel
 
 
---===============0538285870==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0538285870==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0538285870==--
