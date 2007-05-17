@@ -1,61 +1,53 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Tim Chick <chick@computergeek.freeserve.co.uk>
-To: bluez-devel@lists.sourceforge.net
-Date: Thu, 17 May 2007 08:51:27 +0100
-References: <200705170207.52710.bluez-devel@huitl.de>
-	<d89ddf300705162042j1850b997wd069bae29e813d29@mail.gmail.com>
-In-Reply-To: <d89ddf300705162042j1850b997wd069bae29e813d29@mail.gmail.com>
-MIME-Version: 1.0
-Message-Id: <200705170851.28257.chick@computergeek.freeserve.co.uk>
-Subject: Re: [Bluez-devel] headsetd has problems serving two applications at
-	a time
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Return-Path: <linux-kernel-owner+marcel=40holtmann.org-S1760861AbXEQGEu@vger.kernel.org>
+Subject: Re: 2.6.21-rc7: BUG: sleeping function called from invalid context
+	at net/core/sock.c:1523
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jiri Kosina <jikos@jikos.cz>
+Cc: David Miller <davem@davemloft.net>, satyam.sharma@gmail.com,
+        Greg KH <gregkh@suse.de>, jeremy@goop.org, maxk@qualcomm.com,
+        bluez-devel@lists.sourceforge.net, clg@fr.ibm.com,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+In-Reply-To: <Pine.LNX.4.64.0705170116260.13706@twin.jikos.cz>
+References: <1179317775.10069.77.camel@violet>
+	 <Pine.LNX.4.64.0705161418250.25986@twin.jikos.cz>
+	 <Pine.LNX.4.64.0705170102290.13706@twin.jikos.cz>
+	 <20070516.161609.108116976.davem@davemloft.net>
+	 <Pine.LNX.4.64.0705170116260.13706@twin.jikos.cz>
+Content-Type: text/plain
+Date: Thu, 17 May 2007 08:04:29 +0200
+Message-Id: <1179381869.10069.112.camel@violet>
+Mime-Version: 1.0
+Sender: linux-kernel-owner@vger.kernel.org
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Thursday 17 May 2007 04:42, you wrote:
-> Robert
->
-> headsetd is written to allow a single application to use the headset
-> at one time. it doesn't multiplex the mic or mix to the speaker. one
-> of the two apps will fail to get exclusive access. it's basically a
-> latency optimization but there's room for something like dmix or a
-> sound server like pulse to make it more flexible.
->
-> if skype is written such that input and output are separate file
-> descriptors obtained through independent open() calls then it will
-> also fail, even if they're in the same thread. that may be how it's
-> written, especially if they let you choose one device for mic and
-> another for speaker.
->
-Ah.. I think this is why I could not get the audio to work in both 
-directions when I tried sparkle (voip client). I ran out of time to 
-investigate it, but this matches up.
+Hi Jiri,
 
-Can we not do something magic with the .asoundrc again to split it into 
-2 devices essentially? I guess this is the dmix plugin, but I thought 
-there was something simpler to just split recording and playback. Or is 
-dsnoop needed?
+> > > I have just verified that this locking scheme is indeed correct. So you 
+> > > can add
+> > > 
+> > > 	Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+> > > 
+> > > if you wish to, and submit the patch to Andrew.
+> > I guess I don't get sent networking patches any more?
+> > :-)
+> 
+> Well, this is bluetooth-specific, but it seemed to me that Marcel wasn't 
+> going to send pull requests to Linus any time soon, therefore I thought 
+> going through akpm is a thing to do.
 
-Cheers,
-Tim
+actually everything net/ related goes to Dave first. No exception. This
+includes the Bluetooth subsystem. I even send drivers/bluetooth/ through
+Dave before they go to Linus.
+
+> Honestly, I really don't care through which tree this goes in, so sorry if 
+> any offence was caused here :)
+
+Having these small ones passed through Andrew is only a convenience
+since he is really good in picking them up and make sure that they get
+merged by Linus.
+
+Regards
+
+Marcel
 
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
