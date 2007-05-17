@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Fernando Unzu <fernando@bluexare.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Thu, 17 May 2007 10:18:19 +0200
-References: <200705161235.51289.fernando@bluexare.org>
-	<1ab01fb50705162205x224633a5k7f7d4541e512cc98@mail.gmail.com>
-In-Reply-To: <1ab01fb50705162205x224633a5k7f7d4541e512cc98@mail.gmail.com>
+From: Tim Chick <chick@computergeek.freeserve.co.uk>
+To: bluez-devel@lists.sourceforge.net
+Date: Thu, 17 May 2007 08:51:27 +0100
+References: <200705170207.52710.bluez-devel@huitl.de>
+	<d89ddf300705162042j1850b997wd069bae29e813d29@mail.gmail.com>
+In-Reply-To: <d89ddf300705162042j1850b997wd069bae29e813d29@mail.gmail.com>
 MIME-Version: 1.0
-Message-Id: <200705171018.19781.fernando@bluexare.org>
-Subject: Re: [Bluez-devel] How I can select between 2 bluetooth devices?
+Message-Id: <200705170851.28257.chick@computergeek.freeserve.co.uk>
+Subject: Re: [Bluez-devel] headsetd has problems serving two applications at
+	a time
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,81 +18,37 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-15"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Vikas,
-Yes, this is I want to achieve.
-
-I don't understand very well the code, but I uses OBEX_GetUserData, =
-
-OBEX_HandleInput, OBEX_CancelRequest, OBEX_ObjectNew, OBEX_Delete, =
-
-OBEX_TransportConnect and more like these, and in all of them I use a Handl=
-e, =
-
-created by OBEX_Init (OBEX_TRANS_BLUETOOTH, obex_event, 0).
-
-So I Think this is the way..., but I don't know if it is, or how to do...
-
-in other functions I use hci_create_connection to create the handle, I thin=
-k.
-
-How you can see, I don't understand good the code.
-
-How I can separate the two dongles to doing separated functions?
-
-Thanks a lot,
-Fernando
-
-
-El Jueves, 17 de Mayo de 2007 07:05, Vikas Sinha escribi=F3:
-> Hi, Fernando
+On Thursday 17 May 2007 04:42, you wrote:
+> Robert
 >
-> If i am not wrong u have 2 Dongles and u want to use one for scan and oth=
-er
-> for file send... ??
+> headsetd is written to allow a single application to use the headset
+> at one time. it doesn't multiplex the mic or mix to the speaker. one
+> of the two apps will fail to get exclusive access. it's basically a
+> latency optimization but there's room for something like dmix or a
+> sound server like pulse to make it more flexible.
 >
-> am I right ...
+> if skype is written such that input and output are separate file
+> descriptors obtained through independent open() calls then it will
+> also fail, even if they're in the same thread. that may be how it's
+> written, especially if they let you choose one device for mic and
+> another for speaker.
 >
-> On 5/16/07, Fernando Unzu <fernando@bluexare.org> wrote:
-> > Hello,
-> > I'm working in an application that scans for bluetooth devices and send
-> > some
-> > content to they...
-> >
-> > Due to several issues, I need to separate the action scan and send
-> > between two
-> > devices...
-> >
-> > I have the code for doing this in one bluetooth device, and I don't know
-> > very
-> > well how it works, but I have read it some times...
-> >
-> > But I don't find where i can select which bluetooth device I want to use
-> > to
-> > doing one method or other...
-> >
-> > I have seen that "OBEX_Init" creates a handle to manage the conection..=
-.,
-> > but
-> > it can be select which bluetooth device select for doing this handle?
-> >
-> > Thank you very much and I hope somebody understand me.
-> >
-> > Fernando
-> >
-> > -----------------------------------------------------------------------=
---
-> > This SF.net email is sponsored by DB2 Express
-> > Download DB2 Express C - the FREE version of DB2 express and take
-> > control of your XML. No limits. Just data. Click to get it now.
-> > http://sourceforge.net/powerbar/db2/
-> > _______________________________________________
-> > Bluez-devel mailing list
-> > Bluez-devel@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Ah.. I think this is why I could not get the audio to work in both 
+directions when I tried sparkle (voip client). I ran out of time to 
+investigate it, but this matches up.
+
+Can we not do something magic with the .asoundrc again to split it into 
+2 devices essentially? I guess this is the dmix plugin, but I thought 
+there was something simpler to just split recording and playback. Or is 
+dsnoop needed?
+
+Cheers,
+Tim
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
