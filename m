@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <464E19FB.3020703@gmail.com>
+Date: Sat, 19 May 2007 00:26:19 +0300
+From: bhairava <bhairavah@gmail.com>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <464E19FB.3020703@gmail.com>
 References: <be976db60705181015u7ed8a5acqd7ac7ec527c9e25d@mail.gmail.com>
-	<464E19FB.3020703@gmail.com>
-Date: Sun, 20 May 2007 15:08:27 +0200
-Message-Id: <1179666507.10069.246.camel@violet>
-Mime-Version: 1.0
+In-Reply-To: <be976db60705181015u7ed8a5acqd7ac7ec527c9e25d@mail.gmail.com>
 Subject: Re: [Bluez-users] hcid.conf option pin_helper
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,19 +20,39 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+is there a way to have version 3 of hcid work ?
+i can't authenticate.
 
-> is there a way to have version 3 of hcid work ?
-> i can't authenticate.
-
-this has been discussed to death. You need a passkey agent. So you
-either install bluez-gnome or use passkey-agent.c example code.
-
-Regards
-
-Marcel
-
-
+Mark S. Townsley wrote:
+>
+> Hi:
+>
+> In version 2 of hcid, hcid.conf has an option "pin_helper" which could 
+> allow a script to pass down a pin number.
+> In version 3 of hcid, that option seems to have been removed from 
+> hcid.conf.  Instead there is "passkey" option but does not seem to 
+> allow a dynamic arrangement such what "pin_helper" can do.
+>
+> So in version 3 of hcid, is there a way I can perform pin exchange by 
+> a script just like "pin_helper" in version 2?
+>
+> Thanks
+>
+> Mark
+> ------------------------------------------------------------------------
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by DB2 Express
+> Download DB2 Express C - the FREE version of DB2 express and take
+> control of your XML. No limits. Just data. Click to get it now.
+> http://sourceforge.net/powerbar/db2/
+> ------------------------------------------------------------------------
+>
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>   
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
