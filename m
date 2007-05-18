@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d89ddf300705180613u5c24ed8brab0acf3f7ee65280@mail.gmail.com>
-Date: Fri, 18 May 2007 07:13:16 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: feig@nnytech.net, "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <464C7616.9070900@nnytech.net>
+From: Fernando Unzu <fernando@bluexare.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Fri, 18 May 2007 12:19:55 +0200
+References: <200705161235.51289.fernando@bluexare.org>
+	<1179394491.14671.37.camel@panic>
+	<1ab01fb50705170355t727d3b60s818d3a643305ad8b@mail.gmail.com>
+In-Reply-To: <1ab01fb50705170355t727d3b60s818d3a643305ad8b@mail.gmail.com>
 MIME-Version: 1.0
-References: <200705170207.52710.bluez-devel@huitl.de>
-	<d89ddf300705162042j1850b997wd069bae29e813d29@mail.gmail.com>
-	<200705171521.38889.bluez-devel@huitl.de>
-	<464C7616.9070900@nnytech.net>
-Subject: Re: [Bluez-devel] Frequent headset disconnects
+Message-Id: <200705181219.55212.fernando@bluexare.org>
+Subject: Re: [Bluez-devel] How I can select between 2 bluetooth devices?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,71 +18,171 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0590433703=="
+Content-Type: text/plain; charset="iso-8859-15"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0590433703==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_33482_2652486.1179493996681"
+I think all you said to me will be very usefull.
 
-------=_Part_33482_2652486.1179493996681
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Thank you very much, Colin, Vikas.
 
-John
+Soon I implement the new solution you propose.
+
+Thanks a lot.
 
 
-> I've been using the a2dpd app for a couple of weeks now, and really like
-> it. I have a few issues though, with the main one being that after a
-> couple of minutes of playback, my headphones (HT820) turn off
+El Jueves, 17 de Mayo de 2007 12:55, Vikas Sinha escribi=F3:
+> I think Collin said is right ,
+> See for scanning u need to have hci layer api while for file transfer u
+> need OBEX.
+> for scanning bind device before calling scan function.
+> hci_inquiry(iDevId, iSECOND, iMAXDEV, NULL, &inqinfo, IREQ_CACHE_FLUSH))
+> This DevId is device Id(file descriptor).
 >
-
-it looks like alsa_transfer_raw returns -1 once and then a2dpd closes the
-connection. Maybe we should be checking for an error state that indicates we
-can retry or maybe we should retry a few times regardless.
-
-it could be the set turns off because of the way we terminate the
-connection. This is mostly Frederic's playground but I remember locking up
-headsets with a2play by accidentally sending data on the stream fd after we
-had signaled a stream close on the control fd.
-
-brad
-
-------=_Part_33482_2652486.1179493996681
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div><span class="gmail_quote"><b class="gmail_sendername">John<br><br></b></span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;"><br>I&#39;ve been using the a2dpd app for a couple of weeks now, and really like
-<br>it. I have a few issues though, with the main one being that after a<br>couple of minutes of playback, my headphones (HT820) turn off<br></blockquote></div><br>it looks like alsa_transfer_raw returns -1 once and then a2dpd closes the connection. Maybe we should be checking for an error state that indicates we can retry or maybe we should retry a few times regardless.
-<br><br>it could be the set turns off because of the way we terminate the connection. This is mostly Frederic&#39;s playground but I remember locking up headsets with a2play by accidentally sending data on the stream fd after we had signaled a stream close on the control fd.
-<br><br>brad<br>
-
-------=_Part_33482_2652486.1179493996681--
-
-
---===============0590433703==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> while for File sending u can call
+> handle =3D __obex_connect(devid, addr, timeout, &err);
+> here again devid is FD .
+>
+> so by this u can differentiate 2 dongles.
+>
+> On 5/17/07, Collin R. Mulliner <collin@betaversion.net> wrote:
+> > you can do this in a very simple way, just do the connect by hand (bind
+> > to a specific bluetooth device before connect) then pass the file
+> > descriptor to the OBEX library. OBEX will run in normal FD (file
+> > descriptor) mode then. For this to work you also need to do the sdp
+> > lookup yourself, but this is easy.
+> >
+> > Collin
+> >
+> > On Thu, 2007-05-17 at 10:18 +0200, Fernando Unzu wrote:
+> > > Hi Vikas,
+> > > Yes, this is I want to achieve.
+> > >
+> > > I don't understand very well the code, but I uses OBEX_GetUserData,
+> > > OBEX_HandleInput, OBEX_CancelRequest, OBEX_ObjectNew, OBEX_Delete,
+> > > OBEX_TransportConnect and more like these, and in all of them I use a
+> >
+> > Handle,
+> >
+> > > created by OBEX_Init (OBEX_TRANS_BLUETOOTH, obex_event, 0).
+> > >
+> > > So I Think this is the way..., but I don't know if it is, or how to
+> >
+> > do...
+> >
+> > > in other functions I use hci_create_connection to create the handle, I
+> >
+> > think.
+> >
+> > > How you can see, I don't understand good the code.
+> > >
+> > > How I can separate the two dongles to doing separated functions?
+> > >
+> > > Thanks a lot,
+> > > Fernando
+> > >
+> > > El Jueves, 17 de Mayo de 2007 07:05, Vikas Sinha escribi=F3:
+> > > > Hi, Fernando
+> > > >
+> > > > If i am not wrong u have 2 Dongles and u want to use one for scan a=
+nd
+> >
+> > other
+> >
+> > > > for file send... ??
+> > > >
+> > > > am I right ...
+> > > >
+> > > > On 5/16/07, Fernando Unzu <fernando@bluexare.org> wrote:
+> > > > > Hello,
+> > > > > I'm working in an application that scans for bluetooth devices and
+> >
+> > send
+> >
+> > > > > some
+> > > > > content to they...
+> > > > >
+> > > > > Due to several issues, I need to separate the action scan and send
+> > > > > between two
+> > > > > devices...
+> > > > >
+> > > > > I have the code for doing this in one bluetooth device, and I don=
+'t
+> >
+> > know
+> >
+> > > > > very
+> > > > > well how it works, but I have read it some times...
+> > > > >
+> > > > > But I don't find where i can select which bluetooth device I want
+> > > > > to
+> >
+> > use
+> >
+> > > > > to
+> > > > > doing one method or other...
+> > > > >
+> > > > > I have seen that "OBEX_Init" creates a handle to manage the
+> >
+> > conection...,
+> >
+> > > > > but
+> > > > > it can be select which bluetooth device select for doing this
+> >
+> > handle?
+> >
+> > > > > Thank you very much and I hope somebody understand me.
+> > > > >
+> > > > > Fernando
+> >
+> > -----------------------------------------------------------------------=
+--
+> >
+> > > > > This SF.net email is sponsored by DB2 Express
+> > > > > Download DB2 Express C - the FREE version of DB2 express and take
+> > > > > control of your XML. No limits. Just data. Click to get it now.
+> > > > > http://sourceforge.net/powerbar/db2/
+> > > > > _______________________________________________
+> > > > > Bluez-devel mailing list
+> > > > > Bluez-devel@lists.sourceforge.net
+> > > > > https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> >
+> > -----------------------------------------------------------------------=
+--
+> >
+> > > This SF.net email is sponsored by DB2 Express
+> > > Download DB2 Express C - the FREE version of DB2 express and take
+> > > control of your XML. No limits. Just data. Click to get it now.
+> > > http://sourceforge.net/powerbar/db2/
+> > > _______________________________________________
+> > > Bluez-devel mailing list
+> > > Bluez-devel@lists.sourceforge.net
+> > > https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> >
+> > --
+> > Collin R. Mulliner <collin@betaversion.net>
+> > BETAVERSiON Systems [www.betaversion.net]
+> > info/pgp: finger collin@betaversion.net
+> > Life is hard, but unfair!
+> >
+> >
+> > -----------------------------------------------------------------------=
+--
+> > This SF.net email is sponsored by DB2 Express
+> > Download DB2 Express C - the FREE version of DB2 express and take
+> > control of your XML. No limits. Just data. Click to get it now.
+> > http://sourceforge.net/powerbar/db2/
+> > _______________________________________________
+> > Bluez-devel mailing list
+> > Bluez-devel@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0590433703==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0590433703==--
