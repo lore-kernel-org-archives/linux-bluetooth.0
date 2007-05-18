@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <917e3ae00705190555r5bc43884t3cbb517ccbb18550@mail.gmail.com>
-Date: Sat, 19 May 2007 08:55:42 -0400
-From: "Devin Steffler" <devinsteffler@gmail.com>
-To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-devel] interpret hcidump
+Content-Type: multipart/mixed; boundary="----_=_NextPart_001_01C79981.3B9D380E"
+Date: Fri, 18 May 2007 21:17:53 +0200
+Message-ID: <CE5216C10C83944D9FD37B65CD33F3970CF4E1@mplex01.mpl.access-company.com>
+References: <200705170207.52710.bluez-devel@huitl.de>	<d89ddf300705162042j1850b997wd069bae29e813d29@mail.gmail.com>	<200705171521.38889.bluez-devel@huitl.de>	<464C7616.9070900@nnytech.net><d89ddf300705180613u5c24ed8brab0acf3f7ee65280@mail.gmail.com>
+	<464DCCC4.90300@nnytech.net>
+From: "Frederic Dalleau" <Frederic.Dalleau@access-company.com>
+To: <feig@nnytech.net>,
+        "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] RE :  Frequent headset disconnects
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,672 +18,207 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1034276049=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1034276049==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_80444_9027261.1179579342463"
-
-------=_Part_80444_9027261.1179579342463
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hello,
-
-I apologize if this is not an appropriate question but I'm stumped trying to
-figure out what hcidump is trying to tell me.  I posted my entire problem
-here:
-http://forums.gentoo.org/viewtopic-p-4064123.html#4064123
-
-Basically my Palm is making a PPP request to my Linux machine and the Linux
-machine seems to be dropping the ball.
-
-Here's what hcidump -X -V is reporting:
-tux devin # hcidump -X -V
-HCI sniffer - Bluetooth packet analyzer ver 1.30
-device: hci0 snap_len: 1028 filter: 0xffffffff
-> HCI Event: Connect Request (0x04) plen 10
-bdaddr 00:06:56:xx:xx:xx class 0x020114 type ACL
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-bdaddr 00:06:56:xx:xx:xx role 0x01
-Role: Slave
-> HCI Event: Command Status (0x0f) plen 4
-Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-bdaddr 00:06:56:xx:xx:xx
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-bdaddr 00:06:56:xx:xx:xx key ED8E036AB173DCDE8448B3A9E4FB10D9
-> HCI Event: Command Complete (0x0e) plen 10
-Link Key Request Reply (0x01|0x000b) ncmd 1
-status 0x00 bdaddr 00:06:56:xx:xx:xx
-> HCI Event: Connect Complete (0x03) plen 11
-status 0x00 handle 1 bdaddr 00:06:56:xx:xx:xx type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-handle 1
-> HCI Event: Connection Packet Type Changed (0x1d) plen 5
-status 0x00 handle 1 ptype 0x0018
-Packet type: DM1 DH1
-> HCI Event: Command Status (0x0f) plen 4
-Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-handle 1 policy 0x0f
-Link policy: RSWITCH HOLD SNIFF PARK
-> HCI Event: Command Complete (0x0e) plen 6
-Write Link Policy Settings (0x02|0x000d) ncmd 1
-status 0x00 handle 1
-< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
-handle 1 ptype 0xcc18
-Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> ACL data: handle 1 flags 0x02 dlen 12
-L2CAP(s): Connect req: psm 1 scid 0x0040
-< ACL data: handle 1 flags 0x02 dlen 16
-L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-Connection successful
-> HCI Event: Command Status (0x0f) plen 4
-Change Connection Packet Type (0x01|0x000f) status 0x00 ncmd 1
-> HCI Event: Connection Packet Type Changed (0x1d) plen 5
-status 0x00 handle 1 ptype 0x0018
-Packet type: DM1 DH1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-handle 1 packets 1
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-status 0x00 handle 1
-Features: 0x04 0xea 0x31 0x00 0x00 0x00 0x00 0x00
-> ACL data: handle 1 flags 0x02 dlen 16
-L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-MTU 512
-< ACL data: handle 1 flags 0x02 dlen 18
-L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-Success
-MTU 512
-< ACL data: handle 1 flags 0x02 dlen 12
-L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-handle 1 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-handle 1 packets 1
-> ACL data: handle 1 flags 0x02 dlen 14
-L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-Success
-> ACL data: handle 1 flags 0x02 dlen 28
-L2CAP(d): cid 0x0040 len 24 [psm 1]
-SDP SSA Req: tid 0x1 len 0x13
-pat uuid-16 0x1103 (DUN)
-max 512
-aid(s) 0x0000 (SrvRecHndl) 0x0004 (ProtocolDescList) 0x0100 (SrvName)
-cont 00
-< ACL data: handle 1 flags 0x02 dlen 64
-L2CAP(d): cid 0x0040 len 60 [psm 1]
-SDP SSA Rsp: tid 0x1 len 0x37
-count 52
-record #0
-aid 0x0000 (SrvRecHndl)
-uint 0x10003
-aid 0x0004 (ProtocolDescList)
-< < uuid-16 0x0100 (L2CAP) > <
-uuid-16 0x0003 (RFCOMM) uint 0x2 > >
-aid 0x0100 (SrvName)
-str "Dial-Up Networking"
-cont 00
-> HCI Event: Number of Completed Packets (0x13) plen 5
-handle 1 packets 1
-> ACL data: handle 1 flags 0x02 dlen 12
-L2CAP(s): Connect req: psm 3 scid 0x0041
-< ACL data: handle 1 flags 0x02 dlen 16
-L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
-Connection successful
-> HCI Event: Number of Completed Packets (0x13) plen 5
-handle 1 packets 1
-> ACL data: handle 1 flags 0x02 dlen 16
-L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
-MTU 251
-< ACL data: handle 1 flags 0x02 dlen 18
-L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
-Success
-MTU 251
-< ACL data: handle 1 flags 0x02 dlen 16
-L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
-MTU 1013
-> HCI Event: Number of Completed Packets (0x13) plen 5
-handle 1 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-handle 1 packets 1
-> ACL data: handle 1 flags 0x02 dlen 14
-L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
-Success
-> ACL data: handle 1 flags 0x02 dlen 8
-L2CAP(d): cid 0x0041 len 4 [psm 3]
-RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
-< ACL data: handle 1 flags 0x02 dlen 8
-L2CAP(d): cid 0x0041 len 4 [psm 3]
-RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-> HCI Event: Number of Completed Packets (0x13) plen 5
-handle 1 packets 1
-> ACL data: handle 1 flags 0x02 dlen 19
-L2CAP(d): cid 0x0041 len 15 [psm 3]
-RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
-dlci 4 frame_type 0 credit_flow 0 pri 0 ack_timer 0
-frame_size 246 max_retrans 0 credits 0
-< ACL data: handle 1 flags 0x02 dlen 8
-L2CAP(d): cid 0x0041 len 4 [psm 3]
-RFCOMM(s): DM: cr 1 dlci 4 pf 1 ilen 0 fcs 0xbc
-> HCI Event: Number of Completed Packets (0x13) plen 5
-handle 1 packets 1
-> ACL data: handle 1 flags 0x02 dlen 8
-L2CAP(d): cid 0x0041 len 4 [psm 3]
-RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
-< ACL data: handle 1 flags 0x02 dlen 8
-L2CAP(d): cid 0x0041 len 4 [psm 3]
-RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-> HCI Event: Number of Completed Packets (0x13) plen 5
-handle 1 packets 1
-> ACL data: handle 1 flags 0x02 dlen 12
-L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
-< ACL data: handle 1 flags 0x02 dlen 12
-L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0041
-> HCI Event: Number of Completed Packets (0x13) plen 5
-handle 1 packets 1
-> ACL data: handle 1 flags 0x02 dlen 12
-L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-< ACL data: handle 1 flags 0x02 dlen 12
-L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-handle 1 packets 1
-> HCI Event: Disconn Complete (0x05) plen 4
-status 0x00 handle 1 reason 0x13
-Reason: Remote User Terminated Connection
-
-Any ideas?
-
-Thanks,
-Devin
-
-------=_Part_80444_9027261.1179579342463
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hello,<br>
-<br>
-I apologize if this is not an appropriate question but I&#39;m stumped
-trying to figure out what hcidump is trying to tell me.&nbsp; I posted my
-entire problem here:<br>
-<a href="http://forums.gentoo.org/viewtopic-p-4064123.html#4064123">http://forums.gentoo.org/viewtopic-p-4064123.html#4064123</a><br>
-<br>
-Basically my Palm is making a PPP request to my Linux machine and the Linux machine seems to be dropping the ball.<br>
-<br>
-Here&#39;s what hcidump -X -V is reporting:<br>
-tux devin # hcidump -X -V
-<br>
-
-HCI sniffer - Bluetooth packet analyzer ver 1.30
-<br>
-
-device: hci0 snap_len: 1028 filter: 0xffffffff
-<br>
-
-&gt; HCI Event: Connect Request (0x04) plen 10
-<br>
-
-    bdaddr 00:06:56:xx:xx:xx class 0x020114 type ACL
-<br>
-
-&lt; HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-<br>
-
-    bdaddr 00:06:56:xx:xx:xx role 0x01
-<br>
-
-    Role: Slave
-<br>
-
-&gt; HCI Event: Command Status (0x0f) plen 4
-<br>
-
-    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
-<br>
-
-&gt; HCI Event: Link Key Request (0x17) plen 6
-<br>
-
-    bdaddr 00:06:56:xx:xx:xx
-<br>
-
-&lt; HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-<br>
-
-    bdaddr 00:06:56:xx:xx:xx key ED8E036AB173DCDE8448B3A9E4FB10D9
-<br>
-
-&gt; HCI Event: Command Complete (0x0e) plen 10
-<br>
-
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-<br>
-
-    status 0x00 bdaddr 00:06:56:xx:xx:xx
-<br>
-
-&gt; HCI Event: Connect Complete (0x03) plen 11
-<br>
-
-    status 0x00 handle 1 bdaddr 00:06:56:xx:xx:xx type ACL encrypt 0x00
-<br>
-
-&lt; HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-<br>
-
-    handle 1
-<br>
-
-&gt; HCI Event: Connection Packet Type Changed (0x1d) plen 5
-<br>
-
-    status 0x00 handle 1 ptype 0x0018
-<br>
-
-    Packet type: DM1 DH1 
-<br>
-
-&gt; HCI Event: Command Status (0x0f) plen 4
-<br>
-
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-<br>
-
-&lt; HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-<br>
-
-    handle 1 policy 0x0f
-<br>
-
-    Link policy: RSWITCH HOLD SNIFF PARK 
-<br>
-
-&gt; HCI Event: Command Complete (0x0e) plen 6
-<br>
-
-    Write Link Policy Settings (0x02|0x000d) ncmd 1
-<br>
-
-    status 0x00 handle 1
-<br>
-
-&lt; HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
-<br>
-
-    handle 1 ptype 0xcc18
-<br>
-
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 
-<br>
-
-&gt; ACL data: handle 1 flags 0x02 dlen 12
-<br>
-
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-<br>
-
-&lt; ACL data: handle 1 flags 0x02 dlen 16
-<br>
-
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-<br>
-
-      Connection successful
-<br>
-
-&gt; HCI Event: Command Status (0x0f) plen 4
-<br>
-
-    Change Connection Packet Type (0x01|0x000f) status 0x00 ncmd 1
-<br>
-
-&gt; HCI Event: Connection Packet Type Changed (0x1d) plen 5
-<br>
-
-    status 0x00 handle 1 ptype 0x0018
-<br>
-
-    Packet type: DM1 DH1 
-<br>
-
-&gt; HCI Event: Number of Completed Packets (0x13) plen 5
-<br>
-
-    handle 1 packets 1
-<br>
-
-&gt; HCI Event: Read Remote Supported Features (0x0b) plen 11
-<br>
-
-    status 0x00 handle 1
-<br>
-
-    Features: 0x04 0xea 0x31 0x00 0x00 0x00 0x00 0x00
-<br>
-
-&gt; ACL data: handle 1 flags 0x02 dlen 16
-<br>
-
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-<br>
-
-      MTU 512 
-<br>
-
-&lt; ACL data: handle 1 flags 0x02 dlen 18
-<br>
-
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-<br>
-
-      Success
-<br>
-
-      MTU 512 
-<br>
-
-&lt; ACL data: handle 1 flags 0x02 dlen 12
-<br>
-
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-<br>
-
-&gt; HCI Event: Number of Completed Packets (0x13) plen 5
-<br>
-
-    handle 1 packets 1
-<br>
-
-&gt; HCI Event: Number of Completed Packets (0x13) plen 5
-<br>
-
-    handle 1 packets 1
-<br>
-
-&gt; ACL data: handle 1 flags 0x02 dlen 14
-<br>
-
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-<br>
-
-      Success
-<br>
-
-&gt; ACL data: handle 1 flags 0x02 dlen 28
-<br>
-
-    L2CAP(d): cid 0x0040 len 24 [psm 1]
-<br>
-
-        SDP SSA Req: tid 0x1 len 0x13
-<br>
-
-          pat uuid-16 0x1103 (DUN)
-<br>
-
-          max 512
-<br>
-
-          aid(s) 0x0000 (SrvRecHndl) 0x0004 (ProtocolDescList) 0x0100 (SrvName)
-<br>
-
-          cont 00
-<br>
-
-&lt; ACL data: handle 1 flags 0x02 dlen 64
-<br>
-
-    L2CAP(d): cid 0x0040 len 60 [psm 1]
-<br>
-
-        SDP SSA Rsp: tid 0x1 len 0x37
-<br>
-
-          count 52
-<br>
-
-          record #0
-<br>
-
-              aid 0x0000 (SrvRecHndl)
-<br>
-
-                 uint 0x10003
-<br>
-
-              aid 0x0004 (ProtocolDescList)
-<br>
-
-                 &lt; &lt; uuid-16 0x0100 (L2CAP) &gt; &lt;
-<br>
-
-                 uuid-16 0x0003 (RFCOMM) uint 0x2 &gt; &gt;
-<br>
-
-              aid 0x0100 (SrvName)
-<br>
-
-                 str &quot;Dial-Up Networking&quot;
-<br>
-
-          cont 00
-<br>
-
-&gt; HCI Event: Number of Completed Packets (0x13) plen 5
-<br>
-
-    handle 1 packets 1
-<br>
-
-&gt; ACL data: handle 1 flags 0x02 dlen 12
-<br>
-
-    L2CAP(s): Connect req: psm 3 scid 0x0041
-<br>
-
-&lt; ACL data: handle 1 flags 0x02 dlen 16
-<br>
-
-    L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
-<br>
-
-      Connection successful
-<br>
-
-&gt; HCI Event: Number of Completed Packets (0x13) plen 5
-<br>
-
-    handle 1 packets 1
-<br>
-
-&gt; ACL data: handle 1 flags 0x02 dlen 16
-<br>
-
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
-<br>
-
-      MTU 251 
-<br>
-
-&lt; ACL data: handle 1 flags 0x02 dlen 18
-<br>
-
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
-<br>
-
-      Success
-<br>
-
-      MTU 251 
-<br>
-
-&lt; ACL data: handle 1 flags 0x02 dlen 16
-<br>
-
-    L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
-<br>
-
-      MTU 1013 
-<br>
-
-&gt; HCI Event: Number of Completed Packets (0x13) plen 5
-<br>
-
-    handle 1 packets 1
-<br>
-
-&gt; HCI Event: Number of Completed Packets (0x13) plen 5
-<br>
-
-    handle 1 packets 1
-<br>
-
-&gt; ACL data: handle 1 flags 0x02 dlen 14
-<br>
-
-    L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
-<br>
-
-      Success
-<br>
-
-&gt; ACL data: handle 1 flags 0x02 dlen 8
-<br>
-
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-<br>
-
-      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c 
-<br>
-
-&lt; ACL data: handle 1 flags 0x02 dlen 8
-<br>
-
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-<br>
-
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7 
-<br>
-
-&gt; HCI Event: Number of Completed Packets (0x13) plen 5
-<br>
-
-    handle 1 packets 1
-<br>
-
-&gt; ACL data: handle 1 flags 0x02 dlen 19
-<br>
-
-    L2CAP(d): cid 0x0041 len 15 [psm 3]
-<br>
-
-      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
-<br>
-
-      dlci 4 frame_type 0 credit_flow 0 pri 0 ack_timer 0
-<br>
-
-      frame_size 246 max_retrans 0 credits 0
-<br>
-
-&lt; ACL data: handle 1 flags 0x02 dlen 8
-<br>
-
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-<br>
-
-      RFCOMM(s): DM: cr 1 dlci 4 pf 1 ilen 0 fcs 0xbc 
-<br>
-
-&gt; HCI Event: Number of Completed Packets (0x13) plen 5
-<br>
-
-    handle 1 packets 1
-<br>
-
-&gt; ACL data: handle 1 flags 0x02 dlen 8
-<br>
-
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-<br>
-
-      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd 
-<br>
-
-&lt; ACL data: handle 1 flags 0x02 dlen 8
-<br>
-
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-<br>
-
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7 
-<br>
-
-&gt; HCI Event: Number of Completed Packets (0x13) plen 5
-<br>
-
-    handle 1 packets 1
-<br>
-
-&gt; ACL data: handle 1 flags 0x02 dlen 12
-<br>
-
-    L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
-<br>
-
-&lt; ACL data: handle 1 flags 0x02 dlen 12
-<br>
-
-    L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0041
-<br>
-
-&gt; HCI Event: Number of Completed Packets (0x13) plen 5
-<br>
-
-    handle 1 packets 1
-<br>
-
-&gt; ACL data: handle 1 flags 0x02 dlen 12
-<br>
-
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-<br>
-
-&lt; ACL data: handle 1 flags 0x02 dlen 12
-<br>
-
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-<br>
-
-&gt; HCI Event: Number of Completed Packets (0x13) plen 5
-<br>
-
-    handle 1 packets 1
-<br>
-
-&gt; HCI Event: Disconn Complete (0x05) plen 4
-<br>
-
-    status 0x00 handle 1 reason 0x13
-<br>
-
-    Reason: Remote User Terminated Connection<br>
-<br>
-Any ideas?<br>
-<br>
-Thanks,<br>
-Devin<br>
-<br>
-
-------=_Part_80444_9027261.1179579342463--
-
-
---===============1034276049==
+This is a multi-part message in MIME format.
+
+------_=_NextPart_001_01C79981.3B9D380E
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+I did some recent changes and there are things to solve.
+I don't have access to a linux computer right now.=20
+In your case, enclosing the write call in a while loop may help.
+
+do {
+            if ((written =3D write(a2dp->sk, a2dp->buf, a2dp->len)) !=3D =
+
+a2dp->len) {
+                        // Return the error
+                        result =3D written;
+            }
+} while(written<0 && errno=3D=3DEAGAIN);
+
+Remove the DBG call.
+
+However, it may burn cpu time if you don't wait a little before =
+retrying.
+
+
+The best solution would be to find why the packet must be resent.
+Let us know if you get something.
+
+Frederic.
+
+
+-------- Message d'origine--------
+De: bluez-devel-bounces@lists.sourceforge.net de la part de John Feig
+Date: ven. 18/05/2007 17:56
+=C0: BlueZ development
+Objet : Re: [Bluez-devel] Frequent headset disconnects
+=20
+Brad Midgley wrote:
+> *John
+>
+> *
+>
+>
+>     I've been using the a2dpd app for a couple of weeks now, and
+>     really like
+>     it. I have a few issues though, with the main one being that after =
+a
+>     couple of minutes of playback, my headphones (HT820) turn off
+>
+>
+> it looks like alsa_transfer_raw returns -1 once and then a2dpd closes=20
+> the connection. Maybe we should be checking for an error state that=20
+> indicates we can retry or maybe we should retry a few times =
+regardless.
+>
+> it could be the set turns off because of the way we terminate the=20
+> connection. This is mostly Frederic's playground but I remember=20
+> locking up headsets with a2play by accidentally sending data on the=20
+> stream fd after we had signaled a stream close on the control fd.
+>
+> brad
+Brad, thank you for the reply. To try to understand this, you're saying=20
+that when I get:
+
+a2dp_transfer_raw: Wrote -1 not 603 bytes (sbc.len=3D118)
+transfer_outgoing_packets: Error in transfer (transfer=3D-1)
+
+The issue could be that the headset is expecting a value of a certain=20
+length, and since the value -1 is not that length, the headset doens't=20
+like that, and shuts down? If this is the case, where should I look to=20
+change that value, and what should it be changed to? I wouldn't mind=20
+sending some dummy data and have it drop out for a second once in a=20
+while, as long as I don't have to keep restarting the thing. At least it =
+
+would be a temporary fix.
+
+I found the IF block in a2dpd_output_a2dp.c:
+
+if (a2dp->sk > 0) {
+    // Pause?
+    // The value 0 have finally been tested ;)
+    // However, we may safely simulate a failed write
+    if (!a2dp->pause_writing) {
+        // Send our data
+            if ((written =3D write(a2dp->sk, a2dp->buf, a2dp->len)) !=3D =
+
+a2dp->len) {
+                // Error while sending data
+                    DBG("Wrote %d not %d bytes (sbc.len=3D%d)", written, =
+
+a2dp->len, a2dp->sbc.len);
+                        // Return the error
+                        result =3D written;
+            }
+...
+
+That seems to be the only place that contains that string, that I could=20
+find. I can't find out where the function "write" is defined either.
+
+I'll keep looking, and if you guys can give me some suggestions of=20
+things to try and what I should be looking at, I will and let you all=20
+know how it goes.
+
+Thanks again,
+John
+
+
+------_=_NextPart_001_01C79981.3B9D380E
+Content-Type: application/ms-tnef;
+	name="winmail.dat"
+Content-Transfer-Encoding: base64
+
+eJ8+IjYTAQaQCAAEAAAAAAABAAEAAQeQBgAIAAAA5AQAAAAAAADoAAEIgAcAGAAAAElQTS5NaWNy
+b3NvZnQgTWFpbC5Ob3RlADEIAQ2ABAACAAAAAgACAAEEgAEAMAAAAFJFIDogW0JsdWV6LWRldmVs
+XSBGcmVxdWVudCBoZWFkc2V0IGRpc2Nvbm5lY3RzAC0RAQWAAwAOAAAA1wcFABIAFQARADUABQBV
+AQEggAMADgAAANcHBQASABUAEQA1AAUAVQEBCYABACEAAAA2MkVGQzA1NEQwRTQ4OTQzQUNEODAz
+MjREMjRGMkMwRgA4BwEDkAYAHBEAADkAAAADACYAAAAAAAMANgAAAAAAQAA5AA44nTuBmccBHgA9
+AAEAAAABAAAAAAAAAAIBRwABAAAAOAAAAGM9VVM7YT0gO3A9QWNjZXNzLUNvbXBhbnk7bD1NUExF
+WDAxLTA3MDUxODE5MTc1M1otNDM2MzEAHgBJAAEAAAAvAAAAUmU6IFtCbHVlei1kZXZlbF0gRnJl
+cXVlbnQgaGVhZHNldCBkaXNjb25uZWN0cwAAQABOAAC6fyZlmccBHgBaAAEAAAAqAAAAYmx1ZXot
+ZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQAAAACAVsAAQAAAHEAAAAAAAAAgSsf
+pL6jEBmdbgDdAQ9UAgAAAABibHVlei1kZXZlbC1ib3VuY2VzQGxpc3RzLnNvdXJjZWZvcmdlLm5l
+dABTTVRQAGJsdWV6LWRldmVsLWJvdW5jZXNAbGlzdHMuc291cmNlZm9yZ2UubmV0AAAAAAIBXAAB
+AAAALwAAAFNNVFA6QkxVRVotREVWRUwtQk9VTkNFU0BMSVNUUy5TT1VSQ0VGT1JHRS5ORVQAAB4A
+XQABAAAACgAAAEpvaG4gRmVpZwAAAAIBXgABAAAAOAAAAAAAAACBKx+kvqMQGZ1uAN0BD1QCAAAA
+AEpvaG4gRmVpZwBTTVRQAGZlaWdAbm55dGVjaC5uZXQAAgFfAAEAAAAWAAAAU01UUDpGRUlHQE5O
+WVRFQ0guTkVUAAAAHgBmAAEAAAAFAAAAU01UUAAAAAAeAGcAAQAAACoAAABibHVlei1kZXZlbC1i
+b3VuY2VzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAAAAB4AaAABAAAABQAAAFNNVFAAAAAAHgBpAAEA
+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
+peaiqiIgCfBzIlHvpYVwcmkipkVoJDAEICIg+HduP1+ggUKEVHSzJiP/l4GWMnZUHiBwAiECHcQf
+RP9pFKRTpkQoUGlBdkU9wXaz+x9iH+FvrEFD9CJCa0EeYMcdxIr2HoNkdW1skYtz9x/CIoM9wWQD
+YCjgnVFhhf8RIFnBHmBygygDHcQoUy2R/3BBAiCkEQQgIgshEUXAk+D/NWIBkAAgJtZJBBFgqHIm
+IP+jQXjWRAcjcA6wJBAFsArA+ykgRMB4KYseIAIQhkInEvxJRk6BiAEn82ECnUIkIXJfLRIuY5gr
+K8ItFiCvXKBtwTBqMmFQgOI/xNv/QuKkVBFQIoNEwWRTYANrgfsOsB5gO5xVMiU9N3YRKQL/TJBm
+cIrCB3A1oHhiZlELcO+OcidTNogrwiEtFAqwgPH+XydSIMEwTzJSBmC3oiXh/4tyNo8rvyzPLd8u
+7y//MY8/nnQoVIr61x/RlzvhKCJ9miQlHmCastxxmz3ccCn+ImeB0rQmUNXt1CabpTpWf9q/Mf8z
+D+R/NS82PzdMLu/okEIssRIJ4G0g839lAiD/ZHELUabTaUGQEgtxZwKxEv9BUCDBkpOGon8EHcRE
+wmXCv3pBIlFEw7bCrbQnEmZPcfVDsyInUyKEcgEBTUEeYPdScCACv0wnJ9G683AC7OPzH8JIFnV5
+BCB6Qk0wIqH3HqEeg+YAZx+BQ7Jro5bW/yDGfDOwxh4gdkj0BR+wqzH/stEDEAMgH8IogAVAP0In
+wv8dxEfDZzBH8QVAnYAHkOi+f5LgH6F9UAuAHbVc2Ob0fQEAwAAAAB4ANRABAAAASAAAADxDRTUy
+MTZDMTBDODM5NDREOUZEMzdCNjVDRDMzRjM5NzBDRjRFMUBtcGxleDAxLm1wbC5hY2Nlc3MtY29t
+cGFueS5jb20+AB4AORABAAAACwEAADwyMDA3MDUxNzAyMDcuNTI3MTAuYmx1ZXotZGV2ZWxAaHVp
+dGwuZGU+CTxkODlkZGYzMDA3MDUxNjIwNDJqMTg1MGI5OTd3ZDA2OWJhZTI5ZTgxM2QyOUBtYWls
+LmdtYWlsLmNvbT4JPDIwMDcwNTE3MTUyMS4zODg4OS5ibHVlei1kZXZlbEBodWl0bC5kZT4JPDQ2
+NEM3NjE2LjkwNzA5MDBAbm55dGVjaC5uZXQ+PGQ4OWRkZjMwMDcwNTE4MDYxM3U1YzI0ZWQ4YnJh
+YjBhY2YzZjdlZTY1MjgwQG1haWwuZ21haWwuY29tPiA8NDY0RENDQzQuOTAzMDBAbm55dGVjaC5u
+ZXQ+AAAeAEcQAQAAAA8AAABtZXNzYWdlL3JmYzgyMgAACwDyEAEAAAAfAPMQAQAAAGwAAABSAEUA
+IAAlADMAQQAgAFsAQgBsAHUAZQB6AC0AZABlAHYAZQBsAF0AIABGAHIAZQBxAHUAZQBuAHQAIABo
+AGUAYQBkAHMAZQB0ACAAZABpAHMAYwBvAG4AbgBlAGMAdABzAC4ARQBNAEwAAAALAPYQAAAAAEAA
+BzA917r3fpnHAUAACDBywaY7gZnHAQMA3j+vbwAAAwDxPwwEAAAeAPg/AQAAABEAAABGcmVkZXJp
+YyBEYWxsZWF1AAAAAAIB+T8BAAAAXwAAAAAAAADcp0DIwEIQGrS5CAArL+GCAQAAAAAAAAAvTz1B
+Q0NFU1MtQ09NUEFOWS9PVT1NT05UUEVMTElFUi9DTj1SRUNJUElFTlRTL0NOPUZSRURFUklDLkRB
+TExFQVUAAB4A+j8BAAAAFQAAAFN5c3RlbSBBZG1pbmlzdHJhdG9yAAAAAAIB+z8BAAAAHgAAAAAA
+AADcp0DIwEIQGrS5CAArL+GCAQAAAAAAAAAuAAAAAwD9P+QEAAADABlAAAAAAAMAGkAAAAAAAwAd
+QAAAAAADAB5AAAAAAB4AMEABAAAAEQAAAEZSRURFUklDLkRBTExFQVUAAAAAHgAxQAEAAAARAAAA
+RlJFREVSSUMuREFMTEVBVQAAAAAeADJAAQAAACoAAABibHVlei1kZXZlbC1ib3VuY2VzQGxpc3Rz
+LnNvdXJjZWZvcmdlLm5ldAAAAB4AM0ABAAAAEQAAAGZlaWdAbm55dGVjaC5uZXQAAAAAHgA4QAEA
+AAARAAAARlJFREVSSUMuREFMTEVBVQAAAAAeADlAAQAAAAIAAAAuAAAAAwB2QP////8LACkAAAAA
+AAsAIwAAAAAAAwAGEG3vz6ADAAcQ5AgAAAMAEBAAAAAAAwAREAAAAAAeAAgQAQAAAGUAAABISSxJ
+RElEU09NRVJFQ0VOVENIQU5HRVNBTkRUSEVSRUFSRVRISU5HU1RPU09MVkVJRE9OVEhBVkVBQ0NF
+U1NUT0FMSU5VWENPTVBVVEVSUklHSFROT1dJTllPVVJDQVNFLEVOAAAAAAIBfwABAAAASAAAADxD
+RTUyMTZDMTBDODM5NDREOUZEMzdCNjVDRDMzRjM5NzBDRjRFMUBtcGxleDAxLm1wbC5hY2Nlc3Mt
+Y29tcGFueS5jb20+AJsg
+
+------_=_NextPart_001_01C79981.3B9D380E
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -690,7 +229,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1034276049==
+------_=_NextPart_001_01C79981.3B9D380E
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -701,4 +240,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1034276049==--
+------_=_NextPart_001_01C79981.3B9D380E--
