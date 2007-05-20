@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <464B36D4.80702@access-company.com>
-References: <464B36D4.80702@access-company.com>
-Date: Sun, 20 May 2007 15:11:24 +0200
-Message-Id: <1179666685.10069.250.camel@violet>
+In-Reply-To: <1179666105.9244.9.camel@dick.marinus>
+References: <1179666105.9244.9.camel@dick.marinus>
+Date: Sun, 20 May 2007 15:06:31 +0200
+Message-Id: <1179666391.10069.244.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Fix for disconnection in new serial service
+Subject: Re: [Bluez-devel] bluez-gnome patch to
+	disable/enable	schemes-install
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,12 +21,12 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frederic,
+Hi Dick,
 
-> I find a little bug preventing disconnection in new serial service.
+> I've created this small patch for bluez-gnome to be able to configure
+> with --disable-schemes-install. I hope it's okay.
 
-can you check against latest CVS. I am not sure if Claudio fixed this or
-not. Thanks.
+it is already part of the just released bluez-gnome-0.7 package.
 
 Regards
 
