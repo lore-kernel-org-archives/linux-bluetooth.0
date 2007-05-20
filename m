@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <46505989.3090103@doerges.net>
-References: <46505989.3090103@doerges.net>
-Date: Sun, 20 May 2007 17:27:05 +0200
-Message-Id: <1179674825.23757.12.camel@violet>
+In-Reply-To: <1179674287.32091.109.camel@dipsy>
+References: <1179674287.32091.109.camel@dipsy>
+Date: Sun, 20 May 2007 17:26:18 +0200
+Message-Id: <1179674779.23757.10.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] hcid.conf: device section with specific
-	bt	address is ignored
+Cc: Edward OCallaghan <victoredwardocallaghan@yahoo.com.au>
+Subject: Re: [Bluez-devel] Sony BD Remote Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,19 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Till,
+Hi Frank,
 
-> in hcid.conf a device section with a bluetooth address specified apparently is
-> ignored. The following should work according to the man-page:
+> I gathered some information about the Sony BD Remote Control, available
+> at [1].
 > 
-> ># *not* working
-> >device 00:09:DD:10:42:C4 {
-> >        name "%h (dongle 1)";
-> >[...]
+> Basically, it's possible to connect it, and with hidd it also gets
+> automatically reconnected - not on a PS3 at the moment, but this should
+> be known. The problem is that this thing only sends a vendor defined
+> 11-byte input data package. Currently it's only a useless brick.
 > 
-> The default device section is working as expected.
+> So I'm looking for ways to get it to send some input events. One vague
+> idea is to put some special treatment into hidd, like it was done with
+> some other devices in fakehid.c.
 
-should be solved with bluez-utils-3.10.1.
+the hidd will be obsoleted by the input service.
 
 Regards
 
