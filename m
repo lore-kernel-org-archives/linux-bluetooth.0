@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Frank Arnold <frank@scirocco-5v-turbo.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1179674287.32091.109.camel@dipsy>
-References: <1179674287.32091.109.camel@dipsy>
-Date: Sun, 20 May 2007 17:26:18 +0200
-Message-Id: <1179674779.23757.10.camel@violet>
+Date: Sun, 20 May 2007 17:18:07 +0200
+Message-Id: <1179674287.32091.109.camel@dipsy>
 Mime-Version: 1.0
 Cc: Edward OCallaghan <victoredwardocallaghan@yahoo.com.au>
-Subject: Re: [Bluez-devel] Sony BD Remote Control
+Subject: [Bluez-devel] Sony BD Remote Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,25 +19,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frank,
+Hi,
 
-> I gathered some information about the Sony BD Remote Control, available
-> at [1].
-> 
-> Basically, it's possible to connect it, and with hidd it also gets
-> automatically reconnected - not on a PS3 at the moment, but this should
-> be known. The problem is that this thing only sends a vendor defined
-> 11-byte input data package. Currently it's only a useless brick.
-> 
-> So I'm looking for ways to get it to send some input events. One vague
-> idea is to put some special treatment into hidd, like it was done with
-> some other devices in fakehid.c.
+I gathered some information about the Sony BD Remote Control, available
+at [1].
 
-the hidd will be obsoleted by the input service.
+Basically, it's possible to connect it, and with hidd it also gets
+automatically reconnected - not on a PS3 at the moment, but this should
+be known. The problem is that this thing only sends a vendor defined
+11-byte input data package. Currently it's only a useless brick.
 
-Regards
+So I'm looking for ways to get it to send some input events. One vague
+idea is to put some special treatment into hidd, like it was done with
+some other devices in fakehid.c.
 
-Marcel
+Would that be acceptable? I have nothing to show at the moment. I'm just
+asking, before rowing into a wrong direction.
+
+Regards,
+Frank
+
+[1] http://fedoraproject.org/wiki/PlayStation/BDRemote
 
 
 
