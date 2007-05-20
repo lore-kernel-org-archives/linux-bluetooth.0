@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46507A79.5010409@doerges.net>
-Date: Sun, 20 May 2007 18:42:33 +0200
-From: =?UTF-8?B?VGlsbCBEw7ZyZ2Vz?= <lists@doerges.net>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46505989.3090103@doerges.net> <1179674825.23757.12.camel@violet>
-In-Reply-To: <1179674825.23757.12.camel@violet>
-Subject: Re: [Bluez-devel] hcid.conf: device section with
- specific	bt	address is ignored
+In-Reply-To: <46505989.3090103@doerges.net>
+References: <46505989.3090103@doerges.net>
+Date: Sun, 20 May 2007 17:27:05 +0200
+Message-Id: <1179674825.23757.12.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] hcid.conf: device section with specific
+	bt	address is ignored
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,35 +21,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Till,
 
-Am 20.05.2007 17:27, Marcel Holtmann schrieb:
-
->> in hcid.conf a device section with a bluetooth address specified apparently is
->> ignored. The following should work according to the man-page:
->>
->>> # *not* working
->>> device 00:09:DD:10:42:C4 {
->>>        name "%h (dongle 1)";
->>> [...]
->> The default device section is working as expected.
+> in hcid.conf a device section with a bluetooth address specified apparently is
+> ignored. The following should work according to the man-page:
 > 
-> should be solved with bluez-utils-3.10.1.
+> ># *not* working
+> >device 00:09:DD:10:42:C4 {
+> >        name "%h (dongle 1)";
+> >[...]
+> 
+> The default device section is working as expected.
 
-That's nice to hear. :-)
+should be solved with bluez-utils-3.10.1.
 
-Then out of curiosity: For bluez-utils-3.10.1 I get this for hcid:
+Regards
 
---- snip ---
-May 19 18:33:38 myhost hcid[1942]: Can't open system message bus connection: Failed
-to connect to socket /var/run/ dbus/system_bus_socket: No such file or directory
-May 19 18:33:38 myhost hcid[1942]: Unable to get on D-Bus
---- snip ---
+Marcel
 
-Was there a dbus related change? Or is it due to a missing bluez-hcid.conf file
-(present in 3.7 but not in 3.10.1)?
 
-Thanks -- Till
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
