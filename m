@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <e1effdeb0705210812p64d34f57l7800556df240fb23@mail.gmail.com>
-Date: Mon, 21 May 2007 12:12:37 -0300
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1179666685.10069.250.camel@violet>
-MIME-Version: 1.0
-References: <464B36D4.80702@access-company.com>
-	<1179666685.10069.250.camel@violet>
-Subject: Re: [Bluez-devel] Fix for disconnection in new serial service
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <46507A79.5010409@doerges.net>
+References: <46505989.3090103@doerges.net>
+	<1179674825.23757.12.camel@violet>  <46507A79.5010409@doerges.net>
+Date: Sun, 20 May 2007 18:56:39 +0200
+Message-Id: <1179680199.24761.0.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] hcid.conf: device section
+	with	specific	bt	address is ignored
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,31 +22,39 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 5/20/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Frederic,
->
-> > I find a little bug preventing disconnection in new serial service.
->
-> can you check against latest CVS. I am not sure if Claudio fixed this or
-> not. Thanks.
->
-> Regards
->
-> Marcel
+Hi Till,
 
-Hi Frederic,
+> >> in hcid.conf a device section with a bluetooth address specified apparently is
+> >> ignored. The following should work according to the man-page:
+> >>
+> >>> # *not* working
+> >>> device 00:09:DD:10:42:C4 {
+> >>>        name "%h (dongle 1)";
+> >>> [...]
+> >> The default device section is working as expected.
+> > 
+> > should be solved with bluez-utils-3.10.1.
+> 
+> That's nice to hear. :-)
+> 
+> Then out of curiosity: For bluez-utils-3.10.1 I get this for hcid:
+> 
+> --- snip ---
+> May 19 18:33:38 myhost hcid[1942]: Can't open system message bus connection: Failed
+> to connect to socket /var/run/ dbus/system_bus_socket: No such file or directory
+> May 19 18:33:38 myhost hcid[1942]: Unable to get on D-Bus
+> --- snip ---
+> 
+> Was there a dbus related change? Or is it due to a missing bluez-hcid.conf file
+> (present in 3.7 but not in 3.10.1)?
 
-using g_io_channel_set_close_on_unref(io, TRUE) will trigger the
-following warning for G_IO_NVAL condition:
+the file is called bluetooth.conf now.
 
-(process:8085): GLib-WARNING **: Invalid file descriptor.
+Regards
 
-BR,
-Claudio.
--- 
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
