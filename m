@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <e96e9eeb0705200633k711b8744y8d81e7e9c31195bc@mail.gmail.com>
-Date: Sun, 20 May 2007 16:33:48 +0300
-From: "Voni Hakau" <hakauvoni@gmail.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] sdpd problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <be976db60705181036h32b7ed31ge7009a3ccc0a22a4@mail.gmail.com>
+References: <be976db60705181036h32b7ed31ge7009a3ccc0a22a4@mail.gmail.com>
+Date: Sun, 20 May 2007 15:09:18 +0200
+Message-Id: <1179666558.10069.248.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] hcid cannot connect to dbus
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,21 +20,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello to the list,
+Hi Mark,
 
-I am working on embedded without d-bus so I have used utils and libs ver 2.25.
+>  When I fire up my hcid, I got this error message:
+> 
+>      Can't connect to system message bus: Failed to connect to
+> socket /var/run/dbus/system_bus_socket: Connection refused
+> 
+> My DBUS is running and there is /var/run/dbus/system_bus_socket.  I
+> have a generic server/client and talks via the system bus and they
+> work just fine. 
+> My DBUS config also loads the system.d/bluetooth.conf as well.  
+> 
+> Is there a reason why hcid would print out the "Connection refused"
+> message?
 
-When I start hcid and then hciattach, the device is automatically getting up
-by hcid, and everything is working.
+I have no idea. This simply works for me. Seems like your D-Bus
+configuration is messed up.
 
-but, when I start hcid AND sdpd, and then hciattach, the device stays DOWN...
+Regards
 
-Do you have any idea why this is happening ?
+Marcel
 
-And, what does sdpd give me ? do I need it ?
 
-thanks you very much
-H.V.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
