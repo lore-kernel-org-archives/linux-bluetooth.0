@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <e96e9eeb0705222254j4380860ka5377fadd781b796@mail.gmail.com>
-Date: Wed, 23 May 2007 08:54:15 +0300
-From: "Voni Hakau" <hakauvoni@gmail.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] bluez-utils dependencies
+Date: Tue, 22 May 2007 14:08:17 -0400
+From: "Marcus C. Gottwald" <gottwald@inf.fu-berlin.de>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <20070522180817.GA24396@mi.fu-berlin.de>
+References: <20070522161255.GA9813@robsims.com>
+Mime-Version: 1.0
+In-Reply-To: <20070522161255.GA9813@robsims.com>
+Subject: Re: [Bluez-users] Sharing devices with dual-booted Windows
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,23 +16,30 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello.
 
-I decided to dump version 2.25 as Marcel recommended and fight
-my way with d-bus on my embedded.
+Rob Sims wrote (Tue 2007-May-22 10:12:55 -0600):
 
-So i'm going to try to build bluez-utils 3.10.1 on my platform.
+> I have several devices that I use with both Linux and Windows on the
+> same laptop.  The issue is that the remote devices, such as my PDA, see
+> the laptop as the same device no matter what OS is running, and pairing
+> is broken.
 
-I wanted to ask -
+I always thought of this as a defect in the protocol:
+Identification is based on the hardware address, but
+stateful authentication using that identification is
+performed on a layer way up.
 
-Are there more dependencies apart from d-bus (i saw HAL ?)?
 
-Thank You
-H.
+Cheers, Marcus
+
+-- =
+
+   Marcus C. Gottwald  =B7  http://www.inf.fu-berlin.de/~gottwald/
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
