@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4654A640.3010801@gmail.com>
-Date: Wed, 23 May 2007 23:38:24 +0300
-From: bhairava <bhairavah@gmail.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <20070522161255.GA9813@robsims.com>
-In-Reply-To: <20070522161255.GA9813@robsims.com>
-Subject: [Bluez-users] auth problems
+In-Reply-To: <e96e9eeb0705222254j4380860ka5377fadd781b796@mail.gmail.com>
+References: <e96e9eeb0705222254j4380860ka5377fadd781b796@mail.gmail.com>
+Date: Wed, 23 May 2007 09:21:00 +0200
+Message-Id: <1179904860.9152.51.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] bluez-utils dependencies
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,37 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi Voni,
 
-i posted to the list before, but got no answer.
+> I decided to dump version 2.25 as Marcel recommended and fight
+> my way with d-bus on my embedded.
+> 
+> So i'm going to try to build bluez-utils 3.10.1 on my platform.
+> 
+> I wanted to ask -
+> 
+> Are there more dependencies apart from d-bus (i saw HAL ?)?
 
-i am trying to obexftp some files from my nokia fone. the phone asks for 
-a password (pin).
-the problem is:
-1. if i set security none, in hcid.conf, it still wants a password. is 
-this normal ?
-2. if i set security auto, and passkey 1234, hcid says:
+you can have more, but D-Bus is the only real dependency. All the others
+are optional.
 
-hcid[11839]: pin_code_request (sba=00:0B:0D:4C:AB:C3, 
-dba=00:18:C5:38:AF:D1)
-hcid[11839]: call_passkey_agent(): no agent registered
+Regards
 
-why am i setting the passkey if it doesn't read it ?
+Marcel
 
-3. if i set security user, and pin_helper WHATEVER, it says at startup
-hcid[11854]: Unknown option 'pin_helper' line 25
-hcid[11854]: syntax error line 25
 
-and if i try to connect,
-hcid[11854]: pin_code_request (sba=00:0B:0D:4C:AB:C3, 
-dba=00:18:C5:38:AF:D1)
-hcid[11854]: call_passkey_agent(): no agent registered
-
-is the security setting a joke ? shouldn't that give me to option to say 
-if i even WANT to use an agent ?
-
-i use debian 4.0 with kernel 2.6.21.1 and hcid ver 3.7.
-
-thanks for any insight.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
