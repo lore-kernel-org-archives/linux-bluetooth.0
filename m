@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "Aveek Audhya" <aveek@rebaca.com>
-To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
-Date: Thu, 24 May 2007 11:35:49 +0530
+Message-ID: <4654A640.3010801@gmail.com>
+Date: Wed, 23 May 2007 23:38:24 +0300
+From: bhairava <bhairavah@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <4654A640.3010801@gmail.com>
-Message-ID: <E1Hr6Sk-00031h-Rv@mail.sourceforge.net>
-Subject: Re: [Bluez-users] auth problems
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <20070522161255.GA9813@robsims.com>
+In-Reply-To: <20070522161255.GA9813@robsims.com>
+Subject: [Bluez-users] auth problems
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,17 +19,6 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
-
-
-I am using FC6, kernel 2.6.20-1. I have tested with setting the security to
-none in hcif.conf. In this case my Nokia 6600 doesn't ask for any
-password(pin) while doing Obex File Transfer.
-
------Original Message-----
-From: bhairava [mailto:bhairavah@gmail.com] 
-Sent: Thursday, May 24, 2007 2:08 AM
-To: BlueZ users
-Subject: [Bluez-users] auth problems
 
 
 i posted to the list before, but got no answer.
@@ -61,18 +51,6 @@ if i even WANT to use an agent ?
 i use debian 4.0 with kernel 2.6.21.1 and hcid ver 3.7.
 
 thanks for any insight.
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
-
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
