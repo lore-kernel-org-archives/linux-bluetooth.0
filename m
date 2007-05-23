@@ -1,13 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46548395.1070208@access-company.com>
-Date: Wed, 23 May 2007 20:10:29 +0200
-From: Frederic Danis <frederic.danis@access-company.com>
-MIME-Version: 1.0
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <464B36D4.80702@access-company.com>	<1179666685.10069.250.camel@violet>	<e1effdeb0705210812p64d34f57l7800556df240fb23@mail.gmail.com>	<4653218D.3090504@access-company.com>	<1179854658.9152.37.camel@aeonflux.holtmann.net>	<46533F31.9090406@access-company.com>	<1179868135.9152.39.camel@aeonflux.holtmann.net>	<46536A7D.7010500@access-company.com>
-	<1179872473.9152.49.camel@aeonflux.holtmann.net>
-In-Reply-To: <1179872473.9152.49.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] Fix for disconnection in new serial service
+In-Reply-To: <59278C28-851A-44FF-AE01-25D8F074CE1E@nokia.com>
+References: <1179933855.3629.75.camel@cookie.hadess.net>
+	<1179935471.19944.6.camel@aeonflux.holtmann.net>
+	<1179936924.3629.88.camel@cookie.hadess.net>
+	<1179937606.3629.92.camel@cookie.hadess.net>
+	<59278C28-851A-44FF-AE01-25D8F074CE1E@nokia.com>
+Date: Wed, 23 May 2007 18:07:58 +0100
+Message-Id: <1179940078.3629.103.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] CUPS plugin discovery bits
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,13 +24,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+On Wed, 2007-05-23 at 18:56 +0200, Johan Hedberg wrote:
+> Hi Bastien,
+> 
+> On May 23, 2007, at 18:26, Bastien Nocera wrote:
+> > Updated patch attached.
+> 
+> A little about optimizing the device discovery.
+<snip>
+> This way time  
+> will not go wasted to requesting names for devices we will not do  
+> anything with anyway.
 
-Using the latest cvs revision, I saw that this problem has been fixed (using RFCOMM_HANGUP_NOW when rfcomm device is released).
+Good call. I'll fix it up tomorrow.
 
-Sorry
+-- 
+Bastien Nocera <hadess@hadess.net> 
 
-Fred
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
