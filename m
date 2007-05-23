@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <465484B4.2070701@access-company.com>
-Date: Wed, 23 May 2007 20:15:16 +0200
+Message-ID: <46548395.1070208@access-company.com>
+Date: Wed, 23 May 2007 20:10:29 +0200
 From: Frederic Danis <frederic.danis@access-company.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <464B36D4.80702@access-company.com>	<1179666685.10069.250.camel@violet>	<e1effdeb0705210812p64d34f57l7800556df240fb23@mail.gmail.com>	<4653218D.3090504@access-company.com>
-	<1179854658.9152.37.camel@aeonflux.holtmann.net>
-In-Reply-To: <1179854658.9152.37.camel@aeonflux.holtmann.net>
+References: <464B36D4.80702@access-company.com>	<1179666685.10069.250.camel@violet>	<e1effdeb0705210812p64d34f57l7800556df240fb23@mail.gmail.com>	<4653218D.3090504@access-company.com>	<1179854658.9152.37.camel@aeonflux.holtmann.net>	<46533F31.9090406@access-company.com>	<1179868135.9152.39.camel@aeonflux.holtmann.net>	<46536A7D.7010500@access-company.com>
+	<1179872473.9152.49.camel@aeonflux.holtmann.net>
+In-Reply-To: <1179872473.9152.49.camel@aeonflux.holtmann.net>
 Subject: Re: [Bluez-devel] Fix for disconnection in new serial service
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,28 +21,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello Marcel,
+Hello,
 
->> What I want to do in my program is : ConnectService, open rfcomm, DisconnectService, than use file descriptor on rfcomm. Close rfcomm after, that should 
->> disconnect the bluetooth connection.
-> 
-> that is not the the use case for ConnectService and DisconnectService.
-> It is as simple as that. What you want is more like the CreatePort
-> methods that create persistent RFCOMM bindings.
-> 
+Using the latest cvs revision, I saw that this problem has been fixed (using RFCOMM_HANGUP_NOW when rfcomm device is released).
 
-Regarding the Serial service API, I am not sure to understand difference between ConnectService and CreatePort.
-Is it possible to use port like this : CreatePort, open rfcomm, RemovePort, use file descriptor on rfcomm, than close it (that should disconnect bluetooth) ?
-
-Regards
+Sorry
 
 Fred
-
------------------------------------------------
-Danis Frederic                   Access Company
-Software engineer
-Mail : mailto:frederic.danis@access-company.com
------------------------------------------------
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
