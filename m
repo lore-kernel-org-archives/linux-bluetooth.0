@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <46555084.2070106@movilok.com>
-Date: Thu, 24 May 2007 10:44:52 +0200
-From: "J. Carlos Alvarez" <jcalvar@movilok.com>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4655449F.2080000@movilok.com>
 References: <4655449F.2080000@movilok.com>
-	<1179996006.26519.15.camel@aeonflux.holtmann.net>
-In-Reply-To: <1179996006.26519.15.camel@aeonflux.holtmann.net>
+Date: Thu, 24 May 2007 10:40:06 +0200
+Message-Id: <1179996006.26519.15.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] Concurrent hcitool commands
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,85 +20,66 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Thanks a lot, Marcel.
+Hi Juan Carlos,
 
-Juan Carlos
+> we are trying to use hcitool to retrieve some information about 
+> several devices and we need to do it in parallel (several scripts 
+> concurrently call "hcitool name XX:XX:XX:XX:XX" using the same local 
+> device looking for the name of several remote devices).
+> 
+> Doing this we found that some responses received from different remote 
+> devices were mixed, we obtained the same device name from two different 
+> remote devices.
+> 
+> The following is a simple way to check this behaviour:
+> ---------------------------------------------------------------
+> [root@localhost~]# hcitool -i hci0 name 00:12:D1:DB:9A:E3
+> Nokia E70
+> [root@localhost~]# hcitool -i hci0 name 00:13:FD:FC:DE:50
+> Nokia 6680
+> [root@localhost~]# hcitool -i hci0 name 00:12:D1:DB:9A:E3 & hcitool -i 
+> hci0 name 00:13:FD:FC:DE:50
+> [1] 14223
+> Nokia E70
+> Nokia E70
+> [1]+  Done                    hcitool -i hci0 name 00:12:D1:DB:9A:E3
+> ---------------------------------------------------------------
+> 
+> - The first command gets the right name of our E70 phone:
+>  "Nokia E70"
+> 
+> - The second one also gets the right name of our 6680 phone:
+>  "Nokia 6680"
+> 
+> - But if we invoke both commands concurrently, both "hcitool" calls get 
+> the same name as the device response:
+>  "Nokia E70"
+>  "Nokia E70"
+> 
+> Are we doing something wrong?
+> 
+> Is there any technical limitation related to this kind of requests so we 
+> must to do these calls serially?
 
-Marcel Holtmann wrote:
-> Hi Juan Carlos,
->
->   
->> we are trying to use hcitool to retrieve some information about 
->> several devices and we need to do it in parallel (several scripts 
->> concurrently call "hcitool name XX:XX:XX:XX:XX" using the same local 
->> device looking for the name of several remote devices).
->>
->> Doing this we found that some responses received from different remote 
->> devices were mixed, we obtained the same device name from two different 
->> remote devices.
->>
->> The following is a simple way to check this behaviour:
->> ---------------------------------------------------------------
->> [root@localhost~]# hcitool -i hci0 name 00:12:D1:DB:9A:E3
->> Nokia E70
->> [root@localhost~]# hcitool -i hci0 name 00:13:FD:FC:DE:50
->> Nokia 6680
->> [root@localhost~]# hcitool -i hci0 name 00:12:D1:DB:9A:E3 & hcitool -i 
->> hci0 name 00:13:FD:FC:DE:50
->> [1] 14223
->> Nokia E70
->> Nokia E70
->> [1]+  Done                    hcitool -i hci0 name 00:12:D1:DB:9A:E3
->> ---------------------------------------------------------------
->>
->> - The first command gets the right name of our E70 phone:
->>  "Nokia E70"
->>
->> - The second one also gets the right name of our 6680 phone:
->>  "Nokia 6680"
->>
->> - But if we invoke both commands concurrently, both "hcitool" calls get 
->> the same name as the device response:
->>  "Nokia E70"
->>  "Nokia E70"
->>
->> Are we doing something wrong?
->>
->> Is there any technical limitation related to this kind of requests so we 
->> must to do these calls serially?
->>     
->
-> this is a known limitation. And in general you can't execute name
-> request in parallel anyway. Every name request involves a baseband page
-> and that takes time and these can't be done in parallel. However some
-> chips create the illusion that they can.
->
-> I would advise you to use the D-Bus interface since it does the name
-> resolving in the background and automatically caches the resolved device
-> names for you. No need to fiddle around with low-level commands.
->
-> And in case of Bluetooth 2.1 devices with extended inquiry it will
-> deliver the remote name for free with the inquiry response. That all
-> works already and is completely hidden via D-Bus. So nothing for you to
-> worry about.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by DB2 Express
-> Download DB2 Express C - the FREE version of DB2 express and take
-> control of your XML. No limits. Just data. Click to get it now.
-> http://sourceforge.net/powerbar/db2/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->   
+this is a known limitation. And in general you can't execute name
+request in parallel anyway. Every name request involves a baseband page
+and that takes time and these can't be done in parallel. However some
+chips create the illusion that they can.
+
+I would advise you to use the D-Bus interface since it does the name
+resolving in the background and automatically caches the resolved device
+names for you. No need to fiddle around with low-level commands.
+
+And in case of Bluetooth 2.1 devices with extended inquiry it will
+deliver the remote name for free with the inquiry response. That all
+works already and is completely hidden via D-Bus. So nothing for you to
+worry about.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
