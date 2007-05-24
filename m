@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <EJENLMBEOLKAMCJFBFMDCEBNCAAA.leiyu@kcoe.cn>
-References: <EJENLMBEOLKAMCJFBFMDCEBNCAAA.leiyu@kcoe.cn>
-Date: Thu, 24 May 2007 12:07:39 +0200
-Message-Id: <1180001259.26519.20.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] how to cross-compile bluez
+Message-ID: <57c68ddc0705240306s1c9fc345x860dc75b9955d6f@mail.gmail.com>
+Date: Thu, 24 May 2007 15:36:24 +0530
+From: "siddhant tewari" <siddhant.tewari@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-users] remote device identification
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,33 +14,74 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0931053377=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Leiyu,
+--===============0931053377==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_133464_2062542.1180001184620"
 
-> I want to port Bluez to S3C2410 platform, the linux kernel of S3C2410 is 2.4.18,
-> My PC linux kernel is 2.4.22,How may I go on cross-compile? Should I re-compile PC Linux kernel to 2.4.18 first?
->  
-> Bluez kernel is embedded in Linux kernel, but may I get Bluez kernel from website ?  
+------=_Part_133464_2062542.1180001184620
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-use a 2.6 kernel. We don't support any 2.4 kernel anymore. Even if it is
-extra effort to make a 2.6.21 kernel work, it is worth it, because this
-make any other changes a lot easier.
+hi Marcel,
 
-Regards
+              I recently came upon this white paper name as blueprinting
+(titled Remote Device Identification based on Bluetooth Fingerprinting
+Techniques) which presents a way of identifying remote device by using sdp
+discovery records.
 
-Marcel
+What this paper claims is that by using combination of first 3 bytes of
+bluetooth address and number obtained by multiplying service record handle
+and rfcomm channel of OBEX push services one can identify the brand or make
+of the device.
+
+I would like to know how reliable this method is  , also can u suggest other
+techniques which can accomplish such thing.
+
+regards
+siddhant
+
+------=_Part_133464_2062542.1180001184620
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+hi Marcel,<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I recently came upon this white paper name as blueprinting (titled Remote Device Identification based on Bluetooth Fingerprinting Techniques) which presents a way of identifying remote device by using
+sdp discovery records. <br><br>What this paper claims is that by using
+combination of first 3 bytes of bluetooth address and number obtained
+by multiplying service record handle and rfcomm channel of OBEX push
+services one can identify the brand or make of the device.
+<br><br>I would like to know how reliable this method is&nbsp; , also can u suggest other techniques which can accomplish such
+thing.<br><br>regards<br><span class="sg">siddhant<br>
+</span>
+
+------=_Part_133464_2062542.1180001184620--
 
 
+--===============0931053377==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============0931053377==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0931053377==--
