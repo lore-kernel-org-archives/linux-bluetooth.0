@@ -1,14 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1179935471.19944.6.camel@aeonflux.holtmann.net>
+In-Reply-To: <59278C28-851A-44FF-AE01-25D8F074CE1E@nokia.com>
 References: <1179933855.3629.75.camel@cookie.hadess.net>
 	<1179935471.19944.6.camel@aeonflux.holtmann.net>
-Content-Type: multipart/mixed; boundary="=-mOZE8/Iw5wLuAv+KbGIZ"
-Date: Thu, 24 May 2007 16:03:37 +0100
-Message-Id: <1180019017.3151.15.camel@cookie.hadess.net>
+	<1179936924.3629.88.camel@cookie.hadess.net>
+	<1179937606.3629.92.camel@cookie.hadess.net>
+	<59278C28-851A-44FF-AE01-25D8F074CE1E@nokia.com>
+Content-Type: multipart/mixed; boundary="=-eLkBgbW3MgD7gz4nm+r5"
+Date: Thu, 24 May 2007 14:39:52 +0100
+Message-Id: <1180013992.3151.6.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Cc: twaugh@redhat.com
 Subject: Re: [Bluez-devel] CUPS plugin discovery bits
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -23,58 +25,34 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---=-mOZE8/Iw5wLuAv+KbGIZ
+--=-eLkBgbW3MgD7gz4nm+r5
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-On Wed, 2007-05-23 at 17:51 +0200, Marcel Holtmann wrote:
+On Wed, 2007-05-23 at 18:56 +0200, Johan Hedberg wrote:
 > Hi Bastien,
 > 
-> > Here's a patch against CVS bluez-utils to add discovery to the CUPS
-> > backend. With this, it means that most CUPS front-end will be able to
-> > list visible printers when adding a new one, be it through the web
-> > interface or other front-ends (like Fedora' system-config-printer).
-> > 
-> > It adds D-Bus and glib as dependencies for the backend (not that it
-> > matters that much...).
+> On May 23, 2007, at 18:26, Bastien Nocera wrote:
+> > Updated patch attached.
 > 
-> it actually does. We provide an eGlib for embedded systems and so when
-> compiled with GLib, we only use that function subset.
-> 
-> And second you use the GLib D-Bus bindings. I am not willing to create
-> these dependencies for a "daemon" package.
+> A little about optimizing the device discovery.
 
-The dependency is already optional (and if not, I can make it so).
+Fixed in this version, and also added recent devices (through
+ListRemoteDevices and ListBondings).
 
-I've looked at what using dbus directly would entail, and I'm not sure
-that's a good use of my (or anyone's) time. The code would be much more
-complicated than it would need to be, and certainly not any more
-readable.
-
-In the worst case, how about moving the cups plugin to another module?
-
-> Actually that is the reason why we wanna go
-> for a printing service in the future.
-
-I still haven't heard the benefits, or features that service would have.
-
-Unless you want to pass data from a client, over dbus to this printing
-service, which I don't think is a good idea given the potential size of
-the data being passed over.
-
-If anyone is involved with that, a draft API would be appreciated.
-
-This latest patch avoids untranslated messages getting to the end-user.
+Marcel told me this would be mergeable if I removed the dbus-glib
+dependency, which I'm going to do now.
 
 Cheers
 
 -- 
 Bastien Nocera <hadess@hadess.net> 
 
---=-mOZE8/Iw5wLuAv+KbGIZ
+
+--=-eLkBgbW3MgD7gz4nm+r5
 Content-Disposition: attachment;
-	filename=bluez-utils-cups-printer-listing-5.patch
-Content-Type: text/x-patch; name=bluez-utils-cups-printer-listing-5.patch;
+	filename=bluez-utils-cups-printer-listing-4.patch
+Content-Type: text/x-patch; name=bluez-utils-cups-printer-listing-4.patch;
 	charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 
@@ -84,7 +62,7 @@ RCS file: /cvsroot/bluez/utils/acinclude.m4,v
 retrieving revision 1.107
 diff -u -p -r1.107 acinclude.m4
 --- acinclude.m4	8 Apr 2007 19:56:52 -0000	1.107
-+++ acinclude.m4	24 May 2007 14:54:17 -0000
++++ acinclude.m4	24 May 2007 13:37:36 -0000
 @@ -78,6 +78,8 @@ AC_DEFUN([AC_PATH_GLIB], [
  	PKG_CHECK_MODULES(GLIB, glib-2.0, glib_found=yes, glib_found=no)
  	AC_SUBST(GLIB_CFLAGS)
@@ -100,7 +78,7 @@ RCS file: /cvsroot/bluez/utils/cups/Makefile.am,v
 retrieving revision 1.9
 diff -u -p -r1.9 Makefile.am
 --- cups/Makefile.am	20 Aug 2006 02:21:03 -0000	1.9
-+++ cups/Makefile.am	24 May 2007 14:54:17 -0000
++++ cups/Makefile.am	24 May 2007 13:37:36 -0000
 @@ -7,9 +7,19 @@ else
  noinst_PROGRAMS = bluetooth
  endif
@@ -131,12 +109,13 @@ RCS file: /cvsroot/bluez/utils/cups/main.c,v
 retrieving revision 1.6
 diff -u -p -r1.6 main.c
 --- cups/main.c	3 Jan 2006 13:28:57 -0000	1.6
-+++ cups/main.c	24 May 2007 14:54:17 -0000
-@@ -38,12 +38,313 @@
++++ cups/main.c	24 May 2007 13:37:36 -0000
+@@ -38,12 +38,317 @@
  #include <bluetooth/sdp.h>
  #include <bluetooth/sdp_lib.h>
  
 +#include <dbus/dbus-glib.h>
++#include <glib/gi18n.h>
 +#include "bluez-cups-marshal.h"
 +
  extern int sdp_search_spp(sdp_session_t *sdp, uint8_t *channel);
@@ -186,6 +165,7 @@ diff -u -p -r1.6 main.c
 +	char *uri, *escaped;
 +
 +	escaped = g_strdelimit(g_strdup(name), "\"", '\'');
++
 +	uri = g_strdup_printf("bluetooth://%c%c%c%c%c%c%c%c%c%c%c%c",
 +			       bdaddr[0], bdaddr[1],
 +			       bdaddr[3], bdaddr[4],
@@ -281,13 +261,15 @@ diff -u -p -r1.6 main.c
 +discovery_completed(DBusGProxy *object, gpointer user_data)
 +{
 +	GList *l;
++	guint num_unnamed = 1;
 +
 +	for (l = device_list; l != NULL; l = l->next) {
 +		BluezCupsDevice *device = (BluezCupsDevice *) l->data;
 +
 +		if (device->name == NULL) {
-+			device->name = g_strdelimit(g_strdup(device->bdaddr),
-+						    ":", '-');
++			device->name = g_strdup_printf ("Unnamed printer #%d",
++							num_unnamed);
++			num_unnamed++;
 +		}
 +		print_printer_details(device->name, device->bdaddr);
 +		g_free(device->name);
@@ -446,7 +428,7 @@ diff -u -p -r1.6 main.c
  /*
   *  Usage: printer-uri job-id user title copies options [file]
   *
-@@ -73,7 +374,7 @@ int main(int argc, char *argv[])
+@@ -73,7 +378,7 @@ int main(int argc, char *argv[])
  #endif /* HAVE_SIGSET */
  
  	if (argc == 1) {
@@ -461,7 +443,7 @@ diff -u -p -r1.6 main.c
 +VOID:STRING,UINT,INT
 +VOID:STRING,STRING
 
---=-mOZE8/Iw5wLuAv+KbGIZ
+--=-eLkBgbW3MgD7gz4nm+r5
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -472,7 +454,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---=-mOZE8/Iw5wLuAv+KbGIZ
+--=-eLkBgbW3MgD7gz4nm+r5
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -483,4 +465,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-mOZE8/Iw5wLuAv+KbGIZ--
+--=-eLkBgbW3MgD7gz4nm+r5--
