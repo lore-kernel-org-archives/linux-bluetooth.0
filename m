@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <57c68ddc0705240306s1c9fc345x860dc75b9955d6f@mail.gmail.com>
-References: <57c68ddc0705240306s1c9fc345x860dc75b9955d6f@mail.gmail.com>
-Date: Thu, 24 May 2007 12:08:33 +0200
-Message-Id: <1180001313.26519.22.camel@aeonflux.holtmann.net>
+In-Reply-To: <EJENLMBEOLKAMCJFBFMDCEBNCAAA.leiyu@kcoe.cn>
+References: <EJENLMBEOLKAMCJFBFMDCEBNCAAA.leiyu@kcoe.cn>
+Date: Thu, 24 May 2007 12:07:39 +0200
+Message-Id: <1180001259.26519.20.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] remote device identification
+Subject: Re: [Bluez-users] how to cross-compile bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,23 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Leiyu,
 
->               I recently came upon this white paper name as
-> blueprinting (titled Remote Device Identification based on Bluetooth
-> Fingerprinting Techniques) which presents a way of identifying remote
-> device by using sdp discovery records. 
-> 
-> What this paper claims is that by using combination of first 3 bytes
-> of bluetooth address and number obtained by multiplying service record
-> handle and rfcomm channel of OBEX push services one can identify the
-> brand or make of the device. 
-> 
-> I would like to know how reliable this method is  , also can u suggest
-> other techniques which can accomplish such thing.
+> I want to port Bluez to S3C2410 platform, the linux kernel of S3C2410 is 2.4.18,
+> My PC linux kernel is 2.4.22,How may I go on cross-compile? Should I re-compile PC Linux kernel to 2.4.18 first?
+>  
+> Bluez kernel is embedded in Linux kernel, but may I get Bluez kernel from website ?  
 
-it is not really reliable anymore. Too many vectors changed over the
-last 2 years.
+use a 2.6 kernel. We don't support any 2.4 kernel anymore. Even if it is
+extra effort to make a 2.6.21 kernel work, it is worth it, because this
+make any other changes a lot easier.
 
 Regards
 
