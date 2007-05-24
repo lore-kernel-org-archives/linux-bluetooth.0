@@ -1,16 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <e29894ca0705240928m65c9999as6e2380c95610e457@mail.gmail.com>
-Date: Thu, 24 May 2007 19:28:56 +0300
-From: "=?ISO-8859-1?Q?Marc-Andr=E9_Lureau?=" <marcandre.lureau@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <d89ddf300705240624u15df9655gb9624e0955d6d195@mail.gmail.com>
-MIME-Version: 1.0
-References: <200705170207.52710.bluez-devel@huitl.de>
-	<d89ddf300705162042j1850b997wd069bae29e813d29@mail.gmail.com>
-	<200705171521.38889.bluez-devel@huitl.de>
-	<d89ddf300705240624u15df9655gb9624e0955d6d195@mail.gmail.com>
-Subject: Re: [Bluez-devel] headsetd has problems serving two applications at
-	a time
+Mime-Version: 1.0 (Apple Message framework v752.3)
+In-Reply-To: <1180013992.3151.6.camel@cookie.hadess.net>
+References: <1179933855.3629.75.camel@cookie.hadess.net>
+	<1179935471.19944.6.camel@aeonflux.holtmann.net>
+	<1179936924.3629.88.camel@cookie.hadess.net>
+	<1179937606.3629.92.camel@cookie.hadess.net>
+	<59278C28-851A-44FF-AE01-25D8F074CE1E@nokia.com>
+	<1180013992.3151.6.camel@cookie.hadess.net>
+Message-Id: <089F41B2-DBC5-483E-A6C9-F413E18DF38B@nokia.com>
+From: Johan Hedberg <johan.hedberg@nokia.com>
+Date: Thu, 24 May 2007 17:31:32 +0200
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] CUPS plugin discovery bits
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,131 +21,41 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0768978729=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0768978729==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_21896_16555155.1180024136042"
+Hi Bastien,
 
-------=_Part_21896_16555155.1180024136042
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+On May 24, 2007, at 15:39, Bastien Nocera wrote:
+> On Wed, 2007-05-23 at 18:56 +0200, Johan Hedberg wrote:
+>> Hi Bastien,
+>>
+>> On May 23, 2007, at 18:26, Bastien Nocera wrote:
+>>> Updated patch attached.
+>>
+>> A little about optimizing the device discovery.
+>
+> Fixed in this version, and also added recent devices (through
+> ListRemoteDevices and ListBondings).
 
-Hi,
+I see you're now using the manual name resolving discovery and  
+deciding from the device class whether to get the name or not. Great!  
+However, you are causing an unecessary roundtrip back to hcid by  
+calling GetRemoteMinorClass because you in fact already have the  
+necessary information encoded in the class parameter of the  
+RemoteDeviceFound signal. It's not as convenient as a string to do a  
+strcmp on, but you can just take example from hcid code how it  
+converts the 3 byte value to the string.
 
-dmix and dsnoop requires hw interrupts. Thats why they are bundled inside
-alsa-lib and not in alsa-plugins. If you want to do dmx or dsnoop stuff, yo=
-u
-should definetly have a look at PulseAudio as Brad suggested. Not however
-that PulseAudio require NON_BLOCKING alsa pcm. I am unsure about the sco
-alsa plugin support for NON_BLOCKING mode. Maybe Brad could comment.
-
-my 2cents,
-
---=20
-Marc-Andr=E9 Lureau, GSmartMix
-
-On 5/24/07, Brad Midgley <bmidgley@gmail.com> wrote:
->
-> Robert
->
-> > Could it be that some of the ALSA plugins only work with hardware
-> > devices?!
->
->
-> that is a real possibility. libalsa plugins are definitely second-class.
->
-> i am searching around in headsetd to see if it restricts the mic and
-> speaker sockets to be sent to the same application. it should be easy eno=
-ugh
-> to keep track of these two independently.
->
-> Brad
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by DB2 Express
-> Download DB2 Express C - the FREE version of DB2 express and take
-> control of your XML. No limits. Just data. Click to get it now.
-> http://sourceforge.net/powerbar/db2/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net<https://mail.google.com/mail?view=3Dcm&=
-tf=3D0&to=3DBluez-devel@lists.sourceforge.net>
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->
-
-------=_Part_21896_16555155.1180024136042
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi,<br><br>dmix and dsnoop requires hw interrupts. Thats why they are bundl=
-ed inside alsa-lib and not in alsa-plugins. If you want to do dmx or dsnoop=
- stuff, you should definetly have a look at PulseAudio as Brad suggested. N=
-ot however that PulseAudio require NON_BLOCKING alsa pcm. I am unsure about=
- the sco alsa plugin support for NON_BLOCKING mode. Maybe Brad could commen=
-t.
-<br><br clear=3D"all">my 2cents,<br><br>-- <br>Marc-Andr=E9 Lureau, GSmartM=
-ix
-<br><br><div><span class=3D"gmail_quote">On 5/24/07, <b class=3D"gmail_send=
-ername">Brad Midgley</b> &lt;<a href=3D"mailto:bmidgley@gmail.com">bmidgley=
-@gmail.com</a>&gt; wrote:</span><blockquote class=3D"gmail_quote" style=3D"=
-border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; paddi=
-ng-left: 1ex;">
-<b class=3D"gmail_sendername">Robert </b><div><span class=3D"q"><div><br></=
-div><blockquote class=3D"gmail_quote" style=3D"border-left: 1px solid rgb(2=
-04, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Could it be t=
-hat some of the ALSA plugins only work with hardware devices?!
-</blockquote></span><div><br>that is a real possibility. libalsa plugins ar=
-e definitely second-class.<br><br>i am searching around in headsetd to see =
-if it restricts the mic and speaker sockets to be sent to the same applicat=
-ion. it should be easy enough to keep track of these two independently.
-<br><br>Brad<br></div><br></div><br>
-<br>-----------------------------------------------------------------------=
---<br>This SF.net email is sponsored by DB2 Express<br>Download DB2 Express=
- C - the FREE version of DB2 express and take<br>control of your XML. No li=
-mits. Just data. Click to get it now.
-<br><a onclick=3D"return top.js.OpenExtLink(window,event,this)" href=3D"htt=
-p://sourceforge.net/powerbar/db2/" target=3D"_blank">http://sourceforge.net=
-/powerbar/db2/</a><br>_______________________________________________<br>Bl=
-uez-devel mailing list
-<br><a onclick=3D"return top.js.OpenExtLink(window,event,this)" href=3D"htt=
-ps://mail.google.com/mail?view=3Dcm&amp;tf=3D0&amp;to=3DBluez-devel@lists.s=
-ourceforge.net">Bluez-devel@lists.sourceforge.net</a><br><a onclick=3D"retu=
-rn top.js.OpenExtLink(window,event,this)" href=3D"https://lists.sourceforge=
-.net/lists/listinfo/bluez-devel" target=3D"_blank">
-https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br><br></block=
-quote></div><br>
-
-------=_Part_21896_16555155.1180024136042--
-
-
---===============0768978729==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Johan
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0768978729==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0768978729==--
