@@ -1,7 +1,7 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1180032597.14752.13.camel@cookie.hadess.net>
+In-Reply-To: <089F41B2-DBC5-483E-A6C9-F413E18DF38B@nokia.com>
 References: <1179933855.3629.75.camel@cookie.hadess.net>
 	<1179935471.19944.6.camel@aeonflux.holtmann.net>
 	<1179936924.3629.88.camel@cookie.hadess.net>
@@ -9,10 +9,9 @@ References: <1179933855.3629.75.camel@cookie.hadess.net>
 	<59278C28-851A-44FF-AE01-25D8F074CE1E@nokia.com>
 	<1180013992.3151.6.camel@cookie.hadess.net>
 	<089F41B2-DBC5-483E-A6C9-F413E18DF38B@nokia.com>
-	<1180032597.14752.13.camel@cookie.hadess.net>
-Content-Type: multipart/mixed; boundary="=-XzjR165GmABbRxsOK1YP"
-Date: Fri, 25 May 2007 13:30:33 +0100
-Message-Id: <1180096233.14752.27.camel@cookie.hadess.net>
+Content-Type: multipart/mixed; boundary="=-M69p/EqRrZNfeT6Bzfa2"
+Date: Thu, 24 May 2007 19:49:57 +0100
+Message-Id: <1180032597.14752.13.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] CUPS plugin discovery bits
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -28,39 +27,49 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---=-XzjR165GmABbRxsOK1YP
+--=-M69p/EqRrZNfeT6Bzfa2
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-On Thu, 2007-05-24 at 19:50 +0100, Bastien Nocera wrote:
-<snip>
-> This is most ugly. There should really be a helper function for that, or
-> hcid should pass a decoded argument.
+On Thu, 2007-05-24 at 17:31 +0200, Johan Hedberg wrote:
+> Hi Bastien,
 > 
-> Anyway, it's implemented now, along with a port to pure D-Bus, and can
-> use the builtin eglib instead of the system one.
+> On May 24, 2007, at 15:39, Bastien Nocera wrote:
+> > On Wed, 2007-05-23 at 18:56 +0200, Johan Hedberg wrote:
+> >> Hi Bastien,
+> >>
+> >> On May 23, 2007, at 18:26, Bastien Nocera wrote:
+> >>> Updated patch attached.
+> >>
+> >> A little about optimizing the device discovery.
+> >
+> > Fixed in this version, and also added recent devices (through
+> > ListRemoteDevices and ListBondings).
+> 
+> I see you're now using the manual name resolving discovery and  
+> deciding from the device class whether to get the name or not. Great!  
+> However, you are causing an unecessary roundtrip back to hcid by  
+> calling GetRemoteMinorClass because you in fact already have the  
+> necessary information encoded in the class parameter of the  
+> RemoteDeviceFound signal. It's not as convenient as a string to do a  
+> strcmp on, but you can just take example from hcid code how it  
+> converts the 3 byte value to the string.
 
-And an updated version which pulls the IEEE1284 ID from the attributes
-of the SDP record. This means that it takes 2 clicks in most config
-tools to add the printer (add printer, and select the bluetooth
-printer).
+This is most ugly. There should really be a helper function for that, or
+hcid should pass a decoded argument.
 
-If you're using the system hcid instead of the patched in bluez-utils,
-you'll need to replace the line:
-const char *svc_id = "hcrp"; /* aka 0x1126 */
-with:
-const char *svc_id = "00001126-0000-1000-8000-00805F9B34FB";
-in cups/main.c device_get_ieee1284_id()
+Anyway, it's implemented now, along with a port to pure D-Bus, and can
+use the builtin eglib instead of the system one.
 
-Patch attached.
+Marcel
 
 -- 
 Bastien Nocera <hadess@hadess.net> 
 
---=-XzjR165GmABbRxsOK1YP
+--=-M69p/EqRrZNfeT6Bzfa2
 Content-Disposition: attachment;
-	filename=bluez-utils-cups-printer-listing-9.patch
-Content-Type: text/x-patch; name=bluez-utils-cups-printer-listing-9.patch;
+	filename=bluez-utils-cups-printer-listing-8.patch
+Content-Type: text/x-patch; name=bluez-utils-cups-printer-listing-8.patch;
 	charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 
@@ -70,20 +79,16 @@ RCS file: /cvsroot/bluez/utils/cups/Makefile.am,v
 retrieving revision 1.9
 diff -u -p -r1.9 Makefile.am
 --- cups/Makefile.am	20 Aug 2006 02:21:03 -0000	1.9
-+++ cups/Makefile.am	25 May 2007 12:28:37 -0000
-@@ -8,8 +8,13 @@ noinst_PROGRAMS = bluetooth
++++ cups/Makefile.am	24 May 2007 18:50:13 -0000
+@@ -8,8 +8,9 @@ noinst_PROGRAMS = bluetooth
  endif
  
  bluetooth_SOURCES = main.c sdp.c spp.c hcrp.c
 -bluetooth_LDADD = @BLUEZ_LIBS@
-+if EXPAT
-+bluetooth_LDADD = @DBUS_LIBS@ @GLIB_LIBS@ @BLUEZ_LIBS@ -lexpat $(top_builddir)/common/libhelper.a
-+else
 +bluetooth_LDADD = @DBUS_LIBS@ @GLIB_LIBS@ @BLUEZ_LIBS@ $(top_builddir)/common/libhelper.a
-+endif
  
 -AM_CFLAGS = @BLUEZ_CFLAGS@
-+AM_CFLAGS = @BLUEZ_CFLAGS@ @DBUS_CFLAGS@ @GLIB_CFLAGS@
++AM_CFLAGS = @BLUEZ_CFLAGS@ @DBUS_CFLAGS@ @GLIB_CFLAGS@ -I$(top_srcdir)/common
  
  MAINTAINERCLEANFILES = Makefile.in
 +
@@ -93,15 +98,14 @@ RCS file: /cvsroot/bluez/utils/cups/main.c,v
 retrieving revision 1.6
 diff -u -p -r1.6 main.c
 --- cups/main.c	3 Jan 2006 13:28:57 -0000	1.6
-+++ cups/main.c	25 May 2007 12:28:37 -0000
-@@ -38,12 +38,517 @@
++++ cups/main.c	24 May 2007 18:50:14 -0000
+@@ -38,12 +38,414 @@
  #include <bluetooth/sdp.h>
  #include <bluetooth/sdp_lib.h>
  
 +#include <glib.h>
 +#include <dbus/dbus.h>
-+#include "../common/dbus.h"
-+#include "../common/sdp-xml.h"
++#include "dbus.h"
 +
  extern int sdp_search_spp(sdp_session_t *sdp, uint8_t *channel);
  extern int sdp_search_hcrp(sdp_session_t *sdp, unsigned short *ctrl_psm, unsigned short *data_psm);
@@ -114,106 +118,14 @@ diff -u -p -r1.6 main.c
 +typedef struct {
 +	char *bdaddr;
 +	char *name;
-+	char *id;
 +} BluezCupsDevice;
 +
 +static GSList *device_list = NULL;
 +static GMainLoop *loop = NULL;
 +static DBusConnection *conn = NULL;
 +
-+#define ATTRID_1284ID 0x0300
-+
-+static char *
-+parse_xml_sdp(const char *xml)
-+{
-+	sdp_record_t *sdp_record;
-+	sdp_list_t *l;
-+	char *str = NULL;
-+
-+	sdp_record = sdp_xml_parse_record(xml, strlen(xml));
-+	if (sdp_record == NULL)
-+		return NULL;
-+	for (l = sdp_record->attrlist; l != NULL; l = l->next) {
-+		sdp_data_t *data;
-+
-+		data = (sdp_data_t *) l->data;
-+		if (data->attrId != ATTRID_1284ID)
-+			continue;
-+		/* Ignore the length, it's null terminated */
-+		str = g_strdup(data->val.str + 2);
-+		break;
-+	}
-+	sdp_record_free(sdp_record);
-+
-+	return str;
-+}
-+
-+static char *
-+device_get_ieee1284_id(const char *adapter, const char *bdaddr)
-+{
-+	guint service_handle;
-+	DBusMessage *message, *reply;
-+	DBusMessageIter iter, reply_iter, iter_array;
-+	const char *svc_id = "hcrp"; /* aka 0x1126 */
-+	char *xml, *id;
-+
-+	/* Look for the service handle of the HCRP service */
-+	message = dbus_message_new_method_call("org.bluez", adapter,
-+					       "org.bluez.Adapter",
-+					       "GetRemoteServiceHandles");
-+	dbus_message_iter_init_append(message, &iter);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &svc_id);
-+
-+	reply = dbus_connection_send_with_reply_and_block(conn,
-+							  message, -1, NULL);
-+	if (!reply) {
-+		dbus_message_unref(message);
-+		return NULL;
-+	}
-+
-+	dbus_message_iter_init(reply, &reply_iter);
-+	if (dbus_message_iter_get_arg_type(&reply_iter) != DBUS_TYPE_ARRAY) {
-+		dbus_message_unref(reply);
-+		return NULL;
-+	}
-+
-+	/* Hopefully we only get one handle, or take a punt */
-+	dbus_message_iter_recurse(&reply_iter, &iter_array);
-+	while (dbus_message_iter_get_arg_type(&iter_array) == DBUS_TYPE_UINT32) {
-+		dbus_message_iter_get_basic(&iter_array, &service_handle);
-+		dbus_message_iter_next(&iter_array);
-+	}
-+
-+	dbus_message_unref(reply);
-+
-+	/* Now get the XML for the HCRP service record */
-+	message = dbus_message_new_method_call("org.bluez", adapter,
-+					       "org.bluez.Adapter",
-+					       "GetRemoteServiceRecordAsXML");
-+	dbus_message_iter_init_append(message, &iter);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_UINT32, &service_handle);
-+
-+	reply = dbus_connection_send_with_reply_and_block(conn,
-+							  message, -1, NULL);
-+	dbus_message_unref(message);
-+	if (!reply) {
-+		return NULL;
-+	}
-+
-+	dbus_message_iter_init(reply, &reply_iter);
-+        dbus_message_iter_get_basic(&reply_iter, &xml);
-+
-+	id = parse_xml_sdp(xml);
-+
-+	dbus_message_unref(reply);
-+
-+	return id;
-+}
-+
 +static void
-+add_device_to_list(const char *name, const char *bdaddr, const char *id)
++add_device_to_list(const char *name, const char *bdaddr)
 +{
 +	BluezCupsDevice *device;
 +	GSList *l;
@@ -233,7 +145,6 @@ diff -u -p -r1.6 main.c
 +	device = g_new0(BluezCupsDevice, 1);
 +	device->bdaddr = g_strdup(bdaddr);
 +	device->name = g_strdup(name);
-+	device->id = g_strdup(id);
 +
 +	device_list = g_slist_prepend(device_list, device);
 +}
@@ -250,7 +161,7 @@ diff -u -p -r1.6 main.c
 +}
 +
 +static void
-+print_printer_details(const char *name, const char *bdaddr, const char *id)
++print_printer_details(const char *name, const char *bdaddr)
 +{
 +	char *uri, *escaped;
 +	guint len;
@@ -265,11 +176,7 @@ diff -u -p -r1.6 main.c
 +		 bdaddr[9], bdaddr[10],
 +		 bdaddr[12], bdaddr[13],
 +		 bdaddr[15], bdaddr[16]);
-+	printf("network %s \"Unknown\" \"%s (Bluetooth)\"", uri, escaped);
-+	if (id != NULL)
-+		printf(" \"%s\"\n", id);
-+	else
-+		printf ("\n");
++	printf("network %s \"Unknown\" \"%s (Bluetooth)\"\n", uri, escaped);
 +	g_free(escaped);
 +	g_free(uri);
 +}
@@ -289,8 +196,8 @@ diff -u -p -r1.6 main.c
 +
 +	reply = dbus_connection_send_with_reply_and_block(conn,
 +							  message, -1, NULL);
-+	dbus_message_unref(message);
 +	if (!reply) {
++		dbus_message_unref(message);
 +		return FALSE;
 +	}
 +
@@ -339,7 +246,7 @@ diff -u -p -r1.6 main.c
 +	uint8_t minor_index;
 +	uint8_t shift_minor = 0;
 +	gboolean found = FALSE;
-+	char *name, *id;
++	char *name;
 +
 +	/* Check if we have a printer
 +	 * From hcid/dbus-adapter.c minor_class_str() */
@@ -361,16 +268,14 @@ diff -u -p -r1.6 main.c
 +		return;
 +
 +	name = device_get_name(adapter, bdaddr);
-+	id = device_get_ieee1284_id(adapter, bdaddr);
-+	add_device_to_list(name, bdaddr, id);
++	add_device_to_list(name, bdaddr);
 +	g_free(name);
-+	g_free(id);
 +}
 +
 +static void
 +remote_name_updated(const char *bdaddr, const char *name)
 +{
-+	add_device_to_list(name, bdaddr, NULL);
++	add_device_to_list(name, bdaddr);
 +}
 +
 +static void
@@ -385,10 +290,9 @@ diff -u -p -r1.6 main.c
 +			device->name = escape_name(device->bdaddr,
 +						   ':', '-');
 +		}
-+		print_printer_details(device->name, device->bdaddr, device->id);
++		print_printer_details(device->name, device->bdaddr);
 +		g_free(device->name);
 +		g_free(device->bdaddr);
-+		g_free(device->id);
 +		g_free(device);
 +	}
 +
@@ -449,12 +353,10 @@ diff -u -p -r1.6 main.c
 +
 +		dbus_message_iter_get_basic(&iter_array, &bdaddr);
 +		if (device_is_printer(adapter, bdaddr)) {
-+			char *name, *id;
++			char *name;
 +			name = device_get_name(adapter, bdaddr);
-+			id = device_get_ieee1284_id(adapter, bdaddr);
-+			add_device_to_list(name, bdaddr, id);
++			add_device_to_list(name, bdaddr);
 +			g_free(name);
-+			g_free(id);
 +		}
 +		dbus_message_iter_next(&iter_array);
 +	}
@@ -612,7 +514,7 @@ diff -u -p -r1.6 main.c
  /*
   *  Usage: printer-uri job-id user title copies options [file]
   *
-@@ -73,7 +578,7 @@ int main(int argc, char *argv[])
+@@ -73,7 +475,7 @@ int main(int argc, char *argv[])
  #endif /* HAVE_SIGSET */
  
  	if (argc == 1) {
@@ -627,7 +529,7 @@ RCS file: /cvsroot/bluez/utils/eglib/gmain.c,v
 retrieving revision 1.27
 diff -u -p -r1.27 gmain.c
 --- eglib/gmain.c	3 May 2007 15:41:42 -0000	1.27
-+++ eglib/gmain.c	25 May 2007 12:28:38 -0000
++++ eglib/gmain.c	24 May 2007 18:50:17 -0000
 @@ -1127,6 +1127,48 @@ void g_slist_free(GSList *list)
  	}
  }
@@ -683,7 +585,7 @@ RCS file: /cvsroot/bluez/utils/eglib/gmain.h,v
 retrieving revision 1.12
 diff -u -p -r1.12 gmain.h
 --- eglib/gmain.h	3 May 2007 15:41:43 -0000	1.12
-+++ eglib/gmain.h	25 May 2007 12:28:38 -0000
++++ eglib/gmain.h	24 May 2007 18:50:17 -0000
 @@ -191,6 +191,7 @@ int g_slist_length(GSList *list);
  
  void g_slist_foreach(GSList *list, GFunc func, void *user_data);
@@ -692,23 +594,8 @@ diff -u -p -r1.12 gmain.h
  
  /* End GSList declarations */
  
-Index: hcid/dbus-sdp.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus-sdp.c,v
-retrieving revision 1.71
-diff -u -p -r1.71 dbus-sdp.c
---- hcid/dbus-sdp.c	3 May 2007 11:49:43 -0000	1.71
-+++ hcid/dbus-sdp.c	25 May 2007 12:28:38 -0000
-@@ -270,6 +270,7 @@ sdp_service_t sdp_service[] = {
- 	{ "fax",	FAX_SVCLASS_ID,			"Fax"			},
- 	{ "spp",	SERIAL_PORT_SVCLASS_ID,		"Serial Port"		},
- 	{ "hsp",	HEADSET_SVCLASS_ID,		"Headset"		},
-+	{ "hcrp",	HCR_PRINT_SVCLASS_ID,		"Hardcopy Cable Replacement (Printer)" },
- 	{ NULL }
- };
- 
 
---=-XzjR165GmABbRxsOK1YP
+--=-M69p/EqRrZNfeT6Bzfa2
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -719,7 +606,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---=-XzjR165GmABbRxsOK1YP
+--=-M69p/EqRrZNfeT6Bzfa2
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -730,4 +617,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-XzjR165GmABbRxsOK1YP--
+--=-M69p/EqRrZNfeT6Bzfa2--
