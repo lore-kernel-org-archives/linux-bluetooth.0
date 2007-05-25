@@ -1,7 +1,7 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1180097928.14752.33.camel@cookie.hadess.net>
+In-Reply-To: <1180096233.14752.27.camel@cookie.hadess.net>
 References: <1179933855.3629.75.camel@cookie.hadess.net>
 	<1179935471.19944.6.camel@aeonflux.holtmann.net>
 	<1179936924.3629.88.camel@cookie.hadess.net>
@@ -11,10 +11,9 @@ References: <1179933855.3629.75.camel@cookie.hadess.net>
 	<089F41B2-DBC5-483E-A6C9-F413E18DF38B@nokia.com>
 	<1180032597.14752.13.camel@cookie.hadess.net>
 	<1180096233.14752.27.camel@cookie.hadess.net>
-	<1180097928.14752.33.camel@cookie.hadess.net>
-Content-Type: multipart/mixed; boundary="=-HACPFda2JZrgdrN4M3uU"
-Date: Fri, 25 May 2007 16:08:40 +0100
-Message-Id: <1180105720.14752.49.camel@cookie.hadess.net>
+Content-Type: multipart/mixed; boundary="=-SKXJ8pZTpz0n2KRz9Tcp"
+Date: Fri, 25 May 2007 13:58:48 +0100
+Message-Id: <1180097928.14752.33.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] CUPS plugin discovery bits
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -30,48 +29,42 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---=-HACPFda2JZrgdrN4M3uU
+--=-SKXJ8pZTpz0n2KRz9Tcp
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-On Fri, 2007-05-25 at 13:58 +0100, Bastien Nocera wrote:
-> On Fri, 2007-05-25 at 13:30 +0100, Bastien Nocera wrote:
-> > On Thu, 2007-05-24 at 19:50 +0100, Bastien Nocera wrote:
-> > <snip>
-> > > This is most ugly. There should really be a helper function for that, or
-> > > hcid should pass a decoded argument.
-> > > 
-> > > Anyway, it's implemented now, along with a port to pure D-Bus, and can
-> > > use the builtin eglib instead of the system one.
+On Fri, 2007-05-25 at 13:30 +0100, Bastien Nocera wrote:
+> On Thu, 2007-05-24 at 19:50 +0100, Bastien Nocera wrote:
+> <snip>
+> > This is most ugly. There should really be a helper function for that, or
+> > hcid should pass a decoded argument.
 > > 
-> > And an updated version which pulls the IEEE1284 ID from the attributes
-> > of the SDP record. This means that it takes 2 clicks in most config
-> > tools to add the printer (add printer, and select the bluetooth
-> > printer).
-> > 
-> > If you're using the system hcid instead of the patched in bluez-utils,
-> > you'll need to replace the line:
-> > const char *svc_id = "hcrp"; /* aka 0x1126 */
-> > with:
-> > const char *svc_id = "00001126-0000-1000-8000-00805F9B34FB";
-> > in cups/main.c device_get_ieee1284_id()
-> > 
-> > Patch attached.
+> > Anyway, it's implemented now, along with a port to pure D-Bus, and can
+> > use the builtin eglib instead of the system one.
 > 
-> With some indentation changes, at Marcel's request.
+> And an updated version which pulls the IEEE1284 ID from the attributes
+> of the SDP record. This means that it takes 2 clicks in most config
+> tools to add the printer (add printer, and select the bluetooth
+> printer).
+> 
+> If you're using the system hcid instead of the patched in bluez-utils,
+> you'll need to replace the line:
+> const char *svc_id = "hcrp"; /* aka 0x1126 */
+> with:
+> const char *svc_id = "00001126-0000-1000-8000-00805F9B34FB";
+> in cups/main.c device_get_ieee1284_id()
+> 
+> Patch attached.
 
-- Don't typedef BluezCupsDevice
-- Fix includes from common/
-- Simplify Makefile.am slightly
-- Remove already committed eglib changes
+With some indentation changes, at Marcel's request.
 
 -- 
 Bastien Nocera <hadess@hadess.net> 
 
---=-HACPFda2JZrgdrN4M3uU
+--=-SKXJ8pZTpz0n2KRz9Tcp
 Content-Disposition: attachment;
-	filename=bluez-utils-cups-printer-listing-11.patch
-Content-Type: text/x-patch; name=bluez-utils-cups-printer-listing-11.patch;
+	filename=bluez-utils-cups-printer-listing-10.patch
+Content-Type: text/x-patch; name=bluez-utils-cups-printer-listing-10.patch;
 	charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 
@@ -81,20 +74,20 @@ RCS file: /cvsroot/bluez/utils/cups/Makefile.am,v
 retrieving revision 1.9
 diff -u -p -r1.9 Makefile.am
 --- cups/Makefile.am	20 Aug 2006 02:21:03 -0000	1.9
-+++ cups/Makefile.am	25 May 2007 15:08:15 -0000
++++ cups/Makefile.am	25 May 2007 12:59:53 -0000
 @@ -8,8 +8,13 @@ noinst_PROGRAMS = bluetooth
  endif
  
  bluetooth_SOURCES = main.c sdp.c spp.c hcrp.c
 -bluetooth_LDADD = @BLUEZ_LIBS@
++if EXPAT
++bluetooth_LDADD = @DBUS_LIBS@ @GLIB_LIBS@ @BLUEZ_LIBS@ -lexpat $(top_builddir)/common/libhelper.a
++else
 +bluetooth_LDADD = @DBUS_LIBS@ @GLIB_LIBS@ @BLUEZ_LIBS@ $(top_builddir)/common/libhelper.a
++endif
  
 -AM_CFLAGS = @BLUEZ_CFLAGS@
-+if EXPAT
-+bluetooth_LDADD += -lexpat
-+endif
-+
-+AM_CFLAGS = @BLUEZ_CFLAGS@ @DBUS_CFLAGS@ @GLIB_CFLAGS@ -I$(top_srcdir)/common/
++AM_CFLAGS = @BLUEZ_CFLAGS@ @DBUS_CFLAGS@ @GLIB_CFLAGS@
  
  MAINTAINERCLEANFILES = Makefile.in
 +
@@ -104,16 +97,15 @@ RCS file: /cvsroot/bluez/utils/cups/main.c,v
 retrieving revision 1.6
 diff -u -p -r1.6 main.c
 --- cups/main.c	3 Jan 2006 13:28:57 -0000	1.6
-+++ cups/main.c	25 May 2007 15:08:16 -0000
-@@ -38,12 +38,502 @@
++++ cups/main.c	25 May 2007 12:59:53 -0000
+@@ -38,12 +38,501 @@
  #include <bluetooth/sdp.h>
  #include <bluetooth/sdp_lib.h>
  
 +#include <glib.h>
 +#include <dbus/dbus.h>
-+
-+#include "dbus.h"
-+#include "sdp-xml.h"
++#include "../common/dbus.h"
++#include "../common/sdp-xml.h"
 +
  extern int sdp_search_spp(sdp_session_t *sdp, uint8_t *channel);
  extern int sdp_search_hcrp(sdp_session_t *sdp, unsigned short *ctrl_psm, unsigned short *data_psm);
@@ -123,11 +115,11 @@ diff -u -p -r1.6 main.c
  
 +#define PRINTER_SERVICE_CLASS_NAME "printer"
 +
-+typedef struct cups_device {
++typedef struct {
 +	char *bdaddr;
 +	char *name;
 +	char *id;
-+};
++} BluezCupsDevice;
 +
 +static GSList *device_list = NULL;
 +static GMainLoop *loop = NULL;
@@ -224,12 +216,12 @@ diff -u -p -r1.6 main.c
 +
 +static void add_device_to_list(const char *name, const char *bdaddr, const char *id)
 +{
-+	struct cups_device *device;
++	BluezCupsDevice *device;
 +	GSList *l;
 +
 +	/* Look for the device in the list */
 +	for (l = device_list; l != NULL; l = l->next) {
-+		device = (struct cups_device *) l->data;
++		device = (BluezCupsDevice *) l->data;
 +
 +		if (strcmp(device->bdaddr, bdaddr) == 0) {
 +			g_free(device->name);
@@ -239,7 +231,7 @@ diff -u -p -r1.6 main.c
 +	}
 +
 +	/* Or add it to the list if it's not there */
-+	device = g_new0(struct cups_device, 1);
++	device = g_new0(BluezCupsDevice, 1);
 +	device->bdaddr = g_strdup(bdaddr);
 +	device->name = g_strdup(name);
 +	device->id = g_strdup(id);
@@ -381,7 +373,7 @@ diff -u -p -r1.6 main.c
 +	GSList *l;
 +
 +	for (l = device_list; l != NULL; l = l->next) {
-+		struct cups_device *device = (struct cups_device *) l->data;
++		BluezCupsDevice *device = (BluezCupsDevice *) l->data;
 +
 +		if (device->name == NULL) {
 +			device->name = escape_name(device->bdaddr,
@@ -405,7 +397,7 @@ diff -u -p -r1.6 main.c
 +	GSList *l;
 +
 +	for (l = device_list; l != NULL; l = l->next) {
-+		struct cups_device *device = (struct cups_device *) l->data;
++		BluezCupsDevice *device = (BluezCupsDevice *) l->data;
 +
 +		if (strcmp(device->bdaddr, bdaddr) == 0) {
 +			g_free(device->name);
@@ -608,7 +600,7 @@ diff -u -p -r1.6 main.c
  /*
   *  Usage: printer-uri job-id user title copies options [file]
   *
-@@ -73,7 +563,7 @@ int main(int argc, char *argv[])
+@@ -73,7 +562,7 @@ int main(int argc, char *argv[])
  #endif /* HAVE_SIGSET */
  
  	if (argc == 1) {
@@ -617,14 +609,85 @@ diff -u -p -r1.6 main.c
  		return 0;
  	}
  
+Index: eglib/gmain.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/eglib/gmain.c,v
+retrieving revision 1.27
+diff -u -p -r1.27 gmain.c
+--- eglib/gmain.c	3 May 2007 15:41:42 -0000	1.27
++++ eglib/gmain.c	25 May 2007 12:59:54 -0000
+@@ -1127,6 +1127,48 @@ void g_slist_free(GSList *list)
+ 	}
+ }
+ 
++static inline GSList*
++_g_slist_remove_link (GSList *list,
++		      GSList *link)
++{
++	GSList *tmp;
++	GSList *prev;
++
++	prev = NULL;
++	tmp = list;
++
++	while (tmp)
++	{
++		if (tmp == link)
++		{
++			if (prev)
++				prev->next = tmp->next;
++			if (list == tmp)
++				list = list->next;
++
++			tmp->next = NULL;
++			break;
++		}
++
++		prev = tmp;
++		tmp = tmp->next;
++	}
++
++	return list;
++}
++
++
++GSList*
++g_slist_delete_link (GSList *list,
++		     GSList *link)
++{
++	list = _g_slist_remove_link(list, link);
++	g_free(link);
++
++	return list;
++}
++
++
+ /* Memory allocation functions */
+ 
+ gpointer g_malloc(gulong n_bytes)
+Index: eglib/gmain.h
+===================================================================
+RCS file: /cvsroot/bluez/utils/eglib/gmain.h,v
+retrieving revision 1.12
+diff -u -p -r1.12 gmain.h
+--- eglib/gmain.h	3 May 2007 15:41:43 -0000	1.12
++++ eglib/gmain.h	25 May 2007 12:59:54 -0000
+@@ -191,6 +191,7 @@ int g_slist_length(GSList *list);
+ 
+ void g_slist_foreach(GSList *list, GFunc func, void *user_data);
+ void g_slist_free(GSList *list);
++GSList *g_slist_delete_link (GSList *list, GSList *link);
+ 
+ /* End GSList declarations */
+ 
 Index: hcid/dbus-sdp.c
 ===================================================================
 RCS file: /cvsroot/bluez/utils/hcid/dbus-sdp.c,v
-retrieving revision 1.74
-diff -u -p -r1.74 dbus-sdp.c
---- hcid/dbus-sdp.c	9 May 2007 10:12:59 -0000	1.74
-+++ hcid/dbus-sdp.c	25 May 2007 15:08:16 -0000
-@@ -284,6 +284,7 @@ sdp_service_t sdp_service[] = {
+retrieving revision 1.71
+diff -u -p -r1.71 dbus-sdp.c
+--- hcid/dbus-sdp.c	3 May 2007 11:49:43 -0000	1.71
++++ hcid/dbus-sdp.c	25 May 2007 12:59:54 -0000
+@@ -270,6 +270,7 @@ sdp_service_t sdp_service[] = {
  	{ "fax",	FAX_SVCLASS_ID,			"Fax"			},
  	{ "spp",	SERIAL_PORT_SVCLASS_ID,		"Serial Port"		},
  	{ "hsp",	HEADSET_SVCLASS_ID,		"Headset"		},
@@ -633,7 +696,7 @@ diff -u -p -r1.74 dbus-sdp.c
  };
  
 
---=-HACPFda2JZrgdrN4M3uU
+--=-SKXJ8pZTpz0n2KRz9Tcp
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -644,7 +707,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---=-HACPFda2JZrgdrN4M3uU
+--=-SKXJ8pZTpz0n2KRz9Tcp
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -655,4 +718,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-HACPFda2JZrgdrN4M3uU--
+--=-SKXJ8pZTpz0n2KRz9Tcp--
