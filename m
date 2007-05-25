@@ -1,10 +1,20 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Date: Fri, 25 May 2007 14:48:03 +0200
-Message-ID: <39D0ED4A56B05A409DB3C01F8DCEFB54E3A387@CORPAPPL021.corp.saab.se>
-From: "Bengtsson Mikael" <mikael.bengtsson@saabgroup.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] How to emulate DTE and DCE with Free2Move BT HCI?
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1180032597.14752.13.camel@cookie.hadess.net>
+References: <1179933855.3629.75.camel@cookie.hadess.net>
+	<1179935471.19944.6.camel@aeonflux.holtmann.net>
+	<1179936924.3629.88.camel@cookie.hadess.net>
+	<1179937606.3629.92.camel@cookie.hadess.net>
+	<59278C28-851A-44FF-AE01-25D8F074CE1E@nokia.com>
+	<1180013992.3151.6.camel@cookie.hadess.net>
+	<089F41B2-DBC5-483E-A6C9-F413E18DF38B@nokia.com>
+	<1180032597.14752.13.camel@cookie.hadess.net>
+Content-Type: multipart/mixed; boundary="=-XzjR165GmABbRxsOK1YP"
+Date: Fri, 25 May 2007 13:30:33 +0100
+Message-Id: <1180096233.14752.27.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] CUPS plugin discovery bits
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,281 +24,691 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0529062130=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
 
---===============0529062130==
-Content-class: urn:content-classes:message
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C79ECA.EF39E4C1"
-
-This is a multi-part message in MIME format.
-
-------_=_NextPart_001_01C79ECA.EF39E4C1
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-Hello!
-
-I would like to emulate DTE and DCE serial handshaking with Free2Move:s
-BT.
-
-Free2Move offers the "Wireless UART" configuration or the HCI
-configuration.
-In the "Wireless UART" configuration no external software is required.
-HCI, obviously, requires a BlueZ stack on a host.
-
-I have tested Free2Move:s BT in the configuration "Wireless UART" in the
-following manner:
-Evaluation kit nr 1 (EVA1) has an Wireless UART that is configured as
-DTE.
-Evaluation kit nr 2 (EVA2) has an Wireless UART that is configured as
-DCE.
-When pressing a key connected to IO-pin 6 (DCD on EVA1) the
-corresponding IO-pin 6 on EVA2 is activated.
-When pressing a key connected to IO-pin 5 (DTR on EVA2) the
-corresponding IO-pin5  on EVA1 is activated.
-
-So the emulation of DTE and DCE over Bluetooth works with "Wireless
-UART" configuration.
-
-Now, I would like EVA1 to connect to a HCI BT.=20
-
-The problem is, that in the HCI configuration it is not possible to
-configure DCE for the BT.
-
-I have tried the following:
-I used a PC with a simple USB BT dongle.
-I connected to EVA1 with the command "rfcomm /dev/rfcomm0 connect
-<address of EVA1>"
-I used hcidump and when I pressed on IO-pin 6 on EVA1 hcidump displayed
-the following:
-
-HCI sniffer - Bluetooth packet analyzer ver 1.34
-> ACL data: handle 6 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0040 len 8 [psm 0]
-      0000: 01 ef 09 e3 05 0b 45 aa                           ......E.
-< ACL data: handle 6 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0041 len 8 [psm 0]
-      0000: 03 ef 09 e1 05 0b 45 70                           ......Ep
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 6 packets 1
-> ACL data: handle 6 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0040 len 8 [psm 0]
-      0000: 01 ef 09 e3 05 0b c5 aa                           ........
-< ACL data: handle 6 flags 0x02 dlen 12
-    L2CAP(d): cid 0x0041 len 8 [psm 0]
-      0000: 03 ef 09 e1 05 0b c5 70                           .......p
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 6 packets 1
-
-Obviously, the USB BT dongle discovered that something came in. The
-question is, how do I deal with this in a C-program?
-I have tried to connect to EVA1 with a socket with RF_COMM and L2CAPwith
-a C-program, but the program is not able to see any incoming data. I
-suspect I can dissect hcidump and/or rfcomm to see how these programs
-work.
-
-Then there is the other question, how shall I figure what the HCI BT
-shall send to EVA1, the other way around? It seems impossible without
-knowing the protocol or data format.
-
-Is there anyone that knows anything about this?
-
-Regards:
--Mikael
-=20
-
-=20
-
-
-------_=_NextPart_001_01C79ECA.EF39E4C1
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
-<HTML>
-<HEAD>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3DUS-ASCII">
-<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
-6.5.7652.24">
-<TITLE>How to emulate DTE and DCE with Free2Move BT HCI?</TITLE>
-</HEAD>
-<BODY>
-<!-- Converted from text/rtf format -->
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">Hello!</FONT></SPAN>
-</P>
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">I would like to =
-emulate DTE and DCE serial handshaking with Free2Move:s =
-BT.</FONT></SPAN>
-</P>
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">Free2Move offers the =
-&quot;Wireless UART&quot; configuration or the HCI =
-configuration.</FONT></SPAN>
-
-<BR><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">In the =
-&quot;Wireless UART&quot; configuration no external software is =
-required. HCI, obviously, requires a BlueZ stack on a =
-host.</FONT></SPAN></P>
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">I have tested =
-Free2Move:s BT in the configuration &quot;Wireless UART&quot; in the =
-following manner:</FONT></SPAN>
-
-<BR><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">Evaluation kit nr 1 =
-(EVA1) has an Wireless UART that is configured as DTE.</FONT></SPAN>
-
-<BR><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">Evaluation kit nr 2 =
-(EVA2) has an Wireless UART that is configured as DCE.</FONT></SPAN>
-
-<BR><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">When pressing a key =
-connected to IO-pin 6 (DCD on EVA1) the corresponding IO-pin 6 on EVA2 =
-is activated.</FONT></SPAN>
-
-<BR><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">When pressing a key =
-connected to IO-pin 5 (DTR on EVA2) the corresponding IO-pin5&nbsp; on =
-EVA1 is activated.</FONT></SPAN>
-</P>
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">So the emulation of =
-DTE and DCE over Bluetooth works with &quot;Wireless UART&quot; =
-configuration.</FONT></SPAN>
-</P>
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">Now, I would like =
-EVA1 to connect to a HCI BT. </FONT></SPAN>
-</P>
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">The problem is, that =
-in the HCI configuration it is not possible to configure DCE for the =
-BT.</FONT></SPAN>
-</P>
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">I have tried the =
-following:</FONT></SPAN>
-
-<BR><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">I used a PC with a =
-simple USB BT dongle.</FONT></SPAN>
-
-<BR><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">I connected to EVA1 =
-with the command &quot;rfcomm /dev/rfcomm0 connect &lt;address of =
-EVA1&gt;&quot;</FONT></SPAN>
-
-<BR><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">I used hcidump and =
-when I pressed on IO-pin 6 on EVA1 hcidump displayed the =
-following:</FONT></SPAN>
-</P>
-
-<P><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier New">HCI sniffer =
-- Bluetooth packet analyzer ver 1.34</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier New">&gt; ACL =
-data: handle 6 flags 0x02 dlen 12</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier =
-New">&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0040 len 8 [psm 0]</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier =
-New">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0000: 01 ef 09 e3 05 0b 45 =
-aa&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
-&nbsp;&nbsp; ......E.</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier New">&lt; ACL =
-data: handle 6 flags 0x02 dlen 12</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier =
-New">&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0041 len 8 [psm 0]</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier =
-New">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0000: 03 ef 09 e1 05 0b 45 =
-70&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
-&nbsp;&nbsp; ......Ep</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier New">&gt; HCI =
-Event: Number of Completed Packets (0x13) plen 5</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier =
-New">&nbsp;&nbsp;&nbsp; handle 6 packets 1</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier New">&gt; ACL =
-data: handle 6 flags 0x02 dlen 12</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier =
-New">&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0040 len 8 [psm 0]</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier =
-New">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0000: 01 ef 09 e3 05 0b c5 =
-aa&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
-&nbsp;&nbsp; ........</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier New">&lt; ACL =
-data: handle 6 flags 0x02 dlen 12</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier =
-New">&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0041 len 8 [psm 0]</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier =
-New">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0000: 03 ef 09 e1 05 0b c5 =
-70&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
-&nbsp;&nbsp; .......p</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier New">&gt; HCI =
-Event: Number of Completed Packets (0x13) plen 5</FONT></SPAN>
-
-<BR><SPAN LANG=3D"en-us"><FONT SIZE=3D2 FACE=3D"Courier =
-New">&nbsp;&nbsp;&nbsp; handle 6 packets 1</FONT></SPAN>
-</P>
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">Obviously, the USB BT =
-dongle discovered that something came in. The question is, how do I deal =
-with this in a C-program?</FONT></SPAN></P>
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">I have tried to =
-connect to EVA1 with a socket with RF_COMM and L2CAPwith a C-program, =
-but the program is not able to see any incoming data. I suspect I can =
-dissect hcidump and/or rfcomm to see how these programs =
-work.</FONT></SPAN></P>
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">Then there is the =
-other question, how shall I figure what the HCI BT shall send to EVA1, =
-the other way around? It seems impossible without knowing the protocol =
-or data format.</FONT></SPAN></P>
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">Is there anyone that =
-knows anything about this?</FONT></SPAN>
-</P>
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 =
-FACE=3D"Arial">Regards:</FONT></SPAN>
-
-<BR><SPAN LANG=3D"sv"><FONT SIZE=3D2 =
-FACE=3D"Arial">-Mikael</FONT></SPAN>
-
-<BR><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">&nbsp;</FONT></SPAN>
-</P>
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">&nbsp;</FONT></SPAN>
-</P>
-
-</BODY>
-</HTML>
-------_=_NextPart_001_01C79ECA.EF39E4C1--
-
-
---===============0529062130==
+--=-XzjR165GmABbRxsOK1YP
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+On Thu, 2007-05-24 at 19:50 +0100, Bastien Nocera wrote:
+<snip>
+> This is most ugly. There should really be a helper function for that, or
+> hcid should pass a decoded argument.
+> 
+> Anyway, it's implemented now, along with a port to pure D-Bus, and can
+> use the builtin eglib instead of the system one.
+
+And an updated version which pulls the IEEE1284 ID from the attributes
+of the SDP record. This means that it takes 2 clicks in most config
+tools to add the printer (add printer, and select the bluetooth
+printer).
+
+If you're using the system hcid instead of the patched in bluez-utils,
+you'll need to replace the line:
+const char *svc_id = "hcrp"; /* aka 0x1126 */
+with:
+const char *svc_id = "00001126-0000-1000-8000-00805F9B34FB";
+in cups/main.c device_get_ieee1284_id()
+
+Patch attached.
+
+-- 
+Bastien Nocera <hadess@hadess.net> 
+
+--=-XzjR165GmABbRxsOK1YP
+Content-Disposition: attachment;
+	filename=bluez-utils-cups-printer-listing-9.patch
+Content-Type: text/x-patch; name=bluez-utils-cups-printer-listing-9.patch;
+	charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+Index: cups/Makefile.am
+===================================================================
+RCS file: /cvsroot/bluez/utils/cups/Makefile.am,v
+retrieving revision 1.9
+diff -u -p -r1.9 Makefile.am
+--- cups/Makefile.am	20 Aug 2006 02:21:03 -0000	1.9
++++ cups/Makefile.am	25 May 2007 12:28:37 -0000
+@@ -8,8 +8,13 @@ noinst_PROGRAMS = bluetooth
+ endif
+ 
+ bluetooth_SOURCES = main.c sdp.c spp.c hcrp.c
+-bluetooth_LDADD = @BLUEZ_LIBS@
++if EXPAT
++bluetooth_LDADD = @DBUS_LIBS@ @GLIB_LIBS@ @BLUEZ_LIBS@ -lexpat $(top_builddir)/common/libhelper.a
++else
++bluetooth_LDADD = @DBUS_LIBS@ @GLIB_LIBS@ @BLUEZ_LIBS@ $(top_builddir)/common/libhelper.a
++endif
+ 
+-AM_CFLAGS = @BLUEZ_CFLAGS@
++AM_CFLAGS = @BLUEZ_CFLAGS@ @DBUS_CFLAGS@ @GLIB_CFLAGS@
+ 
+ MAINTAINERCLEANFILES = Makefile.in
++
+Index: cups/main.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/cups/main.c,v
+retrieving revision 1.6
+diff -u -p -r1.6 main.c
+--- cups/main.c	3 Jan 2006 13:28:57 -0000	1.6
++++ cups/main.c	25 May 2007 12:28:37 -0000
+@@ -38,12 +38,517 @@
+ #include <bluetooth/sdp.h>
+ #include <bluetooth/sdp_lib.h>
+ 
++#include <glib.h>
++#include <dbus/dbus.h>
++#include "../common/dbus.h"
++#include "../common/sdp-xml.h"
++
+ extern int sdp_search_spp(sdp_session_t *sdp, uint8_t *channel);
+ extern int sdp_search_hcrp(sdp_session_t *sdp, unsigned short *ctrl_psm, unsigned short *data_psm);
+ 
+ extern int spp_print(bdaddr_t *src, bdaddr_t *dst, uint8_t channel, int fd, int copies);
+ extern int hcrp_print(bdaddr_t *src, bdaddr_t *dst, unsigned short ctrl_psm, unsigned short data_psm, int fd, int copies);
+ 
++#define PRINTER_SERVICE_CLASS_NAME "printer"
++
++typedef struct {
++	char *bdaddr;
++	char *name;
++	char *id;
++} BluezCupsDevice;
++
++static GSList *device_list = NULL;
++static GMainLoop *loop = NULL;
++static DBusConnection *conn = NULL;
++
++#define ATTRID_1284ID 0x0300
++
++static char *
++parse_xml_sdp(const char *xml)
++{
++	sdp_record_t *sdp_record;
++	sdp_list_t *l;
++	char *str = NULL;
++
++	sdp_record = sdp_xml_parse_record(xml, strlen(xml));
++	if (sdp_record == NULL)
++		return NULL;
++	for (l = sdp_record->attrlist; l != NULL; l = l->next) {
++		sdp_data_t *data;
++
++		data = (sdp_data_t *) l->data;
++		if (data->attrId != ATTRID_1284ID)
++			continue;
++		/* Ignore the length, it's null terminated */
++		str = g_strdup(data->val.str + 2);
++		break;
++	}
++	sdp_record_free(sdp_record);
++
++	return str;
++}
++
++static char *
++device_get_ieee1284_id(const char *adapter, const char *bdaddr)
++{
++	guint service_handle;
++	DBusMessage *message, *reply;
++	DBusMessageIter iter, reply_iter, iter_array;
++	const char *svc_id = "hcrp"; /* aka 0x1126 */
++	char *xml, *id;
++
++	/* Look for the service handle of the HCRP service */
++	message = dbus_message_new_method_call("org.bluez", adapter,
++					       "org.bluez.Adapter",
++					       "GetRemoteServiceHandles");
++	dbus_message_iter_init_append(message, &iter);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &svc_id);
++
++	reply = dbus_connection_send_with_reply_and_block(conn,
++							  message, -1, NULL);
++	if (!reply) {
++		dbus_message_unref(message);
++		return NULL;
++	}
++
++	dbus_message_iter_init(reply, &reply_iter);
++	if (dbus_message_iter_get_arg_type(&reply_iter) != DBUS_TYPE_ARRAY) {
++		dbus_message_unref(reply);
++		return NULL;
++	}
++
++	/* Hopefully we only get one handle, or take a punt */
++	dbus_message_iter_recurse(&reply_iter, &iter_array);
++	while (dbus_message_iter_get_arg_type(&iter_array) == DBUS_TYPE_UINT32) {
++		dbus_message_iter_get_basic(&iter_array, &service_handle);
++		dbus_message_iter_next(&iter_array);
++	}
++
++	dbus_message_unref(reply);
++
++	/* Now get the XML for the HCRP service record */
++	message = dbus_message_new_method_call("org.bluez", adapter,
++					       "org.bluez.Adapter",
++					       "GetRemoteServiceRecordAsXML");
++	dbus_message_iter_init_append(message, &iter);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_UINT32, &service_handle);
++
++	reply = dbus_connection_send_with_reply_and_block(conn,
++							  message, -1, NULL);
++	dbus_message_unref(message);
++	if (!reply) {
++		return NULL;
++	}
++
++	dbus_message_iter_init(reply, &reply_iter);
++        dbus_message_iter_get_basic(&reply_iter, &xml);
++
++	id = parse_xml_sdp(xml);
++
++	dbus_message_unref(reply);
++
++	return id;
++}
++
++static void
++add_device_to_list(const char *name, const char *bdaddr, const char *id)
++{
++	BluezCupsDevice *device;
++	GSList *l;
++
++	/* Look for the device in the list */
++	for (l = device_list; l != NULL; l = l->next) {
++		device = (BluezCupsDevice *) l->data;
++
++		if (strcmp(device->bdaddr, bdaddr) == 0) {
++			g_free(device->name);
++			device->name = g_strdup(name);
++			return;
++		}
++	}
++
++	/* Or add it to the list if it's not there */
++	device = g_new0(BluezCupsDevice, 1);
++	device->bdaddr = g_strdup(bdaddr);
++	device->name = g_strdup(name);
++	device->id = g_strdup(id);
++
++	device_list = g_slist_prepend(device_list, device);
++}
++
++static char *
++escape_name(const char *str, char orig, char dest)
++{
++	char *ret, *s;
++
++	ret = g_strdup(str);
++	while ((s = strchr(ret, orig)) != NULL)
++		s[0] = dest;
++	return ret;
++}
++
++static void
++print_printer_details(const char *name, const char *bdaddr, const char *id)
++{
++	char *uri, *escaped;
++	guint len;
++
++	escaped = escape_name(name, '\"', '\'');
++	len = strlen("bluetooth://") + 12 + 1;
++	uri = g_malloc(len);
++	snprintf(uri, len, "bluetooth://%c%c%c%c%c%c%c%c%c%c%c%c",
++		 bdaddr[0], bdaddr[1],
++		 bdaddr[3], bdaddr[4],
++		 bdaddr[6], bdaddr[7],
++		 bdaddr[9], bdaddr[10],
++		 bdaddr[12], bdaddr[13],
++		 bdaddr[15], bdaddr[16]);
++	printf("network %s \"Unknown\" \"%s (Bluetooth)\"", uri, escaped);
++	if (id != NULL)
++		printf(" \"%s\"\n", id);
++	else
++		printf ("\n");
++	g_free(escaped);
++	g_free(uri);
++}
++
++static gboolean
++device_is_printer(const char *adapter, const char *bdaddr)
++{
++	char *class;
++	DBusMessage *message, *reply;
++	DBusMessageIter iter, reply_iter;
++
++	message = dbus_message_new_method_call("org.bluez", adapter,
++					       "org.bluez.Adapter",
++					       "GetRemoteMinorClass");
++	dbus_message_iter_init_append(message, &iter);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
++
++	reply = dbus_connection_send_with_reply_and_block(conn,
++							  message, -1, NULL);
++	dbus_message_unref(message);
++	if (!reply) {
++		return FALSE;
++	}
++
++	dbus_message_iter_init(reply, &reply_iter);
++	dbus_message_iter_get_basic(&reply_iter, &class);
++
++	if (class != NULL && strcmp(class, PRINTER_SERVICE_CLASS_NAME) == 0) {
++		dbus_message_unref(reply);
++		return TRUE;
++	}
++
++	return FALSE;
++}
++
++static char *
++device_get_name(const char *adapter, const char *bdaddr)
++{
++	char *name;
++	DBusMessage *message, *reply;
++	DBusMessageIter iter, reply_iter;
++
++	message = dbus_message_new_method_call("org.bluez", adapter,
++					       "org.bluez.Adapter",
++					       "GetRemoteName");
++	dbus_message_iter_init_append(message, &iter);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &bdaddr);
++
++	reply = dbus_connection_send_with_reply_and_block(conn,
++							  message, -1, NULL);
++	dbus_message_unref(message);
++	if (!reply)
++		return NULL;
++
++	dbus_message_iter_init(reply, &reply_iter);
++	dbus_message_iter_get_basic(&reply_iter, &name);
++
++	name = g_strdup(name);
++	dbus_message_unref(reply);
++	return name;
++}
++
++static void
++remote_device_found(const char *adapter, const char *bdaddr, guint class, int rssi)
++{
++	uint8_t major_index = (class >> 8) & 0x1F;
++	uint8_t minor_index;
++	uint8_t shift_minor = 0;
++	gboolean found = FALSE;
++	char *name, *id;
++
++	/* Check if we have a printer
++	 * From hcid/dbus-adapter.c minor_class_str() */
++	if (major_index != 6)
++		return;
++
++	minor_index = (class >> 4) & 0x0F;
++	while (shift_minor < 4) {
++		if (((minor_index >> shift_minor) & 0x01) == 0x01) {
++			if (shift_minor == 3) {
++				found = TRUE;
++				break;
++			}
++		}
++		shift_minor++;
++	}
++
++	if (!found)
++		return;
++
++	name = device_get_name(adapter, bdaddr);
++	id = device_get_ieee1284_id(adapter, bdaddr);
++	add_device_to_list(name, bdaddr, id);
++	g_free(name);
++	g_free(id);
++}
++
++static void
++remote_name_updated(const char *bdaddr, const char *name)
++{
++	add_device_to_list(name, bdaddr, NULL);
++}
++
++static void
++discovery_completed(void)
++{
++	GSList *l;
++
++	for (l = device_list; l != NULL; l = l->next) {
++		BluezCupsDevice *device = (BluezCupsDevice *) l->data;
++
++		if (device->name == NULL) {
++			device->name = escape_name(device->bdaddr,
++						   ':', '-');
++		}
++		print_printer_details(device->name, device->bdaddr, device->id);
++		g_free(device->name);
++		g_free(device->bdaddr);
++		g_free(device->id);
++		g_free(device);
++	}
++
++	g_slist_free(device_list);
++	device_list = NULL;
++
++	g_main_loop_quit(loop);
++}
++
++static void
++remote_device_disappeared(const char *bdaddr)
++{
++	GSList *l;
++
++	for (l = device_list; l != NULL; l = l->next) {
++		BluezCupsDevice *device = (BluezCupsDevice *) l->data;
++
++		if (strcmp(device->bdaddr, bdaddr) == 0) {
++			g_free(device->name);
++			g_free(device->bdaddr);
++			g_free(device);
++			device_list = g_slist_delete_link(device_list, l);
++			return;
++		}
++	}
++}
++
++static gboolean
++list_known_printers(const char *adapter)
++{
++	DBusMessageIter reply_iter, iter_array;
++	DBusError error;
++	DBusMessage *message, *reply;
++
++	message = dbus_message_new_method_call ("org.bluez", adapter,
++						"org.bluez.Adapter",
++						"ListRemoteDevices");
++	if (message == NULL)
++		return FALSE;
++
++	dbus_error_init(&error);
++	reply = dbus_connection_send_with_reply_and_block(conn,
++							  message, -1,
++							  &error);
++	dbus_message_unref(message);
++	if (&error != NULL && dbus_error_is_set(&error))
++		return FALSE;
++
++	dbus_message_iter_init(reply, &reply_iter);
++	if (dbus_message_iter_get_arg_type(&reply_iter) != DBUS_TYPE_ARRAY) {
++		dbus_message_unref(reply);
++		return FALSE;
++	}
++
++	dbus_message_iter_recurse(&reply_iter, &iter_array);
++	while (dbus_message_iter_get_arg_type(&iter_array) == DBUS_TYPE_STRING) {
++		char *bdaddr;
++
++		dbus_message_iter_get_basic(&iter_array, &bdaddr);
++		if (device_is_printer(adapter, bdaddr)) {
++			char *name, *id;
++			name = device_get_name(adapter, bdaddr);
++			id = device_get_ieee1284_id(adapter, bdaddr);
++			add_device_to_list(name, bdaddr, id);
++			g_free(name);
++			g_free(id);
++		}
++		dbus_message_iter_next(&iter_array);
++	}
++
++	dbus_message_unref(reply);
++
++	return FALSE;
++}
++
++static DBusHandlerResult
++filter_func(DBusConnection *connection,
++	    DBusMessage *message,
++	    void *user_data)
++{
++	const char *adapter;
++
++	if (dbus_message_is_signal(message, "org.bluez.Adapter",
++				   "RemoteDeviceFound")) {
++		char *bdaddr;
++		guint class;
++		int rssi;
++
++		dbus_message_get_args(message, NULL,
++				      DBUS_TYPE_STRING, &bdaddr,
++				      DBUS_TYPE_UINT32, &class,
++				      DBUS_TYPE_INT32, &rssi,
++				      DBUS_TYPE_INVALID);
++		adapter = dbus_message_get_path(message);
++		remote_device_found(adapter, bdaddr, class, rssi);
++	} else if (dbus_message_is_signal(message, "org.bluez.Adapter",
++					  "RemoteNameUpdated")) {
++		char *bdaddr, *name;
++
++		dbus_message_get_args(message, NULL,
++				      DBUS_TYPE_STRING, &bdaddr,
++				      DBUS_TYPE_STRING, &name,
++				      DBUS_TYPE_INVALID);
++		remote_name_updated(bdaddr, name);
++	} else if (dbus_message_is_signal(message, "org.bluez.Adapter",
++					  "RemoteDeviceDisappeared")) {
++		char *bdaddr;
++
++		dbus_message_get_args(message, NULL,
++				      DBUS_TYPE_STRING, &bdaddr,
++				      DBUS_TYPE_INVALID);
++		remote_device_disappeared(bdaddr);
++	} else if (dbus_message_is_signal(message, "org.bluez.Adapter",
++					  "DiscoveryCompleted")) {
++		discovery_completed();
++	}
++
++	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
++}
++
++static void
++list_printers(void)
++{
++	/* 1. Connect to the bus
++	 * 2. Get the manager
++	 * 3. Get the default adapter
++	 * 4. Get a list of devices
++	 * 5. Get the class of each device
++	 * 6. Print the details from each printer device
++	 */
++	DBusError error;
++	dbus_bool_t hcid_exists;
++	DBusMessage *reply, *message;
++	DBusMessageIter reply_iter;
++	char *adapter, *match;
++	guint len;
++
++	conn = init_dbus(NULL, NULL, NULL);
++	if (conn == NULL)
++		return;
++
++	dbus_error_init(&error);
++	hcid_exists = dbus_bus_name_has_owner(conn, "org.bluez", &error);
++	if (&error != NULL && dbus_error_is_set(&error))
++		return;
++
++	if (!hcid_exists)
++		return;
++
++	/* Get the default adapter */
++	message = dbus_message_new_method_call("org.bluez", "/org/bluez",
++					       "org.bluez.Manager",
++					       "DefaultAdapter");
++	if (message == NULL) {
++		dbus_connection_unref(conn);
++		return;
++	}
++	reply = dbus_connection_send_with_reply_and_block(conn,
++							  message, -1,
++							  &error);
++	dbus_message_unref(message);
++	if (&error != NULL && dbus_error_is_set(&error)) {
++		dbus_connection_unref(conn);
++		return;
++	}
++
++	dbus_message_iter_init(reply, &reply_iter);
++	if (dbus_message_iter_get_arg_type(&reply_iter) != DBUS_TYPE_STRING) {
++		dbus_message_unref(reply);
++		dbus_connection_unref(conn);
++		return;
++	}
++	dbus_message_iter_get_basic(&reply_iter, &adapter);
++	adapter = g_strdup(adapter);
++	dbus_message_unref(reply);
++
++	if (!dbus_connection_add_filter(conn, filter_func, adapter, g_free)) {
++		g_free(adapter);
++		dbus_connection_unref(conn);
++		return;
++	}
++
++#define MATCH_FORMAT				\
++	"type='signal',"			\
++	"interface='org.bluez.Adapter',"	\
++	"sender='org.bluez',"			\
++	"path='%s'"
++
++	len = strlen(MATCH_FORMAT) - 2 + strlen(adapter) + 1;
++	match = g_malloc(len);
++	snprintf(match, len, "type='signal',"
++		 "interface='org.bluez.Adapter',"
++		 "sender='org.bluez',"
++		 "path='%s'",
++		 adapter);
++	dbus_bus_add_match(conn, match, &error);
++	g_free(match);
++
++	message = dbus_message_new_method_call("org.bluez", adapter,
++					       "org.bluez.Adapter",
++					       "DiscoverDevicesWithoutNameResolving");
++
++	if (!dbus_connection_send_with_reply(conn,
++					     message, NULL, -1)) {
++		dbus_message_unref(message);
++		dbus_connection_unref(conn);
++		g_free(adapter);
++		return;
++	}
++	dbus_message_unref(message);
++
++	/* Also add the the recent devices */
++	g_timeout_add(0, (GSourceFunc) list_known_printers, adapter);
++
++	loop = g_main_loop_new(NULL, TRUE);
++	g_main_loop_run(loop);
++
++	dbus_connection_unref(conn);
++}
++
+ /*
+  *  Usage: printer-uri job-id user title copies options [file]
+  *
+@@ -73,7 +578,7 @@ int main(int argc, char *argv[])
+ #endif /* HAVE_SIGSET */
+ 
+ 	if (argc == 1) {
+-		puts("network bluetooth \"Unknown\" \"Bluetooth printer\"");
++		list_printers();
+ 		return 0;
+ 	}
+ 
+Index: eglib/gmain.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/eglib/gmain.c,v
+retrieving revision 1.27
+diff -u -p -r1.27 gmain.c
+--- eglib/gmain.c	3 May 2007 15:41:42 -0000	1.27
++++ eglib/gmain.c	25 May 2007 12:28:38 -0000
+@@ -1127,6 +1127,48 @@ void g_slist_free(GSList *list)
+ 	}
+ }
+ 
++static inline GSList*
++_g_slist_remove_link (GSList *list,
++		      GSList *link)
++{
++	GSList *tmp;
++	GSList *prev;
++
++	prev = NULL;
++	tmp = list;
++
++	while (tmp)
++	{
++		if (tmp == link)
++		{
++			if (prev)
++				prev->next = tmp->next;
++			if (list == tmp)
++				list = list->next;
++
++			tmp->next = NULL;
++			break;
++		}
++
++		prev = tmp;
++		tmp = tmp->next;
++	}
++
++	return list;
++}
++
++
++GSList*
++g_slist_delete_link (GSList *list,
++		     GSList *link)
++{
++	list = _g_slist_remove_link(list, link);
++	g_free(link);
++
++	return list;
++}
++
++
+ /* Memory allocation functions */
+ 
+ gpointer g_malloc(gulong n_bytes)
+Index: eglib/gmain.h
+===================================================================
+RCS file: /cvsroot/bluez/utils/eglib/gmain.h,v
+retrieving revision 1.12
+diff -u -p -r1.12 gmain.h
+--- eglib/gmain.h	3 May 2007 15:41:43 -0000	1.12
++++ eglib/gmain.h	25 May 2007 12:28:38 -0000
+@@ -191,6 +191,7 @@ int g_slist_length(GSList *list);
+ 
+ void g_slist_foreach(GSList *list, GFunc func, void *user_data);
+ void g_slist_free(GSList *list);
++GSList *g_slist_delete_link (GSList *list, GSList *link);
+ 
+ /* End GSList declarations */
+ 
+Index: hcid/dbus-sdp.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/hcid/dbus-sdp.c,v
+retrieving revision 1.71
+diff -u -p -r1.71 dbus-sdp.c
+--- hcid/dbus-sdp.c	3 May 2007 11:49:43 -0000	1.71
++++ hcid/dbus-sdp.c	25 May 2007 12:28:38 -0000
+@@ -270,6 +270,7 @@ sdp_service_t sdp_service[] = {
+ 	{ "fax",	FAX_SVCLASS_ID,			"Fax"			},
+ 	{ "spp",	SERIAL_PORT_SVCLASS_ID,		"Serial Port"		},
+ 	{ "hsp",	HEADSET_SVCLASS_ID,		"Headset"		},
++	{ "hcrp",	HCR_PRINT_SVCLASS_ID,		"Hardcopy Cable Replacement (Printer)" },
+ 	{ NULL }
+ };
+ 
+
+--=-XzjR165GmABbRxsOK1YP
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -299,7 +719,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0529062130==
+--=-XzjR165GmABbRxsOK1YP
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -310,4 +730,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============0529062130==--
+--=-XzjR165GmABbRxsOK1YP--
