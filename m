@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <c49421c50705271535q7362d2wcf02c917f45e91cc@mail.gmail.com>
-Date: Sun, 27 May 2007 19:35:12 -0300
-From: "Loreno Oliveira" <lorenooliveira@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Date: Fri, 25 May 2007 20:57:33 +0200
+From: Michael Mauch <michael.mauch@gmx.de>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20070525185733.GA9401@elmicha>
 MIME-Version: 1.0
-Subject: [Bluez-users] l2cap question
+Subject: [Bluez-users] Using Bluez as a fake Bluetooth keyboard
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,58 +14,46 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0573174798=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0573174798==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_133650_5402519.1180305312569"
-
-------=_Part_133650_5402519.1180305312569
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 Hi,
 
-is there anyway of creating l2cap sockets over already existent baseband
-connections?
+I'm trying to use my computer as a fake Bluetooth keyboard for a laptop
+running Windows XP with Toshiba's Bluetooth stack.
 
-Regards,
+With Collin Mulliner's xkbd-bthid [1] it works if I start xkbdbthid.sh
+(as root) on my computer and "sudo hidd --search" on a Linux laptop.
 
-Loreno
+That Windows laptop doesn't even try to really connect. It sees the HID
+service on my computer and says "Prepare the connection to a Remote-HID
+and click OK" (what should I prepare there?!), and if I click OK it
+_immediately_ says "Error with the registry" or "Error trying to register"
+(I don't understand what they mean with "Fehler bei der Registrierung").
 
-------=_Part_133650_5402519.1180305312569
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+At that point, hcidump sees not a single byte flying through the air.
 
-Hi,<br><br>is there anyway of creating l2cap sockets over already existent baseband connections?<br><br>Regards,<br><br>Loreno<br>
+Perhaps before clicking OK, the keyboard is supposed to search for a
+HID host and connect on its own? 
 
-------=_Part_133650_5402519.1180305312569--
+How could I do that with Bluez?
+
+I'm using Bluez 3.10/3.11.
+
+Regards...
+		Michael
 
 
---===============0573174798==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+
+[1]: http://www.mulliner.org/bluetooth/xkbdbthid.php
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0573174798==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0573174798==--
