@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sat, 26 May 2007 19:15:39 +0200
-From: Matthias Hensler <matthias@wspse.de>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20070526171539.GA16843@kobayashi-maru.wspse.de>
-MIME-Version: 1.0
-Subject: [Bluez-devel] bluetooth-audio and bug in a2dpd (Patch included)
-Reply-To: Matthias Hensler <matthias@wspse.de>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <46580A33.3030701@idlum.be>
+References: <46580A33.3030701@idlum.be>
+Date: Sat, 26 May 2007 13:01:29 +0200
+Message-Id: <1180177290.21432.42.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] New Serial DBus API - how to choose dongle used?
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -15,138 +16,65 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1779493705=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Pierre-Yves,
 
---===============1779493705==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="JP+T4n/bALQSJXh8"
-Content-Disposition: inline
+> Since bluez-utils v3.10, the new Serial API is included, and the 
+> previous RFCOMM API has been removed. The first semms to functionnaly 
+> replace the latter.
+> 
+> If I'm right, some calls previously done in the RFCOMM hierarchy now 
+> have to be done in the Serial one. For some of them, changes look like this:
+> 
+> RFCOMM: String Connect(String address, String service);
+> Serial: String ConnectService(String address, String pattern);
+> 
+> RFCOMM: String ConnectByChannel(String address, byte channel);
+> Serial: No equivalent so far
 
+simply use ConnectService(<bdaddr>, channel). The pattern matching works
+the that if you give a decimal number that it connects to the specified
+channel.
 
---JP+T4n/bALQSJXh8
-Content-Type: multipart/mixed; boundary="0OAP2g/MAC+5xKAE"
-Content-Disposition: inline
+> RFCOMM: void Disconnect(String device);
+> Serial: void DisconnectService(String device);
+> 
+> RFCOMM: void CancelConnect(String address, String service);
+> Serial: void CancelConnectService(String address, String pattern);
+> 
+> Apart for the missing "ConnectByChannel", it seems looks indeed very 
+> similar.
 
+It is fully compatible.
 
---0OAP2g/MAC+5xKAE
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
+> But there is somethig different: object path for RFCOMM was 
+> /org/bluez/{hci0,hci1,...} (eg. one RFCOMM object for each physical 
+> Adapter). But according to the doc, object path for Serial is 
+> /org/bluez/serial (eg, IIUC one single Manager).
+> 
+> So, my question: how do I choose which dongle to use to perform the 
+> connection with the new implementation, in case several are connected to 
+> the system?
 
-Hi!
+We don't support this. At least not yet. At some point, we might have
+additional methods that let you choose a source address. However that is
+not our priority at the moment.
 
-Playing with the current plugz from CVS and a2dpd I experienced a lot of
-choppy audio with a BW-HF02 bluetooth audio receiver. I tracked down the
-problem to the transmit loop in a2dpd_output_a2dp.c. My receiver has an
-own buffer which runs full after around 3-4 seconds. In that case the
-write will fail with EAGAIN. The loop should take care of that and
-retry, however errno gets lost in the current implementation, so no
-single retry is made.
+Regards
 
-Furthermore there is only one retry round and a too small usleep value.
-To make a2dpd finally work without any problems I had to fix the retry
-issue, increase the usleep to 150ms and try up to 200 times again. A
-patch for this is attached.
-
-Please note that this is only a quick, but no optimal fix. In case of
-XMMS for example the spectrum analyzer is not smooth while a2dpd is
-spending its time in the loop waiting for the receiver to have some new
-free bufferspace.
-
-Without my patch it goes: 4 seconds filling the buffer then breaking
-because of a full buffer interrupting the audio for around 1-2 seconds
-(the connection to the receiver is closed and opened again).
-
-With my patch it is: 4 seconds filling the buffer, waiting up to 500ms
-(spectrum analyzer in XMMS stops), 2-3 seconds filling the buffer
-(spectrum analyzer runs smoothly), waiting again for 500ms, and so on.
-
-A proper solution would be to fill the buffer more constantly using a
-kind of dynamic adaption (I tried a delay of 10ms after every transmit
-which was a satisfying solution for my receiver).
-
-Regards,
-Matthias
-
---0OAP2g/MAC+5xKAE
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: attachment; filename="a2dpd-retry-fix.patch"
-Content-Transfer-Encoding: quoted-printable
-
---- plugz/alsa-plugins/a2dpd/a2dpd_output_a2dp.c.orig	2007-05-26 17:51:01.0=
-00000000 +0200
-+++ plugz/alsa-plugins/a2dpd/a2dpd_output_a2dp.c	2007-05-26 19:14:57.000000=
-000 +0200
-@@ -475,21 +475,23 @@
- 				// However, we may safely simulate a failed write
- 				if (!a2dp->pause_writing) {
- 					int count =3D 0;
-+					int retry =3D 0;
- 					static struct timeval send_date =3D { 0,0 };
- 					static struct timeval prev_date =3D { 0,0 };
- 					struct timeval send_delay =3D { 0,0 };
- 					do {
- 						gettimeofday(&send_date, NULL);
- 						written =3D write(a2dp->sk, a2dp->buf, a2dp->len);
-+						retry =3D (errno =3D=3D EAGAIN);
-=20
- 						if(prev_date.tv_sec !=3D 0) {
- 							timersub(&send_date, &prev_date, &send_delay);
- 							DBG8("send (delay=3D%ld ms)", (long)(send_delay.tv_sec*1000 + send_=
-delay.tv_usec/1000));
- 						}
- 						prev_date =3D send_date;
--						if(written < 0 && errno =3D=3D EAGAIN)
--							usleep(1);
--					} while (count++ < 2 && written < 0 && errno =3D=3D EAGAIN);
-+						if(written < 0 && retry)
-+							usleep(150000);
-+					} while (count++ < 200 && written < 0 && retry);
-=20
- 					// Send our data
- 					if (written !=3D a2dp->len) {
-
---0OAP2g/MAC+5xKAE--
-
---JP+T4n/bALQSJXh8
-Content-Type: application/pgp-signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.7 (GNU/Linux)
-
-iQCVAwUBRlhrNIagCBsispUdAQJArgP+LzXssB8hN2mwerkN4+Za7HOAwnUO+qyz
-2P69bRf5ZB1RtY5ElbnqxXPgvF5U1n0TPnNvSrWjBnzdmgfo4DdjMPhoCie9x07w
-ajjmK0F+fP3Oeub9kweOGdmIZk0/GObeFYibHvP0QG8qIMl3ldDdgFk/q2Q8Zhp2
-MgBVZUNmn8w=
-=Uhcm
------END PGP SIGNATURE-----
-
---JP+T4n/bALQSJXh8--
+Marcel
 
 
---===============1779493705==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1779493705==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1779493705==--
