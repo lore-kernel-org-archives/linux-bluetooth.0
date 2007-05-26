@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4658C395.6010908@jlab.org>
-Date: Sat, 26 May 2007 19:32:37 -0400
-From: Chris Carlin <carlin@jlab.org>
+Message-ID: <4658713F.1020401@idlum.be>
+Date: Sat, 26 May 2007 19:41:19 +0200
+From: Pierre-Yves Paulus <py@idlum.be>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <20070526171539.GA16843@kobayashi-maru.wspse.de>
-In-Reply-To: <20070526171539.GA16843@kobayashi-maru.wspse.de>
-Subject: Re: [Bluez-devel] bluetooth-audio and bug in a2dpd (Patch included)
+References: <46580A33.3030701@idlum.be>
+	<1180177290.21432.42.camel@aeonflux.holtmann.net>
+In-Reply-To: <1180177290.21432.42.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] New Serial DBus API - how to choose dongle used?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,26 +21,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Matthias Hensler wrote:
-> Hi!
+Hi Marcel,
+
+>> RFCOMM: String ConnectByChannel(String address, byte channel);
+>> Serial: No equivalent so far
 > 
-> Playing with the current plugz from CVS and a2dpd I experienced a lot of
-> choppy audio with a BW-HF02 bluetooth audio receiver. I tracked down the
-> problem to the transmit loop in a2dpd_output_a2dp.c. My receiver has an
-> own buffer which runs full after around 3-4 seconds. In that case the
-> write will fail with EAGAIN. The loop should take care of that and
-> retry, however errno gets lost in the current implementation, so no
-> single retry is made.
+> simply use ConnectService(<bdaddr>, channel). The pattern matching works
+> the that if you give a decimal number that it connects to the specified
+> channel.
 
-Great!
+Nice!
 
-This modification made my Motorola S805 headphones usable and my 
-Creative CB2530 headphones almost so (neither was usable at all before).
+>> So, my question: how do I choose which dongle to use to perform the 
+>> connection with the new implementation, in case several are connected to 
+>> the system?
+> 
+> We don't support this. At least not yet. At some point, we might have
+> additional methods that let you choose a source address. However that is
+> not our priority at the moment.
 
-I had a feeling it was something sort of small but I was on the wrong 
-track with finding the cause for the EAGAIN.
+Ouch, bad luck for me. I hope I'll have time to see if I can add this 
+functionnality myself, as I definitely need it. Don't know however if I 
+don't lack the ability and knowledge, as I never worked inside BlueZ 
+source. How would you rate the difficulty of the work involved to 
+implement such a behaviour?
 
-~Chris
+At the moment, the current "no choice" implementation simply always use 
+hci0?
+
+
+Best Regards,
+Pierre-Yves
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
