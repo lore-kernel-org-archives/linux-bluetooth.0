@@ -1,13 +1,19 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Daniel Gollub <dgollub@suse.de>
-To: bluez-devel@lists.sourceforge.net
-Date: Mon, 28 May 2007 01:19:47 +0200
-References: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
-In-Reply-To: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
-MIME-Version: 1.0
-Message-Id: <200705280119.47962.dgollub@suse.de>
-Cc: opsidao@gmail.com
-Subject: Re: [Bluez-devel] Suggesting bluez_pinhelper
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1180277003.3030.18.camel@cookie.hadess.net>
+References: <20060222091231.GM19185@null.research.nokia.com>
+	<1140607245.4519.7.camel@localhost>
+	<20060222125425.GQ19185@null.research.nokia.com>
+	<20060224110357.GT19185@null.research.nokia.com>
+	<1141188501.29216.1.camel@localhost>
+	<1180265456.3030.9.camel@cookie.hadess.net>
+	<1180268229.21432.63.camel@aeonflux.holtmann.net>
+	<1180277003.3030.18.camel@cookie.hadess.net>
+Date: Sun, 27 May 2007 23:22:48 +0100
+Message-Id: <1180304568.3030.26.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Soft lockup
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,59 +27,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sunday 27 May 2007 15:52:30 Gilboa Davara wrote:
-> As some of you may be aware, the current version of kdebluetooth has no
-> support for recent (>= 3.9) bluez DBUS interface.
-Thats correct - it's even quite unmaintained for a while...
-I started at the #1 BlueZ Meeting a kdebluetooth-dbus-integration branch:
+On Sun, 2007-05-27 at 15:43 +0100, Bastien Nocera wrote:
+> Hey Marcel,
+> 
+> On Sun, 2007-05-27 at 14:17 +0200, Marcel Holtmann wrote:
+> > > Here's what I could capture from the i386 crash:
+> > > BUG warning at lib/kref.c:32/kref_get()
+> > 
+> > any chance you can test a 2.6.22-rc3 kernel. We fixed some potential
+> > problems in RFCOMM and Greg pushed some driver model changes that might
+> > make this go away. I really have no idea what triggers this at the
+> > moment. However I would like to see a simple reproducer.
+> 
+> Works with 2.6.22-rc3 (for a meaning of works, my code doesn't seem to
+> work, but that's a different matter).
 
-http://websvn.kde.org/branches/work/kdebluetooth-dbus-integration/
+I forgot to mention that the serial service doesn't seem to create any
+physical devices (ie. test-serial doesn't create a /dev/rfcomm0 despite
+it being the return value of the ConnectService function).
 
-The libkbluetooth got a full rewrite and wraps the full BlueZ DBus API (and 
-the Input Service so far ...) - main goal: avoid any linking against 
-bluez-libs. 
+Is that normal?
 
-The kio_slaves (kio_bluetooth, kio_sdp) and kcm_btpaired got ported to the new 
-libkbluetooth API. The kbluetoothd got rewrite and renamed to kbluetooth and 
-is now a "simple" tray icon application like bluez-gnome. And acts as 
-(Default) Passkey Agent and Authorization Agent. It also includes a (very 
-experimental) bluetooth input device wizard which makes use of the BlueZ 
-Input Service.
+-- 
+Bastien Nocera <hadess@hadess.net> 
 
-Actually i planned to make the first release last week ... but i run out of 
-time. Feel free to give the latest SVN revision a try...
-
-> As it stands I got two options:
-> A. Use this code as a stop-gate until qt-dbus + kdebluetooth is released
-> (KDE 4?) maintaining this code as a Fedora-only blob.
-KDE4, got already some progress in supporting the BlueZ DBus API. There is an 
-experimental Solid Management backend for Bluetooth (trunk/kdebase) which 
-includes also a DBus based BlueZ. There is still some work left - but it has 
-also an initial support for the input service. The Passkey/Authorization 
-Agent support is still missing in KDE4, but will be implementend hopefully 
-quite soon. Last but not least:
-
-- Juan started porting the kio_slaves for KDE4 based on Solid. He will do more 
-work on KDE4 Bluetooth implementation during his GSoC project.
-- Tom Patzig is taking care about the input wizard for KDE3 and most other 
-missing UI implementation (services, trusted users, ...) - later also KDE4 
-stuff.
-
-I guess one of them will do also the implementation of the 
-Passkey/Authorization Agent in the UI - as soon the solid implementation is 
-done.
-
-The kdebluetooth-dbus-integration also includes a rewrite of kio_obex (called 
-kio_obex2) from the kmobiletools project. kio_obex2 isn't based anymore on 
-some own libqobex/libkobex implementation ... just based on obexftp and 
-supports finally OBEX transport via USB.
-
-Btw. if there is any issue/problem with the DBus-"SUSE patch" let me know - in 
-most cases it's my fault. It's a simple (async) implementation of a Default 
-Passkey Agent and seems to work quite well.
-
-best regards,
-Daniel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
