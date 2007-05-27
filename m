@@ -1,12 +1,19 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4659B8EC.3050708@gentoo.org>
-Date: Sun, 27 May 2007 19:59:24 +0300
-From: =?UTF-8?B?UGV0dGVyaSBSw6R0eQ==?= <betelgeuse@gentoo.org>
-MIME-Version: 1.0
-To: gilboad@gmail.com, BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
-In-Reply-To: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
-Subject: Re: [Bluez-devel] Suggesting bluez_pinhelper
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1180277003.3030.18.camel@cookie.hadess.net>
+References: <20060222091231.GM19185@null.research.nokia.com>
+	<1140607245.4519.7.camel@localhost>
+	<20060222125425.GQ19185@null.research.nokia.com>
+	<20060224110357.GT19185@null.research.nokia.com>
+	<1141188501.29216.1.camel@localhost>
+	<1180265456.3030.9.camel@cookie.hadess.net>
+	<1180268229.21432.63.camel@aeonflux.holtmann.net>
+	<1180277003.3030.18.camel@cookie.hadess.net>
+Date: Sun, 27 May 2007 18:28:28 +0200
+Message-Id: <1180283308.21432.67.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Soft lockup
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,33 +27,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Gilboa Davara kirjoitti:
-> Hello all,
+Hi Bastien,
+
+> > > Here's what I could capture from the i386 crash:
+> > > BUG warning at lib/kref.c:32/kref_get()
+> > 
+> > any chance you can test a 2.6.22-rc3 kernel. We fixed some potential
+> > problems in RFCOMM and Greg pushed some driver model changes that might
+> > make this go away. I really have no idea what triggers this at the
+> > moment. However I would like to see a simple reproducer.
 > 
-> I'm currently trying to get kdebluetooth reviewed into Fedora Core (and
-> RHEL).
-> As some of you may be aware, the current version of kdebluetooth has no
-> support for recent (>= 3.9) bluez DBUS interface.
+> Works with 2.6.22-rc3 (for a meaning of works, my code doesn't seem to
+> work, but that's a different matter).
 
-Works just fine here.
-http://dev.gentoo.org/~betelgeuse/kdebluetoothpin.png
+so this is actually fixed now within the upstream kernel. This also
+means that I didn't really bother about older kernels.
 
-betelgeuse@pena /mnt/checkouts/foobar/openjdk-trunk $ emerge --nodeps
--pv bluez-utils kdebluetooth
+> I can reproduce the crash at will on 2 different machines. It might be
+> easier to create a minimal reproducer if you have a debug version of the
+> serial service.
 
-These are the packages that would be merged, in order:
+Actually using SIGUSR2 should switch debugging mode on/off, but I think
+we forgot to introduce that within the service implementation. Need to
+fix that at some point.
 
-[ebuild   R   ] net-wireless/bluez-utils-3.11  USE="cups hal usb -debug
--examples -old-daemons* -test-programs" 0 kB
-[ebuild   R   ] net-wireless/kdebluetooth-1.0_beta2-r2  USE="xinerama
--arts -debug -irmc" LINGUAS="fi -bg -br -ca -cs -cy -da -de -el -en_GB
--es -et -fr -ga -gl -hu -is -it -ja -ka -lt -mt -nb -nl -nn -pa -pl -pt
--pt_BR -ro -ru -rw -sk -sr -sr@Latn -sv -ta -tr -uk -zh_CN" 0 kB
+Regards
 
-Regards,
-Petteri
---
-Gentoo Bluez maintainer
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
