@@ -1,20 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1180283308.21432.67.camel@aeonflux.holtmann.net>
-References: <20060222091231.GM19185@null.research.nokia.com>
-	<1140607245.4519.7.camel@localhost>
-	<20060222125425.GQ19185@null.research.nokia.com>
-	<20060224110357.GT19185@null.research.nokia.com>
-	<1141188501.29216.1.camel@localhost>
-	<1180265456.3030.9.camel@cookie.hadess.net>
-	<1180268229.21432.63.camel@aeonflux.holtmann.net>
-	<1180277003.3030.18.camel@cookie.hadess.net>
-	<1180283308.21432.67.camel@aeonflux.holtmann.net>
-Date: Sun, 27 May 2007 23:16:10 +0100
-Message-Id: <1180304170.3030.23.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Soft lockup
+Message-ID: <9050516b0705271141v10dc2b25i83b43275acea480@mail.gmail.com>
+Date: Sun, 27 May 2007 21:41:40 +0300
+From: "Gilboa Davara" <gilboad@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4659C461.8070405@gentoo.org>
+MIME-Version: 1.0
+References: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
+	<4659B8EC.3050708@gentoo.org>
+	<1180287117.30116.17.camel@gilboa-work-dev.localdomain>
+	<4659C461.8070405@gentoo.org>
+Subject: Re: [Bluez-devel] Suggesting bluez_pinhelper
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,43 +19,40 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sun, 2007-05-27 at 18:28 +0200, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > > > Here's what I could capture from the i386 crash:
-> > > > BUG warning at lib/kref.c:32/kref_get()
-> > > 
-> > > any chance you can test a 2.6.22-rc3 kernel. We fixed some potential
-> > > problems in RFCOMM and Greg pushed some driver model changes that might
-> > > make this go away. I really have no idea what triggers this at the
-> > > moment. However I would like to see a simple reproducer.
-> > 
-> > Works with 2.6.22-rc3 (for a meaning of works, my code doesn't seem to
-> > work, but that's a different matter).
-> 
-> so this is actually fixed now within the upstream kernel. This also
-> means that I didn't really bother about older kernels.
+On 5/27/07, Petteri R=E4ty <betelgeuse@gentoo.org> wrote:
+> Gilboa Davara kirjoitti:
+> > AFAIK there are 3 possibles solutions to this problem.
+> > A. Patch bluez-utils' passkey-agent (adding old-style passkey support)
+> > B. Use the un-official (?) SUSE patch that adds DBUS support to
+> > kdebluetooth.
+> > C. Keep kdebluetooth and bluez-utils as they are and create an out-side
+> > wrapper.
+> >
+> > Do you have any idea which course Gentoo used?
+> >
+> > - Gilboa
+> >
+>
+> http://viewcvs.gentoo.org/viewcvs.py/gentoo-x86/net-wireless/kdebluetooth=
+/kdebluetooth-1.0_beta2-r2.ebuild?rev=3D1.1&view=3Dlog
+>
 
-Any plans for a backport? It would be most useful, at least for testing.
+A short comment about the OpenSUSE patch.
+Unless Gentoo's kdebluetooth maintainer is QT/KDE/CPP programmer, he's
+taking an unreasonable risk.
+If I'm using a wrapper and something breaks, it's either in the
+wrapper code (and I'm the one to blame) or in kdebluetooth (which can
+be reported upstream to kmobiletools).
+... But if an unsupported patch is used, you're S.O.L.
+You can't report the bug upstream (not their code) and you can't
+report the bug to SUSE people. (Not their distro)
+In short, you get to keep all the broken pieces....
 
-> > I can reproduce the crash at will on 2 different machines. It might be
-> > easier to create a minimal reproducer if you have a debug version of the
-> > serial service.
-> 
-> Actually using SIGUSR2 should switch debugging mode on/off, but I think
-> we forgot to introduce that within the service implementation. Need to
-> fix that at some point.
-
-It would also be useful if the different functions could have debugging
-output of their different entry points, after argument parsing.
-
--- 
-Bastien Nocera <hadess@hadess.net> 
-
+- Gilboa
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
