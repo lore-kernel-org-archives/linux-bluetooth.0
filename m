@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4659B8EC.3050708@gentoo.org>
+Date: Sun, 27 May 2007 19:59:24 +0300
+From: =?UTF-8?B?UGV0dGVyaSBSw6R0eQ==?= <betelgeuse@gentoo.org>
+MIME-Version: 1.0
 To: gilboad@gmail.com, BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
 References: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
-Date: Sun, 27 May 2007 18:36:36 +0200
-Message-Id: <1180283796.21432.73.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+In-Reply-To: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
 Subject: Re: [Bluez-devel] Suggesting bluez_pinhelper
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,41 +20,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Gilboa,
-
+Gilboa Davara kirjoitti:
+> Hello all,
+> 
 > I'm currently trying to get kdebluetooth reviewed into Fedora Core (and
 > RHEL).
 > As some of you may be aware, the current version of kdebluetooth has no
 > support for recent (>= 3.9) bluez DBUS interface.
-> As an interim solution I decided to write a small wrapper that can be
-> used as a bridge between kdebluetooth's kbluepin and bluez-utils 3.9
-> (running on the about to be released F7) - basing my work around
-> bluez-utils' passkey-agent.
-> While working on it I decided to further expand it - making it
-> configurable and script-able which in turns, makes it entirely possible
-> to create passkey dialog boxes in non-X modes (using 'dialog') or in
-> low-end machines with minimal WM's (using 'zenity' in
-> IceWM/Fluxbox/etc).
-> 
-> As it stands I got two options:
-> A. Use this code as a stop-gate until qt-dbus + kdebluetooth is released
-> (KDE 4?) maintaining this code as a Fedora-only blob.
-> B. If its of any use to anyone (read, you), get it submitted into
-> bluez-utils while maintaining it (and expending it - if so required)
-> upstream.
 
-take this up with the KDE Bluetooth guys since it the Bluetooth support
-for KDE 3.x got basically abandoned. It is their job to actually fix it
-and provide whatever they need to make Bluetooth working. I am not
-really open for crazy hacks. The passkey-agent.c source code is mainly
-an example on how to write a passkey agent and was used for initial
-testing.
+Works just fine here.
+http://dev.gentoo.org/~betelgeuse/kdebluetoothpin.png
 
-Regards
+betelgeuse@pena /mnt/checkouts/foobar/openjdk-trunk $ emerge --nodeps
+-pv bluez-utils kdebluetooth
 
-Marcel
+These are the packages that would be merged, in order:
 
+[ebuild   R   ] net-wireless/bluez-utils-3.11  USE="cups hal usb -debug
+-examples -old-daemons* -test-programs" 0 kB
+[ebuild   R   ] net-wireless/kdebluetooth-1.0_beta2-r2  USE="xinerama
+-arts -debug -irmc" LINGUAS="fi -bg -br -ca -cs -cy -da -de -el -en_GB
+-es -et -fr -ga -gl -hu -is -it -ja -ka -lt -mt -nb -nl -nn -pa -pl -pt
+-pt_BR -ro -ru -rw -sk -sr -sr@Latn -sv -ta -tr -uk -zh_CN" 0 kB
 
+Regards,
+Petteri
+--
+Gentoo Bluez maintainer
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
