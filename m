@@ -1,12 +1,18 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Gilboa Davara <gilboad@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Sun, 27 May 2007 16:52:30 +0300
-Message-Id: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1180265456.3030.9.camel@cookie.hadess.net>
+References: <20060222091231.GM19185@null.research.nokia.com>
+	<1140607245.4519.7.camel@localhost>
+	<20060222125425.GQ19185@null.research.nokia.com>
+	<20060224110357.GT19185@null.research.nokia.com>
+	<1141188501.29216.1.camel@localhost>
+	<1180265456.3030.9.camel@cookie.hadess.net>
+Date: Sun, 27 May 2007 14:17:09 +0200
+Message-Id: <1180268229.21432.63.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Suggesting bluez_pinhelper
-Reply-To: gilboad@gmail.com,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Soft lockup
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,38 +25,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello all,
+Hi Bastien,
 
-I'm currently trying to get kdebluetooth reviewed into Fedora Core (and
-RHEL).
-As some of you may be aware, the current version of kdebluetooth has no
-support for recent (>= 3.9) bluez DBUS interface.
-As an interim solution I decided to write a small wrapper that can be
-used as a bridge between kdebluetooth's kbluepin and bluez-utils 3.9
-(running on the about to be released F7) - basing my work around
-bluez-utils' passkey-agent.
-While working on it I decided to further expand it - making it
-configurable and script-able which in turns, makes it entirely possible
-to create passkey dialog boxes in non-X modes (using 'dialog') or in
-low-end machines with minimal WM's (using 'zenity' in
-IceWM/Fluxbox/etc).
+> > > Now I have more information about this problem.
+> > > 
+> > > I had debuggin enabled in net/bluetooth/rfcomm/core.c and I noticed that
+> > > for some reson rfcomm_dlc_clear_timer() is called for allready freed
+> > > dlc and lock_timer_base() gets stuck because it's trying to use invalid
+> > > timer pointer. I also tried to reproduce bug in i386 without success.
+> > > Also then debugging is on the bug much harder to reproduse. To me this
+> > > looks like dlc locking doens't work as it should work.
+> > > 
+> > > And other notice. rfcomm_dlc_clear_timeri() uses timer_pending()
+> > > together with del_timer() which allready calls timer_pending(). So
+> > > timer_pending() is useless in rfcomm_dlc_clear_timer().
+> > 
+> > this all looks like we are missing a memory barrier somewhere. This
+> > could also be the reason why it only gets triggered on OMAP systems. Any
+> > further ideas?
+> 
+> I'm getting the same kind of trace (on both x86-64 and i386) when
+> testing the gnome-vfs2-obexftp package with a patch to use the new
+> serial service[1].
+> 
+> It happens on 2.6.19-1.2895.fc6 (x86-64) and 2.6.21-1.3191.fc7 (i386).
+> 
+> Here's what I could capture from the i386 crash:
+> BUG warning at lib/kref.c:32/kref_get()
 
-As it stands I got two options:
-A. Use this code as a stop-gate until qt-dbus + kdebluetooth is released
-(KDE 4?) maintaining this code as a Fedora-only blob.
-B. If its of any use to anyone (read, you), get it submitted into
-bluez-utils while maintaining it (and expending it - if so required)
-upstream.
+any chance you can test a 2.6.22-rc3 kernel. We fixed some potential
+problems in RFCOMM and Greg pushed some driver model changes that might
+make this go away. I really have no idea what triggers this at the
+moment. However I would like to see a simple reproducer.
 
-Comments?
-Is it any use for you?
+Regards
 
-http://gilboadavara.thecodergeek.com/bluez_pinhelper-0.1.tgz
-
-P.S. this code was tested against i386/x86_64 Fedora Rawhide installs
-running bluez-libs 3.9. I've yet to port it to 3.11.
-
-- Gilboa
+Marcel
 
 
 
