@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Gilboa Davara <gilboad@gmail.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4659B8EC.3050708@gentoo.org>
+In-Reply-To: <1180283796.21432.73.camel@aeonflux.holtmann.net>
 References: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
-	<4659B8EC.3050708@gentoo.org>
-Date: Sun, 27 May 2007 20:31:57 +0300
-Message-Id: <1180287117.30116.17.camel@gilboa-work-dev.localdomain>
+	<1180283796.21432.73.camel@aeonflux.holtmann.net>
+Date: Sun, 27 May 2007 20:28:04 +0300
+Message-Id: <1180286884.30116.12.camel@gilboa-work-dev.localdomain>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Suggesting bluez_pinhelper
 Reply-To: gilboad@gmail.com,
@@ -18,53 +18,52 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sun, 2007-05-27 at 19:59 +0300, Petteri R=E4ty wrote:
-> Gilboa Davara kirjoitti:
-> > Hello all,
-> > =
+Marcel,
 
-> > I'm currently trying to get kdebluetooth reviewed into Fedora Core (and
-> > RHEL).
-> > As some of you may be aware, the current version of kdebluetooth has no
-> > support for recent (>=3D 3.9) bluez DBUS interface.
-> =
+> 
+> take this up with the KDE Bluetooth guys since it the Bluetooth support
+> for KDE 3.x got basically abandoned. It is their job to actually fix it
+> and provide whatever they need to make Bluetooth working. 
 
-> Works just fine here.
-> http://dev.gentoo.org/~betelgeuse/kdebluetoothpin.png
-> =
+It's their prerogative to spend their efforts on their up-coming KDE4
+port.
+While I know that SUSE had created a semi-working (at least by my
+experience) dbus support, I rather not p*ck around with it, as I have
+little experience with QT (and I don't really like CPP) and I'll zero
+ability to fix it, if-and-when-things break.
 
-> betelgeuse@pena /mnt/checkouts/foobar/openjdk-trunk $ emerge --nodeps
-> -pv bluez-utils kdebluetooth
-> =
+Once it's official, (or once the SUSE patch works for me...) I'll be the
+first man to drop this hack.
 
-> These are the packages that would be merged, in order:
-> =
+> I am not
+> really open for crazy hacks. 
 
-> [ebuild   R   ] net-wireless/bluez-utils-3.11  USE=3D"cups hal usb -debug
-> -examples -old-daemons* -test-programs" 0 kB
-> [ebuild   R   ] net-wireless/kdebluetooth-1.0_beta2-r2  USE=3D"xinerama
-> -arts -debug -irmc" LINGUAS=3D"fi -bg -br -ca -cs -cy -da -de -el -en_GB
-> -es -et -fr -ga -gl -hu -is -it -ja -ka -lt -mt -nb -nl -nn -pa -pl -pt
-> -pt_BR -ro -ru -rw -sk -sr -sr@Latn -sv -ta -tr -uk -zh_CN" 0 kB
-> =
+Why crazy hack?
 
-> Regards,
-> Petteri
-> --
-> Gentoo Bluez maintainer
+kdebluetooth aside, If -I- (being, among others, the IceWM Fedora
+maintainer) can use this wrapper (coupled with zenity and/or xdialog)
+and create a workable out-of-the-box bluetooth experience on IceWM
+(without the bluez-gnome dep-chain) and other low-end WM's - doesn't it
+enhance the user experience?
 
-AFAIK there are 3 possibles solutions to this problem.
-A. Patch bluez-utils' passkey-agent (adding old-style passkey support)
-B. Use the un-official (?) SUSE patch that adds DBUS support to
-kdebluetooth.
-C. Keep kdebluetooth and bluez-utils as they are and create an out-side
-wrapper.
+> The passkey-agent.c source code is mainly
+> an example on how to write a passkey agent and was used for initial
+> testing.
 
-Do you have any idea which course Gentoo used?
+... And hopefully I took it, expanded it, and put it to good use.
+
+At best, I managed to enhance the bluetooth experience on
+low-end/older/minimal distro/machines/configuration/etc. At worst,
+(after some clean up) I created yet-another-how-to-do-passkey example.
+
+Having said all that, I'm far from forcing the issue down your throat...
+I merely suggesting. If you don't like the idea, I'll keep it
+Fedora-only, until a working DBUS patch is released... or until KDE4
+comes out.
 
 - Gilboa
 
