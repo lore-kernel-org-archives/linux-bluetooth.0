@@ -1,7 +1,7 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1180277003.3030.18.camel@cookie.hadess.net>
+In-Reply-To: <1180283308.21432.67.camel@aeonflux.holtmann.net>
 References: <20060222091231.GM19185@null.research.nokia.com>
 	<1140607245.4519.7.camel@localhost>
 	<20060222125425.GQ19185@null.research.nokia.com>
@@ -10,8 +10,9 @@ References: <20060222091231.GM19185@null.research.nokia.com>
 	<1180265456.3030.9.camel@cookie.hadess.net>
 	<1180268229.21432.63.camel@aeonflux.holtmann.net>
 	<1180277003.3030.18.camel@cookie.hadess.net>
-Date: Sun, 27 May 2007 23:22:48 +0100
-Message-Id: <1180304568.3030.26.camel@cookie.hadess.net>
+	<1180283308.21432.67.camel@aeonflux.holtmann.net>
+Date: Sun, 27 May 2007 23:16:10 +0100
+Message-Id: <1180304170.3030.23.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Soft lockup
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -27,26 +28,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sun, 2007-05-27 at 15:43 +0100, Bastien Nocera wrote:
-> Hey Marcel,
+On Sun, 2007-05-27 at 18:28 +0200, Marcel Holtmann wrote:
+> Hi Bastien,
 > 
-> On Sun, 2007-05-27 at 14:17 +0200, Marcel Holtmann wrote:
-> > > Here's what I could capture from the i386 crash:
-> > > BUG warning at lib/kref.c:32/kref_get()
+> > > > Here's what I could capture from the i386 crash:
+> > > > BUG warning at lib/kref.c:32/kref_get()
+> > > 
+> > > any chance you can test a 2.6.22-rc3 kernel. We fixed some potential
+> > > problems in RFCOMM and Greg pushed some driver model changes that might
+> > > make this go away. I really have no idea what triggers this at the
+> > > moment. However I would like to see a simple reproducer.
 > > 
-> > any chance you can test a 2.6.22-rc3 kernel. We fixed some potential
-> > problems in RFCOMM and Greg pushed some driver model changes that might
-> > make this go away. I really have no idea what triggers this at the
-> > moment. However I would like to see a simple reproducer.
+> > Works with 2.6.22-rc3 (for a meaning of works, my code doesn't seem to
+> > work, but that's a different matter).
 > 
-> Works with 2.6.22-rc3 (for a meaning of works, my code doesn't seem to
-> work, but that's a different matter).
+> so this is actually fixed now within the upstream kernel. This also
+> means that I didn't really bother about older kernels.
 
-I forgot to mention that the serial service doesn't seem to create any
-physical devices (ie. test-serial doesn't create a /dev/rfcomm0 despite
-it being the return value of the ConnectService function).
+Any plans for a backport? It would be most useful, at least for testing.
 
-Is that normal?
+> > I can reproduce the crash at will on 2 different machines. It might be
+> > easier to create a minimal reproducer if you have a debug version of the
+> > serial service.
+> 
+> Actually using SIGUSR2 should switch debugging mode on/off, but I think
+> we forgot to introduce that within the service implementation. Need to
+> fix that at some point.
+
+It would also be useful if the different functions could have debugging
+output of their different entry points, after argument parsing.
 
 -- 
 Bastien Nocera <hadess@hadess.net> 
