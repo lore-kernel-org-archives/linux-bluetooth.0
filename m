@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Tue, 29 May 2007 07:11:56 +1000
-References: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
-	<200705280939.31695.denis.kenzior@trolltech.com>
-	<200705281848.09618.dgollub@suse.de>
-In-Reply-To: <200705281848.09618.dgollub@suse.de>
+Date: Mon, 28 May 2007 22:10:52 +0200
+From: Filippo Giunchedi <filippo@esaurito.net>
+To: bluez-devel@lists.sf.net
+Message-ID: <20070528201052.GA5864@esaurito.net>
 MIME-Version: 1.0
-Message-Id: <200705290711.56349.denis.kenzior@trolltech.com>
-Subject: Re: [Bluez-devel] Suggesting bluez_pinhelper
+Cc: 426410@bugs.debian.org, 426410-submitter@bugs.debian.org
+Subject: [Bluez-devel] [bernat@luffy.cx: [Pkg-bluetooth-maintainers]
+	Bug#426410: bluez-utils: Once paired,
+	a device is granted all accesses]
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,61 +21,83 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Daniel,
+Hi,
+I'm forwarding this upstream so we can have an opinion.
 
-What are your plans with kdebluetooth?  Are you going to make KDE3 based 
-releases or wait until KDE4?  I'm asking since Qtopia Bluetooth is Qt4 based 
-and uses Qt DBUS bindings internally to communicate with BlueZ.
+thanks for your report,
+filippo
 
-> I have to take a deeper look on the implementation of the BlueZ DBUS
-> interface... is there any plan to wrap also BlueZ Service APIs like the
-> Input Service? Or is this already done?
->
+----- Forwarded message from Vincent Bernat <bernat@luffy.cx> -----
 
-Yes, we're planning Input service for 4.4 and PAN for 4.4.   Actually services 
-are probably the least useable by KDE the way they are now.  Mostly because 
-we use our own IPC mechanisms, they could probably be easily adapted to any 
-IPC mechanism though. 
+From: Vincent Bernat <bernat@luffy.cx>
+To: Debian Bug Tracking System <submit@bugs.debian.org>
+Message-ID: <20070528152146.21103.1798.reportbug@zoro.luffy.cx>
+X-Mailer: reportbug 3.38
+Date: Mon, 28 May 2007 17:21:46 +0200
+Subject: [Pkg-bluetooth-maintainers] Bug#426410: bluez-utils: Once paired,
+	a device is granted all accesses
+Reply-To: Vincent Bernat <bernat@luffy.cx>, 426410@bugs.debian.org
+Sender: pkg-bluetooth-maintainers-bounces+filippo=esaurito.net@lists.alioth.debian.org
 
-> Or you going to implement the Authorization Agent as well?
+Package: bluez-utils
+Version: 3.7-1
+Severity: wishlist
+Tags: security
 
-Yes, this only went non-experimental as of 3.10.1, so we're probably going to 
-add this in 4.4.
+Hi !
 
->
-> Actually i plan to implement all the services which are available by BlueZ
-> ... So it would be very interesting which BlueZ services get
-> implemented/used by Qtopia. Or should it be possible to make use of all
-> services via
-> QBluetoothAbstractService?
+I did not find any place to grant access to some services to a device
+and not some others. If it is not possible to tell which service a
+device can access, I think this is a major security drawback and that
+bluez stack should implement a way to define services access.
 
-The QBluetoothAbstractService is more of a framework class, to help build 
-service implementation and insure certain features are supported (starting / 
-stopping services mostly)  To use a service you still need to use an 
-interface class, very similar to BlueZ.  
+For example, I pair with a device to send him a file. I don't want him
+to be able to use my Internet access if dund is started. I don't want
+him to be able to access files from obexserver and I don't want him to
+be able to act as a keyboard for my host.
 
->
-> On which version of BlueZ will be Qtopia 4.3 based? bluez-utils 3.9 like
-> Qtopia 4.2?
+-- System Information:
+Debian Release: lenny/sid
+  APT prefers unstable
+  APT policy: (990, 'unstable'), (1, 'experimental')
+Architecture: i386 (i686)
 
-This is the most likely case.
+Kernel: Linux 2.6.21.1-zoro.15
+Locale: LANG=fr_FR@euro, LC_CTYPE=fr_FR@euro (charmap=ISO-8859-15)
+Shell: /bin/sh linked to /bin/bash
 
->
-> Are you going to keep the OBEX support or make use of the BlueZ transfer
-> service in the future?
+Versions of packages bluez-utils depends on:
+ii  dbus                         1.0.2-5     simple interprocess messaging syst
+ii  libbluetooth2                3.9-1       Library to use the BlueZ Linux Blu
+ii  libc6                        2.5-9       GNU C Library: Shared libraries
+ii  libdbus-1-3                  1.0.2-5     simple interprocess messaging syst
+ii  libusb-0.1-4                 2:0.1.12-7  userspace USB programming library
+ii  lsb-base                     3.1-23.1    Linux Standard Base 3.1 init scrip
+ii  makedev                      2.3.1-83    creates device files in /dev
+ii  module-init-tools            3.3-pre11-1 tools for managing Linux kernel mo
+ii  udev                         0.105-4     /dev/ and hotplug management daemo
 
-OBEX support in 4.2 is not that great, we improved it considerably in 4.3. It 
-wraps OpenOBEX, but makes it very easy to use.  We're planning to implement 
-FTP, PUSH, BPP and BIP profiles over OBEX using this infrastructure.  Some 
-(PUSH client/server, FTP client) are already done.
+Versions of packages bluez-utils recommends:
+pn  bluez-passkey-gnome           <none>     (no description available)
 
->
-> A separated package would be great...
+-- no debconf information
 
-OK will try prioritize this :)
 
-Regards,
--Denis
+_______________________________________________
+Pkg-bluetooth-maintainers mailing list
+Pkg-bluetooth-maintainers@lists.alioth.debian.org
+http://lists.alioth.debian.org/mailman/listinfo/pkg-bluetooth-maintainers
+
+----- End forwarded message -----
+
+filippo
+--
+Filippo Giunchedi - http://esaurito.net
+PGP key: 0x6B79D401
+random quote follows:
+
+All language designers are arrogant. Goes with the territory...
+-- Larry Wall
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
