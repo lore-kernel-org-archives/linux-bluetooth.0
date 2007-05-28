@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <465B4079.8000509@imperial.ac.uk>
-Date: Mon, 28 May 2007 21:50:01 +0100
-From: Konrad Kieling <konrad.kieling@imperial.ac.uk>
-MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <4656FDE4.5070001@imperial.ac.uk> <465AC8C7.1020502@imperial.ac.uk>
-	<1180360514.21432.102.camel@aeonflux.holtmann.net>
-In-Reply-To: <1180360514.21432.102.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] hid keyboard events get lost
+Date: Mon, 28 May 2007 11:16:15 -0400
+From: "Marcus C. Gottwald" <gottwald@inf.fu-berlin.de>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20070528151615.GA12492@mi.fu-berlin.de>
+References: <20070522161255.GA9813@robsims.com>
+	<20070522180817.GA24396@mi.fu-berlin.de>
+	<20070528001339.GB4055@robsims.com>
+Mime-Version: 1.0
+In-Reply-To: <20070528001339.GB4055@robsims.com>
+Subject: Re: [Bluez-users] Sharing devices with dual-booted Windows
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,69 +18,53 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1681751281=="
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---===============1681751281==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="------------enig5179D0E3313491114AE9FA1C"
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig5179D0E3313491114AE9FA1C
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+Rob Sims wrote (Sun 2007-May-27 18:13:40 -0600):
 
-dear marcel,
-yes, i totally agree not to screw things up for a non-standard device.
-however, to understand things better, could you explain to me why l2cap
-sends more config requests to change the mtu although it already agreed
-on the one suggested by the keyboard (hcidump is in one of my recent
-postings), or do i misinterpret what's going on?
+> On Tue, May 22, 2007 at 02:08:17PM -0400, Marcus C. Gottwald wrote:
+> > Rob Sims wrote (Tue 2007-May-22 10:12:55 -0600):
+> > > I have several devices that I use with both Linux and Windows on the
+> > > same laptop.  The issue is that the remote devices, such as my PDA, s=
+ee
+> > > the laptop as the same device no matter what OS is running, and pairi=
+ng
+> > > is broken.
+>  =
 
-all the best,
-  konrad
+> > I always thought of this as a defect in the protocol:
+> > Identification is based on the hardware address, but
+> > stateful authentication using that identification is
+> > performed on a layer way up.
+> =
 
+> Are you implying that the hardware address is not changeable, as it is
+> for ethernet hardware?
 
---------------enig5179D0E3313491114AE9FA1C
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.2 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iD8DBQFGW0B9vBXlQC0NozQRAm/sAKCOp/y7YDv6aJO8UU1fYONDOAyf7ACfZDV9
-/X8vQqt5LXUSY3WM43GPDpY=
-=SILI
------END PGP SIGNATURE-----
-
---------------enig5179D0E3313491114AE9FA1C--
+No. But there's an interesting thought: Do you think (Or does
+anybody know?) that during protocol design, where this issue
+might have come up, someone said, "Ah, that's not a problem,
+simply let the user configure his operating systems to change
+the hardware address after the device has been plugged in."? --
+I still think this was overlooked.
 
 
---===============1681751281==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Cheers, Marcus
+
+-- =
+
+   Marcus C. Gottwald  =B7  http://www.inf.fu-berlin.de/~gottwald/
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1681751281==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1681751281==--
