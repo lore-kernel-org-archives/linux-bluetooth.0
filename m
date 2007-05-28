@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200705281853.28124.dgollub@suse.de>
+From: Daniel Gollub <dgollub@suse.de>
+To: bluez-devel@lists.sourceforge.net
+Date: Tue, 29 May 2007 00:21:17 +0200
 References: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
-	<200705280119.47962.dgollub@suse.de>
-	<1180340996.21432.90.camel@aeonflux.holtmann.net>
-	<200705281853.28124.dgollub@suse.de>
-Date: Tue, 29 May 2007 05:50:53 +0200
-Message-Id: <1180410653.21432.106.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+	<200705281848.09618.dgollub@suse.de>
+	<200705290711.56349.denis.kenzior@trolltech.com>
+In-Reply-To: <200705290711.56349.denis.kenzior@trolltech.com>
+MIME-Version: 1.0
+Message-Id: <200705290021.18684.dgollub@suse.de>
 Subject: Re: [Bluez-devel] Suggesting bluez_pinhelper
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,31 +18,31 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Daniel,
+On Monday 28 May 2007 23:11:56 Denis KENZIOR wrote:
+> What are your plans with kdebluetooth? =A0Are you going to make KDE3 based
+> releases or wait until KDE4? =A0I'm asking since Qtopia Bluetooth is Qt4
+> based and uses Qt DBUS bindings internally to communicate with BlueZ.
 
-> > please do releases and do them often. It is important to have releases,
-> > because otherwise nobody really tests the code. Trust me on that one.
-> > Only core developers check out the source from the SCM directly.
-> 
-> That's true...
-> 
-> I run out of time will hacking on kdebluetooth for KDE3 and KDE4 (and other 
-> projects) at the same time. I try to replace the kdebluetooth trunk version 
-> with the kdebluetooth-dbus-integration branch the next days.
+kdebluetooth for KDE3 consits of a libkbluetooth which got ported to BlueZ =
 
-sometimes a broken release is better than no release. However you need
-to be prepared to fix it as soon as possible. So following release early
-and release often might help to get this progressing faster.
+DBUS interface in the kdebluetooth-dbus-integration work branch:
+http://websvn.kde.org/branches/work/kdebluetooth-dbus-integration/libkbluet=
+ooth/
 
-Regards
+KDE4 will still take some time, so there is need to have something working =
+in =
 
-Marcel
+KDE3 in meantime. I would use the Qtopia Bluetooth API for a new Bluetooth =
 
+Solid backend in KDE4. Which would replace:
+http://websvn.kde.org/trunk/KDE/kdebase/runtime/solid/bluez
 
+best regards,
+Daniel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
