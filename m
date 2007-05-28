@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <465B4079.8000509@imperial.ac.uk>
+Date: Mon, 28 May 2007 21:50:01 +0100
+From: Konrad Kieling <konrad.kieling@imperial.ac.uk>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <465B4079.8000509@imperial.ac.uk>
 References: <4656FDE4.5070001@imperial.ac.uk> <465AC8C7.1020502@imperial.ac.uk>
 	<1180360514.21432.102.camel@aeonflux.holtmann.net>
-	<465B4079.8000509@imperial.ac.uk>
-Date: Tue, 29 May 2007 06:02:08 +0200
-Message-Id: <1180411328.21432.111.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+In-Reply-To: <1180360514.21432.102.camel@aeonflux.holtmann.net>
 Subject: Re: [Bluez-users] hid keyboard events get lost
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -18,42 +17,69 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1681751281=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Konrad,
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--===============1681751281==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="------------enig5179D0E3313491114AE9FA1C"
 
-> yes, i totally agree not to screw things up for a non-standard device.
-> however, to understand things better, could you explain to me why l2cap
-> sends more config requests to change the mtu although it already agreed
-> on the one suggested by the keyboard (hcidump is in one of my recent
-> postings), or do i misinterpret what's going on?
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig5179D0E3313491114AE9FA1C
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 
-I removed the L2CAP MTU settings from the input service. So this one
-should now work for you perfectly fine. However your kernel should some
-weird behavior with a MTU size of 0. That is strange. Can you test a
-2.6.22-rc3 kernel, because that contains a fix for the MTU config
-setting.
+dear marcel,
+yes, i totally agree not to screw things up for a non-standard device.
+however, to understand things better, could you explain to me why l2cap
+sends more config requests to change the mtu although it already agreed
+on the one suggested by the keyboard (hcidump is in one of my recent
+postings), or do i misinterpret what's going on?
 
-It also contains the full HID report support. This means that the
-missing report id in front of the report should be handled correctly. If
-not than we need a quirk for that. My understanding is that even if this
-is valid according to the HID specification, it is not valid for
-Bluetooth based HID devices.
-
-Regards
-
-Marcel
+all the best,
+  konrad
 
 
+--------------enig5179D0E3313491114AE9FA1C
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iD8DBQFGW0B9vBXlQC0NozQRAm/sAKCOp/y7YDv6aJO8UU1fYONDOAyf7ACfZDV9
+/X8vQqt5LXUSY3WM43GPDpY=
+=SILI
+-----END PGP SIGNATURE-----
+
+--------------enig5179D0E3313491114AE9FA1C--
+
+
+--===============1681751281==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1681751281==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1681751281==--
