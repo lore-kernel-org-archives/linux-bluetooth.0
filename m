@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 28 May 2007 11:16:15 -0400
-From: "Marcus C. Gottwald" <gottwald@inf.fu-berlin.de>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20070528151615.GA12492@mi.fu-berlin.de>
-References: <20070522161255.GA9813@robsims.com>
-	<20070522180817.GA24396@mi.fu-berlin.de>
-	<20070528001339.GB4055@robsims.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <465AC8C7.1020502@imperial.ac.uk>
+References: <4656FDE4.5070001@imperial.ac.uk> <465AC8C7.1020502@imperial.ac.uk>
+Date: Mon, 28 May 2007 15:55:14 +0200
+Message-Id: <1180360514.21432.102.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-In-Reply-To: <20070528001339.GB4055@robsims.com>
-Subject: Re: [Bluez-users] Sharing devices with dual-booted Windows
+Subject: Re: [Bluez-users] hid keyboard events get lost
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,45 +16,49 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi Konrad,
 
-Rob Sims wrote (Sun 2007-May-27 18:13:40 -0600):
+> just to let you know: the ``Freedom Universal Keyboard'' is working
+> perfectly now, after applying some minor tweaks to the kernel:
+> 
+> 1. something to avoid the long negotiation for the mtu size, i commented
+>    out the following lines in l2cap_build_conf_req
+>    (net/bluetooth/l2cap.c):
+> 
+>    //	if (pi->imtu != L2CAP_DEFAULT_MTU)
+>    //		l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, pi->imtu);
+> 
+>    yes i know, this might not be the way to go, but bt still works with
+>    my mobile and the headset. maybe someone has an idea for a cleaner
+>    solution?
+> 
+> 2. unfortunately the data coming from the keyboard is missing the first
+>    byte telling us about keyboard input. in hidp_input_report
+>    (net/bluetooth/hidp/core.c) insert the following
+>    lines after variable declaration:
+> 
+>    if ( ( session->input->id.vendor == 0x045e ) &&
+>         ( session->input->id.product == 0x0403 ) )
+>      {
+>      for ( i = 7; i >= 0; i -- ) skb->data[i + 1] = skb->data[i];
+>      skb->data[0] = 0x01;
+>      }
+> 
+>    again, is there a way to cope with this problem in a more generic
+>    way?
 
-> On Tue, May 22, 2007 at 02:08:17PM -0400, Marcus C. Gottwald wrote:
-> > Rob Sims wrote (Tue 2007-May-22 10:12:55 -0600):
-> > > I have several devices that I use with both Linux and Windows on the
-> > > same laptop.  The issue is that the remote devices, such as my PDA, s=
-ee
-> > > the laptop as the same device no matter what OS is running, and pairi=
-ng
-> > > is broken.
->  =
+I need one of these keyboard to actually find the correct to fix this.
+While it might be likely that we need a HID quirk, I am not happy with
+any weird changes in L2CAP without understanding the reasons for it.
 
-> > I always thought of this as a defect in the protocol:
-> > Identification is based on the hardware address, but
-> > stateful authentication using that identification is
-> > performed on a layer way up.
-> =
+Regards
 
-> Are you implying that the hardware address is not changeable, as it is
-> for ethernet hardware?
+Marcel
 
-No. But there's an interesting thought: Do you think (Or does
-anybody know?) that during protocol design, where this issue
-might have come up, someone said, "Ah, that's not a problem,
-simply let the user configure his operating systems to change
-the hardware address after the device has been plugged in."? --
-I still think this was overlooked.
-
-
-Cheers, Marcus
-
--- =
-
-   Marcus C. Gottwald  =B7  http://www.inf.fu-berlin.de/~gottwald/
 
 
 -------------------------------------------------------------------------
