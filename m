@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <465A8875.9090801@access-company.com>
+Date: Mon, 28 May 2007 09:44:53 +0200
+From: Frederic Dalleau <frederic.dalleau@access-company.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200705280119.47962.dgollub@suse.de>
-References: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
-	<200705280119.47962.dgollub@suse.de>
-Date: Mon, 28 May 2007 10:29:56 +0200
-Message-Id: <1180340996.21432.90.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Cc: opsidao@gmail.com
-Subject: Re: [Bluez-devel] Suggesting bluez_pinhelper
+References: <20070526171539.GA16843@kobayashi-maru.wspse.de>
+	<4658C395.6010908@jlab.org>
+In-Reply-To: <4658C395.6010908@jlab.org>
+Subject: Re: [Bluez-devel] bluetooth-audio and bug in a2dpd (Patch included)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,40 +17,35 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Daniel,
+Mathias,
 
-> > As some of you may be aware, the current version of kdebluetooth has no
-> > support for recent (>= 3.9) bluez DBUS interface.
-> Thats correct - it's even quite unmaintained for a while...
-> I started at the #1 BlueZ Meeting a kdebluetooth-dbus-integration branch:
-> 
-> http://websvn.kde.org/branches/work/kdebluetooth-dbus-integration/
-> 
-> The libkbluetooth got a full rewrite and wraps the full BlueZ DBus API (and 
-> the Input Service so far ...) - main goal: avoid any linking against 
-> bluez-libs. 
-> 
-> The kio_slaves (kio_bluetooth, kio_sdp) and kcm_btpaired got ported to the new 
-> libkbluetooth API. The kbluetoothd got rewrite and renamed to kbluetooth and 
-> is now a "simple" tray icon application like bluez-gnome. And acts as 
-> (Default) Passkey Agent and Authorization Agent. It also includes a (very 
-> experimental) bluetooth input device wizard which makes use of the BlueZ 
-> Input Service.
-> 
-> Actually i planned to make the first release last week ... but i run out of 
-> time. Feel free to give the latest SVN revision a try...
+Thanks for the patch,
+I forgot that DBG was erasing errno, irk...
 
-please do releases and do them often. It is important to have releases,
-because otherwise nobody really tests the code. Trust me on that one.
-Only core developers check out the source from the SCM directly.
+I integrated it in order to get a working solution but as you said, this =
 
-Regards
+is not a solution.
 
-Marcel
+> With my patch it is: 4 seconds filling the buffer, waiting up to 500ms
+> (spectrum analyzer in XMMS stops), 2-3 seconds filling the buffer
+> (spectrum analyzer runs smoothly), waiting again for 500ms, and so on.
+
+This behavior is strange, a2dpd calculate delays precisely ;) Can you =
+
+send me on my private email a whole .a2dprc and logfile, done with =
+
+enabledebug=3D255 in .a2dpdrc?
+
+a2dpd > logfile
+press play, wait something like 10 secs then press stop on xmms.
+Don't wait too much as this is very verbose (+/- 10mb).
+
+Thanks,
+Fr=E9d=E9ric.
 
 
 
