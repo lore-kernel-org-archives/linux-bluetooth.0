@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Daniel Gollub <dgollub@suse.de>
 To: bluez-devel@lists.sourceforge.net
-Date: Mon, 28 May 2007 18:48:09 +0200
-References: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
-	<200705280119.47962.dgollub@suse.de>
-	<200705280939.31695.denis.kenzior@trolltech.com>
-In-Reply-To: <200705280939.31695.denis.kenzior@trolltech.com>
-MIME-Version: 1.0
-Message-Id: <200705281848.09618.dgollub@suse.de>
-Subject: Re: [Bluez-devel] Suggesting bluez_pinhelper
+From: Pascal <pascal@pabr.org>
+Date: Mon, 28 May 2007 18:14:31 +0200
+Message-ID: <f3ev58$iku$1@sea.gmane.org>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Increasing HIDP_DEFAULT_MTU ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,55 +14,30 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Monday 28 May 2007 01:39:31 Denis KENZIOR wrote:
-> As part of our work on Qtopia we've wrapped the BlueZ DBUS interface and
-> some of the Bluetooth socket types in a nice Qt way. =A0We've also done s=
-ome
-> work on OBEX support in Qtopia 4.2, with much nicer API in Qtopia 4.3.
->
-> Check out http://doc.trolltech.com/qtopia4.2/qtopiabluetooth.html. =A0If
-> there are some things which can be used by KDE (beats duplicating effort),
-> I can work on separating the Bluetooth classes as a separate Solutions
-> package or something. =A0Same goes for OBEX support.
+Hi,
 
-Sounds very interesting! =
+I have a Bluetooth HID peripheral which sends 50-byte payloads
+on L2CAP psm 19, even though it has accepted a Config req with
+MTU 48.  As a result, the data never reaches userspace.
+Is this a bug in the device ?
 
+Besides, even if the device implemented segmentation with
+DATC, a MTU of 48 might be a significant performance penalty
+(generating twice as many packets on the radio channel ?).
 
-I have to take a deeper look on the implementation of the BlueZ DBUS =
+So would it be appropriate to change
+bluez-libs-3.11/include/hidp.h:#define HIDP_DEFAULT_MTU 48
+to 672, as recommmended by HID_SPEC_V10 section 7.5.2 ?
 
-interface... is there any plan to wrap also BlueZ Service APIs like the Inp=
-ut =
+Or maybe make it a command-line option for hidd and
+bluetoothd-service-input ?
 
-Service? Or is this already done?
+Pascal
 
-Or you going to implement the Authorization Agent as well?
-
-Actually i plan to implement all the services which are available by BlueZ =
-... =
-
-So it would be very interesting which BlueZ services get implemented/used b=
-y =
-
-Qtopia. Or should it be possible to make use of all services via =
-
-QBluetoothAbstractService?
-
-On which version of BlueZ will be Qtopia 4.3 based? bluez-utils 3.9 like =
-
-Qtopia 4.2?
-
-Are you going to keep the OBEX support or make use of the BlueZ transfer =
-
-service in the future?
-
-A separated package would be great...
-
-best regards,
-Daniel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
