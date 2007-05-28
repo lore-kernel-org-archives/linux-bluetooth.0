@@ -1,10 +1,20 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <465AF314.5090206@rousse.org>
-Date: Mon, 28 May 2007 17:19:48 +0200
-From: Alexander <amour@rousse.org>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] dbus api
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1180304568.3030.26.camel@cookie.hadess.net>
+References: <20060222091231.GM19185@null.research.nokia.com>
+	<1140607245.4519.7.camel@localhost>
+	<20060222125425.GQ19185@null.research.nokia.com>
+	<20060224110357.GT19185@null.research.nokia.com>
+	<1141188501.29216.1.camel@localhost>
+	<1180265456.3030.9.camel@cookie.hadess.net>
+	<1180268229.21432.63.camel@aeonflux.holtmann.net>
+	<1180277003.3030.18.camel@cookie.hadess.net>
+	<1180304568.3030.26.camel@cookie.hadess.net>
+Date: Mon, 28 May 2007 10:40:23 +0200
+Message-Id: <1180341623.21432.99.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Soft lockup
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,30 +28,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello list,
+Hi Bastien,
 
-I'm working on a C++ library that invokes bluez over dbus. I'm currently 
-having some trouble understanding the logic of a local service. Could 
-someone explain me the way local services are managed? Like, calling 
-RegisterService() of the org.bluez.Database, what does that method do? 
-Does it create a new ServiceRecord on hciX? If so, what happens with the 
-protocol descriptors of that service record? How can I list all the 
-registered services on hciX? I see Add and Update methods for service 
-records but no ListServiceRecords()? There is a ListServices() method on 
-the manager interface but this interface is just for the /org/bluez 
-object path, so this won't give me a list just for hciX. Also, the 
-org.bluez.Service interface, does it have anything to do with 
-Add/UpdateServiceRecord() methods of the database interface? Can I 
-modify the service record (for example the protocol descriptors) of a 
-service represented by the org.bluez.Service interface?
-What happened with the RFCOMM API? I agree it wasn't very nice by 
-forcing you to open /dev/tty* but it was at least something, now there 
-isn't anything dbus based. A RFCOMM API with connect(), disconnect(), 
-read() and write() will be just great (all dbus based ofcourse, no 
-/dev/tty* stuff :) ).
+> > Works with 2.6.22-rc3 (for a meaning of works, my code doesn't seem to
+> > work, but that's a different matter).
+> 
+> I forgot to mention that the serial service doesn't seem to create any
+> physical devices (ie. test-serial doesn't create a /dev/rfcomm0 despite
+> it being the return value of the ConnectService function).
 
-best regards,
-Alexander
+that looks like an udev problem. It should create the device nodes.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
