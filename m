@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <465AF314.5090206@rousse.org>
+Date: Mon, 28 May 2007 17:19:48 +0200
+From: Alexander <amour@rousse.org>
+MIME-Version: 1.0
 To: bluez-devel@lists.sourceforge.net
-From: Pascal <pascal@pabr.org>
-Date: Mon, 28 May 2007 18:14:31 +0200
-Message-ID: <f3ev58$iku$1@sea.gmane.org>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Increasing HIDP_DEFAULT_MTU ?
+Subject: [Bluez-devel] dbus api
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,26 +18,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hello list,
 
-I have a Bluetooth HID peripheral which sends 50-byte payloads
-on L2CAP psm 19, even though it has accepted a Config req with
-MTU 48.  As a result, the data never reaches userspace.
-Is this a bug in the device ?
+I'm working on a C++ library that invokes bluez over dbus. I'm currently 
+having some trouble understanding the logic of a local service. Could 
+someone explain me the way local services are managed? Like, calling 
+RegisterService() of the org.bluez.Database, what does that method do? 
+Does it create a new ServiceRecord on hciX? If so, what happens with the 
+protocol descriptors of that service record? How can I list all the 
+registered services on hciX? I see Add and Update methods for service 
+records but no ListServiceRecords()? There is a ListServices() method on 
+the manager interface but this interface is just for the /org/bluez 
+object path, so this won't give me a list just for hciX. Also, the 
+org.bluez.Service interface, does it have anything to do with 
+Add/UpdateServiceRecord() methods of the database interface? Can I 
+modify the service record (for example the protocol descriptors) of a 
+service represented by the org.bluez.Service interface?
+What happened with the RFCOMM API? I agree it wasn't very nice by 
+forcing you to open /dev/tty* but it was at least something, now there 
+isn't anything dbus based. A RFCOMM API with connect(), disconnect(), 
+read() and write() will be just great (all dbus based ofcourse, no 
+/dev/tty* stuff :) ).
 
-Besides, even if the device implemented segmentation with
-DATC, a MTU of 48 might be a significant performance penalty
-(generating twice as many packets on the radio channel ?).
-
-So would it be appropriate to change
-bluez-libs-3.11/include/hidp.h:#define HIDP_DEFAULT_MTU 48
-to 672, as recommmended by HID_SPEC_V10 section 7.5.2 ?
-
-Or maybe make it a command-line option for hidd and
-bluetoothd-service-input ?
-
-Pascal
-
+best regards,
+Alexander
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
