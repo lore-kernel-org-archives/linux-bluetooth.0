@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Daniel Gollub <dgollub@suse.de>
 To: bluez-devel@lists.sourceforge.net
-Date: Mon, 28 May 2007 18:53:27 +0200
+Date: Mon, 28 May 2007 18:48:09 +0200
 References: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
 	<200705280119.47962.dgollub@suse.de>
-	<1180340996.21432.90.camel@aeonflux.holtmann.net>
-In-Reply-To: <1180340996.21432.90.camel@aeonflux.holtmann.net>
+	<200705280939.31695.denis.kenzior@trolltech.com>
+In-Reply-To: <200705280939.31695.denis.kenzior@trolltech.com>
 MIME-Version: 1.0
-Message-Id: <200705281853.28124.dgollub@suse.de>
+Message-Id: <200705281848.09618.dgollub@suse.de>
 Subject: Re: [Bluez-devel] Suggesting bluez_pinhelper
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -18,22 +18,52 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Monday 28 May 2007 10:29:56 Marcel Holtmann wrote:
-> please do releases and do them often. It is important to have releases,
-> because otherwise nobody really tests the code. Trust me on that one.
-> Only core developers check out the source from the SCM directly.
+On Monday 28 May 2007 01:39:31 Denis KENZIOR wrote:
+> As part of our work on Qtopia we've wrapped the BlueZ DBUS interface and
+> some of the Bluetooth socket types in a nice Qt way. =A0We've also done s=
+ome
+> work on OBEX support in Qtopia 4.2, with much nicer API in Qtopia 4.3.
+>
+> Check out http://doc.trolltech.com/qtopia4.2/qtopiabluetooth.html. =A0If
+> there are some things which can be used by KDE (beats duplicating effort),
+> I can work on separating the Bluetooth classes as a separate Solutions
+> package or something. =A0Same goes for OBEX support.
 
-That's true...
+Sounds very interesting! =
 
-I run out of time will hacking on kdebluetooth for KDE3 and KDE4 (and other 
-projects) at the same time. I try to replace the kdebluetooth trunk version 
-with the kdebluetooth-dbus-integration branch the next days.
 
-Sorry - i'm really bad in managing my time.
+I have to take a deeper look on the implementation of the BlueZ DBUS =
+
+interface... is there any plan to wrap also BlueZ Service APIs like the Inp=
+ut =
+
+Service? Or is this already done?
+
+Or you going to implement the Authorization Agent as well?
+
+Actually i plan to implement all the services which are available by BlueZ =
+... =
+
+So it would be very interesting which BlueZ services get implemented/used b=
+y =
+
+Qtopia. Or should it be possible to make use of all services via =
+
+QBluetoothAbstractService?
+
+On which version of BlueZ will be Qtopia 4.3 based? bluez-utils 3.9 like =
+
+Qtopia 4.2?
+
+Are you going to keep the OBEX support or make use of the BlueZ transfer =
+
+service in the future?
+
+A separated package would be great...
 
 best regards,
 Daniel
