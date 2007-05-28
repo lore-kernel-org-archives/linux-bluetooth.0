@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sun, 27 May 2007 18:13:40 -0600
-From: Rob Sims <bluez-z@robsims.com>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20070528001339.GB4055@robsims.com>
-References: <20070522161255.GA9813@robsims.com>
-	<20070522180817.GA24396@mi.fu-berlin.de>
+Message-ID: <c49421c50705271709l6ed0684cv892cbdb24ac61bd2@mail.gmail.com>
+Date: Sun, 27 May 2007 21:09:23 -0300
+From: "Loreno Oliveira" <lorenooliveira@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <c49421c50705271535q7362d2wcf02c917f45e91cc@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20070522180817.GA24396@mi.fu-berlin.de>
-Subject: Re: [Bluez-users] Sharing devices with dual-booted Windows
+References: <c49421c50705271535q7362d2wcf02c917f45e91cc@mail.gmail.com>
+Subject: Re: [Bluez-users] l2cap question
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,56 +16,51 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1071537880=="
+Content-Type: multipart/mixed; boundary="===============1832455313=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+--===============1832455313==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_134070_12922577.1180310963611"
 
---===============1071537880==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="s2ZSL+KKDSLx8OML"
+------=_Part_134070_12922577.1180310963611
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
+ops,
 
---s2ZSL+KKDSLx8OML
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+forget the silly question. Already solved...
 
-On Tue, May 22, 2007 at 02:08:17PM -0400, Marcus C. Gottwald wrote:
-> Rob Sims wrote (Tue 2007-May-22 10:12:55 -0600):
-> > I have several devices that I use with both Linux and Windows on the
-> > same laptop.  The issue is that the remote devices, such as my PDA, see
-> > the laptop as the same device no matter what OS is running, and pairing
-> > is broken.
-=20
-> I always thought of this as a defect in the protocol:
-> Identification is based on the hardware address, but
-> stateful authentication using that identification is
-> performed on a layer way up.
 
-Are you implying that the hardware address is not changeable, as it is
-for ethernet hardware?
---=20
-Rob
 
---s2ZSL+KKDSLx8OML
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+On 5/27/07, Loreno Oliveira <lorenooliveira@gmail.com> wrote:
+>
+> Hi,
+>
+> is there anyway of creating l2cap sockets over already existent baseband
+> connections?
+>
+> Regards,
+>
+> Loreno
+>
+
+------=_Part_134070_12922577.1180310963611
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
+ops,<br><br>forget the silly question. Already solved...<br><br><br><br><div><span class="gmail_quote">On 5/27/07, <b class="gmail_sendername">Loreno Oliveira</b> &lt;<a href="mailto:lorenooliveira@gmail.com">lorenooliveira@gmail.com
+</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hi,<br><br>is there anyway of creating l2cap sockets over already existent baseband connections?
+<br><br>Regards,<br><span class="sg"><br>Loreno<br>
+</span></blockquote></div><br>
 
-iD8DBQFGWh6znvKppSZW8osRArZUAJ9wA0IeeeD8eo4ItT7AiPEotbD8aACaA443
-i5RjYhxMeA54u3Cr6TR2D4Y=
-=UzUH
------END PGP SIGNATURE-----
-
---s2ZSL+KKDSLx8OML--
+------=_Part_134070_12922577.1180310963611--
 
 
---===============1071537880==
+--===============1832455313==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -77,7 +71,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1071537880==
+--===============1832455313==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -88,4 +82,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1071537880==--
+--===============1832455313==--
