@@ -1,13 +1,22 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Pascal <pascal@pabr.org>
-Date: Wed, 30 May 2007 00:12:04 +0200
-Message-ID: <f3i8fk$tfv$1@sea.gmane.org>
-References: <f3ev58$iku$1@sea.gmane.org>
-	<1180411455.21432.114.camel@aeonflux.holtmann.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <2d5a2c100705290618n2b74dbcfmfa997c87f344a6a0@mail.gmail.com>
+References: <1179933855.3629.75.camel@cookie.hadess.net>
+	<59278C28-851A-44FF-AE01-25D8F074CE1E@nokia.com>
+	<1180013992.3151.6.camel@cookie.hadess.net>
+	<089F41B2-DBC5-483E-A6C9-F413E18DF38B@nokia.com>
+	<1180032597.14752.13.camel@cookie.hadess.net>
+	<1180096233.14752.27.camel@cookie.hadess.net>
+	<1180097928.14752.33.camel@cookie.hadess.net>
+	<1180105720.14752.49.camel@cookie.hadess.net>
+	<2d5a2c100705282058o22ace961y93308be3340bb2d4@mail.gmail.com>
+	<1180434383.3030.70.camel@cookie.hadess.net>
+	<2d5a2c100705290618n2b74dbcfmfa997c87f344a6a0@mail.gmail.com>
+Date: Tue, 29 May 2007 15:37:55 +0200
+Message-Id: <1180445875.21432.137.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-In-Reply-To: <1180411455.21432.114.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] Increasing HIDP_DEFAULT_MTU ?
+Subject: Re: [Bluez-devel] CUPS plugin discovery bits
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,29 +30,50 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> Actually we are not really supporting segmentation by ourself. If I had
-> one of the devices for testing, I might be able to fix that easily. Hint
-> hint :)
+Hi Luiz,
 
-It's that wireless joystick from Sony.  Be sure to ask for the
-console that goes with it, it makes debugging much easier :-)
+>         > Btw, The printer wizard as it is now wont work with periodic
+>         > discovery, signals DiscoveryStarted and 
+>         > DiscoveryCompleted are not emitted while in
+>         periodic  discovery.
+>         
+>         The cups backend isn't supposed to run forever, so it can't do
+>         periodic
+>         discovery.
+> 
+> Well that is not the case of being running forever but you could
+> probably 
+> test if the periodic scan is active before you start a blocking
+> discovery.
+> My main concern is about multiple process doing this, the probability
+> of
+> having collisions while doing sdp searches could be very high as it is
+> very 
+> common to have more than one functionality in a device, this leaves
+> wizard
+> processes very complicated and may force them to reschedule on each
+> collision .
 
-Note: when polled with HIDP_TRANS_GET_REPORT on the control channel,
-it does use DATC (unlike what happens on the interrupt channel).
-So maybe it would be a good platform for testing reassembly code.
+it is fine to start an inquiry while you are in periodic inquiry. With
+the exception that some chips don't allow that.
 
+It is also fine to create an ACL link while in periodic inquiry since
+the device then will stop its inquiry train automatically and switch to
+page for the ACL link. After it it will continue with the periodic
+inquiry as before.
 
-> I fixed the input service now. We will see how this works out. In
-> addition the 2.6.22-rc3 kernel contains a patch to fix a bug in the
-> L2CAP config handling.
+The kernel now takes care of serializing the ACL link creation. This
+works perfectly fine. There is one small glitch with remote name resolve
+that doesn't trigger the ACL queue. However real name request have been
+always a problem. However over D-Bus you only get cached names or an
+error anyway. The only exception is if you in inquiry or periodic
+inquiry. While the inquiry is no problem, we have to check with the
+periodic inquiry if we create a deadlock.
 
-Thanks; the device now works out-of-the box with ps3-linux 2.6.22-rc3
-and bluetoothd-service-input from bluez-utils-cvs (except I couldn't
-figure how the new authorization framework works, so I renamed
-/var/lib/bluetooth/*/hidd to /var/lib/bluetooth/*/input instead).
+Regards
 
-Pascal
+Marcel
+
 
 
 -------------------------------------------------------------------------
