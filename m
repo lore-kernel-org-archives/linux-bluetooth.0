@@ -1,22 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <2d5a2c100705282058o22ace961y93308be3340bb2d4@mail.gmail.com>
-References: <1179933855.3629.75.camel@cookie.hadess.net>
-	<1179936924.3629.88.camel@cookie.hadess.net>
-	<1179937606.3629.92.camel@cookie.hadess.net>
-	<59278C28-851A-44FF-AE01-25D8F074CE1E@nokia.com>
-	<1180013992.3151.6.camel@cookie.hadess.net>
-	<089F41B2-DBC5-483E-A6C9-F413E18DF38B@nokia.com>
-	<1180032597.14752.13.camel@cookie.hadess.net>
-	<1180096233.14752.27.camel@cookie.hadess.net>
-	<1180097928.14752.33.camel@cookie.hadess.net>
-	<1180105720.14752.49.camel@cookie.hadess.net>
-	<2d5a2c100705282058o22ace961y93308be3340bb2d4@mail.gmail.com>
-Date: Tue, 29 May 2007 11:26:23 +0100
-Message-Id: <1180434383.3030.70.camel@cookie.hadess.net>
+In-Reply-To: <465AF314.5090206@rousse.org>
+References: <465AF314.5090206@rousse.org>
+Date: Tue, 29 May 2007 06:08:52 +0200
+Message-Id: <1180411732.21432.119.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] CUPS plugin discovery bits
+Subject: Re: [Bluez-devel] dbus api
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -30,43 +20,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Tue, 2007-05-29 at 00:58 -0300, Luiz Augusto von Dentz wrote:
-> I consider this as a wizard for printers, like in NetwokManager the
-> network wizard also
-> does start a discovery and it work like a charm but in my opinion it
-> doesnt belong to bluez utils.
+Hi Alexander,
 
-It's a standard feature of cups backends. If they support it, they
-should list the accessible/known printers in the vicinity.
+> I'm working on a C++ library that invokes bluez over dbus. I'm currently 
+> having some trouble understanding the logic of a local service. Could 
+> someone explain me the way local services are managed? Like, calling 
+> RegisterService() of the org.bluez.Database, what does that method do? 
+> Does it create a new ServiceRecord on hciX? If so, what happens with the 
+> protocol descriptors of that service record? How can I list all the 
+> registered services on hciX? I see Add and Update methods for service 
+> records but no ListServiceRecords()? There is a ListServices() method on 
+> the manager interface but this interface is just for the /org/bluez 
+> object path, so this won't give me a list just for hciX. Also, the 
+> org.bluez.Service interface, does it have anything to do with 
+> Add/UpdateServiceRecord() methods of the database interface? Can I 
+> modify the service record (for example the protocol descriptors) of a 
+> service represented by the org.bluez.Service interface?
 
-> Having each wizard to rely in its own discovery is probably a bad
-> design, we can probably integrate 
-> all wizard together and then having services configuring them in the
-> background. This way we
-> could leave to the user to use periodic scan and popup specific device
-> wizard dependent on
-> each service when active. Also in my opinion it should exist a printer
-> service for those that want to 
-> configure its devices that are not in discoverable mode.
+a service and a service record are two different things.
 
-True, it would be much better. But in the meanwhile, this patch simply
-implements a CUPS feature and allows us to have some basic integration
-in the distribution-provided printer tools.
+The service is something that is BlueZ based. It normally implements one
+or more profile specifications and provides a D-Bus interface to use
+them.
 
-Being able to configure the printer via a bluetooth configuration wizard
-requires a bit more work, but it's also on my plans. There should be a
-CUPS service that would allow hcid to add/remove bluetooth printers from
-cups with minimum user interaction.
+The service record are SDP records that are mandated by the profile
+specification.
 
-> Btw, The printer wizard as it is now wont work with periodic
-> discovery, signals DiscoveryStarted and
-> DiscoveryCompleted are not emitted while in periodic  discovery. 
+You can use both independently. However both are bound to your D-Bus
+connection. If you connection dies (meaning your process disconnects)
+the service and also the service records will be automatically removed.
 
-The cups backend isn't supposed to run forever, so it can't do periodic
-discovery.
+> What happened with the RFCOMM API? I agree it wasn't very nice by 
+> forcing you to open /dev/tty* but it was at least something, now there 
+> isn't anything dbus based. A RFCOMM API with connect(), disconnect(), 
+> read() and write() will be just great (all dbus based ofcourse, no 
+> /dev/tty* stuff :) ).
 
--- 
-Bastien Nocera <hadess@hadess.net> 
+The RFCOMM API has been moved over to a serial service.
+
+If you don't wanna open /dev/rfcomm* then use Bluetooth RFCOMM sockets
+directly. D-Bus is not for transferring data.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
