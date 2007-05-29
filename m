@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <465AF314.5090206@rousse.org>
-References: <465AF314.5090206@rousse.org>
-Date: Tue, 29 May 2007 06:08:52 +0200
-Message-Id: <1180411732.21432.119.camel@aeonflux.holtmann.net>
+In-Reply-To: <f3ev58$iku$1@sea.gmane.org>
+References: <f3ev58$iku$1@sea.gmane.org>
+Date: Tue, 29 May 2007 06:04:15 +0200
+Message-Id: <1180411455.21432.114.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] dbus api
+Subject: Re: [Bluez-devel] Increasing HIDP_DEFAULT_MTU ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,46 +20,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Alexander,
+Hi Pascal,
 
-> I'm working on a C++ library that invokes bluez over dbus. I'm currently 
-> having some trouble understanding the logic of a local service. Could 
-> someone explain me the way local services are managed? Like, calling 
-> RegisterService() of the org.bluez.Database, what does that method do? 
-> Does it create a new ServiceRecord on hciX? If so, what happens with the 
-> protocol descriptors of that service record? How can I list all the 
-> registered services on hciX? I see Add and Update methods for service 
-> records but no ListServiceRecords()? There is a ListServices() method on 
-> the manager interface but this interface is just for the /org/bluez 
-> object path, so this won't give me a list just for hciX. Also, the 
-> org.bluez.Service interface, does it have anything to do with 
-> Add/UpdateServiceRecord() methods of the database interface? Can I 
-> modify the service record (for example the protocol descriptors) of a 
-> service represented by the org.bluez.Service interface?
+> I have a Bluetooth HID peripheral which sends 50-byte payloads
+> on L2CAP psm 19, even though it has accepted a Config req with
+> MTU 48.  As a result, the data never reaches userspace.
+> Is this a bug in the device ?
 
-a service and a service record are two different things.
+which device is this. I might need to have one of it at home for
+testing.
 
-The service is something that is BlueZ based. It normally implements one
-or more profile specifications and provides a D-Bus interface to use
-them.
+> Besides, even if the device implemented segmentation with
+> DATC, a MTU of 48 might be a significant performance penalty
+> (generating twice as many packets on the radio channel ?).
 
-The service record are SDP records that are mandated by the profile
-specification.
+Actually we are not really supporting segmentation by ourself. If I had
+one of the devices for testing, I might be able to fix that easily. Hint
+hint :)
 
-You can use both independently. However both are bound to your D-Bus
-connection. If you connection dies (meaning your process disconnects)
-the service and also the service records will be automatically removed.
+> So would it be appropriate to change
+> bluez-libs-3.11/include/hidp.h:#define HIDP_DEFAULT_MTU 48
+> to 672, as recommmended by HID_SPEC_V10 section 7.5.2 ?
+> 
+> Or maybe make it a command-line option for hidd and
+> bluetoothd-service-input ?
 
-> What happened with the RFCOMM API? I agree it wasn't very nice by 
-> forcing you to open /dev/tty* but it was at least something, now there 
-> isn't anything dbus based. A RFCOMM API with connect(), disconnect(), 
-> read() and write() will be just great (all dbus based ofcourse, no 
-> /dev/tty* stuff :) ).
-
-The RFCOMM API has been moved over to a serial service.
-
-If you don't wanna open /dev/rfcomm* then use Bluetooth RFCOMM sockets
-directly. D-Bus is not for transferring data.
+I fixed the input service now. We will see how this works out. In
+addition the 2.6.22-rc3 kernel contains a patch to fix a bug in the
+L2CAP config handling.
 
 Regards
 
