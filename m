@@ -1,16 +1,22 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 29 May 2007 13:27:41 +0200
-From: Stefan Seyfried <seife@suse.de>
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20070529112741.GB23238@suse.de>
-References: <1180273950.15368.42.camel@gilboa-work-dev.localdomain>
-	<4659B8EC.3050708@gentoo.org>
-	<1180287117.30116.17.camel@gilboa-work-dev.localdomain>
-	<4659C461.8070405@gentoo.org>
-	<9050516b0705271141v10dc2b25i83b43275acea480@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <9050516b0705271141v10dc2b25i83b43275acea480@mail.gmail.com>
-Subject: Re: [Bluez-devel] Suggesting bluez_pinhelper
+In-Reply-To: <2d5a2c100705282058o22ace961y93308be3340bb2d4@mail.gmail.com>
+References: <1179933855.3629.75.camel@cookie.hadess.net>
+	<1179936924.3629.88.camel@cookie.hadess.net>
+	<1179937606.3629.92.camel@cookie.hadess.net>
+	<59278C28-851A-44FF-AE01-25D8F074CE1E@nokia.com>
+	<1180013992.3151.6.camel@cookie.hadess.net>
+	<089F41B2-DBC5-483E-A6C9-F413E18DF38B@nokia.com>
+	<1180032597.14752.13.camel@cookie.hadess.net>
+	<1180096233.14752.27.camel@cookie.hadess.net>
+	<1180097928.14752.33.camel@cookie.hadess.net>
+	<1180105720.14752.49.camel@cookie.hadess.net>
+	<2d5a2c100705282058o22ace961y93308be3340bb2d4@mail.gmail.com>
+Date: Tue, 29 May 2007 11:26:23 +0100
+Message-Id: <1180434383.3030.70.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] CUPS plugin discovery bits
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,27 +26,48 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sun, May 27, 2007 at 09:41:40PM +0300, Gilboa Davara wrote:
-> ... But if an unsupported patch is used, you're S.O.L.
-> You can't report the bug upstream (not their code) and you can't
-> report the bug to SUSE people. (Not their distro)
+On Tue, 2007-05-29 at 00:58 -0300, Luiz Augusto von Dentz wrote:
+> I consider this as a wizard for printers, like in NetwokManager the
+> network wizard also
+> does start a discovery and it work like a charm but in my opinion it
+> doesnt belong to bluez utils.
 
-Have you tried this? I'm quite sure that Daniel appreciates a good
-bug report against his code and that he does not really care what
-distro his code runs on.
--- =
+It's a standard feature of cups backends. If they support it, they
+should list the accessible/known printers in the vicinity.
 
-Stefan Seyfried
-QA / R&D Team Mobile Devices        |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
+> Having each wizard to rely in its own discovery is probably a bad
+> design, we can probably integrate 
+> all wizard together and then having services configuring them in the
+> background. This way we
+> could leave to the user to use periodic scan and popup specific device
+> wizard dependent on
+> each service when active. Also in my opinion it should exist a printer
+> service for those that want to 
+> configure its devices that are not in discoverable mode.
 
+True, it would be much better. But in the meanwhile, this patch simply
+implements a CUPS feature and allows us to have some basic integration
+in the distribution-provided printer tools.
 
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
+Being able to configure the printer via a bluetooth configuration wizard
+requires a bit more work, but it's also on my plans. There should be a
+CUPS service that would allow hcid to add/remove bluetooth printers from
+cups with minimum user interaction.
+
+> Btw, The printer wizard as it is now wont work with periodic
+> discovery, signals DiscoveryStarted and
+> DiscoveryCompleted are not emitted while in periodic  discovery. 
+
+The cups backend isn't supposed to run forever, so it can't do periodic
+discovery.
+
+-- 
+Bastien Nocera <hadess@hadess.net> 
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
