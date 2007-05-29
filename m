@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <12a679470705291925s2016d074j34d4097cb6936396@mail.gmail.com>
-Date: Wed, 30 May 2007 03:25:01 +0100
-From: "=?ISO-8859-1?Q?Jos=E9_Pedro_Saraiva?=" <nocive@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Subject: [Bluez-users] opd binded to a specific HCI device?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <80236d750705290911g619e3d9eu8c6cda81c884b44d@mail.gmail.com>
+References: <80236d750705290911g619e3d9eu8c6cda81c884b44d@mail.gmail.com>
+Date: Tue, 29 May 2007 22:20:54 +0200
+Message-Id: <1180470054.21432.141.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] [Bluez Users] Page timeout during sdp on
+	heavy	traffic.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,75 +17,45 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0433996043=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0433996043==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_139350_28542054.1180491901136"
+Hi Emanuele,
 
-------=_Part_139350_28542054.1180491901136
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+> I wrote a little application to simulate an heavy traffic.
+> Simply discovers devices using hci0 and for each device discovered
+> starts a thread to search service using hci1.
+> Rinse and repeat forever.
+> Usually I have 5-6 bluetooth devices in the area. 
+> I'm not using d-bus messaging (yet) but i guess i'll try that too to
+> check
+> 
+> Anyway I noticed a large number of timeouts during search services on
+> devices who previously returned correct service record.
 
-Hi all,
+I have no idea how often I have to say that, but you can't page devices
+at the same time. The chips simply don't support that. The same reason
+why you can run an inquiry and page at the same time. It is not
+possible. Period. And this means you have to serialize the SDP service
+requests.
 
-I'm not sure if BlueZ mailing list is the more appropriate place to present
-my question but anyhow, I hope that someone can enlight me on this matter.
-I'm trying to run Obejct Push Daemon (opd) binded to a specific hci device,
-but not sure if this is the correct way...
+New kernel versions try to handling pending page attempts for piconet
+creation, but that is also limited. And simultaneous name resolve
+request can also cause troubles.
 
-$ sdptool -i hci3 add OPUSH
-$ ./opd --mode OBEX --metadata --path PATH
+Regards
 
-... or should I do a rfcomm bind and run ./opd --channel <rfcomm_channel>?
-
-Thanks in advance!
-
-
-Best regards,
-
-Jos=E9 Pedro Saraiva
-
-------=_Part_139350_28542054.1180491901136
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi all,<br><br>I&#39;m not sure if BlueZ mailing list is the more appropria=
-te place to present my question but anyhow, I hope that someone can enlight=
- me on this matter.<br>I&#39;m trying to run Obejct Push Daemon (opd) binde=
-d to a specific hci device, but not sure if this is the correct way...
-<br><br>$ sdptool -i hci3 add OPUSH<br>$ ./opd --mode OBEX --metadata --pat=
-h PATH<br><br>... or should I do a rfcomm bind and run ./opd --channel &lt;=
-rfcomm_channel&gt;?<br><br>Thanks in advance!<br><br><br>Best regards,<br>
-<br>Jos=E9 Pedro Saraiva<br>
-
-------=_Part_139350_28542054.1180491901136--
+Marcel
 
 
---===============0433996043==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0433996043==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0433996043==--
