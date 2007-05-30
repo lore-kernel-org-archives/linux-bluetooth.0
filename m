@@ -1,13 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <E1HticC-00011g-SL@mail.sourceforge.net>
-References: <E1HticC-00011g-SL@mail.sourceforge.net>
-Date: Thu, 31 May 2007 16:07:56 +0100
-Message-Id: <1180624077.3030.184.camel@cookie.hadess.net>
+In-Reply-To: <f3jl24$tmp$1@sea.gmane.org>
+References: <f3ev58$iku$1@sea.gmane.org>
+	<1180411455.21432.114.camel@aeonflux.holtmann.net>
+	<f3i8fk$tfv$1@sea.gmane.org>
+	<1180510319.21432.158.camel@aeonflux.holtmann.net>
+	<f3jl24$tmp$1@sea.gmane.org>
+Date: Wed, 30 May 2007 13:51:02 +0200
+Message-Id: <1180525862.21432.186.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-devel] connect fail : Operation now in progress
+Subject: Re: [Bluez-devel] Increasing HIDP_DEFAULT_MTU ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,32 +20,38 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-T24gVGh1LCAyMDA3LTA1LTMxIGF0IDE2OjQ0ICswNTMwLCBBdmVlayBBdWRoeWEgd3JvdGU6Cj4g
-SGksCj4gCj4gICAgICAgICAgICAgSSBhbSB0cnlpbmcgdG8gY29tbXVuaWNhdGUgd2l0aCBhIEoy
-TUUgYXBwbGljYXRpb24gcnVubmluZwo+IG9uIG15IG1vYmlsZSBwaG9uZShOb2tpYSA2NjAwKSB1
-c2luZyBhIGNsaWVudCBwcm9ncmFtIHJ1bm5pbmcgb24gYQo+IExpbnV4IG1hY2hpbmUgKEZDNiku
-IFRoZSDigJhzZHB0b29sIGJyb3dzZeKAmSByZXBvcnRzIHRoYXQgdGhlIEoyTUUKPiBhcHBsaWNh
-dGlvbiBpcyBsaXN0ZW5pbmcgb24gY2hhbm5lbCA0LiBUaGUgSjJNRSBhcHBsaWNhdGlvbiBpcyB1
-c2luZwo+IGJ0c3BwIHByb3RvY29sIHdoZXJlYXMgbXkgY2xpZW50IHNpZGUgYXBwbGljYXRpb24g
-aXMgdXNpbmcgUkZDT01NLiBCdXQKPiB3aGVuIEkgcnVuIHRoZSBjbGllbnQgYXBwbGljYXRpb24s
-IHRoZSDigJhjb25uZWN04oCZIHN5c3RlbS1jYWxsIGZhaWxzCj4gKHJldHVybnMgLTEpIHdpdGgg
-ZXJyb3IgdmFsdWUg4oCcT3BlcmF0aW9uIG5vdyBpbiBwcm9ncmVzc+KAnS4gSSBhbSB1c2luZwo+
-IEJsdWVaIHByb3RvY29sIHN0YWNrLgo+IAo+IFdoYXQgY2FuIGJlIHRoZSBwcm9iYWJsZSByZWFz
-b24gZm9yIHRoaXMga2luZCBvZiBiZWhhdmlvcj8gQW55Cj4gc3VnZ2VzdGlvbiBpcyBhcHByZWNp
-YXRlZC4KCllvdSBwcm9iYWJseSBtYWRlIHRoZSBzb2NrZXQncyBmZCBub24tYmxvY2tpbmcuIEVp
-dGhlciBtYWtlIGl0IGJsb2NraW5nLApvciBzZXR1cCBhIHdhdGNoZXIgb24gdGhlIGZkIHRvIHdh
-aXQgZm9yIHRoZSBsaW5rIHRvIGJlIGNyZWF0ZWQuCgpTZWUgcmZjb21tX2Nvbm5lY3QoKSBpbiBi
-bHVlei11dGlscy9zZXJpYWwvbWFuYWdlci5jCgotLSAKQmFzdGllbiBOb2NlcmEgPGhhZGVzc0Bo
-YWRlc3MubmV0PiAKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25z
-b3JlZCBieSBEQjIgRXhwcmVzcwpEb3dubG9hZCBEQjIgRXhwcmVzcyBDIC0gdGhlIEZSRUUgdmVy
-c2lvbiBvZiBEQjIgZXhwcmVzcyBhbmQgdGFrZQpjb250cm9sIG9mIHlvdXIgWE1MLiBObyBsaW1p
-dHMuIEp1c3QgZGF0YS4gQ2xpY2sgdG8gZ2V0IGl0IG5vdy4KaHR0cDovL3NvdXJjZWZvcmdlLm5l
-dC9wb3dlcmJhci9kYjIvCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vm
-b3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1
-ZXotZGV2ZWwK
+Hi Pascal,
+
+> > do you mean the controller that comes with the PS3?
+> 
+> Yes, a.k.a. "sixaxis".  It is not really advertised as a HIDP
+> device, but it behaves pretty much like one.  Sony also has a
+> TV-style Bluetooth remote, which I have not tested.
+
+actually I have both of them. The controller is kinda nasty and I have
+to integrate the cable-based authentication somehow nicely with udev and
+the input service.
+
+The remote uses a total weird HID report format. Doesn't make sense to
+push that through the kernel. We will use a fake HID inside the input
+service and then uinput to create the input device.
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
