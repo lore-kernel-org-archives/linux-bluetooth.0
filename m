@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <465D4072.6030507@rousse.org>
-Date: Wed, 30 May 2007 11:14:26 +0200
-From: Alexander <amour@rousse.org>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <465AF314.5090206@rousse.org>
-	<1180411732.21432.119.camel@aeonflux.holtmann.net>
-In-Reply-To: <1180411732.21432.119.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] dbus api
+In-Reply-To: <f3i8fk$tfv$1@sea.gmane.org>
+References: <f3ev58$iku$1@sea.gmane.org>
+	<1180411455.21432.114.camel@aeonflux.holtmann.net>
+	<f3i8fk$tfv$1@sea.gmane.org>
+Date: Wed, 30 May 2007 09:31:59 +0200
+Message-Id: <1180510319.21432.158.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Increasing HIDP_DEFAULT_MTU ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,89 +22,39 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Pascal,
 
-where can I read or look for examples of a service? I'm confued, how can 
-one make a service available with a name and description?
+> > Actually we are not really supporting segmentation by ourself. If I had
+> > one of the devices for testing, I might be able to fix that easily. Hint
+> > hint :)
+> 
+> It's that wireless joystick from Sony.  Be sure to ask for the
+> console that goes with it, it makes debugging much easier :-)
 
-What about listing the currently added local service records? It looks 
-like such a method is missing from the API.
+do you mean the controller that comes with the PS3?
 
-If I want to make a rfcomm-based service available on my PC for others, 
-than the right way would be to register a service record with a rfcomm 
-protocol descriptor and than I should bind listening for new connections 
-on rfcomm, right?
+> Note: when polled with HIDP_TRANS_GET_REPORT on the control channel,
+> it does use DATC (unlike what happens on the interrupt channel).
+> So maybe it would be a good platform for testing reassembly code.
 
-What do you mean the RFCOMM API is moved to a service? How can I access 
-it? How can I initiate a new rfcomm connection or listen for an incoming 
-one?
+Yes. We need to fix that.
 
-best regards,
-Alexander
+> > I fixed the input service now. We will see how this works out. In
+> > addition the 2.6.22-rc3 kernel contains a patch to fix a bug in the
+> > L2CAP config handling.
+> 
+> Thanks; the device now works out-of-the box with ps3-linux 2.6.22-rc3
+> and bluetoothd-service-input from bluez-utils-cvs (except I couldn't
+> figure how the new authorization framework works, so I renamed
+> /var/lib/bluetooth/*/hidd to /var/lib/bluetooth/*/input instead).
 
+That can produce some strange settings. The input file format is a
+little bit different than the hidd file format.
 
-Marcel Holtmann wrote:
-> Hi Alexander,
->
->   
->> I'm working on a C++ library that invokes bluez over dbus. I'm currently 
->> having some trouble understanding the logic of a local service. Could 
->> someone explain me the way local services are managed? Like, calling 
->> RegisterService() of the org.bluez.Database, what does that method do? 
->> Does it create a new ServiceRecord on hciX? If so, what happens with the 
->> protocol descriptors of that service record? How can I list all the 
->> registered services on hciX? I see Add and Update methods for service 
->> records but no ListServiceRecords()? There is a ListServices() method on 
->> the manager interface but this interface is just for the /org/bluez 
->> object path, so this won't give me a list just for hciX. Also, the 
->> org.bluez.Service interface, does it have anything to do with 
->> Add/UpdateServiceRecord() methods of the database interface? Can I 
->> modify the service record (for example the protocol descriptors) of a 
->> service represented by the org.bluez.Service interface?
->>     
->
-> a service and a service record are two different things.
->
-> The service is something that is BlueZ based. It normally implements one
-> or more profile specifications and provides a D-Bus interface to use
-> them.
->
-> The service record are SDP records that are mandated by the profile
-> specification.
->
-> You can use both independently. However both are bound to your D-Bus
-> connection. If you connection dies (meaning your process disconnects)
-> the service and also the service records will be automatically removed.
->
->   
->> What happened with the RFCOMM API? I agree it wasn't very nice by 
->> forcing you to open /dev/tty* but it was at least something, now there 
->> isn't anything dbus based. A RFCOMM API with connect(), disconnect(), 
->> read() and write() will be just great (all dbus based ofcourse, no 
->> /dev/tty* stuff :) ).
->>     
->
-> The RFCOMM API has been moved over to a serial service.
->
-> If you don't wanna open /dev/rfcomm* then use Bluetooth RFCOMM sockets
-> directly. D-Bus is not for transferring data.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by DB2 Express
-> Download DB2 Express C - the FREE version of DB2 express and take
-> control of your XML. No limits. Just data. Click to get it now.
-> http://sourceforge.net/powerbar/db2/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->   
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
