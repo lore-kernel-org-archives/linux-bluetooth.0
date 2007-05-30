@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <f3jl24$tmp$1@sea.gmane.org>
-References: <f3ev58$iku$1@sea.gmane.org>
-	<1180411455.21432.114.camel@aeonflux.holtmann.net>
-	<f3i8fk$tfv$1@sea.gmane.org>
+To: bluez-devel@lists.sourceforge.net
+From: Pascal <pascal@pabr.org>
+Date: Wed, 30 May 2007 12:52:52 +0200
+Message-ID: <f3jl24$tmp$1@sea.gmane.org>
+References: <f3ev58$iku$1@sea.gmane.org>	<1180411455.21432.114.camel@aeonflux.holtmann.net>	<f3i8fk$tfv$1@sea.gmane.org>
 	<1180510319.21432.158.camel@aeonflux.holtmann.net>
-	<f3jl24$tmp$1@sea.gmane.org>
-Date: Wed, 30 May 2007 13:51:02 +0200
-Message-Id: <1180525862.21432.186.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
+In-Reply-To: <1180510319.21432.158.camel@aeonflux.holtmann.net>
 Subject: Re: [Bluez-devel] Increasing HIDP_DEFAULT_MTU ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -24,26 +21,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pascal,
+Marcel,
 
-> > do you mean the controller that comes with the PS3?
-> 
-> Yes, a.k.a. "sixaxis".  It is not really advertised as a HIDP
-> device, but it behaves pretty much like one.  Sony also has a
-> TV-style Bluetooth remote, which I have not tested.
+> do you mean the controller that comes with the PS3?
 
-actually I have both of them. The controller is kinda nasty and I have
-to integrate the cable-based authentication somehow nicely with udev and
-the input service.
+Yes, a.k.a. "sixaxis".  It is not really advertised as a HIDP
+device, but it behaves pretty much like one.  Sony also has a
+TV-style Bluetooth remote, which I have not tested.
 
-The remote uses a total weird HID report format. Doesn't make sense to
-push that through the kernel. We will use a fake HID inside the input
-service and then uinput to create the input device.
+Regards,
 
-Regards
-
-Marcel
-
+Pascal
 
 
 -------------------------------------------------------------------------
