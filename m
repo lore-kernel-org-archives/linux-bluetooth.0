@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Pascal <pascal@pabr.org>
-Date: Wed, 30 May 2007 12:52:52 +0200
-Message-ID: <f3jl24$tmp$1@sea.gmane.org>
-References: <f3ev58$iku$1@sea.gmane.org>	<1180411455.21432.114.camel@aeonflux.holtmann.net>	<f3i8fk$tfv$1@sea.gmane.org>
-	<1180510319.21432.158.camel@aeonflux.holtmann.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <465D4072.6030507@rousse.org>
+References: <465AF314.5090206@rousse.org>
+	<1180411732.21432.119.camel@aeonflux.holtmann.net>
+	<465D4072.6030507@rousse.org>
+Date: Wed, 30 May 2007 11:36:16 +0200
+Message-Id: <1180517776.21432.182.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-In-Reply-To: <1180510319.21432.158.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] Increasing HIDP_DEFAULT_MTU ?
+Subject: Re: [Bluez-devel] dbus api
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,17 +22,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel,
+Hi Alexander,
 
-> do you mean the controller that comes with the PS3?
+> where can I read or look for examples of a service? I'm confued, how can 
+> one make a service available with a name and description?
 
-Yes, a.k.a. "sixaxis".  It is not really advertised as a HIDP
-device, but it behaves pretty much like one.  Sony also has a
-TV-style Bluetooth remote, which I have not tested.
+the bluez-utils source code is full of examples.
 
-Regards,
+> What about listing the currently added local service records? It looks 
+> like such a method is missing from the API.
 
-Pascal
+And for what do you wanna use that? It is not useful at all.
+
+> If I want to make a rfcomm-based service available on my PC for others, 
+> than the right way would be to register a service record with a rfcomm 
+> protocol descriptor and than I should bind listening for new connections 
+> on rfcomm, right?
+
+Yes.
+
+> What do you mean the RFCOMM API is moved to a service? How can I access 
+> it? How can I initiate a new rfcomm connection or listen for an incoming 
+> one?
+
+For servers you wanna use the RFCOMM sockets.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
