@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <6669365c0705311057j1461f3d8w5ebcaed786570073@mail.gmail.com>
-Date: Thu, 31 May 2007 17:57:22 +0000
-From: "Daniel Ribeiro" <drwyrm@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_35397_28834677.1180634242931"
-Subject: [Bluez-devel] [PATCH] bcm2035 on UART at higher speeds and support
-	for setting BDADDR.
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <E1HticC-00011g-SL@mail.sourceforge.net>
+References: <E1HticC-00011g-SL@mail.sourceforge.net>
+Date: Thu, 31 May 2007 16:07:56 +0100
+Message-Id: <1180624077.3030.184.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-devel] connect fail : Operation now in progress
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,91 +17,32 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_35397_28834677.1180634242931
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi Marcel.
-I dont know if the patch i posted before was lost, or is already
-scheduled for later inclusion..
-I am sending it again, sorry if you got it already the first time i sent.
-
-Let me know if something is not fine for you.
-
-Thank you.
-
--- 
-EOF
-
-Daniel Ribeiro
-
-------=_Part_35397_28834677.1180634242931
-Content-Type: text/x-diff; name=bluez-bcm2035.patch; charset=ANSI_X3.4-1968
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_f2dbbu0r
-Content-Disposition: attachment; filename="bluez-bcm2035.patch"
-
-VGhpcyBjb3JyZWN0cyBiYXVyYXRlIHBhcmFtZXRlcnMgZm9yIGJjbTIwMzUgY29ubmVjdGVkIHZp
-YSB1YXJ0IGFuZCBhZGRzCnN1cHBvcnQgZm9yIHNldHRpbmcgdGhlIGJkYWRkci4KClNpZ25lZC1v
-ZmYtYnk6IERhbmllbCBSaWJlaXJvIDxkcnd5cm1AZ21haWwuY29tPgpJbmRleDogYmx1ZXotdXRp
-bHMtMy4xMC90b29scy9oY2lhdHRhY2guYwo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Ci0tLSBibHVlei11dGlscy0zLjEw
-Lm9yaWcvdG9vbHMvaGNpYXR0YWNoLmMJMjAwNy0wNS0xMiAxMzoxNjozOC4wMDAwMDAwMDAgLTAz
-MDAKKysrIGJsdWV6LXV0aWxzLTMuMTAvdG9vbHMvaGNpYXR0YWNoLmMJMjAwNy0wNS0xMiAxNTo0
-NDoxNC4wMDAwMDAwMDAgLTAzMDAKQEAgLTkyNSwxMSArOTI1LDEzIEBACiAvKgogICogQnJvYWRj
-b20gc3BlY2lmaWMgaW5pdGlhbGl6YXRpb24KICAqIEV4dHJhY3RlZCBmcm9tIEp1bmdvIG9wZW5y
-ZworICogU2V0IGJkYWRkciBhbmQgY29ycmVjdCBiYXVkIHJhdGUgYXJndW1lbnRzIHRha2VuIGZy
-b20gT3BlbkVaWAogICovCiBzdGF0aWMgaW50IGJjbTIwMzUoaW50IGZkLCBzdHJ1Y3QgdWFydF90
-ICp1LCBzdHJ1Y3QgdGVybWlvcyAqdGkpCiB7CiAJaW50IG47CiAJdW5zaWduZWQgY2hhciBjbWRb
-MzBdLCByZXNwWzMwXTsKKwliZGFkZHJfdCBiZGFkZHI7CiAKIAkvKiBSZXNldCB0aGUgQlQgQ2hp
-cCAqLwogCW1lbXNldChjbWQsIDAsIHNpemVvZihjbWQpKTsKQEAgLTk1MSw2ICs5NTMsMzIgQEAK
-IAkJcmV0dXJuIC0xOwogCX0KIAorCWlmICh1LT5iZGFkZHIgIT0gTlVMTCkgeworCQkvKiBzZXQg
-YmRhZGRyICovCisJCW1lbXNldChjbWQsIDAsIHNpemVvZihjbWQpKTsKKwkJbWVtc2V0KHJlc3As
-IDAsIHNpemVvZihyZXNwKSk7CisJCWNtZFswXSA9IEhDSV9DT01NQU5EX1BLVDsKKwkJY21kWzFd
-ID0gMHgwMTsKKwkJY21kWzJdID0gMHhmYzsKKwkJY21kWzNdID0gMHgwNjsKKworCQlzdHIyYmEo
-dS0+YmRhZGRyLCAmYmRhZGRyKTsKKwkJYmFjcHkoKGJkYWRkcl90ICopIChjbWQgKyA0KSwgJmJk
-YWRkcik7CisKKwkJLyogU2VuZCBjb21tYW5kICovCisJCWlmICh3cml0ZShmZCwgY21kLCAxMCkg
-IT0gMTApIHsKKwkJCWZwcmludGYoc3RkZXJyLCAiRmFpbGVkIHRvIHdyaXRlIFwic2V0IGJkYWRk
-clwiICIKKwkJCSJjb21tYW5kXG4iKTsKKwkJCXJldHVybiAtMTsKKwkJfQorCisJCS8qIFJlYWQg
-cmVwbHkgKi8KKwkJaWYgKChuID0gcmVhZF9oY2lfZXZlbnQoZmQsIHJlc3AsIDEwKSkgPCAwKSB7
-CisJCQlmcHJpbnRmKHN0ZGVyciwgIkZhaWxlZCB0byBzZXQgYmRhZGRyXG4iKTsKKwkJCXJldHVy
-biAtMTsKKwkJfQorCX0KKwogCS8qIFJlYWQgdGhlIGxvY2FsIHZlcnNpb24gaW5mbyAqLwogCW1l
-bXNldChjbWQsIDAsIHNpemVvZihjbWQpKTsKIAltZW1zZXQocmVzcCwgMCwgc2l6ZW9mKHJlc3Ap
-KTsKQEAgLTEwMTAsMTEgKzEwMzgsMTEgQEAKIAkJY21kWzVdID0gMHhmYTsKIAkJYnJlYWs7CiAJ
-Y2FzZSA0NjA4MDA6Ci0JCWNtZFs0XSA9IDB4MTE7CisJCWNtZFs0XSA9IDB4MjI7CiAJCWNtZFs1
-XSA9IDB4ZmQ7CiAJCWJyZWFrOwogCWNhc2UgOTIxNjAwOgotCQljbWRbNF0gPSAweDY1OworCQlj
-bWRbNF0gPSAweDU1OwogCQljbWRbNV0gPSAweGZmOwogCQlicmVhazsKIAlkZWZhdWx0OgpAQCAt
-MTEwMyw3ICsxMTMxLDcgQEAKIAl7ICJiaWxsaW9udG9uIiwgMHgwMjc5LCAweDk1MGIsIEhDSV9V
-QVJUX0JDU1AsIDExNTIwMCwgMTE1MjAwLCAwLCAgICAgICAgTlVMTCwgYmNzcCAgICAgfSwKIAog
-CS8qIEJyb2FkY29tIEJDTTIwMzUgKi8KLQl7ICJiY20yMDM1IiwgICAgMHgwQTVDLCAweDIwMzUs
-IEhDSV9VQVJUX0g0LCAgIDExNTIwMCwgMTE1MjAwLCAwLCAgICAgICAgTlVMTCwgYmNtMjAzNSAg
-fSwKKwl7ICJiY20yMDM1IiwgICAgMHgwQTVDLCAweDIwMzUsIEhDSV9VQVJUX0g0LCAgIDExNTIw
-MCwgNDYwODAwLCBGTE9XX0NUTCwgTlVMTCwgYmNtMjAzNSAgfSwKIAogCXsgTlVMTCwgMCB9CiB9
-Owo=
-------=_Part_35397_28834677.1180634242931
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-------=_Part_35397_28834677.1180634242931
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-------=_Part_35397_28834677.1180634242931--
+T24gVGh1LCAyMDA3LTA1LTMxIGF0IDE2OjQ0ICswNTMwLCBBdmVlayBBdWRoeWEgd3JvdGU6Cj4g
+SGksCj4gCj4gICAgICAgICAgICAgSSBhbSB0cnlpbmcgdG8gY29tbXVuaWNhdGUgd2l0aCBhIEoy
+TUUgYXBwbGljYXRpb24gcnVubmluZwo+IG9uIG15IG1vYmlsZSBwaG9uZShOb2tpYSA2NjAwKSB1
+c2luZyBhIGNsaWVudCBwcm9ncmFtIHJ1bm5pbmcgb24gYQo+IExpbnV4IG1hY2hpbmUgKEZDNiku
+IFRoZSDigJhzZHB0b29sIGJyb3dzZeKAmSByZXBvcnRzIHRoYXQgdGhlIEoyTUUKPiBhcHBsaWNh
+dGlvbiBpcyBsaXN0ZW5pbmcgb24gY2hhbm5lbCA0LiBUaGUgSjJNRSBhcHBsaWNhdGlvbiBpcyB1
+c2luZwo+IGJ0c3BwIHByb3RvY29sIHdoZXJlYXMgbXkgY2xpZW50IHNpZGUgYXBwbGljYXRpb24g
+aXMgdXNpbmcgUkZDT01NLiBCdXQKPiB3aGVuIEkgcnVuIHRoZSBjbGllbnQgYXBwbGljYXRpb24s
+IHRoZSDigJhjb25uZWN04oCZIHN5c3RlbS1jYWxsIGZhaWxzCj4gKHJldHVybnMgLTEpIHdpdGgg
+ZXJyb3IgdmFsdWUg4oCcT3BlcmF0aW9uIG5vdyBpbiBwcm9ncmVzc+KAnS4gSSBhbSB1c2luZwo+
+IEJsdWVaIHByb3RvY29sIHN0YWNrLgo+IAo+IFdoYXQgY2FuIGJlIHRoZSBwcm9iYWJsZSByZWFz
+b24gZm9yIHRoaXMga2luZCBvZiBiZWhhdmlvcj8gQW55Cj4gc3VnZ2VzdGlvbiBpcyBhcHByZWNp
+YXRlZC4KCllvdSBwcm9iYWJseSBtYWRlIHRoZSBzb2NrZXQncyBmZCBub24tYmxvY2tpbmcuIEVp
+dGhlciBtYWtlIGl0IGJsb2NraW5nLApvciBzZXR1cCBhIHdhdGNoZXIgb24gdGhlIGZkIHRvIHdh
+aXQgZm9yIHRoZSBsaW5rIHRvIGJlIGNyZWF0ZWQuCgpTZWUgcmZjb21tX2Nvbm5lY3QoKSBpbiBi
+bHVlei11dGlscy9zZXJpYWwvbWFuYWdlci5jCgotLSAKQmFzdGllbiBOb2NlcmEgPGhhZGVzc0Bo
+YWRlc3MubmV0PiAKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25z
+b3JlZCBieSBEQjIgRXhwcmVzcwpEb3dubG9hZCBEQjIgRXhwcmVzcyBDIC0gdGhlIEZSRUUgdmVy
+c2lvbiBvZiBEQjIgZXhwcmVzcyBhbmQgdGFrZQpjb250cm9sIG9mIHlvdXIgWE1MLiBObyBsaW1p
+dHMuIEp1c3QgZGF0YS4gQ2xpY2sgdG8gZ2V0IGl0IG5vdy4KaHR0cDovL3NvdXJjZWZvcmdlLm5l
+dC9wb3dlcmJhci9kYjIvCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vm
+b3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1
+ZXotZGV2ZWwK
