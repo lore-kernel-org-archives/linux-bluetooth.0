@@ -1,104 +1,107 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <a0eb67a90703311403x236db754ob26e7757096177cd@mail.gmail.com>
-Date: Sun, 1 Apr 2007 00:03:11 +0300
-From: Sander <yogizz@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <6669365c0705311057j1461f3d8w5ebcaed786570073@mail.gmail.com>
+Date: Thu, 31 May 2007 17:57:22 +0000
+From: "Daniel Ribeiro" <drwyrm@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] Unable to pair PC with mobile phone
-Reply-To: yogiz@hotmail.com, BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0415087948=="
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Content-Type: multipart/mixed;
+	boundary="----=_Part_35397_28834677.1180634242931"
+Subject: [Bluez-devel] [PATCH] bcm2035 on UART at higher speeds and support
+	for setting BDADDR.
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0415087948==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_44737_25838248.1175374991919"
-
-------=_Part_44737_25838248.1175374991919
+------=_Part_35397_28834677.1180634242931
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
- What I want is to get opensync and file transfers to work between my PC and
+Hi Marcel.
+I dont know if the patch i posted before was lost, or is already
+scheduled for later inclusion..
+I am sending it again, sorry if you got it already the first time i sent.
 
-Sony Ericsson W810i. For that I need to get pairing work. All my current and
+Let me know if something is not fine for you.
 
-solved problems on this particular subject are documented in
-http://www.linuxquestions.org/questions/showthread.php?t=536611
-and you should probably read it through to get all the relevant information
-but I'll try to add a little overview of what' the problem now.
-The PC where I need the pairing to get to work is a desktopless computer
-running Slackware 11.0 and now a 2.6.16.45 kernel. I installed latest dbus,
-this time also dbus glibs, bluez-libs and bluez-utils. hcid works, I can
-ping
-the phone with l2ping, I just can't pair it. The phone sees PC but when it
-tries to pair nothing happens on PC. I was suggested to use passkey-agent to
+Thank you.
 
-give a default pin to use (pin_helper in hcid.conf didn't work) but the
-passkey-agent gives the error:
+-- 
+EOF
 
-Can't register passkey agent
-Method "RegisterDefaultPasskeyAgent" with signature "s" on
-interface "org.bluez.Security" doesn't exist
+Daniel Ribeiro
 
-bluetoothd which I had to start to get it even this far gives the error:
+------=_Part_35397_28834677.1180634242931
+Content-Type: text/x-diff; name=bluez-bcm2035.patch; charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f2dbbu0r
+Content-Disposition: attachment; filename="bluez-bcm2035.patch"
 
-root@SERVER:/usr/src/bluez-utils-3.9/daemon#
-/usr/src/bluez-utils-3.9/daemon/bluetoothd
---debug --nodaemon
-bluetoothd[2179]: Bluetooth daemon ver 3.9
-bluetoothd[2179]: Enabling debug information
-bluetoothd[2179]: Could not become the primary owner of org.bluez
-
-After that I ran out of ideas and I was suggested to try to find help from
-this mailing list. To get all the relevant information you should probably
-read the forum topic. Thanks in advance.
-
-------=_Part_44737_25838248.1175374991919
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-	What I want is to get opensync and file transfers to work between my PC and <br>Sony Ericsson W810i. For that I need to get pairing work. All my current and <br>solved problems on this particular subject are documented in 
-<br><a href="http://www.linuxquestions.org/questions/showthread.php?t=536611">http://www.linuxquestions.org/questions/showthread.php?t=536611</a><br>and you should probably read it through to get all the relevant information
-<br>but I&#39;ll try to add a little overview of what&#39; the problem now.<br>The PC where I need the pairing to get to work is a desktopless computer <br>running Slackware 11.0 and now a <a href="http://2.6.16.45">2.6.16.45
-</a> kernel. I installed latest dbus, <br>this time also dbus glibs, bluez-libs and bluez-utils. hcid works, I can ping <br>the phone with l2ping, I just can&#39;t pair it. The phone sees PC but when it <br>tries to pair nothing happens on PC. I was suggested to use passkey-agent to 
-<br>give a default pin to use (pin_helper in hcid.conf didn&#39;t work) but the <br>passkey-agent gives the error: <br><br>Can&#39;t register passkey agent<br>Method &quot;RegisterDefaultPasskeyAgent&quot; with signature &quot;s&quot; on 
-<br>interface &quot;org.bluez.Security&quot; doesn&#39;t exist<br><br>bluetoothd which I had to start to get it even this far gives the error:<br><br>root@SERVER:/usr/src/bluez-utils-3.9/daemon# /usr/src/bluez-utils-3.9/daemon/bluetoothd --debug --nodaemon
-<br>bluetoothd[2179]: Bluetooth daemon ver 3.9<br>bluetoothd[2179]: Enabling debug information<br>bluetoothd[2179]: Could not become the primary owner of org.bluez<br><br>After that I ran out of ideas and I was suggested to try to find help from 
-<br>this mailing list. To get all the relevant information you should probably <br>read the forum topic. Thanks in advance.<br><br><br>
-
-------=_Part_44737_25838248.1175374991919--
-
-
---===============0415087948==
+VGhpcyBjb3JyZWN0cyBiYXVyYXRlIHBhcmFtZXRlcnMgZm9yIGJjbTIwMzUgY29ubmVjdGVkIHZp
+YSB1YXJ0IGFuZCBhZGRzCnN1cHBvcnQgZm9yIHNldHRpbmcgdGhlIGJkYWRkci4KClNpZ25lZC1v
+ZmYtYnk6IERhbmllbCBSaWJlaXJvIDxkcnd5cm1AZ21haWwuY29tPgpJbmRleDogYmx1ZXotdXRp
+bHMtMy4xMC90b29scy9oY2lhdHRhY2guYwo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Ci0tLSBibHVlei11dGlscy0zLjEw
+Lm9yaWcvdG9vbHMvaGNpYXR0YWNoLmMJMjAwNy0wNS0xMiAxMzoxNjozOC4wMDAwMDAwMDAgLTAz
+MDAKKysrIGJsdWV6LXV0aWxzLTMuMTAvdG9vbHMvaGNpYXR0YWNoLmMJMjAwNy0wNS0xMiAxNTo0
+NDoxNC4wMDAwMDAwMDAgLTAzMDAKQEAgLTkyNSwxMSArOTI1LDEzIEBACiAvKgogICogQnJvYWRj
+b20gc3BlY2lmaWMgaW5pdGlhbGl6YXRpb24KICAqIEV4dHJhY3RlZCBmcm9tIEp1bmdvIG9wZW5y
+ZworICogU2V0IGJkYWRkciBhbmQgY29ycmVjdCBiYXVkIHJhdGUgYXJndW1lbnRzIHRha2VuIGZy
+b20gT3BlbkVaWAogICovCiBzdGF0aWMgaW50IGJjbTIwMzUoaW50IGZkLCBzdHJ1Y3QgdWFydF90
+ICp1LCBzdHJ1Y3QgdGVybWlvcyAqdGkpCiB7CiAJaW50IG47CiAJdW5zaWduZWQgY2hhciBjbWRb
+MzBdLCByZXNwWzMwXTsKKwliZGFkZHJfdCBiZGFkZHI7CiAKIAkvKiBSZXNldCB0aGUgQlQgQ2hp
+cCAqLwogCW1lbXNldChjbWQsIDAsIHNpemVvZihjbWQpKTsKQEAgLTk1MSw2ICs5NTMsMzIgQEAK
+IAkJcmV0dXJuIC0xOwogCX0KIAorCWlmICh1LT5iZGFkZHIgIT0gTlVMTCkgeworCQkvKiBzZXQg
+YmRhZGRyICovCisJCW1lbXNldChjbWQsIDAsIHNpemVvZihjbWQpKTsKKwkJbWVtc2V0KHJlc3As
+IDAsIHNpemVvZihyZXNwKSk7CisJCWNtZFswXSA9IEhDSV9DT01NQU5EX1BLVDsKKwkJY21kWzFd
+ID0gMHgwMTsKKwkJY21kWzJdID0gMHhmYzsKKwkJY21kWzNdID0gMHgwNjsKKworCQlzdHIyYmEo
+dS0+YmRhZGRyLCAmYmRhZGRyKTsKKwkJYmFjcHkoKGJkYWRkcl90ICopIChjbWQgKyA0KSwgJmJk
+YWRkcik7CisKKwkJLyogU2VuZCBjb21tYW5kICovCisJCWlmICh3cml0ZShmZCwgY21kLCAxMCkg
+IT0gMTApIHsKKwkJCWZwcmludGYoc3RkZXJyLCAiRmFpbGVkIHRvIHdyaXRlIFwic2V0IGJkYWRk
+clwiICIKKwkJCSJjb21tYW5kXG4iKTsKKwkJCXJldHVybiAtMTsKKwkJfQorCisJCS8qIFJlYWQg
+cmVwbHkgKi8KKwkJaWYgKChuID0gcmVhZF9oY2lfZXZlbnQoZmQsIHJlc3AsIDEwKSkgPCAwKSB7
+CisJCQlmcHJpbnRmKHN0ZGVyciwgIkZhaWxlZCB0byBzZXQgYmRhZGRyXG4iKTsKKwkJCXJldHVy
+biAtMTsKKwkJfQorCX0KKwogCS8qIFJlYWQgdGhlIGxvY2FsIHZlcnNpb24gaW5mbyAqLwogCW1l
+bXNldChjbWQsIDAsIHNpemVvZihjbWQpKTsKIAltZW1zZXQocmVzcCwgMCwgc2l6ZW9mKHJlc3Ap
+KTsKQEAgLTEwMTAsMTEgKzEwMzgsMTEgQEAKIAkJY21kWzVdID0gMHhmYTsKIAkJYnJlYWs7CiAJ
+Y2FzZSA0NjA4MDA6Ci0JCWNtZFs0XSA9IDB4MTE7CisJCWNtZFs0XSA9IDB4MjI7CiAJCWNtZFs1
+XSA9IDB4ZmQ7CiAJCWJyZWFrOwogCWNhc2UgOTIxNjAwOgotCQljbWRbNF0gPSAweDY1OworCQlj
+bWRbNF0gPSAweDU1OwogCQljbWRbNV0gPSAweGZmOwogCQlicmVhazsKIAlkZWZhdWx0OgpAQCAt
+MTEwMyw3ICsxMTMxLDcgQEAKIAl7ICJiaWxsaW9udG9uIiwgMHgwMjc5LCAweDk1MGIsIEhDSV9V
+QVJUX0JDU1AsIDExNTIwMCwgMTE1MjAwLCAwLCAgICAgICAgTlVMTCwgYmNzcCAgICAgfSwKIAog
+CS8qIEJyb2FkY29tIEJDTTIwMzUgKi8KLQl7ICJiY20yMDM1IiwgICAgMHgwQTVDLCAweDIwMzUs
+IEhDSV9VQVJUX0g0LCAgIDExNTIwMCwgMTE1MjAwLCAwLCAgICAgICAgTlVMTCwgYmNtMjAzNSAg
+fSwKKwl7ICJiY20yMDM1IiwgICAgMHgwQTVDLCAweDIwMzUsIEhDSV9VQVJUX0g0LCAgIDExNTIw
+MCwgNDYwODAwLCBGTE9XX0NUTCwgTlVMTCwgYmNtMjAzNSAgfSwKIAogCXsgTlVMTCwgMCB9CiB9
+Owo=
+------=_Part_35397_28834677.1180634242931
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 -------------------------------------------------------------------------
-Take Surveys. Earn Cash. Influence the Future of IT
-Join SourceForge.net's Techsay panel and you'll get the chance to share your
-opinions on IT & business topics through brief surveys-and earn cash
-http://www.techsay.com/default.php?page=join.php&p=sourceforge&CID=DEVDEV
---===============0415087948==
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+------=_Part_35397_28834677.1180634242931
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============0415087948==--
+------=_Part_35397_28834677.1180634242931--
