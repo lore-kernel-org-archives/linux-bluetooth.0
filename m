@@ -1,14 +1,23 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ville Tervo <ville.tervo@nokia.com>
-In-Reply-To: <20070601111156.GB6310@null.research.nokia.com>
-References: <20070601111156.GB6310@null.research.nokia.com>
-Date: Fri, 01 Jun 2007 17:21:01 +0200
-Message-Id: <1180711261.6726.6.camel@aeonflux.holtmann.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <466032F7.1080607@idlum.be>
+References: <20060222091231.GM19185@null.research.nokia.com>
+	<1140607245.4519.7.camel@localhost>
+	<20060222125425.GQ19185@null.research.nokia.com>
+	<20060224110357.GT19185@null.research.nokia.com>
+	<1141188501.29216.1.camel@localhost>
+	<1180265456.3030.9.camel@cookie.hadess.net>
+	<1180268229.21432.63.camel@aeonflux.holtmann.net>
+	<1180277003.3030.18.camel@cookie.hadess.net>
+	<1180283308.21432.67.camel@aeonflux.holtmann.net>
+	<1180304170.3030.23.camel@cookie.hadess.net>
+	<1180341563.21432.97.camel@aeonflux.holtmann.net>
+	<466032F7.1080607@idlum.be>
+Date: Fri, 01 Jun 2007 17:16:07 +0200
+Message-Id: <1180710967.6726.1.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [Patch] Keep rfcomm device in list until it's
-	freed
+Subject: Re: [Bluez-devel] Soft lockup
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,21 +31,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Ville,
+Hi Pierre-Yves,
 
-> Here is patch for rfcomm to keep rfcomm device in list until it's really
-> unused.
+> > That might be a little bit too much debug overhead. However all services
+> > can be started with -s and then they work standalone. So you can use gdb
+> > and valgrind with them.
+> 
+> Could you or anybody knowing about it please explain more about the 
+> funtion and usage of this "-s" parameter, which I can't find in the man 
+> pages? I experience various crashes of hcid on some systems, and would 
+> like to track the problem down as much as possible, and it seems this 
+> option may help me.
 
-        dev = __rfcomm_dev_get(id);
-+
-+       if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
-+               dev = NULL;
-+
-        if (dev)
-                rfcomm_dev_hold(dev);
+the -s is only for the services. It can only used for service debugging.
+If hcid crashed, then that is something different.
 
-a test_bit() and then return NULL at the beginning makes more sense. No
-need to take the lock since test_bit() is atomic anyway.
+The -s option only tells the service to register the service and make it
+possible to run standalone (hence the option character).
 
 Regards
 
