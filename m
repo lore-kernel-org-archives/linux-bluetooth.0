@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 1 Jun 2007 18:34:55 +0200
-From: Andreas Gaufer <Andreas.Gaufer@bluecellnetworks.com>
-To: Bluez Devel <bluez-devel@lists.sourceforge.net>
-Message-ID: <20070601183455.76998305@localhost.localdomain>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ville Tervo <ville.tervo@nokia.com>
+In-Reply-To: <20070601111156.GB6310@null.research.nokia.com>
+References: <20070601111156.GB6310@null.research.nokia.com>
+Date: Fri, 01 Jun 2007 17:21:01 +0200
+Message-Id: <1180711261.6726.6.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel] [PATCH] Fix broken behavior with
-	EVT_REMOTE_NAME_REQ_COMPLETE
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] [Patch] Keep rfcomm device in list until it's
+	freed
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,104 +22,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi, 
+Hi Ville,
 
-the included patch tries to fix broken behavior of hci_send_req from the bluez-libs package.
+> Here is patch for rfcomm to keep rfcomm device in list until it's really
+> unused.
 
-The function returns data from a EVT_REMOTE_NAME_REQ_COMPLETE event to a
-call from hci_read_remote_name_with_clock_offset without checking if the
-event parameter BD_ADDR equals the bdaddr that was requested.
-
-This problem shows if multiple processes use the same hci-device to do
-remote name requests at the same time. In this scenario all processes
-receive data from the first request-complete-event that occurs after
-there call. This data is only correct for one of them, all others get
-wrong data.
-
-The patch tries to avoid that by comparing the events parameter BD_ADDR
-with the bdaddr of the request. If they match the data is returned, if
-they don't further events are processed.
-
-Since my experience in writing C is very limited i would appreciate
-detailed review and feedback on how this could be done better.
-
-Greetings
-
-Andy
-
-
-
-Index: hci.c
-===================================================================
-RCS file: /cvsroot/bluez/libs/src/hci.c,v
-retrieving revision 1.103
-diff -u -r1.103 hci.c
---- hci.c	13 Feb 2007 14:44:47 -0000	1.103
-+++ hci.c	1 Jun 2007 16:09:01 -0000
-@@ -962,6 +962,8 @@
- 	while (try--) {
- 		evt_cmd_complete *cc;
- 		evt_cmd_status   *cs;
-+		evt_remote_name_req_complete *rn;
-+		remote_name_req_cp *cp;
- 
- 		if (to) {
- 			struct pollfd p;
-@@ -1026,6 +1028,21 @@
- 			memcpy(r->rparam, ptr, r->rlen);
- 			goto done;
- 
-+		case EVT_REMOTE_NAME_REQ_COMPLETE:
+        dev = __rfcomm_dev_get(id);
 +
-+			if (hdr->evt != r->event)
-+				break;
++       if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
++               dev = NULL;
 +
-+			r->rlen = MIN(len, r->rlen);
-+			memcpy(r->rparam, ptr, r->rlen);
-+
-+			rn = r->rparam;
-+			cp = r->cparam;
-+
-+			if (bacmp(&rn->bdaddr,&cp->bdaddr) == 0)
-+				goto done;
-+			continue;
-+
- 		default:
- 			if (hdr->evt != r->event)
- 				break;
+        if (dev)
+                rfcomm_dev_hold(dev);
 
+a test_bit() and then return NULL at the beginning makes more sense. No
+need to take the lock since test_bit() is atomic anyway.
 
+Regards
 
-Example Situation:
-
-************* before patch *******************
-
-TESTHOST:~# hcitool name 00:1B:33:39:48:EE & hcitool name 00:15:A0:85:2F:FB &  hcitool name 00:15:83:B9:EE:E5 &
-[1] 24876
-[2] 24877
-[3] 24878
-TESTHOST:~# N73
-N73
-N73
-
-[1]   Done                    hcitool name 00:1B:33:39:48:EE
-[2]-  Done                    hcitool name 00:15:A0:85:2F:FB
-[3]+  Done                    hcitool name 00:15:83:B9:EE:E5
-
-************* after patch *******************
-
-TESTHOST:~# hcitool name 00:1B:33:39:48:EE & hcitool name 00:15:A0:85:2F:FB &  hcitool name 00:15:83:B9:EE:E5 &
-[1] 25688
-[2] 25689
-[3] 25690
-TESTHOST:~# N73
-N70
-obextester-0
-
-[1]   Done                    hcitool name 00:1B:33:39:48:EE
-[2]-  Done                    hcitool name 00:15:A0:85:2F:FB
-[3]+  Done                    hcitool name 00:15:83:B9:EE:E5
-
+Marcel
 
 
 
