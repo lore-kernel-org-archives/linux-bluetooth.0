@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d89ddf300706012200y24b8d2b3k73c08094ce79e87@mail.gmail.com>
-Date: Fri, 1 Jun 2007 23:00:14 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <9855f77c0706011039yd1efcfen51243a88644c5f57@mail.gmail.com>
+Date: Fri, 1 Jun 2007 21:26:06 +0200
+From: Stefan Seyfried <seife@suse.de>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <20070601192606.GC21247@suse.de>
+References: <4660704B.7050703@pagestation.com>
 MIME-Version: 1.0
-References: <9855f77c0705292042w6b174b39y6f5598983e9d3616@mail.gmail.com>
-	<9855f77c0706011039yd1efcfen51243a88644c5f57@mail.gmail.com>
-Subject: Re: [Bluez-users] CSR Chipset
+In-Reply-To: <4660704B.7050703@pagestation.com>
+Subject: Re: [Bluez-users] centos 5 hci dump
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,56 +16,50 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0033824844=="
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0033824844==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_9255_22772190.1180760414913"
+On Fri, Jun 01, 2007 at 03:15:23PM -0400, Jerry Geis wrote:
+> I am getting the following dump on centos 5. Gigabyte AM2 motherboard.
+> System boots and works for a time, then after this dump my USB mouse stop=
+s working.
+> =
 
-------=_Part_9255_22772190.1180760414913
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> hcid --version reports 3.7
+> =
 
-Viswandha,
+> Should I update bluez packages? Will that help? This same computer had no
+> issues under centos 4.4, mouse worked fine.
 
-I think you are on the right track to try CSR. Silicon Wave is notoriously
-flaky with sco.
+To me (not being an expert, though), this does not look bluetooth related.
+ =
 
-Brad
+>  <IRQ>  [<ffffffff800b389d>] __report_bad_irq+0x30/0x7d
+>  [<ffffffff800b3ad0>] note_interrupt+0x1e6/0x227
+>  [<ffffffff800b3005>] __do_IRQ+0xc7/0x105
+>  [<ffffffff80011c19>] __do_softirq+0x5e/0xd5
+>  [<ffffffff8006a195>] do_IRQ+0xe7/0xf5
+>  [<ffffffff8005b649>] ret_from_intr+0x0/0xa
+>  <EOI>
+> handlers:
+> [<ffffffff801d213f>] (usb_hcd_irq+0x0/0x55)
+-- =
 
-------=_Part_9255_22772190.1180760414913
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Viswandha,<br><br>I think you are on the right track to try CSR. Silicon Wave is notoriously flaky with sco.<br><br>Brad<br>
-
-------=_Part_9255_22772190.1180760414913--
+Stefan Seyfried
+QA / R&D Team Mobile Devices        |              "Any ideas, John?"
+SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
 
 
---===============0033824844==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0033824844==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0033824844==--
