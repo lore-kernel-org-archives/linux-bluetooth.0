@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <5eee8c670706030625o6aad300al5b1848f4e9394ebd@mail.gmail.com>
-Date: Sun, 3 Jun 2007 14:25:35 +0100
-From: "Odysseus Flappington" <deriziotis@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <BAY115-W2E4062F0900DFC1AD4F42A4230@phx.gbl>
+From: Anas koara <anaskoara@hotmail.com>
+To: <bluez-users@lists.sourceforge.net>
+Date: Sat, 2 Jun 2007 16:48:58 +0000
 MIME-Version: 1.0
-Subject: [Bluez-users] a2dp stream + bluetooth mouse not working at same time
+Subject: [Bluez-users] new user
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,83 +14,22 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0867068909=="
+Content-Type: text/plain; charset="iso-8859-6"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0867068909==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_25404_12434190.1180877135684"
-
-------=_Part_25404_12434190.1180877135684
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi,
-
-I've got the MS IntelliMouse Explorer for Bluetooth, and a pair of Orange
-Bluetooth speakers
-(http://www.acoustic-energy.co.uk/News_and_reviews/orangebluetooth.asp).
-I'm using Feisty Fawn and have configured bluetooth-alsa to stream all
-sounds to the bluetooth speakers (via .asounrc in pcm.!default) which works
-well enough if it's the only bluetooth device I'm using.
-
-The only issue is, whenever I connect and move the mouse (using hidd) while
-I'm streaming music using a2dpd, the music starts cutting out and jumping
-until I stop moving the mouse. My first thought was that the bluetooth
-device reached a bandwidth limit. However, a thought occurred to me- since
-the mouse is sending to the bluetooth device, but the speakers are receiving
-from the device- is there not a separate send/receive bandwidth?
-
-One thing I have tried is disabling the bluetooth sniff mode by echoing 0 to
-/sys/class/bluetooth/hci0/idle_timeout, which I think may be providing a
-slight improvement on things (altho it's hard to tell). Am I expecting too
-much from my bluetooth transceiver? Anyone have any ideas how I can improve
-the performance of these two devices working together?
-
-Regards,
-Alex
-
-------=_Part_25404_12434190.1180877135684
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi,<br><br>I&#39;ve got the MS IntelliMouse Explorer for Bluetooth, and a pair of Orange Bluetooth speakers (<a href="http://www.acoustic-energy.co.uk/News_and_reviews/orangebluetooth.asp" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">
-
-http://www.acoustic-energy.co.uk/News_and_reviews/orangebluetooth.asp</a>). I&#39;m using Feisty Fawn and have configured bluetooth-alsa to stream all sounds to the bluetooth speakers (via .asounrc in pcm.!default) which works well enough if it&#39;s the only bluetooth device I&#39;m using.
-<br><br>The
-only issue is, whenever I connect and move the mouse (using hidd) while I&#39;m streaming music
-using a2dpd, the music starts cutting out and jumping until I stop moving the mouse. My first thought was that the bluetooth device reached
-a bandwidth limit. However, a thought occurred to me- since the mouse
-is sending to the bluetooth device, but the speakers are receiving from
-the device- is there not a separate send/receive bandwidth? <br><br>One thing I have tried is disabling the bluetooth sniff mode by echoing 0 to  /sys/class/bluetooth/hci0/idle_timeout, which I think may be providing a slight improvement on things (altho it&#39;s hard to tell). Am I expecting too much from my bluetooth transceiver? Anyone have any ideas how I can improve the performance of these two devices working together?
-<br><br>Regards,<br>Alex<br>
-
-------=_Part_25404_12434190.1180877135684--
-
-
---===============0867068909==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
---===============0867068909==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0867068909==--
+DQpIaSBmb3IgYWxsIA0KSSBhbSBuZXcgc3Vic2NyaWJlciB0byB0aGlzIG1haWxpbmcgbGlzdCAN
+CkkgdXNlZCB0byBwcm9ncmFtIGJsdWV0b290aCB3aXRoIGphdmEgIG9uIHdpbmRvd3MgDQpidXQg
+bm93IEkgd2FudCBtb3ZlIHRvIGJsdWV0b290aCBwcm9ncmFtbWluZyBJbiBsaW51eCB3aGVyZSBJ
+IGNhbiBmaW5kIA0Kc2hvcnQgdHV0b3JpYWwgZm9yIGJsdWV6IA0KDQpUaGFua3MgaW4gYWR2YW5j
+ZSANCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fDQrHytXkIMjH5MPVz+LHwSDIx9PKzs/H5SDHytXH5CDj5cjq6MrRIMXk6SDj
+5cjq6MrRIC0tIOXMx+brxw0KaHR0cDovL2dldC5saXZlLmNvbS9tZXNzZW5nZXIvb3ZlcnZpZXcK
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnkgREIyIEV4
+cHJlc3MKRG93bmxvYWQgREIyIEV4cHJlc3MgQyAtIHRoZSBGUkVFIHZlcnNpb24gb2YgREIyIGV4
+cHJlc3MgYW5kIHRha2UKY29udHJvbCBvZiB5b3VyIFhNTC4gTm8gbGltaXRzLiBKdXN0IGRhdGEu
+IENsaWNrIHRvIGdldCBpdCBub3cuCmh0dHA6Ly9zb3VyY2Vmb3JnZS5uZXQvcG93ZXJiYXIvZGIy
+LwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei11
+c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBz
+Oi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
