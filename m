@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sat, 2 Jun 2007 18:40:43 +0200
-From: Aldo Maggi <turms@ciaoweb.it>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20070602184043.594698c5@topolino>
-Mime-Version: 1.0
-Subject: [Bluez-users] problems with network via bluetooth
+Message-ID: <d89ddf300706012200y24b8d2b3k73c08094ce79e87@mail.gmail.com>
+Date: Fri, 1 Jun 2007 23:00:14 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <9855f77c0706011039yd1efcfen51243a88644c5f57@mail.gmail.com>
+MIME-Version: 1.0
+References: <9855f77c0705292042w6b174b39y6f5598983e9d3616@mail.gmail.com>
+	<9855f77c0706011039yd1efcfen51243a88644c5f57@mail.gmail.com>
+Subject: Re: [Bluez-users] CSR Chipset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,93 +17,56 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0033824844=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-my home lan is made up with three desktops.
-one of them (GW) has 3 eth cards the first one links to the router
-the other 2 connect PC1 and PC2 to GW.
-PC1 has 2 eth cards, the first one links it to GW and i use the second
-to connect, from time to time, my notebook (NB) to the lan.
+--===============0033824844==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_9255_22772190.1180760414913"
 
-recently i have bought 2 bluetooth/usb adapters because i wished to
-create a bluetooth net between PC1 and NB
+------=_Part_9255_22772190.1180760414913
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-in PC1 i have Ubuntu Gutsy (but i have the problem i'm going to tell
-also with Debian Lenny which is installed in PC1 as well) and in the
-NB i have Debian Lenny.
+Viswandha,
 
-the two bluetooth systems see each other:
+I think you are on the right track to try CSR. Silicon Wave is notoriously
+flaky with sco.
 
-if i run in the NB:  hcitool scan
-correctly get:
-11:11:11:11:11:11   paperino-0
- 
-the same in PC1:
-00:15:83:B3:D3:9A    paperinik-0
+Brad
 
-in PC1 in the /etc/bluetooth/hcid.conf i have the line:
-lm accept,master;
+------=_Part_9255_22772190.1180760414913
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-in NB in the same file:
-lm accept;
+Viswandha,<br><br>I think you are on the right track to try CSR. Silicon Wave is notoriously flaky with sco.<br><br>Brad<br>
 
-in PC1 i run:
-pand  --listen --role NAP
+------=_Part_9255_22772190.1180760414913--
 
-in NB i run:
-pand --role PANU --persist --search
 
-and i can read in the relevant /var/log/daemon.log the following:
-in PC1 - pand: new Connection from 00:15:83:B3:D3:9A bnep0
-in NB - pand: Connecting to 11:11:11:11:11:11
-        pand: bnep0 Connected
-
-then i run
-in PC1: ifconfig bnep0 192.168.6.1 netmask 255.255.255.0
-in  NB: ifconfig bnep0 192.168.6.2 netmask 255.255.255.0
-
-and i can read in the relevant /var/log/daemon.log the following:
-in PC1
-Jun  2 18:15:59 paperino avahi-daemon[4819]: Joining mDNS multicast
-group on interface bnep0.IPv4 with address 192.168.6.1. 
-Jun  2 18:15:59
-paperino avahi-daemon[4819]: New relevant interface bnep0.IPv4 for
-mDNS. 
-Jun  2 18:15:59 paperino avahi-daemon[4819]: Registering new
-address record for 192.168.6.1 on bnep0.IPv4. 
-Jun  2 18:16:00 paperino
-avahi-daemon[4819]: Registering new address record for
-fe80::1311:11ff:fe11:1111 on bnep0.*. 
-Jun  2 18:19:53 paperino
-ntpd[4885]: Listening on interface #7 bnep0,
-fe80::1311:11ff:fe11:1111#123 Enabled 
-Jun  2 18:19:53 paperino
-ntpd[4885]: Listening on interface #8 bnep0, 192.168.6.1#123 Enabled
-
-and in NB
-Jun  2 18:17:07 paperinik avahi-daemon[2750]: New relevant interface bnep0.IPv4 for mDNS.
-Jun  2 18:17:07 paperinik avahi-daemon[2750]: Joining mDNS multicast group on interface bnep0.IPv4 with address 192.168.6.2.
-Jun  2 18:17:07 paperinik avahi-daemon[2750]: Registering new address record for 192.168.6.2 on bnep0.
-
-the 192.168.6.0 net on bnep0 is correctly shown by netstat -nr in both
-PC1 and NB
-
-but if i do ping from one machine the ip of the other i get Destination
-Host Unreachable 
-
-where do you think i'm wrong?
-thanks
-
- 
+--===============0033824844==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============0033824844==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0033824844==--
