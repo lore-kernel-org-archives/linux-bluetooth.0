@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sun, 3 Jun 2007 07:32:03 -0700 (PDT)
-From: walt shekrota <penguinacity@yahoo.com>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
+From: "leiyu" <leiyu@kcoe.cn>
+To: <bluez-users@lists.sourceforge.net>
+Date: Sun, 3 Jun 2007 21:42:01 +0800
+Message-ID: <EJENLMBEOLKAMCJFBFMDEECBCAAA.leiyu@kcoe.cn>
 MIME-Version: 1.0
-Message-ID: <776670.33525.qm@web62301.mail.re1.yahoo.com>
-Subject: [Bluez-users] alsa module rebuild
+In-Reply-To: <EJENLMBEOLKAMCJFBFMDCEBNCAAA.leiyu@kcoe.cn>
+Subject: [Bluez-users] the problem of cross-compile bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,61 +15,80 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1905285310=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1905285310==
-Content-Type: multipart/alternative; boundary="0-728217829-1180881123=:33525"
-Content-Transfer-Encoding: 8bit
-
---0-728217829-1180881123=:33525
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-Hi,
+Dear   All,
  
- On one of my systems I'm having difficulty jumping to the 2.6.20 kernel from 18.
- The kernel builds fine but my headset fails to work. I noted the alsa snd-bt-sco module is not rebuilt.
- Does anyone remember exactly what process it is that builds this component? The btsco code was separate I know..... I am using 0.5 there. 
- snd-bt-sco is in the kernel? If so what question in menuconfig toggles it's creation? In 2.6.18 it was added to the extra directory in /lib/modules/kernelversion for me but in my 2.6.20 build there is no such module.
+Marcel had suggested me  using 2.6 kernel for cross-compile bluez last time,  as I am a new user on Linux, it may spend too much time on making 2.6 kernel work, so I still use 2.4.18 kernel for the moment,  cross-compile bluez-libs-3.9 is Ok, but cross-compile bluez-utils-3.9 is fail, the problem has bothered me some weeks ,I do not know how to solve it and  really need your help, thanks very much 
+
+I installed bluez-lib-3.9 in /bluez/lib
+I installed dbus-0.62
+I patched patch-2.4.18-mh15.gz  on kernel
+
+the error message is listed as below
+
+step 1 this is configure's parameter
+ [root@localhost bluez-utils-3.9]# ./configure --host=arm-linux --prefix=/bluez/util  CC=/usr/local/arm/2.95.3/bin/arm-linux-gcc CPP=/usr/local/arm/2.95.3/bin/cpp AR=/usr/local/arm/2.95.3/bin/arm-linux-ar STRIP=/usr/local/arm/2.95.3/bin/arm-linux-strip RANLIB=/usr/local/arm/2.95.3/bin/arm-linux-ranlib LD=/usr/local/arm/2.95.3/bin/arm-linux-ld --includedir=/bluez/lib/include --libdir=/bluez/lib/lib --with-bluez-libs=/usr/local/arm/kernel/lib  --with-kernel=/usr/lcoal/arm/kernel 
+configure: WARNING: If you wanted to set the --build type, don't use --host.
+    If a cross compiler is detected then cross compile mode will be used.
+checking for a BSD-compatible install... /usr/bin/install -c
+......
+config.status: config.h is unchanged
+config.status: executing depfiles commands
+
+step 2,  make 
+[root@localhost bluez-utils-3.9]# make
+make  all-recursive
+make[1]: Entering directory `/blu/bluez-utils-3.9-arm'
+Making all in eglib
+make[2]: Entering directory `/blu/bluez-utils-3.9-arm/eglib'
+source='gmain.c' object='gmain.lo' libtool=yes \
+DEPDIR=.deps depmode=gcc /bin/sh ../depcomp \
+....... 
+/usr/local/arm/2.95.3/bin/arm-linux-gcc -DHAVE_CONFIG_H -I. -I. -I..    -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include   -DDBUS_API_SUBJECT_TO_CHANGE -I../eglib -Wall -O2 -D_FORTIFY_SOURCE=2 -c textfile.c
+source='logging.c' object='logging.o' libtool=no \
+DEPDIR=.deps depmode=gcc /bin/sh ../depcomp \
+/usr/local/arm/2.95.3/bin/arm-linux-gcc -DHAVE_CONFIG_H -I. -I. -I..    -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include   -DDBUS_API_SUBJECT_TO_CHANGE -I../eglib -Wall -O2 -D_FORTIFY_SOURCE=2 -c logging.c
+source='dbus-helper.c' object='dbus-helper.o' libtool=no \
+DEPDIR=.deps depmode=gcc /bin/sh ../depcomp \
+/usr/local/arm/2.95.3/bin/arm-linux-gcc -DHAVE_CONFIG_H -I. -I. -I..    -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include   -DDBUS_API_SUBJECT_TO_CHANGE -I../eglib -Wall -O2 -D_FORTIFY_SOURCE=2 -c dbus-helper.c
+source='sdp-xml.c' object='sdp-xml.o' libtool=no \
+DEPDIR=.deps depmode=gcc /bin/sh ../depcomp \
+/usr/local/arm/2.95.3/bin/arm-linux-gcc -DHAVE_CONFIG_H -I. -I. -I..    -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include   -DDBUS_API_SUBJECT_TO_CHANGE -I../eglib -Wall -O2 -D_FORTIFY_SOURCE=2 -c sdp-xml.c
+sdp-xml.c: In function `convert_raw_data_to_xml':
+sdp-xml.c:111: warning: unknown conversion type character `j' in format
+sdp-xml.c:111: warning: too many arguments for format
+sdp-xml.c:156: warning: unknown conversion type character `j' in format
+sdp-xml.c:156: warning: too many arguments for format
+sdp-xml.c:239: parse error before `int'
+sdp-xml.c:255: `num_chars_to_escape' undeclared (first use in this function)
+sdp-xml.c:255: (Each undeclared identifier is reported only once
+sdp-xml.c:255: for each function it appears in.)
+sdp-xml.c:263: parse error before `char'
+sdp-xml.c:267: `strBuf' undeclared (first use in this function)
+make[2]: *** [sdp-xml.o] Error 1
+make[2]: Leaving directory `/blu/bluez-utils-3.9-arm/common'
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory `/blu/bluez-utils-3.9-arm'
+make: *** [all] Error 2
+
+Best regards,
+Leiyu
+
+
  
- Thanks for any help.
- -Walt
  
-       
----------------------------------
-Building a website is a piece of cake. 
-Yahoo! Small Business gives you all the tools to get online.
---0-728217829-1180881123=:33525
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-Hi,<br> <br> On one of my systems I'm having difficulty jumping to the 2.6.20 kernel from 18.<br> The kernel builds fine but my headset fails to work. I noted the alsa snd-bt-sco module is not rebuilt.<br> Does anyone remember exactly what process it is that builds this component? The btsco code was separate I know..... I am using 0.5 there. <br> snd-bt-sco is in the kernel? If so what question in menuconfig toggles it's creation? In 2.6.18 it was added to the extra directory in /lib/modules/kernelversion for me but in my 2.6.20 build there is no such module.<br> <br> Thanks for any help.<br> -Walt<br> <p>&#32;
-      <hr size=1>Building a website is a piece of cake. <br>Yahoo! Small Business gives you <a href="http://us.rd.yahoo.com/evt=48251/*http://smallbusiness.yahoo.com/webhosting/?p=PASSPORTPLUS">all the tools to get online.</a>
---0-728217829-1180881123=:33525--
-
-
---===============1905285310==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+   
+ 
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1905285310==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1905285310==--
