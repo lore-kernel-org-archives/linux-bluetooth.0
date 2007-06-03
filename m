@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sun, 03 Jun 2007 16:44:43 +0200
-Message-Id: <1826221353@web.de>
+Date: Sun, 3 Jun 2007 07:32:03 -0700 (PDT)
+From: walt shekrota <penguinacity@yahoo.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-From: 01flipstar@web.de
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] bluez-utils on old kernel
+Message-ID: <776670.33525.qm@web62301.mail.re1.yahoo.com>
+Subject: [Bluez-users] alsa module rebuild
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,95 +14,61 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1905285310=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello everybody,
+--===============1905285310==
+Content-Type: multipart/alternative; boundary="0-728217829-1180881123=:33525"
+Content-Transfer-Encoding: 8bit
 
-I'm trying to add bluetooth support to my arm based NAS which runs on
-a 2.6.10 Kernel.
+--0-728217829-1180881123=:33525
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-I compiled the bluez-libs and utils (3.11) but hcitool dev won't
-show any devices and when I exec hciconfig I get
+Hi,
+ 
+ On one of my systems I'm having difficulty jumping to the 2.6.20 kernel from 18.
+ The kernel builds fine but my headset fails to work. I noted the alsa snd-bt-sco module is not rebuilt.
+ Does anyone remember exactly what process it is that builds this component? The btsco code was separate I know..... I am using 0.5 there. 
+ snd-bt-sco is in the kernel? If so what question in menuconfig toggles it's creation? In 2.6.18 it was added to the extra directory in /lib/modules/kernelversion for me but in my 2.6.20 build there is no such module.
+ 
+ Thanks for any help.
+ -Walt
+ 
+       
+---------------------------------
+Building a website is a piece of cake. 
+Yahoo! Small Business gives you all the tools to get online.
+--0-728217829-1180881123=:33525
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-icybox / # /system/overlay/apps/bluez-utils/sbin/hciconfig
-hci0:   Type: USB
-        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
-        DOWN INIT RUNNING
-        RX bytes:0 acl:0 sco:0 events:0 errors:0
-        TX bytes:0 acl:0 sco:0 commands:0 errors:0
+Hi,<br> <br> On one of my systems I'm having difficulty jumping to the 2.6.20 kernel from 18.<br> The kernel builds fine but my headset fails to work. I noted the alsa snd-bt-sco module is not rebuilt.<br> Does anyone remember exactly what process it is that builds this component? The btsco code was separate I know..... I am using 0.5 there. <br> snd-bt-sco is in the kernel? If so what question in menuconfig toggles it's creation? In 2.6.18 it was added to the extra directory in /lib/modules/kernelversion for me but in my 2.6.20 build there is no such module.<br> <br> Thanks for any help.<br> -Walt<br> <p>&#32;
+      <hr size=1>Building a website is a piece of cake. <br>Yahoo! Small Business gives you <a href="http://us.rd.yahoo.com/evt=48251/*http://smallbusiness.yahoo.com/webhosting/?p=PASSPORTPLUS">all the tools to get online.</a>
+--0-728217829-1180881123=:33525--
 
-so I think the device is somehow active but I can't nether reset nor
-do anything usefull with the bw-dongel.
 
-I then tried to apply the latest kernelpatch to the 2.6.10 kernel
-which gives lots of errors
-
-bash-2.05b# patch -p1 < patches/patch-2.6.21-mh1
-patching file drivers/bluetooth/hci_ldisc.c
-Hunk #1 succeeded at 306 (offset -1 lines).
-Hunk #2 FAILED at 474.
-1 out of 2 hunks FAILED -- saving rejects to file
-drivers/bluetooth/hci_ldisc.c.rej
-patching file drivers/bluetooth/hci_uart.h
-Hunk #1 succeeded at 31 (offset 3 lines).
-patching file drivers/bluetooth/hci_usb.c
-Hunk #1 FAILED at 114.
-Hunk #2 FAILED at 148.
-2 out of 2 hunks FAILED -- saving rejects to file
-drivers/bluetooth/hci_usb.c.rej
-patching file include/net/bluetooth/l2cap.h
-Hunk #1 succeeded at 141 (offset 12 lines).
-Hunk #2 succeeded at 215 with fuzz 1 (offset -2 lines).
-patching file Makefile
-Hunk #1 FAILED at 1.
-1 out of 1 hunk FAILED -- saving rejects to file Makefile.rej
-patching file net/bluetooth/hci_conn.c
-Hunk #1 succeeded at 73 (offset 1 line).
-Hunk #2 succeeded at 93 with fuzz 2 (offset -14 lines).
-Hunk #4 succeeded at 306 (offset -42 lines).
-Hunk #5 FAILED at 326.
-Hunk #7 FAILED at 423.
-Hunk #8 FAILED at 452.
-3 out of 8 hunks FAILED -- saving rejects to file
-net/bluetooth/hci_conn.c.rej
-patching file net/bluetooth/hci_core.c
-Hunk #1 succeeded at 203 (offset -13 lines).
-Hunk #3 FAILED at 853.
-Hunk #4 succeeded at 1006 (offset -28 lines).
-Hunk #5 succeeded at 1061 (offset 1 line).
-Hunk #6 succeeded at 1047 (offset -28 lines).
-Hunk #7 succeeded at 1141 (offset 1 line).
-1 out of 7 hunks FAILED -- saving rejects to file
-net/bluetooth/hci_core.c.rej
-patching file net/bluetooth/hci_event.c
-Hunk #1 FAILED at 783.
-Hunk #2 FAILED at 793.
-.
-.
-.
-
-My question is: is it possoble to upgrade the kernel (bluetooth) step by
-step because a jump from 2.6.10 to 2.6.21 is quite big i guess.
-Or do i make something else wrong?
-
-Thanks for your help.
-
-bye
-Philipp
-
-_______________________________________________________________
-SMS schreiben mit WEB.DE FreeMail - einfach, schnell und
-kostenguenstig. Jetzt gleich testen! http://f.web.de/?mc=021192
-
+--===============1905285310==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1905285310==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1905285310==--
