@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <e96e9eeb0706040544v2410d8e8t25a3708cfb345130@mail.gmail.com>
-References: <e96e9eeb0706040544v2410d8e8t25a3708cfb345130@mail.gmail.com>
-Date: Mon, 04 Jun 2007 17:19:56 +0200
-Message-Id: <1180970396.13429.47.camel@violet>
+In-Reply-To: <e96e9eeb0706040653t2a6f8da5lbc7399932ff6fcbb@mail.gmail.com>
+References: <e96e9eeb0706040653t2a6f8da5lbc7399932ff6fcbb@mail.gmail.com>
+Date: Mon, 04 Jun 2007 17:19:15 +0200
+Message-Id: <1180970355.13429.45.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] minimal bluez setup
+Subject: Re: [Bluez-users] hcid <-> dbus problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,22 +22,31 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi Voni,
 
-> i managed to cross compile bluez 3.11 to my platform.
+> I can't run bluez in my platform. i tried this series of commands:
 > 
-> i want to ask what is the minimum commands i need to run bluez ?
-> i thought of :
+> dbus-daemon --system       (seems to work)
+> hcid -nsd
 > 
-> /usr/bin/dbus-daemon
-> /usr/sbin/hcid
-> /usr/sbin/sdpd
+> that last command doesn't work, i get:
+> Dec 31 18:48:16 8 daemon.info hcid[945]: Bluetooth HCI daemon
+> Dec 31 18:48:17 8 daemon.err hcid[945]: Could not become the primary
+> owner of org.bluez
+> Dec 31 18:48:17 8 daemon.err hcid[945]: Unable to get on D-Bus
 > 
-> is it ok ? or do i need more processes (dbus have a lot.. but i want only
-> what bluez needs) ?
+> I even tried:
+> dbus-daemon --config-file /etc/dbus-1/system.d/bluetooth.conf
 > 
-> do i need some special command line arguments to bluez or dbus ?
+> but it fails with the message:
+> Failed to start message bus: Configuration file needs one or more
+> <listen> elements giving addresses
 
-the sdpd is obsoleted. Start hcid with -s to have the included SDP
-server.
+this looks wrong. The bluetooth.conf is only one of the security rules
+used by dbus-daemon. You must make sure the compiled in paths are all
+correct. Ask the D-Bus guys for more help.
+
+> (running sdpd alone does not fail btw)
+
+Of course, but sdpd is obsoleted.
 
 Regards
 
