@@ -1,48 +1,70 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <e96e9eeb0706040833u5eea2a5dk3051bc6056761acb@mail.gmail.com>
-Date: Mon, 4 Jun 2007 18:33:10 +0300
+Return-Path: <hakauvoni@gmail.com>
+Message-ID: <e96e9eeb0706040830p1d0ab00es249070ffece6b941@mail.gmail.com>
+Date: Mon, 4 Jun 2007 18:30:54 +0300
 From: "Voni Hakau" <hakauvoni@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1180970445.13429.49.camel@violet>
+To: marcel@holtmann.org
+Subject: Re: [Bluez-users] hcid <-> dbus problem
+Cc: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1180970355.13429.45.camel@violet>
 MIME-Version: 1.0
-References: <e96e9eeb0706040531j350c2774gcb1d33656f27884a@mail.gmail.com>
-	<1180970445.13429.49.camel@violet>
-Subject: Re: [Bluez-users] bluez-3.11 with kernel 2.6.10 ?
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+References: <e96e9eeb0706040653t2a6f8da5lbc7399932ff6fcbb@mail.gmail.com>
+	 <1180970355.13429.45.camel@violet>
+List-ID: <bluez-users.lists.sourceforge.net>
+
+Hi Marcel,
 
 On 6/4/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > should the following configuration work ?
+> > I can't run bluez in my platform. i tried this series of commands:
+> > that last command doesn't work, i get:
+> > Dec 31 18:48:16 8 daemon.info hcid[945]: Bluetooth HCI daemon
+> > Dec 31 18:48:17 8 daemon.err hcid[945]: Could not become the primary
+> > owner of org.bluez
+> > Dec 31 18:48:17 8 daemon.err hcid[945]: Unable to get on D-Bus
 > >
-> > bluez-[libs/utils]-3.11 with kernel 2.6.10.
+> > I even tried:
+> > dbus-daemon --config-file /etc/dbus-1/system.d/bluetooth.conf
+> >
+> > but it fails with the message:
+> > Failed to start message bus: Configuration file needs one or more
+> > <listen> elements giving addresses
 >
-> in theory it works, but I can't advise anybody to use it. The 2.6.10
-> kernel is way too old. There have been a lot of improvements in the last
-> two years.
+> this looks wrong. The bluetooth.conf is only one of the security rules
+> used by dbus-daemon. You must make sure the compiled in paths are all
+> correct. Ask the D-Bus guys for more help.
 
-hmm. i guess i have no choice since I receive a the kernel from other
-group in the company. and i don't want to use old bluez...
-so i just hope it will work..
+THANKS
+
+indeed something with the paths went wrong. i don't know what, but i played
+with the system.conf file a little and now it works. THANKS !!
+
+i don't need to run a dbus daemon with the bluetooth.conf, right ?
+
+(this line is not relevant: dbus-daemon --config-file
+/etc/dbus-1/system.d/bluetooth.conf ?)
 
 thank you
 voni
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+>
+> > (running sdpd alone does not fail btw)
+>
+> Of course, but sdpd is obsoleted.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by DB2 Express
+> Download DB2 Express C - the FREE version of DB2 express and take
+> control of your XML. No limits. Just data. Click to get it now.
+> http://sourceforge.net/powerbar/db2/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
