@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <e96e9eeb0706040843s5d4b0b8fj25973391383ad241@mail.gmail.com>
-Date: Mon, 4 Jun 2007 18:43:01 +0300
+Message-ID: <e96e9eeb0706040833u5eea2a5dk3051bc6056761acb@mail.gmail.com>
+Date: Mon, 4 Jun 2007 18:33:10 +0300
 From: "Voni Hakau" <hakauvoni@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1826221353@web.de>
+In-Reply-To: <1180970445.13429.49.camel@violet>
 MIME-Version: 1.0
-References: <1826221353@web.de>
-Subject: Re: [Bluez-users] bluez-utils on old kernel
+References: <e96e9eeb0706040531j350c2774gcb1d33656f27884a@mail.gmail.com>
+	<1180970445.13429.49.camel@violet>
+Subject: Re: [Bluez-users] bluez-3.11 with kernel 2.6.10 ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,19 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 6/3/07, 01flipstar@web.de <01flipstar@web.de> wrote:
-> I'm trying to add bluetooth support to my arm based NAS which runs on
-> a 2.6.10 Kernel.
+On 6/4/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+> > should the following configuration work ?
+> >
+> > bluez-[libs/utils]-3.11 with kernel 2.6.10.
 >
-> I compiled the bluez-libs and utils (3.11) but hcitool dev won't
-> show any devices and when I exec hciconfig I get
+> in theory it works, but I can't advise anybody to use it. The 2.6.10
+> kernel is way too old. There have been a lot of improvements in the last
+> two years.
 
-I did the same. I have utils 3.11 on 2.6.10. it is not vanilla 2.6.10 though -
-it is from embedded distribution, but things seems to work.
+hmm. i guess i have no choice since I receive a the kernel from other
+group in the company. and i don't want to use old bluez...
+so i just hope it will work..
 
-just my 2 cents.
-
-voni.
+thank you
+voni
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
