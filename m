@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <e96e9eeb0706040544v2410d8e8t25a3708cfb345130@mail.gmail.com>
-Date: Mon, 4 Jun 2007 15:44:03 +0300
+Message-ID: <e96e9eeb0706040531j350c2774gcb1d33656f27884a@mail.gmail.com>
+Date: Mon, 4 Jun 2007 15:31:53 +0300
 From: "Voni Hakau" <hakauvoni@gmail.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] minimal bluez setup
+Subject: [Bluez-users] bluez-3.11 with kernel 2.6.10 ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,21 +18,11 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hi all,
+hello all,
 
-i managed to cross compile bluez 3.11 to my platform.
+should the following configuration work ?
 
-i want to ask what is the minimum commands i need to run bluez ?
-i thought of :
-
-/usr/bin/dbus-daemon
-/usr/sbin/hcid
-/usr/sbin/sdpd
-
-is it ok ? or do i need more processes (dbus have a lot.. but i want only
-what bluez needs) ?
-
-do i need some special command line arguments to bluez or dbus ?
+bluez-[libs/utils]-3.11 with kernel 2.6.10.
 
 thank you
 voni
