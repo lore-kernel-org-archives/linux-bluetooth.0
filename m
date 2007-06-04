@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <e96e9eeb0706040531j350c2774gcb1d33656f27884a@mail.gmail.com>
-References: <e96e9eeb0706040531j350c2774gcb1d33656f27884a@mail.gmail.com>
-Date: Mon, 04 Jun 2007 17:20:45 +0200
-Message-Id: <1180970445.13429.49.camel@violet>
+In-Reply-To: <e96e9eeb0706040544v2410d8e8t25a3708cfb345130@mail.gmail.com>
+References: <e96e9eeb0706040544v2410d8e8t25a3708cfb345130@mail.gmail.com>
+Date: Mon, 04 Jun 2007 17:19:56 +0200
+Message-Id: <1180970396.13429.47.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] bluez-3.11 with kernel 2.6.10 ?
+Subject: Re: [Bluez-users] minimal bluez setup
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,13 +22,22 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi Voni,
 
-> should the following configuration work ?
+> i managed to cross compile bluez 3.11 to my platform.
 > 
-> bluez-[libs/utils]-3.11 with kernel 2.6.10.
+> i want to ask what is the minimum commands i need to run bluez ?
+> i thought of :
+> 
+> /usr/bin/dbus-daemon
+> /usr/sbin/hcid
+> /usr/sbin/sdpd
+> 
+> is it ok ? or do i need more processes (dbus have a lot.. but i want only
+> what bluez needs) ?
+> 
+> do i need some special command line arguments to bluez or dbus ?
 
-in theory it works, but I can't advise anybody to use it. The 2.6.10
-kernel is way too old. There have been a lot of improvements in the last
-two years.
+the sdpd is obsoleted. Start hcid with -s to have the included SDP
+server.
 
 Regards
 
