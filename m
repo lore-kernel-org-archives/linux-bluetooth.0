@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4665E314.8050609@gmail.com>
-Date: Tue, 05 Jun 2007 16:26:28 -0600
-From: Jarom Hatch <jshatch@gmail.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] dfutool problems
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <d89ddf300706031341t1f38d12ayd8752280f93d9f28@mail.gmail.com>
+References: <d89ddf300706012143s1444d9c9l98f2a06c8a05171b@mail.gmail.com>
+	<1180858390.6872.5.camel@aeonflux.holtmann.net>
+	<d89ddf300706031341t1f38d12ayd8752280f93d9f28@mail.gmail.com>
+Date: Mon, 04 Jun 2007 17:25:48 +0200
+Message-Id: <1180970748.13429.59.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] fleshing out audio daemon scenarios
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,85 +18,38 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1043535413=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---===============1043535413==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="------------enig8F1DF9FAF6EE4049D52EE4EF"
+Hi Brad,
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig8F1DF9FAF6EE4049D52EE4EF
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+> So I think next step will be to tell the audio daemon to put a headset
+> in connected state and then with a basic plugin (no options) put it in
+> streaming state and send some audio to it.
+> 
+> What does the command-line dbus injection stuff look like to get the
+> audio daemon to connect to a set? 
+> 
+> I'll start documenting the minimal approach on the wiki.
 
-All,
+no idea. Simply start playing with the code. A lot of stuff will fall
+into place automatically and some other stuff needs more thinking, but
+without actually trying to do it, we don't know what works and where we
+have to fix stuff.
 
-I recently ran "dfutool archive foo" on my IBM bluetooth adapter
-(Broadcom) thinking it would save my firmware to the file "foo".  It
-created a zero-length file, said that the operation timed out, and
-exited.  Ever since, by bluetooth adapter has been stuck in DFU mode:
+Regards
 
-# dfutool archive foo
-Available devices with DFU support:
-
-         1) Bus 003 Device 034: ID 0a5c:2000 Interface 0 (DFU mode)
-
-Select device (abort with 0): 1
-
-Firmware upload ...
-Can't upload next block: Connection timed out (110)
-
-from dmesg:
-usb 3-1: Product: Broadcom Bluetooth Download Device
-
-Does anyone know why it did that and how to get the adapter out of DFU
-mode?  I don't want to have to buy a new adapter... :)
-
-Thanks.
-
-Jarom Hatch
+Marcel
 
 
---------------enig8F1DF9FAF6EE4049D52EE4EF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (GNU/Linux)
-
-iD8DBQFGZeMX3FKK1nagbwsRAr64AKCZvBMTcF7oZ16aQAEHyesnm4gQUgCgyuP7
-2Xu1ZhrmcEJdXBL+8HhUwBk=
-=lMzf
------END PGP SIGNATURE-----
-
---------------enig8F1DF9FAF6EE4049D52EE4EF--
-
-
---===============1043535413==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1043535413==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1043535413==--
