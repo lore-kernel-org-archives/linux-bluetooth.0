@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Mon, 4 Jun 2007 08:17:55 -0700 (PDT)
+From: walt shekrota <penguinacity@yahoo.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <e96e9eeb0706040653t2a6f8da5lbc7399932ff6fcbb@mail.gmail.com>
-References: <e96e9eeb0706040653t2a6f8da5lbc7399932ff6fcbb@mail.gmail.com>
-Date: Mon, 04 Jun 2007 17:19:15 +0200
-Message-Id: <1180970355.13429.45.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] hcid <-> dbus problem
+In-Reply-To: <d89ddf300706032041r78a9d91ata7a0ea7a90c8d482@mail.gmail.com>
+MIME-Version: 1.0
+Message-ID: <995638.27392.qm@web62306.mail.re1.yahoo.com>
+Subject: Re: [Bluez-users] alsa module rebuild
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,50 +15,65 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1831942022=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Voni,
+--===============1831942022==
+Content-Type: multipart/alternative; boundary="0-1357187761-1180970275=:27392"
+Content-Transfer-Encoding: 8bit
 
-> I can't run bluez in my platform. i tried this series of commands:
-> 
-> dbus-daemon --system       (seems to work)
-> hcid -nsd
-> 
-> that last command doesn't work, i get:
-> Dec 31 18:48:16 8 daemon.info hcid[945]: Bluetooth HCI daemon
-> Dec 31 18:48:17 8 daemon.err hcid[945]: Could not become the primary
-> owner of org.bluez
-> Dec 31 18:48:17 8 daemon.err hcid[945]: Unable to get on D-Bus
-> 
-> I even tried:
-> dbus-daemon --config-file /etc/dbus-1/system.d/bluetooth.conf
-> 
-> but it fails with the message:
-> Failed to start message bus: Configuration file needs one or more
-> <listen> elements giving addresses
+--0-1357187761-1180970275=:27392
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-this looks wrong. The bluetooth.conf is only one of the security rules
-used by dbus-daemon. You must make sure the compiled in paths are all
-correct. Ask the D-Bus guys for more help.
+Ok due to the fact alsa can be configured in or out of the kernel I would assume that the piece of bt that interfaces to it should eventually be in the kernel?
+ Or is the advisement that if you use bt you should seriously consider configuring your alsa modular as opposed to kernel?
+ 
+ Will that work better for most people?
+ 
+ Thanks.
+ -Walt
 
-> (running sdpd alone does not fail btw)
+Brad Midgley <bmidgley@gmail.com> wrote:there is no "stable branch" of the kernel in the same way we had before. the module api changes enough from release to release to make it painful to maintain a module outside the kernel. (and don't ask... it will never be merged upstream because it doesn't belong in the kernel) 
 
-Of course, but sdpd is obsoleted.
+ 
 
-Regards
+ 
+---------------------------------
+Finding fabulous fares is fun.
+Let Yahoo! FareChase search your favorite travel sites to find flight and hotel bargains.
+--0-1357187761-1180970275=:27392
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-Marcel
+Ok due to the fact alsa can be configured in or out of the kernel I would assume that the piece of bt that interfaces to it should eventually be in the kernel?<br> Or is the advisement that if you use bt you should seriously consider configuring your alsa modular as opposed to kernel?<br> <br> Will that work better for most people?<br> <br> Thanks.<br> -Walt<br><br><b><i>Brad Midgley &lt;bmidgley@gmail.com&gt;</i></b> wrote:<blockquote class="replbq" style="border-left: 2px solid rgb(16, 16, 255); margin-left: 5px; padding-left: 5px;">there is no "stable branch" of the kernel in the same way we had before. the module api changes enough from release to release to make it painful to maintain a module outside the kernel. (and don't ask... it will never be merged upstream because it doesn't belong in the kernel) <br><br> </blockquote><br><p>&#32;
+
+<hr size=1>Finding fabulous fares is fun.<br><a href="http://farechase.yahoo.com/promo-generic-14795097;_ylc=X3oDMTFtNW45amVpBF9TAzk3NDA3NTg5BF9zAzI3MTk0ODEEcG9zAzEEc2VjA21haWx0YWdsaW5lBHNsawNxMS0wNw--
+">Let Yahoo! FareChase search your favorite travel sites</a> to find flight and hotel bargains.
+--0-1357187761-1180970275=:27392--
 
 
+--===============1831942022==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1831942022==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1831942022==--
