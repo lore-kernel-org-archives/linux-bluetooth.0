@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20070602184043.594698c5@topolino>
-References: <20070602184043.594698c5@topolino>
-Date: Mon, 04 Jun 2007 17:24:23 +0200
-Message-Id: <1180970663.13429.56.camel@violet>
+In-Reply-To: <1826221353@web.de>
+References: <1826221353@web.de>
+Date: Mon, 04 Jun 2007 17:23:32 +0200
+Message-Id: <1180970612.13429.54.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] problems with network via bluetooth
+Subject: Re: [Bluez-users] bluez-utils on old kernel
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,28 +20,40 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Aldo,
+Hi Phillip,
 
-> my home lan is made up with three desktops.
-> one of them (GW) has 3 eth cards the first one links to the router
-> the other 2 connect PC1 and PC2 to GW.
-> PC1 has 2 eth cards, the first one links it to GW and i use the second
-> to connect, from time to time, my notebook (NB) to the lan.
+> I'm trying to add bluetooth support to my arm based NAS which runs on
+> a 2.6.10 Kernel.
 > 
-> recently i have bought 2 bluetooth/usb adapters because i wished to
-> create a bluetooth net between PC1 and NB
+> I compiled the bluez-libs and utils (3.11) but hcitool dev won't
+> show any devices and when I exec hciconfig I get
 > 
-> in PC1 i have Ubuntu Gutsy (but i have the problem i'm going to tell
-> also with Debian Lenny which is installed in PC1 as well) and in the
-> NB i have Debian Lenny.
+> icybox / # /system/overlay/apps/bluez-utils/sbin/hciconfig
+> hci0:   Type: USB
+>         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
+>         DOWN INIT RUNNING
+>         RX bytes:0 acl:0 sco:0 events:0 errors:0
+>         TX bytes:0 acl:0 sco:0 commands:0 errors:0
 > 
-> the two bluetooth systems see each other:
-> 
-> if i run in the NB:  hcitool scan
-> correctly get:
-> 11:11:11:11:11:11   paperino-0
+> so I think the device is somehow active but I can't nether reset nor
+> do anything usefull with the bw-dongel.
 
-this is not a valid MAC address. And PAN/Ethernet will fail with it.
+I have no idea what went wrong, but it looks like an init issue and is
+maybe actually a kernel bug that we already fixed.
+
+> I then tried to apply the latest kernelpatch to the 2.6.10 kernel
+> which gives lots of errors
+
+This will never work. The patch has 2.6.21 in its name and that means it
+only applied to 2.6.21 source code.
+
+> My question is: is it possoble to upgrade the kernel (bluetooth) step by
+> step because a jump from 2.6.10 to 2.6.21 is quite big i guess.
+> Or do i make something else wrong?
+
+Upgrading the kernel to 2.6.21 is easier. It might be possible to
+backport all the Bluetooth patches, but that takes time and I would
+personally charge a lot for doing that.
 
 Regards
 
