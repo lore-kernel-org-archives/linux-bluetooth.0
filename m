@@ -1,70 +1,60 @@
-Return-Path: <hakauvoni@gmail.com>
-Message-ID: <e96e9eeb0706040830p1d0ab00es249070ffece6b941@mail.gmail.com>
-Date: Mon, 4 Jun 2007 18:30:54 +0300
-From: "Voni Hakau" <hakauvoni@gmail.com>
-To: marcel@holtmann.org
-Subject: Re: [Bluez-users] hcid <-> dbus problem
-Cc: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1180970355.13429.45.camel@violet>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-References: <e96e9eeb0706040653t2a6f8da5lbc7399932ff6fcbb@mail.gmail.com>
-	 <1180970355.13429.45.camel@violet>
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20070602184043.594698c5@topolino>
+References: <20070602184043.594698c5@topolino>
+Date: Mon, 04 Jun 2007 17:24:23 +0200
+Message-Id: <1180970663.13429.56.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] problems with network via bluetooth
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Aldo,
 
-On 6/4/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > I can't run bluez in my platform. i tried this series of commands:
-> > that last command doesn't work, i get:
-> > Dec 31 18:48:16 8 daemon.info hcid[945]: Bluetooth HCI daemon
-> > Dec 31 18:48:17 8 daemon.err hcid[945]: Could not become the primary
-> > owner of org.bluez
-> > Dec 31 18:48:17 8 daemon.err hcid[945]: Unable to get on D-Bus
-> >
-> > I even tried:
-> > dbus-daemon --config-file /etc/dbus-1/system.d/bluetooth.conf
-> >
-> > but it fails with the message:
-> > Failed to start message bus: Configuration file needs one or more
-> > <listen> elements giving addresses
->
-> this looks wrong. The bluetooth.conf is only one of the security rules
-> used by dbus-daemon. You must make sure the compiled in paths are all
-> correct. Ask the D-Bus guys for more help.
+> my home lan is made up with three desktops.
+> one of them (GW) has 3 eth cards the first one links to the router
+> the other 2 connect PC1 and PC2 to GW.
+> PC1 has 2 eth cards, the first one links it to GW and i use the second
+> to connect, from time to time, my notebook (NB) to the lan.
+> 
+> recently i have bought 2 bluetooth/usb adapters because i wished to
+> create a bluetooth net between PC1 and NB
+> 
+> in PC1 i have Ubuntu Gutsy (but i have the problem i'm going to tell
+> also with Debian Lenny which is installed in PC1 as well) and in the
+> NB i have Debian Lenny.
+> 
+> the two bluetooth systems see each other:
+> 
+> if i run in the NB:  hcitool scan
+> correctly get:
+> 11:11:11:11:11:11   paperino-0
 
-THANKS
+this is not a valid MAC address. And PAN/Ethernet will fail with it.
 
-indeed something with the paths went wrong. i don't know what, but i played
-with the system.conf file a little and now it works. THANKS !!
+Regards
 
-i don't need to run a dbus daemon with the bluetooth.conf, right ?
-
-(this line is not relevant: dbus-daemon --config-file
-/etc/dbus-1/system.d/bluetooth.conf ?)
-
-thank you
-voni
+Marcel
 
 
->
-> > (running sdpd alone does not fail btw)
->
-> Of course, but sdpd is obsoleted.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by DB2 Express
-> Download DB2 Express C - the FREE version of DB2 express and take
-> control of your XML. No limits. Just data. Click to get it now.
-> http://sourceforge.net/powerbar/db2/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
