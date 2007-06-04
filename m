@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d23110170706040247h5f7afcc2y4d8fcfe161fe87aa@mail.gmail.com>
-Date: Mon, 4 Jun 2007 11:47:15 +0200
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1180946944.13429.21.camel@violet>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ville Tervo <ville.tervo@nokia.com>
+In-Reply-To: <20070604083531.GF6310@null.research.nokia.com>
 References: <20070601111156.GB6310@null.research.nokia.com>
 	<1180711261.6726.6.camel@aeonflux.holtmann.net>
 	<20070604083531.GF6310@null.research.nokia.com>
-	<1180946944.13429.21.camel@violet>
-Cc: Ville Tervo <ville.tervo@nokia.com>
+Date: Mon, 04 Jun 2007 10:49:04 +0200
+Message-Id: <1180946944.13429.21.camel@violet>
+Mime-Version: 1.0
+Cc: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] [Patch] Keep rfcomm device in list until it's
 	freed
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -25,55 +24,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Ville,
 
-On 6/4/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Ville,
->
-> > > > Here is patch for rfcomm to keep rfcomm device in list until it's really
-> > > > unused.
-> > >
-> > >         dev = __rfcomm_dev_get(id);
-> > > +
-> > > +       if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
-> > > +               dev = NULL;
-> > > +
-> > >         if (dev)
-> > >                 rfcomm_dev_hold(dev);
-> > >
-> > > a test_bit() and then return NULL at the beginning makes more sense. No
-> > > need to take the lock since test_bit() is atomic anyway.
-> >
-> > How do I get flags then? Function only gets device id.
->
-> good point. I overlooked that part.
->
-> > I noticed another bug. If __rfcomm_dev_get returns null we end up using
-> > NULL pointer. Fixed version attached.
->
-> Please remove this part:
->
-> -#ifndef CONFIG_BT_RFCOMM_DEBUG
-> +#ifdef CONFIG_BT_RFCOMM_DEBUG
->
-> And use this code:
->
->         if (dev) {
->                 if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
->                         dev = NULL;
->                 else
->                         rfcomm_dev_hold(dev);
->         }
->
-> It makes it a little bit more readable and easier to understand what we
-> are doing there.
+> > > Here is patch for rfcomm to keep rfcomm device in list until it's really
+> > > unused.
+> > 
+> >         dev = __rfcomm_dev_get(id);
+> > +
+> > +       if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
+> > +               dev = NULL;
+> > +
+> >         if (dev)
+> >                 rfcomm_dev_hold(dev);
+> > 
+> > a test_bit() and then return NULL at the beginning makes more sense. No
+> > need to take the lock since test_bit() is atomic anyway.
+> 
+> How do I get flags then? Function only gets device id.
 
-Where is this patch? I couldn't find it. Does it solve that problem we
-had with RFCOMM_HANGUP_NOW flag?
+good point. I overlooked that part.
 
-Regards,
+> I noticed another bug. If __rfcomm_dev_get returns null we end up using
+> NULL pointer. Fixed version attached.
 
--- Ulisses
+Please remove this part:
+
+-#ifndef CONFIG_BT_RFCOMM_DEBUG
++#ifdef CONFIG_BT_RFCOMM_DEBUG
+
+And use this code:
+
+	if (dev) {
+		if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
+			dev = NULL;
+		else
+	                rfcomm_dev_hold(dev);
+	}
+
+It makes it a little bit more readable and easier to understand what we
+are doing there.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
