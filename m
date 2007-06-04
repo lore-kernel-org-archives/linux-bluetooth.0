@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <e96e9eeb0706040653t2a6f8da5lbc7399932ff6fcbb@mail.gmail.com>
-Date: Mon, 4 Jun 2007 16:53:19 +0300
-From: "Voni Hakau" <hakauvoni@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <4664130B.3090908@pracucci.com>
+Date: Mon, 04 Jun 2007 15:26:35 +0200
+From: Marco Pracucci <development@pracucci.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] hcid <-> dbus problem
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <fc3d922d0706040559j7781d32bxebf4c135004053b3@mail.gmail.com>
+In-Reply-To: <fc3d922d0706040559j7781d32bxebf4c135004053b3@mail.gmail.com>
+Subject: Re: [Bluez-users] Max connections
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,32 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hello,
+Hi
+> But in linux using bluetake dongle i've got only
+> bluetooth.connected.devices.max: 1
+>   
+Don't worry. You can connect until 7 remote devices with your dongle, 
+also under Linux. The value of the property is not correct, but it will 
+not affect any feature.
 
-I can't run bluez in my platform. i tried this series of commands:
+Marco
 
-dbus-daemon --system       (seems to work)
-hcid -nsd
-
-that last command doesn't work, i get:
-Dec 31 18:48:16 8 daemon.info hcid[945]: Bluetooth HCI daemon
-Dec 31 18:48:17 8 daemon.err hcid[945]: Could not become the primary
-owner of org.bluez
-Dec 31 18:48:17 8 daemon.err hcid[945]: Unable to get on D-Bus
-
-I even tried:
-dbus-daemon --config-file /etc/dbus-1/system.d/bluetooth.conf
-
-but it fails with the message:
-Failed to start message bus: Configuration file needs one or more
-<listen> elements giving addresses
-
-any idea ?
-
-(running sdpd alone does not fail btw)
-
-thanks
-voni
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
