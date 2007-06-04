@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1e9e22610706031133h798d523xacc4db0a07055a59@mail.gmail.com>
-References: <1e9e22610706031133h798d523xacc4db0a07055a59@mail.gmail.com>
-Date: Mon, 04 Jun 2007 17:21:22 +0200
-Message-Id: <1180970482.13429.51.camel@violet>
+In-Reply-To: <e96e9eeb0706040531j350c2774gcb1d33656f27884a@mail.gmail.com>
+References: <e96e9eeb0706040531j350c2774gcb1d33656f27884a@mail.gmail.com>
+Date: Mon, 04 Jun 2007 17:20:45 +0200
+Message-Id: <1180970445.13429.49.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluez D-Bus API - Service Transfer
+Subject: Re: [Bluez-users] bluez-3.11 with kernel 2.6.10 ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,13 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Addo,
+Hi Voni,
 
-> Bluez D-Bus API already it has implemented Service Transfer ? 
-> It is possible to use OBEX Object Push ? 
+> should the following configuration work ?
+> 
+> bluez-[libs/utils]-3.11 with kernel 2.6.10.
 
-might be not implemented at all. Look out for the obex-data-server that
-will be written as part of a summer of code project.
+in theory it works, but I can't advise anybody to use it. The 2.6.10
+kernel is way too old. There have been a lot of improvements in the last
+two years.
 
 Regards
 
