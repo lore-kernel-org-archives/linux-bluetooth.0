@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <fc3d922d0706040559j7781d32bxebf4c135004053b3@mail.gmail.com>
-Date: Mon, 4 Jun 2007 14:59:01 +0200
-From: "=?ISO-8859-2?Q?Przemys=B3aw_Jakubowski?=" <przemyslaw.jakubowski@javatech.com.pl>
+Message-ID: <e96e9eeb0706040544v2410d8e8t25a3708cfb345130@mail.gmail.com>
+Date: Mon, 4 Jun 2007 15:44:03 +0300
+From: "Voni Hakau" <hakauvoni@gmail.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] Max connections
+Subject: [Bluez-users] minimal bluez setup
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,18 +18,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi all
+hi all,
 
-I'm programming bluetooth connections with Java using Avetana library.
-Is there a possibility to change bluetooth properties??
-Under windows with built-in bluetooth adapter in my laptop, i've got
-bluetooth.connected.devices.max: 7.
-But in linux using bluetake dongle i've got only
-bluetooth.connected.devices.max: 1
-So once again , is there a possibility to change this value, or maybe
-it depends on operation system or kernel version??
+i managed to cross compile bluez 3.11 to my platform.
 
-Greetings
+i want to ask what is the minimum commands i need to run bluez ?
+i thought of :
+
+/usr/bin/dbus-daemon
+/usr/sbin/hcid
+/usr/sbin/sdpd
+
+is it ok ? or do i need more processes (dbus have a lot.. but i want only
+what bluez needs) ?
+
+do i need some special command line arguments to bluez or dbus ?
+
+thank you
+voni
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
