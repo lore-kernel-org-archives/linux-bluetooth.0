@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1826221353@web.de>
-References: <1826221353@web.de>
-Date: Mon, 04 Jun 2007 17:23:32 +0200
-Message-Id: <1180970612.13429.54.camel@violet>
+In-Reply-To: <1e9e22610706031133h798d523xacc4db0a07055a59@mail.gmail.com>
+References: <1e9e22610706031133h798d523xacc4db0a07055a59@mail.gmail.com>
+Date: Mon, 04 Jun 2007 17:21:22 +0200
+Message-Id: <1180970482.13429.51.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] bluez-utils on old kernel
+Subject: Re: [Bluez-users] Bluez D-Bus API - Service Transfer
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,40 +20,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Phillip,
+Hi Addo,
 
-> I'm trying to add bluetooth support to my arm based NAS which runs on
-> a 2.6.10 Kernel.
-> 
-> I compiled the bluez-libs and utils (3.11) but hcitool dev won't
-> show any devices and when I exec hciconfig I get
-> 
-> icybox / # /system/overlay/apps/bluez-utils/sbin/hciconfig
-> hci0:   Type: USB
->         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
->         DOWN INIT RUNNING
->         RX bytes:0 acl:0 sco:0 events:0 errors:0
->         TX bytes:0 acl:0 sco:0 commands:0 errors:0
-> 
-> so I think the device is somehow active but I can't nether reset nor
-> do anything usefull with the bw-dongel.
+> Bluez D-Bus API already it has implemented Service Transfer ? 
+> It is possible to use OBEX Object Push ? 
 
-I have no idea what went wrong, but it looks like an init issue and is
-maybe actually a kernel bug that we already fixed.
-
-> I then tried to apply the latest kernelpatch to the 2.6.10 kernel
-> which gives lots of errors
-
-This will never work. The patch has 2.6.21 in its name and that means it
-only applied to 2.6.21 source code.
-
-> My question is: is it possoble to upgrade the kernel (bluetooth) step by
-> step because a jump from 2.6.10 to 2.6.21 is quite big i guess.
-> Or do i make something else wrong?
-
-Upgrading the kernel to 2.6.21 is easier. It might be possible to
-backport all the Bluetooth patches, but that takes time and I would
-personally charge a lot for doing that.
+might be not implemented at all. Look out for the obex-data-server that
+will be written as part of a summer of code project.
 
 Regards
 
