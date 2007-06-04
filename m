@@ -1,17 +1,18 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d23110170706040617o60d9649fgaf3463271890c06c@mail.gmail.com>
-Date: Mon, 4 Jun 2007 15:17:58 +0200
-From: "Ulisses Furquim" <ulissesf@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1180951275.13429.23.camel@violet>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ville Tervo <ville.tervo@nokia.com>
+In-Reply-To: <20070604115532.GI6310@null.research.nokia.com>
 References: <20070601111156.GB6310@null.research.nokia.com>
 	<1180711261.6726.6.camel@aeonflux.holtmann.net>
 	<20070604083531.GF6310@null.research.nokia.com>
 	<1180946944.13429.21.camel@violet>
-	<d23110170706040247h5f7afcc2y4d8fcfe161fe87aa@mail.gmail.com>
-	<1180951275.13429.23.camel@violet>
-Cc: Ville Tervo <ville.tervo@nokia.com>
+	<20070604103256.GH6310@null.research.nokia.com>
+	<1180953879.13429.25.camel@violet>
+	<20070604115532.GI6310@null.research.nokia.com>
+Date: Mon, 04 Jun 2007 14:24:16 +0200
+Message-Id: <1180959856.13429.33.camel@violet>
+Mime-Version: 1.0
+Cc: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] [Patch] Keep rfcomm device in list until it's
 	freed
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -27,17 +28,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Ville,
 
-On 6/4/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> it was attached to Ville's email. And it doesn't solve the issue with
+> > do you have a simple re-producer for it. I need to test this on my Quad
+> > G5 before pushing this upstream.
+> 
+> Nope. Claudio said that he had some way to reproduce the bug with some
+> cvs version. I haven't tried that yet. I need to install some distro to
+> test machine first. However I tested this with N800 and it works fine on
+> arm.
 
-Hmm... sorry, but I don't see it. Which e-mail from Ville? Maybe I'm
-having problems with the list?
+but I need to make sure that this is also working on SMP systems and all
+other desktops.
 
-Regards,
+Regards
 
--- Ulisses
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
