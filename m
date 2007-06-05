@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Dennis Veatch <dennisveatch@bellsouth.net>
-To: bluez-devel@lists.sourceforge.net
-Date: Wed, 6 Jun 2007 08:47:21 -0400
-MIME-Version: 1.0
-Message-Id: <200706060847.21565.dennisveatch@bellsouth.net>
-Subject: [Bluez-devel] bluez-utils-3.11 and configure
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4665E314.8050609@gmail.com>
+References: <4665E314.8050609@gmail.com>
+Date: Wed, 06 Jun 2007 00:30:43 +0200
+Message-Id: <1181082643.13429.143.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] dfutool problems
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,55 +20,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi ya folks.
+Hi Jarom,
 
-Um I might be totally out in left field here but there seems to be some 
-deficiencies with the build process in that all the files are not getting 
-installed during make install.
+> I recently ran "dfutool archive foo" on my IBM bluetooth adapter
+> (Broadcom) thinking it would save my firmware to the file "foo".  It
+> created a zero-length file, said that the operation timed out, and
+> exited.  Ever since, by bluetooth adapter has been stuck in DFU mode:
+> 
+> # dfutool archive foo
+> Available devices with DFU support:
+> 
+>          1) Bus 003 Device 034: ID 0a5c:2000 Interface 0 (DFU mode)
+> 
+> Select device (abort with 0): 1
+> 
+> Firmware upload ...
+> Can't upload next block: Connection timed out (110)
+> 
+> from dmesg:
+> usb 3-1: Product: Broadcom Bluetooth Download Device
+> 
+> Does anyone know why it did that and how to get the adapter out of DFU
+> mode?  I don't want to have to buy a new adapter... :)
 
-I have tried configure with --enable-all and specifying all the configure 
-switches individually with the same results. From what I can tell the 
-following files do not get installed from the source tree;
+the Broadcom ones fail for no reason. Seems that their implementation of
+DFU is buggy. I have seen that before.
 
-audio/asound.conf
-common/libhelper.a
-common/test_textfile
-daemon/auth-agent
-daemon/passkey-agent
-daemon/bluetoothd
-eglib/libeglib
-hcid/libhciserver.a
-hcid/service-did.xml
-hcid/service-ftp.xml
-hcid/service-opp.xml
-hcid/service-spp.xml
-sbc/sbcdec
-sbc/sbcenc
-sbc/sbcinfo
-sbc/libsbc.la
-sdpd/libsdpserver.a
-test/apitest
-test/attest
-test/bdaddr
-test/hsmicro
-test/hsplay
-test/hstest
-test/lmptest
-test/scotest
-test/sdptest
-tools/hcisecfilter
-tools/ppporc
+However there is no tool to get it back into normal. It is not that
+complicated, but you have to poke around the source code of dfutool for
+that.
 
-I think that's the bulk of it. The pcmcia stuff I don't have so can't comment 
-on. The distro used for this is my sig.
+Regards
 
-Thanks
--- 
-Dennis
-You can tuna piano but you can't tune a fish.
+Marcel
 
-http://www.lunar-linux.org/
-It's worth the spin.
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
