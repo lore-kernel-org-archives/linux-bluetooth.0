@@ -1,14 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <4665E3BA.1040309@gmail.com>
+Date: Tue, 05 Jun 2007 16:29:14 -0600
+From: Jarom Hatch <jshatch@gmail.com>
+MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-From: sean <seandarcy2@gmail.com>
-Date: Tue, 05 Jun 2007 21:04:24 -0400
-Message-ID: <f4516o$r2m$1@sea.gmane.org>
-References: <c195ebf70706050528x3a4e552fk691239352e3be787@mail.gmail.com>
-	<1181047102.13429.101.camel@violet>
-Mime-Version: 1.0
-In-Reply-To: <1181047102.13429.101.camel@violet>
-Subject: Re: [Bluez-users] logitech mx5000: Access denied: Authorization
-	agent?
+Subject: [Bluez-users] dfutool problems
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,34 +14,85 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1883965724=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I started gnome-bluez-applet from a terminal.
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--===============1883965724==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="------------enigC25FC9B84E0A022338E612D5"
 
-testbox hcid[2297]: Default passkey agent (:1.10, 
-/org/bluez/applet) registered
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigC25FC9B84E0A022338E612D5
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-Now hcitool scan will find the keyboard.
+All,
 
-But still no connection, and:
+I recently ran "dfutool archive foo" on my IBM bluetooth adapter
+(Broadcom) thinking it would save my firmware to the file "foo".  It
+created a zero-length file, said that the operation timed out, and
+exited.  Ever since, by bluetooth adapter has been stuck in DFU mode:
 
-testbox input[2308]: Access denied: Authorization agent does 
-not exist
+# dfutool archive foo
+Available devices with DFU support:
 
-whenever I push the connection buttons on the dongle and the 
-keyboard.
+         1) Bus 003 Device 034: ID 0a5c:2000 Interface 0 (DFU mode)
 
-sean
+Select device (abort with 0): 1
 
+Firmware upload ...
+Can't upload next block: Connection timed out (110)
+
+from dmesg:
+usb 3-1: Product: Broadcom Bluetooth Download Device
+
+Does anyone know why it did that and how to get the adapter out of DFU
+mode?  I don't want to have to buy a new adapter...  :)
+
+Thanks.
+
+Jarom Hatch
+
+
+--------------enigC25FC9B84E0A022338E612D5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iD8DBQFGZeO63FKK1nagbwsRAoLsAJ9i7ssjK6QD8wLwDWm57gEQ+yO/5wCgkSU+
+MSoXqmGfTzDYSSFJB6Bvlaw=
+=puDa
+-----END PGP SIGNATURE-----
+
+--------------enigC25FC9B84E0A022338E612D5--
+
+
+--===============1883965724==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1883965724==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1883965724==--
