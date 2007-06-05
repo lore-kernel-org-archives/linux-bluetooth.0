@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <c195ebf70706050617y216bd79ep8daf069aa4ff6564@mail.gmail.com>
-Date: Tue, 5 Jun 2007 09:17:51 -0400
-From: "sean darcy" <seandarcy2@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1181047102.13429.101.camel@violet>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <c195ebf70706050528x3a4e552fk691239352e3be787@mail.gmail.com>
 References: <c195ebf70706050528x3a4e552fk691239352e3be787@mail.gmail.com>
-	<1181047102.13429.101.camel@violet>
-Subject: Re: [Bluez-users] logitech mx5000: Access denied: Authorization
-	agent?
+Date: Tue, 05 Jun 2007 14:38:22 +0200
+Message-Id: <1181047102.13429.101.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] logitech mx5000: Access denied:
+	Authorization	agent?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,62 +21,55 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 6/5/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Sean,
->
-> > On FC7, bluez-3.11, trying to get the Logitech mx 5000 kbd
-> > and mouse to work. I've had no luck.
-> >
-> > [root@testbox ~]# hcitool scan
-> > Scanning ...
-> > [root@testbox ~]# hidd --search
-> > Searching ...
-> >         No devices in range or visible
-> >
-> > But
-> >
-> > grep Logitech /var/log/messages
-> > Jun  4 20:05:56 testbox kernel: input: Logitech Logitech BT
-> > Mini-Receiver as /class/input/input3
-> > Jun  4 20:05:56 testbox kernel: input: USB HID v1.11
-> > Keyboard [Logitech Logitech BT Mini-Receiver] on
-> > usb-0000:00:1d.0-2.2
-> > Jun  4 20:05:56 testbox kernel: input: Logitech Logitech BT
-> > Mini-Receiver as /class/input/input4
-> > Jun  4 20:05:56 testbox kernel: input,hiddev96: USB HID
-> > v1.11 Mouse [Logitech Logitech BT Mini-Receiver] on
-> > usb-0000:00:1d.0-2.3
-> >
-> > however in syslog:
-> >
-> > Jun  4 21:11:17 testbox input[2308]: Access denied:
-> > Authorization agent does not exist
-> > Jun  4 21:12:12 testbox last message repeated 21 times
-> > Jun  4 21:12:22 testbox last message repeated 8 times
-> >
-> > Is this my problem? If so, how do I set up an Authorization
-> > agent??
-> >
-> > Or should I be looking somewhere else? For everyone else,
-> > the MX 5000 Just Works :(
-> >
-> > bluez-utils-3.11-2.fc8.x86_64
-> > bluez-utils-cups-3.11-2.fc8.x86_64
-> > bluez-libs-3.11-1.fc8.x86_64
->
-> what is your version of bluez-gnome? Maybe that needs an update.
->
-> Regards
->
-> Marcel
+Hi Sean,
 
- bluez-gnome-0.6-2
+> On FC7, bluez-3.11, trying to get the Logitech mx 5000 kbd
+> and mouse to work. I've had no luck.
+> 
+> [root@testbox ~]# hcitool scan
+> Scanning ...
+> [root@testbox ~]# hidd --search
+> Searching ...
+>         No devices in range or visible
+> 
+> But
+> 
+> grep Logitech /var/log/messages
+> Jun  4 20:05:56 testbox kernel: input: Logitech Logitech BT
+> Mini-Receiver as /class/input/input3
+> Jun  4 20:05:56 testbox kernel: input: USB HID v1.11
+> Keyboard [Logitech Logitech BT Mini-Receiver] on
+> usb-0000:00:1d.0-2.2
+> Jun  4 20:05:56 testbox kernel: input: Logitech Logitech BT
+> Mini-Receiver as /class/input/input4
+> Jun  4 20:05:56 testbox kernel: input,hiddev96: USB HID
+> v1.11 Mouse [Logitech Logitech BT Mini-Receiver] on
+> usb-0000:00:1d.0-2.3
+> 
+> however in syslog:
+> 
+> Jun  4 21:11:17 testbox input[2308]: Access denied:
+> Authorization agent does not exist
+> Jun  4 21:12:12 testbox last message repeated 21 times
+> Jun  4 21:12:22 testbox last message repeated 8 times
+> 
+> Is this my problem? If so, how do I set up an Authorization
+> agent??
+> 
+> Or should I be looking somewhere else? For everyone else,
+> the MX 5000 Just Works :(
+> 
+> bluez-utils-3.11-2.fc8.x86_64
+> bluez-utils-cups-3.11-2.fc8.x86_64
+> bluez-libs-3.11-1.fc8.x86_64
 
-FWIW, I first tried standard fc7, bluez*3.9. When that didn't work,
-upgrade to 3.11 from rawhide. bluez-gnome-0.6.2 , from fc7, is the
-most recent.
+what is your version of bluez-gnome? Maybe that needs an update.
 
-sean
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
