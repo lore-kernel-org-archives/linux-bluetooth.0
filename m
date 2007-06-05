@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <c195ebf70706050528x3a4e552fk691239352e3be787@mail.gmail.com>
-Date: Tue, 5 Jun 2007 08:28:19 -0400
-From: "sean darcy" <seandarcy2@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <46650F34.2070207@pracucci.com>
+Date: Tue, 05 Jun 2007 09:22:28 +0200
+From: Marco Pracucci <development@pracucci.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] logitech mx5000: Access denied: Authorization agent?
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <fc3d922d0706040559j7781d32bxebf4c135004053b3@mail.gmail.com>	<4664130B.3090908@pracucci.com>
+	<fc3d922d0706040813q686cd934p9b8bb881e384cfe7@mail.gmail.com>
+In-Reply-To: <fc3d922d0706040813q686cd934p9b8bb881e384cfe7@mail.gmail.com>
+Subject: Re: [Bluez-users] Max connections
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,47 +21,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On FC7, bluez-3.11, trying to get the Logitech mx 5000 kbd
-and mouse to work. I've had no luck.
+Hi,
+> I tested application with several cell phones, and under Windows i've
+> got connection on everyone at the same time, but on linux i have to
+> confirm on one phone and then i've got connection to another.
+What do you mean with "I have to confirm on one phone and that I've got 
+connection to another"? Do you have to insert PIN code? Do you just have 
+to confirm a "notify message"? Please, explain it.
+> The same
+> situation is with bluetooth.sd.trans.max, i can transfer file only to
+> one cell(under windows and linux).
+>   
+I have used avetana bluetooth in the past and I've got not problem. I'm 
+quite sure that it supports multiple/concurrent connections, obviously 
+until 7 remote devices. Moreover, that also a look at here: 
+http://download.pracucci.com/java/jbluetooth/ (it's an experimental 
+library, based on avetana).
 
-[root@testbox ~]# hcitool scan
-Scanning ...
-[root@testbox ~]# hidd --search
-Searching ...
-        No devices in range or visible
+Marco
 
-But
-
-grep Logitech /var/log/messages
-Jun  4 20:05:56 testbox kernel: input: Logitech Logitech BT
-Mini-Receiver as /class/input/input3
-Jun  4 20:05:56 testbox kernel: input: USB HID v1.11
-Keyboard [Logitech Logitech BT Mini-Receiver] on
-usb-0000:00:1d.0-2.2
-Jun  4 20:05:56 testbox kernel: input: Logitech Logitech BT
-Mini-Receiver as /class/input/input4
-Jun  4 20:05:56 testbox kernel: input,hiddev96: USB HID
-v1.11 Mouse [Logitech Logitech BT Mini-Receiver] on
-usb-0000:00:1d.0-2.3
-
-however in syslog:
-
-Jun  4 21:11:17 testbox input[2308]: Access denied:
-Authorization agent does not exist
-Jun  4 21:12:12 testbox last message repeated 21 times
-Jun  4 21:12:22 testbox last message repeated 8 times
-
-Is this my problem? If so, how do I set up an Authorization
-agent??
-
-Or should I be looking somewhere else? For everyone else,
-the MX 5000 Just Works :(
-
-bluez-utils-3.11-2.fc8.x86_64
-bluez-utils-cups-3.11-2.fc8.x86_64
-bluez-libs-3.11-1.fc8.x86_64
-
-sean
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
