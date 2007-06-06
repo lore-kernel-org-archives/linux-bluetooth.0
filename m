@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Dennis Veatch <dennisveatch@bellsouth.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200706061001.33464.dennisveatch@bellsouth.net>
+Date: Wed, 6 Jun 2007 10:51:18 -0400
 References: <200706060847.21565.dennisveatch@bellsouth.net>
-	<1181134253.13429.150.camel@violet>
 	<200706061001.33464.dennisveatch@bellsouth.net>
-Date: Wed, 06 Jun 2007 17:44:29 +0200
-Message-Id: <1181144669.13429.159.camel@violet>
-Mime-Version: 1.0
+	<20070606144623.GE31613@suse.de>
+In-Reply-To: <20070606144623.GE31613@suse.de>
+MIME-Version: 1.0
+Message-Id: <200706061051.18572.dennisveatch@bellsouth.net>
 Subject: Re: [Bluez-devel] bluez-utils-3.11 and configure
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,67 +22,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Dennis,
-
-> > > Um I might be totally out in left field here but there seems to be some
-> > > deficiencies with the build process in that all the files are not getting
-> > > installed during make install.
-> > >
-> > > I have tried configure with --enable-all and specifying all the configure
-> > > switches individually with the same results. From what I can tell the
-> > > following files do not get installed from the source tree;
-> > >
-> > > audio/asound.conf
-> > > common/libhelper.a
-> > > common/test_textfile
-> > > daemon/auth-agent
-> > > daemon/passkey-agent
-> > > daemon/bluetoothd
-> > > eglib/libeglib
-> > > hcid/libhciserver.a
-> > > hcid/service-did.xml
-> > > hcid/service-ftp.xml
-> > > hcid/service-opp.xml
-> > > hcid/service-spp.xml
-> > > sbc/sbcdec
-> > > sbc/sbcenc
-> > > sbc/sbcinfo
-> > > sbc/libsbc.la
-> > > sdpd/libsdpserver.a
-> > > test/apitest
-> > > test/attest
-> > > test/bdaddr
-> > > test/hsmicro
-> > > test/hsplay
-> > > test/hstest
-> > > test/lmptest
-> > > test/scotest
-> > > test/sdptest
-> > > tools/hcisecfilter
-> > > tools/ppporc
+On Wednesday 06 June 2007 10:46:23 am Stefan Seyfried wrote:
+> On Wed, Jun 06, 2007 at 10:01:33AM -0400, Dennis Veatch wrote:
+> > Um, well ok. I'm not trying to piss anyone off here and my apologies for
+> > asking about something that is totally contray to what I _EXPECTED_ to
+> > happen when running ./configure --enable-all, make and make install.
 > >
-> > all of these are _NOT_ installed on purpose. As simple as that.
+> > I was going to submit a patch for configure (at lease the --enable-all
+> > part) to really make all but I get the sense from your statement to just
+> > piss off....... so I will.
 >
-> Um, well ok. I'm not trying to piss anyone off here and my apologies for 
-> asking about something that is totally contray to what I _EXPECTED_ to happen 
-> when running ./configure --enable-all, make and make install.
-> 
-> I was going to submit a patch for configure (at lease the --enable-all part) 
-> to really make all but I get the sense from your statement to just piss 
-> off....... so I will.
+> These are basically examples and test applications that are just for that:
+> being an example or a test application, so they are not installed by
+> default.
+>
+> On openSUSE i have some of them in the bluez-test package (apitest, as an
+> example, is sometimes useful, but you don't want it in the default install
+> since it drags in the python dependency).
 
-for every not installed file there is a good reason. Some of them for
-testing only, some of them are too risky, some of them are examples
-only, some of them are not ready and so on and so on.
+There are such things as optional dependencies. In any event. Ignore this 
+whole thread as my attention is now on frying other fish as this one is done.
 
-If it is useful for people, then it has a configure option or is
-installed by default anyway. As simple as that.
+Thanks
+-- 
+Dennis
+You can tuna piano but you can't tune a fish.
 
-Regards
-
-Marcel
-
-
+http://www.lunar-linux.org/
+It's worth the spin.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
