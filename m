@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 6 Jun 2007 16:46:23 +0200
-From: Stefan Seyfried <seife@suse.de>
+From: Dennis Veatch <dennisveatch@bellsouth.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20070606144623.GE31613@suse.de>
+Date: Wed, 6 Jun 2007 10:01:33 -0400
 References: <200706060847.21565.dennisveatch@bellsouth.net>
 	<1181134253.13429.150.camel@violet>
-	<200706061001.33464.dennisveatch@bellsouth.net>
+In-Reply-To: <1181134253.13429.150.camel@violet>
 MIME-Version: 1.0
-In-Reply-To: <200706061001.33464.dennisveatch@bellsouth.net>
+Message-Id: <200706061001.33464.dennisveatch@bellsouth.net>
 Subject: Re: [Bluez-devel] bluez-utils-3.11 and configure
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -18,43 +17,72 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Wed, Jun 06, 2007 at 10:01:33AM -0400, Dennis Veatch wrote:
+On Wednesday 06 June 2007 08:50:53 am Marcel Holtmann wrote:
+> Hi Dennis,
+>
+> > Um I might be totally out in left field here but there seems to be some
+> > deficiencies with the build process in that all the files are not getting
+> > installed during make install.
+> >
+> > I have tried configure with --enable-all and specifying all the configure
+> > switches individually with the same results. From what I can tell the
+> > following files do not get installed from the source tree;
+> >
+> > audio/asound.conf
+> > common/libhelper.a
+> > common/test_textfile
+> > daemon/auth-agent
+> > daemon/passkey-agent
+> > daemon/bluetoothd
+> > eglib/libeglib
+> > hcid/libhciserver.a
+> > hcid/service-did.xml
+> > hcid/service-ftp.xml
+> > hcid/service-opp.xml
+> > hcid/service-spp.xml
+> > sbc/sbcdec
+> > sbc/sbcenc
+> > sbc/sbcinfo
+> > sbc/libsbc.la
+> > sdpd/libsdpserver.a
+> > test/apitest
+> > test/attest
+> > test/bdaddr
+> > test/hsmicro
+> > test/hsplay
+> > test/hstest
+> > test/lmptest
+> > test/scotest
+> > test/sdptest
+> > tools/hcisecfilter
+> > tools/ppporc
+>
+> all of these are _NOT_ installed on purpose. As simple as that.
+>
+> Regards
+>
+> Marcel
+>
 
-> Um, well ok. I'm not trying to piss anyone off here and my apologies for =
+Um, well ok. I'm not trying to piss anyone off here and my apologies for 
+asking about something that is totally contray to what I _EXPECTED_ to happen 
+when running ./configure --enable-all, make and make install.
 
-> asking about something that is totally contray to what I _EXPECTED_ to ha=
-ppen =
+I was going to submit a patch for configure (at lease the --enable-all part) 
+to really make all but I get the sense from your statement to just piss 
+off....... so I will.
 
-> when running ./configure --enable-all, make and make install.
-> =
+Thanks.
+-- 
+Dennis
+You can tuna piano but you can't tune a fish.
 
-> I was going to submit a patch for configure (at lease the --enable-all pa=
-rt) =
-
-> to really make all but I get the sense from your statement to just piss =
-
-> off....... so I will.
-
-These are basically examples and test applications that are just for that:
-being an example or a test application, so they are not installed by defaul=
-t.
-
-On openSUSE i have some of them in the bluez-test package (apitest, as an
-example, is sometimes useful, but you don't want it in the default install
-since it drags in the python dependency).
--- =
-
-Stefan Seyfried
-QA / R&D Team Mobile Devices        |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
-
-
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
+http://www.lunar-linux.org/
+It's worth the spin.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
