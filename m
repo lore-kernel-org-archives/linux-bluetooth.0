@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Dennis Veatch <dennisveatch@bellsouth.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Wed, 6 Jun 2007 10:01:33 -0400
-References: <200706060847.21565.dennisveatch@bellsouth.net>
-	<1181134253.13429.150.camel@violet>
-In-Reply-To: <1181134253.13429.150.camel@violet>
+From: "Aveek Adhya" <aveek@rebaca.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Wed, 6 Jun 2007 18:46:17 +0530
 MIME-Version: 1.0
-Message-Id: <200706061001.33464.dennisveatch@bellsouth.net>
-Subject: Re: [Bluez-devel] bluez-utils-3.11 and configure
+In-Reply-To: <1180706166.25009.46.camel@cookie.hadess.net>
+Message-ID: <E1HvvNZ-0000Kh-BO@mail.sourceforge.net>
+Subject: Re: [Bluez-devel] connect fail : Operation now in progress
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,68 +19,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Wednesday 06 June 2007 08:50:53 am Marcel Holtmann wrote:
-> Hi Dennis,
->
-> > Um I might be totally out in left field here but there seems to be some
-> > deficiencies with the build process in that all the files are not getting
-> > installed during make install.
-> >
-> > I have tried configure with --enable-all and specifying all the configure
-> > switches individually with the same results. From what I can tell the
-> > following files do not get installed from the source tree;
-> >
-> > audio/asound.conf
-> > common/libhelper.a
-> > common/test_textfile
-> > daemon/auth-agent
-> > daemon/passkey-agent
-> > daemon/bluetoothd
-> > eglib/libeglib
-> > hcid/libhciserver.a
-> > hcid/service-did.xml
-> > hcid/service-ftp.xml
-> > hcid/service-opp.xml
-> > hcid/service-spp.xml
-> > sbc/sbcdec
-> > sbc/sbcenc
-> > sbc/sbcinfo
-> > sbc/libsbc.la
-> > sdpd/libsdpserver.a
-> > test/apitest
-> > test/attest
-> > test/bdaddr
-> > test/hsmicro
-> > test/hsplay
-> > test/hstest
-> > test/lmptest
-> > test/scotest
-> > test/sdptest
-> > tools/hcisecfilter
-> > tools/ppporc
->
-> all of these are _NOT_ installed on purpose. As simple as that.
->
-> Regards
->
-> Marcel
->
+I didn't find any major difference between my application and 'manager.c' in
+bluez-utils. The way it calls socket(), bind(), connect() etc are same as
+what I am doing. Do you think it can be a baudrate problem as RFCOMM is a
+serial communication after all? ... 
 
-Um, well ok. I'm not trying to piss anyone off here and my apologies for 
-asking about something that is totally contray to what I _EXPECTED_ to happen 
-when running ./configure --enable-all, make and make install.
+-----Original Message-----
+From: Bastien Nocera [mailto:hadess@hadess.net] 
+Sent: Friday, June 01, 2007 7:26 PM
+To: BlueZ development
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-devel] connect fail : Operation now in progress
 
-I was going to submit a patch for configure (at lease the --enable-all part) 
-to really make all but I get the sense from your statement to just piss 
-off....... so I will.
+On Fri, 2007-06-01 at 19:18 +0530, Aveek Audhya wrote:
+> Hi Nocera,
+> 
+>       Thanks for your reply. What I have seen is that my socket's fd
+> is by default blocking, every time it returns -1 after waiting for
+> sometime. If I set it as non-blocking then it returns -1 immediately.
+>  
+> 
+>       I have set up a watcher with select() and getsockopt() call. 
+> 
+> It's like that ....
+<snip>
+> Unfortunately I couldn't find 'manager.c' in
+> 'bluez-utils-3.9/serial/'. The folder doesn't contain any .c file
+> except Makefile, Makefile.am and Makefile.in. 'manager.c' is present
+> only in 'bluez-utils-3.9/daemon' folder, but there is no
+> 'rfcomm_connect()' implementation. Probably we are using different
+> utils version.
 
-Thanks.
--- 
-Dennis
-You can tuna piano but you can't tune a fish.
+See in CVS, or in bluez-utils 3.11.
 
-http://www.lunar-linux.org/
-It's worth the spin.
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
