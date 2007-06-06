@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 6 Jun 2007 19:22:08 +0200
-From: Elimar Riesebieter <riesebie@lxtec.de>
-To: bluez-users <bluez-users@lists.sourceforge.net>
-Message-ID: <20070606172207.GA9419@aragorn.home.lxtec.de>
-MIME-Version: 1.0
-Subject: [Bluez-users] 2.6.22-rc4: "Device is not available: No such device"
+To: bluez-users@lists.sourceforge.net
+From: sean <seandarcy2@gmail.com>
+Date: Tue, 05 Jun 2007 21:04:24 -0400
+Message-ID: <f4516o$r2m$1@sea.gmane.org>
+References: <c195ebf70706050528x3a4e552fk691239352e3be787@mail.gmail.com>
+	<1181047102.13429.101.camel@violet>
+Mime-Version: 1.0
+In-Reply-To: <1181047102.13429.101.camel@violet>
+Subject: Re: [Bluez-users] logitech mx5000: Access denied: Authorization
+	agent?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,28 +22,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+I started gnome-bluez-applet from a terminal.
 
-Hi all,
+testbox hcid[2297]: Default passkey agent (:1.10, 
+/org/bluez/applet) registered
 
-I've compiled 2.6.22-rc4 on my Apple pb.
-Loaded modules: hci_usb,rfcomm,hidp,l2cap
+Now hcitool scan will find the keyboard.
 
-# hcitool scan
-Device is not available: No such device
+But still no connection, and:
 
-# rfcomm connect 1 00:11:22:33:44:55 1
-Can't connect RFCOMM socket: No route to host
+testbox input[2308]: Access denied: Authorization agent does 
+not exist
 
-2.6.21 loafed modules: hci_usb,rfcomm,hidp,l2cap
-All went fine though.
+whenever I push the connection buttons on the dongle and the 
+keyboard.
 
-Any hints?
+sean
 
-Elimar
-
--- 
-  Experience is something you don't get until 
-  just after you need it!
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
