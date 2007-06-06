@@ -1,22 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1180105720.14752.49.camel@cookie.hadess.net>
-References: <1179933855.3629.75.camel@cookie.hadess.net>
-	<1179935471.19944.6.camel@aeonflux.holtmann.net>
-	<1179936924.3629.88.camel@cookie.hadess.net>
-	<1179937606.3629.92.camel@cookie.hadess.net>
-	<59278C28-851A-44FF-AE01-25D8F074CE1E@nokia.com>
-	<1180013992.3151.6.camel@cookie.hadess.net>
-	<089F41B2-DBC5-483E-A6C9-F413E18DF38B@nokia.com>
-	<1180032597.14752.13.camel@cookie.hadess.net>
-	<1180096233.14752.27.camel@cookie.hadess.net>
-	<1180097928.14752.33.camel@cookie.hadess.net>
-	<1180105720.14752.49.camel@cookie.hadess.net>
-Date: Thu, 07 Jun 2007 12:21:27 +0200
-Message-Id: <1181211688.13429.168.camel@violet>
+In-Reply-To: <200706061001.33464.dennisveatch@bellsouth.net>
+References: <200706060847.21565.dennisveatch@bellsouth.net>
+	<1181134253.13429.150.camel@violet>
+	<200706061001.33464.dennisveatch@bellsouth.net>
+Date: Wed, 06 Jun 2007 17:44:29 +0200
+Message-Id: <1181144669.13429.159.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] CUPS plugin discovery bits
+Subject: Re: [Bluez-devel] bluez-utils-3.11 and configure
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -30,16 +22,61 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Hi Dennis,
 
-> > With some indentation changes, at Marcel's request.
+> > > Um I might be totally out in left field here but there seems to be some
+> > > deficiencies with the build process in that all the files are not getting
+> > > installed during make install.
+> > >
+> > > I have tried configure with --enable-all and specifying all the configure
+> > > switches individually with the same results. From what I can tell the
+> > > following files do not get installed from the source tree;
+> > >
+> > > audio/asound.conf
+> > > common/libhelper.a
+> > > common/test_textfile
+> > > daemon/auth-agent
+> > > daemon/passkey-agent
+> > > daemon/bluetoothd
+> > > eglib/libeglib
+> > > hcid/libhciserver.a
+> > > hcid/service-did.xml
+> > > hcid/service-ftp.xml
+> > > hcid/service-opp.xml
+> > > hcid/service-spp.xml
+> > > sbc/sbcdec
+> > > sbc/sbcenc
+> > > sbc/sbcinfo
+> > > sbc/libsbc.la
+> > > sdpd/libsdpserver.a
+> > > test/apitest
+> > > test/attest
+> > > test/bdaddr
+> > > test/hsmicro
+> > > test/hsplay
+> > > test/hstest
+> > > test/lmptest
+> > > test/scotest
+> > > test/sdptest
+> > > tools/hcisecfilter
+> > > tools/ppporc
+> >
+> > all of these are _NOT_ installed on purpose. As simple as that.
+>
+> Um, well ok. I'm not trying to piss anyone off here and my apologies for 
+> asking about something that is totally contray to what I _EXPECTED_ to happen 
+> when running ./configure --enable-all, make and make install.
 > 
-> - Don't typedef BluezCupsDevice
-> - Fix includes from common/
-> - Simplify Makefile.am slightly
-> - Remove already committed eglib changes
+> I was going to submit a patch for configure (at lease the --enable-all part) 
+> to really make all but I get the sense from your statement to just piss 
+> off....... so I will.
 
-with some fixes and cleanups, the has now been committed to the CVS.
+for every not installed file there is a good reason. Some of them for
+testing only, some of them are too risky, some of them are examples
+only, some of them are not ready and so on and so on.
+
+If it is useful for people, then it has a configure option or is
+installed by default anyway. As simple as that.
 
 Regards
 
