@@ -1,16 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 7 Jun 2007 15:19:50 +0200
-From: Elimar Riesebieter <riesebie@lxtec.de>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20070607131950.GA3856@aragorn.home.lxtec.de>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20070607105158.GA4873@aragorn.home.lxtec.de>
 References: <20070606172207.GA9419@aragorn.home.lxtec.de>
 	<1181211812.13429.172.camel@violet>
 	<20070607105158.GA4873@aragorn.home.lxtec.de>
-	<1181215998.13429.174.camel@violet>
-MIME-Version: 1.0
-In-Reply-To: <1181215998.13429.174.camel@violet>
-Subject: Re: [Bluez-users] 2.6.22-rc4: "Device is not available: No
-	such	device"
+Date: Thu, 07 Jun 2007 13:33:18 +0200
+Message-Id: <1181215998.13429.174.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] 2.6.22-rc4: "Device is not available:
+	No	such	device"
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,45 +23,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Thu, 07 Jun 2007 the mental interface of
-Marcel Holtmann told:
+Hi Elimar,
 
-> Hi Elimar,
->
-> > > > I've compiled 2.6.22-rc4 on my Apple pb.
-> > > > Loaded modules: hci_usb,rfcomm,hidp,l2cap
-> > > >
-> > > > # hcitool scan
-> > > > Device is not available: No such device
-> > > >
-> > > > # rfcomm connect 1 00:11:22:33:44:55 1
-> > > > Can't connect RFCOMM socket: No route to host
-> > > >
-> > > > 2.6.21 loafed modules: hci_usb,rfcomm,hidp,l2cap
-> > > > All went fine though.
-> > >
-> > > check hciconfig and /proc/bus/usb/devices. Maybe you need to run hid2hci
-> > > first.
-> >
-> > # hciconfig -a
-> > "nothing"
-> > # cat /proc/bus/usb/devices
-> > cat: /proc/bus/usb/devices: No such file or directory
->
-> what about mounting it?
+> > > I've compiled 2.6.22-rc4 on my Apple pb.
+> > > Loaded modules: hci_usb,rfcomm,hidp,l2cap
+> > > 
+> > > # hcitool scan
+> > > Device is not available: No such device
+> > > 
+> > > # rfcomm connect 1 00:11:22:33:44:55 1
+> > > Can't connect RFCOMM socket: No route to host
+> > > 
+> > > 2.6.21 loafed modules: hci_usb,rfcomm,hidp,l2cap
+> > > All went fine though.
+> > 
+> > check hciconfig and /proc/bus/usb/devices. Maybe you need to run hid2hci
+> > first.
+> 
+> # hciconfig -a
+> "nothing"
+> # cat /proc/bus/usb/devices
+> cat: /proc/bus/usb/devices: No such file or directory
 
-Ooops, yes.
+what about mounting it?
 
-I ran hid2hci and all works well now ;) Thanks. But hey, I was
-running fstab without "none  /proc/bus/usb  usbfs  defaults  0  0"
-with 2.6.21.....? Since which kernel we have to mount usbfs
-separately?
+Regards
 
-Elimar
+Marcel
 
--- 
-  Experience is something you don't get until
-  just after you need it!
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
