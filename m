@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 7 Jun 2007 16:12:26 -0700 (PDT)
+Date: Thu, 7 Jun 2007 15:19:59 -0700 (PDT)
 From: hong zhang <henryzhang62@yahoo.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Message-ID: <568785.88635.qm@web58011.mail.re3.yahoo.com>
-Subject: [Bluez-users] integrated bluez libs and utilities
+Message-ID: <656662.76156.qm@web58012.mail.re3.yahoo.com>
+Subject: [Bluez-users] what command needed to patch whole bluez-utilties
+	into kernel tree
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,28 +21,22 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 List,
 
-Previous e-mail talks about to integrate bluez libs
-and utilities into kernel tree should be source file
-tree including kernel. Because my system is embedded,
-I need to integrate bluez-libs-3.11 and
-bluez-utils-3.11 with current source tree and then do
-"make menuconfig" and then run "make" to compile.
+I download bluez-libs-3.11 and bluez-utils-3.11 and
+want to patch it into kernel tree? I want to put all
+together and run make to compile.
 
-I know how to run confirgure, make and make install in
-fedora 5.
+I do not find command to do it.
 
-Should I run configure first in fedora 5 and copy
-Makefile, .configure and subdirectories include and
-src into embedded source file tree?
+Any help will be appreciated.
 
-----henry 
+Thanks.
+
+----henry
 
 
- 
-____________________________________________________________________________________
-8:00? 8:25? 8:40? Find a flick in no time 
-with the Yahoo! Search movie showtime shortcut.
-http://tools.search.yahoo.com/shortcuts/#news
+      ____________________________________________________________________________________
+Fussy? Opinionated? Impossible to please? Perfect.  Join Yahoo!'s user panel and lay it on us. http://surveylink.yahoo.com/gmrs/yahoo_panel_invite.asp?a=7 
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
