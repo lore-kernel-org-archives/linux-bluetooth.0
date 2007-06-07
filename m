@@ -1,7 +1,7 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1181211688.13429.168.camel@violet>
+In-Reply-To: <1180105720.14752.49.camel@cookie.hadess.net>
 References: <1179933855.3629.75.camel@cookie.hadess.net>
 	<1179935471.19944.6.camel@aeonflux.holtmann.net>
 	<1179936924.3629.88.camel@cookie.hadess.net>
@@ -13,9 +13,8 @@ References: <1179933855.3629.75.camel@cookie.hadess.net>
 	<1180096233.14752.27.camel@cookie.hadess.net>
 	<1180097928.14752.33.camel@cookie.hadess.net>
 	<1180105720.14752.49.camel@cookie.hadess.net>
-	<1181211688.13429.168.camel@violet>
-Date: Thu, 07 Jun 2007 13:59:15 +0100
-Message-Id: <1181221155.25009.337.camel@cookie.hadess.net>
+Date: Thu, 07 Jun 2007 12:21:27 +0200
+Message-Id: <1181211688.13429.168.camel@violet>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] CUPS plugin discovery bits
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -31,22 +30,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, 2007-06-07 at 12:21 +0200, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > > With some indentation changes, at Marcel's request.
-> > 
-> > - Don't typedef BluezCupsDevice
-> > - Fix includes from common/
-> > - Simplify Makefile.am slightly
-> > - Remove already committed eglib changes
-> 
-> with some fixes and cleanups, the has now been committed to the CVS.
+Hi Bastien,
 
-Great stuff, thanks!
+> > With some indentation changes, at Marcel's request.
+> 
+> - Don't typedef BluezCupsDevice
+> - Fix includes from common/
+> - Simplify Makefile.am slightly
+> - Remove already committed eglib changes
 
--- 
-Bastien Nocera <hadess@hadess.net> 
+with some fixes and cleanups, the has now been committed to the CVS.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
