@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20070606172207.GA9419@aragorn.home.lxtec.de>
-References: <20070606172207.GA9419@aragorn.home.lxtec.de>
-Date: Thu, 07 Jun 2007 12:23:32 +0200
-Message-Id: <1181211812.13429.172.camel@violet>
+In-Reply-To: <1831337479@web.de>
+References: <1831337479@web.de>
+Date: Thu, 07 Jun 2007 12:22:46 +0200
+Message-Id: <1181211767.13429.170.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] 2.6.22-rc4: "Device is not available: No
-	such	device"
+Subject: Re: [Bluez-users] bluez-utils on old kernel
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,22 +20,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Elimar,
+Hi Philipp,
 
-> I've compiled 2.6.22-rc4 on my Apple pb.
-> Loaded modules: hci_usb,rfcomm,hidp,l2cap
+> I'm still tring to get my bluetooth working.
+> Then I plugin the stick it is correct show when I run lsusb.
 > 
-> # hcitool scan
-> Device is not available: No such device
-> 
-> # rfcomm connect 1 00:11:22:33:44:55 1
-> Can't connect RFCOMM socket: No route to host
-> 
-> 2.6.21 loafed modules: hci_usb,rfcomm,hidp,l2cap
-> All went fine though.
+> Bus 001 Device 002: ID 0a5c:2101 Broadcom Corp.
 
-check hciconfig and /proc/bus/usb/devices. Maybe you need to run hid2hci
-first.
+include the content of /proc/bus/usb/devices.
+
+> Next I start to load the modules:
+> 
+> insmod
+>   bluetooth
+>   sco
+>   l2cap
+>   rfcomm
+>   hci_uart
+>   hci_vhci
+>   firmware_class
+>   hidp
+>   bcm203x
+>   hci_usb
+> 
+> but when the last module is loaded I get a segmentation fault
+
+>>From what? Include information about it.
 
 Regards
 
