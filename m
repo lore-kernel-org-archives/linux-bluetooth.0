@@ -1,8 +1,8 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <fc3d922d0706120106y3a7fd657l1cada74a63166010@mail.gmail.com>
-Date: Tue, 12 Jun 2007 10:06:54 +0200
+Message-ID: <fc3d922d0706110646vc273606k44c3fc3b6ad886b0@mail.gmail.com>
+Date: Mon, 11 Jun 2007 15:46:55 +0200
 From: "=?ISO-8859-2?Q?Przemys=B3aw_Jakubowski?=" <przemyslaw.jakubowski@javatech.com.pl>
-To: bluez-users@lists.sourceforge.net
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
 Subject: [Bluez-users] hci_inquiry
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -20,14 +20,12 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hello
 
-I'm writing aplication in Java using Avetana library. Sometimes
-inquiry hangs up, and I want to stop it. There is native method in
-library cancelInquiry but it's not implemented. I need to stop
-existing inquiry. Function hci_inquiry implemented in hci.c starts
-inquiry, but i don't find there any function that cancels it.
-I'll be very thankful for any help
+How to stop this function. When I called it, in some circumstances
+everything stops. I want to stop the inquiring.
 
-Greetings, Przemek.
+I will be grateful for every help.
+
+Greeting, Przemek
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
