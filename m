@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <fc3d922d0706120106l5b5e2decwdbc9b77c3b9dd907@mail.gmail.com>
-Date: Tue, 12 Jun 2007 10:06:14 +0200
-From: "=?ISO-8859-2?Q?Przemys=B3aw_Jakubowski?=" <przemyslaw.jakubowski@javatech.com.pl>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <fc3d922d0706110735r5ab15f12s22176e0951a0bc0d@mail.gmail.com>
+Message-ID: <466D7A24.3000209@evilgenius.de>
+Date: Mon, 11 Jun 2007 18:36:52 +0200
+From: Martin Karger <martin@evilgenius.de>
 MIME-Version: 1.0
-References: <fc3d922d0706110735r5ab15f12s22176e0951a0bc0d@mail.gmail.com>
-Subject: [Bluez-devel] hci_inquiry
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <20070516021849.199f3034@localhost.local>
+	<464C6CF3.3090600@evilgenius.de>
+In-Reply-To: <464C6CF3.3090600@evilgenius.de>
+Subject: Re: [Bluez-devel] Revive Dead Dongle
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,20 +17,28 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello
+Martin Karger wrote:
+> Andreas B=F6hler wrote:
+>> Hey, =
 
-I'm writing aplication in Java using Avetana library. Sometimes
-inquiry hangs up, and I want to stop it. There is native method in
-library cancelInquiry but it's not implemented. I need to stop
-existing inquiry. Function hci_inquiry implemented in hci.c starts
-inquiry, but i don't find there any function that cancels it.
-I'll be very thankful for any help
+>>
+>> I tried upgrading the Firmware of my CSR-based D-Link DBT-120 B3.
+>> Unfortunately, the upgrade seems to have failed: The D-Link's light
+>> don't light up anymore and no USB-device is detected when plugging
+>> in the device.
+>>
+>> Is there a known way to force the Dongle to boot into DFU-Mode? Or
+>> is it hopelessly flashed to death?
+> =
 
-Greetings, Przemek.
+> if it has spi you might be able to reflash. but i never tried that.
+
+short article on debricking you bt-dongle via spi:
+http://www.evilgenius.de/2007/06/11/de-bricking-your-bluetooth-dongle/
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
