@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <466D2E82.7070805@bluecellnetworks.com>
-References: <E1Hwe2S-0003bG-Gu@mail.sourceforge.net>
-	<B4DB78E18F6C47E6BA941FB0F17C6A97@iMe>
-	<466D2E82.7070805@bluecellnetworks.com>
-Date: Wed, 13 Jun 2007 04:46:18 +0200
-Message-Id: <1181702778.6872.90.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] multiple server-instances on one single machine
+From: CIJOML <cijoml@volny.cz>
+To: bluez-users@lists.sourceforge.net
+Date: Tue, 12 Jun 2007 22:56:12 +0200
+MIME-Version: 1.0
+Message-Id: <200706122256.12825.cijoml@volny.cz>
+Subject: [Bluez-users] hid2hci in utils-3.11 at x86_64 (P4 with 64bit
+	extension) doesn't switch Logitech dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,44 +19,46 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Uli,
+Hi,
 
-> I'm trying to build a Bluteooth - receiver, which uses multiple 
-> bluetooth-devices and has a server running for each stick.
-> (Background is, that i need a machine for testing-purposes to test a 
-> bluetooth-sender. I need multiple parallel connections to test the 
-> transferspeed etc.)
-> 
-> I Took the sources of obexpushd 0.4 (debianpackage) and modified them, 
-> so the obexpushd can be started with -DhciX to use a certain hci device. 
-> This works perfect, if i start the server on hci2 for example, only hci2 
-> gets the files. The big problem is, when i start a second instance of 
-> the obexpushd eg. on hci3, only hci3 gets the content and hci2 not.
-> 
-> I tracked down the problem and can say, that the sdpd promotes the 
-> OBEX-PUSH Service for each stick and not only for the one i want it to.
-> 
-> I altered  the  obexpush-sdp.c file from
-> 
->   session = sdp_connect(BDADDR_ANY,BDADDR_LOCAL,SDP_RETRY_IF_BUSY);
->   status = sdp_record_register(session,rec,0);
-> 
-> to
-> 
->   session = sdp_connect(&btdev,BDADDR_LOCAL,SDP_RETRY_IF_BUSY);
->   status = sdp_record_register(session,rec,0);
-> 
-> where btdev is the bdaddr_t of the wanted hci-device, but i still get 
-> all running services promoted on all hci-devices.
+at i386 I getts:
 
-the change in sdp_connect() gives you nothing when using BDADDR_LOCAL.
-You need to use sdp_device_record_register() in the second step.
-
-Regards
-
-Marcel
+notas:/usr/src# lsusb
+Bus 008 Device 001: ID 0000:0000
+Bus 007 Device 008: ID 046d:c70c Logitech, Inc.
+Bus 007 Device 007: ID 046d:c70b Logitech, Inc.
+Bus 007 Device 006: ID 046d:0b02 Logitech, Inc.
+Bus 007 Device 001: ID 0000:0000
+Bus 006 Device 001: ID 0000:0000
+Bus 005 Device 001: ID 0000:0000
+Bus 004 Device 001: ID 0000:0000
+Bus 003 Device 001: ID 0000:0000
+Bus 002 Device 001: ID 0000:0000
+Bus 001 Device 001: ID 0000:0000
+notas:/usr/src# hid2hci
+Switching device 046d:c70c to HCI mode was successful
+Switching device 046d:c70b to HCI mode was successful
+notas:/usr/src# lsusb
+Bus 008 Device 001: ID 0000:0000
+Bus 007 Device 009: ID 046d:c709 Logitech, Inc.
+Bus 007 Device 008: ID 046d:c70c Logitech, Inc.
+Bus 007 Device 007: ID 046d:c70b Logitech, Inc.
+Bus 007 Device 006: ID 046d:0b02 Logitech, Inc.
+Bus 007 Device 001: ID 0000:0000
+Bus 006 Device 001: ID 0000:0000
+Bus 005 Device 001: ID 0000:0000
+Bus 004 Device 001: ID 0000:0000
+Bus 003 Device 001: ID 0000:0000
+Bus 002 Device 001: ID 0000:0000
+Bus 001 Device 001: ID 0000:0000
 
 
+At x86_64 I getts successfull enable, but Bus 007 Device 006: ID 046d:0b02 
+Logitech, Inc. doesn't show up and hciconfig see NO dongle.
+
+Thanks a lot for fix
+
+Michal
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
