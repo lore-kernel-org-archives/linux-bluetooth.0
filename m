@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <466F1A0E.1080401@evilgenius.de>
+Date: Wed, 13 Jun 2007 00:11:26 +0200
+From: Martin Karger <martin@evilgenius.de>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <loom.20070612T133928-578@post.gmane.org>
-References: <loom.20070612T133928-578@post.gmane.org>
-Date: Wed, 13 Jun 2007 04:58:00 +0200
-Message-Id: <1181703480.6872.93.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] kernel BUG in
-	2.6.20-1.2944.fc6	(add_conn/hci_sysfs)
+References: <20070516021849.199f3034@localhost.local>
+	<464C6CF3.3090600@evilgenius.de>
+In-Reply-To: <464C6CF3.3090600@evilgenius.de>
+Subject: Re: [Bluez-devel] Revive Dead Dongle
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,23 +17,28 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Catalin,
+Martin Karger wrote:
+> Andreas B=F6hler wrote:
+>> Hey, =
 
-> I'm seeing the following oopses and eventually a kernel panic with the 
-> Fedora Core 6 kernel, 2.6.20-1.2944.fc6. They seem to be originating in 
-> the add_conn function from net/bluetooth/hci_sysfs.c
+>>
+>> I tried upgrading the Firmware of my CSR-based D-Link DBT-120 B3.
+>> Unfortunately, the upgrade seems to have failed: The D-Link's light
+>> don't light up anymore and no USB-device is detected when plugging
+>> in the device.
+>>
+>> Is there a known way to force the Dongle to boot into DFU-Mode? Or
+>> is it hopelessly flashed to death?
+> =
 
-please re-test with a 2.6.22-rc4 kernel. I might have already been
-fixed. At least it shouldn't oops.
+> if it has spi you might be able to reflash. but i never tried that.
 
-Regards
-
-Marcel
-
+short article on debricking you bt-dongle via spi:
+http://www.evilgenius.de/2007/06/11/de-bricking-your-bluetooth-dongle/
 
 
 -------------------------------------------------------------------------
