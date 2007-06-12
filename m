@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <52222.190.30.202.149.1181668125.squirrel@www.y2knetworks.com.ar>
-Date: Tue, 12 Jun 2007 14:08:45 -0300 (ART)
-From: msaglietto@y2knetworks.com.ar
-To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-devel] Multi Dongle Problem
+Date: Tue, 12 Jun 2007 17:41:50 +0200
+Message-ID: <39D0ED4A56B05A409DB3C01F8DCEFB54F3281C@CORPAPPL021.corp.saab.se>
+From: "Bengtsson Mikael" <mikael.bengtsson@saabgroup.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] SCO with BlueZ 2.15?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,41 +14,127 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1805174264=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
-im making a program in C ... and was trying to use multi dongles ...
-this is the hcitool dev output:
+This is a multi-part message in MIME format.
 
-Devices:
-        hci0    00:11:F6:0A:06:7B
-        hci1    00:11:F6:0A:06:63
+--===============1805174264==
+Content-class: urn:content-classes:message
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C7AD08.31CE67D3"
 
-and that i make in my program is this...
+This is a multi-part message in MIME format.
 
-str2ba("00:11:F6:0A:06:7B",&bdaddr);
-dev_id = hci_get_route(&bdaddr);
+------_=_NextPart_001_01C7AD08.31CE67D3
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-but when u see the light of the dongles the hci1 is in use ...
-and the hci0 is in use when the program use sdp...
-to solve this i make the link mode of hci0 MASTER ... but then dont care
-what i punt on the hci_get_route function... im making something wrong??
-almost forgot... in some case the program finish with this error
-Failed to connect to SDP server: Interrupted system call ... what can be?...
+I'm developing an application on an Intel Xscale PXA 255 platform. I
+have installed BlueZ utils and libs 2.15 that was included on the
+software CD.
 
-Regards, Mauricio
+The application opens some ACL connections and a few SCO connections.
+The ACL connections starts up fine, but the SCO connections doesn't
+start at all. When inspecting the loaded modules with lsmod, SCO is not
+loaded.
+
+The question is, is SCO working with version 2.15?=20
+
+I have compiled the same application on an ordinary PC with version 3.9
+and 3.11. ACL and SCO works fine. lsmod shows that SCO is loaded.
+
+I'm using a USB dongle for the moment, but shall use UART instead,
+because more than one SCO channel is not working on USB. However, it is
+possible to open two SCO connections on the PC with USB dongle, but not
+communicating it seems.
+
+How do I load SCO on the Xscale?
 
 
 
+
+
+
+
+------_=_NextPart_001_01C7AD08.31CE67D3
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
+6.5.7652.24">
+<TITLE>SCO with BlueZ 2.15?</TITLE>
+</HEAD>
+<BODY>
+<!-- Converted from text/rtf format -->
+
+<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">I'm developing an =
+application on an Intel Xscale PXA 255 platform. I have installed BlueZ =
+utils and libs 2.15 that was included on the software =
+CD.</FONT></SPAN></P>
+
+<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">The application opens =
+some ACL connections and a few SCO connections. The ACL connections =
+starts up fine, but the SCO connections doesn't start at all. When =
+inspecting the loaded modules with lsmod, SCO is not =
+loaded.</FONT></SPAN></P>
+
+<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">The question is, is =
+SCO working with version 2.15? </FONT></SPAN>
+</P>
+
+<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">I have compiled the =
+same application on an ordinary PC with version 3.9 and 3.11. ACL and =
+SCO works fine. lsmod shows that SCO is loaded.</FONT></SPAN></P>
+
+<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">I'm using a USB =
+dongle for the moment, but shall use UART instead, because more than one =
+SCO channel is not working on USB. However, it is possible to open two =
+SCO connections on the PC with USB dongle, but not communicating it =
+seems.</FONT></SPAN></P>
+
+<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">How do I load SCO on =
+the Xscale?</FONT></SPAN>
+</P>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+
+</BODY>
+</HTML>
+------_=_NextPart_001_01C7AD08.31CE67D3--
+
+
+--===============1805174264==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1805174264==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1805174264==--
