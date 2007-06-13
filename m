@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 14 Jun 2007 12:29:47 +0800 (CST)
-From: =?GBK?B?t8nM7Nbt?= <wjs-198209@163.com>
-To: bluez-users <bluez-users@lists.sourceforge.net>
-Message-ID: <13741313.1010741181795387093.JavaMail.coremail@bj163app72.163.com>
+Date: Wed, 13 Jun 2007 12:35:38 -0700 (PDT)
+From: walt shekrota <penguinacity@yahoo.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d89ddf300706122146o2720e93bka0eab97ffbf3cfcb@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] Dbus error happened when I ran hcid
+Message-ID: <861055.97568.qm@web62305.mail.re1.yahoo.com>
+Subject: Re: [Bluez-users] bluez/alsa modules vs kernel
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,89 +15,78 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1476342346=="
+Content-Type: multipart/mixed; boundary="===============0893713769=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1476342346==
-Content-Type: multipart/Alternative;
-	boundary="----=_Part_110401_23225587.1181795387092"
+--===============0893713769==
+Content-Type: multipart/alternative; boundary="0-1306165694-1181763338=:97568"
+Content-Transfer-Encoding: 8bit
 
-------=_Part_110401_23225587.1181795387092
-Content-Type: text/plain; charset=gbk
-Content-Transfer-Encoding: 7bit
+--0-1306165694-1181763338=:97568
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
- Hello! Everyone .I have compile bluez-libs-3.11 and bluez-utils-3.11 in scratchbox for arm .
-I could use hcitoll scan to find devices and sdptool to find services after I ran hciconfig hci0 up.
-But when I ran hcid -n after start dbus-daemon --system,error happened.
-[root@(none) /]# hcid -n
-hcid[481]: Bluetooth HCI daemon
-hcid[481]: Can't connect to system message bus: Did not receive a reply. Possibl
-e causes include: the remote application did not send a reply, the message bus s
-ecurity policy blocked the reply, the reply timeout expired, or the network conn
-ection was broken.
-hcid[481]: Unable to get on D-Bus
-I think maybe the dbus was not configure properly.I also compile it in scratchbox for arm.
-I have changed --localstatedir=/var --sysconfdir=/etc,and also made a link in /etc/ to
-/var/bluetooth and a link dbus-1 in /etc to /var/dbus-1 because my file system is scram format,files can be
-read only in the flash,only the var directory can be changed.
-Can someone help me? I have no idea now though searching google so long time.
-                                                                                                                                                                                                                                                                           Wang Jimscen
-                    Jun 14,2007   
-------=_Part_110401_23225587.1181795387092
-Content-Type: text/html; charset=gbk
-Content-Transfer-Encoding: quoted-printable
+Hi,
+ 
+ Isn't there an alsa interface that can be used without patching?
+ ie Do all applications that use alsa when it's in the kernel, patch?
+ 
+ Thanks.
+ -Walt
 
-<div>&nbsp;Hello! Everyone .I have compile bluez-libs-3.11 and bluez-utils-=
-3.11 in scratchbox for arm .<br>I could use hcitoll scan to find devices an=
-d sdptool to find services after I ran hciconfig hci0 up.<br>But when I ran=
- hcid -n after start dbus-daemon --system,error happened.<br>[root@(none) /=
-]# hcid -n <br>hcid[481]: Bluetooth HCI daemon <br>hcid[481]: Can't connect=
- to system message bus: Did not receive a reply. Possibl <br>e causes inclu=
-de: the remote application did not send a reply, the message bus s <br>ecur=
-ity policy blocked the reply, the reply timeout expired, or the network con=
-n <br>ection was broken. <br>hcid[481]: Unable to get on D-Bus<br>I think m=
-aybe the dbus was not configure properly.I also compile it in scratchbox fo=
-r arm.<br>I have changed --localstatedir=3D/var --sysconfdir=3D/etc,and als=
-o made a link in /etc/ to <br>/var/bluetooth and a link dbus-1 in /etc to /=
-var/dbus-1 because my file system is scram format,files can be<br>read only=
- in the flash,only the var directory can be changed.<br>Can someone help me=
-? I have no idea now though searching google so long time.<br><br><br>&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp; Wang Jimscen <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; J=
-un 14,2007</div><div>&nbsp;</div><div>&nbsp;</div><div>&nbsp;</div><br><!--=
- footer --><br><hr>
-<a style=3D"font-size:14px;line-height:15px; color:#000; text-decoration:no=
-ne" href=3D"http://event.mail.163.com/chanel/xyq.htm?from=3D163_NO1" target=
-=3D"_blank"><span style=3D"text-decoration:underline; color:blue">150 =CD=
-=F2 =C8=CB =CD=AC =CA=B1 =D4=DA =CD=E6 =B5=C4 =CD=F8 =D3=CE=A3=AC=C4=E3 =B2=
-=BB =CA=D4 =CA=D4 =C2=F0 =A3=BF </span> </a>
-------=_Part_110401_23225587.1181795387092--
+Brad Midgley <bmidgley@gmail.com> wrote: btsco only works through a kernel module, not as a kernel built-in. (You'd have to patch the kernel to do it as a built in)
+
+On 6/12/07, walt shekrota  <penguinacity@yahoo.com> wrote:What is the relative difference in installation for someone using a headset with alsa in modules vs alsa in the kernel? Is it just the patch step in btsco? (ie kernel directory) 
+ 
+ Thanks.
+ -Walt
+    
+
+---------------------------------
+Finding fabulous fares is fun.
+ Let Yahoo! FareChase search your favorite travel sites to find flight and hotel bargains.
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express 
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+ http://sourceforge.net/powerbar/db2/
+_______________________________________________
+Bluez-users mailing list
+ Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users 
 
 
 
---===============1476342346==
+ -------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+
+       
+---------------------------------
+Yahoo! oneSearch: Finally,  mobile search that gives answers, not web links. 
+--0-1306165694-1181763338=:97568
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+Hi,<br> <br> Isn't there an alsa interface that can be used without patching?<br> ie Do all applications that use alsa when it's in the kernel, patch?<br> <br> Thanks.<br> -Walt<br><br><b><i>Brad Midgley &lt;bmidgley@gmail.com&gt;</i></b> wrote:<blockquote class="replbq" style="border-left: 2px solid rgb(16, 16, 255); margin-left: 5px; padding-left: 5px;"> btsco only works through a kernel module, not as a kernel built-in. (You'd have to patch the kernel to do it as a built in)<br><br><div><span class="gmail_quote">On 6/12/07, <b class="gmail_sendername">walt shekrota</b>  &lt;<a href="mailto:penguinacity@yahoo.com">penguinacity@yahoo.com</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">What is the relative difference in installation for someone using a headset with alsa in modules vs alsa in the kernel? Is it just the patch step in btsco? (ie kernel directory) <br> <br>
+ Thanks.<br><span class="sg"> -Walt<br></span><span class="ad"> <div>   </div><hr size="1">Finding fabulous fares is fun.<br><a href="http://farechase.yahoo.com/promo-generic-14795097;_ylc=X3oDMTFtNW45amVpBF9TAzk3NDA3NTg5BF9zAzI3MTk0ODEEcG9zAzEEc2VjA21haWx0YWdsaW5lBHNsawNxMS0wNw--%0A" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)"> Let Yahoo! FareChase search your favorite travel sites</a> to find flight and hotel bargains.<div></div></span><br>-------------------------------------------------------------------------<br>This SF.net email is sponsored by DB2 Express <br>Download DB2 Express C - the FREE version of DB2 express and take<br>control of your XML. No limits. Just data. Click to get it now.<br><a onclick="return top.js.OpenExtLink(window,event,this)" href="http://sourceforge.net/powerbar/db2/" target="_blank"> http://sourceforge.net/powerbar/db2/</a><br>_______________________________________________<br>Bluez-users mailing list<br><a
+ onclick="return top.js.OpenExtLink(window,event,this)" href="mailto:Bluez-users@lists.sourceforge.net"> Bluez-users@lists.sourceforge.net</a><br><a onclick="return top.js.OpenExtLink(window,event,this)" href="https://lists.sourceforge.net/lists/listinfo/bluez-users" target="_blank">https://lists.sourceforge.net/lists/listinfo/bluez-users </a><br><br></blockquote></div><br> -------------------------------------------------------------------------<br>This SF.net email is sponsored by DB2 Express<br>Download DB2 Express C - the FREE version of DB2 express and take<br>control of your XML. No limits. Just data. Click to get it now.<br>http://sourceforge.net/powerbar/db2/_______________________________________________<br>Bluez-users mailing list<br>Bluez-users@lists.sourceforge.net<br>https://lists.sourceforge.net/lists/listinfo/bluez-users<br></blockquote><br><p>&#32;
+      <hr size=1>Yahoo! oneSearch: Finally, <a href="http://us.rd.yahoo.com/evt=48252/*http://mobile.yahoo.com/mobileweb/onesearch?refer=1ONXIC"> mobile search 
+that gives answers</a>, not web links. 
+
+
+--0-1306165694-1181763338=:97568--
+
+
+--===============0893713769==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -107,7 +97,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1476342346==
+--===============0893713769==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -118,4 +108,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1476342346==--
+--===============0893713769==--
