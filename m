@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 13 Jun 2007 12:35:38 -0700 (PDT)
-From: walt shekrota <penguinacity@yahoo.com>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <d89ddf300706122146o2720e93bka0eab97ffbf3cfcb@mail.gmail.com>
-MIME-Version: 1.0
-Message-ID: <861055.97568.qm@web62305.mail.re1.yahoo.com>
-Subject: Re: [Bluez-users] bluez/alsa modules vs kernel
+To: bluez-users@lists.sourceforge.net
+From: Dick <dick@mrns.nl>
+Date: Wed, 13 Jun 2007 18:08:08 +0000 (UTC)
+Message-ID: <loom.20070613T200722-459@post.gmane.org>
+Mime-Version: 1.0
+Subject: [Bluez-users] input service trouble
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,97 +14,59 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0893713769=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0893713769==
-Content-Type: multipart/alternative; boundary="0-1306165694-1181763338=:97568"
-Content-Transfer-Encoding: 8bit
-
---0-1306165694-1181763338=:97568
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
 Hi,
- 
- Isn't there an alsa interface that can be used without patching?
- ie Do all applications that use alsa when it's in the kernel, patch?
- 
- Thanks.
- -Walt
 
-Brad Midgley <bmidgley@gmail.com> wrote: btsco only works through a kernel module, not as a kernel built-in. (You'd have to patch the kernel to do it as a built in)
+I'm testing the new input service but I have some trouble with reconnects. If I
+don't use my dinovo keyboard or mx laser for a while the connection is closed
+and  they aren't automatically reconnected.
 
-On 6/12/07, walt shekrota  <penguinacity@yahoo.com> wrote:What is the relative difference in installation for someone using a headset with alsa in modules vs alsa in the kernel? Is it just the patch step in btsco? (ie kernel directory) 
- 
- Thanks.
- -Walt
-    
+Sometimes a power cycle (on the HID device) helps, sometimes I need to send a
+Connect() through DBUS and sometimes I need a hciconfig hci0 reset and I also
+have some success with reloading hci_usb.
 
----------------------------------
-Finding fabulous fares is fun.
- Let Yahoo! FareChase search your favorite travel sites to find flight and hotel bargains.
+I also have error messages in dmesg:
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb df9a7c14 err -38
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb df9a7c14 err -38
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f3272814 err -38
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f3272814 err -38
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f2d36814 err -38
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f2d36814 err -38
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f3272414 err -38
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f3272414 err -38
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f7d01014 err -38
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f7d01014 err -38
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb df9a7a14 err -38
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb df9a7a14 err -38
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express 
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
- http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-users mailing list
- Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users 
+And the module usage count on hidp is high:
+$ lsmod
+Module                  Size  Used by
+hidp                   10816  26 
+hci_usb                13596  4 
+rfcomm                 28376  1 
+l2cap                  17216  18 hidp,rfcomm
+bluetooth              39588  8 hidp,hci_usb,rfcomm,l2cap
 
+ListDevices() only gives the two devices (keyboard0 and pointing1).
 
+I'm using 2.6.20-gentoo-r8 (without mh patches)
 
- -------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+All suggestions are welcome
 
+Thanks in advance,
+Dick
 
-       
----------------------------------
-Yahoo! oneSearch: Finally,  mobile search that gives answers, not web links. 
---0-1306165694-1181763338=:97568
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-Hi,<br> <br> Isn't there an alsa interface that can be used without patching?<br> ie Do all applications that use alsa when it's in the kernel, patch?<br> <br> Thanks.<br> -Walt<br><br><b><i>Brad Midgley &lt;bmidgley@gmail.com&gt;</i></b> wrote:<blockquote class="replbq" style="border-left: 2px solid rgb(16, 16, 255); margin-left: 5px; padding-left: 5px;"> btsco only works through a kernel module, not as a kernel built-in. (You'd have to patch the kernel to do it as a built in)<br><br><div><span class="gmail_quote">On 6/12/07, <b class="gmail_sendername">walt shekrota</b>  &lt;<a href="mailto:penguinacity@yahoo.com">penguinacity@yahoo.com</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">What is the relative difference in installation for someone using a headset with alsa in modules vs alsa in the kernel? Is it just the patch step in btsco? (ie kernel directory) <br> <br>
- Thanks.<br><span class="sg"> -Walt<br></span><span class="ad"> <div>   </div><hr size="1">Finding fabulous fares is fun.<br><a href="http://farechase.yahoo.com/promo-generic-14795097;_ylc=X3oDMTFtNW45amVpBF9TAzk3NDA3NTg5BF9zAzI3MTk0ODEEcG9zAzEEc2VjA21haWx0YWdsaW5lBHNsawNxMS0wNw--%0A" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)"> Let Yahoo! FareChase search your favorite travel sites</a> to find flight and hotel bargains.<div></div></span><br>-------------------------------------------------------------------------<br>This SF.net email is sponsored by DB2 Express <br>Download DB2 Express C - the FREE version of DB2 express and take<br>control of your XML. No limits. Just data. Click to get it now.<br><a onclick="return top.js.OpenExtLink(window,event,this)" href="http://sourceforge.net/powerbar/db2/" target="_blank"> http://sourceforge.net/powerbar/db2/</a><br>_______________________________________________<br>Bluez-users mailing list<br><a
- onclick="return top.js.OpenExtLink(window,event,this)" href="mailto:Bluez-users@lists.sourceforge.net"> Bluez-users@lists.sourceforge.net</a><br><a onclick="return top.js.OpenExtLink(window,event,this)" href="https://lists.sourceforge.net/lists/listinfo/bluez-users" target="_blank">https://lists.sourceforge.net/lists/listinfo/bluez-users </a><br><br></blockquote></div><br> -------------------------------------------------------------------------<br>This SF.net email is sponsored by DB2 Express<br>Download DB2 Express C - the FREE version of DB2 express and take<br>control of your XML. No limits. Just data. Click to get it now.<br>http://sourceforge.net/powerbar/db2/_______________________________________________<br>Bluez-users mailing list<br>Bluez-users@lists.sourceforge.net<br>https://lists.sourceforge.net/lists/listinfo/bluez-users<br></blockquote><br><p>&#32;
-      <hr size=1>Yahoo! oneSearch: Finally, <a href="http://us.rd.yahoo.com/evt=48252/*http://mobile.yahoo.com/mobileweb/onesearch?refer=1ONXIC"> mobile search 
-that gives answers</a>, not web links. 
-
-
---0-1306165694-1181763338=:97568--
-
-
---===============0893713769==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0893713769==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0893713769==--
