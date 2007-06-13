@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Date: 13 Jun 2007 09:44:32 -0000
+Message-ID: <20070613094432.5851.qmail@webmail69.rediffmail.com>
 MIME-Version: 1.0
-Date: Thu, 14 Jun 2007 08:30:19 +0200
-Message-ID: <39D0ED4A56B05A409DB3C01F8DCEFB54F32D95@CORPAPPL021.corp.saab.se>
-From: "Bengtsson Mikael" <mikael.bengtsson@saabgroup.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SCO with BlueZ 2.15?
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+From: "jyotideep bhuyan" <jyotideepjec@rediffmail.com>
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] How to bypass the passkey request
+Reply-To: jyotideep bhuyan <jyotideepjec@rediffmail.com>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,60 +15,57 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1046098552=="
+Content-Type: multipart/mixed; boundary="===============0071889443=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+ This is a multipart mime message
 
---===============1046098552==
-Content-class: urn:content-classes:message
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C7AE4D.7B179B27"
 
-This is a multi-part message in MIME format.
+--===============0071889443==
+Content-type: multipart/alternative;
+	boundary="Next_1181727872---0-203.199.83.249-5847"
 
-------_=_NextPart_001_01C7AE4D.7B179B27
-Content-Type: text/plain;
-	charset="us-ascii"
+ This is a multipart mime message
+
+
+--Next_1181727872---0-203.199.83.249-5847
+Content-type: text/plain;
+	charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Thanks Tim! There was no support for SCO in the kernel. I recompiled and
-installed new kernel. Everything works fine now.
-
--Mikael
-
-------_=_NextPart_001_01C7AE4D.7B179B27
-Content-Type: text/html;
-	charset="us-ascii"
+  =0AHello,=0A=0A     I am very new to bluez.  I want to develop an applica=
+tion for obex push using bluez stack but I don=92t want the pass key reques=
+t at the other end (in my mobile device). I got a piece of code for obexftp=
+ in openobex, its working fine but asking the passkey request to the mobile=
+ user. I have been working on this stuff for some one week. Please help me.=
+=0A=0AThanx and Rgrds=0A    Jyotideep=0A
+--Next_1181727872---0-203.199.83.249-5847
+Content-type: text/html;
+	charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
-<HTML>
-<HEAD>
-<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Dus-ascii">
-<META NAME=3D"Generator" CONTENT=3D"MS Exchange Server version =
-6.5.7652.24">
-<TITLE>Re: [Bluez-devel] SCO with BlueZ 2.15?</TITLE>
-</HEAD>
-<BODY>
-<!-- Converted from text/rtf format -->
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 FACE=3D"Arial">Thanks Tim! There was =
-no support for SCO in the kernel. I recompiled and installed new kernel. =
-Everything works fine now.</FONT></SPAN></P>
-
-<P><SPAN LANG=3D"sv"><FONT SIZE=3D2 =
-FACE=3D"Arial">-Mikael</FONT></SPAN><SPAN LANG=3D"en-us"></SPAN>
-</P>
-
-</BODY>
-</HTML>
-------_=_NextPart_001_01C7AE4D.7B179B27--
+<P>=0A&nbsp; <BR>=0AHello,<BR>=0A<BR>=0A&nbsp; &nbsp;  I am very new to blu=
+ez.&nbsp; I want to develop an application for obex push using bluez stack =
+but I don=92t want the pass key request at the other end (in my mobile devi=
+ce). I got a piece of code for obexftp in openobex, its working fine but as=
+king the passkey request to the mobile user. I have been working on this st=
+uff for some one week. Please help me.<BR>=0A<BR>=0AThanx and Rgrds<BR>=0A&=
+nbsp; &nbsp; Jyotideep<BR>=0A=0A</P>=0A<br><br>=0A<Table border=3D0 Width=
+=3D644 Height=3D57 cellspacing=3D0 cellpadding=3D0 style=3D'font-family:Ver=
+dana;font-size:11px;line-height:15px;'><TR><td><a href=3D'http://adworks.re=
+diff.com/cgi-bin/AdWorks/click.cgi/www.rediff.com/signature-home.htm/105071=
+5198@Middle5/1236533_1230311/1235697/1?PARTNER=3D3&OAS_QUERY=3Dnull target=
+=3Dnew '><img src =3Dhttp://imadworks.rediff.com/cgi-bin/AdWorks/adimage.cg=
+i/1236533_1230311/creative_1235697.gif  alt=3D'soul mate'  border=3D0></a><=
+/td></TR></Table>
+--Next_1181727872---0-203.199.83.249-5847--
 
 
---===============1046098552==
+
+--===============0071889443==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -78,7 +76,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1046098552==
+--===============0071889443==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -89,4 +87,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1046098552==--
+--===============0071889443==--
