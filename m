@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Dick <dick@mrns.nl>
-Date: Wed, 13 Jun 2007 18:08:08 +0000 (UTC)
-Message-ID: <loom.20070613T200722-459@post.gmane.org>
-Mime-Version: 1.0
-Subject: [Bluez-users] input service trouble
+Date: Wed, 13 Jun 2007 11:04:38 -0700 (PDT)
+From: Robert Schmidt <itsmy_emale@yahoo.com>
+To: Bluez User <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Message-ID: <498428.42670.qm@web38511.mail.mud.yahoo.com>
+Subject: [Bluez-users] Segmentation fault
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,59 +14,59 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1572742213=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+--===============1572742213==
+Content-Type: multipart/alternative; boundary="0-2034119548-1181757878=:42670"
+Content-Transfer-Encoding: 8bit
+
+--0-2034119548-1181757878=:42670
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
 Hi,
+ 
+ When I try to execute the l2test.c  and rctest.c programs I get "Segmentation Fault" when I try to Connect and Send(SEND). Besides, what kind of files can be sent and in what format ??
 
-I'm testing the new input service but I have some trouble with reconnects. If I
-don't use my dinovo keyboard or mx laser for a while the connection is closed
-and  they aren't automatically reconnected.
+thanks in advance,
 
-Sometimes a power cycle (on the HID device) helps, sometimes I need to send a
-Connect() through DBUS and sometimes I need a hciconfig hci0 reset and I also
-have some success with reloading hci_usb.
+robert.
 
-I also have error messages in dmesg:
-hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb df9a7c14 err -38
-hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb df9a7c14 err -38
-hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f3272814 err -38
-hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f3272814 err -38
-hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f2d36814 err -38
-hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f2d36814 err -38
-hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f3272414 err -38
-hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f3272414 err -38
-hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f7d01014 err -38
-hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb f7d01014 err -38
-hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb df9a7a14 err -38
-hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb df9a7a14 err -38
+       
+---------------------------------
+Building a website is a piece of cake. 
+Yahoo! Small Business gives you all the tools to get online.
+--0-2034119548-1181757878=:42670
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-And the module usage count on hidp is high:
-$ lsmod
-Module                  Size  Used by
-hidp                   10816  26 
-hci_usb                13596  4 
-rfcomm                 28376  1 
-l2cap                  17216  18 hidp,rfcomm
-bluetooth              39588  8 hidp,hci_usb,rfcomm,l2cap
+Hi,<br> <br> When I try to execute the l2test.c&nbsp; and rctest.c programs I get "Segmentation Fault" when I try to Connect and Send(SEND). Besides, what kind of files can be sent and in what format ??<br><br>thanks in advance,<br><br>robert.<br><p>&#32;
+      <hr size=1>Building a website is a piece of cake. <br>Yahoo! Small Business gives you <a href="http://us.rd.yahoo.com/evt=48251/*http://smallbusiness.yahoo.com/webhosting/?p=PASSPORTPLUS">all the tools to get online.</a>
+--0-2034119548-1181757878=:42670--
 
-ListDevices() only gives the two devices (keyboard0 and pointing1).
 
-I'm using 2.6.20-gentoo-r8 (without mh patches)
-
-All suggestions are welcome
-
-Thanks in advance,
-Dick
-
+--===============1572742213==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1572742213==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1572742213==--
