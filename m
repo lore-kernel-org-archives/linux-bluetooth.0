@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <fc3d922d0706120106y3a7fd657l1cada74a63166010@mail.gmail.com>
-References: <fc3d922d0706120106y3a7fd657l1cada74a63166010@mail.gmail.com>
-Date: Wed, 13 Jun 2007 04:58:59 +0200
-Message-Id: <1181703539.6872.95.camel@aeonflux.holtmann.net>
+In-Reply-To: <466D2E82.7070805@bluecellnetworks.com>
+References: <E1Hwe2S-0003bG-Gu@mail.sourceforge.net>
+	<B4DB78E18F6C47E6BA941FB0F17C6A97@iMe>
+	<466D2E82.7070805@bluecellnetworks.com>
+Date: Wed, 13 Jun 2007 04:46:18 +0200
+Message-Id: <1181702778.6872.90.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] hci_inquiry
+Subject: Re: [Bluez-users] multiple server-instances on one single machine
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,18 +22,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Przemek,
+Hi Uli,
 
-> I'm writing aplication in Java using Avetana library. Sometimes
-> inquiry hangs up, and I want to stop it. There is native method in
-> library cancelInquiry but it's not implemented. I need to stop
-> existing inquiry. Function hci_inquiry implemented in hci.c starts
-> inquiry, but i don't find there any function that cancels it.
-> I'll be very thankful for any help
+> I'm trying to build a Bluteooth - receiver, which uses multiple 
+> bluetooth-devices and has a server running for each stick.
+> (Background is, that i need a machine for testing-purposes to test a 
+> bluetooth-sender. I need multiple parallel connections to test the 
+> transferspeed etc.)
+> 
+> I Took the sources of obexpushd 0.4 (debianpackage) and modified them, 
+> so the obexpushd can be started with -DhciX to use a certain hci device. 
+> This works perfect, if i start the server on hci2 for example, only hci2 
+> gets the files. The big problem is, when i start a second instance of 
+> the obexpushd eg. on hci3, only hci3 gets the content and hci2 not.
+> 
+> I tracked down the problem and can say, that the sdpd promotes the 
+> OBEX-PUSH Service for each stick and not only for the one i want it to.
+> 
+> I altered  the  obexpush-sdp.c file from
+> 
+>   session = sdp_connect(BDADDR_ANY,BDADDR_LOCAL,SDP_RETRY_IF_BUSY);
+>   status = sdp_record_register(session,rec,0);
+> 
+> to
+> 
+>   session = sdp_connect(&btdev,BDADDR_LOCAL,SDP_RETRY_IF_BUSY);
+>   status = sdp_record_register(session,rec,0);
+> 
+> where btdev is the bdaddr_t of the wanted hci-device, but i still get 
+> all running services promoted on all hci-devices.
 
-if you would use the new D-Bus API for BlueZ you would be able to cancel
-it. With the C only API it is not possible. That specific call is
-blocking.
+the change in sdp_connect() gives you nothing when using BDADDR_LOCAL.
+You need to use sdp_device_record_register() in the second step.
 
 Regards
 
