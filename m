@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ Hackers <bluez-devel@lists.sourceforge.net>
-Date: Fri, 15 Jun 2007 00:26:34 +0100
-Message-Id: <1181863594.31424.204.camel@cookie.hadess.net>
+Date: Thu, 14 Jun 2007 20:31:43 +0100
+Message-Id: <1181849504.31424.187.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel] bluez-gnome git repo
+Subject: [Bluez-devel] No pt_BR translations
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,19 +20,12 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Heya,
 
-As I'm currently hacking a lot on the bluez-gnome side of things, I
-created a git repo where you can see the things I'm working on.
+Bluez-gnome needs to rename pt-br to pt_BR, otherwise the translation
+won't be used.
 
-Latest addition is a "Browse device..." menu item that uses
-gnome-vfs-obexftp to browse a particular device.
-
-To clone it:
-git clone git://cgit.freedesktop.org/~hadess/bluez-gnome.git
-
-Web interface:
-http://gitweb.freedesktop.org/?p=users/hadess/bluez-gnome.git;a=summary
-
-I'm new to git, so please bear with me.
+To reproduce, launch:
+LC_ALL=pt_BR bluetooth-applet
+and check the translations.
 
 Cheers
 
