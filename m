@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <467148C3.4070409@gmail.com>
-References: <467148C3.4070409@gmail.com>
-Date: Sat, 16 Jun 2007 09:36:13 +0200
-Message-Id: <1181979373.6846.58.camel@aeonflux.inter-touch.com>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] A slave device wont re-connect
+Message-ID: <d89ddf300706141217q4c88eb74mc5b8b6de0592775c@mail.gmail.com>
+Date: Thu, 14 Jun 2007 13:17:43 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <861055.97568.qm@web62305.mail.re1.yahoo.com>
+MIME-Version: 1.0
+References: <d89ddf300706122146o2720e93bka0eab97ffbf3cfcb@mail.gmail.com>
+	<861055.97568.qm@web62305.mail.re1.yahoo.com>
+Subject: Re: [Bluez-users] bluez/alsa modules vs kernel
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,70 +17,67 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0328506866=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mikko,
+--===============0328506866==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_20309_27668181.1181848663219"
 
-> I have two devices that can act as Bluetooth master (A and B) and a 
-> single device that can act only as a Slave (C). The slave can 
-> communicate only using the RFCOMM profile. The devices A and B are 
-> actually Linux boxes with D-Link DBT-122 BT USB dongles. The device C is 
-> a sensor device that I have no control over (I can just switch it on and 
-> off).
-> 
-> I've been trying to implement a software on the devices A and B which 
-> would do the following:
-> 
-> 1) make periodic BT scans
-> 2) if it finds the device C in these scans, it would create an RFCOMM 
-> connection to the device C and simply read the data that it is sending
-> 3) when the device C moves out of the range say device A to the coverage 
-> area of device B the device B should then discover device C and create 
-> the connection (roaming)
-> 
-> My application is threaded where thread 1 periodically creates a BT 
-> socket, mekes a BT scan and closes the socket. Thread number 2 is 
-> created when the first thread discovers the device C. This thread does 
-> the following:
-> 1) create a BT socket
-> 2) binds the socket to a local BT address
-> 3) connects to the discovered device C
-> 4) read data from socket
-> 5) close socket
-> 
-> This all goes just fine. If the device C first connects to device A and 
-> then moves to lose connection with it, the device B can discover it and 
-> the connection succeeds. The problem comes when the device C loses the 
-> connection to B. Even though the device A can discover C again, the 
-> connect() _always_ fails.
-> 
-> I have even tried to close the connection using RFCOMMRELEASEDEV ioctl.
-> 
-> My question is that have I missed something that I should do in order to 
-> shutdown the BT connection properly so that the device C would be ready 
-> for a new connection from another device?
+------=_Part_20309_27668181.1181848663219
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-first of all threading is not buying you anything. You run an inquiry
-and page another device at the same time. That is a chip limitation and
-that is true for all chips. Period.
-
-Second of all, I need to see the source, hciconfig -a settings and a
-hcidump -X -V for that situation.
-
-Regards
-
-Marcel
+walt
 
 
+> Isn't there an alsa interface that can be used without patching?
+> ie Do all applications that use alsa when it's in the kernel, patch?
+
+
+
+I'm not sure what you're asking. Have you tried out plugz are you only
+talking about btsco? Also which headset are you working with?
+
+There is a recommended kernel patch regardless of which approach you use for
+voice headsets. See plugz/patches for the sco-flowcontrol patch.
+
+Brad
+
+------=_Part_20309_27668181.1181848663219
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<b class="gmail_sendername">walt<br><br></b><div><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;"><br> Isn&#39;t there an alsa interface that can be used without patching?
+<br> ie Do all applications that use alsa when it&#39;s in the kernel, patch?</blockquote></div><br><br>I&#39;m not sure what you&#39;re asking. Have you tried out plugz are you only talking about btsco? Also which headset are you working with?
+<br><br>There is a recommended kernel patch regardless of which approach you use for voice headsets. See plugz/patches for the sco-flowcontrol patch.<br><br>Brad<br>
+
+------=_Part_20309_27668181.1181848663219--
+
+
+--===============0328506866==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============0328506866==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0328506866==--
