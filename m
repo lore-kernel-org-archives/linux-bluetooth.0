@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1181849504.31424.187.camel@cookie.hadess.net>
-References: <1181849504.31424.187.camel@cookie.hadess.net>
-Date: Fri, 15 Jun 2007 04:08:28 +0200
-Message-Id: <1181873309.6846.6.camel@aeonflux>
+In-Reply-To: <1181863594.31424.204.camel@cookie.hadess.net>
+References: <1181863594.31424.204.camel@cookie.hadess.net>
+Date: Fri, 15 Jun 2007 04:02:20 +0200
+Message-Id: <1181872941.6846.3.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] No pt_BR translations
+Subject: Re: [Bluez-devel] bluez-gnome git repo
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,17 +22,30 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Bastien,
 
-> Bluez-gnome needs to rename pt-br to pt_BR, otherwise the translation
-> won't be used.
+> As I'm currently hacking a lot on the bluez-gnome side of things, I
+> created a git repo where you can see the things I'm working on.
 > 
-> To reproduce, launch:
-> LC_ALL=pt_BR bluetooth-applet
-> and check the translations.
+> Latest addition is a "Browse device..." menu item that uses
+> gnome-vfs-obexftp to browse a particular device.
+> 
+> To clone it:
+> git clone git://cgit.freedesktop.org/~hadess/bluez-gnome.git
+> 
+> Web interface:
+> http://gitweb.freedesktop.org/?p=users/hadess/bluez-gnome.git;a=summary
+> 
+> I'm new to git, so please bear with me.
 
-good catch. I fixed that in the CVS.
+that is a great idea. That makes it easy for me to get your patches with
+nice commit messages into CVS. You know that David Woodhouse provides an
+online mirror of bluez-gnome CVS that gives you git access.
 
-I am totally new to this translation stuff. The Linux kernel doesn't
-need any translation ;)
+http://git.infradead.org/?p=bluez-gnome.git;a=summary
+
+So if you use that you are always up-to-date with the current changes.
+
+I will get to your patches as soon as possible. I am just a little bit
+stuck in the wrong timezone right now.
 
 Regards
 
