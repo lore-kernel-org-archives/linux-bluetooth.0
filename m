@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <fc3d922d0706150338q111dd011rae7b20c524e3c2a1@mail.gmail.com>
-Date: Fri, 15 Jun 2007 12:38:49 +0200
-From: "=?ISO-8859-2?Q?Przemys=B3aw_Jakubowski?=" <przemyslaw.jakubowski@javatech.com.pl>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>,
-        bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] Inquiry hanging
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <003101c7af38$98bf6d20$a100010a@Libera.local>
+References: <003101c7af38$98bf6d20$a100010a@Libera.local>
+Date: Fri, 15 Jun 2007 12:37:41 +0200
+Message-Id: <1181903862.6846.23.camel@aeonflux.inter-touch.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] RV: sdp_connect don't work with some handsets
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,15 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi
+Hi Jose,
 
-My application scans for bluetooth devices all the time. Sometimes
-inquiry is hanging.
-What  cuold be a problem?? I'm using avetana library, bluez-libs 3.11.
+> I have attached to this mail 3 logs using "hcidump -X -V"
+> 
+> Send_to_Lg.txt --> trying to send a file from my computer to one LG handset.
 
-Thank you for any help
+it says clearly that role switch is not supported. Show me hciconfig -a
+for your dongle and hcitool info (as root) for the phone.
 
-Greetings, Przemek
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
