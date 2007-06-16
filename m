@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <003e01c7af3c$65f14e00$a100010a@Libera.local>
-References: <003e01c7af3c$65f14e00$a100010a@Libera.local>
-Date: Sat, 16 Jun 2007 09:33:11 +0200
-Message-Id: <1181979191.6846.55.camel@aeonflux.inter-touch.com>
+In-Reply-To: <467297DF.2030401@access-company.com>
+References: <467297DF.2030401@access-company.com>
+Date: Sat, 16 Jun 2007 09:31:20 +0200
+Message-Id: <1181979080.6846.53.camel@aeonflux.inter-touch.com>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] RV: sdp_connect don't work with some handsets
+Subject: Re: [Bluez-devel] Input service signals
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,33 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jose,
+Hi Frederic,
 
-> Here you can see "hciconfig -a" result:
+> I am using the Input service. It is very helpful.
 > 
-> ******************************************
-> [root@localhost sbin]# ./hciconfig -a
-> hci0:   Type: USB
->         BD Address: 00:0B:0D:0B:21:6F ACL MTU: 120:20 SCO MTU: 0:0
->         UP RUNNING PSCAN ISCAN 
->         RX bytes:33459 acl:496 sco:0 events:750 errors:0
->         TX bytes:46184 acl:740 sco:0 commands:228 errors:0
->         Features: 0xff 0xff 0x05 0x38 0x18 0x18 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
->         Link policy: RSWITCH HOLD SNIFF PARK 
->         Link mode: SLAVE ACCEPT 
->         Name: 'libera networks'
->         Class: 0x120104
->         Service Classes: Networking, Object Transfer
->         Device Class: Computer, Desktop workstation
->         HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x757
->         Manufacturer: Silicon Wave (11)
-> *******************************************
+> But Connected/Disconnected signals from Device interface are currently 
+> only sent when connection/disconnection are done through the Device 
+> interface methods. They are not sent when remote device 
+> connects/disconnects.
 > 
-> With "hcitool info MAC" I have the same problem:
+> I wrote a patch that move common code between server.c and device.c into 
+> a new file session.c. This allows to send those signals for all 
+> connect/disconnect.
 
-do you have a CSR based dongle that you can use for testing. I wanna
-check that this is not a dongle problem.
+I haven't looked at your patch, but I agree that we should send the
+signals when the remote device re-connects. I wait for Claudio's or
+Johan's comments on that patch.
 
 Regards
 
