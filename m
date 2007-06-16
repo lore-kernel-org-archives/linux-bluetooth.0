@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <fc3d922d0706122331u55151133x5b141ef3a1159146@mail.gmail.com>
-References: <fc3d922d0706120106y3a7fd657l1cada74a63166010@mail.gmail.com>
-	<1181703539.6872.95.camel@aeonflux.holtmann.net>
-	<fc3d922d0706122331u55151133x5b141ef3a1159146@mail.gmail.com>
-Date: Sat, 16 Jun 2007 09:45:21 +0200
-Message-Id: <1181979921.6846.74.camel@aeonflux.inter-touch.com>
+In-Reply-To: <200706122256.12825.cijoml@volny.cz>
+References: <200706122256.12825.cijoml@volny.cz>
+Date: Sat, 16 Jun 2007 09:42:13 +0200
+Message-Id: <1181979733.6846.68.camel@aeonflux.inter-touch.com>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] hci_inquiry
+Subject: Re: [Bluez-users] hid2hci in utils-3.11 at x86_64 (P4 with
+	64bit	extension) doesn't switch Logitech dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,24 +21,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Michal,
 
-> I'm little new in bluetooth software, so I've got some more questions.
-> Where can I find this D-BUS API (is it in new versions of bluez-libs,
-> bluez-utils or in kernel).
+> at i386 I getts:
 > 
-> Yesterday I generated this code:
+> notas:/usr/src# lsusb
+> Bus 008 Device 001: ID 0000:0000
+> Bus 007 Device 008: ID 046d:c70c Logitech, Inc.
+> Bus 007 Device 007: ID 046d:c70b Logitech, Inc.
+> Bus 007 Device 006: ID 046d:0b02 Logitech, Inc.
+> Bus 007 Device 001: ID 0000:0000
+> Bus 006 Device 001: ID 0000:0000
+> Bus 005 Device 001: ID 0000:0000
+> Bus 004 Device 001: ID 0000:0000
+> Bus 003 Device 001: ID 0000:0000
+> Bus 002 Device 001: ID 0000:0000
+> Bus 001 Device 001: ID 0000:0000
+> notas:/usr/src# hid2hci
+> Switching device 046d:c70c to HCI mode was successful
+> Switching device 046d:c70b to HCI mode was successful
+> notas:/usr/src# lsusb
+> Bus 008 Device 001: ID 0000:0000
+> Bus 007 Device 009: ID 046d:c709 Logitech, Inc.
+> Bus 007 Device 008: ID 046d:c70c Logitech, Inc.
+> Bus 007 Device 007: ID 046d:c70b Logitech, Inc.
+> Bus 007 Device 006: ID 046d:0b02 Logitech, Inc.
+> Bus 007 Device 001: ID 0000:0000
+> Bus 006 Device 001: ID 0000:0000
+> Bus 005 Device 001: ID 0000:0000
+> Bus 004 Device 001: ID 0000:0000
+> Bus 003 Device 001: ID 0000:0000
+> Bus 002 Device 001: ID 0000:0000
+> Bus 001 Device 001: ID 0000:0000
 > 
-> hci_send_req(dev_id, &rq, 100)
-> where
-> rq is hci_request struct and i set
-> rq.ogf = OGF_LINK_CTL;
-> rq.ocf = OCF_INQUIRY_CANCEL;
 > 
-> If this code would be proper if I have new D-Bus API.
+> At x86_64 I getts successfull enable, but Bus 007 Device 006: ID 046d:0b02 
+> Logitech, Inc. doesn't show up and hciconfig see NO dongle.
 
-as I said, use the new D-Bus based API. The source code contains a
-dbus-api.txt file with the full description.
+looks like a bug, but I don't know where.
 
 Regards
 
