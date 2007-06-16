@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4665E3BA.1040309@gmail.com>
-References: <4665E3BA.1040309@gmail.com>
-Date: Sat, 16 Jun 2007 09:52:06 +0200
-Message-Id: <1181980327.6846.80.camel@aeonflux.inter-touch.com>
+In-Reply-To: <fc3d922d0706122331u55151133x5b141ef3a1159146@mail.gmail.com>
+References: <fc3d922d0706120106y3a7fd657l1cada74a63166010@mail.gmail.com>
+	<1181703539.6872.95.camel@aeonflux.holtmann.net>
+	<fc3d922d0706122331u55151133x5b141ef3a1159146@mail.gmail.com>
+Date: Sat, 16 Jun 2007 09:45:21 +0200
+Message-Id: <1181979921.6846.74.camel@aeonflux.inter-touch.com>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] dfutool problems
+Subject: Re: [Bluez-users] hci_inquiry
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,32 +22,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Jarom,
+Hi,
 
-> I recently ran "dfutool archive foo" on my IBM bluetooth adapter
-> (Broadcom) thinking it would save my firmware to the file "foo".  It
-> created a zero-length file, said that the operation timed out, and
-> exited.  Ever since, by bluetooth adapter has been stuck in DFU mode:
+> I'm little new in bluetooth software, so I've got some more questions.
+> Where can I find this D-BUS API (is it in new versions of bluez-libs,
+> bluez-utils or in kernel).
 > 
-> # dfutool archive foo
-> Available devices with DFU support:
+> Yesterday I generated this code:
 > 
->          1) Bus 003 Device 034: ID 0a5c:2000 Interface 0 (DFU mode)
+> hci_send_req(dev_id, &rq, 100)
+> where
+> rq is hci_request struct and i set
+> rq.ogf = OGF_LINK_CTL;
+> rq.ocf = OCF_INQUIRY_CANCEL;
 > 
-> Select device (abort with 0): 1
-> 
-> Firmware upload ...
-> Can't upload next block: Connection timed out (110)
-> 
-> from dmesg:
-> usb 3-1: Product: Broadcom Bluetooth Download Device
-> 
-> Does anyone know why it did that and how to get the adapter out of DFU
-> mode?  I don't want to have to buy a new adapter...  :)
+> If this code would be proper if I have new D-Bus API.
 
-if it is Broadcom then it will fail. And it is possible to get this back
-out of the mode, but no tool supports it. Or maybe the dfu-util from the
-OpenMoko project.
+as I said, use the new D-Bus based API. The source code contains a
+dbus-api.txt file with the full description.
 
 Regards
 
