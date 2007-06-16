@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200706122256.12825.cijoml@volny.cz>
-References: <200706122256.12825.cijoml@volny.cz>
-Date: Sat, 16 Jun 2007 09:42:13 +0200
-Message-Id: <1181979733.6846.68.camel@aeonflux.inter-touch.com>
+In-Reply-To: <498428.42670.qm@web38511.mail.mud.yahoo.com>
+References: <498428.42670.qm@web38511.mail.mud.yahoo.com>
+Date: Sat, 16 Jun 2007 09:40:32 +0200
+Message-Id: <1181979632.6846.64.camel@aeonflux.inter-touch.com>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] hid2hci in utils-3.11 at x86_64 (P4 with
-	64bit	extension) doesn't switch Logitech dongle
+Subject: Re: [Bluez-users] Segmentation fault
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,44 +20,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Michal,
+Hi Robert,
 
-> at i386 I getts:
-> 
-> notas:/usr/src# lsusb
-> Bus 008 Device 001: ID 0000:0000
-> Bus 007 Device 008: ID 046d:c70c Logitech, Inc.
-> Bus 007 Device 007: ID 046d:c70b Logitech, Inc.
-> Bus 007 Device 006: ID 046d:0b02 Logitech, Inc.
-> Bus 007 Device 001: ID 0000:0000
-> Bus 006 Device 001: ID 0000:0000
-> Bus 005 Device 001: ID 0000:0000
-> Bus 004 Device 001: ID 0000:0000
-> Bus 003 Device 001: ID 0000:0000
-> Bus 002 Device 001: ID 0000:0000
-> Bus 001 Device 001: ID 0000:0000
-> notas:/usr/src# hid2hci
-> Switching device 046d:c70c to HCI mode was successful
-> Switching device 046d:c70b to HCI mode was successful
-> notas:/usr/src# lsusb
-> Bus 008 Device 001: ID 0000:0000
-> Bus 007 Device 009: ID 046d:c709 Logitech, Inc.
-> Bus 007 Device 008: ID 046d:c70c Logitech, Inc.
-> Bus 007 Device 007: ID 046d:c70b Logitech, Inc.
-> Bus 007 Device 006: ID 046d:0b02 Logitech, Inc.
-> Bus 007 Device 001: ID 0000:0000
-> Bus 006 Device 001: ID 0000:0000
-> Bus 005 Device 001: ID 0000:0000
-> Bus 004 Device 001: ID 0000:0000
-> Bus 003 Device 001: ID 0000:0000
-> Bus 002 Device 001: ID 0000:0000
-> Bus 001 Device 001: ID 0000:0000
-> 
-> 
-> At x86_64 I getts successfull enable, but Bus 007 Device 006: ID 046d:0b02 
-> Logitech, Inc. doesn't show up and hciconfig see NO dongle.
+> When I try to execute the l2test.c  and rctest.c programs I get
+> "Segmentation Fault" when I try to Connect and Send(SEND). Besides,
+> what kind of files can be sent and in what format ??
 
-looks like a bug, but I don't know where.
+which bluez-utils version is this and I need a gdb backtrace for that.
 
 Regards
 
