@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1182011715.31424.346.camel@cookie.hadess.net>
+In-Reply-To: <1182012252.31424.353.camel@cookie.hadess.net>
 References: <1181925876.31424.326.camel@cookie.hadess.net>
-	<1181977540.6846.38.camel@aeonflux.inter-touch.com>
-	<1182011715.31424.346.camel@cookie.hadess.net>
-Date: Sat, 16 Jun 2007 21:35:31 +0200
-Message-Id: <1182022535.30934.11.camel@aeonflux.inter-touch.com>
+	<1181978755.6846.46.camel@aeonflux.inter-touch.com>
+	<1182012252.31424.353.camel@cookie.hadess.net>
+Date: Sat, 16 Jun 2007 21:24:21 +0200
+Message-Id: <1182021864.30934.5.camel@aeonflux.inter-touch.com>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] HID initiated connections and input service
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -24,64 +24,56 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Bastien,
 
-> > > * Second device: Sixaxis PS3 Bluetooth joypad
+> > > 2(3) HID devices I own have the same problem with BlueZ when using the
+> > > input service. Both use HID initiated connections, rather than the
+> > > Host
+> > > initiated connection use case you would see when addind a Bluetooth
+> > > mouse to a laptop for example.
 > > > 
-> > > Again, 2 connections modes. Firstly, there's no pairing, the joypad
-> > > knows about the computer when one runs sixpair when the pad is connected
-> > > via USB, as per:
-> > > http://www.pabr.org/sixlinux/sixlinux.en.html
-> > > (Marcel talked about integrating this with udev, which should be pretty
-> > > straight forward)
+> > > * First device: Logitech MX5000 mouse/keyboard combo
 > > > 
-> > > Once disconnected from USB, and turned on, the device will try to
-> > > connect to the computer. bluetooth-applet will request auth, and ask us
-> > > whether we want to allow the connection. But as the device was never
-> > > discovered/setup using CreateDevice, the get_store_device_info in
-> > > input/server.c will fail.
+> > > When not switched into HCI mode, the device works as a normal USB HID.
+> > > On boot, hid2hci is run, and the 2 devices (mouse and keyboard) try to
+> > > connect to bluetooth dongle (ex-USB wireless dongle).
+> > > There's no bluetooth-applet, or other services, and the requests are
+> > > dropped to the floor, and I end up with a Bluetooth HCI device, and no
+> > > keyboard or mouse (unplug/replug "fixes" the problem though).
 > > > 
-> > > You can't use CreateDevice with the device, as it's either connecting to
-> > > our computer, or off, and connection requests will fail.
+> > > Could we integrate hid2hci into the input service, so that it would only
+> > > be started when a session is available? I'm not sure how to handle the
+> > > pairing without a keyboard or mouse though...
 > > 
-> > The sixpair.c tool needs to do some nasty tricks. It hast to get its own
-> > Bluetooth address from the controller and then get its HID report
-> > descriptor over USB. Then store them in /var/lib/bluetooth and also set
-> > itself to trusted.
+> > after catching up with the IRC, I realized another problem with this HID
+> > proxy dongles. We can fix that for the original firmwares from CSR that
+> > are used by Apple, but for the Logitech's (they are slightly modified) I
+> > am not sure.
 > > 
-> > We might wanna integrate that into the input service, but to be honest I
-> > currently don't know how. It also might make more sense to let a HAL
-> > addon handle this kind of authentication instead of at udev level.
+> > So when you switch a HID proxy dongle from HID mode into HCI, you have
+> > to read its information about stored devices and their link keys. These
+> > information have then to be put into /var/lib/bluetooth. This leaves out
+> > the HID report descriptor that we also need. So that needs to be gotten
+> > while it is still in USB mode.
 > 
-> What we could do is:
-> 1) have a HAL addon that will set the device's bdaddr in a property of
-> the device when plugged into USB
+> So it would be:
+> 1) Get info from dongle about its own bdaddr, and the bdaddr of the
+> attached devices (do you have code to do that for Logitech devices?)
+> 2) Add attached devices' bdaddr as trusted for the device, and get the
+> HID report descriptor, save it
+> 3) switch the dongle to HCI mode
+> 
+> Would that work? We could even do this in a HAL addon, or udev callback
+> so that we're sure that newly plugged dongles are handled automatically.
 
-I think a HAL addon that export the BD_ADDR of the controller as a
-property is a good idea. We might also wanna add the current configured
-host controller for that device and add a method to change that address.
+something like that and I have no idea how to do that for Logitech
+devices. I have strange code for pure CSR dongles, but it is so ugly
+that I am not going to share it. It is mostly CSR vendor stuff.
 
-> 2) have bluetooth-applet (or any other front-end) ask the user whether
-> to set the device as trusted when it's plugged in (can be switched off
-> with a config item)
+> > Getting the HID report descriptor over USB makes always the assumption
+> > that it is exactly the same as on Bluetooth. This should be checked.
+> 
+> How can I verify that?
 
-Personally I think this should happen without any user-interaction once
-you plugin the controller. However haven't thought about it that much.
-
-> 3) Add a method to the input service (AddUSBDevice(string address,
-> string usbdev) that will get the USB HID report descriptor, and set the
-> device as trusted along with the rest of the info
-
-No. I don't wanna have hardware specific methods in that API.
-
-> I could work on that (it should be pretty straight-forward), except I
-> don't have any code to get the bdaddr from the device and I don't know
-> how to get the HID report descriptor from the device either. If you have
-> some code that does that, feel free to pass it on, I can do the
-> integration.
-
-Check http://www.holtmann.org/papers/bluetooth/csw2007_slides.pdf and
-you will see the report ids that will give you that information. I do
-have code for that, but can't find it right now. Maybe it is on one of
-my machines that I switched off.
+I don't have code for that. Need to write a tool that does this.
 
 Regards
 
