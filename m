@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <467297DF.2030401@access-company.com>
-References: <467297DF.2030401@access-company.com>
-Date: Sat, 16 Jun 2007 09:31:20 +0200
-Message-Id: <1181979080.6846.53.camel@aeonflux.inter-touch.com>
+In-Reply-To: <200706151809.04115.fernando@bluexare.org>
+References: <200706151809.04115.fernando@bluexare.org>
+Date: Sat, 16 Jun 2007 09:29:47 +0200
+Message-Id: <1181978987.6846.50.camel@aeonflux.inter-touch.com>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Input service signals
+Subject: Re: [Bluez-devel] Problems with my own inquiry
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,22 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frederic,
+Hi Fernando,
 
-> I am using the Input service. It is very helpful.
-> 
-> But Connected/Disconnected signals from Device interface are currently 
-> only sent when connection/disconnection are done through the Device 
-> interface methods. They are not sent when remote device 
-> connects/disconnects.
-> 
-> I wrote a patch that move common code between server.c and device.c into 
-> a new file session.c. This allows to send those signals for all 
-> connect/disconnect.
+> I have an application that works with the bluetooth, scanning and sending 
+> content with other devices..., and now, when I'm trying to make irt work in 
+> other distribution, it fails.
 
-I haven't looked at your patch, but I agree that we should send the
-signals when the remote device re-connects. I wait for Claudio's or
-Johan's comments on that patch.
+the solution is to use the new D-Bus based API. It takes care of
+everything that you want.
+
+> This is a normal work, whit INQUIRY_RESULT and COMMAND_STATUS, but in the new 
+> PC (a debian etch, buiilt by DebianLive) where I want to install the 
+> application the output is like this:
+
+The new hcid switches into the best inquiry mode and that means Inquiry
+with RSSI (which is different event) for a Bluetooth 1.2 dongle or
+later. You have to watch for that event, too. Or use the D-Bus API that
+does that for you and already takes care of Extended Inquiry of the
+Bluetooth 2.1 specification.
 
 Regards
 
