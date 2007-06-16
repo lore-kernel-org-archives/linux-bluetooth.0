@@ -3,8 +3,8 @@ From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <1181925876.31424.326.camel@cookie.hadess.net>
 References: <1181925876.31424.326.camel@cookie.hadess.net>
-Date: Sat, 16 Jun 2007 09:25:54 +0200
-Message-Id: <1181978755.6846.46.camel@aeonflux.inter-touch.com>
+Date: Sat, 16 Jun 2007 09:05:40 +0200
+Message-Id: <1181977540.6846.38.camel@aeonflux.inter-touch.com>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] HID initiated connections and input service
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -23,8 +23,7 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 Hi Bastien,
 
 > 2(3) HID devices I own have the same problem with BlueZ when using the
-> input service. Both use HID initiated connections, rather than the
-> Host
+> input service. Both use HID initiated connections, rather than the Host
 > initiated connection use case you would see when addind a Bluetooth
 > mouse to a laptop for example.
 > 
@@ -36,31 +35,42 @@ Hi Bastien,
 > There's no bluetooth-applet, or other services, and the requests are
 > dropped to the floor, and I end up with a Bluetooth HCI device, and no
 > keyboard or mouse (unplug/replug "fixes" the problem though).
-> 
+
+you can do a adapter.SetTrusted(address) call once and no authorization
+agent is called.
+
 > Could we integrate hid2hci into the input service, so that it would only
 > be started when a session is available? I'm not sure how to handle the
 > pairing without a keyboard or mouse though...
 
-after catching up with the IRC, I realized another problem with this HID
-proxy dongles. We can fix that for the original firmwares from CSR that
-are used by Apple, but for the Logitech's (they are slightly modified) I
-am not sure.
+I wanna integrate hid2hci somehow, but currently I don't know how.
 
-So when you switch a HID proxy dongle from HID mode into HCI, you have
-to read its information about stored devices and their link keys. These
-information have then to be put into /var/lib/bluetooth. This leaves out
-the HID report descriptor that we also need. So that needs to be gotten
-while it is still in USB mode.
+> * Second device: Sixaxis PS3 Bluetooth joypad
+> 
+> Again, 2 connections modes. Firstly, there's no pairing, the joypad
+> knows about the computer when one runs sixpair when the pad is connected
+> via USB, as per:
+> http://www.pabr.org/sixlinux/sixlinux.en.html
+> (Marcel talked about integrating this with udev, which should be pretty
+> straight forward)
+> 
+> Once disconnected from USB, and turned on, the device will try to
+> connect to the computer. bluetooth-applet will request auth, and ask us
+> whether we want to allow the connection. But as the device was never
+> discovered/setup using CreateDevice, the get_store_device_info in
+> input/server.c will fail.
+> 
+> You can't use CreateDevice with the device, as it's either connecting to
+> our computer, or off, and connection requests will fail.
 
-Getting the HID report descriptor over USB makes always the assumption
-that it is exactly the same as on Bluetooth. This should be checked.
+The sixpair.c tool needs to do some nasty tricks. It hast to get its own
+Bluetooth address from the controller and then get its HID report
+descriptor over USB. Then store them in /var/lib/bluetooth and also set
+itself to trusted.
 
-We can't use 2 L2CAP connections and SDP at the same time, because some
-devices are limited of the maximum L2CAP connection. If the HID report
-descriptors are different then this is all becomes a little bit more
-trickier. In general it is possible since you first have to disconnect
-the interrupt channel of HID and then do SDP and re-connect it. If I
-remember the specification correctly, this should work.
+We might wanna integrate that into the input service, but to be honest I
+currently don't know how. It also might make more sense to let a HAL
+addon handle this kind of authentication instead of at udev level.
 
 Regards
 
