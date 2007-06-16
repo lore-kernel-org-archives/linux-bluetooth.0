@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200706151809.04115.fernando@bluexare.org>
-References: <200706151809.04115.fernando@bluexare.org>
-Date: Sat, 16 Jun 2007 09:29:47 +0200
-Message-Id: <1181978987.6846.50.camel@aeonflux.inter-touch.com>
+In-Reply-To: <1181925876.31424.326.camel@cookie.hadess.net>
+References: <1181925876.31424.326.camel@cookie.hadess.net>
+Date: Sat, 16 Jun 2007 09:25:54 +0200
+Message-Id: <1181978755.6846.46.camel@aeonflux.inter-touch.com>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Problems with my own inquiry
+Subject: Re: [Bluez-devel] HID initiated connections and input service
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,24 +20,47 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fernando,
+Hi Bastien,
 
-> I have an application that works with the bluetooth, scanning and sending 
-> content with other devices..., and now, when I'm trying to make irt work in 
-> other distribution, it fails.
+> 2(3) HID devices I own have the same problem with BlueZ when using the
+> input service. Both use HID initiated connections, rather than the
+> Host
+> initiated connection use case you would see when addind a Bluetooth
+> mouse to a laptop for example.
+> 
+> * First device: Logitech MX5000 mouse/keyboard combo
+> 
+> When not switched into HCI mode, the device works as a normal USB HID.
+> On boot, hid2hci is run, and the 2 devices (mouse and keyboard) try to
+> connect to bluetooth dongle (ex-USB wireless dongle).
+> There's no bluetooth-applet, or other services, and the requests are
+> dropped to the floor, and I end up with a Bluetooth HCI device, and no
+> keyboard or mouse (unplug/replug "fixes" the problem though).
+> 
+> Could we integrate hid2hci into the input service, so that it would only
+> be started when a session is available? I'm not sure how to handle the
+> pairing without a keyboard or mouse though...
 
-the solution is to use the new D-Bus based API. It takes care of
-everything that you want.
+after catching up with the IRC, I realized another problem with this HID
+proxy dongles. We can fix that for the original firmwares from CSR that
+are used by Apple, but for the Logitech's (they are slightly modified) I
+am not sure.
 
-> This is a normal work, whit INQUIRY_RESULT and COMMAND_STATUS, but in the new 
-> PC (a debian etch, buiilt by DebianLive) where I want to install the 
-> application the output is like this:
+So when you switch a HID proxy dongle from HID mode into HCI, you have
+to read its information about stored devices and their link keys. These
+information have then to be put into /var/lib/bluetooth. This leaves out
+the HID report descriptor that we also need. So that needs to be gotten
+while it is still in USB mode.
 
-The new hcid switches into the best inquiry mode and that means Inquiry
-with RSSI (which is different event) for a Bluetooth 1.2 dongle or
-later. You have to watch for that event, too. Or use the D-Bus API that
-does that for you and already takes care of Extended Inquiry of the
-Bluetooth 2.1 specification.
+Getting the HID report descriptor over USB makes always the assumption
+that it is exactly the same as on Bluetooth. This should be checked.
+
+We can't use 2 L2CAP connections and SDP at the same time, because some
+devices are limited of the maximum L2CAP connection. If the HID report
+descriptors are different then this is all becomes a little bit more
+trickier. In general it is possible since you first have to disconnect
+the interrupt channel of HID and then do SDP and re-connect it. If I
+remember the specification correctly, this should work.
 
 Regards
 
