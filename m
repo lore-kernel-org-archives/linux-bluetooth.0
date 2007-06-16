@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200706082336.00557.dgollub@suse.de>
-References: <200706082336.00557.dgollub@suse.de>
-Date: Sat, 16 Jun 2007 09:50:17 +0200
-Message-Id: <1181980217.6846.78.camel@aeonflux.inter-touch.com>
+In-Reply-To: <52222.190.30.202.149.1181668125.squirrel@www.y2knetworks.com.ar>
+References: <52222.190.30.202.149.1181668125.squirrel@www.y2knetworks.com.ar>
+Date: Sat, 16 Jun 2007 09:43:35 +0200
+Message-Id: <1181979815.6846.71.camel@aeonflux.inter-touch.com>
 Mime-Version: 1.0
-Cc: Stefan Seyfried <seife@suse.de>
-Subject: Re: [Bluez-devel] [PATCH] Input Service - Support for
-	hidd	configuration
+Subject: Re: [Bluez-devel] Multi Dongle Problem
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,27 +20,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Daniel,
+Hi,
 
-> attachted an input service patch which implements support for the hidd 
-> configuration. This is needed to have a smooth transition from hidd daemon to 
-> the new shiny input service ...
+> im making a program in C ... and was trying to use multi dongles ...
+> this is the hcitool dev output:
 > 
-> ( ... and especially this is needed to be able to return from vacation back to 
-> the office - without getting blamed by Seife for not working bluetooth input 
-> devices ;P )
+> Devices:
+>         hci0    00:11:F6:0A:06:7B
+>         hci1    00:11:F6:0A:06:63
 > 
-> The patch reads the entries of hidd and stores it with store_device_info() 
-> function. The hidd doesn't get modified - this means the transition happens 
-> on every start of the input service. store_device_info() avoids duplicate 
-> entries. So there is still the possibility to have a working bluetooth input 
-> device when falling back to hidd.
+> and that i make in my program is this...
+> 
+> str2ba("00:11:F6:0A:06:7B",&bdaddr);
+> dev_id = hci_get_route(&bdaddr);
+> 
+> but when u see the light of the dongles the hci1 is in use ...
+> and the hci0 is in use when the program use sdp...
 
-if I read this correctly, then a hidd entry would overwrite a input
-entry. We can't let that happen.
+you have to give the source to sdp_connect().
 
-Also the format of hidd and input is different, but you are using the
-same function to parse it.
+> to solve this i make the link mode of hci0 MASTER ... but then dont care
+> what i punt on the hci_get_route function... im making something wrong??
+
+No. Never do that. It is wrong. The link mode is selecting a device.
+
+> almost forgot... in some case the program finish with this error
+> Failed to connect to SDP server: Interrupted system call ... what can be?...
+
+Can't say that without seeing hcidump -X -V.
 
 Regards
 
