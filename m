@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <52222.190.30.202.149.1181668125.squirrel@www.y2knetworks.com.ar>
-References: <52222.190.30.202.149.1181668125.squirrel@www.y2knetworks.com.ar>
-Date: Sat, 16 Jun 2007 09:43:35 +0200
-Message-Id: <1181979815.6846.71.camel@aeonflux.inter-touch.com>
+To: jyotideep bhuyan <jyotideepjec@rediffmail.com>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20070613094432.5851.qmail@webmail69.rediffmail.com>
+References: <20070613094432.5851.qmail@webmail69.rediffmail.com>
+Date: Sat, 16 Jun 2007 09:41:26 +0200
+Message-Id: <1181979686.6846.66.camel@aeonflux.inter-touch.com>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Multi Dongle Problem
+Subject: Re: [Bluez-devel] How to bypass the passkey request
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,51 +17,23 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-
-> im making a program in C ... and was trying to use multi dongles ...
-> this is the hcitool dev output:
-> 
-> Devices:
->         hci0    00:11:F6:0A:06:7B
->         hci1    00:11:F6:0A:06:63
-> 
-> and that i make in my program is this...
-> 
-> str2ba("00:11:F6:0A:06:7B",&bdaddr);
-> dev_id = hci_get_route(&bdaddr);
-> 
-> but when u see the light of the dongles the hci1 is in use ...
-> and the hci0 is in use when the program use sdp...
-
-you have to give the source to sdp_connect().
-
-> to solve this i make the link mode of hci0 MASTER ... but then dont care
-> what i punt on the hci_get_route function... im making something wrong??
-
-No. Never do that. It is wrong. The link mode is selecting a device.
-
-> almost forgot... in some case the program finish with this error
-> Failed to connect to SDP server: Interrupted system call ... what can be?...
-
-Can't say that without seeing hcidump -X -V.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SGksCgo+ICAgICBJIGFtIHZlcnkgbmV3IHRvIGJsdWV6LiAgSSB3YW50IHRvIGRldmVsb3AgYW4g
+YXBwbGljYXRpb24gZm9yIG9iZXggcHVzaCB1c2luZyBibHVleiBzdGFjayBidXQgSSBkb27igJl0
+IHdhbnQgdGhlIHBhc3Mga2V5IHJlcXVlc3QgYXQgdGhlIG90aGVyIGVuZCAoaW4gbXkgbW9iaWxl
+IGRldmljZSkuIEkgZ290IGEgcGllY2Ugb2YgY29kZSBmb3Igb2JleGZ0cCBpbiBvcGVub2JleCwg
+aXRzIHdvcmtpbmcgZmluZSBidXQgYXNraW5nIHRoZSBwYXNza2V5IHJlcXVlc3QgdG8gdGhlIG1v
+YmlsZSB1c2VyLiBJIGhhdmUgYmVlbiB3b3JraW5nIG9uIHRoaXMgc3R1ZmYgZm9yIHNvbWUgb25l
+IHdlZWsuIAoKd3JpdGUgeW91ciBvd24gcGFzc2tleSBhZ2VudC4gVGhhdCBpcyBhbHdheXMgcG9z
+c2libGUuCgpSZWdhcmRzCgpNYXJjZWwKCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBl
+bWFpbCBpcyBzcG9uc29yZWQgYnkgREIyIEV4cHJlc3MKRG93bmxvYWQgREIyIEV4cHJlc3MgQyAt
+IHRoZSBGUkVFIHZlcnNpb24gb2YgREIyIGV4cHJlc3MgYW5kIHRha2UKY29udHJvbCBvZiB5b3Vy
+IFhNTC4gTm8gbGltaXRzLiBKdXN0IGRhdGEuIENsaWNrIHRvIGdldCBpdCBub3cuCmh0dHA6Ly9z
+b3VyY2Vmb3JnZS5uZXQvcG93ZXJiYXIvZGIyLwpfX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxA
+bGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3Rz
+L2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
