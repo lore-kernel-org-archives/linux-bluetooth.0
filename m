@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Dick <dick@mrns.nl>
-Date: Sat, 16 Jun 2007 18:31:52 +0000 (UTC)
-Message-ID: <loom.20070616T202746-400@post.gmane.org>
-References: <loom.20070613T200722-459@post.gmane.org>
-	<1181979586.6846.62.camel@aeonflux.inter-touch.com>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] input service trouble
+Date: Sat, 16 Jun 2007 06:21:52 -0700 (PDT)
+From: Robert Schmidt <itsmy_emale@yahoo.com>
+To: Bluez User <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Message-ID: <533660.67769.qm@web38512.mail.mud.yahoo.com>
+Subject: [Bluez-users] HCI socket listen
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,40 +14,66 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1803924238=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel Holtmann <marcel <at> holtmann.org> writes:
-> load the hci_usb driver with isoc=0. It seems that you USB host
-> controller doesn't really like ISOC URBs.
-Thanks, I've disabled isco and the messages are gone.
+--===============1803924238==
+Content-Type: multipart/alternative; boundary="0-785081440-1182000112=:67769"
+Content-Transfer-Encoding: 8bit
 
-> > And the module usage count on hidp is high:
-> > $ lsmod
-> > Module                  Size  Used by
-> > hidp                   10816  26 
-> Check hcitool con and /sys/class/bluetooth/l2cap for open sockets.
-I checked hcitool con and it showed me only the two devices. I can't understand
-why hidp has a usage count of 26, usually this is only 2.
+--0-785081440-1182000112=:67769
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+Hi,
+
+Can a HCI socket listen for connections like l2cap and rfcomm ?? In my case it throws followiing warning and does not listen:
+
+GLib-WARNING **: giounix.c:400Error while getting flags for FD: Bad file descriptor (9)
+
+In my program I do the following:
+
+I Open and Bind the HCI socket (using hci_open_dev)and listen for connections.
 
 
-> We are at 2.6.22-rc4 and that is the official one with all patches.
-> Worth trying that one.
-I'll try that if the trouble persists
+thanks
 
-Again, thanks so far, I will inform you with the results.
+robert.
 
-greetings,
-Dick
+       
+---------------------------------
+Moody friends. Drama queens. Your life? Nope! - their life, your story.
+ Play Sims Stories at Yahoo! Games. 
+--0-785081440-1182000112=:67769
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
+Hi,<br><br>Can a HCI socket listen for connections like l2cap and rfcomm ?? In my case it throws followiing warning and does not listen:<br><br>GLib-WARNING **: giounix.c:400Error while getting flags for FD: Bad file descriptor (9)<br><br>In my program I do the following:<br><br>I Open and Bind the HCI socket (using hci_open_dev)and listen for connections.<br><br><br>thanks<br><br>robert.<br><p>&#32;
+      <hr size=1>Moody friends. Drama queens. Your life? Nope! - their life, your story.<br> <a href="http://us.rd.yahoo.com/evt=48224/*http://sims.yahoo.com/">Play Sims Stories at Yahoo! Games. </a>
+--0-785081440-1182000112=:67769--
+
+
+--===============1803924238==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1803924238==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1803924238==--
