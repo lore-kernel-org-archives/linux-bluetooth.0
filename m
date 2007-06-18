@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 18 Jun 2007 20:59:01 +0300
-From: Mikko Tuumanen <m@sorvankyla.yok.utu.fi>
-In-reply-to: <20070618162819.GK30167@sorvankyla.yok.utu.fi>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-id: <E1I0LVF-0005BK-AK@sorvankyla.yok.utu.fi>
+Message-ID: <60617.213.100.27.27.1182188027.squirrel@mail.dsv.su.se>
+In-Reply-To: <20070618162819.GK30167@sorvankyla.yok.utu.fi>
 References: <20070618162819.GK30167@sorvankyla.yok.utu.fi>
-Subject: Re: [Bluez-users] Are Gembird and Targus usb bluetooth dongles
- going to	be supported?
+Date: Mon, 18 Jun 2007 19:33:47 +0200 (CEST)
+From: "Gary Alistair Macritchie" <x04-gma@dsv.su.se>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-users] BlueZ in non-GPL software
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,26 +16,24 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-> The Gembird attaches and detaches when connected:
-> usb 4-2: new full speed USB device using uhci_hcd and address 25
-> usb 4-2: configuration #1 chosen from 1 choice
-> hub 4-0:1.0: port 2 disabled by hub (EMI?), re-enabling...
-> usb 4-2: USB disconnect, address 25
+Hiya,
 
-Update:
+I've had a good check through this mailing list about the question of
+whether the Bluez files can be used when creating proprietary software,
+but the last thread on this fizzled out before a solid answer.
 
-I've tried the "Gembird" in four more computers: 
-1) works in windows, fails in linux
-2 and 3) fails in linux
-4) works in linux (and even here it fails sometimes)
+What is the current view on whether the kernel modules, packages,
+libraries etc. can be used in non-GPL software?
 
-Could the dongle be damaged? Does anybody else use that kind of
-"Gembird" or "EDRClassone" dongle without problems?
+A specific example would be using the "bluez-hcidump" package with a
+non-GPL piece of software.
+
+Looking forward to a reply!
+X04
 
 
 -------------------------------------------------------------------------
