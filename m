@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <34f2bfea0706181225r181b79a3paa22a6c08546faa4@mail.gmail.com>
-Date: Mon, 18 Jun 2007 22:25:30 +0300
-From: "Matti Katila" <matti.katila@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <60617.213.100.27.27.1182188027.squirrel@mail.dsv.su.se>
-MIME-Version: 1.0
+Date: Mon, 18 Jun 2007 20:59:01 +0300
+From: Mikko Tuumanen <m@sorvankyla.yok.utu.fi>
+In-reply-to: <20070618162819.GK30167@sorvankyla.yok.utu.fi>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-id: <E1I0LVF-0005BK-AK@sorvankyla.yok.utu.fi>
 References: <20070618162819.GK30167@sorvankyla.yok.utu.fi>
-	<60617.213.100.27.27.1182188027.squirrel@mail.dsv.su.se>
-Subject: Re: [Bluez-users] BlueZ in non-GPL software
+Subject: Re: [Bluez-users] Are Gembird and Targus usb bluetooth dongles
+ going to	be supported?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,28 +16,27 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 6/18/07, Gary Alistair Macritchie <x04-gma@dsv.su.se> wrote:
-> What is the current view on whether the kernel modules, packages,
-> libraries etc. can be used in non-GPL software?
+> The Gembird attaches and detaches when connected:
+> usb 4-2: new full speed USB device using uhci_hcd and address 25
+> usb 4-2: configuration #1 chosen from 1 choice
+> hub 4-0:1.0: port 2 disabled by hub (EMI?), re-enabling...
+> usb 4-2: USB disconnect, address 25
 
+Update:
 
-"""5.  You are not required to accept this License, since you have not
-signed it. However, nothing else grants you permission to modify or
-distribute the Program or its derivative works. These actions are
-prohibited by law if you do not accept this License. Therefore, by
-modifying or distributing the Program (or any work based on the
-Program), you indicate your acceptance of this License to do so, and
-all its terms and conditions for copying, distributing or modifying
-the Program or works based on it.""" (GPLv2)
+I've tried the "Gembird" in four more computers: 
+1) works in windows, fails in linux
+2 and 3) fails in linux
+4) works in linux (and even here it fails sometimes)
 
-So, use the license in your project. Honestly, what would you lose?
+Could the dongle be damaged? Does anybody else use that kind of
+"Gembird" or "EDRClassone" dongle without problems?
 
-
-   -Matti
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
