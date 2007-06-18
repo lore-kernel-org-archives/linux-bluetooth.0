@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Pascal <pascal@pabr.org>
-Date: Mon, 18 Jun 2007 19:30:12 +0200
-Message-ID: <f56ffd$gd7$1@sea.gmane.org>
-References: <1181925876.31424.326.camel@cookie.hadess.net>	<1181977540.6846.38.camel@aeonflux.inter-touch.com>	<1182011715.31424.346.camel@cookie.hadess.net>	<1182022535.30934.11.camel@aeonflux.inter-touch.com>	<1182111907.3161.16.camel@cookie.hadess.net>	<1182171997.3161.29.camel@cookie.hadess.net>	<f5636a$qvr$1@sea.gmane.org>	<1182177408.3161.43.camel@cookie.hadess.net>
-	<1182182402.3161.52.camel@cookie.hadess.net>
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1182021864.30934.5.camel@aeonflux.inter-touch.com>
+References: <1181925876.31424.326.camel@cookie.hadess.net>
+	<1181978755.6846.46.camel@aeonflux.inter-touch.com>
+	<1182012252.31424.353.camel@cookie.hadess.net>
+	<1182021864.30934.5.camel@aeonflux.inter-touch.com>
+Date: Mon, 18 Jun 2007 17:08:02 +0100
+Message-Id: <1182182882.3161.59.camel@cookie.hadess.net>
 Mime-Version: 1.0
-In-Reply-To: <1182182402.3161.52.camel@cookie.hadess.net>
 Subject: Re: [Bluez-devel] HID initiated connections and input service
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,25 +23,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Bastien Nocera wrote:
-> Jun 18 16:27:12 snoogens input[4052]: New input device 00:19:C1:7D:2E:FA ()
+On Sat, 2007-06-16 at 21:24 +0200, Marcel Holtmann wrote:
+<snip>
+> something like that and I have no idea how to do that for Logitech
+> devices. I have strange code for pure CSR dongles, but it is so ugly
+> that I am not going to share it. It is mostly CSR vendor stuff.
+
+Shame. Is there any reason to run hid2hci by default then? As in,
+shouldn't be opt-in, rather than opt-out?
+
+> > > Getting the HID report descriptor over USB makes always the assumption
+> > > that it is exactly the same as on Bluetooth. This should be checked.
+> > 
+> > How can I verify that?
 > 
-> But no device is actually created.
+> I don't have code for that. Need to write a tool that does this.
 
-Do you mean nothing shows up in /dev/input/ ?
-Maybe you need to "modprobe joydev" or "modprobe evdev" manually.
+My version of sixpair gets the report descriptor over usb, and stuff it
+in a hci_connadd_req, but the point is moot for HCI proxy dongles, and I
+don't know how to get the Bluetooth one for the sixaxis.
 
-
-> Could it be that I'm not setting the device flags to
-> HIDP_BOOT_PROTOCOL_MODE? (Incidentally, is there any way to check
-> whether a device is in this mode, or in full HID mode?)
-
-You want it to be in "report protocol" mode, not "boot protocol".
-The PS3 controller only supports "report protocol" anyway.
-"hcidump -V -x" will show whether hidp.ko is trying to send a
-"HIDP: Set protocol" command.
-
-Pascal
+-- 
+Bastien Nocera <hadess@hadess.net> 
 
 
 -------------------------------------------------------------------------
