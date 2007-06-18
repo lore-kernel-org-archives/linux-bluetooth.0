@@ -1,13 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1182021864.30934.5.camel@aeonflux.inter-touch.com>
+In-Reply-To: <1182177408.3161.43.camel@cookie.hadess.net>
 References: <1181925876.31424.326.camel@cookie.hadess.net>
-	<1181978755.6846.46.camel@aeonflux.inter-touch.com>
-	<1182012252.31424.353.camel@cookie.hadess.net>
-	<1182021864.30934.5.camel@aeonflux.inter-touch.com>
-Date: Mon, 18 Jun 2007 17:08:02 +0100
-Message-Id: <1182182882.3161.59.camel@cookie.hadess.net>
+	<1181977540.6846.38.camel@aeonflux.inter-touch.com>
+	<1182011715.31424.346.camel@cookie.hadess.net>
+	<1182022535.30934.11.camel@aeonflux.inter-touch.com>
+	<1182111907.3161.16.camel@cookie.hadess.net>
+	<1182171997.3161.29.camel@cookie.hadess.net>
+	<f5636a$qvr$1@sea.gmane.org>
+	<1182177408.3161.43.camel@cookie.hadess.net>
+Date: Mon, 18 Jun 2007 17:00:02 +0100
+Message-Id: <1182182402.3161.52.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] HID initiated connections and input service
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -23,25 +27,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sat, 2007-06-16 at 21:24 +0200, Marcel Holtmann wrote:
-<snip>
-> something like that and I have no idea how to do that for Logitech
-> devices. I have strange code for pure CSR dongles, but it is so ugly
-> that I am not going to share it. It is mostly CSR vendor stuff.
-
-Shame. Is there any reason to run hid2hci by default then? As in,
-shouldn't be opt-in, rather than opt-out?
-
-> > > Getting the HID report descriptor over USB makes always the assumption
-> > > that it is exactly the same as on Bluetooth. This should be checked.
+On Mon, 2007-06-18 at 15:36 +0100, Bastien Nocera wrote:
+> On Mon, 2007-06-18 at 16:00 +0200, Pascal wrote:
+> > Bastien Nocera wrote:
+> > > Jun 18 13:56:40 cookie kernel: hidp_input_report: Unknown key (scancode 0x84) pressed.
+> > > Jun 18 13:56:40 cookie kernel: hidp_input_report: Unknown key (scancode 0x82) pressed.
+> > > Jun 18 13:56:40 cookie kernel: hidp_input_report: Unknown key (scancode 0x82) released.
 > > 
-> > How can I verify that?
+> > This typically occurs when the kernel thinks the device
+> > is reporting in "boot protocol" mode, for example when
+> > net/bluetooth/hidp/core.c:hidp_add_connection() fails to
+> > parse the report descriptor and consequently initializes
+> > session->input instead of session->hid.
+> > 
+> > Another possible cause is that your kernel does not have
+> > HIDP support at all (2.6.20 or earlier).
 > 
-> I don't have code for that. Need to write a tool that does this.
+> Absolutely ancient FC6 kernel (2.6.19-1.2895.fc6 because of the crappy
+> driver, for my crappy wireless card).
+> 
+> Will test on my rawhide laptop. Thanks for the pointer!
 
-My version of sixpair gets the report descriptor over usb, and stuff it
-in a hci_connadd_req, but the point is moot for HCI proxy dongles, and I
-don't know how to get the Bluetooth one for the sixaxis.
+On the laptop, after getting the authorisation dialogue, I get this
+message from the input service:
+Jun 18 16:27:12 snoogens input[4052]: New input device 00:19:C1:7D:2E:FA ()
+
+But no device is actually created.
+
+The class show up in the bluez files as 0x000508, which seems to be
+correct for a gamepad.
+The kernel has HIDP support built in to a module, and seems to be
+getting automatically loaded.
+
+Could it be that I'm not setting the device flags to
+HIDP_BOOT_PROTOCOL_MODE? (Incidentally, is there any way to check
+whether a device is in this mode, or in full HID mode?)
+
+Any idea on how to debug this?
 
 -- 
 Bastien Nocera <hadess@hadess.net> 
