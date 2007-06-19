@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <c1fa8edf0706191743w6e2caad3p428bef72598b8878@mail.gmail.com>
-Date: Tue, 19 Jun 2007 20:43:22 -0400
-From: Simon <simon80@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200706180938.10993.fernando@bluexare.org>
-MIME-Version: 1.0
-References: <200706151809.04115.fernando@bluexare.org>
-	<1181978987.6846.50.camel@aeonflux.inter-touch.com>
-	<200706180938.10993.fernando@bluexare.org>
-Subject: Re: [Bluez-devel] Problems with my own inquiry
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1181668619.31424.28.camel@cookie.hadess.net>
+References: <1181668619.31424.28.camel@cookie.hadess.net>
+Date: Tue, 19 Jun 2007 23:10:27 +0200
+Message-Id: <1182287428.3135.0.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] More bluez-gnome patches
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,15 +20,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 6/18/07, Fernando Unzu <fernando@bluexare.org> wrote:
-> When I install the new distribution, I update the bluetooth/bluez packages
-> with "apt-get", so there may be the later version, doesn't do?
-> If it is not true, where I can update my version to one make my system works
-> ok?
+Hi Bastien,
 
-I think that what Marcel meant was that you should change your
-application code to communicate with bluez using D-Bus instead of
-library calls.
+> This updated monster patch:
+> - Default to use_hal = FALSE, only enable it if it's available and
+> support is compiled in
+> - Remember the old operating mode in the adapter struct
+> - Only show notification popups if we're not showing the icon only when
+> a device is present (the icon appearing/disappearing is enough to see
+> that the device is connected/disconnected)
+> - Make all the strings more translator friendly
+> - Split the adapter_setup to avoid HAL round-trips getting the
+> formfactor multiple times
+> - Simplify the GConf callbacks
+> - Don't translate command-line warnings
+> - Misc UI changes (mostly frame and borders sizes)
+
+I applied some of these patches and I am going to release a 0.9 version
+in a few minutes. Please re-sync and send separate patches for the stuff
+that I left out.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
