@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1181668619.31424.28.camel@cookie.hadess.net>
-References: <1181668619.31424.28.camel@cookie.hadess.net>
-Date: Tue, 19 Jun 2007 23:10:27 +0200
-Message-Id: <1182287428.3135.0.camel@aeonflux.holtmann.net>
+In-Reply-To: <c67bf2ea0706191211g78137a0o490cad12f3998e7e@mail.gmail.com>
+References: <c67bf2ea0706191211g78137a0o490cad12f3998e7e@mail.gmail.com>
+Date: Tue, 19 Jun 2007 21:38:19 +0200
+Message-Id: <1182281899.10089.9.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] More bluez-gnome patches
+Subject: Re: [Bluez-devel] Romanian translation of bluez-gnome
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,25 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Hi Alexandru,
 
-> This updated monster patch:
-> - Default to use_hal = FALSE, only enable it if it's available and
-> support is compiled in
-> - Remember the old operating mode in the adapter struct
-> - Only show notification popups if we're not showing the icon only when
-> a device is present (the icon appearing/disappearing is enough to see
-> that the device is connected/disconnected)
-> - Make all the strings more translator friendly
-> - Split the adapter_setup to avoid HAL round-trips getting the
-> formfactor multiple times
-> - Simplify the GConf callbacks
-> - Don't translate command-line warnings
-> - Misc UI changes (mostly frame and borders sizes)
+> I translated bluez-gnome in romanian.
+> I am a translator in romanian for Gnome, Mozilla, OpenOffice and other
+> open and not so open source projects.
+> 
+> The po file can be downloaded here:
+> http://www.alexxed.com/traduceri/download.php?selected_file_id=1160
+> Please include this in the next releases.
 
-I applied some of these patches and I am going to release a 0.9 version
-in a few minutes. Please re-sync and send separate patches for the stuff
-that I left out.
+I put under po/ro.po in the CVS. Hope that was the correct code. The
+strings inside bluez-gnome may change quickly, so keep up with it.
 
 Regards
 
