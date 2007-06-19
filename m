@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <c67bf2ea0706191211g78137a0o490cad12f3998e7e@mail.gmail.com>
-References: <c67bf2ea0706191211g78137a0o490cad12f3998e7e@mail.gmail.com>
-Date: Tue, 19 Jun 2007 21:38:19 +0200
-Message-Id: <1182281899.10089.9.camel@aeonflux>
+In-Reply-To: <200706180938.10993.fernando@bluexare.org>
+References: <200706151809.04115.fernando@bluexare.org>
+	<1181978987.6846.50.camel@aeonflux.inter-touch.com>
+	<200706180938.10993.fernando@bluexare.org>
+Date: Tue, 19 Jun 2007 16:31:10 +0200
+Message-Id: <1182263470.10089.1.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Romanian translation of bluez-gnome
+Subject: Re: [Bluez-devel] Problems with my own inquiry
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,18 +22,49 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Alexandru,
+Hi Fernando,
 
-> I translated bluez-gnome in romanian.
-> I am a translator in romanian for Gnome, Mozilla, OpenOffice and other
-> open and not so open source projects.
+> > the solution is to use the new D-Bus based API. It takes care of
+> > everything that you want.
 > 
-> The po file can be downloaded here:
-> http://www.alexxed.com/traduceri/download.php?selected_file_id=1160
-> Please include this in the next releases.
+> When I install the new distribution, I update the bluetooth/bluez packages 
+> with "apt-get", so there may be the later version, doesn't do?
+> If it is not true, where I can update my version to one make my system works 
+> ok?
 
-I put under po/ro.po in the CVS. Hope that was the correct code. The
-strings inside bluez-gnome may change quickly, so keep up with it.
+running a Debian Etch for Ubuntu Feisty should be enough,
+
+> > The new hcid switches into the best inquiry mode and that means Inquiry
+> > with RSSI (which is different event) for a Bluetooth 1.2 dongle or
+> > later. You have to watch for that event, too. Or use the D-Bus API that
+> > does that for you and already takes care of Extended Inquiry of the
+> > Bluetooth 2.1 specification.
+> 
+> I thought I was watching for this event, in the program:
+> 
+> switch (buf[1]) {
+> 	case EVT_CMD_STATUS:
+> 		//some code
+> 		break;
+> 	case EVT_INQUIRY_RESULT:
+> 	case EVT_INQUIRY_RESULT_WITH_RSSI:
+> 		//some code
+> 		break;
+> 	case EVT_INQUIRY_COMPLETE:
+> 		//some code
+> 		break;
+> 	default:
+> 		//some code
+> 		break;
+> }
+> 
+> I take the event EVT_INQUIRY_RESULT_WITH_RSSI, so I'm watching the event, 
+> doesn't do?
+> And in the case I have not watch properly the event, it must be executed the 
+> code within the case "default", and do not execute...
+
+that doesn't work. Both event are different. You need an extra routine
+to handle it. Also you must put it in your kernel event filter.
 
 Regards
 
