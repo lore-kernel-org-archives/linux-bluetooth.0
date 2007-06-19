@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <c67bf2ea0706191211g78137a0o490cad12f3998e7e@mail.gmail.com>
-Date: Tue, 19 Jun 2007 22:11:42 +0300
-From: "Alexandru Szasz" <alexxed@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <e1effdeb0706190932y30745338xa7d0851e0eb80ea2@mail.gmail.com>
+Date: Tue, 19 Jun 2007 13:32:55 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4677F360.7050209@access-company.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] Romanian translation of bluez-gnome
+References: <467297DF.2030401@access-company.com>
+	<4677CFEF.3080901@access-company.com>
+	<e1effdeb0706190744w77a2586ar8672a19443e50f89@mail.gmail.com>
+	<4677F360.7050209@access-company.com>
+Subject: Re: [Bluez-devel] Input service signals
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,62 +19,49 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0176315813=="
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0176315813==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_88316_18145184.1182280302743"
-
-------=_Part_88316_18145184.1182280302743
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi, I translated bluez-gnome in romanian.
-I am a translator in romanian for Gnome, Mozilla, OpenOffice and other open
-and not so open source projects.
-
-The po file can be downloaded here:
-http://www.alexxed.com/traduceri/download.php?selected_file_id=1160
-Please include this in the next releases.
-Thank you!
-
--- 
-Alexandru Szasz
-
-------=_Part_88316_18145184.1182280302743
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi, I translated bluez-gnome in romanian.<br>I am a translator in romanian for Gnome, Mozilla, OpenOffice and other open and not so open source projects.<br><br>The po file can be downloaded here: <a href="http://www.alexxed.com/traduceri/download.php?selected_file_id=1160">
-http://www.alexxed.com/traduceri/download.php?selected_file_id=1160</a><br>Please include this in the next releases.<br>Thank you!<br clear="all"><br>-- <br>Alexandru Szasz
-
-------=_Part_88316_18145184.1182280302743--
-
-
---===============0176315813==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
---===============0176315813==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0176315813==--
+SGkgRnJlZGVyaWMsCgpsYXRlc3QgY3ZzICsgeW91ciBwYXRjaCB1c2luZyB0aGUgSElEIGRldmlj
+ZS4KCkJSLApDbGF1ZGlvLgpPbiA2LzE5LzA3LCBGcmVkZXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFu
+aXNAYWNjZXNzLWNvbXBhbnkuY29tPiB3cm90ZToKPiBDbGF1ZGlvIFRha2FoYXNpIHdyb3RlOgo+
+ID4gSGkgRnJlZGVyaWMsCj4gPgo+ID4gSSBnb3QgYSBzZWdtZW50YXRpb24gZmF1bHQgd2hlbiBj
+YWxsaW5nIERldmljZS5Db25uZWN0ICsgRGV2aWNlLkRpc2Nvbm5lY3QKPiA+Cj4gPiBUaGUgcGF0
+aCBjb250ZW50IGlzIHdyb25nKGl0IGNvbnRhaW5zIHRoZSBidXMgaWQpLgo+ID4KPiA+IChnZGIp
+IGJhY2t0cmFjZQo+ID4gIzAgIDB4MDgwNTI4NWIgaW4gZGJ1c19jb25uZWN0aW9uX2VtaXRfc2ln
+bmFsX3ZhbGlzdCAoY29ubj0weDgwNTdhYzgsCj4gPiBwYXRoPTB4ODA1N2RiOCAiOjEuMzQiLCBp
+bnRlcmZhY2U9MHg4MDUzZGY1ICJvcmcuYmx1ZXouaW5wdXQuRGV2aWNlIiwKPiA+ICAgICBuYW1l
+PTB4ODA1M2U3OCAiRGlzY29ubmVjdGVkIiwgZmlyc3Q9MCwgdmFyX2FyZ3M9MHhiZmUzOTM0NAo+
+ID4gIkhX77+977+9aFwyMjPvv73vv71cclwyMDTvv73vv71IXDIzN1wwMDVcYiAiKSBhdCBkYnVz
+LWhlbHBlci5jOjQ3OAo+ID4gIzEgIDB4MDgwNTI5ZTcgaW4gZGJ1c19jb25uZWN0aW9uX2VtaXRf
+c2lnbmFsIChjb25uPTB4ODA1N2FjOCwKPiA+IHBhdGg9MHg4MDU3ZGI4ICI6MS4zNCIsIGludGVy
+ZmFjZT0weDgwNTNkZjUgIm9yZy5ibHVlei5pbnB1dC5EZXZpY2UiLAo+ID4gICAgIG5hbWU9MHg4
+MDUzZTc4ICJEaXNjb25uZWN0ZWQiLCBmaXJzdD0wKSBhdCBkYnVzLWhlbHBlci5jOjUzMQo+ID4K
+PiA+IENvdWxkIHlvdSBwbGVhc2UgZml4IGl0Pwo+Cj4gSGVsbG8gQ2xhdWRpbywKPgo+IFdoZW4g
+ZG8geW91IGdldCB0aGlzIGNyYXNoID8gdXNpbmcgSElEIGRldmljZSBvciBmYWtlIGlucHV0ID8K
+Pgo+IFRoYW5rcwo+Cj4gRnJlZAo+Cj4gLS0KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLQo+IEl0IGlzIG5vdCBieSBpbXByb3ZpbmcgdGhlIG9pbCBsYW1w
+IHRoYXQgb25lIGludmVudHMgdGhlIGVsZWN0cmljIGJ1bGIhCj4gLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiBEYW5pcyBGcmVkZXJpYyAgICAgICAgICAg
+ICAgICAgICBBY2Nlc3MgQ29tcGFueQo+IFNvZnR3YXJlIGVuZ2luZWVyCj4gTWFpbCA6IG1haWx0
+bzpmcmVkZXJpYy5kYW5pc0BhY2Nlc3MtY29tcGFueS5jb20KPiAtLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+Cj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFRoaXMg
+U0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieSBEQjIgRXhwcmVzcwo+IERvd25sb2FkIERCMiBF
+eHByZXNzIEMgLSB0aGUgRlJFRSB2ZXJzaW9uIG9mIERCMiBleHByZXNzIGFuZCB0YWtlCj4gY29u
+dHJvbCBvZiB5b3VyIFhNTC4gTm8gbGltaXRzLiBKdXN0IGRhdGEuIENsaWNrIHRvIGdldCBpdCBu
+b3cuCj4gaHR0cDovL3NvdXJjZWZvcmdlLm5ldC9wb3dlcmJhci9kYjIvCj4gX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KPiBCbHVlei1kZXZlbCBtYWlsaW5n
+IGxpc3QKPiBCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPiBodHRwczovL2xpc3Rz
+LnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo+CgoKLS0gCi0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpDbGF1
+ZGlvIFRha2FoYXNpCkluc3RpdHV0byBOb2tpYSBkZSBUZWNub2xvZ2lhIC0gSU5kVAotLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieSBEQjIgRXhwcmVzcwpE
+b3dubG9hZCBEQjIgRXhwcmVzcyBDIC0gdGhlIEZSRUUgdmVyc2lvbiBvZiBEQjIgZXhwcmVzcyBh
+bmQgdGFrZQpjb250cm9sIG9mIHlvdXIgWE1MLiBObyBsaW1pdHMuIEp1c3QgZGF0YS4gQ2xpY2sg
+dG8gZ2V0IGl0IG5vdy4KaHR0cDovL3NvdXJjZWZvcmdlLm5ldC9wb3dlcmJhci9kYjIvCl9fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1h
+aWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0
+cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
