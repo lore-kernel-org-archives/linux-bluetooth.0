@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: CIJOML <cijoml@volny.cz>
+Message-ID: <fa8a9cb00706211341ved9bd41o2a0484eb4ad1da19@mail.gmail.com>
+Date: Thu, 21 Jun 2007 17:41:13 -0300
+From: "Luiz Siqueira" <luiz.siqueira.neto@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Date: Thu, 21 Jun 2007 23:44:56 +0200
 MIME-Version: 1.0
-Message-Id: <200706212344.57049.cijoml@volny.cz>
-Subject: [Bluez-users] Howto pairing with GPS device (outgoing request from
-	linux)
+Subject: [Bluez-users] D-Link DWB-120M with Ubuntu 7.04
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,14 +18,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+I'm trying to install this Bluetooth adapter in my computer without
+success. I'm trying using this tutorial -> (
+http://translate.google.com/translate?u=http%3A%2F%2Fwww.luug-hn.org%2Fartikel%2Fbluetooth.html&langpair=de%7Cen&hl=pt-BR&ie=UTF-8&oe=UTF-8&prev=%2Flanguage_tools
+ )
 
-can anybody help me howto do outgoing request for pairing from my Bluez to my 
-GPS device? I can't find it anywhere with dbus.
+But I can't install the "bluez bluefw" in the Ubuntu because of a
+dependence, the "hotplug". I believe that all Bluetooth files are
+installed in my computer and looks like to me that "bluefw" is
+obsolete. How can I install the firmware in my device?
 
-Thanks a lot for quick reply
-
-Michal
+Thanks about some help
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
