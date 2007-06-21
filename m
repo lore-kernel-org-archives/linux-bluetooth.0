@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Tadas Dailyda <tadas@dailyda.com>
-To: bluez-devel@lists.sourceforge.net
-Content-Type: multipart/mixed; boundary="=-6OiPlC0TvjTiVbEnplOP"
-Date: Thu, 21 Jun 2007 21:10:21 +0300
-Message-Id: <1182449421.10358.3.camel@VAIO>
-Mime-Version: 1.0
-Subject: [Bluez-devel] [PATCH] bluez-libs patch to include bachk() function
+Message-ID: <6669365c0706210944m23ffe64kde10851d85edf3f0@mail.gmail.com>
+Date: Thu, 21 Jun 2007 16:44:38 +0000
+From: "Daniel Ribeiro" <drwyrm@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_146916_30137553.1182444278599"
+Subject: [Bluez-devel] [PATCH] BCM2035 on UART at higher speeds + Support
+	for setting bdaddr.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,89 +20,62 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-
---=-6OiPlC0TvjTiVbEnplOP
-Content-Type: text/plain
+------=_Part_146916_30137553.1182444278599
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
+Sending again as Marcel requested.
 
+-- 
+EOF
 
---=-6OiPlC0TvjTiVbEnplOP
-Content-Disposition: attachment; filename=bachk.patch
-Content-Type: text/x-patch; name=bachk.patch; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Daniel Ribeiro
 
-Index: include/bluetooth.h
-===================================================================
-RCS file: /cvsroot/bluez/libs/include/bluetooth.h,v
-retrieving revision 1.27
-diff -u -r1.27 bluetooth.h
---- include/bluetooth.h	13 Jan 2007 17:50:06 -0000	1.27
-+++ include/bluetooth.h	21 Jun 2007 17:45:10 -0000
-@@ -125,6 +125,7 @@
- int ba2str(const bdaddr_t *ba, char *str);
- int str2ba(const char *str, bdaddr_t *ba);
- int ba2oui(const bdaddr_t *ba, char *oui);
-+int bachk(const char *str);
- 
- int baprintf(const char *format, ...);
- int bafprintf(FILE *stream, const char *format, ...);
-Index: src/bluetooth.c
-===================================================================
-RCS file: /cvsroot/bluez/libs/src/bluetooth.c,v
-retrieving revision 1.41
-diff -u -r1.41 bluetooth.c
---- src/bluetooth.c	20 Jun 2007 15:34:46 -0000	1.41
-+++ src/bluetooth.c	21 Jun 2007 17:45:11 -0000
-@@ -33,6 +33,7 @@
- #include <stdlib.h>
- #include <malloc.h>
- #include <string.h>
-+#include <ctype.h>
- #include <sys/socket.h>
- 
- #include <bluetooth/bluetooth.h>
-@@ -110,6 +111,38 @@
- 	return sprintf(str, "%2.2X-%2.2X-%2.2X", b[0], b[1], b[2]);
- }
- 
-+int bachk(const char *str)
-+{
-+	char tmp[18];
-+	char *ptr = tmp;
-+
-+	if (!str)
-+		return -1;
-+	if (strlen(str) != 17)
-+		return -1;
-+
-+	memcpy(tmp, str, 18);
-+
-+	while (*ptr) {
-+		*ptr = toupper(*ptr);
-+		if (*ptr < '0'|| (*ptr > '9' && *ptr < 'A') || *ptr > 'F')
-+			return -1;
-+		ptr++;
-+		*ptr = toupper(*ptr);
-+		if (*ptr < '0'|| (*ptr > '9' && *ptr < 'A') || *ptr > 'F')
-+			return -1;
-+		ptr++;
-+		*ptr = toupper(*ptr);
-+		if (*ptr == 0)
-+			break;
-+		if (*ptr != ':')
-+			return -1;
-+		ptr++;
-+	}
-+
-+	return 0;
-+}
-+
- int baprintf(const char *format, ...)
- {
- 	va_list ap;
+------=_Part_146916_30137553.1182444278599
+Content-Type: text/x-diff; name=bluez-bcm2035.patch; charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f37a7ulb
+Content-Disposition: attachment; filename="bluez-bcm2035.patch"
 
---=-6OiPlC0TvjTiVbEnplOP
+VGhpcyBjb3JyZWN0cyBiYXVyYXRlIHBhcmFtZXRlcnMgZm9yIGJjbTIwMzUgY29ubmVjdGVkIHZp
+YSB1YXJ0IGFuZCBhZGRzCnN1cHBvcnQgZm9yIHNldHRpbmcgdGhlIGJkYWRkci4KClNpZ25lZC1v
+ZmYtYnk6IERhbmllbCBSaWJlaXJvIDxkcnd5cm1AZ21haWwuY29tPgpJbmRleDogYmx1ZXotdXRp
+bHMtMy4xMC90b29scy9oY2lhdHRhY2guYwo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Ci0tLSBibHVlei11dGlscy0zLjEw
+Lm9yaWcvdG9vbHMvaGNpYXR0YWNoLmMJMjAwNy0wNS0xMiAxMzoxNjozOC4wMDAwMDAwMDAgLTAz
+MDAKKysrIGJsdWV6LXV0aWxzLTMuMTAvdG9vbHMvaGNpYXR0YWNoLmMJMjAwNy0wNS0xMiAxNTo0
+NDoxNC4wMDAwMDAwMDAgLTAzMDAKQEAgLTkyNSwxMSArOTI1LDEzIEBACiAvKgogICogQnJvYWRj
+b20gc3BlY2lmaWMgaW5pdGlhbGl6YXRpb24KICAqIEV4dHJhY3RlZCBmcm9tIEp1bmdvIG9wZW5y
+ZworICogU2V0IGJkYWRkciBhbmQgY29ycmVjdCBiYXVkIHJhdGUgYXJndW1lbnRzIHRha2VuIGZy
+b20gT3BlbkVaWAogICovCiBzdGF0aWMgaW50IGJjbTIwMzUoaW50IGZkLCBzdHJ1Y3QgdWFydF90
+ICp1LCBzdHJ1Y3QgdGVybWlvcyAqdGkpCiB7CiAJaW50IG47CiAJdW5zaWduZWQgY2hhciBjbWRb
+MzBdLCByZXNwWzMwXTsKKwliZGFkZHJfdCBiZGFkZHI7CiAKIAkvKiBSZXNldCB0aGUgQlQgQ2hp
+cCAqLwogCW1lbXNldChjbWQsIDAsIHNpemVvZihjbWQpKTsKQEAgLTk1MSw2ICs5NTMsMzIgQEAK
+IAkJcmV0dXJuIC0xOwogCX0KIAorCWlmICh1LT5iZGFkZHIgIT0gTlVMTCkgeworCQkvKiBzZXQg
+YmRhZGRyICovCisJCW1lbXNldChjbWQsIDAsIHNpemVvZihjbWQpKTsKKwkJbWVtc2V0KHJlc3As
+IDAsIHNpemVvZihyZXNwKSk7CisJCWNtZFswXSA9IEhDSV9DT01NQU5EX1BLVDsKKwkJY21kWzFd
+ID0gMHgwMTsKKwkJY21kWzJdID0gMHhmYzsKKwkJY21kWzNdID0gMHgwNjsKKworCQlzdHIyYmEo
+dS0+YmRhZGRyLCAmYmRhZGRyKTsKKwkJYmFjcHkoKGJkYWRkcl90ICopIChjbWQgKyA0KSwgJmJk
+YWRkcik7CisKKwkJLyogU2VuZCBjb21tYW5kICovCisJCWlmICh3cml0ZShmZCwgY21kLCAxMCkg
+IT0gMTApIHsKKwkJCWZwcmludGYoc3RkZXJyLCAiRmFpbGVkIHRvIHdyaXRlIFwic2V0IGJkYWRk
+clwiICIKKwkJCSJjb21tYW5kXG4iKTsKKwkJCXJldHVybiAtMTsKKwkJfQorCisJCS8qIFJlYWQg
+cmVwbHkgKi8KKwkJaWYgKChuID0gcmVhZF9oY2lfZXZlbnQoZmQsIHJlc3AsIDEwKSkgPCAwKSB7
+CisJCQlmcHJpbnRmKHN0ZGVyciwgIkZhaWxlZCB0byBzZXQgYmRhZGRyXG4iKTsKKwkJCXJldHVy
+biAtMTsKKwkJfQorCX0KKwogCS8qIFJlYWQgdGhlIGxvY2FsIHZlcnNpb24gaW5mbyAqLwogCW1l
+bXNldChjbWQsIDAsIHNpemVvZihjbWQpKTsKIAltZW1zZXQocmVzcCwgMCwgc2l6ZW9mKHJlc3Ap
+KTsKQEAgLTEwMTAsMTEgKzEwMzgsMTEgQEAKIAkJY21kWzVdID0gMHhmYTsKIAkJYnJlYWs7CiAJ
+Y2FzZSA0NjA4MDA6Ci0JCWNtZFs0XSA9IDB4MTE7CisJCWNtZFs0XSA9IDB4MjI7CiAJCWNtZFs1
+XSA9IDB4ZmQ7CiAJCWJyZWFrOwogCWNhc2UgOTIxNjAwOgotCQljbWRbNF0gPSAweDY1OworCQlj
+bWRbNF0gPSAweDU1OwogCQljbWRbNV0gPSAweGZmOwogCQlicmVhazsKIAlkZWZhdWx0OgpAQCAt
+MTEwMyw3ICsxMTMxLDcgQEAKIAl7ICJiaWxsaW9udG9uIiwgMHgwMjc5LCAweDk1MGIsIEhDSV9V
+QVJUX0JDU1AsIDExNTIwMCwgMTE1MjAwLCAwLCAgICAgICAgTlVMTCwgYmNzcCAgICAgfSwKIAog
+CS8qIEJyb2FkY29tIEJDTTIwMzUgKi8KLQl7ICJiY20yMDM1IiwgICAgMHgwQTVDLCAweDIwMzUs
+IEhDSV9VQVJUX0g0LCAgIDExNTIwMCwgMTE1MjAwLCAwLCAgICAgICAgTlVMTCwgYmNtMjAzNSAg
+fSwKKwl7ICJiY20yMDM1IiwgICAgMHgwQTVDLCAweDIwMzUsIEhDSV9VQVJUX0g0LCAgIDExNTIw
+MCwgNDYwODAwLCBGTE9XX0NUTCwgTlVMTCwgYmNtMjAzNSAgfSwKIAogCXsgTlVMTCwgMCB9CiB9
+Owo=
+------=_Part_146916_30137553.1182444278599
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -111,7 +86,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---=-6OiPlC0TvjTiVbEnplOP
+------=_Part_146916_30137553.1182444278599
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -122,4 +97,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-6OiPlC0TvjTiVbEnplOP--
+------=_Part_146916_30137553.1182444278599--
