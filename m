@@ -1,18 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <e1effdeb0706221032r51dfd2d9q2e4fe88dca29c689@mail.gmail.com>
-Date: Fri, 22 Jun 2007 14:32:21 -0300
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <e1effdeb0706210536y65f83ab0q66fc68c5fde162e3@mail.gmail.com>
+From: Daniel Gollub <dgollub@suse.de>
+To: bluez-devel@lists.sourceforge.net
+Date: Fri, 22 Jun 2007 17:41:29 +0200
+References: <200706082336.00557.dgollub@suse.de>
+In-Reply-To: <200706082336.00557.dgollub@suse.de>
 MIME-Version: 1.0
-References: <467297DF.2030401@access-company.com>
-	<4677CFEF.3080901@access-company.com>
-	<e1effdeb0706190744w77a2586ar8672a19443e50f89@mail.gmail.com>
-	<4677F360.7050209@access-company.com>
-	<e1effdeb0706190932y30745338xa7d0851e0eb80ea2@mail.gmail.com>
-	<46795080.1010308@access-company.com>
-	<e1effdeb0706210536y65f83ab0q66fc68c5fde162e3@mail.gmail.com>
-Subject: Re: [Bluez-devel] Input service signals
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_q2+eGoxlArWK3Qm"
+Message-Id: <200706221741.30531.dgollub@suse.de>
+Subject: Re: [Bluez-devel] [PATCH] Input Service - Support for hidd
+	configuration
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,63 +19,226 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-T24gNi8yMS8wNywgQ2xhdWRpbyBUYWthaGFzaSA8Y2t0YWthaGFzaUBnbWFpbC5jb20+IHdyb3Rl
-Ogo+IE9uIDYvMjAvMDcsIEZyZWRlcmljIERhbmlzIDxmcmVkZXJpYy5kYW5pc0BhY2Nlc3MtY29t
-cGFueS5jb20+IHdyb3RlOgo+ID4gQ2xhdWRpbyBUYWthaGFzaSB3cm90ZToKPiA+ID4gSGkgRnJl
-ZGVyaWMsCj4gPiA+Cj4gPiA+IGxhdGVzdCBjdnMgKyB5b3VyIHBhdGNoIHVzaW5nIHRoZSBISUQg
-ZGV2aWNlLgo+ID4gPgo+ID4gPiBCUiwKPiA+ID4gQ2xhdWRpby4KPiA+ID4gT24gNi8xOS8wNywg
-RnJlZGVyaWMgRGFuaXMgPGZyZWRlcmljLmRhbmlzQGFjY2Vzcy1jb21wYW55LmNvbT4gd3JvdGU6
-Cj4gPiA+PiBDbGF1ZGlvIFRha2FoYXNpIHdyb3RlOgo+ID4gPj4+IEhpIEZyZWRlcmljLAo+ID4g
-Pj4+Cj4gPiA+Pj4gSSBnb3QgYSBzZWdtZW50YXRpb24gZmF1bHQgd2hlbiBjYWxsaW5nIERldmlj
-ZS5Db25uZWN0ICsgRGV2aWNlLkRpc2Nvbm5lY3QKPiA+ID4+Pgo+ID4gPj4+IFRoZSBwYXRoIGNv
-bnRlbnQgaXMgd3JvbmcoaXQgY29udGFpbnMgdGhlIGJ1cyBpZCkuCj4gPiA+Pj4KPiA+ID4+PiAo
-Z2RiKSBiYWNrdHJhY2UKPiA+ID4+PiAjMCAgMHgwODA1Mjg1YiBpbiBkYnVzX2Nvbm5lY3Rpb25f
-ZW1pdF9zaWduYWxfdmFsaXN0IChjb25uPTB4ODA1N2FjOCwKPiA+ID4+PiBwYXRoPTB4ODA1N2Ri
-OCAiOjEuMzQiLCBpbnRlcmZhY2U9MHg4MDUzZGY1ICJvcmcuYmx1ZXouaW5wdXQuRGV2aWNlIiwK
-PiA+ID4+PiAgICAgbmFtZT0weDgwNTNlNzggIkRpc2Nvbm5lY3RlZCIsIGZpcnN0PTAsIHZhcl9h
-cmdzPTB4YmZlMzkzNDQKPiA+ID4+PiAiSFfvv73vv71oXDIyM++/ve+/vVxyXDIwNO+/ve+/vUhc
-MjM3XDAwNVxiICIpIGF0IGRidXMtaGVscGVyLmM6NDc4Cj4gPiA+Pj4gIzEgIDB4MDgwNTI5ZTcg
-aW4gZGJ1c19jb25uZWN0aW9uX2VtaXRfc2lnbmFsIChjb25uPTB4ODA1N2FjOCwKPiA+ID4+PiBw
-YXRoPTB4ODA1N2RiOCAiOjEuMzQiLCBpbnRlcmZhY2U9MHg4MDUzZGY1ICJvcmcuYmx1ZXouaW5w
-dXQuRGV2aWNlIiwKPiA+ID4+PiAgICAgbmFtZT0weDgwNTNlNzggIkRpc2Nvbm5lY3RlZCIsIGZp
-cnN0PTApIGF0IGRidXMtaGVscGVyLmM6NTMxCj4gPiA+Pj4KPiA+ID4+PiBDb3VsZCB5b3UgcGxl
-YXNlIGZpeCBpdD8KPiA+ID4+IEhlbGxvIENsYXVkaW8sCj4gPiA+Pgo+ID4gPj4gV2hlbiBkbyB5
-b3UgZ2V0IHRoaXMgY3Jhc2ggPyB1c2luZyBISUQgZGV2aWNlIG9yIGZha2UgaW5wdXQgPwo+ID4g
-Pj4KPiA+Cj4gPiBIZWxsbyBDbGF1ZGlvLAo+ID4KPiA+IEhlcmUgaXMgYSBuZXcgdmVyc2lvbiBv
-ZiB0aGUgcGF0Y2gsIGZpeGluZyB0aGUgY3Jhc2ggKEkgZG8gbm90IHVuZGVyc3RhbmQgaG93IEkg
-aGFkIHRlc3QgaXQgYmVmb3JlIHdpdGhvdXQgdGhpcyBlcnJvciwgc29ycnkgOy1bKQo+ID4KPiA+
-IEJSCj4gPgo+ID4gRnJlZAo+ID4KPiA+IC0tCj4gPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+ID4gSXQgaXMgbm90IGJ5IGltcHJvdmluZyB0aGUgb2ls
-IGxhbXAgdGhhdCBvbmUgaW52ZW50cyB0aGUgZWxlY3RyaWMgYnVsYiEKPiA+IC0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gPiBEYW5pcyBGcmVkZXJpYyAg
-ICAgICAgICAgICAgICAgICBBY2Nlc3MgQ29tcGFueQo+ID4gU29mdHdhcmUgZW5naW5lZXIKPiA+
-IE1haWwgOiBtYWlsdG86ZnJlZGVyaWMuZGFuaXNAYWNjZXNzLWNvbXBhbnkuY29tCj4gPiAtLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+Cj4gSGkgRnJlZGVy
-aWMsCj4KPiBHZW5lcmFsbHkgSSB0ZXN0IHVzaW5nIGRidXMtc2VuZCwgeW91IGNhbiBmaW5kIHNv
-bWUgZXhhbXBsZXMgaGVyZToKPiBodHRwOi8vd2lraS5ibHVlei5vcmcvd2lraS9IT1dUTy9JbnB1
-dERldmljZXMKPgo+IFRvIHJlcHJvZHVjZSB0aGUgcmVwb3J0ZWQgYnVnIEkgd2FzIGNhbGxpbmc6
-Cj4gMS4gQ3JlYXRlRGV2aWNlCj4gMi4gQ29ubmVjdAo+IDMuIERpc2Nvbm5lY3QKPgo+Cj4gWW91
-ciBsYXN0IHBhdGNoIGlzIHdvcmtpbmcgZmluZS4gIFdlIGNvdWxkIHRyeSByZW1vdmUgdGhlICJz
-dHJ1Y3QKPiBzZXNzaW9uIiBhbmQgcHV0IGV2ZXJ5dGhpbmcgaW5zaWRlIHRoZSAic3RydWN0IGRl
-dmljZSIgc2luY2UgZm9yIGVhY2gKPiBpbnB1dCBkZXZpY2UgcmVnaXN0ZXJlZCB0aGVyZSBpcyBh
-IEQtQnVzIGRhdGEgYXNzaWduZWQoSXQgaXMgYXBwbGllZAo+IHRvIGRldmljZSBhbmQgaG9zdCBp
-bml0aWF0ZWQgY29ubmVjdGlvbnMpLiBTbyB0aGUgInN0cnVjdCBzZXNzaW9uIgo+IGNvbnRhaW5z
-IGR1cGxpY2F0ZWQgZGF0YS4KPgo+IEkgd2lsbCB0cnkgY2hhbmdlIHRoZSBjb2RlIGFuZCBwcm9w
-b3NlIGFub3RoZXIgYXBwcm9hY2ggdXNpbmcgeW91cgo+IGNvZGUgYXMgYmFzZWxpbmUuCj4KPiBC
-UiwKPiBDbGF1ZGlvLgo+CgpIaSBGcmVkZXJpYywKClRoZSBzaWduYWxzIGFyZSBub3cgc2VudCBw
-cm9wZXJseS4KClBsZWFzZSB0ZXN0IGlmIGl0IGlzIHdvcmtpbmcuCgpUaGVyZSBpcyBqdXN0IG9u
-ZSBzY2VuYXJpbyB0aGF0IEkgYW0gZml4aW5nOiBEaXNjb25uZWN0IHNpZ25hbCBpcyBub3QKc2Vu
-dCBpZiBSZW1vdmVEZXZpY2UgaXMgY2FsbGVkKGFuZCB0aGUgZGV2aWNlIGlzIGNvbm5lY3RlZCku
-CgpCUiwKQ2xhdWRpby4KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9u
-c29yZWQgYnkgREIyIEV4cHJlc3MKRG93bmxvYWQgREIyIEV4cHJlc3MgQyAtIHRoZSBGUkVFIHZl
-cnNpb24gb2YgREIyIGV4cHJlc3MgYW5kIHRha2UKY29udHJvbCBvZiB5b3VyIFhNTC4gTm8gbGlt
-aXRzLiBKdXN0IGRhdGEuIENsaWNrIHRvIGdldCBpdCBub3cuCmh0dHA6Ly9zb3VyY2Vmb3JnZS5u
-ZXQvcG93ZXJiYXIvZGIyLwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNl
-Zm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2Js
-dWV6LWRldmVsCg==
+--Boundary-00=_q2+eGoxlArWK3Qm
+Content-Type: text/plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+On Friday 08 June 2007, Daniel Gollub wrote:
+> Hi,
+>
+> attachted an input service patch which implements support for the hidd
+> configuration. This is needed to have a smooth transition from hidd daemon
+> to the new shiny input service ...
+>
+> ( ... and especially this is needed to be able to return from vacation back
+> to the office - without getting blamed by Seife for not working bluetooth
+> input devices ;P )
+>
+> The patch reads the entries of hidd and stores it with store_device_info()
+> function. The hidd doesn't get modified - this means the transition happens
+> on every start of the input service. store_device_info() avoids duplicate
+> entries. So there is still the possibility to have a working bluetooth
+> input device when falling back to hidd.
+
+
+Fixed some discussed issues of the hidd config patch:
+
+- Only transfer entry from hidd config to input if there isn't already a entry 
+of the device in input config
+- Added parsing function for hidd config format (input format changed)
+
+Patch attachted.
+
+best regards,
+Daniel
+
+--Boundary-00=_q2+eGoxlArWK3Qm
+Content-Type: text/x-diff; charset="iso-8859-15";
+	name="bluez-utils-input-hidd-config-v02.diff"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename="bluez-utils-input-hidd-config-v02.diff"
+
+Index: input/manager.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/input/manager.c,v
+retrieving revision 1.26
+diff -u -p -r1.26 manager.c
+--- input/manager.c	21 Jun 2007 22:06:33 -0000	1.26
++++ input/manager.c	22 Jun 2007 15:21:02 -0000
+@@ -962,6 +962,25 @@ cleanup:
+ 		g_free(hidp.rd_data);
+ }
+ 
++/* hidd to input transition function */
++static void stored_hidd(char *key, char *value, void *data)
++{
++	struct hidp_connadd_req hidp; 
++	bdaddr_t dst, *src = data;
++
++	str2ba(key, &dst);
++
++	if (input_device_stored(src, &dst) > 0)
++		return;
++
++	memset(&hidp, 0, sizeof(struct hidp_connadd_req));
++
++	if (parse_stored_hidd(value, &hidp) < 0)
++		return;
++
++	store_device_info(src, &dst, &hidp);
++}
++
+ static void register_stored_inputs(void)
+ {
+ 	char dirname[PATH_MAX + 1];
+@@ -980,10 +999,16 @@ static void register_stored_inputs(void)
+ 		if (!isdigit(de->d_name[0]))
+ 			continue;
+ 
++		str2ba(de->d_name, &src);
++
++		/* move the hidd entries to the input storage */
+ 		create_name(filename, PATH_MAX, STORAGEDIR,
+-						de->d_name, "input");
++						de->d_name, "hidd");
++		textfile_foreach(filename, stored_hidd, &src);
+ 
+-		str2ba(de->d_name, &src);
++		/* load the input stored devices */
++		create_name(filename, PATH_MAX, STORAGEDIR,
++						de->d_name, "input");
+ 
+ 		textfile_foreach(filename, stored_input, &src);
+ 	}
+Index: input/storage.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/input/storage.c,v
+retrieving revision 1.10
+diff -u -p -r1.10 storage.c
+--- input/storage.c	19 Mar 2007 14:58:44 -0000	1.10
++++ input/storage.c	22 Jun 2007 15:21:02 -0000
+@@ -59,6 +59,70 @@ static inline int create_filename(char *
+ 	return create_name(buf, size, STORAGEDIR, addr, name);
+ }
+ 
++int input_device_stored(bdaddr_t *src, bdaddr_t *dst)
++{
++	char filename[PATH_MAX + 1], *str;
++	char peer[18];
++
++	create_filename(filename, PATH_MAX, src, "input");
++
++	ba2str(dst, peer);
++	str = textfile_get(filename, peer);
++	if (!str)
++		return -ENOENT;
++
++	free(str);
++
++	return 1;
++}
++
++int parse_stored_hidd(const char *str, struct hidp_connadd_req *req)
++{
++	char tmp[3];
++	char *desc;
++	unsigned int vendor, product, version, subclass, country, parser, pos;
++	size_t len;
++	int i;
++
++	desc = malloc(4096);
++	if (!desc)
++		return -ENOMEM;
++
++	memset(desc, 0, 4096);
++
++	sscanf(str, "%04X:%04X:%04X %02X %02X %04X %4095s %08X %n",
++			&vendor, &product, &version, &subclass, &country,
++			&parser, desc, &req->flags, &pos);
++
++	len = strlen(desc);
++	if (len <= 0)
++		return -ENOENT;
++
++
++	req->vendor   = vendor;
++	req->product  = product;
++	req->version  = version;
++	req->subclass = subclass;
++	req->country  = country;
++	req->parser   = parser;
++
++	req->rd_size = len / 2;
++	req->rd_data = g_try_malloc0(req->rd_size);
++	if (!req->rd_data) {
++		return -ENOMEM;
++	}
++
++	memset(tmp, 0, sizeof(tmp));
++	for (i = 0; i < req->rd_size; i++) {
++		memcpy(tmp, desc + (i * 2), 2);
++		req->rd_data[i] = (uint8_t) strtol(tmp, NULL, 16);
++	}
++
++	g_free(desc);
++
++	return 0;
++}
++
+ int parse_stored_device_info(const char *str, struct hidp_connadd_req *req)
+ {
+ 	char tmp[3];
+Index: input/storage.h
+===================================================================
+RCS file: /cvsroot/bluez/utils/input/storage.h,v
+retrieving revision 1.6
+diff -u -p -r1.6 storage.h
+--- input/storage.h	19 Mar 2007 14:58:44 -0000	1.6
++++ input/storage.h	22 Jun 2007 15:21:02 -0000
+@@ -21,6 +21,8 @@
+  *
+  */
+ 
++int input_device_stored(bdaddr_t *src, bdaddr_t *dst);
++
+ int get_stored_device_info(bdaddr_t *src, bdaddr_t *dst,
+ 				struct hidp_connadd_req *req);
+ 
+@@ -29,6 +31,7 @@ int del_stored_device_info(bdaddr_t *src
+ int store_device_info(bdaddr_t *src, bdaddr_t *dst,
+ 				struct hidp_connadd_req *req);
+ 
++int parse_stored_hidd(const char *str, struct hidp_connadd_req *req);
+ int parse_stored_device_info(const char *str,
+ 				struct hidp_connadd_req *req);
+ 
+
+--Boundary-00=_q2+eGoxlArWK3Qm
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+--Boundary-00=_q2+eGoxlArWK3Qm
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--Boundary-00=_q2+eGoxlArWK3Qm--
