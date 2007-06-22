@@ -1,15 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Daniel Gollub <dgollub@suse.de>
-To: bluez-devel@lists.sourceforge.net
-Date: Fri, 22 Jun 2007 17:41:29 +0200
-References: <200706082336.00557.dgollub@suse.de>
-In-Reply-To: <200706082336.00557.dgollub@suse.de>
+Message-ID: <6669365c0706220449u1b7848a6j984c0ef00f0ebbf2@mail.gmail.com>
+Date: Fri, 22 Jun 2007 11:49:56 +0000
+From: "Daniel Ribeiro" <drwyrm@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <6669365c0706210944m23ffe64kde10851d85edf3f0@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_q2+eGoxlArWK3Qm"
-Message-Id: <200706221741.30531.dgollub@suse.de>
-Subject: Re: [Bluez-devel] [PATCH] Input Service - Support for hidd
-	configuration
+Content-Type: multipart/mixed;
+	boundary="----=_Part_159909_6093058.1182512996917"
+References: <6669365c0706210944m23ffe64kde10851d85edf3f0@mail.gmail.com>
+Subject: Re: [Bluez-devel] [PATCH] BCM2035 on UART at higher speeds +
+	Support for setting bdaddr.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,204 +22,56 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---Boundary-00=_q2+eGoxlArWK3Qm
-Content-Type: text/plain;
-  charset="iso-8859-15"
+------=_Part_159909_6093058.1182512996917
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-On Friday 08 June 2007, Daniel Gollub wrote:
-> Hi,
->
-> attachted an input service patch which implements support for the hidd
-> configuration. This is needed to have a smooth transition from hidd daemon
-> to the new shiny input service ...
->
-> ( ... and especially this is needed to be able to return from vacation back
-> to the office - without getting blamed by Seife for not working bluetooth
-> input devices ;P )
->
-> The patch reads the entries of hidd and stores it with store_device_info()
-> function. The hidd doesn't get modified - this means the transition happens
-> on every start of the input service. store_device_info() avoids duplicate
-> entries. So there is still the possibility to have a working bluetooth
-> input device when falling back to hidd.
+2007/6/21, Daniel Ribeiro <drwyrm@gmail.com>:
+> Sending again as Marcel requested.
+Corrections as requested on IRC..
 
+-- 
+EOF
 
-Fixed some discussed issues of the hidd config patch:
+Daniel Ribeiro
 
-- Only transfer entry from hidd config to input if there isn't already a entry 
-of the device in input config
-- Added parsing function for hidd config format (input format changed)
+------=_Part_159909_6093058.1182512996917
+Content-Type: text/x-diff; name=bluez-bcm2035.patch; charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f38f6oqb
+Content-Disposition: attachment; filename="bluez-bcm2035.patch"
 
-Patch attachted.
-
-best regards,
-Daniel
-
---Boundary-00=_q2+eGoxlArWK3Qm
-Content-Type: text/x-diff; charset="iso-8859-15";
-	name="bluez-utils-input-hidd-config-v02.diff"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="bluez-utils-input-hidd-config-v02.diff"
-
-Index: input/manager.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/input/manager.c,v
-retrieving revision 1.26
-diff -u -p -r1.26 manager.c
---- input/manager.c	21 Jun 2007 22:06:33 -0000	1.26
-+++ input/manager.c	22 Jun 2007 15:21:02 -0000
-@@ -962,6 +962,25 @@ cleanup:
- 		g_free(hidp.rd_data);
- }
- 
-+/* hidd to input transition function */
-+static void stored_hidd(char *key, char *value, void *data)
-+{
-+	struct hidp_connadd_req hidp; 
-+	bdaddr_t dst, *src = data;
-+
-+	str2ba(key, &dst);
-+
-+	if (input_device_stored(src, &dst) > 0)
-+		return;
-+
-+	memset(&hidp, 0, sizeof(struct hidp_connadd_req));
-+
-+	if (parse_stored_hidd(value, &hidp) < 0)
-+		return;
-+
-+	store_device_info(src, &dst, &hidp);
-+}
-+
- static void register_stored_inputs(void)
- {
- 	char dirname[PATH_MAX + 1];
-@@ -980,10 +999,16 @@ static void register_stored_inputs(void)
- 		if (!isdigit(de->d_name[0]))
- 			continue;
- 
-+		str2ba(de->d_name, &src);
-+
-+		/* move the hidd entries to the input storage */
- 		create_name(filename, PATH_MAX, STORAGEDIR,
--						de->d_name, "input");
-+						de->d_name, "hidd");
-+		textfile_foreach(filename, stored_hidd, &src);
- 
--		str2ba(de->d_name, &src);
-+		/* load the input stored devices */
-+		create_name(filename, PATH_MAX, STORAGEDIR,
-+						de->d_name, "input");
- 
- 		textfile_foreach(filename, stored_input, &src);
- 	}
-Index: input/storage.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/input/storage.c,v
-retrieving revision 1.10
-diff -u -p -r1.10 storage.c
---- input/storage.c	19 Mar 2007 14:58:44 -0000	1.10
-+++ input/storage.c	22 Jun 2007 15:21:02 -0000
-@@ -59,6 +59,70 @@ static inline int create_filename(char *
- 	return create_name(buf, size, STORAGEDIR, addr, name);
- }
- 
-+int input_device_stored(bdaddr_t *src, bdaddr_t *dst)
-+{
-+	char filename[PATH_MAX + 1], *str;
-+	char peer[18];
-+
-+	create_filename(filename, PATH_MAX, src, "input");
-+
-+	ba2str(dst, peer);
-+	str = textfile_get(filename, peer);
-+	if (!str)
-+		return -ENOENT;
-+
-+	free(str);
-+
-+	return 1;
-+}
-+
-+int parse_stored_hidd(const char *str, struct hidp_connadd_req *req)
-+{
-+	char tmp[3];
-+	char *desc;
-+	unsigned int vendor, product, version, subclass, country, parser, pos;
-+	size_t len;
-+	int i;
-+
-+	desc = malloc(4096);
-+	if (!desc)
-+		return -ENOMEM;
-+
-+	memset(desc, 0, 4096);
-+
-+	sscanf(str, "%04X:%04X:%04X %02X %02X %04X %4095s %08X %n",
-+			&vendor, &product, &version, &subclass, &country,
-+			&parser, desc, &req->flags, &pos);
-+
-+	len = strlen(desc);
-+	if (len <= 0)
-+		return -ENOENT;
-+
-+
-+	req->vendor   = vendor;
-+	req->product  = product;
-+	req->version  = version;
-+	req->subclass = subclass;
-+	req->country  = country;
-+	req->parser   = parser;
-+
-+	req->rd_size = len / 2;
-+	req->rd_data = g_try_malloc0(req->rd_size);
-+	if (!req->rd_data) {
-+		return -ENOMEM;
-+	}
-+
-+	memset(tmp, 0, sizeof(tmp));
-+	for (i = 0; i < req->rd_size; i++) {
-+		memcpy(tmp, desc + (i * 2), 2);
-+		req->rd_data[i] = (uint8_t) strtol(tmp, NULL, 16);
-+	}
-+
-+	g_free(desc);
-+
-+	return 0;
-+}
-+
- int parse_stored_device_info(const char *str, struct hidp_connadd_req *req)
- {
- 	char tmp[3];
-Index: input/storage.h
-===================================================================
-RCS file: /cvsroot/bluez/utils/input/storage.h,v
-retrieving revision 1.6
-diff -u -p -r1.6 storage.h
---- input/storage.h	19 Mar 2007 14:58:44 -0000	1.6
-+++ input/storage.h	22 Jun 2007 15:21:02 -0000
-@@ -21,6 +21,8 @@
-  *
-  */
- 
-+int input_device_stored(bdaddr_t *src, bdaddr_t *dst);
-+
- int get_stored_device_info(bdaddr_t *src, bdaddr_t *dst,
- 				struct hidp_connadd_req *req);
- 
-@@ -29,6 +31,7 @@ int del_stored_device_info(bdaddr_t *src
- int store_device_info(bdaddr_t *src, bdaddr_t *dst,
- 				struct hidp_connadd_req *req);
- 
-+int parse_stored_hidd(const char *str, struct hidp_connadd_req *req);
- int parse_stored_device_info(const char *str,
- 				struct hidp_connadd_req *req);
- 
-
---Boundary-00=_q2+eGoxlArWK3Qm
+Q29ycmVjdCBiYXVkcmF0ZSBwYXJhbWV0ZXJzIGZvciBiY20yMDM1IG9uIHVhcnQgYW5kIHNldCBi
+ZGFkZHIuCgpTaWduZWQtb2ZmLWJ5OiBEYW5pZWwgUmliZWlybyA8ZHJ3eXJtQGdtYWlsLmNvbT4K
+SW5kZXg6IGJsdWV6LXV0aWxzLTMuMTAvdG9vbHMvaGNpYXR0YWNoLmMKPT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQotLS0g
+Ymx1ZXotdXRpbHMtMy4xMC5vcmlnL3Rvb2xzL2hjaWF0dGFjaC5jCTIwMDctMDUtMTIgMTM6MTY6
+MzguMDAwMDAwMDAwIC0wMzAwCisrKyBibHVlei11dGlscy0zLjEwL3Rvb2xzL2hjaWF0dGFjaC5j
+CTIwMDctMDYtMjEgMTg6NDI6MDcuMDAwMDAwMDAwIC0wMzAwCkBAIC05NTEsNiArOTUxLDMxIEBA
+CiAJCXJldHVybiAtMTsKIAl9CiAKKwlpZiAodS0+YmRhZGRyICE9IE5VTEwpIHsKKwkJLyogc2V0
+IGJkYWRkciAqLworCQltZW1zZXQoY21kLCAwLCBzaXplb2YoY21kKSk7CisJCW1lbXNldChyZXNw
+LCAwLCBzaXplb2YocmVzcCkpOworCQljbWRbMF0gPSBIQ0lfQ09NTUFORF9QS1Q7CisJCWNtZFsx
+XSA9IDB4MDE7CisJCWNtZFsyXSA9IDB4ZmM7CisJCWNtZFszXSA9IDB4MDY7CisKKwkJc3RyMmJh
+KHUtPmJkYWRkciwgKGJkYWRkcl90ICopIChjbWQgKyA0KSk7CisKKwkJLyogU2VuZCBjb21tYW5k
+ICovCisJCWlmICh3cml0ZShmZCwgY21kLCAxMCkgIT0gMTApIHsKKwkJCWZwcmludGYoc3RkZXJy
+LCAiRmFpbGVkIHRvIHdyaXRlIFwic2V0IGJkYWRkclwiICIKKwkJCSJjb21tYW5kXG4iKTsKKwkJ
+CXJldHVybiAtMTsKKwkJfQorCisJCS8qIFJlYWQgcmVwbHkgKi8KKwkJaWYgKChuID0gcmVhZF9o
+Y2lfZXZlbnQoZmQsIHJlc3AsIDEwKSkgPCAwKSB7CisJCQlmcHJpbnRmKHN0ZGVyciwgIkZhaWxl
+ZCB0byBzZXQgYmRhZGRyXG4iKTsKKwkJCXJldHVybiAtMTsKKwkJfQorCX0KKwogCS8qIFJlYWQg
+dGhlIGxvY2FsIHZlcnNpb24gaW5mbyAqLwogCW1lbXNldChjbWQsIDAsIHNpemVvZihjbWQpKTsK
+IAltZW1zZXQocmVzcCwgMCwgc2l6ZW9mKHJlc3ApKTsKQEAgLTEwMTAsMTEgKzEwMzUsMTEgQEAK
+IAkJY21kWzVdID0gMHhmYTsKIAkJYnJlYWs7CiAJY2FzZSA0NjA4MDA6Ci0JCWNtZFs0XSA9IDB4
+MTE7CisJCWNtZFs0XSA9IDB4MjI7CiAJCWNtZFs1XSA9IDB4ZmQ7CiAJCWJyZWFrOwogCWNhc2Ug
+OTIxNjAwOgotCQljbWRbNF0gPSAweDY1OworCQljbWRbNF0gPSAweDU1OwogCQljbWRbNV0gPSAw
+eGZmOwogCQlicmVhazsKIAlkZWZhdWx0OgpAQCAtMTEwMyw3ICsxMTI4LDcgQEAKIAl7ICJiaWxs
+aW9udG9uIiwgMHgwMjc5LCAweDk1MGIsIEhDSV9VQVJUX0JDU1AsIDExNTIwMCwgMTE1MjAwLCAw
+LCAgICAgICAgTlVMTCwgYmNzcCAgICAgfSwKIAogCS8qIEJyb2FkY29tIEJDTTIwMzUgKi8KLQl7
+ICJiY20yMDM1IiwgICAgMHgwQTVDLCAweDIwMzUsIEhDSV9VQVJUX0g0LCAgIDExNTIwMCwgMTE1
+MjAwLCAwLCAgICAgICAgTlVMTCwgYmNtMjAzNSAgfSwKKwl7ICJiY20yMDM1IiwgICAgMHgwQTVD
+LCAweDIwMzUsIEhDSV9VQVJUX0g0LCAgIDExNTIwMCwgNDYwODAwLCBGTE9XX0NUTCwgTlVMTCwg
+YmNtMjAzNSAgfSwKIAogCXsgTlVMTCwgMCB9CiB9Owo=
+------=_Part_159909_6093058.1182512996917
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -230,7 +82,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---Boundary-00=_q2+eGoxlArWK3Qm
+------=_Part_159909_6093058.1182512996917
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -241,4 +93,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---Boundary-00=_q2+eGoxlArWK3Qm--
+------=_Part_159909_6093058.1182512996917--
