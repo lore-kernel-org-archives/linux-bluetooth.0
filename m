@@ -1,10 +1,18 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <c1fa8edf0706241404y2471673cwf17b4e7aac86ef29@mail.gmail.com>
-Date: Sun, 24 Jun 2007 17:04:40 -0400
-From: "Simon Ruggier" <simon80@gmail.com>
+Message-ID: <e1effdeb0706221032r51dfd2d9q2e4fe88dca29c689@mail.gmail.com>
+Date: Fri, 22 Jun 2007 14:32:21 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <e1effdeb0706210536y65f83ab0q66fc68c5fde162e3@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] minor quibbles
+References: <467297DF.2030401@access-company.com>
+	<4677CFEF.3080901@access-company.com>
+	<e1effdeb0706190744w77a2586ar8672a19443e50f89@mail.gmail.com>
+	<4677F360.7050209@access-company.com>
+	<e1effdeb0706190932y30745338xa7d0851e0eb80ea2@mail.gmail.com>
+	<46795080.1010308@access-company.com>
+	<e1effdeb0706210536y65f83ab0q66fc68c5fde162e3@mail.gmail.com>
+Subject: Re: [Bluez-devel] Input service signals
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,27 +22,63 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This doesn't seem like a big deal, but I noticed that there are a few
-cases where a buffer[PATH_MAX + 1] is allocated, but then snprintf is
-used with a size of up to PATH_MAX.  The man page for snprintf on my
-system says that "The functions snprintf() and vsnprintf() do not
-write  more than size bytes (including the trailing '\0').", which
-would seem to imply that snprintf(buf, PATH_MAX + 1, ... ) is more
-correct.  Someone please correct me if I'm wrong about this.
-
-I'm also wondering if it's intentional that certain hidd options, like
---no-check, are undocumented?
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+T24gNi8yMS8wNywgQ2xhdWRpbyBUYWthaGFzaSA8Y2t0YWthaGFzaUBnbWFpbC5jb20+IHdyb3Rl
+Ogo+IE9uIDYvMjAvMDcsIEZyZWRlcmljIERhbmlzIDxmcmVkZXJpYy5kYW5pc0BhY2Nlc3MtY29t
+cGFueS5jb20+IHdyb3RlOgo+ID4gQ2xhdWRpbyBUYWthaGFzaSB3cm90ZToKPiA+ID4gSGkgRnJl
+ZGVyaWMsCj4gPiA+Cj4gPiA+IGxhdGVzdCBjdnMgKyB5b3VyIHBhdGNoIHVzaW5nIHRoZSBISUQg
+ZGV2aWNlLgo+ID4gPgo+ID4gPiBCUiwKPiA+ID4gQ2xhdWRpby4KPiA+ID4gT24gNi8xOS8wNywg
+RnJlZGVyaWMgRGFuaXMgPGZyZWRlcmljLmRhbmlzQGFjY2Vzcy1jb21wYW55LmNvbT4gd3JvdGU6
+Cj4gPiA+PiBDbGF1ZGlvIFRha2FoYXNpIHdyb3RlOgo+ID4gPj4+IEhpIEZyZWRlcmljLAo+ID4g
+Pj4+Cj4gPiA+Pj4gSSBnb3QgYSBzZWdtZW50YXRpb24gZmF1bHQgd2hlbiBjYWxsaW5nIERldmlj
+ZS5Db25uZWN0ICsgRGV2aWNlLkRpc2Nvbm5lY3QKPiA+ID4+Pgo+ID4gPj4+IFRoZSBwYXRoIGNv
+bnRlbnQgaXMgd3JvbmcoaXQgY29udGFpbnMgdGhlIGJ1cyBpZCkuCj4gPiA+Pj4KPiA+ID4+PiAo
+Z2RiKSBiYWNrdHJhY2UKPiA+ID4+PiAjMCAgMHgwODA1Mjg1YiBpbiBkYnVzX2Nvbm5lY3Rpb25f
+ZW1pdF9zaWduYWxfdmFsaXN0IChjb25uPTB4ODA1N2FjOCwKPiA+ID4+PiBwYXRoPTB4ODA1N2Ri
+OCAiOjEuMzQiLCBpbnRlcmZhY2U9MHg4MDUzZGY1ICJvcmcuYmx1ZXouaW5wdXQuRGV2aWNlIiwK
+PiA+ID4+PiAgICAgbmFtZT0weDgwNTNlNzggIkRpc2Nvbm5lY3RlZCIsIGZpcnN0PTAsIHZhcl9h
+cmdzPTB4YmZlMzkzNDQKPiA+ID4+PiAiSFfvv73vv71oXDIyM++/ve+/vVxyXDIwNO+/ve+/vUhc
+MjM3XDAwNVxiICIpIGF0IGRidXMtaGVscGVyLmM6NDc4Cj4gPiA+Pj4gIzEgIDB4MDgwNTI5ZTcg
+aW4gZGJ1c19jb25uZWN0aW9uX2VtaXRfc2lnbmFsIChjb25uPTB4ODA1N2FjOCwKPiA+ID4+PiBw
+YXRoPTB4ODA1N2RiOCAiOjEuMzQiLCBpbnRlcmZhY2U9MHg4MDUzZGY1ICJvcmcuYmx1ZXouaW5w
+dXQuRGV2aWNlIiwKPiA+ID4+PiAgICAgbmFtZT0weDgwNTNlNzggIkRpc2Nvbm5lY3RlZCIsIGZp
+cnN0PTApIGF0IGRidXMtaGVscGVyLmM6NTMxCj4gPiA+Pj4KPiA+ID4+PiBDb3VsZCB5b3UgcGxl
+YXNlIGZpeCBpdD8KPiA+ID4+IEhlbGxvIENsYXVkaW8sCj4gPiA+Pgo+ID4gPj4gV2hlbiBkbyB5
+b3UgZ2V0IHRoaXMgY3Jhc2ggPyB1c2luZyBISUQgZGV2aWNlIG9yIGZha2UgaW5wdXQgPwo+ID4g
+Pj4KPiA+Cj4gPiBIZWxsbyBDbGF1ZGlvLAo+ID4KPiA+IEhlcmUgaXMgYSBuZXcgdmVyc2lvbiBv
+ZiB0aGUgcGF0Y2gsIGZpeGluZyB0aGUgY3Jhc2ggKEkgZG8gbm90IHVuZGVyc3RhbmQgaG93IEkg
+aGFkIHRlc3QgaXQgYmVmb3JlIHdpdGhvdXQgdGhpcyBlcnJvciwgc29ycnkgOy1bKQo+ID4KPiA+
+IEJSCj4gPgo+ID4gRnJlZAo+ID4KPiA+IC0tCj4gPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+ID4gSXQgaXMgbm90IGJ5IGltcHJvdmluZyB0aGUgb2ls
+IGxhbXAgdGhhdCBvbmUgaW52ZW50cyB0aGUgZWxlY3RyaWMgYnVsYiEKPiA+IC0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gPiBEYW5pcyBGcmVkZXJpYyAg
+ICAgICAgICAgICAgICAgICBBY2Nlc3MgQ29tcGFueQo+ID4gU29mdHdhcmUgZW5naW5lZXIKPiA+
+IE1haWwgOiBtYWlsdG86ZnJlZGVyaWMuZGFuaXNAYWNjZXNzLWNvbXBhbnkuY29tCj4gPiAtLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+Cj4gSGkgRnJlZGVy
+aWMsCj4KPiBHZW5lcmFsbHkgSSB0ZXN0IHVzaW5nIGRidXMtc2VuZCwgeW91IGNhbiBmaW5kIHNv
+bWUgZXhhbXBsZXMgaGVyZToKPiBodHRwOi8vd2lraS5ibHVlei5vcmcvd2lraS9IT1dUTy9JbnB1
+dERldmljZXMKPgo+IFRvIHJlcHJvZHVjZSB0aGUgcmVwb3J0ZWQgYnVnIEkgd2FzIGNhbGxpbmc6
+Cj4gMS4gQ3JlYXRlRGV2aWNlCj4gMi4gQ29ubmVjdAo+IDMuIERpc2Nvbm5lY3QKPgo+Cj4gWW91
+ciBsYXN0IHBhdGNoIGlzIHdvcmtpbmcgZmluZS4gIFdlIGNvdWxkIHRyeSByZW1vdmUgdGhlICJz
+dHJ1Y3QKPiBzZXNzaW9uIiBhbmQgcHV0IGV2ZXJ5dGhpbmcgaW5zaWRlIHRoZSAic3RydWN0IGRl
+dmljZSIgc2luY2UgZm9yIGVhY2gKPiBpbnB1dCBkZXZpY2UgcmVnaXN0ZXJlZCB0aGVyZSBpcyBh
+IEQtQnVzIGRhdGEgYXNzaWduZWQoSXQgaXMgYXBwbGllZAo+IHRvIGRldmljZSBhbmQgaG9zdCBp
+bml0aWF0ZWQgY29ubmVjdGlvbnMpLiBTbyB0aGUgInN0cnVjdCBzZXNzaW9uIgo+IGNvbnRhaW5z
+IGR1cGxpY2F0ZWQgZGF0YS4KPgo+IEkgd2lsbCB0cnkgY2hhbmdlIHRoZSBjb2RlIGFuZCBwcm9w
+b3NlIGFub3RoZXIgYXBwcm9hY2ggdXNpbmcgeW91cgo+IGNvZGUgYXMgYmFzZWxpbmUuCj4KPiBC
+UiwKPiBDbGF1ZGlvLgo+CgpIaSBGcmVkZXJpYywKClRoZSBzaWduYWxzIGFyZSBub3cgc2VudCBw
+cm9wZXJseS4KClBsZWFzZSB0ZXN0IGlmIGl0IGlzIHdvcmtpbmcuCgpUaGVyZSBpcyBqdXN0IG9u
+ZSBzY2VuYXJpbyB0aGF0IEkgYW0gZml4aW5nOiBEaXNjb25uZWN0IHNpZ25hbCBpcyBub3QKc2Vu
+dCBpZiBSZW1vdmVEZXZpY2UgaXMgY2FsbGVkKGFuZCB0aGUgZGV2aWNlIGlzIGNvbm5lY3RlZCku
+CgpCUiwKQ2xhdWRpby4KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9u
+c29yZWQgYnkgREIyIEV4cHJlc3MKRG93bmxvYWQgREIyIEV4cHJlc3MgQyAtIHRoZSBGUkVFIHZl
+cnNpb24gb2YgREIyIGV4cHJlc3MgYW5kIHRha2UKY29udHJvbCBvZiB5b3VyIFhNTC4gTm8gbGlt
+aXRzLiBKdXN0IGRhdGEuIENsaWNrIHRvIGdldCBpdCBub3cuCmh0dHA6Ly9zb3VyY2Vmb3JnZS5u
+ZXQvcG93ZXJiYXIvZGIyLwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNl
+Zm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2Js
+dWV6LWRldmVsCg==
