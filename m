@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <467FC8D4.1060904@yandex.ru>
-Date: Mon, 25 Jun 2007 17:53:24 +0400
-From: Irakli Tsagareli <itsagareli@yandex.ru>
+Message-ID: <c1fa8edf0706241404y2471673cwf17b4e7aac86ef29@mail.gmail.com>
+Date: Sun, 24 Jun 2007 17:04:40 -0400
+From: "Simon Ruggier" <simon80@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] how to access nokia addressbook
+Subject: [Bluez-devel] minor quibbles
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,16 +18,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello!
+This doesn't seem like a big deal, but I noticed that there are a few
+cases where a buffer[PATH_MAX + 1] is allocated, but then snprintf is
+used with a size of up to PATH_MAX.  The man page for snprintf on my
+system says that "The functions snprintf() and vsnprintf() do not
+write  more than size bytes (including the trailing '\0').", which
+would seem to imply that snprintf(buf, PATH_MAX + 1, ... ) is more
+correct.  Someone please correct me if I'm wrong about this.
 
-is there any easy way to access phone's addressbook via libbluez ? I'm 
-currently writing handsfree application for linux to connect my Nokia 
-handset and only thing left to do is access to phones addressbook. docs 
-at bluetooth.org are very low level, may be bluez gives some high level 
-functions to do that.
-
-thank you and best wishes,
-kern.
+I'm also wondering if it's intentional that certain hidd options, like
+--no-check, are undocumented?
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
