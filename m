@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46812123.4030908@free.fr>
-Date: Tue, 26 Jun 2007 16:22:27 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <467FD4DF.9090108@free.fr>
 References: <467FD4DF.9090108@free.fr>
-	<1182808431.6385.30.camel@aeonflux.holtmann.net>
-In-Reply-To: <1182808431.6385.30.camel@aeonflux.holtmann.net>
+Date: Mon, 25 Jun 2007 23:53:51 +0200
+Message-Id: <1182808431.6385.30.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Kernel vs Userland AVDTP
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,21 +20,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Fabien,
 
-> at some point, yes. Currently it makes no sense to start with a kernel
-> version of AVDTP. Also Bluetooth 2.1 and 3.0 are gonna have high impact
-> on L2CAP and I wanna have that settled first before considering a kernel
-> based AVDTP, because it is not that simple. It would be as complex as
-> RFCOMM and so keeping it in userspace is better for now.
+> Browsing the archives i've seen there has been some interest around the 
+> end of 2004 for an avdtp kernel implementation.
 > 
-I would tend to agree with you, specially on the fact that it would be 
-quite complex to implement.
-But what about a user space library? Do you thing that would make sense ?
+> However recent trends seem to try to solve the issue in userland 
+> (Frederic's a2dpd or bluez's btaudiod for instance).
+> 
+> Is there a reason for this change of trends (except for "it's easier to 
+> have it done in user space for now" ;-) ) ?
+> 
+> Wouldn't it make more sense to have it in kernel due to multiplexing 
+> issues ?
 
-Cheers,
+at some point, yes. Currently it makes no sense to start with a kernel
+version of AVDTP. Also Bluetooth 2.1 and 3.0 are gonna have high impact
+on L2CAP and I wanna have that settled first before considering a kernel
+based AVDTP, because it is not that simple. It would be as complex as
+RFCOMM and so keeping it in userspace is better for now.
 
-Fabien
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
