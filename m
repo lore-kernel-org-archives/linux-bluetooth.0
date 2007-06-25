@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46800605.1050804@free.fr>
-Date: Mon, 25 Jun 2007 20:14:29 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
+Message-ID: <d89ddf300706250914v6e5f67c1qea6165186c33c7d3@mail.gmail.com>
+Date: Mon, 25 Jun 2007 10:14:14 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <467FD4DF.9090108@free.fr>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 References: <467FD4DF.9090108@free.fr>
-	<d89ddf300706250914v6e5f67c1qea6165186c33c7d3@mail.gmail.com>
-In-Reply-To: <d89ddf300706250914v6e5f67c1qea6165186c33c7d3@mail.gmail.com>
 Subject: Re: [Bluez-devel] Kernel vs Userland AVDTP
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -17,50 +16,66 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============1496648700=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGkgQnJhZCwKCj4gRmFiaWVuCj4gCj4gV2hhdCBhcmUgdGhlIG11bHRpcGxleGluZyBpc3N1ZXM/
-IFNvbWV0aGluZyBsaWtlIHR3byBhcHBzIHRyeWluZyB0byB1c2UgCj4gdGhlIHNhbWUgcmVtb3Rl
-IGRldmljZT8KVGhhdCBjb3VsZCBzb3VuZCBsaWtlIHRoYXQuIEhvd2V2ZXIgaSBkb24ndCBrbm93
-IGlmIHRoYXQgcmVhbGx5IG1ha2VzIAphbnkgc2Vuc2UgYW5kIGlmIGFueWJvZHkgaW1wbGVtZW50
-cyBpdC4KClF1b3RpbmcgdGhlIEFWRFRQIDEuMCBkb2N1bWVudDoKCjQuMTQgVHJhbnNwb3J0IENo
-YW5uZWwKVGhlIG5vdGlvbiBvZiBhIFRyYW5zcG9ydCBDaGFubmVsIG1lYW5zIGFuIGFic3RyYWN0
-aW9uIG9mIHRoZSBiZWFyZXIgCnVuZGVybHlpbmcgdGhlIEEvViB0cmFuc3BvcnQgbGF5ZXIuIEZv
-ciB0aGUgdGltZSBiZWluZywgYSB0cmFuc3BvcnQgCmNoYW5uZWwgYWx3YXlzIGNvcnJlc3BvbmRz
-IHRvIGFuIEwyQ0FQIGNoYW5uZWwgKHdpdGggYSBQU00gaW5kaWNhdGluZyAKQVZEVFApLgpJZiB0
-aGUgQVZEVFAgTXVsdGlwbGV4aW5nIE1vZGUgaXMgbm90IHN1cHBvcnRlZCwgYSB0cmFuc3BvcnQg
-Y2hhbm5lbCAKY2FycmllcyBwYWNrZXRzIG9mIG9ubHkgb25lIHRyYW5zcG9ydCBzZXNzaW9uLiBJ
-ZiBNdWx0aXBsZXhpbmcgTW9kZSBpcyAKY29uZmlndXJlZCwgYSB0cmFuc3BvcnQgY2hhbm5lbCBj
-YW4gY2FycnkgcGFja2V0cyBiZWxvbmdpbmcgdG8gZGlmZmVyZW50IAp0cmFuc3BvcnQgc2Vzc2lv
-bnMgKG9mIHRoZSBzYW1lIG9yIGRpZmZlcmVudCBzdHJlYW1zKS4gQSBUcmFuc3BvcnQgCkNoYW5u
-ZWwgSWRlbnRpZmllciAoVENJRCwgc2VlIFNlY3Rpb24gNC4xNSkgaXMgdXNlZCB0byByZWZlciB0
-byBhClRyYW5zcG9ydCBDaGFubmVsLgoKCjUuNC40IEFkYXB0YXRpb24gU2VydmljZSDigJMgTXVs
-dGlwbGV4aW5nCkluIHRoZSBNdWx0aXBsZXhpbmcgTW9kZSwgbXVsdGlwbGUgdHJhbnNwb3J0IHNl
-c3Npb25zLCBiZWxvbmdpbmcgdG8gdGhlIApzYW1lIG9yIHRvIGEgZGlmZmVyZW50IHN0cmVhbSwg
-Y2FuIHNoYXJlIGEgY29tbW9uIHRyYW5zcG9ydCAoTDJDQVApIApjaGFubmVsLiBNb3Jlb3Zlciwg
-YW4gTDJDQVAgcGFja2V0IGNhbiBjb250YWluIG11bHRpcGxlIHBhY2tldHMgCmJlbG9uZ2luZyB0
-byB0aGUgc2FtZSBvciBkaWZmZXJlbnQgdHJhbnNwb3J0IHNlc3Npb25zLiBBbiBlbmNhcHN1bGF0
-aW9uIApoZWFkZXIgaXMgdGhlcmVmb3JlIG5lZWRlZCBmb3IgZWFjaCBNZWRpYS9SZXBvcnRpbmcv
-UmVjb3ZlcnkgcGFja2V0LiBBIApUU0lEIGNvbnRhaW5lZCBpbiB0aGlzIGhlYWRlciBhbGxvd3Mg
-Zm9yIGNvcnJlY3Qgcm91dGluZyBvZiB0aGUgcGFja2V0IAphdCB0aGUgU05LIGRldmljZS4KCgo+
-IAo+IEhhdmluZyBhdmR0cCBzb2NrZXRzIG9mZmVyZWQgYnkgdGhlIG9zIHdvdWxkIGVuZm9yY2Ug
-YmV0dGVyIHNlcGFyYXRpb24gCj4gYmV0d2VlbiB0aGUgbGF5ZXJzIGFuZCBpdCB3b3VsZCBjaGFu
-Z2UgdGhlIGxhbmRzY2FwZSBmb3IgYmx1ZXRvb3RoLm9yZyAKPiA8aHR0cDovL2JsdWV0b290aC5v
-cmc+IHZhbGlkYXRpb24gb2YgdGhlIHN0YWNrLiBJdCBkb2VzIGZlZWwgc29ydCBvZiAKPiBmdW5u
-eSB0byB3cml0ZSBjb2RlIHRvIGFzc2VtYmxlIHBhY2tldHMgaW4gdXNlcnNwYWNlLi4uIG1heWJl
-IG9uY2Ugd2UgCj4gaGF2ZSBzb21ldGhpbmcgb3RoZXIgdGhhbiBhMmRwIHJ1bm5pbmcgb24gdG9w
-IG9mIGF2ZHRwIGl0IHdpbGwgYmUgZXZlbiAKPiBtb3JlIGNvbXBlbGxpbmcgdG8gY2hhbmdlIHRo
-aW5ncy4KCkV4YWN0bHkuCkkgd2FzIGp1c3Qgd29uZGVyaW5nIGFib3V0IHRoYXQgdG9vLiBXb3Vs
-ZG4ndCBpdCBtYWtlIHNlbnNlIHRvIGhhdmUgCkFWRFRQIGFzIGFuIG91dHNpZGUgbW9kdWxlIChs
-aWJyYXJ5IG9yIGtlcm5lbCBjb2RlKSB0byBhbGxvdyBpdHMgdXNlIGZvciAKb3RoZXIgcHJvZmls
-ZXMgYnVpbHQgdXBvbiBBVkRUUCwgc3VjaCBhcyBWRFAgPwoKQ2hlZXJzLAoKRmFiaWVuCgotLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieSBEQjIgRXhwcmVz
-cwpEb3dubG9hZCBEQjIgRXhwcmVzcyBDIC0gdGhlIEZSRUUgdmVyc2lvbiBvZiBEQjIgZXhwcmVz
-cyBhbmQgdGFrZQpjb250cm9sIG9mIHlvdXIgWE1MLiBObyBsaW1pdHMuIEp1c3QgZGF0YS4gQ2xp
-Y2sgdG8gZ2V0IGl0IG5vdy4KaHR0cDovL3NvdXJjZWZvcmdlLm5ldC9wb3dlcmJhci9kYjIvCl9f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVs
-IG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9s
-aXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
+--===============1496648700==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_2591_8744975.1182788054417"
+
+------=_Part_2591_8744975.1182788054417
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Fabien
+
+What are the multiplexing issues? Something like two apps trying to use the
+same remote device?
+
+Having avdtp sockets offered by the os would enforce better separation
+between the layers and it would change the landscape for
+bluetooth.orgvalidation of the stack. It does feel sort of funny to
+write code to
+assemble packets in userspace... maybe once we have something other than
+a2dp running on top of avdtp it will be even more compelling to change
+things.
+
+Brad
+
+------=_Part_2591_8744975.1182788054417
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Fabien<br><br>What are the multiplexing issues? Something like two apps trying to use the same remote device?<br><br>Having avdtp sockets offered by the os would enforce better separation between the layers and it would change the landscape for 
+<a href="http://bluetooth.org">bluetooth.org</a> validation of the stack. It does feel sort of funny to write code to assemble packets in userspace... maybe once we have something other than a2dp running on top of avdtp it will be even more compelling to change things.
+<br><br>Brad<br>
+
+------=_Part_2591_8744975.1182788054417--
+
+
+--===============1496648700==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+--===============1496648700==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1496648700==--
