@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <467FD4DF.9090108@free.fr>
-Date: Mon, 25 Jun 2007 16:44:47 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
+Message-ID: <467FC8D4.1060904@yandex.ru>
+Date: Mon, 25 Jun 2007 17:53:24 +0400
+From: Irakli Tsagareli <itsagareli@yandex.ru>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Kernel vs Userland AVDTP
+Subject: [Bluez-devel] how to access nokia addressbook
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,24 +18,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hello!
 
-Hi all,
+is there any easy way to access phone's addressbook via libbluez ? I'm 
+currently writing handsfree application for linux to connect my Nokia 
+handset and only thing left to do is access to phones addressbook. docs 
+at bluetooth.org are very low level, may be bluez gives some high level 
+functions to do that.
 
-Browsing the archives i've seen there has been some interest around the 
-end of 2004 for an avdtp kernel implementation.
-
-However recent trends seem to try to solve the issue in userland 
-(Frederic's a2dpd or bluez's btaudiod for instance).
-
-Is there a reason for this change of trends (except for "it's easier to 
-have it done in user space for now" ;-) ) ?
-
-Wouldn't it make more sense to have it in kernel due to multiplexing 
-issues ?
-
-Cheers,
-
-Fabien
+thank you and best wishes,
+kern.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
