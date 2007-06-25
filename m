@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <46800605.1050804@free.fr>
+Date: Mon, 25 Jun 2007 20:14:29 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <467FD4DF.9090108@free.fr>
 References: <467FD4DF.9090108@free.fr>
-Date: Mon, 25 Jun 2007 23:53:51 +0200
-Message-Id: <1182808431.6385.30.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+	<d89ddf300706250914v6e5f67c1qea6165186c33c7d3@mail.gmail.com>
+In-Reply-To: <d89ddf300706250914v6e5f67c1qea6165186c33c7d3@mail.gmail.com>
 Subject: Re: [Bluez-devel] Kernel vs Userland AVDTP
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -16,42 +17,50 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
-
-> Browsing the archives i've seen there has been some interest around the 
-> end of 2004 for an avdtp kernel implementation.
-> 
-> However recent trends seem to try to solve the issue in userland 
-> (Frederic's a2dpd or bluez's btaudiod for instance).
-> 
-> Is there a reason for this change of trends (except for "it's easier to 
-> have it done in user space for now" ;-) ) ?
-> 
-> Wouldn't it make more sense to have it in kernel due to multiplexing 
-> issues ?
-
-at some point, yes. Currently it makes no sense to start with a kernel
-version of AVDTP. Also Bluetooth 2.1 and 3.0 are gonna have high impact
-on L2CAP and I wanna have that settled first before considering a kernel
-based AVDTP, because it is not that simple. It would be as complex as
-RFCOMM and so keeping it in userspace is better for now.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SGkgQnJhZCwKCj4gRmFiaWVuCj4gCj4gV2hhdCBhcmUgdGhlIG11bHRpcGxleGluZyBpc3N1ZXM/
+IFNvbWV0aGluZyBsaWtlIHR3byBhcHBzIHRyeWluZyB0byB1c2UgCj4gdGhlIHNhbWUgcmVtb3Rl
+IGRldmljZT8KVGhhdCBjb3VsZCBzb3VuZCBsaWtlIHRoYXQuIEhvd2V2ZXIgaSBkb24ndCBrbm93
+IGlmIHRoYXQgcmVhbGx5IG1ha2VzIAphbnkgc2Vuc2UgYW5kIGlmIGFueWJvZHkgaW1wbGVtZW50
+cyBpdC4KClF1b3RpbmcgdGhlIEFWRFRQIDEuMCBkb2N1bWVudDoKCjQuMTQgVHJhbnNwb3J0IENo
+YW5uZWwKVGhlIG5vdGlvbiBvZiBhIFRyYW5zcG9ydCBDaGFubmVsIG1lYW5zIGFuIGFic3RyYWN0
+aW9uIG9mIHRoZSBiZWFyZXIgCnVuZGVybHlpbmcgdGhlIEEvViB0cmFuc3BvcnQgbGF5ZXIuIEZv
+ciB0aGUgdGltZSBiZWluZywgYSB0cmFuc3BvcnQgCmNoYW5uZWwgYWx3YXlzIGNvcnJlc3BvbmRz
+IHRvIGFuIEwyQ0FQIGNoYW5uZWwgKHdpdGggYSBQU00gaW5kaWNhdGluZyAKQVZEVFApLgpJZiB0
+aGUgQVZEVFAgTXVsdGlwbGV4aW5nIE1vZGUgaXMgbm90IHN1cHBvcnRlZCwgYSB0cmFuc3BvcnQg
+Y2hhbm5lbCAKY2FycmllcyBwYWNrZXRzIG9mIG9ubHkgb25lIHRyYW5zcG9ydCBzZXNzaW9uLiBJ
+ZiBNdWx0aXBsZXhpbmcgTW9kZSBpcyAKY29uZmlndXJlZCwgYSB0cmFuc3BvcnQgY2hhbm5lbCBj
+YW4gY2FycnkgcGFja2V0cyBiZWxvbmdpbmcgdG8gZGlmZmVyZW50IAp0cmFuc3BvcnQgc2Vzc2lv
+bnMgKG9mIHRoZSBzYW1lIG9yIGRpZmZlcmVudCBzdHJlYW1zKS4gQSBUcmFuc3BvcnQgCkNoYW5u
+ZWwgSWRlbnRpZmllciAoVENJRCwgc2VlIFNlY3Rpb24gNC4xNSkgaXMgdXNlZCB0byByZWZlciB0
+byBhClRyYW5zcG9ydCBDaGFubmVsLgoKCjUuNC40IEFkYXB0YXRpb24gU2VydmljZSDigJMgTXVs
+dGlwbGV4aW5nCkluIHRoZSBNdWx0aXBsZXhpbmcgTW9kZSwgbXVsdGlwbGUgdHJhbnNwb3J0IHNl
+c3Npb25zLCBiZWxvbmdpbmcgdG8gdGhlIApzYW1lIG9yIHRvIGEgZGlmZmVyZW50IHN0cmVhbSwg
+Y2FuIHNoYXJlIGEgY29tbW9uIHRyYW5zcG9ydCAoTDJDQVApIApjaGFubmVsLiBNb3Jlb3Zlciwg
+YW4gTDJDQVAgcGFja2V0IGNhbiBjb250YWluIG11bHRpcGxlIHBhY2tldHMgCmJlbG9uZ2luZyB0
+byB0aGUgc2FtZSBvciBkaWZmZXJlbnQgdHJhbnNwb3J0IHNlc3Npb25zLiBBbiBlbmNhcHN1bGF0
+aW9uIApoZWFkZXIgaXMgdGhlcmVmb3JlIG5lZWRlZCBmb3IgZWFjaCBNZWRpYS9SZXBvcnRpbmcv
+UmVjb3ZlcnkgcGFja2V0LiBBIApUU0lEIGNvbnRhaW5lZCBpbiB0aGlzIGhlYWRlciBhbGxvd3Mg
+Zm9yIGNvcnJlY3Qgcm91dGluZyBvZiB0aGUgcGFja2V0IAphdCB0aGUgU05LIGRldmljZS4KCgo+
+IAo+IEhhdmluZyBhdmR0cCBzb2NrZXRzIG9mZmVyZWQgYnkgdGhlIG9zIHdvdWxkIGVuZm9yY2Ug
+YmV0dGVyIHNlcGFyYXRpb24gCj4gYmV0d2VlbiB0aGUgbGF5ZXJzIGFuZCBpdCB3b3VsZCBjaGFu
+Z2UgdGhlIGxhbmRzY2FwZSBmb3IgYmx1ZXRvb3RoLm9yZyAKPiA8aHR0cDovL2JsdWV0b290aC5v
+cmc+IHZhbGlkYXRpb24gb2YgdGhlIHN0YWNrLiBJdCBkb2VzIGZlZWwgc29ydCBvZiAKPiBmdW5u
+eSB0byB3cml0ZSBjb2RlIHRvIGFzc2VtYmxlIHBhY2tldHMgaW4gdXNlcnNwYWNlLi4uIG1heWJl
+IG9uY2Ugd2UgCj4gaGF2ZSBzb21ldGhpbmcgb3RoZXIgdGhhbiBhMmRwIHJ1bm5pbmcgb24gdG9w
+IG9mIGF2ZHRwIGl0IHdpbGwgYmUgZXZlbiAKPiBtb3JlIGNvbXBlbGxpbmcgdG8gY2hhbmdlIHRo
+aW5ncy4KCkV4YWN0bHkuCkkgd2FzIGp1c3Qgd29uZGVyaW5nIGFib3V0IHRoYXQgdG9vLiBXb3Vs
+ZG4ndCBpdCBtYWtlIHNlbnNlIHRvIGhhdmUgCkFWRFRQIGFzIGFuIG91dHNpZGUgbW9kdWxlIChs
+aWJyYXJ5IG9yIGtlcm5lbCBjb2RlKSB0byBhbGxvdyBpdHMgdXNlIGZvciAKb3RoZXIgcHJvZmls
+ZXMgYnVpbHQgdXBvbiBBVkRUUCwgc3VjaCBhcyBWRFAgPwoKQ2hlZXJzLAoKRmFiaWVuCgotLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieSBEQjIgRXhwcmVz
+cwpEb3dubG9hZCBEQjIgRXhwcmVzcyBDIC0gdGhlIEZSRUUgdmVyc2lvbiBvZiBEQjIgZXhwcmVz
+cyBhbmQgdGFrZQpjb250cm9sIG9mIHlvdXIgWE1MLiBObyBsaW1pdHMuIEp1c3QgZGF0YS4gQ2xp
+Y2sgdG8gZ2V0IGl0IG5vdy4KaHR0cDovL3NvdXJjZWZvcmdlLm5ldC9wb3dlcmJhci9kYjIvCl9f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVs
+IG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9s
+aXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
