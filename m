@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-In-Reply-To: <mailman.0.1182932509.32439.bluez-devel@lists.sourceforge.net>
-To: Bluez-devel@lists.sourceforge.net
+Message-ID: <46812123.4030908@free.fr>
+Date: Tue, 26 Jun 2007 16:22:27 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
-Message-ID: <OF11C90BD2.0E4C64F9-ON48257307.002E8741-48257307.002E518F@alps.com.hk>
-From: mingyuan.luo@cn.alps.com
-Date: Wed, 27 Jun 2007 16:31:03 +0800
-Subject: [Bluez-devel] does blueZ support lisbon =?GB2312?B?o78g?=
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <467FD4DF.9090108@free.fr>
+	<1182808431.6385.30.camel@aeonflux.holtmann.net>
+In-Reply-To: <1182808431.6385.30.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] Kernel vs Userland AVDTP
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,50 +17,32 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1622944109=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multipart message in MIME format.
---===============1622944109==
-Content-Type: multipart/alternative;
-	boundary="=_alternative 002E518748257307_="
+Hi Marcel,
 
-This is a multipart message in MIME format.
---=_alternative 002E518748257307_=
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="GB2312"
+> at some point, yes. Currently it makes no sense to start with a kernel
+> version of AVDTP. Also Bluetooth 2.1 and 3.0 are gonna have high impact
+> on L2CAP and I wanna have that settled first before considering a kernel
+> based AVDTP, because it is not that simple. It would be as complex as
+> RFCOMM and so keeping it in userspace is better for now.
+> 
+I would tend to agree with you, specially on the fact that it would be 
+quite complex to implement.
+But what about a user space library? Do you thing that would make sense ?
 
-d2hldGhlciB0aGUgYWRhcHRpb24gaGFzIGNvbXBsZXRlZKO/DQo=
---=_alternative 002E518748257307_=
-Content-Transfer-Encoding: base64
-Content-Type: text/html; charset="GB2312"
+Cheers,
 
-DQo8YnI+PGZvbnQgc2l6ZT0yIGZhY2U9InNhbnMtc2VyaWYiPndoZXRoZXIgdGhlIGFkYXB0aW9u
-IGhhcyBjb21wbGV0ZWSjvzwvZm9udD4NCg==
---=_alternative 002E518748257307_=--
-
-
---===============1622944109==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Fabien
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1622944109==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1622944109==--
