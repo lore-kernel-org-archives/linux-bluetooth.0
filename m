@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY102-W69DF635E82A29A17B512DF00A0@phx.gbl>
-From: Robert Rawlins <robert_rawlins@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Wed, 27 Jun 2007 16:31:57 +0000
+Date: Tue, 26 Jun 2007 12:02:12 -0700 (PDT)
+From: walt shekrota <penguinacity@yahoo.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d89ddf300706260750o348a869dm9a4e53fd311df1a0@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] Service Discovery Issues
+Message-ID: <150441.79664.qm@web62312.mail.re1.yahoo.com>
+Subject: Re: [Bluez-users] plugz install still not right
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,106 +15,113 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1104518834=="
+Content-Type: multipart/mixed; boundary="===============1885609220=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1104518834==
-Content-Type: multipart/alternative;
-	boundary="_7bfe8c27-f28e-4e18-acfa-a29d46360344_"
+--===============1885609220==
+Content-Type: multipart/alternative; boundary="0-196315382-1182884532=:79664"
+Content-Transfer-Encoding: 8bit
 
---_7bfe8c27-f28e-4e18-acfa-a29d46360344_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+--0-196315382-1182884532=:79664
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-Hello Guys,
-=20
-I'm trying to use the DBUS API to query a device for a service using the ex=
-ample python code from the WIKI documents:
-=20
-import dbus
-bus =3D dbus.SystemBus();
-obj =3D bus.get_object('org.bluez', '/org/bluez/hci0')
-adapter =3D dbus.Interface(obj, 'org.bluez.Adapter')
-handles =3D adapter.GetRemoteServiceHandles('00:17:B0:A0:E7:09', 'opp')
-for handle in handles:
-print adapter.GetRemoteServiceRecordAsXML('00:17:B0:A0:E7:09', handle)
-=20
-However when running this code i get the following error message displayed:
-=20
-  File "./test.py", line 13, in ?    print adapter.GetRemoteServiceRecordAs=
-XML('00:17:B0:A0:E7:09', handle)  File "/var/lib/python-support/python2.4/d=
-bus/proxies.py", line 169, in __call__    reply_message =3D self._connectio=
-n.send_message_with_reply_and_block(message, timeout)dbus.DBusException: or=
-g.bluez.Error.UnknownMethod: Method "GetRemoteServiceRecordAsXML" with sign=
-ature "su" on interface "org.bluez.Adapter" doesn't exist
-Do you have any ideas what might be causing this?
-=20
-Thanks guys,
-=20
-Rob
-_________________________________________________________________
-Try Live.com - your fast, personalised homepage with all the things you car=
-e about in one place.
-http://www.live.com/?mkt=3Den-gb  =
+I think it is a copy and change from within the plugz subdirectory sample..
+ it follows here 
+ 
+ pcm.headset {
+         @args [BDADDR TIMEOUT] 
+         
+         # The Bluetooth device address for target headset, used for Audio Gateway (PC) initiated connections
+         # Please note that this value is ignored when the connection is Headset initiated
+         @args.BDADDR {
+                 type string
+                  default "00:03:89:F7:A9:78"
+         }
+ 
+         # This value represents how long we will try to reach the headset, until we give up.
+         # Value is in milliseconds
+         @args.TIMEOUT {
+                 type integer
+                 default 6000
+         }
+ 
+         type        sco
+         bdaddr      $BDADDR
+         timeout     $TIMEOUT
+ }
+ 
+ ctl.headset { 
+         type sco
+ }
+ 
+ # Simplest a2dpd possible
+ pcm.a2dpdsimple {
+         type a2dpd
+ }
+ 
+ Thanks Brad!
+ -Walt
+ 
+ Brad Midgley <bmidgley@gmail.com> wrote:  Walt,
 
---_7bfe8c27-f28e-4e18-acfa-a29d46360344_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Yes, I use 
 
-<html>
-<head>
-<style>
-P
-{
-margin:0px;
-padding:0px
-}
-body
-{
-FONT-SIZE: 10pt;
-FONT-FAMILY:Tahoma
-}
-</style>
-</head>
-<body>Hello Guys,<BR>
-&nbsp;<BR>
-I'm trying to use the DBUS API to query a device for a service using the ex=
-ample python code from the WIKI documents:<BR>
-&nbsp;<BR><FONT size=3D1>
-import dbus<BR>
-bus =3D dbus.SystemBus();<BR>
-obj =3D bus.get_object('org.bluez', '/org/bluez/hci0')<BR>
-adapter =3D dbus.Interface(obj, 'org.bluez.Adapter')<BR>
-handles =3D adapter.GetRemoteServiceHandles('00:17:B0:A0:E7:09', '</FONT><F=
-ONT face=3D"Courier New" size=3D1>opp</FONT><FONT face=3D"" size=3D1>')<BR>
-for handle in handles</FONT><FONT face=3D"Courier New" size=3D1>:<BR></FONT=
-><FONT size=3D1>
-print adapter.GetRemoteServiceRecordAsXML('00:17:B0:A0:E7:09', handle)<BR>
-&nbsp;<BR>
-However when running this code i get the following error message displayed:=
-<BR>
-&nbsp;<BR>
-&nbsp; File "./test.py", line 13, in ?<BR>&nbsp;&nbsp;&nbsp; print adapter.=
-GetRemoteServiceRecordAsXML('00:17:B0:A0:E7:09', handle)<BR>&nbsp; File "/v=
-ar/lib/python-support/python2.4/dbus/proxies.py", line 169, in __call__<BR>=
-&nbsp;&nbsp;&nbsp; reply_message =3D self._connection.send_message_with_rep=
-ly_and_block(message, timeout)<BR>dbus.DBusException: org.bluez.Error.Unkno=
-wnMethod: Method "GetRemoteServiceRecordAsXML" with signature "su" on inter=
-face "org.bluez.Adapter" doesn't exist<BR><BR>
-Do you have any ideas what might be causing this?<BR>
-&nbsp;<BR>
-Thanks guys,<BR>
-&nbsp;<BR>
-Rob<BR></FONT><br /><hr />Are you the Quizmaster?  <a href=3D'http://specia=
-ls.uk.msn.com/brainbattle' target=3D'_new'>Play BrainBattle with a friend n=
-ow! </a></body>
-</html>=
+ headset
 
---_7bfe8c27-f28e-4e18-acfa-a29d46360344_--
+in that field for alsa device. It has to match up with an entry in .asoundrc in order to talk to the plugin properly. What does your ~/.asoundrc look like?
+
+Brad
+ -------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+ 
+ 
+
+Brad Midgley <bmidgley@gmail.com> wrote: Walt,
+
+Yes, I use 
+
+ headset
+
+in that field for alsa device. It has to match up with an entry in .asoundrc in order to talk to the plugin properly. What does your ~/.asoundrc look like?
+
+Brad
+ -------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 
---===============1104518834==
+       
+---------------------------------
+Yahoo! oneSearch: Finally,  mobile search that gives answers, not web links. 
+--0-196315382-1182884532=:79664
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+I think it is a copy and change from within the plugz subdirectory sample..<br> it follows here <br> <br> pcm.headset {<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @args [BDADDR TIMEOUT] <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # The Bluetooth device address for target headset, used for Audio Gateway (PC) initiated connections<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # Please note that this value is ignored when the connection is Headset initiated<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @args.BDADDR {<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type string<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; default "00:03:89:F7:A9:78"<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br> <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # This value represents how long we will try to reach the headset, until
+ we give up.<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # Value is in milliseconds<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @args.TIMEOUT {<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type integer<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; default 6000<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br> <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sco<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bdaddr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $BDADDR<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; timeout&nbsp;&nbsp;&nbsp;&nbsp; $TIMEOUT<br> }<br> <br> ctl.headset { <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type sco<br> }<br> <br> # Simplest a2dpd possible<br> pcm.a2dpdsimple {<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type a2dpd<br> }<br> <br> Thanks Brad!<br> -Walt<br> <br> <b><i>Brad Midgley
+ &lt;bmidgley@gmail.com&gt;</i></b> wrote: <blockquote class="replbq" style="border-left: 2px solid rgb(16, 16, 255); margin-left: 5px; padding-left: 5px;"> Walt,<br><br>Yes, I use <br><br>&nbsp;headset<br><br>in that field for alsa device. It has to match up with an entry in .asoundrc in order to talk to the plugin properly. What does your ~/.asoundrc look like?<br><br>Brad<br> -------------------------------------------------------------------------<br>This SF.net email is sponsored by DB2 Express<br>Download DB2 Express C - the FREE version of DB2 express and take<br>control of your XML. No limits. Just data. Click to get it now.<br>http://sourceforge.net/powerbar/db2/_______________________________________________<br>Bluez-users mailing list<br>Bluez-users@lists.sourceforge.net<br>https://lists.sourceforge.net/lists/listinfo/bluez-users<br></blockquote> <br> <br><br><b><i>Brad Midgley &lt;bmidgley@gmail.com&gt;</i></b> wrote:<blockquote class="replbq"
+ style="border-left: 2px solid rgb(16, 16, 255); margin-left: 5px; padding-left: 5px;"> Walt,<br><br>Yes, I use <br><br>&nbsp;headset<br><br>in that field for alsa device. It has to match up with an entry in .asoundrc in order to talk to the plugin properly. What does your ~/.asoundrc look like?<br><br>Brad<br> -------------------------------------------------------------------------<br>This SF.net email is sponsored by DB2 Express<br>Download DB2 Express C - the FREE version of DB2 express and take<br>control of your XML. No limits. Just data. Click to get it now.<br>http://sourceforge.net/powerbar/db2/_______________________________________________<br>Bluez-users mailing list<br>Bluez-users@lists.sourceforge.net<br>https://lists.sourceforge.net/lists/listinfo/bluez-users<br></blockquote><br><p>&#32;
+      <hr size=1>Yahoo! oneSearch: Finally, <a href="http://us.rd.yahoo.com/evt=48252/*http://mobile.yahoo.com/mobileweb/onesearch?refer=1ONXIC"> mobile search 
+that gives answers</a>, not web links. 
+
+
+--0-196315382-1182884532=:79664--
+
+
+--===============1885609220==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -124,7 +132,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1104518834==
+--===============1885609220==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -135,4 +143,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1104518834==--
+--===============1885609220==--
