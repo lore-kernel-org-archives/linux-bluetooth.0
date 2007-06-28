@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Date: Thu, 28 Jun 2007 10:04:59 -0400
-Message-ID: <2EB6297382462046A9427D7324788A4801F55370@MCLNEXVS06.resource.ds.bah.com>
-From: "Williams, Richard" <williams_richard_b@bah.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] hcidump with multiple dongles
+Message-ID: <BAY111-F16FFF3FC5BB2814CF14434C1090@phx.gbl>
+In-Reply-To: <01c7b97e$58d4afe0$5a8bbe54@olavoo>
+From: "Clark Pope" <cepope13@hotmail.com>
+To: bluez-devel@lists.sourceforge.net, bluez-devel@lists.sf.net
+Date: Thu, 28 Jun 2007 09:40:38 -0400
+Mime-Version: 1.0
+Subject: [Bluez-devel] Trouble with bluetooth headset
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,169 +15,338 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1883520827=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
 
---===============1883520827==
-Content-class: urn:content-classes:message
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C7B98D.503923DE"
+I have a colleague that is stuck trying to get a bluetooth headset working. 
+The system is montavista linux 2.6.10 on x86 for development and PPC for 
+deployment. Below is his request to me. Any help/guidance you can provide is 
+greatly appreciated. Also, if you can recommend a known good combination of 
+headset and usb dongle that has working drivers for PPC405 (Xilinx SOC) it 
+would save us the trouble of fixing this one. Thanks, Clark
 
-This is a multi-part message in MIME format.
+-----
 
-------_=_NextPart_001_01C7B98D.503923DE
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Well, I'll accept any help I can get. As I understand it, Montavista gave us 
+Bluetooth packages as not officially supported software, but I would feel 
+free to ask them questions if I thought their software was the issue.
 
-Hello,
-=20
-I've been working on a project that requires multiple Bluetooth dongles
-on a single PC. I have a USB 2.0 hub with two dongles. I can create my
-problem in the following manner:
-=20
-- window 1     l2ping xx:xx:xx:xx:xx:xx  - so this command is running
-constantly.
-- window 2     hcidump -i hci0               - this command is dumping
-the output correctly.
-- window 3     hcitool scan -i hci1
-- window 4     hcidump -i hci1
-=20
-After a little while ( sometimes immediately ) the hcitool scan in
-window 3 will fail:
-=20
-# hcitool scan -i hci1
-Scanning...
-=20
-Inquiry failed. Connection timed out.
-#
-#
-=20
-The test works fine if I do NOT use hcidump. That is, I can run window 1
-and 3 all day with no problem. When I add hcidump, the "hcitool scan -i
-hci1" will then begin to fail to connect to the hci device.
-=20
-Have you seen this ? Any fixes?
-=20
-thank you.
-=20
-Rich Williams
-=20
+With the headset device, I think the problem is with the alsa-bluetooth 
+connection. I am getting my guidance from:
 
-------_=_NextPart_001_01C7B98D.503923DE
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+http://bluetooth-alsa.sourceforge.net
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Dus-ascii">
-<META content=3D"MSHTML 6.00.2900.3132" name=3DGENERATOR></HEAD>
-<BODY>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D737285213-28062007>Hello,</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D737285213-28062007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007>I've =
-been working on=20
-a project that requires multiple Bluetooth dongles on a single PC. I =
-have a USB=20
-2.0 hub with two dongles. I can create my problem in the following=20
-manner:</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D737285213-28062007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007>- =
-window=20
-1&nbsp;&nbsp;&nbsp; &nbsp;<STRONG>l2ping =
-xx:xx:xx:xx:xx:xx</STRONG>&nbsp; - so=20
-this command is running constantly.</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007>- =
-window=20
-2&nbsp;&nbsp;&nbsp;&nbsp; <STRONG>hcidump -i=20
-hci0</STRONG>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
-&nbsp;&nbsp;&nbsp;&nbsp;=20
-- this command is dumping the output correctly.</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007>- =
-window=20
-3&nbsp;&nbsp;&nbsp;&nbsp; <STRONG>hcitool scan -i=20
-hci1</STRONG></SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007>- =
-window=20
-4&nbsp;&nbsp;&nbsp;&nbsp; <STRONG>hcidump -i =
-hci1</STRONG></SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D737285213-28062007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007>After =
-a little while=20
-( sometimes immediately ) the hcitool scan in window 3 will=20
-fail:</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D737285213-28062007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007># =
-hcitool scan -i=20
-hci1</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D737285213-28062007>Scanning...</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D737285213-28062007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN =
-class=3D737285213-28062007>Inquiry failed.=20
-Connection timed out.</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D737285213-28062007>#</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D737285213-28062007>#</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D737285213-28062007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007>The =
-test works fine=20
-if I do NOT use hcidump. That is, I can run window 1 and 3 all day with =
-no=20
-problem. When I add hcidump, the "hcitool scan -i hci1" will then begin =
-to fail=20
-to connect to the hci device.</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D737285213-28062007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007>Have =
-you seen this ?=20
-Any fixes?</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D737285213-28062007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007>thank=20
-you.</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN=20
-class=3D737285213-28062007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007>Rich=20
-Williams</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV></BODY></HTML>
+I am using the "legacy driver" approach with the snd-bt-sco driver and the 
+btsco/btsco2 app. One issue involves whether configuration files are set up 
+so I don't have to enter the passkey. Normally this is done with a Gnome 
+(desktop) app, and that can't work on the 9479. Some of the messages on the 
+hcidump trace lead me to believe I don't have all the configuration files 
+set up correctly - to get access without a passkey, on the correct RF 
+channel, etc.
 
-------_=_NextPart_001_01C7B98D.503923DE--
+With hci0 set up, aplay shows the headphone connection:
+
+# aplay -l
+
+**** List of PLAYBACK Hardware Devices ****
+
+card 0: Headset [BT Headset], device 0: Bluetooth SCO PCM [BT SCO PCM]
+
+Subdevices: 1/1
+
+Subdevice #0: subdevice #0
+
+When btsco2 initializes, it tries to connect to the headphone, and there 
+seem to be errors in the output (I'm not sure what all of it means, but the 
+"connection refused" message seems significant):
+
+# ./btsco2 00:0B:2E:75:D0:07 &
+
+# Device is 0:0
+
+< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
+
+>HCI Event: Command Complete (0x0e) plen 6
+
+Voice setting: 0x0060
+
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+
+>HCI Event: Command Status (0x0f) plen 4
+
+>HCI Event: Connect Complete (0x03) plen 11
+
+< ACL data: handle 5 flags 0x02 dlen 12
+
+L2CAP(s): Connect req: psm 1 scid 0x0040
+
+>HCI Event: Connection Packet Type Changed (0x1d) plen 5
+
+>HCI Event: Number of Completed Packets (0x13) plen 5
+
+>ACL data: handle 5 flags 0x02 dlen 16
+
+L2CAP(s): Connect rsp: dcid 0x0046 scid 0x0040 result 1 status 2
+
+Connection pending - Authorization pending
+
+>ACL data: handle 5 flags 0x02 dlen 16
+
+L2CAP(s): Connect rsp: dcid 0x0046 scid 0x0040 result 0 status 0
+
+Connection successful
+
+< ACL data: handle 5 flags 0x02 dlen 12
+
+L2CAP(s): Config req: dcid 0x0046 flags 0x00 clen 0
+
+>HCI Event: Number of Completed Packets (0x13) plen 5
+
+>ACL data: handle 5 flags 0x02 dlen 14
+
+L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+
+Success
+
+>ACL data: handle 5 flags 0x02 dlen 16
+
+L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+
+MTU 48
+
+< ACL data: handle 5 flags 0x02 dlen 14
+
+L2CAP(s): Config rsp: scid 0x0046 flags 0x00 result 0 clen 0
+
+Success
+
+>HCI Event: Number of Completed Packets (0x13) plen 5
+
+< ACL data: handle 5 flags 0x02 dlen 24
+
+L2CAP(d): cid 0x0046 len 20 [psm 0]
+
+>HCI Event: Number of Completed Packets (0x13) plen 5
+
+>ACL data: handle 5 flags 0x02 dlen 27
+
+>ACL data: handle 5 flags 0x01 dlen 25
+
+L2CAP(d): cid 0x0040 len 48 [psm 0]
+
+< ACL data: handle 5 flags 0x02 dlen 26
+
+L2CAP(d): cid 0x0046 len 22 [psm 0]
+
+>HCI Event: Number of Completed Packets (0x13) plen 5
+
+>ACL data: handle 5 flags 0x02 dlen 27
+
+>ACL data: handle 5 flags 0x01 dlen 25
+
+L2CAP(d): cid 0x0040 len 48 [psm 0]
+
+< ACL data: handle 5 flags 0x02 dlen 26
+
+L2CAP(d): cid 0x0046 len 22 [psm 0]
+
+>HCI Event: Number of Completed Packets (0x13) plen 5
+
+>ACL data: handle 5 flags 0x02 dlen 22
+
+L2CAP(d): cid 0x0040 len 18 [psm 0]
+
+< ACL data: handle 5 flags 0x02 dlen 12
+
+L2CAP(s): Disconn req: dcid 0x0046 scid 0x0040
+
+>HCI Event: Number of Completed Packets (0x13) plen 5
+
+>ACL data: handle 5 flags 0x02 dlen 12
+
+L2CAP(s): Disconn rsp: dcid 0x0046 scid 0x0040
+
+< ACL data: handle 5 flags 0x02 dlen 12
+
+L2CAP(s): Connect req: psm 3 scid 0x0040
+
+>HCI Event: Number of Completed Packets (0x13) plen 5
+
+>ACL data: handle 5 flags 0x02 dlen 16
+
+L2CAP(s): Connect rsp: dcid 0x0047 scid 0x0040 result 1 status 2
+
+Connection pending - Authorization pending
+
+>HCI Event: Link Key Request (0x17) plen 6
+
+Can't connect RFCOMM channel< ACL data: handle 5 flags 0x02 dlen 12
+
+L2CAP(s): Connect req: psm 3 scid 0x0040
+
+>HCI Event: Number of Completed Packets (0x13) plen 5
+
+>ACL data: handle 5 flags 0x02 dlen 16
+
+L2CAP(s): Connect rsp: dcid 0x0047 scid 0x0040 result 1 status 2
+
+Connection pending - Authorization pending
+
+>ACL data: handle 5 flags 0x02 dlen 16
+
+L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0040 result 3 status 0
+
+Connection refused - security block
+
+Can't connect RFCOMM channel> HCI Event: Disconn Complete (0x05) plen 4
+
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+
+>HCI Event: Command Status (0x0f) plen 4
+
+>HCI Event: Connect Complete (0x03) plen 11
+
+< ACL data: handle 6 flags 0x02 dlen 12
+
+L2CAP(s): Connect req: psm 3 scid 0x0040
+
+>HCI Event: Connection Packet Type Changed (0x1d) plen 5
+
+>HCI Event: Number of Completed Packets (0x13) plen 5
+
+>ACL data: handle 6 flags 0x02 dlen 16
+
+L2CAP(s): Connect rsp: dcid 0x0049 scid 0x0040 result 1 status 2
+
+Connection pending - Authorization pending
+
+>HCI Event: Link Key Request (0x17) plen 6
+
+snd-bt-sco: playback_open
+
+snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 2000
+
+snd-bt-sco: playback_trigger 1
+
+snd-bt-sco: setting playback to bspcm
+
+snd-bt-sco: playback_trigger 0
+
+snd-bt-sco: setting playback to NULL
+
+Can't connect RFCOMM channel< ACL data: handle 6 flags 0x02 dlen 12
+
+L2CAP(s): Connect req: psm 3 scid 0x0040
+
+>HCI Event: Number of Completed Packets (0x13) plen 5
+
+>ACL data: handle 6 flags 0x02 dlen 16
+
+L2CAP(s): Connect rsp: dcid 0x0049 scid 0x0040 result 1 status 2
+
+Connection pending - Authorization pending
+
+>ACL data: handle 6 flags 0x02 dlen 16
+
+L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0040 result 3 status 0
+
+Connection refused - security block
+
+Can't connect RFCOMM channel> HCI Event: Disconn Complete (0x05) plen 4
+
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+
+>HCI Event: Command Status (0x0f) plen 4
+
+>HCI Event: Connect Complete (0x03) plen 11
+
+>HCI Event: Connection Packet Type Changed (0x1d) plen 5
+
+< ACL data: handle 7 flags 0x02 dlen 12
+
+L2CAP(s): Connect req: psm 3 scid 0x0040
+
+>HCI Event: Number of Completed Packets (0x13) plen 5
+
+>ACL data: handle 7 flags 0x02 dlen 16
+
+L2CAP(s): Connect rsp: dcid 0x004a scid 0x0040 result 1 status 2
+
+Connection pending - Authorization pending
+
+>HCI Event: Link Key Request (0x17) plen 6
+
+snd-bt-sco: playback_open
+
+snd-bt-sco: prepare ok bps: 16000 size: 8000 count: 2000
+
+snd-bt-sco: playback_trigger 1
+
+snd-bt-sco: setting playback to bspcm
+
+Can't connect RFCOMM channel< ACL data: handle 7 flags 0x02 dlen 12
+
+L2CAP(s): Connect req: psm 3 scid 0x0040
+
+>HCI Event: Number of Completed Packets (0x13) plen 5
+
+>ACL data: handle 7 flags 0x02 dlen 16
+
+L2CAP(s): Connect rsp: dcid 0x004a scid 0x0040 result 1 status 2
+
+Connection pending - Authorization pending
+
+>ACL data: handle 7 flags 0x02 dlen 16
+
+L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0040 result 3 status 0
+
+Connection refused - security block
+
+Can't connect RFCOMM channel> HCI Event: Disconn Complete (0x05) plen 4
+
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+
+>HCI Event: Command Status (0x0f) plen 4
+
+>HCI Event: Connect Complete (0x03) plen 11
+
+>HCI Event: Connection Packet Type Changed (0x1d) plen 5
+
+< ACL data: handle 8 flags 0x02 dlen 12
+
+L2CAP(s): Connect req: psm 3 scid 0x0040
+
+>HCI Event: Number of Completed Packets (0x13) plen 5
+
+>ACL data: handle 8 flags 0x02 dlen 16
+
+L2CAP(s): Connect rsp: dcid 0x004c scid 0x0040 result 1 status 2
+
+Connection pending - Authorization pending
+
+>HCI Event: Link Key Request (0x17) plen 6
 
 
---===============1883520827==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+etc.
+
+More later - when I return from vacation I'll spend more time on it. Any 
+help I can get would be appreciated.
+
+Bob
+
+_________________________________________________________________
+Get a preview of Live Earth, the hottest event this summer - only on MSN 
+http://liveearth.msn.com?source=msntaglineliveearthhm
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1883520827==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1883520827==--
