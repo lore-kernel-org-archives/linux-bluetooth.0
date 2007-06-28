@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BAY111-F16FFF3FC5BB2814CF14434C1090@phx.gbl>
-References: <BAY111-F16FFF3FC5BB2814CF14434C1090@phx.gbl>
-Date: Thu, 28 Jun 2007 16:59:21 +0200
-Message-Id: <1183042761.9499.25.camel@aeonflux.holtmann.net>
+In-Reply-To: <2EB6297382462046A9427D7324788A4801F55370@MCLNEXVS06.resource.ds.bah.com>
+References: <2EB6297382462046A9427D7324788A4801F55370@MCLNEXVS06.resource.ds.bah.com>
+Date: Thu, 28 Jun 2007 16:57:35 +0200
+Message-Id: <1183042655.9499.22.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Cc: bluez-devel@lists.sf.net
-Subject: Re: [Bluez-devel] Trouble with bluetooth headset
+Subject: Re: [Bluez-devel] hcidump with multiple dongles
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,22 +20,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Clark,
+Hi Richard,
 
-> I have a colleague that is stuck trying to get a bluetooth headset working. 
-> The system is montavista linux 2.6.10 on x86 for development and PPC for 
-> deployment. Below is his request to me. Any help/guidance you can provide is 
-> greatly appreciated. Also, if you can recommend a known good combination of 
-> headset and usb dongle that has working drivers for PPC405 (Xilinx SOC) it 
-> would save us the trouble of fixing this one.
+> I've been working on a project that requires multiple Bluetooth
+> dongles on a single PC. I have a USB 2.0 hub with two dongles. I can
+> create my problem in the following manner:
+>  
+> - window 1     l2ping xx:xx:xx:xx:xx:xx  - so this command is running
+> constantly.
+> - window 2     hcidump -i hci0               - this command is dumping
+> the output correctly.
+> - window 3     hcitool scan -i hci1
 
-the 2.6.10 kernel is highly outdated. Switch to the upcoming 2.6.22
-kernel. We are not supporting these old kernels and I am not doing any
-backports for it.
+this must be hcitool -i hci1 scan.
+
+> - window 4     hcidump -i hci1
+>  
+> After a little while ( sometimes immediately ) the hcitool scan in
+> window 3 will fail:
+>  
+> # hcitool scan -i hci1
+> Scanning...
+>  
+> Inquiry failed. Connection timed out.
+> #
+> #
+>  
+> The test works fine if I do NOT use hcidump. That is, I can run window
+> 1 and 3 all day with no problem. When I add hcidump, the "hcitool scan
+> -i hci1" will then begin to fail to connect to the hci device.
+
+Does using "hcitool inq" helps?
 
 Regards
 
 Marcel
+
 
 
 
