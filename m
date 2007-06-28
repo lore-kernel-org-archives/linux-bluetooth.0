@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <695f62bb0706290803w3f55513exce876b64c114fa02@mail.gmail.com>
-Date: Fri, 29 Jun 2007 17:03:38 +0200
-From: "Olivier Arnaud" <oarnaud79.linux@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] Search obex Authentication enabled device for test
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BAY111-F1375482293258DA33AFC60C1090@phx.gbl>
+References: <BAY111-F1375482293258DA33AFC60C1090@phx.gbl>
+Date: Thu, 28 Jun 2007 17:52:34 +0200
+Message-Id: <1183045954.9499.35.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Cc: bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] Trouble with bluetooth headset
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,63 +17,33 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1681088397=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1681088397==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_94511_21466380.1183129418209"
+Hi Clark,
 
-------=_Part_94511_21466380.1183129418209
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> So you think the problem shown in the log is related to the kernel version, 
+> not just some configuration issue? I think the bluetooth part is working it 
+> just rejects the connect for some reason.
 
-Hi,
+I don't even know, but I am simply not chasing any bugs from people that
+don't run at least a reasonable new kernel. And 2.6.10 is ancient. If
+someone else wanna look at it, it is fine by me, but I won't until you
+have this issue with a recent kernel and latest bluez-utils.
 
-Sorry to post it here, but I didn't find any more suitable place.
+Regards
 
-I'm searching a device (FTP server) which is asking for Obex authentication
-to test my implementation.
-
-Can any of you help me?
-
-Thanks,
-br,
-Olivier
-
-------=_Part_94511_21466380.1183129418209
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi,<br><br>Sorry to post it here, but I didn&#39;t find any more suitable place.<br><br>I&#39;m searching a device (FTP server) which is asking for Obex authentication to test my implementation.<br><br>Can any of you help me?
-<br><br>Thanks,<br>br,<br>Olivier<br>
-
-------=_Part_94511_21466380.1183129418209--
+Marcel
 
 
---===============1681088397==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1681088397==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1681088397==--
