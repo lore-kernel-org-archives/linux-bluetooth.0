@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <OF1E5E9AFC.E2E3A26A-ON48257308.000311B1-48257308.0006455D@alps.com.hk>
-References: <OF1E5E9AFC.E2E3A26A-ON48257308.000311B1-48257308.0006455D@alps.com.hk>
-Date: Thu, 28 Jun 2007 17:01:16 +0200
-Message-Id: <1183042877.9499.29.camel@aeonflux.holtmann.net>
+In-Reply-To: <BAY111-F16FFF3FC5BB2814CF14434C1090@phx.gbl>
+References: <BAY111-F16FFF3FC5BB2814CF14434C1090@phx.gbl>
+Date: Thu, 28 Jun 2007 16:59:21 +0200
+Message-Id: <1183042761.9499.25.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] =?utf-8?q?does_blueZ_support_lisbon_=EF=BC=9F?=
+Cc: bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] Trouble with bluetooth headset
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,12 +21,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Clark,
 
-> it is perfect.do you have any plan to port blueZ to windows os? 
+> I have a colleague that is stuck trying to get a bluetooth headset working. 
+> The system is montavista linux 2.6.10 on x86 for development and PPC for 
+> deployment. Below is his request to me. Any help/guidance you can provide is 
+> greatly appreciated. Also, if you can recommend a known good combination of 
+> headset and usb dongle that has working drivers for PPC405 (Xilinx SOC) it 
+> would save us the trouble of fixing this one.
 
-No, no and no. I don't support Windows at all and besides that, you
-can't port BlueZ to it without re-writing the kernel drivers.
+the 2.6.10 kernel is highly outdated. Switch to the upcoming 2.6.22
+kernel. We are not supporting these old kernels and I am not doing any
+backports for it.
 
 Regards
 
