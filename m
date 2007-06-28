@@ -1,7 +1,7 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 MIME-Version: 1.0
-Date: Thu, 28 Jun 2007 10:06:59 -0400
-Message-ID: <2EB6297382462046A9427D7324788A4801F55372@MCLNEXVS06.resource.ds.bah.com>
+Date: Thu, 28 Jun 2007 10:04:59 -0400
+Message-ID: <2EB6297382462046A9427D7324788A4801F55370@MCLNEXVS06.resource.ds.bah.com>
 From: "Williams, Richard" <williams_richard_b@bah.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 Subject: [Bluez-devel] hcidump with multiple dongles
@@ -14,31 +14,24 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0991346570=="
+Content-Type: multipart/mixed; boundary="===============1883520827=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 This is a multi-part message in MIME format.
 
---===============0991346570==
+--===============1883520827==
 Content-class: urn:content-classes:message
 Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C7B98D.97DEEA8A"
+	boundary="----_=_NextPart_001_01C7B98D.503923DE"
 
 This is a multi-part message in MIME format.
 
-------_=_NextPart_001_01C7B98D.97DEEA8A
+------_=_NextPart_001_01C7B98D.503923DE
 Content-Type: text/plain;
 	charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 
-Sorry, I forgot to mention that I'm running 2.6.20-1.2952 Fedora Core 6
-with the latest Bluez libs and utils.
-thanks,
-=20
-Rich
-=20
------------------------------------------------------------------
 Hello,
 =20
 I've been working on a project that requires multiple Bluetooth dongles
@@ -72,9 +65,8 @@ thank you.
 =20
 Rich Williams
 =20
-=20
 
-------_=_NextPart_001_01C7B98D.97DEEA8A
+------_=_NextPart_001_01C7B98D.503923DE
 Content-Type: text/html;
 	charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
@@ -85,22 +77,6 @@ Content-Transfer-Encoding: quoted-printable
 charset=3Dus-ascii">
 <META content=3D"MSHTML 6.00.2900.3132" name=3DGENERATOR></HEAD>
 <BODY>
-<DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007><SPAN=20
-class=3D620340514-28062007>Sorry, I forgot to mention that I'm running=20
-2.6.20-1.2952 Fedora Core 6 with the latest Bluez libs and=20
-utils.</SPAN></SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007><SPAN=20
-class=3D620340514-28062007>thanks,</SPAN></SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007><SPAN=20
-class=3D620340514-28062007></SPAN></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007><SPAN=20
-class=3D620340514-28062007>Rich</SPAN></SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007><SPAN=20
-class=3D620340514-28062007></SPAN></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007><SPAN=20
-class=3D620340514-28062007>----------------------------------------------=
--------------------</SPAN></SPAN></FONT></DIV>
 <DIV><FONT face=3DArial size=3D2><SPAN=20
 class=3D737285213-28062007>Hello,</SPAN></FONT></DIV>
 <DIV><FONT face=3DArial size=3D2><SPAN=20
@@ -124,14 +100,14 @@ window=20
 hci0</STRONG>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
 &nbsp;&nbsp;&nbsp;&nbsp;=20
 - this command is dumping the output correctly.</SPAN></FONT></DIV>
-<DIV><SPAN class=3D737285213-28062007><FONT face=3DArial><FONT =
-size=3D2>- window=20
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007>- =
+window=20
 3&nbsp;&nbsp;&nbsp;&nbsp; <STRONG>hcitool scan -i=20
-hci1</STRONG></FONT></FONT></SPAN></DIV>
-<DIV><SPAN class=3D737285213-28062007><FONT face=3DArial><FONT =
-size=3D2>- window=20
-4&nbsp;&nbsp;&nbsp;&nbsp; <STRONG>hcidump -i=20
-hci1</STRONG></FONT></FONT></SPAN></DIV>
+hci1</STRONG></SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007>- =
+window=20
+4&nbsp;&nbsp;&nbsp;&nbsp; <STRONG>hcidump -i =
+hci1</STRONG></SPAN></FONT></DIV>
 <DIV><FONT face=3DArial size=3D2><SPAN=20
 class=3D737285213-28062007></SPAN></FONT>&nbsp;</DIV>
 <DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007>After =
@@ -176,13 +152,12 @@ you.</SPAN></FONT></DIV>
 class=3D737285213-28062007></SPAN></FONT>&nbsp;</DIV>
 <DIV><FONT face=3DArial size=3D2><SPAN class=3D737285213-28062007>Rich=20
 Williams</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV></DIV>
 <DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV></BODY></HTML>
 
-------_=_NextPart_001_01C7B98D.97DEEA8A--
+------_=_NextPart_001_01C7B98D.503923DE--
 
 
---===============0991346570==
+--===============1883520827==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -193,7 +168,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0991346570==
+--===============1883520827==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -204,4 +179,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============0991346570==--
+--===============1883520827==--
