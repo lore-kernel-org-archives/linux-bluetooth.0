@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46852386.8050608@free.fr>
-Date: Fri, 29 Jun 2007 17:21:42 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
+Message-ID: <695f62bb0706290803w3f55513exce876b64c114fa02@mail.gmail.com>
+Date: Fri, 29 Jun 2007 17:03:38 +0200
+From: "Olivier Arnaud" <oarnaud79.linux@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] CVS audio-api.txt : 1st question
+Subject: [Bluez-devel] Search obex Authentication enabled device for test
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,69 +14,63 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1681088397=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+--===============1681088397==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_94511_21466380.1183129418209"
 
-Hi Bluez developer,
+------=_Part_94511_21466380.1183129418209
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-I'm trying to move forward on the design of the Bluez audio API. I'm 
-gonna suggest some new methods and signals to handle HFP and A2DP, 
-however at first i feel the need to understand the following methods and 
-signals:
+Hi,
 
-Methods:
---------
-void Play()
-void Stop()
-uint16 GetSpeakerGain()
-uint16 GetMicrophoneGain()
-void SetSpeakerGain(uint16 gain)
-void SetMicrophoneGain(uint16 gain)
+Sorry to post it here, but I didn't find any more suitable place.
 
-Signals:
-------------
+I'm searching a device (FTP server) which is asking for Obex authentication
+to test my implementation.
 
-void SpeakerGainChanged(uint16 gain)
-void MicrophoneGainChanged(uint16 gain)
+Can any of you help me?
 
-Here is the question : aren't those actions and events not supposed to 
-be handled by the various ALSA plugins,
-that would communicate using a dedicated unix socket ?
+Thanks,
+br,
+Olivier
 
-In fact i'm afraid of the following issues if those methods/signals are 
-available:
- * An application could use snd_pcm_start to start playing, and another 
-one could shut down the stream using
-Stop() : the result would certainly be an unexpectedly broken stream.
- * Application developpers could be rather confused (Which one of Play() 
-or snd_pcm_start should i use? Or maybe i should use both? In this case 
-which one am i supposed to call first ?)
- * If the ALSA plugin is supposed to call those method by itself, this 
-would mean bring dbus in each
-application process' space, which is not that nice...
- * Gain management signals and functions are redundant with equivalent 
-ALSA&GStreamer functions.
+------=_Part_94511_21466380.1183129418209
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-I hope this will bring some light on the expected use of those 
-methods/signals...
+Hi,<br><br>Sorry to post it here, but I didn&#39;t find any more suitable place.<br><br>I&#39;m searching a device (FTP server) which is asking for Obex authentication to test my implementation.<br><br>Can any of you help me?
+<br><br>Thanks,<br>br,<br>Olivier<br>
 
-Cheers,
-
-Fabien
+------=_Part_94511_21466380.1183129418209--
 
 
-
-
-
+--===============1681088397==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1681088397==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1681088397==--
