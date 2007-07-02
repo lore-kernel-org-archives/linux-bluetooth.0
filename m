@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1183412947.20815.7.camel@localhost>
-References: <1183412947.20815.7.camel@localhost>
-Date: Tue, 03 Jul 2007 05:33:16 +0200
-Message-Id: <1183433596.6351.25.camel@aeonflux.holtmann.net>
+From: Mats Erik Andersson <mats.andersson64@comhem.se>
+To: Bluez-users <bluez-users@lists.sourceforge.net>
+Date: Mon, 02 Jul 2007 23:49:07 +0200
+Message-Id: <1183412947.20815.7.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Only one pand-daemon?
+Subject: [Bluez-users] Only one pand-daemon?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,23 +18,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mats,
+Hello all,
 
-> I am facing the problem that I cannot start more than
-> one listening pand-daemon, in spite of using two usb-dongles.
-> The second call with 'pand --listen -e bdaddr ...' immediately
-> ends with return value zero and no traces in any log file.
-> I am running Bluez-utils 3.7 on Debian Etch. Slowly I am 
-> beginning to think that it could be DBUS that haunts me, but I
-> have just begun studying the source code of pand to make sure.
+I am facing the problem that I cannot start more than
+one listening pand-daemon, in spite of using two usb-dongles.
+The second call with 'pand --listen -e bdaddr ...' immediately
+ends with return value zero and no traces in any log file.
+I am running Bluez-utils 3.7 on Debian Etch. Slowly I am 
+beginning to think that it could be DBUS that haunts me, but I
+have just begun studying the source code of pand to make sure.
+Any pointers are welcome.!
 
-I have no idea why you actually need two pand, but you can call pand
-with -i hciX to bind it to a specific adapter.
 
-Regards
-
-Marcel
-
+Best regards,	Mats Erik Andersson
 
 
 -------------------------------------------------------------------------
