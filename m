@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <18a15270707021204o3ffc0021pc3f0d4b0ec278c39@mail.gmail.com>
-Date: Mon, 2 Jul 2007 20:04:35 +0100
-From: "Ranulf Doswell" <cbe@ranulf.net>
+Message-ID: <18a15270707021202o41c2e1a7id7030b8fdeaaa318@mail.gmail.com>
+Date: Mon, 2 Jul 2007 20:02:15 +0100
+From: "Ranulf Doswell" <ralf@ranulf.net>
 To: cbe-oss-dev@ozlabs.org, bluez-devel@lists.sf.net
+In-Reply-To: <1183268165.8189.9.camel@concordia.ozlabs.ibm.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] [PATCH] bluetooth: reset unexpected connections
+References: <18a15270706300844t28c3aab6jb24f45453ce1557b@mail.gmail.com>
+	<1183268165.8189.9.camel@concordia.ozlabs.ibm.com>
+Subject: Re: [Bluez-devel] [Cbe-oss-dev] [PATCH] reset unexpected bluetooth
+	data connections
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,74 +18,86 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1633505838=="
+Content-Type: multipart/mixed; boundary="===============0445151919=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1633505838==
+--===============0445151919==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_88086_15425107.1183403075189"
+	boundary="----=_Part_88042_11020312.1183402935842"
 
-------=_Part_88086_15425107.1183403075189
+------=_Part_88042_11020312.1183402935842
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-From: Ranulf Doswell <ralf@ranulf.net>
+Hi Michael,
 
-Send a reset command to any device that sends us data when there is no
-active
-connection to that device. This hopefully discourages the device from
-sending
-any more data which causes the syslog to fill up rapidly otherwise.
+Thanks for the info, specifically the pointers to the coding style and patch
+submission rules, which I neglected to look for in my excitement to create
+my first kernel patch!
 
-Signed-off-by: Ranulf Doswell <ralf@ranulf.net>
+ I'll repost the patch in a few minutes as I've made the comments generic
+rather than sounding like a PS3-specific ptroblem.
 
----
+This is one of the places you should send this patch, the other is the
+> bluetooth list, which I've CC'ed. The main issue is whether your patch
+> is safe in the general case, or if it's just a PS3 issue.
 
-An example device which causes this problem is the Sony Playstation six-axis
-controller which continues sending data even after the host is rebooted as
-the linux kernel stack returns before the controller's stack times out.
 
-This patch is against 2.6.22-rc5
+I haven't got a great deal of BT equipment, so it's hard to test, but my
+personal opinion is that any device which sends unsolicited data should
+survive having a reset sent to it, as it's not correct for it to be sending
+ACL data without a valid connection established. Arguably, the same patch
+should be applied when unsolicited SCO data is received, although I have no
+way of testing this.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 8943c93..fb99b95 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1340,6 +1340,12 @@ static inline void hci_acldata_packet(struct hci_dev
-*hdev, struct sk_buff *skb)
-        } else {
-                BT_ERR("%s ACL packet for unknown connection handle %d",
-                        hdev->name, handle);
-+
-+               /* Force the device to reset in the hope that it will then
-+                * leave us alone. In some devices, a reboot doesn't provide
-+                * enough time for the device's stack to time out, so it
-keeps
-+                * sending data until forcibly terminated. */
-+               hci_reset_req(hdev, 0);
-        }
+Without the patch, it doesn't make sense to syslog the invalid data as it
+opens up the system to an easily exploitable DOS simply by getting within
+100m of a machine and flooding it with packets from a handheld device. This
+particular device was sending about 100 packets per second.
 
-        kfree_skb(skb);
+Cool, do the sixaxis controllers work with this patch applied?
 
-------=_Part_88086_15425107.1183403075189
+
+Pascal's hidd patch (patch-hidd-2.24-pabr2) works well to enable the
+controllers to be detected. It looks like the most important part of the
+patch has already been accepted into the bluez-utils tree, although the MTU
+increase part of the patch hasn't been included, so PS3 controllers still
+don't work out of the box as they require a slightly larger MTU.
+
+All this patch does is reset the controllers when the machine is rebooted as
+they otherwise continue to send packets until the machine is powered down.
+It seems that their timeout is about a minute and that linux's stack running
+provides sufficient ACK that data is still being received even if the kernel
+itself doesn't know anything about the connection.
+
+An additional patch to send every bluetooth device a reset as the kernel is
+shutting down would probably also be a good idea, although it is possible to
+add "hidd --killall" to a shutdown script to achieve the same result.
+
+Cheers,
+    Ralf.
+
+------=_Part_88042_11020312.1183402935842
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-From: Ranulf Doswell &lt;<a href="mailto:ralf@ranulf.net">ralf@ranulf.net</a>&gt;<br><br>Send a reset command to any device that sends us data when there is no active<br>connection to that device. This hopefully discourages the device from sending
-<br>any more data which causes the syslog to fill up rapidly otherwise.<br><br>Signed-off-by: Ranulf Doswell &lt;<a href="mailto:ralf@ranulf.net">ralf@ranulf.net</a>&gt;<br><br>---<br><br>An example device which causes this problem is the Sony Playstation six-axis
-<br>controller which continues sending data even after the host is rebooted as<br>the linux kernel stack returns before the controller&#39;s stack times out.<br><br>This patch is against 2.6.22-rc5<br><br>diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-<br>index 8943c93..fb99b95 100644<br>--- a/net/bluetooth/hci_core.c<br>+++ b/net/bluetooth/hci_core.c<br>@@ -1340,6 +1340,12 @@ static inline void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } else {
-<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BT_ERR(&quot;%s ACL packet for unknown connection handle %d&quot;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; hdev-&gt;name, handle);<br>+<br>+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Force the device to reset in the hope that it will then<br>
-+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * leave us alone. In some devices, a reboot doesn&#39;t provide<br>+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * enough time for the device&#39;s stack to time out, so it keeps<br>+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * sending data until forcibly terminated. */
-<br>+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; hci_reset_req(hdev, 0);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; kfree_skb(skb);<br><br>
+Hi Michael,<br><br>Thanks for the info, specifically the pointers to the coding style and patch submission rules, which I neglected to look for in my excitement to create my first kernel patch!<br><br>&nbsp;I&#39;ll repost the patch in a few minutes as I&#39;ve made the comments generic rather than sounding like a PS3-specific ptroblem.
+<br><br><div><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">This is one of the places you should send this patch, the other is the<br>bluetooth list, which I&#39;ve CC&#39;ed. The main issue is whether your patch
+<br>is safe in the general case, or if it&#39;s just a PS3 issue.</blockquote><div><br>I haven&#39;t got a great deal of BT equipment, so it&#39;s hard to test, but my personal opinion is that any device which sends unsolicited data should survive having a reset sent to it, as it&#39;s not correct for it to be sending ACL data without a valid connection established. Arguably, the same patch should be applied when unsolicited SCO data is received, although I have no way of testing this.
+<br><br>Without the patch, it doesn&#39;t make sense to syslog the invalid data as it opens up the system to an easily exploitable DOS simply by getting within 100m of a machine and flooding it with packets from a handheld device. This particular device was sending about 100 packets per second.
+<br><br></div><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Cool, do the sixaxis controllers work with this patch applied?
+</blockquote><div><br>Pascal&#39;s hidd patch (patch-hidd-2.24-pabr2) works well to enable the controllers to be detected. It looks like the most important part of the patch has already been accepted into the bluez-utils tree, although the MTU increase part of the patch hasn&#39;t been included, so PS3 controllers still don&#39;t work out of the box as they require a slightly larger MTU.
+<br><br>All this patch does is reset the controllers when the machine is rebooted as they otherwise continue to send packets until the machine is powered down. It seems that their timeout is about a minute and that linux&#39;s stack running provides sufficient ACK that data is still being received even if the kernel itself doesn&#39;t know anything about the connection.
+<br><br>An additional patch to send every bluetooth device a reset as the kernel is shutting down would probably also be a good idea, although it is possible to add &quot;hidd --killall&quot; to a shutdown script to achieve the same result.
+<br><br></div><div>Cheers,<br>&nbsp;&nbsp;&nbsp; Ralf.</div></div><br>
 
-------=_Part_88086_15425107.1183403075189--
+------=_Part_88042_11020312.1183402935842--
 
 
---===============1633505838==
+--===============0445151919==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -92,7 +108,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1633505838==
+--===============0445151919==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -103,4 +119,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1633505838==--
+--===============0445151919==--
