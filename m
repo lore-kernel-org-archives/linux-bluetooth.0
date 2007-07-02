@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46892FEC.7000705@free.fr>
-Date: Mon, 02 Jul 2007 19:03:40 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
+Date: Mon, 2 Jul 2007 16:15:40 +0200
+From: Mario Iseli <mario@marioiseli.com>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20070702141540.GA3978@aismis.intra.grenchen.ch>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46852386.8050608@free.fr>
-	<2d5a2c100706291110i473d080bv6ba634f0eb8d9deb@mail.gmail.com>
-In-Reply-To: <2d5a2c100706291110i473d080bv6ba634f0eb8d9deb@mail.gmail.com>
-Subject: Re: [Bluez-devel] CVS audio-api.txt : 1st question
+Subject: [Bluez-devel] bluez packages in Debian GNU/Linux
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,75 +14,76 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1790190362=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Luiz Augusto,
-Thanks for your answers !!
 
-Please find some more comments below.
-> Hello Fabien,
-> 
-> The API is not properly design for audio over hci that's why you are 
-> confused.
-
-Oh you're damn right. I knew about this sco over PCM way of doing 
-things, i just completely forgot about it when i read the interface, 
-sorry about that :-(
+--===============1790190362==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="k1lZvvs/B4yU6o8G"
+Content-Disposition: inline
 
 
-> Those methods make no sense as you had mentioned the commands always
-> come from/goes to alsa plugin (we have just one plugin for pcm that should
-> handle any kind of audio device) via unix socket. So a normal scenarios when
-> sco over hci is to CreateHeadset in the very first time, this will salve 
-> the device
-> in the storage so it is no longer necessary to create it anymore. This 
-> mean we
-> don't need any method call to the API to get audio working while in hci 
-> mode,
+--k1lZvvs/B4yU6o8G
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Oh that's nice :-)
+Hello Bluez developers,
 
-> the plugin already works on demand and I currently fixing the concurrent
-> connections when an application want to open the device for playback and
-> capture at same time.
-> The current API is only useful for audio over PCM, in that case I guess 
-> we need
-> the API methods to be able to control the streams.
+I have seen the packages.html file and saw the paragraph about Debian.
+It's no more the case that the Debian packages are only maintained by
+Edd Dumbill, they are now maintained by a whole team which often updates
+the packages in the distribution. Could you please refer to
+http://alioth.debian.org/projects/pkg-bluetooth/ instead of Edd's blog?
+This is the official way now.
 
-Yes and no. The issue with this approach is that applications need to be 
-modified to work with sco-over-pcm, which is not very nice :-(
-I guess it could be possible to have the pcm_bluetooth ALSA plugin to be 
-used even in sco over PCM case, using the ALSA device as slave pcm.
-What do you think of thus idea ?
+Thank you and regards,
+Mario
+
+--=20
+  .''`.     Mario Iseli <admin@marioiseli.com>
+ : :'  :    proud user of Debian unstable
+ `. `'`
+   `-  Debian - when you have better things to do than fixing a system
+
+--k1lZvvs/B4yU6o8G
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFGiQiMJ9EDSN0bDvcRAmOCAKCBJNeGCaExTpec3/74E1WYJdsuawCfU5hq
+mZv+f1ML8XNBZLEo9kfaxwg=
+=ja7B
+-----END PGP SIGNATURE-----
+
+--k1lZvvs/B4yU6o8G--
 
 
-> We could disable those concurrent method while in hci mode as they 
-> probably break
-> the plugin stream, actually they normally affects only the rfcomm socket 
-> because
-> sco socket got duped in the process so plugin got its own reference that 
-> is not
-> affected by API calls, but anyway this is a not common behavior for a 
-> headset.
-
-Indeed, and according to HSP/HFP specs, the sco channel is supposed to 
-be closed before the RFCOMM one...
-
-Btw, sorry to ask again : has anybody an explanation on the reason for 
-the Gain management signals&functions ?
-
-Cheers,
-
-Fabien
+--===============1790190362==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1790190362==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1790190362==--
