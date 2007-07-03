@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <468A7156.1050708@gmail.com>
-Date: Tue, 03 Jul 2007 21:25:02 +0530
-From: Rogue <roguexz@gmail.com>
+Message-ID: <468A02F2.7030903@free.fr>
+Date: Tue, 03 Jul 2007 10:04:02 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46896137.90202@gmail.com>
-	<d89ddf300707021858u2e5e8f80k35794595254736f6@mail.gmail.com>
-In-Reply-To: <d89ddf300707021858u2e5e8f80k35794595254736f6@mail.gmail.com>
-Subject: Re: [Bluez-devel] A few questions about bluetooth-alsa project
+References: <46852386.8050608@free.fr>	<2d5a2c100706291110i473d080bv6ba634f0eb8d9deb@mail.gmail.com>	<46892FEC.7000705@free.fr>
+	<d89ddf300707022031p349950e7w821a74cce27fb321@mail.gmail.com>
+In-Reply-To: <d89ddf300707022031p349950e7w821a74cce27fb321@mail.gmail.com>
+Subject: Re: [Bluez-devel] CVS audio-api.txt : 1st question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,64 +21,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Brad Midgley wrote:
-> hey
->
->     So first up, I have built sample spec files that generate rpm
->     files out
->     of sbc and plugz. In case you are interested then I can share them
->     with
->     you all.
->
->
-> sure... I could put them in contrib/
->
-Do you want me to send them directly to you?
+> Fabien
+> 
+>     Btw, sorry to ask again : has anybody an explanation on the reason for
+>     the Gain management signals&functions ?
+> 
+> 
+> gain management might be harder to justify with an example but I think 
+> the idea is to keep the ipc and dbus apis as similar as possible.
+> 
 
-Secondly, if I build an rpm of plugz, i see that the following files are 
-being generated:
+Ok, thanks for that. :-) I'm gonna start building on top of these 
+assumptions then :-)
 
-plugz                     /etc/dbus-1/system.d/a2dpd.conf
-plugz                     /usr/bin/a2dpd
-plugz                     /usr/bin/a2dpd_ctl
-plugz                     /usr/bin/headsetd
-plugz                     /usr/lib/alsa-lib/libasound_module_ctl_sco.a
-plugz                     /usr/lib/alsa-lib/libasound_module_ctl_sco.la
-plugz                     /usr/lib/alsa-lib/libasound_module_ctl_sco.so
-plugz                     /usr/lib/alsa-lib/libasound_module_ctl_sco.so.0
-plugz                     
-/usr/lib/alsa-lib/libasound_module_ctl_sco.so.0.0.0
-plugz                     /usr/lib/alsa-lib/libasound_module_pcm_a2dpd.a
-plugz                     /usr/lib/alsa-lib/libasound_module_pcm_a2dpd.la
-plugz                     /usr/lib/alsa-lib/libasound_module_pcm_a2dpd.so
-plugz                     /usr/lib/alsa-lib/libasound_module_pcm_a2dpd.so.0
-plugz                     
-/usr/lib/alsa-lib/libasound_module_pcm_a2dpd.so.0.0.0
-plugz                     /usr/lib/alsa-lib/libasound_module_pcm_sco.a
-plugz                     /usr/lib/alsa-lib/libasound_module_pcm_sco.la
-plugz                     /usr/lib/alsa-lib/libasound_module_pcm_sco.so
-plugz                     /usr/lib/alsa-lib/libasound_module_pcm_sco.so.0
-plugz                     
-/usr/lib/alsa-lib/libasound_module_pcm_sco.so.0.0.0
-plugz                     /usr/lib/liba2dpdcommon.a
-plugz                     /usr/lib/liba2dpdcommon.la
-plugz                     /usr/lib/liba2dpdcommon.so
-plugz                     /usr/lib/liba2dpdcommon.so.0
-plugz                     /usr/lib/liba2dpdcommon.so.0.0.0
-plugz                     
-/usr/share/dbus-1/services/com.access.a2dpd.service
+Cheers,
 
-I see that there are some alsa-lib modules being built. So, do I still 
-need to specify a custom asoundrc file? Wouldn't the device show up 
-automatically in the applet's preferences?
-
-I am sorry if these are ignorant questions, but I am trying to learn 
-what I can about this package. Regarding the work that Marcel is doing 
-for bluez utils audio service, is there a project / development package 
-that I can play around with?
-
-thanks,
-Rogue
+Fabien
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
