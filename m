@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <468A7BFB.4080401@access-company.com>
-Date: Tue, 03 Jul 2007 18:40:27 +0200
-From: Frederic Dalleau <frederic.dalleau@access-company.com>
+Message-ID: <468A7156.1050708@gmail.com>
+Date: Tue, 03 Jul 2007 21:25:02 +0530
+From: Rogue <roguexz@gmail.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46896137.90202@gmail.com>	<d89ddf300707021858u2e5e8f80k35794595254736f6@mail.gmail.com>
-	<468A7156.1050708@gmail.com>
-In-Reply-To: <468A7156.1050708@gmail.com>
+References: <46896137.90202@gmail.com>
+	<d89ddf300707021858u2e5e8f80k35794595254736f6@mail.gmail.com>
+In-Reply-To: <d89ddf300707021858u2e5e8f80k35794595254736f6@mail.gmail.com>
 Subject: Re: [Bluez-devel] A few questions about bluetooth-alsa project
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,25 +21,64 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Rogue,
+Brad Midgley wrote:
+> hey
+>
+>     So first up, I have built sample spec files that generate rpm
+>     files out
+>     of sbc and plugz. In case you are interested then I can share them
+>     with
+>     you all.
+>
+>
+> sure... I could put them in contrib/
+>
+Do you want me to send them directly to you?
 
-> I see that there are some alsa-lib modules being built. So, do I still 
-> need to specify a custom asoundrc file? Wouldn't the device show up 
-> automatically in the applet's preferences?
->   
-As far as I know, the device won't show up whether there is an .asoundrc 
-or not.
-However, when the softvol plugin is declared in .asoundrc, it appears in 
-the mixer. So I suspect there is a way to make the plugin appears in the 
-players. I have never looked after that for now.
+Secondly, if I build an rpm of plugz, i see that the following files are 
+being generated:
 
-At least the entry must be declared in .asoundrc or 
-/usr/share/alsa/alsa.conf. I just found a utility called asoundconf. 
-This may be funny to try.
+plugz                     /etc/dbus-1/system.d/a2dpd.conf
+plugz                     /usr/bin/a2dpd
+plugz                     /usr/bin/a2dpd_ctl
+plugz                     /usr/bin/headsetd
+plugz                     /usr/lib/alsa-lib/libasound_module_ctl_sco.a
+plugz                     /usr/lib/alsa-lib/libasound_module_ctl_sco.la
+plugz                     /usr/lib/alsa-lib/libasound_module_ctl_sco.so
+plugz                     /usr/lib/alsa-lib/libasound_module_ctl_sco.so.0
+plugz                     
+/usr/lib/alsa-lib/libasound_module_ctl_sco.so.0.0.0
+plugz                     /usr/lib/alsa-lib/libasound_module_pcm_a2dpd.a
+plugz                     /usr/lib/alsa-lib/libasound_module_pcm_a2dpd.la
+plugz                     /usr/lib/alsa-lib/libasound_module_pcm_a2dpd.so
+plugz                     /usr/lib/alsa-lib/libasound_module_pcm_a2dpd.so.0
+plugz                     
+/usr/lib/alsa-lib/libasound_module_pcm_a2dpd.so.0.0.0
+plugz                     /usr/lib/alsa-lib/libasound_module_pcm_sco.a
+plugz                     /usr/lib/alsa-lib/libasound_module_pcm_sco.la
+plugz                     /usr/lib/alsa-lib/libasound_module_pcm_sco.so
+plugz                     /usr/lib/alsa-lib/libasound_module_pcm_sco.so.0
+plugz                     
+/usr/lib/alsa-lib/libasound_module_pcm_sco.so.0.0.0
+plugz                     /usr/lib/liba2dpdcommon.a
+plugz                     /usr/lib/liba2dpdcommon.la
+plugz                     /usr/lib/liba2dpdcommon.so
+plugz                     /usr/lib/liba2dpdcommon.so.0
+plugz                     /usr/lib/liba2dpdcommon.so.0.0.0
+plugz                     
+/usr/share/dbus-1/services/com.access.a2dpd.service
 
-Hope this helps.
+I see that there are some alsa-lib modules being built. So, do I still 
+need to specify a custom asoundrc file? Wouldn't the device show up 
+automatically in the applet's preferences?
 
-Frederic
+I am sorry if these are ignorant questions, but I am trying to learn 
+what I can about this package. Regarding the work that Marcel is doing 
+for bluez utils audio service, is there a project / development package 
+that I can play around with?
+
+thanks,
+Rogue
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
