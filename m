@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <468A02F2.7030903@free.fr>
-Date: Tue, 03 Jul 2007 10:04:02 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46852386.8050608@free.fr>	<2d5a2c100706291110i473d080bv6ba634f0eb8d9deb@mail.gmail.com>	<46892FEC.7000705@free.fr>
-	<d89ddf300707022031p349950e7w821a74cce27fb321@mail.gmail.com>
-In-Reply-To: <d89ddf300707022031p349950e7w821a74cce27fb321@mail.gmail.com>
-Subject: Re: [Bluez-devel] CVS audio-api.txt : 1st question
+In-Reply-To: <d89ddf300707021858u2e5e8f80k35794595254736f6@mail.gmail.com>
+References: <46896137.90202@gmail.com>
+	<d89ddf300707021858u2e5e8f80k35794595254736f6@mail.gmail.com>
+Date: Tue, 03 Jul 2007 05:31:38 +0200
+Message-Id: <1183433498.6351.22.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] A few questions about bluetooth-alsa project
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,22 +21,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-> Fabien
-> 
->     Btw, sorry to ask again : has anybody an explanation on the reason for
->     the Gain management signals&functions ?
-> 
-> 
-> gain management might be harder to justify with an example but I think 
-> the idea is to keep the ipc and dbus apis as similar as possible.
-> 
+Hi Brad,
 
-Ok, thanks for that. :-) I'm gonna start building on top of these 
-assumptions then :-)
+>         So first up, I have built sample spec files that generate rpm
+>         files out
+>         of sbc and plugz. In case you are interested then I can share
+>         them with 
+>         you all.
+> 
+> sure... I could put them in contrib/
 
-Cheers,
+please do me a favor and stop using HTML email on the BlueZ mailing
+list. It is bad enough that some people have no choice, but as one of
+the core developers you should set a good example and not encourage
+others with crappy HTML email.
 
-Fabien
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
