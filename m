@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d89ddf300707031114o3e6d61ddt7c8677d3b738cfef@mail.gmail.com>
-Date: Tue, 3 Jul 2007 12:14:40 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <468A7156.1050708@gmail.com>
+Message-ID: <468A7FD8.8050302@access-company.com>
+Date: Tue, 03 Jul 2007 18:56:56 +0200
+From: Frederic Dalleau <frederic.dalleau@access-company.com>
 MIME-Version: 1.0
-References: <46896137.90202@gmail.com>
-	<d89ddf300707021858u2e5e8f80k35794595254736f6@mail.gmail.com>
-	<468A7156.1050708@gmail.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <46896137.90202@gmail.com>	<d89ddf300707021858u2e5e8f80k35794595254736f6@mail.gmail.com>	<468A7156.1050708@gmail.com>
+	<468A7BFB.4080401@access-company.com>
+In-Reply-To: <468A7BFB.4080401@access-company.com>
 Subject: Re: [Bluez-devel] A few questions about bluetooth-alsa project
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,35 +21,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-hey
+Just one line more,
+> However, when the softvol plugin is declared in .asoundrc, it appears in 
+> the mixer.
+>   
+Wouldn't this explain the PCM-2device you saw in gnome-xxx?
 
-> > sure... I could put them in contrib/
-> >
-> Do you want me to send them directly to you?
 
-ok
-
-> I see that there are some alsa-lib modules being built. So, do I still
-> need to specify a custom asoundrc file? Wouldn't the device show up
-> automatically in the applet's preferences?
-
-I don't make the rules--I only complain about them. You might think
-that the device would show up, but alsa has two apis for listing
-devices: hardware only and hardware and plugins. No one uses the
-latter so even when you do everything right, the alsa clients don't
-know the device is there. you have to type in the name (some apps
-won't let you do that). You won't escape creating the asoundrc.
-
-The ray of hope here is that we want to get the bluez version to
-behave well enough that it can be set as the default device, so no one
-has to worry about what device is selected any more.
-
-the bluez wiki discusses the bluez utils version
-http://wiki.bluez.org/wiki/Audio
-http://wiki.bluez.org/wiki/HOWTO/AudioDevices
-
-brad
-brought to you in non-html :)
+Frederic
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
