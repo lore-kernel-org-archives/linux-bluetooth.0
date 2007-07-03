@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Tue, 3 Jul 2007 08:39:58 -0700 (PDT)
+From: Robert Schmidt <itsmy_emale@yahoo.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1183462763.4335.17.camel@localhost>
-References: <1183412947.20815.7.camel@localhost>
-	<1183433596.6351.25.camel@aeonflux.holtmann.net>
-	<1183462763.4335.17.camel@localhost>
-Date: Wed, 04 Jul 2007 03:48:26 +0200
-Message-Id: <1183513706.6351.47.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Only one pand-daemon?
+In-Reply-To: <590807.81141.qm@web38512.mail.mud.yahoo.com>
+MIME-Version: 1.0
+Message-ID: <18690.87750.qm@web38512.mail.mud.yahoo.com>
+Subject: Re: [Bluez-users] hcidump
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,46 +15,74 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1657161173=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mats,
+--===============1657161173==
+Content-Type: multipart/alternative; boundary="0-53341669-1183477198=:87750"
+Content-Transfer-Encoding: 8bit
 
-> > > I am facing the problem that I cannot start more than
-> > > one listening pand-daemon, in spite of using two usb-dongles.
-> > > The second call with 'pand --listen -e bdaddr ...' immediately
-> > > ends with return value zero and no traces in any log file.
-> > > I am running Bluez-utils 3.7 on Debiif test "$PAND_ENABLED" != "0"; then
->   
-> > an Etch. Slowly I am 
-> > > beginning to think that it could be DBUS that haunts me, but I
-> > > have just begun studying the source code of pand to make sure.
-> > 
-> > I have no idea why you actually need two pand, but you can call pand
-> > with -i hciX to bind it to a specific adapter.
-> 
-> 
-> I need more than one Bluetooth radio, i.e. usb-dongle, each providing
-> a NAP service, since I am not content with only seven clients in one
-> piconet. Hence my belief was that I could simply start one pand-daemon
-> for each dongle and have my system up and running.
+--0-53341669-1183477198=:87750
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-by default pand listens on all attached dongles. So that should work out
-of the box.
+sorry, got my answer, I have to select the Verbose option.
 
-Regards
+Robert Schmidt <itsmy_emale@yahoo.com> wrote: Hi,
 
-Marcel
+Why doesn't hcidump show what type of packets are being used for L2CAP connection while sending data. It just writes "Number of Completed Packets". Is there a way to see what type of packets are being used ??
 
 
+thanks,
+
+robert.
+        
+
+---------------------------------
+Ready for the edge of your seat?  Check out tonight's top picks on Yahoo! TV.   -------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+
+       
+---------------------------------
+Looking for a deal? Find great prices on flights and hotels with Yahoo! FareChase.
+--0-53341669-1183477198=:87750
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+sorry, got my answer, I have to select the Verbose option.<br><br><b><i>Robert Schmidt &lt;itsmy_emale@yahoo.com&gt;</i></b> wrote:<blockquote class="replbq" style="border-left: 2px solid rgb(16, 16, 255); margin-left: 5px; padding-left: 5px;"> Hi,<br><br>Why doesn't hcidump show what type of packets are being used for L2CAP connection while sending data. It just writes "Number of Completed Packets". Is there a way to see what type of packets are being used ??<br><br><br>thanks,<br><br>robert.<br><div>        </div><hr size="1">Ready for the edge of your seat?  <a href="http://us.rd.yahoo.com/evt=48220/*http://tv.yahoo.com/">Check out tonight's top picks</a> on Yahoo! TV.   -------------------------------------------------------------------------<br>This SF.net email is sponsored by DB2 Express<br>Download DB2 Express C - the FREE version of DB2 express and take<br>control of your XML. No limits. Just data. Click to get it
+ now.<br>http://sourceforge.net/powerbar/db2/_______________________________________________<br>Bluez-users mailing list<br>Bluez-users@lists.sourceforge.net<br>https://lists.sourceforge.net/lists/listinfo/bluez-users<br></blockquote><br><p>&#32;
+      <hr size=1>Looking for a deal? <a href="http://us.rd.yahoo.com/evt=47094/*http://farechase.yahoo.com/;_ylc=X3oDMTFicDJoNDllBF9TAzk3NDA3NTg5BHBvcwMxMwRzZWMDZ3JvdXBzBHNsawNlbWFpbC1uY20-">Find great prices on flights and hotels</a> with Yahoo! FareChase.
+--0-53341669-1183477198=:87750--
+
+
+--===============1657161173==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1657161173==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1657161173==--
