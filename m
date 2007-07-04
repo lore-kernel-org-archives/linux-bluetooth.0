@@ -1,10 +1,19 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 4 Jul 2007 16:11:23 +0200
-From: Stefan Seyfried <seife@suse.de>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20070704141123.GA10807@suse.de>
+Date: Wed, 4 Jul 2007 11:56:28 +0200 (CEST)
+From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+To: Ranulf Doswell <ralf@ranulf.net>
+In-Reply-To: <18a15270707031238n2cfe388ay3843e6939b890a8f@mail.gmail.com>
+Message-ID: <Pine.LNX.4.62.0707041155540.11471@pademelon.sonytel.be>
+References: <18a15270707021204o3ffc0021pc3f0d4b0ec278c39@mail.gmail.com>
+	<1183433306.6351.19.camel@aeonflux.holtmann.net>
+	<18a15270707031238n2cfe388ay3843e6939b890a8f@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] Mouse reconnect problems since version 3.12
+Content-Type: MULTIPART/MIXED;
+	BOUNDARY="-584337861-1293731747-1183542988=:11471"
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>,
+        cbe-oss-dev@ozlabs.org
+Subject: Re: [Bluez-devel] [Cbe-oss-dev] [PATCH] bluetooth: reset unexpected
+ connections
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,63 +23,64 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-I recently upgraded to bluez-3.12 on my openSUSE Factory machine and now i
-have problems with the mouse reconnecting after a timeout.
+---584337861-1293731747-1183542988=:11471
+Content-Type: TEXT/PLAIN; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-It simply does not reconnect. Nothing in syslog nor in the output of
-kbluetooth which is my authorization agent.
+On Tue, 3 Jul 2007, Ranulf Doswell wrote:
+> Do you have any suggestions of an alternative approach to handling this
+> error condition rather than just filling up the syslog? It's definitely a
+> very real DOS possibility - my syslog was growing by about 1Mb per minute
+> with just two regular controllers. Someone who deliberately constructed a
+> device to bombard a linux box with junk bluetooth data could probably fill
+> someone's /var partition in a matter of hours.
 
-I do not know exactly how to proceed with debugging - i tried a
-hcidump -X -V
-when the mouse did not reconnect, and it spat out lots of stuff when i
-moved the mouse. But of course, i could not make any sense out of it.
+Perhaps you can replace the call to printk() with a call to printk_ratelimit()?
 
-So:
-- what do i need to do to debug this?
-- what output of which tool do you need?
+With kind regards,
+ 
+Geert Uytterhoeven
+Software Architect
 
-This is a Logitech MX Laser mouse which worked very reliable before with
-a Microsoft Bluetooth dongle:
-
-hci0:   Type: USB
-        BD Address: 00:50:F2:EA:6B:EF ACL MTU: 377:10 SCO MTU: 16:0
-        UP RUNNING PSCAN ISCAN
-        RX bytes:2544 acl:82 sco:0 events:43 errors:0
-        TX bytes:786 acl:8 sco:0 commands:30 errors:0
-        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'strolchi MS dongle'
-        Class: 0x3e010c
-        Service Classes: Networking, Rendering, Capturing, Object Transfer,=
- Audio
-        Device Class: Computer, Laptop
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x3 LMP Ver: 1.2 (0x2) LMP Subver: 0x800
-        Manufacturer: Broadcom Corporation (15)
-
--- =
-
-Stefan Seyfried
-QA / R&D Team Mobile Devices        |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
-
-
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
+Sony Network and Software Technology Center Europe
+The Corporate Village · Da Vincilaan 7-D1 · B-1935 Zaventem · Belgium
+ 
+Phone:    +32 (0)2 700 8453	
+Fax:      +32 (0)2 700 8622	
+E-mail:   Geert.Uytterhoeven@sonycom.com	
+Internet: http://www.sony-europe.com/
+ 	
+Sony Network and Software Technology Center Europe	
+A division of Sony Service Centre (Europe) N.V.	
+Registered office: Technologielaan 7 · B-1840 Londerzeel · Belgium	
+VAT BE 0413.825.160 · RPR Brussels	
+Fortis Bank Zaventem · Swift GEBABEBB08A · IBAN BE39001382358619
+---584337861-1293731747-1183542988=:11471
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+---584337861-1293731747-1183542988=:11471
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+---584337861-1293731747-1183542988=:11471--
