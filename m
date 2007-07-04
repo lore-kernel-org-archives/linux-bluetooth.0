@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Heiko Wundram|Beenic <wundram@beenic.net>
-To: bluez-devel@lists.sourceforge.net
-Date: Wed, 4 Jul 2007 17:19:20 +0200
+Date: Wed, 4 Jul 2007 16:11:23 +0200
+From: Stefan Seyfried <seife@suse.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20070704141123.GA10807@suse.de>
 MIME-Version: 1.0
-Message-Id: <200707041719.20662.wundram@beenic.net>
-Subject: [Bluez-devel] Using BlueZ in commercial applications - Once again.
+Subject: [Bluez-devel] Mouse reconnect problems since version 3.12
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,95 +18,52 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all!
+Hi,
 
-I'm currently developing a (C++) Bluetooth (server) application under Linux=
-, =
+I recently upgraded to bluez-3.12 on my openSUSE Factory machine and now i
+have problems with the mouse reconnecting after a timeout.
 
-and recently noticed that the BlueZ library (-lbluetooth) is licensed under =
+It simply does not reconnect. Nothing in syslog nor in the output of
+kbluetooth which is my authorization agent.
 
-the GPL, at least according from the bluez-libs sources which I was scannin=
-g =
+I do not know exactly how to proceed with debugging - i tried a
+hcidump -X -V
+when the mouse did not reconnect, and it spat out lots of stuff when i
+moved the mouse. But of course, i could not make any sense out of it.
 
-for documentation (and according to quite a few mails on this list from =
+So:
+- what do i need to do to debug this?
+- what output of which tool do you need?
 
-others asking, but which never seem to gather enough interest to =
+This is a Logitech MX Laser mouse which worked very reliable before with
+a Microsoft Bluetooth dongle:
 
-actually "deserve" a longer and more detailed reply than "yes, it is").
-
-The BlueZ website documentation and FAQ pages have no single mention of =
-
-linking (or, rather, not linking) BlueZ against commercial apps, though, =
-
-which I gather should be put there at some update (for helpless souls like =
-
-me... :-)).
-
-Anyway, as my application links against -lbluetooth for SDP service =
-
-registration (and also has source files include bluetooth/bluetooth.h and =
-
-others for the AF_*- and similar constants to open and manage server socket=
-s =
-
-offered by the kernel modules), I don't see a big chance of keeping BlueZ a=
-s =
-
-my bluetooth stack, though, as the SDP service registration architecture =
-
-isn't offered through the D-BUS interface yet (at least not according to th=
-e =
-
-documentation, if I understood that properly), and neither is server socket =
-
-creation. Is this true?
-
-Finally: is anyone feeling qualified and interested enough to properly expl=
-ain =
-
-to what extent BlueZ can and/or cannot be used in commercial (bluetooth =
-
-server, in my case an implementation of the server-side of the OBEX File =
-
-Transfer Profile) applications? I'm thinking of the fact that the constants =
-
-that define Bluetooth sockets (in bluetooth/*) are specific to BlueZ and ar=
-e =
-
-GPL-marked by the file headers, but the kernel headers that define other =
-
-Linux-specific constants have all been stripped of a license completely, =
-
-which might, but not necessarily must mean something, as if I include a =
-
-header file I don't link code, but only data.
-
-Thanks in advance! I'd hate to be having to move to FreeBSD... :-)
+hci0:   Type: USB
+        BD Address: 00:50:F2:EA:6B:EF ACL MTU: 377:10 SCO MTU: 16:0
+        UP RUNNING PSCAN ISCAN
+        RX bytes:2544 acl:82 sco:0 events:43 errors:0
+        TX bytes:786 acl:8 sco:0 commands:30 errors:0
+        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'strolchi MS dongle'
+        Class: 0x3e010c
+        Service Classes: Networking, Rendering, Capturing, Object Transfer,=
+ Audio
+        Device Class: Computer, Laptop
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x3 LMP Ver: 1.2 (0x2) LMP Subver: 0x800
+        Manufacturer: Broadcom Corporation (15)
 
 -- =
 
-Heiko Wundram
-Product & Application Development
--------------------------------------
-Office Germany - EXPO PARK HANNOVER
- =
-
-Beenic Networks GmbH
-Mail=E4nder Stra=DFe 2
-30539 Hannover
- =
-
-Fon        +49 511 / 590 935 - 15
-Fax        +49 511 / 590 935 - 29
-Mail       wundram@beenic.net
+Stefan Seyfried
+QA / R&D Team Mobile Devices        |              "Any ideas, John?"
+SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
 
 
-Beenic Networks GmbH
--------------------------------------
-Sitz der Gesellschaft: Hannover
-Gesch=E4ftsf=FChrer: Jorge Delgado
-Registernummer: HRB 61869
-Registergericht: Amtsgericht Hannover
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
