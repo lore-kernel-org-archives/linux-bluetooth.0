@@ -1,20 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <2d5a2c100707050653u46deeeacq7e417b2c9240de6d@mail.gmail.com>
-Date: Thu, 5 Jul 2007 10:53:23 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <468CE233.8000909@free.fr>
+Message-ID: <468CEE3D.1040805@gmail.com>
+Date: Thu, 05 Jul 2007 10:12:29 -0300
+From: Manuel Naranjo <naranjo.manuel@gmail.com>
 MIME-Version: 1.0
-References: <46852386.8050608@free.fr>
-	<2d5a2c100706291110i473d080bv6ba634f0eb8d9deb@mail.gmail.com>
-	<46892FEC.7000705@free.fr>
-	<d89ddf300707022031p349950e7w821a74cce27fb321@mail.gmail.com>
-	<468A02F2.7030903@free.fr>
-	<2d5a2c100707031254o330ce2b5se3ca0c30520deac0@mail.gmail.com>
-	<d89ddf300707031408k45227982w72399da69935d0e1@mail.gmail.com>
-	<1183514223.6351.56.camel@aeonflux.holtmann.net>
-	<468CE233.8000909@free.fr>
-Subject: Re: [Bluez-devel] CVS audio-api.txt : 1st question
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <468B05EC.6070100@gmail.com>
+	<1183622932.6351.81.camel@aeonflux.holtmann.net>
+In-Reply-To: <1183622932.6351.81.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] SPP server
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,29 +17,24 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
+Hi Marcel,
+> using RFCOMM sockets is still the preferred way of it. Using RFCOMM TTYs
+> is only there for compat reasons and legacy applications.
+>   
+Thanks, just what I thought. I'm using the RFCOMM sockets then. Any idea 
+when
+the D-BUS interface will be done? I haven't seen the other d-bus 
+implementations yet
+maybe I can help with it, I'm not sure, I will take a look at the other 
+d-bus interfaces
+source.
 
-On 7/5/07, Fabien Chevalier <fabchevalier@free.fr> wrote:
-> I think we need:
->    - Either to let the application perform routing operations (that
-> would make sense in Linux Smartphone style devices, where you have a
-> very reduced set of applications : phone application, media player)
->    - Either perform the audio routing at the system level (desktop PC
-> case), the best candidate today being a sound server like pulseaudio.
->
-> What do you guys think of that ?
-> (+1 for pulseaudio for Luiz i think ;-) )
-
-I imagine that even the smartphone has some kind of audio server on them.
-
--- =
-
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+Regards,
+Manuel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
