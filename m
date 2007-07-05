@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <468D1480.3030301@free.fr>
-Date: Thu, 05 Jul 2007 17:55:44 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
+Date: Thu, 5 Jul 2007 17:55:49 +0200
+From: Stefan Seyfried <seife@suse.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46852386.8050608@free.fr>	<2d5a2c100706291110i473d080bv6ba634f0eb8d9deb@mail.gmail.com>	<46892FEC.7000705@free.fr>	<d89ddf300707022031p349950e7w821a74cce27fb321@mail.gmail.com>	<468A02F2.7030903@free.fr>	<2d5a2c100707031254o330ce2b5se3ca0c30520deac0@mail.gmail.com>	<d89ddf300707031408k45227982w72399da69935d0e1@mail.gmail.com>	<1183514223.6351.56.camel@aeonflux.holtmann.net>	<468CE233.8000909@free.fr>
-	<468CFC41.8090404@access-company.com>
-In-Reply-To: <468CFC41.8090404@access-company.com>
-Subject: Re: [Bluez-devel] CVS audio-api.txt : 1st question
+Message-ID: <20070705155549.GF3175@suse.de>
+References: <20070704141123.GA10807@suse.de>
+	<1183622728.6351.75.camel@aeonflux.holtmann.net>
+MIME-Version: 1.0
+In-Reply-To: <1183622728.6351.75.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] Mouse reconnect problems since version 3.12
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,65 +17,233 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+On Thu, Jul 05, 2007 at 10:05:27AM +0200, Marcel Holtmann wrote:
+> Hi Stefan,
+> =
 
-Hi Frederic,
+> > I recently upgraded to bluez-3.12 on my openSUSE Factory machine and no=
+w i
+> > have problems with the mouse reconnecting after a timeout.
+> > =
 
-Ok, let's take those into account.
-What you're talking about are basically capabilities that are common on 
-proprietary systems but that are still stranger to the free Linux world :-)
+> > It simply does not reconnect. Nothing in syslog nor in the output of
+> > kbluetooth which is my authorization agent.
+> > =
 
-Hopefully one day there will be a free implementation of such an audio 
-routing system. The closest effort i would see is pulseaudio, however it 
-looks like it's really far behind in term of routing features :-(
+> > I do not know exactly how to proceed with debugging - i tried a
+> > hcidump -X -V
+> > when the mouse did not reconnect, and it spat out lots of stuff when i
+> > moved the mouse. But of course, i could not make any sense out of it.
+> =
 
-So i guess your answer is also +1 for global routing daemon/system or 
-whatever :-)
+> I need to see the hcidump output. Otherwise I can't tell anything.
 
-Cheers,
+HCI sniffer - Bluetooth packet analyzer ver 1.35
+device: hci0 snap_len: 1028 filter: 0xffffffff
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 01 00 00 00 00 00  00                       .........
+> HCI Event: Mode Change (0x14) plen 6
+    status 0x00 handle 6 mode 0x00 interval 126
+    Mode: Active
+> HCI Event: Mode Change (0x14) plen 6
+    status 0x00 handle 6 mode 0x02 interval 20
+    Mode: Sniff
 
-Fabien
+up to here this was a left button press, from here on i was moving the
+mouse around.
+
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 00 00 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 01 00 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 04 20 00 00 00  00                       .... ....
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 05 00 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 05 00 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 06 00 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 07 f0 ff 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 08 f0 ff 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 07 f0 ff 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 06 f0 ff 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 06 f0 ff 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 05 f0 ff 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 05 f0 ff 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 05 00 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 03 00 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 05 00 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 04 00 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 01 00 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 01 00 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 01 00 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 fd 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 fe 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 fe 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 fe 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 fe 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 fe 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 fe 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+> ACL data: handle 6 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 ff 0f 00 00 00  00                       .........
+
+Thanks,
+
+    Stefan
+-- =
+
+Stefan Seyfried
+QA / R&D Team Mobile Devices        |              "Any ideas, John?"
+SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
 
 
-> Hi,
-> 
->>    - Either perform the audio routing at the system level (desktop PC 
->> case), the best candidate today being a sound server like pulseaudio.
->>   
-> In the smartphone scenario, there are some streams that are not handled 
-> by the processor. This is typically the case if you have a phone module 
-> wired to the bluetooth pcm. Today's smartphones even have a hardware 
-> routing chip capable of mixing and routing streams. Example inputs are 
-> radio and phone module, example outputs are speaker, loudspeaker, 
-> earphone and bluetooth.
-> 
-> The audio router should be able to take these streams into account. 
-> Having a separate global audio routing would be very flexible. This 
-> would allow to fit a large number of hardware platforms.
-> 
-> Last, there should be a way to distinguish between different streams 
-> natures : for example an alert should not interfere with a voip call .
-> 
-> BR,
-> Frederic
-> 
-> 
-> 
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by DB2 Express
-> Download DB2 Express C - the FREE version of DB2 express and take
-> control of your XML. No limits. Just data. Click to get it now.
-> http://sourceforge.net/powerbar/db2/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
-> 
-
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
