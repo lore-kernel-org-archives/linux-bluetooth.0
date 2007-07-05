@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <fc3d922d0707030446l5caf4a11q8b740068e59d4a01@mail.gmail.com>
-References: <fc3d922d0707030446l5caf4a11q8b740068e59d4a01@mail.gmail.com>
-Date: Thu, 05 Jul 2007 10:09:44 +0200
-Message-Id: <1183622984.6351.83.camel@aeonflux.holtmann.net>
+In-Reply-To: <20070704155527.63ef9dfa@localhost>
+References: <20070704155527.63ef9dfa@localhost>
+Date: Thu, 05 Jul 2007 10:07:53 +0200
+Message-Id: <1183622873.6351.79.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Authentication in Samsung sgh-z630
+Subject: Re: [Bluez-users] Device class in hcid.conf - Problems setting
+	the	correct description of the device.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,21 +21,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Radek,
 
-> I've got application, that sends to all phones in range files through
-> bluetooth object push.
-> I create connection with phones like that
-> btgoep://[macaddress]:9;authenticate=false;encrypt=false;master=false 
-> 
-> With nokia phones or sony ericsson there is no problems, they just ask
-> about permission.
-> Do you want to accept connection?
-> 
-> But samsung sgh-z630 ask for PIN number.
-> Maybe there is something, I need to change in cell settings. 
+> 	I've just decided to set a correct device class on my Linux box (a
+> notebook to be exact) and I've come to unexpected problem - there is no
+> description of class (in hcid.conf man page the description is not complete, to
+> say the least).
+> I've looked up google and it seams that the "Assigned Number" list became
+> confidential (the page to which the pdf specification redirects is member-only on
+> bluetooth.org)
+> 	I've set the class for my Linux devices a while back (a year or two
+> back), but then the list was easily available. Still the operation wasn't fast -
+> the specs describe the class bit by bit... which a bit differs form the way
+> hcid.conf require it to be put.
+> 	Did somebody found a easy way to set up the device class?
 
-I guess it uses security mode 3 and then behavior is normal.
+you can use the D-Bus interface. Especially the SetMinorClass() method.
 
 Regards
 
