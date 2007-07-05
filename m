@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <695f62bb0706290803w3f55513exce876b64c114fa02@mail.gmail.com>
-References: <695f62bb0706290803w3f55513exce876b64c114fa02@mail.gmail.com>
-Date: Thu, 05 Jul 2007 10:17:39 +0200
-Message-Id: <1183623459.6351.94.camel@aeonflux.holtmann.net>
+In-Reply-To: <20070702141540.GA3978@aismis.intra.grenchen.ch>
+References: <20070702141540.GA3978@aismis.intra.grenchen.ch>
+Date: Thu, 05 Jul 2007 10:15:30 +0200
+Message-Id: <1183623331.6351.89.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Search obex Authentication enabled device for	test
+Subject: Re: [Bluez-devel] bluez packages in Debian GNU/Linux
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,14 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Olivier,
+Hi Mario,
 
-> Sorry to post it here, but I didn't find any more suitable place.
-> 
-> I'm searching a device (FTP server) which is asking for Obex
-> authentication to test my implementation.
+> I have seen the packages.html file and saw the paragraph about Debian.
+> It's no more the case that the Debian packages are only maintained by
+> Edd Dumbill, they are now maintained by a whole team which often updates
+> the packages in the distribution. Could you please refer to
+> http://alioth.debian.org/projects/pkg-bluetooth/ instead of Edd's blog?
+> This is the official way now.
 
-I never saw any. Not even IrDA based ones.
+the webpage has been updated.
 
 Regards
 
