@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <A3217085754EEA4D9991C04186FAC96825DB68@micatech.micro>
-References: <A3217085754EEA4D9991C04186FAC96825DB68@micatech.micro>
-Date: Thu, 05 Jul 2007 10:18:26 +0200
-Message-Id: <1183623506.6351.96.camel@aeonflux.holtmann.net>
+In-Reply-To: <5307d89f0706301124p2326b5d9k34a95779fccc0248@mail.gmail.com>
+References: <5307d89f0706301124p2326b5d9k34a95779fccc0248@mail.gmail.com>
+Date: Thu, 05 Jul 2007 10:16:52 +0200
+Message-Id: <1183623412.6351.92.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Simultaneously Broadcast to 256 Users or more
+Subject: Re: [Bluez-users] Info Dinovo
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,15 +20,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Steve,
+Hi Patrick,
 
-> I have an application that requires broadcasting the same data
-> simultaneously to all Bluetooth devices within the reach of the
-> network.  Can this be accomplished utilizing the standard Bluetooth
-> profiles with the server spoofing the two way communication between
-> the server (master) and slave?  Can this be done at all?
+> I'm using Dinovo keyboard and mouse for a long time now with ubuntu.
+> With ubuntu Dapper it worked perfect.
+> All I did is modify /etc/init.d/bluetooth:
+> I changed HIDD_ENABLED=1
+> and I added HIDD_OPTIONS="-i xx:xx:xx:xx:xx:xx --connect
+> XX:XX:XX:XX:XX:XX  --master --server  "
 
-no, it is not feasible. For details read the Bluetooth specification.
+was wrong in the beginning and is still wrong.
+
+> Then I did "sudo hidd --search" and pressed the pairing button on the
+> keyboard and it works perfectly, even when I reboot.
+> 
+> Now, with the latest editions from ubuntu this doesn' work anymore.
+> When I reboot my computer, or wait to long, my keyboard is lost.
+> A lot of people are complaining about this on ubuntuforums.org.
+> Could you tell me what I should change?
+
+No idea what is wrong here, but it is actually working fine with hidd in
+--server mode only and with the new input service.
 
 Regards
 
