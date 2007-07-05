@@ -1,17 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.62.0707041155540.11471@pademelon.sonytel.be>
-References: <18a15270707021204o3ffc0021pc3f0d4b0ec278c39@mail.gmail.com>
-	<1183433306.6351.19.camel@aeonflux.holtmann.net>
-	<18a15270707031238n2cfe388ay3843e6939b890a8f@mail.gmail.com>
-	<Pine.LNX.4.62.0707041155540.11471@pademelon.sonytel.be>
-Date: Thu, 05 Jul 2007 10:11:57 +0200
-Message-Id: <1183623117.6351.87.camel@aeonflux.holtmann.net>
+In-Reply-To: <468B05EC.6070100@gmail.com>
+References: <468B05EC.6070100@gmail.com>
+Date: Thu, 05 Jul 2007 10:08:52 +0200
+Message-Id: <1183622932.6351.81.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Cc: Ranulf Doswell <ralf@ranulf.net>, cbe-oss-dev@ozlabs.org
-Subject: Re: [Bluez-devel] [Cbe-oss-dev] [PATCH] bluetooth: reset	unexpected
-	connections
+Subject: Re: [Bluez-devel] SPP server
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,18 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Geert,
+Hi Manuel,
 
-> > Do you have any suggestions of an alternative approach to handling this
-> > error condition rather than just filling up the syslog? It's definitely a
-> > very real DOS possibility - my syslog was growing by about 1Mb per minute
-> > with just two regular controllers. Someone who deliberately constructed a
-> > device to bombard a linux box with junk bluetooth data could probably fill
-> > someone's /var partition in a matter of hours.
-> 
-> Perhaps you can replace the call to printk() with a call to printk_ratelimit()?
+> I want to write an app that lets me receive SPP connections from 
+> outside. I had been taking a look at the new D-BUS interface, specially 
+> to the D-BUS service, but couldn't get anything useful.
+> I would like to know if someone can give me some tips about this, or 
+> shall I go the old rfcomm sockets way?
 
-we could. Feel free to send a patch for it.
+using RFCOMM sockets is still the preferred way of it. Using RFCOMM TTYs
+is only there for compat reasons and legacy applications.
 
 Regards
 
