@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <468B05EC.6070100@gmail.com>
-References: <468B05EC.6070100@gmail.com>
-Date: Thu, 05 Jul 2007 10:08:52 +0200
-Message-Id: <1183622932.6351.81.camel@aeonflux.holtmann.net>
+In-Reply-To: <20070704141123.GA10807@suse.de>
+References: <20070704141123.GA10807@suse.de>
+Date: Thu, 05 Jul 2007 10:05:27 +0200
+Message-Id: <1183622728.6351.75.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] SPP server
+Subject: Re: [Bluez-devel] Mouse reconnect problems since version 3.12
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,16 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Manuel,
+Hi Stefan,
 
-> I want to write an app that lets me receive SPP connections from 
-> outside. I had been taking a look at the new D-BUS interface, specially 
-> to the D-BUS service, but couldn't get anything useful.
-> I would like to know if someone can give me some tips about this, or 
-> shall I go the old rfcomm sockets way?
+> I recently upgraded to bluez-3.12 on my openSUSE Factory machine and now i
+> have problems with the mouse reconnecting after a timeout.
+> 
+> It simply does not reconnect. Nothing in syslog nor in the output of
+> kbluetooth which is my authorization agent.
+> 
+> I do not know exactly how to proceed with debugging - i tried a
+> hcidump -X -V
+> when the mouse did not reconnect, and it spat out lots of stuff when i
+> moved the mouse. But of course, i could not make any sense out of it.
 
-using RFCOMM sockets is still the preferred way of it. Using RFCOMM TTYs
-is only there for compat reasons and legacy applications.
+I need to see the hcidump output. Otherwise I can't tell anything.
 
 Regards
 
