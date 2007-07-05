@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20070704155527.63ef9dfa@localhost>
-References: <20070704155527.63ef9dfa@localhost>
-Date: Thu, 05 Jul 2007 10:07:53 +0200
-Message-Id: <1183622873.6351.79.camel@aeonflux.holtmann.net>
+In-Reply-To: <1183557790.4951.31.camel@localhost>
+References: <1183557790.4951.31.camel@localhost>
+Date: Thu, 05 Jul 2007 10:07:05 +0200
+Message-Id: <1183622825.6351.77.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Device class in hcid.conf - Problems setting
-	the	correct description of the device.
+Subject: Re: [Bluez-users] Bad transmission rate on second slave-client.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,22 +20,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Radek,
+Hi Mats,
 
-> 	I've just decided to set a correct device class on my Linux box (a
-> notebook to be exact) and I've come to unexpected problem - there is no
-> description of class (in hcid.conf man page the description is not complete, to
-> say the least).
-> I've looked up google and it seams that the "Assigned Number" list became
-> confidential (the page to which the pdf specification redirects is member-only on
-> bluetooth.org)
-> 	I've set the class for my Linux devices a while back (a year or two
-> back), but then the list was easily available. Still the operation wasn't fast -
-> the specs describe the class bit by bit... which a bit differs form the way
-> hcid.conf require it to be put.
-> 	Did somebody found a easy way to set up the device class?
+> in resolving the issue of two dongles I just posted a
+> solution for, something else came up on transmission
+> rate. I have this NAP-station running Bluez-utils 3.7
+> using Debian Etch and full Dbus-support. Emulating
+> future embedded systems I am using two laptops
+> 
+> 	A:   running Debian Sarge, Broadcom 2045 dongle
+> 
+> 	B:   running Debian Etch, CSR dongle
+> 
+> and both are using a privately built Bluez-utils 2.25,
+> where my only changes are to switch of dbus, bluepin, 
+> and bcm203x. The embedded systems cannot afford the
+> space demands of dbus, hence it is switched of. Observe,
+> these clients are internally operation without dbus,
+> the server/master makes full use of dbus.
+> 
+> The remarkable thing is that, at first laptop A ran a 
+> full speed bluetooth connection for several days, but
+> laptop B had minimal speed with heavily fractured packets,
+> and in addition forced itself to be a master aginst the
+> server configuration. When this upset master-slave relation
+> was remedied, laptop B achieved full speed. But to my dismay
+> laptop A has now deteroriated to fractional transmission
+> and terrible 7-8kbyte rates. In spite, of repeatedly halting
+> laptop as well as server, and erasing /var/lib/bluetooth/*
+> on both machines, I am presently stuck with this disfunction.
+> At present it did not even help to let the two laptops
+> establish connections to different dongles on the server,
+> now that I managed to resolve that issue.
 
-you can use the D-Bus interface. Especially the SetMinorClass() method.
+no idea what you are actually trying. Check your settings and make sure
+you use dongles that are known to work correctly.
 
 Regards
 
