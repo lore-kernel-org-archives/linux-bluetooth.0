@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 05 Jul 2007 13:26:39 +0200
-From: Ismael Valladolid Torres <ivalladt@punkass.com>
+From: Daniel Rindt <drindt@mx-solutions.de>
 To: bluez-users@lists.sourceforge.net
-Message-id: <20070705112639.GB3575@punkass.com>
-MIME-version: 1.0
-Subject: [Bluez-users] Error trying to build bluez-utils
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Thu, 5 Jul 2007 13:26:14 +0200
+MIME-Version: 1.0
+Message-Id: <200707051326.19875.drindt@mx-solutions.de>
+Subject: [Bluez-users] how to initialize the bluetooth dongle?
+Reply-To: drindt@mx-solutions.de,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,63 +15,48 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1371189885=="
+Content-Type: multipart/mixed; boundary="===============0709271845=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+--===============0709271845==
+Content-Type: multipart/signed; boundary="nextPart1940401.VHZI9ASHWo";
+	protocol="application/pgp-signature"; micalg=pgp-sha1
+Content-Transfer-Encoding: 7bit
 
---===============1371189885==
-Content-type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary=sdtB3X0nJg68CQEu
-Content-disposition: inline
-
-
---sdtB3X0nJg68CQEu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--nextPart1940401.VHZI9ASHWo
+Content-Type: text/plain;
+  charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-
-test -f lexer.c || /bin/sh ../ylwrap lexer.l .c lexer.c -- /bin/sh /usr/src=
-/bluez/utils/missing --run flex =20
-/usr/src/bluez/utils/hcid/ylwrap20111
-make[3]: *** [lexer.c] Error 1
-make[3]: Leaving directory `/usr/src/bluez/utils/hcid'
-make[2]: *** [all] Error 2
-make[2]: Leaving directory `/usr/src/bluez/utils/hcid'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/usr/src/bluez/utils'
-make: *** [all] Error 2
-
-On my Debian sid I've instaled these packages apart from
-build-essential which was already installed: automake, libtool,
-libdbus-1-dev, bison and flex.
-
-Any ideas welcome.
-
-Cordially, Ismael
---=20
-Ismael Valladolid Torres        GnuPG key: DE721AF4
-                                   Jabber: ivalladt@gmail.com
-http://linuxav.blogspot.com         Skype: ivalladt
-http://lamediahostia.blogspot.com/
-
---sdtB3X0nJg68CQEu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
 Content-Disposition: inline
+
+Hello,
+
+my question is how to initialize the bt-dongle on the usb port. My applicat=
+ion=20
+should run directly after booting the kernel. But currently it needs to run=
+=20
+hcid -n -f hcid.conf to initialize it first.
+Someone please can tell me how i can this built in directly in my app?
+
+Thanks
+Daniel
+
+--nextPart1940401.VHZI9ASHWo
+Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
+Version: GnuPG v1.4.7 (GNU/Linux)
 
-iD8DBQFGjNVv59Nokt5yGvQRAllVAJ9wnwIhZX0d+WyRhoYTwuyI1nBE2wCfQwSR
-a4Bl2/DmW6rKYdrOtMjwEbs=
-=b3Zp
+iD8DBQBGjNVXXpNwE9507IoRAqOgAJ0S7BmmzcU3wh5PP26KM80lfBOaTgCZAUIs
+p+pb529F824u/xRIth3eP4Q=
+=I4hj
 -----END PGP SIGNATURE-----
 
---sdtB3X0nJg68CQEu--
+--nextPart1940401.VHZI9ASHWo--
 
 
---===============1371189885==
+--===============0709271845==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -81,7 +67,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1371189885==
+--===============0709271845==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -92,4 +78,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1371189885==--
+--===============0709271845==--
