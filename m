@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <468CE9AC.6020806@free.fr>
-Date: Thu, 05 Jul 2007 14:53:00 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
+From: "Heiko Wundram (Beenic)" <wundram@beenic.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46852386.8050608@free.fr>	<2d5a2c100706291110i473d080bv6ba634f0eb8d9deb@mail.gmail.com>	<46892FEC.7000705@free.fr>	<d89ddf300707022031p349950e7w821a74cce27fb321@mail.gmail.com>	<468A02F2.7030903@free.fr>
-	<2d5a2c100707031254o330ce2b5se3ca0c30520deac0@mail.gmail.com>
-In-Reply-To: <2d5a2c100707031254o330ce2b5se3ca0c30520deac0@mail.gmail.com>
-Subject: Re: [Bluez-devel] CVS audio-api.txt : 1st question
+Date: Thu, 5 Jul 2007 14:14:49 +0200
+References: <200707041719.20662.wundram@beenic.net>
+	<200707051135.23459.wundram@beenic.net>
+	<18a15270707050404y72f7d4e1i6473089816749123@mail.gmail.com>
+In-Reply-To: <18a15270707050404y72f7d4e1i6473089816749123@mail.gmail.com>
+MIME-Version: 1.0
+Message-Id: <200707051414.49512.wundram@beenic.net>
+Subject: Re: [Bluez-devel] Using BlueZ in commercial applications - Once
+	again.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,64 +19,54 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Luiz Augusto von Dentz wrote:
-> Hi Fabien,
-> 
-> Yep, you are right we cannot stop application using alsa plugin while in 
-> PCM mode,
-> Im not so familiar with alsa so I have no clue about slave pcm, but if 
-> we can make
-> it to just open/close the device (the only thing left in PCM mode) that 
-> is the way
-> to go.
-
-Yes that's possible :-)
-We just have to make the hardware pcm a slave of the headset pcm.
-This basically mean that we would have to call the alsa API function 
-inside each bluetooth PCM plugin function, except for open/close/start/stop.
-
-In this case we can kiss Play()/Stop() byebye :-)
-
-> 
-> Another point I would like to discuss is about not having the 
-> intermediate state when
-> we are connected to the rfcomm but not yet to the sco socket, it seems 
-> useless
-> to have to Connect() and then Play(), the alsa plugin already goes 
-> direct to Play the
-> stream. Do you guys see any value in having a device connected but not 
-> streaming?
-
-Yes there is *great* value to this.
-There are multiple uses to it:
-  * Basically in the long term Connect() could be called by a GUI. That 
-would trigger the bluetooth audio deamon to notify a sound routing 
-daemon that rerouting the audio is now an option. Sound routing deamon 
-would then call Play() or whatever else if it chooses to use the newly 
-available device. [Note : this is just an option, i'm not saying here 
-that's what's gonna be done :-)]
-  * Another reason is that bluetooth audio daemon has to be able to 
-accept incoming RFCOMM connection from the headset. In this case there 
-is no need to call Connect(), but we can go straight to play mode.
-
-So yes that's *very* important :-), RFCOMM connected but not SCO yet is 
-a valid state.
-
-Cheers,
-
-Fabien
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+QW0gRG9ubmVyc3RhZyAwNSBKdWxpIDIwMDcgdW0gMTM6MDQ6Mzggc2NocmllYiBSYW51bGYgRG9z
+d2VsbDoKPiA+ID4gdGhlIHNvY2tldC1BUEkgYmVpbmcgb25lIGZvcm0gb2Ygc3VjaCBnbHVlIGNv
+ZGUKPiA+ID4gKGJ1dCBiZWNhdXNlIHRoYXQgcmVxdWlyZXMgYSBHUEwnZCBoZWFkZXIgdG8gYWN0
+dWFsbHkgZnVuY3Rpb24sIHRoaW5rCj4gPiA+IG9mIEFGX0JMVUVUT09USCBkZWZpbmVkIG9ubHkg
+aW4gYmx1ZXRvb3RoL2JsdWV0b290aC5oLCBpdCdzIG91dCBvZiB0aGUKPiA+ID4gcXVlc3Rpb24p
+Cj4KPiBUaGUgbnVtYmVyIGl0c2VsZiBpc24ndCBjb3ZlcmVkIGJ5IHRoZSBHUEwgaG93ZXZlci4g
+VGhlIGNvbnN0YW50IG5hbWUsIEknbQo+IGxlc3Mgc3VyZSBhYm91dCwgYnV0IEkgc2VlIG5vIHJl
+YXNvbiB3aHkgeW91IGNvdWxkbid0IGRlZmluZSB5b3VyIG93bgo+IGNvbnN0YW50IEZBTUlMWV9C
+TFVFVE9PVEggd2hpY2ggaGFwcGVucyB0byBoYXZlIHRoZSBzYW1lIHZhbHVlIGFzIGEKPiBwdWJs
+aWNhbGx5IGtub3duIG1hZ2ljIHZhbHVlLgoKSSB3b3VsZG4ndCBiZSB0b28gc3VyZSB3aGV0aGVy
+IHRoZSBudW1iZXIgaXNuJ3QgY292ZXJlZCBieSB0aGUgR1BMIGluZGlyZWN0bHksIApzaW1wbHkg
+YmVjYXVzZSBJIGJlY29tZSAidGFpbmVkIiB3aGVuIHVzaW5nIHRoYXQgbWFnaWMgdGhlIG1vbWVu
+dCBJIGhhdmUgdG8gCmxvb2sgYXQgdGhlIEdQTCdkIHNvdXJjZXMgdG8gZ2V0IGl0cyB2YWx1ZS4g
+V2hpY2ggaXMgc2ltcGx5IGFsd2F5cyB0aGUgY2FzZSwgCmJlY2F1c2UgdGhlIHZhbHVlIGRlZmlu
+ZWQgZm9yIEFGX0JMVUVUT09USCBpc24ndCAic2VsZiBleHBsYW5hdG9yeSIgb3IgdXNlZCAKaW4g
+c29tZXRoaW5nIEkgY2FuIHJldmVyc2UtZW5naW5lZXIgaW4gYSBjbGVhbi1yb29tIGVudmlyb25t
+ZW50LCBsaWtlIGEgZmlsZSAKZm9ybWF0LCBidXQgcmF0aGVyIG9ubHkgaW4gYmx1ZXRvb3RoLmgg
+YW5kIHRoZSBrZXJuZWwgc291cmNlcywgYm90aCBvZiB3aGljaCAKYXJlIEdQTCdkLiBPa2F5LCBJ
+IGNvdWxkIGdldCBhdCB0aGUgdmFsdWUgImNsZWFuLXJvb20iIGJ5IHJldmVyc2UtZW5naW5lZXJp
+bmcgCmEgY29tcGlsZWQgR1BMJ2QgYmluYXJ5LgoKT24gYSBkaWZmZXJlbnQgbm90ZSwgdGhlIGxl
+Z2FsIGV4cGVydGlzZSByZXF1aXJlZCBzaW1wbHkgdG8gZ3Vlc3MgKHRoYXQncyB3aGF0IApJJ20g
+ZG9pbmcgYXQgdGhlIG1vbWVudCwgYW5kIGFsc28gcGxheWluZyBhZHZvY2F0dXMgZGlhYm9saSBh
+IGxpdHRsZSBiaXQpIAp3aGF0IHBhcnQgb2YgdGhlIEFQSSBJIGNhbiB1c2UgYW5kIHdoYXQgcGFy
+dCBub3QgaW4gYSBjb21tZXJjaWFsIGFwcGxpY2F0aW9uIAppcyB3aGF0IGRyaXZlcyBtZSBvZmYu
+IFRoYXQncyB3aHkgSSByZXF1ZXN0ZWQgYSBxdWFsaWZpZWQgY29tbWVudCBmcm9tIG9uZSBvZiAK
+dGhlIEJsdWVaIGRldmVsb3BlcnMgaW4gbXkgb3JpZ2luYWwgbWFpbCwgc2ltcGx5IGJlY2F1c2Ug
+YWxsIG9mIHRoaXMgaXNuJ3QgCmZpeGVkIChhdCBsZWFzdCBub3QgZm9yIG1lKSwgYW5kIEkgd291
+bGRuJ3Qga25vdyBob3cgcGVvcGxlIHdvdWxkIHJlYWN0IGlmIEkgCndlcmUgdG8gInJlZGVmaW5l
+IiBhbGwgb2YgdGhlIG1hZ2ljIGNvbnN0YW50cyBvZiBibHVldG9vdGguaCBhbmQgcmZjb21tLmgg
+Cih3aGljaCBpcyBxdWl0ZSBhIGZldykgaW4gYSBwcml2YXRlIGhlYWRlci4KCi0tIApIZWlrbyBX
+dW5kcmFtClByb2R1Y3QgJiBBcHBsaWNhdGlvbiBEZXZlbG9wbWVudAotLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tCk9mZmljZSBHZXJtYW55IC0gRVhQTyBQQVJLIEhBTk5PVkVS
+CsKgCkJlZW5pYyBOZXR3b3JrcyBHbWJICk1haWzDpG5kZXIgU3RyYcOfZSAyCjMwNTM5IEhhbm5v
+dmVyCsKgCkZvbiDCoCDCoCDCoCDCoCs0OSA1MTEgLyA1OTAgOTM1IC0gMTUKRmF4IMKgIMKgIMKg
+IMKgKzQ5IDUxMSAvIDU5MCA5MzUgLSAyOQpNYWlsIMKgIMKgIMKgIHd1bmRyYW1AYmVlbmljLm5l
+dAoKCkJlZW5pYyBOZXR3b3JrcyBHbWJICi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0KU2l0eiBkZXIgR2VzZWxsc2NoYWZ0OiBIYW5ub3ZlcgpHZXNjaMOkZnRzZsO8aHJlcjog
+Sm9yZ2UgRGVsZ2FkbwpSZWdpc3Rlcm51bW1lcjogSFJCIDYxODY5ClJlZ2lzdGVyZ2VyaWNodDog
+QW10c2dlcmljaHQgSGFubm92ZXIKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwg
+aXMgc3BvbnNvcmVkIGJ5IERCMiBFeHByZXNzCkRvd25sb2FkIERCMiBFeHByZXNzIEMgLSB0aGUg
+RlJFRSB2ZXJzaW9uIG9mIERCMiBleHByZXNzIGFuZCB0YWtlCmNvbnRyb2wgb2YgeW91ciBYTUwu
+IE5vIGxpbWl0cy4gSnVzdCBkYXRhLiBDbGljayB0byBnZXQgaXQgbm93LgpodHRwOi8vc291cmNl
+Zm9yZ2UubmV0L3Bvd2VyYmFyL2RiMi8KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3Rz
+LnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0
+aW5mby9ibHVlei1kZXZlbAo=
