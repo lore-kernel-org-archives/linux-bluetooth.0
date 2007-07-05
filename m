@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: "Heiko Wundram (Beenic)" <wundram@beenic.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Thu, 5 Jul 2007 14:14:49 +0200
-References: <200707041719.20662.wundram@beenic.net>
-	<200707051135.23459.wundram@beenic.net>
-	<18a15270707050404y72f7d4e1i6473089816749123@mail.gmail.com>
-In-Reply-To: <18a15270707050404y72f7d4e1i6473089816749123@mail.gmail.com>
+Message-ID: <18a15270707050404y72f7d4e1i6473089816749123@mail.gmail.com>
+Date: Thu, 5 Jul 2007 12:04:38 +0100
+From: "Ranulf Doswell" <ralf@ranulf.net>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200707051135.23459.wundram@beenic.net>
 MIME-Version: 1.0
-Message-Id: <200707051414.49512.wundram@beenic.net>
+References: <200707041719.20662.wundram@beenic.net>
+	<200707051108.32230.wundram@beenic.net>
+	<Pine.LNX.4.63.0707051114450.25165@redbean.intranet.gw-instruments.de>
+	<200707051135.23459.wundram@beenic.net>
 Subject: Re: [Bluez-devel] Using BlueZ in commercial applications - Once
 	again.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -19,54 +20,67 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============0539350188=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-QW0gRG9ubmVyc3RhZyAwNSBKdWxpIDIwMDcgdW0gMTM6MDQ6Mzggc2NocmllYiBSYW51bGYgRG9z
-d2VsbDoKPiA+ID4gdGhlIHNvY2tldC1BUEkgYmVpbmcgb25lIGZvcm0gb2Ygc3VjaCBnbHVlIGNv
-ZGUKPiA+ID4gKGJ1dCBiZWNhdXNlIHRoYXQgcmVxdWlyZXMgYSBHUEwnZCBoZWFkZXIgdG8gYWN0
-dWFsbHkgZnVuY3Rpb24sIHRoaW5rCj4gPiA+IG9mIEFGX0JMVUVUT09USCBkZWZpbmVkIG9ubHkg
-aW4gYmx1ZXRvb3RoL2JsdWV0b290aC5oLCBpdCdzIG91dCBvZiB0aGUKPiA+ID4gcXVlc3Rpb24p
-Cj4KPiBUaGUgbnVtYmVyIGl0c2VsZiBpc24ndCBjb3ZlcmVkIGJ5IHRoZSBHUEwgaG93ZXZlci4g
-VGhlIGNvbnN0YW50IG5hbWUsIEknbQo+IGxlc3Mgc3VyZSBhYm91dCwgYnV0IEkgc2VlIG5vIHJl
-YXNvbiB3aHkgeW91IGNvdWxkbid0IGRlZmluZSB5b3VyIG93bgo+IGNvbnN0YW50IEZBTUlMWV9C
-TFVFVE9PVEggd2hpY2ggaGFwcGVucyB0byBoYXZlIHRoZSBzYW1lIHZhbHVlIGFzIGEKPiBwdWJs
-aWNhbGx5IGtub3duIG1hZ2ljIHZhbHVlLgoKSSB3b3VsZG4ndCBiZSB0b28gc3VyZSB3aGV0aGVy
-IHRoZSBudW1iZXIgaXNuJ3QgY292ZXJlZCBieSB0aGUgR1BMIGluZGlyZWN0bHksIApzaW1wbHkg
-YmVjYXVzZSBJIGJlY29tZSAidGFpbmVkIiB3aGVuIHVzaW5nIHRoYXQgbWFnaWMgdGhlIG1vbWVu
-dCBJIGhhdmUgdG8gCmxvb2sgYXQgdGhlIEdQTCdkIHNvdXJjZXMgdG8gZ2V0IGl0cyB2YWx1ZS4g
-V2hpY2ggaXMgc2ltcGx5IGFsd2F5cyB0aGUgY2FzZSwgCmJlY2F1c2UgdGhlIHZhbHVlIGRlZmlu
-ZWQgZm9yIEFGX0JMVUVUT09USCBpc24ndCAic2VsZiBleHBsYW5hdG9yeSIgb3IgdXNlZCAKaW4g
-c29tZXRoaW5nIEkgY2FuIHJldmVyc2UtZW5naW5lZXIgaW4gYSBjbGVhbi1yb29tIGVudmlyb25t
-ZW50LCBsaWtlIGEgZmlsZSAKZm9ybWF0LCBidXQgcmF0aGVyIG9ubHkgaW4gYmx1ZXRvb3RoLmgg
-YW5kIHRoZSBrZXJuZWwgc291cmNlcywgYm90aCBvZiB3aGljaCAKYXJlIEdQTCdkLiBPa2F5LCBJ
-IGNvdWxkIGdldCBhdCB0aGUgdmFsdWUgImNsZWFuLXJvb20iIGJ5IHJldmVyc2UtZW5naW5lZXJp
-bmcgCmEgY29tcGlsZWQgR1BMJ2QgYmluYXJ5LgoKT24gYSBkaWZmZXJlbnQgbm90ZSwgdGhlIGxl
-Z2FsIGV4cGVydGlzZSByZXF1aXJlZCBzaW1wbHkgdG8gZ3Vlc3MgKHRoYXQncyB3aGF0IApJJ20g
-ZG9pbmcgYXQgdGhlIG1vbWVudCwgYW5kIGFsc28gcGxheWluZyBhZHZvY2F0dXMgZGlhYm9saSBh
-IGxpdHRsZSBiaXQpIAp3aGF0IHBhcnQgb2YgdGhlIEFQSSBJIGNhbiB1c2UgYW5kIHdoYXQgcGFy
-dCBub3QgaW4gYSBjb21tZXJjaWFsIGFwcGxpY2F0aW9uIAppcyB3aGF0IGRyaXZlcyBtZSBvZmYu
-IFRoYXQncyB3aHkgSSByZXF1ZXN0ZWQgYSBxdWFsaWZpZWQgY29tbWVudCBmcm9tIG9uZSBvZiAK
-dGhlIEJsdWVaIGRldmVsb3BlcnMgaW4gbXkgb3JpZ2luYWwgbWFpbCwgc2ltcGx5IGJlY2F1c2Ug
-YWxsIG9mIHRoaXMgaXNuJ3QgCmZpeGVkIChhdCBsZWFzdCBub3QgZm9yIG1lKSwgYW5kIEkgd291
-bGRuJ3Qga25vdyBob3cgcGVvcGxlIHdvdWxkIHJlYWN0IGlmIEkgCndlcmUgdG8gInJlZGVmaW5l
-IiBhbGwgb2YgdGhlIG1hZ2ljIGNvbnN0YW50cyBvZiBibHVldG9vdGguaCBhbmQgcmZjb21tLmgg
-Cih3aGljaCBpcyBxdWl0ZSBhIGZldykgaW4gYSBwcml2YXRlIGhlYWRlci4KCi0tIApIZWlrbyBX
-dW5kcmFtClByb2R1Y3QgJiBBcHBsaWNhdGlvbiBEZXZlbG9wbWVudAotLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tCk9mZmljZSBHZXJtYW55IC0gRVhQTyBQQVJLIEhBTk5PVkVS
-CsKgCkJlZW5pYyBOZXR3b3JrcyBHbWJICk1haWzDpG5kZXIgU3RyYcOfZSAyCjMwNTM5IEhhbm5v
-dmVyCsKgCkZvbiDCoCDCoCDCoCDCoCs0OSA1MTEgLyA1OTAgOTM1IC0gMTUKRmF4IMKgIMKgIMKg
-IMKgKzQ5IDUxMSAvIDU5MCA5MzUgLSAyOQpNYWlsIMKgIMKgIMKgIHd1bmRyYW1AYmVlbmljLm5l
-dAoKCkJlZW5pYyBOZXR3b3JrcyBHbWJICi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0KU2l0eiBkZXIgR2VzZWxsc2NoYWZ0OiBIYW5ub3ZlcgpHZXNjaMOkZnRzZsO8aHJlcjog
-Sm9yZ2UgRGVsZ2FkbwpSZWdpc3Rlcm51bW1lcjogSFJCIDYxODY5ClJlZ2lzdGVyZ2VyaWNodDog
-QW10c2dlcmljaHQgSGFubm92ZXIKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwg
-aXMgc3BvbnNvcmVkIGJ5IERCMiBFeHByZXNzCkRvd25sb2FkIERCMiBFeHByZXNzIEMgLSB0aGUg
-RlJFRSB2ZXJzaW9uIG9mIERCMiBleHByZXNzIGFuZCB0YWtlCmNvbnRyb2wgb2YgeW91ciBYTUwu
-IE5vIGxpbWl0cy4gSnVzdCBkYXRhLiBDbGljayB0byBnZXQgaXQgbm93LgpodHRwOi8vc291cmNl
-Zm9yZ2UubmV0L3Bvd2VyYmFyL2RiMi8KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3Rz
-LnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0
-aW5mby9ibHVlei1kZXZlbAo=
+--===============0539350188==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_3112_3809902.1183633478411"
+
+------=_Part_3112_3809902.1183633478411
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+>
+> > the socket-API being one form of such glue code
+> > (but because that requires a GPL'd header to actually function, think of
+> > AF_BLUETOOTH defined only in bluetooth/bluetooth.h, it's out of the
+> > question)
+>
+
+The number itself isn't covered by the GPL however. The constant name, I'm
+less sure about, but I see no reason why you couldn't define your own
+constant FAMILY_BLUETOOTH which happens to have the same value as a
+publically known magic value.
+
+You'd only be using standard POSIX interfaces at that point.
+
+Ralf.
+
+------=_Part_3112_3809902.1183633478411
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<div><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">&gt; the socket-API being one form of such glue code<br>&gt; (but because that requires a GPL&#39;d header to actually function, think of
+<br>&gt; AF_BLUETOOTH defined only in bluetooth/bluetooth.h, it&#39;s out of the<br>&gt; question) <br></blockquote></div><br>The number itself isn&#39;t covered by the GPL however. The constant name, I&#39;m less sure about, but I see no reason why you couldn&#39;t define your own constant FAMILY_BLUETOOTH which happens to have the same value as a publically known magic value.
+<br><br>You&#39;d only be using standard POSIX interfaces at that point.<br><br>Ralf.<br><br><br>
+
+------=_Part_3112_3809902.1183633478411--
+
+
+--===============0539350188==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+--===============0539350188==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0539350188==--
