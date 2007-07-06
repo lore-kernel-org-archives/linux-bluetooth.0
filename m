@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Thilo Riessner <thilo@riessner.de>
+From: Mats Erik Andersson <mats.andersson64@comhem.se>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Fri, 6 Jul 2007 14:53:00 +0200
-References: <200706181148.34291.thilo@riessner.de>
-In-Reply-To: <200706181148.34291.thilo@riessner.de>
-MIME-Version: 1.0
-Message-Id: <200707061453.00990.thilo@riessner.de>
-Subject: Re: [Bluez-users] HP Bluetooth PC Card Mouse
+In-Reply-To: <1183622825.6351.77.camel@aeonflux.holtmann.net>
+References: <1183557790.4951.31.camel@localhost>
+	<1183622825.6351.77.camel@aeonflux.holtmann.net>
+Date: Fri, 06 Jul 2007 12:49:19 +0200
+Message-Id: <1183718959.5288.30.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Bad transmission rate on second slave-client.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,34 +21,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Finally I found the solution myself (with help from the post: "hidd connection 
-to mouse interferes with headset"). I start the hidd now with the argumets:
---connect 00:02:76:00:D0:3E --master
-I put it in the /etc/sysconfig/bluetooth file in the variable: HID_DAEMON_ARGS
-This gives the desired behavior. When I switch the mouse on and activate it by 
-a click on one of the buttons, it starts to work after a few seconds.
+tor 2007-07-05 klockan 10:07 +0200 skrev Marcel Holtmann:
+> Hi Mats,
 
-Thilo 
+> no idea what you are actually trying. Check your settings and make sure
+> you use dongles that are known to work correctly.
+> 
 
-Am Montag, 18. Juni 2007 11:48 schrieb Thilo:
-> I bought a HP Bluetooth PC Card Mouse. It works when I press the connect
-> button underneath the mouse, and hidd -c adress. This is ok for the first
-> time using it, but I have to press the button every time i am using it.
-> This is bothersome. Is there a possibility to avoid this procedure? I am
-> using a Dell Latitude D620 with OpenSuSE 10.2 operating system.
-> Thanks for any help
->
-> Thilo
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by DB2 Express
-> Download DB2 Express C - the FREE version of DB2 express and take
-> control of your XML. No limits. Just data. Click to get it now.
-> http://sourceforge.net/powerbar/db2/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
+Alarm called off. I could later that first evening verify that the
+dongle hat stopped working reliably. It could be questioned or reset
+by hciconfig. Sorry for the message noice!
+
+
+Regards     Mats E A
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
