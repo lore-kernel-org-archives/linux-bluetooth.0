@@ -1,8 +1,8 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 To: bluez-users@lists.sourceforge.net
 From: David Abrahams <dave@boost-consulting.com>
-Date: Fri, 06 Jul 2007 09:43:45 -0400
-Message-ID: <87fy413awe.fsf@grogan.peloton>
+Date: Fri, 06 Jul 2007 08:57:32 -0400
+Message-ID: <87r6nl3d1f.fsf@grogan.peloton>
 References: <87ir8ytn5n.fsf@grogan.peloton>
 	<d89ddf300707052037n77cde792lef76d30364998959@mail.gmail.com>
 Mime-Version: 1.0
@@ -23,23 +23,16 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 on Thu Jul 05 2007, "Brad Midgley" <bmidgley-AT-gmail.com> wrote:
 
-> On 7/5/07, David Abrahams <dave@boost-consulting.com> wrote:
->> and try to use Skype again, I get horrible distortion, from "choppy
->> sound" to "white noise"
+> Dave
 >
 > if you have "master" in hcid.conf's lm setting and you take "rswitch"
 > and "sniff" out of the lp setting, you are forcing the pc to be master
 > and to hopefully behave better with audio. restart hcid.
 
-Brad,
+I'll try these things; thanks.
 
-these settings worked almost perfectly.  It's worth noting that the
-mouse is somewhat less responsive when audio is going out to the
-headset.  However, it's certainly tolerable, and not nearly as bad as
-the "slushy mouse" effect I've experienced in the past.  Thank you!
-
-[If you have a moment, I'd still like to know what those changes
-actually did and why they're not the defaults]
+What am I losing by making these changes (or, why are the settings
+you suggest not the defaults)?
 
 -- 
 Dave Abrahams
