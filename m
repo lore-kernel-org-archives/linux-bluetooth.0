@@ -1,12 +1,19 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <468E5EAD.7010402@free.fr>
-Date: Fri, 06 Jul 2007 17:24:29 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46852386.8050608@free.fr>	<46892FEC.7000705@free.fr>	<d89ddf300707022031p349950e7w821a74cce27fb321@mail.gmail.com>	<468A02F2.7030903@free.fr>	<2d5a2c100707031254o330ce2b5se3ca0c30520deac0@mail.gmail.com>	<d89ddf300707031408k45227982w72399da69935d0e1@mail.gmail.com>	<1183514223.6351.56.camel@aeonflux.holtmann.net>	<468CE233.8000909@free.fr>	<d89ddf300707050940n7ffece6cs2ec5836def9e3ae9@mail.gmail.com>	<468DF298.5010205@free.fr>	<2d5a2c100707060612g6ed3a543g9f36b6db49a97a95@mail.gmail.com>	<468E446A.1000204@free.fr>
-	<468E46E5.2050206@access-company.com>
+Message-ID: <2d5a2c100707060801s413d8bdclb0b25a4f5a340773@mail.gmail.com>
+Date: Fri, 6 Jul 2007 12:01:35 -0300
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <468E46E5.2050206@access-company.com>
+MIME-Version: 1.0
+References: <46852386.8050608@free.fr>
+	<2d5a2c100707031254o330ce2b5se3ca0c30520deac0@mail.gmail.com>
+	<d89ddf300707031408k45227982w72399da69935d0e1@mail.gmail.com>
+	<1183514223.6351.56.camel@aeonflux.holtmann.net>
+	<468CE233.8000909@free.fr>
+	<d89ddf300707050940n7ffece6cs2ec5836def9e3ae9@mail.gmail.com>
+	<468DF298.5010205@free.fr>
+	<2d5a2c100707060612g6ed3a543g9f36b6db49a97a95@mail.gmail.com>
+	<468E446A.1000204@free.fr> <468E46E5.2050206@access-company.com>
 Subject: Re: [Bluez-devel] CVS audio-api.txt : 1st question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -17,33 +24,37 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Frederic Dalleau wrote:
->> You need the power of Gstreamer in order to stream MP3 directly to the 
->> headset : you need a native Gstreamer bluetooth element.
->>   
-> In a desktop situation, you will want to mix streams this is not 
+Hi again,
+
+On 7/6/07, Frederic Dalleau <frederic.dalleau@access-company.com> wrote:
+>
+> > You need the power of Gstreamer in order to stream MP3 directly to the
+> > headset : you need a native Gstreamer bluetooth element.
+> >
+> In a desktop situation, you will want to mix streams this is not
 > possible using mp3.
-> Lots of a2dp devices do not handle mp3. And what if your music is not 
+> Lots of a2dp devices do not handle mp3. And what if your music is not
 > mp3 encoded, say ogg?
-> 
 
-Frederic, i agree with you. :-)
-But Gstreamer allows to handle all those format conversion issues 
-transparently.
-The BT GStreamer element would simply have to declare what formats are 
-supported by the headset (mp3, sbc, ...) with bitrates, channels ... .
-GStreamer would perform adhoc convertion on a needed basis.
+Yep, but Fabien probably mean that we gain more flexibility by having some
+native elements on gstreamer, and I agree with that. One of the problems
+that Im afraid of is the plugin having to handle encoding/decoding by it own
+when we could just use a framework to do that for us. Because that I think
+it would be good to have a set of elements on gstreamer(btaudiosrc,
+btaudiosink...)
+Btw, my plan is not limited with the current device we have in the market,
+it should be good if we think in something more advanced with a support for
+various codecs and not limited by stereo headset we have, why not be
+able to create a home theater 5.1 wireless system.
 
-However GStreamer is  not meant to replace ALSA, but be used in parallel 
-to it.
+-- =
 
-Cheers,
-
-Fabien
+Luiz Augusto von Dentz
+Engenheiro de Computa=E7=E3o
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
