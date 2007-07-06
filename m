@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d89ddf300707052037n77cde792lef76d30364998959@mail.gmail.com>
-Date: Thu, 5 Jul 2007 21:37:46 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <87ir8ytn5n.fsf@grogan.peloton>
-MIME-Version: 1.0
-References: <87ir8ytn5n.fsf@grogan.peloton>
-Subject: Re: [Bluez-users] hidd connection to mouse interferes with headset
+To: bluez-users@lists.sourceforge.net
+From: David Abrahams <dave@boost-consulting.com>
+Date: Thu, 05 Jul 2007 20:02:12 -0400
+Message-ID: <87ir8ytn5n.fsf@grogan.peloton>
+Mime-Version: 1.0
+Subject: [Bluez-users] hidd connection to mouse interferes with headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,17 +18,45 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Dave
 
-if you have "master" in hcid.conf's lm setting and you take "rswitch"
-and "sniff" out of the lp setting, you are forcing the pc to be master
-and to hopefully behave better with audio. restart hcid.
+I am using a bluetooth mouse (logitech) and headset (plantronics) with
+Ubuntu Feisty.
 
-brad
+Without connecting the mouse, I can use the headset with Skype and get
+reasonably good sound quality.
 
-On 7/5/07, David Abrahams <dave@boost-consulting.com> wrote:
-> and try to use Skype again, I get horrible distortion, from "choppy
-> sound" to "white noise"
+However, if I connect to my BT mouse with
+
+  sudo hidd --connect <btaddr>
+
+and try to use Skype again, I get horrible distortion, from "choppy
+sound" to "white noise"
+
+If I then
+
+  sudo killall /usr/bin/hidd
+
+sound in Skype goes back to normal.
+
+Actually I have
+
+  HIDD_ENABLED=1
+  HIDD_OPTIONS="--connect 00:07:61:35:FE:A9 --master --server"
+
+in my /etc/default/bluetooth, so all I need to do is turn my mouse
+*on* to get this effect.
+
+Does anyone have an idea how to cure (or even debug) this problem?
+
+TIA,
+
+-- 
+Dave Abrahams
+Boost Consulting
+http://www.boost-consulting.com
+
+The Astoria Seminar ==> http://www.astoriaseminar.com
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
