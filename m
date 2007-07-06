@@ -1,14 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20070705155549.GF3175@suse.de>
-References: <20070704141123.GA10807@suse.de>
-	<1183622728.6351.75.camel@aeonflux.holtmann.net>
-	<20070705155549.GF3175@suse.de>
-Date: Fri, 06 Jul 2007 07:57:33 +0200
-Message-Id: <1183701453.6351.107.camel@aeonflux.holtmann.net>
+In-Reply-To: <18a15270707050404y72f7d4e1i6473089816749123@mail.gmail.com>
+References: <200707041719.20662.wundram@beenic.net>
+	<200707051108.32230.wundram@beenic.net>
+	<Pine.LNX.4.63.0707051114450.25165@redbean.intranet.gw-instruments.de>
+	<200707051135.23459.wundram@beenic.net>
+	<18a15270707050404y72f7d4e1i6473089816749123@mail.gmail.com>
+Date: Fri, 06 Jul 2007 08:00:44 +0200
+Message-Id: <1183701644.6351.111.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Mouse reconnect problems since version 3.12
+Subject: Re: [Bluez-devel] Using BlueZ in commercial applications -
+	Once	again.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,38 +25,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Stefan,
+Hi Ranulf,
 
-> > > I recently upgraded to bluez-3.12 on my openSUSE Factory machine and now i
-> > > have problems with the mouse reconnecting after a timeout.
-> > > 
-> > > It simply does not reconnect. Nothing in syslog nor in the output of
-> > > kbluetooth which is my authorization agent.
-> > > 
-> > > I do not know exactly how to proceed with debugging - i tried a
-> > > hcidump -X -V
-> > > when the mouse did not reconnect, and it spat out lots of stuff when i
-> > > moved the mouse. But of course, i could not make any sense out of it.
-> > 
-> > I need to see the hcidump output. Otherwise I can't tell anything.
+>         > the socket-API being one form of such glue code
+>         > (but because that requires a GPL'd header to actually
+>         function, think of 
+>         > AF_BLUETOOTH defined only in bluetooth/bluetooth.h, it's out
+>         of the
+>         > question) 
 > 
-> HCI sniffer - Bluetooth packet analyzer ver 1.35
-> device: hci0 snap_len: 1028 filter: 0xffffffff
-> > ACL data: handle 6 flags 0x02 dlen 13
->     L2CAP(d): cid 0x0041 len 9 [psm 0]
->       0000: a1 02 01 00 00 00 00 00  00                       .........
-> > HCI Event: Mode Change (0x14) plen 6
->     status 0x00 handle 6 mode 0x00 interval 126
->     Mode: Active
-> > HCI Event: Mode Change (0x14) plen 6
->     status 0x00 handle 6 mode 0x02 interval 20
->     Mode: Sniff
-> 
-> up to here this was a left button press, from here on i was moving the
-> mouse around.
+> The number itself isn't covered by the GPL however. The constant name,
+> I'm less sure about, but I see no reason why you couldn't define your
+> own constant FAMILY_BLUETOOTH which happens to have the same value as
+> a publically known magic value. 
 
-are you sure that the authorization agent is working. Maybe you wanna
-use adapter.SetTrusted() to make it fully trusted.
+contact a lawyer before making such statements. How do you learned about
+that number. You read GPL code and this would make it derived work. Be
+really careful. The licenses are in place for a reason. You wanna use
+software from the community so you have to play with our rules. If you
+don't want that, then you can always buy a Bluetooth stack from someone
+else.
 
 Regards
 
