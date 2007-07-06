@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Mats Erik Andersson <mats.andersson64@comhem.se>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY102-W2777B5DBF6DAA26AA0CA9EF0010@phx.gbl>
-References: <BAY102-W2777B5DBF6DAA26AA0CA9EF0010@phx.gbl>
-Date: Sat, 07 Jul 2007 11:32:09 +0200
-Message-Id: <1183800729.4579.12.camel@localhost>
+To: bluez-users@lists.sourceforge.net
+From: David Abrahams <dave@boost-consulting.com>
+Date: Fri, 06 Jul 2007 18:07:36 -0400
+Message-ID: <873b01xk2f.fsf@grogan.peloton>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] configure: error: Bluetooth library is required
+Subject: [Bluez-users] snd-bt-sco unkillable, file count is 2 (expected 3)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,33 +18,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-fre 2007-07-06 klockan 16:57 +0000 skrev Robert Rawlins:
 
-> And then when trying to configure my bluez utils i use
->  
-> ./configure BLUEZ_LIBS=/usr/local/lib
->  
-> And i still get the same issue that it cannot find the bluetooth
-> libraries.
+After wandering out of range with my bluetooth headset (not sure if
+that's relevant), I returned to find snd-bt-scod taking 99% of the
+CPU, klogd taking the other 99% (core duo), and lots of the following
+in /var/log/syslog.  Oh, and I can't kill the snd-bt-scod process!  I
+tried -9, but nothing noticeable happens.
 
-I disected the configure script, and found the correct mechanism to be:
+Jul  6 17:47:28 grogan kernel: [41794.808000] snd-bt-sco: file_count is 2 (expected 3)
+Jul  6 17:47:28 grogan last message repeated 2 times
+Jul  6 17:47:28 grogan kernel: [41794.808000] sncccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccco: fileccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+ cccccccccccccccccccccccccccccccccccc
+Jul  6 17:47:28 grogan kernel: ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccco: c
+ cccccccccccccccccccccccccccccccccccc
+Jul  6 17:47:28 grogan kernel: ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+ cccccccccccccccccccccccccccccccccccc
+Jul  6 17:47:28 grogan kernel: ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccco: ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+ cccccccccccccccccccccccccccccccccccc
+Jul  6 17:47:28 grogan kernel: ccccccccccccccccccccccccccccccccccccccccccco: file_count is 2 (expected 3)
 
-   $ ./configure --with-bluez=/usr/local
+Any clues?
 
-The script distroys external values of BLUEZ_LIBS and based on
-the argument "--with-bluez=/your/path", the test compilations
-and verifications will by themselfs add one directory level
-to search for headers and libraries in
+-- 
+Dave Abrahams
+Boost Consulting
+http://www.boost-consulting.com
 
-   /your/path/include    and     /your/path/lib
+The Astoria Seminar ==> http://www.astoriaseminar.com
 
-By using this observation, I could yesterday evening become
-absolutely sure, that my cross-compilation with Buildroot/uClibc
-uses only the bluez-libs I built for the embedded application
-and does not reference the library I use on the host laptop.
-
-
-Regards	 	Mats E A
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
