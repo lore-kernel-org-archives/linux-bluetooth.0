@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: David Abrahams <dave@boost-consulting.com>
-Date: Fri, 06 Jul 2007 18:07:36 -0400
-Message-ID: <873b01xk2f.fsf@grogan.peloton>
+From: Mats Erik Andersson <mats.andersson64@comhem.se>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY102-W2777B5DBF6DAA26AA0CA9EF0010@phx.gbl>
+References: <BAY102-W2777B5DBF6DAA26AA0CA9EF0010@phx.gbl>
+Date: Sat, 07 Jul 2007 00:00:24 +0200
+Message-Id: <1183759224.4815.2.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-users] snd-bt-sco unkillable, file count is 2 (expected 3)
+Subject: Re: [Bluez-users] configure: error: Bluetooth library is required
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,34 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+fre 2007-07-06 klockan 16:57 +0000 skrev Robert Rawlins:
 
-After wandering out of range with my bluetooth headset (not sure if
-that's relevant), I returned to find snd-bt-scod taking 99% of the
-CPU, klogd taking the other 99% (core duo), and lots of the following
-in /var/log/syslog.  Oh, and I can't kill the snd-bt-scod process!  I
-tried -9, but nothing noticeable happens.
+> And then when trying to configure my bluez utils i use
+>  
+> ./configure BLUEZ_LIBS=/usr/local/lib
+>  
+> And i still get the same issue that it cannot find the bluetooth
+> libraries.
 
-Jul  6 17:47:28 grogan kernel: [41794.808000] snd-bt-sco: file_count is 2 (expected 3)
-Jul  6 17:47:28 grogan last message repeated 2 times
-Jul  6 17:47:28 grogan kernel: [41794.808000] sncccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccco: fileccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
- cccccccccccccccccccccccccccccccccccc
-Jul  6 17:47:28 grogan kernel: ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccco: c
- cccccccccccccccccccccccccccccccccccc
-Jul  6 17:47:28 grogan kernel: ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
- cccccccccccccccccccccccccccccccccccc
-Jul  6 17:47:28 grogan kernel: ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccco: ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
- cccccccccccccccccccccccccccccccccccc
-Jul  6 17:47:28 grogan kernel: ccccccccccccccccccccccccccccccccccccccccccco: file_count is 2 (expected 3)
+The universal cure to this is to use
 
-Any clues?
+  $ env BLUES_LIBS=/usr/local/lib ./configure
 
--- 
-Dave Abrahams
-Boost Consulting
-http://www.boost-consulting.com
-
-The Astoria Seminar ==> http://www.astoriaseminar.com
-
+That way the variable BLUES_LIBS is guaranteed to enter the environment
+for the new process.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
