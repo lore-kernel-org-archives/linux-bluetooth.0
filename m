@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <600883.33976.qm@web38512.mail.mud.yahoo.com>
-References: <600883.33976.qm@web38512.mail.mud.yahoo.com>
-Date: Fri, 06 Jul 2007 08:13:46 +0200
-Message-Id: <1183702426.6351.125.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] hcitool
+Message-ID: <d89ddf300707052037n77cde792lef76d30364998959@mail.gmail.com>
+Date: Thu, 5 Jul 2007 21:37:46 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <87ir8ytn5n.fsf@grogan.peloton>
+MIME-Version: 1.0
+References: <87ir8ytn5n.fsf@grogan.peloton>
+Subject: Re: [Bluez-users] hidd connection to mouse interferes with headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,27 +20,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Robert,
+Dave
 
-> Using the HCI tool utility I am trying to change the packet to HV1 but
-> I get an error 
-> 
-> $ sudo hcitool cc --ptype=HV1  xx:xx:xx:xx:xx:xx
-> Can't create connection: Input/output error
-> 
-> I get this error only if I try to change the packet types to HV1 HV2
-> and HV3. For Data packets it works fine.
+if you have "master" in hcid.conf's lm setting and you take "rswitch"
+and "sniff" out of the lp setting, you are forcing the pc to be master
+and to hopefully behave better with audio. restart hcid.
 
-run hcidump -X -V to see a more verbose error. However don't even do
-this at all. The hcitool cc command is for developers only. We use it
-for testing. It has implications that you obviously don't understand
-right now and trust me on that one. It is not what you want.
+brad
 
-Regards
-
-Marcel
-
-
+On 7/5/07, David Abrahams <dave@boost-consulting.com> wrote:
+> and try to use Skype again, I get horrible distortion, from "choppy
+> sound" to "white noise"
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
