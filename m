@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Mats Erik Andersson <mats.andersson64@comhem.se>
+From: Malte Steiner <steiner@mobileart.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY102-W23476BE4A95129E0C076DBF0070@phx.gbl>
-References: <BAY102-W23476BE4A95129E0C076DBF0070@phx.gbl>
-Date: Mon, 09 Jul 2007 13:02:27 +0200
-Message-Id: <1183978947.5105.9.camel@localhost>
+In-Reply-To: <fc3d922d0707051459t4a7d36bdtd8d0b998bddc6374@mail.gmail.com>
+References: <fc3d922d0707051459t4a7d36bdtd8d0b998bddc6374@mail.gmail.com>
+Date: Mon, 09 Jul 2007 00:55:20 +0200
+Message-Id: <1183935320.10502.7.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] configure: error: Bluetooth library is required
+Subject: Re: [Bluez-users] Recognizing cell phone model
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,68 +16,21 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Dear Robert,
+Its not easy.
+Best way is through a bluetooth modem connection and sending the right
+AT command. Unfortunally the mobile will show then the message like :
+XYZ try to make a modemconnection.
 
-s=F6n 2007-07-08 klockan 16:52 +0000 skrev Robert Rawlins:
-> Thanks guys for your help on this so far,
->  =
+which might irritate your customers.
 
-> I've now tried the following command when configuring my utils:
->  =
+Cheers,
 
-> ./configure --with-bluez=3D/usr/local/lib
->  =
+Malte Steiner
 
-> and
->  =
-
-> ./configure --with-bluez=3D/usr/local
-> =
-
-> And still come up against the same issue with the configuration
-> telling me that it cannot find bluez, which really is bizarre and the
-> make install for the libs confirms where they have been install
-> as /usr/local/lib.
->  =
-
-> inside that directory i can see the folowing files:
->  =
-
-> libbluetooth.so.2.7.0
-> libbluetooth.so.2
-> libbluetooth.a
-> libbluetooth.la
-> libbluetooth.so
->  =
-
-> Is there anything missing? Any other ideas? I'm running debian
-> and have apt-get which i used to use for this kind of thing,
-> unfortunately the only release of bluez i can find on there is a 3.7
-> and we really need to be working with the latest build on this
-> project. I believe there is some kind of svn for the latest build on
-> debian but i wasted a couple of hours trying to get that working with
-> no luck.
->  =
-
-
-Did you remember to add your header files to
-
-    /usr/local/include/bluetooth/    ?
-
-Namely those that come from bluez-libs-3.12.
-They are too easily forgotten, unless you are using debhelper
-to build your own packages, and then installed =
-
-
-   libbluetooth2_1rr.deb    and   libbluetooth2-dev_1rr.deb
-
-or whatever you happened to call them.
-
-Good luck,    Mats E A
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
