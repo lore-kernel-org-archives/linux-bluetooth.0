@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY102-W23476BE4A95129E0C076DBF0070@phx.gbl>
-From: Robert Rawlins <robert_rawlins@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Sun, 8 Jul 2007 16:52:34 +0000
+Date: Sun, 8 Jul 2007 05:53:59 -0700 (PDT)
+From: Robert Schmidt <itsmy_emale@yahoo.com>
+To: Bluez User <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] configure: error: Bluetooth library is required
+Message-ID: <783356.16436.qm@web38514.mail.mud.yahoo.com>
+Subject: [Bluez-users] voice setting
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,110 +14,41 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1710223324=="
+Content-Type: multipart/mixed; boundary="===============1509475282=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1710223324==
-Content-Type: multipart/alternative;
-	boundary="_c14bd8b3-6228-4a5c-997d-43a12cbb7f72_"
+--===============1509475282==
+Content-Type: multipart/alternative; boundary="0-460295759-1183899239=:16436"
+Content-Transfer-Encoding: 8bit
 
---_c14bd8b3-6228-4a5c-997d-43a12cbb7f72_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+--0-460295759-1183899239=:16436
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-Thanks guys for your help on this so far,
-=20
-I've now tried the following command when configuring my utils:
-=20
-./configure --with-bluez=3D/usr/local/lib
-=20
-and
-=20
-./configure --with-bluez=3D/usr/local
-And still come up against the same issue with the configuration telling me =
-that it cannot find bluez, which really is bizarre and the make install for=
- the libs confirms where they have been install as /usr/local/lib.
-=20
-inside that directory i can see the folowing files:
-=20
-libbluetooth.so.2.7.0
-libbluetooth.so.2
-libbluetooth.a
-libbluetooth.la
-libbluetooth.so
-=20
-Is there anything missing? Any other ideas? I'm running debian and have apt=
--get which i used to use for this kind of thing, unfortunately the only rel=
-ease of bluez i can find on there is a 3.7 and we really need to be working=
- with the latest build on this project. I believe there is some kind of svn=
- for the latest build on debian but i wasted a couple of hours trying to ge=
-t that working with no luck.
-=20
-Thanks for any further advice guys,
-=20
-Rob
-_________________________________________________________________
-The next generation of MSN Hotmail has arrived - Windows Live Hotmail
-http://www.newhotmail.co.uk=
+Hi,
 
---_c14bd8b3-6228-4a5c-997d-43a12cbb7f72_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<html>
-<head>
-<style>
-P
-{
-margin:0px;
-padding:0px
-}
-body
-{
-FONT-SIZE: 10pt;
-FONT-FAMILY:Tahoma
-}
-</style>
-</head>
-<body>Thanks guys for your help on this so far,<BR>
-&nbsp;<BR>
-I've now tried the following command when configuring my utils:<BR>
-&nbsp;<BR>
-./configure --with-bluez=3D/usr/local/lib<BR>
-&nbsp;<BR>
-and<BR>
-&nbsp;<BR>
-./configure --with-bluez=3D/usr/local<BR><BR>
-And still come up against the same issue with the configuration telling me =
-that it cannot find bluez, which really is bizarre and the make install for=
- the libs confirms where they have been install as /usr/local/lib.<BR>
-&nbsp;<BR>
-inside that directory i can see the folowing files:<BR>
-&nbsp;<BR>
-libbluetooth.so.2.7.0<BR>
-libbluetooth.so.2<BR>
-libbluetooth.a<BR>
-libbluetooth.la<BR>
-libbluetooth.so<BR>
-&nbsp;<BR>
-Is there anything missing? Any other ideas? I'm running debian and&nbsp;hav=
-e apt-get which i used to use for this kind of thing, unfortunately the onl=
-y release of bluez i can find on there is a 3.7 and we really need to be wo=
-rking with the latest build on this project. I believe there is some kind o=
-f svn for the latest build on debian but i wasted a couple of hours trying =
-to get that working with no luck.<BR>
-&nbsp;<BR>
-Thanks for any further advice guys,<BR>
-&nbsp;<BR>
-Rob<BR><br /><hr />Play Movie Mash-up and win  <a href=3D'https://www.movie=
-mashup.co.uk' target=3D'_new'>BIG prizes! </a></body>
-</html>=
-
---_c14bd8b3-6228-4a5c-997d-43a12cbb7f72_--
+What should be the voice setting in the command hci_write_voice_setting for transparent SCO??
 
 
---===============1710223324==
+thanks
+
+robert.
+
+       
+---------------------------------
+Get the free Yahoo! toolbar and rest assured with the added security of spyware protection. 
+--0-460295759-1183899239=:16436
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+Hi,<br><br>What should be the voice setting in the command hci_write_voice_setting for transparent SCO??<br><br><br>thanks<br><br>robert.<br><p>&#32;
+      <hr size=1><a href="http://us.rd.yahoo.com/evt=48226/*http://new.toolbar.yahoo.com/toolbar/features/norton/index.php">Get the free Yahoo! toolbar</a> and rest assured with the added security of spyware protection.
+ 
+--0-460295759-1183899239=:16436--
+
+
+--===============1509475282==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -128,7 +59,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1710223324==
+--===============1509475282==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -139,4 +70,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1710223324==--
+--===============1509475282==--
