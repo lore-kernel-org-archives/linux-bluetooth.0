@@ -1,9 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY102-W29FDFE40CCB889CA2C3ADFF0060@phx.gbl>
-From: Robert Rawlins <robert_rawlins@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Mon, 9 Jul 2007 14:16:14 +0000
-MIME-Version: 1.0
+From: Mats Erik Andersson <mats.andersson64@comhem.se>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY102-W27ED8AC7D297D3969CA322F0060@phx.gbl>
+References: <BAY102-W27ED8AC7D297D3969CA322F0060@phx.gbl>
+Date: Mon, 09 Jul 2007 15:54:58 +0200
+Message-Id: <1183989298.5105.56.camel@localhost>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] configure: error: Bluetooth library is required
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -14,115 +16,93 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1736593669=="
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1736593669==
-Content-Type: multipart/alternative;
-	boundary="_da3f5c4f-b6ea-4d69-a0cf-afba195d8e3f_"
+Dear Robert,
 
---_da3f5c4f-b6ea-4d69-a0cf-afba195d8e3f_
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
+m=E5n 2007-07-09 klockan 12:34 +0000 skrev Robert Rawlins:
+> Thank you Mats,
+>  =
 
-Great Mats!
-=20
-We're finally starting to get somewhere now, I've installed the package as =
-you recommended and we're getting closer, it now finds the bluetooth librar=
-ys as expected.
-=20
-However, its now not able to find my dbus installation :-D which i know for=
- sure i'm running version 1.0.1 as i've apt-getted it.
-=20
-checking for pkg-config... /usr/bin/pkg-configchecking pkg-config is at lea=
-st version 0.9.0... yeschecking for BLUEZ... yeschecking for GLIB... nochec=
-king for DBUS... noconfigure: error: dbus > 0.35 is required
-Perhaps the path for this is wrong too? it seems that apt-get doesn't insta=
-ll things into the places that the original source packages expect them to =
-be :-D
-=20
-But, looks like we're making progress at least, any idea on how to get it t=
-o find my dbus instalation?
-=20
-Thanks for all your help Mats, I owe you a beer, if i ever head to Sweden i=
-'ll buy you a pint of Sofiero,
-=20
-Rob
-_________________________________________________________________
-100=92s of Music vouchers to be won with MSN Music
-https://www.musicmashup.co.uk/index.html=
+> I ran the commands that you gave me and they appeared to run ok, and
+> when i ls the /usr/local/bluetooth/ folder it displays the following
+> files:
+>  =
 
---_da3f5c4f-b6ea-4d69-a0cf-afba195d8e3f_
-Content-Type: text/html; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
+> bluetooth.h  bnep.h  cmtp.h  hci.h  hci_lib.h  hidp.h  l2cap.h
+> rfcomm.h  sco.h  sdp.h  sdp_lib.h
+> =
 
-<html>
-<head>
-<style>
-P
-{
-margin:0px;
-padding:0px
-}
-body
-{
-FONT-SIZE: 10pt;
-FONT-FAMILY:Tahoma
-}
-</style>
-</head>
-<body>Great Mats!<BR>
-&nbsp;<BR>
-We're finally starting to get somewhere now, I've installed the package as =
-you recommended and we're getting closer, it now finds the bluetooth librar=
-ys as expected.<BR>
-&nbsp;<BR>
-However, its now not able to find my dbus installation :-D which i know for=
- sure i'm running version 1.0.1 as i've apt-getted it.<BR>
-&nbsp;<BR>
-checking for pkg-config... /usr/bin/pkg-config<BR>checking pkg-config is at=
- least version 0.9.0... yes<BR>checking for BLUEZ... yes<BR>checking for GL=
-IB... no<BR>checking for DBUS... no<BR>configure: error: dbus &gt; 0.35 is =
-required<BR><BR>
-Perhaps the path for this is wrong too? it seems that apt-get doesn't insta=
-ll things into the places that the original source packages expect them to =
-be :-D<BR>
-&nbsp;<BR>
-But, looks like we're making progress at least, any idea on how to get it t=
-o find my dbus instalation?<BR>
-&nbsp;<BR>
-Thanks for all your help Mats, I owe you a beer, if i ever head to Sweden i=
-'ll buy you a pint of Sofiero,<BR>
-&nbsp;<BR>
-Rob<BR><br /><hr />The next generation of MSN Hotmail has arrived -  <a hre=
-f=3D'http://www.newhotmail.co.uk' target=3D'_new'>Windows Live Hotmail</a><=
-/body>
-</html>=
+> However, i still get this error when using the configure :-s it really
+> is most odd. I notice in your last mail that you mention the static
+> and shared libraries, i'm not sure if this is of any use, but here is
+> a little more information from my ./configure on the utils, notice it
+> says build static ... no? is that normal?
+>  =
 
---_da3f5c4f-b6ea-4d69-a0cf-afba195d8e3f_--
+> checking whether to build shared libraries... yes
+> checking whether to build static libraries... no
+> configure: creating libtool
+> checking for ppoll... no
+> checking for pkg-config... no
+> checking for BLUEZ... configure: error: Bluetooth library is required
+> =
+
+> Thanks for all your help on this mats, I'm sure we're getting closer,
+>  =
 
 
---===============1736593669==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Yes, first and most importantly do
+
+   # apt-get install pkg-config
+
+which is lacking by your printout (the line second to last). This =
+
+explains most of the present problems, since it provides a mechanism
+to out locations of libraries, and then to configure source code that
+depends on these libraries.
+
+I did the following to check your prospects, likewise an Debian Etch
+system, but this machine is only slowly getting to the expanded stage
+where my Debian Sarge is at.
+
+$ mkdir /tmp/blind
+
+$ cd /tmp/bluez-libs-3.12
+$ ./configure --prefix=3D/tmp/blind
+
+$ make              # No errors should occur
+$ make install      # You can perform a dry run using "make -n install",
+		    # read the output, and se where things go.
+		    # Somewhat technical output, though.
+
+$ cd ../bluez-utils-3.12
+$ ./configure --prefix=3D/tmp/blind --with-bluez=3D/tmp/blind
+$ make =
+
+
+This aborts with an error for device.c complaining about
+LMP_PAUSE_ENC, LMP_NFLUSH_PKTS, and LMP_LSTO. The Bluez spacialist
+have to take over if your machine gets stuck here, since I only
+use Bluez-utils 2.25 and 3.7. But at least, when you can reach this
+stage the original hurdle has been overcome, since you have a working
+copy of libbluetooth2.
+
+Just a reminder, this.so is a dynamic/shared library, whereas that.a
+is a static library. Most users will never need to tell them apart.
+You will soon learn when progressing further on the road of tailoring
+your own software.
+
+Best regards,	Mats E A
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============1736593669==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1736593669==--
