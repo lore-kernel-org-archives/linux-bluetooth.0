@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY102-W16AA72BD57037F1749B764F0060@phx.gbl>
-From: Robert Rawlins <robert_rawlins@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Mon, 9 Jul 2007 11:40:25 +0000
-MIME-Version: 1.0
-Subject: [Bluez-users] configure: error: Bluetooth library is required
+From: Mats Erik Andersson <mats.andersson64@comhem.se>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY102-W23476BE4A95129E0C076DBF0070@phx.gbl>
+References: <BAY102-W23476BE4A95129E0C076DBF0070@phx.gbl>
+Date: Mon, 09 Jul 2007 13:02:27 +0200
+Message-Id: <1183978947.5105.9.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] configure: error: Bluetooth library is required
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,113 +16,75 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0911937812=="
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0911937812==
-Content-Type: multipart/alternative;
-	boundary="_e8d7510d-b490-49a0-8497-adc26dc28a2e_"
+Dear Robert,
 
---_e8d7510d-b490-49a0-8497-adc26dc28a2e_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+s=F6n 2007-07-08 klockan 16:52 +0000 skrev Robert Rawlins:
+> Thanks guys for your help on this so far,
+>  =
 
-Morning Mats,
-=20
-Thanks for your reply. I haven't copied my header files across, i'm not eve=
-n sure how too :-D
-=20
-Can you explain the installation process for me? at the moment I'm doing it=
- as follows.
-=20
-1) Download libs and utils files from bluez.org
-2) Untar those files using tar xzf filename.tar.gz
-3) cd to the directory for libs
-4) ./configure, make, make install
-5) cd to the utils directory
-6)  ./configure --with-bluez=3D/usr/local/lib
-=20
-And that's when i get my error, by the sounds of what you have been saying =
-i must be missing something out but i have no idea what. I don't do much co=
-mpiling from source so this is all quite new to me.
-=20
-Thanks again for your help, it really is appreciated.
-=20
-Rob
-_________________________________________________________________
-Try Live.com - your fast, personalised homepage with all the things you car=
-e about in one place.
-http://www.live.com/?mkt=3Den-gb  =
+> I've now tried the following command when configuring my utils:
+>  =
 
---_e8d7510d-b490-49a0-8497-adc26dc28a2e_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+> ./configure --with-bluez=3D/usr/local/lib
+>  =
 
-<html>
-<head>
-<style>
-P
-{
-margin:0px;
-padding:0px
-}
-body
-{
-FONT-SIZE: 10pt;
-FONT-FAMILY:Tahoma
-}
-</style>
-</head>
-<body>Morning Mats,<BR>
-&nbsp;<BR>
-Thanks for your reply. I haven't copied my header files across, i'm not eve=
-n sure how too :-D<BR>
-&nbsp;<BR>
-Can you explain the installation process for me? at the moment I'm doing it=
- as follows.<BR>
-&nbsp;<BR>
-1) Download libs and utils files from bluez.org<BR>
-2) Untar those files using tar xzf filename.tar.gz<BR>
-3) cd to the directory for libs<BR>
-4) ./configure, make, make install<BR>
-5) cd to the utils directory<BR>
-6)  ./configure --with-bluez=3D/usr/local/lib<BR>
-&nbsp;<BR>
-And that's when i get my error, by the sounds of what you have been saying =
-i must be missing something out but i have no idea what. I don't do much co=
-mpiling from source so this is all quite new to me.<BR>
-&nbsp;<BR>
-Thanks again for your help, it really is appreciated.<BR>
-&nbsp;<BR>
-Rob<BR><br /><hr />Are you the Quizmaster?  <a href=3D'http://specials.uk.m=
-sn.com/brainbattle' target=3D'_new'>Play BrainBattle with a friend now! </a=
-></body>
-</html>=
+> and
+>  =
 
---_e8d7510d-b490-49a0-8497-adc26dc28a2e_--
+> ./configure --with-bluez=3D/usr/local
+> =
+
+> And still come up against the same issue with the configuration
+> telling me that it cannot find bluez, which really is bizarre and the
+> make install for the libs confirms where they have been install
+> as /usr/local/lib.
+>  =
+
+> inside that directory i can see the folowing files:
+>  =
+
+> libbluetooth.so.2.7.0
+> libbluetooth.so.2
+> libbluetooth.a
+> libbluetooth.la
+> libbluetooth.so
+>  =
+
+> Is there anything missing? Any other ideas? I'm running debian
+> and have apt-get which i used to use for this kind of thing,
+> unfortunately the only release of bluez i can find on there is a 3.7
+> and we really need to be working with the latest build on this
+> project. I believe there is some kind of svn for the latest build on
+> debian but i wasted a couple of hours trying to get that working with
+> no luck.
+>  =
 
 
---===============0911937812==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Did you remember to add your header files to
+
+    /usr/local/include/bluetooth/    ?
+
+Namely those that come from bluez-libs-3.12.
+They are too easily forgotten, unless you are using debhelper
+to build your own packages, and then installed =
+
+
+   libbluetooth2_1rr.deb    and   libbluetooth2-dev_1rr.deb
+
+or whatever you happened to call them.
+
+Good luck,    Mats E A
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0911937812==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0911937812==--
