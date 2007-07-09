@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY102-W27ED8AC7D297D3969CA322F0060@phx.gbl>
-From: Robert Rawlins <robert_rawlins@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Mon, 9 Jul 2007 12:34:17 +0000
-MIME-Version: 1.0
-Subject: Re: [Bluez-users] configure: error: Bluetooth library is required
+From: Mats Erik Andersson <mats.andersson64@comhem.se>
+To: Bluez-users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <00ca01c7c21e$1d0961b0$6e00a8c0@komp6>
+References: <00ca01c7c21e$1d0961b0$6e00a8c0@komp6>
+Date: Mon, 09 Jul 2007 14:30:21 +0200
+Message-Id: <1183984221.5105.33.camel@localhost>
+Mime-Version: 1.0
+Subject: [Bluez-users] Printing on Nokia N800
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,114 +16,51 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0286480531=="
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0286480531==
-Content-Type: multipart/alternative;
-	boundary="_6a25a44e-c268-4f50-a670-b0cd0d8ff088_"
-
---_6a25a44e-c268-4f50-a670-b0cd0d8ff088_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-Thank you Mats,
-=20
-I ran the commands that you gave me and they appeared to run ok, and when i=
- ls the /usr/local/bluetooth/ folder it displays the following files:
-=20
-bluetooth.h  bnep.h  cmtp.h  hci.h  hci_lib.h  hidp.h  l2cap.h  rfcomm.h  s=
-co.h  sdp.h  sdp_lib.h
-However, i still get this error when using the configure :-s it really is m=
-ost odd. I notice in your last mail that you mention the static and shared =
-libraries, i'm not sure if this is of any use, but here is a little more in=
-formation from my ./configure on the utils, notice it says build static ...=
- no? is that normal?
-=20
-checking whether to build shared libraries... yeschecking whether to build =
-static libraries... noconfigure: creating libtoolchecking for ppoll... noch=
-ecking for pkg-config... nochecking for BLUEZ... configure: error: Bluetoot=
-h library is required
-Thanks for all your help on this mats, I'm sure we're getting closer,
-=20
-Thanks,
-=20
-Rob
-_________________________________________________________________
-Try Live.com - your fast, personalised homepage with all the things you car=
-e about in one place.
-http://www.live.com/?mkt=3Den-gb  =
-
---_6a25a44e-c268-4f50-a670-b0cd0d8ff088_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<html>
-<head>
-<style>
-P
-{
-margin:0px;
-padding:0px
-}
-body
-{
-FONT-SIZE: 10pt;
-FONT-FAMILY:Tahoma
-}
-</style>
-</head>
-<body>Thank you Mats,<BR>
-&nbsp;<BR>
-I ran the commands that you gave me and they appeared to run ok, and when i=
- ls the /usr/local/bluetooth/ folder it displays the following files:<BR>
-&nbsp;<BR>
-bluetooth.h&nbsp; bnep.h&nbsp; cmtp.h&nbsp; hci.h&nbsp; hci_lib.h&nbsp; hid=
-p.h&nbsp; l2cap.h&nbsp; rfcomm.h&nbsp; sco.h&nbsp; sdp.h&nbsp; sdp_lib.h<BR=
-><BR>
-However, i still get this error when using the configure :-s it really is m=
-ost odd. I notice in your last mail that you mention the static and shared =
-libraries, i'm not sure if this is of any use, but here is a little more in=
-formation from my ./configure on the utils, notice it says build static ...=
- no? is that normal?<BR>
-&nbsp;<BR>
-checking whether to build shared libraries... yes<BR>checking whether to bu=
-ild static libraries... no<BR>configure: creating libtool<BR>checking for p=
-poll... no<BR>checking for pkg-config... no<BR>checking for BLUEZ... config=
-ure: error: Bluetooth library is required<BR><BR>
-Thanks for all your help on this mats, I'm sure we're getting closer,<BR>
-&nbsp;<BR>
-Thanks,<BR>
-&nbsp;<BR>
-Rob<BR><br /><hr />Are you the Quizmaster?  <a href=3D'http://specials.uk.m=
-sn.com/brainbattle' target=3D'_new'>Play BrainBattle with a friend now! </a=
-></body>
-</html>=
-
---_6a25a44e-c268-4f50-a670-b0cd0d8ff088_--
-
-
---===============0286480531==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
---===============0286480531==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0286480531==--
+RGVhciBCbHVlei11c2VycyBsaXN0LAoKYW4gdW5rbm93biBmZWxsb3cgbmVlZGVkIGhlbHAgdG8g
+cG9zdCBhIHF1ZXN0aW9uCnRvIHRoZSBsaXN0LiBUaGUgbWVzc2FnZSBzZWVtcyBzZXJpb3VzIGVu
+b3VnaCwgc28KSSBmb3J3YXJkIGl0IGZvciBvdGhlcnMgdG8gY29tbWVudCB1cG9uLiBIZSBvYnZp
+b3VzbHkKaXMgYWJsZSB0byByZWFkIEJsdWV6LXVzZXJzLCBidXQgZmFpbHMgdG8gcG9zdCBhdCB0
+aGUKbW9tZW50LiBUZWxsIG1lIGlmIGEgYnJha2UgYSB2aXRhbCBwb2xpY3kgYnkgZG9pbmcgdGhp
+cy4KCgptw6VuIDIwMDctMDctMDkga2xvY2thbiAxNTo0MSArMDQwMCBza3JldiDQndC40LrQvtC7
+0LDQuSDQmtC+0LzQsNGA0L7QsjoKPiBTb3JyeSBmb3IgZGlzdHVyYmluZyB5b3UsIGJ1dCBJIG5l
+ZWQgaGVscCEKPiAKPiBJ4oCZdmUgc3Vic2NyaWJlZCB0byBibHVlei11c2VycyBidXQgY2Fu4oCZ
+dCBwb3N0IHRoZXJlIGJlY2F1c2UgdGhlCj4gbWFpbGVyLWRhZW1vbiByZWZ1c2VzIHRvIHJlY2Vp
+dmUgbXkgbWVzc2FnZS4KPiAKPiAgCj4gCj4gQ291bGQgeW91IHBsZWFzZSBhIHBvc3QgYSBtZXNz
+YWdlIHF1b3RlZCBiZWxvdz8KPiAKPiAgCj4gCj4gLS0tLS0tLS0tLS0tLS0tLS0tCj4gCj4gSGkh
+Cj4gSSdtIHRyeWluZyB0byBtYWtlIGl0IHBvc3NpYmxlIHRvIHByaW50IGRvY3VtZW50cyB2aWEg
+Qmx1ZXRvb3RoIG9uIHRoZQo+IE5va2lhIE44MDAgZGV2aWNlIChiYXNlZCBvbiBBUk0gd2l0aCBE
+ZWJpYW4tbGlrZSBPUyBpbnN0YWxsZWQsIHNlZQo+IGh0dHA6Ly9tYWVtby5vcmcvZGV2ZWxvcG1l
+bnQvIGZvciBkZXZlbG9wZXIgZGV0YWlscykuCj4gVGhlcmUgYXJlIHRoZXNlIGxpYnMgaW4gdGhl
+IHN5c3RlbTogYmx1ZXotY3VwcyAzLjdvc3NvMTEsCj4gYmx1ZXotaGNpZHVtcCAxLjM2LTBvc3Nv
+MSwgYmx1ZXotdXRpbHMgMy45LW9zc280ICwgYmx1ZXotdXRpbHMtdGVzdAo+IDMuOS1vc3NvNC4K
+PiAoIGh0dHA6Ly90YWJsZXRzLWRldi5ub2tpYS5jb20vMy4yL2NvbnRlbnRfY29tcGFyaXNvbi5o
+dG1sICkKPiAKPiBBdCB0aGUgc2FtZSB0aW1lLCB0aGVyZSBpcyBubyBDVVBTIGxpYiBwb3J0ZWQg
+dG8gdGhpcyBzeXN0ZW0gc28gSQo+IGNhbid0IHNlbmQgZG9jdW1lbnRzIHRvIGl0IGluIGEgdXN1
+YWwgd2F5LiBUaGUgcXVlc3Rpb24gaXMsIGNhbiBJIHRyeQo+IHByaW50aW5nIGZyb20gdGhhdCBz
+eXN0ZW0gd2l0aG91dCBDVVBTIGFuZCB3aXRob3V0IGJsdWV6LWxpYnM/IFdoaWNoCj4gb2YgdGhl
+IGxpYnMgSSBjb3VsZCB1c2UgZm9yIGl0PyBJcyB0aGVyZSBhIHNpbXBsZSBleGFtcGxlPwo+IAo+
+IEkndmUgbG9va2VkIHRocm91Z2ggc29tZSBkb2NzIG9uIHRoZSBCbHVlWiBkb2NzIHBhZ2UKPiAo
+IGh0dHA6Ly93d3cuYmx1ZXoub3JnL2RvY3VtZW50YXRpb24uaHRtbCApIGFuZCBpbiB0aGUgbGlz
+dCBvZiBIT1dUT3MKPiBmb3VuZCBhIGxpbmsgdG8gc29tZSAiY3Vwcy1ibHVldG9vdGgiIHBhY2tl
+dAo+ICggaHR0cDovL3d3dy5ob2x0bWFubi5vcmcvbGludXgvYmx1ZXRvb3RoL2N1cHMuaHRtbCAp
+LiBXaGF0J3MgdGhlCj4gcmVsYXRpb24gYmV0d2VlbiBpdCBhbmQgQmx1ZVogbGlicz8KPiAKPiBB
+bHNvLCBpZiB0aGVyZSdzIHNvbWUgb2YgdGhlIGRldmVsb3BlcnMgd2hvIGhhdmUgcG9ydGVkIHRo
+ZXNlIGxpYnMgdG8KPiBOb2tpYSBOODAwLCBJJ2QgbGlrZSB0byBjb250YWN0IHRoaXMgcGVyc29u
+Lgo+IAo+IFRoYW5rcyBpbiBhZHZhbmNlIQo+IAo+IAo+ICAKPiAKPiBJIGNhbuKAmXQgd2FpdCB0
+byBmaW5kIG91dCB3aGF04oCZcyB0aGUgcHJvYmxlbSBiZWNhdXNlIHRoaXMgcXVlc3Rpb24gaXMK
+PiB2ZXJ5IHVyZ2VudCBmb3IgbWUsIEkgbmVlZCBpbmZvcm1hdGlvbiBBU0FQLgo+IAo+IEkgY2Fu
+IHJlYWQgcG9zdHMgYnV0IGNhbuKAmXQgcG9zdCBieSBteXNlbGYuIElmIHlvdSBwb3N0IGl0IGZv
+ciBtZSwgSeKAmWxsCj4gYmUgYWJsZSB0byByZWFkIGFuc3dlcnMuIFRoYW5rIHlvdSBpbiBhZHZh
+bmNlISEKPiAKPiAgCj4gCj4gQmVzdCByZWdhcmRzLAo+IAo+ICBOaWtvbGF5IEtvbWFyb3YKPiAK
+PiAKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5IERC
+MiBFeHByZXNzCkRvd25sb2FkIERCMiBFeHByZXNzIEMgLSB0aGUgRlJFRSB2ZXJzaW9uIG9mIERC
+MiBleHByZXNzIGFuZCB0YWtlCmNvbnRyb2wgb2YgeW91ciBYTUwuIE5vIGxpbWl0cy4gSnVzdCBk
+YXRhLiBDbGljayB0byBnZXQgaXQgbm93LgpodHRwOi8vc291cmNlZm9yZ2UubmV0L3Bvd2VyYmFy
+L2RiMi8KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1
+ZXotdXNlcnMgbWFpbGluZyBsaXN0CkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApo
+dHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo=
