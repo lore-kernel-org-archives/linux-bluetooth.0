@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Mats Erik Andersson <mats.andersson64@comhem.se>
-To: Bluez-users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <00ca01c7c21e$1d0961b0$6e00a8c0@komp6>
-References: <00ca01c7c21e$1d0961b0$6e00a8c0@komp6>
-Date: Mon, 09 Jul 2007 14:30:21 +0200
-Message-Id: <1183984221.5105.33.camel@localhost>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY102-W16AA72BD57037F1749B764F0060@phx.gbl>
+References: <BAY102-W16AA72BD57037F1749B764F0060@phx.gbl>
+Date: Mon, 09 Jul 2007 14:15:26 +0200
+Message-Id: <1183983327.5105.27.camel@localhost>
 Mime-Version: 1.0
-Subject: [Bluez-users] Printing on Nokia N800
+Subject: Re: [Bluez-users] configure: error: Bluetooth library is required
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,51 +16,80 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-RGVhciBCbHVlei11c2VycyBsaXN0LAoKYW4gdW5rbm93biBmZWxsb3cgbmVlZGVkIGhlbHAgdG8g
-cG9zdCBhIHF1ZXN0aW9uCnRvIHRoZSBsaXN0LiBUaGUgbWVzc2FnZSBzZWVtcyBzZXJpb3VzIGVu
-b3VnaCwgc28KSSBmb3J3YXJkIGl0IGZvciBvdGhlcnMgdG8gY29tbWVudCB1cG9uLiBIZSBvYnZp
-b3VzbHkKaXMgYWJsZSB0byByZWFkIEJsdWV6LXVzZXJzLCBidXQgZmFpbHMgdG8gcG9zdCBhdCB0
-aGUKbW9tZW50LiBUZWxsIG1lIGlmIGEgYnJha2UgYSB2aXRhbCBwb2xpY3kgYnkgZG9pbmcgdGhp
-cy4KCgptw6VuIDIwMDctMDctMDkga2xvY2thbiAxNTo0MSArMDQwMCBza3JldiDQndC40LrQvtC7
-0LDQuSDQmtC+0LzQsNGA0L7QsjoKPiBTb3JyeSBmb3IgZGlzdHVyYmluZyB5b3UsIGJ1dCBJIG5l
-ZWQgaGVscCEKPiAKPiBJ4oCZdmUgc3Vic2NyaWJlZCB0byBibHVlei11c2VycyBidXQgY2Fu4oCZ
-dCBwb3N0IHRoZXJlIGJlY2F1c2UgdGhlCj4gbWFpbGVyLWRhZW1vbiByZWZ1c2VzIHRvIHJlY2Vp
-dmUgbXkgbWVzc2FnZS4KPiAKPiAgCj4gCj4gQ291bGQgeW91IHBsZWFzZSBhIHBvc3QgYSBtZXNz
-YWdlIHF1b3RlZCBiZWxvdz8KPiAKPiAgCj4gCj4gLS0tLS0tLS0tLS0tLS0tLS0tCj4gCj4gSGkh
-Cj4gSSdtIHRyeWluZyB0byBtYWtlIGl0IHBvc3NpYmxlIHRvIHByaW50IGRvY3VtZW50cyB2aWEg
-Qmx1ZXRvb3RoIG9uIHRoZQo+IE5va2lhIE44MDAgZGV2aWNlIChiYXNlZCBvbiBBUk0gd2l0aCBE
-ZWJpYW4tbGlrZSBPUyBpbnN0YWxsZWQsIHNlZQo+IGh0dHA6Ly9tYWVtby5vcmcvZGV2ZWxvcG1l
-bnQvIGZvciBkZXZlbG9wZXIgZGV0YWlscykuCj4gVGhlcmUgYXJlIHRoZXNlIGxpYnMgaW4gdGhl
-IHN5c3RlbTogYmx1ZXotY3VwcyAzLjdvc3NvMTEsCj4gYmx1ZXotaGNpZHVtcCAxLjM2LTBvc3Nv
-MSwgYmx1ZXotdXRpbHMgMy45LW9zc280ICwgYmx1ZXotdXRpbHMtdGVzdAo+IDMuOS1vc3NvNC4K
-PiAoIGh0dHA6Ly90YWJsZXRzLWRldi5ub2tpYS5jb20vMy4yL2NvbnRlbnRfY29tcGFyaXNvbi5o
-dG1sICkKPiAKPiBBdCB0aGUgc2FtZSB0aW1lLCB0aGVyZSBpcyBubyBDVVBTIGxpYiBwb3J0ZWQg
-dG8gdGhpcyBzeXN0ZW0gc28gSQo+IGNhbid0IHNlbmQgZG9jdW1lbnRzIHRvIGl0IGluIGEgdXN1
-YWwgd2F5LiBUaGUgcXVlc3Rpb24gaXMsIGNhbiBJIHRyeQo+IHByaW50aW5nIGZyb20gdGhhdCBz
-eXN0ZW0gd2l0aG91dCBDVVBTIGFuZCB3aXRob3V0IGJsdWV6LWxpYnM/IFdoaWNoCj4gb2YgdGhl
-IGxpYnMgSSBjb3VsZCB1c2UgZm9yIGl0PyBJcyB0aGVyZSBhIHNpbXBsZSBleGFtcGxlPwo+IAo+
-IEkndmUgbG9va2VkIHRocm91Z2ggc29tZSBkb2NzIG9uIHRoZSBCbHVlWiBkb2NzIHBhZ2UKPiAo
-IGh0dHA6Ly93d3cuYmx1ZXoub3JnL2RvY3VtZW50YXRpb24uaHRtbCApIGFuZCBpbiB0aGUgbGlz
-dCBvZiBIT1dUT3MKPiBmb3VuZCBhIGxpbmsgdG8gc29tZSAiY3Vwcy1ibHVldG9vdGgiIHBhY2tl
-dAo+ICggaHR0cDovL3d3dy5ob2x0bWFubi5vcmcvbGludXgvYmx1ZXRvb3RoL2N1cHMuaHRtbCAp
-LiBXaGF0J3MgdGhlCj4gcmVsYXRpb24gYmV0d2VlbiBpdCBhbmQgQmx1ZVogbGlicz8KPiAKPiBB
-bHNvLCBpZiB0aGVyZSdzIHNvbWUgb2YgdGhlIGRldmVsb3BlcnMgd2hvIGhhdmUgcG9ydGVkIHRo
-ZXNlIGxpYnMgdG8KPiBOb2tpYSBOODAwLCBJJ2QgbGlrZSB0byBjb250YWN0IHRoaXMgcGVyc29u
-Lgo+IAo+IFRoYW5rcyBpbiBhZHZhbmNlIQo+IAo+IAo+ICAKPiAKPiBJIGNhbuKAmXQgd2FpdCB0
-byBmaW5kIG91dCB3aGF04oCZcyB0aGUgcHJvYmxlbSBiZWNhdXNlIHRoaXMgcXVlc3Rpb24gaXMK
-PiB2ZXJ5IHVyZ2VudCBmb3IgbWUsIEkgbmVlZCBpbmZvcm1hdGlvbiBBU0FQLgo+IAo+IEkgY2Fu
-IHJlYWQgcG9zdHMgYnV0IGNhbuKAmXQgcG9zdCBieSBteXNlbGYuIElmIHlvdSBwb3N0IGl0IGZv
-ciBtZSwgSeKAmWxsCj4gYmUgYWJsZSB0byByZWFkIGFuc3dlcnMuIFRoYW5rIHlvdSBpbiBhZHZh
-bmNlISEKPiAKPiAgCj4gCj4gQmVzdCByZWdhcmRzLAo+IAo+ICBOaWtvbGF5IEtvbWFyb3YKPiAK
-PiAKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5IERC
-MiBFeHByZXNzCkRvd25sb2FkIERCMiBFeHByZXNzIEMgLSB0aGUgRlJFRSB2ZXJzaW9uIG9mIERC
-MiBleHByZXNzIGFuZCB0YWtlCmNvbnRyb2wgb2YgeW91ciBYTUwuIE5vIGxpbWl0cy4gSnVzdCBk
-YXRhLiBDbGljayB0byBnZXQgaXQgbm93LgpodHRwOi8vc291cmNlZm9yZ2UubmV0L3Bvd2VyYmFy
-L2RiMi8KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1
-ZXotdXNlcnMgbWFpbGluZyBsaXN0CkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApo
-dHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo=
+Dear Robert,
+
+m=E5n 2007-07-09 klockan 11:40 +0000 skrev Robert Rawlins:
+> Morning Mats,
+>  =
+
+> Thanks for your reply. I haven't copied my header files across, i'm
+> not even sure how too :-D
+>  =
+
+> Can you explain the installation process for me? at the moment I'm
+> doing it as follows.
+>  =
+
+> 1) Download libs and utils files from bluez.org
+> 2) Untar those files using tar xzf filename.tar.gz
+> 3) cd to the directory for libs
+> 4) ./configure, make, make install
+> 5) cd to the utils directory
+> 6) ./configure --with-bluez=3D/usr/local/lib
+>  =
+
+> And that's when i get my error, by the sounds of what you have been
+> saying i must be missing something out but i have no idea what. I
+> don't do much compiling from source so this is all quite new to me.
+>  =
+
+> Thanks again for your help, it really is appreciated.
+>  =
+
+> Rob
+> =
+
+
+The quickest way is to create a directory =
+
+
+# mkdir -p /usr/local/include/bluetooth/
+
+and then copy the header files by hand =
+
+
+# cp /path/to/source/for/bluez-libs-3.12/include/*.h \
+            /usr/local/include/bluetooth/
+
+The lacking of those header files, i.e. detailed descriptions of
+bluez-utils-3.12, is probably the reason why you could not build
+bluez-utils, even though the static and shared libraries were
+present. I am somewhat puzzeled that "make install" did not put
+the headers in the correct place, but give the above manipulation
+a chance, and we will figure out the rest when there is no hurry.
+
+By the way, your very first effort with BLUEZ_LIBS essentially
+only lacked a second necessary variable:
+
+   BLUEZ_LDFLAGS=3D"-I/usr/local/include"
+   BLUEZ_LIBS=3D"-L/usr/local/lib -lbluetooth"
+
+but it is safer to use "--with-bluez=3D/usr/local"
+
+Good luck this time!
+
+Best regards,	Mats E A
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
