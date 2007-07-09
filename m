@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 10 Jul 2007 17:11:45 +0530 (IST)
-From: Santhosh N <santhosh.n@geodesic.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.64.0707101656280.10834@terminator.picopeta.com>
-MIME-Version: 1.0
-Subject: [Bluez-users] Problem making bluetooth device locatable
+From: David Abrahams <dave@boost-consulting.com>
+Date: Mon, 09 Jul 2007 18:00:25 -0400
+Message-ID: <87d4z1fdae.fsf@grogan.peloton>
+Mime-Version: 1.0
+Subject: [Bluez-users] Why do I have to pair my headset each time?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,27 +18,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi All,
 
-I have a bluetooth USB dongle connected to our embedded device. I am 
-having problem in making my embedded device locatable by other devices. I 
-am able to scan the list of devices in the vicinity from my device. I have 
-made sure that PSCAN and ISCAN are enabled. Inspite of that my embedded 
-device is not locatable by other devices.
+My cellphone remembers its relationship to my bluetooth headset, but
+it seems the computer does not.  Is there some trick I'm missing?
 
-The output of "hciconfig" is:
-hci0:   Type: USB
-         BD Address: 00:02:72:01:C3:A0 ACL MTU: 192:8 SCO MTU: 64:8
-         UP RUNNING PSCAN ISCAN
-         RX bytes:151 acl:0 sco:0 events:15 errors:0
-         TX bytes:42 acl:0 sco:0 commands:10 errors:0
+TIA,
 
-Please let me know, how can I proceed further in fixing this issue. I am 
-using linux kernel 2.6.20 and bluez-libs/utils 3.9.
-
-Thanks in advance,
 -- 
-N Santhosh
+Dave Abrahams
+Boost Consulting
+http://www.boost-consulting.com
+
+The Astoria Seminar ==> http://www.astoriaseminar.com
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
