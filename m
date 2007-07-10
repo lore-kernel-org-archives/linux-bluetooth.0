@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <be976db60707101202x7d6b8e99x161ab3cab64af9e7@mail.gmail.com>
-Date: Tue, 10 Jul 2007 12:02:58 -0700
-From: "Mark S. Townsley" <mstownsley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+From: Thilo Riessner <thilo@riessner.de>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Tue, 10 Jul 2007 17:18:51 +0200
+References: <87d4z1fdae.fsf@grogan.peloton>
+In-Reply-To: <87d4z1fdae.fsf@grogan.peloton>
 MIME-Version: 1.0
-Subject: [Bluez-users] hcidump question
+Message-Id: <200707101718.52425.thilo@riessner.de>
+Subject: Re: [Bluez-users] Why do I have to pair my headset each time?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,65 +16,31 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0880325830=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0880325830==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_154246_10411738.1184094178019"
-
-------=_Part_154246_10411738.1184094178019
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi:
-
-When I tried to issue hcidump as a non-root user, I get permission denied.
-Short from doing a setuid on hcidump,
-I traced the code that found this line to be denying non-root user in
-executing the binary:
-
-     ioctl(dd, HCISETRAW, opt);
-
-What is HCISETRAW?  And is root the only user that can fire off hcidump?
-
-Thanks
-
-Mark
-
-------=_Part_154246_10411738.1184094178019
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi:<br><br>When I tried to issue hcidump as a non-root user, I get permission denied.&nbsp; Short from doing a setuid on hcidump,<br>I traced the code that found this line to be denying non-root user in executing the binary:<br>
-<br>&nbsp;&nbsp;&nbsp;&nbsp; ioctl(dd, HCISETRAW, opt);<br><br>What is HCISETRAW?&nbsp; And is root the only user that can fire off hcidump?<br><br>Thanks<br><br>Mark<br>
-
-------=_Part_154246_10411738.1184094178019--
-
-
---===============0880325830==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Am Dienstag, 10. Juli 2007 00:00 schrieb David Abrahams:
+> My cellphone remembers its relationship to my bluetooth headset, but
+> it seems the computer does not.  Is there some trick I'm missing?
+>
+> TIA,
+Sounds like a similar problem I've had with my bluetooth mouse (see 
+thread: "HP Bluetooth PC Card Mouse"). I solved it by starting the hidd with 
+the following options:
+--connect 00:02:76:00:D0:3E --master --server
+(with your correct bluetooth address of course)
+openSuSE 10.2 to starts the hidd during system boot with the arguments found 
+in the variable HID_DAEMON_ARGS in the file /etc/sysconfig/bluetooth. I 
+guess, other distributions have similar mechanisms. So you need not to set 
+this options every time after a restart.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============0880325830==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0880325830==--
