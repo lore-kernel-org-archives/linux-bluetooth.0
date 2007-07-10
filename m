@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Thilo Riessner <thilo@riessner.de>
+Date: Tue, 10 Jul 2007 19:55:37 +0530 (IST)
+From: Santhosh N <santhosh.n@geodesic.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Tue, 10 Jul 2007 17:18:51 +0200
-References: <87d4z1fdae.fsf@grogan.peloton>
-In-Reply-To: <87d4z1fdae.fsf@grogan.peloton>
+In-Reply-To: <1184072616.21280.30.camel@localhost>
+Message-ID: <Pine.LNX.4.64.0707101954090.11129@terminator.picopeta.com>
+References: <Pine.LNX.4.64.0707101656280.10834@terminator.picopeta.com>
+	<1184072616.21280.30.camel@localhost>
 MIME-Version: 1.0
-Message-Id: <200707101718.52425.thilo@riessner.de>
-Subject: Re: [Bluez-users] Why do I have to pair my headset each time?
+Subject: Re: [Bluez-users] Problem making bluetooth device locatable
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,20 +21,65 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Am Dienstag, 10. Juli 2007 00:00 schrieb David Abrahams:
-> My cellphone remembers its relationship to my bluetooth headset, but
-> it seems the computer does not.  Is there some trick I'm missing?
+Hi Mats,
+
+Thanks for the reply. It worked for me.
+
+Warm Regards,
+-- 
+N Santhosh,
+
+On Tue, 10 Jul 2007, Mats Erik Andersson wrote:
+
+> Hi Santhosh,
 >
-> TIA,
-Sounds like a similar problem I've had with my bluetooth mouse (see 
-thread: "HP Bluetooth PC Card Mouse"). I solved it by starting the hidd with 
-the following options:
---connect 00:02:76:00:D0:3E --master --server
-(with your correct bluetooth address of course)
-openSuSE 10.2 to starts the hidd during system boot with the arguments found 
-in the variable HID_DAEMON_ARGS in the file /etc/sysconfig/bluetooth. I 
-guess, other distributions have similar mechanisms. So you need not to set 
-this options every time after a restart.
+> you should add a line to hcid.conf in the device block:
+>
+>  device {
+>      ...
+>      discoverto 0;
+>      ...
+>       }
+>
+> This disables the timer that normally shuts the window
+> allowing for external discovery. Make "man hcid.conf"
+> to learn more.
+>
+> Regards,    Mats E A
+>
+>
+>
+> tis 2007-07-10 klockan 17:11 +0530 skrev Santhosh N:
+>> Hi All,
+>>
+>> I have a bluetooth USB dongle connected to our embedded device. I am
+>> having problem in making my embedded device locatable by other devices. I
+>> am able to scan the list of devices in the vicinity from my device. I have
+>> made sure that PSCAN and ISCAN are enabled. Inspite of that my embedded
+>> device is not locatable by other devices.
+>>
+>> The output of "hciconfig" is:
+>> hci0:   Type: USB
+>>          BD Address: 00:02:72:01:C3:A0 ACL MTU: 192:8 SCO MTU: 64:8
+>>          UP RUNNING PSCAN ISCAN
+>>          RX bytes:151 acl:0 sco:0 events:15 errors:0
+>>          TX bytes:42 acl:0 sco:0 commands:10 errors:0
+>>
+>> Please let me know, how can I proceed further in fixing this issue. I am
+>> using linux kernel 2.6.20 and bluez-libs/utils 3.9.
+>>
+>> Thanks in advance,
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by DB2 Express
+> Download DB2 Express C - the FREE version of DB2 express and take
+> control of your XML. No limits. Just data. Click to get it now.
+> http://sourceforge.net/powerbar/db2/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
