@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Mats Erik Andersson <mats.andersson64@comhem.se>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.64.0707101656280.10834@terminator.picopeta.com>
-References: <Pine.LNX.4.64.0707101656280.10834@terminator.picopeta.com>
-Date: Tue, 10 Jul 2007 15:03:36 +0200
-Message-Id: <1184072616.21280.30.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Problem making bluetooth device locatable
+Date: Tue, 10 Jul 2007 04:38:01 -0700 (PDT)
+From: Robert Schmidt <itsmy_emale@yahoo.com>
+To: Bluez User <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Message-ID: <806473.19249.qm@web38514.mail.mud.yahoo.com>
+Subject: [Bluez-users] SCO question
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,55 +14,61 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1021944699=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Santhosh,
+--===============1021944699==
+Content-Type: multipart/alternative; boundary="0-2074913454-1184067481=:19249"
+Content-Transfer-Encoding: 8bit
 
-you should add a line to hcid.conf in the device block:
+--0-2074913454-1184067481=:19249
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-  device {
-      ...
-      discoverto 0;
-      ...
-       }
+When I establish an SCO connection between two devices I see in the hcidump that there is a lot of garbage being sent between two devices even though I do not give any input.
 
-This disables the timer that normally shuts the window
-allowing for external discovery. Make "man hcid.conf"
-to learn more.
+What kind of data is it ?? Is it from Bluez or....... ??
 
-Regards,    Mats E A
+regards,
+
+robert.
+
+       
+---------------------------------
+Yahoo! oneSearch: Finally,  mobile search that gives answers, not web links. 
+--0-2074913454-1184067481=:19249
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+When I establish an SCO connection between two devices I see in the hcidump that there is a lot of garbage being sent between two devices even though I do not give any input.<br><br>What kind of data is it ?? Is it from Bluez or....... ??<br><br>regards,<br><br>robert.<br><p>&#32;
+      <hr size=1>Yahoo! oneSearch: Finally, <a href="http://us.rd.yahoo.com/evt=48252/*http://mobile.yahoo.com/mobileweb/onesearch?refer=1ONXIC"> mobile search 
+that gives answers</a>, not web links. 
 
 
+--0-2074913454-1184067481=:19249--
 
-tis 2007-07-10 klockan 17:11 +0530 skrev Santhosh N:
-> Hi All,
-> 
-> I have a bluetooth USB dongle connected to our embedded device. I am 
-> having problem in making my embedded device locatable by other devices. I 
-> am able to scan the list of devices in the vicinity from my device. I have 
-> made sure that PSCAN and ISCAN are enabled. Inspite of that my embedded 
-> device is not locatable by other devices.
-> 
-> The output of "hciconfig" is:
-> hci0:   Type: USB
->          BD Address: 00:02:72:01:C3:A0 ACL MTU: 192:8 SCO MTU: 64:8
->          UP RUNNING PSCAN ISCAN
->          RX bytes:151 acl:0 sco:0 events:15 errors:0
->          TX bytes:42 acl:0 sco:0 commands:10 errors:0
-> 
-> Please let me know, how can I proceed further in fixing this issue. I am 
-> using linux kernel 2.6.20 and bluez-libs/utils 3.9.
-> 
-> Thanks in advance,
+
+--===============1021944699==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============1021944699==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1021944699==--
