@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46953A08.7090704@gmail.com>
-Date: Thu, 12 Jul 2007 01:44:00 +0530
-From: Rogue <roguexz@gmail.com>
-MIME-Version: 1.0
+From: George Hansel <ghansel@MIT.EDU>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46896137.90202@gmail.com>	<d89ddf300707021858u2e5e8f80k35794595254736f6@mail.gmail.com>	<468A7156.1050708@gmail.com>	<468A7BFB.4080401@access-company.com>
-	<468A7FD8.8050302@access-company.com>
-In-Reply-To: <468A7FD8.8050302@access-company.com>
-Subject: Re: [Bluez-devel] A few questions about bluetooth-alsa project
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Wed, 11 Jul 2007 16:11:03 -0400
+Message-Id: <1184184663.6062.30.camel@Epimenides>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Handling simultaneous SCO connections: Does	BlueZ
+	have multiple SCO
+Reply-To: ghansel@MIT.EDU,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -17,39 +16,69 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0510838010=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frederic,
 
-Frederic Dalleau wrote:
-> Just one line more,
->   
->> However, when the softvol plugin is declared in .asoundrc, it appears in 
->> the mixer.
->>   
->>     
-> Wouldn't this explain the PCM-2device you saw in gnome-xxx?
->
->   
-Sorry for the late response. Thunderbird had moved this message to the 
-junk folder. Yes, the PCM-2 device in the applet was due to the 
-.asoundrc file. Once I removed the file everything was back to normal. 
-Ideally I would have expected the new devices mentioned in the file to 
-get appended to the available set, but I guess I need to spend some more 
-time understanding how the alsa-sound architecture works and how does it 
-treat the asoundrc file.
+--===============0510838010==
+Content-Type: multipart/alternative; boundary="=-CIXCBKbE+f/Art9ww6Ek"
 
-later,
-Rogue
+
+--=-CIXCBKbE+f/Art9ww6Ek
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+It was my fault. I was binding the port without specifying a local
+adapter - don't do that.
+
+Problem solved. I'm very happy not to have to go into the kernel.
+
+George
+
+--=-CIXCBKbE+f/Art9ww6Ek
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 TRANSITIONAL//EN">
+<HTML>
+<HEAD>
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=UTF-8">
+  <META NAME="GENERATOR" CONTENT="GtkHTML/3.14.1">
+</HEAD>
+<BODY>
+It was my fault. I was binding the port without specifying a local adapter - don't do that.<BR>
+<BR>
+Problem solved. I'm very happy not to have to go into the kernel.<BR>
+<BR>
+George
+</BODY>
+</HTML>
+
+--=-CIXCBKbE+f/Art9ww6Ek--
+
+
+
+--===============0510838010==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
+--===============0510838010==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0510838010==--
