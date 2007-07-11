@@ -1,10 +1,18 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <a92460650707110649l6d1a4f76s82921b2116992781@mail.gmail.com>
-Date: Wed, 11 Jul 2007 15:49:38 +0200
-From: "John Smith" <tonrton@gmail.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] Pairing a phone with linux and windows at same time
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1183715610.5288.22.camel@localhost>
+References: <1183412947.20815.7.camel@localhost>
+	<1183433596.6351.25.camel@aeonflux.holtmann.net>
+	<1183462763.4335.17.camel@localhost>
+	<1183513706.6351.47.camel@aeonflux.holtmann.net>
+	<1183556624.4951.10.camel@localhost>
+	<1183623040.6351.85.camel@aeonflux.holtmann.net>
+	<1183715610.5288.22.camel@localhost>
+Date: Wed, 11 Jul 2007 11:54:31 +0200
+Message-Id: <1184147671.4536.60.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] dbus problem for pand service
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,68 +22,45 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0678629177=="
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0678629177==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_3235_1769506.1184161778546"
-
-------=_Part_3235_1769506.1184161778546
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi
-
-When I pair my phone from Windows, I get an error when try to connect from
-Linux and viceversa.
-
-Windows and Linux are in the same computer.
-
-Is there a way to solve this?
-
-Thanks
-
-------=_Part_3235_1769506.1184161778546
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div>Hi</div>
-<div>&nbsp;</div>
-<div>When&nbsp;I pair my phone from Windows, I get an error when try to connect from Linux and viceversa.</div>
-<div>&nbsp;</div>
-<div>Windows and Linux are in the same computer. </div>
-<div>&nbsp;</div>
-<div>Is there a way to solve this?</div>
-<div>&nbsp;</div>
-<div>Thanks</div>
-
-------=_Part_3235_1769506.1184161778546--
-
-
---===============0678629177==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
---===============0678629177==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0678629177==--
+SGkgTWF0cywKCj4gPiA+ID4gYnkgZGVmYXVsdCBwYW5kIGxpc3RlbnMgb24gYWxsIGF0dGFjaGVk
+IGRvbmdsZXMuIFNvIHRoYXQgc2hvdWxkIHdvcmsgb3V0Cj4gPiA+ID4gb2YgdGhlIGJveC4KPiA+
+ID4gPiAKPiA+ID4gCj4gPiA+IEkgbWFkZSBhbiBhZGRpdGlvbiB0byB0aGUgZGJ1cy1jb25maWd1
+cmF0aW9uIGluIGJsdWV6LWhjaWQuY29uZiBieQo+ID4gPiBpbnNlcnRpbmcgcGF0aHMgZm9yIGhj
+aTAgYW5kIGhjaTEgZm9yIHJvb3QgYW5kIGNvbnNvbGUgbGlrZSB0aGlzOgo+ID4gPiAKPiA+ID4g
+QWZ0ZXIgdGhhdCBhIHNpbmdsZSBsaXN0ZW5pbmcgUEFOIGRhZW1vbiBpcyByZWNlcHRpdmUgb24g
+Ym90aAo+ID4gPiB1c2ItZG9uZ2xlcy4KPiAKPiA+IHRoYXQgaXMgbm9uLXNlbnNlLiBUaGUgcGFu
+ZCBpcyBub3QgaW50ZXJhY3Rpbmcgd2l0aCBELUJ1cyBhdCBhbGwuIFNvbWUKPiA+IG90aGVyIGNo
+YW5nZXMgbXVzdCBoYXZlIG1hZGUgdGhpcyB3b3JraW5nIGZvciB5b3UuCj4gCj4gCj4gYSBoYXJz
+aCB3b3JkIHRvIGNhbGwgaXQgJ25vbi1zZW5zZScgKHp1bSBzdMO8dHppZyBtYWNoZW4hKS4gVHJ1
+ZSwgcGFuZAo+IGRvZXMgbm90IGJ5IGl0c2VsZiBjYWxsIHVwb24gZGJ1cywgYnV0IHRoZSBzZXJ2
+aWNpbmcgZGFlbW9uIGhjaWQgZG9lcwo+IGRlcGVuZCBvbiBkYnVzIGFuZCBhbGwgdGhlIG1vcmUg
+ZG9lcyBwYXNza2V5LWFnZW50IGZvciB0aGUKPiBhdXRoZW50aWNhdGlvbnMgb2YgcGluIGNvZGVz
+IGRlcGVuZCBpbiBkYnVzLiBUaGUgc3RhbmRhcmQgY29kZQo+IHBhc3NrZXktYWdlbnQuYyBldmVu
+IGNvbnRhaW5zCj4gCj4gaWYgKHVzZV9kZWZhdWx0KSB7Cj4gICAgICAgIHBhdGggPSAiL29yZy9i
+bHVleiI7Cj4gICAgICAgIG1ldGhvZCA9ICJSZWdpc3RlckRlZmF1bHRQYXNza2V5QWdlbnQiOwo+
+IH0gZWxzZSB7Cj4gICAgICAgIHBhdGggPSAiL29yZy9ibHVlei9oY2kwIjsKPiAgICAgICAgbWV0
+aG9kID0gIlJlZ2lzdGVyUGFzc2tleUFnZW50IjsKPiB9Cj4gCj4gYW5kIHRoZSBjb3JyZXNwb25k
+aW5nIHBhcnQgZm9yIHVucmVnaXN0ZXJpbmcuIEl0IHNlZW1zIHRvIG1lIHRoYXQgCj4gdGh1cyBp
+dCBpcyBhYnNvbHV0ZWx5IGVzc2VudGlhbCB0byB1c2UgJ3Bhc3NrZXktYWdlbnQgLWQgT3BlblVw
+Jwo+IHRvIGFjdGl2YXRlIG1vcmUgdGhhbiBvbmUgZG9uZ2xlLCBzaW5jZSBpbmRpdmlkdWFsIGFn
+ZW50cyBhbHdheXMKPiB0aWUgdGhlbXNlbGZzIHRvIGhjaTAuIEkgZG8gbm90IHVuZGVyc3RhbmQg
+YWxsIGRldGFpbHMgeWV0LCBidXQgdGhlCj4gYWJvdmUgY29kZSBzbmlwcGV0IHNob3dzIHRoYXQg
+SSB3aWxsIGRldmVsb3AgbXkgb3duIHRhaWxvcmVkCj4gcGFzc2tleS1hZ2VudCBmb3IgbXkgb3du
+IGFwcGxpY2F0aW9uLiBUaGF0IGlzIHRoZSBuYXR1cmFsIHN0YXRlIG9mCj4gYWZmYWlycyBpbiBv
+dXIgdHJhZGUuIFJpZ2h0ISBPbmUgYWx3YXlzIGxlYXJuIG1vc3QgYnkgdGhlIG1pc3Rha2VzCj4g
+YW5kIGJ5IHNjcnV0aW5pemluZyBvdXIgc291cmNlIGNvZGUuIAoKdGhpcyBpcyB3aHkgd2UgaGF2
+ZSB0aGUgcGFzc2tleSBhZ2VudCBpbnRlcmZhY2UuIEl0IGlzIG1lYW50IHRvIGJlIHRoYXQKZXZl
+cnlib2R5IGNhbiBkZXZlbG9wIHRoZWlyIG93biBwYXNza2V5IGhhbmRsZXJzIGZvciB0aGVpciBu
+ZWVkcy4KClJlZ2FyZHMKCk1hcmNlbAoKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVt
+YWlsIGlzIHNwb25zb3JlZCBieSBEQjIgRXhwcmVzcwpEb3dubG9hZCBEQjIgRXhwcmVzcyBDIC0g
+dGhlIEZSRUUgdmVyc2lvbiBvZiBEQjIgZXhwcmVzcyBhbmQgdGFrZQpjb250cm9sIG9mIHlvdXIg
+WE1MLiBObyBsaW1pdHMuIEp1c3QgZGF0YS4gQ2xpY2sgdG8gZ2V0IGl0IG5vdy4KaHR0cDovL3Nv
+dXJjZWZvcmdlLm5ldC9wb3dlcmJhci9kYjIvCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdApCbHVlei11c2Vyc0Bs
+aXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMv
+bGlzdGluZm8vYmx1ZXotdXNlcnMK
