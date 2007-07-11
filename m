@@ -1,19 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d89ddf300707111456s5d53d26dq5074c6aac0920501@mail.gmail.com>
-Date: Wed, 11 Jul 2007 15:56:06 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <46951480.3060107@free.fr>
+Message-ID: <46953A08.7090704@gmail.com>
+Date: Thu, 12 Jul 2007 01:44:00 +0530
+From: Rogue <roguexz@gmail.com>
 MIME-Version: 1.0
-References: <46852386.8050608@free.fr> <468DF298.5010205@free.fr>
-	<2d5a2c100707060612g6ed3a543g9f36b6db49a97a95@mail.gmail.com>
-	<468E446A.1000204@free.fr> <468E46E5.2050206@access-company.com>
-	<2d5a2c100707060801s413d8bdclb0b25a4f5a340773@mail.gmail.com>
-	<468E76DD.6070303@free.fr>
-	<d89ddf300707061644p5483ff3t8c6cb972e867e1d9@mail.gmail.com>
-	<2d5a2c100707062329n5999472dv9159d5f3700dde80@mail.gmail.com>
-	<46951480.3060107@free.fr>
-Subject: Re: [Bluez-devel] CVS audio-api.txt : 1st question
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <46896137.90202@gmail.com>	<d89ddf300707021858u2e5e8f80k35794595254736f6@mail.gmail.com>	<468A7156.1050708@gmail.com>	<468A7BFB.4080401@access-company.com>
+	<468A7FD8.8050302@access-company.com>
+In-Reply-To: <468A7FD8.8050302@access-company.com>
+Subject: Re: [Bluez-devel] A few questions about bluetooth-alsa project
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -27,27 +21,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Fabien
+Hi Frederic,
 
-> The only valid case of MP3 streaming is the one when you build a
-> dedicated audio path between the application(multimedia player) and the
-> hardware device(bt headset).
+Frederic Dalleau wrote:
+> Just one line more,
+>   
+>> However, when the softvol plugin is declared in .asoundrc, it appears in 
+>> the mixer.
+>>   
+>>     
+> Wouldn't this explain the PCM-2device you saw in gnome-xxx?
+>
+>   
+Sorry for the late response. Thunderbird had moved this message to the 
+junk folder. Yes, the PCM-2 device in the applet was due to the 
+.asoundrc file. Once I removed the file everything was back to normal. 
+Ideally I would have expected the new devices mentioned in the file to 
+get appended to the available set, but I guess I need to spend some more 
+time understanding how the alsa-sound architecture works and how does it 
+treat the asoundrc file.
 
-ok... this makes sense. I started hacking the old "a2play" to detect
-the mp3 decoder but never did get it to send mp3 directly. A symbian
-developer told me he would have a whack at it but I never heard if it
-worked for him.
-
-> However a decicated gstreamer support would be nice to have, too.
-
-especially if you are trying to do something that is too complicated for alsa.
-
-> I guess one of those days i'm gonna hack a gstreamer element just for
-> fun :-)... and to prove it's feasible :-)
-
-some of the guys at the uni in Brazil told me the same thing :)
-
-Brad
+later,
+Rogue
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
