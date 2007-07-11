@@ -1,18 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1183715610.5288.22.camel@localhost>
-References: <1183412947.20815.7.camel@localhost>
-	<1183433596.6351.25.camel@aeonflux.holtmann.net>
-	<1183462763.4335.17.camel@localhost>
-	<1183513706.6351.47.camel@aeonflux.holtmann.net>
-	<1183556624.4951.10.camel@localhost>
-	<1183623040.6351.85.camel@aeonflux.holtmann.net>
-	<1183715610.5288.22.camel@localhost>
-Date: Wed, 11 Jul 2007 11:54:31 +0200
-Message-Id: <1184147671.4536.60.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] dbus problem for pand service
+Message-ID: <be976db60707102259j41ffbaesbf7f0e57a490b239@mail.gmail.com>
+Date: Tue, 10 Jul 2007 22:59:24 -0700
+From: "Mark S. Townsley" <mstownsley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <f70rmi$4ck$1@sea.gmane.org>
+MIME-Version: 1.0
+References: <be976db60707101202x7d6b8e99x161ab3cab64af9e7@mail.gmail.com>
+	<f70rmi$4ck$1@sea.gmane.org>
+Subject: Re: [Bluez-users] hcidump question
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,45 +17,89 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============0205839373=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGkgTWF0cywKCj4gPiA+ID4gYnkgZGVmYXVsdCBwYW5kIGxpc3RlbnMgb24gYWxsIGF0dGFjaGVk
-IGRvbmdsZXMuIFNvIHRoYXQgc2hvdWxkIHdvcmsgb3V0Cj4gPiA+ID4gb2YgdGhlIGJveC4KPiA+
-ID4gPiAKPiA+ID4gCj4gPiA+IEkgbWFkZSBhbiBhZGRpdGlvbiB0byB0aGUgZGJ1cy1jb25maWd1
-cmF0aW9uIGluIGJsdWV6LWhjaWQuY29uZiBieQo+ID4gPiBpbnNlcnRpbmcgcGF0aHMgZm9yIGhj
-aTAgYW5kIGhjaTEgZm9yIHJvb3QgYW5kIGNvbnNvbGUgbGlrZSB0aGlzOgo+ID4gPiAKPiA+ID4g
-QWZ0ZXIgdGhhdCBhIHNpbmdsZSBsaXN0ZW5pbmcgUEFOIGRhZW1vbiBpcyByZWNlcHRpdmUgb24g
-Ym90aAo+ID4gPiB1c2ItZG9uZ2xlcy4KPiAKPiA+IHRoYXQgaXMgbm9uLXNlbnNlLiBUaGUgcGFu
-ZCBpcyBub3QgaW50ZXJhY3Rpbmcgd2l0aCBELUJ1cyBhdCBhbGwuIFNvbWUKPiA+IG90aGVyIGNo
-YW5nZXMgbXVzdCBoYXZlIG1hZGUgdGhpcyB3b3JraW5nIGZvciB5b3UuCj4gCj4gCj4gYSBoYXJz
-aCB3b3JkIHRvIGNhbGwgaXQgJ25vbi1zZW5zZScgKHp1bSBzdMO8dHppZyBtYWNoZW4hKS4gVHJ1
-ZSwgcGFuZAo+IGRvZXMgbm90IGJ5IGl0c2VsZiBjYWxsIHVwb24gZGJ1cywgYnV0IHRoZSBzZXJ2
-aWNpbmcgZGFlbW9uIGhjaWQgZG9lcwo+IGRlcGVuZCBvbiBkYnVzIGFuZCBhbGwgdGhlIG1vcmUg
-ZG9lcyBwYXNza2V5LWFnZW50IGZvciB0aGUKPiBhdXRoZW50aWNhdGlvbnMgb2YgcGluIGNvZGVz
-IGRlcGVuZCBpbiBkYnVzLiBUaGUgc3RhbmRhcmQgY29kZQo+IHBhc3NrZXktYWdlbnQuYyBldmVu
-IGNvbnRhaW5zCj4gCj4gaWYgKHVzZV9kZWZhdWx0KSB7Cj4gICAgICAgIHBhdGggPSAiL29yZy9i
-bHVleiI7Cj4gICAgICAgIG1ldGhvZCA9ICJSZWdpc3RlckRlZmF1bHRQYXNza2V5QWdlbnQiOwo+
-IH0gZWxzZSB7Cj4gICAgICAgIHBhdGggPSAiL29yZy9ibHVlei9oY2kwIjsKPiAgICAgICAgbWV0
-aG9kID0gIlJlZ2lzdGVyUGFzc2tleUFnZW50IjsKPiB9Cj4gCj4gYW5kIHRoZSBjb3JyZXNwb25k
-aW5nIHBhcnQgZm9yIHVucmVnaXN0ZXJpbmcuIEl0IHNlZW1zIHRvIG1lIHRoYXQgCj4gdGh1cyBp
-dCBpcyBhYnNvbHV0ZWx5IGVzc2VudGlhbCB0byB1c2UgJ3Bhc3NrZXktYWdlbnQgLWQgT3BlblVw
-Jwo+IHRvIGFjdGl2YXRlIG1vcmUgdGhhbiBvbmUgZG9uZ2xlLCBzaW5jZSBpbmRpdmlkdWFsIGFn
-ZW50cyBhbHdheXMKPiB0aWUgdGhlbXNlbGZzIHRvIGhjaTAuIEkgZG8gbm90IHVuZGVyc3RhbmQg
-YWxsIGRldGFpbHMgeWV0LCBidXQgdGhlCj4gYWJvdmUgY29kZSBzbmlwcGV0IHNob3dzIHRoYXQg
-SSB3aWxsIGRldmVsb3AgbXkgb3duIHRhaWxvcmVkCj4gcGFzc2tleS1hZ2VudCBmb3IgbXkgb3du
-IGFwcGxpY2F0aW9uLiBUaGF0IGlzIHRoZSBuYXR1cmFsIHN0YXRlIG9mCj4gYWZmYWlycyBpbiBv
-dXIgdHJhZGUuIFJpZ2h0ISBPbmUgYWx3YXlzIGxlYXJuIG1vc3QgYnkgdGhlIG1pc3Rha2VzCj4g
-YW5kIGJ5IHNjcnV0aW5pemluZyBvdXIgc291cmNlIGNvZGUuIAoKdGhpcyBpcyB3aHkgd2UgaGF2
-ZSB0aGUgcGFzc2tleSBhZ2VudCBpbnRlcmZhY2UuIEl0IGlzIG1lYW50IHRvIGJlIHRoYXQKZXZl
-cnlib2R5IGNhbiBkZXZlbG9wIHRoZWlyIG93biBwYXNza2V5IGhhbmRsZXJzIGZvciB0aGVpciBu
-ZWVkcy4KClJlZ2FyZHMKCk1hcmNlbAoKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVt
-YWlsIGlzIHNwb25zb3JlZCBieSBEQjIgRXhwcmVzcwpEb3dubG9hZCBEQjIgRXhwcmVzcyBDIC0g
-dGhlIEZSRUUgdmVyc2lvbiBvZiBEQjIgZXhwcmVzcyBhbmQgdGFrZQpjb250cm9sIG9mIHlvdXIg
-WE1MLiBObyBsaW1pdHMuIEp1c3QgZGF0YS4gQ2xpY2sgdG8gZ2V0IGl0IG5vdy4KaHR0cDovL3Nv
-dXJjZWZvcmdlLm5ldC9wb3dlcmJhci9kYjIvCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdApCbHVlei11c2Vyc0Bs
-aXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMv
-bGlzdGluZm8vYmx1ZXotdXNlcnMK
+--===============0205839373==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_49_8845309.1184133564940"
+
+------=_Part_49_8845309.1184133564940
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+you can download it from bluez.org
+
+
+
+On 7/10/07, Timothy Murphy <tim@birdsnest.maths.tcd.ie> wrote:
+>
+> Mark S. Townsley wrote:
+>
+> > When I tried to issue hcidump as a non-root user, I get permission
+> denied.
+>
+> As a matter of interest, where did you find hcidump?
+> It seems to have disappeared from bluez in Fedora 7.
+>
+> --
+> Timothy Murphy
+> e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
+> tel: +353-86-2336090, +353-1-2842366
+> s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
+>
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by DB2 Express
+> Download DB2 Express C - the FREE version of DB2 express and take
+> control of your XML. No limits. Just data. Click to get it now.
+> http://sourceforge.net/powerbar/db2/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+
+------=_Part_49_8845309.1184133564940
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<div>you can download it from <a href="http://bluez.org">bluez.org</a></div>
+<div><br><br>&nbsp;</div>
+<div><span class="gmail_quote">On 7/10/07, <b class="gmail_sendername">Timothy Murphy</b> &lt;<a href="mailto:tim@birdsnest.maths.tcd.ie">tim@birdsnest.maths.tcd.ie</a>&gt; wrote:</span>
+<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">Mark S. Townsley wrote:<br><br>&gt; When I tried to issue hcidump as a non-root user, I get permission denied.
+<br><br>As a matter of interest, where did you find hcidump?<br>It seems to have disappeared from bluez in Fedora 7.<br><br>--<br>Timothy Murphy<br>e-mail (&lt;80k only): tim /at/ <a href="http://birdsnest.maths.tcd.ie">birdsnest.maths.tcd.ie
+</a><br>tel: +353-86-2336090, +353-1-2842366<br>s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland<br><br><br>-------------------------------------------------------------------------<br>This SF.net email is sponsored by DB2 Express
+<br>Download DB2 Express C - the FREE version of DB2 express and take<br>control of your XML. No limits. Just data. Click to get it now.<br><a href="http://sourceforge.net/powerbar/db2/">http://sourceforge.net/powerbar/db2/
+</a><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">
+https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquote></div><br>
+
+------=_Part_49_8845309.1184133564940--
+
+
+--===============0205839373==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by DB2 Express
+Download DB2 Express C - the FREE version of DB2 express and take
+control of your XML. No limits. Just data. Click to get it now.
+http://sourceforge.net/powerbar/db2/
+--===============0205839373==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0205839373==--
