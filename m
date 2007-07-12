@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 To: bluez-users@lists.sourceforge.net
-From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
-Date: Thu, 12 Jul 2007 20:45:53 +0100
-Message-ID: <f760dh$np6$1@sea.gmane.org>
+From: Dick <dick@mrns.nl>
+Date: Thu, 12 Jul 2007 19:14:34 +0000 (UTC)
+Message-ID: <loom.20070712T211207-932@post.gmane.org>
+References: <loom.20070613T200722-459@post.gmane.org>
+	<1181979586.6846.62.camel@aeonflux.inter-touch.com>
+	<loom.20070616T202746-400@post.gmane.org>
+	<loom.20070619T202412-786@post.gmane.org>
 Mime-Version: 1.0
-Subject: [Bluez-users] Why is pairing so complicated?
+Subject: Re: [Bluez-users] input service trouble
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,14 +22,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Why does bluez make pairing such a complicated issue?
-Why not just have a file with the passkey in it?
+Hi,
 
--- 
-Timothy Murphy  
-e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
-tel: +353-86-2336090, +353-1-2842366
-s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
+I still have some problems with the input service. I'm not sure if I'm using the
+report mode (instead of boot). Can I query this using DBUS?
+And the input service doesn't seem to work if one of the devices is SLAVE in
+"hcitool con". Is that a known issue?
+
+Dick
+
 
 
 -------------------------------------------------------------------------
