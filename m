@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: David Abrahams <dave@boost-consulting.com>
-Date: Mon, 16 Jul 2007 10:14:35 -0400
-Message-ID: <871wf8e8qc.fsf@grogan.peloton>
+From: Thilo Riessner <thilo@riessner.de>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Mon, 16 Jul 2007 13:03:29 +0200
 References: <87d4z1fdae.fsf@grogan.peloton>
 	<200707101718.52425.thilo@riessner.de>
 	<87fy3svw5m.fsf@grogan.peloton>
-	<200707161303.29479.thilo@riessner.de>
-Mime-Version: 1.0
+In-Reply-To: <87fy3svw5m.fsf@grogan.peloton>
+MIME-Version: 1.0
+Message-Id: <200707161303.29479.thilo@riessner.de>
 Subject: Re: [Bluez-users] Why do I have to pair my headset each time?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -22,24 +22,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Am Freitag, 13. Juli 2007 23:19 schrieb David Abrahams:
+> on Tue Jul 10 2007, Thilo Riessner <thilo-AT-riessner.de> wrote:
+> > Am Dienstag, 10. Juli 2007 00:00 schrieb David Abrahams:
+> >> My cellphone remembers its relationship to my bluetooth headset, but
+> >> it seems the computer does not.  Is there some trick I'm missing?
+> >>
+> >> TIA,
+> >
+> > Sounds like a similar problem I've had with my bluetooth mouse (see
+> > thread: "HP Bluetooth PC Card Mouse"). I solved it by starting the hidd
+> > with the following options:
+> > --connect 00:02:76:00:D0:3E --master --server
+> > (with your correct bluetooth address of course)
+> > openSuSE 10.2 to starts the hidd during system boot with the arguments
+> > found in the variable HID_DAEMON_ARGS in the file
+> > /etc/sysconfig/bluetooth. I guess, other distributions have similar
+> > mechanisms. So you need not to set this options every time after a
+> > restart.
+>
+> Yes, that's what I do with my mouse.  But I was under the impression
+> that the BT device (mouse in that case) had to be on at startup for
+> the above to work.  My headset is often not on, or not nearby.  Does
+> that make a difference?
+No, it works like you would expect to. No matter weather it is switched on by 
+hand, or wakes up after a sleep, it works after a about 2 seconds.
+Much luck
 
-on Mon Jul 16 2007, Thilo Riessner <thilo-AT-riessner.de> wrote:
-
-> No, it works like you would expect to. No matter weather it is switched on by 
-> hand, or wakes up after a sleep, it works after a about 2 seconds.
-
-Thanks.  I hate to sound like a whiner who doesn't like editing
-configuration files for this sort of thing but... well... I don't like
-editing configuration files for this sort of thing.  Not that it's
-hard, but is there a GUI out there that will make it easier?
-
--- 
-Dave Abrahams
-Boost Consulting
-http://www.boost-consulting.com
-
-The Astoria Seminar ==> http://www.astoriaseminar.com
-
+Thilo
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
