@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 17 Jul 2007 23:12:53 +0300
-From: Mikko Rapeli <mikko.rapeli@iki.fi>
+Date: Tue, 17 Jul 2007 16:10:24 -0400
+From: TJ OConnor <tjoconno@unity.ncsu.edu>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20070717201253.GH1376@nalle>
-References: <20070717191609.GG1376@nalle>
-	<1184702133.28210.38.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-In-Reply-To: <1184702133.28210.38.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] apply rfcomm oops fix?
+Message-ID: <C2C29A70.5C3%tjoconno@unity.ncsu.edu>
+In-Reply-To: <1184702279.28210.40.camel@aeonflux.holtmann.net>
+Mime-version: 1.0
+Subject: Re: [Bluez-devel] Connectionless l2ping.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,22 +19,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Tue, Jul 17, 2007 at 09:55:33PM +0200, Marcel Holtmann wrote:
-> Hi Mikko,
-> 
-> > This bugzilla entry http://bugzilla.kernel.org/show_bug.cgi?id=7509 has
-> > been open for a while and my fix proposal this. I think it makes sence
-> > for rfcomm socket ioctl, which releases the device, to gracefully
-> > (tty_v)hangup the tty layer too. Could this be applied or is there some
-> > problem with this one liner?
-> 
-> check the upstream kernel source. Your patch has already been applied.
+Ok. Thank you. I have another question. In the 2.1 standard, there is a
+mechanism to use Diffie-Helman to negotiate a key later used to create the
+linkkey. 
 
-Eh, I did and saw a latest patch to net/bluetooth dated in May, but now
-a browser reload shows the latest changes made in July. Must be a
-gitweb thing...
+How do pairing devices know to use the 2.1 standard instead of the 2.0 and
+below standard. Is this discovered during the extended inquiry and then the
+decision is defaulted to the lowest version between the 2 devices? Or is
+there a message that agrees on a key negotiation mechanism? Thank you.
 
--Mikko
+
+On 7/17/07 3:57 PM, "Marcel Holtmann" <marcel@holtmann.org> wrote:
+
+> Hi TJ,
+> 
+>> Is it possible to use connectionless sockets with L2CAP? I tried rewriting
+>> l2ping to use SOCK_DGRAM and sendto / recvfrom instead of SOCK_RAW,
+>> send,recv but with no luck.
+> 
+> of course not. This is not how L2CAP works. The SOCK_RAW is special and
+> only present for that exactly purpose.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by DB2 Express
+> Download DB2 Express C - the FREE version of DB2 express and take
+> control of your XML. No limits. Just data. Click to get it now.
+> http://sourceforge.net/powerbar/db2/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
