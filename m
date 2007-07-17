@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 17 Jul 2007 13:00:18 -0400
-From: TJ OConnor <tjoconno@unity.ncsu.edu>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <C2C26DE2.5B5%tjoconno@unity.ncsu.edu>
-In-Reply-To: <c1fa8edf0707162121k5b7abfebn89629fef20db1363@mail.gmail.com>
-Mime-version: 1.0
-Subject: Re: [Bluez-devel] PS3 compatibility list?
+From: Fernando Unzu <fernando@bluexare.org>
+To: bluez-devel@lists.sourceforge.net
+Date: Tue, 17 Jul 2007 13:59:17 +0200
+MIME-Version: 1.0
+Message-Id: <200707171359.17950.fernando@bluexare.org>
+Subject: [Bluez-devel] About DBus API
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,27 +18,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Bluez works on the PS3 under YDL linux. Do an apt-get.
+Hello,
 
-On 7/17/07 12:21 AM, "Simon Ruggier" <simon80@gmail.com> wrote:
+I have some problems with my software (an application to scan and send some 
+files to another devices).
 
-> As a Linux user, and not someone particularly knowledgeable about
-> Bluetooth, I would guess that it's most likely that either everything
-> works or everything is broken, rather than some things failing to work
-> but not others.  If my guess is accurate, then a list wouldn't be very
-> useful.
-> 
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by DB2 Express
-> Download DB2 Express C - the FREE version of DB2 express and take
-> control of your XML. No limits. Just data. Click to get it now.
-> http://sourceforge.net/powerbar/db2/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Some people tell me that I must to use DBus, instead of hci commands.
 
+DBus is more general, I think, and maybe help me..., but I don't find any DBUS 
+API.
 
+Where I can find the functions and its descriptions of DBUS??
+In the bluez page I don't find that, and in other sites I haven't much more 
+lucky (sourceforge, ...).
+
+My problems are:
+- Make my software compatible with two dongles (now, I only use one, and for 
+the future I want to control both dongles separately).
+- With another distributions of Linux I have the problem that the "manual" 
+inquiry that I made, fo not works properly, and I realized that the new 
+distribution scans with RSSI, and my application do not take the events 
+properly.
+
+Maybe this problems I can solve whit DBUS, is it??
+
+Than you very much and sorry for my english
+Fernando Unzu
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
