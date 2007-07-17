@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 17 Jul 2007 22:16:09 +0300
-From: Mikko Rapeli <mikko.rapeli@iki.fi>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20070717191609.GG1376@nalle>
-Mime-Version: 1.0
-Subject: [Bluez-devel] apply rfcomm oops fix?
+Date: Tue, 17 Jul 2007 13:00:18 -0400
+From: TJ OConnor <tjoconno@unity.ncsu.edu>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <C2C26DE2.5B5%tjoconno@unity.ncsu.edu>
+In-Reply-To: <c1fa8edf0707162121k5b7abfebn89629fef20db1363@mail.gmail.com>
+Mime-version: 1.0
+Subject: Re: [Bluez-devel] PS3 compatibility list?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,27 +19,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Bluez works on the PS3 under YDL linux. Do an apt-get.
 
-This bugzilla entry http://bugzilla.kernel.org/show_bug.cgi?id=7509 has
-been open for a while and my fix proposal this. I think it makes sence
-for rfcomm socket ioctl, which releases the device, to gracefully
-(tty_v)hangup the tty layer too. Could this be applied or is there some
-problem with this one liner?
+On 7/17/07 12:21 AM, "Simon Ruggier" <simon80@gmail.com> wrote:
 
---- linux-2.6.22-rc5.orig/net/bluetooth/rfcomm/tty.c	2007-07-01 14:20:00.000000000 +0300
-+++ linux-2.6.22-rc5/net/bluetooth/rfcomm/tty.c	2007-07-01 13:55:35.000000000 +0300
-@@ -395,6 +397,10 @@
- 	if (req.flags & (1 << RFCOMM_HANGUP_NOW))
- 		rfcomm_dlc_close(dev->dlc, 0);
- 
-+	/* Be nice and shut down tty(s) synchronously before
-+	 * freeing rfcomm_dev */
-+	if (dev->tty) tty_vhangup(dev->tty);
-+
- 	rfcomm_dev_del(dev);
- 	rfcomm_dev_put(dev);
- 	return 0;
+> As a Linux user, and not someone particularly knowledgeable about
+> Bluetooth, I would guess that it's most likely that either everything
+> works or everything is broken, rather than some things failing to work
+> but not others.  If my guess is accurate, then a list wouldn't be very
+> useful.
+> 
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by DB2 Express
+> Download DB2 Express C - the FREE version of DB2 express and take
+> control of your XML. No limits. Just data. Click to get it now.
+> http://sourceforge.net/powerbar/db2/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
 
 
 -------------------------------------------------------------------------
