@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20070717191609.GG1376@nalle>
-References: <20070717191609.GG1376@nalle>
-Date: Tue, 17 Jul 2007 21:55:33 +0200
-Message-Id: <1184702133.28210.38.camel@aeonflux.holtmann.net>
+Date: Tue, 17 Jul 2007 22:16:09 +0300
+From: Mikko Rapeli <mikko.rapeli@iki.fi>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20070717191609.GG1376@nalle>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] apply rfcomm oops fix?
+Subject: [Bluez-devel] apply rfcomm oops fix?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,20 +18,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mikko,
+Hello,
 
-> This bugzilla entry http://bugzilla.kernel.org/show_bug.cgi?id=7509 has
-> been open for a while and my fix proposal this. I think it makes sence
-> for rfcomm socket ioctl, which releases the device, to gracefully
-> (tty_v)hangup the tty layer too. Could this be applied or is there some
-> problem with this one liner?
+This bugzilla entry http://bugzilla.kernel.org/show_bug.cgi?id=7509 has
+been open for a while and my fix proposal this. I think it makes sence
+for rfcomm socket ioctl, which releases the device, to gracefully
+(tty_v)hangup the tty layer too. Could this be applied or is there some
+problem with this one liner?
 
-check the upstream kernel source. Your patch has already been applied.
-
-Regards
-
-Marcel
-
+--- linux-2.6.22-rc5.orig/net/bluetooth/rfcomm/tty.c	2007-07-01 14:20:00.000000000 +0300
++++ linux-2.6.22-rc5/net/bluetooth/rfcomm/tty.c	2007-07-01 13:55:35.000000000 +0300
+@@ -395,6 +397,10 @@
+ 	if (req.flags & (1 << RFCOMM_HANGUP_NOW))
+ 		rfcomm_dlc_close(dev->dlc, 0);
+ 
++	/* Be nice and shut down tty(s) synchronously before
++	 * freeing rfcomm_dev */
++	if (dev->tty) tty_vhangup(dev->tty);
++
+ 	rfcomm_dev_del(dev);
+ 	rfcomm_dev_put(dev);
+ 	return 0;
 
 
 -------------------------------------------------------------------------
