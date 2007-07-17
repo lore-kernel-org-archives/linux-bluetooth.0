@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 17 Jul 2007 12:24:33 +0200
-From: Ismael Valladolid Torres <ivalladt@punkass.com>
-In-reply-to: <706125.32228.qm@web38503.mail.mud.yahoo.com>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-id: <20070717102433.GE3549@punkass.com>
-MIME-version: 1.0
-References: <706125.32228.qm@web38503.mail.mud.yahoo.com>
-Subject: Re: [Bluez-users] OBEX support
+Date: Tue, 17 Jul 2007 01:55:51 -0700 (PDT)
+From: Robert Schmidt <itsmy_emale@yahoo.com>
+To: Bluez User <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Message-ID: <706125.32228.qm@web38503.mail.mud.yahoo.com>
+Subject: [Bluez-users] OBEX support
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,58 +14,41 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2103360038=="
+Content-Type: multipart/mixed; boundary="===============1631845351=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+--===============1631845351==
+Content-Type: multipart/alternative; boundary="0-747300906-1184662551=:32228"
+Content-Transfer-Encoding: 8bit
 
---===============2103360038==
-Content-type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="pZs/OQEoSSbxGlYw"
-Content-disposition: inline
+--0-747300906-1184662551=:32228
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
+Hi,
 
---pZs/OQEoSSbxGlYw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I was looking for OBEX implementation in Bluez. Is it supported ??
 
-Robert Schmidt escribe:
-> I was looking for OBEX implementation in Bluez. Is it supported ??
+thanks,
 
-At least running Debian...
+robert.
 
-$ apt-cache search ^obex
-libopenobex1 - OBEX protocol library
-libopenobex1-dev - OBEX protocol library - development files
-obexfs - mount filesystem of ObexFTP capable devices
-obexftp - file transfer utility for devices that use the OBEX protocol
-obexpushd - program for receiving files via Bluetooth or IRDA
+       
+---------------------------------
+Be a better Heartthrob. Get better relationship answers from someone who knows.
+Yahoo! Answers - Check it out. 
+--0-747300906-1184662551=:32228
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-Cordially, Ismael
---=20
-Ismael Valladolid Torres        GnuPG key: DE721AF4
-                                   Jabber: ivalladt@gmail.com
-http://linuxav.blogspot.com         Skype: ivalladt
-http://lamediahostia.blogspot.com/
+Hi,<br><br>I was looking for OBEX implementation in Bluez. Is it supported ??<br><br>thanks,<br><br>robert.<br><p>&#32;
+      <hr size=1>Be a better Heartthrob. <a href="http://us.rd.yahoo.com/evt=48255/*http://answers.yahoo.com/dir/_ylc=X3oDMTI5MGx2aThyBF9TAzIxMTU1MDAzNTIEX3MDMzk2NTQ1MTAzBHNlYwNCQUJwaWxsYXJfTklfMzYwBHNsawNQcm9kdWN0X3F1ZXN0aW9uX3BhZ2U-?link=list&sid=396545433">Get better relationship answers </a>from someone who knows.<br>Yahoo! Answers - Check it out. 
 
---pZs/OQEoSSbxGlYw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
-
-iD8DBQFGnJjh59Nokt5yGvQRAptDAKCjA98p1/r3QrHqmdQ5UNLTo4Z3cwCfXbM0
-lHD78M6wp17dND5LPggSvww=
-=8Cvj
------END PGP SIGNATURE-----
-
---pZs/OQEoSSbxGlYw--
+--0-747300906-1184662551=:32228--
 
 
---===============2103360038==
+--===============1631845351==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -78,7 +59,7 @@ This SF.net email is sponsored by DB2 Express
 Download DB2 Express C - the FREE version of DB2 express and take
 control of your XML. No limits. Just data. Click to get it now.
 http://sourceforge.net/powerbar/db2/
---===============2103360038==
+--===============1631845351==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -89,4 +70,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============2103360038==--
+--===============1631845351==--
