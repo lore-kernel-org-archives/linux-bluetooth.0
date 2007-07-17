@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <C2BFEB57.558%tjoconno@unity.ncsu.edu>
-References: <C2BFEB57.558%tjoconno@unity.ncsu.edu>
-Date: Tue, 17 Jul 2007 21:57:59 +0200
-Message-Id: <1184702279.28210.40.camel@aeonflux.holtmann.net>
+In-Reply-To: <20070717191609.GG1376@nalle>
+References: <20070717191609.GG1376@nalle>
+Date: Tue, 17 Jul 2007 21:55:33 +0200
+Message-Id: <1184702133.28210.38.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Connectionless l2ping.
+Subject: Re: [Bluez-devel] apply rfcomm oops fix?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,14 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi TJ,
+Hi Mikko,
 
-> Is it possible to use connectionless sockets with L2CAP? I tried rewriting
-> l2ping to use SOCK_DGRAM and sendto / recvfrom instead of SOCK_RAW,
-> send,recv but with no luck.
+> This bugzilla entry http://bugzilla.kernel.org/show_bug.cgi?id=7509 has
+> been open for a while and my fix proposal this. I think it makes sence
+> for rfcomm socket ioctl, which releases the device, to gracefully
+> (tty_v)hangup the tty layer too. Could this be applied or is there some
+> problem with this one liner?
 
-of course not. This is not how L2CAP works. The SOCK_RAW is special and
-only present for that exactly purpose.
+check the upstream kernel source. Your patch has already been applied.
 
 Regards
 
