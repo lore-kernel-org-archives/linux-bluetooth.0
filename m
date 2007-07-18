@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <469E5D82.5070800@gmail.com>
-Date: Wed, 18 Jul 2007 11:35:46 -0700
-From: Xamindar <junkxamindar@gmail.com>
+Message-ID: <c02b565a0707181118sdc0a73x1b1f559b355373b@mail.gmail.com>
+Date: Wed, 18 Jul 2007 20:18:33 +0200
+From: "Crni Gorac" <cgorac@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Bluetooth compact flash card troubles.
+Subject: [Bluez-users] Plantronics Explorer 350 and bluetooth-alsa
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,41 +18,63 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I hope I can get some help from you guys.  I have a Zaurus with bluez
-installed.  Probably an old version of bluez.  It works great with a
-bluetooth usb dongle that I have but I recently bought an ambicom
-bt2000-cf compact flash bluetooth card and am having trouble getting it
-to work.
+Am trying to utilize my Plantronics Explorer 350 headset with Skype on
+my Slackware 12.0 installation.  I first provided that hcid and sdpd
+are started upon system boot (is any other daemon needed?), and the
+compiled current CVS versions of sbc and plugz acoording to
+instructions from http://bluetooth-alsa.sourceforge.net/build.html.
+Then I created /etc/asound.conf with following contents (given MAC is
+of my headset, obtained from hcitool scan output):
 
-Apparently it uses the serial_cs driver and I am pretty sure at this
-point that it is built into the zaurus kernel that I am using.
-When I plug it in dmesg reports:
+###
+pcm.headset {
+        @args [BDADDR TIMEOUT]
 
-[code]
+        # The Bluetooth device address for target headset, used for
+Audio Gateway (PC) initiated connections
+        # Please note that this value is ignored when the connection
+is Headset initiated
+        @args.BDADDR {
+                type string
+                default "00:03:89:F5:FB:F6"
+        }
 
-ttyS03 at port 0xf60002f8 (irq = 135) is a 16C950/954
-BlueZ Core ver 2.4 Copyright (C) 2000,2001 Qualcomm Inc
-Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
-BlueZ L2CAP ver 2.3 Copyright (C) 2000,2001 Qualcomm Inc
-Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
-BlueZ RFCOMM ver 1.1
-Copyright (C) 2002 Maxim Krasnyansky <maxk@qualcomm.com>
-Copyright (C) 2002 Marcel Holtmann <marcel@holtmann.org>
-bash-2.05#                                                 
+        # This value represents how long we will try to reach the
+headset, until we give up.
+        # Value is in milliseconds
+        @args.TIMEOUT {
+                type integer
+                default 6000
+        }
 
-[/code]
+        type        sco
+        bdaddr      $BDADDR
+        timeout     $TIMEOUT
+}
 
-It is very interesting that I get [b]"ttyS03 at port 0xf60002f8 (irq =
-135) is a 16C950/954"[/b] .  But I do not get any new bluetooth device
-reported by "hcitool dev", just no device.  Why would it get a serial
-device but no bluetooth device?  Is there any way to pair it or in other
-words use it as if it is a bluetooth device?
+ctl.headset {
+        type sco
+}
+###
 
-I bought this dang card off ebay and the auction specificly stated that
-it was zaurus compatible.  I guess they lied.
+Furhter, I started headsetd manually, and am not trying to have
+something played on headset trough:
+  mplayer -ao alsa:device=headset /opt/Skype/sounds/CallRingingIn.wav
 
+However, I'm receiving following error reported:
+alsa-lib: pcm_sco.c:277:(sco_headset_hw_params) Unable to set number
+of SCO buffers : please upgrade your Kernel !
+alsa-init: unable to set hw-parameters: Invalid argument
+Could not open/initialize audio device -> no sound.
 
-Thanks for any help or suggestions.
+Is this because I haven't applied the sco-flowcontrol kernel patch
+from plugz/patches directory?  But I'm running latest 2.6.22.1 kernel,
+and an error is reported on one of kernel source files when the patch
+applied against this kernel (and - what's the status of this patch
+anyway, is it going to be included in stock kernel soon or not?)...
+Further - do I need CONFIG_BT_SCO option enabled in kernel or not?
+
+Thanks.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by DB2 Express
