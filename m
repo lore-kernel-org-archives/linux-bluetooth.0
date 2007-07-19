@@ -1,18 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Art Rothstein <holtmann@mojo-working.com>
-Date: Thu, 19 Jul 2007 09:13:24 +0000 (UTC)
-Message-ID: <loom.20070719T110941-256@post.gmane.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <loom.20070718T224804-499@post.gmane.org>
 References: <469DCBD6.7040005@mojo-working.com>
 	<1184746735.6357.3.camel@aeonflux.holtmann.net>
 	<loom.20070718T103250-409@post.gmane.org>
 	<1184756006.6357.9.camel@aeonflux.holtmann.net>
 	<loom.20070718T224804-499@post.gmane.org>
-	<1184829597.6357.25.camel@aeonflux.holtmann.net>
+Date: Thu, 19 Jul 2007 09:19:57 +0200
+Message-Id: <1184829597.6357.25.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel]
-	=?utf-8?q?RFCOMM_DISC=09dlci=3D0=09missing=09after?=
-	=?utf-8?q?=09server=09closesocket=3F?=
+Subject: Re: [Bluez-devel] RFCOMM
+	DISC	dlci=0	missing	after	server	closesocket?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -26,11 +25,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann <marcel <at> holtmann.org> writes:
+Hi Art,
 
-> there exists no workaround I know of.
+> > the upcoming Ubuntu Gutsy should be based on 2.6.22. ...
+> 
+> Fix confirmed in 2.6.22-7 with Tribe 2 of Ubuntu Gutsy.  Thanks.
+> 
+> Can you suggest any application workarounds, however obscure they may be, for
+> earlier kernels?
 
-Bummer.  Thanks nonetheless.
+there exists no workaround I know of.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
