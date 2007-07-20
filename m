@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Jesse Barnes <jbarnes@virtuousgeek.org>
+Message-ID: <c02b565a0707200259u12be6d64qacaaddc86a7bd319@mail.gmail.com>
+Date: Fri, 20 Jul 2007 11:59:38 +0200
+From: "Crni Gorac" <cgorac@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Date: Fri, 20 Jul 2007 10:17:28 -0700
-References: <200707191654.29240.jbarnes@virtuousgeek.org>
-	<1184919207.880.5.camel@ubuntu.mpl.access-company.com>
-In-Reply-To: <1184919207.880.5.camel@ubuntu.mpl.access-company.com>
 MIME-Version: 1.0
-Message-Id: <200707201017.28593.jbarnes@virtuousgeek.org>
-Subject: Re: [Bluez-users] Trouble with basic a2dp setup
+Subject: Re: [Bluez-users] Plantronics Explorer 350 and bluetooth-alsa
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,18 +18,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Friday, July 20, 2007 1:13 am Frederic Dalleau wrote:
-> Are you paired?
-> Put your headset discoverable and retry.
-> The pincode dialog should appear, if not, make sure you have
-> bluez-gnome.
+To reply to my own questions from previous posting:
 
-Yes, I'm pretty sure I'm paired, and I have a simple PIN helper that 
-just echos "0000" since that's all I need right now...  If that's 
-likely to cause problems I can try another approach though.
+1. It is absolutely necessary to apply sco-flowcontrol kernel patch in
+order to have Bluetooth headsets supported properly.  The patch
+updated for current (2.6.22.1) kernel could be found here:
+http://gentoo-wiki.com/HOWTO_use_a_bluetooth_headset, link is under
+"Step 2" (bu the way, the whole thing with this patch really sucks, it
+should be pushed upstream into the kernel ASAP).
 
-Thanks,
-Jesse
+2. Also, option "CONFIG_BT_SCO" must be enabled in kernel in order to
+have Bluetooth headsets working properly.
+
+So, now I have my headset working fine (am able to make a recording
+using "arecord -D plug:headset test.wav", and play it back using
+"aplay -D plug:headset test.wav"); on the other side, Skype seems to
+have its own issues in actually using ALSA, but that's another
+story...
+
+HTH.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
