@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <c02b565a0707200259u12be6d64qacaaddc86a7bd319@mail.gmail.com>
-Date: Fri, 20 Jul 2007 11:59:38 +0200
-From: "Crni Gorac" <cgorac@gmail.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: Re: [Bluez-users] Plantronics Explorer 350 and bluetooth-alsa
+From: Mats Erik Andersson <mats.andersson64@comhem.se>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <cfd8c35a0707190551j1972892co4a2e2f2961f0623b@mail.gmail.com>
+References: <cfd8c35a0707190551j1972892co4a2e2f2961f0623b@mail.gmail.com>
+Date: Fri, 20 Jul 2007 10:53:52 +0200
+Message-Id: <1184921632.3755.2.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Computer not visible to other devices.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,25 +20,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-To reply to my own questions from previous posting:
+Hello there.
 
-1. It is absolutely necessary to apply sco-flowcontrol kernel patch in
-order to have Bluetooth headsets supported properly.  The patch
-updated for current (2.6.22.1) kernel could be found here:
-http://gentoo-wiki.com/HOWTO_use_a_bluetooth_headset, link is under
-"Step 2" (bu the way, the whole thing with this patch really sucks, it
-should be pushed upstream into the kernel ASAP).
+Probably same solution as last week: Add an entry
 
-2. Also, option "CONFIG_BT_SCO" must be enabled in kernel in order to
-have Bluetooth headsets working properly.
+	discoverto 0;
 
-So, now I have my headset working fine (am able to make a recording
-using "arecord -D plug:headset test.wav", and play it back using
-"aplay -D plug:headset test.wav"); on the other side, Skype seems to
-have its own issues in actually using ALSA, but that's another
-story...
+to the device section of your hcid.conf and reread the
+configuration by issuing "sudo killall -HUP hcid".
 
-HTH.
+Good luck	Mats E A
+
+
+tor 2007-07-19 klockan 14:51 +0200 skrev Adrian van Dongen:
+> Hi
+> 
+> I installed a new clean debian system and the problem I had before is
+> gone now ( I can connect to my mobile now). This is a other hardware
+> set so I don't know if it due to the install or the hardware. I will
+> see what i can find out. 
+> 
+> I do have a small other problem now, my new computer is not visible to
+> other bluetooth devices... what could be  wrong ? 
+> 
+> I read something about iscan en pscan both being enable but this not
+> the case in the new install: 
+> 
+> hci0:   Type: USB
+>         BD Address: 00:10:60:A9:10:28 ACL MTU: 192:8 SCO MTU: 64:8
+>         UP RUNNING PSCAN
+>         RX bytes:820 acl:0 sco:0 events:34 errors:0 
+>         TX bytes:614 acl:0 sco:0 commands:28 errors:0
+> 
+> can I force iscan to? I do have it enabled in the configuration.
+> 
+> Regards,
+> 
+> Adrian.
+> 
+> 
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by DB2 Express
+> Download DB2 Express C - the FREE version of DB2 express and take
+> control of your XML. No limits. Just data. Click to get it now.
+> http://sourceforge.net/powerbar/db2/
+> _______________________________________________ Bluez-users mailing list Bluez-users@lists.sourceforge.net https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
