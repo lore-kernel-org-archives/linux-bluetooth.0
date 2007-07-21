@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <46A34096.7050306@gmx.de>
-Date: Sun, 22 Jul 2007 13:33:42 +0200
-From: Thomas Pasch <thomas.pasch@gmx.de>
-MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] bluetooth-alsa: Motorola DC800 works with btsco but
-	not with plugz
+From: David Abrahams <dave@boost-consulting.com>
+Date: Sat, 21 Jul 2007 14:09:42 -0400
+Message-ID: <87myxpocgp.fsf@grogan.peloton>
+References: <87d4z1fdae.fsf@grogan.peloton>
+	<200707101718.52425.thilo@riessner.de>
+	<87fy3svw5m.fsf@grogan.peloton>
+	<200707161303.29479.thilo@riessner.de>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Why do I have to pair my headset each time?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,24 +22,52 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hallo,
 
-this maybe a cross-post, but I'm not sure about
-the state of bug tracker at www.sf.net/projects/bluetooth-alsa.
+on Mon Jul 16 2007, Thilo Riessner <thilo-AT-riessner.de> wrote:
 
-With plugz, my Motorola HT820 works but my Motorola DC800 doesn't.
-With btsco, I can transmit to both.
+> Am Freitag, 13. Juli 2007 23:19 schrieb David Abrahams:
+>> on Tue Jul 10 2007, Thilo Riessner <thilo-AT-riessner.de> wrote:
+>> > Am Dienstag, 10. Juli 2007 00:00 schrieb David Abrahams:
+>> >> My cellphone remembers its relationship to my bluetooth headset, but
+>> >> it seems the computer does not.  Is there some trick I'm missing?
+>> >>
+>> >> TIA,
+>> >
+>> > Sounds like a similar problem I've had with my bluetooth mouse (see
+>> > thread: "HP Bluetooth PC Card Mouse"). I solved it by starting the hidd
+>> > with the following options:
+>> > --connect 00:02:76:00:D0:3E --master --server
+>> > (with your correct bluetooth address of course)
+>> > openSuSE 10.2 to starts the hidd during system boot with the arguments
+>> > found in the variable HID_DAEMON_ARGS in the file
+>> > /etc/sysconfig/bluetooth. I guess, other distributions have similar
+>> > mechanisms. So you need not to set this options every time after a
+>> > restart.
+>>
+>> Yes, that's what I do with my mouse.  But I was under the impression
+>> that the BT device (mouse in that case) had to be on at startup for
+>> the above to work.  My headset is often not on, or not nearby.  Does
+>> that make a difference?
+>
+> No, it works like you would expect to. No matter weather it is switched on by 
+> hand, or wakes up after a sleep, it works after a about 2 seconds.
+> Much luck
 
-Detail debugging output of a2dpd can be found at
+Thilo,
 
-https://sourceforge.net/tracker/index.php?func=detail&aid=1758402&group_id=116589&atid=678258
+is there some test I can do to experience the difference you think I
+ought to see once this is done?  Maybe my usual test (using skype)
+couldn't work anyway, so I want to see if your suggestion made any
+difference at all.
 
-Anybody with the same problem? Any suggestions?
+Thanks,
 
-Cheers,
+-- 
+Dave Abrahams
+Boost Consulting
+http://www.boost-consulting.com
 
-Thomas
-
+The Astoria Seminar ==> http://www.astoriaseminar.com
 
 
 -------------------------------------------------------------------------
