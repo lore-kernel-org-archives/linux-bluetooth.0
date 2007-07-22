@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d89ddf300707221847w263a72eas8015380edc66edb9@mail.gmail.com>
-Date: Sun, 22 Jul 2007 19:47:45 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <46A34096.7050306@gmx.de>
+Message-ID: <46A34096.7050306@gmx.de>
+Date: Sun, 22 Jul 2007 13:33:42 +0200
+From: Thomas Pasch <thomas.pasch@gmx.de>
 MIME-Version: 1.0
-References: <46A34096.7050306@gmx.de>
-Subject: Re: [Bluez-users] bluetooth-alsa: Motorola DC800 works with btsco
-	but not with plugz
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] bluetooth-alsa: Motorola DC800 works with btsco but
+	not with plugz
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,19 +19,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Thomas,
+Hallo,
 
-The "a2dpd2" plugin works a little differently (with the same daemon)
-and it would be worth trying.
+this maybe a cross-post, but I'm not sure about
+the state of bug tracker at www.sf.net/projects/bluetooth-alsa.
 
-I wrote the a2play app but Frederic wrote a2dpd so I'm not sure what
-the significance of retrieve_data_from underrun would be.
+With plugz, my Motorola HT820 works but my Motorola DC800 doesn't.
+With btsco, I can transmit to both.
 
-If you post the a2dpd log with your message, you're more likely to get
-some comments on it. The bug area in bluetooth-alsa is only checked
-infrequently.
+Detail debugging output of a2dpd can be found at
 
-Brad
+https://sourceforge.net/tracker/index.php?func=detail&aid=1758402&group_id=116589&atid=678258
+
+Anybody with the same problem? Any suggestions?
+
+Cheers,
+
+Thomas
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
