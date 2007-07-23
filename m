@@ -1,14 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Fernando Unzu <fernando@bluexare.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Mon, 23 Jul 2007 13:06:22 +0200
-References: <200707181232.00253.fernando@bluexare.org>
-	<200707191216.54531.fernando@bluexare.org>
-	<469F6301.3090401@gmail.com>
-In-Reply-To: <469F6301.3090401@gmail.com>
-MIME-Version: 1.0
-Message-Id: <200707231306.22438.fernando@bluexare.org>
-Subject: Re: [Bluez-devel] Obex handle?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Adrian Bunk <bunk@stusta.de>
+In-Reply-To: <20070723012543.GW26212@stusta.de>
+References: <20070723012543.GW26212@stusta.de>
+Content-Type: multipart/mixed; boundary="=-EtPTDyWlzq4wPVJ9lUcf"
+Date: Mon, 23 Jul 2007 09:47:12 +0200
+Message-Id: <1185176832.7111.32.camel@violet>
+Mime-Version: 1.0
+Cc: Ville Tervo <ville.tervo@nokia.com>, netdev@vger.kernel.org,
+        bluez-devel@lists.sf.net, maxk@qualcomm.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [Bluez-devel] net/bluetooth/rfcomm/tty.c: use-after-free
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,90 +20,97 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Thanks Manuel for your response.
 
-It has helped me enough for my issue.
+--=-EtPTDyWlzq4wPVJ9lUcf
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+Hi Adrian,
+
+> Commit 8de0a15483b357d0f0b821330ec84d1660cadc4e added the following 
+> use-after-free in net/bluetooth/rfcomm/tty.c:
+> 
+> <--  snip  -->
+> 
+> ...
+> static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+> {
+> ...
+>         if (IS_ERR(dev->tty_dev)) {
+>                 list_del(&dev->list);
+>                 kfree(dev);
+>                 return PTR_ERR(dev->tty_dev);
+>         }
+> ...
+> 
+> <--  snip  -->
+> 
+> Spotted by the Coverity checker.
+
+really good catch. I fully overlooked that one. The attached patch
+should fix it.
+
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
 
 
-But in the business we are interested into migrate to DBUS functions...
+--=-EtPTDyWlzq4wPVJ9lUcf
+Content-Disposition: attachment; filename=patch
+Content-Type: text/x-patch; name=patch; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-So, if anybody can help me where I can find some information about DBUS API=
- or =
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index 23ba61a..22a8320 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -267,7 +267,7 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+ out:
+ 	write_unlock_bh(&rfcomm_dev_lock);
+ 
+-	if (err) {
++	if (err < 0) {
+ 		kfree(dev);
+ 		return err;
+ 	}
+@@ -275,9 +275,10 @@ out:
+ 	dev->tty_dev = tty_register_device(rfcomm_tty_driver, dev->id, NULL);
+ 
+ 	if (IS_ERR(dev->tty_dev)) {
++		err = PTR_ERR(dev->tty_dev);
+ 		list_del(&dev->list);
+ 		kfree(dev);
+-		return PTR_ERR(dev->tty_dev);
++		return err;
+ 	}
+ 
+ 	return dev->id;
 
-similar, please, tell us.
-
-Thank you, Manuel, once, for your response. A clearly and simple solution.
-Fernando Unzu
-
-
-El Jueves, 19 de Julio de 2007 15:11, Manuel Naranjo escribi=F3:
-> Fernando,
-> This question should be asked in the openobex mailing list but who cares.
-> I had patched the obexftp app to be able to use more than one dongle,
-> here's the code that handle that:
-> if (!src) {
->         bacpy(&src_addr, BDADDR_ANY);
-> else if (!strncmp(src, "hci", 3)) {
->     hci_devba(atoi(src + 3), &src_addr);
-> }
-> else {
->     str2ba(src, &src_addr);
-> }
-> if (!device) {
->     ret =3D -EINVAL;
->     break;
-> }
->
-> (void) str2ba(devicedup, &bdaddr);
-> free(devicedup);
-> ret =3D BtOBEX_TransportConnect(cli->obexhandle, &src_addr, &bdaddr,
-> (uint8_t)port);
->
-> > Thanks for your response, Vikas.
-> >
-> > first...? There is any problem with the mailing list in sourceforge??
-> > I can't do any search...
-> >
-> > Afortunately, you give me a link within I can search.
-> > Thanks once.
-> >
-> > But this issue talks about how to know if a dongle is free to use it or
-> > not...
-> >
-> > This can help me, now what I know, but my question is where I select
-> > which dongle will be used with OBEX...
-> >
-> > So... ,at one moment, I know the dongle I must to use is the "dev_id 0",
-> > ok; but..., how I say to OBEX "use the dongle "dev_id 0"".
-> > In whic method I can select this option??
-> >
-> > In HCI is the addr.hci_dev, and in OBEX...? handle.dev_id????
-> >
-> > I'm not sure I'm explaning well, but I hope you understand me a little.
-> >
-> > Thans a lot,
-> > Fernando Un
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by DB2 Express
-> Download DB2 Express C - the FREE version of DB2 express and take
-> control of your XML. No limits. Just data. Click to get it now.
-> http://sourceforge.net/powerbar/db2/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+--=-EtPTDyWlzq4wPVJ9lUcf
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
+--=-EtPTDyWlzq4wPVJ9lUcf
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--=-EtPTDyWlzq4wPVJ9lUcf--
