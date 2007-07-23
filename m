@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <EJENLMBEOLKAMCJFBFMDMEDFCAAA.leiyu@kcoe.cn>
-References: <EJENLMBEOLKAMCJFBFMDMEDFCAAA.leiyu@kcoe.cn>
-Date: Mon, 23 Jul 2007 14:06:23 +0200
-Message-Id: <1185192383.7111.37.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Do I need to patch 2.6 kernel?
+From: "leiyu" <leiyu@kcoe.cn>
+To: "Bluez-Users" <bluez-users@lists.sourceforge.net>
+Date: Mon, 23 Jul 2007 19:48:35 +0800
+Message-ID: <EJENLMBEOLKAMCJFBFMDMEDFCAAA.leiyu@kcoe.cn>
+MIME-Version: 1.0
+Subject: [Bluez-users] Do I need to patch 2.6 kernel?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,30 +14,43 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1472311679=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Leiyu,
+--===============1472311679==
+Content-Type: text/plain;
+	charset="gb2312"
+Content-Transfer-Encoding: base64
 
-> I port bluez to embedded system, there are some patches for 2.4 kernel in www.bluez.org, but that  I use the kernel version is 2.6.14, Do I need  patch the kernel, if yes , where I should download from?
-> thanks  very much
-
-start using a 2.6.22 kernel or later. Your kernel is already ancient and
-a 2.4 is even more ancient.
-
-Regards
-
-Marcel
+RGVhciAgQWxsLA0KDQpJIHBvcnQgYmx1ZXogdG8gZW1iZWRkZWQgc3lzdGVtLCB0aGVyZSBhcmUg
+c29tZSBwYXRjaGVzIGZvciAyLjQga2VybmVsIGluIHd3dy5ibHVlei5vcmcsIGJ1dCB0aGF0ICBJ
+IHVzZSB0aGUga2VybmVsIHZlcnNpb24gaXMgMi42LjE0LCBEbyBJIG5lZWQgIHBhdGNoIHRoZSBr
+ZXJuZWwsIGlmIHllcyAsIHdoZXJlIEkgc2hvdWxkIGRvd25sb2FkIGZyb20/DQp0aGFua3MgIHZl
+cnkgbXVjaA0KDQpCZXN0IHJlZ2FyZHMsDQpMZWl5dSAgIA==
 
 
+
+--===============1472311679==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
+--===============1472311679==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1472311679==--
