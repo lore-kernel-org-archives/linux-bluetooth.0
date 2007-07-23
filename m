@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Mon, 23 Jul 2007 14:43:09 -0400
-From: Dave Mielke <dave@mielke.cc>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20070723184309.GP11031@beta.private.mielke.cc>
+In-Reply-To: <20070723174905.GO11031@beta.private.mielke.cc>
 References: <20070723174905.GO11031@beta.private.mielke.cc>
-	<1185213219.7111.48.camel@violet>
+Date: Mon, 23 Jul 2007 19:53:39 +0200
+Message-Id: <1185213219.7111.48.camel@violet>
 Mime-Version: 1.0
-In-Reply-To: <1185213219.7111.48.camel@violet>
 Subject: Re: [Bluez-devel] Setting a PIN without a GUI.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,26 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-[quoted lines by Marcel Holtmann on 2007/07/23 at 19:53 +0200]
+Hi Dave,
 
->you have to provide a passkey agent that will handle the PIN request.
->The bluez-utils source contains an example passkey-agent.c that we used
->for testing.
+> Is there a way for a user who isn't running X, i.e. who's just using text mode,
+> to associate a Bluetooth device and its PIN? Is there a text-mode command which
+> does this? Is there a file which can be edited?
 
-Can a variant of that tool run as a thread which lives for the duration of the
-connect attempt? If so, does it need to stay running until the close or can it
-be terminated as soon as the connect succeeds?
+you have to provide a passkey agent that will handle the PIN request.
+The bluez-utils source contains an example passkey-agent.c that we used
+for testing.
 
-I tried to compile it with -I/usr/include/dbus-1.0 and -I/usr/lib/dbus-1.0, and
-still got VERSION not defined.
+Regards
 
-Is there a tool which should give me the right compile and link flags?
+Marcel
 
--- 
-Dave Mielke           | 2213 Fox Crescent | I believe that the Bible is the
-Phone: 1-613-726-0014 | Ottawa, Ontario   | Word of God. Please contact me
-EMail: dave@mielke.cc | Canada  K2A 1H7   | if you're concerned about Hell.
-http://FamilyRadio.com/                   | http://Mielke.cc/bible/
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
