@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <1185197769.46a4aec9d9dee@webmail.epfl.ch>
-Date: Mon, 23 Jul 2007 15:36:10 +0200
-From: steve.morard@epfl.ch
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] Use /dev/ttyS* instead of /dev/rfcomm*
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <EJENLMBEOLKAMCJFBFMDMEDFCAAA.leiyu@kcoe.cn>
+References: <EJENLMBEOLKAMCJFBFMDMEDFCAAA.leiyu@kcoe.cn>
+Date: Mon, 23 Jul 2007 14:06:23 +0200
+Message-Id: <1185192383.7111.37.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Do I need to patch 2.6 kernel?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +20,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello !
+Hi Leiyu,
 
-I would like to know if it is possible to use /dev/ttyS* instead of /dev/rfcomm*
-to connect to a bluetooth device.
-Indeed I tried :
+> I port bluez to embedded system, there are some patches for 2.4 kernel in www.bluez.org, but that  I use the kernel version is 2.6.14, Do I need  patch the kernel, if yes , where I should download from?
+> thanks  very much
 
-rfcomm connect /dev/ttyS2 xx:xx:xx:xx:xx:xx
+start using a 2.6.22 kernel or later. Your kernel is already ancient and
+a 2.4 is even more ancient.
 
-But I get  :
+Regards
 
-Connected /dev/rfcomm0 to xx:xx:xx:xx:xx:xx on channel 1
-
-Any help would be appreciated
-
-Thanks
-
-
+Marcel
 
 
 
