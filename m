@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1185293793.3641.129.camel@cookie.hadess.net>
+In-Reply-To: <1185310470.7111.64.camel@violet>
 References: <1185293793.3641.129.camel@cookie.hadess.net>
-Date: Tue, 24 Jul 2007 23:14:48 +0200
-Message-Id: <1185311688.7111.72.camel@violet>
+	<1185294005.3641.132.camel@cookie.hadess.net>
+	<1185310470.7111.64.camel@violet>
+Date: Tue, 24 Jul 2007 22:12:12 +0100
+Message-Id: <1185311532.3641.178.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] [PATCH] Make BluetoothClient work on all adapters
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -20,33 +22,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+On Tue, 2007-07-24 at 22:54 +0200, Marcel Holtmann wrote:
+> Hi Bastien,
+> 
+> > > With this patch, we can now pass a NULL as the adapter to work with all
+> > > the adapters. This is for use in the upcoming patch for the selector
+> > > widget.
+> > 
+> > And a tiny patch to fix the test-client's compilation.
+> 
+> what is wrong with providing a convenience wrapper around the GObject
+> unref function?
 
-> With this patch, we can now pass a NULL as the adapter to work with all
-> the adapters. This is for use in the upcoming patch for the selector
-> widget.
+unref isn't destroy.
 
-I don't like it. We should not wildly use all attached adapters. Passing
-a NULL to the client creation should use the default adapter.
+Destroy, as used in GTK+ for widgets (it's not used in glib) means you
+destroy the widget, drop the refcount to 0, clean up, free the memory,
+etc.
 
-Actually in case of multiple adapters we need to provide one extra step
-to let the user select the appropriate adapter.
+Unref means you reduce the refcount by 1. If you have > 1 reference
+before running the command, then nothing happens apart from the refcount
+being updates.
 
-Main reason, why I don't wanna start an inquiry on all adapters is that
-it can happen that you see a remote device with one adapter, but then
-the actual connection or device discovery is done via another one. That
-is not good. We should always use the default adapter and if (and only
-if) more adapters are present, then present a way to select a different
-adapter.
+Wrapping a _destroy() function to call _unref() means you're mixing two
+semantics. When you call _destroy() the object isn't destroyed, it's
+refcount is reduced...
 
-However this includes that we have to monitor if the default adapter
-changes or one adapter gets removed while being in the adapter selector
-widget or device selector widget.
-
-Regards
-
-Marcel
-
+-- 
+Bastien Nocera <hadess@hadess.net> 
 
 
 -------------------------------------------------------------------------
