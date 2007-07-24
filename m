@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1185311532.3641.178.camel@cookie.hadess.net>
-References: <1185293793.3641.129.camel@cookie.hadess.net>
-	<1185294005.3641.132.camel@cookie.hadess.net>
-	<1185310470.7111.64.camel@violet>
-	<1185311532.3641.178.camel@cookie.hadess.net>
-Date: Tue, 24 Jul 2007 23:26:23 +0200
-Message-Id: <1185312383.7111.81.camel@violet>
+In-Reply-To: <1185295124.3641.148.camel@cookie.hadess.net>
+References: <1185295124.3641.148.camel@cookie.hadess.net>
+Date: Tue, 24 Jul 2007 23:19:33 +0200
+Message-Id: <1185311973.7111.77.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Make BluetoothClient work on all adapters
+Subject: Re: [Bluez-devel] [PATCH] Implement browse callback in the applet
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,31 +22,15 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Bastien,
 
-> > > > With this patch, we can now pass a NULL as the adapter to work with all
-> > > > the adapters. This is for use in the upcoming patch for the selector
-> > > > widget.
-> > > 
-> > > And a tiny patch to fix the test-client's compilation.
-> > 
-> > what is wrong with providing a convenience wrapper around the GObject
-> > unref function?
+> The patch implements the browse callback for the applet. It hardcodes
+> the use of nautilus, but we should probably also check for nautilus in
+> the obexftp_available().
 > 
-> unref isn't destroy.
-> 
-> Destroy, as used in GTK+ for widgets (it's not used in glib) means you
-> destroy the widget, drop the refcount to 0, clean up, free the memory,
-> etc.
-> 
-> Unref means you reduce the refcount by 1. If you have > 1 reference
-> before running the command, then nothing happens apart from the refcount
-> being updates.
-> 
-> Wrapping a _destroy() function to call _unref() means you're mixing two
-> semantics. When you call _destroy() the object isn't destroyed, it's
-> refcount is reduced...
+> It also fixes a popup menu being created _each time_ someone
+> right-clicks on the bluetooth applet.
 
-okay. Point taken. I removed the _destroy() function form the code, but
-I didn't apply the rest of the patch.
+can you split this into two patches. They are both two independent
+things.
 
 Regards
 
