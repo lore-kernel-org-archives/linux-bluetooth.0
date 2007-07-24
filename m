@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: "leiyu" <leiyu@kcoe.cn>
 To: "Bluez-Users" <bluez-users@lists.sourceforge.net>
-Date: Tue, 24 Jul 2007 13:37:43 +0800
-Message-ID: <EJENLMBEOLKAMCJFBFMDIEDGCAAA.leiyu@kcoe.cn>
+Date: Tue, 24 Jul 2007 11:43:28 +0800
+Message-ID: <EJENLMBEOLKAMCJFBFMDAEDGCAAA.leiyu@kcoe.cn>
 MIME-Version: 1.0
-In-Reply-To: <EJENLMBEOLKAMCJFBFMDAEDGCAAA.leiyu@kcoe.cn>
-Subject: [Bluez-users] cross-compile bluez-utils-3.9
+In-Reply-To: <EJENLMBEOLKAMCJFBFMDOEDDCAAA.leiyu@kcoe.cn>
+Subject: [Bluez-users] Fail in cross-compile bluez-utils-3.9
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,50 +15,50 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1232042231=="
+Content-Type: multipart/mixed; boundary="===============0276405020=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1232042231==
+--===============0276405020==
 Content-Type: text/plain;
 	charset="gb2312"
 Content-Transfer-Encoding: base64
 
-RGVhciBBTEwsDQoNCkkgaGFzIHBhc3NlZCB0byBjb25maWd1cmUgYmx1ZXotdXRpbHMgYnkgU3Vt
-ZWV0J3MgaGVscC4NCkJ1dCB3aGVuIEkgZW50ZXIgaW50byBibHVlei11dGlscyBkaXJlY3Rvcnkg
-dGhlbiBtYWtlIGl0LA0KaXQgaGFwcGVucyBtYW55IGVycm9ycyBhcyBiZWxvdywgSG93IGNhbiBJ
-IGZpeCB0aGVzZSBwcm9ibGVtcz8NClRoYW5rcyB2ZXJ5IG11Y2ggZm9yIHlvdXIgaGVscC4gDQoN
-Ci4uLi4uLg0Kc2RwLXhtbC5jOiBJbiBmdW5jdGlvbiBgc2RwX3htbF9wYXJzZV9kYXRhdHlwZSc6
-DQpzZHAteG1sLmM6NzY0OiBlcnJvcjogZGVyZWZlcmVuY2luZyBwb2ludGVyIHRvIGluY29tcGxl
-dGUgdHlwZQ0Kc2RwLXhtbC5jOjc2NzogZXJyb3I6IGBTRFBfQk9PTCcgdW5kZWNsYXJlZCAoZmly
-c3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pDQpzZHAteG1sLmM6NzY5OiBlcnJvcjogYFNEUF9VSU5U
-OCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pDQpzZHAteG1sLmM6Nzcx
-OiBlcnJvcjogYFNEUF9VSU5UMTYnIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0
-aW9uKQ0Kc2RwLXhtbC5jOjc3MzogZXJyb3I6IGBTRFBfVUlOVDMyJyB1bmRlY2xhcmVkIChmaXJz
-dCB1c2UgaW4gdGhpcyBmdW5jdGlvbikNCnNkcC14bWwuYzo3NzU6IGVycm9yOiBgU0RQX1VJTlQ2
-NCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pDQpzZHAteG1sLmM6Nzc3
-OiBlcnJvcjogYFNEUF9VSU5UMTI4JyB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5j
-dGlvbikNCnNkcC14bWwuYzo3Nzk6IGVycm9yOiBgU0RQX0lOVDgnIHVuZGVjbGFyZWQgKGZpcnN0
-IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQ0Kc2RwLXhtbC5jOjc4MTogZXJyb3I6IGBTRFBfSU5UMTYn
-IHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQ0Kc2RwLXhtbC5jOjc4Mzog
-ZXJyb3I6IGBTRFBfSU5UMzInIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9u
-KQ0Kc2RwLXhtbC5jOjc4NTogZXJyb3I6IGBTRFBfSU5UNjQnIHVuZGVjbGFyZWQgKGZpcnN0IHVz
-ZSBpbiB0aGlzIGZ1bmN0aW9uKQ0Kc2RwLXhtbC5jOjc4NzogZXJyb3I6IGBTRFBfSU5UMTI4JyB1
-bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikNCnNkcC14bWwuYzo3OTM6IGVy
-cm9yOiBkZXJlZmVyZW5jaW5nIHBvaW50ZXIgdG8gaW5jb21wbGV0ZSB0eXBlDQpzZHAteG1sLmM6
-IEF0IHRvcCBsZXZlbDoNCnNkcC14bWwuYzo2NTogZXJyb3I6IHN0b3JhZ2Ugc2l6ZSBvZiBgaW5k
-ZW50JyBpc24ndCBrbm93bg0Kc2RwLXhtbC5jOjY3OiBlcnJvcjogc3RvcmFnZSBzaXplIG9mIGBu
-ZXh0X2luZGVudCcgaXNuJ3Qga25vd24NCnNkcC14bWwuYzozNzQ6IHdhcm5pbmc6IGBjb252ZXJ0
-X3Jhd19hdHRyX3RvX3htbF9mdW5jJyBkZWZpbmVkIGJ1dCBub3QgdXNlZA0KbWFrZVsyXTogKioq
-IFtzZHAteG1sLm9dIGVycm9yr68gMQ0KbWFrZVsyXTogTGVhdmluZyBkaXJlY3RvcnkgYC9ibHVl
-ei9ibHVlei0zLTMtMi9ibHVlei11dGlscy0zLjkvY29tbW9uJw0KbWFrZVsxXTogKioqIFthbGwt
-cmVjdXJzaXZlXSBlcnJvcq+vIDENCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvYmx1ZXov
-Ymx1ZXotMy0zLTIvYmx1ZXotdXRpbHMtMy45Jw0KbWFrZTogKioqIFthbGxdIGVycm9yr68gMg0K
-DQpCZXN0IHJlZ2FyZHMsDQpMZWl5dQ==
+DQoNCkRlYXIgQUxMLA0KDQpJIGhhcyBwYXNzZWQgdG8gY29uZmlndXJlIGJsdWV6LXV0aWxzIGJ5
+IFN1bWVldCdzIGhlbHAuDQpCdXQgd2hlbiBJIGVudGVyIGludG8gYmx1ZXotdXRpbHMgZGlyZWN0
+b3J5IHRoZW4gbWFrZSBpdCwNCml0IGhhcHBlbnMgbWFueSBlcnJvcnMgYXMgYmVsb3csIEhvdyBj
+YW4gSSBmaXggdGhlc2UgcHJvYmxlbXM/DQpUaGFua3MgdmVyeSBtdWNoIGZvciB5b3VyIGhlbHAu
+IA0KDQouLi4uLi4NCnNkcC14bWwuYzogSW4gZnVuY3Rpb24gYHNkcF94bWxfcGFyc2VfZGF0YXR5
+cGUnOg0Kc2RwLXhtbC5jOjc2NDogZXJyb3I6IGRlcmVmZXJlbmNpbmcgcG9pbnRlciB0byBpbmNv
+bXBsZXRlIHR5cGUNCnNkcC14bWwuYzo3Njc6IGVycm9yOiBgU0RQX0JPT0wnIHVuZGVjbGFyZWQg
+KGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQ0Kc2RwLXhtbC5jOjc2OTogZXJyb3I6IGBTRFBf
+VUlOVDgnIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQ0Kc2RwLXhtbC5j
+Ojc3MTogZXJyb3I6IGBTRFBfVUlOVDE2JyB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBm
+dW5jdGlvbikNCnNkcC14bWwuYzo3NzM6IGVycm9yOiBgU0RQX1VJTlQzMicgdW5kZWNsYXJlZCAo
+Zmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pDQpzZHAteG1sLmM6Nzc1OiBlcnJvcjogYFNEUF9V
+SU5UNjQnIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQ0Kc2RwLXhtbC5j
+Ojc3NzogZXJyb3I6IGBTRFBfVUlOVDEyOCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMg
+ZnVuY3Rpb24pDQpzZHAteG1sLmM6Nzc5OiBlcnJvcjogYFNEUF9JTlQ4JyB1bmRlY2xhcmVkIChm
+aXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikNCnNkcC14bWwuYzo3ODE6IGVycm9yOiBgU0RQX0lO
+VDE2JyB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikNCnNkcC14bWwuYzo3
+ODM6IGVycm9yOiBgU0RQX0lOVDMyJyB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5j
+dGlvbikNCnNkcC14bWwuYzo3ODU6IGVycm9yOiBgU0RQX0lOVDY0JyB1bmRlY2xhcmVkIChmaXJz
+dCB1c2UgaW4gdGhpcyBmdW5jdGlvbikNCnNkcC14bWwuYzo3ODc6IGVycm9yOiBgU0RQX0lOVDEy
+OCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pDQpzZHAteG1sLmM6Nzkz
+OiBlcnJvcjogZGVyZWZlcmVuY2luZyBwb2ludGVyIHRvIGluY29tcGxldGUgdHlwZQ0Kc2RwLXht
+bC5jOiBBdCB0b3AgbGV2ZWw6DQpzZHAteG1sLmM6NjU6IGVycm9yOiBzdG9yYWdlIHNpemUgb2Yg
+YGluZGVudCcgaXNuJ3Qga25vd24NCnNkcC14bWwuYzo2NzogZXJyb3I6IHN0b3JhZ2Ugc2l6ZSBv
+ZiBgbmV4dF9pbmRlbnQnIGlzbid0IGtub3duDQpzZHAteG1sLmM6Mzc0OiB3YXJuaW5nOiBgY29u
+dmVydF9yYXdfYXR0cl90b194bWxfZnVuYycgZGVmaW5lZCBidXQgbm90IHVzZWQNCm1ha2VbMl06
+ICoqKiBbc2RwLXhtbC5vXSBlcnJvcq+vIDENCm1ha2VbMl06IExlYXZpbmcgZGlyZWN0b3J5IGAv
+Ymx1ZXovYmx1ZXotMy0zLTIvYmx1ZXotdXRpbHMtMy45L2NvbW1vbicNCm1ha2VbMV06ICoqKiBb
+YWxsLXJlY3Vyc2l2ZV0gZXJyb3KvryAxDQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL2Js
+dWV6L2JsdWV6LTMtMy0yL2JsdWV6LXV0aWxzLTMuOScNCm1ha2U6ICoqKiBbYWxsXSBlcnJvcq+v
+IDINCg0KQmVzdCByZWdhcmRzLA0KTGVpeXU=
 
 
 
---===============1232042231==
+--===============0276405020==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -69,7 +69,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============1232042231==
+--===============0276405020==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -80,4 +80,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1232042231==--
+--===============0276405020==--
