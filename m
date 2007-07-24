@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1185295124.3641.148.camel@cookie.hadess.net>
-References: <1185295124.3641.148.camel@cookie.hadess.net>
-Date: Tue, 24 Jul 2007 23:19:33 +0200
-Message-Id: <1185311973.7111.77.camel@violet>
+In-Reply-To: <1185294690.3641.145.camel@cookie.hadess.net>
+References: <1185294690.3641.145.camel@cookie.hadess.net>
+Date: Tue, 24 Jul 2007 23:18:11 +0200
+Message-Id: <1185311891.7111.74.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Implement browse callback in the applet
+Subject: Re: [Bluez-devel] [PATCH] wizard fixes
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,15 +22,16 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Bastien,
 
-> The patch implements the browse callback for the applet. It hardcodes
-> the use of nautilus, but we should probably also check for nautilus in
-> the obexftp_available().
+> Some small fixes for the wizard.
 > 
-> It also fixes a popup menu being created _each time_ someone
-> right-clicks on the bluetooth applet.
+> - Search on all the adapters, rather than just the first one
 
-can you split this into two patches. They are both two independent
-things.
+I removed this hunk since I think it is wrong. See my other email.
+
+> - Clean up the user-visible strings
+> - Translate the "Device" column
+
+Both changes are in the CVS now.
 
 Regards
 
