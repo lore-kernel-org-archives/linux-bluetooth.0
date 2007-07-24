@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ Hackers <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="=-Xzp6091za1mL75nceTmc"
-Date: Tue, 24 Jul 2007 17:38:44 +0100
-Message-Id: <1185295124.3641.148.camel@cookie.hadess.net>
+Content-Type: multipart/mixed; boundary="=-JO2OP8DjGYdDhrHnE+Tt"
+Date: Tue, 24 Jul 2007 17:31:30 +0100
+Message-Id: <1185294690.3641.145.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel] [PATCH] Implement browse callback in the applet
+Subject: [Bluez-devel] [PATCH] wizard fixes
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,160 +19,84 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---=-Xzp6091za1mL75nceTmc
+--=-JO2OP8DjGYdDhrHnE+Tt
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-The patch implements the browse callback for the applet. It hardcodes
-the use of nautilus, but we should probably also check for nautilus in
-the obexftp_available().
+Some small fixes for the wizard.
 
-It also fixes a popup menu being created _each time_ someone
-right-clicks on the bluetooth applet.
+- Search on all the adapters, rather than just the first one
+- Clean up the user-visible strings
+- Translate the "Device" column
+
+We should probably use the device selector when it's closer to ready.
 
 -- 
 Bastien Nocera <hadess@hadess.net> 
 
---=-Xzp6091za1mL75nceTmc
-Content-Disposition: attachment;
-	filename=bluez-gnome-implement-browse-callback.patch
-Content-Type: text/x-patch; name=bluez-gnome-implement-browse-callback.patch;
+--=-JO2OP8DjGYdDhrHnE+Tt
+Content-Disposition: attachment; filename=bluez-gnome-wizard-fixes.patch
+Content-Type: text/x-patch; name=bluez-gnome-wizard-fixes.patch;
 	charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 
-Index: applet/Makefile.am
-===================================================================
-RCS file: /cvsroot/bluez/gnome/applet/Makefile.am,v
-retrieving revision 1.19
-diff -u -p -r1.19 Makefile.am
---- applet/Makefile.am	22 Jul 2007 16:06:05 -0000	1.19
-+++ applet/Makefile.am	24 Jul 2007 16:35:28 -0000
-@@ -4,7 +4,8 @@ bin_PROGRAMS = bluetooth-applet
- bluetooth_applet_SOURCES = main.c
- 
- bluetooth_applet_LDADD = @NOTIFY_LIBS@ @GCONF_LIBS@ \
--		@GTK_LIBS@ @HAL_LIBS@ @DBUS_LIBS@
-+		@GTK_LIBS@ @HAL_LIBS@ @DBUS_LIBS@ \
-+		$(top_builddir)/common/libcommon.a
- 
- nodist_bluetooth_applet_SOURCES = \
- 		$(top_builddir)/common/passkey-agent-glue.h \
-Index: applet/main.c
-===================================================================
-RCS file: /cvsroot/bluez/gnome/applet/main.c,v
-retrieving revision 1.67
-diff -u -p -r1.67 main.c
---- applet/main.c	24 Jul 2007 15:19:33 -0000	1.67
-+++ applet/main.c	24 Jul 2007 16:35:29 -0000
-@@ -47,6 +47,8 @@
- #include <libnotify/notify.h>
- #endif
- 
-+#include "device-selector.h"
-+
- #define PASSKEY_AGENT_PATH	"/org/bluez/passkey"
- #define AUTH_AGENT_PATH		"/org/bluez/auth"
- 
-@@ -1229,6 +1231,7 @@ static char *get_form_factor(void)
- 
- 	return formfactor;
- }
-+
- static void adapter_setup(gpointer data, gpointer user_data)
+diff --git a/wizard/main.c b/wizard/main.c
+index 9175512..1d686c3 100644
+--- a/wizard/main.c
++++ b/wizard/main.c
+@@ -112,12 +112,12 @@ static void cancel_callback(GtkWidget *assistant, gpointer data)
+ static void prepare_callback(GtkWidget *assistant, GtkWidget *page, gpointer data)
  {
- 	struct adapter_data *adapter = data;
-@@ -1481,8 +1484,53 @@ static void settings_callback(GObject *w
- 		g_printerr("Couldn't execute command: %s\n", command);
- }
+ 	if (page == page_search) {
+-		bluetooth_client_discover_devices(client, "/org/bluez/hci0");
++		bluetooth_client_discover_devices(client, NULL);
+ 		return;
+ 	}
  
-+static void device_selected_callback(GObject *object, GParamSpec *spec, gpointer user_data)
-+{
-+	GtkDialog *dialog = user_data;
-+	char *address;
-+
-+	g_object_get(object, "device-selected", &address, NULL);
-+	gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_ACCEPT, address != NULL);
-+	g_free(address);
-+}
-+
- static void browse_callback(GObject *widget, gpointer user_data)
- {
-+	GtkWidget *dialog, *selector;
-+	char *address, *command;
-+
-+	dialog = gtk_dialog_new_with_buttons(_("Browse devices"),
-+					     NULL,
-+					     GTK_DIALOG_NO_SEPARATOR,
-+					     GTK_STOCK_CANCEL,
-+					     GTK_RESPONSE_REJECT,
-+					     GTK_STOCK_CONNECT,
-+					     GTK_RESPONSE_ACCEPT,
-+					     NULL);
-+	gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT, FALSE);
-+	gtk_window_set_default_size(GTK_WINDOW(dialog), 400, 300);
-+
-+	/* Add the selector widget */
-+	selector = bluetooth_device_selector_new(_("Select device to browse."));
-+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), selector);
-+	gtk_widget_show(selector);
-+	g_signal_connect(selector, "notify::device-selected",
-+			 G_CALLBACK(device_selected_callback), dialog);
-+
-+	if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_ACCEPT) {
-+		gtk_widget_destroy(dialog);
-+		return;
-+	}
-+
-+	g_object_get(selector, "device-selected", &address, NULL);
-+	gtk_widget_destroy(dialog);
-+
-+	command = g_strdup_printf("nautilus --no-default-window \"obex://[%s]\"", address);
-+	g_free(address);
-+
-+	if (!g_spawn_command_line_async(command, NULL))
-+		g_printerr(_("Couldn't execute command: %s\n"), command);
-+	g_free(command);
- }
+ 	if (page == page_pairing) {
+-		bluetooth_client_cancel_discovery(client, "/org/bluez/hci0");
++		bluetooth_client_cancel_discovery(client, NULL);
  
- #if 0
-@@ -1507,9 +1555,13 @@ static void activate_callback(GObject *w
- static void popup_callback(GObject *widget, guint button,
- 				guint activate_time, gpointer user_data)
- {
--	GtkWidget *menu;
-+	static GtkWidget *menu = NULL;
-+	static GtkWidget *browse_item = NULL;
- 	GtkWidget *item;
+ 		bluetooth_client_register_passkey_agent(client,
+ 					"/org/bluez/applet", address,
+@@ -242,7 +242,7 @@ static void create_type(GtkWidget *assistant)
  
-+	if (menu != NULL)
-+		goto popup;
-+
- 	menu = gtk_menu_new();
+ 	vbox = create_vbox(assistant, GTK_ASSISTANT_PAGE_CONTENT,
+ 				_("Device type"),
+-				_("Select type of device you wanna setup"));
++				_("Select the type of device you want to setup"));
  
- 	item = gtk_image_menu_item_new_from_stock(GTK_STOCK_PREFERENCES, NULL);
-@@ -1534,9 +1586,6 @@ static void popup_callback(GObject *widg
- 	gtk_widget_show(item);
- 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+ 	button = gtk_radio_button_new_with_label(group, _("Mouse"));
  
--	gtk_widget_set_sensitive(item, obexftp_available() &&
--						attached_adapters() > 0);
--
- #if 0
- 	item = gtk_separator_menu_item_new();
- 	gtk_widget_show(item);
-@@ -1549,6 +1598,10 @@ static void popup_callback(GObject *widg
- 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
- #endif
+@@ -389,7 +389,7 @@ static void create_search(GtkWidget *assistant)
  
-+popup:
-+	gtk_widget_set_sensitive(item, obexftp_available() &&
-+						attached_adapters() > 0);
-+
- 	gtk_menu_popup(GTK_MENU(menu), NULL, NULL,
- 			gtk_status_icon_position_menu,
- 			GTK_STATUS_ICON(widget), button, activate_time);
+ 	vbox = create_vbox(assistant, GTK_ASSISTANT_PAGE_CONTENT,
+ 				_("Device search"),
+-				_("Select device you wanna setup"));
++				_("Select the device you want to setup"));
+ 
+ 	scrolled = gtk_scrolled_window_new(NULL, NULL);
+ 
+@@ -411,7 +411,7 @@ static void create_search(GtkWidget *assistant)
+ 
+ 	column = gtk_tree_view_column_new();
+ 
+-	gtk_tree_view_column_set_title(column, "Device");
++	gtk_tree_view_column_set_title(column, _("Device"));
+ 
+ 	renderer = gtk_cell_renderer_pixbuf_new();
+ 	gtk_tree_view_column_set_spacing(column, 4);
+@@ -434,7 +434,7 @@ static void create_search(GtkWidget *assistant)
+ 					"Type", gtk_cell_renderer_text_new(),
+ 						type_to_text, NULL, NULL);
+ 
+-	model = bluetooth_client_get_model_for_adapter(client, "/org/bluez/hci0");
++	model = bluetooth_client_get_model_for_adapter(client, NULL);
+ 
+ 	gtk_tree_view_set_model(GTK_TREE_VIEW(tree), model);
+ 
 
---=-Xzp6091za1mL75nceTmc
+--=-JO2OP8DjGYdDhrHnE+Tt
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -183,7 +107,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---=-Xzp6091za1mL75nceTmc
+--=-JO2OP8DjGYdDhrHnE+Tt
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -194,4 +118,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-Xzp6091za1mL75nceTmc--
+--=-JO2OP8DjGYdDhrHnE+Tt--
