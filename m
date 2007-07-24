@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1185294690.3641.145.camel@cookie.hadess.net>
-References: <1185294690.3641.145.camel@cookie.hadess.net>
-Date: Tue, 24 Jul 2007 23:18:11 +0200
-Message-Id: <1185311891.7111.74.camel@violet>
+In-Reply-To: <1185293793.3641.129.camel@cookie.hadess.net>
+References: <1185293793.3641.129.camel@cookie.hadess.net>
+Date: Tue, 24 Jul 2007 23:14:48 +0200
+Message-Id: <1185311688.7111.72.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] wizard fixes
+Subject: Re: [Bluez-devel] [PATCH] Make BluetoothClient work on all adapters
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,16 +22,26 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Bastien,
 
-> Some small fixes for the wizard.
-> 
-> - Search on all the adapters, rather than just the first one
+> With this patch, we can now pass a NULL as the adapter to work with all
+> the adapters. This is for use in the upcoming patch for the selector
+> widget.
 
-I removed this hunk since I think it is wrong. See my other email.
+I don't like it. We should not wildly use all attached adapters. Passing
+a NULL to the client creation should use the default adapter.
 
-> - Clean up the user-visible strings
-> - Translate the "Device" column
+Actually in case of multiple adapters we need to provide one extra step
+to let the user select the appropriate adapter.
 
-Both changes are in the CVS now.
+Main reason, why I don't wanna start an inquiry on all adapters is that
+it can happen that you see a remote device with one adapter, but then
+the actual connection or device discovery is done via another one. That
+is not good. We should always use the default adapter and if (and only
+if) more adapters are present, then present a way to select a different
+adapter.
+
+However this includes that we have to monitor if the default adapter
+changes or one adapter gets removed while being in the adapter selector
+widget or device selector widget.
 
 Regards
 
