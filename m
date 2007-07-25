@@ -1,19 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1185350162.3641.217.camel@cookie.hadess.net>
-References: <1185293793.3641.129.camel@cookie.hadess.net>
-	<1185311688.7111.72.camel@violet>
-	<1185315051.3641.189.camel@cookie.hadess.net>
-	<1185318541.3641.195.camel@cookie.hadess.net>
-	<1185347068.7111.91.camel@violet>
-	<1185348803.3641.213.camel@cookie.hadess.net>
-	<1185350022.7111.97.camel@violet>
-	<1185350162.3641.217.camel@cookie.hadess.net>
-Date: Wed, 25 Jul 2007 10:05:17 +0200
-Message-Id: <1185350717.7111.109.camel@violet>
+In-Reply-To: <1185294455.3641.141.camel@cookie.hadess.net>
+References: <1185294455.3641.141.camel@cookie.hadess.net>
+Date: Wed, 25 Jul 2007 10:04:31 +0200
+Message-Id: <1185350671.7111.108.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Make BluetoothClient work on all adapters
+Subject: Re: [Bluez-devel] [PATCH] add device selector widget
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -29,25 +22,54 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Bastien,
 
-> > > So, the only thing I'm supposed to do, is change the model
-> > > automatically, so that when we get the model for the default adapter,
-> > > the model should change automatically. That will require the
-> > > DefaultAdapterChanged signal to live in the instance, as in my patch, as
-> > > globally, we don't have any knownledge of the instances.
-> > 
-> > We can have that in the model if we connect the proper signals to the
-> > rows. That is the way I prefer, because the rest is messy and would need
-> > DBusProxy for every instance. We don't since the model should be global
-> > and actually valid for the lifetime of the application. However don't
-> > worry. We can fix this up in the background. Once we have proper widgets
-> > available, we don't have to expose the model to the applications anymore
-> > (or at least less).
+> It's a first draft of the device selector widget, which I'd like to use
+> in the applet for gnome-vfs obexftp browsing, and in the wizard. Tadas
+> can probably use it for the obex sending program as well.
 > 
-> What's needed for the patch to go in then? Should we just make sure that
-> we use the default adapter when NULL is passed to those few functions,
-> and that's it? Even easier...
+> The test program shows how to use it. The API is dead simple.
+> 
+> I also want to add a "Search" button, to restart a discovery, and combo
+> boxes at the top of it to filter the type/class of device (known,
+> recently used, recently discovered, and printer/phone/etc.).
+> 
+> Big patch, but not really any other way to do it...
 
-patch for that is in the CVS now. Including the changes to the wizard.
+I really do like it and it is a good idea. However we need to change
+this a little bit. What we need is multiple things:
+
+BluetoothAdapterChooserWidget
+
+This widget should make it possible to choose an adapter. It can be
+either a combo box or a tree view depending on some property.
+
+BluetoothAdapterChooserDialog
+
+Uses the BluetoothAdapterChooserWidget and creates a dialog around.
+
+BluetoothDeviceChooserWidget
+
+Will present devices in range. Has a scan button and other possible
+things to tweak it. And actually we should include maybe a widget to
+choose the adapter if multiple are available and a property says that is
+what we want.
+
+BluetoothDeviceChooserDialog
+
+Use the BluetoothDeviceWidget in a dialog and make it useful for simple
+applications.
+
+Mainly all of these four should be modeled along with the GtkFileChooser
+stuff and work kinda similar.
+
+Also having some kind of BluetoothDeviceButton that launches a dialog if
+needed would be nice.
+
+To shorten the widget names. We might better use _not_ the "Chooser"
+word since it looks like Gtk compat stuff because the other name was
+already taken by an older widget.
+
+So BluetoothDeviceButton, BluetoothDeviceSelection and
+BluetoothDeviceSelectionDialog might be appropriate. What do you think?
 
 Regards
 
