@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1185347068.7111.91.camel@violet>
+In-Reply-To: <1185318541.3641.195.camel@cookie.hadess.net>
 References: <1185293793.3641.129.camel@cookie.hadess.net>
 	<1185311688.7111.72.camel@violet>
 	<1185315051.3641.189.camel@cookie.hadess.net>
 	<1185318541.3641.195.camel@cookie.hadess.net>
-	<1185347068.7111.91.camel@violet>
-Date: Wed, 25 Jul 2007 08:33:23 +0100
-Message-Id: <1185348803.3641.213.camel@cookie.hadess.net>
+Date: Wed, 25 Jul 2007 09:04:28 +0200
+Message-Id: <1185347068.7111.91.camel@violet>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] [PATCH] Make BluetoothClient work on all adapters
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -24,52 +23,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Wed, 2007-07-25 at 09:04 +0200, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > > > However this includes that we have to monitor if the default adapter
-> > > > changes or one adapter gets removed while being in the adapter selector
-> > > > widget or device selector widget.
-> > > 
-> > > Fair enough, I knew this would be a sticky point. I'm trying to fix it
-> > > up so that we use the default adapter by default with "NULL" passed as
-> > > the adapter.
+Hi Bastien,
+
+> > > However this includes that we have to monitor if the default adapter
+> > > changes or one adapter gets removed while being in the adapter selector
+> > > widget or device selector widget.
 > > 
-> > Here goes. This should correctly kill the disco on the old default
-> > adapter and re-enable it on the new default adapter, when the default
-> > adapter changes.
+> > Fair enough, I knew this would be a sticky point. I'm trying to fix it
+> > up so that we use the default adapter by default with "NULL" passed as
+> > the adapter.
 > 
-> you patch is wrong. You are messing up a DBusConnection object with the
-> BluetoothClient object in the callbacks of the DefaultAdapterChanged
-> signal.
-> 
-> Actually I also don't like this way, we should store the default path
-> globally since that is what really counts. The tree storing all
-> information should be fully valid as long as we have an instance of the
-> BluetoothClient object and it can store the information about the
-> default adapter for us.
+> Here goes. This should correctly kill the disco on the old default
+> adapter and re-enable it on the new default adapter, when the default
+> adapter changes.
 
-The tree storing all information is still valid, there's no information
-there as to which is the default adapter.
+you patch is wrong. You are messing up a DBusConnection object with the
+BluetoothClient object in the callbacks of the DefaultAdapterChanged
+signal.
 
-And to be able to use the default_adapter in the instances, you need to
-connect to the signal in the instances.
+Actually I also don't like this way, we should store the default path
+globally since that is what really counts. The tree storing all
+information should be fully valid as long as we have an instance of the
+BluetoothClient object and it can store the information about the
+default adapter for us.
 
-If you're not interested in stopping the existing discoveries on the
-default adapter when the default adapter changes, or transferring those
-discoveries to other devices, then it will be much easier.
+Regards
 
-I'm not sure why we would carry on discovering devices if the model
-showing the devices is going away though.
+Marcel
 
-So, the only thing I'm supposed to do, is change the model
-automatically, so that when we get the model for the default adapter,
-the model should change automatically. That will require the
-DefaultAdapterChanged signal to live in the instance, as in my patch, as
-globally, we don't have any knownledge of the instances.
-
--- 
-Bastien Nocera <hadess@hadess.net> 
 
 
 -------------------------------------------------------------------------
