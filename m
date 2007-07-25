@@ -6,8 +6,8 @@ References: <1185293793.3641.129.camel@cookie.hadess.net>
 	<1185311688.7111.72.camel@violet>
 	<1185315051.3641.189.camel@cookie.hadess.net>
 	<1185318541.3641.195.camel@cookie.hadess.net>
-Date: Wed, 25 Jul 2007 09:04:28 +0200
-Message-Id: <1185347068.7111.91.camel@violet>
+Date: Wed, 25 Jul 2007 08:51:04 +0200
+Message-Id: <1185346264.7111.87.camel@violet>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] [PATCH] Make BluetoothClient work on all adapters
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -36,16 +36,23 @@ Hi Bastien,
 > Here goes. This should correctly kill the disco on the old default
 > adapter and re-enable it on the new default adapter, when the default
 > adapter changes.
+> 
+> If the default adapter changes but we didn't start a discovery using the
+> default adapter, then it's up to the application to start/stop it
+> anyway.
+> 
+> It will also make all the functions taking an adapter use the default
+> adapter when NULL is passed.
+> 
+> We should also kill discovery on all the devices when the object goes
+> away, and move the treestore, and dbus connection to the class, rather
+> than using statics. But that's for another patch.
 
-you patch is wrong. You are messing up a DBusConnection object with the
-BluetoothClient object in the callbacks of the DefaultAdapterChanged
-signal.
-
-Actually I also don't like this way, we should store the default path
-globally since that is what really counts. The tree storing all
-information should be fully valid as long as we have an instance of the
-BluetoothClient object and it can store the information about the
-default adapter for us.
+when the object goes away, then we can disconnect from the system bus
+and kill our D-Bus connection. This means that hcid will detect that our
+application is no longer in control and cancel everything that is still
+running. Only exception is periodic inquiry, but that is meant to be
+like it and we don't have to worry.
 
 Regards
 
