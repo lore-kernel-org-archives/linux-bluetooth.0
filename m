@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1185379646.3641.257.camel@cookie.hadess.net>
-References: <1185379646.3641.257.camel@cookie.hadess.net>
-Date: Wed, 25 Jul 2007 20:02:17 +0200
-Message-Id: <1185386537.6239.4.camel@aeonflux.holtmann.net>
+In-Reply-To: <1185379388.3641.253.camel@cookie.hadess.net>
+References: <1185379388.3641.253.camel@cookie.hadess.net>
+Date: Wed, 25 Jul 2007 20:01:36 +0200
+Message-Id: <1185386496.6239.3.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] BluetoothDeviceSelection fixes
+Subject: Re: [Bluez-devel] [PATCH] New version of obexftp_available
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,13 +22,13 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Bastien,
 
-> As discussed with Marcel:
-> - make the selected device changed a signal as well
-> - add a convenience function to get the selected device
-> - use the above changes in the test program
-> - don't forget to translate it
+> This uses the modulesdir variable in newer gnome-vfs to look for
+> configuration directories.
+> 
+> The code is still pretty ugly, but I guess we'll just use gvfs in a
+> couple of GNOME release cycles.
 
-committed to the CVS. Thanks.
+too ugly for me. I decided to let Nautilus handle the error case ;)
 
 Regards
 
