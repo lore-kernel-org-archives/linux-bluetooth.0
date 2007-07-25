@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <46A8962A.2010207@yandex.ru>
-Date: Thu, 26 Jul 2007 16:40:10 +0400
-From: Irakli Tsagareli <itsagareli@yandex.ru>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] simultaneous read/write on SCO channel
+From: Frederic Dalleau <frederic.dalleau@access-company.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d89ddf300707221847w263a72eas8015380edc66edb9@mail.gmail.com>
+References: <46A34096.7050306@gmx.de>
+	<d89ddf300707221847w263a72eas8015380edc66edb9@mail.gmail.com>
+Date: Wed, 25 Jul 2007 14:14:59 +0200
+Message-Id: <1185365699.2745.19.camel@ubuntu.mpl.access-company.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] bluetooth-alsa: Motorola DC800 works with
+	btsco	but not with plugz
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,20 +22,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi all,
+Brad,
 
-I'm writing a small code to test HandsFree capabilities between my phone 
-and PC. everything works fine for audio playback (on the PC, I can hear 
-sound file played on the phone and in case of incoming call, I can hear 
-a voice of remote subscriber) but when I try at the same time to send 
-some audio data to the handset via same socket, send() function returns 
-"Invalid argument" error. I tried to create new socket for writing (same 
-way I created listening socket), creation succeeds, but connect fails 
-with "Device or resource busy". can anybody be so kind and explain, how 
-can I read and write data through SCO channel simultaneously ?
+> The "a2dpd2" plugin works a little differently (with the same daemon)
+> and it would be worth trying.
+> 
+Hi I finally removed the a2dpd2.
 
-thank you and best regards,
-kern.
+> I wrote the a2play app but Frederic wrote a2dpd so I'm not sure what
+> the significance of retrieve_data_from underrun would be.
+It is an underrun from the application. That's strange as it works with
+HT820.
+
+
+Thomas,
+
+Only thing I found about dc800 is that it is an a2dp source that you
+connect to hifi to listen music with an headset like ht820. This role is
+not supported in a2dpd. Only a2play from btsco will work with this.
+
+Does it support also sink role?
+
+Frederic.
+
 
 
 -------------------------------------------------------------------------
