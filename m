@@ -1,16 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <46A8A7C1.1050200@idlum.be>
-References: <20070709093602.A2C6B58D565@mailflip16.edt02.net>
-	<46935C56.5060108@idlum.be>
-	<2EB6297382462046A9427D7324788A4801FD0E6C@MCLNEXVS06.resource.ds.bah.com>
-	<4694A485.40904@idlum.be>  <46A8A7C1.1050200@idlum.be>
-Date: Thu, 26 Jul 2007 16:30:54 +0200
-Message-Id: <1185460255.7111.140.camel@violet>
+In-Reply-To: <1185459203.3641.287.camel@cookie.hadess.net>
+References: <1185459203.3641.287.camel@cookie.hadess.net>
+Date: Thu, 26 Jul 2007 15:21:50 +0100
+Message-Id: <1185459710.3641.289.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Kernel Oops while transmitting data on
-	several	RFCOMMlinks
+Subject: Re: [Bluez-devel] [PATCH] Show the trusted icon in the treeview
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,22 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pierre-Yves,
-
-> After upgrading to kernel 2.6.21-2 (in fact, the 
-> linux-image-2.6.21-2-486_2.6.21-5_i386.deb package from debian 
-> unstable), I performed some new tests, and it happened again.
+On Thu, 2007-07-26 at 15:13 +0100, Bastien Nocera wrote:
+> I added a property to be able to show/hide a trusted (bonded) icon in
+> the list view, it's shown by default.
 > 
-> Please find attached what I got in the logs. What's wrong here? I will 
-> gladly perform any test or action which you may ask to help track the 
-> problem down. Just ask.
+> There's also a one-liner to avoid changing the address rather than the
+> name, when a device doesn't have a name (ie. it still displayed
+> 00:00:00:00:00:00 rather than 00-00-00-00-00-00, but changed the address
+> to that).
 
-that is not the latest upstream kernel. Try 2.6.23-rc1.
+Johan mentioned that bonded != trusted, and the existing code didn't
+make the difference. I'll fix that up.
 
-Regards
-
-Marcel
-
+-- 
+Bastien Nocera <hadess@hadess.net> 
 
 
 -------------------------------------------------------------------------
