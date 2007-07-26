@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Frederic Dalleau <frederic.dalleau@access-company.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200707261020.24095.bsh_wang@126.com>
-References: <200707261020.24095.bsh_wang@126.com>
-Date: Thu, 26 Jul 2007 16:41:22 +0200
-Message-Id: <1185460882.21272.8.camel@ubuntu.mpl.access-company.com>
+In-Reply-To: <46A8A7C1.1050200@idlum.be>
+References: <20070709093602.A2C6B58D565@mailflip16.edt02.net>
+	<46935C56.5060108@idlum.be>
+	<2EB6297382462046A9427D7324788A4801FD0E6C@MCLNEXVS06.resource.ds.bah.com>
+	<4694A485.40904@idlum.be>  <46A8A7C1.1050200@idlum.be>
+Date: Thu, 26 Jul 2007 16:30:54 +0200
+Message-Id: <1185460255.7111.140.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] a2dp sound skips
+Subject: Re: [Bluez-devel] Kernel Oops while transmitting data on
+	several	RFCOMMlinks
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,20 +24,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-> 	I've gotten a2dp working. My player is totem, but the sound skips every 
-> several seconds while playing. 
-If you're using a2dpd give a try to latest a2dpd from plugz cvs (from
-today). I fixed something similar.
+Hi Pierre-Yves,
 
-> So the aplay. But the kaffeine is ok when 
-> playering format mp3 while for the format wav not work.So I want to debug 
-> this issue. But what componet I will debug, the kernel, alsa, buez or a2dp ?
-If you don't use a2dpd or the issue is not fixed, then I would still beg
-for the a2dp.
+> After upgrading to kernel 2.6.21-2 (in fact, the 
+> linux-image-2.6.21-2-486_2.6.21-5_i386.deb package from debian 
+> unstable), I performed some new tests, and it happened again.
+> 
+> Please find attached what I got in the logs. What's wrong here? I will 
+> gladly perform any test or action which you may ask to help track the 
+> problem down. Just ask.
 
-Let us know if it is ok.
+that is not the latest upstream kernel. Try 2.6.23-rc1.
 
-frederic
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
