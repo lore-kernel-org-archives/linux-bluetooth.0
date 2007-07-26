@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: wang baisheng <bsh_wang@126.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Fri, 27 Jul 2007 13:01:20 +0800
-References: <200707261020.24095.bsh_wang@126.com>
-	<1185460882.21272.8.camel@ubuntu.mpl.access-company.com>
-In-Reply-To: <1185460882.21272.8.camel@ubuntu.mpl.access-company.com>
-MIME-Version: 1.0
-Message-Id: <200707271301.20092.bsh_wang@126.com>
-Subject: Re: [Bluez-devel] a2dp sound skips
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1185475756.3641.329.camel@cookie.hadess.net>
+References: <1185475756.3641.329.camel@cookie.hadess.net>
+Content-Type: multipart/mixed; boundary="=-sosQbgoaFKXKql1pDVOE"
+Date: Thu, 26 Jul 2007 21:17:59 +0100
+Message-Id: <1185481079.3641.339.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] bluez-gnome: "search" button for
+	the	device selection
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,205 +18,347 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-CkhpIGZyZWRlcmljLAoKwqDCoMKgwqDCoMKgwqDCoEkgdHJ5IHRoZSBuZXcgcGx1ZyBpbiBteSBs
-YXB0b3AsIGtlcm5lbCBpcyAyLjYuMTguMywgYmx1ZXogaXMgMy4xMi4gSXQgCndvcmtzIApncmVh
-dCEgVGhhbmsgeW91IQoKwqDCoMKgwqDCoMKgwqDCoEJ1dCB3aGVuIEkgdHJ5IGl0IGluIGFub3Ro
-ZXIsIGV4Y2VwdCB0aGUga2VybmVsIGlzIDIuNi4yMS4zLCBvdGhlciAKY29tcG9uZW50cyAKYXJl
-IGFsbCB0aGUgc2FtZSwgdGhlIHNvdW5kIHNraXBzIGFuZCBJIGZvdW5kIHRoZSBhMmRwZCByZXBl
-YXQgY29ubmVjdGluZyBhbmQgCmRpc2Nvbm5lY3RpbmcuIHRoZSBmb2xsb3dpbmcgaXMgdGhlIGEy
-ZHBkIG91dHB1dDoKCgpBMkRQRFsxMToxODo1MC41ODddOiBwb2xsZmRfY2JfYXZyY3BmZDogc29j
-a2V0IDEyOiBDb25uZWN0aW9uIGZyb20gCkIxOkJDOkI1OkE0OjA3OjAwLCBtdHU9NjEwIGFjY2Vw
-dGVkIGF0IGluZGV4IDAKQTJEUERbMTE6MTg6NTAuNjYwXTogYTJkcF9oYW5kbGVfYXZkdHBfbWVz
-c2FnZTogUmVhZCBub24gY29tbWFuZCBwYWNrZXQgCihtc2d0eXBlPU1FU1NBR0VfVFlQRV9BQ0NF
-UFQsc2lnbmFsPUFWRFRQX0NMT1NFKQpBMkRQRFsxMToxODo1MC42NjBdOiBhMmRwX3N0YXRlX21h
-Y2hpbmU6IEFWRFRQX0NMT1NFIHN1Y2Nlc3MKQTJEUERbMTE6MTg6NTAuNjYwXTogYTJkcF9zdGF0
-ZV9tYWNoaW5lOiBTdGF0ZSBBVkRUUF9TVEFURVhfRElTQ09OTkVDVElORwpBMkRQRFsxMToxODo1
-MC42NjFdOiBhMmRwX2Rpc2Nvbm5lY3Q6CkEyRFBEWzExOjE4OjUwLjY2MV06IGEyZHBfc3RyZWFt
-X3N0b3A6IENsb3Npbmcgc3RyZWFtIHNvY2tldCAxMQpBMkRQRFsxMToxODo1MC42NjFdOiBhMmRw
-X3N0cmVhbV9zdG9wOiBDbG9zZWQKQTJEUERbMTE6MTg6NTAuNjYxXTogYTJkcF9zdHJlYW1fc3Rv
-cDogU3RhdGUgQVZEVFBfU1RBVEVfSURMRQpBMkRQRFsxMToxODo1MC42NjFdOiBhMmRwX2Rpc2Nv
-bm5lY3Q6IENsb3NpbmcgY3RsIHNvY2tldCAxMApBMkRQRFsxMToxODo1MC42NjFdOiBhMmRwX2Rp
-c2Nvbm5lY3Q6IENsb3NlZApBMkRQRFsxMToxODo1MC42NjFdOiBhMmRwX2Rpc2Nvbm5lY3Q6IFN0
-YXRlIEFWRFRQX1NUQVRFX0RJU0NPTk5FQ1RFRApBMkRQRFsxMToxODo1MC42NjFdOiBhMmRwZF9z
-aWduYWxfc3RhdGU6IERpc2Nvbm5lY3RlZApBMkRQRFsxMToxODo1MS40NzFdOiBhMmRwX3N0YXRl
-X2Nvbm5lY3Q6IFN0YXRlIEFWRFRQX1NUQVRFWF9TRFBfQ09OTkVDVElORwpBMkRQRFsxMToxODo1
-MS40NzFdOiBhMmRwX3N0YXRlX21hY2hpbmU6IFJvbGUgaXMgSU5JVElBVE9SCkEyRFBEWzExOjE4
-OjUxLjQ3MV06IGEyZHBfc3RhdGVfbWFjaGluZTogKGVycm5vPTExNTpPcGVyYXRpb24gbm93IGlu
-IApwcm9ncmVzcylTRFAgY29ubmVjdGlvbiBvbiBzb2NrZXQgMTBeTQpBMkRQRFsxMToxODo1MS40
-NzFdOiBhMmRwX3N0YXRlX21hY2hpbmU6IFN0YXRlIApBVkRUUF9TVEFURVhfU0RQX0NPTk5FQ1RJ
-TkdfV0FJVApBMkRQRFsxMToxODo1MS40NzFdOiBhMmRwZF9zaWduYWxfc3RhdGU6IENvbm5lY3Rp
-bmcgMDA6MDc6QTQ6QjU6QkM6QjEKQTJEUERbMTE6MTg6NTEuNTQ2XTogYTJkcF9zdGF0ZV9tYWNo
-aW5lOiBTRFAgY29ubmVjdGlvbiB0ZXJtaW5hdGVkCkEyRFBEWzExOjE4OjUxLjYxMV06IGdldF9h
-dmR0cF9wc206IFBhcnNpbmcgcmVzdWx0cwpBMkRQRFsxMToxODo1MS42MTFdOiBnZXRfYXZkdHBf
-cHNtOiBSZWNvcmQKQTJEUERbMTE6MTg6NTEuNjExXTogZ2V0X2F2ZHRwX3BzbTogU2VydmljZSBT
-ZWFyY2ggT0sKQTJEUERbMTE6MTg6NTEuNjQxXTogZ2V0X2F2ZHRwX3BzbTogQ2hlY2tpbmcgbm9u
-IHNwZWMgYXVkaW8KQTJEUERbMTE6MTg6NTEuNjQxXTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBGb3Vu
-ZCBwc20gMjUKQTJEUERbMTE6MTg6NTEuNjQxXTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTdGF0ZSBB
-VkRUUF9TVEFURVhfQ1RMX0NPTk5FQ1RJTkcKQTJEUERbMTE6MTg6NTEuNjQxXTogYXZyY3BfaGFu
-ZGxlX21lc3NhZ2U6IEFWUkNQIFJlY2VpdmUgZmFpbGVkCkEyRFBEWzExOjE4OjUxLjY0MV06IGEy
-ZHBfc3RhdGVfbWFjaGluZTogU29ja2V0IGlzIDEwCkEyRFBEWzExOjE4OjUxLjY0MV06IGEyZHBf
-c3RhdGVfbWFjaGluZTogKGVycm5vPTExNTpPcGVyYXRpb24gbm93IGluIApwcm9ncmVzcylTdGF0
-ZSBBVkRUUF9TVEFURVhfQ1RMX0NPTk5FQ1RJTkdfV0FJVF5NCkEyRFBEWzExOjE4OjUyLjA1OF06
-IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgQVZEVFBfU1RBVEVfSURMRQpBMkRQRFsxMToxODo1
-Mi4wNTldOiBhMmRwX3N0YXRlX21hY2hpbmU6IFN0YXRlIEFWRFRQX1NUQVRFWF9ESVNDT1ZFUklO
-RwpBMkRQRFsxMToxODo1Mi4wNjBdOiBhMmRwX3N0YXRlX21hY2hpbmU6IFN0YXRlIEFWRFRQX1NU
-QVRFWF9ESVNDT1ZFUklOR19SRVNQCkEyRFBEWzExOjE4OjUyLjI3OV06IGEyZHBfaGFuZGxlX2F2
-ZHRwX21lc3NhZ2U6IFJlYWQgbm9uIGNvbW1hbmQgcGFja2V0IAoobXNndHlwZT1NRVNTQUdFX1RZ
-UEVfQUNDRVBULHNpZ25hbD1BVkRUUF9ESVNDT1ZFUikKQTJEUERbMTE6MTg6NTIuMjc5XTogYTJk
-cF9zdGF0ZV9tYWNoaW5lOiBBVkRUUF9ESVNDT1ZFUiBzdWNjZXNzCkEyRFBEWzExOjE4OjUyLjI4
-MF06IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgCkFWRFRQX1NUQVRFWF9HRVRUSU5HX0NBUEFC
-SUxJVElFUwpBMkRQRFsxMToxODo1Mi4yODBdOiBhMmRwX3N0YXRlX21hY2hpbmU6IEdldHRpbmcg
-Y2FwYWJpbGl0aWVzIGZvciBTRUlEPTEKQTJEUERbMTE6MTg6NTIuMjgxXTogYTJkcF9zdGF0ZV9t
-YWNoaW5lOiBTdGF0ZSAKQVZEVFBfU1RBVEVYX0dFVFRJTkdfQ0FQQUJJTElUSUVTX1JFU1AKQTJE
-UERbMTE6MTg6NTIuMzY5XTogYTJkcF9oYW5kbGVfYXZkdHBfbWVzc2FnZTogUmVhZCBub24gY29t
-bWFuZCBwYWNrZXQgCihtc2d0eXBlPU1FU1NBR0VfVFlQRV9BQ0NFUFQsc2lnbmFsPUFWRFRQX0dF
-VF9DQVBBQklMSVRJRVMpCkEyRFBEWzExOjE4OjUyLjM2OV06IGEyZHBfc3RhdGVfbWFjaGluZTog
-QVZEVFBfR0VUX0NBUEFCSUxJVElFUyBzdWNjZXNzIGZvciAKc2VpZCAxCkEyRFBEWzExOjE4OjUy
-LjM2OV06IGEyZHBfc3RhdGVfbWFjaGluZTogc2VydmNhcF9jYXA9MSwgc2VydmNhcF9sZW49MCwK
-QTJEUERbMTE6MTg6NTIuMzY5XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBjYXBfdHlwZT03LCBsZW5n
-dGg9NgpBMkRQRFsxMToxODo1Mi4zNjldOiBhMmRwX3N0YXRlX21hY2hpbmU6IG1lZGlhX3R5cGU9
-MCwgY29kZWM9MApBMkRQRFsxMToxODo1Mi4zNjldOiBhMmRwX3N0YXRlX21hY2hpbmU6IEEyRFBE
-IMKgUHJlZmVyZWQgYml0cG9vbCAzMgpBMkRQRFsxMToxODo1Mi4zNzBdOiBhMmRwX3N0YXRlX21h
-Y2hpbmU6IERldmljZSBQcmVmZXJlZCBiaXRwb29sIDIgLT4gMjUwCkEyRFBEWzExOjE4OjUyLjM3
-MF06IGEyZHBfc3RhdGVfbWFjaGluZTogQTJEUEQgwqBTZWxlY3RlZCBiaXRwb29sIDMyCkEyRFBE
-WzExOjE4OjUyLjM3MF06IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgCkFWRFRQX1NUQVRFWF9T
-RVRUSU5HX0NPTkZJR1VSQVRJT04KQTJEUERbMTE6MTg6NTIuMzcwXTogYTJkcF9zdGF0ZV9tYWNo
-aW5lOiBTdGF0ZSAKQVZEVFBfU1RBVEVYX1NFVFRJTkdfQ09ORklHVVJBVElPTl9SRVNQCkEyRFBE
-WzExOjE4OjUyLjUyN106IGEyZHBfaGFuZGxlX2F2ZHRwX21lc3NhZ2U6IFJlYWQgbm9uIGNvbW1h
-bmQgcGFja2V0IAoobXNndHlwZT1NRVNTQUdFX1RZUEVfQUNDRVBULHNpZ25hbD1BVkRUUF9TRVRf
-Q09ORklHVVJBVElPTikKQTJEUERbMTE6MTg6NTIuNTI3XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBB
-VkRUUF9TRVRfQ09ORklHVVJBVElPTiBzdWNjZXNzCkEyRFBEWzExOjE4OjUyLjUyN106IGEyZHBf
-c3RhdGVfbWFjaGluZTogU3RhdGUgQVZEVFBfU1RBVEVYX1NUUkVBTV9PUEVOSU5HCkEyRFBEWzEx
-OjE4OjUyLjUyOF06IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgCkFWRFRQX1NUQVRFWF9TVFJF
-QU1fT1BFTklOR19SRVNQCkEyRFBEWzExOjE4OjUyLjYyMV06IGEyZHBfaGFuZGxlX2F2ZHRwX21l
-c3NhZ2U6IFJlYWQgbm9uIGNvbW1hbmQgcGFja2V0IAoobXNndHlwZT1NRVNTQUdFX1RZUEVfQUND
-RVBULHNpZ25hbD1BVkRUUF9PUEVOKQpBMkRQRFsxMToxODo1Mi42MjFdOiBhMmRwX3N0YXRlX21h
-Y2hpbmU6IEFWRFRQX09QRU4gc3VjY2VzcwpBMkRQRFsxMToxODo1Mi42MjFdOiBhMmRwX3N0YXRl
-X21hY2hpbmU6IFN0YXRlIEFWRFRQX1NUQVRFX0NPTkZJR1VSRUQKQTJEUERbMTE6MTg6NTIuNjIy
-XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTdGF0ZSBBVkRUUF9TVEFURVhfU1RSRUFNX0NPTk5FQ1RJ
-TkcKQTJEUERbMTE6MTg6NTIuNjIzXTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTb2NrZXQgaXMgMTEK
-QTJEUERbMTE6MTg6NTIuNjIzXTogYTJkcF9zdGF0ZV9tYWNoaW5lOiAoZXJybm89MTE1Ok9wZXJh
-dGlvbiBub3cgaW4gCnByb2dyZXNzKVN0YXRlIEFWRFRQX1NUQVRFWF9TVFJFQU1fQ09OTkVDVElO
-R19XQUlUXk0KQTJEUERbMTE6MTg6NTIuODk1XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTdHJlYW0g
-Y29ubmVjdGVkCkEyRFBEWzExOjE4OjUyLjg5NV06IGdldF9zb2NrZXRfb210dTogU29ja2V0IDEx
-IGltdHU9NjcyLCBvbXR1PTY3MiwgCmZsdXNoX3RvPTY1NTM1CkEyRFBEWzExOjE4OjUyLjg5NV06
-IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgCkFWRFRQX1NUQVRFX09QRU5fU1RBUlRfU1RSRUFN
-SU5HCkEyRFBEWzExOjE4OjUyLjg5Nl06IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgQVZEVFBf
-U1RBVEVYX1NUUkVBTV9TVEFSVElORwpBMkRQRFsxMToxODo1Mi44OTZdOiBhMmRwZF9zaWduYWxf
-c3RhdGU6IENvbm5lY3RlZCAwMDowNzpBNDpCNTpCQzpCMQpBMkRQRFsxMToxODo1Mi44OTddOiBh
-MmRwX3N0YXRlX21hY2hpbmU6IFN0YXRlIApBVkRUUF9TVEFURVhfU1RSRUFNX1NUQVJUSU5HX1dB
-SVQKQTJEUERbMTE6MTg6NTMuMjM3XTogYTJkcF9oYW5kbGVfYXZkdHBfbWVzc2FnZTogUmVhZCBu
-b24gY29tbWFuZCBwYWNrZXQgCihtc2d0eXBlPU1FU1NBR0VfVFlQRV9BQ0NFUFQsc2lnbmFsPUFW
-RFRQX1NUQVJUKQpBMkRQRFsxMToxODo1My4yMzddOiBhMmRwX3N0YXRlX21hY2hpbmU6IEFWRFRQ
-X1NUQVJUIHN1Y2Nlc3MKQTJEUERbMTE6MTg6NTMuMjM3XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBT
-dGF0ZSBBVkRUUF9TVEFURV9TVFJFQU1JTkcKQTJEUERbMTE6MTg6NTQuMjYxXTogYTJkcF90cmFu
-c2Zlcl9yYXc6IFdyb3RlIC0xIG5vdCA2MjEgYnl0ZXMgKHNiYy5sZW49NzYpCkEyRFBEWzExOjE4
-OjU0LjI2MV06IHRyYW5zZmVyX291dGdvaW5nX3BhY2tldHM6IEVycm9yIGluIHRyYW5zZmVyIAoo
-dHJhbnNmZXI9LTEpCkEyRFBEWzExOjE4OjU0LjI2MV06IGEyZHBfc3RhdGVfZGlzY29ubmVjdDog
-U3RhdGUgQVZEVFBfU1RBVEVYX1NUUkVBTV9DTE9TSU5HCkEyRFBEWzExOjE4OjU0LjI2MV06IGEy
-ZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgCkFWRFRQX1NUQVRFWF9TVFJFQU1fQ0xPU0lOR19XQUlU
-CkEyRFBEWzExOjE4OjU0LjI2MV06IGEyZHBkX3NpZ25hbF9zdGF0ZTogQ29ubmVjdGluZyAwMDow
-NzpBNDpCNTpCQzpCMQpBMkRQRFsxMToxODo1Ni4xNTldOiBnZXRfc29ja2V0X29tdHU6IFNvY2tl
-dCA4IGltdHU9NjcyLCBvbXR1PTAsIApmbHVzaF90bz02NTUzNQpBMkRQRFsxMToxODo1Ni4xNTld
-OiBwb2xsZmRfY2JfYXZyY3BmZDogc29ja2V0IDEyOiBDb25uZWN0aW9uIGZyb20gCkIxOkJDOkI1
-OkE0OjA3OjAwLCBtdHU9NjEwIGFjY2VwdGVkIGF0IGluZGV4IDAKQTJEUERbMTE6MTg6NTYuMjA4
-XTogYTJkcF9oYW5kbGVfYXZkdHBfbWVzc2FnZTogUmVhZCBub24gY29tbWFuZCBwYWNrZXQgCiht
-c2d0eXBlPU1FU1NBR0VfVFlQRV9BQ0NFUFQsc2lnbmFsPUFWRFRQX0NMT1NFKQpBMkRQRFsxMTox
-ODo1Ni4yMDhdOiBhMmRwX3N0YXRlX21hY2hpbmU6IEFWRFRQX0NMT1NFIHN1Y2Nlc3MKQTJEUERb
-MTE6MTg6NTYuMjA4XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTdGF0ZSBBVkRUUF9TVEFURVhfRElT
-Q09OTkVDVElORwpBMkRQRFsxMToxODo1Ni4yMDldOiBhMmRwX2Rpc2Nvbm5lY3Q6CkEyRFBEWzEx
-OjE4OjU2LjIwOV06IGEyZHBfc3RyZWFtX3N0b3A6IENsb3Npbmcgc3RyZWFtIHNvY2tldCAxMQpB
-MkRQRFsxMToxODo1Ni4yMDldOiBhMmRwX3N0cmVhbV9zdG9wOiBDbG9zZWQKQTJEUERbMTE6MTg6
-NTYuMjA5XTogYTJkcF9zdHJlYW1fc3RvcDogU3RhdGUgQVZEVFBfU1RBVEVfSURMRQpBMkRQRFsx
-MToxODo1Ni4yMDldOiBhMmRwX2Rpc2Nvbm5lY3Q6IENsb3NpbmcgY3RsIHNvY2tldCAxMApBMkRQ
-RFsxMToxODo1Ni4yMDldOiBhMmRwX2Rpc2Nvbm5lY3Q6IENsb3NlZApBMkRQRFsxMToxODo1Ni4y
-MDldOiBhMmRwX2Rpc2Nvbm5lY3Q6IFN0YXRlIEFWRFRQX1NUQVRFX0RJU0NPTk5FQ1RFRApBMkRQ
-RFsxMToxODo1Ni4yMDldOiBhMmRwZF9zaWduYWxfc3RhdGU6IERpc2Nvbm5lY3RlZApBMkRQRFsx
-MToxODo1Ni41MjBdOiBhMmRwX3N0YXRlX2Nvbm5lY3Q6IFN0YXRlIEFWRFRQX1NUQVRFWF9TRFBf
-Q09OTkVDVElORwpBMkRQRFsxMToxODo1Ni41MjBdOiBhMmRwX3N0YXRlX21hY2hpbmU6IFJvbGUg
-aXMgSU5JVElBVE9SCkEyRFBEWzExOjE4OjU2LjUyMF06IGEyZHBfc3RhdGVfbWFjaGluZTogKGVy
-cm5vPTExNTpPcGVyYXRpb24gbm93IGluIApwcm9ncmVzcylTRFAgY29ubmVjdGlvbiBvbiBzb2Nr
-ZXQgMTBeTQpBMkRQRFsxMToxODo1Ni41MjBdOiBhMmRwX3N0YXRlX21hY2hpbmU6IFN0YXRlIApB
-VkRUUF9TVEFURVhfU0RQX0NPTk5FQ1RJTkdfV0FJVApBMkRQRFsxMToxODo1Ni41MjBdOiBhMmRw
-ZF9zaWduYWxfc3RhdGU6IENvbm5lY3RpbmcgMDA6MDc6QTQ6QjU6QkM6QjEKQTJEUERbMTE6MTg6
-NTYuNTg3XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTRFAgY29ubmVjdGlvbiB0ZXJtaW5hdGVkCkEy
-RFBEWzExOjE4OjU2LjY3MF06IGdldF9hdmR0cF9wc206IFBhcnNpbmcgcmVzdWx0cwpBMkRQRFsx
-MToxODo1Ni42NzBdOiBnZXRfYXZkdHBfcHNtOiBSZWNvcmQKQTJEUERbMTE6MTg6NTYuNjcwXTog
-Z2V0X2F2ZHRwX3BzbTogU2VydmljZSBTZWFyY2ggT0sKQTJEUERbMTE6MTg6NTYuNzAzXTogZ2V0
-X2F2ZHRwX3BzbTogQ2hlY2tpbmcgbm9uIHNwZWMgYXVkaW8KQTJEUERbMTE6MTg6NTYuNzAzXTog
-YTJkcF9zdGF0ZV9tYWNoaW5lOiBGb3VuZCBwc20gMjUKQTJEUERbMTE6MTg6NTYuNzAzXTogYTJk
-cF9zdGF0ZV9tYWNoaW5lOiBTdGF0ZSBBVkRUUF9TVEFURVhfQ1RMX0NPTk5FQ1RJTkcKQTJEUERb
-MTE6MTg6NTYuNzAzXTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTb2NrZXQgaXMgMTAKQTJEUERbMTE6
-MTg6NTYuNzAzXTogYTJkcF9zdGF0ZV9tYWNoaW5lOiAoZXJybm89MTE1Ok9wZXJhdGlvbiBub3cg
-aW4gCnByb2dyZXNzKVN0YXRlIEFWRFRQX1NUQVRFWF9DVExfQ09OTkVDVElOR19XQUlUXk0KQTJE
-UERbMTE6MTg6NTcuNDk5XTogYXZyY3BfaGFuZGxlX21lc3NhZ2U6IEFWUkNQIFJlY2VpdmUgZmFp
-bGVkCkEyRFBEWzExOjE4OjU3LjkxNF06IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgQVZEVFBf
-U1RBVEVfSURMRQpBMkRQRFsxMToxODo1Ny45MTVdOiBhMmRwX3N0YXRlX21hY2hpbmU6IFN0YXRl
-IEFWRFRQX1NUQVRFWF9ESVNDT1ZFUklORwpBMkRQRFsxMToxODo1Ny45MTZdOiBhMmRwX3N0YXRl
-X21hY2hpbmU6IFN0YXRlIEFWRFRQX1NUQVRFWF9ESVNDT1ZFUklOR19SRVNQCkEyRFBEWzExOjE4
-OjU4LjE2NV06IGEyZHBfaGFuZGxlX2F2ZHRwX21lc3NhZ2U6IFJlYWQgbm9uIGNvbW1hbmQgcGFj
-a2V0IAoobXNndHlwZT1NRVNTQUdFX1RZUEVfQUNDRVBULHNpZ25hbD1BVkRUUF9ESVNDT1ZFUikK
-QTJEUERbMTE6MTg6NTguMTY1XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBBVkRUUF9ESVNDT1ZFUiBz
-dWNjZXNzCkEyRFBEWzExOjE4OjU4LjE2NV06IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgCkFW
-RFRQX1NUQVRFWF9HRVRUSU5HX0NBUEFCSUxJVElFUwpBMkRQRFsxMToxODo1OC4xNjZdOiBhMmRw
-X3N0YXRlX21hY2hpbmU6IEdldHRpbmcgY2FwYWJpbGl0aWVzIGZvciBTRUlEPTEKQTJEUERbMTE6
-MTg6NTguMTY2XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTdGF0ZSAKQVZEVFBfU1RBVEVYX0dFVFRJ
-TkdfQ0FQQUJJTElUSUVTX1JFU1AKQTJEUERbMTE6MTg6NTguMjE3XTogYTJkcF9oYW5kbGVfYXZk
-dHBfbWVzc2FnZTogUmVhZCBub24gY29tbWFuZCBwYWNrZXQgCihtc2d0eXBlPU1FU1NBR0VfVFlQ
-RV9BQ0NFUFQsc2lnbmFsPUFWRFRQX0dFVF9DQVBBQklMSVRJRVMpCkEyRFBEWzExOjE4OjU4LjIx
-N106IGEyZHBfc3RhdGVfbWFjaGluZTogQVZEVFBfR0VUX0NBUEFCSUxJVElFUyBzdWNjZXNzIGZv
-ciAKc2VpZCAxCkEyRFBEWzExOjE4OjU4LjIxN106IGEyZHBfc3RhdGVfbWFjaGluZTogc2VydmNh
-cF9jYXA9MSwgc2VydmNhcF9sZW49MCwKQTJEUERbMTE6MTg6NTguMjE3XTogYTJkcF9zdGF0ZV9t
-YWNoaW5lOiBjYXBfdHlwZT03LCBsZW5ndGg9NgpBMkRQRFsxMToxODo1OC4yMTddOiBhMmRwX3N0
-YXRlX21hY2hpbmU6IG1lZGlhX3R5cGU9MCwgY29kZWM9MApBMkRQRFsxMToxODo1OC4yMTddOiBh
-MmRwX3N0YXRlX21hY2hpbmU6IEEyRFBEIMKgUHJlZmVyZWQgYml0cG9vbCAzMgpBMkRQRFsxMTox
-ODo1OC4yMTddOiBhMmRwX3N0YXRlX21hY2hpbmU6IERldmljZSBQcmVmZXJlZCBiaXRwb29sIDIg
-LT4gMjUwCkEyRFBEWzExOjE4OjU4LjIxN106IGEyZHBfc3RhdGVfbWFjaGluZTogQTJEUEQgwqBT
-ZWxlY3RlZCBiaXRwb29sIDMyCkEyRFBEWzExOjE4OjU4LjIxN106IGEyZHBfc3RhdGVfbWFjaGlu
-ZTogU3RhdGUgCkFWRFRQX1NUQVRFWF9TRVRUSU5HX0NPTkZJR1VSQVRJT04KQTJEUERbMTE6MTg6
-NTguMjE4XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTdGF0ZSAKQVZEVFBfU1RBVEVYX1NFVFRJTkdf
-Q09ORklHVVJBVElPTl9SRVNQCkEyRFBEWzExOjE4OjU4LjM3OF06IGEyZHBfaGFuZGxlX2F2ZHRw
-X21lc3NhZ2U6IFJlYWQgbm9uIGNvbW1hbmQgcGFja2V0IAoobXNndHlwZT1NRVNTQUdFX1RZUEVf
-QUNDRVBULHNpZ25hbD1BVkRUUF9TRVRfQ09ORklHVVJBVElPTikKQTJEUERbMTE6MTg6NTguMzc4
-XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBBVkRUUF9TRVRfQ09ORklHVVJBVElPTiBzdWNjZXNzCkEy
-RFBEWzExOjE4OjU4LjM3OF06IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgQVZEVFBfU1RBVEVY
-X1NUUkVBTV9PUEVOSU5HCkEyRFBEWzExOjE4OjU4LjM3OV06IGEyZHBfc3RhdGVfbWFjaGluZTog
-U3RhdGUgCkFWRFRQX1NUQVRFWF9TVFJFQU1fT1BFTklOR19SRVNQCkEyRFBEWzExOjE4OjU4LjUw
-M106IGEyZHBfaGFuZGxlX2F2ZHRwX21lc3NhZ2U6IFJlYWQgbm9uIGNvbW1hbmQgcGFja2V0IAoo
-bXNndHlwZT1NRVNTQUdFX1RZUEVfQUNDRVBULHNpZ25hbD1BVkRUUF9PUEVOKQpBMkRQRFsxMTox
-ODo1OC41MDNdOiBhMmRwX3N0YXRlX21hY2hpbmU6IEFWRFRQX09QRU4gc3VjY2VzcwoKwqDCoMKg
-wqDCoMKgwqDCoEFuZCB0aGUgZm9sbG93aW5nIG91dHB1dCByZXBlYXRlZC4uLgoKwqDCoMKgwqDC
-oMKgwqDCoEJScywKwqDCoMKgwqDCoMKgwqDCoEJhaXNoZW5nCgoK5ZyoIOaYn+acn+WbmyAyNiDk
-uIPmnIggMjAwNyAyMjo0Me+8jEZyZWRlcmljIERhbGxlYXUg5YaZ6YGT77yaCj4gPiAJSSd2ZSBn
-b3R0ZW4gYTJkcCB3b3JraW5nLiBNeSBwbGF5ZXIgaXMgdG90ZW0sIGJ1dCB0aGUgc291bmQgc2tp
-cHMgZXZlcnkKPiA+IHNldmVyYWwgc2Vjb25kcyB3aGlsZSBwbGF5aW5nLgo+Cj4gSWYgeW91J3Jl
-IHVzaW5nIGEyZHBkIGdpdmUgYSB0cnkgdG8gbGF0ZXN0IGEyZHBkIGZyb20gcGx1Z3ogY3ZzIChm
-cm9tCj4gdG9kYXkpLiBJIGZpeGVkIHNvbWV0aGluZyBzaW1pbGFyLgo+Cj4gPiBTbyB0aGUgYXBs
-YXkuIEJ1dCB0aGUga2FmZmVpbmUgaXMgb2sgd2hlbgo+ID4gcGxheWVyaW5nIGZvcm1hdCBtcDMg
-d2hpbGUgZm9yIHRoZSBmb3JtYXQgd2F2IG5vdCB3b3JrLlNvIEkgd2FudCB0byBkZWJ1Zwo+ID4g
-dGhpcyBpc3N1ZS4gQnV0IHdoYXQgY29tcG9uZXQgSSB3aWxsIGRlYnVnLCB0aGUga2VybmVsLCBh
-bHNhLCBidWV6IG9yCj4gPiBhMmRwID8KPgo+IElmIHlvdSBkb24ndCB1c2UgYTJkcGQgb3IgdGhl
-IGlzc3VlIGlzIG5vdCBmaXhlZCwgdGhlbiBJIHdvdWxkIHN0aWxsIGJlZwo+IGZvciB0aGUgYTJk
-cC4KPgo+IExldCB1cyBrbm93IGlmIGl0IGlzIG9rLgo+Cj4gZnJlZGVyaWMKPgo+Cj4gLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLQo+IFRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogU3BsdW5rIElu
-Yy4KPiBTdGlsbCBncmVwcGluZyB0aHJvdWdoIGxvZyBmaWxlcyB0byBmaW5kIHByb2JsZW1zPyAg
-U3RvcC4KPiBOb3cgU2VhcmNoIGxvZyBldmVudHMgYW5kIGNvbmZpZ3VyYXRpb24gZmlsZXMgdXNp
-bmcgQUpBWCBhbmQgYSBicm93c2VyLgo+IERvd25sb2FkIHlvdXIgRlJFRSBjb3B5IG9mIFNwbHVu
-ayBub3cgPj4gIGh0dHA6Ly9nZXQuc3BsdW5rLmNvbS8KPiBfX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fXwo+IEJsdWV6LWRldmVsIG1haWxpbmcgbGlzdAo+IEJs
-dWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9y
-Z2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMg
-U0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogU3BsdW5rIEluYy4KU3RpbGwgZ3JlcHBpbmcg
-dGhyb3VnaCBsb2cgZmlsZXMgdG8gZmluZCBwcm9ibGVtcz8gIFN0b3AuCk5vdyBTZWFyY2ggbG9n
-IGV2ZW50cyBhbmQgY29uZmlndXJhdGlvbiBmaWxlcyB1c2luZyBBSkFYIGFuZCBhIGJyb3dzZXIu
-CkRvd25sb2FkIHlvdXIgRlJFRSBjb3B5IG9mIFNwbHVuayBub3cgPj4gIGh0dHA6Ly9nZXQuc3Bs
-dW5rLmNvbS8KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
-Qmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5l
-dApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZl
-bAo=
+
+--=-sosQbgoaFKXKql1pDVOE
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+On Thu, 2007-07-26 at 19:49 +0100, Bastien Nocera wrote:
+> For comments (but pretty much finished), to give you an idea of the way
+> it'd work. The search button starts a discovery on the default adapter,
+> and becomes unsensitive.
+> 
+> The search button becomes sensitive again when all discoveries
+> (including those possibly launched on other adapters) are finished.
+
+Updated patch against current CVS.
+
+Renames show_status to show_bonded, as per the property. Adds a property
+to show/hide the search button, and a way for applications hiding the
+search button to automatically start the search.
+
+I'm just not certain about the client.c changes for tracking the last
+discovery.
+
+-- 
+Bastien Nocera <hadess@hadess.net> 
+
+--=-sosQbgoaFKXKql1pDVOE
+Content-Disposition: attachment;
+	filename=bluez-gnome-implement-search-button-2.patch
+Content-Type: text/x-patch; name=bluez-gnome-implement-search-button-2.patch;
+	charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+Index: bluetooth-device-selection.c
+===================================================================
+RCS file: /cvsroot/bluez/gnome/common/bluetooth-device-selection.c,v
+retrieving revision 1.4
+diff -u -p -r1.4 bluetooth-device-selection.c
+--- bluetooth-device-selection.c	26 Jul 2007 19:39:01 -0000	1.4
++++ bluetooth-device-selection.c	26 Jul 2007 20:14:15 -0000
+@@ -53,9 +53,12 @@ struct _BluetoothDeviceSelectionPrivate 
+ 	GtkTreeModel *model;
+ 	GtkWidget *label;
+ 
+-	/* Whether the bonded icon is shown */
++	/* Widgets/UI bits that can be shown or hidden */
+ 	GtkCellRenderer *bonded_cell;
+-	guint show_status : 1;
++	GtkWidget *search_button;
++
++	guint show_bonded : 1;
++	guint show_search : 1;
+ };
+ 
+ G_DEFINE_TYPE(BluetoothDeviceSelection, bluetooth_device_selection, GTK_TYPE_VBOX)
+@@ -150,6 +153,15 @@ type_to_text (GtkTreeViewColumn *column,
+ 	g_object_set (cell, "text", bluetooth_type_to_string (type), NULL);
+ }
+ 
++void
++bluetooth_device_start_discovery (BluetoothDeviceSelection *self)
++{
++	BluetoothDeviceSelectionPrivate *priv = BLUETOOTH_DEVICE_SELECTION_GET_PRIVATE(self);
++
++	gtk_widget_set_sensitive (GTK_WIDGET(priv->search_button), FALSE);
++	bluetooth_client_discover_devices (priv->client, NULL);
++}
++
+ gchar *
+ bluetooth_device_selection_get_selected_device (BluetoothDeviceSelection *self)
+ {
+@@ -167,6 +179,23 @@ bluetooth_device_selection_get_selected_
+ }
+ 
+ static void
++search_button_clicked (GtkButton *button, gpointer user_data)
++{
++	BluetoothDeviceSelection *self = BLUETOOTH_DEVICE_SELECTION(user_data);
++
++	bluetooth_device_start_discovery (self);
++}
++
++static void
++discoveries_completed (BluetoothClient *client, gpointer user_data)
++{
++	BluetoothDeviceSelection *self = BLUETOOTH_DEVICE_SELECTION(user_data);
++	BluetoothDeviceSelectionPrivate *priv = BLUETOOTH_DEVICE_SELECTION_GET_PRIVATE(self);
++
++	gtk_widget_set_sensitive (GTK_WIDGET(priv->search_button), TRUE);
++}
++
++static void
+ select_browse_device_callback (GtkTreeSelection *selection, gpointer user_data)
+ {
+ 	BluetoothDeviceSelection *self = user_data;
+@@ -184,11 +213,11 @@ static void
+ bluetooth_device_selection_init(BluetoothDeviceSelection *self)
+ {
+ 	BluetoothDeviceSelectionPrivate *priv = BLUETOOTH_DEVICE_SELECTION_GET_PRIVATE(self);
+-	GtkWidget *tree, *scrolled, *frame, *box;
++	GtkWidget *tree, *scrolled, *frame, *box, *hbox;
+ 	GtkCellRenderer *renderer;
+ 	GtkTreeViewColumn *column;
+ 
+-	priv->show_status = TRUE;
++	priv->show_bonded = TRUE;
+ 
+ 	gtk_box_set_spacing (GTK_BOX(self), 6);
+ 	gtk_box_set_homogeneous (GTK_BOX(self), FALSE);
+@@ -204,7 +233,9 @@ bluetooth_device_selection_init(Bluetoot
+ 
+ 	priv->client = bluetooth_client_new ();
+ 
+-	//FIXME add a frame around it
++	g_signal_connect (G_OBJECT(priv->client), "discoveries-completed",
++			  G_CALLBACK(discoveries_completed), self);
++
+ 	/* Create the scrolled window */
+ 	scrolled = gtk_scrolled_window_new (NULL, NULL);
+ 
+@@ -270,10 +301,17 @@ bluetooth_device_selection_init(Bluetoot
+ 		g_object_unref (priv->model);
+ 	}
+ 
+-	bluetooth_client_discover_devices (priv->client, NULL);
+-
+ 	gtk_container_add (GTK_CONTAINER(scrolled), tree);
+-	gtk_container_add (GTK_CONTAINER(box), scrolled);
++	gtk_box_pack_start (GTK_BOX(box), scrolled, TRUE, TRUE, 6);
++
++	hbox = gtk_hbox_new (FALSE, 0);
++	priv->search_button = gtk_button_new_with_label (_("Search"));
++	g_signal_connect (G_OBJECT(priv->search_button), "clicked",
++			  G_CALLBACK(search_button_clicked), self);
++	gtk_box_pack_start (GTK_BOX(box), hbox, FALSE, FALSE, 0);
++	gtk_box_pack_start (GTK_BOX(hbox), priv->search_button,
++			    FALSE, FALSE, 0);
++
+ 	gtk_widget_show_all (scrolled);
+ }
+ 
+@@ -289,7 +327,8 @@ enum {
+ 	PROP_0,
+ 	PROP_TITLE,
+ 	PROP_DEVICE_SELECTED,
+-	PROP_SHOW_BONDING
++	PROP_SHOW_BONDING,
++	PROP_SHOW_SEARCH
+ };
+ 
+ static void
+@@ -312,9 +351,14 @@ bluetooth_device_selection_set_property 
+ 		}
+ 		break;
+ 	case PROP_SHOW_BONDING:
+-		priv->show_status = g_value_get_boolean (value);
++		priv->show_bonded = g_value_get_boolean (value);
+ 		if (priv->bonded_cell != NULL)
+-			g_object_set (G_OBJECT (priv->bonded_cell), "visible", priv->show_status, NULL);
++			g_object_set (G_OBJECT (priv->bonded_cell), "visible", priv->show_bonded, NULL);
++		break;
++	case PROP_SHOW_SEARCH:
++		priv->show_search = g_value_get_boolean (value);
++		if (priv->search_button != NULL)
++			g_object_set (G_OBJECT (priv->search_button), "visible", priv->show_search, NULL);
+ 		break;
+ 	default:
+ 		G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+@@ -334,7 +378,10 @@ bluetooth_device_selection_get_property 
+ 		g_value_set_string (value, bluetooth_device_selection_get_selected_device (self));
+ 		break;
+ 	case PROP_SHOW_BONDING:
+-		g_value_set_boolean (value, priv->show_status);
++		g_value_set_boolean (value, priv->show_bonded);
++		break;
++	case PROP_SHOW_SEARCH:
++		g_value_set_boolean (value, priv->show_search);
+ 		break;
+ 	default:
+ 		G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
+@@ -369,7 +416,10 @@ bluetooth_device_selection_class_init (B
+ 										    NULL, NULL, NULL, G_PARAM_READABLE));
+ 	g_object_class_install_property (G_OBJECT_CLASS(klass),
+ 					 PROP_SHOW_BONDING, g_param_spec_boolean ("show-bonding",
+-										    NULL, NULL, TRUE, G_PARAM_READWRITE));
++										  NULL, NULL, TRUE, G_PARAM_READWRITE));
++	g_object_class_install_property (G_OBJECT_CLASS(klass),
++					 PROP_SHOW_SEARCH, g_param_spec_boolean ("show-search",
++										 NULL, NULL, TRUE, G_PARAM_READWRITE));
+ }
+ 
+ GtkWidget *
+Index: bluetooth-device-selection.h
+===================================================================
+RCS file: /cvsroot/bluez/gnome/common/bluetooth-device-selection.h,v
+retrieving revision 1.2
+diff -u -p -r1.2 bluetooth-device-selection.h
+--- bluetooth-device-selection.h	25 Jul 2007 18:01:44 -0000	1.2
++++ bluetooth-device-selection.h	26 Jul 2007 20:14:15 -0000
+@@ -58,6 +58,7 @@ GType bluetooth_device_selection_get_typ
+ 
+ GtkWidget *bluetooth_device_selection_new (const gchar *title);
+ gchar *bluetooth_device_selection_get_selected_device (BluetoothDeviceSelection *sel);
++void bluetooth_device_start_discovery (BluetoothDeviceSelection *sel);
+ 
+ G_END_DECLS
+ 
+Index: client.c
+===================================================================
+RCS file: /cvsroot/bluez/gnome/common/client.c,v
+retrieving revision 1.19
+diff -u -p -r1.19 client.c
+--- client.c	26 Jul 2007 19:39:01 -0000	1.19
++++ client.c	26 Jul 2007 20:14:15 -0000
+@@ -48,8 +48,18 @@ typedef struct _BluetoothClientPrivate B
+ 
+ struct _BluetoothClientPrivate {
+ 	gboolean registered;
++
++	/* The number of discoveries in progress */
++	guint discoveries;
++};
++
++enum {
++	DISCOVERIES_COMPLETED,
++	LAST_SIGNAL
+ };
+ 
++static int client_table_signals[LAST_SIGNAL] = { 0 };
++
+ G_DEFINE_TYPE(BluetoothClient, bluetooth_client, G_TYPE_OBJECT)
+ 
+ static void bluetooth_client_init(BluetoothClient *self)
+@@ -448,6 +458,9 @@ static void add_adapter(const char *path
+ 	dbus_g_proxy_connect_signal(object, "RemoteNameUpdated",
+ 				G_CALLBACK(name_updated), tree_path, NULL);
+ 
++	dbus_g_proxy_add_signal(object, "DiscoveryCompleted",
++				G_TYPE_INVALID);
++
+ 	update_adapter(object, &iter);
+ }
+ 
+@@ -498,6 +511,17 @@ static void default_adapter_changed(DBus
+ 	g_free(temp);
+ }
+ 
++static void discovery_completed(DBusGProxy *object,
++				gpointer user_data)
++{
++	BluetoothClient *self = BLUETOOTH_CLIENT(user_data);
++	BluetoothClientPrivate *priv = BLUETOOTH_CLIENT_GET_PRIVATE(self);
++
++	priv->discoveries--;
++	if (priv->discoveries == 0)
++		g_signal_emit(G_OBJECT(self), client_table_signals[DISCOVERIES_COMPLETED], 0);
++}
++
+ static void setup_manager(void)
+ {
+ 	DBusGProxy *object;
+@@ -592,6 +616,15 @@ static void bluetooth_client_class_init(
+ 			G_TYPE_INT, G_TYPE_STRING, G_TYPE_UINT,
+ 			G_TYPE_BOOLEAN, G_TYPE_BOOLEAN);
+ 
++	client_table_signals[DISCOVERIES_COMPLETED] =
++		g_signal_new ("discoveries-completed",
++			      G_TYPE_FROM_CLASS (klass),
++			      G_SIGNAL_RUN_LAST,
++			      G_STRUCT_OFFSET (BluetoothClientClass, discoveries_completed),
++			      NULL, NULL,
++			      g_cclosure_marshal_VOID__VOID,
++			      G_TYPE_NONE, 0, G_TYPE_NONE);
++
+ 	setup_dbus();
+ 
+ 	setup_manager();
+@@ -684,8 +717,22 @@ gboolean bluetooth_client_discover_devic
+ 						COLUMN_OBJECT, &object, -1);
+ 
+ 		if (g_ascii_strcasecmp(path, adapter) == 0) {
+-			dbus_g_proxy_call(object, "DiscoverDevices",
+-							NULL, G_TYPE_INVALID);
++			BluetoothClientPrivate *priv = BLUETOOTH_CLIENT_GET_PRIVATE(self);
++
++			priv->discoveries++;
++			/* Disconnect any lingering signals, to avoid the callback
++			 * being called twice */
++			dbus_g_proxy_disconnect_signal(object, "DiscoveryCompleted",
++						       G_CALLBACK(discovery_completed),
++						       self);
++			dbus_g_proxy_connect_signal(object, "DiscoveryCompleted",
++						    G_CALLBACK(discovery_completed),
++						    self, NULL);
++
++			if (dbus_g_proxy_call(object, "DiscoverDevices",
++							NULL, G_TYPE_INVALID))
++				priv->discoveries--;
++
+ 			return TRUE;
+ 		}
+ 
+Index: client.h
+===================================================================
+RCS file: /cvsroot/bluez/gnome/common/client.h,v
+retrieving revision 1.13
+diff -u -p -r1.13 client.h
+--- client.h	26 Jul 2007 19:39:01 -0000	1.13
++++ client.h	26 Jul 2007 20:14:15 -0000
+@@ -51,6 +51,8 @@ struct _BluetoothClient {
+ 
+ struct _BluetoothClientClass {
+ 	GObjectClass parent_class;
++
++	void (*discoveries_completed) (BluetoothClient *self);
+ };
+ 
+ GType bluetooth_client_get_type(void);
+
+--=-sosQbgoaFKXKql1pDVOE
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >>  http://get.splunk.com/
+--=-sosQbgoaFKXKql1pDVOE
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--=-sosQbgoaFKXKql1pDVOE--
