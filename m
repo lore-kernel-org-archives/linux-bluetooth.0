@@ -1,13 +1,20 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46AD9C4A.6020003@yandex.ru>
-Date: Mon, 30 Jul 2007 12:07:38 +0400
-From: Irakli Tsagareli <itsagareli@yandex.ru>
-MIME-Version: 1.0
-To: Andreas Kemnade <andreas@kemnade.info>
-References: <46A9A4F1.8090009@yandex.ru> <20070727191022.521811b7@localhost>
-In-Reply-To: <20070727191022.521811b7@localhost>
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] simultaneous read/write on SCO channel
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1185565304.2848.56.camel@cookie.hadess.net>
+References: <1185475756.3641.329.camel@cookie.hadess.net>
+	<1185481079.3641.339.camel@cookie.hadess.net>
+	<1185527921.2848.1.camel@cookie.hadess.net>
+	<1185550243.2848.46.camel@cookie.hadess.net>
+	<1185556171.13228.26.camel@violet>
+	<1185561572.2848.54.camel@cookie.hadess.net>
+	<1185562953.13228.32.camel@violet>
+	<1185565304.2848.56.camel@cookie.hadess.net>
+Date: Fri, 27 Jul 2007 22:16:17 +0200
+Message-Id: <1185567377.13228.38.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel]
+	[PATCH]	bluez-gnome:	"search"	button	for	the	device selection
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,95 +24,48 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1638078954=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1638078954==
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Hi Hadess,
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
-</head>
-<body bgcolor="#ffffff" text="#000000">
-Hi Andreas, <br>
-<br>
-thank you for answer. you are right about my mistake - getsockopt says
-MTU is 16 bytes, so no "Invalid argument" any more. but I still have a
-problem with transmission - send() sends only 437 MTU blocks and then
-stops with "Resource temporarily unavailable". I tried to wait with
-"select()" for proper time slot, but it never arrives after first 437
-blocks. have no idea how to solve it... <br>
-<br>
-Best Regards,<br>
-kern.<br>
-<br>
-<br>
-Andreas Kemnade wrote:
-<blockquote cite="mid:20070727191022.521811b7@localhost" type="cite">
-  <pre wrap="">On Fri, 27 Jul 2007 11:55:29 +0400
-Irakli Tsagareli <a class="moz-txt-link-rfc2396E" href="mailto:itsagareli@yandex.ru">&lt;itsagareli@yandex.ru&gt;</a> wrote:
+> > > > patch has been applied. However I am not okay with some of the callback
+> > > > names, but we can fix that later.
+> > > 
+> > > Let me know what you want renamed to what, and I'll fix it up.
+> > 
+> > I disabled the search button support. I crashes the applet. Main issue
+> > is your handling of starting and stopping discover process and then
+> > listening for the complete signal to change the button state. That is
+> > wrong we have to track the state for an adapter being in discovery or
+> > not inside the tree model. Otherwise we end up with a lot of race
+> > condition. We also need to check if an adapter is already running a
+> > discovery or is using periodic inquiry.
+> 
+> How else do you want to implement it? What's the backtrace from the
+> applet that you've seen?
 
-  </pre>
-  <blockquote type="cite">
-    <pre wrap="">Hi all,
- 
-I'm writing a small code to test HandsFree capabilities between my phone and PC. everything works fine for audio playback (on the PC, I can hear sound file played on the phone and in case of incoming call, I can hear a voice of remote subscriber) but when I try at the same time to send some audio data to the handset via same socket, send() function returns "Invalid argument" error. I tried to create new socket for writing (same way I created listening socket). creation succeeds, but connect fails with "Device or resource busy". can anybody be so kind and explain, how can I read and write data through SCO channel simultaneously ?
-    </pre>
-  </blockquote>
-  <pre wrap=""><!----> 
-[...]
-  </pre>
-  <blockquote type="cite">
-    <pre wrap="">            read(snd_fd, buffer, 48);
-            if(send(cli_scosock, buffer, 48, 0) &lt; 0)             &lt;&lt; --- send() fails here with "Invalid argument"
-            {
-                perror("send failed");
-            }
-    </pre>
-  </blockquote>
-  <pre wrap=""><!---->I remember having trouble with sco and hardcoded packet sizes (try 64). sometimes it's 64
-and sometimes 48 if I remember correctly.
+the Bluetooth client should exists only once per application. We don't
+need multiple. So it is needed that we create that object only once and
+then keep it alive until end of application.
 
-yout should do 
-  struct sco_options opts;
-  int size=sizeof(opts);
-  getsockopt(cli_scosock,SOL_SCO,SCO_OPTIONS,&amp;opts,&amp;size);
-once somewhere and then use opts.mtu
+We also need to track the status of the discovery procedure inside the
+tree store. Then we only have to check for that there. The tree store
+has a reference count and so we can't run into problems there.
 
-Greetings
-Andreas Kemnade
+Regards
 
-  </pre>
-</blockquote>
-<br>
-</body>
-</html>
+Marcel
 
 
---===============1638078954==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============1638078954==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1638078954==--
