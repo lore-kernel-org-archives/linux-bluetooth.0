@@ -1,7 +1,7 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1185565304.2848.56.camel@cookie.hadess.net>
+In-Reply-To: <1185562953.13228.32.camel@violet>
 References: <1185475756.3641.329.camel@cookie.hadess.net>
 	<1185481079.3641.339.camel@cookie.hadess.net>
 	<1185527921.2848.1.camel@cookie.hadess.net>
@@ -9,9 +9,8 @@ References: <1185475756.3641.329.camel@cookie.hadess.net>
 	<1185556171.13228.26.camel@violet>
 	<1185561572.2848.54.camel@cookie.hadess.net>
 	<1185562953.13228.32.camel@violet>
-	<1185565304.2848.56.camel@cookie.hadess.net>
-Date: Fri, 27 Jul 2007 22:16:17 +0200
-Message-Id: <1185567377.13228.38.camel@violet>
+Date: Fri, 27 Jul 2007 20:41:44 +0100
+Message-Id: <1185565304.2848.56.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel]
 	[PATCH]	bluez-gnome:	"search"	button	for	the	device selection
@@ -28,36 +27,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Hadess,
-
-> > > > patch has been applied. However I am not okay with some of the callback
-> > > > names, but we can fix that later.
-> > > 
-> > > Let me know what you want renamed to what, and I'll fix it up.
-> > 
-> > I disabled the search button support. I crashes the applet. Main issue
-> > is your handling of starting and stopping discover process and then
-> > listening for the complete signal to change the button state. That is
-> > wrong we have to track the state for an adapter being in discovery or
-> > not inside the tree model. Otherwise we end up with a lot of race
-> > condition. We also need to check if an adapter is already running a
-> > discovery or is using periodic inquiry.
+On Fri, 2007-07-27 at 21:02 +0200, Marcel Holtmann wrote:
+> Hi Hadess,
 > 
-> How else do you want to implement it? What's the backtrace from the
-> applet that you've seen?
+> > > patch has been applied. However I am not okay with some of the callback
+> > > names, but we can fix that later.
+> > 
+> > Let me know what you want renamed to what, and I'll fix it up.
+> 
+> I disabled the search button support. I crashes the applet. Main issue
+> is your handling of starting and stopping discover process and then
+> listening for the complete signal to change the button state. That is
+> wrong we have to track the state for an adapter being in discovery or
+> not inside the tree model. Otherwise we end up with a lot of race
+> condition. We also need to check if an adapter is already running a
+> discovery or is using periodic inquiry.
 
-the Bluetooth client should exists only once per application. We don't
-need multiple. So it is needed that we create that object only once and
-then keep it alive until end of application.
+How else do you want to implement it? What's the backtrace from the
+applet that you've seen?
 
-We also need to track the status of the discovery procedure inside the
-tree store. Then we only have to check for that there. The tree store
-has a reference count and so we can't run into problems there.
-
-Regards
-
-Marcel
-
+-- 
+Bastien Nocera <hadess@hadess.net> 
 
 
 -------------------------------------------------------------------------
