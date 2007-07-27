@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46A9A4F1.8090009@yandex.ru>
-Date: Fri, 27 Jul 2007 11:55:29 +0400
-From: Irakli Tsagareli <itsagareli@yandex.ru>
+From: wang baisheng <bsh_wang@126.com>
+To: bluez-devel@lists.sourceforge.net
+Date: Fri, 27 Jul 2007 13:01:20 +0800
+References: <200707261020.24095.bsh_wang@126.com>
+	<1185460882.21272.8.camel@ubuntu.mpl.access-company.com>
+In-Reply-To: <1185460882.21272.8.camel@ubuntu.mpl.access-company.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] simultaneous read/write on SCO channel
+Message-Id: <200707271301.20092.bsh_wang@126.com>
+Subject: Re: [Bluez-devel] a2dp sound skips
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,140 +17,205 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0197369768=="
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0197369768==
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-</head>
-<body bgcolor="#ffffff" text="#000000">
-Hi all,
-<br>
-<br>
-I asked this question in bluez-users list, but did not get an answer.
-may be bluez-devel is wrong place to ask such things, but I stuck on
-problem that looks VERY simple, but I can't find a way to correct&nbsp; it.
-it's terrible to know, that 99.99%-percent-done application does not
-work because of only one send() function....<br>
-<br>
-I'm writing a small code to test HandsFree capabilities between my
-phone and PC. everything works fine for audio playback (on the PC, I
-can hear sound file played on the phone and in case of incoming call, I
-can hear a voice of remote subscriber) but when I try at the same time
-to send some audio data to the handset via same socket, send() function
-returns "Invalid argument" error. I tried to create new socket for
-writing (same way I created listening socket). creation succeeds, but
-connect fails with "Device or resource busy". can anybody be so kind
-and explain, how can I read and write data through SCO channel
-simultaneously ?
-<br>
-<br>
-thank you and best regards,
-<br>
-kern.<br>
-<br>
-P.S. here is code snippet, that do actual SCO link setup and data
-transfer:<br>
-<br>
-&nbsp;&nbsp;&nbsp; int scosock, cli_scosock, snd_fd, nbytes;<br>
-&nbsp;&nbsp;&nbsp; socklen_t addrlen;<br>
-&nbsp;&nbsp;&nbsp; struct sockaddr_sco addr;<br>
-<br>
-&nbsp;&nbsp;&nbsp; unsigned char buffer[1024];<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp; snd_fd = init_sound();<br>
-&nbsp;&nbsp;&nbsp; while(1)<br>
-&nbsp;&nbsp;&nbsp; {<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if((scosock = socket(PF_BLUETOOTH, SOCK_SEQPACKET,
-BTPROTO_SCO)) &lt; 0)<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; perror("could not create SCO channel socket");<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; continue;<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }<br>
-&nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; memset(&amp;addr, 0, sizeof(struct sockaddr_sco));<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; addr.sco_family = AF_BLUETOOTH;<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; bacpy(&amp;addr.sco_bdaddr, BDADDR_ANY);<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if(bind(scosock, (struct sockaddr *)&amp;addr, sizeof(struct
-sockaddr)) &lt; 0)<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; perror("could not bind SCO channel to local address");<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; close(scosock);<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; continue;<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; listen(scosock, 20);<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; memset(&amp;addr, 0, sizeof(struct sockaddr_sco));<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; addrlen = sizeof(struct sockaddr);<br>
-&nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; printf("waiting for SCO connection\n");<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if(wait4data(scosock) &lt; 0 || (cli_scosock = accept(scosock,
-(struct sockaddr *)&amp;addr, &amp;addrlen)) &lt; 0)<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; printf("could not accept SCO link, socket error,
-reconnecting\n");<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; close(scosock);<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; continue;<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }<br>
-<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; printf("accepted voice channel from MT\n"); <br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; while(1)<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; memset(buffer, 0, 1024);<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if(wait4data(cli_scosock) &lt; 0 || (nbytes =
-read(cli_scosock, buffer, 1024)) &lt; 0) <br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; printf("could not read from SCO link, socket error,
-reconnecting\n");<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; close(cli_scosock);<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; close(scosock);<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; break;<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; write(snd_fd, buffer, nbytes);<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; memset(buffer, 0, 1024);<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; read(snd_fd, buffer, 48);<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if(send(cli_scosock, buffer, 48, 0) &lt; 0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font
- color="#ff0000">&lt;&lt; --- send() fails here with "Invalid argument"</font><br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; perror("send failed");<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; } <br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }<br>
-&nbsp;&nbsp;&nbsp; }<br>
-}<br>
-<br>
-</body>
-</html>
-
-
---===============0197369768==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============0197369768==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0197369768==--
+CkhpIGZyZWRlcmljLAoKwqDCoMKgwqDCoMKgwqDCoEkgdHJ5IHRoZSBuZXcgcGx1ZyBpbiBteSBs
+YXB0b3AsIGtlcm5lbCBpcyAyLjYuMTguMywgYmx1ZXogaXMgMy4xMi4gSXQgCndvcmtzIApncmVh
+dCEgVGhhbmsgeW91IQoKwqDCoMKgwqDCoMKgwqDCoEJ1dCB3aGVuIEkgdHJ5IGl0IGluIGFub3Ro
+ZXIsIGV4Y2VwdCB0aGUga2VybmVsIGlzIDIuNi4yMS4zLCBvdGhlciAKY29tcG9uZW50cyAKYXJl
+IGFsbCB0aGUgc2FtZSwgdGhlIHNvdW5kIHNraXBzIGFuZCBJIGZvdW5kIHRoZSBhMmRwZCByZXBl
+YXQgY29ubmVjdGluZyBhbmQgCmRpc2Nvbm5lY3RpbmcuIHRoZSBmb2xsb3dpbmcgaXMgdGhlIGEy
+ZHBkIG91dHB1dDoKCgpBMkRQRFsxMToxODo1MC41ODddOiBwb2xsZmRfY2JfYXZyY3BmZDogc29j
+a2V0IDEyOiBDb25uZWN0aW9uIGZyb20gCkIxOkJDOkI1OkE0OjA3OjAwLCBtdHU9NjEwIGFjY2Vw
+dGVkIGF0IGluZGV4IDAKQTJEUERbMTE6MTg6NTAuNjYwXTogYTJkcF9oYW5kbGVfYXZkdHBfbWVz
+c2FnZTogUmVhZCBub24gY29tbWFuZCBwYWNrZXQgCihtc2d0eXBlPU1FU1NBR0VfVFlQRV9BQ0NF
+UFQsc2lnbmFsPUFWRFRQX0NMT1NFKQpBMkRQRFsxMToxODo1MC42NjBdOiBhMmRwX3N0YXRlX21h
+Y2hpbmU6IEFWRFRQX0NMT1NFIHN1Y2Nlc3MKQTJEUERbMTE6MTg6NTAuNjYwXTogYTJkcF9zdGF0
+ZV9tYWNoaW5lOiBTdGF0ZSBBVkRUUF9TVEFURVhfRElTQ09OTkVDVElORwpBMkRQRFsxMToxODo1
+MC42NjFdOiBhMmRwX2Rpc2Nvbm5lY3Q6CkEyRFBEWzExOjE4OjUwLjY2MV06IGEyZHBfc3RyZWFt
+X3N0b3A6IENsb3Npbmcgc3RyZWFtIHNvY2tldCAxMQpBMkRQRFsxMToxODo1MC42NjFdOiBhMmRw
+X3N0cmVhbV9zdG9wOiBDbG9zZWQKQTJEUERbMTE6MTg6NTAuNjYxXTogYTJkcF9zdHJlYW1fc3Rv
+cDogU3RhdGUgQVZEVFBfU1RBVEVfSURMRQpBMkRQRFsxMToxODo1MC42NjFdOiBhMmRwX2Rpc2Nv
+bm5lY3Q6IENsb3NpbmcgY3RsIHNvY2tldCAxMApBMkRQRFsxMToxODo1MC42NjFdOiBhMmRwX2Rp
+c2Nvbm5lY3Q6IENsb3NlZApBMkRQRFsxMToxODo1MC42NjFdOiBhMmRwX2Rpc2Nvbm5lY3Q6IFN0
+YXRlIEFWRFRQX1NUQVRFX0RJU0NPTk5FQ1RFRApBMkRQRFsxMToxODo1MC42NjFdOiBhMmRwZF9z
+aWduYWxfc3RhdGU6IERpc2Nvbm5lY3RlZApBMkRQRFsxMToxODo1MS40NzFdOiBhMmRwX3N0YXRl
+X2Nvbm5lY3Q6IFN0YXRlIEFWRFRQX1NUQVRFWF9TRFBfQ09OTkVDVElORwpBMkRQRFsxMToxODo1
+MS40NzFdOiBhMmRwX3N0YXRlX21hY2hpbmU6IFJvbGUgaXMgSU5JVElBVE9SCkEyRFBEWzExOjE4
+OjUxLjQ3MV06IGEyZHBfc3RhdGVfbWFjaGluZTogKGVycm5vPTExNTpPcGVyYXRpb24gbm93IGlu
+IApwcm9ncmVzcylTRFAgY29ubmVjdGlvbiBvbiBzb2NrZXQgMTBeTQpBMkRQRFsxMToxODo1MS40
+NzFdOiBhMmRwX3N0YXRlX21hY2hpbmU6IFN0YXRlIApBVkRUUF9TVEFURVhfU0RQX0NPTk5FQ1RJ
+TkdfV0FJVApBMkRQRFsxMToxODo1MS40NzFdOiBhMmRwZF9zaWduYWxfc3RhdGU6IENvbm5lY3Rp
+bmcgMDA6MDc6QTQ6QjU6QkM6QjEKQTJEUERbMTE6MTg6NTEuNTQ2XTogYTJkcF9zdGF0ZV9tYWNo
+aW5lOiBTRFAgY29ubmVjdGlvbiB0ZXJtaW5hdGVkCkEyRFBEWzExOjE4OjUxLjYxMV06IGdldF9h
+dmR0cF9wc206IFBhcnNpbmcgcmVzdWx0cwpBMkRQRFsxMToxODo1MS42MTFdOiBnZXRfYXZkdHBf
+cHNtOiBSZWNvcmQKQTJEUERbMTE6MTg6NTEuNjExXTogZ2V0X2F2ZHRwX3BzbTogU2VydmljZSBT
+ZWFyY2ggT0sKQTJEUERbMTE6MTg6NTEuNjQxXTogZ2V0X2F2ZHRwX3BzbTogQ2hlY2tpbmcgbm9u
+IHNwZWMgYXVkaW8KQTJEUERbMTE6MTg6NTEuNjQxXTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBGb3Vu
+ZCBwc20gMjUKQTJEUERbMTE6MTg6NTEuNjQxXTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTdGF0ZSBB
+VkRUUF9TVEFURVhfQ1RMX0NPTk5FQ1RJTkcKQTJEUERbMTE6MTg6NTEuNjQxXTogYXZyY3BfaGFu
+ZGxlX21lc3NhZ2U6IEFWUkNQIFJlY2VpdmUgZmFpbGVkCkEyRFBEWzExOjE4OjUxLjY0MV06IGEy
+ZHBfc3RhdGVfbWFjaGluZTogU29ja2V0IGlzIDEwCkEyRFBEWzExOjE4OjUxLjY0MV06IGEyZHBf
+c3RhdGVfbWFjaGluZTogKGVycm5vPTExNTpPcGVyYXRpb24gbm93IGluIApwcm9ncmVzcylTdGF0
+ZSBBVkRUUF9TVEFURVhfQ1RMX0NPTk5FQ1RJTkdfV0FJVF5NCkEyRFBEWzExOjE4OjUyLjA1OF06
+IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgQVZEVFBfU1RBVEVfSURMRQpBMkRQRFsxMToxODo1
+Mi4wNTldOiBhMmRwX3N0YXRlX21hY2hpbmU6IFN0YXRlIEFWRFRQX1NUQVRFWF9ESVNDT1ZFUklO
+RwpBMkRQRFsxMToxODo1Mi4wNjBdOiBhMmRwX3N0YXRlX21hY2hpbmU6IFN0YXRlIEFWRFRQX1NU
+QVRFWF9ESVNDT1ZFUklOR19SRVNQCkEyRFBEWzExOjE4OjUyLjI3OV06IGEyZHBfaGFuZGxlX2F2
+ZHRwX21lc3NhZ2U6IFJlYWQgbm9uIGNvbW1hbmQgcGFja2V0IAoobXNndHlwZT1NRVNTQUdFX1RZ
+UEVfQUNDRVBULHNpZ25hbD1BVkRUUF9ESVNDT1ZFUikKQTJEUERbMTE6MTg6NTIuMjc5XTogYTJk
+cF9zdGF0ZV9tYWNoaW5lOiBBVkRUUF9ESVNDT1ZFUiBzdWNjZXNzCkEyRFBEWzExOjE4OjUyLjI4
+MF06IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgCkFWRFRQX1NUQVRFWF9HRVRUSU5HX0NBUEFC
+SUxJVElFUwpBMkRQRFsxMToxODo1Mi4yODBdOiBhMmRwX3N0YXRlX21hY2hpbmU6IEdldHRpbmcg
+Y2FwYWJpbGl0aWVzIGZvciBTRUlEPTEKQTJEUERbMTE6MTg6NTIuMjgxXTogYTJkcF9zdGF0ZV9t
+YWNoaW5lOiBTdGF0ZSAKQVZEVFBfU1RBVEVYX0dFVFRJTkdfQ0FQQUJJTElUSUVTX1JFU1AKQTJE
+UERbMTE6MTg6NTIuMzY5XTogYTJkcF9oYW5kbGVfYXZkdHBfbWVzc2FnZTogUmVhZCBub24gY29t
+bWFuZCBwYWNrZXQgCihtc2d0eXBlPU1FU1NBR0VfVFlQRV9BQ0NFUFQsc2lnbmFsPUFWRFRQX0dF
+VF9DQVBBQklMSVRJRVMpCkEyRFBEWzExOjE4OjUyLjM2OV06IGEyZHBfc3RhdGVfbWFjaGluZTog
+QVZEVFBfR0VUX0NBUEFCSUxJVElFUyBzdWNjZXNzIGZvciAKc2VpZCAxCkEyRFBEWzExOjE4OjUy
+LjM2OV06IGEyZHBfc3RhdGVfbWFjaGluZTogc2VydmNhcF9jYXA9MSwgc2VydmNhcF9sZW49MCwK
+QTJEUERbMTE6MTg6NTIuMzY5XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBjYXBfdHlwZT03LCBsZW5n
+dGg9NgpBMkRQRFsxMToxODo1Mi4zNjldOiBhMmRwX3N0YXRlX21hY2hpbmU6IG1lZGlhX3R5cGU9
+MCwgY29kZWM9MApBMkRQRFsxMToxODo1Mi4zNjldOiBhMmRwX3N0YXRlX21hY2hpbmU6IEEyRFBE
+IMKgUHJlZmVyZWQgYml0cG9vbCAzMgpBMkRQRFsxMToxODo1Mi4zNzBdOiBhMmRwX3N0YXRlX21h
+Y2hpbmU6IERldmljZSBQcmVmZXJlZCBiaXRwb29sIDIgLT4gMjUwCkEyRFBEWzExOjE4OjUyLjM3
+MF06IGEyZHBfc3RhdGVfbWFjaGluZTogQTJEUEQgwqBTZWxlY3RlZCBiaXRwb29sIDMyCkEyRFBE
+WzExOjE4OjUyLjM3MF06IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgCkFWRFRQX1NUQVRFWF9T
+RVRUSU5HX0NPTkZJR1VSQVRJT04KQTJEUERbMTE6MTg6NTIuMzcwXTogYTJkcF9zdGF0ZV9tYWNo
+aW5lOiBTdGF0ZSAKQVZEVFBfU1RBVEVYX1NFVFRJTkdfQ09ORklHVVJBVElPTl9SRVNQCkEyRFBE
+WzExOjE4OjUyLjUyN106IGEyZHBfaGFuZGxlX2F2ZHRwX21lc3NhZ2U6IFJlYWQgbm9uIGNvbW1h
+bmQgcGFja2V0IAoobXNndHlwZT1NRVNTQUdFX1RZUEVfQUNDRVBULHNpZ25hbD1BVkRUUF9TRVRf
+Q09ORklHVVJBVElPTikKQTJEUERbMTE6MTg6NTIuNTI3XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBB
+VkRUUF9TRVRfQ09ORklHVVJBVElPTiBzdWNjZXNzCkEyRFBEWzExOjE4OjUyLjUyN106IGEyZHBf
+c3RhdGVfbWFjaGluZTogU3RhdGUgQVZEVFBfU1RBVEVYX1NUUkVBTV9PUEVOSU5HCkEyRFBEWzEx
+OjE4OjUyLjUyOF06IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgCkFWRFRQX1NUQVRFWF9TVFJF
+QU1fT1BFTklOR19SRVNQCkEyRFBEWzExOjE4OjUyLjYyMV06IGEyZHBfaGFuZGxlX2F2ZHRwX21l
+c3NhZ2U6IFJlYWQgbm9uIGNvbW1hbmQgcGFja2V0IAoobXNndHlwZT1NRVNTQUdFX1RZUEVfQUND
+RVBULHNpZ25hbD1BVkRUUF9PUEVOKQpBMkRQRFsxMToxODo1Mi42MjFdOiBhMmRwX3N0YXRlX21h
+Y2hpbmU6IEFWRFRQX09QRU4gc3VjY2VzcwpBMkRQRFsxMToxODo1Mi42MjFdOiBhMmRwX3N0YXRl
+X21hY2hpbmU6IFN0YXRlIEFWRFRQX1NUQVRFX0NPTkZJR1VSRUQKQTJEUERbMTE6MTg6NTIuNjIy
+XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTdGF0ZSBBVkRUUF9TVEFURVhfU1RSRUFNX0NPTk5FQ1RJ
+TkcKQTJEUERbMTE6MTg6NTIuNjIzXTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTb2NrZXQgaXMgMTEK
+QTJEUERbMTE6MTg6NTIuNjIzXTogYTJkcF9zdGF0ZV9tYWNoaW5lOiAoZXJybm89MTE1Ok9wZXJh
+dGlvbiBub3cgaW4gCnByb2dyZXNzKVN0YXRlIEFWRFRQX1NUQVRFWF9TVFJFQU1fQ09OTkVDVElO
+R19XQUlUXk0KQTJEUERbMTE6MTg6NTIuODk1XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTdHJlYW0g
+Y29ubmVjdGVkCkEyRFBEWzExOjE4OjUyLjg5NV06IGdldF9zb2NrZXRfb210dTogU29ja2V0IDEx
+IGltdHU9NjcyLCBvbXR1PTY3MiwgCmZsdXNoX3RvPTY1NTM1CkEyRFBEWzExOjE4OjUyLjg5NV06
+IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgCkFWRFRQX1NUQVRFX09QRU5fU1RBUlRfU1RSRUFN
+SU5HCkEyRFBEWzExOjE4OjUyLjg5Nl06IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgQVZEVFBf
+U1RBVEVYX1NUUkVBTV9TVEFSVElORwpBMkRQRFsxMToxODo1Mi44OTZdOiBhMmRwZF9zaWduYWxf
+c3RhdGU6IENvbm5lY3RlZCAwMDowNzpBNDpCNTpCQzpCMQpBMkRQRFsxMToxODo1Mi44OTddOiBh
+MmRwX3N0YXRlX21hY2hpbmU6IFN0YXRlIApBVkRUUF9TVEFURVhfU1RSRUFNX1NUQVJUSU5HX1dB
+SVQKQTJEUERbMTE6MTg6NTMuMjM3XTogYTJkcF9oYW5kbGVfYXZkdHBfbWVzc2FnZTogUmVhZCBu
+b24gY29tbWFuZCBwYWNrZXQgCihtc2d0eXBlPU1FU1NBR0VfVFlQRV9BQ0NFUFQsc2lnbmFsPUFW
+RFRQX1NUQVJUKQpBMkRQRFsxMToxODo1My4yMzddOiBhMmRwX3N0YXRlX21hY2hpbmU6IEFWRFRQ
+X1NUQVJUIHN1Y2Nlc3MKQTJEUERbMTE6MTg6NTMuMjM3XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBT
+dGF0ZSBBVkRUUF9TVEFURV9TVFJFQU1JTkcKQTJEUERbMTE6MTg6NTQuMjYxXTogYTJkcF90cmFu
+c2Zlcl9yYXc6IFdyb3RlIC0xIG5vdCA2MjEgYnl0ZXMgKHNiYy5sZW49NzYpCkEyRFBEWzExOjE4
+OjU0LjI2MV06IHRyYW5zZmVyX291dGdvaW5nX3BhY2tldHM6IEVycm9yIGluIHRyYW5zZmVyIAoo
+dHJhbnNmZXI9LTEpCkEyRFBEWzExOjE4OjU0LjI2MV06IGEyZHBfc3RhdGVfZGlzY29ubmVjdDog
+U3RhdGUgQVZEVFBfU1RBVEVYX1NUUkVBTV9DTE9TSU5HCkEyRFBEWzExOjE4OjU0LjI2MV06IGEy
+ZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgCkFWRFRQX1NUQVRFWF9TVFJFQU1fQ0xPU0lOR19XQUlU
+CkEyRFBEWzExOjE4OjU0LjI2MV06IGEyZHBkX3NpZ25hbF9zdGF0ZTogQ29ubmVjdGluZyAwMDow
+NzpBNDpCNTpCQzpCMQpBMkRQRFsxMToxODo1Ni4xNTldOiBnZXRfc29ja2V0X29tdHU6IFNvY2tl
+dCA4IGltdHU9NjcyLCBvbXR1PTAsIApmbHVzaF90bz02NTUzNQpBMkRQRFsxMToxODo1Ni4xNTld
+OiBwb2xsZmRfY2JfYXZyY3BmZDogc29ja2V0IDEyOiBDb25uZWN0aW9uIGZyb20gCkIxOkJDOkI1
+OkE0OjA3OjAwLCBtdHU9NjEwIGFjY2VwdGVkIGF0IGluZGV4IDAKQTJEUERbMTE6MTg6NTYuMjA4
+XTogYTJkcF9oYW5kbGVfYXZkdHBfbWVzc2FnZTogUmVhZCBub24gY29tbWFuZCBwYWNrZXQgCiht
+c2d0eXBlPU1FU1NBR0VfVFlQRV9BQ0NFUFQsc2lnbmFsPUFWRFRQX0NMT1NFKQpBMkRQRFsxMTox
+ODo1Ni4yMDhdOiBhMmRwX3N0YXRlX21hY2hpbmU6IEFWRFRQX0NMT1NFIHN1Y2Nlc3MKQTJEUERb
+MTE6MTg6NTYuMjA4XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTdGF0ZSBBVkRUUF9TVEFURVhfRElT
+Q09OTkVDVElORwpBMkRQRFsxMToxODo1Ni4yMDldOiBhMmRwX2Rpc2Nvbm5lY3Q6CkEyRFBEWzEx
+OjE4OjU2LjIwOV06IGEyZHBfc3RyZWFtX3N0b3A6IENsb3Npbmcgc3RyZWFtIHNvY2tldCAxMQpB
+MkRQRFsxMToxODo1Ni4yMDldOiBhMmRwX3N0cmVhbV9zdG9wOiBDbG9zZWQKQTJEUERbMTE6MTg6
+NTYuMjA5XTogYTJkcF9zdHJlYW1fc3RvcDogU3RhdGUgQVZEVFBfU1RBVEVfSURMRQpBMkRQRFsx
+MToxODo1Ni4yMDldOiBhMmRwX2Rpc2Nvbm5lY3Q6IENsb3NpbmcgY3RsIHNvY2tldCAxMApBMkRQ
+RFsxMToxODo1Ni4yMDldOiBhMmRwX2Rpc2Nvbm5lY3Q6IENsb3NlZApBMkRQRFsxMToxODo1Ni4y
+MDldOiBhMmRwX2Rpc2Nvbm5lY3Q6IFN0YXRlIEFWRFRQX1NUQVRFX0RJU0NPTk5FQ1RFRApBMkRQ
+RFsxMToxODo1Ni4yMDldOiBhMmRwZF9zaWduYWxfc3RhdGU6IERpc2Nvbm5lY3RlZApBMkRQRFsx
+MToxODo1Ni41MjBdOiBhMmRwX3N0YXRlX2Nvbm5lY3Q6IFN0YXRlIEFWRFRQX1NUQVRFWF9TRFBf
+Q09OTkVDVElORwpBMkRQRFsxMToxODo1Ni41MjBdOiBhMmRwX3N0YXRlX21hY2hpbmU6IFJvbGUg
+aXMgSU5JVElBVE9SCkEyRFBEWzExOjE4OjU2LjUyMF06IGEyZHBfc3RhdGVfbWFjaGluZTogKGVy
+cm5vPTExNTpPcGVyYXRpb24gbm93IGluIApwcm9ncmVzcylTRFAgY29ubmVjdGlvbiBvbiBzb2Nr
+ZXQgMTBeTQpBMkRQRFsxMToxODo1Ni41MjBdOiBhMmRwX3N0YXRlX21hY2hpbmU6IFN0YXRlIApB
+VkRUUF9TVEFURVhfU0RQX0NPTk5FQ1RJTkdfV0FJVApBMkRQRFsxMToxODo1Ni41MjBdOiBhMmRw
+ZF9zaWduYWxfc3RhdGU6IENvbm5lY3RpbmcgMDA6MDc6QTQ6QjU6QkM6QjEKQTJEUERbMTE6MTg6
+NTYuNTg3XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTRFAgY29ubmVjdGlvbiB0ZXJtaW5hdGVkCkEy
+RFBEWzExOjE4OjU2LjY3MF06IGdldF9hdmR0cF9wc206IFBhcnNpbmcgcmVzdWx0cwpBMkRQRFsx
+MToxODo1Ni42NzBdOiBnZXRfYXZkdHBfcHNtOiBSZWNvcmQKQTJEUERbMTE6MTg6NTYuNjcwXTog
+Z2V0X2F2ZHRwX3BzbTogU2VydmljZSBTZWFyY2ggT0sKQTJEUERbMTE6MTg6NTYuNzAzXTogZ2V0
+X2F2ZHRwX3BzbTogQ2hlY2tpbmcgbm9uIHNwZWMgYXVkaW8KQTJEUERbMTE6MTg6NTYuNzAzXTog
+YTJkcF9zdGF0ZV9tYWNoaW5lOiBGb3VuZCBwc20gMjUKQTJEUERbMTE6MTg6NTYuNzAzXTogYTJk
+cF9zdGF0ZV9tYWNoaW5lOiBTdGF0ZSBBVkRUUF9TVEFURVhfQ1RMX0NPTk5FQ1RJTkcKQTJEUERb
+MTE6MTg6NTYuNzAzXTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTb2NrZXQgaXMgMTAKQTJEUERbMTE6
+MTg6NTYuNzAzXTogYTJkcF9zdGF0ZV9tYWNoaW5lOiAoZXJybm89MTE1Ok9wZXJhdGlvbiBub3cg
+aW4gCnByb2dyZXNzKVN0YXRlIEFWRFRQX1NUQVRFWF9DVExfQ09OTkVDVElOR19XQUlUXk0KQTJE
+UERbMTE6MTg6NTcuNDk5XTogYXZyY3BfaGFuZGxlX21lc3NhZ2U6IEFWUkNQIFJlY2VpdmUgZmFp
+bGVkCkEyRFBEWzExOjE4OjU3LjkxNF06IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgQVZEVFBf
+U1RBVEVfSURMRQpBMkRQRFsxMToxODo1Ny45MTVdOiBhMmRwX3N0YXRlX21hY2hpbmU6IFN0YXRl
+IEFWRFRQX1NUQVRFWF9ESVNDT1ZFUklORwpBMkRQRFsxMToxODo1Ny45MTZdOiBhMmRwX3N0YXRl
+X21hY2hpbmU6IFN0YXRlIEFWRFRQX1NUQVRFWF9ESVNDT1ZFUklOR19SRVNQCkEyRFBEWzExOjE4
+OjU4LjE2NV06IGEyZHBfaGFuZGxlX2F2ZHRwX21lc3NhZ2U6IFJlYWQgbm9uIGNvbW1hbmQgcGFj
+a2V0IAoobXNndHlwZT1NRVNTQUdFX1RZUEVfQUNDRVBULHNpZ25hbD1BVkRUUF9ESVNDT1ZFUikK
+QTJEUERbMTE6MTg6NTguMTY1XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBBVkRUUF9ESVNDT1ZFUiBz
+dWNjZXNzCkEyRFBEWzExOjE4OjU4LjE2NV06IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgCkFW
+RFRQX1NUQVRFWF9HRVRUSU5HX0NBUEFCSUxJVElFUwpBMkRQRFsxMToxODo1OC4xNjZdOiBhMmRw
+X3N0YXRlX21hY2hpbmU6IEdldHRpbmcgY2FwYWJpbGl0aWVzIGZvciBTRUlEPTEKQTJEUERbMTE6
+MTg6NTguMTY2XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTdGF0ZSAKQVZEVFBfU1RBVEVYX0dFVFRJ
+TkdfQ0FQQUJJTElUSUVTX1JFU1AKQTJEUERbMTE6MTg6NTguMjE3XTogYTJkcF9oYW5kbGVfYXZk
+dHBfbWVzc2FnZTogUmVhZCBub24gY29tbWFuZCBwYWNrZXQgCihtc2d0eXBlPU1FU1NBR0VfVFlQ
+RV9BQ0NFUFQsc2lnbmFsPUFWRFRQX0dFVF9DQVBBQklMSVRJRVMpCkEyRFBEWzExOjE4OjU4LjIx
+N106IGEyZHBfc3RhdGVfbWFjaGluZTogQVZEVFBfR0VUX0NBUEFCSUxJVElFUyBzdWNjZXNzIGZv
+ciAKc2VpZCAxCkEyRFBEWzExOjE4OjU4LjIxN106IGEyZHBfc3RhdGVfbWFjaGluZTogc2VydmNh
+cF9jYXA9MSwgc2VydmNhcF9sZW49MCwKQTJEUERbMTE6MTg6NTguMjE3XTogYTJkcF9zdGF0ZV9t
+YWNoaW5lOiBjYXBfdHlwZT03LCBsZW5ndGg9NgpBMkRQRFsxMToxODo1OC4yMTddOiBhMmRwX3N0
+YXRlX21hY2hpbmU6IG1lZGlhX3R5cGU9MCwgY29kZWM9MApBMkRQRFsxMToxODo1OC4yMTddOiBh
+MmRwX3N0YXRlX21hY2hpbmU6IEEyRFBEIMKgUHJlZmVyZWQgYml0cG9vbCAzMgpBMkRQRFsxMTox
+ODo1OC4yMTddOiBhMmRwX3N0YXRlX21hY2hpbmU6IERldmljZSBQcmVmZXJlZCBiaXRwb29sIDIg
+LT4gMjUwCkEyRFBEWzExOjE4OjU4LjIxN106IGEyZHBfc3RhdGVfbWFjaGluZTogQTJEUEQgwqBT
+ZWxlY3RlZCBiaXRwb29sIDMyCkEyRFBEWzExOjE4OjU4LjIxN106IGEyZHBfc3RhdGVfbWFjaGlu
+ZTogU3RhdGUgCkFWRFRQX1NUQVRFWF9TRVRUSU5HX0NPTkZJR1VSQVRJT04KQTJEUERbMTE6MTg6
+NTguMjE4XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBTdGF0ZSAKQVZEVFBfU1RBVEVYX1NFVFRJTkdf
+Q09ORklHVVJBVElPTl9SRVNQCkEyRFBEWzExOjE4OjU4LjM3OF06IGEyZHBfaGFuZGxlX2F2ZHRw
+X21lc3NhZ2U6IFJlYWQgbm9uIGNvbW1hbmQgcGFja2V0IAoobXNndHlwZT1NRVNTQUdFX1RZUEVf
+QUNDRVBULHNpZ25hbD1BVkRUUF9TRVRfQ09ORklHVVJBVElPTikKQTJEUERbMTE6MTg6NTguMzc4
+XTogYTJkcF9zdGF0ZV9tYWNoaW5lOiBBVkRUUF9TRVRfQ09ORklHVVJBVElPTiBzdWNjZXNzCkEy
+RFBEWzExOjE4OjU4LjM3OF06IGEyZHBfc3RhdGVfbWFjaGluZTogU3RhdGUgQVZEVFBfU1RBVEVY
+X1NUUkVBTV9PUEVOSU5HCkEyRFBEWzExOjE4OjU4LjM3OV06IGEyZHBfc3RhdGVfbWFjaGluZTog
+U3RhdGUgCkFWRFRQX1NUQVRFWF9TVFJFQU1fT1BFTklOR19SRVNQCkEyRFBEWzExOjE4OjU4LjUw
+M106IGEyZHBfaGFuZGxlX2F2ZHRwX21lc3NhZ2U6IFJlYWQgbm9uIGNvbW1hbmQgcGFja2V0IAoo
+bXNndHlwZT1NRVNTQUdFX1RZUEVfQUNDRVBULHNpZ25hbD1BVkRUUF9PUEVOKQpBMkRQRFsxMTox
+ODo1OC41MDNdOiBhMmRwX3N0YXRlX21hY2hpbmU6IEFWRFRQX09QRU4gc3VjY2VzcwoKwqDCoMKg
+wqDCoMKgwqDCoEFuZCB0aGUgZm9sbG93aW5nIG91dHB1dCByZXBlYXRlZC4uLgoKwqDCoMKgwqDC
+oMKgwqDCoEJScywKwqDCoMKgwqDCoMKgwqDCoEJhaXNoZW5nCgoK5ZyoIOaYn+acn+WbmyAyNiDk
+uIPmnIggMjAwNyAyMjo0Me+8jEZyZWRlcmljIERhbGxlYXUg5YaZ6YGT77yaCj4gPiAJSSd2ZSBn
+b3R0ZW4gYTJkcCB3b3JraW5nLiBNeSBwbGF5ZXIgaXMgdG90ZW0sIGJ1dCB0aGUgc291bmQgc2tp
+cHMgZXZlcnkKPiA+IHNldmVyYWwgc2Vjb25kcyB3aGlsZSBwbGF5aW5nLgo+Cj4gSWYgeW91J3Jl
+IHVzaW5nIGEyZHBkIGdpdmUgYSB0cnkgdG8gbGF0ZXN0IGEyZHBkIGZyb20gcGx1Z3ogY3ZzIChm
+cm9tCj4gdG9kYXkpLiBJIGZpeGVkIHNvbWV0aGluZyBzaW1pbGFyLgo+Cj4gPiBTbyB0aGUgYXBs
+YXkuIEJ1dCB0aGUga2FmZmVpbmUgaXMgb2sgd2hlbgo+ID4gcGxheWVyaW5nIGZvcm1hdCBtcDMg
+d2hpbGUgZm9yIHRoZSBmb3JtYXQgd2F2IG5vdCB3b3JrLlNvIEkgd2FudCB0byBkZWJ1Zwo+ID4g
+dGhpcyBpc3N1ZS4gQnV0IHdoYXQgY29tcG9uZXQgSSB3aWxsIGRlYnVnLCB0aGUga2VybmVsLCBh
+bHNhLCBidWV6IG9yCj4gPiBhMmRwID8KPgo+IElmIHlvdSBkb24ndCB1c2UgYTJkcGQgb3IgdGhl
+IGlzc3VlIGlzIG5vdCBmaXhlZCwgdGhlbiBJIHdvdWxkIHN0aWxsIGJlZwo+IGZvciB0aGUgYTJk
+cC4KPgo+IExldCB1cyBrbm93IGlmIGl0IGlzIG9rLgo+Cj4gZnJlZGVyaWMKPgo+Cj4gLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLQo+IFRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogU3BsdW5rIElu
+Yy4KPiBTdGlsbCBncmVwcGluZyB0aHJvdWdoIGxvZyBmaWxlcyB0byBmaW5kIHByb2JsZW1zPyAg
+U3RvcC4KPiBOb3cgU2VhcmNoIGxvZyBldmVudHMgYW5kIGNvbmZpZ3VyYXRpb24gZmlsZXMgdXNp
+bmcgQUpBWCBhbmQgYSBicm93c2VyLgo+IERvd25sb2FkIHlvdXIgRlJFRSBjb3B5IG9mIFNwbHVu
+ayBub3cgPj4gIGh0dHA6Ly9nZXQuc3BsdW5rLmNvbS8KPiBfX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fXwo+IEJsdWV6LWRldmVsIG1haWxpbmcgbGlzdAo+IEJs
+dWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9y
+Z2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMg
+U0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogU3BsdW5rIEluYy4KU3RpbGwgZ3JlcHBpbmcg
+dGhyb3VnaCBsb2cgZmlsZXMgdG8gZmluZCBwcm9ibGVtcz8gIFN0b3AuCk5vdyBTZWFyY2ggbG9n
+IGV2ZW50cyBhbmQgY29uZmlndXJhdGlvbiBmaWxlcyB1c2luZyBBSkFYIGFuZCBhIGJyb3dzZXIu
+CkRvd25sb2FkIHlvdXIgRlJFRSBjb3B5IG9mIFNwbHVuayBub3cgPj4gIGh0dHA6Ly9nZXQuc3Bs
+dW5rLmNvbS8KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
+Qmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5l
+dApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZl
+bAo=
