@@ -1,16 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1185527921.2848.1.camel@cookie.hadess.net>
+In-Reply-To: <1185481079.3641.339.camel@cookie.hadess.net>
 References: <1185475756.3641.329.camel@cookie.hadess.net>
 	<1185481079.3641.339.camel@cookie.hadess.net>
-	<1185527921.2848.1.camel@cookie.hadess.net>
-Content-Type: multipart/mixed; boundary="=-fM1MzbCzl8dx8zXCXXU6"
-Date: Fri, 27 Jul 2007 16:30:43 +0100
-Message-Id: <1185550243.2848.46.camel@cookie.hadess.net>
+Content-Type: multipart/mixed; boundary="=-6BPHY6nMNtPjFM5qgSee"
+Date: Fri, 27 Jul 2007 10:18:41 +0100
+Message-Id: <1185527921.2848.1.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] bluez-gnome: "search"
-	button	for	the	device selection
+Subject: Re: [Bluez-devel] [PATCH] bluez-gnome: "search" button
+	for	the	device selection
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,92 +23,48 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---=-fM1MzbCzl8dx8zXCXXU6
+--=-6BPHY6nMNtPjFM5qgSee
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-On Fri, 2007-07-27 at 10:18 +0100, Bastien Nocera wrote:
-> On Thu, 2007-07-26 at 21:17 +0100, Bastien Nocera wrote:
-> > On Thu, 2007-07-26 at 19:49 +0100, Bastien Nocera wrote:
-> > > For comments (but pretty much finished), to give you an idea of the way
-> > > it'd work. The search button starts a discovery on the default adapter,
-> > > and becomes unsensitive.
-> > > 
-> > > The search button becomes sensitive again when all discoveries
-> > > (including those possibly launched on other adapters) are finished.
+On Thu, 2007-07-26 at 21:17 +0100, Bastien Nocera wrote:
+> On Thu, 2007-07-26 at 19:49 +0100, Bastien Nocera wrote:
+> > For comments (but pretty much finished), to give you an idea of the way
+> > it'd work. The search button starts a discovery on the default adapter,
+> > and becomes unsensitive.
 > > 
-> > Updated patch against current CVS.
-> > 
-> > Renames show_status to show_bonded, as per the property. Adds a property
-> > to show/hide the search button, and a way for applications hiding the
-> > search button to automatically start the search.
-> > 
-> > I'm just not certain about the client.c changes for tracking the last
-> > discovery.
+> > The search button becomes sensitive again when all discoveries
+> > (including those possibly launched on other adapters) are finished.
 > 
-> Updated patch to avoid tracking the number of discoveries, it's not
-> useful as we only handle discovery on the default adapter.
+> Updated patch against current CVS.
+> 
+> Renames show_status to show_bonded, as per the property. Adds a property
+> to show/hide the search button, and a way for applications hiding the
+> search button to automatically start the search.
+> 
+> I'm just not certain about the client.c changes for tracking the last
+> discovery.
 
-Another updated patch.
-
-Fixes the device selection's search button in the wizard, and adds
-support to the bonding code in the client to handle the "NULL" adapter
-we pass it.
-
-We're starting to need the filter for the wizard, so as not to show
-paired devices. I'll probably work on that when I come back from
-holidays if nobody beats me to it.
+Updated patch to avoid tracking the number of discoveries, it's not
+useful as we only handle discovery on the default adapter.
 
 -- 
 Bastien Nocera <hadess@hadess.net> 
 
---=-fM1MzbCzl8dx8zXCXXU6
+--=-6BPHY6nMNtPjFM5qgSee
 Content-Disposition: attachment;
-	filename=bluez-gnome-implement-search-button-4.patch
-Content-Type: text/x-patch; name=bluez-gnome-implement-search-button-4.patch;
+	filename=bluez-gnome-implement-search-button-3.patch
+Content-Type: text/x-patch; name=bluez-gnome-implement-search-button-3.patch;
 	charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 
-Index: wizard/main.c
-===================================================================
-RCS file: /cvsroot/bluez/gnome/wizard/main.c,v
-retrieving revision 1.19
-diff -u -p -r1.19 main.c
---- wizard/main.c	26 Jul 2007 11:18:38 -0000	1.19
-+++ wizard/main.c	27 Jul 2007 15:26:29 -0000
-@@ -51,6 +51,8 @@ static GtkWidget *page_summary = NULL;
- static GtkWidget *label_pairing = NULL;
- static GtkWidget *label_passkey = NULL;
- 
-+static GtkWidget *selector = NULL;
-+
- static gboolean passkey_agent_request(GObject *agent,
- 				const char *path, const char *address,
- 					DBusGMethodInvocation *context)
-@@ -114,7 +116,7 @@ static void prepare_callback(GtkWidget *
- 				GtkWidget *page, gpointer data)
- {
- 	if (page == page_search) {
--		bluetooth_client_discover_devices(client, NULL);
-+		bluetooth_device_start_discovery(BLUETOOTH_DEVICE_SELECTION(selector));
- 		return;
- 	}
- 
-@@ -312,7 +314,6 @@ static void select_callback(BluetoothDev
- static void create_search(GtkWidget *assistant)
- {
- 	GtkWidget *vbox;
--	GtkWidget *selector;
- 
- 	vbox = create_vbox(assistant, GTK_ASSISTANT_PAGE_CONTENT,
- 				_("Device search"),
-Index: common/bluetooth-device-selection.c
+Index: bluetooth-device-selection.c
 ===================================================================
 RCS file: /cvsroot/bluez/gnome/common/bluetooth-device-selection.c,v
 retrieving revision 1.4
 diff -u -p -r1.4 bluetooth-device-selection.c
---- common/bluetooth-device-selection.c	26 Jul 2007 19:39:01 -0000	1.4
-+++ common/bluetooth-device-selection.c	27 Jul 2007 15:26:29 -0000
+--- bluetooth-device-selection.c	26 Jul 2007 19:39:01 -0000	1.4
++++ bluetooth-device-selection.c	27 Jul 2007 09:14:28 -0000
 @@ -53,9 +53,12 @@ struct _BluetoothDeviceSelectionPrivate 
  	GtkTreeModel *model;
  	GtkWidget *label;
@@ -262,13 +217,13 @@ diff -u -p -r1.4 bluetooth-device-selection.c
  }
  
  GtkWidget *
-Index: common/bluetooth-device-selection.h
+Index: bluetooth-device-selection.h
 ===================================================================
 RCS file: /cvsroot/bluez/gnome/common/bluetooth-device-selection.h,v
 retrieving revision 1.2
 diff -u -p -r1.2 bluetooth-device-selection.h
---- common/bluetooth-device-selection.h	25 Jul 2007 18:01:44 -0000	1.2
-+++ common/bluetooth-device-selection.h	27 Jul 2007 15:26:29 -0000
+--- bluetooth-device-selection.h	25 Jul 2007 18:01:44 -0000	1.2
++++ bluetooth-device-selection.h	27 Jul 2007 09:14:29 -0000
 @@ -58,6 +58,7 @@ GType bluetooth_device_selection_get_typ
  
  GtkWidget *bluetooth_device_selection_new (const gchar *title);
@@ -277,13 +232,13 @@ diff -u -p -r1.2 bluetooth-device-selection.h
  
  G_END_DECLS
  
-Index: common/client.c
+Index: client.c
 ===================================================================
 RCS file: /cvsroot/bluez/gnome/common/client.c,v
 retrieving revision 1.19
 diff -u -p -r1.19 client.c
---- common/client.c	26 Jul 2007 19:39:01 -0000	1.19
-+++ common/client.c	27 Jul 2007 15:26:30 -0000
+--- client.c	26 Jul 2007 19:39:01 -0000	1.19
++++ client.c	27 Jul 2007 09:14:29 -0000
 @@ -50,6 +50,13 @@ struct _BluetoothClientPrivate {
  	gboolean registered;
  };
@@ -339,20 +294,7 @@ diff -u -p -r1.19 client.c
  	setup_dbus();
  
  	setup_manager();
-@@ -640,6 +667,12 @@ gboolean bluetooth_client_create_bonding
- 	GtkTreeIter iter;
- 	gboolean cont;
- 
-+	if (adapter == NULL)
-+		adapter = default_adapter;
-+
-+	if (adapter == NULL)
-+		return FALSE;
-+
- 	cont = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter);
- 
- 	while (cont == TRUE) {
-@@ -684,8 +717,18 @@ gboolean bluetooth_client_discover_devic
+@@ -684,8 +711,18 @@ gboolean bluetooth_client_discover_devic
  						COLUMN_OBJECT, &object, -1);
  
  		if (g_ascii_strcasecmp(path, adapter) == 0) {
@@ -371,13 +313,13 @@ diff -u -p -r1.19 client.c
  			return TRUE;
  		}
  
-Index: common/client.h
+Index: client.h
 ===================================================================
 RCS file: /cvsroot/bluez/gnome/common/client.h,v
 retrieving revision 1.13
 diff -u -p -r1.13 client.h
---- common/client.h	26 Jul 2007 19:39:01 -0000	1.13
-+++ common/client.h	27 Jul 2007 15:26:30 -0000
+--- client.h	26 Jul 2007 19:39:01 -0000	1.13
++++ client.h	27 Jul 2007 09:14:29 -0000
 @@ -51,6 +51,8 @@ struct _BluetoothClient {
  
  struct _BluetoothClientClass {
@@ -388,7 +330,7 @@ diff -u -p -r1.13 client.h
  
  GType bluetooth_client_get_type(void);
 
---=-fM1MzbCzl8dx8zXCXXU6
+--=-6BPHY6nMNtPjFM5qgSee
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -399,7 +341,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---=-fM1MzbCzl8dx8zXCXXU6
+--=-6BPHY6nMNtPjFM5qgSee
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -410,4 +352,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-fM1MzbCzl8dx8zXCXXU6--
+--=-6BPHY6nMNtPjFM5qgSee--
