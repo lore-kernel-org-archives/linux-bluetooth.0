@@ -1,17 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1185556171.13228.26.camel@violet>
-References: <1185475756.3641.329.camel@cookie.hadess.net>
-	<1185481079.3641.339.camel@cookie.hadess.net>
-	<1185527921.2848.1.camel@cookie.hadess.net>
-	<1185550243.2848.46.camel@cookie.hadess.net>
-	<1185556171.13228.26.camel@violet>
-Date: Fri, 27 Jul 2007 19:39:32 +0100
-Message-Id: <1185561572.2848.54.camel@cookie.hadess.net>
+To: BlueZ Hackers <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1185560447.13228.28.camel@violet>
+References: <1185560447.13228.28.camel@violet>
+Date: Fri, 27 Jul 2007 19:36:41 +0100
+Message-Id: <1185561401.2848.52.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH]
-	bluez-gnome:	"search"	button	for	the	device selection
+Subject: Re: [Bluez-devel] [BlueZ-Announce] Release of bluez-hcidump-1.38
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,14 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Fri, 2007-07-27 at 19:09 +0200, Marcel Holtmann wrote:
-<snip>
-> patch has been applied. However I am not okay with some of the callback
-> names, but we can fix that later.
+On Fri, 2007-07-27 at 20:20 +0200, Marcel Holtmann wrote:
+> Hi Folks,
+> 
+> I released a new version of the hcidump package. This version adds
+> support for daemon mode that allows to access HCI protocol traffic over
+> the network.
+> 
+> The sources can be found at http://www.bluez.org/download.html
 
-Let me know what you want renamed to what, and I'll fix it up.
-
-Thanks for the quick review
+When people package the next version of bluez-gnome, should they make it
+have a dependency on that version of bluez-hcidump, to get the analyser
+working?
 
 -- 
 Bastien Nocera <hadess@hadess.net> 
