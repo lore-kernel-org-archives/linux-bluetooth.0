@@ -1,19 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1185562953.13228.32.camel@violet>
-References: <1185475756.3641.329.camel@cookie.hadess.net>
-	<1185481079.3641.339.camel@cookie.hadess.net>
-	<1185527921.2848.1.camel@cookie.hadess.net>
-	<1185550243.2848.46.camel@cookie.hadess.net>
-	<1185556171.13228.26.camel@violet>
-	<1185561572.2848.54.camel@cookie.hadess.net>
-	<1185562953.13228.32.camel@violet>
-Date: Fri, 27 Jul 2007 20:41:44 +0100
-Message-Id: <1185565304.2848.56.camel@cookie.hadess.net>
+In-Reply-To: <1185561401.2848.52.camel@cookie.hadess.net>
+References: <1185560447.13228.28.camel@violet>
+	<1185561401.2848.52.camel@cookie.hadess.net>
+Date: Fri, 27 Jul 2007 21:03:38 +0200
+Message-Id: <1185563018.13228.34.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel]
-	[PATCH]	bluez-gnome:	"search"	button	for	the	device selection
+Subject: Re: [Bluez-devel] [BlueZ-Announce] Release of bluez-hcidump-1.38
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -27,27 +21,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Fri, 2007-07-27 at 21:02 +0200, Marcel Holtmann wrote:
-> Hi Hadess,
-> 
-> > > patch has been applied. However I am not okay with some of the callback
-> > > names, but we can fix that later.
+Hi Bastien,
+
+> > I released a new version of the hcidump package. This version adds
+> > support for daemon mode that allows to access HCI protocol traffic over
+> > the network.
 > > 
-> > Let me know what you want renamed to what, and I'll fix it up.
+> > The sources can be found at http://www.bluez.org/download.html
 > 
-> I disabled the search button support. I crashes the applet. Main issue
-> is your handling of starting and stopping discover process and then
-> listening for the complete signal to change the button state. That is
-> wrong we have to track the state for an adapter being in discovery or
-> not inside the tree model. Otherwise we end up with a lot of race
-> condition. We also need to check if an adapter is already running a
-> discovery or is using periodic inquiry.
+> When people package the next version of bluez-gnome, should they make it
+> have a dependency on that version of bluez-hcidump, to get the analyser
+> working?
 
-How else do you want to implement it? What's the backtrace from the
-applet that you've seen?
+no. The analyzer works perfectly fine without hcidump. It can still read
+binary trace files. It is only an extra option for people that do want
+live import.
 
--- 
-Bastien Nocera <hadess@hadess.net> 
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
