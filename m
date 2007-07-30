@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46AE7340.4010603@gmail.com>
-Date: Mon, 30 Jul 2007 20:24:48 -0300
-From: Manuel Naranjo <naranjo.manuel@gmail.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] a2dp, sco and kernel version
+In-Reply-To: <0537279F-C314-4CED-A04C-28B306778F87@pi4.informatik.uni-mannheim.de>
+References: <0537279F-C314-4CED-A04C-28B306778F87@pi4.informatik.uni-mannheim.de>
+Date: Mon, 30 Jul 2007 20:57:12 +0200
+Message-Id: <1185821832.5868.142.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] How to bypass inquiry cache?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,31 +20,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello guys,
+Hi Andreas,
 
-After a long time without trying my headset under linux. Yesterday I 
-grabbed the last plugz and sbc as told here: 
-http://bluetooth-alsa.sourceforge.net/build.html with this and by using 
-Mandriva 2007.1 with kernel: 2.6.17-13mdv I got a much more improved 
-quality audio when using a2dp. Now I really get sound in HiFi.
+> How can I perform non-standard inquiries without caching?
+> 
+> I am using an HCI socket to start my inquiry but the results somehow  
+> appear to be cached - i.e. the RSSI doesn't change although it  
+> should, but does after I re-plug the dongle.
+> 
+> We tried setting the two maximum cache age defines in hci_core.c to  
+> zero but this made the whole inquiry run forever apparently.
+> 
+> Where in the kernel code is such caching handled? I only found the  
+> cache maintenance functions and inquiry ioctl handling in hci_core.*,  
+> the  cache updating in hci_event.c and one other reference to the  
+> cache limit in hci_conn.c - neither of those appeared to override the  
+> value returned to userland so I must've missed something...
 
-Then as I was enthusiastic I wanted to test the headsetd daemon, but I 
-can't get it to work. When running from mplayer I get this error:
-alsa-lib: pcm_sco.c:277:(sco_headset_hw_params) Unable to set number of 
-SCO buffers : please upgrade your Kernel !
+simply use the D-Bus API for scanning. It does all you want.
 
-So as I'm used to this stuff I downloaded the latest kernel I got 2.6.22 
-patched by mandriva, I compiled but now It's not only sco the one that's 
-not working, even a2dpd works awfully no, it sounds crappy and 
-disconnects from the headset all the time. Same happens when I compile a 
-vanilla 2.6.22-1 kernel.
+Regards
 
-Finally I compiled snd-bt-sco in my original kernel (2.6.17-13mdv) and I 
-got sco working. But with a very low quality of audio. So my question 
-is... How should I update my kernel?
+Marcel
 
-Cheers,
-Manuel
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
