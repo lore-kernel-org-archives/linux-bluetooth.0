@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Adam Tauno Williams <adam@morrison-ind.com>
-To: bluez-users@lists.sourceforge.net
-Date: Mon, 30 Jul 2007 15:37:25 -0400
-Message-Id: <1185824245.11755.5.camel@aleph.whitemice.org>
-Mime-Version: 1.0
-Subject: [Bluez-users] Palm Treo Pairing Problem (openSUSE 10.2)
-Reply-To: adam@morrison-ind.com,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <46ADD822.6040302@yandex.ru>
+Date: Mon, 30 Jul 2007 16:22:58 +0400
+From: Irakli Tsagareli <itsagareli@yandex.ru>
+MIME-Version: 1.0
+To: BlueZ users <bluez-users@lists.sourceforge.net>, dm@belkam.com
+References: <46ADD0F9.4010501@belkam.com>
+In-Reply-To: <46ADD0F9.4010501@belkam.com>
+Subject: Re: [Bluez-users] athentification problem
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -15,126 +16,141 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1298928373=="
+Content-Type: multipart/mixed; boundary="===============0115263658=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+--===============0115263658==
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
---===============1298928373==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="=-Iwu5JQpV6wd6dQO0rh2z"
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+</head>
+<body bgcolor="#ffffff" text="#000000">
+Maybe it is not authentification problem. hcidump says "Connection
+refused - no resources available". first try to browse GPS device for
+available channels:<br>
+<br>
+$hcitool scan<br>
+Scanning ...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 00:0B:0D:87:14:29&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; G-Rays2<br>
+$sdptool browse 00:0B:0D:87:14:29<br>
+Browsing 00:0B:0D:87:14:29 ...<br>
+Service Name: SPP slave<br>
+Service Description: Bluetooth SPP V1.03<br>
+Service RecHandle: 0x10000<br>
+Service Class ID List:<br>
+&nbsp; "Serial Port" (0x1101)<br>
+Protocol Descriptor List:<br>
+&nbsp; "L2CAP" (0x0100)<br>
+&nbsp; "RFCOMM" (0x0003)<br>
+&nbsp;&nbsp;&nbsp; Channel: 1<br>
+Language Base Attr List:<br>
+&nbsp; code_ISO639: 0x656e<br>
+&nbsp; encoding:&nbsp;&nbsp;&nbsp; 0x6a<br>
+&nbsp; base_offset: 0x100<br>
+<br>
+so my device has only one channel at all. then try to connect with
+specified channel number: <br>
+$rfcomm connect 0 00:0B:0D:87:14:29 1<br>
+Press CTRL-C for hangup<br>
+<br>
+OK, I'm connected. this will connect 00:0B:0D:87:14:29-s channel 1 to
+/dev/rfcomm0<br>
+<br>
+<br>
+Dmitry Melekhov wrote:
+<blockquote cite="mid:46ADD0F9.4010501@belkam.com" type="cite">
+  <pre wrap="">Hello!
+
+My colleague tries to connect gps device over bluethooth.
+He uses ubuntu 7.04
+
+He starts
+
+$ passkey-agent --default 0000
+
+Then
+
+$ sudo rfcomm connect 00:15:7F:00:4F:0C
+Can't connect RFCOMM socket: Connection refused
+
+&lt; HCI Command: Create Connection (0x01|0x0005) plen 13
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">HCI Event: Command Status (0x0f) plen 4
+HCI Event: Connect Complete (0x03) plen 11
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->&lt; ACL data: handle 1 flags 0x02 dlen 12
+   L2CAP(s): Connect req: psm 3 scid 0x0040
+&lt; HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">HCI Event: Command Status (0x0f) plen 4
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->&lt; HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">HCI Event: Command Complete (0x0e) plen 6
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->&lt; HCI Command: Remote Name Request (0x01|0x0019) plen 10
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">HCI Event: Number of Completed Packets (0x13) plen 5
+HCI Event: Command Status (0x0f) plen 4
+HCI Event: Max Slots Change (0x1b) plen 3
+ACL data: handle 1 flags 0x02 dlen 16
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->   L2CAP(s): Connect rsp: dcid 0x01fd scid 0x0040 result 1 status 2
+     Connection pending - Authorization pending
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">HCI Event: Connection Packet Type Changed (0x1d) plen 5
+HCI Event: Read Remote Supported Features (0x0b) plen 11
+HCI Event: Remote Name Req Complete (0x07) plen 255
+ACL data: handle 1 flags 0x02 dlen 16
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->   L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0040 result 4 status 0
+     Connection refused - no resources available
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">HCI Event: Disconn Complete (0x05) plen 4
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+
+l2ping works OK.
+
+He also tried to compile latest bluez code and have the same result.
+
+Could you help us?
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now &gt;&gt;  <a class="moz-txt-link-freetext" href="http://get.splunk.com/">http://get.splunk.com/</a>
+_______________________________________________
+Bluez-users mailing list
+<a class="moz-txt-link-abbreviated" href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a>
+<a class="moz-txt-link-freetext" href="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users</a>
+
+  </pre>
+</blockquote>
+<br>
+</body>
+</html>
 
 
---=-Iwu5JQpV6wd6dQO0rh2z
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-
-openSUSE 10.2
----------------
-bluez-cups-3.7-29
-bluez-utils-3.7-29.2
-bluez-firmware-1.2-20
-bluez-gnome-0.6-7
-bluez-libs-3.7-14.1
-bluez-hcidump-1.33-8
-
-I have used bluetooth/LINUX in the past;  but now I'm utterly unable to
-pair devices (Palm Treo and a USB Blueetooth dongle).  I've used this
-dongle on other machines and successfully paired.  The devices see each
-other but no matter what the PIN code I enter on the Palm results in
-"Unable to add Aleph to your trusted device list"
-
-awilliam@aleph:~> cat /etc/bluetooth/hcid.conf
-device {
-        iscan disable;
-        pscan disable;
-
-        name "Aleph";
-        class 0x120100;
-        lm accept;
-        lp rswitch,hold,sniff,park;
-        auth enable;
-        encrypt disable;
-
-}
-options {
-        security auto;
-        passkey "000000";
-        pairing multi;
-        autoinit yes;
-}
-
-
-aleph:/home/awilliam # /usr/sbin/hciconfig -a hci0
-hci0:   Type: USB
-        BD Address: 00:02:72:C2:28:BA ACL MTU: 377:10 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN=20
-        RX bytes:1377 acl:0 sco:0 events:45 errors:0
-        TX bytes:458 acl:0 sco:0 commands:31 errors:0
-        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3=20
-        Link policy: RSWITCH HOLD SNIFF PARK=20
-        Link mode: SLAVE ACCEPT=20
-        Name: 'Aleph'
-        Class: 0x70010c
-        Service Classes: Object Transfer, Audio, Telephony
-        Device Class: Computer, Laptop
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x14 LMP Ver: 1.2 (0x2) LMP Subver:
-0x309
-        Manufacturer: Broadcom Corporation (15)
-
-aleph:/home/awilliam # hcitool scan
-Scanning ...
-        00:07:E0:C2:C4:83       Scott Timmer
-aleph:/home/awilliam # l2ping 00:07:E0:C2:C4:83
-Ping: 00:07:E0:C2:C4:83 from 00:02:72:C2:28:BA (data size 44) ...
-no response from 00:07:E0:C2:C4:83: id 0
-0 bytes from 00:07:E0:C2:C4:83 id 1 time 19.97ms
-0 bytes from 00:07:E0:C2:C4:83 id 2 time 30.44ms
-0 bytes from 00:07:E0:C2:C4:83 id 3 time 30.41ms
-0 bytes from 00:07:E0:C2:C4:83 id 4 time 133.39ms
-0 bytes from 00:07:E0:C2:C4:83 id 5 time 29.35ms
-0 bytes from 00:07:E0:C2:C4:83 id 6 time 24.34ms
-0 bytes from 00:07:E0:C2:C4:83 id 7 time 25.30ms
-0 bytes from 00:07:E0:C2:C4:83 id 8 time 28.29ms
-0 bytes from 00:07:E0:C2:C4:83 id 9 time 42.27ms
-0 bytes from 00:07:E0:C2:C4:83 id 10 time 17.24ms
-0 bytes from 00:07:E0:C2:C4:83 id 11 time 24.21ms
-0 bytes from 00:07:E0:C2:C4:83 id 12 time 27.17ms
-0 bytes from 00:07:E0:C2:C4:83 id 13 time 31.15ms
-0 bytes from 00:07:E0:C2:C4:83 id 14 time 26.12ms
-0 bytes from 00:07:E0:C2:C4:83 id 15 time 25.09ms
-0 bytes from 00:07:E0:C2:C4:83 id 16 time 26.07ms
-0 bytes from 00:07:E0:C2:C4:83 id 17 time 12.06ms
-18 sent, 17 received, 5% loss
-aleph:/home/awilliam #=20
-
-All I see in the log is "Jul 30 15:31:46 aleph hcid[10209]:
-pin_code_request (sba=3D00:02:72:C2:28:BA, dba=3D00:07:E0:C2:C4:83)" when I
-try to pair from the Palm.
---=20
-Adam Tauno Williams, Systems & Network Administrator
-Michigan Open Source Group - http://www.mosg.org
-Whitemice Consulting - http://www.whitemiceconsulting.com
-
---=-Iwu5JQpV6wd6dQO0rh2z
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (GNU/Linux)
-
-iD8DBQBGrj31LRePpNle04MRAtR7AJ9MnhLYLhncTZeFPFsURmWQxTgqtwCfbyHc
-sCBsa34RftoxEdz/NpHc1HU=
-=/XsO
------END PGP SIGNATURE-----
-
---=-Iwu5JQpV6wd6dQO0rh2z--
-
-
-
---===============1298928373==
+--===============0115263658==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -145,7 +161,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============1298928373==
+--===============0115263658==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -156,4 +172,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1298928373==--
+--===============0115263658==--
