@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <46AEBEEE.6090704@belkam.com>
-Date: Tue, 31 Jul 2007 09:47:42 +0500
-From: Dmitry Melekhov <dm@belkam.com>
+Message-ID: <46AE782C.4070205@theforce.com.au>
+Date: Tue, 31 Jul 2007 09:45:48 +1000
+From: Grahame Jordan <gbj@theforce.com.au>
 MIME-Version: 1.0
-To: Irakli Tsagareli <itsagareli@yandex.ru>
-References: <46ADD0F9.4010501@belkam.com> <46ADD822.6040302@yandex.ru>
-In-Reply-To: <46ADD822.6040302@yandex.ru>
-Cc: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] athentification problem
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Bluetooth not always connecting
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,32 +14,42 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SXJha2xpIFRzYWdhcmVsaSDQv9C40YjQtdGCOgo+IE1heWJlIGl0IGlzIG5vdCBhdXRoZW50aWZp
-Y2F0aW9uIHByb2JsZW0uIGhjaWR1bXAgc2F5cyAiQ29ubmVjdGlvbgo+IHJlZnVzZWQgLSBubyBy
-ZXNvdXJjZXMgYXZhaWxhYmxlIi4gZmlyc3QgdHJ5IHRvIGJyb3dzZSBHUFMgZGV2aWNlIGZvcgo+
-IGF2YWlsYWJsZSBjaGFubmVsczoKPgo+CgpIZWxsbyEKCldlIHRyeSB0byBjb25uZWN0IHRvIGNo
-YW5uZWwgMS4uLgoKJCBzZHB0b29sCnNkcHRvb2wgLSBTRFAgdG9vbCB2My45CgokIHNkcHRvb2wg
-YnJvd3NlIDAwOjE1OjdGOjAwOjRGOjBDCkJyb3dzaW5nIDAwOjE1OjdGOjAwOjRGOjBDIC4uLgoK
-JCBzZHB0b29sIHJlY29yZHMgMDA6MTU6N0Y6MDA6NEY6MEMKU2VydmljZSBOYW1lOiBTUFAgc2xh
-dmUKU2VydmljZSBSZWNIYW5kbGU6IDB4MTAwMDAKU2VydmljZSBDbGFzcyBJRCBMaXN0OgogICJT
-ZXJpYWwgUG9ydCIgKDB4MTEwMSkKUHJvdG9jb2wgRGVzY3JpcHRvciBMaXN0OgogICJMMkNBUCIg
-KDB4MDEwMCkKICAiUkZDT01NIiAoMHgwMDAzKQogICBDaGFubmVsOiAxCgokIHBhc3NrZXktYWdl
-bnQgLS1kZWZhdWx0IDAwMDAKCiQgdGFpbCAvdmFyL2xvZy9zeXNsb2cKSnVsIDMxIDA5OjExOjIw
-IHRvbWNhdCBoY2lkWzE2MTA4XTogRGVmYXVsdCBwYXNza2V5IGFnZW50ICg6MS4xNiwKL29yZy9i
-bHVlei9wYXNza2V5X2FnZW50XzE4MDA5KSByZWdpc3RlcmVkCgokIGNhdCAvZXRjL2JsdWV0b290
-aC9yZmNvbW0uY29uZgpyZmNvbW0wIHsKICAgICAgICBiaW5kIHllczsKICAgICAgICBkZXZpY2Ug
-MDA6MTU6N0Y6MDA6NEY6MEM7CiAgICAgICAgY2hhbm5lbCAxOwp9CgokIHJmY29tbSBjb25uZWN0
-IDAgMDA6MTU6N0Y6MDA6NEY6MEMgMQpDYW4ndCBjb25uZWN0IFJGQ09NTSBzb2NrZXQ6IENvbm5l
-Y3Rpb24gcmVmdXNlZAoKCgoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMg
-c3BvbnNvcmVkIGJ5OiBTcGx1bmsgSW5jLgpTdGlsbCBncmVwcGluZyB0aHJvdWdoIGxvZyBmaWxl
-cyB0byBmaW5kIHByb2JsZW1zPyAgU3RvcC4KTm93IFNlYXJjaCBsb2cgZXZlbnRzIGFuZCBjb25m
-aWd1cmF0aW9uIGZpbGVzIHVzaW5nIEFKQVggYW5kIGEgYnJvd3Nlci4KRG93bmxvYWQgeW91ciBG
-UkVFIGNvcHkgb2YgU3BsdW5rIG5vdyA+PiAgaHR0cDovL2dldC5zcGx1bmsuY29tLwpfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei11c2VycyBtYWls
-aW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMu
-c291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
+Hi,
+
+I have a problem when I am connecting between a Linux Ubuntu PC and a 
+Gumstix.
+I have set the PC to GN
+PAND_OPTIONS="--listen --role GN"
+lm master;
+
+On the Gumstix
+PAND_OPTIONS="--role PANU --service GN --search --persist"
+lm accept;
+
+Sometimes the Gumstix connects to the PC OK but other times it refuses 
+to connect.
+To get it to connect I need to manually run l2ping [address]
+
+I am using the standard kernel on ubuntu 2.6.20-16-generic
+and 2.6.18gum on the Gumstix.
+
+Any help appreciated.
+
+Thanks
+
+Grahame Jordan
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >>  http://get.splunk.com/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
