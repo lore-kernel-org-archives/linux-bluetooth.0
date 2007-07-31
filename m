@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46AF1AD8.2020703@gmail.com>
-Date: Tue, 31 Jul 2007 08:19:52 -0300
-From: Manuel Naranjo <naranjo.manuel@gmail.com>
-MIME-Version: 1.0
+From: Frederic Dalleau <frederic.dalleau@access-company.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46AE7340.4010603@gmail.com>	<1185870706.27218.43.camel@ubuntu.mpl.access-company.com>
-	<1185871920.27218.44.camel@ubuntu.mpl.access-company.com>
-In-Reply-To: <1185871920.27218.44.camel@ubuntu.mpl.access-company.com>
+In-Reply-To: <1185870706.27218.43.camel@ubuntu.mpl.access-company.com>
+References: <46AE7340.4010603@gmail.com>
+	<1185870706.27218.43.camel@ubuntu.mpl.access-company.com>
+Date: Tue, 31 Jul 2007 10:52:00 +0200
+Message-Id: <1185871920.27218.44.camel@ubuntu.mpl.access-company.com>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] a2dp, sco and kernel version
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -17,21 +17,15 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Frederic Dalleau escribi=F3:
->> I'm annoyed by this bug. Several people have been reporting it.
->> It looks like they all uses kernel 2.6.21 and higher.
->>     =
+> I'm annoyed by this bug. Several people have been reporting it.
+> It looks like they all uses kernel 2.6.21 and higher.
 
->
-> I just tested 2.6.22-rc7 and it worked ok :(
-Maybe it's not a matter of which version of the kernel you use, but also =
+I just tested 2.6.22-rc7 and it worked ok :(
 
-in how you have configured it, which modules you have loaded, etc.
-I will check your solution and see how it goes-
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
