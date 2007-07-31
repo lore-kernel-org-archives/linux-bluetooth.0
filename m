@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "leiyu" <leiyu@kcoe.cn>
-To: "Bluez-Users" <bluez-users@lists.sourceforge.net>
-Date: Tue, 31 Jul 2007 15:05:52 +0800
-Message-ID: <EJENLMBEOLKAMCJFBFMDGEDOCAAA.leiyu@kcoe.cn>
+Message-ID: <46AEDD20.5010907@belkam.com>
+Date: Tue, 31 Jul 2007 11:56:32 +0500
+From: Dmitry Melekhov <dm@belkam.com>
 MIME-Version: 1.0
-In-Reply-To: <EJENLMBEOLKAMCJFBFMDOEDMCAAA.leiyu@kcoe.cn>
-Subject: [Bluez-users]
-	=?gb2312?B?UkWjumNyb3NzLWNvbXBpbGUgYmx1ZXotdXRpbHMtMy45?=
+To: Irakli Tsagareli <itsagareli@yandex.ru>
+References: <46ADD0F9.4010501@belkam.com> <46ADD822.6040302@yandex.ru>
+	<46AEBEEE.6090704@belkam.com>
+In-Reply-To: <46AEBEEE.6090704@belkam.com>
+Cc: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] athentification problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,54 +18,36 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0142779232=="
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0142779232==
-Content-Type: text/plain;
-	charset="gb2312"
-Content-Transfer-Encoding: base64
-
-RGVhciBBbGwsDQoNCkkgaGF2ZSBmaXhlZCBiZWxvdyBwcm9ibGVtIGJ5IE1hbnVlbCdzIGhlbHAN
-CnNkcC14bWwuYzozNjoyNzogYmx1ZXRvb3RoL3NkcC5oOiBubyBzdWNoIGZpbGUgb3IgZGlyZWN0
-b3J5DQpzZHAteG1sLmM6Mzc6MzE6IGJsdWV0b290aC9zZHBfbGliLmg6IG5vIHN1Y2ggZmlsZSBv
-ciBkaXJlY3RvcnkgDQoNCmJ1dCBpdCBwcm9tcHQgdGhhdCBpdCBjYW4gbm90IGZpbmQgZGJ1cyBs
-aWJyYXJ5IGFmdGVyd2FyZHMNCg0KV2wsL2JsdWV6L2JsdWV6LWxpYnMvbGliIC1XbCwtLXJwYXRo
-IC1XbCwvYmx1ZXovYmx1ZXotbGlicy9saWINCi91c3IvbG9jYWwvYXJtLzMuMy4yL2xpYi9nY2Mt
-bGliL2FybS1saW51eC8zLjMuMi8uLi8uLi8uLi8uLi9hcm0tbGludXgvYmluL2xkOiBjYW5ub3Qg
-ZmluZCAtbGRidXMtMQ0KY29sbGVjdDI6IGxkIHJldHVybmVkIDEgZXhpdCBzdGF0dXMNCm1ha2Vb
-M106ICoqKiBbaGNpZF0gRXJyb3IgMQ0KbWFrZVszXTogTGVhdmluZyBkaXJlY3RvcnkgYC9ibHVl
-ei9ibHVlei11dGlscy0zLjkvaGNpZCcNCm1ha2VbMl06ICoqKiBbYWxsXSBFcnJvciAyDQptYWtl
-WzJdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL2JsdWV6L2JsdWV6LXV0aWxzLTMuOS9oY2lkJw0KbWFr
-ZVsxXTogKioqIFthbGwtcmVjdXJzaXZlXSBFcnJvciAxDQptYWtlWzFdOiBMZWF2aW5nIGRpcmVj
-dG9yeSBgL2JsdWV6L2JsdWV6LXV0aWxzLTMuOScNCg0KSSBhbHJlYWR5IGluc3RhbGwgZGJ1cy0x
-LjAuMiB3aXRoIHN0YW5kYXJkIHBhdGggIi91c3IiICwgYnV0IGl0IG1lZXQgc2FtZSBwcm9ibGVt
-IGFzIGFib3ZlLCANCk1heSAgeW91IGhlbHAgbWU/IHRoYW5rcyB2ZXJ5IG11Y2gNCg0KQmVzdCBy
-ZWdhcmRzLA0KTGVpeXU=
-
-
-
---===============0142779232==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============0142779232==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0142779232==--
+RG1pdHJ5IE1lbGVraG92INC/0LjRiNC10YI6Cj4gSXJha2xpIFRzYWdhcmVsaSDQv9C40YjQtdGC
+Ogo+ICAgCj4+IE1heWJlIGl0IGlzIG5vdCBhdXRoZW50aWZpY2F0aW9uIHByb2JsZW0uIGhjaWR1
+bXAgc2F5cyAiQ29ubmVjdGlvbgo+PiByZWZ1c2VkIC0gbm8gcmVzb3VyY2VzIGF2YWlsYWJsZSIu
+IGZpcnN0IHRyeSB0byBicm93c2UgR1BTIGRldmljZSBmb3IKPj4gYXZhaWxhYmxlIGNoYW5uZWxz
+Ogo+Pgo+Pgo+PiAgICAgCj4KPiAgIApidHcsIHdlIGp1c3QgdGVzdGVkIHBhaXJpbmcgZnJvbSB3
+aW5kb3dzIGFuZCBhbGwgd29ya3MgT0suCgo+IEhlbGxvIQo+Cj4gV2UgdHJ5IHRvIGNvbm5lY3Qg
+dG8gY2hhbm5lbCAxLi4uCj4KPiAkIHNkcHRvb2wKPiBzZHB0b29sIC0gU0RQIHRvb2wgdjMuOQo+
+Cj4gJCBzZHB0b29sIGJyb3dzZSAwMDoxNTo3RjowMDo0RjowQwo+IEJyb3dzaW5nIDAwOjE1OjdG
+OjAwOjRGOjBDIC4uLgo+Cj4gJCBzZHB0b29sIHJlY29yZHMgMDA6MTU6N0Y6MDA6NEY6MEMKPiBT
+ZXJ2aWNlIE5hbWU6IFNQUCBzbGF2ZQo+IFNlcnZpY2UgUmVjSGFuZGxlOiAweDEwMDAwCj4gU2Vy
+dmljZSBDbGFzcyBJRCBMaXN0Ogo+ICAgIlNlcmlhbCBQb3J0IiAoMHgxMTAxKQo+IFByb3RvY29s
+IERlc2NyaXB0b3IgTGlzdDoKPiAgICJMMkNBUCIgKDB4MDEwMCkKPiAgICJSRkNPTU0iICgweDAw
+MDMpCj4gICAgQ2hhbm5lbDogMQo+Cj4gJCBwYXNza2V5LWFnZW50IC0tZGVmYXVsdCAwMDAwCj4K
+PiAkIHRhaWwgL3Zhci9sb2cvc3lzbG9nCj4gSnVsIDMxIDA5OjExOjIwIHRvbWNhdCBoY2lkWzE2
+MTA4XTogRGVmYXVsdCBwYXNza2V5IGFnZW50ICg6MS4xNiwKPiAvb3JnL2JsdWV6L3Bhc3NrZXlf
+YWdlbnRfMTgwMDkpIHJlZ2lzdGVyZWQKPgo+ICQgY2F0IC9ldGMvYmx1ZXRvb3RoL3JmY29tbS5j
+b25mCj4gcmZjb21tMCB7Cj4gICAgICAgICBiaW5kIHllczsKPiAgICAgICAgIGRldmljZSAwMDox
+NTo3RjowMDo0RjowQzsKPiAgICAgICAgIGNoYW5uZWwgMTsKPiB9Cj4KPiAkIHJmY29tbSBjb25u
+ZWN0IDAgMDA6MTU6N0Y6MDA6NEY6MEMgMQo+IENhbid0IGNvbm5lY3QgUkZDT01NIHNvY2tldDog
+Q29ubmVjdGlvbiByZWZ1c2VkCj4KPgo+Cj4KPgo+ICAgCgoKCi0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhp
+cyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBTcGx1bmsgSW5jLgpTdGlsbCBncmVwcGlu
+ZyB0aHJvdWdoIGxvZyBmaWxlcyB0byBmaW5kIHByb2JsZW1zPyAgU3RvcC4KTm93IFNlYXJjaCBs
+b2cgZXZlbnRzIGFuZCBjb25maWd1cmF0aW9uIGZpbGVzIHVzaW5nIEFKQVggYW5kIGEgYnJvd3Nl
+ci4KRG93bmxvYWQgeW91ciBGUkVFIGNvcHkgb2YgU3BsdW5rIG5vdyA+PiAgaHR0cDovL2dldC5z
+cGx1bmsuY29tLwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+XwpCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2Uu
+bmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVz
+ZXJzCg==
