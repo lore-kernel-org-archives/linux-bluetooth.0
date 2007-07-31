@@ -1,93 +1,50 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <9855f77c0706011039yd1efcfen51243a88644c5f57@mail.gmail.com>
-Date: Fri, 1 Jun 2007 13:39:09 -0400
-From: "Viswanadha Shashank" <viswanadha.shashank@gmail.com>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <9855f77c0705292042w6b174b39y6f5598983e9d3616@mail.gmail.com>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <46AF7DF4.8010701@gmail.com>
+Date: Tue, 31 Jul 2007 15:22:44 -0300
+From: Manuel Naranjo <naranjo.manuel@gmail.com>
 MIME-Version: 1.0
-References: <9855f77c0705292042w6b174b39y6f5598983e9d3616@mail.gmail.com>
-Subject: Re: [Bluez-users] CSR Chipset
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0746909186=="
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <46AE7340.4010603@gmail.com>	<1185870706.27218.43.camel@ubuntu.mpl.access-company.com>	<1185871920.27218.44.camel@ubuntu.mpl.access-company.com>	<46AF1AD8.2020703@gmail.com>
+	<2d5a2c100707310929h1d8d48d3y5c26561c8d35cedd@mail.gmail.com>
+In-Reply-To: <2d5a2c100707310929h1d8d48d3y5c26561c8d35cedd@mail.gmail.com>
+Subject: Re: [Bluez-devel] a2dp, sco and kernel version
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="iso-8859-1"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0746909186==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_7130_33268191.1180719549635"
-
-------=_Part_7130_33268191.1180719549635
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-does someone have ny clue abt this ?? if so plz respond .. thanks
-
-On 5/29/07, Viswanadha Shashank <viswanadha.shashank@gmail.com> wrote:
+Luiz Augusto von Dentz escribi=F3:
+> I had the exactly same problem, only when
+> --enable-retrypatch=3Dyes is set I able to listen the stream
+> without any problem.
 >
-> Hi ,
->
->     I am doing a project where I am trying to establish a voice
-> channel between the host computer and the mobile handset. During the
-> call between the host and the handset I am able to read through the
-> SCO socket on the bluetooth adapter but not able to write to it. I am
-> currently using silicon wave chipset, could this be a possible problem
-> for this ? Please suggest what kind of a chipset to use and if
-> possible the best manufacturer too. Thanks
->
-> --
-> Warm Regards,
-> Shashank
->
+> btw, Im using 2.6.22-8 (ubuntu gutsy)
+>   =
 
+That didn't work for me. I don't know what's wrong now.
+Now I don't get disconnected, but my headset gets pieces of streams but =
 
+with a higher frequency than the original sound, and I get spaces =
 
--- 
-Warm Regards,
-Shashank
-
-------=_Part_7130_33268191.1180719549635
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-does someone have ny clue abt this ?? if so plz respond .. thanks <br><br>
-<div><span class="gmail_quote">On 5/29/07, <b class="gmail_sendername">Viswanadha Shashank</b> &lt;<a href="mailto:viswanadha.shashank@gmail.com">viswanadha.shashank@gmail.com</a>&gt; wrote:</span>
-<blockquote class="gmail_quote" style="PADDING-LEFT: 1ex; MARGIN: 0px 0px 0px 0.8ex; BORDER-LEFT: #ccc 1px solid">Hi ,<br><br>&nbsp;&nbsp;&nbsp;&nbsp;I am doing a project where I am trying to establish a voice<br>channel between the host computer and the mobile handset. During the
-<br>call between the host and the handset I am able to read through the<br>SCO socket on the bluetooth adapter but not able to write to it. I am<br>currently using silicon wave chipset, could this be a possible problem<br>
-for this ? Please suggest what kind of a chipset to use and if<br>possible the best manufacturer too. Thanks<br><br>--<br>Warm Regards,<br>Shashank<br></blockquote></div><br><br clear="all"><br>-- <br>Warm Regards,<br>Shashank 
-
-------=_Part_7130_33268191.1180719549635--
-
-
---===============0746909186==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+between those pieces.
+I'll try to debug this a bit and see if I can find anything useful.
+Cheers,
+Manuel
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by DB2 Express
-Download DB2 Express C - the FREE version of DB2 express and take
-control of your XML. No limits. Just data. Click to get it now.
-http://sourceforge.net/powerbar/db2/
---===============0746909186==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >>  http://get.splunk.com/
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0746909186==--
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
