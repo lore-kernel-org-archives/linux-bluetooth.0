@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Frederic Dalleau <frederic.dalleau@access-company.com>
+Message-ID: <46AE8396.1030501@gmail.com>
+Date: Mon, 30 Jul 2007 21:34:30 -0300
+From: Manuel Naranjo <naranjo.manuel@gmail.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <46AE7340.4010603@gmail.com>
 References: <46AE7340.4010603@gmail.com>
-Date: Tue, 31 Jul 2007 10:31:46 +0200
-Message-Id: <1185870706.27218.43.camel@ubuntu.mpl.access-company.com>
-Mime-Version: 1.0
+	<d89ddf300707301726s6e657773td9e83a9dfd6b271d@mail.gmail.com>
+In-Reply-To: <d89ddf300707301726s6e657773td9e83a9dfd6b271d@mail.gmail.com>
 Subject: Re: [Bluez-devel] a2dp, sco and kernel version
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -16,45 +17,41 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Brad Midgley escribi=F3:
+> Manuel
+>
+>   =
 
->  I got a much more improved 
-> quality audio when using a2dp. Now I really get sound in HiFi.
+>> Finally I compiled snd-bt-sco in my original kernel (2.6.17-13mdv) and I
+>> got sco working. But with a very low quality of audio. So my question
+>> is... How should I update my kernel?
+>>     =
 
-The nokia guys at indt fixed the sbc codec to get good quality.
+>
+> sco is fairly low quality in the best circumstances, but it shouldn't
+> be choppy or unintelligible for voice.
+>
+> brad
+>   =
 
-> even a2dpd works awfully no, it sounds crappy and 
-> disconnects from the headset all the time. 
 
-I'm annoyed by this bug. Several people have been reporting it.
-It looks like they all uses kernel 2.6.21 and higher.
+Brad,
+I can talk with it, it sounds good, but off course running at 8Khz will =
 
-A patch has been proposed that you can try by appending
---enable-retrypatch=yes at configure command line. I have not made this
-patch default yet because I think it hides the problem.
+not get a good sound quality (I will not get sounds with a higher frec =
 
-Now technical question :
-A2DPD tries to send each sbc packet at the correct date for playback. To
-do this, it uses gettimeofday at the beginning of the stream and if it
-is too early to send a packet it will wait for the calculated date.
+of 4Khz), but anyway it's not the recommended way to work if I'm not wrong.
+btsco app requires to have the headset all the time connected, killing =
 
-Sometimes, after a few seconds of playing, the  send() returns EAGAIN.
-As if all data were not sent but enqueued, and the queue was full. But
-if I send the packet at right date, this queue should not be full.
-Most probable is the date of packet sending is bad, but I have checked,
-and why would it work with earlier kernels.
-Without the patch, a2dpd will disconnect instead of resending the data.
-This is because if the packet is not sent at right date, the stream is
-interrupted so no matter.
+my batteries, while headsetd isn't so power consuming. That's why I =
 
-Any advice is welcome...
-
-Frederic
-
+wanna know what I'm missing in order to get it running.
+Thanks,
+Manuel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
