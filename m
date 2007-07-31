@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <2d5a2c100707310929h1d8d48d3y5c26561c8d35cedd@mail.gmail.com>
-Date: Tue, 31 Jul 2007 13:29:33 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Message-ID: <e1effdeb0707310734w7004e158te4b82dfea931bb40@mail.gmail.com>
+Date: Tue, 31 Jul 2007 11:34:59 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <46AF1AD8.2020703@gmail.com>
 MIME-Version: 1.0
-References: <46AE7340.4010603@gmail.com>
-	<1185870706.27218.43.camel@ubuntu.mpl.access-company.com>
-	<1185871920.27218.44.camel@ubuntu.mpl.access-company.com>
-	<46AF1AD8.2020703@gmail.com>
-Subject: Re: [Bluez-devel] a2dp, sco and kernel version
+Content-Type: multipart/mixed;
+	boundary="----=_Part_37196_699658.1185892499067"
+Subject: [Bluez-devel] [PATCH]Adapter D-Bus path on raw mode
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,27 +16,110 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I had the exactly same problem, only when
---enable-retrypatch=3Dyes is set I able to listen the stream
-without any problem.
+------=_Part_37196_699658.1185892499067
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-btw, Im using 2.6.22-8 (ubuntu gutsy)
+Hi Marcel,
 
--- =
+here is the patch to avoid register the D-Bus adapter path when the
+RAW flag is active.
 
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+ListAdapters and FindAdapter were fixed too.
+
+Claudio
+-- 
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
+
+------=_Part_37196_699658.1185892499067
+Content-Type: text/x-diff; name=raw02.patch; charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f4shpdzu
+Content-Disposition: attachment; filename="raw02.patch"
+
+SW5kZXg6IGhjaWQvZGJ1cy1tYW5hZ2VyLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3Qv
+Ymx1ZXovdXRpbHMvaGNpZC9kYnVzLW1hbmFnZXIuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS42
+OApkaWZmIC11IC1yMS42OCBkYnVzLW1hbmFnZXIuYwotLS0gaGNpZC9kYnVzLW1hbmFnZXIuYwk0
+IE1heSAyMDA3IDE1OjMyOjI3IC0wMDAwCTEuNjgKKysrIGhjaWQvZGJ1cy1tYW5hZ2VyLmMJMzEg
+SnVsIDIwMDcgMTQ6MTg6NTYgLTAwMDAKQEAgLTEwMyw2ICsxMDMsNyBAQAogewogCURCdXNNZXNz
+YWdlICpyZXBseTsKIAljaGFyIHBhdGhbTUFYX1BBVEhfTEVOR1RIXSwgKnBhdGhfcHRyID0gcGF0
+aDsKKwlzdHJ1Y3QgaGNpX2Rldl9pbmZvIGRpOwogCWNvbnN0IGNoYXIgKnBhdHRlcm47CiAJaW50
+IGRldl9pZDsKIApAQCAtMTE1LDYgKzExNiw5IEBACiAJaWYgKGRldl9pZCA8IDApCiAJCXJldHVy
+biBlcnJvcl9ub19zdWNoX2FkYXB0ZXIoY29ubiwgbXNnKTsKIAorCWlmICgoaGNpX2RldmluZm8o
+ZGV2X2lkLCAmZGkpIDwgMCkgfHwgaGNpX3Rlc3RfYml0KEhDSV9SQVcsICZkaS5mbGFncykpCisJ
+CXJldHVybiBlcnJvcl9ub19zdWNoX2FkYXB0ZXIoY29ubiwgbXNnKTsKKwogCXJlcGx5ID0gZGJ1
+c19tZXNzYWdlX25ld19tZXRob2RfcmV0dXJuKG1zZyk7CiAJaWYgKCFyZXBseSkKIAkJcmV0dXJu
+IERCVVNfSEFORExFUl9SRVNVTFRfTkVFRF9NRU1PUlk7CkBAIC0xNzQsNyArMTc4LDggQEAKIAkJ
+Y2hhciBwYXRoW01BWF9QQVRIX0xFTkdUSF0sICpwYXRoX3B0ciA9IHBhdGg7CiAJCXN0cnVjdCBo
+Y2lfZGV2X2luZm8gZGk7CiAKLQkJaWYgKGhjaV9kZXZpbmZvKGRyLT5kZXZfaWQsICZkaSkgPCAw
+KQorCQlpZiAoKGhjaV9kZXZpbmZvKGRyLT5kZXZfaWQsICZkaSkgPCAwKSB8fAorCQkJaGNpX3Rl
+c3RfYml0KEhDSV9SQVcsICZkaS5mbGFncykpCiAJCQljb250aW51ZTsKIAogCQlzbnByaW50Zihw
+YXRoLCBzaXplb2YocGF0aCksICIlcy8lcyIsIEJBU0VfUEFUSCwgZGkubmFtZSk7CkluZGV4OiBo
+Y2lkL21haW4uYwo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09ClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVlei91dGlscy9oY2lk
+L21haW4uYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS45OApkaWZmIC11IC1yMS45OCBtYWluLmMK
+LS0tIGhjaWQvbWFpbi5jCTMxIEp1bCAyMDA3IDEyOjI3OjIzIC0wMDAwCTEuOTgKKysrIGhjaWQv
+bWFpbi5jCTMxIEp1bCAyMDA3IDE0OjE4OjU3IC0wMDAwCkBAIC00OTUsOSArNDk1LDggQEAKIAll
+eGl0KDApOwogfQogCi1zdGF0aWMgdm9pZCBpbml0X2RldmljZShpbnQgZGV2X2lkKQorc3RhdGlj
+IHZvaWQgaW5pdF9kZXZpY2Uoc3RydWN0IGhjaV9kZXZfaW5mbyAqZGkpCiB7Ci0Jc3RydWN0IGhj
+aV9kZXZfaW5mbyBkaTsKIAlpbnQgZGQ7CiAKIAkvKiBEbyBpbml0aWFsaXphdGlvbiBpbiB0aGUg
+c2VwYXJhdGUgcHJvY2VzcyAqLwpAQCAtNTA3LDQxICs1MDYsMzkgQEAKIAkJCWJyZWFrOwogCQlj
+YXNlIC0xOgogCQkJZXJyb3IoIkZvcmsgZmFpbGVkLiBDYW4ndCBpbml0IGRldmljZSBoY2klZDog
+JXMgKCVkKSIsCi0JCQkJCWRldl9pZCwgc3RyZXJyb3IoZXJybm8pLCBlcnJubyk7CisJCQkJCWRp
+LT5kZXZfaWQsIHN0cmVycm9yKGVycm5vKSwgZXJybm8pOwogCQlkZWZhdWx0OgogCQkJcmV0dXJu
+OwogCX0KIAotCWRkID0gaGNpX29wZW5fZGV2KGRldl9pZCk7CisJZGQgPSBoY2lfb3Blbl9kZXYo
+ZGktPmRldl9pZCk7CiAJaWYgKGRkIDwgMCkgewogCQllcnJvcigiQ2FuJ3Qgb3BlbiBkZXZpY2Ug
+aGNpJWQ6ICVzICglZCkiLAotCQkJCQlkZXZfaWQsIHN0cmVycm9yKGVycm5vKSwgZXJybm8pOwor
+CQkJCQlkaS0+ZGV2X2lkLCBzdHJlcnJvcihlcnJubyksIGVycm5vKTsKIAkJZXhpdCgxKTsKIAl9
+CiAKIAkvKiBTdGFydCBIQ0kgZGV2aWNlICovCi0JaWYgKGlvY3RsKGRkLCBIQ0lERVZVUCwgZGV2
+X2lkKSA8IDAgJiYgZXJybm8gIT0gRUFMUkVBRFkpIHsKKwlpZiAoaW9jdGwoZGQsIEhDSURFVlVQ
+LCBkaS0+ZGV2X2lkKSA8IDAgJiYgZXJybm8gIT0gRUFMUkVBRFkpIHsKIAkJZXJyb3IoIkNhbid0
+IGluaXQgZGV2aWNlIGhjaSVkOiAlcyAoJWQpIiwKLQkJCQkJZGV2X2lkLCBzdHJlcnJvcihlcnJu
+byksIGVycm5vKTsKKwkJCQkJZGktPmRldl9pZCwgc3RyZXJyb3IoZXJybm8pLCBlcnJubyk7CisJ
+CWhjaV9jbG9zZV9kZXYoZGQpOwogCQlleGl0KDEpOwogCX0KIAotCWlmIChoY2lfZGV2aW5mbyhk
+ZXZfaWQsICZkaSkgPCAwKQotCQlleGl0KDEpOwotCi0JaWYgKGhjaV90ZXN0X2JpdChIQ0lfUkFX
+LCAmZGkuZmxhZ3MpKQotCQlleGl0KDApOworCWlmIChoY2lfdGVzdF9iaXQoSENJX1JBVywgJmRp
+LT5mbGFncykpCisJCWdvdG8gZG9uZTsKIAogCWlmIChoY2lkLm9mZm1vZGUgPT0gSENJRF9PRkZN
+T0RFX0RFVkRPV04pIHsKIAkJY2hhciBtb2RlWzE2XTsKIAotCQlpZiAocmVhZF9kZXZpY2VfbW9k
+ZSgmZGkuYmRhZGRyLCBtb2RlLCBzaXplb2YobW9kZSkpID09IDAgJiYKKwkJaWYgKHJlYWRfZGV2
+aWNlX21vZGUoJmRpLT5iZGFkZHIsIG1vZGUsIHNpemVvZihtb2RlKSkgPT0gMCAmJgogCQkJCQkJ
+c3RyY21wKG1vZGUsICJvZmYiKSA9PSAwKSB7Ci0JCQlpb2N0bChkZCwgSENJREVWRE9XTiwgZGV2
+X2lkKTsKLQkJCWV4aXQoMCk7CisJCQlpb2N0bChkZCwgSENJREVWRE9XTiwgZGktPmRldl9pZCk7
+CisJCQlnb3RvIGRvbmU7CiAJCX0KIAl9Ci0KK2RvbmU6CiAJaGNpX2Nsb3NlX2RldihkZCk7CiAK
+IAlleGl0KDApOwpAQCAtNTQ5LDkgKzU0NiwxNiBAQAogCiBzdGF0aWMgdm9pZCBkZXZpY2VfZGV2
+cmVnX3NldHVwKGludCBkZXZfaWQpCiB7CisJc3RydWN0IGhjaV9kZXZfaW5mbyBkaTsKKworCWlm
+IChoY2lfZGV2aW5mbyhkZXZfaWQsICZkaSkgPCAwKQorCQlyZXR1cm47CisKIAlpZiAoaGNpZC5h
+dXRvX2luaXQpCi0JCWluaXRfZGV2aWNlKGRldl9pZCk7Ci0JaGNpZF9kYnVzX3JlZ2lzdGVyX2Rl
+dmljZShkZXZfaWQpOworCQlpbml0X2RldmljZSgmZGkpOworCisJaWYgKCFoY2lfdGVzdF9iaXQo
+SENJX1JBVywgJmRpLmZsYWdzKSkKKwkJaGNpZF9kYnVzX3JlZ2lzdGVyX2RldmljZShkZXZfaWQp
+OwogfQogCiBzdGF0aWMgdm9pZCBkZXZpY2VfZGV2dXBfc2V0dXAoaW50IGRldl9pZCkK
+------=_Part_37196_699658.1185892499067
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
+------=_Part_37196_699658.1185892499067
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_37196_699658.1185892499067--
