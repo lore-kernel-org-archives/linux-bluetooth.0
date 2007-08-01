@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Thomas Heinz <thomasheinz@gmx.net>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Thu, 2 Aug 2007 02:00:44 +0200
+To: bluez-users@lists.sourceforge.net
+From: Timothy Murphy <tim@birdsnest.maths.tcd.ie>
+Date: Wed, 01 Aug 2007 23:57:37 +0100
+Message-ID: <f8r351$1sb$1@sea.gmane.org>
 References: <200708012335.28600.thomasheinz@gmx.net>
-	<f8r351$1sb$1@sea.gmane.org>
-In-Reply-To: <f8r351$1sb$1@sea.gmane.org>
-MIME-Version: 1.0
-Message-Id: <200708020200.44422.thomasheinz@gmx.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] l2ping: Permission denied
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,24 +19,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Timothy
+Thomas Heinz wrote:
 
-You wrote:
-> Maybe you have to pair with the device first?
+> I am unable to ping my bluetooth device (Logitech Mobile Pro).
 
-`hcitool cc 00:0D:44:5D:1A:9B` also fails.
+Maybe you have to pair with the device first?
 
-> Probably not relevant, but with Fedora-7
-> I also seem to need bluez-gnome , though I use KDE.
+[Nb You obviously know much more about the subject than me,
+so this is probably nonsense!]
 
-I feel that the problem lies somewhere else. Let's see. Hopefully someone 
-can drop a hint. BTW, I'm not really deeply familiar with the bluetooth 
-architecture I have to admit.
+> Version information: bluez-hcidump-1.37, bluez-libs-3.12, bluez-utils-3.12
+> 
+> Any idea what could be the problem?
 
+Probably not relevant, but with Fedora-7
+I also seem to need bluez-gnome , though I use KDE.
 
-Best wishes
+-- 
+Timothy Murphy  
+e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
+tel: +353-86-2336090, +353-1-2842366
+s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
 
-Thomas
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
