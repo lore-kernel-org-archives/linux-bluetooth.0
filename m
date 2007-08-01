@@ -1,19 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <2d5a2c100708012022kf3f53a0o7b227b9f51611f28@mail.gmail.com>
-Date: Thu, 2 Aug 2007 00:22:11 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Message-ID: <e1effdeb0708010656r2f0125f5qd84a2a97691859d3@mail.gmail.com>
+Date: Wed, 1 Aug 2007 10:56:40 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <46B0801C.6070809@gmail.com>
+In-Reply-To: <e1effdeb0707310734w7004e158te4b82dfea931bb40@mail.gmail.com>
 MIME-Version: 1.0
-References: <46AE7340.4010603@gmail.com>
-	<1185870706.27218.43.camel@ubuntu.mpl.access-company.com>
-	<1185871920.27218.44.camel@ubuntu.mpl.access-company.com>
-	<46AF1AD8.2020703@gmail.com>
-	<2d5a2c100707310929h1d8d48d3y5c26561c8d35cedd@mail.gmail.com>
-	<46AF7DF4.8010701@gmail.com>
-	<1185953899.21491.2.camel@ubuntu.mpl.access-company.com>
-	<46B0801C.6070809@gmail.com>
-Subject: Re: [Bluez-devel] a2dp, sco and kernel version
+Content-Type: multipart/mixed;
+	boundary="----=_Part_48378_19716791.1185976600579"
+References: <e1effdeb0707310734w7004e158te4b82dfea931bb40@mail.gmail.com>
+Subject: Re: [Bluez-devel] [PATCH]Adapter D-Bus path on raw mode
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,98 +18,104 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Your bandwidth seems to be higher than expected,
-thought we dont know how much is your bitpool.
+------=_Part_48378_19716791.1185976600579
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Here using 53 the bandwidth used is about 350 kbps,
-using a value higher than 64 it starts to give me some
-buffer problems.
-
-On 8/1/07, Manuel Naranjo <naranjo.manuel@gmail.com> wrote:
+On 7/31/07, Claudio Takahasi <cktakahasi@gmail.com> wrote:
+> Hi Marcel,
 >
-> > Make sure your stream is 44.1khz stereo
-> >
-> That's the first thing I had checked
-> > Do you use the plug plugin?
-> >
-> > pcm.!default {
-> >         type plug
-> >         slave.pcm "a2dpdplug"
-> > }
-> >
-> > pcm.a2dpdplug {
-> >         type a2dpd
-> > }
-> >
-> > Also this variant may help :
-> >
-> > pcm.a2dpdplug {
-> >         type a2dpd
-> >       rateconstraint 44100
-> > }
-> >
-> Sorry but that didn't worked.
+> here is the patch to avoid register the D-Bus adapter path when the
+> RAW flag is active.
 >
-> Here's what mplayer is telling me:
-> alsa-play: trying to reset soundcard
-> alsa-play: write error: Broken pipe0)  2.3%
-> alsa-play: trying to reset soundcard
-> A:  80.9 (01:20.9) of 189.0 (03:09.0)  2.3%
+> ListAdapters and FindAdapter were fixed too.
 >
-> And this is what a2dpd says about it:
-> A2DPD[09:42:05.562]: display_daemon_state: [16,16|16,16] playing
-> connected clients=3D1 freq=3D1032 cnt=3D24833 (1032/0) poll=3D1048
-> latency=3D1185972125 sec.
-> A2DPD[09:42:05.616]: a2dp_transfer_raw: send (retry).
-> A2DPD[09:42:05.767]: a2dp_transfer_raw: Bandwith: 79488 (621 kbps) 32,
-> latency=3D1185972125 sec.
-> A2DPD[09:42:05.826]: a2dp_transfer_raw: send (retry).
-> A2DPD[09:42:05.030]: a2dp_transfer_raw: send (retry).
-> A2DPD[09:42:06.234]: a2dp_transfer_raw: send (retry).
-> A2DPD[09:42:06.479]: a2dp_transfer_raw: send (retry).
-> A2DPD[09:42:06.631]: display_daemon_state: [16,16|16,16] playing
-> connected clients=3D1 freq=3D1144 cnt=3D25977 (1144/0) poll=3D1162
-> latency=3D1185972126 sec.
-> A2DPD[09:42:06.672]: a2dp_transfer_raw: send (retry).
-> A2DPD[09:42:06.836]: a2dp_transfer_raw: Bandwith: 85077 (664 kbps) 32,
-> latency=3D1185972126 sec.
-> A2DPD[09:42:06.895]: a2dp_transfer_raw: send (retry).
-> A2DPD[09:42:06.103]: a2dp_transfer_raw: send (retry).
-> A2DPD[09:42:07.307]: a2dp_transfer_raw: send (retry).
-> A2DPD[09:42:07.508]: a2dp_transfer_raw: send (retry).
->
-> Any ideas what can be wrong?
->
-> Thanks,
-> Manuel
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc.
-> Still grepping through log files to find problems?  Stop.
-> Now Search log events and configuration files using AJAX and a browser.
-> Download your FREE copy of Splunk now >>  http://get.splunk.com/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> Claudio
+> --
+> ---------------------------------------------------------
+> Claudio Takahasi
+> Instituto Nokia de Tecnologia - INdT
 >
 
+Hi Marcel,
 
--- =
+here is a new version based on your suggestions.
 
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+BR,
+Claudio.
+
+------=_Part_48378_19716791.1185976600579
+Content-Type: text/x-diff; name=raw03.patch; charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f4tvtj5p
+Content-Disposition: attachment; filename="raw03.patch"
+
+SW5kZXg6IGhjaWQvZGJ1cy1tYW5hZ2VyLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3Qv
+Ymx1ZXovdXRpbHMvaGNpZC9kYnVzLW1hbmFnZXIuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS42
+OApkaWZmIC11IC1yMS42OCBkYnVzLW1hbmFnZXIuYwotLS0gaGNpZC9kYnVzLW1hbmFnZXIuYwk0
+IE1heSAyMDA3IDE1OjMyOjI3IC0wMDAwCTEuNjgKKysrIGhjaWQvZGJ1cy1tYW5hZ2VyLmMJMSBB
+dWcgMjAwNyAxMzo1Mjo1MyAtMDAwMApAQCAtMTAzLDYgKzEwMyw3IEBACiB7CiAJREJ1c01lc3Nh
+Z2UgKnJlcGx5OwogCWNoYXIgcGF0aFtNQVhfUEFUSF9MRU5HVEhdLCAqcGF0aF9wdHIgPSBwYXRo
+OworCXN0cnVjdCBoY2lfZGV2X2luZm8gZGk7CiAJY29uc3QgY2hhciAqcGF0dGVybjsKIAlpbnQg
+ZGV2X2lkOwogCkBAIC0xMTUsNiArMTE2LDEyIEBACiAJaWYgKGRldl9pZCA8IDApCiAJCXJldHVy
+biBlcnJvcl9ub19zdWNoX2FkYXB0ZXIoY29ubiwgbXNnKTsKIAorCWlmIChoY2lfZGV2aW5mbyhk
+ZXZfaWQsICZkaSkgPCAwKQorCQlyZXR1cm4gZXJyb3Jfbm9fc3VjaF9hZGFwdGVyKGNvbm4sIG1z
+Zyk7CisKKwlpZiAoaGNpX3Rlc3RfYml0KEhDSV9SQVcsICZkaS5mbGFncykpCisJCXJldHVybiBl
+cnJvcl9ub19zdWNoX2FkYXB0ZXIoY29ubiwgbXNnKTsKKwogCXJlcGx5ID0gZGJ1c19tZXNzYWdl
+X25ld19tZXRob2RfcmV0dXJuKG1zZyk7CiAJaWYgKCFyZXBseSkKIAkJcmV0dXJuIERCVVNfSEFO
+RExFUl9SRVNVTFRfTkVFRF9NRU1PUlk7CkBAIC0xNzcsNiArMTg0LDkgQEAKIAkJaWYgKGhjaV9k
+ZXZpbmZvKGRyLT5kZXZfaWQsICZkaSkgPCAwKQogCQkJY29udGludWU7CiAKKwkJaWYgKGhjaV90
+ZXN0X2JpdChIQ0lfUkFXLCAmZGkuZmxhZ3MpKQorCQkJY29udGludWU7CisKIAkJc25wcmludGYo
+cGF0aCwgc2l6ZW9mKHBhdGgpLCAiJXMvJXMiLCBCQVNFX1BBVEgsIGRpLm5hbWUpOwogCiAJCWRi
+dXNfbWVzc2FnZV9pdGVyX2FwcGVuZF9iYXNpYygmYXJyYXlfaXRlciwKSW5kZXg6IGhjaWQvbWFp
+bi5jCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT0KUkNTIGZpbGU6IC9jdnNyb290L2JsdWV6L3V0aWxzL2hjaWQvbWFpbi5j
+LHYKcmV0cmlldmluZyByZXZpc2lvbiAxLjk4CmRpZmYgLXUgLXIxLjk4IG1haW4uYwotLS0gaGNp
+ZC9tYWluLmMJMzEgSnVsIDIwMDcgMTI6Mjc6MjMgLTAwMDAJMS45OAorKysgaGNpZC9tYWluLmMJ
+MSBBdWcgMjAwNyAxMzo1Mjo1MyAtMDAwMApAQCAtNTIzLDE0ICs1MjMsMTQgQEAKIAlpZiAoaW9j
+dGwoZGQsIEhDSURFVlVQLCBkZXZfaWQpIDwgMCAmJiBlcnJubyAhPSBFQUxSRUFEWSkgewogCQll
+cnJvcigiQ2FuJ3QgaW5pdCBkZXZpY2UgaGNpJWQ6ICVzICglZCkiLAogCQkJCQlkZXZfaWQsIHN0
+cmVycm9yKGVycm5vKSwgZXJybm8pOwotCQlleGl0KDEpOworCQlnb3RvIGZhaWw7CiAJfQogCiAJ
+aWYgKGhjaV9kZXZpbmZvKGRldl9pZCwgJmRpKSA8IDApCi0JCWV4aXQoMSk7CisJCWdvdG8gZmFp
+bDsKIAogCWlmIChoY2lfdGVzdF9iaXQoSENJX1JBVywgJmRpLmZsYWdzKSkKLQkJZXhpdCgwKTsK
+KwkJZ290byBkb25lOwogCiAJaWYgKGhjaWQub2ZmbW9kZSA9PSBIQ0lEX09GRk1PREVfREVWRE9X
+TikgewogCQljaGFyIG1vZGVbMTZdOwpAQCAtNTM4LDIwICs1MzgsMjkgQEAKIAkJaWYgKHJlYWRf
+ZGV2aWNlX21vZGUoJmRpLmJkYWRkciwgbW9kZSwgc2l6ZW9mKG1vZGUpKSA9PSAwICYmCiAJCQkJ
+CQlzdHJjbXAobW9kZSwgIm9mZiIpID09IDApIHsKIAkJCWlvY3RsKGRkLCBIQ0lERVZET1dOLCBk
+ZXZfaWQpOwotCQkJZXhpdCgwKTsKKwkJCWdvdG8gZG9uZTsKIAkJfQogCX0KLQorZG9uZToKIAlo
+Y2lfY2xvc2VfZGV2KGRkKTsKLQogCWV4aXQoMCk7CitmYWlsOgorCWhjaV9jbG9zZV9kZXYoZGQp
+OworCWV4aXQoMSk7CiB9CiAKIHN0YXRpYyB2b2lkIGRldmljZV9kZXZyZWdfc2V0dXAoaW50IGRl
+dl9pZCkKIHsKKwlzdHJ1Y3QgaGNpX2Rldl9pbmZvIGRpOworCiAJaWYgKGhjaWQuYXV0b19pbml0
+KQogCQlpbml0X2RldmljZShkZXZfaWQpOwotCWhjaWRfZGJ1c19yZWdpc3Rlcl9kZXZpY2UoZGV2
+X2lkKTsKKworCWlmIChoY2lfZGV2aW5mbyhkZXZfaWQsICZkaSkgPCAwKQorCQlyZXR1cm47CisK
+KwlpZiAoIWhjaV90ZXN0X2JpdChIQ0lfUkFXLCAmZGkuZmxhZ3MpKQorCQloY2lkX2RidXNfcmVn
+aXN0ZXJfZGV2aWNlKGRldl9pZCk7CiB9CiAKIHN0YXRpYyB2b2lkIGRldmljZV9kZXZ1cF9zZXR1
+cChpbnQgZGV2X2lkKQo=
+------=_Part_48378_19716791.1185976600579
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
+------=_Part_48378_19716791.1185976600579
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_48378_19716791.1185976600579--
