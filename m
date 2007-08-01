@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Thomas Heinz <thomasheinz@gmx.net>
-To: bluez-users@lists.sourceforge.net
-Date: Wed, 1 Aug 2007 23:35:27 +0200
+Message-ID: <46B0A557.9080000@kameleon-media.com>
+Date: Wed, 01 Aug 2007 17:23:03 +0200
+From: Laurent BARBIER <lbarbier@kameleon-media.com>
 MIME-Version: 1.0
-Message-Id: <200708012335.28600.thomasheinz@gmx.net>
-Subject: [Bluez-users] l2ping: Permission denied
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Problem building a piconet with pand
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,115 +14,133 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0402756839=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi
+This is a multi-part message in MIME format.
+--===============0402756839==
+Content-Type: multipart/alternative;
+	boundary="------------090303030107050906060100"
 
-I am unable to ping my bluetooth device (Logitech Mobile Pro).
+This is a multi-part message in MIME format.
+--------------090303030107050906060100
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Here some information:
+Hi,
 
-# hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:0C:55:FF:8C:E4 ACL MTU: 192:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:3476 acl:0 sco:0 events:164 errors:0
-        TX bytes:2774 acl:0 sco:0 commands:124 errors:0
-        Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ (0)'
-        Class: 0x3e0100
-        Service Classes: Networking, Rendering, Capturing, Object Transfer, 
-Audio
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x33c LMP Ver: 1.1 (0x1) LMP Subver: 
-0x33c
-        Manufacturer: Cambridge Silicon Radio (10)
+I'm actually working on a project where I need embedded devices to 
+communicate between them. We decided to use bluetooth dongles and pan to 
+build a piconet.
+Actually this work fine when we have only 3 devices : 1 GN & 2 PANU 
+(PANU#1 & PANU#2). When we try to add a third PANU (PANU#3), pand say 
+the host is down. If I shut down the connection of one of the two thers 
+PANU, I'm able to establish a connection with PANU#3 to the GN. I try to 
+setup a different GN on a linux desktop, same result, 1 GN & 2 PANU.
 
-Switching the headset into pairing mode ...
-# hcitool scan
-Scanning ...
-        00:0D:44:5D:1A:9B       Logitech HS05  V02
+*On my server I do this : *
+/pand --listen --nosdp --role GN -i /yy:yy:yy:yy:yy:yy
+I use brctl on the GN to bridge the interface
 
-# hcitool inq
-Inquiring ...
-        00:0D:44:5D:1A:9B       clock offset: 0x1e85    class: 0x200404
+*On my clients I do this :*
+/pand --nodetach -i xx:xx:xx:xx:xx:xx --role PANU --connect 
+/yy:yy:yy:yy:yy:yy
 
-# strace -f l2ping 00:0D:44:5D:1A:9B
-[...]
-socket(PF_BLUETOOTH, SOCK_RAW, 0)       = 3
-bind(3, {sa_family=AF_BLUETOOTH, sa_data="\0\0\0\0\0\0\0\0\0\0\0\0\0\0"}, 
-10) = 0
-connect(3, {sa_family=AF_BLUETOOTH, 
-sa_data="\0\0\233\32]D\r\0\0\0\0\0\0\0"}, 10
-) = -1 EACCES (Permission denied)
-dup(2)                                  = 4
-fcntl64(4, F_GETFL)                     = 0x2 (flags O_RDWR)
-fstat64(4, {st_mode=S_IFCHR|0600, st_rdev=makedev(136, 4), ...}) = 0
-mmap2(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 
-0xb7fb4000
-_llseek(4, 0, 0xbfce9730, SEEK_CUR)     = -1 ESPIPE (Illegal seek)
-write(4, "Can\'t connect: Permission denied"..., 33Can't connect: 
-Permission denied
-) = 33
-close(4)                                = 0
-munmap(0xb7fb4000, 4096)                = 0
-close(3)                                = 0
-exit_group(1)                           = ?
-Process 28321 detached
+On connected PANU i have :
+pand[7334]: Bluetooth PAN daemon version 2.25
+pand[7334]: Connecting to yy:yy:yy:yy:yy:yy
+pand[7334]: bnep0 connected
 
--> connect to bluetooth socket fails.
-
-# hcidump -x
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-  9B 1A 5D 44 0D 00 18 CC 02 00 00 00 01
-> HCI Event: Command Status (0x0f) plen 4
-  00 01 05 04
-> HCI Event: PIN Code Request (0x16) plen 6
-  9B 1A 5D 44 0D 00
-< HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
-  9B 1A 5D 44 0D 00
-> HCI Event: Command Complete (0x0e) plen 10
-  01 0E 04 00 9B 1A 5D 44 0D 00
-> HCI Event: Connect Complete (0x03) plen 11
-  18 29 00 9B 1A 5D 44 0D 00 01 00
-
-My hcid.conf
-options {
-        autoinit yes;
-        security user;
-        pairing multi;
-}
-device {
-        name "BlueZ (%d)";
-        class 0x3e0100;
-        iscan enable; pscan enable;
-        lm accept;
-        lp rswitch,hold,sniff,park;
-}
+On PANU's I can't connect:
+pand[8492]: Bluetooth PAN daemon version 2.25
+pand[8492]: Connecting to yy:yy:yy:yy:yy:yy
+pand[8492]: Connect to yy:yy:yy:yy:yy:yy failed. Host is down(112)
 
 
-Version information: bluez-hcidump-1.37, bluez-libs-3.12, bluez-utils-3.12
+I have read & reread the HOWTO-PAN. I mainly used it to setup my pan.
+I know there is a limitation of 7 PANU max but there I'm far away of the 
+7 devices. Is there is something I have forgotten ? misconfigured  ... ? 
+A problem with my dongles ?
+If anyone could help me
 
-Any idea what could be the problem?
-
-Thanks for your help.
+Laurent
 
 
-Best wishes 
+--------------090303030107050906060100
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-Thomas
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+Hi,<br>
+<br>
+I'm actually working on a project where I need embedded devices to
+communicate between them. We decided to use bluetooth dongles and pan
+to build a piconet.<br>
+Actually this work fine when we have only 3 devices : 1 GN &amp; 2 PANU
+(PANU#1 &amp; PANU#2). When we try to add a third PANU (PANU#3), pand
+say the host is down. If I shut down the connection of one of the two
+thers PANU, I'm able to establish a connection with PANU#3 to the GN. I
+try to setup a different GN on a linux desktop, same result, 1 GN &amp;
+2 PANU.<br>
+<br>
+<b>On my server I do this : </b><br>
+<i>pand --listen --nosdp --role GN -i </i>yy:yy:yy:yy:yy:yy<br>
+I use brctl on the GN to bridge the interface<br>
+<br>
+<b>On my clients I do this :</b><br>
+<i>pand --nodetach -i xx:xx:xx:xx:xx:xx --role PANU --connect </i>yy:yy:yy:yy:yy:yy<br>
+<br>
+On connected PANU i have :<br>
+pand[7334]: Bluetooth PAN daemon version 2.25<br>
+pand[7334]: Connecting to yy:yy:yy:yy:yy:yy<br>
+pand[7334]: bnep0 connected<br>
+<br>
+On PANU's I can't connect:<br>
+pand[8492]: Bluetooth PAN daemon version 2.25<br>
+pand[8492]: Connecting to yy:yy:yy:yy:yy:yy<br>
+pand[8492]: Connect to yy:yy:yy:yy:yy:yy failed. Host is down(112)<br>
+<br>
+<br>
+I have read &amp; reread the HOWTO-PAN. I mainly used it to setup my
+pan.<br>
+I know there is a limitation of 7 PANU max but there I'm far away of
+the 7 devices. Is there is something I have forgotten ? misconfigured&nbsp;
+... ? A problem with my dongles ?<br>
+If anyone could help me<br>
+<br>
+Laurent<br>
+<br>
+</body>
+</html>
+
+--------------090303030107050906060100--
+
+
+--===============0402756839==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
+--===============0402756839==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0402756839==--
