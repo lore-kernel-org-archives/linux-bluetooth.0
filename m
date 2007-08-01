@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46B0801C.6070809@gmail.com>
-Date: Wed, 01 Aug 2007 09:44:12 -0300
-From: Manuel Naranjo <naranjo.manuel@gmail.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46AE7340.4010603@gmail.com>	<1185870706.27218.43.camel@ubuntu.mpl.access-company.com>	<1185871920.27218.44.camel@ubuntu.mpl.access-company.com>	<46AF1AD8.2020703@gmail.com>	<2d5a2c100707310929h1d8d48d3y5c26561c8d35cedd@mail.gmail.com>	<46AF7DF4.8010701@gmail.com>
-	<1185953899.21491.2.camel@ubuntu.mpl.access-company.com>
-In-Reply-To: <1185953899.21491.2.camel@ubuntu.mpl.access-company.com>
-Subject: Re: [Bluez-devel] a2dp, sco and kernel version
+In-Reply-To: <1185959611.21491.13.camel@ubuntu.mpl.access-company.com>
+References: <1185959611.21491.13.camel@ubuntu.mpl.access-company.com>
+Date: Wed, 01 Aug 2007 11:19:03 +0200
+Message-Id: <1185959943.5868.236.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Question about park mode
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,62 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Frederic,
 
-> Make sure your stream is 44.1khz stereo
->   
-That's the first thing I had checked
-> Do you use the plug plugin?
->
-> pcm.!default {
->         type plug
->         slave.pcm "a2dpdplug"
-> }
->
-> pcm.a2dpdplug {
->         type a2dpd
-> }
->
-> Also this variant may help :
->
-> pcm.a2dpdplug {
->         type a2dpd
-> 	rateconstraint 44100
-> }
->   
-Sorry but that didn't worked.
+> I'm playing with park mode today.
+> I setup an rfcomm connection between two devices, then the slave device
+> parks itselfs.
+> 
+> If I send data to this device, it doesn't unpark. How to unpark it?
+> 
+> Must I use hci command?
 
-Here's what mplayer is telling me:
-alsa-play: trying to reset soundcard
-alsa-play: write error: Broken pipe0)  2.3%
-alsa-play: trying to reset soundcard
-A:  80.9 (01:20.9) of 189.0 (03:09.0)  2.3%
+yes, you have to use Exit Park Mode. However the support for park mode
+is quite of broken. So don't expect a device to behave correctly.
 
-And this is what a2dpd says about it:
-A2DPD[09:42:05.562]: display_daemon_state: [16,16|16,16] playing 
-connected clients=1 freq=1032 cnt=24833 (1032/0) poll=1048 
-latency=1185972125 sec.
-A2DPD[09:42:05.616]: a2dp_transfer_raw: send (retry).
-A2DPD[09:42:05.767]: a2dp_transfer_raw: Bandwith: 79488 (621 kbps) 32, 
-latency=1185972125 sec.
-A2DPD[09:42:05.826]: a2dp_transfer_raw: send (retry).
-A2DPD[09:42:05.030]: a2dp_transfer_raw: send (retry).
-A2DPD[09:42:06.234]: a2dp_transfer_raw: send (retry).
-A2DPD[09:42:06.479]: a2dp_transfer_raw: send (retry).
-A2DPD[09:42:06.631]: display_daemon_state: [16,16|16,16] playing 
-connected clients=1 freq=1144 cnt=25977 (1144/0) poll=1162 
-latency=1185972126 sec.
-A2DPD[09:42:06.672]: a2dp_transfer_raw: send (retry).
-A2DPD[09:42:06.836]: a2dp_transfer_raw: Bandwith: 85077 (664 kbps) 32, 
-latency=1185972126 sec.
-A2DPD[09:42:06.895]: a2dp_transfer_raw: send (retry).
-A2DPD[09:42:06.103]: a2dp_transfer_raw: send (retry).
-A2DPD[09:42:07.307]: a2dp_transfer_raw: send (retry).
-A2DPD[09:42:07.508]: a2dp_transfer_raw: send (retry).
+Regards
 
-Any ideas what can be wrong?
+Marcel
 
-Thanks,
-Manuel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
