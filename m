@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1185959611.21491.13.camel@ubuntu.mpl.access-company.com>
-References: <1185959611.21491.13.camel@ubuntu.mpl.access-company.com>
-Date: Wed, 01 Aug 2007 11:19:03 +0200
-Message-Id: <1185959943.5868.236.camel@violet>
+From: Frederic Dalleau <frederic.dalleau@access-company.com>
+To: Bluez-Devel <bluez-devel@lists.sourceforge.net>
+Date: Wed, 01 Aug 2007 11:13:31 +0200
+Message-Id: <1185959611.21491.13.camel@ubuntu.mpl.access-company.com>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Question about park mode
+Subject: [Bluez-devel] Question about park mode
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,24 +18,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frederic,
+Hi,
 
-> I'm playing with park mode today.
-> I setup an rfcomm connection between two devices, then the slave device
-> parks itselfs.
-> 
-> If I send data to this device, it doesn't unpark. How to unpark it?
-> 
-> Must I use hci command?
+I'm playing with park mode today.
+I setup an rfcomm connection between two devices, then the slave device
+parks itselfs.
 
-yes, you have to use Exit Park Mode. However the support for park mode
-is quite of broken. So don't expect a device to behave correctly.
+If I send data to this device, it doesn't unpark. How to unpark it?
 
-Regards
+Must I use hci command?
 
-Marcel
+I have found nothing similar in the archive.
 
-
+Cheers,
+Frederic
 
 
 -------------------------------------------------------------------------
