@@ -1,19 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d89ddf300708021212y757401fdqc9f98a040911fa1e@mail.gmail.com>
-Date: Thu, 2 Aug 2007 13:12:44 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <46B22843.909@gmail.com>
+Message-ID: <46B22DB0.60906@gmail.com>
+Date: Thu, 02 Aug 2007 16:17:04 -0300
+From: Manuel Naranjo <naranjo.manuel@gmail.com>
 MIME-Version: 1.0
-References: <46AE7340.4010603@gmail.com> <46AF7DF4.8010701@gmail.com>
-	<1185953899.21491.2.camel@ubuntu.mpl.access-company.com>
-	<46B0801C.6070809@gmail.com>
-	<2d5a2c100708012022kf3f53a0o7b227b9f51611f28@mail.gmail.com>
-	<46B1573A.3080003@gmail.com>
-	<1186059854.3574.2.camel@ubuntu.mpl.access-company.com>
-	<1186059924.3574.4.camel@ubuntu.mpl.access-company.com>
-	<46B1F5B9.6070107@gmail.com> <46B22843.909@gmail.com>
-Subject: Re: [Bluez-devel] a2dp, sco and kernel version [Possible Solution]
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <d9a09df00708021125n3abd1281l51d7f313e913da27@mail.gmail.com>	<46B224A6.8040501@gmail.com>	<d9a09df00708021140k58b2fc16gd7f5a868899017d9@mail.gmail.com>	<46B228EF.80800@gmail.com>
+	<d9a09df00708021200r1df93be6leab6acc3680cc0da@mail.gmail.com>
+In-Reply-To: <d9a09df00708021200r1df93be6leab6acc3680cc0da@mail.gmail.com>
+Subject: Re: [Bluez-devel] OBEX OPP/FTP implementation in Bluez
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,29 +17,39 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Manuel
+Udayan Singh escribi=F3:
+> Hi Manuel,
+>
+>
+>   =
 
-On 8/2/07, Manuel Naranjo <naranjo.manuel@gmail.com> wrote:
-> I finally could narrow the problem CONFIG_HIGH_RES_TIMERS is the one
-> that makes a2dpd fail in certain circumstances. I'm not sure if my
-> hardware has support for this feature or not, but anyway it's good to
-> know what's causing the problem.
-> So to all those of you that have a kernel >= 2.6.21 and can't use a2dpd
-> can disable CONFIG_HIGH_RES_TIMERS, recompile and reinstall your
-> kernels, and should get a2dpd working again.
+>>> as well as roadmap:
+>>> http://wiki.bluez.org/wiki/Roadmap
+>>>
+>>>       =
 
-the use of highres timers is chosen dynamically at boot based on the
-hardware capabilities. There should be a boot parameter to disable it.
-That would be helpful for our troubleshooting documentation.
+>> I don't know if I can update this one, maybe in the feature BlueZ team
+>> want to add obex support directly in the stack.
+>>     =
 
-didn't someone say things worked in 2.6.23-rc1 or was that test done
-without high-res timers enabled?
+>
+> So presently Bluez does not have obex support directly in the stack.
+> If I want to work on the same, ne pointers to how can I go about doing
+> the same ?
+You can use openobex and obexftp (both are in the same place, openobex =
 
-brad
+is a lib obexftp is an user app), it's the defacto obex implementation =
+
+for linux and it works perfectly over bluetooth with bluez. It's just =
+
+that you don't get this when you download blueZ.
+What I'm not sure is that if the BlueZ guys are planning to reimplement =
+
+Obex and add this to they're source base.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
