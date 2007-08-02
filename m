@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46B60B20.4040801@gmail.com>
-Date: Sun, 05 Aug 2007 23:08:40 +0530
-From: Rogue <roguexz@gmail.com>
-MIME-Version: 1.0
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Does BlueZ have java bindings?
+In-Reply-To: <d9a09df00708021125n3abd1281l51d7f313e913da27@mail.gmail.com>
+References: <d9a09df00708021125n3abd1281l51d7f313e913da27@mail.gmail.com>
+Date: Thu, 02 Aug 2007 22:10:35 +0100
+Message-Id: <1186089035.3908.2.camel@snoogens.fab.redhat.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] OBEX OPP/FTP implementation in Bluez
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,23 +20,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
 
-Hi All,
+On Thu, 2007-08-02 at 23:55 +0530, Udayan Singh wrote:
+> Hi All,
+> 
+> Had been going through the link of bluez wiki. On the following page:
+> http://wiki.bluez.org/wiki/Roadmap
+> ----------------------------
+> .....
+> This page lists planed features, changes, etc to BlueZ in the future.
+> ......
+> Transfer service
+> Obex Object Push Profile (OPP)
+> Obex File Transfer Profile (FTP)
+> ....
+> ----------------------------
+> So, isnt this implemented as of now ?
 
-Just checking, if the bluez stack has java bindings? If it does, how do
-I go about acquiring it?
+Will be in openobex itself, once Tadas finishes his Google Summer of
+Code project (look on Google's page, under the GNOME project).
 
-thanks,
-Rogue
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.7 (GNU/Linux)
-
-iD8DBQFGtgsgceS9IQvx51YRAg3BAKC7biJNyozmcNNupySOQdUrKfvP+QCeND7V
-2t1fzNGC8YU/c0kus80FUAY=
-=frPk
------END PGP SIGNATURE-----
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
