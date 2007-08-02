@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <22b6c3510708020121g64bee772g72aa8762203e1a27@mail.gmail.com>
-Date: Thu, 2 Aug 2007 16:21:54 +0800
-From: "Benjamin Fong" <benjamin.backup@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Message-ID: <46B1573A.3080003@gmail.com>
+Date: Thu, 02 Aug 2007 01:02:02 -0300
+From: Manuel Naranjo <naranjo.manuel@gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel]  hcid does not boot up properly
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <46AE7340.4010603@gmail.com>	<1185870706.27218.43.camel@ubuntu.mpl.access-company.com>	<1185871920.27218.44.camel@ubuntu.mpl.access-company.com>	<46AF1AD8.2020703@gmail.com>	<2d5a2c100707310929h1d8d48d3y5c26561c8d35cedd@mail.gmail.com>	<46AF7DF4.8010701@gmail.com>	<1185953899.21491.2.camel@ubuntu.mpl.access-company.com>	<46B0801C.6070809@gmail.com>
+	<2d5a2c100708012022kf3f53a0o7b227b9f51611f28@mail.gmail.com>
+In-Reply-To: <2d5a2c100708012022kf3f53a0o7b227b9f51611f28@mail.gmail.com>
+Subject: Re: [Bluez-devel] a2dp, sco and kernel version
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,71 +17,109 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0049257818=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0049257818==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_82266_32645465.1186042914985"
+I want to help, just tell me what you need and I get it to all for you.
+I work for the company that builds the USB dongle [1], and I'm using the 
+hifi headset we sell. So I have plenty access to almost every hardware 
+detail. So please let me know what you need, logs, etc, and I get it.
+Thanks,
+Manuel
 
-------=_Part_82266_32645465.1186042914985
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+[1] http://www.aircable.net/host-xr.html
 
-Hi,
+> Your bandwidth seems to be higher than expected,
+> thought we dont know how much is your bitpool.
+>
+> Here using 53 the bandwidth used is about 350 kbps,
+> using a value higher than 64 it starts to give me some
+> buffer problems.
+>
+> On 8/1/07, Manuel Naranjo <naranjo.manuel@gmail.com> wrote:
+>   
+>>> Make sure your stream is 44.1khz stereo
+>>>
+>>>       
+>> That's the first thing I had checked
+>>     
+>>> Do you use the plug plugin?
+>>>
+>>> pcm.!default {
+>>>         type plug
+>>>         slave.pcm "a2dpdplug"
+>>> }
+>>>
+>>> pcm.a2dpdplug {
+>>>         type a2dpd
+>>> }
+>>>
+>>> Also this variant may help :
+>>>
+>>> pcm.a2dpdplug {
+>>>         type a2dpd
+>>>       rateconstraint 44100
+>>> }
+>>>
+>>>       
+>> Sorry but that didn't worked.
+>>
+>> Here's what mplayer is telling me:
+>> alsa-play: trying to reset soundcard
+>> alsa-play: write error: Broken pipe0)  2.3%
+>> alsa-play: trying to reset soundcard
+>> A:  80.9 (01:20.9) of 189.0 (03:09.0)  2.3%
+>>
+>> And this is what a2dpd says about it:
+>> A2DPD[09:42:05.562]: display_daemon_state: [16,16|16,16] playing
+>> connected clients=1 freq=1032 cnt=24833 (1032/0) poll=1048
+>> latency=1185972125 sec.
+>> A2DPD[09:42:05.616]: a2dp_transfer_raw: send (retry).
+>> A2DPD[09:42:05.767]: a2dp_transfer_raw: Bandwith: 79488 (621 kbps) 32,
+>> latency=1185972125 sec.
+>> A2DPD[09:42:05.826]: a2dp_transfer_raw: send (retry).
+>> A2DPD[09:42:05.030]: a2dp_transfer_raw: send (retry).
+>> A2DPD[09:42:06.234]: a2dp_transfer_raw: send (retry).
+>> A2DPD[09:42:06.479]: a2dp_transfer_raw: send (retry).
+>> A2DPD[09:42:06.631]: display_daemon_state: [16,16|16,16] playing
+>> connected clients=1 freq=1144 cnt=25977 (1144/0) poll=1162
+>> latency=1185972126 sec.
+>> A2DPD[09:42:06.672]: a2dp_transfer_raw: send (retry).
+>> A2DPD[09:42:06.836]: a2dp_transfer_raw: Bandwith: 85077 (664 kbps) 32,
+>> latency=1185972126 sec.
+>> A2DPD[09:42:06.895]: a2dp_transfer_raw: send (retry).
+>> A2DPD[09:42:06.103]: a2dp_transfer_raw: send (retry).
+>> A2DPD[09:42:07.307]: a2dp_transfer_raw: send (retry).
+>> A2DPD[09:42:07.508]: a2dp_transfer_raw: send (retry).
+>>
+>> Any ideas what can be wrong?
+>>
+>> Thanks,
+>> Manuel
+>>
+>> -------------------------------------------------------------------------
+>> This SF.net email is sponsored by: Splunk Inc.
+>> Still grepping through log files to find problems?  Stop.
+>> Now Search log events and configuration files using AJAX and a browser.
+>> Download your FREE copy of Splunk now >>  http://get.splunk.com/
+>> _______________________________________________
+>> Bluez-devel mailing list
+>> Bluez-devel@lists.sourceforge.net
+>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>>
+>>     
+>
+>
+>   
 
-When I was using fed 7, I'd noticed that there are a couple of defunct hcid
-after boot. I'd migrated my system OS to fed 6, and that issue seem to
-disappear. However, hcid always seem to have trouble initiating all of my
-bluetooth dongles (I have 4). I've manually reattach each of the dongles
-before hcid can properly use them.
-
-I'm using bluez v 3.12. By the way, v3.12 doesn't seem to be picking up on
-the bluetooth friendly name I'd specified in hcid.conf as well. Any idea?
-
-Regards,
-Ben
-
-------=_Part_82266_32645465.1186042914985
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div>Hi,</div>
-<div>&nbsp;</div>
-<div>When I was using fed 7, I&#39;d noticed that there are a couple of defunct hcid after boot. I&#39;d migrated my system OS to fed 6, and that issue seem to disappear. However, hcid always seem to have trouble initiating all of my bluetooth dongles (I have 4). I&#39;ve manually reattach each of the dongles before hcid can properly use them. 
-</div>
-<div>&nbsp;</div>
-<div>I&#39;m using bluez v 3.12. By the way, v3.12 doesn&#39;t seem to be picking up on the bluetooth friendly name I&#39;d specified in hcid.conf as well. Any idea?</div>
-<div>&nbsp;</div>
-<div>Regards,</div>
-<div>Ben</div>
-
-------=_Part_82266_32645465.1186042914985--
-
-
---===============0049257818==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============0049257818==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0049257818==--
