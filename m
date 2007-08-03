@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d5920d1e0708030011sf85f0cbrbeff1a7f3836f32d@mail.gmail.com>
-Date: Fri, 3 Aug 2007 09:11:08 +0200
+Message-ID: <d5920d1e0708022332n57b22c58ga343f9bf1acfc935@mail.gmail.com>
+Date: Fri, 3 Aug 2007 08:32:46 +0200
 From: "Hamid MENOUAR" <menouar@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <57c68ddc0708022330obca2bdds2d21bdda830db6b4@mail.gmail.com>
+In-Reply-To: <f8pvmj$3tn$1@sea.gmane.org>
 MIME-Version: 1.0
 References: <d5920d1e0708010151h1610b190vb7618b71686cba05@mail.gmail.com>
-	<57c68ddc0708010345u73c7482esff100f76b20646fc@mail.gmail.com>
-	<d5920d1e0708022327v665d3c02gc8799485d896d459@mail.gmail.com>
-	<57c68ddc0708022330obca2bdds2d21bdda830db6b4@mail.gmail.com>
+	<f8pvmj$3tn$1@sea.gmane.org>
 Subject: Re: [Bluez-users] Module bluez not found
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -23,116 +21,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Here is the output
+"service bluetooth restart" works well but still no bluetooth device
+is detected when scanning ...
 
-[root@localhost root]# modprobe hci_usb
-[root@localhost root]# modprobe rfcomm
-[root@localhost root]# hciconfig hci0 up
-[root@localhost root]# hciconfig
-hci0:   Type: USB
-        BD Address: 00:16:38:CA:56:A8 ACL MTU: 1017:8  SCO MTU: 64:1
-        UP RUNNING
-        RX bytes:195 acl:0 sco:0 events:29 errors:0
-        TX bytes:886 acl:0 sco:0 commands:29 errors:0
+You're right, FC2 is very old, but I need to use this old version for
+some reasons. I will try my USB bluetooth adapter with some newer FC
+just to see and I will tel you !
 
-[root@localhost root]# hcitool scan
-Scanning ...
-Inquiry failed: Connection timed out
-[root@localhost root]#
+Regards,
+Menouar
 
-
-
-On 8/3/07, siddhant tewari <siddhant.tewari@gmail.com> wrote:
-> what is the output of hciconfig
+On 8/1/07, Timothy Murphy <tim@birdsnest.maths.tcd.ie> wrote:
+> Hamid MENOUAR wrote:
 >
+> > Dear all,
+> >
+> > In order to use Bluez to connect some bluetooth device on my computer,
+> > I have installed on my Linux FC2 the four following packages
+> > (bluez-libs, bluez-utils, bluez-firmware, bluez-hcidump).
+> >
+> > And, when trying to load the Bluez module manually by doing "modprobe
+> > bluez" it says "FATAL: Module bluez not found."
+> >
+> > Could anyone help me to explain and solve this?
 >
-> On 8/3/07, Hamid MENOUAR <menouar@gmail.com> wrote:
-> >
-> > Thank you for your answer.
-> >
-> > Even when doing that, still no devices is detected when scanning
-> > (hcitool scan) !!
-> >
-> > Regards,
-> > Menouar
-> >
-> > On 8/1/07, siddhant tewari < siddhant.tewari@gmail.com> wrote:
-> > > u should try
-> > > modprobe hci_usb
-> > > modprobe rfcomm
-> > >
-> > > then run
-> > > hciconfig hci0 up (only one dongle attached)
-> > >
-> > > then
-> > > hcitool scan (if near by devices are scanned succesfully then part of
-> > > bluetooth system is working fine)
-> > >
-> > > now for sending and recieving files you should try searching in mail
-> > > archive.....
-> > >
-> > > regards
-> > > siddhant
-> > >
-> > >
-> > >
-> > > On 8/1/07, Hamid MENOUAR < menouar@gmail.com> wrote:
-> > > >
-> > > > Dear all,
-> > > >
-> > > > In order to use Bluez to connect some bluetooth device on my computer,
-> > > > I have installed on my Linux FC2 the four following packages
-> > > > (bluez-libs, bluez-utils, bluez-firmware, bluez-hcidump).
-> > > >
-> > > > And, when trying to load the Bluez module manually by doing "modprobe
-> > > > bluez" it says "FATAL: Module bluez not found."
-> > > >
-> > > > Could anyone help me to explain and solve this?
-> > > >
-> > > > Thank you in advance,
-> > > > Menouar
-> > > >
-> > > >
-> > >
-> -------------------------------------------------------------------------
-> > > > This SF.net email is sponsored by: Splunk Inc.
-> > > > Still grepping through log files to find problems?  Stop.
-> > > > Now Search log events and configuration files using AJAX and a
-> browser.
-> > > > Download your FREE copy of Splunk now >>   http://get.splunk.com/
-> > > > _______________________________________________
-> > > > Bluez-users mailing list
-> > > > Bluez-users@lists.sourceforge.net
-> > > >
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-> > > >
-> > >
-> > >
-> > >
-> -------------------------------------------------------------------------
-> > > This SF.net email is sponsored by: Splunk Inc.
-> > > Still grepping through log files to find problems?  Stop.
-> > > Now Search log events and configuration files using AJAX and a browser.
-> > > Download your FREE copy of Splunk now >>   http://get.splunk.com/
-> > > _______________________________________________
-> > > Bluez-users mailing list
-> > > Bluez-users@lists.sourceforge.net
-> > >
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-> > >
-> > >
-> >
-> >
-> -------------------------------------------------------------------------
-> > This SF.net email is sponsored by: Splunk Inc.
-> > Still grepping through log files to find problems?  Stop.
-> > Now Search log events and configuration files using AJAX and a browser.
-> > Download your FREE copy of Splunk now >>   http://get.splunk.com/
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-users
-> >
+> Why do you think the module is called bluez?
+>
+> Assuming you are using Fedora you can simply say (as root)
+> "service bluetooth restart".
+>
+> Ps FC2 is very old.
+> You could get more advice from the Fedora list
+> if you ran Fedora-7 (or even FC6).
+>
+> --
+> Timothy Murphy
+> e-mail (<80k only): tim /at/ birdsnest.maths.tcd.ie
+> tel: +353-86-2336090, +353-1-2842366
+> s-mail: School of Mathematics, Trinity College, Dublin 2, Ireland
 >
 >
 > -------------------------------------------------------------------------
@@ -144,7 +70,6 @@ On 8/3/07, siddhant tewari <siddhant.tewari@gmail.com> wrote:
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
->
 >
 
 -------------------------------------------------------------------------
