@@ -1,11 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46B6CC07.9010105@idlum.be>
-Date: Mon, 06 Aug 2007 09:21:43 +0200
-From: Pierre-Yves Paulus <py@idlum.be>
+Message-ID: <c1fa8edf0708051322s1a14f64u4f6b98402a82c021@mail.gmail.com>
+Date: Sun, 5 Aug 2007 16:22:53 -0400
+From: "Simon Ruggier" <simon80@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="------------060108050507020200010705"
-Subject: [Bluez-devel] "Invalid CID in request"
+Content-Type: multipart/mixed;
+	boundary="----=_Part_112120_32739284.1186345373939"
+Subject: [Bluez-devel] [PATCH] refactor cleanup code in hidd main.c
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,109 +19,86 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------060108050507020200010705
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+------=_Part_112120_32739284.1186345373939
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Hello,
+This is an almost entirely cosmetic patch to hidd's main.c that moves
+some duplicated close()/exit() calls to the end of their respective
+functions, replacing them with gotos.
 
-Trying to perform a full SDP extraction on a nokia N70, I got several 
-time the error below (full hcidump log attached).
+------=_Part_112120_32739284.1186345373939
+Content-Type: text/x-diff; name=hidd-cleanup.patch; charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f4zz6uw9
+Content-Disposition: attachment; filename="hidd-cleanup.patch"
 
-   > ACL data: handle 11 flags 0x02 dlen 14
-       L2CAP(s): Command rej: reason 2 dcid 0x0000 scid 0x0040
-         Invalid CID in request
-   > ACL data: handle 11 flags 0x02 dlen 14
-       L2CAP(s): Command rej: reason 2 dcid 0x0000 scid 0x0040
-         Invalid CID in request
-
-In don't understand what happens here, nor the meaning of this error. 
-Could someone please explain it?
-
-Best Regards,
-Pierre-Yves
-
-
-
---------------060108050507020200010705
-Content-Type: text/x-log;
- name="hci.log"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="hci.log"
-
-2007-08-05 09:41:17,627 hci2  < HCI Command: Create Connection (0x01|0x0005) plen 13
-2007-08-05 09:41:17,659 hci2      bdaddr 00:16:4E:D6:5D:1A ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-2007-08-05 09:41:17,660 hci2      Packet type: DM1 DM3 DM5 DH1 DH3 DH5 
-2007-08-05 09:41:17,662 hci2  > HCI Event: Command Status (0x0f) plen 4
-2007-08-05 09:41:17,663 hci2      Create Connection (0x01|0x0005) status 0x00 ncmd 1
-2007-08-05 09:41:20,678 hci2  > HCI Event: Connect Complete (0x03) plen 11
-2007-08-05 09:41:20,680 hci2      status 0x00 handle 11 bdaddr 00:16:4E:D6:5D:1A type ACL encrypt 0x00
-2007-08-05 09:41:20,681 hci2  < ACL data: handle 11 flags 0x02 dlen 12
-2007-08-05 09:41:20,682 hci2      L2CAP(s): Connect req: psm 1 scid 0x0040
-2007-08-05 09:41:20,683 hci2  < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-2007-08-05 09:41:20,684 hci2      handle 11
-2007-08-05 09:41:20,685 hci2  > HCI Event: Command Status (0x0f) plen 4
-2007-08-05 09:41:20,686 hci2      Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-2007-08-05 09:41:20,687 hci2  < HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-2007-08-05 09:41:20,688 hci2      handle 11 policy 0x0f
-2007-08-05 09:41:20,689 hci2      Link policy: RSWITCH HOLD SNIFF PARK 
-2007-08-05 09:41:20,691 hci2  > HCI Event: Read Remote Supported Features (0x0b) plen 11
-2007-08-05 09:41:20,692 hci2      status 0x00 handle 11
-2007-08-05 09:41:20,693 hci2      Features: 0xbf 0xee 0x0f 0x46 0x98 0x19 0x00 0x00
-2007-08-05 09:41:20,694 hci2  > HCI Event: Command Complete (0x0e) plen 6
-2007-08-05 09:41:20,696 hci2      Write Link Policy Settings (0x02|0x000d) ncmd 1
-2007-08-05 09:41:20,696 hci2      status 0x00 handle 11
-2007-08-05 09:41:20,697 hci2  > HCI Event: Max Slots Change (0x1b) plen 3
-2007-08-05 09:41:20,699 hci2      handle 11 slots 5
-2007-08-05 09:41:20,700 hci2  < HCI Command: Remote Name Request (0x01|0x0019) plen 10
-2007-08-05 09:41:20,701 hci2      bdaddr 00:16:4E:D6:5D:1A mode 2 clkoffset 0x0000
-2007-08-05 09:41:20,702 hci2  > HCI Event: Command Status (0x0f) plen 4
-2007-08-05 09:41:20,703 hci2      Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-2007-08-05 09:41:20,800 hci2  > ACL data: handle 11 flags 0x02 dlen 10
-2007-08-05 09:41:20,801 hci2      L2CAP(s): Info req: type 2
-2007-08-05 09:41:20,802 hci2  < ACL data: handle 11 flags 0x02 dlen 12
-2007-08-05 09:41:20,803 hci2      L2CAP(s): Info rsp: type 2 result 1
-2007-08-05 09:41:20,804 hci2        Not supported
-2007-08-05 09:41:20,966 hci2  > HCI Event: Number of Completed Packets (0x13) plen 5
-2007-08-05 09:41:20,967 hci2      handle 11 packets 2
-2007-08-05 09:41:28,013 hci2  > ACL data: handle 11 flags 0x02 dlen 16
-2007-08-05 09:41:28,031 hci2      L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-2007-08-05 09:41:28,032 hci2        Connection successful
-2007-08-05 09:41:28,033 hci2  < ACL data: handle 11 flags 0x02 dlen 12
-2007-08-05 09:41:28,034 hci2      L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-2007-08-05 09:41:28,035 hci2  > ACL data: handle 11 flags 0x02 dlen 12
-2007-08-05 09:41:28,036 hci2      L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-2007-08-05 09:41:28,037 hci2  < ACL data: handle 11 flags 0x02 dlen 18
-2007-08-05 09:41:28,046 hci2      L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-2007-08-05 09:41:28,047 hci2        Success
-2007-08-05 09:41:28,048 hci2        MTU 672 
-2007-08-05 09:41:28,049 hci2  > ACL data: handle 11 flags 0x02 dlen 12
-2007-08-05 09:41:28,050 hci2      L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
-2007-08-05 09:41:28,051 hci2  < ACL data: handle 11 flags 0x02 dlen 18
-2007-08-05 09:41:28,052 hci2      L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-2007-08-05 09:41:28,053 hci2        Success
-2007-08-05 09:41:28,054 hci2        MTU 672 
-2007-08-05 09:41:28,055 hci2  > ACL data: handle 11 flags 0x02 dlen 14
-2007-08-05 09:41:28,056 hci2      L2CAP(s): Command rej: reason 2 dcid 0x0040 scid 0x0000
-2007-08-05 09:41:28,057 hci2        Invalid CID in request
-2007-08-05 09:41:28,059 hci2  > HCI Event: Remote Name Req Complete (0x07) plen 255
-2007-08-05 09:41:28,060 hci2      status 0x00 bdaddr 00:16:4E:D6:5D:1A name 'Nokia N70'
-2007-08-05 09:41:28,216 hci2  > HCI Event: Number of Completed Packets (0x13) plen 5
-2007-08-05 09:41:28,217 hci2      handle 11 packets 3
-2007-08-05 09:41:28,301 hci2  > ACL data: handle 11 flags 0x02 dlen 14
-2007-08-05 09:41:28,303 hci2      L2CAP(s): Command rej: reason 2 dcid 0x0000 scid 0x0040
-2007-08-05 09:41:28,304 hci2        Invalid CID in request
-2007-08-05 09:41:29,291 hci2  > ACL data: handle 11 flags 0x02 dlen 14
-2007-08-05 09:41:29,293 hci2      L2CAP(s): Command rej: reason 2 dcid 0x0000 scid 0x0040
-2007-08-05 09:41:29,294 hci2        Invalid CID in request
-2007-08-05 09:41:32,094 hci2  > HCI Event: Disconn Complete (0x05) plen 4
-2007-08-05 09:41:32,095 hci2      status 0x00 handle 11 reason 0x13
-2007-08-05 09:41:32,096 hci2      Reason: Remote User Terminated Connection
-
-
---------------060108050507020200010705
+SW5kZXg6IG1haW4uYwo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09ClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVlei91dGlscy9o
+aWRkL21haW4uYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4zNwpkaWZmIC11IC1wIC1yMS4zNyBt
+YWluLmMKLS0tIG1haW4uYwk4IE1heSAyMDA3IDE2OjM4OjQ3IC0wMDAwCTEuMzcKKysrIG1haW4u
+Ywk1IEF1ZyAyMDA3IDIwOjEzOjQ3IC0wMDAwCkBAIC00NjAsOCArNDYwLDcgQEAgc3RhdGljIHZv
+aWQgZG9fY29ubmVjdChpbnQgY3RsLCBiZGFkZHJfdAogCiAJaWYgKGVyciA8IDApIHsKIAkJcGVy
+cm9yKCJDYW4ndCBnZXQgZGV2aWNlIGluZm9ybWF0aW9uIik7Ci0JCWNsb3NlKGN0bCk7Ci0JCWV4
+aXQoMSk7CisJCWdvdG8gZXhpdF9jdGw7CiAJfQogCiAJc3dpdGNoICh1dWlkKSB7CkBAIC00NzEs
+MjIgKzQ3MCwxOSBAQCBzdGF0aWMgdm9pZCBkb19jb25uZWN0KGludCBjdGwsIGJkYWRkcl90CiAJ
+Y2FzZSBTRVJJQUxfUE9SVF9TVkNMQVNTX0lEOgogCQlpZiAoc3ViY2xhc3MgPT0gMHg0MCB8fCAh
+c3RyY21wKG5hbWUsICJDYWJsZSBSZXBsYWNlbWVudCIpKSB7CiAJCQlpZiAoZXBveF9wcmVzZW50
+ZXIoc3JjLCBkc3QsIGNoYW5uZWwpIDwgMCkgewotCQkJCWNsb3NlKGN0bCk7Ci0JCQkJZXhpdCgx
+KTsKKwkJCQlnb3RvIGV4aXRfY3RsOwogCQkJfQogCQkJYnJlYWs7CiAJCX0KIAkJaWYgKHN1YmNs
+YXNzID09IDB4MWYgfHwgIXN0cmNtcChuYW1lLCAiU1BQIHNsYXZlIikpIHsKIAkJCWlmIChqdGhy
+ZWVfa2V5Ym9hcmQoc3JjLCBkc3QsIGNoYW5uZWwpIDwgMCkgewotCQkJCWNsb3NlKGN0bCk7Ci0J
+CQkJZXhpdCgxKTsKKwkJCQlnb3RvIGV4aXRfY3RsOwogCQkJfQogCQkJYnJlYWs7CiAJCX0KIAkJ
+aWYgKHN1YmNsYXNzID09IDB4MDIgfHwgIXN0cmNtcChuYW1lLCAiU2VyaWFsIFBvcnQiKSkgewog
+CQkJaWYgKGNlbGx1b25fa2V5Ym9hcmQoc3JjLCBkc3QsIGNoYW5uZWwpIDwgMCkgewotCQkJCWNs
+b3NlKGN0bCk7Ci0JCQkJZXhpdCgxKTsKKwkJCQlnb3RvIGV4aXRfY3RsOwogCQkJfQogCQkJYnJl
+YWs7CiAJCX0KQEAgLTQ5NSw4ICs0OTEsNyBAQCBzdGF0aWMgdm9pZCBkb19jb25uZWN0KGludCBj
+dGwsIGJkYWRkcl90CiAJY2FzZSBIRUFEU0VUX1NWQ0xBU1NfSUQ6CiAJY2FzZSBIQU5EU0ZSRUVf
+U1ZDTEFTU19JRDoKIAkJaWYgKGhlYWRzZXRfcHJlc2VudGVyKHNyYywgZHN0LCBjaGFubmVsKSA8
+IDApIHsKLQkJCWNsb3NlKGN0bCk7Ci0JCQlleGl0KDEpOworCQkJZ290byBleGl0X2N0bDsKIAkJ
+fQogCQlicmVhazsKIAl9CkBAIC01MDcsMjggKzUwMiwzMiBAQCBjb25uZWN0OgogCWNzayA9IGwy
+Y2FwX2Nvbm5lY3Qoc3JjLCBkc3QsIEwyQ0FQX1BTTV9ISURQX0NUUkwpOwogCWlmIChjc2sgPCAw
+KSB7CiAJCXBlcnJvcigiQ2FuJ3QgY3JlYXRlIEhJRCBjb250cm9sIGNoYW5uZWwiKTsKLQkJY2xv
+c2UoY3RsKTsKLQkJZXhpdCgxKTsKKwkJZ290byBleGl0X2N0bDsKIAl9CiAKIAlpc2sgPSBsMmNh
+cF9jb25uZWN0KHNyYywgZHN0LCBMMkNBUF9QU01fSElEUF9JTlRSKTsKIAlpZiAoaXNrIDwgMCkg
+ewogCQlwZXJyb3IoIkNhbid0IGNyZWF0ZSBISUQgaW50ZXJydXB0IGNoYW5uZWwiKTsKLQkJY2xv
+c2UoY3NrKTsKLQkJY2xvc2UoY3RsKTsKLQkJZXhpdCgxKTsKKwkJZ290byBleGl0X2NzazsKIAl9
+CiAKIAllcnIgPSBjcmVhdGVfZGV2aWNlKGN0bCwgY3NrLCBpc2ssIHN1YmNsYXNzLCAxLCAxLCBi
+b290b25seSwgZW5jcnlwdCwgdGltZW91dCk7CiAJaWYgKGVyciA8IDApIHsKIAkJZnByaW50Zihz
+dGRlcnIsICJISUQgY3JlYXRlIGVycm9yICVkICglcylcbiIsCiAJCQkJCQllcnJubywgc3RyZXJy
+b3IoZXJybm8pKTsKLQkJY2xvc2UoaXNrKTsKLQkJc2xlZXAoMSk7Ci0JCWNsb3NlKGNzayk7Ci0J
+CWNsb3NlKGN0bCk7Ci0JCWV4aXQoMSk7CisJCWdvdG8gZXhpdF9pc2s7CiAJfQorCXJldHVybjsK
+KworZXhpdF9pc2s6CisJY2xvc2UoaXNrKTsKKwlzbGVlcCgxKTsKK2V4aXRfY3NrOgorCWNsb3Nl
+KGNzayk7CitleGl0X2N0bDoKKwljbG9zZShjdGwpOworCisJZXhpdCgxKTsKIH0KIAogc3RhdGlj
+IHZvaWQgZG9fc2VhcmNoKGludCBjdGwsIGJkYWRkcl90ICpiZGFkZHIsIHVpbnQ4X3Qgc3ViY2xh
+c3MsIGludCBmYWtlaGlkLCBpbnQgYm9vdG9ubHksIGludCBlbmNyeXB0LCBpbnQgdGltZW91dCkK
+QEAgLTYwNSw4ICs2MDQsNyBAQCBzdGF0aWMgdm9pZCBkb19raWxsKGludCBjdGwsIGJkYWRkcl90
+ICpiCiAKIAkJaWYgKGlvY3RsKGN0bCwgSElEUEdFVENPTk5MSVNULCAmY2wpIDwgMCkgewogCQkJ
+cGVycm9yKCJDYW4ndCBnZXQgY29ubmVjdGlvbiBsaXN0Iik7Ci0JCQljbG9zZShjdGwpOwotCQkJ
+ZXhpdCgxKTsKKwkJCWdvdG8gZmFpbF9jdGw7CiAJCX0KIAogCQlmb3IgKGkgPSAwOyBpIDwgY2wu
+Y251bTsgaSsrKSB7CkBAIC02MTUsOCArNjEzLDcgQEAgc3RhdGljIHZvaWQgZG9fa2lsbChpbnQg
+Y3RsLCBiZGFkZHJfdCAqYgogCiAJCQlpZiAoaW9jdGwoY3RsLCBISURQQ09OTkRFTCwgJnJlcSkg
+PCAwKSB7CiAJCQkJcGVycm9yKCJDYW4ndCByZWxlYXNlIGNvbm5lY3Rpb24iKTsKLQkJCQljbG9z
+ZShjdGwpOwotCQkJCWV4aXQoMSk7CisJCQkJZ290byBmYWlsX2N0bDsKIAkJCX0KIAkJfQogCkBA
+IC02MjYsMTAgKzYyMywxMyBAQCBzdGF0aWMgdm9pZCBkb19raWxsKGludCBjdGwsIGJkYWRkcl90
+ICpiCiAKIAkJaWYgKGlvY3RsKGN0bCwgSElEUENPTk5ERUwsICZyZXEpIDwgMCkgewogCQkJcGVy
+cm9yKCJDYW4ndCByZWxlYXNlIGNvbm5lY3Rpb24iKTsKLQkJCWNsb3NlKGN0bCk7Ci0JCQlleGl0
+KDEpOworCQkJZ290byBmYWlsX2N0bDsKIAkJfQogCX0KKworZmFpbF9jdGw6CisJY2xvc2UoY3Rs
+KTsKKwlleGl0KDEpOwogfQogCiBzdGF0aWMgdm9pZCB1c2FnZSh2b2lkKQpAQCAtODAxLDIzICs4
+MDEsMTkgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKIAogCWNhc2UgU0VBUkNI
+OgogCQlkb19zZWFyY2goY3RsLCAmYmRhZGRyLCBzdWJjbGFzcywgZmFrZWhpZCwgYm9vdG9ubHks
+IGVuY3J5cHQsIHRpbWVvdXQpOwotCQljbG9zZShjdGwpOwotCQlleGl0KDApOworCQlnb3RvIGV4
+aXRfY3RsOwogCiAJY2FzZSBDT05ORUNUOgogCQlkb19jb25uZWN0KGN0bCwgJmJkYWRkciwgJmRl
+diwgc3ViY2xhc3MsIGZha2VoaWQsIGJvb3Rvbmx5LCBlbmNyeXB0LCB0aW1lb3V0KTsKLQkJY2xv
+c2UoY3RsKTsKLQkJZXhpdCgwKTsKKwkJZ290byBleGl0X2N0bDsKIAogCWNhc2UgS0lMTDoKIAkJ
+ZG9fa2lsbChjdGwsICZkZXYsIGZsYWdzKTsKLQkJY2xvc2UoY3RsKTsKLQkJZXhpdCgwKTsKKwkJ
+Z290byBleGl0X2N0bDsKIAogCWRlZmF1bHQ6CiAJCWRvX3Nob3coY3RsKTsKLQkJY2xvc2UoY3Rs
+KTsKLQkJZXhpdCgwKTsKKwkJZ290byBleGl0X2N0bDsKIAl9CiAKICAgICAgICAgaWYgKGRldGFj
+aCkgewpAQCAtODU0LDYgKzg1MCw3IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10p
+CiAKIAljbG9zZShjc2spOwogCWNsb3NlKGlzayk7CitleGl0X2N0bDoKIAljbG9zZShjdGwpOwog
+CiAJcmV0dXJuIDA7Cg==
+------=_Part_112120_32739284.1186345373939
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -131,7 +109,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---------------060108050507020200010705
+------=_Part_112120_32739284.1186345373939
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -142,4 +120,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---------------060108050507020200010705--
+------=_Part_112120_32739284.1186345373939--
