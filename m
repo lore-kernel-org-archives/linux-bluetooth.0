@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <c1fa8edf0708051322s1a14f64u4f6b98402a82c021@mail.gmail.com>
-Date: Sun, 5 Aug 2007 16:22:53 -0400
-From: "Simon Ruggier" <simon80@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Message-ID: <46B60B20.4040801@gmail.com>
+Date: Sun, 05 Aug 2007 23:08:40 +0530
+From: Rogue <roguexz@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_112120_32739284.1186345373939"
-Subject: [Bluez-devel] [PATCH] refactor cleanup code in hidd main.c
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Does BlueZ have java bindings?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,108 +14,34 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_112120_32739284.1186345373939
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-This is an almost entirely cosmetic patch to hidd's main.c that moves
-some duplicated close()/exit() calls to the end of their respective
-functions, replacing them with gotos.
+Hi All,
 
-------=_Part_112120_32739284.1186345373939
-Content-Type: text/x-diff; name=hidd-cleanup.patch; charset=ANSI_X3.4-1968
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_f4zz6uw9
-Content-Disposition: attachment; filename="hidd-cleanup.patch"
+Just checking, if the bluez stack has java bindings? If it does, how do
+I go about acquiring it?
 
-SW5kZXg6IG1haW4uYwo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09ClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVlei91dGlscy9o
-aWRkL21haW4uYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4zNwpkaWZmIC11IC1wIC1yMS4zNyBt
-YWluLmMKLS0tIG1haW4uYwk4IE1heSAyMDA3IDE2OjM4OjQ3IC0wMDAwCTEuMzcKKysrIG1haW4u
-Ywk1IEF1ZyAyMDA3IDIwOjEzOjQ3IC0wMDAwCkBAIC00NjAsOCArNDYwLDcgQEAgc3RhdGljIHZv
-aWQgZG9fY29ubmVjdChpbnQgY3RsLCBiZGFkZHJfdAogCiAJaWYgKGVyciA8IDApIHsKIAkJcGVy
-cm9yKCJDYW4ndCBnZXQgZGV2aWNlIGluZm9ybWF0aW9uIik7Ci0JCWNsb3NlKGN0bCk7Ci0JCWV4
-aXQoMSk7CisJCWdvdG8gZXhpdF9jdGw7CiAJfQogCiAJc3dpdGNoICh1dWlkKSB7CkBAIC00NzEs
-MjIgKzQ3MCwxOSBAQCBzdGF0aWMgdm9pZCBkb19jb25uZWN0KGludCBjdGwsIGJkYWRkcl90CiAJ
-Y2FzZSBTRVJJQUxfUE9SVF9TVkNMQVNTX0lEOgogCQlpZiAoc3ViY2xhc3MgPT0gMHg0MCB8fCAh
-c3RyY21wKG5hbWUsICJDYWJsZSBSZXBsYWNlbWVudCIpKSB7CiAJCQlpZiAoZXBveF9wcmVzZW50
-ZXIoc3JjLCBkc3QsIGNoYW5uZWwpIDwgMCkgewotCQkJCWNsb3NlKGN0bCk7Ci0JCQkJZXhpdCgx
-KTsKKwkJCQlnb3RvIGV4aXRfY3RsOwogCQkJfQogCQkJYnJlYWs7CiAJCX0KIAkJaWYgKHN1YmNs
-YXNzID09IDB4MWYgfHwgIXN0cmNtcChuYW1lLCAiU1BQIHNsYXZlIikpIHsKIAkJCWlmIChqdGhy
-ZWVfa2V5Ym9hcmQoc3JjLCBkc3QsIGNoYW5uZWwpIDwgMCkgewotCQkJCWNsb3NlKGN0bCk7Ci0J
-CQkJZXhpdCgxKTsKKwkJCQlnb3RvIGV4aXRfY3RsOwogCQkJfQogCQkJYnJlYWs7CiAJCX0KIAkJ
-aWYgKHN1YmNsYXNzID09IDB4MDIgfHwgIXN0cmNtcChuYW1lLCAiU2VyaWFsIFBvcnQiKSkgewog
-CQkJaWYgKGNlbGx1b25fa2V5Ym9hcmQoc3JjLCBkc3QsIGNoYW5uZWwpIDwgMCkgewotCQkJCWNs
-b3NlKGN0bCk7Ci0JCQkJZXhpdCgxKTsKKwkJCQlnb3RvIGV4aXRfY3RsOwogCQkJfQogCQkJYnJl
-YWs7CiAJCX0KQEAgLTQ5NSw4ICs0OTEsNyBAQCBzdGF0aWMgdm9pZCBkb19jb25uZWN0KGludCBj
-dGwsIGJkYWRkcl90CiAJY2FzZSBIRUFEU0VUX1NWQ0xBU1NfSUQ6CiAJY2FzZSBIQU5EU0ZSRUVf
-U1ZDTEFTU19JRDoKIAkJaWYgKGhlYWRzZXRfcHJlc2VudGVyKHNyYywgZHN0LCBjaGFubmVsKSA8
-IDApIHsKLQkJCWNsb3NlKGN0bCk7Ci0JCQlleGl0KDEpOworCQkJZ290byBleGl0X2N0bDsKIAkJ
-fQogCQlicmVhazsKIAl9CkBAIC01MDcsMjggKzUwMiwzMiBAQCBjb25uZWN0OgogCWNzayA9IGwy
-Y2FwX2Nvbm5lY3Qoc3JjLCBkc3QsIEwyQ0FQX1BTTV9ISURQX0NUUkwpOwogCWlmIChjc2sgPCAw
-KSB7CiAJCXBlcnJvcigiQ2FuJ3QgY3JlYXRlIEhJRCBjb250cm9sIGNoYW5uZWwiKTsKLQkJY2xv
-c2UoY3RsKTsKLQkJZXhpdCgxKTsKKwkJZ290byBleGl0X2N0bDsKIAl9CiAKIAlpc2sgPSBsMmNh
-cF9jb25uZWN0KHNyYywgZHN0LCBMMkNBUF9QU01fSElEUF9JTlRSKTsKIAlpZiAoaXNrIDwgMCkg
-ewogCQlwZXJyb3IoIkNhbid0IGNyZWF0ZSBISUQgaW50ZXJydXB0IGNoYW5uZWwiKTsKLQkJY2xv
-c2UoY3NrKTsKLQkJY2xvc2UoY3RsKTsKLQkJZXhpdCgxKTsKKwkJZ290byBleGl0X2NzazsKIAl9
-CiAKIAllcnIgPSBjcmVhdGVfZGV2aWNlKGN0bCwgY3NrLCBpc2ssIHN1YmNsYXNzLCAxLCAxLCBi
-b290b25seSwgZW5jcnlwdCwgdGltZW91dCk7CiAJaWYgKGVyciA8IDApIHsKIAkJZnByaW50Zihz
-dGRlcnIsICJISUQgY3JlYXRlIGVycm9yICVkICglcylcbiIsCiAJCQkJCQllcnJubywgc3RyZXJy
-b3IoZXJybm8pKTsKLQkJY2xvc2UoaXNrKTsKLQkJc2xlZXAoMSk7Ci0JCWNsb3NlKGNzayk7Ci0J
-CWNsb3NlKGN0bCk7Ci0JCWV4aXQoMSk7CisJCWdvdG8gZXhpdF9pc2s7CiAJfQorCXJldHVybjsK
-KworZXhpdF9pc2s6CisJY2xvc2UoaXNrKTsKKwlzbGVlcCgxKTsKK2V4aXRfY3NrOgorCWNsb3Nl
-KGNzayk7CitleGl0X2N0bDoKKwljbG9zZShjdGwpOworCisJZXhpdCgxKTsKIH0KIAogc3RhdGlj
-IHZvaWQgZG9fc2VhcmNoKGludCBjdGwsIGJkYWRkcl90ICpiZGFkZHIsIHVpbnQ4X3Qgc3ViY2xh
-c3MsIGludCBmYWtlaGlkLCBpbnQgYm9vdG9ubHksIGludCBlbmNyeXB0LCBpbnQgdGltZW91dCkK
-QEAgLTYwNSw4ICs2MDQsNyBAQCBzdGF0aWMgdm9pZCBkb19raWxsKGludCBjdGwsIGJkYWRkcl90
-ICpiCiAKIAkJaWYgKGlvY3RsKGN0bCwgSElEUEdFVENPTk5MSVNULCAmY2wpIDwgMCkgewogCQkJ
-cGVycm9yKCJDYW4ndCBnZXQgY29ubmVjdGlvbiBsaXN0Iik7Ci0JCQljbG9zZShjdGwpOwotCQkJ
-ZXhpdCgxKTsKKwkJCWdvdG8gZmFpbF9jdGw7CiAJCX0KIAogCQlmb3IgKGkgPSAwOyBpIDwgY2wu
-Y251bTsgaSsrKSB7CkBAIC02MTUsOCArNjEzLDcgQEAgc3RhdGljIHZvaWQgZG9fa2lsbChpbnQg
-Y3RsLCBiZGFkZHJfdCAqYgogCiAJCQlpZiAoaW9jdGwoY3RsLCBISURQQ09OTkRFTCwgJnJlcSkg
-PCAwKSB7CiAJCQkJcGVycm9yKCJDYW4ndCByZWxlYXNlIGNvbm5lY3Rpb24iKTsKLQkJCQljbG9z
-ZShjdGwpOwotCQkJCWV4aXQoMSk7CisJCQkJZ290byBmYWlsX2N0bDsKIAkJCX0KIAkJfQogCkBA
-IC02MjYsMTAgKzYyMywxMyBAQCBzdGF0aWMgdm9pZCBkb19raWxsKGludCBjdGwsIGJkYWRkcl90
-ICpiCiAKIAkJaWYgKGlvY3RsKGN0bCwgSElEUENPTk5ERUwsICZyZXEpIDwgMCkgewogCQkJcGVy
-cm9yKCJDYW4ndCByZWxlYXNlIGNvbm5lY3Rpb24iKTsKLQkJCWNsb3NlKGN0bCk7Ci0JCQlleGl0
-KDEpOworCQkJZ290byBmYWlsX2N0bDsKIAkJfQogCX0KKworZmFpbF9jdGw6CisJY2xvc2UoY3Rs
-KTsKKwlleGl0KDEpOwogfQogCiBzdGF0aWMgdm9pZCB1c2FnZSh2b2lkKQpAQCAtODAxLDIzICs4
-MDEsMTkgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKIAogCWNhc2UgU0VBUkNI
-OgogCQlkb19zZWFyY2goY3RsLCAmYmRhZGRyLCBzdWJjbGFzcywgZmFrZWhpZCwgYm9vdG9ubHks
-IGVuY3J5cHQsIHRpbWVvdXQpOwotCQljbG9zZShjdGwpOwotCQlleGl0KDApOworCQlnb3RvIGV4
-aXRfY3RsOwogCiAJY2FzZSBDT05ORUNUOgogCQlkb19jb25uZWN0KGN0bCwgJmJkYWRkciwgJmRl
-diwgc3ViY2xhc3MsIGZha2VoaWQsIGJvb3Rvbmx5LCBlbmNyeXB0LCB0aW1lb3V0KTsKLQkJY2xv
-c2UoY3RsKTsKLQkJZXhpdCgwKTsKKwkJZ290byBleGl0X2N0bDsKIAogCWNhc2UgS0lMTDoKIAkJ
-ZG9fa2lsbChjdGwsICZkZXYsIGZsYWdzKTsKLQkJY2xvc2UoY3RsKTsKLQkJZXhpdCgwKTsKKwkJ
-Z290byBleGl0X2N0bDsKIAogCWRlZmF1bHQ6CiAJCWRvX3Nob3coY3RsKTsKLQkJY2xvc2UoY3Rs
-KTsKLQkJZXhpdCgwKTsKKwkJZ290byBleGl0X2N0bDsKIAl9CiAKICAgICAgICAgaWYgKGRldGFj
-aCkgewpAQCAtODU0LDYgKzg1MCw3IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10p
-CiAKIAljbG9zZShjc2spOwogCWNsb3NlKGlzayk7CitleGl0X2N0bDoKIAljbG9zZShjdGwpOwog
-CiAJcmV0dXJuIDA7Cg==
-------=_Part_112120_32739284.1186345373939
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+thanks,
+Rogue
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (GNU/Linux)
+
+iD8DBQFGtgsgceS9IQvx51YRAg3BAKC7biJNyozmcNNupySOQdUrKfvP+QCeND7V
+2t1fzNGC8YU/c0kus80FUAY=
+=frPk
+-----END PGP SIGNATURE-----
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
-------=_Part_112120_32739284.1186345373939
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-------=_Part_112120_32739284.1186345373939--
