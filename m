@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "leiyu@kcoe.cn" <leiyu@kcoe.cn>
-To: bluez-users@lists.sourceforge.net
-Date: Mon, 6 Aug 2007 15:42:20 +0800
-Mime-Version: 1.0
-Message-ID: <E1IHxKc-0003YU-HU@mail.sourceforge.net>
-Subject: [Bluez-users] how to make the device be discoverable
+From: Sumeet VERMA <sumeet.verma@st.com>
+To: <bluez-users@lists.sf.net>
+Date: Mon, 6 Aug 2007 13:08:58 +0530
+Message-ID: <006d01c7d7fc$df2c2090$0102a8c0@dlh.st.com>
+MIME-Version: 1.0
+Subject: [Bluez-users] A2dp on ARM9- Quality not good
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,45 +14,26 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0143475190=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0143475190==
-Content-Type: text/plain; charset="GB2312"
-Content-Transfer-Encoding: quoted-printable
+Hi 
+I have cross compiled the bluez stack-3.11 and btsco-0.42 for ARM9 platform. The audio streaming is working using the a2play application but the voice quality is not good. There are lot of breaks. The same setup is working fine on the PC.
 
-Dear All,
+I think the problem is due to the MIPS available for SBC encoding. ARM9 is running at 133 MHz. 
+Can you please suggest some optimizations which would help me improve the audio quality?
 
-I use bluez in embedded linux, it can use "hcitool scan" command to searc=
-h for other bluetooth device , how to make it be discoverable so that oth=
-er device can discover it? Thanks!
+Thanks and Regards,
+Sumeet 
 
-Best regards,
-Leiyu  =20
-
-
-
---===============0143475190==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============0143475190==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0143475190==--
