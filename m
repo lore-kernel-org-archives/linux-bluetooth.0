@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Mon, 6 Aug 2007 09:40:10 -0700 (PDT)
-From: hong zhang <henryzhang62@yahoo.com>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <mailman.151917.1186390010.21973.bluez-devel@lists.sourceforge.net>
+Message-ID: <46B74777.1060609@idlum.be>
+Date: Mon, 06 Aug 2007 18:08:23 +0200
+From: Pierre-Yves Paulus <py@idlum.be>
 MIME-Version: 1.0
-Message-ID: <81389.49773.qm@web58001.mail.re3.yahoo.com>
-Subject: [Bluez-devel] BlueZ version
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <d9a09df00708021125n3abd1281l51d7f313e913da27@mail.gmail.com>	<46B224A6.8040501@gmail.com>	<d9a09df00708021140k58b2fc16gd7f5a868899017d9@mail.gmail.com>
+	<46B228EF.80800@gmail.com>
+In-Reply-To: <46B228EF.80800@gmail.com>
+Subject: Re: [Bluez-devel] OBEX OPP/FTP implementation in Bluez
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,22 +21,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Manuel,
 
-My project has to use kernel 2.6.19 for ARM processor.
-Which version of BlueZ is better for 2.6.19?
+>> http://wiki.bluez.org/wiki/Transfer
+>>   
+> I can certainly update this one, and add a brief description on how to 
+> use obexftp and openobex with bluez.
 
-Also, do you have general build command for different
-processor?
+I would be very interested in this howto, too. Thanks in advance for 
+writing it.
 
-Thanks.
-
-----henry
-
-
-      ____________________________________________________________________________________
-Fussy? Opinionated? Impossible to please? Perfect.  Join Yahoo!'s user panel and lay it on us. http://surveylink.yahoo.com/gmrs/yahoo_panel_invite.asp?a=7 
-
+Best Regards,
+Pierre-Yves
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
