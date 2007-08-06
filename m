@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46B737E8.5060106@idlum.be>
-Date: Mon, 06 Aug 2007 17:02:00 +0200
-From: Pierre-Yves Paulus <py@idlum.be>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] What does error 110 actually mean? What is it caused
-	by?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <46B6D6B1.5030007@idlum.be>
+References: <46B6CC07.9010105@idlum.be> <1186386755.20129.1.camel@violet>
+	<46B6D6B1.5030007@idlum.be>
+Date: Mon, 06 Aug 2007 10:14:31 +0200
+Message-Id: <1186388071.20129.4.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] "Invalid CID in request"
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,31 +21,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Hi Pierre-Yves,
 
-I keep getting this error in hcid output now and then, and for various 
-calls:
+> > what kernel are you using? And I need the full trace from the HCI create
+> > connection to the HCI disconnect.
+> 
+> The kernel used is 2.6.21-2-486 (from debian).
+> 
+> The file I attached to my last e-mail (re-attached to this one) contains 
+> the output of "hcidump -XV", are you requesting something else?
 
-(hcid stderr) hcid[32196]: connect(): Connection timed out (110)
+this is unlikely, but try it with only one adapter attached to your
+system. I don't expect that to be a problem, because the kernel is
+designed to handle the case. However I wanna rule out that it is a
+multiple adapter issue.
 
- From my limited understanding, this error happens when a hci call to 
-the dongle times out. Is it right?
+Second, please try a 2.6.23-rc2 kernel. My wild guess is that the L2CAP
+configuration process screws up the phone. We added a fix for that to
+make it fully specification compliant.
 
-I observed that on some computers, this error happens very often when 
-kernel module ehci_hcd is loaded. It is generally coming up less often 
-when it is not loaded.
+Regards
 
-Also, I failed to find any way to have any influence on those errors. I 
-start getting them suddenly, and also suddenly, I stop getting them. I 
-can have none for hours, and then suddenly lots of them for 5 minutes, 
-and afterwards everything works properly again. I can also get one or 
-two every few minutes. Really, I can't find a pattern for their appearence.
+Marcel
 
-So what's happening there? Any feedback on this issue would be really 
-appreciated.
-
-Best Reagrds,
-Pierre-Yves
 
 
 -------------------------------------------------------------------------
