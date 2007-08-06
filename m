@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46B74777.1060609@idlum.be>
-Date: Mon, 06 Aug 2007 18:08:23 +0200
+Message-ID: <46B737E8.5060106@idlum.be>
+Date: Mon, 06 Aug 2007 17:02:00 +0200
 From: Pierre-Yves Paulus <py@idlum.be>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <d9a09df00708021125n3abd1281l51d7f313e913da27@mail.gmail.com>	<46B224A6.8040501@gmail.com>	<d9a09df00708021140k58b2fc16gd7f5a868899017d9@mail.gmail.com>
-	<46B228EF.80800@gmail.com>
-In-Reply-To: <46B228EF.80800@gmail.com>
-Subject: Re: [Bluez-devel] OBEX OPP/FTP implementation in Bluez
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] What does error 110 actually mean? What is it caused
+	by?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,18 +19,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Manuel,
+Hello,
 
->> http://wiki.bluez.org/wiki/Transfer
->>   
-> I can certainly update this one, and add a brief description on how to 
-> use obexftp and openobex with bluez.
+I keep getting this error in hcid output now and then, and for various 
+calls:
 
-I would be very interested in this howto, too. Thanks in advance for 
-writing it.
+(hcid stderr) hcid[32196]: connect(): Connection timed out (110)
 
-Best Regards,
+ From my limited understanding, this error happens when a hci call to 
+the dongle times out. Is it right?
+
+I observed that on some computers, this error happens very often when 
+kernel module ehci_hcd is loaded. It is generally coming up less often 
+when it is not loaded.
+
+Also, I failed to find any way to have any influence on those errors. I 
+start getting them suddenly, and also suddenly, I stop getting them. I 
+can have none for hours, and then suddenly lots of them for 5 minutes, 
+and afterwards everything works properly again. I can also get one or 
+two every few minutes. Really, I can't find a pattern for their appearence.
+
+So what's happening there? Any feedback on this issue would be really 
+appreciated.
+
+Best Reagrds,
 Pierre-Yves
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
