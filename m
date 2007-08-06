@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Nicolas Trangez <eikke@eikke.com>
+Date: Mon, 6 Aug 2007 13:33:51 -0700 (PDT)
+From: hong zhang <henryzhang62@yahoo.com>
 To: bluez-devel@lists.sourceforge.net
-Date: Tue, 07 Aug 2007 01:50:53 +0200
-Message-Id: <1186444253.10966.14.camel@sky.nicolast.be>
-Mime-Version: 1.0
-Subject: [Bluez-devel] [bluez-gnome] Authorization agent address-based
-	whitelisting
+In-Reply-To: <mailman.151917.1186390010.21973.bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Message-ID: <547249.8186.qm@web58008.mail.re3.yahoo.com>
+Subject: [Bluez-devel] cross compile problem on bluez
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,172 +15,83 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1863131556=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+List,
 
---===============1863131556==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="=-wgv6FFB1PB09xN2MWNdL"
+I apply bluez to embedded linux system. ARM processor
+is used and arm compiler from montavista. Based on
+README of bluez-libs-3.11. I run
 
+configure
+--host=/opt/montavista/mobilinux/devkit/arm/v6_vfp_le/bin/arm_v6_vfp_le-
+ --prefix=/root/Desktop/bluez-libs-3.11
 
---=-wgv6FFB1PB09xN2MWNdL
-Content-Type: multipart/mixed; boundary="=-3cgnOMf629sfLWj7WwS+"
+returns error as following, any help would be
+appreciated.
 
-
---=-3cgnOMf629sfLWj7WwS+
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-
-Hija,
-
-I'm working on bluetooth mouse handling in the GNOME desktop recently.
-Now I finally got my mouse working (took a while), I could get some
-coding done. As part of this I thought it could be useful to get around
-the passkey agent authorization question for some devices (ie mouses),
-without enabling auto_authorize in the bluetooth-applet configuration.
-
-Attached you can find a patch to auto-grant authorization request for
-some devices based on their BT address. The addresses are stored in
-gconf as a simple list of strings.
-
-The preferences editor has not been altered (yet) to manipulate this
-list.
-
-Thanks,
-
-Nicolas
-
---=-3cgnOMf629sfLWj7WwS+
-Content-Disposition: attachment;
-	filename=0001-Automatic-authorization-whitelisting.patch
-Content-Type: application/mbox;
-	name=0001-Automatic-authorization-whitelisting.patch
-Content-Transfer-Encoding: base64
-
-RnJvbSAzNGE0ZDQ4YTQ0NThlYTM1ZmE5ZmRkODBkZDQxMDE0NDJkYmRmZTAzIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBOaWNvbGFzIFRyYW5nZXogPGlra2VAbmljb2xhc3QuYmU+CkRh
-dGU6IFR1ZSwgNyBBdWcgMjAwNyAwMTo0OTozNiArMDIwMApTdWJqZWN0OiBbUEFUQ0hdIEF1dG9t
-YXRpYyBhdXRob3JpemF0aW9uIHdoaXRlbGlzdGluZwoKLS0tCiBhcHBsZXQvbWFpbi5jICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgfCAgIDMxICsrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysKIHByb3BlcnRpZXMvYmx1ZXRvb3RoLW1hbmFnZXIuc2NoZW1hcy5pbiB8ICAgMTMgKysrKysr
-KysrKysrKwogMiBmaWxlcyBjaGFuZ2VkLCA0NCBpbnNlcnRpb25zKCspLCAwIGRlbGV0aW9ucygt
-KQoKZGlmZiAtLWdpdCBhL2FwcGxldC9tYWluLmMgYi9hcHBsZXQvbWFpbi5jCmluZGV4IDVhMTBk
-ZWUuLmE5YTU3MjcgMTAwNjQ0Ci0tLSBhL2FwcGxldC9tYWluLmMKKysrIGIvYXBwbGV0L21haW4u
-YwpAQCAtNCw2ICs0LDcgQEAKICAqCiAgKiAgQ29weXJpZ2h0IChDKSAyMDA1LTIwMDcgIE1hcmNl
-bCBIb2x0bWFubiA8bWFyY2VsQGhvbHRtYW5uLm9yZz4KICAqICBDb3B5cmlnaHQgKEMpIDIwMDYt
-MjAwNyAgQmFzdGllbiBOb2NlcmEgPGhhZGVzc0BoYWRlc3MubmV0PgorICogIENvcHlyaWdodCAo
-QykgMjAwNyAgICAgICBOaWNvbGFzIFRyYW5nZXogPGVpa2tlQGVpa2tlLmNvbT4KICAqCiAgKgog
-ICogIFRoaXMgcHJvZ3JhbSBpcyBmcmVlIHNvZnR3YXJlOyB5b3UgY2FuIHJlZGlzdHJpYnV0ZSBp
-dCBhbmQvb3IgbW9kaWZ5CkBAIC03NywxMSArNzgsMTMgQEAgdHlwZWRlZiBlbnVtIHsKIHN0YXRp
-YyBpbnQgaWNvbl9wb2xpY3kgPSBJQ09OX1BPTElDWV9QUkVTRU5UOwogCiBzdGF0aWMgZ2Jvb2xl
-YW4gYXV0b19hdXRob3JpemUgPSBGQUxTRTsKK3N0YXRpYyBHU0xpc3QgKmF1dG9fYXV0aG9yaXpl
-X2FkZHJlc3NlcyA9IE5VTEw7CiAKICNkZWZpbmUgUFJFRl9ESVIJCSIvYXBwcy9ibHVldG9vdGgt
-bWFuYWdlciIKICNkZWZpbmUgUFJFRl9VU0VfSEFMCQlQUkVGX0RJUiAiL3VzZV9oYWwiCiAjZGVm
-aW5lIFBSRUZfSUNPTl9QT0xJQ1kJUFJFRl9ESVIgIi9pY29uX3BvbGljeSIKICNkZWZpbmUgUFJF
-Rl9BVVRPX0FVVEhPUklaRQlQUkVGX0RJUiAiL2F1dG9fYXV0aG9yaXplIgorI2RlZmluZSBQUkVG
-X0FVVE9fQVVUSE9SSVpFX0FERFJFU1NFUyAgIFBSRUZfRElSICIvYXV0b19hdXRob3JpemVfYWRk
-cmVzc2VzIgogCiBzdGF0aWMgR0NvbmZDbGllbnQqIGdjb25mOwogCkBAIC05NDUsNiArOTQ4LDEx
-IEBAIHN0YXRpYyBnYm9vbGVhbiBhdXRoX2FnZW50X2F1dGhvcml6ZShQYXNza2V5QWdlbnQgKmFn
-ZW50LAogCQlyZXR1cm4gVFJVRTsKIAl9CiAKKyAgICAgICAgaWYgKGdfc2xpc3RfZmluZF9jdXN0
-b20oYXV0b19hdXRob3JpemVfYWRkcmVzc2VzLCBhZGRyZXNzLCAoR0NvbXBhcmVGdW5jKXN0cmNt
-cCkgIT0gTlVMTCkgeworICAgICAgICAgICAgICAgIGRidXNfZ19tZXRob2RfcmV0dXJuKGNvbnRl
-eHQpOworICAgICAgICAgICAgICAgIHJldHVybiBUUlVFOworICAgICAgICB9CisKIAlvYmplY3Qg
-PSBkYnVzX2dfcHJveHlfbmV3X2Zvcl9uYW1lKGNvbm4sICJvcmcuYmx1ZXoiLAogCQkJCQkJcGF0
-aCwgIm9yZy5ibHVlei5BZGFwdGVyIik7CiAKQEAgLTE3MTYsNiArMTcyNCw3IEBAIHN0YXRpYyB2
-b2lkIGdjb25mX2NhbGxiYWNrKEdDb25mQ2xpZW50ICpjbGllbnQsIGd1aW50IGNueG5faWQsCiAJ
-CQkJCUdDb25mRW50cnkgKmVudHJ5LCBncG9pbnRlciB1c2VyX2RhdGEpCiB7CiAJR0NvbmZWYWx1
-ZSAqdmFsdWU7CisgICAgICAgIEdTTGlzdCAqbGlzdCA9IE5VTEw7CiAKIAl2YWx1ZSA9IGdjb25m
-X2VudHJ5X2dldF92YWx1ZShlbnRyeSk7CiAJaWYgKHZhbHVlID09IE5VTEwpCkBAIC0xNzYxLDYg
-KzE3NzAsMTkgQEAgc3RhdGljIHZvaWQgZ2NvbmZfY2FsbGJhY2soR0NvbmZDbGllbnQgKmNsaWVu
-dCwgZ3VpbnQgY254bl9pZCwKIAogCWlmIChzdHJjbXAoZW50cnktPmtleSwgUFJFRl9BVVRPX0FV
-VEhPUklaRSkgPT0gMCkKIAkJYXV0b19hdXRob3JpemUgPSBnY29uZl92YWx1ZV9nZXRfYm9vbCh2
-YWx1ZSk7CisKKyAgICAgICAgaWYgKHN0cmNtcChlbnRyeS0+a2V5LCBQUkVGX0FVVE9fQVVUSE9S
-SVpFX0FERFJFU1NFUykgPT0gMCkKKyAgICAgICAgICAgICAgICBpZihnY29uZl92YWx1ZV9nZXRf
-bGlzdF90eXBlKHZhbHVlKSA9PSBHQ09ORl9WQUxVRV9TVFJJTkcpIHsKKyAgICAgICAgICAgICAg
-ICAgICAgICAgIGlmKGF1dG9fYXV0aG9yaXplX2FkZHJlc3NlcyAhPSBOVUxMKSB7CisgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIGdfc2xpc3RfZm9yZWFjaChhdXRvX2F1dGhvcml6ZV9h
-ZGRyZXNzZXMsIChHRnVuYylnX2ZyZWUsIE5VTEwpOworICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBnX3NsaXN0X2ZyZWUoYXV0b19hdXRob3JpemVfYWRkcmVzc2VzKTsKKyAgICAgICAg
-ICAgICAgICAgICAgICAgIH0KKyAgICAgICAgICAgICAgICAgICAgICAgIGxpc3QgPSBnY29uZl92
-YWx1ZV9nZXRfbGlzdCh2YWx1ZSk7CisgICAgICAgICAgICAgICAgICAgICAgICB3aGlsZShsaXN0
-ICE9IE5VTEwpIHsKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYXV0b19hdXRob3Jp
-emVfYWRkcmVzc2VzID0gZ19zbGlzdF9wcmVwZW5kKGF1dG9fYXV0aG9yaXplX2FkZHJlc3Nlcywg
-Z19zdHJkdXAobGlzdC0+ZGF0YSkpOworICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBs
-aXN0ID0gbGlzdC0+bmV4dDsKKyAgICAgICAgICAgICAgICAgICAgICAgIH0KKyAgICAgICAgICAg
-ICAgICB9CiB9CiAKIGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCkBAIC0xODAyLDYg
-KzE4MjQsMTAgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKIAlhdXRvX2F1dGhv
-cml6ZSA9IGdjb25mX2NsaWVudF9nZXRfYm9vbChnY29uZiwKIAkJCQkJUFJFRl9BVVRPX0FVVEhP
-UklaRSwgTlVMTCk7CiAKKyAgICAgICAgYXV0b19hdXRob3JpemVfYWRkcmVzc2VzID0gZ2NvbmZf
-Y2xpZW50X2dldF9saXN0KGdjb25mLAorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIFBSRUZfQVVUT19BVVRIT1JJWkVfQUREUkVTU0VTLAorICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIEdDT05GX1ZBTFVFX1NUUklORywgTlVMTCk7CisKIAlnY29u
-Zl9jbGllbnRfYWRkX2RpcihnY29uZiwgUFJFRl9ESVIsIEdDT05GX0NMSUVOVF9QUkVMT0FEX05P
-TkUsIE5VTEwpOwogCiAJZ2NvbmZfY2xpZW50X25vdGlmeV9hZGQoZ2NvbmYsIFBSRUZfRElSLApA
-QCAtMTg0NCw1ICsxODcwLDEwIEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAK
-IAlkYnVzX2dfY29ubmVjdGlvbl91bnJlZihjb25uKTsKIAorICAgICAgICBpZihhdXRvX2F1dGhv
-cml6ZV9hZGRyZXNzZXMgIT0gTlVMTCkgeworICAgICAgICAgICAgICAgIGdfc2xpc3RfZm9yZWFj
-aChhdXRvX2F1dGhvcml6ZV9hZGRyZXNzZXMsIChHRnVuYylnX2ZyZWUsIE5VTEwpOworICAgICAg
-ICAgICAgICAgIGdfc2xpc3RfZnJlZShhdXRvX2F1dGhvcml6ZV9hZGRyZXNzZXMpOworICAgICAg
-ICB9CisKIAlyZXR1cm4gMDsKIH0KZGlmZiAtLWdpdCBhL3Byb3BlcnRpZXMvYmx1ZXRvb3RoLW1h
-bmFnZXIuc2NoZW1hcy5pbiBiL3Byb3BlcnRpZXMvYmx1ZXRvb3RoLW1hbmFnZXIuc2NoZW1hcy5p
-bgppbmRleCBjOGZjN2M5Li45ZmNhNmZlIDEwMDY0NAotLS0gYS9wcm9wZXJ0aWVzL2JsdWV0b290
-aC1tYW5hZ2VyLnNjaGVtYXMuaW4KKysrIGIvcHJvcGVydGllcy9ibHVldG9vdGgtbWFuYWdlci5z
-Y2hlbWFzLmluCkBAIC0zNyw1ICszNywxOCBAQAogICAgICAgPC9sb2NhbGU+CiAgICAgPC9zY2hl
-bWE+CiAKKyAgICA8c2NoZW1hPgorICAgICAgPGtleT4vc2NoZW1hcy9hcHBzL2JsdWV0b290aC1t
-YW5hZ2VyL2F1dG9fYXV0aG9yaXplX2FkZHJlc3Nlczwva2V5PgorICAgICAgPGFwcGx5dG8+L2Fw
-cHMvYmx1ZXRvb3RoLW1hbmFnZXIvYXV0b19hdXRob3JpemVfYWRkcmVzc2VzPC9rZXk+CisgICAg
-ICA8b3duZXI+Ymx1ZXRvb3RoLW1hbmFnZXI8L293bmVyPgorICAgICAgPHR5cGU+bGlzdDwvdHlw
-ZT4KKyAgICAgIDxsaXN0X3R5cGU+c3RyaW5nPC9saXN0X3R5cGU+CisgICAgICA8ZGVmYXVsdD5b
-XTwvZGVmYXVsdD4KKyAgICAgIDxsb2NhbGUgbmFtZT0iQyI+CisgICAgICAgIDxzaG9ydD5MaXN0
-IG9mIGFkZHJlc3NlcyBmcm9tIHdoaWNoIGF1dGhvcml6YXRpb24gcmVxdWVzdHMgc2hvdWxkIGJl
-IGF1dG9tYXRpY2FsbHkgZ3JhbnRlZDwvc2hvcnQ+CisgICAgICAgIDxsb25nPklmIGFuIGF1dGhv
-cml6YXRpb24gcmVxdWVzdCBjb21lcyBpbiBmcm9tIGEgZGV2aWNlIG9mIHdoaWNoIHRoZSBhZGRy
-ZXNzIGlzIGluIHRoaXMgbGlzdCwgdGhlIHJlcXVlc3Qgd2lsbCBiZSBncmFudGVkLCBubyBtYXR0
-ZXIgdGhlIHZhbHVlIG9mIGF1dG9fYXV0aG9yaXplLjwvbG9uZz4KKyAgICAgIDwvbG9jYWxlPgor
-ICAgIDwvc2NoZW1hPgorCiAgIDwvc2NoZW1hbGlzdD4KIDwvZ2NvbmZzY2hlbWFmaWxlPgotLSAK
-MS41LjEuMwoK
+configure: WARNING: If you wanted to set the --build
+type, don't use --host.
+    If a cross compiler is detected then cross compile
+mode will be used.
+checking for a BSD-compatible install...
+/usr/bin/install -c
+checking whether build environment is sane... yes
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking for
+/opt/montavista/mobilinux/devkit/arm/v6_vfp_le/bin/arm_v6_vfp_le--strip...
+no
+checking for strip... strip
+checking whether to enable maintainer-specific
+portions of Makefiles... no
+checking for
+/opt/montavista/mobilinux/devkit/arm/v6_vfp_le/bin/arm_v6_vfp_le--gcc...
+no
+checking for gcc... gcc
+checking for C compiler default output file name...
+a.out
+checking whether the C compiler works... yes
+checking whether we are cross compiling... no
+checking for suffix of executables...
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler...
+yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ANSI C... none
+needed
+checking for style of include used by make... GNU
+checking dependency style of gcc... gcc3
+checking for a BSD-compatible install...
+/usr/bin/install -c
+checking build system type... i686-redhat-linux-gnu
+checking host system type... Invalid configuration
+`/opt/montavista/mobilinux/devkit/arm/v6_vfp_le/bin/arm_v6_vfp_le-':
+machine
+`/opt/montavista/mobilinux/devkit/arm/v6_vfp_le/bin/arm_v6_vfp_le'
+not recognized
+configure: error: /bin/sh ./config.sub
+/opt/montavista/mobilinux/devkit/arm/v6_vfp_le/bin/arm_v6_vfp_le-
+failed
 
 
---=-3cgnOMf629sfLWj7WwS+--
 
---=-wgv6FFB1PB09xN2MWNdL
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.4 (GNU/Linux)
-
-iD8DBQBGt7PdbXO6F+H86l4RAvw2AKCXUaPXaV0pGHj2pQueX3uivGT3wwCghpPj
-kytHKpB20DJPkWhNqpZZEJI=
-=VgJB
------END PGP SIGNATURE-----
-
---=-wgv6FFB1PB09xN2MWNdL--
+----henry
 
 
---===============1863131556==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+       
+____________________________________________________________________________________
+Boardwalk for $500? In 2007? Ha! Play Monopoly Here and Now (it's updated for today's economy) at Yahoo! Games.
+http://get.games.yahoo.com/proddesc?gamekey=monopolyherenow  
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============1863131556==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1863131556==--
