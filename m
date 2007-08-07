@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46B877D5.1050105@gmail.com>
-Date: Tue, 07 Aug 2007 19:17:01 +0530
-From: Rogue <roguexz@gmail.com>
-MIME-Version: 1.0
+From: "Heiko Wundram (Beenic)" <wundram@beenic.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46B60B20.4040801@gmail.com> <46B7FAFF.8080304@idlum.be>
-In-Reply-To: <46B7FAFF.8080304@idlum.be>
-Subject: Re: [Bluez-devel] Does BlueZ have java bindings?
+Date: Tue, 7 Aug 2007 14:30:28 +0200
+References: <mailman.159099.1186455104.21973.bluez-devel@lists.sourceforge.net>
+	<46B85566.1000100@ucd.ie>
+In-Reply-To: <46B85566.1000100@ucd.ie>
+MIME-Version: 1.0
+Message-Id: <200708071430.29143.wundram@beenic.net>
+Subject: Re: [Bluez-devel] rfcomm connection using multiple dongles
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,46 +21,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Am Dienstag 07 August 2007 13:20:06 schrieb Stephen Keegan:
+> while ((r = connect(m_CommHandle, (struct sockaddr *)&raddr,
+> sizeof(raddr))) == -1)
+>
+> I think that I may need to specify which dongle (hc0 or hci1) should be
+> used in this command.
+>
+> If anybody could advise on a solution, I would be very grateful.
 
+bind() the RFCOMM socket to the local BT-address of the dongle you want to use 
+before connecting it.
 
-Pierre-Yves Paulus wrote:
-> Hi Rogue,
-> 
-> Use the DBus API.
-> http://bluez.cvs.sourceforge.net/bluez/utils/hcid/dbus-api.txt?view=markup
-> 
-> Java DBus bindings are available there:
-> http://www.freedesktop.org/wiki/Software/DBusBindings
-> 
+man 2 bind
 
-Thanks Pierre,
+is your friend.
 
-I am looking into the Dbus bindings right now.
-
-regards,
-Rogue
-
-> Best Regards,
-> Pierre-Yves
-> 
-> Rogue wrote:
-> Hi All,
-> 
-> Just checking, if the bluez stack has java bindings? If it does, how do
-> I go about acquiring it?
-> 
-> thanks,
-> Rogue
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.7 (GNU/Linux)
-
-iD8DBQFGuHfVceS9IQvx51YRAuT/AKCXU+1SOxwUbM2wpYBz0oAA1z5qaQCgwsrO
-mFYd4j0ACqr/5UZVGrf/7gk=
-=LO4e
------END PGP SIGNATURE-----
+-- 
+Heiko Wundram
+Product & Application Development
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
