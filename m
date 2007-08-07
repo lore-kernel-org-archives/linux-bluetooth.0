@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 7 Aug 2007 04:10:20 -0700 (PDT)
-From: Je Co <hulcjje@yahoo.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1186473840.20129.44.camel@violet>
-MIME-Version: 1.0
-Message-ID: <482434.64770.qm@web32409.mail.mud.yahoo.com>
+In-Reply-To: <72022.81167.qm@web32403.mail.mud.yahoo.com>
+References: <72022.81167.qm@web32403.mail.mud.yahoo.com>
+Date: Tue, 07 Aug 2007 10:04:00 +0200
+Message-Id: <1186473840.20129.44.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] configure: error: dbus > 0.35 is requered
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -15,36 +16,27 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2045194064=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============2045194064==
-Content-Type: multipart/alternative; boundary="0-488535779-1186485020=:64770"
-Content-Transfer-Encoding: 8bit
+Hi,
 
---0-488535779-1186485020=:64770
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+> I'm trying to get bluetooth working om my Absolute-box. Hope I'm doing
+> the right things,  to me  it's a bit confusing what to do to get
+> things working properly.
+> 
+> Now I'm trying to install the bluez-libs and bluez-utils. Think
+> bluez-libs went well, but bluez-utils gives error when configuring.
+> 
+> Searched into old posts, but couldn't find the solution (think due to
+> my lack of knowledge).
+> 
+> Don't think dbus is installed on my system, but what confuses me most,
+> is that it seems to me that part of the installation is installing
+> dbus (isn't it in the  dir 'common'?). 
 
-Marcel,
-
-Thanks for fast reply!
-
-Downloaded, configured, made and installed d-bus package, no problems.
-
-Configuring, making and installing bluez-utils, no problems anymore.
-
-Now I finally can start using the commands I find in other postings (hcitool etc.).
-
-Didn't connect to my phone yet, but will be a matter of time I hope.
-
-Think what lacks is a simple how-to from user-perspective how to get bluetooth up and running, in case a distro doesn't contain all necessary software like Absolute.
-
-Jeu.
-
-
-Marcel Holtmann <marcel@holtmann.org> wrote: you have to install the low-level D-Bus library libdbus and its
+you have to install the low-level D-Bus library libdbus and its
 development files. This is a hard requirement.
 
 Regards
@@ -53,39 +45,12 @@ Marcel
 
 
 
-       
----------------------------------
-Building a website is a piece of cake. 
-Yahoo! Small Business gives you all the tools to get online.
---0-488535779-1186485020=:64770
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-Marcel,<br><br>Thanks for fast reply!<br><br>Downloaded, configured, made and installed d-bus package, no problems.<br><br>Configuring, making and installing bluez-utils, no problems anymore.<br><br>Now I finally can start using the commands I find in other postings (hcitool etc.).<br><br>Didn't connect to my phone yet, but will be a matter of time I hope.<br><br>Think what lacks is a simple how-to from user-perspective how to get bluetooth up and running, in case a distro doesn't contain all necessary software like Absolute.<br><br>Jeu.<br><br><br><b><i>Marcel Holtmann &lt;marcel@holtmann.org&gt;</i></b> wrote:<blockquote class="replbq" style="border-left: 2px solid rgb(16, 16, 255); margin-left: 5px; padding-left: 5px;"> you have to install the low-level D-Bus library libdbus and its<br>development files. This is a hard requirement.<br><br>Regards<br><br>Marcel<br><br><br></blockquote><p>&#32;
-      <hr size=1>Building a website is a piece of cake. <br>Yahoo! Small Business gives you <a href="http://us.rd.yahoo.com/evt=48251/*http://smallbusiness.yahoo.com/webhosting/?p=PASSPORTPLUS">all the tools to get online.</a>
---0-488535779-1186485020=:64770--
-
-
---===============2045194064==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============2045194064==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============2045194064==--
