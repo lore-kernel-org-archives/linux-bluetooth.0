@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <38134.204.84.244.1.1186592652.squirrel@webmail.ncsu.edu>
+Message-ID: <38134.204.84.244.1.1186592652.squirrel@webmail.ncsu.edu>
+In-Reply-To: <81389.49773.qm@web58001.mail.re3.yahoo.com>
 References: <81389.49773.qm@web58001.mail.re3.yahoo.com>
-	<38134.204.84.244.1.1186592652.squirrel@webmail.ncsu.edu>
-Date: Wed, 08 Aug 2007 19:09:56 +0200
-Message-Id: <1186592996.20129.103.camel@violet>
-Mime-Version: 1.0
+Date: Wed, 8 Aug 2007 13:04:12 -0400 (EDT)
+From: tjoconno@ncsu.edu
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
 Subject: Re: [Bluez-devel] BlueZ version
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,19 +20,10 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Can anyone point me in the direction of the file formats for btsnoop &
+hcidump? Thank you so much in advance.
 
-> Can anyone point me in the direction of the file formats for btsnoop &
-> hcidump? Thank you so much in advance.
-
-look at the source code of bluez-hcidump/src/hcidump.c. It has all
-needed information.
-
-Regards
-
-Marcel
-
-
+TJ
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
