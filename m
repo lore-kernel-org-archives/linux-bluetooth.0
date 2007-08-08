@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <cfd8c35a0708080117i1190d2d8y9cadc025e64f712@mail.gmail.com>
-Date: Wed, 8 Aug 2007 10:17:35 +0200
-From: "Adrian van Dongen" <adrianvandongen@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1186561022.20129.83.camel@violet>
-MIME-Version: 1.0
-References: <20070808100035.2804041d@debian.fastwebnet.it>
-	<cfd8c35a0708080103y605d305bu8f45809d2f32e41e@mail.gmail.com>
-	<1186561022.20129.83.camel@violet>
-Subject: Re: [Bluez-users] B-Speech Data Stream dongle
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <b5c34db00708072235j3954de14icb69e75bde3d7b72@mail.gmail.com>
+References: <b5c34db00708072235j3954de14icb69e75bde3d7b72@mail.gmail.com>
+Date: Wed, 08 Aug 2007 10:17:51 +0200
+Message-Id: <1186561071.20129.85.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] bluez-utils and bluez-libs
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,85 +16,77 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1934695987=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1934695987==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_30993_21428979.1186561055610"
+Hi,
 
-------=_Part_30993_21428979.1186561055610
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+>    I am working on Au1200 processor and i use linux-2.6.11 and now i
+> am trying USB Bluetooth in it .I need to compile bluetooth libraries
+> and bluetooth utils for it.I downloaded the following files,
+> bluez-libs-3.13.tar.gz
+> 
+> bluez-utils-3.13.tar.gz
+> 
+> I compile the library as follows,
+> ./configure --host=mipsel --prefix=/usr --enable-shared=no
+> --enable-static=yes
+> make
+> make install DESTDIR=$PWD/bluez1
+> 
+> it compiled and next to compile bluez-utils
+> 
+> ./configure \
+> --host=mipsel \
+> --with-bluez=$PWD/../bluez-libs-2.25/install/usr \
+> CPPFLAGS="-DLINUX" \
+> LDFLAGS="-Wl,-elf2flt"
+> 
+> then make
+> 
+> following are the errors ,
+> 
+> make[3]: Entering directory
+> `/home/busybox/bluez/bluez-utils-3.13/hcid'
+> gcc -DHAVE_CONFIG_H -I. -I.. -I../common -I../sdpd -DLINUX
+> -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include
+> -DDBUS_API_SUBJECT_TO_CHANGE -I../eglib -Wall -O2 -D_FORTIFY_SOURCE=2
+> -MT device.o -MD -MP -MF .deps/device.Tpo -c -o device.o device.c
+> device.c: In function 'start_device':
+> device.c:271: error: 'LMP_PAUSE_ENC' undeclared (first use in this
+> function)
+> device.c:271: error: (Each undeclared identifier is reported only once
+> device.c:271: error: for each function it appears in.)
+> device.c:277: error: 'LMP_NFLUSH_PKTS' undeclared (first use in this
+> function)
+> device.c:280: error: 'LMP_LSTO' undeclared (first use in this
+> function)
+> make[3]: *** [device.o] Error 1
+> make[3]: Leaving directory `/home/busybox/bluez/bluez-utils-3.13/hcid'
+> make[2]: *** [all] Error 2
+> make[2]: Leaving directory `/home/busybox/bluez/bluez-utils-3.13/hcid'
+> make[1]: *** [all-recursive] Error 1
+> make[1]: Leaving directory `/home/busybox/bluez/bluez-utils-3.13'
+> make: *** [all] Error 2
+> 
+> could anyone tell me where am going wrong.
 
-super! :D
+your includes are screwed up. You need to make sure it uses the headers
+of bluez-utils-3.13 and not some older ones installed one your system.
 
-Didn't wont to flame/undermine or something, was just curious.
+Regards
 
-
-
-On 8/8/07, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Adrian,
->
-> > I dont know if Bluez supports EDR ..?
->
-> actually we fully support EDR since a long long time.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc.
-> Still grepping through log files to find problems?  Stop.
-> Now Search log events and configuration files using AJAX and a browser.
-> Download your FREE copy of Splunk now >>  http://get.splunk.com/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
-
-------=_Part_30993_21428979.1186561055610
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-super! :D<br><br>Didn&#39;t wont to flame/undermine or something, was just curious.<br><br><br><br><div><span class="gmail_quote">On 8/8/07, <b class="gmail_sendername">Marcel Holtmann</b> &lt;<a href="mailto:marcel@holtmann.org">
-marcel@holtmann.org</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hi Adrian,<br><br>&gt; I dont know if Bluez supports EDR ..?
-<br><br>actually we fully support EDR since a long long time.<br><br>Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>This SF.net email is sponsored by: Splunk Inc.
-<br>Still grepping through log files to find problems?&nbsp;&nbsp;Stop.<br>Now Search log events and configuration files using AJAX and a browser.<br>Download your FREE copy of Splunk now &gt;&gt;&nbsp;&nbsp;<a href="http://get.splunk.com/">
-http://get.splunk.com/</a><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">
-https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquote></div><br>
-
-------=_Part_30993_21428979.1186561055610--
+Marcel
 
 
---===============1934695987==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============1934695987==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1934695987==--
