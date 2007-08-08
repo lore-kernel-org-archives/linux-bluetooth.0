@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <EJENLMBEOLKAMCJFBFMDGEEDCAAA.leiyu@kcoe.cn>
-References: <EJENLMBEOLKAMCJFBFMDGEEDCAAA.leiyu@kcoe.cn>
-Date: Wed, 08 Aug 2007 16:08:36 +0200
-Message-Id: <1186582116.20129.92.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] how to change the attribute of bluetooth dongle
+From: "leiyu" <leiyu@kcoe.cn>
+To: "Bluez-Users" <bluez-users@lists.sourceforge.net>
+Date: Wed, 8 Aug 2007 22:00:03 +0800
+Message-ID: <EJENLMBEOLKAMCJFBFMDGEEDCAAA.leiyu@kcoe.cn>
+MIME-Version: 1.0
+Subject: [Bluez-users] how to change the attribute of bluetooth dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,31 +14,43 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1030094277=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Leiyu,
+--===============1030094277==
+Content-Type: text/plain;
+	charset="gb2312"
+Content-Transfer-Encoding: base64
 
-> it can active the bluetooth dongle that I run the command  "hciconfig hci0 up" , I  can use "hciconfig -a " to see its parameter , but how to change its parameter,
-> for example ,change the device's name or other parameters?
-
-you can use hciconfig to do that. Check the manual page for details. The
-better way is to use the D-Bus API for BlueZ. Check the Wiki pages for
-details. Also the UI tools from bluez-gnome use this API.
-
-Regards
-
-Marcel
+RGVhciBBbGwsDQoNCg0KaXQgY2FuIGFjdGl2ZSB0aGUgYmx1ZXRvb3RoIGRvbmdsZSB0aGF0IEkg
+cnVuIHRoZSBjb21tYW5kICAiaGNpY29uZmlnIGhjaTAgdXAiICwgSSAgY2FuIHVzZSAiaGNpY29u
+ZmlnIC1hICIgdG8gc2VlIGl0cyBwYXJhbWV0ZXIgLCBidXQgaG93IHRvIGNoYW5nZSBpdHMgcGFy
+YW1ldGVyLA0KZm9yIGV4YW1wbGUgLGNoYW5nZSB0aGUgZGV2aWNlJ3MgbmFtZSBvciBvdGhlciBw
+YXJhbWV0ZXJzPw0KDQp0aGFua3MNCg0KQmVzdCByZWdhcmRzLA0KTGVpeXUgICANCg==
 
 
+
+--===============1030094277==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
+--===============1030094277==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1030094277==--
