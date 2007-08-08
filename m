@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Kristofor K Jensen <kristofor.jensen@gmail.com>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <mailman.176270.1186581974.21973.bluez-users@lists.sourceforge.net>
-References: <mailman.176270.1186581974.21973.bluez-users@lists.sourceforge.net>
-Date: Wed, 08 Aug 2007 10:21:08 -0400
-Message-Id: <1186582868.2990.21.camel@localhost.localdomain>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <EJENLMBEOLKAMCJFBFMDGEEDCAAA.leiyu@kcoe.cn>
+References: <EJENLMBEOLKAMCJFBFMDGEEDCAAA.leiyu@kcoe.cn>
+Date: Wed, 08 Aug 2007 16:08:36 +0200
+Message-Id: <1186582116.20129.92.camel@violet>
 Mime-Version: 1.0
-Subject: [Bluez-users] CSR chipsets on an Acer Aspire
+Subject: Re: [Bluez-users] how to change the attribute of bluetooth dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,25 +20,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I've got an Acer Aspire with the bluetooth button on the front but came
-with no internal bluetooth module.  I've ordered and received one off
-Ebay which I've now plugged onto my motherboard.  It's based on the CSR
-Bluecore 4 EXT (the chipset is labeled "CSR 41B14 3AO6U K711SW") and am
-just trying to see if it's being detected in ANY way (since the LED on
-the module is not lighting up)  I'm looking into how the acer_acpi
-package for Fedora 7 activates the acer bluetooth modules since that is
-what got my other acer accessories working properly (wireless, mail LED,
-etc).
+Hi Leiyu,
 
-Once I figure out the Acer end of things, am I correct in assuming that
-this module should be recognized?  I've read that CSR Bluecore 4 works
-but I've only seen discussion on the USB dongles where this is a 4 wire
-connection to the motherboard.
+> it can active the bluetooth dongle that I run the command  "hciconfig hci0 up" , I  can use "hciconfig -a " to see its parameter , but how to change its parameter,
+> for example ,change the device's name or other parameters?
 
-Thanks for the help in advance...I'm just trying to narrow down where
-the problem might be.
+you can use hciconfig to do that. Check the manual page for details. The
+better way is to use the D-Bus API for BlueZ. Check the Wiki pages for
+details. Also the UI tools from bluez-gnome use this API.
 
-Kristofor
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
