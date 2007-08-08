@@ -1,11 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "leiyu" <leiyu@kcoe.cn>
-To: "Bluez-Users" <bluez-users@lists.sourceforge.net>
-Date: Wed, 8 Aug 2007 22:00:03 +0800
-Message-ID: <EJENLMBEOLKAMCJFBFMDGEEDCAAA.leiyu@kcoe.cn>
-MIME-Version: 1.0
-Subject: [Bluez-users] how to change the attribute of bluetooth dongle
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+From: Mats Erik Andersson <mats@blue2net.com>
+To: List Bluez users <bluez-users@lists.sourceforge.net>
+Date: Wed, 08 Aug 2007 11:04:00 +0200
+Message-Id: <1186563840.4744.52.camel@Blue2net-mats.bellman.mea>
+Mime-Version: 1.0
+Subject: [Bluez-users] My netdev_watchdog barked once!
+Reply-To: mats.andersson@blue2net.com,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,43 +15,54 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1030094277=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1030094277==
-Content-Type: text/plain;
-	charset="gb2312"
-Content-Transfer-Encoding: base64
+Hello all,
 
-RGVhciBBbGwsDQoNCg0KaXQgY2FuIGFjdGl2ZSB0aGUgYmx1ZXRvb3RoIGRvbmdsZSB0aGF0IEkg
-cnVuIHRoZSBjb21tYW5kICAiaGNpY29uZmlnIGhjaTAgdXAiICwgSSAgY2FuIHVzZSAiaGNpY29u
-ZmlnIC1hICIgdG8gc2VlIGl0cyBwYXJhbWV0ZXIgLCBidXQgaG93IHRvIGNoYW5nZSBpdHMgcGFy
-YW1ldGVyLA0KZm9yIGV4YW1wbGUgLGNoYW5nZSB0aGUgZGV2aWNlJ3MgbmFtZSBvciBvdGhlciBw
-YXJhbWV0ZXJzPw0KDQp0aGFua3MNCg0KQmVzdCByZWdhcmRzLA0KTGVpeXUgICANCg==
+I had yesterday a surprising kernel message
+
+   NETDEV WATCHDOG: bnep0: transmit timed out
+
+It occurred exactly once and then never more.
+This happened on a FOXBoard with an Etrax100LX,
+i.e. cris architecture, almost exactly twenty
+four hours after the bnep link was initiated.
+The kernel is 2.6.19, with bluez code seemingly
+identical to the code in 2.6.18-mh8, but that
+is beside my present point. 
+
+My question: Is it more probable that it is the
+usb driver that has a suboptimal timer use within
+the kernel, or could it be that bnep/core.c or
+bnep/netdev.c somehow should take timing of a
+particular usb interface into account? The regular
+kernel documentation mentions that the ethernet
+driver e1000.ko can have a timer issue. That is how
+I come to think along these lines.
+
+The remarkable aftermath is that after the isolated
+barking of my watchdog, the bnep link transmitted
+in a fragmented manner (like spikes viewed with gkrellm)
+for three hours, and then magically recovered again
+and is now running for an additional twenty four hours.
+The only extraneous log message for bluez in these
+forty eight hours, is that singular "NETDEV WATCHDOG" call.
+The FOXBoard is the PANU-side, and on the NAP-side the
+logging is completely silent!
 
 
+Thanks for your attention and presumptive remarks.
 
---===============1030094277==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Mats Erik Andersson, PhD
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============1030094277==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1030094277==--
