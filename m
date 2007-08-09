@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <fb2ac3c90708092110y3a4ffff1ka8d5ea1ebdd17e32@mail.gmail.com>
-Date: Thu, 9 Aug 2007 22:10:20 -0600
-From: "Andrew Jorgensen" <andrew.jorgensen@gmail.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] bluetooth-applet and gnome-vfs-obexftp
+From: Philip Barnes <phil@trig222.f9.co.uk>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Thu, 09 Aug 2007 18:25:12 +0100
+Message-Id: <1186680312.5948.4.camel@localhost.localdomain>
+Mime-Version: 1.0
+Subject: [Bluez-users] N70 as a 3G/GPRS modem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,34 +18,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Version 0.10 of bluez-gnome added support for "browsing devices" - a
-much needed feature by any account.  What I'm not thrilled about is
-that it was written to support gnome-vfs-obexftp.
+I am running bluez on FC7. I would like to use my N70 as a bluetooth
+modem to connect to T-Mobile UK but am struggling to get started.
 
-Don't get me wrong - gnome-vfs-obexftp is awesome, but
-bluetooth-applet is the wrong entry point for it.  The applet should
-allow you to see what devices are around you and allow you to initiate
-a bonding with them but the assumption that you want to browse OBEX is
-bad.
+Could some kind soul give me a few pointers, or a URL for a good user
+guide.
 
-Another problem with this approach is that it creates a dependency on
-gnome-vfs-obexftp and assumes that it's present.  If it's desirable to
-have the applet launch other programs it should support more than
-obex:// and there should be some generic mechanism for programs to
-plug themselves in as handling a given service.  It should be possible
-some day to get a bluetooth mouse working from the GUI, or a bluetooth
-headset, for example.
+Thanks Phil
 
-Of course there needs to be better integration of gnome-vfs-obexftp,
-but that integration should be in nautilus where everything else
-vfs-related is found.  A bluetooth link under computer:/// when an
-adapter is present would be sufficient (though I wish we'd treat OBEX
-more generically as well - it's got 3 or 4 transports besides
-bluetooth).
-
-Other thoughts?
-
-Andrew Jorgensen
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
