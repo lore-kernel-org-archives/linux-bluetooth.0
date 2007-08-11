@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <46B737E8.5060106@idlum.be>
-References: <46B737E8.5060106@idlum.be>
-Date: Sat, 11 Aug 2007 20:18:39 +0200
-Message-Id: <1186856319.6698.35.camel@violet>
+In-Reply-To: <193720484730124@lycos-europe.com>
+References: <193720484730124@lycos-europe.com>
+Date: Sat, 11 Aug 2007 20:08:25 +0200
+Message-Id: <1186855705.6698.20.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] What does error 110 actually mean? What is
-	it	caused by?
+Subject: Re: [Bluez-devel] bluetooth audio
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,32 +20,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pierre-Yves,
+Hi Joakim,
 
-> I keep getting this error in hcid output now and then, and for various 
-> calls:
+> I'm trying to intall the alsa-lib plugins for bluetooth audio.
+> I have followed the instructions at:
+> http://bluetooth-alsa.sourceforge.net/build.html
+> install libsbc works well but when I install plugz I get errors ?
+> I have attached the output of make whare I get the errors.
 > 
-> (hcid stderr) hcid[32196]: connect(): Connection timed out (110)
-> 
->  From my limited understanding, this error happens when a hci call to 
-> the dongle times out. Is it right?
-> 
-> I observed that on some computers, this error happens very often when 
-> kernel module ehci_hcd is loaded. It is generally coming up less often 
-> when it is not loaded.
-> 
-> Also, I failed to find any way to have any influence on those errors. I 
-> start getting them suddenly, and also suddenly, I stop getting them. I 
-> can have none for hours, and then suddenly lots of them for 5 minutes, 
-> and afterwards everything works properly again. I can also get one or 
-> two every few minutes. Really, I can't find a pattern for their appearence.
-> 
-> So what's happening there? Any feedback on this issue would be really 
-> appreciated.
+> Do I need a newer kernel? I have 2.6.16.27-0.9-default
+> I have alsa version 1.0.14
+> My distribution is SLED10 / opensuse 10.1
 
-no idea. Are you running a 2.6.22 kernel and bluez-utils-3.14? If not,
-please re-test and try to figure out which part of the code is causing
-them. Look through the code for "connect()".
+your kernel is really old, but it should be good enough. However you
+might wanna consider an update anyway.
+
+The plugz code is basically dead. Actually it works, but the mainstream
+solution is the Bluetooth audio service from the bluez-utils CVS. It now
+has A2DP support and this one should be used. It is still a little bit
+buggy and we have no good documentation for setting it up, but you might
+find enough information in the wiki or on IRC to get this going.
 
 Regards
 
