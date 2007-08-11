@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <d89ddf300708060727r2f2165dawfec381fd3506ec44@mail.gmail.com>
-References: <006d01c7d7fc$df2c2090$0102a8c0@dlh.st.com>
-	<d89ddf300708060727r2f2165dawfec381fd3506ec44@mail.gmail.com>
-Date: Sat, 11 Aug 2007 20:20:33 +0200
-Message-Id: <1186856433.6698.37.camel@violet>
+In-Reply-To: <34746.44504.qm@web32406.mail.mud.yahoo.com>
+References: <34746.44504.qm@web32406.mail.mud.yahoo.com>
+Date: Sat, 11 Aug 2007 20:16:54 +0200
+Message-Id: <1186856214.6698.33.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] A2dp on ARM9- Quality not good
+Subject: Re: [Bluez-users] configure: error: dbus > 0.35 is requered
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,25 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Brad,
+Hi,
 
-> first, try different encoder settings. some settings use more
-> bandwidth but less cpu.
-> 
-> also see the todo items from sbc.c:
-> 
->   use a log2 table for byte integer scale factors calculation (sum
-> log2 results for high and low bytes)
->   fill bitpool by 16 bits instead of one at a time in bits
-> allocation/bitpool generation
->   port to the dsp
->   don't consume more bytes than passed into the encoder
-> 
-> some of these were suggested to me by the guy writing an encoder for
-> palm 700p. I didn't dig into the algorithm to see how they would work.
+>         You could make a howto now you know how it works and submit it
+>         to the community of the disto you use. They should add it to
+>         there documentation. 
+>         
+>         I keep track of the things I'm doing at the Absolute-forum. If
+>         only to know what I've done in case I've to reinstall or
+>         upgrade. When everything starts working I hope it will work, a
+>         howto can be compiled. But that could take some time ......
 
-I think that is a job for our friends from Brazil. Ping them and see if
-they can work something out.
+we have wiki.bluez.org. Feel free to add some documentation.
 
 Regards
 
