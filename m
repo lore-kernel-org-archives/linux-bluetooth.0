@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <46BD85F4.1090400@free.fr>
+Date: Sat, 11 Aug 2007 11:48:36 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <46BD85F4.1090400@free.fr>
-References: <46BD85F4.1090400@free.fr>
-Date: Sat, 11 Aug 2007 20:01:15 +0200
-Message-Id: <1186855275.6698.10.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] An explanation of a2dpd weird behaviour on
-	high	resolution timers enabled kernels
+Subject: [Bluez-devel] An explanation of a2dpd weird behaviour on high
+ resolution timers enabled kernels
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,41 +15,58 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
-
-> I recently purchased a new combo A2DP/HFP headset from Sony Ericsson.
-> This was the first time i was able to try Frederic's a2dpd daemon. :-)
-
-you might wanna focus on the Bluetooth audio service in bluez-utils (the
-code got committed today) which now has A2DP support.
-
-Parts are based on the work from bluetooth-alsa, but the overall design
-concept is a little bit different. For example is the SBC encoding done
-inside the ALSA plugin and not inside the daemon. This allows us to
-avoid any unnecessary copying of data between processes. My laptop
-showed xmms running at 5% CPU and that includes MP3 decoding and then
-SBC encoding.
-
-I have seen some weird behavior with this when the playback speed is way
-to fast. This might be related or totally unrelated. I simply don't
-know.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >>  http://get.splunk.com/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SGkgYWxsLAoKSSByZWNlbnRseSBwdXJjaGFzZWQgYSBuZXcgY29tYm8gQTJEUC9IRlAgaGVhZHNl
+dCBmcm9tIFNvbnkgRXJpY3Nzb24uClRoaXMgd2FzIHRoZSBmaXJzdCB0aW1lIGkgd2FzIGFibGUg
+dG8gdHJ5IEZyZWRlcmljJ3MgYTJkcGQgZGFlbW9uLiA6LSkKSSB3b3JrZWQgZmluZSAoZXhjZXB0
+IHdpdGggc29tZSBhdWRpbyBjdXRzIG9yIGV4Y2Vzc2l2ZSBkZWxheXMgLSBtb3JlIG9uIAp0aGF0
+IGxhdGVyKS4KVGhlbiBpIGRlY2lkZWQgdG8gdXBkYXRlIG15IG9sZCAyLjYuMjAga2VybmVsIHRv
+IGEgcmVjZW50IDIuNi4yMiBrZXJuZWwsIAppbmNsdWRpbmcgdGhlIG5vdyBkZWJpYW4gZGVmYXVs
+dCBzZXR0aW5ncyA6IGR5bmFtaWMgdGlja3MgYW4gaGlnaCAKcmVzb2x1dGlvbiB0aW1lcnMuCgpU
+aGVuIGkgc3RhcnRlZCB0byBleGhpYml0IHRoZSBiZWhhdmlvdXIgb3RoZXIgcGVvcGxlIGhhdmUg
+YmVlbiAKcmVwb3J0aW5nLCB3aGljaCBtZWFucyBzcHVyaW91cyBkaXNjb25uZWN0cyAoaSBkaWRu
+J3QgYWN0aXZhdGUgdGhlIHJldHJ5IApwYXRjaCkuCkkgc3RhcnRlZCBkZWJ1Z2dpbmcgdGhlIGtl
+cm5lbCBwYXJ0IHRvIHNlZSB3aGVyZSB0aGUgRUFHQUlOIGludCB0aGUgCkwyQ0FQIHNvY2tldCB3
+cml0ZSBjYWxsIHdhcyBjb21taW5nIGZyb20uIExvb2tzIGxpa2UgaXQgd2FzIGNvbWluZyBmcm9t
+IAp0aGUgc29ja19hbGxvY19zZW5kX3Bza2IgZnVuY3Rpb24sIHdoaWNoIGlzIHJlc3BvbnNpYmxl
+IHRvIGFsbG9jYXRlIApzb2NrZXQgYnVmZmVycywgcHJlY2lzZWx5IGF0IGxpbmUgIDExOTEgb2Yg
+IG5ldC9jb3JlL3NvY2suYy4gVGhpcyBsaW5lIAp0ZXN0cyB0byBzZWUgaWYgdGhlIHNvY2tldCBx
+dWV1ZSBpcyBmdWxsLiBJZiBpdCBmYWlscyBpdCByZXR1cm5zIEVBR0FJTi4KSW4gb3VyIGNhc2Ug
+dGhhdCBtZWFudCB0aGF0IHRoZSB1c2VyIHNwYWNlIGRhZW1vbiB3YXMgc2VuZGluZyBkYXRhIHdh
+eSAKdG9vIGZhc3QgKGkgYWxzbyBub3RpY2VkIHRoYXQgeG1tcyB0aW1lIGRpc3BsYXkgd2FzIHJ1
+bm5pbmcgd2F5IHRvbyBmYXN0IAphbHNvKS4KCkFmdGVyIGEgd2hpbGUgaSB3YXMgYWJsZSB0byBk
+aXNjb3ZlciB3aGVyZSB0aGUgc2xlZXAgYW5kIHdhaXQgam9iIHdhcyAKcGVyZm9ybWVkIGZvciBh
+MmRwIHN0cmVhbWluZy4gVGhhdCB3YXNuJ3QgcmVhbGx5IGVhc3kgdG8gZmluZCBhcyB0aGVyZSAK
+YXJlIG1hbnkgcGxhY2VzIGluIHRoZSBjb2RlIHRoYXQgc2VlbSB0byBiZSB0cnlpbmcgdG8gaGFu
+ZGxlIHRoaXMgdGFzaywgCmJ1dCBtb3N0IG9mIHRoZW0gaGF2ZSB0aGUgc2xlZXAgY2FsbCBjb21t
+ZW50ZWQgOi0oCgpMb29rcyBsaWtlIHRoZSBqb2IgaXMgcGVyZm9ybWVkIGluIHRoZSBhMmRwZC5j
+IGZpbGUsIGxpbmUgMTU5NDoKICAgICAgICBpZihwb2xsaW5mb3MucG9sbHRpbWVvdXQ+MCkKICAg
+ICAgICAgICAgICAgIHVzbGVlcChwb2xsaW5mb3MucG9sbHRpbWVvdXQpOwoKCkkgYWRkZWQgc29t
+ZSB0cmFjZXMgdG8gdGhpcyBjb2RlIHRvIHNlZSBob3cgbXVjaCB3ZSB3aGVyZSB0cnlpbmcgdG8g
+CnNsZWVwLiBUbyBteSBzdXByaXNlIHRoZSB0cmFjZSBzaG93ZWQgdGhhdCB3ZSB3aGVyZSBtb3N0
+IG9mIHRoZSB0aW1lIApzbGVlcGluZyBmb3IgYXMgbGl0dGxlIGFzIDUwIHVzZWMsIHdoaWNoIGRv
+ZXNuJ3QgbWFrZXMgc2Vuc2UuLi4sIGJlY2F1c2UgCnNsZWVwaW5nIHByZWNpc2lvbiBpcyBib3Vu
+ZCB0byB0aGUgdGltZXIgaW50ZXJydXB0IGZyZXF1ZW5jeSwgd2hpY2ggaXMgCnVzdXN1YWxseSBz
+ZXQgYmV0d2VlbiAxMDBIWiBhbmQgMTAwMEhaICghKQpUaGlzIG9mIGNvdXJzZSB1bmxlc3MgeW91
+IHVzZSBhIGtlcm5lbCB3aXRoIGhpZ2ggcmVzb2x1dGlvbnMgdGltZXJzIAplbmFibGVkLCBpbiB0
+aGF0IGNhc2UgeW91IHJlYWxseSBnZXQgd2hhdCB5b3UgYXNrIGZvciBpZiB5b3VyIGhhcmR3YXJl
+IApzdXBwb3J0cyBpdCwgd2hpY2ggbG9va3MgdG8gYmUgdGhlIGNhc2Ugb24gbm93YWRheXMgY29t
+cHV0ZXJzLCBpbmNsdWRpbmcgCm15IGxhcHRvcC4gOi0pCgpUbyBtYWtlIHNvbWUgbW9yZSBmdW4g
+YWJvdXQgdGhlIGlzc3VlLCBpIHNpbXBseSByZXBsYWNlZCB0aGUgY2FsbCB3aXRoIGEgCnVzbGVl
+cCgxMDAwMCksIHdoaWNoIHdvdWxkIGJlIHdoYXQgeW91IHdvdWxkIGdldCBhbnl3YXkgd2l0aCB0
+aGUgbm9uIEhSIAp0aW1lciBrZXJuZWwuLi4gImV0IHZvaWzDoCIgOiBpdCBzdGFydGVkIHRvIHdv
+cmsgYXMgYmVmb3JlLgoKQXMgYSBjb25jbHVzaW9uIChTb3JyeSB0byBoYXZlIHRvIHNheSB0aGF0
+IEZyZWRlcmljIDstKSApLCBidXQgaXQgbG9va3MgCnRoYXQgdGhlIHdheSBhMmRwZCBoYW5kbGVz
+IHRpbWUgaXMgY3VycmVudGx5IGJhZGx5IGJyb2tlbiA6LSgKClJlZ2FyZHMsCgpGYWJpZW4KCgot
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogU3BsdW5r
+IEluYy4KU3RpbGwgZ3JlcHBpbmcgdGhyb3VnaCBsb2cgZmlsZXMgdG8gZmluZCBwcm9ibGVtcz8g
+IFN0b3AuCk5vdyBTZWFyY2ggbG9nIGV2ZW50cyBhbmQgY29uZmlndXJhdGlvbiBmaWxlcyB1c2lu
+ZyBBSkFYIGFuZCBhIGJyb3dzZXIuCkRvd25sb2FkIHlvdXIgRlJFRSBjb3B5IG9mIFNwbHVuayBu
+b3cgPj4gIGh0dHA6Ly9nZXQuc3BsdW5rLmNvbS8KX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVs
+QGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0
+cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
