@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <46B0A557.9080000@kameleon-media.com>
-References: <46B0A557.9080000@kameleon-media.com>
-Date: Sat, 11 Aug 2007 20:27:55 +0200
-Message-Id: <1186856876.6698.48.camel@violet>
+In-Reply-To: <5307d89f0708051338w35288418x915abd247233c324@mail.gmail.com>
+References: <5307d89f0708051338w35288418x915abd247233c324@mail.gmail.com>
+Date: Sat, 11 Aug 2007 20:25:13 +0200
+Message-Id: <1186856713.6698.44.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Problem building a piconet with pand
+Subject: Re: [Bluez-users] Info Dinovo LCD driver
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,44 +20,40 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Laurent,
+Hi Patrick,
 
-> I'm actually working on a project where I need embedded devices to
-> communicate between them. We decided to use bluetooth dongles and pan
-> to build a piconet.
-> Actually this work fine when we have only 3 devices : 1 GN & 2 PANU
-> (PANU#1 & PANU#2). When we try to add a third PANU (PANU#3), pand say
-> the host is down. If I shut down the connection of one of the two
-> thers PANU, I'm able to establish a connection with PANU#3 to the GN.
-> I try to setup a different GN on a linux desktop, same result, 1 GN &
-> 2 PANU.
-> 
-> On my server I do this : 
-> pand --listen --nosdp --role GN -i yy:yy:yy:yy:yy:yy
-> I use brctl on the GN to bridge the interface
-> 
-> On my clients I do this :
-> pand --nodetach -i xx:xx:xx:xx:xx:xx --role PANU --connect
-> yy:yy:yy:yy:yy:yy
-> 
-> On connected PANU i have :
-> pand[7334]: Bluetooth PAN daemon version 2.25
-> pand[7334]: Connecting to yy:yy:yy:yy:yy:yy
-> pand[7334]: bnep0 connected
-> 
-> On PANU's I can't connect:
-> pand[8492]: Bluetooth PAN daemon version 2.25
-> pand[8492]: Connecting to yy:yy:yy:yy:yy:yy
-> pand[8492]: Connect to yy:yy:yy:yy:yy:yy failed. Host is down(112)
-> 
-> 
-> I have read & reread the HOWTO-PAN. I mainly used it to setup my pan.
-> I know there is a limitation of 7 PANU max but there I'm far away of
-> the 7 devices. Is there is something I have forgotten ?
-> misconfigured  ... ? A problem with my dongles ?
-> If anyone could help me
+> I patched bluez-utils succesfully for the Dinovo MEDIA Pad LCD driver.
+> The example program supplied with it works!
 
-your version of pand is ancient. Install bluez-utils-3.14.
+I don't see any patch or example program.
+
+> But it won't work automaticaly at startup.
+> This is the example of /etc/default/bluetooth:
+> 
+> HIDD_ENABLED=1
+> HIDD_OPTIONS="-i 00:07:61:45:5F:0D --connect 00:07:61:3E:15:1A --server"
+>                                   [_ this is my dongle
+> [_this is the Media Pad
+> 
+> So, when I startup my computer, I have to press one the keyboard Pad
+> buttons to activate the Media Pad,
+> then it's connected , the keyboard buttons works but the lcd won't work.
+> To get he lcd to work I have to do manually:
+> sudo hidd -i 00:07:61:45:5F:0D --connect 00:07:61:3E:15:1A, then the
+> lcd gets also activated.
+> I don't have to use the "--connect" option in /etc/default/bleutooth
+> for my keyoard and mouse! They work automatically.
+
+We don't focus on hidd anymore and everybody that keeps using these
+crappy --connect stuff in the init script and complains that something
+is not working should ask himself if you are actually understand how HID
+within Bluetooth is working. All HID will re-connect to the host. That
+is a fact and it works this way. No excuses. Everything else is a bug
+and all workarounds are wrong. Period.
+
+Anyway. We are pushing the Bluetooth input service and this one should
+be used and issues should be fixed there. Actually the latest
+bluez-gnome from CVS can even connect HID via bluetooth-properties.
 
 Regards
 
