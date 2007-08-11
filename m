@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <525899.68874.qm@web58013.mail.re3.yahoo.com>
-References: <525899.68874.qm@web58013.mail.re3.yahoo.com>
-Date: Sat, 11 Aug 2007 20:15:12 +0200
-Message-Id: <1186856112.6698.31.camel@violet>
+In-Reply-To: <b5c34db00708080157i4840627al1ac38b8ed3840631@mail.gmail.com>
+References: <b5c34db00708072235j3954de14icb69e75bde3d7b72@mail.gmail.com>
+	<1186561071.20129.85.camel@violet>
+	<b5c34db00708080157i4840627al1ac38b8ed3840631@mail.gmail.com>
+Date: Sat, 11 Aug 2007 20:13:19 +0200
+Message-Id: <1186855999.6698.28.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] configure: error: dbus > 0.35 is requered
+Subject: Re: [Bluez-users] bluez-utils and bluez-libs
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,26 +24,13 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi,
 
-> I am using bluez-utils-3.11 for ARM embedded linux.
-> When hcid is buildt, it complains libdbus-1.so
-> 
-> /usr/lib/libdbus-1.so: could not read symbols: File in
-> wrong format.
-> 
-> Because embedded linux kernel version is awalys behind
-> the most recent released kernel.
+> Thanks for your reply.Can you guide how to proceed, i use linux-2.6.11
+> for MIPS architecture(Au1200 processor) shall i use some other version
+> will it help and can you verify whether my configuration and
+> compilation is correct.waiting for your kind reply.
 
-the libdbus has nothing to do with the kernel version. However stop
-whining about embedded kernel versions. Use the latest upstream kernel
-and not some vendor crap.
-
-> And I could not find old versions for bluez in
-> www.bluez.org.
-> 
-> What version of libdbus needed to match
-> bluez-utils-3.13 or 11?
-
-Use the D-Bus 1.0.x release.
+the latest upstream kernel is 2.6.22. So you should start using the
+latest one and not stick with some ancient one.
 
 Regards
 
