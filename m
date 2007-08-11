@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <c1fa8edf0708051322s1a14f64u4f6b98402a82c021@mail.gmail.com>
-References: <c1fa8edf0708051322s1a14f64u4f6b98402a82c021@mail.gmail.com>
-Date: Sat, 11 Aug 2007 20:26:15 +0200
-Message-Id: <1186856775.6698.46.camel@violet>
+In-Reply-To: <46B737E8.5060106@idlum.be>
+References: <46B737E8.5060106@idlum.be>
+Date: Sat, 11 Aug 2007 20:18:39 +0200
+Message-Id: <1186856319.6698.35.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] refactor cleanup code in hidd main.c
+Subject: Re: [Bluez-devel] What does error 110 actually mean? What is
+	it	caused by?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,14 +21,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Simon,
+Hi Pierre-Yves,
 
-> This is an almost entirely cosmetic patch to hidd's main.c that moves
-> some duplicated close()/exit() calls to the end of their respective
-> functions, replacing them with gotos.
+> I keep getting this error in hcid output now and then, and for various 
+> calls:
+> 
+> (hcid stderr) hcid[32196]: connect(): Connection timed out (110)
+> 
+>  From my limited understanding, this error happens when a hci call to 
+> the dongle times out. Is it right?
+> 
+> I observed that on some computers, this error happens very often when 
+> kernel module ehci_hcd is loaded. It is generally coming up less often 
+> when it is not loaded.
+> 
+> Also, I failed to find any way to have any influence on those errors. I 
+> start getting them suddenly, and also suddenly, I stop getting them. I 
+> can have none for hours, and then suddenly lots of them for 5 minutes, 
+> and afterwards everything works properly again. I can also get one or 
+> two every few minutes. Really, I can't find a pattern for their appearence.
+> 
+> So what's happening there? Any feedback on this issue would be really 
+> appreciated.
 
-nice cleanup, but I don't see the advantage of it and hidd is basically
-end of life anyway. Focus is on the Bluetooth input service.
+no idea. Are you running a 2.6.22 kernel and bluez-utils-3.14? If not,
+please re-test and try to figure out which part of the code is causing
+them. Look through the code for "connect()".
 
 Regards
 
