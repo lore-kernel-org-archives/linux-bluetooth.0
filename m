@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20070808100035.2804041d@debian.fastwebnet.it>
-References: <20070808100035.2804041d@debian.fastwebnet.it>
-Date: Sat, 11 Aug 2007 20:12:29 +0200
-Message-Id: <1186855949.6698.26.camel@violet>
+To: mats.andersson@blue2net.com,
+        BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1186563840.4744.52.camel@Blue2net-mats.bellman.mea>
+References: <1186563840.4744.52.camel@Blue2net-mats.bellman.mea>
+Date: Sat, 11 Aug 2007 20:11:04 +0200
+Message-Id: <1186855864.6698.24.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] B-Speech Data Stream dongle
+Subject: Re: [Bluez-users] My netdev_watchdog barked once!
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,18 +21,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Mats,
 
-> do you know this Bluetooth 2.0 + EDR dongle:
+> I had yesterday a surprising kernel message
 > 
-> http://tinyurl.com/2tmgzf
+>    NETDEV WATCHDOG: bnep0: transmit timed out
 > 
-> Does it use a CSR or Broadcom chipset? 
+> It occurred exactly once and then never more.
+> This happened on a FOXBoard with an Etrax100LX,
+> i.e. cris architecture, almost exactly twenty
+> four hours after the bnep link was initiated.
+> The kernel is 2.6.19, with bluez code seemingly
+> identical to the code in 2.6.18-mh8, but that
+> is beside my present point. 
+> 
+> My question: Is it more probable that it is the
+> usb driver that has a suboptimal timer use within
+> the kernel, or could it be that bnep/core.c or
+> bnep/netdev.c somehow should take timing of a
+> particular usb interface into account? The regular
+> kernel documentation mentions that the ethernet
+> driver e1000.ko can have a timer issue. That is how
+> I come to think along these lines.
 
-the 2.0 should be CSR. The 1.2 are something else. Not Broadcom and not
-CSR as far as I can tell.
+the 2.6.19 kernel is old. So I have no idea. In some cases disabling the
+SCO support of the hci_usb driver helps. Either via kernel option or
+loading it with isoc=0.
 
-However the 2.0 that I have is a BlueCore4-ROM chip.
+Also BNEP is in general able to recover from wrong data packets so it
+might be simply something that can happen or a bug in the network stack
+that has already been fixed. Use a 2.6.22 or later kernel.
 
 Regards
 
