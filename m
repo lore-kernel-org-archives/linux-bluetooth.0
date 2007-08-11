@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <34746.44504.qm@web32406.mail.mud.yahoo.com>
-References: <34746.44504.qm@web32406.mail.mud.yahoo.com>
-Date: Sat, 11 Aug 2007 20:16:54 +0200
-Message-Id: <1186856214.6698.33.camel@violet>
+In-Reply-To: <525899.68874.qm@web58013.mail.re3.yahoo.com>
+References: <525899.68874.qm@web58013.mail.re3.yahoo.com>
+Date: Sat, 11 Aug 2007 20:15:12 +0200
+Message-Id: <1186856112.6698.31.camel@violet>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users] configure: error: dbus > 0.35 is requered
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -22,16 +22,26 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi,
 
->         You could make a howto now you know how it works and submit it
->         to the community of the disto you use. They should add it to
->         there documentation. 
->         
->         I keep track of the things I'm doing at the Absolute-forum. If
->         only to know what I've done in case I've to reinstall or
->         upgrade. When everything starts working I hope it will work, a
->         howto can be compiled. But that could take some time ......
+> I am using bluez-utils-3.11 for ARM embedded linux.
+> When hcid is buildt, it complains libdbus-1.so
+> 
+> /usr/lib/libdbus-1.so: could not read symbols: File in
+> wrong format.
+> 
+> Because embedded linux kernel version is awalys behind
+> the most recent released kernel.
 
-we have wiki.bluez.org. Feel free to add some documentation.
+the libdbus has nothing to do with the kernel version. However stop
+whining about embedded kernel versions. Use the latest upstream kernel
+and not some vendor crap.
+
+> And I could not find old versions for bluez in
+> www.bluez.org.
+> 
+> What version of libdbus needed to match
+> bluez-utils-3.13 or 11?
+
+Use the D-Bus 1.0.x release.
 
 Regards
 
