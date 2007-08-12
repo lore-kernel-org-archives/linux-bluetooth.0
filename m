@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sun, 12 Aug 2007 12:45:20 -0700 (PDT)
-From: Jim Carter <jimc@math.ucla.edu>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <Pine.LNX.4.64.0708121241480.5934@xena.cft.ca.us>
+Message-ID: <46BEDF61.2020401@free.fr>
+Date: Sun, 12 Aug 2007 12:22:25 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
-Subject: [Bluez-devel] a2dpd_ipc.c infinite loop stomped
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <46BD85F4.1090400@free.fr> <1186855275.6698.10.camel@violet>
+In-Reply-To: <1186855275.6698.10.camel@violet>
+Subject: Re: [Bluez-devel] An explanation of a2dpd weird behaviour on	high
+ resolution timers enabled kernels
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,72 +21,49 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Versions: 
-SuSE 10.2, kernel 2.6.18
-bluez-utils 3.7
-plugz from CVS on 2007-08-05
+Hi Marcel,
 
-If ~/.a2dprc is configured with the various cmds nonexecutable, e.g.
-	cmdplay=nonexistent --play
-then upon the corresponding AVRCP event (such as when the headphone
-connects), a2dpd will fork a process that uses 100% of CPU time and 
-drives Pulseaudio crazy (also 100% CPU, on a dual core machine), 
-eventually killing it.
+> Hi Fabien,
+> 
+>> I recently purchased a new combo A2DP/HFP headset from Sony Ericsson.
+>> This was the first time i was able to try Frederic's a2dpd daemon. :-)
+> 
+> you might wanna focus on the Bluetooth audio service in bluez-utils (the
+> code got committed today) which now has A2DP support.
 
-The reason is this:  In a2dpd_ipc.c, subroutine async_run_process
-forks and the child execs (execvp) the command, which fails, so 
-execvp returns.  The child then does a DBG printout (if enabled) and 
-returns from the subroutine back to the main loop where the parent is 
-also executing. Things go downhill from there.  
+Ho good, i'm gonna start having a look at it then !
 
-The attached patch makes the child exit in this case.  I also "improved"
-some of the error messages so you can recognize spurious whitespace. 
-I wish I could give an unconditional error printout, i.e. not only if
-debug printout is turned on, but I didn't see a relevant macro.
+> 
+> Parts are based on the work from bluetooth-alsa, but the overall design
+> concept is a little bit different. For example is the SBC encoding done
+> inside the ALSA plugin and not inside the daemon. 
 
-James F. Carter          Voice 310 825 2897    FAX 310 206 6673
-UCLA-Mathnet;  6115 MSA; 405 Hilgard Ave.; Los Angeles, CA, USA 90095-1555
-Email: jimc@math.ucla.edu  http://www.math.ucla.edu/~jimc (q.v. for PGP key)
+That's *great* news !! That always shocked me to have the sound data go 
+through the sound daemon :-)
 
+This allows us to
+> avoid any unnecessary copying of data between processes. My laptop
+> showed xmms running at 5% CPU and that includes MP3 decoding and then
+> SBC encoding.
 
---- plugz/alsa-plugins/a2dpd/a2dpd_ipc.c.orig	2007-05-23 06:14:41.000000000 -0700
-+++ plugz/alsa-plugins/a2dpd/a2dpd_ipc.c	2007-08-12 11:33:48.000000000 -0700
-@@ -433,8 +433,8 @@
-         char* argv[8];
-         int i = 0, status = 0;
-         strncpy(command, cmd, sizeof(command));
--        DBG("Command is %s", command);
-         command[sizeof(command)-1]= '\0';
-+        DBG("Command is '%s'", command);
-         memset(argv, 0, sizeof(argv));
-         argv[0] = command;
- 
-@@ -451,7 +451,7 @@
-         }
- 
- 	for(i=0; i < ARRAY_SIZE(argv); i++) {
--		DBG("argv[%d] = %s", i, argv[i]?argv[i]:"NULL");
-+		DBG("argv[%d] = '%s'", i, argv[i]?argv[i]:"NULL");
- 		if(!argv[i]) break;
- 	}
- 
-@@ -466,12 +466,12 @@
- 
-                                 // Replace children with new process
-                                 i = execvp(command, argv);
--                                DBG("execlp failed %s=%d (errno=%d:%s)", cmd, i, errno, strerror(errno));
--                                break;
-+                                DBG("execvp failed (%d), command='%s' (errno=%d:%s)", i, cmd, errno, strerror(errno));
-+                                exit(EXIT_FAILURE);
-                         case -1:
-                                 // failed
--                                DBG("Fork %s failed", cmd);
--                                break;
-+                                DBG("Fork failed, command='%s' (errno=%d:%s)", cmd, errno, strerror(errno));
-+                                exit(EXIT_FAILURE);
-                         default:
-                                 DBG("Forked %s", cmd);
-                                 // Parent wait for completion if asked
+Agreed. + reduced latency :-)
+> 
+> I have seen some weird behavior with this when the playback speed is way
+> to fast. This might be related or totally unrelated. I simply don't
+> know.
+
+I'm gonna start to play with it then.
+
+I was planning to start some a2dp related work myself on it... if only 
+it wasn't already done. :-)
+
+Could you tell me who's working on the audio service ?
+How should i submit patches / possible functionnal improvements to it 
+(are the people working on it on the list)?
+
+Cheers,
+
+Fabien
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
