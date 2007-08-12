@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "leiyu" <leiyu@kcoe.cn>
-To: "Bluez-Users" <bluez-users@lists.sourceforge.net>
-Date: Mon, 13 Aug 2007 12:41:44 +0800
-Message-ID: <EJENLMBEOLKAMCJFBFMDAEEHCAAA.leiyu@kcoe.cn>
-MIME-Version: 1.0
-Subject: Re: [Bluez-users] How to become a bluetooth obex server
+Message-ID: <BAY122-F353467C9173D52C2DB4F7DFFE30@phx.gbl>
+From: "jaspreet singh" <manny.india@hotmail.com>
+To: bluez-users@lists.sourceforge.net
+Date: Sun, 12 Aug 2007 21:31:56 +0530
+Mime-Version: 1.0
+Subject: [Bluez-users] passkey prompt on debian pc...
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,25 +14,23 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1494588027=="
+Content-Type: multipart/mixed; boundary="===============0746658592=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1494588027==
-Content-Type: text/plain;
-	charset="gb2312"
-Content-Transfer-Encoding: base64
+--===============0746658592==
+Content-Type: text/plain; format=flowed
 
-RGVhciAgTWFudWVsLA0KDQpUaGFuayB5b3UgdmVyeSBtdWNoICxJIHN1Y2NlZWQgd2l0aCB5b3Vy
-IGhlbHAuDQpJIHJlZ2lzdGVyIHRoZSBPUFVTSCBzZXJ2aWNlIGluIFJGQ09NTSBjaGFubmVsIDEw
-IHdpdGggdGhlIGNvbW1hbmQgInNkcHRvb2wgYWRkIC0tY2hhbm5lbD0xMCBPUFVTSCINCm9iZXhm
-dHBkIC1iIHdpbGwgbGlzdGVuIGFsbCB0aGUgc2VydmljZXMgdGhhdCBoYXZlIGJlZW4gcmVnaXN0
-ZXJlZCBpbiBjaGFubmVsIDEwLCBub3Qgb25seSBGVFAsIGJ1dCBhbHNvIE9QVVNIICwNCkFtIG15
-IG9waW5pb24gcmlnaHQ/DQoNCkJlc3QgcmVnYXJkcywNCkxlaXl1DQo=
+i get prompt to enter passkey in my phone but i am not having passkey prompt 
+on my pc.plz help..
+
+_________________________________________________________________
+Tried the new MSN Messenger? It’s cool! Download now. 
+http://messenger.msn.com/Download/Default.aspx?mkt=en-in
 
 
 
---===============1494588027==
+--===============0746658592==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -43,7 +41,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============1494588027==
+--===============0746658592==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -54,4 +52,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1494588027==--
+--===============0746658592==--
