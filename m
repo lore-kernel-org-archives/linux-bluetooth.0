@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Frederic Dalleau <frederic.dalleau@access-company.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1186855275.6698.10.camel@violet>
-References: <46BD85F4.1090400@free.fr>  <1186855275.6698.10.camel@violet>
-Date: Mon, 13 Aug 2007 11:59:18 +0200
-Message-Id: <1186999158.6262.10.camel@ubuntu.mpl.access-company.com>
+In-Reply-To: <46bff919.Rp2duBBGB6cu6MsA%joe@perches.com>
+References: <46bff919.Rp2duBBGB6cu6MsA%joe@perches.com>
+Date: Mon, 13 Aug 2007 08:34:27 +0200
+Message-Id: <1186986867.6698.133.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] An explanation of a2dpd weird behaviour
-	on	high	resolution timers enabled kernels
+Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org,
+        linux-kernel@vger.kernel.org, maxk@qualcomm.com
+Subject: Re: [Bluez-devel] [PATCH] [96/2many] MAINTAINERS -
+	BLUETOOTH	SUBSYSTEM
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,11 +23,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Joe,
 
-> you might wanna focus on the Bluetooth audio service in bluez-utils (the
-> code got committed today) which now has A2DP support.
+> Add file pattern to MAINTAINER entry
+> 
+> Signed-off-by: Joe Perches <joe@perches.com>
 
-That's great news !!! I was thinking of this coming out soon, but didn't expect something so early.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
