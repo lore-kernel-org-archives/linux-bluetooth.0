@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Frederic Dalleau <frederic.dalleau@access-company.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1187025905.6262.34.camel@ubuntu.mpl.access-company.com>
+In-Reply-To: <1187024773.6698.217.camel@violet>
 References: <46C088D7.9000108@silicom.fr>
 	<1187023591.6262.28.camel@ubuntu.mpl.access-company.com>
 	<1187024773.6698.217.camel@violet>
-	<1187025905.6262.34.camel@ubuntu.mpl.access-company.com>
-Date: Mon, 13 Aug 2007 19:50:32 +0200
-Message-Id: <1187027432.6698.242.camel@violet>
+Date: Mon, 13 Aug 2007 19:25:05 +0200
+Message-Id: <1187025905.6262.34.camel@ubuntu.mpl.access-company.com>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] New A2DP support : HOWTO ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -23,35 +22,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frederic,
+On Mon, 2007-08-13 at 19:06 +0200, Marcel Holtmann wrote:
+> once you called CreateDevice (which is needed only once), you can
+> actually press a button on the headset and it should re-connect and you
+> can play music.
 
-> > once you called CreateDevice (which is needed only once), you can
-> > actually press a button on the headset and it should re-connect and you
-> > can play music.
-> 
-> I have a few question too :
-> 
-> I have not setup any asoundrc and alsa found the bluetooth plugin. Any
-> ideas?
+I have a few question too :
 
-no idea how that works. You normally need something like:
+I have not setup any asoundrc and alsa found the bluetooth plugin. Any
+ideas?
 
-pcm.bluetooth {
-        type bluetooth
-}
+What if I start the media player with headset not connected?
 
-In the future we might add some parameters to pick the right device.
-This entry will select the currently connected headset or will connect
-to the default one.
-
-> What if I start the media player with headset not connected?
-
-It will try to connect to the default headset.
-
-Regards
-
-Marcel
-
+Frederic
 
 
 -------------------------------------------------------------------------
