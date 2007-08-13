@@ -1,17 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <2d5a2c100708131939k32d34dc7u9961aecc0c0cf624@mail.gmail.com>
-Date: Mon, 13 Aug 2007 23:39:43 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1187027354.6262.59.camel@ubuntu.mpl.access-company.com>
-MIME-Version: 1.0
+From: Frederic Dalleau <frederic.dalleau@access-company.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1187024669.6698.214.camel@violet>
 References: <46BD85F4.1090400@free.fr> <1186855275.6698.10.camel@violet>
 	<1186999158.6262.10.camel@ubuntu.mpl.access-company.com>
-	<1186999538.6698.141.camel@violet> <46C07EAC.8060407@free.fr>
+	<1186999538.6698.141.camel@violet>  <46C07EAC.8060407@free.fr>
 	<1187024669.6698.214.camel@violet>
-	<1187027354.6262.59.camel@ubuntu.mpl.access-company.com>
-Subject: Re: [Bluez-devel] An explanation of a2dpd weird behaviour on high
-	resolution timers enabled kernels
+Date: Mon, 13 Aug 2007 19:49:14 +0200
+Message-Id: <1187027354.6262.59.camel@ubuntu.mpl.access-company.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] An explanation of
+	a2dpd	weird	behaviour	on	high	resolution timers enabled kernels
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,40 +24,55 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Marcel, Fabien,
 
-I took some time investigating this issue, it really seems to
-be a out of sync problem. As marcel said we send data too
-fast and in some headset this cause the stream playback
-to sound a lot faster than it should. As I dont have one of
-those headset with this problem I emulate mine using a
-computer + a2recv, and for my surprise any of the dongle
- I tried to plugged had the same issue, so it seems it is not
-direct connected to broadcom chips, but it probably tied
- with the way the sink is implemented.
+> > > We have to send the next SBC frame at the exact time slot.
+> > > Otherwise the audio sounds too fast or frames are skipped. If you have
+> > > any ideas on how we can improve pcm_bluetooth.c (yes, that handling is
+> > > inside the ALSA plugin), I would like to know.
+> > 
+> > The way handset makers have solved the issue is to throttle the data 
+> > sending, to avoid triggering moonlight specific headset behaviours.
+> > What i would suggest is to do the same thing using usleep() calls inside 
+> > the alsa plugin.
+> 
+> we have to calculate the actual time of an SBC frame and then transmit
+> it and then sleep the rest of the time before sending the next frame.
+> However to have at least a little bit buffer, we should encode something
+> around 3 L2CAP packets ahead. Should be something like 9-12 SBC frames.
 
-The problem occurs because a2recv has no buffer after
-decode the packet, it simple sent to dsp in the frequency
-it receives from bluetooth, and this dont seem to be the way
-we expected a sink to work. I also run tests inserting a
-usleep(10000) after sending a packet, this helped a lot in the
-way I got almost perfect audio in the emulated sink. But still
-there it sounds noisy if I plug a good wire headset on sink,
-this is probably because the frames are not all in the same
-rate, we dont send frame per frame so the sleep only helps to
-synchronize some frames  between the packets but not the
-ones that are within the packet.
+One sbc frame is very short (350 sbc frames / s). This will only be
+possible if you have high resolution timers ;)
 
-Im not sure if this can be solved with a flow control on L2CAP,
-and Im also not sure if the headset that do work use it, well
-I guess they couldn't because we dont support that too, right?
-This leads me to believe headsets should have its own decoded
-buffer that should be consumed in the proper audio rate not
-the stream rate as a2recv seems to assume.
+a2dpd used to accumulate as much sbc frames as possible in one L2CAP
+packet based on mtu. This of course caused latency, but it allowed to
+wait using a low resolution timer.
 
-We can of course send frame per frame in the exact frame rate
-we want the audio to be played, but we should considerer this
-problems when acting as a sink.
+90% latency in a2dpd was due to the "mixer" implementation.
+
+I'm thinking about having sbc encoding inside the plugin. I'm not
+convinced, mostly for these reasons :
+
+Even if enough data is buffered, you are not guaranteed that the
+application will send data in time. Worse, if enough data is buffered,
+the application can choose not to send more data. The application calls
+snd_pcm_get_delay(), then sleeps for the remaining delay, then sends new
+data. This is typically true at the end of a stream. The application
+write what can be written, then wait until the stream underrun, without
+writing anymore.
+
+Using usleep in the alsaplugin has been an issue for some player
+specially when video and sound must be decoded. Decoding video takes a
+lot of time, and sleeping inside the loop is simply not possible.
+
+> I can't see how the clock offset will help us here. It is only important
+> for paging devices. All the other time, the device will re-sync their
+> clocks as needed.
+
+AFAIK clock drifting has not been an issue to me before. 
+
+Frederic
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
