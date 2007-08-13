@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Frederic Dalleau <frederic.dalleau@access-company.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1187024773.6698.217.camel@violet>
+In-Reply-To: <1187023591.6262.28.camel@ubuntu.mpl.access-company.com>
 References: <46C088D7.9000108@silicom.fr>
 	<1187023591.6262.28.camel@ubuntu.mpl.access-company.com>
-	<1187024773.6698.217.camel@violet>
-Date: Mon, 13 Aug 2007 19:25:05 +0200
-Message-Id: <1187025905.6262.34.camel@ubuntu.mpl.access-company.com>
+Date: Mon, 13 Aug 2007 19:06:13 +0200
+Message-Id: <1187024773.6698.217.camel@violet>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] New A2DP support : HOWTO ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -22,19 +21,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Mon, 2007-08-13 at 19:06 +0200, Marcel Holtmann wrote:
-> once you called CreateDevice (which is needed only once), you can
-> actually press a button on the headset and it should re-connect and you
-> can play music.
+Hi Frederic,
 
-I have a few question too :
+> > Certainly a very stupid question : but how do we get started using
+> > the 
+> > brand new A2DP support ? - for me it seems that it still favors sco over 
+> > a2dp :-(
+> 
+> I modified the test-audio python script to get something like this:
+> Look at your syslog to see what happen.
+> I then got my headset connected and could hear something ;) 
 
-I have not setup any asoundrc and alsa found the bluetooth plugin. Any
-ideas?
+once you called CreateDevice (which is needed only once), you can
+actually press a button on the headset and it should re-connect and you
+can play music.
 
-What if I start the media player with headset not connected?
+Regards
 
-Frederic
+Marcel
+
 
 
 -------------------------------------------------------------------------
