@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 14 Aug 2007 23:16:33 +0200
-From: Michael Mauch <michael.mauch@gmx.de>
+Date: Mon, 13 Aug 2007 10:12:31 -0700 (PDT)
+From: hong zhang <henryzhang62@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20070814211632.GC14110@elmicha>
-References: <mailman.223268.1187020437.21973.bluez-users@lists.sourceforge.net>
-	<811023.94565.qm@web58008.mail.re3.yahoo.com>
+In-Reply-To: <mailman.223268.1187020437.21973.bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-In-Reply-To: <811023.94565.qm@web58008.mail.re3.yahoo.com>
-Subject: Re: [Bluez-users] error for bluez-utils -3.11 configure
+Message-ID: <811023.94565.qm@web58008.mail.re3.yahoo.com>
+Subject: [Bluez-users] error for bluez-utils -3.11 configure
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,29 +19,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hong zhang wrote:
+List,
 
-> I am building bluez-libs-3.11 and bluez-utils-3.11 on
-> my fedora 5.
-> Configure and make on bluez-libs-3.11 successfully.
-> And "make install"  goes through.
-> 
-> But when I do configure for bluez-utils-3.11. Error
-> occurs.
-> 
-> checking for pkg-config... /usr/bin/pkg-config
-> checking pkg-config is at least version 0.9.0... yes
-> checking for BLUEZ... no
-> configure: error: Bluetooth library is required
-> 
-> bluez-libs-3.11 is installed why Bluetooth library
-> cannot be found?
+I am building bluez-libs-3.11 and bluez-utils-3.11 on
+my fedora 5.
+Configure and make on bluez-libs-3.11 successfully.
+And "make install"  goes through.
 
-Perhaps you forgot to add /usr/local/lib to /etc/ld.so.conf (if it's not
-already there) or you forgot to run ldconfig.
+But when I do configure for bluez-utils-3.11. Error
+occurs.
 
-Regards...
-		Michael
+checking for pkg-config... /usr/bin/pkg-config
+checking pkg-config is at least version 0.9.0... yes
+checking for BLUEZ... no
+configure: error: Bluetooth library is required
+
+bluez-libs-3.11 is installed why Bluetooth library
+cannot be found?
+
+
+----henry
+
+
+      ____________________________________________________________________________________
+Park yourself in front of a world of choices in alternative vehicles. Visit the Yahoo! Auto Green Center.
+http://autos.yahoo.com/green_center/ 
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
