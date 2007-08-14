@@ -1,16 +1,20 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <46C1A54A.9080103@free.fr>
+In-Reply-To: <1187102836.3463.60.camel@ubuntu.mpl.access-company.com>
 References: <46BD85F4.1090400@free.fr> <1186855275.6698.10.camel@violet>
 	<1186999158.6262.10.camel@ubuntu.mpl.access-company.com>
 	<1186999538.6698.141.camel@violet> <46C07EAC.8060407@free.fr>
-	<1187024669.6698.214.camel@violet>  <46C1A54A.9080103@free.fr>
-Date: Tue, 14 Aug 2007 18:44:30 +0200
-Message-Id: <1187109870.6698.287.camel@violet>
+	<1187024669.6698.214.camel@violet>
+	<1187027354.6262.59.camel@ubuntu.mpl.access-company.com>
+	<46C1A555.80404@free.fr>
+	<1187102836.3463.60.camel@ubuntu.mpl.access-company.com>
+Date: Tue, 14 Aug 2007 18:40:15 +0200
+Message-Id: <1187109615.6698.283.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] An explanation of
-	a2dpd	weird	behaviour	on	high	resolution timers enabled kernels
+Subject: Re: [Bluez-devel] An
+	explanation	of	a2dpd	weird	behaviour	on	high	resolution
+	timers enabled kernels
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,53 +28,54 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
+Hi Frederic,
 
-> >> That will trigger another issue which is clock drifting, because the 
-> >> headset will supposedly consume data at master clock speed, while we 
-> >> will send data at host clock speed. I think for this one the best is to 
-> >> calculate and compensate for the drift using OCF_READ_CLOCK_OFFSET hci 
-> >> command: however it's just my wild guess ... ;-)
+> > > Even if enough data is buffered, you are not guaranteed that the
+> > > application will send data in time. Worse, if enough data is buffered,
+> > > the application can choose not to send more data. The application calls
+> > > snd_pcm_get_delay(), then sleeps for the remaining delay, then sends new
+> > > data. This is typically true at the end of a stream. The application
+> > > write what can be written, then wait until the stream underrun, without
+> > > writing anymore.
 > > 
-> > I can't see how the clock offset will help us here. It is only important
-> > for paging devices. All the other time, the device will re-sync their
-> > clocks as needed.
+> > I'm not sure i understood your last paragraph : could you please 
+> > expand/reformulate ?
 > 
-> Ok, i will try to be more explicit then. I think you haven't catched the 
-> issue... yet ;-)
-> If you remember some of the electronics courses you certainly had, all 
-> electronics systems clocks are generated using quartz oscillator. Issue 
-> is those quartz, even if clocked officially at the same frequency, all 
-> beat at their own frequency.
-> Bluetooth spec choose to solve this issue by having the master send it's 
-> clock as a field of each packet sent to a slave. This way the slave is 
-> able to update in real time a register that stores the delta between the 
-> slave clock and the master clock. So each slave has an estimate of the 
-> master clock.
-> Now to come back to our streaming issues : the target is as follows.
-> * The A2DP headset has a unique quartz that powers both the bluetooth 
-> baseband and the sbc decoder/DAC part. (this is a guess, but i don't see
-> headset manufacturers put two quartz, as that would cost them more ;-))
-> * We have a usb or rs232 attached bluetooth dongle that is clocked by 
-> its own quartz.
-> * We have a main CPU whose time tracking functions are implemented using 
-> a timer interrupt that is based on its own quartz.
+> Let's take an example : An application write 40 ms of music.
+> If you internally buffer the data, then the application will consider it
+>  written (not played yet).
+> The application will then wait for the data to be played by repeatedly 
+> asking the delay until is it 0. However, that application 
+> will NOT call write(), preventing the plugin code to be executed.
 > 
-> To prevent underrun audio cuts (data sent too slowly) or overrun audio 
-> cuts (data sent two fast), we must sent them at the *right* speed, which 
-> means the master clock's speed.
-> As the main CPU clock and the bluetooth master clock will inevitably 
-> drift (up to 250 ppm for the bluetooth master clock), we will have to 
-> compensate in software (which means in the alsa plugin). I suggest using 
-> the above given HCI command to retrieve the master clock.
+> I already hear you saying, let's put the code in getdelay() too. This is not possible
+> because the application can also call getdelay() once and wait, or even not call
+> getdelay() at all, because the number of music data is known...
+> 
+> However, using a thread can solve this issue.
 
-I might be simply never hear the difference, but anyway, we can actually
-do this. However the implementation is tricky. The plugin should not
-send HCI commands at all. Actually no daemon (except hcid) should send
-any HCI commands at any time. I can make the kernel to as for the clock
-offset in a certain interval. This costs too since it has to go over the
-same HCI link that the audio data goes. So at which rate do you need
-this information?
+while I am against threads, for the plugin it is actually okay since
+ALSA uses threads anyway. For the audio service, threads are not welcome
+and hereby forbidden by me ;)
+
+> > Or at first we can just say "go to hell" to those applications that do 
+> > everything in the same thread and choose to solve the issue later :-)
+> 
+> In fact, the only application to care about is the sound server.
+
+Actually the audio service is not doing any audio handling at all. It
+only drivers AVDTP signaling and parameter negotiation. That's it. The
+plugin is responsible for the whole media channel. This actually
+includes the AVDTP header for that channel including the SBC header and
+the actual SBC encoded data.
+
+The audio service gives the plugin a file descriptor to use and then the
+plugin takes care of everything until the audio service decides to
+disconnect or the remote side terminates the connection. This includes
+start, stop etc., but that are implementation details.
+
+The I expect the following applications to work: aplay, xmms/beep,
+totem, ekiga and skype.
 
 Regards
 
