@@ -1,13 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46C1A52F.7050102@free.fr>
-Date: Tue, 14 Aug 2007 14:50:55 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
+Message-ID: <2d5a2c100708131939k32d34dc7u9961aecc0c0cf624@mail.gmail.com>
+Date: Mon, 13 Aug 2007 23:39:43 -0300
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1187027354.6262.59.camel@ubuntu.mpl.access-company.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46C088D7.9000108@silicom.fr>
-	<1187023591.6262.28.camel@ubuntu.mpl.access-company.com>
-In-Reply-To: <1187023591.6262.28.camel@ubuntu.mpl.access-company.com>
-Subject: Re: [Bluez-devel] New A2DP support : HOWTO ?
+References: <46BD85F4.1090400@free.fr> <1186855275.6698.10.camel@violet>
+	<1186999158.6262.10.camel@ubuntu.mpl.access-company.com>
+	<1186999538.6698.141.camel@violet> <46C07EAC.8060407@free.fr>
+	<1187024669.6698.214.camel@violet>
+	<1187027354.6262.59.camel@ubuntu.mpl.access-company.com>
+Subject: Re: [Bluez-devel] An explanation of a2dpd weird behaviour on high
+	resolution timers enabled kernels
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,74 +25,40 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi,
 
-Thanks frederic !
+I took some time investigating this issue, it really seems to
+be a out of sync problem. As marcel said we send data too
+fast and in some headset this cause the stream playback
+to sound a lot faster than it should. As I dont have one of
+those headset with this problem I emulate mine using a
+computer + a2recv, and for my surprise any of the dongle
+ I tried to plugged had the same issue, so it seems it is not
+direct connected to broadcom chips, but it probably tied
+ with the way the sink is implemented.
 
-For some reason my headset tries to start the A2DP stream, connects to 
-RFCOMM channel, and then stops the a2dp stream, while it stays connected 
-to rfcomm (hs profile).
+The problem occurs because a2recv has no buffer after
+decode the packet, it simple sent to dsp in the frequency
+it receives from bluetooth, and this dont seem to be the way
+we expected a sink to work. I also run tests inserting a
+usleep(10000) after sending a packet, this helped a lot in the
+way I got almost perfect audio in the emulated sink. But still
+there it sounds noisy if I plug a good wire headset on sink,
+this is probably because the frames are not all in the same
+rate, we dont send frame per frame so the sleep only helps to
+synchronize some frames  between the packets but not the
+ones that are within the packet.
 
-To force the use of a2dp i had to reload the audio daemon, and then 
-launch the multimedia player. It then tries to start a2dp stream, and it 
-works.
+Im not sure if this can be solved with a flow control on L2CAP,
+and Im also not sure if the headset that do work use it, well
+I guess they couldn't because we dont support that too, right?
+This leads me to believe headsets should have its own decoded
+buffer that should be consumed in the proper audio rate not
+the stream rate as a2recv seems to assume.
 
-Btw i got perfect sound quality compared to a2dpd. No small glitches 
-from time to time, just *perfect* sound. :-)
-
-
-Fabien
-
-
-> Hi,
-> 
->> Certainly a very stupid question : but how do we get started using
->> the 
->> brand new A2DP support ? - for me it seems that it still favors sco over 
->> a2dp :-(
-> 
-> I modified the test-audio python script to get something like this:
-> Look at your syslog to see what happen.
-> I then got my headset connected and could hear something ;) 
-> 
-> #!/usr/bin/python
-> import dbus
-> bus = dbus.SystemBus()
-> manager = dbus.Interface(bus.get_object('org.bluez', '/org/bluez'),
-> 'org.bluez.Manager')
-> 
-> conn = manager.ActivateService('audio')
-> audio = dbus.Interface(bus.get_object(conn, '/org/bluez/audio'),
-> 'org.bluez.audio.Manager')
-> 
-> # Create device
-> path = audio.CreateDevice("00:03:89:AA:BD:64")
-> 
-> # Get org.bluez.audio.Sink interface
-> sink = dbus.Interface(bus.get_object(conn, path),
-> 'org.bluez.audio.Sink')
-> 
-> try:
-> 	sink.Connect()
-> except:
-> 	pass
-> 
-> #sink.Disconnect() 
-> 
-> 
-> Hope this helps
-> 
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc.
-> Still grepping through log files to find problems?  Stop.
-> Now Search log events and configuration files using AJAX and a browser.
-> Download your FREE copy of Splunk now >>  http://get.splunk.com/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
-> 
-
+We can of course send frame per frame in the exact frame rate
+we want the audio to be played, but we should considerer this
+problems when acting as a sink.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
