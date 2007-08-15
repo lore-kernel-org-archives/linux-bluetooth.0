@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <556150d20708151335n47861b21ob9f6c803744717e8@mail.gmail.com>
-Date: Wed, 15 Aug 2007 22:35:40 +0200
-From: "Simone Piunno" <simonep@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <46C3552F.8000505@suse.de>
+Date: Wed, 15 Aug 2007 21:34:07 +0200
+From: Tom Patzig <tpatzig@suse.de>
 MIME-Version: 1.0
-Subject: [Bluez-devel] Crash in network service
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Content-Type: multipart/mixed; boundary="------------060304000800050803030701"
+Subject: [Bluez-devel] ListTrust Method for org.bluez.Service
+Reply-To: tpatzig@suse.de,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,114 +16,117 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGVsbG8sCgpJJ20gZXhwZXJpbWVudGluZyB3aXRoIGJsdWV6LXV0aWxzIDMuMTIsIHRyeXRpbmcg
-dG8gc2V0dXAgYSBibHVldG9vdGgKbmV0d29yayBiZXR3ZWVuIG15IGxhcHRvcCAoYXMgYSBQQU4g
-Y2xpZW50KSBhbmQgbXkgZGVza3RvcCAoYXMgYSBQQU4Kc2VydmVyKS4gIEkgaGF2ZSBhIGdlbnRv
-byBkaXN0cmlidXRpb24gb24gYW1kNjQgZGlzdHJpYnV0aW9uLgpJIGNvbXBpbGVkIHdpdGggQ0ZM
-QUdTPS1nIExERkxBR1M9LWcgLi9jb25maWd1cmUgLS1wcmVmaXg9L3VzcgotLWhvc3Q9eDg2XzY0
-LXBjLWxpbnV4LWdudSAtLW1hbmRpcj0vdXNyL3NoYXJlL21hbgotLWluZm9kaXI9L3Vzci9zaGFy
-ZS9pbmZvIC0tZGF0YWRpcj0vdXNyL3NoYXJlIC0tc3lzY29uZmRpcj0vZXRjCi0tbG9jYWxzdGF0
-ZWRpcj0vdmFyL2xpYiAtLWVuYWJsZS1kZWJ1ZyAtLWVuYWJsZS1pbm90aWZ5IC0tZW5hYmxlLWhh
-bAotLWVuYWJsZS11c2IgLS1lbmFibGUtZ2xpYiAtLWRpc2FibGUtb2JleCAtLWRpc2FibGUtYWxz
-YQotLWVuYWJsZS1uZXR3b3JrIC0tZW5hYmxlLXNlcmlhbCAtLWVuYWJsZS1pbnB1dCAtLWRpc2Fi
-bGUtYXVkaW8KLS1kaXNhYmxlLXN5bmMgLS1kaXNhYmxlLWVjaG8gLS1lbmFibGUtaGNpZCAtLWRp
-c2FibGUtdGVzdAotLWRpc2FibGUtc2RwZCAtLWRpc2FibGUtaGlkZCAtLWRpc2FibGUtcGFuZCAt
-LWVuYWJsZS1jdXBzCi0tZW5hYmxlLWNvbmZpZ2ZpbGVzIC0tZGlzYWJsZS1pbml0c2NyaXB0cyAt
-LWRpc2FibGUtcGNtY2lhcnVsZXMKLS1lbmFibGUtYmNjbWQgLS1lbmFibGUtYXZjdHJsIC0tZW5h
-YmxlLWhpZDJoY2kgLS1lbmFibGUtZGZ1dG9vbAotLWxvY2Fsc3RhdGVkaXI9L3ZhciAtLWxpYmRp
-cj0vdXNyL2xpYjY0IC0tYnVpbGQ9eDg2XzY0LXBjLWxpbnV4LWdudQoKVGhpcyBpcyB0aGUgbG9n
-IHdoZW4gdGhlIHNlcnZpY2Ugc3RhcnRzCgpBdWcgMTUgMjI6MDA6MDcgcm9lbnRnZW4gaGNpZFsx
-MDQ4MV06IEJsdWV0b290aCBIQ0kgZGFlbW9uCkF1ZyAxNSAyMjowMDowNyByb2VudGdlbiBoY2lk
-WzEwNDgxXTogSENJIGRldiAwIHJlZ2lzdGVyZWQKQXVnIDE1IDIyOjAwOjA3IHJvZW50Z2VuIGhj
-aWRbMTA0ODFdOiBIQ0kgZGV2IDAgYWxyZWFkeSB1cApBdWcgMTUgMjI6MDA6MDcgcm9lbnRnZW4g
-aGNpZFsxMDQ4MV06IERldmljZSBoY2kwIGhhcyBiZWVuIGFkZGVkCkF1ZyAxNSAyMjowMDowNyBy
-b2VudGdlbiBoY2lkWzEwNDgxXTogU3RhcnRpbmcgc2VjdXJpdHkgbWFuYWdlciAwCkF1ZyAxNSAy
-MjowMDowNyByb2VudGdlbiBhY3BpZDogY2xpZW50IGNvbm5lY3RlZCBmcm9tIDEwNTAxWzEwNDox
-MDRdCkF1ZyAxNSAyMjowMDowNyByb2VudGdlbiBhY3BpZDogMSBjbGllbnQgcnVsZSBsb2FkZWQK
-QXVnIDE1IDIyOjAwOjA3IHJvZW50Z2VuIGhjaWRbMTA0ODFdOiBEZXZpY2UgaGNpMCBoYXMgYmVl
-biBhY3RpdmF0ZWQKQXVnIDE1IDIyOjAwOjA3IHJvZW50Z2VuIGhjaWRbMTA0ODFdOiBTdGFydGlu
-ZyBTRFAgc2VydmVyCkF1ZyAxNSAyMjowMDowNyByb2VudGdlbiBoY2lkWzEwNDgxXTogQ3JlYXRl
-ZCBsb2NhbCBzZXJ2ZXIgYXQKdW5peDphYnN0cmFjdD0vdmFyL3J1bi9kYnVzLXh0eUlBYjFPQWos
-Z3VpZD02MjViOGUwMWZjMmNkMzdiMzRiYTY3MDA0NmMzNWI0NwpBdWcgMTUgMjI6MDA6MDcgcm9l
-bnRnZW4gaW5wdXRbMTA1MDhdOiBCbHVldG9vdGggSW5wdXQgZGFlbW9uCkF1ZyAxNSAyMjowMDow
-NyByb2VudGdlbiBpbnB1dFsxMDUwOF06IFJlZ2lzdGVyZWQgaW5wdXQgbWFuYWdlcgpwYXRoOi9v
-cmcvYmx1ZXovaW5wdXQKQXVnIDE1IDIyOjAwOjA3IHJvZW50Z2VuIG5ldHdvcmtbMTA1MDldOiBC
-bHVldG9vdGggTmV0d29yayBkYWVtb24KQXVnIDE1IDIyOjAwOjA3IHJvZW50Z2VuIG5ldHdvcmtb
-MTA1MDldOiBGYWlsZWQgdG8gY2xhaW0gdG8gaW50ZXJmYWNlOgpBdWcgMTUgMjI6MDA6MDcgcm9l
-bnRnZW4gbmV0d29ya1sxMDUwOV06IFJlZ2lzdGVyZWQgbWFuYWdlcgpwYXRoOi9vcmcvYmx1ZXov
-bmV0d29yawpBdWcgMTUgMjI6MDA6MDcgcm9lbnRnZW4gbmV0d29ya1sxMDUwOV06IFJlZ2lzdGVy
-ZWQgc2VydmVyCnBhdGg6L29yZy9ibHVlei9uZXR3b3JrL25hcApBdWcgMTUgMjI6MDA6MDggcm9l
-bnRnZW4gbmV0d29ya1sxMDUwOV06IGFkZF9zZXJ2ZXJfcmVjb3JkOiBnb3QgcmVjb3JkCmlkIDB4
-MTAwMDAKQXVnIDE1IDIyOjAwOjA4IHJvZW50Z2VuIG5ldHdvcmtbMTA1MDldOiBSZWdpc3RlcmVk
-IHNlcnZlcgpwYXRoOi9vcmcvYmx1ZXovbmV0d29yay9nbgpBdWcgMTUgMjI6MDA6MDggcm9lbnRn
-ZW4gbmV0d29ya1sxMDUwOV06IFJlZ2lzdGVyZWQgc2VydmVyCnBhdGg6L29yZy9ibHVlei9uZXR3
-b3JrL3BhbnUKCm5vdGUgdGhhdCAiRmFpbGVkIHRvIGNsYWltIGludGVyZmFjZSIuCkFueWhvdywg
-cGFuMCBnZXRzIGNyZWF0ZWQ6Cgpyb2VudGdlbiB+ICMgaXAgYWRkciBzaG93IGRldiBwYW4wCjEz
-OiBwYW4wOiA8QlJPQURDQVNULE1VTFRJQ0FTVCxVUCwxMDAwMD4gbXR1IDE1MDAgcWRpc2Mgbm9x
-dWV1ZQogICAgbGluay9ldGhlciAwMDowMDowMDowMDowMDowMCBicmQgZmY6ZmY6ZmY6ZmY6ZmY6
-ZmYKICAgIGluZXQgMTkyLjE2OC4xOTguMS8yNCBicmQgMTkyLjE2OC4xOTguMjU1IHNjb3BlIGds
-b2JhbCBwYW4wCiAgICBpbmV0NiBmZTgwOjoyMDA6ZmY6ZmUwMDowLzY0IHNjb3BlIGxpbmsKICAg
-ICAgIHZhbGlkX2xmdCBmb3JldmVyIHByZWZlcnJlZF9sZnQgZm9yZXZlcgoKTm93LCB3aGlsZSBJ
-J20gd2F0Y2hpbmcgcHJvY2VzcyAxMDUwOSB3aXRoIGdkYiwgb24gbXkgbGFwdG9wIEkgbGF1bmNo
-OgoKcGFuZCAtbiAtLWMgPGJkYWRkcj4KCk9uIHRoZSBzZXJ2ZXIgSSBnZXQgdGhpcyBjcmFzaDoK
-ClByb2dyYW0gcmVjZWl2ZWQgc2lnbmFsIFNJR1NFR1YsIFNlZ21lbnRhdGlvbiBmYXVsdC4KMHgw
-MDAwMDAwMDAwNDA3NzNmIGluIGNvbm5lY3Rfc2V0dXBfZXZlbnQgKGNoYW49MHg1MTk3MTAsCmNv
-bmQ9R19JT19JTiwgZGF0YT0weDUxNWFmMCkgYXQgc2VydmVyLmM6NDIxCjQyMSAgICAgICAgICAg
-ICBpZiAoKytucy0+cGF1dGgtPmF0dGVtcHRzID4gMSkgewooZ2RiKSBidAojMCAgMHgwMDAwMDAw
-MDAwNDA3NzNmIGluIGNvbm5lY3Rfc2V0dXBfZXZlbnQgKGNoYW49MHg1MTk3MTAsCmNvbmQ9R19J
-T19JTiwgZGF0YT0weDUxNWFmMCkgYXQgc2VydmVyLmM6NDIxCiMxICAweDAwMDAyYjYyNjJmNzU2
-NDYgaW4gZ19pb191bml4X2Rpc3BhdGNoIChzb3VyY2U9MHg1MTk3YjAsCmNhbGxiYWNrPTB4NDA3
-NjFiIDxjb25uZWN0X3NldHVwX2V2ZW50PiwgdXNlcl9kYXRhPTB4NTE1YWYwKQogICAgYXQgZ2lv
-dW5peC5jOjE2MgojMiAgMHgwMDAwMmI2MjYyZjQxZGRlIGluIGdfbWFpbl9kaXNwYXRjaCAoY29u
-dGV4dD0weDUxNjMyMCkgYXQgZ21haW4uYzoyMDQ1CiMzICAweDAwMDAyYjYyNjJmNDM1NDQgaW4g
-SUFfX2dfbWFpbl9jb250ZXh0X2Rpc3BhdGNoCihjb250ZXh0PTB4NTE2MzIwKSBhdCBnbWFpbi5j
-OjI1OTYKIzQgIDB4MDAwMDJiNjI2MmY0M2I4OSBpbiBnX21haW5fY29udGV4dF9pdGVyYXRlIChj
-b250ZXh0PTB4NTE2MzIwLApibG9jaz0xLCBkaXNwYXRjaD0xLCBzZWxmPTB4NTFhOWYwKSBhdCBn
-bWFpbi5jOjI2NzcKIzUgIDB4MDAwMDJiNjI2MmY0NDM5MyBpbiBJQV9fZ19tYWluX2xvb3BfcnVu
-IChsb29wPTB4NTE0MjEwKSBhdCBnbWFpbi5jOjI4ODEKIzYgIDB4MDAwMDAwMDAwMDQwNGM3MCBp
-biBtYWluIChhcmdjPTEsIGFyZ3Y9MHg3ZmZmNDdjYjhhYzgpIGF0IG1haW4uYzo5MQooZ2RiKSBp
-bmZvIGxvY2Fscwpjb25uID0gKERCdXNDb25uZWN0aW9uICopIDB4NTE1YWYwCm5zID0gKHN0cnVj
-dCBuZXR3b3JrX3NlcnZlciAqKSAweDUxNDVlMApwYXRoID0gIlwwMDJcMDAwXDAwMFwwMDBcMDAw
-XDAwMFwwMDBcMDAw77+9RVFcMDAwXDAwMFwwMDBcMDAwXDAwMO+/ve+/ve+/vWJcMDAxXDAwMFww
-MDBcMDAwQE9RXDAwMFwwMDBcMDAwXDAwMFwwMDDvv71cMjA177+9R++/vVwxNzdcMDAwXDAwMO+/
-ve+/ve+/vWJiK1wwMDBcMDAwXDAwMFwyMDbvv71HXDAwMFwwMDBcMDAwXDAwMO+/vUVRXDAwMFww
-MDBcMDAwXDAwMCIKcmVxID0gKHN0cnVjdCBibmVwX3NldHVwX2Nvbm5fcmVxICopIDB4N2ZmZjQ3
-Y2I3ZWYwCnBrdCA9ICJcMDAxXDAwMVwwMDJcMDIxXDAyNlwwMjFcMDI1XDAwMO+/vSdcMDM2Y2Ir
-XDAwMFwwMDDvv71cMjA077+9R++/vVwxNzciLAonXDAnIDxyZXBlYXRzIDE4IHRpbWVzPiwgIlwy
-MDJ2UVwwMDBcMDAwXDAwMFwwMDBcMDAwClwyMDHvv71H77+9XDE3N1wwMDBcMDAwXDIzMFwyMDDv
-v71H77+9XDE3N1wwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDBIP0pjYitc
-MDAwXDAwMO+/vVwyMDDvv71H77+9XDE3N1wwMDBcMDAwXDIzMFwyMDDvv71H77+9XDE3N1wwMDBc
-MDAwXDAwMVxiIiwKJ1wwJyA8cmVwZWF0cyAyMiB0aW1lcz4sICLvv71cMjAxIiwgJ1wwJyA8cmVw
-ZWF0cyAyMiB0aW1lcz4sCiJcXFxuXDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMVwwMDBcMDAw
-XDAwMFwwMDBcMDAwXDAwMFwwMDBcYlwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDDvv73vv73v
-v71FXDAwMFwwMDBcMDAwXDAwMFwwMDFcYlwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMCVcMDMxXDAw
-MFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMVwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDDvv71c
-MjAxIiwKJ1wwJyA8cmVwZWF0cyAyMiB0aW1lcz4sCiJcXFxuXDAwMFwwMDBcMDAwXDAwMFwwMDBc
-MDAwXDAwMFwwMjBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDBcYlwwMDBcMDAwXDAwMCIuLi4KbiA9
-IDcKZ2VyciA9IEdfSU9fRVJST1JfTk9ORQpwc2VydmljZSA9ICh1aW50OF90ICopIDB4NTE0NWQw
-ICLvv71FUSIKcm9sZSA9IDAKcmVzcG9uc2UgPSAwCihnZGIpIHAgbnMtPnBhdXRoCiQxID0gKHN0
-cnVjdCBwZW5kaW5nX2F1dGggKikgMHgwCgpPbiB0aGUgbG9nIGZpbGUgSSBvbmx5IHNlZToKCkF1
-ZyAxNSAyMjoxNzozOCByb2VudGdlbiBuZXR3b3JrWzEwNTA5XTogQ29ubmVjdGlvbgpmcm9tOjAw
-OjE5OkMxOjhDOjVGOjgwIG9uIFBTTSAxNQoKSSB0cmllZCB0aGlzIHBhdGNoOgoKLS0tIG5ldHdv
-cmsvc2VydmVyLmMub3JpZyAgICAgICAyMDA3LTA4LTE1IDIyOjI2OjE4LjAwMDAwMDAwMCArMDIw
-MAorKysgbmV0d29yay9zZXJ2ZXIuYyAgICAyMDA3LTA4LTE1IDIyOjI2OjQzLjAwMDAwMDAwMCAr
-MDIwMApAQCAtNDE4LDcgKzQxOCw3IEBACiAgICAgICAgICAgICAgICByZXR1cm4gRkFMU0U7CiAg
-ICAgICAgfQoKLSAgICAgICBpZiAoKytucy0+cGF1dGgtPmF0dGVtcHRzID4gMSkgeworICAgICAg
-IGlmIChucy0+cGF1dGggJiYgKytucy0+cGF1dGgtPmF0dGVtcHRzID4gMSkgewogICAgICAgICAg
-ICAgICAgLyoKICAgICAgICAgICAgICAgICAqIElnbm9yZSByZXBlYXRlZCBCTkVQIHNldHVwIGNv
-bm5lY3Rpb24gcmVxdWVzdDogdGhlcmUKICAgICAgICAgICAgICAgICAqIGlzIGEgcGVuZGluZyBh
-dXRob3JpemF0aW9uIHJlcXVlc3QgZm9yIHRoaXMgZGV2aWNlLgoKaXQgYXZvaWRzIHRoZSBjcmFz
-aCwgYnV0IG5vIGJuZXAgaW50ZXJmYWNlIGlzIGNyZWF0ZWQgYW5kIG9uIHRoZQpjbGllbnQgSSBn
-ZXQgUHJvdG9jb2wgZXJyb3IoNzEpLgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWls
-IGlzIHNwb25zb3JlZCBieTogU3BsdW5rIEluYy4KU3RpbGwgZ3JlcHBpbmcgdGhyb3VnaCBsb2cg
-ZmlsZXMgdG8gZmluZCBwcm9ibGVtcz8gIFN0b3AuCk5vdyBTZWFyY2ggbG9nIGV2ZW50cyBhbmQg
-Y29uZmlndXJhdGlvbiBmaWxlcyB1c2luZyBBSkFYIGFuZCBhIGJyb3dzZXIuCkRvd25sb2FkIHlv
-dXIgRlJFRSBjb3B5IG9mIFNwbHVuayBub3cgPj4gIGh0dHA6Ly9nZXQuc3BsdW5rLmNvbS8KX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwg
-bWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xp
-c3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
+This is a multi-part message in MIME format.
+--------------060304000800050803030701
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 8bit
+
+Hi,
+
+to not only get listed the global trusted devices, which also depends on 
+your adapter (/var/lib/%mac/trusts), there is no method for the service 
+interface to just list the trusted devices for this service 
+(/var/lib/00::00::00::00::00::00/trusts).
+Also, when you set trusts with the service interface to single services, 
+then you won't see this trusts with the adapter ListTrusts.
+
+I have written a method, according to the list_trusted method of the 
+adapter interface.
+So with this, u can do for example calls to only get the trusted input 
+devices.
+For the implemantation in the GUI frontend, it would be great to have 
+this function within the next release.
+
+What do you think?
+
+-- 
+--------------------------------------------
+Tom Patzig <tpatzig@suse.de>
+Novell /  SUSE
+SUSE LINUX Products GmbH - Nürnberg - AG Nürnberg - HRB 16746 - GF: Markus Rex
+
+
+--------------060304000800050803030701
+Content-Type: text/x-patch;
+ name="service_listTrusted.diff"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="service_listTrusted.diff"
+
+--- hcid/dbus-service.c
++++ hcid/dbus-service.c
+@@ -566,6 +566,39 @@
+ 	return send_message_and_unref(conn, reply);
+ }
+ 
++static DBusHandlerResult list_trusted(DBusConnection *conn,
++                                        DBusMessage *msg, void *data)
++{
++        struct service *service = data;
++        DBusMessage *reply;
++        GSList *trusts, *l;
++        char **addrs;
++        int len;
++
++        reply = dbus_message_new_method_return(msg);
++        if (!reply)
++                return DBUS_HANDLER_RESULT_NEED_MEMORY;
++        trusts = list_trusts(BDADDR_ANY, service->ident);
++
++        addrs = g_new(char *, g_slist_length(trusts));
++
++        for (l = trusts, len = 0; l; l = l->next, len++)
++                addrs[len] = l->data;
++
++        dbus_message_append_args(reply,
++                        DBUS_TYPE_ARRAY, DBUS_TYPE_STRING,
++                        &addrs, len,
++                        DBUS_TYPE_INVALID);
++
++        g_free(addrs);
++        g_slist_foreach(trusts, (GFunc) g_free, NULL);
++        g_slist_free(trusts);
++
++        return send_message_and_unref(conn, reply);
++
++
++}
++
+ static DBusHandlerResult is_trusted(DBusConnection *conn,
+ 					DBusMessage *msg, void *data)
+ {
+@@ -639,6 +672,7 @@
+ 	{ "SetTrusted",		set_trusted,		"s",	""	},
+ 	{ "IsTrusted",		is_trusted,		"s",	"b"	},
+ 	{ "RemoveTrust",	remove_trust,		"s",	""	},
++	{ "ListTrust",		list_trusted,		"",	"as"	},
+ 	{ NULL, NULL, NULL, NULL }
+ };
+ 
+
+--------------060304000800050803030701
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >>  http://get.splunk.com/
+--------------060304000800050803030701
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--------------060304000800050803030701--
