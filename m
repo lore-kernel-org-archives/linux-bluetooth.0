@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <bd5b16740708160923g17faaaecj77d3f9abd517a65a@mail.gmail.com>
-Date: Thu, 16 Aug 2007 19:23:27 +0300
-From: "Ohad Ben-Cohen" <ohad@bencohen.org>
-To: Alok <develnewbie@gmail.com>
-In-Reply-To: <1187271433.6440.18.camel@greatbear>
-MIME-Version: 1.0
-References: <1187271433.6440.18.camel@greatbear>
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Help regarding TI's Bluetooth chips.
+From: Alok <develnewbie@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+Date: Thu, 16 Aug 2007 19:07:13 +0530
+Message-Id: <1187271433.6440.18.camel@greatbear>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Help regarding TI's Bluetooth chips.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,35 +18,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Alok,
+Hi, 
 
-On 8/16/07, Alok <develnewbie@gmail.com> wrote:
-> 1. Is HCILL critical for TI's BT chips?
+I am working on bluetooth on OMAP 850(fsample) board.
+The Bluetooth chip is BRF6150 2.12 FW 3.0.48.
+The Host Control Interface used is UART.
+I came across this post:
+http://sourceforge.net/mailarchive/message.php?msg_id=200704301139.44842.ohad%40bencohen.org 
 
-No. HCILL is TI's runtime power management protocol. It is not mandatory;
-In fact it is off by default and a special command must be sent to the chip
-in order to turn it on (usually it is the last command in the .bts file).
-We are currently working on merging the HCILL patches to mainline.
-If you are interested, take a look at:
-http://article.gmane.org/gmane.linux.bluez.devel/12071
+I need to send a .bts to the BT chip for initialization. 
+I am using the following patch for it: 
+ http://article.gmane.org/gmane.linux.bluez.devel/5168
 
-> 2. Has anyone tried a2dp on the brf63xx/brf61xx ? If so what is the
-> minimum baud rate that is required ?
+I want to get a2dp up on this chip. 
 
-A safe minimum value would be 460kbps (although there are some bitpool values
-that will make even a baud rate of ~200-300kbps enough).
+I had the following queries: 
 
-> 3. I have currently selected the H4 driver. Do i need to select the bcsp driver instead?
+1. Is HCILL critical for TI's BT chips? 
 
-HCILL is just an extension of H4 (a few single-byte commands with which the chip
-can announce its power state, and the host can wake it up).
-When HCILL is off, the BRF chips speak plain H4, so If you don't want HCILL,
- you should indeed use H4.
-The BCSP is a communication protocol required for CSR BlueCore chips.
-Don't use it.
+2. Has anyone tried a2dp on the brf63xx/brf61xx ? If so what is the
+minimum baud rate that is required ? 
 
-All the best,
-Ohad.
+3. I have currently selected the H4 driver. Do i need to select the bcsp
+driver instead? What is the difference betweent the two?
+
+
+Thanks, 
+Alok.
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
