@@ -1,14 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46C58673.70201@free.fr>
-Date: Fri, 17 Aug 2007 13:28:51 +0200
+Message-ID: <46C583BF.9080705@free.fr>
+Date: Fri, 17 Aug 2007 13:17:19 +0200
 From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46C088D7.9000108@silicom.fr>	<1187023591.6262.28.camel@ubuntu.mpl.access-company.com>	<46C1A52F.7050102@free.fr>
-	<1187109044.6698.276.camel@violet>	<46C57BA5.5000400@free.fr>
-	<1187348439.6698.369.camel@violet>
-In-Reply-To: <1187348439.6698.369.camel@violet>
-Subject: Re: [Bluez-devel] New A2DP support : HOWTO ?
+References: <46BD85F4.1090400@free.fr>
+	<1186855275.6698.10.camel@violet>	<1186999158.6262.10.camel@ubuntu.mpl.access-company.com>	<1186999538.6698.141.camel@violet>
+	<46C07EAC.8060407@free.fr>	<1187024669.6698.214.camel@violet>
+	<46C1A54A.9080103@free.fr> <1187109870.6698.287.camel@violet>
+In-Reply-To: <1187109870.6698.287.camel@violet>
+Subject: Re: [Bluez-devel] An explanation of	a2dpd	weird	behaviour	on	high
+ resolution timers enabled kernels
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,63 +24,48 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel
+Hi Marcel,
 
-> I got the SonyEricsson MBR-100 A2DP receiver dongle. That one is CSR
-> based. Never seen a TI based before.
+> 
+> I might be simply never hear the difference, 
 
-Me neither :-(
+Well, you will, however not always, this will be dependant upon the 
+bluetooth devices used, so that might work for you but fail for someone 
+else if those clock drifting issues are not handled properly.
 
-> Check again. There were a lot of changes.
+but anyway, we can actually
+> do this. However the implementation is tricky. The plugin should not
+> send HCI commands at all. Actually no daemon (except hcid) should send
+> any HCI commands at any time. 
 
-Just did that. In fact it used to work a few days ago, when the acceptor 
-side was paradoxally still broken. Not it has been fixed it doesn't work 
-anymore : funny, isn't it ?
+Woops, didn't know about that :-(
 
-The issue seems to be that my headset doesn't seem to like very much the 
-rejection of the start cmd that the daemon sends to him.
-After a while when xmms starts the daemon sends a start cmd, to which 
-the headset answers with a start rsp, which should indicate that 
-everything is ok... however i hear no sound in the headset whatsoever :-(
+Are there any hard constraints behing this limitation or is it just a 
+good software architecturing rule that prevents us from doing it ?
 
+> I can make the kernel to as for the clock
+> offset in a certain interval. 
+Just for my own comprehension : could you expose here how do you intend 
+to implement this ?
 
-Relevant hcidump log below:
- > ACL data: handle 6 flags 0x02 dlen 7
-     L2CAP(d): cid 0x0041 len 3 [psm 25]
-       AVDTP(s): Start cmd: transaction 4
-         ACP SEID 1
-< ACL data: handle 6 flags 0x02 dlen 8
-     L2CAP(d): cid 0x0054 len 4 [psm 25]
-       AVDTP(s): Start rej: transaction 4
-         ACP SEID 1
-         Error code 25
- > HCI Event: Number of Completed Packets (0x13) plen 5
-   0000: 01 06 00 01 00                                    .....
-< ACL data: handle 6 flags 0x02 dlen 7
-     L2CAP(d): cid 0x0054 len 3 [psm 25]
-       AVDTP(s): Start cmd: transaction 0
-         ACP SEID 1
- > HCI Event: Number of Completed Packets (0x13) plen 5
-   0000: 01 06 00 01 00                                    .....
- > ACL data: handle 6 flags 0x02 dlen 6
-     L2CAP(d): cid 0x0041 len 2 [psm 25]
-       AVDTP(s): Start rsp: transaction 0
-< ACL data: handle 6 flags 0x02 dlen 377
-< ACL data: handle 6 flags 0x01 dlen 153
-     L2CAP(d): cid 0x0056 len 526 [psm 25]
-       AVDTP(m): ver 2 cc 0 pt 1 seqn 0 time 128 ssrc 1
-       0000: 01 9c bf fa 20 00 00 00  00 00 00 00 00 00 7f ff  .... 
-...........
-       0010: 7f ff 7f ff 7f ff 7f ff  7f fe ff fd ff fb ff fb 
-................
-       0020: ff fb ff fb ff fb ff fb  ff f7 ff ef ff df ff df 
-................
-       0030: ff df ff df ff df ff df  ff bf ff 7f fe ff fe ff 
-................
-       0040: fe ff fe ff fe ff fe ff  fd ff fb ff f7 ff f7 ff 
-................
-:
+> This costs too since it has to go over the
+> same HCI link that the audio data goes. 
+Agreed :-)
+> So at which rate do you need
+> this information?
 
+Let's say we are unlucky and we got the master clock and the main CPU 
+clock to drift each of 250 ppm in opposite directions. That leaves use 
+with a 30 ms per minute drift.
+
+I'd say a clock resynch every 20-30 seconds should be enough, and would 
+limit the drift at any time below 15 mseconds, which should be 
+compensated byt the headset side buffering.
+
+So let's say i need this information every ~20 seconds.
+
+Note : of course this is for a2dp only, sco matters are completely 
+different.
 
 Cheers,
 
