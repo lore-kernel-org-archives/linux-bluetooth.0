@@ -1,21 +1,18 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Frederic Dalleau <frederic.dalleau@access-company.com>
+Mime-Version: 1.0 (Apple Message framework v752.3)
+In-Reply-To: <1187354654.9447.6.camel@ubuntu.mpl.access-company.com>
+References: <46C088D7.9000108@silicom.fr>
+	<1187023591.6262.28.camel@ubuntu.mpl.access-company.com>
+	<46C1A52F.7050102@free.fr> <1187109044.6698.276.camel@violet>
+	<46C57BA5.5000400@free.fr> <1187348439.6698.369.camel@violet>
+	<46C58673.70201@free.fr>
+	<5C8C496C-7E67-4DCD-A579-20E1256FA5E0@nokia.com>
+	<1187354654.9447.6.camel@ubuntu.mpl.access-company.com>
+Message-Id: <E3D0E085-FDE6-4BA0-97D4-3720ABB5880C@nokia.com>
+From: Johan Hedberg <johan.hedberg@nokia.com>
+Date: Fri, 17 Aug 2007 16:18:04 +0300
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <46C57B93.7040905@free.fr>
-References: <46BD85F4.1090400@free.fr> <1186855275.6698.10.camel@violet>
-	<1186999158.6262.10.camel@ubuntu.mpl.access-company.com>
-	<1186999538.6698.141.camel@violet> <46C07EAC.8060407@free.fr>
-	<1187024669.6698.214.camel@violet>
-	<1187027354.6262.59.camel@ubuntu.mpl.access-company.com>
-	<46C1A555.80404@free.fr>
-	<1187102836.3463.60.camel@ubuntu.mpl.access-company.com>
-	<46C57B93.7040905@free.fr>
-Date: Fri, 17 Aug 2007 15:41:06 +0200
-Message-Id: <1187358066.6257.21.camel@ubuntu.mpl.access-company.com>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] An
-	explanation	of	a2dpd	weird	behaviour	on	high	resolution
-	timers enabled kernels
+Subject: Re: [Bluez-devel] New A2DP support : HOWTO ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -29,43 +26,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+On Aug 17, 2007, at 15:44, Frederic Dalleau wrote:
+> I had the feeling that start suspend and stop were some basic audio
+> player controls...
 
-> * ALSA API has the builtin assomption that the data gets transmitted 
-> using a hardware ring buffer, which is not the bluetooth way of things 
-> when you send packets one after the other.
+That's what AVRCP is for. Start and Suspend in AVDTP are only used to  
+change between OPEN and STREAMING states. The "simultaneous use of  
+HFP, A2DP and AVRCP profiles" white-paper (available on  
+bluetooth.org) also has this as a recommendation in section 3:
+"The A2DP profile should be seen as a way to setup and configure the  
+actual transport of a
+streaming audio link, the A2DP profile should not be used to control  
+the applications streaming
+data. To control the applications the AVRCP profile should be used."
 
-Right, this is quite simple to emulate by doing this I got the best
-experience with all players in a2dpd.
+> Maybe the start command could be used to launch the
+> audio player and start playback. Then rejecting should only occur if
+> launching failed.
 
-> This means we have to workaround this by implementing a virtual buffer 
-> with a virtual hardware pointer.
+Won't happen. It's just not how the architecture is. User  
+applications initiate access to the system wide audio service, not  
+the other way around.
 
-A buffer, with a hardware pointer... data not sent yet must be stored.
+> And acceptor role is mandatory.
 
-> > I'm not sure we can assume an headset will buffer the received packets.
-> 
-> Well it does. However how much is left completely unspecified by the 
-> bluetooth specs. :-(
+Yes, and we of course support it.
 
-Keep in mind that buffering induce latency. A2DP itself is not so
-latent, my old iphono works great on windows , even for gaming... It
-does not buffer data and requires precise timing.
-
-The "all in plugin" architecture is designed to reduce data copy and
-latency. If buffering starts to occur on headset side, then it seems to
-me that all the benefit of this architecture are ruined.
-
-> > In fact, the only application to care about is the sound server.
-> 
-> Could you be more specific on that ?
-
-I don't think of a server in particular, it's difficult to choose one
-yet...
-
-It is time for me to leave.
-
-Frederic
-
+Johan
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
