@@ -1,18 +1,20 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d89ddf300708170715g47102e93u36fa55c21bd6ddd7@mail.gmail.com>
-Date: Fri, 17 Aug 2007 08:15:33 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1187359379.6698.388.camel@violet>
-MIME-Version: 1.0
-References: <46C088D7.9000108@silicom.fr> <46C57BA5.5000400@free.fr>
-	<1187348439.6698.369.camel@violet> <46C58673.70201@free.fr>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1187358839.6257.28.camel@ubuntu.mpl.access-company.com>
+References: <46C088D7.9000108@silicom.fr>
+	<1187023591.6262.28.camel@ubuntu.mpl.access-company.com>
+	<46C1A52F.7050102@free.fr> <1187109044.6698.276.camel@violet>
+	<46C57BA5.5000400@free.fr> <1187348439.6698.369.camel@violet>
+	<46C58673.70201@free.fr>
 	<5C8C496C-7E67-4DCD-A579-20E1256FA5E0@nokia.com>
 	<1187354654.9447.6.camel@ubuntu.mpl.access-company.com>
 	<E3D0E085-FDE6-4BA0-97D4-3720ABB5880C@nokia.com>
 	<7635988F-7113-477C-B33E-30E10DF56140@nokia.com>
 	<1187358839.6257.28.camel@ubuntu.mpl.access-company.com>
-	<1187359379.6698.388.camel@violet>
+Date: Fri, 17 Aug 2007 16:02:59 +0200
+Message-Id: <1187359379.6698.388.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] New A2DP support : HOWTO ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -27,24 +29,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Frederic,
+
+> > >> Maybe the start command could be used to launch the
+> > >> audio player and start playback. Then rejecting should only occur if
+> > >> launching failed.
+> > >
+> > > Won't happen. It's just not how the architecture is. User
+> > > applications initiate access to the system wide audio service, not
+> > > the other way around.
+> > 
+> > Just a little clarification to this so you don't think we loose all  
+> > usefulness of doing stuff automatically when a headset connects to  
+> > us: The audio service sends (D-Bus) signals when devices connect and  
+> > disconnect and the plan is to also integrate with HAL (a patch is  
+> > already in the works) to provide a object which HAL aware  
+> > applications (e.g. pulseaudio) could automatically use. This way the  
+> > applications or a sound server can automatically recognize the  
+> > connected headset and switch their audio routing accordingly.
+> 
+> Oh I see, then there is no need to write a pulseaudio specific plugin.
+
+we might have to do this for latency purposes. We don't wanna copy our
+audio data around. While it would work on the desktop, on an embedded
+device it would be overkill.
+
+> However, A2DP Test Suite check SNK initiated stream start.
+> 
+> 4.2.4.1  TP/SET/BV-04-I [Start Stream. - SNK]
+> To verify that SNK can start audio streaming.
+> 
+> A reject would probably make the test fail.
+
+In the long run we need to accept it and then suspend the stream if no
+client is attached. However in the long run we also have to tell the
+plugin to simply discard data (if no A2DP connection is open) and not
+fail with various stupid reasons. In that case the start command would
+tell the plugin that a connection is now present and has to use it. It
+is a really complex system and needs a lots of testing to get the right
+and expected behavior for the end user.
+
+Regards
+
 Marcel
 
-> > Oh I see, then there is no need to write a pulseaudio specific plugin.
->
-> we might have to do this for latency purposes. We don't wanna copy our
-> audio data around. While it would work on the desktop, on an embedded
-> device it would be overkill.
 
-it is a little scary to think that the pulse daemon which takes up to
-8% of my laptop's cycles when *idle* might be embedded. Fortunately
-they did just change their threading model in a devel branch.
-Hopefully the change completely removes the need for them to be
-polling from a single mainloop.
-
-I do still like the idea of a native pulse plugin. I think they will
-get it right.
-
-Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
