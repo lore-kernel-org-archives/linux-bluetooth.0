@@ -1,17 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46C57B93.7040905@free.fr>
-Date: Fri, 17 Aug 2007 12:42:27 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
+Message-ID: <46C578A7.4060606@suse.de>
+Date: Fri, 17 Aug 2007 12:29:59 +0200
+From: Tom Patzig <tpatzig@suse.de>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46BD85F4.1090400@free.fr>
-	<1186855275.6698.10.camel@violet>	<1186999158.6262.10.camel@ubuntu.mpl.access-company.com>	<1186999538.6698.141.camel@violet>
-	<46C07EAC.8060407@free.fr>	<1187024669.6698.214.camel@violet>	<1187027354.6262.59.camel@ubuntu.mpl.access-company.com>	<46C1A555.80404@free.fr>
-	<1187102836.3463.60.camel@ubuntu.mpl.access-company.com>
-In-Reply-To: <1187102836.3463.60.camel@ubuntu.mpl.access-company.com>
-Subject: Re: [Bluez-devel] An explanation	of	a2dpd	weird	behaviour	on	high
- resolution timers enabled kernels
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Content-Type: multipart/mixed; boundary="------------000800020409050002080202"
+Subject: [Bluez-devel] Service.ListTrusts()
+Reply-To: tpatzig@suse.de,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -20,76 +16,136 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all, please find some comments below.
+This is a multi-part message in MIME format.
+--------------000800020409050002080202
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 8bit
 
-> Let's take an example : An application write 40 ms of music.
-> If you internally buffer the data, then the application will consider it
->  written (not played yet).
-> The application will then wait for the data to be played by repeatedly 
-> asking the delay until is it 0. However, that application 
-> will NOT call write(), preventing the plugin code to be executed.
-> 
-> I already hear you saying, let's put the code in getdelay() too. This is not possible
-> because the application can also call getdelay() once and wait, or even not call
-> getdelay() at all, because the number of music data is known...
-> 
-> However, using a thread can solve this issue.
-> 
->> Ok, then we have to implement snd_pcm_get_delay() and offer the option 
->> to the application to sleep itself (or do other time consuming tasks 
->> such as video decoding). However when the application sends data too 
->> fast (such as a simple aplay) we *have* to do the sleeping ourselves to 
->> prevents cuts on the headset side :-)
-> 
-> Aplay is not sending the data too fast. aplay tries to fill the sound
-> card buffer as 100% of sound playing application do.
-> Buffer size being known, delay determine available space. When there is
-> space, aplay writes data and that's all.
-> 
-> The current plugin delay implementation is the number of data written
-> (not played) => delay is always 0 => buffer is always empty => aplay
-> fills it => plugin have to wait in the write() call.
-> 
+Hi,
 
-Ok, this time i understood. I agree with you. Which means two things:
-  * i basically screwed up the pcm plugin i did a while ago for headsetd 
-:-(. I was wrongs about the sleeping stuff. I understood alsa dynamic 
-behaviour the wrong way.
-  * ALSA API has the builtin assomption that the data gets transmitted 
-using a hardware ring buffer, which is not the bluetooth way of things 
-when you send packets one after the other.
+final version of the patch.
+    * Renamed the method to ListTrusts()
+    * Removed ListUsers() skeleton
+    * Removed Listusers() in dbus-api.txt
+    * Added ListTrusts() in dbus-api.txt
 
-This means we have to workaround this by implementing a virtual buffer 
-with a virtual hardware pointer.
-While as Marcel, i'm not a big fan of threads, i'd tend to see them here 
-as the less worse alternative we have :-) : so i'd say : let's go with 
-threads !!
+Tom
 
-> I'm not sure we can assume an headset will buffer the received packets.
+-- 
+--------------------------------------------
+Tom Patzig <tpatzig@suse.de>
+Novell /  SUSE
+SUSE LINUX Products GmbH - Nürnberg - AG Nürnberg - HRB 16746 - GF: Markus Rex
 
-Well it does. However how much is left completely unspecified by the 
-bluetooth specs. :-(
 
-> In fact, the only application to care about is the sound server.
+--------------000800020409050002080202
+Content-Type: text/x-patch;
+ name="service_listTrusted.diff"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="service_listTrusted.diff"
 
-Could you be more specific on that ?
-If you think of pulseaudio as the sound server, i'm afraid a native 
-pulse plugin will have to be written for good bluetooth support anyway.
+--- hcid/dbus-api.txt
++++ hcid/dbus-api.txt
+@@ -1193,10 +1193,10 @@
+ 			file. The Start and Stop methods are not applicable to
+ 			external services and will return an error.
+ 
+-		array{string} ListUsers() [experimental]
++		array{string} ListTrusts()
+ 
+-			Returns list of current users (device addresses)
+-			of the service.
++			Returns a list of remote devices that are trusted
++			for the service.
+ 
+ 		void RemoveUser(string address) [experimental]
+ 
+--- hcid/dbus-service.c
++++ hcid/dbus-service.c
+@@ -525,12 +525,6 @@
+ 	return send_message_and_unref(conn, reply);
+ }
+ 
+-static DBusHandlerResult list_users(DBusConnection *conn,
+-					DBusMessage *msg, void *data)
+-{
+-	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+-}
+-
+ static DBusHandlerResult remove_user(DBusConnection *conn,
+ 					DBusMessage *msg, void *data)
+ {
+@@ -566,6 +560,37 @@
+ 	return send_message_and_unref(conn, reply);
+ }
+ 
++static DBusHandlerResult list_trusted(DBusConnection *conn,
++                                        DBusMessage *msg, void *data)
++{
++        struct service *service = data;
++        DBusMessage *reply;
++        GSList *trusts, *l;
++        char **addrs;
++        int len;
++
++        reply = dbus_message_new_method_return(msg);
++        if (!reply)
++                return DBUS_HANDLER_RESULT_NEED_MEMORY;
++        trusts = list_trusts(BDADDR_ANY, service->ident);
++
++        addrs = g_new(char *, g_slist_length(trusts));
++
++        for (l = trusts, len = 0; l; l = l->next, len++)
++                addrs[len] = l->data;
++
++        dbus_message_append_args(reply,
++                        DBUS_TYPE_ARRAY, DBUS_TYPE_STRING,
++                        &addrs, len,
++                        DBUS_TYPE_INVALID);
++
++        g_free(addrs);
++        g_slist_foreach(trusts, (GFunc) g_free, NULL);
++        g_slist_free(trusts);
++
++        return send_message_and_unref(conn, reply);
++}
++
+ static DBusHandlerResult is_trusted(DBusConnection *conn,
+ 					DBusMessage *msg, void *data)
+ {
+@@ -639,6 +664,7 @@
+ 	{ "SetTrusted",		set_trusted,		"s",	""	},
+ 	{ "IsTrusted",		is_trusted,		"s",	"b"	},
+ 	{ "RemoveTrust",	remove_trust,		"s",	""	},
++	{ "ListTrusts",		list_trusted,		"",	"as"	},
+ 	{ NULL, NULL, NULL, NULL }
+ };
+ 
 
-Cheers,
-
-Fabien
+--------------000800020409050002080202
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
+--------------000800020409050002080202
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--------------000800020409050002080202--
