@@ -1,13 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46C57BA5.5000400@free.fr>
-Date: Fri, 17 Aug 2007 12:42:45 +0200
+Message-ID: <46C57B93.7040905@free.fr>
+Date: Fri, 17 Aug 2007 12:42:27 +0200
 From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46C088D7.9000108@silicom.fr>	<1187023591.6262.28.camel@ubuntu.mpl.access-company.com>	<46C1A52F.7050102@free.fr>
-	<1187109044.6698.276.camel@violet>
-In-Reply-To: <1187109044.6698.276.camel@violet>
-Subject: Re: [Bluez-devel] New A2DP support : HOWTO ?
+References: <46BD85F4.1090400@free.fr>
+	<1186855275.6698.10.camel@violet>	<1186999158.6262.10.camel@ubuntu.mpl.access-company.com>	<1186999538.6698.141.camel@violet>
+	<46C07EAC.8060407@free.fr>	<1187024669.6698.214.camel@violet>	<1187027354.6262.59.camel@ubuntu.mpl.access-company.com>	<46C1A555.80404@free.fr>
+	<1187102836.3463.60.camel@ubuntu.mpl.access-company.com>
+In-Reply-To: <1187102836.3463.60.camel@ubuntu.mpl.access-company.com>
+Subject: Re: [Bluez-devel] An explanation	of	a2dpd	weird	behaviour	on	high
+ resolution timers enabled kernels
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,53 +24,65 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> Hi Fabien,
-> 
->> For some reason my headset tries to start the A2DP stream, connects to 
->> RFCOMM channel, and then stops the a2dp stream, while it stays connected 
->> to rfcomm (hs profile).
->>
->> To force the use of a2dp i had to reload the audio daemon, and then 
->> launch the multimedia player. It then tries to start a2dp stream, and it 
->> works.
-> 
-> which headset is this. What about hcitool info output from it.
+Hi all, please find some comments below.
 
-Sony Ericsson HBH-DS970
-
-/home/fchevalier/bluez-cvs# hcitool info 00:18:13:E7:6D:4F
-Requesting information ...
-         BD Address:  00:18:13:E7:6D:4F
-         Device Name: HBH-DS970
-/home/fchevalier/bluez-cvs# hcitool info 00:18:13:E7:6D:4F
-Requesting information ...
-         BD Address:  00:18:13:E7:6D:4F
-         LMP Version: 2.0 (0x3) LMP Subversion: 0xe1b
-         Manufacturer: Texas Instruments Inc. (13)
-         Features: 0xff 0xfd 0x29 0x78 0x18 0x18 0x00 0x80
-                 <3-slot packets> <5-slot packets> <encryption> <slot
-offset>
-                 <timing accuracy> <role switch> <hold mode> <sniff mode>
-                 <park state> <channel quality> <SCO link> <HV2 packets>
-                 <HV3 packets> <u-law log> <A-law log> <CVSD>
-<transparent SCO>
-                 <enhanced iscan> <interlaced iscan> <interlaced pscan>
-                 <inquiry with RSSI> <AFH cap. slave> <AFH class. slave>
-                 <AFH cap. master> <AFH class. master> <extended features>
-
+> Let's take an example : An application write 40 ms of music.
+> If you internally buffer the data, then the application will consider it
+>  written (not played yet).
+> The application will then wait for the data to be played by repeatedly 
+> asking the delay until is it 0. However, that application 
+> will NOT call write(), preventing the plugin code to be executed.
 > 
->> Btw i got perfect sound quality compared to a2dpd. No small glitches 
->> from time to time, just *perfect* sound. :-)
+> I already hear you saying, let's put the code in getdelay() too. This is not possible
+> because the application can also call getdelay() once and wait, or even not call
+> getdelay() at all, because the number of music data is known...
 > 
-> Check the latest CVS. Johan fixed some issues with the AVDTP state
-> machine and the plugin interaction.
+> However, using a thread can solve this issue.
+> 
+>> Ok, then we have to implement snd_pcm_get_delay() and offer the option 
+>> to the application to sleep itself (or do other time consuming tasks 
+>> such as video decoding). However when the application sends data too 
+>> fast (such as a simple aplay) we *have* to do the sleeping ourselves to 
+>> prevents cuts on the headset side :-)
+> 
+> Aplay is not sending the data too fast. aplay tries to fill the sound
+> card buffer as 100% of sound playing application do.
+> Buffer size being known, delay determine available space. When there is
+> space, aplay writes data and that's all.
+> 
+> The current plugin delay implementation is the number of data written
+> (not played) => delay is always 0 => buffer is always empty => aplay
+> fills it => plugin have to wait in the write() call.
+> 
 
-I just did it. However a2dp streaming dooesn't work anymore : i'm gonna
-try to have a look to it...
+Ok, this time i understood. I agree with you. Which means two things:
+  * i basically screwed up the pcm plugin i did a while ago for headsetd 
+:-(. I was wrongs about the sleeping stuff. I understood alsa dynamic 
+behaviour the wrong way.
+  * ALSA API has the builtin assomption that the data gets transmitted 
+using a hardware ring buffer, which is not the bluetooth way of things 
+when you send packets one after the other.
+
+This means we have to workaround this by implementing a virtual buffer 
+with a virtual hardware pointer.
+While as Marcel, i'm not a big fan of threads, i'd tend to see them here 
+as the less worse alternative we have :-) : so i'd say : let's go with 
+threads !!
+
+> I'm not sure we can assume an headset will buffer the received packets.
+
+Well it does. However how much is left completely unspecified by the 
+bluetooth specs. :-(
+
+> In fact, the only application to care about is the sound server.
+
+Could you be more specific on that ?
+If you think of pulseaudio as the sound server, i'm afraid a native 
+pulse plugin will have to be written for good bluetooth support anyway.
+
+Cheers,
 
 Fabien
-
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
