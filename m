@@ -1,16 +1,21 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46C583BF.9080705@free.fr>
-Date: Fri, 17 Aug 2007 13:17:19 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46BD85F4.1090400@free.fr>
-	<1186855275.6698.10.camel@violet>	<1186999158.6262.10.camel@ubuntu.mpl.access-company.com>	<1186999538.6698.141.camel@violet>
-	<46C07EAC.8060407@free.fr>	<1187024669.6698.214.camel@violet>
-	<46C1A54A.9080103@free.fr> <1187109870.6698.287.camel@violet>
-In-Reply-To: <1187109870.6698.287.camel@violet>
-Subject: Re: [Bluez-devel] An explanation of	a2dpd	weird	behaviour	on	high
- resolution timers enabled kernels
+In-Reply-To: <46C57B93.7040905@free.fr>
+References: <46BD85F4.1090400@free.fr> <1186855275.6698.10.camel@violet>
+	<1186999158.6262.10.camel@ubuntu.mpl.access-company.com>
+	<1186999538.6698.141.camel@violet> <46C07EAC.8060407@free.fr>
+	<1187024669.6698.214.camel@violet>
+	<1187027354.6262.59.camel@ubuntu.mpl.access-company.com>
+	<46C1A555.80404@free.fr>
+	<1187102836.3463.60.camel@ubuntu.mpl.access-company.com>
+	<46C57B93.7040905@free.fr>
+Date: Fri, 17 Aug 2007 13:06:09 +0200
+Message-Id: <1187348769.6698.373.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] An
+	explanation	of	a2dpd	weird	behaviour	on	high	resolution
+	timers enabled kernels
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,52 +29,56 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Fabien,
 
+> >> Ok, then we have to implement snd_pcm_get_delay() and offer the option 
+> >> to the application to sleep itself (or do other time consuming tasks 
+> >> such as video decoding). However when the application sends data too 
+> >> fast (such as a simple aplay) we *have* to do the sleeping ourselves to 
+> >> prevents cuts on the headset side :-)
+> > 
+> > Aplay is not sending the data too fast. aplay tries to fill the sound
+> > card buffer as 100% of sound playing application do.
+> > Buffer size being known, delay determine available space. When there is
+> > space, aplay writes data and that's all.
+> > 
+> > The current plugin delay implementation is the number of data written
+> > (not played) => delay is always 0 => buffer is always empty => aplay
+> > fills it => plugin have to wait in the write() call.
+> > 
 > 
-> I might be simply never hear the difference, 
+> Ok, this time i understood. I agree with you. Which means two things:
+>   * i basically screwed up the pcm plugin i did a while ago for headsetd 
+> :-(. I was wrongs about the sleeping stuff. I understood alsa dynamic 
+> behaviour the wrong way.
+>   * ALSA API has the builtin assomption that the data gets transmitted 
+> using a hardware ring buffer, which is not the bluetooth way of things 
+> when you send packets one after the other.
+> 
+> This means we have to workaround this by implementing a virtual buffer 
+> with a virtual hardware pointer.
+> While as Marcel, i'm not a big fan of threads, i'd tend to see them here 
+> as the less worse alternative we have :-) : so i'd say : let's go with 
+> threads !!
 
-Well, you will, however not always, this will be dependant upon the 
-bluetooth devices used, so that might work for you but fail for someone 
-else if those clock drifting issues are not handled properly.
+just a small correction. I hate threads. However since ALSA already uses
+them, we can do, too. Otherwise you would never convince me to use
+threads.
 
-but anyway, we can actually
-> do this. However the implementation is tricky. The plugin should not
-> send HCI commands at all. Actually no daemon (except hcid) should send
-> any HCI commands at any time. 
+> > In fact, the only application to care about is the sound server.
+> 
+> Could you be more specific on that ?
+> If you think of pulseaudio as the sound server, i'm afraid a native 
+> pulse plugin will have to be written for good bluetooth support anyway.
 
-Woops, didn't know about that :-(
+That is the plan in the end. Having a native PulseAudio plugin that
+connects over our IPC to the audio service.
 
-Are there any hard constraints behing this limitation or is it just a 
-good software architecturing rule that prevents us from doing it ?
+Regards
 
-> I can make the kernel to as for the clock
-> offset in a certain interval. 
-Just for my own comprehension : could you expose here how do you intend 
-to implement this ?
+Marcel
 
-> This costs too since it has to go over the
-> same HCI link that the audio data goes. 
-Agreed :-)
-> So at which rate do you need
-> this information?
 
-Let's say we are unlucky and we got the master clock and the main CPU 
-clock to drift each of 250 ppm in opposite directions. That leaves use 
-with a 30 ms per minute drift.
-
-I'd say a clock resynch every 20-30 seconds should be enough, and would 
-limit the drift at any time below 15 mseconds, which should be 
-compensated byt the headset side buffering.
-
-So let's say i need this information every ~20 seconds.
-
-Note : of course this is for a2dp only, sco matters are completely 
-different.
-
-Cheers,
-
-Fabien
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
