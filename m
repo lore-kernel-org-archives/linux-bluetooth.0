@@ -1,13 +1,19 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46C6FBF9.3040607@free.fr>
-Date: Sat, 18 Aug 2007 16:02:33 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
+From: Frederic Dalleau <frederic.dalleau@access-company.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46C088D7.9000108@silicom.fr>	<1187023591.6262.28.camel@ubuntu.mpl.access-company.com>	<46C1A52F.7050102@free.fr>	<1187109044.6698.276.camel@violet>	<46C57BA5.5000400@free.fr>	<1187348439.6698.369.camel@violet>
-	<46C58673.70201@free.fr>
+In-Reply-To: <d89ddf300708170715g47102e93u36fa55c21bd6ddd7@mail.gmail.com>
+References: <46C088D7.9000108@silicom.fr> <46C57BA5.5000400@free.fr>
+	<1187348439.6698.369.camel@violet> <46C58673.70201@free.fr>
 	<5C8C496C-7E67-4DCD-A579-20E1256FA5E0@nokia.com>
-In-Reply-To: <5C8C496C-7E67-4DCD-A579-20E1256FA5E0@nokia.com>
+	<1187354654.9447.6.camel@ubuntu.mpl.access-company.com>
+	<E3D0E085-FDE6-4BA0-97D4-3720ABB5880C@nokia.com>
+	<7635988F-7113-477C-B33E-30E10DF56140@nokia.com>
+	<1187358839.6257.28.camel@ubuntu.mpl.access-company.com>
+	<1187359379.6698.388.camel@violet>
+	<d89ddf300708170715g47102e93u36fa55c21bd6ddd7@mail.gmail.com>
+Date: Fri, 17 Aug 2007 16:29:06 +0200
+Message-Id: <1187360946.6257.34.camel@ubuntu.mpl.access-company.com>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] New A2DP support : HOWTO ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,38 +28,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Johan,
-> To me this sounds like a bug in your headset.
 
-I agree.. however interop experience shows that most a2dp headsets are 
-buggy, but all in different ways :-(
+> > > Oh I see, then there is no need to write a pulseaudio specific plugin.
+> >
+> > we might have to do this for latency purposes. 
+> I do still like the idea of a native pulse plugin. 
 
-  However we should of
-> course strive to be interoperable with as many as possible  
-> implementations.
-> 
-> The reason why the audio service rejects the start command is that  
-> STREAMING state should only be entered by request of alsa, since if  
-> we have no app to provide audio it's unnecessary to have the headset  
-> think it will receive some audio when in fact it wont.
-> 
-> Do you have any ideas how to solve this? 
+The guy of pulse audio had a great idea for their alsa plugin :
+They put all the code in the pulse library, and the plugin only wrap the
+interface.
+Then the pulse library can be reused, for example in the xmms plugin
+which has a different interface but similar functions...
 
-Right now : no. But i knwo a guy who knows :-)
-I'm gonna check what is the most interoperable way of handling this 
-behaviour.
+You might consider this if you plan to write a pulse specific plugin.
 
-I was thinking that we could
-> accept the start command but immediately afterwards send a suspend  
-> command. OTOH this feels a little "hackish". The headsets that I have  
-> which are capable of acting in initiator role will simply disconnect  
-> when their start command is rejected, so I have not been very happy  
-> with the current behavior either.
-
-I'm gonna ask a work colleague to know how he solved this issue. Might 
-take a week or so, as he's in hollidays :-(
-
-Fabien
+Frederic
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
