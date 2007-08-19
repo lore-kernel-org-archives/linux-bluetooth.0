@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 20 Aug 2007 02:16:51 -0700 (PDT)
-From: Mahtab Hossain <mahtab_hossain2002@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Message-ID: <20483.4167.qm@web50509.mail.re2.yahoo.com>
-Subject: [Bluez-users] Bluetooth Access Points
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <loom.20070819T201223-639@post.gmane.org>
+References: <loom.20070819T201223-639@post.gmane.org>
+Date: Sun, 19 Aug 2007 21:19:01 +0200
+Message-Id: <1187551141.11068.55.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] stale connections with input
+	service	(bluez-libs-3.14)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,57 +17,51 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0891435684=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0891435684==
-Content-Type: multipart/alternative; boundary="0-1173807680-1187601411=:4167"
-Content-Transfer-Encoding: 8bit
+Hi Dick,
 
---0-1173807680-1187601411=:4167
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+> I'm using the latest bluez utils and bluez libs but the input service is still
+> unstable. When I'm not using my dinovo desktop (keyboard/pointing) they
+> disconnect but the input service doesn't seem to handle it well.
+> 
+> $ hcitool con
+> keep telling me:
+> 
+> Connections:
+>         ACL 00:07:61:69:XX:XX handle 51 state 1 lm MASTER 
+>         ACL 00:07:61:68:XX:XX handle 48 state 1 lm MASTER AUTH ENCRYPT 
 
-Dear users,
+which kernel version is this. This is not suppose to happen. Have you
+tried a 2.6.23-rc3 kernel?
 
-Can anybody provide me some information on Bluetooth access points which come with BlueZ or has been tested successfully with BlueZ? Any link or suggestion would be really helpful.
+> When I reset the hci:
+> 
+> # hciconfig hci0 reset
+> The mouse reconnects but the keyboard is still not working, I can only get it
+> back online by either pressing the connect button or dis-/connect the batteries.
+> 
+> In the stale situation I see still data coming from the devices (with hcidump);
+> that's kinda weird. (Why isn't it handled by the input service?)
 
-Thanks in advance
-Mahtab
+Does the mouse always works? Maybe this is an issue with the
+authentication and encryption that are mandatory for keyboard. Which
+keyboard are you using? Which Bluetooth chip is inside it.
 
-       
----------------------------------
-Take the Internet to Go: Yahoo!Go puts the Internet in your pocket: mail, news, photos & more. 
---0-1173807680-1187601411=:4167
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Regards
 
-Dear users,<br><br>Can anybody provide me some information on Bluetooth access points which come with BlueZ or has been tested successfully with BlueZ? Any link or suggestion would be really helpful.<br><br>Thanks in advance<br>Mahtab<br><p>&#32;
-      <hr size=1>Take the Internet to Go: Yahoo!Go puts the <a href="http://us.rd.yahoo.com/evt=48253/*http://mobile.yahoo.com/go?refer=1GNXIC">Internet in your pocket:</a> mail, news, photos & more. 
---0-1173807680-1187601411=:4167--
+Marcel
 
 
---===============0891435684==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============0891435684==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0891435684==--
