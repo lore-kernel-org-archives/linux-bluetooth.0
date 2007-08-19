@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <loom.20070819T201223-639@post.gmane.org>
-References: <loom.20070819T201223-639@post.gmane.org>
-Date: Sun, 19 Aug 2007 21:19:01 +0200
-Message-Id: <1187551141.11068.55.camel@violet>
+To: bluez-users@lists.sourceforge.net
+From: Dick <dick@mrns.nl>
+Date: Sun, 19 Aug 2007 18:25:54 +0000 (UTC)
+Message-ID: <loom.20070819T201223-639@post.gmane.org>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] stale connections with input
-	service	(bluez-libs-3.14)
+Subject: [Bluez-users] stale connections with input service (bluez-libs-3.14)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,39 +18,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Dick,
+Hi,
 
-> I'm using the latest bluez utils and bluez libs but the input service is still
-> unstable. When I'm not using my dinovo desktop (keyboard/pointing) they
-> disconnect but the input service doesn't seem to handle it well.
-> 
-> $ hcitool con
-> keep telling me:
-> 
-> Connections:
->         ACL 00:07:61:69:XX:XX handle 51 state 1 lm MASTER 
->         ACL 00:07:61:68:XX:XX handle 48 state 1 lm MASTER AUTH ENCRYPT 
+I'm using the latest bluez utils and bluez libs but the input service is still
+unstable. When I'm not using my dinovo desktop (keyboard/pointing) they
+disconnect but the input service doesn't seem to handle it well.
 
-which kernel version is this. This is not suppose to happen. Have you
-tried a 2.6.23-rc3 kernel?
+$ hcitool con
+keep telling me:
 
-> When I reset the hci:
-> 
-> # hciconfig hci0 reset
-> The mouse reconnects but the keyboard is still not working, I can only get it
-> back online by either pressing the connect button or dis-/connect the batteries.
-> 
-> In the stale situation I see still data coming from the devices (with hcidump);
-> that's kinda weird. (Why isn't it handled by the input service?)
+Connections:
+        ACL 00:07:61:69:XX:XX handle 51 state 1 lm MASTER 
+        ACL 00:07:61:68:XX:XX handle 48 state 1 lm MASTER AUTH ENCRYPT 
 
-Does the mouse always works? Maybe this is an issue with the
-authentication and encryption that are mandatory for keyboard. Which
-keyboard are you using? Which Bluetooth chip is inside it.
+When I reset the hci:
 
-Regards
+# hciconfig hci0 reset
+The mouse reconnects but the keyboard is still not working, I can only get it
+back online by either pressing the connect button or dis-/connect the batteries.
 
-Marcel
+In the stale situation I see still data coming from the devices (with hcidump);
+that's kinda weird. (Why isn't it handled by the input service?)
 
+I grepped for "input" in my syslog:
+http://rafb.net/p/Kf3Ei066.html
+
+What might be wrong?
+
+Thanks in advance,
+Dick
 
 
 -------------------------------------------------------------------------
