@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <2d5a2c100708191902k599014cbo1e08c9c7a3febd45@mail.gmail.com>
-Date: Sun, 19 Aug 2007 23:02:32 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <46C875BA.90204@free.fr>
-MIME-Version: 1.0
 References: <46C875BA.90204@free.fr>
+Date: Sun, 19 Aug 2007 21:15:16 +0200
+Message-Id: <1187550916.11068.51.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] [PATCH] pcm_bluetooth : fix a2dp streaming
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -16,107 +16,115 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabian,
+Hi Fabien,
 
-I got almost the same idea implemented in my git
-(git://git.infradead.org/users/vudentz/bluez-utils.git). There is
-alot of simplification you already did, but I consider the
-bitrate as a2dp spec says. I also implement a circular
-buffer for encoded sbc frames to be consumed by a
-thread.
-
-On 8/19/07, Fabien Chevalier <fabchevalier@free.fr> wrote:
-> Johan & All,
->
-> Following recent mailing list discussions, i decided to implement some
+> Following recent mailing list discussions, i decided to implement some 
 > of the ideas that have been suggested recently. :-)
->
+> 
 > So i heavily modified the A2DP streaming part of the pcm plugin
->
+> 
 > The user-visible features of this patch:
 >    * much reduced latency (You should love this one Frederic)
 >    * supports headsets that are unable to throttle the data flow and
 >      that play too fast or drop packets or whatever (Marcel, could you
 >      please confirm that fixes the issues you had with some headsets ?).
->
-> This patch is fairly intrusive, and removes some code that i judjed
-> useless now, like the bandwidth measurement stuff, and has greatly
-> simplifyed transfer loop for avdtp (see comments in the code for the
+> 
+> This patch is fairly intrusive, and removes some code that i judjed 
+> useless now, like the bandwidth measurement stuff, and has greatly 
+> simplifyed transfer loop for avdtp (see comments in the code for the 
 > justifications)
->
-> It brings in a thread that has for only reponsibility to increment the
-> so called hardware pointer (which doesn't point to anything in our
-> case), and notify the application trough writing in a pipe that some
+> 
+> It brings in a thread that has for only reponsibility to increment the 
+> so called hardware pointer (which doesn't point to anything in our 
+> case), and notify the application trough writing in a pipe that some 
 > room is available (virtual room again), so that it could send more data.
->
-> The attached file details the tests i've run to check i didn't break
-> anything. All is conclusive except playing with XMMS that goes underrun
-> for a reason i haven spotted yet. Apart from that aplay, mplayer,
+> 
+> The attached file details the tests i've run to check i didn't break 
+> anything. All is conclusive except playing with XMMS that goes underrun 
+> for a reason i haven spotted yet. Apart from that aplay, mplayer, 
 > gstreamer are fine.
->
+> 
 > I'm looking forward for any questions you have on the patch.
->
-> Nest step would be to fix the SCO part of the plugin, but this one is
-> looks harder as i think it will require tweaking the kernel SCO part.
->
-> Regards,
->
-> Fabien
->
-> Bluetooth alsa a2dp non regression cookbook
-> -------------------------------------------
->
-> I) PCM test tool shipped with ALSA
->
-> Setup:
-> *Download the alsa-utils source for the binary that run on your machine
-> *build the pcm executable in the test directory
->
-> Run:
-> ./pcm -c 2 -r 48000 -Dbluetooth -m write -b 10000
-> ./pcm -c 2 -r 48000 -Dbluetooth -m write_and_poll -b 10000
-> ./pcm -c 2 -r 48000 -Dbluetooth -m direct_write -b 10000
->
-> Result:
-> You should hear a clear sine in the headset.
-> pcm process should not eat 100% cpu (check with top)
-> Occasionnal sound drops are OK (due to quite short buffering of 10 ms)
->
-> II) Play a file from XMMS
->
-> III) Play file from totem
-> Setup:
-> * gconftool -t string -s /system/gstreamer/0.10/default/musicaudiosink "a=
-lsasink device=3Dbluetooth"
->
-> Run:
-> Launch totem, then select a file for play
->
-> III) PLay a file from mplayer
-> mplayer -ao alsa:device=3Dbluetooth filetoplay.wav
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc.
-> Still grepping through log files to find problems?  Stop.
-> Now Search log events and configuration files using AJAX and a browser.
-> Download your FREE copy of Splunk now >>  http://get.splunk.com/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->
->
+
+I tested the patch with my Logitech headphone and it makes beep work
+fine. Using xmms has serious problems. This keeps happening:
+
+** WARNING **: alsa_write_audio(): write error: Resource temporarily unavailable
+
+However I do have blanks with beep, too. It can also crash:
+
+beep-media-player: pcm_bluetooth.c:386: a2dp_playback_hw_thread:
+Assertion `ret == 1' failed.
+
+This is triggered by a song end where the stream is still open, but beep
+fails to enhance to the next track.
+
+Using usleep() seems not precise enough to me. Also we might not wanna
+use a pipe. Some other notification mechanism might be better. I don't
+really know what solution is best here.
+
+When using mplayer to watch a movie, I have sound blanks from time to
+time and it also crashed:
+
+mplayer: pcm_bluetooth.c:386: a2dp_playback_hw_thread: Assertion `ret == 1' failed.
+
+MPlayer interrupted by signal 6 in module: sleep_timer
+
+However it is a huge improvement and a big step in the right direction.
+I know that Luiz was working on a similar patch. Try to get on #bluez on
+freenode.org so the future work can be coordinated.
+
+Besides that, please fix the coding style. I am serious about that. I am
+picky about whitespace placements, but you already knew that:
+
+Every "if" is following by a whitespace like "if (". No exceptions.
+
+Also stuff like this is not acceptable:
+
+pfd[0].fd = ((struct bluetooth_data *)io->private_data)->stream_fd;
+
+If I have to twist my mind too much to understand why this code is
+correct it is too complex. Do something like this:
+
+struct bluetooth_data *data = io->private_data;
+pfd[0].fd = data->stream_fd;
+
+Don't invert the result of a function call:
+
+ret = -pthread_create(&a2dp_data->hw_thread, 
+
+However thought this is a good idea is wrong. This is big hole for
+overlooking sign errors. Don't do it. Do this instead:
+
+return -ret
+
+And while we are at it. Don't initiate variables with a value:
+
+int ret = 0;
+
+This is only needed in a few rare cases and will hide errors in the code
+flow that otherwise gcc might have caught.
+
+And instead of "ret" use "err" which I prefer.
+
+The assert() statements are nice for development, but we can't have them
+in the final version. We have to survive as much errors as possible and
+better play nothing than crash.
+
+The "for(;;) {" statement are better replaced with "while (1) {".
+
+For the "volatile snd_pcm_sframes_t hw_ptr;". Do you think that is
+enough and we not better use a lock or a mutex?
+
+Regards
+
+Marcel
 
 
--- =
-
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
