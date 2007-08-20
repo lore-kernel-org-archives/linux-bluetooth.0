@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <79be12f70708200908k48717fd4w2baa95824304733c@mail.gmail.com>
-Date: Mon, 20 Aug 2007 10:08:33 -0600
+Message-ID: <79be12f70708200824o14105689v2fd7097963d3bacd@mail.gmail.com>
+Date: Mon, 20 Aug 2007 09:24:03 -0600
 From: "John Sample" <john.m.sample@gmail.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] HCI Daemon Unable to get on D-Bus
+Subject: Re: [Bluez-users] Fwd: hcitool scan problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,61 +14,80 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1224172864=="
+Content-Type: multipart/mixed; boundary="===============0847722648=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1224172864==
+--===============0847722648==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_75330_32159728.1187626113574"
+	boundary="----=_Part_74841_27367594.1187623443046"
 
-------=_Part_75330_32159728.1187626113574
+------=_Part_74841_27367594.1187623443046
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-I've been working on getting Bluez up an running on an embedded platform and
-am having some problems getting hcid to run.  I'm using the 2.6.23 kernel,
-but I've also tested on an old 2.6.10 kernel and run into the same problem.
-I start D-Bus using dbus-daemon-1 --system, and it starts ok without any
-error messages.  I then start hcid, but it immediately exits and I get the
-following in my syslog:
+Hi Marcel,
 
-hcid[1021]: Bluetooth HCI daemon
-hcid[1021]: Can't connect to system message bus: Did not receive a reply.
-Possible causes include: the remote application did not send a reply, the
-message bus security policy blocked the reply, the reply timeout expired, or
-the network connection was broken.
-hcid[1021]: Unable to get on D-Bus
-Do I need to modify bluetooth.conf or system.conf in any way to get the
-security policy to allow the connection?  I saw a similar post a while ago
-on this same topic but I couldn't find a resolution anywhere.
+Thanks for the reply.  I ran the hcidump with hcitool scan and it appears
+that the inquiry retrieves all of the correct addresses, but when it does a
+remote name request the addresses are all scrambled.  There is also an
+occassional "Error: Invalid HCI Command Parameters" following the name
+request.  Any idea what is causing this to happen?
 
-Thanks,
+Thanks.
+
+Hi John,
+
+> I am having a problem with the hcitool scan command (v3.13) using the
+> 2.6.21 kernel, as well as 2.6.23.  Here is my output:
+>
+> Scanning ...
+>         3A:5E:11:6B:00:00       n/a
+>         38:C1:5E:35:3F:D9       n/a
+>         C5:2B:F4:F7:3C:6A       n/a
+>         3A:75:F9:65:1A:02       n/a.
+>         38:C1:60:35:1A:F6       n/a
+>
+> All of the addresses are partially junk for some reason - for example
+> 38:C1:60:35:1A:F6 should be 00:16:38:C1:60:35, and no name are
+> returned.  This seems to effect other tools as well, for example if I
+> do try to do a hidd search I can't detect anything even if there are
+> discoverable hid devices around - I'm guessing because it doesn't have
+> valid addresses.  Previously I had been using the 2.6.10 kernel and
+> everything worked fine.
+
+run "hcidump -X -V" and compare the output.
+
+Regards
+
+Marcel
 
 -- 
 John Sample
 
-------=_Part_75330_32159728.1187626113574
+------=_Part_74841_27367594.1187623443046
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-<div>I&#39;ve been working on getting Bluez up an running on an embedded platform and am having some problems getting hcid to run.&nbsp; I&#39;m using the 2.6.23 kernel, but I&#39;ve also tested on an old 2.6.10 kernel and run into the same problem.&nbsp; I start D-Bus using dbus-daemon-1 --system, and it starts ok without any error messages.&nbsp; I then start hcid, but it immediately exits and I get the following in my syslog:
+<div>Hi Marcel,</div>
+<div>&nbsp;</div>
+<div>Thanks for the reply.&nbsp; I ran the hcidump with hcitool scan and it appears that the inquiry retrieves all of the correct addresses, but when it does a remote name request the addresses are all scrambled.&nbsp; There is also an occassional &quot;Error: Invalid HCI Command Parameters&quot; following the name request.&nbsp; Any idea what is causing this to happen?
 </div>
 <div>&nbsp;</div>
-<div>hcid[1021]: Bluetooth HCI daemon<br>hcid[1021]: Can&#39;t connect to system message bus: Did not receive a reply. Possible causes include: the remote application did not send a reply, the message bus security policy blocked the reply, the reply timeout expired, or the network connection was broken.
-<br>hcid[1021]: Unable to get on D-Bus<br clear="all"></div>
-<div>Do I need to modify bluetooth.conf or system.conf in any way to get the security policy to allow the connection?&nbsp; I saw a similar post a while ago on this same topic but I couldn&#39;t find a resolution anywhere.&nbsp;</div>
-
+<div>Thanks.</div>
 <div>&nbsp;</div>
-<div>Thanks,</div>
-<div><br>-- <br>John Sample </div>
+<div>Hi John,<br><br>&gt; I am having a problem with the hcitool scan command (v3.13) using the<br>&gt; 2.6.21 kernel, as well as 2.6.23. &nbsp;Here is my output:<br>&gt;<br>&gt; Scanning ...<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; 3A:5E:11:6B:00:00 &nbsp; &nbsp; &nbsp; n/a
+<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; 38:C1:5E:35:3F:D9 &nbsp; &nbsp; &nbsp; n/a<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; C5:2B:F4:F7:3C:6A &nbsp; &nbsp; &nbsp; n/a<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; 3A:75:F9:65:1A:02 &nbsp; &nbsp; &nbsp; n/a.<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; 38:C1:60:35:1A:F6 &nbsp; &nbsp; &nbsp; n/a<br>&gt;<br>&gt; All of the addresses are partially junk for some reason - for example
+<br>&gt; 38:C1:60:35:1A:F6 should be 00:16:38:C1:60:35, and no name are<br>&gt; returned. &nbsp;This seems to effect other tools as well, for example if I<br>&gt; do try to do a hidd search I can&#39;t detect anything even if there are
+<br>&gt; discoverable hid devices around - I&#39;m guessing because it doesn&#39;t have<br>&gt; valid addresses. &nbsp;Previously I had been using the 2.6.10 kernel and<br>&gt; everything worked fine.<br><br>run &quot;hcidump -X -V&quot; and compare the output.
+<br><br>Regards<br><br>Marcel<br clear="all"><br>-- <br>John Sample </div>
 
-------=_Part_75330_32159728.1187626113574--
+------=_Part_74841_27367594.1187623443046--
 
 
---===============1224172864==
+--===============0847722648==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -79,7 +98,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============1224172864==
+--===============0847722648==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -90,4 +109,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1224172864==--
+--===============0847722648==--
