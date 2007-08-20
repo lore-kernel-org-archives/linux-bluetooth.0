@@ -1,11 +1,9 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <c49421c50708200735s39be26a5vb6572147d55c36ed@mail.gmail.com>
-Date: Mon, 20 Aug 2007 11:35:25 -0300
-From: "Loreno Oliveira" <lorenooliveira@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BAY102-W8887C0357267FC9175899F0DB0@phx.gbl>
+Message-ID: <BAY102-W28C3F40CD42C15B531AE29F0DB0@phx.gbl>
+From: Robert Rawlins <robert_rawlins@hotmail.com>
+To: <bluez-users@lists.sourceforge.net>
+Date: Mon, 20 Aug 2007 14:52:09 +0000
 MIME-Version: 1.0
-References: <BAY102-W8887C0357267FC9175899F0DB0@phx.gbl>
 Subject: Re: [Bluez-users] Improving Transmission Speeds
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -16,94 +14,71 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1089771974=="
+Content-Type: multipart/mixed; boundary="===============0333684181=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1089771974==
+--===============0333684181==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_89692_7665551.1187620525337"
+	boundary="_4776570d-e5f9-4d0d-bdbf-fdc2967ee889_"
 
-------=_Part_89692_7665551.1187620525337
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+--_4776570d-e5f9-4d0d-bdbf-fdc2967ee889_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-I believe that you also need a 2.6.22 kernel for using the EDR capabilities
-of your dongle.
+Thanks for the suggestion about the kernel upgrade.
+=20
+I did run 2.6.22 a while back as I know that boasted the full 2.0 EDR spec =
+support, however I didn't really notice any difference in the performance a=
+t all. Is there anything additional I would have to do with the system to g=
+et EDR support turned on?
+=20
+Thanks guys,
+=20
+Rob
+_________________________________________________________________
+Try Live.com - your fast, personalised homepage with all the things you car=
+e about in one place.
+http://www.live.com/?mkt=3Den-gb  =
 
-Regards,
+--_4776570d-e5f9-4d0d-bdbf-fdc2967ee889_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Loreno
+<html>
+<head>
+<style>
+.hmmessage P
+{
+margin:0px;
+padding:0px
+}
+body.hmmessage
+{
+FONT-SIZE: 10pt;
+FONT-FAMILY:Tahoma
+}
+</style>
+</head>
+<body class=3D'hmmessage'>Thanks for the suggestion about the kernel upgrad=
+e.<BR>
+&nbsp;<BR>
+I did run 2.6.22 a while back as&nbsp;I know that boasted the full 2.0 EDR =
+spec support, however I didn't really notice any difference in the performa=
+nce at all. Is there anything additional I would have to do with the system=
+ to get EDR support turned on?<BR>
+&nbsp;<BR>
+Thanks guys,<BR>
+&nbsp;<BR>
+Rob<BR><br /><hr />Are you the Quizmaster?  <a href=3D'http://specials.uk.m=
+sn.com/brainbattle' target=3D'_new'>Play BrainBattle with a friend now! </a=
+></body>
+</html>=
 
-On 8/20/07, Robert Rawlins <robert_rawlins@hotmail.com> wrote:
->
-> Hello Guys,
->
-> I'm running Bluez 3.12 and doing a little bit of file transfer over OBEX
-> push and seem to get considerably lower transmission speeds than when i'm
-> transmitting from my windows system using the windows stack. For instance,
-> when transmitting a 40kb file from my linux system using bluez the file will
-> take several seconds to transfer from acceptance of the invitation, however,
-> when using the same hardware on my windows box, it will transfer almost
-> immediately, with no noticeable delay, this speed difference becomes even
-> more apparent when dealing with larger files.
->
-> I'm sure i've read in the past this is quite common when using the linux
-> stacks, is that right? is there any way to make a marked improvement? I'm
-> running bluetooth 2 with EDR capabilities, on a CSR chip.
->
-> Thanks guys,
->
-> Rob
->
-> ------------------------------
-> Are you the Quizmaster? Play BrainBattle with a friend now!
-> <http://specials.uk.msn.com/brainbattle>
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc.
-> Still grepping through log files to find problems?  Stop.
-> Now Search log events and configuration files using AJAX and a browser.
-> Download your FREE copy of Splunk now >>  http://get.splunk.com/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
-
-------=_Part_89692_7665551.1187620525337
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-I believe that you also need a 2.6.22 kernel for using the EDR capabilities of your dongle.<br><br>Regards,<br><br>Loreno<br><br><div><span class="gmail_quote">On 8/20/07, <b class="gmail_sendername">Robert Rawlins</b> &lt;
-<a href="mailto:robert_rawlins@hotmail.com">robert_rawlins@hotmail.com</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+--_4776570d-e5f9-4d0d-bdbf-fdc2967ee889_--
 
 
-
-
-<div>Hello Guys,<br>
-&nbsp;<br>
-I&#39;m running Bluez 3.12 and doing a little bit of file transfer over OBEX push and seem to get considerably lower transmission speeds than when i&#39;m transmitting from my windows system using the windows stack. For instance, when transmitting a 40kb file from my linux system using bluez the file will take several seconds to transfer from acceptance of the invitation, however, when using the same hardware on my windows box, it will transfer almost immediately, with no noticeable delay, this speed difference becomes even more apparent when dealing with larger files.
-<br>
-&nbsp;<br>
-I&#39;m sure i&#39;ve read in the past this is quite common when&nbsp;using the linux stacks, is that right? is there any way to make a marked improvement? I&#39;m running bluetooth 2 with EDR capabilities, on a CSR chip.<br>
-
-&nbsp;<br>
-Thanks guys,<br>
-&nbsp;<br>
-Rob<br><br><hr>Are you the Quizmaster?  <a href="http://specials.uk.msn.com/brainbattle" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">Play BrainBattle with a friend now! </a></div>
-<br>-------------------------------------------------------------------------<br>This SF.net email is sponsored by: Splunk Inc.<br>Still grepping through log files to find problems? &nbsp;Stop.<br>Now Search log events and configuration files using AJAX and a browser.
-<br>Download your FREE copy of Splunk now &gt;&gt; &nbsp;<a onclick="return top.js.OpenExtLink(window,event,this)" href="http://get.splunk.com/" target="_blank">http://get.splunk.com/</a><br>_______________________________________________
-<br>Bluez-users mailing list<br><a onclick="return top.js.OpenExtLink(window,event,this)" href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a><br><a onclick="return top.js.OpenExtLink(window,event,this)" href="https://lists.sourceforge.net/lists/listinfo/bluez-users" target="_blank">
-https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br><br></blockquote></div><br>
-
-------=_Part_89692_7665551.1187620525337--
-
-
---===============1089771974==
+--===============0333684181==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -114,7 +89,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============1089771974==
+--===============0333684181==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -125,4 +100,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1089771974==--
+--===============0333684181==--
