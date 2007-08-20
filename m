@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v752.3)
-Message-Id: <53BC229C-4E4E-4014-87EC-F093B1276DF0@cadvium.net>
-To: bluez-devel@lists.sourceforge.net
-From: robert <rbscott@cadvium.net>
-Date: Mon, 20 Aug 2007 07:44:41 -0700
-Subject: [Bluez-devel] handsfree profile
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ Hackers <bluez-devel@lists.sourceforge.net>
+Content-Type: multipart/mixed; boundary="=-x0QJY/3n7+FKzu6gBMWy"
+Date: Mon, 20 Aug 2007 13:17:10 +0100
+Message-Id: <1187612230.26239.79.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: [Bluez-devel] [PATCH] Better startup under KDE
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,35 +15,68 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-hello bluez-devel,
 
-i am developing an implementation of the handsfree profile (The  
-Handsfree side rather than the Audio Gateway).  So far I have  
-traction in every area except for SCO connections.
+--=-x0QJY/3n7+FKzu6gBMWy
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-What exactly does bluez-alsa project do?  I am a little unclear about  
-what is an alsa driver, and what part is a daemon.  How would I get  
-data from the cell phone to the speakers, and data from the  
-microphone back to cell phone?  From everything I have read it  
-appears to be the Audio Gateway portion of the handsfree profile, but  
-after playing around with it, I am not sue.
+Heya,
 
-thanks for any help,
-robert
+This patch comes from a KDE user via:
+https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=247284
 
-cadvium.net
-an open source car stero
+This makes the bluetooth applet startup after the panel, and disable
+startup notification (as it doesn't support it).
+
+Cheers
+
+-- 
+Bastien Nocera <hadess@hadess.net> 
+
+--=-x0QJY/3n7+FKzu6gBMWy
+Content-Disposition: attachment;
+	filename=bluez-gnome-applet-better-kde-startup.patch
+Content-Type: text/x-patch; name=bluez-gnome-applet-better-kde-startup.patch;
+	charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+Index: applet/bluetooth-applet.desktop.in
+===================================================================
+RCS file: /cvsroot/bluez/gnome/applet/bluetooth-applet.desktop.in,v
+retrieving revision 1.1
+diff -u -p -r1.1 bluetooth-applet.desktop.in
+--- applet/bluetooth-applet.desktop.in	3 Apr 2007 08:09:01 -0000	1.1
++++ applet/bluetooth-applet.desktop.in	20 Aug 2007 12:15:12 -0000
+@@ -8,3 +8,5 @@ Terminal=false
+ Type=Application
+ Categories=
+ OnlyShowIn=GNOME;
++StartupNotify=false
++X-KDE-autostart-after=panel
+
+--=-x0QJY/3n7+FKzu6gBMWy
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
+--=-x0QJY/3n7+FKzu6gBMWy
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--=-x0QJY/3n7+FKzu6gBMWy--
