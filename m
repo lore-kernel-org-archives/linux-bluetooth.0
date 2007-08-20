@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46C9D2E0.5050404@free.fr>
-Date: Mon, 20 Aug 2007 19:44:00 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <46C875BA.90204@free.fr>
-	<2d5a2c100708191902k599014cbo1e08c9c7a3febd45@mail.gmail.com>
-In-Reply-To: <2d5a2c100708191902k599014cbo1e08c9c7a3febd45@mail.gmail.com>
-Subject: Re: [Bluez-devel] [PATCH] pcm_bluetooth : fix a2dp streaming
+Mime-Version: 1.0 (Apple Message framework v752.3)
+Message-Id: <53BC229C-4E4E-4014-87EC-F093B1276DF0@cadvium.net>
+To: bluez-devel@lists.sourceforge.net
+From: robert <rbscott@cadvium.net>
+Date: Mon, 20 Aug 2007 07:44:41 -0700
+Subject: [Bluez-devel] handsfree profile
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,34 +18,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Luiz,
+hello bluez-devel,
 
-Please find a few remarks below:
+i am developing an implementation of the handsfree profile (The  
+Handsfree side rather than the Audio Gateway).  So far I have  
+traction in every area except for SCO connections.
 
-> I got almost the same idea implemented in my git
-> (git://git.infradead.org/users/vudentz/bluez-utils.git). 
+What exactly does bluez-alsa project do?  I am a little unclear about  
+what is an alsa driver, and what part is a daemon.  How would I get  
+data from the cell phone to the speakers, and data from the  
+microphone back to cell phone?  From everything I have read it  
+appears to be the Audio Gateway portion of the handsfree profile, but  
+after playing around with it, I am not sue.
 
-Should make sense then :-)
+thanks for any help,
+robert
 
-There is
-> alot of simplification you already did, but I consider the
-> bitrate as a2dp spec says.
-
-Oh... about this bitrate stuff i must say i'm quite confused : where did 
-you find anything in the spec ? (I have A2DP 1.0 but didn't find 
-anything :-( )
-
-> I also implement a circular
-> buffer for encoded sbc frames to be consumed by a
-> thread.
-
-That was another option, however it was not that clear what the benefits 
-from it would be, so i took the easiest to implement alternative, and 
-just sent data as they arrived ;-)
-
-Cheers,
-
-Fabien
+cadvium.net
+an open source car stero
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
