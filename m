@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY122-F2264A4BF104473B3E857A5FFD50@phx.gbl>
-In-Reply-To: <d5920d1e0708220058w25ad3c66n307c68adce0fcf69@mail.gmail.com>
-From: "jaspreet singh" <manny.india@hotmail.com>
-To: bluez-users@lists.sourceforge.net
-Date: Wed, 22 Aug 2007 19:56:58 +0530
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Can't connect RFCOMM socket:
-	Resourcetemporarilyunavailable
+MIME-Version: 1.0
+Date: Wed, 22 Aug 2007 16:15:26 +0800
+Message-ID: <E21A90CDB9591542899EFC7FB4ED5CC905326B06@tfmail02.TFMAIL.COM>
+From: "guoyun" <guoyun@techfaith.cn>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] About PTS test Dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,18 +18,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Dear All experts
 
-plz tell the device you are using ..check wether it is compatible ar not 
-with your system..also write the linux you are using..the bluetooth stack u 
-r using.
+	Does anyone have the experience about BQB test? I'd like to know what kind of dongle can match the PTS software. I searched the web and found that just CSR have one LABELed "DEV-SYS-1487-1B". 
 
-http://www.holtmann.org/linux/bluetooth/rfcomm.html
+	Could you please give me one list of dongle that can match the PTS requirement? 
 
-_________________________________________________________________
-Live the life in style with MSN Lifestyle. Check out!  
-http://content.msn.co.in/Lifestyle/Default
+	Thanks very much!
 
 
+BRs
+-- 
+GuoYun
+ 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
