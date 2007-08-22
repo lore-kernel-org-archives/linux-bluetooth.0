@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+Message-ID: <d5920d1e0708220058w25ad3c66n307c68adce0fcf69@mail.gmail.com>
+Date: Wed, 22 Aug 2007 08:58:50 +0100
+From: "Hamid MENOUAR" <menouar@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BAY122-F29B0D0BF70AB817B5341FAFFD50@phx.gbl>
 MIME-Version: 1.0
-Date: Wed, 22 Aug 2007 16:15:26 +0800
-Message-ID: <E21A90CDB9591542899EFC7FB4ED5CC905326B06@tfmail02.TFMAIL.COM>
-From: "guoyun" <guoyun@techfaith.cn>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] About PTS test Dongle
+References: <BAY122-F29B0D0BF70AB817B5341FAFFD50@phx.gbl>
+Subject: Re: [Bluez-users] Can't connect RFCOMM socket: Resource
+	temporarilyunavailable
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,19 +21,49 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Dear All experts
+Thanks Jaspreet,
 
-	Does anyone have the experience about BQB test? I'd like to know what kind of dongle can match the PTS software. I searched the web and found that just CSR have one LABELed "DEV-SYS-1487-1B". 
+I tried it and it still doesn't work. That's what I got :
 
-	Could you please give me one list of dongle that can match the PTS requirement? 
+[root@localhost ~]# rfcomm release all
+[root@localhost ~]# rfcomm bind 00:0D:18:60:14:8E
+[root@localhost ~]# rfcomm
+rfcomm0: 00:0D:18:60:14:8E channel 1 clean
+[root@localhost ~]# rfcomm connect rfcomm0 00:0D:18:60:14:8E 1
+Can't connect RFCOMM socket: Resource temporarily unavailable
+[root@localhost ~]#
 
-	Thanks very much!
+Could anyone help me to explain and solve this ?
 
+Many thanks in advance,
+Menouar
 
-BRs
--- 
-GuoYun
- 
+On 8/22/07, jaspreet singh <manny.india@hotmail.com> wrote:
+> try:  #rfcomm bind <address>
+> if it says already binded..then release and bind again..
+> check rfcomm for the channel...
+> #rfcomm
+> it should say <addr.> <channelno> clean
+> then it will be ok...
+>
+> if problem persists than forgive me..ask any expert..
+>
+> _________________________________________________________________
+> Wedding bells are ringing. When's your time to walk the aisle?
+> http://ad.in.doubleclick.net/clk;112111293;17571293;v?http://www.simplymarry.com/timesmatri/faces/jsp/UserTrackLandingPage.jsp?origin=hotmail_taglines_ros_june07
+>
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc.
+> Still grepping through log files to find problems?  Stop.
+> Now Search log events and configuration files using AJAX and a browser.
+> Download your FREE copy of Splunk now >>  http://get.splunk.com/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
