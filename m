@@ -1,137 +1,167 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Matthias Kretz <kretz@kde.org>
-To: hal@lists.freedesktop.org
-Date: Thu, 23 Aug 2007 19:06:46 +0200
-References: <e29894ca0708230922n69a68aedqfb979c67042a965f@mail.gmail.com>
-In-Reply-To: <e29894ca0708230922n69a68aedqfb979c67042a965f@mail.gmail.com>
+Return-Path: <hal-bounces@lists.freedesktop.org>
+Message-ID: <e29894ca0708230922n69a68aedqfb979c67042a965f@mail.gmail.com>
+Date: Thu, 23 Aug 2007 19:22:17 +0300
+From: "=?ISO-8859-1?Q?Marc-Andr=E9_Lureau?=" <marcandre.lureau@gmail.com>
+To: hal@lists.freedesktop.org,
+        "BlueZ development" <bluez-devel@lists.sourceforge.net>,
+        "Takashi Iwai" <tiwai@suse.de>,
+        "Lennart Poettering" <mztfg@0pointer.de>
+Subject: [patch] spec: Update alsa namespace to include virtual device
 MIME-Version: 1.0
-Message-Id: <200708231906.50942.kretz@kde.org>
-Cc: Takashi Iwai <tiwai@suse.de>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>,
-        Lennart Poettering <mztfg@0pointer.de>
-Subject: Re: [Bluez-devel] [patch] spec: Update alsa namespace to include
-	virtual device
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1001070134=="
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Content-Type: multipart/mixed;
+	boundary="----=_Part_19635_28204834.1187886137048"
+List-Unsubscribe: <http://lists.freedesktop.org/mailman/listinfo/hal>,
+	<mailto:hal-request@lists.freedesktop.org?subject=unsubscribe>
+List-Archive: <http://lists.freedesktop.org/archives/hal>
+List-Post: <mailto:hal@lists.freedesktop.org>
+List-Help: <mailto:hal-request@lists.freedesktop.org?subject=help>
+List-Subscribe: <http://lists.freedesktop.org/mailman/listinfo/hal>,
+	<mailto:hal-request@lists.freedesktop.org?subject=subscribe>
+Sender: hal-bounces@lists.freedesktop.org
+Errors-To: hal-bounces@lists.freedesktop.org
+List-ID: <bluez-devel.lists.sourceforge.net>
 
---===============1001070134==
-Content-Type: multipart/signed; boundary="nextPart24754249.pMImLWLSvA";
-	protocol="application/pgp-signature"; micalg=pgp-sha1
-Content-Transfer-Encoding: 7bit
-
---nextPart24754249.pMImLWLSvA
-Content-Type: text/plain;
-  charset="iso-8859-15"
+------=_Part_19635_28204834.1187886137048
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 
-On Thursday 23 August 2007, Marc-Andr=E9 Lureau wrote:
-> The following patch changes the "alsa" namespace so that "virtual
-> devices" can also be described (a former approach was to use
-> alsa.virtual or alsa_virtual new namespace, but alsa.virtual does not
-> inherit alsa property, and both namespaces have a lot in common).
->
-> Thus, a  mandatory property "is_hardware" is introduced. If this value
-> is true, the current mandatory keys remain mandatory. If not, then the
-> client should use "device_name" to "open" the device.
->
-> Arguable:
-> - should "device_name" be optional? (currently, application hard-code
-> the prefix "hw")
-> - "service" is used to make a difference between a2dp and hfp/hsp
-> - "device_name", and "service" key naming
+Hi
 
-Hi,
+Thanks to the great work of Bluez-guys, bluez-utils audio service is
+now able to deal with several audio devices. Those Bluetooth devices
+are accessed by a "bluetooth" ALSA plugin (see
+http://wiki.bluez.org/wiki/HOWTO/AudioDevices)
 
-I don't agree with this approach, i.e. the listing of virtual ALSA devices=
-=20
-through HAL, especially the forcing of the device_name. The application mig=
-ht=20
-be smarter than HAL, once it knows enough about the hardware. For example t=
-he=20
-hw: devices in many cases are not what you want...
+There is only a few missing pieces to make those devices discoverable with =
+HAL.
 
-Since libasound 1.0.14 we have snd_device_name_hint available to list virtu=
-al=20
-devices (they get listed once you add a hint section in your .asoundrc file=
-).=20
-What we're missing is a way to link virtual devices to hardware, meaning if=
-=20
-Hardware "xy" becomes available virtual device "foo" starts to be useful=20
-(only "polling" works from what I know).
+The following patch changes the "alsa" namespace so that "virtual
+devices" can also be described (a former approach was to use
+alsa.virtual or alsa_virtual new namespace, but alsa.virtual does not
+inherit alsa property, and both namespaces have a lot in common).
 
-So what I'd like to see is something along the lines of:
-=2D HAL notifies me that a Bluetooth device with audio support became avail=
-able.
-=2D With the id I get from HAL I can query libasound which virtual devices =
-are=20
-using this device, or if that's not possible iterate over all virtual devic=
-es=20
-that didn't work before and try to open them and see whether they work now.
+Thus, a  mandatory property "is_hardware" is introduced. If this value
+is true, the current mandatory keys remain mandatory. If not, then the
+client should use "device_name" to "open" the device.
 
-You made the example "bluetooth:00:19:4F:DB:04:40,hifi" in the patch. Is it=
-=20
-possible to always access ALSA bluetooth devices that way? Then perhaps the=
-=20
-HAL entry on the bluetooth device should list give me the necessary hints t=
-o=20
-construct that string myself?
+Arguable:
+- should "device_name" be optional? (currently, application hard-code
+the prefix "hw")
+- "service" is used to make a difference between a2dp and hfp/hsp
+- "device_name", and "service" key naming
 
-Anyway, great to hear that bluetooth ALSA support is progressing! I'm reall=
-y=20
-looking forward to supporting it (now all I need is bluetooth devices...)
+Cheers,
+--=20
+Marc-Andr=E9 Lureau
 
-=2D-=20
-________________________________________________________
-Matthias Kretz (Germany)                            <><
-http://Vir.homelinux.org/
-MatthiasKretz@gmx.net, kretz@kde.org,
-Matthias.Kretz@urz.uni-heidelberg.de
+------=_Part_19635_28204834.1187886137048
+Content-Type: text/x-diff;
+	name=0001-spec-Update-alsa-namespace-to-include-virtual-devic.patch;
+	charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f5pgp4q3
+Content-Disposition: attachment; filename="0001-spec-Update-alsa-namespace-to-include-virtual-devic.patch"
 
---nextPart24754249.pMImLWLSvA
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
-
-iD8DBQBGzb6qyg4WnCj6OIoRAo1GAJ4w2zP4+504VPnM86ecBUZdD4dCrACg0Fuj
-PtJcwT22F85xUkduWpuWT9Q=
-=ZZoP
------END PGP SIGNATURE-----
-
---nextPart24754249.pMImLWLSvA--
-
-
---===============1001070134==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============1001070134==
+RnJvbSAyMjk4OTFhMWEzMTg4MjU3NWE3YzNkNjI1ODAxZmZlYmFkN2ZhNWJkIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBNYXJjLUFuZHJlIEx1cmVhdSAoZWxtYXJjbykgPG1hcmNhbmRy
+ZS5sdXJlYXVAZ21haWwuY29tPgpEYXRlOiBUaHUsIDIzIEF1ZyAyMDA3IDE5OjIxOjA0ICswMzAw
+ClN1YmplY3Q6IFtQQVRDSF0gc3BlYzogVXBkYXRlIGFsc2EgbmFtZXNwYWNlIHRvIGluY2x1ZGUg
+dmlydHVhbCBkZXZpY2UKCi0tLQogZG9jL3NwZWMvaGFsLXNwZWMtcHJvcGVydGllcy54bWwgfCAg
+IDQ1ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tCiAxIGZpbGVzIGNoYW5n
+ZWQsIDM4IGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZG9jL3Nw
+ZWMvaGFsLXNwZWMtcHJvcGVydGllcy54bWwgYi9kb2Mvc3BlYy9oYWwtc3BlYy1wcm9wZXJ0aWVz
+LnhtbAppbmRleCA5NGJjMTcxLi4wYTY1ZDVkIDEwMDY0NAotLS0gYS9kb2Mvc3BlYy9oYWwtc3Bl
+Yy1wcm9wZXJ0aWVzLnhtbAorKysgYi9kb2Mvc3BlYy9oYWwtc3BlYy1wcm9wZXJ0aWVzLnhtbApA
+QCAtNTAwNyw3ICs1MDA3LDcgQEAgb3JnLmZyZWVkZXNrdG9wLkhhbC5EZXZpY2UuVm9sdW1lLm1l
+dGhvZF9zaWduYXR1cmVzID0geydzc2FzJywgJ2FzJywgJ2FzJ30KICAgICAgIDwvdGl0bGU+CiAg
+ICAgICA8cGFyYT4KICAgICAgICAgRGV2aWNlIG9iamVjdHMgd2l0aCB0aGUgY2FwYWJpbGl0eSA8
+bGl0ZXJhbD5hbHNhPC9saXRlcmFsPgotICAgICAgICByZXByZXNlbnQgYWxsIHRoZSBzdHJlYW1z
+IGF2YWlsYWJsZSB0aHJvdWdoIEFMU0Egb24gYSBzb3VuZGNhcmQuCisgICAgICAgIHJlcHJlc2Vu
+dCBhbGwgdGhlIGF1ZGlvIGRldmljZXMgYXZhaWxhYmxlIHRocm91Z2ggQUxTQS4gVGhvc2UgY291
+bGQgYmUgaGFyZHdhcmUgb3Igc29mdHdhcmUgInZpcnR1YWwgZGV2aWNlcyIuCiAgICAgICA8L3Bh
+cmE+CiAgICAgICA8aW5mb3JtYWx0YWJsZT4KICAgICAgICAgPHRncm91cCBjb2xzPSIyIj4KQEAg
+LTUwMjUsNyArNTAyNSw3IEBAIG9yZy5mcmVlZGVza3RvcC5IYWwuRGV2aWNlLlZvbHVtZS5tZXRo
+b2Rfc2lnbmF0dXJlcyA9IHsnc3NhcycsICdhcycsICdhcyd9CiAgICAgICAgICAgICAgICAgPGxp
+dGVyYWw+YWxzYS5jYXJkPC9saXRlcmFsPiAoaW50KQogICAgICAgICAgICAgICA8L2VudHJ5Pgog
+ICAgICAgICAgICAgICA8ZW50cnk+PC9lbnRyeT4KLSAgICAgICAgICAgICAgPGVudHJ5Plllczwv
+ZW50cnk+CisgICAgICAgICAgICAgIDxlbnRyeT5JZiA8bGl0ZXJhbD5hbHNhLmlzX2hhcmR3YXJl
+PC9saXRlcmFsPiBpcyBzZXQgdG8gVFJVRTwvZW50cnk+CiAgICAgICAgICAgICAgIDxlbnRyeT4K
+ICAgICAgICAgICAgICAgICBDYXJkIG51bWJlciBpbiBzeXN0ZW0gYXMgcmVnaXN0ZXJlZCBieSBB
+TFNBLgogICAgICAgICAgICAgICA8L2VudHJ5PgpAQCAtNTAzNyw3ICs1MDM3LDcgQEAgb3JnLmZy
+ZWVkZXNrdG9wLkhhbC5EZXZpY2UuVm9sdW1lLm1ldGhvZF9zaWduYXR1cmVzID0geydzc2FzJywg
+J2FzJywgJ2FzJ30KICAgICAgICAgICAgICAgPGVudHJ5PgogICAgICAgICAgICAgICAgIEV4YW1w
+bGVzOiA8bGl0ZXJhbD5JODI4MDFEQklDSDQ8L2xpdGVyYWw+LCA8bGl0ZXJhbD5NUDM8L2xpdGVy
+YWw+CiAgICAgICAgICAgICAgIDwvZW50cnk+Ci0gICAgICAgICAgICAgIDxlbnRyeT5ObzwvZW50
+cnk+CisgICAgICAgICAgICAgIDxlbnRyeT5JZiA8bGl0ZXJhbD5hbHNhLmlzX2hhcmR3YXJlPC9s
+aXRlcmFsPiBpcyBzZXQgdG8gVFJVRTwvZW50cnk+CiAgICAgICAgICAgICAgIDxlbnRyeT4KICAg
+ICAgICAgICAgICAgICBUZXh0dWFsIGRlc2NyaXB0aW9uIG9mIHRoZSBjYXJkLgogICAgICAgICAg
+ICAgICA8L2VudHJ5PgpAQCAtNTA0Nyw3ICs1MDQ3LDcgQEAgb3JnLmZyZWVkZXNrdG9wLkhhbC5E
+ZXZpY2UuVm9sdW1lLm1ldGhvZF9zaWduYXR1cmVzID0geydzc2FzJywgJ2FzJywgJ2FzJ30KICAg
+ICAgICAgICAgICAgICA8bGl0ZXJhbD5hbHNhLmRldmljZTwvbGl0ZXJhbD4gKGludCkKICAgICAg
+ICAgICAgICAgPC9lbnRyeT4KICAgICAgICAgICAgICAgPGVudHJ5PjwvZW50cnk+Ci0gICAgICAg
+ICAgICAgIDxlbnRyeT5ZZXM8L2VudHJ5PgorICAgICAgICAgICAgICA8ZW50cnk+SWYgPGxpdGVy
+YWw+YWxzYS5pc19oYXJkd2FyZTwvbGl0ZXJhbD4gaXMgc2V0IHRvIFRSVUU8L2VudHJ5PgogICAg
+ICAgICAgICAgICA8ZW50cnk+CiAgICAgICAgICAgICAgICAgRGV2aWNlIG51bWJlciBhc3NpZ25l
+ZCBieSBBTFNBIGZvciBhIGN1cnJlbnQgY2FyZC4KICAgICAgICAgICAgICAgPC9lbnRyeT4KQEAg
+LTUwNTcsMTMgKzUwNTcsMjQgQEAgb3JnLmZyZWVkZXNrdG9wLkhhbC5EZXZpY2UuVm9sdW1lLm1l
+dGhvZF9zaWduYXR1cmVzID0geydzc2FzJywgJ2FzJywgJ2FzJ30KICAgICAgICAgICAgICAgICA8
+bGl0ZXJhbD5hbHNhLmRldmljZV9maWxlPC9saXRlcmFsPiAoc3RyaW5nKQogICAgICAgICAgICAg
+ICA8L2VudHJ5PgogICAgICAgICAgICAgICA8ZW50cnk+PC9lbnRyeT4KLSAgICAgICAgICAgICAg
+PGVudHJ5PlllczwvZW50cnk+CisgICAgICAgICAgICAgIDxlbnRyeT5JZiA8bGl0ZXJhbD5hbHNh
+LmlzX2hhcmR3YXJlPC9saXRlcmFsPiBpcyBzZXQgdG8gVFJVRTwvZW50cnk+CiAgICAgICAgICAg
+ICAgIDxlbnRyeT4KICAgICAgICAgICAgICAgICBUaGUgZGV2aWNlIG5vZGUgdG8gYWNjZXNzIHRo
+ZSBBTFNBIGRldmljZS4KICAgICAgICAgICAgICAgPC9lbnRyeT4KICAgICAgICAgICAgIDwvcm93
+PgogICAgICAgICAgICAgPHJvdz4KICAgICAgICAgICAgICAgPGVudHJ5PgorICAgICAgICAgICAg
+ICAgIDxsaXRlcmFsPmFsc2EuZGV2aWNlX25hbWU8L2xpdGVyYWw+IChzdHJpbmcpCisgICAgICAg
+ICAgICAgIDwvZW50cnk+CisJICAgICAgPGVudHJ5PkV4YW1wbGVzOiA8bGl0ZXJhbD5wbHVnOiJo
+dzowLDEiPC9saXRlcmFsPiwgPGxpdGVyYWw+Ymx1ZXRvb3RoOjAwOjE5OjRGOkRCOjA0OjQwLGhp
+Zmk8L2xpdGVyYWw+CisJICAgICAgPC9lbnRyeT4KKwkgICAgICA8ZW50cnk+WWVzPC9lbnRyeT4K
+KyAgICAgICAgICAgICAgPGVudHJ5PgorICAgICAgICAgICAgICAgIFRoZSBkZXZpY2UgbmFtZSB0
+byBhY2Nlc3MgdGhlIEFMU0EgZGV2aWNlLiAKKyAgICAgICAgICAgICAgPC9lbnRyeT4KKyAgICAg
+ICAgICAgIDwvcm93PgorICAgICAgICAgICAgPHJvdz4KKyAgICAgICAgICAgICAgPGVudHJ5Pgog
+ICAgICAgICAgICAgICAgIDxsaXRlcmFsPmFsc2EuZGV2aWNlX2lkPC9saXRlcmFsPiAoc3RyaW5n
+KQogICAgICAgICAgICAgICA8L2VudHJ5PgogICAgICAgICAgICAgICA8ZW50cnk+CkBAIC01MDcx
+LDcgKzUwODIsNyBAQCBvcmcuZnJlZWRlc2t0b3AuSGFsLkRldmljZS5Wb2x1bWUubWV0aG9kX3Np
+Z25hdHVyZXMgPSB7J3NzYXMnLCAnYXMnLCAnYXMnfQogICAgICAgICAgICAgICA8L2VudHJ5Pgog
+ICAgICAgICAgICAgICA8ZW50cnk+Tm88L2VudHJ5PgogICAgICAgICAgICAgICA8ZW50cnk+Ci0g
+ICAgICAgICAgICAgICAgVGV4dHVhbCBkZXNjcmlwdGlvbiBvZiB0aGUgc3BlY2lmaWMgZGV2aWNl
+IGZvciBhIGNhcmQKKyAgICAgICAgICAgICAgICBUZXh0dWFsIGRlc2NyaXB0aW9uIG9mIHRoZSBz
+cGVjaWZpYyBkZXZpY2UgZm9yIGEgY2FyZCwgb3IgdmlydHVhbCBkZXZpY2UKICAgICAgICAgICAg
+ICAgPC9lbnRyeT4KICAgICAgICAgICAgIDwvcm93PgogICAgICAgICAgICAgPHJvdz4KQEAgLTUx
+MzksMTMgKzUxNTAsMzMgQEAgb3JnLmZyZWVkZXNrdG9wLkhhbC5EZXZpY2UuVm9sdW1lLm1ldGhv
+ZF9zaWduYXR1cmVzID0geydzc2FzJywgJ2FzJywgJ2FzJ30KICAgICAgICAgICAgICAgICA8bGl0
+ZXJhbD5hbHNhLm9yaWdpbmF0aW5nX2RldmljZTwvbGl0ZXJhbD4gKHN0cmluZykKICAgICAgICAg
+ICAgICAgPC9lbnRyeT4KICAgICAgICAgICAgICAgPGVudHJ5PjwvZW50cnk+Ci0gICAgICAgICAg
+ICAgIDxlbnRyeT5ZZXM8L2VudHJ5PgorICAgICAgICAgICAgICA8ZW50cnk+SWYgPGxpdGVyYWw+
+YWxzYS5pc19oYXJkd2FyZTwvbGl0ZXJhbD4gaXMgc2V0IHRvIFRSVUU8L2VudHJ5PgogICAgICAg
+ICAgICAgICA8ZW50cnk+CiAgICAgICAgICAgICAgICAgVURJIG9mIHRoZSBkZXZpY2UgdGhlIEFM
+U0EgZGV2aWNlIGlzIGJvdW5kIHRvLgogICAgICAgICAgICAgICA8L2VudHJ5PgogICAgICAgICAg
+ICAgPC9yb3c+CiAgICAgICAgICAgICA8cm93PgogICAgICAgICAgICAgICA8ZW50cnk+CisgICAg
+ICAgICAgICAgICAgPGxpdGVyYWw+YWxzYS5pc19oYXJkd2FyZTwvbGl0ZXJhbD4gKGJvb2wpCisg
+ICAgICAgICAgICAgIDwvZW50cnk+CisgICAgICAgICAgICAgIDxlbnRyeT48L2VudHJ5PgorICAg
+ICAgICAgICAgICA8ZW50cnk+WWVzPC9lbnRyeT4KKyAgICAgICAgICAgICAgPGVudHJ5PgorICAg
+ICAgICAgICAgICAgIFRSVUUgaWYgaXQgaXMgYW4gaGFyZHdhcmUgZGV2aWNlLiBGQUxTRSBpZiBp
+dCBpcyBhICJ2aXJ0dWFsIGRldmljZSIuCisgICAgICAgICAgICAgIDwvZW50cnk+CisgICAgICAg
+ICAgICA8L3Jvdz4KKyAgICAgICAgICAgIDxyb3c+CisgICAgICAgICAgICAgIDxlbnRyeT4KKyAg
+ICAgICAgICAgICAgICA8bGl0ZXJhbD5hbHNhLnNlcnZpY2U8L2xpdGVyYWw+IChzdHJpbmcpCisg
+ICAgICAgICAgICAgIDwvZW50cnk+CisgICAgICAgICAgICAgIDxlbnRyeT5leGFtcGxlOiA8bGl0
+ZXJhbD5IaWZpPC9saXRlcmFsPiwgPGxpdGVyYWw+Vm9pY2U8L2xpdGVyYWw+PC9lbnRyeT4KKyAg
+ICAgICAgICAgICAgPGVudHJ5Pk5vPC9lbnRyeT4KKyAgICAgICAgICAgICAgPGVudHJ5PgorCQlI
+aW50IG9mIHVzZSBjYXNlIG9mIHRoaXMgZGV2aWNlLgorICAgICAgICAgICAgICA8L2VudHJ5Pgor
+ICAgICAgICAgICAgPC9yb3c+CisgICAgICAgICAgICA8cm93PgorICAgICAgICAgICAgICA8ZW50
+cnk+CiAgICAgICAgICAgICAgICAgPGxpdGVyYWw+YWxzYS50eXBlPC9saXRlcmFsPiAoc3RyaW5n
+KQogICAgICAgICAgICAgICA8L2VudHJ5PgogICAgICAgICAgICAgICA8ZW50cnk+PC9lbnRyeT4K
+LS0gCjEuNS4yLjMKCg==
+------=_Part_19635_28204834.1187886137048
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+hal mailing list
+hal@lists.freedesktop.org
+http://lists.freedesktop.org/mailman/listinfo/hal
 
---===============1001070134==--
+------=_Part_19635_28204834.1187886137048--
