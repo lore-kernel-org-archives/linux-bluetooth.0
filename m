@@ -1,167 +1,136 @@
-Return-Path: <hal-bounces@lists.freedesktop.org>
-Message-ID: <e29894ca0708230922n69a68aedqfb979c67042a965f@mail.gmail.com>
-Date: Thu, 23 Aug 2007 19:22:17 +0300
-From: "=?ISO-8859-1?Q?Marc-Andr=E9_Lureau?=" <marcandre.lureau@gmail.com>
-To: hal@lists.freedesktop.org,
-        "BlueZ development" <bluez-devel@lists.sourceforge.net>,
-        "Takashi Iwai" <tiwai@suse.de>,
-        "Lennart Poettering" <mztfg@0pointer.de>
-Subject: [patch] spec: Update alsa namespace to include virtual device
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_19635_28204834.1187886137048"
-List-Unsubscribe: <http://lists.freedesktop.org/mailman/listinfo/hal>,
-	<mailto:hal-request@lists.freedesktop.org?subject=unsubscribe>
-List-Archive: <http://lists.freedesktop.org/archives/hal>
-List-Post: <mailto:hal@lists.freedesktop.org>
-List-Help: <mailto:hal-request@lists.freedesktop.org?subject=help>
-List-Subscribe: <http://lists.freedesktop.org/mailman/listinfo/hal>,
-	<mailto:hal-request@lists.freedesktop.org?subject=subscribe>
-Sender: hal-bounces@lists.freedesktop.org
-Errors-To: hal-bounces@lists.freedesktop.org
-List-ID: <bluez-devel.lists.sourceforge.net>
+Date: Thu, 23 Aug 2007 09:12:56 -0400
+Message-ID: <2EB6297382462046A9427D7324788A480217D35A@MCLNEXVS06.resource.ds.bah.com>
+From: "Williams, Richard" <williams_richard_b@bah.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Multiple Bluetooth Dongles
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0899547327=="
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_19635_28204834.1187886137048
-Content-Type: text/plain; charset=ISO-8859-1
+This is a multi-part message in MIME format.
+
+--===============0899547327==
+Content-class: urn:content-classes:message
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C7E587.4F2D8263"
+
+This is a multi-part message in MIME format.
+
+------_=_NextPart_001_01C7E587.4F2D8263
+Content-Type: text/plain;
+	charset="US-ASCII"
 Content-Transfer-Encoding: quoted-printable
+
+Hello,
+=20
+I have a system that uses multiple Bluetooth dongles and works just
+fine. I've had my system running with several USB hubs and up to the 16
+maximum devices that Bluez supports. Now I have a changing requirement
+from my customer to handle more than 16 Bluetooth devices. They want
+support for up to 30 Bluetooth devices.
+=20
+I changed the HCI_MAX_DEV in bluez_libs/include/hci.h from 16 to 30,
+recompiled and installed bluez_libs and bluez_utils. No problem.
+=20
+My program works fine with up to 16 Bluetooth devices, but the 17th
+device is not recognized and sometimes the entire USB will no longer
+work.
+=20
+Suggestions??
+=20
+Thank you. Best Regards.
+=20
+Rich=20
+
+------_=_NextPart_001_01C7E587.4F2D8263
+Content-Type: text/html;
+	charset="US-ASCII"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Dus-ascii">
+<META content=3D"MSHTML 6.00.2900.3132" name=3DGENERATOR></HEAD>
+<BODY>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D023260513-23082007>Hello,</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D023260513-23082007></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D023260513-23082007>I have =
+a system that=20
+uses multiple Bluetooth dongles and works just fine. I've had my system =
+running=20
+with several USB hubs and up to the 16 maximum devices that Bluez =
+supports. Now=20
+I have a changing requirement from my customer to handle more than 16 =
+Bluetooth=20
+devices. They want support for up to 30 Bluetooth =
+devices.</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D023260513-23082007></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D023260513-23082007>I =
+changed the=20
+HCI_MAX_DEV in bluez_libs/include/hci.h from 16 to 30,&nbsp;recompiled =
+and=20
+installed&nbsp;bluez_libs and bluez_utils. No =
+problem.</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D023260513-23082007></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D023260513-23082007>My =
+program works=20
+fine with up to 16 Bluetooth devices, but the 17th device is not =
+recognized and=20
+sometimes&nbsp;the entire USB&nbsp;will no&nbsp;longer =
+work.</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D023260513-23082007></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D023260513-23082007>Suggestions??</SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN=20
+class=3D023260513-23082007></SPAN></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2><SPAN class=3D023260513-23082007>Thank =
+you. Best=20
+Regards.</SPAN></FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV align=3Dleft><FONT face=3DArial size=3D2><STRONG>Rich =
+</STRONG></FONT><FONT=20
+face=3DArial size=3D2></FONT></DIV></BODY></HTML>
+
+------_=_NextPart_001_01C7E587.4F2D8263--
+
+
+--===============0899547327==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi
-
-Thanks to the great work of Bluez-guys, bluez-utils audio service is
-now able to deal with several audio devices. Those Bluetooth devices
-are accessed by a "bluetooth" ALSA plugin (see
-http://wiki.bluez.org/wiki/HOWTO/AudioDevices)
-
-There is only a few missing pieces to make those devices discoverable with =
-HAL.
-
-The following patch changes the "alsa" namespace so that "virtual
-devices" can also be described (a former approach was to use
-alsa.virtual or alsa_virtual new namespace, but alsa.virtual does not
-inherit alsa property, and both namespaces have a lot in common).
-
-Thus, a  mandatory property "is_hardware" is introduced. If this value
-is true, the current mandatory keys remain mandatory. If not, then the
-client should use "device_name" to "open" the device.
-
-Arguable:
-- should "device_name" be optional? (currently, application hard-code
-the prefix "hw")
-- "service" is used to make a difference between a2dp and hfp/hsp
-- "device_name", and "service" key naming
-
-Cheers,
---=20
-Marc-Andr=E9 Lureau
-
-------=_Part_19635_28204834.1187886137048
-Content-Type: text/x-diff;
-	name=0001-spec-Update-alsa-namespace-to-include-virtual-devic.patch;
-	charset=ANSI_X3.4-1968
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_f5pgp4q3
-Content-Disposition: attachment; filename="0001-spec-Update-alsa-namespace-to-include-virtual-devic.patch"
-
-RnJvbSAyMjk4OTFhMWEzMTg4MjU3NWE3YzNkNjI1ODAxZmZlYmFkN2ZhNWJkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBNYXJjLUFuZHJlIEx1cmVhdSAoZWxtYXJjbykgPG1hcmNhbmRy
-ZS5sdXJlYXVAZ21haWwuY29tPgpEYXRlOiBUaHUsIDIzIEF1ZyAyMDA3IDE5OjIxOjA0ICswMzAw
-ClN1YmplY3Q6IFtQQVRDSF0gc3BlYzogVXBkYXRlIGFsc2EgbmFtZXNwYWNlIHRvIGluY2x1ZGUg
-dmlydHVhbCBkZXZpY2UKCi0tLQogZG9jL3NwZWMvaGFsLXNwZWMtcHJvcGVydGllcy54bWwgfCAg
-IDQ1ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tCiAxIGZpbGVzIGNoYW5n
-ZWQsIDM4IGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZG9jL3Nw
-ZWMvaGFsLXNwZWMtcHJvcGVydGllcy54bWwgYi9kb2Mvc3BlYy9oYWwtc3BlYy1wcm9wZXJ0aWVz
-LnhtbAppbmRleCA5NGJjMTcxLi4wYTY1ZDVkIDEwMDY0NAotLS0gYS9kb2Mvc3BlYy9oYWwtc3Bl
-Yy1wcm9wZXJ0aWVzLnhtbAorKysgYi9kb2Mvc3BlYy9oYWwtc3BlYy1wcm9wZXJ0aWVzLnhtbApA
-QCAtNTAwNyw3ICs1MDA3LDcgQEAgb3JnLmZyZWVkZXNrdG9wLkhhbC5EZXZpY2UuVm9sdW1lLm1l
-dGhvZF9zaWduYXR1cmVzID0geydzc2FzJywgJ2FzJywgJ2FzJ30KICAgICAgIDwvdGl0bGU+CiAg
-ICAgICA8cGFyYT4KICAgICAgICAgRGV2aWNlIG9iamVjdHMgd2l0aCB0aGUgY2FwYWJpbGl0eSA8
-bGl0ZXJhbD5hbHNhPC9saXRlcmFsPgotICAgICAgICByZXByZXNlbnQgYWxsIHRoZSBzdHJlYW1z
-IGF2YWlsYWJsZSB0aHJvdWdoIEFMU0Egb24gYSBzb3VuZGNhcmQuCisgICAgICAgIHJlcHJlc2Vu
-dCBhbGwgdGhlIGF1ZGlvIGRldmljZXMgYXZhaWxhYmxlIHRocm91Z2ggQUxTQS4gVGhvc2UgY291
-bGQgYmUgaGFyZHdhcmUgb3Igc29mdHdhcmUgInZpcnR1YWwgZGV2aWNlcyIuCiAgICAgICA8L3Bh
-cmE+CiAgICAgICA8aW5mb3JtYWx0YWJsZT4KICAgICAgICAgPHRncm91cCBjb2xzPSIyIj4KQEAg
-LTUwMjUsNyArNTAyNSw3IEBAIG9yZy5mcmVlZGVza3RvcC5IYWwuRGV2aWNlLlZvbHVtZS5tZXRo
-b2Rfc2lnbmF0dXJlcyA9IHsnc3NhcycsICdhcycsICdhcyd9CiAgICAgICAgICAgICAgICAgPGxp
-dGVyYWw+YWxzYS5jYXJkPC9saXRlcmFsPiAoaW50KQogICAgICAgICAgICAgICA8L2VudHJ5Pgog
-ICAgICAgICAgICAgICA8ZW50cnk+PC9lbnRyeT4KLSAgICAgICAgICAgICAgPGVudHJ5Plllczwv
-ZW50cnk+CisgICAgICAgICAgICAgIDxlbnRyeT5JZiA8bGl0ZXJhbD5hbHNhLmlzX2hhcmR3YXJl
-PC9saXRlcmFsPiBpcyBzZXQgdG8gVFJVRTwvZW50cnk+CiAgICAgICAgICAgICAgIDxlbnRyeT4K
-ICAgICAgICAgICAgICAgICBDYXJkIG51bWJlciBpbiBzeXN0ZW0gYXMgcmVnaXN0ZXJlZCBieSBB
-TFNBLgogICAgICAgICAgICAgICA8L2VudHJ5PgpAQCAtNTAzNyw3ICs1MDM3LDcgQEAgb3JnLmZy
-ZWVkZXNrdG9wLkhhbC5EZXZpY2UuVm9sdW1lLm1ldGhvZF9zaWduYXR1cmVzID0geydzc2FzJywg
-J2FzJywgJ2FzJ30KICAgICAgICAgICAgICAgPGVudHJ5PgogICAgICAgICAgICAgICAgIEV4YW1w
-bGVzOiA8bGl0ZXJhbD5JODI4MDFEQklDSDQ8L2xpdGVyYWw+LCA8bGl0ZXJhbD5NUDM8L2xpdGVy
-YWw+CiAgICAgICAgICAgICAgIDwvZW50cnk+Ci0gICAgICAgICAgICAgIDxlbnRyeT5ObzwvZW50
-cnk+CisgICAgICAgICAgICAgIDxlbnRyeT5JZiA8bGl0ZXJhbD5hbHNhLmlzX2hhcmR3YXJlPC9s
-aXRlcmFsPiBpcyBzZXQgdG8gVFJVRTwvZW50cnk+CiAgICAgICAgICAgICAgIDxlbnRyeT4KICAg
-ICAgICAgICAgICAgICBUZXh0dWFsIGRlc2NyaXB0aW9uIG9mIHRoZSBjYXJkLgogICAgICAgICAg
-ICAgICA8L2VudHJ5PgpAQCAtNTA0Nyw3ICs1MDQ3LDcgQEAgb3JnLmZyZWVkZXNrdG9wLkhhbC5E
-ZXZpY2UuVm9sdW1lLm1ldGhvZF9zaWduYXR1cmVzID0geydzc2FzJywgJ2FzJywgJ2FzJ30KICAg
-ICAgICAgICAgICAgICA8bGl0ZXJhbD5hbHNhLmRldmljZTwvbGl0ZXJhbD4gKGludCkKICAgICAg
-ICAgICAgICAgPC9lbnRyeT4KICAgICAgICAgICAgICAgPGVudHJ5PjwvZW50cnk+Ci0gICAgICAg
-ICAgICAgIDxlbnRyeT5ZZXM8L2VudHJ5PgorICAgICAgICAgICAgICA8ZW50cnk+SWYgPGxpdGVy
-YWw+YWxzYS5pc19oYXJkd2FyZTwvbGl0ZXJhbD4gaXMgc2V0IHRvIFRSVUU8L2VudHJ5PgogICAg
-ICAgICAgICAgICA8ZW50cnk+CiAgICAgICAgICAgICAgICAgRGV2aWNlIG51bWJlciBhc3NpZ25l
-ZCBieSBBTFNBIGZvciBhIGN1cnJlbnQgY2FyZC4KICAgICAgICAgICAgICAgPC9lbnRyeT4KQEAg
-LTUwNTcsMTMgKzUwNTcsMjQgQEAgb3JnLmZyZWVkZXNrdG9wLkhhbC5EZXZpY2UuVm9sdW1lLm1l
-dGhvZF9zaWduYXR1cmVzID0geydzc2FzJywgJ2FzJywgJ2FzJ30KICAgICAgICAgICAgICAgICA8
-bGl0ZXJhbD5hbHNhLmRldmljZV9maWxlPC9saXRlcmFsPiAoc3RyaW5nKQogICAgICAgICAgICAg
-ICA8L2VudHJ5PgogICAgICAgICAgICAgICA8ZW50cnk+PC9lbnRyeT4KLSAgICAgICAgICAgICAg
-PGVudHJ5PlllczwvZW50cnk+CisgICAgICAgICAgICAgIDxlbnRyeT5JZiA8bGl0ZXJhbD5hbHNh
-LmlzX2hhcmR3YXJlPC9saXRlcmFsPiBpcyBzZXQgdG8gVFJVRTwvZW50cnk+CiAgICAgICAgICAg
-ICAgIDxlbnRyeT4KICAgICAgICAgICAgICAgICBUaGUgZGV2aWNlIG5vZGUgdG8gYWNjZXNzIHRo
-ZSBBTFNBIGRldmljZS4KICAgICAgICAgICAgICAgPC9lbnRyeT4KICAgICAgICAgICAgIDwvcm93
-PgogICAgICAgICAgICAgPHJvdz4KICAgICAgICAgICAgICAgPGVudHJ5PgorICAgICAgICAgICAg
-ICAgIDxsaXRlcmFsPmFsc2EuZGV2aWNlX25hbWU8L2xpdGVyYWw+IChzdHJpbmcpCisgICAgICAg
-ICAgICAgIDwvZW50cnk+CisJICAgICAgPGVudHJ5PkV4YW1wbGVzOiA8bGl0ZXJhbD5wbHVnOiJo
-dzowLDEiPC9saXRlcmFsPiwgPGxpdGVyYWw+Ymx1ZXRvb3RoOjAwOjE5OjRGOkRCOjA0OjQwLGhp
-Zmk8L2xpdGVyYWw+CisJICAgICAgPC9lbnRyeT4KKwkgICAgICA8ZW50cnk+WWVzPC9lbnRyeT4K
-KyAgICAgICAgICAgICAgPGVudHJ5PgorICAgICAgICAgICAgICAgIFRoZSBkZXZpY2UgbmFtZSB0
-byBhY2Nlc3MgdGhlIEFMU0EgZGV2aWNlLiAKKyAgICAgICAgICAgICAgPC9lbnRyeT4KKyAgICAg
-ICAgICAgIDwvcm93PgorICAgICAgICAgICAgPHJvdz4KKyAgICAgICAgICAgICAgPGVudHJ5Pgog
-ICAgICAgICAgICAgICAgIDxsaXRlcmFsPmFsc2EuZGV2aWNlX2lkPC9saXRlcmFsPiAoc3RyaW5n
-KQogICAgICAgICAgICAgICA8L2VudHJ5PgogICAgICAgICAgICAgICA8ZW50cnk+CkBAIC01MDcx
-LDcgKzUwODIsNyBAQCBvcmcuZnJlZWRlc2t0b3AuSGFsLkRldmljZS5Wb2x1bWUubWV0aG9kX3Np
-Z25hdHVyZXMgPSB7J3NzYXMnLCAnYXMnLCAnYXMnfQogICAgICAgICAgICAgICA8L2VudHJ5Pgog
-ICAgICAgICAgICAgICA8ZW50cnk+Tm88L2VudHJ5PgogICAgICAgICAgICAgICA8ZW50cnk+Ci0g
-ICAgICAgICAgICAgICAgVGV4dHVhbCBkZXNjcmlwdGlvbiBvZiB0aGUgc3BlY2lmaWMgZGV2aWNl
-IGZvciBhIGNhcmQKKyAgICAgICAgICAgICAgICBUZXh0dWFsIGRlc2NyaXB0aW9uIG9mIHRoZSBz
-cGVjaWZpYyBkZXZpY2UgZm9yIGEgY2FyZCwgb3IgdmlydHVhbCBkZXZpY2UKICAgICAgICAgICAg
-ICAgPC9lbnRyeT4KICAgICAgICAgICAgIDwvcm93PgogICAgICAgICAgICAgPHJvdz4KQEAgLTUx
-MzksMTMgKzUxNTAsMzMgQEAgb3JnLmZyZWVkZXNrdG9wLkhhbC5EZXZpY2UuVm9sdW1lLm1ldGhv
-ZF9zaWduYXR1cmVzID0geydzc2FzJywgJ2FzJywgJ2FzJ30KICAgICAgICAgICAgICAgICA8bGl0
-ZXJhbD5hbHNhLm9yaWdpbmF0aW5nX2RldmljZTwvbGl0ZXJhbD4gKHN0cmluZykKICAgICAgICAg
-ICAgICAgPC9lbnRyeT4KICAgICAgICAgICAgICAgPGVudHJ5PjwvZW50cnk+Ci0gICAgICAgICAg
-ICAgIDxlbnRyeT5ZZXM8L2VudHJ5PgorICAgICAgICAgICAgICA8ZW50cnk+SWYgPGxpdGVyYWw+
-YWxzYS5pc19oYXJkd2FyZTwvbGl0ZXJhbD4gaXMgc2V0IHRvIFRSVUU8L2VudHJ5PgogICAgICAg
-ICAgICAgICA8ZW50cnk+CiAgICAgICAgICAgICAgICAgVURJIG9mIHRoZSBkZXZpY2UgdGhlIEFM
-U0EgZGV2aWNlIGlzIGJvdW5kIHRvLgogICAgICAgICAgICAgICA8L2VudHJ5PgogICAgICAgICAg
-ICAgPC9yb3c+CiAgICAgICAgICAgICA8cm93PgogICAgICAgICAgICAgICA8ZW50cnk+CisgICAg
-ICAgICAgICAgICAgPGxpdGVyYWw+YWxzYS5pc19oYXJkd2FyZTwvbGl0ZXJhbD4gKGJvb2wpCisg
-ICAgICAgICAgICAgIDwvZW50cnk+CisgICAgICAgICAgICAgIDxlbnRyeT48L2VudHJ5PgorICAg
-ICAgICAgICAgICA8ZW50cnk+WWVzPC9lbnRyeT4KKyAgICAgICAgICAgICAgPGVudHJ5PgorICAg
-ICAgICAgICAgICAgIFRSVUUgaWYgaXQgaXMgYW4gaGFyZHdhcmUgZGV2aWNlLiBGQUxTRSBpZiBp
-dCBpcyBhICJ2aXJ0dWFsIGRldmljZSIuCisgICAgICAgICAgICAgIDwvZW50cnk+CisgICAgICAg
-ICAgICA8L3Jvdz4KKyAgICAgICAgICAgIDxyb3c+CisgICAgICAgICAgICAgIDxlbnRyeT4KKyAg
-ICAgICAgICAgICAgICA8bGl0ZXJhbD5hbHNhLnNlcnZpY2U8L2xpdGVyYWw+IChzdHJpbmcpCisg
-ICAgICAgICAgICAgIDwvZW50cnk+CisgICAgICAgICAgICAgIDxlbnRyeT5leGFtcGxlOiA8bGl0
-ZXJhbD5IaWZpPC9saXRlcmFsPiwgPGxpdGVyYWw+Vm9pY2U8L2xpdGVyYWw+PC9lbnRyeT4KKyAg
-ICAgICAgICAgICAgPGVudHJ5Pk5vPC9lbnRyeT4KKyAgICAgICAgICAgICAgPGVudHJ5PgorCQlI
-aW50IG9mIHVzZSBjYXNlIG9mIHRoaXMgZGV2aWNlLgorICAgICAgICAgICAgICA8L2VudHJ5Pgor
-ICAgICAgICAgICAgPC9yb3c+CisgICAgICAgICAgICA8cm93PgorICAgICAgICAgICAgICA8ZW50
-cnk+CiAgICAgICAgICAgICAgICAgPGxpdGVyYWw+YWxzYS50eXBlPC9saXRlcmFsPiAoc3RyaW5n
-KQogICAgICAgICAgICAgICA8L2VudHJ5PgogICAgICAgICAgICAgICA8ZW50cnk+PC9lbnRyeT4K
-LS0gCjEuNS4yLjMKCg==
-------=_Part_19635_28204834.1187886137048
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >>  http://get.splunk.com/
+--===============0899547327==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 _______________________________________________
-hal mailing list
-hal@lists.freedesktop.org
-http://lists.freedesktop.org/mailman/listinfo/hal
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-------=_Part_19635_28204834.1187886137048--
+--===============0899547327==--
