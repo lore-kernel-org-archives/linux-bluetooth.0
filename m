@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1187612230.26239.79.camel@cookie.hadess.net>
-References: <1187612230.26239.79.camel@cookie.hadess.net>
-Date: Fri, 24 Aug 2007 14:30:06 +0200
-Message-Id: <1187958606.15402.169.camel@violet>
+In-Reply-To: <53BC229C-4E4E-4014-87EC-F093B1276DF0@cadvium.net>
+References: <53BC229C-4E4E-4014-87EC-F093B1276DF0@cadvium.net>
+Date: Fri, 24 Aug 2007 14:23:16 +0200
+Message-Id: <1187958196.15402.167.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Better startup under KDE
+Subject: Re: [Bluez-devel] handsfree profile
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,16 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Hi Robert,
 
-> This patch comes from a KDE user via:
-> https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=247284
+> i am developing an implementation of the handsfree profile (The  
+> Handsfree side rather than the Audio Gateway).  So far I have  
+> traction in every area except for SCO connections.
 > 
-> This makes the bluetooth applet startup after the panel, and disable
-> startup notification (as it doesn't support it).
+> What exactly does bluez-alsa project do?  I am a little unclear about  
+> what is an alsa driver, and what part is a daemon.  How would I get  
+> data from the cell phone to the speakers, and data from the  
+> microphone back to cell phone?  From everything I have read it  
+> appears to be the Audio Gateway portion of the handsfree profile, but  
+> after playing around with it, I am not sue.
 
-no idea why you wanna start a GNOME applet under KDE. They should have
-their own stuff.
+the main focus will be Handsfree audio gateway. For the Handsfree device
+part I don't know when we will support it. We might do it at some point,
+but it certainly has not high priority.
 
 Regards
 
