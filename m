@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20070824202342.1aea5278@debian.fastwebnet.it>
-References: <20070824202342.1aea5278@debian.fastwebnet.it>
-Date: Fri, 24 Aug 2007 20:30:51 +0200
-Message-Id: <1187980251.15402.195.camel@violet>
+Date: Fri, 24 Aug 2007 20:23:42 +0200
+From: automatic_jack <automatic_jack@katamail.com>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20070824202342.1aea5278@debian.fastwebnet.it>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Ok, I have B-Speech Data Stream...
+Subject: [Bluez-users] Ok, I have B-Speech Data Stream...
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,17 +18,9 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+...which information do you want/need?
 
-> ...which information do you want/need?
-
-call "hciconfig hci0 revision" as root.
-
-Regards
-
-Marcel
-
-
+Regards :)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
