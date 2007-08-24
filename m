@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Mon, 27 Aug 2007 09:45:07 +1000
-References: <7AC80B65-3C6D-43DB-8CED-600F9A604255@cadvium.net>
-	<1187957366.15402.141.camel@violet>
-In-Reply-To: <1187957366.15402.141.camel@violet>
+Message-ID: <e1effdeb0708241419s2642deeevf3b234b3578eb507@mail.gmail.com>
+Date: Fri, 24 Aug 2007 18:19:11 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <556150d20708151335n47861b21ob9f6c803744717e8@mail.gmail.com>
 MIME-Version: 1.0
-Message-Id: <200708270945.07388.denis.kenzior@trolltech.com>
-Subject: Re: [Bluez-devel] Avetana GPL Stack
+References: <556150d20708151335n47861b21ob9f6c803744717e8@mail.gmail.com>
+Subject: Re: [Bluez-devel] Crash in network service
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,103 +16,131 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel,
-
-Speaking of JSR82.  I've been hearing our PSO department has been working w=
-ith =
-
-Sun to get a working JSR82 stack on top of Linux.  They've been having some =
-
-problems supporting some JSR82 defined methods, for instance:
-
-/**
- * Checks if a remote device was authenticated.
- *
- * @param addr Bluetooth address of a remote device
-=A0* @param pBool pointer to variable where the result is to be stored:
-=A0* =A0 =A0 =A0 =A0 =A0 =A0 =A0<code>JAVACALL_TRUE</code> if authenticated,
-=A0* =A0 =A0 =A0 =A0 =A0 =A0 =A0<code>JAVACALL_FALSE</code> otherwise
-=A0* @retval <code>JAVACALL_OK</code> on success
-=A0* @retval <code>JAVACALL_FAIL</code> on failure
-=A0*/
-javacall_result javacall_bt_bcc_is_authenticated(
-=A0 =A0 =A0 =A0 const javacall_bt_address addr,
-=A0 =A0 =A0 =A0 /*OUT*/javacall_bool *pBool);
-
-The best way to determine this is of course for a specific transport =
-
-connection, e.g. getsockopt RFCOMM_LM & L2CAP_LM.  However, short of using =
-
-the 'hcitool con' implementation, I'm not sure how to get this information.=
-  =
-
-Should this be up for inclusion into the org.bluez.Adapter API?  What's the =
-
-best way to do this?  I can probably work on a patch if required...
-
-/**
-=A0* Increases or decreases encryption request counter for a remote device.
-=A0*
-=A0* @param addr the Bluetooth address of the remote device
-=A0* @param enable indicated whether the encryption needs to be enabled
-=A0* @param pBool pointer to variable where the result is to be stored:
-=A0* =A0 =A0 =A0 =A0 =A0 =A0 =A0<code>JAVACALL_TRUE</code> if the encryptio=
-n must be
-changed,
-=A0* =A0 =A0 =A0 =A0 =A0 =A0 =A0<code>JAVACALL_FALSE</code> otherwise
-=A0* @retval <code>JAVACALL_OK</code> on success
-=A0* @retval <code>JAVACALL_FAIL</code> on failure
-=A0*/
-javacall_result javacall_bt_bcc_set_encryption(
-=A0 =A0 =A0 =A0 const javacall_bt_address addr,
-=A0 =A0 =A0 =A0 javacall_bool enable,
-=A0 =A0 =A0 =A0 javacall_bool *pBool);
-
-Same problem with this one.  Ideally the setsockopt RFCOMM_LM and L2CAP_LM =
-
-should work on client sockets as well (I think they only work on server =
-
-sockets right now).  Any ideas on how to implement this one?
-
--Denis
-
-On Friday 24 August 2007 22:09, Marcel Holtmann wrote:
-> Hi Robert,
->
-> > I made some patches to the Avetana GPL Stack (the version that works
-> > with Bluez which is why I am posting here).  If any one is interested
-> > in JSR82, java bluetooth stuff, shoot me an email.
->
-> I would prefer if someone takes over the maintainership and creates a
-> working JSR82 stack that can use the latest BlueZ versions. Personally I
-> am not using Java at all so I might be of no help here.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc.
-> Still grepping through log files to find problems?  Stop.
-> Now Search log events and configuration files using AJAX and a browser.
-> Download your FREE copy of Splunk now >>  http://get.splunk.com/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >>  http://get.splunk.com/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+T24gOC8xNS8wNywgU2ltb25lIFBpdW5ubyA8c2ltb25lcEBnbWFpbC5jb20+IHdyb3RlOgo+IEhl
+bGxvLAo+Cj4gSSdtIGV4cGVyaW1lbnRpbmcgd2l0aCBibHVlei11dGlscyAzLjEyLCB0cnl0aW5n
+IHRvIHNldHVwIGEgYmx1ZXRvb3RoCj4gbmV0d29yayBiZXR3ZWVuIG15IGxhcHRvcCAoYXMgYSBQ
+QU4gY2xpZW50KSBhbmQgbXkgZGVza3RvcCAoYXMgYSBQQU4KPiBzZXJ2ZXIpLiAgSSBoYXZlIGEg
+Z2VudG9vIGRpc3RyaWJ1dGlvbiBvbiBhbWQ2NCBkaXN0cmlidXRpb24uCj4gSSBjb21waWxlZCB3
+aXRoIENGTEFHUz0tZyBMREZMQUdTPS1nIC4vY29uZmlndXJlIC0tcHJlZml4PS91c3IKPiAtLWhv
+c3Q9eDg2XzY0LXBjLWxpbnV4LWdudSAtLW1hbmRpcj0vdXNyL3NoYXJlL21hbgo+IC0taW5mb2Rp
+cj0vdXNyL3NoYXJlL2luZm8gLS1kYXRhZGlyPS91c3Ivc2hhcmUgLS1zeXNjb25mZGlyPS9ldGMK
+PiAtLWxvY2Fsc3RhdGVkaXI9L3Zhci9saWIgLS1lbmFibGUtZGVidWcgLS1lbmFibGUtaW5vdGlm
+eSAtLWVuYWJsZS1oYWwKPiAtLWVuYWJsZS11c2IgLS1lbmFibGUtZ2xpYiAtLWRpc2FibGUtb2Jl
+eCAtLWRpc2FibGUtYWxzYQo+IC0tZW5hYmxlLW5ldHdvcmsgLS1lbmFibGUtc2VyaWFsIC0tZW5h
+YmxlLWlucHV0IC0tZGlzYWJsZS1hdWRpbwo+IC0tZGlzYWJsZS1zeW5jIC0tZGlzYWJsZS1lY2hv
+IC0tZW5hYmxlLWhjaWQgLS1kaXNhYmxlLXRlc3QKPiAtLWRpc2FibGUtc2RwZCAtLWRpc2FibGUt
+aGlkZCAtLWRpc2FibGUtcGFuZCAtLWVuYWJsZS1jdXBzCj4gLS1lbmFibGUtY29uZmlnZmlsZXMg
+LS1kaXNhYmxlLWluaXRzY3JpcHRzIC0tZGlzYWJsZS1wY21jaWFydWxlcwo+IC0tZW5hYmxlLWJj
+Y21kIC0tZW5hYmxlLWF2Y3RybCAtLWVuYWJsZS1oaWQyaGNpIC0tZW5hYmxlLWRmdXRvb2wKPiAt
+LWxvY2Fsc3RhdGVkaXI9L3ZhciAtLWxpYmRpcj0vdXNyL2xpYjY0IC0tYnVpbGQ9eDg2XzY0LXBj
+LWxpbnV4LWdudQo+Cj4gVGhpcyBpcyB0aGUgbG9nIHdoZW4gdGhlIHNlcnZpY2Ugc3RhcnRzCj4K
+PiBBdWcgMTUgMjI6MDA6MDcgcm9lbnRnZW4gaGNpZFsxMDQ4MV06IEJsdWV0b290aCBIQ0kgZGFl
+bW9uCj4gQXVnIDE1IDIyOjAwOjA3IHJvZW50Z2VuIGhjaWRbMTA0ODFdOiBIQ0kgZGV2IDAgcmVn
+aXN0ZXJlZAo+IEF1ZyAxNSAyMjowMDowNyByb2VudGdlbiBoY2lkWzEwNDgxXTogSENJIGRldiAw
+IGFscmVhZHkgdXAKPiBBdWcgMTUgMjI6MDA6MDcgcm9lbnRnZW4gaGNpZFsxMDQ4MV06IERldmlj
+ZSBoY2kwIGhhcyBiZWVuIGFkZGVkCj4gQXVnIDE1IDIyOjAwOjA3IHJvZW50Z2VuIGhjaWRbMTA0
+ODFdOiBTdGFydGluZyBzZWN1cml0eSBtYW5hZ2VyIDAKPiBBdWcgMTUgMjI6MDA6MDcgcm9lbnRn
+ZW4gYWNwaWQ6IGNsaWVudCBjb25uZWN0ZWQgZnJvbSAxMDUwMVsxMDQ6MTA0XQo+IEF1ZyAxNSAy
+MjowMDowNyByb2VudGdlbiBhY3BpZDogMSBjbGllbnQgcnVsZSBsb2FkZWQKPiBBdWcgMTUgMjI6
+MDA6MDcgcm9lbnRnZW4gaGNpZFsxMDQ4MV06IERldmljZSBoY2kwIGhhcyBiZWVuIGFjdGl2YXRl
+ZAo+IEF1ZyAxNSAyMjowMDowNyByb2VudGdlbiBoY2lkWzEwNDgxXTogU3RhcnRpbmcgU0RQIHNl
+cnZlcgo+IEF1ZyAxNSAyMjowMDowNyByb2VudGdlbiBoY2lkWzEwNDgxXTogQ3JlYXRlZCBsb2Nh
+bCBzZXJ2ZXIgYXQKPiB1bml4OmFic3RyYWN0PS92YXIvcnVuL2RidXMteHR5SUFiMU9BaixndWlk
+PTYyNWI4ZTAxZmMyY2QzN2IzNGJhNjcwMDQ2YzM1YjQ3Cj4gQXVnIDE1IDIyOjAwOjA3IHJvZW50
+Z2VuIGlucHV0WzEwNTA4XTogQmx1ZXRvb3RoIElucHV0IGRhZW1vbgo+IEF1ZyAxNSAyMjowMDow
+NyByb2VudGdlbiBpbnB1dFsxMDUwOF06IFJlZ2lzdGVyZWQgaW5wdXQgbWFuYWdlcgo+IHBhdGg6
+L29yZy9ibHVlei9pbnB1dAo+IEF1ZyAxNSAyMjowMDowNyByb2VudGdlbiBuZXR3b3JrWzEwNTA5
+XTogQmx1ZXRvb3RoIE5ldHdvcmsgZGFlbW9uCj4gQXVnIDE1IDIyOjAwOjA3IHJvZW50Z2VuIG5l
+dHdvcmtbMTA1MDldOiBGYWlsZWQgdG8gY2xhaW0gdG8gaW50ZXJmYWNlOgo+IEF1ZyAxNSAyMjow
+MDowNyByb2VudGdlbiBuZXR3b3JrWzEwNTA5XTogUmVnaXN0ZXJlZCBtYW5hZ2VyCj4gcGF0aDov
+b3JnL2JsdWV6L25ldHdvcmsKPiBBdWcgMTUgMjI6MDA6MDcgcm9lbnRnZW4gbmV0d29ya1sxMDUw
+OV06IFJlZ2lzdGVyZWQgc2VydmVyCj4gcGF0aDovb3JnL2JsdWV6L25ldHdvcmsvbmFwCj4gQXVn
+IDE1IDIyOjAwOjA4IHJvZW50Z2VuIG5ldHdvcmtbMTA1MDldOiBhZGRfc2VydmVyX3JlY29yZDog
+Z290IHJlY29yZAo+IGlkIDB4MTAwMDAKPiBBdWcgMTUgMjI6MDA6MDggcm9lbnRnZW4gbmV0d29y
+a1sxMDUwOV06IFJlZ2lzdGVyZWQgc2VydmVyCj4gcGF0aDovb3JnL2JsdWV6L25ldHdvcmsvZ24K
+PiBBdWcgMTUgMjI6MDA6MDggcm9lbnRnZW4gbmV0d29ya1sxMDUwOV06IFJlZ2lzdGVyZWQgc2Vy
+dmVyCj4gcGF0aDovb3JnL2JsdWV6L25ldHdvcmsvcGFudQo+Cj4gbm90ZSB0aGF0ICJGYWlsZWQg
+dG8gY2xhaW0gaW50ZXJmYWNlIi4KPiBBbnlob3csIHBhbjAgZ2V0cyBjcmVhdGVkOgo+Cj4gcm9l
+bnRnZW4gfiAjIGlwIGFkZHIgc2hvdyBkZXYgcGFuMAo+IDEzOiBwYW4wOiA8QlJPQURDQVNULE1V
+TFRJQ0FTVCxVUCwxMDAwMD4gbXR1IDE1MDAgcWRpc2Mgbm9xdWV1ZQo+ICAgICBsaW5rL2V0aGVy
+IDAwOjAwOjAwOjAwOjAwOjAwIGJyZCBmZjpmZjpmZjpmZjpmZjpmZgo+ICAgICBpbmV0IDE5Mi4x
+NjguMTk4LjEvMjQgYnJkIDE5Mi4xNjguMTk4LjI1NSBzY29wZSBnbG9iYWwgcGFuMAo+ICAgICBp
+bmV0NiBmZTgwOjoyMDA6ZmY6ZmUwMDowLzY0IHNjb3BlIGxpbmsKPiAgICAgICAgdmFsaWRfbGZ0
+IGZvcmV2ZXIgcHJlZmVycmVkX2xmdCBmb3JldmVyCj4KPiBOb3csIHdoaWxlIEknbSB3YXRjaGlu
+ZyBwcm9jZXNzIDEwNTA5IHdpdGggZ2RiLCBvbiBteSBsYXB0b3AgSSBsYXVuY2g6Cj4KPiBwYW5k
+IC1uIC0tYyA8YmRhZGRyPgo+Cj4gT24gdGhlIHNlcnZlciBJIGdldCB0aGlzIGNyYXNoOgo+Cj4g
+UHJvZ3JhbSByZWNlaXZlZCBzaWduYWwgU0lHU0VHViwgU2VnbWVudGF0aW9uIGZhdWx0Lgo+IDB4
+MDAwMDAwMDAwMDQwNzczZiBpbiBjb25uZWN0X3NldHVwX2V2ZW50IChjaGFuPTB4NTE5NzEwLAo+
+IGNvbmQ9R19JT19JTiwgZGF0YT0weDUxNWFmMCkgYXQgc2VydmVyLmM6NDIxCj4gNDIxICAgICAg
+ICAgICAgIGlmICgrK25zLT5wYXV0aC0+YXR0ZW1wdHMgPiAxKSB7Cj4gKGdkYikgYnQKPiAjMCAg
+MHgwMDAwMDAwMDAwNDA3NzNmIGluIGNvbm5lY3Rfc2V0dXBfZXZlbnQgKGNoYW49MHg1MTk3MTAs
+Cj4gY29uZD1HX0lPX0lOLCBkYXRhPTB4NTE1YWYwKSBhdCBzZXJ2ZXIuYzo0MjEKPiAjMSAgMHgw
+MDAwMmI2MjYyZjc1NjQ2IGluIGdfaW9fdW5peF9kaXNwYXRjaCAoc291cmNlPTB4NTE5N2IwLAo+
+IGNhbGxiYWNrPTB4NDA3NjFiIDxjb25uZWN0X3NldHVwX2V2ZW50PiwgdXNlcl9kYXRhPTB4NTE1
+YWYwKQo+ICAgICBhdCBnaW91bml4LmM6MTYyCj4gIzIgIDB4MDAwMDJiNjI2MmY0MWRkZSBpbiBn
+X21haW5fZGlzcGF0Y2ggKGNvbnRleHQ9MHg1MTYzMjApIGF0IGdtYWluLmM6MjA0NQo+ICMzICAw
+eDAwMDAyYjYyNjJmNDM1NDQgaW4gSUFfX2dfbWFpbl9jb250ZXh0X2Rpc3BhdGNoCj4gKGNvbnRl
+eHQ9MHg1MTYzMjApIGF0IGdtYWluLmM6MjU5Ngo+ICM0ICAweDAwMDAyYjYyNjJmNDNiODkgaW4g
+Z19tYWluX2NvbnRleHRfaXRlcmF0ZSAoY29udGV4dD0weDUxNjMyMCwKPiBibG9jaz0xLCBkaXNw
+YXRjaD0xLCBzZWxmPTB4NTFhOWYwKSBhdCBnbWFpbi5jOjI2NzcKPiAjNSAgMHgwMDAwMmI2MjYy
+ZjQ0MzkzIGluIElBX19nX21haW5fbG9vcF9ydW4gKGxvb3A9MHg1MTQyMTApIGF0IGdtYWluLmM6
+Mjg4MQo+ICM2ICAweDAwMDAwMDAwMDA0MDRjNzAgaW4gbWFpbiAoYXJnYz0xLCBhcmd2PTB4N2Zm
+ZjQ3Y2I4YWM4KSBhdCBtYWluLmM6OTEKPiAoZ2RiKSBpbmZvIGxvY2Fscwo+IGNvbm4gPSAoREJ1
+c0Nvbm5lY3Rpb24gKikgMHg1MTVhZjAKPiBucyA9IChzdHJ1Y3QgbmV0d29ya19zZXJ2ZXIgKikg
+MHg1MTQ1ZTAKPiBwYXRoID0gIlwwMDJcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAw77+9RVFc
+MDAwXDAwMFwwMDBcMDAwXDAwMO+/ve+/ve+/vWJcMDAxXDAwMFwwMDBcMDAwQE9RXDAwMFwwMDBc
+MDAwXDAwMFwwMDDvv71cMjA177+9R++/vVwxNzdcMDAwXDAwMO+/ve+/ve+/vWJiK1wwMDBcMDAw
+XDAwMFwyMDbvv71HXDAwMFwwMDBcMDAwXDAwMO+/vUVRXDAwMFwwMDBcMDAwXDAwMCIKPiByZXEg
+PSAoc3RydWN0IGJuZXBfc2V0dXBfY29ubl9yZXEgKikgMHg3ZmZmNDdjYjdlZjAKPiBwa3QgPSAi
+XDAwMVwwMDFcMDAyXDAyMVwwMjZcMDIxXDAyNVwwMDDvv70nXDAzNmNiK1wwMDBcMDAw77+9XDIw
+NO+/vUfvv71cMTc3IiwKPiAnXDAnIDxyZXBlYXRzIDE4IHRpbWVzPiwgIlwyMDJ2UVwwMDBcMDAw
+XDAwMFwwMDBcMDAwCj4gXDIwMe+/vUfvv71cMTc3XDAwMFwwMDBcMjMwXDIwMO+/vUfvv71cMTc3
+XDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMEg/SmNiK1wwMDBcMDAw77+9
+XDIwMO+/vUfvv71cMTc3XDAwMFwwMDBcMjMwXDIwMO+/vUfvv71cMTc3XDAwMFwwMDBcMDAxXGIi
+LAo+ICdcMCcgPHJlcGVhdHMgMjIgdGltZXM+LCAi77+9XDIwMSIsICdcMCcgPHJlcGVhdHMgMjIg
+dGltZXM+LAo+ICJcXFxuXDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMVwwMDBcMDAwXDAwMFww
+MDBcMDAwXDAwMFwwMDBcYlwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDDvv73vv73vv71FXDAw
+MFwwMDBcMDAwXDAwMFwwMDFcYlwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMCVcMDMxXDAwMFwwMDBc
+MDAwXDAwMFwwMDBcMDAwXDAwMVwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDDvv71cMjAxIiwK
+PiAnXDAnIDxyZXBlYXRzIDIyIHRpbWVzPiwKPiAiXFxcblwwMDBcMDAwXDAwMFwwMDBcMDAwXDAw
+MFwwMDBcMDIwXDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXGJcMDAwXDAwMFwwMDAiLi4uCj4gbiA9
+IDcKPiBnZXJyID0gR19JT19FUlJPUl9OT05FCj4gcHNlcnZpY2UgPSAodWludDhfdCAqKSAweDUx
+NDVkMCAi77+9RVEiCj4gcm9sZSA9IDAKPiByZXNwb25zZSA9IDAKPiAoZ2RiKSBwIG5zLT5wYXV0
+aAo+ICQxID0gKHN0cnVjdCBwZW5kaW5nX2F1dGggKikgMHgwCj4KPiBPbiB0aGUgbG9nIGZpbGUg
+SSBvbmx5IHNlZToKPgo+IEF1ZyAxNSAyMjoxNzozOCByb2VudGdlbiBuZXR3b3JrWzEwNTA5XTog
+Q29ubmVjdGlvbgo+IGZyb206MDA6MTk6QzE6OEM6NUY6ODAgb24gUFNNIDE1Cj4KPiBJIHRyaWVk
+IHRoaXMgcGF0Y2g6Cj4KPiAtLS0gbmV0d29yay9zZXJ2ZXIuYy5vcmlnICAgICAgIDIwMDctMDgt
+MTUgMjI6MjY6MTguMDAwMDAwMDAwICswMjAwCj4gKysrIG5ldHdvcmsvc2VydmVyLmMgICAgMjAw
+Ny0wOC0xNSAyMjoyNjo0My4wMDAwMDAwMDAgKzAyMDAKPiBAQCAtNDE4LDcgKzQxOCw3IEBACj4g
+ICAgICAgICAgICAgICAgIHJldHVybiBGQUxTRTsKPiAgICAgICAgIH0KPgo+IC0gICAgICAgaWYg
+KCsrbnMtPnBhdXRoLT5hdHRlbXB0cyA+IDEpIHsKPiArICAgICAgIGlmIChucy0+cGF1dGggJiYg
+Kytucy0+cGF1dGgtPmF0dGVtcHRzID4gMSkgewo+ICAgICAgICAgICAgICAgICAvKgo+ICAgICAg
+ICAgICAgICAgICAgKiBJZ25vcmUgcmVwZWF0ZWQgQk5FUCBzZXR1cCBjb25uZWN0aW9uIHJlcXVl
+c3Q6IHRoZXJlCj4gICAgICAgICAgICAgICAgICAqIGlzIGEgcGVuZGluZyBhdXRob3JpemF0aW9u
+IHJlcXVlc3QgZm9yIHRoaXMgZGV2aWNlLgo+Cj4gaXQgYXZvaWRzIHRoZSBjcmFzaCwgYnV0IG5v
+IGJuZXAgaW50ZXJmYWNlIGlzIGNyZWF0ZWQgYW5kIG9uIHRoZQo+IGNsaWVudCBJIGdldCBQcm90
+b2NvbCBlcnJvcig3MSkuCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFRoaXMgU0YubmV0IGVtYWlsIGlz
+IHNwb25zb3JlZCBieTogU3BsdW5rIEluYy4KPiBTdGlsbCBncmVwcGluZyB0aHJvdWdoIGxvZyBm
+aWxlcyB0byBmaW5kIHByb2JsZW1zPyAgU3RvcC4KPiBOb3cgU2VhcmNoIGxvZyBldmVudHMgYW5k
+IGNvbmZpZ3VyYXRpb24gZmlsZXMgdXNpbmcgQUpBWCBhbmQgYSBicm93c2VyLgo+IERvd25sb2Fk
+IHlvdXIgRlJFRSBjb3B5IG9mIFNwbHVuayBub3cgPj4gIGh0dHA6Ly9nZXQuc3BsdW5rLmNvbS8K
+PiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IEJsdWV6
+LWRldmVsIG1haWxpbmcgbGlzdAo+IEJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+
+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVs
+Cj4KCkhpIFNpbW9uZSwKCkl0IGlzIG5vdyBmaXhlZCBpbiB0aGUgQmx1ZVogQ1ZTLgoKQ2xhdWRp
+by4KCi0tIAotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0KQ2xhdWRpbyBUYWthaGFzaQpJbnN0aXR1dG8gTm9raWEgZGUgVGVjbm9sb2dpYSAt
+IElOZFQKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6
+IFNwbHVuayBJbmMuClN0aWxsIGdyZXBwaW5nIHRocm91Z2ggbG9nIGZpbGVzIHRvIGZpbmQgcHJv
+YmxlbXM/ICBTdG9wLgpOb3cgU2VhcmNoIGxvZyBldmVudHMgYW5kIGNvbmZpZ3VyYXRpb24gZmls
+ZXMgdXNpbmcgQUpBWCBhbmQgYSBicm93c2VyLgpEb3dubG9hZCB5b3VyIEZSRUUgY29weSBvZiBT
+cGx1bmsgbm93ID4+ICBodHRwOi8vZ2V0LnNwbHVuay5jb20vCl9fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVl
+ei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5u
+ZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
