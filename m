@@ -1,15 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "Tom Allebrandi" <tom@ytram.com>
-To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
-References: <c669a7c70708240036j38c8f42bhdcdb5ee15a8ae4be@mail.gmail.com>
-	<1187943850.15402.129.camel@violet>
-In-Reply-To: <1187943850.15402.129.camel@violet>
-Date: Sat, 25 Aug 2007 12:26:45 -0700
-Message-ID: <000001c7e74d$e4e21bb0$aea65310$@com>
-MIME-Version: 1.0
-Subject: Re: [Bluez-users] problem in parking device. bluez-libs 3.14,
-	bluez-utils-3.14
-Reply-To: tom@ytram.com, BlueZ users <bluez-users@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20070824203411.3d8b400c@debian.fastwebnet.it>
+References: <20070824202342.1aea5278@debian.fastwebnet.it>
+	<1187980251.15402.195.camel@violet>
+	<20070824203411.3d8b400c@debian.fastwebnet.it>
+Date: Fri, 24 Aug 2007 20:37:44 +0200
+Message-Id: <1187980664.15402.197.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Ok, I have B-Speech Data Stream...
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -22,22 +22,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
------Original Message-----
-> the park mode support is always complicated. I would advise you to not
-> support it. Especially with non CSR based chips. However you have to run
-> hcidump -X -V to see what is really going on.
+Hi,
 
-I would echo Marcel's comments. Use of Park Mode is generally discouraged
-and at some point in the future there's a decent chance that Park Mode will
-be deprecated.
+> > > ...which information do you want/need?
+> > 
+> > call "hciconfig hci0 revision" as root.
+> > 
+> > Regards
+> > 
+> > Marcel
+> 
+> Here it is:
+> 
+> hci0:   Type: USB
+>         BD Address: xx:xx:xx:xx:xx:xx ACL MTU: 384:8 SCO MTU: 64:8
+>         HCI 19.2
+>         Chip version: BlueCore4-ROM
+>         Max key size: 128 bit
+>         SCO mapping:  HCI
 
-Because of this, many of the devices that you might try to connect to may
-support Park Mode but not enable it. You are much better off making sure
-that Sniff Mode is working -- if your application needs to care.
+as it says, ROM chip. So not really useful.
 
---- tom
-tom allebrandi
-tom@ytram.com
+Regards
+
+Marcel
 
 
 
