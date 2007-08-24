@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <b5c34db00708210446k64253502w5dd9c7b49b5064ca@mail.gmail.com>
-References: <b5c34db00708210446k64253502w5dd9c7b49b5064ca@mail.gmail.com>
-Date: Fri, 24 Aug 2007 14:20:01 +0200
-Message-Id: <1187958001.15402.160.camel@violet>
+In-Reply-To: <BAY122-F23EB2BD61028C16F758A23FFD50@phx.gbl>
+References: <BAY122-F23EB2BD61028C16F758A23FFD50@phx.gbl>
+Date: Fri, 24 Aug 2007 14:18:00 +0200
+Message-Id: <1187957880.15402.157.camel@violet>
 Mime-Version: 1.0
-Cc: bluez-users@lists.sf.net
-Subject: Re: [Bluez-users] bluetooth compilation
+Subject: Re: [Bluez-users] Can't connect
+	RFCOMM	socket:Resourcetemporarilyunavailable
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,32 +23,13 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi,
 
-> I work on Au1200 processor (its an MMU processor),ported linux-2.6.11
-> kernel and i want to test usb blutooth dongle on this board when i
-> compiled bluetooth libraries and utils (i downloaded the following
-> versions bluez-libs-2.25.tar.gz,bluez-libs-2.25.tar.gz ) and followed
-> compilation procedure,
-> Compiling bluetooth libraries
-> >./configure --host=mipsel --prefix=/usr --enable-shared=no
-> --enable-static=yes
-> >make
-> >make install DESTDIR=/home/busybox/bluez/bluez- libs-2.25/install
-> 
-> Compiling bluetooth utils
-> >./configure --host=mipsel
-> --with-bluez=/home/busybox/bluez/bluez-libs-2.25/install/usr
-> CPPFLAGS="-D__KERNEL__ $(LINUXINCLUDE)" LDDFLAGS="Wl,-elf2flt" 
-> >make
-> >make install DESTDIR=/home/busybox/bluez/bluez-utils-2.25/install
-> 
-> it doesnot execute and says binary file cannot be executed and when i
-> remove LDDFLAGS  it leads to following errors,
+> have u tried "l2ping" to your device?
+> try sdptool,hcitool also..check services running on ur gps device.
+> if tht doesn't help.
+> then check the services running on other laptop(which u have tried 
+> successfully) and compare those with urs.
 
-this kernel version is no longer supported. Use something more recent
-like 2.6.22 and BlueZ 2.x is also no longer supported. Use BlueZ 3.15.
-
-However bluez-utils does not need any special kernel includes. It only
-needs the includes from bluez-libs.
+as usual. Include "hcidump -X -V" output.
 
 Regards
 
