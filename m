@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 24 Aug 2007 20:23:42 +0200
-From: automatic_jack <automatic_jack@katamail.com>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20070824202342.1aea5278@debian.fastwebnet.it>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <c49421c50708240921q554ffa3fg969b1965a905c1b2@mail.gmail.com>
+References: <c49421c50708240921q554ffa3fg969b1965a905c1b2@mail.gmail.com>
+Date: Fri, 24 Aug 2007 19:00:28 +0200
+Message-Id: <1187974828.15402.192.camel@violet>
 Mime-Version: 1.0
-Subject: [Bluez-users] Ok, I have B-Speech Data Stream...
+Subject: Re: [Bluez-users] hcitool issue
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,20 +16,31 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-...which information do you want/need?
-
-Regards :)
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >>  http://get.splunk.com/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGkgTG9yZW5vLAoKPiBJIGtub3cgaGNpdG9vbCB1dGlsaXR5IGlzIGZvciB0ZXN0aW5nIHB1cnBv
+c2VzIG9ubHkgYW5kIHRoZXJlIGlzIG5vCj4gZ3VhcmFudGllcyBhYm91dCBpdHMgZnVuY3Rpb25p
+bmcuIAo+IEhvd2V2ZXIsIEkgd291bGQgbGlrZSB0byBnZXQgc29tZSBkYXRhIGZvciBteSB0aGVz
+aXMsIHJlZ2FyZGluZwo+IGJhbmR3aWR0aCBhdmFpbGFiaWxpdHkgd2hlbiB0aGUgaW50ZXJmYWNl
+IGlzIGNvbmVjdGVkIHRvIG1vcmUgdGhhbiBvbmUKPiBtYXN0ZXIuIAo+IFRoZSBpZGVhIHdhcyB0
+aGVuIHRvIGNyZWF0ZSBjb25uZWN0aW9ucyB0byBvdGhlciBkZXZpY2VzIHVzaW5nCj4gImhjaXRv
+b2wgY2MgPGJkX2FkZHI+Ii4gVGhlIHByb2JsZW0gaXMgdGhhdCwgaW4gbXkgaG9zdHMsIGNvbm5l
+Y3Rpb25zCj4gY3JlYXRlZCB1c2luZyB0aGUgcHJldmlvdXMgY29tbWFuZCBhcmUgbG9zdCBhIGZl
+dyBzZWNvbmRzIGFmdGVyIGJlaW5nCj4gZXN0YWJsaXNoZWQuIAo+IAo+IENvdWxkIGFueW9uZSBn
+aXZlIG1lIHNvbWUgZGlyZWN0aW9uIGFib3V0IHdoYXQgaXMgZ29pbmcgd3JvbmcgaGVyZT8gSQo+
+IMK0bSB1c2luZyBrZXJuZWwgMi42LjIyLXJjNiBhbmQgQmx1ZVogMy4xMiBvbiBib3RoIGhvc3Rz
+IGFuZCBkb25nbGVzCj4gQU5ZQ09NIFVTQi0yNTAuCgp0aGlzIGhhcyBiZWVuIGRpc2N1c3NlZCBz
+byBtYW55IHRpbWVzIGFuZCBJIGFtIHRpcmVkIG9mIHJlcGVhdGluZwpteXNlbGYuIFJlYWQgdGhl
+IG1haWxpbmcgbGlzdCBhcmNoaXZlIGZvciBkZXRhaWxlZCBkZXNjcmlwdGlvbiB3aHkgdGhpcwph
+Y3R1YWxseSBoYXBwZW5zIGFuZCB3aHkgaXQgaGFzIHRvIGJlIHRoaXMgd2F5LgoKUmVnYXJkcwoK
+TWFyY2VsCgoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVk
+IGJ5OiBTcGx1bmsgSW5jLgpTdGlsbCBncmVwcGluZyB0aHJvdWdoIGxvZyBmaWxlcyB0byBmaW5k
+IHByb2JsZW1zPyAgU3RvcC4KTm93IFNlYXJjaCBsb2cgZXZlbnRzIGFuZCBjb25maWd1cmF0aW9u
+IGZpbGVzIHVzaW5nIEFKQVggYW5kIGEgYnJvd3Nlci4KRG93bmxvYWQgeW91ciBGUkVFIGNvcHkg
+b2YgU3BsdW5rIG5vdyA+PiAgaHR0cDovL2dldC5zcGx1bmsuY29tLwpfX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei11c2VycyBtYWlsaW5nIGxpc3QK
+Qmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9y
+Z2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
