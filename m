@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <7AC80B65-3C6D-43DB-8CED-600F9A604255@cadvium.net>
-References: <7AC80B65-3C6D-43DB-8CED-600F9A604255@cadvium.net>
-Date: Fri, 24 Aug 2007 14:09:26 +0200
-Message-Id: <1187957366.15402.141.camel@violet>
+In-Reply-To: <988EE2C769AC284ABAE9328BFC10703F0B9733@ZMY16EXM66.ds.mot.com>
+References: <988EE2C769AC284ABAE9328BFC10703F0B9733@ZMY16EXM66.ds.mot.com>
+Date: Fri, 24 Aug 2007 14:08:13 +0200
+Message-Id: <1187957293.15402.139.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Avetana GPL Stack
+Subject: Re: [Bluez-devel] Bluez with MISPEL
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,15 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Robert,
+Hi Sinah,
 
-> I made some patches to the Avetana GPL Stack (the version that works  
-> with Bluez which is why I am posting here).  If any one is interested  
-> in JSR82, java bluetooth stuff, shoot me an email.
+> I am trying to install Bluez driver in BusyBox which is MISPEL
+> chipset.
+> BlueZ util has a dependency on 'hal.pc'. I downloaded the hal-0.5.9.1.
+> The hal configuration has dependency on expat. I installed expat but
+> while running the configuration of hal I am getting error msg: 
+> checking for XML_ParserCreate in -lexpat.... no
+> configuration: error: Can't find expat library. Please install expat.
 
-I would prefer if someone takes over the maintainership and creates a
-working JSR82 stack that can use the latest BlueZ versions. Personally I
-am not using Java at all so I might be of no help here.
+it has no HAL and Expat dependency. These components are optional. You
+can use --disable-hal and --disable-expat.
 
 Regards
 
