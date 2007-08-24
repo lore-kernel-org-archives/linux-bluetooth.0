@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <c49421c50708240921q554ffa3fg969b1965a905c1b2@mail.gmail.com>
-References: <c49421c50708240921q554ffa3fg969b1965a905c1b2@mail.gmail.com>
-Date: Fri, 24 Aug 2007 19:00:28 +0200
-Message-Id: <1187974828.15402.192.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] hcitool issue
+Message-ID: <c49421c50708240921q554ffa3fg969b1965a905c1b2@mail.gmail.com>
+Date: Fri, 24 Aug 2007 13:21:08 -0300
+From: "Loreno Oliveira" <lorenooliveira@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-users] hcitool issue
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,31 +14,78 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============0327916016=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGkgTG9yZW5vLAoKPiBJIGtub3cgaGNpdG9vbCB1dGlsaXR5IGlzIGZvciB0ZXN0aW5nIHB1cnBv
-c2VzIG9ubHkgYW5kIHRoZXJlIGlzIG5vCj4gZ3VhcmFudGllcyBhYm91dCBpdHMgZnVuY3Rpb25p
-bmcuIAo+IEhvd2V2ZXIsIEkgd291bGQgbGlrZSB0byBnZXQgc29tZSBkYXRhIGZvciBteSB0aGVz
-aXMsIHJlZ2FyZGluZwo+IGJhbmR3aWR0aCBhdmFpbGFiaWxpdHkgd2hlbiB0aGUgaW50ZXJmYWNl
-IGlzIGNvbmVjdGVkIHRvIG1vcmUgdGhhbiBvbmUKPiBtYXN0ZXIuIAo+IFRoZSBpZGVhIHdhcyB0
-aGVuIHRvIGNyZWF0ZSBjb25uZWN0aW9ucyB0byBvdGhlciBkZXZpY2VzIHVzaW5nCj4gImhjaXRv
-b2wgY2MgPGJkX2FkZHI+Ii4gVGhlIHByb2JsZW0gaXMgdGhhdCwgaW4gbXkgaG9zdHMsIGNvbm5l
-Y3Rpb25zCj4gY3JlYXRlZCB1c2luZyB0aGUgcHJldmlvdXMgY29tbWFuZCBhcmUgbG9zdCBhIGZl
-dyBzZWNvbmRzIGFmdGVyIGJlaW5nCj4gZXN0YWJsaXNoZWQuIAo+IAo+IENvdWxkIGFueW9uZSBn
-aXZlIG1lIHNvbWUgZGlyZWN0aW9uIGFib3V0IHdoYXQgaXMgZ29pbmcgd3JvbmcgaGVyZT8gSQo+
-IMK0bSB1c2luZyBrZXJuZWwgMi42LjIyLXJjNiBhbmQgQmx1ZVogMy4xMiBvbiBib3RoIGhvc3Rz
-IGFuZCBkb25nbGVzCj4gQU5ZQ09NIFVTQi0yNTAuCgp0aGlzIGhhcyBiZWVuIGRpc2N1c3NlZCBz
-byBtYW55IHRpbWVzIGFuZCBJIGFtIHRpcmVkIG9mIHJlcGVhdGluZwpteXNlbGYuIFJlYWQgdGhl
-IG1haWxpbmcgbGlzdCBhcmNoaXZlIGZvciBkZXRhaWxlZCBkZXNjcmlwdGlvbiB3aHkgdGhpcwph
-Y3R1YWxseSBoYXBwZW5zIGFuZCB3aHkgaXQgaGFzIHRvIGJlIHRoaXMgd2F5LgoKUmVnYXJkcwoK
-TWFyY2VsCgoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVk
-IGJ5OiBTcGx1bmsgSW5jLgpTdGlsbCBncmVwcGluZyB0aHJvdWdoIGxvZyBmaWxlcyB0byBmaW5k
-IHByb2JsZW1zPyAgU3RvcC4KTm93IFNlYXJjaCBsb2cgZXZlbnRzIGFuZCBjb25maWd1cmF0aW9u
-IGZpbGVzIHVzaW5nIEFKQVggYW5kIGEgYnJvd3Nlci4KRG93bmxvYWQgeW91ciBGUkVFIGNvcHkg
-b2YgU3BsdW5rIG5vdyA+PiAgaHR0cDovL2dldC5zcGx1bmsuY29tLwpfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei11c2VycyBtYWlsaW5nIGxpc3QK
-Qmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9y
-Z2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
+--===============0327916016==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_145289_20475815.1187972468412"
+
+------=_Part_145289_20475815.1187972468412
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi there,
+
+
+I know hcitool utility is for testing purposes only and there is no
+guaranties about its functioning.
+However, I would like to get some data for my thesis, regarding bandwidth
+availability when the interface is conected to more than one master.
+The idea was then to create connections to other devices using "hcitool cc
+<bd_addr>". The problem is that, in my hosts, connections created using the
+previous command are lost a few seconds after being established.
+
+Could anyone give me some direction about what is going wrong here? I=B4m
+using kernel 2.6.22-rc6 and BlueZ 3.12 on both hosts and dongles ANYCOM
+USB-250.
+
+Regards,
+
+Loreno
+
+------=_Part_145289_20475815.1187972468412
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi there,<br><br><br>I know hcitool utility is for testing purposes only an=
+d there is no guaranties about its functioning. <br>However, I would like t=
+o get some data for my thesis, regarding bandwidth availability when the in=
+terface is conected to more than one master.
+<br>The idea was then to create connections to other devices using &quot;hc=
+itool cc &lt;bd_addr&gt;&quot;. The problem is that, in my hosts, connectio=
+ns created using the previous command are lost a few seconds after being es=
+tablished.
+<br><br>Could anyone give me some direction about what is going wrong here?=
+ I=B4m using kernel 2.6.22-rc6 and BlueZ 3.12 on both hosts and dongles ANY=
+COM USB-250.<br><br>Regards,<br><br>Loreno<br>
+
+------=_Part_145289_20475815.1187972468412--
+
+
+--===============0327916016==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >>  http://get.splunk.com/
+--===============0327916016==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0327916016==--
