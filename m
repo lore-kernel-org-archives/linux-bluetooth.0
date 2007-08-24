@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <e1effdeb0708241419s2642deeevf3b234b3578eb507@mail.gmail.com>
-Date: Fri, 24 Aug 2007 18:19:11 -0300
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <556150d20708151335n47861b21ob9f6c803744717e8@mail.gmail.com>
-MIME-Version: 1.0
-References: <556150d20708151335n47861b21ob9f6c803744717e8@mail.gmail.com>
-Subject: Re: [Bluez-devel] Crash in network service
+Mime-Version: 1.0 (Apple Message framework v752.3)
+In-Reply-To: <1187969565.15402.188.camel@violet>
+References: <9FADD91B-899B-45A5-A018-CAA3F97C976D@cadvium.net>
+	<1187969565.15402.188.camel@violet>
+Message-Id: <5639D66F-91F0-4954-9BD2-3C5A5D9D47CC@cadvium.net>
+From: robert <rbscott@cadvium.net>
+Date: Fri, 24 Aug 2007 08:51:08 -0700
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] handsfree profile
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,131 +17,72 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-T24gOC8xNS8wNywgU2ltb25lIFBpdW5ubyA8c2ltb25lcEBnbWFpbC5jb20+IHdyb3RlOgo+IEhl
-bGxvLAo+Cj4gSSdtIGV4cGVyaW1lbnRpbmcgd2l0aCBibHVlei11dGlscyAzLjEyLCB0cnl0aW5n
-IHRvIHNldHVwIGEgYmx1ZXRvb3RoCj4gbmV0d29yayBiZXR3ZWVuIG15IGxhcHRvcCAoYXMgYSBQ
-QU4gY2xpZW50KSBhbmQgbXkgZGVza3RvcCAoYXMgYSBQQU4KPiBzZXJ2ZXIpLiAgSSBoYXZlIGEg
-Z2VudG9vIGRpc3RyaWJ1dGlvbiBvbiBhbWQ2NCBkaXN0cmlidXRpb24uCj4gSSBjb21waWxlZCB3
-aXRoIENGTEFHUz0tZyBMREZMQUdTPS1nIC4vY29uZmlndXJlIC0tcHJlZml4PS91c3IKPiAtLWhv
-c3Q9eDg2XzY0LXBjLWxpbnV4LWdudSAtLW1hbmRpcj0vdXNyL3NoYXJlL21hbgo+IC0taW5mb2Rp
-cj0vdXNyL3NoYXJlL2luZm8gLS1kYXRhZGlyPS91c3Ivc2hhcmUgLS1zeXNjb25mZGlyPS9ldGMK
-PiAtLWxvY2Fsc3RhdGVkaXI9L3Zhci9saWIgLS1lbmFibGUtZGVidWcgLS1lbmFibGUtaW5vdGlm
-eSAtLWVuYWJsZS1oYWwKPiAtLWVuYWJsZS11c2IgLS1lbmFibGUtZ2xpYiAtLWRpc2FibGUtb2Jl
-eCAtLWRpc2FibGUtYWxzYQo+IC0tZW5hYmxlLW5ldHdvcmsgLS1lbmFibGUtc2VyaWFsIC0tZW5h
-YmxlLWlucHV0IC0tZGlzYWJsZS1hdWRpbwo+IC0tZGlzYWJsZS1zeW5jIC0tZGlzYWJsZS1lY2hv
-IC0tZW5hYmxlLWhjaWQgLS1kaXNhYmxlLXRlc3QKPiAtLWRpc2FibGUtc2RwZCAtLWRpc2FibGUt
-aGlkZCAtLWRpc2FibGUtcGFuZCAtLWVuYWJsZS1jdXBzCj4gLS1lbmFibGUtY29uZmlnZmlsZXMg
-LS1kaXNhYmxlLWluaXRzY3JpcHRzIC0tZGlzYWJsZS1wY21jaWFydWxlcwo+IC0tZW5hYmxlLWJj
-Y21kIC0tZW5hYmxlLWF2Y3RybCAtLWVuYWJsZS1oaWQyaGNpIC0tZW5hYmxlLWRmdXRvb2wKPiAt
-LWxvY2Fsc3RhdGVkaXI9L3ZhciAtLWxpYmRpcj0vdXNyL2xpYjY0IC0tYnVpbGQ9eDg2XzY0LXBj
-LWxpbnV4LWdudQo+Cj4gVGhpcyBpcyB0aGUgbG9nIHdoZW4gdGhlIHNlcnZpY2Ugc3RhcnRzCj4K
-PiBBdWcgMTUgMjI6MDA6MDcgcm9lbnRnZW4gaGNpZFsxMDQ4MV06IEJsdWV0b290aCBIQ0kgZGFl
-bW9uCj4gQXVnIDE1IDIyOjAwOjA3IHJvZW50Z2VuIGhjaWRbMTA0ODFdOiBIQ0kgZGV2IDAgcmVn
-aXN0ZXJlZAo+IEF1ZyAxNSAyMjowMDowNyByb2VudGdlbiBoY2lkWzEwNDgxXTogSENJIGRldiAw
-IGFscmVhZHkgdXAKPiBBdWcgMTUgMjI6MDA6MDcgcm9lbnRnZW4gaGNpZFsxMDQ4MV06IERldmlj
-ZSBoY2kwIGhhcyBiZWVuIGFkZGVkCj4gQXVnIDE1IDIyOjAwOjA3IHJvZW50Z2VuIGhjaWRbMTA0
-ODFdOiBTdGFydGluZyBzZWN1cml0eSBtYW5hZ2VyIDAKPiBBdWcgMTUgMjI6MDA6MDcgcm9lbnRn
-ZW4gYWNwaWQ6IGNsaWVudCBjb25uZWN0ZWQgZnJvbSAxMDUwMVsxMDQ6MTA0XQo+IEF1ZyAxNSAy
-MjowMDowNyByb2VudGdlbiBhY3BpZDogMSBjbGllbnQgcnVsZSBsb2FkZWQKPiBBdWcgMTUgMjI6
-MDA6MDcgcm9lbnRnZW4gaGNpZFsxMDQ4MV06IERldmljZSBoY2kwIGhhcyBiZWVuIGFjdGl2YXRl
-ZAo+IEF1ZyAxNSAyMjowMDowNyByb2VudGdlbiBoY2lkWzEwNDgxXTogU3RhcnRpbmcgU0RQIHNl
-cnZlcgo+IEF1ZyAxNSAyMjowMDowNyByb2VudGdlbiBoY2lkWzEwNDgxXTogQ3JlYXRlZCBsb2Nh
-bCBzZXJ2ZXIgYXQKPiB1bml4OmFic3RyYWN0PS92YXIvcnVuL2RidXMteHR5SUFiMU9BaixndWlk
-PTYyNWI4ZTAxZmMyY2QzN2IzNGJhNjcwMDQ2YzM1YjQ3Cj4gQXVnIDE1IDIyOjAwOjA3IHJvZW50
-Z2VuIGlucHV0WzEwNTA4XTogQmx1ZXRvb3RoIElucHV0IGRhZW1vbgo+IEF1ZyAxNSAyMjowMDow
-NyByb2VudGdlbiBpbnB1dFsxMDUwOF06IFJlZ2lzdGVyZWQgaW5wdXQgbWFuYWdlcgo+IHBhdGg6
-L29yZy9ibHVlei9pbnB1dAo+IEF1ZyAxNSAyMjowMDowNyByb2VudGdlbiBuZXR3b3JrWzEwNTA5
-XTogQmx1ZXRvb3RoIE5ldHdvcmsgZGFlbW9uCj4gQXVnIDE1IDIyOjAwOjA3IHJvZW50Z2VuIG5l
-dHdvcmtbMTA1MDldOiBGYWlsZWQgdG8gY2xhaW0gdG8gaW50ZXJmYWNlOgo+IEF1ZyAxNSAyMjow
-MDowNyByb2VudGdlbiBuZXR3b3JrWzEwNTA5XTogUmVnaXN0ZXJlZCBtYW5hZ2VyCj4gcGF0aDov
-b3JnL2JsdWV6L25ldHdvcmsKPiBBdWcgMTUgMjI6MDA6MDcgcm9lbnRnZW4gbmV0d29ya1sxMDUw
-OV06IFJlZ2lzdGVyZWQgc2VydmVyCj4gcGF0aDovb3JnL2JsdWV6L25ldHdvcmsvbmFwCj4gQXVn
-IDE1IDIyOjAwOjA4IHJvZW50Z2VuIG5ldHdvcmtbMTA1MDldOiBhZGRfc2VydmVyX3JlY29yZDog
-Z290IHJlY29yZAo+IGlkIDB4MTAwMDAKPiBBdWcgMTUgMjI6MDA6MDggcm9lbnRnZW4gbmV0d29y
-a1sxMDUwOV06IFJlZ2lzdGVyZWQgc2VydmVyCj4gcGF0aDovb3JnL2JsdWV6L25ldHdvcmsvZ24K
-PiBBdWcgMTUgMjI6MDA6MDggcm9lbnRnZW4gbmV0d29ya1sxMDUwOV06IFJlZ2lzdGVyZWQgc2Vy
-dmVyCj4gcGF0aDovb3JnL2JsdWV6L25ldHdvcmsvcGFudQo+Cj4gbm90ZSB0aGF0ICJGYWlsZWQg
-dG8gY2xhaW0gaW50ZXJmYWNlIi4KPiBBbnlob3csIHBhbjAgZ2V0cyBjcmVhdGVkOgo+Cj4gcm9l
-bnRnZW4gfiAjIGlwIGFkZHIgc2hvdyBkZXYgcGFuMAo+IDEzOiBwYW4wOiA8QlJPQURDQVNULE1V
-TFRJQ0FTVCxVUCwxMDAwMD4gbXR1IDE1MDAgcWRpc2Mgbm9xdWV1ZQo+ICAgICBsaW5rL2V0aGVy
-IDAwOjAwOjAwOjAwOjAwOjAwIGJyZCBmZjpmZjpmZjpmZjpmZjpmZgo+ICAgICBpbmV0IDE5Mi4x
-NjguMTk4LjEvMjQgYnJkIDE5Mi4xNjguMTk4LjI1NSBzY29wZSBnbG9iYWwgcGFuMAo+ICAgICBp
-bmV0NiBmZTgwOjoyMDA6ZmY6ZmUwMDowLzY0IHNjb3BlIGxpbmsKPiAgICAgICAgdmFsaWRfbGZ0
-IGZvcmV2ZXIgcHJlZmVycmVkX2xmdCBmb3JldmVyCj4KPiBOb3csIHdoaWxlIEknbSB3YXRjaGlu
-ZyBwcm9jZXNzIDEwNTA5IHdpdGggZ2RiLCBvbiBteSBsYXB0b3AgSSBsYXVuY2g6Cj4KPiBwYW5k
-IC1uIC0tYyA8YmRhZGRyPgo+Cj4gT24gdGhlIHNlcnZlciBJIGdldCB0aGlzIGNyYXNoOgo+Cj4g
-UHJvZ3JhbSByZWNlaXZlZCBzaWduYWwgU0lHU0VHViwgU2VnbWVudGF0aW9uIGZhdWx0Lgo+IDB4
-MDAwMDAwMDAwMDQwNzczZiBpbiBjb25uZWN0X3NldHVwX2V2ZW50IChjaGFuPTB4NTE5NzEwLAo+
-IGNvbmQ9R19JT19JTiwgZGF0YT0weDUxNWFmMCkgYXQgc2VydmVyLmM6NDIxCj4gNDIxICAgICAg
-ICAgICAgIGlmICgrK25zLT5wYXV0aC0+YXR0ZW1wdHMgPiAxKSB7Cj4gKGdkYikgYnQKPiAjMCAg
-MHgwMDAwMDAwMDAwNDA3NzNmIGluIGNvbm5lY3Rfc2V0dXBfZXZlbnQgKGNoYW49MHg1MTk3MTAs
-Cj4gY29uZD1HX0lPX0lOLCBkYXRhPTB4NTE1YWYwKSBhdCBzZXJ2ZXIuYzo0MjEKPiAjMSAgMHgw
-MDAwMmI2MjYyZjc1NjQ2IGluIGdfaW9fdW5peF9kaXNwYXRjaCAoc291cmNlPTB4NTE5N2IwLAo+
-IGNhbGxiYWNrPTB4NDA3NjFiIDxjb25uZWN0X3NldHVwX2V2ZW50PiwgdXNlcl9kYXRhPTB4NTE1
-YWYwKQo+ICAgICBhdCBnaW91bml4LmM6MTYyCj4gIzIgIDB4MDAwMDJiNjI2MmY0MWRkZSBpbiBn
-X21haW5fZGlzcGF0Y2ggKGNvbnRleHQ9MHg1MTYzMjApIGF0IGdtYWluLmM6MjA0NQo+ICMzICAw
-eDAwMDAyYjYyNjJmNDM1NDQgaW4gSUFfX2dfbWFpbl9jb250ZXh0X2Rpc3BhdGNoCj4gKGNvbnRl
-eHQ9MHg1MTYzMjApIGF0IGdtYWluLmM6MjU5Ngo+ICM0ICAweDAwMDAyYjYyNjJmNDNiODkgaW4g
-Z19tYWluX2NvbnRleHRfaXRlcmF0ZSAoY29udGV4dD0weDUxNjMyMCwKPiBibG9jaz0xLCBkaXNw
-YXRjaD0xLCBzZWxmPTB4NTFhOWYwKSBhdCBnbWFpbi5jOjI2NzcKPiAjNSAgMHgwMDAwMmI2MjYy
-ZjQ0MzkzIGluIElBX19nX21haW5fbG9vcF9ydW4gKGxvb3A9MHg1MTQyMTApIGF0IGdtYWluLmM6
-Mjg4MQo+ICM2ICAweDAwMDAwMDAwMDA0MDRjNzAgaW4gbWFpbiAoYXJnYz0xLCBhcmd2PTB4N2Zm
-ZjQ3Y2I4YWM4KSBhdCBtYWluLmM6OTEKPiAoZ2RiKSBpbmZvIGxvY2Fscwo+IGNvbm4gPSAoREJ1
-c0Nvbm5lY3Rpb24gKikgMHg1MTVhZjAKPiBucyA9IChzdHJ1Y3QgbmV0d29ya19zZXJ2ZXIgKikg
-MHg1MTQ1ZTAKPiBwYXRoID0gIlwwMDJcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAw77+9RVFc
-MDAwXDAwMFwwMDBcMDAwXDAwMO+/ve+/ve+/vWJcMDAxXDAwMFwwMDBcMDAwQE9RXDAwMFwwMDBc
-MDAwXDAwMFwwMDDvv71cMjA177+9R++/vVwxNzdcMDAwXDAwMO+/ve+/ve+/vWJiK1wwMDBcMDAw
-XDAwMFwyMDbvv71HXDAwMFwwMDBcMDAwXDAwMO+/vUVRXDAwMFwwMDBcMDAwXDAwMCIKPiByZXEg
-PSAoc3RydWN0IGJuZXBfc2V0dXBfY29ubl9yZXEgKikgMHg3ZmZmNDdjYjdlZjAKPiBwa3QgPSAi
-XDAwMVwwMDFcMDAyXDAyMVwwMjZcMDIxXDAyNVwwMDDvv70nXDAzNmNiK1wwMDBcMDAw77+9XDIw
-NO+/vUfvv71cMTc3IiwKPiAnXDAnIDxyZXBlYXRzIDE4IHRpbWVzPiwgIlwyMDJ2UVwwMDBcMDAw
-XDAwMFwwMDBcMDAwCj4gXDIwMe+/vUfvv71cMTc3XDAwMFwwMDBcMjMwXDIwMO+/vUfvv71cMTc3
-XDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMEg/SmNiK1wwMDBcMDAw77+9
-XDIwMO+/vUfvv71cMTc3XDAwMFwwMDBcMjMwXDIwMO+/vUfvv71cMTc3XDAwMFwwMDBcMDAxXGIi
-LAo+ICdcMCcgPHJlcGVhdHMgMjIgdGltZXM+LCAi77+9XDIwMSIsICdcMCcgPHJlcGVhdHMgMjIg
-dGltZXM+LAo+ICJcXFxuXDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMVwwMDBcMDAwXDAwMFww
-MDBcMDAwXDAwMFwwMDBcYlwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDDvv73vv73vv71FXDAw
-MFwwMDBcMDAwXDAwMFwwMDFcYlwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMCVcMDMxXDAwMFwwMDBc
-MDAwXDAwMFwwMDBcMDAwXDAwMVwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDDvv71cMjAxIiwK
-PiAnXDAnIDxyZXBlYXRzIDIyIHRpbWVzPiwKPiAiXFxcblwwMDBcMDAwXDAwMFwwMDBcMDAwXDAw
-MFwwMDBcMDIwXDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXGJcMDAwXDAwMFwwMDAiLi4uCj4gbiA9
-IDcKPiBnZXJyID0gR19JT19FUlJPUl9OT05FCj4gcHNlcnZpY2UgPSAodWludDhfdCAqKSAweDUx
-NDVkMCAi77+9RVEiCj4gcm9sZSA9IDAKPiByZXNwb25zZSA9IDAKPiAoZ2RiKSBwIG5zLT5wYXV0
-aAo+ICQxID0gKHN0cnVjdCBwZW5kaW5nX2F1dGggKikgMHgwCj4KPiBPbiB0aGUgbG9nIGZpbGUg
-SSBvbmx5IHNlZToKPgo+IEF1ZyAxNSAyMjoxNzozOCByb2VudGdlbiBuZXR3b3JrWzEwNTA5XTog
-Q29ubmVjdGlvbgo+IGZyb206MDA6MTk6QzE6OEM6NUY6ODAgb24gUFNNIDE1Cj4KPiBJIHRyaWVk
-IHRoaXMgcGF0Y2g6Cj4KPiAtLS0gbmV0d29yay9zZXJ2ZXIuYy5vcmlnICAgICAgIDIwMDctMDgt
-MTUgMjI6MjY6MTguMDAwMDAwMDAwICswMjAwCj4gKysrIG5ldHdvcmsvc2VydmVyLmMgICAgMjAw
-Ny0wOC0xNSAyMjoyNjo0My4wMDAwMDAwMDAgKzAyMDAKPiBAQCAtNDE4LDcgKzQxOCw3IEBACj4g
-ICAgICAgICAgICAgICAgIHJldHVybiBGQUxTRTsKPiAgICAgICAgIH0KPgo+IC0gICAgICAgaWYg
-KCsrbnMtPnBhdXRoLT5hdHRlbXB0cyA+IDEpIHsKPiArICAgICAgIGlmIChucy0+cGF1dGggJiYg
-Kytucy0+cGF1dGgtPmF0dGVtcHRzID4gMSkgewo+ICAgICAgICAgICAgICAgICAvKgo+ICAgICAg
-ICAgICAgICAgICAgKiBJZ25vcmUgcmVwZWF0ZWQgQk5FUCBzZXR1cCBjb25uZWN0aW9uIHJlcXVl
-c3Q6IHRoZXJlCj4gICAgICAgICAgICAgICAgICAqIGlzIGEgcGVuZGluZyBhdXRob3JpemF0aW9u
-IHJlcXVlc3QgZm9yIHRoaXMgZGV2aWNlLgo+Cj4gaXQgYXZvaWRzIHRoZSBjcmFzaCwgYnV0IG5v
-IGJuZXAgaW50ZXJmYWNlIGlzIGNyZWF0ZWQgYW5kIG9uIHRoZQo+IGNsaWVudCBJIGdldCBQcm90
-b2NvbCBlcnJvcig3MSkuCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFRoaXMgU0YubmV0IGVtYWlsIGlz
-IHNwb25zb3JlZCBieTogU3BsdW5rIEluYy4KPiBTdGlsbCBncmVwcGluZyB0aHJvdWdoIGxvZyBm
-aWxlcyB0byBmaW5kIHByb2JsZW1zPyAgU3RvcC4KPiBOb3cgU2VhcmNoIGxvZyBldmVudHMgYW5k
-IGNvbmZpZ3VyYXRpb24gZmlsZXMgdXNpbmcgQUpBWCBhbmQgYSBicm93c2VyLgo+IERvd25sb2Fk
-IHlvdXIgRlJFRSBjb3B5IG9mIFNwbHVuayBub3cgPj4gIGh0dHA6Ly9nZXQuc3BsdW5rLmNvbS8K
-PiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IEJsdWV6
-LWRldmVsIG1haWxpbmcgbGlzdAo+IEJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+
-IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVs
-Cj4KCkhpIFNpbW9uZSwKCkl0IGlzIG5vdyBmaXhlZCBpbiB0aGUgQmx1ZVogQ1ZTLgoKQ2xhdWRp
-by4KCi0tIAotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0KQ2xhdWRpbyBUYWthaGFzaQpJbnN0aXR1dG8gTm9raWEgZGUgVGVjbm9sb2dpYSAt
-IElOZFQKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6
-IFNwbHVuayBJbmMuClN0aWxsIGdyZXBwaW5nIHRocm91Z2ggbG9nIGZpbGVzIHRvIGZpbmQgcHJv
-YmxlbXM/ICBTdG9wLgpOb3cgU2VhcmNoIGxvZyBldmVudHMgYW5kIGNvbmZpZ3VyYXRpb24gZmls
-ZXMgdXNpbmcgQUpBWCBhbmQgYSBicm93c2VyLgpEb3dubG9hZCB5b3VyIEZSRUUgY29weSBvZiBT
-cGx1bmsgbm93ID4+ICBodHRwOi8vZ2V0LnNwbHVuay5jb20vCl9fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVl
-ei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5u
-ZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
+Hello Marcel,
+
+Yeah, I agree this approach is kind of a mess, but it is in line with  
+all of the goals of my project(portability, consistency, ease of use  
+and development).  I would like to have as much done in java as  
+possible.  If I write a lot of the code in C, then someone will have  
+to port it when they move to another OS, or pray that the headset  
+profile is as far along as the one in BlueZ, or worse pray that it  
+exists at all.  I love C, but java is simply a more accessible  
+language, making it easier for other developers to embellish the  
+profile.
+
+agree to disagree.  :)
+
+cheers,
+robert
+
+On Aug 24, 2007, at 8:32 AM, Marcel Holtmann wrote:
+
+> Hi Robert,
+>
+>> So I was planning to implement the profile inside of java, which is
+>> why I am working on the Avetana BT stack, but I don't beleive that I
+>> can handle any of the SCO communication from java.  Essentially I am
+>> planning write the command processor for handling the AT commands in
+>> Java (easier to maintain and debug), and then just create a small
+>> daemon that handles routing traffic between the SCO channel and the
+>> Alsa devices.  Perhaps communicate between the two using D-Bus?
+>
+> that makes my stomach turn around. You you are of course free to do  
+> so,
+> but doing everything in plain C is much easier.
+>
+> And I would advise to try an integration with our audio daemon.
+> Otherwise it would become one of these external things that is hard to
+> install and maintain.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> ---------------------------------------------------------------------- 
+> ---
+> This SF.net email is sponsored by: Splunk Inc.
+> Still grepping through log files to find problems?  Stop.
+> Now Search log events and configuration files using AJAX and a  
+> browser.
+> Download your FREE copy of Splunk now >>  http://get.splunk.com/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >>  http://get.splunk.com/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
