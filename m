@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1187964427.3293.3.camel@snoogens.fab.redhat.com>
-References: <1187612230.26239.79.camel@cookie.hadess.net>
-	<1187958606.15402.169.camel@violet>
-	<1187964427.3293.3.camel@snoogens.fab.redhat.com>
-Date: Fri, 24 Aug 2007 16:27:46 +0200
-Message-Id: <1187965667.15402.181.camel@violet>
+In-Reply-To: <2EB6297382462046A9427D7324788A480217D756@MCLNEXVS06.resource.ds.bah.com>
+References: <2EB6297382462046A9427D7324788A480217D35A@MCLNEXVS06.resource.ds.bah.com>
+	<1187957692.15402.149.camel@violet>
+	<2EB6297382462046A9427D7324788A480217D756@MCLNEXVS06.resource.ds.bah.com>
+Date: Fri, 24 Aug 2007 16:25:37 +0200
+Message-Id: <1187965538.15402.177.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Better startup under KDE
+Subject: Re: [Bluez-devel] Multiple Bluetooth Dongles
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,22 +22,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Hi Richard,
 
-> > > This patch comes from a KDE user via:
-> > > https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=247284
-> > > 
-> > > This makes the bluetooth applet startup after the panel, and disable
-> > > startup notification (as it doesn't support it).
-> > 
-> > no idea why you wanna start a GNOME applet under KDE. They should have
-> > their own stuff.
+> In my case, I am not using the SCO feature. I haven't gotten that far in
+> my development. 
+> The steps I followed were:
+> - boot my PC
+> - modified the HCI_MAX_DEV to 30
+> - ran make & make install
+> - reboot ( probably not necessary, but what the heck ??)
+> - plug in 16 Bluetooth USB dongles. All appear to work OK. For each of
+> these, my Fedora Core 6 system pops up a small dialog box with "BlueZ
+> (X) Switched device into connected mode"
+> - plug in USB flash device. Works OK. 
+> - plug in USB mouse. Works OK.
+> - plug in Bluetooth dongle 17. No obvious response from the system.
+> After a few seconds, the USB mouse no longer works. The keyboard no
+> longer works. A power down restart is required.
 > 
-> Though it's only working properly in KDE4, and this applet is still
-> useful for KDE3 users with newer versions of bluez-libs and bluez-utils.
+> I realize that the test setup is tedious, but maybe you can point me
+> towards what to look for ??
 
-no. There is a KDE3 release that has passkey agent stuff and management
-tools like KDE4 does.
+load the hci_usb with isoc=0 and see how that works out. If not, then
+that is an USB subsystem issue. Make sure you use 2.6.23-rc3.
 
 Regards
 
