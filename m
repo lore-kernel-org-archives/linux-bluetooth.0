@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <E21A90CDB9591542899EFC7FB4ED5CC905326B06@tfmail02.TFMAIL.COM>
-References: <E21A90CDB9591542899EFC7FB4ED5CC905326B06@tfmail02.TFMAIL.COM>
-Date: Fri, 24 Aug 2007 14:17:28 +0200
-Message-Id: <1187957848.15402.155.camel@violet>
+In-Reply-To: <8de6c3e20708220924g3a8db7a5paa153e99b5d829ea@mail.gmail.com>
+References: <8de6c3e20708220924g3a8db7a5paa153e99b5d829ea@mail.gmail.com>
+Date: Fri, 24 Aug 2007 14:16:20 +0200
+Message-Id: <1187957780.15402.152.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] About PTS test Dongle
+Subject: Re: [Bluez-users] hci_read_remote_name() simultaneously on	multiple
+	dongles question
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,18 +21,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Jeffrey,
 
-> 	Does anyone have the experience about BQB test? I'd like to know what kind of dongle can match the PTS software. I searched the web and found that just CSR have one LABELed "DEV-SYS-1487-1B". 
+> I apologize for yet another e-mail about this, but as the last one was
+> too wordy I have narrowed down the problem to a much simpler issue.
 > 
-> 	Could you please give me one list of dongle that can match the PTS requirement? 
+> As my changes to hci.c didn't do anything towards resolving the name
+> mixup, I was wondering how the hci_read_remote_name() ensures that the
+> packet that comes in isn't a packet response to another
+> hci_read_remote_name() request.  It seems that everytime that I do
+> multiple hci_read_remote_name() requests at the same time, that the
+> name request replies indiscriminately choose whichever dongle to
+> enter, and at the hci.c level, there is no way to verify the btaddr
+> that that name request came from, which is rather frustrating.
 > 
-> 	Thanks very much!
+> As some background for what "fixes" that I tried to do to hci.c were,
+> I simply compared the bdaddr const variable with rn.bdaddr near the
+> end of hci_read_remote_name_with_clock_offset() to see if it didn't
+> match, and to reject it if so and return -1, and to allow the name to
+> be copied to the name pointer otherwise.
+> 
+> If anyone out there has experienced similar problems with multiple
+> dongles and hci_read_remote_name(), any help would be appreciated if
+> any solutions to this have been found. 
 
-as far as I know, the PTS dongle is a normal CSR BlueCore4 based USB
-dongle. However they might use a special firmware or the PTS software
-checks a special build id number before starting. Don't know since I
-never used PTS by myself.
+feel free to post a patch, but honestly this is broken for quite some
+time now. The kernel and the new D-Bus based API have no problems with
+it and that should be the main way to retrieve remote names. So I am not
+really keen to fix this since direct HCI access for userspace apps was a
+design mistake.
 
 Regards
 
