@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: oliver@onesteprevolution.com,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1187689633.6051.5.camel@ascension>
-References: <1187689633.6051.5.camel@ascension>
-Date: Fri, 24 Aug 2007 14:21:15 +0200
-Message-Id: <1187958075.15402.163.camel@violet>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <2EB6297382462046A9427D7324788A480217D35A@MCLNEXVS06.resource.ds.bah.com>
+References: <2EB6297382462046A9427D7324788A480217D35A@MCLNEXVS06.resource.ds.bah.com>
+Date: Fri, 24 Aug 2007 14:14:52 +0200
+Message-Id: <1187957692.15402.149.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Sillicon Wave alternative
+Subject: Re: [Bluez-devel] Multiple Bluetooth Dongles
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,24 +20,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Oliver,
+Hi Richard,
 
-> I've been attempting to get my Motorola HS810 (bluetooth headset) to
-> work with Linux, but I've not had much luck.
-> 
-> [oli@ascension ~]$ sudo /usr/sbin/hciconfig -a | grep Manufacturer
->         Manufacturer: Silicon Wave (11)
-> 
-> I take I'm out of luck with my bluetooth adapter? It works fine for file
-> transfers and so on! Is there any timeline for when these adapters might
-> worth with audio?
-> 
-> If I have to get a new adapter, what would you recommend (in the UK)?
+> I have a system that uses multiple Bluetooth dongles and works just
+> fine. I've had my system running with several USB hubs and up to the
+> 16 maximum devices that Bluez supports. Now I have a changing
+> requirement from my customer to handle more than 16 Bluetooth devices.
+> They want support for up to 30 Bluetooth devices.
+>  
+> I changed the HCI_MAX_DEV in bluez_libs/include/hci.h from 16 to
+> 30, recompiled and installed bluez_libs and bluez_utils. No problem.
+>  
+> My program works fine with up to 16 Bluetooth devices, but the 17th
+> device is not recognized and sometimes the entire USB will no longer
+> work.
 
-for A2DP stereo high quality audio support you should have no problem,
-but if you wanna use your voice headset, then this might take some
-additional rounds of hacking around the kernel. Not sure when we get
-this done.
+we might broke something here since I haven't tested this in quite a
+while. Mainly because I don't care so much anymore. Having these kind of
+test setups are nasty.
+
+The USB part can be an issue if you use the SCO support of the hci_usb
+driver. Load the driver with isoc=0 to disable it. The ISOC frames for
+the SCO support consume to much USB bandwidth.
 
 Regards
 
