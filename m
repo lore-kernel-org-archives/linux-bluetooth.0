@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 24 Aug 2007 14:14:53 +0200 (CEST)
-From: Peter Wippich <pewi@gw-instruments.de>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1187964393.5121.10.camel@matthias.BEYONDSOFT.local>
-Message-ID: <Pine.LNX.4.63.0708241410030.12067@redbean.intranet.gw-instruments.de>
+In-Reply-To: <8de6c3e20708231340j439ca230i487e816693149441@mail.gmail.com>
 References: <2EB6297382462046A9427D7324788A480217D35A@MCLNEXVS06.resource.ds.bah.com>
 	<8de6c3e20708231340j439ca230i487e816693149441@mail.gmail.com>
-	<1187964393.5121.10.camel@matthias.BEYONDSOFT.local>
-MIME-Version: 1.0
-Subject: Re: [Bluez-devel] multithreaded name resolution
+Date: Fri, 24 Aug 2007 14:13:03 +0200
+Message-Id: <1187957584.15402.146.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Multiple Bluetooth Dongles
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,31 +21,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Jeffrey,
 
-Hi Matthias,
+> We are doing something similar in that we are using multiple dongles
+> as well, and are also interested in doing something similar to what
+> your customer wants to do by increasing the # of dongles.
 
-On Fri, 24 Aug 2007, Matthias Becker wrote:
+the kernel can handles as many dongles as you want and as long as you
+have memory for the hci_dev structure.
 
-> Hi,
-> 
-> I tried to read the name of different devices parallel using multi
-> threading, but without success. If there is one bluetooth device I works
-> (as there is no real multi threading). If there are who devices, the
-> same name is reported for both devices. In another test with 6 devices
-> hci_read_remote_name returned something <0 so I did not get any name at
-> all.
+For the userspace it is limited to 16, because of the ioctl() design.
 
-this won't work. Asking for the name of a device is some sort of 
-connection setup, and most (all ?) Bt chips do not allow / can not handle 
-parallel connection setups (even though parallel connections are 
-possible). 
+Regards
 
-So don't try further, the problem is outside your code (and even BlueZ). 
-
-Ciao, 
-
-Peter 
-
+Marcel
 
 
 
