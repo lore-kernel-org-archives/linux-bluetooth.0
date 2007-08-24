@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <988EE2C769AC284ABAE9328BFC10703F0B9733@ZMY16EXM66.ds.mot.com>
-References: <988EE2C769AC284ABAE9328BFC10703F0B9733@ZMY16EXM66.ds.mot.com>
-Date: Fri, 24 Aug 2007 14:08:13 +0200
-Message-Id: <1187957293.15402.139.camel@violet>
+In-Reply-To: <076BF2A0-A0AF-44B5-9A4D-2BC3EBBE2940@cadvium.net>
+References: <076BF2A0-A0AF-44B5-9A4D-2BC3EBBE2940@cadvium.net>
+Date: Fri, 24 Aug 2007 14:06:53 +0200
+Message-Id: <1187957213.15402.137.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Bluez with MISPEL
+Subject: Re: [Bluez-devel] SCO Question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,18 +20,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Sinah,
+Hi Robert,
 
-> I am trying to install Bluez driver in BusyBox which is MISPEL
-> chipset.
-> BlueZ util has a dependency on 'hal.pc'. I downloaded the hal-0.5.9.1.
-> The hal configuration has dependency on expat. I installed expat but
-> while running the configuration of hal I am getting error msg: 
-> checking for XML_ParserCreate in -lexpat.... no
-> configuration: error: Can't find expat library. Please install expat.
+> How would I go about redirecting incoming SCO data to an alsa device,  
+> and transmit incoming audio data out as SCO?
+> 
+> I have read the following pages,
+> http://wiki.bluez.org/wiki/Audio
+> http://wiki.bluez.org/wiki/HOWTO/AudioDevices
+> 
+> but everything described seems to do too much.  I would prefer to  
+> handle the RFCOMM channel, and SDP registration elsewhere.   
+> Presently, I just want to determine how to redirect the SCO traffic.
 
-it has no HAL and Expat dependency. These components are optional. You
-can use --disable-hal and --disable-expat.
+actually you can't really do SCO without a profile. In theory you can,
+but that is to compatible with out devices. Since this kind of
+application doesn't really make sense for most people we didn't focus on
+it and so nothing like that is available. However hstest.c and other SCO
+demos can be used to quickly write something like that. The hardest part
+is to get the ALSA thing right. Again, you have to write that by
+yourself since we have no need for this right now.
 
 Regards
 
