@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Matthias Becker <matthias.becker@beyondsoft.de>
+Message-ID: <BAY114-W2714BF579C6DC788F8247CD7D70@phx.gbl>
+From: Mikael Bengtsson <micke_b.b@hotmail.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <8de6c3e20708231340j439ca230i487e816693149441@mail.gmail.com>
-References: <2EB6297382462046A9427D7324788A480217D35A@MCLNEXVS06.resource.ds.bah.com>
-	<8de6c3e20708231340j439ca230i487e816693149441@mail.gmail.com>
-Date: Fri, 24 Aug 2007 16:06:33 +0200
-Message-Id: <1187964393.5121.10.camel@matthias.BEYONDSOFT.local>
-Mime-Version: 1.0
-Subject: [Bluez-devel]  multithreaded name resolution
+Date: Fri, 24 Aug 2007 13:35:31 +0200
+In-Reply-To: <076BF2A0-A0AF-44B5-9A4D-2BC3EBBE2940@cadvium.net>
+References: <076BF2A0-A0AF-44B5-9A4D-2BC3EBBE2940@cadvium.net>
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] SCO Question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,51 +16,146 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1122008010=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+--===============1122008010==
+Content-Type: multipart/alternative;
+	boundary="_80a39df3-bdfa-4a03-8d3f-34434074b2f5_"
 
-I tried to read the name of different devices parallel using multi
-threading, but without success. If there is one bluetooth device I works
-(as there is no real multi threading). If there are who devices, the
-same name is reported for both devices. In another test with 6 devices
-hci_read_remote_name returned something <0 so I did not get any name at
-all.
-
-hcitool scan --flush
-Scanning ...
-        00:1A:89:6F:DE:EE       Nokia 5300
-        00:19:63:9D:09:16       K800i
-
-My multithreaded tool:
-
-00:19:63:9D:09:16       K800i
-00:1A:89:6F:DE:EE       K800i
+--_80a39df3-bdfa-4a03-8d3f-34434074b2f5_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
 
-When I don't start multiple threads but do it single threaded everything
-works fine, and my code should be absolutly threadsafe.
+Hello Robert!
+=20
+I want to do the same thing as you. The methods for redirecting audio accor=
+ding to the different HOWTO:s seems to involve A2D2P which, I think, is use=
+d for point-to-point communication with a headset. A2D2P is not SCO, but ra=
+ther ACL (am I right)?
+=20
+I would like to receive SCO and redirect it to the sound card via Alsa. The=
+ idea is that I will recieve SCO in a buffer and then write the buffer to t=
+he sound card with Alsa functions. The sound card must be initalized with t=
+he correct parameters regarding sample rate, PCM format and so on before be=
+ginning to write to the buffer.
+=20
+I will also record voice via the sound card and then write to a buffer to t=
+he socket for SCO.
+=20
+We have a test version where the voice from a Bluetooth client is echoed ba=
+ck from the master to the client. The result is that the person talking in =
+the headset will here himself. This is simply done by reading the SCO socke=
+t and writing back the same data to the socket.
+=20
+-Mikael> To: bluez-devel@lists.sourceforge.net> From: rbscott@cadvium.net> =
+Date: Wed, 22 Aug 2007 11:23:16 -0700> Subject: [Bluez-devel] SCO Question>=
+ > Hello Bluez,> > How would I go about redirecting incoming SCO data to an=
+ alsa device, > and transmit incoming audio data out as SCO?> > I have read=
+ the following pages,> http://wiki.bluez.org/wiki/Audio> http://wiki.bluez.=
+org/wiki/HOWTO/AudioDevices> > but everything described seems to do too muc=
+h. I would prefer to > handle the RFCOMM channel, and SDP registration else=
+where. > Presently, I just want to determine how to redirect the SCO traffi=
+c.> > Thanks,> --robert> > ------------------------------------------------=
+-------------------------> This SF.net email is sponsored by: Splunk Inc.> =
+Still grepping through log files to find problems? Stop.> Now Search log ev=
+ents and configuration files using AJAX and a browser.> Download your FREE =
+copy of Splunk now >> http://get.splunk.com/> _____________________________=
+__________________> Bluez-devel mailing list> Bluez-devel@lists.sourceforge=
+.net> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+_________________________________________________________________
+Dela filer, prata och spela spel med dina v=E4nner p=E5 Messenger!
+http://get.live.com/?revipcountry=3Dse=
 
-Is this a bug in BlueZ or was it never supposed to work parallel?
+--_80a39df3-bdfa-4a03-8d3f-34434074b2f5_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-When I run hcidump -V  I see that the right names are recived:
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr 00:1A:89:6F:DE:EE name 'Nokia 5300'
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr 00:19:63:9D:09:16 name 'K800i'
+<html>
+<head>
+<style>
+.hmmessage P
+{
+margin:0px;
+padding:0px
+}
+body.hmmessage
+{
+FONT-SIZE: 10pt;
+FONT-FAMILY:Tahoma
+}
+</style>
+</head>
+<body class=3D'hmmessage'>
+Hello Robert!<BR>
+&nbsp;<BR>
+I want to do the same thing as you. The methods for redirecting audio accor=
+ding to the different HOWTO:s seems to involve A2D2P which, I think, is use=
+d for point-to-point communication with a headset. A2D2P is not SCO, but ra=
+ther ACL (am I right)?<BR>
+&nbsp;<BR>
+I would like to receive&nbsp;SCO and redirect it to the sound card via Alsa=
+. The idea is that I will recieve SCO in a buffer and then write the buffer=
+ to the sound card with Alsa functions. The sound card must be initalized w=
+ith the correct parameters regarding sample rate, PCM format and so on befo=
+re beginning to write to the buffer.<BR>
+&nbsp;<BR>
+I will also record voice via the sound card and then write to a buffer to t=
+he socket for SCO.<BR>
+&nbsp;<BR>
+We have a test version where the voice from a Bluetooth client is echoed ba=
+ck from the master to the client. The result is that the person talking in =
+the headset will here himself. This is simply done by reading the SCO socke=
+t and writing back the same data to the socket.<BR>
+&nbsp;<BR>
+-Mikael<BR><BR>&gt; To: bluez-devel@lists.sourceforge.net<BR>&gt; From: rbs=
+cott@cadvium.net<BR>&gt; Date: Wed, 22 Aug 2007 11:23:16 -0700<BR>&gt; Subj=
+ect: [Bluez-devel] SCO Question<BR>&gt; <BR>&gt; Hello Bluez,<BR>&gt; <BR>&=
+gt; How would I go about redirecting incoming SCO data to an alsa device, <=
+BR>&gt; and transmit incoming audio data out as SCO?<BR>&gt; <BR>&gt; I hav=
+e read the following pages,<BR>&gt; http://wiki.bluez.org/wiki/Audio<BR>&gt=
+; http://wiki.bluez.org/wiki/HOWTO/AudioDevices<BR>&gt; <BR>&gt; but everyt=
+hing described seems to do too much. I would prefer to <BR>&gt; handle the =
+RFCOMM channel, and SDP registration elsewhere. <BR>&gt; Presently, I just =
+want to determine how to redirect the SCO traffic.<BR>&gt; <BR>&gt; Thanks,=
+<BR>&gt; --robert<BR>&gt; <BR>&gt; ----------------------------------------=
+---------------------------------<BR>&gt; This SF.net email is sponsored by=
+: Splunk Inc.<BR>&gt; Still grepping through log files to find problems? St=
+op.<BR>&gt; Now Search log events and configuration files using AJAX and a =
+browser.<BR>&gt; Download your FREE copy of Splunk now &gt;&gt; http://get.=
+splunk.com/<BR>&gt; _______________________________________________<BR>&gt;=
+ Bluez-devel mailing list<BR>&gt; Bluez-devel@lists.sourceforge.net<BR>&gt;=
+ https://lists.sourceforge.net/lists/listinfo/bluez-devel<BR><BR><br /><hr =
+/>Dela filer, prata och spela spel med dina v=E4nner p=E5 Messenger, ladda =
+ner senaste versionen h=E4r! <a href=3D'http://g.msn.com/8reen_us/SV/INSTAL=
+L_MSN_MESSENGER_DL.EXE' target=3D'_new'>Messenger</a></body>
+</html>=
+
+--_80a39df3-bdfa-4a03-8d3f-34434074b2f5_--
 
 
--- Matthias
-
+--===============1122008010==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
+--===============1122008010==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1122008010==--
