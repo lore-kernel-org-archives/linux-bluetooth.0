@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v752.3)
-Message-Id: <9FADD91B-899B-45A5-A018-CAA3F97C976D@cadvium.net>
-To: bluez-devel@lists.sourceforge.net
-From: robert <rbscott@cadvium.net>
-Date: Fri, 24 Aug 2007 08:11:26 -0700
-Subject: Re: [Bluez-devel] handsfree profile
+MIME-Version: 1.0
+Date: Fri, 24 Aug 2007 11:06:36 -0400
+Message-ID: <2EB6297382462046A9427D7324788A480217D7B4@MCLNEXVS06.resource.ds.bah.com>
+In-Reply-To: <1187965538.15402.177.camel@violet>
+References: <2EB6297382462046A9427D7324788A480217D35A@MCLNEXVS06.resource.ds.bah.com><1187957692.15402.149.camel@violet><2EB6297382462046A9427D7324788A480217D756@MCLNEXVS06.resource.ds.bah.com>
+	<1187965538.15402.177.camel@violet>
+From: "Williams, Richard" <williams_richard_b@bah.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Multiple Bluetooth Dongles
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,48 +23,78 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hello Marcel,
 
-So I was planning to implement the profile inside of java, which is  
-why I am working on the Avetana BT stack, but I don't beleive that I  
-can handle any of the SCO communication from java.  Essentially I am  
-planning write the command processor for handling the AT commands in  
-Java (easier to maintain and debug), and then just create a small  
-daemon that handles routing traffic between the SCO channel and the  
-Alsa devices.  Perhaps communicate between the two using D-Bus?
+Thank you for the quick response and the suggestion.
 
-Is that possible?
+With my existing 2.6.22.2-42.fc6 kernel, reloading the hci_usb with
+isoc=0 does help somewhat. I can plug in more than 16 dongles and the
+system remains stable. The mouse and keyboard remain usable. However,
+the 17th USB device is not recognized.
 
-Cheers,
-Robert
+I am reluctant to try the 2.6.23-rc3 kernel you suggest, since my
+development shop is all standardized on the current FC release. I don't
+want my machine to get out of sync with the rest of my team.
 
-> Hi Robert,
->
->
->> How would I go about redirecting incoming SCO data to an alsa device,
->> and transmit incoming audio data out as SCO?
->>
->> I have read the following pages,
->> http://wiki.bluez.org/wiki/Audio
->> http://wiki.bluez.org/wiki/HOWTO/AudioDevices
->>
->> but everything described seems to do too much.  I would prefer to
->> handle the RFCOMM channel, and SDP registration elsewhere.
->> Presently, I just want to determine how to redirect the SCO traffic.
->>
->
-> actually you can't really do SCO without a profile. In theory you can,
-> but that is to compatible with out devices. Since this kind of
-> application doesn't really make sense for most people we didn't  
-> focus on
-> it and so nothing like that is available. However hstest.c and  
-> other SCO
-> demos can be used to quickly write something like that. The hardest  
-> part
-> is to get the ALSA thing right. Again, you have to write that by
-> yourself since we have no need for this right now.
->
-> Regards
->
-> Marcel
+I think that I'll just tell my customer that he'll have to wait on more
+than 16. After all, if the application can't accomplish what it wants
+with 16 blueteeth, why do they need more ?
+
+So, thanks for your help. I'm not going to waste any more time on this.
+
+Regards,
+
+Rich
+
+e
+
+-----Original Message-----
+From: bluez-devel-bounces@lists.sourceforge.net
+[mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf Of Marcel
+Holtmann
+Sent: Friday, August 24, 2007 10:26 AM
+To: BlueZ development
+Subject: Re: [Bluez-devel] Multiple Bluetooth Dongles
+
+Hi Richard,
+
+> In my case, I am not using the SCO feature. I haven't gotten that far 
+> in my development.
+> The steps I followed were:
+> - boot my PC
+> - modified the HCI_MAX_DEV to 30
+> - ran make & make install
+> - reboot ( probably not necessary, but what the heck ??)
+> - plug in 16 Bluetooth USB dongles. All appear to work OK. For each of
+
+> these, my Fedora Core 6 system pops up a small dialog box with "BlueZ
+> (X) Switched device into connected mode"
+> - plug in USB flash device. Works OK. 
+> - plug in USB mouse. Works OK.
+> - plug in Bluetooth dongle 17. No obvious response from the system.
+> After a few seconds, the USB mouse no longer works. The keyboard no 
+> longer works. A power down restart is required.
+> 
+> I realize that the test setup is tedious, but maybe you can point me 
+> towards what to look for ??
+
+load the hci_usb with isoc=0 and see how that works out. If not, then
+that is an USB subsystem issue. Make sure you use 2.6.23-rc3.
+
+Regards
+
+Marcel
+
+
+
+------------------------------------------------------------------------
+-
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >>  http://get.splunk.com/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
