@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <53BC229C-4E4E-4014-87EC-F093B1276DF0@cadvium.net>
-References: <53BC229C-4E4E-4014-87EC-F093B1276DF0@cadvium.net>
-Date: Fri, 24 Aug 2007 14:23:16 +0200
-Message-Id: <1187958196.15402.167.camel@violet>
+To: oliver@onesteprevolution.com,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1187689633.6051.5.camel@ascension>
+References: <1187689633.6051.5.camel@ascension>
+Date: Fri, 24 Aug 2007 14:21:15 +0200
+Message-Id: <1187958075.15402.163.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] handsfree profile
+Subject: Re: [Bluez-devel] Sillicon Wave alternative
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,22 +21,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Robert,
+Hi Oliver,
 
-> i am developing an implementation of the handsfree profile (The  
-> Handsfree side rather than the Audio Gateway).  So far I have  
-> traction in every area except for SCO connections.
+> I've been attempting to get my Motorola HS810 (bluetooth headset) to
+> work with Linux, but I've not had much luck.
 > 
-> What exactly does bluez-alsa project do?  I am a little unclear about  
-> what is an alsa driver, and what part is a daemon.  How would I get  
-> data from the cell phone to the speakers, and data from the  
-> microphone back to cell phone?  From everything I have read it  
-> appears to be the Audio Gateway portion of the handsfree profile, but  
-> after playing around with it, I am not sue.
+> [oli@ascension ~]$ sudo /usr/sbin/hciconfig -a | grep Manufacturer
+>         Manufacturer: Silicon Wave (11)
+> 
+> I take I'm out of luck with my bluetooth adapter? It works fine for file
+> transfers and so on! Is there any timeline for when these adapters might
+> worth with audio?
+> 
+> If I have to get a new adapter, what would you recommend (in the UK)?
 
-the main focus will be Handsfree audio gateway. For the Handsfree device
-part I don't know when we will support it. We might do it at some point,
-but it certainly has not high priority.
+for A2DP stereo high quality audio support you should have no problem,
+but if you wanna use your voice headset, then this might take some
+additional rounds of hacking around the kernel. Not sure when we get
+this done.
 
 Regards
 
