@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Fri, 24 Aug 2007 14:14:53 +0200 (CEST)
+From: Peter Wippich <pewi@gw-instruments.de>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <2EB6297382462046A9427D7324788A480217D35A@MCLNEXVS06.resource.ds.bah.com>
+In-Reply-To: <1187964393.5121.10.camel@matthias.BEYONDSOFT.local>
+Message-ID: <Pine.LNX.4.63.0708241410030.12067@redbean.intranet.gw-instruments.de>
 References: <2EB6297382462046A9427D7324788A480217D35A@MCLNEXVS06.resource.ds.bah.com>
-Date: Fri, 24 Aug 2007 14:14:52 +0200
-Message-Id: <1187957692.15402.149.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Multiple Bluetooth Dongles
+	<8de6c3e20708231340j439ca230i487e816693149441@mail.gmail.com>
+	<1187964393.5121.10.camel@matthias.BEYONDSOFT.local>
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] multithreaded name resolution
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,32 +22,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Richard,
 
-> I have a system that uses multiple Bluetooth dongles and works just
-> fine. I've had my system running with several USB hubs and up to the
-> 16 maximum devices that Bluez supports. Now I have a changing
-> requirement from my customer to handle more than 16 Bluetooth devices.
-> They want support for up to 30 Bluetooth devices.
->  
-> I changed the HCI_MAX_DEV in bluez_libs/include/hci.h from 16 to
-> 30, recompiled and installed bluez_libs and bluez_utils. No problem.
->  
-> My program works fine with up to 16 Bluetooth devices, but the 17th
-> device is not recognized and sometimes the entire USB will no longer
-> work.
+Hi Matthias,
 
-we might broke something here since I haven't tested this in quite a
-while. Mainly because I don't care so much anymore. Having these kind of
-test setups are nasty.
+On Fri, 24 Aug 2007, Matthias Becker wrote:
 
-The USB part can be an issue if you use the SCO support of the hci_usb
-driver. Load the driver with isoc=0 to disable it. The ISOC frames for
-the SCO support consume to much USB bandwidth.
+> Hi,
+> 
+> I tried to read the name of different devices parallel using multi
+> threading, but without success. If there is one bluetooth device I works
+> (as there is no real multi threading). If there are who devices, the
+> same name is reported for both devices. In another test with 6 devices
+> hci_read_remote_name returned something <0 so I did not get any name at
+> all.
 
-Regards
+this won't work. Asking for the name of a device is some sort of 
+connection setup, and most (all ?) Bt chips do not allow / can not handle 
+parallel connection setups (even though parallel connections are 
+possible). 
 
-Marcel
+So don't try further, the problem is outside your code (and even BlueZ). 
+
+Ciao, 
+
+Peter 
+
 
 
 
