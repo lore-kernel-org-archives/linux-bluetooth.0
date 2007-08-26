@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200708270945.07388.denis.kenzior@trolltech.com>
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
+To: bluez-devel@lists.sourceforge.net
+Date: Mon, 27 Aug 2007 09:45:07 +1000
 References: <7AC80B65-3C6D-43DB-8CED-600F9A604255@cadvium.net>
 	<1187957366.15402.141.camel@violet>
-	<200708270945.07388.denis.kenzior@trolltech.com>
-Date: Mon, 27 Aug 2007 14:54:23 +0200
-Message-Id: <1188219263.15402.304.camel@violet>
-Mime-Version: 1.0
+In-Reply-To: <1187957366.15402.141.camel@violet>
+MIME-Version: 1.0
+Message-Id: <200708270945.07388.denis.kenzior@trolltech.com>
 Subject: Re: [Bluez-devel] Avetana GPL Stack
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -18,88 +17,96 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Marcel,
 
-> Speaking of JSR82.  I've been hearing our PSO department has been working with 
-> Sun to get a working JSR82 stack on top of Linux.  They've been having some 
-> problems supporting some JSR82 defined methods, for instance:
-> 
-> /**
->  * Checks if a remote device was authenticated.
->  *
->  * @param addr Bluetooth address of a remote device
->  * @param pBool pointer to variable where the result is to be stored:
->  *              <code>JAVACALL_TRUE</code> if authenticated,
->  *              <code>JAVACALL_FALSE</code> otherwise
->  * @retval <code>JAVACALL_OK</code> on success
->  * @retval <code>JAVACALL_FAIL</code> on failure
->  */
-> javacall_result javacall_bt_bcc_is_authenticated(
->         const javacall_bt_address addr,
->         /*OUT*/javacall_bool *pBool);
-> 
-> The best way to determine this is of course for a specific transport 
-> connection, e.g. getsockopt RFCOMM_LM & L2CAP_LM.  However, short of using 
-> the 'hcitool con' implementation, I'm not sure how to get this information.  
-> Should this be up for inclusion into the org.bluez.Adapter API?  What's the 
-> best way to do this?  I can probably work on a patch if required...
+Speaking of JSR82.  I've been hearing our PSO department has been working w=
+ith =
 
-there is actually no point in checking if a connection is authenticated
-or not. If you require an authenticated connection, then this would not
-have been established in the first place.
+Sun to get a working JSR82 stack on top of Linux.  They've been having some =
 
-Anyhow with the Simple Pairing extensions I will introduce a
-SOL_BLUETOOTH that is valid for all sockets and lets your retrieve this
-information without checking all local adapters.
+problems supporting some JSR82 defined methods, for instance:
 
-However there is an issue with the implementation side of this. You can
-not always know if you are authenticated. You don't get an information
-that the authentication was successful in case you are the passive side.
-You only reply to the link key request. Once you see an encryption
-changed event you can assume that you are authenticated, but in general
-you can use authentication and not encryption. Not that this makes sense
-and is in general insecure, but it is possible.
+/**
+ * Checks if a remote device was authenticated.
+ *
+ * @param addr Bluetooth address of a remote device
+=A0* @param pBool pointer to variable where the result is to be stored:
+=A0* =A0 =A0 =A0 =A0 =A0 =A0 =A0<code>JAVACALL_TRUE</code> if authenticated,
+=A0* =A0 =A0 =A0 =A0 =A0 =A0 =A0<code>JAVACALL_FALSE</code> otherwise
+=A0* @retval <code>JAVACALL_OK</code> on success
+=A0* @retval <code>JAVACALL_FAIL</code> on failure
+=A0*/
+javacall_result javacall_bt_bcc_is_authenticated(
+=A0 =A0 =A0 =A0 const javacall_bt_address addr,
+=A0 =A0 =A0 =A0 /*OUT*/javacall_bool *pBool);
 
-> /**
->  * Increases or decreases encryption request counter for a remote device.
->  *
->  * @param addr the Bluetooth address of the remote device
->  * @param enable indicated whether the encryption needs to be enabled
->  * @param pBool pointer to variable where the result is to be stored:
->  *              <code>JAVACALL_TRUE</code> if the encryption must be
-> changed,
->  *              <code>JAVACALL_FALSE</code> otherwise
->  * @retval <code>JAVACALL_OK</code> on success
->  * @retval <code>JAVACALL_FAIL</code> on failure
->  */
-> javacall_result javacall_bt_bcc_set_encryption(
->         const javacall_bt_address addr,
->         javacall_bool enable,
->         javacall_bool *pBool);
-> 
-> Same problem with this one.  Ideally the setsockopt RFCOMM_LM and L2CAP_LM 
-> should work on client sockets as well (I think they only work on server 
-> sockets right now).  Any ideas on how to implement this one?
+The best way to determine this is of course for a specific transport =
 
-For Simple Pairing this has to be done anyway, but we can have this for
-client connections with our current kernel, too. However the real need
-for this is not really there. It is actually stupid to enforce
-encryption from the client side if you are not using Simple Pairing.
+connection, e.g. getsockopt RFCOMM_LM & L2CAP_LM.  However, short of using =
 
-I am not a big fan of JSR-82. Personally I think the specification
-authors were total morons that had no clue how Bluetooth actually work.
-However I would support getting this working, but not at all costs.
-Changes that only benefits JSR-82 need to be reasonable and make sense.
+the 'hcitool con' implementation, I'm not sure how to get this information.=
+  =
 
-Regards
+Should this be up for inclusion into the org.bluez.Adapter API?  What's the =
 
-Marcel
+best way to do this?  I can probably work on a patch if required...
 
+/**
+=A0* Increases or decreases encryption request counter for a remote device.
+=A0*
+=A0* @param addr the Bluetooth address of the remote device
+=A0* @param enable indicated whether the encryption needs to be enabled
+=A0* @param pBool pointer to variable where the result is to be stored:
+=A0* =A0 =A0 =A0 =A0 =A0 =A0 =A0<code>JAVACALL_TRUE</code> if the encryptio=
+n must be
+changed,
+=A0* =A0 =A0 =A0 =A0 =A0 =A0 =A0<code>JAVACALL_FALSE</code> otherwise
+=A0* @retval <code>JAVACALL_OK</code> on success
+=A0* @retval <code>JAVACALL_FAIL</code> on failure
+=A0*/
+javacall_result javacall_bt_bcc_set_encryption(
+=A0 =A0 =A0 =A0 const javacall_bt_address addr,
+=A0 =A0 =A0 =A0 javacall_bool enable,
+=A0 =A0 =A0 =A0 javacall_bool *pBool);
 
+Same problem with this one.  Ideally the setsockopt RFCOMM_LM and L2CAP_LM =
+
+should work on client sockets as well (I think they only work on server =
+
+sockets right now).  Any ideas on how to implement this one?
+
+-Denis
+
+On Friday 24 August 2007 22:09, Marcel Holtmann wrote:
+> Hi Robert,
+>
+> > I made some patches to the Avetana GPL Stack (the version that works
+> > with Bluez which is why I am posting here).  If any one is interested
+> > in JSR82, java bluetooth stuff, shoot me an email.
+>
+> I would prefer if someone takes over the maintainership and creates a
+> working JSR82 stack that can use the latest BlueZ versions. Personally I
+> am not using Java at all so I might be of no help here.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc.
+> Still grepping through log files to find problems?  Stop.
+> Now Search log events and configuration files using AJAX and a browser.
+> Download your FREE copy of Splunk now >>  http://get.splunk.com/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
