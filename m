@@ -1,90 +1,112 @@
-Return-Path: <hal-bounces@lists.freedesktop.org>
-Date: Mon, 27 Aug 2007 16:11:45 +0200
-From: Lennart Poettering <mzuny@0pointer.de>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Subject: Re: [patch] spec: Update alsa namespace to include virtual device
-Message-ID: <20070827141144.GA3190@tango.0pointer.de>
-References: <e29894ca0708230922n69a68aedqfb979c67042a965f@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <e29894ca0708230922n69a68aedqfb979c67042a965f@mail.gmail.com>
-Cc: Takashi Iwai <tiwai@suse.de>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>,
-        hal@lists.freedesktop.org
-List-Unsubscribe: <http://lists.freedesktop.org/mailman/listinfo/hal>,
-	<mailto:hal-request@lists.freedesktop.org?subject=unsubscribe>
-List-Archive: <http://lists.freedesktop.org/archives/hal>
-List-Post: <mailto:hal@lists.freedesktop.org>
-List-Help: <mailto:hal-request@lists.freedesktop.org?subject=help>
-List-Subscribe: <http://lists.freedesktop.org/mailman/listinfo/hal>,
-	<mailto:hal-request@lists.freedesktop.org?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
-Sender: hal-bounces@lists.freedesktop.org
-Errors-To: hal-bounces@lists.freedesktop.org
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <200708270945.07388.denis.kenzior@trolltech.com>
+References: <7AC80B65-3C6D-43DB-8CED-600F9A604255@cadvium.net>
+	<1187957366.15402.141.camel@violet>
+	<200708270945.07388.denis.kenzior@trolltech.com>
+Date: Mon, 27 Aug 2007 14:54:23 +0200
+Message-Id: <1188219263.15402.304.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Avetana GPL Stack
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, 23.08.07 19:22, Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wr=
-ote:
+Hi Denis,
 
-> Hi
-> =
+> Speaking of JSR82.  I've been hearing our PSO department has been working with 
+> Sun to get a working JSR82 stack on top of Linux.  They've been having some 
+> problems supporting some JSR82 defined methods, for instance:
+> 
+> /**
+>  * Checks if a remote device was authenticated.
+>  *
+>  * @param addr Bluetooth address of a remote device
+>  * @param pBool pointer to variable where the result is to be stored:
+>  *              <code>JAVACALL_TRUE</code> if authenticated,
+>  *              <code>JAVACALL_FALSE</code> otherwise
+>  * @retval <code>JAVACALL_OK</code> on success
+>  * @retval <code>JAVACALL_FAIL</code> on failure
+>  */
+> javacall_result javacall_bt_bcc_is_authenticated(
+>         const javacall_bt_address addr,
+>         /*OUT*/javacall_bool *pBool);
+> 
+> The best way to determine this is of course for a specific transport 
+> connection, e.g. getsockopt RFCOMM_LM & L2CAP_LM.  However, short of using 
+> the 'hcitool con' implementation, I'm not sure how to get this information.  
+> Should this be up for inclusion into the org.bluez.Adapter API?  What's the 
+> best way to do this?  I can probably work on a patch if required...
 
-> Thanks to the great work of Bluez-guys, bluez-utils audio service is
-> now able to deal with several audio devices. Those Bluetooth devices
-> are accessed by a "bluetooth" ALSA plugin (see
-> http://wiki.bluez.org/wiki/HOWTO/AudioDevices)
-> =
+there is actually no point in checking if a connection is authenticated
+or not. If you require an authenticated connection, then this would not
+have been established in the first place.
 
-> There is only a few missing pieces to make those devices discoverable wit=
-h HAL.
-> =
+Anyhow with the Simple Pairing extensions I will introduce a
+SOL_BLUETOOTH that is valid for all sockets and lets your retrieve this
+information without checking all local adapters.
 
-> The following patch changes the "alsa" namespace so that "virtual
-> devices" can also be described (a former approach was to use
-> alsa.virtual or alsa_virtual new namespace, but alsa.virtual does not
-> inherit alsa property, and both namespaces have a lot in common).
+However there is an issue with the implementation side of this. You can
+not always know if you are authenticated. You don't get an information
+that the authentication was successful in case you are the passive side.
+You only reply to the link key request. Once you see an encryption
+changed event you can assume that you are authenticated, but in general
+you can use authentication and not encryption. Not that this makes sense
+and is in general insecure, but it is possible.
 
-Uh oh. I am not convinced that adding "virtual" devices to the HAL
-tree is a good idea. I mean, bt is basically a transport protocol and
-audio-over-bt just a service offered via bt. I mean, you wouldn't want
-to include all Avahi-found hw devices in the HAL tree, would you?
+> /**
+>  * Increases or decreases encryption request counter for a remote device.
+>  *
+>  * @param addr the Bluetooth address of the remote device
+>  * @param enable indicated whether the encryption needs to be enabled
+>  * @param pBool pointer to variable where the result is to be stored:
+>  *              <code>JAVACALL_TRUE</code> if the encryption must be
+> changed,
+>  *              <code>JAVACALL_FALSE</code> otherwise
+>  * @retval <code>JAVACALL_OK</code> on success
+>  * @retval <code>JAVACALL_FAIL</code> on failure
+>  */
+> javacall_result javacall_bt_bcc_set_encryption(
+>         const javacall_bt_address addr,
+>         javacall_bool enable,
+>         javacall_bool *pBool);
+> 
+> Same problem with this one.  Ideally the setsockopt RFCOMM_LM and L2CAP_LM 
+> should work on client sockets as well (I think they only work on server 
+> sockets right now).  Any ideas on how to implement this one?
 
-Let's keep services out of HAL. HAL should be for hw devices only.  Of
-course, it is difficult to draw the line here.
+For Simple Pairing this has to be done anyway, but we can have this for
+client connections with our current kernel, too. However the real need
+for this is not really there. It is actually stupid to enforce
+encryption from the client side if you are not using Simple Pairing.
 
-OTOH i must say that this would make it very easy for me to add bt
-support to PA, so I am not inherently opposed. However, I don't really
-think going through ALSA for bt audio makes too much sense for PA. It
-is probably better to integrate bt and PA directly, without having
-this unnecessary abstraction in between.
+I am not a big fan of JSR-82. Personally I think the specification
+authors were total morons that had no clue how Bluetooth actually work.
+However I would support getting this working, but not at all costs.
+Changes that only benefits JSR-82 need to be reasonable and make sense.
 
-> Thus, a  mandatory property "is_hardware" is introduced. If this value
-> is true, the current mandatory keys remain mandatory. If not, then the
-> client should use "device_name" to "open" the device.
-> =
+Regards
 
-> Arguable:
-> - should "device_name" be optional? (currently, application hard-code
-> the prefix "hw")
-
-Hmm. I don't think "device_name" makes sense. For example, if one is
-interested in surround audio one has to open the device as
-surround51:0, or if one wants spdif one has to open it as iec985:0. The
-prefix "hw:" is only relevant for stereo analog outputs. =
+Marcel
 
 
-What I would like to see is that the ALSA devices in HAL would export
-a property which tells us which prefixes make sense. I.e. one that
-tells me in advance that a device is capable of surround sound, or has
-a SPDIF output.
 
-Lennart
-
--- =
-
-Lennart Poettering                        Red Hat, Inc.
-lennart [at] poettering [dot] net         ICQ# 11060553
-http://0pointer.net/lennart/           GnuPG 0x1A015CC4
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >>  http://get.splunk.com/
 _______________________________________________
-hal mailing list
-hal@lists.freedesktop.org
-http://lists.freedesktop.org/mailman/listinfo/hal
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
