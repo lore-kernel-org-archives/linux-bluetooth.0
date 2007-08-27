@@ -1,15 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: Mahin Gupta <mahingupta@gmail.com>
-Date: Tue, 28 Aug 2007 12:34:32 +0000 (UTC)
-Message-ID: <loom.20070828T143052-133@post.gmane.org>
-References: <c669a7c70708240036j38c8f42bhdcdb5ee15a8ae4be@mail.gmail.com>
-	<1187943850.15402.129.camel@violet>
-	<000001c7e74d$e4e21bb0$aea65310$@com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <loom.20070827T214917-305@post.gmane.org>
+References: <loom.20070827T214917-305@post.gmane.org>
+Date: Mon, 27 Aug 2007 22:32:39 +0200
+Message-Id: <1188246759.15402.354.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users]
-	=?utf-8?q?problem_in_parking_device=2E_bluez-libs_3?=
-	=?utf-8?b?LjE0LAlibHVlei11dGlscy0zLjE0?=
+Subject: Re: [Bluez-users] stale connections with input
+	service	(bluez-libs-3.15 / linux 2.6.22)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,16 +21,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi Dick,
 
-Hi Tom,
-Thanks for Reply..
-I want to use park mode to connect more than seven devices.
-Can I use sniff mode in the same way?
+> An update on the stale connections with the new input service.
+> 
+> Linux 2.6.23 didn't help much, it seemed even less stable. I still have the
+> "stale" connections but it seems I can work around it be calling hciconfig hci0
+> reset until hcitool con gives me:
+> 
+> 'Connections:
+> '        > ACL 00:07:61:68:XX:XX handle 49 state 1 lm MASTER AUTH ENCRYPT 
+> '        > ACL 00:07:61:69:XX:XX handle 46 state 1 lm MASTER 
+> 
+> Sometimes the connection is:
+> '        > ACL 00:07:61:69:XX:XX handle ?? state ? lm SLAVE
+> 
+> Which gives me a working mice but the dinovo won't connect.
+> 
+> When I do a hciconfig hci0 reset (again) the connections come back OK.
+> 
+> I hope this will give someone a clue to write a fix :)
 
-Regards,
-mahin Gupta
+without the output of "hcidump -X -V" when this happens, I have no idea
+what is wrong.
 
+Regards
 
+Marcel
 
 
 
