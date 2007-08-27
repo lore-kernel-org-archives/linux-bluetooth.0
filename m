@@ -1,51 +1,63 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d89ddf300708272211k2c881289h8f6c572e0780305e@mail.gmail.com>
-Date: Mon, 27 Aug 2007 23:11:48 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] freepulse results
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Return-Path: <hal-bounces@lists.freedesktop.org>
+Subject: Re: [patch] spec: Update alsa namespace to include virtual device
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Lennart Poettering <mzuny@0pointer.de>
+In-Reply-To: <20070827151514.GA8058@tango.0pointer.de>
+References: <e29894ca0708230922n69a68aedqfb979c67042a965f@mail.gmail.com>
+	<20070827141144.GA3190@tango.0pointer.de>
+	<1188225287.15402.324.camel@violet>
+	<20070827144720.GA6448@tango.0pointer.de>
+	<1188227368.15402.336.camel@violet>
+	<20070827151514.GA8058@tango.0pointer.de>
+Date: Mon, 27 Aug 2007 17:24:55 +0200
+Message-Id: <1188228295.15402.341.camel@violet>
+Mime-Version: 1.0
+Cc: Takashi Iwai <tiwai@suse.de>,
+        =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>,
+        hal@lists.freedesktop.org
+List-Unsubscribe: <http://lists.freedesktop.org/mailman/listinfo/hal>,
+	<mailto:hal-request@lists.freedesktop.org?subject=unsubscribe>
+List-Archive: <http://lists.freedesktop.org/archives/hal>
+List-Post: <mailto:hal@lists.freedesktop.org>
+List-Help: <mailto:hal-request@lists.freedesktop.org?subject=help>
+List-Subscribe: <http://lists.freedesktop.org/mailman/listinfo/hal>,
+	<mailto:hal-request@lists.freedesktop.org?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Sender: hal-bounces@lists.freedesktop.org
+Errors-To: hal-bounces@lists.freedesktop.org
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hey
+Hi Lennart,
 
-I have been playing with Claudio's freepulse set with the a2dp service
-from utils head. The set uses a broadcom chipset and runs bt2.0+edr.
-I've been using a bt1.2 adapter but that shouldn't matter.
+> > > A stable plugin API is not going to happen anytime soon, sorry. Also,
+> > > it is not really practical to develop plugins out-of-tree. I
+> > > acknowledge the demand for it, but the plugin API is just too quickly
+> > > moving.
+> > > 
+> > > Hmm, I'd love to add proper BT support to PA myself, but unfortunately
+> > > I lack the hardware for it. It would be much easier to keep it up to
+> > > date for me then.
+> > 
+> > We are in a chicken-egg situation here. To write a plugin you need to
+> > use our SBC encoder and our IPC. Both of them are internal only.
+> 
+> Hmm, is it going to stay "internal"? Or are you going to stabilize the
+> API for it eventually? How volatile is that API?
 
-I do hear very subtle pops coming out of the set, several times per
-second, but only during quiet music. When I was experimenting with the
-old HP a2dp-only set over a year ago, it would pop like this during
-overruns (underruns were a jarring *crack* sound). Maybe these are
-caused by the data coming across too quickly.
+that is fully 100% unstable right now. The IPC is totally unclear how it
+has to look like in the end. It only works right now.
 
-This set doesn't have complete avrcp controls. It has a sort of "mute"
-button but I don't see any messages from the audio service so I don't
-think it is actually trying to pause the stream via avrcp or even a2dp
-messages.
+We might get the SBC encoder in a why it could be released as its own
+library, but I prefer not doing it right now. It would actually slow
+down the development process.
 
-This set has a much improved latency. I can watch video without any
-sync correction.
+Regards
 
-Brad
+Marcel
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >>  http://get.splunk.com/
+
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+hal mailing list
+hal@lists.freedesktop.org
+http://lists.freedesktop.org/mailman/listinfo/hal
