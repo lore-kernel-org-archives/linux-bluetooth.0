@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <003401c7ea0d$05ef6d00$0200000a@psg>
-From: "psg" <psg@ki.net.pl>
-To: <bluez-users@lists.sourceforge.net>
-Date: Wed, 29 Aug 2007 09:20:05 +0200
-MIME-Version: 1.0
-Subject: [Bluez-users] PAN communication dies
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <loom.20070828T143052-133@post.gmane.org>
+References: <c669a7c70708240036j38c8f42bhdcdb5ee15a8ae4be@mail.gmail.com>
+	<1187943850.15402.129.camel@violet>
+	<000001c7e74d$e4e21bb0$aea65310$@com>
+	<loom.20070828T143052-133@post.gmane.org>
+Date: Tue, 28 Aug 2007 14:44:51 +0200
+Message-Id: <1188305091.19382.1.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] problem in parking device. bluez-libs	3.14,
+	bluez-utils-3.14
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,54 +24,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello!
+Hi Mahin,
 
-I am quite new to Bluetooth and BlueZ, especially under Linux. And I have
-come to a problem.
+> I want to use park mode to connect more than seven devices.
+> Can I use sniff mode in the same way?
 
-My communication gets stuck when I want to send more data. That is to say
-sending larger packets or just when browsing through Internet.
-Everything works fine when I try regular small ping:
---------------------
-...
-Reply from 10.0.0.5: bytes=120 time=47ms TTL=128
-Reply from 10.0.0.5: bytes=120 time=51ms TTL=128
-...
---------------------
-It can go with no errors forever.
+no you can't, but you might also not be able to park more than seven
+devices. Ask your chip manufacturer if they support it. While the
+specification allows it, most chip manufacturer limit the number of
+device within a piconet (active or not) to seven. This mainly to due
+memory restrictions.
 
-But when I increase packets size for example to 1200 bytes, communication
-gets jammed:
---------------------
-Pinging 10.0.0.5 with 1200 bytes of data:
-Request timed out.
-...
---------------------
-Although in hcidump I see those packets as being completed they don't get to
-their destination.:
---------------------
-< ACL data: handle 1 flags 0x02 dlen 1021
-< ACL data: handle 1 flags 0x01 dlen 220
-    L2CAP(d): cid 0x004f len 1237 [psm 0]
-...
-> HCI Event: Number of Completed Packets (0x13) plen 6
-    handle 1 packets 1
-> HCI Event: Number of Completed Packets (0x13) plen 6
-    handle 1 packets 1
+Regards
 
---------------------
-Moreover afterwards I can't send anything (even smaller packets). I need to
-restart Bluetooth and create NAP from the beginning.
+Marcel
 
-What is more important when I connected the very same two bluetooth devices
-between two WindowsXP computers I was able to send packets up to 12000bytes,
-with of course increase in ping times, but wth no "Request timed out" and
-hanging of the device etc.
-
-If you have any idea how to solve this issue I would appreciate this.
-TIA
-
-RGDS PSG
 
 
 -------------------------------------------------------------------------
