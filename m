@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <b150d3010708302129i6fd6c829tc618ecf66f97c07@mail.gmail.com>
-Date: Fri, 31 Aug 2007 09:59:32 +0530
-From: "Shankar Ramesh" <hrshankar@gmail.com>
+Message-ID: <d89ddf300708272211k2c881289h8f6c572e0780305e@mail.gmail.com>
+Date: Mon, 27 Aug 2007 23:11:48 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
 To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-devel] activating bluez service
+Subject: [Bluez-devel] freepulse results
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,64 +14,38 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0022269006=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0022269006==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_5151_12879408.1188534572417"
+Hey
 
-------=_Part_5151_12879408.1188534572417
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+I have been playing with Claudio's freepulse set with the a2dp service
+from utils head. The set uses a broadcom chipset and runs bt2.0+edr.
+I've been using a bt1.2 adapter but that shouldn't matter.
 
-Hi,
+I do hear very subtle pops coming out of the set, several times per
+second, but only during quiet music. When I was experimenting with the
+old HP a2dp-only set over a year ago, it would pop like this during
+overruns (underruns were a jarring *crack* sound). Maybe these are
+caused by the data coming across too quickly.
 
-I am trying to activate serial service using bluez dbus api  (C program)
-(dbus-glib bindings to call remote methods)  ((activateservice(pattern)).  i
-get the following error
+This set doesn't have complete avrcp controls. It has a sort of "mute"
+button but I don't see any messages from the audio service so I don't
+think it is actually trying to pause the stream via avrcp or even a2dp
+messages.
 
-Remote method:  ActivateService (pattern)
+This set has a much improved latency. I can watch video without any
+sync correction.
 
-Error message: Method "ActivateService" with signature "s" on interface "
-org.bluez.Manager" doesn't exist
-
-
-Can anyone tell me how to use these services..
-
-------=_Part_5151_12879408.1188534572417
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi,<br><br>I am trying to activate serial service using bluez dbus api&nbsp; (C program) (dbus-glib bindings to call remote methods)&nbsp; ((activateservice(pattern)).&nbsp; i get the following error <br><br>Remote method:&nbsp; ActivateService (pattern)
-<br><br>Error message: Method &quot;ActivateService&quot; with signature &quot;s&quot; on interface &quot;org.bluez.Manager&quot; doesn&#39;t exist<br><br><br>Can anyone tell me how to use these services..<br>
-
-------=_Part_5151_12879408.1188534572417--
-
-
---===============0022269006==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============0022269006==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0022269006==--
