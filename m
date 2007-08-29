@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Nitin Mahajan <nitinm76@yahoo.com>
-In-Reply-To: <244253.57477.qm@web50108.mail.re2.yahoo.com>
-References: <244253.57477.qm@web50108.mail.re2.yahoo.com>
-Date: Wed, 29 Aug 2007 15:54:22 +0200
-Message-Id: <1188395662.6109.48.camel@violet>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <653326.97274.qm@web30815.mail.mud.yahoo.com>
+References: <653326.97274.qm@web30815.mail.mud.yahoo.com>
+Date: Wed, 29 Aug 2007 15:51:44 +0200
+Message-Id: <1188395504.6109.44.camel@violet>
 Mime-Version: 1.0
-Cc: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] BlueZ APIs
+Subject: Re: [Bluez-users] discovering passkey
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,17 +20,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Nitin,
+Hi Richard,
 
-> Thanks for your inputs, is that possible I can use the BlueZ without D-BUS also?
+> I acquired an Xterasys BSH201 stereo headset. The documentation
+> doesn't list a passkey. Apparently some magic happens with Windows.
+> Hcitool scan finds the device and I can use l2ping with the mac
+> address, but guessing at default pass codes (0000, 1234, etc) has
+> failed. I contacted the vendor, but so far no response. 
+> So, is it possible to discover a BT device passkey?
 
-you could use libbluetooth directly to access HCI, but you really don't
-wanna do that. It is like working with plain IP packets instead of TCP
-and you will do a lot of things wrong. In some cases the kernel or hcid
-will not even allow you certain changes and simply go ahead and
-overwrite them. The D-Bus API is the only one that makes sense, because
-it takes care of a lot of things you normally don't think about. Trust
-me on this one. We spent a lot of time in getting this right.
+no it is not. If you wanna have detailed information you might wanna
+search the Internet for Bluetooth PIN cracking methods.
 
 Regards
 
