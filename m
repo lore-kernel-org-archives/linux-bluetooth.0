@@ -1,12 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 29 Aug 2007 01:57:40 -0700 (PDT)
-From: Nitin Mahajan <nitinm76@yahoo.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Message-ID: <722489.76935.qm@web50107.mail.re2.yahoo.com>
-Subject: [Bluez-users] BlueZ APIs
-Reply-To: Nitin Mahajan <nitinm76@yahoo.com>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <loom.20070829T092645-125@post.gmane.org>
+References: <c669a7c70708240036j38c8f42bhdcdb5ee15a8ae4be@mail.gmail.com>
+	<1187943850.15402.129.camel@violet>
+	<000001c7e74d$e4e21bb0$aea65310$@com>
+	<loom.20070829T092645-125@post.gmane.org>
+Date: Wed, 29 Aug 2007 10:23:48 +0200
+Message-Id: <1188375828.6109.31.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] problem in parking device. bluez-libs	3.14,
+	bluez-utils-3.14
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,20 +24,40 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi!
- 
-I am new to Bluetooth programming. I have read some documentation at BlueZ website and the WiKi regarding bluetooth programming. 
-What I understood is that the latest BlueZ stack has it's interface as the BlueZ D-BUS API, through which one can avail bluetooth services.
- 
-What I wanted to understand that Is there a way I can avail these services without using D-BUS/ D-BUS API and by directly accessing some BlueZ API. One way I know is Bluetooth socket programming, but cannot cover each and every bluetooth functionality. What are the additional set of APIs to access bluetooth services. Is there a place where these BlueZ APIS(other than BlueZ socket and D-BUS API) are documented?
- 
-Thanking in advance
- 
-regards
- 
--Nitin
+Hi Mahin,
 
-Send instant messages to your online friends http://uk.messenger.yahoo.com 
+> > > the park mode support is always complicated. I would advise you to not
+> > > support it. Especially with non CSR based chips. However you have to run
+> > > hcidump -X -V to see what is really going on.
+> > 
+> > I would echo Marcel's comments. Use of Park Mode is generally discouraged
+> > and at some point in the future there's a decent chance that Park Mode will
+> > be deprecated.
+> > 
+> > Because of this, many of the devices that you might try to connect to may
+> > support Park Mode but not enable it. You are much better off making sure
+> > that Sniff Mode is working -- if your application needs to care.
+>
+>  I want to use Park mode to connect more than 7 devices at a time.
+>  If I use sniff mode than is it possible that I can connect more than 7 devices ..
+>  I learned that when we put any link in Park mode, it releases its AM_ADDR (
+> Active Address, 3 bit ) and gets a new PM_ADDR ( park Mode address, 8 bit ). so
+> now we can use the released AM_ADDR to create a new active link.
+>  But in sniff mode link does not release AM_ADDR...
+>  So may be we can not use sniff mode to connect more than 7 devices..
+
+you can't use sniff mode to connect more than 7 devices, but that is
+almost true for most chips with park mode. If they got park mode right.
+See my previous posting. There is a difference between what the
+specification says and what is actually implemented by the chip. The
+memory is limited and storing 256 parked devices is normally out of
+question for these small chips.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
