@@ -1,11 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 29 Aug 2007 05:54:06 -0700 (PDT)
-From: Richard Griffiths <richardg1952@yahoo.com>
-To: bluez-users <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Message-ID: <653326.97274.qm@web30815.mail.mud.yahoo.com>
-Subject: [Bluez-users] discovering passkey
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+From: Mats Erik Andersson <mats@blue2net.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <fc3d922d0708290252l3ccdaec1o527e9ffdb44ad2ca@mail.gmail.com>
+References: <fc3d922d0708290244o2f4be49cv4063e8a70239522@mail.gmail.com>
+	<1188380835.6109.33.camel@violet>
+	<fc3d922d0708290252l3ccdaec1o527e9ffdb44ad2ca@mail.gmail.com>
+Date: Wed, 29 Aug 2007 14:45:06 +0200
+Message-Id: <1188391506.5277.70.camel@Blue2net-mats.bellman.mea>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Pin Authentication
+Reply-To: mats.andersson@blue2net.com,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,31 +19,60 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
- I acquired an Xterasys BSH201 stereo headset. The documentation
-doesn't list a passkey. Apparently some magic happens with Windows.
-Hcitool scan finds the device and I can use l2ping with the mac
-address, but guessing at default pass codes (0000, 1234, etc) has
-failed. I contacted the vendor, but so far no response. 
-So, is it possible to discover a BT device passkey?
-
-Thanks,
-Richard
-
-
-      ____________________________________________________________________________________
-Fussy? Opinionated? Impossible to please? Perfect.  Join Yahoo!'s user panel and lay it on us. http://surveylink.yahoo.com/gmrs/yahoo_panel_invite.asp?a=7 
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >>  http://get.splunk.com/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+b25zIDIwMDctMDgtMjkga2xvY2thbiAxMTo1MiArMDIwMCBza3JldiBQcnplbXlzxYJhdyBKYWt1
+Ym93c2tpOgo+IEkgdXNlIEJsdWVaIDIuMjUsIGFuZCBJIGhhdmUgdG8gdXNlIGl0LiAKPiBOb3cg
+SSBoYXZlIHNldCBzZWN1cml0eSBhdXRvLCBhbmQgcGluX2hlbHBlciAvdXNyL2Jpbi9ibHVlcGlu
+IHdoZXJlCj4gYmx1ZXBpbiBpcyBhIGZpbGUgd2l0aCAxMjM0Lgo+IElzIGl0IGNvcnJlY3QgY29u
+ZmlndXJhdGlvbj8/Cj4gCj4gUmVnYXJkcywgUHJ6ZW1lawo+IApJbiBzeXN0ZW0gd2l0aCBibHVl
+ei11dGlscyAyLiogYW55IHBpbi1jb2RlIGhlbHBlciBoYXZlCnRvIG91dHB1dCBhIHN0cmluZyAi
+UElOOjEyMzQiIGluIG9yZGVyIHRvIGJlIGFjY2VwdGVkLgpUaHVzCgkjIS9iaW4vc2gKCWxvZ2dl
+ciAtdCBoaWNkLnBpbi1oZWxwZXIgIkRpc2Nsb3NlZCBteSBwaW4tY29kZSIKCWVjaG8gIlBJTjox
+MjM0IgoKd291bGQgYmUgdXNlZnVsIGZvciBhIGZpeGVkIGF1dGhlbnRpZmljYXRpb24uIEJ1dCBh
+cyBzdGF0ZWQKYnkgTWFyY2VsIEhvbHRtYW5uLCBwcmVzZW50ZGF5IGJsdWV6LXV0aWxzIDMuKiBh
+cmUgdXNpbmcKY2xlYXJseSBzdXBlcmlvciBtZWNoYW5pc21zLCBzbyB0aGluayB0cm91Z2ggd2hh
+dCBzeXN0ZW1zCnlvdSBhcmUgdXNpbmcuCgpSZWdhcmRzCgpNIEUgQW5kZXJzc29uCgoKCj4gMjAw
+Ny84LzI5LCBNYXJjZWwgSG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+Ogo+ICAgICAgICAg
+SGksCj4gICAgICAgICAKPiAgICAgICAgID4gSSB3YW50IHRvIGNvbmZpZ3VyZSBteSBjb21wdXRl
+ciwgdGhhdCBhY2NlcHRzIGNvbm5lY3Rpb24KPiAgICAgICAgIHdpdGggc29tZQo+ICAgICAgICAg
+PiBkZWZpbmVkIGRlZmF1bHQgUElOLgo+ICAgICAgICAgPiBIb3cgSSBzaG91bGQgY29uZmlndXJl
+IGhjaWQuY29uZj8KPiAgICAgICAgID4gV2hhdCBJIHNob3VsZCBpbnNlcnQgaW4gc2VjdXJpdHkg
+LCBhdXRvLCBub25lLCBvciB1c2VyLgo+ICAgICAgICAgPiBTaG91bGQgSSB1c2UgcGFzc2tleSAi
+MTIzNCIgb3IgbWF5YmUKPiAgICAgICAgIHBpbl9oZWxwZXIgL3Vzci9iaW4vYmx1ZXBpbiAsIGFu
+ZAo+ICAgICAgICAgPiBibHVlcGluIGlzIGZpbGUgd2l0aCAxMjM0Lgo+ICAgICAgICAgPiBTaG91
+bGQgSSBzZXQgbWF5YmUgc29tZXRoaW5nIGVsc2U/Cj4gICAgICAgICAKPiAgICAgICAgIGlmIHlv
+dSB1c2UgYSBkZWZhdWx0IFBJTiwgdGhlbiB5b3UgYWxzbyBjYW4gdXNlIG5vIFBJTiBhdCBhbGwu
+Cj4gICAgICAgICBBbnl3YXkgCj4gICAgICAgICBzdGFydGluZyB3aXRoIEJsdWVaIDMueCB5b3Ug
+bmVlZCBhIHBhc3NrZXkgYWdlbnQuCj4gICAgICAgICAKPiAgICAgICAgIFJlZ2FyZHMKPiAgICAg
+ICAgIAo+ICAgICAgICAgTWFyY2VsCj4gICAgICAgICAKPiAgICAgICAgIAo+ICAgICAgICAgCj4g
+ICAgICAgICAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gICAgICAgICBUaGlzIFNGLm5ldCBlbWFpbCBpcyBz
+cG9uc29yZWQgYnk6IFNwbHVuayBJbmMuIAo+ICAgICAgICAgU3RpbGwgZ3JlcHBpbmcgdGhyb3Vn
+aCBsb2cgZmlsZXMgdG8gZmluZCBwcm9ibGVtcz8gIFN0b3AuCj4gICAgICAgICBOb3cgU2VhcmNo
+IGxvZyBldmVudHMgYW5kIGNvbmZpZ3VyYXRpb24gZmlsZXMgdXNpbmcgQUpBWCBhbmQgYQo+ICAg
+ICAgICAgYnJvd3Nlci4KPiAgICAgICAgIERvd25sb2FkIHlvdXIgRlJFRSBjb3B5IG9mIFNwbHVu
+ayBub3cKPiAgICAgICAgID4+ICBodHRwOi8vZ2V0LnNwbHVuay5jb20vCj4gICAgICAgICBfX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+ICAgICAgICAgQmx1
+ZXotdXNlcnMgbWFpbGluZyBsaXN0Cj4gICAgICAgICBCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vm
+b3JnZS5uZXQKPiAgICAgICAgIGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xp
+c3RpbmZvL2JsdWV6LXVzZXJzCj4gCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFRoaXMgU0YubmV0IGVt
+YWlsIGlzIHNwb25zb3JlZCBieTogU3BsdW5rIEluYy4KPiBTdGlsbCBncmVwcGluZyB0aHJvdWdo
+IGxvZyBmaWxlcyB0byBmaW5kIHByb2JsZW1zPyAgU3RvcC4KPiBOb3cgU2VhcmNoIGxvZyBldmVu
+dHMgYW5kIGNvbmZpZ3VyYXRpb24gZmlsZXMgdXNpbmcgQUpBWCBhbmQgYSBicm93c2VyLgo+IERv
+d25sb2FkIHlvdXIgRlJFRSBjb3B5IG9mIFNwbHVuayBub3cgPj4gIGh0dHA6Ly9nZXQuc3BsdW5r
+LmNvbS8KPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXyBC
+bHVlei11c2VycyBtYWlsaW5nIGxpc3QgQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0
+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJz
+CgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogU3Bs
+dW5rIEluYy4KU3RpbGwgZ3JlcHBpbmcgdGhyb3VnaCBsb2cgZmlsZXMgdG8gZmluZCBwcm9ibGVt
+cz8gIFN0b3AuCk5vdyBTZWFyY2ggbG9nIGV2ZW50cyBhbmQgY29uZmlndXJhdGlvbiBmaWxlcyB1
+c2luZyBBSkFYIGFuZCBhIGJyb3dzZXIuCkRvd25sb2FkIHlvdXIgRlJFRSBjb3B5IG9mIFNwbHVu
+ayBub3cgPj4gIGh0dHA6Ly9nZXQuc3BsdW5rLmNvbS8KX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0CkJsdWV6LXVz
+ZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9s
+aXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo=
