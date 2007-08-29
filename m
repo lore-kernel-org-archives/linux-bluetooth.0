@@ -1,30 +1,54 @@
-Return-Path: <nitinm76@yahoo.com>
-Date: Wed, 29 Aug 2007 04:25:41 -0700 (PDT)
-From: Nitin Mahajan <nitinm76@yahoo.com>
-Reply-To: Nitin Mahajan <nitinm76@yahoo.com>
-Subject: Re: [Bluez-users] BlueZ APIs
-To: Marcel Holtmann <marcel@holtmann.org>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Message-ID: <244253.57477.qm@web50108.mail.re2.yahoo.com>
-List-ID: <bluez-users.lists.sourceforge.net>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <fc3d922d0708290252l3ccdaec1o527e9ffdb44ad2ca@mail.gmail.com>
+References: <fc3d922d0708290244o2f4be49cv4063e8a70239522@mail.gmail.com>
+	<1188380835.6109.33.camel@violet>
+	<fc3d922d0708290252l3ccdaec1o527e9ffdb44ad2ca@mail.gmail.com>
+Date: Wed, 29 Aug 2007 11:58:21 +0200
+Message-Id: <1188381502.6109.38.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Pin Authentication
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-HI Marcel!=0A=0AThanks for your inputs, is that possible I can use the Blue=
-Z without D-BUS also?=0A=0Aregards=0A=0A-Nitin=0A=0A----- Original Message =
-----=0AFrom: Marcel Holtmann <marcel@holtmann.org>=0ATo: Nitin Mahajan <nit=
-inm76@yahoo.com>; BlueZ users <bluez-users@lists.sourceforge.net>=0ASent: W=
-ednesday, August 29, 2007 3:18:19 PM=0ASubject: Re: [Bluez-users] BlueZ API=
-s=0A=0A=0AHi Nitin,=0A=0A> I am new to Bluetooth programming. I have read s=
-ome documentation at BlueZ website and the WiKi regarding bluetooth program=
-ming. =0A> What I understood is that the latest BlueZ stack has it's interf=
-ace as the BlueZ D-BUS API, through which one can avail bluetooth services.=
-=0A>  =0A> What I wanted to understand that Is there a way I can avail thes=
-e services without using D-BUS/ D-BUS API and by directly accessing some Bl=
-ueZ API. One way I know is Bluetooth socket programming, but cannot cover e=
-ach and every bluetooth functionality. What are the additional set of APIs =
-to access bluetooth services. Is there a place where these BlueZ APIS(other=
- than BlueZ socket and D-BUS API) are documented?=0A=0Ause the L2CAP and RF=
-COMM sockets and the D-Bus API for BlueZ. Everything=0Aelse it not worth us=
-ing.=0A=0ARegards=0A=0AMarcel=0A=0ASend instant messages to your online fri=
-ends http://uk.messenger.yahoo.com 
+Hi,
+
+> I use BlueZ 2.25, and I have to use it. 
+
+the BlueZ 2.x is no longer officially supported. If you wanna stick with
+ancient software then it is your choice.
+
+> Now I have set security auto, and pin_helper /usr/bin/bluepin where
+> bluepin is a file with 1234.
+> Is it correct configuration??
+
+No, it was different. The file needs a prefix or something. Check the
+mailing list archives. We removed that piece of crap code for the 3.x
+series and I am happy about that we don't have to worry anymore.
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >>  http://get.splunk.com/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
