@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Nitin Mahajan <nitinm76@yahoo.com>,
-        BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <722489.76935.qm@web50107.mail.re2.yahoo.com>
-References: <722489.76935.qm@web50107.mail.re2.yahoo.com>
-Date: Wed, 29 Aug 2007 11:48:19 +0200
-Message-Id: <1188380899.6109.35.camel@violet>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <fc3d922d0708290244o2f4be49cv4063e8a70239522@mail.gmail.com>
+References: <fc3d922d0708290244o2f4be49cv4063e8a70239522@mail.gmail.com>
+Date: Wed, 29 Aug 2007 11:47:15 +0200
+Message-Id: <1188380835.6109.33.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] BlueZ APIs
+Subject: Re: [Bluez-users] Pin Authentication
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,15 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Nitin,
+Hi,
 
-> I am new to Bluetooth programming. I have read some documentation at BlueZ website and the WiKi regarding bluetooth programming. 
-> What I understood is that the latest BlueZ stack has it's interface as the BlueZ D-BUS API, through which one can avail bluetooth services.
->  
-> What I wanted to understand that Is there a way I can avail these services without using D-BUS/ D-BUS API and by directly accessing some BlueZ API. One way I know is Bluetooth socket programming, but cannot cover each and every bluetooth functionality. What are the additional set of APIs to access bluetooth services. Is there a place where these BlueZ APIS(other than BlueZ socket and D-BUS API) are documented?
+> I want to configure my computer, that accepts connection with some
+> defined default PIN.
+> How I should configure hcid.conf?
+> What I should insert in security , auto, none, or user.
+> Should I use passkey "1234" or maybe pin_helper /usr/bin/bluepin , and
+> bluepin is file with 1234. 
+> Should I set maybe something else?
 
-use the L2CAP and RFCOMM sockets and the D-Bus API for BlueZ. Everything
-else it not worth using.
+if you use a default PIN, then you also can use no PIN at all. Anyway
+starting with BlueZ 3.x you need a passkey agent.
 
 Regards
 
