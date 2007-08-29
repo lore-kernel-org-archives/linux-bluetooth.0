@@ -1,12 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <c669a7c70708290023ia617125rda5bc9e7547fe9f6@mail.gmail.com>
-References: <c669a7c70708290023ia617125rda5bc9e7547fe9f6@mail.gmail.com>
-Date: Wed, 29 Aug 2007 10:21:34 +0200
-Message-Id: <1188375695.6109.28.camel@violet>
+To: bluez-users@lists.sourceforge.net
+From: Mahin Gupta <mahingupta@gmail.com>
+Date: Wed, 29 Aug 2007 07:35:30 +0000 (UTC)
+Message-ID: <loom.20070829T092645-125@post.gmane.org>
+References: <c669a7c70708240036j38c8f42bhdcdb5ee15a8ae4be@mail.gmail.com>
+	<1187943850.15402.129.camel@violet>
+	<000001c7e74d$e4e21bb0$aea65310$@com>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] hcidump output problem
+Subject: Re: [Bluez-users]
+	=?utf-8?q?problem_in_parking_device=2E_bluez-libs_3?=
+	=?utf-8?b?LjE0LAlibHVlei11dGlscy0zLjE0?=
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,47 +23,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mahin,
+Tom Allebrandi <tom <at> ytram.com> writes:
 
-> I am using bluez-libs 3.14, bluez-utils 3.14, hcidump 1.40 ..
-> when I am using hcidump -V -X I am continuously getting following
-> output..
 > 
-> > SCO data: handle 92 flags 0x00 dlen 48
->     0000: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00
-> 00  ................ 
->     0010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00
-> 00  ................
->     0020: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00
-> 00  ................
->  It gives nothing else ...
+> -----Original Message-----
+> > the park mode support is always complicated. I would advise you to not
+> > support it. Especially with non CSR based chips. However you have to run
+> > hcidump -X -V to see what is really going on.
 > 
->  
->  below is output of my hciconfig hci0 -a 
->  [root@vmware-fc6 bluez-hcidump-1.40]# hciconfig hci0 -a
-> hci0:   Type: USB
->         BD Address: 11:11:11:11:11:11 ACL MTU: 672:3 SCO MTU: 48:1
->         UP RUNNING PSCAN ISCAN
->         RX bytes:387498 acl:0 sco:7357 events:9 errors:0 
->         TX bytes:34 acl:0 sco:0 commands:9 errors:0
->         Features: 0xff 0x3e 0x85 0x38 0x18 0x18 0x00 0x00
->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->         Link policy:
->         Link mode: SLAVE ACCEPT 
->         Name: ''
->         Class: 0x000104
->         Service Classes: Unspecified
->         Device Class: Computer, Desktop workstation
->         HCI Ver: 2.0 (0x3) HCI Rev: 0x1f4 LMP Ver: 2.0 (0x3) LMP
-> Subver: 0x1f4 
->         Manufacturer: CONWISE Technology Corporation Ltd (66)
+> I would echo Marcel's comments. Use of Park Mode is generally discouraged
+> and at some point in the future there's a decent chance that Park Mode will
+> be deprecated.
+> 
+> Because of this, many of the devices that you might try to connect to may
+> support Park Mode but not enable it. You are much better off making sure
+> that Sniff Mode is working -- if your application needs to care.
+ Hi Tom ,
+ Thanks for reply ...
+ I want to use Park mode to connect more than 7 devices at a time.
+ If I use sniff mode than is it possible that I can connect more than 7 devices ..
+ I learned that when we put any link in Park mode, it releases its AM_ADDR (
+Active Address, 3 bit ) and gets a new PM_ADDR ( park Mode address, 8 bit ). so
+now we can use the released AM_ADDR to create a new active link.
+ But in sniff mode link does not release AM_ADDR...
+ So may be we can not use sniff mode to connect more than 7 devices..
+ Any help/suggestion on this point
 
-another broken dongle. What brand is it. It seems I need one of these
-for testing at home.
-
-Regards
-
-Marcel
 
 
 
