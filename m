@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: mats.andersson@blue2net.com,
-        BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1188486698.4817.60.camel@Blue2net-mats.bellman.mea>
-References: <1188486698.4817.60.camel@Blue2net-mats.bellman.mea>
-Date: Thu, 30 Aug 2007 17:17:35 +0200
-Message-Id: <1188487055.13373.31.camel@violet>
+From: Mats Erik Andersson <mats@blue2net.com>
+To: List Bluez users <bluez-users@lists.sourceforge.net>
+Date: Thu, 30 Aug 2007 17:11:38 +0200
+Message-Id: <1188486698.4817.60.camel@Blue2net-mats.bellman.mea>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Byte order for baddr-to-string
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Byte order for baddr-to-string
+Reply-To: mats.andersson@blue2net.com,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,28 +19,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mats,
+Hello all,
 
-> I observe that the bluez-libs functions 
-> 
->   int ba2str(const bdaddr_t *, char *);
-> 
->   char * batostr(const bdaddr_t *);
-> 
-> deliver strings with different byte order. Is it just
-> me making a slip of mind regarding netorder or endianness,
-> or is there a deeper reason that I fail to comprehend?
-> I observe the same thing on i386 architecture as well
-> as on cris architecture.
+I observe that the bluez-libs functions 
 
-it is part of the specification. The user visible presentation is
-different from the wire one.
+  int ba2str(const bdaddr_t *, char *);
 
-Regards
+  char * batostr(const bdaddr_t *);
 
-Marcel
+deliver strings with different byte order. Is it just
+me making a slip of mind regarding netorder or endianness,
+or is there a deeper reason that I fail to comprehend?
+I observe the same thing on i386 architecture as well
+as on cris architecture.
 
 
+Thanks for any pointers or corrections.
+
+Best regards
+
+M E Andersson
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
