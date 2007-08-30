@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <79be12f70708301153s7c6961e3jda270e4fe394d1ca@mail.gmail.com>
-Date: Thu, 30 Aug 2007 12:53:49 -0600
-From: "John Sample" <john.m.sample@gmail.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] BlueZ Hcid and D-Bus On ARM
+From: Marcel Holtmann <marcel@holtmann.org>
+To: mats.andersson@blue2net.com,
+        BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1188486698.4817.60.camel@Blue2net-mats.bellman.mea>
+References: <1188486698.4817.60.camel@Blue2net-mats.bellman.mea>
+Date: Thu, 30 Aug 2007 17:17:35 +0200
+Message-Id: <1188487055.13373.31.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Byte order for baddr-to-string
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,58 +17,39 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1236497814=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1236497814==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_6197_17913923.1188500029499"
+Hi Mats,
 
-------=_Part_6197_17913923.1188500029499
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> I observe that the bluez-libs functions 
+> 
+>   int ba2str(const bdaddr_t *, char *);
+> 
+>   char * batostr(const bdaddr_t *);
+> 
+> deliver strings with different byte order. Is it just
+> me making a slip of mind regarding netorder or endianness,
+> or is there a deeper reason that I fail to comprehend?
+> I observe the same thing on i386 architecture as well
+> as on cris architecture.
 
-Has anyone here gotten hcid to connect to D-Bus on an embedded ARM system?
-I can get the dbus system daemon up an running, but everytime I start hcid
-it dies right away and I get a "couldn't connect to D-Bus" message in my
-syslog.  I don't know what else to even try - any suggestions?
+it is part of the specification. The user visible presentation is
+different from the wire one.
 
--- 
-John Sample
+Regards
 
-------=_Part_6197_17913923.1188500029499
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Has anyone here gotten hcid to connect to D-Bus on an embedded ARM system?&nbsp; I can get the dbus system daemon up an running, but everytime I start hcid it dies right away and I get a &quot;couldn&#39;t connect to D-Bus&quot; message in my syslog.&nbsp; I don&#39;t know what else to even try - any suggestions?
-<br clear="all"><br>-- <br>John Sample 
-
-------=_Part_6197_17913923.1188500029499--
+Marcel
 
 
---===============1236497814==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============1236497814==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1236497814==--
