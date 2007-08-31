@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <cc1649d10708311345w6cc50a72w41bc43d43db9e683@mail.gmail.com>
-Date: Fri, 31 Aug 2007 16:45:55 -0400
-From: "Vlad Skarzhevskyy" <skarzhevskyy@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1188582998.13373.102.camel@violet>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <cc1649d10708310723h5eff2001sd95a186888e8dc03@mail.gmail.com>
 References: <cc1649d10708301947o7fbb805dsfb2a7df83d39ec@mail.gmail.com>
 	<1188569227.13373.94.camel@violet>
 	<cc1649d10708310723h5eff2001sd95a186888e8dc03@mail.gmail.com>
-	<1188582998.13373.102.camel@violet>
+Date: Fri, 31 Aug 2007 19:56:38 +0200
+Message-Id: <1188582998.13373.102.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] JSR-82 using D-Bus
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -23,17 +22,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-:) I have no lawyers.
-So basically I'm coming to this conclusion:
-  To make BlueZ support for BlueCove I need to create GPL jar and .so
-for BlueZ that would accompany main BlueCove.jar (LGPL).
-  I will try to use discovery and management using D-Bus....
-  So BlueCove-Bluez.jar will link with BlueCove.jar not the other way around.
+Hi Vlad,
 
-BWT regarding lawyers
- How come You have this page: http://www.bluez.org/jsr82.html
-  "Impronto Developer Kit" and  "Avetana JSR-82"  are not GPL but they
-need to include l2cap.h and rfcomm.h to the native code.
+>   I was talking about native code libraries....
+> Anyway:
+>   The question is is it possible to open and accept RFCOMM and L2CAP
+> connections just using D-Bus?
+
+that is a question for your lawyers actually. I tend to say that once
+you incluce l2cap.h or rfcomm.h you include GPL code thus your code
+becomes GPL, too.
+
+The serial port service however allows you to create RFCOMM connections
+and then map them to a serial port on your system. That can be used from
+D-Bus. For L2CAP such thing makes no sense.
+
+For OBEX connection at some point the obex-data-server will provide a
+D-Bus interface for it.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
