@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <cc1649d10708310723h5eff2001sd95a186888e8dc03@mail.gmail.com>
-Date: Fri, 31 Aug 2007 10:23:05 -0400
-From: "Vlad Skarzhevskyy" <skarzhevskyy@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1188569227.13373.94.camel@violet>
+Message-ID: <46D8419E.9050604@andorsystems.com>
+Date: Fri, 31 Aug 2007 18:28:14 +0200
+From: giulio fedel <giulio.fedel@andorsystems.com>
 MIME-Version: 1.0
-References: <cc1649d10708301947o7fbb805dsfb2a7df83d39ec@mail.gmail.com>
-	<1188569227.13373.94.camel@violet>
-Subject: Re: [Bluez-users] JSR-82 using D-Bus
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <79be12f70708301153s7c6961e3jda270e4fe394d1ca@mail.gmail.com>
+In-Reply-To: <79be12f70708301153s7c6961e3jda270e4fe394d1ca@mail.gmail.com>
+Subject: Re: [Bluez-users] BlueZ Hcid and D-Bus On ARM
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,14 +20,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel
-  I was talking about native code libraries....
-Anyway:
-  The question is is it possible to open and accept RFCOMM and L2CAP
-connections just using D-Bus?
+Yes,
+I'm working on an arm platform (at91rm9200) and it works.
+kernel 2.6.22
+dbus 1.0.2
+bluez 3.14
+It is important that dbus and hcid use the same file location for the 
+socket:
+[--prefix=]/var/run/dbus/system_bus_socket
+where --prefix is /usr/local by default or something you specified 
+during configure phase.
+dbus-daemon read it from etc/dbus-1/system.conf <listen>...</listen> line,
+it not clear to me where hcid read it or if it uses only the default.
+use hcid -n option (and the strace utility) to understand something more...
 
--- 
-Vlad
+     Giulio
+
+
+John Sample wrote:
+> Has anyone here gotten hcid to connect to D-Bus on an embedded ARM 
+> system?  I can get the dbus system daemon up an running, but everytime I 
+> start hcid it dies right away and I get a "couldn't connect to D-Bus" 
+> message in my syslog.  I don't know what else to even try - any 
+> suggestions?
+> 
+> -- 
+> John Sample
+> 
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
