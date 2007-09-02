@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <46DBE94E.1070509@kameleon-media.com>
-Date: Mon, 03 Sep 2007 13:00:30 +0200
-From: Laurent BARBIER <lbarbier@kameleon-media.com>
+Message-ID: <9346e8090709020745u369020f6na5f441b3de7eea29@mail.gmail.com>
+Date: Sun, 2 Sep 2007 20:15:40 +0530
+From: "Richeek Arya" <richeek.arya@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <46B0A557.9080000@kameleon-media.com>
-	<1186856876.6698.48.camel@violet>
-In-Reply-To: <1186856876.6698.48.camel@violet>
-Subject: Re: [Bluez-users] Problem building a piconet with pand
+Subject: [Bluez-users] One more doubt
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,96 +14,76 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: multipart/mixed; boundary="===============1896158369=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Thanks for the answer :)
+--===============1896158369==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_11768_18439446.1188744340958"
 
-I'm back from vacancies and i solved my problem a few hours after =
+------=_Part_11768_18439446.1188744340958
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-posting. my problem was in fact that i didn't specified on the piconet =
+hi
+I have downloaded the BlueZ module from www.bluez.org site and got 5
+modules.
+when i read the README of every module then it says that  prerequisite you
+need to have are :
+"Linux Bluetooth protocol stack (BlueZ)"
+.........................................................
 
-master to be master on the bluetooth connection. (--master flag).
 
-For the 3.14 version, i currently can't upgrade to this version, i'm =
+but i have downloaded this "Bluetooth protocol stack " only in which these 5
+modules are there so how can a software ask for itself?? or do i need to
+download something elase also?
+I hope my question is clear.I am really sorry if it is a stupid question but
+it is really confusing , may be it can solve my problem which i have sent in
+the previous mail.
 
-using bluez on an embedded device and currently it does not support the =
 
-last bluez lib. (cross compile, kernel...)
+With due regards
 
-Laurent
+-- 
+richeek arya
+GHEB-143
+iiit hyderabad
 
-Marcel Holtmann a =E9crit :
-> Hi Laurent,
->
->   =
+------=_Part_11768_18439446.1188744340958
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
->> I'm actually working on a project where I need embedded devices to
->> communicate between them. We decided to use bluetooth dongles and pan
->> to build a piconet.
->> Actually this work fine when we have only 3 devices : 1 GN & 2 PANU
->> (PANU#1 & PANU#2). When we try to add a third PANU (PANU#3), pand say
->> the host is down. If I shut down the connection of one of the two
->> thers PANU, I'm able to establish a connection with PANU#3 to the GN.
->> I try to setup a different GN on a linux desktop, same result, 1 GN &
->> 2 PANU.
->>
->> On my server I do this : =
+hi<br>I have downloaded the BlueZ module from <a href="http://www.bluez.org">www.bluez.org</a> site and got 5 modules.<br>when i read the README of every module then it says that&nbsp; prerequisite you need to have are :<br>&quot;Linux Bluetooth protocol stack (BlueZ)&quot;
+<br>.........................................................<br><br><br>but i have downloaded this &quot;Bluetooth protocol stack &quot; only in which these 5 modules are there so how can a software ask for itself?? or do i need to download something elase also?
+<br>I hope my question is clear.I am really sorry if it is a stupid question but it is really confusing , may be it can solve my problem which i have sent in the previous mail.<br><br><br>With due regards<br clear="all"><br>
+-- <br>richeek arya<br>GHEB-143<br>iiit hyderabad
 
->> pand --listen --nosdp --role GN -i yy:yy:yy:yy:yy:yy
->> I use brctl on the GN to bridge the interface
->>
->> On my clients I do this :
->> pand --nodetach -i xx:xx:xx:xx:xx:xx --role PANU --connect
->> yy:yy:yy:yy:yy:yy
->>
->> On connected PANU i have :
->> pand[7334]: Bluetooth PAN daemon version 2.25
->> pand[7334]: Connecting to yy:yy:yy:yy:yy:yy
->> pand[7334]: bnep0 connected
->>
->> On PANU's I can't connect:
->> pand[8492]: Bluetooth PAN daemon version 2.25
->> pand[8492]: Connecting to yy:yy:yy:yy:yy:yy
->> pand[8492]: Connect to yy:yy:yy:yy:yy:yy failed. Host is down(112)
->>
->>
->> I have read & reread the HOWTO-PAN. I mainly used it to setup my pan.
->> I know there is a limitation of 7 PANU max but there I'm far away of
->> the 7 devices. Is there is something I have forgotten ?
->> misconfigured  ... ? A problem with my dongles ?
->> If anyone could help me
->>     =
+------=_Part_11768_18439446.1188744340958--
 
->
-> your version of pand is ancient. Install bluez-utils-3.14.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc.
-> Still grepping through log files to find problems?  Stop.
-> Now Search log events and configuration files using AJAX and a browser.
-> Download your FREE copy of Splunk now >>  http://get.splunk.com/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->   =
 
+--===============1896158369==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
+--===============1896158369==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1896158369==--
