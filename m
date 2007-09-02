@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46DB968E.40203@gmail.com>
-Date: Mon, 03 Sep 2007 10:37:26 +0530
-From: Rahul Tank <gr8rahul@gmail.com>
+Date: Sun, 2 Sep 2007 14:28:51 -0700 (PDT)
+From: Nooshin Seyghali <nooshin100@yahoo.com>
+To: bluez_users@lists.sf.net, bluez-users@lists.sf.net,
+        bluez_devel@lists.sf.net, bluez-devel@lists.sf.net
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <9346e8090709020731k60893fe5xaf27e01a8c292761@mail.gmail.com>
-	<9346e8090709020805j53dbcc8blba0f42eeecb2c6c6@mail.gmail.com>
-In-Reply-To: <9346e8090709020805j53dbcc8blba0f42eeecb2c6c6@mail.gmail.com>
-Subject: Re: [Bluez-devel] bluez-utils-3.17 installation problem
+Message-ID: <362300.55551.qm@web51609.mail.re2.yahoo.com>
+Subject: [Bluez-devel] bluez-gnome problem...
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,65 +15,63 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1032438907=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Richeek Arya wrote:
->
-> service.c: In function 'update_svclass_list':
-> service.c:83: error: 'sdp_record_t' has no member named 'svclass'
-> service.c:86: error: 'sdp_record_t' has no member named 'svclass'
-> service.c: In function 'create_ext_inquiry_response':
-> service.c:170: error: 'sdp_record_t' has no member named 'svclass'
-> service.c:173: error: 'sdp_record_t' has no member named 'svclass'
-> service.c:182: error: 'sdp_record_t' has no member named 'svclass'
-> service.c:188: error: 'sdp_record_t' has no member named 'svclass'
-> make[2]: *** [ service.o] Error 1
-> make[2]: Leaving directory `/home/richeek/Desktop/bluez-utils-3.17/sdpd'
-> make[1]: *** [all-recursive] Error 1
-> make[1]: Leaving directory `/home/richeek/Desktop/bluez-utils-3.17'
-> make: *** [all] Error 2
->
-IMHO  it is not finding the bluez library. Either bluez-libs is not 
-installed or it is not getting the library path.
+--===============1032438907==
+Content-Type: multipart/alternative; boundary="0-1521250468-1188768531=:55551"
+Content-Transfer-Encoding: 8bit
 
-> My gcc version is 4.1.1. How to solve this problem??
-> With due regards..
-> -- 
-> richeek arya
-> GHEB-143
-> iiit hyderabad
->
-> -- 
-> richeek arya
-> GHEB-148
-> iiit hyderabad
-> ------------------------------------------------------------------------
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc.
-> Still grepping through log files to find problems?  Stop.
-> Now Search log events and configuration files using AJAX and a browser.
-> Download your FREE copy of Splunk now >>  http://get.splunk.com/
-> ------------------------------------------------------------------------
->
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->   
+--0-1521250468-1188768531=:55551
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+Dear Sir/Madam:
+I have a BIG problem when I want to install bluez-gnome-0.14.I am using linux-fedora core 6 and my kernel verion is 2.6.18-1.2798.fc6xen.
+I have installed all the other blueZ packages,but this one has an error:
+XML::Parser perl module is required for intltool.
+i have also run:
+#cd /usr/bin
+#perl -e "require XML::Parser"
+the message was this:
+Can't locate XML/Parser.pm in @INC(..
+Please let me know what should I do.If I have to download something please give the url.
+Best Regards
+NS
+       
+---------------------------------
+Need a vacation? Get great deals to amazing places on Yahoo! Travel. 
+--0-1521250468-1188768531=:55551
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+Dear Sir/Madam:<BR>I have a BIG problem when I want to install bluez-gnome-0.14.I am using linux-fedora core 6 and my kernel verion is 2.6.18-1.2798.fc6xen.<BR>I have installed all the other blueZ packages,but this one has an error:<BR>XML::Parser perl module is required for intltool.<BR>i have also run:<BR>#cd /usr/bin<BR>#perl -e "require XML::Parser"<BR>the message was this:<BR>Can't locate XML/Parser.pm in @INC(..<BR>Please let me know what should I do.If I have to download something please give the url.<BR>Best Regards<BR>NS<p>&#32;
+      <hr size=1>Need a vacation? <a href="http://us.rd.yahoo.com/evt=48256/*http://travel.yahoo.com/;_ylc=X3oDMTFhN2hucjlpBF9TAzk3NDA3NTg5BHBvcwM1BHNlYwNncm91cHMEc2xrA2VtYWlsLW5jbQ--">Get great deals 
+to amazing places </a>on Yahoo! Travel. 
+--0-1521250468-1188768531=:55551--
 
 
-thanks,
-  rahul .
+--===============1032438907==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
+--===============1032438907==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1032438907==--
