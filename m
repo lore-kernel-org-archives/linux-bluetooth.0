@@ -1,7 +1,7 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <5149509b0709030526r3cbf20b2g8f30656ab33afb38@mail.gmail.com>
-Date: Mon, 3 Sep 2007 14:26:02 +0200
-From: "=?ISO-8859-1?Q?S=E9bastien_Baguet?=" <sbaguet@silicom.fr>
+Message-ID: <5149509b0709030628o477273f5yf2c689ed356e2224@mail.gmail.com>
+Date: Mon, 3 Sep 2007 15:28:18 +0200
+From: "=?ISO-8859-1?Q?S=E9bastien_Baguet?=" <sebastien.baguet@tele2.fr>
 To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
 Subject: [Bluez-devel] [BUG] crash in pcm_bluetooth.c
@@ -14,15 +14,15 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1368034765=="
+Content-Type: multipart/mixed; boundary="===============1804822187=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1368034765==
+--===============1804822187==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_8621_14833970.1188822362064"
+	boundary="----=_Part_9266_9604638.1188826098162"
 
-------=_Part_8621_14833970.1188822362064
+------=_Part_9266_9604638.1188826098162
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
@@ -87,7 +87,7 @@ Regards,
 
 S. Baguet
 
-------=_Part_8621_14833970.1188822362064
+------=_Part_9266_9604638.1188826098162
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
@@ -128,10 +128,10 @@ nitiating the connection.<br><br>My setup:<br>* Ubuntu / Kernel 2.6.22-6<br=
  : REL-3_18: 1.64<br><br>Does anyone have a clue on this issues ?<br><br>Re=
 gards,<br><br>S. Baguet<br><br>
 
-------=_Part_8621_14833970.1188822362064--
+------=_Part_9266_9604638.1188826098162--
 
 
---===============1368034765==
+--===============1804822187==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -142,7 +142,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============1368034765==
+--===============1804822187==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -153,4 +153,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1368034765==--
+--===============1804822187==--
