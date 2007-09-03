@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-In-Reply-To: <46DB968E.40203@gmail.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <b150d3010709030446n2788151fva030f8b868a68404@mail.gmail.com>
+Date: Mon, 3 Sep 2007 17:16:44 +0530
+From: "Shankar Ramesh" <hrshankar@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Message-ID: <OFCBE96D9B.5D1B08BF-ON4825734D.002A6C55-4825734D.002B3E09@alps.com.hk>
-From: mingyuan.luo@cn.alps.com
-Date: Wed, 5 Sep 2007 15:52:29 +0800
-Subject: [Bluez-devel] compile the blueZ stack
+Subject: [Bluez-devel] bluez-utils transfer service
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,47 +14,59 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0512248590=="
+Content-Type: multipart/mixed; boundary="===============2102346748=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multipart message in MIME format.
---===============0512248590==
+--===============2102346748==
 Content-Type: multipart/alternative;
-	boundary="=_alternative 002B3E034825734D_="
+	boundary="----=_Part_10280_7579619.1188820004873"
 
-This is a multipart message in MIME format.
---=_alternative 002B3E034825734D_=
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="GB2312"
+------=_Part_10280_7579619.1188820004873
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-MS4gaXMgdGhlcmUgdGhlIG9ubHkgd2F5IHRvIGNvbXBpbGUgdGhlIGJsdWVaIHN0YWNrIHdpdGgg
-bGludXgga2VybmVso78NCjIuIGhvdyB0byB1c2UgdGhlIGJsdWVaIHdpdGggSEYgcHJvZmlsZaO/
-IA0KIHdoZW4gYWRkaW5nIGEgc2NvIGNvbm5ldCBmcm9tIEhGIHRvIEFHLCBBRyByZWplY3QgdGhl
-IGNvbm5lY3Rpb24gcmVxdWVzdCwgDQp0aGUgZXJyb3Jjb2RlIGlzIDB4MGWjrGR1ZSB0byB0aGUg
-c2VjdXJpdHkgcmVhc29uoaNpIGNoZWNrIHRoZSBoY2kgY29kZSwgDQppdCBzYW1lcyB0aGF0IGJs
-dWVaIHVzZSB0aGUgSFYxIHBhY2tldCBmb3Igc2NvPyBob3cgY2FuIGkgbW9kaWZ5IGl0IHRvIA0K
-SFYzPyBtb2RpZnkgdGhlIGNvZGUgYW5kIGNvbXBpbGUgdGhlIHdob2xlIGtlcm5lbD8gDQoNCjN4
-DQoNCg==
---=_alternative 002B3E034825734D_=
-Content-Transfer-Encoding: base64
-Content-Type: text/html; charset="GB2312"
+Hi,
 
-DQo8YnI+PGZvbnQgc2l6ZT0yIGZhY2U9InNhbnMtc2VyaWYiPjEuIGlzIHRoZXJlIHRoZSBvbmx5
-IHdheSB0byBjb21waWxlDQp0aGUgYmx1ZVogc3RhY2sgd2l0aCBsaW51eCBrZXJuZWyjvzwvZm9u
-dD4NCjxicj48Zm9udCBzaXplPTIgZmFjZT0ic2Fucy1zZXJpZiI+Mi4gaG93IHRvIHVzZSB0aGUg
-Ymx1ZVogd2l0aCBIRiBwcm9maWxlo78NCjwvZm9udD4NCjxicj48Zm9udCBzaXplPTIgZmFjZT0i
-c2Fucy1zZXJpZiI+Jm5ic3A7d2hlbiBhZGRpbmcgYSBzY28gY29ubmV0IGZyb20NCkhGIHRvIEFH
-LCBBRyByZWplY3QgdGhlIGNvbm5lY3Rpb24gcmVxdWVzdCwgdGhlIGVycm9yY29kZSBpcyAweDBl
-o6xkdWUNCnRvIHRoZSBzZWN1cml0eSByZWFzb26ho2kgY2hlY2sgdGhlIGhjaSBjb2RlLCBpdCBz
-YW1lcyB0aGF0IGJsdWVaIHVzZQ0KdGhlIEhWMSBwYWNrZXQgZm9yIHNjbz8gaG93IGNhbiBpIG1v
-ZGlmeSBpdCB0byBIVjM/IG1vZGlmeSB0aGUgY29kZSBhbmQNCmNvbXBpbGUgdGhlIHdob2xlIGtl
-cm5lbD8gPC9mb250Pg0KPGJyPg0KPGJyPjxmb250IHNpemU9MiBmYWNlPSJzYW5zLXNlcmlmIj4z
-eDwvZm9udD4NCjxicj4NCg==
---=_alternative 002B3E034825734D_=--
+I am using bluez-utils 3.18.  I am trying to use transfer service provided
+by bluez-utils.
+When i try to activate the service using
+
+activateservice("transfer");  ----> api present in org.bluez.Managerinterface
+
+i get the following error
+
+Error: Exec format error
 
 
---===============0512248590==
+Neither can i start the service using the start() api present in
+org.bluez.service interface... For this i use the path returned by the
+listservices()
+api.
+path: /org/bluez/service_transfer
+
+Can anyone please tell me how to activate this service and use it for obex
+transfers...
+
+Thanks
+Shankar
+
+------=_Part_10280_7579619.1188820004873
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi,<br><br>I am using bluez-utils 3.18.&nbsp; I am trying to use transfer service provided by bluez-utils.<br>When i try to activate the service using <br><br><span style="font-weight: bold;">activateservice(&quot;transfer&quot;);
+</span>&nbsp; ----&gt; api present in <span style="font-weight: bold;">org.bluez.Manager interface</span><br><br>i get the following error<br><br><span style="font-weight: bold;">Error: Exec format error</span><br><br><br>Neither can i start the service using the 
+<span style="font-weight: bold;">start() </span>api present in <span style="font-weight: bold;">org.bluez.service </span>interface... For this i use the path returned by the <span style="font-weight: bold;">listservices() 
+</span>api.&nbsp; <br><span style="font-weight: bold;">path</span>:<span style="font-style: italic;"><span style="font-style: italic;"> </span>/org/bluez/service_transfer</span><br style="font-weight: bold;"><br>Can anyone please tell me how to activate this service and use it for obex transfers...
+<br><br>Thanks<br>Shankar<br>
+
+------=_Part_10280_7579619.1188820004873--
+
+
+--===============2102346748==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -66,7 +77,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============0512248590==
+--===============2102346748==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -77,4 +88,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============0512248590==--
+--===============2102346748==--
