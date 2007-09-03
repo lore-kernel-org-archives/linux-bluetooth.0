@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <db972f430709040351i156c63b3kc73b3020534e838c@mail.gmail.com>
-Date: Tue, 4 Sep 2007 18:51:32 +0800
-From: "Ricky Soh" <rickysoh@gmail.com>
+Date: Mon, 3 Sep 2007 04:39:30 -0700 (PDT)
+From: suman <sundew_suman@yahoo.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] bccmd compilation fails (help needed)
+Message-ID: <794811.56233.qm@web51403.mail.re2.yahoo.com>
+Subject: [Bluez-users] bluez on INTEL SA1110....................
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,86 +14,59 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0014068773=="
+Content-Type: multipart/mixed; boundary="===============1156776717=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0014068773==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_30420_21270310.1188903092681"
+--===============1156776717==
+Content-Type: multipart/alternative; boundary="0-1636817247-1188819570=:56233"
 
-------=_Part_30420_21270310.1188903092681
-Content-Type: text/plain; charset=WINDOWS-1252
+--0-1636817247-1188819570=:56233
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-Hi,
-
-during normal bluez-util-3.18 installation, bccmd in the "tools" folder was
-not compiled.
-
-i tried the following compilation but have the following error.
-
-[root@localhost tools]# gcc -lusb -lbluetooth csr.c csr_3wire.c csr_bcsp.c
-csr_h4.c csr_hci.c csr_usb.c ubcsp.c bccmd.c -o bccmd
-csr_usb.c: In function =E2=80=98csr_open_usb=E2=80=99:
-csr_usb.c:68: warning: assignment makes pointer from integer without a cast
-csr_usb.c:68: error: dereferencing pointer to incomplete type
-csr_usb.c:69: error: dereferencing pointer to incomplete type
-csr_usb.c:69: error: dereferencing pointer to incomplete type
-csr_usb.c:70: error: dereferencing pointer to incomplete type
-csr_usb.c:70: error: =E2=80=98USB_CLASS_HUB=E2=80=99 undeclared (first use =
-in this
-function)
-csr_usb.c:70: error: (Each undeclared identifier is reported only once
-csr_usb.c:70: error: for each function it appears in.)
-csr_usb.c:73: error: dereferencing pointer to incomplete type
-csr_usb.c:74: error: dereferencing pointer to incomplete type
-csr_usb.c:86: warning: assignment makes pointer from integer without a cast
-csr_usb.c: In function =E2=80=98do_command=E2=80=99:
-csr_usb.c:133: error: =E2=80=98USB_TYPE_CLASS=E2=80=99 undeclared (first us=
-e in this
-function)
-csr_usb.c:133: error: =E2=80=98USB_RECIP_DEVICE=E2=80=99 undeclared (first =
-use in this
-function)
-
-Please help.
-
-Thanks.
-
-------=_Part_30420_21270310.1188903092681
-Content-Type: text/html; charset=WINDOWS-1252
+=0A hi all=0A            i need some help on BlueZ installation on INTEL ST=
+RONG ARM SA1110 board. i have the board ported with linux 2.4.4 kernel. i h=
+ave checked the driver and include but the bluetooth drivers r not installe=
+d.   =0A       how can i install the BlueZ on this board. can any body plz =
+help me on this. =0A        thanks in advance=0A=0A------------------------=
+-------------=0AM.suman=0AMithila-213=0AIIIT pune ,hinjawadi=0ARajiv Gandhi=
+ Infotech Park=0Apune=0A =0A=0A=0A=0A=0A=0A       =0A______________________=
+______________________________________________________________=0APinpoint c=
+ustomers who are looking for what you sell. =0Ahttp://searchmarketing.yahoo=
+.com/
+--0-1636817247-1188819570=:56233
+Content-Type: text/html; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-Hi,<br><br>during normal bluez-util-3.18 installation, bccmd in the &quot;t=
-ools&quot; folder was not compiled. <br><br>i tried the following compilati=
-on but have the following error.<br><br>[root@localhost tools]# gcc -lusb -=
-lbluetooth=20
-csr.c csr_3wire.c csr_bcsp.c csr_h4.c csr_hci.c csr_usb.c ubcsp.c bccmd.c -=
-o bccmd<br>csr_usb.c: In function =E2=80=98csr_open_usb=E2=80=99:<br>csr_us=
-b.c:68: warning: assignment makes pointer from integer without a cast<br>cs=
-r_usb.c:68: error: dereferencing pointer to incomplete type
-<br>csr_usb.c:69: error: dereferencing pointer to incomplete type<br>csr_us=
-b.c:69: error: dereferencing pointer to incomplete type<br>csr_usb.c:70: er=
-ror: dereferencing pointer to incomplete type<br>csr_usb.c:70: error: =E2=
-=80=98USB_CLASS_HUB=E2=80=99 undeclared (first use in this function)
-<br>csr_usb.c:70: error: (Each undeclared identifier is reported only once<=
-br>csr_usb.c:70: error: for each function it appears in.)<br>csr_usb.c:73: =
-error: dereferencing pointer to incomplete type<br>csr_usb.c:74: error: der=
-eferencing pointer to incomplete type
-<br>csr_usb.c:86: warning: assignment makes pointer from integer without a =
-cast<br>csr_usb.c: In function =E2=80=98do_command=E2=80=99:<br>csr_usb.c:1=
-33: error: =E2=80=98USB_TYPE_CLASS=E2=80=99 undeclared (first use in this f=
-unction)<br>csr_usb.c:133: error: =E2=80=98USB_RECIP_DEVICE=E2=80=99 undecl=
-ared (first use in this function)
-<br><br>Please help.<br><br>Thanks.<br>
+<html><head><style type=3D"text/css"><!-- DIV {margin:0px;} --></style></he=
+ad><body><div style=3D"font-family:times new roman,new york,times,serif;fon=
+t-size:12pt"><br><div><font size=3D"3"><span style=3D"font-family: times ne=
+w roman,new york,times,serif;">&nbsp;</span></font><font size=3D"4"><font s=
+ize=3D"3"><span style=3D"font-family: times new roman,new york,times,serif;=
+">hi all</span><br style=3D"font-family: times new roman,new york,times,ser=
+if;"><span style=3D"font-family: times new roman,new york,times,serif;">&nb=
+sp;&nbsp;&nbsp; &nbsp;&nbsp;  &nbsp;&nbsp;  i need some help on BlueZ insta=
+llation on INTEL STRONG ARM SA1110 board. i have the board ported with linu=
+x 2.4.4 kernel. i have checked the driver and include but the bluetooth dri=
+vers r not installed.&nbsp;  </span><br style=3D"font-family: times new rom=
+an,new york,times,serif;"><span style=3D"font-family: times new roman,new y=
+ork,times,serif;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; how can i install the Blu=
+eZ on this
+ board. can any body plz help me on this. <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbs=
+p;  thanks in advance<br style=3D"font-family: times new roman,new york,tim=
+es,serif;"></span></font></font></div><font size=3D"4"><span style=3D"font-=
+family: times new roman,new york,times,serif;">----------------------------=
+---------</span></font><br>M.suman<br>Mithila-213<br>IIIT pune ,hinjawadi<b=
+r>Rajiv Gandhi Infotech Park<br>pune<br> <br><div><br></div></div><br>=0A  =
+    <hr size=3D1>Boardwalk for $500? In 2007? Ha! <br><a href=3D"http://us.=
+rd.yahoo.com/evt=3D48223/*http://get.games.yahoo.com/proddesc?gamekey=3Dmon=
+opolyherenow">Play Monopoly Here and Now</a> (it's updated for today's econ=
+omy) at Yahoo! Games.</body></html>
+--0-1636817247-1188819570=:56233--
 
-------=_Part_30420_21270310.1188903092681--
 
-
---===============0014068773==
+--===============1156776717==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -104,7 +77,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============0014068773==
+--===============1156776717==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -115,4 +88,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0014068773==--
+--===============1156776717==--
