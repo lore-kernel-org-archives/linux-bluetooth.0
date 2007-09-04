@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <46DE8927.50201@gmail.com>
-Date: Wed, 05 Sep 2007 03:47:03 -0700
-From: Xamindar <junkxamindar@gmail.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <BAY122-F29B0D0BF70AB817B5341FAFFD50@phx.gbl>
-In-Reply-To: <BAY122-F29B0D0BF70AB817B5341FAFFD50@phx.gbl>
-Subject: Re: [Bluez-users] Can't connect RFCOMM socket:
-	Resource	temporarilyunavailable
+In-Reply-To: <db972f430709040351i156c63b3kc73b3020534e838c@mail.gmail.com>
+References: <db972f430709040351i156c63b3kc73b3020534e838c@mail.gmail.com>
+Date: Tue, 04 Sep 2007 13:23:52 +0200
+Message-Id: <1188905032.2307.17.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] bccmd compilation fails (help needed)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,42 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I'm trying to get rfcomm working as well.  It works great on my main 
-laptop but for some reason I can't get it to work on this other laptop. 
-  When I try the commands talked about below I get weird responses:
+Hi,
 
-carpc xamindar # rfcomm bind 00:12:56:5a:92:59
-Can't create device: Operation not supported
-carpc xamindar # rfcomm
-Can't get device list: Operation not supported
+> during normal bluez-util-3.18 installation, bccmd in the "tools"
+> folder was not compiled. 
+> 
+> i tried the following compilation but have the following error.
+> 
+> [root@localhost tools]# gcc -lusb -lbluetooth csr.c csr_3wire.c
 
-What does this mean?  I must be missing something.
+have the build system build it for you. That works fine.
 
-jaspreet singh wrote:
-> try:  #rfcomm bind <address>
-> if it says already binded..then release and bind again..
-> check rfcomm for the channel...
-> #rfcomm
-> it should say <addr.> <channelno> clean
-> then it will be ok...
-> 
-> if problem persists than forgive me..ask any expert..
-> 
-> _________________________________________________________________
-> Wedding bells are ringing. When's your time to walk the aisle? 
-> http://ad.in.doubleclick.net/clk;112111293;17571293;v?http://www.simplymarry.com/timesmatri/faces/jsp/UserTrackLandingPage.jsp?origin=hotmail_taglines_ros_june07
-> 
-> 
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc.
-> Still grepping through log files to find problems?  Stop.
-> Now Search log events and configuration files using AJAX and a browser.
-> Download your FREE copy of Splunk now >>  http://get.splunk.com/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
