@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <f58d13790709051013hc96fec6h37f5c3de79b1f68d@mail.gmail.com>
-Date: Wed, 5 Sep 2007 19:13:58 +0200
-From: "Carlo Io" <advhertz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <46DEE2D5.3080804@free.fr>
+Message-ID: <46DEE2D5.3080804@free.fr>
+Date: Wed, 05 Sep 2007 19:09:41 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
 References: <f58d13790709050943x4d8a7491qfc5131b76934cce6@mail.gmail.com>
-	<46DEE2D5.3080804@free.fr>
+In-Reply-To: <f58d13790709050943x4d8a7491qfc5131b76934cce6@mail.gmail.com>
 Subject: Re: [Bluez-devel] [bluetooth-alsa] SCO-FLOWCONTROL patch in the
-	newest kernels
+ newest kernels
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,71 +17,35 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1378028003=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1378028003==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_49000_7921492.1189012438769"
-
-------=_Part_49000_7921492.1189012438769
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-First of all, Hi and thanks for the answer.
-
+Hi Carlo,
+> I all,
+> I've applied the 
+> http://bluetooth-alsa.cvs.sourceforge.net/bluetooth-alsa/plugz/patches/sco-flowcontrol-v4.2.diff 
+> <http://bluetooth-alsa.cvs.sourceforge.net/bluetooth-alsa/plugz/patches/sco-flowcontrol-v4.2.diff> 
+> patch on my 2.6.22 kernel to let the SCO protocol works with my 
+> bluetooth headset and it works well.
+> 
+> Anyway I had some problem during the patching as the kernel wasn't the 
+> correct one.
+> 
 Indeed they should be updated to apply cleanly on latest 2.6.22 kernel.
+If you can provide an updated version of the patch i would happily push 
+it in CVS.
 
+Regards,
 
- When u talk about "they" I'm not understanding who are refer to? Are u not
-a bluetooth-alsa maintainer?
-
-If you can provide an updated version of the patch i would happily push
-> it in CVS.
-
-
-Well as I have a few time to spend I'll do...
-
-eh eh...
-
-Best Regards,
-Advhertz
-
-------=_Part_49000_7921492.1189012438769
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div><div>First of all, Hi and thanks for the answer. <br></div><br><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Indeed they should be updated to apply cleanly on latest 
-2.6.22 kernel.</blockquote><div><br>&nbsp;When u talk about &quot;they&quot; I&#39;m not understanding who are refer to? Are u not a bluetooth-alsa maintainer?</div><br><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-If you can provide an updated version of the patch i would happily push<br>it in CVS.</blockquote><div><br>Well as I have a few time to spend I&#39;ll do...<br><br>eh eh...<br><br>Best Regards,<br>Advhertz<br></div><br><div>
-<br><br><br><br></div><br></div><br>
-
-------=_Part_49000_7921492.1189012438769--
-
-
---===============1378028003==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Fabien
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============1378028003==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1378028003==--
