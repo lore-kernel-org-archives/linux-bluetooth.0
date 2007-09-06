@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <BAY114-W25F1578F21DADF5271926AD7C40@phx.gbl>
+From: Mikael Bengtsson <micke_b.b@hotmail.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Thu, 6 Sep 2007 13:03:17 +0200
+In-Reply-To: <1187957213.15402.137.camel@violet>
+References: <076BF2A0-A0AF-44B5-9A4D-2BC3EBBE2940@cadvium.net>
+	<1187957213.15402.137.camel@violet>
 MIME-Version: 1.0
-Date: Thu, 6 Sep 2007 18:26:58 +0530
-Message-ID: <6E672510D37D58428215BDFDF097DB46012D653E@EXGNT01.sasken.com>
-From: "Pintu Agarwal" <pintu.agarwal@sasken.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] FW: Regarding USB Bluetooth Driver for
-	Linux.....(2.4.22 kernel)!
+Subject: Re: [Bluez-devel] SCO Question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,261 +17,140 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0757685885=="
+Content-Type: multipart/mixed; boundary="===============0216044624=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
-
---===============0757685885==
-Content-class: urn:content-classes:message
+--===============0216044624==
 Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C7F085.31FEA6BC"
+	boundary="_956886a9-23f5-45ed-8665-da668a52aff2_"
 
-This is a multi-part message in MIME format.
-
-------_=_NextPart_001_01C7F085.31FEA6BC
-Content-Type: text/plain; charset="us-ascii"
+--_956886a9-23f5-45ed-8665-da668a52aff2_
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
-=20
-I have a USB Bluetooth device which can be used to transfer/receive
-files from my Mobile.=20
-=20
-I am working on a PBX system which is running on Linux.
-I am planning to write a USB Bluetooth Driver for this in Linux. My  PBX
-Linux kernel version is - 2.4.22-ncgl-10.12.1.0
-(Note: This kernel is a modified kernel of "2.4.22" without bluetooth
-support)
-I dont have any means of re-compiling the whole kernel again and putting
-it on the box.
-Also its not possible for me to upgrade the kernel version to 2.6.
-Also this system doesnt have the kernel source as well.
-I have to compile my code in some other system and put my binaries on
-this box to test.
-=20
-=20
-I have written the starting part of it and my driver seems to detect the
-device. That is I could able to read the interface and the endpoints
-from it.
-=20
-But I am stuck on the part where we need to do "register", "open",
-"send" on the HCI device.
-=20
-When I use HCI calls and install my driver I get "un-resolved" symbols.
-(hci_register_dev, hci_unregister_dev)
-I think this symbols are not exported in my kernel.=20
-Is there any way to EXPORT this symbols without re-building the Kernel
-again?
-=20
-Or is there any other way by which I can go ahead. That is without using
-HCI.
-Can I use RFCOMM here??=20
-=20
-According to me it looks like "hci_core", "l2cap" and "rfcomm"
-interfaces are missing from my kernel.
-Is there a way to re-compile only this part from the whole kernel source
-and install it on my system to get those symbols.=20
-=20
-=20
-Can you guide me writing my own simple USB bluetooth driver for kernel
-2=2E4.22 where I can able to transfer files from my mobile to my linux pc.
-Please help me  out.
-=20
-=20
-=20
-Thanks, Regards
-Pintu
-SASKEN BUSINESS DISCLAIMER
--------------------------
-This message may contain confidential, proprietary or legally privileged in=
-formation. In=20
-case you are not the original intended Recipient of the message, you must n=
-ot, directly or=20
-indirectly, use, Disclose, distribute, print, or copy any part of this mess=
-age and you are=20
-requested to delete it and inform the sender. Any views expressed in this m=
-essage are=20
-those of the individual sender unless otherwise stated. Nothing contained i=
-n this message=20
-shall be construed as an offer or acceptance of any offer by Sasken Communi=
-cation=20
-Technologies Limited ("Sasken") unless sent with that express intent and wi=
-th due=20
-authority of Sasken. Sasken has taken enough precautions to prevent the spr=
-ead of=20
-viruses. However the company accepts no liability for any damage caused by =
-any virus=20
-transmitted by this email
 
-------_=_NextPart_001_01C7F085.31FEA6BC
-Content-Type: text/html; charset="us-ascii"
+I have now redirected SCO to ALSA. I setup ALSA as a player, that is, sound=
+ shall be played on the soundcard. The hardest part in ALSA was to set the =
+correct number of frames and number of periods, but with the help of tutori=
+als on the web it worked out.
+=20
+Now I have set up ALSA to play 32 frames, 2 periods, mono, 8 kHz, S16_LE (s=
+igned 16 bits little endian on my Intel XScale PXA255). This means 64 bytes=
+ of data (one frame =3D one sample is 2 bytes when mono). This corresponds =
+to sound from SCO.
+=20
+Unfortunately, on my system SCO delivers only 60 bytes of data per read ope=
+ration, HV3 delivers 30 bytes in one package, which doesn't add up with the=
+ soundcard. The soundcard (AC97-based) wants 16, 32, 64 bytes and so on. Th=
+erefore the sound isn't of good quality. On other soundcards it may be poss=
+ible to set a frame size which corresponds exactly to SCO.
+=20
+I think I will have to do some buffering from SCO before allowing ALSA to p=
+lay sound.=20
+=20
+-Mikael
+> From: marcel@holtmann.org> To: bluez-devel@lists.sourceforge.net> Date: F=
+ri, 24 Aug 2007 14:06:53 +0200> Subject: Re: [Bluez-devel] SCO Question> > =
+Hi Robert,> > > How would I go about redirecting incoming SCO data to an al=
+sa device, > > and transmit incoming audio data out as SCO?> > > > I have r=
+ead the following pages,> > http://wiki.bluez.org/wiki/Audio> > http://wiki=
+.bluez.org/wiki/HOWTO/AudioDevices> > > > but everything described seems to=
+ do too much. I would prefer to > > handle the RFCOMM channel, and SDP regi=
+stration elsewhere. > > Presently, I just want to determine how to redirect=
+ the SCO traffic.> > actually you can't really do SCO without a profile. In=
+ theory you can,> but that is to compatible with out devices. Since this ki=
+nd of> application doesn't really make sense for most people we didn't focu=
+s on> it and so nothing like that is available. However hstest.c and other =
+SCO> demos can be used to quickly write something like that. The hardest pa=
+rt> is to get the ALSA thing right. Again, you have to write that by> yours=
+elf since we have no need for this right now.> > Regards> > Marcel> > > > -=
+------------------------------------------------------------------------> T=
+his SF.net email is sponsored by: Splunk Inc.> Still grepping through log f=
+iles to find problems? Stop.> Now Search log events and configuration files=
+ using AJAX and a browser.> Download your FREE copy of Splunk now >> http:/=
+/get.splunk.com/> _______________________________________________> Bluez-de=
+vel mailing list> Bluez-devel@lists.sourceforge.net> https://lists.sourcefo=
+rge.net/lists/listinfo/bluez-devel
+_________________________________________________________________
+Nu kan du f=E5r Messenger i mobilen, l=E4s mer!
+http://www.mobil.msn.se/=
+
+--_956886a9-23f5-45ed-8665-da668a52aff2_
+Content-Type: text/html; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; charset=3Dus-ascii">
-<META content=3D"MSHTML 6.00.2800.1589" name=3DGENERATOR></HEAD>
-<BODY>
-<DIV dir=3Dltr align=3Dleft><FONT face=3DArial size=3D2><FONT face=3DArial =
-color=3D#0000ff=20
-size=3D2><SPAN class=3D811015813-03092007>Hi,</SPAN></FONT></DIV>
-<DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007></SPAN></FONT>&nbsp;</DIV>
-<DIV><SPAN class=3D811015813-03092007><FONT face=3DArial><FONT color=3D#000=
-0ff><FONT=20
-size=3D2>I have a USB Bluetooth device which can be used to transfer/receiv=
-e files=20
-from my Mobile.<SPAN=20
-class=3D277105713-05092007>&nbsp;</SPAN></FONT></FONT></FONT></SPAN></DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN class=3D811015813-03=
-092007><SPAN=20
-class=3D277105713-05092007>I am working on a PBX system which is running on=20
-Linux.</SPAN></SPAN></FONT></DIV>
-<DIV><FONT face=3DArial><FONT color=3D#0000ff><FONT size=3D2><SPAN=20
-class=3D811015813-03092007>I am planning to write a USB Bluetooth Driver fo=
-r this=20
-in Linux. </SPAN><SPAN class=3D811015813-03092007>My&nbsp;<SPAN=20
-class=3D277105713-05092007>&nbsp;PBX </SPAN>Linux kernel version is -=20
-2=2E4.22-ncgl-10.12.1.0<SPAN=20
-class=3D277105713-05092007></SPAN></SPAN></FONT></FONT></FONT></DIV>
-<DIV><FONT face=3DArial><FONT color=3D#0000ff><FONT size=3D2><SPAN=20
-class=3D811015813-03092007><SPAN class=3D277105713-05092007>(Note:&nbsp;Thi=
-s kernel=20
-is a modified&nbsp;kernel of "2.4.22" without bluetooth=20
-support)</SPAN></SPAN></FONT></FONT></FONT></DIV>
-<DIV><FONT face=3DArial><FONT color=3D#0000ff><FONT size=3D2><SPAN=20
-class=3D811015813-03092007><SPAN class=3D277105713-05092007>I dont have any=
- means of=20
-re-compiling the whole kernel again and putting it on the=20
-box.</SPAN></SPAN></FONT></FONT></FONT></DIV>
-<DIV><FONT face=3DArial><FONT color=3D#0000ff><FONT size=3D2><SPAN=20
-class=3D811015813-03092007><SPAN class=3D277105713-05092007>Also its not po=
-ssible=20
-for me to upgrade the kernel version to=20
-2=2E6.</SPAN></SPAN></FONT></FONT></FONT></DIV>
-<DIV><FONT face=3DArial><FONT color=3D#0000ff><FONT size=3D2><SPAN=20
-class=3D811015813-03092007><SPAN class=3D277105713-05092007>Also this syste=
-m doesnt=20
-have the kernel source as well.</SPAN></SPAN></FONT></FONT></FONT></DIV>
-<DIV><FONT face=3DArial><FONT color=3D#0000ff><FONT size=3D2><SPAN=20
-class=3D811015813-03092007><SPAN class=3D277105713-05092007>I have to compi=
-le my=20
-code in some other system and put my binaries&nbsp;on this box&nbsp;to=20
-test.</SPAN></SPAN></FONT></FONT></FONT></DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007><STRONG></STRONG></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN class=3D811015813-03=
-092007>I have=20
-written the starting part of it and my driver seems to detect the device.=20
-</SPAN></FONT><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007>That is I could able to read the interface and t=
-he=20
-endpoints from it.</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN class=3D811015813-03=
-092007>But I=20
-am stuck on the part where we need to do "register", "open", "send" on the =
-HCI=20
-device.</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN class=3D811015813-03=
-092007>When I=20
-use HCI calls and install my driver I get "un-resolved" symbols.=20
-(hci_register_dev, hci_unregister_dev)</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN class=3D811015813-03=
-092007>I=20
-think this symbols are not exported in my kernel. </SPAN></FONT></DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN class=3D811015813-03=
-092007>Is=20
-there any way to EXPORT this symbols without re-building the Kernel=20
-again?</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN class=3D811015813-03=
-092007>Or is=20
-there any other way by which I can go ahead. That is without using=20
-HCI.</SPAN></FONT></DIV>
-<DIV><SPAN class=3D811015813-03092007><FONT face=3DArial><FONT color=3D#000=
-0ff><FONT=20
-size=3D2>Can I use RFCOMM here??<SPAN=20
-class=3D277105713-05092007>&nbsp;</SPAN></FONT></FONT></FONT></SPAN></DIV>
-<DIV><SPAN class=3D811015813-03092007><FONT face=3DArial><FONT color=3D#000=
-0ff><FONT=20
-size=3D2><SPAN=20
-class=3D277105713-05092007></SPAN></FONT></FONT></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D811015813-03092007><FONT face=3DArial><FONT color=3D#000=
-0ff><FONT=20
-size=3D2><SPAN class=3D277105713-05092007>According to me it looks like "hc=
-i_core",=20
-"l2cap" and "rfcomm" interfaces are missing from my=20
-kernel.</SPAN></FONT></FONT></FONT></SPAN></DIV>
-<DIV><SPAN class=3D811015813-03092007><FONT face=3DArial><FONT color=3D#000=
-0ff><FONT=20
-size=3D2><SPAN class=3D277105713-05092007>Is there a way to re-compile only=
- this=20
-part from the whole kernel source and&nbsp;install it on my system to get t=
-hose=20
-symbols.&nbsp;</SPAN></FONT></FONT></FONT></SPAN></DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN class=3D811015813-03=
-092007>Can=20
-you guide me writing my own simple USB bluetooth driver for kernel 2.4.22 w=
-here=20
-I can able to transfer files from my mobile to my linux pc.</SPAN></FONT></=
-DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN class=3D811015813-03=
-092007>Please=20
-help me&nbsp;<SPAN=20
-class=3D277105713-05092007>&nbsp;out</SPAN>.</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007></SPAN></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007>Thanks, Regards</SPAN></FONT></DIV>
-<DIV><FONT face=3DArial color=3D#0000ff size=3D2><SPAN=20
-class=3D811015813-03092007>Pintu</SPAN></FONT></DIV></FONT></DIV><pre>SASKE=
-N BUSINESS DISCLAIMER
--------------------------
-This message may contain confidential, proprietary or legally privileged in=
-formation. In=20
-case you are not the original intended Recipient of the message, you must n=
-ot, directly or=20
-indirectly, use, Disclose, distribute, print, or copy any part of this mess=
-age and you are=20
-requested to delete it and inform the sender. Any views expressed in this m=
-essage are=20
-those of the individual sender unless otherwise stated. Nothing contained i=
-n this message=20
-shall be construed as an offer or acceptance of any offer by Sasken Communi=
-cation=20
-Technologies Limited ("Sasken") unless sent with that express intent and wi=
-th due=20
-authority of Sasken. Sasken has taken enough precautions to prevent the spr=
-ead of=20
-viruses. However the company accepts no liability for any damage caused by =
-any virus=20
-transmitted by this email
-</pre></BODY></HTML>
+<html>
+<head>
+<style>
+.hmmessage P
+{
+margin:0px;
+padding:0px
+}
+body.hmmessage
+{
+FONT-SIZE: 10pt;
+FONT-FAMILY:Tahoma
+}
+</style>
+</head>
+<body class=3D'hmmessage'>
+I have now redirected SCO to ALSA. I setup ALSA as a player, that is, sound=
+ shall be played on the soundcard. The hardest part in ALSA was to set the =
+correct number of frames and number of periods, but with the help of tutori=
+als on the web it worked out.<BR>
+&nbsp;<BR>
+Now I have set up ALSA to play 32 frames, 2 periods, mono, 8 kHz, S16_LE (s=
+igned 16 bits little endian on my Intel XScale PXA255). This means 64 bytes=
+ of data (one frame =3D one sample is 2 bytes when mono). This corresponds =
+to sound from SCO.<BR>
+&nbsp;<BR>
+Unfortunately, on my system SCO delivers only 60 bytes of data per read ope=
+ration, HV3&nbsp;delivers 30 bytes in one package,&nbsp;which doesn't add u=
+p with the soundcard. The soundcard (AC97-based) wants 16, 32, 64 bytes and=
+ so on. Therefore the sound isn't of good quality. On other soundcards it m=
+ay be possible to set a frame size which corresponds exactly to SCO.<BR>
+&nbsp;<BR>
+I think I will have to do some buffering from SCO before allowing ALSA to p=
+lay sound. <BR>
+&nbsp;<BR>
+-Mikael<BR>
+<BR>&gt; From: marcel@holtmann.org<BR>&gt; To: bluez-devel@lists.sourceforg=
+e.net<BR>&gt; Date: Fri, 24 Aug 2007 14:06:53 +0200<BR>&gt; Subject: Re: [B=
+luez-devel] SCO Question<BR>&gt; <BR>&gt; Hi Robert,<BR>&gt; <BR>&gt; &gt; =
+How would I go about redirecting incoming SCO data to an alsa device, <BR>&=
+gt; &gt; and transmit incoming audio data out as SCO?<BR>&gt; &gt; <BR>&gt;=
+ &gt; I have read the following pages,<BR>&gt; &gt; http://wiki.bluez.org/w=
+iki/Audio<BR>&gt; &gt; http://wiki.bluez.org/wiki/HOWTO/AudioDevices<BR>&gt=
+; &gt; <BR>&gt; &gt; but everything described seems to do too much. I would=
+ prefer to <BR>&gt; &gt; handle the RFCOMM channel, and SDP registration el=
+sewhere. <BR>&gt; &gt; Presently, I just want to determine how to redirect =
+the SCO traffic.<BR>&gt; <BR>&gt; actually you can't really do SCO without =
+a profile. In theory you can,<BR>&gt; but that is to compatible with out de=
+vices. Since this kind of<BR>&gt; application doesn't really make sense for=
+ most people we didn't focus on<BR>&gt; it and so nothing like that is avai=
+lable. However hstest.c and other SCO<BR>&gt; demos can be used to quickly =
+write something like that. The hardest part<BR>&gt; is to get the ALSA thin=
+g right. Again, you have to write that by<BR>&gt; yourself since we have no=
+ need for this right now.<BR>&gt; <BR>&gt; Regards<BR>&gt; <BR>&gt; Marcel<=
+BR>&gt; <BR>&gt; <BR>&gt; <BR>&gt; ----------------------------------------=
+---------------------------------<BR>&gt; This SF.net email is sponsored by=
+: Splunk Inc.<BR>&gt; Still grepping through log files to find problems? St=
+op.<BR>&gt; Now Search log events and configuration files using AJAX and a =
+browser.<BR>&gt; Download your FREE copy of Splunk now &gt;&gt; http://get.=
+splunk.com/<BR>&gt; _______________________________________________<BR>&gt;=
+ Bluez-devel mailing list<BR>&gt; Bluez-devel@lists.sourceforge.net<BR>&gt;=
+ https://lists.sourceforge.net/lists/listinfo/bluez-devel<BR><BR><br /><hr =
+/>Skapa ditt personliga s=F6kdjur och g=F6r dina s=F6kningar lite roligare =
+med SearchPet! <a href=3D'http://searchpet.live.se' target=3D'_new'>SearchP=
+et</a></body>
+</html>=
 
-------_=_NextPart_001_01C7F085.31FEA6BC--
+--_956886a9-23f5-45ed-8665-da668a52aff2_--
 
 
---===============0757685885==
+--===============0216044624==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -280,7 +161,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >>  http://get.splunk.com/
---===============0757685885==
+--===============0216044624==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -291,4 +172,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============0757685885==--
+--===============0216044624==--
