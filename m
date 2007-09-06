@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 6 Sep 2007 10:57:03 +0200
-From: Marco Milanesi <marco.milanesi@iaki.it>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <20070906105703.d2e79f4d.marco.milanesi@iaki.it>
-Mime-Version: 1.0
-Subject: [Bluez-users] pin less obex file transfer
+Message-ID: <d89ddf300709052356p45c2764bo471947b54ba18de@mail.gmail.com>
+Date: Thu, 6 Sep 2007 00:56:06 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <db972f430709052323m7d7df2dfn78fd802aeb4b780d@mail.gmail.com>
+MIME-Version: 1.0
+References: <db972f430709052323m7d7df2dfn78fd802aeb4b780d@mail.gmail.com>
+Subject: Re: [Bluez-users] bccmd compilation fails (help needed)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,24 +20,7 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hi all!
-
-    I have the need to transfer files from PC to mobile without inserting the pin code in the mobile.
-
-it has to be done only via command line, I have tried to disable in /etc/bluetooth/hcid.conf the param:
-
-    - security none
-
-with no success (it always asks the pin number)
-
-as a side note, with kfbtobex kde graphic application I was able to transfer file without authentication to the mobile
-
-any hints?
-
-thanks
-
-ciao,
-Marco
+./configure --enable-bccmd
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
