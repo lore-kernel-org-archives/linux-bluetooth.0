@@ -1,17 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "Stock, Christian" <c.stock@t-online.net>
-To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
-Date: Thu, 6 Sep 2007 15:17:05 +0200
-Message-ID: <7255BF0C8B1D6E409EB51F386145DD9E1258C64A2B@teo00208.de.t-online.corp>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <7255BF0C8B1D6E409EB51F386145DD9E1258C64A28@teo00208.de.t-online.corp>
 References: <mailman.24195.1189073979.21972.bluez-users@lists.sourceforge.net>
 	<7255BF0C8B1D6E409EB51F386145DD9E1258C64A27@teo00208.de.t-online.corp>
 	<1189082571.7318.37.camel@aeonflux.holtmann.net>
 	<7255BF0C8B1D6E409EB51F386145DD9E1258C64A28@teo00208.de.t-online.corp>
-	<1189084022.7318.40.camel@aeonflux.holtmann.net>
-In-Reply-To: <1189084022.7318.40.camel@aeonflux.holtmann.net>
-MIME-Version: 1.0
+Date: Thu, 06 Sep 2007 15:07:02 +0200
+Message-Id: <1189084022.7318.40.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] A2DP - Play Music from Cellphone to Computer,
- any hints?
+	any hints?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -25,28 +24,11 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-O.K.
-
-I'll read in to that then.
-
-Too bad that there are no hints nowhere.
-
-Thanks for the Tip.
-
-Christian
-
-
------Original Message-----
-From: bluez-users-bounces@lists.sourceforge.net [mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Marcel Holtmann
-Sent: Thursday, September 06, 2007 3:07 PM
-To: BlueZ users
-Subject: Re: [Bluez-users] A2DP - Play Music from Cellphone to Computer, any hints?
-
 Hi Christian,
 
 > This might sound stupid, but I thought a2dpd was the "new service".
 > As I read on  http://bluetooth-alsa.sourceforge.net/build.html.
->
+> 
 > Could you point me to the right direction / show me where to read?
 
 check wiki.bluez.org. Simply use --enable-audio with the lastest
@@ -58,16 +40,6 @@ Regards
 Marcel
 
 
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >>  http://get.splunk.com/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
