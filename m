@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "Stock, Christian" <c.stock@t-online.net>
-To: "'bluez-users@lists.sourceforge.net'" <bluez-users@lists.sourceforge.net>
-Date: Thu, 6 Sep 2007 14:40:33 +0200
-Message-ID: <7255BF0C8B1D6E409EB51F386145DD9E1258C64A27@teo00208.de.t-online.corp>
-References: <mailman.24195.1189073979.21972.bluez-users@lists.sourceforge.net>
-In-Reply-To: <mailman.24195.1189073979.21972.bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Subject: [Bluez-users]  A2DP - Play Music from Cellphone to Computer,
- any hints?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Marco Milanesi <marco.milanesi@iaki.it>
+In-Reply-To: <20070906113357.be276256.marco.milanesi@iaki.it>
+References: <20070906105703.d2e79f4d.marco.milanesi@iaki.it>
+	<1189070433.7318.26.camel@aeonflux.holtmann.net>
+	<20070906113357.be276256.marco.milanesi@iaki.it>
+Date: Thu, 06 Sep 2007 11:53:37 +0200
+Message-Id: <1189072417.7318.36.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Cc: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] pin less obex file transfer
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,22 +23,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi folks,
-I compiled an installed fine from http://bluetooth-alsa.sourceforge.net/build.html
+Hi Marco,
 
-...and got the a2dpd up and running.
+> > wild guess is that you used the wrong RFCOMM channel number. Make sure
+> > you use the Object Push channel retrieved via SDP and not some static
+> > magic. If the phone requires a PIN you can't do anything about it.
+> 
+> that was it! at least... partially. now operating on obex push channel (I didn't knew that there was a specific channel for PUSH) I can approve the file receving from the mobile, but obex prints this strange error:
+> root@myhost:/home/kpanic# obexftp -b 00:02:EE:46:5F:32 -B 9 -p image.jpg 
+> Browsing 00:02:EE:46:5F:32 ...
+> Channel: 10
+> Connecting...failed: FBS UUID
+> Still trying to connect
+> Connecting...failed: FBS UUID
+> Still trying to connect
+> Connecting...failed: FBS UUID
+> Still trying to connect
+> 
+> I'm noticing that also that I use -B 9 but Channel 10 is used, weird
 
-Also added the SDP records:
-        sdptool add A2SRC
-      sdptool add AVRTG
+use the OpenOBEX mailing list for any OBEX questions.
 
-I can connect to the service from my windows laptop, but not from my cellphone and in either case, theres no sound on the Computer. Pairing etc. worked fine.
+Regards
 
-How do I play music from the cellphone to the linux-box? Theres a lot of HOWTOs the other way round but not this way.
+Marcel
 
-Any help?
 
-Thanx guys...
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
