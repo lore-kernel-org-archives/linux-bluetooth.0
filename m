@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <e96e9eeb0709092329y686f2f38x479898e640438f03@mail.gmail.com>
-Date: Mon, 10 Sep 2007 09:29:25 +0300
-From: "Voni Hakau" <hakauvoni@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <a481fbf0709090804h3279547fj763b1a753231465d@mail.gmail.com>
+Date: Sun, 9 Sep 2007 11:04:22 -0400
+From: "Raymond Ingles" <sorceror171@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <160502.34676.qm@web38502.mail.mud.yahoo.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] bluez obex problem
+References: <553874.75328.qm@web38513.mail.mud.yahoo.com>
+	<160502.34676.qm@web38502.mail.mud.yahoo.com>
+Subject: Re: [Bluez-users] Throughput in RFCOMM
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,27 +21,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hi list,
+On 9/8/07, Sohel <itsmy_emale@yahoo.com> wrote:
+> any comments on my question?? atleast a "yes" or "no".
 
-i'm trying to use btobex (compiled from bluez' obex cvs package).
+> Sohel <itsmy_emale@yahoo.com> wrote:
 
-i can push files just wonderful using:
+> I have seen that throughput increases with data size in RFCOMM connection.
+> Why is it so ??
 
- ./btobex -i hci0 push target-bdaddr file-to-send
+ I'm not (at all) a Bluez expert, but it could be as simple as the
+fact that the larger the chunks of data you're sending, the lower the
+overhead. For each chunk of data there's going to be a header
+describing the chunk. The more chunks, the more headers; the fewer the
+chunks, the fewer the headers.
 
-but i didn't manage to receive files as I need to supply btobex some "channel":
-
-./btobex pull <bdaddr> [channel]
-
-what is this channel ?
-how can i get it ?
-i just want my device to accept files pushed from other devices...
-
-(it is embedded and i need the simplest possible command line obex
-tool)
-
-thank you !
-voni
+ If what you're seeing can't be accounted for that way, you'll need to
+hope that a real expert chimes in.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
