@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <46E5B456.7010404@gmail.com>
-Date: Mon, 10 Sep 2007 18:17:10 -0300
-From: Manuel Naranjo <naranjo.manuel@gmail.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <e96e9eeb0709092329y686f2f38x479898e640438f03@mail.gmail.com>	<1189451152.687.51.camel@violet>
-	<e96e9eeb0709101343x389fcf0dp46950d56680bb7f3@mail.gmail.com>
-In-Reply-To: <e96e9eeb0709101343x389fcf0dp46950d56680bb7f3@mail.gmail.com>
-Subject: Re: [Bluez-users] bluez obex problem
+In-Reply-To: <8c7950360709101256u4a62893dmcd4b342343088a73@mail.gmail.com>
+References: <8c7950360709061306w39a081f1od1c372dafabc5072@mail.gmail.com>
+	<1189451433.687.59.camel@violet>
+	<8c7950360709101256u4a62893dmcd4b342343088a73@mail.gmail.com>
+Date: Mon, 10 Sep 2007 22:56:59 +0200
+Message-Id: <1189457819.687.89.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] devices always connect with out asking for
+	PIN	even with pairing enabled!
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,14 +23,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Check the project OpenObex, they are the defacto implementation for obex 
-under linux.
-> thank you very much for the reply.
-> is there a simple command-line OPP server or FTP server application anywhere ?
-> and just for the sake of knowledge - how can i know what channel to supply
-> btobex when it is needed ?
->
->   
+Hi Shane,
+
+> I was not trying to do wild guessing with the hci.conf, I have read
+> the readme's and MAN files on the hcid.conf.   What I'm trying to
+> better understand is performing secure bluetooth however can't find
+> documentation on what type of security is available during the initial
+> paring process.  It seem to me that at the hci level is the correct
+> place to provide security.
+> 
+> At a minimum I want to provide a unique PIN so that only devices with
+> that PIN can pair to my unit but I also don't want someone using
+> hcidump to sit by two of my units that are pairing and get the PIN.
+> 
+> Ideally it would be great to have something similar to ssh were I
+> could only allow a certain encrypted key to pair to my device.  Then I
+> could distribute that private encrypted key to all devices that I want
+> to give connection privilege.   That is what I originally thought the
+> Auth/Encryption option was for in the hcid.conf but after reading the
+> MAN page I don't believe that is the case.
+
+they have been removed from upstream anyway, because they lead to the
+wrong assumptions.
+
+And again, check the manual page for pand or check pand --help for
+further information. It will give you all needed information.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
