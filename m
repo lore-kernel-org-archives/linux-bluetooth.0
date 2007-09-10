@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <7A4442F6D7BAD14292CEBFD4A76E31A703D11001@ZMY16EXM66.ds.mot.com>
-References: <7A4442F6D7BAD14292CEBFD4A76E31A703D11001@ZMY16EXM66.ds.mot.com>
-Date: Mon, 10 Sep 2007 21:04:31 +0200
-Message-Id: <1189451071.687.48.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluez Stack compilation for broadcom board
+Message-ID: <e1effdeb0709101035v352dc24uc853cecceaa47f2d@mail.gmail.com>
+Date: Mon, 10 Sep 2007 14:35:46 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <loom.20070907T162203-609@post.gmane.org>
+MIME-Version: 1.0
+References: <loom.20070907T162203-609@post.gmane.org>
+Subject: Re: [Bluez-users] input service leaking l2cap connections
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,20 +20,47 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Dick,
 
->  Please tell me what is the procedure to compile bluez source code for
-> the broadcom bluetooth board, BCM2045.
+I was not able to reproduce the reported problem. Could you please
+send me more details? Try reproduce the problem in the latest release
+(3.18) and share your hcidump.
 
-you must ask specific question and not such generic ones. These kind of
-questions will get you no help here since even I have no idea what you
-actually wanna do.
+On 9/7/07, Dick <dick@mrns.nl> wrote:
+> Hi,
+>
+> I still have some trouble with the input service and I think I've found
+> something related which is reproduceable.
+>
+> If a device is reconnecting a lot the l2cap table in /sys/class/bluetooth/l2cap
+> is growing with connections (which aren't closed).
+>
+> Try the following with a HID input device:
+>
+> 1. Start and configure the input service for the device
+[Claudio Takahasi]
+After call CreateDevice how are you connecting the input? Device
+initiated connection or calling Device.Connect() ?
 
-Regards
+> 2. Start hcidump
+> 3. Power off the input device
+> 4. Wait until "Disconn complete" appear in hcidump
+> 5. Power on the input device
+[Claudio Takahasi]
+how are you reconnecting?
 
-Marcel
+> 6. Repeat from step 3
+>
+> If you look at:
+> sort /sys/class/bluetooth/l2cap |uniq -c
+>
+> You will see a huge number of connections from the input device.
+>
+> greetings,
+> Dick
 
-
+BR,
+Claudio Takahasi.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
