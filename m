@@ -1,18 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <7255BF0C8B1D6E409EB51F386145DD9E1258C64A2B@teo00208.de.t-online.corp>
-References: <mailman.24195.1189073979.21972.bluez-users@lists.sourceforge.net>
-	<7255BF0C8B1D6E409EB51F386145DD9E1258C64A27@teo00208.de.t-online.corp>
-	<1189082571.7318.37.camel@aeonflux.holtmann.net>
-	<7255BF0C8B1D6E409EB51F386145DD9E1258C64A28@teo00208.de.t-online.corp>
-	<1189084022.7318.40.camel@aeonflux.holtmann.net>
-	<7255BF0C8B1D6E409EB51F386145DD9E1258C64A2B@teo00208.de.t-online.corp>
-Date: Mon, 10 Sep 2007 21:12:28 +0200
-Message-Id: <1189451548.687.64.camel@violet>
+In-Reply-To: <8c7950360709061306w39a081f1od1c372dafabc5072@mail.gmail.com>
+References: <8c7950360709061306w39a081f1od1c372dafabc5072@mail.gmail.com>
+Date: Mon, 10 Sep 2007 21:10:33 +0200
+Message-Id: <1189451433.687.59.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] A2DP - Play Music from Cellphone to Computer,
-	any hints?
+Subject: Re: [Bluez-users] devices always connect with out asking for
+	PIN	even with pairing enabled!
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -26,13 +21,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Christian,
+Hi Shane,
 
-> I'll read in to that then.
+> I have two embedded Linux devices that I'm running a network between
+> using PAN.  I have decided that I would like to enable pairing and
+> eventually encryption for security reasons.  
+> Here is what I have done I'm starting pand master with the following: 
+> pand --listen --master --role  NAP
+> and the slave with
+> pand --connect 00:A0:96:18:69:D8 --persist
+> were 00:A0:96:18:69:D8 is the masters address.
 > 
-> Too bad that there are no hints nowhere.
+> Below are the hci.conf files for both my master and slave device.. 
 
-it is Wiki. So feel free to improve the documentation.
+don't touch hcid.conf unless you know exactly what you are doing. Wild
+guessing doesn't help here and if you mess it up then it is your fault.
+I mentioned that multiple times, but people keep doing it anyway.
+
+If you wanna have authentication and encryption, then read the manual
+page of pand. It allows you to specify this for the server.
 
 Regards
 
