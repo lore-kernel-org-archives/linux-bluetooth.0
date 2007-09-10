@@ -1,12 +1,18 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <794811.56233.qm@web51403.mail.re2.yahoo.com>
-References: <794811.56233.qm@web51403.mail.re2.yahoo.com>
-Date: Mon, 10 Sep 2007 21:16:55 +0200
-Message-Id: <1189451815.687.72.camel@violet>
+In-Reply-To: <7255BF0C8B1D6E409EB51F386145DD9E1258C64A2B@teo00208.de.t-online.corp>
+References: <mailman.24195.1189073979.21972.bluez-users@lists.sourceforge.net>
+	<7255BF0C8B1D6E409EB51F386145DD9E1258C64A27@teo00208.de.t-online.corp>
+	<1189082571.7318.37.camel@aeonflux.holtmann.net>
+	<7255BF0C8B1D6E409EB51F386145DD9E1258C64A28@teo00208.de.t-online.corp>
+	<1189084022.7318.40.camel@aeonflux.holtmann.net>
+	<7255BF0C8B1D6E409EB51F386145DD9E1258C64A2B@teo00208.de.t-online.corp>
+Date: Mon, 10 Sep 2007 21:12:28 +0200
+Message-Id: <1189451548.687.64.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] bluez on INTEL SA1110....................
+Subject: Re: [Bluez-users] A2DP - Play Music from Cellphone to Computer,
+	any hints?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,23 +26,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Suman,
+Hi Christian,
 
+> I'll read in to that then.
 > 
->           i need some help on BlueZ installation on INTEL STRONG ARM
-> SA1110 board. i have the board ported with linux 2.4.4 kernel. i have
-> checked the driver and include but the bluetooth drivers r not
-> installed.  
->        how can i install the BlueZ on this board. can any body plz
-> help me on this. 
+> Too bad that there are no hints nowhere.
 
-start by using a 2.6.22 kernel. All this old crappy 2.4 kernels should
-be no longer used. I don't support them anyway.
+it is Wiki. So feel free to improve the documentation.
 
 Regards
 
 Marcel
-
 
 
 
