@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <46DF18F7.8000807@gmail.com>
-References: <46DF18F7.8000807@gmail.com>
-Date: Mon, 10 Sep 2007 21:13:48 +0200
-Message-Id: <1189451628.687.67.camel@violet>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <6E672510D37D58428215BDFDF097DB46012D653E@EXGNT01.sasken.com>
+References: <6E672510D37D58428215BDFDF097DB46012D653E@EXGNT01.sasken.com>
+Date: Mon, 10 Sep 2007 21:11:50 +0200
+Message-Id: <1189451510.687.62.camel@violet>
 Mime-Version: 1.0
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [Bluez-users] [BLUETOOTH-ALSA] Skype with
-	SCO/headsetd deamon
+Subject: Re: [Bluez-devel] FW: Regarding USB Bluetooth Driver
+	for	Linux.....(2.4.22 kernel)!
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,26 +21,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Advhertz,
+Hi Pintu,
+> 
+> I have a USB Bluetooth device which can be used to transfer/receive
+> files from my Mobile. 
+>  
+> I am working on a PBX system which is running on Linux.
+> I am planning to write a USB Bluetooth Driver for this in Linux.
+> My  PBX Linux kernel version is - 2.4.22-ncgl-10.12.1.0
+> (Note: This kernel is a modified kernel of "2.4.22" without bluetooth
+> support)
+> I dont have any means of re-compiling the whole kernel again and
+> putting it on the box.
+> Also its not possible for me to upgrade the kernel version to 2.6.
 
-> anyone knows how to let to works an headset bluetooth via SCO protocol 
-> with skype?
-> 
-> Once compiled and installed the bluetooth-alsa stack I've configured the 
-> ~/.asoundrc as the attached one and I did works the headset with vlc 
-> (vlc --alsadev=headset-sco-resample file.mp3) and aplay (aplay -D 
-> headset-sco-resample file.wav) well.
-> 
-> But as tried with skype, I had some problem.
-> 
-> When I launch skype the system do the pairing with the headset device 
-> but when I'm trying to make some tests (sound test and test call) I 
-> don't hear nothing.
+we don't support the 2.4 kernel series anymore. So you are own your own.
 
-the bluetooth-alsa project is dead. Use the new audio service that is
-included in bluez-utils. However the mono headset support with SCO over
-HCI has been not tested enough. Feel free to report any issues and you
-can always send in patches.
+> Also this system doesnt have the kernel source as well.
+
+Actually that is illegal.
 
 Regards
 
