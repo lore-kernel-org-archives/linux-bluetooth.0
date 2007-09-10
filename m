@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <e96e9eeb0709101559s56995b16rcb442901d3bf3c6e@mail.gmail.com>
-Date: Tue, 11 Sep 2007 01:59:47 +0300
-From: "Voni Hakau" <hakauvoni@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <46E5B456.7010404@gmail.com>
+Message-ID: <46E5B456.7010404@gmail.com>
+Date: Mon, 10 Sep 2007 18:17:10 -0300
+From: Manuel Naranjo <naranjo.manuel@gmail.com>
 MIME-Version: 1.0
-References: <e96e9eeb0709092329y686f2f38x479898e640438f03@mail.gmail.com>
-	<1189451152.687.51.camel@violet>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <e96e9eeb0709092329y686f2f38x479898e640438f03@mail.gmail.com>	<1189451152.687.51.camel@violet>
 	<e96e9eeb0709101343x389fcf0dp46950d56680bb7f3@mail.gmail.com>
-	<46E5B456.7010404@gmail.com>
+In-Reply-To: <e96e9eeb0709101343x389fcf0dp46950d56680bb7f3@mail.gmail.com>
 Subject: Re: [Bluez-users] bluez obex problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -23,16 +21,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Manuel,
+Check the project OpenObex, they are the defacto implementation for obex 
+under linux.
+> thank you very much for the reply.
+> is there a simple command-line OPP server or FTP server application anywhere ?
+> and just for the sake of knowledge - how can i know what channel to supply
+> btobex when it is needed ?
+>
+>   
 
-On 9/11/07, Manuel Naranjo <naranjo.manuel@gmail.com> wrote:
-> Check the project OpenObex, they are the defacto implementation for obex
-> under linux.
-
-but it is only ftp server ? no opp server ?
-
-thank you
-voni
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
