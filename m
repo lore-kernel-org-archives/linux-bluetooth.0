@@ -1,16 +1,19 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <8c7950360709110512k1cede8e8r78b04b739de49ce4@mail.gmail.com>
-Date: Tue, 11 Sep 2007 08:12:54 -0400
-From: shanevolpe@gmail.com
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1189457819.687.89.camel@violet>
+From: "Stock, Christian" <c.stock@t-online.net>
+To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
+Date: Tue, 11 Sep 2007 11:43:30 +0200
+Message-ID: <7255BF0C8B1D6E409EB51F386145DD9E1258C64A40@teo00208.de.t-online.corp>
+References: <mailman.24195.1189073979.21972.bluez-users@lists.sourceforge.net>
+	<7255BF0C8B1D6E409EB51F386145DD9E1258C64A27@teo00208.de.t-online.corp>
+	<1189082571.7318.37.camel@aeonflux.holtmann.net>
+	<7255BF0C8B1D6E409EB51F386145DD9E1258C64A28@teo00208.de.t-online.corp>
+	<1189084022.7318.40.camel@aeonflux.holtmann.net>
+	<7255BF0C8B1D6E409EB51F386145DD9E1258C64A2B@teo00208.de.t-online.corp>
+	<1189451548.687.64.camel@violet>
+In-Reply-To: <1189451548.687.64.camel@violet>
 MIME-Version: 1.0
-References: <8c7950360709061306w39a081f1od1c372dafabc5072@mail.gmail.com>
-	<1189451433.687.59.camel@violet>
-	<8c7950360709101256u4a62893dmcd4b342343088a73@mail.gmail.com>
-	<1189457819.687.89.camel@violet>
-Subject: Re: [Bluez-users] devices always connect with out asking for PIN
-	even with pairing enabled!
+Subject: Re: [Bluez-users] A2DP - Play Music from Cellphone to Computer,
+ any hints?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,65 +27,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel,
-Then if comment out all the options in the hcid.conf, hcid should then
-use all its default values and I should be able to do the pairing and
-security completely with PAND, correct?
+Hi Marcel,
+My bad. You are right of course!
+I meant the bluetooth-alsa project not mentioning they are dead.
 
-A passkey agent is used to send the key when requested by the master
-but then how do you set the passkey on the master.  I was originally
-using passkey in the hcid.conf file but that goes against your
-recommendation of never touching the hcid.conf file.  Were does the
-master PIN get set?  Does it also just use a passkey agent?
-Regards,
-Shane
+Keep up the good work!!!
 
-On 9/10/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Shane,
->
-> > I was not trying to do wild guessing with the hci.conf, I have read
-> > the readme's and MAN files on the hcid.conf.   What I'm trying to
-> > better understand is performing secure bluetooth however can't find
-> > documentation on what type of security is available during the initial
-> > paring process.  It seem to me that at the hci level is the correct
-> > place to provide security.
-> >
-> > At a minimum I want to provide a unique PIN so that only devices with
-> > that PIN can pair to my unit but I also don't want someone using
-> > hcidump to sit by two of my units that are pairing and get the PIN.
-> >
-> > Ideally it would be great to have something similar to ssh were I
-> > could only allow a certain encrypted key to pair to my device.  Then I
-> > could distribute that private encrypted key to all devices that I want
-> > to give connection privilege.   That is what I originally thought the
-> > Auth/Encryption option was for in the hcid.conf but after reading the
-> > MAN page I don't believe that is the case.
->
-> they have been removed from upstream anyway, because they lead to the
-> wrong assumptions.
->
-> And again, check the manual page for pand or check pand --help for
-> further information. It will give you all needed information.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2005.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+Christian
 
 
--- 
-Registered Linux User: #293401
+-----Original Message-----
+From: bluez-users-bounces@lists.sourceforge.net [mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Marcel Holtmann
+Sent: Monday, September 10, 2007 9:12 PM
+To: BlueZ users
+Subject: Re: [Bluez-users] A2DP - Play Music from Cellphone to Computer, any hints?
+
+Hi Christian,
+
+> I'll read in to that then.
+>
+> Too bad that there are no hints nowhere.
+
+it is Wiki. So feel free to improve the documentation.
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
