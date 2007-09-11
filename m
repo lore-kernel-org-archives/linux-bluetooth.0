@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Toralf =?ISO-8859-1?Q?F=F6rster?= <toralf.foerster@gmx.de>
-In-Reply-To: <200709121104.43419.toralf.foerster@gmx.de>
-References: <200709121104.43419.toralf.foerster@gmx.de>
-Date: Wed, 12 Sep 2007 18:23:32 +0200
-Message-Id: <1189614213.12789.59.camel@aeonflux.holtmann.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <000001c7f41c$0436cb70$3701a8c0@YANNIS>
+References: <000001c7f41c$0436cb70$3701a8c0@YANNIS>
+Date: Tue, 11 Sep 2007 06:54:35 +0200
+Message-Id: <1189486475.7893.36.camel@violet>
 Mime-Version: 1.0
-Cc: bluez-devel@lists.sf.net
-Subject: Re: [Bluez-devel] build #314 failed for 2.6.23-rc6-g577107e
-	in	linux/net/bluetooth/hci_sock.c
+Subject: Re: [Bluez-devel] USB Linux support for MA-720
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,22 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Toralf,
+Hi,
+ 
+> T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  2 Spd=1.5 MxCh= 0
+> D:  Ver= 1.00 Cls=ff(vend.) Sub=ff Prot=00 MxPS= 8 #Cfgs=  1
+> P:  Vendor=0df7 ProdID=0722 Rev= 0.00
+> S:  Manufacturer=MobileAction Technology Inc.
+> S:  Product=Bluetooth Dongle
+> C:* #Ifs= 1 Cfg#= 1 Atr=80 MxPwr=100mA
+> I:  If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
+> E:  Ad=02(O) Atr=03(Int.) MxPS=   8 Ivl=10ms
 
-> the build with the attached .config failed, make ends with:
-> ...
->   CC      net/bluetooth/hci_conn.o
->   CC      net/bluetooth/hci_event.o
->   CC      net/bluetooth/hci_sock.o
-> net/bluetooth/hci_sock.c: In function 'hci_sock_cmsg':
-> net/bluetooth/hci_sock.c:352: error: storage size of 'ctv' isn't known
-> net/bluetooth/hci_sock.c:352: warning: unused variable 'ctv'
-> make[2]: *** [net/bluetooth/hci_sock.o] Error 1
-> make[1]: *** [net/bluetooth] Error 2
-> make: *** [net] Error 2
-
-patch for that is floating around the kernel mailing list. It is
-COMPAT_CONFIG issue and fully my fault.
+that actually is a non-default Bluetooth dongle. Seems they need its own
+special driver. I would need a hardware sample to say more.
 
 Regards
 
