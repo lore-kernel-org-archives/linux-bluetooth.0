@@ -1,10 +1,18 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 11 Sep 2007 21:09:39 +0300
-From: Niv <nivw2002@fastmail.fm>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-id: <46E6D9E3.7050605@fastmail.fm>
-MIME-version: 1.0
-Subject: [Bluez-users] palm doesnt discover pc
+Date: Tue, 11 Sep 2007 18:00:35 +0200
+From: "Marcus C. Gottwald" <gottwald@inf.fu-berlin.de>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20070911160035.GA21014@mi.fu-berlin.de>
+References: <8c7950360709061306w39a081f1od1c372dafabc5072@mail.gmail.com>
+	<1189451433.687.59.camel@violet>
+	<8c7950360709101256u4a62893dmcd4b342343088a73@mail.gmail.com>
+	<1189457819.687.89.camel@violet>
+	<8c7950360709110512k1cede8e8r78b04b739de49ce4@mail.gmail.com>
+	<1189523747.12789.25.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+In-Reply-To: <1189523747.12789.25.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-users] devices always connect with out asking for
+	PIN	even with pairing enabled!
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,100 +22,30 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-when I scan for bluetooth in my palm E2 I dont see the pc. I do see the
-cellular and a pc running a previous version of bluez:
-my kernel: 2.6.21-gentoo
-bluez-libs-3.18 bluez-utils-3.18 bluez-hcidump-1.40
-I run hcidump -X and I dont get anything when initiating the scan from
-the palm.
 
-however, I can find and ping the palm from the pc:
+Marcel Holtmann wrote (Tue 2007-Sep-11 17:15:47 +0200):
 
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr 00:07:E0:56:6B:53 mode 2 clkoffset 0x0000
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-    status 0x00 handle 42
-    Features: 0xff 0xff 0x0d 0x00 0x00 0x00 0x00 0x00
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr 00:07:E0:56:6B:53 name 'E2'
-> ACL data: handle 42 flags 0x02 dlen 28
-    L2CAP(s): Echo rsp: dlen 20
-    41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50 51 52 53 54
-< ACL data: handle 42 flags 0x02 dlen 52
-    L2CAP(s): Echo req: dlen 44
-    41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50 51 52 53 54
-    55 56 57 58 59 5A 5B 5C 5D 5E 5F 60 61 62 63 64 65 66 67 68
-    41 42 43 44
+> You have to run a passkey agent. It takes care of asking for the PIN. A
+> passkey agent however must not be interactive. It could always provide a
+> default PIN. Write your own one if you need something special.
 
-how can I turn my pc to be discoverable?
+Note that when a German writes "must not" and it doesn't really
+seem to make sense, he usually means "does not have to". This is
+due to similar wording (but different meaning) used in the
+German language. Same is true for "actual", which is often used
+when the intended meaning is "current" or "prevailing".
 
-/etc/bluetooth/hcid.conf:
-#
-# HCI daemon configuration file.
-#
 
-# HCId options
-options {
-	# Automatically initialize new devices
-	autoinit yes;
+Cheers, Marcus
 
-	# Security Manager mode
-	#   none - Security manager disabled
-	#   auto - Use local PIN for incoming connections
-	#   user - Always ask user for a PIN
-	#
-	security auto;
+-- =
 
-	# Pairing mode
-	#   none  - Pairing disabled
-	#   multi - Allow pairing with already paired devices
-	#   once  - Pair once and deny successive attempts
-	pairing multi;
+   Marcus C. Gottwald  =B7  http://www.inf.fu-berlin.de/~gottwald/
 
-	# Default PIN code for incoming connections
-	passkey /etc/bluetooth/pin-helper;
-}
-
-# Default settings for HCI devices
-device {
-	# Local device name
-	#   %d - device id
-	#   %h - host name
-	##name "BlueZ on %h (%d)";
-	name "BlueZ on %h (%d)";
-
-	# Local device class
-	## old ?
-	class 0x3e0100;
-	##new?? class 0x000100;
-
-	# Default packet type
-	#pkt_type DH1,DM1,HV1;
-
-	# Inquiry and Page scan
-	iscan enable; pscan enable;
-
-	# Default link mode
-	#   none   - no specific policy
-	#   accept - always accept incoming connections
-	#   master - become master on incoming connections,
-	#            deny role switch on outgoing connections
-	lm accept;
-
-	# Default link policy
-	#   none    - no specific policy
-	#   rswitch - allow role switch
-	#   hold    - allow hold mode
-	#   sniff   - allow sniff mode
-	#   park    - allow park mode
-	lp rswitch,hold,sniff,park;
-}
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
