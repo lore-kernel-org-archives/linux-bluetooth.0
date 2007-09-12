@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Matthias Becker <matthias.becker@beyondsoft.de>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1189614213.12789.59.camel@aeonflux.holtmann.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Toralf =?ISO-8859-1?Q?F=F6rster?= <toralf.foerster@gmx.de>
+In-Reply-To: <200709121104.43419.toralf.foerster@gmx.de>
 References: <200709121104.43419.toralf.foerster@gmx.de>
-	<1189614213.12789.59.camel@aeonflux.holtmann.net>
-Date: Thu, 13 Sep 2007 17:24:11 +0200
-Message-Id: <1189697051.4067.19.camel@matthias.BEYONDSOFT.local>
+Date: Wed, 12 Sep 2007 18:23:32 +0200
+Message-Id: <1189614213.12789.59.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel]  What can I do in parallel
+Cc: bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] build #314 failed for 2.6.23-rc6-g577107e
+	in	linux/net/bluetooth/hci_sock.c
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,52 +22,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Toralf,
 
-I write an aplication that is intended to push a file to all surrounding
-mobilephones. So it performs an inquiry scan and than starts threads for
-all recived addresses to push the file.
+> the build with the attached .config failed, make ends with:
+> ...
+>   CC      net/bluetooth/hci_conn.o
+>   CC      net/bluetooth/hci_event.o
+>   CC      net/bluetooth/hci_sock.o
+> net/bluetooth/hci_sock.c: In function 'hci_sock_cmsg':
+> net/bluetooth/hci_sock.c:352: error: storage size of 'ctv' isn't known
+> net/bluetooth/hci_sock.c:352: warning: unused variable 'ctv'
+> make[2]: *** [net/bluetooth/hci_sock.o] Error 1
+> make[1]: *** [net/bluetooth] Error 2
+> make: *** [net] Error 2
 
-But I need to know what is allowed to do in parallel. 
+patch for that is floating around the kernel mailing list. It is
+COMPAT_CONFIG issue and fully my fault.
 
-(I know that I can't read multiple names via hci_read_remote_name. But I
-don't need those names anyway.)
+Regards
 
-To push the file I need to get the OBEX push channel. Can I do multiple
-SDP requests over one bluetooth adapter at the same time?
+Marcel
 
-hcidump shows me that SDP seems to perform a name reuest. Why is this?
-
-(an excerpt from hcidump while a call to "sdptool browse
-00:19:63:9D:09:16":
-...
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr 00:19:63:9D:09:16 mode 2 clkoffset 0x0000
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> HCI Event: Max Slots Change (0x1b) plen 3
-    handle 12 slots 5
-> ACL data: handle 12 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 1 status 0
-      Connection pending - No futher information available
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr 00:19:63:9D:09:16 name 'K800i'
-...
-)
-
-Than I need to do the OBEX stuff (using OpenOBEX
-BtOBEX_TransportConnect, ...).
-
-If I can do things in parallel how many can be performed in parallel per
-bluetooth adapter? I read something about bluetooth allows 7 active
-connections and 255 passive connections, but I'm not sure what that
-meens.
-
-
-
-Thanks in advance
-
--- Matthias
 
 
 -------------------------------------------------------------------------
