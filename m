@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY123-F29B9F211658DBCAE83E7F7C0C30@phx.gbl>
-From: "Another Name" <anothersillyname@hotmail.com>
 To: bluez-users@lists.sourceforge.net
-Date: Fri, 14 Sep 2007 00:28:25 +0100
+From: wimpunk <kwdpggwxwumz@spammotel.com>
+Date: Thu, 13 Sep 2007 19:40:22 +0200
+Message-ID: <699or4-p0q.ln1@tisnix.motzarella.org>
+References: <iafkr4-c36.ln1@tisnix.motzarella.org>
+	<20070912091328.GA6594@suse.de>
 Mime-Version: 1.0
-Subject: [Bluez-users] Plugz fails ./configure glib-2.0 gthread-2.0
-	gobject-2.0 not found on Fedora 7..
+In-Reply-To: <20070912091328.GA6594@suse.de>
+Subject: Re: [Bluez-users] Bluetooth mouse not connecting using Lenny
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,19 +21,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-says it can't find the packages when they're there and installed in the 
-standard paths.
+Stefan Seyfried wrote:
+> On Wed, Sep 12, 2007 at 08:58:58AM +0200, wimpunk wrote:
+>> Hi List,
+>>
+>> Since my upgrade to Lenny, my mouse doesn't connect automatically
+>> anymore.  To get my mouse working, I have to remove my USB bluetooth
+>> dongle and put it back.  I've compared the modules before and after but
+>> everything is the same.
+>> I've asked this on the debian mailinglist but nobody had an answer so
+>> maybe the bluez-user list can.
+>> When I try to connect after startup I get:
+>>
+>> $ hidd --connect 00:30:05:00:04:13
+>> Can't get device information: Connection timed out
+> 
+> Use recent bluez-libs/utils, they don't need hidd anymore.
+> 
+>> I remove the BT dongle and put it back:
+>> $ hidd --connect 00:30:05:00:04:13
+>> $
+>>
+>> Any one a suggestion what's going wrong?
+> 
+> No. I see similar looking problems sometimes, that is having to unplug
+> the dongle before my mouse will reconnect again, but this surely has
+> a different reason.
 
-glib2 2.12.13-1.fc7 (both i386 and x86_64 are installed + the devel library 
-and the static libs as well -devel only i386 obviously!!).
+I'm using hidd - Bluetooth HID daemon version 3.7
+Which version doesn't need HIDD?
 
-Any ideas anyone?
-
-TIA
-
-_________________________________________________________________
-Can you see your house from the sky? Try Live Search Maps 
-http://maps.live.com
+wimpunk.
 
 
 -------------------------------------------------------------------------
