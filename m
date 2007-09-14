@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Dick <dick@mrns.nl>
+Date: Fri, 14 Sep 2007 11:22:31 +0200
+From: Stefan Seyfried <seife@suse.de>
 To: bluez-users@lists.sourceforge.net
-Date: Fri, 14 Sep 2007 19:51:09 +0200
-Message-Id: <1189792269.7901.14.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] input service leaking l2cap connections
+Message-ID: <20070914092231.GB1085@suse.de>
+References: <BAY123-F29B9F211658DBCAE83E7F7C0C30@phx.gbl>
+	<BAY123-F26AFEA092F402F4E2C4044C0BC0@phx.gbl>
+MIME-Version: 1.0
+In-Reply-To: <BAY123-F26AFEA092F402F4E2C4044C0BC0@phx.gbl>
+Subject: Re: [Bluez-users] Plugz fails ./configure
+	glib-2.0	gthread-2.0gobject-2.0 not fo
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,56 +18,32 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-> I was not able to reproduce the reported problem. Could you please
-> send me more details? Try reproduce the problem in the latest release
-> (3.18) and share your hcidump.
-I'm using the latest bluez release and a almost-latest kernel
-(2.6.22-gentoo-r6).
+On Fri, Sep 14, 2007 at 02:29:42AM +0100, Another Name wrote:
+> Ignore this question folks....looks like my pkg-config stuff is borked....
+> =
 
-On 9/7/07, Dick <dick@mr...> wrote:
-> > Try the following with a HID input device:
-> >
-> > 1. Start and configure the input service for the device
-> [Claudio Takahasi]
-> After call CreateDevice how are you connecting the input? Device
-> initiated connection or calling Device.Connect() ?
-Device initiated.
+> rpm -qa | grep glib shows the packages installed whereas
 
-> 2. Start hcidump
-> 3. Power off the input device
-> 4. Wait until "Disconn complete" appear in hcidump
-Well, you *shouldn't* wait until "Disconn complete" during the
-"initialisation", go to step 5 just before the "Disconn complete".
-> 5. Power on the input device, the device should be reconnected
-initiated by the device.
-> 6. Repeat from step 3
+show the output of that command.
 
-I've posted this before; I've got another problem with the dinovo
-desktop.
+> pkg-config --list-all | grep glib doesn't show them and I can't locate =
 
-1. Start and configure the input service
-2. Let the devices initiate the connections
-3. Use the devices
-4. Wait until the devices go idle
-5. Wake the devices up
+> glib-2.0.pc
 
-Result:
-- hcidump will show you input from the devices
-- hcitool con will show you the input devices are connected
-- the input events aren't registed by the input service (keyboard /
-mouse won't work)
+You probably don't have the correct package installed.
+-- =
 
-I hope this helps,
+Stefan Seyfried
+QA / R&D Team Mobile Devices        |              "Any ideas, John?"
+SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
 
-TIA,
-Dick
 
-PS. The bluez gmane archive isn't updated anymore!
-
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
