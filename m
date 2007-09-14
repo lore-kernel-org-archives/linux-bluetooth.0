@@ -1,13 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-To: bluez-users@lists.sourceforge.net
-From: wimpunk <kwdpggwxwumz@spammotel.com>
-Date: Sun, 16 Sep 2007 16:42:38 +0200
-Message-ID: <uvrvr4-re9.ln1@tisnix.motzarella.org>
-References: <iafkr4-c36.ln1@tisnix.motzarella.org>	<20070912091328.GA6594@suse.de>	<699or4-p0q.ln1@tisnix.motzarella.org>
-	<20070914090648.GA1085@suse.de>
-Mime-Version: 1.0
-In-Reply-To: <20070914090648.GA1085@suse.de>
-Subject: Re: [Bluez-users] Bluetooth mouse not connecting using Lenny
+Message-ID: <BAY102-W161A569893E7DED72C4C3DF0BC0@phx.gbl>
+From: Robert Rawlins <robert_rawlins@hotmail.com>
+To: <bluez-users@lists.sourceforge.net>
+Date: Fri, 14 Sep 2007 19:47:25 +0000
+MIME-Version: 1.0
+Subject: [Bluez-users] Devices Get Stuck 'Down'
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,35 +14,99 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1399759804=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Stefan Seyfried wrote:
-> On Thu, Sep 13, 2007 at 07:40:22PM +0200, wimpunk wrote:
->> Stefan Seyfried wrote:
-> 
->>> No. I see similar looking problems sometimes, that is having to unplug
->>> the dongle before my mouse will reconnect again, but this surely has
->>> a different reason.
->> I'm using hidd - Bluetooth HID daemon version 3.7
->> Which version doesn't need HIDD?
-> 
-> You can disable the build of hidd since quite some time. In the openSUSE
-> package we stopped using it wiht release 3.10. Anyway, for proper debugging,
-> you should use the latest BlueZ-version. If you need to use the old version,
-> get support from your distribution ;-)
-> 
+--===============1399759804==
+Content-Type: multipart/alternative;
+	boundary="_b4d21a11-ce88-48c1-9f5d-7168c8ee4685_"
 
-I replaced my BT dongle by another one and my mouse seems to work
-perfect now.  It look likes it either was a kernel or hardware problem.
+--_b4d21a11-ce88-48c1-9f5d-7168c8ee4685_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
+Hello Guys,
+=20
+I've been having a few issues recently when using the DBUS API to work with=
+ my adapters that occasionally an adapter will go 'down' and wont come back=
+ 'up'. This happens more regularly when the devices are being used quite a =
+bit.
+=20
+Is there anything I can do to kick them back in to life again? sometimes a =
+'reboot' on the system doesn't seem to do the job, and i have to do a full =
+blown power cycle. This isn't very efficient when working with embedded pla=
+tforms. is there a better way of handling this? they're a CSR chip connecte=
+d by USB.
+=20
+Thanks guys, I look forward to hearing from you.
+=20
+Rob
+_________________________________________________________________
+Get free emoticon packs and customisation from Windows Live.=20
+http://www.pimpmylive.co.uk=
+
+--_b4d21a11-ce88-48c1-9f5d-7168c8ee4685_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<style>
+.hmmessage P
+{
+margin:0px;
+padding:0px
+}
+body.hmmessage
+{
+FONT-SIZE: 10pt;
+FONT-FAMILY:Tahoma
+}
+</style>
+</head>
+<body class=3D'hmmessage'>Hello Guys,<BR>
+&nbsp;<BR>
+I've been having a few issues recently when using the DBUS API to work with=
+ my adapters that occasionally an adapter will go 'down' and wont come back=
+ 'up'. This happens more regularly when the devices are being used quite a =
+bit.<BR>
+&nbsp;<BR>
+Is there anything I can do to kick them back in to life again? sometimes a =
+'reboot' on the system doesn't seem to do the job, and i have to do a full =
+blown power cycle. This isn't very efficient when working with embedded pla=
+tforms. is there a better way of handling this? they're a CSR chip connecte=
+d by USB.<BR>
+&nbsp;<BR>
+Thanks guys, I look forward to hearing from you.<BR>
+&nbsp;<BR>
+Rob<BR><br /><hr />Are you the Quizmaster?  <a href=3D'http://specials.uk.m=
+sn.com/brainbattle' target=3D'_new'>Play BrainBattle with a friend now! </a=
+></body>
+</html>=
+
+--_b4d21a11-ce88-48c1-9f5d-7168c8ee4685_--
+
+
+--===============1399759804==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============1399759804==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1399759804==--
