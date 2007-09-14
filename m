@@ -1,14 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 14 Sep 2007 11:22:31 +0200
+Date: Fri, 14 Sep 2007 11:06:48 +0200
 From: Stefan Seyfried <seife@suse.de>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20070914092231.GB1085@suse.de>
-References: <BAY123-F29B9F211658DBCAE83E7F7C0C30@phx.gbl>
-	<BAY123-F26AFEA092F402F4E2C4044C0BC0@phx.gbl>
+Message-ID: <20070914090648.GA1085@suse.de>
+References: <iafkr4-c36.ln1@tisnix.motzarella.org>
+	<20070912091328.GA6594@suse.de>
+	<699or4-p0q.ln1@tisnix.motzarella.org>
 MIME-Version: 1.0
-In-Reply-To: <BAY123-F26AFEA092F402F4E2C4044C0BC0@phx.gbl>
-Subject: Re: [Bluez-users] Plugz fails ./configure
-	glib-2.0	gthread-2.0gobject-2.0 not fo
+In-Reply-To: <699or4-p0q.ln1@tisnix.motzarella.org>
+Subject: Re: [Bluez-users] Bluetooth mouse not connecting using Lenny
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,19 +22,26 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Fri, Sep 14, 2007 at 02:29:42AM +0100, Another Name wrote:
-> Ignore this question folks....looks like my pkg-config stuff is borked....
+On Thu, Sep 13, 2007 at 07:40:22PM +0200, wimpunk wrote:
+> Stefan Seyfried wrote:
+
+> > No. I see similar looking problems sometimes, that is having to unplug
+> > the dongle before my mouse will reconnect again, but this surely has
+> > a different reason.
 > =
 
-> rpm -qa | grep glib shows the packages installed whereas
+> I'm using hidd - Bluetooth HID daemon version 3.7
+> Which version doesn't need HIDD?
 
-show the output of that command.
+You can disable the build of hidd since quite some time. In the openSUSE
+package we stopped using it wiht release 3.10. Anyway, for proper debugging,
+you should use the latest BlueZ-version. If you need to use the old version,
+get support from your distribution ;-)
 
-> pkg-config --list-all | grep glib doesn't show them and I can't locate =
+Have fun,
 
-> glib-2.0.pc
+	Stefan
 
-You probably don't have the correct package installed.
 -- =
 
 Stefan Seyfried
