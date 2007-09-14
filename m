@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY102-W161A569893E7DED72C4C3DF0BC0@phx.gbl>
-From: Robert Rawlins <robert_rawlins@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Fri, 14 Sep 2007 19:47:25 +0000
-MIME-Version: 1.0
-Subject: [Bluez-users] Devices Get Stuck 'Down'
+From: Dick <dick@mrns.nl>
+To: bluez-users@lists.sourceforge.net
+Date: Fri, 14 Sep 2007 19:51:09 +0200
+Message-Id: <1189792269.7901.14.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] input service leaking l2cap connections
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,99 +14,62 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1399759804=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1399759804==
-Content-Type: multipart/alternative;
-	boundary="_b4d21a11-ce88-48c1-9f5d-7168c8ee4685_"
+> I was not able to reproduce the reported problem. Could you please
+> send me more details? Try reproduce the problem in the latest release
+> (3.18) and share your hcidump.
+I'm using the latest bluez release and a almost-latest kernel
+(2.6.22-gentoo-r6).
 
---_b4d21a11-ce88-48c1-9f5d-7168c8ee4685_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+On 9/7/07, Dick <dick@mr...> wrote:
+> > Try the following with a HID input device:
+> >
+> > 1. Start and configure the input service for the device
+> [Claudio Takahasi]
+> After call CreateDevice how are you connecting the input? Device
+> initiated connection or calling Device.Connect() ?
+Device initiated.
 
-Hello Guys,
-=20
-I've been having a few issues recently when using the DBUS API to work with=
- my adapters that occasionally an adapter will go 'down' and wont come back=
- 'up'. This happens more regularly when the devices are being used quite a =
-bit.
-=20
-Is there anything I can do to kick them back in to life again? sometimes a =
-'reboot' on the system doesn't seem to do the job, and i have to do a full =
-blown power cycle. This isn't very efficient when working with embedded pla=
-tforms. is there a better way of handling this? they're a CSR chip connecte=
-d by USB.
-=20
-Thanks guys, I look forward to hearing from you.
-=20
-Rob
-_________________________________________________________________
-Get free emoticon packs and customisation from Windows Live.=20
-http://www.pimpmylive.co.uk=
+> 2. Start hcidump
+> 3. Power off the input device
+> 4. Wait until "Disconn complete" appear in hcidump
+Well, you *shouldn't* wait until "Disconn complete" during the
+"initialisation", go to step 5 just before the "Disconn complete".
+> 5. Power on the input device, the device should be reconnected
+initiated by the device.
+> 6. Repeat from step 3
 
---_b4d21a11-ce88-48c1-9f5d-7168c8ee4685_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+I've posted this before; I've got another problem with the dinovo
+desktop.
 
-<html>
-<head>
-<style>
-.hmmessage P
-{
-margin:0px;
-padding:0px
-}
-body.hmmessage
-{
-FONT-SIZE: 10pt;
-FONT-FAMILY:Tahoma
-}
-</style>
-</head>
-<body class=3D'hmmessage'>Hello Guys,<BR>
-&nbsp;<BR>
-I've been having a few issues recently when using the DBUS API to work with=
- my adapters that occasionally an adapter will go 'down' and wont come back=
- 'up'. This happens more regularly when the devices are being used quite a =
-bit.<BR>
-&nbsp;<BR>
-Is there anything I can do to kick them back in to life again? sometimes a =
-'reboot' on the system doesn't seem to do the job, and i have to do a full =
-blown power cycle. This isn't very efficient when working with embedded pla=
-tforms. is there a better way of handling this? they're a CSR chip connecte=
-d by USB.<BR>
-&nbsp;<BR>
-Thanks guys, I look forward to hearing from you.<BR>
-&nbsp;<BR>
-Rob<BR><br /><hr />Are you the Quizmaster?  <a href=3D'http://specials.uk.m=
-sn.com/brainbattle' target=3D'_new'>Play BrainBattle with a friend now! </a=
-></body>
-</html>=
+1. Start and configure the input service
+2. Let the devices initiate the connections
+3. Use the devices
+4. Wait until the devices go idle
+5. Wake the devices up
 
---_b4d21a11-ce88-48c1-9f5d-7168c8ee4685_--
+Result:
+- hcidump will show you input from the devices
+- hcitool con will show you the input devices are connected
+- the input events aren't registed by the input service (keyboard /
+mouse won't work)
 
+I hope this helps,
 
---===============1399759804==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+TIA,
+Dick
+
+PS. The bluez gmane archive isn't updated anymore!
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1399759804==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1399759804==--
