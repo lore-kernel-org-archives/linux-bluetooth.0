@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <ee63ef30709161456h20036922of9baa35648a50c02@mail.gmail.com>
-Date: Sun, 16 Sep 2007 16:56:35 -0500
-From: "Brandon Casey" <drafnel@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1189975690.7541.47.camel@aeonflux.holtmann.net>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <ee63ef30709161045u6e91123fj39996e9797c8f039@mail.gmail.com>
 References: <ee63ef30709161045u6e91123fj39996e9797c8f039@mail.gmail.com>
-	<1189975690.7541.47.camel@aeonflux.holtmann.net>
+Date: Sun, 16 Sep 2007 22:48:10 +0200
+Message-Id: <1189975690.7541.47.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] a2dp not working in stereo and minor patch
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,22 +20,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 9/16/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Brandon,
->
-> > I have a Sony DRBT21G and I have high quality audio working.
-> > I am using bluez-3.18 libs and utils.
-> >
-> > But, I am only getting mono sound. Stereo is not working. Here is an
-> > example running mpg123-alsa...
+Hi Brandon,
 
-> please check bluez-utils-3.19 since this bug should have been fixed
-> already.
+> I have a Sony DRBT21G and I have high quality audio working.
+> I am using bluez-3.18 libs and utils.
+> 
+> But, I am only getting mono sound. Stereo is not working. Here is an
+> example running mpg123-alsa...
+> 
+> $ mpg123-alsa -v -a bluetooth test.mp3
+> Playing MPEG stream 1 of 1: 06 Money.mp3 ...
+> 
+>         Title:   Money
+>         Artist:  Pink Floyd
+>         Album:   The Dark Side of the Moon [SACD]
+>         Year:    2003
+>         Genre:   Rock
+>         Comment:
+> 
+> MPEG 1.0, Layer: III, Freq: 44100, mode: Joint-Stereo, modext: 0, BPF : 835
+> Channels: 2, copyright: No, original: No, CRC: No, emphasis: 0.
+> Bitrate: 256 kbits/s Extension value: 0
+> Audio: 1:1 conversion, rate: 44100, encoding: signed 16 bit, channels: 1
+> 
+> 
+> This last line seems to indicate that the audio is being converted to
+> 1 channel. The missing stereo separation is particularly noticeable in
+> this song since the beginning starts out with cash register sounds
+> alternating from one ear to the other.
 
-confirmed, 3.19 fixes it! Wow, it sounds great.
+please check bluez-utils-3.19 since this bug should have been fixed
+already.
 
-thanks,
--brandon
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
