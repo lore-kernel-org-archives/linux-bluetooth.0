@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-From: Hugues Lafarge <Hugues.Lafarge@afp.com>
-Date: Mon, 17 Sep 2007 15:29:48 +0200
-Message-ID: <876429whbn.fsf@merlot.par.afp.com>
-MIME-Version: 1.0
-Subject: [Bluez-devel] debian not following bluez-* upgrades anymore ?!
+In-Reply-To: <41f42627.4a25d8c3.46ed7733.d4785@o2.pl>
+References: <41f42627.4a25d8c3.46ed7733.d4785@o2.pl>
+Date: Sun, 16 Sep 2007 22:49:31 +0200
+Message-Id: <1189975771.7541.49.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Problem with A2DP & HHB-750
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,42 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Konrad,
 
-It seems that debian is stucked at version 0.13 of the bluez-utils and
-bluez-gnome packages.
+> Hi. I've got Siemens HHB-750 bluetooth headphones and Dell Latitude X1 laptop with dell BT card:
+> Bus 002 Device 003: ID 413c:8103 Dell Computer Corp. Wireless 350 Bluetooth
+> 
+> Pairing is ok, connecting too, but it still skips (like buffering?). It depends on 'sbcbitpool' in config. For example for sbcbitpool=4 it skips every ~9 seconds. For sbcbitpool=32 it's about 300-500ms :(
+> I'm using Feodra 7 with kernel 2.6.22 (2.6.22.1-41.fc7).
 
-I was under the impression that Debian was following rather closely
-mainstream upgrades until recently.
+please test the audio service from bluez-utils-3.19. The installation
+details can be found at wiki.bluez.org.
 
-On my system (based on experimental) i get the following:
+Regards
 
-$ dpkg -l 'bluez-*' | grep '^ii'
+Marcel
 
-ii  bluez-cups              3.13-1            Bluetooth printer driver for CUPS
-ii  bluez-firmware          1.2-2             Firmware for Bluetooth devices
-ii  bluez-gnome             0.13-1            Bluetooth utilities for GNOME
-ii  bluez-hcidump           1.39-1            Analyses Bluetooth HCI packets
-ii  bluez-pcmcia-support    3.13-1            PCMCIA support files for BlueZ 2.0 Bluetooth tools
-ii  bluez-pin               0.30-2.1          Bluetooth PIN helper with D-BUS support
-ii  bluez-utils             3.13-1            Bluetooth tools and daemons
-
-So i'm wondering if anyone knows if there is a reason for that 'delay'.
-
-I'm not pushing, just wondering (and also being eager to that that new audio stuff
-on my laptop, i must admit, but i can perfectly live with the 'waiting').
-
-Thanks in advance for any info.
-
--- 
-Hugues Lafarge                    || Email: Hugues.Lafarge@afp.com
-Agence France Presse              || Phone: +33 1 40 41 77 15
-4 rue de la bourse, 75002 Paris   ||   Fax: +33 1 40 41 79 24
-
-
-
-This e-mail, and any file transmitted with it, is confidential and  intended solely for the use of the individual or entity to whom it is addressed. If you have received this email in error, please  contact the sender and delete the email from your system. If you are  not the named addressee you should not disseminate, distribute or copy  this email.
-
-For more information on Agence France-Presse, please visit our web site at http://www.afp.com
 
 
 -------------------------------------------------------------------------
