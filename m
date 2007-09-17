@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 17 Sep 2007 14:49:30 -0700 (PDT)
-From: suman <sundew_suman@yahoo.com>
+Date: Sun, 16 Sep 2007 22:40:50 -0700 (PDT)
+From: Johan Brannlund <johan_brn@yahoo.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Message-ID: <10405.65486.qm@web51406.mail.re2.yahoo.com>
-Subject: [Bluez-users] serial bluetooth adapter............
+Message-ID: <790151.13379.qm@web50209.mail.re2.yahoo.com>
+Subject: [Bluez-users] SCO headset with bluez audio service
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,79 +14,78 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0199727146=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0199727146==
-Content-Type: multipart/alternative; boundary="0-1395654636-1190065770=:65486"
+Hi. I have a Motorola H300 headset that works reasonably well with
+headsetd (including using it with Twinkle, a SIP softphone). I've now
+attempted to get it running with the bluez audio service - I'm using
+bluez-utils 3.18 in Ubuntu Gutsy.
 
---0-1395654636-1190065770=:65486
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+Playing sounds using "mplayer -ao alsa:device=bluetooth file.mp3" works
+well with the bluez method, but when I start Twinkle, I don't get any
+sound and Twinkle pops up a dialog saying "Unable to access speaker.
+Unable to access microphone." When Twinkle starts, the audio
+service spits out these messages:
 
-hi all=0A       I have some confusion in using bluez. I am trying to commun=
-icate my pc(Linux) with an arm board (LPC2129-ARM7). this board doesn't sup=
-port usb. i want to use a serial bluetooth adapter. =0A          Now i want=
- to know that can i use the BlueZ protocol i.e RFCOMM/L2CAP/SDP to communic=
-ate with the board with bluetooth serial adapter. or will it support only S=
-PP(Serial Port Protocol). i need to know before i buy the serial blouetooth=
- adapter as it costs $100 . =0A       so can any body tell me what services=
- i can use with a serial bluetooth adapter under BlueZ enviroment. or any s=
-uggestions are most welcome. =0A        Thanks in advance=0A=0A=0ADetails:-=
-=0ALinux:-2.6.21 kernel=0ABluez:-latest=0ASerial Adapter(Plug and Play)=0AM=
-odel # GBS301=0AManufacture :-IOGEAR=0A=0A---------------------------------=
-----=0AM.suman=0AIIIT pune ,hinjawadi=0A=0A=0A=0A=0A      _________________=
-___________________________________________________________________=0ADon't=
- let your dream ride pass you by. Make it a reality with Yahoo! Autos.=0Aht=
-tp://autos.yahoo.com/index.html=0A =0A=0A
---0-1395654636-1190065770=:65486
-Content-Type: text/html; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+audio[16573]: Accepted new client connection on unix socket (fd=8)
+audio[16573]: Package PKT_TYPE_CFG_REQ:0
+audio[16573]: State changed /org/bluez/audio/device0: DISCONNECTED -> 
+CONNECTING
+audio[16573]: /org/bluez/audio/device0: Connecting to 00:0B:2E:7E:22:37
+ channel 2
+audio[16573]: State changed /org/bluez/audio/device0: CONNECTING -> 
+CONNECTED
+audio[16573]: /org/bluez/audio/device0: Connected to 00:0B:2E:7E:22:37
+audio[16573]: State changed /org/bluez/audio/device0: CONNECTED -> 
+STREAM_STARTING
+audio[16573]: SCO socket opened for headset /org/bluez/audio/device0
+audio[16573]: SCO fd=10
+audio[16573]: fd=10, fd_opt=1, pkt_len=48, sample_size=2, rate=8000
+audio[16573]: 30 bytes sent
+audio[16573]: 22 bytes sent
+audio[16573]: State changed /org/bluez/audio/device0: STREAM_STARTING
+ -> STREAMING
+audio[16573]: Accepted new client connection on unix socket (fd=11)
+audio[16573]: Unix client disconnected (fd=8)
+audio[16573]: State changed /org/bluez/audio/device0: STREAMING -> 
+DISCONNECTED
+audio[16573]: Package PKT_TYPE_CFG_REQ:0
+audio[16573]: State changed /org/bluez/audio/device0: DISCONNECTED -> 
+CONNECTING
+audio[16573]: get_handles_reply: Unable to get handle array from reply
+audio[16573]: State changed /org/bluez/audio/device0: CONNECTING -> 
+DISCONNECTED
+audio[16573]: Unix client disconnected (fd=11)
+audio[16573]: Accepted new client connection on unix socket (fd=8)
+audio[16573]: Package PKT_TYPE_CFG_REQ:0
+audio[16573]: State changed /org/bluez/audio/device0: DISCONNECTED -> 
+CONNECTING
+audio[16573]: get_handles_reply: Unable to get handle array from reply
+audio[16573]: State changed /org/bluez/audio/device0: CONNECTING -> 
+DISCONNECTED
+audio[16573]: Unix client disconnected (fd=8)
 
-<html><head><style type=3D"text/css"><!-- DIV {margin:0px;} --></style></he=
-ad><body><div style=3D"font-family:times new roman,new york,times,serif;fon=
-t-size:12pt">hi all<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; I have some confusio=
-n in using bluez. I am trying to communicate my pc(Linux) with an arm board=
- (LPC2129-ARM7). this board doesn't support usb. i want to use a serial blu=
-etooth adapter. <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;  &nbsp; Now i want to k=
-now that can i use the BlueZ protocol i.e RFCOMM/L2CAP/SDP to communicate w=
-ith the board with bluetooth serial adapter. or will it support only SPP(Se=
-rial Port Protocol). i need to know before i buy the serial blouetooth adap=
-ter as it costs $100 . <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; so can any body =
-tell me what services i can use with a serial bluetooth adapter under BlueZ=
- enviroment. or any suggestions are most welcome. <br>&nbsp;&nbsp;&nbsp; &n=
-bsp;&nbsp;  Thanks in advance<br><br><br><span style=3D"font-weight:
- bold;">Details:-</span><br>Linux:-2.6.21 kernel<br>Bluez:-latest<br><span =
-style=3D"font-weight: bold; text-decoration: underline;">Serial Adapter(Plu=
-g and Play)</span><br><div><span class=3D"sublabel">Model # </span>GBS301<b=
-r>Manufacture :-IOGEAR<br></div>-------------------------------------<br>M.=
-suman<br>IIIT pune ,hinjawadi<br><br></div><br>=0A      <hr size=3D1>Catch =
-up on <a href=3D"http://us.rd.yahoo.com/tv/mail/tagline/falltv/evt=3D47093/=
-*http://tv.yahoo.com/collections/3658 =0A">fall's hot new shows</a> on Yaho=
-o! TV.  Watch previews, get listings, and more!=0A=0A</body></html>
---0-1395654636-1190065770=:65486--
+Does anyone know what the problem could be? Could it have something to
+do with trying to use the same alsa device for both input and output?
+
+Thanks in advance,
+
+Johan
 
 
---===============0199727146==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+
+       
+____________________________________________________________________________________
+Be a better Globetrotter. Get better travel answers from someone who knows. Yahoo! Answers - Check it out.
+http://answers.yahoo.com/dir/?link=list&sid=396545469
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============0199727146==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0199727146==--
