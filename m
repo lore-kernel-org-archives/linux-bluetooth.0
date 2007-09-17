@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <876429whbn.fsf@merlot.par.afp.com><1190039142.5525.10.camel@aeonflux.holtmann.net>
-From: Hugues Lafarge <Hugues.Lafarge@afp.com>
-Date: Mon, 17 Sep 2007 17:01:08 +0200
-In-Reply-To: <1190039142.5525.10.camel@aeonflux.holtmann.net> (Marcel
-	Holtmann's message of "Mon\, 17 Sep 2007 16\:25\:42 +0200")
-Message-ID: <87sl5dpc97.fsf@merlot.par.afp.com>
-MIME-Version: 1.0
+In-Reply-To: <876429whbn.fsf@merlot.par.afp.com>
+References: <876429whbn.fsf@merlot.par.afp.com>
+Date: Mon, 17 Sep 2007 16:25:42 +0200
+Message-Id: <1190039142.5525.10.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] debian not following bluez-* upgrades anymore ?!
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,37 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
->>>>> "Marcel" == Marcel Holtmann <marcel@holtmann.org> writes:
+Hi Hugues,
 
-    Marcel> Hi Hugues,
-    >> It seems that debian is stucked at version 0.13 of the bluez-utils and
-    >> bluez-gnome packages.
-    >> 
-    >> I was under the impression that Debian was following rather closely
-    >> mainstream upgrades until recently.
+> It seems that debian is stucked at version 0.13 of the bluez-utils and
+> bluez-gnome packages.
+> 
+> I was under the impression that Debian was following rather closely
+> mainstream upgrades until recently.
 
-    Marcel> complain with the Debian package maintainer and not the upstream
-    Marcel> project.
+complain with the Debian package maintainer and not the upstream
+project.
 
-Ok, i'll do that.
+Regards
 
-Please note though that i was not complaining but only asking
-for information (i specifically mentionned that in my request)
+Marcel
 
-I perfectly understand though that you have enough to handle 
-with upstream-maintaining the project, and won't bother you
-anymore with distribution-related questions.
-
--- 
-Hugues Lafarge                    || Email: Hugues.Lafarge@afp.com
-Agence France Presse              || Phone: +33 1 40 41 77 15
-4 rue de la bourse, 75002 Paris   ||   Fax: +33 1 40 41 79 24
-
-
-
-This e-mail, and any file transmitted with it, is confidential and  intended solely for the use of the individual or entity to whom it is addressed. If you have received this email in error, please  contact the sender and delete the email from your system. If you are  not the named addressee you should not disseminate, distribute or copy  this email.
-
-For more information on Agence France-Presse, please visit our web site at http://www.afp.com
 
 
 -------------------------------------------------------------------------
