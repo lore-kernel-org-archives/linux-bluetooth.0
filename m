@@ -1,72 +1,99 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <2d5a2c100709171513i4632c4bby4cd82203914e3938@mail.gmail.com>
-Date: Mon, 17 Sep 2007 19:13:43 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1189975771.7541.49.camel@aeonflux.holtmann.net>
+Return-Path: <fchevalier@silicom.fr>
+Message-ID: <46EEBC41.80401@silicom.fr>
+Date: Mon, 17 Sep 2007 19:41:21 +0200
+From: Fabien Chevalier <fchevalier@silicom.fr>
 MIME-Version: 1.0
-References: <41f42627.4a25d8c3.46ed7733.d4785@o2.pl>
-	<1189975771.7541.49.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] Problem with A2DP & HHB-750
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@nokia.com>
+CC: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [PATCH] Fix bogus avdtp error codes management
+Content-Type: multipart/mixed;
+ boundary="------------000706010305040305030605"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Try this: http://wiki.bluez.org/wiki/HOWTO/AudioDevices
+This is a multi-part message in MIME format.
+--------------000706010305040305030605
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+Hi Johan & Marcel,
 
-On 9/16/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Konrad,
->
-> > Hi. I've got Siemens HHB-750 bluetooth headphones and Dell Latitude X1 =
-laptop with dell BT card:
-> > Bus 002 Device 003: ID 413c:8103 Dell Computer Corp. Wireless 350 Bluet=
-ooth
-> >
-> > Pairing is ok, connecting too, but it still skips (like buffering?). It=
- depends on 'sbcbitpool' in config. For example for sbcbitpool=3D4 it skips=
- every ~9 seconds. For sbcbitpool=3D32 it's about 300-500ms :(
-> > I'm using Feodra 7 with kernel 2.6.22 (2.6.22.1-41.fc7).
->
-> please test the audio service from bluez-utils-3.19. The installation
-> details can be found at wiki.bluez.org.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2005.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+While trying to fix this cross case issue, i came with an issue with the 
+way error codes are handled
+in avdtp.c.
+The issue is basically that the part of the code that retrieves the 
+exact error value is never executed
+due to premature return.
 
+Please have a look at the current patch.
 
--- =
+Fabien
 
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+--------------000706010305040305030605
+Content-Type: text/x-patch;
+ name="avdtp-bogus-error-checking.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="avdtp-bogus-error-checking.patch"
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2005.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+diff -u -1 -0 -r1.49 avdtp.c
+--- avdtp.c     2 Sep 2007 16:52:50 -0000       1.49
++++ avdtp.c     17 Sep 2007 17:33:24 -0000
+@@ -1501,38 +1501,38 @@
+        if (cond & G_IO_NVAL)
+                return FALSE;
+ 
+        if (!g_slist_find(sessions, session)) {
+                debug("l2cap_connect_cb: session got removed");
+                return FALSE;
+        }
+ 
+        sk = g_io_channel_unix_get_fd(chan);
+ 
+-       if (cond & (G_IO_ERR | G_IO_HUP)) {
+-               err = EIO;
+-               goto failed;
+-       }
+-
+        len = sizeof(ret);
+        if (getsockopt(sk, SOL_SOCKET, SO_ERROR, &ret, &len) < 0) {
+                err = errno;
+                error("getsockopt(SO_ERROR): %s (%d)", strerror(err), err);
+                goto failed;
+        }
+ 
+        if (ret != 0) {
+                err = ret;
+                error("connect(): %s (%d)", strerror(err), err);
+                goto failed;
+        }
+ 
++       if (cond & G_IO_HUP) {
++               err = EIO;
++               goto failed;
++       }
++
+        ba2str(&session->dst, address);
+        debug("AVDTP: connected %s channel to %s",
+                        session->pending_open ? "transport" : "signaling",
+                        address);
+ 
+        memset(&l2o, 0, sizeof(l2o));
+        len = sizeof(l2o);
+        if (getsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, &l2o,
+                                &len) < 0) {
+                err = errno;
+f
+--------------000706010305040305030605
+Content-Type: text/x-vcard; charset=utf-8;
+ name="fchevalier.vcf"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="fchevalier.vcf"
+
+YmVnaW46dmNhcmQNCmZuOkZhYmllbiBDSEVWQUxJRVINCm46Q0hFVkFMSUVSO0ZhYmllbg0K
+b3JnOlNJTElDT00NCmFkcjo7OzQgcnVlIGRlIEpvdWFuZXQ7IFJFTk5FUyBBVEFMQU5URTs7
+MzU3MDA7RlJBTkNFDQplbWFpbDtpbnRlcm5ldDpmY2hldmFsaWVyQHNpbGljb20uZnINCnRp
+dGxlOlNvZnR3YXJlICYgU3R1ZGllcyBFbmdpbmVlcg0KdGVsO3dvcms6KzMzICgwKSAyIDk5
+IDg0IDE3IDE3DQp2ZXJzaW9uOjIuMQ0KZW5kOnZjYXJkDQoNCg==
+--------------000706010305040305030605--
