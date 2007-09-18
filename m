@@ -1,37 +1,65 @@
-Return-Path: <Johan.Hedberg@nokia.com>
-Date: Tue, 18 Sep 2007 11:15:57 +0300
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: Fabien Chevalier <fchevalier@silicom.fr>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [PATCH] Fix bogus avdtp error codes management
-Message-ID: <20070918081557.GA13401@localhost>
-References: <46EEBC41.80401@silicom.fr>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <46EF6F66.70705@tfh-berlin.de>
+Date: Tue, 18 Sep 2007 08:25:42 +0200
+From: David Rehle <rehle@tfh-berlin.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <46EEBC41.80401@silicom.fr>
-List-ID: <bluez-devel.lists.sourceforge.net>
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] bluez-utils on arm
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
+Hi all,
 
-On Mon, Sep 17, 2007, Fabien Chevalier wrote:
-> While trying to fix this cross case issue, i came with an issue with the 
-> way error codes are handled
-> in avdtp.c.
-> The issue is basically that the part of the code that retrieves the 
-> exact error value is never executed
-> due to premature return.
+i try to compile bluez-utils (latest version) for ARM. I compiled 
+dbus1.0.2 before and of courese bluez-libs. I don't know how to tell 
+configure where to find dbus-libs. I tried a lot of things, everytime 
+with same result:
 
-Looks fine to me if it works. However, I'd like to hear some comment
-from Marcel as well. At least my connect(2) manpage implies that a
-non-blocking connect should always produce a POLLOUT on connection
-completion regardless if the result was failure or success. So it seems
-bluez may be behaving differently than other socket types in this
-respect.
+...
+checking for GLIB... no
+checking for DBUS... no
+configure: error: dbus > 0.35 is required
 
-We had a similar issue with the EAGAIN/EINPROGRESS mixup with
-non-blocking connect's so maybe this issue should also be fixed on the
-kernel side (however a userspace work-around such as your patch is
-probably also desirable).
+config.log says the following:
 
-Johan
+...
+configure:10494: $PKG_CONFIG --exists --print-errors "dbus-1 > 0.35"
+Package dbus-1 was not found in the pkg-config search path.
+Perhaps you should add the directory containing `dbus-1.pc'
+to the PKG_CONFIG_PATH environment variable
+No package 'dbus-1' found
+configure:10497: $? = 1
+No package 'dbus-1' found
+
+I don't know what the "pkg-config search path" is. "configure -h" shows 
+options DBUS_LIBS and DBUS_CFLAGS, but i can not use these in the right 
+way. Shall i use "-L" option (or so?) or do i only have to put the right 
+path to the directory containing `dbus-1.pc'???
+
+Is it possible to compile bluez-utils without dbus?
+
+Thank you for any suggestions.
+
+
+with kind regards
+
+David
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
