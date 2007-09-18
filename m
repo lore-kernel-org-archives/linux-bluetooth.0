@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <231dafb50709181011n7b7286bua93f205f7878ab9@mail.gmail.com>
-Date: Tue, 18 Sep 2007 11:11:27 -0600
-From: "Chris Hodgins" <shadowofdarkness@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Message-ID: <46EFFE96.3010000@ozob.net>
+Date: Tue, 18 Sep 2007 11:36:38 -0500
+From: Gene Imes <ebi7@ozob.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] Suggest a bluetooth dongle
+To: list-bluez-users <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] rfcomm
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,31 +18,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I currently have a piece of crap dongle that requires some strange
-voodoo* to work. I would like to buy a cheap one for the purposes of
-transfering data to and from my cell phone, use wiimote on my laptop,
-and finally a bluetooth mouse.
+I have several bluetooth receivers. In rfcomm.conf I have them listed 
+and the one I want to use I uncomment. How do I get rfcomm to pickup the 
+changes? I can not seem to get rfcomm to pickup the new device.
 
-I would prefer a class 2 one that just plugs and plays with zero
-commands. If required one that works after plugged in then running the
-command "modprobe hci_usb reset=1"
+Here is the pertinent rfcomm.conf section:
 
-Please only suggest in-expensive ones that you have personally tested.
-Because I don't want to deal with returning a product bought online.
-Canadian websites would be nice.
+rfcomm0 {
+         # Automatically bind the device at startup
+         bind yes;
 
-I found these on tigerdirect.ca if anyone has experience with them
-Zonet - ZUB6212C - Class 2 USB 2.0 Bluetooth Wireless Adapter $20
-Kinamax 328 Foot BT-USB - USB 2.0 Bluetooth Adapter $11 (not class 2
-but I am desperate)
+         # Bluetooth address of the device
+         #device 00:08:1B:C0:D3:1F;
+         #device 00:0B:0D:18:15:4F;
+         #GPSlim240
+         device 00:0B:0D:6D:E2:E6;
 
-I only ask this because there is no where on the internet to find a
-list of adapters and how the work under Linux.
+         # RFCOMM channel for the connection
+#       channel 1;
+}
 
-*by voodoo I mean I can spend hours or days trying to get it to work
-and nothing will happen. Then an hour after I give up and start just
-web surfing it will just switch modes for no reason and work perfect
-after I "modprobe hci_usb reset=1"
+-- 
+Gene Imes ============================= ozob.net
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
