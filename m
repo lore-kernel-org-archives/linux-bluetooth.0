@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <46EFFE96.3010000@ozob.net>
-Date: Tue, 18 Sep 2007 11:36:38 -0500
-From: Gene Imes <ebi7@ozob.net>
-MIME-Version: 1.0
-To: list-bluez-users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] rfcomm
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <0E311DCB642C421AA676D962192631BB@iMe>
+References: <ee63ef30709161045u6e91123fj39996e9797c8f039@mail.gmail.com>
+	<0E311DCB642C421AA676D962192631BB@iMe>
+Date: Tue, 18 Sep 2007 06:59:06 +0200
+Message-Id: <1190091546.5525.111.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Urgent: HCI and LMP are missing!
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,28 +21,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I have several bluetooth receivers. In rfcomm.conf I have them listed 
-and the one I want to use I uncomment. How do I get rfcomm to pickup the 
-changes? I can not seem to get rfcomm to pickup the new device.
+Hi,
 
-Here is the pertinent rfcomm.conf section:
+> I would like to know where can I find the HCI and LMP implementation in 
+> BlueZ!
+> I tried to look in the source code for BlueZ, and only higher levels are 
+> present. I couldn't find any packet headers/playload, LMP messages (like 
+> Host_Connection_Req) or other low level Bluetooth implementation codes in 
+> there.
+> I think it's part of the kernel.. but I couldn't find any .. can u help me 
+> please..?
 
-rfcomm0 {
-         # Automatically bind the device at startup
-         bind yes;
+the LMP is part of the Bluetooth chip. We don't have to implement that
+inside the kernel.
 
-         # Bluetooth address of the device
-         #device 00:08:1B:C0:D3:1F;
-         #device 00:0B:0D:18:15:4F;
-         #GPSlim240
-         device 00:0B:0D:6D:E2:E6;
+Regards
 
-         # RFCOMM channel for the connection
-#       channel 1;
-}
+Marcel
 
--- 
-Gene Imes ============================= ozob.net
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
