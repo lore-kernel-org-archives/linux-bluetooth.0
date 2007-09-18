@@ -1,47 +1,30 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <06bf01c7f9e6$3008dcf0$0200a8c0@jester>
-From: "Olivier Le Pogam" <olepogam@free.fr>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Date: Tue, 18 Sep 2007 13:22:23 +0200
-MIME-Version: 1.0
-Subject: [Bluez-devel] Bluetooth / WiFi USB concurrency issue
-Reply-To: Olivier Le Pogam <olepogam@free.fr>,
+Return-Path: <Johan.Hedberg@nokia.com>
+Date: Tue, 18 Sep 2007 12:09:12 +0300
+From: Johan Hedberg <johan.hedberg@nokia.com>
+To: Fabien Chevalier <fchevalier@silicom.fr>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
         BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Subject: Re: [PATCH] Fix bogus avdtp error codes management
+Message-ID: <20070918090912.GA15007@localhost>
+References: <46EEBC41.80401@silicom.fr> <20070918081557.GA13401@localhost> <1190104027.5525.128.camel@aeonflux.holtmann.net> <46EF9302.50403@silicom.fr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <46EF9302.50403@silicom.fr>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hello,
+On Tue, Sep 18, 2007, Fabien Chevalier wrote:
+> As for the POLLOUT thing, i must say i'm confused..., and don't really 
+> see the link with the patch :-(
+> I guess it works already as the GIOChannels heavily rely on it.
 
-I have a bluetooth device on a USB slot and a WiFi device on another USB 
-slot, and my mini-ATX PC (Ubuntu 7.04 kernel 2.6.30
-Bluez 3.9) is connected to the network thanks to the WiFi/DHCP.
+GLib maps POLLOUT to G_IO_OUT, POLLHUP to G_IO_HUP, etc. I was saying
+that to conform to how other socket types behave[1] the callback should
+*not* be getting a HUP or ERR in this case but a OUT instead. As for
+applying the patch, I'm fine with it even though it in essence is a
+work-around for a kernel side problem. However, it's Marcel's call in
+the end.
 
-I have noticed that when a scan (sdptool) is performed, the network link (if 
-I perform a simple "wget" for example) is either slowed down or interrupted 
-(not sure) and carried one / completed once the scan is finished. On a 
-former kernel / bluez it was simply crashed and I had to up/down the 
-bluetooth device.
+[1] I have yet to verify this but that's what the connect(2) manpage
+implies (in the section about EINPROGRESS)
 
-Do you have any idea why this weird thing happens ?
-
-Thanks a lot,
-Oli 
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2005.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Johan
