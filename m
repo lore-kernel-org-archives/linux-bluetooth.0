@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46EF6F66.70705@tfh-berlin.de>
-Date: Tue, 18 Sep 2007 08:25:42 +0200
-From: David Rehle <rehle@tfh-berlin.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] bluez-utils on arm
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <6E672510D37D58428215BDFDF097DB46014692C9@EXGNT01.sasken.com>
+References: <6E672510D37D58428215BDFDF097DB46014692C9@EXGNT01.sasken.com>
+Date: Tue, 18 Sep 2007 06:58:19 +0200
+Message-Id: <1190091499.5525.108.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] FW: Need some help - linux bluetooth driver
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,42 +20,54 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all,
+Hi Pintu,
 
-i try to compile bluez-utils (latest version) for ARM. I compiled 
-dbus1.0.2 before and of courese bluez-libs. I don't know how to tell 
-configure where to find dbus-libs. I tried a lot of things, everytime 
-with same result:
+> I need a help in compiling the linux 2.4.22 code (bluetooth part).
+> Can you help me here.
 
-...
-checking for GLIB... no
-checking for DBUS... no
-configure: error: dbus > 0.35 is required
+the Linux 2.4 part of BlueZ is actually no longer officially supported
+and so you can't expect any real help here.
 
-config.log says the following:
+However the 2.4.22 might be recent enough to get you going and it
+contains the Bluetooth core.
 
-...
-configure:10494: $PKG_CONFIG --exists --print-errors "dbus-1 > 0.35"
-Package dbus-1 was not found in the pkg-config search path.
-Perhaps you should add the directory containing `dbus-1.pc'
-to the PKG_CONFIG_PATH environment variable
-No package 'dbus-1' found
-configure:10497: $? = 1
-No package 'dbus-1' found
+> Here is my problem description
+> ==========================
+> I have a linux system which is running on Linux 2.4.22-ncgl-10.12.1.0
+> kernel. It is a modified kernel. 
+> Here the BLUETOOTH part is removed from the kernel. 
+> (I didnt find - hci_core , hci_conn.o , and other required drivers and
+> some of the export symbols are missing)
+> (It report un resolved symbols - "hci_register_dev")
 
-I don't know what the "pkg-config search path" is. "configure -h" shows 
-options DBUS_LIBS and DBUS_CFLAGS, but i can not use these in the right 
-way. Shall i use "-L" option (or so?) or do i only have to put the right 
-path to the directory containing `dbus-1.pc'???
+Since this looks like a vendor specific kernel that you have paid for,
+it might be better to complain with that company and make them include
+the Bluetooth sources again. I am serious here.
 
-Is it possible to compile bluez-utils without dbus?
+> I have the 2.4.22-ncgl-10.12.1.0 kernel source with me (on another
+> system).
+> Now, I dont want to build the whole kernel again. (This is not
+> possible as it is in another system under separate path)
+>  
+> I wanted to compile only the Bluetooth related path (net/bluetooth/*)
+> from this kernel source and put all related stuffs on my system.
+> Is it possible??????? Please let me know the procedure. Please help me
+> out.
 
-Thank you for any suggestions.
+So in theory it is possible to compile the kernel modules outside the
+kernel source tree, but I don't remember the exact steps for a 2.4
+system and quite frankly, I am not going to look that up.
+
+The best way is to go for a 2.6.22 kernel or later. It might look
+complicated in the beginning, but it is always worth the extra work. It
+will give you a recent Bluetooth stack that is known to be qualifiable
+and is up-to-date.
+
+Regards
+
+Marcel
 
 
-with kind regards
-
-David
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
