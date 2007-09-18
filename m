@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@nokia.com>
-In-Reply-To: <20070918081557.GA13401@localhost>
-References: <46EEBC41.80401@silicom.fr>  <20070918081557.GA13401@localhost>
-Date: Tue, 18 Sep 2007 10:27:07 +0200
-Message-Id: <1190104027.5525.128.camel@aeonflux.holtmann.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <46EF6F66.70705@tfh-berlin.de>
+References: <46EF6F66.70705@tfh-berlin.de>
+Date: Tue, 18 Sep 2007 10:25:48 +0200
+Message-Id: <1190103949.5525.126.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>,
-        Fabien Chevalier <fchevalier@silicom.fr>
-Subject: Re: [Bluez-devel] [PATCH] Fix bogus avdtp error codes management
+Subject: Re: [Bluez-devel] bluez-utils on arm
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,29 +20,45 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Johan,
+Hi David,
 
-> > While trying to fix this cross case issue, i came with an issue with the 
-> > way error codes are handled
-> > in avdtp.c.
-> > The issue is basically that the part of the code that retrieves the 
-> > exact error value is never executed
-> > due to premature return.
+> i try to compile bluez-utils (latest version) for ARM. I compiled 
+> dbus1.0.2 before and of courese bluez-libs. I don't know how to tell 
+> configure where to find dbus-libs. I tried a lot of things, everytime 
+> with same result:
 > 
-> Looks fine to me if it works. However, I'd like to hear some comment
-> from Marcel as well. At least my connect(2) manpage implies that a
-> non-blocking connect should always produce a POLLOUT on connection
-> completion regardless if the result was failure or success. So it seems
-> bluez may be behaving differently than other socket types in this
-> respect.
+> ...
+> checking for GLIB... no
+> checking for DBUS... no
+> configure: error: dbus > 0.35 is required
+> 
+> config.log says the following:
+> 
+> ...
+> configure:10494: $PKG_CONFIG --exists --print-errors "dbus-1 > 0.35"
+> Package dbus-1 was not found in the pkg-config search path.
+> Perhaps you should add the directory containing `dbus-1.pc'
+> to the PKG_CONFIG_PATH environment variable
+> No package 'dbus-1' found
+> configure:10497: $? = 1
+> No package 'dbus-1' found
+> 
+> I don't know what the "pkg-config search path" is. "configure -h" shows 
+> options DBUS_LIBS and DBUS_CFLAGS, but i can not use these in the right 
+> way. Shall i use "-L" option (or so?) or do i only have to put the right 
+> path to the directory containing `dbus-1.pc'???
 
-if that is so, then we have to fix the kernel. Can someone write me a
-simple reproducer or better send me a patch for the kernel.
+the pkg-config search path needs to contain the dbus-1.pc. Actually you
+must make sure that the D-Bus devel package is present or compile it by
+yourself.
+
+> Is it possible to compile bluez-utils without dbus?
+
+Not with the 3.x version. The D-Bus support is mandatory.
 
 Regards
 
 Marcel
-
 
 
 
