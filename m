@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <a481fbf0709181043m7b4700b1qc58d886c991bebae@mail.gmail.com>
-Date: Tue, 18 Sep 2007 13:43:20 -0400
-From: "Raymond Ingles" <sorceror171@gmail.com>
+Message-ID: <231dafb50709181011n7b7286bua93f205f7878ab9@mail.gmail.com>
+Date: Tue, 18 Sep 2007 11:11:27 -0600
+From: "Chris Hodgins" <shadowofdarkness@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <231dafb50709181011n7b7286bua93f205f7878ab9@mail.gmail.com>
 MIME-Version: 1.0
-References: <231dafb50709181011n7b7286bua93f205f7878ab9@mail.gmail.com>
-Subject: Re: [Bluez-users] Suggest a bluetooth dongle
+Subject: [Bluez-users] Suggest a bluetooth dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,23 +18,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 9/18/07, Chris Hodgins <shadowofdarkness@gmail.com> wrote:
+I currently have a piece of crap dongle that requires some strange
+voodoo* to work. I would like to buy a cheap one for the purposes of
+transfering data to and from my cell phone, use wiimote on my laptop,
+and finally a bluetooth mouse.
 
-> Please only suggest in-expensive ones that you have personally tested.
-> Because I don't want to deal with returning a product bought online.
-> Canadian websites would be nice.
+I would prefer a class 2 one that just plugs and plays with zero
+commands. If required one that works after plugged in then running the
+command "modprobe hci_usb reset=1"
 
- http://www.pcuniverse.com/product.asp?pid=3560912&m_id=32
+Please only suggest in-expensive ones that you have personally tested.
+Because I don't want to deal with returning a product bought online.
+Canadian websites would be nice.
 
- Class 1, good range, inexpensive, etc. Works for me on two different
-Ubuntu 7.04 systems.
+I found these on tigerdirect.ca if anyone has experience with them
+Zonet - ZUB6212C - Class 2 USB 2.0 Bluetooth Wireless Adapter $20
+Kinamax 328 Foot BT-USB - USB 2.0 Bluetooth Adapter $11 (not class 2
+but I am desperate)
 
- One caveat: on a P-III 700MHz system, it worked fine with no
-problems. On my dual-Athlon 2GHz system, it only works *fully* if I
-have it connected at boot time. If I plug it in later, I can see it,
-and scan the neighborhood with it, but I wasn't able to get my Treo
-650 to network with it. Other than that, no issues. Take that for what
-it's worth, I guess.
+I only ask this because there is no where on the internet to find a
+list of adapters and how the work under Linux.
+
+*by voodoo I mean I can spend hours or days trying to get it to work
+and nothing will happen. Then an hour after I give up and start just
+web surfing it will just switch modes for no reason and work perfect
+after I "modprobe hci_usb reset=1"
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
