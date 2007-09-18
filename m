@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46EFC921.30001@tfh-berlin.de>
-Date: Tue, 18 Sep 2007 14:48:33 +0200
-From: David Rehle <rehle@tfh-berlin.de>
+Message-ID: <e1effdeb0709180540n7811a330h75f28c8cd40cff75@mail.gmail.com>
+Date: Tue, 18 Sep 2007 09:40:42 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20070918122833.6D49B46CCB6@f46.poczta.interia.pl>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] can't establish more than two rfcomm connections
+References: <20070918122833.6D49B46CCB6@f46.poczta.interia.pl>
+Subject: Re: [Bluez-devel] Bluetooth Assigned Numbers
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,52 +16,41 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-2"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all,
+Hi Maciek,
 
-i have built a rfcomm server, using bluez-stack. I created a service 
-record containing a service-id 0x1234 on rfcomm port 1.
+See bluetooth.org
+    >Technical resources
+        > Assigned numbers
 
-A client can connect sdpd and establish a connection to my tcplike 
-rfcomm-server. rfcomm-server first gets a socket, binds it on 
-rfcommchannel 1 and listens on that, accepting incomming requests. 
-Incomming connections are handled by sysfunction select().
-
-But only two clients can connect at the same time. It seems that sdpd 
-can not handle more than two clients.
-I tried to make a "sdptool browse", when two clients are connected, but 
-it fails with "Host is down"-msg.
-(But on the local machine, where rfcomm-server is running "sdptool 
-browse local" gives me the correct servicerecord including my 0x1234 
-serviceid)
-
-It's weird, why there can connect two clients on one rfcomm-channel 1 
-and not only one client, or more than two???
-
-Is there a secret option to tell sdpd how much clients have to be handled?
-
-The first "solution" in my brain was to build another servicerecord with 
-same serviceid 0x1234 and let rfcomm-server bind and listen on more than 
-one rfcomm-channel. But clients can not communicate with sdpd when two 
-connections are established. On my J2ME client i get a "security block" 
-exception when trying to connect as third client.
-
-Does somebody got same issues?
-Has anybody an idea why only two connections can be established?
+https://programs.bluetooth.org/apps/content/?doc_id=3D49706
 
 
-Thank you for any suggestions.
+BR,
+Claudio
 
-
-with kind regards
-
-David
-
-
-
+On 18 Sep 2007 14:28:33 +0200, mkalkal@interia.pl <mkalkal@interia.pl> wrot=
+e:
+>
+> Hi
+>
+> I want to find document named Bluetooth Assigned Numbers .Link http://www=
+.bluetooth.org/assigned-numbers.htm is no longer valid .
+> On http://www.bluetooth.com cannot be found. Maybe someone has copy of th=
+is document and
+> can send me (on my email address).
+>
+>
+> Maciek Kaliszewski
+>
+>
+> ----------------------------------------------------------------------
+> Znasz przeb=F3j "Kaniku=B3y" - wygraj p=B3yte z autografami
+>
+> >>>  http://link.interia.pl/f1bc3
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
