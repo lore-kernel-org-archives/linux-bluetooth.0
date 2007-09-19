@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <46F19B7F.70702@ozob.net>
-Date: Wed, 19 Sep 2007 16:58:23 -0500
-From: Gene Imes <ebi7@ozob.net>
+Message-ID: <a654bb710709191343o3472b21auddee76f608ff710@mail.gmail.com>
+Date: Wed, 19 Sep 2007 23:43:44 +0300
+From: "Lari Tuononen" <labralabra@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: list - bluez-users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] How do I get rfcomm to reread config file?
+Subject: [Bluez-users] PS3 remote working?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,37 +18,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I am posting again because my first post did not get a reply.
+Hi!
 
-I have several bluetooth gps receivers. In /etc/bluetooth/rfcomm.conf I 
-have their MAC address listed but commented out except the one I want to 
-use. However, when change and restart the bluetooth service the new 
-address is not picked up and the old one is still by rfcomm.
+Has anyone gotten the playstation 3 BD remote working as a remote
+controller? There has been some discussion about it earlier, anyone
+gotten further in getting it working smoothly?
 
-How can I get rfcomm to pick up the new MAC?
+Best regards,
 
-/etc/bluetooth/rfcomm.conf:
-
-rfcomm0 {
-         # Automatically bind the device at startup
-         bind yes;
-
-         # Bluetooth address of the device
-         #device 00:08:1B:C0:D3:1F;
-         #device 00:0B:0D:18:15:4F;
-         #GPSlim240
-         device 00:0B:0D:6D:E2:E6;
-
-         # RFCOMM channel for the connection
-#       channel 1;
-}
-
-My bluez is 3.18 on Gentoo.
-
-Thanks for any help,
-
--- 
-Gene Imes ============================= ozob.net
+Lari Tuononen
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
