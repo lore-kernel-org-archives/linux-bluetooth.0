@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Fredrik Wendt <fredrik@wendt.se>
-To: bluez-devel@lists.sourceforge.net
-Date: Thu, 20 Sep 2007 11:59:23 +0200
-Message-Id: <1190282363.24745.46.camel@desktop3>
-Mime-Version: 1.0
-Subject: [Bluez-devel] gstreamer + bluetooth-alsa (a2dp) = stalls after song
-	switch
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <000601c7faa4$0aa3b570$0200a8c0@jester>
+From: "Olivier Le Pogam" <olepogam@free.fr>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>,
+        "Fabien Chevalier" <fabchevalier@free.fr>
+References: <06bf01c7f9e6$3008dcf0$0200a8c0@jester> <46EFB949.4090008@free.fr>
+Date: Wed, 19 Sep 2007 12:01:24 +0200
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Bluetooth / WiFi USB concurrency issue
+Reply-To: Olivier Le Pogam <olepogam@free.fr>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,39 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all. 
+Hello Fabien,
 
+Thanks a lot for this !!
 
-My first post, I'm not capable of C programming but believe I can assist
-with basic error searching (gdb is out of my scope, strace and ltrace I
-understand, more or less :)
+> What you experience is bluetooth/wifi coexistence issues.
+> Your wifi chip must have bt coexistence support in order to work when 
+> their is some bt activity.
 
-My issue is that if I use rhythmbox or banshee that both use gstreamer
-they get stalled/hang after changing to a new song. It basically just
-hangs and a2dpd says something about client error. (Other clients
-continue to work.)
+I actually use this driver : RT73(RT2571W) Wireless Lan Linux Driver
+which is built as rt73.ko kernel module.
+I'm currently trying to find how/if the bt_coexist support is managed for 
+this device !
 
-xmms only behaves like this when I manually restart playing the same
-track again (hit the play button while the song is playing). To me, it
-looks like the way gstreamer connects to alsa needs attention? Or is it
-alsasink that has issues talking to the a2dpd device?
-
-How should I proceed to find out where things go wrong? 
-
-What do you want me to report if noone has reported this (sounds
-unlikely to me, but google didn't give me much help otoh) to be of help
-to you?
-
-* Ubunty Feisty (latest/up-to-date kernel and packages from Ubuntu
-distribution)
-* a2dpd built from CVS
-(http://bluetooth-alsa.sourceforge.net/build.html), got it at 2007-09-11
-06:15 CET.
-
-
-Thanks in advance,
-
-	Fredrik Wendt
+Cheers,
+Oli 
 
 
 -------------------------------------------------------------------------
