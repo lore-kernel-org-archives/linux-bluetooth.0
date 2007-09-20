@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <a654bb710709191343o3472b21auddee76f608ff710@mail.gmail.com>
-References: <a654bb710709191343o3472b21auddee76f608ff710@mail.gmail.com>
-Date: Thu, 20 Sep 2007 09:08:11 +0200
-Message-Id: <1190272091.5525.149.camel@aeonflux.holtmann.net>
+In-Reply-To: <e96e9eeb0709190100x2a53fe06kd7ee59b15196925c@mail.gmail.com>
+References: <e96e9eeb0709190100x2a53fe06kd7ee59b15196925c@mail.gmail.com>
+Date: Thu, 20 Sep 2007 09:09:20 +0200
+Message-Id: <1190272160.5525.152.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] PS3 remote working?
+Subject: Re: [Bluez-users] command line pairing ? a2dp ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,14 +20,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Lari,
+Hi Voni,
 
-> Has anyone gotten the playstation 3 BD remote working as a remote
-> controller? There has been some discussion about it earlier, anyone
-> gotten further in getting it working smoothly?
+> I am looking for a way to accomplish pairing without
+> GUI. is there a way to do that ?
 
-the PS3 remote control is basically working. However we are still
-missing a nice integration into the input service.
+you have to write you own passkey agent that uses non-UI. Look at
+passkey-agent.c for an example.
+
+> In addition is there a way to test a2dp playing in command line ?
+
+Yes. The tool is called aplay :) The wiki has examples.
 
 Regards
 
