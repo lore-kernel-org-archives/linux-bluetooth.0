@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46F24E87.2000800@free.fr>
-Date: Thu, 20 Sep 2007 12:42:15 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <1190282363.24745.46.camel@desktop3>
-In-Reply-To: <1190282363.24745.46.camel@desktop3>
-Subject: Re: [Bluez-devel] gstreamer + bluetooth-alsa (a2dp) = stalls after
- song	switch
+From: Fredrik Wendt <fredrik@wendt.se>
+To: bluez-devel@lists.sourceforge.net
+Date: Thu, 20 Sep 2007 11:59:23 +0200
+Message-Id: <1190282363.24745.46.camel@desktop3>
+Mime-Version: 1.0
+Subject: [Bluez-devel] gstreamer + bluetooth-alsa (a2dp) = stalls after song
+	switch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,61 +19,39 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fredrik,
+Hi all. 
 
-You should give a try to the new bluez audio service, see 
-http://wiki.bluez.org/wiki/HOWTO/AudioDevices.
-It should work just fine on gstreamer based applications.
 
-Good luck,
+My first post, I'm not capable of C programming but believe I can assist
+with basic error searching (gdb is out of my scope, strace and ltrace I
+understand, more or less :)
 
-Fabien
+My issue is that if I use rhythmbox or banshee that both use gstreamer
+they get stalled/hang after changing to a new song. It basically just
+hangs and a2dpd says something about client error. (Other clients
+continue to work.)
 
-> Hi all. 
-> 
-> 
-> My first post, I'm not capable of C programming but believe I can assist
-> with basic error searching (gdb is out of my scope, strace and ltrace I
-> understand, more or less :)
-> 
-> My issue is that if I use rhythmbox or banshee that both use gstreamer
-> they get stalled/hang after changing to a new song. It basically just
-> hangs and a2dpd says something about client error. (Other clients
-> continue to work.)
-> 
-> xmms only behaves like this when I manually restart playing the same
-> track again (hit the play button while the song is playing). To me, it
-> looks like the way gstreamer connects to alsa needs attention? Or is it
-> alsasink that has issues talking to the a2dpd device?
-> 
-> How should I proceed to find out where things go wrong? 
-> 
-> What do you want me to report if noone has reported this (sounds
-> unlikely to me, but google didn't give me much help otoh) to be of help
-> to you?
-> 
-> * Ubunty Feisty (latest/up-to-date kernel and packages from Ubuntu
-> distribution)
-> * a2dpd built from CVS
-> (http://bluetooth-alsa.sourceforge.net/build.html), got it at 2007-09-11
-> 06:15 CET.
-> 
-> 
-> Thanks in advance,
-> 
-> 	Fredrik Wendt
-> 
-> 
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2005.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
-> 
+xmms only behaves like this when I manually restart playing the same
+track again (hit the play button while the song is playing). To me, it
+looks like the way gstreamer connects to alsa needs attention? Or is it
+alsasink that has issues talking to the a2dpd device?
+
+How should I proceed to find out where things go wrong? 
+
+What do you want me to report if noone has reported this (sounds
+unlikely to me, but google didn't give me much help otoh) to be of help
+to you?
+
+* Ubunty Feisty (latest/up-to-date kernel and packages from Ubuntu
+distribution)
+* a2dpd built from CVS
+(http://bluetooth-alsa.sourceforge.net/build.html), got it at 2007-09-11
+06:15 CET.
+
+
+Thanks in advance,
+
+	Fredrik Wendt
 
 
 -------------------------------------------------------------------------
