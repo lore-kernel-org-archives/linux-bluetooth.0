@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 20 Sep 2007 09:41:01 -0700 (PDT)
-From: hong zhang <henryzhang62@yahoo.com>
+Message-ID: <f8e53fb0709200804h5dffbc3cy115a9669ab4d05c6@mail.gmail.com>
+Date: Thu, 20 Sep 2007 17:04:16 +0200
+From: "Andrea Galbusera" <gizero@gmail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <mailman.499387.1190295098.21973.bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Message-ID: <351694.66042.qm@web58007.mail.re3.yahoo.com>
-Subject: [Bluez-users] bootstrap for blueZ
+Subject: [Bluez-users] Basic serial communication over RFCOMM
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,29 +18,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-List,
+Hi all,
+I'm new to bluetooth programming and to serial communication too, but
+I have a basic understanding of unix I/O.
 
-I need a bootstrap to send commands to CSR bluetooth
-chip for blueZ. Does anyone has it or sample code for
-that?
+I'm writing an application to communicate with some BT connected
+devices. RFCOMM stuff is up and running ok.
 
-Bluetooth chip can talk with eeprom or bootstrap for
-pskey on the beginning.
+I actually can do basic communication using minicom, but when I try to
+do it in a simple open(), write() and read() program nothing happens!
+I suspect this to be related to some basic setup of the tty attached
+to the RFCOMM device I'm not managing correctly. If I keep minicom
+open on a terminal and run my application on another this works fine
+(I see correct answers from the device).
 
-I have an embedded board with CSR bluetooth chip
-BlueCore 4. It works using CSR bluetooth stack. But I
-want to install BlueZ and use BlueZ utilities for
-bluetooth keyboard and mice.
+Could you please suggest any code examples or resources useful for
+newbies on such a topic. I know there is a lot of stuff behind ttys
+but hopefully only some parameters will be required.
 
----henry
+TIA
 
-
-      ____________________________________________________________________________________
-Don't let your dream ride pass you by. Make it a reality with Yahoo! Autos.
-http://autos.yahoo.com/index.html
- 
-
-
+Andrea
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
