@@ -1,13 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <231dafb50709201139m3570a80em2fe1012d34747a9f@mail.gmail.com>
-Date: Thu, 20 Sep 2007 12:39:48 -0600
-From: "Chris Hodgins" <shadowofdarkness@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <ee63ef30709181857v577e19e1ga94a6e2ae54b8fd6@mail.gmail.com>
+Date: Thu, 20 Sep 2007 09:41:01 -0700 (PDT)
+From: hong zhang <henryzhang62@yahoo.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <mailman.499387.1190295098.21973.bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-References: <231dafb50709181011n7b7286bua93f205f7878ab9@mail.gmail.com>
-	<ee63ef30709181857v577e19e1ga94a6e2ae54b8fd6@mail.gmail.com>
-Subject: Re: [Bluez-users] Suggest a bluetooth dongle
+Message-ID: <351694.66042.qm@web58007.mail.re3.yahoo.com>
+Subject: [Bluez-users] bootstrap for blueZ
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,69 +19,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 9/18/07, Brandon Casey <drafnel@gmail.com> wrote:
-> I've had the bluetake 009i for 2 years. I paid $20, it's a class 2,
-> and I currently use it interchangeably on my rhat9 laptop and
-> ubuntu7.04 desktop interchangeably.
->
-> They also have some class-1 and 2.0w/EDR dongles.
->
-> -brandon
->
->
-> On 9/18/07, Chris Hodgins <shadowofdarkness@gmail.com> wrote:
-> > I currently have a piece of crap dongle that requires some strange
-> > voodoo* to work. I would like to buy a cheap one for the purposes of
-> > transfering data to and from my cell phone, use wiimote on my laptop,
-> > and finally a bluetooth mouse.
-> >
-> > I would prefer a class 2 one that just plugs and plays with zero
-> > commands. If required one that works after plugged in then running the
-> > command "modprobe hci_usb reset=1"
-> >
-> > Please only suggest in-expensive ones that you have personally tested.
-> > Because I don't want to deal with returning a product bought online.
-> > Canadian websites would be nice.
-> >
-> > I found these on tigerdirect.ca if anyone has experience with them
-> > Zonet - ZUB6212C - Class 2 USB 2.0 Bluetooth Wireless Adapter $20
-> > Kinamax 328 Foot BT-USB - USB 2.0 Bluetooth Adapter $11 (not class 2
-> > but I am desperate)
-> >
-> > I only ask this because there is no where on the internet to find a
-> > list of adapters and how the work under Linux.
-> >
-> > *by voodoo I mean I can spend hours or days trying to get it to work
-> > and nothing will happen. Then an hour after I give up and start just
-> > web surfing it will just switch modes for no reason and work perfect
-> > after I "modprobe hci_usb reset=1"
-> >
-> > -------------------------------------------------------------------------
-> > This SF.net email is sponsored by: Microsoft
-> > Defy all challenges. Microsoft(R) Visual Studio 2005.
-> > http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-users
-> >
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2005.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+List,
+
+I need a bootstrap to send commands to CSR bluetooth
+chip for blueZ. Does anyone has it or sample code for
+that?
+
+Bluetooth chip can talk with eeprom or bootstrap for
+pskey on the beginning.
+
+I have an embedded board with CSR bluetooth chip
+BlueCore 4. It works using CSR bluetooth stack. But I
+want to install BlueZ and use BlueZ utilities for
+bluetooth keyboard and mice.
+
+---henry
 
 
-Thanks for the suggestions. I ended up finding one, that the user
-comments includes one that says it works under Linux plus it is only
-$6.35 and free worldwide shipping
+      ____________________________________________________________________________________
+Don't let your dream ride pass you by. Make it a reality with Yahoo! Autos.
+http://autos.yahoo.com/index.html
+ 
 
-http://dealextreme.com/feedbacks/BrowseReviews.dx/sku.754
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
