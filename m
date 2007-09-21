@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <a654bb710709210254x416bab8atcabebcadf8a6523@mail.gmail.com>
-Date: Fri, 21 Sep 2007 12:54:05 +0300
-From: "Lari Tuononen" <lari@tuononen.fi>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1190272091.5525.149.camel@aeonflux.holtmann.net>
-MIME-Version: 1.0
-References: <a654bb710709191343o3472b21auddee76f608ff710@mail.gmail.com>
-	<1190272091.5525.149.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] PS3 remote working?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <351694.66042.qm@web58007.mail.re3.yahoo.com>
+References: <351694.66042.qm@web58007.mail.re3.yahoo.com>
+Date: Fri, 21 Sep 2007 10:47:06 +0200
+Message-Id: <1190364426.5133.24.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] bootstrap for blueZ
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,31 +20,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 20/09/2007, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Lari,
->
-> > Has anyone gotten the playstation 3 BD remote working as a remote
-> > controller? There has been some discussion about it earlier, anyone
-> > gotten further in getting it working smoothly?
->
-> the PS3 remote control is basically working. However we are still
-> missing a nice integration into the input service.
+Hi Henry,
 
-I've noticed this now that I got my bluetooth dongle. The remote
-connects well and registers as /dev/input/eventX but nothing comes
-out...
+> I need a bootstrap to send commands to CSR bluetooth
+> chip for blueZ. Does anyone has it or sample code for
+> that?
+> 
+> Bluetooth chip can talk with eeprom or bootstrap for
+> pskey on the beginning.
+> 
+> I have an embedded board with CSR bluetooth chip
+> BlueCore 4. It works using CSR bluetooth stack. But I
+> want to install BlueZ and use BlueZ utilities for
+> bluetooth keyboard and mice.
 
-Are there any plans to make the input service thing work better or how
- this is done? Would the code need only the mapping of the codes sent
-by the remote to right uinput codes?
+you can use the bccmd utility from bluez-utils to bootstrap the BlueCore
+chip. It supports H4, BCSP, USB and HCI as transports and can read PSR
+files directly and program them. Check the manual page of bccmd.
 
-There are some python scripts that convert the PS3 keypresses with
-uinput to /dev/input/eventX. But this is not very convenient
-solution...
+Regards
 
-Best regards,
+Marcel
 
-Lari Tuononen
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
