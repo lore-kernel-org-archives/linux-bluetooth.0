@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <351694.66042.qm@web58007.mail.re3.yahoo.com>
-References: <351694.66042.qm@web58007.mail.re3.yahoo.com>
-Date: Fri, 21 Sep 2007 10:47:06 +0200
-Message-Id: <1190364426.5133.24.camel@aeonflux.holtmann.net>
+To: pkicad@yahoo.es, BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200709201335.29616.pkicad@yahoo.es>
+References: <200709201335.29616.pkicad@yahoo.es>
+Date: Fri, 21 Sep 2007 10:44:48 +0200
+Message-Id: <1190364288.5133.21.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] bootstrap for blueZ
+Subject: Re: [Bluez-users] Permission denied: hcitools
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,23 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Henry,
+Hi Pedro,
 
-> I need a bootstrap to send commands to CSR bluetooth
-> chip for blueZ. Does anyone has it or sample code for
-> that?
+> Sorry if the topic has been aswered, but I have not found it in the 
+> bluez-users archives.
 > 
-> Bluetooth chip can talk with eeprom or bootstrap for
-> pskey on the beginning.
+> When trying some hcitools, I am unable to use them  but being root. I want to 
+> run them as a "normal" user.
 > 
-> I have an embedded board with CSR bluetooth chip
-> BlueCore 4. It works using CSR bluetooth stack. But I
-> want to install BlueZ and use BlueZ utilities for
-> bluetooth keyboard and mice.
+> Is there any group the user needs to belong to or any other way to have 
+> privileges on hcitools, hcidump, l2ping, etc?
 
-you can use the bccmd utility from bluez-utils to bootstrap the BlueCore
-chip. It supports H4, BCSP, USB and HCI as transports and can read PSR
-files directly and program them. Check the manual page of bccmd.
+if you don't wanna use them as root, then don't use them at all. It is
+really as simple as that. The new D-Bus based interface should be used
+anyway.
 
 Regards
 
