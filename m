@@ -1,12 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <46F19B7F.70702@ozob.net>
-References: <46F19B7F.70702@ozob.net>
-Date: Thu, 20 Sep 2007 09:07:24 +0200
-Message-Id: <1190272044.5525.147.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] How do I get rfcomm to reread config file?
+Message-ID: <ee63ef30709201942q7d313416p5aab4a179bf7fc7c@mail.gmail.com>
+Date: Thu, 20 Sep 2007 21:42:08 -0500
+From: "Brandon Casey" <drafnel@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <231dafb50709201139m3570a80em2fe1012d34747a9f@mail.gmail.com>
+MIME-Version: 1.0
+References: <231dafb50709181011n7b7286bua93f205f7878ab9@mail.gmail.com>
+	<ee63ef30709181857v577e19e1ga94a6e2ae54b8fd6@mail.gmail.com>
+	<231dafb50709201139m3570a80em2fe1012d34747a9f@mail.gmail.com>
+Subject: Re: [Bluez-users] Suggest a bluetooth dongle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,40 +22,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Gene,
+On 9/20/07, Chris Hodgins <shadowofdarkness@gmail.com> wrote:
 
-> I have several bluetooth gps receivers. In /etc/bluetooth/rfcomm.conf I 
-> have their MAC address listed but commented out except the one I want to 
-> use. However, when change and restart the bluetooth service the new 
-> address is not picked up and the old one is still by rfcomm.
-> 
-> How can I get rfcomm to pick up the new MAC?
-> 
-> /etc/bluetooth/rfcomm.conf:
-> 
-> rfcomm0 {
->          # Automatically bind the device at startup
->          bind yes;
-> 
->          # Bluetooth address of the device
->          #device 00:08:1B:C0:D3:1F;
->          #device 00:0B:0D:18:15:4F;
->          #GPSlim240
->          device 00:0B:0D:6D:E2:E6;
-> 
->          # RFCOMM channel for the connection
-> #       channel 1;
-> }
-> 
-> My bluez is 3.18 on Gentoo.
+> Thanks for the suggestions. I ended up finding one, that the user
+> comments includes one that says it works under Linux plus it is only
+> $6.35 and free worldwide shipping
 
-calling "rfcomm unbind all" and then "rfcomm bind all" should work.
+That's cheap. plus it's EDR, maybe I'll get one...
 
-Regards
-
-Marcel
-
-
+-brandon
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
