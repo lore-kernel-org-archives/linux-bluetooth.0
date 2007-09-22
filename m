@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <a654bb710709210254x416bab8atcabebcadf8a6523@mail.gmail.com>
-References: <a654bb710709191343o3472b21auddee76f608ff710@mail.gmail.com>
-	<1190272091.5525.149.camel@aeonflux.holtmann.net>
-	<a654bb710709210254x416bab8atcabebcadf8a6523@mail.gmail.com>
-Date: Sat, 22 Sep 2007 09:52:36 +0200
-Message-Id: <1190447556.5133.57.camel@aeonflux.holtmann.net>
+In-Reply-To: <e96e9eeb0709212334l7803cd69q294eccfcc7c573c4@mail.gmail.com>
+References: <e96e9eeb0709212334l7803cd69q294eccfcc7c573c4@mail.gmail.com>
+Date: Sat, 22 Sep 2007 09:49:04 +0200
+Message-Id: <1190447344.5133.54.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] PS3 remote working?
+Subject: Re: [Bluez-users] cutting-edge bluez with old kernel
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,30 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Lari,
+Hi Voni,
 
-> > > Has anyone gotten the playstation 3 BD remote working as a remote
-> > > controller? There has been some discussion about it earlier, anyone
-> > > gotten further in getting it working smoothly?
-> >
-> > the PS3 remote control is basically working. However we are still
-> > missing a nice integration into the input service.
+> I have a project with 2.6.10 kernel.
+> Will I be able to run the new a2dp that is in bluez ?
 > 
-> I've noticed this now that I got my bluetooth dongle. The remote
-> connects well and registers as /dev/input/eventX but nothing comes
-> out...
+> or maybe my kernel is missing some API and there
+> is absolutely no way it will work ?
 > 
-> Are there any plans to make the input service thing work better or how
->  this is done? Would the code need only the mapping of the codes sent
-> by the remote to right uinput codes?
-> 
-> There are some python scripts that convert the PS3 keypresses with
-> uinput to /dev/input/eventX. But this is not very convenient
-> solution...
+> I know it's better to use recent kernels, but I wonder
+> whether my 2.6.10 will work, even just for a demonstration
+> sake.
 
-as I said, it needs to be integrated into the input service. And it has
-to become a fake input. Using the kernel HID parser makes no sense since
-the mapping is totally off.
+it will probably work, but seriously stop holding on to these old
+kernels. There is no real reason for it. I mean it. This is vendor
+specific bullshit.
 
 Regards
 
