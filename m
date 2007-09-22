@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Fulvio <fulvio@pc.jaring.my>
-To: bluez-users@lists.sourceforge.net
-Date: Sun, 23 Sep 2007 21:03:23 +0200
+Message-ID: <46F5969C.1090504@ozob.net>
+Date: Sat, 22 Sep 2007 17:26:36 -0500
+From: Gene Imes <ebi7@ozob.net>
 MIME-Version: 1.0
-Message-Id: <200709232103.23663.fulvio@pc.jaring.my>
-Subject: [Bluez-users] Anyone got bluez working?
-Reply-To: fulvio@pc.jaring.my, BlueZ users <bluez-users@lists.sourceforge.net>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <46F19B7F.70702@ozob.net>
+	<1190272044.5525.147.camel@aeonflux.holtmann.net>
+In-Reply-To: <1190272044.5525.147.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-users] How do I get rfcomm to reread config file?
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,19 +21,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello there,
+Marcel Holtmann wrote:
+> Hi Gene,
+> 
+>
+> 
+> calling "rfcomm unbind all" and then "rfcomm bind all" should work.
 
-I'm new here and I'd like to point out that after the version 3.12 nothing got 
-working.
-Actually I've install Version 3.19, but I can't figure out anything right. 
-Most of the time the deamon on d-bus isn't answering and pairing don't 
-happen. The pin-helper no way, passkey-agent giving up and no pairing.
+The obvious thing.
 
-Pls show me one of your configuration that works. I always on KDE desktop and 
-also Kbluetooth has several problems to be solved, but even by bash I can't 
-get done.
+Thanks both,
 
-F
+-- 
+Gene Imes ============================= ozob.net
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
