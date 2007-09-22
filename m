@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <46F5969C.1090504@ozob.net>
-Date: Sat, 22 Sep 2007 17:26:36 -0500
-From: Gene Imes <ebi7@ozob.net>
-MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <46F19B7F.70702@ozob.net>
-	<1190272044.5525.147.camel@aeonflux.holtmann.net>
-In-Reply-To: <1190272044.5525.147.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] How do I get rfcomm to reread config file?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: tim@birdsnest.maths.tcd.ie,
+        BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <fd32tv$tmj$1@sea.gmane.org>
+References: <OFFBAD6020.4E382E4A-ON8825735D.005AD683-8825735D.005D2673@etas.de>
+	<1190447181.5133.50.camel@aeonflux.holtmann.net>
+	<fd32tv$tmj$1@sea.gmane.org>
+Date: Sat, 22 Sep 2007 20:53:06 +0200
+Message-Id: <1190487186.5133.62.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] UDP and TCP packets across Bluez connections?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,19 +23,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> Hi Gene,
+Hi Timothy,
+
+> > The first thing that you should read is a Bluetooth introduction that
+> > explains the various protocol layers that can be used for various tasks.
 > 
->
-> 
-> calling "rfcomm unbind all" and then "rfcomm bind all" should work.
+> Is there such a document online?
 
-The obvious thing.
+it is called the Bluetooth core specification and their additional
+profile specifications.
 
-Thanks both,
+Regards
 
--- 
-Gene Imes ============================= ozob.net
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
