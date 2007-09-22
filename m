@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: David Woodhouse <dwmw2@infradead.org>
+Message-ID: <46F568EB.2090806@idlum.be>
+Date: Sat, 22 Sep 2007 21:11:39 +0200
+From: Pierre-Yves Paulus <py@idlum.be>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1190487435.5133.66.camel@aeonflux.holtmann.net>
-References: <1190483342.7150.224.camel@pmac.infradead.org>
-	<1190487435.5133.66.camel@aeonflux.holtmann.net>
-Date: Sat, 22 Sep 2007 22:00:47 +0100
-Message-Id: <1190494847.7150.242.camel@pmac.infradead.org>
-Mime-Version: 1.0
-Cc: Claudio Takahasi <cktakahasi@gmail.com>
-Subject: Re: [Bluez-devel] [PATCH] Attempt bonding with keyboards.
+References: <46F2BC9D.8050206@idlum.be>
+	<1190447455.5133.55.camel@aeonflux.holtmann.net>
+In-Reply-To: <1190447455.5133.55.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] Kernel Oops on 2.6.23-rc6
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,22 +21,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sat, 2007-09-22 at 20:57 +0200, Marcel Holtmann wrote:
-> the main questions is if we wanna make that policy of pairing a device
-> first part of the input service or the the UI creating the device.
-> 
-> I think it should be part of the UI and it should create the pairing
-> before connecting the input device.
+Hi Marcel,
 
-I'm not convinced. Should the UI really have to know things like 'if
-it's a keyboard, attempt pairing. If it's a mouse, don't bother'?
+> please post this to LKML, because it looks like an issue withing the
+> device_move() API call.
 
-I would have thought that this was something we should leave to the
-input service. The UI just tells the service to make it work.
+Ok, will do. Do you think they may need more information about anything, 
+or is this report complete enough for them to be useful?
 
--- 
-dwmw2
-
+Best Regards,
+Pierre-Yves
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
