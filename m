@@ -1,11 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Michele Puccio <michele.puccio@eng.it>
-To: bluez-users@lists.sourceforge.net
-Date: Mon, 24 Sep 2007 16:00:01 +0200
-Message-Id: <1190642401.6465.20.camel@localhost>
+From: Adam Tauno Williams <adam@morrison-ind.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1190617562.5133.86.camel@aeonflux.holtmann.net>
+References: <200709232103.23663.fulvio@pc.jaring.my>
+	<1190617562.5133.86.camel@aeonflux.holtmann.net>
+Date: Mon, 24 Sep 2007 08:30:38 -0400
+Message-Id: <1190637038.5490.0.camel@aleph.wmmi.net>
 Mime-Version: 1.0
-Subject: [Bluez-users] problem pairing device
-Reply-To: michele.puccio@eng.it,
+Subject: Re: [Bluez-users] Anyone got bluez working?
+Reply-To: adam@morrison-ind.com,
         BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,70 +18,74 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1430529288=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hi all
-I cannot pair any device using hcitool scan or hcitool inq: both exit
-without any result or error. this is the output of hcidump during a
-scan:
-HCI sniffer - Bluetooth packet analyzer ver 1.33
-device: hci0 snap_len: 1028 filter: 0xffffffff
-HCI Command: Inquiry (0x01|0x0001) plen 5
-        lap 0x9e8b33 len 8 num 0
-HCI Event: Command Status (0x0f) plen 4
-        Inquiry (0x01|0x0001) status 0x00 ncmd 1
-HCI Event: Vendor (0xff) plen 7
-        0000: cd 03 00 04 00 0000                              .......
-HCI Event: Vendor (0xff) plen 7
-        0000: cd 03 00 04 00 0000                              .......
-HCI Event: Vendor (0xff) plen 7
-        0000: cd 03 00 04 00 0000                              .......
-HCI Event: Vendor (0xff) plen 7
-        0000: cd 03 00 04 00 0000                              .......
-HCI Event: Vendor (0xff) plen 7
-        0000: cd 03 00 04 00 0000                              .......
-HCI Event: Vendor (0xff) plen 7
-        0000: cd 03 00 04 00 0000                              .......
-HCI Event: Vendor (0xff) plen 7
-        0000: cd 03 00 04 00 0000                              .......
-HCI Event: Vendor (0xff) plen 7
-        0000: cd 03 00 04 00 0000                              .......
-HCI Event: Vendor (0xff) plen 7
-        0000: cd 03 00 04 00 0000                              .......
-HCI Event: Vendor (0xff) plen 7
-        0000: cd 03 00 04 00 0000                              .......
-HCI Event: Inquiry Complete (0x01) plen 1
-        
-status 0x00 and this is the output of hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:16:41:1B:97:A3 ACL MTU: 384:8 SCO MTU: 64:8
-        UP RUNNING PSCAN 
-        RX bytes:807 acl:0 sco:0 events:63 errors:0
-        TX bytes:331 acl:0 sco:0 commands:20 errors:0
-        Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-        Link policy: RSWITCH HOLD SNIFF PARK 
-        Link mode: SLAVE ACCEPT 
-        Name: 'D610'
-        Class: 0x000100
-        Service Classes: Unspecified
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x679 LMP Ver: 1.2 (0x2) LMP Subver:
-0x679
-        Manufacturer: Cambridge Silicon Radio (10)
 
-I'm using ubuntu feisty. any suggestions?
-thanks
-michele
+--===============1430529288==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="=-A/wFNaVqSceLwldHJc6a"
 
+
+--=-A/wFNaVqSceLwldHJc6a
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+> > I'm new here and I'd like to point out that after the version 3.12 noth=
+ing got=20
+> > working.
+> > Actually I've install Version 3.19, but I can't figure out anything rig=
+ht.=20
+> > Most of the time the deamon on d-bus isn't answering and pairing don't=20
+> > happen. The pin-helper no way, passkey-agent giving up and no pairing.
+> > Pls show me one of your configuration that works. I always on KDE deskt=
+op and=20
+> > also Kbluetooth has several problems to be solved, but even by bash I c=
+an't=20
+> > get done.
+> no idea what you are trying to do, but I know for sure that the latest
+> Fedora, Ubuntu and openSuSE work perfectly fine. And their upcoming
+> releases have even the latest versions in it.
+
+Yep, using openSUSE 10.2/GNOME and Bluetooth works great.
+
+--=-A/wFNaVqSceLwldHJc6a
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iD8DBQBG963tLRePpNle04MRAhEJAJ0f1SyNAM2ri4dcxosylm6stEADkQCdE6cp
+gpDf6dfthBn16LxOLB65IbY=
+=ld7V
+-----END PGP SIGNATURE-----
+
+--=-A/wFNaVqSceLwldHJc6a--
+
+
+
+--===============1430529288==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============1430529288==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1430529288==--
