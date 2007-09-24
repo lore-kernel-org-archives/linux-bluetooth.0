@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Michele Puccio <michele.puccio@eng.it>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200709241909.50864.fulvio@pc.jaring.my>
-References: <1190642401.6465.20.camel@localhost>
-	<200709241909.50864.fulvio@pc.jaring.my>
-Date: Mon, 24 Sep 2007 21:56:48 +0200
-Message-Id: <1190663808.6212.3.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] problem pairing device
-Reply-To: michele.puccio@eng.it,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <2759cf860709241233w621bd23akf3882800ad48cc28@mail.gmail.com>
+Date: Mon, 24 Sep 2007 15:33:03 -0400
+From: "Jared Greenwald" <greenwaldjared@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20070924192203.GA31266@sus.mcgill.ca>
+MIME-Version: 1.0
+References: <2759cf860709241213o33159203kad04d7a0fa2ecaf5@mail.gmail.com>
+	<20070924192203.GA31266@sus.mcgill.ca>
+Subject: Re: [Bluez-users] help with Logitech Travel Mouse
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,39 +17,73 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-ZnVsdmlvLAp0aGFua3MgZm9yIHlvdXIgYW5zd2VyLgpJIGZpeGVkIHRoZSBjbGFzcyBidXQgbm90
-aGluZyBjaGFuZ2UhCnRoZSBtb2RlIHdhcyBzZXQgdG8gY29ubmVjdGFibGUsIEkgY2hhbmdlZCB0
-byBkaXNjb3ZlcmFibGUgKHRpbWVvdXQKbmV2ZXIpIHRocm91Z2ggdGhlIGdub21lLWJsdWV0b290
-aCBhcHBsZXQgYnV0IHdpdGhvdXQgc3VjY2Vzcy4Kc29tZSBtb3JlIHN1Z2dlc3Rpb25zPwp0aGFu
-a3MgYWdhaW4KCm1pY2hlbGUKT24gTW9uLCAyMDA3LTA5LTI0IGF0IDE5OjA5ICswMjAwLCBGdWx2
-aW8gd3JvdGU6Cj4gT24gbHVuZWTDrCAyNCBzZXR0ZW1icmUgMjAwNywgTWljaGVsZSBQdWNjaW8g
-d3JvdGU6Cj4gPiAgICAgICAgIENsYXNzOiAweDAwMDEwMAo+ID4gICAgICAgICBTZXJ2aWNlIENs
-YXNzZXM6IFVuc3BlY2lmaWVkCj4gPiAgICAgICAgIERldmljZSBDbGFzczogQ29tcHV0ZXIsIFVu
-Y2F0ZWdvcml6ZWQKPiAKPiBUcnkgdG8gc3BlY2lmeSBhIGJldHRlciBjbGFzcyBsaWtlOgo+IAo+
-IGhjaWNvbmZpZyBoY2kwIChvciB3aGljaCByZWx5IG9uKSBjbGFzcyAweDAzZTEwMAo+IAo+IEkg
-Y2FuJ3QgYXNzdXJlIHRoaXMgaXMgdGhlIGZpeCwgYnV0IHRoZXJlJ2xsIGJlIG90aGVyIHRoaW5n
-cyB0byB0cnkgbGlrZQo+IAo+IGRidXMtc2VuZCAtLXN5c3RlbSAtLXR5cGU9bWV0aG9kX2NhbGwg
-LS1wcmludC1yZXBseSAtLWRlc3Q9b3JnLmJsdWV6IC9vcmcvYmx1ZXovaGNpMCAKPiBvcmcuYmx1
-ZXouQWRhcHRlci5HZXRNb2RlCj4gCj4gVG8ga25vdyBpZiBpdCdzIGluIGRpc2NvcmFibGUgbW9k
-ZQo+IAo+IGRidXMtc2VuZCAtLXN5c3RlbSAtLXR5cGU9bWV0aG9kX2NhbGwgLS1wcmludC1yZXBs
-eSAtLWRlc3Q9b3JnLmJsdWV6IC9vcmcvYmx1ZXovaGNpMCAKPiBvcmcuYmx1ZXouQWRhcHRlci5H
-ZXREaXNjb3ZlcmFibGVUaW1lb3V0Cj4gCj4gVG8ga25vdyBob3cgbG9uZyBpdCdsbCByZW1haW4g
-b24gZGlzb3ZlcmFibGUgbW9kZQo+IAo+IEYKPiAKPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gVGhpcyBT
-Ri5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBNaWNyb3NvZnQKPiBEZWZ5IGFsbCBjaGFsbGVu
-Z2VzLiBNaWNyb3NvZnQoUikgVmlzdWFsIFN0dWRpbyAyMDA1Lgo+IGh0dHA6Ly9jbGsuYXRkbXQu
-Y29tL01SVC9nby92c2UwMTIwMDAwMDcwbXJ0L2RpcmVjdC8wMS8KPiBfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IEJsdWV6LXVzZXJzIG1haWxpbmcgbGlz
-dAo+IEJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291
-cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCj4gCgoKLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6IE1pY3Jvc29mdApEZWZ5IGFs
-bCBjaGFsbGVuZ2VzLiBNaWNyb3NvZnQoUikgVmlzdWFsIFN0dWRpbyAyMDA1LgpodHRwOi8vY2xr
-LmF0ZG10LmNvbS9NUlQvZ28vdnNlMDEyMDAwMDA3MG1ydC9kaXJlY3QvMDEvCl9fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxpbmcg
-bGlzdApCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3Vy
-Y2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
+Yea, I would think that would fix things, but I tried that (the hidd
+--connect) and it doesn't seem to work to get connected...
+
+-Jared
+
+On 9/24/07, Martin Stolle <mstoll@sus.mcgill.ca> wrote:
+> I've had similar experience with a bluetooth keyboard (which I am
+> switching between computers, hence the need to re-establish connection).
+> Before, a sudo hidd --search would re-establish the connectino.  Now, I
+> have to try that a couple of times before it spits out the MAC address.
+> Armed with the MAC address, I can now do sudo hidd --connect <MAC address>
+>
+> It's definitely a regression from before (but might be more intended
+> behavior?  The weird part is that often, my keybaord will think the
+> connection is re-established after the hidd --search, but the computer
+> doesn't think so.  So I have to hit the reset/connect button on the
+> keyboard between all the --search and one last time before the
+> --connect.
+>
+> Martin
+>
+>
+> On Mon, Sep 24, 2007 at 03:13:47PM -0400, Jared Greenwald wrote:
+> > I've had this setup for a year or so.  A nice bluetooth mouse and
+> > Kubuntu.  Currently, I'm running kubuntu 7.10 with the 2.6.22-12
+> > kernel and blueZ 3.19-0ubuntu1.
+> >
+> > Every time I upgrade my kernel, I've had to re-establish my mouse's
+> > bluetooth connection by power-cycling it or hitting the reset button
+> > while running hiddev --search.  This time, when I upgraded, I cannot
+> > get the mouse to re-establish a connection.  I'm able to get hiddev to
+> > "see" the mac of my mouse, but it times out on getting any actual
+> > information that would make it usable as an input device.
+> >
+> > Any thoughts or suggestions that people can think of, would be great.
+> >
+> > Thanks in advance...
+> > -Jared
+> >
+> > -------------------------------------------------------------------------
+> > This SF.net email is sponsored by: Microsoft
+> > Defy all challenges. Microsoft(R) Visual Studio 2005.
+> > http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2005.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
