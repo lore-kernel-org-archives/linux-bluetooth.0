@@ -1,12 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <e1effdeb0709250459h341e02ffi2e4644c0321a211b@mail.gmail.com>
-Date: Tue, 25 Sep 2007 08:59:27 -0300
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1190497949.7150.252.camel@pmac.infradead.org>
-MIME-Version: 1.0
-References: <1190497949.7150.252.camel@pmac.infradead.org>
-Subject: Re: [Bluez-devel] [PATCH] Fix leak in serial service.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: WANG Cong <xiyou.wangcong@gmail.com>
+In-Reply-To: <20070924113035.GE2442@hacking>
+References: <20070924021716.9bfe7dfb.akpm@linux-foundation.org>
+	<20070924113035.GE2442@hacking>
+Date: Tue, 25 Sep 2007 00:18:07 +0200
+Message-Id: <1190672287.5133.138.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Cc: maxk@qualcomm.com, Andrew Morton <akpm@linux-foundation.org>,
+        roel <12o3l@tiscali.nl>, linux-kernel@vger.kernel.org,
+        bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] [-mm Patch] net/bluetooth/hidp/core.c: Make
+	hidp_setup_input()	return int
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,63 +25,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 9/22/07, David Woodhouse <dwmw2@infradead.org> wrote:
-> When we remove a port, we should remove it from the ports_paths list.
-> Also, channel numbers can have more than one digit -- allow for up to
-> three digits, to avoid truncating the ident string in the storage entry.
->
-> Would actually be nice if there was a method to retrieve that ident string...
->
-> diff --git a/serial/manager.c b/serial/manager.c
-> index bb46d35..6aaa985 100644
-> --- a/serial/manager.c
-> +++ b/serial/manager.c
-> @@ -896,6 +896,7 @@ static DBusHandlerResult remove_port(DBusConnection *conn,
->  {
->         struct rfcomm_dev_info di;
->         DBusError derr;
-> +       GSList *l;
->         const char *path;
->         int16_t id;
->
-> @@ -927,6 +928,12 @@ static DBusHandlerResult remove_port(DBusConnection *conn,
->                         DBUS_TYPE_STRING, &path,
->                         DBUS_TYPE_INVALID);
->
-> +       l = g_slist_find_custom(ports_paths, path, (GCompareFunc) strcmp);
-> +       if (l) {
-> +               g_free(l->data);
-> +               ports_paths = g_slist_remove(ports_paths, l->data);
-> +       }
-> +
->         return DBUS_HANDLER_RESULT_HANDLED;
->  }
->
-> diff --git a/serial/storage.c b/serial/storage.c
-> index 8b66354..110d8de 100644
-> --- a/serial/storage.c
-> +++ b/serial/storage.c
-> @@ -75,7 +75,7 @@ int port_store(bdaddr_t *src, bdaddr_t *dst, int16_t id,
->         create_name(filename, PATH_MAX, STORAGEDIR, src_addr, "serial");
->         create_file(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
->
-> -       size = strlen(svcname) + 3;
-> +       size = strlen(svcname) + 5;
->         value = g_malloc0(size);
->
->         snprintf(key, 32, "%s#%hd", dst_addr, id);
->
->
-> --
-> dwmw2
+Hi Wang,
 
-Hi David,
+> This patch:
+> - makes hidp_setup_input() return int to indicate errors;
+> - checks its return value to handle errors.
+> 
+> And this time it is against -rc7-mm1 tree.
+> 
+> Thanks to roel and Marcel Holtmann for comments.
+> 
+> Signed-off-by: WANG Cong <xiyou.wangcong@gmail.com>
 
-Committed! Thanks! This leak was introduced when the TTY/Unix socket
-proxy was implemented.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 
-BR,
-Claudio.
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
