@@ -1,13 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Fulvio <fulvio@pc.jaring.my>
-To: bluez-users@lists.sourceforge.net
-Date: Mon, 24 Sep 2007 19:09:50 +0200
-References: <1190642401.6465.20.camel@localhost>
-In-Reply-To: <1190642401.6465.20.camel@localhost>
+Message-ID: <46F7DD20.60407@tfh-berlin.de>
+Date: Mon, 24 Sep 2007 17:52:00 +0200
+From: David Rehle <rehle@tfh-berlin.de>
 MIME-Version: 1.0
-Message-Id: <200709241909.50864.fulvio@pc.jaring.my>
-Subject: Re: [Bluez-users] problem pairing device
-Reply-To: fulvio@pc.jaring.my, BlueZ users <bluez-users@lists.sourceforge.net>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <46F38209.1050507@tfh-berlin.de>	<d89ddf300709231555x6722b2cl34c40b7100a799e3@mail.gmail.com>
+	<1190617970.5133.90.camel@aeonflux.holtmann.net>
+In-Reply-To: <1190617970.5133.90.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-users] can't etablish more than two connections
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -16,36 +17,44 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On luned=EC 24 settembre 2007, Michele Puccio wrote:
-> =A0 =A0 =A0 =A0 Class: 0x000100
-> =A0 =A0 =A0 =A0 Service Classes: Unspecified
-> =A0 =A0 =A0 =A0 Device Class: Computer, Uncategorized
+Hi Marcel,
 
-Try to specify a better class like:
+i only changed Link mode to "master". Previous it was set to "accept". 
+Next i changed link policy to "hold,sniff,park". Previous it was set to 
+nothing.
 
-hciconfig hci0 (or which rely on) class 0x03e100
+I want my server to be master without the possibility to change to 
+"slave". My server shall serve some incomming requests and i think it 
+does it now.
 
-I can't assure this is the fix, but there'll be other things to try like
+For what side effects you are talking?
 
-dbus-send --system --type=3Dmethod_call --print-reply --dest=3Dorg.bluez /o=
-rg/bluez/hci0 =
+There is no much complexity, only to send some data via sockets after a 
+request...
 
-org.bluez.Adapter.GetMode
+Regards,
 
-To know if it's in discorable mode
+David
 
-dbus-send --system --type=3Dmethod_call --print-reply --dest=3Dorg.bluez /o=
-rg/bluez/hci0 =
 
-org.bluez.Adapter.GetDiscoverableTimeout
-
-To know how long it'll remain on disoverable mode
-
-F
+Marcel Holtmann schrieb:
+> Hi David,
+> 
+>> As Marcel points out I"m being lazy with terminology. It's in the
+>> hcid.conf link mode and link policy that you control how you negotiate
+>> master/slave.
+> 
+> and you better not touch these settings. If the defaults don't work, you
+> should really know what you are doing. There are many side effects that
+> can trouble your life later on.
+> 
+> Regards
+> 
+> Marcel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
