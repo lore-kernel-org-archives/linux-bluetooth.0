@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <46F7DD20.60407@tfh-berlin.de>
-Date: Mon, 24 Sep 2007 17:52:00 +0200
-From: David Rehle <rehle@tfh-berlin.de>
-MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <46F38209.1050507@tfh-berlin.de>	<d89ddf300709231555x6722b2cl34c40b7100a799e3@mail.gmail.com>
-	<1190617970.5133.90.camel@aeonflux.holtmann.net>
-In-Reply-To: <1190617970.5133.90.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] can't etablish more than two connections
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+From: Michele Puccio <michele.puccio@eng.it>
+To: bluez-users@lists.sourceforge.net
+Date: Mon, 24 Sep 2007 16:00:01 +0200
+Message-Id: <1190642401.6465.20.camel@localhost>
+Mime-Version: 1.0
+Subject: [Bluez-users] problem pairing device
+Reply-To: michele.puccio@eng.it,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,40 +19,60 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marcel,
+hi all
+I cannot pair any device using hcitool scan or hcitool inq: both exit
+without any result or error. this is the output of hcidump during a
+scan:
+HCI sniffer - Bluetooth packet analyzer ver 1.33
+device: hci0 snap_len: 1028 filter: 0xffffffff
+HCI Command: Inquiry (0x01|0x0001) plen 5
+        lap 0x9e8b33 len 8 num 0
+HCI Event: Command Status (0x0f) plen 4
+        Inquiry (0x01|0x0001) status 0x00 ncmd 1
+HCI Event: Vendor (0xff) plen 7
+        0000: cd 03 00 04 00 0000                              .......
+HCI Event: Vendor (0xff) plen 7
+        0000: cd 03 00 04 00 0000                              .......
+HCI Event: Vendor (0xff) plen 7
+        0000: cd 03 00 04 00 0000                              .......
+HCI Event: Vendor (0xff) plen 7
+        0000: cd 03 00 04 00 0000                              .......
+HCI Event: Vendor (0xff) plen 7
+        0000: cd 03 00 04 00 0000                              .......
+HCI Event: Vendor (0xff) plen 7
+        0000: cd 03 00 04 00 0000                              .......
+HCI Event: Vendor (0xff) plen 7
+        0000: cd 03 00 04 00 0000                              .......
+HCI Event: Vendor (0xff) plen 7
+        0000: cd 03 00 04 00 0000                              .......
+HCI Event: Vendor (0xff) plen 7
+        0000: cd 03 00 04 00 0000                              .......
+HCI Event: Vendor (0xff) plen 7
+        0000: cd 03 00 04 00 0000                              .......
+HCI Event: Inquiry Complete (0x01) plen 1
+        
+status 0x00 and this is the output of hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:16:41:1B:97:A3 ACL MTU: 384:8 SCO MTU: 64:8
+        UP RUNNING PSCAN 
+        RX bytes:807 acl:0 sco:0 events:63 errors:0
+        TX bytes:331 acl:0 sco:0 commands:20 errors:0
+        Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+        Link policy: RSWITCH HOLD SNIFF PARK 
+        Link mode: SLAVE ACCEPT 
+        Name: 'D610'
+        Class: 0x000100
+        Service Classes: Unspecified
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x679 LMP Ver: 1.2 (0x2) LMP Subver:
+0x679
+        Manufacturer: Cambridge Silicon Radio (10)
 
-i only changed Link mode to "master". Previous it was set to "accept". 
-Next i changed link policy to "hold,sniff,park". Previous it was set to 
-nothing.
+I'm using ubuntu feisty. any suggestions?
+thanks
+michele
 
-I want my server to be master without the possibility to change to 
-"slave". My server shall serve some incomming requests and i think it 
-does it now.
-
-For what side effects you are talking?
-
-There is no much complexity, only to send some data via sockets after a 
-request...
-
-Regards,
-
-David
-
-
-Marcel Holtmann schrieb:
-> Hi David,
-> 
->> As Marcel points out I"m being lazy with terminology. It's in the
->> hcid.conf link mode and link policy that you control how you negotiate
->> master/slave.
-> 
-> and you better not touch these settings. If the defaults don't work, you
-> should really know what you are doing. There are many side effects that
-> can trouble your life later on.
-> 
-> Regards
-> 
-> Marcel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
