@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Adam Tauno Williams <adam@morrison-ind.com>
+Message-ID: <46F762B4.70608@tfh-berlin.de>
+Date: Mon, 24 Sep 2007 09:09:40 +0200
+From: David Rehle <rehle@tfh-berlin.de>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1190617562.5133.86.camel@aeonflux.holtmann.net>
-References: <200709232103.23663.fulvio@pc.jaring.my>
-	<1190617562.5133.86.camel@aeonflux.holtmann.net>
-Date: Mon, 24 Sep 2007 08:30:38 -0400
-Message-Id: <1190637038.5490.0.camel@aleph.wmmi.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Anyone got bluez working?
-Reply-To: adam@morrison-ind.com,
-        BlueZ users <bluez-users@lists.sourceforge.net>
+References: <46F38209.1050507@tfh-berlin.de>
+	<d89ddf300709231555x6722b2cl34c40b7100a799e3@mail.gmail.com>
+In-Reply-To: <d89ddf300709231555x6722b2cl34c40b7100a799e3@mail.gmail.com>
+Subject: Re: [Bluez-users] can't etablish more than two connections
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,74 +17,68 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1430529288=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi,
 
---===============1430529288==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="=-A/wFNaVqSceLwldHJc6a"
+a very big THANK YOU!!!
 
+that was my mistake, now it is possible to establish more than two 
+connections.
 
---=-A/wFNaVqSceLwldHJc6a
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+THANK YOU THANK YOU THANK YOU
 
-> > I'm new here and I'd like to point out that after the version 3.12 noth=
-ing got=20
-> > working.
-> > Actually I've install Version 3.19, but I can't figure out anything rig=
-ht.=20
-> > Most of the time the deamon on d-bus isn't answering and pairing don't=20
-> > happen. The pin-helper no way, passkey-agent giving up and no pairing.
-> > Pls show me one of your configuration that works. I always on KDE deskt=
-op and=20
-> > also Kbluetooth has several problems to be solved, but even by bash I c=
-an't=20
-> > get done.
-> no idea what you are trying to do, but I know for sure that the latest
-> Fedora, Ubuntu and openSuSE work perfectly fine. And their upcoming
-> releases have even the latest versions in it.
-
-Yep, using openSUSE 10.2/GNOME and Bluetooth works great.
-
---=-A/wFNaVqSceLwldHJc6a
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.5 (GNU/Linux)
-
-iD8DBQBG963tLRePpNle04MRAhEJAJ0f1SyNAM2ri4dcxosylm6stEADkQCdE6cp
-gpDf6dfthBn16LxOLB65IbY=
-=ld7V
------END PGP SIGNATURE-----
-
---=-A/wFNaVqSceLwldHJc6a--
+and also thank you for this great software, next i go to build a multi 
+dongle application
 
 
+with kind regards
 
---===============1430529288==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+David
+
+
+Brad Midgley schrieb:
+> David
+> 
+> As Marcel points out I"m being lazy with terminology. It's in the
+> hcid.conf link mode and link policy that you control how you negotiate
+> master/slave.
+> 
+> Brad
+> 
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2005.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+
+-- 
+Dipl.-Ing. (FH) David Rehle
+Technischer Angestellter IT-Komponenten
+BAER-Projekt
+
+-------------------------------------------------------------------------
+
+TFH Berlin
+Haus Bauwesen - Raum 209
+Luxemburger Str. 10
+13353 Berlin
+
+Tel. 0 30 / 45 04 - 54 05
+Fax 0 30 / 45 04 - 54 08
+http://www.tfh-berlin.de/BAER
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1430529288==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1430529288==--
