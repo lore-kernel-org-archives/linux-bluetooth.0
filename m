@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon, 24 Sep 2007 18:21:55 -0400
-From: Martin Stolle <mstoll@sus.mcgill.ca>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20070924222152.GA13130@sus.mcgill.ca>
-References: <2759cf860709241213o33159203kad04d7a0fa2ecaf5@mail.gmail.com>
-	<20070924192203.GA31266@sus.mcgill.ca>
-	<2759cf860709241233w621bd23akf3882800ad48cc28@mail.gmail.com>
-	<1190672090.5133.133.camel@aeonflux.holtmann.net>
-MIME-Version: 1.0
-In-Reply-To: <1190672090.5133.133.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-users] help with Logitech Travel Mouse
+From: Marcel Holtmann <marcel@holtmann.org>
+To: michele.puccio@eng.it, BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1190642401.6465.20.camel@localhost>
+References: <1190642401.6465.20.camel@localhost>
+Date: Tue, 25 Sep 2007 00:17:19 +0200
+Message-Id: <1190672239.5133.136.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] problem pairing device
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,24 +20,67 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Tue, Sep 25, 2007 at 12:14:50AM +0200, Marcel Holtmann wrote:
-> Hi Jared,
-> 
-> > Yea, I would think that would fix things, but I tried that (the hidd
-> > --connect) and it doesn't seem to work to get connected...
-> 
-> use the new input service and don't use hidd. The input service will
-> convert your configured devices automatically. There is no need to use
-> hidd --search or hidd --connect more than once. Whoever tells you
-> differently is wrong. Period.
-> 
+Hi Michele,
 
-Thanks, I didn't know that. how do you solve the problem at hand then?
-What are the commands to use for the new input service?  Which man pages
-should I look at?
+> I cannot pair any device using hcitool scan or hcitool inq: both exit
+> without any result or error. this is the output of hcidump during a
+> scan:
+> HCI sniffer - Bluetooth packet analyzer ver 1.33
+> device: hci0 snap_len: 1028 filter: 0xffffffff
+> HCI Command: Inquiry (0x01|0x0001) plen 5
+>         lap 0x9e8b33 len 8 num 0
+> HCI Event: Command Status (0x0f) plen 4
+>         Inquiry (0x01|0x0001) status 0x00 ncmd 1
+> HCI Event: Vendor (0xff) plen 7
+>         0000: cd 03 00 04 00 0000                              .......
+> HCI Event: Vendor (0xff) plen 7
+>         0000: cd 03 00 04 00 0000                              .......
+> HCI Event: Vendor (0xff) plen 7
+>         0000: cd 03 00 04 00 0000                              .......
+> HCI Event: Vendor (0xff) plen 7
+>         0000: cd 03 00 04 00 0000                              .......
+> HCI Event: Vendor (0xff) plen 7
+>         0000: cd 03 00 04 00 0000                              .......
+> HCI Event: Vendor (0xff) plen 7
+>         0000: cd 03 00 04 00 0000                              .......
+> HCI Event: Vendor (0xff) plen 7
+>         0000: cd 03 00 04 00 0000                              .......
+> HCI Event: Vendor (0xff) plen 7
+>         0000: cd 03 00 04 00 0000                              .......
+> HCI Event: Vendor (0xff) plen 7
+>         0000: cd 03 00 04 00 0000                              .......
+> HCI Event: Vendor (0xff) plen 7
+>         0000: cd 03 00 04 00 0000                              .......
+> HCI Event: Inquiry Complete (0x01) plen 1
+>         
+> status 0x00 and this is the output of hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:16:41:1B:97:A3 ACL MTU: 384:8 SCO MTU: 64:8
+>         UP RUNNING PSCAN 
+>         RX bytes:807 acl:0 sco:0 events:63 errors:0
+>         TX bytes:331 acl:0 sco:0 commands:20 errors:0
+>         Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+>         Link policy: RSWITCH HOLD SNIFF PARK 
+>         Link mode: SLAVE ACCEPT 
+>         Name: 'D610'
+>         Class: 0x000100
+>         Service Classes: Unspecified
+>         Device Class: Computer, Uncategorized
+>         HCI Ver: 1.2 (0x2) HCI Rev: 0x679 LMP Ver: 1.2 (0x2) LMP Subver:
+> 0x679
+>         Manufacturer: Cambridge Silicon Radio (10)
 
-Thanks,
-  Martin
+this is one of the funny Dell adapters with the vendor messages. No idea
+what this is actually doing. However maybe loading hci_usb with reset=1
+might help.
+
+Also you can check "sudo bccmd buildname" if this is a special firmware.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
