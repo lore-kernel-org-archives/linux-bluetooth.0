@@ -1,11 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <2759cf860709241213o33159203kad04d7a0fa2ecaf5@mail.gmail.com>
-Date: Mon, 24 Sep 2007 15:13:47 -0400
-From: "Jared Greenwald" <greenwaldjared@gmail.com>
+From: Fulvio <fulvio@pc.jaring.my>
 To: bluez-users@lists.sourceforge.net
+Date: Mon, 24 Sep 2007 19:09:50 +0200
+References: <1190642401.6465.20.camel@localhost>
+In-Reply-To: <1190642401.6465.20.camel@localhost>
 MIME-Version: 1.0
-Subject: [Bluez-users] help with Logitech Travel Mouse
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-Id: <200709241909.50864.fulvio@pc.jaring.my>
+Subject: Re: [Bluez-users] problem pairing device
+Reply-To: fulvio@pc.jaring.my, BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,25 +16,36 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I've had this setup for a year or so.  A nice bluetooth mouse and
-Kubuntu.  Currently, I'm running kubuntu 7.10 with the 2.6.22-12
-kernel and blueZ 3.19-0ubuntu1.
+On luned=EC 24 settembre 2007, Michele Puccio wrote:
+> =A0 =A0 =A0 =A0 Class: 0x000100
+> =A0 =A0 =A0 =A0 Service Classes: Unspecified
+> =A0 =A0 =A0 =A0 Device Class: Computer, Uncategorized
 
-Every time I upgrade my kernel, I've had to re-establish my mouse's
-bluetooth connection by power-cycling it or hitting the reset button
-while running hiddev --search.  This time, when I upgraded, I cannot
-get the mouse to re-establish a connection.  I'm able to get hiddev to
-"see" the mac of my mouse, but it times out on getting any actual
-information that would make it usable as an input device.
+Try to specify a better class like:
 
-Any thoughts or suggestions that people can think of, would be great.
+hciconfig hci0 (or which rely on) class 0x03e100
 
-Thanks in advance...
--Jared
+I can't assure this is the fix, but there'll be other things to try like
+
+dbus-send --system --type=3Dmethod_call --print-reply --dest=3Dorg.bluez /o=
+rg/bluez/hci0 =
+
+org.bluez.Adapter.GetMode
+
+To know if it's in discorable mode
+
+dbus-send --system --type=3Dmethod_call --print-reply --dest=3Dorg.bluez /o=
+rg/bluez/hci0 =
+
+org.bluez.Adapter.GetDiscoverableTimeout
+
+To know how long it'll remain on disoverable mode
+
+F
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
