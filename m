@@ -1,15 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: michele.puccio@eng.it, BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1190705022.6543.5.camel@localhost>
+From: Michele Puccio <michele.puccio@eng.it>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1190672239.5133.136.camel@aeonflux.holtmann.net>
 References: <1190642401.6465.20.camel@localhost>
 	<1190672239.5133.136.camel@aeonflux.holtmann.net>
-	<1190705022.6543.5.camel@localhost>
-Date: Tue, 25 Sep 2007 09:57:55 +0200
-Message-Id: <1190707075.5133.164.camel@aeonflux.holtmann.net>
+Date: Tue, 25 Sep 2007 09:23:42 +0200
+Message-Id: <1190705022.6543.5.camel@localhost>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users] problem pairing device
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Reply-To: michele.puccio@eng.it,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -22,30 +22,81 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Michele,
+hi marcel,
+thanks for answering...but how can I "loading hci_usb with reset=1"?
+my system don't the recognize bccmd as a valid command; may be I need
+some extra package to install...
+can you please help me? the bluetooth is the only stuff that doesn't
+work in my linuxbox (dell latitude d610 + ubuntu feisty)
 
-> thanks for answering...but how can I "loading hci_usb with reset=1"?
+regards
+michele
 
-there are millions of howtos that deal with kernel modules/drivers and
-how to load them with special options. Also /sys/module/hci_usb can be
-used to changed them at runtime. Then however the device needs to be
-unplugged and replugged.
 
-> my system don't the recognize bccmd as a valid command; may be I need
-> some extra package to install...
-
-Ask your distro. It is part of bluez-utils. Compile it from the sources.
-
-> can you please help me? the bluetooth is the only stuff that doesn't
-> work in my linuxbox (dell latitude d610 + ubuntu feisty)
-
-If someone donates a D610 to me, then I can make this easily work, but
-until then, you have to play with it.
-
-Regards
-
-Marcel
-
+On Tue, 2007-09-25 at 00:17 +0200, Marcel Holtmann wrote:
+> Hi Michele,
+> 
+> > I cannot pair any device using hcitool scan or hcitool inq: both exit
+> > without any result or error. this is the output of hcidump during a
+> > scan:
+> > HCI sniffer - Bluetooth packet analyzer ver 1.33
+> > device: hci0 snap_len: 1028 filter: 0xffffffff
+> > HCI Command: Inquiry (0x01|0x0001) plen 5
+> >         lap 0x9e8b33 len 8 num 0
+> > HCI Event: Command Status (0x0f) plen 4
+> >         Inquiry (0x01|0x0001) status 0x00 ncmd 1
+> > HCI Event: Vendor (0xff) plen 7
+> >         0000: cd 03 00 04 00 0000                              .......
+> > HCI Event: Vendor (0xff) plen 7
+> >         0000: cd 03 00 04 00 0000                              .......
+> > HCI Event: Vendor (0xff) plen 7
+> >         0000: cd 03 00 04 00 0000                              .......
+> > HCI Event: Vendor (0xff) plen 7
+> >         0000: cd 03 00 04 00 0000                              .......
+> > HCI Event: Vendor (0xff) plen 7
+> >         0000: cd 03 00 04 00 0000                              .......
+> > HCI Event: Vendor (0xff) plen 7
+> >         0000: cd 03 00 04 00 0000                              .......
+> > HCI Event: Vendor (0xff) plen 7
+> >         0000: cd 03 00 04 00 0000                              .......
+> > HCI Event: Vendor (0xff) plen 7
+> >         0000: cd 03 00 04 00 0000                              .......
+> > HCI Event: Vendor (0xff) plen 7
+> >         0000: cd 03 00 04 00 0000                              .......
+> > HCI Event: Vendor (0xff) plen 7
+> >         0000: cd 03 00 04 00 0000                              .......
+> > HCI Event: Inquiry Complete (0x01) plen 1
+> >         
+> > status 0x00 and this is the output of hciconfig -a
+> > hci0:   Type: USB
+> >         BD Address: 00:16:41:1B:97:A3 ACL MTU: 384:8 SCO MTU: 64:8
+> >         UP RUNNING PSCAN 
+> >         RX bytes:807 acl:0 sco:0 events:63 errors:0
+> >         TX bytes:331 acl:0 sco:0 commands:20 errors:0
+> >         Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
+> >         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+> >         Link policy: RSWITCH HOLD SNIFF PARK 
+> >         Link mode: SLAVE ACCEPT 
+> >         Name: 'D610'
+> >         Class: 0x000100
+> >         Service Classes: Unspecified
+> >         Device Class: Computer, Uncategorized
+> >         HCI Ver: 1.2 (0x2) HCI Rev: 0x679 LMP Ver: 1.2 (0x2) LMP Subver:
+> > 0x679
+> >         Manufacturer: Cambridge Silicon Radio (10)
+> 
+> this is one of the funny Dell adapters with the vendor messages. No idea
+> what this is actually doing. However maybe loading hci_usb with reset=1
+> might help.
+> 
+> Also you can check "sudo bccmd buildname" if this is a special firmware.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
 
 
 -------------------------------------------------------------------------
