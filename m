@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <46F92586.5070402@idlum.be>
-Date: Tue, 25 Sep 2007 17:13:10 +0200
+Message-ID: <46F92364.3080603@idlum.be>
+Date: Tue, 25 Sep 2007 17:04:04 +0200
 From: Pierre-Yves Paulus <py@idlum.be>
 MIME-Version: 1.0
-To: linux-kernel@vger.kernel.org,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Warnings and Bug on 2.6.23-rc6 closing rfcomm links
- (device_move() API ?)
+To: linux-kernel@vger.kernel.org
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Warnings and Oops on 2.6.23-rc6 while activily using
+ rfcomm links (mm/slab.c)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,8 +22,14 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hello,
 
-Yet another report, once again while putting rfcomm system under load. 
-Several USB adapters, several links.
+Putting the bluetooth system under load (opening and closing several 
+rfcomm links off several USB adapters, and transmitting data over them), 
+I got the Oops below. The computer hung completely, as you can see. Just 
+before, I also got those warnings.
+
+I'm not sure if I'm providing the right and useful informations to allow 
+fixing of those problems, as I'm definitely no expert. Please tell me if 
+I do something the wrong way.
 
 
 WARNING: at lib/kref.c:33 kref_get()
@@ -31,28 +37,10 @@ WARNING: at lib/kref.c:33 kref_get()
   [<c01c484b>] kobject_get+0xf/0x13
   [<c0223b2f>] get_device+0xe/0x14
   [<c0223b48>] device_move+0x13/0xe2
-  [<d02f1b78>] rfcomm_tty_close+0x23/0x61 [rfcomm]
+  [<d02f4b78>] rfcomm_tty_close+0x23/0x61 [rfcomm]
   [<c020e0a4>] release_dev+0x1c0/0x54a
-  [<d02f10c9>] rfcomm_dev_destruct+0x59/0x65 [rfcomm]
-  [<d02f170c>] rfcomm_dev_ioctl+0x328/0x4e6 [rfcomm]
-  [<c02460bc>] release_sock+0xc/0x74
-  [<c0243f4e>] sock_ioctl+0x19f/0x1be
-  [<c020e435>] tty_release+0x7/0xa
-  [<c015be91>] __fput+0x93/0x147
-  [<c0159a39>] filp_close+0x51/0x58
-  [<c015aad1>] sys_close+0x54/0x83
-  [<c0103c72>] syscall_call+0x7/0xb
-  =======================
-
-WARNING: at lib/kref.c:33 kref_get()
-  [<c01c537b>] kref_get+0x34/0x3d
-  [<c01c484b>] kobject_get+0xf/0x13
-  [<c0223b2f>] get_device+0xe/0x14
-  [<c0223b48>] device_move+0x13/0xe2
-  [<d02f1b78>] rfcomm_tty_close+0x23/0x61 [rfcomm]
-  [<c020e0a4>] release_dev+0x1c0/0x54a
-  [<d02f10c9>] rfcomm_dev_destruct+0x59/0x65 [rfcomm]
-  [<d02f170c>] rfcomm_dev_ioctl+0x328/0x4e6 [rfcomm]
+  [<d02f40c9>] rfcomm_dev_destruct+0x59/0x65 [rfcomm]
+  [<d02f470c>] rfcomm_dev_ioctl+0x328/0x4e6 [rfcomm]
   [<c012a3a8>] autoremove_wake_function+0x0/0x35
   [<c02460bc>] release_sock+0xc/0x74
   [<c0243f4e>] sock_ioctl+0x19f/0x1be
@@ -68,122 +56,43 @@ WARNING: at lib/kref.c:33 kref_get()
   [<c01c484b>] kobject_get+0xf/0x13
   [<c0223b2f>] get_device+0xe/0x14
   [<c0223b48>] device_move+0x13/0xe2
-  [<d02f1b78>] rfcomm_tty_close+0x23/0x61 [rfcomm]
+  [<d02f4b78>] rfcomm_tty_close+0x23/0x61 [rfcomm]
+  [<c020e0a4>] release_dev+0x1c0/0x54a
+  [<d00375ef>] dl_done_list+0x131/0x1a6 [ohci_hcd]
+  [<c020e435>] tty_release+0x7/0xa
+  [<c015be91>] __fput+0x93/0x147
+  [<c0159a39>] filp_close+0x51/0x58
+  [<c015aad1>] sys_close+0x54/0x83
+  [<c0103c72>] syscall_call+0x7/0xb
+  =======================
+
+WARNING: at lib/kref.c:33 kref_get()
+  [<c01c537b>] kref_get+0x34/0x3d
+  [<c01c484b>] kobject_get+0xf/0x13
+  [<c0223b2f>] get_device+0xe/0x14
+  [<c0223b48>] device_move+0x13/0xe2
+  [<d02f4b78>] rfcomm_tty_close+0x23/0x61 [rfcomm]
+  [<c020e0a4>] release_dev+0x1c0/0x54a
+  [<d02f40c9>] rfcomm_dev_destruct+0x59/0x65 [rfcomm]
+  [<d02f470c>] rfcomm_dev_ioctl+0x328/0x4e6 [rfcomm]
+  [<c012a3a8>] autoremove_wake_function+0x0/0x35
+  [<c02460bc>] release_sock+0xc/0x74
+  [<c0243f4e>] sock_ioctl+0x19f/0x1be
+  [<c020e435>] tty_release+0x7/0xa
+  [<c015be91>] __fput+0x93/0x147
+  [<c0159a39>] filp_close+0x51/0x58
+  [<c015aad1>] sys_close+0x54/0x83
+  [<c0103c72>] syscall_call+0x7/0xb
+  =======================
+
+WARNING: at lib/kref.c:33 kref_get()
+  [<c01c537b>] kref_get+0x34/0x3d
+  [<c01c484b>] kobject_get+0xf/0x13
+  [<c0223b2f>] get_device+0xe/0x14
+  [<c0223b48>] device_move+0x13/0xe2
+  [<d02f4b78>] rfcomm_tty_close+0x23/0x61 [rfcomm]
   [<c020e0a4>] release_dev+0x1c0/0x54a
   [<c01328fb>] do_futex+0x72/0x85d
-  [<d00535d5>] dl_done_list+0x117/0x1a6 [ohci_hcd]
-  [<c020e435>] tty_release+0x7/0xa
-  [<c015be91>] __fput+0x93/0x147
-  [<c0159a39>] filp_close+0x51/0x58
-  [<c015aad1>] sys_close+0x54/0x83
-  [<c0103c72>] syscall_call+0x7/0xb
-  =======================
-BUG: unable to handle kernel paging request at virtual address 6e552220
-  printing eip:
-c01c8111
-*pde = 00000000
-Oops: 0000 [#1]
-Modules linked in: rfcomm l2cap battery ipv6 dm_snapshot dm_mirror 
-dm_mod loop parport_pc parport floppy pcspkr ac button r
-tc snd_cs5535audio snd_ac97_codec ac97_bus snd_pcm snd_timer snd 
-soundcore snd_page_alloc geode_rng cs5535_gpio hci_usb blu
-etooth geode_aes blkcipher tsdev evdev usbhid hid reiserfs ide_disk 
-generic amd74xx ide_core ohci_hcd sata_via ata_generic
-8139cp libata usbcore 8139too mii scsi_mod thermal processor fan
-CPU:    0
-EIP:    0060:[<c01c8111>]    Not tainted VLI
-EFLAGS: 00010246   (2.6.23-rc6 #1)
-EIP is at strlen+0x8/0x11
-eax: 00000000   ebx: cd064e68   ecx: ffffffff   edx: 000000d0
-esi: 000000d0   edi: 6e552220   ebp: 00000001   esp: c8f35e78
-ds: 007b   es: 007b   fs: 0000  gs: 0033  ss: 0068
-Process java (pid: 3847, ti=c8f34000 task=c0ca8570 task.ti=c8f34000)
-Stack: cd064e68 c01c4b61 cd064e68 cf7ab474 cd064e00 ffffffea c01c4bfd 
-c8f35ea0
-        c01c537b c02f04cb c02fde89 00000021 c02b541d 00000000 00000000 
-cd064e00
-        cf7ab474 c0223b89 cd064e68 cca60ec0 cedeec00 c806f3c4 00000000 
-d02f1b78
-Call Trace:
-  [<c01c4b61>] kobject_get_path+0x1a/0x6f
-  [<c01c4bfd>] kobject_move+0x47/0xec
-  [<c01c537b>] kref_get+0x34/0x3d
-  [<c0223b89>] device_move+0x54/0xe2
-  [<d02f1b78>] rfcomm_tty_close+0x23/0x61 [rfcomm]
-  [<c020e0a4>] release_dev+0x1c0/0x54a
-  [<c01328fb>] do_futex+0x72/0x85d
-  [<d00535d5>] dl_done_list+0x117/0x1a6 [ohci_hcd]
-  [<c020e435>] tty_release+0x7/0xa
-  [<c015be91>] __fput+0x93/0x147
-  [<c0159a39>] filp_close+0x51/0x58
-  [<c015aad1>] sys_close+0x54/0x83
-  [<c0103c72>] syscall_call+0x7/0xb
-  =======================
-Code: f0 48 5e c3 56 89 d1 89 c6 83 ec 04 31 d2 89 c8 88 c4 ac 38 e0 75 
-03 8d 56 ff 84 c0 75 f4 5e 89 d0 5e c3 57 83 c9 ff
-89 c7 31 c0 <f2> ae f7 d1 49 5f 89 c8 c3 57 89 c7 89 d0 31 d2 85 c9 74 
-0c f2
-EIP: [<c01c8111>] strlen+0x8/0x11 SS:ESP 0068:c8f35e78
-
-WARNING: at lib/kref.c:33 kref_get()
-  [<c01c537b>] kref_get+0x34/0x3d
-  [<c01c484b>] kobject_get+0xf/0x13
-  [<c0223b2f>] get_device+0xe/0x14
-  [<c0223b48>] device_move+0x13/0xe2
-  [<d02f1b78>] rfcomm_tty_close+0x23/0x61 [rfcomm]
-  [<c020e0a4>] release_dev+0x1c0/0x54a
-  [<c0130a7a>] tick_program_event+0x2a/0x49
-  [<c012ce6d>] hrtimer_interrupt+0x1a4/0x1cf
-  [<c0130c80>] tick_sched_timer+0x0/0x9c
-  [<c020e435>] tty_release+0x7/0xa
-  [<c015be91>] __fput+0x93/0x147
-  [<c0159a39>] filp_close+0x51/0x58
-  [<c0106637>] do_IRQ+0x58/0x6d
-  [<c015aad1>] sys_close+0x54/0x83
-  [<c0103c72>] syscall_call+0x7/0xb
-  =======================
-
-WARNING: at lib/kref.c:33 kref_get()
-  [<c01c537b>] kref_get+0x34/0x3d
-  [<c01c484b>] kobject_get+0xf/0x13
-  [<c0223b2f>] get_device+0xe/0x14
-  [<c0223b48>] device_move+0x13/0xe2
-  [<d02f1b78>] rfcomm_tty_close+0x23/0x61 [rfcomm]
-  [<c020e0a4>] release_dev+0x1c0/0x54a
-  [<d005349a>] finish_urb+0x79/0x9d [ohci_hcd]
-  [<d00535d5>] dl_done_list+0x117/0x1a6 [ohci_hcd]
-  [<c020e435>] tty_release+0x7/0xa
-  [<c015be91>] __fput+0x93/0x147
-  [<c0159a39>] filp_close+0x51/0x58
-  [<c0106637>] do_IRQ+0x58/0x6d
-  [<c015aad1>] sys_close+0x54/0x83
-  [<c0103c72>] syscall_call+0x7/0xb
-  =======================
-
-WARNING: at lib/kref.c:33 kref_get()
-  [<c01c537b>] kref_get+0x34/0x3d
-  [<c01c484b>] kobject_get+0xf/0x13
-  [<c0223b2f>] get_device+0xe/0x14
-  [<c0223b48>] device_move+0x13/0xe2
-  [<d02f1b78>] rfcomm_tty_close+0x23/0x61 [rfcomm]
-  [<c020e0a4>] release_dev+0x1c0/0x54a
-  [<d00535d5>] dl_done_list+0x117/0x1a6 [ohci_hcd]
-  [<c020e435>] tty_release+0x7/0xa
-  [<c015be91>] __fput+0x93/0x147
-  [<c0159a39>] filp_close+0x51/0x58
-  [<c015aad1>] sys_close+0x54/0x83
-  [<c0103c72>] syscall_call+0x7/0xb
-  =======================
-
-WARNING: at lib/kref.c:33 kref_get()
-  [<c01c537b>] kref_get+0x34/0x3d
-  [<c01c484b>] kobject_get+0xf/0x13
-  [<c0223b2f>] get_device+0xe/0x14
-  [<c0223b48>] device_move+0x13/0xe2
-  [<d02f1b78>] rfcomm_tty_close+0x23/0x61 [rfcomm]
-  [<c020e0a4>] release_dev+0x1c0/0x54a
-  [<c01328fb>] do_futex+0x72/0x85d
-  [<d00535d5>] dl_done_list+0x117/0x1a6 [ohci_hcd]
   [<c020e435>] tty_release+0x7/0xa
   [<c015be91>] __fput+0x93/0x147
   [<c0159a39>] filp_close+0x51/0x58
@@ -191,6 +100,85 @@ WARNING: at lib/kref.c:33 kref_get()
   [<c0103c72>] syscall_call+0x7/0xb
   [<c02a0000>] atm_get_addr+0xd0/0x10d
   =======================
+
+------------[ cut here ]------------
+kernel BUG at mm/slab.c:2983!
+invalid opcode: 0000 [#1]
+Modules linked in: rfcomm l2cap battery ipv6 dm_snapshot dm_mirror 
+dm_mod loop tsdev hci_usb bluetooth ac button usbhid hid
+  snd_cs5535audio snd_ac97_codec ac97_bus parport_pc parport snd_pcm 
+snd_timer snd soundcore snd_page_alloc geode_rng cs5535
+_gpio geode_aes blkcipher evdev floppy pcspkr rtc reiserfs ide_disk 
+generic amd74xx ide_core ohci_hcd sata_via ata_generic
+8139cp libata 8139too usbcore mii scsi_mod thermal processor fan
+CPU:    0
+EIP:    0060:[<c01588c5>]    Not tainted VLI
+EFLAGS: 00010046   (2.6.23-rc6 #1)
+EIP is at cache_alloc_refill+0xc0/0x3e7
+eax: 00000008   ebx: 00000001   ecx: cf7af3c0   edx: cf3188a0
+esi: c08ea1a0   edi: cf7ad2a0   ebp: cf7ab360   esp: cd2f5930
+ds: 007b   es: 007b   fs: 0000  gs: 0033  ss: 0068
+Process syslogd (pid: 2554, ti=cd2f4000 task=c1258570 task.ti=cd2f4000)
+Stack: 00000008 00000020 cf7af3c0 0000000b c0116edf 00aea0ab be9e1cb3 
+00000020
+        ce9ccbe0 cf7af3c0 00000282 00000020 c0158c5a ce9ccbe0 00000080 
+ce9ccbe0
+        cf7a7680 c024962f 00000000 00000020 c448ee00 cf499400 00000001 
+cf499400
+Call Trace:
+  [<c0116edf>] __check_preempt_curr_fair+0x5a/0x87
+  [<c0158c5a>] __kmalloc+0x6e/0xab
+  [<c024962f>] __alloc_skb+0x53/0xff
+  [<d0282732>] hci_send_cmd+0x2a/0x146 [bluetooth]
+  [<d0285683>] hci_event_packet+0x56e/0x10e3 [bluetooth]
+  [<c024769a>] sock_def_readable+0x27/0x4b
+  [<c0248c9a>] skb_clone+0x3c/0x23c
+  [<d0282f70>] hci_rx_task+0x63/0x1d5 [bluetooth]
+  [<c011f945>] tasklet_action+0x44/0x76
+  [<c011f875>] __do_softirq+0x3e/0x87
+  [<c011f8f3>] do_softirq+0x35/0x43
+  [<c011fb7a>] irq_exit+0x29/0x58
+  [<c0106637>] do_IRQ+0x58/0x6d
+  [<c013fe05>] handle_IRQ_event+0x23/0x51
+  [<c0104c43>] common_interrupt+0x23/0x30
+  [<c01749c7>] __find_get_block+0x3a/0x13a
+  [<c017529a>] ll_rw_block+0x7a/0x89
+  [<c0174ae6>] __getblk+0x1f/0x236
+  [<c017481c>] __find_get_block_slow+0xfc/0x106
+  [<c017529a>] ll_rw_block+0x7a/0x89
+  [<d0154467>] search_by_key+0x71/0xd2a [reiserfs]
+  [<c0174ae6>] __getblk+0x1f/0x236
+  [<d01543ae>] pathrelse+0x15/0x24 [reiserfs]
+  [<d0143ffe>] reiserfs_update_sd_size+0x279/0x284 [reiserfs]
+  [<d0142844>] make_cpu_key+0x3f/0x46 [reiserfs]
+  [<d0143e03>] reiserfs_update_sd_size+0x7e/0x284 [reiserfs]
+  [<d015b898>] journal_begin+0x96/0xcc [reiserfs]
+  [<d0144150>] reiserfs_commit_write+0x147/0x1b8 [reiserfs]
+  [<c0143b3f>] generic_file_buffered_write+0x3d5/0x5b9
+  [<c01718b1>] __mark_inode_dirty+0x24/0x130
+  [<c0144158>] __generic_file_aio_write_nolock+0x435/0x491
+  [<c0165856>] core_sys_select+0x191/0x2a3
+  [<c0144206>] generic_file_aio_write+0x52/0xb1
+  [<c015ae1a>] do_sync_readv_writev+0xc0/0xfd
+  [<c012a3a8>] autoremove_wake_function+0x0/0x35
+  [<c01038a0>] do_notify_resume+0x4f7/0x5d2
+  [<c015acda>] rw_copy_check_uvector+0x5c/0xb0
+  [<c015b516>] do_readv_writev+0xbc/0x193
+  [<c01441b4>] generic_file_aio_write+0x0/0xb1
+  [<c015b62a>] vfs_writev+0x3d/0x48
+  [<c015b9b0>] sys_writev+0x41/0x67
+  [<c0103c72>] syscall_call+0x7/0xb
+  =======================
+Code: be 00 00 00 8b 37 39 fe 75 15 8b 77 10 8d 47 10 c7 47 30 01 00 00 
+00 39 c6 0f 84 9a 00 00 00 8b 4c 24 08 8b 41 1c 39
+46 10 72 2d <0f> 0b eb fe 8b 44 24 08 8b 5e 14 8b 4d 00 8b 50 10 8b 04 
+24 0f
+EIP: [<c01588c5>] cache_alloc_refill+0xc0/0x3e7 SS:ESP 0068:cd2f5930
+Kernel panic - not syncing: Fatal exception in interrupt
+Rebooting in 60 seconds..
+
+
+.config:
 
 #
 # Automatically generated make config: don't edit
@@ -4002,6 +3990,7 @@ CONFIG_GENERIC_HARDIRQS=y
 CONFIG_GENERIC_IRQ_PROBE=y
 CONFIG_X86_BIOS_REBOOT=y
 CONFIG_KTIME_SCALAR=y
+
 
 Best Regards,
 Pierre-Yves
