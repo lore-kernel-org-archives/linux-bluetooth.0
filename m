@@ -1,31 +1,40 @@
-Return-Path: <nitinm76@yahoo.com>
-Date: Tue, 25 Sep 2007 22:08:23 -0700 (PDT)
-From: Nitin Mahajan <nitinm76@yahoo.com>
-Reply-To: Nitin Mahajan <nitinm76@yahoo.com>
-Subject: Re: [Bluez-users] BlueZ APIs
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: bluez-users@lists.sourceforge.net
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+From: CIJOML <cijoml@volny.cz>
+To: bluez-users@lists.sourceforge.net
+Date: Tue, 25 Sep 2007 19:38:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Message-ID: <970887.10345.qm@web50106.mail.re2.yahoo.com>
-List-ID: <bluez-users.lists.sourceforge.net>
+Message-Id: <200709251938.18839.cijoml@volny.cz>
+Subject: [Bluez-users] bluez-users startup scripts broken?
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello!=0A=0AThanks for the information in this regard. I wanted to know if =
-there is any documentation for the BlueZ HCI APIs.=0A=0Athanks and regards=
-=0A=0A-Nitin=0A=0A----- Original Message ----=0AFrom: Marcel Holtmann <marc=
-el@holtmann.org>=0ATo: Nitin Mahajan <nitinm76@yahoo.com>; BlueZ users <blu=
-ez-users@lists.sourceforge.net>=0ASent: Wednesday, August 29, 2007 3:18:19 =
-PM=0ASubject: Re: [Bluez-users] BlueZ APIs=0A=0AHi Nitin,=0A=0A> I am new t=
-o Bluetooth programming. I have read some documentation at BlueZ website an=
-d the WiKi regarding bluetooth programming. =0A> What I understood is that =
-the latest BlueZ stack has it's interface as the BlueZ D-BUS API, through w=
-hich one can avail bluetooth services.=0A>  =0A> What I wanted to understan=
-d that Is there a way I can avail these services without using D-BUS/ D-BUS=
- API and by directly accessing some BlueZ API. One way I know is Bluetooth =
-socket programming, but cannot cover each and every bluetooth functionality=
-. What are the additional set of APIs to access bluetooth services. Is ther=
-e a place where these BlueZ APIS(other than BlueZ socket and D-BUS API) are=
- documented?=0A=0Ause the L2CAP and RFCOMM sockets and the D-Bus API for Bl=
-ueZ. Everything=0Aelse it not worth using.=0A=0ARegards=0A=0AMarcel=0A=0A=
-=0A=0A=0A=0A=0ASend instant messages to your online friends http://uk.messe=
-nger.yahoo.com 
+Hi all,
+
+I just tested bluez-utils-3.19. I am surpriced, that /etc/init.d/bluetooth 
+start doesn't start anythink? I checked /etc/default/bluetooth, and all HIDD 
+PAND etc. lines are missing??
+
+Marcel can you advice another/supported startup of daemons?
+
+Thanks a lot
+
+Michal
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
