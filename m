@@ -1,22 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Wed, 26 Sep 2007 13:30:35 +0200
-From: Stefan Seyfried <seife@suse.de>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20070926113035.GC8781@suse.de>
-References: <2759cf860709241213o33159203kad04d7a0fa2ecaf5@mail.gmail.com>
-	<20070924192203.GA31266@sus.mcgill.ca>
-	<2759cf860709241233w621bd23akf3882800ad48cc28@mail.gmail.com>
-	<1190672090.5133.133.camel@aeonflux.holtmann.net>
-	<20070924222152.GA13130@sus.mcgill.ca>
-	<1190675554.5133.151.camel@aeonflux.holtmann.net>
-	<20070924232149.GA14346@sus.mcgill.ca>
-	<2759cf860709250450yc36a945m846bd529d006b289@mail.gmail.com>
-	<e1effdeb0709250524n16217623p194a891fa858810c@mail.gmail.com>
-	<20070925123441.GA1032@sus.mcgill.ca>
-MIME-Version: 1.0
-In-Reply-To: <20070925123441.GA1032@sus.mcgill.ca>
-Subject: Re: [Bluez-users] help with Logitech Travel Mouse
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+From: Michele Puccio <michele.puccio@eng.it>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1190707075.5133.164.camel@aeonflux.holtmann.net>
+References: <1190642401.6465.20.camel@localhost>
+	<1190672239.5133.136.camel@aeonflux.holtmann.net>
+	<1190705022.6543.5.camel@localhost>
+	<1190707075.5133.164.camel@aeonflux.holtmann.net>
+Date: Wed, 26 Sep 2007 09:08:31 +0200
+Message-Id: <1190790511.6453.3.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] problem pairing device
+Reply-To: michele.puccio@eng.it,
+        BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -25,38 +20,48 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Tue, Sep 25, 2007 at 08:34:41AM -0400, Martin Stolle wrote:
- =
+Marcel
+thanks again!
+mmmhhhhh not so easy....I have to study some fundamental stuff and spend
+time on it...anyway...
+if someone donates you a D610 please let me know ;-)
 
-> The other problem is - what about people who don't use gnome or kde?  I
-> always thought Linux was about choice.  Clearly, if I want to use
-> bluetooth, I am forced to use one of these desktop systems with their
-> desktops, wms etc..., which is quite restrictive.  That is quite a step
-> back from the  "hidd --search"  way of doing things!
-> =
+Best regards
 
-> (Now, I am not saying that hidd --search should be the only way -
-> definitely not.  Gnome and KDE integratino are really important.  But
-> please not at the expense of simple command-line tools!)
+michele
 
-Just go ahead and write them. Take those python scripts as a base and write
-some nice ncurses-based inputwizard. Or maybe XLib-based or whatever. Lots
-of people are complaining that "there is no way to do it on the command lin=
-e"
-but the only people providing code are the desktop people.
--- =
+On Tue, 2007-09-25 at 09:57 +0200, Marcel Holtmann wrote:
+> Hi Michele,
+> 
+> > thanks for answering...but how can I "loading hci_usb with reset=1"?
+> 
+> there are millions of howtos that deal with kernel modules/drivers and
+> how to load them with special options. Also /sys/module/hci_usb can be
+> used to changed them at runtime. Then however the device needs to be
+> unplugged and replugged.
+> 
+> > my system don't the recognize bccmd as a valid command; may be I need
+> > some extra package to install...
+> 
+> Ask your distro. It is part of bluez-utils. Compile it from the sources.
+> 
+> > can you please help me? the bluetooth is the only stuff that doesn't
+> > work in my linuxbox (dell latitude d610 + ubuntu feisty)
+> 
+> If someone donates a D610 to me, then I can make this easily work, but
+> until then, you have to play with it.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> 
 
-Stefan Seyfried
-QA / R&D Team Mobile Devices        |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg  | "Well, surrounding them's out." =
-
-
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
