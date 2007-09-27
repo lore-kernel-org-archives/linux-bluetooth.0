@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <BAY125-W32A371D4F0BDD0BAC18B63F1B10@phx.gbl>
+Message-ID: <BAY125-W38F2ED861CD4CAAF222AA6F1B10@phx.gbl>
 From: darshan kanani <darshan_kanani@hotmail.com>
 To: <bluez-devel@lists.sourceforge.net>
-Date: Thu, 27 Sep 2007 12:02:03 +0530
+Date: Thu, 27 Sep 2007 12:00:06 +0530
 MIME-Version: 1.0
-Subject: [Bluez-devel] Battery
+Subject: [Bluez-devel] SMS
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,23 +14,24 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1394632111=="
+Content-Type: multipart/mixed; boundary="===============2134787941=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1394632111==
+--===============2134787941==
 Content-Type: multipart/alternative;
-	boundary="_52cd8c70-8df5-4020-b2fd-0c0e919cc036_"
+	boundary="_513d6466-261c-482a-8af4-d71abe9a4e17_"
 
---_52cd8c70-8df5-4020-b2fd-0c0e919cc036_
+--_513d6466-261c-482a-8af4-d71abe9a4e17_
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 
 
-hi=20
 =20
-i want to display battery status of my mobile in computer via bluetooth usi=
-ng blueZ stack with C language.
+hi
+=20
+i want to get notified on compter by bluetooth when i receive any new sms i=
+n my mobile using BlueZ stack with C language.
 =20
 i want documentation with source code.
 =20
@@ -39,10 +40,10 @@ will u help me out?
 regards
 darshan
 _________________________________________________________________
-Get the new Windows Live Messenger!
+Call friends with PC-to-PC calling -- FREE
 http://get.live.com/messenger/overview=
 
---_52cd8c70-8df5-4020-b2fd-0c0e919cc036_
+--_513d6466-261c-482a-8af4-d71abe9a4e17_
 Content-Type: text/html; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 
@@ -62,24 +63,26 @@ FONT-FAMILY:Tahoma
 </style>
 </head>
 <body class=3D'hmmessage'>
-hi <BR>
 &nbsp;<BR>
-i want to display battery status of my mobile in computer via bluetooth usi=
-ng blueZ stack with C language.<BR>
+hi<BR>
+&nbsp;<BR>
+i want to get notified on compter by bluetooth when&nbsp;i receive any new =
+sms in my mobile using BlueZ stack with C language.<BR>
 &nbsp;<BR>
 i want documentation with source code.<BR>
 &nbsp;<BR>
 will u help me out?<BR>
 &nbsp;<BR>
 regards<BR>
-darshan<BR><br /><hr />Get the new Windows Live Messenger! <a href=3D'http:=
-//get.live.com/messenger/overview' target=3D'_new'>Try it!</a></body>
+darshan<BR><br /><hr />Call friends with PC-to-PC calling -- FREE <a href=
+=3D'http://get.live.com/messenger/overview' target=3D'_new'>Try it now!</a>=
+</body>
 </html>=
 
---_52cd8c70-8df5-4020-b2fd-0c0e919cc036_--
+--_513d6466-261c-482a-8af4-d71abe9a4e17_--
 
 
---===============1394632111==
+--===============2134787941==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -89,7 +92,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1394632111==
+--===============2134787941==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -100,4 +103,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1394632111==--
+--===============2134787941==--
