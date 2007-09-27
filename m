@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: "Rafael J. Wysocki" <rjw@sisk.pl>
-To: Pierre-Yves Paulus <py@idlum.be>
-Date: Thu, 27 Sep 2007 14:29:09 +0200
-References: <46F92586.5070402@idlum.be>
-In-Reply-To: <46F92586.5070402@idlum.be>
-MIME-Version: 1.0
-Message-Id: <200709271429.09910.rjw@sisk.pl>
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [Bluez-devel] Warnings and Bug on 2.6.23-rc6 closing rfcomm
-	links (device_move() API ?)
+MIME-version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <BAY125-W38F2ED861CD4CAAF222AA6F1B10@phx.gbl>
+From: Luca Capello <luca@pca.it>
+Date: Thu, 27 Sep 2007 11:48:16 +0200
+In-reply-to: <BAY125-W38F2ED861CD4CAAF222AA6F1B10@phx.gbl>
+Message-id: <87ve9wsalb.fsf@gismo.pca.it>
+Subject: Re: [Bluez-devel] SMS
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,16 +20,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Tuesday, 25 September 2007 17:13, Pierre-Yves Paulus wrote:
-> Hello,
-> 
-> Yet another report, once again while putting rfcomm system under load. 
-> Several USB adapters, several links.
+Hello!
 
-Is this a regression or does it happen with 2.6.22 too?
+On Thu, 27 Sep 2007 08:30:06 +0200, darshan kanani wrote:
+> i want to get notified on compter by bluetooth when i receive any
+> new sms in my mobile using BlueZ stack with C language.
 
-Greetings,
-Rafael
+Something like GNOME Phone Manager [1]?
+
+Thx, bye,
+Gismo / Luca
+
+Footnotes: 
+[1] http://live.gnome.org/PhoneManager
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
