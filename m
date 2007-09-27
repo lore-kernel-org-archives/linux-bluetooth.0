@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-MIME-version: 1.0
+Message-ID: <46FB713C.2040000@kernelconcepts.de>
+Date: Thu, 27 Sep 2007 11:00:44 +0200
+From: Nils Faerber <nils.faerber@kernelconcepts.de>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <BAY125-W38F2ED861CD4CAAF222AA6F1B10@phx.gbl>
-From: Luca Capello <luca@pca.it>
-Date: Thu, 27 Sep 2007 11:48:16 +0200
-In-reply-to: <BAY125-W38F2ED861CD4CAAF222AA6F1B10@phx.gbl>
-Message-id: <87ve9wsalb.fsf@gismo.pca.it>
-Subject: Re: [Bluez-devel] SMS
+References: <BAY125-W32A371D4F0BDD0BAC18B63F1B10@phx.gbl>
+In-Reply-To: <BAY125-W32A371D4F0BDD0BAC18B63F1B10@phx.gbl>
+Subject: Re: [Bluez-devel] Battery
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,19 +20,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello!
+darshan kanani schrieb:
+> hi
+>  
+> i want to display battery status of my mobile in computer via bluetooth
+> using blueZ stack with C language.
 
-On Thu, 27 Sep 2007 08:30:06 +0200, darshan kanani wrote:
-> i want to get notified on compter by bluetooth when i receive any
-> new sms in my mobile using BlueZ stack with C language.
+- open rfcomm channel to your mobile
+- issue AT command to mobile to query for battery (see GSM standard
+07.07 V7.7.0 or later)
+- parse output from modem
+- display
 
-Something like GNOME Phone Manager [1]?
+> i want documentation with source code.
 
-Thx, bye,
-Gismo / Luca
+Which programming language?
+Come on, it is quite simple. Search for the above keywords and you
+should be able to find all kinds of examples...
 
-Footnotes: 
-[1] http://live.gnome.org/PhoneManager
+> will u help me out?
+>  
+> regards
+> darshan
+Cheers
+  nils faerber
+
+-- 
+kernel concepts GbR        Tel: +49-271-771091-12
+Sieghuetter Hauptweg 48    Fax: +49-271-771091-19
+D-57072 Siegen             Mob: +49-176-21024535
+--
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
