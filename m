@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.64.0709281248290.8546@apps0.cs.toronto.edu>
-References: <Pine.LNX.4.64.0709281248290.8546@apps0.cs.toronto.edu>
-Date: Fri, 28 Sep 2007 23:52:09 +0200
-Message-Id: <1191016329.6484.89.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] L2CAP retransmission and flow control support?
+Date: Fri, 28 Sep 2007 13:05:47 -0400 (EDT)
+From: Tim Smith <tsmith@cs.toronto.edu>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <Pine.LNX.4.64.0709281248290.8546@apps0.cs.toronto.edu>
+MIME-Version: 1.0
+Subject: [Bluez-devel] L2CAP retransmission and flow control support?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,22 +18,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Tim,
+Hi,
 
-> >From what I can gather, L2CAP RFC support was added to the -mh patch 
-> series in September of last year and removed two months later for 
-> pre-certification cleanup.
-> 
-> Are there any plans to restore the RFC functionality in the near future?
+>>From what I can gather, L2CAP RFC support was added to the -mh patch 
+series in September of last year and removed two months later for 
+pre-certification cleanup.
 
-if I have enough time, then we should have it soon. The basics are
-implemented and working.
+Are there any plans to restore the RFC functionality in the near future?
 
-Regards
-
-Marcel
-
-
+Thanks,
+Tim
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
