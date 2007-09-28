@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <f8e53fb0709280211o1e447c88mfcad13e26f1c8343@mail.gmail.com>
-Date: Fri, 28 Sep 2007 11:11:53 +0200
-From: "Andrea Galbusera" <gizero@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1190964593.6484.83.camel@aeonflux.holtmann.net>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <f8e53fb0709280019i51e9175bl5a3fa8fa8965c75d@mail.gmail.com>
 References: <f8e53fb0709280019i51e9175bl5a3fa8fa8965c75d@mail.gmail.com>
-	<1190964593.6484.83.camel@aeonflux.holtmann.net>
+Date: Fri, 28 Sep 2007 09:29:53 +0200
+Message-Id: <1190964593.6484.83.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users] Detecting disconnection when using RFCOMM tty API
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,44 +20,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marcel, thanks for your answers.
+Hi Andrea,
 
-> if you poll the TTY you should get a HUP signal. Keeping the same file
-> descriptor is not possible since on disconnect the TTY will be close. It
-> won't re-connect automatically. So you have to open it again to trigger
-> the actual re-connection.
+> I have a couple of question I was not able to give an answer to by
+> digging into the archives or FAQs.
+> 
+> My application uses standard linux tty primitives on the RFCOMM
+> devices to communicate with remote sensors. The application is
+> iteratively quering the device by writing command and reading back
+> answer. This is working fine.
+> 
+> I'm in the need of detecting when a link disconnection occur in order
+> to handle the situation. How can I do that? Is RFCOMM tty sending a
+> signal to my process that I can catch?
+> It would be a good thing also being able to manage when the link comes
+> back again. Shall I close and reopen the corresponding device or is
+> there a way to reuse the same file descriptor I was using before the
+> disconnection occurred?
 
-I'm trying to catch the HUP but with no luck. I'm probably doing
-something wrong. Basically I do the following:
+if you poll the TTY you should get a HUP signal. Keeping the same file
+descriptor is not possible since on disconnect the TTY will be close. It
+won't re-connect automatically. So you have to open it again to trigger
+the actual re-connection.
 
-void hangup_handler (int signal_number) {
-	/* terminate the process on link lost */
-	printf("Hello from my SIGHUP handler\n");
-	exit(2);
-}
+> One more bit...I see RFCOMM can be used also by a socket API. Is this
+> more flexible/powerfull than the standard tty? At moment I have to
+> stick to the legacy tty one, but for the future I should consider
+> switching to it, if there is any potential improvement.
 
-int main(void) {
-        struct sigaction sa;
+The socket API is much more flexible. Use that one.
 
-	/* Install the signal handler for disconnections */
-	memset(&sa, 0, sizeof(sa));
-	sa.sa_handler = &hangup_handler;
-	sigaction(SIGHUP, &sa, NULL);
+Regards
 
-        poll_device();
-}
+Marcel
 
-The apllication process correctly catches and handle the signal if I
-issue it by "kill -SIGHUP <pid>", but nothing happens if I switch off
-my remote device causing the link loss.
 
-> The socket API is much more flexible. Use that one.
-
-I'm unexperienced in sockets programming. Can you suggest me a good
-documentation on using sockets with bluez rfcomm?
-
-Regards,
-Andrea
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
