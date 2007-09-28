@@ -1,627 +1,107 @@
-Return-Path: <fchevalier@silicom.fr>
-Message-ID: <46FCE4A3.4060002@silicom.fr>
-Date: Fri, 28 Sep 2007 13:25:23 +0200
-From: Fabien Chevalier <fchevalier@silicom.fr>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@nokia.com>
-CC: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [PATCH] Allows sink.c to know why the stream setup failed
-Content-Type: multipart/mixed;
- boundary="------------000408020506090203060108"
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Date: Fri, 28 Sep 2007 08:54:38 +0200
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+To: Pierre-Yves Paulus <py@idlum.be>
+Message-ID: <20070928085438.4eb5a38f@gondolin.boeblingen.de.ibm.com>
+In-Reply-To: <46FBF17A.6030009@idlum.be>
+References: <46F92364.3080603@idlum.be> <46F952BD.4010009@redhat.com>
+	<46FA5E2E.3010300@idlum.be>
+	<20070927085658.1c66f1c8@gondolin.boeblingen.de.ibm.com>
+	<46FBC1AE.4020404@idlum.be> <46FBF17A.6030009@idlum.be>
+Mime-Version: 1.0
+Cc: BlueZ@sc8-sf-spam2.sourceforge.net,
+        development <bluez-devel@lists.sourceforge.net>,
+        linux-kernel@vger.kernel.org, Chuck Ebbert <cebbert@redhat.com>
+Subject: Re: [Bluez-devel] Warnings and Oops on 2.6.23-rc6 while activily
+ using rfcomm links (mm/slab.c)
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="iso-8859-15"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------000408020506090203060108
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+On Thu, 27 Sep 2007 20:07:54 +0200,
+Pierre-Yves Paulus <py@idlum.be> wrote:
 
-Hi All,
+> Another one below, complete log from power-up to reboot, with some bugs =
 
-This is my second patch towards the way of solving cross a2dp connect 
-issues.
-The reason to be of this patch is to move the l2cap connection request 
-error code up the call stack (the error code was previously lost around 
-the way) :-(.
+> and one Oops. I only trimmed the numerous "l2cap_recv_acldata" and "ACL =
 
-Basically i intent to use this knowledge to be a bit more clever at the 
-sink level, and be able to better handle errors due to cross l2cap 
-channel connections, instead of just bailing out with a "stream setup 
-failed" exception.
+> packet for unknown connection handle" lines which always fill up the log.
 
-With this patch, i now get in the log:
+Hmm, looked at it, but currently I can't see what's wrong from a driver
+core perspective...
 
-Sep 28 13:00:30 tannat audio[23889]: avdtp_ref(0x8066d88): ref=2
-Sep 28 13:00:30 tannat audio[23889]: a2dp_source_request_stream: 
-selected SEP 0x8066200
-Sep 28 13:00:30 tannat audio[23889]: avdtp_ref(0x8066d88): ref=3
-Sep 28 13:00:30 tannat audio[23889]: stream creation in progress
-Sep 28 13:00:51 tannat audio[23889]: connect(): Host is down (112)
-Sep 28 13:00:51 tannat audio[23889]: avdtp_unref(0x8066d88): ref=2
-Sep 28 13:00:51 tannat audio[23889]: Stream setup failed : Host is down
-Sep 28 13:00:51 tannat audio[23889]: avdtp_unref(0x8066d88): ref=1
-Sep 28 13:00:51 tannat audio[23889]: avdtp_unref(0x8066d88): ref=0
-Sep 28 13:00:51 tannat audio[23889]: avdtp_unref(0x8066d88): freeing 
-session and removing from list
 
-Next patch will be the real cross connect fix that uses those error code 
-values.
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+> BUG kmalloc-128: Poison overwritten
+> -------------------------------------------------------------------------=
+----
+> =
 
-Could you guys have a look ?
+> INFO: 0xc5734f28-0xc5734f40. First byte 0x6a instead of 0x6b
+> INFO: Allocated in rfcomm_dev_ioctl+0xbd/0x4e6 [rfcomm] age=3D6110 cpu=3D=
+0 =
 
-Regards,
+> pid=3D3677
+> INFO: Freed in rfcomm_dev_destruct+0x59/0x65 [rfcomm] age=3D3157 cpu=3D0 =
 
-Fabien
+> pid=3D3927
+> INFO: Slab 0xc10ae680 used=3D21 fp=3D0xc5734f20 flags=3D0x400000c2
+> INFO: Object 0xc5734f20 @offset=3D3872 fp=3D0xc57342c0
+> =
 
---------------000408020506090203060108
-Content-Type: text/x-patch;
- name="avdtp-error-codes-up-the-call-stack.patch"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline;
- filename="avdtp-error-codes-up-the-call-stack.patch"
+> Bytes b4 0xc5734f10:  05 00 00 00 f8 23 0f 00 5a 5a 5a 5a 5a 5a 5a 5a =
 
---- audio/a2dp.c	(.../trunk)	(révision 70)
-+++ audio/a2dp.c	(.../branches/20070928_1202)	(révision 70)
-@@ -23,12 +23,13 @@
- 
- #ifdef HAVE_CONFIG_H
- #include <config.h>
- #endif
- 
- #include <stdlib.h>
-+#include <errno.h>
- 
- #include <dbus/dbus.h>
- #include <glib.h>
- 
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/sdp.h>
-@@ -109,25 +110,35 @@
- 
- 	avdtp_get_peers(session, NULL, &addr);
- 
- 	return manager_device_connected(&addr, A2DP_SOURCE_UUID);
- }
- 
--static void setup_callback(struct a2dp_stream_cb *cb,
--				struct a2dp_stream_setup *s)
-+static gboolean finalize_stream_setup(struct a2dp_stream_setup *s, struct avdtp_error *err)
- {
--	cb->cb(s->session, s->sep, s->stream, cb->user_data);
--}
-+	GSList *l;
-+
-+	for (l = s->cb; l != NULL; l = l->next) {
-+		struct a2dp_stream_cb *cb = l->data;
-+		
-+		cb->cb(s->session, s->sep, s->stream, cb->user_data, err);
-+	}
- 
--static gboolean finalize_stream_setup(struct a2dp_stream_setup *s)
--{
--	g_slist_foreach(s->cb, (GFunc) setup_callback, s);
- 	stream_setup_free(s);
- 	return FALSE;
- }
- 
-+static gboolean finalize_stream_setup_errno(struct a2dp_stream_setup *s, int err)
-+{
-+	struct avdtp_error avdtp_err;
-+
-+	avdtp_error_init(&avdtp_err, AVDTP_ERROR_ERRNO, -err);
-+
-+	return finalize_stream_setup(s, &avdtp_err);
-+}
-+
- static struct a2dp_stream_setup *find_setup_by_session(struct avdtp *session)
- {
- 	GSList *l;
- 
- 	for (l = setups; l != NULL; l = l->next) {
- 		struct a2dp_stream_setup *setup = l->data;
-@@ -321,51 +332,52 @@
- 	*caps = g_slist_append(*caps, media_codec);
- 
- 
- 	return TRUE;
- }
- 
--static void discovery_complete(struct avdtp *session, GSList *seps, int err,
-+static void discovery_complete(struct avdtp *session, GSList *seps, struct avdtp_error *err,
- 				void *user_data)
- {
- 	struct avdtp_local_sep *lsep;
- 	struct avdtp_remote_sep *rsep;
- 	struct a2dp_stream_setup *setup;
- 	GSList *caps = NULL;
-+	int posix_err;
- 
- 	setup = find_setup_by_session(session);
- 
- 	if (!setup)
- 		return;
- 
--	if (err < 0 || setup->canceled) {
-+	if (err || setup->canceled) {
- 		setup->stream = NULL;
--		finalize_stream_setup(setup);
-+		finalize_stream_setup(setup, err);
- 		return;
- 	}
- 
- 	debug("Discovery complete");
- 
- 	if (avdtp_get_seps(session, AVDTP_SEP_TYPE_SINK, AVDTP_MEDIA_TYPE_AUDIO,
- 				A2DP_CODEC_SBC, &lsep, &rsep) < 0) {
- 		error("No matching ACP and INT SEPs found");
--		finalize_stream_setup(setup);
-+		finalize_stream_setup_errno(setup, -EINVAL);
- 		return;
- 	}
- 
- 	if (!a2dp_select_capabilities(session, rsep, &caps)) {
- 		error("Unable to select remote SEP capabilities");
--		finalize_stream_setup(setup);
-+		finalize_stream_setup_errno(setup, -EINVAL);
- 		return;
- 	}
- 
--	err = avdtp_set_configuration(session, rsep, lsep, caps,
-+	posix_err = avdtp_set_configuration(session, rsep, lsep, caps,
- 							&setup->stream);
--	if (err < 0) {
--		error("avdtp_set_configuration: %s", strerror(-err));
--		finalize_stream_setup(setup);
-+	if (posix_err < 0) {
-+		error("avdtp_set_configuration: %s", strerror(-posix_err));
-+		finalize_stream_setup_errno(setup, posix_err);
- 	}
- }
- 
- static gboolean setconf_ind(struct avdtp *session,
- 				struct avdtp_local_sep *sep,
- 				struct avdtp_stream *stream,
-@@ -487,13 +499,13 @@
- 		debug("SBC Source: Set_Configuration_Cfm");
- 
- 	setup = find_setup_by_session(session);
- 
- 	if (err) {
- 		if (setup)
--			finalize_stream_setup(setup);
-+			finalize_stream_setup(setup, err);
- 		return;
- 	}
- 
- 	avdtp_stream_add_cb(session, stream, stream_state_changed, a2dp_sep);
- 	a2dp_sep->stream = stream;
- 
-@@ -507,13 +519,13 @@
- 
- 	ret = avdtp_open(session, stream);
- 	if (ret < 0) {
- 		error("Error on avdtp_open %s (%d)", strerror(-ret),
- 				-ret);
- 		setup->stream = NULL;
--		finalize_stream_setup(setup);
-+		finalize_stream_setup_errno(setup, ret);
- 	}
- }
- 
- static gboolean getconf_ind(struct avdtp *session, struct avdtp_local_sep *sep,
- 				uint8_t *err, void *user_data)
- {
-@@ -554,12 +566,13 @@
- static void open_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 			struct avdtp_stream *stream, struct avdtp_error *err,
- 			void *user_data)
- {
- 	struct a2dp_sep *a2dp_sep = user_data;
- 	struct a2dp_stream_setup *setup;
-+	int posix_err;
- 
- 	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
- 		debug("SBC Sink: Open_Cfm");
- 	else
- 		debug("SBC Source: Open_Cfm");
- 
-@@ -573,25 +586,28 @@
- 		stream_setup_free(setup);
- 		return;
- 	}
- 
- 	if (err) {
- 		setup->stream = NULL;
--		goto finalize;
-+		finalize_stream_setup(setup, err);
-+		return;
- 	}
- 
- 	if (setup->start) {
--		if (avdtp_start(session, stream) == 0)
-+		posix_err = avdtp_start(session, stream);		
-+		if (posix_err == 0)
- 			return;
- 
- 		error("avdtp_start failed");
--		setup->stream = NULL;
-+		setup->stream = NULL;		
- 	}
-+	else
-+		posix_err = 0;
- 
--finalize:
--	finalize_stream_setup(setup);
-+	finalize_stream_setup_errno(setup, -posix_err);
- }
- 
- static gboolean suspend_timeout(struct a2dp_sep *sep)
- {
- 	if (avdtp_suspend(sep->session, sep->stream) == 0)
- 		sep->suspending = TRUE;
-@@ -643,16 +659,18 @@
- 		if (!err)
- 			avdtp_close(session, stream);
- 		stream_setup_free(setup);
- 		return;
- 	}
- 
--	if (err)
-+	if (err) {
- 		setup->stream = NULL;
--
--	finalize_stream_setup(setup);
-+		finalize_stream_setup(setup, err);
-+	}
-+	else
-+		finalize_stream_setup_errno(setup, 0);
- }
- 
- static gboolean suspend_ind(struct avdtp *session, struct avdtp_local_sep *sep,
- 				struct avdtp_stream *stream, uint8_t *err,
- 				void *user_data)
- {
-@@ -668,12 +686,13 @@
- static void suspend_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 			struct avdtp_stream *stream, struct avdtp_error *err,
- 			void *user_data)
- {
- 	struct a2dp_sep *a2dp_sep = user_data;
- 	struct a2dp_stream_setup *setup;
-+	int posix_err;
- 
- 	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
- 		debug("SBC Sink: Suspend_Cfm");
- 	else
- 		debug("SBC Source: Suspend_Cfm");
- 
-@@ -681,19 +700,20 @@
- 
- 	setup = find_setup_by_session(session);
- 	if (!setup)
- 		return;
- 
- 	if (err) {
--		finalize_stream_setup(setup);
-+		finalize_stream_setup(setup, err);
- 		return;
- 	}
- 
- 	if (setup->start) {
--		if (avdtp_start(session, stream) < 0)
--			finalize_stream_setup(setup);
-+		posix_err = avdtp_start(session, stream);
-+		if (posix_err < 0)
-+			finalize_stream_setup_errno(setup, posix_err);
- 	}
- }
- 
- static gboolean close_ind(struct avdtp *session, struct avdtp_local_sep *sep,
- 				struct avdtp_stream *stream, uint8_t *err,
- 				void *user_data)
-@@ -711,12 +731,13 @@
- static void close_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 			struct avdtp_stream *stream, struct avdtp_error *err,
- 			void *user_data)
- {
- 	struct a2dp_sep *a2dp_sep = user_data;
- 	struct a2dp_stream_setup *setup;
-+	int posix_err;
- 
- 	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
- 		debug("SBC Sink: Close_Cfm");
- 	else
- 		debug("SBC Source: Close_Cfm");
- 
-@@ -728,25 +749,28 @@
- 		stream_setup_free(setup);
- 		return;
- 	}
- 
- 	if (err) {
- 		setup->stream = NULL;
--		goto finalize;
-+		finalize_stream_setup(setup, err);
-+		return;
- 	}
- 
- 	if (setup->start) {
--		if (avdtp_discover(session, discovery_complete, setup) == 0)
-+		posix_err = avdtp_discover(session, discovery_complete, setup);
-+		if (posix_err == 0)
- 			return;
- 
- 		error("avdtp_discover failed");
- 		setup->stream = NULL;
- 	}
-+	else
-+		posix_err = 0;
- 
--finalize:
--	finalize_stream_setup(setup);
-+	finalize_stream_setup_errno(setup, -posix_err);
- }
- 
- static gboolean abort_ind(struct avdtp *session, struct avdtp_local_sep *sep,
- 				struct avdtp_stream *stream, uint8_t *err,
- 				void *user_data)
- {
-@@ -789,12 +813,13 @@
- static void reconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 			struct avdtp_stream *stream, struct avdtp_error *err,
- 			void *user_data)
- {
- 	struct a2dp_sep *a2dp_sep = user_data;
- 	struct a2dp_stream_setup *setup;
-+	int posix_err;
- 
- 	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
- 		debug("SBC Sink: ReConfigure_Cfm");
- 	else
- 		debug("SBC Source: ReConfigure_Cfm");
- 
-@@ -808,25 +833,28 @@
- 		stream_setup_free(setup);
- 		return;
- 	}
- 
- 	if (err) {
- 		setup->stream = NULL;
--		goto finalize;
-+		finalize_stream_setup(setup, err);
-+		return;
- 	}
- 
- 	if (setup->start) {
--		if (avdtp_start(session, stream) == 0)
-+		posix_err = avdtp_start(session, stream);		
-+		if (posix_err == 0)
- 			return;
- 
- 		error("avdtp_start failed");
- 		setup->stream = NULL;
- 	}
-+	else
-+		posix_err = 0;
- 
--finalize:
--	finalize_stream_setup(setup);
-+	finalize_stream_setup_errno(setup, -posix_err);
- }
- 
- static struct avdtp_sep_cfm cfm = {
- 	.set_configuration	= setconf_cfm,
- 	.get_configuration	= getconf_cfm,
- 	.open			= open_cfm,
-Index: audio/a2dp.h
-===================================================================
---- audio/a2dp.h	(.../trunk)	(révision 70)
-+++ audio/a2dp.h	(.../branches/20070928_1202)	(révision 70)
-@@ -78,13 +78,14 @@
- #endif
- 
- struct a2dp_sep;
- 
- typedef void (*a2dp_stream_cb_t) (struct avdtp *session, struct a2dp_sep *sep,
- 					struct avdtp_stream *stream,
--					void *user_data);
-+					void *user_data,
-+					struct avdtp_error *err);
- 
- int a2dp_init(DBusConnection *conn, int sources, int sinks);
- void a2dp_exit(void);
- 
- unsigned int a2dp_source_request_stream(struct avdtp *session,
- 					gboolean start, a2dp_stream_cb_t cb,
-Index: audio/sink.c
-===================================================================
---- audio/sink.c	(.../trunk)	(révision 70)
-+++ audio/sink.c	(.../branches/20070928_1202)	(révision 70)
-@@ -132,13 +132,13 @@
- 
- 	sink->state = new_state;
- }
- 
- static void stream_setup_complete(struct avdtp *session, struct a2dp_sep *sep,
- 					struct avdtp_stream *stream,
--					void *user_data)
-+					void *user_data, struct avdtp_error *err)
- {
- 	struct sink *sink = user_data;
- 	struct pending_request *pending;
- 
- 	pending = sink->connect;
- 	sink->connect = NULL;
-@@ -150,13 +150,13 @@
- 		debug("Stream successfully created");
- 	}
- 	else {
- 		err_failed(pending->conn, pending->msg, "Stream setup failed");
- 		avdtp_unref(sink->session);
- 		sink->session = NULL;
--		debug("Stream setup failed");
-+		debug("Stream setup failed : %s", avdtp_strerror(err));
- 	}
- 
- 	pending_request_free(pending);
- }
- 
- static DBusHandlerResult sink_connect(DBusConnection *conn,
-Index: audio/avdtp.c
-===================================================================
---- audio/avdtp.c	(.../trunk)	(révision 70)
-+++ audio/avdtp.c	(.../branches/20070928_1202)	(révision 70)
-@@ -74,17 +74,12 @@
- 
- #define REQ_TIMEOUT 4000
- #define DISCONNECT_TIMEOUT 5000
- #define STREAM_TIMEOUT 20000
- 
- typedef enum {
--	AVDTP_ERROR_ERRNO,
--	AVDTP_ERROR_ERROR_CODE
--} avdtp_error_type_t;
--
--typedef enum {
- 	AVDTP_SESSION_STATE_DISCONNECTED,
- 	AVDTP_SESSION_STATE_CONNECTING,
- 	AVDTP_SESSION_STATE_CONNECTED
- } avdtp_session_state_t;
- 
- #if __BYTE_ORDER == __LITTLE_ENDIAN
-@@ -359,20 +354,12 @@
- 
- 	guint dc_timer;
- 
- 	DBusPendingCall *pending_auth;
- };
- 
--struct avdtp_error {
--	avdtp_error_type_t type;
--	union {
--		uint8_t error_code;
--		int posix_errno;
--	} err;
--};
--
- static uint8_t free_seid = 1;
- static GSList *local_seps = NULL;
- 
- static GIOChannel *avdtp_server = NULL;
- 
- static GSList *sessions = NULL;
-@@ -496,13 +483,13 @@
- 		remove_disconnect_timer(session);
- 
- 	session->dc_timer = g_timeout_add(DISCONNECT_TIMEOUT,
- 						disconnect_timeout, session);
- }
- 
--static void avdtp_error_init(struct avdtp_error *err, uint8_t type, int id)
-+void avdtp_error_init(struct avdtp_error *err, uint8_t type, int id)
- {
- 	err->type = type;
- 	switch (type) {
- 	case AVDTP_ERROR_ERRNO:
- 		err->err.posix_errno = id;
- 		break;
-@@ -695,16 +682,21 @@
- 		break;
- 	}
- }
- 
- static void finalize_discovery(struct avdtp *session, int err)
- {
-+	struct avdtp_error avdtp_err;
-+
-+	avdtp_error_init(&avdtp_err, AVDTP_ERROR_ERRNO, -err);
-+
- 	if (!session->discov_cb)
- 		return;
- 
--	session->discov_cb(session, session->seps, err,
-+	session->discov_cb(session, session->seps,
-+				err ? &avdtp_err : 0,
- 				session->user_data);
- 
- 	session->discov_cb = NULL;
- 	session->user_data = NULL;
- }
- 
---- audio/avdtp.h	(.../trunk)	(révision 70)
-+++ audio/avdtp.h	(.../branches/20070928_1202)	(révision 70)
-@@ -18,17 +18,28 @@
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program; if not, write to the Free Software
-  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-  *
+> ....=F8#..ZZZZZZZZ
+>    Object 0xc5734f20:  6b 6b 6b 6b 6b 6b 6b 6b 6a 6b 6b 6b 6b 6b 6b 6b =
+
+                                                 ^^
+
+This looks suspiciously like someone tried to decrease a refcount on a
+freed kobject. Unfortunately, we only see this after the fact with slub
+debugging turned on :( So could you please turn it off again (but leave
+kobject debugging on) and try with the following silly debug patch:
+
+---
+ lib/kobject.c |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+--- linux-2.6.orig/lib/kobject.c
++++ linux-2.6/lib/kobject.c
+@@ -502,8 +502,12 @@ static void kobject_release(struct kref =
+
   */
- 
-+typedef enum {
-+	AVDTP_ERROR_ERRNO,
-+	AVDTP_ERROR_ERROR_CODE
-+} avdtp_error_type_t;
-+
- struct avdtp;
- struct avdtp_stream;
- struct avdtp_local_sep;
- struct avdtp_remote_sep;
--struct avdtp_error;
-+struct avdtp_error {
-+	avdtp_error_type_t type;
-+	union {
-+		uint8_t error_code;
-+		int posix_errno;
-+	} err;
-+};
- 
- /* SEP capability categories */
- #define AVDTP_MEDIA_TRANSPORT			0x01
- #define AVDTP_REPORTING				0x02
- #define AVDTP_RECOVERY				0x03
- #define AVDTP_CONTENT_PROTECTION		0x04
-@@ -174,13 +185,13 @@
- 	gboolean (*reconfigure) (struct avdtp *session,
- 					struct avdtp_local_sep *lsep,
- 					uint8_t *err, void *user_data);
- };
- 
- typedef void (*avdtp_discover_cb_t) (struct avdtp *session, GSList *seps,
--					int err, void *user_data);
-+					struct avdtp_error *err, void *user_data);
- 
- struct avdtp *avdtp_get(bdaddr_t *src, bdaddr_t *dst);
- 
- void avdtp_unref(struct avdtp *session);
- struct avdtp *avdtp_ref(struct avdtp *session);
- 
-@@ -237,13 +248,15 @@
- 			struct avdtp_remote_sep **rsep);
- 
- int avdtp_unregister_sep(struct avdtp_local_sep *sep);
- 
- avdtp_state_t avdtp_sep_get_state(struct avdtp_local_sep *sep);
- 
-+void avdtp_error_init(struct avdtp_error *err, uint8_t type, int id);
- const char *avdtp_strerror(struct avdtp_error *err);
-+int avdtp_error_code(struct avdtp_error *err);
- 
- void avdtp_get_peers(struct avdtp *session, bdaddr_t *src, bdaddr_t *dst);
- 
- int avdtp_init(void);
- void avdtp_exit(void);
- 
+ void kobject_put(struct kobject * kobj)
+ {
+-	if (kobj)
++	if (kobj) {
++		if (!atomic_read(&kobj->kref.refcount))
++			pr_debug("%s: kobject %s@%p already has zero refcount!\n",
++				 __FUNCTION__, kobj->name, kobj);
+ 		kref_put(&kobj->kref, kobject_release);
++	}
+ }
+ =
 
---------------000408020506090203060108
-Content-Type: text/x-vcard; charset=utf-8;
- name="fchevalier.vcf"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="fchevalier.vcf"
+ =
 
-YmVnaW46dmNhcmQNCmZuOkZhYmllbiBDSEVWQUxJRVINCm46Q0hFVkFMSUVSO0ZhYmllbg0K
-b3JnOlNJTElDT00NCmFkcjo7OzQgcnVlIGRlIEpvdWFuZXQ7IFJFTk5FUyBBVEFMQU5URTs7
-MzU3MDA7RlJBTkNFDQplbWFpbDtpbnRlcm5ldDpmY2hldmFsaWVyQHNpbGljb20uZnINCnRp
-dGxlOlNvZnR3YXJlICYgU3R1ZGllcyBFbmdpbmVlcg0KdGVsO3dvcms6KzMzICgwKSAyIDk5
-IDg0IDE3IDE3DQp2ZXJzaW9uOjIuMQ0KZW5kOnZjYXJkDQoNCg==
---------------000408020506090203060108--
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
