@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Herton Ronaldo Krzesinski <herton@mandriva.com.br>
-To: bluez-devel@lists.sourceforge.net
-Date: Fri, 28 Sep 2007 22:58:06 -0300
-MIME-Version: 1.0
-Message-Id: <200709282258.06375.herton@mandriva.com.br>
-Cc: benjamin_britten@yahoo.co.uk
-Subject: [Bluez-devel] [PATCH] Disable ISOC transfers for ISSC KY-BT100
-	Bluetooth Adapter
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <Pine.LNX.4.64.0709281248290.8546@apps0.cs.toronto.edu>
+References: <Pine.LNX.4.64.0709281248290.8546@apps0.cs.toronto.edu>
+Date: Fri, 28 Sep 2007 23:52:09 +0200
+Message-Id: <1191016329.6484.89.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] L2CAP retransmission and flow control support?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,26 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Benjamin Britten reports that his Integrated System Solution Corp.
-KY-BT100 Bluetooth Adapter (ID 1131:1001) floods syslog with
-"hci_scodata_packet: hci0 SCO packet for unknown connection handle"
-messages. So add a quirk for it to disable ISOC transfers. Reported at
-http://qa.mandriva.com/show_bug.cgi?id=30638
+Hi Tim,
 
-Signed-off-by: Herton Ronaldo Krzesinski <herton@mandriva.com>
-Cc: Benjamin Britten <benjamin_britten@yahoo.co.uk>
+> >From what I can gather, L2CAP RFC support was added to the -mh patch 
+> series in September of last year and removed two months later for 
+> pre-certification cleanup.
+> 
+> Are there any plans to restore the RFC functionality in the near future?
 
---- linux-2.6.22/drivers/bluetooth/hci_usb.c.orig	2007-09-26 02:50:38.000000000 -0300
-+++ linux-2.6.22/drivers/bluetooth/hci_usb.c	2007-09-26 02:56:15.000000000 -0300
-@@ -141,7 +141,7 @@ static struct usb_device_id blacklist_id
- 	{ USB_DEVICE(0x047d, 0x105e), .driver_info = HCI_RESET | HCI_WRONG_SCO_MTU },
- 
- 	/* ISSC Bluetooth Adapter v3.1 */
--	{ USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET },
-+	{ USB_DEVICE(0x1131, 0x1001), .driver_info = HCI_RESET | HCI_BROKEN_ISOC },
- 
- 	/* RTX Telecom based adapters with buggy SCO support */
- 	{ USB_DEVICE(0x0400, 0x0807), .driver_info = HCI_BROKEN_ISOC },
+if I have enough time, then we should have it soon. The basics are
+implemented and working.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
