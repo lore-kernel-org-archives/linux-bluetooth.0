@@ -1,39 +1,67 @@
 Return-Path: <fchevalier@silicom.fr>
-Message-ID: <46FCFB4F.7040700@silicom.fr>
-Date: Fri, 28 Sep 2007 15:02:07 +0200
+Message-ID: <46FCE4A3.4060002@silicom.fr>
+Date: Fri, 28 Sep 2007 13:25:23 +0200
 From: Fabien Chevalier <fchevalier@silicom.fr>
 MIME-Version: 1.0
-To: Fabien Chevalier <fchevalier@silicom.fr>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@nokia.com>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [PATCH] Allows sink.c to know why the stream setup failed
-References: <46FCE4A3.4060002@silicom.fr>
-In-Reply-To: <46FCE4A3.4060002@silicom.fr>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@nokia.com>
+CC: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [PATCH] Allows sink.c to know why the stream setup failed
 Content-Type: multipart/mixed;
- boundary="------------080107040902060002020709"
+ boundary="------------000408020506090203060108"
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 This is a multi-part message in MIME format.
---------------080107040902060002020709
+--------------000408020506090203060108
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Thanks to Johan review, this is an updated version of the patch.
+Hi All,
+
+This is my second patch towards the way of solving cross a2dp connect 
+issues.
+The reason to be of this patch is to move the l2cap connection request 
+error code up the call stack (the error code was previously lost around 
+the way) :-(.
+
+Basically i intent to use this knowledge to be a bit more clever at the 
+sink level, and be able to better handle errors due to cross l2cap 
+channel connections, instead of just bailing out with a "stream setup 
+failed" exception.
+
+With this patch, i now get in the log:
+
+Sep 28 13:00:30 tannat audio[23889]: avdtp_ref(0x8066d88): ref=2
+Sep 28 13:00:30 tannat audio[23889]: a2dp_source_request_stream: 
+selected SEP 0x8066200
+Sep 28 13:00:30 tannat audio[23889]: avdtp_ref(0x8066d88): ref=3
+Sep 28 13:00:30 tannat audio[23889]: stream creation in progress
+Sep 28 13:00:51 tannat audio[23889]: connect(): Host is down (112)
+Sep 28 13:00:51 tannat audio[23889]: avdtp_unref(0x8066d88): ref=2
+Sep 28 13:00:51 tannat audio[23889]: Stream setup failed : Host is down
+Sep 28 13:00:51 tannat audio[23889]: avdtp_unref(0x8066d88): ref=1
+Sep 28 13:00:51 tannat audio[23889]: avdtp_unref(0x8066d88): ref=0
+Sep 28 13:00:51 tannat audio[23889]: avdtp_unref(0x8066d88): freeing 
+session and removing from list
+
+Next patch will be the real cross connect fix that uses those error code 
+values.
+
+Could you guys have a look ?
+
+Regards,
 
 Fabien
 
-
-
---------------080107040902060002020709
+--------------000408020506090203060108
 Content-Type: text/x-patch;
  name="avdtp-error-codes-up-the-call-stack.patch"
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline;
  filename="avdtp-error-codes-up-the-call-stack.patch"
 
---- audio/a2dp.c	(.../trunk)	(révision 71)
-+++ audio/a2dp.c	(.../branches/20070928_1202)	(révision 71)
+--- audio/a2dp.c	(.../trunk)	(révision 70)
++++ audio/a2dp.c	(.../branches/20070928_1202)	(révision 70)
 @@ -23,12 +23,13 @@
  
  #ifdef HAVE_CONFIG_H
@@ -82,7 +110,7 @@ Content-Disposition: inline;
 +
 +	avdtp_error_init(&avdtp_err, AVDTP_ERROR_ERRNO, -err);
 +
-+	return finalize_stream_setup(s, err ? &avdtp_err : NULL);
++	return finalize_stream_setup(s, &avdtp_err);
 +}
 +
  static struct a2dp_stream_setup *find_setup_by_session(struct avdtp *session)
@@ -387,8 +415,8 @@ Content-Disposition: inline;
  	.open			= open_cfm,
 Index: audio/a2dp.h
 ===================================================================
---- audio/a2dp.h	(.../trunk)	(révision 71)
-+++ audio/a2dp.h	(.../branches/20070928_1202)	(révision 71)
+--- audio/a2dp.h	(.../trunk)	(révision 70)
++++ audio/a2dp.h	(.../branches/20070928_1202)	(révision 70)
 @@ -78,13 +78,14 @@
  #endif
  
@@ -407,8 +435,8 @@ Index: audio/a2dp.h
  					gboolean start, a2dp_stream_cb_t cb,
 Index: audio/sink.c
 ===================================================================
---- audio/sink.c	(.../trunk)	(révision 71)
-+++ audio/sink.c	(.../branches/20070928_1202)	(révision 71)
+--- audio/sink.c	(.../trunk)	(révision 70)
++++ audio/sink.c	(.../branches/20070928_1202)	(révision 70)
 @@ -132,13 +132,13 @@
  
  	sink->state = new_state;
@@ -441,8 +469,8 @@ Index: audio/sink.c
  static DBusHandlerResult sink_connect(DBusConnection *conn,
 Index: audio/avdtp.c
 ===================================================================
---- audio/avdtp.c	(.../trunk)	(révision 71)
-+++ audio/avdtp.c	(.../branches/20070928_1202)	(révision 71)
+--- audio/avdtp.c	(.../trunk)	(révision 70)
++++ audio/avdtp.c	(.../branches/20070928_1202)	(révision 70)
 @@ -74,17 +74,12 @@
  
  #define REQ_TIMEOUT 4000
@@ -513,15 +541,15 @@ Index: audio/avdtp.c
  
 -	session->discov_cb(session, session->seps, err,
 +	session->discov_cb(session, session->seps,
-+				err ? &avdtp_err : NULL,
++				err ? &avdtp_err : 0,
  				session->user_data);
  
  	session->discov_cb = NULL;
  	session->user_data = NULL;
  }
  
---- audio/avdtp.h	(.../trunk)	(révision 71)
-+++ audio/avdtp.h	(.../branches/20070928_1202)	(révision 71)
+--- audio/avdtp.h	(.../trunk)	(révision 70)
++++ audio/avdtp.h	(.../branches/20070928_1202)	(révision 70)
 @@ -18,17 +18,28 @@
   *  You should have received a copy of the GNU General Public License
   *  along with this program; if not, write to the Free Software
@@ -582,10 +610,9 @@ Index: audio/avdtp.c
  
  int avdtp_init(void);
  void avdtp_exit(void);
+ 
 
-
-
---------------080107040902060002020709
+--------------000408020506090203060108
 Content-Type: text/x-vcard; charset=utf-8;
  name="fchevalier.vcf"
 Content-Transfer-Encoding: base64
@@ -597,4 +624,4 @@ b3JnOlNJTElDT00NCmFkcjo7OzQgcnVlIGRlIEpvdWFuZXQ7IFJFTk5FUyBBVEFMQU5URTs7
 MzU3MDA7RlJBTkNFDQplbWFpbDtpbnRlcm5ldDpmY2hldmFsaWVyQHNpbGljb20uZnINCnRp
 dGxlOlNvZnR3YXJlICYgU3R1ZGllcyBFbmdpbmVlcg0KdGVsO3dvcms6KzMzICgwKSAyIDk5
 IDg0IDE3IDE3DQp2ZXJzaW9uOjIuMQ0KZW5kOnZjYXJkDQoNCg==
---------------080107040902060002020709--
+--------------000408020506090203060108--
