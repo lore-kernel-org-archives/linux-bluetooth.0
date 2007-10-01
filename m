@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <20071001142832.0pk4h9bjhccsgkc8@admin.betaversion.net>
-Date: Mon, 01 Oct 2007 14:28:32 +0200
-From: collin@betaversion.net
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] SIM access profile?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dave Young <hidave.darkstar@gmail.com>
+In-Reply-To: <a8e1da0709291846x4abf50c8g32b02a9d40240b6@mail.gmail.com>
+References: <a8e1da0709291846x4abf50c8g32b02a9d40240b6@mail.gmail.com>
+Date: Mon, 01 Oct 2007 11:45:56 +0200
+Message-Id: <1191231956.6484.104.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Cc: bluez-devel@lists.sourceforge.net, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [Bluez-devel] bluetooth: hci_sysfs work queue problem
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,13 +21,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi List,
+Hi Dave,
 
-does anybody know anything about BlueZ and SAP (sim access profile). I see that
-it is on the list of planed profiles, is it already under development?
+> The hci_sysfs uses work queue to finish the sysfs add/del fuction.
+> But when the same device connection failed, if another connection of
+> same device come in before the delete work finish, sysfs will warn
+> about duplicate filename creating.
 
-Collin
+which kernel are we talking about. This problem should not exist
+anymore. However the usage of a work queue is unavoidable.
 
+Regards
+
+Marcel
 
 
 
