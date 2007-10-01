@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d89ddf300710011921y469687c9y606b8ca678503550@mail.gmail.com>
-Date: Mon, 1 Oct 2007 20:21:47 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
+Message-ID: <de4879e80710011431q3fa8c870m95a08dc46ea9a679@mail.gmail.com>
+Date: Mon, 1 Oct 2007 18:31:23 -0300
+From: thiagoss <thiagossantos@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20071001142832.0pk4h9bjhccsgkc8@admin.betaversion.net>
 MIME-Version: 1.0
-References: <20071001142832.0pk4h9bjhccsgkc8@admin.betaversion.net>
-Subject: Re: [Bluez-devel] SIM access profile?
+Content-Type: multipart/mixed;
+	boundary="----=_Part_16236_31473672.1191274283155"
+Subject: [Bluez-devel] Patch: inheritance problem in gsta2dpsink
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,27 +16,144 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Collin,
+------=_Part_16236_31473672.1191274283155
+Content-Type: multipart/alternative;
+	boundary="----=_Part_16237_19571925.1191274283155"
 
-SAP is in the development plan but I don't think there is a dbus API
-spec written for it yet. This is usually the starting point.
+------=_Part_16237_19571925.1191274283155
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-SAP is a little unusual because even when it's completed on the bluez
-side, it will probably need some vendor cooperation to complete the
-gsm comms. Qtopia and openmoko both have gsm daemons that would need
-to talk to the SAP service for example.
+GstA2dpSink was extending GstAudioSink, but there is a problem in that,
+GstAudioSink expects only
+"audio/x-raw-int", "audio/x-raw-float", "audio/x-mulaw" or "audio/x-alaw" as
+media types. GstA2dpSink should support mp3 and sbc, that's causing a
+runtime error. This patch changes the base class from GstAudioSink to
+GstBaseSink, changing the stub functions to be implemented also.
 
-Brad
+
+Best regards,
+
+
+Thiago
+
+------=_Part_16237_19571925.1191274283155
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+GstA2dpSink was extending GstAudioSink, but there is a problem in that, GstAudioSink expects only <br>&quot;audio/x-raw-int&quot;, &quot;audio/x-raw-float&quot;, &quot;audio/x-mulaw&quot; or &quot;audio/x-alaw&quot; as media types. GstA2dpSink should support mp3 and sbc, that&#39;s causing a runtime error. This patch changes the base class from GstAudioSink to GstBaseSink, changing the stub functions to be implemented also.
+<br><br><br>Best regards,<br><br><br>Thiago<br>
+
+------=_Part_16237_19571925.1191274283155--
+
+------=_Part_16236_31473672.1191274283155
+Content-Type: text/x-patch; name="gsta2dpsink.patch"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="gsta2dpsink.patch";
+	filename="gsta2dpsink.patch"; filename="gsta2dpsink.patch";
+	filename="gsta2dpsink.patch"; filename="gsta2dpsink.patch";
+	filename="gsta2dpsink.patch"
+X-Attachment-Id: f_f79hdv9z
+
+SW5kZXg6IGF1ZGlvL2dzdGEyZHBzaW5rLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3Qv
+Ymx1ZXovdXRpbHMvYXVkaW8vZ3N0YTJkcHNpbmsuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4z
+CmRpZmYgLXUgLXIxLjMgZ3N0YTJkcHNpbmsuYwotLS0gYXVkaW8vZ3N0YTJkcHNpbmsuYwkyNiBB
+dWcgMjAwNyAxNDoxNDozNCAtMDAwMAkxLjMKKysrIGF1ZGlvL2dzdGEyZHBzaW5rLmMJMSBPY3Qg
+MjAwNyAyMTowNzoxOSAtMDAwMApAQCAtNDMsNyArNDMsNyBAQAogCVBST1BfREVWSUNFLAogfTsK
+IAotR1NUX0JPSUxFUlBMQVRFKEdzdEEyZHBTaW5rLCBnc3RfYTJkcF9zaW5rLCBHc3RBdWRpb1Np
+bmssIEdTVF9UWVBFX0FVRElPX1NJTkspOworR1NUX0JPSUxFUlBMQVRFKEdzdEEyZHBTaW5rLCBn
+c3RfYTJkcF9zaW5rLCBHc3RCYXNlU2luaywgR1NUX1RZUEVfQkFTRV9TSU5LKTsKIAogc3RhdGlj
+IGNvbnN0IEdzdEVsZW1lbnREZXRhaWxzIGEyZHBfc2lua19kZXRhaWxzID0KIAlHU1RfRUxFTUVO
+VF9ERVRBSUxTKCJCbHVldG9vdGggQTJEUCBzaW5rIiwKQEAgLTg1LDYgKzg1LDggQEAKIAogCWdf
+ZnJlZShzaW5rLT5kZXZpY2UpOwogCisJZ19pb19jaGFubmVsX3VucmVmKHNpbmstPnNlcnZlcik7
+CisKIAlHX09CSkVDVF9DTEFTUyhwYXJlbnRfY2xhc3MpLT5maW5hbGl6ZShvYmplY3QpOwogfQog
+CkBAIC0xMjQsNTYgKzEyNiwyNiBAQAogCX0KIH0KIAotc3RhdGljIGdib29sZWFuIGdzdF9hMmRw
+X3Npbmtfb3BlbihHc3RBdWRpb1NpbmsgKnNlbGYpCi17Ci0JR3N0QTJkcFNpbmsgKnNpbmsgPSBH
+U1RfQTJEUF9TSU5LKHNlbGYpOwotCi0JcHJpbnRmKCJkZXZpY2UgJXNcbiIsIHNpbmstPmRldmlj
+ZSk7Ci0JcHJpbnRmKCJvcGVuXG4iKTsKLQotCXJldHVybiBUUlVFOwotfQotCi1zdGF0aWMgZ2Jv
+b2xlYW4gZ3N0X2EyZHBfc2lua19wcmVwYXJlKEdzdEF1ZGlvU2luayAqc2VsZiwKLQkJCQkJCUdz
+dFJpbmdCdWZmZXJTcGVjICpzcGVjKQorc3RhdGljIGdib29sZWFuIGdzdF9hMmRwX3Npbmtfc3Rh
+cnQoR3N0QmFzZVNpbmsgKmJhc2VzaW5rKQogewotCXByaW50ZigicGVycGFyZVxuIik7Ci0JcHJp
+bnRmKCJyYXRlICVkXG4iLCBzcGVjLT5yYXRlKTsKLQlwcmludGYoImNoYW5uZWxzICVkXG4iLCBz
+cGVjLT5jaGFubmVscyk7CisJZ19wcmludCgic3RhcnRcbiIpOwogCiAJcmV0dXJuIFRSVUU7CiB9
+CiAKLXN0YXRpYyBnYm9vbGVhbiBnc3RfYTJkcF9zaW5rX3VucHJlcGFyZShHc3RBdWRpb1Npbmsg
+KnNlbGYpCitzdGF0aWMgZ2Jvb2xlYW4gZ3N0X2EyZHBfc2lua19zdG9wKEdzdEJhc2VTaW5rICpi
+YXNlc2luaykKIHsKLQlwcmludGYoInVucHJlcGFyZVxuIik7CisJZ19wcmludCgic3RvcFxuIik7
+CiAKIAlyZXR1cm4gVFJVRTsKIH0KIAotc3RhdGljIGdib29sZWFuIGdzdF9hMmRwX3NpbmtfY2xv
+c2UoR3N0QXVkaW9TaW5rICpzZWxmKQorc3RhdGljIEdzdEZsb3dSZXR1cm4gZ3N0X2EyZHBfc2lu
+a19yZW5kZXIoR3N0QmFzZVNpbmsgKmJhc2VzaW5rLCAKKwkJCQkJR3N0QnVmZmVyICpidWZmZXIp
+CiB7Ci0JcHJpbnRmKCJjbG9zZVxuIik7CisJZ19wcmludCgicmVuZGVyXG4iKTsKIAotCXJldHVy
+biBUUlVFOwotfQotCi1zdGF0aWMgZ3VpbnQgZ3N0X2EyZHBfc2lua193cml0ZShHc3RBdWRpb1Np
+bmsgKnNlbGYsCi0JCQkJCWdwb2ludGVyIGRhdGEsIGd1aW50IGxlbmd0aCkKLXsKLQlyZXR1cm4g
+MDsKLX0KLQotc3RhdGljIGd1aW50IGdzdF9hMmRwX3NpbmtfZGVsYXkoR3N0QXVkaW9TaW5rICph
+dWRpb3NpbmspCi17Ci0JcHJpbnRmKCJkZWxheVxuIik7Ci0KLQlyZXR1cm4gMDsKLX0KLQotc3Rh
+dGljIHZvaWQgZ3N0X2EyZHBfc2lua19yZXNldChHc3RBdWRpb1NpbmsgKmF1ZGlvc2luaykKLXsK
+LQlwcmludGYoInJlc2V0XG4iKTsKKwlyZXR1cm4gR1NUX0ZMT1dfT0s7CiB9CiAKIHN0YXRpYyBn
+Ym9vbGVhbiBzZXJ2ZXJfY2FsbGJhY2soR0lPQ2hhbm5lbCAqY2hhbiwKQEAgLTE4Nyw3ICsxNTks
+NyBAQAogc3RhdGljIHZvaWQgZ3N0X2EyZHBfc2lua19jbGFzc19pbml0KEdzdEEyZHBTaW5rQ2xh
+c3MgKmtsYXNzKQogewogCUdPYmplY3RDbGFzcyAqb2JqZWN0X2NsYXNzID0gR19PQkpFQ1RfQ0xB
+U1Moa2xhc3MpOwotCUdzdEF1ZGlvU2lua0NsYXNzICphdWRpb3NpbmtfY2xhc3MgPSBHU1RfQVVE
+SU9fU0lOS19DTEFTUyhrbGFzcyk7CisJR3N0QmFzZVNpbmtDbGFzcyAqYmFzZXNpbmtfY2xhc3Mg
+PSBHU1RfQkFTRV9TSU5LX0NMQVNTKGtsYXNzKTsKIAogCXBhcmVudF9jbGFzcyA9IGdfdHlwZV9j
+bGFzc19wZWVrX3BhcmVudChrbGFzcyk7CiAKQEAgLTE5NSwxMyArMTY3LDkgQEAKIAlvYmplY3Rf
+Y2xhc3MtPnNldF9wcm9wZXJ0eSA9IEdTVF9ERUJVR19GVU5DUFRSKGdzdF9hMmRwX3Npbmtfc2V0
+X3Byb3BlcnR5KTsKIAlvYmplY3RfY2xhc3MtPmdldF9wcm9wZXJ0eSA9IEdTVF9ERUJVR19GVU5D
+UFRSKGdzdF9hMmRwX3NpbmtfZ2V0X3Byb3BlcnR5KTsKIAotCWF1ZGlvc2lua19jbGFzcy0+b3Bl
+biA9IEdTVF9ERUJVR19GVU5DUFRSKGdzdF9hMmRwX3Npbmtfb3Blbik7Ci0JYXVkaW9zaW5rX2Ns
+YXNzLT5wcmVwYXJlID0gR1NUX0RFQlVHX0ZVTkNQVFIoZ3N0X2EyZHBfc2lua19wcmVwYXJlKTsK
+LQlhdWRpb3NpbmtfY2xhc3MtPnVucHJlcGFyZSA9IEdTVF9ERUJVR19GVU5DUFRSKGdzdF9hMmRw
+X3NpbmtfdW5wcmVwYXJlKTsKLQlhdWRpb3NpbmtfY2xhc3MtPmNsb3NlID0gR1NUX0RFQlVHX0ZV
+TkNQVFIoZ3N0X2EyZHBfc2lua19jbG9zZSk7Ci0JYXVkaW9zaW5rX2NsYXNzLT53cml0ZSA9IEdT
+VF9ERUJVR19GVU5DUFRSKGdzdF9hMmRwX3Npbmtfd3JpdGUpOwotCWF1ZGlvc2lua19jbGFzcy0+
+ZGVsYXkgPSBHU1RfREVCVUdfRlVOQ1BUUihnc3RfYTJkcF9zaW5rX2RlbGF5KTsKLQlhdWRpb3Np
+bmtfY2xhc3MtPnJlc2V0ID0gR1NUX0RFQlVHX0ZVTkNQVFIoZ3N0X2EyZHBfc2lua19yZXNldCk7
+CisJYmFzZXNpbmtfY2xhc3MtPnN0YXJ0ID0gR1NUX0RFQlVHX0ZVTkNQVFIoZ3N0X2EyZHBfc2lu
+a19zdGFydCk7CisJYmFzZXNpbmtfY2xhc3MtPnN0b3AgPSBHU1RfREVCVUdfRlVOQ1BUUihnc3Rf
+YTJkcF9zaW5rX3N0b3ApOworCWJhc2VzaW5rX2NsYXNzLT5yZW5kZXIgPSBHU1RfREVCVUdfRlVO
+Q1BUUihnc3RfYTJkcF9zaW5rX3JlbmRlcik7CiAKIAlnX29iamVjdF9jbGFzc19pbnN0YWxsX3By
+b3BlcnR5KG9iamVjdF9jbGFzcywgUFJPUF9ERVZJQ0UsCiAJCQkJZ19wYXJhbV9zcGVjX3N0cmlu
+ZygiZGV2aWNlIiwgIkRldmljZSIsCkBAIC0yMzIsNiArMjAwLDQgQEAKIAogCWdfaW9fYWRkX3dh
+dGNoKHNlbGYtPnNlcnZlciwgR19JT19JTiB8IEdfSU9fSFVQIHwgR19JT19FUlIgfCBHX0lPX05W
+QUwsCiAJCQkJCQkJc2VydmVyX2NhbGxiYWNrLCBzZWxmKTsKLQotCWdfaW9fY2hhbm5lbF91bnJl
+ZihzZWxmLT5zZXJ2ZXIpOwogfQpJbmRleDogYXVkaW8vZ3N0YTJkcHNpbmsuaAo9PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+ClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVlei91dGlscy9hdWRpby9nc3RhMmRwc2luay5oLHYKcmV0
+cmlldmluZyByZXZpc2lvbiAxLjMKZGlmZiAtdSAtcjEuMyBnc3RhMmRwc2luay5oCi0tLSBhdWRp
+by9nc3RhMmRwc2luay5oCTI2IEF1ZyAyMDA3IDE0OjE0OjM0IC0wMDAwCTEuMworKysgYXVkaW8v
+Z3N0YTJkcHNpbmsuaAkxIE9jdCAyMDA3IDIxOjA3OjE5IC0wMDAwCkBAIC0yMiw3ICsyMiw3IEBA
+CiAgKi8KIAogI2luY2x1ZGUgPGdzdC9nc3QuaD4KLSNpbmNsdWRlIDxnc3QvYXVkaW8vZ3N0YXVk
+aW9zaW5rLmg+CisjaW5jbHVkZSA8Z3N0L2Jhc2UvZ3N0YmFzZXNpbmsuaD4KIAogR19CRUdJTl9E
+RUNMUwogCkBAIC00MSw3ICs0MSw3IEBACiB0eXBlZGVmIHN0cnVjdCBfR3N0QTJkcFNpbmtDbGFz
+cyBHc3RBMmRwU2lua0NsYXNzOwogCiBzdHJ1Y3QgX0dzdEEyZHBTaW5rIHsKLQlHc3RBdWRpb1Np
+bmsgc2luazsKKwlHc3RCYXNlU2luayBzaW5rOwogCiAJZ2NoYXIgKmRldmljZTsKIApAQCAtNDks
+NyArNDksNyBAQAogfTsKIAogc3RydWN0IF9Hc3RBMmRwU2lua0NsYXNzIHsKLQlHc3RBdWRpb1Np
+bmtDbGFzcyBwYXJlbnRfY2xhc3M7CisJR3N0QmFzZVNpbmtDbGFzcyBwYXJlbnRfY2xhc3M7CiB9
+OwogCiBHVHlwZSBnc3RfYTJkcF9zaW5rX2dldF90eXBlKHZvaWQpOwo=
+------=_Part_16236_31473672.1191274283155
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+------=_Part_16236_31473672.1191274283155
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_16236_31473672.1191274283155--
