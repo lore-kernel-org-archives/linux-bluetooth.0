@@ -1,8 +1,7 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Olivier Le Pogam <olepogam@free.fr>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <004601c8043a$73fcc9e0$0200a8c0@jester>
+Message-ID: <004601c8043a$73fcc9e0$0200a8c0@jester>
+From: "Olivier Le Pogam" <olepogam@free.fr>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 References: <2EB6297382462046A9427D7324788A480217D35A@MCLNEXVS06.resource.ds.bah.com>
 	<8de6c3e20708231340j439ca230i487e816693149441@mail.gmail.com>
 	<1187964393.5121.10.camel@matthias.BEYONDSOFT.local>
@@ -10,12 +9,11 @@ References: <2EB6297382462046A9427D7324788A480217D35A@MCLNEXVS06.resource.ds.bah
 	<20071001154023.53e57c49@localhost.localdomain>
 	<002c01c80435$14e15a70$0200a8c0@jester>
 	<1191248069.6484.107.camel@aeonflux.holtmann.net>
-	<004601c8043a$73fcc9e0$0200a8c0@jester>
-Date: Mon, 01 Oct 2007 17:56:56 +0200
-Message-Id: <1191254216.6484.109.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
+Date: Mon, 1 Oct 2007 16:50:47 +0200
+MIME-Version: 1.0
 Subject: Re: [Bluez-devel] Patch mh3
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Reply-To: Olivier Le Pogam <olepogam@free.fr>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -28,18 +26,48 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Olivier,
+Hi Marcel,
 
-> Is there a way to have all of these changes applied to my current kernel 
-> version, or should I simply wait for a next kernel release ?
+Thanks a lot, indeed it's really simple :)
+Is there a way to have all of these changes applied to my current kernel 
+version, or should I simply wait for a next kernel release ?
 
-there is a way to do this, but not as simple as you think. However since
-2.6.23 is around the corner, you better wait for 2.6.23-mh1.
+Best regards,
+Oli
+----- Original Message ----- 
+From: "Marcel Holtmann" <marcel@holtmann.org>
+To: "Olivier Le Pogam" <olepogam@free.fr>; "BlueZ development" 
+<bluez-devel@lists.sourceforge.net>
+Sent: Monday, October 01, 2007 4:14 PM
+Subject: Re: [Bluez-devel] Patch mh3
 
-Regards
 
-Marcel
-
+> Hi Olivier,
+>
+>> I have a 2.6.22.12 kernel (ubuntu gutsy gibbon) and when I want to apply 
+>> the
+>> mh3 kernel patch (dry run for now) it seems there are some modifications
+>> which have already been applied (partially ?) in hci_core.h, rfcomm.h, 
+>> sco.h
+>
+> the patch name is patch-2.6.22-mh3. This means it applies to 2.6.22 and
+> might not apply to 2.6.22.12. Otherwise it would have been named
+> patch-2.6.22.12-mh3. It is as simple as that.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+>
+> -- 
+> No virus found in this incoming message.
+> Checked by AVG Free Edition.
+> Version: 7.5.488 / Virus Database: 269.13.35/1040 - Release Date: 
+> 30/09/2007 21:01
+> 
 
 
 -------------------------------------------------------------------------
