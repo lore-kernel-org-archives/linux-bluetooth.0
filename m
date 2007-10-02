@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Denis KENZIOR <denis.kenzior@trolltech.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Wed, 3 Oct 2007 10:19:06 +1000
+Date: Wed, 3 Oct 2007 09:45:02 +1000
 MIME-Version: 1.0
 Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_6/tAHuJM6xZm/vJ"
-Message-Id: <200710031019.06334.denis.kenzior@trolltech.com>
-Subject: [Bluez-devel] [PATCH] FindAdapter try #2
+  boundary="Boundary-00=_+ftAH9kVhL2f/7Q"
+Message-Id: <200710030945.02301.denis.kenzior@trolltech.com>
+Subject: [Bluez-devel] [PATCH] FindAdapter ignores adapters which are in
+	DOWN state
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,7 +20,7 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---Boundary-00=_6/tAHuJM6xZm/vJ
+--Boundary-00=_+ftAH9kVhL2f/7Q
 Content-Type: text/plain;
   charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -27,11 +28,14 @@ Content-Disposition: inline
 
 Marcel,
 
-Should be code standard compliant now ;)
+The org.bluez.Manager.FindAdapter method is currently ignoring all adapters 
+which are in DOWN state.  We just noticed this when we tried using the 
+offmode devdown hcid configure option.  The ListAdapters returns all 
+available adapters.  Here's a patch that attempts to fix this.
 
 -Denis
 
---Boundary-00=_6/tAHuJM6xZm/vJ
+--Boundary-00=_+ftAH9kVhL2f/7Q
 Content-Type: text/x-diff;
   charset="us-ascii";
   name="find_adapter.patch"
@@ -45,8 +49,8 @@ RCS file: /cvsroot/bluez/utils/hcid/manager.c,v
 retrieving revision 1.6
 diff -u -5 -r1.6 manager.c
 --- manager.c	26 Sep 2007 13:56:30 -0000	1.6
-+++ manager.c	3 Oct 2007 00:16:30 -0000
-@@ -99,10 +99,54 @@
++++ manager.c	2 Oct 2007 00:04:53 -0000
+@@ -99,10 +99,55 @@
  					DBUS_TYPE_INVALID);
  
  	return send_message_and_unref(conn, reply);
@@ -56,7 +60,7 @@ diff -u -5 -r1.6 manager.c
 +{
 +	struct hci_dev_list_req *dl;
 +	struct hci_dev_req *dr;
-+	bdaddr_t ba;
++        bdaddr_t ba;
 +	int i, sk;
 +	int devid = -1;
 +	
@@ -69,10 +73,11 @@ diff -u -5 -r1.6 manager.c
 +	dl->dev_num = HCI_MAX_DEV;
 +	dr = dl->dev_req;
 +
-+	if (ioctl(sk, HCIGETDEVLIST, dl) < 0)
++	if (ioctl(sk, HCIGETDEVLIST, dl) < 0) {
 +		goto out;
++        }
 +
-+	dr = dl->dev_req;
++        dr = dl->dev_req;
 +	str2ba(str, &ba);
 +
 +	for (i = 0; i < dl->dev_num; i++, dr++) {
@@ -101,7 +106,7 @@ diff -u -5 -r1.6 manager.c
  {
  	DBusMessage *reply;
  	char path[MAX_PATH_LENGTH], *path_ptr = path;
-@@ -113,11 +157,18 @@
+@@ -113,11 +158,18 @@
  	if (!dbus_message_get_args(msg, NULL,
  				DBUS_TYPE_STRING, &pattern,
  				DBUS_TYPE_INVALID))
@@ -122,7 +127,7 @@ diff -u -5 -r1.6 manager.c
  	if (hci_devinfo(dev_id, &di) < 0)
  		return error_no_such_adapter(conn, msg);
 
---Boundary-00=_6/tAHuJM6xZm/vJ
+--Boundary-00=_+ftAH9kVhL2f/7Q
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -132,7 +137,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---Boundary-00=_6/tAHuJM6xZm/vJ
+--Boundary-00=_+ftAH9kVhL2f/7Q
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -143,4 +148,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---Boundary-00=_6/tAHuJM6xZm/vJ--
+--Boundary-00=_+ftAH9kVhL2f/7Q--
