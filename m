@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
+From: David Woodhouse <dwmw2@infradead.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Wed, 3 Oct 2007 09:45:02 +1000
-MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_+ftAH9kVhL2f/7Q"
-Message-Id: <200710030945.02301.denis.kenzior@trolltech.com>
-Subject: [Bluez-devel] [PATCH] FindAdapter ignores adapters which are in
-	DOWN state
+In-Reply-To: <1190504329.7150.277.camel@pmac.infradead.org>
+References: <1190504329.7150.277.camel@pmac.infradead.org>
+Date: Tue, 02 Oct 2007 13:15:06 +0100
+Message-Id: <1191327306.9188.43.camel@pmac.infradead.org>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Serial service support for bluez-gnome
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,135 +16,32 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---Boundary-00=_+ftAH9kVhL2f/7Q
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+On Sun, 2007-09-23 at 00:38 +0100, David Woodhouse wrote:
+> This needs a little more work in the support for adding devices -- we
+> probably want another page in the dialog which shows the services
+> available on the selected device, and lets you choose which one to
+> connect to. I've hard-coded it to DUN for now.
 
-Marcel,
+I've done a first attempt at basic SDP support:
+http://git.infradead.org/?p=users/dwmw2/bluez-gnome.git;a=commitdiff;h=d170121a3f223cb571da81a4958f2b86ec08069b
 
-The org.bluez.Manager.FindAdapter method is currently ignoring all adapters 
-which are in DOWN state.  We just noticed this when we tried using the 
-offmode devdown hcid configure option.  The ListAdapters returns all 
-available adapters.  Here's a patch that attempts to fix this.
+Now it needs to be hooked into the 'create device' dialog box... I'm
+kind of hoping that someone who hates userspace a little less than I
+will take pity on me and finish it off... :)
 
--Denis
+-- 
+dwmw2
 
---Boundary-00=_+ftAH9kVhL2f/7Q
-Content-Type: text/x-diff;
-  charset="us-ascii";
-  name="find_adapter.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="find_adapter.patch"
-
-Index: manager.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/manager.c,v
-retrieving revision 1.6
-diff -u -5 -r1.6 manager.c
---- manager.c	26 Sep 2007 13:56:30 -0000	1.6
-+++ manager.c	2 Oct 2007 00:04:53 -0000
-@@ -99,10 +99,55 @@
- 					DBUS_TYPE_INVALID);
- 
- 	return send_message_and_unref(conn, reply);
- }
- 
-+static int find_by_address(const char *str)
-+{
-+	struct hci_dev_list_req *dl;
-+	struct hci_dev_req *dr;
-+        bdaddr_t ba;
-+	int i, sk;
-+	int devid = -1;
-+	
-+	sk = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-+	if (sk < 0)
-+		return -1;
-+
-+	dl = g_malloc0(HCI_MAX_DEV * sizeof(*dr) + sizeof(*dl));
-+
-+	dl->dev_num = HCI_MAX_DEV;
-+	dr = dl->dev_req;
-+
-+	if (ioctl(sk, HCIGETDEVLIST, dl) < 0) {
-+		goto out;
-+        }
-+
-+        dr = dl->dev_req;
-+	str2ba(str, &ba);
-+
-+	for (i = 0; i < dl->dev_num; i++, dr++) {
-+		struct hci_dev_info di;
-+
-+		if (hci_devinfo(dr->dev_id, &di) < 0)
-+			continue;
-+
-+		if (hci_test_bit(HCI_RAW, &di.flags))
-+			continue;
-+
-+		if (!bacmp(&ba, &di.bdaddr)) {
-+			devid = dr->dev_id;
-+			break;
-+		}
-+	}
-+
-+out:
-+	g_free(dl);
-+	close(sk);
-+	return devid;
-+}
-+
- static DBusHandlerResult find_adapter(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
- 	DBusMessage *reply;
- 	char path[MAX_PATH_LENGTH], *path_ptr = path;
-@@ -113,11 +158,18 @@
- 	if (!dbus_message_get_args(msg, NULL,
- 				DBUS_TYPE_STRING, &pattern,
- 				DBUS_TYPE_INVALID))
- 		return error_invalid_arguments(conn, msg);
- 
--	dev_id = hci_devid(pattern);
-+	/* hci_devid() would make sense to use here, except it
-+	   is restricted to devices which are up */
-+	if (!strncmp(pattern, "hci", 3) && strlen(pattern) >= 4) {
-+		dev_id = atoi(pattern + 3);
-+	} else {
-+		dev_id = find_by_address(pattern);
-+	}
-+
- 	if (dev_id < 0)
- 		return error_no_such_adapter(conn, msg);
- 
- 	if (hci_devinfo(dev_id, &di) < 0)
- 		return error_no_such_adapter(conn, msg);
-
---Boundary-00=_+ftAH9kVhL2f/7Q
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---Boundary-00=_+ftAH9kVhL2f/7Q
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---Boundary-00=_+ftAH9kVhL2f/7Q--
