@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d5d240eb0710050552h25d923a0hd1de3c0cec71aeb7@mail.gmail.com>
-Date: Fri, 5 Oct 2007 18:22:51 +0530
-From: "rohit puri" <rohitpuri.rohit@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Date: Mon,  1 Oct 2007 21:30:59 -0300
+Message-Id: <JP9DFN$2CC7FDC0DC59E96AF33FC3C7C4E3D353@multidominios>
 MIME-Version: 1.0
-Subject: [Bluez-users] DBus error <dbus/dbus-arch-deps.h> is missing
+From: "vcallegari" <vcallegari@terra.com.br>
+To: "bluez-users" <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Need help to Bluez works on the same distance that
+	Bluesoleil ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,150 +15,64 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0073415695=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0073415695==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_35046_20145638.1191588771797"
+Hello everybody.
 
-------=_Part_35046_20145638.1191588771797
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+This is the first time I write, but I'm following Bluez development since some months ago.
+I have my linux debian with 2.6.22 kernel (unstable) and a dongle USB of CSR, bluecore 4, class 1. Also I have installed the 
+obexftpd to receive archives. Over the same desk, there is a PC of my girlfriend with windows and a software Bluesolei with the 
+same dongle bluetooth. If I am very near, i can send an archive to both computers (my linux and my girlfriend windows) from my 
+mobile, Motorola V3.
 
-hi all
+In fact, over Bluesoleil it always works, but in the Linux, just sometimes. And the Linux is always slower than the Bluesoleil. Now, 
+if I go to another room, the windows continues working without delays, but in the linux only establish the connection obex and 
+then, few seconds later, I receive a timeout. And sometimes not even that. Should that works equal in Linux and Windows, isn't it 
+? I'd like to know if it has some special configuration that I need, to get the same performance (in the linux and windows) ?
 
-whenever I am compiling my program of
-dbus for interprocess communication .i am getting following error .I have
-downloaded a latest version of dbus 1.1.2
+I already tried to exchange the dongles between PCs, even I connected the HD of the linux in the PC of my girlfriend, always 
+without success.
 
+As far, I read  in these cases I have to try  > hcidump -X -V,  I did it and obtained these lines:
 
-Here I am writing the program and all the errors I am facing
-#include <stdio.h>
-#include <stdlib.h>
-#include <dbus-1.0/dbus/dbus.h>
-int main(int argc, char **argv)
-{
-    DBusConnection *conn;
-    DBusMessage *msg, *reply;
-    const char *name;
-    conn = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
-    msg = dbus_message_new_method_call("org.bluez", "/org/bluez/hci0",
-                                                   "org.bluez.Adapter ",
-"GetName");
-    reply = dbus_connection_send_with_reply_and_block(conn, msg, -1, NULL);
-    dbus_message_get_args(reply, NULL, DBUS_TYPE_STRING, &name,
-DBUS_TYPE_INVALID);
-    printf("%s\n", name);
-    dbus_message_unref(msg);
-    dbus_message_unref(reply);
-    dbus_connection_close(conn);
-    return 0;
-}
+2007-10-01 18:00:23.644457 > ACL data: handle 42 flags 0x02 dlen 47
+    L2CAP(d): cid 0x0041 len 43 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 39 fcs 0x9a 
+        OBEX: Put cmd(c): len 39
+        Name (0x01) = Unicode length 14
+        0000: 00 61 00 61 00 2e 00 6a  00 70 00 67 00 00        .a.a...j.p.g..
+        Type (0x42) = Sequence length 11
+        0000: 69 6d 61 67 65 2f 6a 70  65 67 00                 image/jpeg.
+        Length (0xc3) = 6215
+2007-10-01 18:00:23.645022 < ACL data: handle 42 flags 0x02 dlen 11
+    L2CAP(d): cid 0x0041 len 7 [psm 3]
+      RFCOMM(d): UIH: cr 0 dlci 2 pf 0 ilen 3 fcs 0x40 
+        OBEX: Put rsp(f): status 100 len 32007-10-01 18:00:23.651443 > HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 42 packets 1
+2007-10-01 18:00:23.662468 > ACL data: handle 42 flags 0x02 dlen 9
+    L2CAP(d): cid 0x0041 len 5 [psm 3]
+      RFCOMM(d): UIH: cr 1 dlci 2 pf 1 ilen 0 fcs 0x86 credits 1
+2007-10-01 18:00:33.903432 > ACL data: handle 42 flags 0x02 dlen 224
+2007-10-01 18:00:44.153415 > ACL data: handle 42 flags 0x01 dlen 224
+2007-10-01 18:00:44.154331 < ACL data: handle 42 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0041 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 0 dlci 2 pf 1 ilen 0 fcs 0xd9 
+2007-10-01 18:00:44.155407 > ACL data: handle 42 flags 0x01 dlen 224
+2007-10-01 18:01:04.171438 > HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 42 reason 0x08
+    Reason: Connection Timeout
 
-
-errors
-In file included from dbus2.c:3:
-/usr/include/dbus-1.0/dbus/dbus.h:29:33: error: dbus/dbus- arch-deps.h: No
-such file or directory
-/usr/include/dbus-1.0/dbus/dbus.h:30:31: error: dbus/dbus-address.h: No such
-file or directory
-/usr/include/dbus-1.0/dbus/dbus.h:31:27: error: dbus/dbus-bus.h: No such
-file or directory
-/usr/include/dbus-1.0/dbus/dbus.h:32:34: error: dbus/dbus-connection.h: No
-such file or directory
-/usr/include/dbus-1.0/dbus/dbus.h:33:30: error: dbus/dbus-errors.h: No such
-file or directory
-/usr/include/dbus-1.0 /dbus/dbus.h:34:30: error: dbus/dbus-macros.h: No such
-file or directory
-/usr/include/dbus-1.0/dbus/dbus.h:35:31: error: dbus/dbus-message.h: No such
-file or directory
-/usr/include/dbus-1.0/dbus/dbus.h:36:28: error: dbus/dbus- misc.h: No such
-file or directory
-/usr/include/dbus-1.0/dbus/dbus.h:37:36: error: dbus/dbus-pending-call.h: No
-such file or directory
-/usr/include/dbus-1.0/dbus/dbus.h:38:32: error: dbus/dbus-protocol.h: No
-such file or directory
-/usr/include/dbus-1.0/dbus/dbus.h:39:30: error: dbus/dbus-server.h: No such
-file or directory
-/usr/include/dbus-1.0/dbus/dbus.h:40:30: error: dbus/dbus-shared.h: No such
-file or directory
-/usr/include/dbus-1.0/dbus/dbus.h:41:33: error: dbus/dbus- signature.h: No
-such file or directory
-/usr/include/dbus-1.0/dbus/dbus.h:42:31: error: dbus/dbus-threads.h: No such
-file or directory
-/usr/include/dbus-1.0/dbus/dbus.h:43:29: error: dbus/dbus-types.h: No such
-file or directory
-dbus2.c: In function 'main':
-dbus2.c:10: error: 'DBusConnection' undeclared (first use in this function)
-dbus2.c:10: error: (Each undeclared identifier is reported only once
-dbus2.c:10: error: for each function it appears in.)
-dbus2.c:10: error: 'connection' undeclared (first use in this function)
-dbus2.c:12: error: 'DBusMessage' undeclared (first use in this function)
-dbus2.c:12: error: 'message' undeclared (first use in this function)
-dbus2.c:12: error: 'reply' undeclared (first use in this function)
-dbus2.c:16: error: 'DBUS_BUS_SYSTEM' undeclared (first use in this function)
-dbus2.c:22: error: 'DBUS_TYPE_STRING' undeclared (first use in this
-function)
-dbus2.c:22: error: 'DBUS_TYPE_INVALID' undeclared (first use in this
-function)
+But I cannot understand them. Someone could help-me ?
 
 
-
-can somebody help me out
-
-
-
-thanks in advance
-
-------=_Part_35046_20145638.1191588771797
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-hi all <br><br>whenever I am compiling my program of <br>dbus for interprocess communication .i am getting following error .I have downloaded a latest version of dbus 1.1.2<br><br><br>Here I am writing the program and all the errors I am facing
-<br>#include &lt;stdio.h&gt;<br>#include &lt;stdlib.h&gt;<br>#include &lt;dbus-1.0/dbus/dbus.h&gt;<br>int main(int argc, char **argv)<br>{<br>&nbsp;&nbsp;&nbsp; DBusConnection *conn;<br>&nbsp;&nbsp;&nbsp; DBusMessage *msg, *reply;<br>&nbsp;&nbsp;&nbsp; const char *name;
-<br>&nbsp;&nbsp;&nbsp; conn = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);<br>&nbsp;&nbsp;&nbsp; msg = dbus_message_new_method_call(&quot;org.bluez&quot;, &quot;/org/bluez/hci0&quot;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="mb_0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &quot;
-org.bluez.Adapter
-&quot;, &quot;GetName&quot;);<br>&nbsp;&nbsp;&nbsp; reply = dbus_connection_send_with_reply_and_block(conn, msg, -1, NULL);<br>&nbsp;&nbsp;&nbsp; dbus_message_get_args(reply, NULL, DBUS_TYPE_STRING, &amp;name, DBUS_TYPE_INVALID);<br>&nbsp;&nbsp;&nbsp; printf(&quot;%s\n&quot;, name);
-<br>&nbsp;&nbsp;&nbsp; dbus_message_unref(msg);<br>&nbsp;&nbsp;&nbsp; dbus_message_unref(reply);<br>&nbsp;&nbsp;&nbsp; dbus_connection_close(conn);<br>&nbsp;&nbsp;&nbsp; return 0;<br>}<br><br><br>errors<br>In file included from dbus2.c:3:<br>/usr/include/dbus-1.0/dbus/dbus.h:29:33: error: dbus/dbus-
-arch-deps.h: No such file or directory<br>/usr/include/dbus-1.0/dbus/dbus.h:30:31: error: dbus/dbus-address.h: No such file or directory<br>/usr/include/dbus-1.0/dbus/dbus.h:31:27: error: dbus/dbus-bus.h: No such file or directory
-<br>/usr/include/dbus-1.0/dbus/dbus.h:32:34: error: dbus/dbus-connection.h: No such file or directory<br>/usr/include/dbus-1.0/dbus/dbus.h:33:30: error: dbus/dbus-errors.h: No such file or directory<br>/usr/include/dbus-
-1.0
-/dbus/dbus.h:34:30: error: dbus/dbus-macros.h: No such file or directory<br>/usr/include/dbus-1.0/dbus/dbus.h:35:31: error: dbus/dbus-message.h: No such file or directory<br>/usr/include/dbus-1.0/dbus/dbus.h:36:28: error: dbus/dbus-
-misc.h: No such file or directory<br>/usr/include/dbus-1.0/dbus/dbus.h:37:36: error: dbus/dbus-pending-call.h: No such file or directory<br>/usr/include/dbus-1.0/dbus/dbus.h:38:32: error: dbus/dbus-protocol.h: No such file or directory
-<br>/usr/include/dbus-1.0/dbus/dbus.h:39:30: error: dbus/dbus-server.h: No such file or directory<br>/usr/include/dbus-1.0/dbus/dbus.h:40:30: error: dbus/dbus-shared.h: No such file or directory<br>/usr/include/dbus-1.0/dbus/dbus.h:41:33: error: dbus/dbus-
-signature.h: No such file or directory<br>/usr/include/dbus-1.0/dbus/dbus.h:42:31: error: dbus/dbus-threads.h: No such file or directory<br>/usr/include/dbus-1.0/dbus/dbus.h:43:29: error: dbus/dbus-types.h: No such file or directory
-<br>dbus2.c: In function &#39;main&#39;:<br>dbus2.c:10: error: &#39;DBusConnection&#39; undeclared (first use in this function)<br>dbus2.c:10: error: (Each undeclared identifier is reported only once<br>dbus2.c:10: error: for each function it appears in.)
-<br>dbus2.c:10: error: &#39;connection&#39; undeclared (first use in this function)<br>dbus2.c:12: error: &#39;DBusMessage&#39; undeclared (first use in this function)<br>dbus2.c:12: error: &#39;message&#39; undeclared (first use in this function)
-<br>dbus2.c:12: error: &#39;reply&#39; undeclared (first use in this function)<br>dbus2.c:16: error: &#39;DBUS_BUS_SYSTEM&#39; undeclared (first use in this function)<br>dbus2.c:22: error: &#39;DBUS_TYPE_STRING&#39; undeclared (first use in this function)
-<br>dbus2.c:22: error: &#39;DBUS_TYPE_INVALID&#39; undeclared (first use in this function)<br><br><br><br>can somebody help me out<br><br><br><br>thanks in advance</div>
-
-------=_Part_35046_20145638.1191588771797--
-
-
---===============0073415695==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============0073415695==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0073415695==--
