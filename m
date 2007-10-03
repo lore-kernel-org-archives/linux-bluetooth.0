@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <BAY114-W266FADABD770552606A55AD7AF0@phx.gbl>
-From: Mikael Bengtsson <micke_b.b@hotmail.com>
-To: <bluez-devel@lists.sourceforge.net>
-Date: Wed, 3 Oct 2007 10:40:08 +0200
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Wed, 3 Oct 2007 10:19:06 +1000
 MIME-Version: 1.0
-Subject: [Bluez-devel] Problem detecting closed connection
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_6/tAHuJM6xZm/vJ"
+Message-Id: <200710031019.06334.denis.kenzior@trolltech.com>
+Subject: [Bluez-devel] [PATCH] FindAdapter try #2
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,79 +16,113 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0274116202=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0274116202==
-Content-Type: multipart/alternative;
-	boundary="_9b3277a9-560e-453f-8b46-a0e30b142212_"
+--Boundary-00=_6/tAHuJM6xZm/vJ
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
---_9b3277a9-560e-453f-8b46-a0e30b142212_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Marcel,
 
+Should be code standard compliant now ;)
 
-Hello!
-=20
-I have a problem detecting a device that has closed it's connection.
-=20
-The software I'm developing sends and receives data through sockets to a sl=
-ave device. When I switch of the slave device I expect that send and receiv=
-e should return the value 0, as in ordinary sockets programming for TCP and=
- UDP sockets. But instead send happily always returns a value which is bigg=
-er than 0. Why? Shouldn't Bluetooth sockets behave the same way as ordinary=
- sockets? I have a quite old Bluez, version 2.15. Is there another way of d=
-etecting closed connections?
-=20
-Regards:
--Mikael
-_________________________________________________________________
-Express yourself instantly with MSN Messenger! Download today it's FREE!
-http://messenger.msn.click-url.com/go/onm00200471ave/direct/01/=
+-Denis
 
---_9b3277a9-560e-453f-8b46-a0e30b142212_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+--Boundary-00=_6/tAHuJM6xZm/vJ
+Content-Type: text/x-diff;
+  charset="us-ascii";
+  name="find_adapter.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename="find_adapter.patch"
 
-<html>
-<head>
-<style>
-.hmmessage P
-{
-margin:0px;
-padding:0px
-}
-body.hmmessage
-{
-FONT-SIZE: 10pt;
-FONT-FAMILY:Tahoma
-}
-</style>
-</head>
-<body class=3D'hmmessage'>
-Hello!<BR>
-&nbsp;<BR>
-I have a problem detecting a device that has closed it's connection.<BR>
-&nbsp;<BR>
-The software I'm developing sends and receives data through sockets to a sl=
-ave device. When I switch of the slave device I expect that send and receiv=
-e should return the value 0, as in ordinary sockets programming for TCP and=
- UDP sockets. But instead send happily always returns a value which is bigg=
-er than 0. Why? Shouldn't Bluetooth sockets behave the same way as ordinary=
- sockets? I have a quite old Bluez, version 2.15. Is there another way of d=
-etecting closed connections?<BR>
-&nbsp;<BR>
-Regards:<BR>
--Mikael<BR><br /><hr />Express yourself instantly with MSN Messenger! <a hr=
-ef=3D'http://clk.atdmt.com/AVE/go/onm00200471ave/direct/01/' target=3D'_new=
-'>MSN Messenger</a></body>
-</html>=
+Index: manager.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/hcid/manager.c,v
+retrieving revision 1.6
+diff -u -5 -r1.6 manager.c
+--- manager.c	26 Sep 2007 13:56:30 -0000	1.6
++++ manager.c	3 Oct 2007 00:16:30 -0000
+@@ -99,10 +99,54 @@
+ 					DBUS_TYPE_INVALID);
+ 
+ 	return send_message_and_unref(conn, reply);
+ }
+ 
++static int find_by_address(const char *str)
++{
++	struct hci_dev_list_req *dl;
++	struct hci_dev_req *dr;
++	bdaddr_t ba;
++	int i, sk;
++	int devid = -1;
++	
++	sk = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
++	if (sk < 0)
++		return -1;
++
++	dl = g_malloc0(HCI_MAX_DEV * sizeof(*dr) + sizeof(*dl));
++
++	dl->dev_num = HCI_MAX_DEV;
++	dr = dl->dev_req;
++
++	if (ioctl(sk, HCIGETDEVLIST, dl) < 0)
++		goto out;
++
++	dr = dl->dev_req;
++	str2ba(str, &ba);
++
++	for (i = 0; i < dl->dev_num; i++, dr++) {
++		struct hci_dev_info di;
++
++		if (hci_devinfo(dr->dev_id, &di) < 0)
++			continue;
++
++		if (hci_test_bit(HCI_RAW, &di.flags))
++			continue;
++
++		if (!bacmp(&ba, &di.bdaddr)) {
++			devid = dr->dev_id;
++			break;
++		}
++	}
++
++out:
++	g_free(dl);
++	close(sk);
++	return devid;
++}
++
+ static DBusHandlerResult find_adapter(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
+ {
+ 	DBusMessage *reply;
+ 	char path[MAX_PATH_LENGTH], *path_ptr = path;
+@@ -113,11 +157,18 @@
+ 	if (!dbus_message_get_args(msg, NULL,
+ 				DBUS_TYPE_STRING, &pattern,
+ 				DBUS_TYPE_INVALID))
+ 		return error_invalid_arguments(conn, msg);
+ 
+-	dev_id = hci_devid(pattern);
++	/* hci_devid() would make sense to use here, except it
++	   is restricted to devices which are up */
++	if (!strncmp(pattern, "hci", 3) && strlen(pattern) >= 4) {
++		dev_id = atoi(pattern + 3);
++	} else {
++		dev_id = find_by_address(pattern);
++	}
++
+ 	if (dev_id < 0)
+ 		return error_no_such_adapter(conn, msg);
+ 
+ 	if (hci_devinfo(dev_id, &di) < 0)
+ 		return error_no_such_adapter(conn, msg);
 
---_9b3277a9-560e-453f-8b46-a0e30b142212_--
-
-
---===============0274116202==
+--Boundary-00=_6/tAHuJM6xZm/vJ
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -96,7 +132,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============0274116202==
+--Boundary-00=_6/tAHuJM6xZm/vJ
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -107,4 +143,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============0274116202==--
+--Boundary-00=_6/tAHuJM6xZm/vJ--
