@@ -1,258 +1,40 @@
-Return-Path: <fchevalier@silicom.fr>
-Message-ID: <47049EBF.2000103@silicom.fr>
-Date: Thu, 04 Oct 2007 10:05:19 +0200
-From: Fabien Chevalier <fchevalier@silicom.fr>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>,
-        denis.kenzior@trolltech.com, Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH] makes STLC2500 start without files download & other cleanup
-Content-Type: multipart/mixed;
- boundary="------------090508060809010403020502"
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Mime-Version: 1.0 (Apple Message framework v752.3)
+In-Reply-To: <200710031019.06334.denis.kenzior@trolltech.com>
+References: <200710031019.06334.denis.kenzior@trolltech.com>
+Message-Id: <57113323-63A6-4776-B49F-D6BA4983F2DD@nokia.com>
+From: Johan Hedberg <johan.hedberg@nokia.com>
+Date: Wed, 3 Oct 2007 15:29:28 +0300
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [PATCH] FindAdapter try #2
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------090508060809010403020502
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi Denis,
 
-All,
+On Oct 3, 2007, at 3:19, Denis KENZIOR wrote:
+> Should be code standard compliant now ;)
 
-I cooked up a patch for the STLC2500 startup sequence.
-The changes are listed below:
+Looks good. Commited to CVS with minor fixes related to braces usage  
+and a missing include file (atoi depends on stdlib.h).
 
-* Makes the firmware & parameters download optional : even though those 
-are supposed to be mandatory, practive shows that the chip can run 
-without them.
-* Cleanup the speed setting step : call the Ericsson routines directly 
-instead of duplicating the code.
-* Reset the chip only once after all settings & downloads have been done.
+Johan
 
-I couldn't regression test the file download stuff as i don't have any 
-firmware patch files or parameters files to download.
-
-Denis, it would be great if you could give this patch a try on a 
-Greenphone, see if i didn't break anything :-)
-
-Cheers,
-
-Fabien
-
-
-
---------------090508060809010403020502
-Content-Type: text/x-patch;
- name="hciattach-stl2500-cleanup-and-fix.patch"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline;
- filename="hciattach-stl2500-cleanup-and-fix.patch"
-
---- tools/hciattach.c	(.../trunk)	(révision 89)
-+++ tools/hciattach.c	(.../branches/20070928_1730)	(révision 89)
-@@ -829,62 +829,20 @@
- 
- extern int stlc2500_init(int fd, bdaddr_t *bdaddr);
- 
- static int stlc2500(int fd, struct uart_t *u, struct termios *ti)
- {
- 	bdaddr_t bdaddr;
--	char cmd[5];
- 	unsigned char resp[10];
- 	int n;
-+	int rvalue;
- 
--	/* STLC2500 Set Baud Rate stuff */
--	/* We should set the baud rate first, so the firmware download */
--	/* goes much faster */
--
--	/* STLC2500 Seems to support the Ericsson set baud rate stuff */
--	/* It should also support the ST Set Baud Rate command */
--	/* (as in st() function above, but those commands never succeed */
--	cmd[0] = HCI_COMMAND_PKT;
--	cmd[1] = 0x09;
--	cmd[2] = 0xfc;
--	cmd[3] = 0x01;
--
--	switch (u->speed) {
--	case 57600:
--		cmd[4] = 0x03;
--		break;
--	case 115200:
--		cmd[4] = 0x02;
--		break;
--	case 230400:
--		cmd[4] = 0x01;
--		break;
--	case 460800:
--		cmd[4] = 0x00;
--		break;
--	case 921600:
--		cmd[4] = 0x20;
--		break;
--	default:
--		cmd[4] = 0x02;
--		u->speed = 115200;
--		break;
--	}
--
--#ifdef STLC2500_DEBUG
--	fprintf(stderr, "Sending Baud Rate %02x\n", cmd[4]);
--#endif
--	/* Send initialization command */
--	if (write(fd, cmd, 5) != 5) {
--		perror("Failed to write init command");
--		return -1;
--	}
--
--	/* Need to wait here to give a chance for the device to set baud */
--	/* But no more than 0.5 seconds */
--	usleep(200000);
-+	/* STLC2500 has an ericsson core */
-+	rvalue = ericsson(fd, u, ti);
-+	if(rvalue != 0)
-+		return rvalue;
- 
- #ifdef STLC2500_DEBUG
- 	fprintf(stderr, "Setting speed\n");
- #endif
- 	if (set_speed(fd, ti, u->speed) < 0) {
- 		perror("Can't set baud rate");
-Index: tools/hciattach_st.c
-===================================================================
---- tools/hciattach_st.c	(.../trunk)	(révision 89)
-+++ tools/hciattach_st.c	(.../branches/20070928_1730)	(révision 89)
-@@ -119,13 +119,13 @@
- 	DIR *dir;
- 	struct dirent *d;
- 	char pathname[PATH_MAX], filename[NAME_MAX], prefix[20];
- 	unsigned char cmd[256];
- 	unsigned char buf[256];
- 	uint8_t seqnum = 0;
--	int fd, size, len;
-+	int fd, size, len, found_fw_file;
- 
- 	memset(filename, 0, sizeof(filename));
- 
- 	snprintf(prefix, sizeof(prefix), "STLC2500_R%d_%02d_",
- 						version >> 8, version & 0xff);
- 
-@@ -135,12 +135,13 @@
- 		strcpy(pathname, ".");
- 		dir = opendir(pathname);
- 		if (!dir)
- 			return -errno;
- 	}
- 
-+	found_fw_file = 0;	
- 	while (1) {
- 		d = readdir(dir);
- 		if (!d)
- 			break;
- 
- 		if (strncmp(d->d_name + strlen(d->d_name) - strlen(suffix),
-@@ -149,16 +150,20 @@
- 
- 		if (strncmp(d->d_name, prefix, strlen(prefix)))
- 			continue;
- 
- 		snprintf(filename, sizeof(filename), "%s/%s",
- 							pathname, d->d_name);
-+		found_fw_file = 1;
- 	}
- 
- 	closedir(dir);
- 
-+	if(!found_fw_file)
-+		return -ENOENT;
-+
- 	printf("Loading file %s\n", filename);
- 
- 	fd = open(filename, O_RDONLY);
- 	if (fd < 0) {
- 		perror("Can't open firmware file");
- 		return -errno;
-@@ -191,47 +196,54 @@
- int stlc2500_init(int dd, bdaddr_t *bdaddr)
- {
- 	unsigned char cmd[16];
- 	unsigned char buf[254];
- 	uint16_t version;
- 	int len;
-+	int err;
- 
--	len = do_command(dd, 0x04, 0x0001, NULL, 0, buf, sizeof(buf));
-+	/* Hci_Cmd_Ericsson_Read_Revision_Information */	
-+	len = do_command(dd, 0xff, 0x000f, NULL, 0, buf, sizeof(buf));
- 	if (len < 0)
- 		return -1;
- 
--	version = buf[2] << 8 | buf[1];
--
--	if (load_file(dd, version, ".ptc") < 0)
--		return -1;
-+	printf("%s\n", buf);
- 
--	len = do_command(dd, 0x03, 0x0003, NULL, 0, buf, sizeof(buf));
-+	/* HCI_Read_Local_Version_Information */	
-+	len = do_command(dd, 0x04, 0x0001, NULL, 0, buf, sizeof(buf));
- 	if (len < 0)
- 		return -1;
- 
--	if (load_file(dd, buf[2] << 8 | buf[1], ".ssf") < 0)
--		return -1;
--
--	len = do_command(dd, 0x03, 0x0003, NULL, 0, buf, sizeof(buf));
--	if (len < 0)
--		return -1;
-+	version = buf[2] << 8 | buf[1];
- 
--	len = do_command(dd, 0xff, 0x000f, NULL, 0, buf, sizeof(buf));
--	if (len < 0)
--		return -1;
-+	err = load_file(dd, version, ".ptc");
-+	if(err < 0) {
-+		if(err == -ENOENT) 	
-+			fprintf(stderr, "No ROM patch file loaded.\n");
-+		else
-+			return -1;
-+	}
- 
--	printf("%s\n", buf);
-+	err = load_file(dd, buf[2] << 8 | buf[1], ".ssf");
-+	if(err < 0) {
-+		if(err == -ENOENT) 	
-+			fprintf(stderr, "No static settings file loaded.\n");
-+		else
-+			return -1;
-+	}
- 
- 	cmd[0] = 0xfe;
- 	cmd[1] = 0x06;
- 	bacpy((bdaddr_t *) (cmd + 2), bdaddr);
- 
-+	/* Hci_Cmd_ST_Store_In_NVDS */	
- 	len = do_command(dd, 0xff, 0x0022, cmd, 8, buf, sizeof(buf));
- 	if (len < 0)
- 		return -1;
- 
-+	/* HCI_Reset : applies parameters*/
- 	len = do_command(dd, 0x03, 0x0003, NULL, 0, buf, sizeof(buf));
- 	if (len < 0)
- 		return -1;
- 
- 	return 0;
- }
-
-
---------------090508060809010403020502
-Content-Type: text/x-vcard; charset=utf-8;
- name="fchevalier.vcf"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="fchevalier.vcf"
-
-YmVnaW46dmNhcmQNCmZuOkZhYmllbiBDSEVWQUxJRVINCm46Q0hFVkFMSUVSO0ZhYmllbg0K
-b3JnOlNJTElDT00NCmFkcjo7OzQgcnVlIGRlIEpvdWFuZXQ7IFJFTk5FUyBBVEFMQU5URTs7
-MzU3MDA7RlJBTkNFDQplbWFpbDtpbnRlcm5ldDpmY2hldmFsaWVyQHNpbGljb20uZnINCnRp
-dGxlOlNvZnR3YXJlICYgU3R1ZGllcyBFbmdpbmVlcg0KdGVsO3dvcms6KzMzICgwKSAyIDk5
-IDg0IDE3IDE3DQp2ZXJzaW9uOjIuMQ0KZW5kOnZjYXJkDQoNCg==
---------------090508060809010403020502--
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
