@@ -1,36 +1,29 @@
 Return-Path: <fabchevalier@free.fr>
-Message-ID: <4704E8FF.2010706@free.fr>
-Date: Thu, 04 Oct 2007 15:22:07 +0200
+Message-ID: <4704E820.3090605@free.fr>
+Date: Thu, 04 Oct 2007 15:18:24 +0200
 From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>,
-        Marcel Holtmann <marcel@holtmann.org>
-CC: denis.kenzior@trolltech.com
+To: Marcel Holtmann <marcel@holtmann.org>, denis.kenzior@trolltech.com
+CC: BlueZ development <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] [PATCH] makes STLC2500 start without files download
  &	other cleanup
-References: <47049EBF.2000103@silicom.fr> <4704DFAC.2050709@silicom.fr> <4704E820.3090605@free.fr>
-In-Reply-To: <4704E820.3090605@free.fr>
+References: <47049EBF.2000103@silicom.fr> <4704DFAC.2050709@silicom.fr>
+In-Reply-To: <4704DFAC.2050709@silicom.fr>
 Content-Type: multipart/mixed;
- boundary="------------020400060300090308000104"
+ boundary="------------070205080600000102020603"
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 This is a multi-part message in MIME format.
---------------020400060300090308000104
+--------------070205080600000102020603
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-> Rereading my own code,
-> same patch but with coding rules fixes :-)
-> 
-> Fabien
-
-Grr... wrong patch !
-This one is the right one. :-)
+Rereading my own code,
+same patch but with coding rules fixes :-)
 
 Fabien
 
-
---------------020400060300090308000104
+--------------070205080600000102020603
 Content-Type: text/x-patch;
  name="hciattach-stl2500-cleanup-and-fix.patch"
 Content-Transfer-Encoding: 8bit
@@ -39,23 +32,9 @@ Content-Disposition: inline;
 
 Index: tools/hciattach.c
 ===================================================================
---- tools/hciattach.c	(.../trunk)	(révision 90)
-+++ tools/hciattach.c	(.../branches/20070928_1730)	(révision 90)
-@@ -206,12 +206,13 @@
- 	case 921600:
- 		cmd[4] = 0x20;
- 		break;
- 	default:
- 		cmd[4] = 0x03;
- 		u->speed = 57600;
-+		fprintf(stderr, "Invalid speed requested, using %d bps instead\n", u->speed);
- 		break;
- 	}
- 
- 	/* Send initialization command */
- 	if (write(fd, cmd, 5) != 5) {
- 		perror("Failed to write init command");
-@@ -829,62 +830,20 @@
+--- tools/hciattach.c	(.../trunk)	(révision 89)
++++ tools/hciattach.c	(.../branches/20070928_1730)	(révision 89)
+@@ -829,62 +829,20 @@
  
  extern int stlc2500_init(int fd, bdaddr_t *bdaddr);
  
@@ -115,7 +94,7 @@ Index: tools/hciattach.c
 -	usleep(200000);
 +	/* STLC2500 has an ericsson core */
 +	rvalue = ericsson(fd, u, ti);
-+	if (rvalue != 0)
++	if(rvalue != 0)
 +		return rvalue;
  
  #ifdef STLC2500_DEBUG
@@ -125,8 +104,8 @@ Index: tools/hciattach.c
  		perror("Can't set baud rate");
 Index: tools/hciattach_st.c
 ===================================================================
---- tools/hciattach_st.c	(.../trunk)	(révision 90)
-+++ tools/hciattach_st.c	(.../branches/20070928_1730)	(révision 90)
+--- tools/hciattach_st.c	(.../trunk)	(révision 89)
++++ tools/hciattach_st.c	(.../branches/20070928_1730)	(révision 89)
 @@ -119,13 +119,13 @@
  	DIR *dir;
  	struct dirent *d;
@@ -168,7 +147,7 @@ Index: tools/hciattach_st.c
  
  	closedir(dir);
  
-+	if (!found_fw_file)
++	if(!found_fw_file)
 +		return -ENOENT;
 +
  	printf("Loading file %s\n", filename);
@@ -216,8 +195,8 @@ Index: tools/hciattach_st.c
 -	if (len < 0)
 -		return -1;
 +	err = load_file(dd, version, ".ptc");
-+	if (err < 0) {
-+		if (err == -ENOENT) 	
++	if(err < 0) {
++		if(err == -ENOENT) 	
 +			fprintf(stderr, "No ROM patch file loaded.\n");
 +		else
 +			return -1;
@@ -225,8 +204,8 @@ Index: tools/hciattach_st.c
  
 -	printf("%s\n", buf);
 +	err = load_file(dd, buf[2] << 8 | buf[1], ".ssf");
-+	if (err < 0) {
-+		if (err == -ENOENT) 	
++	if(err < 0) {
++		if(err == -ENOENT) 	
 +			fprintf(stderr, "No static settings file loaded.\n");
 +		else
 +			return -1;
@@ -250,4 +229,4 @@ Index: tools/hciattach_st.c
  }
 
 
---------------020400060300090308000104--
+--------------070205080600000102020603--
