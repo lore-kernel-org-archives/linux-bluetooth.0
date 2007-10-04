@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1191513767.10698.148.camel@violet>
+In-Reply-To: <1191511655.3479.13.camel@cookie.hadess.net>
 References: <1191511655.3479.13.camel@cookie.hadess.net>
-	<1191513767.10698.148.camel@violet>
-Date: Thu, 04 Oct 2007 17:09:57 +0100
-Message-Id: <1191514197.3479.16.camel@cookie.hadess.net>
+Date: Thu, 04 Oct 2007 18:02:46 +0200
+Message-Id: <1191513767.10698.148.camel@violet>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Possible infinite loop in inotify code
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -21,27 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, 2007-10-04 at 18:02 +0200, Marcel Holtmann wrote:
-> Hi Bastien,
+Hi Bastien,
+
+> Uli mentioned a possible infinite loop in some circumstances:
+> https://bugzilla.redhat.com/show_bug.cgi?id=235307
 > 
-> > Uli mentioned a possible infinite loop in some circumstances:
-> > https://bugzilla.redhat.com/show_bug.cgi?id=235307
-> > 
-> > Although I wasn't able to reproduce the bug, the attached patch looks
-> > technically correct.
-> 
-> I reworked the patch a little bit and applied it. The G_IO_STATUS_AGAIN
-> and G_IO_ERROR_AGAIN are not guaranteed to be the same.
+> Although I wasn't able to reproduce the bug, the attached patch looks
+> technically correct.
 
-My mistake, I made the first patch using g_io_channel_read_chars instead
-of the deprecated g_io_channel_read and changed the code accordingly
-(including possible retvals), but then remembered eglib. I guess I
-didn't completely revert those changes.
+I reworked the patch a little bit and applied it. The G_IO_STATUS_AGAIN
+and G_IO_ERROR_AGAIN are not guaranteed to be the same.
 
-Cheers
+Regards
 
--- 
-Bastien Nocera <hadess@hadess.net> 
+Marcel
+
 
 
 -------------------------------------------------------------------------
