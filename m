@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <d5d240eb0710050640p1d9454f3peb935cbcbb6052bf@mail.gmail.com>
-References: <d5d240eb0710050552h25d923a0hd1de3c0cec71aeb7@mail.gmail.com>
-	<1191589377.10698.168.camel@violet>
-	<d5d240eb0710050640p1d9454f3peb935cbcbb6052bf@mail.gmail.com>
-Date: Sat, 06 Oct 2007 11:24:06 +0200
-Message-Id: <1191662646.6484.121.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] DBus error <dbus/dbus-arch-deps.h> is missing
+Message-ID: <d89ddf300710051649y61ba5838s43baa48a65bfb536@mail.gmail.com>
+Date: Fri, 5 Oct 2007 17:49:04 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4706B480.8000907@pyrocufflink.net>
+MIME-Version: 1.0
+References: <4706B480.8000907@pyrocufflink.net>
+Subject: Re: [Bluez-users] Configuring BlueZ to provide audio sink service
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,25 +20,48 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Rohit,
+Dustin
 
-> Thanks very much for your assistance but still some errors are there
-> even I have changed the include path to -1
-> 
-> 'DBusConnection' undeclared (first use in this function) 
-> dbus2.c:10: error: (Each undeclared identifier is reported only once
-> dbus2.c:10: error: for each function it appears in.)
-> dbus2.c:10: error: 'connection' undeclared (first use in this
-> function)
+a2dp source hasn't been reimplemented inside bluez yet. Check out the
+old prototype--see the bottom of
+http://bluetooth-alsa.sourceforge.net/build.html
 
-don't ask me. You might wanna start using pkg-config to get the right
-paths for the header files.
+Brad
 
-Regards
-
-Marcel
-
-
+On 10/5/07, Dustin C. Hatch <admiralnemo@pyrocufflink.net> wrote:
+> Hello all,
+>
+> I am currently working on a line-audio over Bluetooth solution.  My plan
+> is to play audio on my tablet PC in Windows Media Player and have it
+> played on my desktop's stereo system. It would seem that this would be
+> possible using A2DP, setting the tablet as the "source" and the desktop
+> as the "sink."  I am having trouble, however, configuring BlueZ to
+> provide the "audio sink" service.  Google searching doesn't turn up
+> much, mostly information on configuring BlueZ to be the source.
+>
+> If anyone has some pointers, suggestions, etc. I would be glad to hear
+> them.  I plan to post all my findings and complete documentation on my
+> procedures on the Web when I am finished.
+>
+> It may be important to note that the desktop is running Gentoo Linux
+> (2.6.22) and the tablet is Windows Vista Ultimate x64.  The desktop has
+> an HP BT450 USB Bluetooth adapter and the tablet has a built-in Broadcom.
+>
+> Thanks,
+> Dustin C. Hatch
+>
+>
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc.
+> Still grepping through log files to find problems?  Stop.
+> Now Search log events and configuration files using AJAX and a browser.
+> Download your FREE copy of Splunk now >> http://get.splunk.com/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
