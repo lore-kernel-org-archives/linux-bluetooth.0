@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sun, 7 Oct 2007 14:40:18 -0400
-From: Aristeu Sergio Rozanski Filho <aris@ruivo.org>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20071007184018.GW7430@cathedrallabs.org>
+Message-ID: <d89ddf300710061016k23fdca8bh403c50fa6d287f8c@mail.gmail.com>
+Date: Sat, 6 Oct 2007 11:16:34 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-Subject: [Bluez-devel] [RFC][PATCH 0/4] add ps3 remote support
+Subject: [Bluez-devel] itech "radio" headset shakedown
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,16 +18,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-	this series of patches add support to ps3 remote controller. It
-took me some time to understand the code, so it's more like a RFC. Also,
-I don't have any bluetooth input device with me to be 100% sure this
-series won't break existing devices. So, feedback and testing is more
-than welcome.
+Hey
 
--- 
-Aristeu
+FYI, I have an itech radio headset now. Has FM, HFP/HSP/A2DP/AVRCP but
+doesn't quite have it all:
 
+bt2.0 but no EDR
+no mp3 decoder
+
+the avrcp profile has a couple of new ops:
+
+Fast forward (opcode is 0xc9)
+Rewind (opcode is 0xc8)
+
+if you tap the play button, the message it sends alternates between
+play and pause, unlike the previous r35 model which always sent play
+for a tap and pause for tap-and-hold.
+
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
