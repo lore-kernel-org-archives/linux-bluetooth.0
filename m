@@ -1,126 +1,78 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20071007184035.GA7430@cathedrallabs.org>
-References: <20071007184035.GA7430@cathedrallabs.org>
-Date: Sun, 07 Oct 2007 20:23:36 +0100
-Message-Id: <1191785016.3626.29.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Subject: Re: [Bluez-devel] [RFC][PATCH 4/4] add support to ps3
-	remote	controller
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Return-Path: <fabchevalier@free.fr>
+Message-ID: <47092B7D.5000404@free.fr>
+Date: Sun, 07 Oct 2007 20:54:53 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
+MIME-Version: 1.0
+To: Brad Midgley <bmidgley@xmission.com>,
+        Johan Hedberg <johan.hedberg@nokia.com>, luiz.dentz@gmail.com,
+        Marcel Holtmann <marcel@holtmann.org>
+CC: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [PATCH] Alsa plugin fix
+Content-Type: multipart/mixed;
+ boundary="------------060906060906090100030601"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hey Aristeu,
+This is a multi-part message in MIME format.
+--------------060906060906090100030601
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Some comments about your selection of keycodes, CC:'ing Dmitry for
-comments.
+All,
 
-For reference, here's a picture of the remote in question:
-http://files.playstatic.com/playstation-3-hardware/bd-remote-2-playstation-3.jpg
+I've spent most of my afternoon fixing the support for my favorite media 
+player, the descendant of XMMS : audacious. :-)
 
-On Sun, 2007-10-07 at 14:40 -0400, Aristeu Sergio Rozanski Filho wrote:
-> And finally, adding support to PS3 remote controller.
-> 
-<snip> 
-> +/* ps3 remote support */
-> +static unsigned int ps3remote_keymap[] = {
-> +	[0x16] = KEY_EJECTCD,
-> +	[0x64] = KEY_AUDIO,
-> +	[0x65] = KEY_ANGLE,
-> +	[0x63] = KEY_SUBTITLE,
-> +	[0x0f] = KEY_CLEAR,
-> +	[0x28] = KEY_TIME,
-> +	[0x00] = KEY_1,
-> +	[0x01] = KEY_2,
-> +	[0x02] = KEY_3,
-> +	[0x03] = KEY_4,
-> +	[0x04] = KEY_5,
-> +	[0x05] = KEY_6,
-> +	[0x06] = KEY_7,
-> +	[0x07] = KEY_8,
-> +	[0x08] = KEY_9,
-> +	[0x09] = KEY_0,
-> +	[0x81] = KEY_RED,
-> +	[0x82] = KEY_GREEN,
-> +	[0x80] = KEY_BLUE,
-> +	[0x83] = KEY_YELLOW,
-> +	[0x70] = KEY_DISPLAYTOGGLE,	/* display */
+Audacious was almost working except for a *very* annoying bug (in our 
+side :-( ). It would
+eventually stop playing at the end of each song, which meant i would 
+have to manually select the next song and hit play again... not very 
+funny :-(
 
-This is wrong. Display toggle is to change the LCD/CRT output on
-laptops. KEY_INFO sounds like a better option.
+Now it looks it works perfectly (didn't have time to check that in 
+details, but that should be fixed as soon i tomorrow, after i would
+have spent the most part of the day listening to music with Audacious ;-) )
 
-> +	[0x1a] = BTN_TOP,		/* top menu */
-> +	[0x40] = KEY_MENU,		/* pop up/menu */
-> +	[0x0e] = KEY_ESC,		/* return */
-> +	[0x5c] = KEY_OPTION,		/* options/triangle */
-> +	[0x5d] = KEY_BACK,		/* back/circle */
-> +	[0x5f] = KEY_SCREEN,		/* view/square */
-> +	[0x5e] = KEY_ENTER,		/* cross */
-> +	[0x54] = KEY_UP,
-> +	[0x56] = KEY_DOWN,
-> +	[0x57] = KEY_LEFT,
-> +	[0x55] = KEY_RIGHT,
-> +	[0x0b] = KEY_ENTER,
-> +	[0x5a] = BTN_1,		/* L1 */
-> +	[0x58] = BTN_2,		/* L2 */
-> +	[0x51] = BTN_3,		/* L3 */
-> +	[0x5b] = BTN_4,		/* R1 */
-> +	[0x59] = BTN_5,		/* R2 */
-> +	[0x52] = BTN_6,		/* R3 */
+The patch is fairly simple, it implements the delay() call to make sure 
+we change the pcm state to the XRUN state whenever the hw_ptr moves
+on top of appl_ptr.
 
-Use BTN_TL, BTN_TL2, BTN_TR and BTN_TR2. ("that's trigger left, trigger
-left 2"). BTN_THUMBL and BTN_THUMBR are L3 and R3 respectively (thumb
-left, thumb right).
+Anybody to review it and commit to CVS ?
 
-> +	[0x43] = KEY_VENDOR,		/* PS button */
+Cheers,
 
-KEY_HOMEPAGE sounds better (Sony calls it the Home button).
+Fabien
 
-> +	[0x50] = BTN_SELECT,
-> +	[0x53] = BTN_START,
-> +	[0x33] = KEY_BACK,		/* scan back */
+--------------060906060906090100030601
+Content-Type: text/plain;
+ name="plugin-xun-fix.diff"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+ filename="plugin-xun-fix.diff"
 
-KEY_REWIND
-
-> +	[0x32] = KEY_PLAY,
-> +	[0x34] = KEY_FORWARD,		/* scan forward */
-> +	[0x30] = KEY_PREVIOUS,
-> +	[0x38] = KEY_STOP,
-> +	[0x31] = KEY_NEXT,
-> +	[0x60] = KEY_PREVIOUSSONG,	/* slow/step back */
-
-This one...
-
-> +	[0x39] = KEY_PAUSE,
-> +	[0x61] = KEY_NEXTSONG,		/* slow/step forward */
-
-...and this one could probably do with additional keys being defined in
-input.h
-
-Slow/step forward could be KEY_SLOW, don't know about slow/step back.
-
--- 
-Bastien Nocera <hadess@hadess.net> 
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >> http://get.splunk.com/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SW5kZXg6IHBjbV9ibHVldG9vdGguYwo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Ci0tLSBwY21fYmx1ZXRvb3Ro
+LmMJKHLDqXZpc2lvbiA3NCkKKysrIHBjbV9ibHVldG9vdGguYwkoY29waWUgZGUgdHJhdmFp
+bCkKQEAgLTc2NCw2ICs3NjQsMjUgQEAKIAlyZXR1cm4gcmV0OwogfQogCitzdGF0aWMgaW50
+IGJsdWV0b290aF9wbGF5YmFja19kZWxheShzbmRfcGNtX2lvcGx1Z190ICppbywgCisJCQkJ
+c25kX3BjbV9zZnJhbWVzX3QgKmRlbGF5cCkKK3sKKwlEQkcoIiIpOworCisJLyogVGhpcyB1
+cGRhdGVzIGlvLT5od19wdHIgdmFsdWUgdXNpbmcgcG9pbnRlcigpIGZ1bmN0aW9uICovCisJ
+c25kX3BjbV9od3N5bmMoaW8tPnBjbSk7CisgCQorCSpkZWxheXAgPSBpby0+YXBwbF9wdHIg
+LSBpby0+aHdfcHRyOworCWlmICgoaW8tPnN0YXRlID09IFNORF9QQ01fU1RBVEVfUlVOTklO
+RykgJiYgKCpkZWxheXAgPCAwKSkgeworCQlpby0+Y2FsbGJhY2stPnN0b3AoaW8pOworCQlp
+by0+c3RhdGUgPSBTTkRfUENNX1NUQVRFX1hSVU47CisJCSpkZWxheXAgPSAwOworCX0KKwkv
+KiBUaGlzIHNob3VsZCBuZXZlciBmYWlsLCBBTFNBIEFQSSBpcyByZWFsbHkgbm90CisJcHJl
+cGFyZWQgdG8gaGFuZGxlIGEgbm9uIHplcm8gcmV0dXJuIHZhbHVlICovCisJcmV0dXJuIDA7
+Cit9CisKIHN0YXRpYyBzbmRfcGNtX2lvcGx1Z19jYWxsYmFja190IGJsdWV0b290aF9oc3Bf
+cGxheWJhY2sgPSB7CiAJLnN0YXJ0CQkJPSBibHVldG9vdGhfcGxheWJhY2tfc3RhcnQsCiAJ
+LnN0b3AJCQk9IGJsdWV0b290aF9wbGF5YmFja19zdG9wLApAQCAtNzc0LDYgKzc5Myw3IEBA
+CiAJLnRyYW5zZmVyCQk9IGJsdWV0b290aF9oc3Bfd3JpdGUsCiAJLnBvbGxfZGVzY3JpcHRv
+cnMJPSBibHVldG9vdGhfcGxheWJhY2tfcG9sbF9kZXNjcmlwdG9ycywKIAkucG9sbF9yZXZl
+bnRzCQk9IGJsdWV0b290aF9wbGF5YmFja19wb2xsX3JldmVudHMsCisJLmRlbGF5CQkJPSBi
+bHVldG9vdGhfcGxheWJhY2tfZGVsYXksCiB9OwogCiBzdGF0aWMgc25kX3BjbV9pb3BsdWdf
+Y2FsbGJhY2tfdCBibHVldG9vdGhfaHNwX2NhcHR1cmUgPSB7CkBAIC03OTgsNiArODE4LDcg
+QEAKIAkudHJhbnNmZXIJCT0gYmx1ZXRvb3RoX2EyZHBfd3JpdGUsCiAJLnBvbGxfZGVzY3Jp
+cHRvcnMJPSBibHVldG9vdGhfcGxheWJhY2tfcG9sbF9kZXNjcmlwdG9ycywKIAkucG9sbF9y
+ZXZlbnRzCQk9IGJsdWV0b290aF9wbGF5YmFja19wb2xsX3JldmVudHMsCisJLmRlbGF5CQkJ
+PSBibHVldG9vdGhfcGxheWJhY2tfZGVsYXksCiB9OwogCiBzdGF0aWMgc25kX3BjbV9pb3Bs
+dWdfY2FsbGJhY2tfdCBibHVldG9vdGhfYTJkcF9jYXB0dXJlID0gewo=
+--------------060906060906090100030601--
