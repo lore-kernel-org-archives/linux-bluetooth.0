@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <470A01CD.8090002@omepet.es>
-Date: Mon, 08 Oct 2007 12:09:17 +0200
-From: jm <jmtoro@omepet.es>
-MIME-Version: 1.0
-To: Bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Problem with RFCOMM socket
+Date: Sun, 7 Oct 2007 23:04:30 +0200
+From: Radek (Fotopiper) <fotopiper@o2.pl>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <20071007230430.5910d417@darkstar.example.net>
+Mime-Version: 1.0
+Subject: [Bluez-users] GPRS via BT, pppd says "Serial line is looped back."
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,54 +18,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello all,
+Hello to You all,
+I'm trying to connect to my GSM/GPRS/EDGE provider via a mobile with BT, on Linux
+side I'm using bluez (3.20), kernel (vanilla) 2.6.20.8 (or 20.9 makes little
+difference) and pppd 2.4.4.
+Unfortunately when I try to connect pppd announces:
+"Serial line is looped back." or "LCP terminated by peer (peer refused to
+authenticate)"
+The funny thing is that the same scripts worked well with kernel 2.6.20.2 (about,
+don't remember exactly), Bluez 3.16 and pppd (an older verion) (and a bit
+different distribution - KateOS vs currently Slacware, but I suppose that's
+irrelevant).
 
-I am trying to connect BlueZ with JSR-82 with RFCOMM sockets. The BlueZ 
-server creates a socket server and the JSR-82 MIDlet connects to it.
+What should I downgrade to have my notebook connected to the net on the go?
+kernel,pppd, bluez?
+Or maybe there is some better solution?
 
-It all goes well until the server sends some data and closes the socket. 
-The JSR-82 program launches a "java.io.IOException: Stream closed or 
-disconnected" when trying to get the number of bytes available from the 
-stream. The problem can be solved by having the server call sleep(10) 
-before calling close(clientSocket), giving some time for the client to 
-fetch the data, but obviously it is a bad solution.
-
-This is the code:
-
-Server, C:
-
-    status = write( clientSocket, message, messageSize );
-  
-    sleep(10); //Comment this for an error
-
-    close(clientSocket);
-
-Client, Java:
-
-    try
-    {
-           while ( inputStream.available() == 0)
-           {
-                Thread.sleep(100);
-                notifyUser("Waiting for data...");
-           }
-    }
-    catch(IOException ex)
-    {
-           notifyUser(ex.getMessage());
-    }
-
-Rest of the code is not relevant in my opinion, but I can post it if 
-someone needs it to find a solution. However, it is pretty simple and 
-based in http://people.csail.mit.edu/albert/bluez-intro/x502.html and 
-http://developers.sun.com/mobility/midp/articles/bluetooth2/
-
-Is there something I am missing about RFCOMM sockets? Is it JSR-82 
-related? Is it a bug?
-
-Thanks
-
-jm
+Best regards.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
