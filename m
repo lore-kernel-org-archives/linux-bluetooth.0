@@ -1,78 +1,44 @@
-Return-Path: <fabchevalier@free.fr>
-Message-ID: <47092B7D.5000404@free.fr>
-Date: Sun, 07 Oct 2007 20:54:53 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Date: Sun, 7 Oct 2007 14:43:38 -0400
+From: Aristeu Sergio Rozanski Filho <aris@ruivo.org>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20071007184338.GB7430@cathedrallabs.org>
+References: <20071007184018.GW7430@cathedrallabs.org>
 MIME-Version: 1.0
-To: Brad Midgley <bmidgley@xmission.com>,
-        Johan Hedberg <johan.hedberg@nokia.com>, luiz.dentz@gmail.com,
-        Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [PATCH] Alsa plugin fix
-Content-Type: multipart/mixed;
- boundary="------------060906060906090100030601"
-List-ID: <bluez-devel.lists.sourceforge.net>
+In-Reply-To: <20071007184018.GW7430@cathedrallabs.org>
+Subject: Re: [Bluez-devel] [RFC][PATCH 0/4] add ps3 remote support
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------060906060906090100030601
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+> Hi,
+> 	this series of patches add support to ps3 remote controller. It
+> took me some time to understand the code, so it's more like a RFC. Also,
+> I don't have any bluetooth input device with me to be 100% sure this
+> series won't break existing devices. So, feedback and testing is more
+> than welcome.
+forgot to mention that these patches are over the CVS repository,
+utils/input/, which I guess it's the one.
 
-All,
+-- 
+Aristeu
 
-I've spent most of my afternoon fixing the support for my favorite media 
-player, the descendant of XMMS : audacious. :-)
 
-Audacious was almost working except for a *very* annoying bug (in our 
-side :-( ). It would
-eventually stop playing at the end of each song, which meant i would 
-have to manually select the next song and hit play again... not very 
-funny :-(
-
-Now it looks it works perfectly (didn't have time to check that in 
-details, but that should be fixed as soon i tomorrow, after i would
-have spent the most part of the day listening to music with Audacious ;-) )
-
-The patch is fairly simple, it implements the delay() call to make sure 
-we change the pcm state to the XRUN state whenever the hw_ptr moves
-on top of appl_ptr.
-
-Anybody to review it and commit to CVS ?
-
-Cheers,
-
-Fabien
-
---------------060906060906090100030601
-Content-Type: text/plain;
- name="plugin-xun-fix.diff"
-Content-Transfer-Encoding: base64
-Content-Disposition: inline;
- filename="plugin-xun-fix.diff"
-
-SW5kZXg6IHBjbV9ibHVldG9vdGguYwo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Ci0tLSBwY21fYmx1ZXRvb3Ro
-LmMJKHLDqXZpc2lvbiA3NCkKKysrIHBjbV9ibHVldG9vdGguYwkoY29waWUgZGUgdHJhdmFp
-bCkKQEAgLTc2NCw2ICs3NjQsMjUgQEAKIAlyZXR1cm4gcmV0OwogfQogCitzdGF0aWMgaW50
-IGJsdWV0b290aF9wbGF5YmFja19kZWxheShzbmRfcGNtX2lvcGx1Z190ICppbywgCisJCQkJ
-c25kX3BjbV9zZnJhbWVzX3QgKmRlbGF5cCkKK3sKKwlEQkcoIiIpOworCisJLyogVGhpcyB1
-cGRhdGVzIGlvLT5od19wdHIgdmFsdWUgdXNpbmcgcG9pbnRlcigpIGZ1bmN0aW9uICovCisJ
-c25kX3BjbV9od3N5bmMoaW8tPnBjbSk7CisgCQorCSpkZWxheXAgPSBpby0+YXBwbF9wdHIg
-LSBpby0+aHdfcHRyOworCWlmICgoaW8tPnN0YXRlID09IFNORF9QQ01fU1RBVEVfUlVOTklO
-RykgJiYgKCpkZWxheXAgPCAwKSkgeworCQlpby0+Y2FsbGJhY2stPnN0b3AoaW8pOworCQlp
-by0+c3RhdGUgPSBTTkRfUENNX1NUQVRFX1hSVU47CisJCSpkZWxheXAgPSAwOworCX0KKwkv
-KiBUaGlzIHNob3VsZCBuZXZlciBmYWlsLCBBTFNBIEFQSSBpcyByZWFsbHkgbm90CisJcHJl
-cGFyZWQgdG8gaGFuZGxlIGEgbm9uIHplcm8gcmV0dXJuIHZhbHVlICovCisJcmV0dXJuIDA7
-Cit9CisKIHN0YXRpYyBzbmRfcGNtX2lvcGx1Z19jYWxsYmFja190IGJsdWV0b290aF9oc3Bf
-cGxheWJhY2sgPSB7CiAJLnN0YXJ0CQkJPSBibHVldG9vdGhfcGxheWJhY2tfc3RhcnQsCiAJ
-LnN0b3AJCQk9IGJsdWV0b290aF9wbGF5YmFja19zdG9wLApAQCAtNzc0LDYgKzc5Myw3IEBA
-CiAJLnRyYW5zZmVyCQk9IGJsdWV0b290aF9oc3Bfd3JpdGUsCiAJLnBvbGxfZGVzY3JpcHRv
-cnMJPSBibHVldG9vdGhfcGxheWJhY2tfcG9sbF9kZXNjcmlwdG9ycywKIAkucG9sbF9yZXZl
-bnRzCQk9IGJsdWV0b290aF9wbGF5YmFja19wb2xsX3JldmVudHMsCisJLmRlbGF5CQkJPSBi
-bHVldG9vdGhfcGxheWJhY2tfZGVsYXksCiB9OwogCiBzdGF0aWMgc25kX3BjbV9pb3BsdWdf
-Y2FsbGJhY2tfdCBibHVldG9vdGhfaHNwX2NhcHR1cmUgPSB7CkBAIC03OTgsNiArODE4LDcg
-QEAKIAkudHJhbnNmZXIJCT0gYmx1ZXRvb3RoX2EyZHBfd3JpdGUsCiAJLnBvbGxfZGVzY3Jp
-cHRvcnMJPSBibHVldG9vdGhfcGxheWJhY2tfcG9sbF9kZXNjcmlwdG9ycywKIAkucG9sbF9y
-ZXZlbnRzCQk9IGJsdWV0b290aF9wbGF5YmFja19wb2xsX3JldmVudHMsCisJLmRlbGF5CQkJ
-PSBibHVldG9vdGhfcGxheWJhY2tfZGVsYXksCiB9OwogCiBzdGF0aWMgc25kX3BjbV9pb3Bs
-dWdfY2FsbGJhY2tfdCBibHVldG9vdGhfYTJkcF9jYXB0dXJlID0gewo=
---------------060906060906090100030601--
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >> http://get.splunk.com/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
