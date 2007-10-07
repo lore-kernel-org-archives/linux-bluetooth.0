@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sun, 7 Oct 2007 23:04:30 +0200
-From: Radek (Fotopiper) <fotopiper@o2.pl>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20071007230430.5910d417@darkstar.example.net>
+In-Reply-To: <1191747315.5622.9.camel@Gentoo-desktop.lan>
+References: <1191696694.2049.7.camel@Gentoo-desktop.lan>
+	<d89ddf300710062041q59531981xe2a3c693960bff40@mail.gmail.com>
+	<1191740426.5622.4.camel@Gentoo-desktop.lan>
+	<1191746631.10698.176.camel@violet>
+	<1191747315.5622.9.camel@Gentoo-desktop.lan>
+Date: Sun, 07 Oct 2007 11:01:50 +0200
+Message-Id: <1191747710.10698.182.camel@violet>
 Mime-Version: 1.0
-Subject: [Bluez-users] GPRS via BT, pppd says "Serial line is looped back."
+Subject: Re: [Bluez-users] How do I get a bluetooth headset working?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +24,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello to You all,
-I'm trying to connect to my GSM/GPRS/EDGE provider via a mobile with BT, on Linux
-side I'm using bluez (3.20), kernel (vanilla) 2.6.20.8 (or 20.9 makes little
-difference) and pppd 2.4.4.
-Unfortunately when I try to connect pppd announces:
-"Serial line is looped back." or "LCP terminated by peer (peer refused to
-authenticate)"
-The funny thing is that the same scripts worked well with kernel 2.6.20.2 (about,
-don't remember exactly), Bluez 3.16 and pppd (an older verion) (and a bit
-different distribution - KateOS vs currently Slacware, but I suppose that's
-irrelevant).
+Hi Aniruddha,
 
-What should I downgrade to have my notebook connected to the net on the go?
-kernel,pppd, bluez?
-Or maybe there is some better solution?
+> I did make a texfile in my home directory named '.asoundrc' with the
+> following input (I obtained the address through hcitool)
+> 
+> pcm.bluetooth {
+>    type bluetooth
+>    device 00:11:22:33:44:55
+> }
+> 
+> But how do I proceed using it with Skype? 
 
-Best regards.
+you need to also change the default PCM or select the Bluetooth headset
+within Skype. However as Brad mentioned earlier, Skype might not work
+since it has a broken usage of the ALSA interface.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
