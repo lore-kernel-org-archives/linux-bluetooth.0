@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sun, 7 Oct 2007 14:40:28 -0400
+Date: Sun, 7 Oct 2007 14:40:23 -0400
 From: Aristeu Sergio Rozanski Filho <aris@ruivo.org>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20071007184028.GY7430@cathedrallabs.org>
+Message-ID: <20071007184023.GX7430@cathedrallabs.org>
 MIME-Version: 1.0
-Subject: [Bluez-devel] [RFC][PATCH 2/4] add connect,
-	disconnect and is_connected methods	to fake_input
+Subject: [Bluez-devel] [RFC][PATCH 1/4] add bluetooth id database
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,136 +18,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This patch adds three methods to fake_input structure, in order to
-prepare fake_hid support addition.
+This patch adds a simple bluetooth id database
 
---- input.orig/device.c	2007-10-06 23:35:10.000000000 -0400
-+++ input/device.c	2007-10-06 23:55:38.000000000 -0400
-@@ -65,6 +65,9 @@
- 	int		rfcomm; /* RFCOMM socket */
- 	int		uinput;	/* uinput socket */
- 	uint8_t		ch;	/* RFCOMM channel number */
-+	gboolean 	(*connect)(struct device *idev);
-+	int		(*disconnect)(struct device *idev);
-+	int		(is_connected)(struct device *idev);
- };
- 
- struct device {
-@@ -761,6 +764,26 @@
- 	return FALSE;
- }
- 
-+static int fake_disconnect(struct device *idev)
-+{
-+	struct fake_input *fake = idev->fake;
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ input/bluetooth_ids.h	2007-10-06 23:35:10.000000000 -0400
+@@ -0,0 +1,8 @@
++#ifndef BLUETOOTH_IDS_H
++#define BLUETOOTH_IDS_H
 +
-+	if (!fake->io)
-+		return -ENOTCONN;
++#define BLUETOOTH_VENDOR_ID_SONY 0x054c
++#define BLUETOOTH_DEVICE_ID_PS3CONTROLLER 0x0268
 +
-+	g_io_channel_close(fake->io);
-+	g_io_channel_unref(fake->io);
-+	fake->io = NULL;
++#endif	/* BLUETOOTH_IDS_H */
 +
-+	if (fake->uinput >= 0) {
-+		ioctl(fake->uinput, UI_DEV_DESTROY);
-+		close(fake->uinput);
-+		fake->uinput = -1;
-+	}
-+
-+	return 0;
-+}
-+
- static int disconnect(struct device *idev, uint32_t flags)
- {
- 	struct fake_input *fake = idev->fake;
-@@ -769,22 +792,8 @@
- 	int ctl, err;
+--- input.orig/device.c	2007-10-06 23:35:07.000000000 -0400
++++ input/device.c	2007-10-06 23:35:10.000000000 -0400
+@@ -52,6 +52,7 @@
+ #include "error.h"
+ #include "manager.h"
+ #include "storage.h"
++#include "bluetooth_ids.h"
  
- 	/* Fake input disconnect */
--	if (fake) {
--		if (!fake->io)
--			return -ENOTCONN;
--
--		g_io_channel_close(fake->io);
--		g_io_channel_unref(fake->io);
--		fake->io = NULL;
--
--		if (fake->uinput >= 0) {
--			ioctl(fake->uinput, UI_DEV_DESTROY);
--			close(fake->uinput);
--			fake->uinput = -1;
--		}
--
--		return 0;
--	}
-+	if (fake)
-+		return fake->disconnect(idev);
+ #define INPUT_DEVICE_INTERFACE	"org.bluez.input.Device"
  
- 	/* Standard HID disconnect */
- 	if (idev->ctrl_sk >= 0) {
-@@ -837,12 +846,8 @@
- 	int ctl;
+@@ -615,7 +616,8 @@
  
- 	/* Fake input */
--	if (fake) {
--		if (fake->io)
--			return 1;
--		else
--			return 0;
--	}
-+	if (fake)
-+		return fake->is_connected(idev);
+ 	info("New input device %s (%s)", addr, req.name);
  
- 	/* Standard HID */
- 	ctl = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HIDP);
-@@ -871,6 +876,7 @@
- 					DBusMessage *msg, void *data)
- {
- 	struct device *idev = data;
-+	struct fake_input *fake = idev->fake;
+-	if (req.vendor == 0x054c && req.product == 0x0268) {
++	if (req.vendor == BLUETOOTH_VENDOR_ID_SONY &&
++	    req.product == BLUETOOTH_DEVICE_ID_PS3CONTROLLER) {
+ 		unsigned char buf[] = { 0x53, 0xf4,  0x42, 0x03, 0x00, 0x00 };
+ 		err = write(ctrl_sk, buf, sizeof(buf));
+ 	}
+--- input.orig/Makefile.am	2007-10-06 23:35:23.000000000 -0400
++++ input/Makefile.am	2007-10-06 23:35:33.000000000 -0400
+@@ -12,7 +12,8 @@
  
- 	if (idev->pending_connect)
- 		return err_connection_failed(conn, msg, "Connection in progress");
-@@ -881,10 +887,10 @@
- 	idev->pending_connect = dbus_message_ref(msg);
+ bluetoothd_service_input_SOURCES = main.c \
+ 	manager.h manager.c error.h error.c \
+-	server.h server.c device.h device.c storage.h storage.c
++	server.h server.c device.h device.c \
++	storage.h storage.c bluetooth_ids.h
  
- 	/* Fake input device */
--	if (idev->fake) {
--		if (rfcomm_connect(idev) < 0) {
-+	if (fake) {
-+		if (fake->connect(idev) < 0) {
- 			const char *str = strerror(errno);
--			error("RFCOMM connect failed: %s(%d)", str, errno);
-+			error("Connect failed: %s(%d)", str, errno);
- 			dbus_message_unref(idev->pending_connect);
- 			idev->pending_connect = NULL;
- 			return err_connection_failed(conn, msg, str);
-@@ -1117,6 +1123,15 @@
- 	return err;
- }
- 
-+static int fake_is_connected(struct device *idev)
-+{
-+	struct fake_input *fake = idev->fake;
-+
-+	if (fake->io)
-+		return 1;
-+	return 0;
-+}
-+
- int fake_input_register(DBusConnection *conn, bdaddr_t *src,
- 			bdaddr_t *dst, uint8_t ch, const char **ppath)
- {
-@@ -1141,6 +1156,9 @@
- 
- 	idev->fake = g_new0(struct fake_input, 1);
- 	idev->fake->ch = ch;
-+	idev->fake->connect = rfcomm_connect;
-+	idev->fake->disconnect = fake_disconnect;
-+	idev->fake->is_connected = fake_is_connected;
- 
- 	err = register_path(conn, path, idev);
- 
+ LDADD = $(top_builddir)/common/libhelper.a \
+ 		@GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
