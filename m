@@ -1,13 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <2d5a2c100710081056m6391d8aao6fbc2d2b1aa34948@mail.gmail.com>
-Date: Mon, 8 Oct 2007 14:56:40 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <de4879e80710051236j243ff5c6mc6bd18e5c43640a6@mail.gmail.com>
-MIME-Version: 1.0
-References: <de4879e80710011431q3fa8c870m95a08dc46ea9a679@mail.gmail.com>
-	<de4879e80710051236j243ff5c6mc6bd18e5c43640a6@mail.gmail.com>
-Subject: Re: [Bluez-devel] Patch: inheritance problem in gsta2dpsink
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <470A3A00.3000909@free.fr>
+References: <47092B7D.5000404@free.fr>
+	<d89ddf300710071722k2ac2074dqe0dfc16ac960f982@mail.gmail.com>
+	<4709E3EA.1010205@free.fr>
+	<2d5a2c100710080640m69180310r93e52f8dac91624a@mail.gmail.com>
+	<470A3A00.3000909@free.fr>
+Date: Mon, 08 Oct 2007 18:53:51 +0200
+Message-Id: <1191862431.12212.10.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] Alsa plugin fix
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,21 +20,21 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi thiago,
+Hi Fabien,
 
-I guess we really need a tiny library for ipc, we dont want to
-duplicate code from
-pcm_bluetooth.c again in a2dpsink, it might happen that someone need this
-in another plugin or so.
+> I 100% agree with you. :-)
 
--- =
+you know that you can edit the wiki by yourself ;)
 
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
