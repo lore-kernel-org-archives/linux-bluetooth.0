@@ -1,59 +1,126 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <2d5a2c100710080640m69180310r93e52f8dac91624a@mail.gmail.com>
-Date: Mon, 8 Oct 2007 10:40:50 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4709E3EA.1010205@free.fr>
+Return-Path: <fchevalier@silicom.fr>
+Message-ID: <470A24D6.70901@silicom.fr>
+Date: Mon, 08 Oct 2007 14:38:46 +0200
+From: Fabien Chevalier <fchevalier@silicom.fr>
 MIME-Version: 1.0
-References: <47092B7D.5000404@free.fr>
-	<d89ddf300710071722k2ac2074dqe0dfc16ac960f982@mail.gmail.com>
-	<4709E3EA.1010205@free.fr>
-Subject: Re: [Bluez-devel] [PATCH] Alsa plugin fix
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [PATCH] STLC2500 updated patch
+References: <470A11D3.10707@silicom.fr> <1191842227.7931.3.camel@aeonflux.holtmann.net>
+In-Reply-To: <1191842227.7931.3.camel@aeonflux.holtmann.net>
+Content-Type: multipart/mixed;
+ boundary="------------010707070507010901080605"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi,
+This is a multi-part message in MIME format.
+--------------010707070507010901080605
+Content-Type: text/plain; charset=windows-1251; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 10/8/07, Fabien Chevalier <fabchevalier@free.fr> wrote:
-> > Fabien,
-> >
-> > I noticed the same problem with xmms, but it works great now. I
-> > committed your fix.
->
-> Thanks !
->
-> Btw, maybe we should put Audacious on the HOWTO/Audiodevices pages and
-> recommand its usage instead of XMMS/BMP, which both seem to have been
-> abandonned ?
 
-It doen't hurt to leave xmms in there since it is just a few lines to
-explain how to
-enable its support, we just need to mark it as not recommended and include
-Audacious as a recommended player along with gstreamer based ones.
+And finally the last of the list:
 
-btw, great work!
+* Makes the firmware & parameters download optional : even though those
+are supposed to be mandatory, practive shows that the chip can run
+without them.
 
--- =
+Cheers,
 
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+Fabien
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >> http://get.splunk.com/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+--------------010707070507010901080605
+Content-Type: text/x-patch;
+ name="hciattach-stl2500-cleanup-and-fix-4.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="hciattach-stl2500-cleanup-and-fix-4.patch"
+
+--- tools/hciattach_st.c	2007-10-08 13:47:07.000000000 +0200
++++ ../tools/hciattach_st.c	2007-10-08 14:35:41.000000000 +0200
+@@ -122,7 +122,7 @@
+ 	unsigned char cmd[256];
+ 	unsigned char buf[256];
+ 	uint8_t seqnum = 0;
+-	int fd, size, len;
++	int fd, size, len, found_fw_file;
+ 
+ 	memset(filename, 0, sizeof(filename));
+ 
+@@ -138,6 +138,7 @@
+ 			return -errno;
+ 	}
+ 
++	found_fw_file = 0;	
+ 	while (1) {
+ 		d = readdir(dir);
+ 		if (!d)
+@@ -152,10 +153,14 @@
+ 
+ 		snprintf(filename, sizeof(filename), "%s/%s",
+ 							pathname, d->d_name);
++		found_fw_file = 1;
+ 	}
+ 
+ 	closedir(dir);
+ 
++	if (!found_fw_file)
++		return -ENOENT;
++
+ 	printf("Loading file %s\n", filename);
+ 
+ 	fd = open(filename, O_RDONLY);
+@@ -194,6 +199,7 @@
+ 	unsigned char buf[254];
+ 	uint16_t version;
+ 	int len;
++	int err;
+ 
+ 	/* Hci_Cmd_Ericsson_Read_Revision_Information */	
+ 	len = do_command(dd, 0xff, 0x000f, NULL, 0, buf, sizeof(buf));
+@@ -209,11 +215,21 @@
+ 
+ 	version = buf[2] << 8 | buf[1];
+ 
+-	if (load_file(dd, version, ".ptc") < 0)
+-		return -1;
++	err = load_file(dd, version, ".ptc");
++	if (err < 0) {
++		if (err == -ENOENT) 	
++			fprintf(stderr, "No ROM patch file loaded.\n");
++		else
++			return -1;
++	}
+ 
+-	if (load_file(dd, buf[2] << 8 | buf[1], ".ssf") < 0)
+-		return -1;
++	err = load_file(dd, buf[2] << 8 | buf[1], ".ssf");
++	if (err < 0) {
++		if (err == -ENOENT) 	
++			fprintf(stderr, "No static settings file loaded.\n");
++		else
++			return -1;
++	}
+ 
+ 	cmd[0] = 0xfe;
+ 	cmd[1] = 0x06;
+
+--------------010707070507010901080605
+Content-Type: text/x-vcard; charset=utf-8;
+ name="fchevalier.vcf"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="fchevalier.vcf"
+
+begin:vcard
+fn:Fabien CHEVALIER
+n:CHEVALIER;Fabien
+org:SILICOM
+adr:;;4 rue de Jouanet; RENNES ATALANTE;;35700;FRANCE
+email;internet:fchevalier@silicom.fr
+title:Software & Studies Engineer
+tel;work:+33 (0) 2 99 84 17 17
+version:2.1
+end:vcard
+
+
+--------------010707070507010901080605--
