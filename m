@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <360bc8300710080404y7f77ff4ci8da906d508ba800d@mail.gmail.com>
-Date: Mon, 8 Oct 2007 08:04:21 -0300
-From: "Manuel Naranjo" <naranjo.manuel@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <470A01CD.8090002@omepet.es>
+Message-ID: <3fb4ac6c0710080418j3868f85k63e4b3d3671ae244@mail.gmail.com>
+Date: Mon, 8 Oct 2007 16:48:17 +0530
+From: "karthik rao" <kthik82@gmail.com>
+To: bluez-users@lists.sourceforge.net, kthik82@gmail.com
 MIME-Version: 1.0
-References: <470A01CD.8090002@omepet.es>
-Subject: Re: [Bluez-users] Problem with RFCOMM socket
+Subject: [Bluez-users] DBUS Bluez Api : send and recieve functionality
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,93 +14,75 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0485299697=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I don't think it's a bug at all, if the status of write tells you that
-the data has all ready beeing streamed, then the problem is on the
-midlet side. Take into account that given the frequency bluetooth
-works there's a little delay between you send the data, and the data
-is received by your peer, for most applications you will not notice,
-but you might for this.
+--===============0485299697==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_23376_11998505.1191842297515"
 
-What you can do is making the midlet side to close the connection, and
-not regard on the bluez side. Or make the midlet send some control
-stuff back to bluez so your C code closes the rfcomm after the other
-peer received your data.
+------=_Part_23376_11998505.1191842297515
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
+Hi ,
 
-> Hello all,
->
-> I am trying to connect BlueZ with JSR-82 with RFCOMM sockets. The BlueZ
-> server creates a socket server and the JSR-82 MIDlet connects to it.
->
-> It all goes well until the server sends some data and closes the socket.
-> The JSR-82 program launches a "java.io.IOException: Stream closed or
-> disconnected" when trying to get the number of bytes available from the
-> stream. The problem can be solved by having the server call sleep(10)
-> before calling close(clientSocket), giving some time for the client to
-> fetch the data, but obviously it is a bad solution.
->
-> This is the code:
->
-> Server, C:
->
->     status = write( clientSocket, message, messageSize );
->
->     sleep(10); //Comment this for an error
->
->     close(clientSocket);
->
-> Client, Java:
->
->     try
->     {
->            while ( inputStream.available() == 0)
->            {
->                 Thread.sleep(100);
->                 notifyUser("Waiting for data...");
->            }
->     }
->     catch(IOException ex)
->     {
->            notifyUser(ex.getMessage());
->     }
->
-> Rest of the code is not relevant in my opinion, but I can post it if
-> someone needs it to find a solution. However, it is pretty simple and
-> based in http://people.csail.mit.edu/albert/bluez-intro/x502.html and
-> http://developers.sun.com/mobility/midp/articles/bluetooth2/
->
-> Is there something I am missing about RFCOMM sockets? Is it JSR-82
-> related? Is it a bug?
->
-> Thanks
->
-> jm
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc.
-> Still grepping through log files to find problems?  Stop.
-> Now Search log events and configuration files using AJAX and a browser.
-> Download your FREE copy of Splunk now >> http://get.splunk.com/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+I tried programming a small server which will take
+the text input and show it on the screen.It was a simple
+client server implementation over bluetooth using
+rfcomm.Basic implementation being adding ,advertising
+a service and then on getting connected by client sending
+the key inputs to the user screen.
+
+I am now trying to do the same using dbus api in bluez.
+
+Have gone through the documentation and found
+some api for adding a service record and for
+starting a service. But i could'nt find any info
+on how the sending and receiving part of the data
+is to be done .
+
+If someone could point to some documentation or opinion
+in this context would be great.
+
+Thanks,
+kthik
+
+------=_Part_23376_11998505.1191842297515
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi ,<br>&nbsp;<br>I tried programming a small server which will take&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>the text input and show it on the screen.It was a simple <br>client server implementation over bluetooth using<br>rfcomm.Basic implementation being adding ,advertising
+<br>a service and then on getting connected by client sending<br>the key inputs to the user screen.<br><br>I am now trying to do the same using dbus api in bluez.<br><br>Have gone through the documentation and found<br>
+some api for adding a service record and for<br>starting a service. But i could&#39;nt find any info<br>on how the sending and receiving part of the data<br>is to be done .<br><br>If someone could point to some documentation or opinion
+<br>in this context would be great.<br><br>Thanks,<br>kthik<br><br>
+
+------=_Part_23376_11998505.1191842297515--
 
 
--- 
-Naranjo, Manuel Francisco
+--===============0485299697==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
+--===============0485299697==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0485299697==--
