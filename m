@@ -1,13 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <003901c809c4$9acb3db0$0200a8c0@jester>
-From: "Olivier Le Pogam" <olepogam@free.fr>
-To: <bluez-devel@lists.sourceforge.net>
-References: <46EFC921.30001@tfh-berlin.de>
-Date: Mon, 8 Oct 2007 18:02:18 +0200
+Message-ID: <470A50E5.2090800@free.fr>
+Date: Mon, 08 Oct 2007 17:46:45 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] can't establish more than two rfcomm connections
-Reply-To: Olivier Le Pogam <olepogam@free.fr>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] HFP design question : polls opened !
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -20,24 +18,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi David,
 
-I think your problem is not BlueZ related.
-When your mobile tries to connect to the RFCOMM server, the mobile is in 
-master mode (initiating the connection), thus the bluetooth dongle is in 
-slave mode.
-When you try to connect a second mobile phone concurrently, it will be the 
-same but the bluetooth dongle can't have 2 slaves, it can be master with 7 
-devices and slave with 1.
-A solution would be a role-switching, i.e. once connected the mobile becomes 
-slave & the bluetooth dongle master, however, role-switching is usually not 
-implemented in mobile phones.
-Basically, you can consider have only one RFCOMM connection per dongle from 
-a mobile phone.
-BlueZ experts, don't hesitate to flame me if i'm wrong.
+Dear Bluez friends,
 
-Oli 
+Looks like HFP work will finally get started, thanks to Frederic 
+Dalleau's initiative. :-)
+For my part i will switch to that one day or the other, however at
+the moment i am still working on some a2dp fixes and some other stuff, 
+but i will get there eventually.
 
+One of the painful issues with HFP is the AT commands parsing. I tend to
+be a lazy guy and not very interested in writing a parser (hey we are in 
+21th century now !! :-) )
+To ease the pain we could use the brand new GRegex tool, that brings the
+power of regular expressions to the glib world. That would meen however 
+that we would have to port it to eglib first.
+
+I don't know if this is a good idea or not, it's just an idea.
+What do you guys think about it?
+
+Cheers,
+
+Fabien
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
