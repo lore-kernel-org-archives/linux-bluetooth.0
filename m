@@ -1,6 +1,6 @@
 Return-Path: <fchevalier@silicom.fr>
-Message-ID: <470A1639.7020302@silicom.fr>
-Date: Mon, 08 Oct 2007 13:36:25 +0200
+Message-ID: <470A146C.3060806@silicom.fr>
+Date: Mon, 08 Oct 2007 13:28:44 +0200
 From: Fabien Chevalier <fchevalier@silicom.fr>
 MIME-Version: 1.0
 To: Marcel Holtmann <marcel@holtmann.org>
@@ -9,116 +9,105 @@ Subject: Re: [PATCH] STLC2500 updated patch
 References: <470A11D3.10707@silicom.fr> <1191842227.7931.3.camel@aeonflux.holtmann.net>
 In-Reply-To: <1191842227.7931.3.camel@aeonflux.holtmann.net>
 Content-Type: multipart/mixed;
- boundary="------------060508050000040701000808"
+ boundary="------------090508020803010307030804"
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 This is a multi-part message in MIME format.
---------------060508050000040701000808
-Content-Type: text/plain; charset=UTF-8; format=flowed
+--------------090508020803010307030804
+Content-Type: text/plain; charset=windows-1251; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Marcel Holtmann wrote:
 
 > please break this down into four separate patches. I hate big patches
 > that try to fix everything in one go.
 > 
 
-Second on the list : remove duplicated code between ericsson and st 
-initialization methods.
+First of the list : provide support for higher baud rates for ericcson 
+based chipsets.
 
 Fabien
 
---------------060508050000040701000808
+
+
+--------------090508020803010307030804
 Content-Type: text/x-patch;
- name="hciattach-stl2500-cleanup-and-fix-2.patch"
+ name="hciattach-stl2500-cleanup-and-fix-1.patch"
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline;
- filename="hciattach-stl2500-cleanup-and-fix-2.patch"
+ filename="hciattach-stl2500-cleanup-and-fix-1.patch"
 
 Index: tools/hciattach.c
 ===================================================================
 --- tools/hciattach.c	(.../tags/20070928_1730)	(révision 105)
 +++ tools/hciattach.c	(.../branches/20070928_1730)	(révision 105)
-@@ -829,62 +849,20 @@
+@@ -117,12 +117,22 @@
+ 	case 1000000:
+ 		return B1000000;
+ 	case 1152000:
+ 		return B1152000;
+ 	case 1500000:
+ 		return B1500000;
++	case 2000000:
++		return B2000000;
++	case 2500000:
++		return B2500000;
++	case 3000000:
++		return B3000000;
++	case 3500000:
++		return B3500000;
++	case 4000000:
++		return B4000000;
+ 	default:
+ 		return B57600;
+ 	}
+ }
  
- extern int stlc2500_init(int fd, bdaddr_t *bdaddr);
+ static int set_speed(int fd, struct termios *ti, int speed)
+@@ -203,15 +213,25 @@
+ 	case 460800:
+ 		cmd[4] = 0x00;
+ 		break;
+ 	case 921600:
+ 		cmd[4] = 0x20;
+ 		break;
++	case 2000000:
++		cmd[4] = 0x25;
++		break;
++	case 3000000:
++		cmd[4] = 0x27;
++		break;
++	case 4000000:
++		cmd[4] = 0x2B;
++		break;
+ 	default:
+ 		cmd[4] = 0x03;
+ 		u->speed = 57600;
++		fprintf(stderr, "Invalid speed requested, using %d bps instead\n", u->speed);
+ 		break;
+ 	}
  
- static int stlc2500(int fd, struct uart_t *u, struct termios *ti)
- {
- 	bdaddr_t bdaddr;
--	char cmd[5];
- 	unsigned char resp[10];
- 	int n;
-+	int rvalue;
- 
--	/* STLC2500 Set Baud Rate stuff */
--	/* We should set the baud rate first, so the firmware download */
--	/* goes much faster */
--
--	/* STLC2500 Seems to support the Ericsson set baud rate stuff */
--	/* It should also support the ST Set Baud Rate command */
--	/* (as in st() function above, but those commands never succeed */
--	cmd[0] = HCI_COMMAND_PKT;
--	cmd[1] = 0x09;
--	cmd[2] = 0xfc;
--	cmd[3] = 0x01;
--
--	switch (u->speed) {
--	case 57600:
--		cmd[4] = 0x03;
--		break;
--	case 115200:
--		cmd[4] = 0x02;
--		break;
--	case 230400:
--		cmd[4] = 0x01;
--		break;
--	case 460800:
--		cmd[4] = 0x00;
--		break;
--	case 921600:
--		cmd[4] = 0x20;
--		break;
--	default:
--		cmd[4] = 0x02;
--		u->speed = 115200;
--		break;
--	}
--
--#ifdef STLC2500_DEBUG
--	fprintf(stderr, "Sending Baud Rate %02x\n", cmd[4]);
--#endif
--	/* Send initialization command */
--	if (write(fd, cmd, 5) != 5) {
--		perror("Failed to write init command");
--		return -1;
--	}
--
--	/* Need to wait here to give a chance for the device to set baud */
--	/* But no more than 0.5 seconds */
--	usleep(200000);
-+	/* STLC2500 has an ericsson core */
-+	rvalue = ericsson(fd, u, ti);
-+	if (rvalue != 0)
-+		return rvalue;
- 
- #ifdef STLC2500_DEBUG
- 	fprintf(stderr, "Setting speed\n");
- #endif
- 	if (set_speed(fd, ti, u->speed) < 0) {
- 		perror("Can't set baud rate");
+ 	/* Send initialization command */
+ 	if (write(fd, cmd, 5) != 5) {
+ 		perror("Failed to write init command");
 
 
---------------060508050000040701000808
+--------------090508020803010307030804
 Content-Type: text/x-vcard; charset=utf-8;
  name="fchevalier.vcf"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
  filename="fchevalier.vcf"
 
-YmVnaW46dmNhcmQNCmZuOkZhYmllbiBDSEVWQUxJRVINCm46Q0hFVkFMSUVSO0ZhYmllbg0K
-b3JnOlNJTElDT00NCmFkcjo7OzQgcnVlIGRlIEpvdWFuZXQ7IFJFTk5FUyBBVEFMQU5URTs7
-MzU3MDA7RlJBTkNFDQplbWFpbDtpbnRlcm5ldDpmY2hldmFsaWVyQHNpbGljb20uZnINCnRp
-dGxlOlNvZnR3YXJlICYgU3R1ZGllcyBFbmdpbmVlcg0KdGVsO3dvcms6KzMzICgwKSAyIDk5
-IDg0IDE3IDE3DQp2ZXJzaW9uOjIuMQ0KZW5kOnZjYXJkDQoNCg==
---------------060508050000040701000808--
+begin:vcard
+fn:Fabien CHEVALIER
+n:CHEVALIER;Fabien
+org:SILICOM
+adr:;;4 rue de Jouanet; RENNES ATALANTE;;35700;FRANCE
+email;internet:fchevalier@silicom.fr
+title:Software & Studies Engineer
+tel;work:+33 (0) 2 99 84 17 17
+version:2.1
+end:vcard
+
+
+--------------090508020803010307030804--
