@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <470A50E5.2090800@free.fr>
-Date: Mon, 08 Oct 2007 17:46:45 +0200
+Message-ID: <470A3A00.3000909@free.fr>
+Date: Mon, 08 Oct 2007 16:09:04 +0200
 From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] HFP design question : polls opened !
+References: <47092B7D.5000404@free.fr>	<d89ddf300710071722k2ac2074dqe0dfc16ac960f982@mail.gmail.com>	<4709E3EA.1010205@free.fr>
+	<2d5a2c100710080640m69180310r93e52f8dac91624a@mail.gmail.com>
+In-Reply-To: <2d5a2c100710080640m69180310r93e52f8dac91624a@mail.gmail.com>
+Subject: Re: [Bluez-devel] [PATCH] Alsa plugin fix
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,23 +22,18 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
-Dear Bluez friends,
+>> Btw, maybe we should put Audacious on the HOWTO/Audiodevices pages and
+>> recommand its usage instead of XMMS/BMP, which both seem to have been
+>> abandonned ?
+> 
+> It doen't hurt to leave xmms in there since it is just a few lines to
+> explain how to
+> enable its support, we just need to mark it as not recommended and include
+> Audacious as a recommended player along with gstreamer based ones.
 
-Looks like HFP work will finally get started, thanks to Frederic 
-Dalleau's initiative. :-)
-For my part i will switch to that one day or the other, however at
-the moment i am still working on some a2dp fixes and some other stuff, 
-but i will get there eventually.
+Hello Luiz,
 
-One of the painful issues with HFP is the AT commands parsing. I tend to
-be a lazy guy and not very interested in writing a parser (hey we are in 
-21th century now !! :-) )
-To ease the pain we could use the brand new GRegex tool, that brings the
-power of regular expressions to the glib world. That would meen however 
-that we would have to port it to eglib first.
-
-I don't know if this is a good idea or not, it's just an idea.
-What do you guys think about it?
+I 100% agree with you. :-)
 
 Cheers,
 
