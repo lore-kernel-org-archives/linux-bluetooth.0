@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <470A50E5.2090800@free.fr>
-References: <470A50E5.2090800@free.fr>
-Date: Mon, 08 Oct 2007 18:50:20 +0200
-Message-Id: <1191862220.12212.3.camel@aeonflux.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] HFP design question : polls opened !
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <003901c809c4$9acb3db0$0200a8c0@jester>
+From: "Olivier Le Pogam" <olepogam@free.fr>
+To: <bluez-devel@lists.sourceforge.net>
+References: <46EFC921.30001@tfh-berlin.de>
+Date: Mon, 8 Oct 2007 18:02:18 +0200
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] can't establish more than two rfcomm connections
+Reply-To: Olivier Le Pogam <olepogam@free.fr>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -20,30 +20,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
+Hi David,
 
-> Looks like HFP work will finally get started, thanks to Frederic 
-> Dalleau's initiative. :-)
-> For my part i will switch to that one day or the other, however at
-> the moment i am still working on some a2dp fixes and some other stuff, 
-> but i will get there eventually.
-> 
-> One of the painful issues with HFP is the AT commands parsing. I tend to
-> be a lazy guy and not very interested in writing a parser (hey we are in 
-> 21th century now !! :-) )
-> To ease the pain we could use the brand new GRegex tool, that brings the
-> power of regular expressions to the glib world. That would meen however 
-> that we would have to port it to eglib first.
+I think your problem is not BlueZ related.
+When your mobile tries to connect to the RFCOMM server, the mobile is in 
+master mode (initiating the connection), thus the bluetooth dongle is in 
+slave mode.
+When you try to connect a second mobile phone concurrently, it will be the 
+same but the bluetooth dongle can't have 2 slaves, it can be master with 7 
+devices and slave with 1.
+A solution would be a role-switching, i.e. once connected the mobile becomes 
+slave & the bluetooth dongle master, however, role-switching is usually not 
+implemented in mobile phones.
+Basically, you can consider have only one RFCOMM connection per dongle from 
+a mobile phone.
+BlueZ experts, don't hesitate to flame me if i'm wrong.
 
-it is okay to depend on GLib for certain things. Starting with 4.x we
-will make GLib mandatory and remove eglib. However for the AT command
-parsing, I might wanna have a self written parser. This way it is more
-portable.
-
-Regards
-
-Marcel
-
+Oli 
 
 
 -------------------------------------------------------------------------
