@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <b7f7accd0710082324v71ae3980g9728c91712c20fac@mail.gmail.com>
-Date: Tue, 9 Oct 2007 11:54:16 +0530
-From: "Yogesh Jagtap" <jagtapyb@gmail.com>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <mailman.6954.1191910942.26582.bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-References: <mailman.6954.1191910942.26582.bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Advantages of Bluez using DBus API over direct blueZ
-	calls
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <3fb4ac6c0710080418j3868f85k63e4b3d3671ae244@mail.gmail.com>
+References: <3fb4ac6c0710080418j3868f85k63e4b3d3671ae244@mail.gmail.com>
+Date: Mon, 08 Oct 2007 18:53:10 +0200
+Message-Id: <1191862390.12212.8.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] DBUS Bluez Api : send and recieve functionality
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,65 +16,41 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2115408676=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============2115408676==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_3662_30483527.1191911056490"
+Hi,
 
-------=_Part_3662_30483527.1191911056490
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> I tried programming a small server which will take                 
+> the text input and show it on the screen.It was a simple 
+> client server implementation over bluetooth using
+> rfcomm.Basic implementation being adding ,advertising 
+> a service and then on getting connected by client sending
+> the key inputs to the user screen.
+> 
+> I am now trying to do the same using dbus api in bluez.
+> 
+> Have gone through the documentation and found
+> some api for adding a service record and for
+> starting a service. But i could'nt find any info
+> on how the sending and receiving part of the data
+> is to be done .
 
-> Hello All,
->
-> Can any body give an me idea about advantages of using DBus API over
-> direct Bluez calls.
->
-> Regards
-> Yogesh
->
->
->
+sending of data should still be done through the socket interfaces.
 
-------=_Part_3662_30483527.1191911056490
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Regards
 
-<br><br><div><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;"><br><span class="gmail_quote"></span>Hello All,<br><br>Can any body give an me idea about advantages of using DBus API over direct Bluez calls.
-<br>
-<div><br>Regards<span><br>Yogesh<br>
-</span></div><br>
-<br></blockquote></div><br>
-<br>
-
-------=_Part_3662_30483527.1191911056490--
+Marcel
 
 
---===============2115408676==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============2115408676==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============2115408676==--
