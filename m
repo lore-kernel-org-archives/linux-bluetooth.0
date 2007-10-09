@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d89ddf300710091134xcc28f75g1df2ca0c214de402@mail.gmail.com>
-Date: Tue, 9 Oct 2007 12:34:29 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <470BB918.5010509@k-i-s.net>
+Message-ID: <470BB918.5010509@k-i-s.net>
+Date: Tue, 09 Oct 2007 19:23:36 +0200
+From: Balint Kis <balint@k-i-s.net>
 MIME-Version: 1.0
-References: <470BB918.5010509@k-i-s.net>
-Subject: Re: [Bluez-users] A2DP and HFP profiles for bluez
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] A2DP and HFP profiles for bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,18 +18,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hello Everybody,
+
+I am trying to implement a HFP and a A2DP profile on top of bluez. I did check out the bluez-utils/audio stuff, but I couldn't get it working, so I decided to write my own, and publish it for your review so that you can pull it into bluez if you like it.
+
+The HFP profile is ready, but I failed to get up the L2CAP Transport Layer so I cannot get any audio out of L2CAP socket. My setup is the following:
+
+Device: a2dp capable phone (SonyEricsson W850i and an MDA with windows mobile)
+PC: usb bluetooth dongle with latest bluez stack (kernel 2.6.20-2936.fc7xen)
+
+I implemented the L2CAP signaling layer, and the Device hooks up nicely with the PC and starts streaming the audio data. I can see the audio data with hcidump:
+
+> ACL data: handle 1 flags 0x02 dlen 665
+    L2CAP(d): cid 0x0041 len 661 [psm 25]
+      AVDTP(m): ver 2 cc 0 pt 1 seqn 726 time 9478796 ssrc 1
+
+But I don't know how to extract this data through the L2CAP socket which I opened for signaling. Is there some socket option that I need to set up in order to get the audio data? Or do I need to set up an other socket once the AVDTP state machine enters into OPEN state?
+
+Any help is appreciated!
+
+Many thanks in advance
 Balint
 
-> I am trying to implement a HFP and a A2DP profile on top of bluez. I did check out the bluez-utils/audio stuff, but I couldn't get it working, so I decided to write my own, and publish it for your review so that you can pull it into bluez if you like it.
 
-It would take some digging to figure out what your code is doing. If
-you help us improve the documentation or the setup or whatever so the
-audio driver in bluez-utils works for you, that would be the most
-productive approach.
-
-Use bluez-devel to reach more developers.
-
-Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
