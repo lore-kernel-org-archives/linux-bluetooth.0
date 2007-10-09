@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <60E2CE9DAF064501A26FC14E3A38A8AC@iMe>
-From: "Eng. Waleed S. Al-Rashoud" <iwaleed@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Date: Tue, 9 Oct 2007 13:54:55 +0300
+Date: Tue, 9 Oct 2007 10:24:41 +0100 (BST)
+From: "Azhar Mr." <shaik.azharuddin@yahoo.co.in>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] How many Read_Remote_Bluetooth_name at the same time?
+Message-ID: <967075.4465.qm@web7612.mail.in.yahoo.com>
+Subject: [Bluez-users] Reg - Birger Kroon
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,55 +14,50 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0957117342=="
+Content-Type: multipart/mixed; boundary="===============0673936178=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+--===============0673936178==
+Content-Type: multipart/alternative; boundary="0-685839599-1191921881=:4465"
+Content-Transfer-Encoding: 8bit
 
---===============0957117342==
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0015_01C80A7B.F95547B0"
+--0-685839599-1191921881=:4465
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-This is a multi-part message in MIME format.
+Hello,
+   
+   I am Azharuddin from India. I require the email id of Mr. Birger Kroon to clarify my doubts about GPIO pins for the completion of my project.
+   
+  Any body Please help me in providing me his contact information
+   
+  Thanking you
+   
+  Azharuddin
+  R&D Engineer
+  X_Design Ventures Pvt. Ltd.
+  Hyderabad
+  India
+   
+  email: shaik.azharuddin@yahoo.co.in
+  Phone: 91-9866875569
 
-------=_NextPart_000_0015_01C80A7B.F95547B0
-Content-Type: text/plain;
-	charset="windows-1256"
-Content-Transfer-Encoding: quoted-printable
+       
+---------------------------------
+ Save all your chat conversations. Find them online.
+--0-685839599-1191921881=:4465
+Content-Type: text/html; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 
-Dear all,
-If I'm gonna search for devices without their names, then request the =
-remote name for each device.. what is the maximum number of concurrent =
-Read_remote_bluetooth_name requests I can handle?
-thanks..
-------=_NextPart_000_0015_01C80A7B.F95547B0
-Content-Type: text/html;
-	charset="windows-1256"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Dwindows-1256">
-<META content=3D"MSHTML 6.00.6000.16527" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Dear all,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>If I'm gonna search for devices without =
-their=20
-names, then request the remote name for each device.. what is the =
-maximum number=20
-of concurrent Read_remote_bluetooth_name requests I can =
-handle?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>thanks..</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0015_01C80A7B.F95547B0--
+<DIV>Hello,</DIV>  <DIV>&nbsp;</DIV>  <DIV>&nbsp;I am Azharuddin from India. I require the email id of Mr. Birger Kroon to clarify my doubts about GPIO pins for the completion of my project.</DIV>  <DIV>&nbsp;</DIV>  <DIV>Any body Please help me in providing me his contact information</DIV>  <DIV>&nbsp;</DIV>  <DIV>Thanking you</DIV>  <DIV>&nbsp;</DIV>  <DIV>Azharuddin</DIV>  <DIV>R&amp;D Engineer</DIV>  <DIV>X_Design Ventures Pvt. Ltd.</DIV>  <DIV>Hyderabad</DIV>  <DIV>India</DIV>  <DIV>&nbsp;</DIV>  <DIV>email: <A href="http://in.f76.mail.yahoo.com/ym/Compose?To=shaik.azharuddin@yahoo.co.in" target=_blank rel=nofollow ymailto="mailto:shaik.azharuddin@yahoo.co.in"><FONT color=#003399>shaik.azharuddin@yahoo.co.in</FONT></A></DIV>  <DIV>Phone: 91-9866875569</DIV><p>&#32;
 
 
+      <!--3--><hr size=1></hr> Save all your chat conversations. <a href="http://in.rd.yahoo.com/tagline_webmessenger_3/*http://in.messenger.yahoo.com/webmessengerpromo.php">Find them online.</a>
+--0-685839599-1191921881=:4465--
 
---===============0957117342==
+
+--===============0673936178==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -73,7 +68,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============0957117342==
+--===============0673936178==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -84,4 +79,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0957117342==--
+--===============0673936178==--
