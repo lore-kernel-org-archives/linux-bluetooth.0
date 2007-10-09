@@ -1,10 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 9 Oct 2007 10:24:41 +0100 (BST)
-From: "Azhar Mr." <shaik.azharuddin@yahoo.co.in>
+Message-ID: <b7f7accd0710082324v71ae3980g9728c91712c20fac@mail.gmail.com>
+Date: Tue, 9 Oct 2007 11:54:16 +0530
+From: "Yogesh Jagtap" <jagtapyb@gmail.com>
 To: bluez-users@lists.sourceforge.net
+In-Reply-To: <mailman.6954.1191910942.26582.bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Message-ID: <967075.4465.qm@web7612.mail.in.yahoo.com>
-Subject: [Bluez-users] Reg - Birger Kroon
+References: <mailman.6954.1191910942.26582.bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Advantages of Bluez using DBus API over direct blueZ
+	calls
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,50 +17,46 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0673936178=="
+Content-Type: multipart/mixed; boundary="===============2115408676=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0673936178==
-Content-Type: multipart/alternative; boundary="0-685839599-1191921881=:4465"
-Content-Transfer-Encoding: 8bit
+--===============2115408676==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_3662_30483527.1191911056490"
 
---0-685839599-1191921881=:4465
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+------=_Part_3662_30483527.1191911056490
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Hello,
-   
-   I am Azharuddin from India. I require the email id of Mr. Birger Kroon to clarify my doubts about GPIO pins for the completion of my project.
-   
-  Any body Please help me in providing me his contact information
-   
-  Thanking you
-   
-  Azharuddin
-  R&D Engineer
-  X_Design Ventures Pvt. Ltd.
-  Hyderabad
-  India
-   
-  email: shaik.azharuddin@yahoo.co.in
-  Phone: 91-9866875569
+> Hello All,
+>
+> Can any body give an me idea about advantages of using DBus API over
+> direct Bluez calls.
+>
+> Regards
+> Yogesh
+>
+>
+>
 
-       
----------------------------------
- Save all your chat conversations. Find them online.
---0-685839599-1191921881=:4465
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+------=_Part_3662_30483527.1191911056490
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-<DIV>Hello,</DIV>  <DIV>&nbsp;</DIV>  <DIV>&nbsp;I am Azharuddin from India. I require the email id of Mr. Birger Kroon to clarify my doubts about GPIO pins for the completion of my project.</DIV>  <DIV>&nbsp;</DIV>  <DIV>Any body Please help me in providing me his contact information</DIV>  <DIV>&nbsp;</DIV>  <DIV>Thanking you</DIV>  <DIV>&nbsp;</DIV>  <DIV>Azharuddin</DIV>  <DIV>R&amp;D Engineer</DIV>  <DIV>X_Design Ventures Pvt. Ltd.</DIV>  <DIV>Hyderabad</DIV>  <DIV>India</DIV>  <DIV>&nbsp;</DIV>  <DIV>email: <A href="http://in.f76.mail.yahoo.com/ym/Compose?To=shaik.azharuddin@yahoo.co.in" target=_blank rel=nofollow ymailto="mailto:shaik.azharuddin@yahoo.co.in"><FONT color=#003399>shaik.azharuddin@yahoo.co.in</FONT></A></DIV>  <DIV>Phone: 91-9866875569</DIV><p>&#32;
+<br><br><div><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;"><br><span class="gmail_quote"></span>Hello All,<br><br>Can any body give an me idea about advantages of using DBus API over direct Bluez calls.
+<br>
+<div><br>Regards<span><br>Yogesh<br>
+</span></div><br>
+<br></blockquote></div><br>
+<br>
 
-
-      <!--3--><hr size=1></hr> Save all your chat conversations. <a href="http://in.rd.yahoo.com/tagline_webmessenger_3/*http://in.messenger.yahoo.com/webmessengerpromo.php">Find them online.</a>
---0-685839599-1191921881=:4465--
+------=_Part_3662_30483527.1191911056490--
 
 
---===============0673936178==
+--===============2115408676==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -68,7 +67,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============0673936178==
+--===============2115408676==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -79,4 +78,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0673936178==--
+--===============2115408676==--
