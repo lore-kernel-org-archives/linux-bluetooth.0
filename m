@@ -1,37 +1,57 @@
-Return-Path: <fabchevalier@free.fr>
-Message-ID: <470B4D3D.4080507@free.fr>
-Date: Tue, 09 Oct 2007 11:43:25 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Frederic Dalleau <frederic.dalleau@access-company.com>,
-        frederic.danis@access-company.com
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <470B3979.4080301@free.fr>
+References: <470A50E5.2090800@free.fr>
+	<1191862220.12212.3.camel@aeonflux.holtmann.net>
+	<470B3979.4080301@free.fr>
+Date: Tue, 09 Oct 2007 10:45:24 +0200
+Message-Id: <1191919524.31341.11.camel@aeonflux.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] HFP design question : polls opened !
-References: <470A50E5.2090800@free.fr>	<1191862220.12212.3.camel@aeonflux.holtmann.net>	<470B3979.4080301@free.fr> <1191919524.31341.11.camel@aeonflux.holtmann.net>
-In-Reply-To: <1191919524.31341.11.camel@aeonflux.holtmann.net>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-List-ID: <bluez-devel.lists.sourceforge.net>
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel, Frederic x2 & all
+Hi Fabien,
 
->> Marcel, there is no portability issue with GRegex : it is completely 
->> self contained (no external deps added). ;-)
+> >> To ease the pain we could use the brand new GRegex tool, that brings the
+> >> power of regular expressions to the glib world. That would meen however 
+> >> that we would have to port it to eglib first.
+> > 
+> > it is okay to depend on GLib for certain things. Starting with 4.x we
+> > will make GLib mandatory and remove eglib. However for the AT command
+> > parsing, I might wanna have a self written parser. This way it is more
+> > portable.
 > 
-> as I said, for BlueZ 4.x, no problem. Before that we have to see. Show
-> me example code for an AT parser. I purely will judge based on its
-> complexity.
-> 
+> Marcel, there is no portability issue with GRegex : it is completely 
+> self contained (no external deps added). ;-)
 
-That's a good way to judge indeed, however no way i spend 2 days writing 
-  an AT parser by hand just for you to have a 2 minutes looks at it ;-)
+as I said, for BlueZ 4.x, no problem. Before that we have to see. Show
+me example code for an AT parser. I purely will judge based on its
+complexity.
 
-However Access guys have already written a parser,
-maybe either of our Frederic's can share with us their HFP parsing code,
-to see how it looks like ?
+Regards
 
-FD and FD, what do you think ?
+Marcel
 
-Cheers,
 
-Fabien
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >> http://get.splunk.com/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
