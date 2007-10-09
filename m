@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <470B361D.5040707@free.fr>
-Date: Tue, 09 Oct 2007 10:04:45 +0200
+Message-ID: <470B35AA.2070002@free.fr>
+Date: Tue, 09 Oct 2007 10:02:50 +0200
 From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <47092B7D.5000404@free.fr>	<d89ddf300710071722k2ac2074dqe0dfc16ac960f982@mail.gmail.com>	<4709E3EA.1010205@free.fr>	<2d5a2c100710080640m69180310r93e52f8dac91624a@mail.gmail.com>	<470A3A00.3000909@free.fr>
-	<1191862431.12212.10.camel@aeonflux.holtmann.net>
-In-Reply-To: <1191862431.12212.10.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] [PATCH] Alsa plugin fix
+References: <470A39B1.5020405@free.fr>
+	<1191862275.12212.5.camel@aeonflux.holtmann.net>
+In-Reply-To: <1191862275.12212.5.camel@aeonflux.holtmann.net>
+Cc: Johan Hedberg <johan.hedberg@nokia.com>,
+        Brad Midgley <bmidgley@xmission.com>
+Subject: Re: [Bluez-devel] [PATCH] a2dp cross connect issues
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,17 +23,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
-
+Marcel Holtmann wrote:
 > Hi Fabien,
 > 
->> I 100% agree with you. :-)
+>> Here is finally the patch that fixes the a2dp cross connect issues.
 > 
-> you know that you can edit the wiki by yourself ;)
+> looks good to me. Convince Johan to agree and make him commit it.
 > 
 
-Sure, just wanted to make sure you guys would agree before to make the 
-changes :-)
+Good!
+I will do :-)
 
 Cheers,
 
