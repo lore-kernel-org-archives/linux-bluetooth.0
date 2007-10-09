@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <470B3979.4080301@free.fr>
-Date: Tue, 09 Oct 2007 10:19:05 +0200
+Message-ID: <470B361D.5040707@free.fr>
+Date: Tue, 09 Oct 2007 10:04:45 +0200
 From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <470A50E5.2090800@free.fr>
-	<1191862220.12212.3.camel@aeonflux.holtmann.net>
-In-Reply-To: <1191862220.12212.3.camel@aeonflux.holtmann.net>
-Subject: Re: [Bluez-devel] HFP design question : polls opened !
+References: <47092B7D.5000404@free.fr>	<d89ddf300710071722k2ac2074dqe0dfc16ac960f982@mail.gmail.com>	<4709E3EA.1010205@free.fr>	<2d5a2c100710080640m69180310r93e52f8dac91624a@mail.gmail.com>	<470A3A00.3000909@free.fr>
+	<1191862431.12212.10.camel@aeonflux.holtmann.net>
+In-Reply-To: <1191862431.12212.10.camel@aeonflux.holtmann.net>
+Subject: Re: [Bluez-devel] [PATCH] Alsa plugin fix
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,24 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi All,
+Hi Marcel,
 
->> To ease the pain we could use the brand new GRegex tool, that brings the
->> power of regular expressions to the glib world. That would meen however 
->> that we would have to port it to eglib first.
+> Hi Fabien,
 > 
-> it is okay to depend on GLib for certain things. Starting with 4.x we
-> will make GLib mandatory and remove eglib. However for the AT command
-> parsing, I might wanna have a self written parser. This way it is more
-> portable.
+>> I 100% agree with you. :-)
+> 
+> you know that you can edit the wiki by yourself ;)
+> 
 
-Marcel, there is no portability issue with GRegex : it is completely 
-self contained (no external deps added). ;-)
+Sure, just wanted to make sure you guys would agree before to make the 
+changes :-)
 
 Cheers,
 
 Fabien
-
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
