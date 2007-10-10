@@ -1,16 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Matthias Becker <matthias.becker@beyondsoft.de>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20071001154023.53e57c49@localhost.localdomain>
-References: <2EB6297382462046A9427D7324788A480217D35A@MCLNEXVS06.resource.ds.bah.com>
-	<8de6c3e20708231340j439ca230i487e816693149441@mail.gmail.com>
-	<1187964393.5121.10.camel@matthias.BEYONDSOFT.local>
-	<Pine.LNX.4.63.0708241410030.12067@redbean.intranet.gw-instruments.de>
-	<20071001154023.53e57c49@localhost.localdomain>
-Date: Thu, 11 Oct 2007 13:10:25 +0200
-Message-Id: <1192101025.8393.4.camel@matthias.BEYONDSOFT.local>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH]Re:  multithreaded name resolution
+Message-ID: <d89ddf300710101000o1b8e386dr48cf69ce5b2b20d9@mail.gmail.com>
+Date: Wed, 10 Oct 2007 11:00:01 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <470D04C7.8040707@free.fr>
+MIME-Version: 1.0
+References: <470D04C7.8040707@free.fr>
+Subject: Re: [Bluez-devel] Updated SCO flow control patch: 2.6.23
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,41 +20,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-> > > I tried to read the name of different devices parallel using multi
-> > > threading, but without success. If there is one bluetooth device I works
-> > > (as there is no real multi threading). If there are who devices, the
-> > > same name is reported for both devices. In another test with 6 devices
-> > > hci_read_remote_name returned something <0 so I did not get any name at
-> > > all.
-> > 
-> > this won't work. Asking for the name of a device is some sort of 
-> > connection setup, and most (all ?) Bt chips do not allow / can not handle 
-> > parallel connection setups (even though parallel connections are 
-> > possible). 
-> > 
-> > So don't try further, the problem is outside your code (and even BlueZ). 
-> > 
-> 
-> That's not true, the reported behavior is produced by bluez-libs. I already
-> sent a patch to fix it and will attach that patch again to this mail.
-> 
-> Please let me know if that Patch fixes your problem Matthias.
-> 
-> Greetings
-> 
-> Andy
-> 
-> See also:
-> http://thread.gmane.org/gmane.linux.bluez.devel/12491
+Fabien
 
-Sorry for the delay. I tried your patch and in my tests it works
-perfectly with up to three parallel name requests using this bluetooth
-adapter: http://www.trust.com/products/default.aspx?item=14693
+Good--thanks for testing it. I guess we should start naming these
+after the kernel they match up with.
 
-Thanks
+Brad
 
--- Matthias Becker
-
+On 10/10/07, Fabien Chevalier <fabchevalier@free.fr> wrote:
+> Brad & All,
+>
+> I've tested the sco-flowcontrol-v4.3.diff patch.
+> It works perfectly fine when applied on 2.6.23-rc9, i guess 2.6.23 will
+> work too. :-)
+>
+> As for sco-flowcontrol-v4.4.diff, which is against 2.6.22-mh3, i didn't
+> manage to test it due to broken sco behaviour. :-(
+>
+> Cheers,
+>
+> Fabien
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc.
+> Still grepping through log files to find problems?  Stop.
+> Now Search log events and configuration files using AJAX and a browser.
+> Download your FREE copy of Splunk now >> http://get.splunk.com/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
