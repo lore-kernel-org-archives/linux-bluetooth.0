@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 12 Oct 2007 01:08:51 +0200
-From: Radek (Fotopiper) <fotopiper@o2.pl>
-To: bluez-devel@lists.sf.net
-Message-ID: <20071012010851.1a1ffc7e@darkstar.example.net>
-In-Reply-To: <20071011143418.65350112@darkstar.example.net>
-References: <20071011143418.65350112@darkstar.example.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <d89ddf300710111011j5c36df76ga1844b56ff3e1f0b@mail.gmail.com>
+References: <d89ddf300710110913x709d8010u9eb6f4d70c7fe47c@mail.gmail.com>
+	<1192120314.6537.43.camel@aeonflux.holtmann.net>
+	<d89ddf300710110948y2a1b097p823f38a1099c7154@mail.gmail.com>
+	<1192121581.6537.45.camel@aeonflux.holtmann.net>
+	<d89ddf300710111011j5c36df76ga1844b56ff3e1f0b@mail.gmail.com>
+Date: Thu, 11 Oct 2007 19:31:53 +0200
+Message-Id: <1192123913.6537.48.camel@aeonflux.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] RFCOMM - serial line looped back.
+Subject: Re: [Bluez-devel] sbc analysis code
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,30 +24,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, 11 Oct 2007 14:34:18 +0200
-Radek (Fotopiper) <fotopiper@o2.pl> wrote:
+Hi Brad,
 
-> Hello,
-> I'm getting a "Serial line is looped back." from pppd when I try to connect to
-> the net threw my GSM phone.
-> pppd 2.4.4
-> kernel 2.6.22.8 (22.2 & 22.9 give the same results)
-> Bluez 3.20 (libs&utils)
-> Slacware 12
+> > > it is currently in its own autoconf harness but I would just use the one c file.
+> >
+> > fix the coding style and send me a version that I can include. I will
+> > take care of the aufoconf/automake magic. Don't mess around with it.
 > 
-> PPPD debug fallows "serial line looped back" and (at the end of mail) "LCP
-> terminated by peer (peer refused to authenticate)".
-> 
-> Any suggestions what I am doing wrong?
+> hmm... indent likes to break lines. Let me know if the loops are
+> nested too deeply.
 
-Well I found a remedy, maybe someone else will benefit..
-The serial line looped back if there was a problem connecting the ISP.. but the
-main problem was the noauth option in pppd, as my ISP changed they configuration:
-rcvd [LCP ConfReq id=0x1 <asyncmap 0xa0000> <auth pap>]
-this line says that the peer (ISP) needs to authenticate (if anybody else
-starts to look for a solution for a similar problem)..
+I think your question already gives you my answer, but let me make it
+clear, I don't wanna have too deeply nested loops. Use break and
+continue or put it into separate functions.
 
-Best regards to ALL, and sorry for the trouble
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
