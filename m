@@ -1,10 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sat, 13 Oct 2007 16:40:03 +0100 (BST)
-From: Ray <whatdoineed2do@yahoo.co.uk>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <d89ddf300710121153j35e53a43h89671519932dc1f0@mail.gmail.com>
+Date: Fri, 12 Oct 2007 12:53:23 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1192212057.3919.1.camel@91-64-236-249-dynip>
 MIME-Version: 1.0
-Message-ID: <323835.55544.qm@web23315.mail.ird.yahoo.com>
-Subject: [Bluez-users] laptop undiscoverable but iscan enabled?
+References: <1192124959.3808.11.camel@91-64-236-100-dynip>
+	<d89ddf300710111324i5e131754o16ef37882e93f75@mail.gmail.com>
+	<1192212057.3919.1.camel@91-64-236-249-dynip>
+Subject: Re: [Bluez-users] integrated blutooth on laptop doesn't work
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,47 +22,54 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hi,
+Sebastian
 
-am running linux 2.6.21 with bluez libs/utils 2.20 and
-am having problems getting my sony ericsson phone (or
-anything for that matter) discover my linux box.
+I haven't heard how to activate the adapter on an f5v, sorry. Check
+the mailing list archives, suse forums, and google for it.
 
-bluetooth is working to some extent on the linux box:
-i am able to obexftp to my devices, just that when i
-try to get my devices to discover my laptop nothing is
-found.  when i reboot my laptop into windows, the my
-devices can discover the laptop.
+I have heard that on at least one model of laptop, one could boot
+windows, enable the adapter, then softboot into linux. That would at
+least tell you it was working even if it was an ugly workaround.
 
-iscan and pscan is enabled on the device (see below)
+Brad
 
-can anyone tell me where i might be going wrong?
-thanks
--ray
-
-hci0:	Type: USB
-	BD Address: 00:xx:xx:xx:xx:xx ACL MTU: 192:8 SCO MTU:
-64:8
-	UP RUNNING PSCAN ISCAN 
-	RX bytes:11020 acl:47 sco:0 events:186 errors:0
-	TX bytes:2408 acl:36 sco:0 commands:97 errors:0
-	Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-	Link policy: RSWITCH HOLD SNIFF PARK 
-	Link mode: SLAVE ACCEPT 
-	Name: 'BlueZ (0)'
-	Class: 0x00010c
-	Service Classes: Unspecified
-	Device Class: Computer, Laptop
-	HCI Ver: 1.1 (0x1) HCI Rev: 0x20d LMP Ver: 1.1 (0x1)
-LMP Subver: 0x20d
-	Manufacturer: Cambridge Silicon Radio (10)
-
-
-
-      ___________________________________________________________ 
-Want ideas for reducing your carbon footprint? Visit Yahoo! For Good  http://uk.promotions.yahoo.com/forgood/environment.html
-
+On 10/12/07, Sebastian Alff <Sebastian-Alff@gmx.de> wrote:
+> Brad
+>
+> It's an Asus F5V laptop. Can you give me an advice, what I should do?
+>
+> Sebastian
+>
+> Am Donnerstag, den 11.10.2007, 14:24 -0600 schrieb Brad Midgley:
+> > Sebastian
+> >
+> > If hciconfig shows nothing, then you might need some acpi etc magic to
+> > get the adapter to connect to usb. How you do it depends on which
+> > laptop model you have. It's typically a special app outside of bluez.
+> >
+> > Brad
+> >
+> > -------------------------------------------------------------------------
+> > This SF.net email is sponsored by: Splunk Inc.
+> > Still grepping through log files to find problems?  Stop.
+> > Now Search log events and configuration files using AJAX and a browser.
+> > Download your FREE copy of Splunk now >> http://get.splunk.com/
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc.
+> Still grepping through log files to find problems?  Stop.
+> Now Search log events and configuration files using AJAX and a browser.
+> Download your FREE copy of Splunk now >> http://get.splunk.com/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
