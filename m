@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4712383C.9030200@free.fr>
-Date: Sun, 14 Oct 2007 17:39:40 +0200
+Message-ID: <4711FB4D.2010609@free.fr>
+Date: Sun, 14 Oct 2007 13:19:41 +0200
 From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
-To: Brad Midgley <bmidgley@xmission.com>,
-        Johan Hedberg <johan.hedberg@nokia.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Type: multipart/mixed; boundary="------------020100060308090409030307"
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] [PATCH] Small headset.c fixes
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <000001c80cca$eff9ed00$c72915ac@NOE.Nokia.com>
+In-Reply-To: <000001c80cca$eff9ed00$c72915ac@NOE.Nokia.com>
+Subject: Re: [Bluez-devel] PATCH1/2: bluez-utils -
+	fix-a2dp-buffer-constraints
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,104 +17,107 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------020100060308090409030307
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Hello Kai,
 
-Hi All,
+Please find a few comments below
 
-Please find attached a rather small patch, that fixes some small issues 
-i found while reading headset.c code:
-  * make String representation of state consistent with the state name
-  * send Stop() signal only if we transition from playing state, not 
-playin_in_progress
-  * remove unused io_id field.
+> Hello,
+> 
+> I've been having some problems in using the Bluez ALSA/A2DP plugin
+> with applications that use the ALSA API in event driven fashion (so
+> 'write samples at last possible moment' instead of 'write samples when 
+> there is free room in the buffer'). One test application I've used is
+> Pulseaudio. 
+> 
+> Here're couple of patches (against CVS HEAD) that solve the 
+> problems for me (for instance pulseaudio starts working with
+> the plugin, less CPU usage with other apps).
+
+Could you provide some details on the problems you experienced, as well 
+the hardware platform you experienced them on ?
+
+> diff -ruN bluez-utils.orig/audio/pcm_bluetooth.c bluez-utils/audio/pcm_bluetooth.c
+> --- bluez-utils.orig/audio/pcm_bluetooth.c	2007-10-12 12:57:28.000000000 +0300
+> +++ bluez-utils/audio/pcm_bluetooth.c	2007-10-12 15:04:49.000000000 +0300
+> @@ -45,7 +45,8 @@
+>  
+>  #define MIN_PERIOD_TIME 1
+>  
+> -#define BUFFER_SIZE 2048
+> +#define MIN_BUFFER_SIZE 256    /* minimum size of buffer */
+> +#define MAX_BUFFER_SIZE 16384  /* allocated RAM for buffer */
+>  
+>  #ifdef ENABLE_DEBUG
+>  #define DBG(fmt, arg...)  printf("DEBUG: %s: " fmt "\n" , __FUNCTION__ , ## arg)
+> @@ -123,7 +124,7 @@
+>  	sbc_t sbc;			/* Codec data */
+>  	int codesize;			/* SBC codesize */
+>  	int samples;			/* Number of encoded samples */
+> -	uint8_t buffer[BUFFER_SIZE];	/* Codec transfer buffer */
+> +	uint8_t buffer[MAX_BUFFER_SIZE];/* Codec transfer buffer */
+>  	int count;			/* Codec transfer buffer counter */
+>  
+>  	int nsamples;			/* Cumulative number of codec samples */
+> @@ -137,7 +138,7 @@
+>  	struct ipc_data_cfg cfg;	/* Bluetooth device config */
+>  	struct pollfd stream;		/* Audio stream filedescriptor */
+>  	struct pollfd server;		/* Audio daemon filedescriptor */
+> -	uint8_t buffer[BUFFER_SIZE];	/* Encoded transfer buffer */
+> +	uint8_t buffer[MAX_BUFFER_SIZE];/* Encoded transfer buffer */
+>  	int count;			/* Transfer buffer counter */
+>  	struct bluetooth_a2dp a2dp;	/* A2DP data */
+>  
+> @@ -932,14 +933,24 @@
+>  	if (err < 0)
+>  		return err;
+>  
+> -	/* supported block size */
+> +	/* supported block sizes:
+> +	 *   - lower limit is A2DP codec size
+> +	 *   - total buffer size is the upper limit (with two periods) */
+>  	err = snd_pcm_ioplug_set_param_minmax(io, SND_PCM_IOPLUG_HW_PERIOD_BYTES,
+> -						a2dp->codesize, a2dp->codesize);
+> +					      a2dp->codesize, MAX_BUFFER_SIZE / 2);
+> +	if (err < 0)
+> +		return err;
+> +
+> +	/* supported buffer sizes */
+> +	err = snd_pcm_ioplug_set_param_minmax(io, SND_PCM_IOPLUG_HW_BUFFER_BYTES,
+> +					      MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
+>  	if (err < 0)
+>  		return err;
+
+This part of the code is useless, you don't need to set 
+SND_PCM_IOPLUG_HW_BUFFER_BYTES if you set SND_PCM_IOPLUG_HW_PERIODS, you 
+just have to choose one of the two alternatives :-)
+
+>  
+> +	/* supported period count: 
+> +	 *   - derived from max buffer size and minimum period size */
+>  	err = snd_pcm_ioplug_set_param_minmax(io, SND_PCM_IOPLUG_HW_PERIODS,
+> -									2, 50);
+> +					      2, MAX_BUFFER_SIZE / a2dp->codesize);
+>  	if (err < 0)
+>  		return err;
+>  
+> 
+
+Apart from that i'd say this is a foot step in the right direction :-)
 
 Cheers,
 
 Fabien
-
-
---------------020100060308090409030307
-Content-Type: text/x-patch;
- name="headset.patch"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline;
- filename="headset.patch"
-
-Index: headset.c
-===================================================================
---- headset.c	(révision 120)
-+++ headset.c	(copie de travail)
-@@ -63,14 +63,18 @@
- #define HEADSET_GAIN_SPEAKER 'S'
- #define HEADSET_GAIN_MICROPHONE 'M'
- 
--static char *str_state[] = {"DISCONNECTED", "CONNECTING", "CONNECTED",
--				"STREAM_STARTING", "STREAMING"};
-+static char *str_state[] = {
-+	"HEADSET_STATE_DISCONNECTED", 
-+	"HEADSET_STATE_CONNECT_IN_PROGRESS",
-+	"HEADSET_STATE_CONNECTED",
-+	"HEADSET_STATE_PLAY_IN_PROGRESS",
-+	"HEADSET_STATE_PLAYING",
-+	};
- 
- struct pending_connect {
- 	DBusMessage *msg;
- 	DBusPendingCall *call;
- 	GIOChannel *io;
--	guint io_id;
- 	int sock;
- 	int err;
- 	unsigned int id;
-@@ -489,9 +493,9 @@
- 			return -err;
- 		}
- 
--		c->io_id = g_io_add_watch(c->io,
--					G_IO_OUT | G_IO_NVAL | G_IO_ERR | G_IO_HUP,
--					(GIOFunc) sco_connect_cb, device);
-+		g_io_add_watch(c->io,
-+				G_IO_OUT | G_IO_NVAL | G_IO_ERR | G_IO_HUP,
-+				(GIOFunc) sco_connect_cb, device);
- 	} else
- 		do_callback = TRUE;
- 
-@@ -1553,7 +1557,7 @@
- 						AUDIO_HEADSET_INTERFACE,
- 						"Connected",
- 						DBUS_TYPE_INVALID);
--		} else {
-+		} else if (hs->state == HEADSET_STATE_PLAYING) {
- 			close_sco(dev);
- 			dbus_connection_emit_signal(dev->conn, dev->path,
- 						AUDIO_HEADSET_INTERFACE,
-
---------------020100060308090409030307
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---------------020100060308090409030307
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---------------020100060308090409030307--
