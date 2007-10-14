@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <2d5a2c100710132036l86d5162gda0aa40a9a8a9d4b@mail.gmail.com>
-Date: Sun, 14 Oct 2007 00:36:19 -0300
+Message-ID: <2d5a2c100710132021o60ae76auf64c6cb5cfe702db@mail.gmail.com>
+Date: Sun, 14 Oct 2007 00:21:06 -0300
 From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000001c80cca$eff9ed00$c72915ac@NOE.Nokia.com>
+In-Reply-To: <000401c80ccb$a7cb44b0$c72915ac@NOE.Nokia.com>
 MIME-Version: 1.0
-References: <000001c80cca$eff9ed00$c72915ac@NOE.Nokia.com>
-Subject: Re: [Bluez-devel] PATCH1/2: bluez-utils -
-	fix-a2dp-buffer-constraints
+References: <000401c80ccb$a7cb44b0$c72915ac@NOE.Nokia.com>
+Subject: Re: [Bluez-devel] PATCH2/2: bluez-utils - avoid-unnecessary-polls
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,16 +23,21 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 Hi Kai,
 
 On 10/12/07, Kai Vehmanen <kai.vehmanen@nokia.com> wrote:
-> This first modifies the buffering constraints as exposed by
-> the A2DP ALSA plugin:
->   - increased max overall buffer size to 16384 bytes (~93msecs
->     of CD quality audio, so a reasonable max size)
->   - allow applications to specify buffer size
->   - allow applications to use bigger periods (less wakeup
->     load -> the previous limit of 128 is heavy for apps)
+> Hello again,
+>
+> here's the second patch to ALSA A2DP plugin in bluez-utils
+> (see my previous mail).
+>
+> This patch changes the worker thread poll timeout to be
+> calculated according to application chosen period size.
+> This allows to decrease the CPU load significantly for those
+> applications that do not require an ultra small period
+> size. Without the patch (poll timeout of 1msec), the system
+> call load is pretty heavy...
 
-All seems to be good improvements, perhaps brad can comment
-about it because he was working with pulse before.
+This was done before but I guess for some reason I don't remember
+now we remove it in favor of fixed timeout. Thought we should
+reconsider it if it has a good impact on CPU load.
 
 -- =
 
