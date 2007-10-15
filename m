@@ -1,13 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: "Kai Vehmanen" <kai.vehmanen@nokia.com>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-References: <000001c80cca$eff9ed00$c72915ac@NOE.Nokia.com>
-	<4711FB4D.2010609@free.fr>
-Date: Mon, 15 Oct 2007 13:54:13 +0300
-Message-ID: <000601c80f19$b92b2270$0f9db70a@NOE.Nokia.com>
+Message-ID: <471331EC.8050204@free.fr>
+Date: Mon, 15 Oct 2007 11:25:00 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
-In-Reply-To: <4711FB4D.2010609@free.fr>
-Subject: Re: [Bluez-devel] PATCH1/2: bluez-utils -fix-a2dp-buffer-constraints
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <4712383C.9030200@free.fr>
+	<2d5a2c100710141848s5cc34c5bn71c077673114e924@mail.gmail.com>
+In-Reply-To: <2d5a2c100710141848s5cc34c5bn71c077673114e924@mail.gmail.com>
+Content-Type: multipart/mixed; boundary="------------090706050206090404050300"
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>,
+        Johan Hedberg <johan.hedberg@nokia.com>,
+        Brad Midgley <bmidgley@xmission.com>
+Subject: Re: [Bluez-devel] [PATCH] Small headset.c fixes
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,68 +21,118 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+This is a multi-part message in MIME format.
+--------------090706050206090404050300
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 14 Oct 2007,  Fabien Chevalier wrote:
->Could you provide some details on the problems you 
->experienced, as well the hardware platform you experienced them on ?
+Hi Luiz,
+> Thought we should not emit Stopped signal please maintain the code
+> for sco cleanup (close_sco), sco connection may fail or disconnected
+> before we got a chance to change the state to playing.
 
-I've been testing with a low spec GNU/Debian desktop, and the problem has 
-been too high CPU load leading to a continuous stream of XRUNs in 
-the pcm_bluetooth.c code (i.e. no audio output at all). With the patch, 
-on the same exact system, playback is flawless. And the problem only
-occurs with apps that always poll/select before writing to the device (i.e.
-not aplay). Relaxing the buffering constraints allows apps to feed audio 
-to A2DP with less context switches and less system calls (bigger buffer
-fragments at a time basicly).
+This was bogus indeed, thanks for spotting that ;-)
 
->> -	/* supported block size */
->> +	/* supported block sizes:
->> +	 *   - lower limit is A2DP codec size
->> +	 *   - total buffer size is the upper limit (with two periods) */
->>  	err = snd_pcm_ioplug_set_param_minmax(io,
-SND_PCM_IOPLUG_HW_PERIOD_BYTES,
-[...]
->> +	/* supported buffer sizes */
->> +	err = snd_pcm_ioplug_set_param_minmax(io,
-SND_PCM_IOPLUG_HW_BUFFER_BYTES,
->> +					      MIN_BUFFER_SIZE,
-MAX_BUFFER_SIZE);
->>  	if (err < 0)
->>  		return err;
->
->
->This part of the code is useless, you don't need to set 
->SND_PCM_IOPLUG_HW_BUFFER_BYTES if you set 
->SND_PCM_IOPLUG_HW_PERIODS, you just have to choose one of the 
->two alternatives :-)
+> 
+> Besides that it seems good to me.
+> 
 
-But if we'd drop setting mimax for BUFFER_BYTES, the application could 
-request for 64 periods of size 'MAX_BUFFER_SIZE / 2' -> 524288 bytes.
-Of course we could fix this by limiting the max period size, but then 
-the application couldn't use a buffering setup of two max-sized periods
-(good for robust playback). If we'd limit the max count of periods, 
-application couldn't choose a buffering setup of lots of small 
-buffer fragments (good for robust recording with minimal latency).
+Here comes ans updated version of the patch. I moved close_sco to be 
+executed at anytime, it doesn't hurt as close_sco does already check to
+see if the the sco channel is already opened.
 
-So defining a minmax range for all three params gives more
-flexibility without requiring any added logic to the plugin
-code.
+Cheers,
 
--- 
-first.surname@nokia.com (Kai Vehmanen)
+Fabien
 
+--------------090706050206090404050300
+Content-Type: text/x-patch;
+ name="headset.patch"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline;
+ filename="headset.patch"
+
+Index: headset.c
+===================================================================
+--- headset.c	(révision 120)
++++ headset.c	(copie de travail)
+@@ -63,14 +63,18 @@
+ #define HEADSET_GAIN_SPEAKER 'S'
+ #define HEADSET_GAIN_MICROPHONE 'M'
+ 
+-static char *str_state[] = {"DISCONNECTED", "CONNECTING", "CONNECTED",
+-				"STREAM_STARTING", "STREAMING"};
++static char *str_state[] = {
++	"HEADSET_STATE_DISCONNECTED", 
++	"HEADSET_STATE_CONNECT_IN_PROGRESS",
++	"HEADSET_STATE_CONNECTED",
++	"HEADSET_STATE_PLAY_IN_PROGRESS",
++	"HEADSET_STATE_PLAYING",
++	};
+ 
+ struct pending_connect {
+ 	DBusMessage *msg;
+ 	DBusPendingCall *call;
+ 	GIOChannel *io;
+-	guint io_id;
+ 	int sock;
+ 	int err;
+ 	unsigned int id;
+@@ -489,9 +493,9 @@
+ 			return -err;
+ 		}
+ 
+-		c->io_id = g_io_add_watch(c->io,
+-					G_IO_OUT | G_IO_NVAL | G_IO_ERR | G_IO_HUP,
+-					(GIOFunc) sco_connect_cb, device);
++		g_io_add_watch(c->io,
++				G_IO_OUT | G_IO_NVAL | G_IO_ERR | G_IO_HUP,
++				(GIOFunc) sco_connect_cb, device);
+ 	} else
+ 		do_callback = TRUE;
+ 
+@@ -1544,6 +1548,7 @@
+ 	case HEADSET_STATE_CONNECT_IN_PROGRESS:
+ 		break;
+ 	case HEADSET_STATE_CONNECTED:
++		close_sco(dev);
+ 		if (hs->state < state) {
+ 			g_io_add_watch(hs->rfcomm,
+ 				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+@@ -1553,8 +1558,7 @@
+ 						AUDIO_HEADSET_INTERFACE,
+ 						"Connected",
+ 						DBUS_TYPE_INVALID);
+-		} else {
+-			close_sco(dev);
++		} else if (hs->state == HEADSET_STATE_PLAYING) {
+ 			dbus_connection_emit_signal(dev->conn, dev->path,
+ 						AUDIO_HEADSET_INTERFACE,
+ 						"Stopped",
+
+--------------090706050206090404050300
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
+--------------090706050206090404050300
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--------------090706050206090404050300--
