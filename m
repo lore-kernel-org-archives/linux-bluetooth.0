@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <47137A98.9060204@celunite.com>
-Date: Mon, 15 Oct 2007 20:05:04 +0530
+Message-ID: <4712F226.5040506@celunite.com>
+Date: Mon, 15 Oct 2007 10:22:54 +0530
 From: rahul <rahul.tank@celunite.com>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
 References: <d5d240eb0710120713r27a2ddcfm84493a711187bcb3@mail.gmail.com>
-	<4712F226.5040506@celunite.com>
-In-Reply-To: <4712F226.5040506@celunite.com>
-Subject: Re: [Bluez-users] problem in browsing services through
-	dbus	interface.
+In-Reply-To: <d5d240eb0710120713r27a2ddcfm84493a711187bcb3@mail.gmail.com>
+Subject: Re: [Bluez-users] problem in browsing services through dbus
+	interface.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,36 +21,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-rahul wrote:
-> rohit puri wrote:
->   
->> hi all,
->>
->> I am browsing the services using the dbus interface.but my code gives 
->> the following error
->> `get_remote_service_channel':
->> /root/marcel/main.c:78: undefined reference to `sdp_extract_pdu'
->> /root/marcel/main.c:81: undefined reference to `sdp_get_access_protos'
->> /root/marcel/main.c:85: undefined reference to `sdp_get_proto_port'
->> /root/marcel/main.c:88: undefined reference to `sdp_list_free'
->> /root/marcel/main.c:89: undefined reference to `sdp_list_free'
->> /root/marcel/main.c:92: undefined reference to `sdp_record_free'
->> collect2: ld returned 1 exit status
->> Does someone know how to rectify this problem.
->>
->> Thanks in advance
->>
->>     
-> Have you compiled the sources on your own? . If yes, then i think you 
-> have linked the bluez-utils to the correct bluez-libs.
->   
+rohit puri wrote:
+> hi all,
+>
+> I am browsing the services using the dbus interface.but my code gives 
+> the following error
+> `get_remote_service_channel':
+> /root/marcel/main.c:78: undefined reference to `sdp_extract_pdu'
+> /root/marcel/main.c:81: undefined reference to `sdp_get_access_protos'
+> /root/marcel/main.c:85: undefined reference to `sdp_get_proto_port'
+> /root/marcel/main.c:88: undefined reference to `sdp_list_free'
+> /root/marcel/main.c:89: undefined reference to `sdp_list_free'
+> /root/marcel/main.c:92: undefined reference to `sdp_record_free'
+> collect2: ld returned 1 exit status
+> Does someone know how to rectify this problem.
+>
+> Thanks in advance
+>
+Have you compiled the sources on your own? . If yes, then i think you 
+have linked the bluez-utils to the correct bluez-libs.
 
-Oops .. it shuld have been .."you have *not* linked ..." .
->
->
-> thanks,
->   rahul
->   
+
+
+thanks,
+  rahul
 
 
 -------------------------------------------------------------------------
