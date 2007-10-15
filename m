@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <47140347.40409@gmail.com>
-Date: Tue, 16 Oct 2007 02:18:15 +0200
-From: Advhertz <advhertz@gmail.com>
+Message-ID: <47138547.80601@stuart.es>
+Date: Mon, 15 Oct 2007 17:20:39 +0200
+From: Stuart Pook <bluez16t@stuart.es>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users]  Alsa headset with MPlayer
+Subject: [Bluez-users] the SIP softphones ekiga & twinkle do not work with
+	my headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,69 +19,47 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi All,
-I've got workin' fine the BT headset with the last kernel 2.6.23 patched 
-with sco-flowcontrol-v4.3.diff included in the plugz bluetooth alsa cvs 
-repository and aplay/arecord, xmms, Rhythmbox and Skype too works fine.
-The problem now is mplayer.
+hello
 
-As I give the command " mplayer -ao alsa:device=headset " it stucks as here:
+I have tried to get two different SIP softphones to work with bluez-3.20 
+without success. Both of them hang when I use them with the microphone 
+of my Plantronics M2500 Bluetooth headset. As they both have the same 
+problem it is perhaps bluez-3.20 (or my configuration) that is at fault. 
+As anyone else had more success? Which softphones work with bluez?
 
-Starting playback...
-A:   0.0 (00.0) of 226.0 (03:46.0) ??,?% 98%
+My ~/.asoundrc contains
 
-and it doesn't start to play.
-
-The headset string is the one I used in my $HOME/.asoundrc file as the 
-following:
-
-pcm.headset {
-        type plug
-        slave {
-                pcm "headsetBT"
-                rate 8000
-                format S16_LE
-                channels 1
-        }
+pcm.M2500 {
+         type bluetooth
+         device "00:03:89:xx:xx:xx" # M2500 by Plantronics
+}
+pcm.!default {
+         type plug;
+         slave.pcm "M2500"
 }
 
-pcm.headsetBT {
-        @args [BDADDR TIMEOUT]
+"arecord -f S16_LE|aplay" and "arecord -D M2500 -f S16_LE|aplay -D 
+M2500" work fine (most times).
 
-        # The Bluetooth device address for target headset, used for 
-Audio Gateway (PC) initiated connections
-        # Please note that this value is ignored when the connection is 
-Headset initiated
-        @args.BDADDR {
-                type string
-                default "XX:XX:XX:XX:XX:XX"
-        }
+When I use the "Configuration Druid" in Ekiga (2.0.11) I can choose my 
+headset as the "audio input device" (I choose default) and another sound 
+card as the audio output device.  The "Test Setting" button works and 
+what I say comes out of the speakers. When I make a call using these 
+setting I can hear the other party but nothing is read from the 
+microphone and when I try to hang up ekiga hangs.
 
-        # This value represents how long we will try to reach the 
-headset, until we give up.
-        # Value is in milliseconds
-        @args.TIMEOUT {
-                type integer
-                default 6000
-        }
+When I configure twinkle (version 1.1) to use M2500 as the microphone 
+and another device as the speaker, I don't hear anything when I call and 
+when I try to end the call twinkle hangs.
 
-        type        sco
-        bdaddr      $BDADDR
-        timeout     $TIMEOUT
-}
+Both programs fail in the same way if I use the headset as the speaker 
+and microphone.
 
-ctl.headset {
-        type sco
-}
+Both programs work fine if I use my headset as the speaker and another 
+device as the microphone.
 
-Do anyone know anything about it ? MPlayer could work with the bt alsa 
-headset, right? Maybe I wrong something?
-
-Let me know please.
-
-Thanks.
-
-Advhertz.
+any ideas?
+Stuart
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
