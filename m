@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4715E28A.3080009@free.fr>
-Date: Wed, 17 Oct 2007 12:23:06 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
+Message-ID: <5f84803c0710161138i6123770dk22c1b63d03f45f59@mail.gmail.com>
+Date: Tue, 16 Oct 2007 14:38:39 -0400
+From: "Chris Rivera" <crivera@novell.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <000001c80cca$eff9ed00$c72915ac@NOE.Nokia.com>	<4711FB4D.2010609@free.fr>
-	<000601c80f19$b92b2270$0f9db70a@NOE.Nokia.com>
-In-Reply-To: <000601c80f19$b92b2270$0f9db70a@NOE.Nokia.com>
-Subject: Re: [Bluez-devel] PATCH1/2: bluez-utils -fix-a2dp-buffer-constraints
+Content-Type: multipart/mixed;
+	boundary="----=_Part_68733_19773431.1192559919432"
+Subject: [Bluez-devel] [PATCH] make bluez GNOME UIs singletons
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,72 +16,239 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello Kai,
+------=_Part_68733_19773431.1192559919432
+Content-Type: multipart/alternative;
+	boundary="----=_Part_68734_4305981.1192559919433"
 
-> I've been testing with a low spec GNU/Debian desktop, and the problem has 
-> been too high CPU load leading to a continuous stream of XRUNs in 
-> the pcm_bluetooth.c code (i.e. no audio output at all). With the patch, 
-> on the same exact system, playback is flawless. And the problem only
-> occurs with apps that always poll/select before writing to the device (i.e.
-> not aplay). Relaxing the buffering constraints allows apps to feed audio 
-> to A2DP with less context switches and less system calls (bigger buffer
-> fragments at a time basicly).
+------=_Part_68734_4305981.1192559919433
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-I'm quite interested in optimizations for low end ARM boxes :-)
-Could you provide CPU details and the player you used to performed your 
-testing ? I'd like to be able to reproduce those on my Neo1973 box :-)
+Howdy folks.  The attached patch makes the applet, properties dialog, and
+wizard singletons.  Currently, you can open several instances of these at a
+time.  This is particularly annoying since you can launch the properties
+dialog from the applet.  I also added a simple DBUS method (Present) to the
+properties dialog and wizard that can be called by another instance to bring
+the current instance to the foreground.
 
-> 
->>> -	/* supported block size */
->>> +	/* supported block sizes:
->>> +	 *   - lower limit is A2DP codec size
->>> +	 *   - total buffer size is the upper limit (with two periods) */
->>>  	err = snd_pcm_ioplug_set_param_minmax(io,
-> SND_PCM_IOPLUG_HW_PERIOD_BYTES,
-> [...]
->>> +	/* supported buffer sizes */
->>> +	err = snd_pcm_ioplug_set_param_minmax(io,
-> SND_PCM_IOPLUG_HW_BUFFER_BYTES,
->>> +					      MIN_BUFFER_SIZE,
-> MAX_BUFFER_SIZE);
->>>  	if (err < 0)
->>>  		return err;
->>
->> This part of the code is useless, you don't need to set 
->> SND_PCM_IOPLUG_HW_BUFFER_BYTES if you set 
->> SND_PCM_IOPLUG_HW_PERIODS, you just have to choose one of the 
->> two alternatives :-)
-> 
-> But if we'd drop setting mimax for BUFFER_BYTES, the application could 
-> request for 64 periods of size 'MAX_BUFFER_SIZE / 2' -> 524288 bytes.
-> Of course we could fix this by limiting the max period size, but then 
-> the application couldn't use a buffering setup of two max-sized periods
-> (good for robust playback). If we'd limit the max count of periods, 
-> application couldn't choose a buffering setup of lots of small 
-> buffer fragments (good for robust recording with minimal latency).
-> 
-> So defining a minmax range for all three params gives more
-> flexibility without requiring any added logic to the plugin
-> code.
+Chris
 
-That's definately a good answer :-).
-Maybe we should drop SND_PCM_IOPLUG_HW_PERIODS and keep 
-SND_PCM_IOPLUG_HW_BUFFER_BYTES only then ?
+------=_Part_68734_4305981.1192559919433
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Cheers,
+Howdy folks.&nbsp; The attached patch makes the applet, properties dialog, and wizard singletons.&nbsp; Currently, you can open several instances of these at a time.&nbsp; This is particularly annoying since you can launch the properties dialog from the applet.&nbsp; I also added a simple DBUS method (Present) to the properties dialog and wizard that can be called by another instance to bring the current instance to the foreground.
+<br><br>Chris<br>
 
-Fabien
+------=_Part_68734_4305981.1192559919433--
+
+------=_Part_68733_19773431.1192559919432
+Content-Type: text/x-patch; name="bluez-gnome-singleton.patch"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="bluez-gnome-singleton.patch";
+	filename="bluez-gnome-singleton.patch";
+	filename="bluez-gnome-singleton.patch";
+	filename="bluez-gnome-singleton.patch";
+	filename="bluez-gnome-singleton.patch";
+	filename="bluez-gnome-singleton.patch"
+X-Attachment-Id: f_f7tbbdc7
+
+SW5kZXg6IGFwcGxldC9tYWluLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXov
+Z25vbWUvYXBwbGV0L21haW4uYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS44NwpkaWZmIC11IC1y
+MS44NyBtYWluLmMKLS0tIGFwcGxldC9tYWluLmMJMjkgQXVnIDIwMDcgMjA6NDI6MTggLTAwMDAJ
+MS44NworKysgYXBwbGV0L21haW4uYwkxNiBPY3QgMjAwNyAxNzo0MjoyOSAtMDAwMApAQCAtMzIs
+OSArMzIsOSBAQAogI2luY2x1ZGUgPHN0cmluZy5oPgogCiAjaW5jbHVkZSA8ZGJ1cy9kYnVzLWds
+aWIuaD4KKyNpbmNsdWRlIDxkYnVzL2RidXMtZ2xpYi1sb3dsZXZlbC5oPgogCiAjaWZkZWYgSEFW
+RV9IQUwKLSNpbmNsdWRlIDxkYnVzL2RidXMtZ2xpYi1sb3dsZXZlbC5oPgogI2luY2x1ZGUgPGhh
+bC9saWJoYWwuaD4KICNlbmRpZgogCkBAIC0xNzg4LDYgKzE3ODQsMTAgQEAKIAlHdGtXaWRnZXQg
+Km1lbnU7CiAJR0Vycm9yICplcnJvciA9IE5VTEw7CiAJY2hhciAqc3RyOworCURCdXNHQ29ubmVj
+dGlvbiAqc2Vzc2lvbl9jb25uOworCURCdXNHUHJveHkgKmJ1c19wcm94eTsKKwlnYm9vbGVhbiBy
+ZXQ7CisJZ3VpbnQgcmVxdWVzdF9yZXN1bHQ7CiAKIAliaW5kdGV4dGRvbWFpbihHRVRURVhUX1BB
+Q0tBR0UsIExPQ0FMRURJUik7CiAJYmluZF90ZXh0ZG9tYWluX2NvZGVzZXQoR0VUVEVYVF9QQUNL
+QUdFLCAiVVRGLTgiKTsKQEAgLTE4MDcsNiArMTgwNyw0MSBAQAogCQlleGl0KEVYSVRfRkFJTFVS
+RSk7CiAJfQogCisJc2Vzc2lvbl9jb25uID0gZGJ1c19nX2J1c19nZXQoREJVU19CVVNfU0VTU0lP
+TiwgJmVycm9yKTsKKwlpZiAoZXJyb3IgIT0gTlVMTCkgeworCQlnX3ByaW50ZXJyKCJDb25uZWN0
+aW5nIHRvIHNlc3Npb24gYnVzIGZhaWxlZDogJXNcbiIsCisJCQkJCWVycm9yLT5tZXNzYWdlKTsK
+KwkJZ19lcnJvcl9mcmVlKGVycm9yKTsKKwkJZGJ1c19nX2Nvbm5lY3Rpb25fdW5yZWYoY29ubik7
+CisJCWV4aXQoRVhJVF9GQUlMVVJFKTsKKwl9CisKKwlidXNfcHJveHkgPSBkYnVzX2dfcHJveHlf
+bmV3X2Zvcl9uYW1lKHNlc3Npb25fY29ubiwKKwkJCQkJCQkJCQkgIERCVVNfU0VSVklDRV9EQlVT
+LAorCQkJCQkJCQkJCSAgREJVU19QQVRIX0RCVVMsCisJCQkJCQkJCQkJICBEQlVTX0lOVEVSRkFD
+RV9EQlVTKTsKKworCXJldCA9IGRidXNfZ19wcm94eV9jYWxsKGJ1c19wcm94eSwgIlJlcXVlc3RO
+YW1lIiwgTlVMTCwKKwkJCQkJCQlHX1RZUEVfU1RSSU5HLCAib3JnLmJsdWV6Lkdub21lQXBwbGV0
+IiwKKwkJCQkJCQlHX1RZUEVfVUlOVCwgMCwKKwkJCQkJCQlHX1RZUEVfSU5WQUxJRCwKKwkJCQkJ
+CQlHX1RZUEVfVUlOVCwgJnJlcXVlc3RfcmVzdWx0LAorCQkJCQkJCUdfVFlQRV9JTlZBTElEKTsK
+KwlnX29iamVjdF91bnJlZihHX09CSkVDVChidXNfcHJveHkpKTsKKwlpZiAoIXJldCkgeworCQln
+X3ByaW50ZXJyKCJGYWlsZWQgdG8gcmVxdWVzdCBuYW1lIG9uIHRoZSBzZXNzaW9uIGJ1c1xuIik7
+CisJCWRidXNfZ19jb25uZWN0aW9uX3VucmVmKGNvbm4pOworCQlkYnVzX2dfY29ubmVjdGlvbl91
+bnJlZihzZXNzaW9uX2Nvbm4pOworCQlleGl0KEVYSVRfRkFJTFVSRSk7CisJfQorCisJaWYgKHJl
+cXVlc3RfcmVzdWx0ICE9IERCVVNfUkVRVUVTVF9OQU1FX1JFUExZX1BSSU1BUllfT1dORVIpIHsK
+KwkJZ19wcmludCgiQW5vdGhlciBpbnN0YW5jZSBpcyBhbHJlYWR5IHJ1bm5pbmcuXG4iKTsKKwkJ
+ZGJ1c19nX2Nvbm5lY3Rpb25fdW5yZWYoY29ubik7CisJCWRidXNfZ19jb25uZWN0aW9uX3VucmVm
+KHNlc3Npb25fY29ubik7CisJCWV4aXQoRVhJVF9TVUNDRVNTKTsKKwl9CisKIAlnY29uZiA9IGdj
+b25mX2NsaWVudF9nZXRfZGVmYXVsdCgpOwogCiAjaWZkZWYgSEFWRV9IQUwKQEAgLTE4NjMsNiAr
+MTg5OCw3IEBACiAJZ19saXN0X2ZvcmVhY2goYWRhcHRlcl9saXN0LCBhZGFwdGVyX2ZyZWUsIE5V
+TEwpOwogCiAJZGJ1c19nX2Nvbm5lY3Rpb25fdW5yZWYoY29ubik7CisJZGJ1c19nX2Nvbm5lY3Rp
+b25fdW5yZWYoc2Vzc2lvbl9jb25uKTsKIAogCXJldHVybiAwOwogfQpJbmRleDogcHJvcGVydGll
+cy9tYWluLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovZ25vbWUvcHJvcGVy
+dGllcy9tYWluLmMsdgpyZXRyaWV2aW5nIHJldmlzaW9uIDEuNDgKZGlmZiAtdSAtcjEuNDggbWFp
+bi5jCi0tLSBwcm9wZXJ0aWVzL21haW4uYwkzMSBKdWwgMjAwNyAyMTozNzoyOSAtMDAwMAkxLjQ4
+CisrKyBwcm9wZXJ0aWVzL21haW4uYwkxNiBPY3QgMjAwNyAxNzo0MjoyOSAtMDAwMApAQCAtMzIs
+NiArMzIsNyBAQAogI2luY2x1ZGUgPHN0cmluZy5oPgogCiAjaW5jbHVkZSA8ZGJ1cy9kYnVzLWds
+aWIuaD4KKyNpbmNsdWRlIDxkYnVzL2RidXMtZ2xpYi1sb3dsZXZlbC5oPgogCiAjaW5jbHVkZSA8
+Z2xpYi9naTE4bi5oPgogCkBAIC00MSw2ICs0Miw5IEBACiAjaW5jbHVkZSAic2VydmljZS5oIgog
+I2luY2x1ZGUgImFkYXB0ZXIuaCIKIAorI2RlZmluZSBQUk9QRVJUSUVTX0RCVVNfUEFUSCAiL29y
+Zy9ibHVlei9Hbm9tZVByb3BlcnRpZXMiCisjZGVmaW5lIFBST1BFUlRJRVNfREJVU19TRVJWSUNF
+ICJvcmcuYmx1ZXouR25vbWVQcm9wZXJ0aWVzIgorCiBzdGF0aWMgdm9pZCBkZWxldGVfY2FsbGJh
+Y2soR3RrV2lkZ2V0ICp3aW5kb3csIEdka0V2ZW50ICpldmVudCwKIAkJCQkJCWdwb2ludGVyIHVz
+ZXJfZGF0YSkKIHsKQEAgLTU4LDcgKzYyLDcgQEAKIAlndGtfbWFpbl9xdWl0KCk7CiB9CiAKLXN0
+YXRpYyB2b2lkIGNyZWF0ZV93aW5kb3coR3RrV2lkZ2V0ICpub3RlYm9vaykKK3N0YXRpYyBHdGtX
+aWRnZXQgKmNyZWF0ZV93aW5kb3coR3RrV2lkZ2V0ICpub3RlYm9vaykKIHsKIAlHdGtXaWRnZXQg
+KndpbmRvdzsKIAlHdGtXaWRnZXQgKndpZGdldDsKQEAgLTEwOCw2ICsxMTIsNyBAQAogCQkJCQkJ
+d2lkZ2V0LCBfKCJHZW5lcmFsIikpOwogCiAJZ3RrX3dpZGdldF9zaG93X2FsbCh3aW5kb3cpOwor
+CXJldHVybiB3aW5kb3c7CiB9CiAKIHN0YXRpYyB2b2lkIG5hbWVfb3duZXJfY2hhbmdlZChEQnVz
+R1Byb3h5ICpvYmplY3QsIGNvbnN0IGNoYXIgKm5hbWUsCkBAIC0xMzksMTIgKzE0NCwzMCBAQAog
+CXJldHVybiBwcm94eTsKIH0KIAorc3RhdGljIERCdXNIYW5kbGVyUmVzdWx0IE1lc3NhZ2VGdW5j
+IChEQnVzQ29ubmVjdGlvbiAqYywgREJ1c01lc3NhZ2UgKm0sIHZvaWQgKnVzZXJfZGF0YSkKK3sK
+KwlpZiAoZGJ1c19tZXNzYWdlX2dldF90eXBlKG0pID09IERCVVNfTUVTU0FHRV9UWVBFX01FVEhP
+RF9DQUxMICYmCisJCSFzdHJuY21wKFBST1BFUlRJRVNfREJVU19QQVRILCBkYnVzX21lc3NhZ2Vf
+Z2V0X3BhdGgobSksIHN0cmxlbihQUk9QRVJUSUVTX0RCVVNfUEFUSCkpICYmCisJCSFzdHJuY21w
+KFBST1BFUlRJRVNfREJVU19TRVJWSUNFLCBkYnVzX21lc3NhZ2VfZ2V0X2ludGVyZmFjZShtKSwg
+c3RybGVuKFBST1BFUlRJRVNfREJVU19TRVJWSUNFKSkgJiYKKwkJIXN0cm5jbXAoIlByZXNlbnQi
+LCBkYnVzX21lc3NhZ2VfZ2V0X21lbWJlcihtKSwgNykpIHsKKwkJR3RrV2luZG93ICp3aW5kb3cg
+PSB1c2VyX2RhdGE7CisJCWd0a193aW5kb3dfcHJlc2VudCh3aW5kb3cpOworCX0KKworCXJldHVy
+biBEQlVTX0hBTkRMRVJfUkVTVUxUX0hBTkRMRUQ7Cit9CisKIGludCBtYWluKGludCBhcmdjLCBj
+aGFyICphcmd2W10pCiB7CiAJR3RrV2lkZ2V0ICpub3RlYm9vazsKLQlEQnVzR0Nvbm5lY3Rpb24g
+KmNvbm47Ci0JREJ1c0dQcm94eSAqbWFuYWdlcjsKKwlHdGtXaWRnZXQgKndpbmRvdzsKIAlHRXJy
+b3IgKmVycm9yID0gTlVMTDsKKwlEQnVzR0Nvbm5lY3Rpb24gKmNvbm4sICpzZXNzaW9uX2Nvbm47
+CisJREJ1c0dQcm94eSAqbWFuYWdlcjsKKwlEQnVzR1Byb3h5ICpidXNfcHJveHk7CisJREJ1c09i
+amVjdFBhdGhWVGFibGUgdnRhYmxlOworCWd1aW50IHJlcXVlc3RfcmVzdWx0OworCWdib29sZWFu
+IHJldDsKIAogCWJpbmR0ZXh0ZG9tYWluKEdFVFRFWFRfUEFDS0FHRSwgTE9DQUxFRElSKTsKIAli
+aW5kX3RleHRkb21haW5fY29kZXNldChHRVRURVhUX1BBQ0tBR0UsICJVVEYtOCIpOwpAQCAtMTYw
+LDE2ICsxODMsNjEgQEAKIAkJZXhpdChFWElUX0ZBSUxVUkUpOwogCX0KIAorCXNlc3Npb25fY29u
+biA9IGRidXNfZ19idXNfZ2V0KERCVVNfQlVTX1NFU1NJT04sICZlcnJvcik7CisJaWYgKGVycm9y
+ICE9IE5VTEwpIHsKKwkJZ19wcmludGVycigiQ29ubmVjdGluZyB0byBzZXNzaW9uIGJ1cyBmYWls
+ZWQ6ICVzXG4iLAorCQkJCQllcnJvci0+bWVzc2FnZSk7CisJCWdfZXJyb3JfZnJlZShlcnJvcik7
+CisJCWRidXNfZ19jb25uZWN0aW9uX3VucmVmKGNvbm4pOworCQlleGl0KEVYSVRfRkFJTFVSRSk7
+CisJfQorCisJYnVzX3Byb3h5ID0gZGJ1c19nX3Byb3h5X25ld19mb3JfbmFtZShzZXNzaW9uX2Nv
+bm4sCisJCQkJCQkJCQkJICBEQlVTX1NFUlZJQ0VfREJVUywKKwkJCQkJCQkJCQkgIERCVVNfUEFU
+SF9EQlVTLAorCQkJCQkJCQkJCSAgREJVU19JTlRFUkZBQ0VfREJVUyk7CisKKwlyZXQgPSBkYnVz
+X2dfcHJveHlfY2FsbChidXNfcHJveHksICJSZXF1ZXN0TmFtZSIsIE5VTEwsCisgICAJCQkJCQlH
+X1RZUEVfU1RSSU5HLCBQUk9QRVJUSUVTX0RCVVNfU0VSVklDRSwKKwkJCQkJCQlHX1RZUEVfVUlO
+VCwgMCwKKwkJCQkJCQlHX1RZUEVfSU5WQUxJRCwKKwkJCQkJCQlHX1RZUEVfVUlOVCwgJnJlcXVl
+c3RfcmVzdWx0LAorCQkJCQkJCUdfVFlQRV9JTlZBTElEKTsKKwlnX29iamVjdF91bnJlZihHX09C
+SkVDVChidXNfcHJveHkpKTsKKwlpZiAoIXJldCkgeworCQlnX3ByaW50ZXJyKCJGYWlsZWQgdG8g
+cmVxdWVzdCBuYW1lIG9uIHRoZSBzZXNzaW9uIGJ1c1xuIik7CisJCWRidXNfZ19jb25uZWN0aW9u
+X3VucmVmKGNvbm4pOworCQlkYnVzX2dfY29ubmVjdGlvbl91bnJlZihzZXNzaW9uX2Nvbm4pOwor
+CQlleGl0KEVYSVRfRkFJTFVSRSk7CisJfQorCisJaWYgKHJlcXVlc3RfcmVzdWx0ICE9IERCVVNf
+UkVRVUVTVF9OQU1FX1JFUExZX1BSSU1BUllfT1dORVIpIHsKKwkJZ19wcmludCgiQW5vdGhlciBp
+bnN0YW5jZSBpcyBhbHJlYWR5IHJ1bm5pbmcuXG4iKTsKKwkJREJ1c0dQcm94eSAqcHJveHkgPSBk
+YnVzX2dfcHJveHlfbmV3X2Zvcl9uYW1lKHNlc3Npb25fY29ubiwKKwkJCQkJCQkJCQkJCQkgIFBS
+T1BFUlRJRVNfREJVU19TRVJWSUNFLAorCQkJCQkJCQkJCQkJCSAgUFJPUEVSVElFU19EQlVTX1BB
+VEgsCisJCQkJCQkJCQkJCQkJICBQUk9QRVJUSUVTX0RCVVNfU0VSVklDRSk7CisJCWRidXNfZ19w
+cm94eV9jYWxsX25vX3JlcGx5KHByb3h5LCAiUHJlc2VudCIsIEdfVFlQRV9JTlZBTElELCBHX1RZ
+UEVfSU5WQUxJRCk7CisJCWdfb2JqZWN0X3VucmVmKEdfT0JKRUNUKHByb3h5KSk7CisJCWRidXNf
+Z19jb25uZWN0aW9uX3VucmVmKGNvbm4pOworCQlkYnVzX2dfY29ubmVjdGlvbl91bnJlZihzZXNz
+aW9uX2Nvbm4pOworCQlleGl0KEVYSVRfU1VDQ0VTUyk7CisJfQorCiAJc2V0dXBfZ2VuZXJhbCgp
+OwogCiAJbm90ZWJvb2sgPSBndGtfbm90ZWJvb2tfbmV3KCk7Ci0KKyAgICAKIAlhc3NpZ25fYWRh
+cHRlcihub3RlYm9vayk7CiAKIAltYW5hZ2VyID0gc2V0dXBfbWFuYWdlcihjb25uKTsKIAotCWNy
+ZWF0ZV93aW5kb3cobm90ZWJvb2spOworCXdpbmRvdyA9IGNyZWF0ZV93aW5kb3cobm90ZWJvb2sp
+OwogCisJdnRhYmxlLm1lc3NhZ2VfZnVuY3Rpb24gPSBNZXNzYWdlRnVuYzsKKwl2dGFibGUudW5y
+ZWdpc3Rlcl9mdW5jdGlvbiA9IE5VTEw7CisJZGJ1c19jb25uZWN0aW9uX3JlZ2lzdGVyX29iamVj
+dF9wYXRoKGRidXNfZ19jb25uZWN0aW9uX2dldF9jb25uZWN0aW9uIChzZXNzaW9uX2Nvbm4pLAor
+CQkJCQkJCQkJCSAiL29yZy9ibHVlei9Hbm9tZVByb3BlcnRpZXMiLCAmdnRhYmxlLCB3aW5kb3cp
+OwogCWd0a19tYWluKCk7CiAKIAljbGVhbnVwX2FkYXB0ZXIoKTsKQEAgLTE4MSw2ICsyNDksNyBA
+QAogCWdfb2JqZWN0X3VucmVmKG1hbmFnZXIpOwogCiAJZGJ1c19nX2Nvbm5lY3Rpb25fdW5yZWYo
+Y29ubik7CisJZGJ1c19nX2Nvbm5lY3Rpb25fdW5yZWYoc2Vzc2lvbl9jb25uKTsKIAogCXJldHVy
+biAwOwogfQpJbmRleDogd2l6YXJkL21haW4uYwo9PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09ClJDUyBmaWxlOiAvY3Zzcm9v
+dC9ibHVlei9nbm9tZS93aXphcmQvbWFpbi5jLHYKcmV0cmlldmluZyByZXZpc2lvbiAxLjIzCmRp
+ZmYgLXUgLXIxLjIzIG1haW4uYwotLS0gd2l6YXJkL21haW4uYwkxNSBBdWcgMjAwNyAwNzowNDow
+MyAtMDAwMAkxLjIzCisrKyB3aXphcmQvbWFpbi5jCTE2IE9jdCAyMDA3IDE3OjQyOjI5IC0wMDAw
+CkBAIC0yNiw4ICsyNiwxMCBAQAogI2VuZGlmCiAKICNpbmNsdWRlIDxzdHJpbmcuaD4KKyNpbmNs
+dWRlIDxzdGRsaWIuaD4KIAogI2luY2x1ZGUgPGRidXMvZGJ1cy1nbGliLmg+CisjaW5jbHVkZSA8
+ZGJ1cy9kYnVzLWdsaWItbG93bGV2ZWwuaD4KIAogI2luY2x1ZGUgPGdsaWIvZ2kxOG4uaD4KIApA
+QCAtMzksNiArNDEsOSBAQAogCiAjaW5jbHVkZSAiYmx1ZXRvb3RoLWRldmljZS1zZWxlY3Rpb24u
+aCIKIAorI2RlZmluZSBXSVpBUkRfREJVU19QQVRIICIvb3JnL2JsdWV6L0dub21lV2l6YXJkIgor
+I2RlZmluZSBXSVpBUkRfREJVU19TRVJWSUNFICJvcmcuYmx1ZXouR25vbWVXaXphcmQiCisKIHN0
+YXRpYyBCbHVldG9vdGhDbGllbnQgKmNsaWVudDsKIAogc3RhdGljIGdjaGFyICphZGRyZXNzID0g
+TlVMTDsKQEAgLTM4Nyw3ICszOTIsNyBAQAogCXBhZ2Vfc3VtbWFyeSA9IHZib3g7CiB9CiAKLXN0
+YXRpYyB2b2lkIGNyZWF0ZV93aXphcmQodm9pZCkKK3N0YXRpYyBHdGtXaWRnZXQgKmNyZWF0ZV93
+aXphcmQodm9pZCkKIHsKIAlHdGtXaWRnZXQgKmFzc2lzdGFudDsKIApAQCAtNDMwLDIzICs0MzUs
+OTAgQEAKIAlndGtfd2lkZ2V0X3Nob3dfYWxsKGFzc2lzdGFudCk7CiAKIAlndGtfYXNzaXN0YW50
+X3VwZGF0ZV9idXR0b25zX3N0YXRlKEdUS19BU1NJU1RBTlQoYXNzaXN0YW50KSk7CisJcmV0dXJu
+IGFzc2lzdGFudDsKK30KKworc3RhdGljIERCdXNIYW5kbGVyUmVzdWx0IE1lc3NhZ2VGdW5jIChE
+QnVzQ29ubmVjdGlvbiAqYywgREJ1c01lc3NhZ2UgKm0sIHZvaWQgKnVzZXJfZGF0YSkKK3sKKwlp
+ZiAoZGJ1c19tZXNzYWdlX2dldF90eXBlKG0pID09IERCVVNfTUVTU0FHRV9UWVBFX01FVEhPRF9D
+QUxMICYmCisJCSFzdHJuY21wKFdJWkFSRF9EQlVTX1BBVEgsIGRidXNfbWVzc2FnZV9nZXRfcGF0
+aChtKSwgc3RybGVuKFdJWkFSRF9EQlVTX1BBVEgpKSAmJgorCQkhc3RybmNtcChXSVpBUkRfREJV
+U19TRVJWSUNFLCBkYnVzX21lc3NhZ2VfZ2V0X2ludGVyZmFjZShtKSwgc3RybGVuKFdJWkFSRF9E
+QlVTX1NFUlZJQ0UpKSAmJgorCQkhc3RybmNtcCgiUHJlc2VudCIsIGRidXNfbWVzc2FnZV9nZXRf
+bWVtYmVyKG0pLCA3KSkgeworCQlHdGtXaW5kb3cgKndpbmRvdyA9IHVzZXJfZGF0YTsKKwkJZ3Rr
+X3dpbmRvd19wcmVzZW50KHdpbmRvdyk7CisJfQorCisJcmV0dXJuIERCVVNfSEFORExFUl9SRVNV
+TFRfSEFORExFRDsKIH0KIAogaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKIHsKLQli
+aW5kdGV4dGRvbWFpbihHRVRURVhUX1BBQ0tBR0UsIExPQ0FMRURJUik7CisJR3RrV2lkZ2V0ICp3
+aW5kb3c7CisJR0Vycm9yICplcnJvciA9IE5VTEw7CisJREJ1c0dDb25uZWN0aW9uICpzZXNzaW9u
+X2Nvbm47CisJREJ1c0dQcm94eSAqYnVzX3Byb3h5OworCURCdXNPYmplY3RQYXRoVlRhYmxlIHZ0
+YWJsZTsKKwlnYm9vbGVhbiByZXQ7CisJZ3VpbnQgcmVxdWVzdF9yZXN1bHQ7CisJCisJYmluZHRl
+eHRkb21haW4oR0VUVEVYVF9QQUNLQUdFLCBMT0NBTEVESVIpOwogCWJpbmRfdGV4dGRvbWFpbl9j
+b2Rlc2V0KEdFVFRFWFRfUEFDS0FHRSwgIlVURi04Iik7CiAJdGV4dGRvbWFpbihHRVRURVhUX1BB
+Q0tBR0UpOwogCiAJZ3RrX2luaXQoJmFyZ2MsICZhcmd2KTsKIAorCXNlc3Npb25fY29ubiA9IGRi
+dXNfZ19idXNfZ2V0KERCVVNfQlVTX1NFU1NJT04sICZlcnJvcik7CisJaWYgKGVycm9yICE9IE5V
+TEwpIHsKKwkJZ19wcmludGVycigiQ29ubmVjdGluZyB0byBzZXNzaW9uIGJ1cyBmYWlsZWQ6ICVz
+XG4iLAorCQkJCQllcnJvci0+bWVzc2FnZSk7CisJCWdfZXJyb3JfZnJlZShlcnJvcik7CisJCWV4
+aXQoRVhJVF9GQUlMVVJFKTsKKwl9CisKKwlidXNfcHJveHkgPSBkYnVzX2dfcHJveHlfbmV3X2Zv
+cl9uYW1lKHNlc3Npb25fY29ubiwKKwkJCQkJCQkJCQkgIERCVVNfU0VSVklDRV9EQlVTLAorCQkJ
+CQkJCQkJCSAgREJVU19QQVRIX0RCVVMsCisJCQkJCQkJCQkJICBEQlVTX0lOVEVSRkFDRV9EQlVT
+KTsKKworCXJldCA9IGRidXNfZ19wcm94eV9jYWxsKGJ1c19wcm94eSwgIlJlcXVlc3ROYW1lIiwg
+TlVMTCwKKwkJCQkJCQlHX1RZUEVfU1RSSU5HLCBXSVpBUkRfREJVU19TRVJWSUNFLAorCQkJCQkJ
+CUdfVFlQRV9VSU5ULCAwLAorCQkJCQkJCUdfVFlQRV9JTlZBTElELAorCQkJCQkJCUdfVFlQRV9V
+SU5ULCAmcmVxdWVzdF9yZXN1bHQsCisJCQkJCQkJR19UWVBFX0lOVkFMSUQpOworCWdfb2JqZWN0
+X3VucmVmKEdfT0JKRUNUKGJ1c19wcm94eSkpOworCWlmICghcmV0KSB7CisJCWdfcHJpbnRlcnIo
+IkZhaWxlZCB0byByZXF1ZXN0IG5hbWUgb24gdGhlIHNlc3Npb24gYnVzXG4iKTsKKwkJZGJ1c19n
+X2Nvbm5lY3Rpb25fdW5yZWYoc2Vzc2lvbl9jb25uKTsKKwkJZXhpdChFWElUX0ZBSUxVUkUpOwor
+CX0KKworCWlmIChyZXF1ZXN0X3Jlc3VsdCAhPSBEQlVTX1JFUVVFU1RfTkFNRV9SRVBMWV9QUklN
+QVJZX09XTkVSKSB7CisJCWdfcHJpbnQoIkFub3RoZXIgaW5zdGFuY2UgaXMgYWxyZWFkeSBydW5u
+aW5nLlxuIik7CisJCURCdXNHUHJveHkgKnByb3h5ID0gZGJ1c19nX3Byb3h5X25ld19mb3JfbmFt
+ZShzZXNzaW9uX2Nvbm4sCisgICAgICAgCQkJCQkJCQkJCQkgIFdJWkFSRF9EQlVTX1NFUlZJQ0Us
+CisJCQkJCQkJCQkJCQkJICBXSVpBUkRfREJVU19QQVRILAorCQkJCQkJCQkJCQkJCSAgV0laQVJE
+X0RCVVNfU0VSVklDRSk7CisJCWRidXNfZ19wcm94eV9jYWxsX25vX3JlcGx5KHByb3h5LCAiUHJl
+c2VudCIsIEdfVFlQRV9JTlZBTElELCBHX1RZUEVfSU5WQUxJRCk7CisJCWdfb2JqZWN0X3VucmVm
+KEdfT0JKRUNUKHByb3h5KSk7CisJCWRidXNfZ19jb25uZWN0aW9uX3VucmVmKHNlc3Npb25fY29u
+bik7CisJCWV4aXQoRVhJVF9TVUNDRVNTKTsKKwl9CisKIAljbGllbnQgPSBibHVldG9vdGhfY2xp
+ZW50X25ldygpOwogCi0JY3JlYXRlX3dpemFyZCgpOworCXdpbmRvdyA9IGNyZWF0ZV93aXphcmQo
+KTsKKyAgICAKKwl2dGFibGUubWVzc2FnZV9mdW5jdGlvbiA9IE1lc3NhZ2VGdW5jOworCXZ0YWJs
+ZS51bnJlZ2lzdGVyX2Z1bmN0aW9uID0gTlVMTDsKKwlkYnVzX2Nvbm5lY3Rpb25fcmVnaXN0ZXJf
+b2JqZWN0X3BhdGgoZGJ1c19nX2Nvbm5lY3Rpb25fZ2V0X2Nvbm5lY3Rpb24gKHNlc3Npb25fY29u
+biksCisJCQkJCQkJCQkJIFdJWkFSRF9EQlVTX1BBVEgsICZ2dGFibGUsIHdpbmRvdyk7CiAKIAln
+dGtfbWFpbigpOwogCiAJZ19vYmplY3RfdW5yZWYoY2xpZW50KTsKKwkKKwlkYnVzX2dfY29ubmVj
+dGlvbl91bnJlZihzZXNzaW9uX2Nvbm4pOwogCiAJcmV0dXJuIDA7CiB9Cg==
+------=_Part_68733_19773431.1192559919432
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
+------=_Part_68733_19773431.1192559919432
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_68733_19773431.1192559919432--
