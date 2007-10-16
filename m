@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <BAY117-W133C5EC8978F7D66F2C33CC09C0@phx.gbl>
-From: "" <semiyd@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Tue, 16 Oct 2007 09:45:59 +0000
+Message-ID: <194c6ea30710160217l4e609d6cs62301313a5d6852f@mail.gmail.com>
+Date: Tue, 16 Oct 2007 17:17:34 +0800
+From: "dong yan" <semiydsemiyd@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] Headset :SCO connection timed out
+Subject: [Bluez-users] Headset problem: SCO connection timed out
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,117 +14,77 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0636445776=="
+Content-Type: multipart/mixed; boundary="===============0627526968=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0636445776==
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: 8bit
+--===============0627526968==
+Content-Type: text/plain; charset=GB2312
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
+
+SGkgQWxsOgoKU29ycnkgdG8gcG9zdCB0aGlzIGFnYWluLGJ1dCBpdCBzZWVtcyB0aGF0IHRoZSBs
+YXN0IHBvc3QgaSBzZW50IGZyb20KdGhpcyBtYWlsIGFkZHJlc3MgdHVybmVkIG91dCB0byBiZSBz
+b21lIHN0cmFuZ2UgY29kZS4oUHJvYmFibHkgYmVjYXVzZQpvZiB0aGUgcmljaCB0ZXh0IGZvcm1h
+dCkKClJpZ2h0IG5vdyxJJ20gZG9pbmcgYSBwcm9qZWN0IGFpbWluZyB0byBlbmFibGUgdGhlIGJs
+dWV6IGF1ZGlvIGZlYXR1cmUKb24gbGludXggMi42LjE4IGJhc2VkIG9uIGEgczNjMjQxMCBlbWJl
+ZGVkIGRldmVsb3BtZW50IGJvYXJkLldlIGFyZQp0cnlpbmcgdG8gZW5hYmxlIHRoZSBTQ08gaGVh
+ZHNldCBhbmQgQTJEUCBhdWRpbyBmZWF0dXJlLkknbSB1c2luZwpibHVlei1saWJzLTMuMjAgYW5k
+IGJsdWV6LXV0aWxzLTMuMjAgYW5kIEFMU0EgYXVkaW8gZHJpdmVycy5JJ3ZlIGFsc28KYXBwbGll
+ZCB0aGUgMiBwYXRjaGVzOiJzY28tZmxvdy1jb250cm9sLTQuMiBwYXRjaCIgYW5kIGFub3RoZXIg
+a2VybmVsCnBhdGNoICJwYXRjaC0yLjYuMTgtbWg4IiBkb3dubG9hZGVkIGZyb20gYmx1ZXoub3Jn
+IC4gSSdtIHVzaW5nIGEKYmx1ZXRvb3RoIGFkYXB0ZXIgY2FsbGVkICJTVExDMjUwMEMiIGJhc2Vk
+IG9uIFVBUlQgaW50ZXJmYWNlLkl0IGhhcyBhCnNlcmlhbC1VU0IgY29udmVydGVyIG9uIGl0IHNv
+IGl0IHdvdWxkIGJlIGNvbm5lY3RlZCB0byBteSBib2FyZAp0aHJvdWdoIFVTQi5JbiBsaW51eCwg
+aXQgd291bGQgYmUgdGhlIGRldmljZTovZGV2L3R0eVVTQjAuClRoZSB0cm91YmxlIGlzICwgaSd2
+ZSB0cmllZCBtYW55IGRpZmZlcmVudCB3YXlzIHRvIHBsYXkgYXVkaW8gdmlhIFNDTwpoZWFkc2V0
+KGFwbGF5IC1EIGhlYWRzZXQgLzEud2F2LGhzdGVzdCBwbGF5IC8xLndhdiAwMDowRDozQzpFQjo1
+MzpGMAoxLi4uLmV0YyksaXQgYWx3YXlzIHJlc3VsdCBpbiBhbiAiQ2FuJ3QgY29ubmVjdCBTQ08g
+YXVkaW8gY2hhbm5lbDoKQ29ubmVjdGlvbiB0aW1lZCBvdXQiIGZhaWx1cmUuVGhlIHBhaXJpbmcg
+cHJvY2VkdXJlIGlzIG9rZXkuCkhlcmUgYXJlIHNvbWUgZGV0YWlsZWQgaW5mb3JtYXRpb246CgpG
+aXJzdCx0aGVzZSBhcmUgdGhlIGNvbW1hbmRzIGkgcHV0IGluIHRoZSAvZXRjL2luaXQuZC9yY1MK
+aW5pdGlhbGl6YXRpb24gcHJvY2VkdXJlczoKaGNpYXR0YWNoIHR0eVVTQjAgYW55CmhjaWNvbmZp
+ZyBoY2kwIHVwCnJtIC1mIC92YXIvcnVuL21lc3NhZ2VidXMucGlkCmRidXMtZGFlbW9uIC0tc3lz
+dGVtIC0tZm9yawpoY2lkIC1uIC1kIC1mIC9ldGMvYmx1ZXRvb3RoL2hjaWQuY29uZiAmCnNkcGQg
+LW4gJgphMmRwZCAtbiAmCmhjaXRvb2wgc2NhbgpoY2ljb25maWcgLWEKc2RwdG9vbCBhZGQgQTJT
+UkMKc2RwdG9vbCBhZGQgQTJTTksKc2RwdG9vbCBhZGQgQVZSVEcKc2RwdG9vbCBhZGQgaHMKc2Rw
+dG9vbCBhZGQgaGYKaGVhZHNldGQgLW4gJgpoY2ljb25maWcgaGNpMCB2b2ljZSAweDAwNjAKCiNo
+Y2ljb25maWcgaGNpMCByZXZpc2lvbqO6CmhjaTA6IFR5cGU6IFVBUlQKQkQgQWRkcmVzczogMDA6
+ODA6RTE6MDA6MDA6MDAgQUNMIE1UVTogMTAyMTo3IFNDTyBNVFU6IDA6MAoKU1RMQzI1MDAgUjQu
+MiAxMjEwMjAwNSAxMjo0MDoxNCBaQVYxMDAwMTIKSFcgSWQ9IFY0NDBCQUEKKE15IFNDTyBNVFUg
+aXMgMDowLGlzIHRoaXMgb2tleT8pCgojYXBsYXkgLUQgaGVhZHNldCAvMS53YXYKQ2FuJ3QgY29u
+bmVjdCBTQ08gYXVkaW8gY2hhbm5lbDogQ29ubmVjdGlvbiB0aW1lZCBvdXQKCiMgaHN0ZXN0IHBs
+YXkgLzEud2F2IDAwOjBEOjNDOkVCOjUzOkYwIDEKVm9pY2Ugc2V0dGluZzogMHgwMDYwClJGQ09N
+TSBjaGFubmVsIGNvbm5lY3RlZApDYW4ndCBjb25uZWN0IFNDTyBhdWRpbyBjaGFubmVsOiBDb25u
+ZWN0aW9uIHRpbWVkIG91dAoKKEkndmUgYWxzbyB0cmllZCBidHNjbyxhcGxheSAtRCBwbHVnaHc6
+SGVhZHNldCAvMS53YXYsLi4uLi5ldGMuIHRoZQpmYWlsdXJlcyBhcmUgdGhlIHNhbWUpCgojaGNp
+dG9vbCBjb24KQ29ubmVjdGlvbnM6CjwgU0NPIDAwOjBEOjNDOkVCOjUzOkYwIGhhbmRsZSAwIHN0
+YXRlIDUgbG0gU0xBVkUKPCBBQ0wgMDA6MEQ6M0M6RUI6NTM6RjAgaGFuZGxlIDEgc3RhdGUgMSBs
+bSBTTEFWRSBFTkNSWVBUCgooaXQgc2VlbXMgdGhlIFNDTyBsaW5rIGlzIGluY29tcGxldGUuc3Rh
+dGU9NSxub3QgMS4pCgpJIHJlYWQgdGhlIGhlYWRzZXQgcHJvZmlsZSBzcGVjOgpodHRwOi8vd3d3
+LmJsdWV0b290aC5jb20vTlIvcmRvbmx5cmVzLzVDMERFRTA1LTg0Q0QtNEQ3OS1CRDUyLTdFQ0Ey
+ODM0MzBBMC85ODEvSFNQX1NQRUNfVjExLnBkZgphbmQgb24gaXQgc2F5cyB0aGF0ICIKVGhlIGF1
+ZGlvIGdhdGV3YXkgY29udHJvbHMgdGhlIFNDTyBsaW5rIGVzdGFibGlzaG1lbnQgYW5kIHJlbGVh
+c2UuIiBTbwppIHRob3VnaHQgbWF5YmUgaSBzaG91bGQgcGF5IGF0dGVudGlvbiB0byB0aGUgIkF1
+ZGlvIEdhdGV3YXkiLgoKTGF0ZXIgaSBmb3VuZCBzb21ldGhpbmcuSSBjaGVja2VkIG91dCB0aGUg
+d2Vic2l0ZSAiCmh0dHA6Ly93aWtpLmJsdWV6Lm9yZy93aWtpL0F1ZGlvIiBhbmQgZm91bmQgdGhh
+dCB0aGUKL2JsdWV6LXV0aWxzLTMuMjAvYXVkaW8vZ2F0ZXdheS5jIGltcGxlbWVudHMgdGhlCm9y
+Zy5ibHVlei5hdWRpby5nYXRld2F5IGludGVyZmFjZS5CdXQgd2hlbiBpIGxvb2tlZCBpbnRvIHRo
+ZQpnYXRld2F5LmMsIHRoZXJlJ3Mgbm90aGluZyBpbiB0aGVyZS5BbmQgL2JsdWV6LQp1dGlscy0z
+LjIwL2F1ZGlvLWFwaS50eHQgYWxzbyBzYXlzIHRoYXQgdGhlIGF1ZGlvIGdhdGV3YXkgc2Vydmlj
+ZSBpcwpub3QgeWV0IGltcGxlbWVudGVkIGluIHRoZSBjdXJyZW50IGJsdWV6LiBJcyB0aGF0IHRy
+dWU/IElmIGl0IGlzIHNvCixkb2VzIHRoaXMgbWVhbnMgdGhhdCB0aGVyZSdzIG5vIHdheSB3ZSBj
+YW4gZW5hYmxlIHRoZSBTQ08vQTJEUCBhdWRpbwpjb25uZWN0aW9uIHRvIHRoZSBoZWFkc2V0IHJp
+Z2h0IG5vdz8KCkknbSByZWFsbHkgY29uZnVzZWQgY2F1c2UgaSByZWFkIGFib3V0IGFuCmFydGlj
+bGU6aHR0cDovL2JsdWV0b290aC1hbHNhLnNvdXJjZWZvcmdlLm5ldC9idWlsZC5odG1sICx3aGlj
+aAp0ZWFjaGVzIHRoZSByZWFkZXIgaG93IHRvIGVuYWJsZSBibHVleiBhdWRpbyB3aXRob3V0IG1l
+bnRpb25pbmcKYW55dGhpbmcgYWJvdXQgdGhlIG9yZy5ibHVlei5hdWRpby5nYXRld2F5IGltcGxl
+bWVudGF0aW9uLgoKU28gaXMgdGhpcyAiYXVkaW8gZ2F0ZXdheSAiIG5lY2Vzc2FyeSBmb3IgU0NP
+IGxpbmsgZXN0YWJsaXNobWVudD8gT3IKdGhlcmUncyBhbnl0aGluZyBlbHNlIGdvaW5nIHdyb25n
+ID8KCgoKClRoYW5rcwo=
 
 
-
-Hi All:
-
-Sorry to post this again and again,but it seems that the last 2 posts i sent from
-that gmail address turned out to be some strange code.(Probably because
-of the rich text format)
-
-Right now,I'm doing a project aiming to enable the bluez audio feature
-on linux 2.6.18 based on a s3c2410 embeded development board.We are
-trying to enable the SCO headset and A2DP audio feature.I'm using
-bluez-libs-3.20 and bluez-utils-3.20 and ALSA audio drivers.I've also
-applied the 2 patches:"sco-flow-control-4.2 patch" and another kernel
-patch "patch-2.6.18-mh8" downloaded from bluez.org . I'm using a
-bluetooth adapter called "STLC2500C" based on UART interface.It has a
-serial-USB converter on it so it would be connected to my board
-through USB.In linux, it would be the device:/dev/ttyUSB0.
-The trouble is , i've tried many different ways to play audio via SCO
-headset(aplay -D headset /1.wav,hstest play /1.wav 00:0D:3C:EB:53:F0
-1....etc),it always result in an "Can't connect SCO audio channel:
-Connection timed out" failure.The pairing procedure is okey.
-Here are some detailed information:
-
-First,these are the commands i put in the /etc/init.d/rcS
-initialization procedures:
-hciattach ttyUSB0 any
-hciconfig hci0 up
-rm -f /var/run/messagebus.pid
-dbus-daemon --system --fork
-hcid -n -d -f /etc/bluetooth/hcid.conf &
-sdpd -n &
-a2dpd -n &
-hcitool scan
-hciconfig -a
-sdptool add A2SRC
-sdptool add A2SNK
-sdptool add AVRTG
-sdptool add hs
-sdptool add hf
-headsetd -n &
-hciconfig hci0 voice 0x0060
-
-#hciconfig hci0 revision£º
-hci0: Type: UART
-BD Address: 00:80:E1:00:00:00 ACL MTU: 1021:7 SCO MTU: 0:0
-
-STLC2500 R4.2 12102005 12:40:14 ZAV100012
-HW Id= V440BAA
-(My SCO MTU is 0:0,is this okey?)
-
-#aplay -D headset /1.wav
-Can't connect SCO audio channel: Connection timed out
-
-# hstest play /1.wav 00:0D:3C:EB:53:F0 1
-Voice setting: 0x0060
-RFCOMM channel connected
-Can't connect SCO audio channel: Connection timed out
-
-(I've also tried btsco,aplay -D plughw:Headset /1.wav,.....etc. the
-failures are the same)
-
-#hcitool con
-Connections:
-< SCO 00:0D:3C:EB:53:F0 handle 0 state 5 lm SLAVE
-< ACL 00:0D:3C:EB:53:F0 handle 1 state 1 lm SLAVE ENCRYPT
-
-(it seems the SCO link is incomplete.state=5,not 1.)
-
-I read the headset profile spec:
-http://www.bluetooth.com/NR/rdonlyres/5C0DEE05-84CD-4D79-BD52-7ECA283430A0/981/HSP_SPEC_V11.pdf
-and on it says that "
-The audio gateway controls the SCO link establishment and release." So
-i thought maybe i should pay attention to the "Audio Gateway".
-
-Later i found something.I checked out the website "
-http://wiki.bluez.org/wiki/Audio" and found that the
-/bluez-utils-3.20/audio/gateway.c implements the
-org.bluez.audio.gateway interface.But when i looked into the
-gateway.c, there's nothing in there.And /bluez-
-utils-3.20/audio-api.txt also says that the audio gateway service is
-not yet implemented in the current bluez. Is that true? If it is so
-,does this means that there's no way we can enable the SCO/A2DP audio
-connection to the headset right now?
-
-I'm really confused cause i read about an
-article:http://bluetooth-alsa.sourceforge.net/build.html ,which
-teaches the reader how to enable bluez audio without mentioning
-anything about the org.bluez.audio.gateway implementation.
-
-So is this "audio gateway " necessary for SCO link establishment? Or
-there's anything else going wrong ?
-
-
-
-
-Thanks
-
-_________________________________________________________________
-Explore the seven wonders of the world
-http://search.msn.com/results.aspx?q=7+wonders+world&mkt=en-US&form=QBRE
-
-
---===============0636445776==
+--===============0627526968==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -135,7 +95,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============0636445776==
+--===============0627526968==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -146,4 +106,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0636445776==--
+--===============0627526968==--
