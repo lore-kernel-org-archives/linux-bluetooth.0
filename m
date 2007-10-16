@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 16 Oct 2007 19:26:13 -0700 (PDT)
-From: Chris Dragga <chris_dragga@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <b7f7accd0710160552x6d6e8a49h9646911eb2a94bf8@mail.gmail.com>
+Date: Tue, 16 Oct 2007 18:22:00 +0530
+From: "Yogesh Jagtap" <jagtapyb@gmail.com>
+To: Bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Message-ID: <965195.67885.qm@web52102.mail.re2.yahoo.com>
-Subject: [Bluez-users] Not finding services through D-Bus API
+Subject: [Bluez-users] Regarding GetInfo
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,29 +14,56 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============2110858549=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I'm trying to use the Bluez D-Bus API on XUbuntu to establish a PAN network connection, as described in the wiki page on creating network connections.  However, I inevitably get the error "No such service" upon trying to activate the network service with the Bluez Manager object.  Furthermore, calls to ListServices() return an empty array, and I've noticed that none of the .service files that come with Bluez-utils are installed on my computer.  sdptool works, though, allowing me to activate services that then show up using "sdptool browse local".  I currently have bluez-utils-3.20 and bluez-libs-3.20 installed, though I've also tried this with bluez-utils-3.9 and bluez-libs-3.9 (the packages available from Synaptic) with equally little success.  If anyone could provide any information that might help me, I'd greatly appreciate it, as I'm really not sure what to do.
+--===============2110858549==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_25290_33125658.1192539120485"
 
-Thanks,
-Chris Dragga
+------=_Part_25290_33125658.1192539120485
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hello everyone,
+
+How can I retrive values returned by GetInfo api?
+
+Regards
+Yogesh
+
+------=_Part_25290_33125658.1192539120485
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hello everyone,<br><br>How can I retrive values returned by GetInfo api? <br><br>Regards<br>Yogesh<br>
+
+------=_Part_25290_33125658.1192539120485--
 
 
-
-
-       
-____________________________________________________________________________________
-Take the Internet to Go: Yahoo!Go puts the Internet in your pocket: mail, news, photos & more. 
-http://mobile.yahoo.com/go?refer=1GNXIC
+--===============2110858549==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
+--===============2110858549==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============2110858549==--
