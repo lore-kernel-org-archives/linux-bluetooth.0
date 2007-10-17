@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4715E28A.3080009@free.fr>
+Date: Wed, 17 Oct 2007 12:23:06 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5f84803c0710161138i6123770dk22c1b63d03f45f59@mail.gmail.com>
-References: <5f84803c0710161138i6123770dk22c1b63d03f45f59@mail.gmail.com>
-Date: Wed, 17 Oct 2007 16:24:11 +0200
-Message-Id: <1192631052.6184.25.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] make bluez GNOME UIs singletons
+References: <000001c80cca$eff9ed00$c72915ac@NOE.Nokia.com>	<4711FB4D.2010609@free.fr>
+	<000601c80f19$b92b2270$0f9db70a@NOE.Nokia.com>
+In-Reply-To: <000601c80f19$b92b2270$0f9db70a@NOE.Nokia.com>
+Subject: Re: [Bluez-devel] PATCH1/2: bluez-utils -fix-a2dp-buffer-constraints
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,28 +21,61 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Chris,
+Hello Kai,
 
-> Howdy folks.  The attached patch makes the applet, properties dialog,
-> and wizard singletons.  Currently, you can open several instances of
-> these at a time.  This is particularly annoying since you can launch
-> the properties dialog from the applet.  I also added a simple DBUS
-> method (Present) to the properties dialog and wizard that can be
-> called by another instance to bring the current instance to the
-> foreground. 
+> I've been testing with a low spec GNU/Debian desktop, and the problem has 
+> been too high CPU load leading to a continuous stream of XRUNs in 
+> the pcm_bluetooth.c code (i.e. no audio output at all). With the patch, 
+> on the same exact system, playback is flawless. And the problem only
+> occurs with apps that always poll/select before writing to the device (i.e.
+> not aplay). Relaxing the buffering constraints allows apps to feed audio 
+> to A2DP with less context switches and less system calls (bigger buffer
+> fragments at a time basicly).
 
-actually the wizard and the properties applications are meant to be
-_not_ singletons. They are designed in a way that multiple instances can
-exist and work together.
+I'm quite interested in optimizations for low end ARM boxes :-)
+Could you provide CPU details and the player you used to performed your 
+testing ? I'd like to be able to reproduce those on my Neo1973 box :-)
 
-For the applet, only one instance is useful. However for testing and
-development purposes it is nice to start two of them.
+> 
+>>> -	/* supported block size */
+>>> +	/* supported block sizes:
+>>> +	 *   - lower limit is A2DP codec size
+>>> +	 *   - total buffer size is the upper limit (with two periods) */
+>>>  	err = snd_pcm_ioplug_set_param_minmax(io,
+> SND_PCM_IOPLUG_HW_PERIOD_BYTES,
+> [...]
+>>> +	/* supported buffer sizes */
+>>> +	err = snd_pcm_ioplug_set_param_minmax(io,
+> SND_PCM_IOPLUG_HW_BUFFER_BYTES,
+>>> +					      MIN_BUFFER_SIZE,
+> MAX_BUFFER_SIZE);
+>>>  	if (err < 0)
+>>>  		return err;
+>>
+>> This part of the code is useless, you don't need to set 
+>> SND_PCM_IOPLUG_HW_BUFFER_BYTES if you set 
+>> SND_PCM_IOPLUG_HW_PERIODS, you just have to choose one of the 
+>> two alternatives :-)
+> 
+> But if we'd drop setting mimax for BUFFER_BYTES, the application could 
+> request for 64 periods of size 'MAX_BUFFER_SIZE / 2' -> 524288 bytes.
+> Of course we could fix this by limiting the max period size, but then 
+> the application couldn't use a buffering setup of two max-sized periods
+> (good for robust playback). If we'd limit the max count of periods, 
+> application couldn't choose a buffering setup of lots of small 
+> buffer fragments (good for robust recording with minimal latency).
+> 
+> So defining a minmax range for all three params gives more
+> flexibility without requiring any added logic to the plugin
+> code.
 
-Regards
+That's definately a good answer :-).
+Maybe we should drop SND_PCM_IOPLUG_HW_PERIODS and keep 
+SND_PCM_IOPLUG_HW_BUFFER_BYTES only then ?
 
-Marcel
+Cheers,
 
-
+Fabien
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
