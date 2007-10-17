@@ -1,15 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Thilo Riessner <thilo@riessner.de>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Wed, 17 Oct 2007 18:04:10 +0200
-References: <200710170839.22891.thilo@riessner.de>
-	<1192630894.6184.20.camel@violet>
-In-Reply-To: <1192630894.6184.20.camel@violet>
+Message-ID: <47162FFD.3080408@pagema.net>
+Date: Wed, 17 Oct 2007 17:53:33 +0200
+From: maho+bluez <maho+bluez@pagema.net>
 MIME-Version: 1.0
-Message-Id: <200710171804.10464.thilo@riessner.de>
-Subject: Re: [Bluez-users]
-	=?iso-8859-1?q?HP_Bluetooth_PC_Card_Mouse_doesn=27t?=
-	=?iso-8859-1?q?_work_after=09upgrade_to_openSuSE_10=2E3?=
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <4716261D.40902@pagema.net>
+In-Reply-To: <4716261D.40902@pagema.net>
+Subject: Re: [Bluez-users] problem with alsa/bluetooth device
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,30 +20,58 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Am Mittwoch, 17. Oktober 2007 schrieb Marcel Holtmann:
-> Hi Thilo,
->
-> > my HP Bluetooth PC Card Moue, worked fine under openSuSE 10.2 after I
-> > added --connect 00:02:76:00:D0:3E to the hidd option (in the
-> > file /etc/sysconfig/bluetooth). But after upgrade to 10.3 this trick
-> > doesn't work any more. I tryed to to remove the pionting device and
-> > create it new. But than I have to switch the mouse in discorvery more. Is
-> > there any hint how to solve the problem?
->
-> the openSuSE 10.3 should use the input service. Check the wiki.bluez.org
-> for details on how to configure devices. You only need to do that once
-> btw. and then the mouse will re-connect.
->
-> Regards
->
-> Marcel
-I tried that already, but it doesn't work for me, at least not satisfying. The 
-reconnect does not work. Should the hidd still run, and if yes, which options 
-should it be given? I guess "--connect 00:02:76:00:D0:3E" is not needed 
-any more? But maybe --master and/or --server? 
-Thanks for your answer,
+maho+bluez wrote:
+> [...]
+> Next, I have run:
+> #v+
+> maho@tereska:~/tmp$ aplay -v -Dbluetooth /tmp/ee.wav
+> Playing WAVE '/tmp/ee.wav' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
+> ALSA lib pcm_bluetooth.c:417:(bluetooth_hsp_hw_params) Protocol not
+> available (92)
+> Bluetooth Audio Device
+> Its setup is:
+>   stream       : PLAYBACK
+>   access       : RW_INTERLEAVED
+>   format       : S16_LE
+>   subformat    : STD
+>   channels     : 1
+>   rate         : 8000
+>   exact rate   : 8000 (8000/1)
+>   msbits       : 16
+>   buffer_size  : 4008
+>   period_size  : 24
+>   period_time  : 3000
+>   tick_time    : 0
+>   tstamp_mode  : NONE
+>   period_step  : 1
+>   sleep_min    : 0
+>   avail_min    : 24
+>   xfer_align   : 24
+>   start_threshold  : 4008
+>   stop_threshold   : 4008
+>   silence_threshold: 0
+>   silence_size : 0
+>   boundary     : 9025213653250473984
+> aplay: pcm_write:1265: write error: Invalid argument
+>   
+And interesting thing: arecord reports the same error message...
 
-Thilo
+#v+
+maho@tereska:~/tmp$ LC_ALL=C arecord -D bluetooth -f S16_LE  > /tmp/eee.wav
+Recording WAVE 'stdin' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
+ALSA lib pcm_bluetooth.c:417:(bluetooth_hsp_hw_params) Protocol not
+available (92)
+#v-
+
+, but /tmp/eee.wav contains properly recorded sound.
+
+Any ideas?
+
+regards
+
+maHo
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
