@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <965195.67885.qm@web52102.mail.re2.yahoo.com>
-References: <965195.67885.qm@web52102.mail.re2.yahoo.com>
-Date: Wed, 17 Oct 2007 16:22:27 +0200
-Message-Id: <1192630947.6184.22.camel@violet>
+In-Reply-To: <200710170839.22891.thilo@riessner.de>
+References: <200710170839.22891.thilo@riessner.de>
+Date: Wed, 17 Oct 2007 16:21:34 +0200
+Message-Id: <1192630894.6184.20.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Not finding services through D-Bus API
+Subject: Re: [Bluez-users] HP Bluetooth PC Card Mouse doesn't work
+	after	upgrade to openSuSE 10.3
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,11 +21,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Chris,
+Hi Thilo,
 
-> I'm trying to use the Bluez D-Bus API on XUbuntu to establish a PAN network connection, as described in the wiki page on creating network connections.  However, I inevitably get the error "No such service" upon trying to activate the network service with the Bluez Manager object.  Furthermore, calls to ListServices() return an empty array, and I've noticed that none of the .service files that come with Bluez-utils are installed on my computer.  sdptool works, though, allowing me to activate services that then show up using "sdptool browse local".  I currently have bluez-utils-3.20 and bluez-libs-3.20 installed, though I've also tried this with bluez-utils-3.9 and bluez-libs-3.9 (the packages available from Synaptic) with equally little success.  If anyone could provide any information that might help me, I'd greatly appreciate it, as I'm really not sure what to do.
+> my HP Bluetooth PC Card Moue, worked fine under openSuSE 10.2 after I 
+> added --connect 00:02:76:00:D0:3E to the hidd option (in the 
+> file /etc/sysconfig/bluetooth). But after upgrade to 10.3 this trick doesn't 
+> work any more. I tryed to to remove the pionting device and create it new. 
+> But than I have to switch the mouse in discorvery more. Is there any hint how 
+> to solve the problem?
 
-the the syslog for any error messages.
+the openSuSE 10.3 should use the input service. Check the wiki.bluez.org
+for details on how to configure devices. You only need to do that once
+btw. and then the mouse will re-connect.
 
 Regards
 
