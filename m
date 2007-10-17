@@ -1,10 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <f8e53fb0710170033u2b451d7ft34cad156e0828a49@mail.gmail.com>
-Date: Wed, 17 Oct 2007 09:33:14 +0200
-From: "Andrea Galbusera" <gizero@gmail.com>
-To: Bluez-users@lists.sourceforge.net
+From: Thilo Riessner <thilo@riessner.de>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Wed, 17 Oct 2007 08:39:22 +0200
 MIME-Version: 1.0
-Subject: [Bluez-users] concurrent calls to RFCOMM connect()
+Message-Id: <200710170839.22891.thilo@riessner.de>
+Subject: [Bluez-users] HP Bluetooth PC Card Mouse doesn't work after upgrade
+	to openSuSE 10.3
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +19,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi all,
-I'm planning to write an application handling communication with four
-bluetooth devices, each with its own BT address. I was thinking to
-design it with four parallel threads and use rfcomm sockets API.
+Hello,
 
-The common thread function will start connecting to the appropriate
-remote device by allocating a socket and calling connect(). Do I have
-to consider any particular syncronization issue between the threads?
-Is this approach reasonable or not?
+my HP Bluetooth PC Card Moue, worked fine under openSuSE 10.2 after I 
+added --connect 00:02:76:00:D0:3E to the hidd option (in the 
+file /etc/sysconfig/bluetooth). But after upgrade to 10.3 this trick doesn't 
+work any more. I tryed to to remove the pionting device and create it new. 
+But than I have to switch the mouse in discorvery more. Is there any hint how 
+to solve the problem?
+Many thanks in advance
 
-I found posts in the archives about connect() returning EBUSY. This
-has to be an   error code specific to RFCOMM sockets. When is it
-supposed to be raised? Is it something I have to take into account in
-my scenario?
+Thilo
 
-TIA
-Andrea
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
