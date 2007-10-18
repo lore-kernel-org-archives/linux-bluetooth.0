@@ -1,18 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <d89ddf300710171859t299c136ai64c61b329b90ec8d@mail.gmail.com>
-Date: Wed, 17 Oct 2007 19:59:41 -0600
+Message-ID: <d89ddf300710171849p3cd9da02kb7488387e095b534@mail.gmail.com>
+Date: Wed, 17 Oct 2007 19:49:57 -0600
 From: "Brad Midgley" <bmidgley@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <470F4FE8.2080003@access-company.com>
+In-Reply-To: <BAY117-W36EE4B29F3D4550A7C9847C09E0@phx.gbl>
 MIME-Version: 1.0
-References: <d89ddf300710110913x709d8010u9eb6f4d70c7fe47c@mail.gmail.com>
-	<1192120314.6537.43.camel@aeonflux.holtmann.net>
-	<d89ddf300710110948y2a1b097p823f38a1099c7154@mail.gmail.com>
-	<1192121581.6537.45.camel@aeonflux.holtmann.net>
-	<d89ddf300710111011j5c36df76ga1844b56ff3e1f0b@mail.gmail.com>
-	<1192123913.6537.48.camel@aeonflux.holtmann.net>
-	<470F4FE8.2080003@access-company.com>
-Subject: Re: [Bluez-devel] sbc analysis code
+References: <BAY117-W36EE4B29F3D4550A7C9847C09E0@phx.gbl>
+Subject: Re: [Bluez-devel] SCO connection timed out issue
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -26,20 +20,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel
+semiyd
 
-This will be nice for future optimization work so I'd like to add this
-to the project if there are no objections. I'll  let you add the build
-stuff.
+> Later i found something.I checked out the website "
+> http://wiki.bluez.org/wiki/Audio" and found that the
+> /bluez-utils-3.20/audio/gateway.c implements the
+> org.bluez.audio.gateway interface.But when i looked into the
+> gateway.c, there's nothing in there.And /bluez-
+> utils-3.20/audio-api.txt also says that the audio gateway service is
+> not yet implemented in the current bluez. Is that true? If it is so
+> ,does this means that there's no way we can enable the SCO/A2DP audio
+> connection to the headset right now?
 
-Brad
+for now the files there are named backward. gateway.c would contain
+code for talking to a gateway device, not for being a gateway. You can
+experiment now with sco/a2dp to a headset just fine.
 
-> Marcel,
->
-> This is updated version.
-> Regards,
->
-> Frederic
+> I'm really confused cause i read about an
+> article:http://bluetooth-alsa.sourceforge.net/build.html ,which
+> teaches the reader how to enable bluez audio without mentioning
+> anything about the org.bluez.audio.gateway implementation.
+
+the bluetooth-alsa stuff is all old. that's why there's a banner
+across the top of the page directing people to the new stuff.
+
+brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
