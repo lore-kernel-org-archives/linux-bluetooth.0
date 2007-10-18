@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4717360C.7090801@free.fr>
-Date: Thu, 18 Oct 2007 12:31:40 +0200
+Message-ID: <47173238.5070508@free.fr>
+Date: Thu, 18 Oct 2007 12:15:20 +0200
 From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <BAY117-W36EE4B29F3D4550A7C9847C09E0@phx.gbl>
-In-Reply-To: <BAY117-W36EE4B29F3D4550A7C9847C09E0@phx.gbl>
-Subject: Re: [Bluez-devel] SCO connection timed out issue
+References: <5f84803c0710161138i6123770dk22c1b63d03f45f59@mail.gmail.com>	<1192631052.6184.25.camel@violet>	<5f84803c0710170748j57f46eebh37a6707b9ec02b86@mail.gmail.com>
+	<1192633908.10179.2.camel@snoogens.fab.redhat.com>
+In-Reply-To: <1192633908.10179.2.camel@snoogens.fab.redhat.com>
+Subject: Re: [Bluez-devel] [PATCH] make bluez GNOME UIs singletons
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,21 +21,46 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Bastien Nocera wrote:
+> On Wed, 2007-10-17 at 10:48 -0400, Chris Rivera wrote:
+>> On 10/17/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+>>         
+>>         actually the wizard and the properties applications are meant
+>>         to be
+>>         _not_ singletons. They are designed in a way that multiple
+>>         instances can
+>>         exist and work together.
+>>         
+>>         For the applet, only one instance is useful. However for
+>>         testing and 
+>>         development purposes it is nice to start two of them.
+>>
+>> The applet already has the ability to launch the properties dialog and
+>> I think it should also have an entry to launch the wizard.   This
+>> makes it very easy to get to a state where you have multiple copies
+>> open at once.  I think it's confusing to users and it doesn't buy you
+>> anything.  Just in case it's not clear, the patch allows for one
+>> instance per desktop session. 
+> 
+> Both of you are right. Developers should be able to launch another
+> applet or prefs for testing, but users should only ever see one applet
+> and prefs dialogue.
+> 
+> Maybe a command-line flag or envvar to disable the singleton behaviour
+> in Chris' patch would be acceptable for Marcel?
+> 
+> Cheers
+> 
 
-Sorry i have to say you this, but you're basically trying to make sth
-work that will never make it ;-)
+Bastien, i agree with you. :-)
+ From the user experience perspective, having more than one instance of 
+those windows is just plain wrong( in fact this was a remark one working 
+collegue of mine just had when he discovered the bluez GUI for the first 
+time :-) )
+If Marcel wants to keep the old behaviour for testing purpose, i'm not 
+against it, but i really think the singleton behavior should be the default.
 
-* STLC2500C does not support sco over hci, so unless your development 
-has an audio codec hardwired to the BT chip, you're screwed :-(
-* You need latest bluez-utils CVS to have any chance for your chip
-to run at decent speed, which is required for a2dp streaming. You should 
-then use the follwing syntax to start the chip at max speed: hciattach 
-/dev/ttyUSB0 stlc2500 921600
-
-Apart from that this is know to work.
-
-Regards,
+Cheers,
 
 Fabien
 
