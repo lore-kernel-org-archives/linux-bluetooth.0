@@ -1,10 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Thu, 18 Oct 2007 11:45:17 -0600
-From: Kevin Fenzi <kevin@scrye.com>
-To: Bluez-devel@lists.sourceforge.net
-Message-ID: <20071018114517.4b6d1850@ghistelwchlohm.scrye.com>
-Mime-Version: 1.0
-Subject: [Bluez-devel] bluetooth headset not working
+Date: Thu, 18 Oct 2007 10:33:45 -0700 (PDT)
+From: Jim Carter <jimc@math.ucla.edu>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <471730B2.3030606@free.fr>
+Message-ID: <Pine.LNX.4.64.0710181017560.28683@simba.math.ucla.edu>
+References: <719D5CCC2F6E3644B0A9F5C9B1D00088038171C2@esebe104.NOE.Nokia.com>
+	<471730B2.3030606@free.fr>
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] PATCH1/2: bluez-utils -
+	fix-a2dp-buffer-constraints
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,88 +18,46 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0230622132=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0230622132==
-Content-Type: multipart/signed; boundary="Sig_/GomzaIeIW=+31KgwJDycWT/";
-	protocol="application/pgp-signature"; micalg=PGP-SHA1
+On Thu, 18 Oct 2007, Fabien Chevalier wrote:
+> > On 12 Oct 2007, Kai Vehmanen wrote: 
 
---Sig_/GomzaIeIW=+31KgwJDycWT/
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+> > Current code seems to gather samples-to-be-sent in a buffer,
+> > and when a threshold (a2dp->codesize or cfg.pkt_len) is reached,
+> > a packet is then sent right away. So in other words, application
+> > cannot really prefill more data than one packet worth, and most of 
+> > the allocated buffer space gets never used.
+> 
+> Well, application can prefill more data, the data gets send immediately 
+> to the headset, and buffering will happen at headset side. The issue is 
+> if the buffer size as seen by the application is bigger than the real 
+> headset buffer size, and the application waits for the buffer to be 
+> almost empty before to refill it, then audio cuts might happen. :-(
 
-Greetings.=20
+I remember a month or two back, someone said that the A2DP profile was weak 
+on flow control, requiring the source (ALSA) to send data at an even rate.  
+If the headset's buffer is full can it cork the stream?  Or will the 
+additional data just overwrite data already at the headset?
 
-I recently had a chance to look at the new bluez-utils and the setup
-for headsets. Very much nicer than any of the old methods. :)=20
+With bluez-utils-3.19 (3.20 is latest) I'm having consistently good results 
+sending to the Bluetooth ALSA device, with neither silent gaps nor lost 
+chunks.  But I'm seeing corruption when going through PulseAudio, which is 
+attributed to an unknown formatting or parameter issue and is being dealt 
+with on their mailing list.
 
-However, I can't seem to get my headset working with twinkle (or any
-other phone app).=20
-
-I have setup my ~/.asoundrc.=20
-I can play audio to my headset via mplayer or aplay fine.=20
-When I try and set twinkle to use the ALSA bluetooth device it seems
-like it opens the headset, and then it spits out:=20
-
-ALSA lib pcm_bluetooth.c:417:(bluetooth_hsp_hw_params) Protocol not
-available (92)=20
-ALSA lib pcm_bluetooth.c:417:(bluetooth_hsp_hw_params) Protocol not
-available (92)
-
-Then it goes to 100% cpu and unresponsive.=20
-
-ALSA bug? or bluez-utils? Anyone seen this before or have
-a work around?=20
-
-twinkle-1.1-3.fc8.x86_64
-alsa-lib-1.0.15-0.2.rc2.fc8.x86_64
-bluez-utils-3.20-2.fc8.x86_64
-
-I talked with the twinkle developers, and they say it's not an issue
-with twinkle. See:=20
-http://tech.groups.yahoo.com/group/twinklephone/message/1879?l=3D1
-
-Happy to provide info or debugging... CC me for faster response.=20
-
-kevin
-
---Sig_/GomzaIeIW=+31KgwJDycWT/
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Disposition: attachment; filename=signature.asc
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.7 (GNU/Linux)
-
-iD8DBQFHF5ut3imCezTjY0ERAnCVAJ4icCGkmyofl76Pq6fqSyHduPRzIgCgjvmX
-ejrgHfpnJGnxzr784oSUVXk=
-=XEh6
------END PGP SIGNATURE-----
-
---Sig_/GomzaIeIW=+31KgwJDycWT/--
-
-
---===============0230622132==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+James F. Carter          Voice 310 825 2897    FAX 310 206 6673
+UCLA-Mathnet;  6115 MSA; 405 Hilgard Ave.; Los Angeles, CA, USA  90095-1555
+Email: jimc@math.ucla.edu    http://www.math.ucla.edu/~jimc (q.v. for PGP key)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============0230622132==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0230622132==--
