@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <47179104.2000601@silicom.fr>
-Date: Thu, 18 Oct 2007 18:59:48 +0200
-From: Fabien Chevalier <fchevalier@silicom.fr>
+From: "Pierre Savary" <pierre.savary@kerlink.fr>
+To: <bluez-devel@lists.sourceforge.net>
+Date: Thu, 18 Oct 2007 16:10:49 +0200
+Message-ID: <008f01c81190$b044a270$10cde750$@savary@kerlink.fr>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <008f01c81190$b044a270$10cde750$@savary@kerlink.fr>
-In-Reply-To: <008f01c81190$b044a270$10cde750$@savary@kerlink.fr>
-Content-Type: multipart/mixed; boundary="------------030301020200010701040708"
-Subject: Re: [Bluez-devel] compile audio in bluez-utils-3.20
+Subject: [Bluez-devel] compile audio in bluez-utils-3.20
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,81 +14,102 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------030301020200010701040708
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi,
 
-Hi Pierre,
-> Hi,
-> 
-> I am a beginner with bluez and I hope that you will be able to inform me and
-> to help itself. I wish that my PC be the headset of my phone.
-> I wish that it embed audio profiles HFP and A2DP so that it can be used as
-> headset/handsfree for a telephone or a walkman.
+I am a beginner with bluez and I hope that you will be able to inform me and
+to help itself. I wish that my PC be the headset of my phone.
+I wish that it embed audio profiles HFP and A2DP so that it can be used as
+headset/handsfree for a telephone or a walkman.
 
-It will be done at some point in the future, but right now this is not 
-implemented. Only the HFP audio gateway side an A2DP source is currently 
-being actively developped.
+To begin I try to compile audio/ package bluez-utils-3.20 but it doesn't
+work ... I make ./configure --enable-all and obtain this config.h :
+/* config.h.  Generated from config.h.in by configure.  */
+/* config.h.in.  Generated from configure.in by autoheader.  */
+/* Directory for the configuration files */
+#define CONFIGDIR "/etc/bluetooth"
+/* Define to 1 if you have D-Bus GLib bindings. */
+/* #undef HAVE_DBUS_GLIB */
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#define HAVE_DLFCN_H 1
+/* Define to 1 if you have the <expat.h> header file. */
+/* #undef HAVE_EXPAT_H */
+/* Define to 1 if you have the <inttypes.h> header file. */
+#define HAVE_INTTYPES_H 1
+/* Define to 1 if you have USB library. */
+#define HAVE_LIBUSB 1
+/* Define to 1 if you have the <memory.h> header file. */
+#define HAVE_MEMORY_H 1
+/* Define to 1 if you have the <stdint.h> header file. */
+#define HAVE_STDINT_H 1
+/* Define to 1 if you have the <stdlib.h> header file. */
+#define HAVE_STDLIB_H 1
+/* Define to 1 if you have the <strings.h> header file. */
+#define HAVE_STRINGS_H 1
+/* Define to 1 if you have the <string.h> header file. */
+#define HAVE_STRING_H 1
+/* Define to 1 if you have the <sys/inotify.h> header file. */
+/* #undef HAVE_SYS_INOTIFY_H */
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#define HAVE_SYS_STAT_H 1
+/* Define to 1 if you have the <sys/types.h> header file. */
+#define HAVE_SYS_TYPES_H 1
+/* Define to 1 if you have the <unistd.h> header file. */
+#define HAVE_UNISTD_H 1
+/* Define to 1 if you need the dbus_watch_get_unix_fd() function. */
+#define NEED_DBUS_WATCH_GET_UNIX_FD 1
+/* Define to 1 if you need the ppoll() function. */
+#define NEED_PPOLL 1
+/* Define to 1 if you need the usb_get_busses() function. */
+/* #undef NEED_USB_GET_BUSSES */
+/* Define to 1 if you need the usb_interrupt_read() function. */
+/* #undef NEED_USB_INTERRUPT_READ */
+/* Name of package */
+#define PACKAGE "bluez-utils"
+/* Define to the address where bug reports for this package should be sent.
+*/
+#define PACKAGE_BUGREPORT ""
+/* Define to the full name of this package. */
+#define PACKAGE_NAME ""
+/* Define to the full name and version of this package. */
+#define PACKAGE_STRING ""
+/* Define to the one symbol short name of this package. */
+#define PACKAGE_TARNAME ""
+/* Define to the version of this package. */
+#define PACKAGE_VERSION ""
+/* Directory for the service programs */
+#define SERVICEDIR "/usr/local/lib/bluetooth"
+/* Define to 1 if you have the ANSI C header files. */
+#define STDC_HEADERS 1
+/* Directory for the storage files */
+#define STORAGEDIR "/var/lib/bluetooth"
+/* Version number of package */
+#define VERSION "3.20"
+/* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
+   `char[]'. */
+/* #undef YYTEXT_POINTER */
+Then I make a make ... and I don't see *.o file in the audio directory
+???!!! What can I do?
 
-> Then I make a make ... and I don't see *.o file in the audio directory
-> ???!!! What can I do?
+Also, does it exist an opensource project for handsfree profile with bluez?
+Could you help me to compile and to use a HFP profile please?
 
---enable-all does not enable audio service ;-)
-You need to run with --enable-audio.
+Big thanks in advance
+Regards
 
-> 
-> Also, does it exist an opensource project for handsfree profile with bluez?
-
-Handsfree profile is basically in the pipe. If all goes as planned, it 
-should come something like end of 2007/early 2008.
-
-Regards,
-
-Fabien Chevalier
-
---------------030301020200010701040708
-Content-Type: text/x-vcard; charset=utf-8;
- name="fchevalier.vcf"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="fchevalier.vcf"
-
-begin:vcard
-fn:Fabien CHEVALIER
-n:CHEVALIER;Fabien
-org:SILICOM
-adr:;;4 rue de Jouanet; RENNES ATALANTE;;35700;FRANCE
-email;internet:fchevalier@silicom.fr
-title:Software & Studies Engineer
-tel;work:+33 (0) 2 99 84 17 17
-version:2.1
-end:vcard
+Pierre
 
 
---------------030301020200010701040708
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---------------030301020200010701040708
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---------------030301020200010701040708--
