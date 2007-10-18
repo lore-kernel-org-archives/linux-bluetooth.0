@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Thu, 18 Oct 2007 10:59:50 -0700 (PDT)
-From: Jim Carter <jimc@math.ucla.edu>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20071018114517.4b6d1850@ghistelwchlohm.scrye.com>
-Message-ID: <Pine.LNX.4.64.0710181052500.28683@simba.math.ucla.edu>
-References: <20071018114517.4b6d1850@ghistelwchlohm.scrye.com>
+Message-ID: <47179EC5.8080808@cilnu.com>
+Date: Thu, 18 Oct 2007 18:58:29 +0100
+From: Jon Maber <jon@cilnu.com>
 MIME-Version: 1.0
-Cc: kevin@scrye.com
-Subject: Re: [Bluez-devel] bluetooth headset not working
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] LED Output Reports to Keyboard
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,27 +18,53 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, 18 Oct 2007, Kevin Fenzi wrote:
+Right place to talk about the Bluez source code that is now in the Linux 
+Kernel? Hope so.
 
-> I have setup my ~/.asoundrc. 
-> I can play audio to my headset via mplayer or aplay fine. 
-> When I try and set twinkle to use the ALSA bluetooth device it seems
-> like it opens the headset, and then it spits out: 
-> 
-> ALSA lib pcm_bluetooth.c:417:(bluetooth_hsp_hw_params) Protocol not
-> available (92) 
+In essence: testing with kernel 2.6.22, it seems to me that LED 
+information is sent to bluetooth devices using the boot protocol 
+regardless of whether the boot protocol is active and even if the device 
+explicitly declares that it doesn't support boot protocol.
 
-aplay or mplayer are talking to the ALSA device that uses the A2DP profile.  
-The phone app needs to use the device with the HFP profile.  It looks like 
-you got that set up in .asoundrc since a plausible subroutine is reporting 
-the error.  Next question: does your headset do HFP, or is it purely a 
-music headset (A2DP)?  Some headsets, including the Motorola HT820, will 
-auto-switch, but I think not every music headset will do so.  Hope this 
-helps!
 
-James F. Carter          Voice 310 825 2897    FAX 310 206 6673
-UCLA-Mathnet;  6115 MSA; 405 Hilgard Ave.; Los Angeles, CA, USA  90095-1555
-Email: jimc@math.ucla.edu    http://www.math.ucla.edu/~jimc (q.v. for PGP key)
+
+In detail:  I'm designing a Bluetooth keyboard device which has some 
+LEDs which are for customised use.   This means that they have ID 
+numbers that cannot be represented in the boot protocol keyboard output 
+report.  So, the device has a customised report descriptor. The first 
+byte of the output report is the same as the boot protocol but a second 
+byte is added containing eight more LED flags. 
+
+I'm testing my device on a laptop running Fedora Core 6 with kernel 
+2.6.22.  Digging in the kernel source code I found that the LED output 
+reports are sent from the function hidp_queue_event in the source file 
+net/bluetooth/hidp/core.c.  I added an extra line for debugging;
+
+    BT_DBG("Sending keyboard boot protocol LED output report. Session is 
+in %s mode.",
+        ((session->flags & (1 << 
+HIDP_BOOT_PROTOCOL_MODE))?"boot":"report") );
+
+which confirms that the HIDP module has correctly understood from my 
+service record that boot protocol mode is not set.  The rest of this 
+function however sends a hard wired boot protocol frame and therefore 
+ignores completely any LED events that cannot be represented.  In fact 
+for my customised LEDs no frame is sent at all since to this function it 
+seems that no significant LED has changed state.
+
+By the way, I also use a customised input report for key presses which 
+is handled perfectly O.K.
+
+First question: can anyone tell me that the more unusual LED events do 
+get through to their Bluetooth keyboard when using Linux?  It is of 
+course possible that I've messed up my Service Record and all of the 
+above is a load of tosh.
+
+Second question: actually I'll not dive into a load more questions about 
+fixing the bug until I know that I've actually found one.
+
+Jon
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
