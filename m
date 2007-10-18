@@ -1,14 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Thu, 18 Oct 2007 10:33:45 -0700 (PDT)
-From: Jim Carter <jimc@math.ucla.edu>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <471730B2.3030606@free.fr>
-Message-ID: <Pine.LNX.4.64.0710181017560.28683@simba.math.ucla.edu>
-References: <719D5CCC2F6E3644B0A9F5C9B1D00088038171C2@esebe104.NOE.Nokia.com>
-	<471730B2.3030606@free.fr>
+Message-ID: <d89ddf300710181026y23897b7eqb542f3adf7bfd35f@mail.gmail.com>
+Date: Thu, 18 Oct 2007 11:26:02 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <BAY117-W3751B12FFAA024B30DE551C09E0@phx.gbl>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] PATCH1/2: bluez-utils -
-	fix-a2dp-buffer-constraints
+References: <BAY117-W36EE4B29F3D4550A7C9847C09E0@phx.gbl>
+	<d89ddf300710171849p3cd9da02kb7488387e095b534@mail.gmail.com>
+	<BAY117-W28F4B89B2868D45873A26CC09E0@phx.gbl>
+	<d89ddf300710180624r1970cc87p2ed1911a93a98c56@mail.gmail.com>
+	<BAY117-W3751B12FFAA024B30DE551C09E0@phx.gbl>
+Subject: Re: [Bluez-devel] SCO connection timed out issue
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,35 +24,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, 18 Oct 2007, Fabien Chevalier wrote:
-> > On 12 Oct 2007, Kai Vehmanen wrote: 
+semiyd,
 
-> > Current code seems to gather samples-to-be-sent in a buffer,
-> > and when a threshold (a2dp->codesize or cfg.pkt_len) is reached,
-> > a packet is then sent right away. So in other words, application
-> > cannot really prefill more data than one packet worth, and most of 
-> > the allocated buffer space gets never used.
-> 
-> Well, application can prefill more data, the data gets send immediately 
-> to the headset, and buffering will happen at headset side. The issue is 
-> if the buffer size as seen by the application is bigger than the real 
-> headset buffer size, and the application waits for the buffer to be 
-> almost empty before to refill it, then audio cuts might happen. :-(
+fyi you get unpredictable behavior if you change stuff in
+/var/lib/bluetooth manually.
 
-I remember a month or two back, someone said that the A2DP profile was weak 
-on flow control, requiring the source (ALSA) to send data at an even rate.  
-If the headset's buffer is full can it cork the stream?  Or will the 
-additional data just overwrite data already at the headset?
+brad
 
-With bluez-utils-3.19 (3.20 is latest) I'm having consistently good results 
-sending to the Bluetooth ALSA device, with neither silent gaps nor lost 
-chunks.  But I'm seeing corruption when going through PulseAudio, which is 
-attributed to an unknown formatting or parameter issue and is being dealt 
-with on their mailing list.
-
-James F. Carter          Voice 310 825 2897    FAX 310 206 6673
-UCLA-Mathnet;  6115 MSA; 405 Hilgard Ave.; Los Angeles, CA, USA  90095-1555
-Email: jimc@math.ucla.edu    http://www.math.ucla.edu/~jimc (q.v. for PGP key)
+On 10/18/07, semiyd@hotmail.com <semiyd@hotmail.com> wrote:
+>
+> Hi Brad:
+>        No , i didn't start up the passkey agent:)
+>        In /etc/bluetooth/hcid.conf ,my configuration is "security auto;"
+>        I manually created a file named 'pincodes' in /var/lib/bluetooth/XX:XX:XX:XX:XX:XX/ and put the linkcode
+> in it . So that hcid will find the linkcode when requested by the headset.
+>
+> thanks
+>
+> semiyd
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
