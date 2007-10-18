@@ -1,16 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Thilo Riessner <thilo@riessner.de>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Thu, 18 Oct 2007 12:05:23 +0200
-References: <200710170839.22891.thilo@riessner.de>
-	<200710171804.10464.thilo@riessner.de>
-	<1192640778.6184.37.camel@violet>
-In-Reply-To: <1192640778.6184.37.camel@violet>
+Message-ID: <f8e53fb0710172339r42591c22v857a3fd00b89d6f4@mail.gmail.com>
+Date: Thu, 18 Oct 2007 08:39:41 +0200
+From: "Andrea Galbusera" <gizero@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1192630825.6184.17.camel@violet>
 MIME-Version: 1.0
-Message-Id: <200710181205.24046.thilo@riessner.de>
-Subject: Re: [Bluez-users]
-	=?iso-8859-1?q?HP_Bluetooth_PC_Card_Mouse_doesn=27t?=
-	=?iso-8859-1?q?_work=09after=09upgrade_to_openSuSE_10=2E3?=
+References: <f8e53fb0710170033u2b451d7ft34cad156e0828a49@mail.gmail.com>
+	<1192630825.6184.17.camel@violet>
+Subject: Re: [Bluez-users] concurrent calls to RFCOMM connect()
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,38 +21,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Am Mittwoch, 17. Oktober 2007 schrieb Marcel Holtmann:
-> Hi Thilo,
->
-> > > > my HP Bluetooth PC Card Moue, worked fine under openSuSE 10.2 after I
-> > > > added --connect 00:02:76:00:D0:3E to the hidd option (in the
-> > > > file /etc/sysconfig/bluetooth). But after upgrade to 10.3 this trick
-> > > > doesn't work any more. I tryed to to remove the pionting device and
-> > > > create it new. But than I have to switch the mouse in discorvery
-> > > > more. Is there any hint how to solve the problem?
-> > >
-> > > the openSuSE 10.3 should use the input service. Check the
-> > > wiki.bluez.org for details on how to configure devices. You only need
-> > > to do that once btw. and then the mouse will re-connect.
-> >
-> > I tried that already, but it doesn't work for me, at least not
-> > satisfying. The reconnect does not work. Should the hidd still run, and
-> > if yes, which options should it be given? I guess "--connect
-> > 00:02:76:00:D0:3E" is not needed any more? But maybe --master and/or
-> > --server?
->
-> no, go with the input service. It should work.
->
-> Regards
->
-> Marcel
-Thanks for your information so far. But still the mouse doesn't work. There 
-seems to be a kind of connection between the mouse and the notebook (the 
-kbluetooth icon in the system tray gets blue and lists the hp-mouse as 
-connected), but the LED of the mouse remains dark, and it simply does not 
-work. As I said, it used to work with openSuSE 10.2 and hidd.
+Hi Marcel,
 
-Thilo  
+On 10/17/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+> > The common thread function will start connecting to the appropriate
+> > remote device by allocating a socket and calling connect(). Do I have
+> > to consider any particular syncronization issue between the threads?
+> > Is this approach reasonable or not?
+> >
+> > I found posts in the archives about connect() returning EBUSY. This
+> > has to be an   error code specific to RFCOMM sockets. When is it
+> > supposed to be raised? Is it something I have to take into account in
+> > my scenario?
+>
+> depending on how which kernel you use, this might work. Older kernel
+> didn't queue the ACL link requests and so you saw problems.
+
+I'm working with >2.6.17 kernels and >2.25 bluez. Since the
+application should run also on some embedded device with 2.6.17 and
+bluez 2.25, it is important for me to know in advance if the
+architecture I have in mind is feasible or not.
+
+If my kernels are affected, is the EBUSY problem something related to
+the connect() call only or do I have to expect more general problems
+in using threads for communication over BT sockets?
+
+
+Thanks
+Regards,
+Andrea
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
