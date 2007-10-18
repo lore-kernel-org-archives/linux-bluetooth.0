@@ -1,17 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <194c6ea30710181924x2de24e87i7df6352a7114f5b9@mail.gmail.com>
-Date: Fri, 19 Oct 2007 10:24:58 +0800
-From: "dong yan" <semiydsemiyd@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <d89ddf300710181026y23897b7eqb542f3adf7bfd35f@mail.gmail.com>
-MIME-Version: 1.0
-References: <BAY117-W36EE4B29F3D4550A7C9847C09E0@phx.gbl>
-	<d89ddf300710171849p3cd9da02kb7488387e095b534@mail.gmail.com>
-	<BAY117-W28F4B89B2868D45873A26CC09E0@phx.gbl>
-	<d89ddf300710180624r1970cc87p2ed1911a93a98c56@mail.gmail.com>
-	<BAY117-W3751B12FFAA024B30DE551C09E0@phx.gbl>
-	<d89ddf300710181026y23897b7eqb542f3adf7bfd35f@mail.gmail.com>
-Subject: Re: [Bluez-devel] SCO connection timed out issue
+Date: Thu, 18 Oct 2007 12:48:30 -0600
+From: Kevin Fenzi <kevin@scrye.com>
+To: Jim Carter <jimc@math.ucla.edu>
+Message-ID: <20071018124830.58d558be@ghistelwchlohm.scrye.com>
+In-Reply-To: <Pine.LNX.4.64.0710181052500.28683@simba.math.ucla.edu>
+References: <20071018114517.4b6d1850@ghistelwchlohm.scrye.com>
+	<Pine.LNX.4.64.0710181052500.28683@simba.math.ucla.edu>
+Mime-Version: 1.0
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] bluetooth headset not working
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,69 +18,85 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0007582842=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brad:
-      You are right.I launched passkey-agent with the command
-"passkey-agent --default 8888 &". After that ,i deleted the headset
-related linkcode in the /var/lib/bluetooth/XX:XX:XX:XX:XX:XX/pincodes.
-Now hcid looks for the linkcode from passkey-agent.
-Here:
-hcid[306]: link_key_request (sba=00:80:E1:00:AB:BA,
-dba=00:0D:3C:EB:53:F0) hcid[306]: pin_code_request
-(sba=00:80:E1:00:AB:BA, dba=00:0D:3C:EB:53:F0) hcid[306]: Calling
-PasskeyAgent.Request: name=:1.3, path=/org/bluez/passkey_agent_328
-Passkey request for device 00:0D:3C:EB:53:F0
-hcid[306]: link_key_notify (sba=00:80:E1:00:AB:BA, dba=00:0D:3C:EB:53:F0)
-hcid[306]: link_key_request (sba=00:80:E1:00:AB:BA,
-dba=00:0D:3C:EB:53:F0) The pairing procedure to the headset is now
-handled by passkey-agent. Seems like hcid will search the linkcode
-firstly in that 'pincodes' file. If he didn't find one ,he will turn
-to the passkey-agent and ask for the code.
+--===============0007582842==
+Content-Type: multipart/signed; boundary="Sig_/kutvuOGsU/q2mE51Hy/IrVs";
+	protocol="application/pgp-signature"; micalg=PGP-SHA1
 
-thanks
+--Sig_/kutvuOGsU/q2mE51Hy/IrVs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
- semiyd
+On Thu, 18 Oct 2007 10:59:50 -0700 (PDT)
+Jim Carter <jimc@math.ucla.edu> wrote:
 
-2007/10/19, Brad Midgley <bmidgley@gmail.com>:
-> semiyd,
->
-> fyi you get unpredictable behavior if you change stuff in
-> /var/lib/bluetooth manually.
->
-> brad
->
-> On 10/18/07, semiyd@hotmail.com <semiyd@hotmail.com> wrote:
-> >
-> > Hi Brad:
-> >        No , i didn't start up the passkey agent:)
-> >        In /etc/bluetooth/hcid.conf ,my configuration is "security auto;"
-> >        I manually created a file named 'pincodes' in /var/lib/bluetooth/XX:XX:XX:XX:XX:XX/ and put the linkcode
-> > in it . So that hcid will find the linkcode when requested by the headset.
-> >
-> > thanks
-> >
-> > semiyd
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc.
-> Still grepping through log files to find problems?  Stop.
-> Now Search log events and configuration files using AJAX and a browser.
-> Download your FREE copy of Splunk now >> http://get.splunk.com/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+> On Thu, 18 Oct 2007, Kevin Fenzi wrote:
+>=20
+> > I have setup my ~/.asoundrc.=20
+> > I can play audio to my headset via mplayer or aplay fine.=20
+> > When I try and set twinkle to use the ALSA bluetooth device it seems
+> > like it opens the headset, and then it spits out:=20
+> >=20
+> > ALSA lib pcm_bluetooth.c:417:(bluetooth_hsp_hw_params) Protocol not
+> > available (92)=20
+>=20
+> aplay or mplayer are talking to the ALSA device that uses the A2DP
+> profile. The phone app needs to use the device with the HFP profile.
+
+Humm... do all headsets do A2DP? I thought mine did not.=20
+
+> It looks like you got that set up in .asoundrc since a plausible
+> subroutine is reporting the error.  Next question: does your headset
+> do HFP, or is it purely a music headset (A2DP)?  Some headsets,
+> including the Motorola HT820, will auto-switch, but I think not every
+> music headset will do so.  Hope this helps!
+
+I am using a jabra BT 250v headset.=20
+It's not a music headset.=20
+
+I have a few more headsets I can dig up here to test with if you think
+it's something with the jabra.=20
+
+kevin
+
+--Sig_/kutvuOGsU/q2mE51Hy/IrVs
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (GNU/Linux)
+
+iD8DBQFHF6p+3imCezTjY0ERAnE7AJ9IvBmXdrA/RudQx/NzPXBsYDRgpgCfbPHr
+NYqHAwjtV9yLD/c50CB7gWw=
+=MdwI
+-----END PGP SIGNATURE-----
+
+--Sig_/kutvuOGsU/q2mE51Hy/IrVs--
+
+
+--===============0007582842==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
+--===============0007582842==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0007582842==--
