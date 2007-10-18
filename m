@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: "Pierre Savary" <pierre.savary@kerlink.fr>
-To: <bluez-devel@lists.sourceforge.net>
-Date: Thu, 18 Oct 2007 16:10:49 +0200
-Message-ID: <008f01c81190$b044a270$10cde750$@savary@kerlink.fr>
+Message-ID: <BAY117-W3751B12FFAA024B30DE551C09E0@phx.gbl>
+From: "" <semiyd@hotmail.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Thu, 18 Oct 2007 13:46:25 +0000
+In-Reply-To: <d89ddf300710180624r1970cc87p2ed1911a93a98c56@mail.gmail.com>
+References: <BAY117-W36EE4B29F3D4550A7C9847C09E0@phx.gbl>
+	<d89ddf300710171849p3cd9da02kb7488387e095b534@mail.gmail.com>
+	<BAY117-W28F4B89B2868D45873A26CC09E0@phx.gbl>
+	<d89ddf300710180624r1970cc87p2ed1911a93a98c56@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] compile audio in bluez-utils-3.20
+Subject: Re: [Bluez-devel] SCO connection timed out issue
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,102 +19,77 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0727888459=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-
-I am a beginner with bluez and I hope that you will be able to inform me and
-to help itself. I wish that my PC be the headset of my phone.
-I wish that it embed audio profiles HFP and A2DP so that it can be used as
-headset/handsfree for a telephone or a walkman.
-
-To begin I try to compile audio/ package bluez-utils-3.20 but it doesn't
-work ... I make ./configure --enable-all and obtain this config.h :
-/* config.h.  Generated from config.h.in by configure.  */
-/* config.h.in.  Generated from configure.in by autoheader.  */
-/* Directory for the configuration files */
-#define CONFIGDIR "/etc/bluetooth"
-/* Define to 1 if you have D-Bus GLib bindings. */
-/* #undef HAVE_DBUS_GLIB */
-/* Define to 1 if you have the <dlfcn.h> header file. */
-#define HAVE_DLFCN_H 1
-/* Define to 1 if you have the <expat.h> header file. */
-/* #undef HAVE_EXPAT_H */
-/* Define to 1 if you have the <inttypes.h> header file. */
-#define HAVE_INTTYPES_H 1
-/* Define to 1 if you have USB library. */
-#define HAVE_LIBUSB 1
-/* Define to 1 if you have the <memory.h> header file. */
-#define HAVE_MEMORY_H 1
-/* Define to 1 if you have the <stdint.h> header file. */
-#define HAVE_STDINT_H 1
-/* Define to 1 if you have the <stdlib.h> header file. */
-#define HAVE_STDLIB_H 1
-/* Define to 1 if you have the <strings.h> header file. */
-#define HAVE_STRINGS_H 1
-/* Define to 1 if you have the <string.h> header file. */
-#define HAVE_STRING_H 1
-/* Define to 1 if you have the <sys/inotify.h> header file. */
-/* #undef HAVE_SYS_INOTIFY_H */
-/* Define to 1 if you have the <sys/stat.h> header file. */
-#define HAVE_SYS_STAT_H 1
-/* Define to 1 if you have the <sys/types.h> header file. */
-#define HAVE_SYS_TYPES_H 1
-/* Define to 1 if you have the <unistd.h> header file. */
-#define HAVE_UNISTD_H 1
-/* Define to 1 if you need the dbus_watch_get_unix_fd() function. */
-#define NEED_DBUS_WATCH_GET_UNIX_FD 1
-/* Define to 1 if you need the ppoll() function. */
-#define NEED_PPOLL 1
-/* Define to 1 if you need the usb_get_busses() function. */
-/* #undef NEED_USB_GET_BUSSES */
-/* Define to 1 if you need the usb_interrupt_read() function. */
-/* #undef NEED_USB_INTERRUPT_READ */
-/* Name of package */
-#define PACKAGE "bluez-utils"
-/* Define to the address where bug reports for this package should be sent.
-*/
-#define PACKAGE_BUGREPORT ""
-/* Define to the full name of this package. */
-#define PACKAGE_NAME ""
-/* Define to the full name and version of this package. */
-#define PACKAGE_STRING ""
-/* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME ""
-/* Define to the version of this package. */
-#define PACKAGE_VERSION ""
-/* Directory for the service programs */
-#define SERVICEDIR "/usr/local/lib/bluetooth"
-/* Define to 1 if you have the ANSI C header files. */
-#define STDC_HEADERS 1
-/* Directory for the storage files */
-#define STORAGEDIR "/var/lib/bluetooth"
-/* Version number of package */
-#define VERSION "3.20"
-/* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
-   `char[]'. */
-/* #undef YYTEXT_POINTER */
-Then I make a make ... and I don't see *.o file in the audio directory
-???!!! What can I do?
-
-Also, does it exist an opensource project for handsfree profile with bluez?
-Could you help me to compile and to use a HFP profile please?
-
-Big thanks in advance
-Regards
-
-Pierre
+--===============0727888459==
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: 8bit
 
 
+Hi Brad:
+       No , i didn't start up the passkey agent:)
+       In /etc/bluetooth/hcid.conf ,my configuration is "security auto;"
+       I manually created a file named 'pincodes' in /var/lib/bluetooth/XX:XX:XX:XX:XX:XX/ and put the linkcode
+in it . So that hcid will find the linkcode when requested by the headset.
+
+thanks
+
+semiyd
+
+
+> Date: Thu, 18 Oct 2007 07:24:58 -0600
+> From: bmidgley@gmail.com
+> To: bluez-devel@lists.sourceforge.net
+> Subject: Re: [Bluez-devel] SCO connection timed out issue
+>
+> semiyd
+>
+>> hcid[318]: link_key_request (sba=00:80:E1:00:00:00, dba=00:0D:3C:EB:53:F0)
+>> hcid[318]: link_key_request (sba=00:80:E1:00:00:00, dba=00:0D:3C:EB:53:F0)
+>
+> did you start up a passkey agent? under some setups I have to do this manually:
+>
+> passkey-agent --default 0000 &
+>
+> brad
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc.
+> Still grepping through log files to find problems? Stop.
+> Now Search log events and configuration files using AJAX and a browser.
+> Download your FREE copy of Splunk now>> http://get.splunk.com/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+_________________________________________________________________
+Invite your mail contacts to join your friends list with Windows Live Spaces. It's easy!
+http://spaces.live.com/spacesapi.aspx?wx_action=create&wx_url=/friends.aspx&mkt=en-us
+
+
+--===============0727888459==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
+--===============0727888459==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0727888459==--
