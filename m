@@ -1,31 +1,71 @@
-Return-Path: <hidave.darkstar@gmail.com>
-Date: Fri, 19 Oct 2007 13:00:58 +0800
-From: Dave Young <hidave.darkstar@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: bluez-devel@lists.sourceforge.net, LKML <linux-kernel@vger.kernel.org>
-Subject: [PATCH] bluetooth: hidp core debug code wrong argument fix
-Message-ID: <20071019050057.GA8734@darkstar.te-china.tietoenator.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <6656b6540710182155m29cd7441l6dcb9a7d722d5417@mail.gmail.com>
+Date: Fri, 19 Oct 2007 10:25:51 +0530
+From: "Robin Gujjar" <robin.gujjar@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] BlueZ integration to LINUX kernel (ARM)
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============1516788369=="
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-In the debug code of the hidp_queue_report function, the "device" variable does not exist, replace it with "session->hid"
+--===============1516788369==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_2139_12990269.1192769751599"
 
-Signed-off-by: Dave Young <hidave.darkstar@gmail.com> 
+------=_Part_2139_12990269.1192769751599
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
----
-net/bluetooth/hidp/core.c |    2 +-
-1 file changed, 1 insertion(+), 1 deletion(-)
+hi every body
 
-diff -upr linux/net/bluetooth/hidp/core.c linux.new/net/bluetooth/hidp/core.c
---- linux/net/bluetooth/hidp/core.c	2007-10-15 14:05:23.000000000 +0800
-+++ linux.new/net/bluetooth/hidp/core.c	2007-10-15 14:06:38.000000000 +0800
-@@ -247,7 +247,7 @@ static inline int hidp_queue_report(stru
- {
- 	struct sk_buff *skb;
- 
--	BT_DBG("session %p hid %p data %p size %d", session, device, data, size);
-+	BT_DBG("session %p hid %p data %p size %d", session, session->hid, data, size);
- 
- 	if (!(skb = alloc_skb(size + 1, GFP_ATOMIC))) {
- 		BT_ERR("Can't allocate memory for new frame");
+i am newbie to bluetooth .i want to integrate blueZ to my linux kernel
+2.6.22 can any body plz give me some basic step to do that .
+
+thanks in advance
+
+Robin Singh
+
+------=_Part_2139_12990269.1192769751599
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+hi every body <br><br>i am newbie to bluetooth .i want to integrate blueZ to my linux kernel 2.6.22 can any body plz give me some basic step to do that .<br><br>thanks in advance <br><br>Robin Singh<br>
+
+------=_Part_2139_12990269.1192769751599--
+
+
+--===============1516788369==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >> http://get.splunk.com/
+--===============1516788369==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1516788369==--
