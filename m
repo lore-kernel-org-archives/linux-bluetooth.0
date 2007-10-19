@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Fri, 19 Oct 2007 09:03:43 -0700 (PDT)
-From: Jim Carter <jimc@math.ucla.edu>
-To: Kevin Fenzi <kevin@scrye.com>
-In-Reply-To: <20071018124830.58d558be@ghistelwchlohm.scrye.com>
-Message-ID: <Pine.LNX.4.64.0710190839510.16412@simba.math.ucla.edu>
-References: <20071018114517.4b6d1850@ghistelwchlohm.scrye.com>
-	<Pine.LNX.4.64.0710181052500.28683@simba.math.ucla.edu>
-	<20071018124830.58d558be@ghistelwchlohm.scrye.com>
+Message-ID: <e1effdeb0710190744p5d0ddd1bxe1f4b506c985bbab@mail.gmail.com>
+Date: Fri, 19 Oct 2007 11:44:31 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <014201c78883$55aec980$8935c70a@dlh.st.com>
 MIME-Version: 1.0
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] bluetooth headset not working
+References: <1177608335.14980.100.camel@aeonflux.holtmann.net>
+	<014201c78883$55aec980$8935c70a@dlh.st.com>
+Subject: Re: [Bluez-devel] basic printing profile server?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,42 +21,96 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, 18 Oct 2007, Kevin Fenzi wrote:
+Does someone still interested on help me?
 
-> On Thu, 18 Oct 2007 10:59:50 -0700 (PDT)
-> Jim Carter <jimc@math.ucla.edu> wrote:
-> > aplay or mplayer are talking to the ALSA device that uses the A2DP
-> > profile. The phone app needs to use the device with the HFP profile.
-> 
-> Humm... do all headsets do A2DP? I thought mine did not. 
+The objective is create a BPP server(CUPS proxy). The objects/jobs are
+pushed to the desktop(BPP server), PostScripts and raw text documents
+it works perfect since CUPS already supports filters for these
+formats. However for XHTML-Print we have to implement a new CUPS
+filter. I don't want convert XHTML-Print to PostScript inside in the
+BlueZ.
 
-The ones with 2 earpieces and a mass of about 100 grams invariably (?) do 
-A2DP which transmits stereo at 44100 Hz or 48000 Hz, compressed with the 
-SBC codec.  The single-ear ones with a mass of about 20 grams invariably 
-(?) do HSP/HFP, monaural at 8000 Hz, I think uncompressed.  That would be 
-your Jabra BT 250v.  Some but not all of the music headsets can switch 
-protocols and have call control buttons for HFP; these are advertised as 
-"works with Skype".
+The simple push model is trivial, however for the Job-Based transfer
+model we need put more effort. The current prototype is able to handle
+SOAP messages, but I am facing a problem: I have no idea how retrieve
+a referenced image.
 
-So the Jabra is capable of doing the HSP protocol, and when the message 
-says the protocol is "not available", the problem is likely not in the 
-headset.  Not likely that the headset is broken or has buggy firmware, but 
-just for paranoia, it would be a good data point if the same message were 
-seen with a different headset.  
+This is the last data received after create a job:
+<?xml version="1.0" encoding="UTF-8"?>
+...
+        <body>
+...
+                <div class="page_last">
 
-I've seen a similar message when I didn't have bluetoothd-service-audio 
-configured to autostart and forgot to start it manually.  Do you have the 
-corresponding protocol/profile daemon running?  I don't have my laptop 
-handy to look up the name of this daemon but I think it's 
-bluetoothd-service-sco.  This is in bluez-utils-3.19 (3.20 is latest; 
-probably came in at 3.16.)
+                        <div id="img_frame" class="position1">
+                                <img class="img_details1"
+src="obex:1120/mmc/09242007082.jpg" alt=""/>
+                        </div>
+                </div>
+        </body>
+</html>
 
-Unfortunately that's about the limit of my expertise, since I haven't 
-messed with the HSP/HFP feature of the Motorola HT-820 that I have.
 
-James F. Carter          Voice 310 825 2897    FAX 310 206 6673
-UCLA-Mathnet;  6115 MSA; 405 Hilgard Ave.; Los Angeles, CA, USA  90095-1555
-Email: jimc@math.ucla.edu    http://www.math.ucla.edu/~jimc (q.v. for PGP key)
+According to the BPP spec the referenced img should be retrived using
+a object channel/reverse channel, defined in the Sender's Basic
+Printing Referenced Objects Service Record. But my N95 doesn't
+contains any record with this UUID. How can I retrieve this img? I
+tried to send a GetReferencedObjects msg in the same job
+channel(instead of establish a reverse connection) but it is not
+working. The printer I ordered will arrive next week only :-(
+
+BR,
+Claudio.
+-- 
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
+
+On 4/27/07, Sumeet VERMA <sumeet.verma@st.com> wrote:
+> Hi
+> I have seen the dump of a printing application for Nokia phones (Nokia
+> 6600). Its developed by nokia and HP collectively. It asks for BPP. However
+> it wont work with your device if you don't support
+> application/vnd.pwg-multiplexed doc format. Same goes with Nokia N Series.
+>
+> Regards,
+> Sumeet
+> -----Original Message-----
+> From: bluez-devel-bounces@lists.sourceforge.net
+> [mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf Of Marcel
+> Holtmann
+> Sent: Thursday, April 26, 2007 10:56 PM
+> To: BlueZ development
+> Subject: Re: [Bluez-devel] basic printing profile server?
+>
+> Hi Adam,
+>
+> > I was wondering if anyone has worked on a basic printing profile
+> > server for Linux? By server, I mean a way that phones or other small
+> > devices can send jobs to a Linux desktop host which would then print
+> > through CUPS (or lpd, etc.).
+>
+> there have been ideas about it, but I can't recall an actual implementation.
+> However it might happen that INdT starts working on something like this in
+> the future.
+>
+> > It seems like a missing piece, since CUPS can already print to
+> > bluetooth printers.
+>
+> The CUPS plugin can only print via HCRP and Serial Port Profile.
+>
+> > My new phone supports printing of SMS messages and photos, so before I
+> > try writing a server for it, I wanted to check to see if someone has
+> > done it.
+>
+> There are many printing profiles around. You should check which one the
+> phone actually uses. Run "hcidump -X -V" and look for the profile UUID it
+> requests.
+>
+> Regards
+>
+> Marcel
+>
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
