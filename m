@@ -1,7 +1,7 @@
-Return-Path: <fchevalier@silicom.fr>
-Message-ID: <4718E9CA.2010009@silicom.fr>
-Date: Fri, 19 Oct 2007 19:30:50 +0200
-From: Fabien Chevalier <fchevalier@silicom.fr>
+Return-Path: <fabchevalier@free.fr>
+Message-ID: <4718E9A4.6090101@free.fr>
+Date: Fri, 19 Oct 2007 19:30:12 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
 CC: Brad Midgley <bmidgley@xmission.com>,
@@ -12,11 +12,11 @@ Subject: Re: [Bluez-devel] [PATCH] newapi patch v1
 References: <4718E8E0.5050608@silicom.fr>
 In-Reply-To: <4718E8E0.5050608@silicom.fr>
 Content-Type: multipart/mixed;
- boundary="------------070402020509020605020806"
+ boundary="------------080105030805090608000400"
 List-ID: <bluez-devel.lists.sourceforge.net>
 
 This is a multi-part message in MIME format.
---------------070402020509020605020806
+--------------080105030805090608000400
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 
@@ -79,7 +79,7 @@ Fabien
 > https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
---------------070402020509020605020806
+--------------080105030805090608000400
 Content-Type: text/plain;
  name="newapiv1.diff"
 Content-Transfer-Encoding: 8bit
@@ -2814,23 +2814,4 @@ Index: Makefile.am
  
  if GSTREAMER
 
---------------070402020509020605020806
-Content-Type: text/x-vcard; charset=utf-8;
- name="fchevalier.vcf"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="fchevalier.vcf"
-
-begin:vcard
-fn:Fabien CHEVALIER
-n:CHEVALIER;Fabien
-org:SILICOM
-adr:;;4 rue de Jouanet; RENNES ATALANTE;;35700;FRANCE
-email;internet:fchevalier@silicom.fr
-title:Software & Studies Engineer
-tel;work:+33 (0) 2 99 84 17 17
-version:2.1
-end:vcard
-
-
---------------070402020509020605020806--
+--------------080105030805090608000400--
