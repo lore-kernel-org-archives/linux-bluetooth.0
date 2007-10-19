@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <bd5b16740710190111h6ae03842g62f04973339ca8aa@mail.gmail.com>
-Date: Fri, 19 Oct 2007 10:11:08 +0200
-From: "Ohad Ben-Cohen" <ohad@bencohen.org>
-To: "Marcel Holtmann" <marcel@holtmann.org>
+Date: Fri, 19 Oct 2007 03:31:32 -0400
+From: Jeff Garzik <jeff@garzik.org>
+To: marcel@holtmann.org, maxk@qualcomm.com, bluez-devel@lists.sf.net
+Message-ID: <20071019073132.GA5678@havoc.gtf.org>
 MIME-Version: 1.0
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] 2.6.24 merge window
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: [Bluez-devel] [PATCH] bluetooth: Eliminate checks for impossible
+	conditions in	irq handler
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,16 +21,92 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
 
-Is it possible to have a peek at your patches queue for the current 2.6.24
-merge window ?
+commit 1c8073a42f133bf5780099c1e6efd9e48468cd29
+Author: Jeff Garzik <jeff@garzik.org>
+Date:   Fri Oct 19 03:07:30 2007 -0400
 
-(I couldn't find it at the usual master branch of
-git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6)
+    [BLUETOOTH] Eliminate checks for impossible conditions in irq handler
+    
+    Our info structure and info->hdev is always passed to the irq handler,
+    so we don't have to worry about these checks in every interrupt.
+    
+    Leave a BUG_ON() just to help unwary programmers, but these could
+    probably be removed as well.
+    
+    Signed-off-by: Jeff Garzik <jgarzik@redhat.com>
 
-Thanks,
-Ohad.
+ drivers/bluetooth/bluecard_cs.c |    5 +----
+ drivers/bluetooth/bt3c_cs.c     |    5 +----
+ drivers/bluetooth/btuart_cs.c   |    5 +----
+ drivers/bluetooth/dtl1_cs.c     |    5 +----
+ 4 files changed, 4 insertions(+), 16 deletions(-)
+
+1c8073a42f133bf5780099c1e6efd9e48468cd29
+diff --git a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_cs.c
+index 851de4d..bcf5792 100644
+--- a/drivers/bluetooth/bluecard_cs.c
++++ b/drivers/bluetooth/bluecard_cs.c
+@@ -503,10 +503,7 @@ static irqreturn_t bluecard_interrupt(int irq, void *dev_inst)
+ 	unsigned int iobase;
+ 	unsigned char reg;
+ 
+-	if (!info || !info->hdev) {
+-		BT_ERR("Call of irq %d for unknown device", irq);
+-		return IRQ_NONE;
+-	}
++	BUG_ON(!info->hdev);
+ 
+ 	if (!test_bit(CARD_READY, &(info->hw_state)))
+ 		return IRQ_HANDLED;
+diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
+index 3951607..a18f9b8 100644
+--- a/drivers/bluetooth/bt3c_cs.c
++++ b/drivers/bluetooth/bt3c_cs.c
+@@ -344,10 +344,7 @@ static irqreturn_t bt3c_interrupt(int irq, void *dev_inst)
+ 	unsigned int iobase;
+ 	int iir;
+ 
+-	if (!info || !info->hdev) {
+-		BT_ERR("Call of irq %d for unknown device", irq);
+-		return IRQ_NONE;
+-	}
++	BUG_ON(!info->hdev);
+ 
+ 	iobase = info->p_dev->io.BasePort1;
+ 
+diff --git a/drivers/bluetooth/btuart_cs.c b/drivers/bluetooth/btuart_cs.c
+index d7d2ea0..08f48d5 100644
+--- a/drivers/bluetooth/btuart_cs.c
++++ b/drivers/bluetooth/btuart_cs.c
+@@ -294,10 +294,7 @@ static irqreturn_t btuart_interrupt(int irq, void *dev_inst)
+ 	int boguscount = 0;
+ 	int iir, lsr;
+ 
+-	if (!info || !info->hdev) {
+-		BT_ERR("Call of irq %d for unknown device", irq);
+-		return IRQ_NONE;
+-	}
++	BUG_ON(!info->hdev);
+ 
+ 	iobase = info->p_dev->io.BasePort1;
+ 
+diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
+index 7f9c54b..dae45cd 100644
+--- a/drivers/bluetooth/dtl1_cs.c
++++ b/drivers/bluetooth/dtl1_cs.c
+@@ -298,10 +298,7 @@ static irqreturn_t dtl1_interrupt(int irq, void *dev_inst)
+ 	int boguscount = 0;
+ 	int iir, lsr;
+ 
+-	if (!info || !info->hdev) {
+-		BT_ERR("Call of irq %d for unknown device", irq);
+-		return IRQ_NONE;
+-	}
++	BUG_ON(!info->hdev);
+ 
+ 	iobase = info->p_dev->io.BasePort1;
+ 
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
