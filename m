@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <47189691.2000504@cilnu.com>
-Date: Fri, 19 Oct 2007 12:35:45 +0100
-From: Jon Maber <jon@cilnu.com>
+Message-ID: <bd5b16740710190111h6ae03842g62f04973339ca8aa@mail.gmail.com>
+Date: Fri, 19 Oct 2007 10:11:08 +0200
+From: "Ohad Ben-Cohen" <ohad@bencohen.org>
+To: "Marcel Holtmann" <marcel@holtmann.org>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <6656b6540710182155m29cd7441l6dcb9a7d722d5417@mail.gmail.com>
-In-Reply-To: <6656b6540710182155m29cd7441l6dcb9a7d722d5417@mail.gmail.com>
-Subject: Re: [Bluez-devel] BlueZ integration to LINUX kernel (ARM)
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] 2.6.24 merge window
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,40 +19,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Robin,
-the job is already done for you.  Download kernel 2.6.22 and take a look 
-in net/bluetooth - you will see that the source code is there already.  
-Run menuconfig and you will see bluetooth configuration options under 
-the networking heading.  The fact that you are building for ARM 
-shouldn't present any additional problems.
-Jon
+Hi Marcel,
 
-Robin Gujjar wrote:
-> hi every body
->
-> i am newbie to bluetooth .i want to integrate blueZ to my linux kernel
-> 2.6.22 can any body plz give me some basic step to do that .
->
-> thanks in advance
->
-> Robin Singh
->
->   
-> ------------------------------------------------------------------------
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc.
-> Still grepping through log files to find problems?  Stop.
-> Now Search log events and configuration files using AJAX and a browser.
-> Download your FREE copy of Splunk now >> http://get.splunk.com/
-> ------------------------------------------------------------------------
->
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->   
+Is it possible to have a peek at your patches queue for the current 2.6.24
+merge window ?
 
+(I couldn't find it at the usual master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6)
+
+Thanks,
+Ohad.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
