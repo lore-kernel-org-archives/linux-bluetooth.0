@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Dave Young <hidave.darkstar@gmail.com>
-In-Reply-To: <20071019050057.GA8734@darkstar.te-china.tietoenator.com>
-References: <20071019050057.GA8734@darkstar.te-china.tietoenator.com>
-Date: Sat, 20 Oct 2007 15:51:54 +0200
-Message-Id: <1192888315.6184.113.camel@violet>
-Mime-Version: 1.0
-Cc: bluez-devel@lists.sourceforge.net, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [Bluez-devel] [PATCH] bluetooth: hidp core debug code wrong
-	argument fix
+Mime-Version: 1.0 (Apple Message framework v752.3)
+In-Reply-To: <OF8924A15A.C478BABF-ON4825737A.000A932C@mxic.com.cn>
+References: <OF8924A15A.C478BABF-ON4825737A.000A932C@mxic.com.cn>
+Message-Id: <47C10469-7852-4022-A777-AC07CD7E5B5C@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Sat, 20 Oct 2007 15:45:27 +0300
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] bluetooth headset not working
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,16 +20,58 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Dave,
 
-> In the debug code of the hidp_queue_report function, the "device" variable does not exist, replace it with "session->hid"
+On Oct 20, 2007, at 5:10, KyoYin@mxic.com.cn wrote:
+>       Do u mean the bluetoothd-service-audio will read .asoundrc?
 
-applied to my tree. Thanks.
+No. The values in .asoundrc are given to the bluetooth alsa plugin  
+which then passes them over to the audio service using a unix socket.
 
-Regards
+>       could you tell me how to write .asoundrc if i want to use  
+> a2dp and
+> hsp.now my .asoundrc is:
+>
+>       pcm.headset {
+>       type bluetooth
+>       }
+>
+>       ctl.headset {
+>       type bluetooth
+>       }
+>
+>       pcm.bluetooth {
+>       type bluetooth
+>       device 00:0D:3C:EB:53:F0
+>       }
 
-Marcel
+If you want to have one alsa device for A2DP and another for HSP it  
+might be a good idea to explicitly state the profile you want to use  
+for each device. You do this by providing a line such as "profile  
+a2dp" in addition to the device and type lines. I just checked the  
+code and the plugin will map "hifi" and "a2dp" to A2DP and "voice"  
+and "hfp" to HSP (it's actually a bug that it doesn't recognize "hsp").
 
+> when i use  "aplay -D bluetooth -f S16_LE /1.wav ",i will get the  
+> following
+> error.
+<snip>
+> audio[837]: START request succAlignment trap: bluetoothd-serv (837)
+> PC=0x0001ce50 Instr=0xe1c320b0 Address=0xbe871a89 FSR 0x813
+> eeded
+> audio[837]: SBC Source: Start_Cfm
+> audio[837]: SBC Source SEP 0x376b8 locked
+> hcid[825]: Service owner exited: :1.1
+
+Looks like the audio service crashed. What architecture are you  
+running this on and what compiler did you use? It would be good if  
+you could try to reproduce this by running bluetoothd-audio-service  
+through valgrind or gdb and get a proper backtrace of the crash. To  
+do this remove the /etc/bluetooth/audio.service file (hcid should  
+detect this and unregister the service but if it doesn't you need to  
+restart hcid), and run "/usr/lib/bluetooth/bluetoothd-service-audio - 
+s" either through gdb or valgrind.
+
+Johan
 
 
 -------------------------------------------------------------------------
