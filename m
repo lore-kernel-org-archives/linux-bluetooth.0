@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <bd5b16740710190111h6ae03842g62f04973339ca8aa@mail.gmail.com>
-References: <bd5b16740710190111h6ae03842g62f04973339ca8aa@mail.gmail.com>
-Date: Sat, 20 Oct 2007 16:01:48 +0200
-Message-Id: <1192888909.6184.119.camel@violet>
+In-Reply-To: <20071019073132.GA5678@havoc.gtf.org>
+References: <20071019073132.GA5678@havoc.gtf.org>
+Date: Sat, 20 Oct 2007 15:52:15 +0200
+Message-Id: <1192888335.6184.115.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] 2.6.24 merge window
+Cc: Andrew Morton <akpm@linux-foundation.org>, bluez-devel@lists.sf.net,
+        maxk@qualcomm.com, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [Bluez-devel] [PATCH] bluetooth: Eliminate checks
+	for	impossible conditions in	irq handler
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,15 +23,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Ohad,
+Hi Jeff,
 
-> Is it possible to have a peek at your patches queue for the current 2.6.24
-> merge window ?
-> 
-> (I couldn't find it at the usual master branch of
-> git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6)
+>     [BLUETOOTH] Eliminate checks for impossible conditions in irq handler
+>     
+>     Our info structure and info->hdev is always passed to the irq handler,
+>     so we don't have to worry about these checks in every interrupt.
+>     
+>     Leave a BUG_ON() just to help unwary programmers, but these could
+>     probably be removed as well.
 
-forgot to push it. Should be there now.
+applied to my tree. Thanks.
 
 Regards
 
