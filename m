@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <bd5b16740710200816j33adf6bax383680510973f2b9@mail.gmail.com>
-Date: Sat, 20 Oct 2007 17:16:45 +0200
-From: "Ohad Ben-Cohen" <ohad@bencohen.org>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1192888909.6184.119.camel@violet>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <bd5b16740710190111h6ae03842g62f04973339ca8aa@mail.gmail.com>
 References: <bd5b16740710190111h6ae03842g62f04973339ca8aa@mail.gmail.com>
-	<1192888909.6184.119.camel@violet>
+Date: Sat, 20 Oct 2007 16:01:48 +0200
+Message-Id: <1192888909.6184.119.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] 2.6.24 merge window
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,10 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-> forgot to push it. Should be there now.
+Hi Ohad,
 
-Thanks!
-Ohad.
+> Is it possible to have a peek at your patches queue for the current 2.6.24
+> merge window ?
+> 
+> (I couldn't find it at the usual master branch of
+> git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6)
+
+forgot to push it. Should be there now.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
