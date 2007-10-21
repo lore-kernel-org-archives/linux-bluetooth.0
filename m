@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sun, 21 Oct 2007 20:42:58 -0700 (PDT)
-From: Chris Dragga <chris_dragga@yahoo.com>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
+From: Flyzone <flyzone@technologist.com>
+To: bluez-users@lists.sourceforge.net
+Date: Sun, 21 Oct 2007 23:13:39 +0200
 MIME-Version: 1.0
-Message-ID: <159044.84892.qm@web52105.mail.re2.yahoo.com>
-Subject: Re: [Bluez-users] Not finding services through D-Bus API
+Message-Id: <200710212313.40126.flyzone@technologist.com>
+Subject: [Bluez-users] DBT120 B4 not working
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,74 +18,45 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Thanks for the advice, but I went through the syslog, and wasn't able
-to find any errors regarding this.  I did realize belatedly that I
-lacked libusb, flex, and bison, but installing those made no
-difference.  Does one have to install the different services manually,
-or is it possible that my device is just broken somehow (I'm using a
-Trendnet Compact Bluetooth USB 2.0 Adapter, which is probably not the
-greatest piece of equipment in the world)?
+Hi, I have a bluetooth device D-link DBT120 revision B4 with a kernel 2.6.18
+with a debian etch stable (bluez-hcidump-1.32-1, bluez-utils-3.7.1, 
+bluez-firmware-1.2-1 and other package for kde).
 
+on messages:
+kernel: usb 5-1.4: new full speed USB device using ehci_hcd and address 6
+kernel: usb 5-1.4: configuration #1 chosen from 1 choice
+kernel: Bluetooth: HCI USB driver ver 2.9
+kernel: usbcore: registered new driver hci_usb
+on syslog:
+kernel: hci_usb_intr_rx_submit: hci0 intr rx submit failed urb cdcb6654 
+err -28
+kernel: hci_usb_intr_rx_submit: hci0 intr rx submit failed urb f4b749d4 
+err -28
 
+lsusb show:
+Bus 005 Device 010: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle 
+(HCI mode)
 
-In addition, I'm getting another problem where the device on my main
-computer will not be recognized with the device on my laptop, though my
-main computer will see the device on my laptop (my laptop also lacks
-the service files).  I doubt this is related, but I thought I'd mention
-it in the event that it was.
+hciconfig:
+hci0:   Type: USB
+        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
+        DOWN 
+        RX bytes:0 acl:0 sco:0 events:0 errors:0
+        TX bytes:0 acl:0 sco:0 commands:0 errors:0
+hciconfig hci0 up
+Can't init device hci0: Input/output error (5)
 
+strace hciconfig hci0 up:
+ socket(PF_BLUETOOTH, SOCK_RAW, 1)       = 3
+ ioctl(3, 0x800448d3, 0x805d300)         = 0
+ ioctl(3, 0x400448c9, 0)                 = -1 EIO (Input/output error)
+ write(2, "Can\'t init device hci0: Input/ou"..., 47Can't init device hci0:
+ Input/output error (5)
 
-
--Chris
-
------ Original Message ----
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Sent: Wednesday, October 17, 2007 9:22:27 AM
-Subject: Re: [Bluez-users] Not finding services through D-Bus API
-
-
-Hi Chris,
-
-> I'm trying to use the Bluez D-Bus API on XUbuntu to establish a PAN
- network connection, as described in the wiki page on creating network
- connections.  However, I inevitably get the error "No such service" upon
- trying to activate the network service with the Bluez Manager object.
-  Furthermore, calls to ListServices() return an empty array, and I've
- noticed that none of the .service files that come with Bluez-utils are
- installed on my computer.  sdptool works, though, allowing me to activate
- services that then show up using "sdptool browse local".  I currently
- have bluez-utils-3.20 and bluez-libs-3.20 installed, though I've also
- tried this with bluez-utils-3.9 and bluez-libs-3.9 (the packages
- available from Synaptic) with equally little success.  If anyone could provide
- any information that might help me, I'd greatly appreciate it, as I'm
- really not sure what to do.
-
-the the syslog for any error messages.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >> http://get.splunk.com/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
-
-
-
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
+I have a motherboard with VIA VT82 UHCI USB controller...in the past mail i 
+read about a user "Marcel Holtmann" having the same problem with kernel 2.6.5 
+but i cannot find the earlier post with the solution...
+Any help will be appreciate.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
