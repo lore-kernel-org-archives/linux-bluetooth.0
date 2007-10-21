@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <000b01c81484$989af5b0$0200a8c0@jester>
-From: "Olivier Le Pogam" <olepogam@free.fr>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-References: <6656b6540710182155m29cd7441l6dcb9a7d722d5417@mail.gmail.com>	<47189691.2000504@cilnu.com><6656b6540710210008v5cc459dv6692a5e8ff888187@mail.gmail.com>
-	<471B5E66.1030601@cilnu.com>
-Date: Mon, 22 Oct 2007 10:21:50 +0200
+Message-ID: <471B5E66.1030601@cilnu.com>
+Date: Sun, 21 Oct 2007 15:12:54 +0100
+From: Jon Maber <jon@cilnu.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] Blocking connect(AF_BLUETOOTH, SOCK_STREAM,
-	BTPROTO_RFCOMM) => EINPROGRESS
-Reply-To: Olivier Le Pogam <olepogam@free.fr>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <6656b6540710182155m29cd7441l6dcb9a7d722d5417@mail.gmail.com>	<47189691.2000504@cilnu.com>
+	<6656b6540710210008v5cc459dv6692a5e8ff888187@mail.gmail.com>
+In-Reply-To: <6656b6540710210008v5cc459dv6692a5e8ff888187@mail.gmail.com>
+Subject: Re: [Bluez-devel] BlueZ integration to LINUX kernel (ARM)
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -22,22 +21,100 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Robin,
 
-I am trying to perform RFCOMM connection to a mobile phone thanks to a 
-blocking "connect(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)" (Blocking is 
-the only way for me to get a "Connection Refused" return status !), and if 
-the phone is still asking for the authorization when the connect times out, 
-the connect and leaves with a EINPROGRESS status.
+once again, the work has been done already.  You really need to study 
+the documentation and configure properly.   If you have a bluetooth 
+module connected to a UART and it understands one of the supported HCI 
+protocols then you don't need to write any kind of driver you just need 
+to tell the bluetooth subsystem which UART to talk to, what protocol to 
+talk with and the baud rate etc.  Typing 'man hciattach' will explain 
+this well enough.  You would also do well to buy a decent book on Bluetooth.
 
-Could you please tell me :
-- If there is a way to extend the blocking "connect" timeout ?
-- When a connect exists with a "EINPROGRESS" status, does it make sense to 
-try another "connect" on the same socket without doing a complete retry 
-(close / socket / bind / connect) ?
+I would advise you to direct further questions to the manufacturer of 
+your Bluetooth module.  You will need to know which HCI protocol it 
+supports, the baud rate, handshaking etc.
 
-Thanks a lot,
-Oli 
+Jon
+
+
+Robin Gujjar wrote:
+> hi jon
+> thanks for the reply .Jon i saw the source code i got it . now i want to
+> write a bluetooth UART device driver for my board
+> can you just give me some basic step how to go ahead because i am new to
+> linux device driver .please help any on
+>
+> thanks and regrds
+> Robin Singh
+>
+> On 10/19/07, Jon Maber <jon@cilnu.com> wrote:
+>   
+>> Robin,
+>> the job is already done for you.  Download kernel 2.6.22 and take a look
+>> in net/bluetooth - you will see that the source code is there already.
+>> Run menuconfig and you will see bluetooth configuration options under
+>> the networking heading.  The fact that you are building for ARM
+>> shouldn't present any additional problems.
+>> Jon
+>>
+>> Robin Gujjar wrote:
+>>     
+>>> hi every body
+>>>
+>>> i am newbie to bluetooth .i want to integrate blueZ to my linux kernel
+>>> 2.6.22 can any body plz give me some basic step to do that .
+>>>
+>>> thanks in advance
+>>>
+>>> Robin Singh
+>>>
+>>>
+>>> ------------------------------------------------------------------------
+>>>
+>>>
+>>>       
+>> -------------------------------------------------------------------------
+>>     
+>>> This SF.net email is sponsored by: Splunk Inc.
+>>> Still grepping through log files to find problems?  Stop.
+>>> Now Search log events and configuration files using AJAX and a browser.
+>>> Download your FREE copy of Splunk now >> http://get.splunk.com/
+>>> ------------------------------------------------------------------------
+>>>
+>>> _______________________________________________
+>>> Bluez-devel mailing list
+>>> Bluez-devel@lists.sourceforge.net
+>>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>>>
+>>>       
+>> -------------------------------------------------------------------------
+>> This SF.net email is sponsored by: Splunk Inc.
+>> Still grepping through log files to find problems?  Stop.
+>> Now Search log events and configuration files using AJAX and a browser.
+>> Download your FREE copy of Splunk now >> http://get.splunk.com/
+>> _______________________________________________
+>> Bluez-devel mailing list
+>> Bluez-devel@lists.sourceforge.net
+>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>>
+>>     
+>
+>   
+> ------------------------------------------------------------------------
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc.
+> Still grepping through log files to find problems?  Stop.
+> Now Search log events and configuration files using AJAX and a browser.
+> Download your FREE copy of Splunk now >> http://get.splunk.com/
+> ------------------------------------------------------------------------
+>
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>   
 
 
 -------------------------------------------------------------------------
