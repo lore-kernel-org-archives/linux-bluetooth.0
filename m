@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <2d5a2c100710221315h683d18fch731f8b86e533daf3@mail.gmail.com>
-Date: Mon, 22 Oct 2007 17:15:09 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Message-ID: <de4879e80710221221q47ed0e39w64c4ae526c94eca9@mail.gmail.com>
+Date: Mon, 22 Oct 2007 16:21:23 -0300
+From: thiagoss <thiagossantos@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <719D5CCC2F6E3644B0A9F5C9B1D0008803840FC4@esebe104.NOE.Nokia.com>
 MIME-Version: 1.0
-References: <719D5CCC2F6E3644B0A9F5C9B1D00088038171C2@esebe104.NOE.Nokia.com>
-	<471730B2.3030606@free.fr>
-	<Pine.LNX.4.64.0710181017560.28683@simba.math.ucla.edu>
-	<719D5CCC2F6E3644B0A9F5C9B1D0008803840FC4@esebe104.NOE.Nokia.com>
-Subject: Re: [Bluez-devel] PATCH1/2: bluez-utils -fix-a2dp-buffer-constraints
+Content-Type: multipart/mixed;
+	boundary="----=_Part_19306_5043671.1193080883998"
+Subject: [Bluez-devel] [PATCH] Removing unused variables from gsta2dpsink
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,67 +16,81 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Kai,
+------=_Part_19306_5043671.1193080883998
+Content-Type: multipart/alternative;
+	boundary="----=_Part_19307_27609427.1193080883998"
 
-> ok, I'm very new to A2DP, but my understanding is that timing
-> is done similarly as in RTP-over-IP: the receiver adapts to
-> the clock of the sender. This means the sender just needs to
-> send at a steady pace (not required, but makes life easier for
-> the receiver). And as with RTP, I assume implementations vary
-> a lot in quality, so improving the timing (reducing jitter
-> and drift against nominal rate) will improve interoperability
-> between different devices.
->
-> Any ++agreed or --aggreed statements? :)
+------=_Part_19307_27609427.1193080883998
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Yep, that is probably a good explanation why some devices
-work better than others.
+Patch removing unused variables from gsta2dpsink. Those were needed on alsa
+plugin for sbc encoding, but they aren't in gsta2dpsink, because it is not
+responsible for the encoding.
 
->
-> >With bluez-utils-3.19 (3.20 is latest) I'm having consistently
-> >good results sending to the Bluetooth ALSA device, with
-> >neither silent gaps nor lost chunks.  But I'm seeing
-> >corruption when going through PulseAudio, which is attributed
-> >to an unknown formatting or parameter issue and is being dealt
-> >with on their mailing list.
->
+[]s
 
-There is some misunderstanding about the buffer size we use, those
-buffers are not intended to be used as ring buffers, it is just fill buffers
-so when you got enough frames to send they are written in the socket
-to device. The first buffer used (bluetooth_data) for pcm frames witch
-should be the same size of the codesize, it is intend to buffer pcm
-frames until it got enough data to encode a sbc frame than it should
-be restarted. The second buffer (bluetooth_a2dp) is filled with sbc frames
-it should have the mtu size of the l2cap, it stuff how many frames it can
-in there until there is no space left for another frame. The pace should
-be adjusted by the worker thread.
+Thiago Sousa Santos
 
-Making the buffer to be 16384 bytes long is nonsense we probably will never
-use this, bluetooth_a2dp_write does not expect block sizes bigger than code=
-size.
-So we need to fix this as soon as possible.
+------=_Part_19307_27609427.1193080883998
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-One thing that may worth trying is to set the supported block sizes up to
-the number of pcm frames it need to fill an entire packet, normally this
-means 4-6 sbc frames so it would be 2kb to 3kb (each sbc frame
-normally correspond to 512bytes).
+Patch removing unused variables from gsta2dpsink. Those were needed on alsa plugin for sbc encoding, but they aren&#39;t in gsta2dpsink, because it is not responsible for the encoding.<br><br>[]s<br><br>Thiago Sousa Santos
+<br>
 
--- =
+------=_Part_19307_27609427.1193080883998--
 
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+------=_Part_19306_5043671.1193080883998
+Content-Type: text/x-patch; name=gsta2dpsink_unusedvariables.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f83d6cra
+Content-Disposition: attachment; filename=gsta2dpsink_unusedvariables.patch
+
+SW5kZXg6IGF1ZGlvL2dzdGEyZHBzaW5rLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3Qv
+Ymx1ZXovdXRpbHMvYXVkaW8vZ3N0YTJkcHNpbmsuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS42
+CmRpZmYgLXUgLXIxLjYgZ3N0YTJkcHNpbmsuYwotLS0gYXVkaW8vZ3N0YTJkcHNpbmsuYwkxOCBP
+Y3QgMjAwNyAyMzowMjoyNCAtMDAwMAkxLjYKKysrIGF1ZGlvL2dzdGEyZHBzaW5rLmMJMjIgT2N0
+IDIwMDcgMTk6MDk6MjcgLTAwMDAKQEAgLTgzLDggKzgzLDYgQEAKIH07CiBzdHJ1Y3QgYmx1ZXRv
+b3RoX2RhdGEgewogCXN0cnVjdCBpcGNfZGF0YV9jZmcgY2ZnOwkvKiBCbHVldG9vdGggZGV2aWNl
+IGNvbmZpZyAqLwotCXVpbnQ4X3QgYnVmZmVyW0JVRkZFUl9TSVpFXTsJLyogRW5jb2RlZCB0cmFu
+c2ZlciBidWZmZXIgKi8KLQlpbnQgY291bnQ7CQkJLyogVHJhbnNmZXIgYnVmZmVyIGNvdW50ZXIg
+Ki8KIAlzdHJ1Y3QgYmx1ZXRvb3RoX2EyZHAgYTJkcDsJLyogQTJEUCBkYXRhICovCiB9OwogCkBA
+IC00NjUsMTQgKzQ2MywxNCBAQAogCWRhdGEgaW4gdGhlIHBpcGUgLSB3ZSBoYXZlIHRvIGVtcHR5
+IGl0ICovCiAJd2hpbGUgKDEpIHsKIAkJZXJyID0gZ19pb19jaGFubmVsX3JlYWQoc2luay0+c3Ry
+ZWFtLAotCQkJCQkoZ2NoYXIgKikgc2luay0+ZGF0YS0+YnVmZmVyLAorCQkJCQkoZ2NoYXIgKikg
+c2luay0+ZGF0YS0+YTJkcC5idWZmZXIsCiAJCQkJCShnc2l6ZSkgc2luay0+ZGF0YS0+Y2ZnLnBr
+dF9sZW4sCiAJCQkJCSZyZWFkKTsKIAkJaWYgKGVyciAhPSBHX0lPX0VSUk9SX05PTkUgfHwgcmVh
+ZCA8PSAwKQogCQkJYnJlYWs7CiAJfQogCi0JbWVtc2V0KHNpbmstPmRhdGEtPmJ1ZmZlciwgMCwg
+c2l6ZW9mKHNpbmstPmRhdGEtPmJ1ZmZlcikpOworCW1lbXNldChzaW5rLT5kYXRhLT5hMmRwLmJ1
+ZmZlciwgMCwgc2l6ZW9mKHNpbmstPmRhdGEtPmEyZHAuYnVmZmVyKSk7CiAKIAlyZXR1cm4gVFJV
+RTsKIH0K
+------=_Part_19306_5043671.1193080883998
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
+------=_Part_19306_5043671.1193080883998
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_19306_5043671.1193080883998--
