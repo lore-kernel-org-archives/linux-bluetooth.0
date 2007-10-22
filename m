@@ -1,11 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Oliver Neukum <oliver@neukum.org>
-To: marcel@holtmann.org, maxk@qualcomm.com, bluez-devel@lists.sf.net
-Date: Mon, 22 Oct 2007 17:01:23 +0200
 MIME-Version: 1.0
-Message-Id: <200710221701.24120.oliver@neukum.org>
-Subject: [Bluez-devel] connection to keypad dropped after several minutes of
-	inactivity with 2.6.23
+Date: Mon, 22 Oct 2007 15:28:14 +0300
+Message-ID: <719D5CCC2F6E3644B0A9F5C9B1D0008803840FC4@esebe104.NOE.Nokia.com>
+In-Reply-To: <Pine.LNX.4.64.0710181017560.28683@simba.math.ucla.edu>
+References: <719D5CCC2F6E3644B0A9F5C9B1D00088038171C2@esebe104.NOE.Nokia.com><471730B2.3030606@free.fr>
+	<Pine.LNX.4.64.0710181017560.28683@simba.math.ucla.edu>
+From: <Kai.Vehmanen@nokia.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] PATCH1/2: bluez-utils -fix-a2dp-buffer-constraints
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,43 +23,37 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-I have a Logitech Mediapad which drops the connection if I don't use it for several minutes.
-It just stops working.
+On 18 Oct 2007,  Jim Carter wrote:
+>I remember a month or two back, someone said that the A2DP 
+>profile was weak on flow control, requiring the source (ALSA) 
+>to send data at an even rate.  
+>If the headset's buffer is full can it cork the stream?  Or 
+>will the additional data just overwrite data already at the headset?
 
-oenone:/home/oliver # hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:50:F2:E9:DF:8D ACL MTU: 377:10 SCO MTU: 16:0
-        UP RUNNING PSCAN
-        RX bytes:0 acl:177 sco:0 events:286 errors:0
-        TX bytes:1747 acl:43 sco:0 commands:66 errors:0
-        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'BlueZ oenone (0)'
-        Class: 0x100100
-        Service Classes: Object Transfer
-        Device Class: Computer, Uncategorized
-        HCI Ver: 1.2 (0x2) HCI Rev: 0x3 LMP Ver: 1.2 (0x2) LMP Subver: 0x800
-        Manufacturer: Broadcom Corporation (15)
+ok, I'm very new to A2DP, but my understanding is that timing 
+is done similarly as in RTP-over-IP: the receiver adapts to
+the clock of the sender. This means the sender just needs to 
+send at a steady pace (not required, but makes life easier for
+the receiver). And as with RTP, I assume implementations vary
+a lot in quality, so improving the timing (reducing jitter 
+and drift against nominal rate) will improve interoperability
+between different devices.
 
-oenone:/home/oliver # hcitool inq
-Inquiring ...
-oenone:/home/oliver # hcitool info 00:07:61:36:C1:09
-Requesting information ...
-        BD Address:  00:07:61:36:C1:09
-        Device Name: Logitech Mediapad
-        LMP Version: 1.2 (0x2) LMP Subversion: 0x545
-        Manufacturer: Cambridge Silicon Radio (10)
-        Features: 0xfc 0xff 0x0f 0x00 0x08 0x08 0x00 0x00
-                <encryption> <slot offset> <timing accuracy> <role switch>
-                <hold mode> <sniff mode> <park state> <RSSI> <channel quality>
-                <SCO link> <HV2 packets> <HV3 packets> <u-law log> <A-law log>
-                <CVSD> <paging scheme> <power control> <transparent SCO>
-                <AFH cap. slave> <AFH cap. master>
+Any ++agreed or --aggreed statements? :)
 
-	Regards
-		Oliver
+>With bluez-utils-3.19 (3.20 is latest) I'm having consistently 
+>good results sending to the Bluetooth ALSA device, with 
+>neither silent gaps nor lost chunks.  But I'm seeing 
+>corruption when going through PulseAudio, which is attributed 
+>to an unknown formatting or parameter issue and is being dealt 
+>with on their mailing list.
+
+Have you tested with my patches (now in CVS)? Vanilla 3.19/3.20
+didn't work at all with Pulseaudio, but with my patches the
+playback is now flawless.
+
+-- 
+first.surname@nokia.com (Kai Vehmanen)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
