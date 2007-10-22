@@ -1,12 +1,17 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <47179EC5.8080808@cilnu.com>
-References: <47179EC5.8080808@cilnu.com>
-Date: Mon, 22 Oct 2007 11:28:22 +0200
-Message-Id: <1193045302.6184.165.camel@violet>
+To: Olivier Le Pogam <olepogam@free.fr>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <000b01c81484$989af5b0$0200a8c0@jester>
+References: <6656b6540710182155m29cd7441l6dcb9a7d722d5417@mail.gmail.com>
+	<47189691.2000504@cilnu.com>
+	<6656b6540710210008v5cc459dv6692a5e8ff888187@mail.gmail.com>
+	<471B5E66.1030601@cilnu.com>  <000b01c81484$989af5b0$0200a8c0@jester>
+Date: Mon, 22 Oct 2007 11:22:26 +0200
+Message-Id: <1193044946.6184.157.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] LED Output Reports to Keyboard
+Subject: Re: [Bluez-devel] Blocking connect(AF_BLUETOOTH, SOCK_STREAM,
+	BTPROTO_RFCOMM) => EINPROGRESS
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,58 +25,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jon,
+Hi Oli,
 
-> Right place to talk about the Bluez source code that is now in the Linux 
-> Kernel? Hope so.
-> 
-> In essence: testing with kernel 2.6.22, it seems to me that LED 
-> information is sent to bluetooth devices using the boot protocol 
-> regardless of whether the boot protocol is active and even if the device 
-> explicitly declares that it doesn't support boot protocol.
-> 
-> 
-> 
-> In detail:  I'm designing a Bluetooth keyboard device which has some 
-> LEDs which are for customised use.   This means that they have ID 
-> numbers that cannot be represented in the boot protocol keyboard output 
-> report.  So, the device has a customised report descriptor. The first 
-> byte of the output report is the same as the boot protocol but a second 
-> byte is added containing eight more LED flags. 
-> 
-> I'm testing my device on a laptop running Fedora Core 6 with kernel 
-> 2.6.22.  Digging in the kernel source code I found that the LED output 
-> reports are sent from the function hidp_queue_event in the source file 
-> net/bluetooth/hidp/core.c.  I added an extra line for debugging;
-> 
->     BT_DBG("Sending keyboard boot protocol LED output report. Session is 
-> in %s mode.",
->         ((session->flags & (1 << 
-> HIDP_BOOT_PROTOCOL_MODE))?"boot":"report") );
-> 
-> which confirms that the HIDP module has correctly understood from my 
-> service record that boot protocol mode is not set.  The rest of this 
-> function however sends a hard wired boot protocol frame and therefore 
-> ignores completely any LED events that cannot be represented.  In fact 
-> for my customised LEDs no frame is sent at all since to this function it 
-> seems that no significant LED has changed state.
-> 
-> By the way, I also use a customised input report for key presses which 
-> is handled perfectly O.K.
-> 
-> First question: can anyone tell me that the more unusual LED events do 
-> get through to their Bluetooth keyboard when using Linux?  It is of 
-> course possible that I've messed up my Service Record and all of the 
-> above is a load of tosh.
-> 
-> Second question: actually I'll not dive into a load more questions about 
-> fixing the bug until I know that I've actually found one.
+> I am trying to perform RFCOMM connection to a mobile phone thanks to a 
+> blocking "connect(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)" (Blocking is 
+> the only way for me to get a "Connection Refused" return status !), and if 
+> the phone is still asking for the authorization when the connect times out, 
+> the connect and leaves with a EINPROGRESS status.
 
-don't force it to use the boot protocol mode. Lets use Linux the report
-protocol mode and make sure your HID report descriptor is sane. Then we
-can fix it up in the common HID parser of Linux to handle you leds.
-
-Run "hcidump -X -V" to show what is send by your keyboard.
+I have no idea what you are trying to achieve here. Anyway, the RFCOMM
+socket behaves like every other TCP socket. So in the non-blocking case
+apply the same stuff you use when programming TCP.
 
 Regards
 
