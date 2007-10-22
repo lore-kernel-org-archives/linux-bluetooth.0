@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200710212313.40126.flyzone@technologist.com>
-References: <200710212313.40126.flyzone@technologist.com>
-Date: Mon, 22 Oct 2007 11:25:42 +0200
-Message-Id: <1193045142.6184.162.camel@violet>
+In-Reply-To: <88a477560710220150y756f8e7dj333b46eb5d9f6f68@mail.gmail.com>
+References: <88a477560710220150y756f8e7dj333b46eb5d9f6f68@mail.gmail.com>
+Date: Mon, 22 Oct 2007 11:23:32 +0200
+Message-Id: <1193045012.6184.159.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] DBT120 B4 not working
+Subject: Re: [Bluez-users] Authorization denied: Authorization agent
+	does	not exist
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,51 +21,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Matthias,
 
-> I have a bluetooth device D-link DBT120 revision B4 with a kernel 2.6.18
-> with a debian etch stable (bluez-hcidump-1.32-1, bluez-utils-3.7.1, 
-> bluez-firmware-1.2-1 and other package for kde).
+> I try to use my bluetooth mouse with bluez under opensuse 10.3. I've
+> used the instructions on the bluez wiki to pair and activate the
+> mouse:
 > 
-> on messages:
-> kernel: usb 5-1.4: new full speed USB device using ehci_hcd and address 6
-> kernel: usb 5-1.4: configuration #1 chosen from 1 choice
-> kernel: Bluetooth: HCI USB driver ver 2.9
-> kernel: usbcore: registered new driver hci_usb
-> on syslog:
-> kernel: hci_usb_intr_rx_submit: hci0 intr rx submit failed urb cdcb6654 
-> err -28
-> kernel: hci_usb_intr_rx_submit: hci0 intr rx submit failed urb f4b749d4 
-> err -28
+> % dbus-send --system --type=method_call --print-reply --dest=org.bluez
+> /org/bluez org.bluez.Manager.ActivateService string:input
+> method return sender=:1.2 -> dest=:1.336
+>    string ":1.3"
 > 
-> lsusb show:
-> Bus 005 Device 010: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle 
-> (HCI mode)
+> % dbus-send --system --type=method_call --print-reply --dest=":1.3"
+> /org/bluez/input org.bluez.input.Manager.CreateDevice
+> string:00:02:76:00:D3:12
+> method return sender=:1.3 -> dest=:1.505
+>    string "/org/bluez/input/pointing0"
 > 
-> hciconfig:
-> hci0:   Type: USB
->         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
->         DOWN 
->         RX bytes:0 acl:0 sco:0 events:0 errors:0
->         TX bytes:0 acl:0 sco:0 commands:0 errors:0
-> hciconfig hci0 up
-> Can't init device hci0: Input/output error (5)
+> I can connect from the notebook to the mouse with:
 > 
-> strace hciconfig hci0 up:
->  socket(PF_BLUETOOTH, SOCK_RAW, 1)       = 3
->  ioctl(3, 0x800448d3, 0x805d300)         = 0
->  ioctl(3, 0x400448c9, 0)                 = -1 EIO (Input/output error)
->  write(2, "Can\'t init device hci0: Input/ou"..., 47Can't init device hci0:
->  Input/output error (5)
+> % dbus-send --system --type=method_call --print-reply --dest=":1.3"
+> /org/bluez/input/pointing0 org.bluez.input.Device.Connect
+> method return sender=:1.3 -> dest=:1.3038
 > 
-> I have a motherboard with VIA VT82 UHCI USB controller...in the past mail i 
-> read about a user "Marcel Holtmann" having the same problem with kernel 2.6.5 
-> but i cannot find the earlier post with the solution...
+> Now I try to reconnect automatically which doesn't work as expected.
+> If I press a button on the mouse I've got
+> 
+> Oct 22 10:33:57 sus input[2846]: Incoming connection on PSM 17
+> Oct 22 10:33:58 sus input[2846]: Incoming connection on PSM 19
+> Oct 22 10:33:58 sus input[2846]: Authorization denied: Authorization
+> agent does not exist
+> 
+> How Do I disable the need for authorisation for my mouse?
 
-use a newer kernel. The 2.6.5 is ancient and most USB issues have been
-fixed. However this is not really a Bluetooth issue. It is an USB
-problem or hardware problem. And to make it clear. It is not the dongle.
-I have a bunch of them, they work.
+you can't disable it. However you can use Adapter.SetTrusted() to make
+the mouse a trusted device.
 
 Regards
 
