@@ -1,11 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <88a477560710220150y756f8e7dj333b46eb5d9f6f68@mail.gmail.com>
-Date: Mon, 22 Oct 2007 10:50:44 +0200
-From: "Matthias Teege" <mteege@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Date: Sun, 21 Oct 2007 21:30:15 -0700 (PDT)
+From: Chris Dragga <chris_dragga@yahoo.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] Authorization denied: Authorization agent does not
-	exist
+Message-ID: <521733.37689.qm@web52102.mail.re2.yahoo.com>
+Subject: Re: [Bluez-users] Not finding services through D-Bus API
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,41 +18,106 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Moin,
+Disregard these questions.  Almost immediately after posting this, I realized that configure had an option --enable-network; after using this, my problem naturally went away.  Sorry to waste your time.
 
-I try to use my bluetooth mouse with bluez under opensuse 10.3. I've
-used the instructions on the bluez wiki to pair and activate the
-mouse:
+-Chris Dragga
 
-% dbus-send --system --type=method_call --print-reply --dest=org.bluez
-/org/bluez org.bluez.Manager.ActivateService string:input
-method return sender=:1.2 -> dest=:1.336
-   string ":1.3"
+----- Original Message ----
+From: Chris Dragga <chris_dragga@yahoo.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Sent: Sunday, October 21, 2007 10:42:58 PM
+Subject: Re: [Bluez-users] Not finding services through D-Bus API
 
-% dbus-send --system --type=method_call --print-reply --dest=":1.3"
-/org/bluez/input org.bluez.input.Manager.CreateDevice
-string:00:02:76:00:D3:12
-method return sender=:1.3 -> dest=:1.505
-   string "/org/bluez/input/pointing0"
 
-I can connect from the notebook to the mouse with:
+Thanks for the advice, but I went through the syslog, and wasn't able
+to find any errors regarding this.  I did realize belatedly that I
+lacked libusb, flex, and bison, but installing those made no
+difference.  Does one have to install the different services manually,
+or is it possible that my device is just broken somehow (I'm using a
+Trendnet Compact Bluetooth USB 2.0 Adapter, which is probably not the
+greatest piece of equipment in the world)?
 
-% dbus-send --system --type=method_call --print-reply --dest=":1.3"
-/org/bluez/input/pointing0 org.bluez.input.Device.Connect
-method return sender=:1.3 -> dest=:1.3038
 
-Now I try to reconnect automatically which doesn't work as expected.
-If I press a button on the mouse I've got
 
-Oct 22 10:33:57 sus input[2846]: Incoming connection on PSM 17
-Oct 22 10:33:58 sus input[2846]: Incoming connection on PSM 19
-Oct 22 10:33:58 sus input[2846]: Authorization denied: Authorization
-agent does not exist
+In addition, I'm getting another problem where the device on my main
+computer will not be recognized with the device on my laptop, though my
+main computer will see the device on my laptop (my laptop also lacks
+the service files).  I doubt this is related, but I thought I'd mention
+it in the event that it was.
 
-How Do I disable the need for authorisation for my mouse?
 
-Many thanks
-Matthias
+
+-Chris
+
+----- Original Message ----
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Sent: Wednesday, October 17, 2007 9:22:27 AM
+Subject: Re: [Bluez-users] Not finding services through D-Bus API
+
+
+Hi Chris,
+
+> I'm trying to use the Bluez D-Bus API on XUbuntu to establish a PAN
+ network connection, as described in the wiki page on creating network
+ connections.  However, I inevitably get the error "No such service"
+ upon
+ trying to activate the network service with the Bluez Manager object.
+  Furthermore, calls to ListServices() return an empty array, and I've
+ noticed that none of the .service files that come with Bluez-utils are
+ installed on my computer.  sdptool works, though, allowing me to
+ activate
+ services that then show up using "sdptool browse local".  I currently
+ have bluez-utils-3.20 and bluez-libs-3.20 installed, though I've also
+ tried this with bluez-utils-3.9 and bluez-libs-3.9 (the packages
+ available from Synaptic) with equally little success.  If anyone could
+ provide
+ any information that might help me, I'd greatly appreciate it, as I'm
+ really not sure what to do.
+
+the the syslog for any error messages.
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >> http://get.splunk.com/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+
+
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >> http://get.splunk.com/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+
+
+
+__________________________________________________
+Do You Yahoo!?
+Tired of spam?  Yahoo! Mail has the best spam protection around 
+http://mail.yahoo.com 
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
