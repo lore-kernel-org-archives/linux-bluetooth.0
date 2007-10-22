@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <b667c1330710221148r382f757qbdbfb92f529352d1@mail.gmail.com>
-Date: Tue, 23 Oct 2007 01:48:01 +0700
-From: "igi prowny" <prownyhawk@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <471CD91C.9080209@vsnl.com>
+Date: Mon, 22 Oct 2007 22:38:44 +0530
 MIME-Version: 1.0
-Subject: [Bluez-users] bluetooth confirmation message
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
+From: Mohan Sundaram <mohan.tux@gmail.com>
+Subject: [Bluez-users] Gutsy+Moto+BlueTooth+Wammu
+Reply-To: smohan@vsnl.com, BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,66 +14,73 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2121325489=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============2121325489==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_17625_24958027.1193078881715"
+My experience:
+*Headset HS805:*
+1. When I shifted to Gutsy, the first thing I noticed was direct headset
+support. System >> Preferences >> Bluetooth headset.
+2. My Moto HS805 worked first shot in pairing. Subsequent connections
+took some learning.  Invoking the BT headset and check for new devices
+shows the headset when headset is in pairing mode and the HS button was
+clicked a couple of times. No pairing beeps as I would hear if it paired
+with my Moto L6.
+3. Once it appeared on the list, choosing it as the active headset made
+it the second ALSA and OSS device.
+4. Once done, I was able to pick the BT headset in Skype sound devices.
 
-------=_Part_17625_24958027.1193078881715
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+        Happy, thrilled and felt something was accomplished fairly fast.
 
-hai,,i'm newbie in linux programming and bluetooth.i have project, it's call
-"automatic date and time".
-i want program can discover all blutooth device (handphone celular like
-nokia) in range 100meter.when handphone in  range, my program can send
-confirmation  message to handphone like "would you change  date and time?",
-so  if  user  angree, date and time of handphone will  change base on
-daytime server ( suppose www.example.mil )..
+*Moto L6:* Wanted to use Wammu/Kmobiletools for phonebook/ SMS etc.
+1. When I installed Gutsy, I also installed the kobexclient.
+Gnome-obex-server came in the gnome-bluez utils pack and got installed.
+2. I set the laptop to automatic connect on my MotoL6. Obex push from PC
+   worked well. Invoked gnome-obex-server on PC and obex push from phone
+worked well.
+3. I setup rfcomm to bind to the address and l2ping worked well. "rfcomm
+connect 0" refused to connect. /dev/rfcomm0 had 600 as rights and I was
+root. As I'd read someplace, I set the permissions to 666. Still pairing
+did not happen.
+4. /var/log/syslog showed passkey-agent registered. I set default to
+0000 and still no avail. I wrote a pin_helper script that  echoed
+"PIN:0000" and called it from /etc/bluetooth/hcid.conf. Still no avail.
+5. Did some more RTFM and read in blueZ architecture that auth uses the
+dbus architecture and a interactive dbus-send command was listed. I used
+that to send a PIN to the device and it paired.
+6. Went to the bluetooth paired devices config and set both the headset
+and phone as trusted devices.
+7. Tried rfcomm connect 0 and it worked. Fired up cutecom and tried AT+C
+commands. Disconnected. Moved down from 115200 to 19200 bauds and they
+worked.
+8. Wammu and Kmobiletools were a breeze after this.
 
-i hope anybody can help me and i need sample source.
+Hope this is useful to others. Most documents I read did not deal with
+the PIN auth problem solution that I tried. Most list pin_helpers which
+were deprecated in blueZ 3.0.
 
-i'm sorry my english not well..
+Pairing/bonding:
+1. What I did was to create a bond. Since the PIN exchange was not 
+happening, I was forced to go lower and create the bond myself. This is 
+a one time exercise per device as I understand it.
+2. URL http://wiki.bluez.org/wiki/HOWTO/Bonding
+3. command used: dbus-send --system --type=method_call --print-reply
+--dest=org.bluez /org/bluez/hci0 org.bluez.Adapter.CreateBonding
+string:AA:BB:CC:DD:EE:FF
 
+This caused the PIN box to pop up on the PC. Once keyed in, the MotoL6
+asked for the same key. This was timing out pretty fast. I had to do a
+one hand per device act to beat the clock. Got it after a few tries.
 
-thank you
-
-------=_Part_17625_24958027.1193078881715
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-hai,,i&#39;m newbie in linux programming and bluetooth.i have project, it&#39;s call &quot;automatic date and time&quot;.<br>i want program can discover all blutooth device (handphone celular like nokia) in range 100meter.when
- handphone in&nbsp; range, my program can send confirmation&nbsp; message to handphone like &quot;would you change&nbsp; date and time?&quot;, so&nbsp; if&nbsp; user&nbsp; angree, date and time of handphone will&nbsp; change base on daytime server ( suppose 
-<a href="http://www.example.mil">www.example.mil</a> )..<br><br>i hope anybody can help me and i need sample source.<br><br>i&#39;m sorry my english not well..<br><br><br>thank you<br>
-
-------=_Part_17625_24958027.1193078881715--
-
-
---===============2121325489==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Mohan Sundaram
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============2121325489==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============2121325489==--
