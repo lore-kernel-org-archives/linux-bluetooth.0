@@ -1,12 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <de4879e80710221221q47ed0e39w64c4ae526c94eca9@mail.gmail.com>
-Date: Mon, 22 Oct 2007 16:21:23 -0300
-From: thiagoss <thiagossantos@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+From: Oliver Neukum <oliver@neukum.org>
+To: marcel@holtmann.org, maxk@qualcomm.com, bluez-devel@lists.sf.net
+Date: Mon, 22 Oct 2007 17:01:23 +0200
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_19306_5043671.1193080883998"
-Subject: [Bluez-devel] [PATCH] Removing unused variables from gsta2dpsink
+Message-Id: <200710221701.24120.oliver@neukum.org>
+Subject: [Bluez-devel] connection to keypad dropped after several minutes of
+	inactivity with 2.6.23
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,81 +15,56 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_19306_5043671.1193080883998
-Content-Type: multipart/alternative;
-	boundary="----=_Part_19307_27609427.1193080883998"
+Hi,
 
-------=_Part_19307_27609427.1193080883998
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+I have a Logitech Mediapad which drops the connection if I don't use it for several minutes.
+It just stops working.
 
-Patch removing unused variables from gsta2dpsink. Those were needed on alsa
-plugin for sbc encoding, but they aren't in gsta2dpsink, because it is not
-responsible for the encoding.
+oenone:/home/oliver # hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:50:F2:E9:DF:8D ACL MTU: 377:10 SCO MTU: 16:0
+        UP RUNNING PSCAN
+        RX bytes:0 acl:177 sco:0 events:286 errors:0
+        TX bytes:1747 acl:43 sco:0 commands:66 errors:0
+        Features: 0xff 0xfe 0x0d 0x38 0x08 0x08 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'BlueZ oenone (0)'
+        Class: 0x100100
+        Service Classes: Object Transfer
+        Device Class: Computer, Uncategorized
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x3 LMP Ver: 1.2 (0x2) LMP Subver: 0x800
+        Manufacturer: Broadcom Corporation (15)
 
-[]s
+oenone:/home/oliver # hcitool inq
+Inquiring ...
+oenone:/home/oliver # hcitool info 00:07:61:36:C1:09
+Requesting information ...
+        BD Address:  00:07:61:36:C1:09
+        Device Name: Logitech Mediapad
+        LMP Version: 1.2 (0x2) LMP Subversion: 0x545
+        Manufacturer: Cambridge Silicon Radio (10)
+        Features: 0xfc 0xff 0x0f 0x00 0x08 0x08 0x00 0x00
+                <encryption> <slot offset> <timing accuracy> <role switch>
+                <hold mode> <sniff mode> <park state> <RSSI> <channel quality>
+                <SCO link> <HV2 packets> <HV3 packets> <u-law log> <A-law log>
+                <CVSD> <paging scheme> <power control> <transparent SCO>
+                <AFH cap. slave> <AFH cap. master>
 
-Thiago Sousa Santos
-
-------=_Part_19307_27609427.1193080883998
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Patch removing unused variables from gsta2dpsink. Those were needed on alsa plugin for sbc encoding, but they aren&#39;t in gsta2dpsink, because it is not responsible for the encoding.<br><br>[]s<br><br>Thiago Sousa Santos
-<br>
-
-------=_Part_19307_27609427.1193080883998--
-
-------=_Part_19306_5043671.1193080883998
-Content-Type: text/x-patch; name=gsta2dpsink_unusedvariables.patch
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_f83d6cra
-Content-Disposition: attachment; filename=gsta2dpsink_unusedvariables.patch
-
-SW5kZXg6IGF1ZGlvL2dzdGEyZHBzaW5rLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3Qv
-Ymx1ZXovdXRpbHMvYXVkaW8vZ3N0YTJkcHNpbmsuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS42
-CmRpZmYgLXUgLXIxLjYgZ3N0YTJkcHNpbmsuYwotLS0gYXVkaW8vZ3N0YTJkcHNpbmsuYwkxOCBP
-Y3QgMjAwNyAyMzowMjoyNCAtMDAwMAkxLjYKKysrIGF1ZGlvL2dzdGEyZHBzaW5rLmMJMjIgT2N0
-IDIwMDcgMTk6MDk6MjcgLTAwMDAKQEAgLTgzLDggKzgzLDYgQEAKIH07CiBzdHJ1Y3QgYmx1ZXRv
-b3RoX2RhdGEgewogCXN0cnVjdCBpcGNfZGF0YV9jZmcgY2ZnOwkvKiBCbHVldG9vdGggZGV2aWNl
-IGNvbmZpZyAqLwotCXVpbnQ4X3QgYnVmZmVyW0JVRkZFUl9TSVpFXTsJLyogRW5jb2RlZCB0cmFu
-c2ZlciBidWZmZXIgKi8KLQlpbnQgY291bnQ7CQkJLyogVHJhbnNmZXIgYnVmZmVyIGNvdW50ZXIg
-Ki8KIAlzdHJ1Y3QgYmx1ZXRvb3RoX2EyZHAgYTJkcDsJLyogQTJEUCBkYXRhICovCiB9OwogCkBA
-IC00NjUsMTQgKzQ2MywxNCBAQAogCWRhdGEgaW4gdGhlIHBpcGUgLSB3ZSBoYXZlIHRvIGVtcHR5
-IGl0ICovCiAJd2hpbGUgKDEpIHsKIAkJZXJyID0gZ19pb19jaGFubmVsX3JlYWQoc2luay0+c3Ry
-ZWFtLAotCQkJCQkoZ2NoYXIgKikgc2luay0+ZGF0YS0+YnVmZmVyLAorCQkJCQkoZ2NoYXIgKikg
-c2luay0+ZGF0YS0+YTJkcC5idWZmZXIsCiAJCQkJCShnc2l6ZSkgc2luay0+ZGF0YS0+Y2ZnLnBr
-dF9sZW4sCiAJCQkJCSZyZWFkKTsKIAkJaWYgKGVyciAhPSBHX0lPX0VSUk9SX05PTkUgfHwgcmVh
-ZCA8PSAwKQogCQkJYnJlYWs7CiAJfQogCi0JbWVtc2V0KHNpbmstPmRhdGEtPmJ1ZmZlciwgMCwg
-c2l6ZW9mKHNpbmstPmRhdGEtPmJ1ZmZlcikpOworCW1lbXNldChzaW5rLT5kYXRhLT5hMmRwLmJ1
-ZmZlciwgMCwgc2l6ZW9mKHNpbmstPmRhdGEtPmEyZHAuYnVmZmVyKSk7CiAKIAlyZXR1cm4gVFJV
-RTsKIH0K
-------=_Part_19306_5043671.1193080883998
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+	Regards
+		Oliver
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
-------=_Part_19306_5043671.1193080883998
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-------=_Part_19306_5043671.1193080883998--
