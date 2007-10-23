@@ -1,10 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Mime-Version: 1.0 (Apple Message framework v752.3)
-Message-Id: <6BA4FAD4-57D8-419A-B6BB-A86591FFDD3F@canonical.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-From: Michael Frey <michael.frey@canonical.com>
-Date: Tue, 23 Oct 2007 19:35:19 -0400
-Subject: [Bluez-devel] GUI for Bluetooth headsets..
+From: "Rafael J. Wysocki" <rjw@sisk.pl>
+To: "Alon Bar-Lev" <alon.barlev@gmail.com>
+Date: Wed, 24 Oct 2007 00:10:35 +0200
+References: <200710231950.31313.alon.barlev@gmail.com>
+	<1193162106.6184.208.camel@violet>
+	<9e0cf0bf0710231057lf60ce17ldd38489850cdf7c5@mail.gmail.com>
+In-Reply-To: <9e0cf0bf0710231057lf60ce17ldd38489850cdf7c5@mail.gmail.com>
+MIME-Version: 1.0
+Message-Id: <200710240010.35799.rjw@sisk.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-kernel@vger.kernel.org,
+        bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] [BUG] rfcomm]
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,14 +24,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Is there any plan for creating a UI for discovering and pairing a  
-bluetooth headset?
+On Tuesday, 23 October 2007 19:57, Alon Bar-Lev wrote:
+> On 10/23/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+> > first of all, please check if this still happens with 2.6.23, because we
+> > had some patches in the area of the RFCOMM TTY code that might have
+> > fixed this.
+> 
+> These messages are of 2.6.23.
+> 
+> > Second, can you try without uswsusp or suspend2. Both of
+> > them are not upstream and I can't tell how much these would effect this
+> > kind of behavior.
+> 
+> How can I test this without doing suspend?
+> uswsusp is not upstream?!?! Rafael?
 
-Something that adds the pcm entry in the asoundrc file.
+It is upstream and is supposed to work.
 
-Thanks,
-Michael
-
+Greetings,
+Rafael
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
