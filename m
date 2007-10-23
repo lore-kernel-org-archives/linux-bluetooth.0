@@ -1,15 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Alon Bar-Lev <alon.barlev@gmail.com>
-In-Reply-To: <9e0cf0bf0710231057lf60ce17ldd38489850cdf7c5@mail.gmail.com>
+To: Jiri Kosina <jikos@jikos.cz>
+In-Reply-To: <Pine.LNX.4.64.0710232004260.18815@twin.jikos.cz>
 References: <200710231950.31313.alon.barlev@gmail.com>
 	<1193162106.6184.208.camel@violet>
-	<9e0cf0bf0710231057lf60ce17ldd38489850cdf7c5@mail.gmail.com>
-Date: Tue, 23 Oct 2007 20:26:46 +0200
-Message-Id: <1193164006.6184.217.camel@violet>
+	<Pine.LNX.4.64.0710232004260.18815@twin.jikos.cz>
+Date: Tue, 23 Oct 2007 20:25:05 +0200
+Message-Id: <1193163905.6184.214.camel@violet>
 Mime-Version: 1.0
-Cc: "Rafael J. Wysocki" <rjw@sisk.pl>, linux-kernel@vger.kernel.org,
-        bluez-devel@lists.sf.net
+Cc: Alon Bar-Lev <alon.barlev@gmail.com>, bluez-devel@lists.sourceforge.net,
+        linux-kernel@vger.kernel.org
 Subject: Re: [Bluez-devel] [BUG] rfcomm]
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -24,20 +24,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Alon,
+Hi Jiri,
 
-> > first of all, please check if this still happens with 2.6.23, because we
-> > had some patches in the area of the RFCOMM TTY code that might have
-> > fixed this.
+> > Second, can you try without uswsusp or suspend2. Both of them are not 
+> > upstream and I can't tell how much these would effect this kind of 
+> > behavior.
 > 
-> These messages are of 2.6.23.
+> Hi Marcel,
+> 
+> actually uswsusp has been upstream for quite some time already. See 
+> Documentation/power/userland-swsusp.txt
 
-still another one to go :( Anyway since you have experience and you have
-a way to reproduce it, please test the latest kernel from Linus' Git
-tree.
-
-I can also whip up a patch that disables the device_move() usage and see
-if that is the reason for the falling over.
+nice. I've never used it. Currently I am using what comes with Ubuntu
+7.10 and that seems to work.
 
 Regards
 
