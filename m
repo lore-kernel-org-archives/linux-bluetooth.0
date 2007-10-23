@@ -1,46 +1,28 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "Pierre Savary" <pierre.savary@kerlink.fr>
-To: <bluez-users@lists.sourceforge.net>,
-        "BlueZ-Dev" <bluez-devel@lists.sourceforge.net>
-Date: Tue, 23 Oct 2007 11:54:27 +0200
-Message-ID: <005201c8155a$b4247ff0$1c6d7fd0$@savary@kerlink.fr>
+Return-Path: <maxk@qualcomm.com>
+Message-ID: <471DA835.2060308@qualcomm.com>
+Date: Tue, 23 Oct 2007 00:52:21 -0700
+From: Max Krasnyansky <maxk@qualcomm.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] ISCAN drop automically ...
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+To: bluez-devel@lists.sourceforge.net, marcel@holtmann.org
+Subject: What's the purpose of the new btusb driver ?
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi all,
+Marcel,
 
-I have a problem with the hci configuration of my device. On hcid.conf I
-have "iscan enable" but ISCAN flag drop automatically after some timeout
-...??? Why? It is the same thing when I make " $ hciconfig hci0 iscan" on
-the console.
-I don't know if it's important but I use a CSR BC6 chip with 3.15 utils and
-libs.
+I was going through latest 2.6 updates and noticed
+	"Generic Bluetooth USB driver"
+Why do we need it ?
 
-Thanks in advance,
-Regards,
+The driver code looks awfully similar to my very first implementation of the hci_usb.
+ie No URB queuing, etc.
+I think the only thing that is wrong with hci_usb is the custom urb queuing code
+(ie _urb stuff). That code was temporary at the time I put it in (year ago now). 
+Greg and I were discussing merging it into USB core. I think we should just do 
+that instead.
+If you think URB queuing is no longer needed (I doubt it) then maybe we can just
+rip that part out.
 
-Pierre
+Comments ?
 
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >> http://get.splunk.com/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Max
