@@ -1,14 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <471E36FF.8010008@free.fr>
-References: <4718E8E0.5050608@silicom.fr>
-	<d89ddf300710191635v1c9c6c84pcd6b82d0affcefab@mail.gmail.com>
-	<471E36FF.8010008@free.fr>
-Date: Tue, 23 Oct 2007 20:28:10 +0200
-Message-Id: <1193164090.6184.220.camel@violet>
+To: Alon Bar-Lev <alon.barlev@gmail.com>
+In-Reply-To: <9e0cf0bf0710231057lf60ce17ldd38489850cdf7c5@mail.gmail.com>
+References: <200710231950.31313.alon.barlev@gmail.com>
+	<1193162106.6184.208.camel@violet>
+	<9e0cf0bf0710231057lf60ce17ldd38489850cdf7c5@mail.gmail.com>
+Date: Tue, 23 Oct 2007 20:26:46 +0200
+Message-Id: <1193164006.6184.217.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] newapi patch v1
+Cc: "Rafael J. Wysocki" <rjw@sisk.pl>, linux-kernel@vger.kernel.org,
+        bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] [BUG] rfcomm]
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,21 +24,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
+Hi Alon,
 
-> >> As nobody suggested a new name, i've just chose one, which is
-> >> "btaudioservice.h" :-). Of course this can be changed if somebody
-> >> prefers a better name :-)
-> > 
-> > maybe audioclient.h. something like that would mesh best if it was
-> > ever made officially externally available (ie
-> > /usr/include/bluetooth/audioclient.h)
+> > first of all, please check if this still happens with 2.6.23, because we
+> > had some patches in the area of the RFCOMM TTY code that might have
+> > fixed this.
 > 
-> Sounds reasonable :-)
+> These messages are of 2.6.23.
 
-don't worry about any name, because before this goes into a state where
-I actually consider it being installed, I have changed my mind too many
-times.
+still another one to go :( Anyway since you have experience and you have
+a way to reproduce it, please test the latest kernel from Linus' Git
+tree.
+
+I can also whip up a patch that disables the device_move() usage and see
+if that is the reason for the falling over.
 
 Regards
 
