@@ -1,11 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="========GMX308691193144858563618"
-Date: Tue, 23 Oct 2007 15:07:38 +0200
-From: "eGore" <eGore@gmx.de>
-Message-ID: <20071023130738.308690@gmx.net>
-MIME-Version: 1.0
+Message-ID: <de4879e80710230520w37f85fe8x5f00b59f908d4d56@mail.gmail.com>
+Date: Tue, 23 Oct 2007 09:20:15 -0300
+From: thiagoss <thiagossantos@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] [PATCH] randomizer for passkey-agent
+In-Reply-To: <de4879e80710221221q47ed0e39w64c4ae526c94eca9@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_537_22253890.1193142015751"
+References: <de4879e80710221221q47ed0e39w64c4ae526c94eca9@mail.gmail.com>
+Subject: Re: [Bluez-devel] [PATCH] Removing unused variables from gsta2dpsink
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,207 +21,142 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---========GMX308691193144858563618
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8bit
+------=_Part_537_22253890.1193142015751
+Content-Type: multipart/alternative;
+	boundary="----=_Part_538_6727356.1193142015751"
 
-Hi list,
+------=_Part_538_6727356.1193142015751
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-I wanted a passkey-agent that does not always use the same passkey so it can run in daemon mode and provide passkeys. This is an attempt to implement this functionality.
+I've worked further and solved more problems on gsta2dpsink, I have a new
+patch that includes the modifications on the previous one.
 
-Please review and commit.
+This one also:
+- fixes a possible access to unitialized data
+- removes the watch from the server g_io_channel when closing it
 
-Thanks in advance,
-  Christoph Brill
--- 
-Psssst! Schon vom neuen GMX MultiMessenger gehört?
-Der kanns mit allen: http://www.gmx.net/de/go/multimessenger
+[]s
 
---========GMX308691193144858563618
-Content-Type: text/x-patch; charset="iso-8859-15";
-	name="bluez-passkey-random.patch"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: attachment; filename="bluez-passkey-random.patch"
+Thiago Sousa Santos
 
---- daemon/passkey-agent.c.org	2007-01-25 16:09:25.000000000 +0100
-+++ daemon/passkey-agent.c	2007-10-23 15:02:48.000000000 +0200
-@@ -32,6 +32,7 @@
- #include <signal.h>
- #include <getopt.h>
- #include <string.h>
-+#include <time.h>
- 
- #include <dbus/dbus.h>
- 
-@@ -39,6 +40,9 @@
- 
- static char *passkey = NULL;
- static char *address = NULL;
-+int use_random = 0;
-+int use_default = 0;
-+int key_length = 4;
- 
- static volatile sig_atomic_t __io_canceled = 0;
- static volatile sig_atomic_t __io_terminated = 0;
-@@ -48,6 +52,16 @@
- 	__io_canceled = 1;
- }
- 
-+static char * next_key() {
-+	int i;
-+	char * key = malloc((key_length + 1) * sizeof(char));
-+	for (i = 0; i < key_length; i++) {
-+		key[i] = 48+(rand() %10);
-+	}
-+	key[key_length] = '\0';
-+	return key;
-+}
-+
- static DBusHandlerResult agent_filter(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
-@@ -78,6 +92,12 @@
- 	const char *path, *address;
- 	dbus_bool_t numeric;
- 
-+	if (use_random) {
-+		if (passkey)
-+			free(passkey);
-+		passkey = next_key();
-+	}
-+
- 	if (!passkey)
- 		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- 
-@@ -150,7 +170,7 @@
- 	if (!dbus_message_get_args(msg, NULL,
- 			DBUS_TYPE_STRING, &path, DBUS_TYPE_STRING, &address,
- 							DBUS_TYPE_INVALID)) {
--		fprintf(stderr, "Invalid arguments for passkey Confirm method");
-+		fprintf(stderr, "Invalid arguments for passkey Cancel method");
- 		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- 	}
- 
-@@ -224,7 +244,7 @@
- };
- 
- static int register_agent(DBusConnection *conn, const char *agent_path,
--				const char *remote_address, int use_default)
-+				const char *remote_address)
- {
- 	DBusMessage *msg, *reply;
- 	DBusError err;
-@@ -280,7 +300,7 @@
- }
- 
- static int unregister_agent(DBusConnection *conn, const char *agent_path,
--				const char *remote_address, int use_default)
-+				const char *remote_address)
- {
- 	DBusMessage *msg, *reply;
- 	DBusError err;
-@@ -334,17 +354,23 @@
- 
- static void usage(void)
- {
-+#ifdef HAVE_CONFIG_H
- 	printf("Bluetooth passkey agent ver %s\n\n", VERSION);
-+#else
-+	printf("Bluetooth passkey agent\n\n");
-+#endif
- 
- 	printf("Usage:\n"
--		"\tpasskey-agent [--default] [--path agent-path] <passkey> [address]\n"
-+		"\tpasskey-agent [--default] [--path agent-path] [--random] [--length keylength] <passkey> [address]\n"
- 		"\n");
- }
- 
- static struct option main_options[] = {
--	{ "default",	0, 0, 'd' },
--	{ "path",	1, 0, 'p' },
--	{ "help",	0, 0, 'h' },
-+	{ "default", no_argument,       &use_default, 1   },
-+	{ "path",    required_argument, 0,            'p' },
-+	{ "help",    no_argument,       0,            'h' },
-+	{ "random",  no_argument,       &use_random,  1   },
-+	{ "length",  required_argument, 0,            'l' },
- 	{ 0, 0, 0, 0 }
- };
- 
-@@ -353,12 +379,14 @@
- 	struct sigaction sa;
- 	DBusConnection *conn;
- 	char match_string[128], default_path[128], *agent_path = NULL;
--	int opt, use_default = 0;
-+	int opt = 0;
-+
-+	srand(time(NULL));
- 
- 	snprintf(default_path, sizeof(default_path),
- 				"/org/bluez/passkey_agent_%d", getpid());
- 
--	while ((opt = getopt_long(argc, argv, "+dp:h", main_options, NULL)) != EOF) {
-+	while ((opt = getopt_long(argc, argv, "+dp:hrl:", main_options, NULL)) != EOF) {
- 		switch(opt) {
- 		case 'd':
- 			use_default = 1;
-@@ -373,8 +401,15 @@
- 		case 'h':
- 			usage();
- 			exit(0);
-+		case 'r':
-+			use_random = 1;
-+			break;
-+		case 'l':
-+			key_length = atoi(optarg);
-+			use_random = 1;
-+			break;
- 		default:
--			exit(1);
-+			abort ();
- 		}
- 	}
- 
-@@ -382,12 +417,17 @@
- 	argv += optind;
- 	optind = 0;
- 
--	if (argc < 1) {
-+	if (argc < 1 && !use_random) {
- 		usage();
- 		exit(1);
- 	}
- 
--	passkey = strdup(argv[0]);
-+	if (!use_random) {
-+		passkey = strdup(argv[0]);
-+	} else {
-+		passkey = next_key();
-+	}
-+
- 	address = (argc > 1) ? strdup(argv[1]) : NULL;
- 
- 	if (!use_default && !address) {
-@@ -404,7 +444,7 @@
- 		exit(1);
- 	}
- 
--	if (register_agent(conn, agent_path, address, use_default) < 0) {
-+	if (register_agent(conn, agent_path, address) < 0) {
- 		dbus_connection_unref(conn);
- 		exit(1);
- 	}
-@@ -430,7 +470,7 @@
- 	}
- 
- 	if (!__io_terminated)
--		unregister_agent(conn, agent_path, address, use_default);
-+		unregister_agent(conn, agent_path, address);
- 
- 	if (passkey)
- 		free(passkey);
+On 10/22/07, thiagoss <thiagossantos@gmail.com> wrote:
+>
+> Patch removing unused variables from gsta2dpsink. Those were needed on
+> alsa plugin for sbc encoding, but they aren't in gsta2dpsink, because it is
+> not responsible for the encoding.
+>
+> []s
+>
+> Thiago Sousa Santos
+>
+>
 
---========GMX308691193144858563618
+------=_Part_538_6727356.1193142015751
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+I&#39;ve worked further and solved more problems on gsta2dpsink, I have a new patch that includes the modifications on the previous one.<br><br>This one also:<br>- fixes a possible access to unitialized data<br>- removes the watch from the server g_io_channel when closing it
+<br><br>[]s<br><br>Thiago Sousa Santos<br><br><div><span class="gmail_quote">On 10/22/07, <b class="gmail_sendername">thiagoss</b> &lt;<a href="mailto:thiagossantos@gmail.com">thiagossantos@gmail.com</a>&gt; wrote:</span>
+<blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Patch removing unused variables from gsta2dpsink. Those were needed on alsa plugin for sbc encoding, but they aren&#39;t in gsta2dpsink, because it is not responsible for the encoding.
+<br><br>[]s<br><br>Thiago Sousa Santos
+<br>
+<br clear="all"></blockquote></div><br>
+
+------=_Part_538_6727356.1193142015751--
+
+------=_Part_537_22253890.1193142015751
+Content-Type: text/x-patch; name=gsta2dpsink_bugs.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f84dullj
+Content-Disposition: attachment; filename=gsta2dpsink_bugs.patch
+
+SW5kZXg6IGF1ZGlvL2dzdGEyZHBzaW5rLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3Qv
+Ymx1ZXovdXRpbHMvYXVkaW8vZ3N0YTJkcHNpbmsuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS42
+CmRpZmYgLXUgLXIxLjYgZ3N0YTJkcHNpbmsuYwotLS0gYXVkaW8vZ3N0YTJkcHNpbmsuYwkxOCBP
+Y3QgMjAwNyAyMzowMjoyNCAtMDAwMAkxLjYKKysrIGF1ZGlvL2dzdGEyZHBzaW5rLmMJMjMgT2N0
+IDIwMDcgMTI6MTY6MDEgLTAwMDAKQEAgLTgzLDggKzgzLDYgQEAKIH07CiBzdHJ1Y3QgYmx1ZXRv
+b3RoX2RhdGEgewogCXN0cnVjdCBpcGNfZGF0YV9jZmcgY2ZnOwkvKiBCbHVldG9vdGggZGV2aWNl
+IGNvbmZpZyAqLwotCXVpbnQ4X3QgYnVmZmVyW0JVRkZFUl9TSVpFXTsJLyogRW5jb2RlZCB0cmFu
+c2ZlciBidWZmZXIgKi8KLQlpbnQgY291bnQ7CQkJLyogVHJhbnNmZXIgYnVmZmVyIGNvdW50ZXIg
+Ki8KIAlzdHJ1Y3QgYmx1ZXRvb3RoX2EyZHAgYTJkcDsJLyogQTJEUCBkYXRhICovCiB9OwogCkBA
+IC0xMzIsMTUgKzEzMCwxMyBAQAogc3RhdGljIGdib29sZWFuIGdzdF9hMmRwX3Npbmtfc3RvcChH
+c3RCYXNlU2luayAqYmFzZXNpbmspCiB7CiAJR3N0QTJkcFNpbmsgKnNlbGYgPSBHU1RfQTJEUF9T
+SU5LKGJhc2VzaW5rKTsKLQlzdHJ1Y3QgYmx1ZXRvb3RoX2EyZHAgKmEyZHAgPSAmc2VsZi0+ZGF0
+YS0+YTJkcDsKIAogCXNlbGYtPmNvbl9zdGF0ZSA9IE5PVF9DT05GSUdVUkVEOwogCXNlbGYtPnRv
+dGFsID0gMDsKIAotCWlmIChzZWxmLT5zdHJlYW0pIHsKLQkJZ19pb19jaGFubmVsX2Nsb3NlKHNl
+bGYtPnN0cmVhbSk7Ci0JCWdfaW9fY2hhbm5lbF91bnJlZihzZWxmLT5zdHJlYW0pOwotCQlzZWxm
+LT5zdHJlYW0gPSBOVUxMOworCWlmIChzZWxmLT53YXRjaF9pZCAhPSAtMSkgeworCQlnX3NvdXJj
+ZV9yZW1vdmUoc2VsZi0+d2F0Y2hfaWQpOworCQlzZWxmLT53YXRjaF9pZCA9IC0xOwogCX0KIAog
+CWlmIChzZWxmLT5zZXJ2ZXIpIHsKQEAgLTE0OSwxMCArMTQ1LDE1IEBACiAJCXNlbGYtPnN0cmVh
+bSA9IE5VTEw7CiAJfQogCi0JaWYgKHNlbGYtPmRhdGEtPmNmZy5jb2RlYyA9PSBDRkdfQ09ERUNf
+U0JDKQotCQlzYmNfZmluaXNoKCZhMmRwLT5zYmMpOworCWlmIChzZWxmLT5zdHJlYW0pIHsKKwkJ
+Z19pb19jaGFubmVsX2Nsb3NlKHNlbGYtPnN0cmVhbSk7CisJCWdfaW9fY2hhbm5lbF91bnJlZihz
+ZWxmLT5zdHJlYW0pOworCQlzZWxmLT5zdHJlYW0gPSBOVUxMOworCX0KIAogCWlmIChzZWxmLT5k
+YXRhKSB7CisJCWlmIChzZWxmLT5kYXRhLT5jZmcuY29kZWMgPT0gQ0ZHX0NPREVDX1NCQykKKwkJ
+CXNiY19maW5pc2goJnNlbGYtPmRhdGEtPmEyZHAuc2JjKTsKIAkJZ19mcmVlKHNlbGYtPmRhdGEp
+OwogCQlzZWxmLT5kYXRhID0gTlVMTDsKIAl9CkBAIC00NDksNyArNDUwLDcgQEAKIHsKIAlnaW50
+IHJldDsKIAlHSU9FcnJvciBlcnI7Ci0JZ3NpemUgcmVhZDsKKwlnc2l6ZSByZWFkPTA7CiAKIAly
+ZXQgPSBnc3RfYTJkcF9zaW5rX2JsdWV0b290aF9yZWN2bXNnX2ZkKHNpbmspOwogCWlmIChyZXQg
+PCAwKQpAQCAtNDY1LDE0ICs0NjYsMTQgQEAKIAlkYXRhIGluIHRoZSBwaXBlIC0gd2UgaGF2ZSB0
+byBlbXB0eSBpdCAqLwogCXdoaWxlICgxKSB7CiAJCWVyciA9IGdfaW9fY2hhbm5lbF9yZWFkKHNp
+bmstPnN0cmVhbSwKLQkJCQkJKGdjaGFyICopIHNpbmstPmRhdGEtPmJ1ZmZlciwKKwkJCQkJKGdj
+aGFyICopIHNpbmstPmRhdGEtPmEyZHAuYnVmZmVyLAogCQkJCQkoZ3NpemUpIHNpbmstPmRhdGEt
+PmNmZy5wa3RfbGVuLAogCQkJCQkmcmVhZCk7CiAJCWlmIChlcnIgIT0gR19JT19FUlJPUl9OT05F
+IHx8IHJlYWQgPD0gMCkKIAkJCWJyZWFrOwogCX0KIAotCW1lbXNldChzaW5rLT5kYXRhLT5idWZm
+ZXIsIDAsIHNpemVvZihzaW5rLT5kYXRhLT5idWZmZXIpKTsKKwltZW1zZXQoc2luay0+ZGF0YS0+
+YTJkcC5idWZmZXIsIDAsIHNpemVvZihzaW5rLT5kYXRhLT5hMmRwLmJ1ZmZlcikpOwogCiAJcmV0
+dXJuIFRSVUU7CiB9CkBAIC01MTIsMTAgKzUxMywxMSBAQAogc3RhdGljIGdib29sZWFuIHNlcnZl
+cl9jYWxsYmFjayhHSU9DaGFubmVsICpjaGFuLAogCQkJCQlHSU9Db25kaXRpb24gY29uZCwgZ3Bv
+aW50ZXIgZGF0YSkKIHsKLQlHc3RBMmRwU2luayAqc2luayA9IEdTVF9BMkRQX1NJTksoZGF0YSk7
+CisJR3N0QTJkcFNpbmsgKnNpbms7CiAKIAlzd2l0Y2ggKGNvbmQpIHsKIAljYXNlIEdfSU9fSU46
+CisJCXNpbmsgPSBHU1RfQTJEUF9TSU5LKGRhdGEpOwogCQlpZiAoc2luay0+Y29uX3N0YXRlICE9
+IE5PVF9DT05GSUdVUkVEICYmCiAJCQlzaW5rLT5jb25fc3RhdGUgIT0gQ09ORklHVVJFRCkKIAkJ
+CWdzdF9hMmRwX3NpbmtfY29uZl9yZWN2X2RhdGEoc2luayk7CkBAIC01MjYsMTIgKzUyOCwxNCBA
+QAogCQlyZXR1cm4gRkFMU0U7CiAJCWJyZWFrOwogCWNhc2UgR19JT19FUlI6CisJCXNpbmsgPSBH
+U1RfQTJEUF9TSU5LKGRhdGEpOwogCQlHU1RfV0FSTklOR19PQkpFQ1Qoc2luaywgIlVudHJlYXRl
+ZCBjYWxsYmFjayBHX0lPX0VSUiIpOwogCQlicmVhazsKIAljYXNlIEdfSU9fTlZBTDoKIAkJcmV0
+dXJuIEZBTFNFOwogCQlicmVhazsKIAlkZWZhdWx0OgorCQlzaW5rID0gR1NUX0EyRFBfU0lOSyhk
+YXRhKTsKIAkJR1NUX1dBUk5JTkdfT0JKRUNUKHNpbmssICJVbmV4cGVjdGVkIGNhbGxiYWNrIGNh
+bGwiKTsKIAkJYnJlYWs7CiAJfQpAQCAtNTQ2LDYgKzU1MCw4IEBACiAJZ2ludCBzazsKIAlnaW50
+IGVycjsKIAorCXNlbGYtPndhdGNoX2lkID0gLTE7CisKIAlzayA9IHNvY2tldChQRl9MT0NBTCwg
+U09DS19TVFJFQU0sIDApOwogCWlmIChzayA8IDApIHsKIAkJZXJyID0gZXJybm87CkBAIC01NTYs
+NyArNTYyLDcgQEAKIAogCWlmIChjb25uZWN0KHNrLCAoc3RydWN0IHNvY2thZGRyICopICZhZGRy
+LCBzaXplb2YoYWRkcikpIDwgMCkgewogCQllcnIgPSBlcnJubzsKLQkJR1NUX0VSUk9SX09CSkVD
+VChzZWxmLCAiQ29ubmVjdGlvbiBmYWlsICVzICglZCkiLCAKKwkJR1NUX0VSUk9SX09CSkVDVChz
+ZWxmLCAiQ29ubmVjdGlvbiBmYWlsICVzICglZCkiLAogCQkJc3RyZXJyb3IoZXJyKSwgZXJyKTsK
+IAkJY2xvc2Uoc2spOwogCQlyZXR1cm4gRkFMU0U7CkBAIC01NjQsMTIgKzU3MCwxOCBAQAogCiAJ
+c2VsZi0+c2VydmVyID0gZ19pb19jaGFubmVsX3VuaXhfbmV3KHNrKTsKIAotCWdfaW9fYWRkX3dh
+dGNoKHNlbGYtPnNlcnZlciwgR19JT19JTiB8IEdfSU9fSFVQIHwgR19JT19FUlIgfCBHX0lPX05W
+QUwsCi0JCQlzZXJ2ZXJfY2FsbGJhY2ssIHNlbGYpOworCXNlbGYtPndhdGNoX2lkID0gZ19pb19h
+ZGRfd2F0Y2goc2VsZi0+c2VydmVyLCBHX0lPX0lOIHwgR19JT19IVVAgfAorCQkJR19JT19FUlIg
+fCBHX0lPX05WQUwsIHNlcnZlcl9jYWxsYmFjaywgc2VsZik7CiAKIAlzZWxmLT5kYXRhID0gZ19u
+ZXcwKHN0cnVjdCBibHVldG9vdGhfZGF0YSwgMSk7CiAJbWVtc2V0KHNlbGYtPmRhdGEsIDAsIHNp
+emVvZihzdHJ1Y3QgYmx1ZXRvb3RoX2RhdGEpKTsKIAorCXNlbGYtPnN0cmVhbSA9IE5VTEw7CisJ
+c2VsZi0+Y29uX3N0YXRlID0gTk9UX0NPTkZJR1VSRUQ7CisJc2VsZi0+dG90YWwgPSAwOworCisJ
+c2VsZi0+d2FpdGluZ19jb25fY29uZiA9IEZBTFNFOworCiAJcmV0dXJuIFRSVUU7CiB9CiAKQEAg
+LTY2OCw4ICs2ODAsOSBAQAogCWhlYWRlci0+c3NyYyA9IGh0b25sKDEpOwogCiAJd2hpbGUgKDEp
+IHsKLQkJZXJyID0gZ19pb19jaGFubmVsX3dyaXRlKHNpbmstPnN0cmVhbSwgKGNvbnN0IGNoYXIg
+KikgYTJkcC0+YnVmZmVyLAotCQkJCQkoZ3NpemUpIGEyZHAtPmNvdW50LCAoZ3NpemUgKikgJnJl
+dCk7CisJCWVyciA9IGdfaW9fY2hhbm5lbF93cml0ZShzaW5rLT5zdHJlYW0sCisJCQkoY29uc3Qg
+Y2hhciAqKSBhMmRwLT5idWZmZXIsCisJCQkoZ3NpemUpIGEyZHAtPmNvdW50LCAoZ3NpemUgKikg
+JnJldCk7CiAKIAkJaWYgKGVyciA9PSBHX0lPX0VSUk9SX0FHQUlOKSB7CiAJCQl1c2xlZXAgKDEw
+MCk7CkBAIC02OTQsNyArNzA3LDcgQEAKIAlHc3RBMmRwU2luayAqc2luazsKIAlzdHJ1Y3QgYmx1
+ZXRvb3RoX2RhdGEgKmRhdGE7CiAJc3RydWN0IGJsdWV0b290aF9hMmRwICphMmRwOwotCWdpbnQg
+ZW5jb2RlZCwgZnJhbWVfc2l6ZT0xMDI0OworCWdpbnQgZW5jb2RlZD0wLCBmcmFtZV9zaXplPTEw
+MjQ7IC8qIEZJWE1FIGhvdyB0byBnZXQgdGhlIGZyYW1lIHNpemU/ICovCiAJZ2ludCByZXQ9MDsK
+IAogCXNpbmsgPSBHU1RfQTJEUF9TSU5LKGJhc2VzaW5rKTsKSW5kZXg6IGF1ZGlvL2dzdGEyZHBz
+aW5rLmgKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovdXRpbHMvYXVkaW8vZ3N0
+YTJkcHNpbmsuaCx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS40CmRpZmYgLXUgLXIxLjQgZ3N0YTJk
+cHNpbmsuaAotLS0gYXVkaW8vZ3N0YTJkcHNpbmsuaAkxOCBPY3QgMjAwNyAyMTo1MDowMCAtMDAw
+MAkxLjQKKysrIGF1ZGlvL2dzdGEyZHBzaW5rLmgJMjMgT2N0IDIwMDcgMTI6MTY6MDEgLTAwMDAK
+QEAgLTY3LDYgKzY3LDcgQEAKIAlHTXV0ZXggKnNpbmtfbG9jazsKIAogCWdpbnQgdG90YWw7CisJ
+Z2ludCB3YXRjaF9pZDsKIAogfTsKIAo=
+------=_Part_537_22253890.1193142015751
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -229,7 +167,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---========GMX308691193144858563618
+------=_Part_537_22253890.1193142015751
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -240,4 +178,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---========GMX308691193144858563618--
+------=_Part_537_22253890.1193142015751--
