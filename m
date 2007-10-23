@@ -1,29 +1,55 @@
-Return-Path: <alon.barlev@gmail.com>
-Message-ID: <9e0cf0bf0710231127o485a52e1sc7a06df7c8bc0189@mail.gmail.com>
-Date: Tue, 23 Oct 2007 20:27:16 +0200
-From: "Alon Bar-Lev" <alon.barlev@gmail.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: [BUG] rfcomm]
-Cc: "Jiri Kosina" <jikos@jikos.cz>, linux-kernel@vger.kernel.org,
-        bluez-devel@lists.sourceforge.net
-In-Reply-To: <1193163905.6184.214.camel@violet>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-References: <200710231950.31313.alon.barlev@gmail.com>
-	 <1193162106.6184.208.camel@violet>
-	 <Pine.LNX.4.64.0710232004260.18815@twin.jikos.cz>
-	 <1193163905.6184.214.camel@violet>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <471E36FF.8010008@free.fr>
+References: <4718E8E0.5050608@silicom.fr>
+	<d89ddf300710191635v1c9c6c84pcd6b82d0affcefab@mail.gmail.com>
+	<471E36FF.8010008@free.fr>
+Date: Tue, 23 Oct 2007 20:28:10 +0200
+Message-Id: <1193164090.6184.220.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] newapi patch v1
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 10/23/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> nice. I've never used it. Currently I am using what comes with Ubuntu
-> 7.10 and that seems to work.
+Hi Fabien,
 
-Have you tried to suspend while pppd is using rfcomm?
+> >> As nobody suggested a new name, i've just chose one, which is
+> >> "btaudioservice.h" :-). Of course this can be changed if somebody
+> >> prefers a better name :-)
+> > 
+> > maybe audioclient.h. something like that would mesh best if it was
+> > ever made officially externally available (ie
+> > /usr/include/bluetooth/audioclient.h)
+> 
+> Sounds reasonable :-)
 
-The fact that it happens with suspend2 and uswsusp means that the
-issue is suspend blind.
-Do you need any more information in order to determine what is the problem?
+don't worry about any name, because before this goes into a state where
+I actually consider it being installed, I have changed my mind too many
+times.
 
-Best Regards,
-Alon Bar-Lev.
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >> http://get.splunk.com/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
