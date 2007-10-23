@@ -1,29 +1,55 @@
-Return-Path: <jikos@jikos.cz>
-Date: Tue, 23 Oct 2007 20:06:27 +0200 (CEST)
-From: Jiri Kosina <jikos@jikos.cz>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: Alon Bar-Lev <alon.barlev@gmail.com>, linux-kernel@vger.kernel.org,
-        bluez-devel@lists.sourceforge.net
-Subject: Re: [BUG] rfcomm]
-In-Reply-To: <1193162106.6184.208.camel@violet>
-Message-ID: <Pine.LNX.4.64.0710232004260.18815@twin.jikos.cz>
-References: <200710231950.31313.alon.barlev@gmail.com> <1193162106.6184.208.camel@violet>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <471E36FF.8010008@free.fr>
+Date: Tue, 23 Oct 2007 20:01:35 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-List-ID: <bluez-devel.lists.sourceforge.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <4718E8E0.5050608@silicom.fr>
+	<d89ddf300710191635v1c9c6c84pcd6b82d0affcefab@mail.gmail.com>
+In-Reply-To: <d89ddf300710191635v1c9c6c84pcd6b82d0affcefab@mail.gmail.com>
+Subject: Re: [Bluez-devel] [PATCH] newapi patch v1
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Tue, 23 Oct 2007, Marcel Holtmann wrote:
+Hi Brad,
 
-> Second, can you try without uswsusp or suspend2. Both of them are not 
-> upstream and I can't tell how much these would effect this kind of 
-> behavior.
+> This is all stuff we definitely need. Johan and Luiz have been working
+> more closely with this so I will leave it up to them to
+> comment/commit.
+> 
 
-Hi Marcel,
+No problem :-)
 
-actually uswsusp has been upstream for quite some time already. See 
-Documentation/power/userland-swsusp.txt
+>> As nobody suggested a new name, i've just chose one, which is
+>> "btaudioservice.h" :-). Of course this can be changed if somebody
+>> prefers a better name :-)
+> 
+> maybe audioclient.h. something like that would mesh best if it was
+> ever made officially externally available (ie
+> /usr/include/bluetooth/audioclient.h)
 
-Thanks,
+Sounds reasonable :-)
 
--- 
-Jiri Kosina
+Cheers,
+
+Fabien
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >> http://get.splunk.com/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
