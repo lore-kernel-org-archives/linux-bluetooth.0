@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Adrian Bunk <bunk@kernel.org>
-In-Reply-To: <20071024162632.GL30533@stusta.de>
-References: <20071024162632.GL30533@stusta.de>
-Date: Wed, 24 Oct 2007 18:39:26 +0200
-Message-Id: <1193243966.6184.250.camel@violet>
-Mime-Version: 1.0
-Cc: bluez-devel@lists.sf.net, maxk@qualcomm.com, linux-kernel@vger.kernel.org
-Subject: Re: [Bluez-devel] [2.6 patch] drivers/bluetooth/bpa10x.c: fix
-	memleak
+Message-ID: <471F36CB.5060501@free.fr>
+Date: Wed, 24 Oct 2007 14:12:59 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <4718E8E0.5050608@silicom.fr>	<d89ddf300710191635v1c9c6c84pcd6b82d0affcefab@mail.gmail.com>	<471E36FF.8010008@free.fr>
+	<1193164090.6184.220.camel@violet>
+In-Reply-To: <1193164090.6184.220.camel@violet>
+Subject: Re: [Bluez-devel] [PATCH] newapi patch v1
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,17 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Adrian,
+Hi Marcel,
 
-> This patch fixea a memleak spotted by the Coverity checker.
+> don't worry about any name, because before this goes into a state where
+> I actually consider it being installed, I have changed my mind too many
+> times.
 
-good catch. Patch has been applied to me tree. Thanks.
+lol :-)
 
-Regards
+I really don't care about the name, it's more worried about changing it 
+too often, given the fact if i remember well CVS is quite a pain in this 
+case :-)
 
-Marcel
+Cheers,
 
-
+Fabien
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
