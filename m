@@ -1,35 +1,60 @@
-Return-Path: <cornelia.huck@de.ibm.com>
-Date: Wed, 24 Oct 2007 10:43:52 +0200
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-To: "Alon Bar-Lev" <alon.barlev@gmail.com>
-Cc: "Marcel Holtmann" <marcel@holtmann.org>, "Jiri Kosina" <jikos@jikos.cz>,
-        linux-kernel@vger.kernel.org, bluez-devel@lists.sourceforge.net
-Subject: Re: [BUG] rfcomm]
-Message-ID: <20071024104352.294d3b03@gondolin.boeblingen.de.ibm.com>
-In-Reply-To: <9e0cf0bf0710231155n71cf38fey4d1edae6401db173@mail.gmail.com>
-References: <200710231950.31313.alon.barlev@gmail.com>
-	<1193162106.6184.208.camel@violet>
-	<Pine.LNX.4.64.0710232004260.18815@twin.jikos.cz>
-	<1193163905.6184.214.camel@violet>
-	<9e0cf0bf0710231127o485a52e1sc7a06df7c8bc0189@mail.gmail.com>
-	<1193164210.6184.221.camel@violet>
-	<9e0cf0bf0710231155n71cf38fey4d1edae6401db173@mail.gmail.com>
+Return-Path: <hidave.darkstar@gmail.com>
+Date: Wed, 24 Oct 2007 11:14:19 +0800
+From: Dave Young <hidave.darkstar@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: bluez-devel@lists.sourceforge.net, LKML <linux-kernel@vger.kernel.org>
+Subject: [PATCH] bluetooth: hidp_process_hid_control remove unnecessary parameter dealing
+Message-ID: <20071024031419.GA7409@darkstar.te-china.tietoenator.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-On Tue, 23 Oct 2007 20:55:54 +0200,
-"Alon Bar-Lev" <alon.barlev@gmail.com> wrote:
+According to the bluetooth HID spec v1.0 chapter 7.4.2
 
-> On 10/23/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > the code in net/bluetooth/rfcomm/tty.c contains two calls to
-> > device_move(). Please comment these out and try again. At least then we
-> > know that it is in issue on how we use the driver model.
-> 
-> No bugs...
-> Looks OK, although I don't know what removed :)
+"This code requests a major state change in a BT-HID device. A HID_CONTROL request does not generate a HANDSHAKE response."
 
-Hm, this might be similar to
-http://marc.info/?l=linux-kernel&m=119124209009812&w=2. To confirm,
-could you try with CONFIG_DEBUG_DRIVER and CONFIG_DEBUG_KOBJECT set
-(and the device_move() calls in again)?
+"A HID_CONTROL packet with a parameter of VIRTUAL_CABLE_UNPLUG is the only HID_CONTROL packet a device can send to a host. A host will ignore all other packets."
+
+So in the hidp_precess_hid_control function, we just need to deal with the UNLUG packet.
+
+Signed-off-by: Dave Young <hidave.darkstar@gmail.com> 
+
+---
+net/bluetooth/hidp/core.c |   19 +------------------
+1 file changed, 1 insertion(+), 18 deletions(-)
+
+diff -upr linux/net/bluetooth/hidp/core.c linux.new/net/bluetooth/hidp/core.c
+--- linux/net/bluetooth/hidp/core.c	2007-10-15 14:05:23.000000000 +0800
++++ linux.new/net/bluetooth/hidp/core.c	2007-10-24 11:01:07.000000000 +0800
+@@ -369,30 +369,13 @@ static inline void hidp_process_hid_cont
+ {
+ 	BT_DBG("session %p param 0x%02x", session, param);
+ 
+-	switch (param) {
+-	case HIDP_CTRL_NOP:
+-		break;
+-
+-	case HIDP_CTRL_VIRTUAL_CABLE_UNPLUG:
++	if (param == HIDP_CTRL_VIRTUAL_CABLE_UNPLUG) {
+ 		/* Flush the transmit queues */
+ 		skb_queue_purge(&session->ctrl_transmit);
+ 		skb_queue_purge(&session->intr_transmit);
+ 
+ 		/* Kill session thread */
+ 		atomic_inc(&session->terminate);
+-		break;
+-
+-	case HIDP_CTRL_HARD_RESET:
+-	case HIDP_CTRL_SOFT_RESET:
+-	case HIDP_CTRL_SUSPEND:
+-	case HIDP_CTRL_EXIT_SUSPEND:
+-		/* FIXME: We have to parse these and return no error */
+-		break;
+-
+-	default:
+-		__hidp_send_ctrl_message(session,
+-			HIDP_TRANS_HANDSHAKE | HIDP_HSHK_ERR_INVALID_PARAMETER, NULL, 0);
+-		break;
+ 	}
+ }
+ 
