@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <ec2bd4d50710231042h3fd2cf9bod90e25fdc65fbfe3@mail.gmail.com>
-References: <ec2bd4d50710231042h3fd2cf9bod90e25fdc65fbfe3@mail.gmail.com>
-Date: Fri, 26 Oct 2007 00:51:05 +0200
-Message-Id: <1193352665.6184.295.camel@violet>
+In-Reply-To: <4720C85B.1090300@hccnet.nl>
+References: <4720C85B.1090300@hccnet.nl>
+Date: Fri, 26 Oct 2007 00:48:14 +0200
+Message-Id: <1193352494.6184.290.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluez-Gnome applet 'pair' function
+Subject: Re: [Bluez-users] Audio gaps with bcm2035 and Hama receiver
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,15 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi George,
+Hi Remy,
 
-> I am using the bluez-gnome applet; I've tried both the 'official' and
-> Gnome:Community versions - where is the option to pair a new device?
-> I'm trying to pair my Logitech BT mouse.
+> I'd like to have my sound sent over from my laptop with a BCM2035 chip to a
+> Hama receiver. Though it works fine under W*ws, the sound under Linux is
+> broken off every minute for a second to continue afterwards. I used mplayer
+> and xmms2. and both have this problem.
 
-a Bluetooth mouse will not be paired according to the specification. How
-do you wanna enter the pin code? With morse code and the mouse
-buttons ;)
+try the version from CVS or wait until I release a new one. These issues
+should be fixed now.
 
 Regards
 
