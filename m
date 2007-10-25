@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4720DF23.6040607@silicom.fr>
-References: <4720DF23.6040607@silicom.fr>
-Date: Fri, 26 Oct 2007 00:43:18 +0200
-Message-Id: <1193352198.6184.280.camel@violet>
-Mime-Version: 1.0
-Cc: Johan Hedberg <johan.hedberg@nokia.com>,
-        Brad Midgley <bmidgley@xmission.com>
-Subject: Re: [Bluez-devel] Bluez DBUS API usuability regarding end
-	user	experience
+Message-ID: <5f84803c0710251220m73a0b7va39bd0c46cfaabd9@mail.gmail.com>
+Date: Thu, 25 Oct 2007 15:20:17 -0400
+From: "Chris Rivera" <crivera@novell.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_2566_5737775.1193340017669"
+Subject: [Bluez-devel] [PATCH] Add an ellipsis to the preferences menu item
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,43 +16,75 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
+------=_Part_2566_5737775.1193340017669
+Content-Type: multipart/alternative;
+	boundary="----=_Part_2567_10612099.1193340017670"
 
-> I have a (kind of) formal request to ask to the Bluez project.
-> 
-> I'm basically trying to use the Bluez API to design a user friendly 
-> device that will have bluetooth functionnality.
-> Speeking of a user friendly device, i'm thinking of two things i wanna have:
->    - the end user bluetooth feature should work most of the time, which
-> means it will have to be robust and not throw errors most of the time.
->    - When something goes wrong, the end user should only be presented 
-> with error messages he can understand and actually act upon. If the 
-> message is too cryptic, then a generic placeholder would be use instead 
-> of a low level message. One of the first non cryptic messages i think of 
-> would be a "Device unreachable : please check your bluetooth device is 
-> powered on" message :-)
+------=_Part_2567_10612099.1193340017670
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-feel free to improve the error messages. We haven't spend enough time
-with them yet. There were other issues that needed to be addressed
-first. Also the error support should made generic and reside in common/.
-So if you wanna work on it, send patches.
+Since the Preferences menu entry in the applet opens a new window it should
+probably have an ellipsis in the label.  Attached is a trivial patch to add
+this.
 
-Regards
+Chris
 
-Marcel
+------=_Part_2567_10612099.1193340017670
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
+Since the Preferences menu entry in the applet opens a new window it should probably have an ellipsis in the label.&nbsp; Attached is a trivial patch to add this.<br><br>Chris<br>
+<br>
 
+------=_Part_2567_10612099.1193340017670--
+
+------=_Part_2566_5737775.1193340017669
+Content-Type: text/x-patch; name=bluez-gnome-pref-menu-item.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f87nrut4
+Content-Disposition: attachment; filename=bluez-gnome-pref-menu-item.patch
+
+SW5kZXg6IGFwcGxldC9tYWluLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXov
+Z25vbWUvYXBwbGV0L21haW4uYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS44NwpkaWZmIC11IC1y
+MS44NyBtYWluLmMKLS0tIGFwcGxldC9tYWluLmMJMjkgQXVnIDIwMDcgMjA6NDI6MTggLTAwMDAJ
+MS44NworKysgYXBwbGV0L21haW4uYwkyNSBPY3QgMjAwNyAxOToxMzo0NyAtMDAwMApAQCAtMTY3
+NSwxMiArMTY3NSwxNSBAQAogewogCUd0a1dpZGdldCAqbWVudTsKIAlHdGtXaWRnZXQgKml0ZW07
+CisJR3RrV2lkZ2V0ICppbWFnZTsKIAogCW1lbnUgPSBndGtfbWVudV9uZXcoKTsKIAotCWl0ZW0g
+PSBndGtfaW1hZ2VfbWVudV9pdGVtX25ld19mcm9tX3N0b2NrKEdUS19TVE9DS19QUkVGRVJFTkNF
+UywgTlVMTCk7CisJaXRlbSA9IGd0a19pbWFnZV9tZW51X2l0ZW1fbmV3X3dpdGhfbW5lbW9uaWMg
+KF8oIl9QcmVmZXJlbmNlcy4uLiIpKTsKIAlnX3NpZ25hbF9jb25uZWN0KGl0ZW0sICJhY3RpdmF0
+ZSIsCiAJCQkJR19DQUxMQkFDSyhzZXR0aW5nc19jYWxsYmFjayksIE5VTEwpOworCWltYWdlID0g
+Z3RrX2ltYWdlX25ld19mcm9tX3N0b2NrIChHVEtfU1RPQ0tfUFJFRkVSRU5DRVMsIEdUS19JQ09O
+X1NJWkVfTUVOVSk7CisJZ3RrX2ltYWdlX21lbnVfaXRlbV9zZXRfaW1hZ2UgKEdUS19JTUFHRV9N
+RU5VX0lURU0gKGl0ZW0pLCBpbWFnZSk7CiAJZ3RrX3dpZGdldF9zaG93KGl0ZW0pOwogCWd0a19t
+ZW51X3NoZWxsX2FwcGVuZChHVEtfTUVOVV9TSEVMTChtZW51KSwgaXRlbSk7CiAK
+------=_Part_2566_5737775.1193340017669
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
+------=_Part_2566_5737775.1193340017669
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_2566_5737775.1193340017669--
