@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20071025094513.GA8346@wavehammer.waldi.eu.org>
-References: <20071025094513.GA8346@wavehammer.waldi.eu.org>
-Date: Fri, 26 Oct 2007 00:46:44 +0200
-Message-Id: <1193352404.6184.288.camel@violet>
+In-Reply-To: <685df2130710250927m3f56731au9e6e508f851e9cf3@mail.gmail.com>
+References: <685df2130710250927m3f56731au9e6e508f851e9cf3@mail.gmail.com>
+Date: Fri, 26 Oct 2007 00:45:31 +0200
+Message-Id: <1193352331.6184.284.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] audio support choppy with mplayer and video
+Subject: Re: [Bluez-devel] Audio service with multiple adapters
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,19 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Hi Joshua,
 
-> I tried the bluetooth audio support in bluez. It works nice with
-> esd/alsa except that the audio delay is incorrect.
+> I am using BlueZ for a project and it is working well. I have a
+> question concerning multiple adapters.
 > 
-> With the alsa support in mplayer it makes more problems. Audio files can
-> be played without problems. But video files produces choppy video and
-> audio output. It looks like some runaway delay loop and already happened
-> in the bluetooth-alsa support some months ago but was fixed in the
-> meantime.
+> I am able to connect my headset to the default adapter through the
+> audio service. However I cannot connect a headset to a second adapter
+> (hci1) through the audio service. I can bond my headset to the second
+> adapter, but I cannot create a sco connection. 
+> 
+> Is it possible to start the audio service on the non-default adapter
+> (hci1)?
+> Is it possible to run the audio service for both adapters? I would
+> like to have 2 adapters each supporting a separate headset.
 
-we simply can't make every ALSA application happy. We are only a virtual
-sound card and some application's usage of ALSA is simply broken.
+the audio service can used with any attached adapter. It is designed to
+deal with them. However having two SCO channels open at the same time
+might be limited by your hardware.
 
 Regards
 
