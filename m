@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4720C85B.1090300@hccnet.nl>
-References: <4720C85B.1090300@hccnet.nl>
-Date: Fri, 26 Oct 2007 00:48:14 +0200
-Message-Id: <1193352494.6184.290.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Audio gaps with bcm2035 and Hama receiver
+Message-ID: <4720C85B.1090300@hccnet.nl>
+Date: Thu, 25 Oct 2007 18:46:19 +0200
+From: Remy Bosch <reboli@hccnet.nl>
+MIME-Version: 1.0
+To: Bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Audio gaps with bcm2035 and Hama receiver
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,19 +18,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Remy,
+Hi,
 
-> I'd like to have my sound sent over from my laptop with a BCM2035 chip to a
-> Hama receiver. Though it works fine under W*ws, the sound under Linux is
-> broken off every minute for a second to continue afterwards. I used mplayer
-> and xmms2. and both have this problem.
+I'd like to have my sound sent over from my laptop with a BCM2035 chip to a
+Hama receiver. Though it works fine under W*ws, the sound under Linux is
+broken off every minute for a second to continue afterwards. I used mplayer
+and xmms2. and both have this problem.
 
-try the version from CVS or wait until I release a new one. These issues
-should be fixed now.
+I use bluez-libs/utils 3.2
+Commands to get audio online:
+dbus-send --system --print-reply --dest=org.bluez /org/bluez \
+org.bluez.Manager.ActivateService string:audio
+dbus-send --system --type=method_call --print-reply --dest=":1.19"
+/org/bluez/audio \ org.bluez.audio.Manager.CreateDevice
+string:00:10:60:9F:32:3B
 
-Regards
+For some reason sco isn't used...
 
-Marcel
+Thanks!
+
+
+Remy
 
 
 
