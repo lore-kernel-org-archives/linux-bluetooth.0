@@ -1,14 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <5f84803c0710251622g64559cai7e09e657f9c78665@mail.gmail.com>
-Date: Thu, 25 Oct 2007 19:22:23 -0400
-From: "Chris Rivera" <chrismrivera@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1193352257.6184.282.camel@violet>
-MIME-Version: 1.0
-References: <5f84803c0710251220m73a0b7va39bd0c46cfaabd9@mail.gmail.com>
-	<1193352257.6184.282.camel@violet>
-Subject: Re: [Bluez-devel] [PATCH] Add an ellipsis to the preferences menu
-	item
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20071025120653.5a89aebe@localhost.localdomain>
+References: <20071025120653.5a89aebe@localhost.localdomain>
+Content-Type: multipart/mixed; boundary="=-4DBnwmdHOqe/3duGIatW"
+Date: Fri, 26 Oct 2007 01:04:47 +0200
+Message-Id: <1193353487.6184.307.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] Fix broken EVT_REMOTE_NAME_REQ_COMPLETE
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,73 +17,94 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2100366093=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============2100366093==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_3525_14952325.1193354544340"
 
-------=_Part_3525_14952325.1193354544340
-Content-Type: text/plain; charset=ISO-8859-1
+--=-4DBnwmdHOqe/3duGIatW
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
-Agreed.  We need to follow the HIG.  According to:
+Hi Andreas,
 
-http://developer.gnome.org/projects/gup/hig/hig-diff/menus-design.html
+> I'm sending this bluez-libs patch for the third time now and i wonder why
+> you do not include it. If there is anything wrong with it please let me know
+> so I can learn.
+> 
+> Please look at 
+> 
+> http://article.gmane.org/gmane.linux.bluez.devel/13859
+> http://thread.gmane.org/gmane.linux.bluez.devel/12491
+> 
+> We did extensive testing and rolled that patch into production
+> environment already and there is another independent user (Matthias
+> Becker) who confirmed its usefulness.
 
-the ellipsis should be in place only if it _requires_ further input from the
-user.  I guess the ellipsis isn't necessary.
+I know, but I still don't think that you should use the raw HCI socket
+in this way. The D-Bus API will take care of name resolving for you in
+the background and it is doing always the right thing. However I decided
+to simply apply a modified patch (see attachment). You assign return
+values in the case where they are not used. That makes no sense.
 
-Chris
+Regards
 
-On 10/25/07, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Chris,
->
-> > Since the Preferences menu entry in the applet opens a new window it
-> > should probably have an ellipsis in the label.  Attached is a trivial
-> > patch to add this.
->
-> what does the HIG recommend for applet menus. I wanna follow the HIG.
-> Currently I simply did what all other applets do that I have running.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc.
-> Still grepping through log files to find problems?  Stop.
-> Now Search log events and configuration files using AJAX and a browser.
-> Download your FREE copy of Splunk now >> http://get.splunk.com/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+Marcel
 
-------=_Part_3525_14952325.1193354544340
-Content-Type: text/html; charset=ISO-8859-1
+
+--=-4DBnwmdHOqe/3duGIatW
+Content-Disposition: attachment; filename=patch
+Content-Type: text/plain; name=patch; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
-Agreed.&nbsp; We need to follow the HIG.&nbsp; According to:<br><br><a href="http://developer.gnome.org/projects/gup/hig/hig-diff/menus-design.html">http://developer.gnome.org/projects/gup/hig/hig-diff/menus-design.html</a><br><br>the ellipsis should be in place only if it _requires_ further input from the user.&nbsp; I guess the ellipsis isn&#39;t necessary.
-<br><br>Chris<br><br><div><span class="gmail_quote">On 10/25/07, <b class="gmail_sendername">Marcel Holtmann</b> &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-Hi Chris,<br><br>&gt; Since the Preferences menu entry in the applet opens a new window it<br>&gt; should probably have an ellipsis in the label.&nbsp;&nbsp;Attached is a trivial<br>&gt; patch to add this.<br><br>what does the HIG recommend for applet menus. I wanna follow the HIG.
-<br>Currently I simply did what all other applets do that I have running.<br><br>Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>This SF.net email is sponsored by: Splunk Inc.
-<br>Still grepping through log files to find problems?&nbsp;&nbsp;Stop.<br>Now Search log events and configuration files using AJAX and a browser.<br>Download your FREE copy of Splunk now &gt;&gt; <a href="http://get.splunk.com/">http://get.splunk.com/
-</a><br>_______________________________________________<br>Bluez-devel mailing list<br><a href="mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-devel">
-https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br></blockquote></div><br>
+? src/.deps
+? src/.libs
+? src/Makefile
+? src/Makefile.in
+? src/bluetooth.lo
+? src/hci.lo
+? src/libbluetooth.la
+? src/sdp.lo
+Index: src/hci.c
+===================================================================
+RCS file: /cvsroot/bluez/libs/src/hci.c,v
+retrieving revision 1.109
+diff -u -r1.109 hci.c
+--- src/hci.c	5 Oct 2007 11:23:35 -0000	1.109
++++ src/hci.c	25 Oct 2007 22:59:34 -0000
+@@ -1009,7 +1009,9 @@
+ 	try = 10;
+ 	while (try--) {
+ 		evt_cmd_complete *cc;
+-		evt_cmd_status   *cs;
++		evt_cmd_status *cs;
++		evt_remote_name_req_complete *rn;
++		remote_name_req_cp *cp;
+ 
+ 		if (to) {
+ 			struct pollfd p;
+@@ -1074,6 +1076,20 @@
+ 			memcpy(r->rparam, ptr, r->rlen);
+ 			goto done;
+ 
++		case EVT_REMOTE_NAME_REQ_COMPLETE:
++			if (hdr->evt != r->event)
++				break;
++
++			rn = r->rparam;
++			cp = r->cparam;
++
++			if (bacmp(&rn->bdaddr, &cp->bdaddr))
++				continue;
++
++			r->rlen = MIN(len, r->rlen);
++			memcpy(r->rparam, ptr, r->rlen);
++			goto done;
++
+ 		default:
+ 			if (hdr->evt != r->event)
+ 				break;
 
-------=_Part_3525_14952325.1193354544340--
-
-
---===============2100366093==
+--=-4DBnwmdHOqe/3duGIatW
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -95,7 +115,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============2100366093==
+--=-4DBnwmdHOqe/3duGIatW
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -106,4 +126,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============2100366093==--
+--=-4DBnwmdHOqe/3duGIatW--
