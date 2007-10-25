@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <ec2bd4d50710251938j6617bd7dq931aefa5086ea868@mail.gmail.com>
-Date: Thu, 25 Oct 2007 22:38:38 -0400
-From: "George Francis" <gfrancis1@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1193352665.6184.295.camel@violet>
-MIME-Version: 1.0
-References: <ec2bd4d50710231042h3fd2cf9bod90e25fdc65fbfe3@mail.gmail.com>
-	<1193352665.6184.295.camel@violet>
-Subject: Re: [Bluez-users] Bluez-Gnome applet 'pair' function
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <255b859d0710251600v36690e0tdf69e445fbf9827f@mail.gmail.com>
+References: <1193352351.6184.286.camel@violet>
+	<255b859d0710251600v36690e0tdf69e445fbf9827f@mail.gmail.com>
+Date: Fri, 26 Oct 2007 01:12:08 +0200
+Message-Id: <1193353929.6184.309.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Intercom Profile
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,24 +21,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 10/25/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi George,
->
-> > I am using the bluez-gnome applet; I've tried both the 'official' and
-> > Gnome:Community versions - where is the option to pair a new device?
-> > I'm trying to pair my Logitech BT mouse.
->
-> a Bluetooth mouse will not be paired according to the specification. How
-> do you wanna enter the pin code? With morse code and the mouse
-> buttons ;)
->
-> Regards
->
-> Marcel
->
+Hi Peter,
 
-Why reply with sarcasm?  Don't you know that BT devices that dont
-accept user input have the default code of 0000?
+> I am would also like intercom support. Do you know how difficult it
+> woul be for an intermediate level programmer to write it?
+
+the protocol behind it (TCS-BIN) is pretty simply. Go ahead and try it.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
