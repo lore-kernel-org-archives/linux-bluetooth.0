@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <5f84803c0710251220m73a0b7va39bd0c46cfaabd9@mail.gmail.com>
-Date: Thu, 25 Oct 2007 15:20:17 -0400
-From: "Chris Rivera" <crivera@novell.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <4720DF23.6040607@silicom.fr>
+Date: Thu, 25 Oct 2007 20:23:31 +0200
+From: Fabien Chevalier <fchevalier@silicom.fr>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_2566_5737775.1193340017669"
-Subject: [Bluez-devel] [PATCH] Add an ellipsis to the preferences menu item
+To: Marcel Holtmann <marcel@holtmann.org>
+Content-Type: multipart/mixed; boundary="------------020404050708000006080802"
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>,
+        Johan Hedberg <johan.hedberg@nokia.com>,
+        Brad Midgley <bmidgley@xmission.com>
+Subject: [Bluez-devel] Bluez DBUS API usuability regarding end user
+	experience
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,53 +22,82 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_2566_5737775.1193340017669
-Content-Type: multipart/alternative;
-	boundary="----=_Part_2567_10612099.1193340017670"
-
-------=_Part_2567_10612099.1193340017670
-Content-Type: text/plain; charset=ISO-8859-1
+This is a multi-part message in MIME format.
+--------------020404050708000006080802
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
-Since the Preferences menu entry in the applet opens a new window it should
-probably have an ellipsis in the label.  Attached is a trivial patch to add
-this.
 
-Chris
+Marcel,
 
-------=_Part_2567_10612099.1193340017670
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+I have a (kind of) formal request to ask to the Bluez project.
 
-Since the Preferences menu entry in the applet opens a new window it should probably have an ellipsis in the label.&nbsp; Attached is a trivial patch to add this.<br><br>Chris<br>
-<br>
+I'm basically trying to use the Bluez API to design a user friendly 
+device that will have bluetooth functionnality.
+Speeking of a user friendly device, i'm thinking of two things i wanna have:
+   - the end user bluetooth feature should work most of the time, which
+means it will have to be robust and not throw errors most of the time.
+   - When something goes wrong, the end user should only be presented 
+with error messages he can understand and actually act upon. If the 
+message is too cryptic, then a generic placeholder would be use instead 
+of a low level message. One of the first non cryptic messages i think of 
+would be a "Device unreachable : please check your bluetooth device is 
+powered on" message :-)
 
-------=_Part_2567_10612099.1193340017670--
+I've done a quick review of hcid an audio service code, and did some 
+testing too. What i've found is:
+  - for hcid case: the closed match i found is the 
+org.audio.bluez.ConnectionAttemptFailed exception. This one seems to be 
+raised when the L2CAP connection fails. But it is not specific on the
+failure cause ( i think what i'm looking for is EHOSTDOWN posix error 
+code, please correct me if i'm wrong ;-) )
+  - for Audio service the case is different. Sink object Connect() dbus 
+call would fail with org.bluez.audio.Error.Failed while the Headset 
+object Connect() dbus call would fail with 
+org.bluez.audio.Error.ConnectFailed. Those two are not even consistent :-(
+headset.c code looks even a bit hackish, as it tryes to regenerate the 
+lost EHOSTDOWN error code by hand :
 
-------=_Part_2566_5737775.1193340017669
-Content-Type: text/x-patch; name=bluez-gnome-pref-menu-item.patch
+if (dbus_error_has_name(&derr,						 
+"org.bluez.Error.ConnectionAttemptFailed"))
+	err_connect_failed(device->conn, c->msg,
+					strerror(EHOSTDOWN));
+
+My point of view is that this common case of error should be clearly 
+identified and sent up to the application.
+
+What i would like to do is propose a patch that would:
+   - Define org.bluez.Error.DeviceUnreachable exception for hcid. This 
+would be fired each time a connect on an l2cap socket would return 
+EHOSTDOWN.
+   - Define org.bluez.Error.Audio.DeviceUnreachable for use by the audio 
+service. This one would be sent by the Headset and Sink objects instead 
+of the org.bluez.audio.Error.Failed and 
+org.bluez.audio.Error.ConnectFailed when the l2cap/rfcomm/sco connect() 
+code returns EHOSTDOWN.
+
+Marcel, would you agree this is the right way to proceed ? Would you be 
+willing to accept patches that move the code in that direction ?
+( I mean : shall i start coding now ? ;-) )
+
+Regards,
+
+Fabien
+
+
+--------------020404050708000006080802
+Content-Type: text/x-vcard; charset=utf-8;
+ name="fchevalier.vcf"
 Content-Transfer-Encoding: base64
-X-Attachment-Id: f_f87nrut4
-Content-Disposition: attachment; filename=bluez-gnome-pref-menu-item.patch
+Content-Disposition: attachment;
+ filename="fchevalier.vcf"
 
-SW5kZXg6IGFwcGxldC9tYWluLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXov
-Z25vbWUvYXBwbGV0L21haW4uYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS44NwpkaWZmIC11IC1y
-MS44NyBtYWluLmMKLS0tIGFwcGxldC9tYWluLmMJMjkgQXVnIDIwMDcgMjA6NDI6MTggLTAwMDAJ
-MS44NworKysgYXBwbGV0L21haW4uYwkyNSBPY3QgMjAwNyAxOToxMzo0NyAtMDAwMApAQCAtMTY3
-NSwxMiArMTY3NSwxNSBAQAogewogCUd0a1dpZGdldCAqbWVudTsKIAlHdGtXaWRnZXQgKml0ZW07
-CisJR3RrV2lkZ2V0ICppbWFnZTsKIAogCW1lbnUgPSBndGtfbWVudV9uZXcoKTsKIAotCWl0ZW0g
-PSBndGtfaW1hZ2VfbWVudV9pdGVtX25ld19mcm9tX3N0b2NrKEdUS19TVE9DS19QUkVGRVJFTkNF
-UywgTlVMTCk7CisJaXRlbSA9IGd0a19pbWFnZV9tZW51X2l0ZW1fbmV3X3dpdGhfbW5lbW9uaWMg
-KF8oIl9QcmVmZXJlbmNlcy4uLiIpKTsKIAlnX3NpZ25hbF9jb25uZWN0KGl0ZW0sICJhY3RpdmF0
-ZSIsCiAJCQkJR19DQUxMQkFDSyhzZXR0aW5nc19jYWxsYmFjayksIE5VTEwpOworCWltYWdlID0g
-Z3RrX2ltYWdlX25ld19mcm9tX3N0b2NrIChHVEtfU1RPQ0tfUFJFRkVSRU5DRVMsIEdUS19JQ09O
-X1NJWkVfTUVOVSk7CisJZ3RrX2ltYWdlX21lbnVfaXRlbV9zZXRfaW1hZ2UgKEdUS19JTUFHRV9N
-RU5VX0lURU0gKGl0ZW0pLCBpbWFnZSk7CiAJZ3RrX3dpZGdldF9zaG93KGl0ZW0pOwogCWd0a19t
-ZW51X3NoZWxsX2FwcGVuZChHVEtfTUVOVV9TSEVMTChtZW51KSwgaXRlbSk7CiAK
-------=_Part_2566_5737775.1193340017669
+YmVnaW46dmNhcmQNCmZuOkZhYmllbiBDSEVWQUxJRVINCm46Q0hFVkFMSUVSO0ZhYmllbg0K
+b3JnOlNJTElDT00NCmFkcjo7OzQgcnVlIGRlIEpvdWFuZXQ7IFJFTk5FUyBBVEFMQU5URTs7
+MzU3MDA7RlJBTkNFDQplbWFpbDtpbnRlcm5ldDpmY2hldmFsaWVyQHNpbGljb20uZnINCnRp
+dGxlOlNvZnR3YXJlICYgU3R1ZGllcyBFbmdpbmVlcg0KdGVsO3dvcms6KzMzICgwKSAyIDk5
+IDg0IDE3IDE3DQp2ZXJzaW9uOjIuMQ0KZW5kOnZjYXJkDQoNCg==
+--------------020404050708000006080802
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -76,7 +108,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
-------=_Part_2566_5737775.1193340017669
+--------------020404050708000006080802
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -87,4 +119,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-------=_Part_2566_5737775.1193340017669--
+--------------020404050708000006080802--
