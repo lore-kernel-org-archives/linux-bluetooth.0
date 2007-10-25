@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <255b859d0710251600v36690e0tdf69e445fbf9827f@mail.gmail.com>
-Date: Thu, 25 Oct 2007 16:00:08 -0700
-From: "Peter Hollenbeck" <pwhbeck@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1193352351.6184.286.camel@violet>
-MIME-Version: 1.0
-References: <1193352351.6184.286.camel@violet>
-Subject: Re: [Bluez-users] Intercom Profile
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <b667c1330710221148r382f757qbdbfb92f529352d1@mail.gmail.com>
+References: <b667c1330710221148r382f757qbdbfb92f529352d1@mail.gmail.com>
+Date: Fri, 26 Oct 2007 00:55:56 +0200
+Message-Id: <1193352956.6184.302.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] bluetooth confirmation message
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,34 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I am would also like intercom support. Do you know how difficult it
-woul be for an intermediate level programmer to write it?
-Peter Hollenbeck
+Hi,
 
-On 10/25/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Pierre,
->
-> > I would like to integrate the Intercom Profile on my board. This profile was
-> > it already developed with BlueZ? If so, what must I make for use it?
->
-> we don't have Intercom support at the moment.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Splunk Inc.
-> Still grepping through log files to find problems?  Stop.
-> Now Search log events and configuration files using AJAX and a browser.
-> Download your FREE copy of Splunk now >> http://get.splunk.com/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+> hai,,i'm newbie in linux programming and bluetooth.i have project,
+> it's call "automatic date and time".
+> i want program can discover all blutooth device (handphone celular
+> like nokia) in range 100meter.when handphone in  range, my program can
+> send confirmation  message to handphone like "would you change  date
+> and time?", so  if  user  angree, date and time of handphone will
+> change base on daytime server ( suppose www.example.mil )..
+> 
+> i hope anybody can help me and i need sample source.
+
+better use www.google.com/codesearch for code examples.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
