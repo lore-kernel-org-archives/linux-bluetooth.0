@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <b667c1330710221148r382f757qbdbfb92f529352d1@mail.gmail.com>
-References: <b667c1330710221148r382f757qbdbfb92f529352d1@mail.gmail.com>
-Date: Fri, 26 Oct 2007 00:55:56 +0200
-Message-Id: <1193352956.6184.302.camel@violet>
+In-Reply-To: <ec2bd4d50710231042h3fd2cf9bod90e25fdc65fbfe3@mail.gmail.com>
+References: <ec2bd4d50710231042h3fd2cf9bod90e25fdc65fbfe3@mail.gmail.com>
+Date: Fri, 26 Oct 2007 00:51:05 +0200
+Message-Id: <1193352665.6184.295.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] bluetooth confirmation message
+Subject: Re: [Bluez-users] Bluez-Gnome applet 'pair' function
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,19 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi George,
 
-> hai,,i'm newbie in linux programming and bluetooth.i have project,
-> it's call "automatic date and time".
-> i want program can discover all blutooth device (handphone celular
-> like nokia) in range 100meter.when handphone in  range, my program can
-> send confirmation  message to handphone like "would you change  date
-> and time?", so  if  user  angree, date and time of handphone will
-> change base on daytime server ( suppose www.example.mil )..
-> 
-> i hope anybody can help me and i need sample source.
+> I am using the bluez-gnome applet; I've tried both the 'official' and
+> Gnome:Community versions - where is the option to pair a new device?
+> I'm trying to pair my Logitech BT mouse.
 
-better use www.google.com/codesearch for code examples.
+a Bluetooth mouse will not be paired according to the specification. How
+do you wanna enter the pin code? With morse code and the mouse
+buttons ;)
 
 Regards
 
