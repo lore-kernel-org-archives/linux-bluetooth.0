@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <685df2130710250927m3f56731au9e6e508f851e9cf3@mail.gmail.com>
-References: <685df2130710250927m3f56731au9e6e508f851e9cf3@mail.gmail.com>
-Date: Fri, 26 Oct 2007 00:45:31 +0200
-Message-Id: <1193352331.6184.284.camel@violet>
+In-Reply-To: <5f84803c0710251220m73a0b7va39bd0c46cfaabd9@mail.gmail.com>
+References: <5f84803c0710251220m73a0b7va39bd0c46cfaabd9@mail.gmail.com>
+Date: Fri, 26 Oct 2007 00:44:17 +0200
+Message-Id: <1193352257.6184.282.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Audio service with multiple adapters
+Subject: Re: [Bluez-devel] [PATCH] Add an ellipsis to the preferences
+	menu	item
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,24 +21,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Joshua,
+Hi Chris,
 
-> I am using BlueZ for a project and it is working well. I have a
-> question concerning multiple adapters.
-> 
-> I am able to connect my headset to the default adapter through the
-> audio service. However I cannot connect a headset to a second adapter
-> (hci1) through the audio service. I can bond my headset to the second
-> adapter, but I cannot create a sco connection. 
-> 
-> Is it possible to start the audio service on the non-default adapter
-> (hci1)?
-> Is it possible to run the audio service for both adapters? I would
-> like to have 2 adapters each supporting a separate headset.
+> Since the Preferences menu entry in the applet opens a new window it
+> should probably have an ellipsis in the label.  Attached is a trivial
+> patch to add this.
 
-the audio service can used with any attached adapter. It is designed to
-deal with them. However having two SCO channels open at the same time
-might be limited by your hardware.
+what does the HIG recommend for applet menus. I wanna follow the HIG.
+Currently I simply did what all other applets do that I have running.
 
 Regards
 
