@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d89ddf300710261035r613fee0pe09aa130f348398c@mail.gmail.com>
-Date: Fri, 26 Oct 2007 11:35:27 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <472213B6.50402@hccnet.nl>
+Message-ID: <472213B6.50402@hccnet.nl>
+Date: Fri, 26 Oct 2007 18:20:06 +0200
+From: Remy Bosch <reboli@hccnet.nl>
 MIME-Version: 1.0
+To: BlueZ users <bluez-users@lists.sourceforge.net>
 References: <4720C85B.1090300@hccnet.nl> <1193352494.6184.290.camel@violet>
-	<4721E348.2060403@hccnet.nl> <472213B6.50402@hccnet.nl>
+	<4721E348.2060403@hccnet.nl>
+In-Reply-To: <4721E348.2060403@hccnet.nl>
 Subject: Re: [Bluez-users] Audio gaps with bcm2035 and Hama receiver
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,11 +21,69 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Remy
+For some reason "rtp.h" can't be found (included in
+audio/pcm_bluetooth.c). This blocks my attempt to build it on gentoo
+without the use of eglib.
+The build goes as follows. In the source directory:
 
-Is this last attempt using v3.22?
+The rm -r eglib/{*.c,*.h} # make sure eglib is ignored
+autoreconf -fis                  # Reconfigure
+./configure --enable-inotify --enable-hal --enable-usb --enable-alsa
+--enable-glib --disable-obex --enable-network --enable-serial
+--enable-input --enable-audio --enable-sync --enable-hcid
+--enable-configfiles --disable-initscripts --disable-pcmciarules
+--enable-bccmd --enable-avctrl --enable-hid2hci --enable-dfutool
+--localstatedir=/var
+make       # And then make
 
-Brad
+This creates the error:
+ gcc -DHAVE_CONFIG_H -I. -I.. -I../common -I/usr/include/alsa -I../sbc
+-Wall -O2 -D_FORTIFY_SOURCE=2 -MT
+libasound_module_pcm_bluetooth_la-pcm_bluetooth.lo -MD -MP -MF
+.deps/libasound_module_pcm_bluetooth_la-pcm_bluetooth.Tpo -c
+pcm_bluetooth.c  -fPIC -DPIC -o
+.libs/libasound_module_pcm_bluetooth_la-pcm_bluetooth.o
+pcm_bluetooth.c:41:17: error: rtp.h: No such file or directory
+pcm_bluetooth.c: In function 'avdtp_write':
+pcm_bluetooth.c:601: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:603: warning: left-hand operand of comma expression has
+no effect
+pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:605: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:606: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:607: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:608: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:609: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:610: error: dereferencing pointer to incomplete type
+pcm_bluetooth.c:617: error: invalid application of 'sizeof' to
+incomplete type 'struct rtp_header'
+pcm_bluetooth.c:617: error: invalid application of 'sizeof' to
+incomplete type 'struct rtp_payload'
+pcm_bluetooth.c: In function 'bluetooth_a2dp_init':
+pcm_bluetooth.c:968: error: invalid application of 'sizeof' to
+incomplete type 'struct rtp_header'
+pcm_bluetooth.c:968: error: invalid application of 'sizeof' to
+incomplete type 'struct rtp_payload'
+make[2]: *** [libasound_module_pcm_bluetooth_la-pcm_bluetooth.lo] Error 1
+make[2]: Leaving directory `/root/bluez-utils-3.21/audio'
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory `/root/bluez-utils-3.21'
+make: *** [all] Error 2
+
+
+Any idea how to fix it?
+
+Thanks!
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
