@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <ec2bd4d50710251938j6617bd7dq931aefa5086ea868@mail.gmail.com>
+Message-ID: <ec2bd4d50710251938j6617bd7dq931aefa5086ea868@mail.gmail.com>
+Date: Thu, 25 Oct 2007 22:38:38 -0400
+From: "George Francis" <gfrancis1@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1193352665.6184.295.camel@violet>
+MIME-Version: 1.0
 References: <ec2bd4d50710231042h3fd2cf9bod90e25fdc65fbfe3@mail.gmail.com>
 	<1193352665.6184.295.camel@violet>
-	<ec2bd4d50710251938j6617bd7dq931aefa5086ea868@mail.gmail.com>
-Date: Fri, 26 Oct 2007 06:18:36 +0200
-Message-Id: <1193372316.6184.331.camel@violet>
-Mime-Version: 1.0
 Subject: Re: [Bluez-users] Bluez-Gnome applet 'pair' function
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -22,33 +21,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi George,
-
-> > > I am using the bluez-gnome applet; I've tried both the 'official' and
-> > > Gnome:Community versions - where is the option to pair a new device?
-> > > I'm trying to pair my Logitech BT mouse.
-> >
-> > a Bluetooth mouse will not be paired according to the specification. How
-> > do you wanna enter the pin code? With morse code and the mouse
-> > buttons ;)
+On 10/25/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi George,
 >
-> Why reply with sarcasm?  Don't you know that BT devices that dont
-> accept user input have the default code of 0000?
+> > I am using the bluez-gnome applet; I've tried both the 'official' and
+> > Gnome:Community versions - where is the option to pair a new device?
+> > I'm trying to pair my Logitech BT mouse.
+>
+> a Bluetooth mouse will not be paired according to the specification. How
+> do you wanna enter the pin code? With morse code and the mouse
+> buttons ;)
+>
+> Regards
+>
+> Marcel
+>
 
-if you would read the HID specification, then you would see that it
-explicitly says that mice don't pair with the host.
-
-Also there is no relation between the 0000 pin code and not having user
-input. That 90% of all devices do it this way, doesn't make it a
-standard and no way it makes it secure. A default pin code (no matter
-what it is) doesn't give you a useful authentication and hence no useful
-encryption either.
-
-Regards
-
-Marcel
-
-
+Why reply with sarcasm?  Don't you know that BT devices that dont
+accept user input have the default code of 0000?
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
