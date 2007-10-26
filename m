@@ -1,16 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <47227AD9.10307@hccnet.nl>
+Date: Sat, 27 Oct 2007 01:40:09 +0200
+From: Remy Bosch <reboli@hccnet.nl>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <ec2bd4d50710260607y3d03d774h982915ed9f2f5dda@mail.gmail.com>
-References: <ec2bd4d50710231042h3fd2cf9bod90e25fdc65fbfe3@mail.gmail.com>
-	<1193352665.6184.295.camel@violet>
-	<ec2bd4d50710251938j6617bd7dq931aefa5086ea868@mail.gmail.com>
-	<1193372316.6184.331.camel@violet>
-	<ec2bd4d50710260607y3d03d774h982915ed9f2f5dda@mail.gmail.com>
-Date: Sat, 27 Oct 2007 12:26:30 +0200
-Message-Id: <1193480790.4416.14.camel@aeonflux>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluez-Gnome applet 'pair' function
+References: <4720C85B.1090300@hccnet.nl>
+	<1193352494.6184.290.camel@violet>	<4721E348.2060403@hccnet.nl>
+	<472213B6.50402@hccnet.nl>	<d89ddf300710261035r613fee0pe09aa130f348398c@mail.gmail.com>	<47224D7E.3080901@hccnet.nl>
+	<d89ddf300710261446v53c110e2lea0793a98ba5e450@mail.gmail.com>
+In-Reply-To: <d89ddf300710261446v53c110e2lea0793a98ba5e450@mail.gmail.com>
+Subject: Re: [Bluez-users] Audio gaps with bcm2035 and Hama receiver
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,40 +23,39 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi George,
-
-> > > > > I am using the bluez-gnome applet; I've tried both the 'official' and
-> > > > > Gnome:Community versions - where is the option to pair a new device?
-> > > > > I'm trying to pair my Logitech BT mouse.
-> > > >
-> > > > a Bluetooth mouse will not be paired according to the specification. How
-> > > > do you wanna enter the pin code? With morse code and the mouse
-> > > > buttons ;)
-> > >
-> > > Why reply with sarcasm?  Don't you know that BT devices that dont
-> > > accept user input have the default code of 0000?
-> >
-> > if you would read the HID specification, then you would see that it
-> > explicitly says that mice don't pair with the host.
-> >
-> > Also there is no relation between the 0000 pin code and not having user
-> > input. That 90% of all devices do it this way, doesn't make it a
-> > standard and no way it makes it secure. A default pin code (no matter
-> > what it is) doesn't give you a useful authentication and hence no useful
-> > encryption either.
+Brad Midgley wrote:
+> Remy
 >
-> Are you saying that there's no way to use a BT mouse with
-> Suse10.3/Gnome?  If you're not saying that then please tell me how to
-> do it.
+> Did you already check the link mode & policy? If you have "master" in
+> hcid.conf's lm setting and you take "rswitch" and "sniff" out of the
+> lp setting, you are forcing the pc to be master and to hopefully
+> behave better. (be sure to restart hcid)
+>   
 
-of course there is, but that is a different topic. You were talking
-about pairing a mouse. Not making a mouse work. Check the BlueZ wiki
-pages on how to make a input device work.
+Thanks Brad!
 
-Regards
+It helped for the largest part, though there are still some gaps. I made
+sure the pairing is done once.
+My config is as follows:
+options {
+        autoinit yes;
+        security user;
+        pairing once;
+        passkey "Y0ur3n0tw3lc0m3";
+}
 
-Marcel
+device {
+        name "BlueZ (%d)";
+        class 0x000100;
+        iscan enable; pscan enable;
+        lm master;
+        lp hold;
+}
 
+Any points to improve?
+
+
+Remy
 
 
 -------------------------------------------------------------------------
