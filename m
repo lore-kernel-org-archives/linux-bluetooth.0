@@ -1,13 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <472213B6.50402@hccnet.nl>
-Date: Fri, 26 Oct 2007 18:20:06 +0200
-From: Remy Bosch <reboli@hccnet.nl>
+Message-ID: <ec2bd4d50710260607y3d03d774h982915ed9f2f5dda@mail.gmail.com>
+Date: Fri, 26 Oct 2007 09:07:29 -0400
+From: "George Francis" <gfrancis1@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1193372316.6184.331.camel@violet>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <4720C85B.1090300@hccnet.nl> <1193352494.6184.290.camel@violet>
-	<4721E348.2060403@hccnet.nl>
-In-Reply-To: <4721E348.2060403@hccnet.nl>
-Subject: Re: [Bluez-users] Audio gaps with bcm2035 and Hama receiver
+References: <ec2bd4d50710231042h3fd2cf9bod90e25fdc65fbfe3@mail.gmail.com>
+	<1193352665.6184.295.camel@violet>
+	<ec2bd4d50710251938j6617bd7dq931aefa5086ea868@mail.gmail.com>
+	<1193372316.6184.331.camel@violet>
+Subject: Re: [Bluez-users] Bluez-Gnome applet 'pair' function
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,69 +23,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-For some reason "rtp.h" can't be found (included in
-audio/pcm_bluetooth.c). This blocks my attempt to build it on gentoo
-without the use of eglib.
-The build goes as follows. In the source directory:
+On 10/26/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi George,
+>
+> > > > I am using the bluez-gnome applet; I've tried both the 'official' and
+> > > > Gnome:Community versions - where is the option to pair a new device?
+> > > > I'm trying to pair my Logitech BT mouse.
+> > >
+> > > a Bluetooth mouse will not be paired according to the specification. How
+> > > do you wanna enter the pin code? With morse code and the mouse
+> > > buttons ;)
+> >
+> > Why reply with sarcasm?  Don't you know that BT devices that dont
+> > accept user input have the default code of 0000?
+>
+> if you would read the HID specification, then you would see that it
+> explicitly says that mice don't pair with the host.
+>
+> Also there is no relation between the 0000 pin code and not having user
+> input. That 90% of all devices do it this way, doesn't make it a
+> standard and no way it makes it secure. A default pin code (no matter
+> what it is) doesn't give you a useful authentication and hence no useful
+> encryption either.
+>
+> Regards
+>
+> Marcel
+>
 
-The rm -r eglib/{*.c,*.h} # make sure eglib is ignored
-autoreconf -fis                  # Reconfigure
-./configure --enable-inotify --enable-hal --enable-usb --enable-alsa
---enable-glib --disable-obex --enable-network --enable-serial
---enable-input --enable-audio --enable-sync --enable-hcid
---enable-configfiles --disable-initscripts --disable-pcmciarules
---enable-bccmd --enable-avctrl --enable-hid2hci --enable-dfutool
---localstatedir=/var
-make       # And then make
-
-This creates the error:
- gcc -DHAVE_CONFIG_H -I. -I.. -I../common -I/usr/include/alsa -I../sbc
--Wall -O2 -D_FORTIFY_SOURCE=2 -MT
-libasound_module_pcm_bluetooth_la-pcm_bluetooth.lo -MD -MP -MF
-.deps/libasound_module_pcm_bluetooth_la-pcm_bluetooth.Tpo -c
-pcm_bluetooth.c  -fPIC -DPIC -o
-.libs/libasound_module_pcm_bluetooth_la-pcm_bluetooth.o
-pcm_bluetooth.c:41:17: error: rtp.h: No such file or directory
-pcm_bluetooth.c: In function 'avdtp_write':
-pcm_bluetooth.c:601: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:603: warning: left-hand operand of comma expression has
-no effect
-pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:605: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:606: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:607: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:608: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:609: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:610: error: dereferencing pointer to incomplete type
-pcm_bluetooth.c:617: error: invalid application of 'sizeof' to
-incomplete type 'struct rtp_header'
-pcm_bluetooth.c:617: error: invalid application of 'sizeof' to
-incomplete type 'struct rtp_payload'
-pcm_bluetooth.c: In function 'bluetooth_a2dp_init':
-pcm_bluetooth.c:968: error: invalid application of 'sizeof' to
-incomplete type 'struct rtp_header'
-pcm_bluetooth.c:968: error: invalid application of 'sizeof' to
-incomplete type 'struct rtp_payload'
-make[2]: *** [libasound_module_pcm_bluetooth_la-pcm_bluetooth.lo] Error 1
-make[2]: Leaving directory `/root/bluez-utils-3.21/audio'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/root/bluez-utils-3.21'
-make: *** [all] Error 2
+Are you saying that there's no way to use a BT mouse with
+Suse10.3/Gnome?  If you're not saying that then please tell me how to
+do it.
 
 
-Any idea how to fix it?
-
-Thanks!
-
+-- 
+George Francis
+e-mail: gfrancis1@gmail.com
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
