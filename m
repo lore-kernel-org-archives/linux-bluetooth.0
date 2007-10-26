@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <685df2130710260711n7262f993rc53e06c01f38dfdc@mail.gmail.com>
-Date: Fri, 26 Oct 2007 10:11:40 -0400
-From: "Joshua Bryant" <josh@alumni.cmu.edu>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <mailman.81807.1193352252.26582.bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-References: <mailman.81807.1193352252.26582.bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Bluez-devel Digest, Vol 18, Issue 50
+Date: Fri, 26 Oct 2007 16:31:22 +0300
+Message-ID: <719D5CCC2F6E3644B0A9F5C9B1D00088038C8C83@esebe104.NOE.Nokia.com>
+In-Reply-To: <471E2829.5020303@free.fr>
+References: <719D5CCC2F6E3644B0A9F5C9B1D00088038171C2@esebe104.NOE.Nokia.com><471730B2.3030606@free.fr>	<Pine.LNX.4.64.0710181017560.28683@simba.math.ucla.edu><719D5CCC2F6E3644B0A9F5C9B1D0008803840FC4@esebe104.NOE.Nokia.com>
+	<471E2829.5020303@free.fr>
+From: <Kai.Vehmanen@nokia.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] experimental ALSA/A2DP plugin patch (was: RE:
+	PATCH1/2: bluez-utils -fix-a2dp-buffer-constraints)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,102 +18,61 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1433643342=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1433643342==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_3554_21296620.1193407900731"
+Hi,
 
-------=_Part_3554_21296620.1193407900731
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+On 23 Oct 2007,  Fabien Chevalier wrote:
+>Except for the timing part, i'm not really sure the receiver 
+>is that clever. I guess at least some of them will expect to 
+>receive data with at their local clock speed...
 
-I would like to call the 'CreateHeadset' method and associate the headset
-with a non-default adapter.
+hmm, based on further reading of the spec, I think the receivers
+must be that clever. And this makes sense, as it's basicly RTP, 
+so an off-the-shelf RTP receiver implementation would work
+for the headsets.
 
-I am able to bond a headset to a non-default adapter with by referencing
-"/org/bluez/hci1" in the object path of the Adapter.CreateBonding method.
+And that assumption leads to an experimental patch (patch plus
+patched pcm_bluetooth.c for convenience):
 
-However the 'CreateHeadset' method does not reference an adapter. So it
-seems to associate the headset with the default adapter. I would like to
-associate headset A with the default adapter and headset B with a
-non-default adapter.
+http://sofia-sip.org/~vehmanek/bluez-patches/patch-pcm_bluetooth-kv-2007
+1025-works.txt
+http://sofia-sip.org/~vehmanek/bluez-patches/pcm_bluetooth.c
 
-Is there a way to associate a headset with a non-default adapter?
+ - send errors are now ignored (packets dropped), seems
+   to have no bad side effects on the headsets I've tested
+   with
+     -> the positive impact is that we can more easily keep
+	  up the correct timing even with bigger period sizes
+ - a2dp_write() now loops'n'sends until all data submitted by
+   the app is  encoded (needed to work with MMAP using clients)
+ - allowed period sizes defined as set of values (vs range), 
+   this works with for example pcm.c (seems to be an alsa-lib bug,
+   but didn't have time to track it down)
+ - period count fixed to 3 (seems to work best and still 
+   doesn't confuse ALSA apps)
 
+I've tested this with alsa-lib pcm.c, aplay, and pulseaudio, and all
+seem to work better. But **NOTE**, I've only tested with limited
+number of headsets, so it might be that ignoring send errors
+causes audible glitches on some models. So feedback is very welcome!
 
-Date: Fri, 26 Oct 2007 00:45:31 +0200
-> From: Marcel Holtmann <marcel@holtmann.org>
-> Subject: Re: [Bluez-devel] Audio service with multiple adapters
-> To: BlueZ development <bluez-devel@lists.sourceforge.net>
-> Message-ID: <1193352331.6184.284.camel@violet>
-> Content-Type: text/plain
->
-> Hi Joshua,
->
-> > I am using BlueZ for a project and it is working well. I have a
-> > question concerning multiple adapters.
-> >
-> > I am able to connect my headset to the default adapter through the
-> > audio service. However I cannot connect a headset to a second adapter
-> > (hci1) through the audio service. I can bond my headset to the second
-> > adapter, but I cannot create a sco connection.
-> >
-> > Is it possible to start the audio service on the non-default adapter
-> > (hci1)?
-> > Is it possible to run the audio service for both adapters? I would
-> > like to have 2 adapters each supporting a separate headset.
->
-> the audio service can used with any attached adapter. It is designed to
-> deal with them. However having two SCO channels open at the same time
-> might be limited by your hardware.
->
-> Regards
->
-> Marcel
->
+If you can, please test this and report whether this improves (or 
+degrades) the audio quality, and/or compatibility with ALSA apps 
+you are using.
 
-------=_Part_3554_21296620.1193407900731
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-I would like to call the &#39;CreateHeadset&#39; method and associate the headset with a non-default adapter.<br><br>I am able to bond a headset to a non-default adapter with by referencing &quot;/org/bluez/hci1&quot; in the object path of the 
-Adapter.CreateBonding method. <br><br>However the &#39;CreateHeadset&#39; method does not reference an adapter. So it seems to associate the headset with the default adapter. I would like to associate headset A with the default adapter and headset B with a non-default adapter.
-<br><br>Is there a way to associate a headset with a non-default adapter?<br><br><br><div><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Date: Fri, 26 Oct 2007 00:45:31 +0200
-<br>From: Marcel Holtmann &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt;<br>Subject: Re: [Bluez-devel] Audio service with multiple adapters<br>To: BlueZ development &lt;<a href="mailto:bluez-devel@lists.sourceforge.net">
-bluez-devel@lists.sourceforge.net</a>&gt;<br>Message-ID: &lt;1193352331.6184.284.camel@violet&gt;<br>Content-Type: text/plain<br><br>Hi Joshua,<br><br>&gt; I am using BlueZ for a project and it is working well. I have a<br>
-&gt; question concerning multiple adapters.<br>&gt;<br>&gt; I am able to connect my headset to the default adapter through the<br>&gt; audio service. However I cannot connect a headset to a second adapter<br>&gt; (hci1) through the audio service. I can bond my headset to the second
-<br>&gt; adapter, but I cannot create a sco connection.<br>&gt;<br>&gt; Is it possible to start the audio service on the non-default adapter<br>&gt; (hci1)?<br>&gt; Is it possible to run the audio service for both adapters? I would
-<br>&gt; like to have 2 adapters each supporting a separate headset.<br><br>the audio service can used with any attached adapter. It is designed to<br>deal with them. However having two SCO channels open at the same time<br>
-might be limited by your hardware.<br><br>Regards<br><br>Marcel<br></blockquote></div><br>
-
-------=_Part_3554_21296620.1193407900731--
-
-
---===============1433643342==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+br,
+-- 
+first.surname@nokia.com (Kai Vehmanen)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============1433643342==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1433643342==--
