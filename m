@@ -1,78 +1,74 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Return-Path: <jikos@jikos.cz>
+Date: Fri, 26 Oct 2007 15:29:19 +0200 (CEST)
+From: Jiri Kosina <jikos@jikos.cz>
+To: Simone Malacarne <s.malacarne@gmail.com>
+cc: linux-usb-devel@lists.sourceforge.net, bluez-devel@lists.sourceforge.net,
+        Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [linux-usb-devel] dmesg warning on hid core
+In-Reply-To: <1193350427.11632.8.camel@simo-desktop>
+Message-ID: <Pine.LNX.4.64.0710261526020.18815@twin.jikos.cz>
+References: <1193350427.11632.8.camel@simo-desktop>
 MIME-Version: 1.0
-Date: Fri, 26 Oct 2007 16:31:22 +0300
-Message-ID: <719D5CCC2F6E3644B0A9F5C9B1D00088038C8C83@esebe104.NOE.Nokia.com>
-In-Reply-To: <471E2829.5020303@free.fr>
-References: <719D5CCC2F6E3644B0A9F5C9B1D00088038171C2@esebe104.NOE.Nokia.com><471730B2.3030606@free.fr>	<Pine.LNX.4.64.0710181017560.28683@simba.math.ucla.edu><719D5CCC2F6E3644B0A9F5C9B1D0008803840FC4@esebe104.NOE.Nokia.com>
-	<471E2829.5020303@free.fr>
-From: <Kai.Vehmanen@nokia.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] experimental ALSA/A2DP plugin patch (was: RE:
-	PATCH1/2: bluez-utils -fix-a2dp-buffer-constraints)
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <bluez-devel.lists.sourceforge.net>
+
+On Fri, 26 Oct 2007, Simone Malacarne wrote:
+
+> don't know if this is the right place to post this msg. If it's not 
+> related sorry for the noise. I see these warnings in my dmesg related to 
+> hid-core.c. I'm running Ubuntu Gutsy 64bit version (Linux version 
+> 2.6.22-14-generic (buildd@crested) (gcc version 4.1.3 20070929 
+> (prerelease) (Ubuntu 4.1.2-16ubuntu2)) #1 SMP) with a Logitech bluetooth 
+> mouse + keyboard.
+> [   56.549723] ppdev: user-space parallel port driver
+> [   57.088868] audit(1193337315.477:3):  type=1503
+> operation="inode_permission" requested_mask="a" denied_mask="a"
+> name="/dev/tty" pid=5062 profile="/usr/sbin/cupsd"
+> [   58.301241] Failure registering capabilities with primary security
+> module.
+> [   58.548905] Bluetooth: Core ver 2.11
+> [   58.548997] NET: Registered protocol family 31
+> [   58.549000] Bluetooth: HCI device and connection manager initialized
+> [   58.549003] Bluetooth: HCI socket layer initialized
+> [   58.576780] Bluetooth: L2CAP ver 2.8
+> [   58.576784] Bluetooth: L2CAP socket layer initialized
+> [   58.712747] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
+> [   58.761656] WARNING:
+> at /build/buildd/linux-source-2.6.22-2.6.22/drivers/hid/hid-core.c:777
+> implement()
+> [   58.761661] 
+> [   58.761662] Call Trace:
+> [   58.761680]  [<ffffffff881415d8>] :hid:hid_output_report+0x218/0x280
+> [   58.761693]  [<ffffffff8814b51c>] :usbhid:hid_submit_ctrl+0x7c/0x260
+> [   58.761702]  [<ffffffff8814b859>] :usbhid:usbhid_submit_report
+> +0x159/0x210
+> [   58.761711]  [<ffffffff8814e1f6>] :usbhid:hiddev_ioctl+0x456/0xb10
+> [   58.761720]  [<ffffffff80326971>] __up_read+0x21/0xb0
+> [   58.761727]  [<ffffffff8043495b>] do_page_fault+0x3cb/0x870
+> [   58.761738]  [<ffffffff8814dda0>] :usbhid:hiddev_ioctl+0x0/0xb10
+> [   58.761744]  [<ffffffff802a6e63>] do_ioctl+0x93/0xe0
+> [   58.761750]  [<ffffffff802a6f24>] vfs_ioctl+0x74/0x2d0
+> [   58.761756]  [<ffffffff802a7215>] sys_ioctl+0x95/0xb0
+> [   58.761763]  [<ffffffff80209e8e>] system_call+0x7e/0x83
+
+[... several identical backtraces removed ...]
+
+> [  108.915332] input: Logitech diNovo Keyboard as /class/input/input16
+> [  111.469640] input: Logitech MX900 Mouse as /class/input/input17
+> [ 3905.201642] input: Logitech MX900 Mouse as /class/input/input18
+> [ 4140.456387] input: Logitech diNovo Keyboard as /class/input/input19
+> [ 4208.661803] input: Logitech MX900 Mouse as /class/input/input20
+> [ 6377.597303] input: Logitech MX900 Mouse as /class/input/input21
+> [ 6634.465647] input: Logitech diNovo Keyboard as /class/input/input22
 
 Hi,
 
-On 23 Oct 2007,  Fabien Chevalier wrote:
->Except for the timing part, i'm not really sure the receiver 
->is that clever. I guess at least some of them will expect to 
->receive data with at their local clock speed...
+the problem is that some userspace utility (I guess hid2hci from 
+bluez-utils) issues hiddev ioctl() with inappropriate out-of-bounds value.
 
-hmm, based on further reading of the spec, I think the receivers
-must be that clever. And this makes sense, as it's basicly RTP, 
-so an off-the-shelf RTP receiver implementation would work
-for the headsets.
+As far as I know Logitech bluetooth keyboards are problematic, as Marcel 
+doesn't have any specification for them, so switching between HID and HCI 
+modes is reverse engineering and guessing.
 
-And that assumption leads to an experimental patch (patch plus
-patched pcm_bluetooth.c for convenience):
-
-http://sofia-sip.org/~vehmanek/bluez-patches/patch-pcm_bluetooth-kv-2007
-1025-works.txt
-http://sofia-sip.org/~vehmanek/bluez-patches/pcm_bluetooth.c
-
- - send errors are now ignored (packets dropped), seems
-   to have no bad side effects on the headsets I've tested
-   with
-     -> the positive impact is that we can more easily keep
-	  up the correct timing even with bigger period sizes
- - a2dp_write() now loops'n'sends until all data submitted by
-   the app is  encoded (needed to work with MMAP using clients)
- - allowed period sizes defined as set of values (vs range), 
-   this works with for example pcm.c (seems to be an alsa-lib bug,
-   but didn't have time to track it down)
- - period count fixed to 3 (seems to work best and still 
-   doesn't confuse ALSA apps)
-
-I've tested this with alsa-lib pcm.c, aplay, and pulseaudio, and all
-seem to work better. But **NOTE**, I've only tested with limited
-number of headsets, so it might be that ignoring send errors
-causes audible glitches on some models. So feedback is very welcome!
-
-If you can, please test this and report whether this improves (or 
-degrades) the audio quality, and/or compatibility with ALSA apps 
-you are using.
-
-br,
 -- 
-first.surname@nokia.com (Kai Vehmanen)
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >> http://get.splunk.com/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Jiri Kosina
