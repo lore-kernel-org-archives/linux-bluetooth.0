@@ -1,10 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sat, 27 Oct 2007 23:37:03 -0700 (PDT)
-From: Chris Dragga <chris_dragga@yahoo.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Message-ID: <578209.61831.qm@web52103.mail.re2.yahoo.com>
-Subject: [Bluez-users] Creating connections with the network DBUS API
+In-Reply-To: <ec2bd4d50710260607y3d03d774h982915ed9f2f5dda@mail.gmail.com>
+References: <ec2bd4d50710231042h3fd2cf9bod90e25fdc65fbfe3@mail.gmail.com>
+	<1193352665.6184.295.camel@violet>
+	<ec2bd4d50710251938j6617bd7dq931aefa5086ea868@mail.gmail.com>
+	<1193372316.6184.331.camel@violet>
+	<ec2bd4d50710260607y3d03d774h982915ed9f2f5dda@mail.gmail.com>
+Date: Sat, 27 Oct 2007 12:26:30 +0200
+Message-Id: <1193480790.4416.14.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Bluez-Gnome applet 'pair' function
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,39 +24,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi George,
 
-I'm back with another question about the network features of DBUS.  Specifically, I'm trying to create a connection using NAP as described on the wiki, albeit in C, rather than Python, and when I execute the Connect method on the connection object, I get the error:  "Operation now in progresss."  In addition, I never get a Connected signal (though I do have it handled correctly, I'm pretty sure), and hcitool shows no connections active once I've done this.  Note that the same error also occurs with GN.  Is there some sort of setting for Bluetooth itself that I'm missing, or do I need to introduce a delay somewhere in the code?  For what it's worth, the relevant sections of code are as follows:
+> > > > > I am using the bluez-gnome applet; I've tried both the 'official' and
+> > > > > Gnome:Community versions - where is the option to pair a new device?
+> > > > > I'm trying to pair my Logitech BT mouse.
+> > > >
+> > > > a Bluetooth mouse will not be paired according to the specification. How
+> > > > do you wanna enter the pin code? With morse code and the mouse
+> > > > buttons ;)
+> > >
+> > > Why reply with sarcasm?  Don't you know that BT devices that dont
+> > > accept user input have the default code of 0000?
+> >
+> > if you would read the HID specification, then you would see that it
+> > explicitly says that mice don't pair with the host.
+> >
+> > Also there is no relation between the 0000 pin code and not having user
+> > input. That 90% of all devices do it this way, doesn't make it a
+> > standard and no way it makes it secure. A default pin code (no matter
+> > what it is) doesn't give you a useful authentication and hence no useful
+> > encryption either.
+>
+> Are you saying that there's no way to use a BT mouse with
+> Suse10.3/Gnome?  If you're not saying that then please tell me how to
+> do it.
 
-/*Connects the signal properly*/
-        dbus_g_object_register_marshaller(
-                        g_cclosure_marshal_VOID__VOID,
-                        G_TYPE_NONE, G_TYPE_NONE,
-                        G_TYPE_INVALID);
-        dbus_g_proxy_add_signal(network_conn, "Connected",
-                        G_TYPE_INVALID);
-        dbus_g_proxy_connect_signal(network_conn, "Connected",
-                        G_CALLBACK(connected_handler), network_iface, NULL);
-/*The actual connection method call*/
-        if (!dbus_g_proxy_call(network_conn, "Connect", &error,
-                        G_TYPE_INVALID, G_TYPE_STRING, &network_iface,
-                        G_TYPE_INVALID)){
-                handle_error(error);
-                g_print("The network interface might be: %s\n", network_iface);
-/*              return NULL;*/
-        }
+of course there is, but that is a different topic. You were talking
+about pairing a mouse. Not making a mouse work. Check the BlueZ wiki
+pages on how to make a input device work.
 
-Also, when the documentation says that the Connect method returns the network interface, would this be something along the lines of bnep0?  Finally, correct me if I'm wrong, but since there is no "CreateServer" method in the network manager object (despite what the wiki says), the servers that ListServers lists are the only ones available.  Any help would be appreciated.
+Regards
 
-Thanks,
-Chris Dragga
+Marcel
 
 
-
-__________________________________________________
-Do You Yahoo!?
-Tired of spam?  Yahoo! Mail has the best spam protection around 
-http://mail.yahoo.com 
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
