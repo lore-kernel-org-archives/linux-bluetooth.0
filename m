@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <8ccc3510710291631h638601c3q2901b27e993eab@mail.gmail.com>
-Date: Tue, 30 Oct 2007 00:31:49 +0100
-From: "Christophe-Marie Duquesne" <chm.duquesne@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <-2269298179091254094@unknownmsgid>
+Message-ID: <685df2130710290924m65b5d4ccr2cb86c1570f063d8@mail.gmail.com>
+Date: Mon, 29 Oct 2007 12:24:37 -0400
+From: "Joshua Bryant" <josh@bryantweb.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-References: <7947815319360230880@unknownmsgid>
-	<1ab01fb50710290904w1b703da1p1a834f514e24ce71@mail.gmail.com>
-	<-2269298179091254094@unknownmsgid>
-Subject: Re: [Bluez-devel] How to use my PC as a headset ?
+Subject: Re: [Bluez-devel] Audio service with multiple adapters
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,155 +14,92 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2039954023=="
+Content-Type: multipart/mixed; boundary="===============1486986545=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============2039954023==
+--===============1486986545==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_627_20771681.1193700709838"
+	boundary="----=_Part_4545_8632427.1193675077187"
 
-------=_Part_627_20771681.1193700709838
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+------=_Part_4545_8632427.1193675077187
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-SSBoYXZlIG1hZGUgdGhpcyB3b3JrIHVuZGVyIHdpbmRvd3MuIEkgZG8gbm90IGtub3cgaWYgaXQg
-aXMgcG9zc2libGUgdW5kZXIKbGludXguIEkgdGhpbmsgeW91IGhhdmUgdG8gdXNlIGEyZHAsIGJ1
-dCBJIGRvIG5vdCBrbm93IGhvdy4uLgoKT24gMTAvMjkvMDcsIFBpZXJyZSBTYXZhcnkgPHBpZXJy
-ZS5zYXZhcnlAa2VybGluay5mcj4gd3JvdGU6Cj4KPiBJIHdhbnQgdXNlIG15IFBDIGFzIGEgSEVB
-RFNFVCBvciBiZXR0ZXIgYXMgYSBoYW5kc2ZyZWUgYW5kIHdoeSBub3Qgd2l0aAo+IGEyZHAKPiAu
-Li4gSW4gZmFjdCBJIHdhbnQgdXNlIG15IFBDIHRvIGxpc3RlbiB0aGUgTVAzIHdoaWNoIGFyZSBv
-biBteSBwaG9uZSwgb3IKPiB1c2UKPiB0aGUgUEMgZm9yIGNvbW11bmljYXRpb24sIGluIGZhY3Qg
-bGlrZSBhIGhlYWRzZXQgLi4uCj4KPiBUaGFua3MgZm9yIHlvdXIgaW50ZXJlc3QKPgo+IFBpZXJy
-ZQo+Cj4gLS0tLS1NZXNzYWdlIGQnb3JpZ2luZS0tLS0tCj4gRGU6IGJsdWV6LWRldmVsLWJvdW5j
-ZXNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cj4gW21haWx0bzpibHVlei1kZXZlbC1ib3VuY2VzQGxp
-c3RzLnNvdXJjZWZvcmdlLm5ldF0gRGUgbGEgcGFydCBkZSBWaWthcwo+IFNpbmhhCj4gRW52b3nD
-qTogbHVuZGkgMjkgb2N0b2JyZSAyMDA3IDE3OjA1Cj4gw4A6IEJsdWVaIGRldmVsb3BtZW50Cj4g
-T2JqZXQ6IFJlOiBbQmx1ZXotZGV2ZWxdIEhvdyB0byB1c2UgbXkgUEMgYXMgYSBoZWFkc2V0ID8K
-Pgo+IGhpCj4gY2FuIHUgZXhwbGFpbiB3aGF0IGFsbCBmdW5jdGlvbmFsaXR5IHUgciBsb29raW5n
-Lgo+Cj4gdG8ganVzdCBzZW5kIG9yIHJlY2VpdmUgIHUgbmVlZCB0byBoYXZlIG9iZXggbGlicmFy
-aWVzIC4KPgo+IGlmIHUgbmVlZCB0byB1c2Ugc29ja2V0IGNvbW11bmljYXRpb25zIHUgY2FuIHVz
-ZSByZmNvbW0gc2VydmljZXMuCj4KPgo+IE9uIDEwLzMwLzA3LCBQaWVycmUgU2F2YXJ5IDxwaWVy
-cmUuc2F2YXJ5QGtlcmxpbmsuZnI+IHdyb3RlOgo+ID4gSGksCj4gPiAgLi4uIG15IHF1ZXN0aW9u
-IGlzIG9uIHRoZSBzdWJqZWN0LCBTbyBJIHdhbnQgdG8gdXNlIG15IFBDIHdpdGggbXkgcGhvbmUK
-PiBhcwo+ID4gYSBoZWFkc2V0LiBJZiBzbywgd2hhdCBtdXN0IEkgbWFrZSBmb3IgdXNlIGl0Pwo+
-ID4gVGhhbmtzIGluIGFkdmFuY2UuCj4gPiBSZWdhcmRzCj4gPgo+ID4gUGllcnJlCj4gPgo+ID4K
-PiA+Cj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+ID4gVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVk
-IGJ5OiBTcGx1bmsgSW5jLgo+ID4gU3RpbGwgZ3JlcHBpbmcgdGhyb3VnaCBsb2cgZmlsZXMgdG8g
-ZmluZCBwcm9ibGVtcz8gIFN0b3AuCj4gPiBOb3cgU2VhcmNoIGxvZyBldmVudHMgYW5kIGNvbmZp
-Z3VyYXRpb24gZmlsZXMgdXNpbmcgQUpBWCBhbmQgYSBicm93c2VyLgo+ID4gRG93bmxvYWQgeW91
-ciBGUkVFIGNvcHkgb2YgU3BsdW5rIG5vdyA+PiBodHRwOi8vZ2V0LnNwbHVuay5jb20vCj4gPiBf
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+ID4gQmx1ZXot
-ZGV2ZWwgbWFpbGluZyBsaXN0Cj4gPiBCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQK
-PiA+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRl
-dmVsCj4gPgo+Cj4KPiAtLQo+IEltcG9zc2libGUKPiBpdHNlbGYgY29udGFpbgo+IEkgTSBQb3Nz
-aWJsZQo+Cj4gVmlrYXMKPgo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiBUaGlzIFNGLm5ldCBlbWFpbCBp
-cyBzcG9uc29yZWQgYnk6IFNwbHVuayBJbmMuCj4gU3RpbGwgZ3JlcHBpbmcgdGhyb3VnaCBsb2cg
-ZmlsZXMgdG8gZmluZCBwcm9ibGVtcz8gIFN0b3AuCj4gTm93IFNlYXJjaCBsb2cgZXZlbnRzIGFu
-ZCBjb25maWd1cmF0aW9uIGZpbGVzIHVzaW5nIEFKQVggYW5kIGEgYnJvd3Nlci4KPiBEb3dubG9h
-ZCB5b3VyIEZSRUUgY29weSBvZiBTcGx1bmsgbm93ID4+IGh0dHA6Ly9nZXQuc3BsdW5rLmNvbS8K
-PiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IEJsdWV6
-LWRldmVsIG1haWxpbmcgbGlzdAo+IEJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+
-IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVs
-Cj4KPgo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiBUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQg
-Ynk6IFNwbHVuayBJbmMuCj4gU3RpbGwgZ3JlcHBpbmcgdGhyb3VnaCBsb2cgZmlsZXMgdG8gZmlu
-ZCBwcm9ibGVtcz8gIFN0b3AuCj4gTm93IFNlYXJjaCBsb2cgZXZlbnRzIGFuZCBjb25maWd1cmF0
-aW9uIGZpbGVzIHVzaW5nIEFKQVggYW5kIGEgYnJvd3Nlci4KPiBEb3dubG9hZCB5b3VyIEZSRUUg
-Y29weSBvZiBTcGx1bmsgbm93ID4+IGh0dHA6Ly9nZXQuc3BsdW5rLmNvbS8KPiBfX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IEJsdWV6LWRldmVsIG1haWxp
-bmcgbGlzdAo+IEJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlz
-dHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCj4KCgoKLS0gCnZv
-dXMgcG91dmV6IGNvbnN1bHRlciBtb24gY2FsZW5kcmllciDDoCBsJ2FkcmVzc2Ugc3VpdmFudGUg
-OgpodHRwOi8vd3d3Lmdvb2dsZS5jb20vY2FsZW5kYXIvZW1iZWQ/c3JjPXRydGY3ZDZwbWhjbW5x
-cnVlZmFwazkydmtzJTQwZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQo=
-------=_Part_627_20771681.1193700709838
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: base64
+I would like to call the 'CreateHeadset' method and associate the headset
+with a non-default adapter.
+
+I am able to bond a headset to a non-default adapter with by referencing
+"/org/bluez/hci1" in the object path of the Adapter.CreateBonding method.
+
+However the 'CreateHeadset' method does not reference an adapter. It seems
+to associate the headset with the default adapter. I would like to associate
+headset A with the default adapter and headset B with a non-default adapter.
+
+
+Is there a way to associate a headset with a non-default adapter in a
+'CreateHeadset' call?
+
+
+Date: Fri, 26 Oct 2007 00:45:31 +0200
+> From: Marcel Holtmann <marcel@holtmann.org>
+> Subject: Re: [Bluez-devel] Audio service with multiple adapters
+> To: BlueZ development < bluez-devel@lists.sourceforge.net>
+> Message-ID: <1193352331.6184.284.camel@violet>
+> Content-Type: text/plain
+>
+> Hi Joshua,
+>
+> > I am using BlueZ for a project and it is working well. I have a
+> > question concerning multiple adapters.
+> >
+> > I am able to connect my headset to the default adapter through the
+> > audio service. However I cannot connect a headset to a second adapter
+> > (hci1) through the audio service. I can bond my headset to the second
+> > adapter, but I cannot create a sco connection.
+> >
+> > Is it possible to start the audio service on the non-default adapter
+> > (hci1)?
+> > Is it possible to run the audio service for both adapters? I would
+> > like to have 2 adapters each supporting a separate headset.
+>
+> the audio service can used with any attached adapter. It is designed to
+> deal with them. However having two SCO channels open at the same time
+> might be limited by your hardware.
+>
+> Regards
+>
+> Marcel
+>
+
+------=_Part_4545_8632427.1193675077187
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-SSBoYXZlIG1hZGUgdGhpcyB3b3JrIHVuZGVyIHdpbmRvd3MuIEkgZG8gbm90IGtub3cgaWYgaXQg
-aXMgcG9zc2libGUgdW5kZXIgbGludXguIEkgdGhpbmsgeW91IGhhdmUgdG8gdXNlIGEyZHAsIGJ1
-dCBJIGRvIG5vdCBrbm93IGhvdy4uLjxicj48YnI+PGRpdj48c3BhbiBjbGFzcz0iZ21haWxfcXVv
-dGUiPk9uIDEwLzI5LzA3LCA8YiBjbGFzcz0iZ21haWxfc2VuZGVybmFtZSI+UGllcnJlIFNhdmFy
-eQo8L2I+ICZsdDs8YSBocmVmPSJtYWlsdG86cGllcnJlLnNhdmFyeUBrZXJsaW5rLmZyIj5waWVy
-cmUuc2F2YXJ5QGtlcmxpbmsuZnI8L2E+Jmd0OyB3cm90ZTo8L3NwYW4+PGJsb2NrcXVvdGUgY2xh
-c3M9ImdtYWlsX3F1b3RlIiBzdHlsZT0iYm9yZGVyLWxlZnQ6IDFweCBzb2xpZCByZ2IoMjA0LCAy
-MDQsIDIwNCk7IG1hcmdpbjogMHB0IDBwdCAwcHQgMC44ZXg7IHBhZGRpbmctbGVmdDogMWV4OyI+
-Ckkgd2FudCB1c2UgbXkgUEMgYXMgYSBIRUFEU0VUIG9yIGJldHRlciBhcyBhIGhhbmRzZnJlZSBh
-bmQgd2h5IG5vdCB3aXRoIGEyZHA8YnI+Li4uIEluIGZhY3QgSSB3YW50IHVzZSBteSBQQyB0byBs
-aXN0ZW4gdGhlIE1QMyB3aGljaCBhcmUgb24gbXkgcGhvbmUsIG9yIHVzZTxicj50aGUgUEMgZm9y
-IGNvbW11bmljYXRpb24sIGluIGZhY3QgbGlrZSBhIGhlYWRzZXQgLi4uPGJyPjxicj5UaGFua3Mg
-Zm9yIHlvdXIgaW50ZXJlc3QKPGJyPjxicj5QaWVycmU8YnI+PGJyPi0tLS0tTWVzc2FnZSBkJiMz
-OTtvcmlnaW5lLS0tLS08YnI+RGU6IDxhIGhyZWY9Im1haWx0bzpibHVlei1kZXZlbC1ib3VuY2Vz
-QGxpc3RzLnNvdXJjZWZvcmdlLm5ldCI+Ymx1ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3VyY2Vm
-b3JnZS5uZXQ8L2E+PGJyPlttYWlsdG86PGEgaHJlZj0ibWFpbHRvOmJsdWV6LWRldmVsLWJvdW5j
-ZXNAbGlzdHMuc291cmNlZm9yZ2UubmV0Ij4KYmx1ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3Vy
-Y2Vmb3JnZS5uZXQ8L2E+XSBEZSBsYSBwYXJ0IGRlIFZpa2FzIFNpbmhhPGJyPkVudm95w6k6IGx1
-bmRpIDI5IG9jdG9icmUgMjAwNyAxNzowNTxicj7DgDogQmx1ZVogZGV2ZWxvcG1lbnQ8YnI+T2Jq
-ZXQ6IFJlOiBbQmx1ZXotZGV2ZWxdIEhvdyB0byB1c2UgbXkgUEMgYXMgYSBoZWFkc2V0ID88YnI+
-PGJyPmhpPGJyPmNhbiB1IGV4cGxhaW4gd2hhdCBhbGwgZnVuY3Rpb25hbGl0eSB1IHIgbG9va2lu
-Zy4KPGJyPjxicj50byBqdXN0IHNlbmQgb3IgcmVjZWl2ZSZuYnNwOyZuYnNwO3UgbmVlZCB0byBo
-YXZlIG9iZXggbGlicmFyaWVzIC48YnI+PGJyPmlmIHUgbmVlZCB0byB1c2Ugc29ja2V0IGNvbW11
-bmljYXRpb25zIHUgY2FuIHVzZSByZmNvbW0gc2VydmljZXMuPGJyPjxicj48YnI+T24gMTAvMzAv
-MDcsIFBpZXJyZSBTYXZhcnkgJmx0OzxhIGhyZWY9Im1haWx0bzpwaWVycmUuc2F2YXJ5QGtlcmxp
-bmsuZnIiPgpwaWVycmUuc2F2YXJ5QGtlcmxpbmsuZnI8L2E+Jmd0OyB3cm90ZTo8YnI+Jmd0OyBI
-aSw8YnI+Jmd0OyZuYnNwOyZuYnNwOy4uLiBteSBxdWVzdGlvbiBpcyBvbiB0aGUgc3ViamVjdCwg
-U28gSSB3YW50IHRvIHVzZSBteSBQQyB3aXRoIG15IHBob25lPGJyPmFzPGJyPiZndDsgYSBoZWFk
-c2V0LiBJZiBzbywgd2hhdCBtdXN0IEkgbWFrZSBmb3IgdXNlIGl0Pzxicj4mZ3Q7IFRoYW5rcyBp
-biBhZHZhbmNlLjxicj4KJmd0OyBSZWdhcmRzPGJyPiZndDs8YnI+Jmd0OyBQaWVycmU8YnI+Jmd0
-Ozxicj4mZ3Q7PGJyPiZndDsgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLTxicj4mZ3Q7IFRoaXMgU0YubmV0IGVt
-YWlsIGlzIHNwb25zb3JlZCBieTogU3BsdW5rIEluYy48YnI+Jmd0OyBTdGlsbCBncmVwcGluZyB0
-aHJvdWdoIGxvZyBmaWxlcyB0byBmaW5kIHByb2JsZW1zPyZuYnNwOyZuYnNwO1N0b3AuCjxicj4m
-Z3Q7IE5vdyBTZWFyY2ggbG9nIGV2ZW50cyBhbmQgY29uZmlndXJhdGlvbiBmaWxlcyB1c2luZyBB
-SkFYIGFuZCBhIGJyb3dzZXIuPGJyPiZndDsgRG93bmxvYWQgeW91ciBGUkVFIGNvcHkgb2YgU3Bs
-dW5rIG5vdyAmZ3Q7Jmd0OyA8YSBocmVmPSJodHRwOi8vZ2V0LnNwbHVuay5jb20vIj5odHRwOi8v
-Z2V0LnNwbHVuay5jb20vPC9hPjxicj4mZ3Q7IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fCjxicj4mZ3Q7IEJsdWV6LWRldmVsIG1haWxpbmcgbGlzdDxicj4m
-Z3Q7IDxhIGhyZWY9Im1haWx0bzpCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQiPkJs
-dWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldDwvYT48YnI+Jmd0OyA8YSBocmVmPSJodHRw
-czovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbCI+aHR0
-cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwKPC9h
-Pjxicj4mZ3Q7PGJyPjxicj48YnI+LS08YnI+SW1wb3NzaWJsZTxicj5pdHNlbGYgY29udGFpbjxi
-cj5JIE0gUG9zc2libGU8YnI+PGJyPlZpa2FzPGJyPjxicj4tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPGJyPlRo
-aXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogU3BsdW5rIEluYy48YnI+ClN0aWxsIGdy
-ZXBwaW5nIHRocm91Z2ggbG9nIGZpbGVzIHRvIGZpbmQgcHJvYmxlbXM/Jm5ic3A7Jm5ic3A7U3Rv
-cC48YnI+Tm93IFNlYXJjaCBsb2cgZXZlbnRzIGFuZCBjb25maWd1cmF0aW9uIGZpbGVzIHVzaW5n
-IEFKQVggYW5kIGEgYnJvd3Nlci48YnI+RG93bmxvYWQgeW91ciBGUkVFIGNvcHkgb2YgU3BsdW5r
-IG5vdyAmZ3Q7Jmd0OyA8YSBocmVmPSJodHRwOi8vZ2V0LnNwbHVuay5jb20vIj5odHRwOi8vZ2V0
-LnNwbHVuay5jb20vCjwvYT48YnI+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX188YnI+Qmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0PGJyPjxhIGhyZWY9Im1haWx0
-bzpCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQiPkJsdWV6LWRldmVsQGxpc3RzLnNv
-dXJjZWZvcmdlLm5ldDwvYT48YnI+PGEgaHJlZj0iaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5u
-ZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwiPgpodHRwczovL2xpc3RzLnNvdXJjZWZvcmdl
-Lm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbDwvYT48YnI+PGJyPjxicj4tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tPGJyPlRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogU3BsdW5rIEluYy48
-YnI+U3RpbGwgZ3JlcHBpbmcgdGhyb3VnaCBsb2cgZmlsZXMgdG8gZmluZCBwcm9ibGVtcz8mbmJz
-cDsmbmJzcDtTdG9wLgo8YnI+Tm93IFNlYXJjaCBsb2cgZXZlbnRzIGFuZCBjb25maWd1cmF0aW9u
-IGZpbGVzIHVzaW5nIEFKQVggYW5kIGEgYnJvd3Nlci48YnI+RG93bmxvYWQgeW91ciBGUkVFIGNv
-cHkgb2YgU3BsdW5rIG5vdyAmZ3Q7Jmd0OyA8YSBocmVmPSJodHRwOi8vZ2V0LnNwbHVuay5jb20v
-Ij5odHRwOi8vZ2V0LnNwbHVuay5jb20vPC9hPjxicj5fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwo8YnI+Qmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0PGJyPjxh
-IGhyZWY9Im1haWx0bzpCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQiPkJsdWV6LWRl
-dmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldDwvYT48YnI+PGEgaHJlZj0iaHR0cHM6Ly9saXN0cy5z
-b3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwiPmh0dHBzOi8vbGlzdHMu
-c291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCjwvYT48YnI+PC9ibG9j
-a3F1b3RlPjwvZGl2Pjxicj48YnIgY2xlYXI9ImFsbCI+PGJyPi0tIDxicj52b3VzIHBvdXZleiBj
-b25zdWx0ZXIgbW9uIGNhbGVuZHJpZXIgw6AgbCYjMzk7YWRyZXNzZSBzdWl2YW50ZSA6PGJyPjxh
-IGhyZWY9Imh0dHA6Ly93d3cuZ29vZ2xlLmNvbS9jYWxlbmRhci9lbWJlZD9zcmM9dHJ0ZjdkNnBt
-aGNtbnFydWVmYXBrOTJ2a3MlNDBncm91cC5jYWxlbmRhci5nb29nbGUuY29tIj4KaHR0cDovL3d3
-dy5nb29nbGUuY29tL2NhbGVuZGFyL2VtYmVkP3NyYz10cnRmN2Q2cG1oY21ucXJ1ZWZhcGs5MnZr
-cyU0MGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb208L2E+Cg==
-------=_Part_627_20771681.1193700709838--
+I would like to call the &#39;CreateHeadset&#39; method and associate the headset with a non-default adapter.<br><br>I am able to bond a headset to a non-default adapter with by referencing &quot;/org/bluez/hci1&quot; in the object path of the 
+Adapter.CreateBonding method. <br><br>However
+the &#39;CreateHeadset&#39; method does not reference an adapter. It seems
+to associate the headset with the default adapter. I would like to
+associate headset A with the default adapter and headset B with a
+non-default adapter.
+<br><br>Is there a way to associate a headset with a non-default adapter in a &#39;CreateHeadset&#39; call?<br><br><div><span class="gmail_quote"><br></span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+
+Date: Fri, 26 Oct 2007 00:45:31 +0200<br>From: Marcel Holtmann &lt;<a href="mailto:marcel@holtmann.org" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">marcel@holtmann.org</a>&gt;<br>Subject: Re: [Bluez-devel] Audio service with multiple adapters
+<br>To: BlueZ development &lt;
+<a href="mailto:bluez-devel@lists.sourceforge.net" target="_blank" onclick="return top.js.OpenExtLink(window,event,this)">bluez-devel@lists.sourceforge.net</a>&gt;<br>Message-ID: &lt;1193352331.6184.284.camel@violet&gt;<br>
+Content-Type: text/plain<br><br>Hi Joshua,<br><br>&gt; I am using BlueZ for a project and it is working well. I have a
+<br>&gt; question concerning multiple adapters.<br>&gt;<br>&gt; I am able to connect my headset to the default adapter through the<br>&gt; audio service. However I cannot connect a headset to a second adapter<br>&gt; (hci1) through the audio service. I can bond my headset to the second
+<br>&gt; adapter, but I cannot create a sco connection.<br>&gt;<br>&gt; Is it possible to start the audio service on the non-default adapter<br>&gt; (hci1)?<br>&gt; Is it possible to run the audio service for both adapters? I would
+<br>&gt; like to have 2 adapters each supporting a separate headset.<br><br>the audio service can used with any attached adapter. It is designed to<br>deal with them. However having two SCO channels open at the same time
+<br>
+might be limited by your hardware.<br><br>Regards<br><br>Marcel<br></blockquote></div><br>
+
+------=_Part_4545_8632427.1193675077187--
 
 
---===============2039954023==
+--===============1486986545==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -177,7 +110,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============2039954023==
+--===============1486986545==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -188,4 +121,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============2039954023==--
+--===============1486986545==--
