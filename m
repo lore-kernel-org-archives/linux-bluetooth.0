@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <8ccc3510710300158k292ac545i312ccb4b1934656b@mail.gmail.com>
-Date: Tue, 30 Oct 2007 09:58:05 +0100
-From: "Christophe-Marie Duquesne" <chm.duquesne@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <3176486627050719742@unknownmsgid>
-MIME-Version: 1.0
-References: <7947815319360230880@unknownmsgid>
-	<1ab01fb50710290904w1b703da1p1a834f514e24ce71@mail.gmail.com>
-	<-2269298179091254094@unknownmsgid>
+From: "Pierre Savary" <pierre.savary@kerlink.fr>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+References: <7947815319360230880@unknownmsgid>	<1ab01fb50710290904w1b703da1p1a834f514e24ce71@mail.gmail.com>	<-2269298179091254094@unknownmsgid>
 	<8ccc3510710291631h638601c3q2901b27e993eab@mail.gmail.com>
-	<3176486627050719742@unknownmsgid>
+In-Reply-To: <8ccc3510710291631h638601c3q2901b27e993eab@mail.gmail.com>
+Date: Tue, 30 Oct 2007 08:59:19 +0100
+Message-ID: <006c01c81aca$c6fc7950$54f56bf0$@savary@kerlink.fr>
+MIME-Version: 1.0
 Subject: Re: [Bluez-devel] How to use my PC as a headset ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,265 +17,401 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0000556059=="
+Content-Type: multipart/mixed; boundary="===============1018666005=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0000556059==
+Il s'agit d'un message ` parties multiples au format MIME.
+
+--===============1018666005==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_258_16194211.1193734685422"
+	boundary="----=_NextPart_000_006D_01C81AD3.28C0E150"
+Content-Language: fr
 
-------=_Part_258_16194211.1193734685422
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+Il s'agit d'un message ` parties multiples au format MIME.
 
-SXQgd2FzIGp1c3QgYSB2ZXJ5IGJhc2ljIG1hbmlwdWxhdGlvbiwgbm90IGEgZGV2ZWxvcG1lbnQu
-IFdoZW4gSSBwYWlyZWQgbXkKY2VsbHBob25lIGFuZCBteSBwYyBmb3IgdGhlIGZpcnN0IHRpbWUs
-IG15IGNlbGxwaG9uZSBhc2tlZCBtZSBpZiBJIHdhbnRlZCB0bwp1c2UgdGhlIG90aGVyIGRldmlj
-ZSBhcyBhIGhlYWRzZXQuIEkganVzdCBhbnN3ZXJlZCB5ZXMuIEkgdGhpbmsgdGhlIG5hbWUgb2YK
-dGhlIHNvZnR3YXJlIHdhcyAiYmx1ZXNvbGVpbCIuCgpTb3JyeSBJIGRvIG5vdCByZW1lbWJlciBl
-dmVyeXRoaW5nLCBJIGhhZCBpbnN0YWxsZWQgd2luZG93cyBmb3IgdGVzdGluZwpwdXJwb3NlIG9u
-bHkgYW5kIGl0IGlzIG5vIG1vcmUgb24gbXkgbWFjaGluZS4uLgoKT24gMTAvMzAvMDcsIFBpZXJy
-ZSBTYXZhcnkgPHBpZXJyZS5zYXZhcnlAa2VybGluay5mcj4gd3JvdGU6Cj4KPiAgT2ssIHRoYW5r
-cyBmb3IgeW91ciBpbnRlcmVzdC4gQW5kIHdoYXQgaGF2ZSB5b3UgbWFrZSB1bmRlciB3aW5kb3dz
-PyBJdAo+IHdhcyBqdXN0IGEgbWFuaXB1bGF0aW9uIG9yIG1vcmUgZGV2ZWxvcG1lbnQ/IEknbSBy
-ZWFsbHkgaW50ZXJlc3RlZCBieSB5b3VyCj4gd29yay4KPgo+IFRoYW5rcyBpbiBhZHZhbmNlCj4K
-Pgo+Cj4gUGllcnJlCj4KPgo+Cj4gKkRlIDoqIGJsdWV6LWRldmVsLWJvdW5jZXNAbGlzdHMuc291
-cmNlZm9yZ2UubmV0IFttYWlsdG86Cj4gYmx1ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3VyY2Vm
-b3JnZS5uZXRdICpEZSBsYSBwYXJ0IGRlKkNocmlzdG9waGUtTWFyaWUgRHVxdWVzbmUKPiAqRW52
-b3nDqSA6KiBtYXJkaSAzMCBvY3RvYnJlIDIwMDcgMDA6MzIKPiAqw4AgOiogQmx1ZVogZGV2ZWxv
-cG1lbnQKPiAqT2JqZXQgOiogUmU6IFtCbHVlei1kZXZlbF0gSG93IHRvIHVzZSBteSBQQyBhcyBh
-IGhlYWRzZXQgPwo+Cj4KPgo+IEkgaGF2ZSBtYWRlIHRoaXMgd29yayB1bmRlciB3aW5kb3dzLiBJ
-IGRvIG5vdCBrbm93IGlmIGl0IGlzIHBvc3NpYmxlIHVuZGVyCj4gbGludXguIEkgdGhpbmsgeW91
-IGhhdmUgdG8gdXNlIGEyZHAsIGJ1dCBJIGRvIG5vdCBrbm93IGhvdy4uLgo+Cj4gT24gMTAvMjkv
-MDcsICpQaWVycmUgU2F2YXJ5ICo8cGllcnJlLnNhdmFyeUBrZXJsaW5rLmZyPiB3cm90ZToKPgo+
-IEkgd2FudCB1c2UgbXkgUEMgYXMgYSBIRUFEU0VUIG9yIGJldHRlciBhcyBhIGhhbmRzZnJlZSBh
-bmQgd2h5IG5vdCB3aXRoCj4gYTJkcAo+IC4uLiBJbiBmYWN0IEkgd2FudCB1c2UgbXkgUEMgdG8g
-bGlzdGVuIHRoZSBNUDMgd2hpY2ggYXJlIG9uIG15IHBob25lLCBvcgo+IHVzZQo+IHRoZSBQQyBm
-b3IgY29tbXVuaWNhdGlvbiwgaW4gZmFjdCBsaWtlIGEgaGVhZHNldCAuLi4KPgo+IFRoYW5rcyBm
-b3IgeW91ciBpbnRlcmVzdAo+Cj4gUGllcnJlCj4KPiAtLS0tLU1lc3NhZ2UgZCdvcmlnaW5lLS0t
-LS0KPiBEZTogYmx1ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPiBbbWFp
-bHRvOiBibHVlei1kZXZlbC1ib3VuY2VzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldF0gRGUgbGEgcGFy
-dCBkZSBWaWthcwo+IFNpbmhhCj4gRW52b3nDqTogbHVuZGkgMjkgb2N0b2JyZSAyMDA3IDE3OjA1
-Cj4gw4A6IEJsdWVaIGRldmVsb3BtZW50Cj4gT2JqZXQ6IFJlOiBbQmx1ZXotZGV2ZWxdIEhvdyB0
-byB1c2UgbXkgUEMgYXMgYSBoZWFkc2V0ID8KPgo+IGhpCj4gY2FuIHUgZXhwbGFpbiB3aGF0IGFs
-bCBmdW5jdGlvbmFsaXR5IHUgciBsb29raW5nLgo+Cj4gdG8ganVzdCBzZW5kIG9yIHJlY2VpdmUg
-IHUgbmVlZCB0byBoYXZlIG9iZXggbGlicmFyaWVzIC4KPgo+IGlmIHUgbmVlZCB0byB1c2Ugc29j
-a2V0IGNvbW11bmljYXRpb25zIHUgY2FuIHVzZSByZmNvbW0gc2VydmljZXMuCj4KPgo+IE9uIDEw
-LzMwLzA3LCBQaWVycmUgU2F2YXJ5IDwgcGllcnJlLnNhdmFyeUBrZXJsaW5rLmZyPiB3cm90ZToK
-PiA+IEhpLAo+ID4gIC4uLiBteSBxdWVzdGlvbiBpcyBvbiB0aGUgc3ViamVjdCwgU28gSSB3YW50
-IHRvIHVzZSBteSBQQyB3aXRoIG15IHBob25lCj4gYXMKPiA+IGEgaGVhZHNldC4gSWYgc28sIHdo
-YXQgbXVzdCBJIG1ha2UgZm9yIHVzZSBpdD8KPiA+IFRoYW5rcyBpbiBhZHZhbmNlLgo+ID4gUmVn
-YXJkcwo+ID4KPiA+IFBpZXJyZQo+ID4KPiA+Cj4gPgo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiA+IFRo
-aXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogU3BsdW5rIEluYy4KPiA+IFN0aWxsIGdy
-ZXBwaW5nIHRocm91Z2ggbG9nIGZpbGVzIHRvIGZpbmQgcHJvYmxlbXM/ICBTdG9wLgo+ID4gTm93
-IFNlYXJjaCBsb2cgZXZlbnRzIGFuZCBjb25maWd1cmF0aW9uIGZpbGVzIHVzaW5nIEFKQVggYW5k
-IGEgYnJvd3Nlci4KPiA+IERvd25sb2FkIHlvdXIgRlJFRSBjb3B5IG9mIFNwbHVuayBub3cgPj4g
-aHR0cDovL2dldC5zcGx1bmsuY29tLwo+ID4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX18KPiA+IEJsdWV6LWRldmVsIG1haWxpbmcgbGlzdAo+ID4gQmx1ZXot
-ZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cj4gPiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdl
-Lm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo+ID4KPgo+Cj4gLS0KPiBJbXBvc3NpYmxl
-Cj4gaXRzZWxmIGNvbnRhaW4KPiBJIE0gUG9zc2libGUKPgo+IFZpa2FzCj4KPiAtLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tCj4gVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBTcGx1bmsgSW5jLgo+
-IFN0aWxsIGdyZXBwaW5nIHRocm91Z2ggbG9nIGZpbGVzIHRvIGZpbmQgcHJvYmxlbXM/ICBTdG9w
-Lgo+IE5vdyBTZWFyY2ggbG9nIGV2ZW50cyBhbmQgY29uZmlndXJhdGlvbiBmaWxlcyB1c2luZyBB
-SkFYIGFuZCBhIGJyb3dzZXIuCj4gRG93bmxvYWQgeW91ciBGUkVFIGNvcHkgb2YgU3BsdW5rIG5v
-dyA+PiBodHRwOi8vZ2V0LnNwbHVuay5jb20vCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX18KPiBCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKPiBCbHVlei1k
-ZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5l
-dC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo+Cj4KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gVGhp
-cyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBTcGx1bmsgSW5jLgo+IFN0aWxsIGdyZXBw
-aW5nIHRocm91Z2ggbG9nIGZpbGVzIHRvIGZpbmQgcHJvYmxlbXM/ICBTdG9wLgo+IE5vdyBTZWFy
-Y2ggbG9nIGV2ZW50cyBhbmQgY29uZmlndXJhdGlvbiBmaWxlcyB1c2luZyBBSkFYIGFuZCBhIGJy
-b3dzZXIuCj4gRG93bmxvYWQgeW91ciBGUkVFIGNvcHkgb2YgU3BsdW5rIG5vdyA+PiBodHRwOi8v
-Z2V0LnNwbHVuay5jb20vCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX18KPiBCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKPiBCbHVlei1kZXZlbEBsaXN0cy5z
-b3VyY2Vmb3JnZS5uZXQKPiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0
-aW5mby9ibHVlei1kZXZlbAo+Cj4KPgo+Cj4gLS0KPiB2b3VzIHBvdXZleiBjb25zdWx0ZXIgbW9u
-IGNhbGVuZHJpZXIgw6AgbCdhZHJlc3NlIHN1aXZhbnRlIDoKPgo+IGh0dHA6Ly93d3cuZ29vZ2xl
-LmNvbS9jYWxlbmRhci9lbWJlZD9zcmM9dHJ0ZjdkNnBtaGNtbnFydWVmYXBrOTJ2a3MlNDBncm91
-cC5jYWxlbmRhci5nb29nbGUuY29tCj4KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gVGhpcyBTRi5uZXQg
-ZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBTcGx1bmsgSW5jLgo+IFN0aWxsIGdyZXBwaW5nIHRocm91
-Z2ggbG9nIGZpbGVzIHRvIGZpbmQgcHJvYmxlbXM/ICBTdG9wLgo+IE5vdyBTZWFyY2ggbG9nIGV2
-ZW50cyBhbmQgY29uZmlndXJhdGlvbiBmaWxlcyB1c2luZyBBSkFYIGFuZCBhIGJyb3dzZXIuCj4g
-RG93bmxvYWQgeW91ciBGUkVFIGNvcHkgb2YgU3BsdW5rIG5vdyA+PiBodHRwOi8vZ2V0LnNwbHVu
-ay5jb20vCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
-PiBCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKPiBCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3Jn
-ZS5uZXQKPiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVl
-ei1kZXZlbAo+Cj4KCgotLSAKdm91cyBwb3V2ZXogY29uc3VsdGVyIG1vbiBjYWxlbmRyaWVyIMOg
-IGwnYWRyZXNzZSBzdWl2YW50ZSA6Cmh0dHA6Ly93d3cuZ29vZ2xlLmNvbS9jYWxlbmRhci9lbWJl
-ZD9zcmM9dHJ0ZjdkNnBtaGNtbnFydWVmYXBrOTJ2a3MlNDBncm91cC5jYWxlbmRhci5nb29nbGUu
-Y29tCg==
-------=_Part_258_16194211.1193734685422
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+------=_NextPart_000_006D_01C81AD3.28C0E150
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-SXQgd2FzIGp1c3QgYSB2ZXJ5IGJhc2ljIG1hbmlwdWxhdGlvbiwgbm90IGEgZGV2ZWxvcG1lbnQu
-IFdoZW4gSSBwYWlyZWQgbXkgY2VsbHBob25lIGFuZCBteSBwYyBmb3IgdGhlIGZpcnN0IHRpbWUs
-IG15IGNlbGxwaG9uZSBhc2tlZCBtZSBpZiBJIHdhbnRlZCB0byB1c2UgdGhlIG90aGVyIGRldmlj
-ZSBhcyBhIGhlYWRzZXQuIEkganVzdCBhbnN3ZXJlZCB5ZXMuIEkgdGhpbmsgdGhlIG5hbWUgb2Yg
-dGhlIHNvZnR3YXJlIHdhcyAmcXVvdDtibHVlc29sZWlsJnF1b3Q7Lgo8YnI+PGJyPlNvcnJ5IEkg
-ZG8gbm90IHJlbWVtYmVyIGV2ZXJ5dGhpbmcsIEkgaGFkIGluc3RhbGxlZCB3aW5kb3dzIGZvciB0
-ZXN0aW5nIHB1cnBvc2Ugb25seSBhbmQgaXQgaXMgbm8gbW9yZSBvbiBteSBtYWNoaW5lLi4uPGJy
-Pjxicj48ZGl2PjxzcGFuIGNsYXNzPSJnbWFpbF9xdW90ZSI+T24gMTAvMzAvMDcsIDxiIGNsYXNz
-PSJnbWFpbF9zZW5kZXJuYW1lIj5QaWVycmUgU2F2YXJ5PC9iPgogJmx0OzxhIGhyZWY9Im1haWx0
-bzpwaWVycmUuc2F2YXJ5QGtlcmxpbmsuZnIiPnBpZXJyZS5zYXZhcnlAa2VybGluay5mcjwvYT4m
-Z3Q7IHdyb3RlOjwvc3Bhbj48YmxvY2txdW90ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJi
-b3JkZXItbGVmdDogMXB4IHNvbGlkIHJnYigyMDQsIDIwNCwgMjA0KTsgbWFyZ2luOiAwcHQgMHB0
-IDBwdCAwLjhleDsgcGFkZGluZy1sZWZ0OiAxZXg7Ij4KCgoKCgoKCgoKPGRpdiBsaW5rPSJibHVl
-IiB2bGluaz0icHVycGxlIiBsYW5nPSJGUiI+Cgo8ZGl2PgoKPHA+PHNwYW4gc3R5bGU9ImZvbnQt
-c2l6ZTogMTFwdDsgY29sb3I6IHJnYigzMSwgNzMsIDEyNSk7IiBsYW5nPSJFTi1VUyI+T2ssIHRo
-YW5rcyBmb3IgeW91ciBpbnRlcmVzdC4gQW5kIHdoYXQgaGF2ZSB5b3UgbWFrZSB1bmRlcgp3aW5k
-b3dzPyBJdCB3YXMganVzdCBhIG1hbmlwdWxhdGlvbiBvciBtb3JlIGRldmVsb3BtZW50PyBJJ20g
-cmVhbGx5IGludGVyZXN0ZWQKYnkgeW91ciB3b3JrLjwvc3Bhbj48L3A+Cgo8cD48c3BhbiBzdHls
-ZT0iZm9udC1zaXplOiAxMXB0OyBjb2xvcjogcmdiKDMxLCA3MywgMTI1KTsiIGxhbmc9IkVOLVVT
-Ij5UaGFua3MgaW4gYWR2YW5jZTwvc3Bhbj48L3A+Cgo8cD48c3BhbiBzdHlsZT0iZm9udC1zaXpl
-OiAxMXB0OyBjb2xvcjogcmdiKDMxLCA3MywgMTI1KTsiIGxhbmc9IkVOLVVTIj4mbmJzcDs8L3Nw
-YW4+PC9wPgoKPHA+PHNwYW4gc3R5bGU9ImNvbG9yOiByZ2IoMzEsIDczLCAxMjUpOyI+UGllcnJl
-PC9zcGFuPjxzcGFuIHN0eWxlPSJmb250LXNpemU6IDEwLjVwdDsgZm9udC1mYW1pbHk6IENvbnNv
-bGFzOyBjb2xvcjogcmdiKDMxLCA3MywgMTI1KTsiPjwvc3Bhbj48L3A+Cgo8cD48c3BhbiBzdHls
-ZT0iZm9udC1zaXplOiAxMXB0OyBjb2xvcjogcmdiKDMxLCA3MywgMTI1KTsiPiZuYnNwOzwvc3Bh
-bj48L3A+Cgo8ZGl2IHN0eWxlPSJib3JkZXItc3R5bGU6IHNvbGlkIG5vbmUgbm9uZTsgYm9yZGVy
-LWNvbG9yOiByZ2IoMTgxLCAxOTYsIDIyMykgLW1vei11c2UtdGV4dC1jb2xvciAtbW96LXVzZS10
-ZXh0LWNvbG9yOyBib3JkZXItd2lkdGg6IDFwdCBtZWRpdW0gbWVkaXVtOyBwYWRkaW5nOiAzcHQg
-MGNtIDBjbTsiPgoKPHA+PGI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZTogMTBwdDsiPkRlJm5ic3A7
-Ojwvc3Bhbj48L2I+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZTogMTBwdDsiPgo8YSBocmVmPSJtYWls
-dG86Ymx1ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQiIHRhcmdldD0iX2Js
-YW5rIiBvbmNsaWNrPSJyZXR1cm4gdG9wLmpzLk9wZW5FeHRMaW5rKHdpbmRvdyxldmVudCx0aGlz
-KSI+Ymx1ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQ8L2E+ClttYWlsdG86
-PGEgaHJlZj0ibWFpbHRvOmJsdWV6LWRldmVsLWJvdW5jZXNAbGlzdHMuc291cmNlZm9yZ2UubmV0
-IiB0YXJnZXQ9Il9ibGFuayIgb25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5k
-b3csZXZlbnQsdGhpcykiPmJsdWV6LWRldmVsLWJvdW5jZXNAbGlzdHMuc291cmNlZm9yZ2UubmV0
-PC9hPl0gPGI+RGUgbGEgcGFydCBkZTwvYj4KQ2hyaXN0b3BoZS1NYXJpZSBEdXF1ZXNuZTxicj4K
-PGI+RW52b3nDqSZuYnNwOzo8L2I+IG1hcmRpIDMwIG9jdG9icmUgMjAwNyAwMDozMjxkaXY+PHNw
-YW4gY2xhc3M9ImUiIGlkPSJxXzExNWVmZWNhYmNhYjRlYTZfMSI+PGJyPgo8Yj7DgCZuYnNwOzo8
-L2I+IEJsdWVaIGRldmVsb3BtZW50PGJyPgo8Yj5PYmpldCZuYnNwOzo8L2I+IFJlOiBbQmx1ZXot
-ZGV2ZWxdIEhvdyB0byB1c2UgbXkgUEMgYXMgYSBoZWFkc2V0ID88L3NwYW4+PC9kaXY+PC9zcGFu
-PjwvcD4KCjwvZGl2PjxkaXY+PHNwYW4gY2xhc3M9ImUiIGlkPSJxXzExNWVmZWNhYmNhYjRlYTZf
-MyI+Cgo8cD4mbmJzcDs8L3A+Cgo8cCBzdHlsZT0ibWFyZ2luLWJvdHRvbTogMTJwdDsiPkkgaGF2
-ZSBtYWRlIHRoaXMgd29yayB1bmRlcgp3aW5kb3dzLiBJIGRvIG5vdCBrbm93IGlmIGl0IGlzIHBv
-c3NpYmxlIHVuZGVyIGxpbnV4LiBJIHRoaW5rIHlvdSBoYXZlIHRvIHVzZQphMmRwLCBidXQgSSBk
-byBub3Qga25vdyBob3cuLi48L3A+Cgo8ZGl2PgoKPHA+PHNwYW4+T24gMTAvMjkvMDcsIDxiPlBp
-ZXJyZSBTYXZhcnkgPC9iPiZsdDs8YSBocmVmPSJtYWlsdG86cGllcnJlLnNhdmFyeUBrZXJsaW5r
-LmZyIiB0YXJnZXQ9Il9ibGFuayIgb25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3
-aW5kb3csZXZlbnQsdGhpcykiPnBpZXJyZS5zYXZhcnlAa2VybGluay5mcjwvYT4mZ3Q7IHdyb3Rl
-Ojwvc3Bhbj48L3A+Cgo8cD5JIHdhbnQgdXNlIG15IFBDIGFzIGEgSEVBRFNFVCBvciBiZXR0ZXIg
-YXMgYSBoYW5kc2ZyZWUgYW5kCndoeSBub3Qgd2l0aCBhMmRwPGJyPgouLi4gSW4gZmFjdCBJIHdh
-bnQgdXNlIG15IFBDIHRvIGxpc3RlbiB0aGUgTVAzIHdoaWNoIGFyZSBvbiBteSBwaG9uZSwgb3Ig
-dXNlPGJyPgp0aGUgUEMgZm9yIGNvbW11bmljYXRpb24sIGluIGZhY3QgbGlrZSBhIGhlYWRzZXQg
-Li4uPGJyPgo8YnI+ClRoYW5rcyBmb3IgeW91ciBpbnRlcmVzdCA8YnI+Cjxicj4KUGllcnJlPGJy
-Pgo8YnI+Ci0tLS0tTWVzc2FnZSBkJiMzOTtvcmlnaW5lLS0tLS08YnI+CkRlOiA8YSBocmVmPSJt
-YWlsdG86Ymx1ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQiIHRhcmdldD0i
-X2JsYW5rIiBvbmNsaWNrPSJyZXR1cm4gdG9wLmpzLk9wZW5FeHRMaW5rKHdpbmRvdyxldmVudCx0
-aGlzKSI+Ymx1ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQ8L2E+PGJyPgpb
-bWFpbHRvOjxhIGhyZWY9Im1haWx0bzpibHVlei1kZXZlbC1ib3VuY2VzQGxpc3RzLnNvdXJjZWZv
-cmdlLm5ldCIgdGFyZ2V0PSJfYmxhbmsiIG9uY2xpY2s9InJldHVybiB0b3AuanMuT3BlbkV4dExp
-bmsod2luZG93LGV2ZW50LHRoaXMpIj4KYmx1ZXotZGV2ZWwtYm91bmNlc0BsaXN0cy5zb3VyY2Vm
-b3JnZS5uZXQ8L2E+XSBEZSBsYSBwYXJ0IGRlIFZpa2FzIFNpbmhhPGJyPgpFbnZvecOpOiBsdW5k
-aSAyOSBvY3RvYnJlIDIwMDcgMTc6MDU8YnI+CsOAOiBCbHVlWiBkZXZlbG9wbWVudDxicj4KT2Jq
-ZXQ6IFJlOiBbQmx1ZXotZGV2ZWxdIEhvdyB0byB1c2UgbXkgUEMgYXMgYSBoZWFkc2V0ID88YnI+
-Cjxicj4KaGk8YnI+CmNhbiB1IGV4cGxhaW4gd2hhdCBhbGwgZnVuY3Rpb25hbGl0eSB1IHIgbG9v
-a2luZy4gPGJyPgo8YnI+CnRvIGp1c3Qgc2VuZCBvciByZWNlaXZlJm5ic3A7Jm5ic3A7dSBuZWVk
-IHRvIGhhdmUgb2JleCBsaWJyYXJpZXMgLjxicj4KPGJyPgppZiB1IG5lZWQgdG8gdXNlIHNvY2tl
-dCBjb21tdW5pY2F0aW9ucyB1IGNhbiB1c2UgcmZjb21tIHNlcnZpY2VzLjxicj4KPGJyPgo8YnI+
-Ck9uIDEwLzMwLzA3LCBQaWVycmUgU2F2YXJ5ICZsdDs8YSBocmVmPSJtYWlsdG86cGllcnJlLnNh
-dmFyeUBrZXJsaW5rLmZyIiB0YXJnZXQ9Il9ibGFuayIgb25jbGljaz0icmV0dXJuIHRvcC5qcy5P
-cGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiPgpwaWVycmUuc2F2YXJ5QGtlcmxpbmsuZnI8
-L2E+Jmd0OyB3cm90ZTo8YnI+CiZndDsgSGksPGJyPgomZ3Q7Jm5ic3A7Jm5ic3A7Li4uIG15IHF1
-ZXN0aW9uIGlzIG9uIHRoZSBzdWJqZWN0LCBTbyBJIHdhbnQgdG8gdXNlIG15IFBDIHdpdGgKbXkg
-cGhvbmU8YnI+CmFzPGJyPgomZ3Q7IGEgaGVhZHNldC4gSWYgc28sIHdoYXQgbXVzdCBJIG1ha2Ug
-Zm9yIHVzZSBpdD88YnI+CiZndDsgVGhhbmtzIGluIGFkdmFuY2UuPGJyPgomZ3Q7IFJlZ2FyZHM8
-YnI+CiZndDs8YnI+CiZndDsgUGllcnJlPGJyPgomZ3Q7PGJyPgomZ3Q7PGJyPgomZ3Q7IC0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS08YnI+CiZndDsgVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBT
-cGx1bmsgSW5jLjxicj4KJmd0OyBTdGlsbCBncmVwcGluZyB0aHJvdWdoIGxvZyBmaWxlcyB0byBm
-aW5kIHByb2JsZW1zPyZuYnNwOyZuYnNwO1N0b3AuIDxicj4KJmd0OyBOb3cgU2VhcmNoIGxvZyBl
-dmVudHMgYW5kIGNvbmZpZ3VyYXRpb24gZmlsZXMgdXNpbmcgQUpBWCBhbmQgYSBicm93c2VyLjxi
-cj4KJmd0OyBEb3dubG9hZCB5b3VyIEZSRUUgY29weSBvZiBTcGx1bmsgbm93ICZndDsmZ3Q7IDxh
-IGhyZWY9Imh0dHA6Ly9nZXQuc3BsdW5rLmNvbS8iIHRhcmdldD0iX2JsYW5rIiBvbmNsaWNrPSJy
-ZXR1cm4gdG9wLmpzLk9wZW5FeHRMaW5rKHdpbmRvdyxldmVudCx0aGlzKSI+aHR0cDovL2dldC5z
-cGx1bmsuY29tLzwvYT48YnI+CiZndDsgX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX18gPGJyPgomZ3Q7IEJsdWV6LWRldmVsIG1haWxpbmcgbGlzdDxicj4KJmd0
-OyA8YSBocmVmPSJtYWlsdG86Qmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0IiB0YXJn
-ZXQ9Il9ibGFuayIgb25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5kb3csZXZl
-bnQsdGhpcykiPkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldDwvYT48YnI+CiZndDsg
-PGEgaHJlZj0iaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1
-ZXotZGV2ZWwiIHRhcmdldD0iX2JsYW5rIiBvbmNsaWNrPSJyZXR1cm4gdG9wLmpzLk9wZW5FeHRM
-aW5rKHdpbmRvdyxldmVudCx0aGlzKSI+aHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlz
-dHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwKPC9hPjxicj4KJmd0Ozxicj4KPGJyPgo8YnI+Ci0tPGJy
-PgpJbXBvc3NpYmxlPGJyPgppdHNlbGYgY29udGFpbjxicj4KSSBNIFBvc3NpYmxlPGJyPgo8YnI+
-ClZpa2FzPGJyPgo8YnI+Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS08YnI+ClRoaXMgU0YubmV0IGVtYWlsIGlz
-IHNwb25zb3JlZCBieTogU3BsdW5rIEluYy48YnI+ClN0aWxsIGdyZXBwaW5nIHRocm91Z2ggbG9n
-IGZpbGVzIHRvIGZpbmQgcHJvYmxlbXM/Jm5ic3A7Jm5ic3A7U3RvcC48YnI+Ck5vdyBTZWFyY2gg
-bG9nIGV2ZW50cyBhbmQgY29uZmlndXJhdGlvbiBmaWxlcyB1c2luZyBBSkFYIGFuZCBhIGJyb3dz
-ZXIuPGJyPgpEb3dubG9hZCB5b3VyIEZSRUUgY29weSBvZiBTcGx1bmsgbm93ICZndDsmZ3Q7IDxh
-IGhyZWY9Imh0dHA6Ly9nZXQuc3BsdW5rLmNvbS8iIHRhcmdldD0iX2JsYW5rIiBvbmNsaWNrPSJy
-ZXR1cm4gdG9wLmpzLk9wZW5FeHRMaW5rKHdpbmRvdyxldmVudCx0aGlzKSI+aHR0cDovL2dldC5z
-cGx1bmsuY29tLwo8L2E+PGJyPgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fXzxicj4KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0PGJyPgo8YSBocmVmPSJtYWls
-dG86Qmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0IiB0YXJnZXQ9Il9ibGFuayIgb25j
-bGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiPkJsdWV6
-LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldDwvYT48YnI+CjxhIGhyZWY9Imh0dHBzOi8vbGlz
-dHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsIiB0YXJnZXQ9Il9i
-bGFuayIgb25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhp
-cykiPmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRl
-dmVsPC9hPjxicj4KPGJyPgo8YnI+Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS08YnI+ClRoaXMgU0YubmV0IGVt
-YWlsIGlzIHNwb25zb3JlZCBieTogU3BsdW5rIEluYy48YnI+ClN0aWxsIGdyZXBwaW5nIHRocm91
-Z2ggbG9nIGZpbGVzIHRvIGZpbmQgcHJvYmxlbXM/Jm5ic3A7Jm5ic3A7U3RvcC4gPGJyPgpOb3cg
-U2VhcmNoIGxvZyBldmVudHMgYW5kIGNvbmZpZ3VyYXRpb24gZmlsZXMgdXNpbmcgQUpBWCBhbmQg
-YSBicm93c2VyLjxicj4KRG93bmxvYWQgeW91ciBGUkVFIGNvcHkgb2YgU3BsdW5rIG5vdyAmZ3Q7
-Jmd0OyA8YSBocmVmPSJodHRwOi8vZ2V0LnNwbHVuay5jb20vIiB0YXJnZXQ9Il9ibGFuayIgb25j
-bGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiPmh0dHA6
-Ly9nZXQuc3BsdW5rLmNvbS88L2E+PGJyPgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXyA8YnI+CkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdDxicj4KPGEgaHJl
-Zj0ibWFpbHRvOkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldCIgdGFyZ2V0PSJfYmxh
-bmsiIG9uY2xpY2s9InJldHVybiB0b3AuanMuT3BlbkV4dExpbmsod2luZG93LGV2ZW50LHRoaXMp
-Ij5CbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQ8L2E+PGJyPgo8YSBocmVmPSJodHRw
-czovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbCIgdGFy
-Z2V0PSJfYmxhbmsiIG9uY2xpY2s9InJldHVybiB0b3AuanMuT3BlbkV4dExpbmsod2luZG93LGV2
-ZW50LHRoaXMpIj5odHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9i
-bHVlei1kZXZlbAo8L2E+PC9wPgoKPC9kaXY+Cgo8cD48YnI+CjxiciBjbGVhcj0iYWxsIj4KPGJy
-PgotLSA8YnI+CnZvdXMgcG91dmV6IGNvbnN1bHRlciBtb24gY2FsZW5kcmllciDDoCBsJiMzOTth
-ZHJlc3NlIHN1aXZhbnRlIDo8YnI+CjxhIGhyZWY9Imh0dHA6Ly93d3cuZ29vZ2xlLmNvbS9jYWxl
-bmRhci9lbWJlZD9zcmM9dHJ0ZjdkNnBtaGNtbnFydWVmYXBrOTJ2a3MlNDBncm91cC5jYWxlbmRh
-ci5nb29nbGUuY29tIiB0YXJnZXQ9Il9ibGFuayIgb25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVu
-RXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiPmh0dHA6Ly93d3cuZ29vZ2xlLmNvbS9jYWxlbmRh
-ci9lbWJlZD9zcmM9dHJ0ZjdkNnBtaGNtbnFydWVmYXBrOTJ2a3MlNDBncm91cC5jYWxlbmRhci5n
-b29nbGUuY29tCjwvYT4KPC9wPgoKPC9zcGFuPjwvZGl2PjwvZGl2PgoKPC9kaXY+CgoKPGJyPi0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS08YnI+VGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBTcGx1
-bmsgSW5jLjxicj5TdGlsbCBncmVwcGluZyB0aHJvdWdoIGxvZyBmaWxlcyB0byBmaW5kIHByb2Js
-ZW1zPyAmbmJzcDtTdG9wLjxicj5Ob3cgU2VhcmNoIGxvZyBldmVudHMgYW5kIGNvbmZpZ3VyYXRp
-b24gZmlsZXMgdXNpbmcgQUpBWCBhbmQgYSBicm93c2VyLgo8YnI+RG93bmxvYWQgeW91ciBGUkVF
-IGNvcHkgb2YgU3BsdW5rIG5vdyAmZ3Q7Jmd0OyA8YSBvbmNsaWNrPSJyZXR1cm4gdG9wLmpzLk9w
-ZW5FeHRMaW5rKHdpbmRvdyxldmVudCx0aGlzKSIgaHJlZj0iaHR0cDovL2dldC5zcGx1bmsuY29t
-LyIgdGFyZ2V0PSJfYmxhbmsiPmh0dHA6Ly9nZXQuc3BsdW5rLmNvbS88L2E+PGJyPl9fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCjxicj5CbHVlei1kZXZlbCBt
-YWlsaW5nIGxpc3Q8YnI+PGEgb25jbGljaz0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5k
-b3csZXZlbnQsdGhpcykiIGhyZWY9Im1haWx0bzpCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3Jn
-ZS5uZXQiPkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldDwvYT48YnI+PGEgb25jbGlj
-az0icmV0dXJuIHRvcC5qcy5PcGVuRXh0TGluayh3aW5kb3csZXZlbnQsdGhpcykiIGhyZWY9Imh0
-dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsIiB0
-YXJnZXQ9Il9ibGFuayI+Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3Rp
-bmZvL2JsdWV6LWRldmVsPC9hPjxicj48YnI+PC9ibG9ja3F1b3RlPjwvZGl2Pjxicj48YnIgY2xl
-YXI9ImFsbCI+PGJyPi0tIDxicj52b3VzIHBvdXZleiBjb25zdWx0ZXIgbW9uIGNhbGVuZHJpZXIg
-w6AgbCYjMzk7YWRyZXNzZSBzdWl2YW50ZSA6PGJyPjxhIGhyZWY9Imh0dHA6Ly93d3cuZ29vZ2xl
-LmNvbS9jYWxlbmRhci9lbWJlZD9zcmM9dHJ0ZjdkNnBtaGNtbnFydWVmYXBrOTJ2a3MlNDBncm91
-cC5jYWxlbmRhci5nb29nbGUuY29tIj4KaHR0cDovL3d3dy5nb29nbGUuY29tL2NhbGVuZGFyL2Vt
-YmVkP3NyYz10cnRmN2Q2cG1oY21ucXJ1ZWZhcGs5MnZrcyU0MGdyb3VwLmNhbGVuZGFyLmdvb2ds
-ZS5jb208L2E+Cg==
-------=_Part_258_16194211.1193734685422--
+Ok, thanks for your interest. And what have you make under windows? It =
+was just a manipulation or more development? I=E2=80=99m really =
+interested by your work.
+
+Thanks in advance
+
+=20
+
+Pierre
+
+=20
+
+De : bluez-devel-bounces@lists.sourceforge.net =
+[mailto:bluez-devel-bounces@lists.sourceforge.net] De la part de =
+Christophe-Marie Duquesne
+Envoy=C3=A9 : mardi 30 octobre 2007 00:32
+=C3=80 : BlueZ development
+Objet : Re: [Bluez-devel] How to use my PC as a headset ?
+
+=20
+
+I have made this work under windows. I do not know if it is possible =
+under linux. I think you have to use a2dp, but I do not know how...
+
+On 10/29/07, Pierre Savary <pierre.savary@kerlink.fr> wrote:
+
+I want use my PC as a HEADSET or better as a handsfree and why not with =
+a2dp
+... In fact I want use my PC to listen the MP3 which are on my phone, or =
+use
+the PC for communication, in fact like a headset ...
+
+Thanks for your interest=20
+
+Pierre
+
+-----Message d'origine-----
+De: bluez-devel-bounces@lists.sourceforge.net
+[mailto: <mailto:bluez-devel-bounces@lists.sourceforge.net>  =
+bluez-devel-bounces@lists.sourceforge.net] De la part de Vikas Sinha
+Envoy=C3=A9: lundi 29 octobre 2007 17:05
+=C3=80: BlueZ development
+Objet: Re: [Bluez-devel] How to use my PC as a headset ?
+
+hi
+can u explain what all functionality u r looking.=20
+
+to just send or receive  u need to have obex libraries .
+
+if u need to use socket communications u can use rfcomm services.
 
 
---===============0000556059==
+On 10/30/07, Pierre Savary < <mailto:pierre.savary@kerlink.fr>  =
+pierre.savary@kerlink.fr> wrote:
+> Hi,
+>  ... my question is on the subject, So I want to use my PC with my =
+phone
+as
+> a headset. If so, what must I make for use it?
+> Thanks in advance.
+> Regards
+>
+> Pierre
+>
+>
+> =
+-------------------------------------------------------------------------=
+
+> This SF.net email is sponsored by: Splunk Inc.
+> Still grepping through log files to find problems?  Stop.=20
+> Now Search log events and configuration files using AJAX and a =
+browser.
+> Download your FREE copy of Splunk now >> http://get.splunk.com/
+> _______________________________________________=20
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel=20
+>
+
+
+--
+Impossible
+itself contain
+I M Possible
+
+Vikas
+
+-------------------------------------------------------------------------=
+
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >> http://get.splunk.com/=20
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+
+-------------------------------------------------------------------------=
+
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.=20
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >> http://get.splunk.com/
+_______________________________________________=20
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel=20
+
+
+
+
+--=20
+vous pouvez consulter mon calendrier =C3=A0 l'adresse suivante :
+http://www.google.com/calendar/embed?src=3Dtrtf7d6pmhcmnqruefapk92vks%40g=
+roup.calendar.google.com=20
+
+
+------=_NextPart_000_006D_01C81AD3.28C0E150
+Content-Type: text/html;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" =
+xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
+xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" =
+xmlns=3D"http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=3DContent-Type content=3D"text/html; charset=3Dutf-8">
+<meta name=3DGenerator content=3D"Microsoft Word 12 (filtered medium)">
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:Tahoma;
+	panose-1:2 11 6 4 3 5 4 4 2 4;}
+@font-face
+	{font-family:Consolas;
+	panose-1:2 11 6 9 2 2 4 3 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman","serif";}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:purple;
+	text-decoration:underline;}
+span.gmailquote
+	{mso-style-name:gmail_quote;}
+span.EmailStyle18
+	{mso-style-type:personal-reply;
+	font-family:"Calibri","sans-serif";
+	color:#1F497D;}
+.MsoChpDefault
+	{mso-style-type:export-only;}
+@page Section1
+	{size:612.0pt 792.0pt;
+	margin:70.85pt 70.85pt 70.85pt 70.85pt;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+<!--[if gte mso 9]><xml>
+ <o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <o:shapelayout v:ext=3D"edit">
+  <o:idmap v:ext=3D"edit" data=3D"1" />
+ </o:shapelayout></xml><![endif]-->
+</head>
+
+<body lang=3DFR link=3Dblue vlink=3Dpurple>
+
+<div class=3DSection1>
+
+<p class=3DMsoNormal><span lang=3DEN-US =
+style=3D'font-size:11.0pt;font-family:"Calibri","sans-serif";
+color:#1F497D'>Ok, thanks for your interest. And what have you make =
+under
+windows? It was just a manipulation or more development? I=E2=80=99m =
+really interested
+by your work.<o:p></o:p></span></p>
+
+<p class=3DMsoNormal><span lang=3DEN-US =
+style=3D'font-size:11.0pt;font-family:"Calibri","sans-serif";
+color:#1F497D'>Thanks in advance<o:p></o:p></span></p>
+
+<p class=3DMsoNormal><span lang=3DEN-US =
+style=3D'font-size:11.0pt;font-family:"Calibri","sans-serif";
+color:#1F497D'><o:p>&nbsp;</o:p></span></p>
+
+<p class=3DMsoNormal><span style=3D'color:#1F497D'>Pierre</span><span
+style=3D'font-size:10.5pt;font-family:Consolas;color:#1F497D'><o:p></o:p>=
+</span></p>
+
+<p class=3DMsoNormal><span =
+style=3D'font-size:11.0pt;font-family:"Calibri","sans-serif";
+color:#1F497D'><o:p>&nbsp;</o:p></span></p>
+
+<div style=3D'border:none;border-top:solid #B5C4DF 1.0pt;padding:3.0pt =
+0cm 0cm 0cm'>
+
+<p class=3DMsoNormal><b><span =
+style=3D'font-size:10.0pt;font-family:"Tahoma","sans-serif"'>De&nbsp;:</s=
+pan></b><span
+style=3D'font-size:10.0pt;font-family:"Tahoma","sans-serif"'>
+bluez-devel-bounces@lists.sourceforge.net
+[mailto:bluez-devel-bounces@lists.sourceforge.net] <b>De la part de</b>
+Christophe-Marie Duquesne<br>
+<b>Envoy=C3=A9&nbsp;:</b> mardi 30 octobre 2007 00:32<br>
+<b>=C3=80&nbsp;:</b> BlueZ development<br>
+<b>Objet&nbsp;:</b> Re: [Bluez-devel] How to use my PC as a headset =
+?<o:p></o:p></span></p>
+
+</div>
+
+<p class=3DMsoNormal><o:p>&nbsp;</o:p></p>
+
+<p class=3DMsoNormal style=3D'margin-bottom:12.0pt'>I have made this =
+work under
+windows. I do not know if it is possible under linux. I think you have =
+to use
+a2dp, but I do not know how...<o:p></o:p></p>
+
+<div>
+
+<p class=3DMsoNormal><span class=3Dgmailquote>On 10/29/07, <b>Pierre =
+Savary </b>&lt;<a
+href=3D"mailto:pierre.savary@kerlink.fr">pierre.savary@kerlink.fr</a>&gt;=
+ wrote:</span><o:p></o:p></p>
+
+<p class=3DMsoNormal>I want use my PC as a HEADSET or better as a =
+handsfree and
+why not with a2dp<br>
+... In fact I want use my PC to listen the MP3 which are on my phone, or =
+use<br>
+the PC for communication, in fact like a headset ...<br>
+<br>
+Thanks for your interest <br>
+<br>
+Pierre<br>
+<br>
+-----Message d'origine-----<br>
+De: <a =
+href=3D"mailto:bluez-devel-bounces@lists.sourceforge.net">bluez-devel-bou=
+nces@lists.sourceforge.net</a><br>
+[mailto:<a href=3D"mailto:bluez-devel-bounces@lists.sourceforge.net">
+bluez-devel-bounces@lists.sourceforge.net</a>] De la part de Vikas =
+Sinha<br>
+Envoy=C3=A9: lundi 29 octobre 2007 17:05<br>
+=C3=80: BlueZ development<br>
+Objet: Re: [Bluez-devel] How to use my PC as a headset ?<br>
+<br>
+hi<br>
+can u explain what all functionality u r looking. <br>
+<br>
+to just send or receive&nbsp;&nbsp;u need to have obex libraries .<br>
+<br>
+if u need to use socket communications u can use rfcomm services.<br>
+<br>
+<br>
+On 10/30/07, Pierre Savary &lt;<a =
+href=3D"mailto:pierre.savary@kerlink.fr">
+pierre.savary@kerlink.fr</a>&gt; wrote:<br>
+&gt; Hi,<br>
+&gt;&nbsp;&nbsp;... my question is on the subject, So I want to use my =
+PC with
+my phone<br>
+as<br>
+&gt; a headset. If so, what must I make for use it?<br>
+&gt; Thanks in advance.<br>
+&gt; Regards<br>
+&gt;<br>
+&gt; Pierre<br>
+&gt;<br>
+&gt;<br>
+&gt; =
+-------------------------------------------------------------------------=
+<br>
+&gt; This SF.net email is sponsored by: Splunk Inc.<br>
+&gt; Still grepping through log files to find problems?&nbsp;&nbsp;Stop. =
+<br>
+&gt; Now Search log events and configuration files using AJAX and a =
+browser.<br>
+&gt; Download your FREE copy of Splunk now &gt;&gt; <a
+href=3D"http://get.splunk.com/">http://get.splunk.com/</a><br>
+&gt; _______________________________________________ <br>
+&gt; Bluez-devel mailing list<br>
+&gt; <a =
+href=3D"mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourc=
+eforge.net</a><br>
+&gt; <a =
+href=3D"https://lists.sourceforge.net/lists/listinfo/bluez-devel">https:/=
+/lists.sourceforge.net/lists/listinfo/bluez-devel
+</a><br>
+&gt;<br>
+<br>
+<br>
+--<br>
+Impossible<br>
+itself contain<br>
+I M Possible<br>
+<br>
+Vikas<br>
+<br>
+-------------------------------------------------------------------------=
+<br>
+This SF.net email is sponsored by: Splunk Inc.<br>
+Still grepping through log files to find problems?&nbsp;&nbsp;Stop.<br>
+Now Search log events and configuration files using AJAX and a =
+browser.<br>
+Download your FREE copy of Splunk now &gt;&gt; <a =
+href=3D"http://get.splunk.com/">http://get.splunk.com/
+</a><br>
+_______________________________________________<br>
+Bluez-devel mailing list<br>
+<a =
+href=3D"mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourc=
+eforge.net</a><br>
+<a =
+href=3D"https://lists.sourceforge.net/lists/listinfo/bluez-devel">https:/=
+/lists.sourceforge.net/lists/listinfo/bluez-devel</a><br>
+<br>
+<br>
+-------------------------------------------------------------------------=
+<br>
+This SF.net email is sponsored by: Splunk Inc.<br>
+Still grepping through log files to find problems?&nbsp;&nbsp;Stop. <br>
+Now Search log events and configuration files using AJAX and a =
+browser.<br>
+Download your FREE copy of Splunk now &gt;&gt; <a =
+href=3D"http://get.splunk.com/">http://get.splunk.com/</a><br>
+_______________________________________________ <br>
+Bluez-devel mailing list<br>
+<a =
+href=3D"mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourc=
+eforge.net</a><br>
+<a =
+href=3D"https://lists.sourceforge.net/lists/listinfo/bluez-devel">https:/=
+/lists.sourceforge.net/lists/listinfo/bluez-devel
+</a><o:p></o:p></p>
+
+</div>
+
+<p class=3DMsoNormal><br>
+<br clear=3Dall>
+<br>
+-- <br>
+vous pouvez consulter mon calendrier =C3=A0 l'adresse suivante :<br>
+<a
+href=3D"http://www.google.com/calendar/embed?src=3Dtrtf7d6pmhcmnqruefapk9=
+2vks%40group.calendar.google.com">http://www.google.com/calendar/embed?sr=
+c=3Dtrtf7d6pmhcmnqruefapk92vks%40group.calendar.google.com</a>
+<o:p></o:p></p>
+
+</div>
+
+</body>
+
+</html>
+
+------=_NextPart_000_006D_01C81AD3.28C0E150--
+
+
+
+--===============1018666005==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -289,7 +422,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============0000556059==
+--===============1018666005==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -300,4 +433,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============0000556059==--
+--===============1018666005==--
