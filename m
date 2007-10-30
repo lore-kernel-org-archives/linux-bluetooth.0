@@ -1,9 +1,9 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <8ccc3510710300713v4de9781al17edbb4eda8612cd@mail.gmail.com>
-Date: Tue, 30 Oct 2007 15:13:36 +0100
-From: "Christophe-Marie Duquesne" <chm.duquesne@gmail.com>
+Message-ID: <d89ddf300710300436k16ef12aaqca06ec036a30518c@mail.gmail.com>
+Date: Tue, 30 Oct 2007 05:36:26 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <d89ddf300710300436k16ef12aaqca06ec036a30518c@mail.gmail.com>
+In-Reply-To: <8ccc3510710300158k292ac545i312ccb4b1934656b@mail.gmail.com>
 MIME-Version: 1.0
 References: <7947815319360230880@unknownmsgid>
 	<1ab01fb50710290904w1b703da1p1a834f514e24ce71@mail.gmail.com>
@@ -11,7 +11,6 @@ References: <7947815319360230880@unknownmsgid>
 	<8ccc3510710291631h638601c3q2901b27e993eab@mail.gmail.com>
 	<3176486627050719742@unknownmsgid>
 	<8ccc3510710300158k292ac545i312ccb4b1934656b@mail.gmail.com>
-	<d89ddf300710300436k16ef12aaqca06ec036a30518c@mail.gmail.com>
 Subject: Re: [Bluez-devel] How to use my PC as a headset ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,111 +21,33 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1877637447=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1877637447==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_1460_18218299.1193753616105"
+fwiw
 
-------=_Part_1460_18218299.1193753616105
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+if you build the old btsco project, you'll get an app "a2recv" that
+can listen for an a2dp stream from a cellphone. This one thing hasn't
+been rewritten inside bluez.
 
-SSBoYWQgbm90IHRob3VnaHQgYWJvdXQgZ2FtbXUuIEkgaGF2ZSB0aGUgbGF0ZXN0IHN0YWJsZSB2
-ZXJzaW9ucyBvZgpnYW1tdSt3YW1tdSBvbiBteSB1YnVudHUsIGFuZCBJIHRoaW5rIGl0IGlzIHN0
-aWxsIG5vdCBwb3NzaWJsZSB0byB1c2UgaXQKdGhhdCB3YXkuLi4KCk9uIDEwLzMwLzA3LCBCcmFk
-IE1pZGdsZXkgPGJtaWRnbGV5QGdtYWlsLmNvbT4gd3JvdGU6Cj4KPiBmd2l3Cj4KPiBpZiB5b3Ug
-YnVpbGQgdGhlIG9sZCBidHNjbyBwcm9qZWN0LCB5b3UnbGwgZ2V0IGFuIGFwcCAiYTJyZWN2IiB0
-aGF0Cj4gY2FuIGxpc3RlbiBmb3IgYW4gYTJkcCBzdHJlYW0gZnJvbSBhIGNlbGxwaG9uZS4gVGhp
-cyBvbmUgdGhpbmcgaGFzbid0Cj4gYmVlbiByZXdyaXR0ZW4gaW5zaWRlIGJsdWV6Lgo+Cj4gYXMg
-ZmFyIGFzIHZvaWNlIGhlYWRzZXQsIEkgdXNlZCB0byBwb2ludCBwZW9wbGUgdG8gZ2FtbXUub3Jn
-LCBidXQgSQo+IGNhbid0IGZpZ3VyZSBvdXQgaWYgdGhleSBhcmUgc3RpbGwgdHJ5aW5nIHRvIGRv
-IHZvaWNlIG9yIG5vdC4KPgo+IEJyYWQKPgo+ID4gPiBJIHdhbnQgdXNlIG15IFBDIGFzIGEgSEVB
-RFNFVCBvciBiZXR0ZXIgYXMgYSBoYW5kc2ZyZWUgYW5kIHdoeSBub3QKPiB3aXRoCj4gPiBhMmRw
-Cj4gPiA+IC4uLiBJbiBmYWN0IEkgd2FudCB1c2UgbXkgUEMgdG8gbGlzdGVuIHRoZSBNUDMgd2hp
-Y2ggYXJlIG9uIG15IHBob25lLAo+IG9yCj4gPiB1c2UKPiA+ID4gdGhlIFBDIGZvciBjb21tdW5p
-Y2F0aW9uLCBpbiBmYWN0IGxpa2UgYSBoZWFkc2V0IC4uLgo+Cj4gLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+
-IFRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogU3BsdW5rIEluYy4KPiBTdGlsbCBn
-cmVwcGluZyB0aHJvdWdoIGxvZyBmaWxlcyB0byBmaW5kIHByb2JsZW1zPyAgU3RvcC4KPiBOb3cg
-U2VhcmNoIGxvZyBldmVudHMgYW5kIGNvbmZpZ3VyYXRpb24gZmlsZXMgdXNpbmcgQUpBWCBhbmQg
-YSBicm93c2VyLgo+IERvd25sb2FkIHlvdXIgRlJFRSBjb3B5IG9mIFNwbHVuayBub3cgPj4gaHR0
-cDovL2dldC5zcGx1bmsuY29tLwo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fCj4gQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0Cj4gQmx1ZXotZGV2ZWxAbGlz
-dHMuc291cmNlZm9yZ2UubmV0Cj4gaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMv
-bGlzdGluZm8vYmx1ZXotZGV2ZWwKPgoKCgotLSAKdm91cyBwb3V2ZXogY29uc3VsdGVyIG1vbiBj
-YWxlbmRyaWVyIMOgIGwnYWRyZXNzZSBzdWl2YW50ZSA6Cmh0dHA6Ly93d3cuZ29vZ2xlLmNvbS9j
-YWxlbmRhci9lbWJlZD9zcmM9dHJ0ZjdkNnBtaGNtbnFydWVmYXBrOTJ2a3MlNDBncm91cC5jYWxl
-bmRhci5nb29nbGUuY29tCg==
-------=_Part_1460_18218299.1193753616105
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+as far as voice headset, I used to point people to gammu.org, but I
+can't figure out if they are still trying to do voice or not.
 
-SSBoYWQgbm90IHRob3VnaHQgYWJvdXQgZ2FtbXUuIEkgaGF2ZSB0aGUgbGF0ZXN0IHN0YWJsZSB2
-ZXJzaW9ucyBvZiBnYW1tdSt3YW1tdSBvbiBteSB1YnVudHUsIGFuZCBJIHRoaW5rIGl0IGlzIHN0
-aWxsIG5vdCBwb3NzaWJsZSB0byB1c2UgaXQgdGhhdCB3YXkuLi48YnI+PGJyPjxkaXY+PHNwYW4g
-Y2xhc3M9ImdtYWlsX3F1b3RlIj5PbiAxMC8zMC8wNywgPGIgY2xhc3M9ImdtYWlsX3NlbmRlcm5h
-bWUiPgpCcmFkIE1pZGdsZXk8L2I+ICZsdDs8YSBocmVmPSJtYWlsdG86Ym1pZGdsZXlAZ21haWwu
-Y29tIj5ibWlkZ2xleUBnbWFpbC5jb208L2E+Jmd0OyB3cm90ZTo8L3NwYW4+PGJsb2NrcXVvdGUg
-Y2xhc3M9ImdtYWlsX3F1b3RlIiBzdHlsZT0iYm9yZGVyLWxlZnQ6IDFweCBzb2xpZCByZ2IoMjA0
-LCAyMDQsIDIwNCk7IG1hcmdpbjogMHB0IDBwdCAwcHQgMC44ZXg7IHBhZGRpbmctbGVmdDogMWV4
-OyI+CmZ3aXc8YnI+PGJyPmlmIHlvdSBidWlsZCB0aGUgb2xkIGJ0c2NvIHByb2plY3QsIHlvdSYj
-Mzk7bGwgZ2V0IGFuIGFwcCAmcXVvdDthMnJlY3YmcXVvdDsgdGhhdDxicj5jYW4gbGlzdGVuIGZv
-ciBhbiBhMmRwIHN0cmVhbSBmcm9tIGEgY2VsbHBob25lLiBUaGlzIG9uZSB0aGluZyBoYXNuJiMz
-OTt0PGJyPmJlZW4gcmV3cml0dGVuIGluc2lkZSBibHVlei48YnI+PGJyPmFzIGZhciBhcyB2b2lj
-ZSBoZWFkc2V0LCBJIHVzZWQgdG8gcG9pbnQgcGVvcGxlIHRvIAo8YSBocmVmPSJodHRwOi8vZ2Ft
-bXUub3JnIj5nYW1tdS5vcmc8L2E+LCBidXQgSTxicj5jYW4mIzM5O3QgZmlndXJlIG91dCBpZiB0
-aGV5IGFyZSBzdGlsbCB0cnlpbmcgdG8gZG8gdm9pY2Ugb3Igbm90Ljxicj48YnI+QnJhZDxicj48
-YnI+Jmd0OyAmZ3Q7IEkgd2FudCB1c2UgbXkgUEMgYXMgYSBIRUFEU0VUIG9yIGJldHRlciBhcyBh
-IGhhbmRzZnJlZSBhbmQgd2h5IG5vdCB3aXRoPGJyPgomZ3Q7IGEyZHA8YnI+Jmd0OyAmZ3Q7IC4u
-LiBJbiBmYWN0IEkgd2FudCB1c2UgbXkgUEMgdG8gbGlzdGVuIHRoZSBNUDMgd2hpY2ggYXJlIG9u
-IG15IHBob25lLCBvcjxicj4mZ3Q7IHVzZTxicj4mZ3Q7ICZndDsgdGhlIFBDIGZvciBjb21tdW5p
-Y2F0aW9uLCBpbiBmYWN0IGxpa2UgYSBoZWFkc2V0IC4uLjxicj48YnI+LS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LQo8YnI+VGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBTcGx1bmsgSW5jLjxicj5T
-dGlsbCBncmVwcGluZyB0aHJvdWdoIGxvZyBmaWxlcyB0byBmaW5kIHByb2JsZW1zPyZuYnNwOyZu
-YnNwO1N0b3AuPGJyPk5vdyBTZWFyY2ggbG9nIGV2ZW50cyBhbmQgY29uZmlndXJhdGlvbiBmaWxl
-cyB1c2luZyBBSkFYIGFuZCBhIGJyb3dzZXIuPGJyPkRvd25sb2FkIHlvdXIgRlJFRSBjb3B5IG9m
-IFNwbHVuayBub3cgJmd0OyZndDsgCjxhIGhyZWY9Imh0dHA6Ly9nZXQuc3BsdW5rLmNvbS8iPmh0
-dHA6Ly9nZXQuc3BsdW5rLmNvbS88L2E+PGJyPl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fPGJyPkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdDxicj48YSBocmVm
-PSJtYWlsdG86Qmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Ij5CbHVlei1kZXZlbEBs
-aXN0cy5zb3VyY2Vmb3JnZS5uZXQKPC9hPjxicj48YSBocmVmPSJodHRwczovL2xpc3RzLnNvdXJj
-ZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbCI+aHR0cHM6Ly9saXN0cy5zb3Vy
-Y2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWw8L2E+PGJyPjwvYmxvY2txdW90
-ZT48L2Rpdj48YnI+PGJyIGNsZWFyPSJhbGwiPjxicj4tLSA8YnI+dm91cyBwb3V2ZXogY29uc3Vs
-dGVyIG1vbiBjYWxlbmRyaWVyIMOgIGwmIzM5O2FkcmVzc2Ugc3VpdmFudGUgOgo8YnI+PGEgaHJl
-Zj0iaHR0cDovL3d3dy5nb29nbGUuY29tL2NhbGVuZGFyL2VtYmVkP3NyYz10cnRmN2Q2cG1oY21u
-cXJ1ZWZhcGs5MnZrcyU0MGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20iPmh0dHA6Ly93d3cuZ29v
-Z2xlLmNvbS9jYWxlbmRhci9lbWJlZD9zcmM9dHJ0ZjdkNnBtaGNtbnFydWVmYXBrOTJ2a3MlNDBn
-cm91cC5jYWxlbmRhci5nb29nbGUuY29tPC9hPgo=
-------=_Part_1460_18218299.1193753616105--
+Brad
 
-
---===============1877637447==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> > I want use my PC as a HEADSET or better as a handsfree and why not with
+> a2dp
+> > ... In fact I want use my PC to listen the MP3 which are on my phone, or
+> use
+> > the PC for communication, in fact like a headset ...
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============1877637447==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1877637447==--
