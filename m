@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <472705E8.8050408@hccnet.nl>
-Date: Tue, 30 Oct 2007 11:22:32 +0100
-From: Remy Bosch <reboli@hccnet.nl>
+Message-ID: <4726D00D.2020609@gmail.com>
+Date: Tue, 30 Oct 2007 12:02:45 +0530
+From: Rahul Tank <gr8rahul@gmail.com>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <00c201c81abd$bb7b24d0$832fc70a@dlh.st.com>
-In-Reply-To: <00c201c81abd$bb7b24d0$832fc70a@dlh.st.com>
-Subject: Re: [Bluez-users] Audio gaps with bcm2035 and Hama receiver
+References: <00c301c81abe$137d8240$832fc70a@dlh.st.com>
+In-Reply-To: <00c301c81abe$137d8240$832fc70a@dlh.st.com>
+Subject: Re: [Bluez-users] Problem while compiling bluez-utils-3.22
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,85 +21,17 @@ Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Sumeet VERMA wrote:
-> Hi Remy
-> I am also facing the same compilation problem. I saw in the mailing list you
-> were able to resolve it. How did you do it? 
->
->
-> Thanks,
-> Sumeet 
-> -----Original Message-----
-> From: bluez-users-bounces@lists.sourceforge.net
-> [mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Remy Bosch
-> Sent: Friday, October 26, 2007 9:50 PM
-> To: BlueZ users
-> Subject: Re: [Bluez-users] Audio gaps with bcm2035 and Hama receiver
->
-> For some reason "rtp.h" can't be found (included in audio/pcm_bluetooth.c).
-> This blocks my attempt to build it on gentoo without the use of eglib.
-> The build goes as follows. In the source directory:
->
-> The rm -r eglib/{*.c,*.h} # make sure eglib is ignored
-> autoreconf -fis                  # Reconfigure
-> ./configure --enable-inotify --enable-hal --enable-usb --enable-alsa
-> --enable-glib --disable-obex --enable-network --enable-serial --enable-input
-> --enable-audio --enable-sync --enable-hcid --enable-configfiles
-> --disable-initscripts --disable-pcmciarules --enable-bccmd --enable-avctrl
-> --enable-hid2hci --enable-dfutool --localstatedir=/var
-> make       # And then make
->
-> This creates the error:
->  gcc -DHAVE_CONFIG_H -I. -I.. -I../common -I/usr/include/alsa -I../sbc -Wall
-> -O2 -D_FORTIFY_SOURCE=2 -MT
-> libasound_module_pcm_bluetooth_la-pcm_bluetooth.lo -MD -MP -MF
-> .deps/libasound_module_pcm_bluetooth_la-pcm_bluetooth.Tpo -c pcm_bluetooth.c
-> -fPIC -DPIC -o .libs/libasound_module_pcm_bluetooth_la-pcm_bluetooth.o
-> pcm_bluetooth.c:41:17: error: rtp.h: No such file or directory
-> pcm_bluetooth.c: In function 'avdtp_write':
-> pcm_bluetooth.c:601: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:603: warning: left-hand operand of comma expression has no
-> effect
-> pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:603: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:605: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:606: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:607: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:608: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:609: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:610: error: dereferencing pointer to incomplete type
-> pcm_bluetooth.c:617: error: invalid application of 'sizeof' to incomplete
-> type 'struct rtp_header'
-> pcm_bluetooth.c:617: error: invalid application of 'sizeof' to incomplete
-> type 'struct rtp_payload'
-> pcm_bluetooth.c: In function 'bluetooth_a2dp_init':
-> pcm_bluetooth.c:968: error: invalid application of 'sizeof' to incomplete
-> type 'struct rtp_header'
-> pcm_bluetooth.c:968: error: invalid application of 'sizeof' to incomplete
-> type 'struct rtp_payload'
-> make[2]: *** [libasound_module_pcm_bluetooth_la-pcm_bluetooth.lo] Error 1
-> make[2]: Leaving directory `/root/bluez-utils-3.21/audio'
-> make[1]: *** [all-recursive] Error 1
-> make[1]: Leaving directory `/root/bluez-utils-3.21'
-> make: *** [all] Error 2
->
->
-> Any idea how to fix it?
+> Hi Rahul
+> I cross checked. It 3.21..sorry for the mistake. Is it fixed in 3.22? 
 >
 >   
+>   
 
-Update to 3.22
+Yes :)
 
 
-Remy
-
+thanks,
+ rahul
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
