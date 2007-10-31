@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4728B138.4020007@pagema.net>
-Date: Wed, 31 Oct 2007 17:45:44 +0100
-From: maho+bluez <maho+bluez@pagema.net>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <1In7ly-1gisng0@fwd33.aul.t-online.de>
-	<1193847468.32459.40.camel@violet>
-In-Reply-To: <1193847468.32459.40.camel@violet>
-Subject: Re: [Bluez-users] [OT] VOIP bluetooth headset
+In-Reply-To: <578209.61831.qm@web52103.mail.re2.yahoo.com>
+References: <578209.61831.qm@web52103.mail.re2.yahoo.com>
+Date: Wed, 31 Oct 2007 17:30:13 +0100
+Message-Id: <1193848213.32459.57.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Creating connections with the network DBUS API
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,19 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> [...]
->
-> first of all Skype is not VoIP. Skype is using a proprietary protocol
-> that allows you do make calls over the Internet. That is no VoIP,
-> because it would mean an open and well document protocol.
->   
-Very interesting opinion. VoIP is voice over the internet. So Skype
-doesn't send voice, or doesn't do it over the internet?
+Hi Chris,
 
-regards
+> I'm back with another question about the network features of DBUS.  Specifically, I'm trying to create a connection using NAP as described on the wiki, albeit in C, rather than Python, and when I execute the Connect method on the connection object, I get the error:  "Operation now in progresss."  In addition, I never get a Connected signal (though I do have it handled correctly, I'm pretty sure), and hcitool shows no connections active once I've done this.  Note that the same error also occurs with GN.  Is there some sort of setting for Bluetooth itself that I'm missing, or do I need to introduce a delay somewhere in the code?  For what it's worth, the relevant sections of code are as follows:
 
-maHo
+I have used the network service and the connection creation works
+perfectly fine. Don't see the problem. However make sure you are running
+the latest release since there were some glitches.
+
+> Also, when the documentation says that the Connect method returns the network interface, would this be something along the lines of bnep0?  Finally, correct me if I'm wrong, but since there is no "CreateServer" method in the network manager object (despite what the wiki says), the servers that ListServers lists are the only ones available.  Any help would be appreciated.
+
+By definition there are only 3 servers. NAP, GN and PANU and they are
+all available, but disabled by default. I am even thinking about moving
+these settings into a config file instead of a D-Bus interface.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
