@@ -1,55 +1,73 @@
-Return-Path: <hidave.darkstar@gmail.com>
-Date: Wed, 31 Oct 2007 10:30:17 +0800
-From: Dave Young <hidave.darkstar@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, bluez-devel@lists.sourceforge.net
-Subject: [PATCH]bluetooth: hci_sysfs connection bus_id add support for diffrent hci device
-Message-ID: <20071031023017.GA3896@darkstar.te-china.tietoenator.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+From: Hunyue Yau <hyau@mvista.com>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+Date: Tue, 30 Oct 2007 18:36:54 -0700
+MIME-Version: 1.0
+Message-Id: <200710301836.55311.hyau@mvista.com>
+Subject: [Bluez-devel] Synchronization between SCO audio and HCI command
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-For multi hci devices host, connection from/to same destination
-bluetooth device, add_conn will failed due to sysfs duplicate name.
+Hi,
 
-sysfs: duplicate filename 'acl0018C5B6B456' can not be created
-WARNING: at fs/sysfs/dir.c:424 sysfs_add_one()
- [<c01c0120>] sysfs_add_one+0xa0/0xe0
- [<c01c0d7b>] sysfs_create_link+0x9b/0x140
- [<c01c1671>] create_files+0x31/0x60
- [<c02b537b>] bus_add_device+0x5b/0xf0
- [<c02b391c>] device_add+0x11c/0x350
- [<f8951410>] add_conn+0x0/0x90 [bluetooth]
- [<f895141f>] add_conn+0xf/0x90 [bluetooth]
- [<c013baee>] run_workqueue+0x5e/0x110
- [<c013bc4c>] worker_thread+0xac/0x100
- [<c0140000>] autoremove_wake_function+0x0/0x50
- [<c0140000>] autoremove_wake_function+0x0/0x50
- [<c013bba0>] worker_thread+0x0/0x100
- [<c013fa39>] kthread+0x59/0xa0
- [<c013f9e0>] kthread+0x0/0xa0
- [<c0104f83>] kernel_thread_helper+0x7/0x14
- =======================
-add_conn: Failed to register connection device
+I am looking at crash that happens during the close of the SCO socket 
+after playing a moderately long (around 3-4 minutes) audio file.
+Kernel version is 2.6.21 with the SCO audio patch version 4.2. Audio
+is a 16bit, 8KHz wav file played through ALSA emulation using the plugz
+ALSA plugins and headsetd. The bluetooth interface is a USB dongle with a 
+CSR radio (Actiontec branded).  Command used to play it is:
+aplay -D headset -B 1000000 p3.wav
+where p3.wav s a 2997592 byte long 16bit, mono 8KHz wav file.
+Audio plays until the close happens then it gets truncated. 
 
-Add prefix hdev->name to bus_id to fix this problem.
+I have debugged the problem down to a synchronization issue between the
+HCI command and the SCO data path. What happens is when userspace
+closes the socket, it causes the OCF_DISCONNECT command to be sent after 
+10ms. From net/bluetooth/sco.c:sco_chan_del() as part of hci_conn_put. The timer 
+calls hci_conn_timeout in net/bluetooth/hci_conn.c which sends the command.
 
-Signed-off-by: Dave Young <hidave.darkstar@gmail.com> 
+For the case of a USB dongle driven by drivers/bluetooth/hci_usb.c, commands
+and SCO data are on different queues. So with a sufficiently long audio stream, 
+there could be up to an entire socket buffer full of SKB's sitting in hci_usb.c's 
+transmit queue. I have measured about 1 minute of audio which roughly works
+out to be about 200K+. 
 
----
-net/bluetooth/hci_sysfs.c |    3 ++-
-1 file changed, 2 insertions(+), 1 deletion(-)
+Since they are on different queues, the USB dongle can (and in this case, does) 
+receive the OCF_DISCONNECT command before the SCO data is drained from the
+queue. This upsets the dongle and causes it to reset itself since it continues to 
+receive the SCO data after the OCF_DISCONNECT command. I have verified the
+dongle has received the command with a USB sniffer and the dongle has 
+acknowledge completion afterwhich it continues to receive data. 
 
-diff -upr linux/net/bluetooth/hci_sysfs.c linux.new/net/bluetooth/hci_sysfs.c
---- linux/net/bluetooth/hci_sysfs.c	2007-10-31 10:21:00.000000000 +0800
-+++ linux.new/net/bluetooth/hci_sysfs.c	2007-10-31 10:21:55.000000000 +0800
-@@ -302,7 +302,8 @@ void hci_conn_add_sysfs(struct hci_conn 
- 	conn->dev.release = bt_release;
- 
- 	snprintf(conn->dev.bus_id, BUS_ID_SIZE,
--			"%s%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X",
-+			"%s%s%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X",
-+			hdev->name,
- 			conn->type == ACL_LINK ? "acl" : "sco",
- 			ba->b[5], ba->b[4], ba->b[3],
- 			ba->b[2], ba->b[1], ba->b[0]);
+Has anyone seen this and is there a way to synchronize the data? From what I
+can tell, as soon as things are passed to hci_usb, there is no way the upper hci
+layers can determine if the data associated with the original connection has 
+really reached the bluetooth hardware. This does not appear to be a problem on
+other hardware as they only have one queue (btuart.c is what I looked at.)
+
+One possible work around is to blindly increase the timeout in hci_conn_put but has
+other side effects and could be broken by increasing the socket buffers.
+
+Thanks.
+
+-- Hunyue
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >> http://get.splunk.com/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
