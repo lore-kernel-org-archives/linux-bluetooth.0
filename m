@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4728B6FD.50205@infitsrl.com>
-Date: Wed, 31 Oct 2007 18:10:21 +0100
-From: Fabrizio Guglielmino <guglielmino@infitsrl.com>
+Date: Wed, 31 Oct 2007 18:06:42 +0100 (CET)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1193849542.32459.74.camel@violet>
+Message-ID: <Pine.LNX.4.63.0710311758430.25155@redbean.intranet.gw-instruments.de>
+References: <307f591f0710301305n410b8ebds4fa399dd0a518840@mail.gmail.com>
+	<1193849542.32459.74.camel@violet>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] About bluetooth 2.1
+Subject: Re: [Bluez-devel] multi-frequency scanning & possible contract work
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,19 +21,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all,
-I've read about optimized inquiry in bluetooth 2.1, If I understood 
-correctly the inquiry return remote device name and services list 
-information of the discovered remote devices.
-In current version to obtain the same result I've to make an inquiry a 
-name request and a sdp query for every remote device discovered.
-My question is, given that the new protocol is compatible with the old, 
-if I make an inquiry using a 2.1 dongle with blueZ I don't need to make 
-name and service  discovery or it's required because the optimized 
-inquiry works only between devices with 2.1 version?
 
-many thanks
-Fabrizio
+Hi Marcel, 
+
+> the use of an directional antenna with a Bluetooth chip is illegal as
+> far as I know. You really wanna check the regulations here.
+
+I don't think so. What you have to observe is that the maximum isotropic 
+radiation does not exceed +20dBm. So if you use an directional antenna 
+with a gain of, lets say +16 dBm (a somehow typical value) than the 
+maximum transmit power that can be used is +4 dBm. And you have to 
+convince the regulartory body that this will not be exceeded  under all 
+circumstances.....
+
+Ciao, 
+
+Peter 
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
