@@ -1,15 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Wed, 31 Oct 2007 09:33:29 -0700 (PDT)
+From: Jim Carter <jimc@math.ucla.edu>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1193358579.25405.158.camel@cookie.hadess.net>
-References: <5f84803c0710251220m73a0b7va39bd0c46cfaabd9@mail.gmail.com>
-	<1193352257.6184.282.camel@violet>
-	<1193358579.25405.158.camel@cookie.hadess.net>
-Date: Wed, 31 Oct 2007 17:33:57 +0100
-Message-Id: <1193848437.32459.64.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Add an ellipsis to
-	the	preferences	menu	item
+In-Reply-To: <307f591f0710301305n410b8ebds4fa399dd0a518840@mail.gmail.com>
+Message-ID: <Pine.LNX.4.64.0710310909510.769@simba.math.ucla.edu>
+References: <307f591f0710301305n410b8ebds4fa399dd0a518840@mail.gmail.com>
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] multi-frequency scanning & possible contract work
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,32 +20,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+On Tue, 30 Oct 2007, Paul Huber wrote:
 
-> > > Since the Preferences menu entry in the applet opens a new window it
-> > > should probably have an ellipsis in the label.  Attached is a trivial
-> > > patch to add this.
-> > 
-> > what does the HIG recommend for applet menus. I wanna follow the HIG.
-> > Currently I simply did what all other applets do that I have running.
-> 
-> This one is a toss-up between what's right, and what GTK+ implements. It
-> doesn't have separate strings for menus, so you don't get the ellipsis.
-> 
-> I'm sure there's a GTK+ bug opened somewhere about "doing the right
-> thing" in the case of stock items.
-> 
-> So it's really up to you. Personally, I'd stick with the stock item,
-> unless you have a wide-ranging amount of translations (which you'd get
-> if you moved bluez-gnome to GNOME SVN, hint hint :)
+> I need to use a directional antenna focused on an area about 6 meters x 6
+> meters that can scan for Bluetooth mobile phones as they pass through the
+> area, and identify them very quickly.  It's for a new startup business
+> that's focusing on a retail application running on an embedded Linux box.
 
-I stick with the stock item. Makes stuff simpler.
+Since you're using non-provincial units I assume you're in the European 
+Union, but in the USA there's a specific reg forbidding cellphone spam.  
+Pro-actively dialling the customer's phone could well give a hostile 
+impression.  A customer-initiated interaction such as WAP is a lot more 
+polite, but the shopkeeper would want to make it available to everyone 
+including those looking through the window.
 
-Regards
+If the technical and regulatory issues can be straightened out, it would be 
+very valuable to both the customer and the business to provide a product 
+search feature, tech specs for products, etc.  All the advantages of online 
+shopping, but you can look at the physical product and buy it on the spot.
 
-Marcel
-
-
+James F. Carter          Voice 310 825 2897    FAX 310 206 6673
+UCLA-Mathnet;  6115 MSA; 405 Hilgard Ave.; Los Angeles, CA, USA  90095-1555
+Email: jimc@math.ucla.edu    http://www.math.ucla.edu/~jimc (q.v. for PGP key)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
