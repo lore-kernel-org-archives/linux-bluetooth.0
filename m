@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Wed, 31 Oct 2007 09:33:29 -0700 (PDT)
-From: Jim Carter <jimc@math.ucla.edu>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <307f591f0710301305n410b8ebds4fa399dd0a518840@mail.gmail.com>
-Message-ID: <Pine.LNX.4.64.0710310909510.769@simba.math.ucla.edu>
-References: <307f591f0710301305n410b8ebds4fa399dd0a518840@mail.gmail.com>
-MIME-Version: 1.0
-Subject: Re: [Bluez-devel] multi-frequency scanning & possible contract work
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Jiri Kosina <jikos@jikos.cz>
+In-Reply-To: <Pine.LNX.4.64.0710261526020.18815@twin.jikos.cz>
+References: <1193350427.11632.8.camel@simo-desktop>
+	<Pine.LNX.4.64.0710261526020.18815@twin.jikos.cz>
+Date: Wed, 31 Oct 2007 17:33:06 +0100
+Message-Id: <1193848386.32459.62.camel@violet>
+Mime-Version: 1.0
+Cc: bluez-devel@lists.sourceforge.net, linux-usb-devel@lists.sourceforge.net,
+        Simone Malacarne <s.malacarne@gmail.com>
+Subject: Re: [Bluez-devel] [linux-usb-devel] dmesg warning on hid core
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,28 +23,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Tue, 30 Oct 2007, Paul Huber wrote:
+Hi Jiri,
 
-> I need to use a directional antenna focused on an area about 6 meters x 6
-> meters that can scan for Bluetooth mobile phones as they pass through the
-> area, and identify them very quickly.  It's for a new startup business
-> that's focusing on a retail application running on an embedded Linux box.
+> the problem is that some userspace utility (I guess hid2hci from 
+> bluez-utils) issues hiddev ioctl() with inappropriate out-of-bounds value.
+> 
+> As far as I know Logitech bluetooth keyboards are problematic, as Marcel 
+> doesn't have any specification for them, so switching between HID and HCI 
+> modes is reverse engineering and guessing.
 
-Since you're using non-provincial units I assume you're in the European 
-Union, but in the USA there's a specific reg forbidding cellphone spam.  
-Pro-actively dialling the customer's phone could well give a hostile 
-impression.  A customer-initiated interaction such as WAP is a lot more 
-polite, but the shopkeeper would want to make it available to everyone 
-including those looking through the window.
+there exists a patch that might make this work again. Didn't have the
+time to properly test it, but it can't make it worse.
 
-If the technical and regulatory issues can be straightened out, it would be 
-very valuable to both the customer and the business to provide a product 
-search feature, tech specs for products, etc.  All the advantages of online 
-shopping, but you can look at the physical product and buy it on the spot.
+Regards
 
-James F. Carter          Voice 310 825 2897    FAX 310 206 6673
-UCLA-Mathnet;  6115 MSA; 405 Hilgard Ave.; Los Angeles, CA, USA  90095-1555
-Email: jimc@math.ucla.edu    http://www.math.ucla.edu/~jimc (q.v. for PGP key)
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
