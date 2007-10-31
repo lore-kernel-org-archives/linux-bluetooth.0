@@ -1,38 +1,81 @@
-Return-Path: <davem@davemloft.net>
-Date: Wed, 31 Oct 2007 00:01:41 -0700 (PDT)
-Message-Id: <20071031.000141.241824894.davem@davemloft.net>
-To: hidave.darkstar@gmail.com
-Cc: marcel@holtmann.org, linux-kernel@vger.kernel.org,
-        bluez-devel@lists.sourceforge.net
-Subject: Re: [PATCH]bluetooth: hci_sysfs connection bus_id add support for
- diffrent hci device
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20071031023017.GA3896@darkstar.te-china.tietoenator.com>
-References: <20071031023017.GA3896@darkstar.te-china.tietoenator.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <307f591f0710302059w4b80246dnb39ba04111dcd187@mail.gmail.com>
+Date: Tue, 30 Oct 2007 19:59:35 -0800
+From: "Paul Huber" <paul2004x@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <d89ddf300710301323h5a56b932h8304f42f5ae3fc6@mail.gmail.com>
+MIME-Version: 1.0
+References: <307f591f0710301305n410b8ebds4fa399dd0a518840@mail.gmail.com>
+	<d89ddf300710301323h5a56b932h8304f42f5ae3fc6@mail.gmail.com>
+Subject: Re: [Bluez-devel] multi-frequency scanning & possible contract work
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0902210894=="
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-From: Dave Young <hidave.darkstar@gmail.com>
-Date: Wed, 31 Oct 2007 10:30:17 +0800
+--===============0902210894==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_6854_17718369.1193803175511"
 
-> diff -upr linux/net/bluetooth/hci_sysfs.c linux.new/net/bluetooth/hci_sysfs.c
-> --- linux/net/bluetooth/hci_sysfs.c	2007-10-31 10:21:00.000000000 +0800
-> +++ linux.new/net/bluetooth/hci_sysfs.c	2007-10-31 10:21:55.000000000 +0800
-> @@ -302,7 +302,8 @@ void hci_conn_add_sysfs(struct hci_conn 
->  	conn->dev.release = bt_release;
->  
->  	snprintf(conn->dev.bus_id, BUS_ID_SIZE,
-> -			"%s%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X",
-> +			"%s%s%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X",
-> +			hdev->name,
->  			conn->type == ACL_LINK ? "acl" : "sco",
->  			ba->b[5], ba->b[4], ba->b[3],
->  			ba->b[2], ba->b[1], ba->b[0]);
+------=_Part_6854_17718369.1193803175511
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-This might not work.
+Brad,
 
-Your device's name is already 15 characters long,
-BUS_ID_SIZE is 20, and it seems hdev->name could
-easily overflow the 4 or 5 characters of space
-remaining.
+I'm using the C libraries directly within my own code, so I do get the
+piecemeal results, and have played with extended inquiry.  But I find that
+it's still not fast enough, which was why I was hoping to try simultaneous
+scanning with multiple dongles, or something like that to speed it up.
+
+Do you know if bluez has enough low-level control over the usb device to do
+something like that?  ie have two devices scanning different frequencies?
+Or does the usb interface just have a high level 'start scanning' without
+the low-level control that would be needed?
+
+Paul
+
+------=_Part_6854_17718369.1193803175511
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Brad,<br><br>I&#39;m using the C libraries directly within my own code, so I do get the piecemeal results, and have played with extended inquiry.&nbsp; But I find that it&#39;s still not fast enough, which was why I was hoping to try simultaneous scanning with multiple dongles, or something like that to speed it up.
+<br><br>Do you know if bluez has enough low-level control over the usb device to do something like that?&nbsp; ie have two devices scanning different frequencies?&nbsp; Or does the usb interface just have a high level &#39;start scanning&#39; without the low-level control that would be needed?
+<br><br>Paul<br><br>
+
+------=_Part_6854_17718369.1193803175511--
+
+
+--===============0902210894==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >> http://get.splunk.com/
+--===============0902210894==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0902210894==--
