@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <685df2130710290924m65b5d4ccr2cb86c1570f063d8@mail.gmail.com>
-References: <685df2130710290924m65b5d4ccr2cb86c1570f063d8@mail.gmail.com>
-Date: Wed, 31 Oct 2007 17:26:53 +0100
-Message-Id: <1193848013.32459.52.camel@violet>
+In-Reply-To: <1193847250.32459.36.camel@violet>
+References: <5f84803c0710161138i6123770dk22c1b63d03f45f59@mail.gmail.com>
+	<1192631052.6184.25.camel@violet>
+	<5f84803c0710170748j57f46eebh37a6707b9ec02b86@mail.gmail.com>
+	<1192633908.10179.2.camel@snoogens.fab.redhat.com>
+	<47173238.5070508@free.fr>  <1193847250.32459.36.camel@violet>
+Date: Wed, 31 Oct 2007 16:24:28 +0000
+Message-Id: <1193847868.31723.99.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Audio service with multiple adapters
+Subject: Re: [Bluez-devel] [PATCH] make bluez GNOME UIs singletons
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,30 +24,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Joshua,
 
-> I would like to call the 'CreateHeadset' method and associate the
-> headset with a non-default adapter.
+On Wed, 2007-10-31 at 17:14 +0100, Marcel Holtmann wrote:
+<snip>
+> actually I do think that the current behavior should be default. I
+> really want that behavior. There are corner cases that need to be
+> thought of and making it a singleton only hides these issues.
 > 
-> I am able to bond a headset to a non-default adapter with by
-> referencing "/org/bluez/hci1" in the object path of the
-> Adapter.CreateBonding method. 
-> 
-> However the 'CreateHeadset' method does not reference an adapter. It
-> seems to associate the headset with the default adapter. I would like
-> to associate headset A with the default adapter and headset B with a
-> non-default adapter. 
-> 
-> Is there a way to associate a headset with a non-default adapter in a
-> 'CreateHeadset' call?
+> However having a special switch that makes it a singleton would be a
+> good enhancement and I agree with you that any application started by
+> the applet should only exists once. The applet can use that specific
+> switch easily and we don't break current behavior.
 
-actually there isn't at the moment. The only way is to physically switch
-the dongles. This support doesn't have high priority.
+As long as the switch exists, I don't mind. I'd probably make it the
+default for Fedora, in the .desktop files, and it wouldn't break normal
+development use.
 
-Regards
-
-Marcel
-
+Chris, can you update the patches for that?
 
 
 -------------------------------------------------------------------------
