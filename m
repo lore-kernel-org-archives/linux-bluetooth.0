@@ -1,14 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <a8e1da0710292006u7082d22bo1da87fefe23a7222@mail.gmail.com>
-References: <47268999.8010700@storm.ca>
-	<a8e1da0710292006u7082d22bo1da87fefe23a7222@mail.gmail.com>
-Date: Wed, 31 Oct 2007 17:22:15 +0100
-Message-Id: <1193847735.32459.45.camel@violet>
+In-Reply-To: <1In7ly-1gisng0@fwd33.aul.t-online.de>
+References: <1In7ly-1gisng0@fwd33.aul.t-online.de>
+Date: Wed, 31 Oct 2007 17:17:48 +0100
+Message-Id: <1193847468.32459.40.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Problems using bluetooth keyboard with
-	Nokia	N800...
+Subject: Re: [Bluez-users] VOIP bluetooth headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,73 +20,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Dave,
-
-> > < ACL data: handle 44 flags 0x02 dlen 12
-> >     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-> > > HCI Event: Number of Completed Packets (0x13) plen 5
-> >     handle 44 packets 1
-> > > ACL data: handle 44 flags 0x02 dlen 12
-> >     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-> > < ACL data: handle 44 flags 0x02 dlen 12
-> >     L2CAP(s): Connect req: psm 17 scid 0x0040
-> > > HCI Event: Number of Completed Packets (0x13) plen 5
-> >     handle 44 packets 1
-> > > ACL data: handle 44 flags 0x02 dlen 16
-> >     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
-> >       Connection successful
-> > < ACL data: handle 44 flags 0x02 dlen 16
-> >     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-> >       MTU 48
-> > > ACL data: handle 44 flags 0x02 dlen 16
-> >     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-> >       MTU 48
-> > < ACL data: handle 44 flags 0x02 dlen 18
-> >     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
-> >       Success
-> >       MTU 48
-> > > HCI Event: Number of Completed Packets (0x13) plen 5
-> >     handle 44 packets 1
-> > > ACL data: handle 44 flags 0x02 dlen 18
-> >     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 1 clen 4
-> >       MTU 128
-> > < ACL data: handle 44 flags 0x02 dlen 16
-> >     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-> >       MTU 48
-> > > HCI Event: Number of Completed Packets (0x13) plen 5
-> >     handle 44 packets 1
-> > > HCI Event: Number of Completed Packets (0x13) plen 5
-> >     handle 44 packets 1
-> > > ACL data: handle 44 flags 0x02 dlen 18
-> >     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 1 clen 4
-> >       MTU 128
-> > < ACL data: handle 44 flags 0x02 dlen 12
-> >     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
-> > > HCI Event: Number of Completed Packets (0x13) plen 5
-> >     handle 44 packets 1
-> > > ACL data: handle 44 flags 0x02 dlen 12
-> >     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
-> > < HCI Command: Disconnect (0x01|0x0006) plen 3
-> >     handle 44 reason 0x13
-> >     Reason: Remote User Terminated Connection
-> > > HCI Event: Command Status (0x0f) plen 4
-> >     Disconnect (0x01|0x0006) status 0x00 ncmd 1
-> > > HCI Event: Disconn Complete (0x05) plen 4
-> >     status 0x00 handle 44 reason 0x16
-> >     Reason: Connection Terminated by Local Host
-> >
-> Modify the head file :
-> /usr/include/bluetooth/hidp.h:
-> #define HIDP_DEFAULT_MTU 128
+Hi Frank,
 > 
-> Then rebuild the hidd. This is a hardcode change, just have a try.
+> i have successfully compiled bluez-libs and bluez-utils 3.22 with
+> audio enabled. I can use my Logitech voice headset with 'mplayer -ao
+> alsa:device=bluetooth' to play audio and arecord to record audio. But
+> with skype 1.4.0 118 and twinkle it doesn't work. When i want to start
+> a call in skype the headset makes a beep noise every second and after
+> 30 seconds the call failes. when i go to the options dialog the
+> headset beep again and i must wait In twinkle there is no alsa device
+> "bluetooth". VOIP was the reason why i have installed bluez. I have
+> googled many hours to find a solution but without success. Last i have
+> tried the OSS-Version of Skype because alsa seems to be buggy in Skype
+> but to emulate the headset as dsp-device in .asoundrc to use with aoss
+> was too difficult for me. I hope you have an idea how i can solve the
+> problem, because i can't belive that it's not possible to use skype
+> with a bluetooth headset.
 
-this looks like a bug in the keyboards firmware. The minimum MTU of 48
-must be accepted and then use segmentation and reassembly within the
-protocol. However if that works, we can change the default MTU value.
-Looking at the bluez-utils-3.22 input service source, I just see that we
-disabled the MTU requirement code completely for now. So use
-bluez-utils-3.22 and use the input service.
+first of all Skype is not VoIP. Skype is using a proprietary protocol
+that allows you do make calls over the Internet. That is no VoIP,
+because it would mean an open and well document protocol.
+
+Second, you have to blame Skype for not working. Their usage of the ALSA
+API is totally strange and it gets worse with every version. That this
+works with real hardware sound cards, it from my point of view, pure
+luck. With virtual sound cards, like a Bluetooth headset it is not that
+simple and so far I couldn't find a sane way to make Skype happy.
 
 Regards
 
