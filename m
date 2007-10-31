@@ -1,15 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Jiri Kosina <jikos@jikos.cz>
-In-Reply-To: <Pine.LNX.4.64.0710261526020.18815@twin.jikos.cz>
-References: <1193350427.11632.8.camel@simo-desktop>
-	<Pine.LNX.4.64.0710261526020.18815@twin.jikos.cz>
-Date: Wed, 31 Oct 2007 17:33:06 +0100
-Message-Id: <1193848386.32459.62.camel@violet>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <472227FC.9000206@mercuryresearch.com>
+References: <472227FC.9000206@mercuryresearch.com>
+Date: Wed, 31 Oct 2007 17:32:11 +0100
+Message-Id: <1193848331.32459.60.camel@violet>
 Mime-Version: 1.0
-Cc: bluez-devel@lists.sourceforge.net, linux-usb-devel@lists.sourceforge.net,
-        Simone Malacarne <s.malacarne@gmail.com>
-Subject: Re: [Bluez-devel] [linux-usb-devel] dmesg warning on hid core
+Subject: Re: [Bluez-devel] Patch to add support for Apple Aluminum	Bluetooth
+	Keyboard
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,17 +21,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jiri,
+Hi Dean,
 
-> the problem is that some userspace utility (I guess hid2hci from 
-> bluez-utils) issues hiddev ioctl() with inappropriate out-of-bounds value.
+> Here's a trivial patch to add support for Apple's aluminum
+> bluetooth keyboard. The keyboard works out of the the box,
+> but this enables the Fn modifier key so that a few useful
+> keys (namely pageup/pagedown using Fn+arrows).
 > 
-> As far as I know Logitech bluetooth keyboards are problematic, as Marcel 
-> doesn't have any specification for them, so switching between HID and HCI 
-> modes is reverse engineering and guessing.
+> Apologies if I'm not conforming to local patch formatting
+> conventions, but the needed change is pretty obvious regardless.
 
-there exists a patch that might make this work again. Didn't have the
-time to properly test it, but it can't make it worse.
+patch looks fine, but can you please re-send it with a proper
+Signed-off-by line. Remember that this is a kernel patch and it has to
+follow the guidelines of the kernel. Otherwise I simply have to ignore
+your credit for this patch.
 
 Regards
 
