@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <C6216C494F7BD443AA39D93B9BB9CF29018F78E7@esebe107.NOE.Nokia.com>
+MIME-Version: 1.0
+Date: Wed, 31 Oct 2007 11:43:15 +0200
+Message-ID: <C6216C494F7BD443AA39D93B9BB9CF29018F78E7@esebe107.NOE.Nokia.com>
+In-Reply-To: <1193823612.32459.14.camel@violet>
 References: <C6216C494F7BD443AA39D93B9BB9CF29018F78D0@esebe107.NOE.Nokia.com>
 	<1193823612.32459.14.camel@violet>
-	<C6216C494F7BD443AA39D93B9BB9CF29018F78E7@esebe107.NOE.Nokia.com>
-Date: Wed, 31 Oct 2007 10:48:24 +0100
-Message-Id: <1193824104.32459.17.camel@violet>
-Mime-Version: 1.0
+From: <Dmitry.Kasatkin@nokia.com>
+To: <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] DUN
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,19 +21,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Dmitry,
+Hi Marcel,
 
-> Yep, I saw that. Probably it register SPP SDP record?
-> Is it fully functional? Does it register proper SDP record for DUN?
+Yep, I saw that. Probably it register SPP SDP record?
+Is it fully functional? Does it register proper SDP record for DUN?
 
-you can give it a UUID and it will create the proper service record for
-it. If not, then that is a bug and needs fixing.
+Thanks.
 
-Regards
+Regards, 
+Dmitry
 
-Marcel
+ 
 
-
+>-----Original Message-----
+>From: bluez-devel-bounces@lists.sourceforge.net 
+>[mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf 
+>Of ext Marcel Holtmann
+>Sent: 31 October 2007 11:40
+>To: BlueZ development
+>Subject: Re: [Bluez-devel] DUN
+>
+>Hi Dmitry,
+>
+>> Is anyone working on implementing DUN Service to new service 
+>> architecture for accessing real device modem?
+>
+>meaning a DUN server that uses a real modem as backend. Yes, 
+>that is supported by the serial service and its proxy support.
+>
+>Regards
+>
+>Marcel
+>
+>
+>
+>---------------------------------------------------------------
+>----------
+>This SF.net email is sponsored by: Splunk Inc.
+>Still grepping through log files to find problems?  Stop.
+>Now Search log events and configuration files using AJAX and a browser.
+>Download your FREE copy of Splunk now >> 
+>http://get.splunk.com/ _______________________________________________
+>Bluez-devel mailing list
+>Bluez-devel@lists.sourceforge.net
+>https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
