@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <slrnficmht.ogv.matt@coleridge.tplus1.com>
-References: <slrnficmht.ogv.matt@coleridge.tplus1.com>
-Date: Wed, 31 Oct 2007 17:25:37 +0100
-Message-Id: <1193847937.32459.50.camel@violet>
+In-Reply-To: <20071029191950.f9f17f16.vientito1@pppoe.ca>
+References: <20071029191950.f9f17f16.vientito1@pppoe.ca>
+Date: Wed, 31 Oct 2007 17:23:01 +0100
+Message-Id: <1193847781.32459.47.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] I need help pulling photos off my phone
-	with	bluetooth
+Subject: Re: [Bluez-users] Error 22 when configurating device
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,17 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Matthew,
+Hi Billy,
 
-> I have a Samsung A707 phone with AT&T.  They call this the SYNC phone.
-> Anyway, I can export photos off the phone when I boot into Windows, but
-> all attempts to do this with my Ubuntu linux box have failed.
+> I am getting this error as i try to connect to my BH-600 headset on a BCM2045 USB dongle.  as i check out the pcm_bluetooth.c, i realize the error comes up from the fact of checking received packet.  I am wondering what's up with this.
+> 
+> BTW I see an audio.conf file in my audio directory but it never gets installed in my system.  what is this file and its usage?
+> 
+> And error 22 signifies what kind of a problem?  where could i find protocol documentation of this?
 
-you might wanna include the output of hcidump -X -V when trying this.
-However I am pretty sure that you have no passkey agent running or a
-screwed up system. I would advise that you have a clean install or
-better switch to something like Ubuntu Gutsy were all the needed tools
-can be installed easily.
+check the syslog and include the output of hcidump -X -V.
 
 Regards
 
