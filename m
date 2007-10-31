@@ -1,81 +1,55 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <307f591f0710302059w4b80246dnb39ba04111dcd187@mail.gmail.com>
-Date: Tue, 30 Oct 2007 19:59:35 -0800
-From: "Paul Huber" <paul2004x@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <d89ddf300710301323h5a56b932h8304f42f5ae3fc6@mail.gmail.com>
-MIME-Version: 1.0
-References: <307f591f0710301305n410b8ebds4fa399dd0a518840@mail.gmail.com>
-	<d89ddf300710301323h5a56b932h8304f42f5ae3fc6@mail.gmail.com>
-Subject: Re: [Bluez-devel] multi-frequency scanning & possible contract work
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0902210894=="
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Return-Path: <hidave.darkstar@gmail.com>
+Date: Wed, 31 Oct 2007 10:30:17 +0800
+From: Dave Young <hidave.darkstar@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, bluez-devel@lists.sourceforge.net
+Subject: [PATCH]bluetooth: hci_sysfs connection bus_id add support for diffrent hci device
+Message-ID: <20071031023017.GA3896@darkstar.te-china.tietoenator.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+List-ID: <bluez-devel.lists.sourceforge.net>
 
---===============0902210894==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_6854_17718369.1193803175511"
+For multi hci devices host, connection from/to same destination
+bluetooth device, add_conn will failed due to sysfs duplicate name.
 
-------=_Part_6854_17718369.1193803175511
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+sysfs: duplicate filename 'acl0018C5B6B456' can not be created
+WARNING: at fs/sysfs/dir.c:424 sysfs_add_one()
+ [<c01c0120>] sysfs_add_one+0xa0/0xe0
+ [<c01c0d7b>] sysfs_create_link+0x9b/0x140
+ [<c01c1671>] create_files+0x31/0x60
+ [<c02b537b>] bus_add_device+0x5b/0xf0
+ [<c02b391c>] device_add+0x11c/0x350
+ [<f8951410>] add_conn+0x0/0x90 [bluetooth]
+ [<f895141f>] add_conn+0xf/0x90 [bluetooth]
+ [<c013baee>] run_workqueue+0x5e/0x110
+ [<c013bc4c>] worker_thread+0xac/0x100
+ [<c0140000>] autoremove_wake_function+0x0/0x50
+ [<c0140000>] autoremove_wake_function+0x0/0x50
+ [<c013bba0>] worker_thread+0x0/0x100
+ [<c013fa39>] kthread+0x59/0xa0
+ [<c013f9e0>] kthread+0x0/0xa0
+ [<c0104f83>] kernel_thread_helper+0x7/0x14
+ =======================
+add_conn: Failed to register connection device
 
-Brad,
+Add prefix hdev->name to bus_id to fix this problem.
 
-I'm using the C libraries directly within my own code, so I do get the
-piecemeal results, and have played with extended inquiry.  But I find that
-it's still not fast enough, which was why I was hoping to try simultaneous
-scanning with multiple dongles, or something like that to speed it up.
+Signed-off-by: Dave Young <hidave.darkstar@gmail.com> 
 
-Do you know if bluez has enough low-level control over the usb device to do
-something like that?  ie have two devices scanning different frequencies?
-Or does the usb interface just have a high level 'start scanning' without
-the low-level control that would be needed?
+---
+net/bluetooth/hci_sysfs.c |    3 ++-
+1 file changed, 2 insertions(+), 1 deletion(-)
 
-Paul
-
-------=_Part_6854_17718369.1193803175511
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Brad,<br><br>I&#39;m using the C libraries directly within my own code, so I do get the piecemeal results, and have played with extended inquiry.&nbsp; But I find that it&#39;s still not fast enough, which was why I was hoping to try simultaneous scanning with multiple dongles, or something like that to speed it up.
-<br><br>Do you know if bluez has enough low-level control over the usb device to do something like that?&nbsp; ie have two devices scanning different frequencies?&nbsp; Or does the usb interface just have a high level &#39;start scanning&#39; without the low-level control that would be needed?
-<br><br>Paul<br><br>
-
-------=_Part_6854_17718369.1193803175511--
-
-
---===============0902210894==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============0902210894==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0902210894==--
+diff -upr linux/net/bluetooth/hci_sysfs.c linux.new/net/bluetooth/hci_sysfs.c
+--- linux/net/bluetooth/hci_sysfs.c	2007-10-31 10:21:00.000000000 +0800
++++ linux.new/net/bluetooth/hci_sysfs.c	2007-10-31 10:21:55.000000000 +0800
+@@ -302,7 +302,8 @@ void hci_conn_add_sysfs(struct hci_conn 
+ 	conn->dev.release = bt_release;
+ 
+ 	snprintf(conn->dev.bus_id, BUS_ID_SIZE,
+-			"%s%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X",
++			"%s%s%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X",
++			hdev->name,
+ 			conn->type == ACL_LINK ? "acl" : "sco",
+ 			ba->b[5], ba->b[4], ba->b[3],
+ 			ba->b[2], ba->b[1], ba->b[0]);
