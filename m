@@ -1,40 +1,34 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <472227FC.9000206@mercuryresearch.com>
-References: <472227FC.9000206@mercuryresearch.com>
-Date: Wed, 31 Oct 2007 17:32:11 +0100
-Message-Id: <1193848331.32459.60.camel@violet>
+In-Reply-To: <000601c81a36$73346970$599d3c50$@savary@kerlink.fr>
+References: <000601c81a36$73346970$599d3c50$@savary@kerlink.fr>
+Date: Wed, 31 Oct 2007 17:28:01 +0100
+Message-Id: <1193848081.32459.54.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Patch to add support for Apple Aluminum	Bluetooth
-	Keyboard
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Cc: bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] [Bluez-devel] How to use my PC as a headset ?
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Dean,
+Hi,
 
-> Here's a trivial patch to add support for Apple's aluminum
-> bluetooth keyboard. The keyboard works out of the the box,
-> but this enables the Fn modifier key so that a few useful
-> keys (namely pageup/pagedown using Fn+arrows).
-> 
-> Apologies if I'm not conforming to local patch formatting
-> conventions, but the needed change is pretty obvious regardless.
+>  ... my question is on the subject, So I want to use my PC with my phone as
+> a headset. If so, what must I make for use it?
 
-patch looks fine, but can you please re-send it with a proper
-Signed-off-by line. Remember that this is a kernel patch and it has to
-follow the guidelines of the kernel. Otherwise I simply have to ignore
-your credit for this patch.
+this is not covered by BlueZ at the moment, but there are some projects
+that use BlueZ and implement that. Look through the Internet, because I
+can't remember the names of these projects.
 
 Regards
 
@@ -48,6 +42,6 @@ Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
