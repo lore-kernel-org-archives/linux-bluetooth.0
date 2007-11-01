@@ -1,6 +1,6 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4729D526.8050308@vsnl.com>
-Date: Thu, 01 Nov 2007 19:01:18 +0530
+Message-ID: <4729D4EE.3070400@vsnl.com>
+Date: Thu, 01 Nov 2007 19:00:22 +0530
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
 From: Mohan Sundaram <mohan.tux@gmail.com>
@@ -34,7 +34,6 @@ given and connection gets established. Used hcitool to check.
 
 Powered off headset. Powered it on and it was discovered in gbtsco. 
 However, make active handset failed. hcidump shown below.
-
 root@smohan-laptop:/home/smohan# hcidump -X -V
 HCI sniffer - Bluetooth packet analyzer ver 1.39
 device: hci0 snap_len: 1028 filter: 0xffffffff
