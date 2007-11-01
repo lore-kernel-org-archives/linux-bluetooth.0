@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: smohan@vsnl.com, BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <47293E85.1050708@vsnl.com>
-References: <47293E85.1050708@vsnl.com>
-Date: Thu, 01 Nov 2007 06:02:57 +0100
-Message-Id: <1193893377.32459.111.camel@violet>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20071101001341.0c2a9fd2.vientito1@pppoe.ca>
+References: <20071101001341.0c2a9fd2.vientito1@pppoe.ca>
+Date: Thu, 01 Nov 2007 06:02:23 +0100
+Message-Id: <1193893343.32459.109.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Headset problem
+Subject: Re: [Bluez-users] continue:  error 22
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,16 +20,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mohan,
+Hi Billy,
 
-> I have a Motorola headset and am trying to use it with my system. When I 
-> invoke the Bluetooth headset applet, the headset is discovered by does 
-> not register as the active handset. It looks like the connection is made 
-> but it still does not show up.
-> 
-> root@smohan-laptop:/home/smohan# hcidump
+> when you talk about my device, which one are you talking about - the cellular headset or my USB bluetooth adaptor?  i glance past the manual and it seems to indicate both have headset service (obvious for the headset, otherwise what's its use? ).  or does it have something to do with SCO mapping?  if so, would we expect resolution in the future versions?
 
-use hcidump -X -V. I am not physic.
+stop messing up the threading. Reply in that thread and reply to the
+previous email inline. I am not your assistant who has to keep track of
+things.
 
 Regards
 
