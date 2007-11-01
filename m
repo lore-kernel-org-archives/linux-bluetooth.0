@@ -1,11 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Thu, 1 Nov 2007 00:13:41 -0400
-From: billy leung <vientito1@pppoe.ca>
-To: bluez-users@lists.sourceforge.net
-Message-Id: <20071101001341.0c2a9fd2.vientito1@pppoe.ca>
-Mime-Version: 1.0
-Subject: [Bluez-users] continue:  error 22
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <47293E85.1050708@vsnl.com>
+Date: Thu, 01 Nov 2007 08:18:37 +0530
+MIME-Version: 1.0
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+From: Mohan Sundaram <mohan.tux@gmail.com>
+Subject: [Bluez-users] Headset problem
+Reply-To: smohan@vsnl.com, BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,7 +18,46 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-when you talk about my device, which one are you talking about - the cellular headset or my USB bluetooth adaptor?  i glance past the manual and it seems to indicate both have headset service (obvious for the headset, otherwise what's its use? ).  or does it have something to do with SCO mapping?  if so, would we expect resolution in the future versions?
+I have a Motorola headset and am trying to use it with my system. When I 
+invoke the Bluetooth headset applet, the headset is discovered by does 
+not register as the active handset. It looks like the connection is made 
+but it still does not show up.
+
+root@smohan-laptop:/home/smohan# hcidump
+HCI sniffer - Bluetooth packet analyzer ver 1.39
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+ > HCI Event: Command Status (0x0f) plen 4
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+ > HCI Event: Inquiry Result with RSSI (0x22) plen 15
+ > HCI Event: Inquiry Complete (0x01) plen 1
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+ > HCI Event: Command Status (0x0f) plen 4
+ > HCI Event: Remote Name Req Complete (0x07) plen 255
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+ > HCI Event: Command Status (0x0f) plen 4
+ > HCI Event: Link Key Request (0x17) plen 6
+< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+ > HCI Event: Command Complete (0x0e) plen 10
+ > HCI Event: Connect Complete (0x03) plen 11
+< HCI Command: Read Voice Setting (0x03|0x0025) plen 0
+ > HCI Event: Command Complete (0x0e) plen 6
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+ > HCI Event: Command Status (0x0f) plen 4
+ > HCI Event: Link Key Request (0x17) plen 6
+< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+ > HCI Event: Command Complete (0x0e) plen 10
+ > HCI Event: Connect Complete (0x03) plen 11
+
+after this, hcitool con does not show any connections.
+Mohan
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
