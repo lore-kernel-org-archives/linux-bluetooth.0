@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4729E07A.3070809@free.fr>
-Date: Thu, 01 Nov 2007 15:19:38 +0100
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <719D5CCC2F6E3644B0A9F5C9B1D00088038171C2@esebe104.NOE.Nokia.com><471730B2.3030606@free.fr>	<Pine.LNX.4.64.0710181017560.28683@simba.math.ucla.edu><719D5CCC2F6E3644B0A9F5C9B1D0008803840FC4@esebe104.NOE.Nokia.com>	<471E2829.5020303@free.fr>
-	<719D5CCC2F6E3644B0A9F5C9B1D00088038C8C83@esebe104.NOE.Nokia.com>
-In-Reply-To: <719D5CCC2F6E3644B0A9F5C9B1D00088038C8C83@esebe104.NOE.Nokia.com>
-Subject: Re: [Bluez-devel] experimental ALSA/A2DP plugin patch
+In-Reply-To: <307f591f0710312056r5f3f62ak42bc3cd3b8f01942@mail.gmail.com>
+References: <307f591f0710312056r5f3f62ak42bc3cd3b8f01942@mail.gmail.com>
+Date: Thu, 01 Nov 2007 06:20:55 +0100
+Message-Id: <1193894455.32459.130.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] multi-frequency scanning & US $2,000 'bounty'
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,56 +20,74 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Kai,
+Hi Paul,
 
+> First, regarding the concerns previously stated in the thread: Don't
+> worry about 'spamming'; the customer has to explicitly sign up online
+> first.  There's also no concern about getting the Bluetooth logo on
+> the box; this is a closed system for a particular retail customer.
+> It's a black box solution.  Also, there's no concern about needing to
+> actually 'pair' with the device that fast and transmit data; we just
+> need to quickly detect the phones as they pass through.  And any mods
+> to bluez will be released under GPL. 
 
-> Hi,
+since the system is using Bluetooth, you have to get the Bluetooth logo
+on your box. Otherwise you are not allowed to sell it. You really wanna
+look into the Bluetooth IP license stuff that comes along with the
+Bluetooth logo. You should not ignore this matter.
+
+And just to be clear. Not only the modifications to BlueZ, all programs
+liking in libbluetooth must be made GPL. The Bluetooth library itself is
+GPL and thus your programs must be licensed under GPL, too.
+
+> 2)  Code the software: I need a piece of software that can detect a
+> mobile phone and report the bluetooth id and the mac address of the
+> phone reliably in 2 seconds or less when that phone is passing under
+> the antenna at a speed of up to 2.5 meters per second (ie a brisk
+> walk) so that each phone will always be detected every time as it
+> passes through the coverage area.
+
+If you mean class of device with the bluetooth id, then the D-Bus signal
+RemoteDeviceUpdated gives you exactly that information.
+
+> The software app can just write the mac + bluetooth id to stdout as
+> the phones are detected.  That is sufficient for this, and I can do
+> the rest.  I'd like the software to be in C or C++.  Ideally I'll
+> probably use the 2.4 kernel for this since it seems lighter weight.
+> But I'd need you to confirm that the bluetooth stuff works
+> sufficiently well on 2.4, and we can go to 2.6 if needed.  It has to
+> be reliable and accurate and detect a standard bluetooth phone that is
+> not obscured by anything except perhaps fabric (ie in a pocket) 99% of
+> the time. 
+
+I don't know who comes up with this crap that a 2.4 kernel is more
+lightweight. Because the source code is smaller? Yeah, that is a pretty
+bad indicator. The kernel to use is 2.6.23 and there is no real reason
+to use any older kernel.
+
+> The deliverables are: 1) specify what usb dongle and antenna to use
+> (make/model/supplier), 2) code that compiles with 'make' and runs and
+> performs the tasks described.  I'd like to have the finished solution
+> within about 4 weeks. 
 > 
-> On 23 Oct 2007,  Fabien Chevalier wrote:
->> Except for the timing part, i'm not really sure the receiver 
->> is that clever. I guess at least some of them will expect to 
->> receive data with at their local clock speed...
-> 
-> hmm, based on further reading of the spec, I think the receivers
-> must be that clever. And this makes sense, as it's basicly RTP, 
-> so an off-the-shelf RTP receiver implementation would work
-> for the headsets.
+> If someone thinks that the requirements are doable in the time frame,
+> I'll get the client to provide the contract confirming payment when
+> the deliverables are met.  If it's not doable or will require more
+> time/money, let me know, and I'll try to get the client to approve
+> more.  I told them I thought $2k was reasonable, even though I don't
+> really know all that's involved.  If you e-mail me privately, I'll
+> give you a phone number too so you can call if you'd like to discuss. 
 
-There is a major difference between Internet RTP and Bluetooth RTP.
-AFAIK the senders and the receivers' clocks are not syncrhonized on the 
-Internet, while using bluetooth technology all slaves devices have an 
-estimate of the master clock.
+Just a small piece of advise for everybody who is thinking about taking
+this bounty. Don't post to the mailing list a request on how to do this
+and expect us to write the code for you. Get it done by yourself since
+it is actually pretty simple.
 
-As for off the shelf implementations, i guess everybody just rewrites an 
-  RTP implementation for it's own device, as we have done for the Bluez 
-project :-)
+Regards
 
-> 
-> And that assumption leads to an experimental patch (patch plus
-> patched pcm_bluetooth.c for convenience):
-> 
-> http://sofia-sip.org/~vehmanek/bluez-patches/patch-pcm_bluetooth-kv-2007
-> 1025-works.txt
-> http://sofia-sip.org/~vehmanek/bluez-patches/pcm_bluetooth.c
-> 
->  - send errors are now ignored (packets dropped), seems
->    to have no bad side effects on the headsets I've tested
->    with
->      -> the positive impact is that we can more easily keep
-> 	  up the correct timing even with bigger period sizes
->  - a2dp_write() now loops'n'sends until all data submitted by
->    the app is  encoded (needed to work with MMAP using clients)
->  - allowed period sizes defined as set of values (vs range), 
->    this works with for example pcm.c (seems to be an alsa-lib bug,
->    but didn't have time to track it down)
->  - period count fixed to 3 (seems to work best and still 
->    doesn't confuse ALSA apps)
-> 
+Marcel
 
 
-I'm gonna have a look to that :-)
-
-Fabien
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
