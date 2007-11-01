@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20071031130902.7c0d8dd1.vientito1@pppoe.ca>
-References: <20071031130902.7c0d8dd1.vientito1@pppoe.ca>
-Date: Thu, 01 Nov 2007 06:05:19 +0100
-Message-Id: <1193893519.32459.117.camel@violet>
+To: smohan@vsnl.com, BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <47293E85.1050708@vsnl.com>
+References: <47293E85.1050708@vsnl.com>
+Date: Thu, 01 Nov 2007 06:02:57 +0100
+Message-Id: <1193893377.32459.111.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] broadcomm 2045
+Subject: Re: [Bluez-users] Headset problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,14 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Billy,
+Hi Mohan,
 
-> Is this chipset supposed to work with bluez stack on HSP profile?
+> I have a Motorola headset and am trying to use it with my system. When I 
+> invoke the Bluetooth headset applet, the headset is discovered by does 
+> not register as the active handset. It looks like the connection is made 
+> but it still does not show up.
 > 
-> anyone can confirm if broadcomm 2045 would not work for audio mode under linux bluez stack?
+> root@smohan-laptop:/home/smohan# hcidump
 
-I am sure it works. However I still prefer a CSR chip since they are
-more understood.
+use hcidump -X -V. I am not physic.
 
 Regards
 
