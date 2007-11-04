@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Sumeet VERMA <sumeet.verma@st.com>
-To: <bluez-users@lists.sf.net>
-Date: Mon, 5 Nov 2007 14:31:16 +0530
-Message-ID: <018c01c81f8a$6d010370$832fc70a@dlh.st.com>
+Message-ID: <ecb5e6b70711041110l5e7a5a72tafac1954f6b927aa@mail.gmail.com>
+Date: Sun, 4 Nov 2007 20:10:03 +0100
+From: "Emmanuel Wilhelm" <fremwi@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] Problem with HSP/HFP in bluez-3.22
+Subject: [Bluez-users] sco service with bluez3.19
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,34 +14,77 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0648387925=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi
-I am trying to test the Headset profile using bluez-3.22 but I am facing the following error. I followed the steps from
+--===============0648387925==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_19205_19703013.1194203403553"
+
+------=_Part_19205_19703013.1194203403553
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hello,
+
+with Kubuntu Gutsy, I follow the howto AudioDevices
 http://wiki.bluez.org/wiki/HOWTO/AudioDevices
+Kubuntu installs by default bluez3.19, then I follow the =A7 for bluez3.16 =
+and
+newer.
+
+I have very good results for a2dp with amarok and Kaffeine (with vlc, no
+access to the bluetooth device even with audio device list renewed), but no
+sco service (arecord doesn't work, skype worked with a bluez3.15 but doesn'=
+t
+work anymore):
+
+Does I have something else to do to get access to the sco service?
+
+Regards
+Emmanuel
+
+------=_Part_19205_19703013.1194203403553
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hello,<br><br>with Kubuntu Gutsy, I follow the howto AudioDevices<br><a hre=
+f=3D"http://wiki.bluez.org/wiki/HOWTO/AudioDevices">http://wiki.bluez.org/w=
+iki/HOWTO/AudioDevices</a><br>Kubuntu installs by default bluez3.19, then I=
+ follow the =A7 for=20
+bluez3.16 and newer.<br><br>I have very good results for a2dp with amarok a=
+nd Kaffeine (with vlc, no access to the bluetooth device even with audio de=
+vice list renewed), but no sco service (arecord doesn&#39;t work, skype wor=
+ked with a=20
+bluez3.15 but doesn&#39;t work anymore): <br><br>Does I have something else=
+ to do to get access to the sco service?<br><br>Regards<br>Emmanuel<br>
+
+------=_Part_19205_19703013.1194203403553--
 
 
-[root@dlhl0330 audio]# dbus-send --system --print-reply --type=method_call --dest=:1.3 /org/bluez/audio org.bluez.audio.Manager.CreateHeadset string:XX:XX:XX:11:65:00
-method return sender=:1.3 -> dest=:1.19
- string "/org/bluez/audio/device3"
-[root@dlhl0330 audio]# dbus-send --system --print-reply --type=method_call --dest=:1.3 /org/bluez/audio/device3 org.bluez.audio.Headset.Connect
-Error org.freedesktop.DBus.Error.UnknownMethod: Method "Connect" with signature "" on interface "org.bluez.audio.Headset" doesn't exist
-
-
-The A2DP profile is working fine.
-
-Regards,
-Sumeet 
-
+--===============0648387925==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
+--===============0648387925==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0648387925==--
