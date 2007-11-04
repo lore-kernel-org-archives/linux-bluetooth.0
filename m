@@ -1,12 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: David Elze <wegwerf@datenschrott.de>
+Message-ID: <472DFD88.6060108@pagema.net>
+Date: Sun, 04 Nov 2007 18:12:40 +0100
+From: maho+bluez <maho+bluez@pagema.net>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <472DFD88.6060108@pagema.net>
 References: <1194192865.2823.20.camel@aero64.datenschrott.de>
-	<472DFD88.6060108@pagema.net>
-Date: Sun, 04 Nov 2007 18:46:37 +0100
-Message-Id: <1194198397.2823.29.camel@aero64.datenschrott.de>
-Mime-Version: 1.0
+In-Reply-To: <1194192865.2823.20.camel@aero64.datenschrott.de>
 Subject: Re: [Bluez-users] headset via bluetooth-headset not fully working
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,79 +20,41 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hey maHo, 
+David Elze wrote:
+> Hey, 
+>
+> I'm running Debian unstable and want to do some VoIP stuff with my
+> HBH-PV700 (Sony Ericsson) headset over a standard bluetooth dongle
+> (usb).
+>
+> Pretty everything works as it should: 
+> 1. I can pair the headset correctly (hcitool, gnome bluetooth 
+>    manager and friends) [1]
+> 2. I can start the headsetd via 'headsetd -n' to get its output
+> 3. When I run 
+>    'aplay -Dplug:headset /usr/share/sounds/alsa/Front_Center.wav'
+>    the headsets does a beep, I can hear some silent noise (nothing
+>    like the expected sound, only background noise that is slightly
+>    louder than the headset normally is if there is no aplay involved)
+>    but not the expected sound and headsetd says [2] whereas my 
+>    .asoundrc looks like [3]
+>   
+[...]
+What aplay -v -Dplug:headset /usr/share/sounds/alsa/Front_Center.wav says?
 
-Am Sonntag, den 04.11.2007, 18:12 +0100 schrieb maho+bluez:
-> What aplay -v -Dplug:headset /usr/share/sounds/alsa/Front_Center.wav says?
-> Doesn't it say that "Prorotocol not available (92)" ?
+Doesn't it say that "Prorotocol not available (92)" ?
 
-Nope, the output is just:
+I have very similar problems (see
+http://article.gmane.org/gmane.linux.bluez.user/12981), but no solution
+yet, but my aplay gives that error #92.
 
-# aplay -v -Dplug:headset /usr/share/sounds/alsa/Front_Center.wav
-Playing WAVE '/usr/share/sounds/alsa/Front_Center.wav' : Signed 16 bit
-Little Endian, Rate 48000 Hz, Mono
-Plug PCM: Rate conversion PCM (8000, sformat=S16_LE)
-Its setup is:
-  stream       : PLAYBACK
-  access       : RW_INTERLEAVED
-  format       : S16_LE
-  subformat    : STD
-  channels     : 1
-  rate         : 48000
-  exact rate   : 48000 (48000/1)
-  msbits       : 16
-  buffer_size  : 24048
-  period_size  : 144
-  period_time  : 3000
-  tick_time    : 0
-  tstamp_mode  : NONE
-  period_step  : 1
-  sleep_min    : 0
-  avail_min    : 144
-  xfer_align   : 144
-  start_threshold  : 24048
-  stop_threshold   : 24048
-  silence_threshold: 0
-  silence_size : 0
-  boundary     : 1576009728
-Slave: Bluetooth SCO Audio
-Its setup is:
-  stream       : PLAYBACK
-  access       : MMAP_INTERLEAVED
-  format       : S16_LE
-  subformat    : STD
-  channels     : 1
-  rate         : 8000
-  exact rate   : 8000 (8000/1)
-  msbits       : 16
-  buffer_size  : 4008
-  period_size  : 24
-  period_time  : 3000
-  tick_time    : 0
-  tstamp_mode  : NONE
-  period_step  : 1
-  sleep_min    : 0
-  avail_min    : 24
-  xfer_align   : 24
-  start_threshold  : 4008
-  stop_threshold   : 4008
-  silence_threshold: 0
-  silence_size : 0
-  boundary     : 2101346304
+I suspect that it's hardware issue, but I don't know if it's my headset
+(moto h500), usb dongle (some broadcom), or something else?
 
-Rate conversion is done (48kHz->8kHz) so this can't be the problem
-anyways. Furthermore, if I play some longer file (or for example a
-mp3 via xmms with the headset as alsa output device selected) the
-same happens. Headset beeps initially, sound is playing according to the
-user level in Linux quite normally but there is no sound at the headset,
-just this very low noise (that goes away when the user level player,
-aplay or xmms, is done). 
+regards
 
-Oh, and I also tried to record something off the headset via arecord: 
-the sound seems to be recorded (again, no errors at all) but the
-resulting wav-file is just empty.
+maHo
 
-Greets, David
 
 
 -------------------------------------------------------------------------
