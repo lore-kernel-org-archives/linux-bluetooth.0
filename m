@@ -1,202 +1,163 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Return-Path: <hidave.darkstar@gmail.com>
+Message-ID: <a8e1da0711051846u1b0a4e3he1226bcaf321eab0@mail.gmail.com>
+Date: Tue, 6 Nov 2007 10:46:32 +0800
+From: "Dave Young" <hidave.darkstar@gmail.com>
+To: "Cornelia Huck" <cornelia.huck@de.ibm.com>
+Subject: Re: Warnings and Oops on 2.6.23-rc6 while activily using rfcomm links (mm/slab.c)
+Cc: "Pierre-Yves Paulus" <py@idlum.be>, linux-kernel@vger.kernel.org,
+        "Chuck Ebbert" <cebbert@redhat.com>,
+        "BlueZ development" <bluez-devel@lists.sourceforge.net>,
+        "Marcel Holtmann" <marcel@holtmann.org>
+In-Reply-To: <20071001143230.3c370b2e@gondolin.boeblingen.de.ibm.com>
 MIME-Version: 1.0
-Date: Mon, 5 Nov 2007 22:59:14 -0500
-Message-ID: <C041389043587644A5B9F3006A412D76043B42@eevsbs.EEV.local>
-From: "Tom McKaige" <tmckaige@eeventures.net>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] a2dp support for multiple headphones through multiple
-	dongles
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1331229304=="
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Content-Type: multipart/mixed;
+	boundary="----=_Part_26981_5171473.1194317192896"
+References: <46F92364.3080603@idlum.be> <46FA5E2E.3010300@idlum.be>
+	 <20070927085658.1c66f1c8@gondolin.boeblingen.de.ibm.com>
+	 <46FBC1AE.4020404@idlum.be> <46FBF17A.6030009@idlum.be>
+	 <20070928085438.4eb5a38f@gondolin.boeblingen.de.ibm.com>
+	 <46FD1200.9020407@idlum.be> <46FD1670.5070109@idlum.be>
+	 <46FD2CA0.3050704@idlum.be>
+	 <20071001143230.3c370b2e@gondolin.boeblingen.de.ibm.com>
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-This is a multi-part message in MIME format.
-
---===============1331229304==
-Content-class: urn:content-classes:message
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C82029.6518EB6E"
-
-This is a multi-part message in MIME format.
-
-------_=_NextPart_001_01C82029.6518EB6E
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-Hi everyone,
-=20
-I am new to both linux and BLUEZ...=20
-I am interested in the feasibility of getting multiple A2DP headsets =
-playing audio through multiple USB->BT dongles simultaneously.  From the =
-below two references I am confused if this is a "future wish" or already =
-implemented feature in the current 3.22.  I highlighted in red the =
-source of my confusion.
-=20
-If this feature is already implemented can someone give me a quick =
-example of how to set up asound.conf and asoundrc so that I can get =
-audio to multiple headsets. I don't require any more than a one to one =
-headphone to dongle relationship. =20
-=20
-If its not already done what would be a sufficient bounty for this?
-=20
-Thanks in advance
-Tom=20
-=20
-http://wiki.bluez.org/wiki/Audio
-FROM the section 'Control socket API"=20
-
-"Plugz does not have any way to handle multiple independent headsets. We =
-should at least make a design that doesn't prevent multiple headsets. =
-The dbus interface allows us to be specific about what headset we want =
-to connect or which headset has connected itself. The dbus api will =
-probably also need to pass an index for talking to that headset along =
-with connection events. It would usually be 0 (meaning the only set =
-connected) but it could be 1, 2, 3. We'd have to set up device entries =
-in asound.conf for all these, eg: bluetooth (aka bluetooth0), =
-bluetooth1, bluetooth2. These would have an index parameter set to the =
-right value."
-
-=20
-
-
-asound.conf =B6
-
-
-We will have to put a bunch of entries in here that applications can be =
-pointed at, 0 in the examples is to signify the first/only device, ie =
-device_index=3D0. could also have alsa entries for 1, 2, 3=20
-
-*	voice, aka voice0 (audio_preference=3Dvoice; will use sco and/or =
-wired)=20
-*	hifi, aka hifi0 (audio_preference=3Dhifi; will use a2dp or wired for =
-output, wired mic)=20
-*	auto, aka auto0 (audio_preference=3Dauto; autodetect profile)=20
-*	loud, aka loud0 (alternate_speaker_device=3Ddefault; will send sound, =
-eg ringer, to any headset too)=20
-*	any, aka any0 (audio_preference=3Dnone; always prefer a2dp, sco, then =
-wired)=20
-
-
-------_=_NextPart_001_01C82029.6518EB6E
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"><HTML =
-DIR=3Dltr><HEAD><META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
-charset=3Diso-8859-1"></HEAD><BODY><DIV><FONT face=3D'Arial' =
-color=3D#000000 size=3D2>=0A=
-<DIV><FONT face=3DArial color=3D#000000 size=3D2>Hi =
-everyone,</FONT></DIV>=0A=
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>=0A=
-<DIV><FONT face=3DArial size=3D2>I am new to both linux and =0A=
-BLUEZ...&nbsp;</FONT></DIV>=0A=
-<DIV><FONT face=3DArial size=3D2>I am interested in the feasibility of =
-getting =0A=
-multiple A2DP headsets playing audio through multiple USB-&gt;BT dongles =0A=
-simultaneously.&nbsp; From the below two references I am confused if =
-this is a =0A=
-"future wish" or already implemented feature in the =
-current&nbsp;3.22.&nbsp; I =0A=
-highlighted in red the source of my confusion.</FONT></DIV>=0A=
-<DIV>&nbsp;</DIV>=0A=
-<DIV><FONT face=3DArial size=3D2>If this feature is already implemented =
-can someone =0A=
-give me a quick example of how to set up asound.conf =
-and&nbsp;asoundrc&nbsp;so =0A=
-that&nbsp;I can get&nbsp;audio to multiple headsets.&nbsp;I don't =
-require any =0A=
-more than a one to one headphone to dongle relationship.&nbsp; =
-</FONT></DIV>=0A=
-<DIV>&nbsp;</DIV>=0A=
-<DIV>If its not already done what would be a sufficient bounty for =
-this?</DIV>=0A=
-<DIV>&nbsp;</DIV>=0A=
-<DIV><FONT face=3DArial size=3D2>Thanks in advance</FONT></DIV>=0A=
-<DIV><FONT face=3DArial size=3D2>Tom</FONT>&nbsp;</DIV>=0A=
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>=0A=
-<DIV><FONT face=3DArial size=3D2><A =0A=
-href=3D"/exchweb/bin/redir.asp?URL=3Dhttp://wiki.bluez.org/wiki/Audio" =0A=
-target=3D_blank>http://wiki.bluez.org/wiki/Audio</A></FONT></DIV>=0A=
-<DIV><FONT face=3DArial size=3D2>FROM the section '<FONT =0A=
-face=3D"Times New Roman">Control socket API"</FONT><A class=3Danchor =0A=
-title=3D"Link to this section" href=3D""><FONT face=3D"Times New Roman"> =0A=
-</FONT></A></FONT></DIV>=0A=
-<DIV>=0A=
-<P>"<STRONG><FONT color=3D#ff0000>Plugz does not have any way to handle =
-multiple =0A=
-independent headsets. We should at least make a design that doesn't =
-prevent =0A=
-multiple headsets. The dbus interface allows us to be specific about =
-what =0A=
-headset we want to connect or which headset has connected =0A=
-itself.</FONT></STRONG> The dbus api will probably also need to pass an =
-index =0A=
-for talking to that headset along with connection events. It would =
-usually be 0 =0A=
-(meaning the only set connected) but it could be 1, 2, 3. We'd have to =
-set up =0A=
-device entries in asound.conf for all these, eg: bluetooth (aka =
-bluetooth0), =0A=
-bluetooth1, bluetooth2. These would have an index parameter set to the =
-right =0A=
-value."</P>=0A=
-<P>&nbsp;</P>=0A=
-<H3 id=3Dasound.conf>asound.conf<A class=3Danchor title=3D"Link to this =
-section" =0A=
-href=3D""> =B6</A></H3>=0A=
-<P><FONT color=3D#ff0000><STRONG>We will have to put a bunch of entries =
-in here =0A=
-that applications can be pointed at, 0 in the examples is to signify the =0A=
-first/only device, ie device_index=3D0. could also have alsa entries for =
-1, 2, 3 =0A=
-</STRONG></FONT></P>=0A=
-<UL>=0A=
-  <LI>voice, aka voice0 (audio_preference=3Dvoice; will use sco and/or =
-wired) =0A=
-  <LI>hifi, aka hifi0 (audio_preference=3Dhifi; will use a2dp or wired =
-for output, =0A=
-  wired mic) =0A=
-  <LI>auto, aka auto0 (audio_preference=3Dauto; autodetect profile) =0A=
-  <LI>loud, aka loud0 (alternate_speaker_device=3Ddefault; will send =
-sound, eg =0A=
-  ringer, to any headset too) =0A=
-  <LI>any, aka any0 (audio_preference=3Dnone; always prefer a2dp, sco, =
-then wired) =0A=
-  </LI></UL></DIV></FONT></DIV></BODY></HTML>
-------_=_NextPart_001_01C82029.6518EB6E--
-
-
---===============1331229304==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+------=_Part_26981_5171473.1194317192896
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============1331229304==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+On 10/1/07, Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
+> On Fri, 28 Sep 2007 18:32:32 +0200,
+> Pierre-Yves Paulus <py@idlum.be> wrote:
+>
+> This looks more informational, thanks.
+>
+> > DEV: Unregistering device. ID = 'rfcomm0'
+> > PM: Removing info for No Bus:rfcomm0
+> > kobject_uevent_env
+> > fill_kobj_path: path = '/class/tty/rfcomm0'
+> > fill_kobj_path: path =
+> > '/devices/pci0000:00/0000:00:0f.4/usb1/1-1/1-1.5/1-1.5.1/1-1.5.1:1.0/hci2/acl00126253F906'
+> > kobject rfcomm0: cleaning up
+> > device_create_release called for rfcomm0
+>
+> Here rfcomm0 was unregistered and released.
+>
+> > bus bluetooth: remove device acl00126253F906
+> > PM: Removing info for bluetooth:acl00126253F906
+> > kobject_uevent_env
+> > fill_kobj_path: path =
+> > '/devices/pci0000:00/0000:00:0f.4/usb1/1-1/1-1.5/1-1.5.1/1-1.5.1:1.0/hci2/acl00126253F906'
+> > kobject acl00126253F906: cleaning up
+>
+> And here the corresponding physdev.
+>
+> > BUG: unable to handle kernel NULL pointer dereference at virtual address
+> > 00000000
+> >   printing eip:
+> > c0249e29
+> > *pde = 00000000
+> > Oops: 0000 [#1]
+> > Modules linked in: rfcomm l2cap battery ipv6 dm_snapshot dm_mirror
+> > dm_mod softdog loop parport_pc parport floppy rtc pcspkr ac button
+> > psmouse serio_raw snd_cs5535audio snd_ac97_codec ac97_bus snd_pcm
+> > snd_timer snd soundcore snd_page_alloc geode_rng cs5535_gpio hci_usb
+> > bluetooth geode_aes blkcipher tsdev evdev usbhid hid reiserfs ide_disk
+> > generic amd74xx ide_core ohci_hcd sata_via ata_generic 8139cp libata
+> > 8139too usbcore mii scsi_mod thermal processor fan
+> > CPU:    0
+> > EIP:    0060:[<c0249e29>]    Not tainted VLI
+> > EFLAGS: 00010017   (2.6.23-rc8 #1)
+> > EIP is at skb_dequeue+0x23/0x4a
+> > eax: 00000282   ebx: 00000282   ecx: 00000000   edx: caf8ab8c
+> > esi: c8428d48   edi: c8428c00   ebp: c8428c0c   esp: c124ff60
+> > ds: 007b   es: 007b   fs: 0000  gs: 0000  ss: 0068
+> > Process events/0 (pid: 5, ti=c124e000 task=c1243500 task.ti=c124e000)
+> > Stack: caf8ab8c c024b0a1 c8428c00 d02f4075 c8428d60 c020eb8d c08978a8
+> > 00000000
+> >         00000000 00000000 cf7ab680 c8428d48 c020eac4 00000000 c01279a9
+> > c124ffb4
+> >         00000046 c1243500 cf7ab680 cf7ab680 c0127ffe c124ffd0 c01280b0
+> > 00000000
+> > Call Trace:
+> >   [<c024b0a1>] skb_queue_purge+0x11/0x17
+> >   [<d02f4075>] rfcomm_tty_flush_buffer+0x1c/0x33 [rfcomm]
+> >   [<c020eb8d>] do_tty_hangup+0xc9/0x2d0
+> >   [<c020eac4>] do_tty_hangup+0x0/0x2d0
+> >   [<c01279a9>] run_workqueue+0x7d/0x103
+> >   [<c0127ffe>] worker_thread+0x0/0xbe
+> >   [<c01280b0>] worker_thread+0xb2/0xbe
+> >   [<c012a510>] autoremove_wake_function+0x0/0x35
+> >   [<c012a363>] kthread+0x36/0x5b
+> >   [<c012a32d>] kthread+0x0/0x5b
+> >   [<c0104e17>] kernel_thread_helper+0x7/0x10
+> >   =======================
+>
+> rfcomm0 is already freed, maybe this code is still trying to access it?
+>
+> > Code: 89 42 0a 5b 5e 5f 5d c3 53 89 c2 9c 58 90 8d b4 26 00 00 00 00 89
+> > c3 fa 90 8d b4 26 00 00 00 00 90 8b 0a 39 d1 75 04 31 c9 eb 17 <8b> 01
+> > ff 4a 08 89 02 89 50 04 c7 01 00 00 00 00 c7 41 04 00 00
+> > EIP: [<c0249e29>] skb_dequeue+0x23/0x4a SS:ESP 0068:c124ff60
+> > WARNING: at lib/kref.c:33 kref_get()
+> >   [<c01c6db7>] kref_get+0x34/0x3d
+> >   [<c01c61a9>] kobject_get+0xf/0x13
+> >   [<c022578d>] get_device+0xe/0x14
+> >   [<c02257a6>] device_move+0x13/0x114
+> >   [<d02f4b7c>] rfcomm_tty_close+0x23/0x61 [rfcomm]
+> >   [<c020f88d>] release_dev+0x1c0/0x54e
+> >   [<d02f40e5>] rfcomm_dev_destruct+0x59/0x65 [rfcomm]
+> >   [<d02f4725>] rfcomm_dev_ioctl+0x329/0x4d0 [rfcomm]
+> >   [<c0130c96>] tick_program_event+0x2a/0x49
+> >   [<c0248124>] release_sock+0xc/0x74
+> >   [<c020fc22>] tty_release+0x7/0xa
+> >   [<c015dabd>] __fput+0x93/0x147
+> >   [<c015b66a>] filp_close+0x51/0x58
+> >   [<c02a8b0e>] __sched_text_start+0x1d6/0x245
+> >   [<c015c70b>] sys_close+0x54/0x83
+> >   [<c0103c72>] syscall_call+0x7/0xb
+> >   =======================
+> > DEVICE: moving 'rfcomm0' to '<NULL>'
+> > kobject <NULL>: cleaning up
+> > device_create_release called for rfcomm0
+>
+> But here someone still tries to move rfcomm0 around? It already is gone
+> and released... The code path has no reference on rfcomm0. (Well,
+> device_move() tries to get a reference on the device to be moved, but
+> that doesn't help since the device is already gone.)
+>
+> This looks like a race inside rfcomm. The device_unregister() either
+> needs to be delayed until after device_move() has finished, or the
+> thread calling device_move() needs to have a reference. (device_move()
+> on an unregistered device should just fail but not oops.) Marcel?
+> -
+Hi,
+please try the attached patch.
+or the one by marcel in http://lkml.org/lkml/2007/11/5/111
 
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Please tell me the result, thanks.
 
---===============1331229304==--
+Regards
+dave
+
+------=_Part_26981_5171473.1194317192896
+Content-Type: application/octet-stream; name=diff.rfcomm
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_f8ntqq3i
+Content-Disposition: attachment; filename=diff.rfcomm
+
+U2lnbmVkLW9mZi1ieTogRGF2ZSBZb3VuZyA8aGlkYXZlLmRhcmtzdGFyQGdtYWlsLmNvbT4gCgot
+LS0KbmV0L2JsdWV0b290aC9yZmNvbW0vdHR5LmMgfCAgICA3IC0tLS0tLS0KMSBmaWxlIGNoYW5n
+ZWQsIDcgZGVsZXRpb25zKC0pCgpkaWZmIC11cHIgbGludXgvbmV0L2JsdWV0b290aC9yZmNvbW0v
+dHR5LmMgbGludXgubmV3L25ldC9ibHVldG9vdGgvcmZjb21tL3R0eS5jCi0tLSBsaW51eC9uZXQv
+Ymx1ZXRvb3RoL3JmY29tbS90dHkuYwkyMDA3LTExLTA1IDExOjI4OjQ5LjAwMDAwMDAwMCArMDgw
+MAorKysgbGludXgubmV3L25ldC9ibHVldG9vdGgvcmZjb21tL3R0eS5jCTIwMDctMTEtMDUgMTE6
+MzA6NTkuMDAwMDAwMDAwICswODAwCkBAIC0xMDE4LDEzICsxMDE4LDYgQEAgc3RhdGljIHZvaWQg
+cmZjb21tX3R0eV9oYW5ndXAoc3RydWN0IHR0eQogCQlyZXR1cm47CiAKIAlyZmNvbW1fdHR5X2Zs
+dXNoX2J1ZmZlcih0dHkpOwotCi0JaWYgKHRlc3RfYml0KFJGQ09NTV9SRUxFQVNFX09OSFVQLCAm
+ZGV2LT5mbGFncykpIHsKLQkJaWYgKHJmY29tbV9kZXZfZ2V0KGRldi0+aWQpID09IE5VTEwpCi0J
+CQlyZXR1cm47Ci0JCXJmY29tbV9kZXZfZGVsKGRldik7Ci0JCXJmY29tbV9kZXZfcHV0KGRldik7
+Ci0JfQogfQogCiBzdGF0aWMgaW50IHJmY29tbV90dHlfcmVhZF9wcm9jKGNoYXIgKmJ1ZiwgY2hh
+ciAqKnN0YXJ0LCBvZmZfdCBvZmZzZXQsIGludCBsZW4sIGludCAqZW9mLCB2b2lkICp1bnVzZWQp
+Cg==
+------=_Part_26981_5171473.1194317192896--
