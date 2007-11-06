@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4732FBFB.4090804@thebmwz3.co.uk>
-Date: Thu, 08 Nov 2007 12:07:23 +0000
-From: Andy Brown <andy@thebmwz3.co.uk>
-MIME-Version: 1.0
+Message-ID: <5c1c70820711052228i4c46fa04lede3ffd9d2b543c4@mail.gmail.com>
+Date: Tue, 6 Nov 2007 16:58:08 +1030
+From: "Pooyan McSporran" <duckfreezone@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] multiple simultaneous connections
+MIME-Version: 1.0
+Subject: [Bluez-users] BlueZ/DBus/C++ ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,25 +18,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi All,
-Hopefully a simple one, I'd like to know if Bluez supports multiple 
-connections, and also if I can tell if my device supports it.
+I've previously written various BlueZ tools in C++ using the (old)
+socket interface, but I figure it's time I started using the DBus
+interface.  The problem is that I'm finding it hard working out how to
+combine C++ and DBus and BlueZ.
 
-I am trying to run two l2ping or connections at the same time, and 
-always seems to be the first one works, the second one fails with many 
-random errors (Connection timed out, Function not implemented, Can't 
-connect, etc).
+I can write small programs that use C and DBus and BlueZ (via the GLIB
+bindings), and I've written code using C++ and DBus (via the OpenWengo
+C++ bindings) but not using BlueZ.
 
-So is there a way I can check if my USB dongle supports multiple 
-connections, and/or Bluez can support it?
+Does anyone have any example code using C++ and DBus and BlueZ, or
+indeed any other  information that might be helpful?
 
-Thanks for the help everyone.
-
--- 
-Andy
-e: andy @ thebmwz3.co.uk
-e: andy @ broadcast-tech.co.uk
-
+(I see that Qtopia has BlueZ support, but I'd rather not tie myself to
+Qt as I'd like to minimise dependencies.)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
