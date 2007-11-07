@@ -1,38 +1,48 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000001c8212f$58c2cc80$0a486580$@savary@kerlink.fr>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <47320355.7020600@gmail.com>
+Date: Wed, 07 Nov 2007 15:26:29 -0300
+From: Manuel Naranjo <naranjo.manuel@gmail.com>
+MIME-Version: 1.0
+To: Olivier Le Pogam <olepogam@free.fr>,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 References: <000001c8212f$58c2cc80$0a486580$@savary@kerlink.fr>
-Date: Wed, 07 Nov 2007 19:27:01 +0100
-Message-Id: <1194460021.4635.0.camel@aeonflux>
-Mime-Version: 1.0
-Cc: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] [Bluez-devel] Bluez utils and libs 3.22
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+	<00ef01c8214f$1f9cc580$0200a8c0@jester>
+In-Reply-To: <00ef01c8214f$1f9cc580$0200a8c0@jester>
+Subject: Re: [Bluez-devel] Bluez libs 3.22 & hci_read_remote_name
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pierre,
+I had seen the same problem, but by doing "hcitool scan". I have a piece
+of code in C that does scanning (based on the web site example) and it
+doesn't seem to be having the same problem.
 
-> I want to upgrade utils and libs. My kernel is 2.6.21. Do I have to upgrade
-> the kernel to use these new utils?
+Maybe hci_* functions had started failing? And it's time to move to D-BUS?
 
-not necessary, but I would still advise to upgrade the kernel to at
-least 2.6.23.
+D-BUS is a great solution, I really like it, I had my first experience
+with it during the weekend, and it's much better than calling libbluez
+directly, but AFAIK there's no way to open an rfcomm channel and wait
+for connections. So moving to D-BUS is not 100% applicable yet.
 
-Regards
-
-Marcel
-
+Thanks
+Manuel
+> I have big problems making "hci_read_remote_name" work using libs 3.22, it 
+> is very long or blocking.
+> I had to roll back to 3.20 which is working fine.
+> I have 4 dongles on my computer, maybe has there been a change on 
+> multi-devices in 3.22 ?
+> If you need me to investigate further just ask me what to do and I'll 
+> provide you with more details.
+>   
 
 
 -------------------------------------------------------------------------
@@ -41,6 +51,6 @@ Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
