@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <194c6ea30711072228t74e00705ub785d74a8de77c29@mail.gmail.com>
-Date: Thu, 8 Nov 2007 14:28:16 +0800
-From: "dong yan" <semiydsemiyd@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <473204D5.6060809@tiscali.nl>
+Date: Wed, 07 Nov 2007 19:32:53 +0100
+From: Roel Kluin <12o3l@tiscali.nl>
 MIME-Version: 1.0
-Subject: [Bluez-devel] Does BlueZ 3.22 support SPP profile?
+To: bluez-devel@lists.sf.net
+Subject: [Bluez-devel] [PATCH] fix freeing of skbs in btsdio_rx_packet();
+	drivers/bluetooth/btsdio.c
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,25 +19,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi All:
-    im about to use bluez3.22 to connect my development-board with a
-GPS module that supports SPP.
-   Does BlueZ3.22 support the SPP profile? I read on the wiki of
-bluez.org that the protocol stack supports serial service(RFCOMM).
-Also,after i cross-compiled bluez-utils-3.22,there's a program named
-"bluetoothd-service-serial" which seems like a demon handles all the
-serial service.This programme is initiated by hcid when the system
-starts.     But the SPP profile is based on the RFCOMM service.(maybe
-im wrong?) So supporting serial service/rfcomm doesn't necessarily
-means it supports SPP?
+Free skbs with kfree_skb rather than kfree
 
-If bluez do supports SPP,how can i use it ?
-
-
-Thanks for any help!
-
-
-semiyd
+Signed-off-by: Roel Kluin <12o3l@tiscali.nl>
+---
+diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+index b786f61..df79882 100644
+--- a/drivers/bluetooth/btsdio.c
++++ b/drivers/bluetooth/btsdio.c
+@@ -152,7 +152,7 @@ static int btsdio_rx_packet(struct btsdio_data *data)
+ 
+ 	err = sdio_readsb(data->func, skb->data, REG_RDAT, len - 4);
+ 	if (err < 0) {
+-		kfree(skb);
++		kfree_skb(skb);
+ 		return err;
+ 	}
+ 
+@@ -163,7 +163,7 @@ static int btsdio_rx_packet(struct btsdio_data *data)
+ 
+ 	err = hci_recv_frame(skb);
+ 	if (err < 0) {
+-		kfree(skb);
++		kfree_skb(skb);
+ 		return err;
+ 	}
+ 
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
