@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: "Pierre Savary" <pierre.savary@kerlink.fr>
-To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>,
-        "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-References: <000001c8212f$58c2cc80$0a486580$@savary@kerlink.fr>
-	<1194460021.4635.0.camel@aeonflux>
-In-Reply-To: <1194460021.4635.0.camel@aeonflux>
-Date: Thu, 8 Nov 2007 08:49:51 +0100
-Message-ID: <002601c821db$f1d7b820$d5872860$@savary@kerlink.fr>
+Message-ID: <194c6ea30711072228t74e00705ub785d74a8de77c29@mail.gmail.com>
+Date: Thu, 8 Nov 2007 14:28:16 +0800
+From: "dong yan" <semiydsemiyd@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] [Bluez-users]  Bluez utils and libs 3.22
+Subject: [Bluez-devel] Does BlueZ 3.22 support SPP profile?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,54 +14,29 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Thanks for your response. For several reasons, I cannot upgrade the
-integrality of my kernel. However is it possible to upgrade only what is
-necessary to update the stack Bluez? Exists there patchs tu update only
-Bluez?
+Hi All:
+    im about to use bluez3.22 to connect my development-board with a
+GPS module that supports SPP.
+   Does BlueZ3.22 support the SPP profile? I read on the wiki of
+bluez.org that the protocol stack supports serial service(RFCOMM).
+Also,after i cross-compiled bluez-utils-3.22,there's a program named
+"bluetoothd-service-serial" which seems like a demon handles all the
+serial service.This programme is initiated by hcid when the system
+starts.     But the SPP profile is based on the RFCOMM service.(maybe
+im wrong?) So supporting serial service/rfcomm doesn't necessarily
+means it supports SPP?
 
-Thanks in advance.
-
-Pierre =
-
-
------Message d'origine-----
-De=A0: bluez-users-bounces@lists.sourceforge.net
-[mailto:bluez-users-bounces@lists.sourceforge.net] De la part de Marcel
-Holtmann
-Envoy=E9=A0: mercredi 7 novembre 2007 19:27
-=C0=A0: BlueZ development
-Cc=A0: bluez-users@lists.sourceforge.net
-Objet=A0: Re: [Bluez-users] [Bluez-devel] Bluez utils and libs 3.22
-
-Hi Pierre,
-
-> I want to upgrade utils and libs. My kernel is 2.6.21. Do I have to
-upgrade
-> the kernel to use these new utils?
-
-not necessary, but I would still advise to upgrade the kernel to at
-least 2.6.23.
-
-Regards
-
-Marcel
+If bluez do supports SPP,how can i use it ?
 
 
+Thanks for any help!
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Splunk Inc.
-Still grepping through log files to find problems?  Stop.
-Now Search log events and configuration files using AJAX and a browser.
-Download your FREE copy of Splunk now >> http://get.splunk.com/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
 
+semiyd
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
