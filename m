@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <473482DA.8090300@csr.com>
-Date: Fri, 09 Nov 2007 15:55:06 +0000
-From: David Vrabel <david.vrabel@csr.com>
+Message-ID: <47348048.8000107@cenosys.com>
+Date: Fri, 09 Nov 2007 16:44:08 +0100
+From: Guillaume Ligneul <guillaume.ligneul@cenosys.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <47348048.8000107@cenosys.com>
-In-Reply-To: <47348048.8000107@cenosys.com>
-Subject: Re: [Bluez-devel] BC6 over SDIO
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] BC6 over SDIO
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,25 +18,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Guillaume Ligneul wrote:
-> Hi all,
-> 
-> I am developping on Linux 2.6.14. On this version, there's not SDIO 
-> bluez support.
-> Does anyone know if I can use Bluez to use my BC6 over SDIO ?
+Hi all,
 
-You will require 2.6.24-rc1 or later.
+I am developping on Linux 2.6.14. On this version, there's not SDIO 
+bluez support.
+Does anyone know if I can use Bluez to use my BC6 over SDIO ?
+I have bluez-utils with bccmd but this command doesn't support SDIO,
+does it exist any soft to set BC6 PS Keys ?
+To finish, do you think it could be better to use UART protocol than SDIO ?
 
-> To finish, do you think it could be better to use UART protocol than SDIO ?
+Thanks all
 
-This depends on your particular hardware/software platform.  If you
-don't wish to upgrade your kernel and you have a sufficiently fast UART
-available then it may be best to just use a UART.
 
-David
+
 -- 
-David Vrabel, Software Engineer, Drivers group  Tel: +44 (0)1223 692562
-CSR plc, Churchill House, Cambridge Business Park, Cowley Road, CB4 0WZ
+
+Mario
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
