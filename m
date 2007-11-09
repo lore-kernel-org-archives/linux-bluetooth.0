@@ -1,10 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <47348048.8000107@cenosys.com>
-Date: Fri, 09 Nov 2007 16:44:08 +0100
-From: Guillaume Ligneul <guillaume.ligneul@cenosys.com>
+Message-ID: <d89ddf300711090727u3aa0b50bie97615df7c71d195@mail.gmail.com>
+Date: Fri, 9 Nov 2007 08:27:01 -0700
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <47347AB3.30504@kernelconcepts.de>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] BC6 over SDIO
+References: <47347AB3.30504@kernelconcepts.de>
+Subject: Re: [Bluez-devel] i.Tech Clip S38 - MP3 streaming?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,23 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all,
+Nils
 
-I am developping on Linux 2.6.14. On this version, there's not SDIO 
-bluez support.
-Does anyone know if I can use Bluez to use my BC6 over SDIO ?
-I have bluez-utils with bccmd but this command doesn't support SDIO,
-does it exist any soft to set BC6 PS Keys ?
-To finish, do you think it could be better to use UART protocol than SDIO ?
+> I have one of those "i.Tech Clip S38" laying quite uselessly on my desk...
 
-Thanks all
+I have a similar r35. mp3 is a different codec that you choose when
+negotiating the connection. I made the old a2play detect the codec but
+never did try to use it.
 
-
+The right approach is to work with the gstreamer plugins inside
+bluez-utils so the codec negotiation happens the gst way. This way an
+mp3 stream would naturally choose the mp3 decoder as the optimal
+selection.
 
 -- 
-
-Mario
-
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
