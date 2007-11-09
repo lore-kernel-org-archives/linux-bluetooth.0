@@ -1,13 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <473485D7.8080101@kernelconcepts.de>
-Date: Fri, 09 Nov 2007 17:07:51 +0100
-From: Nils Faerber <nils.faerber@kernelconcepts.de>
+Message-ID: <473482DA.8090300@csr.com>
+Date: Fri, 09 Nov 2007 15:55:06 +0000
+From: David Vrabel <david.vrabel@csr.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <47347AB3.30504@kernelconcepts.de>
-	<d89ddf300711090727u3aa0b50bie97615df7c71d195@mail.gmail.com>
-In-Reply-To: <d89ddf300711090727u3aa0b50bie97615df7c71d195@mail.gmail.com>
-Subject: Re: [Bluez-devel] i.Tech Clip S38 - MP3 streaming?
+References: <47348048.8000107@cenosys.com>
+In-Reply-To: <47348048.8000107@cenosys.com>
+Subject: Re: [Bluez-devel] BC6 over SDIO
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,35 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Brad Midgley schrieb:
-> Nils
-Hi Brad!
+Guillaume Ligneul wrote:
+> Hi all,
+> 
+> I am developping on Linux 2.6.14. On this version, there's not SDIO 
+> bluez support.
+> Does anyone know if I can use Bluez to use my BC6 over SDIO ?
 
->> I have one of those "i.Tech Clip S38" laying quite uselessly on my desk...
-> I have a similar r35. mp3 is a different codec that you choose when
-> negotiating the connection. I made the old a2play detect the codec but
-> never did try to use it.
+You will require 2.6.24-rc1 or later.
 
-Ah, cool, that's what I thought...
+> To finish, do you think it could be better to use UART protocol than SDIO ?
 
-> The right approach is to work with the gstreamer plugins inside
-> bluez-utils so the codec negotiation happens the gst way. This way an
-> mp3 stream would naturally choose the mp3 decoder as the optimal
-> selection.
+This depends on your particular hardware/software platform.  If you
+don't wish to upgrade your kernel and you have a sufficiently fast UART
+available then it may be best to just use a UART.
 
-Uh, OK ;)
-Yeah, nothing comes for free, so I will have to look into this.
-
-Many thanks for your hints/advice!
-
-Cheers
-  nils faerber
-
+David
 -- 
-kernel concepts GbR        Tel: +49-271-771091-12
-Sieghuetter Hauptweg 48    Fax: +49-271-771091-19
-D-57072 Siegen             Mob: +49-176-21024535
---
+David Vrabel, Software Engineer, Drivers group  Tel: +44 (0)1223 692562
+CSR plc, Churchill House, Cambridge Business Park, Cowley Road, CB4 0WZ
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
