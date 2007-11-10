@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4736046F.7030102@qualcomm.com>
-Date: Sat, 10 Nov 2007 11:20:15 -0800
-From: Max Krasnyansky <maxk@qualcomm.com>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <471DA835.2060308@qualcomm.com>	<1193139336.6184.191.camel@violet>
-	<471E200E.80108@qualcomm.com>	<1193352893.6184.301.camel@violet>
-	<472425AB.9080802@qualcomm.com> <1193593771.5096.12.camel@aeonflux>
-In-Reply-To: <1193593771.5096.12.camel@aeonflux>
-Subject: Re: [Bluez-devel] What's the purpose of the new btusb driver ?
+In-Reply-To: <47352479.01613A.04980@e-post07.km.ru>
+References: <47352479.01613A.04980@e-post07.km.ru>
+Date: Sat, 10 Nov 2007 19:40:37 +0100
+Message-Id: <1194720037.5175.25.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] j2me hid profile
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,36 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> Hi Max,
-> 
->>> I heard rumors that Qualcomm is working on a BlueZ based project. 
->> Hmm. Heard from whom ?
-> 
-> we had one guy from Qualcomm attending the BlueZ developer meeting a few
-> month ago. So it seems there some efforts.
-Do you remember his name ?
- 
->>> Any chance you are coming back to help me out with the kernel stuff. All
->>> this new Alternate MAC/PHY stuff is a lot of work.
->> It is ? I haven't been following BT spec development. I get these emails
->> from SIG (I'm still subscribed to their mailing list). But they are being
->> redirected to /dev/null because of lack of time.
->> Can you give me some pointers to that MAC/PHY stuff you're talking about ?
->> Is it in the latest spec ?
-> 
-> Nothing is set in stone here, but for the Seattle release of the
-> specification next year it seems that Alternate MAC/PHY additions are
-> coming. Which means using Ultra-Wideband and/or IEEE 802.11 as alternate
-> radio technologies for high speed links.
+Hi,
 
-> Also the L2CAP retransmission and flow control will be started to be
-> used by profile specification. This means we need an implementation for
-> that at some point. I started working on it, but always get distracted
-> by user space stuff.
-Sounds interesting.
+> I'm interesping how to plugin a bluetooth keyboard to cell phone with j2me + jsr-82. It's need implement a HID profile. But the problem is happened. It described here: http://developer.sonyericsson.com/thread.jspa?&threadID=37949&start=0
+>  
+> But I can't understand: if HID based on L2CAP layer and it works correct on j2se, why it can't work properly on j2me's L2CAR layer? What's matter? What's need else for HID implementation on j2me? Or is it possible plugin the keyboard some another way (keyboard's bios or some think else)? Can you advise some solutions?
 
-Max
+this mailing list handles the development based on the Linux Bluetooth
+stack and not some other OS.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
