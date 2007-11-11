@@ -1,12 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Sat, 10 Nov 2007 18:19:25 -0800 (PST)
-From: Jim Carter <jimc@math.ucla.edu>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200711091734.29670.ken.koster@elektrobit.com>
-Message-ID: <Pine.LNX.4.64.0711101806421.6015@xena.cft.ca.us>
-References: <200711091734.29670.ken.koster@elektrobit.com>
-MIME-Version: 1.0
-Subject: Re: [Bluez-devel] headset audio playback real slooowwww
+In-Reply-To: <4736046F.7030102@qualcomm.com>
+References: <471DA835.2060308@qualcomm.com>
+	<1193139336.6184.191.camel@violet> <471E200E.80108@qualcomm.com>
+	<1193352893.6184.301.camel@violet> <472425AB.9080802@qualcomm.com>
+	<1193593771.5096.12.camel@aeonflux>  <4736046F.7030102@qualcomm.com>
+Date: Sun, 11 Nov 2007 02:53:10 +0100
+Message-Id: <1194745990.5175.36.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] What's the purpose of the new btusb driver ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,28 +23,45 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Fri, 9 Nov 2007, Koster Ken wrote:
+Hi Max,
 
-> bluez-lib and bluez-util to 3.19 and I'm attempting to make use of the 
-> audio service to send audio to a bluetooth headset.
+> >>> I heard rumors that Qualcomm is working on a BlueZ based project. 
+> >> Hmm. Heard from whom ?
+> > 
+> > we had one guy from Qualcomm attending the BlueZ developer meeting a few
+> > month ago. So it seems there some efforts.
+> Do you remember his name ?
+
+his name is Steve Ross and since the Google announcement of the Android
+mobile platform, I am pretty sure that it goes into that direction.
+
+> >>> Any chance you are coming back to help me out with the kernel stuff. All
+> >>> this new Alternate MAC/PHY stuff is a lot of work.
+> >> It is ? I haven't been following BT spec development. I get these emails
+> >> from SIG (I'm still subscribed to their mailing list). But they are being
+> >> redirected to /dev/null because of lack of time.
+> >> Can you give me some pointers to that MAC/PHY stuff you're talking about ?
+> >> Is it in the latest spec ?
+> > 
+> > Nothing is set in stone here, but for the Seattle release of the
+> > specification next year it seems that Alternate MAC/PHY additions are
+> > coming. Which means using Ultra-Wideband and/or IEEE 802.11 as alternate
+> > radio technologies for high speed links.
 > 
-> Everything is working with the exception that the playback is at half the
-> normal speed, so everything recorded is lower in pitch and takes twice
-> as long.  (a seven second sound sample takes fourteen to play back)
+> > Also the L2CAP retransmission and flow control will be started to be
+> > used by profile specification. This means we need an implementation for
+> > that at some point. I started working on it, but always get distracted
+> > by user space stuff.
+> Sounds interesting.
 
-You mentioned SCO later in the message; this protocol is monophonic.  If 
-the sound clip were recorded in stereo (I'm assuming 44100 Hz), with 
-independent channels (not joint stereo), then there would be two 
-nearly-identical copies of each sound sample, and if you forced it to go 
-out as mono, it would play at half speed.  There would be a 22 KHz whistle 
-as you alternated between possibly unequal stereo tracks, but since SCO is 
-at 8000 Hz, this would be inaudible after the sound stream was resampled 
-(or maybe being imaged down to 2 KHz but very quiet due to averaging).  
-Maybe that's what happened.
+Cool. Ping me when you are back in. The user space portion is covered
+pretty well, but the kernel area lacks some developers.
 
-James F. Carter          Voice 310 825 2897    FAX 310 206 6673
-UCLA-Mathnet;  6115 MSA; 405 Hilgard Ave.; Los Angeles, CA, USA 90095-1555
-Email: jimc@math.ucla.edu  http://www.math.ucla.edu/~jimc (q.v. for PGP key)
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
