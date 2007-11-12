@@ -1,14 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Ken Koster <ken.koster@elektrobit.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Mon, 12 Nov 2007 10:41:30 -0700
-References: <200711091734.29670.ken.koster@elektrobit.com>
-	<Pine.LNX.4.64.0711101806421.6015@xena.cft.ca.us>
-In-Reply-To: <Pine.LNX.4.64.0711101806421.6015@xena.cft.ca.us>
+Message-ID: <47386088.80306@dev.rtsoft.ru>
+Date: Mon, 12 Nov 2007 17:17:44 +0300
+From: Rusev <arusev@dev.rtsoft.ru>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="----------=_1194889296-28423-28"
-Message-Id: <200711120941.30666.ken.koster@elektrobit.com>
-Subject: Re: [Bluez-devel] headset audio playback real slooowwww
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] PIN codes auto and user
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,63 +14,72 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0357339692=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format...
+This is a multi-part message in MIME format.
+--===============0357339692==
+Content-Type: multipart/alternative;
+	boundary="------------050700040206030407090908"
 
-------------=_1194889296-28423-28
-Content-Type: text/plain;
-  charset="iso-8859-1"
+This is a multi-part message in MIME format.
+--------------050700040206030407090908
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
-On Saturday 10 November 2007, Jim Carter wrote:
-> On Fri, 9 Nov 2007, Koster Ken wrote:
-> 
-> > bluez-lib and bluez-util to 3.19 and I'm attempting to make use of the 
-> > audio service to send audio to a bluetooth headset.
-> > 
-> > Everything is working with the exception that the playback is at half the
-> > normal speed, so everything recorded is lower in pitch and takes twice
-> > as long.  (a seven second sound sample takes fourteen to play back)
-> 
-> You mentioned SCO later in the message; this protocol is monophonic.  If 
-> the sound clip were recorded in stereo (I'm assuming 44100 Hz), with 
-> independent channels (not joint stereo), then there would be two 
-> nearly-identical copies of each sound sample, and if you forced it to go 
-> out as mono, it would play at half speed.  There would be a 22 KHz whistle 
-> as you alternated between possibly unequal stereo tracks, but since SCO is 
-> at 8000 Hz, this would be inaudible after the sound stream was resampled 
-> (or maybe being imaged down to 2 KHz but very quiet due to averaging).  
-> Maybe that's what happened.
+Greetings!
 
-Unfortunately the clip is mono, recorded at an 8k rate.
+>>From my experiments with pairing to various devices I found that
+presence of pincodes file (in /var/lib/bluetooth/<dondle-MAC>/)  in mode
+"user" prevents
+from pairing for some unknown reason, while absense
+of pincodes file in mode "auto" just makes hcid fallback
+to using of D-bus passkey agent.
 
-I'm rapidly learning far more about SCO than I ever planned :-)
+Is it intented behavior? I suggested that in "user" mode pincodes would
+be ignored...
 
--- 
-Ken Koster
-Senior Software Engineer
+Im using BlueZ libs/utils ver. 3.22
 
-EB - Discover the Experience 
-22745 29th Dr. SE, Suite 200
-Bothell, WA 98021, USA 
-Tel: +1 425-444-2691 
-Fax: +1 425-686-3102 
-ken.koster@elektrobit.com 
-www.elektrobit.com
+Regards,
+      Alexandre
 
 
-----------------------------------------------------------------
-Please note: This e-mail may contain confidential information
-intended solely for the addressee. If you have received this
-e-mail in error, please do not disclose it to anyone, notify
-the sender promptly, and delete the message from your system.
-Thank you.
+--------------050700040206030407090908
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<pre wrap="">Greetings!
+
+>>From my experiments with pairing to various devices I found that
+presence of pincodes file (in <i class="moz-txt-slash"><span
+ class="moz-txt-tag">/</span>var/lib/bluetooth<span class="moz-txt-tag">/</span></i>&lt;dondle-MAC&gt;/)  in mode
+"user" prevents
+from pairing for some unknown reason, while absense
+of pincodes file in mode "auto" just makes hcid fallback
+to using of D-bus passkey agent.
+
+Is it intented behavior? I suggested that in "user" mode pincodes would
+be ignored...
+
+Im using BlueZ libs/utils ver. 3.22
+
+Regards,
+      Alexandre</pre>
+</body>
+</html>
+
+--------------050700040206030407090908--
 
 
-------------=_1194889296-28423-28
+--===============0357339692==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -85,7 +90,7 @@ This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
-------------=_1194889296-28423-28
+--===============0357339692==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -96,4 +101,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-------------=_1194889296-28423-28--
+--===============0357339692==--
