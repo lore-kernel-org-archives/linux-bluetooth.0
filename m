@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 13 Nov 2007 21:20:37 +0100
-Message-Id: <JRGOID$E89B74129A648F706CF4A5806E5DFC45@libero.it>
+Message-ID: <c74b6b3d0711131128t7ddb75c0s9f53657b2173aea6@mail.gmail.com>
+Date: Tue, 13 Nov 2007 20:28:29 +0100
+From: "Adam Strojek" <zwierzak2003@gmail.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <c74b6b3d0711131125s38582456pf64390af9d3e447d@mail.gmail.com>
 MIME-Version: 1.0
-From: "Dario Tonesi" <tonybox@inwind.it>
-To: "bluez-users" <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Setting max transmit power
+References: <c74b6b3d0711131125s38582456pf64390af9d3e447d@mail.gmail.com>
+Subject: [Bluez-users] Bluez with Kensington Si670m Bluetooth mouse
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,15 +20,47 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi to all!
+Recently I buy great bluetooth mouse Kensington Si670m. It is good,
+but bluez (even the newest) don support the extra buttons to navigate
+on web pages (I can press to side my scroll to tigger action like
+forward and backward). On Windows this works and also hcidump shows
+new events, but bluez don't inform X about this event. Here is hcidump
+ -X -V. Do you need something more?
 
-I'd like to know if there is a way (either with hciconfig, hcitool or bccmd) for setting the maximum tx power of a CSR based bluetooth dongle.
-Alternatively, is there any other bluetooth dongle that allows to set the maximum tx power?
+# hcidump -X -V
+HCI sniffer - Bluetooth packet analyzer ver 1.40
+device: hci0 snap_len: 1028 filter: 0xffffffff
+// When I pressed into left side
+> ACL data: handle 42 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 00 00 00 00 ff  02                       .........
+> ACL data: handle 42 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 00 00 00 00 ff  02                       .........
+> ACL data: handle 42 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 00 00 00 00 ff  02                       .........
+> ACL data: handle 42 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 00 00 00 00 ff  02                       .........
+// When I pressed into right side
+> ACL data: handle 42 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 00 00 00 00 01  01                       .........
+> ACL data: handle 42 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 00 00 00 00 01  01                       .........
+> ACL data: handle 42 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 00 00 00 00 01  01                       .........
+> ACL data: handle 42 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 00 00 00 00 01  01                       .........
+> ACL data: handle 42 flags 0x02 dlen 13
+    L2CAP(d): cid 0x0041 len 9 [psm 0]
+      0000: a1 02 00 00 00 00 00 01  01                       .........
 
-Any help is appreciated.
-Thanks a lot.
-Dario
-
+I press here only this special buttons. Probably this is universal method.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
