@@ -1,12 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <36c9ddd40711130004t6e77df83y44ef846a3ade34d6@mail.gmail.com>
-Date: Tue, 13 Nov 2007 18:04:12 +1000
-From: "Nick Irvine" <nfirvine@gmail.com>
-To: bluez-users@lists.sourceforge.net
-In-Reply-To: <36c9ddd40711122352m2bdb4e49ud9790c487ee7800b@mail.gmail.com>
+Message-ID: <BAY117-W14FB0463308C709A1DFDEAC0800@phx.gbl>
+From: "" <semiyd@hotmail.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Tue, 13 Nov 2007 02:03:45 +0000
+In-Reply-To: <d89ddf300711121024x48b98b92h183fd6b1a1b50849@mail.gmail.com>
+References: <BAY117-W20475FC961A6D4564AA606C0870@phx.gbl>
+	<d89ddf300711121024x48b98b92h183fd6b1a1b50849@mail.gmail.com>
 MIME-Version: 1.0
-References: <36c9ddd40711122352m2bdb4e49ud9790c487ee7800b@mail.gmail.com>
-Subject: [Bluez-users] Unsupported bluetooth adaptor?
+Subject: Re: [Bluez-users] Does Bluez3.22 support SPP?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,93 +17,128 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0898286921=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi all,
+--===============0898286921==
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: 8bit
 
-I've bought a cheapo bluetooth adaptor from China without a brandname.
- According to lsusb, it uses the Broadcom 2035 chipset:
 
-Bus 002 Device 082: ID 0a5c:2035 Broadcom Corp. BCM2035 Bluetooth
+Hi Brad:
 
-As far as I can tell, it's unsupported by linux/bluez.  But I was
-hoping it would work anyway.  If anybody has this particular chipset
-and has got it working, I'd like to know how.
 
-There are a couple of things that indicate to me that it's not going to work:
+     Yes,i've found that python-dbus package you mentioned.Since im using
+montavista on ARM9 platform, i cross-compiled dbus-python-0.82.3 instead of
+directly using the python-dbus package. Right now i can use the demo script
+"test-serial" in /bluez-utils-3.22/serial.
 
-1) Sometimes it won't show up in lsusb.  dmesg | tail shows a few
-lines like this everytime I plug it in:
-[13965.928000] usb 2-1: new full speed USB device using uhci_hcd and address 91
-[13966.336000] usb 2-1: device not accepting address 91, error -71
-with various addresses.  There is a light on the device, but when this
-happens, it doesn't turn on.  Eventually though, after a few unplugs
-and replugs, the light will come
-on, the GNOME bluetooth preferences applet will say it's connected
-(and will give it a consistent name -- not sure if this is relevant).
-At this point though...
+$ ./test-serial
+hcid[825]: /org/bluez: org.bluez.Manager.ActivateService()
+Usage: ./test-serial  [service]
 
-2) dmesg shows:
-[14111.892000] usb 2-1: configuration #1 chosen from 1 choice
-[14114.076000] hci_cmd_task: hci0 command tx timeout
->>From other people's adventures with bluetooth, I can see that there
-should be lines after that about bluetooth, but there isn't.
+The script seems to be running fine.
+Although i can't connect to any real bluetooth SPP device cause my GPS
+module hasn't arrived yet...
 
-3) I was feeling desperate, and was looking at the kernel drivers
-source for bluetooth (namely drivers/bluetooth/hci_usb.c).  I found
-this in an array called "blacklist_ids:", which indicates to me that
-it's blacklisted or something:
- 113         /* Broadcom BCM2035 */
- 114         { USB_DEVICE(0x0a5c, 0x200a), .driver_info = HCI_RESET |
-HCI_WRONG_SCO_MTU },
- 115         { USB_DEVICE(0x0a5c, 0x2009), .driver_info = HCI_BCM92035 },
-However, in lsusb, my device shows up as 0a5c:2035, not
-:200a or :2009.  I found less than ten references to this device ID on
-Google, most of which were Chinese or Russian, and none of which
-seemed to have a solution (based on Google translation).  I'm no
-kernel hacker, but when I read something about my device being
-blacklisted, I know it's not a good sign.
 
-4) hciconfig shows a 0'd address:
-hci0:   Type: USB
-       BD Address: 00:00:00:00:00:00 ACL MTU: 377:10 SCO MTU: 16:0
-       UP RUNNING
-       RX bytes:352 acl:0 sco:0 events:14 errors:0
-       TX bytes:306 acl:0 sco:0 commands:16 errors:1
-Yet, it shows RX and TX bytes, as well as commands.
+Anyway, i still have 2 questions:
 
-5) I did an hcidump -x while doing an hcitool scan in another
-terminal.  It gave me this:
-hcidump -x
-HCI sniffer - Bluetooth packet analyzer ver 1.39
-device: hci0 snap_len: 1028 filter: 0xffffffff
-< HCI Command: Write Scan Enable (0x03|0x001a) plen 1
- 03
-< HCI Command: Read Local Name (0x03|0x0014) plen 0
-< HCI Command: Inquiry (0x01|0x0001) plen 5
- 33 8B 9E 08 00
-hcitool scan yields "Inquiry failed: connection timed out".
-Interesting to note, each of the above lines were for separate runs of
-hcitool scan, i.e., a new one would pop up every time I did the scan.
+1.There are 2 methods u mentioned that i use on SPP: rfcomm.conf and dbus.
+So how do i make use of rfcomm.conf to get SPP running?
 
-So it doesn't look good, but any help would be appreciated.  The
-device I'm trying to connect via bluetooth is a Nintendo Wii Remote,
-which I've heard connects up fine and you can even transfer files from
-its memory.  I have had no such luck.
+Here's my current rfcomm.conf:
+************************************
+#
+# RFCOMM configuration file.
+#
 
-Anyway, thanks in advance,
-Nick Irvine
+rfcomm0 {
+     # Automatically bind the device at startup
+     bind no;
 
-PS  I may have double-posted this by mistake.  If I did, I apologise.
+     # Bluetooth address of the device
+     device 00:0D:3C:EB:53:F0;
+
+     # RFCOMM channel for the connection
+     channel     1;
+
+     # Description of the connection
+     comment "Example Bluetooth device";
+}
+*************************************
+Is there anything wrong/needs to be changed?
+
+Also, it seems i can use python script to get SPP running by the dbus
+method...??(im not familiar with python :-(   )
+
+
+2.Im still not very clear about the functionality of
+"bluetoothd-serivce-serial" daemon.
+  i read a little about the code of /bluez-utils-3.22/serial/main.c and i
+guess maybe it does the following things?
+
+ Register the serial service
+ accept any incoming spp connection
+
+Is that right/all?
+
+Thanks for your help!
+
+
+semiyd
+
+
+> Date: Mon, 12 Nov 2007 11:24:54 -0700
+> From: bmidgley@gmail.com
+> To: bluez-users@lists.sourceforge.net
+> Subject: Re: [Bluez-users] Does Bluez3.22 support SPP?
+>
+> semiyd
+>
+> on ubuntu the package is "python-dbus" and yes bluez supports spp. The
+> older method uses /etc/bluetooth/rfcomm.conf but you can also use dbus
+> to get the new method.
+>
+> --
+> Brad
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Splunk Inc.
+> Still grepping through log files to find problems? Stop.
+> Now Search log events and configuration files using AJAX and a browser.
+> Download your FREE copy of Splunk now>> http://get.splunk.com/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+_________________________________________________________________
+Explore the seven wonders of the world
+http://search.msn.com/results.aspx?q=7+wonders+world&mkt=en-US&form=QBRE
+
+
+--===============0898286921==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
+--===============0898286921==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0898286921==--
