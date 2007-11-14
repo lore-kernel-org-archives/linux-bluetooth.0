@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <5c1c70820711141825g6c9e27ecm51c00272bad6d7fd@mail.gmail.com>
-Date: Thu, 15 Nov 2007 12:55:52 +1030
-From: "Pooyan McSporran" <duckfreezone@gmail.com>
+Message-ID: <685df2130711140953t75ed2dbm7d8b00ba2ec66031@mail.gmail.com>
+Date: Wed, 14 Nov 2007 12:53:53 -0500
+From: "Joshua Bryant" <josh@bryantweb.com>
 To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-devel] Serial server problems
+Subject: [Bluez-devel] Question about BDADDR_ANY
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,38 +18,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-(I'm unclear on which list, either bluez-devel or bluez-users, this
-query should be on.  Let me know if I've sent to the wrong list.)
+Hello,
 
-I'm trying to write an application using BlueZ which will:
-- advertise a service, based on SPP (custom UUID, etc)
-- listen for incoming connections for that service
-- when an inbound connection is requested, create the connection
-- send data to/from on the connection
+With btsco, I could specifiy an adapter with the -i switch (btsco -i
+hci1 11.22.33.44.55..66).
 
-I'm having problems trying to work out how to do this using the DBus
-interface.  I've browsed through the Wiki (http://wiki.bluez.org) but
-all the examples that I've found seem to be from the client
-perspective, not a server.  (Correct me if I'm wrong.)  The only
-server example I found is for the network service, not the serial
-service.  Similarly, the 'test-serial' python script only implements a
-client.
+With the current dbus call, it seems the interface is chosen
+automatically with BDADDR_ANY. I notice in headset.c, sco_connect uses
+BDADDR_ANY as the adapter.
 
-The approximate sequence of actions that I'm currently
-(unsuccessfully!) using is:
-- Determine the default adapter (DefaultAdapter())
-- add the service (AddServiceRecordFromXML())
-- activate the serial service (ActivateService ("serial"))
+Where is BDADDR_ANY set and can it be changed through the api? Are
+there plans to manually specify the interface in the dbus command
+(audio.Headset.Connect) as was possible through btsco? If not, how
+will I deal with multiple adapters under the newer dbus command set?
 
-The service is then visible to remote devices (so far so good!)
-
-- create a proxy (serial.Manager.CreateProxy (uuid, "/dev/rfcomm0"))
-
-This is where I'm obviously missing some basic stuff, I'm not sure in
-this area (with ports, proxies, etc).  Any help that people might have
-in this regard would be appreciated.
-
-Thank you.
+Thanks for your help,
+Josh
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
