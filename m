@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <473B5E8D.1010401@moussaud.org>
-Date: Wed, 14 Nov 2007 21:46:05 +0100
-From: David MOUSSAUD <david@moussaud.org>
+Message-ID: <d89ddf300711141239u468f4a86mb43c842cae00c90@mail.gmail.com>
+Date: Wed, 14 Nov 2007 13:39:53 -0700
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <473A9B06.8040108@moussaud.org>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
 References: <473A9B06.8040108@moussaud.org>
-	<d89ddf300711141239u468f4a86mb43c842cae00c90@mail.gmail.com>
-In-Reply-To: <d89ddf300711141239u468f4a86mb43c842cae00c90@mail.gmail.com>
-Subject: Re: [Bluez-users] Problem activating audio service
+Subject: Re: [Bluez-users] [bluez-users] Problem activating audio service
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,24 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-thanks Brad but i'have finally found the solution :
-bluez-utils was not configured with the option --enable-audio (it seems 
-that the option --enable-all does not work)
+David
 
-Now it works ! (unless with skype :-(
+> Error org.bluez.Error.NoSuchService: No such service
 
-Brad Midgley wrote:
-> David
->
->   
->> Error org.bluez.Error.NoSuchService: No such service
->>     
->
-> Is the service in place in
-> /usr[/local]/lib/bluetooth/bluetoothd-service-audio? what is in
-> /etc/bluetooth/audio.service?
->
->   
+Is the service in place in
+/usr[/local]/lib/bluetooth/bluetoothd-service-audio? what is in
+/etc/bluetooth/audio.service?
+
+-- 
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
