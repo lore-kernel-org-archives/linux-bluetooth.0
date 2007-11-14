@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <268ee1e30711140506r4af8ab9ela71e2b67db6719c4@mail.gmail.com>
-Date: Wed, 14 Nov 2007 13:06:04 +0000
-From: "newton alexander" <aalexnewton@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <473A9B06.8040108@moussaud.org>
+Date: Wed, 14 Nov 2007 07:51:50 +0100
+From: David MOUSSAUD <david@moussaud.org>
 MIME-Version: 1.0
-Subject: [Bluez-users] output power control
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] [bluez-users] Problem activating audio service
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,66 +14,37 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1896655584=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1896655584==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_4858_18065390.1195045564181"
-
-------=_Part_4858_18065390.1195045564181
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 Hi,
 
-I would like to know if there is anyway to control the output transmitted
-power of a bluetooth radio. I am aware that transmitted power level can be
-read, using the tpl command. Similarly is there any command  (or is it
-possible to write a progam) to instruct the bluetooth-radio to transmit with
-a certain power level instead of using its own transmitting power level.
+I'am trying to activate audio service for my bluetooth USB adapter 
+(Berlkin FBT003).
+I've installed the last bluez-lib (3.22) and bluez utils (3.22).
 
-Thank you,
-Alex
+I've succeeded in pairing my bluetooth headset by when i'm trying to 
+activate the audio service through dbus :
+$dbus-send --system --print-reply --dest=org.bluez /org/bluez 
+org.bluez.Manager.ActivateService string:audio
+Error org.bluez.Error.NoSuchService: No such service
 
-------=_Part_4858_18065390.1195045564181
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+So i can't retrieve the unique bus name to create my headset object with 
+dbus.
 
-<div>Hi,</div>
-<div><font color="#3c63ff">&nbsp;</font></div>
-<div>I would like to know if there is anyway to control the output transmitted power of a bluetooth radio. I am aware that transmitted power level&nbsp;can be read, using the tpl command. Similarly&nbsp;is there any command&nbsp; (or is it possible to write a progam) to instruct the bluetooth-radio to transmit with a certain power level instead of using its own transmitting power level. 
-</div>
-<div>&nbsp;</div>
-<div>Thank you,</div>
-<div>Alex</div>
+I'd like to use my headset for VoIp  application such Skype or Linphone.
 
-------=_Part_4858_18065390.1195045564181--
+Thanks for you help.
 
-
---===============1896655584==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+David
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---===============1896655584==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1896655584==--
