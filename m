@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <473BFAD7.6090107@omepet.es>
-Date: Thu, 15 Nov 2007 08:52:55 +0100
-From: jm <jmtoro@omepet.es>
+Message-ID: <473BF56D.8010301@szift.org>
+Date: Thu, 15 Nov 2007 08:29:49 +0100
+From: =?ISO-8859-2?Q?=A3ukasz_Hejnak?= <szift@szift.org>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] device doesn't support
+Subject: [Bluez-users] LAN over bluetooth connection hangs
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,33 +14,51 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-2"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi!
+Hi
+I've got a problem with the LAN over bluetooth functionality.
+I've got two bluetooth usb dongles and two linux machines, one of which =
 
-I want to know if my dongle supports the HCI_Write_Page_Timeout command, 
-so I do:
+is connected to the internet. The idea was simply to connect the second =
 
-#hcitool -i hci0 cmd 0x04 0x0003 (informational commands, read supported 
-commands)
+machine via bluetooth to the internet.
+The basic instructions that I found at =
 
-and I get:
+http://fedoranews.org/contributors/muhammad_al_ismail/bluetooth/
+work... but not exactly.
 
-< HCI Command: ogf 0x04, ocf 0x0003, plen 0
- > HCI Event: 0x0e plen 12
-  01 03 10 00 FF FF 8F FE 9B F9 00 80
-                                       ^
-According to this results, the dongle supports HCI_Write_Page_Timeout,
-but I am getting 12 octets instead of 16 (BT spec.), Why?
+I mean I get the connection established, the firewall is set up, icmp =
 
-Am I doing something wrong? Something related to bit-byte ordering?
-Is the information returned by hcitool correct? Please reply.
+packets are passing ok, but when I try getting anything else over the =
 
-Thanks!
+connection (like when I fire up my browser, or even connect via ssh and =
 
-JM
+do some stuff that needs more bandwidth, display dmesg for example) it =
+
+stalls. Nothing else can get trough (not even ICMP). Everything else =
+
+seems in order:
+link quality is 255, the connection according to hcitool is established, =
+
+bnep0 devices are visible on both ends, but what I get in the logs of =
+
+the client machine is:
+hci_acldata_packet: hci0 ACL packet for unknown connection handle 266
+
+The valid connection handle as displayed by `hcitool con` is 1
+Can anybody help me?
+Is this a (cheap) hardware problem or maybe just some misconfiguration?
+The dongles are the ever so popular BlueSoleil.
+
+-- =
+
+Pozdrawiam
+=A3ukasz 'Szift' Hejnak
+jid: Szift@jabster.pl
+email: Lukasz@Hejnak.pl
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
