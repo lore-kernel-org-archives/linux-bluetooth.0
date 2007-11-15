@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <473C74C1.2000105@aircable.net>
+Date: Thu, 15 Nov 2007 13:33:05 -0300
+From: Manuel Naranjo <manuel@aircable.net>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <a96155200711150615q38dcf09g140d2386830e9e23@mail.gmail.com>
-References: <a96155200711150615q38dcf09g140d2386830e9e23@mail.gmail.com>
-Date: Thu, 15 Nov 2007 19:00:28 +0100
-Message-Id: <1195149628.5175.120.camel@aeonflux>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] select(2) or read(2) on bluetooth sockets
-	not	working correctly?
+References: <473BB4BA.4030102@aircable.net>
+	<1195139936.3140.98.camel@cookie.hadess.net>
+In-Reply-To: <1195139936.3140.98.camel@cookie.hadess.net>
+Content-Type: multipart/mixed; boundary="------------000600080401090706070707"
+Subject: Re: [Bluez-devel] [PATCH] Fix 64 configuration
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,62 +18,73 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pawel,
+This is a multi-part message in MIME format.
+--------------000600080401090706070707
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-> In gnokii project, we use Bluetooth sockets as one of the phone
-> communication medium. We use it in quite usual way (simplified code):
-> 
-> fd = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-> [...]
-> bind(fd, (struct sockaddr *)&laddr, sizeof(laddr));
-> [...]
-> connect(fd, (struct sockaddr *)&raddr, sizeof(raddr));
-> 
-> Then we have (simplified code again):
-> 
-> while (1) {
->    [...]
->    write(fd, write_buf, size);
->    [...]
->    FD_ZERO(&readfds);
->    FD_SET(fd, &readfds);
->    if (select(fd + 1, &readfds, NULL, NULL, &timeout) > 0) {
->       read(fd, read_buf, size);
->       [...]
->    }
->    [...]
-> }
-> 
-> The problem is (or rather was) that then bluetooth device gets out of
-> range (or bluetooth gets disabled in the device) the program hangs on
-> read(2). So select(2) went OK and told us that there's something to be
-> read, but actually nothing can be read. According to select(2) manual
-> page, after the successful select(2), read(2) should not hang (it may
-> fail though).
-> 
-> It can be workarounded by setting O_NONBLOCK flag on the socket, but
-> still I consider it as a bug that read(2) hangs after successful
-> select(2).
+Oops!! Sorry.
+> Please use "diff -up" to generate your patches. There's not even a
+> filename in the diff you posted.
+>
+>   
+Here it's again.
 
-which kernel version? Can you construct a simple demo program that shows
-this effect easily with a 2.6.24-rc2 kernel?
+--------------000600080401090706070707
+Content-Type: text/x-patch;
+ name="bluez-utils_64bits.cvs.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="bluez-utils_64bits.cvs.patch"
 
-Regards
+--- acinclude.m4.orig	2007-11-14 23:40:12.000000000 -0300
++++ acinclude.m4	2007-11-15 12:22:48.000000000 -0300
+@@ -44,11 +44,17 @@ AC_DEFUN([AC_INIT_BLUEZ], [
+ 
+ 		prefix="${ac_default_prefix}"
+ 	fi
+-
+-	if (test "${libdir}" = '${exec_prefix}/lib'); then
+-		libdir="${prefix}/lib"
++	
++	dnl if lib64 is present then we use it
++	if (test -d "${prefix}/lib64" ); then
++	    libdir="${prefix}/lib64"
+ 	fi
+-
++	
++	dnl and then only if ${libdir} keeps beeing empty we use lib
++	if ( test -z "${libdir}" ) ; then
++	    libdir="${prefix}/lib"
++	fi
++	
+ 	if (test "$sysconfdir" = '${prefix}/etc'); then
+ 		configdir="${prefix}/etc/bluetooth"
+ 	else
 
-Marcel
-
-
+--------------000600080401090706070707
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
+--------------000600080401090706070707
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--------------000600080401090706070707--
