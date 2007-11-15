@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <23a15590711151534k50b707e4y73cf053eb0e9ada7@mail.gmail.com>
-Date: Fri, 16 Nov 2007 00:34:41 +0100
-From: "Leszek Ciesielski" <skolima@gmail.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] Howto setup bluetooth network
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <473BFAD7.6090107@omepet.es>
+References: <473BFAD7.6090107@omepet.es>
+Date: Thu, 15 Nov 2007 18:58:31 +0100
+Message-Id: <1195149511.5175.118.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] device doesn't support
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,33 +22,43 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi,
 
-is there any up-to-date guide for setting a network using
-bluez-utils-3-* ? I had searched the web quite extensively, but
-everything I found was about bluez-2 . What should I put in
-/etc/bluetooth/network.service and /etc/bluetooth/network.conf ?
-Tutorials write about 'pand', which is no longer shipped with current
-bluez on my distro (Gentoo). I get up to bluez creating pan0 and pan1,
-but do not know what to do next - I can't connect from a Windows box that
-did communicate with other PCs...
+> I want to know if my dongle supports the HCI_Write_Page_Timeout command, 
+> so I do:
+> 
+> #hcitool -i hci0 cmd 0x04 0x0003 (informational commands, read supported 
+> commands)
+> 
+> and I get:
+> 
+> < HCI Command: ogf 0x04, ocf 0x0003, plen 0
+>  > HCI Event: 0x0e plen 12
+>   01 03 10 00 FF FF 8F FE 9B F9 00 80
+>                                        ^
+> According to this results, the dongle supports HCI_Write_Page_Timeout,
+> but I am getting 12 octets instead of 16 (BT spec.), Why?
+> 
+> Am I doing something wrong? Something related to bit-byte ordering?
+> Is the information returned by hcitool correct? Please reply.
 
-And what does "Failed to claim to interface:" mean? It is always
-present in logs and never provides any additional info...
+and another decoding question where you could simple let hcidump -X -V
+do it for you. Also calling hciconfig hci0 pageto would tell you if the
+command works or not. Including hciconfig hci0 commands if you wanna get
+this specific list of supported commands.
 
-Regards,
+There are manual pages available for every Bluetooth command. Please
+read them first before posting.
 
-skolima
+Regards
 
--- 
-MS-DOS user since 5.0
-Windows user since 3.11
-Linux user since kernel 2.4
-Novell Netware user since 2.2
-WARCRAFT user since 1.0
+Marcel
+
+
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2005.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >> http://get.splunk.com/
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
