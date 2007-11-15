@@ -1,10 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <5c1c70820711152155s3557856aja583f4c02a6f1d71@mail.gmail.com>
-Date: Fri, 16 Nov 2007 16:25:48 +1030
-From: "Pooyan McSporran" <duckfreezone@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] Serial server problems
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <a96155200711150615q38dcf09g140d2386830e9e23@mail.gmail.com>
+References: <a96155200711150615q38dcf09g140d2386830e9e23@mail.gmail.com>
+Date: Thu, 15 Nov 2007 19:00:28 +0100
+Message-Id: <1195149628.5175.120.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] select(2) or read(2) on bluetooth sockets
+	not	working correctly?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,50 +21,57 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-(I'm unclear on which list, either bluez-devel or bluez-users, this
-query should be on.  Let me know if I've sent to the wrong list.
-Also, I'm having some erratic email issues, so my apologies if this
-appears twice.)
+Hi Pawel,
 
-I'm trying to write an application using BlueZ which will:
-- advertise a service, based on SPP (custom UUID, etc)
-- listen for incoming connections for that service
-- when an inbound connection is requested, create the connection
-- send data to/from on the connection
+> In gnokii project, we use Bluetooth sockets as one of the phone
+> communication medium. We use it in quite usual way (simplified code):
+> 
+> fd = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+> [...]
+> bind(fd, (struct sockaddr *)&laddr, sizeof(laddr));
+> [...]
+> connect(fd, (struct sockaddr *)&raddr, sizeof(raddr));
+> 
+> Then we have (simplified code again):
+> 
+> while (1) {
+>    [...]
+>    write(fd, write_buf, size);
+>    [...]
+>    FD_ZERO(&readfds);
+>    FD_SET(fd, &readfds);
+>    if (select(fd + 1, &readfds, NULL, NULL, &timeout) > 0) {
+>       read(fd, read_buf, size);
+>       [...]
+>    }
+>    [...]
+> }
+> 
+> The problem is (or rather was) that then bluetooth device gets out of
+> range (or bluetooth gets disabled in the device) the program hangs on
+> read(2). So select(2) went OK and told us that there's something to be
+> read, but actually nothing can be read. According to select(2) manual
+> page, after the successful select(2), read(2) should not hang (it may
+> fail though).
+> 
+> It can be workarounded by setting O_NONBLOCK flag on the socket, but
+> still I consider it as a bug that read(2) hangs after successful
+> select(2).
 
-I'm having problems trying to work out how to do this using the DBus
-interface.  I've browsed through the Wiki (http://wiki.bluez.org) but
-all the examples that I've found seem to be from the client
-perspective, not a server.  (Correct me if I'm wrong.)  The only
-server example I found is for the network service, not the serial
-service.  Similarly, the 'test-serial' python script only implements a
-client.
+which kernel version? Can you construct a simple demo program that shows
+this effect easily with a 2.6.24-rc2 kernel?
 
-The approximate sequence of actions that I'm currently
-(unsuccessfully!) using is:
-- Determine the default adapter (DefaultAdapter())
-- add the service (AddServiceRecordFromXML())
-- activate the serial service (ActivateService ("serial"))
+Regards
 
-The service is then visible to remote devices (so far so good!)
+Marcel
 
-- create a proxy (serial.Manager.CreateProxy (uuid, "/dev/rfcomm0"))
-- Enable the proxy (proxy.Enable ())
 
-This is where I'm obviously missing some basic stuff, I'm not sure in
-this area (with ports, proxies, etc).  In this scenario I end up with
-'invalid address' on the CreateProxy() call.  Looking at the API,
-CreateProxy expects either a socket or a character device, but I'm
-unsure what I should use here in my scenario.  Should I be using
-rfcomm0 in this manner, or some other approach?  Any help would be
-appreciated.
-
-Thanks.
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2005.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+This SF.net email is sponsored by: Splunk Inc.
+Still grepping through log files to find problems?  Stop.
+Now Search log events and configuration files using AJAX and a browser.
+Download your FREE copy of Splunk now >> http://get.splunk.com/
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
