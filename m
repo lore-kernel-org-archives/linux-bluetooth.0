@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <473BB4BA.4030102@aircable.net>
-Date: Wed, 14 Nov 2007 23:53:46 -0300
-From: Manuel Naranjo <manuel@aircable.net>
+Message-ID: <5c1c70820711141825g6c9e27ecm51c00272bad6d7fd@mail.gmail.com>
+Date: Thu, 15 Nov 2007 12:55:52 +1030
+From: "Pooyan McSporran" <duckfreezone@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="------------040109050201060205080501"
-Subject: [Bluez-devel] [PATCH] Fix 64 configuration
+Subject: [Bluez-devel] Serial server problems
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,91 +14,49 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------040109050201060205080501
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+(I'm unclear on which list, either bluez-devel or bluez-users, this
+query should be on.  Let me know if I've sent to the wrong list.)
 
-Hello everyone,
+I'm trying to write an application using BlueZ which will:
+- advertise a service, based on SPP (custom UUID, etc)
+- listen for incoming connections for that service
+- when an inbound connection is requested, create the connection
+- send data to/from on the connection
 
-It's been about 1 month since I got my 64 bits laptop, and after a hole
-month I started to figure out why the he## I couldn't get the audio
-service working on it. Or the pan service, or the serial service, or
-what ever service you might think off.
+I'm having problems trying to work out how to do this using the DBus
+interface.  I've browsed through the Wiki (http://wiki.bluez.org) but
+all the examples that I've found seem to be from the client
+perspective, not a server.  (Correct me if I'm wrong.)  The only
+server example I found is for the network service, not the serial
+service.  Similarly, the 'test-serial' python script only implements a
+client.
 
-I was always getting: dbus.exceptions.DBusException:
-org.bluez.Error.Failed: Exec format error
+The approximate sequence of actions that I'm currently
+(unsuccessfully!) using is:
+- Determine the default adapter (DefaultAdapter())
+- add the service (AddServiceRecordFromXML())
+- activate the serial service (ActivateService ("serial"))
 
-When ever I asked dbus to register a new server.
+The service is then visible to remote devices (so far so good!)
 
-After a long trial and error, I discovered that by default bluez was
-installing all the services to ${prefix}/lib instead of ${prefix}/lib64.
+- create a proxy (serial.Manager.CreateProxy (uuid, "/dev/rfcomm0"))
 
-Here's a little patch that fixes that problem. I'm not sure if I fixed
-the problem in the best way, I haven't ever used auto tools for over 10
-seconds, so I might have broken something. I tested, it builds, and then
-when I make the install it puts the files into lib64.
+This is where I'm obviously missing some basic stuff, I'm not sure in
+this area (with ports, proxies, etc).  Any help that people might have
+in this regard would be appreciated.
 
-The patch was made against the latest cvs version.
-
-Thanks,
-Manuel Naranjo
-Wireless Cables Inc.
-www.aircable.net
-
-
-
---------------040109050201060205080501
-Content-Type: text/x-patch;
- name="bluez-utils_64bits.cvs.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="bluez-utils_64bits.cvs.patch"
-
-47,49c47,50
-< 
-< 	if (test "${libdir}" = '${exec_prefix}/lib'); then
-< 		libdir="${prefix}/lib"
----
-> 	
-> 	dnl if lib64 is present then we use it
-> 	if (test -d "${prefix}/lib64" ); then
-> 	    libdir="${prefix}/lib64"
-51c52,57
-< 
----
-> 	
-> 	dnl and then only if ${libdir} keeps beeing empty we use lib
-> 	if ( test -z "${libdir}" ) ; then
-> 	    libdir="${prefix}/lib"
-> 	fi
-> 	
-68a75
-> 
-
---------------040109050201060205080501
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Thank you.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Splunk Inc.
 Still grepping through log files to find problems?  Stop.
 Now Search log events and configuration files using AJAX and a browser.
 Download your FREE copy of Splunk now >> http://get.splunk.com/
---------------040109050201060205080501
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---------------040109050201060205080501--
