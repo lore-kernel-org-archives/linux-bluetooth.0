@@ -1,49 +1,74 @@
-Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-To: bluez-devel@lists.sourceforge.net
-From: Raphael Geissert <atomo64+debian@gmail.com>
-Date: Sat, 17 Nov 2007 23:39:19 -0600
-Message-ID: <fhoj6b$p47$1@ger.gmane.org>
-Mime-Version: 1.0
-Subject: [Bluez-devel] why not using sourceforge's release system?
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Return-Path: <ohad@bencohen.org>
+From: Ohad Ben-Cohen <ohad@bencohen.org>
+Subject: [PATCH] always send explicit wake-up ack for TI's BRF chips
+To: Marcel Holtmann <marcel@holtmann.org>
+cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <tkrat.50b6a7c1cc5d762b@bencohen.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; CHARSET=us-ascii
+Date: Sat, 17 Nov 2007 10:29:05 -0800 (PST)
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hello,
+[Bluetooth] always send explicit wake-up acks for TI's BRF chips
 
-I was wondering what's the reason sourceforge's mirroring/release system is
-not used.
-The website service provided sourceforge is not meant to be used for file
-storage (read sf.net's documentation, it isn't allowed).
-It also makes it hard to implement some monitoring on the file releases by
-using a non-standard way.
+In the (rare) event of simultaneous wake up requests,
+do send the chip an explicit wake-up ack. This is required
+for Texas Instruments's BRF6350 chip.
 
-I would then recommend to switch to sf.net's release/mirroring system.
+Signed-off-by: Ohad Ben-Cohen <ohad@bencohen.org>
 
-[Note: I read the list]
+---
+Marcel,
 
-Kind regards,
+This is a small (but important) fix for TI's UART driver, that should
+go in 2.6.24.  It has been tested extensively with both the BRF6300 and
+the BRF6350 chips.
+Thanks.
+
+ drivers/bluetooth/hci_ll.c |   23 ++++++++++++++---------
+ 1 files changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index 8c3e62a..b91d45a 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -204,6 +204,19 @@ static void ll_device_want_to_wakeup(struct hci_uart *hu)
+ 	spin_lock_irqsave(&ll->hcill_lock, flags);
+ 
+ 	switch (ll->hcill_state) {
++	case HCILL_ASLEEP_TO_AWAKE:
++		/*
++		 * This state means that both the host and the BRF chip
++		 * have simultaneously sent a wake-up-indication packet.
++		 * Traditionaly, in this case, receiving a wake-up-indication
++		 * was enough and an additional wake-up-ack wasn't needed.
++		 * This has changed with the BRF6350, which does require an
++		 * explicit wake-up-ack. Other BRF versions, which do not
++		 * require an explicit ack here, do accept it, thus it is
++		 * perfectly safe to always send one.
++		 */
++		BT_DBG("dual wake-up-indication");
++		/* deliberate fall-through - do not add break */
+ 	case HCILL_ASLEEP:
+ 		/* acknowledge device wake up */
+ 		if (send_hcill_cmd(HCILL_WAKE_UP_ACK, hu) < 0) {
+@@ -211,16 +224,8 @@ static void ll_device_want_to_wakeup(struct hci_uart *hu)
+ 			goto out;
+ 		}
+ 		break;
+-	case HCILL_ASLEEP_TO_AWAKE:
+-		/*
+-		 * this state means that a wake-up-indication
+-		 * is already on its way to the device,
+-		 * and will serve as the required wake-up-ack
+-		 */
+-		BT_DBG("dual wake-up-indication");
+-		break;
+ 	default:
+-		/* any other state are illegal */
++		/* any other state is illegal */
+ 		BT_ERR("received HCILL_WAKE_UP_IND in state %ld", ll->hcill_state);
+ 		break;
+ 	}
 -- 
-Atomo64 - Raphael
-
-Please avoid sending me Word, PowerPoint or Excel attachments.
-See http://www.gnu.org/philosophy/no-word-attachments.html
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2005.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+1.4.4.2
