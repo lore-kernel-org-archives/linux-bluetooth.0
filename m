@@ -1,14 +1,11 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: Fulvio <fulvio@pc.jaring.my>
-To: bluez-users@lists.sourceforge.net
-Date: Sun, 18 Nov 2007 20:43:44 +0800
-References: <1190642401.6465.20.camel@localhost>
-	<200709241909.50864.fulvio@pc.jaring.my>
-In-Reply-To: <200709241909.50864.fulvio@pc.jaring.my>
+Message-ID: <38687c4a0711170438u4301359u42818267c0a8f51@mail.gmail.com>
+Date: Sat, 17 Nov 2007 13:38:11 +0100
+From: "Daniele Primon" <ledebass@gmail.com>
+To: Bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Message-Id: <200711182043.44315.fulvio@pc.jaring.my>
-Subject: [Bluez-users]  problem pairing, hcid die
-Reply-To: fulvio@pc.jaring.my, BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Bluetooth applet translation
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -17,41 +14,59 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============2091454898=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello there,
+--===============2091454898==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_12299_20549711.1195303091382"
 
-I still have a long way to go to understand what's going on with bluez 3.20, 
-Arch Linux and KDE desktop manager.
-As far as I could see the deamon die after a trial to set a link with the 
-device which I want to connect.
-Here's the syslog:
+------=_Part_12299_20549711.1195303091382
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Nov 18 20:28:20 laptop hcid[11827]: link_key_request (sba=00:A0:96:xx:CE:34, 
-dba=00:1A:xx:08:A5:F9)
-Nov 18 20:28:28 laptop hcid[11827]: pin_code_request (sba=00:A0:96:xx:CE:34, 
-dba=00:1A:xx:08:A5:F9)
-Nov 18 20:28:31 laptop sdpd[11831]: Stopping SDP server
-Nov 18 20:28:31 laptop sdpd[11831]: Exit
-Nov 18 20:28:31 laptop hcid[11827]: Unregister path: /org/bluez/hci0
-Nov 18 20:28:31 laptop hcid[11827]: Unregister path: /org/bluez
-Nov 18 20:28:31 laptop hcid[11827]: Shutting down local server
-Nov 18 20:28:31 laptop hcid[11827]: Exit
+When i open the preferences dialog from the systray area of the bluez-gnome
+package I have thre readio buttons for host operating mode. Changing them
+leads to different messages popup notifications but the meaning of the first
+is at least the contrary of the one showed by the notification area. This is
+at least misleading.
+I took a look to .it.po translation files on the sources and discovered that
+translation in the dialog is correct while then messages show in the
+notification popups are absent. Can anyone bring some light?
 
-Therefore, is there a practical way to make the link/pairing, some simple 
-script that will answer to the pin request?
-What should I check if something goes wrong and it will kill the hcid?
+------=_Part_12299_20549711.1195303091382
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<span class="ppt" id="_user_bluez-users@lists.sourceforge.net"><span class="lg">When i open the preferences dialog from the systray area of the bluez-gnome package I have thre readio buttons for host operating mode. Changing them leads to different messages popup notifications but the meaning of the first is at least the contrary of the one showed by the notification area. This is at least misleading.
+<br>I took a look to .it.po translation files on the sources and discovered that translation in the dialog is correct while then messages show in the notification popups are absent. Can anyone bring some light?<br><br><br>
+</span></span>
+
+------=_Part_12299_20549711.1195303091382--
 
 
-F
+--===============2091454898==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============2091454898==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============2091454898==--
