@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <a96155200711181327tce91b18w5bd842ee88611db4@mail.gmail.com>
-Date: Sun, 18 Nov 2007 22:27:52 +0100
-From: "Pawel Kot" <gnokii@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <a96155200711150615q38dcf09g140d2386830e9e23@mail.gmail.com>
-MIME-Version: 1.0
-References: <a96155200711150615q38dcf09g140d2386830e9e23@mail.gmail.com>
-Subject: Re: [Bluez-devel] select(2) or read(2) on bluetooth sockets not
-	working correctly?
+From: Raphael Geissert <atomo64+debian@gmail.com>
+Date: Sat, 17 Nov 2007 23:39:19 -0600
+Message-ID: <fhoj6b$p47$1@ger.gmane.org>
+Mime-Version: 1.0
+Subject: [Bluez-devel] why not using sourceforge's release system?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,21 +18,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hello,
 
-I have put simple program demonstrating the problem at
-http://tfuj.pl/gnokii/bt.c with compilation hints and usage.
-The testing I did was on Ubuntu kernels, so that's for sure not the
-recent one, but I think it is really easy to reproduce if the problem
-still persists.
+I was wondering what's the reason sourceforge's mirroring/release system is
+not used.
+The website service provided sourceforge is not meant to be used for file
+storage (read sf.net's documentation, it isn't allowed).
+It also makes it hard to implement some monitoring on the file releases by
+using a non-standard way.
 
-You may catch me on #bluez if needed.
+I would then recommend to switch to sf.net's release/mirroring system.
 
-take care,
-pkot
-PS. I'm really not subscribed, so please Cc on reply.
+[Note: I read the list]
+
+Kind regards,
 -- 
-Pawel Kot
+Atomo64 - Raphael
+
+Please avoid sending me Word, PowerPoint or Excel attachments.
+See http://www.gnu.org/philosophy/no-word-attachments.html
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
