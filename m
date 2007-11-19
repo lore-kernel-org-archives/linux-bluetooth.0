@@ -1,12 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <d89ddf300711191224r62590f98xf44060aa52fa30f8@mail.gmail.com>
-Date: Mon, 19 Nov 2007 13:24:28 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
+Message-ID: <37666aa80711182224q731d19f4mb0610949fb3d240d@mail.gmail.com>
+Date: Sun, 18 Nov 2007 22:24:33 -0800
+From: Han <keepsimple@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <c74b6b3d0711180941j33e07d11j8083973dde8047df@mail.gmail.com>
 MIME-Version: 1.0
-References: <c74b6b3d0711180941j33e07d11j8083973dde8047df@mail.gmail.com>
-Subject: Re: [Bluez-users] Can't use bt mouse and a2dp together
+Subject: [Bluez-users] is SDP required for RFCOMM communications?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,33 +18,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-if you have "master" in hcid.conf's lm setting and you take "rswitch"
-and "sniff" out of the lp setting, you are making the pc prefer to be
-master and to hopefully behave better. This can eliminate choppiness.
+Hi,
 
-On Nov 18, 2007 10:41 AM, Adam Strojek <zwierzak2003@gmail.com> wrote:
-> OK I do more tests and I can't use my bluetooth headset with any other
-> bluetooth device! Probably a2dp service take whole bt transfer because
-> it don't compress it. When I used old bluetooth-alsa service I could
-> connect and use more then only headset!
->
-> Btw. How to start AVRCP service?
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2005.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+I just started to use BlueZ to write bluetooth programs in C.  And I
+am using VMware based Ubuntu Linux.
 
+I can do hci_inquiry successfully. But  when I tried to run a RFCOMM
+server program ( listen on channel 1).  The client always reports
+error : "Operation now in progress".
 
+The same client can connect with no problem if i closed VMware +
+ubuntu and enable bluetooth in windows XP.
 
--- 
-Brad
+since the windows XP enables bluetooth & SDP services (Serial Port on
+RFCOMM channel 1),  i was wondering if SDP is required to do RFCOMM
+communication (on server side)  ?
+
+or, is there anything else the server side need to do to accept the
+RFCOMM connections ?
+
+Thanks in advance,
+Han
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
