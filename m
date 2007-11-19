@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <474181FA.2010906@aircable.net>
-Date: Mon, 19 Nov 2007 09:30:50 -0300
-From: Manuel Naranjo <manuel@aircable.net>
+Message-ID: <BAY130-W206BA0DD1FFF8BBEC7C1A4817E0@phx.gbl>
+From: "Dr. Arturo Mendoza-Lopez" <arturomendoza7@hotmail.com>
+To: <bluez-devel@lists.sourceforge.net>
+Date: Sun, 18 Nov 2007 22:24:30 -0600
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Rfcomm is not buffering received data?
+Subject: [Bluez-devel] PROFILES
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,52 +14,87 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0318673310=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello everyone,
+--===============0318673310==
+Content-Type: multipart/alternative;
+	boundary="_7c3438db-7848-4b5b-933d-2d1c9b2dfce7_"
 
-I'm working on a dbus version of obexftp [1]. My goal was to remove all
-the calls to hci-lib and replace those for the dbus equivalent. It
-wasn't a though task, but now I'm facing a huge problem.
-
-It took me almost 5 hours to detect the problem, firstly I thought that
-the phone wasn't replying the request, but then after a brilliant idea I
-probed that the phone was replying because hcidump was showing that. My
-first conclusion was: "someone else is reading /dev/rfcomm# and erasing
-the buffer before I can read it"
-
-Then I checked with fuser which PIDs where using that file. For my
-surprise there where two PIDs, one was my program the other was the
-serial port service from BlueZ. I enabled gdb and did step debugging
-until I faced the first write function, and then I kill the serial port
-service PID. But I wasn't lucky at all, someone was still reading the
-rfcomm.
-
-Well after a couple of hours of thinking I cammed to the conclusion that
-some how the rfcomm device is not buffering the data it receives. I'm
-sure that the rfcomm buffer is not been overflowed, as the first reply
-from the phone is not more than 30 bytes long. I'm gonna start going
-through the rfcomm kernel sources, but if someone knows what's going on
-please let me know.
-
-I'm working on an Open Source Proximity Marketing Solution, and this is
-the last thing I need to finish before doing the official announcement
-(Marcel do you mind if I send a mail to the list saying this?)
-
-Thanks,
-Manuel
-
-[1] http://code.google.com/p/proximitymarketing/
+--_7c3438db-7848-4b5b-933d-2d1c9b2dfce7_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
 
+I HAVE AN iMATE POCKET PC PHONE WM 2003 (http://www.clubimate.com/t-DETAILS=
+_PPC.aspx) MISSING THE NECESSARY PROFILES-STACKS (LIKE HANDS FREE) TO FUNCT=
+ION WITH MY BMW 335i (2007) iDRIVE BLUETOOTH CAR KIT. IT CAN "PAIR" BUT THE=
+N DOES NOT WORK AS IT SHOULD (BEING ABLE TO MAKE A PHONE CALL THROUGH THE C=
+AR'S SPEAKERS.
+DO YOU HAVE DOES NEEDED PROFILES?
+THANKS IN ADVANCE
+ARTURO
+_________________________________________________________________
+Connect to the next generation of MSN Messenger=A0
+http://imagine-msn.com/messenger/launch80/default.aspx?locale=3Den-us&sourc=
+e=3Dwlmailtagline=
+
+--_7c3438db-7848-4b5b-933d-2d1c9b2dfce7_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<style>
+.hmmessage P
+{
+margin:0px;
+padding:0px
+}
+body.hmmessage
+{
+FONT-SIZE: 10pt;
+FONT-FAMILY:Tahoma
+}
+</style>
+</head>
+<body class=3D'hmmessage'>
+I HAVE AN iMATE POCKET PC PHONE WM 2003 (<A onclick=3DonClickUnsafeLink(eve=
+nt); href=3D"http://www.clubimate.com/t-DETAILS_PPC.aspx" target=3D_blank>h=
+ttp://www.clubimate.com/t-DETAILS_PPC.aspx</A>) MISSING THE NECESSARY PROFI=
+LES-STACKS (LIKE HANDS FREE)&nbsp;TO FUNCTION WITH MY BMW 335i (2007) iDRIV=
+E BLUETOOTH CAR KIT. IT CAN "PAIR" BUT THEN DOES NOT WORK AS IT SHOULD (BEI=
+NG ABLE TO MAKE A PHONE CALL THROUGH THE CAR'S SPEAKERS.<BR>
+DO YOU HAVE DOES NEEDED PROFILES?<BR>
+THANKS IN ADVANCE<BR>
+ARTURO<BR><br /><hr />Connect to the next generation of MSN Messenger=A0  <=
+a href=3D'http://imagine-msn.com/messenger/launch80/default.aspx?locale=3De=
+n-us&source=3Dwlmailtagline' target=3D'_new'>Get it now! </a></body>
+</html>=
+
+--_7c3438db-7848-4b5b-933d-2d1c9b2dfce7_--
+
+
+--===============0318673310==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============0318673310==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0318673310==--
