@@ -1,10 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <37666aa80711191548g5a63577ge13d215410c69fd0@mail.gmail.com>
-Date: Mon, 19 Nov 2007 15:48:09 -0800
-From: Han <keepsimple@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <474181FA.2010906@aircable.net>
+Date: Mon, 19 Nov 2007 09:30:50 -0300
+From: Manuel Naranjo <manuel@aircable.net>
 MIME-Version: 1.0
-Subject: [Bluez-devel] is SDPd required for RFCOMM calls ?
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Rfcomm is not buffering received data?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,27 +18,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hello everyone,
 
-I just started to use BlueZ to write bluetooth programs in C.  And I
-am using VMware based Ubuntu Linux.
+I'm working on a dbus version of obexftp [1]. My goal was to remove all
+the calls to hci-lib and replace those for the dbus equivalent. It
+wasn't a though task, but now I'm facing a huge problem.
 
-I can do hci_inquiry successfully. But  when I tried to run a RFCOMM
-server program ( listen on channel 1).  The client always reports
-error : "Operation now in progress".
+It took me almost 5 hours to detect the problem, firstly I thought that
+the phone wasn't replying the request, but then after a brilliant idea I
+probed that the phone was replying because hcidump was showing that. My
+first conclusion was: "someone else is reading /dev/rfcomm# and erasing
+the buffer before I can read it"
 
-The same client can connect with no problem if i closed VMware +
-ubuntu and enable bluetooth in windows XP.
+Then I checked with fuser which PIDs where using that file. For my
+surprise there where two PIDs, one was my program the other was the
+serial port service from BlueZ. I enabled gdb and did step debugging
+until I faced the first write function, and then I kill the serial port
+service PID. But I wasn't lucky at all, someone was still reading the
+rfcomm.
 
-since the windows XP enables bluetooth & SDP services (Serial Port on
-RFCOMM channel 1),  i was wondering if SDP is required to do RFCOMM
-communication (on server side)  ?
+Well after a couple of hours of thinking I cammed to the conclusion that
+some how the rfcomm device is not buffering the data it receives. I'm
+sure that the rfcomm buffer is not been overflowed, as the first reply
+from the phone is not more than 30 bytes long. I'm gonna start going
+through the rfcomm kernel sources, but if someone knows what's going on
+please let me know.
 
-or, is there anything else the server side need to do to accept the
-RFCOMM connections ?
+I'm working on an Open Source Proximity Marketing Solution, and this is
+the last thing I need to finish before doing the official announcement
+(Marcel do you mind if I send a mail to the list saying this?)
 
-Thanks in advance,
-Han
+Thanks,
+Manuel
+
+[1] http://code.google.com/p/proximitymarketing/
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
