@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <37666aa80711191548g5a63577ge13d215410c69fd0@mail.gmail.com>
+Date: Mon, 19 Nov 2007 15:48:09 -0800
+From: Han <keepsimple@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Date: Tue, 20 Nov 2007 14:30:57 +0200
-Message-ID: <719D5CCC2F6E3644B0A9F5C9B1D0008803A90D3E@esebe104.NOE.Nokia.com>
-From: <Kai.Vehmanen@nokia.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] [PATCH] bluez-utils/audio/pcm_bluetooth.c:
-	drop-pcm_bluetooth-gettimeofday
+Subject: [Bluez-devel] is SDPd required for RFCOMM calls ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,18 +18,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello again,
+Hi,
 
-here's a patch that gets rid of all uses of gettimeofday() 
-and also does away with using struct timevals for calculating
-the hw_ptr. Should have no impact to plugin functionality.
+I just started to use BlueZ to write bluetooth programs in C.  And I
+am using VMware based Ubuntu Linux.
 
-Patch available at:
-http://sofia-sip.org/~vehmanek/bluez-patches/patch-20071120-kv-drop-pcm_
-bluetooth-gettimeofday.txt
+I can do hci_inquiry successfully. But  when I tried to run a RFCOMM
+server program ( listen on channel 1).  The client always reports
+error : "Operation now in progress".
 
--- 
-first.surname@nokia.com (Kai Vehmanen)
+The same client can connect with no problem if i closed VMware +
+ubuntu and enable bluetooth in windows XP.
+
+since the windows XP enables bluetooth & SDP services (Serial Port on
+RFCOMM channel 1),  i was wondering if SDP is required to do RFCOMM
+communication (on server side)  ?
+
+or, is there anything else the server side need to do to accept the
+RFCOMM connections ?
+
+Thanks in advance,
+Han
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
