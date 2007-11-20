@@ -1,10 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 MIME-Version: 1.0
-Date: Tue, 20 Nov 2007 14:31:07 +0200
-Message-ID: <719D5CCC2F6E3644B0A9F5C9B1D0008803A90D3F@esebe104.NOE.Nokia.com>
+Date: Tue, 20 Nov 2007 14:30:57 +0200
+Message-ID: <719D5CCC2F6E3644B0A9F5C9B1D0008803A90D3E@esebe104.NOE.Nokia.com>
 From: <Kai.Vehmanen@nokia.com>
 To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] [PATCH] bluez-utils/audio: kv-multiple-periods-support
+Subject: [Bluez-devel] [PATCH] bluez-utils/audio/pcm_bluetooth.c:
+	drop-pcm_bluetooth-gettimeofday
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,22 +19,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hello again,
 
-here's a patch that allows pcm_bluetooth.c to support
-multiple period sizes (and thus gives application some
-control over the wakeup/latency requirements it has to meet).
-This patch works around an alsa-lib bug/limitation (triggered
-if we allow the buffersize to vary). And a consequency,
-buffersize is always fixed to 3*8192 bytes.
+here's a patch that gets rid of all uses of gettimeofday() 
+and also does away with using struct timevals for calculating
+the hw_ptr. Should have no impact to plugin functionality.
 
 Patch available at:
-http://sofia-sip.org/~vehmanek/bluez-patches/patch-20071120-kv-multiple-
-periods-support.txt
-
-PS Tested with alsa-lib pcm.c, alsa-utils speaker-test, 
-   gstreamer (gst-launch + alsasink), and pulseaudio. The A2DP headsets
-   used for testing were Nokia BH-501 and Logitech Freepulse Wireless.
+http://sofia-sip.org/~vehmanek/bluez-patches/patch-20071120-kv-drop-pcm_
+bluetooth-gettimeofday.txt
 
 -- 
 first.surname@nokia.com (Kai Vehmanen)
