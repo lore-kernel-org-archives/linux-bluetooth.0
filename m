@@ -1,11 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 MIME-Version: 1.0
-Date: Tue, 20 Nov 2007 14:31:21 +0200
-Message-ID: <719D5CCC2F6E3644B0A9F5C9B1D0008803A90D40@esebe104.NOE.Nokia.com>
+Date: Tue, 20 Nov 2007 14:31:07 +0200
+Message-ID: <719D5CCC2F6E3644B0A9F5C9B1D0008803A90D3F@esebe104.NOE.Nokia.com>
 From: <Kai.Vehmanen@nokia.com>
 To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] [PATCH] bluez-utils/audio/pcm_bluetooth.c:
-	audio-makefile.am-add-linkage-to-librt
+Subject: [Bluez-devel] [PATCH] bluez-utils/audio: kv-multiple-periods-support
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,13 +20,20 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-here's a patch that fixes linking of pcm_bluetooth.c
-now that it uses clock_gettimeofday() (which is in librt
-in glibc).
+here's a patch that allows pcm_bluetooth.c to support
+multiple period sizes (and thus gives application some
+control over the wakeup/latency requirements it has to meet).
+This patch works around an alsa-lib bug/limitation (triggered
+if we allow the buffersize to vary). And a consequency,
+buffersize is always fixed to 3*8192 bytes.
 
 Patch available at:
-http://sofia-sip.org/~vehmanek/bluez-patches/patch-20071120-kv-audio-mak
-efile.am-add-linkage-to-librt.txt
+http://sofia-sip.org/~vehmanek/bluez-patches/patch-20071120-kv-multiple-
+periods-support.txt
+
+PS Tested with alsa-lib pcm.c, alsa-utils speaker-test, 
+   gstreamer (gst-launch + alsasink), and pulseaudio. The A2DP headsets
+   used for testing were Nokia BH-501 and Logitech Freepulse Wireless.
 
 -- 
 first.surname@nokia.com (Kai Vehmanen)
