@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="----_=_NextPart_001_01C82D0B.8F273AD2"
-Date: Thu, 22 Nov 2007 15:28:24 +0200
-Message-ID: <719D5CCC2F6E3644B0A9F5C9B1D0008803AF043B@esebe104.NOE.Nokia.com>
-From: <Kai.Vehmanen@nokia.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] bluez-utils/audio/pcm_bluetooth.c:
-	audio-makefile.am-add-linkage-to-librt
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20071120161611.GA22301@cathedrallabs.org>
+References: <1277734668.20071120170636@casema.nl>
+	<20071120161611.GA22301@cathedrallabs.org>
+Date: Tue, 20 Nov 2007 16:26:03 +0000
+Message-Id: <1195575963.10878.208.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] fakeinput for PS3 sixaxis
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,66 +17,31 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
 
-------_=_NextPart_001_01C82D0B.8F273AD2
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+On Tue, 2007-11-20 at 11:16 -0500, Aristeu Rozanski wrote:
+> Hi Robert,
+> > Maybe it have been lost in the chatter but Aristeu Sergio Rozanski
+> > Filho did send in a fakeinput patch for the Playstation 3 sixaxis
+> > controller a month ago.
+> actually, the sixaxis controller already works. the patches I've
+> submitted are for supporting the blu-ray remote.
 
-Hi,
+The Sixaxis only works with the old hidd, it doesn't with the new input
+service though, as the input service expects to be able to connect to
+the device to get its info.
 
-On 20 Nov 2007, Vehmanen Kai wrote:
->here's a patch that fixes linking of pcm_bluetooth.c now that=20
->it uses clock_gettimeofday() (which is in librt in glibc).
+See my attempts at fixing that in the archives.
 
-updated to latest CVS, recreated, renamed and attached.
-
---=20
-first.surname@nokia.com (Kai Vehmanen)
-
-------_=_NextPart_001_01C82D0B.8F273AD2
-Content-Type: application/octet-stream;
-	name="patch-20071122-kv-audio-makefile.am-add-linkage-to-librt.diff"
-Content-Transfer-Encoding: base64
-Content-Description: patch-20071122-kv-audio-makefile.am-add-linkage-to-librt.diff
-Content-Disposition: attachment;
-	filename="patch-20071122-kv-audio-makefile.am-add-linkage-to-librt.diff"
-
-LS0tIGF1ZGlvL01ha2VmaWxlLmFtCTIxIE5vdiAyMDA3IDIwOjI0OjExIC0wMDAwCTEuNDEKKysr
-IGF1ZGlvL01ha2VmaWxlLmFtCTIyIE5vdiAyMDA3IDEyOjUwOjU4IC0wMDAwCkBAIC0yNSw3ICsy
-NSw3IEBACiAKIGxpYmFzb3VuZF9tb2R1bGVfcGNtX2JsdWV0b290aF9sYV9TT1VSQ0VTID0gcGNt
-X2JsdWV0b290aC5jIHJ0cC5oIGlwYy5oIGlwYy5jCiBsaWJhc291bmRfbW9kdWxlX3BjbV9ibHVl
-dG9vdGhfbGFfTERGTEFHUyA9IC1tb2R1bGUgLWF2b2lkLXZlcnNpb24gLWV4cG9ydC1zeW1ib2xz
-LXJlZ2V4IFtfXSpzbmRfcGNtXy4qCi1saWJhc291bmRfbW9kdWxlX3BjbV9ibHVldG9vdGhfbGFf
-TElCQUREID0gQFNCQ19MSUJTQCBAQUxTQV9MSUJTQAorbGliYXNvdW5kX21vZHVsZV9wY21fYmx1
-ZXRvb3RoX2xhX0xJQkFERCA9IEBTQkNfTElCU0AgQEFMU0FfTElCU0AgLWxydAogbGliYXNvdW5k
-X21vZHVsZV9wY21fYmx1ZXRvb3RoX2xhX0NGTEFHUyA9IEBBTFNBX0NGTEFHU0AgQFNCQ19DRkxB
-R1NACiAKIGxpYmFzb3VuZF9tb2R1bGVfY3RsX2JsdWV0b290aF9sYV9TT1VSQ0VTID0gY3RsX2Js
-dWV0b290aC5jIHJ0cC5oIGlwYy5oIGlwYy5jCg==
-
-------_=_NextPart_001_01C82D0B.8F273AD2
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-------_=_NextPart_001_01C82D0B.8F273AD2
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-------_=_NextPart_001_01C82D0B.8F273AD2--
