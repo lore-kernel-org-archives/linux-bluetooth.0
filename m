@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Date: Tue, 20 Nov 2007 17:06:36 +0100
-From: Robert Winder <robertwinder@casema.nl>
-Message-ID: <1277734668.20071120170636@casema.nl>
-To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-devel] fakeinput for PS3 sixaxis
-Reply-To: Robert Winder <robertwinder@casema.nl>,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Tue, 20 Nov 2007 14:31:21 +0200
+Message-ID: <719D5CCC2F6E3644B0A9F5C9B1D0008803A90D40@esebe104.NOE.Nokia.com>
+From: <Kai.Vehmanen@nokia.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] [PATCH] bluez-utils/audio/pcm_bluetooth.c:
+	audio-makefile.am-add-linkage-to-librt
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,32 +21,16 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-Maybe it have been lost in the chatter but Aristeu Sergio Rozanski
-Filho did send in a fakeinput patch for the Playstation 3 sixaxis
-controller a month ago.
+here's a patch that fixes linking of pcm_bluetooth.c
+now that it uses clock_gettimeofday() (which is in librt
+in glibc).
 
-see http://sourceforge.net/mailarchive/message.php?msg_id=20071007184035.GA7430%40cathedrallabs.org
+Patch available at:
+http://sofia-sip.org/~vehmanek/bluez-patches/patch-20071120-kv-audio-mak
+efile.am-add-linkage-to-librt.txt
 
-I don't see the patch in cvs so maybe it got stalled somewhere. Maybe
-someone can consider this patch again for inclusion. Can't ask
-Aristeau for a resend directly because i just subscribed and thus
-haven't got his email address to ask for a resend.
-
-As I understand it the ps3 sixaxis controller has to be defined as
-fakeinput otherwise it won't connect.
-
-With bluez-util 3.22. I see the PS3 controller trying to connect
-
-Nov 20 18:06:56 localhost input[4060]: Incoming connection on PSM 17
-Nov 20 18:06:56 localhost input[4060]: Incoming connection on PSM 19
-
-but to no avail.
-
-With the old daemon hidd there is a nocheck option but with hidc there
-isn't so I'm not able to connect the controller with BT.
-
-    /Robert     
-
+-- 
+first.surname@nokia.com (Kai Vehmanen)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
