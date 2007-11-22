@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <474594B7.2070005@aircable.net>
+Date: Thu, 22 Nov 2007 11:39:51 -0300
+From: Manuel Naranjo <manuel@aircable.net>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="----_=_NextPart_001_01C82D16.8500AC90"
-Date: Thu, 22 Nov 2007 16:46:51 +0200
-Message-ID: <719D5CCC2F6E3644B0A9F5C9B1D0008803AF0549@esebe104.NOE.Nokia.com>
-From: <Kai.Vehmanen@nokia.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] bluez-utils/audio:
-	kv-multiple-periods-support
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <474181FA.2010906@aircable.net>
+In-Reply-To: <474181FA.2010906@aircable.net>
+Subject: Re: [Bluez-devel] Rfcomm is not buffering received data?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,77 +16,85 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+Hello guys,
 
-------_=_NextPart_001_01C82D16.8500AC90
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+I've been able to fix this, by switching the tty node to raw mode. But
+still something is not working well, select returns 0 even though
+there's data in the buffer.
 
-Hi,
+Here's the fix if anyone wants to know:
+    int fd = fileno(data->fd);
+   
+    struct termios tio;
+   
+    tcgetattr(fd, &tio);
 
-On 20 Nov 2007,  Vehmanen Kai (Nokia-TP-MSW/Helsinki) wrote:
->here's a patch that allows pcm_bluetooth.c to support multiple=20
->period sizes (and thus gives application some control over the=20
->wakeup/latency requirements it has to meet).
+    tcflush(fd, TCIOFLUSH);
+   
+    tio.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+    tio.c_iflag &= ~(BRKINT | ICRNL | ISTRIP | IXON);
+    tio.c_cflag &= ~(CSIZE | PARENB);
+    tio.c_cflag |= CS8;
+    tio.c_oflag &= ~(OPOST);
 
-updated to latest CVS, recreated, renamed and attached.
+    cfmakeraw(&tio);
+   
+    tio.c_cc[VMIN] = 0;
+    tio.c_cc[VTIME] = 0;
 
---=20
-first.surname@nokia.com (Kai Vehmanen)
+I think we should add a comment about this in the wiki, what do you think?
 
-------_=_NextPart_001_01C82D16.8500AC90
-Content-Type: application/octet-stream;
-	name="patch-20071122-kv-multiple-periods-support.diff"
-Content-Transfer-Encoding: base64
-Content-Description: patch-20071122-kv-multiple-periods-support.diff
-Content-Disposition: attachment;
-	filename="patch-20071122-kv-multiple-periods-support.diff"
+Cheers,
+Manuel
+> Hello everyone,
+>
+> I'm working on a dbus version of obexftp [1]. My goal was to remove all
+> the calls to hci-lib and replace those for the dbus equivalent. It
+> wasn't a though task, but now I'm facing a huge problem.
+>
+> It took me almost 5 hours to detect the problem, firstly I thought that
+> the phone wasn't replying the request, but then after a brilliant idea I
+> probed that the phone was replying because hcidump was showing that. My
+> first conclusion was: "someone else is reading /dev/rfcomm# and erasing
+> the buffer before I can read it"
+>
+> Then I checked with fuser which PIDs where using that file. For my
+> surprise there where two PIDs, one was my program the other was the
+> serial port service from BlueZ. I enabled gdb and did step debugging
+> until I faced the first write function, and then I kill the serial port
+> service PID. But I wasn't lucky at all, someone was still reading the
+> rfcomm.
+>
+> Well after a couple of hours of thinking I cammed to the conclusion that
+> some how the rfcomm device is not buffering the data it receives. I'm
+> sure that the rfcomm buffer is not been overflowed, as the first reply
+> from the phone is not more than 30 bytes long. I'm gonna start going
+> through the rfcomm kernel sources, but if someone knows what's going on
+> please let me know.
+>
+> I'm working on an Open Source Proximity Marketing Solution, and this is
+> the last thing I need to finish before doing the official announcement
+> (Marcel do you mind if I send a mail to the list saying this?)
+>
+> Thanks,
+> Manuel
+>
+> [1] http://code.google.com/p/proximitymarketing/
+>
+>
+>
+>   
 
-LS0tIGF1ZGlvL3BjbV9ibHVldG9vdGguYwkyMSBOb3YgMjAwNyAyMDoyNDoxMSAtMDAwMAkxLjg0
-CisrKyBhdWRpby9wY21fYmx1ZXRvb3RoLmMJMjIgTm92IDIwMDcgMTI6NTc6MTggLTAwMDAKQEAg
-LTk5Nyw3ICs5OTcsOSBAQAogCXVuc2lnbmVkIGludCByYXRlX2NvdW50OwogCWludCBlcnIsIG1p
-bl9jaGFubmVscywgbWF4X2NoYW5uZWxzOwogCXVuc2lnbmVkIGludCBwZXJpb2RfbGlzdFtdID0g
-ewotCQk0MDk2LCAvKiAyMy80Nm1zIChzdGVyZW8vbW9ubyAxNmJpdCBhdCA0NC4xa0h6KSAqLwor
-CQkyMDQ4LAorCQk0MDk2LCAvKiBlLmcuIDIzLjJtc2VjL3BlcmlvZCAoc3RlcmVvIDE2Yml0IGF0
-IDQ0LjFrSHopICovCisJCTgxOTIKIAl9OwogCiAJLyogYWNjZXNzIHR5cGUgKi8KQEAgLTEwMjgs
-MTUgKzEwMzAsMTYgQEAKIAlpZiAoZXJyIDwgMCkKIAkJcmV0dXJuIGVycjsKIAotCS8qIHN1cHBv
-cnRlZCBibG9jayBzaXplczogKi8KLQllcnIgPSBzbmRfcGNtX2lvcGx1Z19zZXRfcGFyYW1fbGlz
-dChpbywgU05EX1BDTV9JT1BMVUdfSFdfUEVSSU9EX0JZVEVTLAotCQkJQVJSQVlfTkVMRU1TKHBl
-cmlvZF9saXN0KSwgcGVyaW9kX2xpc3QpOworCS8qIHN1cHBvcnRlZCBidWZmZXIgc2l6ZXMgCisJ
-ICogKGNhbiBiZSB1c2VkIGFzIDMqODE5MiwgNio0MDk2LCAxMioyMDQ4LCAuLi4pICovCisJZXJy
-ID0gc25kX3BjbV9pb3BsdWdfc2V0X3BhcmFtX21pbm1heChpbywgU05EX1BDTV9JT1BMVUdfSFdf
-QlVGRkVSX0JZVEVTLAorCQkJCQkgICAgICA4MTkyKjMsIDgxOTIqMyk7CiAJaWYgKGVyciA8IDAp
-CiAJCXJldHVybiBlcnI7CiAKLQkvKiBwZXJpb2QgY291bnQgZml4ZWQgdG8gMyBhcyB3ZSBkb24n
-dCBzdXBwb3J0IHByZWZpbGxpbmcgKi8KLQllcnIgPSBzbmRfcGNtX2lvcGx1Z19zZXRfcGFyYW1f
-bWlubWF4KGlvLCBTTkRfUENNX0lPUExVR19IV19QRVJJT0RTLAotCQkJCQkgICAgICAzLCAzKTsK
-KwkvKiBzdXBwb3J0ZWQgYmxvY2sgc2l6ZXM6ICovCisJZXJyID0gc25kX3BjbV9pb3BsdWdfc2V0
-X3BhcmFtX2xpc3QoaW8sIFNORF9QQ01fSU9QTFVHX0hXX1BFUklPRF9CWVRFUywKKwkJCUFSUkFZ
-X05FTEVNUyhwZXJpb2RfbGlzdCksIHBlcmlvZF9saXN0KTsKIAlpZiAoZXJyIDwgMCkKIAkJcmV0
-dXJuIGVycjsKIAo=
-
-------_=_NextPart_001_01C82D16.8500AC90
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-------_=_NextPart_001_01C82D16.8500AC90
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-------_=_NextPart_001_01C82D16.8500AC90--
