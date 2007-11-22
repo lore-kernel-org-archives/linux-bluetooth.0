@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4745D9EE.4020101@uni-koeln.de>
-Date: Thu, 22 Nov 2007 20:35:10 +0100
-From: Paul Wachendorf <pwachend@uni-koeln.de>
+Message-ID: <1c9b31320711220913r1f89aafgcf88c0927bfb1c1@mail.gmail.com>
+Date: Thu, 22 Nov 2007 19:13:55 +0200
+From: "Johan Hedberg" <johan.hedberg@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <9a119b3c0711220826u405b3845pb1101fcfb2c42e3c@mail.gmail.com>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] hcitool scan returns wrong bdaddr
+References: <9a119b3c0711220826u405b3845pb1101fcfb2c42e3c@mail.gmail.com>
+Subject: Re: [Bluez-users] Using AVRCP with current BlueZ
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,39 +16,32 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
-I have a strange Problem with hcitool on a ARM CPU based embedded 
-system.  I have installed a debian system (tried woody, etch and lenny) 
-and tried the bluez-utils from the distribution and self compiled ones. 
-The bluetooth device works fine, but when I run a 'hcitool scan' to 
-discover the bdaddr of remote devices  it always returns wrong MACs:
-# hcitool scan
-Scanning ...
-        02:01:00:12:EE:58       n/a
-        02:02:00:10:C6:81       n/a
+Hi Kristof,
 
-on my normal i386 PC running ubuntu linux, using the same bluetooth 
-device the output is:
-$ hcitool scan
-Scanning ...
-        00:10:C6:81:48:19       NAME-FB399BACD9
-        00:12:EE:58:72:1C       V630i
+On Nov 22, 2007 6:26 PM, Csillag Krist=F3f <csillag.kristof@gmail.com> wrot=
+e:
+> My question is, how can I use AVRCP now? bluetooth-alsa used to contain
+> some support for it, but now I guess it's gone. Browsing the source
+> code of bluez-utils, I see some dbus interface, but I can not find
+> any example demonstrating how to use this.
+>
+> Could you please point me to the right documentation (if it exists)?
 
-back again on the ARM box I can successfully l2ping  00:12:EE:58:72:1C 
-and an # hcitool name 00:12:EE:58:72:1C
-returns "V630i" as suspected , so on I can use ussp-push to send Files 
-to my V630i. So the whole bluetooth subsystem seems to work fine, except 
-of the discovering of remote MACs.
+I don't think there is any proper documentation yet. bluez-utils-3.22
+has some preliminary AVRCP support but by default it's disabled. You
+need to add a line "Enable=3DControl" to the General section in
+/etc/bluetooth/audio.conf to enable it. Currently no D-Bus signals or
+or methods are supported. Instead, the audio service uses the kernel
+uinput interface (you need to have the uinput module loaded) to inject
+keypress events to the kernel input subsystem. You can see what kind
+of AVRCP->keycode mappings are used by looking in the audio/control.c
+file from bluez-utils.
 
-Does anybody has am idea why this wrong MACs are returned?
-Thanks for your help,
-
-Paul
-
+Johan
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
