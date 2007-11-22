@@ -1,53 +1,27 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <1c9b31320711220913r1f89aafgcf88c0927bfb1c1@mail.gmail.com>
-Date: Thu, 22 Nov 2007 19:13:55 +0200
-From: "Johan Hedberg" <johan.hedberg@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <9a119b3c0711220826u405b3845pb1101fcfb2c42e3c@mail.gmail.com>
+Return-Path: <csillag.kristof@gmail.com>
+Message-ID: <9a119b3c0711220826u405b3845pb1101fcfb2c42e3c@mail.gmail.com>
+Date: Thu, 22 Nov 2007 17:26:25 +0100
+From: "=?ISO-8859-1?Q?Csillag_Krist=F3f?=" <csillag.kristof@gmail.com>
+To: bluez-users@lists.sourceforge.net
+Subject: Using AVRCP with current BlueZ
+Cc: marcel@holtmann.org
 MIME-Version: 1.0
-References: <9a119b3c0711220826u405b3845pb1101fcfb2c42e3c@mail.gmail.com>
-Subject: Re: [Bluez-users] Using AVRCP with current BlueZ
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Content-Type: text/plain; charset=ISO-8859-1
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hi Kristof,
+Hi there!
 
-On Nov 22, 2007 6:26 PM, Csillag Krist=F3f <csillag.kristof@gmail.com> wrot=
-e:
-> My question is, how can I use AVRCP now? bluetooth-alsa used to contain
-> some support for it, but now I guess it's gone. Browsing the source
-> code of bluez-utils, I see some dbus interface, but I can not find
-> any example demonstrating how to use this.
->
-> Could you please point me to the right documentation (if it exists)?
+The wiki page at http://wiki.bluez.org/wiki/HOWTO/AudioDevices says that
+I no longer not need bluetooth-alsa, plugz, btsco or the like for audio
+to work - they are now obsolete.
 
-I don't think there is any proper documentation yet. bluez-utils-3.22
-has some preliminary AVRCP support but by default it's disabled. You
-need to add a line "Enable=3DControl" to the General section in
-/etc/bluetooth/audio.conf to enable it. Currently no D-Bus signals or
-or methods are supported. Instead, the audio service uses the kernel
-uinput interface (you need to have the uinput module loaded) to inject
-keypress events to the kernel input subsystem. You can see what kind
-of AVRCP->keycode mappings are used by looking in the audio/control.c
-file from bluez-utils.
+My question is, how can I use AVRCP now? bluetooth-alsa used to contain
+some support for it, but now I guess it's gone. Browsing the source
+code of bluez-utils, I see some dbus interface, but I can not find
+any example demonstrating how to use this.
 
-Johan
+Could you please point me to the right documentation (if it exists)?
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2005.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Thank you for your help:
+
+   Kristof Csillag
