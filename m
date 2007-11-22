@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <474594B7.2070005@aircable.net>
-Date: Thu, 22 Nov 2007 11:39:51 -0300
-From: Manuel Naranjo <manuel@aircable.net>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <474181FA.2010906@aircable.net>
-In-Reply-To: <474181FA.2010906@aircable.net>
-Subject: Re: [Bluez-devel] Rfcomm is not buffering received data?
+Content-Type: multipart/mixed; boundary="----_=_NextPart_001_01C82D0B.8F273AD2"
+Date: Thu, 22 Nov 2007 15:28:24 +0200
+Message-ID: <719D5CCC2F6E3644B0A9F5C9B1D0008803AF043B@esebe104.NOE.Nokia.com>
+From: <Kai.Vehmanen@nokia.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [PATCH] bluez-utils/audio/pcm_bluetooth.c:
+	audio-makefile.am-add-linkage-to-librt
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,85 +16,66 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello guys,
+This is a multi-part message in MIME format.
 
-I've been able to fix this, by switching the tty node to raw mode. But
-still something is not working well, select returns 0 even though
-there's data in the buffer.
+------_=_NextPart_001_01C82D0B.8F273AD2
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Here's the fix if anyone wants to know:
-    int fd = fileno(data->fd);
-   
-    struct termios tio;
-   
-    tcgetattr(fd, &tio);
+Hi,
 
-    tcflush(fd, TCIOFLUSH);
-   
-    tio.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
-    tio.c_iflag &= ~(BRKINT | ICRNL | ISTRIP | IXON);
-    tio.c_cflag &= ~(CSIZE | PARENB);
-    tio.c_cflag |= CS8;
-    tio.c_oflag &= ~(OPOST);
+On 20 Nov 2007, Vehmanen Kai wrote:
+>here's a patch that fixes linking of pcm_bluetooth.c now that=20
+>it uses clock_gettimeofday() (which is in librt in glibc).
 
-    cfmakeraw(&tio);
-   
-    tio.c_cc[VMIN] = 0;
-    tio.c_cc[VTIME] = 0;
+updated to latest CVS, recreated, renamed and attached.
 
-I think we should add a comment about this in the wiki, what do you think?
+--=20
+first.surname@nokia.com (Kai Vehmanen)
 
-Cheers,
-Manuel
-> Hello everyone,
->
-> I'm working on a dbus version of obexftp [1]. My goal was to remove all
-> the calls to hci-lib and replace those for the dbus equivalent. It
-> wasn't a though task, but now I'm facing a huge problem.
->
-> It took me almost 5 hours to detect the problem, firstly I thought that
-> the phone wasn't replying the request, but then after a brilliant idea I
-> probed that the phone was replying because hcidump was showing that. My
-> first conclusion was: "someone else is reading /dev/rfcomm# and erasing
-> the buffer before I can read it"
->
-> Then I checked with fuser which PIDs where using that file. For my
-> surprise there where two PIDs, one was my program the other was the
-> serial port service from BlueZ. I enabled gdb and did step debugging
-> until I faced the first write function, and then I kill the serial port
-> service PID. But I wasn't lucky at all, someone was still reading the
-> rfcomm.
->
-> Well after a couple of hours of thinking I cammed to the conclusion that
-> some how the rfcomm device is not buffering the data it receives. I'm
-> sure that the rfcomm buffer is not been overflowed, as the first reply
-> from the phone is not more than 30 bytes long. I'm gonna start going
-> through the rfcomm kernel sources, but if someone knows what's going on
-> please let me know.
->
-> I'm working on an Open Source Proximity Marketing Solution, and this is
-> the last thing I need to finish before doing the official announcement
-> (Marcel do you mind if I send a mail to the list saying this?)
->
-> Thanks,
-> Manuel
->
-> [1] http://code.google.com/p/proximitymarketing/
->
->
->
->   
+------_=_NextPart_001_01C82D0B.8F273AD2
+Content-Type: application/octet-stream;
+	name="patch-20071122-kv-audio-makefile.am-add-linkage-to-librt.diff"
+Content-Transfer-Encoding: base64
+Content-Description: patch-20071122-kv-audio-makefile.am-add-linkage-to-librt.diff
+Content-Disposition: attachment;
+	filename="patch-20071122-kv-audio-makefile.am-add-linkage-to-librt.diff"
 
+LS0tIGF1ZGlvL01ha2VmaWxlLmFtCTIxIE5vdiAyMDA3IDIwOjI0OjExIC0wMDAwCTEuNDEKKysr
+IGF1ZGlvL01ha2VmaWxlLmFtCTIyIE5vdiAyMDA3IDEyOjUwOjU4IC0wMDAwCkBAIC0yNSw3ICsy
+NSw3IEBACiAKIGxpYmFzb3VuZF9tb2R1bGVfcGNtX2JsdWV0b290aF9sYV9TT1VSQ0VTID0gcGNt
+X2JsdWV0b290aC5jIHJ0cC5oIGlwYy5oIGlwYy5jCiBsaWJhc291bmRfbW9kdWxlX3BjbV9ibHVl
+dG9vdGhfbGFfTERGTEFHUyA9IC1tb2R1bGUgLWF2b2lkLXZlcnNpb24gLWV4cG9ydC1zeW1ib2xz
+LXJlZ2V4IFtfXSpzbmRfcGNtXy4qCi1saWJhc291bmRfbW9kdWxlX3BjbV9ibHVldG9vdGhfbGFf
+TElCQUREID0gQFNCQ19MSUJTQCBAQUxTQV9MSUJTQAorbGliYXNvdW5kX21vZHVsZV9wY21fYmx1
+ZXRvb3RoX2xhX0xJQkFERCA9IEBTQkNfTElCU0AgQEFMU0FfTElCU0AgLWxydAogbGliYXNvdW5k
+X21vZHVsZV9wY21fYmx1ZXRvb3RoX2xhX0NGTEFHUyA9IEBBTFNBX0NGTEFHU0AgQFNCQ19DRkxB
+R1NACiAKIGxpYmFzb3VuZF9tb2R1bGVfY3RsX2JsdWV0b290aF9sYV9TT1VSQ0VTID0gY3RsX2Js
+dWV0b290aC5jIHJ0cC5oIGlwYy5oIGlwYy5jCg==
+
+------_=_NextPart_001_01C82D0B.8F273AD2
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+------_=_NextPart_001_01C82D0B.8F273AD2
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------_=_NextPart_001_01C82D0B.8F273AD2--
