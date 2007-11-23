@@ -1,12 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4746C39E.5090107@aircable.net>
-Date: Fri, 23 Nov 2007 09:12:14 -0300
-From: Manuel Naranjo <manuel@aircable.net>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <E1IvOBq-0005p1-0g@daffy.sipo.nl>
-In-Reply-To: <E1IvOBq-0005p1-0g@daffy.sipo.nl>
-Subject: Re: [Bluez-devel] python / dbus issue
+To: bluez-devel@lists.sourceforge.net
+From: "thHog" <bluez@t3i.nl>
+Mime-Version: 1.0
+Message-Id: <E1IvOBq-0005p1-0g@daffy.sipo.nl>
+Date: Fri, 23 Nov 2007 03:22:46 +0100
+Subject: [Bluez-devel] python / dbus issue
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,45 +19,73 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
-> I tried my first python script for accessing bluez through dbus. The bluez
-> setup is complete and I can scan and connect bluetooth devices using hcitool
-> and rfcomm tools. The dbus setup is working as well, the "dbus-monitor
-> --system" shows bluez messages when starting bluez.
->   
-I think it wasn't well installed.
-> But, I tried to run the following python script (and several other examples
-> from the internet):
-> .....
->   
-I checked your script and it works for me. Make sure you have the latest
-version, and that's installed as it's supposed to be.
 
-If you don't want to mess up with scripts you can check with: dbus-send
---system --type=method_call --print-reply --dest=org.bluez /org/bluez
-org.bluez.Manager.ListAdapters
+I tried my first python script for accessing bluez through dbus. The bluez
+setup is complete and I can scan and connect bluetooth devices using hcitool
+and rfcomm tools. The dbus setup is working as well, the "dbus-monitor
+--system" shows bluez messages when starting bluez.
 
-> self._connection.send_message_with_reply_and_block(message, timeout)
-> dbus.DBusException: org.freedesktop.DBus.Error.UnknownMethod: Method
-> "ListAdapters" with signature "" on interface "org.bluez.Manager" doesn't
-> exist
->   
-How strange you are missing the method ListAdapters which actually exists.
+But, I tried to run the following python script (and several other examples
+from the internet):
 
-> On starting /etc/init.d/bluetooth, dbus-monitor --system shows:
->
-> $ dbus-monitor --system
-> signal sender=org.freedesktop.DBus -> dest=:1.5 path=/org/freedesktop/DBus;
-> ......
->   
-What does it show when running the script?
 
-> What is wrong here?
->   
-Maybe you missed something when passing the arguments to configure and
-built.
+import dbus
+bus = dbus.SystemBus();
+obj = bus.get_object('org.bluez', '/org/bluez')
+manager = dbus.Interface(obj, 'org.bluez.Manager')
+print manager.ListAdapters()
 
-Cheers,
-Manuel
+
+The output from this script is:
+
+Traceback (most recent call last):
+  File "./mydbus.py", line 27, in ?
+    print manager.ListAdapters()
+  File "/usr/lib/python2.4/site-packages/dbus/proxies.py", line 85, in
+__call__
+    return self._proxy_method(*args, **keywords)
+  File "/usr/lib/python2.4/site-packages/dbus/proxies.py", line 169, in
+__call__
+    reply_message =
+self._connection.send_message_with_reply_and_block(message, timeout)
+dbus.DBusException: org.freedesktop.DBus.Error.UnknownMethod: Method
+"ListAdapters" with signature "" on interface "org.bluez.Manager" doesn't
+exist
+
+On starting /etc/init.d/bluetooth, dbus-monitor --system shows:
+
+$ dbus-monitor --system
+signal sender=org.freedesktop.DBus -> dest=:1.5 path=/org/freedesktop/DBus;
+interface=org.freedesktop.DBus; member=NameAcquired
+   string ":1.5"
+signal sender=org.freedesktop.DBus -> dest=(null destination)
+path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
+member=NameOwnerChanged
+   string ":1.6"
+   string ""
+   string ":1.6"
+signal sender=org.freedesktop.DBus -> dest=(null destination)
+path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
+member=NameOwnerChanged
+   string "org.bluez"
+   string ""
+   string ":1.6"
+signal sender=:1.6 -> dest=(null destination) path=/org/bluez/Manager;
+interface=org.bluez.Manager; member=DeviceAdded
+   string "/org/bluez/Device/hci0"
+signal sender=:1.6 -> dest=(null destination) path=/org/bluez/Device/hci0;
+interface=org.bluez.Device; member=Up
+signal sender=:1.6 -> dest=(null destination) path=/org/bluez/Device/hci0;
+interface=org.bluez.Device; member=PropertyChanged
+   string "name"
+   string ""
+
+What is wrong here?
+
+Thanks,
+--theHog
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
