@@ -1,13 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <474AA430.6010307@uni-koeln.de>
-Date: Mon, 26 Nov 2007 11:47:12 +0100
-From: Paul Wachendorf <pwachend@uni-koeln.de>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <4745D9EE.4020101@uni-koeln.de> <4749FAD6.6080403@uni-koeln.de>
-	<1196055526.4217.44.camel@aeonflux>
-In-Reply-To: <1196055526.4217.44.camel@aeonflux>
-Subject: Re: [Bluez-users] hcitool scan returns wrong bdaddr
+In-Reply-To: <23a15590711151534k50b707e4y73cf053eb0e9ada7@mail.gmail.com>
+References: <23a15590711151534k50b707e4y73cf053eb0e9ada7@mail.gmail.com>
+Date: Mon, 26 Nov 2007 07:40:32 +0100
+Message-Id: <1196059232.4217.95.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Howto setup bluetooth network
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,60 +20,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marcel,
-thanks a lot for your fast resonse.
-I have installed dbus on my System so I assumed that bluez would use it. 
-Is this wrong?
-I tried to find a archive for 3.21, but found none.
-So I load the CVS Version by:
+Hi Leszek,
 
-  cvs -d:pserver:anonymous@cvs.bluez.org:/cvsroot/bluez login
-  cvs -d:pserver:anonymous@cvs.bluez.org:/cvsroot/bluez co -P libs
+> is there any up-to-date guide for setting a network using
+> bluez-utils-3-* ? I had searched the web quite extensively, but
+> everything I found was about bluez-2 . What should I put in
+> /etc/bluetooth/network.service and /etc/bluetooth/network.conf ?
+> Tutorials write about 'pand', which is no longer shipped with current
+> bluez on my distro (Gentoo). I get up to bluez creating pan0 and pan1,
+> but do not know what to do next - I can't connect from a Windows box that
+> did communicate with other PCs...
 
+check wiki.bluez.org for examples on the network service. It still needs
+some work to make it fully specification compliant, but that shouldn't
+be far away. Patches are always welcome.
 
-for some reason autoconf -o configure configure.in  on my  embedded box  
-didn't  create anything, so I ran it on my PC, copyed the resulting 
-configure script to the box, and run  bootstrap and bootstrap-configure.
-make and make install, produced  /usr/lib/libbluetooth.so.2.9.2
+> And what does "Failed to claim to interface:" mean? It is always
+> present in logs and never provides any additional info...
 
-but an hcitool scan, still returns
-Scanning ...
-        02:01:00:12:EE:58       n/a
+Provide the full log and check the source code for the function that
+would trigger this error message.
 
-ldd `which hcitool`:
-        libbluetooth.so.2 => /usr/lib/libbluetooth.so.2 (0x40025000)
-        libc.so.6 => /lib/libc.so.6 (0x4003f000)
-        /lib/ld-linux.so.2 (0x40000000)
+Regards
 
-ls -l /usr/lib/libbluetooth.so.2:
- /usr/lib/libbluetooth.so.2 -> libbluetooth.so.2.9.2
-
-What's going wrong?
-Greetings,
-
-Paul
-
-
-Marcel Holtmann schrieb:
-> if you would use the D-Bus API, then you don't have this problem.
-> However there was a bug in the 3.22 library that I fixed now. Install
-> the library from CVS and you should be good. Or use 3.21.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2005.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->   
+Marcel
 
 
 
