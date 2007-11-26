@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BAY130-W206BA0DD1FFF8BBEC7C1A4817E0@phx.gbl>
-References: <BAY130-W206BA0DD1FFF8BBEC7C1A4817E0@phx.gbl>
-Date: Mon, 26 Nov 2007 07:34:28 +0100
-Message-Id: <1196058868.4217.86.camel@aeonflux>
+In-Reply-To: <37666aa80711191548g5a63577ge13d215410c69fd0@mail.gmail.com>
+References: <37666aa80711191548g5a63577ge13d215410c69fd0@mail.gmail.com>
+Date: Mon, 26 Nov 2007 07:27:11 +0100
+Message-Id: <1196058431.4217.83.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] PROFILES
+Subject: Re: [Bluez-devel] is SDPd required for RFCOMM calls ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,17 +20,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Han,
 
-> I HAVE AN iMATE POCKET PC PHONE WM 2003
-> (http://www.clubimate.com/t-DETAILS_PPC.aspx) MISSING THE NECESSARY
-> PROFILES-STACKS (LIKE HANDS FREE) TO FUNCTION WITH MY BMW 335i (2007)
-> iDRIVE BLUETOOTH CAR KIT. IT CAN "PAIR" BUT THEN DOES NOT WORK AS IT
-> SHOULD (BEING ABLE TO MAKE A PHONE CALL THROUGH THE CAR'S SPEAKERS.
-> DO YOU HAVE DOES NEEDED PROFILES?
+> I just started to use BlueZ to write bluetooth programs in C.  And I
+> am using VMware based Ubuntu Linux.
+> 
+> I can do hci_inquiry successfully. But  when I tried to run a RFCOMM
+> server program ( listen on channel 1).  The client always reports
+> error : "Operation now in progress".
+> 
+> The same client can connect with no problem if i closed VMware +
+> ubuntu and enable bluetooth in windows XP.
+> 
+> since the windows XP enables bluetooth & SDP services (Serial Port on
+> RFCOMM channel 1),  i was wondering if SDP is required to do RFCOMM
+> communication (on server side)  ?
+> 
+> or, is there anything else the server side need to do to accept the
+> RFCOMM connections ?
 
-there is no reason to shout. And this is a Linux mailing list. Not some
-Windows or Pocket PC help forum.
+start hcid -s and you get your SDP server.
 
 Regards
 
