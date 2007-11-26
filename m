@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <37666aa80711191548g5a63577ge13d215410c69fd0@mail.gmail.com>
-References: <37666aa80711191548g5a63577ge13d215410c69fd0@mail.gmail.com>
-Date: Mon, 26 Nov 2007 07:27:11 +0100
-Message-Id: <1196058431.4217.83.camel@aeonflux>
+In-Reply-To: <4746EC10.5080509@pracucci.com>
+References: <4746EC10.5080509@pracucci.com>
+Date: Mon, 26 Nov 2007 07:21:35 +0100
+Message-Id: <1196058095.4217.79.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] is SDPd required for RFCOMM calls ?
+Subject: Re: [Bluez-devel] 2.6.23.8: kernel panic
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,26 +20,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Han,
+Hi Marco,
 
-> I just started to use BlueZ to write bluetooth programs in C.  And I
-> am using VMware based Ubuntu Linux.
-> 
-> I can do hci_inquiry successfully. But  when I tried to run a RFCOMM
-> server program ( listen on channel 1).  The client always reports
-> error : "Operation now in progress".
-> 
-> The same client can connect with no problem if i closed VMware +
-> ubuntu and enable bluetooth in windows XP.
-> 
-> since the windows XP enables bluetooth & SDP services (Serial Port on
-> RFCOMM channel 1),  i was wondering if SDP is required to do RFCOMM
-> communication (on server side)  ?
-> 
-> or, is there anything else the server side need to do to accept the
-> RFCOMM connections ?
+> I have compiled linux kernel 2.6.23.8 for a single board computer based
+> on ARM architecture (EP9302 processor). I have tried to stress the
+> Bluetooth subsystem, creating repeatly a lot of RFCOMM connections to
+> other Bluetooth dongles (installed on remote computers) and I'm able to
+> get a kernel panic in few minutes.
 
-start hcid -s and you get your SDP server.
+it would be good to know if 2.6.24-rc3 shows the same issue and if you
+could also produce it on x86. And please post some example code that
+would trigger this issue. I haven't seen this kind of problem so far.
 
 Regards
 
