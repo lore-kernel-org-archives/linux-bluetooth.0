@@ -1,12 +1,16 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: listen@kapune.de, BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1195843917.16086.8.camel@johannes-02.kapune.lokal>
-References: <1195843917.16086.8.camel@johannes-02.kapune.lokal>
-Date: Mon, 26 Nov 2007 07:18:49 +0100
-Message-Id: <1196057929.4217.76.camel@aeonflux>
+To: bluez@frederic-blain.com,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <47482E7C.9090205@frederic-blain.com>
+References: <47477234.9010007@free.fr>
+	<1195956126.10878.444.camel@cookie.hadess.net>
+	<47482E7C.9090205@frederic-blain.com>
+Date: Mon, 26 Nov 2007 07:17:30 +0100
+Message-Id: <1196057850.4217.74.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] permission denied when start a2dpd
+Cc: Bastien Nocera <hadess@hadess.net>
+Subject: Re: [Bluez-devel] Sony PS3 sixaxis & bluez
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,13 +24,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Johannes,
+Hi Frederic,
 
-> when I start on comandline a2dpd I get this output with errors.
-> I think there is a problem with rights. What can I do to examine?
+> Thanks for this, I've updated http://wiki.bluez.org/wiki/Input to
+> reflect explicitly this information.
+> 
+> Do you know why device initiated connections are not supported  (Lake
+> of time,
+> technical issues, ...) and if someone is working on this integration ?
 
-use the audio service. The a2dpd was never officially supported. Check
-wiki.bluez.org for details.
+in case of the PS3 controller you don't need device initiated
+connections. The PS3 controller will be never discoverable. The bonding
+procedure is triggered via the cable authorization. Meaning if you
+attache the controller via its USB cable you have to do the magic
+automatically in the background.
 
 Regards
 
