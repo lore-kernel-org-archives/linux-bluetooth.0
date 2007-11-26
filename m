@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5c1c70820711152155s3557856aja583f4c02a6f1d71@mail.gmail.com>
-References: <5c1c70820711152155s3557856aja583f4c02a6f1d71@mail.gmail.com>
-Date: Mon, 26 Nov 2007 07:38:08 +0100
-Message-Id: <1196059088.4217.92.camel@aeonflux>
+In-Reply-To: <6656b6540711162348n61ac8957ibc0a8b8ee4438b0c@mail.gmail.com>
+References: <6656b6540711162348n61ac8957ibc0a8b8ee4438b0c@mail.gmail.com>
+Date: Mon, 26 Nov 2007 07:37:05 +0100
+Message-Id: <1196059025.4217.90.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Serial server problems
+Subject: Re: [Bluez-devel] sleep mode protocol for bluetooth module
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,16 +20,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pooyan,
+Hi Robin,
 
-> I'm trying to write an application using BlueZ which will:
-> - advertise a service, based on SPP (custom UUID, etc)
-> - listen for incoming connections for that service
-> - when an inbound connection is requested, create the connection
-> - send data to/from on the connection
+> i want to write a driver for sleep mode for bluetooth module  can any
+> body help me with some documentaion or tips or can any body tell me
+> about sleep mode protocol for bluetooth
 
-simply use the RFCOMM socket interface and use D-Bus only for
-registering the SDP record.
+all sleep mode protocols are vendor specific. So ask the manufacturer of
+your module.
 
 Regards
 
