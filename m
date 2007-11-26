@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4746EC10.5080509@pracucci.com>
-References: <4746EC10.5080509@pracucci.com>
-Date: Mon, 26 Nov 2007 07:21:35 +0100
-Message-Id: <1196058095.4217.79.camel@aeonflux>
+To: listen@kapune.de, BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1195843917.16086.8.camel@johannes-02.kapune.lokal>
+References: <1195843917.16086.8.camel@johannes-02.kapune.lokal>
+Date: Mon, 26 Nov 2007 07:18:49 +0100
+Message-Id: <1196057929.4217.76.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] 2.6.23.8: kernel panic
+Subject: Re: [Bluez-devel] permission denied when start a2dpd
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,17 +20,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marco,
+Hi Johannes,
 
-> I have compiled linux kernel 2.6.23.8 for a single board computer based
-> on ARM architecture (EP9302 processor). I have tried to stress the
-> Bluetooth subsystem, creating repeatly a lot of RFCOMM connections to
-> other Bluetooth dongles (installed on remote computers) and I'm able to
-> get a kernel panic in few minutes.
+> when I start on comandline a2dpd I get this output with errors.
+> I think there is a problem with rights. What can I do to examine?
 
-it would be good to know if 2.6.24-rc3 shows the same issue and if you
-could also produce it on x86. And please post some example code that
-would trigger this issue. I haven't seen this kind of problem so far.
+use the audio service. The a2dpd was never officially supported. Check
+wiki.bluez.org for details.
 
 Regards
 
