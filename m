@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1195956126.10878.444.camel@cookie.hadess.net>
+To: bluez@frederic-blain.com,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <47477234.9010007@free.fr>
 References: <47477234.9010007@free.fr>
-	<1195956126.10878.444.camel@cookie.hadess.net>
-Date: Mon, 26 Nov 2007 07:15:24 +0100
-Message-Id: <1196057724.4217.71.camel@aeonflux>
+Date: Mon, 26 Nov 2007 06:55:18 +0100
+Message-Id: <1196056518.4217.60.camel@aeonflux>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Sony PS3 sixaxis & bluez
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -21,42 +21,48 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Hi Frederic,
 
-> > With the current bluez-utils version (3.22 or CVS), the PS3 bluetooth 
-> > controller (Sixaxis) is
-> > not recognized.
-> 
-> The input service doesn't support device initiated connections. See:
-> http://thread.gmane.org/gmane.linux.bluez.devel/12584/focus=12614
+> With the current bluez-utils version (3.22 or CVS), the PS3 bluetooth 
+> controller (Sixaxis) is
+> not recognized. As a workaround, you need to use the former HID daemon 
+> (hidd), rename
+> the file /var/lib/bluetooth/xx:xx:xx:xx:xx:xx/hidd to 
+> /var/lib/bluetooth/xx:xx:xx:xx:xx:xx/input
+> and restart bluez with bluetoothd-service-input. It will now recognize 
+> the controller.
 
-please remember that hidd file format is different from the input file
-format. I am serious here. It is different.
+no, no and no. The file formats a different. And you don't have to do anything if you have the hidd file. The input service will import it.
 
-> Haaa. Once I get the capabilities right in my sixaxis patch (I'll be
-> able to compare the hidd generated output with the one from my patch), I
-> think I'll be able to use udev to automatically add the device as
-> supported via Bluetooth once connected via USB.
+> Could someone explains me what should be the process to establish a HID 
+> connection
+> from a remote device to the host using bluetoothd-service-input ? What 
+> are the
+> interactions between hcid and bluetoothd-service-input ? Do you have a 
+> doc / diagram
+> explaining this ?
 
-I haven't spend any time on this, but here is how it should work. We
-need a udev rule that detects the PS3 controller and then runs an
-application. This application has to find the local Bluetooth adapter
-and get its BD_ADDR. Then it has to read the adapter address and
-controller address stored in the controller. This should be done via
-hidraw (or if possible via hiddev), because otherwise you have to
-disconnect the controller from the HID driver. If the stored adapter
-address is not one of the local Bluetooth adapters it should change it
-and add an entry into the input file. For this entry it needs the HID
-report descriptor. Best is to read this via USB (since it can change
-with a new generation of the controller), but it could also be hardcoded
-since currently it is fixed. The modification of the trusts file is
-optional, but it could be automated to avoid confusion. Since you attach
-the cable you basically give authorization.
+The wiki.bluez.org contains a lot of diagrams and there are slides
+available from my talks that explains it.
 
-The case were you have multiple Bluetooth adapters attached to your
-local system is a bit tricky. We must make sure that we don't keep
-overwriting the settings if the adapter order changes. Also if assigned
-to a new adapter, the device should be removed from the other ones.
+> I think bluetoothd-service-input should listen signals from 
+> /org/bluez/hci0 and create a
+> device structure when a  RemoteDeviceConnected signal is intercepted, 
+> but it doesn't
+> seem to work like this.
+
+The short answer is no. The long one is that we have two L2CAP PSM that
+handle the remote connections.
+
+> In bluetoothd-service-input, in which step of this process should the 
+> create_device()
+> function be called ?  I've noticed interrupt_connect_cb() & 
+> control_connect_cb() but
+> I can't figure out when they will be called.
+
+You don't do this. It is a security risk. Period. Think about what you
+are proposing. Creating a device entry for a remote input device needs
+user interaction.
 
 Regards
 
