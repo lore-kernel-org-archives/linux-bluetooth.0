@@ -1,15 +1,14 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <f8e53fb0711270003r2e32f78ev18205a8381d750d3@mail.gmail.com>
-Date: Tue, 27 Nov 2007 09:03:05 +0100
-From: "Andrea Galbusera" <gizero@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1196055392.4217.41.camel@aeonflux>
+Message-ID: <474B110A.7000804@uni-koeln.de>
+Date: Mon, 26 Nov 2007 19:31:38 +0100
+From: Paul Wachendorf <pwachend@uni-koeln.de>
 MIME-Version: 1.0
-References: <f8e53fb0710170033u2b451d7ft34cad156e0828a49@mail.gmail.com>
-	<1192630825.6184.17.camel@violet>
-	<f8e53fb0711250754n60de59f7md759b9d21f39ec53@mail.gmail.com>
-	<1196055392.4217.41.camel@aeonflux>
-Subject: Re: [Bluez-users] concurrent calls to RFCOMM connect()
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <4745D9EE.4020101@uni-koeln.de>
+	<4749FAD6.6080403@uni-koeln.de>	<1196055526.4217.44.camel@aeonflux>
+	<474AA430.6010307@uni-koeln.de> <1196080043.17196.4.camel@aeonflux>
+In-Reply-To: <1196080043.17196.4.camel@aeonflux>
+Subject: Re: [Bluez-users] hcitool scan returns wrong bdaddr
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,54 +23,22 @@ Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi Marcel,
-
-On Nov 26, 2007 6:36 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> a small comment up-front. Top-posting is not a good way of getting my
-> attention. Check http://www.bluez.org/lists.html
-
-You are obviously right! I apologize to you and other users of the
-list for the inconvenience. That was accidental and was not intended
-as a way to catch more attention. I understand that some of my
-questions may sound silly to you and other bluez developers, but I
-don't have a wireless communication background and I'm trying to
-approach bluetooth from the application level.
-
-> It takes 20 seconds, because that is the page timeout of your local
-> hardware. You can change it with "hciconfig hci0 pageto". You can also
-> play with the link supervision timeout to faster detect a link loss.
-> Please remember that a shorter value also has disadvantages.
-
-I will search more on these timeouts and the pro/cons of changing
-them. Maybe tuning them will suffice.
-
-> It serializes connection attempts to different remote devices. If you
-> try to connect to the same remote device (by opening the same TTY twice)
-> then you are out of luck. The kernel is not doing anything here.
-
-My question was not clear enough... In my test I try to connect to a
-different remote address while in progress with the first one (both
-powered off). I do it like this:
-
-Terminal 1:
-$> rfcomm connect 00:01:95:07:30:EA
-
-Terminal 2 (while the first attempt is in progress):
-$> rfcomm connect 00:01:95:07:30:40
-Can't connect RFCOMM socket: Device or resource busy
-
-Does it mean my kernel and/or my bluez-utils are too old to queue
-connection attempts?
-
-> You need to read the specification since clearly you are guessing here
-> behavior. The various timeouts can be configured. Or maybe get a book
-> that explains the basics behind the Bluetooth radio.
-
-I'm going to follow your suggestions, even if I believe the
-specification is too intricated for me. Maybe a book is a better
-choice. Thanks for patience.
-
+I found the 3.21 tarball, thanks. Unfortunately the error still occurs 
+with the resulting  libbluetooth.so.2.9.1. Because of the output from 
+ldd, I'm sure that hcitool is linked against the "right" lib. So the Bug 
+must be in 3.21 too, or there is an completely different Problem as I 
+assume, because of the same behavior with libbluetooth.so.2.9.0 from 
+debian lenny, and because you told me that it should work with an D-Bus 
+API, which is installed.
+So perhaps the Problem is rooted in my D-Bus setup. I installed it from 
+the debian repository and thought it should work without any further 
+configurations.
+I'll search for it,
+thank you very much for your time and help,
 Regards,
-Andrea
+
+Paul
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
