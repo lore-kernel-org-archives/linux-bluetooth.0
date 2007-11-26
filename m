@@ -1,13 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: bluez@frederic-blain.com,
-        BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <47477234.9010007@free.fr>
-References: <47477234.9010007@free.fr>
-Date: Mon, 26 Nov 2007 06:55:18 +0100
-Message-Id: <1196056518.4217.60.camel@aeonflux>
+To: Fabien Chevalier <fabchevalier@free.fr>
+In-Reply-To: <4749E9DB.3020801@free.fr>
+References: <4749E9DB.3020801@free.fr>
+Date: Mon, 26 Nov 2007 06:47:31 +0100
+Message-Id: <1196056051.4217.51.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Sony PS3 sixaxis & bluez
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>,
+        Johan Hedberg <johan.hedberg@nokia.com>
+Subject: Re: [Bluez-devel] [PATCH] Bluez exceptions refactoring updated patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,48 +22,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frederic,
+Hi Fabien,
 
-> With the current bluez-utils version (3.22 or CVS), the PS3 bluetooth 
-> controller (Sixaxis) is
-> not recognized. As a workaround, you need to use the former HID daemon 
-> (hidd), rename
-> the file /var/lib/bluetooth/xx:xx:xx:xx:xx:xx/hidd to 
-> /var/lib/bluetooth/xx:xx:xx:xx:xx:xx/input
-> and restart bluez with bluetoothd-service-input. It will now recognize 
-> the controller.
+> I finally managed to spend a few hours of my spare time on Bluez.
+> 
+> As a result i updated the patch that updates the common/ directory as 
+> well as the various services to share the exceptions definition.
+> 
+> Changes compared to previous version:
+>   - renamed the common .h and .c as error.h and error.c
+>   - completely removed various error.{c,h} from services directory
+>   - updated api documentation (dbus-api.txt + services api definition).
+> 
+> The patch is pretty big, if needed i can provided splitted patches for 
+> various directories.
 
-no, no and no. The file formats a different. And you don't have to do anything if you have the hidd file. The input service will import it.
+I think we should do it in a few steps to make it actually readable if
+we ever have to track this down:
 
-> Could someone explains me what should be the process to establish a HID 
-> connection
-> from a remote device to the host using bluetoothd-service-input ? What 
-> are the
-> interactions between hcid and bluetoothd-service-input ? Do you have a 
-> doc / diagram
-> explaining this ?
+	- Create common/error.[ch]
+	- Update dbus-api.txt
+	- Remove error.[ch] from every service and use common/error.h
+	  It should be one patch per service and also update its API
+	  document
 
-The wiki.bluez.org contains a lot of diagrams and there are slides
-available from my talks that explains it.
+Two comments on your patch itself. The copyright on common/error.[ch] is
+not only yours. Keep the original copyright of the files.
 
-> I think bluetoothd-service-input should listen signals from 
-> /org/bluez/hci0 and create a
-> device structure when a  RemoteDeviceConnected signal is intercepted, 
-> but it doesn't
-> seem to work like this.
-
-The short answer is no. The long one is that we have two L2CAP PSM that
-handle the remote connections.
-
-> In bluetoothd-service-input, in which step of this process should the 
-> create_device()
-> function be called ?  I've noticed interrupt_connect_cb() & 
-> control_connect_cb() but
-> I can't figure out when they will be called.
-
-You don't do this. It is a security risk. Period. Think about what you
-are proposing. Creating a device entry for a remote input device needs
-user interaction.
+It is great that you added comments for each function, but they belong
+inside the *.c files. The rule is that they should be placed where the
+actual function body is defined.
 
 Regards
 
