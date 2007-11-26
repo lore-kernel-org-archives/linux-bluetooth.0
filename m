@@ -1,16 +1,19 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Fabien Chevalier <fabchevalier@free.fr>
-In-Reply-To: <474AF05D.70404@free.fr>
-References: <4749E9DB.3020801@free.fr> <1196056051.4217.51.camel@aeonflux>
-	<474AF05D.70404@free.fr>
-Date: Tue, 27 Nov 2007 21:54:57 +0100
-Message-Id: <1196196897.17196.56.camel@aeonflux>
-Mime-Version: 1.0
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>,
-        Johan Hedberg <johan.hedberg@nokia.com>
-Subject: Re: [Bluez-devel] [PATCH] Bluez exceptions refactoring updated patch
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <474B34DC.3080005@frederic-blain.com>
+Date: Mon, 26 Nov 2007 21:04:28 +0000
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_Blain?= <bluez@frederic-blain.com>
+MIME-Version: 1.0
+To: Bastien Nocera <hadess@hadess.net>
+References: <47477234.9010007@free.fr>	
+	<1195956126.10878.444.camel@cookie.hadess.net>	
+	<1196057724.4217.71.camel@aeonflux>	
+	<1196098681.10878.486.camel@cookie.hadess.net>
+	<1196103584.10878.490.camel@cookie.hadess.net>
+In-Reply-To: <1196103584.10878.490.camel@cookie.hadess.net>
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Sony PS3 sixaxis & bluez
+Reply-To: bluez@frederic-blain.com,
+        BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -23,44 +26,40 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
+Bastien Nocera wrote:
+> Frederic, could you check it works for you?
+>   
+Everything's fine with sixpair2.
 
-> > Two comments on your patch itself. The copyright on common/error.[ch] is
-> > not only yours. Keep the original copyright of the files.
-> 
-> Well, that file didn't exit beforehand, so as far as nobody else but me 
-> has touched it, what's the point in putting everybody's copyright in it?
-> (OK, this is not true anymore as Johan made some changes you requested 
-> to it :-) )
+Just  need to adjust the trusts file.
+This could be easily done by adding something like :
 
-and the origin is from the other error.[ch] files. So the copyright
-still prevails. Copying content from one file to another one doesn't
-change the copyright.
- 
-> > It is great that you added comments for each function, but they belong
-> > inside the *.c files. The rule is that they should be placed where the
-> > actual function body is defined.
-> 
-> Marcel, i don't know where from you got this idea, but i find it pretty 
-> dumb. The whole point in having the documentation in the header file is 
-> that as a user of a function you're not interested in how it works (the 
-> c file), but what it does, which is what the documentation is for.
-> 
-> I don't know of *any* project that has it's function level documentation 
-> in the C files.
-> But there are numerous counter-examples:
->    - The Linux Kernel (have a look at the USB stack file 
-> include/linux/usb.h for instance).
+  bdaddr_t hostaddr;
+  str2ba(option_master, &hostaddr);
+  write_trust(&hostaddr, device, GLOBAL_TRUST, TRUE);
 
-And check drivers/usb/core/urb.c for another example. The documentation
-comment are not for reading the *.h. They are for creating automated API
-documentation. The that structs are document in the header file is
-right, because they are defined there. The actual function are defined
-in the *.c files and thus the comment belongs there.
+instead of "//FIXME finally, set device as trusted" in handle_device() 
+(sixpair2.c:316)
+However, write_trust() is defined in hcid/hcid.h and implemented in 
+hcid/storage.c.
+Since both hcid/storage.c and input/storage.c implement the function 
+read_device_name(),
+with a different prototype, it can not compile :
 
-Regards
+../hcid/hcid.h:193: error: conflicting types for 'read_device_name'
+storage.h:36: error: previous declaration of 'read_device_name' was here
 
-Marcel
+/tmp/ccE5MOV3.o: In function `read_device_name':
+storage.c:(.opd+0x138): multiple definition of `read_device_name'
+
+
+It could be good to move write_trust() and GLOBAL_TRUST (hcid/hcid.h) in 
+the common directory / lib.
+
+Whatever, thanks a lot for your work,
+
+-- 
+creber
 
 
 
