@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <6656b6540711162348n61ac8957ibc0a8b8ee4438b0c@mail.gmail.com>
-References: <6656b6540711162348n61ac8957ibc0a8b8ee4438b0c@mail.gmail.com>
-Date: Mon, 26 Nov 2007 07:37:05 +0100
-Message-Id: <1196059025.4217.90.camel@aeonflux>
+In-Reply-To: <BAY130-W206BA0DD1FFF8BBEC7C1A4817E0@phx.gbl>
+References: <BAY130-W206BA0DD1FFF8BBEC7C1A4817E0@phx.gbl>
+Date: Mon, 26 Nov 2007 07:34:28 +0100
+Message-Id: <1196058868.4217.86.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] sleep mode protocol for bluetooth module
+Subject: Re: [Bluez-devel] PROFILES
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,14 +20,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Robin,
+Hi,
 
-> i want to write a driver for sleep mode for bluetooth module  can any
-> body help me with some documentaion or tips or can any body tell me
-> about sleep mode protocol for bluetooth
+> I HAVE AN iMATE POCKET PC PHONE WM 2003
+> (http://www.clubimate.com/t-DETAILS_PPC.aspx) MISSING THE NECESSARY
+> PROFILES-STACKS (LIKE HANDS FREE) TO FUNCTION WITH MY BMW 335i (2007)
+> iDRIVE BLUETOOTH CAR KIT. IT CAN "PAIR" BUT THEN DOES NOT WORK AS IT
+> SHOULD (BEING ABLE TO MAKE A PHONE CALL THROUGH THE CAR'S SPEAKERS.
+> DO YOU HAVE DOES NEEDED PROFILES?
 
-all sleep mode protocols are vendor specific. So ask the manufacturer of
-your module.
+there is no reason to shout. And this is a Linux mailing list. Not some
+Windows or Pocket PC help forum.
 
 Regards
 
