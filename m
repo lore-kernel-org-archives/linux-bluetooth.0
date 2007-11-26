@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <38687c4a0711170438u4301359u42818267c0a8f51@mail.gmail.com>
-References: <38687c4a0711170438u4301359u42818267c0a8f51@mail.gmail.com>
-Date: Mon, 26 Nov 2007 07:36:25 +0100
-Message-Id: <1196058985.4217.88.camel@aeonflux>
+To: bgsmith@bendcable.com, BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1196009038.14897.6.camel@pico>
+References: <1196009038.14897.6.camel@pico>
+Date: Mon, 26 Nov 2007 06:49:47 +0100
+Message-Id: <1196056187.4217.54.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluetooth applet translation
+Subject: Re: [Bluez-users] Lost connections - mouse and keyboard
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,20 +20,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Daniele,
+Hi Brad,
 
-> When i open the preferences dialog from the systray area of the
-> bluez-gnome package I have thre readio buttons for host operating
-> mode. Changing them leads to different messages popup notifications
-> but the meaning of the first is at least the contrary of the one
-> showed by the notification area. This is at least misleading. 
-> I took a look to .it.po translation files on the sources and
-> discovered that translation in the dialog is correct while then
-> messages show in the notification popups are absent. Can anyone bring
-> some light?
+> I have a Logitech mouse and keyboard that use bluetooth (dinovo).  I
+> have enabled bluetooth on this Fedora 8 system and both work well with
+> two problems.
+> 
+> (1) When I lock the system and return later the mouse no longer works.
+> I have to open a terminal window and issue an hidd --connect command.
+> 
+> (2) When I log out, both the mouse and keyboard stop working.  I have to
+> connect a USB mouse and USB keyboard to enter the authentication
+> information.  Once logged in the bluetooth devices usually work,
+> although I sometimes have to issue an hidd --connect command to enable
+> the keyboard.
+> 
+> Any suggestions on resolving these issues would be appreciated.
 
-talk to the translators. I only check the English original and don't
-bother with the translations.
+not using hidd and using bluetoothd-input-service instead is one thing.
+For input devices to re-connect you have to have a daemon running that
+handles this. The input service is the best way to achieve this. Check
+the BlueZ wiki for details.
 
 Regards
 
