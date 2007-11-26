@@ -1,13 +1,10 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <5c1c70820711261359j2005400dy636f083260f08fee@mail.gmail.com>
-Date: Tue, 27 Nov 2007 08:29:27 +1030
-From: "Pooyan McSporran" <duckfreezone@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1196059088.4217.92.camel@aeonflux>
-MIME-Version: 1.0
-References: <5c1c70820711152155s3557856aja583f4c02a6f1d71@mail.gmail.com>
-	<1196059088.4217.92.camel@aeonflux>
-Subject: Re: [Bluez-devel] Serial server problems
+Mime-Version: 1.0 (Apple Message framework v752.2)
+Message-Id: <5E13F596-B867-4C0D-9795-97D93507474C@infitsrl.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+From: Fabrizio Guglielmino <guglielmino@infitsrl.com>
+Date: Mon, 26 Nov 2007 21:49:12 +0100
+Subject: [Bluez-devel] (no subject)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,18 +18,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 26/11/2007, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> > I'm trying to write an application using BlueZ which will:
-> > - advertise a service, based on SPP (custom UUID, etc)
-> > - listen for incoming connections for that service
-> > - when an inbound connection is requested, create the connection
-> > - send data to/from on the connection
->
-> simply use the RFCOMM socket interface and use D-Bus only for
-> registering the SDP record.
+Hi all,
+I made a simple software to send small pictures to all bluetooth  
+devices in range (it's used by a museum ).
+This software is made in C using bluez api, I've used two bluetooth  
+dongles : one to make periodic inquiry (not with HCI periodic inquiry  
+command by with a loop) and the other to make sdp query looking for  
+obex push service and sending image.
+My requirement was to use this software in some embedded linux based  
+computer so I chose to limit external library, I made all using  
+pthread so there is an infinite thread for inquiries and one thread  
+to handle every sdp query and relative connection when devices are  
+discovered. I've discarded also using python or other scripting  
+languages for the platfom limitations.
 
-Thanks for your help.  I'm now using this approach and it is working well.
+All works but I found it not so efficient, also with 6/7 devices it's  
+really slow to identify and connect to devices, some times connection  
+are unexpectedly closed and so on....
+
+Is it my approch to the problem wrong or bluetooth protocol is not  
+suitable for this type of use?
+
+I'm using libs version 3.7-1 (on debian 4.0)
+
+Many thanks
+Fabrizio
+  
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
