@@ -1,12 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <474ABFD4.3070906@aircable.net>
-Date: Mon, 26 Nov 2007 09:45:08 -0300
-From: Manuel Naranjo <manuel@aircable.net>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <474181FA.2010906@aircable.net> <474594B7.2070005@aircable.net>
-In-Reply-To: <474594B7.2070005@aircable.net>
-Subject: Re: [Bluez-devel] Rfcomm is not buffering received data?
+In-Reply-To: <a96155200711181327tce91b18w5bd842ee88611db4@mail.gmail.com>
+References: <a96155200711150615q38dcf09g140d2386830e9e23@mail.gmail.com>
+	<a96155200711181327tce91b18w5bd842ee88611db4@mail.gmail.com>
+Date: Mon, 26 Nov 2007 10:14:50 +0100
+Message-Id: <1196068490.4217.101.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] select(2) or read(2) on bluetooth sockets
+	not	working correctly?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,56 +22,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello everyone,
+Hi Pawel,
 
-I think this mail might got lost between all the spam we are getting
-those days.
+> I have put simple program demonstrating the problem at
+> http://tfuj.pl/gnokii/bt.c with compilation hints and usage.
+> The testing I did was on Ubuntu kernels, so that's for sure not the
+> recent one, but I think it is really easy to reproduce if the problem
+> still persists.
 
-I'm starting to think that some how select() is not working for tty
-devices. I had switched the tty device to raw mode (by using termios
-calls). And still even though there's data on the tty buffer select
-keeps returning 0. So far I'm using select as an sleep function, but
-that's not it's purpose, not at all. Maybe I keep missing something?
+this from the select() manual page:
 
-BTW how's the state for server side rfcomm services? I mean you register
-a service at a certain port via dbus, and you get locked (or you get a
-function callback I don't know) when a connection was established and
-you get the tty device name.
+Those listed in readfds will be watched to see if characters  become
+available  for reading  (more  precisely, to see if a read will not
+block; in particular, a file descriptor is also ready on end-of-file)
 
-Thanks,
-Manuel
+If a device disconnects or gets out of range, it is considered to be an
+end of file situation. It might help to also watch the exceptfds for the
+hangup signal. The read() should return an error if the connection has
+been terminated. So that part is strange.
 
-> Hello guys,
->
-> I've been able to fix this, by switching the tty node to raw mode. But
-> still something is not working well, select returns 0 even though
-> there's data in the buffer.
->
-> Here's the fix if anyone wants to know:
->     int fd = fileno(data->fd);
->    
->     struct termios tio;
->    
->     tcgetattr(fd, &tio);
->
->     tcflush(fd, TCIOFLUSH);
->    
->     tio.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
->     tio.c_iflag &= ~(BRKINT | ICRNL | ISTRIP | IXON);
->     tio.c_cflag &= ~(CSIZE | PARENB);
->     tio.c_cflag |= CS8;
->     tio.c_oflag &= ~(OPOST);
->
->     cfmakeraw(&tio);
->    
->     tio.c_cc[VMIN] = 0;
->     tio.c_cc[VTIME] = 0;
->
-> I think we should add a comment about this in the wiki, what do you think?
->
-> Cheers,
-> Manuel
->   
+It means that if you connect, then poweroff and then call read() you
+would see the same effect. The read() command will block. Can you
+confirm this?
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
