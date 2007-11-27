@@ -1,13 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <5c1c70820711271426ga2b58aasc7c721d2e30b4aa4@mail.gmail.com>
-Date: Wed, 28 Nov 2007 08:56:58 +1030
-From: "Pooyan McSporran" <duckfreezone@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <e1effdeb0711270618w5e1b6fck4ce0484ea124a155@mail.gmail.com>
-MIME-Version: 1.0
-References: <5c1c70820711141825g6c9e27ecm51c00272bad6d7fd@mail.gmail.com>
-	<e1effdeb0711270618w5e1b6fck4ce0484ea124a155@mail.gmail.com>
-Subject: Re: [Bluez-devel] Serial server problems
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Fabien Chevalier <fabchevalier@free.fr>
+In-Reply-To: <474AF05D.70404@free.fr>
+References: <4749E9DB.3020801@free.fr> <1196056051.4217.51.camel@aeonflux>
+	<474AF05D.70404@free.fr>
+Date: Tue, 27 Nov 2007 21:54:57 +0100
+Message-Id: <1196196897.17196.56.camel@aeonflux>
+Mime-Version: 1.0
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>,
+        Johan Hedberg <johan.hedberg@nokia.com>
+Subject: Re: [Bluez-devel] [PATCH] Bluez exceptions refactoring updated patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,22 +23,46 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 28/11/2007, Claudio Takahasi <cktakahasi@gmail.com> wrote:
->
-> The address is wrong. Here are some examples:
-> TTY proxy: "/dev/ttyS0"
-> Unix socket: "/tmp/gps-data"
-> Unix socket(abstract namespace): "x00/org/bluez/echo"
->
-> I will try update the BlueZ wiki with some unix socket proxy examples.
+Hi Fabien,
 
-Thanks, I'd appreciate that.
+> > Two comments on your patch itself. The copyright on common/error.[ch] is
+> > not only yours. Keep the original copyright of the files.
+> 
+> Well, that file didn't exit beforehand, so as far as nobody else but me 
+> has touched it, what's the point in putting everybody's copyright in it?
+> (OK, this is not true anymore as Johan made some changes you requested 
+> to it :-) )
 
-For now I'm using DBus to do everything else (eg setting the name of
-the adapter, making it visible, advertising the service via SDP, etc),
-but using sockets for the serial aspects, but in the longer term I'd
-like to use DBus for everything, so that wiki information would be
-helpful.
+and the origin is from the other error.[ch] files. So the copyright
+still prevails. Copying content from one file to another one doesn't
+change the copyright.
+ 
+> > It is great that you added comments for each function, but they belong
+> > inside the *.c files. The rule is that they should be placed where the
+> > actual function body is defined.
+> 
+> Marcel, i don't know where from you got this idea, but i find it pretty 
+> dumb. The whole point in having the documentation in the header file is 
+> that as a user of a function you're not interested in how it works (the 
+> c file), but what it does, which is what the documentation is for.
+> 
+> I don't know of *any* project that has it's function level documentation 
+> in the C files.
+> But there are numerous counter-examples:
+>    - The Linux Kernel (have a look at the USB stack file 
+> include/linux/usb.h for instance).
+
+And check drivers/usb/core/urb.c for another example. The documentation
+comment are not for reading the *.h. They are for creating automated API
+documentation. The that structs are document in the header file is
+right, because they are defined there. The actual function are defined
+in the *.c files and thus the comment belongs there.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
