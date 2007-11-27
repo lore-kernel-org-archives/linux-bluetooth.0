@@ -1,10 +1,17 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Tue, 27 Nov 2007 17:18:45 +0530
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20071127114845.GA7037@yogi>
-MIME-Version: 1.0
-From: balajirrao <balajirrao@gmail.com>
-Subject: [Bluez-users] Dongle not detected
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <474BD737.5010905@pracucci.com>
+References: <f8e53fb0710170033u2b451d7ft34cad156e0828a49@mail.gmail.com>
+	<1192630825.6184.17.camel@violet>
+	<f8e53fb0711250754n60de59f7md759b9d21f39ec53@mail.gmail.com>
+	<1196055392.4217.41.camel@aeonflux>
+	<f8e53fb0711270003r2e32f78ev18205a8381d750d3@mail.gmail.com>
+	<1196152161.17196.20.camel@aeonflux>  <474BD737.5010905@pracucci.com>
+Date: Tue, 27 Nov 2007 09:43:08 +0100
+Message-Id: <1196152988.17196.25.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] concurrent calls to RFCOMM connect()
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,24 +25,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello guys,
+Hi Marco,
 
-I have a Dlink DBT-122 USB Bluetooth dongle which I use to plug into
-my linux desktop. Of late, my mobile phone is no longer able to discover
-the dongle. My phone is able to  discover it when i use windows xp.
+> > I think your kernel is too old, because we fixed that. However the
+> > kernel only queues the attempt. It won't make it faster since we can't
+> > serialize the baseband/radio.
+> >   
+> In which kernel version did you add this feature?
 
-Are there any bluetooth specific debugging tools that I can use to find
-out more about the problem, some tool which snoops bluetooth messages
-exchanged, or something like that ?
+it is part of 2.6.19 and later.
 
-Please help me solve this problem.
+Regards
 
-Thank you in advance.
+Marcel
 
-regards,
-balaji rao
 
------ End forwarded message -----
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
