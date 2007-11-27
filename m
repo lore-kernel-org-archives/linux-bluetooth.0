@@ -1,10 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <b7f7accd0711280116t37fd7e98u5fa39e39a27fb398@mail.gmail.com>
-Date: Wed, 28 Nov 2007 14:46:18 +0530
-From: "Yogesh Jagtap" <jagtapyb@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <474C0DB6.7080606@gmail.com>
+Date: Tue, 27 Nov 2007 17:59:42 +0530
+From: Rahul Tank <gr8rahul@gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] Problem in using BlueZ-Utils in Ubuntu fiesty version
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <20071127114845.GA7037@yogi>
+In-Reply-To: <20071127114845.GA7037@yogi>
+Subject: Re: [Bluez-users] Dongle not detected
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,28 +20,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello All,
+balajirrao wrote:
+> Hello guys,
+>
+> I have a Dlink DBT-122 USB Bluetooth dongle which I use to plug into
+> my linux desktop. Of late, my mobile phone is no longer able to discover
+> the dongle. My phone is able to  discover it when i use windows xp.
+>
+>   
 
-We are using bluez-utils 3.7.
+I guess your dongle is not in discoverable mode.
 
-We have code for Device discover, service discovery, service registration.
+Check out this link  http://wiki.bluez.org/wiki/FAQ
 
-The same code works for me in Ubuntu Dapper version.
 
-And I am getting problem in service registration in Ubuntu edgy and
-fiesty version. sdp_record_register() function is returning error
-value as 22, and that is for invalid argument.
+HTH
 
-What can be the reason for the same?
-
-Regards
-Yogesh
+regards,
+  rahul
 
 -------------------------------------------------------------------------
-SF.Net email is sponsored by: The Future of Linux Business White Paper
-from Novell.  From the desktop to the data center, Linux is going
-mainstream.  Let it simplify your IT future.
-http://altfarm.mediaplex.com/ad/ck/8857-50307-18918-4
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
