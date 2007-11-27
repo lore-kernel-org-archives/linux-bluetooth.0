@@ -1,20 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <5f84803c0711270745t18eb7a2cp8b971a2ba86d7fe7@mail.gmail.com>
-Date: Tue, 27 Nov 2007 10:45:20 -0500
-From: "Chris Rivera" <chrismrivera@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5f84803c0711130906m4a96901du1638f10d280d2ff6@mail.gmail.com>
+Message-ID: <474C398D.1000701@pracucci.com>
+Date: Tue, 27 Nov 2007 16:36:45 +0100
+From: Marco Pracucci <development@pracucci.com>
 MIME-Version: 1.0
-References: <5f84803c0710161138i6123770dk22c1b63d03f45f59@mail.gmail.com>
-	<1192631052.6184.25.camel@violet>
-	<5f84803c0710170748j57f46eebh37a6707b9ec02b86@mail.gmail.com>
-	<1192633908.10179.2.camel@snoogens.fab.redhat.com>
-	<47173238.5070508@free.fr> <1193847250.32459.36.camel@violet>
-	<1193847868.31723.99.camel@cookie.hadess.net>
-	<5f84803c0711130824u2ad55b4bn36f42781b3c7ffe@mail.gmail.com>
-	<1194971409.3140.41.camel@cookie.hadess.net>
-	<5f84803c0711130906m4a96901du1638f10d280d2ff6@mail.gmail.com>
-Subject: Re: [Bluez-devel] [PATCH] make bluez GNOME UIs singletons
+To: Dave Young <hidave.darkstar@gmail.com>,
+        Bluez Development ML <bluez-devel@lists.sourceforge.net>
+References: <4746EC10.5080509@pracucci.com>
+	<20071127103239.GA4477@darkstar.te-china.tietoenator.com>
+In-Reply-To: <20071127103239.GA4477@darkstar.te-china.tietoenator.com>
+Subject: Re: [Bluez-devel] 2.6.23.8: kernel panic
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,65 +18,77 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0431032236=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0431032236==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_640_21650925.1196178320738"
-
-------=_Part_640_21650925.1196178320738
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Any word on this?
-
-Chris
-
-On Nov 13, 2007 12:06 PM, Chris Rivera <chrismrivera@gmail.com> wrote:
-
-> On Nov 13, 2007 11:30 AM, Bastien Nocera <hadess@hadess.net> wrote:
-> > Could you modify the .desktop file that starts the applet as well?
-> >
+Hi Dave,
+> This problem is caused by the workqueue in hci_sysfs.c, the del_conn
+> is scheduled after the add_conn with same bluetooth address.
+> Please try this patch:
+> ----------------------------
 >
-> Updated patch to include desktop file modification.
+> The bluetooth hci conn sysfs add/del executed in the default workqueue. If the conn del function is executed after the new conn add function with same bluetooth target address, the connection add will failed and warning about same kobject name.
 >
-> Chris
->
+> Here add a btconn workqueue, and flush the workqueue in the add_conn function to avoid the above issue. 
+>   
+I have applied your patch against kernel 2.6.24-rc3 and I've got the
+following error:
 
-------=_Part_640_21650925.1196178320738
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Jan 1 00:13:01 user.warn kernel: run_workqueue: recursion depth exceeded: 4
+Jan 1 00:13:01 user.warn kernel: [<c0022a88>] (dump_stack+0x0/0x14) from
+[<c00485cc>] (run_workqueue+0x4c/0x144)
+Jan 1 00:13:01 user.warn kernel: [<c0048580>] (run_workqueue+0x0/0x144)
+from [<c00486f8>] (flush_cpu_workqueue+0x34/0x94)
+Jan 1 00:13:01 user.warn kernel: r6:c020d624 r5:c05bc088 r4:00000001
+Jan 1 00:13:01 user.warn kernel: [<c00486c4>]
+(flush_cpu_workqueue+0x0/0x94) from [<c0048cc0>] (flush_workqueue+0x14/0x18)
+Jan 1 00:13:01 user.warn kernel: r4:c03c9420
+Jan 1 00:13:01 user.warn kernel: [<c0048cac>] (flush_workqueue+0x0/0x18)
+from [<c020d640>] (add_conn+0x1c/0x80)
+Jan 1 00:13:01 user.warn kernel: [<c020d624>] (add_conn+0x0/0x80) from
+[<c0048634>] (run_workqueue+0xb4/0x144)
+Jan 1 00:13:01 user.warn kernel: r5:c0340000 r4:c03c9420
+Jan 1 00:13:01 user.warn kernel: [<c0048580>] (run_workqueue+0x0/0x144)
+from [<c00486f8>] (flush_cpu_workqueue+0x34/0x94)
+Jan 1 00:13:01 user.warn kernel: r6:c020d624 r5:c1051e88 r4:00000001
+Jan 1 00:13:01 user.warn kernel: [<c00486c4>]
+(flush_cpu_workqueue+0x0/0x94) from [<c0048cc0>] (flush_workqueue+0x14/0x18)
+Jan 1 00:13:01 user.warn kernel: r4:c03c9420
+Jan 1 00:13:01 user.warn kernel: [<c0048cac>] (flush_workqueue+0x0/0x18)
+from [<c020d640>] (add_conn+0x1c/0x80)
+Jan 1 00:13:01 user.warn kernel: [<c020d624>] (add_conn+0x0/0x80) from
+[<c0048634>] (run_workqueue+0xb4/0x144)
+Jan 1 00:13:01 user.warn kernel: r5:c0340000 r4:c03c9420
+Jan 1 00:13:01 user.warn kernel: [<c0048580>] (run_workqueue+0x0/0x144)
+from [<c00486f8>] (flush_cpu_workqueue+0x34/0x94)
+Jan 1 00:13:01 user.warn kernel: r6:c020d624 r5:c042ca88 r4:00000001
+Jan 1 00:13:01 user.warn kernel: [<c00486c4>]
+(flush_cpu_workqueue+0x0/0x94) from [<c0048cc0>] (flush_workqueue+0x14/0x18)
+Jan 1 00:13:01 user.warn kernel: r4:c03c9420
+Jan 1 00:13:01 user.warn kernel: [<c0048cac>] (flush_workqueue+0x0/0x18)
+from [<c020d640>] (add_conn+0x1c/0x80)
+Jan 1 00:13:01 user.warn kernel: [<c020d624>] (add_conn+0x0/0x80) from
+[<c0048634>] (run_workqueue+0xb4/0x144)
+Jan 1 00:13:01 user.warn kernel: r5:c0340000 r4:c03c9420
+Jan 1 00:13:01 user.warn kernel: [<c0048580>] (run_workqueue+0x0/0x144)
+from [<c0048888>] (worker_thread+0xa4/0xb8)
+Jan 1 00:13:01 user.warn kernel: r6:c00487e4 r5:c03c9420 r4:c03c9428
+Jan 1 00:13:01 user.warn kernel: [<c00487e4>] (worker_thread+0x0/0xb8)
+from [<c004c598>] (kthread+0x5c/0x90)
+Jan 1 00:13:01 user.warn kernel: r5:c03c9420 r4:c0340000
+Jan 1 00:13:01 user.warn kernel: [<c004c53c>] (kthread+0x0/0x90) from
+[<c003b348>] (do_exit+0x0/0x690)
+Jan 1 00:13:01 user.warn kernel: r6:00000000 r5:00000000 r4:00000000
 
-Any word on this?<br><br>Chris<br><br><div class="gmail_quote">On Nov 13, 2007 12:06 PM, Chris Rivera &lt;<a href="mailto:chrismrivera@gmail.com">chrismrivera@gmail.com</a>&gt; wrote:<br><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-<div class="Ih2E3d">On Nov 13, 2007 11:30 AM, Bastien Nocera &lt;<a href="mailto:hadess@hadess.net">hadess@hadess.net</a>&gt; wrote:<br>&gt; Could you modify the .desktop file that starts the applet as well?<br>&gt;<br><br>
-</div>Updated patch to include desktop file modification.<br><font color="#888888"><br>Chris<br></font></blockquote></div><br>
+Marco Pracucci
 
-------=_Part_640_21650925.1196178320738--
-
-
---===============0431032236==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============0431032236==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0431032236==--
