@@ -1,17 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1196152368.17196.23.camel@aeonflux>
-References: <47477234.9010007@free.fr>
-	<1195956126.10878.444.camel@cookie.hadess.net>
-	<1196057724.4217.71.camel@aeonflux>
-	<1196098681.10878.486.camel@cookie.hadess.net>
-	<1196103584.10878.490.camel@cookie.hadess.net>
-	<1196152368.17196.23.camel@aeonflux>
-Date: Tue, 27 Nov 2007 10:52:38 +0000
-Message-Id: <1196160759.10878.504.camel@cookie.hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Dave Young <hidave.darkstar@gmail.com>
+In-Reply-To: <20071127103239.GA4477@darkstar.te-china.tietoenator.com>
+References: <4746EC10.5080509@pracucci.com>
+	<20071127103239.GA4477@darkstar.te-china.tietoenator.com>
+Date: Tue, 27 Nov 2007 11:38:24 +0100
+Message-Id: <1196159904.17196.33.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Sony PS3 sixaxis & bluez
+Cc: bluez-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org
+Subject: Re: [Bluez-devel] 2.6.23.8: kernel panic
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,44 +22,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Dave,
 
-On Tue, 2007-11-27 at 09:32 +0100, Marcel Holtmann wrote:
-> Hi Bastien,
+> This problem is caused by the workqueue in hci_sysfs.c, the del_conn is scheduled after the add_conn with same bluetooth address.
 > 
-> > > sixpair2.c has a couple of bugs:
-> > > - country is wrong
-> > 
-> > Doesn't matter.
-> > 
-> > > - version is wrong
-> > 
-> > That was my mistake.
-> > 
-> > > - report is missing 4 bytes
-> > 
-> > Doesn't seem to matter. I think it might be hidd being broken...
+> Please try this patch:
+> ----------------------------
 > 
-> can you extract the full HID report descriptor from SDP and simply put
-> it statically into the code? I think that makes it easier.
-
-The report descriptor says length is 148 (in lsusb and my code) and my
-"truncated" version has 296 characters, so it look fine.
-
-> > Attaching a new version of sixpair2.c that seems to work:
-> > sudo ./sixpair2 --store-info <local bdaddr>
-> > 
-> > It needs to be compiled from the input/ subdir of bluez-utils, using the
-> > command-line at the top of the file.
+> The bluetooth hci conn sysfs add/del executed in the default workqueue. If the conn del function is executed after the new conn add function with same bluetooth target address, the connection add will failed and warning about same kobject name.
 > 
-> I would like to include this one into the CVS. Can you get me a version
-> without GLib stuff? It is not really needed as I can tell. You only use
-> it for option parsing.
+> Here add a btconn workqueue, and flush the workqueue in the add_conn function to avoid the above issue. 
 
-You mentioned that already last time I sent the script. I'd really like
-to be sure it works as expected before I trim it though, so if you or
-Frederic could test it, I even have a udev rule, and some code to look
-at to implement using hiddev instead lsusb so the device doesn't
-disconnect on plugging it in.
+the patch looks good to me (except some style cleanups). Let me push it
+to one of my test machines and stress it a little bit. I give you
+feedback after my testing.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
