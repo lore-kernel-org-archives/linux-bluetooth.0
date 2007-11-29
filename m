@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-Id: <50056D6C-D77D-48C3-9D89-87CA795AA71B@holtmann.org>
+Message-Id: <B340381F-12D7-44F6-8B6D-02918336E55E@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <474D80EB.5070501@aircable.net>
+In-Reply-To: <474EA586.5010602@student.uib.no>
 Mime-Version: 1.0 (Apple Message framework v915)
-Date: Thu, 29 Nov 2007 21:22:44 +0100
-References: <474D6B82.40206@aircable.net>
-	<56C8D22F4B7F104DBE581411F10682E9268FE8@beyondsoft.dyndns.org>
-	<474D80EB.5070501@aircable.net>
-Subject: Re: [Bluez-devel] Set security level?
+Date: Thu, 29 Nov 2007 21:17:02 +0100
+References: <474EA586.5010602@student.uib.no>
+Subject: Re: [Bluez-devel] Is it posible to generate passkey on some
+	external device,
+	and then update the BT-device (without MMi) automatically?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,17 +22,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Manuel,
+Hi Isabel,
 
-> I know, that's because the phone is using security level 0. I want to
-> know how to set it from the bluez side.
+> Useally a BT device without MMI uses a fixed passkey. If this device  
+> is
+> a public device, so that a group of people can connect to it, each
+> person should have a unique passkey with the public device.
+>
+> I wonder if it is possible with BlueZ to let some other external
+> controll/system generate a unique passkey for each person that  
+> wishes to
+> connect to this public device in the future.
+>
+> The external controll/system updates the public device and sends the  
+> new
+> passkey through a secure channel.
+>
+> Is there some function in BLueZ for this? Is this be possible?
 
-a security level 0 doesn't exist. So I would propose that you read the  
-specification first before making some untrue claims.
-
-BlueZ is using security mode 1/2 by default. The difference depends on  
-the running services. Again, check the specification to understand the  
-difference.
+not really, but you can create a passkey agent that hands out  
+different pin codes based on the remote device address.
 
 Regards
 
