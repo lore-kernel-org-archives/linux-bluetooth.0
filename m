@@ -1,16 +1,15 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-Id: <6EE8D368-C303-400A-B4FE-811228391639@holtmann.org>
+Message-Id: <81AD8A6B-9825-4641-951F-FEE9A0DE20C4@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Dave Young <hidave.darkstar@gmail.com>
-In-Reply-To: <a8e1da0711290006x4bd3cc45x1ae8dcaa9c0ab462@mail.gmail.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d89ddf300711291206g56544e3cud237a2f71355fc93@mail.gmail.com>
 Mime-Version: 1.0 (Apple Message framework v915)
-Date: Thu, 29 Nov 2007 21:19:03 +0100
-References: <1196009038.14897.6.camel@pico> <1196056187.4217.54.camel@aeonflux>
-	<1196305426.23029.12.camel@pico>
-	<a8e1da0711290006x4bd3cc45x1ae8dcaa9c0ab462@mail.gmail.com>
-Cc: bgsmith@bendcable.com, BlueZ users <bluez-users@lists.sourceforge.net>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [Bluez-users] Lost connections - mouse and keyboard
+Date: Thu, 29 Nov 2007 21:15:23 +0100
+References: <20070522161255.GA9813@robsims.com>
+	<20071129155526.GA17661@robsims.com>
+	<d89ddf300711290845l5162bca2l16dfdf6c902cfa92@mail.gmail.com>
+	<d89ddf300711291206g56544e3cud237a2f71355fc93@mail.gmail.com>
+Subject: Re: [Bluez-users] Sharing devices with dual-booted Windows
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,50 +23,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Dave,
+Hi Brad,
 
->> apparently does manage bluetooth devices using bluetooth-input- 
->> service.
->> I  still have the problem of the devices disappearing if idle for too
->> long such as when i lock the desktop or log out for  a long period.
->> Sometimes I can re-enable the devices, but sometimes I cannot.   
->> This is
->> frustrating.
->>
->> I see a the following several times in the system log if i restart
->> bluetooth:
->> Nov 28 18:53:39 pico kernel: WARNING: at drivers/hid/hid-core.c:784
->> implement() (Tainted: P       )
->> Nov 28 18:53:39 pico kernel:
->> Nov 28 18:53:39 pico kernel: Call Trace:
->> Nov 28 18:53:39 pico kernel:  [<ffffffff811d8549>] hid_output_report
->> +0x1c5/0x232
->> Nov 28 18:53:39 pico kernel:  [<ffffffff811ddaf1>] hid_submit_ctrl
->> +0x60/0x24b
->> Nov 28 18:53:39 pico kernel:  [<ffffffff811dde45>]  
->> usbhid_submit_report
->> +0x169/0x19e
->> Nov 28 18:53:39 pico kernel:  [<ffffffff811e030b>] hiddev_ioctl
->> +0x368/0x919
->> Nov 28 18:53:39 pico kernel:  [<ffffffff810f54c5>] inode_has_perm
->> +0x65/0x72
->> Nov 28 18:53:39 pico kernel:  [<ffffffff81120c17>] __up_read 
->> +0x19/0x7f
->> Nov 28 18:53:39 pico kernel:  [<ffffffff8125eecc>] do_page_fault
->> +0x490/0x7e4
->> Nov 28 18:53:39 pico kernel:  [<ffffffff810a7399>] do_ioctl+0x55/0x6b
->> Nov 28 18:53:39 pico kernel:  [<ffffffff810a75f2>] vfs_ioctl 
->> +0x243/0x25c
->> Nov 28 18:53:39 pico kernel:  [<ffffffff810a7664>] sys_ioctl 
->> +0x59/0x79
->> Nov 28 18:53:39 pico kernel:  [<ffffffff8100bd45>] tracesys+0xd5/0xda
->>
+> fwiw, the only thing I could find would work only for csr chips using
+> bccmd from bluez-utils/tools (configure --enable-bccmd). Get the
+> bdaddr to see how the bytes are swapped around:
 >
-> Does bluetooth input devices have something to do with usbhid? I don't
-> know, perhaps this is another problem in kernel.
+> bccmd psget bdaddr
+>
+> then set and reset the adapter (sometimes these commands take two  
+> goes to take)
+>
+> bccmd psset -r bdaddr 0x2000 0xaf9b 0xf400 0x0800
+>
+> I could give this a whack tonight.
 
-in case you have a HID proxy dongle the usbhid driver can be involved.  
-And since this is hiddev, then it will be caused by the hid2hci program.
+using the bdaddr command is much simpler. It does the magic of  
+bringing the address into the right format.
+
+> fyi, bccmd can brick the adapter (eg if you use "-s" to make bad
+> settings permanent). It would be nice if someone who fiddles with csr
+> stuff can verify this approach.
+
+Take this warning serious. You can really brick your dongle.
 
 Regards
 
