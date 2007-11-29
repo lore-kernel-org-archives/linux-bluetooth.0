@@ -1,15 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-Id: <B7DDE0E9-17B7-4980-9405-906ED5F56900@holtmann.org>
+Message-Id: <6EE8D368-C303-400A-B4FE-811228391639@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <a8e1da0711282343v4397e754qbcedf9f67c94499a@mail.gmail.com>
+To: Dave Young <hidave.darkstar@gmail.com>
+In-Reply-To: <a8e1da0711290006x4bd3cc45x1ae8dcaa9c0ab462@mail.gmail.com>
 Mime-Version: 1.0 (Apple Message framework v915)
-Date: Thu, 29 Nov 2007 21:19:50 +0100
-References: <4745D9EE.4020101@uni-koeln.de> <4749FAD6.6080403@uni-koeln.de>
-	<1196055526.4217.44.camel@aeonflux> <474AA430.6010307@uni-koeln.de>
-	<1196080043.17196.4.camel@aeonflux> <474B110A.7000804@uni-koeln.de>
-	<a8e1da0711282343v4397e754qbcedf9f67c94499a@mail.gmail.com>
-Subject: Re: [Bluez-users] hcitool scan returns wrong bdaddr
+Date: Thu, 29 Nov 2007 21:19:03 +0100
+References: <1196009038.14897.6.camel@pico> <1196056187.4217.54.camel@aeonflux>
+	<1196305426.23029.12.camel@pico>
+	<a8e1da0711290006x4bd3cc45x1ae8dcaa9c0ab462@mail.gmail.com>
+Cc: bgsmith@bendcable.com, BlueZ users <bluez-users@lists.sourceforge.net>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [Bluez-users] Lost connections - mouse and keyboard
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -25,30 +26,48 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi Dave,
 
->> I found the 3.21 tarball, thanks. Unfortunately the error still  
->> occurs
->> with the resulting  libbluetooth.so.2.9.1. Because of the output from
->> ldd, I'm sure that hcitool is linked against the "right" lib. So  
->> the Bug
->> must be in 3.21 too, or there is an completely different Problem as I
->> assume, because of the same behavior with libbluetooth.so.2.9.0 from
->> debian lenny, and because you told me that it should work with an D- 
->> Bus
->> API, which is installed.
->> So perhaps the Problem is rooted in my D-Bus setup. I installed it  
->> from
->> the debian repository and thought it should work without any further
->> configurations.
->> I'll search for it,
->> thank you very much for your time and help,
+>> apparently does manage bluetooth devices using bluetooth-input- 
+>> service.
+>> I  still have the problem of the devices disappearing if idle for too
+>> long such as when i lock the desktop or log out for  a long period.
+>> Sometimes I can re-enable the devices, but sometimes I cannot.   
+>> This is
+>> frustrating.
+>>
+>> I see a the following several times in the system log if i restart
+>> bluetooth:
+>> Nov 28 18:53:39 pico kernel: WARNING: at drivers/hid/hid-core.c:784
+>> implement() (Tainted: P       )
+>> Nov 28 18:53:39 pico kernel:
+>> Nov 28 18:53:39 pico kernel: Call Trace:
+>> Nov 28 18:53:39 pico kernel:  [<ffffffff811d8549>] hid_output_report
+>> +0x1c5/0x232
+>> Nov 28 18:53:39 pico kernel:  [<ffffffff811ddaf1>] hid_submit_ctrl
+>> +0x60/0x24b
+>> Nov 28 18:53:39 pico kernel:  [<ffffffff811dde45>]  
+>> usbhid_submit_report
+>> +0x169/0x19e
+>> Nov 28 18:53:39 pico kernel:  [<ffffffff811e030b>] hiddev_ioctl
+>> +0x368/0x919
+>> Nov 28 18:53:39 pico kernel:  [<ffffffff810f54c5>] inode_has_perm
+>> +0x65/0x72
+>> Nov 28 18:53:39 pico kernel:  [<ffffffff81120c17>] __up_read 
+>> +0x19/0x7f
+>> Nov 28 18:53:39 pico kernel:  [<ffffffff8125eecc>] do_page_fault
+>> +0x490/0x7e4
+>> Nov 28 18:53:39 pico kernel:  [<ffffffff810a7399>] do_ioctl+0x55/0x6b
+>> Nov 28 18:53:39 pico kernel:  [<ffffffff810a75f2>] vfs_ioctl 
+>> +0x243/0x25c
+>> Nov 28 18:53:39 pico kernel:  [<ffffffff810a7664>] sys_ioctl 
+>> +0x59/0x79
+>> Nov 28 18:53:39 pico kernel:  [<ffffffff8100bd45>] tracesys+0xd5/0xda
+>>
 >
-> Maybe the Dbus api works for you, but the problem with hcitool is  
-> still there.
->
-> If you could build the bluez-utils/lib with -g and debug the hcitool,
-> you might get the answer then.
+> Does bluetooth input devices have something to do with usbhid? I don't
+> know, perhaps this is another problem in kernel.
 
-don't worry. I fixed that already. It was a stupid thinko on my side.
+in case you have a HID proxy dongle the usbhid driver can be involved.  
+And since this is hiddev, then it will be caused by the hid2hci program.
 
 Regards
 
