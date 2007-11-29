@@ -1,12 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-Id: <7905B385-9955-4295-A9EA-724890421F98@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <474F201C.9020702@aircable.net>
+Date: Thu, 29 Nov 2007 17:25:00 -0300
+From: Manuel Naranjo <manuel@aircable.net>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.64.0711282121010.18049@apps0.cs.toronto.edu>
-Mime-Version: 1.0 (Apple Message framework v915)
-Date: Thu, 29 Nov 2007 21:23:43 +0100
-References: <Pine.LNX.4.64.0711282121010.18049@apps0.cs.toronto.edu>
-Subject: Re: [Bluez-devel] RFCOMM 2x faster than L2CAP on the Nokia N800
+References: <474D6B82.40206@aircable.net>	<56C8D22F4B7F104DBE581411F10682E9268FE8@beyondsoft.dyndns.org>	<474D80EB.5070501@aircable.net>
+	<50056D6C-D77D-48C3-9D89-87CA795AA71B@holtmann.org>
+In-Reply-To: <50056D6C-D77D-48C3-9D89-87CA795AA71B@holtmann.org>
+Subject: Re: [Bluez-devel] Set security level?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,50 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Tim,
+Hi Marcel,
+> a security level 0 doesn't exist. So I would propose that you read the  
+> specification first before making some untrue claims.
+>   
+Sorry you are right. There is 1 2 and 3 right?
+I'll try to get a book that explains this things, actually I want to get
+more into the bluetooth specs, so this is a good time.
 
-> I've noticed something strange on the Nokia N800 (which runs linux  
-> 2.6.18
-> and uses the BlueZ stack). I have two programs: one opens an L2CAP  
-> socket,
-> accepts a connection, and receives data in MTU-sized packets, then
-> discards the data. The other does the same thing, but uses RFCOMM. I  
-> also
-> have corresponding "sender" programs that send data on the correct
-> PSM/channel.
->
-> When I run the pair of L2CAP programs and transfer 10MB of data, it  
-> takes
-> 142 seconds. The RFCOMM programs take 74 seconds to perform the same
-> transfer, despite the fact that a) RFCOMM imposes additional  
-> overhead and
-> b) RFCOMM uses an L2CAP socket at the kernel level.
->
-> Further complicating things is that I also have a simple program that
-> floods a remote host with malformed SDP packets (which are sized at  
-> the
-> L2CAP MTU). When I run this program and send 10MB of malformed SDP  
-> packets
-> to the N800's SDP server, it runs in 66 seconds.
->
-> So, what I have:
-> - L2CAP on SDP PSM: 66s
-> - L2CAP on other PSM: 142s
-> - RFCOMM: 74s
->
-> I've done multiple (at least three) runs of each. I've also tried  
-> sending
-> to the N800 from multiple machines (x505 laptop and mac mini running
-> linux) and both see this effect.
->
-> Does anyone have any idea what is going on here?
-
-it would help if you post your code that you used for testing.
-
-Regards
-
-Marcel
-
+> BlueZ is using security mode 1/2 by default. The difference depends on  
+> the running services. Again, check the specification to understand the  
+> difference.
+>   
+Ok thanks a lot,
+Regards,
+Manuel
 
 -------------------------------------------------------------------------
 SF.Net email is sponsored by: The Future of Linux Business White Paper
