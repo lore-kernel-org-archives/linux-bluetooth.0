@@ -1,70 +1,62 @@
-Return-Path: <hidave.darkstar@gmail.com>
-Message-ID: <a8e1da0710311805l32282ce0ve9df9280cf7cce06@mail.gmail.com>
-Date: Thu, 1 Nov 2007 09:05:14 +0800
-From: "Dave Young" <hidave.darkstar@gmail.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: [PATCH]bluetooth: hci_sysfs connection bus_id add support for diffrent hci device
-Cc: "David Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
-        bluez-devel@lists.sourceforge.net
-In-Reply-To: <1193824773.32459.22.camel@violet>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <20071031023017.GA3896@darkstar.te-china.tietoenator.com>
-	 <20071031.000141.241824894.davem@davemloft.net>
-	 <1193817409.32459.10.camel@violet>
-	 <a8e1da0710310213r1e4f3d7ckcbdf2e6bf854745e@mail.gmail.com>
-	 <1193824773.32459.22.camel@violet>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Return-Path: <bluez-users-bounces@lists.sourceforge.net>
+From: christopher reder <creder@digitalcpt.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <02eb01c83391$bea8d7f0$2600a8c0@engineering5>
+References: <02eb01c83391$bea8d7f0$2600a8c0@engineering5>
+Date: Fri, 30 Nov 2007 16:11:10 -0600
+Message-Id: <1196460670.27518.120.camel@linuxserver.digital>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] headset not connecting, pin issue?
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 10/31/07, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Dave,
->
-> > > > > diff -upr linux/net/bluetooth/hci_sysfs.c linux.new/net/bluetooth/hci_sysfs.c
-> > > > > --- linux/net/bluetooth/hci_sysfs.c 2007-10-31 10:21:00.000000000 +0800
-> > > > > +++ linux.new/net/bluetooth/hci_sysfs.c     2007-10-31 10:21:55.000000000 +0800
-> > > > > @@ -302,7 +302,8 @@ void hci_conn_add_sysfs(struct hci_conn
-> > > > >     conn->dev.release = bt_release;
-> > > > >
-> > > > >     snprintf(conn->dev.bus_id, BUS_ID_SIZE,
-> > > > > -                   "%s%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X",
-> > > > > +                   "%s%s%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X",
-> > > > > +                   hdev->name,
-> > > > >                     conn->type == ACL_LINK ? "acl" : "sco",
-> > > > >                     ba->b[5], ba->b[4], ba->b[3],
-> > > > >                     ba->b[2], ba->b[1], ba->b[0]);
-> > > >
-> > > > This might not work.
-> > > >
-> > > > Your device's name is already 15 characters long,
-> > > > BUS_ID_SIZE is 20, and it seems hdev->name could
-> > > > easily overflow the 4 or 5 characters of space
-> > > > remaining.
-> > >
-> > > and should also be not needed since their parents are different. However
-> > > we had to add the connections to a bus. Otherwise the userspace will
-> > > never see them. I have to think about the right solution for this
-> > > problem.
-> >
-> > Maybe we can use this instead:
-> >       snprintf(conn->dev.bus_id, BUS_ID_SIZE,
-> > -                     "%s%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X",
-> > +                     "%s%s%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X",
-> > +                     hdev->name + 3,
-> >                       conn->type == ACL_LINK ? "acl" : "sco",
-> >                       ba->b[5], ba->b[4], ba->b[3],
-> >                       ba->b[2], ba->b[1], ba->b[0]);
->
-> I had a look on how other subsystems handle this case and yes, they
-> duplicate the id number from its parent device. So I applied the
-> attached patch to my tree.
-Thanks.
->
-> The best would be to use '"%d-%d", hdev->id, conn->handle', but at the
-> time we create the hci_conn structure and add the sysfs entry the
-> connection handle is not know yet. I have to look into that and see if
-> that can be changed.
-I agree. I wonder to  know whether the conn sys issue can be delayed
-after the handle is availible.
+On Fri, 2007-11-30 at 14:44 -0600, Christopher Reder wrote:
+> Hello all.  I have searched around and seen people with similar issues but
+> have not found a solution yet.  
+> 
+> I am trying to connect a headset to a linux box with a usb Bluetooth dongle.
+> I would like to listen to music through the headset.  
+> 
+> When I run mplayer -ao alsa:device=Bluetooth song.mp3, I get:
+> 
 
-Regards
-dave
+
+Sorry for the previous post as I am further along than I thought.  This
+may be the wrong list but I'll continue what I found in the hopes that
+someone can tell me where I have gone wrong and what I need to do. 
+
+I think the issue is that the audio service has not started.  I did a
+hciconfig -a and I don't see that in the services.  I do see
+audio.service in the /etc/bluetooth directory.  
+
+I don't have python installed as this is an embedded system, but I would
+like to have the audio service running (which may be what needs to
+connect alsa to bluetooth).  
+
+Currently, I am able to connect to the headset via rfcomm and it does
+the pin and connection correctly.
+
+Any help in this regard would be appreciated.
+
+Christopher
+
+
+-------------------------------------------------------------------------
+SF.Net email is sponsored by: The Future of Linux Business White Paper
+from Novell.  From the desktop to the data center, Linux is going
+mainstream.  Let it simplify your IT future.
+http://altfarm.mediaplex.com/ad/ck/8857-50307-18918-4
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
