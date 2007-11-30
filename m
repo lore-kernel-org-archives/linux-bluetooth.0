@@ -1,132 +1,33 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-From: "Christopher Reder" <creder@digitalcpt.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Fri, 30 Nov 2007 14:44:04 -0600
-Message-ID: <02eb01c83391$bea8d7f0$2600a8c0@engineering5>
+Return-Path: <jikos@jikos.cz>
+Date: Fri, 30 Nov 2007 10:15:33 +0100 (CET)
+From: Jiri Kosina <jikos@jikos.cz>
+To: Dave Young <hidave.darkstar@gmail.com>
+cc: Marcel Holtmann <marcel@holtmann.org>, bgsmith@bendcable.com,
+        BlueZ users <bluez-users@lists.sourceforge.net>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [Bluez-users] Lost connections - mouse and keyboard
+In-Reply-To: <a8e1da0711291706h68d1d19ajc3819f8836cf51e8@mail.gmail.com>
+Message-ID: <Pine.LNX.4.64.0711301011330.19853@twin.jikos.cz>
+References: <1196009038.14897.6.camel@pico> <1196056187.4217.54.camel@aeonflux>
+  <1196305426.23029.12.camel@pico>  <a8e1da0711290006x4bd3cc45x1ae8dcaa9c0ab462@mail.gmail.com>
+  <6EE8D368-C303-400A-B4FE-811228391639@holtmann.org>
+ <Pine.LNX.4.64.0711292141220.19853@twin.jikos.cz>
+ <a8e1da0711291706h68d1d19ajc3819f8836cf51e8@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] headset not connecting, pin issue?
-Reply-To: creder@digitalcpt.com,
-        BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+List-ID: <bluez-users.lists.sourceforge.net>
 
+On Fri, 30 Nov 2007, Dave Young wrote:
 
-Hello all.  I have searched around and seen people with similar issues but
-have not found a solution yet.  
+> > This particular warning means, that someone (usually indeed hid2hci) 
+> > passed usage through hiddev that was out of bounds, with respect to 
+> > the device's report descriptor.
+> Is this behaviour the normal one? IMHO, userspace program should not
+> cause kernel warnings like this no mater what input from users.
 
-I am trying to connect a headset to a linux box with a usb Bluetooth dongle.
-I would like to listen to music through the headset.  
+It has been on my todo list to convert that WARN_ON() to something that 
+won't scare users that much, especially the stacktrace shouldn't certainly 
+be there. I will do it.
 
-When I run mplayer -ao alsa:device=Bluetooth song.mp3, I get:
-
-alsa-lib: pcm_bluetooth.c:1145:(bluetooth_init) Connection fail
-alsa-init: playback open error: Connection refused
-Could not open/initialize audio device -> no sound.
-
-Which tells me that it sees the .asoundrc file and is trying to play via
-Bluetooth.  However, I do not think that the headset is connected.  So, when
-I hit the button on the headset, I get the following from the hcidump.  Keep
-in mind that I have hcid.conf configured so that it points to a pin file
-with the echo PIN="0000"
-  pin_helper /home/root/bluepin;  (in hcid.conf)
-#!/bin/sh   (in bluepin with chmod 777)
-echo "PIN:0000"
-
-root@sarge-at91:/etc/bluetooth$ > HCI Event: Connect Request (0x04) plen 10
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Link Key Request (0x17) plen 6
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-> HCI Event: Command Complete (0x0e) plen 10
-> HCI Event: Connect Complete (0x03) plen 11
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-> HCI Event: Command Status (0x0f) plen 4
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-> HCI Event: Command Complete (0x0e) plen 6
-< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
-> ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x004e
-< ACL data: handle 11 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x004e result 0 status 0
-      Connection successful
-> HCI Event: Command Status (0x0f) plen 4
-> ACL data: handle 11 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 48
-< ACL data: handle 11 flags 0x02 dlen 18
-    L2CAP(s): Config rsp: scid 0x004e flags 0x00 result 0 clen 4
-      Success
-      MTU 48
-< ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x004e flags 0x00 clen 0
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-> HCI Event: Command Status (0x0f) plen 4
-> ACL data: handle 11 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-> ACL data: handle 11 flags 0x02 dlen 19
-    L2CAP(d): cid 0x0040 len 15 [psm 1]
-        SDP SS Req: tid 0x1 len 0xa
-          pat uuid-32 0x111f (Handsfree AG)
-          max 40
-          cont 00
-< ACL data: handle 11 flags 0x02 dlen 14
-    L2CAP(d): cid 0x004e len 10 [psm 1]
-        SDP SS Rsp: tid 0x1 len 0x5
-          count 0
-          cont 00
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 11 flags 0x02 dlen 19
-    L2CAP(d): cid 0x0040 len 15 [psm 1]
-        SDP SS Req: tid 0x2 len 0xa
-          pat uuid-32 0x1112 (Headset AG)
-          max 40
-          cont 00
-< ACL data: handle 11 flags 0x02 dlen 14
-    L2CAP(d): cid 0x004e len 10 [psm 1]
-        SDP SS Rsp: tid 0x2 len 0x5
-          count 0
-          cont 00
-> ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0040 scid 0x004e
-< ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x004e
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> HCI Event: Disconn Complete (0x05) plen 4
-
-I see from this that it sees the headset but is not connecting.  I don't
-know if it is because of the pin not connecting, or if the hcid.conf is not
-correct.  Can anyone offer a suggestion on this?
-
-I can post more info if anyone needs something that I have not put in here.
-
-Thanks
-Christopher
-
-Internal Virus Database is out-of-date.
-Checked by AVG Free Edition. 
-Version: 7.5.503 / Virus Database: 269.15.34/1134 - Release Date: 11/16/2007
-9:52 AM
- 
-
-
--------------------------------------------------------------------------
-SF.Net email is sponsored by: The Future of Linux Business White Paper
-from Novell.  From the desktop to the data center, Linux is going
-mainstream.  Let it simplify your IT future.
-http://altfarm.mediaplex.com/ad/ck/8857-50307-18918-4
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+-- 
+Jiri Kosina
