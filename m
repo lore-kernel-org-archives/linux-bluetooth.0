@@ -1,33 +1,47 @@
-Return-Path: <jikos@jikos.cz>
-Date: Fri, 30 Nov 2007 10:15:33 +0100 (CET)
-From: Jiri Kosina <jikos@jikos.cz>
-To: Dave Young <hidave.darkstar@gmail.com>
-cc: Marcel Holtmann <marcel@holtmann.org>, bgsmith@bendcable.com,
-        BlueZ users <bluez-users@lists.sourceforge.net>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [Bluez-users] Lost connections - mouse and keyboard
-In-Reply-To: <a8e1da0711291706h68d1d19ajc3819f8836cf51e8@mail.gmail.com>
-Message-ID: <Pine.LNX.4.64.0711301011330.19853@twin.jikos.cz>
-References: <1196009038.14897.6.camel@pico> <1196056187.4217.54.camel@aeonflux>
-  <1196305426.23029.12.camel@pico>  <a8e1da0711290006x4bd3cc45x1ae8dcaa9c0ab462@mail.gmail.com>
-  <6EE8D368-C303-400A-B4FE-811228391639@holtmann.org>
- <Pine.LNX.4.64.0711292141220.19853@twin.jikos.cz>
- <a8e1da0711291706h68d1d19ajc3819f8836cf51e8@mail.gmail.com>
+Return-Path: <hidave.darkstar@gmail.com>
+Message-ID: <a8e1da0711291852t4207f742sbd49dcda838c47c7@mail.gmail.com>
+Date: Fri, 30 Nov 2007 10:52:50 +0800
+From: "Dave Young" <hidave.darkstar@gmail.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Subject: Re: [Bluez-users] hcitool scan returns wrong bdaddr
+Cc: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <B7DDE0E9-17B7-4980-9405-906ED5F56900@holtmann.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
+References: <4745D9EE.4020101@uni-koeln.de> <4749FAD6.6080403@uni-koeln.de>
+	 <1196055526.4217.44.camel@aeonflux> <474AA430.6010307@uni-koeln.de>
+	 <1196080043.17196.4.camel@aeonflux> <474B110A.7000804@uni-koeln.de>
+	 <a8e1da0711282343v4397e754qbcedf9f67c94499a@mail.gmail.com>
+	 <B7DDE0E9-17B7-4980-9405-906ED5F56900@holtmann.org>
 List-ID: <bluez-users.lists.sourceforge.net>
 
-On Fri, 30 Nov 2007, Dave Young wrote:
+On Nov 30, 2007 4:19 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Dave,
+>
+>
+> >> I found the 3.21 tarball, thanks. Unfortunately the error still
+> >> occurs
+> >> with the resulting  libbluetooth.so.2.9.1. Because of the output from
+> >> ldd, I'm sure that hcitool is linked against the "right" lib. So
+> >> the Bug
+> >> must be in 3.21 too, or there is an completely different Problem as I
+> >> assume, because of the same behavior with libbluetooth.so.2.9.0 from
+> >> debian lenny, and because you told me that it should work with an D-
+> >> Bus
+> >> API, which is installed.
+> >> So perhaps the Problem is rooted in my D-Bus setup. I installed it
+> >> from
+> >> the debian repository and thought it should work without any further
+> >> configurations.
+> >> I'll search for it,
+> >> thank you very much for your time and help,
+> >
+> > Maybe the Dbus api works for you, but the problem with hcitool is
+> > still there.
+> >
+> > If you could build the bluez-utils/lib with -g and debug the hcitool,
+> > you might get the answer then.
+>
+> don't worry. I fixed that already. It was a stupid thinko on my side.
 
-> > This particular warning means, that someone (usually indeed hid2hci) 
-> > passed usage through hiddev that was out of bounds, with respect to 
-> > the device's report descriptor.
-> Is this behaviour the normal one? IMHO, userspace program should not
-> cause kernel warnings like this no mater what input from users.
-
-It has been on my todo list to convert that WARN_ON() to something that 
-won't scare users that much, especially the stacktrace shouldn't certainly 
-be there. I will do it.
-
--- 
-Jiri Kosina
+Thanks :)
