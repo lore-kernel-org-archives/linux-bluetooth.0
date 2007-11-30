@@ -1,15 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <474FD67D.2070504@gmail.com>
+Date: Fri, 30 Nov 2007 10:23:09 +0100
+From: Isabel <st10900@gmail.com>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <474FD172.3090109@free.fr>
-References: <4749E9DB.3020801@free.fr> <1196056051.4217.51.camel@aeonflux>
-	<474AF05D.70404@free.fr> <1196196897.17196.56.camel@aeonflux>
-	<474FD172.3090109@free.fr>
-Date: Fri, 30 Nov 2007 10:41:36 +0100
-Message-Id: <1196415696.12292.38.camel@violet>
-Mime-Version: 1.0
-Cc: Johan Hedberg <johan.hedberg@nokia.com>
-Subject: Re: [Bluez-devel] [PATCH] Bluez exceptions refactoring updated	patch
+References: <474EA586.5010602@student.uib.no>
+	<B340381F-12D7-44F6-8B6D-02918336E55E@holtmann.org>
+In-Reply-To: <B340381F-12D7-44F6-8B6D-02918336E55E@holtmann.org>
+Subject: Re: [Bluez-devel] Is it posible to generate passkey on some
+ external device, and then update the BT-device (without MMi) automatically?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,32 +18,77 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabien,
+Marcel Holtmann skrev:
+> Hi Isabel,
+> =
 
-> > and the origin is from the other error.[ch] files. So the copyright
-> > still prevails. Copying content from one file to another one doesn't
-> > change the copyright.
-> 
-> If this is the case i should have a couple of copyrights in the 
-> pcm_bluetooth and ctl_bluetooth files, as if i remember well they both 
-> started as a copy& past from plugz project ;-)
+>> Useally a BT device without MMI uses a fixed passkey. If this device  =
 
-in the beginning they didn't start out as copy&paste. I wrote them from
-scratch to have them clean. Right now the situation might be different.
+>> is
+>> a public device, so that a group of people can connect to it, each
+>> person should have a unique passkey with the public device.
+>>
+>> I wonder if it is possible with BlueZ to let some other external
+>> controll/system generate a unique passkey for each person that  =
 
-> I will surely send a patch to fix that one of those days.
+>> wishes to
+>> connect to this public device in the future.
+>>
+>> The external controll/system updates the public device and sends the  =
 
-Sure. Go ahead. I am trying to keep track of it, but the project grows
-so big that I might simply miss things here and there. Especially with
-all this outside CVS development.
+>> new
+>> passkey through a secure channel.
+>>
+>> Is there some function in BLueZ for this? Is this be possible?
+> =
 
-Regards
+> not really, but you can create a passkey agent that hands out  =
 
-Marcel
+> different pin codes based on the remote device address.
+> =
+
+> Regards
+> =
+
+> Marcel
+> =
+
+> =
+
+> -------------------------------------------------------------------------
+> SF.Net email is sponsored by: The Future of Linux Business White Paper
+> from Novell.  From the desktop to the data center, Linux is going
+> mainstream.  Let it simplify your IT future.
+> http://altfarm.mediaplex.com/ad/ck/8857-50307-18918-4
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+
+I was thinking of setting up a couple of public BT-devices far away from
+each other. And hoping that a person could have the same passkey with
+all the public BT-devices. witch has no input og output capabilities)
+
+This passkey agent that you talk about, was to be placed in the public
+device i suppose. Since a person has to use the same passkey with all
+the public BT-devices, I need some sentralized passkey agent.
+
+I=B4ll have to think of some other idea of doing this...
+
+
+-- Tripas
+
+
+
+
+
+
+
 
 
 
