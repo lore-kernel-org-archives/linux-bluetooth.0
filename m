@@ -1,78 +1,72 @@
-Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Mon,  1 Oct 2007 21:30:59 -0300
-Message-Id: <JP9DFN$2CC7FDC0DC59E96AF33FC3C7C4E3D353@multidominios>
+Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
+Message-ID: <c52bcaf0711301015w4eb90a5cr9c3b545bf1dbc6f6@mail.gmail.com>
+Date: Fri, 30 Nov 2007 10:15:07 -0800
+From: "Adam Bliss" <abliss@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-From: "vcallegari" <vcallegari@terra.com.br>
-To: "bluez-users" <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Need help to Bluez works on the same distance that
-	Bluesoleil ?
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Subject: [Bluez-devel] Bug: a2dpd cannot use avrcp unless run as root [
+	bluetooth-alsa-Bugs-1841837 ]
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello everybody.
+Hi,
 
-This is the first time I write, but I'm following Bluez development since some months ago.
-I have my linux debian with 2.6.22 kernel (unstable) and a dongle USB of CSR, bluecore 4, class 1. Also I have installed the 
-obexftpd to receive archives. Over the same desk, there is a PC of my girlfriend with windows and a software Bluesolei with the 
-same dongle bluetooth. If I am very near, i can send an archive to both computers (my linux and my girlfriend windows) from my 
-mobile, Motorola V3.
+I just filed this bug on the SF issue tracker, but in accordance with
+http://bluetooth-alsa.sourceforge.net/contact.html I'm shooting off
+this email in the hopes of catching the right person's attention.
 
-In fact, over Bluesoleil it always works, but in the Linux, just sometimes. And the Linux is always slower than the Bluesoleil. Now, 
-if I go to another room, the windows continues working without delays, but in the linux only establish the connection obex and 
-then, few seconds later, I receive a timeout. And sometimes not even that. Should that works equal in Linux and Windows, isn't it 
-? I'd like to know if it has some special configuration that I need, to get the same performance (in the linux and windows) ?
+I will go ahead and try out the new audio in bluez-utils-3.16, but it
+would be great if this could be fixed in plugz too.
 
-I already tried to exchange the dongles between PCs, even I connected the HD of the linux in the PC of my girlfriend, always 
-without success.
+Thanks,
+--Adam
 
-As far, I read  in these cases I have to try  > hcidump -X -V,  I did it and obtained these lines:
+---------- Forwarded message ----------
+I just checked out and rebuilt the latest a2dpd.  If I run it as root,
+it works perfectly.  If I run as a user, I get these errors:
 
-2007-10-01 18:00:23.644457 > ACL data: handle 42 flags 0x02 dlen 47
-    L2CAP(d): cid 0x0041 len 43 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 0 ilen 39 fcs 0x9a 
-        OBEX: Put cmd(c): len 39
-        Name (0x01) = Unicode length 14
-        0000: 00 61 00 61 00 2e 00 6a  00 70 00 67 00 00        .a.a...j.p.g..
-        Type (0x42) = Sequence length 11
-        0000: 69 6d 61 67 65 2f 6a 70  65 67 00                 image/jpeg.
-        Length (0xc3) = 6215
-2007-10-01 18:00:23.645022 < ACL data: handle 42 flags 0x02 dlen 11
-    L2CAP(d): cid 0x0041 len 7 [psm 3]
-      RFCOMM(d): UIH: cr 0 dlci 2 pf 0 ilen 3 fcs 0x40 
-        OBEX: Put rsp(f): status 100 len 32007-10-01 18:00:23.651443 > HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 42 packets 1
-2007-10-01 18:00:23.662468 > ACL data: handle 42 flags 0x02 dlen 9
-    L2CAP(d): cid 0x0041 len 5 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 2 pf 1 ilen 0 fcs 0x86 credits 1
-2007-10-01 18:00:33.903432 > ACL data: handle 42 flags 0x02 dlen 224
-2007-10-01 18:00:44.153415 > ACL data: handle 42 flags 0x01 dlen 224
-2007-10-01 18:00:44.154331 < ACL data: handle 42 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0041 len 4 [psm 3]
-      RFCOMM(s): DISC: cr 0 dlci 2 pf 1 ilen 0 fcs 0xd9 
-2007-10-01 18:00:44.155407 > ACL data: handle 42 flags 0x01 dlen 224
-2007-10-01 18:01:04.171438 > HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 42 reason 0x08
-    Reason: Connection Timeout
+> a2dpd -o --debug
 
-But I cannot understand them. Someone could help-me ?
+...
+
+A2DPD[08:30:24.064]: a2dp_make_listen_socket: (errno=13:Permission
+denied)Cannot bind socket 6 for psm 25
+A2DPD[08:30:24.064]: main_loop: *** Cannot get AVDTP socket, incoming
+AVDTP connections are impossible ***
+
+...
+
+A2DPD[08:30:24.075]: main_loop: Bluetooth Device Settings [44100 hz, 2
+channels, 16 bits]
+A2DPD[08:30:24.081]: a2dp_make_listen_socket: (errno=13:Permission
+denied)Cannot bind socket 8 for psm 23
+A2DPD[08:30:24.081]: avrcp_new: Listening for AVRCP on socket -1
 
 
+And then a2dp works, but avrcp does not (I'm using a BlueAnt X5 Stereo headset).
+
+
+----------------------------------------------------------------------
+
+You can respond by visiting:
+https://sourceforge.net/tracker/?func=detail&atid=678258&aid=1841837&group_id=116589
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2005.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+SF.Net email is sponsored by: The Future of Linux Business White Paper
+from Novell.  From the desktop to the data center, Linux is going
+mainstream.  Let it simplify your IT future.
+http://altfarm.mediaplex.com/ad/ck/8857-50307-18918-4
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
