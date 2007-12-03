@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <b88f52540712010301t154c17f2xa5629b5b9fb335d3@mail.gmail.com>
-References: <b88f52540712010301t154c17f2xa5629b5b9fb335d3@mail.gmail.com>
-Date: Mon, 03 Dec 2007 17:31:13 +0100
-Message-Id: <1196699473.12292.122.camel@violet>
+In-Reply-To: <1196677470.3227.192.camel@cookie.hadess.net>
+References: <1196677470.3227.192.camel@cookie.hadess.net>
+Date: Mon, 03 Dec 2007 17:26:52 +0100
+Message-Id: <1196699212.12292.115.camel@violet>
 Mime-Version: 1.0
-Cc: bluez-devel@lists.sf.net
-Subject: Re: [Bluez-devel] "hci_scodata_packet: hci0 SCO packet for
-	unknown	connection handle 92" for 1131:1001 (issc usb dongle)
+Subject: Re: [Bluez-devel] [patch] Use buttons in notification popups
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,38 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi Bastien,
 
-> I'm getting the usual "syslog flooded" problem with my usb dongle, id 1131:1001.
+> As reported here:
+> https://bugzilla.redhat.com/show_bug.cgi?id=407551
 > 
-> Just for reference, the problem (and other very similar problems) are
-> mentioned here:
-> http://qa.mandriva.com/show_bug.cgi?id=30638
-> http://bugzilla.kernel.org/show_bug.cgi?id=6833
-> https://bugs.launchpad.net/ubuntu/+source/linux-source-2.6.15/+bug/39414
-> http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=444603
+> notification-daemon kind of sucks and doesn't allow for long messages
+> (it will clip the messages, see those screenshots:
+> https://bugzilla.redhat.com/attachment.cgi?id=274901
+> https://bugzilla.redhat.com/attachment.cgi?id=274911
+> )
 > 
-> 
-> I've tried applying the patch mentioned here:
-> http://permalink.gmane.org/gmane.linux.bluez.devel/13721
-> and the patch appears to fix the problem (and my bluetooth dongle
-> seems to continue to work).
-> 
-> 
-> Could you please push this patch upstream? (I've checked
-> http://git.kernel.org/?p=linux/kernel/git/holtmann/bluetooth-2.6.git;a=blob_plain;f=drivers/bluetooth/hci_usb.c;hb=HEAD
-> and the patch does not yet appear to be included - I may be looking in
-> the wrong place, of course!)
+> Attached patch removes the extra lines, and adds a button to the popup
+> instead. It looks better, and still pops up the dialogues as expected.
 
-it has already been pushed into the upstream kernel.
-
-> One other question - does this quirk make my usb bluetooth dongle
-> "inferior" in some way? What do I lose if I don't have "ISOC
-> transfers"? (this way, I can work out if I should buy a different
-> dongle).
-
-Yes. It will no longer support SCO data. So no headset support will be
-possible.
+look good to me. Any special requirements on the version of libnotify to
+make this work?
 
 Regards
 
