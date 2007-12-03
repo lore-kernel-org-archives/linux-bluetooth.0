@@ -1,14 +1,14 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1196699566.3227.215.camel@cookie.hadess.net>
-References: <1196677470.3227.192.camel@cookie.hadess.net>
-	<1196699212.12292.115.camel@violet>
-	<1196699566.3227.215.camel@cookie.hadess.net>
-Date: Mon, 03 Dec 2007 18:04:58 +0100
-Message-Id: <1196701498.12292.133.camel@violet>
+In-Reply-To: <5f84803c0712030850k5810ee43na4a13f5e74657388@mail.gmail.com>
+References: <5f84803c0712030733q38350283m77e8930dfcca4162@mail.gmail.com>
+	<1196699122.12292.113.camel@violet>
+	<5f84803c0712030850k5810ee43na4a13f5e74657388@mail.gmail.com>
+Date: Mon, 03 Dec 2007 17:59:41 +0100
+Message-Id: <1196701181.12292.128.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [patch] Use buttons in notification popups
+Subject: Re: [Bluez-devel] [PATCH] [RESEND] make bluez GNOME UIs singletons
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,32 +22,50 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Hi Chris,
 
-> > > As reported here:
-> > > https://bugzilla.redhat.com/show_bug.cgi?id=407551
-> > > 
-> > > notification-daemon kind of sucks and doesn't allow for long messages
-> > > (it will clip the messages, see those screenshots:
-> > > https://bugzilla.redhat.com/attachment.cgi?id=274901
-> > > https://bugzilla.redhat.com/attachment.cgi?id=274911
-> > > )
-> > > 
-> > > Attached patch removes the extra lines, and adds a button to the popup
-> > > instead. It looks better, and still pops up the dialogues as expected.
-> > 
-> > look good to me. Any special requirements on the version of libnotify to
-> > make this work?
+>         
+>         I meant to look into it, but never got around it. Some small
+>         comments
+>         about it. Don't make the applet a singleton. That is totally
+>         unneeded
+>         since the applet will be loaded at login.
 > 
-> I don't think so, but this seems to work on any recent version of
-> libnotify I've seen. And it's the same API you've used (just the
-> "action" is different).
+> I still think it should be a singleton.  You wouldn't ever want two
+> applets running unless you're testing, and we have the singleton flags
+> for that.  I don't think this hurts anything. 
 
-I gonna double check, but otherwise the patch is fine and committed.
+I am okay with that. Please abstract everything into common/. And don't
+forget to document it in the manual pages.
 
-About the _(action). I don't think we should do the translation this
-way. Lets translate the string where there actually are an not mask them
-with N(). It confuses me, but you are a better expert in this area.
+>         For the "Present" method. Don't use the D-Bus low-level calls.
+>         It should 
+>         be all dbus-glib. Which means we have to abstract that into an
+>         object. I
+>         don't know if there is a well defined way for this. If it is,
+>         it might
+>         be good to use that. If not, then propose something for
+>         freedesktop.org.
+> 
+> I thought about doing this, but it seems like overkill to define a
+> GObject to just expose one method.  GObject isn't exactly terse
+> either.
+
+In a simple way you can use GObject for it. It is better than using the
+low-level D-Bus calls.
+
+>         And we should probably have some generic methods inside
+>         common/ instead
+>         of doing it again in every program.
+>         
+>         Please follow the kernel coding style. I know it is odd for a
+>         GTK
+>         application, but it makes it a lot easier for me. 
+> 
+> Which parts of the patch violate the kernel coding style?  The
+> function parameter spacing?
+
+Mainly the spacing.
 
 Regards
 
