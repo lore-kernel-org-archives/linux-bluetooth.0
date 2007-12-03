@@ -1,12 +1,12 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <!&!AAAAAAAAAAAYAAAAAAAAAA28jtZUXBJFr+ktBeMYxbfCgAAAEAAAABpn6hByp39MlPtVk/LJX4UBAAAAAA==@lainfo.com.mx>
-References: <!&!AAAAAAAAAAAYAAAAAAAAAA28jtZUXBJFr+ktBeMYxbfCgAAAEAAAABpn6hByp39MlPtVk/LJX4UBAAAAAA==@lainfo.com.mx>
-Date: Mon, 03 Dec 2007 17:29:21 +0100
-Message-Id: <1196699361.12292.120.camel@violet>
+In-Reply-To: <e378cfb20712022232yff12800gd8a6ae68dffbb530@mail.gmail.com>
+References: <e378cfb20712022232yff12800gd8a6ae68dffbb530@mail.gmail.com>
+Date: Mon, 03 Dec 2007 17:28:41 +0100
+Message-Id: <1196699321.12292.118.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] GetRemoteCompany(string address)
+Subject: Re: [Bluez-users] Support for multicasting in bluetooth
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,21 +20,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Cristian,
+Hi,
 
-> In the doc for the GetRemoteCompany(string address) says:
->  
-> string GetRemoteCompany(string address)
->  
->                        Get the company name from the OUI database of the
->                        Bluetooth device address. This function will need a
->                        valid and up-to-date oui.txt from the IEEE. This value
->                        will be different from the manufacturer string in the
->                        most cases.
->  
-> Where I need to put the oui.txt ??  (in what directory o how?)
+>   I want to write a small app wherein am able to broadcast a message
+> to a piconet. However to start of with, i found that bluetooth version
+> 1.2 doesn't have mutlicast support[1]. 
+> 
+> However a little of googling and i found that bluetooth version2.0
+> supports multicasting :) [2]
 
-multiple places will work. Try /var/lib/misc/ for example.
+not sure what that means, but the way of multicast that you think of is
+actually not supported by Bluetooth.
 
 Regards
 
