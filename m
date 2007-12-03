@@ -1,12 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1196677470.3227.192.camel@cookie.hadess.net>
-References: <1196677470.3227.192.camel@cookie.hadess.net>
-Date: Mon, 03 Dec 2007 17:26:52 +0100
-Message-Id: <1196699212.12292.115.camel@violet>
+In-Reply-To: <5f84803c0712030733q38350283m77e8930dfcca4162@mail.gmail.com>
+References: <5f84803c0712030733q38350283m77e8930dfcca4162@mail.gmail.com>
+Date: Mon, 03 Dec 2007 17:25:22 +0100
+Message-Id: <1196699122.12292.113.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [patch] Use buttons in notification popups
+Subject: Re: [Bluez-devel] [PATCH] [RESEND] make bluez GNOME UIs singletons
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,22 +20,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Hi Chris,
 
-> As reported here:
-> https://bugzilla.redhat.com/show_bug.cgi?id=407551
-> 
-> notification-daemon kind of sucks and doesn't allow for long messages
-> (it will clip the messages, see those screenshots:
-> https://bugzilla.redhat.com/attachment.cgi?id=274901
-> https://bugzilla.redhat.com/attachment.cgi?id=274911
-> )
-> 
-> Attached patch removes the extra lines, and adds a button to the popup
-> instead. It looks better, and still pops up the dialogues as expected.
+> I'm resending this patch since I haven't gotten a response in the
+> original thread in weeks.  Let me know if this looks OK.
 
-look good to me. Any special requirements on the version of libnotify to
-make this work?
+I meant to look into it, but never got around it. Some small comments
+about it. Don't make the applet a singleton. That is totally unneeded
+since the applet will be loaded at login.
+
+For the well known names use org.bluez.properties and org.bluez.wizard
+and don't define constants for it. Simply use the string.
+
+For the "Present" method. Don't use the D-Bus low-level calls. It should
+be all dbus-glib. Which means we have to abstract that into an object. I
+don't know if there is a well defined way for this. If it is, it might
+be good to use that. If not, then propose something for freedesktop.org.
+
+And we should probably have some generic methods inside common/ instead
+of doing it again in every program.
+
+Please follow the kernel coding style. I know it is odd for a GTK
+application, but it makes it a lot easier for me.
 
 Regards
 
