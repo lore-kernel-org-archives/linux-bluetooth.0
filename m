@@ -1,14 +1,12 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
+Date: Wed, 5 Dec 2007 00:25:38 +0100
+From: Bastian Blank <bastian@waldi.eu.org>
 To: bluez-devel@lists.sourceforge.net
-Date: Wed, 5 Dec 2007 16:01:03 +1000
-References: <20071204232538.GA23003@wavehammer.waldi.eu.org>
-In-Reply-To: <20071204232538.GA23003@wavehammer.waldi.eu.org>
+Message-ID: <20071204232538.GA23003@wavehammer.waldi.eu.org>
 MIME-Version: 1.0
-Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_f6jVHMG0NkninEL"
-Message-Id: <200712051601.03309.denis.kenzior@trolltech.com>
-Subject: [Bluez-devel] Possible Race condition in Rfcomm TTY
+Content-Type: multipart/mixed; boundary="SUOF0GtieIMvvwua"
+Subject: [Bluez-devel] [PATCH] audio - ignore permission denied errors on
+	avctp and avdtp sockets
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,205 +19,262 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---Boundary-00=_f6jVHMG0NkninEL
-Content-Type: text/plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 7bit
+
+--SUOF0GtieIMvvwua
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 
-Marcel,
+Hi
 
-I think there is a race condition in the RFCOMM Socket -> TTY adaptation.  
-Basically whenever a client device connects and starts sending data right 
-away, the serial port will not receive it.
+The attached patch ignores permission denied errors from the bind on
+avctp and avdtp sockets. This bind is only allowed for root since some
+kernel versions and disabling is better than failing completely if run
+without root priviledges.
 
-To see what I mean:
+Bastian
 
-run 'rfcomm -r listen 0 15' on a server.
+-- 
+Each kiss is as the first.
+		-- Miramanee, Kirk's wife, "The Paradise Syndrome",
+		   stardate 4842.6
 
-and run a simple test app that sends data right after connecting (one 
-attached).
+--SUOF0GtieIMvvwua
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: attachment; filename=diff
 
-Once connection has been established, run 'cat /dev/rfcomm0' 
+Index: audio/avdtp.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/audio/avdtp.c,v
+retrieving revision 1.60
+diff -u -r1.60 avdtp.c
+--- audio/avdtp.c	3 Dec 2007 22:41:29 -0000	1.60
++++ audio/avdtp.c	4 Dec 2007 23:21:00 -0000
+@@ -364,6 +364,7 @@
+ static GSList *local_seps = NULL;
+ 
+ static GIOChannel *avdtp_server = NULL;
++static gboolean avdtp_server_failed;
+ 
+ static GSList *sessions = NULL;
+ 
+@@ -2866,23 +2867,22 @@
+ 	return TRUE;
+ }
+ 
+-static GIOChannel *avdtp_server_socket(void)
++static int avdtp_server_socket(GIOChannel **io)
+ {
+ 	int sock, lm;
+ 	struct sockaddr_l2 addr;
+-	GIOChannel *io;
+ 
+ 	sock = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
+ 	if (sock < 0) {
+ 		error("AVDTP server socket: %s (%d)", strerror(errno), errno);
+-		return NULL;
++		return -1;
+ 	}
+ 
+ 	lm = L2CAP_LM_SECURE;
+ 	if (setsockopt(sock, SOL_L2CAP, L2CAP_LM, &lm, sizeof(lm)) < 0) {
+ 		error("AVDTP server setsockopt: %s (%d)", strerror(errno), errno);
+ 		close(sock);
+-		return NULL;
++		return -1;
+ 	}
+ 
+ 	memset(&addr, 0, sizeof(addr));
+@@ -2891,25 +2891,31 @@
+ 	addr.l2_psm = htobs(AVDTP_PSM);
+ 
+ 	if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		if (errno == EACCES) {
++			info("AVDTP server bind failed, disabling support");
++			close(sock);
++			return 0;
++		}
++
+ 		error("AVDTP server bind: %s", strerror(errno), errno);
+ 		close(sock);
+-		return NULL;
++		return -1;
+ 	}
+ 
+ 	if (listen(sock, 4) < 0) {
+ 		error("AVDTP server listen: %s", strerror(errno), errno);
+ 		close(sock);
+-		return NULL;
++		return -1;
+ 	}
+ 
+-	io = g_io_channel_unix_new(sock);
+-	if (!io) {
++	*io = g_io_channel_unix_new(sock);
++	if (!*io) {
+ 		error("Unable to allocate new io channel");
+ 		close(sock);
+-		return NULL;
++		return -1;
+ 	}
+ 
+-	return io;
++	return 1;
+ }
+ 
+ const char *avdtp_strerror(struct avdtp_error *err)
+@@ -2972,12 +2978,17 @@
+ 
+ int avdtp_init(void)
+ {
+-	if (avdtp_server)
++	int ret;
++
++	if (avdtp_server || avdtp_server_failed)
+ 		return 0;
+ 
+-	avdtp_server = avdtp_server_socket();
+-	if (!avdtp_server)
+-		return -1;
++	ret = avdtp_server_socket(&avdtp_server);
++
++	if (ret <= 0) {
++		avdtp_server_failed = TRUE;
++		return ret;
++	}
+ 
+ 	g_io_add_watch(avdtp_server, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+ 			(GIOFunc) avdtp_server_cb, NULL);
+Index: audio/control.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/audio/control.c,v
+retrieving revision 1.11
+diff -u -r1.11 control.c
+--- audio/control.c	27 Nov 2007 09:15:16 -0000	1.11
++++ audio/control.c	4 Dec 2007 23:21:01 -0000
+@@ -99,6 +99,7 @@
+ static uint32_t ct_record_id = 0;
+ 
+ static GIOChannel *avctp_server = NULL;
++static gboolean avctp_server_failed;
+ 
+ static GSList *sessions = NULL;
+ 
+@@ -309,23 +310,22 @@
+ 	return ret;
+ }
+ 
+-static GIOChannel *avctp_server_socket(void)
++static int avctp_server_socket(GIOChannel **io)
+ {
+ 	int sock, lm;
+ 	struct sockaddr_l2 addr;
+-	GIOChannel *io;
+ 
+ 	sock = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
+ 	if (sock < 0) {
+ 		error("AVCTP server socket: %s (%d)", strerror(errno), errno);
+-		return NULL;
++		return -1;
+ 	}
+ 
+ 	lm = L2CAP_LM_SECURE;
+ 	if (setsockopt(sock, SOL_L2CAP, L2CAP_LM, &lm, sizeof(lm)) < 0) {
+ 		error("AVCTP server setsockopt: %s (%d)", strerror(errno), errno);
+ 		close(sock);
+-		return NULL;
++		return -1;
+ 	}
+ 
+ 	memset(&addr, 0, sizeof(addr));
+@@ -334,25 +334,31 @@
+ 	addr.l2_psm = htobs(AVCTP_PSM);
+ 
+ 	if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		if (errno == EACCES) {
++			info("AVCTP server bind failed, disabling control support");
++			close(sock);
++			return 0;
++		}
++
+ 		error("AVCTP server bind: %s", strerror(errno), errno);
+ 		close(sock);
+-		return NULL;
++		return -1;
+ 	}
+ 
+ 	if (listen(sock, 4) < 0) {
+ 		error("AVCTP server listen: %s", strerror(errno), errno);
+ 		close(sock);
+-		return NULL;
++		return -1;
+ 	}
+ 
+-	io = g_io_channel_unix_new(sock);
+-	if (!io) {
++	*io = g_io_channel_unix_new(sock);
++	if (!*io) {
+ 		error("Unable to allocate new io channel");
+ 		close(sock);
+-		return NULL;
++		return -1;
+ 	}
+ 
+-	return io;
++	return 1;
+ }
+ 
+ static struct avctp *find_session(bdaddr_t *src, bdaddr_t *dst)
+@@ -964,8 +970,9 @@
+ int avrcp_init(DBusConnection *conn)
+ {
+ 	sdp_buf_t buf;
++	int ret;
+ 
+-	if (avctp_server)
++	if (avctp_server || avctp_server_failed)
+ 		return 0;
+ 
+ 	connection = dbus_connection_ref(conn);
+@@ -996,9 +1003,12 @@
+ 		return -1;
+ 	}
+ 
+-	avctp_server = avctp_server_socket();
+-	if (!avctp_server)
+-		return -1;
++	ret = avctp_server_socket(&avctp_server);
++
++	if (ret <= 0) {
++		avctp_server_failed = TRUE;
++		return ret;
++	}
+ 
+ 	g_io_add_watch(avctp_server, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+ 			(GIOFunc) avctp_server_cb, NULL);
+Index: audio/sink.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/audio/sink.c,v
+retrieving revision 1.38
+diff -u -r1.38 sink.c
+--- audio/sink.c	3 Dec 2007 22:41:29 -0000	1.38
++++ audio/sink.c	4 Dec 2007 23:21:03 -0000
+@@ -46,6 +46,14 @@
+ 
+ #define STREAM_SETUP_RETRY_TIMER 2000
+ 
++#ifndef MIN
++# define MIN(x, y) ((x) < (y) ? (x) : (y))
++#endif
++
++#ifndef MAX
++# define MAX(x, y) ((x) > (y) ? (x) : (y))
++#endif
++
+ struct pending_request {
+ 	DBusConnection *conn;
+ 	DBusMessage *msg;
 
-Using my Suse 10.2 desktop with kernel 2.6.18.8 and Neo with kernel 2.6.22.5 
-(Nov 26 snapshot), about 95% of the time the initial data sent never shows up 
-on the serial port.  If I reverse the roles, the desktop usually gets the 
-initial chunk of data.  This inconsistency makes it hard to implement 
-something like the DUN or Handsfree services where clients very frequently 
-send data right away.
-
-Looking at the kernel code it seems that the data is copied into the socket 
-buf or into the serial buf from the rfcomm_recv_data.  It also seems that 
-rfcomm_dev_add never copies what is in the socket buffer to what is in the 
-serial buffer.  It would seem that rfomm_dev_add should also copy any pending 
-data from a socket read buffer to the serial port read buffer whenever doing 
-the conversion.  Or is there something else going on here?
-
--Denis
-
-
---Boundary-00=_f6jVHMG0NkninEL
-Content-Type: text/x-csrc;
-  charset="utf-8";
-  name="rfc.c"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="rfc.c"
-
-#include <stdio.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <termios.h>
-#include <sys/wait.h>
-#include <sys/time.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/hci.h>
-#include <bluetooth/hci_lib.h>
-#include <bluetooth/sco.h>
-#include <bluetooth/rfcomm.h>
-
-static volatile int terminate = 0;
-
-static void sig_term(int sig) {
-	terminate = 1;
-}
-
-static int rfcomm_connect(bdaddr_t *src, bdaddr_t *dst, uint8_t channel)
-{
-	struct sockaddr_rc addr;
-	int s;
-
-	if ((s = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)) < 0) {
-		return -1;
-	}
-
-	memset(&addr, 0, sizeof(addr));
-	addr.rc_family = AF_BLUETOOTH;
-	bacpy(&addr.rc_bdaddr, src);
-	addr.rc_channel = 0;
-	if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-		close(s);
-		return -1;
-	}
-
-	memset(&addr, 0, sizeof(addr));
-	addr.rc_family = AF_BLUETOOTH;
-	bacpy(&addr.rc_bdaddr, dst);
-	addr.rc_channel = channel;
-	if (connect(s, (struct sockaddr *)&addr, sizeof(addr)) < 0 ){
-		close(s);
-		return -1;
-	}
-	return s;
-}
-
-static void usage(void)
-{
-	printf("Usage:\n"
-		"\trfc <bdaddr> [channel]\n");
-}
-
-int main(int argc, char *argv[])
-{
-	struct sigaction sa;
-
-	fd_set rfds;
-	struct timeval timeout;
-	unsigned char buf[2048], *p;
-	int maxfd, sel, rlen, wlen;
-
-	bdaddr_t local;
-	bdaddr_t bdaddr;
-	uint8_t channel;
-
-	char *filename;
-	mode_t filemode;
-	int err, mode = 0;
-	int dd, rd, sd, fd;
-	uint16_t sco_handle, sco_mtu, vs;
-
-	switch (argc) {
-	case 2:
-		str2ba(argv[1], &bdaddr);
-		channel = 6;
-		break;
-	case 3:
-		str2ba(argv[1], &bdaddr);
-		channel = atoi(argv[2]);
-		break;
-	default:
-		usage();
-		exit(-1);
-	}
-
-	hci_devba(0, &local);
-	
-	memset(&sa, 0, sizeof(sa));
-	sa.sa_flags = SA_NOCLDSTOP;
-	sa.sa_handler = sig_term;
-	sigaction(SIGTERM, &sa, NULL);
-	sigaction(SIGINT,  &sa, NULL);
-
-	sa.sa_handler = SIG_IGN;
-	sigaction(SIGCHLD, &sa, NULL);
-	sigaction(SIGPIPE, &sa, NULL);
-
-	if ((rd = rfcomm_connect(&local, &bdaddr, channel)) < 0) {
-		perror("Can't connect RFCOMM channel");
-		return -1;
-	}
-
-	fprintf(stderr, "RFCOMM channel connected\n");
-
-	fprintf(stderr, "Sending BRSF\n");
-	write(rd, "AT+BRSF=24\r\n", 12);
-
-	while (!terminate) {
-		FD_ZERO(&rfds);
-		FD_SET(rd, &rfds);
-		FD_SET(fileno(stdin), &rfds);
-
-		timeout.tv_sec = 0;
-		timeout.tv_usec = 10000;
-
-		if ((sel = select(rd + 1, &rfds, NULL, NULL, &timeout)) > 0) {
-			if (FD_ISSET(rd, &rfds)) {
-				memset(buf, 0, sizeof(buf));
-				rlen = read(rd, buf, sizeof(buf));
-				if (rlen > 0) {
-					fprintf(stderr, "%s\n", buf);
-				} else {
-					break;
-				}				
-			}
-			
-			if (FD_ISSET(fileno(stdin), &rfds)) {
-				memset(buf, 0, sizeof(buf));
-				rlen = read(fileno(stdin), buf, sizeof(buf));
-				if (rlen > 0) {
-					fprintf(stderr, "Sending->%s", buf);
-					wlen = write(rd, buf, rlen);
-				}
-				else {
-					break;
-				}
-			}
-		}
-	}
-
-	close(rd);
-
-	return 0;
-}
-
---Boundary-00=_f6jVHMG0NkninEL
+--SUOF0GtieIMvvwua
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -230,7 +285,7 @@ SF.Net email is sponsored by: The Future of Linux Business White Paper
 from Novell.  From the desktop to the data center, Linux is going
 mainstream.  Let it simplify your IT future.
 http://altfarm.mediaplex.com/ad/ck/8857-50307-18918-4
---Boundary-00=_f6jVHMG0NkninEL
+--SUOF0GtieIMvvwua
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -241,4 +296,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---Boundary-00=_f6jVHMG0NkninEL--
+--SUOF0GtieIMvvwua--
