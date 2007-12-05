@@ -1,13 +1,16 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <4756AC23.5020207@hccnet.nl>
-Date: Wed, 05 Dec 2007 14:48:19 +0100
-From: Remy Bosch <reboli@hccnet.nl>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <005b01c8366a$5b6e07b0$9901a8c0@kcoe74512670e8>	<475545AC.2030509@gmail.com><000d01c83672$7fecdbe0$9901a8c0@kcoe74512670e8>	<47554E19.6000803@gmail.com>
-	<01b301c8371d$eb932f10$9901a8c0@kcoe74512670e8>
-In-Reply-To: <01b301c8371d$eb932f10$9901a8c0@kcoe74512670e8>
-Subject: Re: [Bluez-users] how to use bluetooth audiotools	inbluez-utils-3.22
+In-Reply-To: <bc2917430712050522y53baf906q1c13111b5125f90d@mail.gmail.com>
+References: <bc2917430712040950x21220f7an64d0d558939d42f7@mail.gmail.com>
+	<1196839466.12292.154.camel@violet>
+	<bc2917430712050434y7c3eb69bm57fce2702c977f64@mail.gmail.com>
+	<1196859942.12292.179.camel@violet>
+	<bc2917430712050522y53baf906q1c13111b5125f90d@mail.gmail.com>
+Date: Wed, 05 Dec 2007 14:35:04 +0100
+Message-Id: <1196861704.12292.184.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Dell D830 laptop BT card doesn't start
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,37 +24,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Leiyu wrote:
-> Dear All,
->
-> sorry for typing error, I send it again 
->  I create ~/.asoundrc  and modify it to contain 
->  pcm.bluetooth {
->    type bluetooth
->    device 00:18:6a:00:01:06
->  }
->
-> then call " mplayer -ao alsa:device=bluetooth /wulai.mp3" to play music and  meet the errors:
-> alsa-lib:pcm_bluetooth.c1240:(bluetooth_init) connection fail
-> alsa-init:playback open error: Connection refused
->   
+Hi Franck,
 
-I got similar. It won't work out of the box. Most appliances - to my
-knowledge - have a pin like '0000' which has to be send out, but don't
-see any reference in hcid.conf manual.
-Searching around the net points me to bluez-pin at
-http://gpe.handhelds.org/projects/bluez-pin.shtml. Do we still need an
-separate program to pass a pin?
-For a while I used gnome-bluetooth which asked for a pin, and the info
-is now stored under /var/lib/bluetooth/00:0B:6B:92:41:57/
-If I remove this dir, the audio device won't work and give errors. I
-place the dir back and it's music to my ears. Literally.
-What to do for new apps without gnome-bluetooth? I'd like to avoid as
-much bloat as possible which include - imho - gnome/kde.
+>         if I am not mistaken, then this is a CSR based dongle. Would
+>         need to
+>         decode the Rev=43.15 into the build id. However an easier way
+>         is when
+>         you boot into Windows first and then into Linux so the dongle
+>         works and 
+>         then execute bccmd buildname (as root).
+> 
+> Here is the result of bccmd buildname:
+> Build name: cyt_8unified_fl_bt2.0_kymodo_21d_0702212310_encr56
+> 2007-02-21
 
-Thanks
+this is a special build for Dell as it seems. I have no idea what's so
+special about it. Only Dell or CSR people can answer that.
 
-R. Bosch
+Maybe you need to enable the antenna or something. I don't know. There
+could be also some ACPI magic that does this job.
+
+>         You could sniff the init sequence under Windows. Would help to
+>         find the 
+>         init sequence.
+> 
+> hmm, How can i do that ? and what should i do when i'll find the init
+> sequence ?
+
+You can use USBsnoopy or run Linux and then Windows in a VMware and use
+usbmon. There is no easy way to explain this task. Find someone who
+donates one of these laptops and I can do it by myself. Otherwise you
+are on your own here.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
