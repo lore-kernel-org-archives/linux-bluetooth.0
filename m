@@ -1,10 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <4757DCBD.40602@access-company.com>
-Date: Thu, 06 Dec 2007 12:27:57 +0100
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?= <frederic.dalleau@access-company.com>
+Message-ID: <c004c40d0712050146v41168091v3d5191b3b276f40b@mail.gmail.com>
+Date: Wed, 5 Dec 2007 10:46:23 +0100
+From: "Raul Siles" <raul.siles@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <c004c40d0711020918x6753c75bheaa76d84b469d93@mail.gmail.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] [Patch] org.bluez.audio.headset.Connect() to handsfree
+References: <c004c40d0710311812u50795ca4wa3a8f3a6b2848ec0@mail.gmail.com>
+	<1193893450.32459.114.camel@violet>
+	<c004c40d0711020918x6753c75bheaa76d84b469d93@mail.gmail.com>
+Subject: Re: [Bluez-devel] How to confirm if a device has DFU support
+	(dfutool)?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,23 +23,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Hi everyone,
+The previous issue I reported back about "dfutool" not capable of
+backing up the firmware for a USB Bluetooth dongle (see below) is
+solved.
 
-As of today, when calling org.bluez.audio.headset.Connect(), the hfp 
-profile is searched only if the headset->hfp_handle is initialized.
-This member variable is initialized upon CreateDevice the first time the 
-device is created (during resolve_services).
-The variable is not initialized when the audio service is restarted, so 
-after restarting audio service, it is no longer possible to connect to hfp.
+It seems "dfutool" doesn't like VMware (v5.5.X). The native VMware USB
+port emulation (or USB pass through) interferes with the raw USB
+access required by dfutool. From a native OS (without any
+virtualization SW) everything works as expected.
 
-The attached patch fix the problem as follow : first search the hfp 
-profile handle, then search an hsp profile handle, by getting rfcomm 
-channel to connect to.
+Cheers,
+--
+Raul Siles
+GSE
+www.raulsiles.com
 
-It is based against latest git tree.
-
-Frederic.
-
+> I'm trying to backup the firmware from a Conceptronic CBT100U USB
+> Bluetooth dongle using dfutool, and the message I get after selecting
+> the device is:
+>
+> # dfutool -dhci0 archive file.dfu
+> ...
+>  "Can't identify device with DFU mode"
+> #
+>
+> I understand this could mean this chip manufacturer does NOT support DFU,
+> although it is a CSR-based device, and mostly all CSR based modules and dongles
+> support DFU. How can I confirm if DFU is supported?
 
 -------------------------------------------------------------------------
 SF.Net email is sponsored by: The Future of Linux Business White Paper
