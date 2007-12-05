@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <00ac01c83704$8f17aef0$9901a8c0@kcoe74512670e8>
+Message-ID: <00a701c83704$8b43c390$9901a8c0@kcoe74512670e8>
 From: "Leiyu" <leiyu_83@163.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 References: <005b01c8366a$5b6e07b0$9901a8c0@kcoe74512670e8>	<475545AC.2030509@gmail.com><000d01c83672$7fecdbe0$9901a8c0@kcoe74512670e8>
 	<47554E19.6000803@gmail.com>
-Date: Wed, 5 Dec 2007 14:03:29 +0800
+Date: Wed, 5 Dec 2007 14:03:19 +0800
 MIME-Version: 1.0
 Subject: Re: [Bluez-users] how to use bluetooth audiotools	inbluez-utils-3.22
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
