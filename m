@@ -1,13 +1,13 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200712051601.03309.denis.kenzior@trolltech.com>
+In-Reply-To: <20071204232538.GA23003@wavehammer.waldi.eu.org>
 References: <20071204232538.GA23003@wavehammer.waldi.eu.org>
-	<200712051601.03309.denis.kenzior@trolltech.com>
-Date: Wed, 05 Dec 2007 08:28:02 +0100
-Message-Id: <1196839682.12292.159.camel@violet>
+Date: Wed, 05 Dec 2007 08:22:35 +0100
+Message-Id: <1196839355.12292.151.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Possible Race condition in Rfcomm TTY
+Subject: Re: [Bluez-devel] [PATCH] audio - ignore permission denied
+	errors	on avctp and avdtp sockets
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,45 +21,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Denis,
+Hi Bastien,
 
-> I think there is a race condition in the RFCOMM Socket -> TTY adaptation.  
-> Basically whenever a client device connects and starts sending data right 
-> away, the serial port will not receive it.
-> 
-> To see what I mean:
-> 
-> run 'rfcomm -r listen 0 15' on a server.
-> 
-> and run a simple test app that sends data right after connecting (one 
-> attached).
-> 
-> Once connection has been established, run 'cat /dev/rfcomm0' 
-> 
-> Using my Suse 10.2 desktop with kernel 2.6.18.8 and Neo with kernel 2.6.22.5 
-> (Nov 26 snapshot), about 95% of the time the initial data sent never shows up 
-> on the serial port.  If I reverse the roles, the desktop usually gets the 
-> initial chunk of data.  This inconsistency makes it hard to implement 
-> something like the DUN or Handsfree services where clients very frequently 
-> send data right away.
+> The attached patch ignores permission denied errors from the bind on
+> avctp and avdtp sockets. This bind is only allowed for root since some
+> kernel versions and disabling is better than failing completely if run
+> without root priviledges.
 
-I am not a big fan of the TTY support at all. It had more problems in
-the end than we ever expected. Using the socket directly is always the
-better approach.
-
-For Handsfree, I would prefer if the audio service will be extended and
-that is what is currently planned. For DUN you can use the serial
-service proxy feature. This can directly attach to a physical TTY or to
-a Unix socket.
-
-> Looking at the kernel code it seems that the data is copied into the socket 
-> buf or into the serial buf from the rfcomm_recv_data.  It also seems that 
-> rfcomm_dev_add never copies what is in the socket buffer to what is in the 
-> serial buffer.  It would seem that rfomm_dev_add should also copy any pending 
-> data from a socket read buffer to the serial port read buffer whenever doing 
-> the conversion.  Or is there something else going on here?
-
-No. That is probably it. Feel free to send a patch.
+and why do you wanna run the service without proper permission? If you
+don't want AVDTP or AVCTP, then disable it in the audio.conf file.
 
 Regards
 
