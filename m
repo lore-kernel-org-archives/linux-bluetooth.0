@@ -1,17 +1,15 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-Message-ID: <5f84803c0712060959n6db58e78y4adfa1b4a212df71@mail.gmail.com>
-Date: Thu, 6 Dec 2007 12:59:17 -0500
-From: "Chris Rivera" <chrismrivera@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1196701181.12292.128.camel@violet>
+Message-ID: <47581231.3010505@access-company.com>
+Date: Thu, 06 Dec 2007 16:16:01 +0100
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?= <frederic.dalleau@access-company.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_6559_7875885.1196963957128"
-References: <5f84803c0712030733q38350283m77e8930dfcca4162@mail.gmail.com>
-	<1196699122.12292.113.camel@violet>
-	<5f84803c0712030850k5810ee43na4a13f5e74657388@mail.gmail.com>
-	<1196701181.12292.128.camel@violet>
-Subject: Re: [Bluez-devel] [PATCH] [RESEND] make bluez GNOME UIs singletons
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <4757DCBD.40602@access-company.com>
+	<1196941226.12292.192.camel@violet>
+In-Reply-To: <1196941226.12292.192.camel@violet>
+Content-Type: multipart/mixed; boundary="------------090909000705020901050508"
+Subject: Re: [Bluez-devel] [Patch]
+	org.bluez.audio.headset.Connect()	to	handsfree
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,420 +22,308 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_6559_7875885.1196963957128
+This is a multi-part message in MIME format.
+--------------090909000705020901050508
 Content-Type: multipart/alternative;
-	boundary="----=_Part_6560_27395319.1196963957129"
+	boundary="------------090105080808090506050709"
 
-------=_Part_6560_27395319.1196963957129
-Content-Type: text/plain; charset=ISO-8859-1
+
+--------------090105080808090506050709
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
-Attached is an updated patch with the changes that we talked about.
+Right!
 
-Chris
+Here is an updated patch. It adds a parameter to headset_init() to know 
+whether hfp is enabled or not.
 
-On Dec 3, 2007 11:59 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+Let me know what you think,
+Regards,
 
-> Hi Chris,
->
-> >
-> >         I meant to look into it, but never got around it. Some small
-> >         comments
-> >         about it. Don't make the applet a singleton. That is totally
-> >         unneeded
-> >         since the applet will be loaded at login.
-> >
-> > I still think it should be a singleton.  You wouldn't ever want two
-> > applets running unless you're testing, and we have the singleton flags
-> > for that.  I don't think this hurts anything.
->
-> I am okay with that. Please abstract everything into common/. And don't
-> forget to document it in the manual pages.
->
-> >         For the "Present" method. Don't use the D-Bus low-level calls.
-> >         It should
-> >         be all dbus-glib. Which means we have to abstract that into an
-> >         object. I
-> >         don't know if there is a well defined way for this. If it is,
-> >         it might
-> >         be good to use that. If not, then propose something for
-> >         freedesktop.org.
-> >
-> > I thought about doing this, but it seems like overkill to define a
-> > GObject to just expose one method.  GObject isn't exactly terse
-> > either.
->
-> In a simple way you can use GObject for it. It is better than using the
-> low-level D-Bus calls.
->
-> >         And we should probably have some generic methods inside
-> >         common/ instead
-> >         of doing it again in every program.
-> >
-> >         Please follow the kernel coding style. I know it is odd for a
-> >         GTK
-> >         application, but it makes it a lot easier for me.
-> >
-> > Which parts of the patch violate the kernel coding style?  The
-> > function parameter spacing?
->
-> Mainly the spacing.
->
->
+Frederic
 
-------=_Part_6560_27395319.1196963957129
+
+Marcel Holtmann wrote:
+> Hi Frederic,
+>
+>   
+>> As of today, when calling org.bluez.audio.headset.Connect(), the hfp 
+>> profile is searched only if the headset->hfp_handle is initialized.
+>> This member variable is initialized upon CreateDevice the first time the 
+>> device is created (during resolve_services).
+>> The variable is not initialized when the audio service is restarted, so 
+>> after restarting audio service, it is no longer possible to connect to hfp.
+>>     
+>
+> we had to disable HFP with a config setting since we are not fully
+> supporting it at the moment. So this must depend on the config setting
+> if we search for HFP and if we consider it for the connect. By default
+> we only support HSP.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> -------------------------------------------------------------------------
+> SF.Net email is sponsored by: The Future of Linux Business White Paper
+> from Novell.  From the desktop to the data center, Linux is going
+> mainstream.  Let it simplify your IT future.
+> http://altfarm.mediaplex.com/ad/ck/8857-50307-18918-4
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>   
+
+
+--------------090105080808090506050709
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
-Attached is an updated patch with the changes that we talked about.<br><br>Chris<br><br><div class="gmail_quote">On Dec 3, 2007 11:59 AM, Marcel Holtmann &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:
-<br><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;"><div class="Ih2E3d">Hi Chris,<br><br>&gt;<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; I meant to look into it, but never got around it. Some small
-<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; comments<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; about it. Don&#39;t make the applet a singleton. That is totally<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; unneeded<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; since the applet will be loaded at login.<br>&gt;<br>&gt; I still think it should be a singleton. &nbsp;You wouldn&#39;t ever want two
-<br>&gt; applets running unless you&#39;re testing, and we have the singleton flags<br>&gt; for that. &nbsp;I don&#39;t think this hurts anything.<br><br></div>I am okay with that. Please abstract everything into common/. And don&#39;t
-<br>forget to document it in the manual pages.<br><div class="Ih2E3d"><br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; For the &quot;Present&quot; method. Don&#39;t use the D-Bus low-level calls.<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; It should<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; be all dbus-glib. Which means we have to abstract that into an
-<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; object. I<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; don&#39;t know if there is a well defined way for this. If it is,<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; it might<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; be good to use that. If not, then propose something for<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; 
-<a href="http://freedesktop.org" target="_blank">freedesktop.org</a>.<br>&gt;<br>&gt; I thought about doing this, but it seems like overkill to define a<br>&gt; GObject to just expose one method. &nbsp;GObject isn&#39;t exactly terse
-<br>&gt; either.<br><br></div>In a simple way you can use GObject for it. It is better than using the<br>low-level D-Bus calls.<br><div class="Ih2E3d"><br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; And we should probably have some generic methods inside
-<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; common/ instead<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; of doing it again in every program.<br>&gt;<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; Please follow the kernel coding style. I know it is odd for a<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; GTK<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; application, but it makes it a lot easier for me.
-<br>&gt;<br>&gt; Which parts of the patch violate the kernel coding style? &nbsp;The<br>&gt; function parameter spacing?<br><br></div>Mainly the spacing.<br><div><div></div><div class="Wj3C7c"><br></div></div></blockquote></div>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
+</head>
+<body bgcolor="#ffffff" text="#000000">
+Right!<br>
 <br>
+Here is an updated patch. It adds a parameter to headset_init() to know
+whether hfp is enabled or not.<br>
+<br>
+Let me know what you think,<br>
+Regards,<br>
+<br>
+Frederic<br>
+<br>
+<br>
+Marcel Holtmann wrote:
+<blockquote cite="mid1196941226.12292.192.camel@violet" type="cite">
+  <pre wrap="">Hi Frederic,
 
-------=_Part_6560_27395319.1196963957129--
+  </pre>
+  <blockquote type="cite">
+    <pre wrap="">As of today, when calling org.bluez.audio.headset.Connect(), the hfp 
+profile is searched only if the headset-&gt;hfp_handle is initialized.
+This member variable is initialized upon CreateDevice the first time the 
+device is created (during resolve_services).
+The variable is not initialized when the audio service is restarted, so 
+after restarting audio service, it is no longer possible to connect to hfp.
+    </pre>
+  </blockquote>
+  <pre wrap=""><!---->
+we had to disable HFP with a config setting since we are not fully
+supporting it at the moment. So this must depend on the config setting
+if we search for HFP and if we consider it for the connect. By default
+we only support HSP.
 
-------=_Part_6559_7875885.1196963957128
-Content-Type: text/x-patch; name=bluez-gnome-singleton.patch
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_f9vii3zv0
-Content-Disposition: attachment; filename=bluez-gnome-singleton.patch
+Regards
 
-ZGlmZiAtdXJOIGdub21lL2FwcGxldC9ibHVldG9vdGgtYXBwbGV0LjEgZ25vbWUtbmV3L2FwcGxl
-dC9ibHVldG9vdGgtYXBwbGV0LjEKLS0tIGdub21lL2FwcGxldC9ibHVldG9vdGgtYXBwbGV0LjEJ
-MjAwNy0wNy0yMiAxMTozMzoxMy4wMDAwMDAwMDAgLTA0MDAKKysrIGdub21lLW5ldy9hcHBsZXQv
-Ymx1ZXRvb3RoLWFwcGxldC4xCTIwMDctMTItMDYgMTE6Mjg6MDAuMDAwMDAwMDAwIC0wNTAwCkBA
-IC0xMCw4ICsxMCw5IEBACiAuSSBibHVldG9vdGgtYXBwbGV0CiBpcyBwYXJ0IG9mIGJsdWV6LWdu
-b21lLCBzZWUgYWxzbyBodHRwOi8vd3d3LmJsdWV6Lm9yZwogLlNIIE9QVElPTlMKLS5JIGJsdWV0
-b290aC1hcHBsZXQKLXRha2VzIG5vIG9wdGlvbnMKKy5UUCAKKy5CSSBcLVwtc2luZ2xldG9uCitF
-bnN1cmUgdGhhdCBvbmx5IG9uZSBpbnN0YW5jZSBpcyBydW5uaW5nLgogLlNIIEFVVEhPUgogTWFy
-Y2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9sdG1hbm4ub3JnPgogLlNIIExJQ0VOU0UKZGlmZiAtdXJO
-IGdub21lL2FwcGxldC9ibHVldG9vdGgtYXBwbGV0LmRlc2t0b3AuaW4gZ25vbWUtbmV3L2FwcGxl
-dC9ibHVldG9vdGgtYXBwbGV0LmRlc2t0b3AuaW4KLS0tIGdub21lL2FwcGxldC9ibHVldG9vdGgt
-YXBwbGV0LmRlc2t0b3AuaW4JMjAwNy0wNC0wMyAwNDowOTowMS4wMDAwMDAwMDAgLTA0MDAKKysr
-IGdub21lLW5ldy9hcHBsZXQvYmx1ZXRvb3RoLWFwcGxldC5kZXNrdG9wLmluCTIwMDctMTItMDYg
-MTE6MTY6MDMuMDAwMDAwMDAwIC0wNTAwCkBAIC0zLDcgKzMsNyBAQAogX05hbWU9Qmx1ZXRvb3Ro
-IE1hbmFnZXIKIF9Db21tZW50PUJsdWV0b290aCBNYW5hZ2VyIGFwcGxldAogSWNvbj1zdG9ja19i
-bHVldG9vdGgKLUV4ZWM9Ymx1ZXRvb3RoLWFwcGxldAorRXhlYz1ibHVldG9vdGgtYXBwbGV0IC0t
-c2luZ2xldG9uCiBUZXJtaW5hbD1mYWxzZQogVHlwZT1BcHBsaWNhdGlvbgogQ2F0ZWdvcmllcz0K
-ZGlmZiAtdXJOIGdub21lL2FwcGxldC9tYWluLmMgZ25vbWUtbmV3L2FwcGxldC9tYWluLmMKLS0t
-IGdub21lL2FwcGxldC9tYWluLmMJMjAwNy0xMi0wNCAxMDozMDo1MS4wMDAwMDAwMDAgLTA1MDAK
-KysrIGdub21lLW5ldy9hcHBsZXQvbWFpbi5jCTIwMDctMTItMDYgMTE6MTY6MDMuMDAwMDAwMDAw
-IC0wNTAwCkBAIC00OSw2ICs0OSw3IEBACiAjZW5kaWYKIAogI2luY2x1ZGUgImJsdWV0b290aC1k
-ZXZpY2Utc2VsZWN0aW9uLmgiCisjaW5jbHVkZSAiYmx1ZXRvb3RoLWFwcGxpY2F0aW9uLWluc3Rh
-bmNlLmgiCiAKICNkZWZpbmUgUEFTU0tFWV9BR0VOVF9QQVRICSIvb3JnL2JsdWV6L3Bhc3NrZXki
-CiAjZGVmaW5lIEFVVEhfQUdFTlRfUEFUSAkJIi9vcmcvYmx1ZXovYXV0aCIKQEAgLTE1NTAsNyAr
-MTU1MSw3IEBACiAKIHN0YXRpYyB2b2lkIHNldHRpbmdzX2NhbGxiYWNrKEdPYmplY3QgKndpZGdl
-dCwgZ3BvaW50ZXIgdXNlcl9kYXRhKQogewotCWNvbnN0IGNoYXIgKmNvbW1hbmQgPSAiYmx1ZXRv
-b3RoLXByb3BlcnRpZXMiOworCWNvbnN0IGNoYXIgKmNvbW1hbmQgPSAiYmx1ZXRvb3RoLXByb3Bl
-cnRpZXMgLS1zaW5nbGV0b24iOwogCiAJaWYgKCFnX3NwYXduX2NvbW1hbmRfbGluZV9hc3luYyhj
-b21tYW5kLCBOVUxMKSkKIAkJZ19wcmludGVycigiQ291bGRuJ3QgZXhlY3V0ZSBjb21tYW5kOiAl
-c1xuIiwgY29tbWFuZCk7CkBAIC0xNjM5LDcgKzE2NDAsNyBAQAogI2lmIDAKIHN0YXRpYyB2b2lk
-IHdpemFyZF9jYWxsYmFjayhHT2JqZWN0ICp3aWRnZXQsIGdwb2ludGVyIHVzZXJfZGF0YSkKIHsK
-LQljb25zdCBjaGFyICpjb21tYW5kID0gImJsdWV0b290aC13aXphcmQiOworCWNvbnN0IGNoYXIg
-KmNvbW1hbmQgPSAiYmx1ZXRvb3RoLXdpemFyZCAtLXNpbmdsZXRvbiI7CiAKIAlpZiAoIWdfc3Bh
-d25fY29tbWFuZF9saW5lX2FzeW5jKGNvbW1hbmQsIE5VTEwpKQogCQlnX3ByaW50ZXJyKCJDb3Vs
-ZG4ndCBleGVjdXRlIGNvbW1hbmQ6ICVzXG4iLCBjb21tYW5kKTsKQEAgLTE3ODIsOSArMTc4Mywx
-OSBAQAogCiBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogeworCUdPcHRpb25Db250
-ZXh0ICpjdHg7CiAJR3RrV2lkZ2V0ICptZW51OwogCUdFcnJvciAqZXJyb3IgPSBOVUxMOworCUJs
-dWV0b290aEFwcGxpY2F0aW9uSW5zdGFuY2UgKmFwcDsKIAljaGFyICpzdHI7CisJaW50IHJldHZh
-bCA9IDA7CisJZ2Jvb2xlYW4gc2luZ2xldG9uID0gRkFMU0U7CisKKwlHT3B0aW9uRW50cnkgZW50
-cmllc1tdID0geworCQl7ICJzaW5nbGV0b24iLCAwLCAwLCBHX09QVElPTl9BUkdfTk9ORSwgJnNp
-bmdsZXRvbiwKKwkJICBOXygiT25seSBhbGxvdyBvbmUgaW5zdGFuY2Ugb2YgdGhpcyBhcHBsaWNh
-dGlvbiIpLCBOVUxMIH0sCisJCXsgTlVMTCwgMCwgMCwgMCwgTlVMTCwgTlVMTCwgTlVMTCB9CisJ
-fTsKIAogCWJpbmR0ZXh0ZG9tYWluKEdFVFRFWFRfUEFDS0FHRSwgTE9DQUxFRElSKTsKIAliaW5k
-X3RleHRkb21haW5fY29kZXNldChHRVRURVhUX1BBQ0tBR0UsICJVVEYtOCIpOwpAQCAtMTc5Miw2
-ICsxODAzLDE1IEBACiAKIAlndGtfaW5pdCgmYXJnYywgJmFyZ3YpOwogCisJY3R4ID0gZ19vcHRp
-b25fY29udGV4dF9uZXcoIiIpOworCWdfb3B0aW9uX2NvbnRleHRfYWRkX21haW5fZW50cmllcyhj
-dHgsIGVudHJpZXMsIE5VTEwpOworCWlmICghZ19vcHRpb25fY29udGV4dF9wYXJzZShjdHgsICZh
-cmdjLCAmYXJndiwgJmVycm9yKSkgeworCQlnX3ByaW50ZXJyKF8oInBhcnNpbmcgZmFpbGVkOiAl
-c1xuIiksIGVycm9yLT5tZXNzYWdlKTsKKwkJZ19lcnJvcl9mcmVlKGVycm9yKTsKKwkJZ19vcHRp
-b25fY29udGV4dF9mcmVlKGN0eCk7CisJCXJldHVybiByZXR2YWw7CisJfQorCiAjaWZkZWYgSEFW
-RV9MSUJOT1RJRlkKIAlub3RpZnlfaW5pdCgiYmx1ZXRvb3RoLW1hbmFnZXIiKTsKICNlbmRpZgpA
-QCAtMTgwNCw2ICsxODI0LDExIEBACiAJCWV4aXQoRVhJVF9GQUlMVVJFKTsKIAl9CiAKKwlhcHAg
-PSBibHVldG9vdGhfYXBwbGljYXRpb25faW5zdGFuY2VfbmV3KCk7CisJaWYoIWJsdWV0b290aF9h
-cHBsaWNhdGlvbl9pbnN0YW5jZV9yZWdpc3RlcihhcHAsICZyZXR2YWwsIHNpbmdsZXRvbiwgCisJ
-CSIvb3JnL2JsdWV6L0FwcGxldCIsICJvcmcuYmx1ZXouQXBwbGV0IikpCisJCWV4aXQocmV0dmFs
-KTsKKwogCWdjb25mID0gZ2NvbmZfY2xpZW50X2dldF9kZWZhdWx0KCk7CiAKICNpZmRlZiBIQVZF
-X0hBTApAQCAtMTg2MCw2ICsxODg1LDEwIEBACiAJZ19saXN0X2ZvcmVhY2goYWRhcHRlcl9saXN0
-LCBhZGFwdGVyX2ZyZWUsIE5VTEwpOwogCiAJZGJ1c19nX2Nvbm5lY3Rpb25fdW5yZWYoY29ubik7
-CisgICAgCisJZ19vYmplY3RfdW5yZWYoYXBwKTsKIAorCWdfb3B0aW9uX2NvbnRleHRfZnJlZShj
-dHgpOworCQogCXJldHVybiAwOwogfQpkaWZmIC11ck4gZ25vbWUvY29tbW9uL2JsdWV0b290aC1h
-cHBsaWNhdGlvbi1pbnN0YW5jZS5jIGdub21lLW5ldy9jb21tb24vYmx1ZXRvb3RoLWFwcGxpY2F0
-aW9uLWluc3RhbmNlLmMKLS0tIGdub21lL2NvbW1vbi9ibHVldG9vdGgtYXBwbGljYXRpb24taW5z
-dGFuY2UuYwkxOTY5LTEyLTMxIDE5OjAwOjAwLjAwMDAwMDAwMCAtMDUwMAorKysgZ25vbWUtbmV3
-L2NvbW1vbi9ibHVldG9vdGgtYXBwbGljYXRpb24taW5zdGFuY2UuYwkyMDA3LTEyLTA2IDExOjE2
-OjE5LjAwMDAwMDAwMCAtMDUwMApAQCAtMCwwICsxLDEzMiBAQAorLyoKKyAqCisgKiAgQmx1ZVog
-LSBCbHVldG9vdGggcHJvdG9jb2wgc3RhY2sgZm9yIExpbnV4CisgKgorICogIENvcHlyaWdodCAo
-QykgMjAwNS0yMDA3ICBNYXJjZWwgSG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+CisgKgor
-ICoKKyAqICBUaGlzIGxpYnJhcnkgaXMgZnJlZSBzb2Z0d2FyZTsgeW91IGNhbiByZWRpc3RyaWJ1
-dGUgaXQgYW5kL29yCisgKiAgbW9kaWZ5IGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIExl
-c3NlciBHZW5lcmFsIFB1YmxpYworICogIExpY2Vuc2UgYXMgcHVibGlzaGVkIGJ5IHRoZSBGcmVl
-IFNvZnR3YXJlIEZvdW5kYXRpb247IGVpdGhlcgorICogIHZlcnNpb24gMi4xIG9mIHRoZSBMaWNl
-bnNlLCBvciAoYXQgeW91ciBvcHRpb24pIGFueSBsYXRlciB2ZXJzaW9uLgorICoKKyAqICBUaGlz
-IGxpYnJhcnkgaXMgZGlzdHJpYnV0ZWQgaW4gdGhlIGhvcGUgdGhhdCBpdCB3aWxsIGJlIHVzZWZ1
-bCwKKyAqICBidXQgV0lUSE9VVCBBTlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1wbGll
-ZCB3YXJyYW50eSBvZgorICogIE1FUkNIQU5UQUJJTElUWSBvciBGSVRORVNTIEZPUiBBIFBBUlRJ
-Q1VMQVIgUFVSUE9TRS4gIFNlZSB0aGUgR05VCisgKiAgTGVzc2VyIEdlbmVyYWwgUHVibGljIExp
-Y2Vuc2UgZm9yIG1vcmUgZGV0YWlscy4KKyAqCisgKiAgWW91IHNob3VsZCBoYXZlIHJlY2VpdmVk
-IGEgY29weSBvZiB0aGUgR05VIExlc3NlciBHZW5lcmFsIFB1YmxpYworICogIExpY2Vuc2UgYWxv
-bmcgd2l0aCB0aGlzIGxpYnJhcnk7IGlmIG5vdCwgd3JpdGUgdG8gdGhlIEZyZWUgU29mdHdhcmUK
-KyAqICBGb3VuZGF0aW9uLCBJbmMuLCA1MSBGcmFua2xpbiBTdCwgRmlmdGggRmxvb3IsIEJvc3Rv
-biwgTUEgIDAyMTEwLTEzMDEgIFVTQQorICoKKyAqLworCisjaW5jbHVkZSA8ZGJ1cy9kYnVzLWds
-aWIuaD4KKworI2luY2x1ZGUgImJsdWV0b290aC1hcHBsaWNhdGlvbi1pbnN0YW5jZS5oIgorI2lu
-Y2x1ZGUgImFwcC1pbnN0YW5jZS1nbHVlLmgiCisKK0dfREVGSU5FX1RZUEUoQmx1ZXRvb3RoQXBw
-bGljYXRpb25JbnN0YW5jZSwgYmx1ZXRvb3RoX2FwcGxpY2F0aW9uX2luc3RhbmNlLCBHX1RZUEVf
-T0JKRUNUKQorCisjZGVmaW5lIEJMVUVUT09USF9BUFBMSUNBVElPTl9JTlNUQU5DRV9HRVRfUFJJ
-VkFURShvYmopIChHX1RZUEVfSU5TVEFOQ0VfR0VUX1BSSVZBVEUoKG9iaiksIFwKKwkJCQkJCQkJ
-CQkgQkxVRVRPT1RIX1RZUEVfQVBQTElDQVRJT05fSU5TVEFOQ0UsIEJsdWV0b290aEFwcGxpY2F0
-aW9uSW5zdGFuY2VQcml2YXRlKSkKKwordHlwZWRlZiBzdHJ1Y3QgX0JsdWV0b290aEFwcGxpY2F0
-aW9uSW5zdGFuY2VQcml2YXRlIEJsdWV0b290aEFwcGxpY2F0aW9uSW5zdGFuY2VQcml2YXRlOwor
-CitzdHJ1Y3QgX0JsdWV0b290aEFwcGxpY2F0aW9uSW5zdGFuY2VQcml2YXRlIHsKKwlHdGtXaW5k
-b3cgKndpbmRvdzsKKwlEQnVzR0Nvbm5lY3Rpb24gKmNvbm5lY3Rpb247Cit9OworCitnYm9vbGVh
-bgorYmx1ZXRvb3RoX2FwcGxpY2F0aW9uX2luc3RhbmNlX3JlZ2lzdGVyKEJsdWV0b290aEFwcGxp
-Y2F0aW9uSW5zdGFuY2UgKnNlbGYsCisJCWludCAqcmV0dmFsLCBnYm9vbGVhbiBzaW5nbGV0b24s
-IGdjaGFyICpwYXRoLCBnY2hhciAqc2VydmljZSkKK3sKKwlCbHVldG9vdGhBcHBsaWNhdGlvbklu
-c3RhbmNlUHJpdmF0ZSAqcHJpdiA9IEJMVUVUT09USF9BUFBMSUNBVElPTl9JTlNUQU5DRV9HRVRf
-UFJJVkFURShzZWxmKTsKKwlEQnVzR0Nvbm5lY3Rpb24gKnNjOworCURCdXNHUHJveHkgKnByb3h5
-OworCUdFcnJvciAqZXJyb3IgPSBOVUxMOworCWd1aW50IHJlcXVlc3RfcmVzdWx0OworCWdib29s
-ZWFuIHJldDsKKworCXNjID0gZGJ1c19nX2J1c19nZXQoREJVU19CVVNfU0VTU0lPTiwgJmVycm9y
-KTsKKwlpZiAoZXJyb3IgIT0gTlVMTCkgeworCQlnX3ByaW50ZXJyKCJDb25uZWN0aW5nIHRvIHNl
-c3Npb24gYnVzIGZhaWxlZDogJXNcbiIsIGVycm9yLT5tZXNzYWdlKTsKKwkJZ19lcnJvcl9mcmVl
-KGVycm9yKTsKKwkJKnJldHZhbCA9IDE7CisJCXJldHVybiBGQUxTRTsKKwl9CisKKwlwcm94eSA9
-IGRidXNfZ19wcm94eV9uZXdfZm9yX25hbWUoc2MsIERCVVNfU0VSVklDRV9EQlVTLAorCQkJREJV
-U19QQVRIX0RCVVMsIERCVVNfSU5URVJGQUNFX0RCVVMpOworCisJcmV0ID0gZGJ1c19nX3Byb3h5
-X2NhbGwocHJveHksICJSZXF1ZXN0TmFtZSIsIE5VTEwsCisJCQlHX1RZUEVfU1RSSU5HLCBzZXJ2
-aWNlLCBHX1RZUEVfVUlOVCwgMCwgR19UWVBFX0lOVkFMSUQsCisJCQlHX1RZUEVfVUlOVCwgJnJl
-cXVlc3RfcmVzdWx0LCBHX1RZUEVfSU5WQUxJRCk7CisJCisJZ19vYmplY3RfdW5yZWYoR19PQkpF
-Q1QocHJveHkpKTsKKwlpZiAoIXJldCkgeworCQlnX3ByaW50ZXJyKCJGYWlsZWQgdG8gcmVxdWVz
-dCBuYW1lIG9uIHRoZSBzZXNzaW9uIGJ1c1xuIik7CisJCWRidXNfZ19jb25uZWN0aW9uX3VucmVm
-KHNjKTsKKwkJKnJldHZhbCA9IDE7CisJCXJldHVybiBGQUxTRTsKKwl9CisKKwlpZiAocmVxdWVz
-dF9yZXN1bHQgIT0gREJVU19SRVFVRVNUX05BTUVfUkVQTFlfUFJJTUFSWV9PV05FUiAmJiBzaW5n
-bGV0b24pIHsKKwkJcHJveHkgPSBkYnVzX2dfcHJveHlfbmV3X2Zvcl9uYW1lKHNjLCBzZXJ2aWNl
-LCBwYXRoLCAib3JnLmJsdWV6LkFwcGxpY2F0aW9uSW5zdGFuY2UiKTsKKwkJZGJ1c19nX3Byb3h5
-X2NhbGxfbm9fcmVwbHkocHJveHksICJQcmVzZW50IiwgR19UWVBFX0lOVkFMSUQsIEdfVFlQRV9J
-TlZBTElEKTsKKwkJZ19vYmplY3RfdW5yZWYoR19PQkpFQ1QocHJveHkpKTsKKwkJZ19wcmludCgi
-QW5vdGhlciBpbnN0YW5jZSBpcyBhbHJlYWR5IHJ1bm5pbmcuXG4iKTsKKwkJZGJ1c19nX2Nvbm5l
-Y3Rpb25fdW5yZWYoc2MpOworCQkqcmV0dmFsID0gMDsKKwkJcmV0dXJuIEZBTFNFOworCX0KKwor
-CWRidXNfZ19jb25uZWN0aW9uX3JlZ2lzdGVyX2dfb2JqZWN0KHNjLCBwYXRoLCBHX09CSkVDVCAo
-c2VsZikpOworCXByaXYtPmNvbm5lY3Rpb24gPSBzYzsKKwlyZXR1cm4gVFJVRTsKK30KKwordm9p
-ZCAKK2JsdWV0b290aF9hcHBsaWNhdGlvbl9pbnN0YW5jZV9zZXRfd2luZG93IChCbHVldG9vdGhB
-cHBsaWNhdGlvbkluc3RhbmNlICpzZWxmLCBHdGtXaW5kb3cgKndpbmRvdykKK3sKKwlCbHVldG9v
-dGhBcHBsaWNhdGlvbkluc3RhbmNlUHJpdmF0ZSAqcHJpdiA9IEJMVUVUT09USF9BUFBMSUNBVElP
-Tl9JTlNUQU5DRV9HRVRfUFJJVkFURShzZWxmKTsKKwlwcml2LT53aW5kb3cgPSB3aW5kb3c7Cit9
-CisKK2dib29sZWFuCitibHVldG9vdGhfYXBwbGljYXRpb25faW5zdGFuY2VfcHJlc2VudChCbHVl
-dG9vdGhBcHBsaWNhdGlvbkluc3RhbmNlICpzZWxmLCBHRXJyb3IgKiplcnJvcikKK3sKKwlCbHVl
-dG9vdGhBcHBsaWNhdGlvbkluc3RhbmNlUHJpdmF0ZSAqcHJpdiA9IEJMVUVUT09USF9BUFBMSUNB
-VElPTl9JTlNUQU5DRV9HRVRfUFJJVkFURShzZWxmKTsKKwlpZiAocHJpdi0+d2luZG93KQorCQln
-dGtfd2luZG93X3ByZXNlbnQocHJpdi0+d2luZG93KTsKKwlyZXR1cm4gVFJVRTsKK30KKworc3Rh
-dGljIHZvaWQKK2JsdWV0b290aF9hcHBsaWNhdGlvbl9pbnN0YW5jZV9pbml0KEJsdWV0b290aEFw
-cGxpY2F0aW9uSW5zdGFuY2UgKnNlbGYpCit7Cit9CisKK3N0YXRpYyB2b2lkCitibHVldG9vdGhf
-YXBwbGljYXRpb25faW5zdGFuY2VfZmluYWxpemUoR09iamVjdCAqc2VsZikKK3sKKwlCbHVldG9v
-dGhBcHBsaWNhdGlvbkluc3RhbmNlUHJpdmF0ZSAqcHJpdiA9IEJMVUVUT09USF9BUFBMSUNBVElP
-Tl9JTlNUQU5DRV9HRVRfUFJJVkFURShzZWxmKTsKKwlpZiAocHJpdi0+Y29ubmVjdGlvbikKKwkJ
-ZGJ1c19nX2Nvbm5lY3Rpb25fdW5yZWYocHJpdi0+Y29ubmVjdGlvbik7Cit9CisKK3N0YXRpYyB2
-b2lkCitibHVldG9vdGhfYXBwbGljYXRpb25faW5zdGFuY2VfY2xhc3NfaW5pdChCbHVldG9vdGhB
-cHBsaWNhdGlvbkluc3RhbmNlQ2xhc3MgKmtsYXNzKQoreworCWdfdHlwZV9jbGFzc19hZGRfcHJp
-dmF0ZShrbGFzcywgc2l6ZW9mKEJsdWV0b290aEFwcGxpY2F0aW9uSW5zdGFuY2VQcml2YXRlKSk7
-CisJR19PQkpFQ1RfQ0xBU1Moa2xhc3MpLT5maW5hbGl6ZSA9IGJsdWV0b290aF9hcHBsaWNhdGlv
-bl9pbnN0YW5jZV9maW5hbGl6ZTsKKwlkYnVzX2dfb2JqZWN0X3R5cGVfaW5zdGFsbF9pbmZvKEJM
-VUVUT09USF9UWVBFX0FQUExJQ0FUSU9OX0lOU1RBTkNFLAorCQkJJmRidXNfZ2xpYl9ibHVldG9v
-dGhfYXBwbGljYXRpb25faW5zdGFuY2Vfb2JqZWN0X2luZm8pOworfQorCitCbHVldG9vdGhBcHBs
-aWNhdGlvbkluc3RhbmNlICoKK2JsdWV0b290aF9hcHBsaWNhdGlvbl9pbnN0YW5jZV9uZXcodm9p
-ZCkKK3sKKwlyZXR1cm4gZ19vYmplY3RfbmV3KEJMVUVUT09USF9UWVBFX0FQUExJQ0FUSU9OX0lO
-U1RBTkNFLCBOVUxMKTsKK30KZGlmZiAtdXJOIGdub21lL2NvbW1vbi9ibHVldG9vdGgtYXBwbGlj
-YXRpb24taW5zdGFuY2UuaCBnbm9tZS1uZXcvY29tbW9uL2JsdWV0b290aC1hcHBsaWNhdGlvbi1p
-bnN0YW5jZS5oCi0tLSBnbm9tZS9jb21tb24vYmx1ZXRvb3RoLWFwcGxpY2F0aW9uLWluc3RhbmNl
-LmgJMTk2OS0xMi0zMSAxOTowMDowMC4wMDAwMDAwMDAgLTA1MDAKKysrIGdub21lLW5ldy9jb21t
-b24vYmx1ZXRvb3RoLWFwcGxpY2F0aW9uLWluc3RhbmNlLmgJMjAwNy0xMi0wNiAxMToxNjoxOS4w
-MDAwMDAwMDAgLTA1MDAKQEAgLTAsMCArMSw2MyBAQAorLyoKKyAqCisgKiAgQmx1ZVogLSBCbHVl
-dG9vdGggcHJvdG9jb2wgc3RhY2sgZm9yIExpbnV4CisgKgorICogIENvcHlyaWdodCAoQykgMjAw
-NS0yMDA3ICBNYXJjZWwgSG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+CisgKgorICoKKyAq
-ICBUaGlzIGxpYnJhcnkgaXMgZnJlZSBzb2Z0d2FyZTsgeW91IGNhbiByZWRpc3RyaWJ1dGUgaXQg
-YW5kL29yCisgKiAgbW9kaWZ5IGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIExlc3NlciBH
-ZW5lcmFsIFB1YmxpYworICogIExpY2Vuc2UgYXMgcHVibGlzaGVkIGJ5IHRoZSBGcmVlIFNvZnR3
-YXJlIEZvdW5kYXRpb247IGVpdGhlcgorICogIHZlcnNpb24gMi4xIG9mIHRoZSBMaWNlbnNlLCBv
-ciAoYXQgeW91ciBvcHRpb24pIGFueSBsYXRlciB2ZXJzaW9uLgorICoKKyAqICBUaGlzIGxpYnJh
-cnkgaXMgZGlzdHJpYnV0ZWQgaW4gdGhlIGhvcGUgdGhhdCBpdCB3aWxsIGJlIHVzZWZ1bCwKKyAq
-ICBidXQgV0lUSE9VVCBBTlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1wbGllZCB3YXJy
-YW50eSBvZgorICogIE1FUkNIQU5UQUJJTElUWSBvciBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIg
-UFVSUE9TRS4gIFNlZSB0aGUgR05VCisgKiAgTGVzc2VyIEdlbmVyYWwgUHVibGljIExpY2Vuc2Ug
-Zm9yIG1vcmUgZGV0YWlscy4KKyAqCisgKiAgWW91IHNob3VsZCBoYXZlIHJlY2VpdmVkIGEgY29w
-eSBvZiB0aGUgR05VIExlc3NlciBHZW5lcmFsIFB1YmxpYworICogIExpY2Vuc2UgYWxvbmcgd2l0
-aCB0aGlzIGxpYnJhcnk7IGlmIG5vdCwgd3JpdGUgdG8gdGhlIEZyZWUgU29mdHdhcmUKKyAqICBG
-b3VuZGF0aW9uLCBJbmMuLCA1MSBGcmFua2xpbiBTdCwgRmlmdGggRmxvb3IsIEJvc3RvbiwgTUEg
-IDAyMTEwLTEzMDEgIFVTQQorICoKKyAqLworCisjaWZuZGVmIF9fQkxVRVRPT1RIX0FQUExJQ0FU
-SU9OX0lOU1RBTkNFX0gKKyNkZWZpbmUgX19CTFVFVE9PVEhfQVBQTElDQVRJT05fSU5TVEFOQ0Vf
-SAorCisjaW5jbHVkZSA8Z3RrL2d0ay5oPgorCitHX0JFR0lOX0RFQ0xTCisKKyNkZWZpbmUgQkxV
-RVRPT1RIX1RZUEVfQVBQTElDQVRJT05fSU5TVEFOQ0UgKGJsdWV0b290aF9hcHBsaWNhdGlvbl9p
-bnN0YW5jZV9nZXRfdHlwZSgpKQorI2RlZmluZSBCTFVFVE9PVEhfQVBQTElDQVRJT05fSU5TVEFO
-Q0Uob2JqKSAoR19UWVBFX0NIRUNLX0lOU1RBTkNFX0NBU1QoKG9iaiksIFwKKwkJCQlCTFVFVE9P
-VEhfVFlQRV9BUFBMSUNBVElPTl9JTlNUQU5DRSwgQmx1ZXRvb3RoQXBwbGljYXRpb25JbnN0YW5j
-ZSkpCisjZGVmaW5lIEJMVUVUT09USF9BUFBMSUNBVElPTl9JTlNUQU5DRV9DTEFTUyhrbGFzcykg
-KEdfVFlQRV9DSEVDS19DTEFTU19DQVNUKChrbGFzcyksIFwKKwkJCQlCTFVFVE9PVEhfVFlQRV9B
-UFBMSUNBVElPTl9JTlNUQU5DRSwgQmx1ZXRvb3RoQXBwbGljYXRpb25JbnN0YW5jZUNsYXNzKSkK
-KyNkZWZpbmUgQkxVRVRPT1RIX0lTX0FQUExJQ0FUSU9OX0lOU1RBTkNFKG9iaikgKEdfVFlQRV9D
-SEVDS19JTlNUQU5DRV9UWVBFKChvYmopLCBcCisJCQkJCQlCTFVFVE9PVEhfVFlQRV9BUFBMSUNB
-VElPTl9JTlNUQU5DRSkpCisjZGVmaW5lIEJMVUVUT09USF9JU19BUFBMSUNBVElPTl9JTlNUQU5D
-RV9DTEFTUyhrbGFzcykgKEdfVFlQRV9DSEVDS19DTEFTU19UWVBFKChrbGFzcyksIFwKKwkJCQkJ
-CUJMVUVUT09USF9UWVBFX0FQUExJQ0FUSU9OX0lOU1RBTkNFKSkKKyNkZWZpbmUgQkxVRVRPT1RI
-X0dFVF9BUFBMSUNBVElPTl9JTlNUQU5DRV9DTEFTUyhvYmopIChHX1RZUEVfSU5TVEFOQ0VfR0VU
-X0NMQVNTKChvYmopLCBcCisJCQkJQkxVRVRPT1RIX1RZUEVfQVBQTElDQVRJT05fSU5TVEFOQ0Us
-IEJsdWV0b290aEFwcGxpY2F0aW9uSW5zdGFuY2VDbGFzcykpCisKK3R5cGVkZWYgc3RydWN0IF9C
-bHVldG9vdGhBcHBsaWNhdGlvbkluc3RhbmNlIEJsdWV0b290aEFwcGxpY2F0aW9uSW5zdGFuY2U7
-Cit0eXBlZGVmIHN0cnVjdCBfQmx1ZXRvb3RoQXBwbGljYXRpb25JbnN0YW5jZUNsYXNzIEJsdWV0
-b290aEFwcGxpY2F0aW9uSW5zdGFuY2VDbGFzczsKKworc3RydWN0IF9CbHVldG9vdGhBcHBsaWNh
-dGlvbkluc3RhbmNlIHsKKwlHT2JqZWN0IHBhcmVudDsKK307CisKK3N0cnVjdCBfQmx1ZXRvb3Ro
-QXBwbGljYXRpb25JbnN0YW5jZUNsYXNzIHsKKwlHT2JqZWN0Q2xhc3MgcGFyZW50X2NsYXNzOwor
-fTsKKworR1R5cGUgYmx1ZXRvb3RoX2FwcGxpY2F0aW9uX2luc3RhbmNlX2dldF90eXBlKHZvaWQp
-OworQmx1ZXRvb3RoQXBwbGljYXRpb25JbnN0YW5jZSAqYmx1ZXRvb3RoX2FwcGxpY2F0aW9uX2lu
-c3RhbmNlX25ldyh2b2lkKTsKK3ZvaWQgYmx1ZXRvb3RoX2FwcGxpY2F0aW9uX2luc3RhbmNlX3Nl
-dF93aW5kb3coQmx1ZXRvb3RoQXBwbGljYXRpb25JbnN0YW5jZSAqc2VsZiwgR3RrV2luZG93ICp3
-aW5kb3cpOworZ2Jvb2xlYW4gYmx1ZXRvb3RoX2FwcGxpY2F0aW9uX2luc3RhbmNlX3ByZXNlbnQo
-Qmx1ZXRvb3RoQXBwbGljYXRpb25JbnN0YW5jZSAqc2VsZiwgR0Vycm9yICoqZXJyb3IpOworZ2Jv
-b2xlYW4gYmx1ZXRvb3RoX2FwcGxpY2F0aW9uX2luc3RhbmNlX3JlZ2lzdGVyKEJsdWV0b290aEFw
-cGxpY2F0aW9uSW5zdGFuY2UgKnNlbGYsCisJCWludCAqcmV0dmFsLCBnYm9vbGVhbiBzaW5nbGV0
-b24sIGdjaGFyICpwYXRoLCBnY2hhciAqc2VydmljZSk7CisKK0dfRU5EX0RFQ0xTCisKKyNlbmRp
-ZiAvKiBfX0JMVUVUT09USF9BUFBMSUNBVElPTl9JTlNUQU5DRV9IICovCmRpZmYgLXVyTiBnbm9t
-ZS9jb21tb24vYmx1ZXRvb3RoLWFwcGxpY2F0aW9uLWluc3RhbmNlLnhtbCBnbm9tZS1uZXcvY29t
-bW9uL2JsdWV0b290aC1hcHBsaWNhdGlvbi1pbnN0YW5jZS54bWwKLS0tIGdub21lL2NvbW1vbi9i
-bHVldG9vdGgtYXBwbGljYXRpb24taW5zdGFuY2UueG1sCTE5NjktMTItMzEgMTk6MDA6MDAuMDAw
-MDAwMDAwIC0wNTAwCisrKyBnbm9tZS1uZXcvY29tbW9uL2JsdWV0b290aC1hcHBsaWNhdGlvbi1p
-bnN0YW5jZS54bWwJMjAwNy0xMi0wNiAxMToxNjoxOS4wMDAwMDAwMDAgLTA1MDAKQEAgLTAsMCAr
-MSw4IEBACis8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJVVEYtOCIgPz4KKworPG5vZGUg
-bmFtZT0iLyI+CisgIDxpbnRlcmZhY2UgbmFtZT0ib3JnLmJsdWV6LkFwcGxpY2F0aW9uSW5zdGFu
-Y2UiPgorICAgIDxtZXRob2QgbmFtZT0iUHJlc2VudCI+CisgICAgPC9tZXRob2Q+CisgIDwvaW50
-ZXJmYWNlPgorPC9ub2RlPgpkaWZmIC11ck4gZ25vbWUvY29tbW9uL01ha2VmaWxlLmFtIGdub21l
-LW5ldy9jb21tb24vTWFrZWZpbGUuYW0KLS0tIGdub21lL2NvbW1vbi9NYWtlZmlsZS5hbQkyMDA3
-LTA3LTI1IDA2OjI4OjU2LjAwMDAwMDAwMCAtMDQwMAorKysgZ25vbWUtbmV3L2NvbW1vbi9NYWtl
-ZmlsZS5hbQkyMDA3LTEyLTA2IDExOjE2OjAzLjAwMDAwMDAwMCAtMDUwMApAQCAtMywxMiArMywx
-MyBAQAogCiBsaWJjb21tb25fYV9TT1VSQ0VTID0gXAogCQljbGllbnQuaCBjbGllbnQuYyBkZXZp
-Y2Utc3RvcmUuaCBkZXZpY2Utc3RvcmUuYyBcCisJCWJsdWV0b290aC1hcHBsaWNhdGlvbi1pbnN0
-YW5jZS5jIGJsdWV0b290aC1hcHBsaWNhdGlvbi1pbnN0YW5jZS5oIFwKIAkJYmx1ZXRvb3RoLWRl
-dmljZS1zZWxlY3Rpb24uYyBibHVldG9vdGgtZGV2aWNlLXNlbGVjdGlvbi5oCiAKIEFNX0NGTEFH
-UyA9IEBEQlVTX0NGTEFHU0AgQEdUS19DRkxBR1NACiAKIEJVSUxUX1NPVVJDRVMgPSBtYXJzaGFs
-LmggbWFyc2hhbC5jIGRidXMtZ2x1ZS5oIFwKLQkJcGFzc2tleS1hZ2VudC1nbHVlLmggYXV0aC1h
-Z2VudC1nbHVlLmgKKwkJcGFzc2tleS1hZ2VudC1nbHVlLmggYXV0aC1hZ2VudC1nbHVlLmggYXBw
-LWluc3RhbmNlLWdsdWUuaAogCiBub2Rpc3RfbGliY29tbW9uX2FfU09VUkNFUyA9ICQoQlVJTFRf
-U09VUkNFUykKIApAQCAtMjIsNyArMjMsOCBAQAogCiB0ZXN0X2RldmljZXNlbGVjdGlvbl9MREFE
-RCA9IGxpYmNvbW1vbi5hIEBHVEtfTElCU0AgQERCVVNfTElCU0AKIAotRVhUUkFfRElTVCA9IG1h
-cnNoYWwubGlzdCBkYnVzLnhtbCBwYXNza2V5LWFnZW50LnhtbCBhdXRoLWFnZW50LnhtbAorRVhU
-UkFfRElTVCA9IG1hcnNoYWwubGlzdCBkYnVzLnhtbCBwYXNza2V5LWFnZW50LnhtbCBhdXRoLWFn
-ZW50LnhtbCBcCisJCWJsdWV0b290aC1hcHBsaWNhdGlvbi1pbnN0YW5jZS54bWwKIAogTUFJTlRB
-SU5FUkNMRUFORklMRVMgPSBNYWtlZmlsZS5pbgogCkBAIC00MCwzICs0Miw2IEBACiAKIGF1dGgt
-YWdlbnQtZ2x1ZS5oOiBhdXRoLWFnZW50LnhtbAogCSQoREJVU19CSU5ESU5HX1RPT0wpIC0tcHJl
-Zml4PWF1dGhfYWdlbnQgLS1tb2RlPWdsaWItc2VydmVyIC0tb3V0cHV0PSRAICQ8CisKK2FwcC1p
-bnN0YW5jZS1nbHVlLmg6IGJsdWV0b290aC1hcHBsaWNhdGlvbi1pbnN0YW5jZS54bWwKKwkkKERC
-VVNfQklORElOR19UT09MKSAtLXByZWZpeD1ibHVldG9vdGhfYXBwbGljYXRpb25faW5zdGFuY2Ug
-LS1tb2RlPWdsaWItc2VydmVyIC0tb3V0cHV0PSRAICQ8CmRpZmYgLXVyTiBnbm9tZS9wcm9wZXJ0
-aWVzL2JsdWV0b290aC1wcm9wZXJ0aWVzLjEgZ25vbWUtbmV3L3Byb3BlcnRpZXMvYmx1ZXRvb3Ro
-LXByb3BlcnRpZXMuMQotLS0gZ25vbWUvcHJvcGVydGllcy9ibHVldG9vdGgtcHJvcGVydGllcy4x
-CTIwMDctMDctMjIgMTE6MzM6MTMuMDAwMDAwMDAwIC0wNDAwCisrKyBnbm9tZS1uZXcvcHJvcGVy
-dGllcy9ibHVldG9vdGgtcHJvcGVydGllcy4xCTIwMDctMTItMDYgMTE6MzE6MTguMDAwMDAwMDAw
-IC0wNTAwCkBAIC05LDggKzksOSBAQAogLkkgYmx1ZXRvb3RoLXByb3BlcnRpZXMKIGlzIHBhcnQg
-b2YgYmx1ZXotZ25vbWUsIHNlZSBhbHNvIGh0dHA6Ly93d3cuYmx1ZXoub3JnCiAuU0ggT1BUSU9O
-UwotLkkgYmx1ZXRvb3RoLXByb3BlcnRpZXMKLXRha2VzIG5vIG9wdGlvbnMKKy5UUCAKKy5CSSBc
-LVwtc2luZ2xldG9uCitFbnN1cmUgdGhhdCBvbmx5IG9uZSBpbnN0YW5jZSBpcyBydW5uaW5nLgog
-LlNIIEFVVEhPUgogTWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9sdG1hbm4ub3JnPgogLlNIIExJ
-Q0VOU0UKZGlmZiAtdXJOIGdub21lL3Byb3BlcnRpZXMvbWFpbi5jIGdub21lLW5ldy9wcm9wZXJ0
-aWVzL21haW4uYwotLS0gZ25vbWUvcHJvcGVydGllcy9tYWluLmMJMjAwNy0wNy0zMSAxNzozNzoy
-OS4wMDAwMDAwMDAgLTA0MDAKKysrIGdub21lLW5ldy9wcm9wZXJ0aWVzL21haW4uYwkyMDA3LTEy
-LTA2IDExOjE2OjAzLjAwMDAwMDAwMCAtMDUwMApAQCAtNDAsNiArNDAsNyBAQAogI2luY2x1ZGUg
-ImdlbmVyYWwuaCIKICNpbmNsdWRlICJzZXJ2aWNlLmgiCiAjaW5jbHVkZSAiYWRhcHRlci5oIgor
-I2luY2x1ZGUgImJsdWV0b290aC1hcHBsaWNhdGlvbi1pbnN0YW5jZS5oIgogCiBzdGF0aWMgdm9p
-ZCBkZWxldGVfY2FsbGJhY2soR3RrV2lkZ2V0ICp3aW5kb3csIEdka0V2ZW50ICpldmVudCwKIAkJ
-CQkJCWdwb2ludGVyIHVzZXJfZGF0YSkKQEAgLTU4LDcgKzU5LDcgQEAKIAlndGtfbWFpbl9xdWl0
-KCk7CiB9CiAKLXN0YXRpYyB2b2lkIGNyZWF0ZV93aW5kb3coR3RrV2lkZ2V0ICpub3RlYm9vaykK
-K3N0YXRpYyBHdGtXaWRnZXQgKmNyZWF0ZV93aW5kb3coR3RrV2lkZ2V0ICpub3RlYm9vaykKIHsK
-IAlHdGtXaWRnZXQgKndpbmRvdzsKIAlHdGtXaWRnZXQgKndpZGdldDsKQEAgLTEwOCw2ICsxMDks
-NyBAQAogCQkJCQkJd2lkZ2V0LCBfKCJHZW5lcmFsIikpOwogCiAJZ3RrX3dpZGdldF9zaG93X2Fs
-bCh3aW5kb3cpOworCXJldHVybiB3aW5kb3c7CiB9CiAKIHN0YXRpYyB2b2lkIG5hbWVfb3duZXJf
-Y2hhbmdlZChEQnVzR1Byb3h5ICpvYmplY3QsIGNvbnN0IGNoYXIgKm5hbWUsCkBAIC0xNDEsMTcg
-KzE0MywzNyBAQAogCiBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogeworCUdPcHRp
-b25Db250ZXh0ICpjdHg7CiAJR3RrV2lkZ2V0ICpub3RlYm9vazsKKwlHdGtXaWRnZXQgKndpbmRv
-dzsKKwlHRXJyb3IgKmVycm9yID0gTlVMTDsKIAlEQnVzR0Nvbm5lY3Rpb24gKmNvbm47CisJQmx1
-ZXRvb3RoQXBwbGljYXRpb25JbnN0YW5jZSAqYXBwOwogCURCdXNHUHJveHkgKm1hbmFnZXI7Ci0J
-R0Vycm9yICplcnJvciA9IE5VTEw7CisJaW50IHJldHZhbCA9IDA7CisJZ2Jvb2xlYW4gc2luZ2xl
-dG9uID0gRkFMU0U7CiAKKwlHT3B0aW9uRW50cnkgZW50cmllc1tdID0geworCQl7ICJzaW5nbGV0
-b24iLCAwLCAwLCBHX09QVElPTl9BUkdfTk9ORSwgJnNpbmdsZXRvbiwKKwkJICBOXygiT25seSBh
-bGxvdyBvbmUgaW5zdGFuY2Ugb2YgdGhpcyBhcHBsaWNhdGlvbiIpLCBOVUxMIH0sCisJCXsgTlVM
-TCwgMCwgMCwgMCwgTlVMTCwgTlVMTCwgTlVMTCB9CisJfTsKKwkKIAliaW5kdGV4dGRvbWFpbihH
-RVRURVhUX1BBQ0tBR0UsIExPQ0FMRURJUik7CiAJYmluZF90ZXh0ZG9tYWluX2NvZGVzZXQoR0VU
-VEVYVF9QQUNLQUdFLCAiVVRGLTgiKTsKIAl0ZXh0ZG9tYWluKEdFVFRFWFRfUEFDS0FHRSk7CiAK
-IAlndGtfaW5pdCgmYXJnYywgJmFyZ3YpOwogCisJY3R4ID0gZ19vcHRpb25fY29udGV4dF9uZXco
-IiIpOworCWdfb3B0aW9uX2NvbnRleHRfYWRkX21haW5fZW50cmllcyhjdHgsIGVudHJpZXMsIE5V
-TEwpOworCWlmICghZ19vcHRpb25fY29udGV4dF9wYXJzZShjdHgsICZhcmdjLCAmYXJndiwgJmVy
-cm9yKSkgeworCQlnX3ByaW50ZXJyKF8oInBhcnNpbmcgZmFpbGVkOiAlc1xuIiksIGVycm9yLT5t
-ZXNzYWdlKTsKKwkJZ19lcnJvcl9mcmVlKGVycm9yKTsKKwkJZ19vcHRpb25fY29udGV4dF9mcmVl
-KGN0eCk7CisJCXJldHVybiByZXR2YWw7CisJfQorCQogCWNvbm4gPSBkYnVzX2dfYnVzX2dldChE
-QlVTX0JVU19TWVNURU0sICZlcnJvcik7CiAJaWYgKGVycm9yICE9IE5VTEwpIHsKIAkJZ19wcmlu
-dGVycigiQ29ubmVjdGluZyB0byBzeXN0ZW0gYnVzIGZhaWxlZDogJXNcbiIsCkBAIC0xNjMsMTIg
-KzE4NSwxOCBAQAogCXNldHVwX2dlbmVyYWwoKTsKIAogCW5vdGVib29rID0gZ3RrX25vdGVib29r
-X25ldygpOwotCisgICAgCiAJYXNzaWduX2FkYXB0ZXIobm90ZWJvb2spOwogCi0JbWFuYWdlciA9
-IHNldHVwX21hbmFnZXIoY29ubik7CisJd2luZG93ID0gY3JlYXRlX3dpbmRvdyhub3RlYm9vayk7
-CiAKLQljcmVhdGVfd2luZG93KG5vdGVib29rKTsKKwlhcHAgPSBibHVldG9vdGhfYXBwbGljYXRp
-b25faW5zdGFuY2VfbmV3KCk7CisJYmx1ZXRvb3RoX2FwcGxpY2F0aW9uX2luc3RhbmNlX3NldF93
-aW5kb3coYXBwLCBHVEtfV0lORE9XKHdpbmRvdykpOworCWlmKCFibHVldG9vdGhfYXBwbGljYXRp
-b25faW5zdGFuY2VfcmVnaXN0ZXIoYXBwLCAmcmV0dmFsLCBzaW5nbGV0b24sIAorCQkiL29yZy9i
-bHVlei9Qcm9wZXJ0aWVzIiwgIm9yZy5ibHVlei5Qcm9wZXJ0aWVzIikpCisJCWV4aXQocmV0dmFs
-KTsKKwkKKwltYW5hZ2VyID0gc2V0dXBfbWFuYWdlcihjb25uKTsKIAogCWd0a19tYWluKCk7CiAK
-QEAgLTE4MSw2ICsyMDksMTAgQEAKIAlnX29iamVjdF91bnJlZihtYW5hZ2VyKTsKIAogCWRidXNf
-Z19jb25uZWN0aW9uX3VucmVmKGNvbm4pOworICAgIAorCWdfb2JqZWN0X3VucmVmKGFwcCk7CiAK
-KwlnX29wdGlvbl9jb250ZXh0X2ZyZWUoY3R4KTsKKwkKIAlyZXR1cm4gMDsKIH0KZGlmZiAtdXJO
-IGdub21lL3dpemFyZC9ibHVldG9vdGgtd2l6YXJkLjEgZ25vbWUtbmV3L3dpemFyZC9ibHVldG9v
-dGgtd2l6YXJkLjEKLS0tIGdub21lL3dpemFyZC9ibHVldG9vdGgtd2l6YXJkLjEJMjAwNy0wNy0y
-MiAxMTozMzoxMi4wMDAwMDAwMDAgLTA0MDAKKysrIGdub21lLW5ldy93aXphcmQvYmx1ZXRvb3Ro
-LXdpemFyZC4xCTIwMDctMTItMDYgMTE6MzE6NDEuMDAwMDAwMDAwIC0wNTAwCkBAIC05LDggKzks
-OSBAQAogLkkgYmx1ZXRvb3RoLXdpemFyZAogaXMgcGFydCBvZiBibHVlei1nbm9tZSwgc2VlIGFs
-c28gaHR0cDovL3d3dy5ibHVlei5vcmcKIC5TSCBPUFRJT05TCi0uSSBibHVldG9vdGgtd2l6YXJk
-Ci10YWtlcyBubyBvcHRpb25zCisuVFAgCisuQkkgXC1cLXNpbmdsZXRvbgorRW5zdXJlIHRoYXQg
-b25seSBvbmUgaW5zdGFuY2UgaXMgcnVubmluZy4KIC5TSCBBVVRIT1IKIE1hcmNlbCBIb2x0bWFu
-biA8bWFyY2VsQGhvbHRtYW5uLm9yZz4KIC5TSCBMSUNFTlNFCmRpZmYgLXVyTiBnbm9tZS93aXph
-cmQvbWFpbi5jIGdub21lLW5ldy93aXphcmQvbWFpbi5jCi0tLSBnbm9tZS93aXphcmQvbWFpbi5j
-CTIwMDctMDgtMTUgMDM6MDQ6MDMuMDAwMDAwMDAwIC0wNDAwCisrKyBnbm9tZS1uZXcvd2l6YXJk
-L21haW4uYwkyMDA3LTEyLTA2IDExOjE2OjAzLjAwMDAwMDAwMCAtMDUwMApAQCAtMjYsNiArMjYs
-NyBAQAogI2VuZGlmCiAKICNpbmNsdWRlIDxzdHJpbmcuaD4KKyNpbmNsdWRlIDxzdGRsaWIuaD4K
-IAogI2luY2x1ZGUgPGRidXMvZGJ1cy1nbGliLmg+CiAKQEAgLTM4LDYgKzM5LDcgQEAKICNpbmNs
-dWRlICJkYnVzLWdsdWUuaCIKIAogI2luY2x1ZGUgImJsdWV0b290aC1kZXZpY2Utc2VsZWN0aW9u
-LmgiCisjaW5jbHVkZSAiYmx1ZXRvb3RoLWFwcGxpY2F0aW9uLWluc3RhbmNlLmgiCiAKIHN0YXRp
-YyBCbHVldG9vdGhDbGllbnQgKmNsaWVudDsKIApAQCAtMzg3LDcgKzM4OSw3IEBACiAJcGFnZV9z
-dW1tYXJ5ID0gdmJveDsKIH0KIAotc3RhdGljIHZvaWQgY3JlYXRlX3dpemFyZCh2b2lkKQorc3Rh
-dGljIEd0a1dpZGdldCAqY3JlYXRlX3dpemFyZCh2b2lkKQogewogCUd0a1dpZGdldCAqYXNzaXN0
-YW50OwogCkBAIC00MzAsMjMgKzQzMiw1NiBAQAogCWd0a193aWRnZXRfc2hvd19hbGwoYXNzaXN0
-YW50KTsKIAogCWd0a19hc3Npc3RhbnRfdXBkYXRlX2J1dHRvbnNfc3RhdGUoR1RLX0FTU0lTVEFO
-VChhc3Npc3RhbnQpKTsKKwlyZXR1cm4gYXNzaXN0YW50OwogfQogCiBpbnQgbWFpbihpbnQgYXJn
-YywgY2hhciAqYXJndltdKQogeworCUdPcHRpb25Db250ZXh0ICpjdHg7CisJR3RrV2lkZ2V0ICp3
-aW5kb3c7CisJQmx1ZXRvb3RoQXBwbGljYXRpb25JbnN0YW5jZSAqYXBwOworCUdFcnJvciAqZXJy
-b3IgPSBOVUxMOworCWludCByZXR2YWwgPSAwOworCWdib29sZWFuIHNpbmdsZXRvbiA9IEZBTFNF
-OworCisJR09wdGlvbkVudHJ5IGVudHJpZXNbXSA9IHsKKwkJeyAic2luZ2xldG9uIiwgMCwgMCwg
-R19PUFRJT05fQVJHX05PTkUsICZzaW5nbGV0b24sCisJCSAgTl8oIk9ubHkgYWxsb3cgb25lIGlu
-c3RhbmNlIG9mIHRoaXMgYXBwbGljYXRpb24iKSwgTlVMTCB9LAorCQl7IE5VTEwsIDAsIDAsIDAs
-IE5VTEwsIE5VTEwsIE5VTEwgfQorCX07CisJCiAJYmluZHRleHRkb21haW4oR0VUVEVYVF9QQUNL
-QUdFLCBMT0NBTEVESVIpOwogCWJpbmRfdGV4dGRvbWFpbl9jb2Rlc2V0KEdFVFRFWFRfUEFDS0FH
-RSwgIlVURi04Iik7CiAJdGV4dGRvbWFpbihHRVRURVhUX1BBQ0tBR0UpOwogCiAJZ3RrX2luaXQo
-JmFyZ2MsICZhcmd2KTsKIAorCWN0eCA9IGdfb3B0aW9uX2NvbnRleHRfbmV3KCIiKTsKKwlnX29w
-dGlvbl9jb250ZXh0X2FkZF9tYWluX2VudHJpZXMoY3R4LCBlbnRyaWVzLCBOVUxMKTsKKwlpZiAo
-IWdfb3B0aW9uX2NvbnRleHRfcGFyc2UoY3R4LCAmYXJnYywgJmFyZ3YsICZlcnJvcikpIHsKKwkJ
-Z19wcmludGVycihfKCJwYXJzaW5nIGZhaWxlZDogJXNcbiIpLCBlcnJvci0+bWVzc2FnZSk7CisJ
-CWdfZXJyb3JfZnJlZShlcnJvcik7CisJCWdfb3B0aW9uX2NvbnRleHRfZnJlZShjdHgpOworCQly
-ZXR1cm4gcmV0dmFsOworCX0KKwkKIAljbGllbnQgPSBibHVldG9vdGhfY2xpZW50X25ldygpOwog
-Ci0JY3JlYXRlX3dpemFyZCgpOworCXdpbmRvdyA9IGNyZWF0ZV93aXphcmQoKTsKKyAgICAKKwlh
-cHAgPSBibHVldG9vdGhfYXBwbGljYXRpb25faW5zdGFuY2VfbmV3KCk7CisJYmx1ZXRvb3RoX2Fw
-cGxpY2F0aW9uX2luc3RhbmNlX3NldF93aW5kb3coYXBwLCBHVEtfV0lORE9XKHdpbmRvdykpOwor
-CWlmKCFibHVldG9vdGhfYXBwbGljYXRpb25faW5zdGFuY2VfcmVnaXN0ZXIoYXBwLCAmcmV0dmFs
-LCBzaW5nbGV0b24sIAorCQkiL29yZy9ibHVlei9XaXphcmQiLCAib3JnLmJsdWV6LldpemFyZCIp
-KQorCQlleGl0KHJldHZhbCk7CiAKIAlndGtfbWFpbigpOwogCiAJZ19vYmplY3RfdW5yZWYoY2xp
-ZW50KTsKIAorCWdfb2JqZWN0X3VucmVmKGFwcCk7CisKKwlnX29wdGlvbl9jb250ZXh0X2ZyZWUo
-Y3R4KTsKKwkKIAlyZXR1cm4gMDsKIH0K
-------=_Part_6559_7875885.1196963957128
+Marcel
+
+
+
+
+-------------------------------------------------------------------------
+SF.Net email is sponsored by: The Future of Linux Business White Paper
+from Novell.  From the desktop to the data center, Linux is going
+mainstream.  Let it simplify your IT future.
+<a class="moz-txt-link-freetext" href="http://altfarm.mediaplex.com/ad/ck/8857-50307-18918-4">http://altfarm.mediaplex.com/ad/ck/8857-50307-18918-4</a>
+_______________________________________________
+Bluez-devel mailing list
+<a class="moz-txt-link-abbreviated" href="mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourceforge.net</a>
+<a class="moz-txt-link-freetext" href="https://lists.sourceforge.net/lists/listinfo/bluez-devel">https://lists.sourceforge.net/lists/listinfo/bluez-devel</a>
+  </pre>
+</blockquote>
+<br>
+</body>
+</html>
+
+--------------090105080808090506050709--
+
+--------------090909000705020901050508
+Content-Type: text/x-patch;
+ name="handsfreeconnect.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="handsfreeconnect.patch"
+
+diff --git a/audio/headset.c b/audio/headset.c
+index 6cb5406..98d2836 100644
+--- a/audio/headset.c
++++ b/audio/headset.c
+@@ -99,6 +99,7 @@ struct headset {
+ 	int data_start;
+ 	int data_length;
+ 
++	int enable_hfp;
+ 	headset_type_t type;
+ 
+ 	headset_state_t state;
+@@ -111,6 +112,7 @@ struct headset {
+ };
+ 
+ static int rfcomm_connect(struct device *device, struct pending_connect *c);
++static int get_handles(struct device *device, struct pending_connect *c);
+ 
+ static void pending_connect_free(struct pending_connect *c)
+ {
+@@ -640,11 +642,21 @@ static void get_record_reply(DBusPendingCall *call, void *data)
+ 		goto failed_not_supported;
+ 	}
+ 
+-	if ((uuid.type == SDP_UUID32 &&
++	if (hs->type == SVC_HEADSET &&
++			((uuid.type == SDP_UUID32 &&
+ 			uuid.value.uuid32 != HEADSET_SVCLASS_ID) ||
+ 			(uuid.type == SDP_UUID16 &&
+-			 uuid.value.uuid16 != HEADSET_SVCLASS_ID)) {
+-		error("Service classes did not contain the expected UUID");
++			 uuid.value.uuid16 != HEADSET_SVCLASS_ID))) {
++		error("Service classes did not contain the expected UUID hsp");
++		goto failed_not_supported;
++	}
++
++	if (hs->type == SVC_HANDSFREE &&
++			((uuid.type == SDP_UUID32 &&
++			uuid.value.uuid32 != HANDSFREE_SVCLASS_ID) ||
++			(uuid.type == SDP_UUID16 &&
++			 uuid.value.uuid16 != HANDSFREE_SVCLASS_ID))) {
++		error("Service classes did not contain the expected UUID hfp");
+ 		goto failed_not_supported;
+ 	}
+ 
+@@ -750,7 +762,17 @@ static void get_handles_reply(DBusPendingCall *call, void *data)
+ 	}
+ 
+ 	if (array_len < 1) {
+-		debug("No record handles found");
++
++		if(hs->type == SVC_HANDSFREE) {
++			debug("No record handles found for hfp");
++			hs->type = SVC_HEADSET;
++			get_handles(device, c);
++			dbus_message_unref(reply);
++			return;
++		}
++
++		debug("No record handles found for hsp");
++
+ 		if (c->msg)
+ 			error_not_supported(device->conn, c->msg);
+ 		goto failed;
+@@ -862,7 +884,7 @@ static int rfcomm_connect(struct device *device, struct pending_connect *c)
+ 		if (!g_slist_find(hs->pending, c))
+ 			hs->pending = g_slist_append(hs->pending, c);
+ 
+-		hs->type = hs->hfp_handle ? SVC_HANDSFREE : SVC_HEADSET;
++		hs->type = hs->enable_hfp ? SVC_HANDSFREE : SVC_HEADSET;
+ 
+ 		if (hs->state == HEADSET_STATE_DISCONNECTED)
+ 			return get_handles(device, c);
+@@ -1368,8 +1390,8 @@ void headset_update(struct device *dev, sdp_record_t *record, uint16_t svc)
+ 	headset_set_channel(headset, record);
+ }
+ 
+-struct headset *headset_init(struct device *dev, sdp_record_t *record,
+-				uint16_t svc)
++struct headset *headset_init(struct device *dev, int enable_hfp,
++				sdp_record_t *record, uint16_t svc)
+ {
+ 	struct headset *hs;
+ 
+@@ -1377,6 +1399,7 @@ struct headset *headset_init(struct device *dev, sdp_record_t *record,
+ 	hs->rfcomm_ch = -1;
+ 	hs->sp_gain = -1;
+ 	hs->mic_gain = -1;
++	hs->enable_hfp = enable_hfp;
+ 
+ 	if (!record)
+ 		goto register_iface;
+diff --git a/audio/headset.h b/audio/headset.h
+index 5e19cd9..b151dbd 100644
+--- a/audio/headset.h
++++ b/audio/headset.h
+@@ -54,8 +54,8 @@ typedef enum {
+ 
+ typedef void (*headset_stream_cb_t) (struct device *dev, void *user_data);
+ 
+-struct headset *headset_init(struct device *dev, sdp_record_t *record,
+-				uint16_t svc);
++struct headset *headset_init(struct device *dev, int enable_hfp,
++				sdp_record_t *record, uint16_t svc);
+ 
+ void headset_free(struct device *dev);
+ 
+diff --git a/audio/manager.c b/audio/manager.c
+index 507f60a..6f690f9 100644
+--- a/audio/manager.c
++++ b/audio/manager.c
+@@ -108,6 +108,7 @@ static GIOChannel *hs_server = NULL;
+ static GIOChannel *hf_server = NULL;
+ 
+ static const struct enabled_interfaces *enabled;
++static gboolean enable_hfp = FALSE;
+ 
+ static void get_next_record(struct audio_sdp_data *data);
+ static DBusHandlerResult get_handles(const char *uuid,
+@@ -213,7 +214,7 @@ done:
+ 	return uuid16;
+ }
+ 
+-static gboolean server_is_enabled(uint16_t svc)
++gboolean server_is_enabled(uint16_t svc)
+ {
+ 	gboolean ret;
+ 
+@@ -254,6 +255,7 @@ static void handle_record(sdp_record_t *record, struct device *device)
+ 			headset_update(device, record, uuid16);
+ 		else
+ 			device->headset = headset_init(device,
++							enable_hfp,
+ 							record, uuid16);
+ 		break;
+ 	case HEADSET_AGW_SVCLASS_ID:
+@@ -265,6 +267,7 @@ static void handle_record(sdp_record_t *record, struct device *device)
+ 			headset_update(device, record, uuid16);
+ 		else
+ 			device->headset = headset_init(device,
++							enable_hfp,
+ 							record, uuid16);
+ 		break;
+ 	case HANDSFREE_AGW_SVCLASS_ID:
+@@ -645,7 +648,7 @@ struct device *manager_device_connected(bdaddr_t *bda, const char *uuid)
+ 		if (device->headset)
+ 			return device;
+ 
+-		device->headset = headset_init(device, NULL, 0);
++		device->headset = headset_init(device, enable_hfp, NULL, 0);
+ 
+ 		if (!device->headset)
+ 			return NULL;
+@@ -1070,7 +1073,7 @@ static void parse_stored_devices(char *key, char *value, void *data)
+ 	bacpy(&device->store, src);
+ 
+ 	if (enabled->headset && strstr(value, "headset"))
+-		device->headset = headset_init(device, NULL, 0);
++		device->headset = headset_init(device, enable_hfp, NULL, 0);
+ 	if (enabled->sink && strstr(value, "sink"))
+ 		device->sink = sink_init(device);
+ 	if (enabled->control && strstr(value, "control"))
+@@ -1561,6 +1564,8 @@ static int headset_server_init(DBusConnection *conn, gboolean no_hfp)
+ 	if (no_hfp)
+ 		return 0;
+ 
++	enable_hfp = TRUE;
++
+ 	chan = DEFAULT_HF_AG_CHANNEL;
+ 
+ 	hf_server = server_socket(&chan);
+
+--------------090909000705020901050508
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -448,7 +334,7 @@ SF.Net email is sponsored by: The Future of Linux Business White Paper
 from Novell.  From the desktop to the data center, Linux is going
 mainstream.  Let it simplify your IT future.
 http://altfarm.mediaplex.com/ad/ck/8857-50307-18918-4
-------=_Part_6559_7875885.1196963957128
+--------------090909000705020901050508
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -459,4 +345,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-------=_Part_6559_7875885.1196963957128--
+--------------090909000705020901050508--
