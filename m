@@ -1,11 +1,11 @@
 Return-Path: <bluez-devel-bounces@lists.sourceforge.net>
-From: Andrew Kohlsmith <aklists@mixdown.ca>
-To: bluez-devel@lists.sourceforge.net
-Date: Fri, 7 Dec 2007 09:37:20 -0500
-References: <20071207092240.jtm1je3tcc4cwo40@www.nexusmail.uwaterloo.ca>
+Date: Fri, 7 Dec 2007 15:40:49 +0100 (CET)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <20071207092240.jtm1je3tcc4cwo40@www.nexusmail.uwaterloo.ca>
+Message-ID: <Pine.LNX.4.63.0712071526020.24788@redbean.intranet.gw-instruments.de>
+References: <20071207092240.jtm1je3tcc4cwo40@www.nexusmail.uwaterloo.ca>
 MIME-Version: 1.0
-Message-Id: <200712070937.20497.aklists@mixdown.ca>
 Subject: Re: [Bluez-devel] BlueZ protocol stack on microcontroller
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,24 +20,45 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Friday 07 December 2007 09:22:40 gpolack@engmail.uwaterloo.ca wrote:
-> I'm new to using Bluetooth modules and would appreciate some guidance.
-> I'm connecting a Bluetooth module that has a UART interface to a
-> microcontroller, and I wish to use the BlueZ protocol stack to talk to
-> the module but I know nothing about how the protocol works. Can it be
-> configured to talk via UART to the module? Also, what is the minimal
-> set of functions one would need for simple data transfer between two
-> Bluetooth modules, no stereo audio, or other fancy stuff? My questions
+
+Jorge,
+
+> Hello,
+> 
+> I'm new to using Bluetooth modules and would appreciate some guidance.  
+> I'm connecting a Bluetooth module that has a UART interface to a  
+> microcontroller, and I wish to use the BlueZ protocol stack to talk to  
+> the module but I know nothing about how the protocol works. Can it be  
+> configured to talk via UART to the module? Also, what is the minimal  
+> set of functions one would need for simple data transfer between two  
+> Bluetooth modules, no stereo audio, or other fancy stuff? My questions  
 > will get more specific as I start understanding how this all works.
+> 
+> Thank you,
+> Jorge
 
-You want to use the hciattach.  I have used this on one of my MCF5282 designs 
-when talking to A7eng's bluetooth modules.
+when your micro runs linux, then you should use Bluez. But from your mail
+I suggest it doesn't. Than BlueZ won't be an real option because it
+heavily depends on the operating system.
+ 
+In the latter case you may
+a) buy a commercial BT stack which is not OS dependend.
+b) write your own stack (I don't think to use BlueZ as a base would be a  
+good idea)
+c) use a BT chip / modul with build in stack
 
-hciattach creates an hci device and brokers all requests over the UART to the 
-bluetooth module.  From that point on you use everyday standard utilities to 
-manipulate the hci device that was created.
+Ciao, 
 
--A.
+Peter 
+
+
+
+
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
+
 
 -------------------------------------------------------------------------
 SF.Net email is sponsored by:
