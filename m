@@ -1,10 +1,10 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Fri, 7 Dec 2007 04:44:00 -0800 (PST)
-From: akna akna <akmarot@yahoo.com.ar>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <97aa57970712062200s630fac39ha145987f95741b5c@mail.gmail.com>
+Date: Fri, 7 Dec 2007 14:00:33 +0800
+From: "benson dong" <dongas86.bluez@gmail.com>
+To: Bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Message-ID: <124596.58763.qm@web56115.mail.re3.yahoo.com>
-Subject: [Bluez-users] Bluez Pin Issue
+Subject: [Bluez-users] Problems when playing bluetooth A2DP
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,47 +14,95 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0864486211=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0864486211==
-Content-Type: multipart/alternative; boundary="0-1277453648-1197031440=:58763"
+Hi all
+    I used aplay from alsa-utils to play audio through bluetooth A2DP
+,but i could hear only a few seconds of the music from the headset
+,then the audio ended and the "xrun" error happened. This error has
+bothered me for several days .It's so hard to deal and now i think i
+really need your help.If there's anyone who knows about this error and
+how to get rid of it please tell me ,i would really appreciate your
+help!
 
---0-1277453648-1197031440=:58763
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-=0AHello guys, i upgrade in my debian system to bluez 3.22 (from cvs) and=
-=0Awhen i use obexftp is always asking me for the pin (whit 3.1* was workin=
-g=0Afine)  ...  i  have the hcid.conf whit security none; (the name is work=
-ing=0Awhit that hcid.conf)  ... how can i know what is the problem ?=0A=0AB=
-est Regards,=0AJerif=0A=0A=0A=0A=0A      Tarjeta de cr=C3=A9dito Yahoo! de =
-Banco Supervielle.=0ASolicit=C3=A1 tu nueva Tarjeta de cr=C3=A9dito. De tu =
-PC directo a tu casa. www.tuprimeratarjeta.com.ar 
---0-1277453648-1197031440=:58763
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-<html><head><style type=3D"text/css"><!-- DIV {margin:0px;} --></style></he=
-ad><body><div style=3D"font-family:times new roman, new york, times, serif;=
-font-size:12pt"><div>=0A              <br><pre>Hello guys, i upgrade in my =
-debian system to bluez 3.22 (from cvs) and<br>when i use obexftp is always =
-asking me for the pin (whit 3.1* was working<br>fine)  ...  i  have the hci=
-d.conf whit security none; (the name is working<br>whit that hcid.conf)  ..=
-. how can i know what is the problem ?<br><br>Best Regards,<br>Jerif<br></p=
-re></div></div><br>=0A      <hr size=3D1><br><font face=3D"Verdana" size=3D=
-"-2">Tarjeta de cr=C3=A9dito Yahoo! de Banco Supervielle.=0ASolicit=C3=A1 t=
-u nueva Tarjeta de cr=C3=A9dito. De tu PC directo a tu casa. <br> Visit=C3=
-=A1 www.tuprimeratarjeta.com.ar</font></body></html>
---0-1277453648-1197031440=:58763--
+My board is arm920t and kernel is Montavista 2.6.18 .The alsa lib and
+alsa utils vertion are 1.0.15.
+Here is the configure parameter of bluez-utils 3.3.2
+./configure --host=arm-9tdmi-linux-gnu
+--prefix=/work/install/bluetooth1/ --enable-test --enable-usb
+--enable-input --enable-obex --enable-serial --enable-initscripts
+--enable-bccmd --enable-cups --disable-pcmia --enable-alsa
+--enable-audio --enable-shared --enable-avctrl --enable-network
+PKG_CONFIG=pkg-config
 
 
---===============0864486211==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+The error log is as follows:
+/ # aplay -D bluetooth 1.wav
+audio[320]: Accepted new client connection on unix socket (fd=8)
+audio[320]: Package PKT_TYPE_CFG_REQ:0
+audio[320]: avdtp_ref(0x2d9c8): ref=2
+audio[320]: a2dp_source_request_stream: selected SEP 0x2d228
+audio[320]: avdtp_ref(0x2d9c8): ref=3
+hcid[313]: link_key_request (sba=11:11:11:11:11:11, dba=00:0D:3C:EB:53:F0)
+audio[320]: AVDTP: connected signaling channel to 00:0D:3C:EB:53:F0
+audio[320]: session_cb
+audio[320]: DISCOVER request succeeded
+audio[320]: seid 1 type 1 media 0 in use 0
+audio[320]: seid 2 type 1 media 0 in use 0
+audio[320]: session_cb
+audio[320]: GET_CAPABILITIES request succeeded
+audio[320]: seid 1 type 1 media 0
+audio[320]: session_cb
+audio[320]: GET_CAPABILITIES request succeeded
+audio[320]: seid 2 type 1 media 0
+audio[320]: Discovery complete
+audio[320]: avdtp_set_configuration(0x2d9c8): int_seid=1, acp_seid=1
+audio[320]: session_cb
+audio[320]: SET_CONFIGURATION request succeeded
+audio[320]: SBC Source: Set_Configuration_Cfm
+audio[320]: avdtp_ref(0x2d9c8): ref=4
+audio[320]: stream state changed: IDLE -> CONFIGURED
+audio[320]: session_cb
+audio[320]: OPEN request succeeded
+audio[320]: stream state changed: CONFIGURED -> OPEN
+audio[320]: AVCTP: connected to 00:0D:3C:EB:53:F0
+input: i.Tech Clip Radio as /class/input/input1
+audio[320]: AVRCP: uinput initialized for i.Tech Clip Radio
+audio[320]: AVDTP: connected transport channel to 00:0D:3C:EB:53:F0
+audio[320]: SBC Source: Open_Cfm
+audio[320]: session_cb
+audio[320]: START request succeeded
+audio[320]: SBC Source: Start_Cfm
+audio[320]: SBC Source SEP 0x2d228 locked
+audio[320]: fd=11, fd_opt=1, pkt_len=672, sample_size=2, rate=44100
+audio[320]: 34 bytes sent
+audio[320]: 1 bytes sent
+audio[320]: avdtp_unref(0x2d9c8): ref=3
+audio[320]: stream state changed: OPEN -> STREAMING
+Playing WAVE '1.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Stereo
+aplay: xrun:1094: read/write error, state = RUNNING
+<-----------------xrun error here------------
+audio[320]: Unix client disconnected (fd=8)
+audio[320]: SBC Source SEP 0x2d228 unlocked
+audio[320]: avdtp_unref(0x2d9c8): ref=2
+/ # audio[320]: session_cb
+audio[320]: SUSPEND request succeeded
+audio[320]: stream state changed: STREAMING -> OPEN
+audio[320]: SBC Source: Suspend_Cfm
+audio[320]: session_cb
+audio[320]: CLOSE request succeeded
+audio[320]: stream state changed: OPEN -> CLOSING
+audio[320]: SBC Source: Close_Cfm
+audio[320]: stream state changed: CLOSING -> IDLE
+audio[320]: avdtp_unref(0x2d9c8): ref=1
+audio[320]: Disconnected from 00:0D:3C:EB:53:F0
+audio[320]: avdtp_unref(0x2d9c8): ref=0
+audio[320]: avdtp_unref(0x2d9c8): freeing session and removing from list
+
+Best Regards!
+Dongas
 
 -------------------------------------------------------------------------
 SF.Net email is sponsored by:
@@ -62,15 +110,7 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
---===============0864486211==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0864486211==--
