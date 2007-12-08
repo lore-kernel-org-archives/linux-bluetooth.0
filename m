@@ -1,14 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Message-ID: <475B2922.5090001@aircable.net>
-Date: Sat, 08 Dec 2007 20:30:42 -0300
-From: Manuel Naranjo <manuel@aircable.net>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <475B263E.4060801@aircable.net>
 References: <1197153708.12292.247.camel@violet> <475B263E.4060801@aircable.net>
-	<1197156509.12292.251.camel@violet>
-In-Reply-To: <1197156509.12292.251.camel@violet>
-Subject: Re: [Bluez-users] [BlueZ-Announce] Release of bluez-libs-3.23	and
- bluez-utils-3.23
+Date: Sun, 09 Dec 2007 00:28:29 +0100
+Message-Id: <1197156509.12292.251.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] [BlueZ-Announce] Release of bluez-libs-3.23
+	and	bluez-utils-3.23
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,25 +21,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi Manuel,
+
+> I think there's a bug in the automake scripts, both bluez-libs and
+> bluez-utils. In 64 bits systems if there's lib64 present then both
+> packages are trying to install to lib instead of lib64. I sent a rather
+> simple patch for this, but I think it should be more complex, and it
+> didn't applied to libs only utils
+
+the bluez-utils is not installing any libraries. Never has been and
+never will be.
+
+For the bluez-libs this is on purpose and you can overwrite it with
+--libdir when calling configure. All distros are different and
+especially with the new multi-arch stuff.
+
+Regards
+
 Marcel
-> the bluez-utils is not installing any libraries. Never has been and
-> never will be.
->   
-You are right, but it install the services inside the lib folder, and
-that's making conflicts. If you don't get those to the right folder
-(lib64) in this case, then when you want to use any of those services
-(serial service for example) via dbus you get an error telling that the
-elf version is not right (even though it is, it's elf64)
 
-> For the bluez-libs this is on purpose and you can overwrite it with
-> --libdir when calling configure. All distros are different and
-> especially with the new multi-arch stuff
->   
-Ok, isn't there a way to know this from autotools? Actually this is the
-only project that I had faced with such problems.
 
-Thanks,
-Manuel Naranjo
 
 -------------------------------------------------------------------------
 SF.Net email is sponsored by:
