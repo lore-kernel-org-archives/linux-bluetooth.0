@@ -1,13 +1,13 @@
 Return-Path: <bluez-users-bounces@lists.sourceforge.net>
-Date: Sat, 8 Dec 2007 13:57:43 +0100
-From: Didier Link <didier@famille-link.fr>
+From: Fabrice =?iso-8859-1?q?M=E9nard?= <menard.fabrice@orange.fr>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20071208135743.681df20f@neutrino.cosmos.net>
-In-Reply-To: <200712081125.03678.>
+Date: Sat, 8 Dec 2007 11:25:03 +0100
 References: <1196009038.14897.6.camel@pico>
 	<a8e1da0711291706h68d1d19ajc3819f8836cf51e8@mail.gmail.com>
-	<20071208004239.234a0406@neutrino.cosmos.net> <200712081125.03678.>
-Mime-Version: 1.0
+	<20071208004239.234a0406@neutrino.cosmos.net>
+In-Reply-To: <20071208004239.234a0406@neutrino.cosmos.net>
+MIME-Version: 1.0
+Message-Id: <200712081125.03678.>
 Subject: Re: [Bluez-users] Lost connections - mouse and keyboard
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -18,53 +18,46 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpMZSBTYXQs
-IDggRGVjIDIwMDcgMTE6MjU6MDMgKzAxMDAsDQpGYWJyaWNlIE3DqW5hcmQgPG1lbmFyZC5mYWJy
-aWNlQG9yYW5nZS5mcj4gYSDDqWNyaXQgOg0KDQo+IE9uIFNhdHVyZGF5IDA4IERlY2VtYmVyIDIw
-MDcgMDA6NDI6MzkgRGlkaWVyIExpbmsgd3JvdGU6DQo+ID4gSGkgYWxsLA0KPiA+DQo+ID4gSnVz
-dCBmb3IgYWRkIHNvbWV0aGluZyBvbiB0aGlzIGJ1ZyByZXBvcnQsIEkndmUgdGhlIHNhbWUgaGFy
-ZHdhcmUNCj4gPiAoTG9naXRlY2ggZGlub3ZvIGtleWJvYXJkK21vdXNlKSwgY29ubmVjdGVkIHdp
-dGggYmx1ZXRvb3RoDQo+ID4gaGNpZC9ibHVldG9vdGhkLXNlcnZpY2UtaW5wdXQNCj4gPg0KPiA+
-IEZpcnN0IG9mIGFsbCwgdGhpcyB3b3JrIHZlcnkgd2VsbCBhdCBmaXJzdCBydW4gYW5kIGFsbCB0
-aGUgdGltZSBJDQo+ID4gaW50ZXJhY3Qgd2l0aCBrZXlib2FyZCBhbmQgbW91c2UsIHZlcnkgZ29v
-ZCBqb2Igb2YgdGhlIGJsdWV6IHN0YWNrDQo+ID4gZGV2ZWxvcHBlcnMgIQ0KPiA+DQo+ID4gQnV0
-LCBsaWtlIEJyYWQsIGFmdGVyIGFuIGFtb3VudCBvZiBpbmFjdGl2aXR5IChhYm91dCAyMCBtaW51
-dGVzDQo+ID4gSSB0aGluayAuLi4pIHRoZSBkZXZpY2VzIGdvIHRvIHNsZWVwIG1vZGUgYW5kIG5l
-dmVyIHJlY29ubmVjdC4gSQ0KPiA+IG5lZWQgdG8gcmVzdGFydCB0aGUgYmx1ZXRvb3RoIHNlcnZp
-Y2UgYXQgYWxsLCB3aXRoIGFub3RoZXIgdXNiDQo+ID4ga2V5Ym9hcmQuIE15IGtlcm5lbCBsb2cg
-Y29udGFpbiB0aGUgc2FtZSB3YXJuaW5ncyBhcyBCcmFkIGVhY2ggdGltZQ0KPiA+IHRoZSBzZXJ2
-aWNlIGlzIHJlc3RhcnRlZC4NCg0KSGkgRmFicmljZSwNCg0KPiANCj4gSSBoYWQgYSBzaW1pbGFy
-IHByb2JsZW0sIHNlZSBteSBwb3N0IGZvciBhIHBvc3NpYmxlIHNvbHV0aW9uIChpdA0KPiB3b3Jr
-cyBmb3IgbWUpOg0KPiBodHRwOi8vYXJ0aWNsZS5nbWFuZS5vcmcvZ21hbmUubGludXguYmx1ZXou
-dXNlci8xMjk4OC9tYXRjaD1kaW5vdm8NCg0KVGhhbmtzIGZvciB0aGlzIGxpbmssIEkndmUgbWlz
-c2VkIHlvdXIgbWVzc2FnZSBhbmQgSSdtIG5vdCBhbG9uZQ0KYmVjYXVzZSBub2JvZHkgZnJvbSBi
-bHVleiBkZXZlbG9wZXJzIGhhdmUgY29tbWVudGVkIHlvdSBwb3N0IC4uLiA6KA0KDQpJIGtub3cg
-Ymx1ZXogaXMgYSBsb3Qgb2Ygd29yayBmb3IgTWFyY2VsIGFuZCBvdGhlcnMgYnV0IEkgdGhpbmsg
-dGhpcw0KaXNzdWUgaXMgaW1wb3J0YW50IGZvciBhbGwgZGlub3ZvIHVzZXJzLCBhbmQgbWF5YmUg
-b3RoZXJzIGtleWJvYXJkIHNldA0KZnJvbSBMb2dpdGVjaCA/DQoNCkFzIERhdmUgWW91bmcgcG9p
-bnRlZCBiZWZvcmUsIEkgdGhpbmsgdGhpcyB3YXJuaW5nIChhbmQgdGhlIG9vcHNlIEkNCnBvc3Rl
-ZCkgbmVlZCB0byBiZSBmaXhlZCBmb3IgaW1wcm92ZSBrZXJuZWwgc3RhYmlsaXR5Lg0KDQpGaW5h
-bGx5LCBGYWJyaWNlLCB5b3VyIHBhdGNoZXMgYXJlbid0IGFjY2Vzc2libGUgd2l0aCB0aGUgc291
-cmNlZm9yZ2UNCmFuZCBnbWFuZSBhcmNoaXZlcyBvZiB0aGUgbGlzdCwgY2FuIHlvdSByZXNlbmQg
-b3IgcHV0IGl0IG9uIHBhc3RlYmluIG9yDQpvdGhlciB3ZWIgbG9jYXRpb24gcGxlYXNlID8/DQoN
-ClRoYW5rcyBhIGxvdCBmb3IgdGhlIGdvb2Qgd29yayBhbmQgYmVzdCByZWdhcmRzLg0KDQpEaWRp
-ZXIgTGluaw0KDQpwczogdGhlIGxhc3QgLW1oMSBwYXRjaCBmb3Iga2VybmVsIDIuNi4yMyBkb2Vz
-bid0IHNvbHZlIHRoZQ0Kc2xlZXAvcmVjb25uZWN0IGlzc3VlLg0KDQotIC0tIA0KRGlkaWVyIExp
-bmsgPGRpZGllckBmYW1pbGxlLWxpbmsuZnI+DQpKYWJiZXIgOiBkaWRpZXJfbGlua0BqYWJiZXIu
-ZnINCk1TTiA6IHphbmZpYkBob3RtYWlsLmZyDQpTSVAgOiBaYW5maWJAZWtpZ2EubmV0DQoNCkNs
-w6kgR1BHIDogNzVCQUM5RUUNCi0tLS0tQkVHSU4gUEdQIFNJR05BVFVSRS0tLS0tDQpWZXJzaW9u
-OiBHbnVQRyB2MS40LjcgKEdOVS9MaW51eCkNCg0KaUQ4REJRRkhXcFRIa3lQd2luVzZ5ZTRSQXBX
-a0FKOUtORWdDdFJCUU1uTHpSZkRRRUtQRG1Jbk5MQUNmYlBkMQ0KQUdpcUdxZVZVNzRseHhCdHNV
-VXFSOFU9DQo9V0hOWQ0KLS0tLS1FTkQgUEdQIFNJR05BVFVSRS0tLS0tDQotLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tClNGLk5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6CkNoZWNrIG91dCB0aGUgbmV3IFNvdXJj
-ZUZvcmdlLm5ldCBNYXJrZXRwbGFjZS4KSXQncyB0aGUgYmVzdCBwbGFjZSB0byBidXkgb3Igc2Vs
-bCBzZXJ2aWNlcyBmb3IKanVzdCBhYm91dCBhbnl0aGluZyBPcGVuIFNvdXJjZS4KaHR0cDovL3Nv
-dXJjZWZvcmdlLm5ldC9zZXJ2aWNlcy9idXkvaW5kZXgucGhwCl9fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdApCbHVl
-ei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5u
-ZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
+On Saturday 08 December 2007 00:42:39 Didier Link wrote:
+> Hi all,
+>
+> Just for add something on this bug report, I've the same hardware
+> (Logitech dinovo keyboard+mouse), connected with bluetooth
+> hcid/bluetoothd-service-input
+>
+> First of all, this work very well at first run and all the time I
+> interact with keyboard and mouse, very good job of the bluez stack
+> developpers !
+>
+> But, like Brad, after an amount of inactivity (about 20 minutes
+> I think ...) the devices go to sleep mode and never reconnect. I need to
+> restart the bluetooth service at all, with another usb keyboard. My
+> kernel log contain the same warnings as Brad each time the service is
+> restarted.
+
+I had a similar problem, see my post for a possible solution (it works for =
+
+me):
+http://article.gmane.org/gmane.linux.bluez.user/12988/match=3Ddinovo
+
+Regards,
+
+Fabrice M=E9nard
+
+
+
+
+-------------------------------------------------------------------------
+SF.Net email is sponsored by:
+Check out the new SourceForge.net Marketplace.
+It's the best place to buy or sell services for
+just about anything Open Source.
+http://sourceforge.net/services/buy/index.php
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
