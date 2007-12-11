@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: M.E.M.Lijding@ewi.utwente.nl
-MIME-Version: 1.0
-Date: Tue, 11 Dec 2007 15:08:36 +0100
-Message-ID: <FA783DEE7533904091C5F59BF22169ADFCC34A@EWIEX12.dynamic.ewi.utwente.nl>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Problems opening L2CAP connections concurrently
+To: bluez-users@lists.sourceforge.net
+From: Johan Brannlund <johan_brn@yahoo.com>
+Date: Tue, 11 Dec 2007 02:06:55 +0000 (UTC)
+Message-ID: <pan.2007.12.11.02.06.55@yahoo.com>
+Mime-Version: 1.0
+Subject: [Bluez-users] Headset not working with audio service
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,120 +18,64 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
- 
-I'm trying to open concurrently L2CAP connections to different Bluetooth
-devices. What I experience is that opening the connection occurs in a
-sequential manner. This becomes a problem especially when a device is
-not in range, because then the other connection requests get delayed by
-the page timeout. 
- 
-I should like to know if this is a problem of Bluetooth, BlueZ, the
-firmware (I've tried Belkin F8T012 and FT8012xx1) or something else?
- 
-Do you have any suggestions to solve the problem? 
- 
-Here is the output of hcidump of a program with 4 threads each trying to
-open a connection to a different device. Only one device was available
-(the one corresponding to the third thread launched 39 C7 06 E4 18 00).
-The page timeout is set to 6.25 seconds.
- 
-sudo hcidump -tx
-HCI sniffer - Bluetooth packet analyzer ver 1.39
-device: hci0 snap_len: 1028 filter: 0xffffffff
-1197140124.182914 < HCI Command: Create Connection (0x01|0x0005) plen 13
-  8B C9 06 E4 18 00 18 CC 02 00 00 00 01
-1197140124.185025 > HCI Event: Command Status (0x0f) plen 4
-  00 01 05 04
-1197140124.185892 < HCI Command: Create Connection (0x01|0x0005) plen 13
-  8A C9 06 E4 18 00 18 CC 02 00 00 00 01
-1197140124.188024 > HCI Event: Command Status (0x0f) plen 4
-  00 01 05 04
-1197140124.188051 < HCI Command: Create Connection (0x01|0x0005) plen 13
-  39 C7 06 E4 18 00 18 CC 02 00 00 00 01
-1197140124.191024 > HCI Event: Command Status (0x0f) plen 4
-  00 01 05 04
-1197140124.191063 < HCI Command: Create Connection (0x01|0x0005) plen 13
-  8D C9 06 E4 18 00 18 CC 02 00 00 00 01
-1197140124.194022 > HCI Event: Command Status (0x0f) plen 4
-  00 01 05 04
-1197140130.447228 > HCI Event: Connect Complete (0x03) plen 11
-  04 0C 00 8B C9 06 E4 18 00 01 00
-1197140136.703435 > HCI Event: Connect Complete (0x03) plen 11
-  04 0D 00 8A C9 06 E4 18 00 01 00
-1197140140.217989 > HCI Event: Connect Complete (0x03) plen 11
-  00 0B 00 39 C7 06 E4 18 00 01 00
-1197140140.218021 < ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 1 scid 0x0040
-1197140140.218031 < HCI Command: Read Remote Supported Features
-(0x01|0x001b) plen 2
-  0B 00
-1197140140.220989 > HCI Event: Command Status (0x0f) plen 4
-  00 01 1B 04
-1197140140.221011 < HCI Command: Write Link Policy Settings
-(0x02|0x000d) plen 4
-  0B 00 0F 00
-1197140140.221987 > HCI Event: Read Remote Supported Features (0x0b)
-plen 11
-  00 0B 00 FC FE 0F 80 0B A8 00 00
-1197140140.223985 > HCI Event: Command Complete (0x0e) plen 6
-  01 0D 08 00 0B 00
-1197140140.223999 < HCI Command: Remote Name Request (0x01|0x0019) plen
-10
-  39 C7 06 E4 18 00 02 00 00 00
-1197140140.226984 > HCI Event: Command Status (0x0f) plen 4
-  00 01 19 04
-1197140140.382966 > HCI Event: Remote Name Req Complete (0x07) plen 255
-  00 39 C7 06 E4 18 00 50 53 33 2D 4D 41 58 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-1197140140.386986 > ACL data: handle 11 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0048 scid 0x0040 result 1 status 2
-      Connection pending - Authorization pending
-1197140140.387968 > ACL data: handle 11 flags 0x02 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0048 scid 0x0040 result 0 status 0
-      Connection successful
-1197140140.387986 < ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(s): Config req: dcid 0x0048 flags 0x00 clen 0
-1197140140.428962 > ACL data: handle 11 flags 0x02 dlen 14
-    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
-      Success
-1197140140.429967 > ACL data: handle 11 flags 0x02 dlen 16
-    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 48
-1197140140.430001 < ACL data: handle 11 flags 0x02 dlen 18
-    L2CAP(s): Config rsp: scid 0x0048 flags 0x00 result 0 clen 4
-      Success
-      MTU 48
-1197140140.430907 < ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0048 scid 0x0040
-1197140140.470963 > HCI Event: Number of Completed Packets (0x13) plen 5
-  01 0B 00 04 00
-1197140140.470973 > ACL data: handle 11 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0048 scid 0x0040
-1197140142.469105 < HCI Command: Disconnect (0x01|0x0006) plen 3
-  0B 00 13
-1197140142.471701 > HCI Event: Command Status (0x0f) plen 4
-  00 01 06 04
-1197140142.650681 > HCI Event: Disconn Complete (0x05) plen 4
-  00 0B 00 16
-1197140146.126239 > HCI Event: Connect Complete (0x03) plen 11
-  04 0E 00 8D C9 06 E4 18 00 01 00
+Hi. I can't get my motorola H300 headset to work with the bluez audio 
+service - on older kernels, it did work with headsetd, once I'd applied 
+the SCO flow control patch (the bluetooth controller on my laptop is one 
+of those troublesome broadcom devices).
 
- 
-Best regards,
- 
-Maria
+Here's what I did and what happened:
+
+$ arecord -D headset -f S16_LE test.wav
+Recording WAVE 'test.wav' : Signed 16 bit Little Endian, Rate 8000 Hz, 
+Mono
+ALSA lib pcm_bluetooth.c:370:(bluetooth_hsp_hw_params) Protocol not 
+available (92)
+Aborted by signal Interrupt...
+
+Even though arecord complains about an error, I get a file test.wav that 
+correctly recorded what I said and I can play it through my regular 
+speakers. But when I try to play it back through the headset I get
+
+$ aplay -D headset -f S16_LE test.wav
+Playing WAVE 'test.wav' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
+ALSA lib pcm_bluetooth.c:370:(bluetooth_hsp_hw_params) Protocol not 
+available (92)
+aplay: pcm_write:1265: write error: Invalid argument
+
+
+and aplay exits almost immediately, without playing any sound. When I run 
+the above aplay command, bluetoothd-service-audio outputs
+
+
+
+audio[7384]: Accepted new client connection on unix socket (fd=8)
+audio[7384]: Package PKT_TYPE_CFG_REQ:0
+audio[7384]: State changed /org/bluez/audio/device0: 
+HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
+audio[7384]: /org/bluez/audio/device0: Connecting to 00:XX:XX:XX:XX:XX 
+channel 2
+audio[7384]: State changed /org/bluez/audio/device0: 
+HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_CONNECTED
+audio[7384]: /org/bluez/audio/device0: Connected to 00:XX:XX:XX:XX:XX
+audio[7384]: State changed /org/bluez/audio/device0: 
+HEADSET_STATE_CONNECTED -> HEADSET_STATE_PLAY_IN_PROGRESS
+audio[7384]: SCO socket opened for headset /org/bluez/audio/device0
+audio[7384]: SCO fd=10
+audio[7384]: fd=10, fd_opt=1, pkt_len=48, sample_size=2, rate=8000
+audio[7384]: 30 bytes sent
+audio[7384]: 1 bytes sent
+audio[7384]: State changed /org/bluez/audio/device0: 
+HEADSET_STATE_PLAY_IN_PROGRESS -> HEADSET_STATE_PLAYING
+audio[7384]: Unix client disconnected (fd=8)
+audio[7384]: State changed /org/bluez/audio/device0: 
+HEADSET_STATE_PLAYING -> HEADSET_STATE_DISCONNECTED
+
+
+Any ideas? This is with bluez 3.22 and the very latest 2.6.24-based 
+Ubuntu kernel. 2.6.24-rc3 gives the same result...
+
+- Johan
+
 
 -------------------------------------------------------------------------
 SF.Net email is sponsored by:
