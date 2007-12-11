@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 11 Dec 2007 14:00:01 -0200
-Message-Id: <JSW741$A58C7550DB40F4B04CB558CA34606BF7@multidominios>
-MIME-Version: 1.0
-From: "vcallegari" <vcallegari@terra.com.br>
-To: "bluez-users" <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Instability with BlueZ under medium load
+Date: Tue, 11 Dec 2007 10:35:49 -0500
+From: vientito1@pppoe.ca
+To: bluez-users@lists.sourceforge.net
+Message-Id: <20071211103549.990878a4.vientito1@pppoe.ca>
+In-Reply-To: <mailman.282482.1197382116.26582.bluez-users@lists.sourceforge.net>
+References: <mailman.282482.1197382116.26582.bluez-users@lists.sourceforge.net>
+Mime-Version: 1.0
+Subject: [Bluez-users] compiling problem in audio directory for 3.23
+	bluez-utils
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,40 +21,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+when i configured with --enable-audio, compiling failed at this point:
 
-There are some very odd situations with an application running on a 2.6.22 kernel, using dbus-glib, and several
-bluetooth dongles on USB with a hub. All dongles are hci version 2.0, CSR bluecore 4, class 2, the hubs are
-cheapo no names. It works correctly while there are only a few bluetooth device in the area, but as soon as the
-number of peers reaches a certain level, the follwoing messages pop up in the kernel log files:
-
-	add_conn: Failed to register connection
-	hci_cmd_task: hci0 command tx timeout
-
-These lines are repeated several times, the second being more frequent, but from there on, most connections
-will fail, the
-g_io_watch callback getting an G_IO_ERR. It seems that once this happens, all lines refer to the same device,
-which doesn't need to be hci0. At that moment the dbus-method ListConnections returns an empty list or with at
-most one or two entries. The failure of the connections and these messages don't seem to happen at the same
-instant, but once the connections start to fail, the kernel log certainly will show them. hcidump doesn't
-indicate any problem, it's just that the connection had timed out. This effect was reproduced with different
-computers, different dongles, and hubs. All computers have USB from VIA, but there is one which has USB from
-Intel, which also shows this effect.
-
-The only method to restore this situation is to switch off the computer, wait a few minutes and restart it with
-no peers in the
-area. One really funny thing is, when the application is restarted without reboot in such a situation, but
-choosing different dongles
-which where formerly present but not used. Then it can happen that performance improves somewhat (though not to
-normal operation) while the messages in the kernel log files refer to a device which is not even being used.
-
-Is this a problem with BlueZ, USB in Linux or is this hardware related? Where would be the best place to ask?
-And most importantly, what can be done about it?
-
-Thanks for your reply.
-
-Valter
-
+sink.o: In function `discovery_complete':
+sink.c:(.text+0x507): undefined reference to `MAX'
+sink.c:(.text+0x559): undefined reference to `MIN'
+collect2: ld returned 1 exit status
+make[2]: *** [bluetoothd-service-audio] Error 1
+make[2]: Leaving directory `/home/cml/Desktop/bluez-utils-3.23/audio'
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory `/home/cml/Desktop/bluez-utils-3.23'
+make: *** [all] Error 2
 
 -------------------------------------------------------------------------
 SF.Net email is sponsored by:
