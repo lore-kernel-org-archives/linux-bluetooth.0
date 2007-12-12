@@ -1,15 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: =?UTF-8?Q?=D0=A0=D1=83=D1=81=D0=BB=D0=B0=D0=BD_?= =?UTF-8?Q?=D0=9A=D0=BE=D0=BD=D0=B4=D1=80=D0=B0=D1=82=D1=8C=D0=B5=D0=B2?= <ruslan712@mail.ru>,
-	BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <E1J2sgg-0004j6-Lz@mail.sourceforge.net>
-References: <1197474698.5644.17.camel@aeonflux>
-	<E1J2sgg-0004j6-Lz@mail.sourceforge.net>
-Date: Thu, 13 Dec 2007 19:26:50 +0100
-Message-Id: <1197570410.5644.100.camel@aeonflux>
+From: =?koi8-r?Q?=F2=D5=D3=CC=C1=CE_=EB=CF=CE=C4=D2=C1=D4=D8=C5=D7?= <ruslan712@mail.ru>
+To: bluez-devel@lists.sourceforge.net
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] I would like to use Bluez in my device...
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Wed, 12 Dec 2007 20:00:02 +0300
+References: <1197474698.5644.17.camel@aeonflux>
+In-Reply-To: <1197474698.5644.17.camel@aeonflux>
+Message-ID: <E1J2sgg-0004j6-Lz@mail.sourceforge.net>
+Subject: Re: [Bluez-devel]
+	=?koi8-r?b?SSB3b3VsZCBsaWtlIHRvIHVzZSBCbHVleiBpbiBt?=
+	=?koi8-r?b?eSBkZXZpY2UuLi4=?=
+Reply-To: =?koi8-r?Q?=F2=D5=D3=CC=C1=CE_=EB=CF=CE=C4=D2=C1=D4=D8=C5=D7?= <ruslan712@mail.ru>,
+	BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,37 +19,31 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="koi8-r"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-
-> Many thanks for your answer.
-> 
-> But, Linux and eCos have a lot in common.
-> 
-> Could you help me even with any documentation.
-
-even if eCos and Linux has enough in common, you still need to port the
-kernel portion of BlueZ to the eCos kernel. Not an easy task since all
-the core layers are Linux kernel modules. So feel free to go ahead and
-try, but to be honest, don't expect help from the BlueZ developers. Our
-main focus is Linux and that keeps us busy enough.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-SF.Net email is sponsored by:
-Check out the new SourceForge.net Marketplace.
-It's the best place to buy or sell services
-for just about anything Open Source.
-http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SGVsbG8sIE1hcmNlbCBIb2x0bWFubiEKCk1hbnkgdGhhbmtzIGZvciB5b3VyIGFuc3dlci4KCkJ1
+dCwgTGludXggYW5kIGVDb3MgaGF2ZSBhIGxvdCBpbiBjb21tb24uCgpDb3VsZCB5b3UgaGVscCBt
+ZSBldmVuIHdpdGggYW55IGRvY3VtZW50YXRpb24uCgpJIHdpbGwgYmUgdmVyeSBncmF0ZWZ1bCB0
+byB5b3UuCgpCZXN0IHJlZ2FyZHMsClJ1c2xhbiBLb25kcmF0eWV2CgoKLS0tLS1PcmlnaW5hbCBN
+ZXNzYWdlLS0tLS0KRnJvbTogTWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9sdG1hbm4ub3JnPgpU
+bzog8tXTzMHOIOvPzsTSwdTYxdcgPHJ1c2xhbjcxMkBtYWlsLnJ1PiwgQmx1ZVogZGV2ZWxvcG1l
+bnQgPGJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldD4KRGF0ZTogV2VkLCAxMiBEZWMg
+MjAwNyAxNjo1MTozOCArMDEwMApTdWJqZWN0OiBSZTogW0JsdWV6LWRldmVsXSBJIHdvdWxkIGxp
+a2UgdG8gdXNlIEJsdWV6IGluIG15IGRldmljZS4uLgoKPiAKPiBIaSwKPiAKPiA+IEkgd291bGQg
+bGlrZSB0byB1c2UgQmx1ZXogaW4gbXkgZGV2aWNlLgo+ID4gCj4gPiBBcmNoaXRlY3R1cmUgb2Yg
+dGhlIHByb2Nlc3NvcjogU1BBUkMtVjguCj4gPiBPcGVyYXRpb25hbCBzeXN0ZW06IGVDb3MgZnJv
+bSBlQ29zQ2VudHJpYwo+ID4gTXkgbWFpbiBwdXJwb3NlOiBTZXJpYWwgUG9ydCBQcm9maWxlIHVz
+aW5nIFJGQ09NTS4KPiAKPiBCbHVlWiBpcyBkZXNpZ25lZCBmb3IgTGludXggYXMgb3BlcmF0aW5n
+IHN5c3RlbS4gU28gZWl0aGVyIHN3aXRjaCB0bwo+IExpbnV4IG9yIGJ1eSBhIEJsdWV0b290aCBz
+dGFjayBmb3IgZUNvcy4KPiAKPiBSZWdhcmRzCj4gCj4gTWFyY2VsCj4gCj4gCgotLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tClNGLk5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6CkNoZWNrIG91dCB0aGUgbmV3IFNv
+dXJjZUZvcmdlLm5ldCBNYXJrZXRwbGFjZS4KSXQncyB0aGUgYmVzdCBwbGFjZSB0byBidXkgb3Ig
+c2VsbCBzZXJ2aWNlcwpmb3IganVzdCBhYm91dCBhbnl0aGluZyBPcGVuIFNvdXJjZS4KaHR0cDov
+L2FkLmRvdWJsZWNsaWNrLm5ldC9jbGs7MTY0MjE2MjM5OzEzNTAzMDM4O3c/aHR0cDovL3NmLm5l
+dC9tYXJrZXRwbGFjZQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9y
+Z2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6
+LWRldmVsCg==
