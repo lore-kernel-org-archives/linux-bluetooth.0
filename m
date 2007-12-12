@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <002e01c83c96$d2f37270$2a0dc70a@dlh.st.com>
-References: <002e01c83c96$d2f37270$2a0dc70a@dlh.st.com>
-Date: Wed, 12 Dec 2007 16:50:44 +0100
-Message-Id: <1197474644.5644.15.camel@aeonflux>
+In-Reply-To: <8c7950360712120508j3da5da11sf79e1c321cc37865@mail.gmail.com>
+References: <8c7950360712120508j3da5da11sf79e1c321cc37865@mail.gmail.com>
+Date: Wed, 12 Dec 2007 16:49:26 +0100
+Message-Id: <1197474566.5644.12.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Simple Pairing in BlueZ
+Subject: Re: [Bluez-users] PAN security questions
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,17 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Shankar,
+Hi Shane,
 
-> I want to use the simple pairing procedure. I digged the archives of bluez-announce mailing list and read that BlueZ now supports it. I could not find in the mailing list how to enable and use it. Has anybody here  tried it and can give me ideas on how to go about it.
+> PAND MAN file lists the following options regarding security:
+> --encrypt -E
+>     Enable encryption
+> --secure -S
+>     Secure connection
 > 
-> I have googled "simple pairing in bluez" without much success. It just leads me to the announcement.  
+> The PAND howto (http://bluez.sourceforge.net/contrib/HOWTO-PAN)
+> explains --encrypt as follows:
+>      "activates BT security (authentication and encryption)"
+> 
+> so then what does the option --secure do?
 
-we only have basic support for Simple Pairing. The Bluetooth SIG changed
-the whole Simple Pairing/Security Mode 4 in the last minute before
-releasing the Bluetooth 2.1 specification and so far nobody has tried to
-fully implement it. With the changed specification, it is actually kinda
-complex.
+the --encrypt does authentication and then encrypt the link. With the
+--secure you do the authentication, then encrypt the link and then make
+sure the link key will be re-generated. It is an extra step of
+protection since the link key itself has no expiration date.
 
 Regards
 
