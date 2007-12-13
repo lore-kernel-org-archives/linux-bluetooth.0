@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <3ad703600712110300j7a3e628cj1e4d55dd9d4a0d5b@mail.gmail.com>
-References: <3ad703600712110300j7a3e628cj1e4d55dd9d4a0d5b@mail.gmail.com>
-Date: Thu, 13 Dec 2007 17:15:54 +0100
-Message-Id: <1197562554.5644.95.camel@aeonflux>
+In-Reply-To: <2a9506370712130701t2c1c7d33ocd2c44fde5e2abf1@mail.gmail.com>
+References: <2a9506370712130701t2c1c7d33ocd2c44fde5e2abf1@mail.gmail.com>
+Date: Thu, 13 Dec 2007 17:00:54 +0100
+Message-Id: <1197561654.5644.85.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Patch proposal for serial manager
+Subject: Re: [Bluez-devel] [Patch] Extending the serial service to export
+	a	TCP socket.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,29 +21,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Geoffrey,
+Hi Vinicius,
 
-> I have added a connect service method in the serial service manager
-> that take the address of an adapter as first parameter to be able to
-> use more than one adapter. I realy would like to contribute to bluez
-> and see my patch applied to the CVS. This is a first proposal, if you
-> have any remarks, I will take them into account. 
+> It only exports a local (127.0.0.1) port, but could be easily modified
+> to export a port from any host. It is really simple as all the hard
+> work was already done for the Unix socket proxy. My primary interest
+> is export the internal N810 GPS so other devices can use it.
 
-first issue is the naming. You don't connect something to an adapter.
-You use the adapter to connect to something. So it needs either to be
-named ConnectServiceByAdapter or ConnectServiceFromAdapter. Join #bluez
-channel on freenode.org to discuss this.
+patch looks good, but it contains to many unneeded hunks. Which
+indicates that you only changed whitespace into tabs or vise versa.
+Please use an editor that visually shows whitespaces and tabs.
 
-Second is that you did a nasty thing with the signature checking. That
-is not how this should be implement. You should have your own callback
-in the callback table. If code is shared between two callbacks then a
-common function has to be created and both callbacks become a small shim
-to call this function. Otherwise the code gets to complex and nobody
-will understand it a year later.
+First thing it is "unsigned short port" and not some "short int" or
+something. This also means you can skip all reformatting in struct
+proxy.
 
-Third is that we have to agree on the adapter parameter. Should it be
-the adapter address or the adapter object path. Pros and cons needs to
-be discussed on #bluez.
+Don't introduce extra empty lines in your if or case statements. They
+are not needed.
 
 Regards
 
