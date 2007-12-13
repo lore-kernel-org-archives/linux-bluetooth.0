@@ -1,16 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?koi8-r?Q?=F2=D5=D3=CC=C1=CE_=EB=CF=CE=C4=D2=C1=D4=D8=C5=D7?= <ruslan712@mail.ru>
-To: bluez-devel@lists.sourceforge.net
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <3ad703600712110300j7a3e628cj1e4d55dd9d4a0d5b@mail.gmail.com>
+References: <3ad703600712110300j7a3e628cj1e4d55dd9d4a0d5b@mail.gmail.com>
+Date: Thu, 13 Dec 2007 17:15:54 +0100
+Message-Id: <1197562554.5644.95.camel@aeonflux>
 Mime-Version: 1.0
-Date: Wed, 12 Dec 2007 20:00:02 +0300
-References: <1197474698.5644.17.camel@aeonflux>
-In-Reply-To: <1197474698.5644.17.camel@aeonflux>
-Message-ID: <E1J2sgg-0004j6-Lz@mail.sourceforge.net>
-Subject: Re: [Bluez-devel]
-	=?koi8-r?b?SSB3b3VsZCBsaWtlIHRvIHVzZSBCbHVleiBpbiBt?=
-	=?koi8-r?b?eSBkZXZpY2UuLi4=?=
-Reply-To: =?koi8-r?Q?=F2=D5=D3=CC=C1=CE_=EB=CF=CE=C4=D2=C1=D4=D8=C5=D7?= <ruslan712@mail.ru>,
-	BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Patch proposal for serial manager
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,31 +16,47 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="koi8-r"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGVsbG8sIE1hcmNlbCBIb2x0bWFubiEKCk1hbnkgdGhhbmtzIGZvciB5b3VyIGFuc3dlci4KCkJ1
-dCwgTGludXggYW5kIGVDb3MgaGF2ZSBhIGxvdCBpbiBjb21tb24uCgpDb3VsZCB5b3UgaGVscCBt
-ZSBldmVuIHdpdGggYW55IGRvY3VtZW50YXRpb24uCgpJIHdpbGwgYmUgdmVyeSBncmF0ZWZ1bCB0
-byB5b3UuCgpCZXN0IHJlZ2FyZHMsClJ1c2xhbiBLb25kcmF0eWV2CgoKLS0tLS1PcmlnaW5hbCBN
-ZXNzYWdlLS0tLS0KRnJvbTogTWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9sdG1hbm4ub3JnPgpU
-bzog8tXTzMHOIOvPzsTSwdTYxdcgPHJ1c2xhbjcxMkBtYWlsLnJ1PiwgQmx1ZVogZGV2ZWxvcG1l
-bnQgPGJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldD4KRGF0ZTogV2VkLCAxMiBEZWMg
-MjAwNyAxNjo1MTozOCArMDEwMApTdWJqZWN0OiBSZTogW0JsdWV6LWRldmVsXSBJIHdvdWxkIGxp
-a2UgdG8gdXNlIEJsdWV6IGluIG15IGRldmljZS4uLgoKPiAKPiBIaSwKPiAKPiA+IEkgd291bGQg
-bGlrZSB0byB1c2UgQmx1ZXogaW4gbXkgZGV2aWNlLgo+ID4gCj4gPiBBcmNoaXRlY3R1cmUgb2Yg
-dGhlIHByb2Nlc3NvcjogU1BBUkMtVjguCj4gPiBPcGVyYXRpb25hbCBzeXN0ZW06IGVDb3MgZnJv
-bSBlQ29zQ2VudHJpYwo+ID4gTXkgbWFpbiBwdXJwb3NlOiBTZXJpYWwgUG9ydCBQcm9maWxlIHVz
-aW5nIFJGQ09NTS4KPiAKPiBCbHVlWiBpcyBkZXNpZ25lZCBmb3IgTGludXggYXMgb3BlcmF0aW5n
-IHN5c3RlbS4gU28gZWl0aGVyIHN3aXRjaCB0bwo+IExpbnV4IG9yIGJ1eSBhIEJsdWV0b290aCBz
-dGFjayBmb3IgZUNvcy4KPiAKPiBSZWdhcmRzCj4gCj4gTWFyY2VsCj4gCj4gCgotLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tClNGLk5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6CkNoZWNrIG91dCB0aGUgbmV3IFNv
-dXJjZUZvcmdlLm5ldCBNYXJrZXRwbGFjZS4KSXQncyB0aGUgYmVzdCBwbGFjZSB0byBidXkgb3Ig
-c2VsbCBzZXJ2aWNlcwpmb3IganVzdCBhYm91dCBhbnl0aGluZyBPcGVuIFNvdXJjZS4KaHR0cDov
-L2FkLmRvdWJsZWNsaWNrLm5ldC9jbGs7MTY0MjE2MjM5OzEzNTAzMDM4O3c/aHR0cDovL3NmLm5l
-dC9tYXJrZXRwbGFjZQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9y
-Z2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6
-LWRldmVsCg==
+Hi Geoffrey,
+
+> I have added a connect service method in the serial service manager
+> that take the address of an adapter as first parameter to be able to
+> use more than one adapter. I realy would like to contribute to bluez
+> and see my patch applied to the CVS. This is a first proposal, if you
+> have any remarks, I will take them into account. 
+
+first issue is the naming. You don't connect something to an adapter.
+You use the adapter to connect to something. So it needs either to be
+named ConnectServiceByAdapter or ConnectServiceFromAdapter. Join #bluez
+channel on freenode.org to discuss this.
+
+Second is that you did a nasty thing with the signature checking. That
+is not how this should be implement. You should have your own callback
+in the callback table. If code is shared between two callbacks then a
+common function has to be created and both callbacks become a small shim
+to call this function. Otherwise the code gets to complex and nobody
+will understand it a year later.
+
+Third is that we have to agree on the adapter parameter. Should it be
+the adapter address or the adapter object path. Pros and cons needs to
+be discussed on #bluez.
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+SF.Net email is sponsored by:
+Check out the new SourceForge.net Marketplace.
+It's the best place to buy or sell services
+for just about anything Open Source.
+http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
