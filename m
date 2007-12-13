@@ -1,15 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <2a9506370712131041x6a356138nbc5d2e2fbc6bbc7c@mail.gmail.com>
+Message-ID: <2a9506370712131041x6a356138nbc5d2e2fbc6bbc7c@mail.gmail.com>
+Date: Thu, 13 Dec 2007 15:41:08 -0300
+From: "Vinicius Gomes" <vinicius.gomes@openbossa.org>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1197561654.5644.85.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_11348_11982407.1197571268982"
 References: <2a9506370712130701t2c1c7d33ocd2c44fde5e2abf1@mail.gmail.com>
 	<1197561654.5644.85.camel@aeonflux>
-	<2a9506370712131041x6a356138nbc5d2e2fbc6bbc7c@mail.gmail.com>
-Date: Thu, 13 Dec 2007 20:09:48 +0100
-Message-Id: <1197572989.5644.105.camel@aeonflux>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [Patch] Extending the serial service to export
-	a	TCP socket.
+Subject: Re: [Bluez-devel] [Patch] Extending the serial service to export a
+	TCP socket.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,34 +20,177 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Vinicius,
+------=_Part_11348_11982407.1197571268982
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> > > It only exports a local (127.0.0.1) port, but could be easily modified
-> > > to export a port from any host. It is really simple as all the hard
-> > > work was already done for the Unix socket proxy. My primary interest
-> > > is export the internal N810 GPS so other devices can use it.
-> >
-> > patch looks good, but it contains to many unneeded hunks. Which
-> > indicates that you only changed whitespace into tabs or vise versa.
-> > Please use an editor that visually shows whitespaces and tabs.
-> 
-> Many of these hunks were showing whitespace being removed from the end
-> of some lines.   Also there was a line with just a tab on it.
+On 12/13/07, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Vinicius,
+>
+> > It only exports a local (127.0.0.1) port, but could be easily modified
+> > to export a port from any host. It is really simple as all the hard
+> > work was already done for the Unix socket proxy. My primary interest
+> > is export the internal N810 GPS so other devices can use it.
+>
+> patch looks good, but it contains to many unneeded hunks. Which
+> indicates that you only changed whitespace into tabs or vise versa.
+> Please use an editor that visually shows whitespaces and tabs.
 
-and your new patch introduced as many as it fixes. I am serious about
-this and once you look at the diff file, I can even tell without
-whitespace visualization. I fixed it up for you, but make sure in the
-future this is all sane and sound. Patch is in the CVS.
+Many of these hunks were showing whitespace being removed from the end
+of some lines.   Also there was a line with just a tab on it.
 
-Regards
+> First thing it is "unsigned short port" and not some "short int" or
+> something. This also means you can skip all reformatting in struct
+> proxy.
 
-Marcel
+Much better, done.
 
+> Don't introduce extra empty lines in your if or case statements. They
+> are not needed.
 
+Also done.
+
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> SF.Net email is sponsored by:
+> Check out the new SourceForge.net Marketplace.
+> It's the best place to buy or sell services
+> for just about anything Open Source.
+> http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+
+Cheers,
+
+-- 
+Vinicius Gomes
+INdT - Instituto Nokia de Tecnologia
+
+------=_Part_11348_11982407.1197571268982
+Content-Type: application/octet-stream; name=tcp-proxy.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fa5lzrps
+Content-Disposition: attachment; filename=tcp-proxy.patch
+
+ZGlmZiAtLWdpdCBhL3NlcmlhbC9tYW5hZ2VyLmMgYi9zZXJpYWwvbWFuYWdlci5jCmluZGV4IGI0
+NTk1OGIuLjI1NjkzZjkgMTAwNjQ0Ci0tLSBhL3NlcmlhbC9tYW5hZ2VyLmMKKysrIGIvc2VyaWFs
+L21hbmFnZXIuYwpAQCAtMTA1LDYgKzEwNSw3IEBAIHN0YXRpYyBzdHJ1Y3QgewogdHlwZWRlZiBl
+bnVtIHsKIAlUVFlfUFJPWFksCiAJVU5JWF9TT0NLRVRfUFJPWFksCisJVENQX1NPQ0tFVF9QUk9Y
+WSwKIAlVTktOT1dOX1BST1hZX1RZUEUgPSAweEZGCiB9IHByb3h5X3R5cGVfdDsKIApAQCAtMTEz
+LDYgKzExNCw3IEBAIHN0cnVjdCBwcm94eSB7CiAJYmRhZGRyX3QJZHN0OwogCWNoYXIJCSp1dWlk
+MTI4OwkvKiBVVUlEIDEyOCAqLwogCWNoYXIJCSphZGRyZXNzOwkvKiBUVFkgb3IgVW5peCBzb2Nr
+ZXQgbmFtZSAqLworICAgICAgICBzaG9ydCBpbnQgICAgICAgcG9ydDsgICAgICAgICAgIC8qIFRD
+UCBwb3J0ICovCiAJcHJveHlfdHlwZV90CXR5cGU7CQkvKiBUVFkgb3IgVW5peCBzb2NrZXQgKi8K
+IAlzdHJ1Y3QgdGVybWlvcyAgc3lzX3RpOwkJLyogRGVmYXVsdCBUVFkgc2V0dGluZyAqLwogCXN0
+cnVjdCB0ZXJtaW9zICBwcm94eV90aTsJLyogUHJveHkgVFRZIHNldHRpbmdzICovCkBAIC01ODYs
+NyArNTg4LDcgQEAgc3RhdGljIHZvaWQgcmVjb3JkX3JlcGx5KERCdXNQZW5kaW5nQ2FsbCAqY2Fs
+bCwgdm9pZCAqZGF0YSkKIAkJZXJyID0gcmZjb21tX2Nvbm5lY3QocGMpOwogCQlpZiAoZXJyIDwg
+MCkgewogCQkJZXJyb3IoIlJGQ09NTSBjb25uZWN0aW9uIGZhaWxlZCIpOwotCQkJZXJyb3JfY29u
+bmVjdGlvbl9hdHRlbXB0X2ZhaWxlZChwYy0+Y29ubiwgCisJCQllcnJvcl9jb25uZWN0aW9uX2F0
+dGVtcHRfZmFpbGVkKHBjLT5jb25uLAogCQkJCQlwYy0+bXNnLCAtZXJyKTsKIAkJCWdvdG8gZmFp
+bDsKIAkJfQpAQCAtNjU3LDcgKzY1OSw3IEBAIHN0YXRpYyB2b2lkIGhhbmRsZXNfcmVwbHkoREJ1
+c1BlbmRpbmdDYWxsICpjYWxsLCB2b2lkICpkYXRhKQogCQkvKiBGSVhNRSA6IGZvcndhcmQgZXJy
+b3IgYXMgaXMgKi8KIAkJaWYgKGRidXNfZXJyb3JfaGFzX25hbWUoJmRlcnIsCiAJCQkJIm9yZy5i
+bHVlei5FcnJvci5Db25uZWN0aW9uQXR0ZW1wdEZhaWxlZCIpKQotCQkJZXJyb3JfY29ubmVjdGlv
+bl9hdHRlbXB0X2ZhaWxlZChwYy0+Y29ubiwgCisJCQllcnJvcl9jb25uZWN0aW9uX2F0dGVtcHRf
+ZmFpbGVkKHBjLT5jb25uLAogCQkJCQlwYy0+bXNnLCBFSU8pOwogCQllbHNlCiAJCQllcnJvcl9u
+b3Rfc3VwcG9ydGVkKHBjLT5jb25uLCBwYy0+bXNnKTsKQEAgLTY2Nyw3ICs2NjksNyBAQCBzdGF0
+aWMgdm9pZCBoYW5kbGVzX3JlcGx5KERCdXNQZW5kaW5nQ2FsbCAqY2FsbCwgdm9pZCAqZGF0YSkK
+IAkJZGJ1c19lcnJvcl9mcmVlKCZkZXJyKTsKIAkJZ290byBmYWlsOwogCX0KLQkKKwogCWlmICgh
+ZGJ1c19tZXNzYWdlX2dldF9hcmdzKHJlcGx5LCAmZGVyciwKIAkJCQlEQlVTX1RZUEVfQVJSQVks
+IERCVVNfVFlQRV9VSU5UMzIsICZwaGFuZGxlLAogCQkJCSZsZW4sIERCVVNfVFlQRV9JTlZBTElE
+KSkgewpAQCAtMTI4Nyw2ICsxMjg5LDQ1IEBAIHN0YXRpYyBpbmxpbmUgaW50IHVuaXhfc29ja2V0
+X2Nvbm5lY3QoY29uc3QgY2hhciAqYWRkcmVzcykKIAlyZXR1cm4gc2s7CiB9CiAKK3N0YXRpYyBp
+bnQgdGNwX3NvY2tldF9jb25uZWN0KGNvbnN0IGNoYXIgKmFkZHJlc3MpCit7CisJc3RydWN0IHNv
+Y2thZGRyX2luIGFkZHI7CisJaW50IGVyciwgc2s7CisJdW5zaWduZWQgc2hvcnQgaW50IHBvcnQ7
+CisKKwltZW1zZXQoJmFkZHIsIDAsIHNpemVvZihhZGRyKSk7CisKKwlpZiAoc3RybmNtcChhZGRy
+ZXNzLCAibG9jYWxob3N0IiwgOSkgIT0gMCkgeworCQllcnJvcigiQWRkcmVzcyBzaG91bGQgaGF2
+ZSB0aGUgZm9ybSBsb2NhbGhvc3Q6cG9ydC4iKTsKKwkJcmV0dXJuIC0xOworCX0KKwlwb3J0ID0g
+YXRvaShzdHJjaHIoYWRkcmVzcywgJzonKSArIDEpOworCWlmIChwb3J0IDw9IDApIHsKKwkJZXJy
+b3IoIkludmFsaWQgcG9ydCAnJWQnLiIsIHBvcnQpOworCQlyZXR1cm4gLTE7CisJfQorCWFkZHIu
+c2luX2ZhbWlseSA9IEFGX0lORVQ7CisJYWRkci5zaW5fYWRkci5zX2FkZHIgPSBpbmV0X2FkZHIo
+IjEyNy4wLjAuMSIpOworCWFkZHIuc2luX3BvcnQgPSBodG9ucyhwb3J0KTsKKworCXNrID0gc29j
+a2V0KFBGX0lORVQsIFNPQ0tfU1RSRUFNLCAwKTsKKwlpZiAoc2sgPCAwKSB7CisJCWVyciA9IGVy
+cm5vOworCQllcnJvcigiVENQIHNvY2tldCglcykgY3JlYXRlIGZhaWxlZCAlcyglZCkiLCBhZGRy
+ZXNzLAorCQkgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cmVycm9yKGVyciks
+IGVycik7CisJCXJldHVybiAtZXJyOworCX0KKwlpZiAoY29ubmVjdChzaywgKHN0cnVjdCBzb2Nr
+YWRkciAqKSAmYWRkciwgc2l6ZW9mKGFkZHIpKSA8IDApIHsKKwkJZXJyID0gZXJybm87CisJCWVy
+cm9yKCJUQ1Agc29ja2V0KCVzKSBjb25uZWN0IGZhaWxlZDogJXMoJWQpIiwKKwkJCQlhZGRyZXNz
+LCBzdHJlcnJvcihlcnIpLCBlcnIpOworCQljbG9zZShzayk7CisJCWVycm5vID0gZXJyOworCQly
+ZXR1cm4gLWVycjsKKwl9CisJcmV0dXJuIHNrOworfQorCiBzdGF0aWMgaW5saW5lIGludCB0dHlf
+b3Blbihjb25zdCBjaGFyICp0dHksIHN0cnVjdCB0ZXJtaW9zICp0aSkKIHsKIAlpbnQgZXJyLCBz
+azsKQEAgLTEzMzcsMTAgKzEzNzgsMTkgQEAgc3RhdGljIGdib29sZWFuIGNvbm5lY3RfZXZlbnQo
+R0lPQ2hhbm5lbCAqY2hhbiwKIAogCWJhY3B5KCZwcngtPmRzdCwgJnJhZGRyLnJjX2JkYWRkcik7
+CiAKLQlpZiAocHJ4LT50eXBlID09IFVOSVhfU09DS0VUX1BST1hZKQorCXN3aXRjaCAocHJ4LT50
+eXBlKSB7CisJY2FzZSBVTklYX1NPQ0tFVF9QUk9YWToKIAkJbHNrID0gdW5peF9zb2NrZXRfY29u
+bmVjdChwcngtPmFkZHJlc3MpOwotCWVsc2UKKwkJYnJlYWs7CisJY2FzZSBUVFlfUFJPWFk6CiAJ
+CWxzayA9IHR0eV9vcGVuKHByeC0+YWRkcmVzcywgJnByeC0+cHJveHlfdGkpOworCQlicmVhazsK
+KwljYXNlIFRDUF9TT0NLRVRfUFJPWFk6CisJCWxzayA9IHRjcF9zb2NrZXRfY29ubmVjdChwcngt
+PmFkZHJlc3MpOworCQlicmVhazsKKwlkZWZhdWx0OgorCQlsc2sgPSAtMTsKKwl9CiAKIAlpZiAo
+bHNrIDwgMCkgewogCQljbG9zZShyc2spOwpAQCAtMTc1Myw2ICsxODAzLDI1IEBAIHN0YXRpYyBp
+bnQgcHJveHlfc29ja2V0X3JlZ2lzdGVyKGJkYWRkcl90ICpzcmMsIGNvbnN0IGNoYXIgKnV1aWQx
+MjgsCiAJcmV0dXJuIHJldDsKIH0KIAorc3RhdGljIGludCBwcm94eV90Y3BfcmVnaXN0ZXIoYmRh
+ZGRyX3QgKnNyYywgY29uc3QgY2hhciAqdXVpZDEyOCwKKwkJY29uc3QgY2hhciAqYWRkcmVzcywg
+Y2hhciAqb3V0cGF0aCwgc2l6ZV90IHNpemUpCit7CisJc3RydWN0IHByb3h5ICpwcng7CisJaW50
+IHJldDsKKworCXByeCA9IGdfbmV3MChzdHJ1Y3QgcHJveHksIDEpOworCXByeC0+YWRkcmVzcyA9
+IGdfc3RyZHVwKGFkZHJlc3MpOworCXByeC0+dXVpZDEyOCA9IGdfc3RyZHVwKHV1aWQxMjgpOwor
+CXByeC0+dHlwZSA9IFRDUF9TT0NLRVRfUFJPWFk7CisJYmFjcHkoJnByeC0+c3JjLCBzcmMpOwor
+CisJcmV0ID0gcmVnaXN0ZXJfcHJveHlfb2JqZWN0KHByeCwgb3V0cGF0aCwgc2l6ZSk7CisJaWYg
+KHJldCA8IDApCisJCXByb3h5X2ZyZWUocHJ4KTsKKworCXJldHVybiByZXQ7Cit9CisKIHN0YXRp
+YyBwcm94eV90eXBlX3QgYWRkcjJ0eXBlKGNvbnN0IGNoYXIgKmFkZHJlc3MpCiB7CiAJc3RydWN0
+IHN0YXQgc3Q7CkBAIC0xNzYzLDYgKzE4MzIsOCBAQCBzdGF0aWMgcHJveHlfdHlwZV90IGFkZHIy
+dHlwZShjb25zdCBjaGFyICphZGRyZXNzKQogCQkgKiBpdCByZWZlcnMgdG8gYWJzdHJhY3QgbmFt
+ZXNwYWNlLiAneDAwJyB3aWxsIGJlIHVzZWQKIAkJICogdG8gcmVwcmVzZW50IHRoZSBudWxsIGJ5
+dGUuCiAJCSAqLworCQlpZiAoc3RybmNtcCgibG9jYWxob3N0OiIsIGFkZHJlc3MsIDEwKSA9PSAw
+KQorCQkJcmV0dXJuIFRDUF9TT0NLRVRfUFJPWFk7CiAJCWlmIChzdHJuY21wKCJ4MDAiLCBhZGRy
+ZXNzLCAzKSAhPSAwKQogCQkJcmV0dXJuIFVOS05PV05fUFJPWFlfVFlQRTsKIAkJZWxzZQpAQCAt
+MTgzMywxMyArMTkwNCwyMiBAQCBzdGF0aWMgREJ1c0hhbmRsZXJSZXN1bHQgY3JlYXRlX3Byb3h5
+KERCdXNDb25uZWN0aW9uICpjb25uLAogCWlmICghcmVwbHkpCiAJCXJldHVybiBEQlVTX0hBTkRM
+RVJfUkVTVUxUX05FRURfTUVNT1JZOwogCi0JaWYgKHR5cGUgIT0gVFRZX1BST1hZKQorCXN3aXRj
+aCAodHlwZSkgeworCWNhc2UgVU5JWF9TT0NLRVRfUFJPWFk6CiAJCXJldCA9IHByb3h5X3NvY2tl
+dF9yZWdpc3Rlcigmc3JjLCB1dWlkMTI4LAotCQkJCWFkZHJlc3MsIHBhdGgsIHNpemVvZihwYXRo
+KSk7Ci0JZWxzZQorCQkJCQkgICAgYWRkcmVzcywgcGF0aCwgc2l6ZW9mKHBhdGgpKTsKKwkJYnJl
+YWs7CisJY2FzZSBUVFlfUFJPWFk6CiAJCXJldCA9IHByb3h5X3R0eV9yZWdpc3Rlcigmc3JjLCB1
+dWlkMTI4LAogCQkJCWFkZHJlc3MsIE5VTEwsIHBhdGgsIHNpemVvZihwYXRoKSk7Ci0KKwkJYnJl
+YWs7CisJY2FzZSBUQ1BfU09DS0VUX1BST1hZOgorCQlyZXQgPSBwcm94eV90Y3BfcmVnaXN0ZXIo
+JnNyYywgdXVpZDEyOCwgYWRkcmVzcywKKwkJCQkJICBwYXRoLCBzaXplb2YocGF0aCkpOworCQli
+cmVhazsKKwlkZWZhdWx0OgorCQlyZXQgPSAtMTsKKwl9CiAJaWYgKHJldCA8IDApIHsKIAkJZGJ1
+c19tZXNzYWdlX3VucmVmKHJlcGx5KTsKIAkJcmV0dXJuIGVycm9yX2ZhaWxlZChjb25uLCBtc2cs
+ICJDcmVhdGUgb2JqZWN0IHBhdGggZmFpbGVkIik7CkBAIC0yMDY1LDcgKzIxNDUsNyBAQCBzdGF0
+aWMgREJ1c0hhbmRsZXJSZXN1bHQgY2FuY2VsX2Nvbm5lY3Rfc2VydmljZShEQnVzQ29ubmVjdGlv
+biAqY29ubiwKIAogCXBlbmRpbmcgPSBmaW5kX3BlbmRpbmdfY29ubmVjdF9ieV9wYXR0ZXJuKGJk
+YSwgcGF0dGVybik7CiAJaWYgKCFwZW5kaW5nKQotCQlyZXR1cm4gZXJyb3JfZG9lc19ub3RfZXhp
+c3QoY29ubiwgbXNnLCAKKwkJcmV0dXJuIGVycm9yX2RvZXNfbm90X2V4aXN0KGNvbm4sIG1zZywK
+IAkJCQkiTm8gc3VjaCBjb25uZWN0aW9uIHJlcXVlc3QiKTsKIAogCXJlcGx5ID0gZGJ1c19tZXNz
+YWdlX25ld19tZXRob2RfcmV0dXJuKG1zZyk7CkBAIC0yMDg3LDcgKzIxNjcsNyBAQCBzdGF0aWMg
+dm9pZCBwcm94eV9wYXRoX2ZyZWUoZ3BvaW50ZXIgZGF0YSwgZ3BvaW50ZXIgdWRhdGEpCiAJaWYg
+KGRidXNfY29ubmVjdGlvbl9nZXRfb2JqZWN0X3VzZXJfZGF0YShjb25uLAogCQkJCXBhdGgsICh2
+b2lkICopICZwcngpICYmIHByeCkgewogCQlzdHJ1Y3QgdGVybWlvcyAqdGk7Ci0JCQorCiAJCXRp
+ID0gKHByeC0+dHlwZSA9PSBUVFlfUFJPWFkgPyAmcHJ4LT5wcm94eV90aSA6IE5VTEwpOwogCQlw
+cm94eV9zdG9yZSgmcHJ4LT5zcmMsIHByeC0+dXVpZDEyOCwgcHJ4LT5hZGRyZXNzLCBOVUxMLAog
+CQkJCXByeC0+Y2hhbm5lbCwgMCwgdGkpOwpAQCAtMjI0NCw2ICsyMzI0LDkgQEAgc3RhdGljIHZv
+aWQgcGFyc2VfcHJveHkoY2hhciAqa2V5LCBjaGFyICp2YWx1ZSwgdm9pZCAqZGF0YSkKIAljYXNl
+IFVOSVhfU09DS0VUX1BST1hZOgogCQlwcm94eV9zb2NrZXRfcmVnaXN0ZXIoJnNyYywgdXVpZDEy
+OCwga2V5LCBOVUxMLCAwKTsKIAkJYnJlYWs7CisJY2FzZSBUQ1BfU09DS0VUX1BST1hZOgorCQlw
+cm94eV90Y3BfcmVnaXN0ZXIoJnNyYywgdXVpZDEyOCwga2V5LCBOVUxMLCAwKTsKKwkJYnJlYWs7
+CiAJZGVmYXVsdDoKIAkJcmV0dXJuOwogCX0K
+------=_Part_11348_11982407.1197571268982
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 SF.Net email is sponsored by:
@@ -54,7 +198,15 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services
 for just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+------=_Part_11348_11982407.1197571268982
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_11348_11982407.1197571268982--
