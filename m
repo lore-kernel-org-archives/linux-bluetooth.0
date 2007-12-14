@@ -1,45 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?koi8-r?Q?=F2=D5=D3=CC=C1=CE_=EB=CF=CE=C4=D2=C1=D4=D8=C5=D7?= <ruslan712@mail.ru>
-To: bluez-devel@lists.sourceforge.net,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: =?koi8-r?Q?Re[2]=3A_[Bluez-devel]_I_would_like_to_use_Bluez_in_my_device...?=
-Mime-Version: 1.0
-Date: Fri, 14 Dec 2007 13:31:00 +0300
-In-Reply-To: <1197570410.5644.100.camel@aeonflux>
-References: <1197570410.5644.100.camel@aeonflux>
-Reply-To: =?koi8-r?Q?=F2=D5=D3=CC=C1=CE_=EB=CF=CE=C4=D2=C1=D4=D8=C5=D7?= <ruslan712@mail.ru>
-Content-Type: text/plain; charset=koi8-r
-Message-Id: <E1J37oq-000ClW-00.ruslan712-mail-ru@f105.mail.ru>
+Date: Fri, 14 Dec 2007 09:45:56 +0800
+From: Dave Young <hidave.darkstar@gmail.com>
+To: marcel@holtmann.org
+Cc: linux-kernel@vger.kernel.org, bluez-devel@lists.sourceforge.net
+Subject: [PATCH][rewrite with goto error handling] Bluetooth: hci_sysfs
+	connection add/del workqueue bug fix
+Message-ID: <20071214014556.GA3090@darkstar.te-china.tietoenator.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 List-ID: <bluez-devel.lists.sourceforge.net>
 
-Thank you very much for a help and for answers!
+The bluetooth hci conn sysfs add/del executed in the default workqueue. If the conn del function is executed after the new conn add function with same bluetooth target address, the connection add will failed and warning about same kobject name.
 
-Best regards,
-Ruslan Kondratyev
+Here add a btconn workqueue, and flush the workqueue in the add_conn function to avoid the above issue. 
 
------Original Message-----
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Руслан Кондратьев <ruslan712@mail.ru>, BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Thu, 13 Dec 2007 19:26:50 +0100
-Subject: Re: [Bluez-devel] I would like to use Bluez in my device...
+Signed-off-by: Dave Young <hidave.darkstar@gmail.com> 
 
-> 
-> Hi,
-> 
-> > Many thanks for your answer.
-> > 
-> > But, Linux and eCos have a lot in common.
-> > 
-> > Could you help me even with any documentation.
-> 
-> even if eCos and Linux has enough in common, you still need to port the
-> kernel portion of BlueZ to the eCos kernel. Not an easy task since all
-> the core layers are Linux kernel modules. So feel free to go ahead and
-> try, but to be honest, don't expect help from the BlueZ developers. Our
-> main focus is Linux and that keeps us busy enough.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
+---
+net/bluetooth/hci_sysfs.c |   48 +++++++++++++++++++++++++++++++++++-----------
+1 file changed, 37 insertions(+), 11 deletions(-)
+
+diff -upr linux/net/bluetooth/hci_sysfs.c linux.new/net/bluetooth/hci_sysfs.c
+--- linux/net/bluetooth/hci_sysfs.c	2007-12-14 09:24:44.000000000 +0800
++++ linux.new/net/bluetooth/hci_sysfs.c	2007-12-14 09:36:50.000000000 +0800
+@@ -12,6 +12,8 @@
+ #undef  BT_DBG
+ #define BT_DBG(D...)
+ #endif
++static struct workqueue_struct *btaddconn;
++static struct workqueue_struct *btdelconn;
+ 
+ static inline char *typetostr(int type)
+ {
+@@ -279,6 +281,7 @@ static void add_conn(struct work_struct 
+ 	struct hci_conn *conn = container_of(work, struct hci_conn, work);
+ 	int i;
+ 
++	flush_workqueue(btdelconn);
+ 	if (device_add(&conn->dev) < 0) {
+ 		BT_ERR("Failed to register connection device");
+ 		return;
+@@ -313,6 +316,7 @@ void hci_conn_add_sysfs(struct hci_conn 
+ 
+ 	INIT_WORK(&conn->work, add_conn);
+ 
++	queue_work(btaddconn, &conn->work);
+ 	schedule_work(&conn->work);
+ }
+ 
+@@ -331,6 +335,7 @@ void hci_conn_del_sysfs(struct hci_conn 
+ 
+ 	INIT_WORK(&conn->work, del_conn);
+ 
++	queue_work(btdelconn, &conn->work);
+ 	schedule_work(&conn->work);
+ }
+ 
+@@ -380,31 +385,52 @@ int __init bt_sysfs_init(void)
+ {
+ 	int err;
+ 
++	btaddconn = create_singlethread_workqueue("btaddconn");
++	if (!btaddconn) {
++		err = -ENOMEM;
++		goto out;
++	}
++	btdelconn = create_singlethread_workqueue("btdelconn");
++	if (!btdelconn) {
++		err = -ENOMEM;
++		goto out_del;
++	}
++
+ 	bt_platform = platform_device_register_simple("bluetooth", -1, NULL, 0);
+-	if (IS_ERR(bt_platform))
+-		return PTR_ERR(bt_platform);
++	if (IS_ERR(bt_platform)) {
++		err = PTR_ERR(bt_platform);
++		goto out_platform;
++	}
+ 
+ 	err = bus_register(&bt_bus);
+-	if (err < 0) {
+-		platform_device_unregister(bt_platform);
+-		return err;
+-	}
++	if (err < 0)
++		goto out_bus;
+ 
+ 	bt_class = class_create(THIS_MODULE, "bluetooth");
+ 	if (IS_ERR(bt_class)) {
+-		bus_unregister(&bt_bus);
+-		platform_device_unregister(bt_platform);
+-		return PTR_ERR(bt_class);
++		err = PTR_ERR(bt_class);
++		goto out_class;
+ 	}
+ 
+ 	return 0;
++
++out_class:
++	bus_unregister(&bt_bus);
++out_bus:
++	platform_device_unregister(bt_platform);
++out_platform:
++	destroy_workqueue(btdelconn);
++out_del:
++	destroy_workqueue(btaddconn);
++out:
++	return err;
+ }
+ 
+ void bt_sysfs_cleanup(void)
+ {
++	destroy_workqueue(btaddconn);
++	destroy_workqueue(btdelconn);
+ 	class_destroy(bt_class);
+-
+ 	bus_unregister(&bt_bus);
+-
+ 	platform_device_unregister(bt_platform);
+ }
