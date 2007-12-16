@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <8a8adccc0712161405l301ad3b4p771bea92d835d070@mail.gmail.com>
-References: <8a8adccc0712161331u26260504gfa88aa9f0218dc7@mail.gmail.com>
-	<1197841994.8050.45.camel@aeonflux>
-	<8a8adccc0712161405l301ad3b4p771bea92d835d070@mail.gmail.com>
-Date: Sun, 16 Dec 2007 23:29:20 +0000
-Message-Id: <1197847760.26210.271.camel@cookie.hadess.net>
+In-Reply-To: <8a8adccc0712161443w7ba67743jc06515240cfdf83d@mail.gmail.com>
+References: <8a8adccc0712161309m29c70a45x212bead7a823d808@mail.gmail.com>
+	<1197841650.8050.39.camel@aeonflux>
+	<8a8adccc0712161443w7ba67743jc06515240cfdf83d@mail.gmail.com>
+Date: Sun, 16 Dec 2007 23:24:07 +0000
+Message-Id: <1197847447.26210.268.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Use PO Linguas for i18n
+Subject: Re: [Bluez-devel] [PATCH] Beautify about dialog
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,18 +22,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hey Jaap,
 
-On Sun, 2007-12-16 at 23:05 +0100, Jaap A. Haitsma wrote:
+On Sun, 2007-12-16 at 23:43 +0100, Jaap A. Haitsma wrote:
+> Hi Marcel,
 > 
-> -AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [The name of
-> the gettext domain])
-> +AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [GETTEXT
-> package name])
+> >
+> > > Attached patch does the following
+> > >
+> > > * about dialog code is simpler
+> >
+> > you can't use gtk_dialog_run for the applet's about dialog. It will
+> > block and thus block all PIN requests. The current code is this way for
+> > a reason.
+> 
+> Didn't know that. I now use g_object_set which also reduces the amount
+> of code considerably.
 
-That's unneeded (unless you're fixing errors related to quoting, in
-which case don't change the spacing or the contents).
+You can still use gtk_show_about_dialog(). It removes the close
+callback, and makes sure that only one dialogue shows up, and removes a
+lot of boiler-plate code (it doesn't use a separate main loop like
+gtk_dialog_run does). The gtk_dialog_run avoidance in the callbacks is
+still needed.
 
-The rest is straight forward and should be applied.
+Cheers
 
 
 -------------------------------------------------------------------------
