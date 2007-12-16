@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <8a8adccc0712161309m29c70a45x212bead7a823d808@mail.gmail.com>
-References: <8a8adccc0712161309m29c70a45x212bead7a823d808@mail.gmail.com>
-Date: Sun, 16 Dec 2007 22:47:30 +0100
-Message-Id: <1197841650.8050.39.camel@aeonflux>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Beautify about dialog
+Message-ID: <8a8adccc0712161331u26260504gfa88aa9f0218dc7@mail.gmail.com>
+Date: Sun, 16 Dec 2007 22:31:16 +0100
+From: "Jaap A. Haitsma" <jaap@haitsma.org>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_10574_30187444.1197840676981"
+Subject: [Bluez-devel] [PATCH] Use PO Linguas for i18n
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,34 +16,103 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jaap,
+------=_Part_10574_30187444.1197840676981
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> Attached patch does the following
-> 
-> * about dialog code is simpler
+See GNOME Goal
+http://live.gnome.org/GnomeGoals/PoLinguas
 
-you can't use gtk_dialog_run for the applet's about dialog. It will
-block and thus block all PIN requests. The current code is this way for
-a reason.
+* Attached patch has to be applied
+* Attached LINGUAS file has to be put in the po directory
+* po/Makefile.in.in can be removed
 
-> * email address and URLs are clickable
+Jaap
 
-Send a separate patch for this.
+------=_Part_10574_30187444.1197840676981
+Content-Type: text/x-patch; name=gnome-bluetoot-polinguas.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_faa3cimg0
+Content-Disposition: attachment; filename=gnome-bluetoot-polinguas.patch
 
-> * Makes sure that every window gets a bluetooth window icon
+PyBNYWtlZmlsZQo/IE1ha2VmaWxlLmluCj8gYWNsb2NhbC5tNAo/IGF1dG9nZW4uc2gKPyBhdXRv
+bTR0ZS5jYWNoZQo/IGNvbmZpZy5ndWVzcwo/IGNvbmZpZy5oCj8gY29uZmlnLmguaW4KPyBjb25m
+aWcubG9nCj8gY29uZmlnLnN0YXR1cwo/IGNvbmZpZy5zdWIKPyBjb25maWd1cmUKPyBkZXBjb21w
+Cj8gaW5zdGFsbC1zaAo/IGludGx0b29sLWV4dHJhY3QKPyBpbnRsdG9vbC1leHRyYWN0LmluCj8g
+aW50bHRvb2wtbWVyZ2UKPyBpbnRsdG9vbC1tZXJnZS5pbgo/IGludGx0b29sLXVwZGF0ZQo/IGlu
+dGx0b29sLXVwZGF0ZS5pbgo/IG1pc3NpbmcKPyBta2luc3RhbGxkaXJzCj8gb21mLm1ha2UKPyBz
+dGFtcC1oMQo/IHhtbGRvY3MubWFrZQo/IGFuYWx5emVyLy5kZXBzCj8gYW5hbHl6ZXIvTWFrZWZp
+bGUKPyBhbmFseXplci9NYWtlZmlsZS5pbgo/IGFuYWx5emVyL2JsdWV0b290aC1hbmFseXplcgo/
+IGFuYWx5emVyL2JsdWV0b290aC1hbmFseXplci5kZXNrdG9wCj8gYW5hbHl6ZXIvYmx1ZXRvb3Ro
+LW1hbmFnZXIueG1sCj8gYXBwbGV0Ly5kZXBzCj8gYXBwbGV0L01ha2VmaWxlCj8gYXBwbGV0L01h
+a2VmaWxlLmluCj8gYXBwbGV0L2JsdWV0b290aC1hcHBsZXQKPyBhcHBsZXQvYmx1ZXRvb3RoLWFw
+cGxldC5kZXNrdG9wCj8gY29tbW9uLy5kZXBzCj8gY29tbW9uL01ha2VmaWxlCj8gY29tbW9uL01h
+a2VmaWxlLmluCj8gY29tbW9uL2F1dGgtYWdlbnQtZ2x1ZS5oCj8gY29tbW9uL2RidXMtZ2x1ZS5o
+Cj8gY29tbW9uL21hcnNoYWwuYwo/IGNvbW1vbi9tYXJzaGFsLmgKPyBjb21tb24vcGFzc2tleS1h
+Z2VudC1nbHVlLmgKPyBjb21tb24vdGVzdC1hZ2VudAo/IGNvbW1vbi90ZXN0LWNsaWVudAo/IGNv
+bW1vbi90ZXN0LWRldmljZXNlbGVjdGlvbgo/IHBvL0xJTkdVQVMKPyBwby9NYWtlZmlsZQo/IHBv
+L01ha2VmaWxlLmluCj8gcG8vTWFrZWZpbGUuaW4uaW4KPyBwby9QT1RGSUxFUwo/IHBvL2JnLmdt
+bwo/IHBvL2NhLmdtbwo/IHBvL2NzLmdtbwo/IHBvL2RhLmdtbwo/IHBvL2RlLmdtbwo/IHBvL2Vu
+X0dCLmdtbwo/IHBvL2VzLmdtbwo/IHBvL2ZpLmdtbwo/IHBvL2ZyLmdtbwo/IHBvL2h1Lmdtbwo/
+IHBvL2lkLmdtbwo/IHBvL2l0Lmdtbwo/IHBvL2t1Lmdtbwo/IHBvL25iLmdtbwo/IHBvL25sLmdt
+bwo/IHBvL3BsLmdtbwo/IHBvL3B0Lmdtbwo/IHBvL3B0X0JSLmdtbwo/IHBvL3JvLmdtbwo/IHBv
+L3J1Lmdtbwo/IHBvL3NrLmdtbwo/IHBvL3NyLmdtbwo/IHBvL3N0YW1wLWl0Cj8gcG8vc3YuZ21v
+Cj8gcG8vdHIuZ21vCj8gcG8vemhfQ04uZ21vCj8gcHJvcGVydGllcy8uZGVwcwo/IHByb3BlcnRp
+ZXMvTWFrZWZpbGUKPyBwcm9wZXJ0aWVzL01ha2VmaWxlLmluCj8gcHJvcGVydGllcy9ibHVldG9v
+dGgtbWFuYWdlci5zY2hlbWFzCj8gcHJvcGVydGllcy9ibHVldG9vdGgtcHJvcGVydGllcwo/IHBy
+b3BlcnRpZXMvYmx1ZXRvb3RoLXByb3BlcnRpZXMuZGVza3RvcAo/IHByb3hpbWl0eS8uZGVwcwo/
+IHByb3hpbWl0eS9NYWtlZmlsZQo/IHByb3hpbWl0eS9NYWtlZmlsZS5pbgo/IHByb3hpbWl0eS9i
+bHVldG9vdGgtcHJveGltaXR5Cj8gcHJveGltaXR5L21hcnNoYWwuYwo/IHByb3hpbWl0eS9tYXJz
+aGFsLmgKPyBzZW5kdG8vLmRlcHMKPyBzZW5kdG8vTWFrZWZpbGUKPyBzZW5kdG8vTWFrZWZpbGUu
+aW4KPyBzZW5kdG8vYmx1ZXRvb3RoLXNlbmR0bwo/IHNlbmR0by9tYXJzaGFsLmMKPyBzZW5kdG8v
+bWFyc2hhbC5oCj8gd2l6YXJkLy5kZXBzCj8gd2l6YXJkL01ha2VmaWxlCj8gd2l6YXJkL01ha2Vm
+aWxlLmluCj8gd2l6YXJkL2JsdWV0b290aC13aXphcmQKSW5kZXg6IGNvbmZpZ3VyZS5pbgo9PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09ClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVlei9nbm9tZS9jb25maWd1cmUuaW4sdgpyZXRy
+aWV2aW5nIHJldmlzaW9uIDEuNTUKZGlmZiAtdSAtcjEuNTUgY29uZmlndXJlLmluCi0tLSBjb25m
+aWd1cmUuaW4JMjkgQXVnIDIwMDcgMTM6MTk6NTAgLTAwMDAJMS41NQorKysgY29uZmlndXJlLmlu
+CTE2IERlYyAyMDA3IDIxOjI4OjE1IC0wMDAwCkBAIC0xNSwxNCArMTUsMTYgQEAKIEFDX1BST0df
+SU5TVEFMTAogQUNfUFJPR19SQU5MSUIKIAorIyoqKioqKioqKioqKioqKioqKioqKioqKioqKioq
+KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKKyMgSW50
+ZXJuYXRpb25hbGl6YXRpb24KKyMqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
+KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCiBHRVRURVhUX1BBQ0tB
+R0U9Ymx1ZXRvb3RoLW1hbmFnZXIKIEFDX1NVQlNUKEdFVFRFWFRfUEFDS0FHRSkKLUFDX0RFRklO
+RV9VTlFVT1RFRChHRVRURVhUX1BBQ0tBR0UsICIkR0VUVEVYVF9QQUNLQUdFIiwgW1RoZSBuYW1l
+IG9mIHRoZSBnZXR0ZXh0IGRvbWFpbl0pCitBQ19ERUZJTkVfVU5RVU9URUQoR0VUVEVYVF9QQUNL
+QUdFLCIkR0VUVEVYVF9QQUNLQUdFIiwgW0dFVFRFWFQgcGFja2FnZSBuYW1lXSkKIAotQUxMX0xJ
+TkdVQVM9ImZpIHB0X0JSIHBsIGh1IHJvIHRyIGNhIHpoX0NOIHNyIGlkIHJ1IHNrIG5iIGl0IHN2
+IGJnIGVuX0dCIGZyIGNzIG5sIGt1IGVzIHB0IGRlIGRhIgorSVRfUFJPR19JTlRMVE9PTChbMC4z
+NS4wXSkKIEFNX0dMSUJfR05VX0dFVFRFWFQKLQotSVRfUFJPR19JTlRMVE9PTAorIyoqKioqKioq
+KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
+KioqKioqKioqKioqKioKIAogQUNfUEFUSF9QUk9HKEdDT05GVE9PTCwgW2djb25mdG9vbC0yXSkK
+IEFNX0dDT05GX1NPVVJDRV8yCkBAIC03Niw0ICs3OCwxNSBAQAogCiBBQ19BUkdfQkxVRVoKIAot
+QUNfT1VUUFVUKE1ha2VmaWxlIGNvbW1vbi9NYWtlZmlsZSBhcHBsZXQvTWFrZWZpbGUgcHJvcGVy
+dGllcy9NYWtlZmlsZSBzZW5kdG8vTWFrZWZpbGUgd2l6YXJkL01ha2VmaWxlIGFuYWx5emVyL01h
+a2VmaWxlIHByb3hpbWl0eS9NYWtlZmlsZSBwby9NYWtlZmlsZS5pbikKKyMqKioqKioqKioqKioq
+KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
+KioqKioqKioqCitBQ19PVVRQVVQoWworTWFrZWZpbGUgCitjb21tb24vTWFrZWZpbGUKK2FwcGxl
+dC9NYWtlZmlsZSAKK3Byb3BlcnRpZXMvTWFrZWZpbGUgCitzZW5kdG8vTWFrZWZpbGUgCit3aXph
+cmQvTWFrZWZpbGUgCithbmFseXplci9NYWtlZmlsZSAKK3Byb3hpbWl0eS9NYWtlZmlsZSAKK3Bv
+L01ha2VmaWxlLmluCitdKQo=
+------=_Part_10574_30187444.1197840676981
+Content-Type: application/octet-stream; name=LINGUAS
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_faa3dmnl1
+Content-Disposition: attachment; filename=LINGUAS
 
-This should be already working. And if it is missing somewhere, I need a
-separate patch for it.
-
-Regards
-
-Marcel
-
-
+IyBwbGVhc2Uga2VlcCB0aGlzIGxpc3Qgc29ydGVkIGFscGhhYmV0aWNhbGx5CmJnICAKY2EgIApj
+cyAgCmRhICAgICAKZGUgICAgIAplbl9HQiAgCmVzICAKZmkgIApmciAgCmh1ICAKaWQgIAppdCAg
+Cmt1ICAKbmIgIApubCAgCnBsICAgICAKcHRfQlIgIApwdCAgICAgCnJvICAKcnUgIApzayAgCnNy
+ICAKc3YKdHIKemhfQ04K
+------=_Part_10574_30187444.1197840676981
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 SF.Net email is sponsored by:
@@ -51,7 +120,15 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services
 for just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+------=_Part_10574_30187444.1197840676981
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_10574_30187444.1197840676981--
