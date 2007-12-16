@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1197847760.26210.271.camel@cookie.hadess.net>
+In-Reply-To: <8a8adccc0712161405l301ad3b4p771bea92d835d070@mail.gmail.com>
 References: <8a8adccc0712161331u26260504gfa88aa9f0218dc7@mail.gmail.com>
 	<1197841994.8050.45.camel@aeonflux>
 	<8a8adccc0712161405l301ad3b4p771bea92d835d070@mail.gmail.com>
-	<1197847760.26210.271.camel@cookie.hadess.net>
-Date: Mon, 17 Dec 2007 01:52:52 +0100
-Message-Id: <1197852772.8050.47.camel@aeonflux>
+Date: Sun, 16 Dec 2007 23:29:20 +0000
+Message-Id: <1197847760.26210.271.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] [PATCH] Use PO Linguas for i18n
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -23,26 +22,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
 
-> > -AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [The name of
-> > the gettext domain])
-> > +AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [GETTEXT
-> > package name])
+On Sun, 2007-12-16 at 23:05 +0100, Jaap A. Haitsma wrote:
 > 
-> That's unneeded (unless you're fixing errors related to quoting, in
-> which case don't change the spacing or the contents).
+> -AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [The name of
+> the gettext domain])
+> +AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [GETTEXT
+> package name])
 
-right, I don't get this one. I skipped it.
+That's unneeded (unless you're fixing errors related to quoting, in
+which case don't change the spacing or the contents).
 
-> The rest is straight forward and should be applied.
-
-Used my own version, but should work the same.
-
-Regards
-
-Marcel
-
+The rest is straight forward and should be applied.
 
 
 -------------------------------------------------------------------------
