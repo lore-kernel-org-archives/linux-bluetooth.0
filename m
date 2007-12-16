@@ -1,49 +1,213 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <8a8adccc0712161449r135b552ct39f2cb9bcdeb543d@mail.gmail.com>
-Date: Sun, 16 Dec 2007 23:49:02 +0100
+Message-ID: <8a8adccc0712161443w7ba67743jc06515240cfdf83d@mail.gmail.com>
+Date: Sun, 16 Dec 2007 23:43:55 +0100
 From: "Jaap A. Haitsma" <jaap@haitsma.org>
-Sender: jaap.haitsma@gmail.com
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: [PATCH] Bluez build system
-Cc: bluez-devel@lists.sourceforge.net
-In-Reply-To: <1197841752.8050.42.camel@aeonflux>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1197841650.8050.39.camel@aeonflux>
 MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_10780_21440921.1197845035838"
+References: <8a8adccc0712161309m29c70a45x212bead7a823d808@mail.gmail.com>
+	<1197841650.8050.39.camel@aeonflux>
+Subject: Re: [Bluez-devel] [PATCH] Beautify about dialog
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
+
+------=_Part_10780_21440921.1197845035838
 Content-Type: text/plain; charset=ISO-8859-1
-References: <8a8adccc0709020615m38389d6axe49041f8fbe18c4b@mail.gmail.com>
-	 <1188768824.24968.9.camel@violet>
-	 <8a8adccc0712161246y3f435aefwdb6c92c464d19f96@mail.gmail.com>
-	 <1197841752.8050.42.camel@aeonflux>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-On Dec 16, 2007 10:49 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jaap,
+Hi Marcel,
+
 >
-> > With a couple of months delay but here it is.
+> > Attached patch does the following
 > >
-> > Attached you find autogen.sh. Just put this file in the gnome
-> > directory of bluez and gnome-bluetooth can be build with jhbuild. NOTE
-> > you need to have the package gnome-common installed. gnome-common
-> > contains common scripts and macros to make developing GNOME apps
-> > easier
+> > * about dialog code is simpler
 >
-> that is not gonna happen since even if it is called bluez-gnome, it can
-> be build and used without GNOME. Its only dependency is GTK+. So
-> depending on gnome-common is not an option.
+> you can't use gtk_dialog_run for the applet's about dialog. It will
+> block and thus block all PIN requests. The current code is this way for
+> a reason.
 
-It's a build time dependency only. There is no run time dependency.
+Didn't know that. I now use g_object_set which also reduces the amount
+of code considerably.
 
-> > The files bootstrap and bootstrap-configure can be removed because
-> > autogen.sh is now doing that job.
+
+> > * email address and URLs are clickable
 >
-> I actually like bootstrap and bootstrap-configure, because they do
-> exactly the right job for the developers.
->
-I'd like to have autogen.sh because then bluez gnome can get build with jhbuild
-I then see two options
-1) Add autogen.sh as is and also leave the bootstrap files in CVS
-2) I'll need to hack up an autogen.sh which doesn't need gnome-common.
-I'm not an autofoo expert but I guess that can be done
+> Send a separate patch for this.
 
-What's acceptable for you?
+It's still in the same patch, because the patches change stuff in the
+same function
+
+These two function calls in about_callback do the trick
+
+	gtk_about_dialog_set_url_hook (about_dialog_handle_url_cb, NULL, NULL);
+	gtk_about_dialog_set_email_hook (about_dialog_handle_email_cb, NULL, NULL);
+
+
+> > * Makes sure that every window gets a bluetooth window icon
+>
+> This should be already working. And if it is missing somewhere, I need a
+> separate patch for it.
+
+The credits window didn't have it.
+
+The call:
+gtk_window_set_default_icon_name ("stock_bluetooth");
+makes sure that any window at least gets an icon
+
+        g_set_application_name (_("Bluetooth Applet"));
+makes sure that the about dialog always says "Bluetooth Applet" no
+matter which version of GTK you have installed. (In GTK 2.12 the name
+attribute was changed)
+
+I hope that with this info it is easy to review the patch. If not let
+me know and I'll try to split it up
+
+Kind regards
 
 Jaap
+
+Jaap
+
+------=_Part_10780_21440921.1197845035838
+Content-Type: text/x-patch; name=gnome-bluetooth-about-dialog2.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_faa5zwd50
+Content-Disposition: attachment; filename=gnome-bluetooth-about-dialog2.patch
+
+SW5kZXg6IGFwcGxldC9tYWluLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXov
+Z25vbWUvYXBwbGV0L21haW4uYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS44OQpkaWZmIC11IC1y
+MS44OSBtYWluLmMKLS0tIGFwcGxldC9tYWluLmMJNCBEZWMgMjAwNyAxNTozMDo1MSAtMDAwMAkx
+Ljg5CisrKyBhcHBsZXQvbWFpbi5jCTE2IERlYyAyMDA3IDIyOjMxOjM1IC0wMDAwCkBAIC0xNTA0
+LDQwICsxNTA0LDEyMCBAQAogCWd0a193aWRnZXRfZGVzdHJveShkaWFsb2cpOwogfQogCi1zdGF0
+aWMgdm9pZCBhYm91dF9jYWxsYmFjayhHdGtXaWRnZXQgKml0ZW0sIGdwb2ludGVyIHVzZXJfZGF0
+YSkKK3N0YXRpYyB2b2lkIAorYWJvdXRfZGlhbG9nX2hhbmRsZV91cmxfY2IgKEd0a0Fib3V0RGlh
+bG9nICphYm91dCwgY29uc3QgZ2NoYXIgKnVybCwgZ3BvaW50ZXIgZGF0YSkKIHsKLQljb25zdCBn
+Y2hhciAqYXV0aG9yc1tdID0gewotCQkiTWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9sdG1hbm4u
+b3JnPiIsCi0JCSJCYXN0aWVuIE5vY2VyYSA8aGFkZXNzQGhhZGVzcy5uZXQ+IiwKLQkJTlVMTAot
+CX07Ci0JR3RrV2lkZ2V0ICpkaWFsb2c7CisJR0Vycm9yICplcnJvciA9IE5VTEw7CisJZ2Jvb2xl
+YW4gcmV0OworCWNoYXIgKmNtZGxpbmU7CisJR2RrU2NyZWVuICpnc2NyZWVuOworCUd0a1dpZGdl
+dCAqZXJyb3JfZGlhbG9nOworCisJZ3NjcmVlbiA9IGdka19zY3JlZW5fZ2V0X2RlZmF1bHQoKTsK
+KworCWNtZGxpbmUgPSBnX3N0cmNvbmNhdCAoImdub21lLW9wZW4gIiwgdXJsLCBOVUxMKTsKKwly
+ZXQgPSBnZGtfc3Bhd25fY29tbWFuZF9saW5lX29uX3NjcmVlbiAoZ3NjcmVlbiwgY21kbGluZSwg
+JmVycm9yKTsKKwlnX2ZyZWUgKGNtZGxpbmUpOwogCi0JZGlhbG9nID0gZ3RrX2Fib3V0X2RpYWxv
+Z19uZXcoKTsKKwlpZiAocmV0ID09IFRSVUUpCisJCXJldHVybjsKIAotCWd0a193aW5kb3dfc2V0
+X2ljb25fbmFtZShHVEtfV0lORE9XKGRpYWxvZyksICJzdG9ja19ibHVldG9vdGgiKTsKKwlnX2Vy
+cm9yX2ZyZWUgKGVycm9yKTsKKwllcnJvciA9IE5VTEw7CisKKwljbWRsaW5lID0gZ19zdHJjb25j
+YXQgKCJ4ZGctb3BlbiAiLCB1cmwsIE5VTEwpOworCXJldCA9IGdka19zcGF3bl9jb21tYW5kX2xp
+bmVfb25fc2NyZWVuIChnc2NyZWVuLCBjbWRsaW5lLCAmZXJyb3IpOworCWdfZnJlZSAoY21kbGlu
+ZSk7CisJCisJaWYgKHJldCA9PSBGQUxTRSkgeworCQllcnJvcl9kaWFsb2cgPSBndGtfbWVzc2Fn
+ZV9kaWFsb2dfbmV3ICggTlVMTCwgR1RLX0RJQUxPR19NT0RBTCwgR1RLX01FU1NBR0VfSU5GTywg
+R1RLX0JVVFRPTlNfT0ssICJGYWlsZWQgdG8gc2hvdyB1cmwgJXMiLCBlcnJvci0+bWVzc2FnZSk7
+IAorCQlndGtfZGlhbG9nX3J1biAoR1RLX0RJQUxPRyAoZXJyb3JfZGlhbG9nKSk7CisJCWdfZXJy
+b3JfZnJlZSAoZXJyb3IpOworCX0KKworfQorCisvKiBNYWtlIGVtYWlsIGluIGFib3V0IGRpYWxv
+ZyBjbGlja2FibGUgKi8KK3N0YXRpYyB2b2lkIAorYWJvdXRfZGlhbG9nX2hhbmRsZV9lbWFpbF9j
+YiAoR3RrQWJvdXREaWFsb2cgKmFib3V0LCBjb25zdCBjaGFyICplbWFpbF9hZGRyZXNzLCBncG9p
+bnRlciBkYXRhKQoreworCUdFcnJvciAqZXJyb3IgPSBOVUxMOworCWdib29sZWFuIHJldDsKKwlj
+aGFyICpjbWRsaW5lOworCUdka1NjcmVlbiAqZ3NjcmVlbjsKKwlHdGtXaWRnZXQgKmVycm9yX2Rp
+YWxvZzsKKworCWdzY3JlZW4gPSBnZGtfc2NyZWVuX2dldF9kZWZhdWx0KCk7CisKKwljbWRsaW5l
+ID0gZ19zdHJjb25jYXQgKCJnbm9tZS1vcGVuIG1haWx0bzoiLCBlbWFpbF9hZGRyZXNzLCBOVUxM
+KTsKKwlyZXQgPSBnZGtfc3Bhd25fY29tbWFuZF9saW5lX29uX3NjcmVlbiAoZ3NjcmVlbiwgY21k
+bGluZSwgJmVycm9yKTsKKwlnX2ZyZWUgKGNtZGxpbmUpOworCisJaWYgKHJldCA9PSBUUlVFKQor
+CQlyZXR1cm47CiAKLQlndGtfYWJvdXRfZGlhbG9nX3NldF9uYW1lKEdUS19BQk9VVF9ESUFMT0co
+ZGlhbG9nKSwKLQkJCQkJCV8oIkJsdWV0b290aCBBcHBsZXQiKSk7CisJZ19lcnJvcl9mcmVlIChl
+cnJvcik7CisJZXJyb3IgPSBOVUxMOwogCi0JZ3RrX2Fib3V0X2RpYWxvZ19zZXRfdmVyc2lvbihH
+VEtfQUJPVVRfRElBTE9HKGRpYWxvZyksIFZFUlNJT04pOworCWNtZGxpbmUgPSBnX3N0cmNvbmNh
+dCAoInhkZy1vcGVuIG1haWx0bzoiLCBlbWFpbF9hZGRyZXNzLCBOVUxMKTsKKwlyZXQgPSBnZGtf
+c3Bhd25fY29tbWFuZF9saW5lX29uX3NjcmVlbiAoZ3NjcmVlbiwgY21kbGluZSwgJmVycm9yKTsK
+KwlnX2ZyZWUgKGNtZGxpbmUpOworCQorCWlmIChyZXQgPT0gRkFMU0UpIHsKKwkJZXJyb3JfZGlh
+bG9nID0gZ3RrX21lc3NhZ2VfZGlhbG9nX25ldyAoIE5VTEwsIEdUS19ESUFMT0dfTU9EQUwsIEdU
+S19NRVNTQUdFX0lORk8sIEdUS19CVVRUT05TX09LLCAiRmFpbGVkIHRvIHNob3cgdXJsICVzIiwg
+ZXJyb3ItPm1lc3NhZ2UpOyAKKwkJZ3RrX2RpYWxvZ19ydW4gKEdUS19ESUFMT0cgKGVycm9yX2Rp
+YWxvZykpOworCQlnX2Vycm9yX2ZyZWUgKGVycm9yKTsKKwl9Cit9CiAKLQlndGtfYWJvdXRfZGlh
+bG9nX3NldF9jb3B5cmlnaHQoR1RLX0FCT1VUX0RJQUxPRyhkaWFsb2cpLAotCQkJIkNvcHlyaWdo
+dCBceGMyXHhhOSAyMDA1LTIwMDcgTWFyY2VsIEhvbHRtYW5uIik7CiAKLQlndGtfYWJvdXRfZGlh
+bG9nX3NldF9jb21tZW50cyhHVEtfQUJPVVRfRElBTE9HKGRpYWxvZyksCi0JCQlfKCJBIEJsdWV0
+b290aCBtYW5hZ2VyIGZvciB0aGUgR05PTUUgZGVza3RvcCIpKTsKK3N0YXRpYyB2b2lkIGFib3V0
+X2NhbGxiYWNrKEd0a1dpZGdldCAqaXRlbSwgZ3BvaW50ZXIgdXNlcl9kYXRhKQoreworCUd0a1dp
+ZGdldCAqZGlhbG9nOworCisJY29uc3QgZ2NoYXIgKmF1dGhvcnNbXSA9IHsKKwkJIk1hcmNlbCBI
+b2x0bWFubiA8bWFyY2VsQGhvbHRtYW5uLm9yZz4iLAorCQkiQmFzdGllbiBOb2NlcmEgPGhhZGVz
+c0BoYWRlc3MubmV0PiIsCisJCU5VTEwKKwl9OworICAgICAgICBjb25zdCBjaGFyICp0cmFuc2xh
+dG9yczsKKyAgICAgICAgdHJhbnNsYXRvcnMgPSBfKCJ0cmFuc2xhdG9yLWNyZWRpdHMiKTsKIAot
+CWd0a19hYm91dF9kaWFsb2dfc2V0X2xvZ29faWNvbl9uYW1lKEdUS19BQk9VVF9ESUFMT0coZGlh
+bG9nKSwKLQkJCQkJCQkic3RvY2tfYmx1ZXRvb3RoIik7CisgICAgICAgIGNvbnN0IGNoYXIgKmxp
+Y2Vuc2VbXSA9IHsKKyAgICAgICAgICAgICAgICBOXygiVGhpcyBwcm9ncmFtIGlzIGZyZWUgc29m
+dHdhcmU7IHlvdSBjYW4gcmVkaXN0cmlidXRlIGl0IGFuZC9vciBtb2RpZnkgIgorICAgICAgICAg
+ICAgICAgICJpdCB1bmRlciB0aGUgdGVybXMgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNl
+bnNlIGFzIHB1Ymxpc2hlZCBieSAiCisgICAgICAgICAgICAgICAgInRoZSBGcmVlIFNvZnR3YXJl
+IEZvdW5kYXRpb247IGVpdGhlciB2ZXJzaW9uIDIgb2YgdGhlIExpY2Vuc2UsIG9yICIKKyAgICAg
+ICAgICAgICAgICAiKGF0IHlvdXIgb3B0aW9uKSBhbnkgbGF0ZXIgdmVyc2lvbi5cbiIpLAorICAg
+ICAgICAgICAgICAgIE5fKCJUaGlzIHByb2dyYW0gaXMgZGlzdHJpYnV0ZWQgaW4gdGhlIGhvcGUg
+dGhhdCBpdCB3aWxsIGJlIHVzZWZ1bCwgIgorICAgICAgICAgICAgICAgICJidXQgV0lUSE9VVCBB
+TlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1wbGllZCB3YXJyYW50eSBvZiAiCisgICAg
+ICAgICAgICAgICAgIk1FUkNIQU5UQUJJTElUWSBvciBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIg
+UFVSUE9TRS4gIFNlZSB0aGUgIgorICAgICAgICAgICAgICAgICJHTlUgR2VuZXJhbCBQdWJsaWMg
+TGljZW5zZSBmb3IgbW9yZSBkZXRhaWxzLlxuIiksCisgICAgICAgICAgICAgICAgTl8oIllvdSBz
+aG91bGQgaGF2ZSByZWNlaXZlZCBhIGNvcHkgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNl
+bnNlICIKKyAgICAgICAgICAgICAgICAiYWxvbmcgd2l0aCB0aGlzIHByb2dyYW0uIElmIG5vdCwg
+c2VlIDxodHRwOi8vd3d3LmdudS5vcmcvbGljZW5zZXMvPi4iKQorICAgICAgICB9OworCisgICAg
+ICAgIGNoYXIgKmxpY2Vuc2VfdHJhbnM7CisgICAgICAgIAorICAgICAgICBsaWNlbnNlX3RyYW5z
+ID0gZ19zdHJjb25jYXQgKF8obGljZW5zZVswXSksICJcbiIsIF8obGljZW5zZVsxXSksICJcbiIs
+CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXyhsaWNlbnNlWzJdKSwgIlxu
+IiwgTlVMTCk7CiAKLQlndGtfYWJvdXRfZGlhbG9nX3NldF93ZWJzaXRlKEdUS19BQk9VVF9ESUFM
+T0coZGlhbG9nKSwKLQkJCQkJCQkid3d3LmJsdWV6Lm9yZyIpOworCWd0a19hYm91dF9kaWFsb2df
+c2V0X3VybF9ob29rIChhYm91dF9kaWFsb2dfaGFuZGxlX3VybF9jYiwgTlVMTCwgTlVMTCk7CisJ
+Z3RrX2Fib3V0X2RpYWxvZ19zZXRfZW1haWxfaG9vayAoYWJvdXRfZGlhbG9nX2hhbmRsZV9lbWFp
+bF9jYiwgTlVMTCwgTlVMTCk7CiAKLQlndGtfYWJvdXRfZGlhbG9nX3NldF9hdXRob3JzKEdUS19B
+Qk9VVF9ESUFMT0coZGlhbG9nKSwgYXV0aG9ycyk7CisJZGlhbG9nID0gZ3RrX2Fib3V0X2RpYWxv
+Z19uZXcoKTsKIAotCWd0a19hYm91dF9kaWFsb2dfc2V0X3RyYW5zbGF0b3JfY3JlZGl0cyhHVEtf
+QUJPVVRfRElBTE9HKGRpYWxvZyksCi0JCQkJCQlfKCJ0cmFuc2xhdG9yLWNyZWRpdHMiKSk7Cisg
+ICAgICAgIGdfb2JqZWN0X3NldCAoR19PQkpFQ1QoZGlhbG9nKSwKKyAgICAgICAgICAgICAgICAg
+ICAgICAidmVyc2lvbiIsIFZFUlNJT04sCisgICAgICAgICAgICAgICAgICAgICAgImNvcHlyaWdo
+dCIsICJDb3B5cmlnaHQgXHhjMlx4YTkgMjAwNS0yMDA3IE1hcmNlbCBIb2x0bWFubiIsCisgICAg
+ICAgICAgICAgICAgICAgICAgImNvbW1lbnRzIiwgXygiQSBCbHVldG9vdGggbWFuYWdlciBmb3Ig
+dGhlIEdOT01FIGRlc2t0b3AiKSwKKyAgICAgICAgICAgICAgICAgICAgICAiYXV0aG9ycyIsIGF1
+dGhvcnMsCisgICAgICAgICAgICAgICAgICAgICAgInRyYW5zbGF0b3ItY3JlZGl0cyIsIHRyYW5z
+bGF0b3JzLAorICAgICAgICAgICAgICAgICAgICAgICJ3ZWJzaXRlIiwgImh0dHA6Ly93d3cuYmx1
+ZXoub3JnIiwKKwkgICAgICAgICAgICAgICJ3ZWJzaXRlLWxhYmVsIiwgXygiQmx1ZXogV2Vic2l0
+ZSIpLAorICAgICAgICAgICAgICAgICAgICAgICJsb2dvLWljb24tbmFtZSIsICJzdG9ja19ibHVl
+dG9vdGgiLAorICAgICAgICAgICAgICAgICAgICAgICJ3cmFwLWxpY2Vuc2UiLCBUUlVFLAorICAg
+ICAgICAgICAgICAgICAgICAgICJsaWNlbnNlIiwgbGljZW5zZV90cmFucywKKyAgICAgICAgICAg
+ICAgICAgICAgICBOVUxMKTsKIAogCWdfc2lnbmFsX2Nvbm5lY3QoZGlhbG9nLCAiY2xvc2UiLAog
+CQkJCUdfQ0FMTEJBQ0soY2xvc2VfY2FsbGJhY2spLCBOVUxMKTsKQEAgLTE3OTUsNiArMTg3NSw4
+IEBACiAjaWZkZWYgSEFWRV9MSUJOT1RJRlkKIAlub3RpZnlfaW5pdCgiYmx1ZXRvb3RoLW1hbmFn
+ZXIiKTsKICNlbmRpZgorICAgICAgICBnX3NldF9hcHBsaWNhdGlvbl9uYW1lIChfKCJCbHVldG9v
+dGggQXBwbGV0IikpOworICAgICAgICBndGtfd2luZG93X3NldF9kZWZhdWx0X2ljb25fbmFtZSAo
+InN0b2NrX2JsdWV0b290aCIpOwogCiAJY29ubiA9IGRidXNfZ19idXNfZ2V0KERCVVNfQlVTX1NZ
+U1RFTSwgJmVycm9yKTsKIAlpZiAoZXJyb3IgIT0gTlVMTCkgewo=
+------=_Part_10780_21440921.1197845035838
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+SF.Net email is sponsored by:
+Check out the new SourceForge.net Marketplace.
+It's the best place to buy or sell services
+for just about anything Open Source.
+http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+------=_Part_10780_21440921.1197845035838
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_10780_21440921.1197845035838--
