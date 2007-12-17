@@ -1,51 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <476615CA.8020809@am.sony.com>
-Date: Sun, 16 Dec 2007 22:23:06 -0800
-From: Geoff Levand <geoffrey.levand@am.sony.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ development <bluez-devel@lists.sourceforge.net>, maxk@qualcomm.com,
-        bluez-devel@lists.sf.net, dwmw2@infradead.org
-Subject: Re: [Bluez-devel] [RFC] PS3 Bluetooth quirk for HCI_FLT_CLEAR_ALL
-References: <463F7386.6050900@am.sony.com>	 <1178608551.8628.52.camel@aeonflux.holtmann.net>	 <1178622391.2824.34.camel@pmac.infradead.org>	 <1178630359.8628.63.camel@aeonflux.holtmann.net>	 <1178639244.2824.40.camel@pmac.infradead.org>	 <1178642601.8628.67.camel@aeonflux.holtmann.net>	 <4640FF63.8070403@am.sony.com>  <4641331E.1070408@am.sony.com>	 <1178694136.8628.82.camel@aeonflux.holtmann.net>	 <47646F04.8080301@am.sony.com> <1197768294.8050.8.camel@aeonflux>
-In-Reply-To: <1197768294.8050.8.camel@aeonflux>
-Content-Type: text/plain; charset=ISO-8859-1
-List-ID: <bluez-devel.lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <5f84803c0712060959n6db58e78y4adfa1b4a212df71@mail.gmail.com>
+References: <5f84803c0712030733q38350283m77e8930dfcca4162@mail.gmail.com>
+	<1196699122.12292.113.camel@violet>
+	<5f84803c0712030850k5810ee43na4a13f5e74657388@mail.gmail.com>
+	<1196701181.12292.128.camel@violet>
+	<5f84803c0712060959n6db58e78y4adfa1b4a212df71@mail.gmail.com>
+Date: Mon, 17 Dec 2007 06:47:39 +0100
+Message-Id: <1197870459.8050.80.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] [RESEND] make bluez GNOME UIs singletons
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On 12/15/2007 05:24 PM, Marcel Holtmann wrote:
-> Hi Geoff,
-> 
->> OK, so users are screaming for bluetooth support.  Can we get this
->> resolved?
->> 
->> Here is the patch again.
->> 
->> -Geoff
->> 
->> ----------------------------------------------------------------------
->> Subject: PS3 Bluetooth quirk for HCI_FLT_CLEAR_ALL
->> 
->> It seems the PS3 built-in bluetooth host controler doesn't support the
->> HCI_FLT_CLEAR_ALL command properly.  Add a check to conditionally use
->> the HCI_FLT_CONN_SETUP command to clear the event filter on PS3.
-> 
-> actually can you just test with a 2.6.23 or later kernel. I fixed the
-> OCF_SET_EVENT_FLT since it was broken since the beginning. In case you
-> give HCI_FTL_CLEAR_ALL you are not allowed to give any additional
-> parameters. Otherwise the command fails. So with this command now
-> succeeding, it might be enough to get Bluetooth working.
+Hi Chris,
 
-Hi Marcel,
+> Attached is an updated patch with the changes that we talked about.
 
-I got the following back from our Kimoto-san, so it seems to work
-properly with your update:
+the patch looks good, but using bluetooth_application_instance is too
+long for my taste. Use bluetooth_instance to make this shorter.
 
-  I tried Bluetooth on linux 2.6.24-rc4.
-  BT HID also works after boot without patch.
-  I checked mouse and keyboard of Microsoft and they work well without the patch.
+Also use org.bluez.properties etc. for the service names
+and /org/bluez/properties etc. for the object path.
 
-I'll do some more testing this coming week also.
+I also like to have multiple separate patches. One that add the generic
+instance code and then additional patches that adds support for it to
+every application. This makes it a lot easier for me to review and apply
+it.
 
-Thanks.
+Regards
 
--Geoff
+Marcel
+
+
+
+-------------------------------------------------------------------------
+SF.Net email is sponsored by:
+Check out the new SourceForge.net Marketplace.
+It's the best place to buy or sell services
+for just about anything Open Source.
+http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
