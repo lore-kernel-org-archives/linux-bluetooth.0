@@ -1,21 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5f84803c0712171129o770c38e5g35d57dea64be94f5@mail.gmail.com>
-Date: Mon, 17 Dec 2007 14:29:14 -0500
-From: "Chris Rivera" <crivera@novell.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1197917583.8050.87.camel@aeonflux>
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_11375_22919865.1197919754198"
-References: <5f84803c0712030733q38350283m77e8930dfcca4162@mail.gmail.com>
-	<1196699122.12292.113.camel@violet>
-	<5f84803c0712030850k5810ee43na4a13f5e74657388@mail.gmail.com>
-	<1196701181.12292.128.camel@violet>
-	<5f84803c0712060959n6db58e78y4adfa1b4a212df71@mail.gmail.com>
-	<1197870459.8050.80.camel@aeonflux>
-	<5f84803c0712170754n14d401a7l225d3d9b2f413850@mail.gmail.com>
-	<1197917583.8050.87.camel@aeonflux>
-Subject: Re: [Bluez-devel] [PATCH] [RESEND] make bluez GNOME UIs singletons
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Geoff Levand <geoffrey.levand@am.sony.com>
+In-Reply-To: <476615CA.8020809@am.sony.com>
+References: <463F7386.6050900@am.sony.com>
+	<1178608551.8628.52.camel@aeonflux.holtmann.net>
+	<1178622391.2824.34.camel@pmac.infradead.org>
+	<1178630359.8628.63.camel@aeonflux.holtmann.net>
+	<1178639244.2824.40.camel@pmac.infradead.org>
+	<1178642601.8628.67.camel@aeonflux.holtmann.net>
+	<4640FF63.8070403@am.sony.com>  <4641331E.1070408@am.sony.com>
+	<1178694136.8628.82.camel@aeonflux.holtmann.net>
+	<47646F04.8080301@am.sony.com> <1197768294.8050.8.camel@aeonflux>
+	<476615CA.8020809@am.sony.com>
+Date: Mon, 17 Dec 2007 20:08:37 +0100
+Message-Id: <1197918517.8050.95.camel@aeonflux>
+Mime-Version: 1.0
+Cc: dwmw2@infradead.org,
+	BlueZ development <bluez-devel@lists.sourceforge.net>,
+	bluez-devel@lists.sf.net, maxk@qualcomm.com
+Subject: Re: [Bluez-devel] [RFC] PS3 Bluetooth quirk for HCI_FLT_CLEAR_ALL
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,230 +28,31 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_11375_22919865.1197919754198
-Content-Type: multipart/alternative;
-	boundary="----=_Part_11376_20835059.1197919754198"
+Hi Geoff,
 
-------=_Part_11376_20835059.1197919754198
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> I got the following back from our Kimoto-san, so it seems to work
+> properly with your update:
+> 
+>   I tried Bluetooth on linux 2.6.24-rc4.
+>   BT HID also works after boot without patch.
+>   I checked mouse and keyboard of Microsoft and they work well without the patch.
 
-On Dec 17, 2007 1:53 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+this is what I expected. I was a really stupid mistake, but
+unfortunately buried really deep since the first releases.
 
-> Hi Chris,
->
-> > Updated patches attached.
->
-> I added the generic singleton instance patch to the CVS. I did some
-> minor modifications. The interface name is org.bluez.Instance. No need
-> to duplicate the word Bluetooth here. And I removed the retval parameter
-> from the register function. It is useless. Use the return value for it.
-> If it is TRUE, everything is okay. If FALSE, cleanup and exit(1).
->
->
->
-I wanted to distinguish between an instance already running and actual DBUS
-errors.  If an instance is already running then we can exit with 0 since the
-intended action was successful (the launched application is now in the
-foreground).  If, however, there are errors connecting to the bus then we
-exit with 1.  It isn't a big deal though.  I've attached an updated apps
-patch that gets rid of the retval parameter.
+> I'll do some more testing this coming week also.
 
-Chris
+Please do.
 
-------=_Part_11376_20835059.1197919754198
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Regards
 
-On Dec 17, 2007 1:53 PM, Marcel Holtmann &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:<br><div class="gmail_quote"><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-Hi Chris,<br><br>&gt; Updated patches attached.<br><br>I added the generic singleton instance patch to the CVS. I did some<br>minor modifications. The interface name is org.bluez.Instance. No need<br>to duplicate the word Bluetooth here. And I removed the retval parameter
-<br>from the register function. It is useless. Use the return value for it.<br>If it is TRUE, everything is okay. If FALSE, cleanup and exit(1).<br><br><br></blockquote></div><br>I wanted to distinguish between an instance already running and actual DBUS errors.&nbsp; If an instance is already running then we can exit with 0 since the intended action was successful (the launched application is now in the foreground).&nbsp; If, however, there are errors connecting to the bus then we exit with 1.&nbsp; It isn&#39;t a big deal though.&nbsp; I&#39;ve attached an updated apps patch that gets rid of the retval parameter.
-<br><br>Chris<br>
+Marcel
 
-------=_Part_11376_20835059.1197919754198--
 
-------=_Part_11375_22919865.1197919754198
-Content-Type: text/x-patch; name=bluez-gnome-singleton-apps.patch
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_faafuv4m0
-Content-Disposition: attachment; filename=bluez-gnome-singleton-apps.patch
-
-ZGlmZiAtdXJwTiBnbm9tZS9hcHBsZXQvYmx1ZXRvb3RoLWFwcGxldC4xIGdub21lLW5ldy9hcHBs
-ZXQvYmx1ZXRvb3RoLWFwcGxldC4xCi0tLSBnbm9tZS9hcHBsZXQvYmx1ZXRvb3RoLWFwcGxldC4x
-CTIwMDctMDctMjIgMTE6MzM6MTMuMDAwMDAwMDAwIC0wNDAwCisrKyBnbm9tZS1uZXcvYXBwbGV0
-L2JsdWV0b290aC1hcHBsZXQuMQkyMDA3LTEyLTE2IDE4OjMxOjA5LjAwMDAwMDAwMCAtMDUwMApA
-QCAtMTAsOCArMTAsOSBAQCB3aGVuZXZlciBhIHBhc3NrZXkgKGFrYSBQSU4pIGlzIHJlcXVpcmVk
-CiAuSSBibHVldG9vdGgtYXBwbGV0CiBpcyBwYXJ0IG9mIGJsdWV6LWdub21lLCBzZWUgYWxzbyBo
-dHRwOi8vd3d3LmJsdWV6Lm9yZwogLlNIIE9QVElPTlMKLS5JIGJsdWV0b290aC1hcHBsZXQKLXRh
-a2VzIG5vIG9wdGlvbnMKKy5UUCAKKy5CSSBcLVwtc2luZ2xldG9uCitFbnN1cmUgdGhhdCBvbmx5
-IG9uZSBpbnN0YW5jZSBpcyBydW5uaW5nLgogLlNIIEFVVEhPUgogTWFyY2VsIEhvbHRtYW5uIDxt
-YXJjZWxAaG9sdG1hbm4ub3JnPgogLlNIIExJQ0VOU0UKZGlmZiAtdXJwTiBnbm9tZS9hcHBsZXQv
-Ymx1ZXRvb3RoLWFwcGxldC5kZXNrdG9wLmluIGdub21lLW5ldy9hcHBsZXQvYmx1ZXRvb3RoLWFw
-cGxldC5kZXNrdG9wLmluCi0tLSBnbm9tZS9hcHBsZXQvYmx1ZXRvb3RoLWFwcGxldC5kZXNrdG9w
-LmluCTIwMDctMDQtMDMgMDQ6MDk6MDEuMDAwMDAwMDAwIC0wNDAwCisrKyBnbm9tZS1uZXcvYXBw
-bGV0L2JsdWV0b290aC1hcHBsZXQuZGVza3RvcC5pbgkyMDA3LTEyLTE2IDE4OjMxOjA5LjAwMDAw
-MDAwMCAtMDUwMApAQCAtMyw3ICszLDcgQEAgRW5jb2Rpbmc9VVRGLTgKIF9OYW1lPUJsdWV0b290
-aCBNYW5hZ2VyCiBfQ29tbWVudD1CbHVldG9vdGggTWFuYWdlciBhcHBsZXQKIEljb249c3RvY2tf
-Ymx1ZXRvb3RoCi1FeGVjPWJsdWV0b290aC1hcHBsZXQKK0V4ZWM9Ymx1ZXRvb3RoLWFwcGxldCAt
-LXNpbmdsZXRvbgogVGVybWluYWw9ZmFsc2UKIFR5cGU9QXBwbGljYXRpb24KIENhdGVnb3JpZXM9
-CmRpZmYgLXVycE4gZ25vbWUvYXBwbGV0L21haW4uYyBnbm9tZS1uZXcvYXBwbGV0L21haW4uYwot
-LS0gZ25vbWUvYXBwbGV0L21haW4uYwkyMDA3LTEyLTA0IDEwOjMwOjUxLjAwMDAwMDAwMCAtMDUw
-MAorKysgZ25vbWUtbmV3L2FwcGxldC9tYWluLmMJMjAwNy0xMi0xNiAyMjoxMTo0NC4wMDAwMDAw
-MDAgLTA1MDAKQEAgLTQ5LDYgKzQ5LDcgQEAKICNlbmRpZgogCiAjaW5jbHVkZSAiYmx1ZXRvb3Ro
-LWRldmljZS1zZWxlY3Rpb24uaCIKKyNpbmNsdWRlICJibHVldG9vdGgtaW5zdGFuY2UuaCIKIAog
-I2RlZmluZSBQQVNTS0VZX0FHRU5UX1BBVEgJIi9vcmcvYmx1ZXovcGFzc2tleSIKICNkZWZpbmUg
-QVVUSF9BR0VOVF9QQVRICQkiL29yZy9ibHVlei9hdXRoIgpAQCAtMTU1MCw3ICsxNTUxLDcgQEAg
-c3RhdGljIHZvaWQgYWJvdXRfY2FsbGJhY2soR3RrV2lkZ2V0ICppdAogCiBzdGF0aWMgdm9pZCBz
-ZXR0aW5nc19jYWxsYmFjayhHT2JqZWN0ICp3aWRnZXQsIGdwb2ludGVyIHVzZXJfZGF0YSkKIHsK
-LQljb25zdCBjaGFyICpjb21tYW5kID0gImJsdWV0b290aC1wcm9wZXJ0aWVzIjsKKwljb25zdCBj
-aGFyICpjb21tYW5kID0gImJsdWV0b290aC1wcm9wZXJ0aWVzIC0tc2luZ2xldG9uIjsKIAogCWlm
-ICghZ19zcGF3bl9jb21tYW5kX2xpbmVfYXN5bmMoY29tbWFuZCwgTlVMTCkpCiAJCWdfcHJpbnRl
-cnIoIkNvdWxkbid0IGV4ZWN1dGUgY29tbWFuZDogJXNcbiIsIGNvbW1hbmQpOwpAQCAtMTYzOSw3
-ICsxNjQwLDcgQEAgc3RhdGljIHZvaWQgc2VuZHRvX2NhbGxiYWNrKEdPYmplY3QgKndpZAogI2lm
-IDAKIHN0YXRpYyB2b2lkIHdpemFyZF9jYWxsYmFjayhHT2JqZWN0ICp3aWRnZXQsIGdwb2ludGVy
-IHVzZXJfZGF0YSkKIHsKLQljb25zdCBjaGFyICpjb21tYW5kID0gImJsdWV0b290aC13aXphcmQi
-OworCWNvbnN0IGNoYXIgKmNvbW1hbmQgPSAiYmx1ZXRvb3RoLXdpemFyZCAtLXNpbmdsZXRvbiI7
-CiAKIAlpZiAoIWdfc3Bhd25fY29tbWFuZF9saW5lX2FzeW5jKGNvbW1hbmQsIE5VTEwpKQogCQln
-X3ByaW50ZXJyKCJDb3VsZG4ndCBleGVjdXRlIGNvbW1hbmQ6ICVzXG4iLCBjb21tYW5kKTsKQEAg
-LTE3ODIsOSArMTc4MywxOCBAQCBzdGF0aWMgdm9pZCBnY29uZl9jYWxsYmFjayhHQ29uZkNsaWVu
-dCAqCiAKIGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiB7CisJR09wdGlvbkNvbnRl
-eHQgKmN0eDsKIAlHdGtXaWRnZXQgKm1lbnU7CiAJR0Vycm9yICplcnJvciA9IE5VTEw7CisJQmx1
-ZXRvb3RoSW5zdGFuY2UgKmFwcDsKIAljaGFyICpzdHI7CisJZ2Jvb2xlYW4gc2luZ2xldG9uID0g
-RkFMU0U7CisKKwlHT3B0aW9uRW50cnkgZW50cmllc1tdID0geworCQl7ICJzaW5nbGV0b24iLCAw
-LCAwLCBHX09QVElPTl9BUkdfTk9ORSwgJnNpbmdsZXRvbiwKKwkJICBOXygiT25seSBhbGxvdyBv
-bmUgaW5zdGFuY2Ugb2YgdGhpcyBhcHBsaWNhdGlvbiIpLCBOVUxMIH0sCisJCXsgTlVMTCwgMCwg
-MCwgMCwgTlVMTCwgTlVMTCwgTlVMTCB9CisJfTsKIAogCWJpbmR0ZXh0ZG9tYWluKEdFVFRFWFRf
-UEFDS0FHRSwgTE9DQUxFRElSKTsKIAliaW5kX3RleHRkb21haW5fY29kZXNldChHRVRURVhUX1BB
-Q0tBR0UsICJVVEYtOCIpOwpAQCAtMTc5Miw2ICsxODAyLDE1IEBAIGludCBtYWluKGludCBhcmdj
-LCBjaGFyICphcmd2W10pCiAKIAlndGtfaW5pdCgmYXJnYywgJmFyZ3YpOwogCisJY3R4ID0gZ19v
-cHRpb25fY29udGV4dF9uZXcoIiIpOworCWdfb3B0aW9uX2NvbnRleHRfYWRkX21haW5fZW50cmll
-cyhjdHgsIGVudHJpZXMsIE5VTEwpOworCWlmICghZ19vcHRpb25fY29udGV4dF9wYXJzZShjdHgs
-ICZhcmdjLCAmYXJndiwgJmVycm9yKSkgeworCQlnX3ByaW50ZXJyKF8oInBhcnNpbmcgZmFpbGVk
-OiAlc1xuIiksIGVycm9yLT5tZXNzYWdlKTsKKwkJZ19lcnJvcl9mcmVlKGVycm9yKTsKKwkJZ19v
-cHRpb25fY29udGV4dF9mcmVlKGN0eCk7CisJCWV4aXQoRVhJVF9GQUlMVVJFKTsKKwl9CisKICNp
-ZmRlZiBIQVZFX0xJQk5PVElGWQogCW5vdGlmeV9pbml0KCJibHVldG9vdGgtbWFuYWdlciIpOwog
-I2VuZGlmCkBAIC0xODA0LDYgKzE4MjMsMTEgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFy
-Z3ZbXSkKIAkJZXhpdChFWElUX0ZBSUxVUkUpOwogCX0KIAorCWFwcCA9IGJsdWV0b290aF9pbnN0
-YW5jZV9uZXcoKTsKKwlpZighYmx1ZXRvb3RoX2luc3RhbmNlX3JlZ2lzdGVyKGFwcCwgc2luZ2xl
-dG9uLCAKKwkJIi9vcmcvYmx1ZXovYXBwbGV0IiwgIm9yZy5ibHVlei5hcHBsZXQiKSkKKwkJZXhp
-dChFWElUX0ZBSUxVUkUpOworCiAJZ2NvbmYgPSBnY29uZl9jbGllbnRfZ2V0X2RlZmF1bHQoKTsK
-IAogI2lmZGVmIEhBVkVfSEFMCkBAIC0xODYwLDYgKzE4ODQsMTAgQEAgaW50IG1haW4oaW50IGFy
-Z2MsIGNoYXIgKmFyZ3ZbXSkKIAlnX2xpc3RfZm9yZWFjaChhZGFwdGVyX2xpc3QsIGFkYXB0ZXJf
-ZnJlZSwgTlVMTCk7CiAKIAlkYnVzX2dfY29ubmVjdGlvbl91bnJlZihjb25uKTsKKyAgICAKKwln
-X29iamVjdF91bnJlZihhcHApOwogCisJZ19vcHRpb25fY29udGV4dF9mcmVlKGN0eCk7CisJCiAJ
-cmV0dXJuIDA7CiB9CmRpZmYgLXVycE4gZ25vbWUvcHJvcGVydGllcy9ibHVldG9vdGgtcHJvcGVy
-dGllcy4xIGdub21lLW5ldy9wcm9wZXJ0aWVzL2JsdWV0b290aC1wcm9wZXJ0aWVzLjEKLS0tIGdu
-b21lL3Byb3BlcnRpZXMvYmx1ZXRvb3RoLXByb3BlcnRpZXMuMQkyMDA3LTA3LTIyIDExOjMzOjEz
-LjAwMDAwMDAwMCAtMDQwMAorKysgZ25vbWUtbmV3L3Byb3BlcnRpZXMvYmx1ZXRvb3RoLXByb3Bl
-cnRpZXMuMQkyMDA3LTEyLTE2IDE4OjMxOjA5LjAwMDAwMDAwMCAtMDUwMApAQCAtOSw4ICs5LDkg
-QEAgd2lsbCBkaXNwbGF5IGEgZGlhbG9nIGZvciBjaGFuZ2luZyBCbHVldAogLkkgYmx1ZXRvb3Ro
-LXByb3BlcnRpZXMKIGlzIHBhcnQgb2YgYmx1ZXotZ25vbWUsIHNlZSBhbHNvIGh0dHA6Ly93d3cu
-Ymx1ZXoub3JnCiAuU0ggT1BUSU9OUwotLkkgYmx1ZXRvb3RoLXByb3BlcnRpZXMKLXRha2VzIG5v
-IG9wdGlvbnMKKy5UUCAKKy5CSSBcLVwtc2luZ2xldG9uCitFbnN1cmUgdGhhdCBvbmx5IG9uZSBp
-bnN0YW5jZSBpcyBydW5uaW5nLgogLlNIIEFVVEhPUgogTWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxA
-aG9sdG1hbm4ub3JnPgogLlNIIExJQ0VOU0UKZGlmZiAtdXJwTiBnbm9tZS9wcm9wZXJ0aWVzL21h
-aW4uYyBnbm9tZS1uZXcvcHJvcGVydGllcy9tYWluLmMKLS0tIGdub21lL3Byb3BlcnRpZXMvbWFp
-bi5jCTIwMDctMDctMzEgMTc6Mzc6MjkuMDAwMDAwMDAwIC0wNDAwCisrKyBnbm9tZS1uZXcvcHJv
-cGVydGllcy9tYWluLmMJMjAwNy0xMi0xNiAyMjoxMzoxOS4wMDAwMDAwMDAgLTA1MDAKQEAgLTQw
-LDYgKzQwLDcgQEAKICNpbmNsdWRlICJnZW5lcmFsLmgiCiAjaW5jbHVkZSAic2VydmljZS5oIgog
-I2luY2x1ZGUgImFkYXB0ZXIuaCIKKyNpbmNsdWRlICJibHVldG9vdGgtaW5zdGFuY2UuaCIKIAog
-c3RhdGljIHZvaWQgZGVsZXRlX2NhbGxiYWNrKEd0a1dpZGdldCAqd2luZG93LCBHZGtFdmVudCAq
-ZXZlbnQsCiAJCQkJCQlncG9pbnRlciB1c2VyX2RhdGEpCkBAIC01OCw3ICs1OSw3IEBAIHN0YXRp
-YyB2b2lkIGNsb3NlX2NhbGxiYWNrKEd0a1dpZGdldCAqYnUKIAlndGtfbWFpbl9xdWl0KCk7CiB9
-CiAKLXN0YXRpYyB2b2lkIGNyZWF0ZV93aW5kb3coR3RrV2lkZ2V0ICpub3RlYm9vaykKK3N0YXRp
-YyBHdGtXaWRnZXQgKmNyZWF0ZV93aW5kb3coR3RrV2lkZ2V0ICpub3RlYm9vaykKIHsKIAlHdGtX
-aWRnZXQgKndpbmRvdzsKIAlHdGtXaWRnZXQgKndpZGdldDsKQEAgLTEwOCw2ICsxMDksNyBAQCBz
-dGF0aWMgdm9pZCBjcmVhdGVfd2luZG93KEd0a1dpZGdldCAqbm90CiAJCQkJCQl3aWRnZXQsIF8o
-IkdlbmVyYWwiKSk7CiAKIAlndGtfd2lkZ2V0X3Nob3dfYWxsKHdpbmRvdyk7CisJcmV0dXJuIHdp
-bmRvdzsKIH0KIAogc3RhdGljIHZvaWQgbmFtZV9vd25lcl9jaGFuZ2VkKERCdXNHUHJveHkgKm9i
-amVjdCwgY29uc3QgY2hhciAqbmFtZSwKQEAgLTE0MSwxNyArMTQzLDM2IEBAIHN0YXRpYyBEQnVz
-R1Byb3h5ICpzZXR1cF9tYW5hZ2VyKERCdXNHQ28KIAogaW50IG1haW4oaW50IGFyZ2MsIGNoYXIg
-KmFyZ3ZbXSkKIHsKKwlHT3B0aW9uQ29udGV4dCAqY3R4OwogCUd0a1dpZGdldCAqbm90ZWJvb2s7
-CisJR3RrV2lkZ2V0ICp3aW5kb3c7CisJR0Vycm9yICplcnJvciA9IE5VTEw7CiAJREJ1c0dDb25u
-ZWN0aW9uICpjb25uOworCUJsdWV0b290aEluc3RhbmNlICphcHA7CiAJREJ1c0dQcm94eSAqbWFu
-YWdlcjsKLQlHRXJyb3IgKmVycm9yID0gTlVMTDsKKwlnYm9vbGVhbiBzaW5nbGV0b24gPSBGQUxT
-RTsKIAorCUdPcHRpb25FbnRyeSBlbnRyaWVzW10gPSB7CisJCXsgInNpbmdsZXRvbiIsIDAsIDAs
-IEdfT1BUSU9OX0FSR19OT05FLCAmc2luZ2xldG9uLAorCQkgIE5fKCJPbmx5IGFsbG93IG9uZSBp
-bnN0YW5jZSBvZiB0aGlzIGFwcGxpY2F0aW9uIiksIE5VTEwgfSwKKwkJeyBOVUxMLCAwLCAwLCAw
-LCBOVUxMLCBOVUxMLCBOVUxMIH0KKwl9OworCQogCWJpbmR0ZXh0ZG9tYWluKEdFVFRFWFRfUEFD
-S0FHRSwgTE9DQUxFRElSKTsKIAliaW5kX3RleHRkb21haW5fY29kZXNldChHRVRURVhUX1BBQ0tB
-R0UsICJVVEYtOCIpOwogCXRleHRkb21haW4oR0VUVEVYVF9QQUNLQUdFKTsKIAogCWd0a19pbml0
-KCZhcmdjLCAmYXJndik7CiAKKwljdHggPSBnX29wdGlvbl9jb250ZXh0X25ldygiIik7CisJZ19v
-cHRpb25fY29udGV4dF9hZGRfbWFpbl9lbnRyaWVzKGN0eCwgZW50cmllcywgTlVMTCk7CisJaWYg
-KCFnX29wdGlvbl9jb250ZXh0X3BhcnNlKGN0eCwgJmFyZ2MsICZhcmd2LCAmZXJyb3IpKSB7CisJ
-CWdfcHJpbnRlcnIoXygicGFyc2luZyBmYWlsZWQ6ICVzXG4iKSwgZXJyb3ItPm1lc3NhZ2UpOwor
-CQlnX2Vycm9yX2ZyZWUoZXJyb3IpOworCQlnX29wdGlvbl9jb250ZXh0X2ZyZWUoY3R4KTsKKwkJ
-ZXhpdChFWElUX0ZBSUxVUkUpOworCX0KKwkKIAljb25uID0gZGJ1c19nX2J1c19nZXQoREJVU19C
-VVNfU1lTVEVNLCAmZXJyb3IpOwogCWlmIChlcnJvciAhPSBOVUxMKSB7CiAJCWdfcHJpbnRlcnIo
-IkNvbm5lY3RpbmcgdG8gc3lzdGVtIGJ1cyBmYWlsZWQ6ICVzXG4iLApAQCAtMTYzLDEyICsxODQs
-MTggQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKIAlzZXR1cF9nZW5lcmFsKCk7
-CiAKIAlub3RlYm9vayA9IGd0a19ub3RlYm9va19uZXcoKTsKLQorICAgIAogCWFzc2lnbl9hZGFw
-dGVyKG5vdGVib29rKTsKIAotCW1hbmFnZXIgPSBzZXR1cF9tYW5hZ2VyKGNvbm4pOworCXdpbmRv
-dyA9IGNyZWF0ZV93aW5kb3cobm90ZWJvb2spOwogCi0JY3JlYXRlX3dpbmRvdyhub3RlYm9vayk7
-CisJYXBwID0gYmx1ZXRvb3RoX2luc3RhbmNlX25ldygpOworCWJsdWV0b290aF9pbnN0YW5jZV9z
-ZXRfd2luZG93KGFwcCwgR1RLX1dJTkRPVyh3aW5kb3cpKTsKKwlpZighYmx1ZXRvb3RoX2luc3Rh
-bmNlX3JlZ2lzdGVyKGFwcCwgc2luZ2xldG9uLCAKKwkJIi9vcmcvYmx1ZXovcHJvcGVydGllcyIs
-ICJvcmcuYmx1ZXoucHJvcGVydGllcyIpKQorCQlleGl0KEVYSVRfRkFJTFVSRSk7CisJCisJbWFu
-YWdlciA9IHNldHVwX21hbmFnZXIoY29ubik7CiAKIAlndGtfbWFpbigpOwogCkBAIC0xODEsNiAr
-MjA4LDEwIEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAJZ19vYmplY3RfdW5y
-ZWYobWFuYWdlcik7CiAKIAlkYnVzX2dfY29ubmVjdGlvbl91bnJlZihjb25uKTsKKyAgICAKKwln
-X29iamVjdF91bnJlZihhcHApOwogCisJZ19vcHRpb25fY29udGV4dF9mcmVlKGN0eCk7CisJCiAJ
-cmV0dXJuIDA7CiB9CmRpZmYgLXVycE4gZ25vbWUvd2l6YXJkL2JsdWV0b290aC13aXphcmQuMSBn
-bm9tZS1uZXcvd2l6YXJkL2JsdWV0b290aC13aXphcmQuMQotLS0gZ25vbWUvd2l6YXJkL2JsdWV0
-b290aC13aXphcmQuMQkyMDA3LTA3LTIyIDExOjMzOjEyLjAwMDAwMDAwMCAtMDQwMAorKysgZ25v
-bWUtbmV3L3dpemFyZC9ibHVldG9vdGgtd2l6YXJkLjEJMjAwNy0xMi0xNiAxODozMTowOS4wMDAw
-MDAwMDAgLTA1MDAKQEAgLTksOCArOSw5IEBAIHdpbGwgZGlzcGxheSBhIHdpemFyZCBmb3Igc2V0
-dGluZyB1cCBCbHUKIC5JIGJsdWV0b290aC13aXphcmQKIGlzIHBhcnQgb2YgYmx1ZXotZ25vbWUs
-IHNlZSBhbHNvIGh0dHA6Ly93d3cuYmx1ZXoub3JnCiAuU0ggT1BUSU9OUwotLkkgYmx1ZXRvb3Ro
-LXdpemFyZAotdGFrZXMgbm8gb3B0aW9ucworLlRQIAorLkJJIFwtXC1zaW5nbGV0b24KK0Vuc3Vy
-ZSB0aGF0IG9ubHkgb25lIGluc3RhbmNlIGlzIHJ1bm5pbmcuCiAuU0ggQVVUSE9SCiBNYXJjZWwg
-SG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+CiAuU0ggTElDRU5TRQpkaWZmIC11cnBOIGdu
-b21lL3dpemFyZC9tYWluLmMgZ25vbWUtbmV3L3dpemFyZC9tYWluLmMKLS0tIGdub21lL3dpemFy
-ZC9tYWluLmMJMjAwNy0wOC0xNSAwMzowNDowMy4wMDAwMDAwMDAgLTA0MDAKKysrIGdub21lLW5l
-dy93aXphcmQvbWFpbi5jCTIwMDctMTItMTYgMjI6MTI6MTMuMDAwMDAwMDAwIC0wNTAwCkBAIC0y
-Niw2ICsyNiw3IEBACiAjZW5kaWYKIAogI2luY2x1ZGUgPHN0cmluZy5oPgorI2luY2x1ZGUgPHN0
-ZGxpYi5oPgogCiAjaW5jbHVkZSA8ZGJ1cy9kYnVzLWdsaWIuaD4KIApAQCAtMzgsNiArMzksNyBA
-QAogI2luY2x1ZGUgImRidXMtZ2x1ZS5oIgogCiAjaW5jbHVkZSAiYmx1ZXRvb3RoLWRldmljZS1z
-ZWxlY3Rpb24uaCIKKyNpbmNsdWRlICJibHVldG9vdGgtaW5zdGFuY2UuaCIKIAogc3RhdGljIEJs
-dWV0b290aENsaWVudCAqY2xpZW50OwogCkBAIC0zODcsNyArMzg5LDcgQEAgc3RhdGljIHZvaWQg
-Y3JlYXRlX3N1bW1hcnkoR3RrV2lkZ2V0ICphcwogCXBhZ2Vfc3VtbWFyeSA9IHZib3g7CiB9CiAK
-LXN0YXRpYyB2b2lkIGNyZWF0ZV93aXphcmQodm9pZCkKK3N0YXRpYyBHdGtXaWRnZXQgKmNyZWF0
-ZV93aXphcmQodm9pZCkKIHsKIAlHdGtXaWRnZXQgKmFzc2lzdGFudDsKIApAQCAtNDMwLDIzICs0
-MzIsNTUgQEAgc3RhdGljIHZvaWQgY3JlYXRlX3dpemFyZCh2b2lkKQogCWd0a193aWRnZXRfc2hv
-d19hbGwoYXNzaXN0YW50KTsKIAogCWd0a19hc3Npc3RhbnRfdXBkYXRlX2J1dHRvbnNfc3RhdGUo
-R1RLX0FTU0lTVEFOVChhc3Npc3RhbnQpKTsKKwlyZXR1cm4gYXNzaXN0YW50OwogfQogCiBpbnQg
-bWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogeworCUdPcHRpb25Db250ZXh0ICpjdHg7CisJ
-R3RrV2lkZ2V0ICp3aW5kb3c7CisJQmx1ZXRvb3RoSW5zdGFuY2UgKmFwcDsKKwlHRXJyb3IgKmVy
-cm9yID0gTlVMTDsKKwlnYm9vbGVhbiBzaW5nbGV0b24gPSBGQUxTRTsKKworCUdPcHRpb25FbnRy
-eSBlbnRyaWVzW10gPSB7CisJCXsgInNpbmdsZXRvbiIsIDAsIDAsIEdfT1BUSU9OX0FSR19OT05F
-LCAmc2luZ2xldG9uLAorCQkgIE5fKCJPbmx5IGFsbG93IG9uZSBpbnN0YW5jZSBvZiB0aGlzIGFw
-cGxpY2F0aW9uIiksIE5VTEwgfSwKKwkJeyBOVUxMLCAwLCAwLCAwLCBOVUxMLCBOVUxMLCBOVUxM
-IH0KKwl9OworCQogCWJpbmR0ZXh0ZG9tYWluKEdFVFRFWFRfUEFDS0FHRSwgTE9DQUxFRElSKTsK
-IAliaW5kX3RleHRkb21haW5fY29kZXNldChHRVRURVhUX1BBQ0tBR0UsICJVVEYtOCIpOwogCXRl
-eHRkb21haW4oR0VUVEVYVF9QQUNLQUdFKTsKIAogCWd0a19pbml0KCZhcmdjLCAmYXJndik7CiAK
-KwljdHggPSBnX29wdGlvbl9jb250ZXh0X25ldygiIik7CisJZ19vcHRpb25fY29udGV4dF9hZGRf
-bWFpbl9lbnRyaWVzKGN0eCwgZW50cmllcywgTlVMTCk7CisJaWYgKCFnX29wdGlvbl9jb250ZXh0
-X3BhcnNlKGN0eCwgJmFyZ2MsICZhcmd2LCAmZXJyb3IpKSB7CisJCWdfcHJpbnRlcnIoXygicGFy
-c2luZyBmYWlsZWQ6ICVzXG4iKSwgZXJyb3ItPm1lc3NhZ2UpOworCQlnX2Vycm9yX2ZyZWUoZXJy
-b3IpOworCQlnX29wdGlvbl9jb250ZXh0X2ZyZWUoY3R4KTsKKwkJZXhpdChFWElUX0ZBSUxVUkUp
-OworCX0KKwkKIAljbGllbnQgPSBibHVldG9vdGhfY2xpZW50X25ldygpOwogCi0JY3JlYXRlX3dp
-emFyZCgpOworCXdpbmRvdyA9IGNyZWF0ZV93aXphcmQoKTsKKyAgICAKKwlhcHAgPSBibHVldG9v
-dGhfaW5zdGFuY2VfbmV3KCk7CisJYmx1ZXRvb3RoX2luc3RhbmNlX3NldF93aW5kb3coYXBwLCBH
-VEtfV0lORE9XKHdpbmRvdykpOworCWlmKCFibHVldG9vdGhfaW5zdGFuY2VfcmVnaXN0ZXIoYXBw
-LCBzaW5nbGV0b24sIAorCQkiL29yZy9ibHVlei93aXphcmQiLCAib3JnLmJsdWV6LndpemFyZCIp
-KQorCQlleGl0KEVYSVRfRkFJTFVSRSk7CiAKIAlndGtfbWFpbigpOwogCiAJZ19vYmplY3RfdW5y
-ZWYoY2xpZW50KTsKIAorCWdfb2JqZWN0X3VucmVmKGFwcCk7CisKKwlnX29wdGlvbl9jb250ZXh0
-X2ZyZWUoY3R4KTsKKwkKIAlyZXR1cm4gMDsKIH0K
-------=_Part_11375_22919865.1197919754198
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 SF.Net email is sponsored by:
@@ -256,15 +60,7 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services
 for just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
-------=_Part_11375_22919865.1197919754198
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-------=_Part_11375_22919865.1197919754198--
