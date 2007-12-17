@@ -1,17 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <8a8adccc0712162315v53bf668et553413d6dbc81551@mail.gmail.com>
-References: <8a8adccc0712161309m29c70a45x212bead7a823d808@mail.gmail.com>
-	<1197841650.8050.39.camel@aeonflux>
-	<8a8adccc0712161443w7ba67743jc06515240cfdf83d@mail.gmail.com>
-	<1197847447.26210.268.camel@cookie.hadess.net>
-	<1197853381.8050.58.camel@aeonflux>
-	<8a8adccc0712162315v53bf668et553413d6dbc81551@mail.gmail.com>
-Date: Mon, 17 Dec 2007 20:04:25 +0100
-Message-Id: <1197918266.8050.90.camel@aeonflux>
+In-Reply-To: <5f84803c0712170754n14d401a7l225d3d9b2f413850@mail.gmail.com>
+References: <5f84803c0712030733q38350283m77e8930dfcca4162@mail.gmail.com>
+	<1196699122.12292.113.camel@violet>
+	<5f84803c0712030850k5810ee43na4a13f5e74657388@mail.gmail.com>
+	<1196701181.12292.128.camel@violet>
+	<5f84803c0712060959n6db58e78y4adfa1b4a212df71@mail.gmail.com>
+	<1197870459.8050.80.camel@aeonflux>
+	<5f84803c0712170754n14d401a7l225d3d9b2f413850@mail.gmail.com>
+Date: Mon, 17 Dec 2007 19:53:03 +0100
+Message-Id: <1197917583.8050.87.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Beautify about dialog
+Subject: Re: [Bluez-devel] [PATCH] [RESEND] make bluez GNOME UIs singletons
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,41 +26,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jaap,
+Hi Chris,
 
-> > > > > > Attached patch does the following
-> > > > > >
-> > > > > > * about dialog code is simpler
-> > > > >
-> > > > > you can't use gtk_dialog_run for the applet's about dialog. It will
-> > > > > block and thus block all PIN requests. The current code is this way for
-> > > > > a reason.
-> > > >
-> > > > Didn't know that. I now use g_object_set which also reduces the amount
-> > > > of code considerably.
-> > >
-> > > You can still use gtk_show_about_dialog(). It removes the close
-> > > callback, and makes sure that only one dialogue shows up, and removes a
-> > > lot of boiler-plate code (it doesn't use a separate main loop like
-> > > gtk_dialog_run does). The gtk_dialog_run avoidance in the callbacks is
-> > > still needed.
-> >
-> > not sure why I haven't done it that way. Maybe it was not available when
-> > I wrote the initial version. However now the requirements are GTK 2.10
-> > or later. So if we can simplify code, I am all for it.
-> >
-> Attached two patches
-> 
-> One uses gtk-show-about-dialog
+> Updated patches attached.
 
-fix the coding style for this one. I can already see that it messes up
-the whitespaces. We use tabs and no whitespace in front of the ( in
-function declarations.
+I added the generic singleton instance patch to the CVS. I did some
+minor modifications. The interface name is org.bluez.Instance. No need
+to duplicate the word Bluetooth here. And I removed the retval parameter
+from the register function. It is useless. Use the return value for it.
+If it is TRUE, everything is okay. If FALSE, cleanup and exit(1).
 
-> The other makes sure that the windows always get an icon
-
-I applied that patch, but at the same time I applied it to all other
-applications inside bluez-gnome. There is more than the applet.
+Please update the application patches and resend them. And double check
+the whitespace stuff. I had to fix some of them in your other patch. Use
+an editor that has a visual representation of tabs and whitespaces. It
+really helps.
 
 Regards
 
