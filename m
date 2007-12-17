@@ -1,10 +1,22 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alok <develnewbie@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Tue, 18 Dec 2007 19:05:58 +0530
-Message-Id: <1197984959.21252.31.camel@greatbear>
+In-Reply-To: <5f84803c0712171247t7879a8adp6d17981697396527@mail.gmail.com>
+References: <5f84803c0712030733q38350283m77e8930dfcca4162@mail.gmail.com>
+	<1196699122.12292.113.camel@violet>
+	<5f84803c0712030850k5810ee43na4a13f5e74657388@mail.gmail.com>
+	<1196701181.12292.128.camel@violet>
+	<5f84803c0712060959n6db58e78y4adfa1b4a212df71@mail.gmail.com>
+	<1197870459.8050.80.camel@aeonflux>
+	<5f84803c0712170754n14d401a7l225d3d9b2f413850@mail.gmail.com>
+	<1197917583.8050.87.camel@aeonflux>
+	<5f84803c0712171129o770c38e5g35d57dea64be94f5@mail.gmail.com>
+	<1197922624.8050.107.camel@aeonflux>
+	<5f84803c0712171247t7879a8adp6d17981697396527@mail.gmail.com>
+Date: Mon, 17 Dec 2007 22:01:34 +0100
+Message-Id: <1197925294.8050.111.camel@aeonflux>
 Mime-Version: 1.0
-Subject: [Bluez-devel] [HFP] New Methods/Signals.
+Subject: Re: [Bluez-devel] [PATCH] [RESEND] make bluez GNOME UIs singletons
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,38 +30,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel/Johan, 
+Hi Chris,
 
-some new Methods/Signals are required for HFP in the audio service. Here
-are the ones needed as of now. 
+>         Please use use gtk_init_with_args and make the GOptionEntry
+>         data global 
+>         and static. Look at bluetooth-analyzer for an example.
+> 
+> This would force the singleton flag variable to be global.  Is this
+> what you want?
 
-Method:
-	void CallSetup(uint16 value)
-	
-		Used to send "callsetup" indicator value to the HF.
+what is the difference? It is fine to have it global. I don't see any
+problem with it. I don't wanna introduce any complexity if it is not
+needed.
 
-Signal:
-	void TerminateCall()
-		
-		This signal is sent when an ongoing call is terminated.
+Regards
 
-
-An appropriate method name would be IndicateCall(), But thats already
-used for Alerting(RING) the Headset/HFP. 
-
-Is it possible to use Alert() instead of IndicateCall() to RING the
-headset/HF and use IndicateCall to send "callsetup" indicator? 
-
-
-The headset method implementations start with hs_* . Should the hf
-methods prepend hf_ to them for distinguishing them from headset
-methods ?   
-
-
--Alok 
-
-
-
+Marcel
 
 
 
