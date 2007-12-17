@@ -1,24 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Geoff Levand <geoffrey.levand@am.sony.com>
-In-Reply-To: <476615CA.8020809@am.sony.com>
-References: <463F7386.6050900@am.sony.com>
-	<1178608551.8628.52.camel@aeonflux.holtmann.net>
-	<1178622391.2824.34.camel@pmac.infradead.org>
-	<1178630359.8628.63.camel@aeonflux.holtmann.net>
-	<1178639244.2824.40.camel@pmac.infradead.org>
-	<1178642601.8628.67.camel@aeonflux.holtmann.net>
-	<4640FF63.8070403@am.sony.com>  <4641331E.1070408@am.sony.com>
-	<1178694136.8628.82.camel@aeonflux.holtmann.net>
-	<47646F04.8080301@am.sony.com> <1197768294.8050.8.camel@aeonflux>
-	<476615CA.8020809@am.sony.com>
-Date: Mon, 17 Dec 2007 20:08:37 +0100
-Message-Id: <1197918517.8050.95.camel@aeonflux>
+To: "Jaap A. Haitsma" <jaap@haitsma.org>
+In-Reply-To: <8a8adccc0712162252v4cabae88md549ef651cbef5ad@mail.gmail.com>
+References: <8a8adccc0709020615m38389d6axe49041f8fbe18c4b@mail.gmail.com>
+	<1188768824.24968.9.camel@violet>
+	<8a8adccc0712161246y3f435aefwdb6c92c464d19f96@mail.gmail.com>
+	<1197841752.8050.42.camel@aeonflux>
+	<8a8adccc0712161449r135b552ct39f2cb9bcdeb543d@mail.gmail.com>
+	<1197853211.8050.55.camel@aeonflux>
+	<8a8adccc0712162252v4cabae88md549ef651cbef5ad@mail.gmail.com>
+Date: Mon, 17 Dec 2007 20:06:44 +0100
+Message-Id: <1197918404.8050.92.camel@aeonflux>
 Mime-Version: 1.0
-Cc: dwmw2@infradead.org,
-	BlueZ development <bluez-devel@lists.sourceforge.net>,
-	bluez-devel@lists.sf.net, maxk@qualcomm.com
-Subject: Re: [Bluez-devel] [RFC] PS3 Bluetooth quirk for HCI_FLT_CLEAR_ALL
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] [PATCH] Bluez build system
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -32,21 +27,47 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Geoff,
+Hi Jaap,
 
-> I got the following back from our Kimoto-san, so it seems to work
-> properly with your update:
-> 
->   I tried Bluetooth on linux 2.6.24-rc4.
->   BT HID also works after boot without patch.
->   I checked mouse and keyboard of Microsoft and they work well without the patch.
+> > > > > With a couple of months delay but here it is.
+> > > > >
+> > > > > Attached you find autogen.sh. Just put this file in the gnome
+> > > > > directory of bluez and gnome-bluetooth can be build with jhbuild. NOTE
+> > > > > you need to have the package gnome-common installed. gnome-common
+> > > > > contains common scripts and macros to make developing GNOME apps
+> > > > > easier
+> > > >
+> > > > that is not gonna happen since even if it is called bluez-gnome, it can
+> > > > be build and used without GNOME. Its only dependency is GTK+. So
+> > > > depending on gnome-common is not an option.
+> > >
+> > > It's a build time dependency only. There is no run time dependency.
+> >
+> > I am making no difference in build or runtime dependency here. Every
+> > extra dependency is bad. Especially if they are useless.
+> >
+> > > > > The files bootstrap and bootstrap-configure can be removed because
+> > > > > autogen.sh is now doing that job.
+> > > >
+> > > > I actually like bootstrap and bootstrap-configure, because they do
+> > > > exactly the right job for the developers.
+> > > >
+> > > I'd like to have autogen.sh because then bluez gnome can get build with jhbuild
+> > > I then see two options
+> > > 1) Add autogen.sh as is and also leave the bootstrap files in CVS
+> > > 2) I'll need to hack up an autogen.sh which doesn't need gnome-common.
+> > > I'm not an autofoo expert but I guess that can be done
+> >
+> > Is it a modified autogen.sh or a standard one? Do it have to be inside
+> > the tarball or is CVS enough?
+> >
+> Just needs to be in CVS. It won't be part of the tarball. I guess it's
+> just a standard one, but as I said I'm not an expert at it. I'll look
+> into other projects which use autogen.sh but don't use gnome-common
 
-this is what I expected. I was a really stupid mistake, but
-unfortunately buried really deep since the first releases.
-
-> I'll do some more testing this coming week also.
-
-Please do.
+if it only will be in the CVS for jhbuild, then you don't have to modify
+anything. Simply make sure it is a really default one and I put it
+there.
 
 Regards
 
