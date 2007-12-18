@@ -1,7 +1,7 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20071218233930.2d96a897@neutrino.cosmos.net>
+To: "Jaap A. Haitsma" <jaap@haitsma.org>
+In-Reply-To: <8a8adccc0712181417n6c0b5052i4e37137c24748a6a@mail.gmail.com>
 References: <8a8adccc0709020615m38389d6axe49041f8fbe18c4b@mail.gmail.com>
 	<1188768824.24968.9.camel@violet>
 	<8a8adccc0712161246y3f435aefwdb6c92c464d19f96@mail.gmail.com>
@@ -11,10 +11,10 @@ References: <8a8adccc0709020615m38389d6axe49041f8fbe18c4b@mail.gmail.com>
 	<8a8adccc0712162252v4cabae88md549ef651cbef5ad@mail.gmail.com>
 	<1197918404.8050.92.camel@aeonflux>
 	<8a8adccc0712181417n6c0b5052i4e37137c24748a6a@mail.gmail.com>
-	<20071218233930.2d96a897@neutrino.cosmos.net>
-Date: Wed, 19 Dec 2007 00:30:02 +0100
-Message-Id: <1198020602.8050.208.camel@aeonflux>
+Date: Wed, 19 Dec 2007 00:28:27 +0100
+Message-Id: <1198020507.8050.205.camel@aeonflux>
 Mime-Version: 1.0
+Cc: bluez-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] [PATCH] Bluez build system
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -29,17 +29,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Didier,
+Hi Jaap,
 
-> I just see your autogen.sh and I think about autoreconf. This tool can
-> rebuild the autotools in a project like your autogen.sh does.
-> 
-> My project's autogen.sh contains only one line : autoreconf -f
+> > > > > > > With a couple of months delay but here it is.
+> > > > > > >
+> > > > > > > Attached you find autogen.sh. Just put this file in the gnome
+> > > > > > > directory of bluez and gnome-bluetooth can be build with jhbuild. NOTE
+> > > > > > > you need to have the package gnome-common installed. gnome-common
+> > > > > > > contains common scripts and macros to make developing GNOME apps
+> > > > > > > easier
+> > > > > >
+> > > > > > that is not gonna happen since even if it is called bluez-gnome, it can
+> > > > > > be build and used without GNOME. Its only dependency is GTK+. So
+> > > > > > depending on gnome-common is not an option.
+> > > > >
+> > > > > It's a build time dependency only. There is no run time dependency.
+> > > >
+> > > > I am making no difference in build or runtime dependency here. Every
+> > > > extra dependency is bad. Especially if they are useless.
+> > > >
+> > > > > > > The files bootstrap and bootstrap-configure can be removed because
+> > > > > > > autogen.sh is now doing that job.
+> > > > > >
+> > > > > > I actually like bootstrap and bootstrap-configure, because they do
+> > > > > > exactly the right job for the developers.
+> > > > > >
+> > > > > I'd like to have autogen.sh because then bluez gnome can get build with jhbuild
+> > > > > I then see two options
+> > > > > 1) Add autogen.sh as is and also leave the bootstrap files in CVS
+> > > > > 2) I'll need to hack up an autogen.sh which doesn't need gnome-common.
+> > > > > I'm not an autofoo expert but I guess that can be done
+> > > >
+> > > > Is it a modified autogen.sh or a standard one? Do it have to be inside
+> > > > the tarball or is CVS enough?
+> > > >
+> > > Just needs to be in CVS. It won't be part of the tarball. I guess it's
+> > > just a standard one, but as I said I'm not an expert at it. I'll look
+> > > into other projects which use autogen.sh but don't use gnome-common
+> >
+> > if it only will be in the CVS for jhbuild, then you don't have to modify
+> > anything. Simply make sure it is a really default one and I put it
+> > there.
+> >
+> New autogen.sh with no dependencies on gnome-common attached
 
-try it on a bare repository from CVS and you will see it fails. It is
-not meant for bootstrapping things. And to be quite honest, if it works
-for you, you have too many files in your repository that could be
-auto-generated.
+I put that on into the CVS now. Everything should be good then.
 
 Regards
 
