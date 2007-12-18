@@ -1,19 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <8a8adccc0712181352u1d802bfava194bf372cb5f232@mail.gmail.com>
-References: <8a8adccc0712161309m29c70a45x212bead7a823d808@mail.gmail.com>
-	<1197841650.8050.39.camel@aeonflux>
-	<8a8adccc0712161443w7ba67743jc06515240cfdf83d@mail.gmail.com>
-	<1197847447.26210.268.camel@cookie.hadess.net>
-	<1197853381.8050.58.camel@aeonflux>
-	<8a8adccc0712162315v53bf668et553413d6dbc81551@mail.gmail.com>
-	<1197918266.8050.90.camel@aeonflux>
-	<8a8adccc0712181352u1d802bfava194bf372cb5f232@mail.gmail.com>
-Date: Wed, 19 Dec 2007 00:22:17 +0100
-Message-Id: <1198020137.8050.203.camel@aeonflux>
+Date: Tue, 18 Dec 2007 23:39:30 +0100
+From: Didier Link <didier@famille-link.fr>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20071218233930.2d96a897@neutrino.cosmos.net>
+In-Reply-To: <8a8adccc0712181417n6c0b5052i4e37137c24748a6a@mail.gmail.com>
+References: <8a8adccc0709020615m38389d6axe49041f8fbe18c4b@mail.gmail.com>
+	<1188768824.24968.9.camel@violet>
+	<8a8adccc0712161246y3f435aefwdb6c92c464d19f96@mail.gmail.com>
+	<1197841752.8050.42.camel@aeonflux>
+	<8a8adccc0712161449r135b552ct39f2cb9bcdeb543d@mail.gmail.com>
+	<1197853211.8050.55.camel@aeonflux>
+	<8a8adccc0712162252v4cabae88md549ef651cbef5ad@mail.gmail.com>
+	<1197918404.8050.92.camel@aeonflux>
+	<8a8adccc0712181417n6c0b5052i4e37137c24748a6a@mail.gmail.com>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Beautify about dialog
+Subject: Re: [Bluez-devel] [PATCH] Bluez build system
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,67 +24,29 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jaap,
-
-> > > > > > > > Attached patch does the following
-> > > > > > > >
-> > > > > > > > * about dialog code is simpler
-> > > > > > >
-> > > > > > > you can't use gtk_dialog_run for the applet's about dialog. It will
-> > > > > > > block and thus block all PIN requests. The current code is this way for
-> > > > > > > a reason.
-> > > > > >
-> > > > > > Didn't know that. I now use g_object_set which also reduces the amount
-> > > > > > of code considerably.
-> > > > >
-> > > > > You can still use gtk_show_about_dialog(). It removes the close
-> > > > > callback, and makes sure that only one dialogue shows up, and removes a
-> > > > > lot of boiler-plate code (it doesn't use a separate main loop like
-> > > > > gtk_dialog_run does). The gtk_dialog_run avoidance in the callbacks is
-> > > > > still needed.
-> > > >
-> > > > not sure why I haven't done it that way. Maybe it was not available when
-> > > > I wrote the initial version. However now the requirements are GTK 2.10
-> > > > or later. So if we can simplify code, I am all for it.
-> > > >
-> > > Attached two patches
-> > >
-> > > One uses gtk-show-about-dialog
-> >
-> > fix the coding style for this one. I can already see that it messes up
-> > the whitespaces. We use tabs and no whitespace in front of the ( in
-> > function declarations.
-> 
-> Attached patch with coding style fixup attached
-
-I don't see the advantage of this patch. Especially with this ugly ifdef
-for the program-name bug, I decided to not apply it. Especially the
-license crap is not worth doing it. There is no need that the UI shows
-the license in the about dialog.
-
-You can still fill in the code for the URL and email hooks to make the
-actually work. I didn't bother so far, because the default screen thing
-seem to be wrong. You should use the screen where the actual about
-dialog is present. However I am not so deep into GDK to tell what is the
-correct way here.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-SF.Net email is sponsored by:
-Check out the new SourceForge.net Marketplace.
-It's the best place to buy or sell services
-for just about anything Open Source.
-http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQoNCj4gTmV3
+IGF1dG9nZW4uc2ggd2l0aCBubyBkZXBlbmRlbmNpZXMgb24gZ25vbWUtY29tbW9uIGF0dGFjaGVk
+DQo+IA0KPiBKYWFwDQoNCkhpIEphYXAsDQoNCkkganVzdCBzZWUgeW91ciBhdXRvZ2VuLnNoIGFu
+ZCBJIHRoaW5rIGFib3V0IGF1dG9yZWNvbmYuIFRoaXMgdG9vbCBjYW4NCnJlYnVpbGQgdGhlIGF1
+dG90b29scyBpbiBhIHByb2plY3QgbGlrZSB5b3VyIGF1dG9nZW4uc2ggZG9lcy4NCg0KTXkgcHJv
+amVjdCdzIGF1dG9nZW4uc2ggY29udGFpbnMgb25seSBvbmUgbGluZSA6IGF1dG9yZWNvbmYgLWYN
+Cg0KSXQgaXMgaW5jbHVkZWQgaW4gYXV0b2NvbmYgcGFja2FnZSA7KQ0KDQpEaWRpZXINCg0KLSAt
+LSANCkRpZGllciBMaW5rIDxkaWRpZXJAZmFtaWxsZS1saW5rLmZyPg0KSmFiYmVyIDogZGlkaWVy
+X2xpbmtAamFiYmVyLmZyDQpNU04gOiB6YW5maWJAaG90bWFpbC5mcg0KU0lQIDogWmFuZmliQGVr
+aWdhLm5ldA0KDQpDbMOpIEdQRyA6IDc1QkFDOUVFDQotLS0tLUJFR0lOIFBHUCBTSUdOQVRVUkUt
+LS0tLQ0KVmVyc2lvbjogR251UEcgdjEuNC43IChHTlUvTGludXgpDQoNCmlEOERCUUZIYUV3aWt5
+UHdpblc2eWU0UkFqcFZBSjR2Vk9tUWZKNkFMVW54N0JzYnNKTU90U3VaY2dDZmF2aloNCnRrTGJ2
+M0VqTDZaU25SQjAvUkM3MmtnPQ0KPVpaeDUNCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQ0K
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLQpTRi5OZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OgpDaGVjayBvdXQg
+dGhlIG5ldyBTb3VyY2VGb3JnZS5uZXQgTWFya2V0cGxhY2UuCkl0J3MgdGhlIGJlc3QgcGxhY2Ug
+dG8gYnV5IG9yIHNlbGwgc2VydmljZXMKZm9yIGp1c3QgYWJvdXQgYW55dGhpbmcgT3BlbiBTb3Vy
+Y2UuCmh0dHA6Ly9hZC5kb3VibGVjbGljay5uZXQvY2xrOzE2NDIxNjIzOTsxMzUwMzAzODt3P2h0
+dHA6Ly9zZi5uZXQvbWFya2V0cGxhY2UKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3Rz
+LnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0
+aW5mby9ibHVlei1kZXZlbAo=
