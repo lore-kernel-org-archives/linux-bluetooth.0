@@ -1,14 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4767CC25.3060309@aircable.net>
-Date: Tue, 18 Dec 2007 10:33:25 -0300
-From: Manuel Naranjo <manuel@aircable.net>
+Message-ID: <359782e70712180139r4928877cl8bd3890e58223bf1@mail.gmail.com>
+Date: Tue, 18 Dec 2007 17:39:37 +0800
+From: "bsd user" <oldmoonster@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <359782e70712180127w7f7880d5u4353477683131e8f@mail.gmail.com>
 MIME-Version: 1.0
-To: russogia4@libero.it
-References: <JT8M43$561AFF24392062823768CC682BF19784@libero.it>
-In-Reply-To: <JT8M43$561AFF24392062823768CC682BF19784@libero.it>
-Content-Type: multipart/mixed; boundary="------------010105030002060203050101"
-Cc: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] error to compile avetana
+References: <359782e70712180013h17bf6e2bm10e06c1ee243709d@mail.gmail.com>
+	<4767855D.3070100@gmail.com>
+	<359782e70712180127w7f7880d5u4353477683131e8f@mail.gmail.com>
+Subject: Re: [Bluez-users] can bluetooth mice work with 2 laptop at the same
+	time?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,134 +19,89 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============1018666080=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------010105030002060203050101
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+--===============1018666080==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_9742_31641556.1197970777902"
 
-Hi,
-I've been able to compile avetana without much problem, only that I
-needed to patch it a bit in order to be able to compile it in my 64 bits
-system.
-I'm mailing you my patch.
-Maybe you are missing something, make sure you make all the exports that
-are required for building:
-JDK_HOME
-JDK_PLATFORM
-BIN_DIR
-
-JDK_PLATFORM should be just linux.
-Then launch install.
-Thanks,
-Manuel
-> Hi, i tried to compile avetanaBT-20070719.tgz but it return me the follow     error:
->
-> g++ -shared -lbluetooth -I /opt/jdk1.6.0_03/include -I /opt/jdk1.6.0_03/include//opt/jdk1.6.0_03/include BlueZ.cpp -o /home/gianfranco/Desktop/Cartella/binaries/libavetanaBT.so 
-> BlueZ.cpp: In function ‘int gen_dataseq_pdu(char*, const sdp_list_t*, uint8_t)’:
-> BlueZ.cpp:198: error: invalid conversion from ‘uint8_t*’ to ‘char*’
-> BlueZ.cpp: In function ‘jint Java_de_avetana_bluetooth_stack_BlueZ_getLinkQuality(JNIEnv*, _jclass*, _jstring*)’:
-> BlueZ.cpp:407: error: ‘read_link_quality_rp’ was not declared in this scope
-> BlueZ.cpp:407: error: expected `;' before ‘rp’
-> BlueZ.cpp:456: error: ‘OCF_READ_LINK_QUALITY’ was not declared in this scope
-> BlueZ.cpp:459: error: ‘rp’ was not declared in this scope
-> BlueZ.cpp:460: error: ‘READ_LINK_QUALITY_RP_SIZE’ was not declared in this scope
-> BlueZ.cpp: In function ‘jint Java_de_avetana_bluetooth_stack_BlueZ_updateService(JNIEnv*, _jclass*, _jobject*, jlong)’:
-> BlueZ.cpp:1203: error: ‘sdp_gen_tid’ was not declared in this scope
-> BlueZ.cpp: In function ‘jint Java_de_avetana_bluetooth_stack_BlueZ_createService(JNIEnv*, _jclass*, _jobject*)’:
-> BlueZ.cpp:1385: error: ‘sdp_gen_tid’ was not declared in this scope
-> BlueZ.cpp: In function ‘_jobject* my_sdp_service_attr_req(JNIEnv*, _jclass*, sdp_session_t*, uint32_t, sdp_attrreq_type_t, const sdp_list_t*)’:
-> BlueZ.cpp:2139: error: ‘sdp_gen_tid’ was not declared in this scope
-> BlueZ.cpp:2170: error: invalid conversion from ‘uint8_t*’ to ‘char*’
-> BlueZ.cpp: In function ‘int my_sdp_service_search_attr_req(JNIEnv*, _jclass*, sdp_session_t*, const sdp_list_t*, sdp_attrreq_type_t, const sdp_list_t*, sdp_list_t**, sdp_list_t*, _jstring*, jint)’:
-> BlueZ.cpp:2275: error: ‘sdp_gen_tid’ was not declared in this scope
-> BlueZ.cpp:2313: error: invalid conversion from ‘uint8_t*’ to ‘char*’
-> make[1]: *** [libavetanaBT.so] Error 1
-> make[1]: Leaving directory `/home/gianfranco/Desktop/Cartella/c'
-> make: *** [csource] Error 2
->
-> Can you help me?
->
-> Thanks
->
->
-> -------------------------------------------------------------------------
-> SF.Net email is sponsored by:
-> Check out the new SourceForge.net Marketplace.
-> It's the best place to buy or sell services
-> for just about anything Open Source.
-> http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->   
-
-
---------------010105030002060203050101
-Content-Type: text/x-patch;
- name="avetana.patch"
+------=_Part_9742_31641556.1197970777902
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="avetana.patch"
+Content-Disposition: inline
 
-diff -uprN ave/c/BlueZ.cpp aventana/c/BlueZ.cpp
---- ave/c/BlueZ.cpp	2007-07-19 11:21:14.000000000 -0300
-+++ aventana/c/BlueZ.cpp	2007-12-18 10:07:27.000000000 -0300
-@@ -257,7 +257,7 @@ static int gen_attridseq_pdu(char *dst, 
-  * Throws a Java exception if an error occured. Depending on the erro, you will
-  * surely have to call the method exit(1) after this excpetion is thrown
-  */
--void throwException(JNIEnv *env, char *msg)
-+void throwException(JNIEnv *env, const char *msg)
- {
- 	/* Throw a BlueZException in Java, with the given message */
- 	jclass exception_cls;
-@@ -1230,7 +1230,7 @@ JNIEXPORT jint JNICALL Java_de_avetana_b
-  * This jobject (a LocalServiceRecord if you are using the Avetana implementation) MUST implement a method
-  * toByteArray().
-  */
--JNIEXPORT jint JNICALL Java_de_avetana_bluetooth_stack_BlueZ_createService
-+JNIEXPORT jlong JNICALL Java_de_avetana_bluetooth_stack_BlueZ_createService
- 	(JNIEnv *env, jclass obj, jobject srecord) {
- 
- 	bdaddr_t interface;
-@@ -1409,7 +1409,7 @@ JNIEXPORT jint JNICALL Java_de_avetana_b
- 		srh->srHandle = handle;
- 		
- 		
--	return (jint)srh;
-+	return (jlong)srh;
- 	}
- 	else return -1;
- }
+further more, can I associate 20 BT mices with one laptop's BT controller,
+and anytime I can choose one of them move on the screen?. Do I have to
+pre-configure up to 7 mices in concurrent and other in park state?
 
-diff -uprN ave/c/Makefile.in aventana/c/Makefile.in
---- ave/c/Makefile.in	2005-06-30 11:59:08.000000000 -0300
-+++ aventana/c/Makefile.in	2007-12-18 10:26:15.000000000 -0300
-@@ -69,4 +69,4 @@ de_avetana_bluetooth_stack_BlueZ.h: clea
- 
- # Native language (C) library - libavetanaBT.so
- libavetanaBT.so: BlueZ.cpp de_avetana_bluetooth_stack_BlueZ.h 
--	$(CC) -shared -lbluetooth $(CFLAGS) BlueZ.cpp -o $(BIN_DIR)/libavetanaBT.so $(LDFLAGS)
-+	$(CC) -fPIC -shared -lbluetooth $(CFLAGS) BlueZ.cpp -o $(BIN_DIR)/libavetanaBT.so $(LDFLAGS)
-diff -uprN ave/de/avetana/bluetooth/stack/BlueZ.java aventana/de/avetana/bluetooth/stack/BlueZ.java
---- ave/de/avetana/bluetooth/stack/BlueZ.java	2007-05-17 17:33:21.000000000 -0300
-+++ aventana/de/avetana/bluetooth/stack/BlueZ.java	2007-12-18 10:11:24.000000000 -0300
-@@ -413,7 +413,7 @@ public class BlueZ
-          * @return a positive integer is the process succeeds.
-          * @throws BlueZException
-          */
--        public static synchronized native int createService(LocalServiceRecord service) throws BlueZException;
-+        public static synchronized native long createService(LocalServiceRecord service) throws BlueZException;
- 
-         /**
-          * Updates an existing service record (the old <service record must be already stored in the BCC.)
+On Dec 18, 2007 5:27 PM, bsd user <oldmoonster@gmail.com> wrote:
 
---------------010105030002060203050101
+> Thanks  for your answer, Mohan. In my limited experience with BT mice, I
+> found sometimes the mice can not be inquired, I have to push "reset" button
+> for several seconds and release it, then I can get mice info from inquiry
+> command. I'd like to know, what's the state of mice, if I leave it alone for
+> a certain long time without associate with laptop? standby or some else like
+> parked?
+>
+> Thanks again!
+>
+>
+> On Dec 18, 2007 4:31 PM, Mohan Sundaram <mohan.tux@gmail.com> wrote:
+>
+> > bsd user wrote:
+> > > Hi, all,
+> > >
+> > > Can a bluetooth mice active as slave for at least 2 piconets? In other
+> > > way, I'd like to setup a bluetooth mice to work with 2 laptops at the
+> > > same time. Is it possible?
+> > >
+> > > Thanks a lot.
+> > BT mice are on serial pt-pt connections and thus can be paired with only
+> > one computer IMHO at any point in time.
+> >
+> > Mohan
+> >
+> > -------------------------------------------------------------------------
+> >
+> > SF.Net email is sponsored by:
+> > Check out the new SourceForge.net Marketplace.
+> > It's the best place to buy or sell services
+> > for just about anything Open Source.
+> >
+> > http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+> > _______________________________________________
+> > Bluez-users mailing list
+> > Bluez-users@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >
+>
+>
+
+------=_Part_9742_31641556.1197970777902
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+further more, can I associate 20 BT mices with one laptop&#39;s BT controller, and anytime I can choose one of them move on the screen?. Do I have to pre-configure up to 7 mices in concurrent and other in park state?<br><br>
+<div class="gmail_quote">On Dec 18, 2007 5:27 PM, bsd user &lt;<a href="mailto:oldmoonster@gmail.com">oldmoonster@gmail.com</a>&gt; wrote:<br><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+Thanks&nbsp; for your answer, Mohan. In my limited experience with BT mice, I found sometimes the mice can not be inquired, I have to push &quot;reset&quot; button for several seconds and release it, then I can get mice info from inquiry command. I&#39;d like to know, what&#39;s the state of mice, if I leave it alone for a certain long time without associate with laptop? standby or some else like parked? 
+<br><br>Thanks again!<div><div></div><div class="Wj3C7c"><br><br><div class="gmail_quote">On Dec 18, 2007 4:31 PM, Mohan Sundaram &lt;<a href="mailto:mohan.tux@gmail.com" target="_blank">mohan.tux@gmail.com</a>&gt; wrote:
+<br><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+<div><div></div><div>bsd user wrote:<br>&gt; Hi, all,<br>&gt;<br>&gt; Can a bluetooth mice active as slave for at least 2 piconets? In other<br>&gt; way, I&#39;d like to setup a bluetooth mice to work with 2 laptops at the
+<br>&gt; same time. Is it possible?<br>&gt;<br>&gt; Thanks a lot.<br></div></div>BT mice are on serial pt-pt connections and thus can be paired with only<br>one computer IMHO at any point in time.<br><br>Mohan<br><br>-------------------------------------------------------------------------
+<br>SF.Net email is sponsored by:<br>Check out the new SourceForge.net Marketplace.<br>It&#39;s the best place to buy or sell services<br>for just about anything Open Source.<br><a href="http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace" target="_blank">
+
+http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace</a><br>_______________________________________________<br>Bluez-users mailing list<br><a href="mailto:Bluez-users@lists.sourceforge.net" target="_blank">
+Bluez-users@lists.sourceforge.net
+</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users" target="_blank">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br></blockquote></div><br>
+</div></div></blockquote></div><br>
+
+------=_Part_9742_31641556.1197970777902--
+
+
+--===============1018666080==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -157,7 +113,7 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services
 for just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
---------------010105030002060203050101
+--===============1018666080==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -168,4 +124,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---------------010105030002060203050101--
+--===============1018666080==--
