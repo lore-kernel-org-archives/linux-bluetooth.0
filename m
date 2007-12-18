@@ -1,7 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5f84803c0712181037w39132b53x1488195f71802479@mail.gmail.com>
+Message-ID: <5f84803c0712181037w39132b53x1488195f71802479@mail.gmail.com>
+Date: Tue, 18 Dec 2007 13:37:44 -0500
+From: "Chris Rivera" <chrismrivera@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1197925294.8050.111.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_16224_14602584.1198003064697"
 References: <5f84803c0712030733q38350283m77e8930dfcca4162@mail.gmail.com>
 	<1196701181.12292.128.camel@violet>
 	<5f84803c0712060959n6db58e78y4adfa1b4a212df71@mail.gmail.com>
@@ -12,10 +17,6 @@ References: <5f84803c0712030733q38350283m77e8930dfcca4162@mail.gmail.com>
 	<1197922624.8050.107.camel@aeonflux>
 	<5f84803c0712171247t7879a8adp6d17981697396527@mail.gmail.com>
 	<1197925294.8050.111.camel@aeonflux>
-	<5f84803c0712181037w39132b53x1488195f71802479@mail.gmail.com>
-Date: Tue, 18 Dec 2007 20:10:08 +0100
-Message-Id: <1198005009.8050.185.camel@aeonflux>
-Mime-Version: 1.0
 Subject: Re: [Bluez-devel] [PATCH] [RESEND] make bluez GNOME UIs singletons
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -26,24 +27,243 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Chris,
+------=_Part_16224_14602584.1198003064697
+Content-Type: multipart/alternative;
+	boundary="----=_Part_16225_30816102.1198003064697"
 
-> Updated patch attached.
+------=_Part_16225_30816102.1198003064697
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-patch looks good to me. One question though, why do we use the extra
-register function. Can't we include that in the _new function. This
-would make the code a little simpler. We still have to check if the
-object creation succeeded.
+Updated patch attached.
 
-Regards
+Chris
 
-Marcel
+On Dec 17, 2007 4:01 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
 
+> Hi Chris,
+>
+> >         Please use use gtk_init_with_args and make the GOptionEntry
+> >         data global
+> >         and static. Look at bluetooth-analyzer for an example.
+> >
+> > This would force the singleton flag variable to be global.  Is this
+> > what you want?
+>
+> what is the difference? It is fine to have it global. I don't see any
+> problem with it. I don't wanna introduce any complexity if it is not
+> needed.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> SF.Net email is sponsored by:
+> Check out the new SourceForge.net Marketplace.
+> It's the best place to buy or sell services
+> for just about anything Open Source.
+>
+> http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
+------=_Part_16225_30816102.1198003064697
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Updated patch attached.<br><br>Chris<br><br><div class="gmail_quote">On Dec 17, 2007 4:01 PM, Marcel Holtmann &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:<br><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+Hi Chris,<br><div class="Ih2E3d"><br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; Please use use gtk_init_with_args and make the GOptionEntry<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; data global<br>&gt; &nbsp; &nbsp; &nbsp; &nbsp; and static. Look at bluetooth-analyzer for an example.<br>&gt;<br>&gt; This would force the singleton flag variable to be global. &nbsp;Is this
+<br>&gt; what you want?<br><br></div>what is the difference? It is fine to have it global. I don&#39;t see any<br>problem with it. I don&#39;t wanna introduce any complexity if it is not<br>needed.<br><div><div></div><div class="Wj3C7c">
+<br>Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>SF.Net email is sponsored by:<br>Check out the new SourceForge.net Marketplace.<br>It&#39;s the best place to buy or sell services
+<br>for just about anything Open Source.<br><a href="http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace" target="_blank">http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+</a><br>_______________________________________________<br>Bluez-devel mailing list<br><a href="mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-devel" target="_blank">
+https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br></div></div></blockquote></div><br>
+
+------=_Part_16225_30816102.1198003064697--
+
+------=_Part_16224_14602584.1198003064697
+Content-Type: text/x-patch; name=bluez-gnome-singleton-apps.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fabpo3dp0
+Content-Disposition: attachment; filename=bluez-gnome-singleton-apps.patch
+
+ZGlmZiAtdXJwTiBnbm9tZS9hcHBsZXQvYmx1ZXRvb3RoLWFwcGxldC4xIGdub21lLW5ldy9hcHBs
+ZXQvYmx1ZXRvb3RoLWFwcGxldC4xCi0tLSBnbm9tZS9hcHBsZXQvYmx1ZXRvb3RoLWFwcGxldC4x
+CTIwMDctMDctMjIgMTE6MzM6MTMuMDAwMDAwMDAwIC0wNDAwCisrKyBnbm9tZS1uZXcvYXBwbGV0
+L2JsdWV0b290aC1hcHBsZXQuMQkyMDA3LTEyLTE2IDE4OjMxOjA5LjAwMDAwMDAwMCAtMDUwMApA
+QCAtMTAsOCArMTAsOSBAQCB3aGVuZXZlciBhIHBhc3NrZXkgKGFrYSBQSU4pIGlzIHJlcXVpcmVk
+CiAuSSBibHVldG9vdGgtYXBwbGV0CiBpcyBwYXJ0IG9mIGJsdWV6LWdub21lLCBzZWUgYWxzbyBo
+dHRwOi8vd3d3LmJsdWV6Lm9yZwogLlNIIE9QVElPTlMKLS5JIGJsdWV0b290aC1hcHBsZXQKLXRh
+a2VzIG5vIG9wdGlvbnMKKy5UUCAKKy5CSSBcLVwtc2luZ2xldG9uCitFbnN1cmUgdGhhdCBvbmx5
+IG9uZSBpbnN0YW5jZSBpcyBydW5uaW5nLgogLlNIIEFVVEhPUgogTWFyY2VsIEhvbHRtYW5uIDxt
+YXJjZWxAaG9sdG1hbm4ub3JnPgogLlNIIExJQ0VOU0UKZGlmZiAtdXJwTiBnbm9tZS9hcHBsZXQv
+Ymx1ZXRvb3RoLWFwcGxldC5kZXNrdG9wLmluIGdub21lLW5ldy9hcHBsZXQvYmx1ZXRvb3RoLWFw
+cGxldC5kZXNrdG9wLmluCi0tLSBnbm9tZS9hcHBsZXQvYmx1ZXRvb3RoLWFwcGxldC5kZXNrdG9w
+LmluCTIwMDctMDQtMDMgMDQ6MDk6MDEuMDAwMDAwMDAwIC0wNDAwCisrKyBnbm9tZS1uZXcvYXBw
+bGV0L2JsdWV0b290aC1hcHBsZXQuZGVza3RvcC5pbgkyMDA3LTEyLTE2IDE4OjMxOjA5LjAwMDAw
+MDAwMCAtMDUwMApAQCAtMyw3ICszLDcgQEAgRW5jb2Rpbmc9VVRGLTgKIF9OYW1lPUJsdWV0b290
+aCBNYW5hZ2VyCiBfQ29tbWVudD1CbHVldG9vdGggTWFuYWdlciBhcHBsZXQKIEljb249c3RvY2tf
+Ymx1ZXRvb3RoCi1FeGVjPWJsdWV0b290aC1hcHBsZXQKK0V4ZWM9Ymx1ZXRvb3RoLWFwcGxldCAt
+LXNpbmdsZXRvbgogVGVybWluYWw9ZmFsc2UKIFR5cGU9QXBwbGljYXRpb24KIENhdGVnb3JpZXM9
+CmRpZmYgLXVycE4gZ25vbWUvYXBwbGV0L21haW4uYyBnbm9tZS1uZXcvYXBwbGV0L21haW4uYwot
+LS0gZ25vbWUvYXBwbGV0L21haW4uYwkyMDA3LTEyLTA0IDEwOjMwOjUxLjAwMDAwMDAwMCAtMDUw
+MAorKysgZ25vbWUtbmV3L2FwcGxldC9tYWluLmMJMjAwNy0xMi0xNyAxOToxNjoyOS4wMDAwMDAw
+MDAgLTA1MDAKQEAgLTQ5LDYgKzQ5LDcgQEAKICNlbmRpZgogCiAjaW5jbHVkZSAiYmx1ZXRvb3Ro
+LWRldmljZS1zZWxlY3Rpb24uaCIKKyNpbmNsdWRlICJibHVldG9vdGgtaW5zdGFuY2UuaCIKIAog
+I2RlZmluZSBQQVNTS0VZX0FHRU5UX1BBVEgJIi9vcmcvYmx1ZXovcGFzc2tleSIKICNkZWZpbmUg
+QVVUSF9BR0VOVF9QQVRICQkiL29yZy9ibHVlei9hdXRoIgpAQCAtMTU1MCw3ICsxNTUxLDcgQEAg
+c3RhdGljIHZvaWQgYWJvdXRfY2FsbGJhY2soR3RrV2lkZ2V0ICppdAogCiBzdGF0aWMgdm9pZCBz
+ZXR0aW5nc19jYWxsYmFjayhHT2JqZWN0ICp3aWRnZXQsIGdwb2ludGVyIHVzZXJfZGF0YSkKIHsK
+LQljb25zdCBjaGFyICpjb21tYW5kID0gImJsdWV0b290aC1wcm9wZXJ0aWVzIjsKKwljb25zdCBj
+aGFyICpjb21tYW5kID0gImJsdWV0b290aC1wcm9wZXJ0aWVzIC0tc2luZ2xldG9uIjsKIAogCWlm
+ICghZ19zcGF3bl9jb21tYW5kX2xpbmVfYXN5bmMoY29tbWFuZCwgTlVMTCkpCiAJCWdfcHJpbnRl
+cnIoIkNvdWxkbid0IGV4ZWN1dGUgY29tbWFuZDogJXNcbiIsIGNvbW1hbmQpOwpAQCAtMTYzOSw3
+ICsxNjQwLDcgQEAgc3RhdGljIHZvaWQgc2VuZHRvX2NhbGxiYWNrKEdPYmplY3QgKndpZAogI2lm
+IDAKIHN0YXRpYyB2b2lkIHdpemFyZF9jYWxsYmFjayhHT2JqZWN0ICp3aWRnZXQsIGdwb2ludGVy
+IHVzZXJfZGF0YSkKIHsKLQljb25zdCBjaGFyICpjb21tYW5kID0gImJsdWV0b290aC13aXphcmQi
+OworCWNvbnN0IGNoYXIgKmNvbW1hbmQgPSAiYmx1ZXRvb3RoLXdpemFyZCAtLXNpbmdsZXRvbiI7
+CiAKIAlpZiAoIWdfc3Bhd25fY29tbWFuZF9saW5lX2FzeW5jKGNvbW1hbmQsIE5VTEwpKQogCQln
+X3ByaW50ZXJyKCJDb3VsZG4ndCBleGVjdXRlIGNvbW1hbmQ6ICVzXG4iLCBjb21tYW5kKTsKQEAg
+LTE3ODAsMTcgKzE3ODEsMzQgQEAgc3RhdGljIHZvaWQgZ2NvbmZfY2FsbGJhY2soR0NvbmZDbGll
+bnQgKgogCQlhdXRvX2F1dGhvcml6ZSA9IGdjb25mX3ZhbHVlX2dldF9ib29sKHZhbHVlKTsKIH0K
+IAorc3RhdGljIGdib29sZWFuIHNpbmdsZXRvbiA9IEZBTFNFOworc3RhdGljIEdPcHRpb25FbnRy
+eSBvcHRpb25zW10gPSB7CisJeyAic2luZ2xldG9uIiwgMCwgMCwgR19PUFRJT05fQVJHX05PTkUs
+ICZzaW5nbGV0b24sCisJICAiT25seSBhbGxvdyBvbmUgaW5zdGFuY2Ugb2YgdGhpcyBhcHBsaWNh
+dGlvbiIsIE5VTEwgfSwKKwl7IE5VTEwsIDAsIDAsIDAsIE5VTEwsIE5VTEwsIE5VTEwgfQorfTsK
+KwogaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKIHsKIAlHdGtXaWRnZXQgKm1lbnU7
+CiAJR0Vycm9yICplcnJvciA9IE5VTEw7CisJQmx1ZXRvb3RoSW5zdGFuY2UgKmFwcDsKIAljaGFy
+ICpzdHI7CiAKIAliaW5kdGV4dGRvbWFpbihHRVRURVhUX1BBQ0tBR0UsIExPQ0FMRURJUik7CiAJ
+YmluZF90ZXh0ZG9tYWluX2NvZGVzZXQoR0VUVEVYVF9QQUNLQUdFLCAiVVRGLTgiKTsKIAl0ZXh0
+ZG9tYWluKEdFVFRFWFRfUEFDS0FHRSk7CiAKLQlndGtfaW5pdCgmYXJnYywgJmFyZ3YpOworCWlm
+IChndGtfaW5pdF93aXRoX2FyZ3MoJmFyZ2MsICZhcmd2LCAiIiwKKwkJCQlvcHRpb25zLCBHRVRU
+RVhUX1BBQ0tBR0UsICZlcnJvcikgPT0gRkFMU0UpIHsKKwkJaWYgKGVycm9yKSB7CisJCQlnX3By
+aW50KCIlc1xuIiwgZXJyb3ItPm1lc3NhZ2UpOworCQkJZ19lcnJvcl9mcmVlKGVycm9yKTsKKwkJ
+fSBlbHNlCisJCQlnX3ByaW50KCJBbiB1bmtub3duIGVycm9yIG9jY3VycmVkXG4iKTsKKworCQln
+dGtfZXhpdCgxKTsKKwl9CiAKICNpZmRlZiBIQVZFX0xJQk5PVElGWQogCW5vdGlmeV9pbml0KCJi
+bHVldG9vdGgtbWFuYWdlciIpOwpAQCAtMTgwNCw2ICsxODIyLDExIEBAIGludCBtYWluKGludCBh
+cmdjLCBjaGFyICphcmd2W10pCiAJCWV4aXQoRVhJVF9GQUlMVVJFKTsKIAl9CiAKKwlhcHAgPSBi
+bHVldG9vdGhfaW5zdGFuY2VfbmV3KCk7CisJaWYoIWJsdWV0b290aF9pbnN0YW5jZV9yZWdpc3Rl
+cihhcHAsIHNpbmdsZXRvbiwgCisJCSIvb3JnL2JsdWV6L2FwcGxldCIsICJvcmcuYmx1ZXouYXBw
+bGV0IikpCisJCWV4aXQoRVhJVF9GQUlMVVJFKTsKKwogCWdjb25mID0gZ2NvbmZfY2xpZW50X2dl
+dF9kZWZhdWx0KCk7CiAKICNpZmRlZiBIQVZFX0hBTApAQCAtMTg2MCw2ICsxODgzLDggQEAgaW50
+IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKIAlnX2xpc3RfZm9yZWFjaChhZGFwdGVyX2xp
+c3QsIGFkYXB0ZXJfZnJlZSwgTlVMTCk7CiAKIAlkYnVzX2dfY29ubmVjdGlvbl91bnJlZihjb25u
+KTsKKyAgICAKKwlnX29iamVjdF91bnJlZihhcHApOwogCiAJcmV0dXJuIDA7CiB9CmRpZmYgLXVy
+cE4gZ25vbWUvcHJvcGVydGllcy9ibHVldG9vdGgtcHJvcGVydGllcy4xIGdub21lLW5ldy9wcm9w
+ZXJ0aWVzL2JsdWV0b290aC1wcm9wZXJ0aWVzLjEKLS0tIGdub21lL3Byb3BlcnRpZXMvYmx1ZXRv
+b3RoLXByb3BlcnRpZXMuMQkyMDA3LTA3LTIyIDExOjMzOjEzLjAwMDAwMDAwMCAtMDQwMAorKysg
+Z25vbWUtbmV3L3Byb3BlcnRpZXMvYmx1ZXRvb3RoLXByb3BlcnRpZXMuMQkyMDA3LTEyLTE2IDE4
+OjMxOjA5LjAwMDAwMDAwMCAtMDUwMApAQCAtOSw4ICs5LDkgQEAgd2lsbCBkaXNwbGF5IGEgZGlh
+bG9nIGZvciBjaGFuZ2luZyBCbHVldAogLkkgYmx1ZXRvb3RoLXByb3BlcnRpZXMKIGlzIHBhcnQg
+b2YgYmx1ZXotZ25vbWUsIHNlZSBhbHNvIGh0dHA6Ly93d3cuYmx1ZXoub3JnCiAuU0ggT1BUSU9O
+UwotLkkgYmx1ZXRvb3RoLXByb3BlcnRpZXMKLXRha2VzIG5vIG9wdGlvbnMKKy5UUCAKKy5CSSBc
+LVwtc2luZ2xldG9uCitFbnN1cmUgdGhhdCBvbmx5IG9uZSBpbnN0YW5jZSBpcyBydW5uaW5nLgog
+LlNIIEFVVEhPUgogTWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9sdG1hbm4ub3JnPgogLlNIIExJ
+Q0VOU0UKZGlmZiAtdXJwTiBnbm9tZS9wcm9wZXJ0aWVzL21haW4uYyBnbm9tZS1uZXcvcHJvcGVy
+dGllcy9tYWluLmMKLS0tIGdub21lL3Byb3BlcnRpZXMvbWFpbi5jCTIwMDctMDctMzEgMTc6Mzc6
+MjkuMDAwMDAwMDAwIC0wNDAwCisrKyBnbm9tZS1uZXcvcHJvcGVydGllcy9tYWluLmMJMjAwNy0x
+Mi0xNyAxOToyMDo0My4wMDAwMDAwMDAgLTA1MDAKQEAgLTQwLDYgKzQwLDcgQEAKICNpbmNsdWRl
+ICJnZW5lcmFsLmgiCiAjaW5jbHVkZSAic2VydmljZS5oIgogI2luY2x1ZGUgImFkYXB0ZXIuaCIK
+KyNpbmNsdWRlICJibHVldG9vdGgtaW5zdGFuY2UuaCIKIAogc3RhdGljIHZvaWQgZGVsZXRlX2Nh
+bGxiYWNrKEd0a1dpZGdldCAqd2luZG93LCBHZGtFdmVudCAqZXZlbnQsCiAJCQkJCQlncG9pbnRl
+ciB1c2VyX2RhdGEpCkBAIC01OCw3ICs1OSw3IEBAIHN0YXRpYyB2b2lkIGNsb3NlX2NhbGxiYWNr
+KEd0a1dpZGdldCAqYnUKIAlndGtfbWFpbl9xdWl0KCk7CiB9CiAKLXN0YXRpYyB2b2lkIGNyZWF0
+ZV93aW5kb3coR3RrV2lkZ2V0ICpub3RlYm9vaykKK3N0YXRpYyBHdGtXaWRnZXQgKmNyZWF0ZV93
+aW5kb3coR3RrV2lkZ2V0ICpub3RlYm9vaykKIHsKIAlHdGtXaWRnZXQgKndpbmRvdzsKIAlHdGtX
+aWRnZXQgKndpZGdldDsKQEAgLTEwOCw2ICsxMDksNyBAQCBzdGF0aWMgdm9pZCBjcmVhdGVfd2lu
+ZG93KEd0a1dpZGdldCAqbm90CiAJCQkJCQl3aWRnZXQsIF8oIkdlbmVyYWwiKSk7CiAKIAlndGtf
+d2lkZ2V0X3Nob3dfYWxsKHdpbmRvdyk7CisJcmV0dXJuIHdpbmRvdzsKIH0KIAogc3RhdGljIHZv
+aWQgbmFtZV9vd25lcl9jaGFuZ2VkKERCdXNHUHJveHkgKm9iamVjdCwgY29uc3QgY2hhciAqbmFt
+ZSwKQEAgLTEzOSwxOCArMTQxLDM2IEBAIHN0YXRpYyBEQnVzR1Byb3h5ICpzZXR1cF9tYW5hZ2Vy
+KERCdXNHQ28KIAlyZXR1cm4gcHJveHk7CiB9CiAKK3N0YXRpYyBnYm9vbGVhbiBzaW5nbGV0b24g
+PSBGQUxTRTsKK3N0YXRpYyBHT3B0aW9uRW50cnkgb3B0aW9uc1tdID0geworCXsgInNpbmdsZXRv
+biIsIDAsIDAsIEdfT1BUSU9OX0FSR19OT05FLCAmc2luZ2xldG9uLAorCSAgIk9ubHkgYWxsb3cg
+b25lIGluc3RhbmNlIG9mIHRoaXMgYXBwbGljYXRpb24iLCBOVUxMIH0sCisJeyBOVUxMLCAwLCAw
+LCAwLCBOVUxMLCBOVUxMLCBOVUxMIH0KK307CisKIGludCBtYWluKGludCBhcmdjLCBjaGFyICph
+cmd2W10pCiB7CiAJR3RrV2lkZ2V0ICpub3RlYm9vazsKKwlHdGtXaWRnZXQgKndpbmRvdzsKKwlH
+RXJyb3IgKmVycm9yID0gTlVMTDsKIAlEQnVzR0Nvbm5lY3Rpb24gKmNvbm47CisJQmx1ZXRvb3Ro
+SW5zdGFuY2UgKmFwcDsKIAlEQnVzR1Byb3h5ICptYW5hZ2VyOwotCUdFcnJvciAqZXJyb3IgPSBO
+VUxMOwotCisJCiAJYmluZHRleHRkb21haW4oR0VUVEVYVF9QQUNLQUdFLCBMT0NBTEVESVIpOwog
+CWJpbmRfdGV4dGRvbWFpbl9jb2Rlc2V0KEdFVFRFWFRfUEFDS0FHRSwgIlVURi04Iik7CiAJdGV4
+dGRvbWFpbihHRVRURVhUX1BBQ0tBR0UpOwogCi0JZ3RrX2luaXQoJmFyZ2MsICZhcmd2KTsKKwlp
+ZiAoZ3RrX2luaXRfd2l0aF9hcmdzKCZhcmdjLCAmYXJndiwgIiIsCisJCQkJb3B0aW9ucywgR0VU
+VEVYVF9QQUNLQUdFLCAmZXJyb3IpID09IEZBTFNFKSB7CisJCWlmIChlcnJvcikgeworCQkJZ19w
+cmludCgiJXNcbiIsIGVycm9yLT5tZXNzYWdlKTsKKwkJCWdfZXJyb3JfZnJlZShlcnJvcik7CisJ
+CX0gZWxzZQorCQkJZ19wcmludCgiQW4gdW5rbm93biBlcnJvciBvY2N1cnJlZFxuIik7CisKKwkJ
+Z3RrX2V4aXQoMSk7CisJfQogCiAJY29ubiA9IGRidXNfZ19idXNfZ2V0KERCVVNfQlVTX1NZU1RF
+TSwgJmVycm9yKTsKIAlpZiAoZXJyb3IgIT0gTlVMTCkgewpAQCAtMTYzLDEyICsxODMsMTggQEAg
+aW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKIAlzZXR1cF9nZW5lcmFsKCk7CiAKIAlu
+b3RlYm9vayA9IGd0a19ub3RlYm9va19uZXcoKTsKLQorICAgIAogCWFzc2lnbl9hZGFwdGVyKG5v
+dGVib29rKTsKIAotCW1hbmFnZXIgPSBzZXR1cF9tYW5hZ2VyKGNvbm4pOworCXdpbmRvdyA9IGNy
+ZWF0ZV93aW5kb3cobm90ZWJvb2spOwogCi0JY3JlYXRlX3dpbmRvdyhub3RlYm9vayk7CisJYXBw
+ID0gYmx1ZXRvb3RoX2luc3RhbmNlX25ldygpOworCWJsdWV0b290aF9pbnN0YW5jZV9zZXRfd2lu
+ZG93KGFwcCwgR1RLX1dJTkRPVyh3aW5kb3cpKTsKKwlpZighYmx1ZXRvb3RoX2luc3RhbmNlX3Jl
+Z2lzdGVyKGFwcCwgc2luZ2xldG9uLCAKKwkJIi9vcmcvYmx1ZXovcHJvcGVydGllcyIsICJvcmcu
+Ymx1ZXoucHJvcGVydGllcyIpKQorCQlleGl0KEVYSVRfRkFJTFVSRSk7CisJCisJbWFuYWdlciA9
+IHNldHVwX21hbmFnZXIoY29ubik7CiAKIAlndGtfbWFpbigpOwogCkBAIC0xODEsNiArMjA3LDgg
+QEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKIAlnX29iamVjdF91bnJlZihtYW5h
+Z2VyKTsKIAogCWRidXNfZ19jb25uZWN0aW9uX3VucmVmKGNvbm4pOworICAgIAorCWdfb2JqZWN0
+X3VucmVmKGFwcCk7CiAKIAlyZXR1cm4gMDsKIH0KZGlmZiAtdXJwTiBnbm9tZS93aXphcmQvYmx1
+ZXRvb3RoLXdpemFyZC4xIGdub21lLW5ldy93aXphcmQvYmx1ZXRvb3RoLXdpemFyZC4xCi0tLSBn
+bm9tZS93aXphcmQvYmx1ZXRvb3RoLXdpemFyZC4xCTIwMDctMDctMjIgMTE6MzM6MTIuMDAwMDAw
+MDAwIC0wNDAwCisrKyBnbm9tZS1uZXcvd2l6YXJkL2JsdWV0b290aC13aXphcmQuMQkyMDA3LTEy
+LTE2IDE4OjMxOjA5LjAwMDAwMDAwMCAtMDUwMApAQCAtOSw4ICs5LDkgQEAgd2lsbCBkaXNwbGF5
+IGEgd2l6YXJkIGZvciBzZXR0aW5nIHVwIEJsdQogLkkgYmx1ZXRvb3RoLXdpemFyZAogaXMgcGFy
+dCBvZiBibHVlei1nbm9tZSwgc2VlIGFsc28gaHR0cDovL3d3dy5ibHVlei5vcmcKIC5TSCBPUFRJ
+T05TCi0uSSBibHVldG9vdGgtd2l6YXJkCi10YWtlcyBubyBvcHRpb25zCisuVFAgCisuQkkgXC1c
+LXNpbmdsZXRvbgorRW5zdXJlIHRoYXQgb25seSBvbmUgaW5zdGFuY2UgaXMgcnVubmluZy4KIC5T
+SCBBVVRIT1IKIE1hcmNlbCBIb2x0bWFubiA8bWFyY2VsQGhvbHRtYW5uLm9yZz4KIC5TSCBMSUNF
+TlNFCmRpZmYgLXVycE4gZ25vbWUvd2l6YXJkL21haW4uYyBnbm9tZS1uZXcvd2l6YXJkL21haW4u
+YwotLS0gZ25vbWUvd2l6YXJkL21haW4uYwkyMDA3LTA4LTE1IDAzOjA0OjAzLjAwMDAwMDAwMCAt
+MDQwMAorKysgZ25vbWUtbmV3L3dpemFyZC9tYWluLmMJMjAwNy0xMi0xNyAxOToyMToxMy4wMDAw
+MDAwMDAgLTA1MDAKQEAgLTI2LDYgKzI2LDcgQEAKICNlbmRpZgogCiAjaW5jbHVkZSA8c3RyaW5n
+Lmg+CisjaW5jbHVkZSA8c3RkbGliLmg+CiAKICNpbmNsdWRlIDxkYnVzL2RidXMtZ2xpYi5oPgog
+CkBAIC0zOCw2ICszOSw3IEBACiAjaW5jbHVkZSAiZGJ1cy1nbHVlLmgiCiAKICNpbmNsdWRlICJi
+bHVldG9vdGgtZGV2aWNlLXNlbGVjdGlvbi5oIgorI2luY2x1ZGUgImJsdWV0b290aC1pbnN0YW5j
+ZS5oIgogCiBzdGF0aWMgQmx1ZXRvb3RoQ2xpZW50ICpjbGllbnQ7CiAKQEAgLTM4Nyw3ICszODks
+NyBAQCBzdGF0aWMgdm9pZCBjcmVhdGVfc3VtbWFyeShHdGtXaWRnZXQgKmFzCiAJcGFnZV9zdW1t
+YXJ5ID0gdmJveDsKIH0KIAotc3RhdGljIHZvaWQgY3JlYXRlX3dpemFyZCh2b2lkKQorc3RhdGlj
+IEd0a1dpZGdldCAqY3JlYXRlX3dpemFyZCh2b2lkKQogewogCUd0a1dpZGdldCAqYXNzaXN0YW50
+OwogCkBAIC00MzAsMjMgKzQzMiw1MiBAQCBzdGF0aWMgdm9pZCBjcmVhdGVfd2l6YXJkKHZvaWQp
+CiAJZ3RrX3dpZGdldF9zaG93X2FsbChhc3Npc3RhbnQpOwogCiAJZ3RrX2Fzc2lzdGFudF91cGRh
+dGVfYnV0dG9uc19zdGF0ZShHVEtfQVNTSVNUQU5UKGFzc2lzdGFudCkpOworCXJldHVybiBhc3Np
+c3RhbnQ7CiB9CiAKK3N0YXRpYyBnYm9vbGVhbiBzaW5nbGV0b24gPSBGQUxTRTsKK3N0YXRpYyBH
+T3B0aW9uRW50cnkgb3B0aW9uc1tdID0geworCXsgInNpbmdsZXRvbiIsIDAsIDAsIEdfT1BUSU9O
+X0FSR19OT05FLCAmc2luZ2xldG9uLAorCSAgIk9ubHkgYWxsb3cgb25lIGluc3RhbmNlIG9mIHRo
+aXMgYXBwbGljYXRpb24iLCBOVUxMIH0sCisJeyBOVUxMLCAwLCAwLCAwLCBOVUxMLCBOVUxMLCBO
+VUxMIH0KK307CisKIGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiB7CisJR3RrV2lk
+Z2V0ICp3aW5kb3c7CisJQmx1ZXRvb3RoSW5zdGFuY2UgKmFwcDsKKwlHRXJyb3IgKmVycm9yID0g
+TlVMTDsKKwkKIAliaW5kdGV4dGRvbWFpbihHRVRURVhUX1BBQ0tBR0UsIExPQ0FMRURJUik7CiAJ
+YmluZF90ZXh0ZG9tYWluX2NvZGVzZXQoR0VUVEVYVF9QQUNLQUdFLCAiVVRGLTgiKTsKIAl0ZXh0
+ZG9tYWluKEdFVFRFWFRfUEFDS0FHRSk7CiAKLQlndGtfaW5pdCgmYXJnYywgJmFyZ3YpOworCWlm
+IChndGtfaW5pdF93aXRoX2FyZ3MoJmFyZ2MsICZhcmd2LCAiIiwKKwkJCQlvcHRpb25zLCBHRVRU
+RVhUX1BBQ0tBR0UsICZlcnJvcikgPT0gRkFMU0UpIHsKKwkJaWYgKGVycm9yKSB7CisJCQlnX3By
+aW50KCIlc1xuIiwgZXJyb3ItPm1lc3NhZ2UpOworCQkJZ19lcnJvcl9mcmVlKGVycm9yKTsKKwkJ
+fSBlbHNlCisJCQlnX3ByaW50KCJBbiB1bmtub3duIGVycm9yIG9jY3VycmVkXG4iKTsKIAorCQln
+dGtfZXhpdCgxKTsKKwl9CisJCiAJY2xpZW50ID0gYmx1ZXRvb3RoX2NsaWVudF9uZXcoKTsKIAot
+CWNyZWF0ZV93aXphcmQoKTsKKwl3aW5kb3cgPSBjcmVhdGVfd2l6YXJkKCk7CisgICAgCisJYXBw
+ID0gYmx1ZXRvb3RoX2luc3RhbmNlX25ldygpOworCWJsdWV0b290aF9pbnN0YW5jZV9zZXRfd2lu
+ZG93KGFwcCwgR1RLX1dJTkRPVyh3aW5kb3cpKTsKKwlpZighYmx1ZXRvb3RoX2luc3RhbmNlX3Jl
+Z2lzdGVyKGFwcCwgc2luZ2xldG9uLCAKKwkJIi9vcmcvYmx1ZXovd2l6YXJkIiwgIm9yZy5ibHVl
+ei53aXphcmQiKSkKKwkJZXhpdChFWElUX0ZBSUxVUkUpOwogCiAJZ3RrX21haW4oKTsKIAogCWdf
+b2JqZWN0X3VucmVmKGNsaWVudCk7CiAKKwlnX29iamVjdF91bnJlZihhcHApOworCiAJcmV0dXJu
+IDA7CiB9Cg==
+------=_Part_16224_14602584.1198003064697
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 SF.Net email is sponsored by:
@@ -51,7 +271,15 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services
 for just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+------=_Part_16224_14602584.1198003064697
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_16224_14602584.1198003064697--
