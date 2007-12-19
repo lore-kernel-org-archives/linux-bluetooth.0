@@ -1,13 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200712192341.02293.post@hendrik-sattler.de>
-References: <200712192341.02293.post@hendrik-sattler.de>
-Date: Thu, 20 Dec 2007 00:34:33 +0100
-Message-Id: <1198107273.8050.228.camel@aeonflux>
-Mime-Version: 1.0
-Cc: Hendrik Sattler <post@hendrik-sattler.de>
-Subject: Re: [Bluez-devel] SDP services cannot be unregistered
+From: Hendrik Sattler <post@hendrik-sattler.de>
+To: bluez-devel@lists.sourceforge.net
+Date: Wed, 19 Dec 2007 23:41:01 +0100
+MIME-Version: 1.0
+Message-Id: <200712192341.02293.post@hendrik-sattler.de>
+Subject: [Bluez-devel] SDP services cannot be unregistered
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,35 +18,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Hendrik,
+Hi,
 
-> since several versions of bluez userspace libs and utils, I am unable to 
-> unregister local SDP server records. Everything I tried so far fails to 
-> unregister the record:
-> I use sdp_connect() and sdp_device_record_register() to register the SDP 
-> record and use the return result of the latter for 
-> sdp_device_record_unregister() and then sdp_close().
-> 
-> In earlier versions, the unregistering and explicit closing of the session 
-> handle wasn't even necessary but that broke. That can be handled but 
-> unregistering a record in an explicit way like above should work, doesn't it?
-> 
-> When the bug appeared, I though that waiting some versions might suffice. But 
-> obviously, nobody ever noticed.
-> Is there a possibility that this gets fixed?
+since several versions of bluez userspace libs and utils, I am unable to 
+unregister local SDP server records. Everything I tried so far fails to 
+unregister the record:
+I use sdp_connect() and sdp_device_record_register() to register the SDP 
+record and use the return result of the latter for 
+sdp_device_record_unregister() and then sdp_close().
 
-not sure about that. Never heard about it. Are you using the sdpd daemon
-or do you use hcid -s and the embedded SDP server?
+In earlier versions, the unregistering and explicit closing of the session 
+handle wasn't even necessary but that broke. That can be handled but 
+unregistering a record in an explicit way like above should work, doesn't it?
 
-I might have introduced a bug when switching everything over to the
-embedded SDP server and the automatic service classes handling. Do you
-have a simple reproducer that I can try?
+When the bug appeared, I though that waiting some versions might suffice. But 
+obviously, nobody ever noticed.
+Is there a possibility that this gets fixed?
 
-Regards
+HS
 
-Marcel
-
-
+PS: please CC me on replies as I am not subscribed.
 
 -------------------------------------------------------------------------
 SF.Net email is sponsored by:
