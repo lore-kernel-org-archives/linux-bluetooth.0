@@ -1,15 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <3ad703600712210116p59cc3a27uaad6300625fd2645@mail.gmail.com>
-Date: Fri, 21 Dec 2007 10:16:43 +0100
-From: "Geoffrey Doret" <gdoret@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1198163860.8050.257.camel@aeonflux>
-MIME-Version: 1.0
-References: <3ad703600712110300j7a3e628cj1e4d55dd9d4a0d5b@mail.gmail.com>
-	<1197562554.5644.95.camel@aeonflux>
-	<3ad703600712200615i1c039fbep5076ac119bddef61@mail.gmail.com>
-	<1198163860.8050.257.camel@aeonflux>
-Subject: Re: [Bluez-devel] Patch proposal for serial manager
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Hendrik Sattler <post@hendrik-sattler.de>
+In-Reply-To: <200712202240.34586.post@hendrik-sattler.de>
+References: <200712192341.02293.post@hendrik-sattler.de>
+	<200712200229.40589.post@hendrik-sattler.de>
+	<1198116580.8050.232.camel@aeonflux>
+	<200712202240.34586.post@hendrik-sattler.de>
+Date: Fri, 21 Dec 2007 00:12:32 +0100
+Message-Id: <1198192352.8050.269.camel@aeonflux>
+Mime-Version: 1.0
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] SDP services cannot be unregistered
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,23 +24,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Hendrik,
 
->
-> it has to take "hciX" strings or the local BD_ADDR of the adapter. Both
-> must work. This is how other methods handle this. The reason behind it
-> is that as an application developer using this method, you should not
-> worry about the details. The service should do all the heavy lifting.
+> > first of all you are using the unregister function wrongly. You have to
+> > give it the exact record structure you gave the register function. So
+> > when you allocate a new record, then the unregister has no idea what to
+> > do with it.
+> 
+> Ok, I remember now everything related to the record and it works. One note 
+> though: the sdp_record_free() function always crashes. Is it actually 
+> supposed to be used? Or asked the other way: how is one supposed to free the 
+> previously allocated stuff correctly? Or is this done automatically?
 
-If I've understood, that is how hci_devid handle its parameter? If that is
-correct, the new adapter parameter is correctly handled.
->
-> Don't forget to document this new method in serial-api.txt.
+actually I can't remember. There might be some cases where the
+unregister function actually frees the record. The SDP code is not
+something anybody can be proud of.
 
-Documentation is included in the last patch.
+Regards
 
-Regards,
-Geoffrey Doret
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
