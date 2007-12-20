@@ -1,11 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <951351190712200246v72181504u52169ed53a34fcd6@mail.gmail.com>
-Date: Thu, 20 Dec 2007 10:46:20 +0000
-From: "Jason Zhan" <zhan.jason@gmail.com>
-To: Bluez-devel@lists.sourceforge.net
+Message-ID: <006001c842ee$f30945e0$0200a8c0@jester>
+From: "Olivier Le Pogam" <olepogam@free.fr>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+References: <200712192341.02293.post@hendrik-sattler.de>
+	<1198107273.8050.228.camel@aeonflux>
+Date: Thu, 20 Dec 2007 10:59:01 +0100
 MIME-Version: 1.0
-Subject: [Bluez-devel] link key PIN code authentication
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Multi-device : maximizing the number of concurrent
+	ourgoing RFCOMM connections
+Reply-To: Olivier Le Pogam <olepogam@free.fr>,
+	BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,60 +18,42 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1889658220=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1889658220==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_18818_27207754.1198147580098"
+Hi,
 
-------=_Part_18818_27207754.1198147580098
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+I am currently working on trying to have the maximum concurrent RFCOMM 
+connections (OBEX) from a PC with several dongles to mobile phones. I use 
+several BT dongles, usually 4. From a bluetooth point of view, the device is 
+always master and the mobile slave.
 
-Dear all,
+I have big difficulties to define which is the best solution (Hardware, 
+Kernel, BlueZ version).
 
-Currently, I am working on a project to handle the pairing procedure. The
-aim is quite simple.  If  the authentication is required by the user, the
-program will detect whether the link key exists. If not, the program will
-print out several lines in the terminal and ask the user entering the PIN
-code.  The authentication will perform based on the PIN code which the user
-provided and finally the new link key for this connection will be passed to
-the host for future connections if the authentication is successful.
+I have developped a simple forking application which is opening concurrent 
+sockets to remote mobiles and I record the connection status (success, 
+failure) and the connection delay, and I am running it on several 
+configurations in order to get the best results.
 
-The bluez exploits the D-Bus to manage the pin code and link key. Since my
-application is very simple, I don't think I need the D-Bus framework.
+I am really interested in contacting people having the same concern, or 
+trying to find the best solution as well.
 
-HCI can send the command to LM by hci_send_cmd() method, but I cannot find
-the suitable methods which can read back the request from the LM.
+Here are some of my questions :
+- Hardware
+    . which BT dongles do you prefer (I use class 1 dongles, 2.0 EDR with 
+USB2.0 support) ?
+    . do you use a USB2.0 hub or direct connection to the PC USB ports ?
+- OS / BlueZ
+    . which Kernel version / distro and BlueZ version would you use ?
 
-Can anybody give me some expert level suggestions regarding the
-authentication?
+Everyone interested don't hesitate to contact me ( olepogam@free.fr ) so we 
+can share our experience.
 
-BTW, Happy Christmas to all bluez developers !
+Best regards,
+Oli 
 
-Regards,
-Jason
-
-------=_Part_18818_27207754.1198147580098
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Dear all,<br><br>Currently, I am working on a project to handle the pairing procedure. The aim is quite simple.&nbsp; If&nbsp; the authentication is required by the user, the program will detect whether the link key exists. If not, the program will print out several lines in the terminal and ask the user entering the PIN code.&nbsp; The authentication will perform based on the PIN code which the user provided and finally the new link key for this connection will be passed to the host for future connections if the authentication is successful. 
-<br><br>The bluez exploits the D-Bus to manage the pin code and link key. Since my application is very simple, I don&#39;t think I need the D-Bus framework. <br><br>HCI can send the command to LM by hci_send_cmd() method, but I cannot find the suitable methods which can read back the request from the LM.&nbsp; 
-<br><br>Can anybody give me some expert level suggestions regarding the authentication? <br><br>BTW, Happy Christmas to all bluez developers !<br><br>Regards,<br>Jason<br><br>&nbsp;<br> <br>&nbsp;<br>
-
-------=_Part_18818_27207754.1198147580098--
-
-
---===============1889658220==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 SF.Net email is sponsored by:
@@ -75,15 +61,7 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services
 for just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
---===============1889658220==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1889658220==--
