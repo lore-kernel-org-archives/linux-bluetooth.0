@@ -1,15 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <3ad703600712200615i1c039fbep5076ac119bddef61@mail.gmail.com>
-Date: Thu, 20 Dec 2007 15:15:51 +0100
-From: "Geoffrey Doret" <gdoret@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1197562554.5644.95.camel@aeonflux>
+Message-ID: <951351190712200246v72181504u52169ed53a34fcd6@mail.gmail.com>
+Date: Thu, 20 Dec 2007 10:46:20 +0000
+From: "Jason Zhan" <zhan.jason@gmail.com>
+To: Bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_12739_21427335.1198160151692"
-References: <3ad703600712110300j7a3e628cj1e4d55dd9d4a0d5b@mail.gmail.com>
-	<1197562554.5644.95.camel@aeonflux>
-Subject: Re: [Bluez-devel] Patch proposal for serial manager
+Subject: [Bluez-devel] link key PIN code authentication
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,115 +14,56 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============1889658220=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_12739_21427335.1198160151692
+--===============1889658220==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_12740_16577625.1198160151692"
+	boundary="----=_Part_18818_27207754.1198147580098"
 
-------=_Part_12740_16577625.1198160151692
+------=_Part_18818_27207754.1198147580098
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi,
+Dear all,
 
-I tied to speak on the channel two times but it seems we are not present at
-the same time. So I noted your remarks and reformulated my patch.
-First, I opted for "ConnectServiceByAdapter" but changing the naming is
-quite simple.
-Second, the format of the new adapter parameter is a string "hciX" or a
-string representing the adapter address.
+Currently, I am working on a project to handle the pairing procedure. The
+aim is quite simple.  If  the authentication is required by the user, the
+program will detect whether the link key exists. If not, the program will
+print out several lines in the terminal and ask the user entering the PIN
+code.  The authentication will perform based on the PIN code which the user
+provided and finally the new link key for this connection will be passed to
+the host for future connections if the authentication is successful.
+
+The bluez exploits the D-Bus to manage the pin code and link key. Since my
+application is very simple, I don't think I need the D-Bus framework.
+
+HCI can send the command to LM by hci_send_cmd() method, but I cannot find
+the suitable methods which can read back the request from the LM.
+
+Can anybody give me some expert level suggestions regarding the
+authentication?
+
+BTW, Happy Christmas to all bluez developers !
 
 Regards,
-Geoffrey Doret
+Jason
 
-------=_Part_12740_16577625.1198160151692
+------=_Part_18818_27207754.1198147580098
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi,<br><br>I tied to speak on the channel two times but it seems we are not present at the same time. So I noted your remarks and reformulated my patch.<br>First, I opted for &quot;ConnectServiceByAdapter&quot; but changing the naming is quite simple.
-<br>Second, the format of the new adapter parameter is a string &quot;hciX&quot; or a string representing the adapter address.<br><br>Regards,<br>Geoffrey Doret<br> 
+Dear all,<br><br>Currently, I am working on a project to handle the pairing procedure. The aim is quite simple.&nbsp; If&nbsp; the authentication is required by the user, the program will detect whether the link key exists. If not, the program will print out several lines in the terminal and ask the user entering the PIN code.&nbsp; The authentication will perform based on the PIN code which the user provided and finally the new link key for this connection will be passed to the host for future connections if the authentication is successful. 
+<br><br>The bluez exploits the D-Bus to manage the pin code and link key. Since my application is very simple, I don&#39;t think I need the D-Bus framework. <br><br>HCI can send the command to LM by hci_send_cmd() method, but I cannot find the suitable methods which can read back the request from the LM.&nbsp; 
+<br><br>Can anybody give me some expert level suggestions regarding the authentication? <br><br>BTW, Happy Christmas to all bluez developers !<br><br>Regards,<br>Jason<br><br>&nbsp;<br> <br>&nbsp;<br>
 
-------=_Part_12740_16577625.1198160151692--
+------=_Part_18818_27207754.1198147580098--
 
-------=_Part_12739_21427335.1198160151692
-Content-Type: text/x-patch; name=connect_service.patch
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fafhwqvs0
-Content-Disposition: attachment; filename=connect_service.patch
 
-SW5kZXg6IHV0aWxzL3NlcmlhbC9tYW5hZ2VyLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jv
-b3QvYmx1ZXovdXRpbHMvc2VyaWFsL21hbmFnZXIuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4x
-MDAKZGlmZiAtdSAtcjEuMTAwIG1hbmFnZXIuYwotLS0gdXRpbHMvc2VyaWFsL21hbmFnZXIuYwkx
-MyBEZWMgMjAwNyAxOTowNzozNyAtMDAwMAkxLjEwMAorKysgdXRpbHMvc2VyaWFsL21hbmFnZXIu
-YwkyMCBEZWMgMjAwNyAxMzoxODoxOSAtMDAwMApAQCAtMTk5MSwzMiArMTk5MSwyMCBAQAogCQkJ
-ZGJ1c19tZXNzYWdlX25ld19tZXRob2RfcmV0dXJuKG1zZykpOwogfQogCi1zdGF0aWMgREJ1c0hh
-bmRsZXJSZXN1bHQgY29ubmVjdF9zZXJ2aWNlKERCdXNDb25uZWN0aW9uICpjb25uLAotCQkJCQlE
-QnVzTWVzc2FnZSAqbXNnLCB2b2lkICpkYXRhKQorc3RhdGljIERCdXNIYW5kbGVyUmVzdWx0IGNv
-bm5lY3Rfc2VydmljZV9ieV9kZXZpZChEQnVzQ29ubmVjdGlvbiAqY29ubiwKKwkJCQlEQnVzTWVz
-c2FnZSAqbXNnLCB2b2lkICpkYXRhLCBpbnQgZGV2X2lkLAorCQkJCWNvbnN0IGNoYXIgKmJkYSwg
-Y29uc3QgY2hhciAqcGF0dGVybikKIHsKIAlzdHJ1Y3QgcGVuZGluZ19jb25uZWN0ICpwZW5kaW5n
-LCAqcGM7Ci0JREJ1c0Vycm9yIGRlcnI7CiAJYmRhZGRyX3Qgc3JjOwotCWNvbnN0IGNoYXIgKmJk
-YSwgKnBhdHRlcm47CiAJbG9uZyB2YWw7Ci0JaW50IGRldl9pZCwgZXJyOworCWludCBlcnI7CiAJ
-Y2hhciB1dWlkW01BWF9MRU5fVVVJRF9TVFJdOwogCi0JZGJ1c19lcnJvcl9pbml0KCZkZXJyKTsK
-LQlpZiAoIWRidXNfbWVzc2FnZV9nZXRfYXJncyhtc2csICZkZXJyLAotCQkJCURCVVNfVFlQRV9T
-VFJJTkcsICZiZGEsCi0JCQkJREJVU19UWVBFX1NUUklORywgJnBhdHRlcm4sCi0JCQkJREJVU19U
-WVBFX0lOVkFMSUQpKSB7Ci0JCWVycm9yX2ludmFsaWRfYXJndW1lbnRzKGNvbm4sIG1zZywgZGVy
-ci5tZXNzYWdlKTsKLQkJZGJ1c19lcnJvcl9mcmVlKCZkZXJyKTsKLQkJcmV0dXJuIERCVVNfSEFO
-RExFUl9SRVNVTFRfSEFORExFRDsKLQl9Ci0KIAlwZW5kaW5nID0gZmluZF9wZW5kaW5nX2Nvbm5l
-Y3RfYnlfcGF0dGVybihiZGEsIHBhdHRlcm4pOwogCWlmIChwZW5kaW5nKQogCQlyZXR1cm4gZXJy
-b3JfaW5fcHJvZ3Jlc3MoY29ubiwgbXNnLCAiQ29ubmVjdGlvbiBpbiBwcm9ncmVzcyIpOwogCi0J
-ZGV2X2lkID0gaGNpX2dldF9yb3V0ZShOVUxMKTsKIAlpZiAoKGRldl9pZCA8IDApIHx8IChoY2lf
-ZGV2YmEoZGV2X2lkLCAmc3JjKSA8IDApKQogCQlyZXR1cm4gZXJyb3JfZmFpbGVkKGNvbm4sIG1z
-ZywgIkFkYXB0ZXIgbm90IGF2YWlsYWJsZSIpOwogCkBAIC0yMDkxLDYgKzIwNzksNDkgQEAKIAly
-ZXR1cm4gREJVU19IQU5ETEVSX1JFU1VMVF9IQU5ETEVEOwogfQogCitzdGF0aWMgREJ1c0hhbmRs
-ZXJSZXN1bHQgY29ubmVjdF9zZXJ2aWNlKERCdXNDb25uZWN0aW9uICpjb25uLAorCQkJCQlEQnVz
-TWVzc2FnZSAqbXNnLCB2b2lkICpkYXRhKQoreworCURCdXNFcnJvciBkZXJyOworCWNvbnN0IGNo
-YXIgKmJkYSwgKnBhdHRlcm47CisJaW50IGRldmlkOworCisJZGJ1c19lcnJvcl9pbml0KCZkZXJy
-KTsKKwlpZiAoIWRidXNfbWVzc2FnZV9nZXRfYXJncyhtc2csICZkZXJyLAorCQkJCURCVVNfVFlQ
-RV9TVFJJTkcsICZiZGEsCisJCQkJREJVU19UWVBFX1NUUklORywgJnBhdHRlcm4sCisJCQkJREJV
-U19UWVBFX0lOVkFMSUQpKSB7CisJCWVycm9yX2ludmFsaWRfYXJndW1lbnRzKGNvbm4sIG1zZywg
-ZGVyci5tZXNzYWdlKTsKKwkJZGJ1c19lcnJvcl9mcmVlKCZkZXJyKTsKKwkJcmV0dXJuIERCVVNf
-SEFORExFUl9SRVNVTFRfSEFORExFRDsKKwl9CisJZGV2aWQgPSBoY2lfZ2V0X3JvdXRlKE5VTEwp
-OworCisJcmV0dXJuIGNvbm5lY3Rfc2VydmljZV9ieV9kZXZpZChjb25uLCBtc2csIGRhdGEsIGRl
-dmlkLCBiZGEsIHBhdHRlcm4pOworfQorCitzdGF0aWMgREJ1c0hhbmRsZXJSZXN1bHQgY29ubmVj
-dF9zZXJ2aWNlX2J5X2FkYXB0ZXIoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sCisJCQkJCURCdXNNZXNz
-YWdlICptc2csIHZvaWQgKmRhdGEpCit7CisJREJ1c0Vycm9yIGRlcnI7CisJY29uc3QgY2hhciAq
-YWRhcHRlciwgKmJkYSwgKnBhdHRlcm47CisJaW50IGRldmlkOworCisJZGJ1c19lcnJvcl9pbml0
-KCZkZXJyKTsKKwlpZiAoIWRidXNfbWVzc2FnZV9nZXRfYXJncyhtc2csICZkZXJyLAorCQkJCURC
-VVNfVFlQRV9TVFJJTkcsICZhZGFwdGVyLAorCQkJCURCVVNfVFlQRV9TVFJJTkcsICZiZGEsCisJ
-CQkJREJVU19UWVBFX1NUUklORywgJnBhdHRlcm4sCisJCQkJREJVU19UWVBFX0lOVkFMSUQpKSB7
-CisJCWVycm9yX2ludmFsaWRfYXJndW1lbnRzKGNvbm4sIG1zZywgZGVyci5tZXNzYWdlKTsKKwkJ
-ZGJ1c19lcnJvcl9mcmVlKCZkZXJyKTsKKwkJcmV0dXJuIERCVVNfSEFORExFUl9SRVNVTFRfSEFO
-RExFRDsKKwl9CisJZGV2aWQgPSBoY2lfZGV2aWQoYWRhcHRlcik7CisKKwlyZXR1cm4gY29ubmVj
-dF9zZXJ2aWNlX2J5X2RldmlkKGNvbm4sIG1zZywgZGF0YSwgZGV2aWQsIGJkYSwgcGF0dGVybik7
-Cit9CisKIHN0YXRpYyBEQnVzSGFuZGxlclJlc3VsdCBkaXNjb25uZWN0X3NlcnZpY2UoREJ1c0Nv
-bm5lY3Rpb24gKmNvbm4sCiAJCQkJCURCdXNNZXNzYWdlICptc2csIHZvaWQgKmRhdGEpCiB7CkBA
-IC0yMjE5LDE1ICsyMjUwLDE2IEBACiB9CiAKIHN0YXRpYyBEQnVzTWV0aG9kVlRhYmxlIG1hbmFn
-ZXJfbWV0aG9kc1tdID0gewotCXsgIkNyZWF0ZVBvcnQiLAkJCWNyZWF0ZV9wb3J0LAkJInNzIiwJ
-InMiCX0sCi0JeyAiTGlzdFBvcnRzIiwJCQlsaXN0X3BvcnRzLAkJIiIsCSJhcyIJfSwKLQl7ICJS
-ZW1vdmVQb3J0IiwJCQlyZW1vdmVfcG9ydCwJCSJzIiwJIiIJfSwKLQl7ICJDcmVhdGVQcm94eSIs
-CQljcmVhdGVfcHJveHksCQkic3MiLAkicyIJfSwKLQl7ICJMaXN0UHJveGllcyIsCQlsaXN0X3By
-b3hpZXMsCQkiIiwJImFzIgl9LAotCXsgIlJlbW92ZVByb3h5IiwJCXJlbW92ZV9wcm94eSwJCSJz
-IiwJIiIJfSwKLQl7ICJDb25uZWN0U2VydmljZSIsCQljb25uZWN0X3NlcnZpY2UsCSJzcyIsCSJz
-Igl9LAotCXsgIkRpc2Nvbm5lY3RTZXJ2aWNlIiwJCWRpc2Nvbm5lY3Rfc2VydmljZSwJInMiLAki
-Igl9LAotCXsgIkNhbmNlbENvbm5lY3RTZXJ2aWNlIiwJY2FuY2VsX2Nvbm5lY3Rfc2VydmljZSwJ
-InNzIiwJIiIJfSwKKwl7ICJDcmVhdGVQb3J0IiwJCQljcmVhdGVfcG9ydCwJCQkic3MiLAkicyIJ
-fSwKKwl7ICJMaXN0UG9ydHMiLAkJCWxpc3RfcG9ydHMsCQkJIiIsCSJhcyIJfSwKKwl7ICJSZW1v
-dmVQb3J0IiwJCQlyZW1vdmVfcG9ydCwJCQkicyIsCSIiCX0sCisJeyAiQ3JlYXRlUHJveHkiLAkJ
-Y3JlYXRlX3Byb3h5LAkJCSJzcyIsCSJzIgl9LAorCXsgIkxpc3RQcm94aWVzIiwJCWxpc3RfcHJv
-eGllcywJCQkiIiwJImFzIgl9LAorCXsgIlJlbW92ZVByb3h5IiwJCXJlbW92ZV9wcm94eSwJCQki
-cyIsCSIiCX0sCisJeyAiQ29ubmVjdFNlcnZpY2UiLAkJY29ubmVjdF9zZXJ2aWNlLAkJInNzIiwJ
-InMiCX0sCisJeyAiQ29ubmVjdFNlcnZpY2VCeUFkYXB0ZXIiLAljb25uZWN0X3NlcnZpY2VfYnlf
-YWRhcHRlciwJInNzcyIsCSJzIgl9LAorCXsgIkRpc2Nvbm5lY3RTZXJ2aWNlIiwJCWRpc2Nvbm5l
-Y3Rfc2VydmljZSwJCSJzIiwJIiIJfSwKKwl7ICJDYW5jZWxDb25uZWN0U2VydmljZSIsCWNhbmNl
-bF9jb25uZWN0X3NlcnZpY2UsCQkic3MiLAkiIgl9LAogCXsgTlVMTCwgTlVMTCwgTlVMTCwgTlVM
-TCB9LAogfTsKIAo=
-------=_Part_12739_21427335.1198160151692
+--===============1889658220==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -139,7 +75,7 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services
 for just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
-------=_Part_12739_21427335.1198160151692
+--===============1889658220==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -150,4 +86,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-------=_Part_12739_21427335.1198160151692--
+--===============1889658220==--
