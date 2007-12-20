@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <3ad703600712200615i1c039fbep5076ac119bddef61@mail.gmail.com>
-References: <3ad703600712110300j7a3e628cj1e4d55dd9d4a0d5b@mail.gmail.com>
-	<1197562554.5644.95.camel@aeonflux>
-	<3ad703600712200615i1c039fbep5076ac119bddef61@mail.gmail.com>
-Date: Thu, 20 Dec 2007 16:17:40 +0100
-Message-Id: <1198163860.8050.257.camel@aeonflux>
+In-Reply-To: <951351190712200246v72181504u52169ed53a34fcd6@mail.gmail.com>
+References: <951351190712200246v72181504u52169ed53a34fcd6@mail.gmail.com>
+Date: Thu, 20 Dec 2007 16:13:18 +0100
+Message-Id: <1198163598.8050.253.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Patch proposal for serial manager
+Subject: Re: [Bluez-devel] link key PIN code authentication
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,25 +20,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Geoffrey,
+Hi Jason,
 
-> I tied to speak on the channel two times but it seems we are not
-> present at the same time. So I noted your remarks and reformulated my
-> patch.
-> First, I opted for "ConnectServiceByAdapter" but changing the naming
-> is quite simple. 
-> Second, the format of the new adapter parameter is a string "hciX" or
-> a string representing the adapter address.
+> Currently, I am working on a project to handle the pairing procedure.
+> The aim is quite simple.  If  the authentication is required by the
+> user, the program will detect whether the link key exists. If not, the
+> program will print out several lines in the terminal and ask the user
+> entering the PIN code.  The authentication will perform based on the
+> PIN code which the user provided and finally the new link key for this
+> connection will be passed to the host for future connections if the
+> authentication is successful. 
+> 
+> The bluez exploits the D-Bus to manage the pin code and link key.
+> Since my application is very simple, I don't think I need the D-Bus
+> framework. 
 
-it has to take "hciX" strings or the local BD_ADDR of the adapter. Both
-must work. This is how other methods handle this. The reason behind it
-is that as an application developer using this method, you should not
-worry about the details. The service should do all the heavy lifting.
+D-Bus is a really simple framework and not using D-Bus means you can
+also not use hcid. Which means you have to duplicate all the effort
+inside hcid. If you have that much free time, have fun. However you time
+could be spent more useful ;)
 
-Don't forget to document this new method in serial-api.txt.
+> HCI can send the command to LM by hci_send_cmd() method, but I cannot
+> find the suitable methods which can read back the request from the
+> LM.  
 
-Try the IRC channel again. At some point, I might pick up the
-conversation. If I am not responding, ask Johan.
+You would have to open a raw HCI socket and read the HCI events. See the
+Bluetooth specification for details. Please don't expect me to get into
+details here. The hcid does all this and with the passkey agent
+interface you have a nice framework to solve your problem. Use it.
 
 Regards
 
