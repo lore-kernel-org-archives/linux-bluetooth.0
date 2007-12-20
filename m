@@ -1,12 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <951351190712200246v72181504u52169ed53a34fcd6@mail.gmail.com>
-References: <951351190712200246v72181504u52169ed53a34fcd6@mail.gmail.com>
-Date: Thu, 20 Dec 2007 16:13:18 +0100
-Message-Id: <1198163598.8050.253.camel@aeonflux>
+To: Hendrik Sattler <post@hendrik-sattler.de>
+In-Reply-To: <20071220102046.7h0duacmskwgkc8g@v1539.ncsrv.de>
+References: <200712192341.02293.post@hendrik-sattler.de>
+	<1198107273.8050.228.camel@aeonflux>
+	<200712200229.40589.post@hendrik-sattler.de>
+	<1198116580.8050.232.camel@aeonflux>
+	<20071220102046.7h0duacmskwgkc8g@v1539.ncsrv.de>
+Date: Thu, 20 Dec 2007 16:08:52 +0100
+Message-Id: <1198163332.8050.250.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] link key PIN code authentication
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] SDP services cannot be unregistered
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,34 +25,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jason,
+Hi Hendrik,
 
-> Currently, I am working on a project to handle the pairing procedure.
-> The aim is quite simple.  If  the authentication is required by the
-> user, the program will detect whether the link key exists. If not, the
-> program will print out several lines in the terminal and ask the user
-> entering the PIN code.  The authentication will perform based on the
-> PIN code which the user provided and finally the new link key for this
-> connection will be passed to the host for future connections if the
-> authentication is successful. 
+> > first of all you are using the unregister function wrongly. You have to
+> > give it the exact record structure you gave the register function. So
+> > when you allocate a new record, then the unregister has no idea what to
+> > do with it.
 > 
-> The bluez exploits the D-Bus to manage the pin code and link key.
-> Since my application is very simple, I don't think I need the D-Bus
-> framework. 
+> bt_sdp_obexpush() does create a new record structure but with the  
+> exact same parameters (actually no variable parameters at all). The  
+> resulting records should fully match, at least I assume that. The  
+> record ID is then stored in the session_t value, I assume.
+> Or are pointer addresses matched, too?
 
-D-Bus is a really simple framework and not using D-Bus means you can
-also not use hcid. Which means you have to duplicate all the effort
-inside hcid. If you have that much free time, have fun. However you time
-could be spent more useful ;)
+doesn't work like that. The magic is the record->handle and nothing
+else. However that might change. So the safest way is to have a static
+variable for the record that stores it for the lifetime of the daemon.
 
-> HCI can send the command to LM by hci_send_cmd() method, but I cannot
-> find the suitable methods which can read back the request from the
-> LM.  
+> > Why it doesn't cleanup after program termination is unclear to me. That
+> > should actually work. You might wanna investigate on that one.
+> 
+> Before this came up, I did not unregister or close at all and  
+> everything was fine when the program was killed (SDP record was gone).
+> Can you give me a hint where this is actually processed, bluez-libs or  
+> bluez-utils?
 
-You would have to open a raw HCI socket and read the HCI events. See the
-Bluetooth specification for details. Please don't expect me to get into
-details here. The hcid does all this and with the passkey agent
-interface you have a nice framework to solve your problem. Use it.
+It is processed in bluez-utils/sdpd/, but be aware of that this code is
+really tricky. I am about to actually remove it at some point. Not sure
+when and how though.
 
 Regards
 
