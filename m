@@ -1,17 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Hendrik Sattler <post@hendrik-sattler.de>
-In-Reply-To: <20071220102046.7h0duacmskwgkc8g@v1539.ncsrv.de>
-References: <200712192341.02293.post@hendrik-sattler.de>
-	<1198107273.8050.228.camel@aeonflux>
-	<200712200229.40589.post@hendrik-sattler.de>
-	<1198116580.8050.232.camel@aeonflux>
-	<20071220102046.7h0duacmskwgkc8g@v1539.ncsrv.de>
-Date: Thu, 20 Dec 2007 16:08:52 +0100
-Message-Id: <1198163332.8050.250.camel@aeonflux>
-Mime-Version: 1.0
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] SDP services cannot be unregistered
+Message-ID: <3ad703600712200615i1c039fbep5076ac119bddef61@mail.gmail.com>
+Date: Thu, 20 Dec 2007 15:15:51 +0100
+From: "Geoffrey Doret" <gdoret@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1197562554.5644.95.camel@aeonflux>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_12739_21427335.1198160151692"
+References: <3ad703600712110300j7a3e628cj1e4d55dd9d4a0d5b@mail.gmail.com>
+	<1197562554.5644.95.camel@aeonflux>
+Subject: Re: [Bluez-devel] Patch proposal for serial manager
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,50 +19,135 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Hendrik,
+------=_Part_12739_21427335.1198160151692
+Content-Type: multipart/alternative;
+	boundary="----=_Part_12740_16577625.1198160151692"
 
-> > first of all you are using the unregister function wrongly. You have to
-> > give it the exact record structure you gave the register function. So
-> > when you allocate a new record, then the unregister has no idea what to
-> > do with it.
-> 
-> bt_sdp_obexpush() does create a new record structure but with the  
-> exact same parameters (actually no variable parameters at all). The  
-> resulting records should fully match, at least I assume that. The  
-> record ID is then stored in the session_t value, I assume.
-> Or are pointer addresses matched, too?
+------=_Part_12740_16577625.1198160151692
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-doesn't work like that. The magic is the record->handle and nothing
-else. However that might change. So the safest way is to have a static
-variable for the record that stores it for the lifetime of the daemon.
+Hi,
 
-> > Why it doesn't cleanup after program termination is unclear to me. That
-> > should actually work. You might wanna investigate on that one.
-> 
-> Before this came up, I did not unregister or close at all and  
-> everything was fine when the program was killed (SDP record was gone).
-> Can you give me a hint where this is actually processed, bluez-libs or  
-> bluez-utils?
+I tied to speak on the channel two times but it seems we are not present at
+the same time. So I noted your remarks and reformulated my patch.
+First, I opted for "ConnectServiceByAdapter" but changing the naming is
+quite simple.
+Second, the format of the new adapter parameter is a string "hciX" or a
+string representing the adapter address.
 
-It is processed in bluez-utils/sdpd/, but be aware of that this code is
-really tricky. I am about to actually remove it at some point. Not sure
-when and how though.
+Regards,
+Geoffrey Doret
 
-Regards
+------=_Part_12740_16577625.1198160151692
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Marcel
+Hi,<br><br>I tied to speak on the channel two times but it seems we are not present at the same time. So I noted your remarks and reformulated my patch.<br>First, I opted for &quot;ConnectServiceByAdapter&quot; but changing the naming is quite simple.
+<br>Second, the format of the new adapter parameter is a string &quot;hciX&quot; or a string representing the adapter address.<br><br>Regards,<br>Geoffrey Doret<br> 
 
+------=_Part_12740_16577625.1198160151692--
 
+------=_Part_12739_21427335.1198160151692
+Content-Type: text/x-patch; name=connect_service.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fafhwqvs0
+Content-Disposition: attachment; filename=connect_service.patch
+
+SW5kZXg6IHV0aWxzL3NlcmlhbC9tYW5hZ2VyLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jv
+b3QvYmx1ZXovdXRpbHMvc2VyaWFsL21hbmFnZXIuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4x
+MDAKZGlmZiAtdSAtcjEuMTAwIG1hbmFnZXIuYwotLS0gdXRpbHMvc2VyaWFsL21hbmFnZXIuYwkx
+MyBEZWMgMjAwNyAxOTowNzozNyAtMDAwMAkxLjEwMAorKysgdXRpbHMvc2VyaWFsL21hbmFnZXIu
+YwkyMCBEZWMgMjAwNyAxMzoxODoxOSAtMDAwMApAQCAtMTk5MSwzMiArMTk5MSwyMCBAQAogCQkJ
+ZGJ1c19tZXNzYWdlX25ld19tZXRob2RfcmV0dXJuKG1zZykpOwogfQogCi1zdGF0aWMgREJ1c0hh
+bmRsZXJSZXN1bHQgY29ubmVjdF9zZXJ2aWNlKERCdXNDb25uZWN0aW9uICpjb25uLAotCQkJCQlE
+QnVzTWVzc2FnZSAqbXNnLCB2b2lkICpkYXRhKQorc3RhdGljIERCdXNIYW5kbGVyUmVzdWx0IGNv
+bm5lY3Rfc2VydmljZV9ieV9kZXZpZChEQnVzQ29ubmVjdGlvbiAqY29ubiwKKwkJCQlEQnVzTWVz
+c2FnZSAqbXNnLCB2b2lkICpkYXRhLCBpbnQgZGV2X2lkLAorCQkJCWNvbnN0IGNoYXIgKmJkYSwg
+Y29uc3QgY2hhciAqcGF0dGVybikKIHsKIAlzdHJ1Y3QgcGVuZGluZ19jb25uZWN0ICpwZW5kaW5n
+LCAqcGM7Ci0JREJ1c0Vycm9yIGRlcnI7CiAJYmRhZGRyX3Qgc3JjOwotCWNvbnN0IGNoYXIgKmJk
+YSwgKnBhdHRlcm47CiAJbG9uZyB2YWw7Ci0JaW50IGRldl9pZCwgZXJyOworCWludCBlcnI7CiAJ
+Y2hhciB1dWlkW01BWF9MRU5fVVVJRF9TVFJdOwogCi0JZGJ1c19lcnJvcl9pbml0KCZkZXJyKTsK
+LQlpZiAoIWRidXNfbWVzc2FnZV9nZXRfYXJncyhtc2csICZkZXJyLAotCQkJCURCVVNfVFlQRV9T
+VFJJTkcsICZiZGEsCi0JCQkJREJVU19UWVBFX1NUUklORywgJnBhdHRlcm4sCi0JCQkJREJVU19U
+WVBFX0lOVkFMSUQpKSB7Ci0JCWVycm9yX2ludmFsaWRfYXJndW1lbnRzKGNvbm4sIG1zZywgZGVy
+ci5tZXNzYWdlKTsKLQkJZGJ1c19lcnJvcl9mcmVlKCZkZXJyKTsKLQkJcmV0dXJuIERCVVNfSEFO
+RExFUl9SRVNVTFRfSEFORExFRDsKLQl9Ci0KIAlwZW5kaW5nID0gZmluZF9wZW5kaW5nX2Nvbm5l
+Y3RfYnlfcGF0dGVybihiZGEsIHBhdHRlcm4pOwogCWlmIChwZW5kaW5nKQogCQlyZXR1cm4gZXJy
+b3JfaW5fcHJvZ3Jlc3MoY29ubiwgbXNnLCAiQ29ubmVjdGlvbiBpbiBwcm9ncmVzcyIpOwogCi0J
+ZGV2X2lkID0gaGNpX2dldF9yb3V0ZShOVUxMKTsKIAlpZiAoKGRldl9pZCA8IDApIHx8IChoY2lf
+ZGV2YmEoZGV2X2lkLCAmc3JjKSA8IDApKQogCQlyZXR1cm4gZXJyb3JfZmFpbGVkKGNvbm4sIG1z
+ZywgIkFkYXB0ZXIgbm90IGF2YWlsYWJsZSIpOwogCkBAIC0yMDkxLDYgKzIwNzksNDkgQEAKIAly
+ZXR1cm4gREJVU19IQU5ETEVSX1JFU1VMVF9IQU5ETEVEOwogfQogCitzdGF0aWMgREJ1c0hhbmRs
+ZXJSZXN1bHQgY29ubmVjdF9zZXJ2aWNlKERCdXNDb25uZWN0aW9uICpjb25uLAorCQkJCQlEQnVz
+TWVzc2FnZSAqbXNnLCB2b2lkICpkYXRhKQoreworCURCdXNFcnJvciBkZXJyOworCWNvbnN0IGNo
+YXIgKmJkYSwgKnBhdHRlcm47CisJaW50IGRldmlkOworCisJZGJ1c19lcnJvcl9pbml0KCZkZXJy
+KTsKKwlpZiAoIWRidXNfbWVzc2FnZV9nZXRfYXJncyhtc2csICZkZXJyLAorCQkJCURCVVNfVFlQ
+RV9TVFJJTkcsICZiZGEsCisJCQkJREJVU19UWVBFX1NUUklORywgJnBhdHRlcm4sCisJCQkJREJV
+U19UWVBFX0lOVkFMSUQpKSB7CisJCWVycm9yX2ludmFsaWRfYXJndW1lbnRzKGNvbm4sIG1zZywg
+ZGVyci5tZXNzYWdlKTsKKwkJZGJ1c19lcnJvcl9mcmVlKCZkZXJyKTsKKwkJcmV0dXJuIERCVVNf
+SEFORExFUl9SRVNVTFRfSEFORExFRDsKKwl9CisJZGV2aWQgPSBoY2lfZ2V0X3JvdXRlKE5VTEwp
+OworCisJcmV0dXJuIGNvbm5lY3Rfc2VydmljZV9ieV9kZXZpZChjb25uLCBtc2csIGRhdGEsIGRl
+dmlkLCBiZGEsIHBhdHRlcm4pOworfQorCitzdGF0aWMgREJ1c0hhbmRsZXJSZXN1bHQgY29ubmVj
+dF9zZXJ2aWNlX2J5X2FkYXB0ZXIoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sCisJCQkJCURCdXNNZXNz
+YWdlICptc2csIHZvaWQgKmRhdGEpCit7CisJREJ1c0Vycm9yIGRlcnI7CisJY29uc3QgY2hhciAq
+YWRhcHRlciwgKmJkYSwgKnBhdHRlcm47CisJaW50IGRldmlkOworCisJZGJ1c19lcnJvcl9pbml0
+KCZkZXJyKTsKKwlpZiAoIWRidXNfbWVzc2FnZV9nZXRfYXJncyhtc2csICZkZXJyLAorCQkJCURC
+VVNfVFlQRV9TVFJJTkcsICZhZGFwdGVyLAorCQkJCURCVVNfVFlQRV9TVFJJTkcsICZiZGEsCisJ
+CQkJREJVU19UWVBFX1NUUklORywgJnBhdHRlcm4sCisJCQkJREJVU19UWVBFX0lOVkFMSUQpKSB7
+CisJCWVycm9yX2ludmFsaWRfYXJndW1lbnRzKGNvbm4sIG1zZywgZGVyci5tZXNzYWdlKTsKKwkJ
+ZGJ1c19lcnJvcl9mcmVlKCZkZXJyKTsKKwkJcmV0dXJuIERCVVNfSEFORExFUl9SRVNVTFRfSEFO
+RExFRDsKKwl9CisJZGV2aWQgPSBoY2lfZGV2aWQoYWRhcHRlcik7CisKKwlyZXR1cm4gY29ubmVj
+dF9zZXJ2aWNlX2J5X2RldmlkKGNvbm4sIG1zZywgZGF0YSwgZGV2aWQsIGJkYSwgcGF0dGVybik7
+Cit9CisKIHN0YXRpYyBEQnVzSGFuZGxlclJlc3VsdCBkaXNjb25uZWN0X3NlcnZpY2UoREJ1c0Nv
+bm5lY3Rpb24gKmNvbm4sCiAJCQkJCURCdXNNZXNzYWdlICptc2csIHZvaWQgKmRhdGEpCiB7CkBA
+IC0yMjE5LDE1ICsyMjUwLDE2IEBACiB9CiAKIHN0YXRpYyBEQnVzTWV0aG9kVlRhYmxlIG1hbmFn
+ZXJfbWV0aG9kc1tdID0gewotCXsgIkNyZWF0ZVBvcnQiLAkJCWNyZWF0ZV9wb3J0LAkJInNzIiwJ
+InMiCX0sCi0JeyAiTGlzdFBvcnRzIiwJCQlsaXN0X3BvcnRzLAkJIiIsCSJhcyIJfSwKLQl7ICJS
+ZW1vdmVQb3J0IiwJCQlyZW1vdmVfcG9ydCwJCSJzIiwJIiIJfSwKLQl7ICJDcmVhdGVQcm94eSIs
+CQljcmVhdGVfcHJveHksCQkic3MiLAkicyIJfSwKLQl7ICJMaXN0UHJveGllcyIsCQlsaXN0X3By
+b3hpZXMsCQkiIiwJImFzIgl9LAotCXsgIlJlbW92ZVByb3h5IiwJCXJlbW92ZV9wcm94eSwJCSJz
+IiwJIiIJfSwKLQl7ICJDb25uZWN0U2VydmljZSIsCQljb25uZWN0X3NlcnZpY2UsCSJzcyIsCSJz
+Igl9LAotCXsgIkRpc2Nvbm5lY3RTZXJ2aWNlIiwJCWRpc2Nvbm5lY3Rfc2VydmljZSwJInMiLAki
+Igl9LAotCXsgIkNhbmNlbENvbm5lY3RTZXJ2aWNlIiwJY2FuY2VsX2Nvbm5lY3Rfc2VydmljZSwJ
+InNzIiwJIiIJfSwKKwl7ICJDcmVhdGVQb3J0IiwJCQljcmVhdGVfcG9ydCwJCQkic3MiLAkicyIJ
+fSwKKwl7ICJMaXN0UG9ydHMiLAkJCWxpc3RfcG9ydHMsCQkJIiIsCSJhcyIJfSwKKwl7ICJSZW1v
+dmVQb3J0IiwJCQlyZW1vdmVfcG9ydCwJCQkicyIsCSIiCX0sCisJeyAiQ3JlYXRlUHJveHkiLAkJ
+Y3JlYXRlX3Byb3h5LAkJCSJzcyIsCSJzIgl9LAorCXsgIkxpc3RQcm94aWVzIiwJCWxpc3RfcHJv
+eGllcywJCQkiIiwJImFzIgl9LAorCXsgIlJlbW92ZVByb3h5IiwJCXJlbW92ZV9wcm94eSwJCQki
+cyIsCSIiCX0sCisJeyAiQ29ubmVjdFNlcnZpY2UiLAkJY29ubmVjdF9zZXJ2aWNlLAkJInNzIiwJ
+InMiCX0sCisJeyAiQ29ubmVjdFNlcnZpY2VCeUFkYXB0ZXIiLAljb25uZWN0X3NlcnZpY2VfYnlf
+YWRhcHRlciwJInNzcyIsCSJzIgl9LAorCXsgIkRpc2Nvbm5lY3RTZXJ2aWNlIiwJCWRpc2Nvbm5l
+Y3Rfc2VydmljZSwJCSJzIiwJIiIJfSwKKwl7ICJDYW5jZWxDb25uZWN0U2VydmljZSIsCWNhbmNl
+bF9jb25uZWN0X3NlcnZpY2UsCQkic3MiLAkiIgl9LAogCXsgTlVMTCwgTlVMTCwgTlVMTCwgTlVM
+TCB9LAogfTsKIAo=
+------=_Part_12739_21427335.1198160151692
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2005.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+SF.Net email is sponsored by:
+Check out the new SourceForge.net Marketplace.
+It's the best place to buy or sell services
+for just about anything Open Source.
+http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+------=_Part_12739_21427335.1198160151692
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_12739_21427335.1198160151692--
