@@ -1,18 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <000e01c843de$cabd8d80$0200a8c0@jester>
-From: "Olivier Le Pogam" <olepogam@free.fr>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Date: Fri, 21 Dec 2007 14:49:52 +0100 (CET)
+From: Peter Wippich <pewi@gw-instruments.de>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1198244391.8050.285.camel@aeonflux>
+Message-ID: <Pine.LNX.4.63.0712211442560.8893@redbean.intranet.gw-instruments.de>
 References: <009b01c8432a$f2b9a800$0200a8c0@jester>
 	<Pine.LNX.4.63.0712201911380.5733@redbean.intranet.gw-instruments.de>
 	<000801c84343$f6efce40$0200a8c0@jester>
 	<003101c843ba$5d611280$0200a8c0@jester>
 	<1198244391.8050.285.camel@aeonflux>
-	<Pine.LNX.4.63.0712211442560.8893@redbean.intranet.gw-instruments.de>
-Date: Fri, 21 Dec 2007 15:35:53 +0100
 MIME-Version: 1.0
 Subject: Re: [Bluez-devel] Creating a connection : Error: Command Disallowed
-Reply-To: Olivier Le Pogam <olepogam@free.fr>,
-	BlueZ development <bluez-devel@lists.sourceforge.net>
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -25,86 +24,47 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Peter, Hi Marcel,
 
-> You only have one radio in the chip. Once that is busy
+Hi Marcel, Hi Olivier, 
+
+On Fri, 21 Dec 2007, Marcel Holtmann wrote:
+
+> Hi Olivier,
+> 
+> > I have tried parallel connection requests with 2 types of dongles :
+> > - Cambridge Silicon Radio (CSR) one is successful for the first connection, 
+> > and, as Peter said, returns "Command Disallowed" for next ones (and there 
+> > are automatic retries)
+> > - Integrated System Solution Corp. one allows all connection requests (no 
+> > more "Command Disallowed")
+> 
+> not seeing the "Command Disallowed" doesn't meant the connection request
+> is not queued. It is impossible to have two (or more) baseband pages at
+> the same time. You only have one radio in the chip. Once that is busy
 > with a connection attempt, then everything else has to wait. So if the
 > host stack queues these connection attempts or the link manager inside
 > the Bluetooth chip makes no real difference.
+> 
 
-Thanks a lot for your explanations guys everything is clearer now.
-However, I can't understand the following behaviour : instead of starting 4 
-connections from the same hci device, I put 4 dongles and start 4 
-connections at the same time one per dongle.
-Here is what I get -dump below- (basically 2 "quick" connections, and 2 page 
-timeout). It can vary depending on attempts, but at least 1 page timeout.
+Marcel is perfectly right. The Radio/Baseband is a shared resource and 
+busy when setting up a conection. So all connection attempts must be 
+serialized. The only way to speed up the process may be to do an inquiry 
+first, so you know the clock offsets for the different devices. Knowing 
+the clock offset usualy makes connection setup a lot faster. If I remember 
+right BlueZ caches the clock offsets and uses them in a connection request 
+if available. However, the connection setups still need to be serialized 
+(either inside the Bluetooth chip or inside the stack).   
 
-> The only way to speed up the process may be to do an inquiry
-> first, so you know the clock offsets for the different devices. Knowing
-> the clock offset usualy makes connection setup a lot faster. If I remember
-> right BlueZ caches the clock offsets and uses them in a connection request
-> if available
+Ciao, 
 
-Do you think running the inquiry on hci0 (for example) would "save" the 
-clock offsets for connections on other dongles ? (I mean inquiry on hci0 
-then "connect" to the found device on hci1 to N) ?
-Do you thing there is there another way to speed this up (e.g. doing a 
-request name to the remote device on the dongle where the connection will be 
-done) ?
+Peter 
 
-Thanks again & best regards,
-Oli
------------
-HCI sniffer - Bluetooth packet analyzer ver 1.40
-device: hci0 snap_len: 1028 filter: 0xffffffff
-2007-12-21 15:11:41.662180 < HCI Command: Create Connection (0x01|0x0005) 
-plen 13
-    bdaddr 00:19:2D:15:FF:0E ptype 0xcc18 rswitch 0x00 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-2007-12-21 15:11:41.665286 > HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-2007-12-21 15:11:41.758270 > HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 1 bdaddr 00:19:2D:15:FF:0E type ACL encrypt 0x00
-...
------------
-HCI sniffer - Bluetooth packet analyzer ver 1.40
-device: hci1 snap_len: 1028 filter: 0xffffffff
-2007-12-21 15:11:41.663603 < HCI Command: Create Connection (0x01|0x0005) 
-plen 13
-    bdaddr 00:17:B0:1E:54:FD ptype 0xcc18 rswitch 0x00 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-2007-12-21 15:11:41.666283 > HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-2007-12-21 15:11:42.779225 > HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 1 bdaddr 00:17:B0:1E:54:FD type ACL encrypt 0x00
-...
------------
-HCI sniffer - Bluetooth packet analyzer ver 1.40
-device: hci2 snap_len: 1028 filter: 0xffffffff
-2007-12-21 15:11:41.664980 < HCI Command: Create Connection (0x01|0x0005) 
-plen 13
-    bdaddr 00:12:D1:65:27:7F ptype 0xcc18 rswitch 0x00 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-2007-12-21 15:11:41.668350 > HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-2007-12-21 15:12:02.148460 > HCI Event: Connect Complete (0x03) plen 11
-    status 0x04 handle 0 bdaddr 00:12:D1:65:27:7F type ACL encrypt 0x00
-    Error: Page Timeout
 
------------
-HCI sniffer - Bluetooth packet analyzer ver 1.40
-device: hci3 snap_len: 1028 filter: 0xffffffff
-2007-12-21 15:11:41.666608 < HCI Command: Create Connection (0x01|0x0005) 
-plen 13
-    bdaddr 00:12:D1:6E:4C:96 ptype 0xcc18 rswitch 0x00 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-2007-12-21 15:11:41.669339 > HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-2007-12-21 15:12:02.149466 > HCI Event: Connect Complete (0x03) plen 11
-    status 0x04 handle 0 bdaddr 00:12:D1:6E:4C:96 type ACL encrypt 0x00
-    Error: Page Timeout
 
------------
+|       Peter Wippich                   Voice: +49 30 46776411          |
+|       G&W Instruments GmbH            fax:   +49 30 46776419          |
+|       Gustav-Meyer-Allee 25, Geb. 12  Email: pewi@gw-instruments.de   |
+|       D-13355 Berlin  / Germany                                       |
 
 
 -------------------------------------------------------------------------
