@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <476E98A3.5040508@gmx.de>
-Date: Sun, 23 Dec 2007 18:19:31 +0100
-From: Johannes Luber <jaluber@gmx.de>
+Message-ID: <d89ddf300712210752p24070ee5i33d17a427e3c31c@mail.gmail.com>
+Date: Fri, 21 Dec 2007 08:52:43 -0700
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BLU117-W236D38B8C3E38C09A75D83885E0@phx.gbl>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Bluetooth devices don't authenticate themselves
+References: <BLU117-W236D38B8C3E38C09A75D83885E0@phx.gbl>
+Subject: Re: [Bluez-users] a2dp choppy sound problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,24 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi!
+Benson
 
-I've got a problem with my Logitech MX1000 mouse and my Logitech MX5000
-keyboard. I have authenticated the devices as per the instructions, but
-after a half hour without any activity the devices aren't recognized
-anymore. I have to use "Input Devices" over and over again. I'm pretty
-sure, I've clicked for both devices the "Always Accept"-button, but it
-seems there was no effect.
+>     I get very choppy sound when playback audio through A2DP. Even the application shows playback ends,the headset could still hear the intermittent choppy sound for a few seconds.
 
-Except maybe that when starting linux (I use openSUSE 10.3), I can
-nonetheless use my bluetooth devices. In any case, I don't get to see
-that dialog with the various options for automatic acceptance anymore,
-so I can't test "Always Accept" again. Also I don't know where the
-config files for blueZ are saved - and how to edit them correctly, if
-necessary. Can someone help me?
+can tell us what you get when you run 'hcitool con' while the audio is
+playing? Does it show slave connections?
 
-Thanks in advance,
-Johannes
+-- 
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
