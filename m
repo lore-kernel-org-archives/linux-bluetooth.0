@@ -1,18 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e1effdeb0712211320x7323e43ew582954b3a77dc2fb@mail.gmail.com>
-Date: Fri, 21 Dec 2007 18:20:33 -0300
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
+Message-ID: <000d01c84408$7277a550$0200a8c0@jester>
+From: "Olivier Le Pogam" <olepogam@free.fr>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <3ad703600712210735oe566022k62f2959629140ab9@mail.gmail.com>
+References: <009b01c8432a$f2b9a800$0200a8c0@jester>
+	<Pine.LNX.4.63.0712201911380.5733@redbean.intranet.gw-instruments.de>
+	<000801c84343$f6efce40$0200a8c0@jester>
+	<003101c843ba$5d611280$0200a8c0@jester>
+	<1198244391.8050.285.camel@aeonflux>
+	<Pine.LNX.4.63.0712211442560.8893@redbean.intranet.gw-instruments.de>
+	<000e01c843de$cabd8d80$0200a8c0@jester>
+	<Pine.LNX.4.63.0712211538040.8893@redbean.intranet.gw-instruments.de>
+Date: Fri, 21 Dec 2007 20:34:04 +0100
 MIME-Version: 1.0
-References: <3ad703600712110300j7a3e628cj1e4d55dd9d4a0d5b@mail.gmail.com>
-	<1197562554.5644.95.camel@aeonflux>
-	<3ad703600712200615i1c039fbep5076ac119bddef61@mail.gmail.com>
-	<1198163860.8050.257.camel@aeonflux>
-	<3ad703600712210117o284990d5mbd3928923845abe7@mail.gmail.com>
-	<3ad703600712210735oe566022k62f2959629140ab9@mail.gmail.com>
-Subject: Re: [Bluez-devel] Patch proposal for serial manager
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Cc: Peter Wippich <pewi@gw-instruments.de>
+Subject: Re: [Bluez-devel] Creating a connection : Error: Command Disallowed
+Reply-To: Olivier Le Pogam <olepogam@free.fr>,
+	BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -25,29 +28,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Dec 21, 2007 12:35 PM, Geoffrey Doret <gdoret@gmail.com> wrote:
-> The same patch as the previous one but with
-> "ConnectServiceFromAdapter" naming and the method noted experimental
-> in the documentation.
-> Let me know if the patch is accepted or not.
->
-> Regards,
-> Geoffrey Doret
->
+Hi Peter,
 
-Hi Geoffrey,
+> That's probably because the "air" interface is also a shared resource.
+> When multiple devices are paging at the same time you'll get collisons and
+> corrupted data packages which may cause random page timeouts.
 
-patch committed!  I added an example and some comments in the wiki:
+Indeed, maybe will I try to put my dongles in a hub allowing a bit of 
+distance between each other. Having them too close is maybe not a good idea. 
+Using class 2 ones instead of class 1 may not be bad as well, I suppose the 
+more powerful the more "air" problems. What's your opinion about all of this 
+? Another point : have you ever had USB / power issues when using several 
+dongles ? I was wondering if a lack of responsiveness of power supplying 
+when more power is required for some operations could not cause troubles (I 
+mean the delay between "I need more power" and "I get it"). If I'm talking 
+nonsense don't hesitate to flame me.
 
-http://wiki.bluez.org/wiki/Serial
-http://wiki.bluez.org/wiki/HOWTO/SerialConnections
+Thanks a lot for your help, I think things start to be clearer to me !
 
-BR,
-Claudio.
--- 
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+Best regards,
+Oli 
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
