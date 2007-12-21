@@ -1,13 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <951351190712210842u78ca4a25y7815ebf2d4589096@mail.gmail.com>
-Date: Fri, 21 Dec 2007 16:42:36 +0000
-From: "Jason Zhan" <zhan.jason@gmail.com>
+Message-ID: <3ad703600712210735oe566022k62f2959629140ab9@mail.gmail.com>
+Date: Fri, 21 Dec 2007 16:35:17 +0100
+From: "Geoffrey Doret" <gdoret@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1198163598.8050.253.camel@aeonflux>
+In-Reply-To: <3ad703600712210117o284990d5mbd3928923845abe7@mail.gmail.com>
 MIME-Version: 1.0
-References: <951351190712200246v72181504u52169ed53a34fcd6@mail.gmail.com>
-	<1198163598.8050.253.camel@aeonflux>
-Subject: Re: [Bluez-devel] link key PIN code authentication
+Content-Type: multipart/mixed;
+	boundary="----=_Part_2104_11659228.1198251317487"
+References: <3ad703600712110300j7a3e628cj1e4d55dd9d4a0d5b@mail.gmail.com>
+	<1197562554.5644.95.camel@aeonflux>
+	<3ad703600712200615i1c039fbep5076ac119bddef61@mail.gmail.com>
+	<1198163860.8050.257.camel@aeonflux>
+	<3ad703600712210117o284990d5mbd3928923845abe7@mail.gmail.com>
+Subject: Re: [Bluez-devel] Patch proposal for serial manager
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,117 +22,116 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0911711347=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0911711347==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_7127_14501190.1198255356622"
-
-------=_Part_7127_14501190.1198255356622
+------=_Part_2104_11659228.1198251317487
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi, Marcel
+The same patch as the previous one but with
+"ConnectServiceFromAdapter" naming and the method noted experimental
+in the documentation.
+Let me know if the patch is accepted or not.
 
-Thank you for your kindly reply.
+Regards,
+Geoffrey Doret
 
-I am starting to look at the D-bus framework and passkey-agent.c in
-utils/daemon/.
+------=_Part_2104_11659228.1198251317487
+Content-Type: text/x-patch; name=connect_service.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fah00h9n1
+Content-Disposition: attachment; filename=connect_service.patch
 
-One question regarding the bluetooth applet, maybe it's a little bit stupid.
-But I really I can't figure it out by myself.
+SW5kZXg6IHV0aWxzL3NlcmlhbC9tYW5hZ2VyLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jv
+b3QvYmx1ZXovdXRpbHMvc2VyaWFsL21hbmFnZXIuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4x
+MDAKZGlmZiAtdSAtcjEuMTAwIG1hbmFnZXIuYwotLS0gdXRpbHMvc2VyaWFsL21hbmFnZXIuYwkx
+MyBEZWMgMjAwNyAxOTowNzozNyAtMDAwMAkxLjEwMAorKysgdXRpbHMvc2VyaWFsL21hbmFnZXIu
+YwkyMSBEZWMgMjAwNyAxNToyMjowMiAtMDAwMApAQCAtMTk5MSwzMiArMTk5MSwyMCBAQAogCQkJ
+ZGJ1c19tZXNzYWdlX25ld19tZXRob2RfcmV0dXJuKG1zZykpOwogfQogCi1zdGF0aWMgREJ1c0hh
+bmRsZXJSZXN1bHQgY29ubmVjdF9zZXJ2aWNlKERCdXNDb25uZWN0aW9uICpjb25uLAotCQkJCQlE
+QnVzTWVzc2FnZSAqbXNnLCB2b2lkICpkYXRhKQorc3RhdGljIERCdXNIYW5kbGVyUmVzdWx0IGNv
+bm5lY3Rfc2VydmljZV9mcm9tX2RldmlkKERCdXNDb25uZWN0aW9uICpjb25uLAorCQkJCURCdXNN
+ZXNzYWdlICptc2csIHZvaWQgKmRhdGEsIGludCBkZXZfaWQsCisJCQkJY29uc3QgY2hhciAqYmRh
+LCBjb25zdCBjaGFyICpwYXR0ZXJuKQogewogCXN0cnVjdCBwZW5kaW5nX2Nvbm5lY3QgKnBlbmRp
+bmcsICpwYzsKLQlEQnVzRXJyb3IgZGVycjsKIAliZGFkZHJfdCBzcmM7Ci0JY29uc3QgY2hhciAq
+YmRhLCAqcGF0dGVybjsKIAlsb25nIHZhbDsKLQlpbnQgZGV2X2lkLCBlcnI7CisJaW50IGVycjsK
+IAljaGFyIHV1aWRbTUFYX0xFTl9VVUlEX1NUUl07CiAKLQlkYnVzX2Vycm9yX2luaXQoJmRlcnIp
+OwotCWlmICghZGJ1c19tZXNzYWdlX2dldF9hcmdzKG1zZywgJmRlcnIsCi0JCQkJREJVU19UWVBF
+X1NUUklORywgJmJkYSwKLQkJCQlEQlVTX1RZUEVfU1RSSU5HLCAmcGF0dGVybiwKLQkJCQlEQlVT
+X1RZUEVfSU5WQUxJRCkpIHsKLQkJZXJyb3JfaW52YWxpZF9hcmd1bWVudHMoY29ubiwgbXNnLCBk
+ZXJyLm1lc3NhZ2UpOwotCQlkYnVzX2Vycm9yX2ZyZWUoJmRlcnIpOwotCQlyZXR1cm4gREJVU19I
+QU5ETEVSX1JFU1VMVF9IQU5ETEVEOwotCX0KLQogCXBlbmRpbmcgPSBmaW5kX3BlbmRpbmdfY29u
+bmVjdF9ieV9wYXR0ZXJuKGJkYSwgcGF0dGVybik7CiAJaWYgKHBlbmRpbmcpCiAJCXJldHVybiBl
+cnJvcl9pbl9wcm9ncmVzcyhjb25uLCBtc2csICJDb25uZWN0aW9uIGluIHByb2dyZXNzIik7CiAK
+LQlkZXZfaWQgPSBoY2lfZ2V0X3JvdXRlKE5VTEwpOwogCWlmICgoZGV2X2lkIDwgMCkgfHwgKGhj
+aV9kZXZiYShkZXZfaWQsICZzcmMpIDwgMCkpCiAJCXJldHVybiBlcnJvcl9mYWlsZWQoY29ubiwg
+bXNnLCAiQWRhcHRlciBub3QgYXZhaWxhYmxlIik7CiAKQEAgLTIwOTEsNiArMjA3OSw1MSBAQAog
+CXJldHVybiBEQlVTX0hBTkRMRVJfUkVTVUxUX0hBTkRMRUQ7CiB9CiAKK3N0YXRpYyBEQnVzSGFu
+ZGxlclJlc3VsdCBjb25uZWN0X3NlcnZpY2UoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sCisJCQkJCURC
+dXNNZXNzYWdlICptc2csIHZvaWQgKmRhdGEpCit7CisJREJ1c0Vycm9yIGRlcnI7CisJY29uc3Qg
+Y2hhciAqYmRhLCAqcGF0dGVybjsKKwlpbnQgZGV2aWQ7CisKKwlkYnVzX2Vycm9yX2luaXQoJmRl
+cnIpOworCWlmICghZGJ1c19tZXNzYWdlX2dldF9hcmdzKG1zZywgJmRlcnIsCisJCQkJREJVU19U
+WVBFX1NUUklORywgJmJkYSwKKwkJCQlEQlVTX1RZUEVfU1RSSU5HLCAmcGF0dGVybiwKKwkJCQlE
+QlVTX1RZUEVfSU5WQUxJRCkpIHsKKwkJZXJyb3JfaW52YWxpZF9hcmd1bWVudHMoY29ubiwgbXNn
+LCBkZXJyLm1lc3NhZ2UpOworCQlkYnVzX2Vycm9yX2ZyZWUoJmRlcnIpOworCQlyZXR1cm4gREJV
+U19IQU5ETEVSX1JFU1VMVF9IQU5ETEVEOworCX0KKworCWRldmlkID0gaGNpX2dldF9yb3V0ZShO
+VUxMKTsKKworCXJldHVybiBjb25uZWN0X3NlcnZpY2VfZnJvbV9kZXZpZChjb25uLCBtc2csIGRh
+dGEsIGRldmlkLCBiZGEsIHBhdHRlcm4pOworfQorCitzdGF0aWMgREJ1c0hhbmRsZXJSZXN1bHQg
+Y29ubmVjdF9zZXJ2aWNlX2Zyb21fYWRhcHRlcihEQnVzQ29ubmVjdGlvbiAqY29ubiwKKwkJCQkJ
+REJ1c01lc3NhZ2UgKm1zZywgdm9pZCAqZGF0YSkKK3sKKwlEQnVzRXJyb3IgZGVycjsKKwljb25z
+dCBjaGFyICphZGFwdGVyLCAqYmRhLCAqcGF0dGVybjsKKwlpbnQgZGV2aWQ7CisKKwlkYnVzX2Vy
+cm9yX2luaXQoJmRlcnIpOworCWlmICghZGJ1c19tZXNzYWdlX2dldF9hcmdzKG1zZywgJmRlcnIs
+CisJCQkJREJVU19UWVBFX1NUUklORywgJmFkYXB0ZXIsCisJCQkJREJVU19UWVBFX1NUUklORywg
+JmJkYSwKKwkJCQlEQlVTX1RZUEVfU1RSSU5HLCAmcGF0dGVybiwKKwkJCQlEQlVTX1RZUEVfSU5W
+QUxJRCkpIHsKKwkJZXJyb3JfaW52YWxpZF9hcmd1bWVudHMoY29ubiwgbXNnLCBkZXJyLm1lc3Nh
+Z2UpOworCQlkYnVzX2Vycm9yX2ZyZWUoJmRlcnIpOworCQlyZXR1cm4gREJVU19IQU5ETEVSX1JF
+U1VMVF9IQU5ETEVEOworCX0KKworCWRldmlkID0gaGNpX2RldmlkKGFkYXB0ZXIpOworCisJcmV0
+dXJuIGNvbm5lY3Rfc2VydmljZV9mcm9tX2RldmlkKGNvbm4sIG1zZywgZGF0YSwgZGV2aWQsIGJk
+YSwgcGF0dGVybik7Cit9CisKIHN0YXRpYyBEQnVzSGFuZGxlclJlc3VsdCBkaXNjb25uZWN0X3Nl
+cnZpY2UoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sCiAJCQkJCURCdXNNZXNzYWdlICptc2csIHZvaWQg
+KmRhdGEpCiB7CkBAIC0yMjE5LDE1ICsyMjUyLDE2IEBACiB9CiAKIHN0YXRpYyBEQnVzTWV0aG9k
+VlRhYmxlIG1hbmFnZXJfbWV0aG9kc1tdID0gewotCXsgIkNyZWF0ZVBvcnQiLAkJCWNyZWF0ZV9w
+b3J0LAkJInNzIiwJInMiCX0sCi0JeyAiTGlzdFBvcnRzIiwJCQlsaXN0X3BvcnRzLAkJIiIsCSJh
+cyIJfSwKLQl7ICJSZW1vdmVQb3J0IiwJCQlyZW1vdmVfcG9ydCwJCSJzIiwJIiIJfSwKLQl7ICJD
+cmVhdGVQcm94eSIsCQljcmVhdGVfcHJveHksCQkic3MiLAkicyIJfSwKLQl7ICJMaXN0UHJveGll
+cyIsCQlsaXN0X3Byb3hpZXMsCQkiIiwJImFzIgl9LAotCXsgIlJlbW92ZVByb3h5IiwJCXJlbW92
+ZV9wcm94eSwJCSJzIiwJIiIJfSwKLQl7ICJDb25uZWN0U2VydmljZSIsCQljb25uZWN0X3NlcnZp
+Y2UsCSJzcyIsCSJzIgl9LAotCXsgIkRpc2Nvbm5lY3RTZXJ2aWNlIiwJCWRpc2Nvbm5lY3Rfc2Vy
+dmljZSwJInMiLAkiIgl9LAotCXsgIkNhbmNlbENvbm5lY3RTZXJ2aWNlIiwJY2FuY2VsX2Nvbm5l
+Y3Rfc2VydmljZSwJInNzIiwJIiIJfSwKKwl7ICJDcmVhdGVQb3J0IiwJCQljcmVhdGVfcG9ydCwJ
+CQkic3MiLAkicyIJfSwKKwl7ICJMaXN0UG9ydHMiLAkJCWxpc3RfcG9ydHMsCQkJIiIsCSJhcyIJ
+fSwKKwl7ICJSZW1vdmVQb3J0IiwJCQlyZW1vdmVfcG9ydCwJCQkicyIsCSIiCX0sCisJeyAiQ3Jl
+YXRlUHJveHkiLAkJY3JlYXRlX3Byb3h5LAkJCSJzcyIsCSJzIgl9LAorCXsgIkxpc3RQcm94aWVz
+IiwJCWxpc3RfcHJveGllcywJCQkiIiwJImFzIgl9LAorCXsgIlJlbW92ZVByb3h5IiwJCXJlbW92
+ZV9wcm94eSwJCQkicyIsCSIiCX0sCisJeyAiQ29ubmVjdFNlcnZpY2UiLAkJY29ubmVjdF9zZXJ2
+aWNlLAkJInNzIiwJInMiCX0sCisJeyAiQ29ubmVjdFNlcnZpY2VGcm9tQWRhcHRlciIsCWNvbm5l
+Y3Rfc2VydmljZV9mcm9tX2FkYXB0ZXIsCSJzc3MiLAkicyIJfSwKKwl7ICJEaXNjb25uZWN0U2Vy
+dmljZSIsCQlkaXNjb25uZWN0X3NlcnZpY2UsCQkicyIsCSIiCX0sCisJeyAiQ2FuY2VsQ29ubmVj
+dFNlcnZpY2UiLAljYW5jZWxfY29ubmVjdF9zZXJ2aWNlLAkJInNzIiwJIiIJfSwKIAl7IE5VTEws
+IE5VTEwsIE5VTEwsIE5VTEwgfSwKIH07CiAKSW5kZXg6IHV0aWxzL3NlcmlhbC9zZXJpYWwtYXBp
+LnR4dAo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09ClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVlei91dGlscy9zZXJpYWwvc2Vy
+aWFsLWFwaS50eHQsdgpyZXRyaWV2aW5nIHJldmlzaW9uIDEuMjEKZGlmZiAtdSAtcjEuMjEgc2Vy
+aWFsLWFwaS50eHQKLS0tIHV0aWxzL3NlcmlhbC9zZXJpYWwtYXBpLnR4dAkyNiBOb3YgMjAwNyAx
+Mzo0MTozOSAtMDAwMAkxLjIxCisrKyB1dGlscy9zZXJpYWwvc2VyaWFsLWFwaS50eHQJMjEgRGVj
+IDIwMDcgMTU6MjI6MDIgLTAwMDAKQEAgLTY4LDYgKzY4LDIxIEBACiAJCQkJCW9yZy5ibHVlei5F
+cnJvci5Ob3RTdXBwb3J0ZWQKIAkJCQkJb3JnLmJsdWV6LkVycm9yLkZhaWxlZAogCisJCXN0cmlu
+ZyBDb25uZWN0U2VydmljZUZyb21BZGFwdGVyKHN0cmluZyBhZGFwdGVyLCBzdHJpbmcgYWRkcmVz
+cywKKwkJCQlzdHJpbmcgcGF0dGVybikgW2V4cGVyaW1lbnRhbF0KKworCQkJVXNlIHRoZSBnaXZl
+biBhZGFwdGVyIHRvIGNvbm5lY3RzIHRvIGEgc3BlY2lmaWMgUkZDT01NCisJCQliYXNlZCBzZXJ2
+aWNlIG9uIGEgcmVtb3RlIGRldmljZSBhbmQgdGhlbiBjcmVhdGVzIGEKKwkJCVJGQ09NTSBUVFkg
+ZGV2aWNlIGZvciBpdC4gVGhlIFJGQ09NTSBUVFkgZGV2aWNlIGlzCisJCQlyZXR1cm5lZC4KKwor
+CQkJUG9zc2libGUgZXJyb3JzOm9yZy5ibHVlei5FcnJvci5JbnZhbGlkQXJndW1lbnRzCisJCQkJ
+CW9yZy5ibHVlei5FcnJvci5DYW5jZWxlZAorCQkJCQlvcmcuYmx1ZXouRXJyb3IuSW5Qcm9ncmVz
+cworCQkJCQlvcmcuYmx1ZXouRXJyb3IuQ29ubmVjdGlvbkF0dGVtcHRGYWlsZWQKKwkJCQkJb3Jn
+LmJsdWV6LkVycm9yLk5vdFN1cHBvcnRlZAorCQkJCQlvcmcuYmx1ZXouRXJyb3IuRmFpbGVkCisK
+IAkJdm9pZCBDYW5jZWxDb25uZWN0U2VydmljZShzdHJpbmcgYWRkcmVzcywgc3RyaW5nIHBhdHRl
+cm4pCiAKIAkJCUNhbmNlbCBhIHByZXZpb3VzIENvbm5lY3RTZXJ2aWNlIG1ldGhvZCBjYWxsLgo=
 
-In my program, I prefer the user enter the passkey from the terminal rather
-than from the applet window. I afraid I need to disable the bluetooth
-applet, since it always automatically jump out a window when it finds
-devices requesting pass key.
-
-The figure 1 presented in "Security interface" shows the applet was built
-upon the D-bus. Do I need to do some changes on gnome/applet? Or just modify
-the passkey agent.
-
-Please give me some hints on how to disable the applet during the
-authentication.
-
-Many thanks and Merry Christmas,
-Jason
-
-
-
-On 20/12/2007, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Jason,
->
-> > Currently, I am working on a project to handle the pairing procedure.
-> > The aim is quite simple.  If  the authentication is required by the
-> > user, the program will detect whether the link key exists. If not, the
-> > program will print out several lines in the terminal and ask the user
-> > entering the PIN code.  The authentication will perform based on the
-> > PIN code which the user provided and finally the new link key for this
-> > connection will be passed to the host for future connections if the
-> > authentication is successful.
-> >
-> > The bluez exploits the D-Bus to manage the pin code and link key.
-> > Since my application is very simple, I don't think I need the D-Bus
-> > framework.
->
-> D-Bus is a really simple framework and not using D-Bus means you can
-> also not use hcid. Which means you have to duplicate all the effort
-> inside hcid. If you have that much free time, have fun. However you time
-> could be spent more useful ;)
->
-> > HCI can send the command to LM by hci_send_cmd() method, but I cannot
-> > find the suitable methods which can read back the request from the
-> > LM.
->
-> You would have to open a raw HCI socket and read the HCI events. See the
-> Bluetooth specification for details. Please don't expect me to get into
-> details here. The hcid does all this and with the passkey agent
-> interface you have a nice framework to solve your problem. Use it.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2005.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
-
-------=_Part_7127_14501190.1198255356622
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi, Marcel<br><br>Thank you for your kindly reply. <br><br>I am starting to look at the D-bus framework and passkey-agent.c in utils/daemon/.&nbsp; <br><br>One question regarding the bluetooth applet, maybe it&#39;s a little bit stupid. But I really I can&#39;t figure it out by myself.
-<br><br>In my program, I prefer the user enter the passkey from the terminal rather than from the applet window. I afraid I need to disable the bluetooth applet, since it always automatically jump out a window when it finds devices requesting pass key. 
-<br><br>The figure 1 presented in &quot;Security interface&quot; shows the applet was built upon the D-bus. Do I need to do some changes on gnome/applet? Or just modify the passkey agent. <br><br>Please give me some hints on how to disable the applet during the authentication. 
-<br><br>Many thanks and Merry Christmas,<br>Jason<br><br><br><br><div><span class="gmail_quote">On 20/12/2007, <b class="gmail_sendername">Marcel Holtmann</b> &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>
-&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hi Jason,<br><br>&gt; Currently, I am working on a project to handle the pairing procedure.
-<br>&gt; The aim is quite simple.&nbsp;&nbsp;If&nbsp;&nbsp;the authentication is required by the<br>&gt; user, the program will detect whether the link key exists. If not, the<br>&gt; program will print out several lines in the terminal and ask the user
-<br>&gt; entering the PIN code.&nbsp;&nbsp;The authentication will perform based on the<br>&gt; PIN code which the user provided and finally the new link key for this<br>&gt; connection will be passed to the host for future connections if the
-<br>&gt; authentication is successful.<br>&gt;<br>&gt; The bluez exploits the D-Bus to manage the pin code and link key.<br>&gt; Since my application is very simple, I don&#39;t think I need the D-Bus<br>&gt; framework.<br>
-<br>D-Bus is a really simple framework and not using D-Bus means you can<br>also not use hcid. Which means you have to duplicate all the effort<br>inside hcid. If you have that much free time, have fun. However you time<br>
-could be spent more useful ;)<br><br>&gt; HCI can send the command to LM by hci_send_cmd() method, but I cannot<br>&gt; find the suitable methods which can read back the request from the<br>&gt; LM.<br><br>You would have to open a raw HCI socket and read the HCI events. See the
-<br>Bluetooth specification for details. Please don&#39;t expect me to get into<br>details here. The hcid does all this and with the passkey agent<br>interface you have a nice framework to solve your problem. Use it.<br><br>
-Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------<br>This SF.net email is sponsored by: Microsoft<br>Defy all challenges. Microsoft(R) Visual Studio 2005.<br><a href="http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/">
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/</a><br>_______________________________________________<br>Bluez-devel mailing list<br><a href="mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourceforge.net
-</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-devel">https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br></blockquote></div><br>
-
-------=_Part_7127_14501190.1198255356622--
-
-
---===============0911711347==
+------=_Part_2104_11659228.1198251317487
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -137,7 +141,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============0911711347==
+------=_Part_2104_11659228.1198251317487
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -148,4 +152,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============0911711347==--
+------=_Part_2104_11659228.1198251317487--
