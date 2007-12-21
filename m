@@ -1,13 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <8a8adccc0712211417o3d2c8467m543e113eee1839c6@mail.gmail.com>
-Date: Fri, 21 Dec 2007 23:17:03 +0100
-From: "Jaap A. Haitsma" <jaap@haitsma.org>
+Message-ID: <e1effdeb0712211320x7323e43ew582954b3a77dc2fb@mail.gmail.com>
+Date: Fri, 21 Dec 2007 18:20:33 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <3ad703600712210735oe566022k62f2959629140ab9@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_3528_14453836.1198275423136"
-Subject: [Bluez-devel] [PATCH] Make links in about dialog launch
-	browser/email client
+References: <3ad703600712110300j7a3e628cj1e4d55dd9d4a0d5b@mail.gmail.com>
+	<1197562554.5644.95.camel@aeonflux>
+	<3ad703600712200615i1c039fbep5076ac119bddef61@mail.gmail.com>
+	<1198163860.8050.257.camel@aeonflux>
+	<3ad703600712210117o284990d5mbd3928923845abe7@mail.gmail.com>
+	<3ad703600712210735oe566022k62f2959629140ab9@mail.gmail.com>
+Subject: Re: [Bluez-devel] Patch proposal for serial manager
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,120 +21,39 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_3528_14453836.1198275423136
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+On Dec 21, 2007 12:35 PM, Geoffrey Doret <gdoret@gmail.com> wrote:
+> The same patch as the previous one but with
+> "ConnectServiceFromAdapter" naming and the method noted experimental
+> in the documentation.
+> Let me know if the patch is accepted or not.
+>
+> Regards,
+> Geoffrey Doret
+>
 
-Hi,
+Hi Geoffrey,
 
-Attached patch does this. It now uses the screen of the about dialog
+patch committed!  I added an example and some comments in the wiki:
 
-Jaap
+http://wiki.bluez.org/wiki/Serial
+http://wiki.bluez.org/wiki/HOWTO/SerialConnections
 
-------=_Part_3528_14453836.1198275423136
-Content-Type: text/x-patch; name=bluez-gnome-clickable.patch
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_faha80950
-Content-Disposition: attachment; filename=bluez-gnome-clickable.patch
-
-SW5kZXg6IGFuYWx5emVyL2RpYWxvZy5jCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KUkNTIGZpbGU6IC9jdnNyb290L2Js
-dWV6L2dub21lL2FuYWx5emVyL2RpYWxvZy5jLHYKcmV0cmlldmluZyByZXZpc2lvbiAxLjIwCmRp
-ZmYgLXUgLXIxLjIwIGRpYWxvZy5jCi0tLSBhbmFseXplci9kaWFsb2cuYwkxNyBEZWMgMjAwNyAw
-MTo0MToxOSAtMDAwMAkxLjIwCisrKyBhbmFseXplci9kaWFsb2cuYwkyMSBEZWMgMjAwNyAyMjox
-MDozOCAtMDAwMApAQCAtNTQsMTEgKzU0LDY1IEBACiBzdGF0aWMgdm9pZCBhYm91dF91cmxfaG9v
-ayhHdGtBYm91dERpYWxvZyAqZGlhbG9nLAogCQkJCQljb25zdCBnY2hhciAqdXJsLCBncG9pbnRl
-ciBkYXRhKQogeworCUdFcnJvciAqZXJyb3IgPSBOVUxMOworCWdib29sZWFuIHJldDsKKwljaGFy
-ICpjbWRsaW5lOworCUdka1NjcmVlbiAqZ3NjcmVlbjsKKwlHdGtXaWRnZXQgKmVycm9yX2RpYWxv
-ZzsKKworCWdzY3JlZW4gPSBndGtfd2luZG93X2dldF9zY3JlZW4gKEdUS19XSU5ET1coZGlhbG9n
-KSk7CisKKwljbWRsaW5lID0gZ19zdHJjb25jYXQgKCJnbm9tZS1vcGVuICIsIHVybCwgTlVMTCk7
-CisJcmV0ID0gZ2RrX3NwYXduX2NvbW1hbmRfbGluZV9vbl9zY3JlZW4gKGdzY3JlZW4sIGNtZGxp
-bmUsICZlcnJvcik7CisJZ19mcmVlIChjbWRsaW5lKTsKKworCWlmIChyZXQgPT0gVFJVRSkKKwkJ
-cmV0dXJuOworCisJZ19lcnJvcl9mcmVlIChlcnJvcik7CisJZXJyb3IgPSBOVUxMOworCisJY21k
-bGluZSA9IGdfc3RyY29uY2F0ICgieGRnLW9wZW4gIiwgdXJsLCBOVUxMKTsKKwlyZXQgPSBnZGtf
-c3Bhd25fY29tbWFuZF9saW5lX29uX3NjcmVlbiAoZ3NjcmVlbiwgY21kbGluZSwgJmVycm9yKTsK
-KwlnX2ZyZWUgKGNtZGxpbmUpOworCisJaWYgKHJldCA9PSBGQUxTRSkgeworCQllcnJvcl9kaWFs
-b2cgPSBndGtfbWVzc2FnZV9kaWFsb2dfbmV3ICggTlVMTCwgR1RLX0RJQUxPR19NT0RBTCwgR1RL
-X01FU1NBR0VfSU5GTywgR1RLX0JVVFRPTlNfT0ssICJGYWlsZWQgdG8gc2hvdyB1cmwgJXMiLCBl
-cnJvci0+bWVzc2FnZSk7IAorCQlndGtfZGlhbG9nX3J1biAoR1RLX0RJQUxPRyAoZXJyb3JfZGlh
-bG9nKSk7CisJCWdfZXJyb3JfZnJlZSAoZXJyb3IpOworCX0KIH0KIAogc3RhdGljIHZvaWQgYWJv
-dXRfZW1haWxfaG9vayhHdGtBYm91dERpYWxvZyAqZGlhbG9nLAogCQkJCQljb25zdCBnY2hhciAq
-ZW1haWwsIGdwb2ludGVyIGRhdGEpCiB7CisJR0Vycm9yICplcnJvciA9IE5VTEw7CisJZ2Jvb2xl
-YW4gcmV0OworCWNoYXIgKmNtZGxpbmU7CisJR2RrU2NyZWVuICpnc2NyZWVuOworCUd0a1dpZGdl
-dCAqZXJyb3JfZGlhbG9nOworCisJZ3NjcmVlbiA9IGd0a193aW5kb3dfZ2V0X3NjcmVlbiAoR1RL
-X1dJTkRPVyhkaWFsb2cpKTsKKworCWNtZGxpbmUgPSBnX3N0cmNvbmNhdCAoImdub21lLW9wZW4g
-bWFpbHRvOiIsIGVtYWlsLCBOVUxMKTsKKwlyZXQgPSBnZGtfc3Bhd25fY29tbWFuZF9saW5lX29u
-X3NjcmVlbiAoZ3NjcmVlbiwgY21kbGluZSwgJmVycm9yKTsKKwlnX2ZyZWUgKGNtZGxpbmUpOwor
-CisJaWYgKHJldCA9PSBUUlVFKQorCQlyZXR1cm47CisKKwlnX2Vycm9yX2ZyZWUgKGVycm9yKTsK
-KwllcnJvciA9IE5VTEw7CisKKwljbWRsaW5lID0gZ19zdHJjb25jYXQgKCJ4ZGctb3BlbiBtYWls
-dG86IiwgZW1haWwsIE5VTEwpOworCXJldCA9IGdka19zcGF3bl9jb21tYW5kX2xpbmVfb25fc2Ny
-ZWVuIChnc2NyZWVuLCBjbWRsaW5lLCAmZXJyb3IpOworCWdfZnJlZSAoY21kbGluZSk7CisKKwlp
-ZiAocmV0ID09IEZBTFNFKSB7CisJCWVycm9yX2RpYWxvZyA9IGd0a19tZXNzYWdlX2RpYWxvZ19u
-ZXcgKCBOVUxMLCBHVEtfRElBTE9HX01PREFMLCBHVEtfTUVTU0FHRV9JTkZPLCBHVEtfQlVUVE9O
-U19PSywgIkZhaWxlZCB0byBzaG93IHVybCAlcyIsIGVycm9yLT5tZXNzYWdlKTsgCisJCWd0a19k
-aWFsb2dfcnVuIChHVEtfRElBTE9HIChlcnJvcl9kaWFsb2cpKTsKKwkJZ19lcnJvcl9mcmVlIChl
-cnJvcik7CisJfQogfQogCiB2b2lkIHNob3dfYWJvdXRfZGlhbG9nKHZvaWQpCkluZGV4OiBhcHBs
-ZXQvbWFpbi5jCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT0KUkNTIGZpbGU6IC9jdnNyb290L2JsdWV6L2dub21lL2FwcGxl
-dC9tYWluLmMsdgpyZXRyaWV2aW5nIHJldmlzaW9uIDEuOTQKZGlmZiAtdSAtcjEuOTQgbWFpbi5j
-Ci0tLSBhcHBsZXQvbWFpbi5jCTE5IERlYyAyMDA3IDAxOjA2OjA1IC0wMDAwCTEuOTQKKysrIGFw
-cGxldC9tYWluLmMJMjEgRGVjIDIwMDcgMjI6MTA6MzggLTAwMDAKQEAgLTE1MTAsMTEgKzE1MTAs
-NjUgQEAKIHN0YXRpYyB2b2lkIGFib3V0X3VybF9ob29rKEd0a0Fib3V0RGlhbG9nICpkaWFsb2cs
-CiAJCQkJCWNvbnN0IGdjaGFyICp1cmwsIGdwb2ludGVyIGRhdGEpCiB7CisJR0Vycm9yICplcnJv
-ciA9IE5VTEw7CisJZ2Jvb2xlYW4gcmV0OworCWNoYXIgKmNtZGxpbmU7CisJR2RrU2NyZWVuICpn
-c2NyZWVuOworCUd0a1dpZGdldCAqZXJyb3JfZGlhbG9nOworCisJZ3NjcmVlbiA9IGd0a193aW5k
-b3dfZ2V0X3NjcmVlbiAoR1RLX1dJTkRPVyhkaWFsb2cpKTsKKworCWNtZGxpbmUgPSBnX3N0cmNv
-bmNhdCAoImdub21lLW9wZW4gIiwgdXJsLCBOVUxMKTsKKwlyZXQgPSBnZGtfc3Bhd25fY29tbWFu
-ZF9saW5lX29uX3NjcmVlbiAoZ3NjcmVlbiwgY21kbGluZSwgJmVycm9yKTsKKwlnX2ZyZWUgKGNt
-ZGxpbmUpOworCisJaWYgKHJldCA9PSBUUlVFKQorCQlyZXR1cm47CisKKwlnX2Vycm9yX2ZyZWUg
-KGVycm9yKTsKKwllcnJvciA9IE5VTEw7CisKKwljbWRsaW5lID0gZ19zdHJjb25jYXQgKCJ4ZGct
-b3BlbiAiLCB1cmwsIE5VTEwpOworCXJldCA9IGdka19zcGF3bl9jb21tYW5kX2xpbmVfb25fc2Ny
-ZWVuIChnc2NyZWVuLCBjbWRsaW5lLCAmZXJyb3IpOworCWdfZnJlZSAoY21kbGluZSk7CisKKwlp
-ZiAocmV0ID09IEZBTFNFKSB7CisJCWVycm9yX2RpYWxvZyA9IGd0a19tZXNzYWdlX2RpYWxvZ19u
-ZXcgKCBOVUxMLCBHVEtfRElBTE9HX01PREFMLCBHVEtfTUVTU0FHRV9JTkZPLCBHVEtfQlVUVE9O
-U19PSywgIkZhaWxlZCB0byBzaG93IHVybCAlcyIsIGVycm9yLT5tZXNzYWdlKTsgCisJCWd0a19k
-aWFsb2dfcnVuIChHVEtfRElBTE9HIChlcnJvcl9kaWFsb2cpKTsKKwkJZ19lcnJvcl9mcmVlIChl
-cnJvcik7CisJfQogfQogCiBzdGF0aWMgdm9pZCBhYm91dF9lbWFpbF9ob29rKEd0a0Fib3V0RGlh
-bG9nICpkaWFsb2csCiAJCQkJCWNvbnN0IGdjaGFyICplbWFpbCwgZ3BvaW50ZXIgZGF0YSkKIHsK
-KwlHRXJyb3IgKmVycm9yID0gTlVMTDsKKwlnYm9vbGVhbiByZXQ7CisJY2hhciAqY21kbGluZTsK
-KwlHZGtTY3JlZW4gKmdzY3JlZW47CisJR3RrV2lkZ2V0ICplcnJvcl9kaWFsb2c7CisKKwlnc2Ny
-ZWVuID0gZ3RrX3dpbmRvd19nZXRfc2NyZWVuIChHVEtfV0lORE9XKGRpYWxvZykpOworCisJY21k
-bGluZSA9IGdfc3RyY29uY2F0ICgiZ25vbWUtb3BlbiBtYWlsdG86IiwgZW1haWwsIE5VTEwpOwor
-CXJldCA9IGdka19zcGF3bl9jb21tYW5kX2xpbmVfb25fc2NyZWVuIChnc2NyZWVuLCBjbWRsaW5l
-LCAmZXJyb3IpOworCWdfZnJlZSAoY21kbGluZSk7CisKKwlpZiAocmV0ID09IFRSVUUpCisJCXJl
-dHVybjsKKworCWdfZXJyb3JfZnJlZSAoZXJyb3IpOworCWVycm9yID0gTlVMTDsKKworCWNtZGxp
-bmUgPSBnX3N0cmNvbmNhdCAoInhkZy1vcGVuIG1haWx0bzoiLCBlbWFpbCwgTlVMTCk7CisJcmV0
-ID0gZ2RrX3NwYXduX2NvbW1hbmRfbGluZV9vbl9zY3JlZW4gKGdzY3JlZW4sIGNtZGxpbmUsICZl
-cnJvcik7CisJZ19mcmVlIChjbWRsaW5lKTsKKworCWlmIChyZXQgPT0gRkFMU0UpIHsKKwkJZXJy
-b3JfZGlhbG9nID0gZ3RrX21lc3NhZ2VfZGlhbG9nX25ldyAoIE5VTEwsIEdUS19ESUFMT0dfTU9E
-QUwsIEdUS19NRVNTQUdFX0lORk8sIEdUS19CVVRUT05TX09LLCAiRmFpbGVkIHRvIHNob3cgdXJs
-ICVzIiwgZXJyb3ItPm1lc3NhZ2UpOyAKKwkJZ3RrX2RpYWxvZ19ydW4gKEdUS19ESUFMT0cgKGVy
-cm9yX2RpYWxvZykpOworCQlnX2Vycm9yX2ZyZWUgKGVycm9yKTsKKwl9CiB9CiAKIHN0YXRpYyB2
-b2lkIGFib3V0X2NhbGxiYWNrKEd0a1dpZGdldCAqaXRlbSwgZ3BvaW50ZXIgdXNlcl9kYXRhKQo=
-
-------=_Part_3528_14453836.1198275423136
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+BR,
+Claudio.
+-- 
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-------=_Part_3528_14453836.1198275423136
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-------=_Part_3528_14453836.1198275423136--
