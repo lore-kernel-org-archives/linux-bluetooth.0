@@ -1,10 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <477190AC.4000102@free.fr>
-Date: Wed, 26 Dec 2007 00:22:20 +0100
-From: =?ISO-8859-1?Q?fabrice_r=E9gnier?= <regnier.fab@free.fr>
-MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] where is /etc/bluetooth/audio.service ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BLU117-W35384D9D521C82D28811E588590@phx.gbl>
+References: <BLU117-W236D38B8C3E38C09A75D83885E0@phx.gbl>
+	<d89ddf300712210752p24070ee5i33d17a427e3c31c@mail.gmail.com>
+	<BLU117-W24F980AF55D11A07E6B6E688590@phx.gbl>
+	<d89ddf300712231836m32ea9778o72a300c47cac18e@mail.gmail.com>
+	<BLU117-W1270E7F77535BE008FEAF288590@phx.gbl>
+	<d89ddf300712232026y32878c5x4b1e61ac0cee712c@mail.gmail.com>
+	<BLU117-W35384D9D521C82D28811E588590@phx.gbl>
+Date: Mon, 24 Dec 2007 11:47:05 +0100
+Message-Id: <1198493225.8050.315.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] a2dp choppy sound problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,24 +26,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi to all ;)
+Hi Benson,
 
-I try to use a Plantronics Voyager 510 USB Bluetooth Headset on Debian 
-lenny (bluez-utils : 3.22-2)
+> > is it running on a slow computer or an embedded computer?
+> 
+> It is running on CentOS 5.0(VMware) on x86 , 1G Mem ,PD3.2GHz .
+> I just compiled and installed bluez-libs 3.22 and bluez-utils 3.22 .
 
-The pairing goes ok.
+if you run this inside VMware then it is not guaranteed to work at all.
+The latency that the USB emulation of VMware imposes makes it impossible
+to use it properly. We have seen this with VMware Fusion on MacBooks
+already.
 
-I followed http://wiki.bluez.org/wiki/HOWTO/AudioDevices.
-It says :
-"Make sure the audio service is installed and enabled (file 
-/etc/bluetooth/audio.service should exist) "
+Regards
 
-Ok, but how do i know that the audio service is installed and enabled ? 
-In my case, the file /etc/bluetooth/audio.service is absent.
-
-regards,
-
-f.
+Marcel
 
 
 
