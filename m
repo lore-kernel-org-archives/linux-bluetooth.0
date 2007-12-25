@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <477190F8.9060305@free.fr>
-Date: Wed, 26 Dec 2007 00:23:36 +0100
+Message-ID: <477190CE.2030308@free.fr>
+Date: Wed, 26 Dec 2007 00:22:54 +0100
 From: =?ISO-8859-1?Q?fabrice_r=E9gnier?= <regnier.fab@free.fr>
 MIME-Version: 1.0
 To: bluez-users@lists.sourceforge.net
