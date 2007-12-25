@@ -1,61 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Dec 2007 18:03:21 +0800
-From: Dave Young <hidave.darkstar@gmail.com>
-To: akpm@linux-foundation.org
-Cc: greg@kroah.com, marcel@holtmann.org, linux-kernel@vger.kernel.org,
-	bluez-devel@lists.sourceforge.net
-Subject: [BUG][PATCH -mm] bluetooth : rfcomm add get/put device in del_conn
-Message-ID: <20071225100321.GA2791@darkstar.te-china.tietoenator.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <bluez-devel.lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Olivier Le Pogam <olepogam@free.fr>,
+	BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <000601c84639$c8ef8640$0200a8c0@jester>
+References: <359782e70712230600n7077ee15hcab67216b9e7c8b4@mail.gmail.com>
+	<1198437472.8050.305.camel@aeonflux>
+	<001001c84619$20f716d0$0200a8c0@jester>
+	<1198493046.8050.311.camel@aeonflux>
+	<000601c84639$c8ef8640$0200a8c0@jester>
+Date: Tue, 25 Dec 2007 05:26:01 +0100
+Message-Id: <1198556761.8050.329.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Add 3 HCI commands / concurrent connections	setup
+	question
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Due to 2.6.24-rc6-mm1 kernel changes (maybe kobject or driver core), If I exec:
+Hi Olivier,
 
-rfcomm connect 0 1
+> >> I'd like to add : Set_AFH_Host_Channel_Classification (OCF 0x003F),
+> >> Read_AFH_Channel_Assessment_Mode (OCF 0x0048) and
+> >> Write_AFH_Channel_Assessment_Mode (OCF 0x0049) to the supported HCI 
+> >> commands
+> > what do you wanna do with these commands? More important is, what do you
+> > expect what is gonna happen if you use them?
+> 
+> You are perfectly right I should have started with this. I have several 
+> bluetooth dongles and my idea was to split the frequency range between these 
+> devices so each one have his proper range and does not overlap with others, 
+> to limit interferences.
+> This is in the case the host is a master and tries to connect to several 
+> remote devices so there can be concurrent outgoing page scans from different 
+> dongles.
+> However, I realize now that maybe this HCI command is not implemented on 
+> device chips, so I will maybe have a look first ... no need to implement a 
+> command which is not supported by any hardware. By the way, don't hesitate 
+> to tell me if my idea does not make sense at all.
 
-kernel will oops after connect timeout.
+all Bluetooth 1.2 dongles have to support AFH and thus these commands
+have to be present.
 
-hand copy some oops text:
+However you should read the radio and baseband part of the Bluetooth
+specification and then you will realize that AFH will not help you to
+solve any page issues you see. It simply doesn't work this way and
+Bluetooth is _not_ WiFi.
 
-EIP is at driver_sysfs_remove+0x1a/0x40
-Call Trace:
- show_trace_log_lvl+0x1a/0x30
- show_stack_log_lvl+0x9a/0xc0
- show_registers+0xc7/0x270
- die+0x129/0x240
- do_page_fault+0x3a1/0x670
- error_code+0x72/0x78
- __device_release_driver+0x1e/0xa0
- device_release_driver+0x30/0x50
- bus_remove_device+0x63/0x90
- device_del+0x55/0x190
- del_conn+0xb/0x10 [bluetooth]
- run_workqueue+0xe1/0x210
- worker_thread+0x99/0xf0
- kthread+0x5c/0xa0
- kernel_thread_helper+0x7/0x18
+> I have something to ask as well ... With CSR's chips trying to open 
+> concurrent connections makes the first work and others get a "Command 
+> Disallowed". Then I saw with hcidump that the "Create Connection" is 
+> re-issued automatically. However, it can be really later sometimes (more 
+> than several seconds). My question is : how connection requests are 
+> serialized by the stack ? would it be possible to make the connection 
+> requests be retried more quickly ? Is there something blocking that would 
+> explain why it's long ?
 
-(The remote bluetooth device is a mobile phone which is power off)
+We try with the next connection attempt once the radio is free again.
+And this is if no inquiry and no page attempt is running.
 
-The reason is that in bus_remobe_dev, the klist_del function will release the device, so just add a get/put pair around the device_del in del_conn.
+> Here is a dump of trying to connect to 7 different devices concurrently, 
+> with a CSR bases dongle ("connect" are performed at the same time, then a 
+> "sleep 10 seconds", and a "close"). As you can see, times are really ... 
+> long !
+> 
+> 1st device : 1.3 seconds to come back successfully from "connect" socket
+> 2nd device : 5.5 seconds
+> 3rd device : 9.9 seconds
+> 4th device : 10.9 seconds
+> 5th device : 13 seconds
+> 6th device : 18.3 seconds
+> 7th device : 19.8 seconds
 
-Signed-off-by: Dave Young <hidave.darkstar@gmail.com> 
+For every page the slave device has to sync with the master clock
+(assuming that none of the remote device request a role switch). This
+can take some time and at that point the clock_offset from the inquiry
+result might be out of sync. So it is simply plain bad luck.
 
----
-net/bluetooth/hci_sysfs.c |    2 ++
-1 file changed, 2 insertions(+)
+On the other hand the concurrent page support is more than a workaround
+for the application to not to have to bother. If the radio/baseband is
+busy, then it is busy.
 
-diff -upr linux/net/bluetooth/hci_sysfs.c linux.new/net/bluetooth/hci_sysfs.c
---- linux/net/bluetooth/hci_sysfs.c	2007-12-25 17:45:09.000000000 +0800
-+++ linux.new/net/bluetooth/hci_sysfs.c	2007-12-25 17:45:51.000000000 +0800
-@@ -319,7 +319,9 @@ void hci_conn_add_sysfs(struct hci_conn 
- static void del_conn(struct work_struct *work)
- {
- 	struct hci_conn *conn = container_of(work, struct hci_conn, work);
-+	get_device(&conn->dev);
- 	device_del(&conn->dev);
-+	put_device(&conn->dev);
- }
- 
- void hci_conn_del_sysfs(struct hci_conn *conn)
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
