@@ -1,11 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47725DEF.7070302@mizi.com>
-Date: Wed, 26 Dec 2007 22:58:07 +0900
-From: Louis JANG <louis@mizi.com>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Content-Type: multipart/mixed; boundary="------------030408010106040904000104"
-Subject: [Bluez-devel] [PATCH] align issue of sdpd
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <992527.97227.qm@web50206.mail.re2.yahoo.com>
+References: <992527.97227.qm@web50206.mail.re2.yahoo.com>
+Date: Wed, 26 Dec 2007 12:43:43 +0100
+Message-Id: <1198669423.29208.19.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] check for inquiry
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,62 +16,34 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------030408010106040904000104
-Content-Type: text/plain; charset=EUC-KR
-Content-Transfer-Encoding: 7bit
+Hi Mina,
 
-Hi,
+> is there a way to check if there is inquiry running by me or any other
+> process? also is there a way to cancel a running inquiry through an
+> API call (I ask for a method other than issuing the command "hcitool
+> cmd 0x01 0x0002")
+> 
+> I am using APIs declared in hci_lib.h not DBus.
 
-Because of alignment issue, sdpd couldn't handle continuation
-information correctly in arm architecture. the following is patch for
-this issue.
+switch to use the D-Bus based API. It will make it a lot easier. The
+hci_inquiry() call is blocking and can't handle Inquiry Result with RSSI
+or Extended Inquiry Results.
 
-Regards,
-Louis JANG
+Regards
+
+Marcel
 
 
---------------030408010106040904000104
-Content-Type: text/x-patch;
- name="sdpd.h.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="sdpd.h.patch"
-
---- bluez-utils-3.9/sdpd/sdpd.h.orig	2007-12-26 22:46:40.000000000 +0900
-+++ bluez-utils-3.9/sdpd/sdpd.h	2007-12-26 22:47:08.000000000 +0900
-@@ -47,7 +47,7 @@
- void register_public_browse_group(int public);
- void register_server_service(int public);
- 
--typedef struct {
-+typedef struct __attribute__((packed)) {
- 	uint32_t timestamp;
- 	union {
- 		uint16_t maxBytesSent;
-
---------------030408010106040904000104
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---------------030408010106040904000104
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---------------030408010106040904000104--
