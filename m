@@ -1,126 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <a8e1da0712262119n9743337o7dbe599080b52748@mail.gmail.com>
-Date: Thu, 27 Dec 2007 13:19:32 +0800
-From: "Dave Young" <hidave.darkstar@gmail.com>
-To: akpm@linux-foundation.org
-Subject: Re: [BUG][PATCH -mm] bluetooth : rfcomm add get/put device in del_conn
-Cc: greg@kroah.com, marcel@holtmann.org, linux-kernel@vger.kernel.org,
-	bluez-devel@lists.sourceforge.net
-In-Reply-To: <20071226031300.GA3007@darkstar.te-china.tietoenator.com>
+Message-ID: <951351190712261349w3b541e7bn319da55ae02b1410@mail.gmail.com>
+Date: Wed, 26 Dec 2007 21:49:46 +0000
+From: "Jason Zhan" <zhan.jason@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1198556341.8050.321.camel@aeonflux>
 MIME-Version: 1.0
+References: <951351190712240702x7b84c38j135735888bbd40d0@mail.gmail.com>
+	<1198556341.8050.321.camel@aeonflux>
+Subject: Re: [Bluez-devel] passkey-agent
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0953025659=="
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
+
+--===============0953025659==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_13519_8702769.1198705786566"
+
+------=_Part_13519_8702769.1198705786566
 Content-Type: text/plain; charset=ISO-8859-1
-References: <20071225100321.GA2791@darkstar.te-china.tietoenator.com>
-	 <a8e1da0712250207q2da4ce9bwc6ee70dfff240f9f@mail.gmail.com>
-	 <20071226031300.GA3007@darkstar.te-china.tietoenator.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-On Dec 26, 2007 11:13 AM, Dave Young <hidave.darkstar@gmail.com> wrote:
+Hey, Marcel and Olivier
+
+The problem has been solved. The reason is that the bluetooth-applet has
+registered the default passkey agent. So I only can register the specific
+passkey agents for bluetooth devices or disable the default passkey agent in
+bluetooth-applet.
+
+Many thanks for all your help.
+
+Regards,
+Jason
+
+On 25/12/2007, Marcel Holtmann <marcel@holtmann.org> wrote:
 >
-> On Tue, Dec 25, 2007 at 06:07:24PM +0800, Dave Young wrote:
-> > On Dec 25, 2007 6:03 PM, Dave Young <hidave.darkstar@gmail.com> wrote:
-> > > Due to 2.6.24-rc6-mm1 kernel changes (maybe kobject or driver core), If I exec:
-> > >
-> > > rfcomm connect 0 1
-> > >
-> > > kernel will oops after connect timeout.
-> > >
-> > > hand copy some oops text:
-> > >
-> > > EIP is at driver_sysfs_remove+0x1a/0x40
-> > > Call Trace:
-> > >  show_trace_log_lvl+0x1a/0x30
-> > >  show_stack_log_lvl+0x9a/0xc0
-> > >  show_registers+0xc7/0x270
-> > >  die+0x129/0x240
-> > >  do_page_fault+0x3a1/0x670
-> > >  error_code+0x72/0x78
-> > >  __device_release_driver+0x1e/0xa0
-> > >  device_release_driver+0x30/0x50
-> > >  bus_remove_device+0x63/0x90
-> > >  device_del+0x55/0x190
-> > >  del_conn+0xb/0x10 [bluetooth]
-> > >  run_workqueue+0xe1/0x210
-> > >  worker_thread+0x99/0xf0
-> > >  kthread+0x5c/0xa0
-> > >  kernel_thread_helper+0x7/0x18
-> > >
-> > > (The remote bluetooth device is a mobile phone which is power off)
-> > >
-> > > The reason is that in bus_remobe_dev, the klist_del function will release the device, so just add a get/put pair around the device_del in del_conn.
-> > >
-> > > Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
-> > >
-> > > ---
-> > > net/bluetooth/hci_sysfs.c |    2 ++
-> > > 1 file changed, 2 insertions(+)
-> > >
-> > > diff -upr linux/net/bluetooth/hci_sysfs.c linux.new/net/bluetooth/hci_sysfs.c
-> > > --- linux/net/bluetooth/hci_sysfs.c     2007-12-25 17:45:09.000000000 +0800
-> > > +++ linux.new/net/bluetooth/hci_sysfs.c 2007-12-25 17:45:51.000000000 +0800
-> > > @@ -319,7 +319,9 @@ void hci_conn_add_sysfs(struct hci_conn
-> > >  static void del_conn(struct work_struct *work)
-> > >  {
-> > >         struct hci_conn *conn = container_of(work, struct hci_conn, work);
-> > > +       get_device(&conn->dev);
-> > >         device_del(&conn->dev);
-> > > +       put_device(&conn->dev);
-> > >  }
-> > >
-> > >  void hci_conn_del_sysfs(struct hci_conn *conn)
-> > >
-> >
-> > Hi greg,
-> >
-> > BTW, Is it a possible bug of driver core or kobject ?
-> >
+> Hi Jason,
 >
-> In device_del
+> > Currently, I am implementing a passkey-agent for my own application.
+> > The principle is similar with the /daemon/passkey-agent.c. However,
+> > when I run it, the system gives me some errors: "Can't regiter passeky
+> > agent, passkey agnet already exists".
 >
-> if(parent)
->     klist_del()  will drop the kref of device
+> the error message is pretty clear. You can have multiple remote device
+> specific passkey agents, but only _ONE_ default passkey agent.
 >
-> and then in bus_remove_device
->     klist_del()  will drop it again, so the device would be released.
+> Regards
 >
-> then the following works will oops.
+> Marcel
 >
-> So might my patch is a wrong fix. how about the below one:
 >
-> Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
 >
-> ---
-> drivers/base/core.c |    2 ++
-> 1 file changed, 2 insertions(+)
->
-> diff -upr linux/drivers/base/core.c linux.new/drivers/base/core.c
-> --- linux/drivers/base/core.c   2007-12-26 11:00:49.000000000 +0800
-> +++ linux.new/drivers/base/core.c       2007-12-26 11:01:18.000000000 +0800
-> @@ -926,6 +926,7 @@ void device_del(struct device * dev)
->         struct device * parent = dev->parent;
->         struct class_interface *class_intf;
->
-> +       dev = get_device(dev);
->         if (parent)
->                 klist_del(&dev->knode_parent);
->         if (MAJOR(dev->devt))
-> @@ -966,6 +967,7 @@ void device_del(struct device * dev)
->         cleanup_device_parent(dev);
->         kobject_del(&dev->kobj);
->         put_device(parent);
-> +       put_device(dev);
->  }
->
->  /**
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2005.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 >
 
-Hi all,
-The patches in this thread of me are wrong fixes, I'm sorry for this.
+------=_Part_13519_8702769.1198705786566
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-I've found the real problem(BUG), it's in bluetooth connection code,
-because of workqueue delay, the device could be put before the
-device_del called.
+Hey, Marcel and Olivier<br><br>The problem has been solved. The reason is that the bluetooth-applet has registered the default passkey agent. So I only can register the specific passkey agents for bluetooth devices or disable the default passkey agent in bluetooth-applet. 
+<br><br>Many thanks for all your help.<br><br>Regards,<br>Jason<br><br><div><span class="gmail_quote">On 25/12/2007, <b class="gmail_sendername">Marcel Holtmann</b> &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org
+</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hi Jason,<br><br>&gt; Currently, I am implementing a passkey-agent for my own application.
+<br>&gt; The principle is similar with the /daemon/passkey-agent.c. However,<br>&gt; when I run it, the system gives me some errors: &quot;Can&#39;t regiter passeky<br>&gt; agent, passkey agnet already exists&quot;.<br><br>
+the error message is pretty clear. You can have multiple remote device<br>specific passkey agents, but only _ONE_ default passkey agent.<br><br>Regards<br><br>Marcel<br><br><br><br>-------------------------------------------------------------------------
+<br>This SF.net email is sponsored by: Microsoft<br>Defy all challenges. Microsoft(R) Visual Studio 2005.<br><a href="http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/">http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+</a><br>_______________________________________________<br>Bluez-devel mailing list<br><a href="mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-devel">
+https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br></blockquote></div><br>
 
-I will submit a new patch in a while.
+------=_Part_13519_8702769.1198705786566--
 
-Regards
-dave
+
+--===============0953025659==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============0953025659==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0953025659==--
