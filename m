@@ -1,12 +1,22 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4775870C.4030304@yahoo.es>
-Date: Sat, 29 Dec 2007 00:30:20 +0100
-From: Perki Pat <perki_pat3@yahoo.es>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <47754D1D.9020907@yahoo.es> <1198881591.4455.30.camel@aeonflux>
-In-Reply-To: <1198881591.4455.30.camel@aeonflux>
-Subject: Re: [Bluez-devel] hcitool and argv syntax
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Olivier Le Pogam <olepogam@free.fr>,
+	BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <001001c8498c$bc3491b0$0200a8c0@jester>
+References: <359782e70712230600n7077ee15hcab67216b9e7c8b4@mail.gmail.com>
+	<1198437472.8050.305.camel@aeonflux>
+	<001001c84619$20f716d0$0200a8c0@jester>
+	<1198493046.8050.311.camel@aeonflux>
+	<000601c84639$c8ef8640$0200a8c0@jester>
+	<1198556761.8050.329.camel@aeonflux>
+	<003c01c84945$64d21600$0200a8c0@jester>
+	<1198869661.4455.21.camel@aeonflux>
+	<001001c8498c$bc3491b0$0200a8c0@jester>
+Date: Fri, 28 Dec 2007 23:35:02 +0100
+Message-Id: <1198881302.4455.27.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Add 3 HCI commands / concurrent connection
+	setup	question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,69 +26,43 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0827358740=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0827358740==
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Hi Olivier,
 
-> your patch is way too complicated. You can simply check for
-> command[i].cmd == NULL to print the error.
-You're completely right. I don't know what I was thinking on.
+> > the design of AFH is to help _other_ 2.4 GHz radios to survive while
+> > Bluetooth is active in the same area. It is not meant to protect it
+> > against its own technology. The basics behind AFH is too play nice with
+> > WiFi networks in the same area. That's it.
 > 
-> And of course you have to follow the coding style. I am not joking with
-> this one. It is the main reason for me to reject patches.
-I've replaced 3-space-tabs with real tabs.
+> I have found an interesting article about this (for people who find this 
+> interesting as well !) :
+> 
+> http://www.us.design-reuse.com/articles/5715/adaptive-frequency-hopping-for-reduced-interference-between-bluetooth-and-wireless-lan.html
+> 
+> Sorry to carry on theorically speaking, but in my opinion it's always good 
+> to understand the underlying techniques ... do you know how AFH is 
+> implemented by chips ? Is the channel blacklisting "manually" up to the 
+> developper (software), or is there a built-in blacklisting algorithm 
+> (hardware) ?
 
---- hcitool.c.orig	2007-12-28 20:06:58.000000000 +0100
-+++ hcitool.c	2007-12-29 00:09:03.000000000 +0100
-@@ -2329,5 +2329,11 @@
- 		command[i].func(dev_id, argc, argv);
- 		break;
- 	}
--	return 0;
-+
-+	if(!command[i].cmd) {
-+		fprintf(stderr, "\"%s\" isn't a valid command. Try --help for a list
-of commands.\n", argv[0]);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	exit(EXIT_SUCCESS);
- }
+it is fully up to the firmware running on the Bluetooth chip. The only
+chance a host stack has it to modify the channel map and even that one
+can be ignored by the chip.
+
+Regards
+
+Marcel
 
 
-	
-	
-		
-______________________________________________ 
-LLama Gratis a cualquier PC del Mundo. 
-Llamadas a fijos y móviles desde 1 céntimo por minuto. 
-http://es.voice.yahoo.com
-
-
-
---===============0827358740==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============0827358740==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0827358740==--
