@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Dec 2007 22:48:04 +0100
-From: Felix Dorner <felix_do@web.de>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <20071228224804.1518212d@serenity>
-In-Reply-To: <8ccc3510712281142j5762e5c7l24c10083aad6321e@mail.gmail.com>
+Message-ID: <8ccc3510712281142j5762e5c7l24c10083aad6321e@mail.gmail.com>
+Date: Fri, 28 Dec 2007 20:42:48 +0100
+From: "Christophe-Marie Duquesne" <chm.duquesne@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20071228193217.5277a57f@serenity>
+MIME-Version: 1.0
 References: <20071228193217.5277a57f@serenity>
-	<8ccc3510712281142j5762e5c7l24c10083aad6321e@mail.gmail.com>
-Mime-Version: 1.0
 Subject: Re: [Bluez-users] Connecting to the Logitech HS05 V04 Headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -17,25 +16,124 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0335587092=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Fri, 28 Dec 2007 20:42:48 +0100
-"Christophe-Marie Duquesne" <chm.duquesne@gmail.com> wrote:
+--===============0335587092==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_6002_32579591.1198870968040"
 
-> Which system are you running? Do not use the ubuntu bluez package
-> since a2dp does not work on it.
-> 
+------=_Part_6002_32579591.1198870968040
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
 
-I use gentoo linux, a custom 2.6.22 kernel. 
+V2hpY2ggc3lzdGVtIGFyZSB5b3UgcnVubmluZz8gRG8gbm90IHVzZSB0aGUgdWJ1bnR1IGJsdWV6
+IHBhY2thZ2Ugc2luY2UgYTJkcApkb2VzIG5vdCB3b3JrIG9uIGl0LgoKT24gRGVjIDI4LCAyMDA3
+IDc6MzIgUE0sIEZlbGl4IERvcm5lciA8ZmVsaXhfZG9Ad2ViLmRlPiB3cm90ZToKCj4gSGksCj4K
+PiBJIGFtIGN1cnJlbnRseSB0ZXN0aW5nIGlmIEkgY2FuIGNvbm5lY3QgdG8gdGhpcyBMb2dpdGVj
+aCBkZXZpY2UgKEhTMDUKPiBWMDQpLiBJIGdvdCB0aGUgZGV2aWNlcyBuYW1lL21hYyBieSAiaGNp
+dG9vbCBzY2FuIi4gSSBub3cgZm9sbG93ZWQgdGhlCj4gc3RlcHMgZm9yICJibHVlei11dGlscy0z
+LjE2IGFuZCBuZXdlciIgKEkgZ290IHNvbWUgMy4yeCB2ZXJzaW9uKSBmcm9tCj4gdGhpcyBwYWdl
+Ogo+Cj4gaHR0cDovL3dpa2kuYmx1ZXoub3JnL3dpa2kvSE9XVE8vQXVkaW9EZXZpY2VzCj4KPiAx
+LiBNYWtlIHN1cmUgdGhlIGF1ZGlvIHNlcnZpY2UgaXMgaW5zdGFsbGVkIGFuZCBlbmFibGVkCj4K
+PiBOb3QgYmVpbmcgcXVpdGUgc3VyZSB3aGF0IHRoYXQgbWVhbnMgSQo+IGNoZWNrZWQgL2V0Yy9i
+bHVldG9vdGgvYXVkaW8uc2VydmljZS4gVGhlIGZpbGUgZXhpc3RzLiBJIGNoYW5nZWQgdGhlCj4g
+IkF1dG9zdGFydCIgb3B0aW9uIGZyb20gZmFsc2UgdG8gdHJ1ZSAtIGp1c3QgdG8gYmUgc2FmZS4g
+U28gSSBndWVzcwo+IFN0ZXAgMSBzaG91bGQgYmUgb2suCj4KPiAyLiBJIGhhZCB0byBjcmVhdGUg
+fi8uYXNvdW5kcmMgdG8gaW5zZXJ0IHRoZSB0ZW1wbGF0ZSBhbmQgZW50ZXJlZCB0aGUKPiBkZXZp
+Y2VzIE1BQy4KPgo+IE5vdyBJIHRyeSAiYXBsYXkgLUQgYmx1ZXRvb3RoIC1mIFMxNl9MRSBzb21l
+ZmlsZSIgd2hpY2ggZmFpbHMgd2l0aDoKPgo+IEFMU0EgbGliIHBjbV9ibHVldG9vdGguYzoxMjQw
+OihibHVldG9vdGhfaW5pdCkgQ29ubmVjdGlvbiBmYWlsCj4gYXBsYXk6IG1haW46NTQ1OiBhdWRp
+byBvcGVuIGVycm9yOiBDb25uZWN0aW9uIHJlZnVzZWQKPgo+IEkgdHJpZWQgdGhlIGZvbGxvd2lu
+ZzoKPiAtIFJlc3RhcnQgYWxzYQo+IC0gSSBzb21ld2hlcmUgcmVhZCB0aGF0IEknZCBuZWVkIHRv
+IGxvYWQgdGhlIHNuZC11c2ItYXVkaW8gbW9kdWxlLCBkaWQuCj4KPiBJcyBpdCB0aGF0IHRoZSBk
+ZXZpY2UgaXMgc2ltcGx5IG5vdCBzdXBwb3J0ZWQ/IHdoYXQgZWxzZSBtaWdodCBpIGhhdmUKPiBt
+aXNzZWQ/Cj4KPgo+IFRoYW5rcyBmb3IgYW55IGhpbnRzLgo+Cj4gRmVsaXgKPgo+Cj4gLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLQo+IFRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogTWljcm9zb2Z0
+Cj4gRGVmeSBhbGwgY2hhbGxlbmdlcy4gTWljcm9zb2Z0KFIpIFZpc3VhbCBTdHVkaW8gMjAwNS4K
+PiBodHRwOi8vY2xrLmF0ZG10LmNvbS9NUlQvZ28vdnNlMDEyMDAwMDA3MG1ydC9kaXJlY3QvMDEv
+Cj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KPiBCbHVl
+ei11c2VycyBtYWlsaW5nIGxpc3QKPiBCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQK
+PiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vy
+cwo+CgoKCi0tIAp2b3VzIHBvdXZleiBjb25zdWx0ZXIgbW9uIGNhbGVuZHJpZXIgw6AgbCdhZHJl
+c3NlIHN1aXZhbnRlIDoKaHR0cDovL3d3dy5nb29nbGUuY29tL2NhbGVuZGFyL2VtYmVkP3NyYz10
+cnRmN2Q2cG1oY21ucXJ1ZWZhcGs5MnZrcyU0MGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20K
+------=_Part_6002_32579591.1198870968040
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
 
+V2hpY2ggc3lzdGVtIGFyZSB5b3UgcnVubmluZz8gRG8gbm90IHVzZSB0aGUgdWJ1bnR1IGJsdWV6
+IHBhY2thZ2Ugc2luY2UgYTJkcCBkb2VzIG5vdCB3b3JrIG9uIGl0Ljxicj48YnI+PGRpdiBjbGFz
+cz0iZ21haWxfcXVvdGUiPk9uIERlYyAyOCwgMjAwNyA3OjMyIFBNLCBGZWxpeCBEb3JuZXIgJmx0
+OzxhIGhyZWY9Im1haWx0bzpmZWxpeF9kb0B3ZWIuZGUiPmZlbGl4X2RvQHdlYi5kZTwvYT4KJmd0
+OyB3cm90ZTo8YnI+PGJsb2NrcXVvdGUgY2xhc3M9ImdtYWlsX3F1b3RlIiBzdHlsZT0iYm9yZGVy
+LWxlZnQ6IDFweCBzb2xpZCByZ2IoMjA0LCAyMDQsIDIwNCk7IG1hcmdpbjogMHB0IDBwdCAwcHQg
+MC44ZXg7IHBhZGRpbmctbGVmdDogMWV4OyI+SGksPGJyPjxicj5JIGFtIGN1cnJlbnRseSB0ZXN0
+aW5nIGlmIEkgY2FuIGNvbm5lY3QgdG8gdGhpcyBMb2dpdGVjaCBkZXZpY2UgKEhTMDUKPGJyPlYw
+NCkuIEkgZ290IHRoZSBkZXZpY2VzIG5hbWUvbWFjIGJ5ICZxdW90O2hjaXRvb2wgc2NhbiZxdW90
+Oy4gSSBub3cgZm9sbG93ZWQgdGhlPGJyPnN0ZXBzIGZvciAmcXVvdDtibHVlei11dGlscy0zLjE2
+IGFuZCBuZXdlciZxdW90OyAoSSBnb3Qgc29tZSAzLjJ4IHZlcnNpb24pIGZyb208YnI+dGhpcyBw
+YWdlOjxicj48YnI+PGEgaHJlZj0iaHR0cDovL3dpa2kuYmx1ZXoub3JnL3dpa2kvSE9XVE8vQXVk
+aW9EZXZpY2VzIiB0YXJnZXQ9Il9ibGFuayI+Cmh0dHA6Ly93aWtpLmJsdWV6Lm9yZy93aWtpL0hP
+V1RPL0F1ZGlvRGV2aWNlczwvYT48YnI+PGJyPjEuIE1ha2Ugc3VyZSB0aGUgYXVkaW8gc2Vydmlj
+ZSBpcyBpbnN0YWxsZWQgYW5kIGVuYWJsZWQ8YnI+PGJyPk5vdCBiZWluZyBxdWl0ZSBzdXJlIHdo
+YXQgdGhhdCBtZWFucyBJPGJyPmNoZWNrZWQgL2V0Yy9ibHVldG9vdGgvYXVkaW8uc2VydmljZS4g
+VGhlIGZpbGUgZXhpc3RzLiBJIGNoYW5nZWQgdGhlCjxicj4mcXVvdDtBdXRvc3RhcnQmcXVvdDsg
+b3B0aW9uIGZyb20gZmFsc2UgdG8gdHJ1ZSAtIGp1c3QgdG8gYmUgc2FmZS4gU28gSSBndWVzczxi
+cj5TdGVwIDEgc2hvdWxkIGJlIG9rLjxicj48YnI+Mi4gSSBoYWQgdG8gY3JlYXRlIH4vLmFzb3Vu
+ZHJjIHRvIGluc2VydCB0aGUgdGVtcGxhdGUgYW5kIGVudGVyZWQgdGhlPGJyPmRldmljZXMgTUFD
+Ljxicj48YnI+Tm93IEkgdHJ5ICZxdW90O2FwbGF5IC1EIGJsdWV0b290aCAtZiBTMTZfTEUgc29t
+ZWZpbGUmcXVvdDsgd2hpY2ggZmFpbHMgd2l0aDoKPGJyPjxicj5BTFNBIGxpYiBwY21fYmx1ZXRv
+b3RoLmM6MTI0MDooYmx1ZXRvb3RoX2luaXQpIENvbm5lY3Rpb24gZmFpbDxicj5hcGxheTogbWFp
+bjo1NDU6IGF1ZGlvIG9wZW4gZXJyb3I6IENvbm5lY3Rpb24gcmVmdXNlZDxicj48YnI+SSB0cmll
+ZCB0aGUgZm9sbG93aW5nOjxicj4tIFJlc3RhcnQgYWxzYTxicj4tIEkgc29tZXdoZXJlIHJlYWQg
+dGhhdCBJJiMzOTtkIG5lZWQgdG8gbG9hZCB0aGUgc25kLXVzYi1hdWRpbyBtb2R1bGUsIGRpZC4K
+PGJyPjxicj5JcyBpdCB0aGF0IHRoZSBkZXZpY2UgaXMgc2ltcGx5IG5vdCBzdXBwb3J0ZWQ/IHdo
+YXQgZWxzZSBtaWdodCBpIGhhdmU8YnI+bWlzc2VkPzxicj48YnI+PGJyPlRoYW5rcyBmb3IgYW55
+IGhpbnRzLjxicj48YnI+RmVsaXg8YnI+PGJyPjxicj4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPGJyPgpUaGlz
+IFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6IE1pY3Jvc29mdDxicj5EZWZ5IGFsbCBjaGFs
+bGVuZ2VzLiBNaWNyb3NvZnQoUikgVmlzdWFsIFN0dWRpbyAyMDA1Ljxicj48YSBocmVmPSJodHRw
+Oi8vY2xrLmF0ZG10LmNvbS9NUlQvZ28vdnNlMDEyMDAwMDA3MG1ydC9kaXJlY3QvMDEvIiB0YXJn
+ZXQ9Il9ibGFuayI+aHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBtcnQv
+ZGlyZWN0LzAxLwo8L2E+PGJyPl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fPGJyPkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdDxicj48YSBocmVmPSJtYWlsdG86
+Qmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Ij5CbHVlei11c2Vyc0BsaXN0cy5zb3Vy
+Y2Vmb3JnZS5uZXQ8L2E+PGJyPjxhIGhyZWY9Imh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0
+L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzIiB0YXJnZXQ9Il9ibGFuayI+Cmh0dHBzOi8vbGlz
+dHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzPC9hPjxicj48L2Js
+b2NrcXVvdGU+PC9kaXY+PGJyPjxiciBjbGVhcj0iYWxsIj48YnI+LS0gPGJyPnZvdXMgcG91dmV6
+IGNvbnN1bHRlciBtb24gY2FsZW5kcmllciDDoCBsJiMzOTthZHJlc3NlIHN1aXZhbnRlIDo8YnI+
+PGEgaHJlZj0iaHR0cDovL3d3dy5nb29nbGUuY29tL2NhbGVuZGFyL2VtYmVkP3NyYz10cnRmN2Q2
+cG1oY21ucXJ1ZWZhcGs5MnZrcyU0MGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20iPgpodHRwOi8v
+d3d3Lmdvb2dsZS5jb20vY2FsZW5kYXIvZW1iZWQ/c3JjPXRydGY3ZDZwbWhjbW5xcnVlZmFwazky
+dmtzJTQwZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbTwvYT4K
+------=_Part_6002_32579591.1198870968040--
+
+
+--===============0335587092==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============0335587092==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0335587092==--
