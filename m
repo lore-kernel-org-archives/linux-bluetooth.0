@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 30 Dec 2007 21:34:40 +0000 (GMT)
-From: Chris Rankin <rankincj@yahoo.com>
+From: Timothy Livingston <tim@livingstonautomation.com>
 To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Message-ID: <123485.22659.qm@web52907.mail.re2.yahoo.com>
-Subject: [Bluez-users] Bluetooth headset failing with lib/utils 3.24 and
-	bluez-gnome 0.15
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Sun, 30 Dec 2007 14:58:33 -0500
+Message-Id: <1199044713.6648.4.camel@acer>
+Mime-Version: 1.0
+Subject: [Bluez-users] RFCOMM connection to a cell phone
+Reply-To: tim@livingstonautomation.com,
+	BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,87 +19,133 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+I am interested in tinkering with my bluetooth devices. I have been
+reading the specs for the different profiles. It is my understanding
+that I should be able to make an rfcomm connection to my cellphone and
+issue AT commands. 
 
-I have a bluetooth headset that used to work fine with bluez-gnome 0.6 and libs/utils 3.16, but it
-is now suddenly silent. I have patched my 2.6.23.11 kernel with the updated bluetooth drivers, and
-the message log is now giving me the following:
+The first time the connect command is issued, the phone and computer
+prompt for the key, and they both report that they paired successfully.
 
-Dec 30 21:17:14 volcano kernel: Bluetooth: HCI USB driver ver 2.9
-Dec 30 21:17:14 volcano hcid[2053]: HCI dev 0 registered
-Dec 30 21:17:14 volcano kernel: usbcore: registered new interface driver hci_usb
-Dec 30 21:17:14 volcano hcid[2053]: HCI dev 0 up
-Dec 30 21:17:14 volcano hcid[2053]: Device hci0 has been added
-Dec 30 21:17:14 volcano hcid[2053]: Starting security manager 0
-Dec 30 21:17:14 volcano hcid[2053]: Device hci0 has been activated
-Dec 30 21:17:41 volcano hcid[2053]: link_key_request (sba=00:0A:3A:7D:FF:80,
-dba=00:19:7F:30:F8:9E)
-Dec 30 21:17:41 volcano hcid[2053]: pin_code_request (sba=00:0A:3A:7D:FF:80,
-dba=00:19:7F:30:F8:9E)
-Dec 30 21:17:55 volcano hcid[2053]: link_key_notify (sba=00:0A:3A:7D:FF:80, dba=00:19:7F:30:F8:9E)
-Dec 30 21:17:56 volcano hcid[2053]: link_key_notify (sba=00:0A:3A:7D:FF:80, dba=00:19:7F:30:F8:9E)
-Dec 30 21:18:30 volcano audio[2076]: Audio API: received BT_GETCAPABILITIES_REQ
-Dec 30 21:18:30 volcano audio[2076]: Audio API: sending BT_GETCAPABILITIES_RSP
-Dec 30 21:18:30 volcano audio[2076]: Audio API: received BT_SETCONFIGURATION_REQ
-Dec 30 21:18:30 volcano kernel: Bluetooth: SCO (Voice Link) ver 0.5
-Dec 30 21:18:30 volcano kernel: Bluetooth: SCO socket layer initialized
-Dec 30 21:19:10 volcano audio[2076]: connect(): Connection timed out (110)
-Dec 30 21:19:10 volcano audio[2076]: config failed
-Dec 30 21:19:10 volcano audio[2076]: Audio API: sending BT_SETCONFIGURATION_RSP
-Dec 30 21:19:16 volcano audio[2076]: Audio API: received BT_GETCAPABILITIES_REQ
-Dec 30 21:19:16 volcano audio[2076]: Audio API: sending BT_GETCAPABILITIES_RSP
-Dec 30 21:19:17 volcano audio[2076]: Audio API: received BT_SETCONFIGURATION_REQ
-Dec 30 21:19:57 volcano audio[2076]: connect(): Connection timed out (110)
-Dec 30 21:19:57 volcano audio[2076]: config failed
-Dec 30 21:19:57 volcano audio[2076]: Audio API: sending BT_SETCONFIGURATION_RSP
-
-The aplay application is giving me the following:
-
-ALSA lib pcm_bluetooth.c:458:(bluetooth_hsp_hw_params) BT_SETCONFIGURATION failed : Input/output
-error(5)
-aplay: set_params:962: Unable to install hw params:
-ACCESS:  RW_INTERLEAVED
-FORMAT:  S16_LE
-SUBFORMAT:  STD
-SAMPLE_BITS: 16
-FRAME_BITS: 16
-CHANNELS: 1
-RATE: 44100
-PERIOD_TIME: 125000
-PERIOD_SIZE: (5512 5513)
-PERIOD_BYTES: (11024 11026)
-PERIODS: (3 5)
-BUFFER_TIME: 500000
-BUFFER_SIZE: 22050
-BUFFER_BYTES: 44100
-TICK_TIME: 0
-
-Ironically, I was actually getting sound out of this same headset on another machine running
-vanilla 2.6.23 with utils/libs 3.20 and bluez-gnome 0.14. However, I had previously paired the
-headset with that machine while it was running Fedora 7 before upgrading it to Fedora 8. Deleting
-that bonding and trying to re-pair it has rendered that machine as useless as this one, so I am
-suspecting that pairing is broken somehow. Is there any way to test the connection between my
-headset and adapter, please?
-
-I already have:
-
-# hcitool con
-Connections:
-        < eSCO 00:19:7F:30:F8:9E handle 0 state 9 lm SLAVE 
-        > ACL 00:19:7F:30:F8:9E handle 11 state 1 lm SLAVE AUTH ENCRYPT SECURE
-
-but aplay should give me some noise. Is the "connect(): Connection timed out (110)" message from
-the log referring to the bluetooth link to the headset?
-
-Thanks for any help diagnosing this,
-Cheers,
-Chris
+However, when using the command "rfcomm connect 0  00:1C:62:3A:7D:69 1"
+I get "Can't connect RFCOMM socket: Connection refused".
 
 
+HCIDump:Results of "sudo hcidump -a"
+
+HCI sniffer - Bluetooth packet analyzer ver 1.39
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+  i } : b . . . . . . . . . 
+> HCI Event: Command Status (0x0f) plen 4
+  . . . . 
+> HCI Event: Role Change (0x12) plen 8
+  . i } : b . . . 
+> HCI Event: Link Key Request (0x17) plen 6
+  i } : b . . 
+< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+  i } : b . . . . . . . . H . F . O ` . . 
+  . . 
+> HCI Event: Command Complete (0x0e) plen 10
+  . . . . i } : b . . 
+> HCI Event: Connect Complete (0x03) plen 11
+  . . . i } : b . . . . 
+< ACL data: handle 11 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x0040
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+  . . 
+> HCI Event: Command Status (0x0f) plen 4
+  . . . . 
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+  . . . . 
+> HCI Event: Read Remote Supported Features (0x0b) plen 11
+  . . . . . . . . . . . 
+> HCI Event: Command Complete (0x0e) plen 6
+  . . . . . . 
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+  i } : b . . . . . . 
+> HCI Event: Max Slots Change (0x1b) plen 3
+  . . . 
+> HCI Event: Command Status (0x0f) plen 4
+  . . . . 
+> ACL data: handle 11 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x015c scid 0x0040 result 0 status 0
+      Connection successful
+< ACL data: handle 11 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x015c flags 0x00 clen 4
+      MTU 1013 
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+  . i } : b . . T i m s   L G   V X 8 3 0 
+  0 . . . . . . . . . . . . . . . . . . . 
+  . . . . . . . . . . . . . . . . . . . . 
+  . . . . . . . . . . . . . . . . . . . . 
+  . . . . . . . . . . . . . . . . . . . . 
+  . . . . . . . . . . . . . . . . . . . . 
+  . . . . . . . . . . . . . . . . . . . . 
+  . . . . . . . . . . . . . . . . . . . . 
+  . . . . . . . . . . . . . . . . . . . . 
+  . . . . . . . . . . . . . . . . . . . . 
+  . . . . . . . . . . . . . . . . . . . . 
+  . . . . . . . . . . . . . . . . . . . . 
+  . . . . . . . . . . . . . . . 
+> ACL data: handle 11 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+> ACL data: handle 11 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
+< ACL data: handle 11 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x015c flags 0x00 result 0 clen 4
+      Success
+      MTU 672 
+< ACL data: handle 11 flags 0x02 dlen 8
+    L2CAP(d): cid 0x015c len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c 
+> HCI Event: Number of Completed Packets (0x13) plen 5
+  . . . . . 
+> ACL data: handle 11 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7 
+< ACL data: handle 11 flags 0x02 dlen 18
+    L2CAP(d): cid 0x015c len 14 [psm 3]
+      RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+      dlci 2 frame_type 0 credit_flow 15 pri 7 ack_timer 0
+      frame_size 667 max_retrans 0 credits 7
+> ACL data: handle 11 flags 0x02 dlen 18
+    L2CAP(d): cid 0x0040 len 14 [psm 3]
+      RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+      dlci 2 frame_type 0 credit_flow 14 pri 7 ack_timer 0
+      frame_size 666 max_retrans 0 credits 3
+< ACL data: handle 11 flags 0x02 dlen 8
+    L2CAP(d): cid 0x015c len 4 [psm 3]
+      RFCOMM(s): SABM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x59 
+> ACL data: handle 11 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): DM: cr 1 dlci 2 pf 1 ilen 0 fcs 0x73 
+< ACL data: handle 11 flags 0x02 dlen 8
+    L2CAP(d): cid 0x015c len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd 
+< ACL data: handle 11 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x015c scid 0x0040
+> HCI Event: Number of Completed Packets (0x13) plen 5
+  . . . . . 
+> ACL data: handle 11 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7 
+> ACL data: handle 11 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x015c scid 0x0040
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+  . . . 
+> HCI Event: Command Status (0x0f) plen 4
+  . . . . 
+> HCI Event: Disconn Complete (0x05) plen 4
+  . . . . 
 
 
-      ___________________________________________________________
-Support the World Aids Awareness campaign this month with Yahoo! For Good http://uk.promotions.yahoo.com/forgood/
+Any help or suggestions are appreciated!
+
+Thanks!
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
