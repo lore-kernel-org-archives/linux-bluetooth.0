@@ -1,36 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <a8e1da0801011700q72f63ce1wf2a224900b459b37@mail.gmail.com>
-Date: Wed, 2 Jan 2008 09:00:39 +0800
-From: "Dave Young" <hidave.darkstar@gmail.com>
-To: "David Miller" <davem@davemloft.net>
-Subject: Re: [BUG][PATCH] bluetooth: put_device before device_del fix
-Cc: marcel@holtmann.org, akpm@linux-foundation.org, greg@kroah.com,
-	linux-kernel@vger.kernel.org, bluez-devel@lists.sourceforge.net
-In-Reply-To: <20071229.191855.100656438.davem@davemloft.net>
+Message-ID: <683a0f200712311200u51618ba1k968b46478691f1ae@mail.gmail.com>
+Date: Tue, 1 Jan 2008 01:30:53 +0530
+From: "Dinesh Uthayakumar" <udinesh5@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
+Subject: [Bluez-devel] Scatternet Solution
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============1351305615=="
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
+
+--===============1351305615==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_1031_13060690.1199131253627"
+
+------=_Part_1031_13060690.1199131253627
 Content-Type: text/plain; charset=ISO-8859-1
-References: <20071227052750.GA6296@darkstar.te-china.tietoenator.com>
-	 <20071229.191855.100656438.davem@davemloft.net>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-On Dec 30, 2007 11:18 AM, David Miller <davem@davemloft.net> wrote:
-> From: Dave Young <hidave.darkstar@gmail.com>
-> Date: Thu, 27 Dec 2007 13:27:50 +0800
->
-> > Because of workqueue delay, the put_device could be called before device_del, so move it to del_conn.
-> >
-> > Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
->
-> Applied, thanks Dave.
->
-> Please post bluetooth patches, just like any other networking patches,
-> to netdev@vger.kernel.org (CC:'ing me) so that other networking
-> developers can process them during times like these when most
-> maintainers aren't around and thus not looking at bug fixes like
-> your's.
->
+Hello !
 
-Ok, thanks for pointing out, I didn't know this before.
+I want to know if there is any open source scatternet
+solutions/implementation ?
 
-Regards
-dave
+
+Dinesh
+
+------=_Part_1031_13060690.1199131253627
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hello !<br><br>I want to know if there is any open source scatternet<br>solutions/implementation ?<br><br><br>Dinesh<br>
+
+------=_Part_1031_13060690.1199131253627--
+
+
+--===============1351305615==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============1351305615==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1351305615==--
