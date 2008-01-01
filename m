@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300801012103l48e26e3ax379e391055e31e72@mail.gmail.com>
-Date: Tue, 1 Jan 2008 22:03:16 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200801012109.19744.lists@spudulike.me.uk>
+Message-ID: <477AC130.500@boerkel.de>
+Date: Tue, 01 Jan 2008 23:39:44 +0100
+From: =?ISO-8859-1?Q?Thomas_B=F6rkel?= <thomas@boerkel.de>
 MIME-Version: 1.0
-References: <200801012109.19744.lists@spudulike.me.uk>
-Subject: Re: [Bluez-users] Stereo audio headset - half a second of audio,
-	8 seconds of silence, then disconnection.
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <477AA678.4000707@boerkel.de> <477AA8D9.9080804@boerkel.de>
+In-Reply-To: <477AA8D9.9080804@boerkel.de>
+Subject: Re: [Bluez-users] Trouble with Tecom BT3030 - not recognized
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,28 +20,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Colin
+HI!
 
-> On hitting the 'play' button there is a 2 second delay before XMMS begins to
-> play, and the Graphic EQ bars start to dance.  Half a second, or so, of audio
-> can be heard from the headphones, after which they go silent
+I think, I am a small step further.
 
-this could be the scatternet problem we've been working over.
+I guess, the working Anycom USB-250 device has a firmware onboard, where
+as the Tecom BT3030 needs the firmware to be loaded when plugging it in
+and this is what not works.
 
-what does
- hcitool con
-show during the audio playing?
+I have firmware loading support in the kernel (standard Gentoo 2.6.23
+kernel) active and it works for an ivtv video capture card.
 
-what other bluetooth devices are you using?
-is the headset trying to connect to a phone at the same time?
-do you know which bluetooth adapter your pc uses?
+So I tried manually uploading the firmware to the dongle like this:
+/etc/init.d/bluetooth stop
+bluefw usb 004/003;/etc/init.d/bluetooth start
 
-if you have "master" in hcid.conf's lm setting and you take "rswitch"
-out of the lp setting, you are making the pc prefer to be master and
-to hopefully behave better.
+This worked one time and hciconfig showed the device (so it is not wrecked).
 
--- 
-Brad
+But now this gives me:
+bluefw[13626]: Loading firmware to usb device 0a5c:2033
+bluefw[13626]: Can't claim interface 0. Device or resource busy (16)
+
+Anyway, normally hotplug should load the firmware into the device. I did
+not have the hotplug package installed but now I have and it makes no
+difference.
+
+Any ideas?
+
+Thanks!
+
+Thomas
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
