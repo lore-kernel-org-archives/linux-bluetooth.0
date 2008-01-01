@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <477AC130.500@boerkel.de>
-Date: Tue, 01 Jan 2008 23:39:44 +0100
-From: =?ISO-8859-1?Q?Thomas_B=F6rkel?= <thomas@boerkel.de>
-MIME-Version: 1.0
+From: Colin Murphy <lists@spudulike.me.uk>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <477AA678.4000707@boerkel.de> <477AA8D9.9080804@boerkel.de>
-In-Reply-To: <477AA8D9.9080804@boerkel.de>
-Subject: Re: [Bluez-users] Trouble with Tecom BT3030 - not recognized
+Date: Tue, 1 Jan 2008 21:09:19 +0000
+MIME-Version: 1.0
+Message-Id: <200801012109.19744.lists@spudulike.me.uk>
+Subject: [Bluez-users] Stereo audio headset - half a second of audio,
+	8 seconds of silence, then disconnection.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,38 +19,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-HI!
+I have XMMS set up to play alsa audio through bluetooth.  This is what happens 
+when I try to play some audio.  
 
-I think, I am a small step further.
+On hitting the 'play' button there is a 2 second delay before XMMS begins to 
+play, and the Graphic EQ bars start to dance.  Half a second, or so, of audio 
+can be heard from the headphones, after which they go silent, even though the 
+Graphic EQ bars continue to dance for another 8 seconds.  After the bars have 
+stopped dancing I get a message that the bluetooth connection has been 
+dropped. 
 
-I guess, the working Anycom USB-250 device has a firmware onboard, where
-as the Tecom BT3030 needs the firmware to be loaded when plugging it in
-and this is what not works.
+There's another glimpse from my /var/log/syslog file hiding at 
+http://pastebin.ubuntu.com/3181/
 
-I have firmware loading support in the kernel (standard Gentoo 2.6.23
-kernel) active and it works for an ivtv video capture card.
+Is this an alsa or bluetooth problem?   Because the GEq bars continue to dance 
+it makes me think something must be getting through to XMMS, but it might 
+also be considered correct for the bluetooth connection to be dropped 
+automatically after 8 seconds of silence, I don't know.  I also don't know 
+how to find the solution.  Any help much appreciated, especially advice on 
+where else, log files, etc, to look.
 
-So I tried manually uploading the firmware to the dongle like this:
-/etc/init.d/bluetooth stop
-bluefw usb 004/003;/etc/init.d/bluetooth start
-
-This worked one time and hciconfig showed the device (so it is not wrecked).
-
-But now this gives me:
-bluefw[13626]: Loading firmware to usb device 0a5c:2033
-bluefw[13626]: Can't claim interface 0. Device or resource busy (16)
-
-Anyway, normally hotplug should load the firmware into the device. I did
-not have the hotplug package installed but now I have and it makes no
-difference.
-
-Any ideas?
-
-Thanks!
-
-Thomas
-
-
+-- 
+Colin@spudulike.me.uk
+Gotta' go, things to be, people to do, stuff to, err, stuff.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
