@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 Jan 2008 15:48:08 +0100
-From: Gabor Gombas <gombasg@sztaki.hu>
-To: Dave Young <hidave.darkstar@gmail.com>
-Message-ID: <20080102144807.GA809@boogie.lpds.sztaki.hu>
-References: <20071228173203.GA20690@boogie.lpds.sztaki.hu>
-	<a8e1da0712290007o168a730cw923055ad2c265d84@mail.gmail.com>
+Message-ID: <992535570801012318m4cb67e35ke0c95e60ad85b496@mail.gmail.com>
+Date: Wed, 2 Jan 2008 07:18:13 +0000
+From: "Alex Tanner" <lxtanner@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-In-Reply-To: <a8e1da0712290007o168a730cw923055ad2c265d84@mail.gmail.com>
-Cc: linux-kernel@vger.kernel.org, bluez-devel@lists.sf.net
-Subject: Re: [Bluez-devel] Oops involving RFCOMM and sysfs
+Subject: [Bluez-devel] Bug: "SCO packet for unknown connection handle X"
+	errors unnecessarily flood syslog/dmesg when certain BT
+	adapters are used
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,21 +20,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sat, Dec 29, 2007 at 04:07:04PM +0800, Dave Young wrote:
-
-> Please try the -mm tree kernel, might have been fixed by :
-> http://lkml.org/lkml/2007/11/18/141
-
-I've applied the patch on top of 2.6.24-rc6 (I don't want to run -mm
-kernels on this machine). We'll see what happens.
-
-Gabor
-
--- 
-     ---------------------------------------------------------
-     MTA SZTAKI Computer and Automation Research Institute
-                Hungarian Academy of Sciences
-     ---------------------------------------------------------
+IMO, I think checking for the above named error is in itself an error
+if done outside a debug context. Perhaps the Connection Handle "error"
+could be checked for just ONCE (upon insertion of "offending"
+hardware) rather than 100's of times a second? The effect on hardware
+seems to be so minimal that there is no justification for checking the
+situation that many times. Much more information on this issue can be
+found at <http://bugs.launchpad.net/ubuntu/+source/linux-source-2.6.15/+bug/39414>
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
