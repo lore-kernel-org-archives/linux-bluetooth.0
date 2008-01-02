@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <359782e70801012108o2cf527e3kf858e316e292dc05@mail.gmail.com>
-Date: Wed, 2 Jan 2008 13:08:40 +0800
-From: "bsd user" <oldmoonster@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <d89ddf300801012103l48e26e3ax379e391055e31e72@mail.gmail.com>
+Date: Tue, 1 Jan 2008 22:03:16 -0700
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <200801012109.19744.lists@spudulike.me.uk>
 MIME-Version: 1.0
-Subject: [Bluez-users] slave - slave talk in a piconet
+References: <200801012109.19744.lists@spudulike.me.uk>
+Subject: Re: [Bluez-users] Stereo audio headset - half a second of audio,
+	8 seconds of silence, then disconnection.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,54 +17,38 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0826345162=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0826345162==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_20718_14328511.1199250520098"
+Colin
 
-------=_Part_20718_14328511.1199250520098
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> On hitting the 'play' button there is a 2 second delay before XMMS begins to
+> play, and the Graphic EQ bars start to dance.  Half a second, or so, of audio
+> can be heard from the headphones, after which they go silent
 
-Hi, I have a question:
-If there is a piconet that has 2 slave B,C, the master is A. Does B know the
-existence of C? can B talk to C directly without A(master)'s intervention?
+this could be the scatternet problem we've been working over.
 
-Thanks a lot.
+what does
+ hcitool con
+show during the audio playing?
 
-------=_Part_20718_14328511.1199250520098
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+what other bluetooth devices are you using?
+is the headset trying to connect to a phone at the same time?
+do you know which bluetooth adapter your pc uses?
 
-Hi, I have a question:<br>If there is a piconet that has 2 slave B,C, the master is A. Does B know the existence of C? can B talk to C directly without A(master)&#39;s intervention?<br><br>Thanks a lot. <br>
+if you have "master" in hcid.conf's lm setting and you take "rswitch"
+out of the lp setting, you are making the pc prefer to be master and
+to hopefully behave better.
 
-------=_Part_20718_14328511.1199250520098--
-
-
---===============0826345162==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============0826345162==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0826345162==--
