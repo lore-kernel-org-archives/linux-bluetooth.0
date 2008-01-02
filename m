@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Jan 2008 09:05:42 +0800
-From: Dave Young <hidave.darkstar@gmail.com>
-To: Gabor Gombas <gombasg@sztaki.hu>
-Message-ID: <20080104010542.GA2860@darkstar.te-china.tietoenator.com>
+Date: Wed, 2 Jan 2008 15:48:08 +0100
+From: Gabor Gombas <gombasg@sztaki.hu>
+To: Dave Young <hidave.darkstar@gmail.com>
+Message-ID: <20080102144807.GA809@boogie.lpds.sztaki.hu>
 References: <20071228173203.GA20690@boogie.lpds.sztaki.hu>
 	<a8e1da0712290007o168a730cw923055ad2c265d84@mail.gmail.com>
-	<20080102151642.GA7273@boogie.lpds.sztaki.hu>
-	<20080103131620.GA16307@boogie.lpds.sztaki.hu>
 MIME-Version: 1.0
-In-Reply-To: <20080103131620.GA16307@boogie.lpds.sztaki.hu>
+In-Reply-To: <a8e1da0712290007o168a730cw923055ad2c265d84@mail.gmail.com>
 Cc: linux-kernel@vger.kernel.org, bluez-devel@lists.sf.net
 Subject: Re: [Bluez-devel] Oops involving RFCOMM and sysfs
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -24,32 +22,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Thu, Jan 03, 2008 at 02:16:21PM +0100, Gabor Gombas wrote:
-> On Wed, Jan 02, 2008 at 04:16:42PM +0100, Gabor Gombas wrote:
-> 
-> > So the patch referenced above does not help. But I've found a very easy
-> > way to trigger the bug:
-> > 
-> > - do a "cat /dev/zero > /dev/rfcomm0"
-> > - switch the phone off
-> > - switch the phone on, and the kernel oopses
-> 
-> FYI I also remember having oopses with 2.6.22.<something> but I do not
-> have those logs anymore. Also I now booted 2.6.20.7 and it did not oops.
+On Sat, Dec 29, 2007 at 04:07:04PM +0800, Dave Young wrote:
 
-Could you try the patch (on 2.6.24-rc6) following and check the debug messages? 
+> Please try the -mm tree kernel, might have been fixed by :
+> http://lkml.org/lkml/2007/11/18/141
 
-diff -upr linux/net/bluetooth/rfcomm/tty.c linux.new/net/bluetooth/rfcomm/tty.c
---- linux/net/bluetooth/rfcomm/tty.c	2008-01-04 08:58:48.000000000 +0800
-+++ linux.new/net/bluetooth/rfcomm/tty.c	2008-01-04 09:01:01.000000000 +0800
-@@ -313,6 +313,7 @@ static void rfcomm_dev_del(struct rfcomm
- {
- 	BT_DBG("dev %p", dev);
- 
-+	dump_stack();
- 	set_bit(RFCOMM_TTY_RELEASED, &dev->flags);
- 	rfcomm_dev_put(dev);
- }
+I've applied the patch on top of 2.6.24-rc6 (I don't want to run -mm
+kernels on this machine). We'll see what happens.
+
+Gabor
+
+-- 
+     ---------------------------------------------------------
+     MTA SZTAKI Computer and Automation Research Institute
+                Hungarian Academy of Sciences
+     ---------------------------------------------------------
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
