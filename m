@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <b3bfcaed0801031150r58334972s9cd6a4fa54dbe5a9@mail.gmail.com>
-Date: Thu, 3 Jan 2008 19:50:34 +0000
-From: "=?KOI8-R?B?88XSx8XKIO3BzM/eyc7Ty8nK?=" <sergey.malochinskiy@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <541230EF1AD0482CBD0D62ABB835388C@iMe>
+From: "Eng. Waleed Al-Rashoud" <iwaleed@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Date: Thu, 3 Jan 2008 20:40:23 +0300
 MIME-Version: 1.0
-Subject: [Bluez-users] Please help...
+Subject: [Bluez-users] Rssi always 0x00
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,69 +14,77 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1271156669=="
+Content-Type: multipart/mixed; boundary="===============0620068041=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1271156669==
+This is a multi-part message in MIME format.
+
+--===============0620068041==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_34612_29309249.1199389834808"
+	boundary="----=_NextPart_000_0024_01C84E48.DD10B290"
 
-------=_Part_34612_29309249.1199389834808
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+This is a multi-part message in MIME format.
 
-Hello.
+------=_NextPart_000_0024_01C84E48.DD10B290
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-I need help.
+Hello all..
+I know this is a BlueZ list.. but=20
+a friend of mine asked me about a Bluetooth problem in a different stack =
+he is developing.. his question was:
+Why RSSI returns 0x00 all the time?=20
+- Setting inquiry mode to include rssi
+- the Bluetooth adapter returns INQUIRY_RESULT_WITH_RSSI but rssi value =
+is always 0x00..
 
-I try connect my HeadSet BT25E to my laptop.
+ he used 3 different Bluetooth adapter from different manufacturers and =
+they all return the same thing.. 0x00 ..!
 
-I configure kernel bluetooth modules for my dongle.
+Thanks..!
 
-With mobile phone it`s work fine.
+------=_NextPart_000_0024_01C84E48.DD10B290
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-bluez-utils-3.24
-When I start script headset.py from you Wiki in /var/log/messages:
-Jan  3 22:45:48 sangrebook audio[21937]: Bluetooth Audio daemon
-Jan  3 22:45:48 sangrebook audio[21937]: /etc/bluetooth/audio.conf: Key file
-does not have key 'Enable'
-Jan  3 22:45:48 sangrebook audio[21937]: /etc/bluetooth/audio.conf: Key file
-does not have key 'Disable'
-Jan  3 22:45:48 sangrebook audio[21937]: /etc/bluetooth/audio.conf: Key file
-does not have group 'A2DP'
-Jan  3 22:45:48 sangrebook audio[21937]: Config options: DisableHFP=true,
-SCORouting=HCI, SourceCount=1
-Jan  3 22:45:48 sangrebook audio[21937]: Unix socket created: 5
-Jan  3 22:45:48 sangrebook audio[21937]: server socket: Protocol not
-supported (93)
-Jan  3 22:45:48 sangrebook audio[21937]: Unregistered manager path
-Jan  3 22:45:48 sangrebook audio[21937]: Audio init failed!
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type =
+content=3Dtext/html;charset=3Diso-8859-1>
+<META content=3D"MSHTML 6.00.6000.16587" name=3DGENERATOR></HEAD>
+<BODY id=3DMailContainerBody=20
+style=3D"PADDING-RIGHT: 10px; PADDING-LEFT: 10px; PADDING-TOP: 15px"=20
+bgColor=3D#ffffff leftMargin=3D0 topMargin=3D0 CanvasTabStop=3D"true"=20
+name=3D"Compose message area">
+<DIV><FONT face=3DArial size=3D2>Hello all..</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>I know this is&nbsp;a BlueZ list.. but=20
+</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>a friend of mine asked me about a =
+Bluetooth problem=20
+in a different stack he is developing.. his question was:</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>Why RSSI returns 0x00 all the time? =
+</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>- Setting inquiry mode to include =
+rssi</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>- the Bluetooth adapter returns=20
+INQUIRY_RESULT_WITH_RSSI but rssi value is always 0x00..</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>&nbsp;he used 3 different Bluetooth =
+adapter from=20
+different manufacturers and they all return the same thing.. 0x00=20
+..!</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Thanks..!</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV></BODY></HTML>
 
-What is it? Where I can read about this error?
-
-Please sorry. My English very bad.
-
----
-Sergey
-
-------=_Part_34612_29309249.1199389834808
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hello.<br><br>I need help.<br><br>I try connect my HeadSet BT25E to my laptop.<br><br>I configure kernel bluetooth modules for my dongle.<br><br>With mobile phone it`s work fine.<br><br>bluez-utils-3.24<br>When I start script 
-headset.py from you Wiki in /var/log/messages:<br>Jan&nbsp; 3 22:45:48 sangrebook audio[21937]: Bluetooth Audio daemon<br>Jan&nbsp; 3 22:45:48 sangrebook audio[21937]: /etc/bluetooth/audio.conf: Key file does not have key &#39;Enable&#39;
-<br>Jan&nbsp; 3 22:45:48 sangrebook audio[21937]: /etc/bluetooth/audio.conf: Key file does not have key &#39;Disable&#39;<br>Jan&nbsp; 3 22:45:48 sangrebook audio[21937]: /etc/bluetooth/audio.conf: Key file does not have group &#39;A2DP&#39;
-<br>Jan&nbsp; 3 22:45:48 sangrebook audio[21937]: Config options: DisableHFP=true, SCORouting=HCI, SourceCount=1<br>Jan&nbsp; 3 22:45:48 sangrebook audio[21937]: Unix socket created: 5<br>Jan&nbsp; 3 22:45:48 sangrebook audio[21937]: server socket: Protocol not supported (93)
-<br>Jan&nbsp; 3 22:45:48 sangrebook audio[21937]: Unregistered manager path<br>Jan&nbsp; 3 22:45:48 sangrebook audio[21937]: Audio init failed!<br><br>What is it? Where I can read about this error?<br><br>Please sorry. My English very bad.
-<br><br>---<br>Sergey<br><br>
-
-------=_Part_34612_29309249.1199389834808--
+------=_NextPart_000_0024_01C84E48.DD10B290--
 
 
---===============1271156669==
+
+--===============0620068041==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -86,7 +94,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1271156669==
+--===============0620068041==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -97,4 +105,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1271156669==--
+--===============0620068041==--
