@@ -1,15 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300801022052i2fb09d53m203f5946455d406a@mail.gmail.com>
-Date: Wed, 2 Jan 2008 21:52:07 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <loom.20080103T040638-726@post.gmane.org>
-MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+From: paul Rushworth <paul@rushworth.co.nz>
+Date: Thu, 3 Jan 2008 04:06:55 +0000 (UTC)
+Message-ID: <loom.20080103T040638-726@post.gmane.org>
 References: <200801012109.19744.lists@spudulike.me.uk>
 	<d89ddf300801012103l48e26e3ax379e391055e31e72@mail.gmail.com>
-	<loom.20080103T040638-726@post.gmane.org>
-Subject: Re: [Bluez-users] Stereo audio headset - half a second of audio,
-	8 seconds of silence, then disconnection.
+Mime-Version: 1.0
+Subject: Re: [Bluez-users]
+	=?utf-8?q?Stereo_audio_headset_-_half_a_second_of_a?=
+	=?utf-8?q?udio=2C=098_seconds_of_silence=2C_then_disconnection=2E?=
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,21 +22,58 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Paul
+Brad Midgley <bmidgley <at> gmail.com> writes:
 
-> absolutely fine for around 2-3 minutes and then audio stops working (does seem
-> slightly random, but always within 2-3 minutes.)
+> 
+> Colin
+> 
+> > On hitting the 'play' button there is a 2 second delay before XMMS begins to
+> > play, and the Graphic EQ bars start to dance.  Half a second, or so, of audio
+> > can be heard from the headphones, after which they go silent
+> 
+> this could be the scatternet problem we've been working over.
+> 
+> what does
+>  hcitool con
+> show during the audio playing?
+> 
+> what other bluetooth devices are you using?
+> is the headset trying to connect to a phone at the same time?
+> do you know which bluetooth adapter your pc uses?
+> 
+> if you have "master" in hcid.conf's lm setting and you take "rswitch"
+> out of the lp setting, you are making the pc prefer to be master and
+> to hopefully behave better.
+> 
 
-likely this is a different problem. Does the gstreamer plugin route do
-the same thing? iirc:
+I have a similar problem. I'm using Creative CB2530 headphones, and they work
+absolutely fine for around 2-3 minutes and then audio stops working (does seem
+slightly random, but always within 2-3 minutes.) This is with an audio sink
+setup, my headphones connect automatically and work with all applications.
 
-gst-launch filesrc location=song.mp3 ! mad ! audioconvert ! sbcenc !
-a2dpsink device=00:12:0E:09:CF:9E
+I saw your tips above about changing the settings in hcid.conf, which i have
+done, and it has made no difference.
 
-with a few different mp3s for good measure.
+I'm seeing this in the syslog:
 
--- 
-Brad
+15:27:17  audio[5742]: stream state changed: OPEN -> STREAMING (starts working)
+Then suddenly it stops:
+15:30:16  audio[5742]: session_cb
+15:30:16  audio[5742]: Received CLOSE_CMD
+15:30:16  audio[5742]: SBC Source: Close_Ind
+15:30:16  audio[5742]: stream state changed: STREAMING -> CLOSING
+15:30:16  audio[5742]: stream state changed: CLOSING -> IDLE
+15:30:16  audio[5742]: avdtp_unref(0x806b598): ref=2
+15:30:16  audio[5742]: SBC Source SEP 0x80694b8 unlocked
+15:30:16  audio[5742]: avdtp_unref(0x806b598): ref=1
+15:30:16  audio[5742]: session_cb
+15:30:16  audio[5742]: Disconnected from 00:12:0E:09:CF:9E
+
+If i run ~$ hcitool con before it fails:
+Connections:
+        < ACL 00:12:0E:09:CF:9E handle 41 state 1 lm MASTER 
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
