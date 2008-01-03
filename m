@@ -1,10 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <477C6D10.2040003@cs.wisc.edu>
-Date: Wed, 02 Jan 2008 23:05:20 -0600
-From: Ben Liblit <liblit@cs.wisc.edu>
+Message-ID: <d89ddf300801022052i2fb09d53m203f5946455d406a@mail.gmail.com>
+Date: Wed, 2 Jan 2008 21:52:07 -0700
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <loom.20080103T040638-726@post.gmane.org>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] enabling/disabling in response to ThinkPad hotkey
+References: <200801012109.19744.lists@spudulike.me.uk>
+	<d89ddf300801012103l48e26e3ax379e391055e31e72@mail.gmail.com>
+	<loom.20080103T040638-726@post.gmane.org>
+Subject: Re: [Bluez-users] Stereo audio headset - half a second of audio,
+	8 seconds of silence, then disconnection.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,53 +23,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-My ThinkPad X61 laptop has a special wireless networking hotkey, Fn+F5. 
-  Traditionally this has been used to enable/disable bluetooth.  That's 
-how it worked with previous ThinkPads I've owned, but on this X61, when 
-I press Fn+F5, nothing happens.
+Paul
 
-The HAL daemon running on correctly detects the key press and broadcasts 
-this on the system D-BUS:
+> absolutely fine for around 2-3 minutes and then audio stops working (does seem
+> slightly random, but always within 2-3 minutes.)
 
-     signal sender=:1.5 -> dest=(null destination)
-       path=/org/freedesktop/Hal/devices/computer;
-       interface=org.freedesktop.Hal.Device;
-       member=Condition
-         string "ButtonPressed"
-         string "wifi-power"
+likely this is a different problem. Does the gstreamer plugin route do
+the same thing? iirc:
 
-If I want Fn+F5 to toggle bluetooth, how should I hook that up?  I 
-already know how to write a small Python script that reacts to HAL 
-ButtonPressed signals.  But this script would need to run as root, since 
-normal uses cannot write to /proc/acpi/ibm/bluetooth.  (One 
-enables/disables bluetooth by echoing "enable" or "disable" into 
-/proc/acpi/ibm/bluetooth.)
+gst-launch filesrc location=song.mp3 ! mad ! audioconvert ! sbcenc !
+a2dpsink device=00:12:0E:09:CF:9E
 
-I'm loath to create new scripts running as root.  Is that really the 
-right approach here?  Or is there some other system component that 
-already ought to be listening for this signal but is either buggy or not 
-running?
+with a few different mp3s for good measure.
 
-I asked about this on the HAL mailing list, and Rui Tiago Matos replied:
-> Shouldn't bluez-utils' hcid daemon handle this?  Actually, I think
-> these kind of daemons should be autostarted by D-Bus when HAL
-> broadcasts their signal and exit gracefully when the user turns the
-> killswitch off.
-
-Do the bluez-utils developers agree?  Is this something hcid should 
-already be listening for and handling?  Should I file a bluez-utils bug 
-report requesting that it do this?  Or do you consider this to be 
-outside of hcid's domain of responsibility?
-
-Please note that my concern here is not actually the radio kill switch 
-that Rui Tiago Matos mentions.  That seems to work fine.  (The daemons 
-keep running and do not "exit gracefully", but at least the desktop 
-reacts appropriately when the radio kill switch takes bluetooth away.) 
-So the question here is the Fn+F5 wifi button, not the radio kill switch.
-
-Thanks!
-
--- Ben
+-- 
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
