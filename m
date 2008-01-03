@@ -1,14 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-From: paul Rushworth <paul@rushworth.co.nz>
-Date: Thu, 3 Jan 2008 04:06:55 +0000 (UTC)
-Message-ID: <loom.20080103T040638-726@post.gmane.org>
-References: <200801012109.19744.lists@spudulike.me.uk>
-	<d89ddf300801012103l48e26e3ax379e391055e31e72@mail.gmail.com>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users]
-	=?utf-8?q?Stereo_audio_headset_-_half_a_second_of_a?=
-	=?utf-8?q?udio=2C=098_seconds_of_silence=2C_then_disconnection=2E?=
+MIME-Version: 1.0
+Date: Thu, 3 Jan 2008 09:07:02 +0800
+Message-ID: <E21A90CDB9591542899EFC7FB4ED5CC90776A695@tfmail02.TFMAIL.COM>
+In-Reply-To: <d89ddf300801021040o28e16943t2c51ac0190bd4e91@mail.gmail.com>
+From: "guoyun" <guoyun@techfaith.cn>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] slave - slave talk in a piconet
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,68 +15,55 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1707231664=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Brad Midgley <bmidgley <at> gmail.com> writes:
+--===============1707231664==
+Content-class: urn:content-classes:message
+Content-Type: text/plain;
+	charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> Colin
-> 
-> > On hitting the 'play' button there is a 2 second delay before XMMS begins to
-> > play, and the Graphic EQ bars start to dance.  Half a second, or so, of audio
-> > can be heard from the headphones, after which they go silent
-> 
-> this could be the scatternet problem we've been working over.
-> 
-> what does
->  hcitool con
-> show during the audio playing?
-> 
-> what other bluetooth devices are you using?
-> is the headset trying to connect to a phone at the same time?
-> do you know which bluetooth adapter your pc uses?
-> 
-> if you have "master" in hcid.conf's lm setting and you take "rswitch"
-> out of the lp setting, you are making the pc prefer to be master and
-> to hopefully behave better.
-> 
+Hi, Brad
+=20
+> hey
+>=20
+> > If there is a piconet that has 2 slave B,C, the master is A. Does B=20
+> > know the existence of C? can B talk to C directly without=20
+> A(master)'s intervention?
+>=20
+> if they did talk to each other directly, one would have to be=20
+> master and you'd have a scatternet.
 
-I have a similar problem. I'm using Creative CB2530 headphones, and they work
-absolutely fine for around 2-3 minutes and then audio stops working (does seem
-slightly random, but always within 2-3 minutes.) This is with an audio sink
-setup, my headphones connect automatically and work with all applications.
+one bluetooth could be in two or more piconet, but it just can play as =
+slave _not_ master for the bluetooth clock.
 
-I saw your tips above about changing the settings in hcid.conf, which i have
-done, and it has made no difference.
+Please refer to Core SPEC. chapter 4.1. Piconet topology.
 
-I'm seeing this in the syslog:
-
-15:27:17  audio[5742]: stream state changed: OPEN -> STREAMING (starts working)
-Then suddenly it stops:
-15:30:16  audio[5742]: session_cb
-15:30:16  audio[5742]: Received CLOSE_CMD
-15:30:16  audio[5742]: SBC Source: Close_Ind
-15:30:16  audio[5742]: stream state changed: STREAMING -> CLOSING
-15:30:16  audio[5742]: stream state changed: CLOSING -> IDLE
-15:30:16  audio[5742]: avdtp_unref(0x806b598): ref=2
-15:30:16  audio[5742]: SBC Source SEP 0x80694b8 unlocked
-15:30:16  audio[5742]: avdtp_unref(0x806b598): ref=1
-15:30:16  audio[5742]: session_cb
-15:30:16  audio[5742]: Disconnected from 00:12:0E:09:CF:9E
-
-If i run ~$ hcitool con before it fails:
-Connections:
-        < ACL 00:12:0E:09:CF:9E handle 41 state 1 lm MASTER 
+BRs
+Yun
 
 
+--===============1707231664==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============1707231664==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1707231664==--
