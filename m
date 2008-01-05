@@ -1,10 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Fabio Uol" <fvazsilva@uol.com.br>
-To: <Bluez-users@lists.sourceforge.net>
-Date: Sun, 6 Jan 2008 02:05:59 -0200
-Message-ID: <2762BC7B662A4BB4BF68B77710468164@FabioVaio>
+Message-ID: <8ccc3510801051337t621fed03r1ccfeab924328a17@mail.gmail.com>
+Date: Sat, 5 Jan 2008 22:37:03 +0100
+From: "Christophe-Marie Duquesne" <chm.duquesne@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d89ddf300801051234i45d2d574s65fd7954a9cbaa82@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] Pairing using only command line
+References: <loom.20080105T181918-303@post.gmane.org>
+	<loom.20080105T191502-7@post.gmane.org>
+	<loom.20080105T192949-442@post.gmane.org>
+	<loom.20080105T195122-398@post.gmane.org>
+	<d89ddf300801051234i45d2d574s65fd7954a9cbaa82@mail.gmail.com>
+Subject: Re: [Bluez-users] Updated to bluez 3.24 from Ubuntu repo's.
+	Headphones still disconnect after 2-3 mins.
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,175 +21,94 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1955285087=="
+Content-Type: multipart/mixed; boundary="===============0343779452=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
-
---===============1955285087==
+--===============0343779452==
 Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_00DD_01C85008.B2752040"
+	boundary="----=_Part_12299_1603292.1199569023529"
 
-This is a multi-part message in MIME format.
+------=_Part_12299_1603292.1199569023529
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
 
-------=_NextPart_000_00DD_01C85008.B2752040
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+d2hlcmUgZGlkIHlvdSB1cGRhdGVkIHRvIGJsdWV6IDMuMjQ/IEkgYW0gcnVubmluZyB1YnVudHUg
+Z3V0c3kgYW5kIHRoZSBvbmx5CnZlcnNpb24gSSBnZXQgd2l0aCBzeW5hcHRpYyBpcyAzLjE5LiBJ
+IGhhZCB0byBjb21waWxlIG15IG93biB2ZXJzaW9uIHRvIGhhdmUKaXQgd29ya2luZwoKT24gSmFu
+IDUsIDIwMDggOTozNCBQTSwgQnJhZCBNaWRnbGV5IDxibWlkZ2xleUBnbWFpbC5jb20+IHdyb3Rl
+OgoKPiBQYXVsCj4KPiBJZiB5b3UnbGwgbGV0IHNvbWVvbmUgZWxzZSBnZXQgYSB3b3JkIGluLi4u
+IDopCj4KPiBZb3UnbGwgZ2V0IGEgbG90IG9mIGRhdGEsIGJ1dCBpZiB5b3UgcnVuIHRoaXMgd2hp
+bGUgcGxheWluZyBhdWRpbywKPiBuZWFyIHRoZSBlbmQgaXQgbWlnaHQgc2F5IHNvbWV0aGluZyBp
+bnRlcmVzdGluZyBhYm91dCB0aGUgZGlzY29ubmVjdDoKPgo+IHN1ZG8gaGNpZHVtcCAtWFYgPmxv
+Zwo+Cj4gYXBsYXkgZnJvbSB0aGUgY29uc29sZSBtaWdodCBwcmludCBhIGRlY2VudCBlcnJvciBt
+ZXNzYWdlLgo+Cj4gQnJhZAo+Cj4gT24gSmFuIDUsIDIwMDggMTI6NTMgUE0sIFBhdWwgUnVzaHdv
+cnRoIDxwYXVsQHJ1c2h3b3J0aC5jby5uej4gd3JvdGU6Cj4gPiBQYXVsIFJ1c2h3b3J0aCA8cGF1
+bCA8YXQ+IHJ1c2h3b3J0aC5jby5uej4gd3JpdGVzOgo+ID4gPiBQYXVsIFJ1c2h3b3J0aCA8cGF1
+bCA8YXQ+IHJ1c2h3b3J0aC5jby5uej4gd3JpdGVzOgo+ID4gPiA+IFBlcmhhcHMgdmxjIHdpdGgg
+YXVkaW8gc2luayBpcyB0aGUgY2F1c2Ugb2YgdGhlIHByb2JsZW0/Cj4KPiAtLQo+IEJyYWQKPgo+
+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0KPiBUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6IE1p
+Y3Jvc29mdAo+IERlZnkgYWxsIGNoYWxsZW5nZXMuIE1pY3Jvc29mdChSKSBWaXN1YWwgU3R1ZGlv
+IDIwMDUuCj4gaHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBtcnQvZGly
+ZWN0LzAxLwo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+Cj4gQmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0Cj4gQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9y
+Z2UubmV0Cj4gaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1
+ZXotdXNlcnMKPgoKCgotLSAKdm91cyBwb3V2ZXogY29uc3VsdGVyIG1vbiBjYWxlbmRyaWVyIMOg
+IGwnYWRyZXNzZSBzdWl2YW50ZSA6Cmh0dHA6Ly93d3cuZ29vZ2xlLmNvbS9jYWxlbmRhci9lbWJl
+ZD9zcmM9dHJ0ZjdkNnBtaGNtbnFydWVmYXBrOTJ2a3MlNDBncm91cC5jYWxlbmRhci5nb29nbGUu
+Y29tCg==
+------=_Part_12299_1603292.1199569023529
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
 
-Hello,
-
- 
-
-I have a Digital Pen which I have to pair with an embedded device running
-Debian Linux (kernel 2.4.11). I'm able to pair the pen with my desktop with
-same Linux because it's running Gnome but in the embedded device I can't
-install any graphical environment. 
-
- 
-
-In desktop linux after I scan for the pen and I call "hcitool cc
-xx:xx:xx:xx:xx" it opens in Gnome a Dialog asking for the PIN (passkey). I
-inform it and the pairing is successful. 
-
- 
-
-How can I do the same pairing without a Graphical environment ? I tried to
-inform the PIN in the /etc/bluetooth/hcid.conf but I think, as I read
-somewhere, that this pin is only used for incoming connections so it didn't
-work.
-
- 
-
-Thanks in advance,
-
-Fabio.
-
-
-------=_NextPart_000_00DD_01C85008.B2752040
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-<html xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
-xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
-xmlns:st1=3D"urn:schemas-microsoft-com:office:smarttags" =
-xmlns=3D"http://www.w3.org/TR/REC-html40">
-
-<head>
-<meta http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Dus-ascii">
-<meta name=3DGenerator content=3D"Microsoft Word 11 (filtered medium)">
-<o:SmartTagType =
-namespaceuri=3D"urn:schemas-microsoft-com:office:smarttags"
- name=3D"PersonName"/>
-<!--[if !mso]>
-<style>
-st1\:*{behavior:url(#default#ieooui) }
-</style>
-<![endif]-->
-<style>
-<!--
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0in;
-	margin-bottom:.0001pt;
-	font-size:12.0pt;
-	font-family:"Times New Roman";}
-a:link, span.MsoHyperlink
-	{color:blue;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{color:purple;
-	text-decoration:underline;}
-span.EstiloDeEmail17
-	{mso-style-type:personal-compose;
-	font-family:Arial;
-	color:windowtext;}
-@page Section1
-	{size:8.5in 11.0in;
-	margin:1.0in 1.25in 1.0in 1.25in;}
-div.Section1
-	{page:Section1;}
--->
-</style>
-
-</head>
-
-<body lang=3DEN-US link=3Dblue vlink=3Dpurple>
-
-<div class=3DSection1>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Hello,<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>I have a Digital Pen which I have to pair with an =
-embedded
-device running <st1:PersonName ProductID=3D"Debian Linux" =
-w:st=3D"on">Debian Linux</st1:PersonName>
-(kernel 2.4.11). I&#8217;m able to pair the pen with my desktop with =
-same Linux
-because it&#8217;s running Gnome but in the embedded device I =
-can&#8217;t
-install any graphical environment. <o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>In desktop linux after I scan for the pen and I call =
-&#8220;hcitool
-cc xx:xx:xx:xx:xx&#8221; it opens in Gnome a Dialog asking for the PIN
-(passkey). I inform it and the pairing is successful. =
-<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>How can I do the same pairing without a Graphical
-environment ? I tried to inform the PIN in the /etc/bluetooth/hcid.conf =
-but I
-think, as I read somewhere, that this pin is only used for incoming =
-connections
-so it didn&#8217;t work.<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'><o:p>&nbsp;</o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Thanks in advance,<o:p></o:p></span></font></p>
-
-<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
-style=3D'font-size:10.0pt;
-font-family:Arial'>Fabio.<o:p></o:p></span></font></p>
-
-</div>
-
-</body>
-
-</html>
-
-------=_NextPart_000_00DD_01C85008.B2752040--
+d2hlcmUgZGlkIHlvdSB1cGRhdGVkIHRvIGJsdWV6IDMuMjQ/IEkgYW0gcnVubmluZyB1YnVudHUg
+Z3V0c3kgYW5kIHRoZSBvbmx5IHZlcnNpb24gSSBnZXQgd2l0aCBzeW5hcHRpYyBpcyAzLjE5LiBJ
+IGhhZCB0byBjb21waWxlIG15IG93biB2ZXJzaW9uIHRvIGhhdmUgaXQgd29ya2luZzxicj48YnI+
+PGRpdiBjbGFzcz0iZ21haWxfcXVvdGUiPk9uIEphbiA1LCAyMDA4IDk6MzQgUE0sIEJyYWQgTWlk
+Z2xleSAmbHQ7CjxhIGhyZWY9Im1haWx0bzpibWlkZ2xleUBnbWFpbC5jb20iPmJtaWRnbGV5QGdt
+YWlsLmNvbTwvYT4mZ3Q7IHdyb3RlOjxicj48YmxvY2txdW90ZSBjbGFzcz0iZ21haWxfcXVvdGUi
+IHN0eWxlPSJib3JkZXItbGVmdDogMXB4IHNvbGlkIHJnYigyMDQsIDIwNCwgMjA0KTsgbWFyZ2lu
+OiAwcHQgMHB0IDBwdCAwLjhleDsgcGFkZGluZy1sZWZ0OiAxZXg7Ij5QYXVsPGJyPjxicj5JZiB5
+b3UmIzM5O2xsIGxldCBzb21lb25lIGVsc2UgZ2V0IGEgd29yZCBpbi4uLiA6KQo8YnI+PGJyPllv
+dSYjMzk7bGwgZ2V0IGEgbG90IG9mIGRhdGEsIGJ1dCBpZiB5b3UgcnVuIHRoaXMgd2hpbGUgcGxh
+eWluZyBhdWRpbyw8YnI+bmVhciB0aGUgZW5kIGl0IG1pZ2h0IHNheSBzb21ldGhpbmcgaW50ZXJl
+c3RpbmcgYWJvdXQgdGhlIGRpc2Nvbm5lY3Q6PGJyPjxicj5zdWRvIGhjaWR1bXAgLVhWICZndDts
+b2c8YnI+PGJyPmFwbGF5IGZyb20gdGhlIGNvbnNvbGUgbWlnaHQgcHJpbnQgYSBkZWNlbnQgZXJy
+b3IgbWVzc2FnZS4KPGJyPjxicj5CcmFkPGJyPjxkaXYgY2xhc3M9IkloMkUzZCI+PGJyPk9uIEph
+biA1LCAyMDA4IDEyOjUzIFBNLCBQYXVsIFJ1c2h3b3J0aCAmbHQ7PGEgaHJlZj0ibWFpbHRvOnBh
+dWxAcnVzaHdvcnRoLmNvLm56Ij5wYXVsQHJ1c2h3b3J0aC5jby5uejwvYT4mZ3Q7IHdyb3RlOjxi
+cj4mZ3Q7IFBhdWwgUnVzaHdvcnRoICZsdDtwYXVsICZsdDthdCZndDsgPGEgaHJlZj0iaHR0cDov
+L3J1c2h3b3J0aC5jby5ueiIgdGFyZ2V0PSJfYmxhbmsiPgpydXNod29ydGguY28ubno8L2E+Jmd0
+OyB3cml0ZXM6PGJyPiZndDsgJmd0OyBQYXVsIFJ1c2h3b3J0aCAmbHQ7cGF1bCAmbHQ7YXQmZ3Q7
+IDxhIGhyZWY9Imh0dHA6Ly9ydXNod29ydGguY28ubnoiIHRhcmdldD0iX2JsYW5rIj5ydXNod29y
+dGguY28ubno8L2E+Jmd0OyB3cml0ZXM6PGJyPiZndDsgJmd0OyAmZ3Q7IFBlcmhhcHMgdmxjIHdp
+dGggYXVkaW8gc2luayBpcyB0aGUgY2F1c2Ugb2YgdGhlIHByb2JsZW0/Cjxicj48YnI+PC9kaXY+
+LS08YnI+PGZvbnQgY29sb3I9IiM4ODg4ODgiPkJyYWQ8YnI+PC9mb250PjxkaXY+PGRpdj48L2Rp
+dj48ZGl2IGNsYXNzPSJXajNDN2MiPjxicj4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPGJyPlRoaXMgU0YubmV0
+IGVtYWlsIGlzIHNwb25zb3JlZCBieTogTWljcm9zb2Z0PGJyPgpEZWZ5IGFsbCBjaGFsbGVuZ2Vz
+LiBNaWNyb3NvZnQoUikgVmlzdWFsIFN0dWRpbyAyMDA1Ljxicj48YSBocmVmPSJodHRwOi8vY2xr
+LmF0ZG10LmNvbS9NUlQvZ28vdnNlMDEyMDAwMDA3MG1ydC9kaXJlY3QvMDEvIiB0YXJnZXQ9Il9i
+bGFuayI+aHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBtcnQvZGlyZWN0
+LzAxLzwvYT48YnI+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X18KPGJyPkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdDxicj48YSBocmVmPSJtYWlsdG86Qmx1ZXot
+dXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Ij5CbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3Jn
+ZS5uZXQ8L2E+PGJyPjxhIGhyZWY9Imh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3Rz
+L2xpc3RpbmZvL2JsdWV6LXVzZXJzIiB0YXJnZXQ9Il9ibGFuayI+aHR0cHM6Ly9saXN0cy5zb3Vy
+Y2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMKPC9hPjxicj48L2Rpdj48L2Rp
+dj48L2Jsb2NrcXVvdGU+PC9kaXY+PGJyPjxiciBjbGVhcj0iYWxsIj48YnI+LS0gPGJyPnZvdXMg
+cG91dmV6IGNvbnN1bHRlciBtb24gY2FsZW5kcmllciDDoCBsJiMzOTthZHJlc3NlIHN1aXZhbnRl
+IDo8YnI+PGEgaHJlZj0iaHR0cDovL3d3dy5nb29nbGUuY29tL2NhbGVuZGFyL2VtYmVkP3NyYz10
+cnRmN2Q2cG1oY21ucXJ1ZWZhcGs5MnZrcyU0MGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20iPgpo
+dHRwOi8vd3d3Lmdvb2dsZS5jb20vY2FsZW5kYXIvZW1iZWQ/c3JjPXRydGY3ZDZwbWhjbW5xcnVl
+ZmFwazkydmtzJTQwZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbTwvYT4K
+------=_Part_12299_1603292.1199569023529--
 
 
-
-
---===============1955285087==
+--===============0343779452==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -192,7 +118,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1955285087==
+--===============0343779452==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -203,4 +129,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1955285087==--
+--===============0343779452==--
