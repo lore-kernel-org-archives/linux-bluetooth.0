@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 To: bluez-users@lists.sourceforge.net
 From: Paul Rushworth <paul@rushworth.co.nz>
-Date: Sat, 5 Jan 2008 19:53:20 +0000 (UTC)
-Message-ID: <loom.20080105T195122-398@post.gmane.org>
+Date: Sat, 5 Jan 2008 19:30:58 +0000 (UTC)
+Message-ID: <loom.20080105T192949-442@post.gmane.org>
 References: <loom.20080105T181918-303@post.gmane.org>
 	<loom.20080105T191502-7@post.gmane.org>
-	<loom.20080105T192949-442@post.gmane.org>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users]
 	=?utf-8?q?Updated_to_bluez_3=2E24_from_Ubuntu_repo?=
@@ -25,26 +24,12 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Paul Rushworth <paul <at> rushworth.co.nz> writes:
 
-> 
-> Paul Rushworth <paul <at> rushworth.co.nz> writes:
-> 
-> > > 
-> 
 > > 
-> > Perhaps vlc with audio sink is the cause of the problem?
+
 > 
-> Now vlc is working. Hmm. I can't explain it- i only hope it continues!
+> Perhaps vlc with audio sink is the cause of the problem?
 
-This gets weirder. I rebooted to test some more, and using totem and vlc, i had
-the headphones disconnect after 2-3 minutes as per normal.
-
-I then played xmoto first for 5 minutes, and then tried mp3 and video in vlc and
-totem. They both work... no disconnect.
-
-Totally scratching my head. 
-
-
-
+Now vlc is working. Hmm. I can't explain it- i only hope it continues!
 
 
 -------------------------------------------------------------------------
