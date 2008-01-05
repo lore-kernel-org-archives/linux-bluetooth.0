@@ -1,16 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300801051234i45d2d574s65fd7954a9cbaa82@mail.gmail.com>
-Date: Sat, 5 Jan 2008 13:34:56 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <loom.20080105T195122-398@post.gmane.org>
-MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+From: Paul Rushworth <paul@rushworth.co.nz>
+Date: Sat, 5 Jan 2008 19:53:20 +0000 (UTC)
+Message-ID: <loom.20080105T195122-398@post.gmane.org>
 References: <loom.20080105T181918-303@post.gmane.org>
 	<loom.20080105T191502-7@post.gmane.org>
 	<loom.20080105T192949-442@post.gmane.org>
-	<loom.20080105T195122-398@post.gmane.org>
-Subject: Re: [Bluez-users] Updated to bluez 3.24 from Ubuntu repo's.
-	Headphones still disconnect after 2-3 mins.
+Mime-Version: 1.0
+Subject: Re: [Bluez-users]
+	=?utf-8?q?Updated_to_bluez_3=2E24_from_Ubuntu_repo?=
+	=?utf-8?q?=27s=2E_Headphones=09still_disconnect_after_2-3_mins=2E?=
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,26 +23,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Paul
+Paul Rushworth <paul <at> rushworth.co.nz> writes:
 
-If you'll let someone else get a word in... :)
-
-You'll get a lot of data, but if you run this while playing audio,
-near the end it might say something interesting about the disconnect:
-
-sudo hcidump -XV >log
-
-aplay from the console might print a decent error message.
-
-Brad
-
-On Jan 5, 2008 12:53 PM, Paul Rushworth <paul@rushworth.co.nz> wrote:
+> 
 > Paul Rushworth <paul <at> rushworth.co.nz> writes:
-> > Paul Rushworth <paul <at> rushworth.co.nz> writes:
-> > > Perhaps vlc with audio sink is the cause of the problem?
+> 
+> > > 
+> 
+> > 
+> > Perhaps vlc with audio sink is the cause of the problem?
+> 
+> Now vlc is working. Hmm. I can't explain it- i only hope it continues!
 
--- 
-Brad
+This gets weirder. I rebooted to test some more, and using totem and vlc, i had
+the headphones disconnect after 2-3 minutes as per normal.
+
+I then played xmoto first for 5 minutes, and then tried mp3 and video in vlc and
+totem. They both work... no disconnect.
+
+Totally scratching my head. 
+
+
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
