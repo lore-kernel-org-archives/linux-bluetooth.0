@@ -1,11 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <477F94BC.3040509@gmail.com>
-Date: Sun, 06 Jan 2008 00:31:24 +1000
-From: 1 <it.had.even@gmail.com>
+Message-ID: <b5c34db00801042031s4564c190sc9cc5ff0718cc188@mail.gmail.com>
+Date: Sat, 5 Jan 2008 10:01:12 +0530
+From: umeshyv <umeshyv@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <477E9A32.8080908@cs.wisc.edu>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Possible insignificant bug in pcm_bluetooth.c
-	(bluez-utils)
+References: <477C6D10.2040003@cs.wisc.edu> <1199337678.26099.35.camel@aeonflux>
+	<477E9A32.8080908@cs.wisc.edu>
+Subject: Re: [Bluez-users] enabling/disabling in response to ThinkPad hotkey
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,88 +17,98 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1246989030=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
- here is question  raised while digging thru bluez-utils source.
-Piece from /audio/pcm_bluetooth.c (function bluetooth_parse_config) :
+--===============1246989030==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_15201_32767848.1199507472917"
 
-if (strcmp(id, "mode") == 0) {
-    if (snd_config_get_string(n, &mode) < 0) {
-        SNDERR("Invalid type for %s", id);
-        return -EINVAL;
-    }
+------=_Part_15201_32767848.1199507472917
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-    if (strcmp(pref, "auto") == 0) {
-        bt_config->channel_mode = BT_A2DP_CHANNEL_MODE_AUTO;
-        bt_config->has_channel_mode = 1;
-    } else if (strcmp(pref, "mono") == 0) {
-        bt_config->channel_mode = BT_A2DP_CHANNEL_MODE_MONO;
-        bt_config->has_channel_mode = 1;
-    } else if (strcmp(pref, "dual") == 0) {
-        bt_config->channel_mode = BT_A2DP_CHANNEL_MODE_DUAL_CHANNEL;
-        bt_config->has_channel_mode = 1;
-    } else if (strcmp(pref, "stereo") == 0) {
-        bt_config->channel_mode = BT_A2DP_CHANNEL_MODE_STEREO;
-        bt_config->has_channel_mode = 1;
-    } else if (strcmp(pref, "joint") == 0) {
-        bt_config->channel_mode = BT_A2DP_CHANNEL_MODE_JOINT_STEREO;
-        bt_config->has_channel_mode = 1;
-    }
-    continue;
-}
+Hi to all,
+I use suse linux 10.1 and i connected bluetooth usb dongle and enabled
+bluetooth server and i removed mouse from my system and i own sony erricsion
+(K750i) mobile and it contains remote control application in it and using
+that i am able to access desktop in windows  vista and is this possible to
+do in linux.please send your valuable comments
 
-if (strcmp(id, "allocation") == 0) {
-    if (snd_config_get_string(n, &allocation) < 0) {
-        SNDERR("Invalid type for %s", id);
-        return -EINVAL;
-    }
+Regards
+Umesh
 
-    if (strcmp(pref, "auto") == 0) {
-        bt_config->allocation_method = BT_A2DP_ALLOCATION_AUTO;
-        bt_config->has_allocation_method = 1;
-    } else if (strcmp(pref, "loudness") == 0) {
-        bt_config->allocation_method = BT_A2DP_ALLOCATION_LOUDNESS;
-        bt_config->has_allocation_method = 1;
-    } else if (strcmp(pref, "snr") == 0) {
-        bt_config->allocation_method = BT_A2DP_ALLOCATION_SNR;
-        bt_config->has_allocation_method = 1;
-    }
-    continue;
-}
+On Jan 5, 2008 2:12 AM, Ben Liblit <liblit@cs.wisc.edu> wrote:
 
-As I understood, bt_config->channel_mode and 
-bt_config->allocation_method will never be set properly, because of
-wrong variable in strcmp : strcmp(pref,"auto").
-If I am right, there must be strcmp(mode,"auto") and 
-strcmp(allocation,"auto") respectively.
+> Marcel Holtmann wrote:
+> > The reason for this is that the Bluetooth on/off switches are all
+> > different and HAL and rfkill is the way to abstract it into a common
+> > interface. It is not the job of hcid to abstract this.
+>
+> OK, I see your point.  HAL is supposed to keep other daemons from having
+> to worry about such things.  I've conveyed your reply back to the HAL
+> mailing list.
+>
+> That said, it's unfortunate that the end result is an Fn+F5 key which
+> does *nothing* useful out of the box.  Even if different users would
+> want it to do slightly different things, right now it does *nothing* by
+> default.  I'm savvy enough to write my own script that runs as root,
+> hooks into HAL D-BUS signals, and responds accordingly.  Most users
+> won't do that, so for them, this key is useless.
+>
+> Oh well.  Between HAL and Bluez, things are much better now than they
+> ever were before.  We're not done yet, but at least we're making progress.
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2005.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
-Further, if it is bug, it is insignificant for now the configuration of 
-A2DP (~/.asoundrc) is not fully implemented.
-Found this in above file:
-    /* FIXME: this needs to be really implemented (take into account 
-real asoundrc settings + ALSA hw settings ) once server side sends us
-    more than one possible configuration */
+------=_Part_15201_32767848.1199507472917
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-And something else: I got choppy sound (it chops every 2 sec) when 
-listening my A2DP stereo headset Southwing SA505 (BT dongle ASUS WL-BTD-202,
-Ubuntu Gutsy, bluez-3.24). Tried to:
-- change configuration in ~/.asoundrc but unfortunately settings for 
-A2DP unimplemented .
-- changed hcid.conf -> lm accept,master and removed lp rswitch. with no use
-Anybody knows what can it be?
+Hi to all,<br>I use suse linux 10.1 and i connected bluetooth usb dongle and enabled bluetooth server and i removed mouse from my system and i own sony erricsion (K750i) mobile and it contains remote control application in it and using that i am able to access desktop in windows&nbsp; vista and is this possible to do in 
+linux.please send your valuable comments<br><br>Regards<br>Umesh<br><br><div class="gmail_quote">On Jan 5, 2008 2:12 AM, Ben Liblit &lt;<a href="mailto:liblit@cs.wisc.edu">liblit@cs.wisc.edu</a>&gt; wrote:<br><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+Marcel Holtmann wrote:<br>&gt; The reason for this is that the Bluetooth on/off switches are all<br>&gt; different and HAL and rfkill is the way to abstract it into a common<br>&gt; interface. It is not the job of hcid to abstract this.
+<br><br>OK, I see your point. &nbsp;HAL is supposed to keep other daemons from having<br>to worry about such things. &nbsp;I&#39;ve conveyed your reply back to the HAL<br>mailing list.<br><br>That said, it&#39;s unfortunate that the end result is an Fn+F5 key which
+<br>does *nothing* useful out of the box. &nbsp;Even if different users would<br>want it to do slightly different things, right now it does *nothing* by<br>default. &nbsp;I&#39;m savvy enough to write my own script that runs as root,
+<br>hooks into HAL D-BUS signals, and responds accordingly. &nbsp;Most users<br>won&#39;t do that, so for them, this key is useless.<br><br>Oh well. &nbsp;Between HAL and Bluez, things are much better now than they<br>ever were before. &nbsp;We&#39;re not done yet, but at least we&#39;re making progress.
+<br><div><div></div><div class="Wj3C7c"><br>-------------------------------------------------------------------------<br>This SF.net email is sponsored by: Microsoft<br>Defy all challenges. Microsoft(R) Visual Studio 2005.
+<br><a href="http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/" target="_blank">http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/</a><br>_______________________________________________<br>Bluez-users mailing list
+<br><a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a><br><a href="https://lists.sourceforge.net/lists/listinfo/bluez-users" target="_blank">https://lists.sourceforge.net/lists/listinfo/bluez-users
+</a><br></div></div></blockquote></div><br>
 
-Now waiting for new release in hope that A2DP settings will be 
-implemented :)
+------=_Part_15201_32767848.1199507472917--
 
+
+--===============1246989030==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2005.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============1246989030==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1246989030==--
