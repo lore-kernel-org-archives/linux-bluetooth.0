@@ -1,10 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2bab7e280801061151s221838ccy9913e62ad4480706@mail.gmail.com>
-Date: Sun, 6 Jan 2008 20:51:21 +0100
-From: "=?UTF-8?Q?M=C3=B4she_Van_der_Sterre?=" <moshevds@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] PS3 BD remote
+Date: Sun, 6 Jan 2008 03:35:37 +0000
+From: Al Viro <viro@ZenIV.linux.org.uk>
+To: Tejun Heo <htejun@gmail.com>
+Message-ID: <20080106033537.GT27894@ZenIV.linux.org.uk>
+References: <20071228173203.GA20690@boogie.lpds.sztaki.hu>
+	<a8e1da0712290007o168a730cw923055ad2c265d84@mail.gmail.com>
+	<20080102151642.GA7273@boogie.lpds.sztaki.hu>
+	<20080105075039.GF27894@ZenIV.linux.org.uk>
+	<477F9481.2040505@gmail.com>
+	<20080105194510.GK27894@ZenIV.linux.org.uk>
+	<478037F8.8020103@gmail.com>
+	<20080106021826.GR27894@ZenIV.linux.org.uk>
+	<478042F3.7010002@gmail.com>
+Mime-Version: 1.0
+In-Reply-To: <478042F3.7010002@gmail.com>
+Cc: Gabor Gombas <gombasg@sztaki.hu>, Greg KH <greg@kroah.com>,
+	linux-kernel@vger.kernel.org, ebiederm@xmission.com,
+	bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] Oops involving RFCOMM and sysfs
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,23 +27,36 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGVsbG8sCgpJIGhhdmUgYSBTb255IFBsYXlzdGF0aW9uIDMgQmx1LXJheSBEaXNrIFJlbW90ZSBD
-b250cm9sLCBhbmQgdXNlIGl0CndpdGggYmx1ZXogdXNpbmcgYSBzZWxmIHdyaXR0ZW4gcHJvZ3Jh
-bSwKKEkndmUgdXBsb2FkZWQgaXQgdG8gaHR0cDovL21vc2hlLm5sL3BzMy1yZW1vdGUtdGVzdDEu
-dGFyLmJ6MiApClNvbWUgdGltZSBhZ28sIEkgc3Bva2Ugc29tZW9uZSBvbiBJUkMgd2hvIHRvbGQg
-bWUgYmx1ZXotdXRpbHMgaGFzIHNvbWUKY29kZSB0aGF0IGRvZXMgdGhlIHNhbWUsCmJ1dCBJIGRv
-bid0IHJlYWxseSBrbm93IGhvdyB0byBjcmVhdGUgYSBwbHVnaW4gdG8gaGFuZGxlIHRoZSByZW1v
-dGUuCgpDYW4gc29tZW9uZSBwb2ludCBtZSB0byBpbmZvcm1hdGlvbiBhYm91dCB0aGlzLCBvciBn
-aXZlIHNvbWUgZXhhbXBsZXMKb24gaG93IHRvIGRvIGl0PwoKLS0gCk12ZwpNw7RzaGUgdmFuIGRl
-ciBTdGVycmUKaHR0cDovL3d3dy5tb3NoZS5ubC8KaHR0cDovL3d3dy5jb2VjdS5ubC8KLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6IE1pY3Jvc29mdApE
-ZWZ5IGFsbCBjaGFsbGVuZ2VzLiBNaWNyb3NvZnQoUikgVmlzdWFsIFN0dWRpbyAyMDA1LgpodHRw
-Oi8vY2xrLmF0ZG10LmNvbS9NUlQvZ28vdnNlMDEyMDAwMDA3MG1ydC9kaXJlY3QvMDEvCl9fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1h
-aWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0
-cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
+On Sun, Jan 06, 2008 at 11:54:43AM +0900, Tejun Heo wrote:
+> That means sysfs_remove_dir() is called on parent while other operations
+> are in progress on children, right?  sysfs has never allowed such things
+> && AFAIK no one does that.  It's somewhat implied in the interface (such
+> as recursive removing) but I fully agree it's problematic.  Things like
+> these are why I think we need to unify/simplify locking as I wrote
+> previously.
+
+All it takes is kobject_rename() or kobject_move() called asynchronously 
+wrt removal...  I don't see an explicit ban for that.
+
+FWIW, what happens here *is* fishy, but I don't see an outright ban on
+that in documentation - rfcomm_tty_open() does
+                device_move(dev->tty_dev, rfcomm_get_device(dev));
+when we get openers, rfcomm_tty_close() does
+                device_move(dev->tty_dev, NULL);
+when the number of openers hits zero.  Can happen repeatedly.
+
+Note that device_move() with new parent being NULL is explicitly allowed
+and handled, so...
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
