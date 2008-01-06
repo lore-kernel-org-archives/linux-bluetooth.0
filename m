@@ -1,17 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-From: Colin Murphy <lists@spudulike.me.uk>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Sun, 6 Jan 2008 11:46:40 +0000
+To: bluez-users@lists.sourceforge.net
+From: Paul Rushworth <paul@rushworth.co.nz>
+Date: Sun, 6 Jan 2008 04:28:25 +0000 (UTC)
+Message-ID: <loom.20080106T042630-278@post.gmane.org>
 References: <loom.20080105T181918-303@post.gmane.org>
+	<loom.20080105T191502-7@post.gmane.org>
+	<loom.20080105T192949-442@post.gmane.org>
+	<loom.20080105T195122-398@post.gmane.org>
 	<d89ddf300801051234i45d2d574s65fd7954a9cbaa82@mail.gmail.com>
-	<loom.20080106T042630-278@post.gmane.org>
-In-Reply-To: <loom.20080106T042630-278@post.gmane.org>
-MIME-Version: 1.0
-Message-Id: <200801061146.40141.lists@spudulike.me.uk>
+Mime-Version: 1.0
 Subject: Re: [Bluez-users]
- =?iso-8859-1?q?Updated_to_bluez_3=2E24_from_Ubuntu_?=
- =?iso-8859-1?q?repo=27s=2E=09Headphones_still_disconnect_after_2-3_mins?=
- =?iso-8859-1?q?=2E?=
+	=?utf-8?q?Updated_to_bluez_3=2E24_from_Ubuntu_repo?=
+	=?utf-8?q?=27s=2E=09Headphones_still_disconnect_after_2-3_mins=2E?=
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -25,14 +25,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Sunday 06 January 2008 04:28:25 Paul Rushworth wrote:
-> Xmoto doesn't seem to be a relevant factor.
->
-What is Xmoto?  I can only find a motorcycle game.
+Brad Midgley <bmidgley <at> gmail.com> writes:
 
--- 
-Colin@spudulike.me.uk
-Gotta' go, things to be, people to do, stuff to, err, stuff.
+> 
+> Paul
+> 
+> If you'll let someone else get a word in... :)
+> 
+> You'll get a lot of data, but if you run this while playing audio,
+> near the end it might say something interesting about the disconnect:
+> 
+> sudo hcidump -XV >log
+> 
+> aplay from the console might print a decent error message.
+> 
+> Brad
+
+thanks for the tip. I'm now trying to tightly define when it works or doesn't
+and what steps i take. It is not working 100% of the time, but perhaps 80% of
+the time. Xmoto doesn't seem to be a relevant factor.
+
+I think ill try and map out a set of conditions over 2-3 days and see what i
+come up with.
+
+The net change does seem to be the 3.24 libs update?
+
+Paul
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
