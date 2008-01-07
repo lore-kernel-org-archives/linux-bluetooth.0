@@ -1,17 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 Jan 2008 15:10:15 +0100
-From: Gabor Gombas <gombasg@sztaki.hu>
-To: Dave Young <hidave.darkstar@gmail.com>
-Message-ID: <20080107141014.GA12763@boogie.lpds.sztaki.hu>
-References: <20071228173203.GA20690@boogie.lpds.sztaki.hu>
-	<a8e1da0712290007o168a730cw923055ad2c265d84@mail.gmail.com>
-	<20080102151642.GA7273@boogie.lpds.sztaki.hu>
-	<20080103131620.GA16307@boogie.lpds.sztaki.hu>
-	<20080104010542.GA2860@darkstar.te-china.tietoenator.com>
-MIME-Version: 1.0
-In-Reply-To: <20080104010542.GA2860@darkstar.te-china.tietoenator.com>
-Cc: linux-kernel@vger.kernel.org, bluez-devel@lists.sf.net
-Subject: Re: [Bluez-devel] Oops involving RFCOMM and sysfs
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <2bab7e280801070449h3786dc47jb7811016f71af8e@mail.gmail.com>
+References: <2bab7e280801061151s221838ccy9913e62ad4480706@mail.gmail.com>
+	<1199706716.6584.4.camel@cookie.hadess.net>
+	<2bab7e280801070449h3786dc47jb7811016f71af8e@mail.gmail.com>
+Date: Mon, 07 Jan 2008 13:06:39 +0000
+Message-Id: <1199711199.6584.13.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] PS3 BD remote
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,37 +18,42 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
 
-On Fri, Jan 04, 2008 at 09:05:42AM +0800, Dave Young wrote:
+On Mon, 2008-01-07 at 13:49 +0100, M=F4she Van der Sterre wrote:
+> > See the patch(es) sent by Aristeu on the list:
+> > http://thread.gmane.org/gmane.linux.bluez.devel/13793
+> > http://thread.gmane.org/gmane.linux.bluez.devel/13794
+> > http://thread.gmane.org/gmane.linux.bluez.devel/13795
+> > http://thread.gmane.org/gmane.linux.bluez.devel/13796
+> > http://thread.gmane.org/gmane.linux.bluez.devel/13797
+> >
+> > Cheers
+> =
 
-> Could you try the patch (on 2.6.24-rc6) following and check the debug messages? 
-> 
-> diff -upr linux/net/bluetooth/rfcomm/tty.c linux.new/net/bluetooth/rfcomm/tty.c
-> --- linux/net/bluetooth/rfcomm/tty.c	2008-01-04 08:58:48.000000000 +0800
-> +++ linux.new/net/bluetooth/rfcomm/tty.c	2008-01-04 09:01:01.000000000 +0800
-> @@ -313,6 +313,7 @@ static void rfcomm_dev_del(struct rfcomm
->  {
->  	BT_DBG("dev %p", dev);
->  
-> +	dump_stack();
->  	set_bit(RFCOMM_TTY_RELEASED, &dev->flags);
->  	rfcomm_dev_put(dev);
->  }
+> Great, This seems to be send to the list some time after I asked about
+> it on IRC, and it seems to be a complete implementation of the remote.
 
-This did not trigger.
+Aristeu sent a patch weeks before that was the first draft
+implementation, but we got key definitions added to the kernel to
+support all the keys properly. See the archives.
 
-Gabor
+> The only thing I don't see is support for multiple keys pressed (only
+> the 'playstaton' keys support this), I'll try to test this code this
+> week.
 
--- 
-     ---------------------------------------------------------
-     MTA SZTAKI Computer and Automation Research Institute
-                Hungarian Academy of Sciences
-     ---------------------------------------------------------
+I don't understand what you mean by multiple key presses there.
+
+> Also, some keys are bound really weird (cross to KEY_ENTER while the
+> enter key already is KEY_ENTER? how does the sixaxis do this?).
+
+I don't understand the problem here either...
+
+Cheers
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
