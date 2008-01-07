@@ -1,71 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4781DDCA.20605@gmail.com>
-Date: Mon, 07 Jan 2008 17:07:38 +0900
-From: Tejun Heo <htejun@gmail.com>
+Date: Mon, 7 Jan 2008 13:41:22 +0800
+From: Dave Young <hidave.darkstar@gmail.com>
+To: marcel@holtmann.org
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bluez-devel@lists.sourceforge.net
+Subject: [PATCH] bluetooth : rfcomm tty BUG_ON() code fix
+Message-ID: <20080107054122.GA4502@darkstar.te-china.tietoenator.com>
 MIME-Version: 1.0
-To: Dave Young <hidave.darkstar@gmail.com>
-References: <20071228173203.GA20690@boogie.lpds.sztaki.hu>
-	<a8e1da0712290007o168a730cw923055ad2c265d84@mail.gmail.com>
-	<20080102151642.GA7273@boogie.lpds.sztaki.hu>
-	<20080103131620.GA16307@boogie.lpds.sztaki.hu>
-	<20080104010542.GA2860@darkstar.te-china.tietoenator.com>
-In-Reply-To: <20080104010542.GA2860@darkstar.te-china.tietoenator.com>
-Cc: Gabor Gombas <gombasg@sztaki.hu>, linux-kernel@vger.kernel.org,
-	bluez-devel@lists.sf.net
-Subject: Re: [Bluez-devel] Oops involving RFCOMM and sysfs
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Dave Young wrote:
-> On Thu, Jan 03, 2008 at 02:16:21PM +0100, Gabor Gombas wrote:
->> On Wed, Jan 02, 2008 at 04:16:42PM +0100, Gabor Gombas wrote:
->>
->>> So the patch referenced above does not help. But I've found a very easy
->>> way to trigger the bug:
->>>
->>> - do a "cat /dev/zero > /dev/rfcomm0"
->>> - switch the phone off
->>> - switch the phone on, and the kernel oopses
->> FYI I also remember having oopses with 2.6.22.<something> but I do not
->> have those logs anymore. Also I now booted 2.6.20.7 and it did not oops.
-> 
-> Could you try the patch (on 2.6.24-rc6) following and check the debug messages? 
-> 
-> diff -upr linux/net/bluetooth/rfcomm/tty.c linux.new/net/bluetooth/rfcomm/tty.c
-> --- linux/net/bluetooth/rfcomm/tty.c	2008-01-04 08:58:48.000000000 +0800
-> +++ linux.new/net/bluetooth/rfcomm/tty.c	2008-01-04 09:01:01.000000000 +0800
-> @@ -313,6 +313,7 @@ static void rfcomm_dev_del(struct rfcomm
->  {
->  	BT_DBG("dev %p", dev);
->  
-> +	dump_stack();
->  	set_bit(RFCOMM_TTY_RELEASED, &dev->flags);
->  	rfcomm_dev_put(dev);
->  }
+1) In tty.c the BUG_ON at line 115 will never be called, because the the before list_del_init in this same function.
+ 115          BUG_ON(!list_empty(&dev->list));
+So move the list_del_init to rfcomm_dev_del 
 
-Tried to reproduce the problem here but I can't persuade my laptop to
-talk to my cell. :-( Gabor, can you please report what Dave Young asked?
+2) The rfcomm_dev_del could be called from diffrent path (rfcomm_tty_hangup/rfcomm_dev_state_change/rfcomm_release_dev),
+So add another BUG_ON when the rfcomm_dev_del is called more than one time.
 
-Thanks.
+Signed-off-by: Dave Young <hidave.darkstar@gmail.com> 
 
--- 
-tejun
+---
+net/bluetooth/rfcomm/tty.c |   22 +++++++++++++---------
+1 file changed, 13 insertions(+), 9 deletions(-)
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2005.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+diff -upr linux/net/bluetooth/rfcomm/tty.c linux.new/net/bluetooth/rfcomm/tty.c
+--- linux/net/bluetooth/rfcomm/tty.c	2008-01-07 13:20:17.000000000 +0800
++++ linux.new/net/bluetooth/rfcomm/tty.c	2008-01-07 13:25:17.000000000 +0800
+@@ -95,9 +95,10 @@ static void rfcomm_dev_destruct(struct r
+ 
+ 	BT_DBG("dev %p dlc %p", dev, dlc);
+ 
+-	write_lock_bh(&rfcomm_dev_lock);
+-	list_del_init(&dev->list);
+-	write_unlock_bh(&rfcomm_dev_lock);
++	/* Refcount should only hit zero when called from rfcomm_dev_del()
++	   which will have taken us off the list. Everything else are
++	   refcounting bugs. */
++	BUG_ON(!list_empty(&dev->list));
+ 
+ 	rfcomm_dlc_lock(dlc);
+ 	/* Detach DLC if it's owned by this dev */
+@@ -109,11 +110,6 @@ static void rfcomm_dev_destruct(struct r
+ 
+ 	tty_unregister_device(rfcomm_tty_driver, dev->id);
+ 
+-	/* Refcount should only hit zero when called from rfcomm_dev_del()
+-	   which will have taken us off the list. Everything else are
+-	   refcounting bugs. */
+-	BUG_ON(!list_empty(&dev->list));
+-
+ 	kfree(dev);
+ 
+ 	/* It's safe to call module_put() here because socket still
+@@ -313,7 +309,15 @@ static void rfcomm_dev_del(struct rfcomm
+ {
+ 	BT_DBG("dev %p", dev);
+ 
+-	set_bit(RFCOMM_TTY_RELEASED, &dev->flags);
++	if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
++		BUG_ON(1);
++	else
++		set_bit(RFCOMM_TTY_RELEASED, &dev->flags);
++
++	write_lock_bh(&rfcomm_dev_lock);
++	list_del_init(&dev->list);
++	write_unlock_bh(&rfcomm_dev_lock);
++
+ 	rfcomm_dev_put(dev);
+ }
+ 
