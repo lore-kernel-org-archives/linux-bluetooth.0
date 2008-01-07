@@ -1,19 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47824415.80703@gmail.com>
-Date: Tue, 08 Jan 2008 00:24:05 +0900
-From: Tejun Heo <htejun@gmail.com>
+Message-ID: <2bab7e280801070712l493fc709v4797d4b6647b8b89@mail.gmail.com>
+Date: Mon, 7 Jan 2008 16:12:17 +0100
+From: "=?UTF-8?Q?M=C3=B4she_Van_der_Sterre?=" <moshevds@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20080107150345.GC6027@cathedrallabs.org>
 MIME-Version: 1.0
-To: Gabor Gombas <gombasg@sztaki.hu>
-References: <20071228173203.GA20690@boogie.lpds.sztaki.hu>
-	<a8e1da0712290007o168a730cw923055ad2c265d84@mail.gmail.com>
-	<20080102151642.GA7273@boogie.lpds.sztaki.hu>
-	<20080105075039.GF27894@ZenIV.linux.org.uk>
-	<20080107141300.GB12763@boogie.lpds.sztaki.hu>
-In-Reply-To: <20080107141300.GB12763@boogie.lpds.sztaki.hu>
-Content-Type: multipart/mixed; boundary="------------080309060701040302010706"
-Cc: linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>,
-	bluez-devel@lists.sf.net
-Subject: Re: [Bluez-devel] Oops involving RFCOMM and sysfs
+References: <2bab7e280801061151s221838ccy9913e62ad4480706@mail.gmail.com>
+	<1199706716.6584.4.camel@cookie.hadess.net>
+	<2bab7e280801070449h3786dc47jb7811016f71af8e@mail.gmail.com>
+	<1199711199.6584.13.camel@cookie.hadess.net>
+	<2bab7e280801070640s76089762v208061db0fce57f7@mail.gmail.com>
+	<20080107150345.GC6027@cathedrallabs.org>
+Subject: Re: [Bluez-devel] PS3 BD remote
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,77 +21,35 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------080309060701040302010706
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-
-Gabor Gombas wrote:
-> Hi,
-> 
-> On Sat, Jan 05, 2008 at 07:50:39AM +0000, Al Viro wrote:
-> 
->> Could you stick
->> 	if (!parent->d_inode)
->> 		printk(KERN_WARNING "sysfs locking blows: %s",
->> 			parent->d_name.name);
->> right before
->>                 mutex_lock(&parent->d_inode->i_mutex);
->>                 dentry = lookup_one_noperm(cur->s_name, parent);
->>                 mutex_unlock(&parent->d_inode->i_mutex);
->> in sysfs_get_dentry() (fs/sysfs/dir.c) and verify that it does, indeed,
->> trigger?
-> 
-> Here it is:
-> 
-> Jan  7 14:35:43 twister kernel: sysfs locking blows: acl001BAFE1624D<1>Unable to handle kernel NULL pointer dereference at 00000000000000b8 RIP: 
-
-Does the attached patch fix the problem?
-
--- 
-tejun
-
---------------080309060701040302010706
-Content-Type: text/x-patch;
- name="kill-extra-put-in-sysfs_move_dir.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline; filename="kill-extra-put-in-sysfs_move_dir.patch"
-
-diff --git a/fs/sysfs/dir.c b/fs/sysfs/dir.c
-index 3371629..4e7f3bf 100644
---- a/fs/sysfs/dir.c
-+++ b/fs/sysfs/dir.c
-@@ -878,7 +878,6 @@ again:
- 	error = 0;
- 	d_add(new_dentry, NULL);
- 	d_move(old_dentry, new_dentry);
--	dput(new_dentry);
- 
- 	/* Remove from old parent's list and insert into new parent's list. */
- 	sysfs_unlink_sibling(sd);
-
---------------080309060701040302010706
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2005.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---------------080309060701040302010706
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---------------080309060701040302010706--
+T24gSmFuIDcsIDIwMDggNDowMyBQTSwgQXJpc3RldSBSb3phbnNraSA8YXJpc0BydWl2by5vcmc+
+IHdyb3RlOgo+ID4gPiBJIGRvbid0IHVuZGVyc3RhbmQgd2hhdCB5b3UgbWVhbiBieSBtdWx0aXBs
+ZSBrZXkgcHJlc3NlcyB0aGVyZS4KPiA+IFdoZW4geW91IHByZXNzIHRyaWFuZ2xlIGFuZCBsZWZ0
+IHRvZ2V0aGVyLCB0aGlzIGNhbiBiZSByZWNvZ25pc2VkLCBidXQKPiA+IG9ubHkgZm9yIHRoZSBw
+bGF5c3RhdGlvbiAobWlkZGxlKSBrZXlzLgo+IGl0J3Mgbm90IHN1cHBvcnRlZC4gZG9lcyB5b3Vy
+IGFwcGxpY2F0aW9uIHJlY29nbml6ZSBib3RoIGtleXMgYmVpbmcKPiBwcmVzc2VkIGF0IHNhbWUg
+dGltZT8gSSBub3RpY2VkIHRoYXQgcHMga2V5ICsgb3RoZXIga2V5cyBnZW5lcmF0ZXMgYQo+IGRp
+ZmZlcmVudCBjb2RlIGJ1dCBJIGRpZG4ndCBpbXBsZW1lbnRlZCBzdXBwb3J0IGZvciB0aGF0LgoK
+WWVzLCBJIGhhdmUgYSB0YWJsZSBleHBsYWluaW5nIHRoZSBjb2RlcyB0aGF0IGFyZSBnZW5lcmF0
+ZWQgc29tZXdoZXJlLApJJ2xsIGxvb2sgaXQgdXAgd2hlbiBJJ20gYmFjayBob21lLgoKPiA+ID4g
+PiBBbHNvLCBzb21lIGtleXMgYXJlIGJvdW5kIHJlYWxseSB3ZWlyZCAoY3Jvc3MgdG8gS0VZX0VO
+VEVSIHdoaWxlIHRoZQo+ID4gPiA+IGVudGVyIGtleSBhbHJlYWR5IGlzIEtFWV9FTlRFUj8gaG93
+IGRvZXMgdGhlIHNpeGF4aXMgZG8gdGhpcz8pLgo+ID4gPgo+ID4gPiBJIGRvbid0IHVuZGVyc3Rh
+bmQgdGhlIHByb2JsZW0gaGVyZSBlaXRoZXIuLi4KPiA+IFRoZSB3YXkgSSBzZWUgaXQsIHRoZSBl
+bnRlciBhbmQgY3Jvc3Mga2V5cyBhcmUgcmVhbGx5IGRpZmZlcmVudCBrZXlzLAo+ID4gYnV0IG1h
+eWJlIHRoZXJlIGlzIHNvbWUgcmVhc29uIGZvciB0aGlzPwo+IHdoZXJlIGRpZCB5b3UgZmluZCB0
+aGF0IHRoZSBjcm9zcyBidXR0b24gaXMgbWFwcGVkIHRvIEtFWV9FTlRFUj8KCm9uIGh0dHA6Ly9h
+cnRpY2xlLmdtYW5lLm9yZy9nbWFuZS5saW51eC5ibHVlei5kZXZlbC8xNDAzNSBJIHNlZToKKwlb
+MHg1ZV0gPSBLRVlfRU5URVIsCQkvKiBjcm9zcyAqLwouLi4KKwlbMHgwYl0gPSBLRVlfRU5URVIs
+CgotLSAKTXZnCk3DtHNoZSB2YW4gZGVyIFN0ZXJyZQpodHRwOi8vd3d3Lm1vc2hlLm5sLwpodHRw
+Oi8vd3d3LmNvZWN1Lm5sLwotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNw
+b25zb3JlZCBieTogTWljcm9zb2Z0CkRlZnkgYWxsIGNoYWxsZW5nZXMuIE1pY3Jvc29mdChSKSBW
+aXN1YWwgU3R1ZGlvIDIwMDUuCmh0dHA6Ly9jbGsuYXRkbXQuY29tL01SVC9nby92c2UwMTIwMDAw
+MDcwbXJ0L2RpcmVjdC8wMS8KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJj
+ZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9i
+bHVlei1kZXZlbAo=
