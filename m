@@ -1,10 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 8 Jan 2008 00:09:10 +0100
-From: Pavel Semerad <semerad@sisal.mff.cuni.cz>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20080107230910.GA5883@ps.ms.mff.cuni.cz>
+Date: Mon, 7 Jan 2008 22:00:24 +0100
+From: Gabor Gombas <gombasg@sztaki.hu>
+To: Tejun Heo <htejun@gmail.com>
+Message-ID: <20080107210024.GA13537@boogie.lpds.sztaki.hu>
+References: <20071228173203.GA20690@boogie.lpds.sztaki.hu>
+	<a8e1da0712290007o168a730cw923055ad2c265d84@mail.gmail.com>
+	<20080102151642.GA7273@boogie.lpds.sztaki.hu>
+	<20080105075039.GF27894@ZenIV.linux.org.uk>
+	<20080107141300.GB12763@boogie.lpds.sztaki.hu>
+	<47824415.80703@gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] patch removing one extra memset
+In-Reply-To: <47824415.80703@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>,
+	bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] Oops involving RFCOMM and sysfs
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,29 +27,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+On Tue, Jan 08, 2008 at 12:24:05AM +0900, Tejun Heo wrote:
 
-Helo,
+> Does the attached patch fix the problem?
 
-I have found one mistake in audio/ctl_bluetooth.c . When initializing
-this plugin, 'data' is allocated and memset-ed to 0. Then socket is
-created and assigned to 'data'. And then there is another memset, which
-sets this socket back to zero.
-    Patch removing this extra memset is attached:
+No, it still oopses.
 
---- ./audio/ctl_bluetooth.c.ps  2007-12-08 20:04:39.000000000 +0100
-+++ ./audio/ctl_bluetooth.c     2008-01-07 23:41:23.000000000 +0100
-@ -327,8 +327,6 @@ SND_CTL_PLUGIN_DEFINE_FUNC(bluetooth)
-        if (err < 0)
-                goto error;
- 
--       memset(data, 0, sizeof(*data));
--
-        data->ext.version = SND_CTL_EXT_VERSION;
-        data->ext.card_idx = -1;
- 
+Gabor
 
-Pavel Semerad
-
+-- 
+     ---------------------------------------------------------
+     MTA SZTAKI Computer and Automation Research Institute
+                Hungarian Academy of Sciences
+     ---------------------------------------------------------
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
