@@ -1,16 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2bab7e280801070712l493fc709v4797d4b6647b8b89@mail.gmail.com>
-Date: Mon, 7 Jan 2008 16:12:17 +0100
-From: "=?UTF-8?Q?M=C3=B4she_Van_der_Sterre?=" <moshevds@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20080107150345.GC6027@cathedrallabs.org>
-MIME-Version: 1.0
+Date: Mon, 7 Jan 2008 10:03:45 -0500
+From: Aristeu Rozanski <aris@ruivo.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20080107150345.GC6027@cathedrallabs.org>
 References: <2bab7e280801061151s221838ccy9913e62ad4480706@mail.gmail.com>
 	<1199706716.6584.4.camel@cookie.hadess.net>
 	<2bab7e280801070449h3786dc47jb7811016f71af8e@mail.gmail.com>
 	<1199711199.6584.13.camel@cookie.hadess.net>
 	<2bab7e280801070640s76089762v208061db0fce57f7@mail.gmail.com>
-	<20080107150345.GC6027@cathedrallabs.org>
+MIME-Version: 1.0
+In-Reply-To: <2bab7e280801070640s76089762v208061db0fce57f7@mail.gmail.com>
 Subject: Re: [Bluez-devel] PS3 BD remote
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,35 +20,34 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-T24gSmFuIDcsIDIwMDggNDowMyBQTSwgQXJpc3RldSBSb3phbnNraSA8YXJpc0BydWl2by5vcmc+
-IHdyb3RlOgo+ID4gPiBJIGRvbid0IHVuZGVyc3RhbmQgd2hhdCB5b3UgbWVhbiBieSBtdWx0aXBs
-ZSBrZXkgcHJlc3NlcyB0aGVyZS4KPiA+IFdoZW4geW91IHByZXNzIHRyaWFuZ2xlIGFuZCBsZWZ0
-IHRvZ2V0aGVyLCB0aGlzIGNhbiBiZSByZWNvZ25pc2VkLCBidXQKPiA+IG9ubHkgZm9yIHRoZSBw
-bGF5c3RhdGlvbiAobWlkZGxlKSBrZXlzLgo+IGl0J3Mgbm90IHN1cHBvcnRlZC4gZG9lcyB5b3Vy
-IGFwcGxpY2F0aW9uIHJlY29nbml6ZSBib3RoIGtleXMgYmVpbmcKPiBwcmVzc2VkIGF0IHNhbWUg
-dGltZT8gSSBub3RpY2VkIHRoYXQgcHMga2V5ICsgb3RoZXIga2V5cyBnZW5lcmF0ZXMgYQo+IGRp
-ZmZlcmVudCBjb2RlIGJ1dCBJIGRpZG4ndCBpbXBsZW1lbnRlZCBzdXBwb3J0IGZvciB0aGF0LgoK
-WWVzLCBJIGhhdmUgYSB0YWJsZSBleHBsYWluaW5nIHRoZSBjb2RlcyB0aGF0IGFyZSBnZW5lcmF0
-ZWQgc29tZXdoZXJlLApJJ2xsIGxvb2sgaXQgdXAgd2hlbiBJJ20gYmFjayBob21lLgoKPiA+ID4g
-PiBBbHNvLCBzb21lIGtleXMgYXJlIGJvdW5kIHJlYWxseSB3ZWlyZCAoY3Jvc3MgdG8gS0VZX0VO
-VEVSIHdoaWxlIHRoZQo+ID4gPiA+IGVudGVyIGtleSBhbHJlYWR5IGlzIEtFWV9FTlRFUj8gaG93
-IGRvZXMgdGhlIHNpeGF4aXMgZG8gdGhpcz8pLgo+ID4gPgo+ID4gPiBJIGRvbid0IHVuZGVyc3Rh
-bmQgdGhlIHByb2JsZW0gaGVyZSBlaXRoZXIuLi4KPiA+IFRoZSB3YXkgSSBzZWUgaXQsIHRoZSBl
-bnRlciBhbmQgY3Jvc3Mga2V5cyBhcmUgcmVhbGx5IGRpZmZlcmVudCBrZXlzLAo+ID4gYnV0IG1h
-eWJlIHRoZXJlIGlzIHNvbWUgcmVhc29uIGZvciB0aGlzPwo+IHdoZXJlIGRpZCB5b3UgZmluZCB0
-aGF0IHRoZSBjcm9zcyBidXR0b24gaXMgbWFwcGVkIHRvIEtFWV9FTlRFUj8KCm9uIGh0dHA6Ly9h
-cnRpY2xlLmdtYW5lLm9yZy9nbWFuZS5saW51eC5ibHVlei5kZXZlbC8xNDAzNSBJIHNlZToKKwlb
-MHg1ZV0gPSBLRVlfRU5URVIsCQkvKiBjcm9zcyAqLwouLi4KKwlbMHgwYl0gPSBLRVlfRU5URVIs
-CgotLSAKTXZnCk3DtHNoZSB2YW4gZGVyIFN0ZXJyZQpodHRwOi8vd3d3Lm1vc2hlLm5sLwpodHRw
-Oi8vd3d3LmNvZWN1Lm5sLwotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNw
-b25zb3JlZCBieTogTWljcm9zb2Z0CkRlZnkgYWxsIGNoYWxsZW5nZXMuIE1pY3Jvc29mdChSKSBW
-aXN1YWwgU3R1ZGlvIDIwMDUuCmh0dHA6Ly9jbGsuYXRkbXQuY29tL01SVC9nby92c2UwMTIwMDAw
-MDcwbXJ0L2RpcmVjdC8wMS8KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJj
-ZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9i
-bHVlei1kZXZlbAo=
+> > I don't understand what you mean by multiple key presses there.
+> When you press triangle and left together, this can be recognised, but
+> only for the playstation (middle) keys.
+it's not supported. does your application recognize both keys being
+pressed at same time? I noticed that ps key + other keys generates a
+different code but I didn't implemented support for that.
+
+> > > Also, some keys are bound really weird (cross to KEY_ENTER while the
+> > > enter key already is KEY_ENTER? how does the sixaxis do this?).
+> >
+> > I don't understand the problem here either...
+> The way I see it, the enter and cross keys are really different keys,
+> but maybe there is some reason for this?
+where did you find that the cross button is mapped to KEY_ENTER?
+
+-- 
+Aristeu
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
