@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2bab7e280801070449h3786dc47jb7811016f71af8e@mail.gmail.com>
-Date: Mon, 7 Jan 2008 13:49:39 +0100
-From: "=?UTF-8?Q?M=C3=B4she_Van_der_Sterre?=" <moshevds@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1199706716.6584.4.camel@cookie.hadess.net>
-MIME-Version: 1.0
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <2bab7e280801061151s221838ccy9913e62ad4480706@mail.gmail.com>
 References: <2bab7e280801061151s221838ccy9913e62ad4480706@mail.gmail.com>
-	<1199706716.6584.4.camel@cookie.hadess.net>
+Date: Mon, 07 Jan 2008 11:51:56 +0000
+Message-Id: <1199706716.6584.4.camel@cookie.hadess.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] PS3 BD remote
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -17,29 +16,41 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-PiBTZWUgdGhlIHBhdGNoKGVzKSBzZW50IGJ5IEFyaXN0ZXUgb24gdGhlIGxpc3Q6Cj4gaHR0cDov
-L3RocmVhZC5nbWFuZS5vcmcvZ21hbmUubGludXguYmx1ZXouZGV2ZWwvMTM3OTMKPiBodHRwOi8v
-dGhyZWFkLmdtYW5lLm9yZy9nbWFuZS5saW51eC5ibHVlei5kZXZlbC8xMzc5NAo+IGh0dHA6Ly90
-aHJlYWQuZ21hbmUub3JnL2dtYW5lLmxpbnV4LmJsdWV6LmRldmVsLzEzNzk1Cj4gaHR0cDovL3Ro
-cmVhZC5nbWFuZS5vcmcvZ21hbmUubGludXguYmx1ZXouZGV2ZWwvMTM3OTYKPiBodHRwOi8vdGhy
-ZWFkLmdtYW5lLm9yZy9nbWFuZS5saW51eC5ibHVlei5kZXZlbC8xMzc5Nwo+Cj4gQ2hlZXJzCgpH
-cmVhdCwgVGhpcyBzZWVtcyB0byBiZSBzZW5kIHRvIHRoZSBsaXN0IHNvbWUgdGltZSBhZnRlciBJ
-IGFza2VkIGFib3V0Cml0IG9uIElSQywgYW5kIGl0IHNlZW1zIHRvIGJlIGEgY29tcGxldGUgaW1w
-bGVtZW50YXRpb24gb2YgdGhlIHJlbW90ZS4KVGhlIG9ubHkgdGhpbmcgSSBkb24ndCBzZWUgaXMg
-c3VwcG9ydCBmb3IgbXVsdGlwbGUga2V5cyBwcmVzc2VkIChvbmx5CnRoZSAncGxheXN0YXRvbicg
-a2V5cyBzdXBwb3J0IHRoaXMpLCBJJ2xsIHRyeSB0byB0ZXN0IHRoaXMgY29kZSB0aGlzCndlZWsu
-CkFsc28sIHNvbWUga2V5cyBhcmUgYm91bmQgcmVhbGx5IHdlaXJkIChjcm9zcyB0byBLRVlfRU5U
-RVIgd2hpbGUgdGhlCmVudGVyIGtleSBhbHJlYWR5IGlzIEtFWV9FTlRFUj8gaG93IGRvZXMgdGhl
-IHNpeGF4aXMgZG8gdGhpcz8pLgoKLS0gCk12ZwpNw7RzaGUgdmFuIGRlciBTdGVycmUKaHR0cDov
-L3d3dy5tb3NoZS5ubC8KaHR0cDovL3d3dy5jb2VjdS5ubC8KLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlz
-IFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6IE1pY3Jvc29mdApEZWZ5IGFsbCBjaGFsbGVu
-Z2VzLiBNaWNyb3NvZnQoUikgVmlzdWFsIFN0dWRpbyAyMDA1LgpodHRwOi8vY2xrLmF0ZG10LmNv
-bS9NUlQvZ28vdnNlMDEyMDAwMDA3MG1ydC9kaXJlY3QvMDEvCl9fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVl
-ei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5u
-ZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
+
+On Sun, 2008-01-06 at 20:51 +0100, M=F4she Van der Sterre wrote:
+> Hello,
+> =
+
+> I have a Sony Playstation 3 Blu-ray Disk Remote Control, and use it
+> with bluez using a self written program,
+> (I've uploaded it to http://moshe.nl/ps3-remote-test1.tar.bz2 )
+> Some time ago, I spoke someone on IRC who told me bluez-utils has some
+> code that does the same,
+> but I don't really know how to create a plugin to handle the remote.
+> =
+
+> Can someone point me to information about this, or give some examples
+> on how to do it?
+
+See the patch(es) sent by Aristeu on the list:
+http://thread.gmane.org/gmane.linux.bluez.devel/13793
+http://thread.gmane.org/gmane.linux.bluez.devel/13794
+http://thread.gmane.org/gmane.linux.bluez.devel/13795
+http://thread.gmane.org/gmane.linux.bluez.devel/13796
+http://thread.gmane.org/gmane.linux.bluez.devel/13797
+
+Cheers
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
