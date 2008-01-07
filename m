@@ -1,71 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 Jan 2008 13:41:22 +0800
-From: Dave Young <hidave.darkstar@gmail.com>
-To: marcel@holtmann.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bluez-devel@lists.sourceforge.net
-Subject: [PATCH] bluetooth : rfcomm tty BUG_ON() code fix
-Message-ID: <20080107054122.GA4502@darkstar.te-china.tietoenator.com>
+Message-ID: <47819079.3000606@gmail.com>
+Date: Mon, 07 Jan 2008 11:37:45 +0900
+From: Tejun Heo <htejun@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-List-ID: <bluez-devel.lists.sourceforge.net>
+To: Al Viro <viro@ZenIV.linux.org.uk>
+References: <20071228173203.GA20690@boogie.lpds.sztaki.hu>
+	<a8e1da0712290007o168a730cw923055ad2c265d84@mail.gmail.com>
+	<20080102151642.GA7273@boogie.lpds.sztaki.hu>
+	<20080105075039.GF27894@ZenIV.linux.org.uk>
+	<477F9481.2040505@gmail.com>
+	<20080105194510.GK27894@ZenIV.linux.org.uk>
+	<478037F8.8020103@gmail.com>
+In-Reply-To: <478037F8.8020103@gmail.com>
+Cc: Gabor Gombas <gombasg@sztaki.hu>, Greg KH <greg@kroah.com>,
+	linux-kernel@vger.kernel.org, ebiederm@xmission.com,
+	bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] Oops involving RFCOMM and sysfs
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-1) In tty.c the BUG_ON at line 115 will never be called, because the the before list_del_init in this same function.
- 115          BUG_ON(!list_empty(&dev->list));
-So move the list_del_init to rfcomm_dev_del 
+Hello,
 
-2) The rfcomm_dev_del could be called from diffrent path (rfcomm_tty_hangup/rfcomm_dev_state_change/rfcomm_release_dev),
-So add another BUG_ON when the rfcomm_dev_del is called more than one time.
+Tejun Heo wrote:
+> Al Viro wrote:
+>> On Sat, Jan 05, 2008 at 11:30:25PM +0900, Tejun Heo wrote:
+>>>> Assuming that this is what we get, everything looks explainable - we
+>>>> have sysfs_rename_dir() calling sysfs_get_dentry() while the parent
+>>>> gets evicted.  We don't have any exclusion, so while we are playing
+>>>> silly buggers with lookups in sysfs_get_dentry() we have parent become
+>>>> negative; the rest is obvious...
+>>> That part of code is walking down the sysfs tree from the s_root of
+>>> sysfs hierarchy and on each step parent is held using dget() while being
+>>> referenced, so I don't think they can turn negative there.
+>> Turn?  Just what stops you from getting a negative (and unhashed) from
+>> lookup_one_noperm() and on the next iteration being buggered on mutex_lock()?
+> 
+> Right, I haven't thought about that.  When sysfs_get_dentry() is called,
+> @sd is always valid so unless there was existing negative dentry, lookup
+> is guaranteed to return positive dentry, but by populating dcache with
+> negative dentry before a node is created, things can go wrong.  I don't
+> think that's what's going on here tho.  If that was the case, the
+> while() loop looking up the next sd to lookup (@cur) should have blown
+> up as negative dentry will have NULL d_fsdata which doesn't match any sd.
+> 
+> I guess what's needed here is d_revalidate() as other distributed
+> filesystems do.  I'll test whether this can be actually triggered and
+> prepare a fix.  Thanks a lot for pointing out the problem.
 
-Signed-off-by: Dave Young <hidave.darkstar@gmail.com> 
+This can't happen because lookup of non-existent entry doesn't create a
+negative dentry.  The new dentry is never hashed and killed after lookup
+failure, the above scenario can't happen.
 
----
-net/bluetooth/rfcomm/tty.c |   22 +++++++++++++---------
-1 file changed, 13 insertions(+), 9 deletions(-)
+That said, the mechanism is a bit too fragile.  sysfs currently ensures
+that dentry/inode point to the associated sysfs_dirent.  This is mainly
+remanent of conversion from previous VFS based implementation.  I think
+the right thing to do here is to make sysfs behave like other proper
+distributed filesystems using d_revalidate.
 
-diff -upr linux/net/bluetooth/rfcomm/tty.c linux.new/net/bluetooth/rfcomm/tty.c
---- linux/net/bluetooth/rfcomm/tty.c	2008-01-07 13:20:17.000000000 +0800
-+++ linux.new/net/bluetooth/rfcomm/tty.c	2008-01-07 13:25:17.000000000 +0800
-@@ -95,9 +95,10 @@ static void rfcomm_dev_destruct(struct r
- 
- 	BT_DBG("dev %p dlc %p", dev, dlc);
- 
--	write_lock_bh(&rfcomm_dev_lock);
--	list_del_init(&dev->list);
--	write_unlock_bh(&rfcomm_dev_lock);
-+	/* Refcount should only hit zero when called from rfcomm_dev_del()
-+	   which will have taken us off the list. Everything else are
-+	   refcounting bugs. */
-+	BUG_ON(!list_empty(&dev->list));
- 
- 	rfcomm_dlc_lock(dlc);
- 	/* Detach DLC if it's owned by this dev */
-@@ -109,11 +110,6 @@ static void rfcomm_dev_destruct(struct r
- 
- 	tty_unregister_device(rfcomm_tty_driver, dev->id);
- 
--	/* Refcount should only hit zero when called from rfcomm_dev_del()
--	   which will have taken us off the list. Everything else are
--	   refcounting bugs. */
--	BUG_ON(!list_empty(&dev->list));
--
- 	kfree(dev);
- 
- 	/* It's safe to call module_put() here because socket still
-@@ -313,7 +309,15 @@ static void rfcomm_dev_del(struct rfcomm
- {
- 	BT_DBG("dev %p", dev);
- 
--	set_bit(RFCOMM_TTY_RELEASED, &dev->flags);
-+	if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
-+		BUG_ON(1);
-+	else
-+		set_bit(RFCOMM_TTY_RELEASED, &dev->flags);
-+
-+	write_lock_bh(&rfcomm_dev_lock);
-+	list_del_init(&dev->list);
-+	write_unlock_bh(&rfcomm_dev_lock);
-+
- 	rfcomm_dev_put(dev);
- }
- 
+Thanks.
+
+-- 
+tejun
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2005.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
