@@ -1,10 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 Jan 2008 01:28:28 +0100
-From: Pavel Semerad <semerad@sisal.mff.cuni.cz>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20080109002828.GB5883@ps.ms.mff.cuni.cz>
-MIME-Version: 1.0
-Subject: [Bluez-devel] error in headset capture, patch included
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1199805807.20835.10.camel@greatbear>
+References: <20080107230910.GA5883@ps.ms.mff.cuni.cz>
+	<d89ddf300801071547k792a5b9fqe6e7e72e597b0e5f@mail.gmail.com>
+	<1199805807.20835.10.camel@greatbear>
+Date: Tue, 08 Jan 2008 19:28:57 +0100
+Message-Id: <1199816937.26099.75.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] HFP method "SetupCall" +
+	audio-api.txt	update
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,44 +23,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Alok,
 
-Helo,
+> Here is a patch for adding the SetupCall method , used for call setup on
+> hfp. Also adding a patch to update the audio-api.txt file for the same. 
+> 
+> Let me know if anything needs to be changed. 
 
-I have found error in function bluetooth_hsp_read. frame_size is
-correctly set only when data->count is zero. When data->count is
-nonzero, frame_size is 0 and condition
-'if ((data->count + size * frame_size) <= data->link_mtu)'
-is always true and frames_to_write is set incorrectly (1000 instead
-max 24 in my case). This results in capture not working for headset,
-cycling in endless loop.
+the signal should be "CallTerminated" or its description is wrong. A
+name like "TerminateCall" would be a name for a method.
 
-Following patch sets frame_size before check to data->count and
-'arecord -D bluetooth -f S16_LE' now works.
+Regards
 
-Pavel Semerad
+Marcel
 
 
-
---- ./audio/pcm_bluetooth.c.capture     2007-12-08 20:04:40.000000000
-+0100
-+++ ./audio/pcm_bluetooth.c     2008-01-09 01:12:02.000000000 +0100
-@ -786,11 +786,11 @@ static snd_pcm_sframes_t bluetooth_hsp_r
-        DBG("areas->step=%u areas->first=%u offset=%lu size=%lu
-io->nonblock=%u",
-                        areas->step, areas->first, offset, size,
-io->nonblock);
- 
-+       frame_size = areas->step / 8;
-+
-        if (data->count > 0)
-                goto proceed;
- 
--       frame_size = areas->step / 8;
--
-        nrecv = recv(data->stream.fd, data->buffer, data->link_mtu,
-                        MSG_WAITALL | (io->nonblock ? MSG_DONTWAIT :
-0));
- 
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
