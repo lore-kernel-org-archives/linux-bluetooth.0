@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <359782e70801080817y3c57b5c6se41ee8631948e4d7@mail.gmail.com>
-Date: Wed, 9 Jan 2008 00:17:49 +0800
-From: "bsd user" <oldmoonster@gmail.com>
+Date: Tue, 8 Jan 2008 06:24:30 +0100 (CET)
+From: Leszek Koltunski <leszek@3miasto.net.pl>
 To: bluez-users@lists.sourceforge.net
+Message-ID: <20080108043952.K43726@3miasto.net.pl>
 MIME-Version: 1.0
-Subject: [Bluez-users] is there java bluetooth application on linux?
+Subject: [Bluez-users] problems with bluez-utils audio: arecord, mplayer
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,60 +14,77 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1387893194=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1387893194==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_7382_6064346.1199809069444"
 
-------=_Part_7382_6064346.1199809069444
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hello everybody,
 
-Hi, all,
+recently I installed bluez-utils 3.22 with the thought I'd set up it for 
+my Motorola HT820 headset.
 
-I am trying to find some java bluetooth application(no matter opensourced or
-not) that can run on Linux x86 box, is here the right alias to ask for?
+I took the sources from Debian testing, applied patch 
+'bluez-utils_debian.debdiff' as given in
 
-Thanks a lot!
+http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=453066
 
-------=_Part_7382_6064346.1199809069444
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+,copied files 'audio.conf' and 'audio.service' to /etc/bluetooth ( as it 
+is recommended in the bugreport above ) and compiled everything.
 
-<div>Hi, all,</div>
-<div>&nbsp;</div>
-<div>I am trying to find some java bluetooth application(no matter opensourced or not)&nbsp;that can run on Linux x86 box, is here the right alias to ask for?</div>
-<div>&nbsp;</div>
-<div>Thanks a lot!</div>
+My .asoundrc:
 
-------=_Part_7382_6064346.1199809069444--
+pcm.headset_hw {
+    type bluetooth
+    device BTADDR
+    }
+
+ctl.headset {
+    type bluetooth
+    device BTADDR
+    }
+
+pcm.headset {
+    type plug
+    slave.pcm "headset_hw"
+    }
 
 
---===============1387893194==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+The result:
+
+- aplay, audacious can send decent-quality sound to my headset with no 
+problems
+- totem can play a movie and send its sound to the headset with no 
+problems
+- 'arecord -D headset -f S16_LE foo.wav' FAILS to record anything ( 
+produces a 44 byte long 'foo.wav' with just the WAV header , but otherwise 
+does not spit out any errors )
+- mplayer can play sound alone, but playing sound and video at the same 
+time results in a choppy sound. This effect has been described before 
+here:
+
+http://sourceforge.net/mailarchive/forum.php?thread_name=9a119b3c0711230758v7fa8a53eub2532227762542bd%40mail.gmail.com&forum_name=bluez-users
+
+I can add one observation: I've seen movies which play good sound 
+initially, but at the moment when I resize the video alsa says 'broken 
+pipe' and the sound becomes choppy.
+
+
+**********************************************************************
+
+Questions:
+
+- how can I debug the problem with 'arecord' ?
+- why totem can play movies with no problems, but mplayer can not?
+
+
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
---===============1387893194==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1387893194==--
