@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 From: Alok <develnewbie@gmail.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <d89ddf300801071547k792a5b9fqe6e7e72e597b0e5f@mail.gmail.com>
-References: <20080107230910.GA5883@ps.ms.mff.cuni.cz>
-	<d89ddf300801071547k792a5b9fqe6e7e72e597b0e5f@mail.gmail.com>
-Content-Type: multipart/mixed; boundary="=-5xkvlCMssrQbVM0etzW0"
-Date: Tue, 08 Jan 2008 20:53:27 +0530
-Message-Id: <1199805807.20835.10.camel@greatbear>
+In-Reply-To: <000801c851e8$81d6a710$8583f530$@savary@kerlink.fr>
+References: <000801c851e8$81d6a710$8583f530$@savary@kerlink.fr>
+Content-Type: multipart/mixed; boundary="=-Zxh1V+QgCjnnyD+/xJRc"
+Date: Tue, 08 Jan 2008 19:33:53 +0530
+Message-Id: <1199801033.20835.4.camel@greatbear>
 Mime-Version: 1.0
-Subject: [Bluez-devel] [PATCH] HFP method "SetupCall" + audio-api.txt update
+Subject: [Bluez-devel] [PATCH] more headset.c fixes
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,152 +21,241 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---=-5xkvlCMssrQbVM0etzW0
+--=-Zxh1V+QgCjnnyD+/xJRc
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-Hi Johan/Fredric, 
+Hi Johan/Fredric,
 
-Here is a patch for adding the SetupCall method , used for call setup on
-hfp. Also adding a patch to update the audio-api.txt file for the same. 
+Here is a patch which fixes the following :
 
-Let me know if anything needs to be changed. 
+1. Consistency with headset_send args. 
+2. error checks for headset_send. 
+3. Populating answer_call and terminate_call methods.
+4. Adding "TerminateCall" signal.
+
+let me know if anything needs to be changed.
 
 -Alok.
 
---=-5xkvlCMssrQbVM0etzW0
-Content-Disposition: attachment; filename=audio-api.patch
-Content-Type: text/x-patch; name=audio-api.patch; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-
-Index: audio/audio-api.txt
-===================================================================
-RCS file: /cvsroot/bluez/utils/audio/audio-api.txt,v
-retrieving revision 1.25
-diff -u -5 -p -r1.25 audio-api.txt
---- audio/audio-api.txt	29 Aug 2007 11:41:15 -0000	1.25
-+++ audio/audio-api.txt	8 Jan 2008 15:01:51 -0000
-@@ -181,10 +181,17 @@ Methods		void Connect()
- 
- 		void SetMicrophoneGain(uint16 gain)
- 
- 			Changes the current speaker gain if possible.
- 
-+                void SetupCall(string value)
-+
-+                        Sets up an call with the connected HFP.
-+                        value can be incoming, outgoing
-+                        or remote to indicate incoming call, outgoing
-+                        call and remote party alerted respectively.                                                                   
-+
- Signals		void AnswerRequested()
- 
- 			Sent when the answer button is pressed on the headset
- 
- 		void Connected()
-@@ -209,10 +216,14 @@ Signals		void AnswerRequested()
- 
- 		void MicrophoneGainChanged(uint16 gain)
- 
- 			The microphone gain changed.
- 
-+                void TerminateCall()
-+
-+                        Sent when an ongoing call is terminated.                
-+
- 
- org.bluez.audio.Gateway interface
- =================================
- 
- [not yet implemented]
-
---=-5xkvlCMssrQbVM0etzW0
-Content-Disposition: attachment; filename=setupCall.patch
-Content-Type: text/x-patch; name=setupCall.patch; charset=us-ascii
+--=-Zxh1V+QgCjnnyD+/xJRc
+Content-Disposition: attachment; filename=patch
+Content-Type: text/x-patch; name=patch; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
 Index: audio/headset.c
 ===================================================================
 RCS file: /cvsroot/bluez/utils/audio/headset.c,v
-retrieving revision 1.153
-diff -u -5 -p -r1.153 headset.c
---- audio/headset.c	8 Jan 2008 14:45:32 -0000	1.153
-+++ audio/headset.c	8 Jan 2008 14:52:49 -0000
-@@ -1395,10 +1395,60 @@ static DBusHandlerResult hs_set_mic_gain
- 						void *data)
- {
- 	return hs_set_gain(conn, msg, data, HEADSET_GAIN_MICROPHONE);
+retrieving revision 1.152
+diff -u -5 -p -r1.152 headset.c
+--- audio/headset.c	8 Jan 2008 08:58:14 -0000	1.152
++++ audio/headset.c	8 Jan 2008 14:02:41 -0000
+@@ -173,11 +173,11 @@ static int supported_features(struct dev
+ 	hs->hfp_features = strtoul(&buf[8], NULL, 10);
+ 	err = headset_send(hs, "\r\n+BRSF=%u\r\n", ag_features);
+ 	if (err < 0)
+ 		return err;
+ 
+-	return headset_send(device->headset, "\r\nOK\r\n");
++	return headset_send(hs, "\r\nOK\r\n");
  }
  
-+static DBusHandlerResult hf_setup_call(DBusConnection *conn,
-+						DBusMessage *msg,
-+						void *data)
-+{
-+	struct device *device = data;
+ static int report_indicators(struct device *device, const char *buf)
+ {
+ 	struct headset *hs = device->headset;
+@@ -190,16 +190,17 @@ static int report_indicators(struct devi
+ 		err = headset_send(hs, "\r\n+CIND:1, 0, 0\r\n");
+ 
+ 	if (err < 0)
+ 		return err;
+ 
+-	return headset_send(device->headset, "\r\nOK\r\n");
++	return headset_send(hs, "\r\nOK\r\n");
+ }
+ 
+ static int event_reporting(struct device *device, const char *buf)
+ {
+-	return headset_send(device->headset, "\r\nOK\r\n");
 +	struct headset *hs = device->headset;
-+	DBusMessage *reply;
-+	DBusError derr;
-+	const char *value;
++	return headset_send(hs, "\r\nOK\r\n");
+ }
+ 
+ static int call_hold(struct device *device, const char *buf)
+ {
+ 	struct headset *hs = device->headset;
+@@ -207,29 +208,68 @@ static int call_hold(struct device *devi
+ 
+ 	err = headset_send(hs, "\r\n+CHLD:(0,1,1x,2,2x,3,4)\r\n");
+ 	if (err < 0)
+ 		return err;
+ 
+-	return headset_send(device->headset, "\r\nOK\r\n");
++	return headset_send(hs, "\r\nOK\r\n");
+ }
+ 
+ static int answer_call(struct device *device, const char *buf)
+ {
++	struct headset *hs = device->headset;
 +	int err;
 +
+ 	dbus_connection_emit_signal(device->conn, device->path,
+ 			AUDIO_HEADSET_INTERFACE, "AnswerRequested",
+ 			DBUS_TYPE_INVALID);
+ 
+-	return headset_send(device->headset, "\r\nOK\r\n");
++	if (hs->ring_timer) {
++		g_source_remove(hs->ring_timer);
++		hs->ring_timer = 0;
++	}
++
 +	if (!hs->hfp_active)
-+		return error_not_supported(device->conn, msg);
++		return headset_send(hs, "\r\nOK\r\n");
 +
-+	if (hs->state < HEADSET_STATE_CONNECTED)
-+		return error_not_connected(conn, msg);
++	err = headset_send(hs, "\r\nOK\r\n");
++	if (err < 0)
++		return err;
 +
-+	dbus_error_init(&derr);
-+	dbus_message_get_args(msg, &derr, DBUS_TYPE_STRING, &value,
-+				DBUS_TYPE_INVALID);
++	/*+CIEV: (call = 1)*/
++	err = headset_send(hs, "\r\n+CIEV:2, 1\r\n");
++	if (err < 0)
++		return err;
 +
-+	if (dbus_error_is_set(&derr)) {
-+		error_invalid_arguments(conn, msg, derr.message);
-+		dbus_error_free(&derr);
-+		return DBUS_HANDLER_RESULT_HANDLED;
++	/*+CIEV: (callsetup = 0)*/
++	return headset_send(hs, "\r\n+CIEV:3, 0\r\n");
+ }
+ 
+ static int terminate_call(struct device *device, const char *buf)
+ {
+-	return headset_send(device->headset, "\r\nOK\r\n");
++	struct headset *hs = device->headset;
++	int err;
++
++	dbus_connection_emit_signal(device->conn, device->path,
++			AUDIO_HEADSET_INTERFACE, "TerminateCall",
++			DBUS_TYPE_INVALID);
++
++	if (hs->ring_timer) {
++		g_source_remove(hs->ring_timer);
++		hs->ring_timer = 0;
 +	}
 +
-+	reply = dbus_message_new_method_return(msg);
-+	if (!reply)
-+		return DBUS_HANDLER_RESULT_NEED_MEMORY;
++	err = headset_send(hs, "\r\nOK\r\n");
++	if (err < 0)
++		return err;
 +
-+	if (!strncmp(value, "incoming", 8))
-+		err = headset_send(hs, "\r\n+CIEV:3, 1\r\n");
-+	else if (!strncmp(value, "outgoing", 8))
-+		err = headset_send(hs, "\r\n+CIEV:3, 2\r\n");
-+	else if (!strncmp(value, "remote", 6))
-+		err = headset_send(hs, "\r\n+CIEV:3, 3\r\n");
-+	else
-+		err = -EINVAL;
-+
++	/*+CIEV: (call = 0)*/
++	return headset_send(hs, "\r\n+CIEV:2, 0\r\n");
+ }
+ 
+ static int signal_gain_setting(struct device *device, const char *buf)
+ {
++	struct headset *hs = device->headset;
+ 	const char *name;
+ 	dbus_uint16_t gain;
+ 
+ 	if (strlen(buf) < 8) {
+ 		error("Too short string for Gain setting");
+@@ -243,20 +283,20 @@ static int signal_gain_setting(struct de
+ 		return -1;
+ 	}
+ 
+ 	switch (buf[5]) {
+ 	case HEADSET_GAIN_SPEAKER:
+-		if (device->headset->sp_gain == gain)
++		if (hs->sp_gain == gain)
+ 			goto ok;
+ 		name = "SpeakerGainChanged";
+-		device->headset->sp_gain = gain;
++		hs->sp_gain = gain;
+ 		break;
+ 	case HEADSET_GAIN_MICROPHONE:
+-		if (device->headset->mic_gain == gain)
++		if (hs->mic_gain == gain)
+ 			goto ok;
+ 		name = "MicrophoneGainChanged";
+-		device->headset->mic_gain = gain;
++		hs->mic_gain = gain;
+ 		break;
+ 	default:
+ 		error("Unknown gain setting");
+ 		return G_IO_ERROR_INVAL;
+ 	}
+@@ -265,11 +305,11 @@ static int signal_gain_setting(struct de
+ 				    AUDIO_HEADSET_INTERFACE, name,
+ 				    DBUS_TYPE_UINT16, &gain,
+ 				    DBUS_TYPE_INVALID);
+ 
+ ok:
+-	return headset_send(device->headset, "\r\nOK\r\n");
++	return headset_send(hs, "\r\nOK\r\n");
+ }
+ 
+ static struct event event_callbacks[] = {
+ 	{"ATA", answer_call},
+ 	{"AT+VG", signal_gain_setting},
+@@ -1123,15 +1163,16 @@ error:
+ }
+ 
+ static gboolean ring_timer_cb(gpointer data)
+ {
+ 	struct device *device = data;
++	struct headset *hs = device->headset;
+ 	int err;
+ 
+-	err = headset_send(device->headset, "\r\nRING\r\n");
++	err = headset_send(hs, "\r\nRING\r\n");
+ 
+-	if (err)
++	if (err < 0)
+ 		error("Sending RING failed");
+ 
+ 	return TRUE;
+ }
+ 
+@@ -1153,12 +1194,12 @@ static DBusHandlerResult hs_ring(DBusCon
+ 	if (hs->ring_timer) {
+ 		debug("IndicateCall received when already indicating");
+ 		goto done;
+ 	}
+ 
+-	err = headset_send(device->headset, "\r\nRING\r\n");
+-	if (err) {
++	err = headset_send(hs, "\r\nRING\r\n");
 +	if (err < 0) {
-+		dbus_message_unref(reply);
-+		return error_failed_errno(conn, msg, -err);
-+	}
-+
-+	send_message_and_unref(conn, reply);
-+
-+	return DBUS_HANDLER_RESULT_HANDLED;
-+}
-+
- static DBusMethodVTable headset_methods[] = {
- 	{ "Connect",		hs_connect,		"",	""	},
- 	{ "Disconnect",		hs_disconnect,		"",	""	},
- 	{ "IsConnected",	hs_is_connected,	"",	"b"	},
- 	{ "IndicateCall",	hs_ring,		"",	""	},
-@@ -1408,10 +1458,11 @@ static DBusMethodVTable headset_methods[
- 	{ "IsPlaying",		hs_is_playing,		"",	"b"	},
- 	{ "GetSpeakerGain",	hs_get_speaker_gain,	"",	"q"	},
- 	{ "GetMicrophoneGain",	hs_get_mic_gain,	"",	"q"	},
- 	{ "SetSpeakerGain",	hs_set_speaker_gain,	"q",	""	},
- 	{ "SetMicrophoneGain",	hs_set_mic_gain,	"q",	""	},
-+	{ "SetupCall",		hf_setup_call,		"s",	""	},
- 	{ NULL, NULL, NULL, NULL }
+ 		dbus_message_unref(reply);
+ 		return error_failed(conn, msg, "Failed");
+ 	}
+ 
+ 	hs->ring_timer = g_timeout_add(RING_INTERVAL, ring_timer_cb, device);
+@@ -1311,12 +1352,12 @@ static DBusHandlerResult hs_set_gain(DBu
+ 	if (!reply)
+ 		return DBUS_HANDLER_RESULT_NEED_MEMORY;
+ 
+ 	if (hs->state != HEADSET_STATE_PLAYING)
+ 		goto done;
+-	err = headset_send(device->headset, "\r\n+VG%c=%u\r\n", type, gain);
+-	if (err) {
++	err = headset_send(hs, "\r\n+VG%c=%u\r\n", type, gain);
++	if (err < 0) {
+ 		dbus_message_unref(reply);
+ 		return error_failed(conn, msg, "Unable to send to headset");
+ 	}
+ 
+ done:
+@@ -1377,10 +1418,11 @@ static DBusSignalVTable headset_signals[
+ 	{ "AnswerRequested",		""	},
+ 	{ "Stopped",			""	},
+ 	{ "Playing",			""	},
+ 	{ "SpeakerGainChanged",		"q"	},
+ 	{ "MicrophoneGainChanged",	"q"	},
++	{ "TerminateCall",		""	},
+ 	{ NULL, NULL }
  };
  
- static DBusSignalVTable headset_signals[] = {
- 	{ "Connected",			""	},
+ static void headset_set_channel(struct headset *headset, sdp_record_t *record)
+ {
 
---=-5xkvlCMssrQbVM0etzW0
+--=-Zxh1V+QgCjnnyD+/xJRc
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -178,7 +266,7 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
---=-5xkvlCMssrQbVM0etzW0
+--=-Zxh1V+QgCjnnyD+/xJRc
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -189,4 +277,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-5xkvlCMssrQbVM0etzW0--
+--=-Zxh1V+QgCjnnyD+/xJRc--
