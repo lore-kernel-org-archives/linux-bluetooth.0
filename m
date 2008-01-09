@@ -1,24 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 Jan 2008 09:11:17 +0800
-From: Dave Young <hidave.darkstar@gmail.com>
-To: Tejun Heo <htejun@gmail.com>
-Message-ID: <20080110011117.GA3968@darkstar.te-china.tietoenator.com>
-References: <20071228173203.GA20690@boogie.lpds.sztaki.hu>
-	<a8e1da0712290007o168a730cw923055ad2c265d84@mail.gmail.com>
-	<20080102151642.GA7273@boogie.lpds.sztaki.hu>
-	<20080105075039.GF27894@ZenIV.linux.org.uk>
-	<20080107141300.GB12763@boogie.lpds.sztaki.hu>
-	<47824415.80703@gmail.com>
-	<20080107210024.GA13537@boogie.lpds.sztaki.hu>
-	<47834593.1000506@gmail.com>
-	<20080108133215.GA15814@boogie.lpds.sztaki.hu>
-	<478490D2.5050902@gmail.com>
+Message-ID: <BAY114-W11FC5ABD9C41BFDB590860D7490@phx.gbl>
+From: Mikael Bengtsson <micke_b.b@hotmail.com>
+To: "bluez-devel@lists.sourceforge.net" <bluez-devel@lists.sourceforge.net>
+Date: Wed, 9 Jan 2008 14:42:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <478490D2.5050902@gmail.com>
-Cc: Gabor Gombas <gombasg@sztaki.hu>, Greg KH <greg@kroah.com>,
-	kay.sievers@vrfy.org, linux-kernel@vger.kernel.org,
-	Al Viro <viro@ZenIV.linux.org.uk>, bluez-devel@lists.sf.net
-Subject: Re: [Bluez-devel] Oops involving RFCOMM and sysfs
+Subject: [Bluez-devel] Impossible to restart slave
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -28,148 +14,122 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0315435970=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Wed, Jan 09, 2008 at 06:16:02PM +0900, Tejun Heo wrote:
-> Hello,
-> 
-> My laptop and cell finally decided to talk to each other and I could
-> reproduce the bug here.  The attached patch should remove the oops.
-> 
-> The bug is two folded.  I just skimmed through the bluetooth code and am
-> very likely to wrong at places.  Please correct me where I'm wrong.
-> 
-> 1. It's introduced by class device migration and the bug will go away
-> with CONFIG_SYSFS_DEPRECATED turned on.  With CONFIG_SYSFS_DEPRECATED
-> turned off, what used to be class devices live under actual devices.
-> For rfcomm, this means the rfcommN tty device now lives under the
-> aclXXXX node (probably represents an active connection?) instead of the
-> class directory.
-> 
-> It seems rfcommN devices are supposed to survive over disconnects so the
-> rfcommN device moves under the live connection while connection is alive
-> and retreats back to a default directory when the connection is lost.
-> This is all fine and dandy as long as the rfcommN device lives under
-> class directory as class directory never goes away.
-> 
-> However, with recent sysfs updates, rfcommN now lives directly under the
-> aclXXXX node.  If the connection goes away while rfcommN device is under
-> it, it gets deleted but rfcommN is still treated as alive.
-> 
-> This isn't supported.  sysfs doesn't allow parents to die first and the
-> dangling children to be salvaged using sysfs_move().
-> 
-> 2. Which in turn exposes three bugs in sysfs
-> 	- sysfs_lookup() returning NULL on negative lookup.  sysfs
-> 	  code requires that all negative dentries are shot down.
-> 	  lookup should return -ENOENT instead of NULL.
-> 	- in move and rename, error handling is wrong.  It ends up
-> 	  passing ERR_PTR() values to dput().
-> 	- there was an extra dput() in sysfs_move_dir().
-> 
-> The attached patch fixes all sysfs bugs and removes the oops.  However,
-> rfcommX moving is still broken.  The rfcommX device won't be visible
-> from sysfs tree after the initial move failure and all following moves
-> will fail.
-> 
-> Please confirm the attached patch fixes the oops.  I'll separate it into
-> two patches and forward them to Greg.  But bluetooth code also needs to
-> be updated such that it moves the refcommX device before killing the
-> connection node.
-For bluetooth device_move, the only child device of hci_conn dev is the rfcomm tty_dev. How about the following patch, please verify :
+--===============0315435970==
+Content-Type: multipart/alternative;
+	boundary="_4f8ea4b1-6404-4054-8169-2871f9730cb5_"
 
----
-net/bluetooth/hci_sysfs.c |    7 +++++++
-1 file changed, 7 insertions(+)
+--_4f8ea4b1-6404-4054-8169-2871f9730cb5_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-diff -upr linux/net/bluetooth/hci_sysfs.c linux.new/net/bluetooth/hci_sysfs.c
---- linux/net/bluetooth/hci_sysfs.c	2008-01-10 09:01:51.000000000 +0800
-+++ linux.new/net/bluetooth/hci_sysfs.c	2008-01-10 09:01:22.000000000 +0800
-@@ -316,9 +316,16 @@ void hci_conn_add_sysfs(struct hci_conn 
- 	schedule_work(&conn->work);
- }
- 
-+static int hci_conn_move_child(struct device *dev, void *data)
-+{
-+	device_move(dev, NULL);
-+	return 0;
-+}
-+
- static void del_conn(struct work_struct *work)
- {
- 	struct hci_conn *conn = container_of(work, struct hci_conn, work);
-+	device_for_each_child(&conn->dev, NULL, hci_conn_move_child);
- 	device_del(&conn->dev);
- 	put_device(&conn->dev);
- }
 
-> 
-> Thanks.
-> 
-> -- 
-> tejun
+I'm developing an application which has one master device and three slave d=
+evices. The communication links are the following:
+=20
+Slave device 1: RFCOMM and SCO
+Slave device 2: RFCOMM and SCO
+Slave device 3: RFCOMM
+=20
+If for example slave device 3 should crash or other reason, the master shal=
+l automatically try to restart it. But this seems impossible if the other d=
+evices are up and running. If I then for example power-off slave device 2, =
+slave device 3 will start immediately. Thereafter, when I power-on slave de=
+vice 2 again, this device will start too and everything is up and running.
+=20
+I suspect that it is practically impossible to start slave device 3 since t=
+here are 2 SCO connections up and running which consumes much bandwidth. Co=
+uld this be the fact?
+=20
+Is it possible to use hold mode for slave device 2 for a short period of ti=
+me until slave device 3 starts? What is the BlueZ command for that, I have =
+only seen hci_park_mode.
+=20
+Another solution may be to close down one SCO connection for a short moment=
+ and restart it after slave device 3 has started.
+=20
+Are there any other method which can be used?
+_________________________________________________________________
+Ladda ner hela Windows Live gratis och uppt=E4ck f=F6rdelarna!
+http://get.live.com/ =
 
-> diff --git a/drivers/ata/libata-pmp.c b/drivers/ata/libata-pmp.c
-> diff --git a/fs/dcache.c b/fs/dcache.c
-> diff --git a/fs/sysfs/dir.c b/fs/sysfs/dir.c
-> index 3371629..f281cc6 100644
-> --- a/fs/sysfs/dir.c
-> +++ b/fs/sysfs/dir.c
-> @@ -678,8 +678,10 @@ static struct dentry * sysfs_lookup(struct inode *dir, struct dentry *dentry,
->  	sd = sysfs_find_dirent(parent_sd, dentry->d_name.name);
->  
->  	/* no such entry */
-> -	if (!sd)
-> +	if (!sd) {
-> +		ret = ERR_PTR(-ENOENT);
->  		goto out_unlock;
-> +	}
->  
->  	/* attach dentry and inode */
->  	inode = sysfs_get_inode(sd);
-> @@ -781,6 +783,7 @@ int sysfs_rename_dir(struct kobject * kobj, const char *new_name)
->  	old_dentry = sysfs_get_dentry(sd);
->  	if (IS_ERR(old_dentry)) {
->  		error = PTR_ERR(old_dentry);
-> +		old_dentry = NULL;
->  		goto out;
->  	}
->  
-> @@ -848,6 +851,7 @@ int sysfs_move_dir(struct kobject *kobj, struct kobject *new_parent_kobj)
->  	old_dentry = sysfs_get_dentry(sd);
->  	if (IS_ERR(old_dentry)) {
->  		error = PTR_ERR(old_dentry);
-> +		old_dentry = NULL;
->  		goto out;
->  	}
->  	old_parent = old_dentry->d_parent;
-> @@ -855,6 +859,7 @@ int sysfs_move_dir(struct kobject *kobj, struct kobject *new_parent_kobj)
->  	new_parent = sysfs_get_dentry(new_parent_sd);
->  	if (IS_ERR(new_parent)) {
->  		error = PTR_ERR(new_parent);
-> +		new_parent = NULL;
->  		goto out;
->  	}
->  
-> @@ -878,7 +883,6 @@ again:
->  	error = 0;
->  	d_add(new_dentry, NULL);
->  	d_move(old_dentry, new_dentry);
-> -	dput(new_dentry);
->  
->  	/* Remove from old parent's list and insert into new parent's list. */
->  	sysfs_unlink_sibling(sd);
-> diff --git a/include/linux/dcache.h b/include/linux/dcache.h
+--_4f8ea4b1-6404-4054-8169-2871f9730cb5_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
+<html>
+<head>
+<style>
+.hmmessage P
+{
+margin:0px;
+padding:0px
+}
+body.hmmessage
+{
+FONT-SIZE: 10pt;
+FONT-FAMILY:Tahoma
+}
+</style>
+</head>
+<body class=3D'hmmessage'>
+I'm developing an application which has one master device and three slave d=
+evices. The communication links are the following:<BR>
+&nbsp;<BR>
+Slave device 1: RFCOMM and SCO<BR>
+Slave device 2: RFCOMM and SCO<BR>
+Slave device 3: RFCOMM<BR>
+&nbsp;<BR>
+If for example slave device&nbsp;3 should crash or other reason, the master=
+ shall automatically try to restart it. But this seems impossible if the ot=
+her devices are up and running. If I then for example power-off slave devic=
+e 2, slave device 3 will start immediately. Thereafter, when I power-on sla=
+ve device 2 again, this device will start too and everything is up and runn=
+ing.<BR>
+&nbsp;<BR>
+I suspect that it is practically impossible to start slave device 3 since t=
+here are 2 SCO connections up and running which consumes much bandwidth. Co=
+uld this be the fact?<BR>
+&nbsp;<BR>
+Is it possible to use hold mode for slave device 2 for a short period of ti=
+me until slave device 3 starts? What is the BlueZ command for that, I have =
+only seen hci_park_mode.<BR>
+&nbsp;<BR>
+Another solution may be to close down one SCO connection for a short moment=
+ and restart it after slave device 3 has started.<BR>
+&nbsp;<BR>
+Are there any other method which can be used?<BR><br /><hr />Sugen p=E5 att=
+ bli tokk=E4r? H=E4r finns massor av singlar som k=E4nner likadant! <a href=
+=3D'http://match.se.msn.com/channel/index.aspx?trackingid=3D1002952' target=
+=3D'_new'>MSN Dejting</a></body>
+</html>=
+
+--_4f8ea4b1-6404-4054-8169-2871f9730cb5_--
+
+
+--===============0315435970==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+--===============0315435970==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0315435970==--
