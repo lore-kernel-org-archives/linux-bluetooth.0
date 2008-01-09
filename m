@@ -1,16 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <938E2C20-AD33-4236-8549-17E7235827B1@gmail.com>
+Message-Id: <D2E21FE3-C4DE-484A-A593-31BD5900B83C@gmail.com>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1199816937.26099.75.camel@aeonflux>
+In-Reply-To: <20080109002828.GB5883@ps.ms.mff.cuni.cz>
 Mime-Version: 1.0 (Apple Message framework v915)
-Date: Wed, 9 Jan 2008 05:06:07 +0200
-References: <20080107230910.GA5883@ps.ms.mff.cuni.cz>
-	<d89ddf300801071547k792a5b9fqe6e7e72e597b0e5f@mail.gmail.com>
-	<1199805807.20835.10.camel@greatbear>
-	<1199816937.26099.75.camel@aeonflux>
-Subject: Re: [Bluez-devel] [PATCH] HFP method "SetupCall" + audio-api.txt
-	update
+Date: Wed, 9 Jan 2008 05:03:52 +0200
+References: <20080109002828.GB5883@ps.ms.mff.cuni.cz>
+Subject: Re: [Bluez-devel] error in headset capture, patch included
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,20 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Pavel,
 
-On Jan 8, 2008, at 20:28, Marcel Holtmann wrote:
->> Here is a patch for adding the SetupCall method , used for call  
->> setup on
->> hfp. Also adding a patch to update the audio-api.txt file for the  
->> same.
->>
->> Let me know if anything needs to be changed.
+On Jan 9, 2008, at 2:28, Pavel Semerad wrote:
+> I have found error in function bluetooth_hsp_read. frame_size is
+> correctly set only when data->count is zero. When data->count is
+> nonzero, frame_size is 0 and condition
+> 'if ((data->count + size * frame_size) <= data->link_mtu)'
+> is always true and frames_to_write is set incorrectly (1000 instead
+> max 24 in my case). This results in capture not working for headset,
+> cycling in endless loop.
 >
-> the signal should be "CallTerminated" or its description is wrong. A
-> name like "TerminateCall" would be a name for a method.
+> Following patch sets frame_size before check to data->count and
+> 'arecord -D bluetooth -f S16_LE' now works.
 
-The CVS now has the correct name for the signal ("CallTerminated").
+Nice catch! Thanks! Commited to CVS now.
 
 Johan
 
