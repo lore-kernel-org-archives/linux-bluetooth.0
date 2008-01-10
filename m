@@ -1,13 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alok <develnewbie@gmail.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20080109002828.GB5883@ps.ms.mff.cuni.cz>
-References: <20080109002828.GB5883@ps.ms.mff.cuni.cz>
-Content-Type: multipart/mixed; boundary="=-tbLi3cfDGj4dP8udgCbO"
-Date: Thu, 10 Jan 2008 20:54:50 +0530
-Message-Id: <1199978691.23989.10.camel@greatbear>
-Mime-Version: 1.0
-Subject: [Bluez-devel] [PATCH][HFP] - default device as hfp
+Date: Thu, 10 Jan 2008 11:15:31 +0100
+From: Gabor Gombas <gombasg@sztaki.hu>
+To: Tejun Heo <htejun@gmail.com>
+Message-ID: <20080110101531.GB3591@boogie.lpds.sztaki.hu>
+References: <20071228173203.GA20690@boogie.lpds.sztaki.hu>
+	<a8e1da0712290007o168a730cw923055ad2c265d84@mail.gmail.com>
+	<20080102151642.GA7273@boogie.lpds.sztaki.hu>
+	<20080105075039.GF27894@ZenIV.linux.org.uk>
+	<20080107141300.GB12763@boogie.lpds.sztaki.hu>
+	<47824415.80703@gmail.com>
+	<20080107210024.GA13537@boogie.lpds.sztaki.hu>
+	<47834593.1000506@gmail.com>
+	<20080108133215.GA15814@boogie.lpds.sztaki.hu>
+	<478490D2.5050902@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <478490D2.5050902@gmail.com>
+Cc: Greg KH <greg@kroah.com>, kay.sievers@vrfy.org,
+	linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>,
+	bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] Oops involving RFCOMM and sysfs
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,90 +28,82 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi,
 
---=-tbLi3cfDGj4dP8udgCbO
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+On Wed, Jan 09, 2008 at 06:16:02PM +0900, Tejun Heo wrote:
 
-Hi Johan, 
+> Please confirm the attached patch fixes the oops.  I'll separate it into
+> two patches and forward them to Greg.  But bluetooth code also needs to
+> be updated such that it moves the refcommX device before killing the
+> connection node.
 
-Attaching a patch which fixes a HFP bug in headset.c  
+The kernel survives switching the phone off & on but then oopses when
+pppd is started:
 
-When a default device/stored device is registered, it cannot be used as
-a handsfree (i.e hs->hfp_active = false) because the following condition
-in rfcomm_connect_cb() fails. 
+Jan 10 10:59:09 twister kernel: Unable to handle kernel NULL pointer dereference at 0000000000000008 RIP: 
+Jan 10 10:59:09 twister kernel:  [<ffffffff802af03f>] sysfs_get_dentry+0x27/0x8f
+Jan 10 10:59:09 twister kernel: PGD 260bb067 PUD 260bc067 PMD 0 
+Jan 10 10:59:09 twister kernel: Oops: 0000 [1] 
+Jan 10 10:59:09 twister kernel: CPU 0 
+Jan 10 10:59:09 twister kernel: Modules linked in: ppp_generic slhc binfmt_misc rfcomm l2cap nfsd auth_rpcgss exportfs ipt_REJECT xt_tcpudp ipt_LOG xt_limit iptable_filter ip_tables x_tables nfs lockd nfs_acl sunrpc fuse dm_crypt saa7134_alsa radeon hwmon_vid eeprom hci_usb bluetooth usb_storage tuner tea5767 tda8290 tuner_simple mt20xx tea5761 snd_intel8x0 snd_ac97_codec saa7134 firewire_ohci firewire_core sg ac97_bus videobuf_dma_sg videobuf_core ir_kbd_i2c crc_itu_t ir_common snd_pcm parport_pc parport sky2 forcedeth sr_mod snd_timer snd_page_alloc ehci_hcd ohci_hcd floppy cdrom
+Jan 10 10:59:09 twister kernel: Pid: 4490, comm: pppd Not tainted 2.6.24-rc6debug-dirty #8
+Jan 10 10:59:09 twister kernel: RIP: 0010:[<ffffffff802af03f>]  [<ffffffff802af03f>] sysfs_get_dentry+0x27/0x8f
+Jan 10 10:59:09 twister kernel: RSP: 0018:ffff8100260dbc88  EFLAGS: 00010207
+Jan 10 10:59:09 twister kernel: RAX: 0000000000000000 RBX: ffff8100251577d0 RCX: 0000000000000000
+Jan 10 10:59:09 twister kernel: RDX: ffff8100260e3410 RSI: ffffffff80643d70 RDI: ffff8100bb32d898
+Jan 10 10:59:09 twister kernel: RBP: 0000000000000000 R08: 6390dfaa7e3bd395 R09: ffffffff8050cee6
+Jan 10 10:59:09 twister kernel: R10: ffff8100260dbcb8 R11: 0000003000000018 R12: ffff8100b6ef4b90
+Jan 10 10:59:09 twister kernel: R13: 00000000fffffff4 R14: ffff81004d9d2600 R15: ffff8100b6eb227e
+Jan 10 10:59:09 twister kernel: FS:  00002b5731903ac0(0000) GS:ffffffff805ba000(0000) knlGS:0000000000000000
+Jan 10 10:59:09 twister kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
+Jan 10 10:59:09 twister kernel: CR2: 0000000000000008 CR3: 00000000260b1000 CR4: 00000000000006e0
+Jan 10 10:59:09 twister kernel: DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+Jan 10 10:59:09 twister kernel: DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+Jan 10 10:59:09 twister kernel: Process pppd (pid: 4490, threadinfo ffff8100260da000, task ffff81009550d060)
+Jan 10 10:59:09 twister kernel: Stack:  ffff8100260e3690 ffff8100b6ef4b90 ffff81003a5942a0 ffffffff802af272
+Jan 10 10:59:09 twister kernel:  ffff8100becca2d0 ffff8100becca2d0 ffff8100260df300 ffff81003a5942a0
+Jan 10 10:59:09 twister kernel:  00000000fffffff4 ffff81004d9d2600 ffff8100b6eb227e ffffffff803007a5
+Jan 10 10:59:09 twister kernel: Call Trace:
+Jan 10 10:59:09 twister kernel:  [<ffffffff802af272>] sysfs_move_dir+0x63/0x1fd
+Jan 10 10:59:09 twister kernel:  [<ffffffff803007a5>] kobject_move+0xba/0x110
+Jan 10 10:59:09 twister kernel:  [<ffffffff803698cc>] device_move+0x59/0x111
+Jan 10 10:59:09 twister kernel:  [<ffffffff8827d31e>] :rfcomm:rfcomm_tty_open+0x1c1/0x1db
+Jan 10 10:59:09 twister kernel:  [<ffffffff80224204>] default_wake_function+0x0/0xe
+Jan 10 10:59:09 twister kernel:  [<ffffffff80345a2d>] tty_open+0x1c5/0x2af
+Jan 10 10:59:09 twister kernel:  [<ffffffff80278590>] chrdev_open+0x113/0x132
+Jan 10 10:59:09 twister kernel:  [<ffffffff8027847d>] chrdev_open+0x0/0x132
+Jan 10 10:59:09 twister kernel:  [<ffffffff80274b4a>] __dentry_open+0xda/0x1aa
+Jan 10 10:59:09 twister kernel:  [<ffffffff80274cd1>] do_filp_open+0x2d/0x3d
+Jan 10 10:59:09 twister kernel:  [<ffffffff80473812>] mutex_lock+0xd/0x1d
+Jan 10 10:59:09 twister kernel:  [<ffffffff802749d6>] get_unused_fd_flags+0x6d/0x100
+Jan 10 10:59:09 twister kernel:  [<ffffffff80274d27>] do_sys_open+0x46/0xc3
+Jan 10 10:59:09 twister kernel:  [<ffffffff8020b5fc>] tracesys+0xdc/0xe1
+Jan 10 10:59:09 twister kernel: 
+Jan 10 10:59:09 twister kernel: 
+Jan 10 10:59:09 twister kernel: Code: 48 8b 45 08 48 39 d0 74 05 48 89 c5 eb f2 48 8b 7b 08 48 81 
+Jan 10 10:59:09 twister kernel: RIP  [<ffffffff802af03f>] sysfs_get_dentry+0x27/0x8f
+Jan 10 10:59:09 twister kernel:  RSP <ffff8100260dbc88>
+Jan 10 10:59:09 twister kernel: CR2: 0000000000000008
+Jan 10 10:59:09 twister kernel: ---[ end trace b33fe66800773e0c ]---
 
- if (server_is_enabled(HANDSFREE_SVCLASS_ID) && hs->hfp_handle != 0) 
+Gabor
 
-This is because, hs->hfp_handle is not populated for the default
-device.As a matter of fact, hs->hsp_handle is not populated either.
-verified this by printing the handles.
-
-The 2 handles are ONLY populated through a call to headset_init() with
-its 2nd and 3rd arguments not being zero.
-
-I have tested this patch with my setup. 
-
-Let me know if my logic is wrong or the patch needs to be changed.
-
-
-Thanks, 
-Alok. 
-
-
---=-tbLi3cfDGj4dP8udgCbO
-Content-Disposition: attachment; filename=patch
-Content-Type: text/x-patch; name=patch; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-
-Index: audio/headset.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/audio/headset.c,v
-retrieving revision 1.156
-diff -u -5 -p -r1.156 headset.c
---- audio/headset.c	9 Jan 2008 12:36:58 -0000	1.156
-+++ audio/headset.c	10 Jan 2008 14:43:36 -0000
-@@ -752,10 +752,16 @@ static void get_record_reply(DBusPending
- 		|| (uuid.type == SDP_UUID16 && uuid.value.uuid16 != id)) {
- 		error("Service classes did not contain the expected UUID");
- 		goto failed_not_supported;
- 	}
- 
-+	if ((uuid.value.uuid32 == HANDSFREE_SVCLASS_ID)
-+		|| (uuid.value.uuid16 == HANDSFREE_SVCLASS_ID)) {
-+		hs->hfp_handle = record->handle;
-+	}else
-+		hs->hsp_handle = record->handle;
-+
- 	if (!sdp_get_access_protos(record, &protos)) {
- 		ch = sdp_get_proto_port(protos, RFCOMM_UUID);
- 		sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free,
- 					NULL);
- 		sdp_list_free(protos, NULL);
-
---=-tbLi3cfDGj4dP8udgCbO
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+     ---------------------------------------------------------
+     MTA SZTAKI Computer and Automation Research Institute
+                Hungarian Academy of Sciences
+     ---------------------------------------------------------
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
---=-tbLi3cfDGj4dP8udgCbO
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---=-tbLi3cfDGj4dP8udgCbO--
