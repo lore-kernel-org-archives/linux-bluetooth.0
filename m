@@ -1,13 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Jan 2008 16:28:29 +0100
-From: Marco Zavagno <m.zavagno@eurotech.it>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20080114152829.GD6064@localdomain>
+Date: Sat, 12 Jan 2008 00:09:29 +0100
+From: Gabor Gombas <gombasg@sztaki.hu>
+To: Dave Young <hidave.darkstar@gmail.com>
+Message-ID: <20080111230929.GA7052@boogie.lpds.sztaki.hu>
+References: <a8e1da0712290007o168a730cw923055ad2c265d84@mail.gmail.com>
+	<20080102151642.GA7273@boogie.lpds.sztaki.hu>
+	<20080105075039.GF27894@ZenIV.linux.org.uk>
+	<20080107141300.GB12763@boogie.lpds.sztaki.hu>
+	<47824415.80703@gmail.com>
+	<20080107210024.GA13537@boogie.lpds.sztaki.hu>
+	<47834593.1000506@gmail.com>
+	<20080108133215.GA15814@boogie.lpds.sztaki.hu>
+	<478490D2.5050902@gmail.com>
+	<20080110011117.GA3968@darkstar.te-china.tietoenator.com>
 MIME-Version: 1.0
-Cc: Rodolfo Giometti <giometti@enneenne.com>
-Subject: [Bluez-devel] bt-sco problem
-Reply-To: Marco Zavagno <m.zavagno@eurotech.it>,
-	BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20080110011117.GA3968@darkstar.te-china.tietoenator.com>
+Cc: Tejun Heo <htejun@gmail.com>, Greg KH <greg@kroah.com>,
+	kay.sievers@vrfy.org, linux-kernel@vger.kernel.org,
+	Al Viro <viro@ZenIV.linux.org.uk>, bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] Oops involving RFCOMM and sysfs
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -16,90 +28,99 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0899409573=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+On Thu, Jan 10, 2008 at 09:11:17AM +0800, Dave Young wrote:
 
---===============0899409573==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="OaZoDhBhXzo6bW1J"
-Content-Disposition: inline
+> For bluetooth device_move, the only child device of hci_conn dev is
+> the rfcomm tty_dev. How about the following patch, please verify :
 
+There is now no oops, instead the keyboard becomes almost completely
+unresponsible when I switch off & on the phone. The mouse still works
+(tested both with X and with the VGA console), but terminal input and VT
+switching is dead. On the VGA console, even scrolling using Shift+PgUp
+stops working.
 
---OaZoDhBhXzo6bW1J
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Alt+SysRq+w works, trace is below. Ctrl+Alt+Del also works, but then
+init complains about hung processes and that it can not umount the file
+systems and cannot stop the RAID arrays. Once it still rebooted though,
+the second time it got hung after trying to umount the filesystems, and
+I had to use Alt+SysRq+b.
 
-Hi,
-I'm using a Mitsumi WML-C29AH bluetooth serial adapter.
-Every bt function works well but when I try to send/recieve audio data
-using bluetooth-alsa package I've got noisy audio during playback and
-very noisy audio during recording operations.=20
-I'm using a 2.6.22 kernel on arm pxa cpu with alsa-utils 1.0.15 and
-bluez-libs and bluez-utils-alsa 3.22.
-The adapter is binded to bluez stack using "hciattach /dev/ttyS1 csr 921600=
-".
+If I can choose then I prefer the Oops...
 
-To setup the system I paired the bt headset, created an .asoundrc file insi=
-de=20
-my home directory and execute bluetoothd-service-audio.
-Then I try to record/playback audio using aplay/arecord utils but noise iss=
-ue=20
-arise. At this point if I perform a hciconfig on the system the TX counter =
-for
-SCO packets always reports 0.
+Jan 11 23:46:35 twister kernel: SysRq : Emergency Sync
+Jan 11 23:46:35 twister kernel: Emergency Sync complete
+Jan 11 23:46:42 twister kernel: SysRq : Show Blocked State
+Jan 11 23:46:42 twister kernel:   task                        PC stack   pid father
+Jan 11 23:46:42 twister kernel: events/0      D ffffffff80487190     0     5      2
+Jan 11 23:46:42 twister kernel:  ffff8100bf84fd40 0000000000000046 ffff8100ae7f2600 ffff8100bf84fd00
+Jan 11 23:46:42 twister kernel:  ffff8100bf84a830 ffff8100bd872000 ffffffff80652ae0 0000000100000100
+Jan 11 23:46:42 twister kernel:  0000000000000000 7fffffffffffffff 7fffffffffffffff 0000000000000002
+Jan 11 23:46:42 twister kernel: Call Trace:
+Jan 11 23:46:42 twister kernel:  [<ffffffff80473543>] schedule_timeout+0x1e/0xad
+Jan 11 23:46:42 twister kernel:  [<ffffffff8028560d>] dput+0x26/0x103
+Jan 11 23:46:42 twister kernel:  [<ffffffff802af3fd>] sysfs_move_dir+0x1ee/0x1fd
+Jan 11 23:46:42 twister kernel:  [<ffffffff8047340b>] wait_for_common+0xc4/0x129
+Jan 11 23:46:42 twister kernel:  [<ffffffff80224204>] default_wake_function+0x0/0xe
+Jan 11 23:46:42 twister kernel:  [<ffffffff80471d72>] klist_del+0x15/0x2e
+Jan 11 23:46:42 twister kernel:  [<ffffffff803698f3>] device_move+0x80/0x111
+Jan 11 23:46:42 twister kernel:  [<ffffffff88146a27>] :bluetooth:hci_conn_move_child+0x0/0xf
+Jan 11 23:46:42 twister kernel:  [<ffffffff88146a32>] :bluetooth:hci_conn_move_child+0xb/0xf
+Jan 11 23:46:42 twister kernel:  [<ffffffff80369836>] device_for_each_child+0x22/0x4d
+Jan 11 23:46:42 twister kernel:  [<ffffffff88146a05>] :bluetooth:del_conn+0x0/0x22
+Jan 11 23:46:42 twister kernel:  [<ffffffff88146a1e>] :bluetooth:del_conn+0x19/0x22
+Jan 11 23:46:42 twister kernel:  [<ffffffff8023696d>] run_workqueue+0x74/0xee
+Jan 11 23:46:42 twister kernel:  [<ffffffff80236ff8>] worker_thread+0x0/0xe7
+Jan 11 23:46:42 twister kernel:  [<ffffffff802370d2>] worker_thread+0xda/0xe7
+Jan 11 23:46:42 twister kernel:  [<ffffffff80239b77>] autoremove_wake_function+0x0/0x2e
+Jan 11 23:46:42 twister kernel:  [<ffffffff80236ff8>] worker_thread+0x0/0xe7
+Jan 11 23:46:42 twister kernel:  [<ffffffff802399a0>] kthread+0x47/0x73
+Jan 11 23:46:42 twister kernel:  [<ffffffff8020bdc8>] child_rip+0xa/0x12
+Jan 11 23:46:42 twister kernel:  [<ffffffff80239959>] kthread+0x0/0x73
+Jan 11 23:46:42 twister kernel:  [<ffffffff8020bdbe>] child_rip+0x0/0x12
+Jan 11 23:46:42 twister kernel: 
+Jan 11 23:46:42 twister kernel: cat           D 7fffffffffffffff     0  3978   3965
+Jan 11 23:46:42 twister kernel:  ffff81009e857ce8 0000000000000086 ffff8100ae7f2900 ffff81009e857ca8
+Jan 11 23:46:42 twister kernel:  ffff8100bd872000 ffff8100bf9e7060 ffffffff80652ae0 00000001000000c0
+Jan 11 23:46:42 twister kernel:  0000000000000000 7fffffffffffffff 7fffffffffffffff 0000000000000002
+Jan 11 23:46:42 twister kernel: Call Trace:
+Jan 11 23:46:42 twister kernel:  [<ffffffff80473543>] schedule_timeout+0x1e/0xad
+Jan 11 23:46:42 twister kernel:  [<ffffffff80223ccc>] __dequeue_entity+0x1c/0x32
+Jan 11 23:46:42 twister kernel:  [<ffffffff80223d05>] set_next_entity+0x23/0x73
+Jan 11 23:46:42 twister kernel:  [<ffffffff8047340b>] wait_for_common+0xc4/0x129
+Jan 11 23:46:42 twister kernel:  [<ffffffff80224204>] default_wake_function+0x0/0xe
+Jan 11 23:46:42 twister kernel:  [<ffffffff80236b02>] flush_cpu_workqueue+0x50/0x58
+Jan 11 23:46:42 twister kernel:  [<ffffffff80236c32>] wq_barrier_func+0x0/0x9
+Jan 11 23:46:42 twister kernel:  [<ffffffff80236ecf>] flush_workqueue+0x9/0x12
+Jan 11 23:46:42 twister kernel:  [<ffffffff803449f9>] release_dev+0x47c/0x5e2
+Jan 11 23:46:42 twister kernel:  [<ffffffff8021b609>] do_page_fault+0x2ff/0x65a
+Jan 11 23:46:42 twister kernel:  [<ffffffff80344b6b>] tty_release+0xc/0x10
+Jan 11 23:46:42 twister kernel:  [<ffffffff80277013>] __fput+0xb1/0x16f
+Jan 11 23:46:42 twister kernel:  [<ffffffff80274961>] filp_close+0x5d/0x65
+Jan 11 23:46:42 twister kernel:  [<ffffffff80275ab3>] sys_close+0x73/0xa6
+Jan 11 23:46:42 twister kernel:  [<ffffffff8020b5fc>] tracesys+0xdc/0xe1
+Jan 11 23:46:42 twister kernel: 
 
-I'm also using same setup with a USB BT adapter and everything works well.
-Any idea?=20
+If I'm not mistaken the "cat" above is the "cat /dev/zero >
+/dev/rfcomm0" command.
 
-Thanx in advance
+Gabor
 
---=20
-Only that in you which is me can hear what I'm saying.
-		-- Baba Ram Dass
-++
-Marco Zavagno
-Eurotech - The complete embedded PC solution
-www.eurotech.it
-
---OaZoDhBhXzo6bW1J
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
-
-iD8DBQFHi3+dm2ufZSfClXARAmqmAKDIVioFlsCI3l49MFXicl+6nAj1ggCgxUkQ
-WCIw1scSIznEn7Co1W1JJQk=
-=SPU0
------END PGP SIGNATURE-----
-
---OaZoDhBhXzo6bW1J--
-
-
---===============0899409573==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+     ---------------------------------------------------------
+     MTA SZTAKI Computer and Automation Research Institute
+                Hungarian Academy of Sciences
+     ---------------------------------------------------------
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
---===============0899409573==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0899409573==--
