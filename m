@@ -1,15 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <359782e70801120831o33e6fb4cyab9801906925480d@mail.gmail.com>
-Date: Sun, 13 Jan 2008 00:31:40 +0800
-From: "bsd user" <oldmoonster@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <477CF705.1090006@kameleon-media.com>
+Message-ID: <592e5b110801101723r23e80c1dpdb828c2a1acdbb25@mail.gmail.com>
+Date: Thu, 10 Jan 2008 17:23:53 -0800
+From: "Ryan Nevell" <ryan.nevell@gmail.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <592e5b110801100459w2ea5ec9lb894c912cad3c26@mail.gmail.com>
 MIME-Version: 1.0
-References: <d89ddf300801021040o28e16943t2c51ac0190bd4e91@mail.gmail.com>
-	<E21A90CDB9591542899EFC7FB4ED5CC90776A695@tfmail02.TFMAIL.COM>
-	<359782e70801030510p5abedbe4m6d7e129d8a5b0692@mail.gmail.com>
-	<477CF705.1090006@kameleon-media.com>
-Subject: Re: [Bluez-users] slave - slave talk in a piconet
+References: <592e5b110801100453v1e62da89n991cfc126e96e568@mail.gmail.com>
+	<592e5b110801100459w2ea5ec9lb894c912cad3c26@mail.gmail.com>
+Subject: Re: [Bluez-users] Simultaneous scan and request
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,238 +17,33 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2013899523=="
+Content-Type: multipart/mixed; boundary="===============1440370913=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============2013899523==
+--===============1440370913==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_3904_18433181.1200155500829"
+	boundary="----=_Part_25107_4004647.1200014633405"
 
-------=_Part_3904_18433181.1200155500829
+------=_Part_25107_4004647.1200014633405
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-I learned PAN Profile 1.0 from SIG. I am interested in the PANU service.
-According to the profile, device has PANU service can establish a connectio=
-n
-with another device's PANU service DIRECTLY, no need message forwarding by
-NAP or GN node! but this feature hasn't been mentioned in "HOWTO-PAN"...
+Think I found my answer here:
+http://wiki.bluez.org/wiki/HOWTO/DiscoveringDevices
 
-I want to setup a real p2p ad-hoc network with 4 bluetooth enabled computer=
-s
-without message forwarding from 3rd node when message need to be exchanged
-between any two nodes, see below picture::
-
-             +------+     +------+
-             | PANU1|<--->| PANU2|
-             +------+     +------+
-               /|\    \ /    /|\
-                |      X      |
-               \|/    / \    \|/
-              +------+    +------+
-              | PANU3|<-->| PANU4|
-              +------+    +------+
-
-in above scenario,
-    PANU1 is master of PANU2, PANUS3 and PANU4
-    PANU2 is master of PANU4,
-    PANU4 is master of PANU3,
-    PANU3 is master of PANU2,
-
-So, PANU3 need to work in 2 piconet. Is this scenario valid?
-
-Thanks a lot!
-
-
-
-On Jan 3, 2008 10:53 PM, Laurent BARBIER <lbarbier@kameleon-media.com>
-wrote:
-
-> When you wan't to make B talk to C all need to be forward from and to A.
-> Something like brctl do the job quite sufficiently.
-> Have a look there : http://bluez.sourceforge.net/contrib/HOWTO-PAN
-> section "Ethernet Bridging"
->
-> Laurent
->
-> bsd user a =E9crit :
-> > So, B or C has no knowledge about each other when they are slaves of
-> > master A, right? Then, can I say if B want to talk with C, they need
-> > higher level protocol support, such as telnet, ftp. And, all data
-> > exchange will be forwarded by Master A. right?
-> >
-> > Thanks!
-> >
-> > On Jan 3, 2008 9:07 AM, guoyun <guoyun@techfaith.cn
-> > <mailto:guoyun@techfaith.cn>> wrote:
-> >
-> >     Hi, Brad
-> >
-> >     > hey
-> >     >
-> >     > > If there is a piconet that has 2 slave B,C, the master is A.
-> >     Does B
-> >     > > know the existence of C? can B talk to C directly without
-> >     > A(master)'s intervention?
-> >     >
-> >     > if they did talk to each other directly, one would have to be
-> >     > master and you'd have a scatternet.
-> >
-> >     one bluetooth could be in two or more piconet, but it just can
-> >     play as slave _not_ master for the bluetooth clock.
-> >
-> >     Please refer to Core SPEC. chapter 4.1. Piconet topology.
-> >
-> >     BRs
-> >     Yun
-> >
-> >
-> >
-> -------------------------------------------------------------------------
-> >     This SF.net email is sponsored by: Microsoft
-> >     Defy all challenges. Microsoft(R) Visual Studio 2005.
-> >     http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> >     _______________________________________________
-> >     Bluez-users mailing list
-> >     Bluez-users@lists.sourceforge.net
-> >     <mailto:Bluez-users@lists.sourceforge.net>
-> >     https://lists.sourceforge.net/lists/listinfo/bluez-users
-> >     <https://lists.sourceforge.net/lists/listinfo/bluez-users>
-> >
-> >
-> > -----------------------------------------------------------------------=
--
-> >
-> >
-> -------------------------------------------------------------------------
-> > This SF.net email is sponsored by: Microsoft
-> > Defy all challenges. Microsoft(R) Visual Studio 2005.
-> > http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> > -----------------------------------------------------------------------=
--
-> >
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-users
-> >
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2005.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
-
-------=_Part_3904_18433181.1200155500829
+------=_Part_25107_4004647.1200014633405
 Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-I learned PAN Profile 1.0 from SIG. I am interested in the PANU service. Ac=
-cording to the profile, device has PANU service can establish a connection =
-with another device&#39;s PANU service DIRECTLY, no need message forwarding=
- by NAP or GN node! but this feature hasn&#39;t been mentioned in &quot;HOW=
-TO-PAN&quot;...
-<br><br>I want to setup a real p2p ad-hoc network with 4 bluetooth enabled =
-computers without message forwarding from 3rd node when message need to be =
-exchanged between any two nodes, see below picture::<br><pre>             +=
-------+     +------+
-<br>             | PANU1|&lt;---&gt;| PANU2|<br>             +------+     +=
-------+<br>              &nbsp;/|\    \ /    /|\<br>                |      =
-X      |<br>               \|/    / \    \|/<br>              +------+    +=
-------+
-<br>              | PANU3|&lt;--&gt;| PANU4|<br>              +------+    +=
-------+<br><br>in above scenario, <br>    PANU1 is master of PANU2, PANUS3 =
-and PANU4 <br>    PANU2 is master of PANU4,<br>    PANU4 is master of PANU3=
-,
-<br>    PANU3 is master of PANU2,<br><br>So, PANU3 need to work in 2 picone=
-t. Is this scenario valid?<br><br>Thanks a lot!<br></pre><br><br><div class=
-=3D"gmail_quote">On Jan 3, 2008 10:53 PM, Laurent BARBIER &lt;<a href=3D"ma=
-ilto:lbarbier@kameleon-media.com">
-lbarbier@kameleon-media.com</a>&gt; wrote:<br><blockquote class=3D"gmail_qu=
-ote" style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0p=
-t 0.8ex; padding-left: 1ex;">When you wan&#39;t to make B talk to C all nee=
-d to be forward from and to A.
-<br>Something like brctl do the job quite sufficiently.<br>Have a look ther=
-e : <a href=3D"http://bluez.sourceforge.net/contrib/HOWTO-PAN" target=3D"_b=
-lank">http://bluez.sourceforge.net/contrib/HOWTO-PAN</a><br>section &quot;E=
-thernet Bridging&quot;
-<br><br>Laurent<br><br>bsd user a =E9crit :<br><div class=3D"Ih2E3d">&gt; S=
-o, B or C has no knowledge about each other when they are slaves of<br>&gt;=
- master A, right? Then, can I say if B want to talk with C, they need<br>&g=
-t; higher level protocol support, such as telnet, ftp. And, all data
-<br>&gt; exchange will be forwarded by Master A. right?<br>&gt;<br>&gt; Tha=
-nks!<br>&gt;<br>&gt; On Jan 3, 2008 9:07 AM, guoyun &lt;<a href=3D"mailto:g=
-uoyun@techfaith.cn">guoyun@techfaith.cn</a><br></div><div class=3D"Ih2E3d">
-&gt; &lt;mailto:<a href=3D"mailto:guoyun@techfaith.cn">guoyun@techfaith.cn<=
-/a>&gt;&gt; wrote:<br>&gt;<br>&gt; &nbsp; &nbsp; Hi, Brad<br>&gt;<br>&gt; &=
-nbsp; &nbsp; &gt; hey<br>&gt; &nbsp; &nbsp; &gt;<br>&gt; &nbsp; &nbsp; &gt;=
- &gt; If there is a piconet that has 2 slave B,C, the master is A.
-<br>&gt; &nbsp; &nbsp; Does B<br>&gt; &nbsp; &nbsp; &gt; &gt; know the exis=
-tence of C? can B talk to C directly without<br>&gt; &nbsp; &nbsp; &gt; A(m=
-aster)&#39;s intervention?<br>&gt; &nbsp; &nbsp; &gt;<br>&gt; &nbsp; &nbsp;=
- &gt; if they did talk to each other directly, one would have to be
-<br>&gt; &nbsp; &nbsp; &gt; master and you&#39;d have a scatternet.<br>&gt;=
-<br>&gt; &nbsp; &nbsp; one bluetooth could be in two or more piconet, but i=
-t just can<br>&gt; &nbsp; &nbsp; play as slave _not_ master for the bluetoo=
-th clock.<br>&gt;<br>&gt; &nbsp; &nbsp; Please refer to Core SPEC. chapter=
-=20
-4.1. Piconet topology.<br>&gt;<br>&gt; &nbsp; &nbsp; BRs<br>&gt; &nbsp; &nb=
-sp; Yun<br>&gt;<br>&gt;<br>&gt; &nbsp; &nbsp; -----------------------------=
---------------------------------------------<br>&gt; &nbsp; &nbsp; This SF.=
-net email is sponsored by: Microsoft
-<br>&gt; &nbsp; &nbsp; Defy all challenges. Microsoft(R) Visual Studio 2005=
-.<br>&gt; &nbsp; &nbsp; <a href=3D"http://clk.atdmt.com/MRT/go/vse012000007=
-0mrt/direct/01/" target=3D"_blank">http://clk.atdmt.com/MRT/go/vse012000007=
-0mrt/direct/01/</a><br>
-&gt; &nbsp; &nbsp; _______________________________________________<br>&gt; =
-&nbsp; &nbsp; Bluez-users mailing list<br>&gt; &nbsp; &nbsp; <a href=3D"mai=
-lto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a=
-><br></div>&gt; &nbsp; &nbsp; &lt;mailto:
-<a href=3D"mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sour=
-ceforge.net</a>&gt;<br><div class=3D"Ih2E3d">&gt; &nbsp; &nbsp; <a href=3D"=
-https://lists.sourceforge.net/lists/listinfo/bluez-users" target=3D"_blank"=
->https://lists.sourceforge.net/lists/listinfo/bluez-users
-</a><br>&gt; &nbsp; &nbsp; &lt;<a href=3D"https://lists.sourceforge.net/lis=
-ts/listinfo/bluez-users" target=3D"_blank">https://lists.sourceforge.net/li=
-sts/listinfo/bluez-users</a>&gt;<br>&gt;<br>&gt;<br></div>&gt; ------------=
-------------------------------------------------------------
-<br><div><div></div><div class=3D"Wj3C7c">&gt;<br>&gt; --------------------=
------------------------------------------------------<br>&gt; This SF.net e=
-mail is sponsored by: Microsoft<br>&gt; Defy all challenges. Microsoft(R) V=
-isual Studio 2005.
-<br>&gt; <a href=3D"http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/=
-" target=3D"_blank">http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/=
-</a><br>&gt; --------------------------------------------------------------=
-----------
-<br>&gt;<br>&gt; _______________________________________________<br>&gt; Bl=
-uez-users mailing list<br>&gt; <a href=3D"mailto:Bluez-users@lists.sourcefo=
-rge.net">Bluez-users@lists.sourceforge.net</a><br>&gt; <a href=3D"https://l=
-ists.sourceforge.net/lists/listinfo/bluez-users" target=3D"_blank">
-https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br>&gt;<br><br=
->-------------------------------------------------------------------------<=
-br>This SF.net email is sponsored by: Microsoft<br>Defy all challenges. Mic=
-rosoft(R) Visual Studio 2005.
-<br><a href=3D"http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/" tar=
-get=3D"_blank">http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/</a><=
-br>_______________________________________________<br>Bluez-users mailing l=
-ist
-<br><a href=3D"mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.=
-sourceforge.net</a><br><a href=3D"https://lists.sourceforge.net/lists/listi=
-nfo/bluez-users" target=3D"_blank">https://lists.sourceforge.net/lists/list=
-info/bluez-users
-</a><br></div></div></blockquote></div><br>
+Think I found my answer here: <a href="http://wiki.bluez.org/wiki/HOWTO/DiscoveringDevices">http://wiki.bluez.org/wiki/HOWTO/DiscoveringDevices</a><br>
 
-------=_Part_3904_18433181.1200155500829--
+------=_Part_25107_4004647.1200014633405--
 
 
---===============2013899523==
+--===============1440370913==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -261,7 +54,7 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
---===============2013899523==
+--===============1440370913==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -272,4 +65,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============2013899523==--
+--===============1440370913==--
