@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <3863b6300801150529n6e37f046je923cf4c26b9ba23@mail.gmail.com>
-Date: Tue, 15 Jan 2008 14:29:41 +0100
-From: "Pancrazio Auteri" <pancrazio.auteri@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <478CB508.50904@aircable.net>
+Date: Tue, 15 Jan 2008 11:28:40 -0200
+From: Manuel Naranjo <manuel@aircable.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] Small footprint Bluetooth stack for embedded?
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <fe53c8c00801150523j4eebbf02p584cf92bdcf9f777@mail.gmail.com>
+In-Reply-To: <fe53c8c00801150523j4eebbf02p584cf92bdcf9f777@mail.gmail.com>
+Subject: Re: [Bluez-users] how many BT devices can be connected at the same
+ time?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,66 +17,43 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1824892109=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1824892109==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_19168_8169308.1200403781925"
+Joel,
+You have 2 maximuns one is because of bluetooth specs the other is
+because of BlueZ constraints.
 
-------=_Part_19168_8169308.1200403781925
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+BlueZ can handle up to 15 (someone correct me if I'm wrong) bluetooth
+dongles (hci devices).
 
-Hi all,
+Then you can get up to 7 connections per bluetooth dongles (bluetooth
+constraint)
 
-I have to run Bluetooth on MIPS and ST40 CPU and I'm looking for a BT stack
-with minimal dependencies.
-I tried to compile Bluez but I got problems with Gnome dependencies.
+Cheers,
+Manuel
 
-What can I do to compile Bluez with minimal footprint?
-Should I try an alternative BT stack? Which one?
+> hy all,
+>
+> I am doing a project, which requires 'n' simultanious connection,
+> depending on the users loggin into the facility. I was thinking about
+> implementing an application level "scheduling" to take care of
+> multiplexing the request. But is there a limit in bluez?? I have heard
+> bluethooth has a 6slave+1master rule?? I read the FAQ for bluez..but
+> it confused me with saying .. "multiple devices can be connected".
+>
+> thanks for your time,
+> joel.
+>   
 
-
-Thank you very much for your help.
-
-
-Pancrazio Auteri
-TVBLOB
-
-------=_Part_19168_8169308.1200403781925
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi all,<br><br>I have to run Bluetooth on MIPS and ST40 CPU and I&#39;m looking for a BT stack with minimal dependencies.<br>I tried to compile Bluez but I got problems with Gnome dependencies.<br><br>What can I do to compile Bluez with minimal footprint?
-<br>Should I try an alternative BT stack? Which one?<br><br><br>Thank you very much for your help.<br><br><br>Pancrazio Auteri<br>TVBLOB<br><br><br>
-
-------=_Part_19168_8169308.1200403781925--
-
-
---===============1824892109==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
---===============1824892109==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1824892109==--
