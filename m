@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <8a8adccc0801161317x75c1a7efue250750cdaa76687@mail.gmail.com>
-Date: Wed, 16 Jan 2008 22:17:37 +0100
-From: "Jaap A. Haitsma" <jaap@haitsma.org>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1200511232.7978.69.camel@aeonflux>
-MIME-Version: 1.0
-References: <8a8adccc0801161116t512f70c2o61c4df24e246a394@mail.gmail.com>
-	<1200511232.7978.69.camel@aeonflux>
-Subject: Re: [Bluez-devel] Let GHOP student write manual for Bluez GNOME
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1200510167.17973.2.camel@teponkone>
+References: <1200510167.17973.2.camel@teponkone>
+Date: Wed, 16 Jan 2008 20:33:38 +0100
+Message-Id: <1200512018.7978.83.camel@aeonflux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] bluez-gnome ui
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,28 +20,50 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Jan 16, 2008 8:20 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jaap,
->
-> > I've had a student writing a manual for Cheese on GHOP [1]
-> > Also a request has been filed in bugzilla [2]
-> >
-> > It's maybe also an idea to have a student do this for Bluez GNOME.
-> >
-> > I can write the boilerplate (make files etc.) such that the student
-> > just needs to write the docbook file
->
-> I am all for it. Do you need anything from my side?
+Hi Teppo,
 
-I'm not that familiar with bluez-gnome yet so can you file the request
-here [1] and be the mentor of this student?
-You can take [2] as the template what you need to fill in
+> I am not a user interface designer, but I think that the current UI for
+> bluez-gnome is pretty awful: There is a Services tab that only geeks
+> will understand (what actually is a Serial service?), there are buttons
+> that appear/disapper and change contents depending on which bonded
+> device is selected, there are non-obvious icons (what does that lock
+> next to my phone mean? Is my phone locked?), there is no way to initiate
+> pairing with a new device, for some reason it is necessary to ask the
+> user for the class of the device when HAL already knows that, etc. I
+> tried filing bugs for some of the individual issues, but those got
+> wontfixed, so I thought I'd email the list directly. 
 
-Jaap
+to be quite honest it is not that simple. I also never said that this is
+a perfect UI, but it is a working one.
+
+With the service tab, I fully agree. It was written from a full
+technical background in mind and stuff like that should not be exposed
+to the end user. However there are limitations to a certain degree and I
+haven't seen any other proposal so far.
+
+For the explanations of the icons. Write a patch that utilizes tooltip
+to explain them.
+
+In the class of device case, we actually do use HAL. However I wanna
+have a way to not use HAL and set the class by myself. In case the "Use
+HAL" checkbox is clicked we could go ahead and hide the class selection.
+However that is not as simple as it sounds. You would have to hide the
+box for all adapters. Remember this UI supports seamlessly multiple
+adapters.
+
+> I think the current crappiness is even more evident when compared to the
+> brilliant design for BluetoothManager that was up at live.gnome.org. [1]
+> Is there any chance of working towards the more non-geek-friendly vision
+> presented on that old BluetoothManager page?
+
+The answer to these kind of comments/questions is always the same. Send
+in patches that will improve it.
+
+Regards
+
+Marcel
 
 
-[1] http://code.google.com/p/google-highly-open-participation-gnome/issues/list
-[2] http://code.google.com/p/google-highly-open-participation-gnome/issues/detail?id=81
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
