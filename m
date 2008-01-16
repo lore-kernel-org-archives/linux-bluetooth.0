@@ -1,10 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BAY134-DS3C865C476D02281CDD6BAB1410@phx.gbl>
-From: "shy" <shyboysby@hotmail.com>
-To: <bluez-devel@lists.sourceforge.net>
-Date: Thu, 17 Jan 2008 09:09:38 +0800
+Message-ID: <8a8adccc0801161329i7e1aec72waab8d732e49041e7@mail.gmail.com>
+Date: Wed, 16 Jan 2008 22:29:47 +0100
+From: "Jaap A. Haitsma" <jaap@haitsma.org>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1200512872.7978.87.camel@aeonflux>
 MIME-Version: 1.0
-Subject: [Bluez-devel] bluez utils complie error
+References: <1200489349.26259.29.camel@cookie.hadess.net>
+	<1200497567.7978.51.camel@aeonflux>
+	<1200497718.26259.38.camel@cookie.hadess.net>
+	<1200498238.7978.59.camel@aeonflux>
+	<1200498782.26259.41.camel@cookie.hadess.net>
+	<1200511043.7978.65.camel@aeonflux>
+	<1200511695.26259.56.camel@cookie.hadess.net>
+	<1200512872.7978.87.camel@aeonflux>
+Subject: Re: [Bluez-devel] [PATCH] Ignore built files
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,97 +23,48 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0781906136=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0781906136==
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_006D_01C858E8.AFE58250"
+On Jan 16, 2008 8:47 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Bastien,
+>
+> > > > > I don't see the need and especially since the long-term goal is to move
+> > > > > to git, it will become useless.
+> > > >
+> > > > I thought we wanted to move bluez-gnome to GNOME's SVN...
+> > >
+> > > personally I think that Subversion is as worse as CVS and I don't see
+> > > any advantage for a switch to that. Convincing me that GNOME's
+> > > infrastructure makes sense is different, but from a pure technical
+> > > standpoint of the SCM, Subversion is not an argument I am gonna buy
+> > > into.
+> >
+> > I'm not getting into SCM discussions, if GNOME was still using CVS, I'd
+> > still be using CVS (and so forth). What I meant was using the GNOME
+> > infrastructure to get translators, documentation writers, and plenty of
+> > pairs of eyeballs for the code.
+>
+> for me it really boils down to the SCM in the end. I am not a big fan of
+> CVS, but switching to SVN is not an option. Best would be if GNOME would
+> support GIT, because then we can switch right now.
+>
+Marcel,
 
-------=_NextPart_000_006D_01C858E8.AFE58250
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: 7bit
+You can use git-svn on SVN repositories to get almost full git
+functionality [1]. Quite some GNOME developers already use that for
+modules in GNOME SVN.
 
-hi, all
- I encountered an error when I compiled the bluez utils. If I compiled the
-original code without modifying any code, there would be no error. But If I
-modified the code, e.g., I added "printf("test\n");" in the function
-dev_info in hcitool.c, there would be an error:
+Jaap
 
- make[2]: Entering directory
-`/home/tester/bluez_code3.20/bluez-utils-3.20/hcid'
- test -f parser.c || /bin/bash ../ylwrap parser.y y.tab.c parser.c y.tab.h
-parser.h y.output parser.output -- yacc -d
- ../ylwrap: line 111: yacc: command not found
- make[2]: *** [parser.c] Error 1
- make[2]: Leaving directory
-`/home/tester/bluez_code3.20/bluez-utils-3.20/hcid'
- make[1]: *** [all-recursive] Error 1
- make[1]: Leaving directory `/home/tester/bluez_code3.20/bluez-utils-3.20'
- make: *** [all] Error 2
- 
-Could anyone help to resolve it?
-Many thanks in advance.
-Best regards
-Shi Buyun
-
-------=_NextPart_000_006D_01C858E8.AFE58250
-Content-Type: text/html; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Dus-ascii">
-<META content=3D"MSHTML 6.00.2900.3199" name=3DGENERATOR></HEAD>
-<BODY>
-<DIV>hi, all<BR>&nbsp;I encountered an error when I compiled the bluez =
-utils. If=20
-I compiled the original code without modifying any code, there would be =
-no=20
-error. But If I modified the code, e.g., I added "printf("test\n");" in =
-the=20
-function dev_info in hcitool.c, there would be an =
-error:<BR><BR>&nbsp;make[2]:=20
-Entering directory=20
-`/home/tester/bluez_code3.20/bluez-utils-3.20/hcid'<BR>&nbsp;test -f =
-parser.c ||=20
-/bin/bash ../ylwrap parser.y y.tab.c parser.c y.tab.h parser.h y.output=20
-parser.output -- yacc -d<BR>&nbsp;../ylwrap: line 111: yacc: command not =
-
-found<BR>&nbsp;make[2]: *** [parser.c] Error 1<BR>&nbsp;make[2]: Leaving =
-
-directory =
-`/home/tester/bluez_code3.20/bluez-utils-3.20/hcid'<BR>&nbsp;make[1]:=20
-*** [all-recursive] Error 1<BR>&nbsp;make[1]: Leaving directory=20
-`/home/tester/bluez_code3.20/bluez-utils-3.20'<BR>&nbsp;make: *** [all] =
-Error=20
-2<BR>&nbsp;<BR>Could anyone help to resolve it?<BR>Many thanks in=20
-advance.<BR>Best regards<BR>Shi Buyun</DIV></BODY></HTML>
-
-------=_NextPart_000_006D_01C858E8.AFE58250--
-
-
---===============0781906136==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+[1] http://live.gnome.org/GitForGnomeDevelopers
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============0781906136==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0781906136==--
