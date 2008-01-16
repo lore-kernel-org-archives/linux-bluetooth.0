@@ -1,17 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1200511043.7978.65.camel@aeonflux>
-References: <1200489349.26259.29.camel@cookie.hadess.net>
-	<1200497567.7978.51.camel@aeonflux>
-	<1200497718.26259.38.camel@cookie.hadess.net>
-	<1200498238.7978.59.camel@aeonflux>
-	<1200498782.26259.41.camel@cookie.hadess.net>
-	<1200511043.7978.65.camel@aeonflux>
-Date: Wed, 16 Jan 2008 19:28:15 +0000
-Message-Id: <1200511695.26259.56.camel@cookie.hadess.net>
+In-Reply-To: <8a8adccc0801161116t512f70c2o61c4df24e246a394@mail.gmail.com>
+References: <8a8adccc0801161116t512f70c2o61c4df24e246a394@mail.gmail.com>
+Date: Wed, 16 Jan 2008 20:20:31 +0100
+Message-Id: <1200511232.7978.69.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Ignore built files
+Subject: Re: [Bluez-devel] Let GHOP student write manual for Bluez GNOME
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,25 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Jaap,
 
-On Wed, 2008-01-16 at 20:17 +0100, Marcel Holtmann wrote:
-> Hi Bastien,
+> I've had a student writing a manual for Cheese on GHOP [1]
+> Also a request has been filed in bugzilla [2]
 > 
-> > > I don't see the need and especially since the long-term goal is to move
-> > > to git, it will become useless.
-> > 
-> > I thought we wanted to move bluez-gnome to GNOME's SVN...
+> It's maybe also an idea to have a student do this for Bluez GNOME.
 > 
-> personally I think that Subversion is as worse as CVS and I don't see
-> any advantage for a switch to that. Convincing me that GNOME's
-> infrastructure makes sense is different, but from a pure technical
-> standpoint of the SCM, Subversion is not an argument I am gonna buy
-> into.
+> I can write the boilerplate (make files etc.) such that the student
+> just needs to write the docbook file
 
-I'm not getting into SCM discussions, if GNOME was still using CVS, I'd
-still be using CVS (and so forth). What I meant was using the GNOME
-infrastructure to get translators, documentation writers, and plenty of
-pairs of eyeballs for the code.
+I am all for it. Do you need anything from my side?
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
