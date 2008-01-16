@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <8a8adccc0801161116t512f70c2o61c4df24e246a394@mail.gmail.com>
-References: <8a8adccc0801161116t512f70c2o61c4df24e246a394@mail.gmail.com>
-Date: Wed, 16 Jan 2008 20:20:31 +0100
-Message-Id: <1200511232.7978.69.camel@aeonflux>
+In-Reply-To: <478E13ED.3060506@access-company.com>
+References: <478E13ED.3060506@access-company.com>
+Date: Wed, 16 Jan 2008 20:18:02 +0100
+Message-Id: <1200511082.7978.67.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Let GHOP student write manual for Bluez GNOME
+Subject: Re: [Bluez-devel] UNITINFO and SUBUNITINFO in avrcp
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,17 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jaap,
+Hi Frederic,
 
-> I've had a student writing a manual for Cheese on GHOP [1]
-> Also a request has been filed in bugzilla [2]
+> This little patch enables support of UNITINFO and SUBUNITINFO commands 
+> in audio service.
+> The implementation is not very useful itself but it is mandatory in AVRCP.
 > 
-> It's maybe also an idea to have a student do this for Bluez GNOME.
-> 
-> I can write the boilerplate (make files etc.) such that the student
-> just needs to write the docbook file
+> PTS has some test cases to check for it.
 
-I am all for it. Do you need anything from my side?
+patch seems to be in the CVS. Thanks.
 
 Regards
 
