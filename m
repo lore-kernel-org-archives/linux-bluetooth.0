@@ -1,12 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1200510167.17973.2.camel@teponkone>
-References: <1200510167.17973.2.camel@teponkone>
-Date: Wed, 16 Jan 2008 20:33:38 +0100
-Message-Id: <1200512018.7978.83.camel@aeonflux>
+In-Reply-To: <1200511695.26259.56.camel@cookie.hadess.net>
+References: <1200489349.26259.29.camel@cookie.hadess.net>
+	<1200497567.7978.51.camel@aeonflux>
+	<1200497718.26259.38.camel@cookie.hadess.net>
+	<1200498238.7978.59.camel@aeonflux>
+	<1200498782.26259.41.camel@cookie.hadess.net>
+	<1200511043.7978.65.camel@aeonflux>
+	<1200511695.26259.56.camel@cookie.hadess.net>
+Date: Wed, 16 Jan 2008 20:47:52 +0100
+Message-Id: <1200512872.7978.87.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bluez-gnome ui
+Subject: Re: [Bluez-devel] [PATCH] Ignore built files
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,44 +26,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Teppo,
+Hi Bastien,
 
-> I am not a user interface designer, but I think that the current UI for
-> bluez-gnome is pretty awful: There is a Services tab that only geeks
-> will understand (what actually is a Serial service?), there are buttons
-> that appear/disapper and change contents depending on which bonded
-> device is selected, there are non-obvious icons (what does that lock
-> next to my phone mean? Is my phone locked?), there is no way to initiate
-> pairing with a new device, for some reason it is necessary to ask the
-> user for the class of the device when HAL already knows that, etc. I
-> tried filing bugs for some of the individual issues, but those got
-> wontfixed, so I thought I'd email the list directly. 
+> > > > I don't see the need and especially since the long-term goal is to move
+> > > > to git, it will become useless.
+> > > 
+> > > I thought we wanted to move bluez-gnome to GNOME's SVN...
+> > 
+> > personally I think that Subversion is as worse as CVS and I don't see
+> > any advantage for a switch to that. Convincing me that GNOME's
+> > infrastructure makes sense is different, but from a pure technical
+> > standpoint of the SCM, Subversion is not an argument I am gonna buy
+> > into.
+> 
+> I'm not getting into SCM discussions, if GNOME was still using CVS, I'd
+> still be using CVS (and so forth). What I meant was using the GNOME
+> infrastructure to get translators, documentation writers, and plenty of
+> pairs of eyeballs for the code.
 
-to be quite honest it is not that simple. I also never said that this is
-a perfect UI, but it is a working one.
-
-With the service tab, I fully agree. It was written from a full
-technical background in mind and stuff like that should not be exposed
-to the end user. However there are limitations to a certain degree and I
-haven't seen any other proposal so far.
-
-For the explanations of the icons. Write a patch that utilizes tooltip
-to explain them.
-
-In the class of device case, we actually do use HAL. However I wanna
-have a way to not use HAL and set the class by myself. In case the "Use
-HAL" checkbox is clicked we could go ahead and hide the class selection.
-However that is not as simple as it sounds. You would have to hide the
-box for all adapters. Remember this UI supports seamlessly multiple
-adapters.
-
-> I think the current crappiness is even more evident when compared to the
-> brilliant design for BluetoothManager that was up at live.gnome.org. [1]
-> Is there any chance of working towards the more non-geek-friendly vision
-> presented on that old BluetoothManager page?
-
-The answer to these kind of comments/questions is always the same. Send
-in patches that will improve it.
+for me it really boils down to the SCM in the end. I am not a big fan of
+CVS, but switching to SVN is not an option. Best would be if GNOME would
+support GIT, because then we can switch right now.
 
 Regards
 
