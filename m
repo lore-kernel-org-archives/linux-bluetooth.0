@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1200489349.26259.29.camel@cookie.hadess.net>
-References: <1200489349.26259.29.camel@cookie.hadess.net>
-Date: Wed, 16 Jan 2008 16:32:46 +0100
-Message-Id: <1200497567.7978.51.camel@aeonflux>
+In-Reply-To: <fd0635d10801160019n360c60a8g49d0259726f141ae@mail.gmail.com>
+References: <fd0635d10801151921u1fa4b7bq55711ab4b009db3@mail.gmail.com>
+	<1200463696.7978.41.camel@aeonflux>
+	<fd0635d10801160019n360c60a8g49d0259726f141ae@mail.gmail.com>
+Date: Wed, 16 Jan 2008 16:23:48 +0100
+Message-Id: <1200497029.7978.44.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Ignore built files
+Subject: Re: [Bluez-devel] bluez-gnome Japanese translation
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,28 +22,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Hi,
 
-> First "patch" is to add some cvsignore files, cleaning up patches:
-> http://bugzilla.gnome.org/attachment.cgi?id=101355&action=view
+> > > I want to add Japanese translation for bluez-gnome (ja.po).
+> > > How do I send translated file ?
+> > > Must I get developer account, or do I send a file to someone ?
+> > >
+> > > The translated file is based on yesterday's CVS with make update-po.
+> >
+> > post the file as attachment to the mailing list and I make sure it gets
+> > applied. Patches are also fine.
+> >
+> > Don't forget to send an initial patch for the po/LINGUAS file if you add
+> > a new language.
 > 
-> Just untar in the root directory of the checkout. BZ:
-> http://bugzilla.gnome.org/show_bug.cgi?id=504745
+> Here is patch file which includes new ja.po and diff of po/LINGUAS.
+> Thanks.
 
-I never bothered with the .cvsignore stuff, because the way CVS uses it
-is totally stupid and calling "make maintainer-clean" will give you a
-complete clean repository.
-
-> I'd need an opinion on another bug:
-> http://bugzilla.gnome.org/show_bug.cgi?id=505605
-> 
-> I think that it would be a good idea to move the adapter name to the top
-> of the dialogue, as it is rather more important than the mode of
-> operation.
-
-Actually I think the mode is more important. You might change your name
-once, but the mode change (especially with the visible timeout) is the
-one that you use more often.
+patch has been committed to the CVS. Send me updates as needed. Thanks.
 
 Regards
 
