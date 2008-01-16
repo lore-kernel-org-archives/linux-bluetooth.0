@@ -1,17 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <478DB0E1.7090401@gmail.com>
-Date: Wed, 16 Jan 2008 16:23:13 +0900
+Message-ID: <478DA86F.10905@gmail.com>
+Date: Wed, 16 Jan 2008 15:47:11 +0900
 From: Tejun Heo <htejun@gmail.com>
 MIME-Version: 1.0
-To: Al Viro <viro@ZenIV.linux.org.uk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 References: <478D74A6.7000206@gmail.com> <478D75BD.1010805@gmail.com>
 	<alpine.LFD.1.00.0801151928380.2806@woody.linux-foundation.org>
-	<20080116035224.GW27894@ZenIV.linux.org.uk>
-In-Reply-To: <20080116035224.GW27894@ZenIV.linux.org.uk>
+In-Reply-To: <alpine.LFD.1.00.0801151928380.2806@woody.linux-foundation.org>
 Cc: Gabor Gombas <gombasg@sztaki.hu>, Greg KH <greg@kroah.com>,
 	Linux Kernel <linux-kernel@vger.kernel.org>,
-	bluez-devel@lists.sourceforge.net,
-	Linus Torvalds <torvalds@linux-foundation.org>
+	bluez-devel@lists.sourceforge.net, Al Viro <viro@ZenIV.linux.org.uk>,
+	cornelia.huck@de.ibm.com
 Subject: Re: [Bluez-devel] [PATCH 2.6.24-rc7 2/2] sysfs: fix bugs in
 	sysfs_rename/move_dir()
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -27,47 +26,62 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello.
+Linus Torvalds wrote:
+> 
+> On Wed, 16 Jan 2008, Tejun Heo wrote:
+>> * sysfs_move_dir() has an extra dput() on success path.
+> 
+> Are you sure? How did this ever work?
 
-Al Viro wrote:
-> No ACK is coming until we get something resembling analysis of locking
-> scheme.  Which won't happen until we at least get the "what callers are
-> allowed to do" written down, damnit.
+I'm pretty sure.  I've seen dentry blowing up due to early release &&
+compared it with older code.  It was my mistake during restructuring
+error path.  The only user of sysfs_move_dir() was S390 Cornelia works
+on (cc'd).  Cornelia is usually very good at spotting and debugging
+sysfs bugs.  Dunno how it got slipped this time.
 
-I agree that sysfs needs further clean up.  As I wrote in the earlier
-thread, sysfs has been under constant flux of cleanups and updates
-although it has slowed down recently due to the hazy number of libata
-bugs.  For example, several months ago with buggy dentry / inode
-reclamation, sysfs could trigger pretty cryptic oopses under memory
-pressure and locking was more awkward and buggy.
+> Also, looking at this, I think the "how did this ever work" question is 
+> answered by "it didn't",
 
-The two posted patches are bug fixes for apparent bugs which can be
-triggered by the current two users of the interface.  AFAICS, locking
-there is weird but correct for the current two users.  If you can find
-any problem there, please lemme know.  We shouldn't hold this type of
-fixes for future clean ups.
+Before dput() bug was introduced, it worked although error handling path
+was broken.
 
-> As it is, I'm more than inclined
-> to propose ripping kobject_move() out, especially since it has only two
-> users - something s390-specific and rfcomm, with its shitloads of problems
-> beyond just sysfs interaction.
+> but I also think there are still serious problems 
+> there. Look at
+> 
+> 	again:
+> 	        mutex_lock(&old_parent->d_inode->i_mutex);
+> 	        if (!mutex_trylock(&new_parent->d_inode->i_mutex)) {
+> 	                mutex_unlock(&old_parent->d_inode->i_mutex);
+> 	                goto again;
+> 	        }
+> 
+> and wonder what happen sif old_parent == new_parent. Is that trying to 
+> avoid an ABBA deadlock?
 
-Can you please elaborate?  All sysfs problems discovered by the rfcomm
-are fixed by the posted patches.  Dave Young has a patch waiting for
-verification by the tester.  Furthermore, even if we rip out
-kobject_move() in the future, I don't think -rc7 is the right time to do it.
+It will fall in infinite loop if old_parent == new_parent and for the
+question, I suppose so.  Cornelia, right?
 
-I posted some patches a while back which did sysfs locking
-reorganization, separation from and proper layering with kobject /
-driver model.  There were some disagreements regarding the interface and
-I got struck by load of ATA bugs.  I'll dig it up and give it another
-shot in a few weeks.
+> Normally you'd do it by ordering the locks, or by 
+> taking a third lock to guarantee serialization at a higher level (ie the 
+> "s_vfs_rename_mutex" on the VFS layer)
+
+sysfs currently doesn't depend on VFS locking.  VFS locking is done just
+to keep VFS layer happy.  sysfs_dirent hierarchy is protected by
+sysfs_mutex and renaming/moving are protected by sysfs_rename_mutex.  As
+both ops are under rename_mutex, I think the above code just can grab
+both mutexes in any order.  It's probably a remnant of the days when
+sysfs used VFS locking to protect internal structures.
+
+s390 was the only user of the move interface till now and through all
+the recent sysfs change, it didn't receive enough attention other than
+Cornelia's testing.  Eventually, I think sysfs_rename_dir() and
+sysfs_move_dir() should be merged into sysfs_move() but for the current
+two users, I don't see anything wrong with the locking.
 
 Thanks.
 
 -- 
 tejun
-
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
