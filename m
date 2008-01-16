@@ -1,11 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ Hackers <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="=-F1CSDHBsSgERYNsGX0D/"
-Date: Wed, 16 Jan 2008 12:55:27 +0000
-Message-Id: <1200488127.26259.23.camel@cookie.hadess.net>
+Date: Wed, 16 Jan 2008 09:20:11 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+To: Tejun Heo <htejun@gmail.com>
+Message-ID: <20080116092011.115c3f0e@gondolin.boeblingen.de.ibm.com>
+In-Reply-To: <478DA86F.10905@gmail.com>
+References: <478D74A6.7000206@gmail.com> <478D75BD.1010805@gmail.com>
+	<alpine.LFD.1.00.0801151928380.2806@woody.linux-foundation.org>
+	<478DA86F.10905@gmail.com>
 Mime-Version: 1.0
-Subject: [Bluez-devel] [PATCH] Add more supported HAL classes
+Cc: Gombas <gombasg@sztaki.hu>, Gabor@sc8-sf-spam2.sourceforge.net,
+	Greg KH <greg@kroah.com>,
+	Linux Kernel <linux-kernel@vger.kernel.org>,
+	bluez-devel@lists.sourceforge.net, Al Viro <viro@ZenIV.linux.org.uk>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [Bluez-devel] [PATCH 2.6.24-rc7 2/2] sysfs: fix bugs in
+ sysfs_rename/move_dir()
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,110 +24,89 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+On Wed, 16 Jan 2008 15:47:11 +0900,
+Tejun Heo <htejun@gmail.com> wrote:
 
---=-F1CSDHBsSgERYNsGX0D/
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+> Linus Torvalds wrote:
+> > 
+> > On Wed, 16 Jan 2008, Tejun Heo wrote:
+> >> * sysfs_move_dir() has an extra dput() on success path.
+> > 
+> > Are you sure? How did this ever work?
+> 
+> I'm pretty sure.  I've seen dentry blowing up due to early release &&
+> compared it with older code.  It was my mistake during restructuring
+> error path.  The only user of sysfs_move_dir() was S390 Cornelia works
+> on (cc'd).  Cornelia is usually very good at spotting and debugging
+> sysfs bugs.  Dunno how it got slipped this time.
 
-Heya,
+Hm, don't know either. It never blew for my tests (and I did extensive
+moving around of ccw devices...)
 
-Server and handheld are both supported minor classes for HAL and hcid,
-so we should handle them appropriately.
+> 
+> > Also, looking at this, I think the "how did this ever work" question is 
+> > answered by "it didn't",
+> 
+> Before dput() bug was introduced, it worked although error handling path
+> was broken.
+> 
+> > but I also think there are still serious problems 
+> > there. Look at
+> > 
+> > 	again:
+> > 	        mutex_lock(&old_parent->d_inode->i_mutex);
+> > 	        if (!mutex_trylock(&new_parent->d_inode->i_mutex)) {
+> > 	                mutex_unlock(&old_parent->d_inode->i_mutex);
+> > 	                goto again;
+> > 	        }
+> > 
+> > and wonder what happen sif old_parent == new_parent. Is that trying to 
+> > avoid an ABBA deadlock?
+> 
+> It will fall in infinite loop if old_parent == new_parent and for the
+> question, I suppose so.  Cornelia, right?
 
-Simple patch attached.
+Yes. But we jump out early if old_parent == new_parent.
 
-Cheers
+> 
+> > Normally you'd do it by ordering the locks, or by 
+> > taking a third lock to guarantee serialization at a higher level (ie the 
+> > "s_vfs_rename_mutex" on the VFS layer)
+> 
+> sysfs currently doesn't depend on VFS locking.  VFS locking is done just
+> to keep VFS layer happy.  sysfs_dirent hierarchy is protected by
+> sysfs_mutex and renaming/moving are protected by sysfs_rename_mutex.  As
+> both ops are under rename_mutex, I think the above code just can grab
+> both mutexes in any order.  It's probably a remnant of the days when
+> sysfs used VFS locking to protect internal structures.
 
---=-F1CSDHBsSgERYNsGX0D/
-Content-Disposition: attachment; filename=bluez-gnome-add-more-classes.patch
-Content-Type: text/x-patch; name=bluez-gnome-add-more-classes.patch;
-	charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Yes, I think so.
 
-Index: applet/main.c
-===================================================================
-RCS file: /cvsroot/bluez/gnome/applet/main.c,v
-retrieving revision 1.95
-diff -u -p -r1.95 main.c
---- applet/main.c	22 Dec 2007 00:09:15 -0000	1.95
-+++ applet/main.c	16 Jan 2008 12:54:30 -0000
-@@ -1271,7 +1271,10 @@ static char *get_form_factor(void)
- 	libhal_ctx_shutdown(ctx, NULL);
- 	libhal_ctx_free(ctx);
- 
--	if (strcmp(formfactor, "laptop") && strcmp(formfactor, "desktop")) {
-+	if (strcmp(formfactor, "laptop")
-+	    && strcmp(formfactor, "desktop")
-+	    && strcmp (formfactor, "server")
-+	    && strcmp (formfactor, "handheld")) {
- 		/* We don't know anything else */
- 		g_free(formfactor);
- 		formfactor = g_strdup("uncategorized");
-Index: properties/adapter.c
-===================================================================
-RCS file: /cvsroot/bluez/gnome/properties/adapter.c,v
-retrieving revision 1.17
-diff -u -p -r1.17 adapter.c
---- properties/adapter.c	29 Aug 2007 15:41:49 -0000	1.17
-+++ properties/adapter.c	16 Jan 2008 12:54:31 -0000
-@@ -227,6 +227,12 @@ static void class_callback(GtkWidget *co
- 	case 2:
- 		minor = "laptop";
- 		break;
-+	case 3:
-+		minor = "server";
-+		break;
-+	case 4:
-+		minor = "handheld";
-+		break;
- 	default:
- 		return;
- 	}
-@@ -705,6 +711,10 @@ static void create_adapter(struct adapte
- 						_("Desktop workstation"));
- 	gtk_combo_box_append_text(GTK_COMBO_BOX(combobox),
- 						_("Laptop computer"));
-+	gtk_combo_box_append_text(GTK_COMBO_BOX(combobox),
-+						_("Server"));
-+	gtk_combo_box_append_text(GTK_COMBO_BOX(combobox),
-+						_("Handheld"));
- 	gtk_box_pack_start(GTK_BOX(vbox), combobox, FALSE, FALSE, 0);
- 
- 	if (major && minor && g_ascii_strcasecmp(major, "computer") == 0) {
-@@ -714,6 +724,10 @@ static void create_adapter(struct adapte
- 			index = 1;
- 		else if (g_ascii_strcasecmp(minor, "laptop") == 0)
- 			index = 2;
-+		else if (g_ascii_strcasecmp(minor, "server") == 0)
-+			index = 3;
-+		else if (g_ascii_strcasecmp(minor, "handheld") == 0)
-+			index = 4;
- 		else
- 			index = -1;
- 
+> 
+> s390 was the only user of the move interface till now and through all
+> the recent sysfs change, it didn't receive enough attention other than
+> Cornelia's testing. 
 
---=-F1CSDHBsSgERYNsGX0D/
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+I just wonder why I never hit it since I regularily do some testing of
+the moving stuff (on Greg's tree and on mainline). But bluetooth has
+been using this interface for some time as well (and they were the ones
+with the problems triggering this patch).
+
+> Eventually, I think sysfs_rename_dir() and
+> sysfs_move_dir() should be merged into sysfs_move() but for the current
+> two users, I don't see anything wrong with the locking.
+
+Me too. But maybe I'm just too familiar with the code...
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---=-F1CSDHBsSgERYNsGX0D/
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---=-F1CSDHBsSgERYNsGX0D/--
