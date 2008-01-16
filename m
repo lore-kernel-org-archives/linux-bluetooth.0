@@ -1,10 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: Teppo Turtiainen <teppot@iki.fi>
-To: bluez-devel@lists.sourceforge.net
-Date: Wed, 16 Jan 2008 21:02:47 +0200
-Message-Id: <1200510167.17973.2.camel@teponkone>
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Content-Type: multipart/mixed; boundary="=-SV0bIh16KOD9IA4G2I93"
+Date: Wed, 16 Jan 2008 15:57:57 +0000
+Message-Id: <1200499077.26259.42.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel] bluez-gnome ui
+Subject: [Bluez-devel] [PATCH] Use latest API in sendto
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,43 +15,59 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi guys,
 
-Let me start by saying that I'm a big fan of Bluetooth (6 devices and
-counting) and of the work you are doing.
+--=-SV0bIh16KOD9IA4G2I93
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-I am not a user interface designer, but I think that the current UI for
-bluez-gnome is pretty awful: There is a Services tab that only geeks
-will understand (what actually is a Serial service?), there are buttons
-that appear/disapper and change contents depending on which bonded
-device is selected, there are non-obvious icons (what does that lock
-next to my phone mean? Is my phone locked?), there is no way to initiate
-pairing with a new device, for some reason it is necessary to ask the
-user for the class of the device when HAL already knows that, etc. I
-tried filing bugs for some of the individual issues, but those got
-wontfixed, so I thought I'd email the list directly. 
+Little one-liner to allow bluetooth-sendto to work with the latest
+obex-data-server.
 
-I think the current crappiness is even more evident when compared to the
-brilliant design for BluetoothManager that was up at live.gnome.org. [1]
-Is there any chance of working towards the more non-geek-friendly vision
-presented on that old BluetoothManager page?
+--=-SV0bIh16KOD9IA4G2I93
+Content-Disposition: attachment; filename=bluez-gnome-sendto-fix.patch
+Content-Type: text/x-patch; name=bluez-gnome-sendto-fix.patch;
+	charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-Thanks,
-Teppo
+Index: main.c
+===================================================================
+RCS file: /cvsroot/bluez/gnome/sendto/main.c,v
+retrieving revision 1.11
+diff -u -p -r1.11 main.c
+--- main.c	22 Dec 2007 00:09:17 -0000	1.11
++++ main.c	16 Jan 2008 15:56:30 -0000
+@@ -353,7 +353,7 @@ int main(int argc, char *argv[])
+ 	dbus_g_proxy_begin_call(proxy, "CreateBluetoothSession",
+ 				create_notify, filename, NULL,
+ 				G_TYPE_STRING, address, G_TYPE_STRING, "opp",
+-				G_TYPE_BOOLEAN, FALSE, G_TYPE_INVALID);
++				G_TYPE_INVALID);
+ 
+ 	gtk_main();
+ 
 
-[1] http://live.gnome.org/BluetoothManager?action=recall&rev=16
-
-
+--=-SV0bIh16KOD9IA4G2I93
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--=-SV0bIh16KOD9IA4G2I93
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--=-SV0bIh16KOD9IA4G2I93--
