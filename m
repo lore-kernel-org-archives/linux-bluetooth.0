@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1200497718.26259.38.camel@cookie.hadess.net>
-References: <1200489349.26259.29.camel@cookie.hadess.net>
-	<1200497567.7978.51.camel@aeonflux>
-	<1200497718.26259.38.camel@cookie.hadess.net>
-Date: Wed, 16 Jan 2008 16:43:58 +0100
-Message-Id: <1200498238.7978.59.camel@aeonflux>
+In-Reply-To: <1200488127.26259.23.camel@cookie.hadess.net>
+References: <1200488127.26259.23.camel@cookie.hadess.net>
+Date: Wed, 16 Jan 2008 16:40:40 +0100
+Message-Id: <1200498040.7978.53.camel@aeonflux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Ignore built files
+Subject: Re: [Bluez-devel] [PATCH] Add more supported HAL classes
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,20 +22,10 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Bastien,
 
-> > > First "patch" is to add some cvsignore files, cleaning up patches:
-> > > http://bugzilla.gnome.org/attachment.cgi?id=101355&action=view
-> > > 
-> > > Just untar in the root directory of the checkout. BZ:
-> > > http://bugzilla.gnome.org/show_bug.cgi?id=504745
-> > 
-> > I never bothered with the .cvsignore stuff, because the way CVS uses it
-> > is totally stupid and calling "make maintainer-clean" will give you a
-> > complete clean repository.
-> 
-> So not going to apply that patch/tarball?
+> Server and handheld are both supported minor classes for HAL and hcid,
+> so we should handle them appropriately.
 
-I don't see the need and especially since the long-term goal is to move
-to git, it will become useless.
+patch has been applied. Thanks.
 
 Regards
 
