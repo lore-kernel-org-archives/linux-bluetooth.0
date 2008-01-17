@@ -1,10 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 17 Jan 2008 17:19:14 +0800
-Message-ID: <15A39AF0EC0CC0418BE4B70B810E61B7B89A36@zmy16exm72.ds.mot.com>
-From: "Shi Buyun-FVBP83" <FVBP83@motorola.com>
-To: <bluez-devel@lists.sourceforge.net>, <tim@hentenaar.com>
-Subject: Re: [Bluez-devel] bluez compile error
+Date: Thu, 17 Jan 2008 04:22:16 +0000
+From: Al Viro <viro@ZenIV.linux.org.uk>
+To: Tejun Heo <htejun@gmail.com>
+Message-ID: <20080117042216.GB27894@ZenIV.linux.org.uk>
+References: <478D74A6.7000206@gmail.com> <478D75BD.1010805@gmail.com>
+	<alpine.LFD.1.00.0801151928380.2806@woody.linux-foundation.org>
+	<20080116035224.GW27894@ZenIV.linux.org.uk>
+	<478DB0E1.7090401@gmail.com>
+Mime-Version: 1.0
+In-Reply-To: <478DB0E1.7090401@gmail.com>
+Cc: Gabor Gombas <gombasg@sztaki.hu>, Greg KH <greg@kroah.com>,
+	Linux Kernel <linux-kernel@vger.kernel.org>,
+	bluez-devel@lists.sourceforge.net,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [Bluez-devel] [PATCH 2.6.24-rc7 2/2] sysfs: fix bugs in
+	sysfs_rename/move_dir()
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,103 +24,51 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1193808836=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+On Wed, Jan 16, 2008 at 04:23:13PM +0900, Tejun Heo wrote:
 
---===============1193808836==
-Content-class: urn:content-classes:message
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C858EA.07B46D66"
+> The two posted patches are bug fixes for apparent bugs which can be
+> triggered by the current two users of the interface.  AFAICS, locking
+> there is weird but correct for the current two users.  If you can find
+> any problem there, please lemme know.
 
-This is a multi-part message in MIME format.
+How about "what happens after that move-to-NULL if you have a cwd inside
+the subtree", for starters?
 
-------_=_NextPart_001_01C858EA.07B46D66
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+>  We shouldn't hold this type of
+> fixes for future clean ups.
 
-Hi, Tim, all
-I'm sure I have installed yacc && lex in my desktop and they run well.
-And you know, I could compile correctly the code got from the website
-which was not modified; but, even if added "printf("test\n");" would
-cause compile error.
-=20
-Could be any more clue to this?
-=20
-Best regards
-Shi Buyun
-=20
->  ../ylwrap: line 111: yacc: command not found
->Do you have yacc or bison installed? Is it in your path? You can check
-for that by running 'which yacc' in your terminal.
->Tim
+No, but I'd rather see the rules for callers of sysfs/kobject primitives
+spelled out - before cleanups or review become even possible.
+ 
+> > As it is, I'm more than inclined
+> > to propose ripping kobject_move() out, especially since it has only two
+> > users - something s390-specific and rfcomm, with its shitloads of problems
+> > beyond just sysfs interaction.
+> 
+> Can you please elaborate?  All sysfs problems discovered by the rfcomm
+> are fixed by the posted patches.  Dave Young has a patch waiting for
+> verification by the tester.
 
+Umm...  IIRC, there'd been a lot of fun with tty and procfs sides of that;
+will check.
 
-------_=_NextPart_001_01C858EA.07B46D66
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+> Furthermore, even if we rip out
+> kobject_move() in the future, I don't think -rc7 is the right time to do it.
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Dus-ascii">
-<META content=3D"MSHTML 6.00.2900.3243" name=3DGENERATOR></HEAD>
-<BODY>
-<DIV><SPAN class=3D050281209-17012008><FONT size=3D2>Hi, Tim,=20
-all</FONT></SPAN></DIV>
-<DIV><SPAN class=3D050281209-17012008><FONT size=3D2>I'm sure I have =
-installed yacc=20
-&amp;&amp; lex in my desktop and they run well. And you know, I could=20
-compile&nbsp;correctly&nbsp;the code got from the website which was not=20
-modified; but, even if added "printf("test\n");" would cause compile=20
-error.</FONT></SPAN></DIV>
-<DIV><SPAN class=3D050281209-17012008><FONT =
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D050281209-17012008><FONT size=3D2>Could be any more =
-clue to=20
-this?</FONT></SPAN></DIV>
-<DIV><SPAN class=3D050281209-17012008><FONT =
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D050281209-17012008><FONT size=3D2>Best=20
-regards</FONT></SPAN></DIV>
-<DIV><SPAN class=3D050281209-17012008><FONT size=3D2>Shi =
-Buyun</FONT></SPAN></DIV>
-<DIV><SPAN class=3D050281209-17012008><FONT =
-size=3D2></FONT></SPAN>&nbsp;</DIV>
-<DIV><FONT size=3D2>&gt;&nbsp; ../ylwrap: line 111: yacc: command not=20
-found</FONT></DIV>
-<DIV><FONT size=3D2>&gt;Do you have yacc or bison installed? Is it in =
-your path?=20
-You can check for that by running 'which yacc' in your =
-terminal.</FONT></DIV>
-<DIV><FONT size=3D2>&gt;Tim<BR></FONT></DIV></BODY></HTML>
-
-------_=_NextPart_001_01C858EA.07B46D66--
-
-
---===============1193808836==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+OK...  You do have a point, but at this stage I'm not convinced that this
+thing is safe and usable.  I agree that patches do not make things worse,
+but I suspect that the real problem with kobject_move() is that it's a
+fundamentally broken interface.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1193808836==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1193808836==--
