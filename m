@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4790B322.4040605@omepet.es>
-Date: Fri, 18 Jan 2008 15:09:38 +0100
-From: jm <jmtoro@omepet.es>
+Message-ID: <47909C03.60905@aircable.net>
+Date: Fri, 18 Jan 2008 10:30:59 -0200
+From: Manuel Naranjo <manuel@aircable.net>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <4790817D.3030400@omepet.es>
-In-Reply-To: <4790817D.3030400@omepet.es>
-Subject: Re: [Bluez-users] Problem when cancelling connect
+References: <d5d240eb0801180153j24eeb93cx3fa037f561720800@mail.gmail.com>
+In-Reply-To: <d5d240eb0801180153j24eeb93cx3fa037f561720800@mail.gmail.com>
+Subject: Re: [Bluez-users] error building openobex-apps-1.0.0
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,61 +16,37 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I forgot to mention I cancel the call to connect() using siglongjmp:
-
-sigjmp_buf jmpbuf;
-
-int sig_handler(int signo)
-{
-    siglongjmp (jmpbuf, 1);
-}
-
-...
-
-signal (SIGALRM, sig_handler);
-
-alarm( MAX_CONNECT_TIME );
-
-if (!sigsetjmp(jmpbuf, 1)){
-    BtOBEX_TransportConnect(handle, BDADDR_ANY, &bdaddr, channel)
-    alarm(0);  
-    ...
-}
-else{
-    signal (SIGALRM, SIG_DFL);
-    return -1;
-}
-> Hi all!
->
-> I'm trying to cancel a call to connect() (The one called by 
-> BtOBEX_TransportConnect) using a SIGALRM signal. It works fine, but a 
-> random subsequent call to hci_inquiry() or sdp_connect() causes a 
-> segmentation fault. I've tried to restore the default signal handler and 
-> closing the socket by hand, with no luck. Any idea about what is going on?
->
-> Thanks in advance
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2008.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->   
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+QXNrIHRoZSBndXlzIGZyb20gb3Blbm9iZXggbm90IGhlcmUuCj4gSGkgYWxsLAo+ICBJIGhhdmUg
+ZG93bmxvYWRlZCBvcGVub2JleC1hcHBzLTEuMC4wIGFuZCB0cnlpbmcgYnVpbGRpbmcgaXQKPiBI
+ZXJlIEkgYW0gZG9pbmcgLi9jb25maWd1cmUKPiB0aGVuIG1ha2UgYnV0IGl0IGdpdmVzIHRoZSBm
+b2xsb3dpbmcgZXJyb3JzCj4KPiBvYmV4X3B1dF9jb21tb24uYzogSW4gZnVuY3Rpb24gJ3B1dF9k
+b25lJzoKPiBvYmV4X3B1dF9jb21tb24uYzo4NTogZXJyb3I6IGV4cGVjdGVkICcpJyBiZWZvcmUg
+c3RyaW5nIGNvbnN0YW50Cj4gb2JleF9wdXRfY29tbW9uLmM6IEluIGZ1bmN0aW9uICdzZXJ2ZXJf
+cmVxdWVzdCc6Cj4gb2JleF9wdXRfY29tbW9uLmM6MTI2OiBlcnJvcjogZXhwZWN0ZWQgJyknIGJl
+Zm9yZSBzdHJpbmcgY29uc3RhbnQKPiBtYWtlWzJdOiAqKiogW29iZXhfcHV0X2NvbW1vbi5vXSBF
+cnJvciAxCj4gbWFrZVsyXTogTGVhdmluZyBkaXJlY3RvcnkgYC9yb290L0Rlc2t0b3Avb3Blbm9i
+ZXgtIGFwcHMtMS4wLjAgL3NyYycKPiBtYWtlWzFdOiAqKiogW2FsbC1yZWN1cnNpdmVdIEVycm9y
+IDEKPiBtYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Jvb3QvRGVza3RvcC9vcGVub2JleC1h
+cHBzLTEuMC4wJwo+IG1ha2U6ICoqKiBbYWxsLXJlY3Vyc2l2ZS1hbV0gRXJyb3IgMiDvv70KPgo+
+IGFueSBoZWxwIGlzIGFwcHJlY2lhdGVkCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4KPiAtLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tCj4gVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBNaWNyb3NvZnQKPiBE
+ZWZ5IGFsbCBjaGFsbGVuZ2VzLiBNaWNyb3NvZnQoUikgVmlzdWFsIFN0dWRpbyAyMDA4Lgo+IGh0
+dHA6Ly9jbGsuYXRkbXQuY29tL01SVC9nby92c2UwMTIwMDAwMDcwbXJ0L2RpcmVjdC8wMS8KPiAt
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0KPgo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fCj4gQmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0Cj4gQmx1ZXotdXNlcnNAbGlzdHMu
+c291cmNlZm9yZ2UubmV0Cj4gaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlz
+dGluZm8vYmx1ZXotdXNlcnMKPiAgIAoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1h
+aWwgaXMgc3BvbnNvcmVkIGJ5OiBNaWNyb3NvZnQKRGVmeSBhbGwgY2hhbGxlbmdlcy4gTWljcm9z
+b2Z0KFIpIFZpc3VhbCBTdHVkaW8gMjAwOC4KaHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3Zz
+ZTAxMjAwMDAwNzBtcnQvZGlyZWN0LzAxLwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fXwpCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlz
+dHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xp
+c3RpbmZvL2JsdWV6LXVzZXJzCg==
