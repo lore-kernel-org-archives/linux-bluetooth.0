@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 19 Jan 2008 21:07:08 +0100
-From: Michael Domann <profbunny@gmx.de>
+Message-ID: <5eee8c670801191136p604d5a84jbc1284a47bd86334@mail.gmail.com>
+Date: Sat, 19 Jan 2008 19:36:06 +0000
+From: "Odysseus Flappington" <deriziotis@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20080119210708.333efbd8.profbunny@gmx.de>
-Mime-Version: 1.0
-Subject: [Bluez-users] sound problems with headset
+MIME-Version: 1.0
+Subject: [Bluez-users] Bluetooth dongle not reconnecting
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,87 +14,102 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1359181537=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hi list,
+--===============1359181537==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_7188_15931834.1200771366312"
 
-i try for some time to use my bluetooth headset with debian lenny, atm version 3.24 libs and bluez-utils.
+------=_Part_7188_15931834.1200771366312
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-it looks like i have more success like befor, but it doesnt work.
+Hi,
 
-syslog displays
+I've got an Edimax EB-DGC2 USB 2.0 bluetooth dongle running on Ubuntu
+7.10with kernel
+2.6.22-14-generic.
 
-Jan 19 20:47:08 sysiphus kernel: Bluetooth: HCI USB driver ver 2.9
-Jan 19 20:47:08 sysiphus kernel: usbcore: registered new interface driver hci_usb
-Jan 19 20:47:08 sysiphus hcid[3700]: HCI dev 0 registered
-Jan 19 20:47:08 sysiphus hcid[3700]: HCI dev 0 up
-Jan 19 20:47:08 sysiphus hcid[3700]: Device hci0 has been added
-Jan 19 20:47:08 sysiphus hcid[3700]: Starting security manager 0
-Jan 19 20:47:08 sysiphus hcid[3700]: Device hci0 has been activated
-Jan 19 20:47:38 sysiphus audio[3724]: Accepted new client connection on unix socket (fd=9)
-Jan 19 20:47:38 sysiphus audio[3724]: Audio API: received BT_GETCAPABILITIES_REQ
-Jan 19 20:47:38 sysiphus audio[3724]: Got path /org/bluez/hci0 for adapter with address 00:13:EF:F1:44:13
-Jan 19 20:47:41 sysiphus audio[3724]: Audio service discovery completed with success
-Jan 19 20:47:41 sysiphus audio[3724]: Found Headset record
-Jan 19 20:47:41 sysiphus audio[3724]: Discovered Headset service on RFCOMM channel 2
-Jan 19 20:47:41 sysiphus audio[3724]: Selecting default device
-Jan 19 20:47:41 sysiphus audio[3724]: Audio API: sending BT_GETCAPABILITIES_RSP
-Jan 19 20:47:41 sysiphus audio[3724]: Unix client disconnected (fd=9)
-Jan 19 20:48:01 sysiphus /USR/SBIN/CRON[27631]: (www-data) CMD (         [ -x /usr/share/drupal5/scripts/cron.sh ] && /usr/share/drupal5/scripts/cron.sh)
-Jan 19 20:48:29 sysiphus audio[3724]: Accepted new client connection on unix socket (fd=9)
-Jan 19 20:48:29 sysiphus audio[3724]: Audio API: received BT_GETCAPABILITIES_REQ
-Jan 19 20:48:29 sysiphus audio[3724]: Audio API: sending BT_GETCAPABILITIES_RSP
-Jan 19 20:48:29 sysiphus audio[3724]: Audio API: received BT_SETCONFIGURATION_REQ
-Jan 19 20:48:29 sysiphus audio[3724]: State changed /org/bluez/audio/device1: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
-Jan 19 20:48:33 sysiphus audio[3724]: /org/bluez/audio/device1: Connecting to 00:1A:45:6E:D5:23 channel 2
-Jan 19 20:48:33 sysiphus hcid[3700]: link_key_request (sba=00:13:EF:F1:44:13, dba=00:1A:45:6E:D5:23)
-Jan 19 20:48:34 sysiphus audio[3724]: State changed /org/bluez/audio/device1: HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_CONNECTED
-Jan 19 20:48:34 sysiphus audio[3724]: /org/bluez/audio/device1: Connected to 00:1A:45:6E:D5:23
-Jan 19 20:48:34 sysiphus kernel: Bluetooth: SCO (Voice Link) ver 0.5
-Jan 19 20:48:34 sysiphus kernel: Bluetooth: SCO socket layer initialized
-Jan 19 20:48:34 sysiphus audio[3724]: State changed /org/bluez/audio/device1: HEADSET_STATE_CONNECTED -> HEADSET_STATE_PLAY_IN_PROGRESS
-Jan 19 20:48:36 sysiphus audio[3724]: SCO socket opened for headset /org/bluez/audio/device1
-Jan 19 20:48:36 sysiphus audio[3724]: SCO fd=11
-Jan 19 20:48:36 sysiphus audio[3724]: Audio API: sending BT_SETCONFIGURATION_RSP
-Jan 19 20:48:36 sysiphus audio[3724]: State changed /org/bluez/audio/device1: HEADSET_STATE_PLAY_IN_PROGRESS -> HEADSET_STATE_PLAYING
-Jan 19 20:48:36 sysiphus audio[3724]: Audio API: received BT_STREAMSTART_REQ
-Jan 19 20:48:36 sysiphus audio[3724]: Audio API: sending BT_STREAMSTART_RSP
-Jan 19 20:48:36 sysiphus audio[3724]: Audio API: sending BT_STREAMFD_IND
-Jan 19 20:48:36 sysiphus audio[3724]: Audio API: received BT_STREAMSTART_REQ
+I can pair my MS Intellimouse bluetooth mouse, but hidd can never re-connect
+after I reboot. The same thing happens with my Apple Bluetooth keyboard (the
+old one which is fully hid compatible). If I don't reboot, but let the
+devices sleep, they re-establish their connections automatically. It's only
+after rebooting that they can't reconnect.
 
-it looks good i think
+I've tested both devices on my laptop and they both automatically reconnect
+after rebooting without any modifications to configuration files with the
+same OS and configuration.
 
+Things I've tried:
+- After rebooting, I try to re-connect manually using sudo hidd --connect
+[MAC]. It gives me the following error:
 
-i have connected  to the HS:
-sysiphus:~$ hcitool con
-Connections:
-        < SCO 00:1A:45:6E:D5:23 handle 0 state 5 lm SLAVE 
-        < ACL 00:1A:45:6E:D5:23 handle 2 state 1 lm MASTER 
+Can't get device information: Operation already in progress
 
-this also
+- When I do a dmesg after rebooting and without actually attempting to
+initiate the connection using hidd --connect (however, I guess it would
+already be automatically trying to reconnect), I can see a ton of the
+following error messages coming up:
 
-but my syslog is bombed with messages looks like that
-Jan 19 20:48:36 sysiphus audio[3724]: Audio API: sending BT_STREAMFD_IND
-Jan 19 20:48:36 sysiphus audio[3724]: Audio API: received BT_STREAMSTART_REQ
-sysiphus:~$ cat /var/log/syslog|grep "Audio API: sending BT_STREAMFD_IND"|wc -l
-68787
+[  119.934706] hci_acldata_packet: hci0 ACL packet for unknown connection
+handle 42
 
-when i try to play with audacious, its only swishes. i have had success to record one time, i dont know how i have done this, i have never can do this again.
+Since everthing works fine on my laptop with the same configuration, the
+issue has to be with the bluetooth dongle itself. Either there's a problem
+with its driver, or there's a problem with the hardware. So, three
+questions:
 
-any suggestions for me?
-thanks and regards from germany
+1) Is there anything else that I need to do to further diagnose this
+problem? More output needed?
+2) Who do I report this problem to in order to get this issue fixed for
+everyone? Kernel developer who maintains bluetooth dongle drivers?
+3) Are there any immediate solutions I can try? I saw something about
+flashing the dongle's firmware.. Is this a possibility? Any other
+suggestions? Could always just buy a new dongle.
 
-micha
+Thanks very much,
+Alex Deriziotis
+
+------=_Part_7188_15931834.1200771366312
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi,<br><br>I&#39;ve got an Edimax EB-DGC2 USB 2.0 bluetooth dongle running on Ubuntu 7.10 with kernel 2.6.22-14-generic.<br><br>I can pair my MS Intellimouse bluetooth mouse, but hidd can never re-connect after I reboot. The same thing happens with my Apple Bluetooth keyboard (the old one which is fully hid compatible). If I don&#39;t reboot, but let the devices sleep, they re-establish their connections automatically. It&#39;s only after rebooting that they can&#39;t reconnect.
+<br><br>I&#39;ve tested both devices on my laptop and they both automatically reconnect after rebooting without any modifications to configuration files with the same OS and configuration.<br><br>Things I&#39;ve tried:<br>
+
+- After rebooting, I try to re-connect manually using sudo hidd --connect [MAC]. It gives me the following error:<br><br>Can&#39;t get device information: Operation already in progress<br><br>- When I do a dmesg after rebooting and without actually attempting to initiate the connection using hidd --connect (however, I guess it would already be automatically trying to reconnect), I can see a ton of the following error messages coming up:
+<br><br>[&nbsp; 119.934706] hci_acldata_packet: hci0 ACL packet for unknown connection handle 42<br><br>Since everthing works fine on my laptop with the same configuration, the issue has to be with the bluetooth dongle itself. Either there&#39;s a problem with its driver, or there&#39;s a problem with the hardware. So, three questions:
+<br><br>1) Is there anything else that I need to do to further diagnose this problem? More output needed?<br>2) Who do I report this problem to in order to get this issue fixed for everyone? Kernel developer who maintains bluetooth dongle drivers?
+<br>3) Are there any immediate solutions I can try? I saw something about flashing the dongle&#39;s firmware.. Is this a possibility? Any other suggestions? Could always just buy a new dongle.<br><br>Thanks very much,<br>
+
+Alex Deriziotis<br><br>
+
+------=_Part_7188_15931834.1200771366312--
 
 
+--===============1359181537==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============1359181537==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1359181537==--
