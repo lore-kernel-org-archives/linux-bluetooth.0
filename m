@@ -1,11 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d716b6350801200544g2c32c5a9m8059e67f907b1a3c@mail.gmail.com>
-Date: Sun, 20 Jan 2008 14:44:20 +0100
-From: "David Geiger" <lists@david-geiger.de>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <479346D7.1080500@gmx.net>
+Date: Sun, 20 Jan 2008 14:04:23 +0100
+From: Gunnar Thielebein <gunnar_thielebein@gmx.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] Service discovery problem
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+To: Bluez-users@lists.sourceforge.net
+References: <47928635.2030400@gmx.net>
+	<d89ddf300801192041o12e98ee7ybeeb28efb2fdfa1d@mail.gmail.com>
+In-Reply-To: <d89ddf300801192041o12e98ee7ybeeb28efb2fdfa1d@mail.gmail.com>
+Subject: Re: [Bluez-users] audio bluetooth connectivity in gutsy
+Reply-To: gunnar_thielebein@gmx.net,
+	BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,68 +18,120 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1429444551=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1429444551==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_12889_9600766.1200836660875"
+Heres my hcid.conf (comments stripped):
 
-------=_Part_12889_9600766.1200836660875
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+options {
+        autoinit yes;
+        security auto;
+        pairing multi;
+        passkey "0000"; # pw for headset pairing
+}
 
-Hi,
+device {
+        name "%h-%d";
+        class 0x000100;
+        iscan enable; pscan enable;
+        lm master;
+        lp rswitch,hold,sniff,park;
+}
 
-I'm trying to connect with my mobile phone to a PAN daemon (running on SUSE
-10.3).
-However, my phone doesn't discover any services on my computer. After
-playing around with the PAN daemon, even the file push service isn't
-detected anymore (btw how does this work in KDE?).
+.asoundrc:
 
-My device class in hcid.conf is set to 0x12010c. There is a tool called
-sdptool which alters a sdpd database but there's no daemon of that name
-running.
+pcm.bluetooth {
+   type bluetooth
+   device 00:12:EE:18:95:CA
+}
 
-Can anyone tell me what the problem might be or where I can find some
-information about how this whole service discovery thing works?
+I had my other soundcard in use could that cause problems in some cases?
+I want to use the sco part of bt-audio so the test with mplayer was only 
+for checking if it works in general.
+later on I would like to use linphone with it.
 
-Thanks,
-David
+This is output of hciconfig:
 
-------=_Part_12889_9600766.1200836660875
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+hci0:   Type: USB
+        BD Address: 00:0B:0D:20:FE:15 ACL MTU: 339:4 SCO MTU: 0:0
+        UP RUNNING PSCAN
+        RX bytes:996 acl:0 sco:0 events:25 errors:0
+        TX bytes:596 acl:0 sco:0 commands:24 errors:0
+        Features: 0xff 0xff 0x3d 0x00 0x00 0x00 0x00 0x00
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: MASTER
+        Name: 'knallbuntu-0knallbuntu-0'
+        Class: 0x080104
+        Service Classes: Capturing
+        Device Class: Computer, Desktop workstation
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x93 LMP Ver: 1.1 (0x1) LMP Subver: 0x93
+        Manufacturer: Transilica, Inc. (24)
 
-Hi,<br><br>I&#39;m trying to connect with my mobile phone to a PAN daemon (running on SUSE 10.3).<br>However, my phone doesn&#39;t discover any services on my computer. After playing around with the PAN daemon, even the file push service isn&#39;t detected anymore (btw how does this work in KDE?).
-<br><br>My device class in hcid.conf is set to 0x12010c. There is a tool called sdptool which alters a sdpd database but there&#39;s no daemon of that name running.<br><br>Can anyone tell me what the problem might be or where I can find some information about how this whole service discovery thing works?
-<br><br>Thanks,<br>David<br>
+hci0:   Type: USB
+        BD Address: 00:0B:0D:20:FE:15 ACL MTU: 339:4 SCO MTU: 0:0
+        Unsupported manufacturer
 
-------=_Part_12889_9600766.1200836660875--
+Brad Midgley schrieb:
+> Gunnar
+>
+> I'd be most suspect of the microtune dongle. It would tell us more if you ran:
+>
+> hciconfig -a;sudo hciconfig hci0 revision
+>
+> Brad
+>
+> On Jan 19, 2008 4:22 PM, Gunnar Thielebein <gunnar_thielebein@gmx.net> wrote:
+>   
+>> Hi group,
+>>
+>> I am trying to connect my headset in gutsy with default kernel
+>> 2.6.22-14-generic. I tried all four(?) possible solutions: old sco way,
+>> plugz, bluetooth-alsa (at least the package in gutsy) and bluez-audio
+>> which all ends finally with a hardlock of my system when the connection
+>> was established with headset.
+>>
+>> Authentication and sdp browsing works fine at least in kde.
+>>
+>> I tested sound play with smplayer,mplayer,aplay,play.
+>>
+>> I also tested with the unstable packages from sid libbluez, bluez-
+>> bluez-audio, gstreamer-plugins
+>>
+>> Could you tell if I need a more current kernel version than 22?
+>> Or is it something with my hardware?
+>>
+>> my hardware spec:
+>>
+>> Headset: HBH-PV700
+>> ---
+>> Dongle: Bus 001 Device 003: ID 0f4d:1000 Microtune, Inc. Bluetooth Dongle
+>> ---
+>> arch: amd64 - 2.6.22-14-generic #1 SMP Tue Dec 18 05:28:27 UTC 2007
+>> x86_64 GNU/Linux
+>>
+>> -------------------------------------------------------------------------
+>> This SF.net email is sponsored by: Microsoft
+>> Defy all challenges. Microsoft(R) Visual Studio 2008.
+>> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+>> _______________________________________________
+>> Bluez-users mailing list
+>> Bluez-users@lists.sourceforge.net
+>> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>>
+>>     
+>
+>
+>
+>   
 
-
---===============1429444551==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1429444551==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1429444551==--
