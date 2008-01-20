@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47933DF5.1060706@hccnet.nl>
-Date: Sun, 20 Jan 2008 13:26:29 +0100
-From: Remy Bosch <reboli@hccnet.nl>
+Message-ID: <8f5c4ad0801200247i5ddf4181p5d021b681ac8756b@mail.gmail.com>
+Date: Sun, 20 Jan 2008 16:17:33 +0530
+From: "george keane" <chemvell@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <8f5c4ad0801200247i5ddf4181p5d021b681ac8756b@mail.gmail.com>
-In-Reply-To: <8f5c4ad0801200247i5ddf4181p5d021b681ac8756b@mail.gmail.com>
-Subject: Re: [Bluez-users] firmware for 2035
+Subject: [Bluez-users] firmware for 2035
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,29 +14,60 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1024258620=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-george keane wrote:
-> Hi all,
->  
->   can somebody please tell me where can I get firmware for BCM 2035 chip?
+--===============1024258620==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_9195_3257136.1200826053244"
 
-You kan use the bcm2033 which you can donwload it at the same place as
-you got the source. The package is called bluez-firmware.
+------=_Part_9195_3257136.1200826053244
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi all,
+
+  can somebody please tell me where can I get firmware for BCM 2035 chip?
+
+regards,
+George.
+
+------=_Part_9195_3257136.1200826053244
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<div>Hi all,</div>
+<div>&nbsp;</div>
+<div>&nbsp; can somebody please tell me where can I get firmware for BCM 2035 chip?</div>
+<div>&nbsp;</div>
+<div>regards,</div>
+<div>George.</div>
+
+------=_Part_9195_3257136.1200826053244--
 
 
-Regards,
-
-Remy
-
+--===============1024258620==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============1024258620==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1024258620==--
