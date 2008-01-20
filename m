@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <8f5c4ad0801200247i5ddf4181p5d021b681ac8756b@mail.gmail.com>
-Date: Sun, 20 Jan 2008 16:17:33 +0530
-From: "george keane" <chemvell@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Message-ID: <d89ddf300801192041o12e98ee7ybeeb28efb2fdfa1d@mail.gmail.com>
+Date: Sat, 19 Jan 2008 21:41:15 -0700
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: gunnar_thielebein@gmx.net,
+	"BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <47928635.2030400@gmx.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] firmware for 2035
+References: <47928635.2030400@gmx.net>
+Subject: Re: [Bluez-users] audio bluetooth connectivity in gutsy
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,60 +17,66 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1024258620=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1024258620==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_9195_3257136.1200826053244"
+Gunnar
 
-------=_Part_9195_3257136.1200826053244
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+I'd be most suspect of the microtune dongle. It would tell us more if you ran:
 
-Hi all,
+hciconfig -a;sudo hciconfig hci0 revision
 
-  can somebody please tell me where can I get firmware for BCM 2035 chip?
+Brad
 
-regards,
-George.
+On Jan 19, 2008 4:22 PM, Gunnar Thielebein <gunnar_thielebein@gmx.net> wrote:
+> Hi group,
+>
+> I am trying to connect my headset in gutsy with default kernel
+> 2.6.22-14-generic. I tried all four(?) possible solutions: old sco way,
+> plugz, bluetooth-alsa (at least the package in gutsy) and bluez-audio
+> which all ends finally with a hardlock of my system when the connection
+> was established with headset.
+>
+> Authentication and sdp browsing works fine at least in kde.
+>
+> I tested sound play with smplayer,mplayer,aplay,play.
+>
+> I also tested with the unstable packages from sid libbluez, bluez-
+> bluez-audio, gstreamer-plugins
+>
+> Could you tell if I need a more current kernel version than 22?
+> Or is it something with my hardware?
+>
+> my hardware spec:
+>
+> Headset: HBH-PV700
+> ---
+> Dongle: Bus 001 Device 003: ID 0f4d:1000 Microtune, Inc. Bluetooth Dongle
+> ---
+> arch: amd64 - 2.6.22-14-generic #1 SMP Tue Dec 18 05:28:27 UTC 2007
+> x86_64 GNU/Linux
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2008.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
-------=_Part_9195_3257136.1200826053244
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div>Hi all,</div>
-<div>&nbsp;</div>
-<div>&nbsp; can somebody please tell me where can I get firmware for BCM 2035 chip?</div>
-<div>&nbsp;</div>
-<div>regards,</div>
-<div>George.</div>
-
-------=_Part_9195_3257136.1200826053244--
 
 
---===============1024258620==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1024258620==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1024258620==--
