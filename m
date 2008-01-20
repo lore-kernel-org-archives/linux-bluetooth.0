@@ -1,15 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <479346D7.1080500@gmx.net>
-Date: Sun, 20 Jan 2008 14:04:23 +0100
-From: Gunnar Thielebein <gunnar_thielebein@gmx.net>
+Message-ID: <8ccc3510801200454o29b90487i3f1cf4e380bcd70@mail.gmail.com>
+Date: Sun, 20 Jan 2008 13:54:27 +0100
+From: "Christophe-Marie Duquesne" <chm.duquesne@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d89ddf300801192041o12e98ee7ybeeb28efb2fdfa1d@mail.gmail.com>
 MIME-Version: 1.0
-To: Bluez-users@lists.sourceforge.net
 References: <47928635.2030400@gmx.net>
 	<d89ddf300801192041o12e98ee7ybeeb28efb2fdfa1d@mail.gmail.com>
-In-Reply-To: <d89ddf300801192041o12e98ee7ybeeb28efb2fdfa1d@mail.gmail.com>
 Subject: Re: [Bluez-users] audio bluetooth connectivity in gutsy
-Reply-To: gunnar_thielebein@gmx.net,
-	BlueZ users <bluez-users@lists.sourceforge.net>
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,120 +17,57 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0202738927=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Heres my hcid.conf (comments stripped):
+--===============0202738927==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_4631_21625732.1200833667627"
 
-options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        passkey "0000"; # pw for headset pairing
-}
+------=_Part_4631_21625732.1200833667627
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-device {
-        name "%h-%d";
-        class 0x000100;
-        iscan enable; pscan enable;
-        lm master;
-        lp rswitch,hold,sniff,park;
-}
+If you are on gutsy, I can also tell you : the official bluez package is
+outdated. You won't have good sound quality (a2dp) with it. There are
+updated packages there --> "deb http://download.tuxfamily.org/blueman ubuntu
+bluetooth". On wiki.bluez.org, there are all the explanations you need to
+connect your headset. And try blueman, in the same repo. It makes life
+easier.
 
-.asoundrc:
+------=_Part_4631_21625732.1200833667627
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-pcm.bluetooth {
-   type bluetooth
-   device 00:12:EE:18:95:CA
-}
+If you are on gutsy, I can also tell you : the official bluez package is outdated. You won&#39;t have good sound quality (a2dp) with it. There are updated packages there --&gt; &quot;deb <a href="http://download.tuxfamily.org/blueman">
+http://download.tuxfamily.org/blueman</a> ubuntu bluetooth&quot;. On <a href="http://wiki.bluez.org">wiki.bluez.org</a>, there are all the explanations you need to connect your headset. And try blueman, in the same repo. It makes life easier.
+<br>
 
-I had my other soundcard in use could that cause problems in some cases?
-I want to use the sco part of bt-audio so the test with mplayer was only 
-for checking if it works in general.
-later on I would like to use linphone with it.
+------=_Part_4631_21625732.1200833667627--
 
-This is output of hciconfig:
 
-hci0:   Type: USB
-        BD Address: 00:0B:0D:20:FE:15 ACL MTU: 339:4 SCO MTU: 0:0
-        UP RUNNING PSCAN
-        RX bytes:996 acl:0 sco:0 events:25 errors:0
-        TX bytes:596 acl:0 sco:0 commands:24 errors:0
-        Features: 0xff 0xff 0x3d 0x00 0x00 0x00 0x00 0x00
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: MASTER
-        Name: 'knallbuntu-0knallbuntu-0'
-        Class: 0x080104
-        Service Classes: Capturing
-        Device Class: Computer, Desktop workstation
-        HCI Ver: 1.1 (0x1) HCI Rev: 0x93 LMP Ver: 1.1 (0x1) LMP Subver: 0x93
-        Manufacturer: Transilica, Inc. (24)
-
-hci0:   Type: USB
-        BD Address: 00:0B:0D:20:FE:15 ACL MTU: 339:4 SCO MTU: 0:0
-        Unsupported manufacturer
-
-Brad Midgley schrieb:
-> Gunnar
->
-> I'd be most suspect of the microtune dongle. It would tell us more if you ran:
->
-> hciconfig -a;sudo hciconfig hci0 revision
->
-> Brad
->
-> On Jan 19, 2008 4:22 PM, Gunnar Thielebein <gunnar_thielebein@gmx.net> wrote:
->   
->> Hi group,
->>
->> I am trying to connect my headset in gutsy with default kernel
->> 2.6.22-14-generic. I tried all four(?) possible solutions: old sco way,
->> plugz, bluetooth-alsa (at least the package in gutsy) and bluez-audio
->> which all ends finally with a hardlock of my system when the connection
->> was established with headset.
->>
->> Authentication and sdp browsing works fine at least in kde.
->>
->> I tested sound play with smplayer,mplayer,aplay,play.
->>
->> I also tested with the unstable packages from sid libbluez, bluez-
->> bluez-audio, gstreamer-plugins
->>
->> Could you tell if I need a more current kernel version than 22?
->> Or is it something with my hardware?
->>
->> my hardware spec:
->>
->> Headset: HBH-PV700
->> ---
->> Dongle: Bus 001 Device 003: ID 0f4d:1000 Microtune, Inc. Bluetooth Dongle
->> ---
->> arch: amd64 - 2.6.22-14-generic #1 SMP Tue Dec 18 05:28:27 UTC 2007
->> x86_64 GNU/Linux
->>
->> -------------------------------------------------------------------------
->> This SF.net email is sponsored by: Microsoft
->> Defy all challenges. Microsoft(R) Visual Studio 2008.
->> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
->> _______________________________________________
->> Bluez-users mailing list
->> Bluez-users@lists.sourceforge.net
->> https://lists.sourceforge.net/lists/listinfo/bluez-users
->>
->>     
->
->
->
->   
-
+--===============0202738927==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============0202738927==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0202738927==--
