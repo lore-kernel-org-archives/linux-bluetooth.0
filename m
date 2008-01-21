@@ -1,13 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <20080122042247.25733.qmail@station192.com>
-From: "=?iso-8859-1?Q?russell?=" <russell@rickstewart.com>
-To: bluez-users@lists.sourceforge.net
-Date: Tue, 22 Jan 2008 04:22:46 +0000
+Message-ID: <d89ddf300801211019h6591383asa0239dccede535d5@mail.gmail.com>
+Date: Mon, 21 Jan 2008 11:19:07 -0700
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20080121135052.GB20816@juIljoat8>
 MIME-Version: 1.0
-Subject: [Bluez-users] 'cannot open libasound_module_pcm_bluetooth.so': a
-	solution
-Reply-To: =?iso-8859-1?Q?russell?= <russell@rickstewart.com>,
-	BlueZ users <bluez-users@lists.sourceforge.net>
+References: <47928635.2030400@gmx.net>
+	<d89ddf300801192041o12e98ee7ybeeb28efb2fdfa1d@mail.gmail.com>
+	<479346D7.1080500@gmx.net>
+	<d89ddf300801200639h393483e3y2ca35af47b93a608@mail.gmail.com>
+	<20080121135052.GB20816@juIljoat8>
+Subject: Re: [Bluez-users] audio bluetooth connectivity in gutsy
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -20,25 +24,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-	When I try to play a file on my headset via bluetooth I get
-that message.  I don't have libasound_module_pcm_bluetooth.so.  I run
-Slackware 10.2 with kernel 2.6.23.1 and had all the bluez-* packages
-(3.22) installed.  I uninstalled all the bluez-* packages, downloaded
-the latest source from bluez.org, built it, and still had the same
-result.  I found some likely source for
-libasound_module_pcm_bluetooth.so in bluez-utils-3.24, ran:
+Benito
 
-	configure --enable-alsa --enable-usb --enable-avctrl --enable-audio
+> Nevertheless I can go one step further than Gunnar: the audio player
+> starts up, the headset-speaker beeps,
+>
+> To my uneducated eyes this looks like the audio stream somehow can't be
+> transmitted while the "signalling" works.
 
-(I don't know that I needed all of those, perhaps just the
-'--enable-alsa') rebuilt, and still had the same problem.  I figured
-out my sound apps were looking only in /usr/lib/alsa while the build
-had put the libraries in /usr/local/lib/alsa.  I linked the contents
-of /usr/local/lib/alsa to /usr/lib/alsa and they were happy (perhaps
-rebuilding the apps, or other libraries they use, would have solved
-the problem too) - at least they didn't complain about not finding the
-library, only about not finding a target: I still haven't figured out
-how to make a permanent connection to my headset.
+Yes, you're correct that signaling works but not audio. The beep you
+hear is the headset letting you know the connection was negotiated...
+it's not a sound sent by the computer.
+
+It's unlikely the problem is in the headset. What usually is happening
+in this situation is the computer opens the sco connection and tries
+to push data over it but the adapter is not picking up the data and
+transmitting it.
+
+-- 
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
