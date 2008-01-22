@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4795F9EC.20509@aircable.net>
-Date: Tue, 22 Jan 2008 12:13:00 -0200
-From: Manuel Naranjo <manuel@aircable.net>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <QiqzmGYI.1201010734.9272710.fma@alezan.org>
+In-Reply-To: <4795F1C9.9050609@aircable.net>
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric?= <fma@gbiloba.org>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <QiqzmGYI.1201010734.9272710.fma@alezan.org>
-In-Reply-To: <QiqzmGYI.1201010734.9272710.fma@alezan.org>
+Date: Tue, 22 Jan 2008 15:05:34 +0100 (CET)
 Subject: Re: [Bluez-users] Newbie needs help to start
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -16,43 +15,60 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 
-> Ok, I got it. But how and where do I generate link keys?
->   
-You don't after the PIN transaction has completed successfully the
-stacks handle the link generation. Links are stored under
-/var/lib/bluetooth/<hci address>/linkkeys take into account that if you
-switch from windows into linux, or if you plug your bluetooth dongle to
-another pc, you will need to remove the linkkey from the file or it will
-never work. It's like when RSA keys changes for a server.
+Le 22/1/2008, "Manuel Naranjo" <manuel@aircable.net> a =E9crit:
 
-> So, after I connect the BT device to the rfcomm channel, I can read/write
-> to it using the /dev/rfcomm entry, like if I'm using a /dev/ttySxx ?
->   
-Exactly.
+>The process is simple, when you start a connection there's an initial
+>phase where both devices authenticate, for this they exchange something
+>called link key it's something similar to the way ssh works. If the link
+>keys aren't generated yet then they exchange a PIN code, this is what
+>the passkey agent does.
+>
+>After the authentication has been done then the connection is possible.
 
-> If I understand correctly, rfcomm is not supported anymore? If it is the
-> old way, what is the new way?
->   
-rfcomm as a tool isn't supported any more, rfcomm as technology is and
-is the base for most of the bluetooth services. The new way is using the
-dbus serial service. Which will also generate the rfcomm node, in a more
-simple way, but if your distro is not well configured, it can be a
-headhacke to get it to work.
+Ok, I got it. But how and where do I generate link keys?
 
-> I certainly don't want to deep inside d-bus, but the fact is that python
-> examples on bluez wiki use d-bus module :o/
->   
-You WANT to get deep into bluez dbus api, not into the old hci lib api ;).
+>The fast and easy way to do it, it's using the old rfcomm tool from the
+>bluez-utils package then you do:
+>rfcomm connect rfcomm# ADDR [CHANNEL]
+>
+>For SPP you generally use channel 1 (the Serial3 is one of those cases)
+>
+># is a number of a valid and available rfcomm node, you will need to
+>create it, check the web for the mayor number of the rfcomm node.
 
-> I attached it.
->   
-Where? I don't think this list can take attached files.
+So, after I connect the BT device to the rfcomm channel, I can read/write
+to it using the /dev/rfcomm entry, like if I'm using a /dev/ttySxx ?
 
+If I understand correctly, rfcomm is not supported anymore? If it is the
+old way, what is the new way?
+
+>Again BlueZ is the stack, without it you can't do any bluetooth work
+>under linux. D-Bus layer is used to make the programmers life easier as
+>it hides all the bluez lib complexity (trust me you don't want to get
+>much deeply into it, it requires serious bluetooth understanding)
+
+I certainly don't want to deep inside d-bus, but the fact is that python
+examples on bluez wiki use d-bus module :o/
+
+>Anyway, and again, without a full hcidump trace, we can't tell you
+>what's wrong, and guide you through this stuff.
+
+I attached it.
+
+>PS: BTW slackware has some patches in common with debian, they have a
+>folder called /etc/bluetooth/passkeys there you can store files for
+>default passkeys, you can have one called default and it uses for a
+>default pin code, not the most secure way, but it works some how.
+
+Ok.
+
+--
+    Fr=E9d=E9ric
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
