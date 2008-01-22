@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <QiqzmGYI.1201010734.9272710.fma@alezan.org>
-In-Reply-To: <4795F1C9.9050609@aircable.net>
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric?= <fma@gbiloba.org>
+Message-ID: <4795F3C5.8090208@wurmsdobler.org>
+Date: Tue, 22 Jan 2008 13:46:45 +0000
+From: Peter Wurmsdobler <peter@wurmsdobler.org>
 MIME-Version: 1.0
-Date: Tue, 22 Jan 2008 15:05:34 +0100 (CET)
-Subject: Re: [Bluez-users] Newbie needs help to start
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] mx27, csr and bluez: initialisation timed out
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,60 +14,48 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hello,
 
-Le 22/1/2008, "Manuel Naranjo" <manuel@aircable.net> a =E9crit:
+I am using a combined WiFi/BlueTooth module called apm6628, integrating
+  the CSR BlueTooth silicon which is connected over a serial cable to my
+i.MX27 ADS development board, running linux 2.6.19.2. I have bluez
+support compiled into the kernel and the bluez-utils installed using
+LTIB (not to forget with the --enable-bccmd in the spec file).
 
->The process is simple, when you start a connection there's an initial
->phase where both devices authenticate, for this they exchange something
->called link key it's something similar to the way ssh works. If the link
->keys aren't generated yet then they exchange a PIN code, this is what
->the passkey agent does.
->
->After the authentication has been done then the connection is possible.
+The kernel boots, and the bluetooth related facilities printk some
+messages such as HCI UART driver ver 2.2, H4 and BCSP protocol
+initialised. Since the BlueTooth module does not know the clock
+frequency it is using, or the baud rate of the host, I need to
+"configure" the BlueCore and warm-reset it:
 
-Ok, I got it. But how and where do I generate link keys?
+     mx27# bccmd -t BCSP -d /dev/ttymxc1 psload config.psr warmreset
 
->The fast and easy way to do it, it's using the old rfcomm tool from the
->bluez-utils package then you do:
->rfcomm connect rfcomm# ADDR [CHANNEL]
->
->For SPP you generally use channel 1 (the Serial3 is one of those cases)
->
-># is a number of a valid and available rfcomm node, you will need to
->create it, check the web for the mayor number of the rfcomm node.
+However, the only message I get is: "Initialization timed out", which,
+looking through the code, is generated in bluez/tools/csr_bcsp.c in the
+open function. But why?
 
-So, after I connect the BT device to the rfcomm channel, I can read/write
-to it using the /dev/rfcomm entry, like if I'm using a /dev/ttySxx ?
+I then tried to compile bluez-utils on my linux host. For some reason, 
+".configure --enable-bccmd" does not generate the bccmd options in the 
+tools/Makefile. Any idea why that is so?
 
-If I understand correctly, rfcomm is not supported anymore? If it is the
-old way, what is the new way?
+Alternatively to bccmd, could I simply use
 
->Again BlueZ is the stack, without it you can't do any bluetooth work
->under linux. D-Bus layer is used to make the programmers life easier as
->it hides all the bluez lib complexity (trust me you don't want to get
->much deeply into it, it requires serious bluetooth understanding)
+     "hciattach -s 230400 -d /dev/ttymxc1 csr"
 
-I certainly don't want to deep inside d-bus, but the fact is that python
-examples on bluez wiki use d-bus module :o/
+in order to create a hci0 device?
 
->Anyway, and again, without a full hcidump trace, we can't tell you
->what's wrong, and guide you through this stuff.
+Am I missing something in the way the kernel creates bluetooth devices?
 
-I attached it.
+Is there a good (up-to-date) documentation on this matter?
 
->PS: BTW slackware has some patches in common with debian, they have a
->folder called /etc/bluetooth/passkeys there you can store files for
->default passkeys, you can have one called default and it uses for a
->default pin code, not the most secure way, but it works some how.
+Regards,
+peter
 
-Ok.
 
---
-    Fr=E9d=E9ric
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
