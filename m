@@ -1,11 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <YKHOViWG.1201003691.1597540.fma@alezan.org>
-In-Reply-To: <200801182020.30477.fma@gbiloba.org>
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric?= <fma@gbiloba.org>
-MIME-Version: 1.0
-Date: Tue, 22 Jan 2008 13:08:11 +0100 (CET)
-Subject: Re: [Bluez-users] Newbie needs help to start
+From: Guillaume Bedot <littletux@zarb.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1200993959.8563.1.camel@localhost>
+References: <1200993959.8563.1.camel@localhost>
+Date: Tue, 22 Jan 2008 13:06:11 +0100
+Message-Id: <1201003572.7514.8.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] A2DP capable devices and capture (Motorola HT820)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,49 +16,28 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-
-Le 18/1/2008, "Fr=E9d=E9ric" <fma@gbiloba.org> a =E9crit:
-
->And I need your help to access it from linux/debian. Manuel Naranjo helped =
-
->me a lot, but I still have strange issues. And I would also like to =
-
->understand how Bluetooth is implemented under linux; there seems to have a =
-
->lot of layers, and it is not simple... So, if someone could summarize all =
-
->this for me...
->
->I also need to know how to use the serial protocol to access the Serial3 =
-
->hardware as any other serial port. I tired to use rfcomm, but, again, I'm =
-
->not sure to clearly undertand whait it is supposed to do.
-
-Nobody to help me? I still can't access corretly to my Serial3 device
-under debian. I'm trying to use the passkey-agent, and obexftp client,
-but I always get some:
-
-    Connecting...failed: connect
-    Still trying to connect
-
-errors.
-
-What am I doing wrong? What is the correct way to use a BT device? What
-different phases are need?
-
---
-    Fr=E9d=E9ric
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+UmUsCgpMZSBtYXJkaSAyMiBqYW52aWVyIDIwMDggw6AgMTA6MjUgKzAxMDAsIEd1aWxsYXVtZSBC
+ZWRvdCBhIMOpY3JpdCA6Cj4gSGVsbG8sCj4gCj4gSSd2ZSB0cmllZCB0byBjYXB0dXJlIHNvdW5k
+IGZyb20gYSBIVDgyMCB3aXRoIGN1cnJlbnQgY3ZzLCBhbmQgZmFpbGVkLgo+IEkgd2FzIHN1cnBy
+aXNlZCBhcyBpdCB3b3JrZWQgd2l0aCBhIG1vbm8gaGVhZHNldC4uLgo+IAo+IEl0IHdvcmtzIGZp
+bmUgaW4gaGlmaSBtb2RlIHRob3VnaC4KPiAKPiBBcmUgdGhlc2Uga2luZCBvZiBkZXZpY2VzIHN1
+cHBvc2VkIHRvIHdvcmsgaW4gYm90aCAiaGlmaSIgYW5kICJ2b2ljZSIKPiBwcm9maWxlcyA/Cj4g
+Cj4gRGlkIHNvbWVvbmUgbWFuYWdlIHRvIG1ha2UgdGhpcyB3b3JrIHdpdGggY3VycmVudCBibHVl
+eiAvIGtlcm5lbCA/CgpJJ2xsIHJlcGx5IHRvIG15IG15c2VsZiBhcyBpdCBpcyBzb2x2ZWQuIEl0
+IHdvcmtzIHdpdGggdGhpcyBzZXR1cCA6CgpJJ20gdXNpbmcgY3VycmVudCBjdnMgZm9yIGJsdWV6
+LWxpYnMgYW5kIGJsdWV6LXV0aWxzIG9uIE1hbmRyaXZhIDIwMDguMC4KUHJvZmlsZSBtdXN0IGJl
+ICJ2b2ljZSIgZm9yIGNhcHR1cmUgKG5vdCAiYXV0byIpLgpJIGhhdmUgdG8gdXNlIGZvcmNlX3Nj
+b2ZpeCBvcHRpb24gZm9yIG15IGRvbmdsZS4KUGFpcmluZyBtdXN0IGJlIGRvbmUuCgpNYXliZSBv
+bmUgb2YgdGhlc2UgY29uZGl0aW9ucyB3YXMgbWlzc2luZyBiZWZvcmUsIGJ1dCBpJ2xsIHJlLWNo
+ZWNrIHdpdGgKY29va2VyIGtlcm5lbCB0b28uLi4KCkJlc3QgcmVnYXJkcywKCkd1aWxsYXVtZSBC
+LgoKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTog
+TWljcm9zb2Z0CkRlZnkgYWxsIGNoYWxsZW5nZXMuIE1pY3Jvc29mdChSKSBWaXN1YWwgU3R1ZGlv
+IDIwMDguCmh0dHA6Ly9jbGsuYXRkbXQuY29tL01SVC9nby92c2UwMTIwMDAwMDcwbXJ0L2RpcmVj
+dC8wMS8KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1
+ZXotdXNlcnMgbWFpbGluZyBsaXN0CkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApo
+dHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo=
