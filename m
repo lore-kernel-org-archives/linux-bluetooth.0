@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-Message-ID: <iJvsC1im.1201013968.2928480.fma@alezan.org>
-In-Reply-To: <47960225.4000004@aircable.net>
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric?= <fma@gbiloba.org>
-MIME-Version: 1.0
-Date: Tue, 22 Jan 2008 15:59:28 +0100 (CET)
+Date: Tue, 22 Jan 2008 15:56:24 +0100
+From: Miguel <mc354@tid.es>
+In-reply-to: <47960225.4000004@aircable.net>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-id: <1201013784.21244.12.camel@McM>
+MIME-version: 1.0
+References: <QiqzmGYI.1201010734.9272710.fma@alezan.org>
+	<4795F9EC.20509@aircable.net> <1201012984.21244.9.camel@McM>
+	<47960225.4000004@aircable.net>
 Subject: Re: [Bluez-users] Newbie needs help to start
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -15,23 +18,33 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+and is it possible to access to a mobile profile bluetooth?
 
-Le 22/1/2008, "Manuel Naranjo" <manuel@aircable.net> a =E9crit:
+Is it possible to do via Java? (access to the mobile agenda, read
+sms, ...)
 
->> but How do you do the same using dbus serial??
->
->Like this http://wiki.bluez.org/wiki/HOWTO/SerialConnections
 
-It should do the same as the rfcomm connect command, if I understood
-correctly Manuel. This is where I get an error, under debian. Miguel,
-let me know if it works for you under ubuntu...
 
---
-    Fr=E9d=E9ric
+On Tue, 2008-01-22 at 12:48 -0200, Manuel Naranjo wrote:
+> > but How do you do the same using dbus serial??
+> >
+> >   
+> 
+> Like this http://wiki.bluez.org/wiki/HOWTO/SerialConnections
+> 
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2008.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
