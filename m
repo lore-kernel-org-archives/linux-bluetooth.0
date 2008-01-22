@@ -1,10 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: Guillaume Bedot <littletux@zarb.org>
 To: bluez-users@lists.sourceforge.net
-Date: Tue, 22 Jan 2008 10:25:59 +0100
-Message-Id: <1200993959.8563.1.camel@localhost>
+From: Johan Brannlund <johan_brn@yahoo.com>
+Date: Tue, 22 Jan 2008 05:16:26 +0000 (UTC)
+Message-ID: <pan.2008.01.22.05.15.43@yahoo.com>
+References: <47928635.2030400@gmx.net>
 Mime-Version: 1.0
-Subject: [Bluez-users] A2DP capable devices and capture (Motorola HT820)
+Subject: Re: [Bluez-users] audio bluetooth connectivity in gutsy
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,32 +19,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+On Sun, 20 Jan 2008 00:22:29 +0100, Gunnar Thielebein wrote:
 
-I've tried to capture sound from a HT820 with current cvs, and failed.
-I was surprised as it worked with a mono headset...
+> Hi group,
+> 
+> I am trying to connect my headset in gutsy with default kernel
+> 2.6.22-14-generic. I tried all four(?) possible solutions: old sco way,
+> plugz, bluetooth-alsa (at least the package in gutsy) and bluez-audio
+> which all ends finally with a hardlock of my system when the connection
+> was established with headset.
 
-It works fine in hifi mode though.
+Hi. Try adding "options hci_usb force_scofix=1" to /etc/modprobe.d/bluez .
 
-Are these kind of devices supposed to work in both "hifi" and "voice"
-profiles ?
+Regards,
 
-Did someone manage to make this work with current bluez / kernel ?
+Johan
 
-Thanks in advance,
-
-Best regards,
-
-Guillaume B.
-
-PS:
-I also failed to make this work in Windows xp , so no useful log...
-Maybe the old computer misses some ram, and for sure Windows is trashcan
-ready.
-I just know that it's supposed to use Hands-Free Profile (not HSP), and
-it tries to use A2DP and HFP at the same time.
-And by the way, how can one capture BT traffic for free in this
-environment ?
 
 
 -------------------------------------------------------------------------
