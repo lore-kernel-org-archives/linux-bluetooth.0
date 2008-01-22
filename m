@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <20080122212531.2515.qmail@station192.com>
-From: "=?iso-8859-1?Q?russell?=" <russell@rickstewart.com>
-To: bluez-users@lists.sourceforge.net
-Date: Tue, 22 Jan 2008 21:25:31 +0000
-MIME-Version: 1.0
-Subject: [Bluez-users]  All connections disconnect immediately
-Reply-To: =?iso-8859-1?Q?russell?= <russell@rickstewart.com>,
-	BlueZ users <bluez-users@lists.sourceforge.net>
+From: Guillaume Bedot <littletux@zarb.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <4795D6EB.2080209@naustech.com>
+References: <4795D6EB.2080209@naustech.com>
+Date: Tue, 22 Jan 2008 17:14:31 +0100
+Message-Id: <1201018471.24085.4.camel@littletux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Headset half working using Bluez's ALSA plugin
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,14 +20,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-     'It is not pairing. Bluez site has info that describe how pairing can be
-achieved.'
-    I have searched high and low but failed to find this information.  Would
-you or someone be so kind as to point me to the relevant documentation?
-    Has someone translated the python scripts offered in the documentation
-into commands one can merely run on the command line?
+Hello,
 
-russell 
+On mar, 2008-01-22 at 12:43 +0100, Ing. Gabriele Oberhammer wrote:
+> What information can I post to help solving this problem?
+> Can someone point me to an howto or README with best practices for 
+> installing from cvs?
+
+I guess you need the cvs version indeed.
+Try in the utils directory:
+$ ./configure --help
+to see all options available.
+
+( --enable-audio or --enable-all may be ok)
+
+You would need of lot of headers installed too (packages usually named
+libsomething-dev  or -devel).
+
+Then the services should be installed...
+
+Regards,
+
+Guillaume B.
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
