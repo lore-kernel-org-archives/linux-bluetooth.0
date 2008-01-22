@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Guillaume Bedot <littletux@zarb.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1200993959.8563.1.camel@localhost>
-References: <1200993959.8563.1.camel@localhost>
-Date: Tue, 22 Jan 2008 13:06:11 +0100
-Message-Id: <1201003572.7514.8.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] A2DP capable devices and capture (Motorola HT820)
+Message-ID: <4795D6EB.2080209@naustech.com>
+Date: Tue, 22 Jan 2008 12:43:39 +0100
+From: "Ing. Gabriele Oberhammer" <gabriele@naustech.com>
+MIME-Version: 1.0
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Headset half working using Bluez's ALSA plugin
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,28 +14,104 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-UmUsCgpMZSBtYXJkaSAyMiBqYW52aWVyIDIwMDggw6AgMTA6MjUgKzAxMDAsIEd1aWxsYXVtZSBC
-ZWRvdCBhIMOpY3JpdCA6Cj4gSGVsbG8sCj4gCj4gSSd2ZSB0cmllZCB0byBjYXB0dXJlIHNvdW5k
-IGZyb20gYSBIVDgyMCB3aXRoIGN1cnJlbnQgY3ZzLCBhbmQgZmFpbGVkLgo+IEkgd2FzIHN1cnBy
-aXNlZCBhcyBpdCB3b3JrZWQgd2l0aCBhIG1vbm8gaGVhZHNldC4uLgo+IAo+IEl0IHdvcmtzIGZp
-bmUgaW4gaGlmaSBtb2RlIHRob3VnaC4KPiAKPiBBcmUgdGhlc2Uga2luZCBvZiBkZXZpY2VzIHN1
-cHBvc2VkIHRvIHdvcmsgaW4gYm90aCAiaGlmaSIgYW5kICJ2b2ljZSIKPiBwcm9maWxlcyA/Cj4g
-Cj4gRGlkIHNvbWVvbmUgbWFuYWdlIHRvIG1ha2UgdGhpcyB3b3JrIHdpdGggY3VycmVudCBibHVl
-eiAvIGtlcm5lbCA/CgpJJ2xsIHJlcGx5IHRvIG15IG15c2VsZiBhcyBpdCBpcyBzb2x2ZWQuIEl0
-IHdvcmtzIHdpdGggdGhpcyBzZXR1cCA6CgpJJ20gdXNpbmcgY3VycmVudCBjdnMgZm9yIGJsdWV6
-LWxpYnMgYW5kIGJsdWV6LXV0aWxzIG9uIE1hbmRyaXZhIDIwMDguMC4KUHJvZmlsZSBtdXN0IGJl
-ICJ2b2ljZSIgZm9yIGNhcHR1cmUgKG5vdCAiYXV0byIpLgpJIGhhdmUgdG8gdXNlIGZvcmNlX3Nj
-b2ZpeCBvcHRpb24gZm9yIG15IGRvbmdsZS4KUGFpcmluZyBtdXN0IGJlIGRvbmUuCgpNYXliZSBv
-bmUgb2YgdGhlc2UgY29uZGl0aW9ucyB3YXMgbWlzc2luZyBiZWZvcmUsIGJ1dCBpJ2xsIHJlLWNo
-ZWNrIHdpdGgKY29va2VyIGtlcm5lbCB0b28uLi4KCkJlc3QgcmVnYXJkcywKCkd1aWxsYXVtZSBC
-LgoKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTog
-TWljcm9zb2Z0CkRlZnkgYWxsIGNoYWxsZW5nZXMuIE1pY3Jvc29mdChSKSBWaXN1YWwgU3R1ZGlv
-IDIwMDguCmh0dHA6Ly9jbGsuYXRkbXQuY29tL01SVC9nby92c2UwMTIwMDAwMDcwbXJ0L2RpcmVj
-dC8wMS8KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1
-ZXotdXNlcnMgbWFpbGluZyBsaXN0CkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApo
-dHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo=
+My problem is similar to that outlined in this post:
+
+http://thread.gmane.org/gmane.linux.bluez.user/13352
+
+I wish to use my new Phoenix BTK-03 (PCB300) bluetooth headset with VOIP 
+applications.
+Audio playback works well with mplayer (mplayer -ao 
+alsa:device=bluetooth test.mp3) and aplay (aplay -D bluetooth test.wav) 
+but I can't get capture working.
+
+Test command:
+$ arecord -D bluetooth -f S16_LE | aplay -D bluetooth -f S16_LE
+
+executes without errors and:
+$ arecord -D bluetooth -f S16_LE /tmp/rec_test.wav
+
+produces always files with lenght=44 bytes (the files seems to contain 
+only the wav format headers but no sound).
+I'm sure the headset starts capturing because I hear a beep and some 
+noise in the speaker.
+
+I've tried with 'options hci_usb force_scofix=1' but the results are the 
+same.
+I've also successfully compiled bluez-utils from the yesterday cvs but I 
+think I screwed up something when installing because the services in the 
+'Service' tab in bluetooth applet preferences became uncheckable.
+
+What information can I post to help solving this problem?
+Can someone point me to an howto or README with best practices for 
+installing from cvs?
+
+This is my configuration:
+
+PC:
+	Dell Latitude D820
+
+software versions:
+	bluetooth		3.24-0ubuntu1
+	bluez-gnome		0.14-0ubuntu2
+	bluez-hcidump		1.39-1
+	bluez-utils		3.24-0ubuntu1
+	gnome-bluetooth		0.9.1-0ubuntu1
+	libbluetooth-dev	3.24-0ubuntu1
+	libbluetooth2		3.24-0ubuntu1
+	python-bluez		0.9.1-1
+
+.asoundrc:
+	pcm.bluetooth {
+        	 	type bluetooth
+         	device 00:07:B0:0F:49:B7
+	        profile voice
+	}
+
+hci0:   Type: USB
+         BD Address: 00:1A:6B:11:52:5A ACL MTU: 384:8 SCO MTU: 64:8
+         UP RUNNING PSCAN ISCAN
+         RX bytes:6430 acl:57 sco:0 events:181 errors:0
+         TX bytes:1739 acl:52 sco:0 commands:82 errors:0
+         Features: 0xff 0xff 0x9f 0xfe 0x9b 0xf9 0x00 0x80
+         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+         Link policy: RSWITCH HOLD SNIFF PARK
+         Link mode: SLAVE ACCEPT
+         Name: 'BlueZ (0)'
+         Class: 0x08210c
+         Service Classes: Capturing
+         Device Class: Computer, Laptop
+         HCI Ver: 2.0 (0x3) HCI Rev: 0x976 LMP Ver: 2.0 (0x3)
+	LMP Subver:0x976 Manufacturer: Cambridge Silicon Radio (10)
+
+headset:
+BD Address:  00:07:B0:0F:49:B7
+         Device Name: PBC300
+         LMP Version: 2.0 (0x3) LMP Subversion: 0xbf9
+         Manufacturer: Cambridge Silicon Radio (10)
+         Features: 0xfc 0xfe 0x0f 0x00 0x08 0x08 0x00 0x00
+                 <encryption><slot offset><timing accuracy><roleswitch>
+                 <hold mode><sniff mode><RSSI><channel quality><SCO link>
+                 <HV2 packets><HV3 packets><u-law log><A-law log><CVSD>
+                 <paging scheme><power control><transparent SCO>
+		<AFH cap. slave><AFH cap. master>
+
+
+Best regard, Gabriele
+
+PS: The PC was shipped with Vista, but I've installed winXp and 
+downgraded the firmware with the Dell utlity. Th headset works both for 
+playing and capturing under winXP.
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
