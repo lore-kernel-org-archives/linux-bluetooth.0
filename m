@@ -1,11 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 22 Jan 2008 16:04:35 +0100
-From: Miguel <mc354@tid.es>
-In-reply-to: <iJvsC1im.1201013968.2928480.fma@alezan.org>
+Message-ID: <4796056A.8030306@aircable.net>
+Date: Tue, 22 Jan 2008 13:02:02 -0200
+From: Manuel Naranjo <manuel@aircable.net>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-id: <1201014275.21244.16.camel@McM>
-MIME-version: 1.0
-References: <iJvsC1im.1201013968.2928480.fma@alezan.org>
+References: <QiqzmGYI.1201010734.9272710.fma@alezan.org>	<4795F9EC.20509@aircable.net>
+	<1201012984.21244.9.camel@McM>	<47960225.4000004@aircable.net>
+	<1201013784.21244.12.camel@McM>
+In-Reply-To: <1201013784.21244.12.camel@McM>
 Subject: Re: [Bluez-users] Newbie needs help to start
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -16,35 +18,27 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-aXQgd29ya3MgdW5kZXIgdWJ1bnR1IGJ1dCBJIG0gZ2V0dGluZyBzZXZlcmFsIGVycm9ycwoKSSBt
-IHRyeWluZyB0byBjb25uZWN0IGEgbW9iaWxlIHBob25lIGZyb20gYSBsYXB0b3AgaW5pdGlhbGl6
-aW5nIHRoZQpjb25uZWN0aW9uIGZyb20gdGhlIGxhcHRvcCBhcyBpIGhhdmUgY29tbWVudGVkLgoK
-SXQgd29ya3Mgd2l0aCBzZXZlcmFsIG1vYmlsZSBwaG9uZXMgKG1heWJlIG9sZCBvbmVzKSBidXQg
-d2l0aCB0aGUgTjk1IEkKZ2V0ICJkaXNjb25uZWN0ZWQiICwgSSBkb250IGtub3cgd2h5IC4uLgoK
-YW55IElkZWFzPz8KCk9uIFR1ZSwgMjAwOC0wMS0yMiBhdCAxNTo1OSArMDEwMCwgRnLDqWTDqXJp
-YyB3cm90ZToKPiBMZSAyMi8xLzIwMDgsICJNYW51ZWwgTmFyYW5qbyIgPG1hbnVlbEBhaXJjYWJs
-ZS5uZXQ+IGEgw6ljcml0Ogo+IAo+ID4+IGJ1dCBIb3cgZG8geW91IGRvIHRoZSBzYW1lIHVzaW5n
-IGRidXMgc2VyaWFsPz8KPiA+Cj4gPkxpa2UgdGhpcyBodHRwOi8vd2lraS5ibHVlei5vcmcvd2lr
-aS9IT1dUTy9TZXJpYWxDb25uZWN0aW9ucwo+IAo+IEl0IHNob3VsZCBkbyB0aGUgc2FtZSBhcyB0
-aGUgcmZjb21tIGNvbm5lY3QgY29tbWFuZCwgaWYgSSB1bmRlcnN0b29kCj4gY29ycmVjdGx5IE1h
-bnVlbC4gVGhpcyBpcyB3aGVyZSBJIGdldCBhbiBlcnJvciwgdW5kZXIgZGViaWFuLiBNaWd1ZWws
-Cj4gbGV0IG1lIGtub3cgaWYgaXQgd29ya3MgZm9yIHlvdSB1bmRlciB1YnVudHUuLi4KPiAKPiAt
-LQo+ICAgICBGcsOpZMOpcmljCj4gCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFRoaXMgU0YubmV0IGVt
-YWlsIGlzIHNwb25zb3JlZCBieTogTWljcm9zb2Z0Cj4gRGVmeSBhbGwgY2hhbGxlbmdlcy4gTWlj
-cm9zb2Z0KFIpIFZpc3VhbCBTdHVkaW8gMjAwOC4KPiBodHRwOi8vY2xrLmF0ZG10LmNvbS9NUlQv
-Z28vdnNlMDEyMDAwMDA3MG1ydC9kaXJlY3QvMDEvCj4gX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX18KPiBCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKPiBCbHVl
-ei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdl
-Lm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2VycwoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBT
-Ri5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBNaWNyb3NvZnQKRGVmeSBhbGwgY2hhbGxlbmdl
-cy4gTWljcm9zb2Z0KFIpIFZpc3VhbCBTdHVkaW8gMjAwOC4KaHR0cDovL2Nsay5hdGRtdC5jb20v
-TVJUL2dvL3ZzZTAxMjAwMDAwNzBtcnQvZGlyZWN0LzAxLwpfX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXot
-dXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0
-L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
+Miguel escribi=F3:
+> and is it possible to access to a mobile profile bluetooth?
+>   =
+
+I'm not sure about it, it just opens an RFCOMM connection, I would say so.
+> Is it possible to do via Java? (access to the mobile agenda, read
+> sms, ...)
+>   =
+
+You might need to implement the a service of RFCOMM, or use any of the
+dbus services that do it for you, there's a dbus binding for java.
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
