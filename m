@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: Guillaume Bedot <littletux@zarb.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4795D6EB.2080209@naustech.com>
-References: <4795D6EB.2080209@naustech.com>
-Date: Tue, 22 Jan 2008 17:14:31 +0100
-Message-Id: <1201018471.24085.4.camel@littletux>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Headset half working using Bluez's ALSA plugin
+To: bluez-users@lists.sourceforge.net
+Message-ID: <DzxUEOBQ.1201015880.2873440.fma@alezan.org>
+In-Reply-To: <1201014275.21244.16.camel@McM>
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric?= <fma@gbiloba.org>
+MIME-Version: 1.0
+Date: Tue, 22 Jan 2008 16:31:20 +0100 (CET)
+Subject: Re: [Bluez-users] Newbie needs help to start
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,33 +15,29 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
 
-On mar, 2008-01-22 at 12:43 +0100, Ing. Gabriele Oberhammer wrote:
-> What information can I post to help solving this problem?
-> Can someone point me to an howto or README with best practices for 
-> installing from cvs?
+Le 22/1/2008, "Miguel" <mc354@tid.es> a =E9crit:
 
-I guess you need the cvs version indeed.
-Try in the utils directory:
-$ ./configure --help
-to see all options available.
+>it works under ubuntu but I m getting several errors
 
-( --enable-audio or --enable-all may be ok)
+Ok, so I'll have a look how it is configured under ubuntu...
 
-You would need of lot of headers installed too (packages usually named
-libsomething-dev  or -devel).
+>I m trying to connect a mobile phone from a laptop initializing the
+>connection from the laptop as i have commented.
+>
+>It works with several mobile phones (maybe old ones) but with the N95 I
+>get "disconnected" , I dont know why ...
+>
+>any Ideas??
 
-Then the services should be installed...
+I'm afraid I can't help you on this point :o/
 
-Regards,
-
-Guillaume B.
-
+--
+    Fr=E9d=E9ric
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
