@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4796A192.8000308@aircable.net>
-Date: Wed, 23 Jan 2008 00:08:18 -0200
+Message-ID: <4796A147.7090505@aircable.net>
+Date: Wed, 23 Jan 2008 00:07:03 -0200
 From: Manuel Naranjo <manuel@aircable.net>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
