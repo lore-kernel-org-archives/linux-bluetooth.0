@@ -1,13 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47986354.2080205@naustech.com>
-Date: Thu, 24 Jan 2008 11:07:16 +0100
-From: "Ing. Gabriele Oberhammer" <gabriele@naustech.com>
+Message-ID: <1201097235.47974a133555f@netmail.crc.ca>
+Date: Wed, 23 Jan 2008 09:07:15 -0500
+From: Jean-Michel Bouffard <jean-michel.bouffard@crc.ca>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <4795D6EB.2080209@naustech.com>
-	<1201018471.24085.4.camel@littletux>
-In-Reply-To: <1201018471.24085.4.camel@littletux>
-Subject: Re: [Bluez-users] Headset half working using Bluez's ALSA plugin
+Subject: [Bluez-users] Bluetooth on SUSE 10.3
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,61 +18,45 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi, I've successful compiled and installed 'utils' and 'libs' from today 
-cvs but now its worse then before, now playback doesn't work too :-(
-Now In the preferences menu in gnome-applet there are no services 
-listed, but my headset pairs correctly.
-Here's what I've done, please tell ma what's wrong:
 
-1. checked out latest 'utils' and 'libs' directoryes from cvs
-2. installed all needed development headers
-3. Compiled:
-	$ cd utils/
-	$ sudo ./bootstrap
-	$ sudo ./configure --enable-all --prefix=/usr/local/
-	$ sudo make
+Hi,
 
-	$ cd ../libs/
-	$ sudo ./bootstrap
-	$ sudo ./configure --prefix=/usr/local/
-	$ sudo make
+I am trying to install a D-Link DBT-120 USB Bluetooth adapter on OpenSUSE 10.3.
+When I connect the adapter the log shows:
+kernel: usb 3-1: new full speed USB device using uhci_hcd and address 2
+kernel: usb 3-1: new device found, idVendor=0a5c, idProduct=2033
+kernel: usb 3-1: new device strings: Mfr=0, Product=0, SerialNumber=0
+kernel: usb 3-1: configuration #1 chosen from 1 choice
+kernel: Bluetooth: Core ver 2.11
+kernel: NET: Registered protocol family 31
+kernel: Bluetooth: HCI device and connection manager initialized
+kernel: Bluetooth: HCI socket layer initialized
+kernel: Bluetooth: HCI USB driver ver 2.9
+kernel: usbcore: registered new interface driver hci_usb
+kernel: Bluetooth: Broadcom Blutonium firmware driver ver 1.1
+kernel: usbcore: registered new interface driver bcm203x
 
-4. uninstalled bluez-utils:
-	$ sudo apt-get remove bluez-utils
+And lsusb shows:
+Bus 003 Device 002: ID 0a5c:2033 Broadcom Corp. BCM2033 Bluetooth
 
-5. uninstalled libbluetooth2 (forcing needed to solve dependencies):
-	$ sudo dpkg --force-all -r libbluetoot2
+When I try to run "hcitool dev" I cannot see the adapter.
 
-6. Installed libs and utils:
-	$ cd libs; sudo make install
-	$ cd utils; sudo make install
+>>From some documentation I have read that the lsusb result should be:
+Bus 001 Device 018: ID 0a5c:2001 Broadcom Corp.
+I have installed every required packages for BlueZ, including the firmware for
+the BCM2033 chip. In the past I even installed this BT adapter easily on an
+older version of SUSE. I was using bluefw to manually load the firmware into
+the card but today this tool doesn't seem to exist anymore. So how could I load
+the firmware into the adapter? Or any other suggestions are welcome.
 
-7. Edited '/etc/init.d/bluetooth' and modified all paths to pont to 
-correct locations under /usr/local/{bin,sbin}
+Thanks.
 
-8. rebooted (I know it's not needed but I did it)
-
-9. Now headset pairs, 'hcitool dev' correctly shows it but
-	$ mplayer -ao alsa:device=bluetooth test.mp3
-	
-	gives:
-
-	....
-	[AO_ALSA] alsa-lib: pcm.c:2105:(snd_pcm_open_conf) Cannot open shared 
-library /usr/lib/alsa-lib/libasound_module_pcm_bluetooth.so
-	[AO_ALSA] Playback open error: No such file or directory
-	....
+--
+Jean-Michel
 
 
-10. sadness  ;(
-
-
-Can someone help me or give me some link to documentation about correct 
-procedures for cvs building?
-
-
-Tnx  :-)
-
+----------------------------------------------------------------
+This message was sent using IMP, the Internet Messaging Program.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
