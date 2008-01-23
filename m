@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BAY102-W31F02D952D8C6CC3028EBEF03F0@phx.gbl>
-From: Robert Rawlins <robert_rawlins@hotmail.com>
+From: Alok <develnewbie@gmail.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Wed, 23 Jan 2008 14:40:13 +0000
-In-Reply-To: <200801182017.36181.chick@computergeek.freeserve.co.uk>
-References: <BAY102-W17970DD14D6076D3F44BCBF0420@phx.gbl>
-	<200801182017.36181.chick@computergeek.freeserve.co.uk>
-MIME-Version: 1.0
-Subject: Re: [Bluez-devel] Same Old Speed Issues
+In-Reply-To: <4796A192.8000308@aircable.net>
+References: <4796A192.8000308@aircable.net>
+Content-Type: multipart/mixed; boundary="=-fTjwfHYc1qGBIPCU+OBU"
+Date: Wed, 23 Jan 2008 18:32:54 +0530
+Message-Id: <1201093374.23161.19.camel@greatbear>
+Mime-Version: 1.0
+Subject: [Bluez-devel] [HFP][PATCH] fixes CancelCall
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,112 +17,68 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0357897980=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0357897980==
-Content-Type: multipart/alternative;
-	boundary="_3b6efce9-e2c7-4ae3-b475-9d7e2ec1d50b_"
 
---_3b6efce9-e2c7-4ae3-b475-9d7e2ec1d50b_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+--=-fTjwfHYc1qGBIPCU+OBU
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Hello Guys,
-=20
-What is the playability of this being a compatibility / driver issue? I not=
-iced on the compatibility list some of the devices were listed as 'works bu=
-t slow'.If this is a Driver issue what is likely to be the best way to appr=
-oach it? can the driver be modified? or is it something we should be speaki=
-ng to the manufacturer about?
-=20
-Rob
-=20
+Hi Johan/Fredric, 
 
+This patch fixes CancelCall .
 
+Let me know if anything needs to be changed.  
 
-> From: chick@computergeek.freeserve.co.uk> To: bluez-devel@lists.sourcefor=
-ge.net> Date: Fri, 18 Jan 2008 20:17:35 +0000> Subject: Re: [Bluez-devel] S=
-ame Old Speed Issues> > On Friday 18 January 2008 15:04:58 Robert Rawlins w=
-rote:> > At the moment I've tried using both ussp-push and open-obex push c=
-lients to> > transfer the file, both giving me the same results. I'm achiev=
-ing roughly> > 25Kbytes/s transfer speed both up and down. I've tried runni=
-ng these same> > dongles from my Windows PC and achieve well over 100kBytes=
-/s. (This is> > transmitting to a Sony k850i handset which is v2.0 + EDR). =
-This would lead> > me to believe its not an issue with the Dongle, more lik=
-ely something with> > my Linux configuration> >> > Have you tried changing =
-the OBEX block size - try forcing the minimum size to > 64kB-1?> > Cheers,>=
- Tim> > > -----------------------------------------------------------------=
---------> This SF.net email is sponsored by: Microsoft> Defy all challenges=
-. Microsoft(R) Visual Studio 2008.> http://clk.atdmt.com/MRT/go/vse01200000=
-70mrt/direct/01/> _______________________________________________> Bluez-de=
-vel mailing list> Bluez-devel@lists.sourceforge.net> https://lists.sourcefo=
-rge.net/lists/listinfo/bluez-devel
-_________________________________________________________________
-Get Hotmail on your mobile, text MSN to 63463!
-http://mobile.uk.msn.com/pc/mail.aspx=
+-Alok.
 
---_3b6efce9-e2c7-4ae3-b475-9d7e2ec1d50b_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+--=-fTjwfHYc1qGBIPCU+OBU
+Content-Disposition: attachment; filename=patch
+Content-Type: text/x-patch; name=patch; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-<html>
-<head>
-<style>
-.hmmessage P
-{
-margin:0px;
-padding:0px
-}
-body.hmmessage
-{
-FONT-SIZE: 10pt;
-FONT-FAMILY:Tahoma
-}
-</style>
-</head>
-<body class=3D'hmmessage'>Hello Guys,<BR>
-&nbsp;<BR>
-What is the playability of this being a compatibility / driver issue? I not=
-iced on the compatibility list some of the devices were listed as 'works bu=
-t slow'.<BR><BR>If this is a Driver issue what is likely to be the best way=
- to approach it? can the driver be modified? or is it something we should b=
-e speaking to the manufacturer about?<BR>
-&nbsp;<BR>
-Rob<BR>
-&nbsp;<BR>
+Index: audio/headset.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/audio/headset.c,v
+retrieving revision 1.163
+diff -u -5 -p -r1.163 headset.c
+--- audio/headset.c	23 Jan 2008 12:13:30 -0000	1.163
++++ audio/headset.c	23 Jan 2008 12:33:59 -0000
+@@ -1270,10 +1270,11 @@ static DBusHandlerResult hs_cancel_ringi
+ 						void *data)
+ {
+ 	struct device *device = data;
+ 	struct headset *hs = device->headset;
+ 	DBusMessage *reply = NULL;
++	int err;
+ 
+ 	if (hs->state < HEADSET_STATE_CONNECTED)
+ 		return error_not_connected(conn, msg);
+ 
+ 	reply = dbus_message_new_method_return(msg);
+@@ -1287,10 +1288,19 @@ static DBusHandlerResult hs_cancel_ringi
+ 
+ 	g_source_remove(hs->ring_timer);
+ 	hs->ring_timer = 0;
+ 
+ done:
++	if (hs->hfp_active) {
++		/*+CIEV: (callsetup = 0)*/
++		err = headset_send(hs, "\r\n+CIEV:3, 0\r\n");
++		if (err < 0) {
++			dbus_message_unref(reply);
++			return error_failed_errno(conn, msg, -err);
++		}
++	}
++
+ 	send_message_and_unref(conn, reply);
+ 
+ 	return DBUS_HANDLER_RESULT_HANDLED;
+ }
+ 
 
-<HR id=3DstopSpelling>
-<BR>
-&gt; From: chick@computergeek.freeserve.co.uk<BR>&gt; To: bluez-devel@lists=
-.sourceforge.net<BR>&gt; Date: Fri, 18 Jan 2008 20:17:35 +0000<BR>&gt; Subj=
-ect: Re: [Bluez-devel] Same Old Speed Issues<BR>&gt; <BR>&gt; On Friday 18 =
-January 2008 15:04:58 Robert Rawlins wrote:<BR>&gt; &gt; At the moment I've=
- tried using both ussp-push and open-obex push clients to<BR>&gt; &gt; tran=
-sfer the file, both giving me the same results. I'm achieving roughly<BR>&g=
-t; &gt; 25Kbytes/s transfer speed both up and down. I've tried running thes=
-e same<BR>&gt; &gt; dongles from my Windows PC and achieve well over 100kBy=
-tes/s. (This is<BR>&gt; &gt; transmitting to a Sony k850i handset which is =
-v2.0 + EDR). This would lead<BR>&gt; &gt; me to believe its not an issue wi=
-th the Dongle, more likely something with<BR>&gt; &gt; my Linux configurati=
-on<BR>&gt; &gt;<BR>&gt; <BR>&gt; Have you tried changing the OBEX block siz=
-e - try forcing the minimum size to <BR>&gt; 64kB-1?<BR>&gt; <BR>&gt; Cheer=
-s,<BR>&gt; Tim<BR>&gt; <BR>&gt; <BR>&gt; ----------------------------------=
----------------------------------------<BR>&gt; This SF.net email is sponso=
-red by: Microsoft<BR>&gt; Defy all challenges. Microsoft(R) Visual Studio 2=
-008.<BR>&gt; http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/<BR>&gt=
-; _______________________________________________<BR>&gt; Bluez-devel maili=
-ng list<BR>&gt; Bluez-devel@lists.sourceforge.net<BR>&gt; https://lists.sou=
-rceforge.net/lists/listinfo/bluez-devel<BR><BR><br /><hr />Think you know y=
-our TV, music and film? <a href=3D'https://www.searchcharades.com' target=
-=3D'_new'>Try Search Charades!</a></body>
-</html>=
-
---_3b6efce9-e2c7-4ae3-b475-9d7e2ec1d50b_--
-
-
---===============0357897980==
+--=-fTjwfHYc1qGBIPCU+OBU
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -132,7 +88,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============0357897980==
+--=-fTjwfHYc1qGBIPCU+OBU
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -143,4 +99,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============0357897980==--
+--=-fTjwfHYc1qGBIPCU+OBU--
