@@ -1,13 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alok <develnewbie@gmail.com>
+Message-ID: <4796A192.8000308@aircable.net>
+Date: Wed, 23 Jan 2008 00:08:18 -0200
+From: Manuel Naranjo <manuel@aircable.net>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4796A192.8000308@aircable.net>
-References: <4796A192.8000308@aircable.net>
-Content-Type: multipart/mixed; boundary="=-fTjwfHYc1qGBIPCU+OBU"
-Date: Wed, 23 Jan 2008 18:32:54 +0530
-Message-Id: <1201093374.23161.19.camel@greatbear>
-Mime-Version: 1.0
-Subject: [Bluez-devel] [HFP][PATCH] fixes CancelCall
+Subject: [Bluez-devel] Bug in SDP example?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,86 +14,50 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hello guys,
+I've been tracing a bug in part of Tadas work (obex-data-server), and I
+finally found it, it was related to sdp records calls, the dbus
+interface specifies to use array of byte, while he was using array of
+int. So I replaced
+DBUS_TYPE_G_UINT_ARRAY for DBUS_TYPE_G_UCHAR_ARRAY, and valgrind stopped
+blaming about bugs.
 
---=-fTjwfHYc1qGBIPCU+OBU
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Strange is that the example at this page:
+http://wiki.bluez.org/wiki/HOWTO/DiscoveringServices
 
-Hi Johan/Fredric, 
+Seems to have exactly the same problem in the D-Bus glib example. The
+D-Bus function call that has an error is this one:
+dbus_g_proxy_call (adapter_proxy,
+"GetRemoteServiceRecord", &error,
+G_TYPE_STRING, address,
+G_TYPE_UINT, *((guint32 *)handle_array->data),
+G_TYPE_INVALID,
+DBUS_TYPE_G_UINT_ARRAY, &record_array,
+G_TYPE_INVALID)
 
-This patch fixes CancelCall .
+I'm not 100% sure, but I've been through both hcid and sdpd sources from
+the latest bluez libs and seems like I'm right. It should say:
+DBUS_TYPE_G_UCHAR_ARRAY, &record_array,
+Instead of:
+DBUS_TYPE_G_UINT_ARRAY, &record_array,
 
-Let me know if anything needs to be changed.  
+Any of the gurus out there can confirm this? I don't want to fix the
+example if it's all ready all right.
 
--Alok.
+Thanks,
+Manuel Naranjo
+Wireless Cables Inc. www.aircable.net
 
---=-fTjwfHYc1qGBIPCU+OBU
-Content-Disposition: attachment; filename=patch
-Content-Type: text/x-patch; name=patch; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-
-Index: audio/headset.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/audio/headset.c,v
-retrieving revision 1.163
-diff -u -5 -p -r1.163 headset.c
---- audio/headset.c	23 Jan 2008 12:13:30 -0000	1.163
-+++ audio/headset.c	23 Jan 2008 12:33:59 -0000
-@@ -1270,10 +1270,11 @@ static DBusHandlerResult hs_cancel_ringi
- 						void *data)
- {
- 	struct device *device = data;
- 	struct headset *hs = device->headset;
- 	DBusMessage *reply = NULL;
-+	int err;
- 
- 	if (hs->state < HEADSET_STATE_CONNECTED)
- 		return error_not_connected(conn, msg);
- 
- 	reply = dbus_message_new_method_return(msg);
-@@ -1287,10 +1288,19 @@ static DBusHandlerResult hs_cancel_ringi
- 
- 	g_source_remove(hs->ring_timer);
- 	hs->ring_timer = 0;
- 
- done:
-+	if (hs->hfp_active) {
-+		/*+CIEV: (callsetup = 0)*/
-+		err = headset_send(hs, "\r\n+CIEV:3, 0\r\n");
-+		if (err < 0) {
-+			dbus_message_unref(reply);
-+			return error_failed_errno(conn, msg, -err);
-+		}
-+	}
-+
- 	send_message_and_unref(conn, reply);
- 
- 	return DBUS_HANDLER_RESULT_HANDLED;
- }
- 
-
---=-fTjwfHYc1qGBIPCU+OBU
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---=-fTjwfHYc1qGBIPCU+OBU
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---=-fTjwfHYc1qGBIPCU+OBU--
