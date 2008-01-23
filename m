@@ -1,49 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 Jan 2008 14:06:29 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: davem@davemloft.net, hidave.darkstar@gmail.com, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bluez-devel@lists.sourceforge.net,
-        cornelia.huck@de.ibm.com, gombasg@sztaki.hu, htejun@gmail.com,
-        viro@zeniv.linux.org.uk, kay.sievers@vrfy.org, greg@kroah.com
-Subject: Re: [PATCH] bluetooth : move children of connection device to NULL
- before connection down
-Message-Id: <20080123140629.c24d4d68.akpm@linux-foundation.org>
-In-Reply-To: <1200982696.7978.148.camel@aeonflux>
-References: <20080121044913.GA4162@darkstar.te-china.tietoenator.com>
-	<20080121045401.GB4162@darkstar.te-china.tietoenator.com>
-	<20080121.031417.171098597.davem@davemloft.net>
-	<1200982696.7978.148.camel@aeonflux>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-List-ID: <bluez-devel.lists.sourceforge.net>
+Message-ID: <BAY102-W31F02D952D8C6CC3028EBEF03F0@phx.gbl>
+From: Robert Rawlins <robert_rawlins@hotmail.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Wed, 23 Jan 2008 14:40:13 +0000
+In-Reply-To: <200801182017.36181.chick@computergeek.freeserve.co.uk>
+References: <BAY102-W17970DD14D6076D3F44BCBF0420@phx.gbl>
+	<200801182017.36181.chick@computergeek.freeserve.co.uk>
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Same Old Speed Issues
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0357897980=="
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-> On Tue, 22 Jan 2008 07:18:16 +0100 Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Dave,
-> 
-> > > Add people missed in cc-list.
-> > 
-> > Thanks Dave for your continued efforts on Bluetooth bugs like this.
-> > 
-> > Marcel, are you going to review/ACK/integrate/push-upstream/whatever
-> > any of these Bluetooth patches?
-> > 
-> > It hasn't been getting much love from you as of late, you are one of
-> > the listed maintainers, and I don't want to lose any of Dave's
-> > valuable bug fixing work.
-> 
-> I will be fully back in business next week. Just got stuck in a project
-> that needed 200% of my time to get it going.
->
+--===============0357897980==
+Content-Type: multipart/alternative;
+	boundary="_3b6efce9-e2c7-4ae3-b475-9d7e2ec1d50b_"
 
-These patches in -mm:
+--_3b6efce9-e2c7-4ae3-b475-9d7e2ec1d50b_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-bluetooth-hidp_process_hid_control-remove-unnecessary-parameter-dealing.patch
-bluetooth-uninlining.patch
-drivers-bluetooth-bpa10xc-fix-memleak.patch
-drivers-bluetooth-btsdioc-fix-double-free.patch
-bluetooth-blacklist-another-broadcom-bcm2035-device.patch
-bluetooth-rfcomm-tty_close-before-destruct.patch
-hci_ldisc-fix-null-pointer-deref.patch
+Hello Guys,
+=20
+What is the playability of this being a compatibility / driver issue? I not=
+iced on the compatibility list some of the devices were listed as 'works bu=
+t slow'.If this is a Driver issue what is likely to be the best way to appr=
+oach it? can the driver be modified? or is it something we should be speaki=
+ng to the manufacturer about?
+=20
+Rob
+=20
 
-could benefit from some attention please.
+
+
+> From: chick@computergeek.freeserve.co.uk> To: bluez-devel@lists.sourcefor=
+ge.net> Date: Fri, 18 Jan 2008 20:17:35 +0000> Subject: Re: [Bluez-devel] S=
+ame Old Speed Issues> > On Friday 18 January 2008 15:04:58 Robert Rawlins w=
+rote:> > At the moment I've tried using both ussp-push and open-obex push c=
+lients to> > transfer the file, both giving me the same results. I'm achiev=
+ing roughly> > 25Kbytes/s transfer speed both up and down. I've tried runni=
+ng these same> > dongles from my Windows PC and achieve well over 100kBytes=
+/s. (This is> > transmitting to a Sony k850i handset which is v2.0 + EDR). =
+This would lead> > me to believe its not an issue with the Dongle, more lik=
+ely something with> > my Linux configuration> >> > Have you tried changing =
+the OBEX block size - try forcing the minimum size to > 64kB-1?> > Cheers,>=
+ Tim> > > -----------------------------------------------------------------=
+--------> This SF.net email is sponsored by: Microsoft> Defy all challenges=
+. Microsoft(R) Visual Studio 2008.> http://clk.atdmt.com/MRT/go/vse01200000=
+70mrt/direct/01/> _______________________________________________> Bluez-de=
+vel mailing list> Bluez-devel@lists.sourceforge.net> https://lists.sourcefo=
+rge.net/lists/listinfo/bluez-devel
+_________________________________________________________________
+Get Hotmail on your mobile, text MSN to 63463!
+http://mobile.uk.msn.com/pc/mail.aspx=
+
+--_3b6efce9-e2c7-4ae3-b475-9d7e2ec1d50b_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<style>
+.hmmessage P
+{
+margin:0px;
+padding:0px
+}
+body.hmmessage
+{
+FONT-SIZE: 10pt;
+FONT-FAMILY:Tahoma
+}
+</style>
+</head>
+<body class=3D'hmmessage'>Hello Guys,<BR>
+&nbsp;<BR>
+What is the playability of this being a compatibility / driver issue? I not=
+iced on the compatibility list some of the devices were listed as 'works bu=
+t slow'.<BR><BR>If this is a Driver issue what is likely to be the best way=
+ to approach it? can the driver be modified? or is it something we should b=
+e speaking to the manufacturer about?<BR>
+&nbsp;<BR>
+Rob<BR>
+&nbsp;<BR>
+
+<HR id=3DstopSpelling>
+<BR>
+&gt; From: chick@computergeek.freeserve.co.uk<BR>&gt; To: bluez-devel@lists=
+.sourceforge.net<BR>&gt; Date: Fri, 18 Jan 2008 20:17:35 +0000<BR>&gt; Subj=
+ect: Re: [Bluez-devel] Same Old Speed Issues<BR>&gt; <BR>&gt; On Friday 18 =
+January 2008 15:04:58 Robert Rawlins wrote:<BR>&gt; &gt; At the moment I've=
+ tried using both ussp-push and open-obex push clients to<BR>&gt; &gt; tran=
+sfer the file, both giving me the same results. I'm achieving roughly<BR>&g=
+t; &gt; 25Kbytes/s transfer speed both up and down. I've tried running thes=
+e same<BR>&gt; &gt; dongles from my Windows PC and achieve well over 100kBy=
+tes/s. (This is<BR>&gt; &gt; transmitting to a Sony k850i handset which is =
+v2.0 + EDR). This would lead<BR>&gt; &gt; me to believe its not an issue wi=
+th the Dongle, more likely something with<BR>&gt; &gt; my Linux configurati=
+on<BR>&gt; &gt;<BR>&gt; <BR>&gt; Have you tried changing the OBEX block siz=
+e - try forcing the minimum size to <BR>&gt; 64kB-1?<BR>&gt; <BR>&gt; Cheer=
+s,<BR>&gt; Tim<BR>&gt; <BR>&gt; <BR>&gt; ----------------------------------=
+---------------------------------------<BR>&gt; This SF.net email is sponso=
+red by: Microsoft<BR>&gt; Defy all challenges. Microsoft(R) Visual Studio 2=
+008.<BR>&gt; http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/<BR>&gt=
+; _______________________________________________<BR>&gt; Bluez-devel maili=
+ng list<BR>&gt; Bluez-devel@lists.sourceforge.net<BR>&gt; https://lists.sou=
+rceforge.net/lists/listinfo/bluez-devel<BR><BR><br /><hr />Think you know y=
+our TV, music and film? <a href=3D'https://www.searchcharades.com' target=
+=3D'_new'>Try Search Charades!</a></body>
+</html>=
+
+--_3b6efce9-e2c7-4ae3-b475-9d7e2ec1d50b_--
+
+
+--===============0357897980==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============0357897980==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0357897980==--
