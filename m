@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300801240717g61e06642v28d6f0cf1b3cf2da@mail.gmail.com>
-Date: Thu, 24 Jan 2008 08:17:37 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <47986354.2080205@naustech.com>
+Message-ID: <4798987E.6060600@naustech.com>
+Date: Thu, 24 Jan 2008 14:54:06 +0100
+From: "Ing. Gabriele Oberhammer" <gabriele@naustech.com>
 MIME-Version: 1.0
-References: <4795D6EB.2080209@naustech.com>
-	<1201018471.24085.4.camel@littletux> <47986354.2080205@naustech.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <860396.82093.qm@web8411.mail.in.yahoo.com>
+In-Reply-To: <860396.82093.qm@web8411.mail.in.yahoo.com>
 Subject: Re: [Bluez-users] Headset half working using Bluez's ALSA plugin
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,15 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Gabriele
+tnx for your response, but I've a standard Ubuntu kernel and alsa i 
+correcty configured.
+Running dpkg -S libasound_module_pcm_bluetooth.la I found that this 
+module is shipped with the package bluez-utils.
+If I install the package bluez-utils form standard repositories almost 
+everything of bluetooth works flawlessly. The problem is that capture 
+from my headset does not work (i.e. only playback works).
+Several posts confirm that this is a common problem which the latest cvs 
+is supposed to solve.
+I've correctly compiled and installed latest blues-utils form cvs, but I 
+guess the library libasound_module_pcm_bluetooth.la is not correctly 
+build/installed  :-(
 
->         $ sudo ./configure --prefix=/usr/local/
+I guess I must wait until the cvs becomes stable.
 
-there are hacks so alsa plugins will work from /usr/local. it's easier
-to just use /usr.
-
--- 
-Brad
+Tnx, bye
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
