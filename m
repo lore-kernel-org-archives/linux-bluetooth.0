@@ -1,10 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-Date: Fri, 25 Jan 2008 09:38:39 -0500
+Message-ID: <4799A562.1030906@naustech.com>
+Date: Fri, 25 Jan 2008 10:01:22 +0100
+From: "Ing. Gabriele Oberhammer" <gabriele@naustech.com>
 MIME-Version: 1.0
-From: laurent-z@neuf.fr
-Message-Id: <8CA2D771C11F4F5-14EC-2263@FRR1-L19.sis.aol.com>
-Subject: [Bluez-users] Error cross compiling bluez-utils 3.9 ARM S3C2410
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <4795D6EB.2080209@naustech.com>	<1201018471.24085.4.camel@littletux>
+	<47986354.2080205@naustech.com>	<d89ddf300801240717g61e06642v28d6f0cf1b3cf2da@mail.gmail.com>	<479911A2.6040704@naustech.com>
+	<d89ddf300801241520x440c0714lbe996ac3ac6aced9@mail.gmail.com>
+In-Reply-To: <d89ddf300801241520x440c0714lbe996ac3ac6aced9@mail.gmail.com>
+Subject: Re: [Bluez-users] Headset half working using Bluez's ALSA plugin
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,141 +18,252 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0688346820=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
-
---===============0688346820==
-Content-Type: multipart/alternative;
-	boundary="--------MB_8CA2D771C11F4F5_14EC_9D1A_FRR1-L19.sis.aol.com"
-
-This is a multi-part message in MIME format.
-
-----------MB_8CA2D771C11F4F5_14EC_9D1A_FRR1-L19.sis.aol.com
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-
-=0AHello,=0A=0A=0A=C2=A0=0A=0A=0AI=E2=80=99m=20having=20trouble=20cross-compilin=
-g=20=0Abluez-utils=203.9=20using=20this=20command=20line:=0A=0A=0A#=20./configur=
-e=20=E2=80=93host=3Darm-linux=20=0A=E2=80=93prefix=3D/opt/bluez_build=20=E2=80=93=
-with-bluez-libs=3D/opt/bluez_build=20/lib=20=0A=E2=80=93with-bluez-include=3D/op=
-t/bluez_build=20/include=0A=0A=0A=C2=A0=0A=0A=0A(I=20use=20gcc-arm-3.4.1=20cross=
-=20compiler=20=0Aand=20/opt/bluez_build=20is=20the=20destination=20folder)=0A=0A=
-=0A=C2=A0=0A=0A=0Aand=20I=20get=20this=20=0Amessage:=0A=0A=0A=C2=A0=0A=0A=0Achec=
-king=20for=20BLUEZ...=20no=0A=0A=0Aconfigure:=20error:=20Bluez=20library=20is=20=
-=0Arequired=0A=0A=0A=C2=A0=0A=0A=0AI=20successfully=20compiled=20=0Aand=20instal=
-led=20bluez-libs3.9=20with=20the=20following=20command:=0A=0A=0A=C2=A0=0A=0A=0A#=
-=20./configure=20=E2=80=93host=3Darm-linux=20=0A=E2=80=93prefix=3D/opt/bluez_bui=
-ld=0A=0A=0A=C2=A0=0A=0A=0AI=20also=20successfully=20=0Acompiled=20and=20installe=
-d=20dbus-1.0.2=20in=20=0Acase.=0A=0A=0A=C2=A0=0A=0A=0AMy=20point=20is=20I=20trie=
-d=20bluez-2.5=20with=20=0Athe=20same=20method=20and=20everything=20went=20well=20=
-and=20I=20was=20able=20to=20use=20my=20Bluetooth=20=0Adongle.=0A=0A=0A=C2=A0=0A=0A=
-=0AI=20checked=20the=20mailing=20list=20and=20I=E2=80=99m=20=0Anot=20the=20only=20=
-one=20facing=20this=20problem,=20but=20I=20don=E2=80=99t=20see=20any=20replies=20=
-providing=20the=20=0Asolution=20to=20my=20problem.=0A=0A=0A=C2=A0=0A=0A=0AIs=20a=
-nybody=20able=20to=20get=20this=20thing=20to=20=0Awork?=20Please=20help!=0A=0A=0A=
-=C2=A0=0A=0A=0AThanks=0A
-----------MB_8CA2D771C11F4F5_14EC_9D1A_FRR1-L19.sis.aol.com
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/html; charset="utf-8"
-
-=0A<div=20class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D=
-"font-size:=2010pt;=20font-family:=20Arial;">Hello,<O:P></O:P></span></font></di=
-v>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><span=20=
-style=3D"font-size:=2010pt;=20font-family:=20Arial;"><O:P>&nbsp;</O:P></span></f=
-ont></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2=
-"><span=20style=3D"font-size:=2010pt;=20font-family:=20Arial;">I=E2=80=99m=20hav=
-ing=20trouble=20cross-compiling=20=0Abluez-utils=203.9=20using=20this=20command=20=
-line:<O:P></O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20=
-face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-family:=20=
-Arial;">#=20./configure=20=E2=80=93host=3Darm-linux=20=0A=E2=80=93prefix=3D/opt/=
-bluez_build=20=E2=80=93with-bluez-libs=3D/opt/bluez_build=20/lib=20=0A=E2=80=93w=
-ith-bluez-include=3D/opt/bluez_build=20/include<O:P></O:P></span></font></div>=0A=
-=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><span=20sty=
-le=3D"font-size:=2010pt;=20font-family:=20Arial;"><O:P>&nbsp;</O:P></span></font=
-></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><=
-span=20style=3D"font-size:=2010pt;=20font-family:=20Arial;">(I=20use=20gcc-arm-3=
-.4.1=20cross=20compiler=20=0Aand=20/opt/bluez_build=20is=20the=20destination=20f=
-older)<O:P></O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20=
-face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-family:=20=
-Arial;"><O:P>&nbsp;</O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"=
-><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-=
-family:=20Arial;">and=20I=20get=20this=20=0Amessage:<O:P></O:P></span></font></d=
-iv>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><span=
-=20style=3D"font-size:=2010pt;=20font-family:=20Arial;"><O:P>&nbsp;</O:P></span>=
-</font></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Times=20New=20R=
-oman"=20size=3D"3"><span=20style=3D"font-size:=2012pt;">checking=20for=20BLUEZ..=
-.=20no<O:P></O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20=
-face=3D"Times=20New=20Roman"=20size=3D"3"><span=20style=3D"font-size:=2012pt;">c=
-onfigure:=20error:=20Bluez=20library=20is=20=0Arequired<O:P></O:P></span></font>=
-</div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Times=20New=20Roman"=20=
-size=3D"3"><span=20style=3D"font-size:=2012pt;"><O:P>&nbsp;</O:P></span></font><=
-/div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Times=20New=20Roman"=20=
-size=3D"3"><span=20style=3D"font-size:=2012pt;">I</span></font><font=20face=3D"A=
-rial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-family:=20Arial;">=
-=20successfully</span></font>=20compiled=20=0Aand=20installed=20bluez-libs3.9=20=
-with=20the=20following=20command:<O:P></O:P></div>=0A=0A=0A<div=20class=3D"MsoNo=
-rmal"><font=20face=3D"Times=20New=20Roman"=20size=3D"3"><span=20style=3D"font-si=
-ze:=2012pt;"><O:P>&nbsp;</O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNo=
-rmal"><font=20face=3D"Times=20New=20Roman"=20size=3D"3"><span=20style=3D"font-si=
-ze:=2012pt;">#=20./configure=20=E2=80=93host=3Darm-linux=20=0A=E2=80=93prefix=3D=
-/opt/bluez</span></font><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"fon=
-t-size:=2010pt;=20font-family:=20Arial;">_build</span></font><O:P></O:P></div>=0A=
-=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Times=20New=20Roman"=20size=3D"=
-3"><span=20style=3D"font-size:=2012pt;"><O:P>&nbsp;</O:P></span></font></div>=0A=
-=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><span=20sty=
-le=3D"font-size:=2010pt;=20font-family:=20Arial;">I=20also=20successfully</span>=
-</font>=20=0A<font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=201=
-0pt;=20font-family:=20Arial;">compiled=20and=20installed=20dbus-1.0.2=20in=20=0A=
-case.<O:P></O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20=
-face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-family:=20=
-Arial;"><O:P>&nbsp;</O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"=
-><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-=
-family:=20Arial;">My=20point=20is=20I=20tried=20bluez-2.5=20with=20=0Athe=20same=
-=20method=20and=20everything=20went=20well=20and=20I=20was=20able=20to=20use=20m=
-y=20Bluetooth=20=0Adongle.<O:P></O:P></span></font></div>=0A=0A=0A<div=20class=3D=
-"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010=
-pt;=20font-family:=20Arial;"><O:P>&nbsp;</O:P></span></font></div>=0A=0A=0A<div=20=
-class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"font-si=
-ze:=2010pt;=20font-family:=20Arial;">I=20checked=20the=20mailing=20list=20and=20=
-I=E2=80=99m=20=0Anot=20the=20only=20one=20facing=20this=20problem,=20but=20I=20d=
-on=E2=80=99t=20see=20any=20replies=20providing=20the=20=0Asolution=20to=20my=20p=
-roblem.<O:P></O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20=
-face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-family:=20=
-Arial;"><O:P>&nbsp;</O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"=
-><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-=
-family:=20Arial;">Is=20anybody=20able=20to=20get=20this=20thing=20to=20=0Awork?=20=
-Please=20help<font=20color=3D"navy"><span=20style=3D"color:=20navy;">!</span></f=
-ont><O:P></O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20f=
-ace=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-family:=20=
-Arial;"><O:P>&nbsp;</O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"=
-><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-=
-family:=20Arial;">Thanks</span></font></div>=0A
-----------MB_8CA2D771C11F4F5_14EC_9D1A_FRR1-L19.sis.aol.com--
+hcidump of '$ arecord -D bluetooth -f S16_LE /tmp/test.wav'  :
 
 
+HCI sniffer - Bluetooth packet analyzer ver 1.39
+device: hci0 snap_len: 1028 filter: 0xffffffff
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+ > HCI Event: Command Status (0x0f) plen 4
+ > HCI Event: Connect Complete (0x03) plen 11
+< ACL data: handle 46 flags 0x02 dlen 12
+     L2CAP(s): Connect req: psm 1 scid 0x0040
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+ > HCI Event: Command Status (0x0f) plen 4
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+ > ACL data: handle 46 flags 0x02 dlen 16
+     L2CAP(s): Connect rsp: dcid 0x004b scid 0x0040 result 1 status 2
+       Connection pending - Authorization pending
+ > ACL data: handle 46 flags 0x02 dlen 16
+     L2CAP(s): Connect rsp: dcid 0x004b scid 0x0040 result 0 status 0
+       Connection successful
+< ACL data: handle 46 flags 0x02 dlen 12
+     L2CAP(s): Config req: dcid 0x004b flags 0x00 clen 0
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > HCI Event: Command Complete (0x0e) plen 6
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+ > HCI Event: Command Status (0x0f) plen 4
+ > ACL data: handle 46 flags 0x02 dlen 14
+     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+       Success
+ > HCI Event: Read Remote Supported Features (0x0b) plen 11
+ > ACL data: handle 46 flags 0x02 dlen 16
+     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+       MTU 48
+< ACL data: handle 46 flags 0x02 dlen 18
+     L2CAP(s): Config rsp: scid 0x004b flags 0x00 result 0 clen 4
+       Success
+       MTU 48
+< ACL data: handle 46 flags 0x02 dlen 17
+     L2CAP(d): cid 0x004b len 13 [psm 1]
+         SDP SS Req: tid 0x0 len 0x8
+           pat uuid-16 0x1108 (Headset)
+           max 64
+           cont 00
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > ACL data: handle 46 flags 0x02 dlen 18
+     L2CAP(d): cid 0x0040 len 14 [psm 1]
+         SDP SS Rsp: tid 0x0 len 0x9
+           count 1
+           handle 0x10005
+           cont 00
+< ACL data: handle 46 flags 0x02 dlen 23
+     L2CAP(d): cid 0x004b len 19 [psm 1]
+         SDP SA Req: tid 0x1 len 0xe
+           handle 0x10005
+           max 65535
+           aid(s) 0x0000 - 0xffff
+           cont 00
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > HCI Event: Remote Name Req Complete (0x07) plen 255
+ > ACL data: handle 46 flags 0x02 dlen 27
+ > ACL data: handle 46 flags 0x01 dlen 25
+     L2CAP(d): cid 0x0040 len 48 [psm 1]
+         SDP SA Rsp: tid 0x1 len 0x2b
+           count 38
+           cont 02 00 2D
+< ACL data: handle 46 flags 0x02 dlen 25
+     L2CAP(d): cid 0x004b len 21 [psm 1]
+         SDP SA Req: tid 0x2 len 0x10
+           handle 0x10005
+           max 65535
+           aid(s) 0x0000 - 0xffff
+           cont 02 00 2D
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > ACL data: handle 46 flags 0x02 dlen 27
+ > ACL data: handle 46 flags 0x01 dlen 25
+     L2CAP(d): cid 0x0040 len 48 [psm 1]
+         SDP SA Rsp: tid 0x2 len 0x2b
+           count 38
+           cont 02 00 07
+< ACL data: handle 46 flags 0x02 dlen 25
+     L2CAP(d): cid 0x004b len 21 [psm 1]
+         SDP SA Req: tid 0x3 len 0x10
+           handle 0x10005
+           max 65535
+           aid(s) 0x0000 - 0xffff
+           cont 02 00 07
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > ACL data: handle 46 flags 0x02 dlen 19
+     L2CAP(d): cid 0x0040 len 15 [psm 1]
+         SDP SA Rsp: tid 0x3 len 0xa
+           count 7
+           aid 0x0000 (SrvRecHndl)
+              uint 0x10005
+           aid 0x0001 (SrvClassIDList)
+              < uuid-16 0x1108 (Headset) uuid-16 0x1203 (Audio) >
+           aid 0x0004 (ProtocolDescList)
+              < < uuid-16 0x0100 (L2CAP) > <
+              uuid-16 0x0003 (RFCOMM) uint 0x2 > >
+           aid 0x0006 (LangBaseAttrIDList)
+              < uint 0x656e uint 0x6a uint 0x100 >
+           aid 0x0009 (BTProfileDescList)
+              < < uuid-16 0x1108 (Headset) uint 0x100 > >
+           aid 0x0100 (SrvName)
+              str "Headset"
+           aid 0x0302 (unknown)
+              bool 0x1
+           cont 00
+< ACL data: handle 46 flags 0x02 dlen 12
+     L2CAP(s): Connect req: psm 3 scid 0x0041
+< ACL data: handle 46 flags 0x02 dlen 12
+     L2CAP(s): Disconn req: dcid 0x004b scid 0x0040
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > ACL data: handle 46 flags 0x02 dlen 16
+     L2CAP(s): Connect rsp: dcid 0x004c scid 0x0041 result 1 status 2
+       Connection pending - Authorization pending
+ > ACL data: handle 46 flags 0x02 dlen 12
+     L2CAP(s): Disconn rsp: dcid 0x004b scid 0x0040
+ > HCI Event: Link Key Request (0x17) plen 6
+< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+ > HCI Event: Command Complete (0x0e) plen 10
+ > ACL data: handle 46 flags 0x02 dlen 16
+     L2CAP(s): Connect rsp: dcid 0x004c scid 0x0041 result 0 status 0
+       Connection successful
+< ACL data: handle 46 flags 0x02 dlen 16
+     L2CAP(s): Config req: dcid 0x004c flags 0x00 clen 4
+       MTU 1013
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > ACL data: handle 46 flags 0x02 dlen 14
+     L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 0
+       Success
+ > ACL data: handle 46 flags 0x02 dlen 16
+     L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
+       MTU 1013
+< ACL data: handle 46 flags 0x02 dlen 18
+     L2CAP(s): Config rsp: scid 0x004c flags 0x00 result 0 clen 4
+       Success
+       MTU 1013
+< ACL data: handle 46 flags 0x02 dlen 8
+     L2CAP(d): cid 0x004c len 4 [psm 3]
+       RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > ACL data: handle 46 flags 0x02 dlen 8
+     L2CAP(d): cid 0x0041 len 4 [psm 3]
+       RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+< ACL data: handle 46 flags 0x02 dlen 18
+     L2CAP(d): cid 0x004c len 14 [psm 3]
+       RFCOMM(s): PN CMD: cr 1 dlci 0 pf 0 ilen 10 fcs 0x70 mcc_len 8
+       dlci 4 frame_type 0 credit_flow 15 pri 7 ack_timer 0
+       frame_size 1008 max_retrans 0 credits 7
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > ACL data: handle 46 flags 0x02 dlen 18
+     L2CAP(d): cid 0x0041 len 14 [psm 3]
+       RFCOMM(s): PN RSP: cr 0 dlci 0 pf 0 ilen 10 fcs 0xaa mcc_len 8
+       dlci 4 frame_type 0 credit_flow 14 pri 7 ack_timer 0
+       frame_size 127 max_retrans 0 credits 0
+< ACL data: handle 46 flags 0x02 dlen 8
+     L2CAP(d): cid 0x004c len 4 [psm 3]
+       RFCOMM(s): SABM: cr 1 dlci 4 pf 1 ilen 0 fcs 0x96
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > ACL data: handle 46 flags 0x02 dlen 8
+     L2CAP(d): cid 0x0041 len 4 [psm 3]
+       RFCOMM(s): UA: cr 1 dlci 4 pf 1 ilen 0 fcs 0x5d
+< ACL data: handle 46 flags 0x02 dlen 12
+     L2CAP(d): cid 0x004c len 8 [psm 3]
+       RFCOMM(s): MSC CMD: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+       dlci 4 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 0 b2 0 b3 0 len 0
+< HCI Command: Add SCO Connection (0x01|0x0007) plen 4
+ > ACL data: handle 46 flags 0x02 dlen 12
+     L2CAP(d): cid 0x0041 len 8 [psm 3]
+       RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+       dlci 4 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 0 b2 0 b3 0 len 0
+< ACL data: handle 46 flags 0x02 dlen 12
+     L2CAP(d): cid 0x004c len 8 [psm 3]
+       RFCOMM(s): MSC RSP: cr 1 dlci 0 pf 0 ilen 4 fcs 0x70 mcc_len 2
+       dlci 4 fc 0 rtc 1 rtr 1 ic 0 dv 0 b1 0 b2 0 b3 0 len 0
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > HCI Event: Command Status (0x0f) plen 4
+ > ACL data: handle 46 flags 0x02 dlen 12
+     L2CAP(d): cid 0x0041 len 8 [psm 3]
+       RFCOMM(s): MSC RSP: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
+       dlci 4 fc 0 rtc 1 rtr 1 ic 0 dv 1 b1 0 b2 0 b3 0 len 0
+< ACL data: handle 46 flags 0x02 dlen 9
+     L2CAP(d): cid 0x004c len 5 [psm 3]
+       RFCOMM(d): UIH: cr 1 dlci 4 pf 1 ilen 0 fcs 0x79 credits 33
+ > ACL data: handle 46 flags 0x02 dlen 9
+     L2CAP(d): cid 0x0041 len 5 [psm 3]
+       RFCOMM(d): UIH: cr 0 dlci 4 pf 1 ilen 0 fcs 0xa3 credits 15
+ > HCI Event: Encrypt Change (0x08) plen 4
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > HCI Event: Connect Complete (0x03) plen 11
+ > HCI Event: Mode Change (0x14) plen 6
 
---===============0688346820==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Here I hear a beep and some noise in the headset, so I guess it has 
+entered capture mode correctly.
+But from now no more packets are dumped till I interrupt arecord with 
+ctrl-c. After stopping arecord I get the diconnect sequence:
+
+< ACL data: handle 46 flags 0x02 dlen 8
+     L2CAP(d): cid 0x004c len 4 [psm 3]
+       RFCOMM(s): DISC: cr 1 dlci 4 pf 1 ilen 0 fcs 0x77
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+ > HCI Event: Command Status (0x0f) plen 4
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > ACL data: handle 46 flags 0x02 dlen 8
+     L2CAP(d): cid 0x0041 len 4 [psm 3]
+       RFCOMM(s): UA: cr 1 dlci 4 pf 1 ilen 0 fcs 0x5d
+< ACL data: handle 46 flags 0x02 dlen 8
+     L2CAP(d): cid 0x004c len 4 [psm 3]
+       RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
+< ACL data: handle 46 flags 0x02 dlen 12
+     L2CAP(s): Disconn req: dcid 0x004c scid 0x0041
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+ > HCI Event: Disconn Complete (0x05) plen 4
+ > ACL data: handle 46 flags 0x02 dlen 8
+     L2CAP(d): cid 0x0041 len 4 [psm 3]
+       RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+ > ACL data: handle 46 flags 0x02 dlen 12
+     L2CAP(s): Disconn rsp: dcid 0x004c scid 0x0041
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+ > HCI Event: Command Status (0x0f) plen 4
+ > HCI Event: Disconn Complete (0x05) plen 4
+
+
+Is this useful?
+I'm not much into bluez source code, but I'm a C programmer so if you 
+give me some hints about what to look for in the sources I could try to 
+solve the problem myself.
+
+
+Best regards, Gabriele
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============0688346820==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0688346820==--
