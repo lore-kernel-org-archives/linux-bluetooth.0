@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Jan 2008 15:51:55 +0100
-Message-ID: <C9CD4450A0E5AA40A45E950BC0FAFD3E23612D@server-1.huebinet.intern>
+To: bluez-users@lists.sourceforge.net
+Date: Fri, 25 Jan 2008 09:38:39 -0500
 MIME-Version: 1.0
-From: "Alexander Werle" <awerle@huebinet.de>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Display text on remote device
+From: laurent-z@neuf.fr
+Message-Id: <8CA2D771C11F4F5-14EC-2263@FRR1-L19.sis.aol.com>
+Subject: [Bluez-users] Error cross compiling bluez-utils 3.9 ARM S3C2410
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,239 +14,123 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1268793180=="
+Content-Type: multipart/mixed; boundary="===============0688346820=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 This is a multi-part message in MIME format.
 
---===============1268793180==
-Content-class: urn:content-classes:message
+--===============0688346820==
 Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C85F61.E24FD780"
+	boundary="--------MB_8CA2D771C11F4F5_14EC_9D1A_FRR1-L19.sis.aol.com"
 
 This is a multi-part message in MIME format.
 
-------_=_NextPart_001_01C85F61.E24FD780
-Content-Type: text/plain;
-	charset="iso-8859-1"
+----------MB_8CA2D771C11F4F5_14EC_9D1A_FRR1-L19.sis.aol.com
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
 
-Hi!
-
-=20
-
-I'm working with BlueZ and OpenOBEX to discover devices, bond to one of
-
-them and send a file to the remote device. In general there is displayed
-
-a dialog on the device if I want to accept the file containing the name
-
-of the file which is send. Is there any option in the BlueZ api to
-
-change the text of this dialog, or to trigger the device to show another
-
-one? Maybe it is possible to send a simple text message to the device,
-
-but I haven't found anything helpful in the archive or the web.
-
-=20
-
-Alexander Werle
-Telefon 0261/50086-19
-Telefax 0261/50086-29
-E-Mail: awerle@huebinet.de <mailto:whebel@huebinet.de>=20
-http://www.huebinet.de <http://www.huebinet.de> =20
-
-HUEBINET Informationsmanagement GmbH & Co. KG
-Maria Trost 23
-56070 Koblenz
-
-Sitz und Registergericht: Koblenz HRA 5329
-
-Pers=F6nlich haftender Gesellschafter der KG:
-HUEBINET GmbH;
-Sitz und Registergericht: Koblenz HRB 6857
-
-Gesch=E4ftsf=FChrung:
-Frank H=FCttmann; Michael Biemer
-
-
-Der Nachrichtenaustausch mit HUEBINET Informationsmanagement GmbH & Co. =
-KG, Koblenz via E-Mail dient lediglich zu Informationszwecken. =
-Rechtsgesch=E4ftliche Erkl=E4rungen mit verbindlichem Inhalt k=F6nnen =
-=FCber dieses Medium nicht ausgetauscht werden, da die Manipulation von =
-E-Mails durch Dritte nicht ausgeschlossen werden kann.=20
-
-=20
-
-
-------_=_NextPart_001_01C85F61.E24FD780
-Content-Type: text/html;
-	charset="iso-8859-1"
+=0AHello,=0A=0A=0A=C2=A0=0A=0A=0AI=E2=80=99m=20having=20trouble=20cross-compilin=
+g=20=0Abluez-utils=203.9=20using=20this=20command=20line:=0A=0A=0A#=20./configur=
+e=20=E2=80=93host=3Darm-linux=20=0A=E2=80=93prefix=3D/opt/bluez_build=20=E2=80=93=
+with-bluez-libs=3D/opt/bluez_build=20/lib=20=0A=E2=80=93with-bluez-include=3D/op=
+t/bluez_build=20/include=0A=0A=0A=C2=A0=0A=0A=0A(I=20use=20gcc-arm-3.4.1=20cross=
+=20compiler=20=0Aand=20/opt/bluez_build=20is=20the=20destination=20folder)=0A=0A=
+=0A=C2=A0=0A=0A=0Aand=20I=20get=20this=20=0Amessage:=0A=0A=0A=C2=A0=0A=0A=0Achec=
+king=20for=20BLUEZ...=20no=0A=0A=0Aconfigure:=20error:=20Bluez=20library=20is=20=
+=0Arequired=0A=0A=0A=C2=A0=0A=0A=0AI=20successfully=20compiled=20=0Aand=20instal=
+led=20bluez-libs3.9=20with=20the=20following=20command:=0A=0A=0A=C2=A0=0A=0A=0A#=
+=20./configure=20=E2=80=93host=3Darm-linux=20=0A=E2=80=93prefix=3D/opt/bluez_bui=
+ld=0A=0A=0A=C2=A0=0A=0A=0AI=20also=20successfully=20=0Acompiled=20and=20installe=
+d=20dbus-1.0.2=20in=20=0Acase.=0A=0A=0A=C2=A0=0A=0A=0AMy=20point=20is=20I=20trie=
+d=20bluez-2.5=20with=20=0Athe=20same=20method=20and=20everything=20went=20well=20=
+and=20I=20was=20able=20to=20use=20my=20Bluetooth=20=0Adongle.=0A=0A=0A=C2=A0=0A=0A=
+=0AI=20checked=20the=20mailing=20list=20and=20I=E2=80=99m=20=0Anot=20the=20only=20=
+one=20facing=20this=20problem,=20but=20I=20don=E2=80=99t=20see=20any=20replies=20=
+providing=20the=20=0Asolution=20to=20my=20problem.=0A=0A=0A=C2=A0=0A=0A=0AIs=20a=
+nybody=20able=20to=20get=20this=20thing=20to=20=0Awork?=20Please=20help!=0A=0A=0A=
+=C2=A0=0A=0A=0AThanks=0A
+----------MB_8CA2D771C11F4F5_14EC_9D1A_FRR1-L19.sis.aol.com
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset="utf-8"
 
-<html xmlns:v=3D"urn:schemas-microsoft-com:vml" =
-xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
-xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
-xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" =
-xmlns=3D"http://www.w3.org/TR/REC-html40">
-
-<head>
-<meta http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<meta name=3DGenerator content=3D"Microsoft Word 12 (filtered medium)">
-<style>
-<!--
- /* Font Definitions */
- @font-face
-	{font-family:"Cambria Math";
-	panose-1:2 4 5 3 5 4 6 3 2 4;}
-@font-face
-	{font-family:Calibri;
-	panose-1:2 15 5 2 2 2 4 3 2 4;}
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0cm;
-	margin-bottom:.0001pt;
-	font-size:11.0pt;
-	font-family:"Calibri","sans-serif";}
-a:link, span.MsoHyperlink
-	{mso-style-priority:99;
-	color:blue;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{mso-style-priority:99;
-	color:purple;
-	text-decoration:underline;}
-span.E-MailFormatvorlage17
-	{mso-style-type:personal-compose;
-	font-family:"Calibri","sans-serif";
-	color:windowtext;}
-.MsoChpDefault
-	{mso-style-type:export-only;}
-@page Section1
-	{size:612.0pt 792.0pt;
-	margin:70.85pt 70.85pt 2.0cm 70.85pt;}
-div.Section1
-	{page:Section1;}
--->
-</style>
-<!--[if gte mso 9]><xml>
- <o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
-</xml><![endif]--><!--[if gte mso 9]><xml>
- <o:shapelayout v:ext=3D"edit">
-  <o:idmap v:ext=3D"edit" data=3D"1" />
- </o:shapelayout></xml><![endif]-->
-</head>
-
-<body lang=3DDE link=3Dblue vlink=3Dpurple>
-
-<div class=3DSection1>
-
-<p class=3DMsoNormal style=3D'text-autospace:none'><span lang=3DEN-US
-style=3D'font-size:10.0pt;font-family:"Courier =
-New"'>Hi!<o:p></o:p></span></p>
-
-<p class=3DMsoNormal style=3D'text-autospace:none'><span lang=3DEN-US
-style=3D'font-size:10.0pt;font-family:"Courier =
-New"'><o:p>&nbsp;</o:p></span></p>
-
-<p class=3DMsoNormal style=3D'text-autospace:none'><span lang=3DEN-US
-style=3D'font-size:10.0pt;font-family:"Courier New"'>I'm working with =
-BlueZ and
-OpenOBEX to discover devices, bond to one of<o:p></o:p></span></p>
-
-<p class=3DMsoNormal style=3D'text-autospace:none'><span lang=3DEN-US
-style=3D'font-size:10.0pt;font-family:"Courier New"'>them and send a =
-file to the
-remote device. In general there is displayed<o:p></o:p></span></p>
-
-<p class=3DMsoNormal style=3D'text-autospace:none'><span lang=3DEN-US
-style=3D'font-size:10.0pt;font-family:"Courier New"'>a dialog on the =
-device if I
-want to accept the file containing the name<o:p></o:p></span></p>
-
-<p class=3DMsoNormal style=3D'text-autospace:none'><span lang=3DEN-US
-style=3D'font-size:10.0pt;font-family:"Courier New"'>of the file which =
-is send.
-Is there any option in the BlueZ api to<o:p></o:p></span></p>
-
-<p class=3DMsoNormal style=3D'text-autospace:none'><span lang=3DEN-US
-style=3D'font-size:10.0pt;font-family:"Courier New"'>change the text of =
-this
-dialog, or to trigger the device to show another<o:p></o:p></span></p>
-
-<p class=3DMsoNormal style=3D'text-autospace:none'><span lang=3DEN-US
-style=3D'font-size:10.0pt;font-family:"Courier New"'>one? Maybe it is =
-possible to
-send a simple text message to the device,<o:p></o:p></span></p>
-
-<p class=3DMsoNormal style=3D'text-autospace:none'><span lang=3DEN-US
-style=3D'font-size:10.0pt;font-family:"Courier New"'>but I haven't found =
-anything
-helpful in the archive or the web.<o:p></o:p></span></p>
-
-<p class=3DMsoNormal><span lang=3DEN-US><o:p>&nbsp;</o:p></span></p>
-
-<p class=3DMsoNormal =
-style=3D'mso-margin-top-alt:auto;mso-margin-bottom-alt:auto'><span
-style=3D'font-size:10.0pt;font-family:"Arial","sans-serif"'>Alexander =
-Werle<br>
-Telefon 0261/50086-19<br>
-Telefax 0261/50086-29<br>
-E-Mail: </span><span style=3D'font-size:12.0pt;font-family:"Times New =
-Roman","serif"'><a
-href=3D"mailto:whebel@huebinet.de"><span =
-style=3D'font-size:10.0pt;font-family:
-"Arial","sans-serif";color:blue'>awerle@huebinet.de</span></a><br>
-</span><span =
-style=3D'font-size:10.0pt;font-family:"Arial","sans-serif"'><a
-href=3D"http://www.huebinet.de"><span =
-style=3D'color:blue'>http://www.huebinet.de</span></a></span><span
-style=3D'font-size:12.0pt;font-family:"Times New Roman","serif"'> =
-<o:p></o:p></span></p>
-
-<p class=3DMsoNormal =
-style=3D'mso-margin-top-alt:auto;mso-margin-bottom-alt:auto'><span
-style=3D'font-size:10.0pt;font-family:"Arial","sans-serif"'>HUEBINET =
-Informationsmanagement
-GmbH &amp; Co. KG<br>
-Maria Trost 23<br>
-56070 Koblenz<br>
-<br>
-Sitz und Registergericht: Koblenz HRA 5329<br>
-<br>
-Pers=F6nlich haftender Gesellschafter der KG:<br>
-HUEBINET GmbH;<br>
-Sitz und Registergericht: Koblenz HRB 6857<br>
-<br>
-Gesch=E4ftsf=FChrung:<br>
-Frank H=FCttmann; Michael Biemer<br>
-<br>
-<br>
-Der Nachrichtenaustausch mit HUEBINET Informationsmanagement GmbH &amp; =
-Co. KG,
-Koblenz via E-Mail dient lediglich zu Informationszwecken. =
-Rechtsgesch=E4ftliche
-Erkl=E4rungen mit verbindlichem Inhalt k=F6nnen =FCber dieses Medium =
-nicht
-ausgetauscht werden, da die Manipulation von E-Mails durch Dritte nicht
-ausgeschlossen werden kann.&nbsp;</span><span style=3D'font-size:12.0pt;
-font-family:"Times New Roman","serif"'><o:p></o:p></span></p>
-
-<p class=3DMsoNormal><o:p>&nbsp;</o:p></p>
-
-</div>
-
-</body>
-
-</html>
-
-------_=_NextPart_001_01C85F61.E24FD780--
+=0A<div=20class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D=
+"font-size:=2010pt;=20font-family:=20Arial;">Hello,<O:P></O:P></span></font></di=
+v>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><span=20=
+style=3D"font-size:=2010pt;=20font-family:=20Arial;"><O:P>&nbsp;</O:P></span></f=
+ont></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2=
+"><span=20style=3D"font-size:=2010pt;=20font-family:=20Arial;">I=E2=80=99m=20hav=
+ing=20trouble=20cross-compiling=20=0Abluez-utils=203.9=20using=20this=20command=20=
+line:<O:P></O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20=
+face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-family:=20=
+Arial;">#=20./configure=20=E2=80=93host=3Darm-linux=20=0A=E2=80=93prefix=3D/opt/=
+bluez_build=20=E2=80=93with-bluez-libs=3D/opt/bluez_build=20/lib=20=0A=E2=80=93w=
+ith-bluez-include=3D/opt/bluez_build=20/include<O:P></O:P></span></font></div>=0A=
+=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><span=20sty=
+le=3D"font-size:=2010pt;=20font-family:=20Arial;"><O:P>&nbsp;</O:P></span></font=
+></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><=
+span=20style=3D"font-size:=2010pt;=20font-family:=20Arial;">(I=20use=20gcc-arm-3=
+.4.1=20cross=20compiler=20=0Aand=20/opt/bluez_build=20is=20the=20destination=20f=
+older)<O:P></O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20=
+face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-family:=20=
+Arial;"><O:P>&nbsp;</O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"=
+><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-=
+family:=20Arial;">and=20I=20get=20this=20=0Amessage:<O:P></O:P></span></font></d=
+iv>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><span=
+=20style=3D"font-size:=2010pt;=20font-family:=20Arial;"><O:P>&nbsp;</O:P></span>=
+</font></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Times=20New=20R=
+oman"=20size=3D"3"><span=20style=3D"font-size:=2012pt;">checking=20for=20BLUEZ..=
+.=20no<O:P></O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20=
+face=3D"Times=20New=20Roman"=20size=3D"3"><span=20style=3D"font-size:=2012pt;">c=
+onfigure:=20error:=20Bluez=20library=20is=20=0Arequired<O:P></O:P></span></font>=
+</div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Times=20New=20Roman"=20=
+size=3D"3"><span=20style=3D"font-size:=2012pt;"><O:P>&nbsp;</O:P></span></font><=
+/div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Times=20New=20Roman"=20=
+size=3D"3"><span=20style=3D"font-size:=2012pt;">I</span></font><font=20face=3D"A=
+rial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-family:=20Arial;">=
+=20successfully</span></font>=20compiled=20=0Aand=20installed=20bluez-libs3.9=20=
+with=20the=20following=20command:<O:P></O:P></div>=0A=0A=0A<div=20class=3D"MsoNo=
+rmal"><font=20face=3D"Times=20New=20Roman"=20size=3D"3"><span=20style=3D"font-si=
+ze:=2012pt;"><O:P>&nbsp;</O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNo=
+rmal"><font=20face=3D"Times=20New=20Roman"=20size=3D"3"><span=20style=3D"font-si=
+ze:=2012pt;">#=20./configure=20=E2=80=93host=3Darm-linux=20=0A=E2=80=93prefix=3D=
+/opt/bluez</span></font><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"fon=
+t-size:=2010pt;=20font-family:=20Arial;">_build</span></font><O:P></O:P></div>=0A=
+=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Times=20New=20Roman"=20size=3D"=
+3"><span=20style=3D"font-size:=2012pt;"><O:P>&nbsp;</O:P></span></font></div>=0A=
+=0A=0A<div=20class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><span=20sty=
+le=3D"font-size:=2010pt;=20font-family:=20Arial;">I=20also=20successfully</span>=
+</font>=20=0A<font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=201=
+0pt;=20font-family:=20Arial;">compiled=20and=20installed=20dbus-1.0.2=20in=20=0A=
+case.<O:P></O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20=
+face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-family:=20=
+Arial;"><O:P>&nbsp;</O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"=
+><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-=
+family:=20Arial;">My=20point=20is=20I=20tried=20bluez-2.5=20with=20=0Athe=20same=
+=20method=20and=20everything=20went=20well=20and=20I=20was=20able=20to=20use=20m=
+y=20Bluetooth=20=0Adongle.<O:P></O:P></span></font></div>=0A=0A=0A<div=20class=3D=
+"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010=
+pt;=20font-family:=20Arial;"><O:P>&nbsp;</O:P></span></font></div>=0A=0A=0A<div=20=
+class=3D"MsoNormal"><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"font-si=
+ze:=2010pt;=20font-family:=20Arial;">I=20checked=20the=20mailing=20list=20and=20=
+I=E2=80=99m=20=0Anot=20the=20only=20one=20facing=20this=20problem,=20but=20I=20d=
+on=E2=80=99t=20see=20any=20replies=20providing=20the=20=0Asolution=20to=20my=20p=
+roblem.<O:P></O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20=
+face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-family:=20=
+Arial;"><O:P>&nbsp;</O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"=
+><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-=
+family:=20Arial;">Is=20anybody=20able=20to=20get=20this=20thing=20to=20=0Awork?=20=
+Please=20help<font=20color=3D"navy"><span=20style=3D"color:=20navy;">!</span></f=
+ont><O:P></O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"><font=20f=
+ace=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-family:=20=
+Arial;"><O:P>&nbsp;</O:P></span></font></div>=0A=0A=0A<div=20class=3D"MsoNormal"=
+><font=20face=3D"Arial"=20size=3D"2"><span=20style=3D"font-size:=2010pt;=20font-=
+family:=20Arial;">Thanks</span></font></div>=0A
+----------MB_8CA2D771C11F4F5_14EC_9D1A_FRR1-L19.sis.aol.com--
 
 
---===============1268793180==
+
+--===============0688346820==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -256,7 +140,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1268793180==
+--===============0688346820==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -267,4 +151,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1268793180==--
+--===============0688346820==--
