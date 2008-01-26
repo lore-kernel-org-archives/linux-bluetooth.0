@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Guillaume Bedot <littletux@zarb.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1201338089.22866.14.camel@littletux>
+In-Reply-To: <1201336771.22866.7.camel@littletux>
 References: <1201336771.22866.7.camel@littletux>
-	<1201338089.22866.14.camel@littletux>
-Date: Sat, 26 Jan 2008 11:04:05 +0100
-Message-Id: <1201341845.7769.11.camel@localhost>
+Date: Sat, 26 Jan 2008 10:01:29 +0100
+Message-Id: <1201338089.22866.14.camel@littletux>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] HT820, capture and  eSCO
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -17,31 +16,60 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-U29ycnkgZm9yIHRyaXBsZSBwb3N0aW5nIC4uLgoKTGUgc2FtZWRpIDI2IGphbnZpZXIgMjAwOCDD
-oCAxMDowMSArMDEwMCwgR3VpbGxhdW1lIEJlZG90IGEgw6ljcml0IDoKPiBoY2l0b29sIGNvbgo+
-IENvbm5lY3Rpb25zOgo+IAk+IEFDTCB4eDp4eDp4eDp4eDp4eDp4eCBoYW5kbGUgMTEgc3RhdGUg
-MSBsbSBTTEFWRSBBVVRIIEVOQ1JZUFQgU0VDVVJFIAo+IAk8IGVTQ08geHg6eHg6eHg6eHg6eHg6
-eHggaGFuZGxlIDAgc3RhdGUgOCBsbSBTTEFWRSAKCk9rYXksIHRoaXMgY29ubmV4aW9uIHdhcyBr
-ZXB0IGFsaXZlIGJ1dCBpc24ndCB1c2VkIGZvciBwbGF5YmFjay4KCkFuZCBJIGZvcmdvdCB0byB0
-ZWxsIHRoZSBjYXB0dXJlIHdvcmtzIHdpdGggYW4gb2xkZXIga2VybmVsIDoKdW5hbWUgLWEKTGlu
-dXggbG9jYWxob3N0IDIuNi4yMi4xMi1kZXNrdG9wLTFtZHYgIzEgU01QIFR1ZSBOb3YgMjAgMDg6
-Mzg6MjcgRVNUCjIwMDcgaTY4NiBBTUQgQXRobG9uKHRtKSBYUCAxODAwKyBHTlUvTGludXgKCmNv
-bm5leGlvbiBvcGVuZWQgd2hlbiB1c2luZyAiaGlmaSIgKHBsYXliYWNrKSA6CmhjaXRvb2wgY29u
-CkNvbm5lY3Rpb25zOgogICAgICAgID4gQUNMIDAwOjA3OkE0OkYyOkJDOjNGIGhhbmRsZSAxMSBz
-dGF0ZSAxIGxtIFNMQVZFIEFVVEggRU5DUllQVApTRUNVUkUgCgpjb25uZXhpb24gb3BlbmVkIHdo
-ZW4gdXNpbmcgInZvaWNlIiAoY2FwdHVyZSBhbmQgcGxheWJhY2spIDoKaGNpdG9vbCBjb24KQ29u
-bmVjdGlvbnM6CiAgICAgICAgPCBTQ08geHg6eHg6eHg6eHg6eHg6eHggaGFuZGxlIDEgc3RhdGUg
-MSBsbSBTTEFWRSAKICAgICAgICA+IEFDTCB4eDp4eDp4eDp4eDp4eDp4eCBoYW5kbGUgMTEgc3Rh
-dGUgMSBsbSBTTEFWRSBBVVRIIEVOQ1JZUFQKU0VDVVJFIAoKU28sIGhvdyBjYW4gSSBmb3JjZSB1
-c2Ugb2YgU0NPIGluc3RlYWQgb2YgZVNDTyA/CgpCZXN0IHJlZ2FyZHMsCgpHdWlsbGF1bWUgQi4K
-CgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogTWlj
-cm9zb2Z0CkRlZnkgYWxsIGNoYWxsZW5nZXMuIE1pY3Jvc29mdChSKSBWaXN1YWwgU3R1ZGlvIDIw
-MDguCmh0dHA6Ly9jbGsuYXRkbXQuY29tL01SVC9nby92c2UwMTIwMDAwMDcwbXJ0L2RpcmVjdC8w
-MS8KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXot
-ZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRw
-czovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
+
+On sam, 2008-01-26 at 09:39 +0100, Guillaume Bedot wrote:
+> Hello,
+> 
+> I have issues using "voice"/HSP/HFP profiles with this headset and
+> latest kernels/bluez cvs.
+> 
+> It seems it tries to use extended SCO when it shouldn't...
+> 
+> hcitool info xx:xx:xx:xx:xx:xx
+> Requesting information ...
+> 	BD Address:  xx:xx:xx:xx:xx:xx
+> 	Device Name: Motorola HT820
+> 	LMP Version: 2.0 (0x3) LMP Subversion: 0xa41
+> 	Manufacturer: Cambridge Silicon Radio (10)
+> 	Features: 0xff 0xff 0x8b 0x78 0x18 0x18 0x00 0x80
+> 		<3-slot packets> <5-slot packets> <encryption> <slot offset> 
+> 		<timing accuracy> <role switch> <hold mode> <sniff mode> 
+> 		<park state> <RSSI> <channel quality> <SCO link> <HV2 packets> 
+> 		<HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme> 
+> 		<transparent SCO> <broadcast encrypt> <enhanced iscan> 
+> 		<interlaced iscan> <interlaced pscan> <inquiry with RSSI> 
+> 		<AFH cap. slave> <AFH class. slave> <AFH cap. master> 
+> 		<AFH class. master> <extended features> 
+
+If it can help, I noticed there are a lot of these messages in syslog :
+
+Jan 26 07:52:05 littletux kernel: hci_scodata_packet: hci0 SCO packet
+for unknown connection handle 1
+
+And with "hifi" profile, the headset playback works although it seems to
+use eSCO too :
+
+hcitool con
+Connections:
+	> ACL xx:xx:xx:xx:xx:xx handle 11 state 1 lm SLAVE AUTH ENCRYPT SECURE 
+	< eSCO xx:xx:xx:xx:xx:xx handle 0 state 8 lm SLAVE 
+
+I'm not sure what the problem is anymore...
+
+Best regards,
+
+Guillaume B.
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
