@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Guillaume Bedot <littletux@zarb.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1201336771.22866.7.camel@littletux>
-References: <1201336771.22866.7.camel@littletux>
-Date: Sat, 26 Jan 2008 10:01:29 +0100
-Message-Id: <1201338089.22866.14.camel@littletux>
+Date: Sat, 26 Jan 2008 09:39:31 +0100
+Message-Id: <1201336771.22866.7.camel@littletux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] HT820, capture and  eSCO
+Subject: [Bluez-devel] HT820, capture and  eSCO
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,45 +18,47 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hello,
 
-On sam, 2008-01-26 at 09:39 +0100, Guillaume Bedot wrote:
-> Hello,
-> 
-> I have issues using "voice"/HSP/HFP profiles with this headset and
-> latest kernels/bluez cvs.
-> 
-> It seems it tries to use extended SCO when it shouldn't...
-> 
-> hcitool info xx:xx:xx:xx:xx:xx
-> Requesting information ...
-> 	BD Address:  xx:xx:xx:xx:xx:xx
-> 	Device Name: Motorola HT820
-> 	LMP Version: 2.0 (0x3) LMP Subversion: 0xa41
-> 	Manufacturer: Cambridge Silicon Radio (10)
-> 	Features: 0xff 0xff 0x8b 0x78 0x18 0x18 0x00 0x80
-> 		<3-slot packets> <5-slot packets> <encryption> <slot offset> 
-> 		<timing accuracy> <role switch> <hold mode> <sniff mode> 
-> 		<park state> <RSSI> <channel quality> <SCO link> <HV2 packets> 
-> 		<HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme> 
-> 		<transparent SCO> <broadcast encrypt> <enhanced iscan> 
-> 		<interlaced iscan> <interlaced pscan> <inquiry with RSSI> 
-> 		<AFH cap. slave> <AFH class. slave> <AFH cap. master> 
-> 		<AFH class. master> <extended features> 
+I have issues using "voice"/HSP/HFP profiles with this headset and
+latest kernels/bluez cvs.
 
-If it can help, I noticed there are a lot of these messages in syslog :
+It seems it tries to use extended SCO when it shouldn't...
 
-Jan 26 07:52:05 littletux kernel: hci_scodata_packet: hci0 SCO packet
-for unknown connection handle 1
+hcitool info xx:xx:xx:xx:xx:xx
+Requesting information ...
+	BD Address:  xx:xx:xx:xx:xx:xx
+	Device Name: Motorola HT820
+	LMP Version: 2.0 (0x3) LMP Subversion: 0xa41
+	Manufacturer: Cambridge Silicon Radio (10)
+	Features: 0xff 0xff 0x8b 0x78 0x18 0x18 0x00 0x80
+		<3-slot packets> <5-slot packets> <encryption> <slot offset> 
+		<timing accuracy> <role switch> <hold mode> <sniff mode> 
+		<park state> <RSSI> <channel quality> <SCO link> <HV2 packets> 
+		<HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme> 
+		<transparent SCO> <broadcast encrypt> <enhanced iscan> 
+		<interlaced iscan> <interlaced pscan> <inquiry with RSSI> 
+		<AFH cap. slave> <AFH class. slave> <AFH cap. master> 
+		<AFH class. master> <extended features> 
 
-And with "hifi" profile, the headset playback works although it seems to
-use eSCO too :
+An other headset which support eSCO, works fine :
 
-hcitool con
-Connections:
-	> ACL xx:xx:xx:xx:xx:xx handle 11 state 1 lm SLAVE AUTH ENCRYPT SECURE 
-	< eSCO xx:xx:xx:xx:xx:xx handle 0 state 8 lm SLAVE 
+hcitool info xx:xx:xx:xx:xx:xx
+Requesting information ...
+	BD Address:  xx:xx:xx:xx:xx:xx
+	Device Name: PROF PBH-6W
+	LMP Version: 2.0 (0x3) LMP Subversion: 0x978
+	Manufacturer: Cambridge Silicon Radio (10)
+	Features: 0xfd 0xfe 0x8f 0x80 0x0b 0xa8 0x00 0x80
+		<3-slot packets> <encryption> <slot offset> <timing accuracy> 
+		<role switch> <hold mode> <sniff mode> <RSSI> 
+		<channel quality> <SCO link> <HV2 packets> <HV3 packets> 
+		<u-law log> <A-law log> <CVSD> <paging scheme> <power control> 
+		<transparent SCO> <broadcast encrypt> <extended SCO> 
+		<EV4 packets> <EV5 packets> <AFH cap. slave> <AFH cap. master> 
+		<EDR eSCO 2 Mbps> <3-slot EDR eSCO> <extended features> 
 
-I'm not sure what the problem is anymore...
+What can I do to help now ?
 
 Best regards,
 
