@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 From: Guillaume Bedot <littletux@zarb.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1201002028.7978.159.camel@aeonflux>
-References: <1200991632.7006.20.camel@localhost>
-	<1201002028.7978.159.camel@aeonflux>
-Content-Type: multipart/mixed; boundary="=-OUBJBSvMZdXnIR6xuoV1"
-Date: Sat, 26 Jan 2008 11:42:41 +0100
-Message-Id: <1201344161.7769.28.camel@localhost>
+In-Reply-To: <1201338089.22866.14.camel@littletux>
+References: <1201336771.22866.7.camel@littletux>
+	<1201338089.22866.14.camel@littletux>
+Date: Sat, 26 Jan 2008 11:04:05 +0100
+Message-Id: <1201341845.7769.11.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Asus WL-BTD202 needs force_scofix
+Subject: Re: [Bluez-devel] HT820, capture and  eSCO
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,119 +17,31 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-
---=-OUBJBSvMZdXnIR6xuoV1
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-
-
-Le mardi 22 janvier 2008 à 12:40 +0100, Marcel Holtmann a écrit :
-> Hi Guillaume,
-> 
-> > I'm currently testing bluetooth audio with latest cvs.
-> > 
-> > I use this dongle and a mono headset (PROF PBH-6W) :
-> > $ /usr/sbin/lsusb | grep ASUS
-> > Bus 001 Device 002: ID 0b05:1715 ASUSTek Computer, Inc. 
-> > 
-> > Apparently, it only works with this option set hci_usb :
-> > options hci_usb force_scofix=1
-> > 
-> > Recording and playback work, mostly.
-> > Sometimes noise is produced, retrying once or twice make it work...
-> > 
-> > Could this option be set as a default in hci_usb.c, or could it have
-> > some drawback I'm not aware of ?
-> 
-> include the content of /proc/bus/usb/devices for this dongle
-T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0b05 ProdID=1715 Rev= 1.00
-S:  Manufacturer=Broadcom Corp
-S:  Product=WL-BTD202
-C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:* If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=hci_usb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
-
-
->  and create
-> a kernel patch for hci_usb to always enable the SCO fix.
-
-It is the joined file (it remains to test though).
-
-What's the use of usb_device_id blacklist_ids[] ?
-
-Best regards,
-
-Guillaume B.
-
---=-OUBJBSvMZdXnIR6xuoV1
-Content-Disposition: attachment;
-	filename=hci_usb.c-automatically-set-scofix-for-wl-btd202.patch
-Content-Type: text/x-patch;
-	name=hci_usb.c-automatically-set-scofix-for-wl-btd202.patch;
-	charset=utf-8
-Content-Transfer-Encoding: 7bit
-
---- drivers/bluetooth/hci_usb.c.orig	2008-01-26 11:33:36.000000000 +0100
-+++ drivers/bluetooth/hci_usb.c	2008-01-26 11:36:43.000000000 +0100
-@@ -98,6 +98,9 @@
- 	/* Canyon CN-BTU1 with HID interfaces */
- 	{ USB_DEVICE(0x0c10, 0x0000), .driver_info = HCI_RESET },
- 
-+	/* ASUS WL-BTD202 */
-+	{ USB_DEVICE(0x0b05, 0x1715), .driver_info = HCI_WRONG_SCO_MTU },
-+
- 	{ }	/* Terminating entry */
- };
- 
-
---=-OUBJBSvMZdXnIR6xuoV1
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---=-OUBJBSvMZdXnIR6xuoV1
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---=-OUBJBSvMZdXnIR6xuoV1--
+U29ycnkgZm9yIHRyaXBsZSBwb3N0aW5nIC4uLgoKTGUgc2FtZWRpIDI2IGphbnZpZXIgMjAwOCDD
+oCAxMDowMSArMDEwMCwgR3VpbGxhdW1lIEJlZG90IGEgw6ljcml0IDoKPiBoY2l0b29sIGNvbgo+
+IENvbm5lY3Rpb25zOgo+IAk+IEFDTCB4eDp4eDp4eDp4eDp4eDp4eCBoYW5kbGUgMTEgc3RhdGUg
+MSBsbSBTTEFWRSBBVVRIIEVOQ1JZUFQgU0VDVVJFIAo+IAk8IGVTQ08geHg6eHg6eHg6eHg6eHg6
+eHggaGFuZGxlIDAgc3RhdGUgOCBsbSBTTEFWRSAKCk9rYXksIHRoaXMgY29ubmV4aW9uIHdhcyBr
+ZXB0IGFsaXZlIGJ1dCBpc24ndCB1c2VkIGZvciBwbGF5YmFjay4KCkFuZCBJIGZvcmdvdCB0byB0
+ZWxsIHRoZSBjYXB0dXJlIHdvcmtzIHdpdGggYW4gb2xkZXIga2VybmVsIDoKdW5hbWUgLWEKTGlu
+dXggbG9jYWxob3N0IDIuNi4yMi4xMi1kZXNrdG9wLTFtZHYgIzEgU01QIFR1ZSBOb3YgMjAgMDg6
+Mzg6MjcgRVNUCjIwMDcgaTY4NiBBTUQgQXRobG9uKHRtKSBYUCAxODAwKyBHTlUvTGludXgKCmNv
+bm5leGlvbiBvcGVuZWQgd2hlbiB1c2luZyAiaGlmaSIgKHBsYXliYWNrKSA6CmhjaXRvb2wgY29u
+CkNvbm5lY3Rpb25zOgogICAgICAgID4gQUNMIDAwOjA3OkE0OkYyOkJDOjNGIGhhbmRsZSAxMSBz
+dGF0ZSAxIGxtIFNMQVZFIEFVVEggRU5DUllQVApTRUNVUkUgCgpjb25uZXhpb24gb3BlbmVkIHdo
+ZW4gdXNpbmcgInZvaWNlIiAoY2FwdHVyZSBhbmQgcGxheWJhY2spIDoKaGNpdG9vbCBjb24KQ29u
+bmVjdGlvbnM6CiAgICAgICAgPCBTQ08geHg6eHg6eHg6eHg6eHg6eHggaGFuZGxlIDEgc3RhdGUg
+MSBsbSBTTEFWRSAKICAgICAgICA+IEFDTCB4eDp4eDp4eDp4eDp4eDp4eCBoYW5kbGUgMTEgc3Rh
+dGUgMSBsbSBTTEFWRSBBVVRIIEVOQ1JZUFQKU0VDVVJFIAoKU28sIGhvdyBjYW4gSSBmb3JjZSB1
+c2Ugb2YgU0NPIGluc3RlYWQgb2YgZVNDTyA/CgpCZXN0IHJlZ2FyZHMsCgpHdWlsbGF1bWUgQi4K
+CgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogTWlj
+cm9zb2Z0CkRlZnkgYWxsIGNoYWxsZW5nZXMuIE1pY3Jvc29mdChSKSBWaXN1YWwgU3R1ZGlvIDIw
+MDguCmh0dHA6Ly9jbGsuYXRkbXQuY29tL01SVC9nby92c2UwMTIwMDAwMDcwbXJ0L2RpcmVjdC8w
+MS8KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXot
+ZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRw
+czovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
