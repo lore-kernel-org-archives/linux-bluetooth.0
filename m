@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <479D1EFB.9020005@gmail.com>
-Date: Mon, 28 Jan 2008 10:16:59 +1000
+Message-ID: <479D1BC0.6030306@gmail.com>
+Date: Mon, 28 Jan 2008 10:03:12 +1000
 From: Eugene <it.had.even@gmail.com>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <200801242256.33910.sa@claborn.net>
-In-Reply-To: <200801242256.33910.sa@claborn.net>
-Content-Type: multipart/mixed; boundary="------------080907040402000003010105"
-Subject: Re: [Bluez-users] How to setup a headset as an audio device?
- Getting "Device busy" errors
+References: <8CA2D771C11F4F5-14EC-2263@FRR1-L19.sis.aol.com>
+In-Reply-To: <8CA2D771C11F4F5-14EC-2263@FRR1-L19.sis.aol.com>
+Content-Type: multipart/mixed; boundary="------------050202010100050305060008"
+Subject: Re: [Bluez-users] Error cross compiling bluez-utils 3.9 ARM S3C2410
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,116 +21,92 @@ Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 This is a multi-part message in MIME format.
---------------080907040402000003010105
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+--------------050202010100050305060008
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-SA ?????:
+laurent-z@neuf.fr пишет:
 > Hello,
+>  
+> I’m having trouble cross-compiling bluez-utils 3.9 using this command 
+> line:
+> # ./configure –host=arm-linux –prefix=/opt/bluez_build 
+> –with-bluez-libs=/opt/bluez_build /lib 
+> –with-bluez-include=/opt/bluez_build /include
+>  
+> (I use gcc-arm-3.4.1 cross compiler and /opt/bluez_build is the 
+> destination folder)
+>  
+> and I get this message:
+>  
+> checking for BLUEZ... no
+> configure: error: Bluez library is required
+>  
+> I successfully compiled and installed bluez-libs3.9 with the following 
+> command:
+>  
+> # ./configure –host=arm-linux –prefix=/opt/bluez_build
+>  
+> I also successfully compiled and installed dbus-1.0.2 in case.
+>  
+> My point is I tried bluez-2.5 with the same method and everything went 
+> well and I was able to use my Bluetooth dongle.
+>  
+> I checked the mailing list and I’m not the only one facing this 
+> problem, but I don’t see any replies providing the solution to my problem.
+>  
+> Is anybody able to get this thing to work? Please help!
+>  
+> Thanks
+> ------------------------------------------------------------------------
 >
-> My boss has just purchased a "Jawbone" bluetooth headset (cell phone type) 
-> that he wants to hook up to his computer to use like skype.
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2008.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> ------------------------------------------------------------------------
 >
-> I found instructions for old btsco first, and plugz. I saw that btsco was 
-> outdated but I tried plugz and sbc first.
->
-> Then I saw on http://wiki.bluez.org/wiki/HOWTO/AudioDevices the following:
->
-> "Note: you will not need bluetooth-alsa, plugz, btsco or the like for audio to 
-> work. They are obsolete. "
->
-> The steps there are listed as
->
-> 1. Make sure the audio service is installed and enabled 
-> (file /etc/bluetooth/audio.service should exist)
->
-> 2. modify your ~/.asoundrc to contain
->
-> pcm.bluetooth {
->    type bluetooth
->    device 00:11:22:33:44:55
-> }
-> 3. configure your audio application to use the alsa device "bluetooth". See 
-> Supported Players 
-> http://wiki.bluez.org/wiki/HOWTO/AudioDevices#SupportedPlayers for some 
-> examples.
-> 4. start playing :) 
->
-> Which is wonderfully simple, but it did not work for me. I also tried it on my 
-> own computer. Both computers have OpenSuSE 10.3. I used the KDE bluetooth 
-> manager to pair the devices. It shows up correctly in "hcitool scan"
->
-> The correct Bluetooth address is 00:0D:3C:6F:0E:89, so I tried this on both 
-> computers (for the remainder of this email I will focus on my own computer - 
-> once I get it working here I can make it work on my boss's laptop too)
->
-> Here's my /etc/bluetooth/audio.service:
-> [Bluetooth Service]
-> Identifier=audio
-> Name=Audio service
-> Description=Bluetooth Audio service
->
->
-> Here's my ~/.asoundrc:
-> pcm.bluetooth {
->    type bluetooth
->    device 00:0D:3C:6F:0E:89
-> }
->
-> I have the following bluez packages installed:
->
-> bluez-utils-3.18-12
-> bluez-libs-3.18-5
->
->
-> When I try to configure any of the players as recommended by the page 
-> http://wiki.bluez.org/wiki/HOWTO/AudioDevices#SupportedPlayers the best 
-> response I get is "Device Busy" from amarok and Kaffiene (xine engine) like 
-> this:
->
-> "Audio output unavailable; the device is busy.
-> xine parameters: "
->
-> MPlayer, when I try to run the suggested command 
-> "mplayer -ao alsa:device=bluetooth"
-> prints out the options/argument list as though I'm using an incorrect command.
->
-> I can't configure audacious at all, under Audio the "Current output plugin" 
-> has no option to select, and all the other preferences are grayed out too.
->
-> Can anyone tell me what I need to do to make this work?
->
-> Thanks,
->
-> 	JW
->
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 >   
 Hello,
-try to
-aplay -v -D bluetooth './your-sound.wav'
-and send its output. Else, did you started bluetooth audio service?
-To check, use:
-ps ax | grep bluetoothd-service-audio
+This error shows that you have no /usr/lib/pkgconfig/bluez.pc file.
+Here is a corresponding part of ./configure :
+    pkg_cv_BLUEZ_CFLAGS=`$PKG_CONFIG --cflags "bluez" 2>/dev/null`
+
+    What pkg-config does (man):
+       pkg-config retrieves information about packages from  special  
+metadata
+       files. These files are named after the package, with the 
+extension .pc.
+       By default, pkg-config looks in the directory 
+prefix/lib/pkgconfig  for
+       these  files;  it  will  also  look in the colon-separated (on 
+Windows,
+       semicolon-separated) list of  directories  specified  by  the  
+PKG_CON‐
+       FIG_PATH environment variable.
+
+This file is included in libbluetooth-dev package (in case of Ubuntu), 
+or anyway it is
+obtained when compliling and installing bluez-libs.
+So check if you compiled and installed bluez-libs first.
 
 Regards,
 Eugene
 
-
---------------080907040402000003010105
+--------------050202010100050305060008
 Content-Type: text/x-vcard; charset=utf-8;
  name="it_had_even.vcf"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
 Content-Disposition: attachment;
  filename="it_had_even.vcf"
 
-begin:vcard
-fn:Eugene
-n:;Eugene
-version:2.1
-end:vcard
-
-
---------------080907040402000003010105
+YmVnaW46dmNhcmQNCmZuOkV1Z2VuZQ0Kbjo7RXVnZW5lDQp2ZXJzaW9uOjIuMQ0KZW5kOnZj
+YXJkDQoNCg==
+--------------050202010100050305060008
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -141,7 +116,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---------------080907040402000003010105
+--------------050202010100050305060008
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -152,4 +127,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---------------080907040402000003010105--
+--------------050202010100050305060008--
