@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Alexander Werle" <awerle@huebinet.de>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-References: <C9CD4450A0E5AA40A45E950BC0FAFD3E236131@server-1.huebinet.intern>
-	<479DBD23.1070408@infitsrl.com>
-In-Reply-To: <479DBD23.1070408@infitsrl.com>
-Date: Mon, 28 Jan 2008 13:14:13 +0100
-Message-ID: <000901c861a7$4bf7c1a0$e3e744e0$@de>
+Message-ID: <479DBD23.1070408@infitsrl.com>
+Date: Mon, 28 Jan 2008 12:31:47 +0100
+From: Fabrizio Guglielmino <guglielmino@infitsrl.com>
 MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <C9CD4450A0E5AA40A45E950BC0FAFD3E236131@server-1.huebinet.intern>
+In-Reply-To: <C9CD4450A0E5AA40A45E950BC0FAFD3E236131@server-1.huebinet.intern>
 Subject: Re: [Bluez-devel] Display text on remote device
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,20 +19,6 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
-
-Thx for the fast reply!
-
-Is there no option in the BlueZ api to send a short message text to a mobile
-device which is directly displayed on the device? =
-
-
------Urspr=FCngliche Nachricht-----
-Von: bluez-devel-bounces@lists.sourceforge.net
-[mailto:bluez-devel-bounces@lists.sourceforge.net] Im Auftrag von Fabrizio
-Guglielmino
-Gesendet: Montag, 28. Januar 2008 12:32
-An: BlueZ development
-Betreff: Re: [Bluez-devel] Display text on remote device
 
 Hi,
 generally the dialog box text is implemented in software of receiving =
@@ -117,18 +102,6 @@ ber =
 > Bluez-devel@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-devel
 >   =
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-
 
 
 -------------------------------------------------------------------------
