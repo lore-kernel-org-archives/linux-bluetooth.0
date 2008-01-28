@@ -1,12 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <479DBD23.1070408@infitsrl.com>
-Date: Mon, 28 Jan 2008 12:31:47 +0100
-From: Fabrizio Guglielmino <guglielmino@infitsrl.com>
-MIME-Version: 1.0
+From: Guillaume Bedot <littletux@zarb.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <C9CD4450A0E5AA40A45E950BC0FAFD3E236131@server-1.huebinet.intern>
-In-Reply-To: <C9CD4450A0E5AA40A45E950BC0FAFD3E236131@server-1.huebinet.intern>
-Subject: Re: [Bluez-devel] Display text on remote device
+In-Reply-To: <1201341845.7769.11.camel@localhost>
+References: <1201336771.22866.7.camel@littletux>
+	<1201338089.22866.14.camel@littletux>
+	<1201341845.7769.11.camel@localhost>
+Content-Type: multipart/mixed; boundary="=-N7L7+VT1Yi+o9Z2eL2tL"
+Date: Mon, 28 Jan 2008 09:43:27 +0100
+Message-Id: <1201509807.7254.7.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] HT820, capture and  eSCO
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,99 +19,99 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-generally the dialog box text is implemented in software of receiving =
 
-device. In case of mobile phones this is in the firmware so
-is not controllable from remote computer.
+--=-N7L7+VT1Yi+o9Z2eL2tL
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
+Re,
 
-Alexander Werle ha scritto:
->
-> Hi!
->
->  =
+An other (ugly?) patch that fixes this issue for me.
 
->
-> I'm working with BlueZ and OpenOBEX to discover devices, bond to one of
->
-> them and send a file to the remote device. In general there is displayed
->
-> a dialog on the device if I want to accept the file containing the name
->
-> of the file which is send. Is there any option in the BlueZ api to
->
-> change the text of this dialog, or to trigger the device to show another
->
-> one? Maybe it is possible to send a simple text message to the device,
->
-> but I haven't found anything helpful in the archive or the web.
->
->  =
+There are an other case, for incoming connections (headset->dongle), I
+guess, which is not taken into account, because i'm not sure what to
+do / how to test.
 
->
->  =
+Best regards,
 
->
-> Alexander Werle
-> Telefon 0261/50086-19
-> Telefax 0261/50086-29
-> E-Mail: awerle@huebinet.de <mailto:whebel@huebinet.de>
-> http://www.huebinet.de
->
-> HUEBINET Informationsmanagement GmbH & Co. KG
-> Maria Trost 23
-> 56070 Koblenz
->
-> Sitz und Registergericht: Koblenz HRA 5329
->
-> Pers=F6nlich haftender Gesellschafter der KG:
-> HUEBINET GmbH;
-> Sitz und Registergericht: Koblenz HRB 6857
->
-> Gesch=E4ftsf=FChrung:
-> Frank H=FCttmann; Michael Biemer
->
->
-> Der Nachrichtenaustausch mit HUEBINET Informationsmanagement GmbH & =
+Guillaume B.
 
-> Co. KG, Koblenz via E-Mail dient lediglich zu Informationszwecken. =
+--=-N7L7+VT1Yi+o9Z2eL2tL
+Content-Disposition: attachment;
+	filename=kernel-2.6.24-check-both-ends-for-esco-features.patch
+Content-Type: text/x-patch;
+	name=kernel-2.6.24-check-both-ends-for-esco-features.patch;
+	charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-> Rechtsgesch=E4ftliche Erkl=E4rungen mit verbindlichem Inhalt k=F6nnen =FC=
-ber =
+--- net/bluetooth/hci_conn.c.orig	2008-01-28 09:15:50.000000000 +0100
++++ net/bluetooth/hci_conn.c	2008-01-28 09:25:19.000000000 +0100
+@@ -332,6 +332,11 @@
+ 	if (type == ACL_LINK)
+ 		return acl;
+ 
++	if (lmp_esco_capable(hdev) && lmp_esco_capable(acl)) {
++		type=ESCO_LINK;
++	} else {
++		type=SCO_LINK;
++	}
+ 	if (!(sco = hci_conn_hash_lookup_ba(hdev, type, dst))) {
+ 		if (!(sco = hci_conn_add(hdev, type, dst))) {
+ 			hci_conn_put(acl);
+@@ -346,7 +351,7 @@
+ 
+ 	if (acl->state == BT_CONNECTED &&
+ 			(sco->state == BT_OPEN || sco->state == BT_CLOSED)) {
+-		if (lmp_esco_capable(hdev))
++		if (type==ESCO_LINK)
+ 			hci_setup_sync(sco, acl->handle);
+ 		else
+ 			hci_add_sco(sco, acl->handle);
+--- net/bluetooth/sco.c.orig	2008-01-28 09:15:14.000000000 +0100
++++ net/bluetooth/sco.c	2008-01-28 09:21:00.000000000 +0100
+@@ -189,7 +189,7 @@
+ 	struct sco_conn *conn;
+ 	struct hci_conn *hcon;
+ 	struct hci_dev  *hdev;
+-	int err, type;
++	int err;
+ 
+ 	BT_DBG("%s -> %s", batostr(src), batostr(dst));
+ 
+@@ -200,9 +200,7 @@
+ 
+ 	err = -ENOMEM;
+ 
+-	type = lmp_esco_capable(hdev) ? ESCO_LINK : SCO_LINK;
+-
+-	hcon = hci_connect(hdev, type, dst);
++	hcon = hci_connect(hdev, SCO_LINK, dst);
+ 	if (!hcon)
+ 		goto done;
+ 
 
-> dieses Medium nicht ausgetauscht werden, da die Manipulation von =
-
-> E-Mails durch Dritte nicht ausgeschlossen werden kann. =
-
->
->  =
-
->
-> ------------------------------------------------------------------------
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2008.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> ------------------------------------------------------------------------
->
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->   =
-
+--=-N7L7+VT1Yi+o9Z2eL2tL
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--=-N7L7+VT1Yi+o9Z2eL2tL
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--=-N7L7+VT1Yi+o9Z2eL2tL--
