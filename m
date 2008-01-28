@@ -1,15 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
 From: Guillaume Bedot <littletux@zarb.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1201341845.7769.11.camel@localhost>
-References: <1201336771.22866.7.camel@littletux>
-	<1201338089.22866.14.camel@littletux>
-	<1201341845.7769.11.camel@localhost>
-Content-Type: multipart/mixed; boundary="=-N7L7+VT1Yi+o9Z2eL2tL"
-Date: Mon, 28 Jan 2008 09:43:27 +0100
-Message-Id: <1201509807.7254.7.camel@localhost>
+In-Reply-To: <1201344161.7769.28.camel@localhost>
+References: <1200991632.7006.20.camel@localhost>
+	<1201002028.7978.159.camel@aeonflux>
+	<1201344161.7769.28.camel@localhost>
+Content-Type: multipart/mixed; boundary="=-aDPC7s4nabva3CPn04Zg"
+Date: Mon, 28 Jan 2008 09:38:43 +0100
+Message-Id: <1201509523.7254.1.camel@localhost>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] HT820, capture and  eSCO
+Subject: Re: [Bluez-devel] Asus WL-BTD202 needs force_scofix
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,77 +23,41 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---=-N7L7+VT1Yi+o9Z2eL2tL
+--=-aDPC7s4nabva3CPn04Zg
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-Re,
+Hello,
 
-An other (ugly?) patch that fixes this issue for me.
+Hopefully, this time a working patch :-)
 
-There are an other case, for incoming connections (headset->dongle), I
-guess, which is not taken into account, because i'm not sure what to
-do / how to test.
-
-Best regards,
+Regards,
 
 Guillaume B.
 
---=-N7L7+VT1Yi+o9Z2eL2tL
+
+--=-aDPC7s4nabva3CPn04Zg
 Content-Disposition: attachment;
-	filename=kernel-2.6.24-check-both-ends-for-esco-features.patch
+	filename=hci_usb.c-automatically-set-scofix-for-wl-btd202-v2.patch
 Content-Type: text/x-patch;
-	name=kernel-2.6.24-check-both-ends-for-esco-features.patch;
+	name=hci_usb.c-automatically-set-scofix-for-wl-btd202-v2.patch;
 	charset=utf-8
 Content-Transfer-Encoding: 7bit
 
---- net/bluetooth/hci_conn.c.orig	2008-01-28 09:15:50.000000000 +0100
-+++ net/bluetooth/hci_conn.c	2008-01-28 09:25:19.000000000 +0100
-@@ -332,6 +332,11 @@
- 	if (type == ACL_LINK)
- 		return acl;
+--- drivers/bluetooth/hci_usb.c.orig	2008-01-28 02:43:22.000000000 +0100
++++ drivers/bluetooth/hci_usb.c	2008-01-28 00:34:12.000000000 +0100
+@@ -104,6 +104,9 @@
+ MODULE_DEVICE_TABLE (usb, bluetooth_ids);
  
-+	if (lmp_esco_capable(hdev) && lmp_esco_capable(acl)) {
-+		type=ESCO_LINK;
-+	} else {
-+		type=SCO_LINK;
-+	}
- 	if (!(sco = hci_conn_hash_lookup_ba(hdev, type, dst))) {
- 		if (!(sco = hci_conn_add(hdev, type, dst))) {
- 			hci_conn_put(acl);
-@@ -346,7 +351,7 @@
- 
- 	if (acl->state == BT_CONNECTED &&
- 			(sco->state == BT_OPEN || sco->state == BT_CLOSED)) {
--		if (lmp_esco_capable(hdev))
-+		if (type==ESCO_LINK)
- 			hci_setup_sync(sco, acl->handle);
- 		else
- 			hci_add_sco(sco, acl->handle);
---- net/bluetooth/sco.c.orig	2008-01-28 09:15:14.000000000 +0100
-+++ net/bluetooth/sco.c	2008-01-28 09:21:00.000000000 +0100
-@@ -189,7 +189,7 @@
- 	struct sco_conn *conn;
- 	struct hci_conn *hcon;
- 	struct hci_dev  *hdev;
--	int err, type;
-+	int err;
- 
- 	BT_DBG("%s -> %s", batostr(src), batostr(dst));
- 
-@@ -200,9 +200,7 @@
- 
- 	err = -ENOMEM;
- 
--	type = lmp_esco_capable(hdev) ? ESCO_LINK : SCO_LINK;
--
--	hcon = hci_connect(hdev, type, dst);
-+	hcon = hci_connect(hdev, SCO_LINK, dst);
- 	if (!hcon)
- 		goto done;
+ static struct usb_device_id blacklist_ids[] = {
++	/* ASUS WL-BTD202 */
++	{ USB_DEVICE(0x0b05, 0x1715), .driver_info = HCI_WRONG_SCO_MTU },
++
+ 	/* CSR BlueCore devices */
+ 	{ USB_DEVICE(0x0a12, 0x0001), .driver_info = HCI_CSR },
  
 
---=-N7L7+VT1Yi+o9Z2eL2tL
+--=-aDPC7s4nabva3CPn04Zg
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -103,7 +67,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---=-N7L7+VT1Yi+o9Z2eL2tL
+--=-aDPC7s4nabva3CPn04Zg
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -114,4 +78,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-N7L7+VT1Yi+o9Z2eL2tL--
+--=-aDPC7s4nabva3CPn04Zg--
