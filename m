@@ -1,10 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Jan 2008 11:03:32 +0530 (IST)
-From: pramod gurav <pramod_gurav_etc@yahoo.co.in>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Message-ID: <228297.79374.qm@web8411.mail.in.yahoo.com>
-Subject: [Bluez-devel] trouble in headset connection
+References: <courier.479F910B.00002E18@softhome.net>
+	<20080129210226.GV5671@cathedrallabs.org>
+	<courier.479FA02D.0000617F@softhome.net>
+	<20080129221236.GW5671@cathedrallabs.org>
+In-Reply-To: <20080129221236.GW5671@cathedrallabs.org> 
+From: iemai@softhome.net
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Tue, 29 Jan 2008 16:17:27 -0700
+Mime-Version: 1.0
+Message-ID: <courier.479FB407.0000262B@softhome.net>
+Subject: Re: [Bluez-devel] PS3Remote patches
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,72 +19,80 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1884077271=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1884077271==
-Content-Type: multipart/alternative; boundary="0-1649127532-1201671212=:79374"
+Aristeu Rozanski writes: 
 
---0-1649127532-1201671212=:79374
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+> check if bluetoothd-service-input/hcid are running, they may be the old copy.
+> also, by default it'll be installed in /usr/local/...
+> Is uinput module loaded? is there anything on logs perhaps? 
+> 
+> -- 
+> Aristeu
+let's see:
+# ps ax|grep hcid
+4704 ?        Ss     0:00 /usr/sbin/hcid -x -s
+5323 pts/1    R+     0:00 grep hcid
+it seems is running.
+Right after I compiled the utils I restarted bluetooth service and had no 
+errors.
+But now I tried to first stop it:
+# /etc/init.d/bluetooth stop
+Stopping bluetooth: rfcomm hid_devicesSwitching device 0a12:0001 to HID mode 
+failed (Broken pipe)
+hidd hcid.
+then tried to start:
+# /etc/init.d/bluetooth start
+Starting bluetooth: hcid hidd hid_devicesNo devices in HCI mode found
+rfcomm. 
 
-hi All,=0Ai am trying to connect my BT headset to linux system thruogh rfco=
-mm=0AI am able to connect...=0Abut the connection lasts for only for few se=
-conds..after that it gets disconnected,.=0A=0AWhen i try to play audo file =
-using=0A[Pramod@localhost ~]$ mplayer_install/usr/local/bin/mplayer -ao als=
-a:device=3Dbluetooth 1.mp3=0Athis gives me error...=0A=0Abt_audio_service_o=
-pen: connect() failed: Connection refused (111)=0A[AO_ALSA] Playback open e=
-rror: Connection refused=0ACould not open/initialize audio device -> no sou=
-nd.=0AAudio: no sound=0AVideo: no video=0A=0ACan anyone please help me in t=
-his.????=0Awhats are the reason for these...dont i have alsa plugins or wha=
-t...=0Athanks in=0A advance..=0APramod=0A=0A=0A=0A      Get the freedom to =
-save as many mails as you wish. To know how, go to http://help.yahoo.com/l/=
-in/yahoo/mail/yahoomail/tools/tools-08.html
---0-1649127532-1201671212=:79374
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+I think I broke something...
+Here is some syslog
+ -This is when I attach the usb dongle:
+Jan 30 00:04:03 soulmate kernel: usb 3-1: new full speed USB device using 
+uhci_hcd and address 3
+Jan 30 00:04:03 soulmate kernel: usb 3-1: configuration #1 chosen from 1 
+choice
+Jan 30 00:04:03 soulmate hcid[3291]: HCI dev 0 registered
+Jan 30 00:04:03 soulmate hcid[3291]: HCI dev 0 up
+Jan 30 00:04:03 soulmate hcid[3291]: Device hci0 has been added
+Jan 30 00:04:03 soulmate hcid[3291]: Starting security manager 0
+Jan 30 00:04:03 soulmate hcid[3291]: Device hci0 has been activated
+ -press a button on the remote:
+Jan 30 00:07:40 soulmate hidd[3295]: New HID device XX:XX:XX:XX:XX:XX (Sony 
+Computer Entertainment Inc BD Remote Control)
+Jan 30 00:07:40 soulmate kernel: input: Sony Computer Entertainment Inc BD 
+Remote Control as /class/input/input6
+ -tried to stop the service:
+an 30 00:10:06 soulmate hidd[3295]: Exit
+Jan 30 00:10:06 soulmate hcid[3291]: Stopping SDP server
+Jan 30 00:10:06 soulmate hcid[3291]: Unregister path: /org/bluez/hci0
+Jan 30 00:10:06 soulmate hcid[3291]: Unregister path: /org/bluez
+Jan 30 00:10:06 soulmate hcid[3291]: Shutting down local server
+Jan 30 00:10:06 soulmate hcid[3291]: Exit
+ -tried to start the service:
+Jan 30 00:12:04 soulmate hcid[3856]: Bluetooth HCI daemon
+Jan 30 00:12:04 soulmate hcid[3856]: HCI dev 0 registered
+Jan 30 00:12:04 soulmate hcid[3856]: HCI dev 0 already up
+Jan 30 00:12:04 soulmate hcid[3856]: Device hci0 has been added
+Jan 30 00:12:04 soulmate hidd[3860]: Bluetooth HID daemon
+Jan 30 00:12:04 soulmate hcid[3856]: Starting security manager 0
+Jan 30 00:12:04 soulmate hcid[3856]: Device hci0 has been activated
+Jan 30 00:12:04 soulmate hcid[3856]: Starting SDP server
+Jan 30 00:12:04 soulmate hcid[3856]: Created local server at 
+unix:abstract=/var/run/dbus-DmTOlqsMvO,guid=fd5b47e83850bf415914b64e479fb2c4 
 
-<html><head><style type=3D"text/css"><!-- DIV {margin:0px;} --></style></he=
-ad><body><div style=3D"font-family:times new roman, new york, times, serif;=
-font-size:12pt"><div>hi All,<br>i am trying to connect my BT headset to lin=
-ux system thruogh rfcomm<br>I am able to connect...<br>but the connection l=
-asts for only for few seconds..after that it gets disconnected,.<br><br>Whe=
-n i try to play audo file using<br>[Pramod@localhost ~]$ mplayer_install/us=
-r/local/bin/mplayer -ao alsa:device=3Dbluetooth 1.mp3<br>this gives me erro=
-r...<br><br>bt_audio_service_open: connect() failed: Connection refused (11=
-1)<br>[AO_ALSA] Playback open error: Connection refused<br>Could not open/i=
-nitialize audio device -&gt; no sound.<br>Audio: no sound<br>Video: no vide=
-o<br><br>Can anyone please help me in this.????<br>whats are the reason for=
- these...dont i have alsa plugins or what...<br>thanks in=0A advance..<br>P=
-ramod</div></div><br>=0A=0A=0A      <!--3--><hr size=3D1></hr> Save all you=
-r chat conversations. <a href=3D"http://in.rd.yahoo.com/tagline_webmessenge=
-r_3/*http://in.messenger.yahoo.com/webmessengerpromo.php">Find them online.=
-</a></body></html>
---0-1649127532-1201671212=:79374--
+-- 
+Ciao, Emiliano. 
 
-
-
---===============1884077271==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1884077271==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1884077271==--
