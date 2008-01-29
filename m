@@ -1,10 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Jan 2008 13:28:50 +0100
-Message-ID: <C9CD4450A0E5AA40A45E950BC0FAFD3E236145@server-1.huebinet.intern>
+Date: Tue, 29 Jan 2008 00:12:20 -0500
+From: Aristeu Sergio Rozanski Filho <aris@cathedrallabs.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20080129051220.GC14674@jake.ruivo.org>
 MIME-Version: 1.0
-From: "Alexander Werle" <awerle@huebinet.de>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Cancel Openobex SendFile
+Subject: [Bluez-devel] [PATCH 2/4] add connect,
+	disconnect and is_connected methods to	fake_input
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,241 +15,151 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1695028417=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+This patch adds three methods to fake_input structure, in order to
+prepare fake_hid support addition.
 
---===============1695028417==
-Content-class: urn:content-classes:message
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C86272.8168E6A0"
+---
+ input/device.c |   68 ++++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 43 insertions(+), 25 deletions(-)
 
-This is a multi-part message in MIME format.
-
-------_=_NextPart_001_01C86272.8168E6A0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-Hi List,
-
-=20
-
-I wrote a tool which sends a short text file to each mobile device that =
-comes in reach. For that purpose I'm using the SendFile method from the =
-openobex dbus-api. If the receiver accepts the file the send process is =
-started and finished correctly, but when the receiver doesn't accept the =
-file transfer my tool is blocked until the receiver finishes the accept =
-dialog. By now I'm trying to implement some timeout mechanism by using =
-the Cancel () method on the established session, but I only get a no =
-reply warning. Disconnecting and closing the session doesn't work until =
-the operation in progress is stopped. Has anybody experience in stopping =
-an started obex transfer? Does the Cancel method need any parameters I'm =
-missing?
-
-=20
-
-Thx in advance!
-
-Alexander Werle
-Telefon 0261/50086-19
-Telefax 0261/50086-29
-E-Mail: awerle@huebinet.de <mailto:whebel@huebinet.de>=20
-http://www.huebinet.de <http://www.huebinet.de> =20
-
-HUEBINET Informationsmanagement GmbH & Co. KG
-Maria Trost 23
-56070 Koblenz
-
-Sitz und Registergericht: Koblenz HRA 5329
-
-Pers=F6nlich haftender Gesellschafter der KG:
-HUEBINET GmbH;
-Sitz und Registergericht: Koblenz HRB 6857
-
-Gesch=E4ftsf=FChrung:
-Frank H=FCttmann; Michael Biemer
-
-
-Der Nachrichtenaustausch mit HUEBINET Informationsmanagement GmbH & Co. =
-KG, Koblenz via E-Mail dient lediglich zu Informationszwecken. =
-Rechtsgesch=E4ftliche Erkl=E4rungen mit verbindlichem Inhalt k=F6nnen =
-=FCber dieses Medium nicht ausgetauscht werden, da die Manipulation von =
-E-Mails durch Dritte nicht ausgeschlossen werden kann.=20
-
-=20
-
-
-------_=_NextPart_001_01C86272.8168E6A0
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<html xmlns:v=3D"urn:schemas-microsoft-com:vml" =
-xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
-xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
-xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" =
-xmlns=3D"http://www.w3.org/TR/REC-html40">
-
-<head>
-<meta http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<meta name=3DGenerator content=3D"Microsoft Word 12 (filtered medium)">
-<style>
-<!--
- /* Font Definitions */
- @font-face
-	{font-family:"Cambria Math";
-	panose-1:2 4 5 3 5 4 6 3 2 4;}
-@font-face
-	{font-family:Calibri;
-	panose-1:2 15 5 2 2 2 4 3 2 4;}
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0cm;
-	margin-bottom:.0001pt;
-	font-size:11.0pt;
-	font-family:"Calibri","sans-serif";}
-a:link, span.MsoHyperlink
-	{mso-style-priority:99;
-	color:blue;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{mso-style-priority:99;
-	color:purple;
-	text-decoration:underline;}
-span.E-MailFormatvorlage17
-	{mso-style-type:personal-compose;
-	font-family:"Calibri","sans-serif";
-	color:windowtext;}
-.MsoChpDefault
-	{mso-style-type:export-only;}
-@page Section1
-	{size:612.0pt 792.0pt;
-	margin:70.85pt 70.85pt 2.0cm 70.85pt;}
-div.Section1
-	{page:Section1;}
--->
-</style>
-<!--[if gte mso 9]><xml>
- <o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
-</xml><![endif]--><!--[if gte mso 9]><xml>
- <o:shapelayout v:ext=3D"edit">
-  <o:idmap v:ext=3D"edit" data=3D"1" />
- </o:shapelayout></xml><![endif]-->
-</head>
-
-<body lang=3DDE link=3Dblue vlink=3Dpurple>
-
-<div class=3DSection1>
-
-<p class=3DMsoNormal>Hi List,<o:p></o:p></p>
-
-<p class=3DMsoNormal><o:p>&nbsp;</o:p></p>
-
-<p class=3DMsoNormal><span lang=3DEN-US>I wrote a tool which sends a =
-short text file
-to each mobile device that comes in reach. For that purpose I&#8217;m =
-using the
-SendFile method from the openobex dbus-api. If the receiver accepts the =
-file
-the send process is started and finished correctly, but when the =
-receiver doesn&#8217;t
-accept the file transfer my tool is blocked until the receiver finishes =
-the
-accept dialog. By now I&#8217;m trying to implement some timeout =
-mechanism by
-using the Cancel () method on the established session, but I only get a =
-no
-reply warning. Disconnecting and closing the session doesn&#8217;t work =
-until
-the operation in progress is stopped. Has anybody experience in stopping =
-an started
-obex transfer? Does the Cancel method need any parameters I&#8217;m =
-missing?<o:p></o:p></span></p>
-
-<p class=3DMsoNormal><span lang=3DEN-US><o:p>&nbsp;</o:p></span></p>
-
-<p class=3DMsoNormal><span lang=3DEN-US>Thx in =
-advance!<o:p></o:p></span></p>
-
-<p class=3DMsoNormal =
-style=3D'mso-margin-top-alt:auto;mso-margin-bottom-alt:auto'><span
-style=3D'font-size:10.0pt;font-family:"Arial","sans-serif"'>Alexander =
-Werle<br>
-Telefon 0261/50086-19<br>
-Telefax 0261/50086-29<br>
-E-Mail: </span><span style=3D'font-size:12.0pt;font-family:"Times New =
-Roman","serif"'><a
-href=3D"mailto:whebel@huebinet.de"><span =
-style=3D'font-size:10.0pt;font-family:
-"Arial","sans-serif";color:blue'>awerle@huebinet.de</span></a><br>
-</span><span =
-style=3D'font-size:10.0pt;font-family:"Arial","sans-serif"'><a
-href=3D"http://www.huebinet.de"><span =
-style=3D'color:blue'>http://www.huebinet.de</span></a></span><span
-style=3D'font-size:12.0pt;font-family:"Times New Roman","serif"'> =
-<o:p></o:p></span></p>
-
-<p class=3DMsoNormal =
-style=3D'mso-margin-top-alt:auto;mso-margin-bottom-alt:auto'><span
-style=3D'font-size:10.0pt;font-family:"Arial","sans-serif"'>HUEBINET
-Informationsmanagement GmbH &amp; Co. KG<br>
-Maria Trost 23<br>
-56070 Koblenz<br>
-<br>
-Sitz und Registergericht: Koblenz HRA 5329<br>
-<br>
-Pers=F6nlich haftender Gesellschafter der KG:<br>
-HUEBINET GmbH;<br>
-Sitz und Registergericht: Koblenz HRB 6857<br>
-<br>
-Gesch=E4ftsf=FChrung:<br>
-Frank H=FCttmann; Michael Biemer<br>
-<br>
-<br>
-Der Nachrichtenaustausch mit HUEBINET Informationsmanagement GmbH &amp; =
-Co. KG,
-Koblenz via E-Mail dient lediglich zu Informationszwecken. =
-Rechtsgesch=E4ftliche
-Erkl=E4rungen mit verbindlichem Inhalt k=F6nnen =FCber dieses Medium =
-nicht
-ausgetauscht werden, da die Manipulation von E-Mails durch Dritte nicht
-ausgeschlossen werden kann.&nbsp;</span><span style=3D'font-size:12.0pt;
-font-family:"Times New Roman","serif"'><o:p></o:p></span></p>
-
-<p class=3DMsoNormal><o:p>&nbsp;</o:p></p>
-
-</div>
-
-</body>
-
-</html>
-
-------_=_NextPart_001_01C86272.8168E6A0--
-
-
---===============1695028417==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+--- a/input/device.c	2008-01-28 23:33:25.000000000 -0500
++++ b/input/device.c	2008-01-28 23:33:27.000000000 -0500
+@@ -65,6 +65,9 @@ struct fake_input {
+ 	int		rfcomm; /* RFCOMM socket */
+ 	int		uinput;	/* uinput socket */
+ 	uint8_t		ch;	/* RFCOMM channel number */
++	gboolean 	(*connect)(struct device *idev);
++	int		(*disconnect)(struct device *idev);
++	int		(is_connected)(struct device *idev);
+ };
+ 
+ struct device {
+@@ -761,6 +764,26 @@ failed:
+ 	return FALSE;
+ }
+ 
++static int fake_disconnect(struct device *idev)
++{
++	struct fake_input *fake = idev->fake;
++
++	if (!fake->io)
++		return -ENOTCONN;
++
++	g_io_channel_close(fake->io);
++	g_io_channel_unref(fake->io);
++	fake->io = NULL;
++
++	if (fake->uinput >= 0) {
++		ioctl(fake->uinput, UI_DEV_DESTROY);
++		close(fake->uinput);
++		fake->uinput = -1;
++	}
++
++	return 0;
++}
++
+ static int disconnect(struct device *idev, uint32_t flags)
+ {
+ 	struct fake_input *fake = idev->fake;
+@@ -769,22 +792,8 @@ static int disconnect(struct device *ide
+ 	int ctl, err;
+ 
+ 	/* Fake input disconnect */
+-	if (fake) {
+-		if (!fake->io)
+-			return -ENOTCONN;
+-
+-		g_io_channel_close(fake->io);
+-		g_io_channel_unref(fake->io);
+-		fake->io = NULL;
+-
+-		if (fake->uinput >= 0) {
+-			ioctl(fake->uinput, UI_DEV_DESTROY);
+-			close(fake->uinput);
+-			fake->uinput = -1;
+-		}
+-
+-		return 0;
+-	}
++	if (fake)
++		return fake->disconnect(idev);
+ 
+ 	/* Standard HID disconnect */
+ 	if (idev->ctrl_sk >= 0) {
+@@ -837,12 +846,8 @@ static int is_connected(struct device *i
+ 	int ctl;
+ 
+ 	/* Fake input */
+-	if (fake) {
+-		if (fake->io)
+-			return 1;
+-		else
+-			return 0;
+-	}
++	if (fake)
++		return fake->is_connected(idev);
+ 
+ 	/* Standard HID */
+ 	ctl = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HIDP);
+@@ -871,6 +876,7 @@ static DBusHandlerResult device_connect(
+ 					DBusMessage *msg, void *data)
+ {
+ 	struct device *idev = data;
++	struct fake_input *fake = idev->fake;
+ 
+ 	if (idev->pending_connect)
+ 		return error_in_progress(conn, msg,
+@@ -882,11 +888,11 @@ static DBusHandlerResult device_connect(
+ 	idev->pending_connect = dbus_message_ref(msg);
+ 
+ 	/* Fake input device */
+-	if (idev->fake) {
+-		if (rfcomm_connect(idev) < 0) {
++	if (fake) {
++		if (fake->connect(idev) < 0) {
+ 			int err = errno;
+ 			const char *str = strerror(err);
+-			error("RFCOMM connect failed: %s(%d)", str, err);
++			error("Connect failed: %s(%d)", str, err);
+ 			dbus_message_unref(idev->pending_connect);
+ 			idev->pending_connect = NULL;
+ 			return error_connection_attempt_failed(conn,
+@@ -1120,6 +1126,15 @@ int input_device_register(DBusConnection
+ 	return err;
+ }
+ 
++static int fake_is_connected(struct device *idev)
++{
++	struct fake_input *fake = idev->fake;
++
++	if (fake->io)
++		return 1;
++	return 0;
++}
++
+ int fake_input_register(DBusConnection *conn, bdaddr_t *src,
+ 			bdaddr_t *dst, uint8_t ch, const char **ppath)
+ {
+@@ -1144,6 +1159,9 @@ int fake_input_register(DBusConnection *
+ 
+ 	idev->fake = g_new0(struct fake_input, 1);
+ 	idev->fake->ch = ch;
++	idev->fake->connect = rfcomm_connect;
++	idev->fake->disconnect = fake_disconnect;
++	idev->fake->is_connected = fake_is_connected;
+ 
+ 	err = register_path(conn, path, idev);
+ 
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1695028417==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1695028417==--
