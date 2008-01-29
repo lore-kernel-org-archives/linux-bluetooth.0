@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1201626119.6218.15.camel@violet>
-References: <1201227720.2389.17.camel@cookie.hadess.net>
-	<1201626119.6218.15.camel@violet>
-Date: Tue, 29 Jan 2008 17:24:06 +0000
-Message-Id: <1201627446.2389.121.camel@cookie.hadess.net>
+In-Reply-To: <20080129051226.GE14674@jake.ruivo.org>
+References: <20080129051226.GE14674@jake.ruivo.org>
+Date: Tue, 29 Jan 2008 17:34:11 +0100
+Message-Id: <1201624451.6218.13.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] client.c cleanup
+Subject: Re: [Bluez-devel] [PATCH 4/4] add support to ps3 remote controller
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,48 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Aristeu,
 
-On Tue, 2008-01-29 at 18:01 +0100, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > Some time ago I had problems with client.c's architecture. It would
-> > allow me to easily report completed discoveries without causing crashes.
-> > 
-> > The attached patch moves all the static variables into the main
-> > BluetoothClient object, and instead of return a new object when using
-> > _new() we return an existing instance of the client.
-> > 
-> > This makes no changes to the external API for the BluetoothClient, and
-> > should work just as well as older versions did.
-> 
-> patch has been applied. Don't really see the difference, but I am okay
-> with doing it this way.
+> And finally, adding support to PS3 remote controller.
 
-There's no differences in terms of the outside API, but it allows the
-signals coming back from hcid to have a reference to a BluetoothClient
-object and thus sending out signals, etc.
+lets use the common/uninput.h and update it if needed.
 
-> > A couple of bugs I found in client.c:
-> > - launch test-client with a dongle inserted, remove and reinsert the
-> > dongle, the bdaddr of the device is not set anymore
-> > - launch test-client without a dongle inserted, insert it, the bdaddr is
-> > not set and there's no children to the adapter (although there are if
-> > inserted when started)
-> > - launch test-client with a dongle inserted, remove it, add another one,
-> > the set of known devices underneath hasn't changed
-> > 
-> > All those problems exist in the old version of client.c, and I intend on
-> > fixing them, as well as making the search button work as expected in the
-> > device selection widget.
-> 
-> Send patches when you figured it out :)
+Regards
 
-I think for most of those it would mean clearing the children of the
-adapters (removing them from the tree). Not sure what's wrong about the
-bdaddr not appearing for newly inserted devices though, probably just a
-missing call.
+Marcel
 
-Cheers
 
 
 -------------------------------------------------------------------------
