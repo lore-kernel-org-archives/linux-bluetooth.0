@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Jan 2008 12:06:29 -0500
-From: Aristeu Rozanski <aris@ruivo.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20080129170629.GU5671@cathedrallabs.org>
-References: <20080129051224.GD14674@jake.ruivo.org>
-	<1201624340.6218.11.camel@violet>
-MIME-Version: 1.0
-In-Reply-To: <1201624340.6218.11.camel@violet>
-Subject: Re: [Bluez-devel] [PATCH 3/4] add support to fake HID devices
+In-Reply-To: <1201227720.2389.17.camel@cookie.hadess.net>
+References: <1201227720.2389.17.camel@cookie.hadess.net>
+Date: Tue, 29 Jan 2008 18:01:59 +0100
+Message-Id: <1201626119.6218.15.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] client.c cleanup
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,24 +20,40 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
-> > This patch adds support to fake HID devices. Instead of registering with
-> > kernel, the fake HID will be handled in user level and an uinput device
-> > will be created in order to get the events into input layer.
+Hi Bastien,
+
+> Some time ago I had problems with client.c's architecture. It would
+> allow me to easily report completed discoveries without causing crashes.
 > 
-> the filename should be fakehid.[ch].
-will do
+> The attached patch moves all the static variables into the main
+> BluetoothClient object, and instead of return a new object when using
+> _new() we return an existing instance of the client.
+> 
+> This makes no changes to the external API for the BluetoothClient, and
+> should work just as well as older versions did.
 
-> Why do we export struct device? Why is this needed? Can't it stay local?
-I thought it'd be useful in the future for new fakehid implementations.
-I guess it's a better idea to not do it and do when (and if) it's
-needed.
+patch has been applied. Don't really see the difference, but I am okay
+with doing it this way.
 
-Thanks for the comments Marcel, I'll work on them and repost the
-patches.
+> A couple of bugs I found in client.c:
+> - launch test-client with a dongle inserted, remove and reinsert the
+> dongle, the bdaddr of the device is not set anymore
+> - launch test-client without a dongle inserted, insert it, the bdaddr is
+> not set and there's no children to the adapter (although there are if
+> inserted when started)
+> - launch test-client with a dongle inserted, remove it, add another one,
+> the set of known devices underneath hasn't changed
+> 
+> All those problems exist in the old version of client.c, and I intend on
+> fixing them, as well as making the search button work as expected in the
+> device selection widget.
 
--- 
-Aristeu
+Send patches when you figured it out :)
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
