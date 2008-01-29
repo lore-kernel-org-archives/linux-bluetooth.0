@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Tue, 29 Jan 2008 11:59:39 -0500
+From: Aristeu Rozanski <aris@ruivo.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1201227720.2389.17.camel@cookie.hadess.net>
-References: <1201227720.2389.17.camel@cookie.hadess.net>
-Date: Tue, 29 Jan 2008 18:01:59 +0100
-Message-Id: <1201626119.6218.15.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] client.c cleanup
+Message-ID: <20080129165939.GT5671@cathedrallabs.org>
+References: <20080129051220.GC14674@jake.ruivo.org>
+	<1201624205.6218.9.camel@violet>
+MIME-Version: 1.0
+In-Reply-To: <1201624205.6218.9.camel@violet>
+Subject: Re: [Bluez-devel] [PATCH 2/4] add connect,
+	disconnect and	is_connected methods to fake_input
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,40 +22,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
-
-> Some time ago I had problems with client.c's architecture. It would
-> allow me to easily report completed discoveries without causing crashes.
+> Hi Aristeu,
 > 
-> The attached patch moves all the static variables into the main
-> BluetoothClient object, and instead of return a new object when using
-> _new() we return an existing instance of the client.
+> > This patch adds three methods to fake_input structure, in order to
+> > prepare fake_hid support addition.
 > 
-> This makes no changes to the external API for the BluetoothClient, and
-> should work just as well as older versions did.
+> looks good to me with the exception of is_connected. Why do we need
+> that. Can't we track that status based on connect and disconnect method?
+OK, will do it
 
-patch has been applied. Don't really see the difference, but I am okay
-with doing it this way.
-
-> A couple of bugs I found in client.c:
-> - launch test-client with a dongle inserted, remove and reinsert the
-> dongle, the bdaddr of the device is not set anymore
-> - launch test-client without a dongle inserted, insert it, the bdaddr is
-> not set and there's no children to the adapter (although there are if
-> inserted when started)
-> - launch test-client with a dongle inserted, remove it, add another one,
-> the set of known devices underneath hasn't changed
-> 
-> All those problems exist in the old version of client.c, and I intend on
-> fixing them, as well as making the search button work as expected in the
-> device selection widget.
-
-Send patches when you figured it out :)
-
-Regards
-
-Marcel
-
+-- 
+Aristeu
 
 
 -------------------------------------------------------------------------
