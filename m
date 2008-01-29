@@ -1,12 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300801291107y15ba6888n65c6841f8c95088f@mail.gmail.com>
-Date: Tue, 29 Jan 2008 12:07:03 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <50282bd30801290946l359dc7a6j29bb3b891ab35f9a@mail.gmail.com>
-MIME-Version: 1.0
-References: <50282bd30801290946l359dc7a6j29bb3b891ab35f9a@mail.gmail.com>
-Subject: Re: [Bluez-devel] ARM optimization
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1201630090.2389.132.camel@cookie.hadess.net>
+References: <1201227720.2389.17.camel@cookie.hadess.net>
+	<1201626119.6218.15.camel@violet>
+	<1201627446.2389.121.camel@cookie.hadess.net>
+	<1201628148.6218.23.camel@violet>
+	<1201630090.2389.132.camel@cookie.hadess.net>
+Date: Tue, 29 Jan 2008 19:14:00 +0100
+Message-Id: <1201630440.6218.31.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] client.c cleanup
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,56 +24,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hey
+Hi Bastien,
 
-The only thing I'd add here is the ugliness in putting the function
-declaration inside the ifdef is mitigated a bit by taking advantage
-instead of the ugliness of making the function non-static for all
-platforms.
+> > > I think for most of those it would mean clearing the children of the
+> > > adapters (removing them from the tree). Not sure what's wrong about the
+> > > bdaddr not appearing for newly inserted devices though, probably just a
+> > > missing call.
+> > 
+> > that is a bug or missing signal. Keeping the adapter allows us to keep
+> > the D-Bus proxy object and will prevent from duplicate signals. Removing
+> > the adapter would mean to also remove the signal handles etc. Seemed why
+> > to ugly for me.
+> 
+> I'm talking about removing the children (ie. the devices), not the
+> adapter itself. Which makes sense, as they shouldn't be associated with
+> a non-existant adapter.
 
-The thing to note here is the optimization will not take if gcc sees
-the function is static *or* inline.
+we can do that. Makes sense to me. Purge all children on adapter
+removal.
 
-It isn't perfect, but replacing the whole function with assembly will
-be even harder to maintain. We're really hurting on omap so we need to
-take some steps to get performance up.
+Regards
 
-diff -u -r1.56 sbc.c
---- sbc/sbc.c   29 Jan 2008 18:56:13 -0000      1.56
-+++ sbc/sbc.c   29 Jan 2008 19:03:06 -0000
-@@ -709,9 +709,13 @@
- }
-
-
--static inline void _sbc_analyze_four(const int32_t *in, int32_t *out)
-+void _sbc_analyze_four(const int32_t *in, int32_t *out)
- {
-+#ifdef __arm__
-+       sbc_extended_t register res asm("r4");
-+#else
-        sbc_extended_t res;
-+#endif
-        sbc_fixed_t t[8];
-        sbc_extended_t s[5];
-
-@@ -794,9 +798,13 @@
-                state->position[ch] = 36;
- }
-
--static inline void _sbc_analyze_eight(const int32_t *in, int32_t *out)
-+void _sbc_analyze_eight(const int32_t *in, int32_t *out)
- {
-+#ifdef __arm__
-+       sbc_extended_t register res asm("r4");
-+#else
-        sbc_extended_t res;
-+#endif
-        sbc_fixed_t t[8];
-        sbc_extended_t s[8];
+Marcel
 
 
--- 
-Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
