@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20080129051226.GE14674@jake.ruivo.org>
-References: <20080129051226.GE14674@jake.ruivo.org>
-Date: Tue, 29 Jan 2008 17:34:11 +0100
-Message-Id: <1201624451.6218.13.camel@violet>
+In-Reply-To: <1201278912.2389.39.camel@cookie.hadess.net>
+References: <1201228119.2389.20.camel@cookie.hadess.net>
+	<1201278912.2389.39.camel@cookie.hadess.net>
+Date: Tue, 29 Jan 2008 18:03:58 +0100
+Message-Id: <1201626238.6218.17.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH 4/4] add support to ps3 remote controller
+Subject: Re: [Bluez-devel] [PATCH] Make device selection look better
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,11 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Aristeu,
+Hi Bastien,
 
-> And finally, adding support to PS3 remote controller.
+> > Here's a patch to make the device selection widget look better, from the
+> > bug http://bugzilla.gnome.org/show_bug.cgi?id=505222
+> > 
+> > Before:
+> > http://bugzilla.gnome.org/attachment.cgi?id=103695&action=view
+> > After:
+> > http://bugzilla.gnome.org/attachment.cgi?id=103696&action=view
+> 
+> Updated patch with some fixes:
+> http://bugzilla.gnome.org/show_bug.cgi?id=505222#c18
 
-lets use the common/uninput.h and update it if needed.
+patch has been applied. Please check bluetooth-applet and make sure its
+usage of the device selector is correct and HIG compliant.
 
 Regards
 
