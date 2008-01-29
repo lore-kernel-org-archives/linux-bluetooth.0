@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20080129051220.GC14674@jake.ruivo.org>
-References: <20080129051220.GC14674@jake.ruivo.org>
-Date: Tue, 29 Jan 2008 17:30:05 +0100
-Message-Id: <1201624205.6218.9.camel@violet>
+In-Reply-To: <20080129051224.GD14674@jake.ruivo.org>
+References: <20080129051224.GD14674@jake.ruivo.org>
+Date: Tue, 29 Jan 2008 17:32:20 +0100
+Message-Id: <1201624340.6218.11.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH 2/4] add connect,
-	disconnect and	is_connected methods to	fake_input
+Subject: Re: [Bluez-devel] [PATCH 3/4] add support to fake HID devices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,11 +22,13 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Aristeu,
 
-> This patch adds three methods to fake_input structure, in order to
-> prepare fake_hid support addition.
+> This patch adds support to fake HID devices. Instead of registering with
+> kernel, the fake HID will be handled in user level and an uinput device
+> will be created in order to get the events into input layer.
 
-looks good to me with the exception of is_connected. Why do we need
-that. Can't we track that status based on connect and disconnect method?
+the filename should be fakehid.[ch].
+
+Why do we export struct device? Why is this needed? Can't it stay local?
 
 Regards
 
