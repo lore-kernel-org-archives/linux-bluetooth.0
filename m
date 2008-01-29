@@ -1,13 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1201278912.2389.39.camel@cookie.hadess.net>
-References: <1201228119.2389.20.camel@cookie.hadess.net>
-	<1201278912.2389.39.camel@cookie.hadess.net>
-Date: Tue, 29 Jan 2008 18:03:58 +0100
-Message-Id: <1201626238.6218.17.camel@violet>
+In-Reply-To: <20080129170629.GU5671@cathedrallabs.org>
+References: <20080129051224.GD14674@jake.ruivo.org>
+	<1201624340.6218.11.camel@violet>
+	<20080129170629.GU5671@cathedrallabs.org>
+Date: Tue, 29 Jan 2008 18:09:52 +0100
+Message-Id: <1201626592.6218.20.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Make device selection look better
+Subject: Re: [Bluez-devel] [PATCH 3/4] add support to fake HID devices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,21 +22,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Hi Aristeu,
 
-> > Here's a patch to make the device selection widget look better, from the
-> > bug http://bugzilla.gnome.org/show_bug.cgi?id=505222
-> > 
-> > Before:
-> > http://bugzilla.gnome.org/attachment.cgi?id=103695&action=view
-> > After:
-> > http://bugzilla.gnome.org/attachment.cgi?id=103696&action=view
-> 
-> Updated patch with some fixes:
-> http://bugzilla.gnome.org/show_bug.cgi?id=505222#c18
+> > Why do we export struct device? Why is this needed? Can't it stay local?
+> I thought it'd be useful in the future for new fakehid implementations.
+> I guess it's a better idea to not do it and do when (and if) it's
+> needed.
 
-patch has been applied. Please check bluetooth-applet and make sure its
-usage of the device selector is correct and HIG compliant.
+having things local is better. Unnecessary exports are more trouble than
+it is worth.
+
+> Thanks for the comments Marcel, I'll work on them and repost the
+> patches.
+
+Please do. And then I can check if we can get them in before the next
+release.
 
 Regards
 
