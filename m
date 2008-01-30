@@ -1,62 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Jan 2008 19:02:14 +0530 (IST)
-From: pramod gurav <pramod_gurav_etc@yahoo.co.in>
-To: Bluez-users@lists.sourceforge.net,
+Message-ID: <4f22d59a0801300443j3c9f338es3d3efae8edea5511@mail.gmail.com>
+Date: Wed, 30 Jan 2008 12:43:08 +0000
+From: "Pierre-Emmanuel DUBREUIL" <pedubreuil@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>,
 	bluez-devel <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-Message-ID: <206732.52353.qm@web8406.mail.in.yahoo.com>
-Subject: [Bluez-devel] Using HOWTO/SudioDevices on BlueZ
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1251351204=="
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Subject: [Bluez-users] BlueZ : to send pictures from a Java software
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0471037795=="
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
+List-ID: <bluez-devel.lists.sourceforge.net>
 
---===============1251351204==
-Content-Type: multipart/alternative; boundary="0-924320133-1201699934=:52353"
+--===============0471037795==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_7508_23701336.1201696988824"
 
---0-924320133-1201699934=:52353
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+------=_Part_7508_23701336.1201696988824
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
 
-hi All=0ACan anyone tell me what are the scripts on this link...=0Ahttp://w=
-iki.bluez.org/wiki/HOWTO/AudioDevices=0A are all about...???How can i run t=
-ehm...?=0Awhats service activation?how is it done...I have audio service ac=
-tivated..why is this script for?=0Awhat do the dbus commands do ? =0A=0APle=
-ase some one tell me these things...i am not able to pair and play the audi=
-o on my headset from=0Amy linux system...=0ACan anyone help me this???=0ATh=
-anks in Advance...=0APramod=0A=0A=0A=0A=0A=0A=0A=0A      Download prohibite=
-d? No problem. CHAT from any browser, without download. Go to http://in.mes=
-senger.yahoo.com/webmessengerpromo.php/
---0-924320133-1201699934=:52353
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+SGVsbG8uCgpJIGFtIGltcGxlbWVudGluZyBhIHNvZnR3YXJlIChub3cgaW4gSmF2YSwgYnV0IEkg
+YW0gcmVhZHkgdG8gY2hhbmdlIHRoZQpsYW5ndWFnZSBpZiBpdCBpcyByZXF1ZXN0ZWQpLCB1c2lu
+ZyBVU0IgYmx1ZXRvb3RoIGRvbmdsZXMgdG8gc2VuZCBKUEcgZmlsZXMKdG8gdGhlIHJlbW90ZSBk
+ZXZpY2VzLgpUbyBkbyB0aGF0LCBJIGFtIHVzaW5nIHRoZSBMaW51eCBjb21tYW5kIGxpbmUgImdu
+b21lLW9iZXgtc2VuZCAtLWRlc3QKLi4uLi4uIi4KQnV0IEkgaGF2ZSAyIHByb2JsZW1zIDoKMS8g
+SSBjYW5ub3QgY2hvb3NlIHRoZSBkb25nbGUgdGhhdCB3aWxsIGJlIHVzZWQgdG8gc2VuZCB0aGUg
+cGljdHVyZQoyLyBpZiB0aGUgc2VuZGluZyBmYWlscyAocmVtb3RlIGRldmljZSBpcyBhYnNlbnQg
+b3IgZG9lc24ndCBzdXBwb3J0IHRoYXQKcHJvdG9jb2wpLCB0aGUgcHJvY2VzcyBpcyBibG9ja2Vk
+LCB3YWl0aW5nIHRoYXQgc29tZW9uZSBjbGlja3Mgb24gdGhlIHdpbmRvdwphYm91dCB0aGUgZmFp
+bHVyZS4KClNvLCB3b3VsZCB5b3UgaGF2ZSBhbnkgaWRlYSB0byBoZWxwIG1lLCBwbGVhc2UgPwoK
+VGhhbmsgeW91LgoKClBpZXJyZS1FbW1hbnVlbCBEVUJSRVVJTAoKX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fCkVuZ2luZWVyaW5nIHN0dWRlbnQgb2YgSW5mb3Jt
+YXRpY3MKSW5mb3JtYXRpY3MgUmVzZWFyY2ggSW5zdGl0dXRlIChJUkkpLSBOZXdjYXN0bGUgVW5p
+dmVyc2l0eQpDb21wdXRpbmcgU2NpZW5jZSAtIFVuaXZlcnNpdMOpIGRlIFRlY2hub2xvZ2llIGRl
+IENvbXBpw6hnbmUgKFVUQykKTW9iaWxlIDogKzQ0ICgwKTc5MiAwMDM1IDE5MSAvICszMyAoMCk2
+IDIxIDIwIDM2IDE5CkZheCA6ICszMyAoMCk4IDIxIDQ4IDI5IDM3Cg==
+------=_Part_7508_23701336.1201696988824
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
 
-<html><head><style type=3D"text/css"><!-- DIV {margin:0px;} --></style></he=
-ad><body><div style=3D"font-family:times new roman, new york, times, serif;=
-font-size:12pt"><div>hi All<br>Can anyone tell me what are the scripts on t=
-his link...<br><span><a target=3D"_blank" href=3D"http://wiki.bluez.org/wik=
-i/HOWTO/AudioDevices">http://wiki.bluez.org/wiki/HOWTO/AudioDevices</a></sp=
-an><br>&nbsp;are all about...???How can i run tehm...?<br>whats service act=
-ivation?how is it done...I have audio service activated..why is this script=
- for?<br>what do the dbus commands do ? <br><br>Please some one tell me the=
-se things...i am not able to pair and play the audio on my headset from<br>=
-my linux system...<br>Can anyone help me this???<br>Thanks in Advance...<br=
->Pramod<br><br><br><br></div></div><br>=0A=0A=0A      <!--4--><hr size=3D1>=
-</hr> Forgot the famous last words? Access your message archive online. <a =
-href=3D"http://in.rd.yahoo.com/tagline_webmessenger_4/*http://in.messenger.=
-yahoo.com/webmessengerpromo.php">Click here.</a></body></html>
---0-924320133-1201699934=:52353--
+PGRpdj48Zm9udCBjb2xvcj0iIzJhMDBmZiIgc2l6ZT0iMiI+PC9mb250PkhlbGxvLjxicj4mbmJz
+cDs8YnI+SSBhbSBpbXBsZW1lbnRpbmcgYSBzb2Z0d2FyZSAobm93IGluIEphdmEsIGJ1dCBJIGFt
+IHJlYWR5IHRvIGNoYW5nZSB0aGUgbGFuZ3VhZ2UgaWYgaXQgaXMgcmVxdWVzdGVkKSwgdXNpbmcg
+VVNCIGJsdWV0b290aCBkb25nbGVzIHRvIHNlbmQgSlBHIGZpbGVzIHRvIHRoZSByZW1vdGUgZGV2
+aWNlcy48YnI+ClRvIGRvIHRoYXQsIEkgYW0gdXNpbmcgdGhlIExpbnV4IGNvbW1hbmQgbGluZSAm
+cXVvdDtnbm9tZS1vYmV4LXNlbmQgLS1kZXN0IC4uLi4uLiZxdW90Oy48YnI+QnV0Jm5ic3A7SSBo
+YXZlIDIgcHJvYmxlbXMgOiZuYnNwOzxicj4xLyBJIGNhbm5vdCBjaG9vc2UgdGhlIGRvbmdsZSB0
+aGF0IHdpbGwmbmJzcDtiZSB1c2VkIHRvIHNlbmQgdGhlIHBpY3R1cmU8YnI+Mi8mbmJzcDtpZiB0
+aGUgc2VuZGluZyBmYWlscyAocmVtb3RlIGRldmljZSBpcyBhYnNlbnQgb3IgZG9lc24mIzM5O3Qg
+c3VwcG9ydCB0aGF0IHByb3RvY29sKSwgdGhlIHByb2Nlc3MgaXMgYmxvY2tlZCwgd2FpdGluZyB0
+aGF0IHNvbWVvbmUgY2xpY2tzIG9uIHRoZSB3aW5kb3cgYWJvdXQgdGhlIGZhaWx1cmUuPGJyPgom
+bmJzcDs8L2Rpdj4KPGRpdj5Tbywgd291bGQgeW91IGhhdmUgYW55IGlkZWEgdG8gaGVscCBtZSwg
+cGxlYXNlID88L2Rpdj4KPGRpdj4mbmJzcDs8L2Rpdj4KPGRpdj5UaGFuayB5b3UuPC9kaXY+Cjxk
+aXY+Jm5ic3A7PC9kaXY+CjxkaXY+PGJyPlBpZXJyZS1FbW1hbnVlbCBEVUJSRVVJTDxicj48YnI+
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fPGJyPkVuZ2luZWVy
+aW5nIHN0dWRlbnQgb2YgSW5mb3JtYXRpY3M8YnI+SW5mb3JtYXRpY3MgUmVzZWFyY2ggSW5zdGl0
+dXRlIChJUkkpLSBOZXdjYXN0bGUgVW5pdmVyc2l0eTxicj5Db21wdXRpbmcgU2NpZW5jZSAtIFVu
+aXZlcnNpdMOpIGRlIFRlY2hub2xvZ2llIGRlIENvbXBpw6hnbmUgKFVUQyk8YnI+Ck1vYmlsZSA6
+ICs0NCAoMCk3OTIgMDAzNSAxOTEgLyArMzMgKDApNiAyMSAyMCAzNiAxOTxicj5GYXggOiArMzMg
+KDApOCAyMSA0OCAyOSAzNyA8L2Rpdj4K
+------=_Part_7508_23701336.1201696988824--
 
 
---===============1251351204==
+--===============0471037795==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -66,15 +82,15 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1251351204==
+--===============0471037795==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1251351204==--
+--===============0471037795==--
