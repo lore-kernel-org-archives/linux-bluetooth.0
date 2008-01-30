@@ -1,10 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Jan 2008 16:08:47 +0100
-Message-ID: <C9CD4450A0E5AA40A45E950BC0FAFD3E236156@server-1.huebinet.intern>
-MIME-Version: 1.0
-From: "Alexander Werle" <awerle@huebinet.de>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Usage Authorization-Agent
+Date: Wed, 30 Jan 2008 14:57:47 +0100
+From: Miguel <mc354@tid.es>
+In-reply-to: <4f22d59a0801300443j3c9f338es3d3efae8edea5511@mail.gmail.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-id: <1201701467.26421.8.camel@McM>
+MIME-version: 1.0
+References: <4f22d59a0801300443j3c9f338es3d3efae8edea5511@mail.gmail.com>
+Cc: bluez-devel <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [Bluez-users] BlueZ : to send pictures from a
+	Java software
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,138 +18,130 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1013888365=="
+Content-Type: multipart/mixed; boundary="===============1292945965=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
 
---===============1013888365==
-Content-class: urn:content-classes:message
-Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C86352.03F104D0"
-
-This is a multi-part message in MIME format.
-
-------_=_NextPart_001_01C86352.03F104D0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-Hi!
-
-=20
-
-After some hard work I managed to run the auth-agent in
-bluez-utils/daemon. When I run the python example from the bluez wiki
-the started auth-agent tells me "Authorization request for device
-AA:BB:CC:DD:EE:FF" but nothing else happens until the program exits.
-After program exit the auth-agent terminates and with him  bluez stack
-is gone. I expected that some authorization dialog is displayed on the
-remote device. What is my fault? Can somebody give me information about
-the auth-agent?=20
-
-=20
-
-=20
+--===============1292945965==
+Content-type: multipart/alternative;
+	boundary="Boundary_(ID_WfHF4jX9NxsKnUp24znLhw)"
 
 
-------_=_NextPart_001_01C86352.03F104D0
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+--Boundary_(ID_WfHF4jX9NxsKnUp24znLhw)
+Content-type: text/plain; charset=UTF-8
+Content-transfer-encoding: 8BIT
 
-<html xmlns:v=3D"urn:schemas-microsoft-com:vml" =
-xmlns:o=3D"urn:schemas-microsoft-com:office:office" =
-xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
-xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" =
-xmlns=3D"http://www.w3.org/TR/REC-html40">
+Avetana is the java implementation that people usually use. You can try
+it. An example is also given.
 
-<head>
-<meta http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Dus-ascii">
-<meta name=3DGenerator content=3D"Microsoft Word 12 (filtered medium)">
-<style>
-<!--
- /* Font Definitions */
- @font-face
-	{font-family:"Cambria Math";
-	panose-1:2 4 5 3 5 4 6 3 2 4;}
-@font-face
-	{font-family:Calibri;
-	panose-1:2 15 5 2 2 2 4 3 2 4;}
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0cm;
-	margin-bottom:.0001pt;
-	font-size:11.0pt;
-	font-family:"Calibri","sans-serif";}
-a:link, span.MsoHyperlink
-	{mso-style-priority:99;
-	color:blue;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{mso-style-priority:99;
-	color:purple;
-	text-decoration:underline;}
-span.E-MailFormatvorlage17
-	{mso-style-type:personal-compose;
-	font-family:"Calibri","sans-serif";
-	color:windowtext;}
-.MsoChpDefault
-	{mso-style-type:export-only;}
-@page Section1
-	{size:612.0pt 792.0pt;
-	margin:70.85pt 70.85pt 2.0cm 70.85pt;}
-div.Section1
-	{page:Section1;}
--->
-</style>
-<!--[if gte mso 9]><xml>
- <o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
-</xml><![endif]--><!--[if gte mso 9]><xml>
- <o:shapelayout v:ext=3D"edit">
-  <o:idmap v:ext=3D"edit" data=3D"1" />
- </o:shapelayout></xml><![endif]-->
-</head>
-
-<body lang=3DDE link=3Dblue vlink=3Dpurple>
-
-<div class=3DSection1>
-
-<p class=3DMsoNormal>Hi!<o:p></o:p></p>
-
-<p class=3DMsoNormal><o:p>&nbsp;</o:p></p>
-
-<p class=3DMsoNormal><span lang=3DEN-US>After some hard work I managed =
-to run the auth-agent
-in bluez-utils/daemon. When I run the python example from the bluez wiki =
-the
-started auth-agent tells me &#8220;Authorization request for device
-AA:BB:CC:DD:EE:FF&#8221; but nothing else happens until the program =
-exits.
-After program exit the auth-agent terminates and with him &nbsp;bluez =
-stack is
-gone. I expected that some authorization dialog is displayed on the =
-remote
-device. What is my fault? Can somebody give me information about the =
-auth-agent?
-<o:p></o:p></span></p>
-
-<p class=3DMsoNormal><span lang=3DEN-US><o:p>&nbsp;</o:p></span></p>
-
-<p class=3DMsoNormal><span lang=3DEN-US><o:p>&nbsp;</o:p></span></p>
-
-</div>
-
-</body>
-
-</html>
-
-------_=_NextPart_001_01C86352.03F104D0--
+good luck
+M
 
 
---===============1013888365==
+
+On Wed, 2008-01-30 at 12:43 +0000, Pierre-Emmanuel DUBREUIL wrote:
+> Hello.
+>  
+> I am implementing a software (now in Java, but I am ready to change
+> the language if it is requested), using USB bluetooth dongles to send
+> JPG files to the remote devices.
+> To do that, I am using the Linux command line "gnome-obex-send
+> --dest ......".
+> But I have 2 problems : 
+> 1/ I cannot choose the dongle that will be used to send the picture
+> 2/ if the sending fails (remote device is absent or doesn't support
+> that protocol), the process is blocked, waiting that someone clicks on
+> the window about the failure.
+>  
+> So, would you have any idea to help me, please ?
+>  
+> Thank you.
+>  
+> 
+> Pierre-Emmanuel DUBREUIL
+> 
+> _____________________________________________
+> Engineering student of Informatics
+> Informatics Research Institute (IRI)- Newcastle University
+> Computing Science - Université de Technologie de Compiègne (UTC)
+> Mobile : +44 (0)792 0035 191 / +33 (0)6 21 20 36 19
+> Fax : +33 (0)8 21 48 29 37 
+> 
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2008.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________ Bluez-users mailing list Bluez-users@lists.sourceforge.net https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--Boundary_(ID_WfHF4jX9NxsKnUp24znLhw)
+Content-type: text/html; charset=utf-8
+Content-transfer-encoding: 7BIT
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 TRANSITIONAL//EN">
+<HTML>
+<HEAD>
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=UTF-8">
+  <META NAME="GENERATOR" CONTENT="GtkHTML/3.14.1">
+</HEAD>
+<BODY>
+Avetana is the java implementation that people usually use. You can try it. An example is also given.<BR>
+<BR>
+good luck<BR>
+M<BR>
+<BR>
+<BR>
+<BR>
+On Wed, 2008-01-30 at 12:43 +0000, Pierre-Emmanuel DUBREUIL wrote:
+<BLOCKQUOTE TYPE=CITE>
+    <FONT COLOR="#000000">Hello.</FONT><BR>
+    <FONT COLOR="#000000">&nbsp;</FONT><BR>
+    <FONT COLOR="#000000">I am implementing a software (now in Java, but I am ready to change the language if it is requested), using USB bluetooth dongles to send JPG files to the remote devices.</FONT><BR>
+    <FONT COLOR="#000000">To do that, I am using the Linux command line &quot;gnome-obex-send --dest ......&quot;.</FONT><BR>
+    <FONT COLOR="#000000">But&nbsp;I have 2 problems :&nbsp;</FONT><BR>
+    <FONT COLOR="#000000">1/ I cannot choose the dongle that will&nbsp;be used to send the picture</FONT><BR>
+    <FONT COLOR="#000000">2/&nbsp;if the sending fails (remote device is absent or doesn't support that protocol), the process is blocked, waiting that someone clicks on the window about the failure.</FONT><BR>
+    <FONT COLOR="#000000">&nbsp;</FONT>
+</BLOCKQUOTE>
+<BLOCKQUOTE TYPE=CITE>
+    <FONT COLOR="#000000">So, would you have any idea to help me, please ?</FONT>
+</BLOCKQUOTE>
+<BLOCKQUOTE TYPE=CITE>
+    <FONT COLOR="#000000">&nbsp;</FONT>
+</BLOCKQUOTE>
+<BLOCKQUOTE TYPE=CITE>
+    <FONT COLOR="#000000">Thank you.</FONT>
+</BLOCKQUOTE>
+<BLOCKQUOTE TYPE=CITE>
+    <FONT COLOR="#000000">&nbsp;</FONT>
+</BLOCKQUOTE>
+<BLOCKQUOTE TYPE=CITE>
+    <BR>
+    <FONT COLOR="#000000">Pierre-Emmanuel DUBREUIL</FONT><BR>
+    <BR>
+    <FONT COLOR="#000000">_____________________________________________</FONT><BR>
+    <FONT COLOR="#000000">Engineering student of Informatics</FONT><BR>
+    <FONT COLOR="#000000">Informatics Research Institute (IRI)- Newcastle University</FONT><BR>
+    <FONT COLOR="#000000">Computing Science - Universit&#233; de Technologie de Compi&#232;gne (UTC)</FONT><BR>
+    <FONT COLOR="#000000">Mobile : +44 (0)792 0035 191 / +33 (0)6 21 20 36 19</FONT><BR>
+    <FONT COLOR="#000000">Fax : +33 (0)8 21 48 29 37 </FONT>
+</BLOCKQUOTE>
+<BLOCKQUOTE TYPE=CITE>
+<PRE>
+<FONT COLOR="#000000">-------------------------------------------------------------------------</FONT>
+<FONT COLOR="#000000">This SF.net email is sponsored by: Microsoft</FONT>
+<FONT COLOR="#000000">Defy all challenges. Microsoft(R) Visual Studio 2008.</FONT>
+<FONT COLOR="#000000"><A HREF="http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/">http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/</A></FONT>
+<FONT COLOR="#000000">_______________________________________________ Bluez-users mailing list <A HREF="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</A> <A HREF="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users</A></FONT>
+</PRE>
+</BLOCKQUOTE>
+</BODY>
+</HTML>
+
+--Boundary_(ID_WfHF4jX9NxsKnUp24znLhw)--
+
+
+--===============1292945965==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -155,7 +151,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1013888365==
+--===============1292945965==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -166,4 +162,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1013888365==--
+--===============1292945965==--
