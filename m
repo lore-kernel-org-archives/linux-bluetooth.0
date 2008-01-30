@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300801300941l43be84a0g2efa0959aacd0414@mail.gmail.com>
-Date: Wed, 30 Jan 2008 10:41:18 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <50282bd30801300907q6ce966b0x13fcd1c6dbac7a8b@mail.gmail.com>
-MIME-Version: 1.0
-References: <50282bd30801290946l359dc7a6j29bb3b891ab35f9a@mail.gmail.com>
-	<d89ddf300801291107y15ba6888n65c6841f8c95088f@mail.gmail.com>
-	<50282bd30801300907q6ce966b0x13fcd1c6dbac7a8b@mail.gmail.com>
-Subject: Re: [Bluez-devel] ARM optimization
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1201626119.6218.15.camel@violet>
+References: <1201227720.2389.17.camel@cookie.hadess.net>
+	<1201626119.6218.15.camel@violet>
+Date: Wed, 30 Jan 2008 17:31:29 +0000
+Message-Id: <1201714289.2389.227.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] client.c cleanup
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,13 +21,45 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Guys
 
-It may be useful to think of this as two different optimizations.
-First, making assignment happen outside the macro and nesting macros;
-second, adding an arm version of MULA.
+On Tue, 2008-01-29 at 18:01 +0100, Marcel Holtmann wrote:
+> Hi Bastien,
+> 
+> > Some time ago I had problems with client.c's architecture. It would
+> > allow me to easily report completed discoveries without causing crashes.
+> > 
+> > The attached patch moves all the static variables into the main
+> > BluetoothClient object, and instead of return a new object when using
+> > _new() we return an existing instance of the client.
+> > 
+> > This makes no changes to the external API for the BluetoothClient, and
+> > should work just as well as older versions did.
+> 
+> patch has been applied. Don't really see the difference, but I am okay
+> with doing it this way.
+> 
+> > A couple of bugs I found in client.c:
+> > - launch test-client with a dongle inserted, remove and reinsert the
+> > dongle, the bdaddr of the device is not set anymore
+> > - launch test-client without a dongle inserted, insert it, the bdaddr is
+> > not set and there's no children to the adapter (although there are if
+> > inserted when started)
 
-Brad
+Both of those are a race:
+When the AdapterAdded signal is launched in hcid, the address isn't
+available yet. It is available when "ModeChanged" has been launched
+though.
+
+hcid_dbus_register_device() setups the structures, and launched
+AdapterAdded, but the address is only set when hcid_dbus_start_device()
+is called (and the ModeChanged signal is launched).
+
+How do you think we should be handling that? I would think we should
+make GetAddress fail if the data isn't available yet, or hack around it
+in client.c and only setup the adapters when the mode changes.
+
+Cheers
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
