@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300801300819k583a931codf6cf224aebd8db3@mail.gmail.com>
-Date: Wed, 30 Jan 2008 09:19:07 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
+Message-ID: <50282bd30801300907q6ce966b0x13fcd1c6dbac7a8b@mail.gmail.com>
+Date: Wed, 30 Jan 2008 14:07:12 -0300
+From: "Cidorvan Leite" <cidorvan@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <d89ddf300801291107y15ba6888n65c6841f8c95088f@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_29512_12459325.1201712832128"
 References: <50282bd30801290946l359dc7a6j29bb3b891ab35f9a@mail.gmail.com>
 	<d89ddf300801291107y15ba6888n65c6841f8c95088f@mail.gmail.com>
 Subject: Re: [Bluez-devel] ARM optimization
@@ -17,457 +19,364 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel
+------=_Part_29512_12459325.1201712832128
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Cidorvan has a new proposal. It shifts MUL/MULA around so the
-assignment happens outside the macro. The good news is the assembly is
-now limited to a single ifdef around the macro definition. If we had
-to define eg MIPS code or something specialized it would be relatively
-quick & clean.
+Hi!
 
-The tricky part is he nests the use of the macro. I'll show you how he
-formatted it. Formatting it in a traditional way will get messy
-quickly unfortunately.
+I found another way to remove #ifdef from C file.
+I changed the format of MUL and MULA macros, but ARM assembly code is
+still necessary.
+This way is no longer necessary to declare a temporary variable with
+"register" and we can keep static inline functions.
 
-Index: sbc.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/sbc/sbc.c,v
-retrieving revision 1.57
-diff -u -p -r1.57 sbc.c
---- sbc.c	29 Jan 2008 19:47:49 -0000	1.57
-+++ sbc.c	30 Jan 2008 13:22:53 -0000
- -614,7 +614,8 @@ static inline void sbc_synthesize_four(s
- 		/* Distribute the new matrix value to the shifted position */
- 		SBC_FIXED_0(res);
- 		for (j = 0; j < 4; j++)
--			MULA(res, synmatrix4[i][j], frame->sb_sample[blk][ch][j]);
-+			res = MULA(synmatrix4[i][j],
-+					frame->sb_sample[blk][ch][j], res);
- 		state->V[ch][state->offset[ch][i]] = SCALE4_STAGED1(res);
- 	}
+On Jan 29, 2008 4:07 PM, Brad Midgley <bmidgley@gmail.com> wrote:
+> Hey
+>
+> The only thing I'd add here is the ugliness in putting the function
+> declaration inside the ifdef is mitigated a bit by taking advantage
+> instead of the ugliness of making the function non-static for all
+> platforms.
+>
+> The thing to note here is the optimization will not take if gcc sees
+> the function is static *or* inline.
+>
+> It isn't perfect, but replacing the whole function with assembly will
+> be even harder to maintain. We're really hurting on omap so we need to
+> take some steps to get performance up.
+>
+> diff -u -r1.56 sbc.c
+> --- sbc/sbc.c   29 Jan 2008 18:56:13 -0000      1.56
+> +++ sbc/sbc.c   29 Jan 2008 19:03:06 -0000
+> @@ -709,9 +709,13 @@
+>  }
+>
+>
+> -static inline void _sbc_analyze_four(const int32_t *in, int32_t *out)
+> +void _sbc_analyze_four(const int32_t *in, int32_t *out)
+>  {
+> +#ifdef __arm__
+> +       sbc_extended_t register res asm("r4");
+> +#else
+>         sbc_extended_t res;
+> +#endif
+>         sbc_fixed_t t[8];
+>         sbc_extended_t s[5];
+>
+> @@ -794,9 +798,13 @@
+>                 state->position[ch] = 36;
+>  }
+>
+> -static inline void _sbc_analyze_eight(const int32_t *in, int32_t *out)
+> +void _sbc_analyze_eight(const int32_t *in, int32_t *out)
+>  {
+> +#ifdef __arm__
+> +       sbc_extended_t register res asm("r4");
+> +#else
+>         sbc_extended_t res;
+> +#endif
+>         sbc_fixed_t t[8];
+>         sbc_extended_t s[8];
+>
+>
+> --
+> Brad
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2008.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
- -623,10 +624,10 @@ static inline void sbc_synthesize_four(s
- 		k = (i + 4) & 0xf;
- 		SBC_FIXED_0(res);
- 		for (j = 0; j < 10; idx++) {
--			MULA(res, state->V[ch][state->offset[ch][i]+j++],
--					sbc_proto_4_40m0[idx]);
--			MULA(res, state->V[ch][state->offset[ch][k]+j++],
--					sbc_proto_4_40m1[idx]);
-+			res = MULA(state->V[ch][state->offset[ch][i]+j++],
-+					sbc_proto_4_40m0[idx], res);
-+			res = MULA(state->V[ch][state->offset[ch][k]+j++],
-+					sbc_proto_4_40m1[idx], res);
- 		}
+------=_Part_29512_12459325.1201712832128
+Content-Type: text/x-patch; name=p.diff
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fc23wksu0
+Content-Disposition: attachment; filename=p.diff
 
- 		/* Store in output, Q0 */
- -655,7 +656,8 @@ static inline void sbc_synthesize_eight(
- 		SBC_FIXED_0(res);
- 		for (j = 0; j < 8; j++) {
- 			/* Q28 = Q15 * Q13 */
--			MULA(res, synmatrix8[i][j], frame->sb_sample[blk][ch][j]);
-+			res = MULA(synmatrix8[i][j],
-+					frame->sb_sample[blk][ch][j], res);
- 		}
- 		/* Q10 */
- 		state->V[ch][state->offset[ch][i]] = SCALE8_STAGED1(res);
- -666,8 +668,10 @@ static inline void sbc_synthesize_eight(
- 		k = (i + 8) & 0xf;
- 		SBC_FIXED_0(res);
- 		for (j = 0; j < 10; idx++) {
--			MULA(res, state->V[ch][state->offset[ch][i]+j++], sbc_proto_8_80m0[idx]);
--			MULA(res, state->V[ch][state->offset[ch][k]+j++], sbc_proto_8_80m1[idx]);
-+			res = MULA(state->V[ch][state->offset[ch][i]+j++],
-+					sbc_proto_8_80m0[idx], res);
-+			res = MULA(state->V[ch][state->offset[ch][k]+j++],
-+					sbc_proto_8_80m1[idx], res);
- 		}
- 		/* Store in output */
- 		frame->pcm_sample[ch][blk * 8 + i] = SCALE8_STAGED2(res); // Q0
- -708,67 +712,66 @@ static void sbc_encoder_init(struct sbc_
- 	state->position[0] = state->position[1] = 9 * frame->subbands;
- }
-
--
- static inline void _sbc_analyze_four(const int32_t *in, int32_t *out)
- {
--	sbc_extended_t res;
- 	sbc_fixed_t t[8];
- 	sbc_extended_t s[5];
-
--	MUL(res, _sbc_proto_4[0], in[8] - in[32]); /* Q18 */
--	MULA(res, _sbc_proto_4[1], in[16] - in[24]);
--	t[0] = SCALE4_STAGE1(res); /* Q8 */
--
--	MUL(res, _sbc_proto_4[2], in[1]);
--	MULA(res, _sbc_proto_4[3], in[9]);
--	MULA(res, _sbc_proto_4[4], in[17]);
--	MULA(res, _sbc_proto_4[5], in[25]);
--	MULA(res, _sbc_proto_4[6], in[33]);
--	t[1] = SCALE4_STAGE1(res);
--
--	MUL(res, _sbc_proto_4[7], in[2]);
--	MULA(res, _sbc_proto_4[8], in[10]);
--	MULA(res, _sbc_proto_4[9], in[18]);
--	MULA(res, _sbc_proto_4[10], in[26]);
--	MULA(res, _sbc_proto_4[11], in[34]);
--	t[2] = SCALE4_STAGE1(res);
--
--	MUL(res, _sbc_proto_4[12], in[3]);
--	MULA(res, _sbc_proto_4[13], in[11]);
--	MULA(res, _sbc_proto_4[14], in[19]);
--	MULA(res, _sbc_proto_4[15], in[27]);
--	MULA(res, _sbc_proto_4[16], in[35]);
--	t[3] = SCALE4_STAGE1(res);
--
--	MUL(res, _sbc_proto_4[17], in[4] + in[36]);
--	MULA(res, _sbc_proto_4[18], in[12] + in[28]);
--	MULA(res, _sbc_proto_4[19], in[20]);
--	t[4] = SCALE4_STAGE1(res);
--
--	MUL(res, _sbc_proto_4[16], in[5]);
--	MULA(res, _sbc_proto_4[15], in[13]);
--	MULA(res, _sbc_proto_4[14], in[21]);
--	MULA(res, _sbc_proto_4[13], in[29]);
--	MULA(res, _sbc_proto_4[12], in[37]);
--	t[5] = SCALE4_STAGE1(res);
-+	t[0] = SCALE4_STAGE1( /* Q8 */
-+		MULA(_sbc_proto_4[0], in[8] - in[32], /* Q18 */
-+		MUL( _sbc_proto_4[1], in[16] - in[24])));
-+
-+	t[1] = SCALE4_STAGE1(
-+		MULA(_sbc_proto_4[2], in[1],
-+		MULA(_sbc_proto_4[3], in[9],
-+		MULA(_sbc_proto_4[4], in[17],
-+		MULA(_sbc_proto_4[5], in[25],
-+		MUL( _sbc_proto_4[6], in[33]))))));
-+
-+	t[2] = SCALE4_STAGE1(
-+		MULA(_sbc_proto_4[7], in[2],
-+		MULA(_sbc_proto_4[8], in[10],
-+		MULA(_sbc_proto_4[9], in[18],
-+		MULA(_sbc_proto_4[10], in[26],
-+		MUL( _sbc_proto_4[11], in[34]))))));
-+
-+	t[3] = SCALE4_STAGE1(
-+		MULA(_sbc_proto_4[12], in[3],
-+		MULA(_sbc_proto_4[13], in[11],
-+		MULA(_sbc_proto_4[14], in[19],
-+		MULA(_sbc_proto_4[15], in[27],
-+		MUL( _sbc_proto_4[16], in[35]))))));
-+
-+	t[4] = SCALE4_STAGE1(
-+		MULA(_sbc_proto_4[17], in[4] + in[36],
-+		MULA(_sbc_proto_4[18], in[12] + in[28],
-+		MUL( _sbc_proto_4[19], in[20]))));
-+
-+	t[5] = SCALE4_STAGE1(
-+		MULA(_sbc_proto_4[16], in[5],
-+		MULA(_sbc_proto_4[15], in[13],
-+		MULA(_sbc_proto_4[14], in[21],
-+		MULA(_sbc_proto_4[13], in[29],
-+		MUL( _sbc_proto_4[12], in[37]))))));
-
- 	/* don't compute t[6]... this term always multiplies
- 	 * with cos(pi/2) = 0 */
-
--	MUL(res, _sbc_proto_4[6], in[7]);
--	MULA(res, _sbc_proto_4[5], in[15]);
--	MULA(res, _sbc_proto_4[4], in[23]);
--	MULA(res, _sbc_proto_4[3], in[31]);
--	MULA(res, _sbc_proto_4[2], in[39]);
--	t[7] = SCALE4_STAGE1(res);
--
--	MUL(s[0], _anamatrix4[0], t[0] + t[4]);
--	MUL(s[1], _anamatrix4[2], t[2]);
--	MUL(s[2], _anamatrix4[1], t[1] + t[3]);
--	MULA(s[2], _anamatrix4[3], t[5]);
--	MUL(s[3], _anamatrix4[3], t[1] + t[3]);
--	MULA(s[3], _anamatrix4[1], - t[5] + t[7]);
--	MUL(s[4], _anamatrix4[3], t[7]);
-+	t[7] = SCALE4_STAGE1(
-+		MULA(_sbc_proto_4[6], in[7],
-+		MULA(_sbc_proto_4[5], in[15],
-+		MULA(_sbc_proto_4[4], in[23],
-+		MULA(_sbc_proto_4[3], in[31],
-+		MUL( _sbc_proto_4[2], in[39]))))));
-+
-+	s[0] = MUL( _anamatrix4[0], t[0] + t[4]);
-+	s[1] = MUL( _anamatrix4[2], t[2]);
-+	s[2] = MULA(_anamatrix4[1], t[1] + t[3],
-+		MUL(_anamatrix4[3], t[5]));
-+	s[3] = MULA(_anamatrix4[3], t[1] + t[3],
-+		MUL(_anamatrix4[1], -t[5] + t[7]));
-+	s[4] = MUL( _anamatrix4[3], t[7]);
-+
- 	out[0] = SCALE4_STAGE2( s[0] + s[1] + s[2] + s[4]); /* Q0 */
- 	out[1] = SCALE4_STAGE2(-s[0] + s[1] + s[3]);
- 	out[2] = SCALE4_STAGE2(-s[0] + s[1] - s[3]);
- -796,117 +799,117 @@ static inline void sbc_analyze_four(stru
-
- static inline void _sbc_analyze_eight(const int32_t *in, int32_t *out)
- {
--	sbc_extended_t res;
- 	sbc_fixed_t t[8];
- 	sbc_extended_t s[8];
-
--	MUL(res,  _sbc_proto_8[0], (in[16] - in[64])); /* Q18 = Q18 * Q0 */
--	MULA(res, _sbc_proto_8[1], (in[32] - in[48]));
--	MULA(res, _sbc_proto_8[2], in[4]);
--	MULA(res, _sbc_proto_8[3], in[20]);
--	MULA(res, _sbc_proto_8[4], in[36]);
--	MULA(res, _sbc_proto_8[5], in[52]);
--	t[0] = SCALE8_STAGE1(res); /* Q10 */
--
--	MUL(res,   _sbc_proto_8[6], in[2]);
--	MULA(res,  _sbc_proto_8[7], in[18]);
--	MULA(res,  _sbc_proto_8[8], in[34]);
--	MULA(res,  _sbc_proto_8[9], in[50]);
--	MULA(res, _sbc_proto_8[10], in[66]);
--	t[1] = SCALE8_STAGE1(res);
--
--	MUL(res,  _sbc_proto_8[11], in[1]);
--	MULA(res, _sbc_proto_8[12], in[17]);
--	MULA(res, _sbc_proto_8[13], in[33]);
--	MULA(res, _sbc_proto_8[14], in[49]);
--	MULA(res, _sbc_proto_8[15], in[65]);
--	MULA(res, _sbc_proto_8[16], in[3]);
--	MULA(res, _sbc_proto_8[17], in[19]);
--	MULA(res, _sbc_proto_8[18], in[35]);
--	MULA(res, _sbc_proto_8[19], in[51]);
--	MULA(res, _sbc_proto_8[20], in[67]);
--	t[2] = SCALE8_STAGE1(res);
--
--	MUL(res,   _sbc_proto_8[21], in[5]);
--	MULA(res,  _sbc_proto_8[22], in[21]);
--	MULA(res,  _sbc_proto_8[23], in[37]);
--	MULA(res,  _sbc_proto_8[24], in[53]);
--	MULA(res,  _sbc_proto_8[25], in[69]);
--	MULA(res, -_sbc_proto_8[15], in[15]);
--	MULA(res, -_sbc_proto_8[14], in[31]);
--	MULA(res, -_sbc_proto_8[13], in[47]);
--	MULA(res, -_sbc_proto_8[12], in[63]);
--	MULA(res, -_sbc_proto_8[11], in[79]);
--	t[3] = SCALE8_STAGE1(res);
--
--	MUL(res,   _sbc_proto_8[26], in[6]);
--	MULA(res,  _sbc_proto_8[27], in[22]);
--	MULA(res,  _sbc_proto_8[28], in[38]);
--	MULA(res,  _sbc_proto_8[29], in[54]);
--	MULA(res,  _sbc_proto_8[30], in[70]);
--	MULA(res, -_sbc_proto_8[10], in[14]);
--	MULA(res,  -_sbc_proto_8[9], in[30]);
--	MULA(res,  -_sbc_proto_8[8], in[46]);
--	MULA(res,  -_sbc_proto_8[7], in[62]);
--	MULA(res,  -_sbc_proto_8[6], in[78]);
--	t[4] = SCALE8_STAGE1(res);
--
--	MUL(res,   _sbc_proto_8[31], in[7]);
--	MULA(res,  _sbc_proto_8[32], in[23]);
--	MULA(res,  _sbc_proto_8[33], in[39]);
--	MULA(res,  _sbc_proto_8[34], in[55]);
--	MULA(res,  _sbc_proto_8[35], in[71]);
--	MULA(res, -_sbc_proto_8[20], in[13]);
--	MULA(res, -_sbc_proto_8[19], in[29]);
--	MULA(res, -_sbc_proto_8[18], in[45]);
--	MULA(res, -_sbc_proto_8[17], in[61]);
--	MULA(res, -_sbc_proto_8[16], in[77]);
--	t[5] = SCALE8_STAGE1(res);
--
--	MUL(res,   _sbc_proto_8[36], in[8] + in[72]);
--	MULA(res,  _sbc_proto_8[37], in[24] + in[56]);
--	MULA(res,  _sbc_proto_8[38], in[40]);
--	MULA(res, -_sbc_proto_8[39], in[12]);
--	MULA(res,  -_sbc_proto_8[5], in[28]);
--	MULA(res,  -_sbc_proto_8[4], in[44]);
--	MULA(res,  -_sbc_proto_8[3], in[60]);
--	MULA(res,  -_sbc_proto_8[2], in[76]);
--	t[6] = SCALE8_STAGE1(res);
--
--	MUL(res,   _sbc_proto_8[35], in[9]);
--	MULA(res,  _sbc_proto_8[34], in[25]);
--	MULA(res,  _sbc_proto_8[33], in[41]);
--	MULA(res,  _sbc_proto_8[32], in[57]);
--	MULA(res,  _sbc_proto_8[31], in[73]);
--	MULA(res, -_sbc_proto_8[25], in[11]);
--	MULA(res, -_sbc_proto_8[24], in[27]);
--	MULA(res, -_sbc_proto_8[23], in[43]);
--	MULA(res, -_sbc_proto_8[22], in[59]);
--	MULA(res, -_sbc_proto_8[21], in[75]);
--	t[7] = SCALE8_STAGE1(res);
--
--	MUL(s[0], _anamatrix8[0], t[0]); /* = Q14 * Q10 */
--	MULA(s[0], _anamatrix8[1], t[6]);
--	MUL(s[1], _anamatrix8[7], t[1]);
--	MUL(s[2], _anamatrix8[2], t[2]);
--	MULA(s[2], _anamatrix8[3], t[3]);
--	MULA(s[2], _anamatrix8[4], t[5]);
--	MULA(s[2], _anamatrix8[5], t[7]);
--	MUL(s[3], _anamatrix8[6], t[4]);
--	MUL(s[4], _anamatrix8[3], t[2]);
--	MULA(s[4], -_anamatrix8[5], t[3]);
--	MULA(s[4], -_anamatrix8[2], t[5]);
--	MULA(s[4], -_anamatrix8[4], t[7]);
--	MUL(s[5], _anamatrix8[4], t[2]);
--	MULA(s[5], -_anamatrix8[2], t[3]);
--	MULA(s[5], _anamatrix8[5], t[5]);
--	MULA(s[5], _anamatrix8[3], t[7]);
--	MUL(s[6], _anamatrix8[1], t[0]);
--	MULA(s[6], -_anamatrix8[0], t[6]);
--	MUL(s[7], _anamatrix8[5], t[2]);
--	MULA(s[7], -_anamatrix8[4], t[3]);
--	MULA(s[7], _anamatrix8[3], t[5]);
--	MULA(s[7], -_anamatrix8[2], t[7]);
-+	t[0] = SCALE8_STAGE1( /* Q10 */
-+		MULA(_sbc_proto_8[0], (in[16] - in[64]), /* Q18 = Q18 * Q0 */
-+		MULA(_sbc_proto_8[1], (in[32] - in[48]),
-+		MULA(_sbc_proto_8[2], in[4],
-+		MULA(_sbc_proto_8[3], in[20],
-+		MULA(_sbc_proto_8[4], in[36],
-+		MUL( _sbc_proto_8[5], in[52])))))));
-+
-+	t[1] = SCALE8_STAGE1(
-+		MULA(_sbc_proto_8[6], in[2],
-+		MULA(_sbc_proto_8[7], in[18],
-+		MULA(_sbc_proto_8[8], in[34],
-+		MULA(_sbc_proto_8[9], in[50],
-+		MUL(_sbc_proto_8[10], in[66]))))));
-+
-+	t[2] = SCALE8_STAGE1(
-+		MULA(_sbc_proto_8[11], in[1],
-+		MULA(_sbc_proto_8[12], in[17],
-+		MULA(_sbc_proto_8[13], in[33],
-+		MULA(_sbc_proto_8[14], in[49],
-+		MULA(_sbc_proto_8[15], in[65],
-+		MULA(_sbc_proto_8[16], in[3],
-+		MULA(_sbc_proto_8[17], in[19],
-+		MULA(_sbc_proto_8[18], in[35],
-+		MULA(_sbc_proto_8[19], in[51],
-+		MUL( _sbc_proto_8[20], in[67])))))))))));
-+
-+	t[3] = SCALE8_STAGE1(
-+		MULA( _sbc_proto_8[21], in[5],
-+		MULA( _sbc_proto_8[22], in[21],
-+		MULA( _sbc_proto_8[23], in[37],
-+		MULA( _sbc_proto_8[24], in[53],
-+		MULA( _sbc_proto_8[25], in[69],
-+		MULA(-_sbc_proto_8[15], in[15],
-+		MULA(-_sbc_proto_8[14], in[31],
-+		MULA(-_sbc_proto_8[13], in[47],
-+		MULA(-_sbc_proto_8[12], in[63],
-+		MUL( -_sbc_proto_8[11], in[79])))))))))));
-+
-+	t[4] = SCALE8_STAGE1(
-+		MULA( _sbc_proto_8[26], in[6],
-+		MULA( _sbc_proto_8[27], in[22],
-+		MULA( _sbc_proto_8[28], in[38],
-+		MULA( _sbc_proto_8[29], in[54],
-+		MULA( _sbc_proto_8[30], in[70],
-+		MULA(-_sbc_proto_8[10], in[14],
-+		MULA(-_sbc_proto_8[9], in[30],
-+		MULA(-_sbc_proto_8[8], in[46],
-+		MULA(-_sbc_proto_8[7], in[62],
-+		MUL( -_sbc_proto_8[6], in[78])))))))))));
-+
-+	t[5] = SCALE8_STAGE1(
-+		MULA( _sbc_proto_8[31], in[7],
-+		MULA( _sbc_proto_8[32], in[23],
-+		MULA( _sbc_proto_8[33], in[39],
-+		MULA( _sbc_proto_8[34], in[55],
-+		MULA( _sbc_proto_8[35], in[71],
-+		MULA(-_sbc_proto_8[20], in[13],
-+		MULA(-_sbc_proto_8[19], in[29],
-+		MULA(-_sbc_proto_8[18], in[45],
-+		MULA(-_sbc_proto_8[17], in[61],
-+		MUL( -_sbc_proto_8[16], in[77])))))))))));
-+
-+	t[6] = SCALE8_STAGE1(
-+		MULA( _sbc_proto_8[36], (in[8] + in[72]),
-+		MULA( _sbc_proto_8[37], (in[24] + in[56]),
-+		MULA( _sbc_proto_8[38], in[40],
-+		MULA(-_sbc_proto_8[39], in[12],
-+		MULA(-_sbc_proto_8[5], in[28],
-+		MULA(-_sbc_proto_8[4], in[44],
-+		MULA(-_sbc_proto_8[3], in[60],
-+		MUL( -_sbc_proto_8[2], in[76])))))))));
-+
-+	t[7] = SCALE8_STAGE1(
-+		MULA( _sbc_proto_8[35], in[9],
-+		MULA( _sbc_proto_8[34], in[25],
-+		MULA( _sbc_proto_8[33], in[41],
-+		MULA( _sbc_proto_8[32], in[57],
-+		MULA( _sbc_proto_8[31], in[73],
-+		MULA(-_sbc_proto_8[25], in[11],
-+		MULA(-_sbc_proto_8[24], in[27],
-+		MULA(-_sbc_proto_8[23], in[43],
-+		MULA(-_sbc_proto_8[22], in[59],
-+		MUL( -_sbc_proto_8[21], in[75])))))))))));
-+
-+	s[0] = MULA(  _anamatrix8[0], t[0],
-+		MUL(  _anamatrix8[1], t[6]));
-+	s[1] = MUL(   _anamatrix8[7], t[1]);
-+	s[2] = MULA(  _anamatrix8[2], t[2],
-+		MULA( _anamatrix8[3], t[3],
-+		MULA( _anamatrix8[4], t[5],
-+		MUL(  _anamatrix8[5], t[7]))));
-+	s[3] = MUL(   _anamatrix8[6], t[4]);
-+	s[4] = MULA(  _anamatrix8[3], t[2],
-+		MULA(-_anamatrix8[5], t[3],
-+		MULA(-_anamatrix8[2], t[5],
-+		MUL( -_anamatrix8[4], t[7]))));
-+	s[5] = MULA(  _anamatrix8[4], t[2],
-+		MULA(-_anamatrix8[2], t[3],
-+		MULA( _anamatrix8[5], t[5],
-+		MUL(  _anamatrix8[3], t[7]))));
-+	s[6] = MULA(  _anamatrix8[1], t[0],
-+		MUL( -_anamatrix8[0], t[6]));
-+	s[7] = MULA(  _anamatrix8[5], t[2],
-+		MULA(-_anamatrix8[4], t[3],
-+		MULA( _anamatrix8[3], t[5],
-+		MUL( -_anamatrix8[2], t[7]))));
-+
- 	out[0] = SCALE8_STAGE2( s[0] + s[1] + s[2] + s[3]);
- 	out[1] = SCALE8_STAGE2( s[1] - s[3] + s[4] + s[6]);
- 	out[2] = SCALE8_STAGE2( s[1] - s[3] + s[5] - s[6]);
-Index: sbc_math.h
-===================================================================
-RCS file: /cvsroot/bluez/utils/sbc/sbc_math.h,v
-retrieving revision 1.12
-diff -u -p -r1.12 sbc_math.h
---- sbc_math.h	28 Jan 2008 18:00:51 -0000	1.12
-+++ sbc_math.h	30 Jan 2008 13:22:53 -0000
- -64,6 +64,17 @@ typedef long long sbc_extended_t;
- #define SBC_FIXED_0(val) { val = 0; }
- #define ADD(dst, src)    { dst += src; }
- #define SUB(dst, src)    { dst -= src; }
--#define MUL(dst, a, b)   { dst = (sbc_extended_t) (a) * (b); }
-+#define MUL(a, b)        ((sbc_extended_t)(a) * (b))
- #define DIV2(dst, src)   { dst = ASR(src, 1); }
--#define MULA(dst, a, b)  { dst += (sbc_extended_t) (a) * (b); }
-+
-+#ifdef __arm__
-+#define MULA(a, b, res) ({				\
-+		long long tmp = res;			\
-+		__asm__(				\
-+			"smlal %Q0, %R0, %2, %3"	\
-+			: "=&r" (tmp)			\
-+			: "0" (tmp), "r" (a), "r" (b));	\
-+		tmp; })
-+#else
-+#define MULA(a, b, res)  ((sbc_extended_t)(a) * (b) + (res))
-+#endif
-
-Brad
+SW5kZXg6IHNiYy5jCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT0KUkNTIGZpbGU6IC9jdnNyb290L2JsdWV6L3V0aWxzL3Ni
+Yy9zYmMuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS41NwpkaWZmIC11IC1wIC1yMS41NyBzYmMu
+YwotLS0gc2JjLmMJMjkgSmFuIDIwMDggMTk6NDc6NDkgLTAwMDAJMS41NworKysgc2JjLmMJMzAg
+SmFuIDIwMDggMTM6MjI6NTMgLTAwMDAKQEAgLTYxNCw3ICs2MTQsOCBAQCBzdGF0aWMgaW5saW5l
+IHZvaWQgc2JjX3N5bnRoZXNpemVfZm91cihzCiAJCS8qIERpc3RyaWJ1dGUgdGhlIG5ldyBtYXRy
+aXggdmFsdWUgdG8gdGhlIHNoaWZ0ZWQgcG9zaXRpb24gKi8KIAkJU0JDX0ZJWEVEXzAocmVzKTsK
+IAkJZm9yIChqID0gMDsgaiA8IDQ7IGorKykKLQkJCU1VTEEocmVzLCBzeW5tYXRyaXg0W2ldW2pd
+LCBmcmFtZS0+c2Jfc2FtcGxlW2Jsa11bY2hdW2pdKTsKKwkJCXJlcyA9IE1VTEEoc3lubWF0cml4
+NFtpXVtqXSwKKwkJCQkJZnJhbWUtPnNiX3NhbXBsZVtibGtdW2NoXVtqXSwgcmVzKTsKIAkJc3Rh
+dGUtPlZbY2hdW3N0YXRlLT5vZmZzZXRbY2hdW2ldXSA9IFNDQUxFNF9TVEFHRUQxKHJlcyk7CiAJ
+fQogCkBAIC02MjMsMTAgKzYyNCwxMCBAQCBzdGF0aWMgaW5saW5lIHZvaWQgc2JjX3N5bnRoZXNp
+emVfZm91cihzCiAJCWsgPSAoaSArIDQpICYgMHhmOwogCQlTQkNfRklYRURfMChyZXMpOwogCQlm
+b3IgKGogPSAwOyBqIDwgMTA7IGlkeCsrKSB7Ci0JCQlNVUxBKHJlcywgc3RhdGUtPlZbY2hdW3N0
+YXRlLT5vZmZzZXRbY2hdW2ldK2orK10sCi0JCQkJCXNiY19wcm90b180XzQwbTBbaWR4XSk7Ci0J
+CQlNVUxBKHJlcywgc3RhdGUtPlZbY2hdW3N0YXRlLT5vZmZzZXRbY2hdW2tdK2orK10sCi0JCQkJ
+CXNiY19wcm90b180XzQwbTFbaWR4XSk7CisJCQlyZXMgPSBNVUxBKHN0YXRlLT5WW2NoXVtzdGF0
+ZS0+b2Zmc2V0W2NoXVtpXStqKytdLAorCQkJCQlzYmNfcHJvdG9fNF80MG0wW2lkeF0sIHJlcyk7
+CisJCQlyZXMgPSBNVUxBKHN0YXRlLT5WW2NoXVtzdGF0ZS0+b2Zmc2V0W2NoXVtrXStqKytdLAor
+CQkJCQlzYmNfcHJvdG9fNF80MG0xW2lkeF0sIHJlcyk7CiAJCX0KIAogCQkvKiBTdG9yZSBpbiBv
+dXRwdXQsIFEwICovCkBAIC02NTUsNyArNjU2LDggQEAgc3RhdGljIGlubGluZSB2b2lkIHNiY19z
+eW50aGVzaXplX2VpZ2h0KAogCQlTQkNfRklYRURfMChyZXMpOwogCQlmb3IgKGogPSAwOyBqIDwg
+ODsgaisrKSB7CiAJCQkvKiBRMjggPSBRMTUgKiBRMTMgKi8KLQkJCU1VTEEocmVzLCBzeW5tYXRy
+aXg4W2ldW2pdLCBmcmFtZS0+c2Jfc2FtcGxlW2Jsa11bY2hdW2pdKTsKKwkJCXJlcyA9IE1VTEEo
+c3lubWF0cml4OFtpXVtqXSwKKwkJCQkJZnJhbWUtPnNiX3NhbXBsZVtibGtdW2NoXVtqXSwgcmVz
+KTsKIAkJfQogCQkvKiBRMTAgKi8KIAkJc3RhdGUtPlZbY2hdW3N0YXRlLT5vZmZzZXRbY2hdW2ld
+XSA9IFNDQUxFOF9TVEFHRUQxKHJlcyk7CkBAIC02NjYsOCArNjY4LDEwIEBAIHN0YXRpYyBpbmxp
+bmUgdm9pZCBzYmNfc3ludGhlc2l6ZV9laWdodCgKIAkJayA9IChpICsgOCkgJiAweGY7CiAJCVNC
+Q19GSVhFRF8wKHJlcyk7CiAJCWZvciAoaiA9IDA7IGogPCAxMDsgaWR4KyspIHsKLQkJCU1VTEEo
+cmVzLCBzdGF0ZS0+VltjaF1bc3RhdGUtPm9mZnNldFtjaF1baV0raisrXSwgc2JjX3Byb3RvXzhf
+ODBtMFtpZHhdKTsKLQkJCU1VTEEocmVzLCBzdGF0ZS0+VltjaF1bc3RhdGUtPm9mZnNldFtjaF1b
+a10raisrXSwgc2JjX3Byb3RvXzhfODBtMVtpZHhdKTsKKwkJCXJlcyA9IE1VTEEoc3RhdGUtPlZb
+Y2hdW3N0YXRlLT5vZmZzZXRbY2hdW2ldK2orK10sCisJCQkJCXNiY19wcm90b184XzgwbTBbaWR4
+XSwgcmVzKTsKKwkJCXJlcyA9IE1VTEEoc3RhdGUtPlZbY2hdW3N0YXRlLT5vZmZzZXRbY2hdW2td
+K2orK10sCisJCQkJCXNiY19wcm90b184XzgwbTFbaWR4XSwgcmVzKTsKIAkJfQogCQkvKiBTdG9y
+ZSBpbiBvdXRwdXQgKi8KIAkJZnJhbWUtPnBjbV9zYW1wbGVbY2hdW2JsayAqIDggKyBpXSA9IFND
+QUxFOF9TVEFHRUQyKHJlcyk7IC8vIFEwCkBAIC03MDgsNjcgKzcxMiw2NiBAQCBzdGF0aWMgdm9p
+ZCBzYmNfZW5jb2Rlcl9pbml0KHN0cnVjdCBzYmNfCiAJc3RhdGUtPnBvc2l0aW9uWzBdID0gc3Rh
+dGUtPnBvc2l0aW9uWzFdID0gOSAqIGZyYW1lLT5zdWJiYW5kczsKIH0KIAotCiBzdGF0aWMgaW5s
+aW5lIHZvaWQgX3NiY19hbmFseXplX2ZvdXIoY29uc3QgaW50MzJfdCAqaW4sIGludDMyX3QgKm91
+dCkKIHsKLQlzYmNfZXh0ZW5kZWRfdCByZXM7CiAJc2JjX2ZpeGVkX3QgdFs4XTsKIAlzYmNfZXh0
+ZW5kZWRfdCBzWzVdOwogCi0JTVVMKHJlcywgX3NiY19wcm90b180WzBdLCBpbls4XSAtIGluWzMy
+XSk7IC8qIFExOCAqLwotCU1VTEEocmVzLCBfc2JjX3Byb3RvXzRbMV0sIGluWzE2XSAtIGluWzI0
+XSk7Ci0JdFswXSA9IFNDQUxFNF9TVEFHRTEocmVzKTsgLyogUTggKi8KLQotCU1VTChyZXMsIF9z
+YmNfcHJvdG9fNFsyXSwgaW5bMV0pOwotCU1VTEEocmVzLCBfc2JjX3Byb3RvXzRbM10sIGluWzld
+KTsKLQlNVUxBKHJlcywgX3NiY19wcm90b180WzRdLCBpblsxN10pOwotCU1VTEEocmVzLCBfc2Jj
+X3Byb3RvXzRbNV0sIGluWzI1XSk7Ci0JTVVMQShyZXMsIF9zYmNfcHJvdG9fNFs2XSwgaW5bMzNd
+KTsKLQl0WzFdID0gU0NBTEU0X1NUQUdFMShyZXMpOwotCi0JTVVMKHJlcywgX3NiY19wcm90b180
+WzddLCBpblsyXSk7Ci0JTVVMQShyZXMsIF9zYmNfcHJvdG9fNFs4XSwgaW5bMTBdKTsKLQlNVUxB
+KHJlcywgX3NiY19wcm90b180WzldLCBpblsxOF0pOwotCU1VTEEocmVzLCBfc2JjX3Byb3RvXzRb
+MTBdLCBpblsyNl0pOwotCU1VTEEocmVzLCBfc2JjX3Byb3RvXzRbMTFdLCBpblszNF0pOwotCXRb
+Ml0gPSBTQ0FMRTRfU1RBR0UxKHJlcyk7Ci0KLQlNVUwocmVzLCBfc2JjX3Byb3RvXzRbMTJdLCBp
+blszXSk7Ci0JTVVMQShyZXMsIF9zYmNfcHJvdG9fNFsxM10sIGluWzExXSk7Ci0JTVVMQShyZXMs
+IF9zYmNfcHJvdG9fNFsxNF0sIGluWzE5XSk7Ci0JTVVMQShyZXMsIF9zYmNfcHJvdG9fNFsxNV0s
+IGluWzI3XSk7Ci0JTVVMQShyZXMsIF9zYmNfcHJvdG9fNFsxNl0sIGluWzM1XSk7Ci0JdFszXSA9
+IFNDQUxFNF9TVEFHRTEocmVzKTsKLQotCU1VTChyZXMsIF9zYmNfcHJvdG9fNFsxN10sIGluWzRd
+ICsgaW5bMzZdKTsKLQlNVUxBKHJlcywgX3NiY19wcm90b180WzE4XSwgaW5bMTJdICsgaW5bMjhd
+KTsKLQlNVUxBKHJlcywgX3NiY19wcm90b180WzE5XSwgaW5bMjBdKTsKLQl0WzRdID0gU0NBTEU0
+X1NUQUdFMShyZXMpOwotCi0JTVVMKHJlcywgX3NiY19wcm90b180WzE2XSwgaW5bNV0pOwotCU1V
+TEEocmVzLCBfc2JjX3Byb3RvXzRbMTVdLCBpblsxM10pOwotCU1VTEEocmVzLCBfc2JjX3Byb3Rv
+XzRbMTRdLCBpblsyMV0pOwotCU1VTEEocmVzLCBfc2JjX3Byb3RvXzRbMTNdLCBpblsyOV0pOwot
+CU1VTEEocmVzLCBfc2JjX3Byb3RvXzRbMTJdLCBpblszN10pOwotCXRbNV0gPSBTQ0FMRTRfU1RB
+R0UxKHJlcyk7CisJdFswXSA9IFNDQUxFNF9TVEFHRTEoIC8qIFE4ICovCisJCU1VTEEoX3NiY19w
+cm90b180WzBdLCBpbls4XSAtIGluWzMyXSwgLyogUTE4ICovCisJCU1VTCggX3NiY19wcm90b180
+WzFdLCBpblsxNl0gLSBpblsyNF0pKSk7CisKKwl0WzFdID0gU0NBTEU0X1NUQUdFMSgKKwkJTVVM
+QShfc2JjX3Byb3RvXzRbMl0sIGluWzFdLAorCQlNVUxBKF9zYmNfcHJvdG9fNFszXSwgaW5bOV0s
+CisJCU1VTEEoX3NiY19wcm90b180WzRdLCBpblsxN10sCisJCU1VTEEoX3NiY19wcm90b180WzVd
+LCBpblsyNV0sCisJCU1VTCggX3NiY19wcm90b180WzZdLCBpblszM10pKSkpKSk7CisKKwl0WzJd
+ID0gU0NBTEU0X1NUQUdFMSgKKwkJTVVMQShfc2JjX3Byb3RvXzRbN10sIGluWzJdLAorCQlNVUxB
+KF9zYmNfcHJvdG9fNFs4XSwgaW5bMTBdLAorCQlNVUxBKF9zYmNfcHJvdG9fNFs5XSwgaW5bMThd
+LAorCQlNVUxBKF9zYmNfcHJvdG9fNFsxMF0sIGluWzI2XSwKKwkJTVVMKCBfc2JjX3Byb3RvXzRb
+MTFdLCBpblszNF0pKSkpKSk7CisKKwl0WzNdID0gU0NBTEU0X1NUQUdFMSgKKwkJTVVMQShfc2Jj
+X3Byb3RvXzRbMTJdLCBpblszXSwKKwkJTVVMQShfc2JjX3Byb3RvXzRbMTNdLCBpblsxMV0sCisJ
+CU1VTEEoX3NiY19wcm90b180WzE0XSwgaW5bMTldLAorCQlNVUxBKF9zYmNfcHJvdG9fNFsxNV0s
+IGluWzI3XSwKKwkJTVVMKCBfc2JjX3Byb3RvXzRbMTZdLCBpblszNV0pKSkpKSk7CisKKwl0WzRd
+ID0gU0NBTEU0X1NUQUdFMSgKKwkJTVVMQShfc2JjX3Byb3RvXzRbMTddLCBpbls0XSArIGluWzM2
+XSwKKwkJTVVMQShfc2JjX3Byb3RvXzRbMThdLCBpblsxMl0gKyBpblsyOF0sCisJCU1VTCggX3Ni
+Y19wcm90b180WzE5XSwgaW5bMjBdKSkpKTsKKworCXRbNV0gPSBTQ0FMRTRfU1RBR0UxKAorCQlN
+VUxBKF9zYmNfcHJvdG9fNFsxNl0sIGluWzVdLAorCQlNVUxBKF9zYmNfcHJvdG9fNFsxNV0sIGlu
+WzEzXSwKKwkJTVVMQShfc2JjX3Byb3RvXzRbMTRdLCBpblsyMV0sCisJCU1VTEEoX3NiY19wcm90
+b180WzEzXSwgaW5bMjldLAorCQlNVUwoIF9zYmNfcHJvdG9fNFsxMl0sIGluWzM3XSkpKSkpKTsK
+IAogCS8qIGRvbid0IGNvbXB1dGUgdFs2XS4uLiB0aGlzIHRlcm0gYWx3YXlzIG11bHRpcGxpZXMK
+IAkgKiB3aXRoIGNvcyhwaS8yKSA9IDAgKi8KIAotCU1VTChyZXMsIF9zYmNfcHJvdG9fNFs2XSwg
+aW5bN10pOwotCU1VTEEocmVzLCBfc2JjX3Byb3RvXzRbNV0sIGluWzE1XSk7Ci0JTVVMQShyZXMs
+IF9zYmNfcHJvdG9fNFs0XSwgaW5bMjNdKTsKLQlNVUxBKHJlcywgX3NiY19wcm90b180WzNdLCBp
+blszMV0pOwotCU1VTEEocmVzLCBfc2JjX3Byb3RvXzRbMl0sIGluWzM5XSk7Ci0JdFs3XSA9IFND
+QUxFNF9TVEFHRTEocmVzKTsKLQotCU1VTChzWzBdLCBfYW5hbWF0cml4NFswXSwgdFswXSArIHRb
+NF0pOwotCU1VTChzWzFdLCBfYW5hbWF0cml4NFsyXSwgdFsyXSk7Ci0JTVVMKHNbMl0sIF9hbmFt
+YXRyaXg0WzFdLCB0WzFdICsgdFszXSk7Ci0JTVVMQShzWzJdLCBfYW5hbWF0cml4NFszXSwgdFs1
+XSk7Ci0JTVVMKHNbM10sIF9hbmFtYXRyaXg0WzNdLCB0WzFdICsgdFszXSk7Ci0JTVVMQShzWzNd
+LCBfYW5hbWF0cml4NFsxXSwgLSB0WzVdICsgdFs3XSk7Ci0JTVVMKHNbNF0sIF9hbmFtYXRyaXg0
+WzNdLCB0WzddKTsKKwl0WzddID0gU0NBTEU0X1NUQUdFMSgKKwkJTVVMQShfc2JjX3Byb3RvXzRb
+Nl0sIGluWzddLAorCQlNVUxBKF9zYmNfcHJvdG9fNFs1XSwgaW5bMTVdLAorCQlNVUxBKF9zYmNf
+cHJvdG9fNFs0XSwgaW5bMjNdLAorCQlNVUxBKF9zYmNfcHJvdG9fNFszXSwgaW5bMzFdLAorCQlN
+VUwoIF9zYmNfcHJvdG9fNFsyXSwgaW5bMzldKSkpKSkpOworCisJc1swXSA9IE1VTCggX2FuYW1h
+dHJpeDRbMF0sIHRbMF0gKyB0WzRdKTsKKwlzWzFdID0gTVVMKCBfYW5hbWF0cml4NFsyXSwgdFsy
+XSk7CisJc1syXSA9IE1VTEEoX2FuYW1hdHJpeDRbMV0sIHRbMV0gKyB0WzNdLAorCQlNVUwoX2Fu
+YW1hdHJpeDRbM10sIHRbNV0pKTsKKwlzWzNdID0gTVVMQShfYW5hbWF0cml4NFszXSwgdFsxXSAr
+IHRbM10sCisJCU1VTChfYW5hbWF0cml4NFsxXSwgLXRbNV0gKyB0WzddKSk7CisJc1s0XSA9IE1V
+TCggX2FuYW1hdHJpeDRbM10sIHRbN10pOworCiAJb3V0WzBdID0gU0NBTEU0X1NUQUdFMiggc1sw
+XSArIHNbMV0gKyBzWzJdICsgc1s0XSk7IC8qIFEwICovCiAJb3V0WzFdID0gU0NBTEU0X1NUQUdF
+Migtc1swXSArIHNbMV0gKyBzWzNdKTsKIAlvdXRbMl0gPSBTQ0FMRTRfU1RBR0UyKC1zWzBdICsg
+c1sxXSAtIHNbM10pOwpAQCAtNzk2LDExNyArNzk5LDExNyBAQCBzdGF0aWMgaW5saW5lIHZvaWQg
+c2JjX2FuYWx5emVfZm91cihzdHJ1CiAKIHN0YXRpYyBpbmxpbmUgdm9pZCBfc2JjX2FuYWx5emVf
+ZWlnaHQoY29uc3QgaW50MzJfdCAqaW4sIGludDMyX3QgKm91dCkKIHsKLQlzYmNfZXh0ZW5kZWRf
+dCByZXM7CiAJc2JjX2ZpeGVkX3QgdFs4XTsKIAlzYmNfZXh0ZW5kZWRfdCBzWzhdOwogCi0JTVVM
+KHJlcywgIF9zYmNfcHJvdG9fOFswXSwgKGluWzE2XSAtIGluWzY0XSkpOyAvKiBRMTggPSBRMTgg
+KiBRMCAqLwotCU1VTEEocmVzLCBfc2JjX3Byb3RvXzhbMV0sIChpblszMl0gLSBpbls0OF0pKTsK
+LQlNVUxBKHJlcywgX3NiY19wcm90b184WzJdLCBpbls0XSk7Ci0JTVVMQShyZXMsIF9zYmNfcHJv
+dG9fOFszXSwgaW5bMjBdKTsKLQlNVUxBKHJlcywgX3NiY19wcm90b184WzRdLCBpblszNl0pOwot
+CU1VTEEocmVzLCBfc2JjX3Byb3RvXzhbNV0sIGluWzUyXSk7Ci0JdFswXSA9IFNDQUxFOF9TVEFH
+RTEocmVzKTsgLyogUTEwICovCi0KLQlNVUwocmVzLCAgIF9zYmNfcHJvdG9fOFs2XSwgaW5bMl0p
+OwotCU1VTEEocmVzLCAgX3NiY19wcm90b184WzddLCBpblsxOF0pOwotCU1VTEEocmVzLCAgX3Ni
+Y19wcm90b184WzhdLCBpblszNF0pOwotCU1VTEEocmVzLCAgX3NiY19wcm90b184WzldLCBpbls1
+MF0pOwotCU1VTEEocmVzLCBfc2JjX3Byb3RvXzhbMTBdLCBpbls2Nl0pOwotCXRbMV0gPSBTQ0FM
+RThfU1RBR0UxKHJlcyk7Ci0KLQlNVUwocmVzLCAgX3NiY19wcm90b184WzExXSwgaW5bMV0pOwot
+CU1VTEEocmVzLCBfc2JjX3Byb3RvXzhbMTJdLCBpblsxN10pOwotCU1VTEEocmVzLCBfc2JjX3By
+b3RvXzhbMTNdLCBpblszM10pOwotCU1VTEEocmVzLCBfc2JjX3Byb3RvXzhbMTRdLCBpbls0OV0p
+OwotCU1VTEEocmVzLCBfc2JjX3Byb3RvXzhbMTVdLCBpbls2NV0pOwotCU1VTEEocmVzLCBfc2Jj
+X3Byb3RvXzhbMTZdLCBpblszXSk7Ci0JTVVMQShyZXMsIF9zYmNfcHJvdG9fOFsxN10sIGluWzE5
+XSk7Ci0JTVVMQShyZXMsIF9zYmNfcHJvdG9fOFsxOF0sIGluWzM1XSk7Ci0JTVVMQShyZXMsIF9z
+YmNfcHJvdG9fOFsxOV0sIGluWzUxXSk7Ci0JTVVMQShyZXMsIF9zYmNfcHJvdG9fOFsyMF0sIGlu
+WzY3XSk7Ci0JdFsyXSA9IFNDQUxFOF9TVEFHRTEocmVzKTsKLQotCU1VTChyZXMsICAgX3NiY19w
+cm90b184WzIxXSwgaW5bNV0pOwotCU1VTEEocmVzLCAgX3NiY19wcm90b184WzIyXSwgaW5bMjFd
+KTsKLQlNVUxBKHJlcywgIF9zYmNfcHJvdG9fOFsyM10sIGluWzM3XSk7Ci0JTVVMQShyZXMsICBf
+c2JjX3Byb3RvXzhbMjRdLCBpbls1M10pOwotCU1VTEEocmVzLCAgX3NiY19wcm90b184WzI1XSwg
+aW5bNjldKTsKLQlNVUxBKHJlcywgLV9zYmNfcHJvdG9fOFsxNV0sIGluWzE1XSk7Ci0JTVVMQShy
+ZXMsIC1fc2JjX3Byb3RvXzhbMTRdLCBpblszMV0pOwotCU1VTEEocmVzLCAtX3NiY19wcm90b184
+WzEzXSwgaW5bNDddKTsKLQlNVUxBKHJlcywgLV9zYmNfcHJvdG9fOFsxMl0sIGluWzYzXSk7Ci0J
+TVVMQShyZXMsIC1fc2JjX3Byb3RvXzhbMTFdLCBpbls3OV0pOwotCXRbM10gPSBTQ0FMRThfU1RB
+R0UxKHJlcyk7Ci0KLQlNVUwocmVzLCAgIF9zYmNfcHJvdG9fOFsyNl0sIGluWzZdKTsKLQlNVUxB
+KHJlcywgIF9zYmNfcHJvdG9fOFsyN10sIGluWzIyXSk7Ci0JTVVMQShyZXMsICBfc2JjX3Byb3Rv
+XzhbMjhdLCBpblszOF0pOwotCU1VTEEocmVzLCAgX3NiY19wcm90b184WzI5XSwgaW5bNTRdKTsK
+LQlNVUxBKHJlcywgIF9zYmNfcHJvdG9fOFszMF0sIGluWzcwXSk7Ci0JTVVMQShyZXMsIC1fc2Jj
+X3Byb3RvXzhbMTBdLCBpblsxNF0pOwotCU1VTEEocmVzLCAgLV9zYmNfcHJvdG9fOFs5XSwgaW5b
+MzBdKTsKLQlNVUxBKHJlcywgIC1fc2JjX3Byb3RvXzhbOF0sIGluWzQ2XSk7Ci0JTVVMQShyZXMs
+ICAtX3NiY19wcm90b184WzddLCBpbls2Ml0pOwotCU1VTEEocmVzLCAgLV9zYmNfcHJvdG9fOFs2
+XSwgaW5bNzhdKTsKLQl0WzRdID0gU0NBTEU4X1NUQUdFMShyZXMpOwotCi0JTVVMKHJlcywgICBf
+c2JjX3Byb3RvXzhbMzFdLCBpbls3XSk7Ci0JTVVMQShyZXMsICBfc2JjX3Byb3RvXzhbMzJdLCBp
+blsyM10pOwotCU1VTEEocmVzLCAgX3NiY19wcm90b184WzMzXSwgaW5bMzldKTsKLQlNVUxBKHJl
+cywgIF9zYmNfcHJvdG9fOFszNF0sIGluWzU1XSk7Ci0JTVVMQShyZXMsICBfc2JjX3Byb3RvXzhb
+MzVdLCBpbls3MV0pOwotCU1VTEEocmVzLCAtX3NiY19wcm90b184WzIwXSwgaW5bMTNdKTsKLQlN
+VUxBKHJlcywgLV9zYmNfcHJvdG9fOFsxOV0sIGluWzI5XSk7Ci0JTVVMQShyZXMsIC1fc2JjX3By
+b3RvXzhbMThdLCBpbls0NV0pOwotCU1VTEEocmVzLCAtX3NiY19wcm90b184WzE3XSwgaW5bNjFd
+KTsKLQlNVUxBKHJlcywgLV9zYmNfcHJvdG9fOFsxNl0sIGluWzc3XSk7Ci0JdFs1XSA9IFNDQUxF
+OF9TVEFHRTEocmVzKTsKLQotCU1VTChyZXMsICAgX3NiY19wcm90b184WzM2XSwgaW5bOF0gKyBp
+bls3Ml0pOwotCU1VTEEocmVzLCAgX3NiY19wcm90b184WzM3XSwgaW5bMjRdICsgaW5bNTZdKTsK
+LQlNVUxBKHJlcywgIF9zYmNfcHJvdG9fOFszOF0sIGluWzQwXSk7Ci0JTVVMQShyZXMsIC1fc2Jj
+X3Byb3RvXzhbMzldLCBpblsxMl0pOwotCU1VTEEocmVzLCAgLV9zYmNfcHJvdG9fOFs1XSwgaW5b
+MjhdKTsKLQlNVUxBKHJlcywgIC1fc2JjX3Byb3RvXzhbNF0sIGluWzQ0XSk7Ci0JTVVMQShyZXMs
+ICAtX3NiY19wcm90b184WzNdLCBpbls2MF0pOwotCU1VTEEocmVzLCAgLV9zYmNfcHJvdG9fOFsy
+XSwgaW5bNzZdKTsKLQl0WzZdID0gU0NBTEU4X1NUQUdFMShyZXMpOwotCi0JTVVMKHJlcywgICBf
+c2JjX3Byb3RvXzhbMzVdLCBpbls5XSk7Ci0JTVVMQShyZXMsICBfc2JjX3Byb3RvXzhbMzRdLCBp
+blsyNV0pOwotCU1VTEEocmVzLCAgX3NiY19wcm90b184WzMzXSwgaW5bNDFdKTsKLQlNVUxBKHJl
+cywgIF9zYmNfcHJvdG9fOFszMl0sIGluWzU3XSk7Ci0JTVVMQShyZXMsICBfc2JjX3Byb3RvXzhb
+MzFdLCBpbls3M10pOwotCU1VTEEocmVzLCAtX3NiY19wcm90b184WzI1XSwgaW5bMTFdKTsKLQlN
+VUxBKHJlcywgLV9zYmNfcHJvdG9fOFsyNF0sIGluWzI3XSk7Ci0JTVVMQShyZXMsIC1fc2JjX3By
+b3RvXzhbMjNdLCBpbls0M10pOwotCU1VTEEocmVzLCAtX3NiY19wcm90b184WzIyXSwgaW5bNTld
+KTsKLQlNVUxBKHJlcywgLV9zYmNfcHJvdG9fOFsyMV0sIGluWzc1XSk7Ci0JdFs3XSA9IFNDQUxF
+OF9TVEFHRTEocmVzKTsKLQotCU1VTChzWzBdLCBfYW5hbWF0cml4OFswXSwgdFswXSk7IC8qID0g
+UTE0ICogUTEwICovCi0JTVVMQShzWzBdLCBfYW5hbWF0cml4OFsxXSwgdFs2XSk7Ci0JTVVMKHNb
+MV0sIF9hbmFtYXRyaXg4WzddLCB0WzFdKTsKLQlNVUwoc1syXSwgX2FuYW1hdHJpeDhbMl0sIHRb
+Ml0pOwotCU1VTEEoc1syXSwgX2FuYW1hdHJpeDhbM10sIHRbM10pOwotCU1VTEEoc1syXSwgX2Fu
+YW1hdHJpeDhbNF0sIHRbNV0pOwotCU1VTEEoc1syXSwgX2FuYW1hdHJpeDhbNV0sIHRbN10pOwot
+CU1VTChzWzNdLCBfYW5hbWF0cml4OFs2XSwgdFs0XSk7Ci0JTVVMKHNbNF0sIF9hbmFtYXRyaXg4
+WzNdLCB0WzJdKTsKLQlNVUxBKHNbNF0sIC1fYW5hbWF0cml4OFs1XSwgdFszXSk7Ci0JTVVMQShz
+WzRdLCAtX2FuYW1hdHJpeDhbMl0sIHRbNV0pOwotCU1VTEEoc1s0XSwgLV9hbmFtYXRyaXg4WzRd
+LCB0WzddKTsKLQlNVUwoc1s1XSwgX2FuYW1hdHJpeDhbNF0sIHRbMl0pOwotCU1VTEEoc1s1XSwg
+LV9hbmFtYXRyaXg4WzJdLCB0WzNdKTsKLQlNVUxBKHNbNV0sIF9hbmFtYXRyaXg4WzVdLCB0WzVd
+KTsKLQlNVUxBKHNbNV0sIF9hbmFtYXRyaXg4WzNdLCB0WzddKTsKLQlNVUwoc1s2XSwgX2FuYW1h
+dHJpeDhbMV0sIHRbMF0pOwotCU1VTEEoc1s2XSwgLV9hbmFtYXRyaXg4WzBdLCB0WzZdKTsKLQlN
+VUwoc1s3XSwgX2FuYW1hdHJpeDhbNV0sIHRbMl0pOwotCU1VTEEoc1s3XSwgLV9hbmFtYXRyaXg4
+WzRdLCB0WzNdKTsKLQlNVUxBKHNbN10sIF9hbmFtYXRyaXg4WzNdLCB0WzVdKTsKLQlNVUxBKHNb
+N10sIC1fYW5hbWF0cml4OFsyXSwgdFs3XSk7CisJdFswXSA9IFNDQUxFOF9TVEFHRTEoIC8qIFEx
+MCAqLworCQlNVUxBKF9zYmNfcHJvdG9fOFswXSwgKGluWzE2XSAtIGluWzY0XSksIC8qIFExOCA9
+IFExOCAqIFEwICovCisJCU1VTEEoX3NiY19wcm90b184WzFdLCAoaW5bMzJdIC0gaW5bNDhdKSwK
+KwkJTVVMQShfc2JjX3Byb3RvXzhbMl0sIGluWzRdLAorCQlNVUxBKF9zYmNfcHJvdG9fOFszXSwg
+aW5bMjBdLAorCQlNVUxBKF9zYmNfcHJvdG9fOFs0XSwgaW5bMzZdLAorCQlNVUwoIF9zYmNfcHJv
+dG9fOFs1XSwgaW5bNTJdKSkpKSkpKTsKKworCXRbMV0gPSBTQ0FMRThfU1RBR0UxKAorCQlNVUxB
+KF9zYmNfcHJvdG9fOFs2XSwgaW5bMl0sCisJCU1VTEEoX3NiY19wcm90b184WzddLCBpblsxOF0s
+CisJCU1VTEEoX3NiY19wcm90b184WzhdLCBpblszNF0sCisJCU1VTEEoX3NiY19wcm90b184Wzld
+LCBpbls1MF0sCisJCU1VTChfc2JjX3Byb3RvXzhbMTBdLCBpbls2Nl0pKSkpKSk7CisKKwl0WzJd
+ID0gU0NBTEU4X1NUQUdFMSgKKwkJTVVMQShfc2JjX3Byb3RvXzhbMTFdLCBpblsxXSwKKwkJTVVM
+QShfc2JjX3Byb3RvXzhbMTJdLCBpblsxN10sCisJCU1VTEEoX3NiY19wcm90b184WzEzXSwgaW5b
+MzNdLAorCQlNVUxBKF9zYmNfcHJvdG9fOFsxNF0sIGluWzQ5XSwKKwkJTVVMQShfc2JjX3Byb3Rv
+XzhbMTVdLCBpbls2NV0sCisJCU1VTEEoX3NiY19wcm90b184WzE2XSwgaW5bM10sCisJCU1VTEEo
+X3NiY19wcm90b184WzE3XSwgaW5bMTldLAorCQlNVUxBKF9zYmNfcHJvdG9fOFsxOF0sIGluWzM1
+XSwKKwkJTVVMQShfc2JjX3Byb3RvXzhbMTldLCBpbls1MV0sCisJCU1VTCggX3NiY19wcm90b184
+WzIwXSwgaW5bNjddKSkpKSkpKSkpKSk7CisKKwl0WzNdID0gU0NBTEU4X1NUQUdFMSgKKwkJTVVM
+QSggX3NiY19wcm90b184WzIxXSwgaW5bNV0sCisJCU1VTEEoIF9zYmNfcHJvdG9fOFsyMl0sIGlu
+WzIxXSwKKwkJTVVMQSggX3NiY19wcm90b184WzIzXSwgaW5bMzddLAorCQlNVUxBKCBfc2JjX3By
+b3RvXzhbMjRdLCBpbls1M10sCisJCU1VTEEoIF9zYmNfcHJvdG9fOFsyNV0sIGluWzY5XSwKKwkJ
+TVVMQSgtX3NiY19wcm90b184WzE1XSwgaW5bMTVdLAorCQlNVUxBKC1fc2JjX3Byb3RvXzhbMTRd
+LCBpblszMV0sCisJCU1VTEEoLV9zYmNfcHJvdG9fOFsxM10sIGluWzQ3XSwKKwkJTVVMQSgtX3Ni
+Y19wcm90b184WzEyXSwgaW5bNjNdLAorCQlNVUwoIC1fc2JjX3Byb3RvXzhbMTFdLCBpbls3OV0p
+KSkpKSkpKSkpKTsKKworCXRbNF0gPSBTQ0FMRThfU1RBR0UxKAorCQlNVUxBKCBfc2JjX3Byb3Rv
+XzhbMjZdLCBpbls2XSwKKwkJTVVMQSggX3NiY19wcm90b184WzI3XSwgaW5bMjJdLAorCQlNVUxB
+KCBfc2JjX3Byb3RvXzhbMjhdLCBpblszOF0sCisJCU1VTEEoIF9zYmNfcHJvdG9fOFsyOV0sIGlu
+WzU0XSwKKwkJTVVMQSggX3NiY19wcm90b184WzMwXSwgaW5bNzBdLAorCQlNVUxBKC1fc2JjX3By
+b3RvXzhbMTBdLCBpblsxNF0sCisJCU1VTEEoLV9zYmNfcHJvdG9fOFs5XSwgaW5bMzBdLAorCQlN
+VUxBKC1fc2JjX3Byb3RvXzhbOF0sIGluWzQ2XSwKKwkJTVVMQSgtX3NiY19wcm90b184WzddLCBp
+bls2Ml0sCisJCU1VTCggLV9zYmNfcHJvdG9fOFs2XSwgaW5bNzhdKSkpKSkpKSkpKSk7CisKKwl0
+WzVdID0gU0NBTEU4X1NUQUdFMSgKKwkJTVVMQSggX3NiY19wcm90b184WzMxXSwgaW5bN10sCisJ
+CU1VTEEoIF9zYmNfcHJvdG9fOFszMl0sIGluWzIzXSwKKwkJTVVMQSggX3NiY19wcm90b184WzMz
+XSwgaW5bMzldLAorCQlNVUxBKCBfc2JjX3Byb3RvXzhbMzRdLCBpbls1NV0sCisJCU1VTEEoIF9z
+YmNfcHJvdG9fOFszNV0sIGluWzcxXSwKKwkJTVVMQSgtX3NiY19wcm90b184WzIwXSwgaW5bMTNd
+LAorCQlNVUxBKC1fc2JjX3Byb3RvXzhbMTldLCBpblsyOV0sCisJCU1VTEEoLV9zYmNfcHJvdG9f
+OFsxOF0sIGluWzQ1XSwKKwkJTVVMQSgtX3NiY19wcm90b184WzE3XSwgaW5bNjFdLAorCQlNVUwo
+IC1fc2JjX3Byb3RvXzhbMTZdLCBpbls3N10pKSkpKSkpKSkpKTsKKworCXRbNl0gPSBTQ0FMRThf
+U1RBR0UxKAorCQlNVUxBKCBfc2JjX3Byb3RvXzhbMzZdLCAoaW5bOF0gKyBpbls3Ml0pLAorCQlN
+VUxBKCBfc2JjX3Byb3RvXzhbMzddLCAoaW5bMjRdICsgaW5bNTZdKSwKKwkJTVVMQSggX3NiY19w
+cm90b184WzM4XSwgaW5bNDBdLAorCQlNVUxBKC1fc2JjX3Byb3RvXzhbMzldLCBpblsxMl0sCisJ
+CU1VTEEoLV9zYmNfcHJvdG9fOFs1XSwgaW5bMjhdLAorCQlNVUxBKC1fc2JjX3Byb3RvXzhbNF0s
+IGluWzQ0XSwKKwkJTVVMQSgtX3NiY19wcm90b184WzNdLCBpbls2MF0sCisJCU1VTCggLV9zYmNf
+cHJvdG9fOFsyXSwgaW5bNzZdKSkpKSkpKSkpOworCisJdFs3XSA9IFNDQUxFOF9TVEFHRTEoCisJ
+CU1VTEEoIF9zYmNfcHJvdG9fOFszNV0sIGluWzldLAorCQlNVUxBKCBfc2JjX3Byb3RvXzhbMzRd
+LCBpblsyNV0sCisJCU1VTEEoIF9zYmNfcHJvdG9fOFszM10sIGluWzQxXSwKKwkJTVVMQSggX3Ni
+Y19wcm90b184WzMyXSwgaW5bNTddLAorCQlNVUxBKCBfc2JjX3Byb3RvXzhbMzFdLCBpbls3M10s
+CisJCU1VTEEoLV9zYmNfcHJvdG9fOFsyNV0sIGluWzExXSwKKwkJTVVMQSgtX3NiY19wcm90b184
+WzI0XSwgaW5bMjddLAorCQlNVUxBKC1fc2JjX3Byb3RvXzhbMjNdLCBpbls0M10sCisJCU1VTEEo
+LV9zYmNfcHJvdG9fOFsyMl0sIGluWzU5XSwKKwkJTVVMKCAtX3NiY19wcm90b184WzIxXSwgaW5b
+NzVdKSkpKSkpKSkpKSk7CisKKwlzWzBdID0gTVVMQSggIF9hbmFtYXRyaXg4WzBdLCB0WzBdLAor
+CQlNVUwoICBfYW5hbWF0cml4OFsxXSwgdFs2XSkpOworCXNbMV0gPSBNVUwoICAgX2FuYW1hdHJp
+eDhbN10sIHRbMV0pOworCXNbMl0gPSBNVUxBKCAgX2FuYW1hdHJpeDhbMl0sIHRbMl0sCisJCU1V
+TEEoIF9hbmFtYXRyaXg4WzNdLCB0WzNdLAorCQlNVUxBKCBfYW5hbWF0cml4OFs0XSwgdFs1XSwK
+KwkJTVVMKCAgX2FuYW1hdHJpeDhbNV0sIHRbN10pKSkpOworCXNbM10gPSBNVUwoICAgX2FuYW1h
+dHJpeDhbNl0sIHRbNF0pOworCXNbNF0gPSBNVUxBKCAgX2FuYW1hdHJpeDhbM10sIHRbMl0sCisJ
+CU1VTEEoLV9hbmFtYXRyaXg4WzVdLCB0WzNdLAorCQlNVUxBKC1fYW5hbWF0cml4OFsyXSwgdFs1
+XSwKKwkJTVVMKCAtX2FuYW1hdHJpeDhbNF0sIHRbN10pKSkpOworCXNbNV0gPSBNVUxBKCAgX2Fu
+YW1hdHJpeDhbNF0sIHRbMl0sCisJCU1VTEEoLV9hbmFtYXRyaXg4WzJdLCB0WzNdLAorCQlNVUxB
+KCBfYW5hbWF0cml4OFs1XSwgdFs1XSwKKwkJTVVMKCAgX2FuYW1hdHJpeDhbM10sIHRbN10pKSkp
+OworCXNbNl0gPSBNVUxBKCAgX2FuYW1hdHJpeDhbMV0sIHRbMF0sCisJCU1VTCggLV9hbmFtYXRy
+aXg4WzBdLCB0WzZdKSk7CisJc1s3XSA9IE1VTEEoICBfYW5hbWF0cml4OFs1XSwgdFsyXSwKKwkJ
+TVVMQSgtX2FuYW1hdHJpeDhbNF0sIHRbM10sCisJCU1VTEEoIF9hbmFtYXRyaXg4WzNdLCB0WzVd
+LAorCQlNVUwoIC1fYW5hbWF0cml4OFsyXSwgdFs3XSkpKSk7CisKIAlvdXRbMF0gPSBTQ0FMRThf
+U1RBR0UyKCBzWzBdICsgc1sxXSArIHNbMl0gKyBzWzNdKTsKIAlvdXRbMV0gPSBTQ0FMRThfU1RB
+R0UyKCBzWzFdIC0gc1szXSArIHNbNF0gKyBzWzZdKTsKIAlvdXRbMl0gPSBTQ0FMRThfU1RBR0Uy
+KCBzWzFdIC0gc1szXSArIHNbNV0gLSBzWzZdKTsKSW5kZXg6IHNiY19tYXRoLmgKPT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovdXRpbHMvc2JjL3NiY19tYXRoLmgsdgpyZXRyaWV2
+aW5nIHJldmlzaW9uIDEuMTIKZGlmZiAtdSAtcCAtcjEuMTIgc2JjX21hdGguaAotLS0gc2JjX21h
+dGguaAkyOCBKYW4gMjAwOCAxODowMDo1MSAtMDAwMAkxLjEyCisrKyBzYmNfbWF0aC5oCTMwIEph
+biAyMDA4IDEzOjIyOjUzIC0wMDAwCkBAIC02NCw2ICs2NCwxNyBAQCB0eXBlZGVmIGxvbmcgbG9u
+ZyBzYmNfZXh0ZW5kZWRfdDsKICNkZWZpbmUgU0JDX0ZJWEVEXzAodmFsKSB7IHZhbCA9IDA7IH0K
+ICNkZWZpbmUgQUREKGRzdCwgc3JjKSAgICB7IGRzdCArPSBzcmM7IH0KICNkZWZpbmUgU1VCKGRz
+dCwgc3JjKSAgICB7IGRzdCAtPSBzcmM7IH0KLSNkZWZpbmUgTVVMKGRzdCwgYSwgYikgICB7IGRz
+dCA9IChzYmNfZXh0ZW5kZWRfdCkgKGEpICogKGIpOyB9CisjZGVmaW5lIE1VTChhLCBiKSAgICAg
+ICAgKChzYmNfZXh0ZW5kZWRfdCkoYSkgKiAoYikpCiAjZGVmaW5lIERJVjIoZHN0LCBzcmMpICAg
+eyBkc3QgPSBBU1Ioc3JjLCAxKTsgfQotI2RlZmluZSBNVUxBKGRzdCwgYSwgYikgIHsgZHN0ICs9
+IChzYmNfZXh0ZW5kZWRfdCkgKGEpICogKGIpOyB9CisKKyNpZmRlZiBfX2FybV9fCisjZGVmaW5l
+IE1VTEEoYSwgYiwgcmVzKSAoewkJCQlcCisJCWxvbmcgbG9uZyB0bXAgPSByZXM7CQkJXAorCQlf
+X2FzbV9fKAkJCQlcCisJCQkic21sYWwgJVEwLCAlUjAsICUyLCAlMyIJXAorCQkJOiAiPSZyIiAo
+dG1wKQkJCVwKKwkJCTogIjAiICh0bXApLCAiciIgKGEpLCAiciIgKGIpKTsJXAorCQl0bXA7IH0p
+CisjZWxzZQorI2RlZmluZSBNVUxBKGEsIGIsIHJlcykgICgoc2JjX2V4dGVuZGVkX3QpKGEpICog
+KGIpICsgKHJlcykpCisjZW5kaWYK
+------=_Part_29512_12459325.1201712832128
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+------=_Part_29512_12459325.1201712832128
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_29512_12459325.1201712832128--
