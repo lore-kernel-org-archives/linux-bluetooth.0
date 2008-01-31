@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Guillaume Bedot <littletux@zarb.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <741609.62275.qm@web8404.mail.in.yahoo.com>
-References: <741609.62275.qm@web8404.mail.in.yahoo.com>
-Date: Thu, 31 Jan 2008 19:25:49 +0100
-Message-Id: <1201803949.18849.7.camel@littletux>
+In-Reply-To: <944096.9486.qm@web8409.mail.in.yahoo.com>
+References: <944096.9486.qm@web8409.mail.in.yahoo.com>
+Date: Thu, 31 Jan 2008 08:54:54 +0100
+Message-Id: <1201766094.6553.3.camel@localhost>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users] trouble in headset connection
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -16,39 +16,20 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-
-On jeu, 2008-01-31 at 17:16 +0530, pramod gurav wrote:
-> hi
-> thanks for reply
-> yes i am trying to pair my system to BT headset and want to play audio
-> on it thrugh BT.
-> i am using bluez-libs-3.24, bluez-utils-3.24, bluez-hcidump-1.40
-> 
-> i am usind a broadcom BCM2035 dongle, Sony Erricson HBH-600 headset
-> and 2.6.15 kernel..
-
-There is a bug that was corrected in early January in cvs that affected
-headset connections. You can try to compile the current cvs or wait
-until 3.25 is released...
-
-bt-sco and other tools from bluetooth-alsa are the old way-to-do, but
-that can work better for you.
-
-Regards,
-
-Guillaume B.
-
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGVsbG8sCgpMZSBtZXJjcmVkaSAzMCBqYW52aWVyIDIwMDggw6AgMTQ6MDcgKzA1MzAsIHByYW1v
+ZCBndXJhdiBhIMOpY3JpdCA6Cj4gYnRfYXVkaW9fc2VydmljZV9vcGVuOiBjb25uZWN0KCkgZmFp
+bGVkOiBDb25uZWN0aW9uIHJlZnVzZWQgKDExMSkKVHJ5IHRvIHBhaXIgeW91ciBoZWFkc2V0ID8K
+ClBsZWFzZSBnaXZlIG1vcmUgZGV0YWlscywgZm9yIGluc3RhbmNlLCB3aGF0IHZlcnNpb24gb2Yg
+Ymx1ZXogYW5kIGtlcm5lbApkbyB5b3UgdXNlID8gV2hpY2ggZG9uZ2xlLCB3aGljaCBoZWFkc2V0
+LCB0aGVpciBjYXBhY2l0aWVzLgoKUmVnYXJkcywKCkd1aWxsYXVtZSBCLgoKCi0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBNaWNyb3NvZnQKRGVmeSBh
+bGwgY2hhbGxlbmdlcy4gTWljcm9zb2Z0KFIpIFZpc3VhbCBTdHVkaW8gMjAwOC4KaHR0cDovL2Ns
+ay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBtcnQvZGlyZWN0LzAxLwpfX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei11c2VycyBtYWlsaW5n
+IGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291
+cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
