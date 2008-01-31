@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Guillaume Bedot <littletux@zarb.org>
+From: Brian Sammon <bluez-users@brisammon.fastmail.fm>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <944096.9486.qm@web8409.mail.in.yahoo.com>
-References: <944096.9486.qm@web8409.mail.in.yahoo.com>
-Date: Thu, 31 Jan 2008 08:54:54 +0100
-Message-Id: <1201766094.6553.3.camel@localhost>
+In-reply-to: <200801292219.m0TMJw9k011646@alumnus.caltech.edu> 
+References: <200801292219.m0TMJw9k011646@alumnus.caltech.edu>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] trouble in headset connection
+Date: Wed, 30 Jan 2008 23:08:16 -0500
+Message-Id: <E1JKQin-000806-Qm@necz1>
+Subject: Re: [Bluez-users] registering a passkey agent with hcid
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,20 +16,29 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGVsbG8sCgpMZSBtZXJjcmVkaSAzMCBqYW52aWVyIDIwMDggw6AgMTQ6MDcgKzA1MzAsIHByYW1v
-ZCBndXJhdiBhIMOpY3JpdCA6Cj4gYnRfYXVkaW9fc2VydmljZV9vcGVuOiBjb25uZWN0KCkgZmFp
-bGVkOiBDb25uZWN0aW9uIHJlZnVzZWQgKDExMSkKVHJ5IHRvIHBhaXIgeW91ciBoZWFkc2V0ID8K
-ClBsZWFzZSBnaXZlIG1vcmUgZGV0YWlscywgZm9yIGluc3RhbmNlLCB3aGF0IHZlcnNpb24gb2Yg
-Ymx1ZXogYW5kIGtlcm5lbApkbyB5b3UgdXNlID8gV2hpY2ggZG9uZ2xlLCB3aGljaCBoZWFkc2V0
-LCB0aGVpciBjYXBhY2l0aWVzLgoKUmVnYXJkcywKCkd1aWxsYXVtZSBCLgoKCi0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBNaWNyb3NvZnQKRGVmeSBh
-bGwgY2hhbGxlbmdlcy4gTWljcm9zb2Z0KFIpIFZpc3VhbCBTdHVkaW8gMjAwOC4KaHR0cDovL2Ns
-ay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBtcnQvZGlyZWN0LzAxLwpfX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei11c2VycyBtYWlsaW5n
-IGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291
-cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
+> 	I can't bond to my headset.  If I run hcid with debug output I see:
+> 	call_passkey_agent(): no agent available
+> 
+> when I try to make a connection.  It seems I have no passkey agent.  I
+> notice that bluez-utils builds 'passkey-agent' in /daemon but doesn't
+> install it.  When I put passkey-agent in the path with the rest of the
+> bluez-utils executables it still isn't found.  How do I make hcid find
+> the passkey agent?
+
+Well, if it works like the gnome passkey agent, you just run it, and it 
+registers itself.
+
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
