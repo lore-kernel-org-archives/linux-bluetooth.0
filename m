@@ -1,17 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1201801687.2389.286.camel@cookie.hadess.net>
-References: <1201227720.2389.17.camel@cookie.hadess.net>
-	<1201626119.6218.15.camel@violet>
-	<1201714289.2389.227.camel@cookie.hadess.net>
-	<1201791472.2389.275.camel@cookie.hadess.net>
-	<1201801687.2389.286.camel@cookie.hadess.net>
-Content-Type: multipart/mixed; boundary="=-MGlJ6Q7czFZKpzXT14nY"
-Date: Fri, 01 Feb 2008 10:46:06 +0000
-Message-Id: <1201862766.2389.302.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] client.c cleanup
+Message-ID: <47A25328.6000008@in.tum.de>
+Date: Fri, 01 Feb 2008 00:00:56 +0100
+From: Aleksandar Kanchev <kanchev@in.tum.de>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Content-Type: multipart/mixed; boundary="------------080708030005060009050601"
+Subject: [Bluez-devel] kernel bug?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,102 +18,180 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-
---=-MGlJ6Q7czFZKpzXT14nY
-Content-Type: text/plain
+This is a multi-part message in MIME format.
+--------------080708030005060009050601
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 
+Hello list,
 
-On Thu, 2008-01-31 at 17:48 +0000, Bastien Nocera wrote:
-<snip>
-> About the hcid bug, should GetInfo fail when the bdaddr for the device
-> isn't available, or should it just give out empty information?
+recently I've stumbled upon something that I think might be a bluez bug.
+My nokia phone was messed up, so it dropped rfcomm connections 
+immediately after they were established. This caused my glibmm (glib2) 
+based program to exit because of a glib error. After researching a bit I 
+found out, that I was flushing a glib io channel after the channel was 
+polled for IO_OUT, which is right. The flush caused a write() to the 
+socket and glib expects write() to return either a negative number (an 
+error) or positive > 0, a return = 0 is not expected probably because 
+one should first wait for the IO_OUT event.
+What was happening is that the connection was being dropped right after 
+the socket was polled and this caused glib to crash most of the time. 
+Should't bluez close the socket and return < 0 instead of returning 0?
+I've attached a small program to better demonstrate what happened. I've 
+also attached a copy of the email which I sent to the gtkmm mailing 
+list, since I first thought it was a glib issue.
 
-Patch to allow GetAddress to fail, and don't add the information that's
-not available to the GetInfo dict.
+Thanks
 
-Cheers
 
---=-MGlJ6Q7czFZKpzXT14nY
-Content-Disposition: attachment;
-	filename=bluez-utils-hcid-allow-getaddr-failure.patch
-Content-Type: text/x-patch; name=bluez-utils-hcid-allow-getaddr-failure.patch;
-	charset=ISO-8859-1
+--------------080708030005060009050601
+Content-Type: text/x-csrc;
+ name="bluez-bug.c"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="bluez-bug.c"
+
+/*
+ * write() should not return 0 after
+ * the remote device has terminated the connetion.
+ * This makes glib's io_channel terminate
+ * the running program.
+ *                kanchev@in.tum.de
+ */
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <poll.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/rfcomm.h>
+
+
+int main(int argc, char **argv)
+{
+	char dummy;
+	int sock, r;
+	struct sockaddr_rc saddr;
+	struct pollfd pollfd;
+
+	if (argc != 3) {
+		fprintf(stderr, "Usage: %s <bluetooth address> <rfcomm channel>\n", argv[0]);
+		return -1;
+	}
+
+	if ((sock = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM)) < 0) {
+		perror("socket()");
+		return -1;
+	}
+
+	memset(&saddr, 0, sizeof(struct sockaddr_rc));
+	str2ba(argv[1], &saddr.rc_bdaddr);
+	saddr.rc_family = AF_BLUETOOTH;
+    saddr.rc_channel = (uint8_t) atoi(argv[2]);
+
+	printf("Connecting to %s ...\n", argv[1]);
+	if (connect(sock, (struct sockaddr *) &saddr, sizeof(struct sockaddr_rc)) < 0) {
+		close(sock);
+		perror("connect()");
+		return -1;
+	}
+
+	pollfd.fd = sock;
+	pollfd.events = POLLOUT;
+	pollfd.revents = 0;
+	if (poll(&pollfd, 1, -1) <= 0) {
+		close(sock);
+		perror("poll()");
+		return -1;
+	}
+
+	printf("Turn off the bluetooth device %s now!\nPress enter to continue...", argv[1]);
+	fflush(stdout);
+	read(0, &dummy, 1);
+
+	r = write(sock, "Hello", 5);
+	printf("write() returned %d\n", r);
+
+	close(sock);
+
+	return 0;
+}
+
+
+--------------080708030005060009050601
+Content-Type: message/rfc822;
+ name="Attached Message"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="Attached Message"
+
+Message-ID: <47A1B761.6080306@in.tum.de>
+Date: Thu, 31 Jan 2008 12:56:17 +0100
+From: Aleksandar Kanchev <kanchev@in.tum.de>
+User-Agent: Thunderbird 2.0.0.9 (X11/20071115)
+MIME-Version: 1.0
+To: gtkmm-list@gnome.org
+Subject: is this a glibmm/glib bug?
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Index: adapter.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/adapter.c,v
-retrieving revision 1.13
-diff -u -p -r1.13 adapter.c
---- adapter.c	28 Jan 2008 10:38:40 -0000	1.13
-+++ adapter.c	1 Feb 2008 10:44:20 -0000
-@@ -302,16 +302,18 @@ static DBusHandlerResult adapter_get_inf
- 			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
- 			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
- 
--	dbus_message_iter_append_dict_entry(&dict, "address",
--			DBUS_TYPE_STRING, &property);
--
--	memset(str, 0, sizeof(str));
--	property = str;
--	str2ba(adapter->address, &ba);
--
--	if (!read_local_name(&ba, str))
--		dbus_message_iter_append_dict_entry(&dict, "name",
--			DBUS_TYPE_STRING, &property);
-+	if (check_address (property) == 0) {
-+		dbus_message_iter_append_dict_entry(&dict, "address",
-+						    DBUS_TYPE_STRING, &property);
-+
-+		memset(str, 0, sizeof(str));
-+		property = str;
-+		str2ba(adapter->address, &ba);
-+
-+		if (!read_local_name(&ba, str))
-+			dbus_message_iter_append_dict_entry(&dict, "name",
-+							    DBUS_TYPE_STRING, &property);
-+	}
- 
- 	get_device_version(adapter->dev_id, str, sizeof(str));
- 	dbus_message_iter_append_dict_entry(&dict, "version",
-@@ -337,7 +339,7 @@ static DBusHandlerResult adapter_get_inf
- 	dbus_message_iter_append_dict_entry(&dict, "discoverable_timeout",
- 				DBUS_TYPE_UINT32, &adapter->discov_timeout);
- 
--	if (!read_local_class(&ba, cls)) {
-+	if (check_address (property) == 0 && !read_local_class(&ba, cls)) {
- 		uint32_t class;
- 
- 		memcpy(&class, cls, 3);
-@@ -368,6 +370,9 @@ static DBusHandlerResult adapter_get_add
- 	if (!dbus_message_has_signature(msg, DBUS_TYPE_INVALID_AS_STRING))
- 		return error_invalid_arguments(conn, msg, NULL);
- 
-+	if (check_address (paddr) < 0)
-+		return error_not_ready(conn, msg);
-+
- 	reply = dbus_message_new_method_return(msg);
- 	if (!reply)
- 		return DBUS_HANDLER_RESULT_NEED_MEMORY;
-Index: dbus-api.txt
-===================================================================
-RCS file: /cvsroot/bluez/utils/hcid/dbus-api.txt,v
-retrieving revision 1.135
-diff -u -p -r1.135 dbus-api.txt
---- dbus-api.txt	28 Jan 2008 10:38:40 -0000	1.135
-+++ dbus-api.txt	1 Feb 2008 10:44:20 -0000
-@@ -335,7 +335,7 @@ Methods		dict GetInfo()
- 
- 			Example: "00:11:22:33:44:55"
- 
--			Possible errors: none
-+			Possible errors: org.bluez.Error.NotReady
- 
- 		string GetVersion()
- 
+Hello list,
 
---=-MGlJ6Q7czFZKpzXT14nY
+I'm developing a bluetooth C++ library based on glibmm. I've stumbled 
+upon a problem which concerns Glib::IOChannel(s). The problem occurs in 
+the following scenario:
+    1) open an RFCOMM socket to a remote bluetooth device and 
+Glib::IOChannel::create_from_fd()
+    2) connect the socket's file descriptor to Glib::SignalIO and wait 
+for Glib:IO_OUT
+    3) when Glib::IO_OUT is set, then write some bytes to the 
+Glib::IOChannel
+    4) shut down the bluetooth device in order to terminate the 
+bluetooth connection, this also terminates the file descriptor
+    5) flush the Glib::IOChannel, this causes:
+GLib-ERROR **: file giochannel.c: line 951 (g_io_channel_flush): 
+assertion failed: (this_time > 0)
+aborting...
+
+Program received signal SIGABRT, Aborted.
+0x00110402 in __kernel_vsyscall ()
+(gdb) bt
+#0  0x00110402 in __kernel_vsyscall ()
+#1  0x00b15690 in raise () from /lib/libc.so.6
+#2  0x00b16f91 in abort () from /lib/libc.so.6
+#3  0x00d0df7a in g_logv () from /lib/libglib-2.0.so.0
+#4  0x00d0dfb9 in g_log () from /lib/libglib-2.0.so.0
+#5  0x00d0e036 in g_assert_warning () from /lib/libglib-2.0.so.0
+#6  0x00cfa7a1 in g_io_channel_flush () from /lib/libglib-2.0.so.0
+#7  0x007f274e in Glib::IOChannel::flush () from /usr/lib/libglibmm-2.4.so.1
+
+I came across this because my nokia phone was disconnecting immediately 
+after a connection was established. I was able to reproduce the error by 
+sleeping right after a Glib::IOChannel::write and shutting down the 
+bluetooth connection from my phone while the program was sleeping, then 
+flushing the Glib::IOChannel. If I ::close() (the syscall) the fd, 
+instead of shutting down the phone, then I get:
+(process:19643): GLib-WARNING **: Invalid file descriptor.
+which is ok.
+
+What does the GLib-Error mean? Is it a glib, glibmm or bluez problem?
+
+I was using:
+gtkmm24-2.12.3-1.fc8
+glibmm24-2.14.2-1.fc8
+glib2-2.14.4-1.fc8
+bluez-libs-3.20-1.fc8
+Linux 2.6.23.14-107.fc8 #1 SMP Mon Jan 14 21:37:30 EST 2008 i686 i686 
+i386 GNU/Linux
+on Fedora 8
+
+best regards,
+Aleksandar
+
+
+--------------080708030005060009050601
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -129,7 +201,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---=-MGlJ6Q7czFZKpzXT14nY
+--------------080708030005060009050601
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -140,4 +212,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-MGlJ6Q7czFZKpzXT14nY--
+--------------080708030005060009050601--
