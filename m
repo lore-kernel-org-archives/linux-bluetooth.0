@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Brian Sammon <bluez-users@brisammon.fastmail.fm>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-reply-to: <200801292219.m0TMJw9k011646@alumnus.caltech.edu> 
-References: <200801292219.m0TMJw9k011646@alumnus.caltech.edu>
-Mime-Version: 1.0
-Date: Wed, 30 Jan 2008 23:08:16 -0500
-Message-Id: <E1JKQin-000806-Qm@necz1>
-Subject: Re: [Bluez-users] registering a passkey agent with hcid
+Message-ID: <BLU117-W44AA8A3C5A42B686465F2C88370@phx.gbl>
+From: Benson Dong <dongas86.dev@hotmail.com>
+To: Bluez-user <bluez-users@lists.sourceforge.net>
+Date: Thu, 31 Jan 2008 09:37:50 +0800
+In-Reply-To: <BLU117-W173F09C979259273711BFA883F0@phx.gbl>
+References: <BLU117-W173F09C979259273711BFA883F0@phx.gbl>
+MIME-Version: 1.0
+Subject: Re: [Bluez-users] BIP Implementation Problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,29 +16,75 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1733422739=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-> 	I can't bond to my headset.  If I run hcid with debug output I see:
-> 	call_passkey_agent(): no agent available
-> 
-> when I try to make a connection.  It seems I have no passkey agent.  I
-> notice that bluez-utils builds 'passkey-agent' in /daemon but doesn't
-> install it.  When I put passkey-agent in the path with the rest of the
-> bluez-utils executables it still isn't found.  How do I make hcid find
-> the passkey agent?
-
-Well, if it works like the gnome passkey agent, you just run it, and it 
-registers itself.
+--===============1733422739==
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: 8bit
 
 
+Hi all,
+
+Is there anyone who has the experiance about BIP profile implementatioin ?
+Please lend me some pointers!
+Even a little help would be much appreciated!
+
+Thanks!
+Benson
+
+> From: dongas86.dev@hotmail.com
+> To: bluez-users@lists.sourceforge.net
+> Date: Wed, 23 Jan 2008 14:26:10 +0800
+> Subject: [Bluez-users] BIP Implementation Problem
+>
+>
+> Hi all,
+>
+> I think bluetooth BIP profile probably has not been realized by the current vertion 3.24 of bluez. I'm trying to write code to implement it in my project . I only need to implement the client side of BIP profile .I have no BLUEZ and OBEX programming experience and i'm just studying then doing. So i don't know exactly how to do it in a effective way ,just try.Is there anyone who knows about how to implement the BIP profile help me?
+>
+> I have already read over BIP,IrOBEX,FTP,SDP spec and its related specs.
+> I think maybe i could implement it based on obexftp since they use the same protocal OBEX. is it right ?
+>
+> I also wonder if there was a already implemented BIP client that maybe i could reference?
+>
+> I need some pointers!
+> Any help would be much appreciated!
+>
+> Thanks in advance!
+> Benson
+>
+>
+> _________________________________________________________________
+> Express yourself instantly with MSN Messenger! Download today it's FREE!
+> http://messenger.msn.click-url.com/go/onm00200471ave/direct/01/
+>
+
+_________________________________________________________________
+Express yourself instantly with MSN Messenger! Download today it's FREE!
+http://messenger.msn.click-url.com/go/onm00200471ave/direct/01/
+
+
+--===============1733422739==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============1733422739==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1733422739==--
