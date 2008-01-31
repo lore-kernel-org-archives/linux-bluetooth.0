@@ -1,9 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 31 Jan 2008 12:28:08 -0800 (PST)
-From: "Russell A. Bell" <rbell@alumnus.caltech.edu>
-Message-Id: <200801312028.m0VKS8ST011488@alumnus.caltech.edu>
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] unique bus name
+From: Guillaume Bedot <littletux@zarb.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <741609.62275.qm@web8404.mail.in.yahoo.com>
+References: <741609.62275.qm@web8404.mail.in.yahoo.com>
+Date: Thu, 31 Jan 2008 19:25:49 +0100
+Message-Id: <1201803949.18849.7.camel@littletux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] trouble in headset connection
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -13,32 +16,33 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-	'Could you try running it manually as root with
-"/usr/lib/bluetooth/ bluetoothd-service-audio -s" as see what messages
-you get?'
 
-/etc/bluetooth# /usr/local/lib/bluetooth/bluetoothd-service-audio -s
-audio[5746]: Bluetooth Audio daemon
-audio[5746]: Config options: DisableHFP=true, SCORouting=PCM, SourceCount=2
-audio[5746]: Unix socket created: 5
-audio[5746]: Adding service record failed: Connection refused
-audio[5746]: Unable to register HS AG service record
-audio[5746]: Unregistered manager path
-audio[5746]: Audio init failed!
+On jeu, 2008-01-31 at 17:16 +0530, pramod gurav wrote:
+> hi
+> thanks for reply
+> yes i am trying to pair my system to BT headset and want to play audio
+> on it thrugh BT.
+> i am using bluez-libs-3.24, bluez-utils-3.24, bluez-hcidump-1.40
+> 
+> i am usind a broadcom BCM2035 dongle, Sony Erricson HBH-600 headset
+> and 2.6.15 kernel..
 
-	This causes nothing to show up in hcidump, so it isn't even
-getting to the Bluetooth transceiver.
+There is a bug that was corrected in early January in cvs that affected
+headset connections. You can try to compile the current cvs or wait
+until 3.25 is released...
 
-	Everything I try, when it gets through to the target headset,
-times out.  'Pin Code Request' returns 'Error: LMP Response Timeout'
-	Is this more likely the headset or the transceiver?
+bt-sco and other tools from bluetooth-alsa are the old way-to-do, but
+that can work better for you.
 
-russell bell
+Regards,
+
+Guillaume B.
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
