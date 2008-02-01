@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1201882130.2389.334.camel@cookie.hadess.net>
+In-Reply-To: <1201871693.2389.326.camel@cookie.hadess.net>
 References: <1200566602.26259.89.camel@cookie.hadess.net>
 	<1200663790.2676.3.camel@cookie.hadess.net>
 	<1201871693.2389.326.camel@cookie.hadess.net>
-	<1201882130.2389.334.camel@cookie.hadess.net>
-Content-Type: multipart/mixed; boundary="=-ndGKZIW0T8WYg2WARAi8"
-Date: Fri, 01 Feb 2008 16:20:26 +0000
-Message-Id: <1201882826.2389.337.camel@cookie.hadess.net>
+Content-Type: multipart/mixed; boundary="=-JGhenognbsXTZgRvSjU9"
+Date: Fri, 01 Feb 2008 16:08:50 +0000
+Message-Id: <1201882130.2389.334.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] [PATCH] Allow multiple files to be sent
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -24,40 +23,39 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---=-ndGKZIW0T8WYg2WARAi8
+--=-JGhenognbsXTZgRvSjU9
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
 
-On Fri, 2008-02-01 at 16:08 +0000, Bastien Nocera wrote:
-> On Fri, 2008-02-01 at 13:14 +0000, Bastien Nocera wrote:
-> > On Fri, 2008-01-18 at 13:43 +0000, Bastien Nocera wrote:
-> > > Hello again,
-> > > 
-> > > On Thu, 2008-01-17 at 10:43 +0000, Bastien Nocera wrote: 
-> > > > Heya,
-> > > > 
-> > > > Another for bluetooth-sento feature parity with gnome-obex-send.
-> > > 
-> > > Another patch, based on Tadas' gnome-obex-send port.
-> > > 
-> > > - Fix to run with the latest obex-data-server (in 2 places)
-> > > - Add an appropriate error when the target device is a Palm
-> > > - Accept relative local paths and URIs as well as absolute filenames as
-> > > arguments (needed for ease of use and nautilus-sendto, respectively)
-> > > - Gather the name of the Bluetooth device from hcid to show in the UI
+On Fri, 2008-02-01 at 13:14 +0000, Bastien Nocera wrote:
+> On Fri, 2008-01-18 at 13:43 +0000, Bastien Nocera wrote:
+> > Hello again,
 > > 
-> > Updated patch to use the marshal file in common/ instead of our own.
+> > On Thu, 2008-01-17 at 10:43 +0000, Bastien Nocera wrote: 
+> > > Heya,
+> > > 
+> > > Another for bluetooth-sento feature parity with gnome-obex-send.
+> > 
+> > Another patch, based on Tadas' gnome-obex-send port.
+> > 
+> > - Fix to run with the latest obex-data-server (in 2 places)
+> > - Add an appropriate error when the target device is a Palm
+> > - Accept relative local paths and URIs as well as absolute filenames as
+> > arguments (needed for ease of use and nautilus-sendto, respectively)
+> > - Gather the name of the Bluetooth device from hcid to show in the UI
 > 
-> Updated patch:
-> - follow coding style
-> - move the helper dialogues in another file
+> Updated patch to use the marshal file in common/ instead of our own.
 
-And the function declarations on one line.
+Updated patch:
+- follow coding style
+- move the helper dialogues in another file
 
---=-ndGKZIW0T8WYg2WARAi8
-Content-Disposition: attachment; filename=bluez-gnome-new-sendto-4.patch
-Content-Type: text/x-patch; name=bluez-gnome-new-sendto-4.patch;
+Cheers
+
+--=-JGhenognbsXTZgRvSjU9
+Content-Disposition: attachment; filename=bluez-gnome-new-sendto-3.patch
+Content-Type: text/x-patch; name=bluez-gnome-new-sendto-3.patch;
 	charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 
@@ -67,7 +65,7 @@ RCS file: /cvsroot/bluez/gnome/sendto/Makefile.am,v
 retrieving revision 1.8
 diff -u -p -r1.8 Makefile.am
 --- Makefile.am	1 Feb 2008 14:03:47 -0000	1.8
-+++ Makefile.am	1 Feb 2008 16:19:25 -0000
++++ Makefile.am	1 Feb 2008 16:04:22 -0000
 @@ -1,7 +1,7 @@
  
  noinst_PROGRAMS = bluetooth-sendto
@@ -88,7 +86,7 @@ RCS file: /cvsroot/bluez/gnome/sendto/main.c,v
 retrieving revision 1.12
 diff -u -p -r1.12 main.c
 --- main.c	16 Jan 2008 19:13:39 -0000	1.12
-+++ main.c	1 Feb 2008 16:19:26 -0000
++++ main.c	1 Feb 2008 16:04:22 -0000
 @@ -1,9 +1,11 @@
  /*
 + * bluetooth-sendto
@@ -102,7 +100,7 @@ diff -u -p -r1.12 main.c
   *
   *  This program is free software; you can redistribute it and/or modify
   *  it under the terms of the GNU General Public License as published by
-@@ -25,342 +27,747 @@
+@@ -25,342 +27,765 @@
  #include <config.h>
  #endif
  
@@ -175,7 +173,8 @@ diff -u -p -r1.12 main.c
 -static GtkWidget *label_filename;
 -static GtkWidget *label_status;
 -static GtkWidget *progress;
-+static gint64 get_system_time(void)
++static gint64
++get_system_time(void)
 +{
 +	struct timeval tmp;
  
@@ -185,7 +184,8 @@ diff -u -p -r1.12 main.c
 +}
  
 -static gchar *open_file_dialog(void)
-+static gboolean is_palm_device(const gchar *bdaddr)
++static gboolean
++is_palm_device(const gchar *bdaddr)
  {
 -	GtkWidget *dialog;
 -	gchar *filename = NULL;
@@ -200,7 +200,8 @@ diff -u -p -r1.12 main.c
 -				GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
 +/* Return the local absolute filename for the file, and its size
 + * if the file exists and is stat()'able */
-+static gchar *normalise_filename(const gchar *filename, gint64 *size)
++static gchar *
++normalise_filename(const gchar *filename, gint64 *size)
 +{
 +	char *ret;
 +	struct stat file_stat;
@@ -249,7 +250,8 @@ diff -u -p -r1.12 main.c
  }
  
 -static gchar *browse_device_dialog(void)
-+static gchar *get_device_name(BluetoothSendto *app)
++static gchar *
++get_device_name(BluetoothSendto *app)
  {
 -	GtkWidget *dialog;
 -	GtkWidget *selector;
@@ -314,8 +316,9 @@ diff -u -p -r1.12 main.c
 +}
  
 -	gtk_widget_show_all(selector);
-+static gint show_error_dialog(GtkWindow *parent, ButtonSet buttons,
-+			      const gchar *primary_text, const gchar *secondary_text)
++static gint
++show_error_dialog(GtkWindow *parent, ButtonSet buttons,
++		  const gchar *primary_text, const gchar *secondary_text)
 +{
 +	GtkWidget *dialog;
 +	gchar *primary_text_markup;
@@ -346,8 +349,9 @@ diff -u -p -r1.12 main.c
 +}
  
 -	return address;
-+static gint show_connection_error_dialog(GtkWindow *parent, const gchar *bdaddr,
-+					 const gchar *primary_text)
++static gint
++show_connection_error_dialog(GtkWindow *parent, const gchar *bdaddr,
++			     const gchar *primary_text)
 +{
 +	if (!is_palm_device(bdaddrstr)) {
 +		return show_error_dialog(parent,
@@ -364,10 +368,12 @@ diff -u -p -r1.12 main.c
  
 -static void response_callback(GtkWidget *dialog,
 -					gint response, gpointer user_data)
-+static gint handle_file_sending_error(const gchar *error_text,
-+				      const gchar *error_secondary_text, BluetoothSendto *app)
- {
+-{
 -	gtk_widget_destroy(dialog);
++static gint
++handle_file_sending_error(const gchar *error_text,
++			  const gchar *error_secondary_text, BluetoothSendto *app)
++{
 +	ButtonSet buttons;
 +	gint response_id;
 +
@@ -393,13 +399,15 @@ diff -u -p -r1.12 main.c
 +	return response_id;
 +}
  
-+static void cancel_clicked_cb(GtkWidget *button, BluetoothSendto *app)
++static void
++cancel_clicked_cb(GtkWidget *button, BluetoothSendto *app)
 +{
  	gtk_main_quit();
  }
  
 -static void create_window(const gchar *filename)
-+static void ui_init(BluetoothSendto *app)
++static void
++ui_init(BluetoothSendto *app)
  {
 -	GtkWidget *vbox;
 -	GtkWidget *label;
@@ -413,11 +421,9 @@ diff -u -p -r1.12 main.c
 -				GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
 -
 -	gtk_window_set_default_size(GTK_WINDOW(dialog), 400, -1);
-+	/* initialize UI */
- 
+-
 -	gtk_container_set_border_width(GTK_CONTAINER(dialog), 6);
-+	device_name = get_device_name(app);
- 
+-
 -	vbox = gtk_vbox_new(FALSE, 6);
 -	gtk_container_set_border_width(GTK_CONTAINER(vbox), 12);
 -	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), vbox);
@@ -425,6 +431,19 @@ diff -u -p -r1.12 main.c
 -	label = gtk_label_new(NULL);
 -	gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.0);
 -	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
++	/* initialize UI */
+ 
+-	label_filename = label;
++	device_name = get_device_name(app);
+ 
+-	progress = gtk_progress_bar_new();
+-	gtk_box_pack_start(GTK_BOX(vbox), progress, FALSE, FALSE, 0);
+-
+-	label = gtk_label_new(NULL);
+-	gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.0);
+-	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 6);
+-
+-	label_status = label;
 +	/* main dialog */
 +	app->main_dialog = gtk_dialog_new();
 +	gtk_dialog_set_has_separator(GTK_DIALOG(app->main_dialog), FALSE);
@@ -461,7 +480,8 @@ diff -u -p -r1.12 main.c
 +	gtk_label_set_markup(GTK_LABEL(label3), text);
 +	g_free(text);
  
--	label_filename = label;
+-	text = g_strdup_printf("<b>%s</b>", filename);
+-	gtk_label_set_markup(GTK_LABEL(label_filename), text);
 +	/* table */
 +	table = gtk_table_new(2, 2, FALSE);
 +	gtk_table_set_col_spacings(GTK_TABLE(table), 4);
@@ -477,7 +497,7 @@ diff -u -p -r1.12 main.c
 +	text = g_markup_printf_escaped("<span weight=\"bold\" size=\"larger\">%s</span>",
 +				       _("Sending files via bluetooth"));
 +	gtk_label_set_markup(GTK_LABEL(label1), text);
-+	g_free(text);
+ 	g_free(text);
 +	progress_bar = gtk_progress_bar_new();
 +	gtk_progress_bar_set_ellipsize(GTK_PROGRESS_BAR(progress_bar),
 +				       PANGO_ELLIPSIZE_END);
@@ -507,7 +527,8 @@ diff -u -p -r1.12 main.c
 +	gtk_widget_show_all(app->main_dialog);
 +}
 +
-+static gboolean send_one(BluetoothSendto *app)
++static gboolean
++send_one(BluetoothSendto *app)
 +{
 +	const gchar *fname;
 +	gint ret;
@@ -530,17 +551,15 @@ diff -u -p -r1.12 main.c
 +			return FALSE;
 +		}
  
--	progress = gtk_progress_bar_new();
--	gtk_box_pack_start(GTK_BOX(vbox), progress, FALSE, FALSE, 0);
+-	gtk_label_set_markup(GTK_LABEL(label_status), _("Connecting..."));
 +		if (!app->first_transfer_time) {
 +			app->first_transfer_time = get_system_time();
 +		}
 +		bname = g_path_get_basename(fname);
 +		dirname = g_path_get_dirname(fname);
  
--	label = gtk_label_new(NULL);
--	gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.0);
--	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 6);
+-	gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog),
+-						GTK_RESPONSE_CLOSE, FALSE);
 +		operation_text = g_strdup_printf(_("Sending %s"), bname);
 +		operation_markup = g_markup_printf_escaped("<i>%s</i>", operation_text);
 +		progressbar_text = g_strdup_printf(_("Sending file: %d of %d"),
@@ -563,49 +582,54 @@ diff -u -p -r1.12 main.c
 +	return FALSE;
 +}
  
--	label_status = label;
-+static void session_connected_cb(DBusGProxy *proxy, BluetoothSendto *app)
+-	g_signal_connect(G_OBJECT(dialog), "response",
+-				G_CALLBACK(response_callback), NULL);
++static void
++session_connected_cb(DBusGProxy *proxy, BluetoothSendto *app)
 +{
 +	/* OBEX connect has succeeded, so start sending */
 +	g_idle_add((GSourceFunc) send_one, app);
 +}
  
--	text = g_strdup_printf("<b>%s</b>", filename);
--	gtk_label_set_markup(GTK_LABEL(label_filename), text);
--	g_free(text);
-+static void transfer_started_cb(DBusGProxy *proxy, const gchar *filename,
-+				const gchar *local_path, gint byte_count, BluetoothSendto *app)
+-	gtk_widget_show_all(dialog);
++static void
++transfer_started_cb(DBusGProxy *proxy, const gchar *filename,
++		    const gchar *local_path, gint byte_count, BluetoothSendto *app)
 +{
 +	app->file_length = byte_count;
-+}
+ }
  
--	gtk_label_set_markup(GTK_LABEL(label_status), _("Connecting..."));
-+static void transfer_cancelled_cb(DBusGProxy *proxy, BluetoothSendto *app)
-+{
+-static void transfer_started(DBusGProxy *proxy, gchar *a, gchar *b,
+-						gint size, gpointer user_data)
++static void
++transfer_cancelled_cb(DBusGProxy *proxy, BluetoothSendto *app)
+ {
+-	gchar *text;
 +	gint ret;
 +	gchar *error_text;
  
--	gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog),
--						GTK_RESPONSE_CLOSE, FALSE);
+-	filesize = size;
 +	error_text = g_strdup_printf(_("An error occured while sending file '%s'"),
 +				     (gchar *)g_slist_nth_data(app->file_list, app->current_file));
 +	ret = handle_file_sending_error(error_text,
 +					_("The remote device cancelled the transfer"), app);
  
--	g_signal_connect(G_OBJECT(dialog), "response",
--				G_CALLBACK(response_callback), NULL);
+-	text = g_strdup_printf(_("Starting transfer of %d bytes"), size);
+-	gtk_label_set_markup(GTK_LABEL(label_status), text);
+-	g_free(text);
 +	if (ret != GTK_RESPONSE_CANCEL)
 +		g_idle_add((GSourceFunc) send_one, app);
  
--	gtk_widget_show_all(dialog);
+-	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress), 0.0);
 +	g_free(error_text);
  }
  
--static void transfer_started(DBusGProxy *proxy, gchar *a, gchar *b,
--						gint size, gpointer user_data)
-+static void transfer_progress_cb(DBusGProxy *proxy, gint bytes_transferred, BluetoothSendto *app)
+-static void transfer_progress(DBusGProxy *proxy, guint bytes, gpointer user_data)
++static void
++transfer_progress_cb(DBusGProxy *proxy, gint bytes_transferred, BluetoothSendto *app)
  {
 -	gchar *text;
+-	gdouble fraction;
 +	gdouble frac;
 +	guint actual_bytes_sent;
 +	gint elapsed_time;
@@ -615,22 +639,25 @@ diff -u -p -r1.12 main.c
 +	gchar *str, *str2;
 +	gchar *progressbar_text;
  
--	filesize = size;
+-	text = g_strdup_printf(_("Transfered %d of %d bytes"), bytes, filesize);
+-	gtk_label_set_markup(GTK_LABEL(label_status), text);
+-	g_free(text);
 +	/* update progress bar fraction */
 +	actual_bytes_sent = app->bytes_sent + bytes_transferred;
 +	frac = (gdouble)actual_bytes_sent / app->byte_count;
 +	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(app->progress_bar), frac);
  
--	text = g_strdup_printf(_("Starting transfer of %d bytes"), size);
--	gtk_label_set_markup(GTK_LABEL(label_status), text);
--	g_free(text);
+-	fraction = (gdouble) bytes / (gdouble) filesize;
+-	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress), fraction);
+-}
 +	/* update progress bar text (time remaining)
 +	 * (only update once in a second) */
 +	current_time = get_system_time();
 +	elapsed_time = (current_time - app->first_transfer_time) / 1000000;
  
--	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress), 0.0);
--}
+-static void transfer_completed(DBusGProxy *proxy, gpointer user_data)
+-{
+-	gtk_label_set_markup(GTK_LABEL(label_status), _("Completed"));
 +	if (app->last_update_time) {
 +		if (current_time < app->last_update_time + 1000000)
 +			return;
@@ -639,29 +666,19 @@ diff -u -p -r1.12 main.c
 +	} else {
 +		app->last_update_time = current_time;
 +	}
- 
--static void transfer_progress(DBusGProxy *proxy, guint bytes, gpointer user_data)
--{
--	gchar *text;
--	gdouble fraction;
++
 +	if (!elapsed_time)
 +		return;
- 
--	text = g_strdup_printf(_("Transfered %d of %d bytes"), bytes, filesize);
--	gtk_label_set_markup(GTK_LABEL(label_status), text);
--	g_free(text);
++
 +	transfer_rate = actual_bytes_sent / elapsed_time;
 +	if (transfer_rate == 0)
 +		return;
  
--	fraction = (gdouble) bytes / (gdouble) filesize;
--	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress), fraction);
--}
+-	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress), 1.0);
 +	time_remaining = (app->byte_count - actual_bytes_sent) / transfer_rate;
  
--static void transfer_completed(DBusGProxy *proxy, gpointer user_data)
--{
--	gtk_label_set_markup(GTK_LABEL(label_status), _("Completed"));
+-	dbus_g_proxy_call(proxy, "Disconnect", NULL, G_TYPE_INVALID,
+-							G_TYPE_INVALID);
 +	if (time_remaining >= 3600) {
 +		str = g_strdup_printf(_("(%d:%02d:%d Remaining)"), 
 +				      time_remaining / 3600,
@@ -673,7 +690,8 @@ diff -u -p -r1.12 main.c
 +				      time_remaining % 60);
 +	}
  
--	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress), 1.0);
+-	gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog),
+-						GTK_RESPONSE_CLOSE, TRUE);
 +	/* Translators:
 +	 * Sending file 1 of 3 */
 +	str2 = g_strdup_printf(_("Sending file %d of %d"),
@@ -686,16 +704,13 @@ diff -u -p -r1.12 main.c
 +	g_free(str2);
 +	g_free(progressbar_text);
 +}
- 
--	dbus_g_proxy_call(proxy, "Disconnect", NULL, G_TYPE_INVALID,
--							G_TYPE_INVALID);
-+static void transfer_completed_cb(DBusGProxy *proxy, BluetoothSendto *app)
++
++static void
++transfer_completed_cb(DBusGProxy *proxy, BluetoothSendto *app)
 +{
 +	app->current_file++;
 +	app->bytes_sent += app->file_length;
- 
--	gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog),
--						GTK_RESPONSE_CLOSE, TRUE);
++
 +	g_idle_add((GSourceFunc) send_one, app);
  }
  
@@ -837,8 +852,9 @@ diff -u -p -r1.12 main.c
  }
  
 -static gchar *option_device = NULL;
-+static void error_occurred_cb(DBusGProxy *proxy, const gchar *error_name,	
-+			      const gchar *error_message, BluetoothSendto *app)
++static void
++error_occurred_cb(DBusGProxy *proxy, const gchar *error_name,	
++		  const gchar *error_message, BluetoothSendto *app)
 +{
 +	gint ret;
 +	gboolean link_error = FALSE;
@@ -883,9 +899,14 @@ diff -u -p -r1.12 main.c
 +
 +	g_free(error_text);
 +}
-+
-+static void free_mem(BluetoothSendto *app)
-+{
+ 
+-int main(int argc, char *argv[])
++static void
++free_mem(BluetoothSendto *app)
+ {
+-	DBusGProxy *proxy;
+-	GError *error;
+-	gchar *filename, *address;
 +	if (files_to_send)
 +		g_strfreev(files_to_send);
 +	g_free(bdaddrstr);
@@ -899,12 +920,10 @@ diff -u -p -r1.12 main.c
 +		g_free(app);
 +	}
 +}
- 
- int main(int argc, char *argv[])
- {
--	DBusGProxy *proxy;
--	GError *error;
--	gchar *filename, *address;
++
++int
++main(int argc, char *argv[])
++{
 +	GOptionContext *option_context;
 +	GError *err = NULL;
 +	guint i;
@@ -1077,41 +1096,8 @@ diff -u -p -r1.12 main.c
  }
 +
 --- /dev/null	2008-01-24 17:45:36.352009045 +0000
-+++ utils.h	2008-02-01 16:00:15.000000000 +0000
-@@ -0,0 +1,30 @@
-+/*
-+ * bluetooth-sendto
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2005-2007  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2006-2007 Tadas Dailyda <tadas@dailyda.com>
-+ *  Copyright (C) 2007 Bastien Nocera <hadess@hadess.net>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <glib.h>
-+
-+gchar *browse_device_dialog(void);
-+GSList *select_files_dialog(void);
-+
---- /dev/null	2008-01-24 17:45:36.352009045 +0000
-+++ utils.c	2008-02-01 16:13:24.000000000 +0000
-@@ -0,0 +1,112 @@
++++ utils.c	2008-02-01 16:00:39.000000000 +0000
+@@ -0,0 +1,115 @@
 +/*
 + * bluetooth-sendto
 + *
@@ -1154,8 +1140,9 @@ diff -u -p -r1.12 main.c
 +
 +#include "bluetooth-device-selection.h"
 +
-+static void selected_device_changed_cb(BluetoothDeviceSelection *selector,
-+				       gchar *address, gpointer user_data)
++static void
++selected_device_changed_cb(BluetoothDeviceSelection *selector,
++			   gchar *address, gpointer user_data)
 +{
 +	GtkWidget *dialog = user_data;
 +
@@ -1163,7 +1150,8 @@ diff -u -p -r1.12 main.c
 +					  GTK_RESPONSE_ACCEPT, address != NULL);
 +}
 +
-+gchar *browse_device_dialog(void)
++gchar *
++browse_device_dialog(void)
 +{
 +	GtkWidget *dialog;
 +	GtkWidget *selector;
@@ -1202,7 +1190,8 @@ diff -u -p -r1.12 main.c
 +	return address;
 +}
 +
-+GSList *select_files_dialog(void)
++GSList *
++select_files_dialog(void)
 +{
 +	GtkWidget *dialog;
 +	GSList *file_list;
@@ -1224,8 +1213,41 @@ diff -u -p -r1.12 main.c
 +	return file_list;
 +}
 +
+--- /dev/null	2008-01-24 17:45:36.352009045 +0000
++++ utils.h	2008-02-01 16:00:15.000000000 +0000
+@@ -0,0 +1,30 @@
++/*
++ * bluetooth-sendto
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2005-2007  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2006-2007 Tadas Dailyda <tadas@dailyda.com>
++ *  Copyright (C) 2007 Bastien Nocera <hadess@hadess.net>
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include <glib.h>
++
++gchar *browse_device_dialog(void);
++GSList *select_files_dialog(void);
++
 
---=-ndGKZIW0T8WYg2WARAi8
+--=-JGhenognbsXTZgRvSjU9
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -1235,7 +1257,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---=-ndGKZIW0T8WYg2WARAi8
+--=-JGhenognbsXTZgRvSjU9
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -1246,4 +1268,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-ndGKZIW0T8WYg2WARAi8--
+--=-JGhenognbsXTZgRvSjU9--
