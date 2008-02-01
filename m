@@ -1,10 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1201866163.2389.311.camel@cookie.hadess.net>
+In-Reply-To: <1201869196.2389.321.camel@cookie.hadess.net>
 References: <1201866163.2389.311.camel@cookie.hadess.net>
-Date: Fri, 01 Feb 2008 13:44:44 +0100
-Message-Id: <1201869884.6218.193.camel@violet>
+	<1201869196.2389.321.camel@cookie.hadess.net>
+Date: Fri, 01 Feb 2008 13:40:25 +0100
+Message-Id: <1201869625.6218.191.camel@violet>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] [PATCH] Send DefaultAdapterChanged more often
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -22,11 +23,18 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Bastien,
 
-> Both patches attached. The bluez-gnome patch includes the changes from
-> the client.c cleanup thread.
+> > Before the patch, we only used to send the DefaultAdapter changed from
+> > one adapter to another, never when there wasn't a new default adapter.
+> > 
+> > This allows us to remove bad tricks from client.c as well.
+> > 
+> > Both patches attached. The bluez-gnome patch includes the changes from
+> > the client.c cleanup thread.
+> > 
+> > Try plugging/unplugging your adapters after the patching, and the
+> > treeview will magically change its contents.
 > 
-> Try plugging/unplugging your adapters after the patching, and the
-> treeview will magically change its contents.
+> Updated patch with documentation changes.
 
 patch has been applied. Thanks.
 
