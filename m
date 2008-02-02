@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Guillaume Bedot <littletux@zarb.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <47A438C6.90700@gmx.de>
-References: <47A274DB.9020808@gmx.de>  <47A438C6.90700@gmx.de>
-Date: Sat, 02 Feb 2008 15:29:55 +0100
-Message-Id: <1201962595.7441.1.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] BT Headset connected but no sound
+Message-ID: <5eee8c670802020353r6664d3eoec5fc6eb7b2f9a49@mail.gmail.com>
+Date: Sat, 2 Feb 2008 11:53:11 +0000
+From: "Odysseus Flappington" <deriziotis@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <204186.99953.qm@web8409.mail.in.yahoo.com>
+MIME-Version: 1.0
+References: <204186.99953.qm@web8409.mail.in.yahoo.com>
+Subject: Re: [Bluez-users] Want BT Dongle supporting Bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,17 +16,48 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-UmUsCgpMZSBzYW1lZGkgMDIgZsOpdnJpZXIgMjAwOCDDoCAxMDozMiArMDEwMCwgRGFuaWVsIFN0
-dW1wbmVyIGEgw6ljcml0IDoKPiA+IGJsdWV6LWxpYnMtMy4yNAo+ID4gYmx1ZXMtdXRpbHMtMy4y
-NAoKMy4yNSBpcyBvdXQuLi4gaXQgc2hvdWxkIGhlbHAuCgpSZWdhcmRzLAoKR3VpbGxhdW1lIEIu
-CgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6IE1p
-Y3Jvc29mdApEZWZ5IGFsbCBjaGFsbGVuZ2VzLiBNaWNyb3NvZnQoUikgVmlzdWFsIFN0dWRpbyAy
-MDA4LgpodHRwOi8vY2xrLmF0ZG10LmNvbS9NUlQvZ28vdnNlMDEyMDAwMDA3MG1ydC9kaXJlY3Qv
-MDEvCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6
-LXVzZXJzIG1haWxpbmcgbGlzdApCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0
-cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
+Hi,
+
+I'd recommend the Edimax USB dongle since it actually states
+Linux-compatibility on the product specs. It does claim that it does
+not provide Linux-support itself, but the community does, but not many
+manufacturers even acknowledge Linux on the device specs, and this is
+something I appreciate with all Edimax devices.
+
+http://www.edimax.com/en/produce_detail.php?pd_id=127&pl1_id=13&pl2_id=43
+
+Alex
+
+On 02/02/2008, pramod gurav <pramod_gurav_etc@yahoo.co.in> wrote:
+>
+> hi all
+> Can anyone suggest me the names of some of the BT dongle models that will
+> support BlueZ.
+>
+> Pramod
+>
+>  ________________________________
+>  Unlimited freedom, unlimited storage. Get it now
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2008.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
