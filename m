@@ -1,11 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Guillaume Bedot <littletux@zarb.org>
+Message-ID: <47A54226.2040703@gmx.de>
+Date: Sun, 03 Feb 2008 05:25:10 +0100
+From: Daniel Stumpner <bigstumpi@gmx.de>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <47A274DB.9020808@gmx.de>
 References: <47A274DB.9020808@gmx.de>
-Date: Sun, 03 Feb 2008 09:05:49 +0100
-Message-Id: <1202025949.7162.10.camel@localhost>
-Mime-Version: 1.0
+	<47A438C6.90700@gmx.de>	<1201948807.11895.10.camel@littletux>
+	<alpine.LNX.1.00.0802022032290.23675@nge2.ngu.pk>
+In-Reply-To: <alpine.LNX.1.00.0802022032290.23675@nge2.ngu.pk>
 Subject: Re: [Bluez-users] BT Headset connected but no sound
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -16,31 +18,44 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGVsbG8gYWdhaW4sCgpMZSB2ZW5kcmVkaSAwMSBmw6l2cmllciAyMDA4IMOgIDAyOjI0ICswMTAw
-LCBEYW5pZWwgU3R1bXBuZXIgYSDDqWNyaXQgOgo+IAo+ICMgaGNpY29uZmlnIC1hCj4gaGNpMDog
-ICBUeXBlOiBVU0IKPiAgICAgICAgIEJEIEFkZHJlc3M6IDAwOjEwOkM2OkY4OjExOjdDIEFDTCBN
-VFU6IDM3NzoxMCBTQ08gTVRVOiAxNjowCj4gICAgICAgICBVUCBSVU5OSU5HIFBTQ0FOIElTQ0FO
-Cj4gICAgICAgICBSWCBieXRlczo4NzE5MSBhY2w6Mjcgc2NvOjE2NzYgZXZlbnRzOjUzIGVycm9y
-czowCj4gICAgICAgICBUWCBieXRlczo4MDkgYWNsOjIxIHNjbzowIGNvbW1hbmRzOjMwIGVycm9y
-czowCj4gICAgICAgICBGZWF0dXJlczogMHhmZiAweGZlIDB4MGQgMHgzOCAweDA4IDB4MDggMHgw
-MCAweDAwCj4gICAgICAgICBQYWNrZXQgdHlwZTogRE0xIERNMyBETTUgREgxIERIMyBESDUgSFYx
-IEhWMiBIVjMKPiAgICAgICAgIExpbmsgcG9saWN5OiBSU1dJVENIIEhPTEQgU05JRkYgUEFSSwo+
-ICAgICAgICAgTGluayBtb2RlOiBTTEFWRSBBQ0NFUFQKPiAgICAgICAgIE5hbWU6ICdCbHVlWiAo
-MCknCj4gICAgICAgICBDbGFzczogMHgwODAxMDAKPiAgICAgICAgIFNlcnZpY2UgQ2xhc3Nlczog
-Q2FwdHVyaW5nCj4gICAgICAgICBEZXZpY2UgQ2xhc3M6IENvbXB1dGVyLCBVbmNhdGVnb3JpemVk
-Cj4gICAgICAgICBIQ0kgVmVyOiAxLjIgKDB4MikgSENJIFJldjogMHgxMSBMTVAgVmVyOiAxLjIg
-KDB4MikgTE1QCj4gU3VidmVyOiAweDY5NjMKPiAgICAgICAgIE1hbnVmYWN0dXJlcjogQnJvYWRj
-b20gQ29ycG9yYXRpb24gKDE1KQpEaWQgeW91IHRyeSB0byBhZGQgIm9wdGlvbnMgaGNpX3VzYiBm
-b3JjZV9zY29maXg9MSIgdG8KeW91ciAvZXRjL21vZHByb2JlLmNvbmYgPwoKUmVnYXJkcywKCkd1
-aWxsYXVtZSBCLgoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNv
-cmVkIGJ5OiBNaWNyb3NvZnQKRGVmeSBhbGwgY2hhbGxlbmdlcy4gTWljcm9zb2Z0KFIpIFZpc3Vh
-bCBTdHVkaW8gMjAwOC4KaHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBt
-cnQvZGlyZWN0LzAxLwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXwpCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9y
-Z2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6
-LXVzZXJzCg==
+Hello,
+
+I tried with the Patch for 3.24 and with the new version bluez-utils-3.25.
+
+One Error Message is gone in both cases but the problem is still the
+same. Is there a difference between the Authorization Agent and the
+Passkey-Agent in log Messages?
+(The Message "no default passkey agent" is gone.)
+
+
+Now I get following output:
+
+hcid[7839]: link_key_request (sba=00:10:C6:F8:11:7C, dba=00:0D:44:30:4B:11)
+audio[7846]: Requesting authorization for device 00:0D:44:30:4B:11, UUID
+00001112-0000-1000-8000-00805F9B34FB
+audio[7846]: State changed /org/bluez/audio/device0:
+HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
+audio[7846]: Access denied: Authorization agent does not exist
+audio[7846]: State changed /org/bluez/audio/device0:
+HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_DISCONNECTED
+hcid[7839]: link_key_notify (sba=00:10:C6:F8:11:7C, dba=00:0D:44:30:4B:11)
+
+
+Can you tell me what further detailed information you (or I) need to
+find the reason for my problem?
+
+Thanks for your time!
+Regards, Daniel
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
