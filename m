@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Feb 2008 14:18:20 -0500
-From: jayjwa <jayjwa@atr2.ath.cx>
+From: Guillaume Bedot <littletux@zarb.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <123158.43460.qm@web8404.mail.in.yahoo.com>
-Message-ID: <alpine.LNX.1.00.0802041337320.20697@nge2.ngu.pk>
-References: <123158.43460.qm@web8404.mail.in.yahoo.com>
-MIME-Version: 1.0
-Subject: Re: [Bluez-users] No sound on headset
+In-Reply-To: <47A274DB.9020808@gmx.de>
+References: <47A274DB.9020808@gmx.de>
+Date: Sun, 03 Feb 2008 09:05:49 +0100
+Message-Id: <1202025949.7162.10.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] BT Headset connected but no sound
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,53 +16,31 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-
-
-On Mon, 4 Feb 2008, pramod gurav wrote:
-
--> I want to play audio from my system on my BT headset..
--> I am able connect to it, pair it, but when i run command
--> [Pramod@localhost ~]$ mplayer_install/bin/mplayer -ao alsa:device=headset 
-1.mp3                                                       mmmmmmm
--> It gives one beep and waits for few seconds and again comes out with this error.....
--> 
--> [AO_ALSA] alsa-lib: pcm_sco.c:277:(sco_headset_hw_params) Unable to set number of SCO buffers : please upgrade your Kernel !
--> [AO_ALSA] Unable to set hw-parameters: Invalid argument
--> Could not open/initialize audio device -> no sound.
--> Audio: no sound
--> Video: no video
-
-You should at least use a modern kernel for the best chance at getting this to 
-work. The current version is something like 2.6.24 last time I looked, so 
-2.6.15 is very old and possibly vulnerable to a number root exploits if not 
-patched.
-
-
--> After this one beep is being listened..
--> What may be the reason for this ???
-
-There's not enough info here for me to tell. Try running the daemons in debug 
-in the forground (hcid, sdpd). Maybe run hcidump during the time you try as 
-well.
-
-
--> I tried adding patch from plugs from Bluez CVS....But its not compatible  with my kernel 
--> 2..6.15 fedoraCore-5....
--> Which patch i should add for upgrading my kernel.....?
-
-Just download the latest kernel. Build, install.
-
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGVsbG8gYWdhaW4sCgpMZSB2ZW5kcmVkaSAwMSBmw6l2cmllciAyMDA4IMOgIDAyOjI0ICswMTAw
+LCBEYW5pZWwgU3R1bXBuZXIgYSDDqWNyaXQgOgo+IAo+ICMgaGNpY29uZmlnIC1hCj4gaGNpMDog
+ICBUeXBlOiBVU0IKPiAgICAgICAgIEJEIEFkZHJlc3M6IDAwOjEwOkM2OkY4OjExOjdDIEFDTCBN
+VFU6IDM3NzoxMCBTQ08gTVRVOiAxNjowCj4gICAgICAgICBVUCBSVU5OSU5HIFBTQ0FOIElTQ0FO
+Cj4gICAgICAgICBSWCBieXRlczo4NzE5MSBhY2w6Mjcgc2NvOjE2NzYgZXZlbnRzOjUzIGVycm9y
+czowCj4gICAgICAgICBUWCBieXRlczo4MDkgYWNsOjIxIHNjbzowIGNvbW1hbmRzOjMwIGVycm9y
+czowCj4gICAgICAgICBGZWF0dXJlczogMHhmZiAweGZlIDB4MGQgMHgzOCAweDA4IDB4MDggMHgw
+MCAweDAwCj4gICAgICAgICBQYWNrZXQgdHlwZTogRE0xIERNMyBETTUgREgxIERIMyBESDUgSFYx
+IEhWMiBIVjMKPiAgICAgICAgIExpbmsgcG9saWN5OiBSU1dJVENIIEhPTEQgU05JRkYgUEFSSwo+
+ICAgICAgICAgTGluayBtb2RlOiBTTEFWRSBBQ0NFUFQKPiAgICAgICAgIE5hbWU6ICdCbHVlWiAo
+MCknCj4gICAgICAgICBDbGFzczogMHgwODAxMDAKPiAgICAgICAgIFNlcnZpY2UgQ2xhc3Nlczog
+Q2FwdHVyaW5nCj4gICAgICAgICBEZXZpY2UgQ2xhc3M6IENvbXB1dGVyLCBVbmNhdGVnb3JpemVk
+Cj4gICAgICAgICBIQ0kgVmVyOiAxLjIgKDB4MikgSENJIFJldjogMHgxMSBMTVAgVmVyOiAxLjIg
+KDB4MikgTE1QCj4gU3VidmVyOiAweDY5NjMKPiAgICAgICAgIE1hbnVmYWN0dXJlcjogQnJvYWRj
+b20gQ29ycG9yYXRpb24gKDE1KQpEaWQgeW91IHRyeSB0byBhZGQgIm9wdGlvbnMgaGNpX3VzYiBm
+b3JjZV9zY29maXg9MSIgdG8KeW91ciAvZXRjL21vZHByb2JlLmNvbmYgPwoKUmVnYXJkcywKCkd1
+aWxsYXVtZSBCLgoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNv
+cmVkIGJ5OiBNaWNyb3NvZnQKRGVmeSBhbGwgY2hhbGxlbmdlcy4gTWljcm9zb2Z0KFIpIFZpc3Vh
+bCBTdHVkaW8gMjAwOC4KaHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBt
+cnQvZGlyZWN0LzAxLwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fXwpCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9y
+Z2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6
+LXVzZXJzCg==
