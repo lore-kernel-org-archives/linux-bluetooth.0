@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: SA <sa@claborn.net>
+Date: Mon, 4 Feb 2008 14:18:20 -0500
+From: jayjwa <jayjwa@atr2.ath.cx>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Mon, 4 Feb 2008 17:52:04 -0600
-References: <200801242256.33910.sa@claborn.net> <479D1EFB.9020005@gmail.com>
-In-Reply-To: <479D1EFB.9020005@gmail.com>
+In-Reply-To: <123158.43460.qm@web8404.mail.in.yahoo.com>
+Message-ID: <alpine.LNX.1.00.0802041337320.20697@nge2.ngu.pk>
+References: <123158.43460.qm@web8404.mail.in.yahoo.com>
 MIME-Version: 1.0
-Message-Id: <200802041752.04450.sa@claborn.net>
-Subject: Re: [Bluez-users] How to setup a headset as an audio device?
-	Getting "Device busy" errors
+Subject: Re: [Bluez-users] No sound on headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,78 +20,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Sunday 27 January 2008 18:16:59 Eugene wrote:
-> Hello,
-> try to
-> aplay -v -D bluetooth './your-sound.wav'
-> and send its output. Else, did you started bluetooth audio service?
-> To check, use:
-> ps ax | grep bluetoothd-service-audio
 
 
-BTW I started off using KDE and the bluetooth applet to pair the device. It is 
-now listed in the "Paired/Trusted Devices" screen. It it also listed in 
-the "Configured Input Devices" section of "Input Devices".
+On Mon, 4 Feb 2008, pramod gurav wrote:
 
-I'm a little suspicious of the KDE applets, does anyone know what tools to use 
-on the commandline to make sure that the connection/pairing is good? It shows 
-up with hcitool scan:
+-> I want to play audio from my system on my BT headset..
+-> I am able connect to it, pair it, but when i run command
+-> [Pramod@localhost ~]$ mplayer_install/bin/mplayer -ao alsa:device=headset 
+1.mp3                                                       mmmmmmm
+-> It gives one beep and waits for few seconds and again comes out with this error.....
+-> 
+-> [AO_ALSA] alsa-lib: pcm_sco.c:277:(sco_headset_hw_params) Unable to set number of SCO buffers : please upgrade your Kernel !
+-> [AO_ALSA] Unable to set hw-parameters: Invalid argument
+-> Could not open/initialize audio device -> no sound.
+-> Audio: no sound
+-> Video: no video
 
-
-citrine:~ # hcitool scan
-Scanning ...
-        00:0D:3C:6F:0E:89       Jawbone
-#
-
-Output of trying to play:
-
-:~> aplay -v -D bluetooth /work/tmp/Audio-tmp/11\ -\ How\ Can\ I\ Keep\ From\ 
-Singing-.wav
-ALSA lib pcm_bluetooth.c:1189:(bluetooth_init) Connection fail
-aplay: main:546: audio open error: Connection refused
-
-I don't see anything useful in /var/log/messages
-
-I tried deleting the pairing, re-pairing and immediately doing the "aplay" 
-test and still I get the same error.
-
-As far as the bluetooth audio service, I'm not sure. As I mentioend, I'm on 
-SuSE 10.3. It only has /etc/init.d/bluetooth which I think is supposed to 
-handle all types of bluetooth connections - like a wrapper or something.
-
-ps ax |grep blue
-27467 ?        Ss     0:00 /usr/sbin/hcid -s -f /etc/bluetooth/hcid.conf
-27472 ?        S      0:00 /usr/lib/bluetooth/bluetoothd-service-input
+You should at least use a modern kernel for the best chance at getting this to 
+work. The current version is something like 2.6.24 last time I looked, so 
+2.6.15 is very old and possibly vulnerable to a number root exploits if not 
+patched.
 
 
-# cat /etc/bluetooth/audio.service
-[Bluetooth Service]
-Identifier=audio
-Name=Audio service
-Description=Bluetooth Audio service
+-> After this one beep is being listened..
+-> What may be the reason for this ???
 
-My bluetooth adapter is the good old USB D-Link DBT 120 that works on 
-everything (Mac, Linux etc).
-
-hcitool con shows:
-
-# hcitool con
-Connections:
+There's not enough info here for me to tell. Try running the daemons in debug 
+in the forground (hcid, sdpd). Maybe run hcidump during the time you try as 
+well.
 
 
-hcitool rssi 00:0D:3C:6F:0E:89
-Not connected.
+-> I tried adding patch from plugs from Bluez CVS....But its not compatible  with my kernel 
+-> 2..6.15 fedoraCore-5....
+-> Which patch i should add for upgrading my kernel.....?
+
+Just download the latest kernel. Build, install.
 
 
-I'm not sure what that means. I wonder if it means it's not really connected?
-
-	JW
-
--- 
-
-----------------------
-System Administrator - Cedar Creek Software http://www.cedarcreeksoftware.com
-http://jwadmin.blogspot.com/
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
