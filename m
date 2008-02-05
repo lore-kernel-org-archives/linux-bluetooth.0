@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300802050732p7344b52enca222f33e8599085@mail.gmail.com>
-Date: Tue, 5 Feb 2008 08:32:27 -0700
+Message-ID: <d89ddf300802050725w60e5c976ped6a6d83d97df0d6@mail.gmail.com>
+Date: Tue, 5 Feb 2008 08:25:22 -0700
 From: "Brad Midgley" <bmidgley@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <8f5c4ad0802050338m771e8783x1974173ef7588685@mail.gmail.com>
+In-Reply-To: <47A8669E.4080308@gmx.de>
 MIME-Version: 1.0
-References: <8f5c4ad0802010514p6c52938fy173541c9600ea55f@mail.gmail.com>
-	<d89ddf300802010833p34cb076cs3fa1ef394f8b730c@mail.gmail.com>
-	<8f5c4ad0802050338m771e8783x1974173ef7588685@mail.gmail.com>
-Subject: Re: [Bluez-users] Infineon PBA31308
+References: <47A274DB.9020808@gmx.de> <1202025949.7162.10.camel@localhost>
+	<47A8669E.4080308@gmx.de>
+Subject: Re: [Bluez-users] BT Headset connected but no sound
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,14 +21,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-George
+Daniel
 
-I believe blackfin is using an older version of the gumstix hack.
+> I am using twinkle for SIP, but I can't get it working with bluetooth.
+> Is there a way that I can see the headset as a alsa-device in
+> /proc/asound/cards and that all applications can use it like a standard
+> audio-device (alsamixer, etc...)?
 
-I haven't experimented with initializing the chip myself but I know it
-is very particular about how things are done... I would suggest trying
-to do things exactly as they do if you still have trouble.
+sorry...alsa does not allow the plugin to show up in the standard list.
 
+you should be able to choose "ALSA: other device" and type in
+"bluetooth" or whatever you named the plugin in /etc/asound.conf or
+~/.asounrc
+
+-- 
 Brad
 
 -------------------------------------------------------------------------
