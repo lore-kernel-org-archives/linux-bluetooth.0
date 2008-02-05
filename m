@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300802050725w60e5c976ped6a6d83d97df0d6@mail.gmail.com>
-Date: Tue, 5 Feb 2008 08:25:22 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <47A8669E.4080308@gmx.de>
+Message-ID: <47A8669E.4080308@gmx.de>
+Date: Tue, 05 Feb 2008 14:37:34 +0100
+From: Daniel Stumpner <bigstumpi@gmx.de>
 MIME-Version: 1.0
+To: BlueZ users <bluez-users@lists.sourceforge.net>
 References: <47A274DB.9020808@gmx.de> <1202025949.7162.10.camel@localhost>
-	<47A8669E.4080308@gmx.de>
+In-Reply-To: <1202025949.7162.10.camel@localhost>
 Subject: Re: [Bluez-users] BT Headset connected but no sound
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -17,31 +16,52 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Daniel
-
-> I am using twinkle for SIP, but I can't get it working with bluetooth.
-> Is there a way that I can see the headset as a alsa-device in
-> /proc/asound/cards and that all applications can use it like a standard
-> audio-device (alsamixer, etc...)?
-
-sorry...alsa does not allow the plugin to show up in the standard list.
-
-you should be able to choose "ALSA: other device" and type in
-"bluetooth" or whatever you named the plugin in /etc/asound.conf or
-~/.asounrc
-
--- 
-Brad
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGksCgpJIGdvdCBpdCB3b3JraW5nIQoKSSBwYXRjaGVkIG15IDIuNi4yMyBrZXJuZWwgd2l0aCB0
+aGUgYmx1ZXotcGF0Y2ggYW5kIGF0dGFjaGVkIHRoZQpmb3JjZV9zY29maXg9MSBvcHRpb24gKHRv
+IGtlcm5lbCBib290IGxpbmUgYW5kIHRvIG1vZHJvYmUuY29uZiBqdXN0IHRvCm1ha2Ugc3VyZSkK
+VGhhdCBkaWRuJ3QgY2hhbmdlIGFueXRoaW5nIGZvciBtZS4KVGhlbiBJIGluc3RhbGxlZCB0aGUg
+Ymx1ZXotZ25vbWUgYWdlbnQgYW5kIHN0YXJ0ZWQgdGhlIGFwcGxldC4gVGhhdApoZWxwZWQgbWUg
+Z2V0dGluZyByaWQgb2YgdGhlIHdhcm5pbmcgdGhhdCBubyBhdXRob3JpemF0aW9uIGFnZW50IGlz
+CmF2YWlsYWJsZS4KU2hvdWxkJ3QgYmUgb25lIGluIGJsdWV6LXV0aWxzL2RhZW1vbi9hdXRoLWFn
+ZW50LmMgID8/PwpIb3cgY2FuIEkgZ2V0IHRoaXMgb25lIHdvcmtpbmc/CgoKSSBjYW4gcGxheSBh
+bmQgcmVjb3JkIHdpdGggYXBsYXkvYXJlY29yZCBhbmQgcGxheSB3aXRoIG1wbGF5ZXIuCgpJIGFt
+IHVzaW5nIHR3aW5rbGUgZm9yIFNJUCwgYnV0IEkgY2FuJ3QgZ2V0IGl0IHdvcmtpbmcgd2l0aCBi
+bHVldG9vdGguCklzIHRoZXJlIGEgd2F5IHRoYXQgSSBjYW4gc2VlIHRoZSBoZWFkc2V0IGFzIGEg
+YWxzYS1kZXZpY2UgaW4KL3Byb2MvYXNvdW5kL2NhcmRzIGFuZCB0aGF0IGFsbCBhcHBsaWNhdGlv
+bnMgY2FuIHVzZSBpdCBsaWtlIGEgc3RhbmRhcmQKYXVkaW8tZGV2aWNlIChhbHNhbWl4ZXIsIGV0
+Yy4uLik/CgpCZXN0IHJlZ2FyZHMsIERhbmllbAoKCgpHdWlsbGF1bWUgQmVkb3Qgd3JvdGU6Cj4g
+SGVsbG8gYWdhaW4sCj4gCj4gTGUgdmVuZHJlZGkgMDEgZsOpdnJpZXIgMjAwOCDDoCAwMjoyNCAr
+MDEwMCwgRGFuaWVsIFN0dW1wbmVyIGEgw6ljcml0IDoKPj4gIyBoY2ljb25maWcgLWEKPj4gaGNp
+MDogICBUeXBlOiBVU0IKPj4gICAgICAgICBCRCBBZGRyZXNzOiAwMDoxMDpDNjpGODoxMTo3QyBB
+Q0wgTVRVOiAzNzc6MTAgU0NPIE1UVTogMTY6MAo+PiAgICAgICAgIFVQIFJVTk5JTkcgUFNDQU4g
+SVNDQU4KPj4gICAgICAgICBSWCBieXRlczo4NzE5MSBhY2w6Mjcgc2NvOjE2NzYgZXZlbnRzOjUz
+IGVycm9yczowCj4+ICAgICAgICAgVFggYnl0ZXM6ODA5IGFjbDoyMSBzY286MCBjb21tYW5kczoz
+MCBlcnJvcnM6MAo+PiAgICAgICAgIEZlYXR1cmVzOiAweGZmIDB4ZmUgMHgwZCAweDM4IDB4MDgg
+MHgwOCAweDAwIDB4MDAKPj4gICAgICAgICBQYWNrZXQgdHlwZTogRE0xIERNMyBETTUgREgxIERI
+MyBESDUgSFYxIEhWMiBIVjMKPj4gICAgICAgICBMaW5rIHBvbGljeTogUlNXSVRDSCBIT0xEIFNO
+SUZGIFBBUksKPj4gICAgICAgICBMaW5rIG1vZGU6IFNMQVZFIEFDQ0VQVAo+PiAgICAgICAgIE5h
+bWU6ICdCbHVlWiAoMCknCj4+ICAgICAgICAgQ2xhc3M6IDB4MDgwMTAwCj4+ICAgICAgICAgU2Vy
+dmljZSBDbGFzc2VzOiBDYXB0dXJpbmcKPj4gICAgICAgICBEZXZpY2UgQ2xhc3M6IENvbXB1dGVy
+LCBVbmNhdGVnb3JpemVkCj4+ICAgICAgICAgSENJIFZlcjogMS4yICgweDIpIEhDSSBSZXY6IDB4
+MTEgTE1QIFZlcjogMS4yICgweDIpIExNUAo+PiBTdWJ2ZXI6IDB4Njk2Mwo+PiAgICAgICAgIE1h
+bnVmYWN0dXJlcjogQnJvYWRjb20gQ29ycG9yYXRpb24gKDE1KQo+IERpZCB5b3UgdHJ5IHRvIGFk
+ZCAib3B0aW9ucyBoY2lfdXNiIGZvcmNlX3Njb2ZpeD0xIiB0bwo+IHlvdXIgL2V0Yy9tb2Rwcm9i
+ZS5jb25mID8KPiAKPiBSZWdhcmRzLAo+IAo+IEd1aWxsYXVtZSBCLgo+IAo+IAo+IC0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0KPiBUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6IE1pY3Jvc29mdAo+
+IERlZnkgYWxsIGNoYWxsZW5nZXMuIE1pY3Jvc29mdChSKSBWaXN1YWwgU3R1ZGlvIDIwMDguCj4g
+aHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBtcnQvZGlyZWN0LzAxLwo+
+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCj4gQmx1ZXot
+dXNlcnMgbWFpbGluZyBsaXN0Cj4gQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cj4g
+aHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
+Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBNaWNy
+b3NvZnQKRGVmeSBhbGwgY2hhbGxlbmdlcy4gTWljcm9zb2Z0KFIpIFZpc3VhbCBTdHVkaW8gMjAw
+OC4KaHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBtcnQvZGlyZWN0LzAx
+LwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei11
+c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBz
+Oi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
