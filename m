@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <f21e7dc80802050621n28934acay903394cbc6152413@mail.gmail.com>
+Message-ID: <f21e7dc80802050621n28934acay903394cbc6152413@mail.gmail.com>
+Date: Tue, 5 Feb 2008 16:21:37 +0200
+From: "Choi Sonim" <choisonim@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1202220823.15090.88.camel@violet>
+MIME-Version: 1.0
 References: <f21e7dc80802042255w4a688071h2678817a45b920fa@mail.gmail.com>
 	<1202220823.15090.88.camel@violet>
-	<f21e7dc80802050621n28934acay903394cbc6152413@mail.gmail.com>
-Date: Tue, 05 Feb 2008 15:29:57 +0100
-Message-Id: <1202221797.15090.93.camel@violet>
-Mime-Version: 1.0
 Subject: Re: [Bluez-devel] bluez+dbus: why glib binding
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,37 +21,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Choi,
+Hi Marcel,
 
-> > We use glib for the mainloop, the XML parser and other things.
-> 
-> Does glib impose a big memory footprint on the system or is it ok for
-> embedded systems ?
+On Feb 5, 2008 4:13 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> We use glib for the mainloop, the XML parser and other things.
 
-in most cases you need it for some other applications, too. So it is
-there anyway. For the Nokia Tablets and OpenMoko it seems good enough.
+Does glib impose a big memory footprint on the system or is it ok for
+embedded systems ?
 
-> > We will have hard dependencies on dbus and glib (not dbus-glib).
-> 
-> Maybe I'm confusing terms - but don't you use dbus' glib binding
-> (isn't that dbus-glib?) ?
+> We will have hard dependencies on dbus and glib (not dbus-glib).
 
-We use the dbus-glib only in bluez-gnome. The bluez-utils depends on
-glib and dbus. And that is different.
+Maybe I'm confusing terms - but don't you use dbus' glib binding
+(isn't that dbus-glib?) ?
 
-> If not - what do you use instead ? directly the libdus C lowlevel library ?
-> or some other binding ?
-> IOW - is it possible to use glib binding without dbus-glib ?
+If not - what do you use instead ? directly the libdus C lowlevel library ?
+or some other binding ?
+IOW - is it possible to use glib binding without dbus-glib ?
 
-You don't get it. The dbus-glib bindings are an integration of dbus into
-the GObject model (libgobject). We don't use that. Yes, we use glib, but
-not gobject and yes, we use dbus (low-level libdbus).
-
-Regards
-
-Marcel
-
-
+thank you very much - you are very helpful !
+choi
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
