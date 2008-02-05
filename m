@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <f21e7dc80802050641pe208e9ew8eb686088cbf71d5@mail.gmail.com>
-Date: Tue, 5 Feb 2008 16:41:30 +0200
-From: "Choi Sonim" <choisonim@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1202221797.15090.93.camel@violet>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <f21e7dc80802050621n28934acay903394cbc6152413@mail.gmail.com>
 References: <f21e7dc80802042255w4a688071h2678817a45b920fa@mail.gmail.com>
 	<1202220823.15090.88.camel@violet>
 	<f21e7dc80802050621n28934acay903394cbc6152413@mail.gmail.com>
-	<1202221797.15090.93.camel@violet>
+Date: Tue, 05 Feb 2008 15:29:57 +0100
+Message-Id: <1202221797.15090.93.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] bluez+dbus: why glib binding
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -23,42 +22,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Choi,
 
-On Feb 5, 2008 4:29 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > If not - what do you use instead ? directly the libdus C lowlevel library ?
-> > or some other binding ?
-> > IOW - is it possible to use glib binding without dbus-glib ?
->
-> You don't get it. The dbus-glib bindings are an integration of dbus into
-> the GObject model (libgobject). We don't use that. Yes, we use glib, but
-> not gobject and yes, we use dbus (low-level libdbus).
+> > We use glib for the mainloop, the XML parser and other things.
+> 
+> Does glib impose a big memory footprint on the system or is it ok for
+> embedded systems ?
 
-Ok, I think I understand.
-In bluez-utils, which is a d-bus server, you use directly the libdbus library,
-just like dbus-daemon does. So the glib is required for completely
-different reasons - not
-for using dbus. am I correct ?
+in most cases you need it for some other applications, too. So it is
+there anyway. For the Nokia Tablets and OpenMoko it seems good enough.
 
-thank you again very much
-choi
->
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2008.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+> > We will have hard dependencies on dbus and glib (not dbus-glib).
+> 
+> Maybe I'm confusing terms - but don't you use dbus' glib binding
+> (isn't that dbus-glib?) ?
+
+We use the dbus-glib only in bluez-gnome. The bluez-utils depends on
+glib and dbus. And that is different.
+
+> If not - what do you use instead ? directly the libdus C lowlevel library ?
+> or some other binding ?
+> IOW - is it possible to use glib binding without dbus-glib ?
+
+You don't get it. The dbus-glib bindings are an integration of dbus into
+the GObject model (libgobject). We don't use that. Yes, we use glib, but
+not gobject and yes, we use dbus (low-level libdbus).
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
