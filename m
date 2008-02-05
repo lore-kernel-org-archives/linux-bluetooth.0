@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <f21e7dc80802050621n28934acay903394cbc6152413@mail.gmail.com>
-Date: Tue, 5 Feb 2008 16:21:37 +0200
-From: "Choi Sonim" <choisonim@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1202220823.15090.88.camel@violet>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <f21e7dc80802042255w4a688071h2678817a45b920fa@mail.gmail.com>
 References: <f21e7dc80802042255w4a688071h2678817a45b920fa@mail.gmail.com>
-	<1202220823.15090.88.camel@violet>
+Date: Tue, 05 Feb 2008 15:13:43 +0100
+Message-Id: <1202220823.15090.88.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] bluez+dbus: why glib binding
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,25 +20,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Choi,
 
-On Feb 5, 2008 4:13 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> We use glib for the mainloop, the XML parser and other things.
+> i am intersted to understand why did bluez daemon choose to use the
+> glib binding of dbus.
 
-Does glib impose a big memory footprint on the system or is it ok for
-embedded systems ?
+the bluez-utils don't depend on dbus-glib. It is an option that we use
+for testing and nothing more.
 
-> We will have hard dependencies on dbus and glib (not dbus-glib).
+> i understand it is easier than the low level c library.
+> 
+> but - doesn't glib impose a new depedanbility ?
+> 
+> and - does the bluez daemon use glib for something other than dbus ?
 
-Maybe I'm confusing terms - but don't you use dbus' glib binding
-(isn't that dbus-glib?) ?
+We use glib for the mainloop, the XML parser and other things. However
+currently you can configure it to use the included eglib which means you
+don't have to depend on glib.
 
-If not - what do you use instead ? directly the libdus C lowlevel library ?
-or some other binding ?
-IOW - is it possible to use glib binding without dbus-glib ?
+However the option to use eglib will go away with the 4.x series. We
+will have hard dependencies on dbus and glib (not dbus-glib).
 
-thank you very much - you are very helpful !
-choi
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
