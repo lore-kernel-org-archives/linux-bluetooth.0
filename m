@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <f21e7dc80802042255w4a688071h2678817a45b920fa@mail.gmail.com>
-References: <f21e7dc80802042255w4a688071h2678817a45b920fa@mail.gmail.com>
-Date: Tue, 05 Feb 2008 15:13:43 +0100
-Message-Id: <1202220823.15090.88.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bluez+dbus: why glib binding
+Message-ID: <ad4496950802050402n70fd50a4t6532c34cca5ba73d@mail.gmail.com>
+Date: Tue, 5 Feb 2008 15:02:01 +0300
+From: "Mohammed Hagag" <mohamedhagag1981@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] device info database
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,42 +14,19 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Choi,
-
-> i am intersted to understand why did bluez daemon choose to use the
-> glib binding of dbus.
-
-the bluez-utils don't depend on dbus-glib. It is an option that we use
-for testing and nothing more.
-
-> i understand it is easier than the low level c library.
-> 
-> but - doesn't glib impose a new depedanbility ?
-> 
-> and - does the bluez daemon use glib for something other than dbus ?
-
-We use glib for the mainloop, the XML parser and other things. However
-currently you can configure it to use the included eglib which means you
-don't have to depend on glib.
-
-However the option to use eglib will go away with the 4.x series. We
-will have hard dependencies on dbus and glib (not dbus-glib).
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+aGkgYWxsLApkb2VzIGFueSBvbmUgaGVyZSBrbm93cyBpZiB0aGVyZSdzIGEgZGV2aWNlIGluZm8g
+ZGF0YWJhc2UgZXhpc3Qgb3Igbm90ID8KZm9yIGV4YW1wbGUgYSBkYXRhYmFzZSBjb250YWlucyB0
+aGUgZGV2aWNlIG1vZGVsIGFuZCB0aGUgYmx1ZXRvb3RoCmNoYW5uZWxzIGZvciBldmVyeSBkZXZp
+Y2UuCgoKLS0gCk1vaGFtZWQgTS4gSGFnYWcK2YXYrdmF2K8g2YXYrdmF2YjYryDYrdis2KfYrApo
+dHRwOi8vYmludG9vLnNmLm5ldC9kcnBsLwpodHRwOi8vbW9oYW1lZGhhZ2FnLndvcmRwcmVzcy5j
+b20KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6IE1p
+Y3Jvc29mdApEZWZ5IGFsbCBjaGFsbGVuZ2VzLiBNaWNyb3NvZnQoUikgVmlzdWFsIFN0dWRpbyAy
+MDA4LgpodHRwOi8vY2xrLmF0ZG10LmNvbS9NUlQvZ28vdnNlMDEyMDAwMDA3MG1ydC9kaXJlY3Qv
+MDEvCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6
+LWRldmVsIG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0
+cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
