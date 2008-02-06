@@ -1,12 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Guillaume Bedot <littletux@zarb.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200802052108.m15L8JgM007877@alumnus.caltech.edu>
-References: <200802052108.m15L8JgM007877@alumnus.caltech.edu>
-Date: Wed, 06 Feb 2008 10:24:00 +0100
-Message-Id: <1202289840.15090.214.camel@violet>
+In-Reply-To: <200802051542.11330.sa@claborn.net>
+References: <200801242256.33910.sa@claborn.net>
+	<200802051233.33098.sa@claborn.net>
+	<d89ddf300802051041j76801e4n5214d01bf01b48e3@mail.gmail.com>
+	<200802051542.11330.sa@claborn.net>
+Date: Wed, 06 Feb 2008 09:43:14 +0100
+Message-Id: <1202287394.11812.2.camel@littletux>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] failed PIN Code Request
+Subject: Re: [Bluez-users] How to setup a headset as an audio
+	device?	Getting "Device busy" errors
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,33 +24,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Russell,
+Hello,
 
-> 	When I try to connect to my headset (00:13:17:DD:D0:86) does
-> this hcidump:
-> 
-> 	> HCI Event: PIN Code Request (0x16) plen 6
-> 	    bdaddr 00:13:17:DD:D0:86
-> 	> HCI Event: Connect Complete (0x03) plen 11
-> 	    status 0x22 handle 0 bdaddr 00:13:17:DD:D0:86 type ACL encrypt 0x00
-> 	    Error: LMP Response Timeout
-> 
-> reveal that the headset has asked my computer for a PIN Code and not
-> received one in time?
-> 
-> 	20945 tty6     S      0:00 /usr/local/lib/bluetooth/add-passkey 00:13:17:DD:D0:86
-> 
-> is in the process list.  Does this mean that add-passkey isn't
-> working?
+On mar, 2008-02-05 at 15:42 -0600, SA wrote:
+> audio[3234]: /etc/bluetooth/audio.conf: /etc/bluetooth/audio.conf: No
+> such 
+> file or directory
+> Feb  5 14:31:56 citrine syslog-ng[2307]: last message repeated 3 times
+> Feb  5 14:31:56 citrine audio[3234]: Config options: DisableHFP=true, 
+> SCORouting=HCI, SourceCount=1
 
-this is from an odd Debian installation. Using that is a bad thing. Kill
-all these processes and simply log into the GNOME or KDE desktop and use
-their Bluetooth applet.
+So it should work using Hands-Free Profile,
+with /etc/bluetooth/audio.conf containing at least :
+DisableHFP=false
 
-Regards
+Regards,
 
-Marcel
-
+Guillaume B.
 
 
 -------------------------------------------------------------------------
