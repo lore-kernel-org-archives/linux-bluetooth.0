@@ -1,15 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <cc1649d10802071303i7517c3d1id683a6b1edf227bc@mail.gmail.com>
-Date: Thu, 7 Feb 2008 16:03:23 -0500
+Message-ID: <cc1649d10802071257r1d65d622sffa0e9a21883d9b@mail.gmail.com>
+Date: Thu, 7 Feb 2008 15:57:40 -0500
 From: "Vlad Skarzhevskyy" <skarzhevskyy@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <cc1649d10802071257r1d65d622sffa0e9a21883d9b@mail.gmail.com>
+In-Reply-To: <1202410007.15090.255.camel@violet>
 MIME-Version: 1.0
 References: <cc1649d10802051215j7f1d9406u6c4cda1b161c77de@mail.gmail.com>
 	<1202251232.15090.147.camel@violet>
 	<cc1649d10802071025s38dbe8dbuaeff21f05e45b49f@mail.gmail.com>
 	<1202410007.15090.255.camel@violet>
-	<cc1649d10802071257r1d65d622sffa0e9a21883d9b@mail.gmail.com>
 Subject: Re: [Bluez-devel] sdp_extract_pdu *** stack smashing detected ***
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -24,30 +23,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Just to make it clear  this is the versions.
+In fact I used default Fedora 7 and it has bluez-libs 3.9
+(libbluetooth.so.2.5.0)
 
-[root@tor bluez-libs-tests]# gcc --version
-gcc (GCC) 4.1.2 20070925 (Red Hat 4.1.2-27)
+I did source comparison with current sdp.c from bluez-libs 3.25 and I
+was not able to see any changer related to this.  So I blindly assumed
+this may be a bug.
 
-[root@tor bluez-libs-tests]# uname -a
-Linux torv 2.6.21-6.fc7xen #1 SMP Mon Nov 19 07:14:27 EST 2007 i686
-i686 i386 GNU/Linux
+Once  bluez-libs 3.25 installed (libbluetooth.so.2.9.4) the original
+test works fine but when I change the number of records to 215 I get
+the same error.  BUT not every run!!!!
 
-[root@tor bluez-libs-tests]# ldd ./target/bluez-tests
-        linux-gate.so.1 =>  (0x00762000)
-        libbluetooth.so.2 => /usr/lib/libbluetooth.so.2 (0x00233000)
-        libc.so.6 => /lib/i686/nosegneg/libc.so.6 (0x002b1000)
+--- start testing SDP convenrsions ---
+create SEQ of 215 elements
+call sdp_attr_add
+call sdp_gen_record_pdu
+pdu.data_size 438
+call sdp_extract_pdu
+pdu scanned 438
+OK
+--- tests finished ---
 
-[root@tor bluez-libs-tests]# file /usr/lib/libbluetooth.so.2
-/usr/lib/libbluetooth.so.2: symbolic link to `libbluetooth.so.2.9.4'
+
+--- start testing SDP convenrsions ---
+create SEQ of 215 elements
+call sdp_attr_add
+call sdp_gen_record_pdu
+make: *** [run] Segmentation fault
 
 
-[root@tor bluez-libs-tests]# file /usr/lib/libbluetooth.so.2.9.4
-/usr/lib/libbluetooth.so.2.9.4: ELF 32-bit LSB shared object, Intel
-80386, version 1 (SYSV), not stripped
-
--- 
-Vlad
+If I have  #define TEST_SEQ_SIZE 128  (On bluez-libs 3.25 )
+When I run the test if fails every 10-th run.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
