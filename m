@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Feb 2008 18:08:02 -0500
-From: jayjwa <jayjwa@atr2.ath.cx>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <611951.12552.qm@web8407.mail.in.yahoo.com>
-Message-ID: <alpine.LNX.1.00.0802081245410.12298@nge2.ngu.pk>
-References: <611951.12552.qm@web8407.mail.in.yahoo.com>
+Message-Id: <200802081658.m18GwrGX006241@fizban.dyndns.org>
+To: bluez-users@lists.sourceforge.net
+Date: Fri, 8 Feb 2008 11:58:53 -0500 (EST)
+From: montef@bellsouth.net
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] Headset not playing audio HELP PLEASE
+Subject: [Bluez-users] No output from hciconfig
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,47 +18,72 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hello all,
 
-On Fri, 8 Feb 2008, pramod gurav wrote:
+ A problem/question from a complete Bluetooth newb..
 
--> On the console where i run the audio service I get these log
--> audio[3032]: Accepted new client connection on unix socket (fd=9) audio[3032]: Audio API: received BT_GETCAPABILITIES_REQ
--> audio[3032]: Got path /org/bluez/hci0 for adapter with address 00:0B:0D:33:9E:FB
--> audio[3032]: /org/bluez/hci0 GetRemoteName(): Not available
--> Passkey request for device 00:0F:DE:B1:02:42
+ I've been trying to follow the article from the September 2007 issue of
+Linux Journal titled "Hacking Cell Phones via Bluetooth Tools under
+Linux".
+
+ I bought the same D-Link DBT-120 Bluetooth dongle that Patrick M.
+Davila references using in his article.
+
+ I'm using kernel version 2.6.22-gentoo-r5, running on an AMD processor
+and an ASUS motherboard with on-board USB.
+
+ I've tried the DBT-120 in all 4 of the USB connectors on the
+motherboard. 
+
+ Plugging this same DBT-120 into a Windows XP box, and loading the
+D-Link tools that came with the dongle; that machine *does* see
+Bluetooth devices around it.  So that seems to indicate that the dongle
+is fuctional.
+
+ Following Patrick's article, I've done:
+
+ lsmod |grep blue
+bluetooth              52708  2 hci_usb,rfcomm,hidp,l2cap
+
+ dmesg |grep Blue
+Bluetooth: Core ver 2.11
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+Bluetooth: L2CAP ver 2.8
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM TTY layer initialized
+Bluetooth: RFCOMM ver 1.8
+Bluetooth: Core ver 2.11
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+Bluetooth: L2CAP ver 2.8
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: HIDP (Human Interface Emulation) ver 1.2
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM TTY layer initialized
+Bluetooth: RFCOMM ver 1.8
+Bluetooth: HCI USB driver ver 2.9
+
+ This all looks very close to the output printed in the article, aside
+from differences in versions.
+
+ The next step in the article is to do:
+
+ hciconfig -a
+
+ This is where I'm having problems. I can't get any output at all from
+hciconfig. Searching the mailing list archives as well as Google,
+haven't turned up much with what to do to debug this.  I have tried:
+
+  hciconfig hci0 up
+Can't get device info: No such device
 
 
-Did you also start auth-agent? My headset uses both:
+ Anyone have any suggestions on what to try to debug this? 
 
-Passkey request for device 00:1A:45:01:F9:42 
-Authorization request for device 00:1A:45:01:F9:42
-
-
--> audio[3032]: Audio service discovery completed with success
--> audio[3032]: Found Headset record
--> audio[3032]: Discovered Headset service on RFCOMM channel 1
--> audio[3032]: Selecting default device
--> audio[3032]: Audio API: sending BT_GETCAPABILITIES_RSP
--> audio[3032]: Audio API: received BT_SETCONFIGURATION_REQ
--> audio[3032]: config sbc - frequency = 0 channel_mode = 0 allocation = 0 subbands = 0 blocks = 0 bitpool = 0
--> audio[3032]: State changed /org/bluez/audio/device0: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
--> audio[3032]: /org/bluez/audio/device0: Connecting to 00:0F:DE:B1:02:42 channel 1
--> audio[3032]: State changed /org/bluez/audio/device0: HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_CONNECTED
--> audio[3032]: /org/bluez/audio/device0: Connected to 00:0F:DE:B1:02:42
--> audio[3032]: State changed /org/bluez/audio/device0: HEADSET_STATE_CONNECTED -> HEADSET_STATE_PLAY_IN_PROGRESS
--> audio[3032]: Received AT*ECBP=?
--> audio[3032]: Badly formated or unrecognized command: AT*ECBP=?
-
-I had errors like these the day before. If I remeber right, setting 
-force_scofix=1 on the device's module (hci_usb) seemed to clear them up. But I 
-forgot if your Bluetooth adapter is usb or not.
-
-Did you pair the devices first? My headset had a button to press which makes 
-it pair. I've heard the noise too, like the one you're getting. I upgraded to
-3.25, set the force_scofix to 1 and tried a few different values in
-audio.conf. After that it just worked.
-
-
+-- 
+	-Monte
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
