@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47AC1B43.40807@wurmsdobler.org>
-Date: Fri, 08 Feb 2008 09:05:07 +0000
-From: Peter Wurmsdobler <peter@wurmsdobler.org>
-MIME-Version: 1.0
+From: Brian Sammon <bluez-users@brisammon.fastmail.fm>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <47AB5665.8040101@wurmsdobler.org> <E1JNHhP-0003Yf-Fl@necz1>
-In-Reply-To: <E1JNHhP-0003Yf-Fl@necz1>
+In-reply-to: <47AB5665.8040101@wurmsdobler.org> 
+References: <47AB5665.8040101@wurmsdobler.org>
+Mime-Version: 1.0
+Date: Thu, 07 Feb 2008 20:06:39 -0500
+Message-Id: <E1JNHhP-0003Yf-Fl@necz1>
 Subject: Re: [Bluez-users] Headset, ALSA and other issues
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -20,11 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello Brian,
-> Do you have them paired?
-Well here I am not so sure. I know that this is necessary, but how can I 
-make pairing happen? is there an hcitool command?
-peter
+I found it easier to focus on pairing the devices, before I worry about 
+playing sound.
+Do you have them paired?
+To figure that out, look in /var/lib/bluetooth/ .  There should be a directory 
+named for the MAC address of the bluetooth adaptor (local device).  In that 
+directory should be a file "linkkeys" which will list all the devices that it 
+is paired with.  In particular, you hope that the file contains the MAC 
+address of the headset.
+
 
 
 -------------------------------------------------------------------------
