@@ -1,13 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <47AC2216.6030600@wurmsdobler.org>
+Date: Fri, 08 Feb 2008 09:34:14 +0000
+From: Peter Wurmsdobler <peter@wurmsdobler.org>
 MIME-Version: 1.0
-Date: Fri, 8 Feb 2008 17:45:53 +0200
-Message-ID: <5976F853A3B35845B6375F0C1FE13EB303115480@hasmsx415.ger.corp.intel.com>
-In-Reply-To: <1202344111.15090.241.camel@violet>
-References: <1202344111.15090.241.camel@violet>
-From: "Glickman, Claudio" <claudio.glickman@intel.com>
-To: <bluez-users@lists.sourceforge.net>,
-	"BlueZ Mailing List" <bluez-announce@lists.sourceforge.net>
-Subject: Re: [Bluez-users] [BlueZ-Announce] Release of bluez-gnome-0.17
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <47AB5665.8040101@wurmsdobler.org>
+	<E1JNHhP-0003Yf-Fl@necz1>	<47AC1B43.40807@wurmsdobler.org>
+	<E7A0FBBA-A2CF-4B87-B4CA-B05CD6BF5600@gmail.com>
+In-Reply-To: <E7A0FBBA-A2CF-4B87-B4CA-B05CD6BF5600@gmail.com>
+Subject: Re: [Bluez-users] Headset, ALSA and other issues
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,54 +22,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hello Johan,
+> The preferred way would be to use the BlueZ D-Bus interface, but I'm  
+> not aware of any nice UI to do it (e.g. the bluetooth-wizard from  
+> bluez-gnome is still incomplete). 
+I had this wizard running on the desktop, but I am not very happy with 
+it as it is not clear how it happens, what happens and also it is not 
+predictible enough.
 
-Hi everybody,
-Are there any developments in progress concerning BlueZ support
-Bluetooth devices over SD/SDIO protocol? 
+> You can however find some examples  
+> of running dbus-send from the command line and example python scripts  
+> here:
+> http://wiki.bluez.org/wiki/HOWTO/Bonding
+Thanks, I will have a look at it.
 
-Thanks,
-Claudio 
- 
+If a "client" would send requests on the dbus, who would be the 
+receiver? WOuld it have to be hcid?
 
->-----Original Message-----
->From: bluez-announce-bounces@lists.sourceforge.net 
->[mailto:bluez-announce-bounces@lists.sourceforge.net] On 
->Behalf Of Marcel Holtmann
->Sent: Thursday, February 07, 2008 2:29 AM
->To: BlueZ Mailing List
->Subject: [BlueZ-Announce] Release of bluez-gnome-0.17
->
->Hi Folks,
->
->this is the seventeenth release of the gnome package for BlueZ. It
->updates the sendto application to reflect the API changes of the first
->obex-data-server release.
->
->The sources can be found at http://www.bluez.org/download.html
->
->Regards
->
->Marcel
->
->
->
->---------------------------------------------------------------
->----------
->This SF.net email is sponsored by: Microsoft
->Defy all challenges. Microsoft(R) Visual Studio 2008.
->http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
->_______________________________________________
->BlueZ-Announce mailing list
->BlueZ-Announce@lists.sourceforge.net
->https://lists.sourceforge.net/lists/listinfo/bluez-announce
->
----------------------------------------------------------------------
-Intel Israel (74) Limited
+As mentioned earlier, the entire bt system appears to me very woolly; 
+difficult to get a grip onit.
 
-This e-mail and any attachments may contain confidential material for
-the sole use of the intended recipient(s). Any review or distribution
-by others is strictly prohibited. If you are not the intended
-recipient, please contact the sender and delete all copies.
+peter
+
 
 
 -------------------------------------------------------------------------
