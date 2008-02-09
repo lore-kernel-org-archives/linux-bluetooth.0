@@ -1,12 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <ad4496950802090028h418cb52fub110d45ecd44d32a@mail.gmail.com>
-Date: Sat, 9 Feb 2008 11:28:39 +0300
-From: "Mohammed Hagag" <mohamedhagag1981@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <ad4496950802050402n70fd50a4t6532c34cca5ba73d@mail.gmail.com>
-MIME-Version: 1.0
-References: <ad4496950802050402n70fd50a4t6532c34cca5ba73d@mail.gmail.com>
-Subject: Re: [Bluez-devel] device info database
+Message-Id: <20080209072942.BB31B3BD2A@xena.cft.ca.us>
+Date: Fri,  8 Feb 2008 23:29:42 -0800 (PST)
+From: jimc@math.ucla.edu (Jim Carter)
+Subject: [Bluez-devel] Audio service starts bogus copy of hcid
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,25 +13,68 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-aGkgYW55IGJvZHkga25vdyBhbnkgdGhpbmcgYWJvdXQgYSBkYXRhYmFzZSBjb250YWlucyBNQUMg
-YWRkcmVzcyBhbmQKY2hhbm5lbCBpbmZvLiBmb3IgYmx1ZXRvb3RoIGRldmljZXM/CgpPbiBGZWIg
-NSwgMjAwOCAzOjAyIFBNLCBNb2hhbW1lZCBIYWdhZyA8bW9oYW1lZGhhZ2FnMTk4MUBnbWFpbC5j
-b20+IHdyb3RlOgo+IGhpIGFsbCwKPiBkb2VzIGFueSBvbmUgaGVyZSBrbm93cyBpZiB0aGVyZSdz
-IGEgZGV2aWNlIGluZm8gZGF0YWJhc2UgZXhpc3Qgb3Igbm90ID8KPiBmb3IgZXhhbXBsZSBhIGRh
-dGFiYXNlIGNvbnRhaW5zIHRoZSBkZXZpY2UgbW9kZWwgYW5kIHRoZSBibHVldG9vdGgKPiBjaGFu
-bmVscyBmb3IgZXZlcnkgZGV2aWNlLgo+Cj4KPiAtLQo+IE1vaGFtZWQgTS4gSGFnYWcKPiDZhdit
-2YXYryDZhdit2YXZiNivINit2KzYp9isCj4gaHR0cDovL2JpbnRvby5zZi5uZXQvZHJwbC8KPiBo
-dHRwOi8vbW9oYW1lZGhhZ2FnLndvcmRwcmVzcy5jb20KPgoKCgotLSAKTW9oYW1lZCBNLiBIYWdh
-ZwrZhdit2YXYryDZhdit2YXZiNivINit2KzYp9isCmh0dHA6Ly9iaW50b28uc2YubmV0L2RycGwv
-Cmh0dHA6Ly9tb2hhbWVkaGFnYWcud29yZHByZXNzLmNvbQotLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMg
-U0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogTWljcm9zb2Z0CkRlZnkgYWxsIGNoYWxsZW5n
-ZXMuIE1pY3Jvc29mdChSKSBWaXN1YWwgU3R1ZGlvIDIwMDguCmh0dHA6Ly9jbGsuYXRkbXQuY29t
-L01SVC9nby92c2UwMTIwMDAwMDcwbXJ0L2RpcmVjdC8wMS8KX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6
-LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5l
-dC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
+Using bluez-utils-3.25, I try to do:
+    aplay -D bluetooth file.wav
+It says: audio open error: Input/output error.  Numerous other
+applications have similar but more complicated failures.  None ever 
+work.  Restarting hcid, resetting the transceiver or rebooting the
+machine have no effect.
+
+In syslog I find this sequence (after reasonable-looking startup
+messages for hcid and bluetoothd-service-audio, which are the instances
+in /usr/local/sbin from bluez-utils-3.25, not the ones from 3.18 from my
+distro, SuSE 10.3).  
+
+audio[13196]: Accepted new client connection on unix socket (fd=9)
+audio[13196]: Audio API: received BT_GETCAPABILITIES_REQ
+audio[13196]: avdtp_ref(0x806a000): ref=2
+hcid[13234]: Bluetooth HCI daemon
+hcid[13234]: Could not become the primary owner of org.bluez
+hcid[13234]: Unable to get on D-Bus
+hcid[13192]: link_key_request (sba=00:19:7E:E7:A7:11, dba=00:07:A4:F1:C8:E9)
+audio[13196]: connect(): Software caused connection abort (103)
+
+See how a bogus instance of hcid starts up, then (obviously) fails to
+serve the connection for the audio service?  Of course 13234 cannot
+seize org.bluez because 13192 already owns it.  I can't even tell if
+it's the correct version [suggestion: include the version in the splash
+message] or figure out where it's being started.  The link key request
+is from the leader hcid thread, and the btaddrs are for the laptop's
+transceiver and the Motorola HT820 headphone.
+
+I used "strace -f" to start up a new instance of hcid (producing the
+above syslog output), and I was able to find what happened right after
+it syslogged "avdtp_ref..." (13196 is the audio service):
+
+13196 socket(PF_BLUETOOTH, SOCK_SEQPACKET, 0) = 10
+13196 bind(10, {sa_family=AF_BLUETOOTH, sa_data="\0\0\21\247\347~\31
+	\0\0\240\6\10\0\240"}, 10) = 0
+(sets flags)
+13196 connect(10, {sa_family=AF_BLUETOOTH, sa_data="\31\0\351\310\361
+	\244\7\0\0\240\6\10\0\240"}, 10) = -1 EINPROGRESS (Operation 
+	now in progress)
+13196 poll( <unfinished ...>
+
+After which 13192 (the real hcid) handles the link key request and
+13196 reports the connection abort.  But 13234 (the interloper hcid)
+is not seen at all by strace.  Very mysterious.  
+
+Does anyone have any ideas here?
+
+James F. Carter          Voice 310 825 2897    FAX 310 206 6673
+UCLA-Mathnet;  6115 MSA; 405 Hilgard Ave.; Los Angeles, CA, USA 90095-1555
+Email: jimc@math.ucla.edu  http://www.math.ucla.edu/~jimc (q.v. for PGP key)
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
