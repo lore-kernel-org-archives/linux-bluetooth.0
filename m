@@ -1,20 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <8a8adccc0802101354i614472ccg138171db654e0283@mail.gmail.com>
-References: <8a8adccc0802100701y384d23f6oeb12c7a8d0fe4f83@mail.gmail.com>
-	<1202659315.7664.88.camel@violet>
-	<8a8adccc0802100831k107d6d0akc0cfe388b61b7810@mail.gmail.com>
-	<1202661736.7664.91.camel@violet>
-	<8a8adccc0802100924m58527440rcd3d6ffb062c742@mail.gmail.com>
-	<1202665966.7664.97.camel@violet>
-	<8a8adccc0802101021p2ce8de5enbe61e34232ce7bf1@mail.gmail.com>
-	<1202674141.7664.109.camel@violet>
-	<8a8adccc0802101354i614472ccg138171db654e0283@mail.gmail.com>
-Date: Sun, 10 Feb 2008 23:12:02 +0100
-Message-Id: <1202681522.7664.125.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Use new tango icon for bluez gnome
+Message-ID: <8a8adccc0802101428j1eaa6c1by4c452adcda426687@mail.gmail.com>
+Date: Sun, 10 Feb 2008 23:28:26 +0100
+From: "Jaap A. Haitsma" <jaap@haitsma.org>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_29635_7462402.1202682506154"
+Subject: [Bluez-devel] [PATCH] Simplify about dialog code
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,34 +16,145 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jaap,
+------=_Part_29635_7462402.1202682506154
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> > fixed that. However I am not happy with the status icon. I think it
-> > looks ugly. Kinda blurry. The other icons look great.
-> >
->
-> Great you fixed it. I looks fine here. See attachment. I prefer this
-> icon over the old because it uses the
-> same palette and styling as the other icons
+Hi Marcel,
 
-as I said, I like the new icon. However in my system it looks pretty
-bad. However it is only the status icon. The others look fine.
+Before you're holidays I sent you a patch which simplifies the about
+dialog code. We went on discussing it but didn't come to a conclusion,
+I think
 
-Regards
+In my opinion it's a good patch because:
 
-Marcel
+1) The patch removes about 20 function calls
+2) You don't need  to hookup signals to the about dialog
+3) Eog, cheese, gnome-power-manager, nautilus, gedit to name a few all
+do it this way.
 
+Jaap
 
+------=_Part_29635_7462402.1202682506154
+Content-Type: text/x-patch; name=bluez-gnome-about-dialog.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fci63jjz0
+Content-Disposition: attachment; filename=bluez-gnome-about-dialog.patch
+
+SW5kZXg6IGFuYWx5emVyL2RpYWxvZy5jCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KUkNTIGZpbGU6IC9jdnNyb290L2Js
+dWV6L2dub21lL2FuYWx5emVyL2RpYWxvZy5jLHYKcmV0cmlldmluZyByZXZpc2lvbiAxLjI0CmRp
+ZmYgLXUgLXIxLjI0IGRpYWxvZy5jCi0tLSBhbmFseXplci9kaWFsb2cuYwkxMCBGZWIgMjAwOCAy
+MDozNToyMiAtMDAwMAkxLjI0CisrKyBhbmFseXplci9kaWFsb2cuYwkxMCBGZWIgMjAwOCAyMjoy
+MTo0NiAtMDAwMApAQCAtMzIsMTEgKzMyLDYgQEAKICNpbmNsdWRlICJkaWFsb2cuaCIKICNpbmNs
+dWRlICJkaXNjb3Zlci5oIgogCi1zdGF0aWMgY29uc3QgZ2NoYXIgKmF1dGhvcnNbXSA9IHsKLQki
+TWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9sdG1hbm4ub3JnPiIsCi0JTlVMTAotfTsKLQogdm9p
+ZCBzaG93X2Vycm9yX2RpYWxvZyhjb25zdCBnY2hhciAqbWVzc2FnZSkKIHsKIAlHdGtXaWRnZXQg
+KmRpYWxvZzsKQEAgLTkzLDQzICs4OCwyNCBAQAogewogCUd0a1dpZGdldCAqZGlhbG9nOwogCi0J
+ZGlhbG9nID0gZ3RrX2Fib3V0X2RpYWxvZ19uZXcoKTsKLQotCWd0a193aW5kb3dfc2V0X3Bvc2l0
+aW9uKEdUS19XSU5ET1coZGlhbG9nKSwKLQkJCQkJR1RLX1dJTl9QT1NfQ0VOVEVSX09OX1BBUkVO
+VCk7Ci0KLQlndGtfYWJvdXRfZGlhbG9nX3NldF9uYW1lKEdUS19BQk9VVF9ESUFMT0coZGlhbG9n
+KSwKLQkJCQkJCV8oIkJsdWV0b290aCBBbmFseXplciIpKTsKLQotCWd0a19hYm91dF9kaWFsb2df
+c2V0X3ZlcnNpb24oR1RLX0FCT1VUX0RJQUxPRyhkaWFsb2cpLCBWRVJTSU9OKTsKLQotCWd0a19h
+Ym91dF9kaWFsb2dfc2V0X2NvcHlyaWdodChHVEtfQUJPVVRfRElBTE9HKGRpYWxvZyksCi0JCQki
+Q29weXJpZ2h0IFx4YzJceGE5IDIwMDUtMjAwOCBNYXJjZWwgSG9sdG1hbm4iKTsKLQotCWd0a19h
+Ym91dF9kaWFsb2dfc2V0X2NvbW1lbnRzKEdUS19BQk9VVF9ESUFMT0coZGlhbG9nKSwKLQkJCQlf
+KCJCbHVldG9vdGggcHJvdG9jb2wgYW5hbHl6ZXIiKSk7Ci0KLQlndGtfYWJvdXRfZGlhbG9nX3Nl
+dF9sb2dvX2ljb25fbmFtZShHVEtfQUJPVVRfRElBTE9HKGRpYWxvZyksCi0JCQkJCQkJImJsdWV0
+b290aCIpOworCXN0YXRpYyBjb25zdCBnY2hhciAqYXV0aG9yc1tdID0geworCQkiTWFyY2VsIEhv
+bHRtYW5uIDxtYXJjZWxAaG9sdG1hbm4ub3JnPiIsCisJCU5VTEwKKwl9OwogCiAJZ3RrX2Fib3V0
+X2RpYWxvZ19zZXRfdXJsX2hvb2soYWJvdXRfdXJsX2hvb2ssIE5VTEwsIE5VTEwpOwotCiAJZ3Rr
+X2Fib3V0X2RpYWxvZ19zZXRfZW1haWxfaG9vayhhYm91dF9lbWFpbF9ob29rLCBOVUxMLCBOVUxM
+KTsKIAotCWd0a19hYm91dF9kaWFsb2dfc2V0X3dlYnNpdGUoR1RLX0FCT1VUX0RJQUxPRyhkaWFs
+b2cpLAotCQkJCQkJImh0dHA6Ly93d3cuYmx1ZXoub3JnIik7Ci0KLQlndGtfYWJvdXRfZGlhbG9n
+X3NldF93ZWJzaXRlX2xhYmVsKEdUS19BQk9VVF9ESUFMT0coZGlhbG9nKSwKLQkJCQkJCQkid3d3
+LmJsdWV6Lm9yZyIpOwotCi0JZ3RrX2Fib3V0X2RpYWxvZ19zZXRfYXV0aG9ycyhHVEtfQUJPVVRf
+RElBTE9HKGRpYWxvZyksIGF1dGhvcnMpOwotCi0JZ3RrX2Fib3V0X2RpYWxvZ19zZXRfdHJhbnNs
+YXRvcl9jcmVkaXRzKEdUS19BQk9VVF9ESUFMT0coZGlhbG9nKSwKLQkJCQkJCV8oInRyYW5zbGF0
+b3ItY3JlZGl0cyIpKTsKLQotCWd0a19kaWFsb2dfcnVuKEdUS19ESUFMT0coZGlhbG9nKSk7Ci0K
+LQlndGtfd2lkZ2V0X2Rlc3Ryb3koZGlhbG9nKTsKKwlndGtfc2hvd19hYm91dF9kaWFsb2coTlVM
+TCwKKwkJCSAgICAgICJ2ZXJzaW9uIiwgVkVSU0lPTiwKKwkJCSAgICAgICJjb3B5cmlnaHQiLCAi
+Q29weXJpZ2h0IFx4YzJceGE5IDIwMDUtMjAwOCBNYXJjZWwgSG9sdG1hbm4iLAorCQkJICAgICAg
+ImNvbW1lbnRzIiwgXygiQmx1ZXRvb3RoIHByb3RvY29sIGFuYWx5emVyIiksCisJCQkgICAgICAi
+YXV0aG9ycyIsIGF1dGhvcnMsCisJCQkgICAgICAidHJhbnNsYXRvci1jcmVkaXRzIiwgXygidHJh
+bnNsYXRvci1jcmVkaXRzIiksCisJCQkgICAgICAid2Vic2l0ZSIsICJodHRwOi8vd3d3LmJsdWV6
+Lm9yZyIsCisJCQkgICAgICAid2Vic2l0ZS1sYWJlbCIsICJ3d3cuYmx1ZXoub3JnIiwKKwkJCSAg
+ICAgICJsb2dvLWljb24tbmFtZSIsICJibHVldG9vdGgiLAorCQkJICAgICAgTlVMTCk7CiB9CiAK
+IHN0YXRpYyB2b2lkIGFkZF9maWx0ZXJzKEd0a0ZpbGVDaG9vc2VyICpjaG9vc2VyKQpJbmRleDog
+YW5hbHl6ZXIvbWFpbi5jCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT0KUkNTIGZpbGU6IC9jdnNyb290L2JsdWV6L2dub21l
+L2FuYWx5emVyL21haW4uYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4zOApkaWZmIC11IC1yMS4z
+OCBtYWluLmMKLS0tIGFuYWx5emVyL21haW4uYwkxMCBGZWIgMjAwOCAxNzo0Njo1MCAtMDAwMAkx
+LjM4CisrKyBhbmFseXplci9tYWluLmMJMTAgRmViIDIwMDggMjI6MjE6NDggLTAwMDAKQEAgLTEw
+MjksNiArMTAyOSw4IEBACiAJCWd0a19leGl0KDEpOwogCX0KIAorIAlnX3NldF9hcHBsaWNhdGlv
+bl9uYW1lKF8oIkJsdWV0b290aCBBbmFseXplciIpKTsKKwogCWd0a193aW5kb3dfc2V0X2RlZmF1
+bHRfaWNvbl9uYW1lKCJibHVldG9vdGgiKTsKIAogCWNyZWF0ZV93aW5kb3coKTsKSW5kZXg6IGFw
+cGxldC9tYWluLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovZ25vbWUvYXBw
+bGV0L21haW4uYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4xMDgKZGlmZiAtdSAtcjEuMTA4IG1h
+aW4uYwotLS0gYXBwbGV0L21haW4uYwkxMCBGZWIgMjAwOCAyMDozNToyMiAtMDAwMAkxLjEwOAor
+KysgYXBwbGV0L21haW4uYwkxMCBGZWIgMjAwOCAyMjoyMTo0OCAtMDAwMApAQCAtNTEzLDQ2ICs1
+MTMsMjAgQEAKIAkJIkJhc3RpZW4gTm9jZXJhIDxoYWRlc3NAaGFkZXNzLm5ldD4iLAogCQlOVUxM
+CiAJfTsKLQlHdGtXaWRnZXQgKmRpYWxvZzsKLQotCWRpYWxvZyA9IGd0a19hYm91dF9kaWFsb2df
+bmV3KCk7Ci0KLQlndGtfYWJvdXRfZGlhbG9nX3NldF9uYW1lKEdUS19BQk9VVF9ESUFMT0coZGlh
+bG9nKSwKLQkJCQkJCV8oIkJsdWV0b290aCBBcHBsZXQiKSk7Ci0KLQlndGtfYWJvdXRfZGlhbG9n
+X3NldF92ZXJzaW9uKEdUS19BQk9VVF9ESUFMT0coZGlhbG9nKSwgVkVSU0lPTik7Ci0KLQlndGtf
+YWJvdXRfZGlhbG9nX3NldF9jb3B5cmlnaHQoR1RLX0FCT1VUX0RJQUxPRyhkaWFsb2cpLAotCQkJ
+IkNvcHlyaWdodCBceGMyXHhhOSAyMDA1LTIwMDggTWFyY2VsIEhvbHRtYW5uIik7Ci0KLQlndGtf
+YWJvdXRfZGlhbG9nX3NldF9jb21tZW50cyhHVEtfQUJPVVRfRElBTE9HKGRpYWxvZyksCi0JCQlf
+KCJBIEJsdWV0b290aCBtYW5hZ2VyIGZvciB0aGUgR05PTUUgZGVza3RvcCIpKTsKLQotCWd0a19h
+Ym91dF9kaWFsb2dfc2V0X2xvZ29faWNvbl9uYW1lKEdUS19BQk9VVF9ESUFMT0coZGlhbG9nKSwK
+LQkJCQkJCQkiYmx1ZXRvb3RoIik7Ci0KLQlndGtfYWJvdXRfZGlhbG9nX3NldF91cmxfaG9vayhh
+Ym91dF91cmxfaG9vaywgTlVMTCwgTlVMTCk7Ci0KLQlndGtfYWJvdXRfZGlhbG9nX3NldF9lbWFp
+bF9ob29rKGFib3V0X2VtYWlsX2hvb2ssIE5VTEwsIE5VTEwpOwotCi0JZ3RrX2Fib3V0X2RpYWxv
+Z19zZXRfd2Vic2l0ZShHVEtfQUJPVVRfRElBTE9HKGRpYWxvZyksCi0JCQkJCQkiaHR0cDovL3d3
+dy5ibHVlei5vcmciKTsKLQotCWd0a19hYm91dF9kaWFsb2dfc2V0X3dlYnNpdGVfbGFiZWwoR1RL
+X0FCT1VUX0RJQUxPRyhkaWFsb2cpLAotCQkJCQkJCSJ3d3cuYmx1ZXoub3JnIik7Ci0KLQlndGtf
+YWJvdXRfZGlhbG9nX3NldF9hdXRob3JzKEdUS19BQk9VVF9ESUFMT0coZGlhbG9nKSwgYXV0aG9y
+cyk7Ci0KLQlndGtfYWJvdXRfZGlhbG9nX3NldF90cmFuc2xhdG9yX2NyZWRpdHMoR1RLX0FCT1VU
+X0RJQUxPRyhkaWFsb2cpLAotCQkJCQkJXygidHJhbnNsYXRvci1jcmVkaXRzIikpOwotCi0JZ19z
+aWduYWxfY29ubmVjdChkaWFsb2csICJjbG9zZSIsCi0JCQkJR19DQUxMQkFDSyhjbG9zZV9jYWxs
+YmFjayksIE5VTEwpOwotCi0JZ19zaWduYWxfY29ubmVjdChkaWFsb2csICJyZXNwb25zZSIsCi0J
+CQkJR19DQUxMQkFDSyhjbG9zZV9jYWxsYmFjayksIE5VTEwpOwotCi0JZ3RrX3dpZGdldF9zaG93
+X2FsbChkaWFsb2cpOworIAorIAlndGtfYWJvdXRfZGlhbG9nX3NldF91cmxfaG9vayhhYm91dF91
+cmxfaG9vaywgTlVMTCwgTlVMTCk7CisgCWd0a19hYm91dF9kaWFsb2dfc2V0X2VtYWlsX2hvb2so
+YWJvdXRfZW1haWxfaG9vaywgTlVMTCwgTlVMTCk7CisgCisJZ3RrX3Nob3dfYWJvdXRfZGlhbG9n
+KE5VTEwsCisJCQkgICAgICAidmVyc2lvbiIsIFZFUlNJT04sCisJCQkgICAgICAiY29weXJpZ2h0
+IiwgIkNvcHlyaWdodCBceGMyXHhhOSAyMDA1LTIwMDggTWFyY2VsIEhvbHRtYW5uIiwKKwkJCSAg
+ICAgICJjb21tZW50cyIsIF8oIkEgQmx1ZXRvb3RoIG1hbmFnZXIgZm9yIHRoZSBHTk9NRSBkZXNr
+dG9wIiksCisJCQkgICAgICAiYXV0aG9ycyIsIGF1dGhvcnMsCisJCQkgICAgICAidHJhbnNsYXRv
+ci1jcmVkaXRzIiwgXygidHJhbnNsYXRvci1jcmVkaXRzIiksCisJCQkgICAgICAid2Vic2l0ZSIs
+ICJodHRwOi8vd3d3LmJsdWV6Lm9yZyIsCisJCQkgICAgICAid2Vic2l0ZS1sYWJlbCIsICJ3d3cu
+Ymx1ZXoub3JnIiwKKwkJCSAgICAgICJsb2dvLWljb24tbmFtZSIsICJibHVldG9vdGgiLAorCQkJ
+ICAgICAgTlVMTCk7CiB9CiAKIHN0YXRpYyB2b2lkIHNldHRpbmdzX2NhbGxiYWNrKEdPYmplY3Qg
+KndpZGdldCwgZ3BvaW50ZXIgdXNlcl9kYXRhKQpAQCAtODQ5LDYgKzgyMyw4IEBACiAJaWYgKGlu
+c3RhbmNlID09IE5VTEwpCiAJCWd0a19leGl0KDApOwogCisJZ19zZXRfYXBwbGljYXRpb25fbmFt
+ZSAoXygiQmx1ZXRvb3RoIEFwcGxldCIpKTsKKwogCWd0a193aW5kb3dfc2V0X2RlZmF1bHRfaWNv
+bl9uYW1lKCJibHVldG9vdGgiKTsKIAogCWNvbm4gPSBkYnVzX2dfYnVzX2dldChEQlVTX0JVU19T
+WVNURU0sICZlcnJvcik7Cg==
+------=_Part_29635_7462402.1202682506154
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+------=_Part_29635_7462402.1202682506154
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_29635_7462402.1202682506154--
