@@ -1,16 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <8a8adccc0802101021p2ce8de5enbe61e34232ce7bf1@mail.gmail.com>
+In-Reply-To: <8a8adccc0802101010y13130615q1c0fec1ff8e84041@mail.gmail.com>
 References: <8a8adccc0802100701y384d23f6oeb12c7a8d0fe4f83@mail.gmail.com>
 	<1202659315.7664.88.camel@violet>
 	<8a8adccc0802100831k107d6d0akc0cfe388b61b7810@mail.gmail.com>
 	<1202661736.7664.91.camel@violet>
 	<8a8adccc0802100924m58527440rcd3d6ffb062c742@mail.gmail.com>
 	<1202665966.7664.97.camel@violet>
-	<8a8adccc0802101021p2ce8de5enbe61e34232ce7bf1@mail.gmail.com>
-Date: Sun, 10 Feb 2008 21:09:01 +0100
-Message-Id: <1202674141.7664.109.camel@violet>
+	<8a8adccc0802101010y13130615q1c0fec1ff8e84041@mail.gmail.com>
+Date: Sun, 10 Feb 2008 21:08:11 +0100
+Message-Id: <1202674091.7664.107.camel@violet>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] [PATCH] Use new tango icon for bluez gnome
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -35,16 +35,14 @@ Hi Jaap,
 > > file structure. Would be nice if we had some nice templates for doing
 > > this properly within one directory.
 > >
-> Hi Marcel,
+> Here's a template
+> Take a look at how vinagre does this
 > 
-> Just looked in CVS to your patch you are installing the an SVG of
-> 22x22 into the scalable directory. That SVG should not be installed.
-> It should be just in CVS such that artists can make updates to the
-> icons. You need to install the SVG which in my tarball is in the
-> scalable directory (it has a size of 48x48)
+> http://svn.gnome.org/viewvc/vinagre/trunk/data/icons/
 
-fixed that. However I am not happy with the status icon. I think it
-looks ugly. Kinda blurry. The other icons look great.
+did it this way. Some nice autoconf/automake macros for it in some
+generic way would be nice. Found actually some bugs talking about it,
+but nobody did it.
 
 Regards
 
