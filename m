@@ -1,10 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 10 Feb 2008 19:33:44 +0100
-From: Filippo Giunchedi <filippo@esaurito.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20080210183344.GA2605@esaurito.net>
+Message-ID: <8a8adccc0802101021p2ce8de5enbe61e34232ce7bf1@mail.gmail.com>
+Date: Sun, 10 Feb 2008 19:21:25 +0100
+From: "Jaap A. Haitsma" <jaap@haitsma.org>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1202665966.7664.97.camel@violet>
 MIME-Version: 1.0
-Subject: [Bluez-devel] [PATCH] account for non-existant update-*-database
+References: <8a8adccc0802100701y384d23f6oeb12c7a8d0fe4f83@mail.gmail.com>
+	<1202659315.7664.88.camel@violet>
+	<8a8adccc0802100831k107d6d0akc0cfe388b61b7810@mail.gmail.com>
+	<1202661736.7664.91.camel@violet>
+	<8a8adccc0802100924m58527440rcd3d6ffb062c742@mail.gmail.com>
+	<1202665966.7664.97.camel@violet>
+Subject: Re: [Bluez-devel] [PATCH] Use new tango icon for bluez gnome
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,42 +25,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-I've noticed a bug in bluez-gnome when update-*-database programs are not
-present (i.e. $UPDATE_*_DATABASE is "" thus install-data-hook fails), the
-following patch (or something similar) should work:
+>
+> I did my own patch to handle the update-icon-cache thing properly in
+> cases of distcheck and the maintainers.
+>
+> For now I also only included the 22x22 icons. Still have to re-think the
+> file structure. Would be nice if we had some nice templates for doing
+> this properly within one directory.
+>
+Hi Marcel,
 
---- gnome/configure.in	10 Feb 2008 17:46:50 -0000	1.63
-+++ gnome/configure.in	10 Feb 2008 18:31:57 -0000
-@@ -27,15 +27,15 @@
- 
- AC_PATH_PROG(UPDATE_DESKTOP_DATABASE, [update-desktop-database])
- AC_ARG_ENABLE(desktop-update, AC_HELP_STRING([--disable-desktop-update], [Disable desktop database update]))
--AM_CONDITIONAL([DESKTOP_UPDATE], [test "$enable_desktop_update" != no])
-+AM_CONDITIONAL([DESKTOP_UPDATE], [test "$enable_desktop_update" != no -a ! -z "$UPDATE_DESKTOP_DATABASE"])
- 
- AC_PATH_PROG(UPDATE_MIME_DATABASE, [update-mime-database])
- AC_ARG_ENABLE(mime-update, AC_HELP_STRING([--disable-mime-update], [Disable mime database update]))
--AM_CONDITIONAL([MIME_UPDATE], [test "$enable_mime_update" != no])
-+AM_CONDITIONAL([MIME_UPDATE], [test "$enable_mime_update" != no -a ! -z "$UPDATE_MIME_DATABASE"])
- 
- AC_PATH_PROG(UPDATE_ICON_CACHE, [gtk-update-icon-cache])
- AC_ARG_ENABLE(icon-update, AC_HELP_STRING([--disable-icon-update], [Disable icon cache update]))
--AM_CONDITIONAL([ICON_UPDATE], [test "$enable_icon_update" != no])
-+AM_CONDITIONAL([ICON_UPDATE], [test "$enable_icon_update" != no -a ! -z "$UPDATE_ICON_CACHE"])
- 
- PKG_CHECK_MODULES(DBUS, dbus-glib-1 >= 0.60, dummy=yes, AC_MSG_ERROR(dbus-glib >= 0.60 is required))
- m4_ifdef([PKG_CHECK_EXISTS], [
+Just looked in CVS to your patch you are installing the an SVG of
+22x22 into the scalable directory. That SVG should not be installed.
+It should be just in CVS such that artists can make updates to the
+icons. You need to install the SVG which in my tarball is in the
+scalable directory (it has a size of 48x48)
 
-thanks,
-filippo
---
-Filippo Giunchedi - http://esaurito.net
-PGP key: 0x6B79D401
-random quote follows:
-
-I worked myself up from nothing to a state of extreme poverty.
--- Groucho Marx
+Jaap
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
