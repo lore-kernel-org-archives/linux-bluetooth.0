@@ -1,11 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <8a8adccc0802101016u7108223mc327ace0495ce8cd@mail.gmail.com>
-Date: Sun, 10 Feb 2008 19:16:59 +0100
+Message-ID: <8a8adccc0802101010y13130615q1c0fec1ff8e84041@mail.gmail.com>
+Date: Sun, 10 Feb 2008 19:10:58 +0100
 From: "Jaap A. Haitsma" <jaap@haitsma.org>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1202665966.7664.97.camel@violet>
 MIME-Version: 1.0
-Subject: [Bluez-devel] [PATCH] Launch browser / email client when clicking
-	on link in about dialogs
+References: <8a8adccc0802100701y384d23f6oeb12c7a8d0fe4f83@mail.gmail.com>
+	<1202659315.7664.88.camel@violet>
+	<8a8adccc0802100831k107d6d0akc0cfe388b61b7810@mail.gmail.com>
+	<1202661736.7664.91.camel@violet>
+	<8a8adccc0802100924m58527440rcd3d6ffb062c742@mail.gmail.com>
+	<1202665966.7664.97.camel@violet>
+Subject: Re: [Bluez-devel] [PATCH] Use new tango icon for bluez gnome
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,10 +25,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel
+>
+> I did my own patch to handle the update-icon-cache thing properly in
+> cases of distcheck and the maintainers.
+>
+> For now I also only included the 22x22 icons. Still have to re-think the
+> file structure. Would be nice if we had some nice templates for doing
+> this properly within one directory.
+>
+Here's a template
+Take a look at how vinagre does this
 
-Another patch
-http://bugzilla.gnome.org/show_bug.cgi?id=515581
+http://svn.gnome.org/viewvc/vinagre/trunk/data/icons/
 
 Jaap
 
