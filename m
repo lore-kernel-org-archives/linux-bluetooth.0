@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 10 Feb 2008 20:51:48 +0100
-From: Filippo Giunchedi <filippo@esaurito.net>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20080210195148.GC2605@esaurito.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20080210183344.GA2605@esaurito.net>
 References: <20080210183344.GA2605@esaurito.net>
-	<1202669869.7664.102.camel@violet>
-MIME-Version: 1.0
-In-Reply-To: <1202669869.7664.102.camel@violet>
+Date: Sun, 10 Feb 2008 19:57:49 +0100
+Message-Id: <1202669869.7664.102.camel@violet>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] [PATCH] account for non-existant	update-*-database
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,30 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sun, Feb 10, 2008 at 07:57:49PM +0100, Marcel Holtmann wrote:
-> Hi Filippo,
-> 
-> > I've noticed a bug in bluez-gnome when update-*-database programs are not
-> > present (i.e. $UPDATE_*_DATABASE is "" thus install-data-hook fails), the
-> > following patch (or something similar) should work:
-> 
-> call --disable-*-update should be a good thing for packages. And then
-> have some post-install routines. Not doing the update is really a
-> problem, because it limits the functionality. So producing an error
-> seems fine to me.
+Hi Filippo,
 
-I agree, note though that in this case the error is "permission denied" since
-make will try to execute a directory (e.g. $(DESTDIR)$(datadir)/mime) when
-UPDATE_*_DATABASE is "" which is not much straightforward.
+> I've noticed a bug in bluez-gnome when update-*-database programs are not
+> present (i.e. $UPDATE_*_DATABASE is "" thus install-data-hook fails), the
+> following patch (or something similar) should work:
 
-filippo
---
-Filippo Giunchedi - http://esaurito.net
-PGP key: 0x6B79D401
-random quote follows:
+call --disable-*-update should be a good thing for packages. And then
+have some post-install routines. Not doing the update is really a
+problem, because it limits the functionality. So producing an error
+seems fine to me.
 
-Endian little hate we
--- Anonymous (?)
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
