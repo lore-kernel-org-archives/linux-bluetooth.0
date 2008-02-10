@@ -1,18 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <8a8adccc0802101010y13130615q1c0fec1ff8e84041@mail.gmail.com>
-References: <8a8adccc0802100701y384d23f6oeb12c7a8d0fe4f83@mail.gmail.com>
-	<1202659315.7664.88.camel@violet>
-	<8a8adccc0802100831k107d6d0akc0cfe388b61b7810@mail.gmail.com>
-	<1202661736.7664.91.camel@violet>
-	<8a8adccc0802100924m58527440rcd3d6ffb062c742@mail.gmail.com>
-	<1202665966.7664.97.camel@violet>
-	<8a8adccc0802101010y13130615q1c0fec1ff8e84041@mail.gmail.com>
-Date: Sun, 10 Feb 2008 21:08:11 +0100
-Message-Id: <1202674091.7664.107.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Use new tango icon for bluez gnome
+Date: Sun, 10 Feb 2008 20:51:48 +0100
+From: Filippo Giunchedi <filippo@esaurito.net>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20080210195148.GC2605@esaurito.net>
+References: <20080210183344.GA2605@esaurito.net>
+	<1202669869.7664.102.camel@violet>
+MIME-Version: 1.0
+In-Reply-To: <1202669869.7664.102.camel@violet>
+Subject: Re: [Bluez-devel] [PATCH] account for non-existant	update-*-database
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -26,29 +21,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jaap,
-
-> > I did my own patch to handle the update-icon-cache thing properly in
-> > cases of distcheck and the maintainers.
-> >
-> > For now I also only included the 22x22 icons. Still have to re-think the
-> > file structure. Would be nice if we had some nice templates for doing
-> > this properly within one directory.
-> >
-> Here's a template
-> Take a look at how vinagre does this
+On Sun, Feb 10, 2008 at 07:57:49PM +0100, Marcel Holtmann wrote:
+> Hi Filippo,
 > 
-> http://svn.gnome.org/viewvc/vinagre/trunk/data/icons/
+> > I've noticed a bug in bluez-gnome when update-*-database programs are not
+> > present (i.e. $UPDATE_*_DATABASE is "" thus install-data-hook fails), the
+> > following patch (or something similar) should work:
+> 
+> call --disable-*-update should be a good thing for packages. And then
+> have some post-install routines. Not doing the update is really a
+> problem, because it limits the functionality. So producing an error
+> seems fine to me.
 
-did it this way. Some nice autoconf/automake macros for it in some
-generic way would be nice. Found actually some bugs talking about it,
-but nobody did it.
+I agree, note though that in this case the error is "permission denied" since
+make will try to execute a directory (e.g. $(DESTDIR)$(datadir)/mime) when
+UPDATE_*_DATABASE is "" which is not much straightforward.
 
-Regards
+filippo
+--
+Filippo Giunchedi - http://esaurito.net
+PGP key: 0x6B79D401
+random quote follows:
 
-Marcel
-
-
+Endian little hate we
+-- Anonymous (?)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
