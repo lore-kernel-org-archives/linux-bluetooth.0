@@ -1,14 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20080210214029.GD2605@esaurito.net>
-References: <20080210183344.GA2605@esaurito.net>
-	<1202669869.7664.102.camel@violet> <20080210195148.GC2605@esaurito.net>
-	<1202675082.7664.111.camel@violet> <20080210214029.GD2605@esaurito.net>
-Date: Sun, 10 Feb 2008 22:56:22 +0100
-Message-Id: <1202680582.7664.121.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] account for	non-existant	update-*-database
+Message-ID: <8a8adccc0802101354i614472ccg138171db654e0283@mail.gmail.com>
+Date: Sun, 10 Feb 2008 22:54:08 +0100
+From: "Jaap A. Haitsma" <jaap@haitsma.org>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1202674141.7664.109.camel@violet>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_29541_31645906.1202680448813"
+References: <8a8adccc0802100701y384d23f6oeb12c7a8d0fe4f83@mail.gmail.com>
+	<1202659315.7664.88.camel@violet>
+	<8a8adccc0802100831k107d6d0akc0cfe388b61b7810@mail.gmail.com>
+	<1202661736.7664.91.camel@violet>
+	<8a8adccc0802100924m58527440rcd3d6ffb062c742@mail.gmail.com>
+	<1202665966.7664.97.camel@violet>
+	<8a8adccc0802101021p2ce8de5enbe61e34232ce7bf1@mail.gmail.com>
+	<1202674141.7664.109.camel@violet>
+Subject: Re: [Bluez-devel] [PATCH] Use new tango icon for bluez gnome
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,44 +25,169 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Filippo,
+------=_Part_29541_31645906.1202680448813
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> > > > > I've noticed a bug in bluez-gnome when update-*-database programs are not
-> > > > > present (i.e. $UPDATE_*_DATABASE is "" thus install-data-hook fails), the
-> > > > > following patch (or something similar) should work:
-> > > > 
-> > > > call --disable-*-update should be a good thing for packages. And then
-> > > > have some post-install routines. Not doing the update is really a
-> > > > problem, because it limits the functionality. So producing an error
-> > > > seems fine to me.
-> > > 
-> > > I agree, note though that in this case the error is "permission denied" since
-> > > make will try to execute a directory (e.g. $(DESTDIR)$(datadir)/mime) when
-> > > UPDATE_*_DATABASE is "" which is not much straightforward.
-> > 
-> > I put something in the CVS now that should fix it. Please test it.
-> 
-> typo:
-> 
-> AM_CONDITIONAL([MIME_UPDATE], [test -n "$UPDATE_DESKTOP_DATABASE"])
+>
+> fixed that. However I am not happy with the status icon. I think it
+> looks ugly. Kinda blurry. The other icons look great.
+>
+Hi Marcel
 
-has been fixed now. Thanks.
+Great you fixed it. I looks fine here. See attachment. I prefer this
+icon over the old because it uses the
+same palette and styling as the other icons
 
-Regards
+Jaap
 
-Marcel
+------=_Part_29541_31645906.1202680448813
+Content-Type: image/png; name=Screenshot.png
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fci4unll0
+Content-Disposition: attachment; filename=Screenshot.png
 
-
+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
+AElFTkSuQmCC
+------=_Part_29541_31645906.1202680448813
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+------=_Part_29541_31645906.1202680448813
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_29541_31645906.1202680448813--
