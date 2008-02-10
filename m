@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <8a8adccc0802100701y384d23f6oeb12c7a8d0fe4f83@mail.gmail.com>
-Date: Sun, 10 Feb 2008 16:01:52 +0100
-From: "Jaap A. Haitsma" <jaap@haitsma.org>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Subject: [Bluez-devel] [PATCH] Use new tango icon for bluez gnome
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <8a8adccc0802100246s6a242747w2f69a128b36a109e@mail.gmail.com>
+References: <8a8adccc0802100246s6a242747w2f69a128b36a109e@mail.gmail.com>
+Date: Sun, 10 Feb 2008 10:49:46 +0000
+Message-Id: <1202640586.3491.84.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] sendto does not compile
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,20 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
 
-Andreas Nilson has made new tango icons for bluez-gnome. (The
-stock_bluetooth icon will be removed from gnome-icon-theme, because
-it's deprecated)
+On Sun, 2008-02-10 at 11:46 +0100, Jaap A. Haitsma wrote:
+> I get the following errors
+> 
+> main.c:355: error: 'marshal_VOID__STRING_STRING_UINT64' undeclared
+> (first use in this function)
+> main.c:355: error: (Each undeclared identifier is reported only once
+> main.c:355: error: for each function it appears in.)
+> main.c:359: error: 'marshal_VOID__UINT64' undeclared (first use in
+> this function)
 
-I've added the Makefiles and made a patch for the code changes. You
-can find everything overhere
+It's defined in common/marshal.h which is generated from
+common/marshal.list. You need to generate that file, or simply run make
+from the root.
 
-
-http://bugzilla.gnome.org/show_bug.cgi?id=506133
-
-
-Jaap
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
