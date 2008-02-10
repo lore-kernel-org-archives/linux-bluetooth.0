@@ -1,14 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <8a8adccc0802101345s239f7b1cw331bb7dd95169f4f@mail.gmail.com>
-Date: Sun, 10 Feb 2008 22:45:30 +0100
-From: "Jaap A. Haitsma" <jaap@haitsma.org>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1202675946.7664.117.camel@violet>
+Date: Sun, 10 Feb 2008 22:40:29 +0100
+From: Filippo Giunchedi <filippo@esaurito.net>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20080210214029.GD2605@esaurito.net>
+References: <20080210183344.GA2605@esaurito.net>
+	<1202669869.7664.102.camel@violet>
+	<20080210195148.GC2605@esaurito.net>
+	<1202675082.7664.111.camel@violet>
 MIME-Version: 1.0
-References: <8a8adccc0802101016u7108223mc327ace0495ce8cd@mail.gmail.com>
-	<1202668388.7664.99.camel@violet> <1202675946.7664.117.camel@violet>
-Subject: Re: [Bluez-devel] [PATCH] Launch browser / email client when
-	clicking on link in about dialogs
+In-Reply-To: <1202675082.7664.111.camel@violet>
+Subject: Re: [Bluez-devel] [PATCH] account for non-existant	update-*-database
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,40 +23,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Feb 10, 2008 9:39 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jaap,
->
-> > > Another patch
-> > > http://bugzilla.gnome.org/show_bug.cgi?id=515581
-> >
-> > can you fix the coding style please. There are white spaces that
-> > shouldn't be there.
+On Sun, Feb 10, 2008 at 09:24:42PM +0100, Marcel Holtmann wrote:
+> Hi Filippo,
+> 
+> > > > I've noticed a bug in bluez-gnome when update-*-database programs are not
+> > > > present (i.e. $UPDATE_*_DATABASE is "" thus install-data-hook fails), the
+> > > > following patch (or something similar) should work:
+> > > 
+> > > call --disable-*-update should be a good thing for packages. And then
+> > > have some post-install routines. Not doing the update is really a
+> > > problem, because it limits the functionality. So producing an error
+> > > seems fine to me.
+> > 
+> > I agree, note though that in this case the error is "permission denied" since
+> > make will try to execute a directory (e.g. $(DESTDIR)$(datadir)/mime) when
+> > UPDATE_*_DATABASE is "" which is not much straightforward.
+> 
+> I put something in the CVS now that should fix it. Please test it.
 
-Sorry. I try not to put spaces, but it's difficult to change a habit.
-I'll try checking better when sending you a patch next time.
+typo:
 
+AM_CONDITIONAL([MIME_UPDATE], [test -n "$UPDATE_DESKTOP_DATABASE"])
+												^^^^^^^
 
-> never mind. Did it by myself. Just two minor things.
->
-> First, I am picky about the coding style. Always have been and always
-> will be. The code must look sane and not as some hackish crap. Also
-> having the coding style in place in the first place makes my life easier
-> and patching is a lot simpler.
+the rest looks good, thanks
+filippo
+--
+Filippo Giunchedi - http://esaurito.net
+PGP key: 0x6B79D401
+random quote follows:
 
-Will do my best
-
-> Second, please don't put patches into Bugzilla. I stated before that I
-> don't care about the GNOME Bugzilla. If you wanna do that, fine, but
-> then send a copy to the mailing list (not some link). This is the place
-> where I pick them up. Otherwise the will go unseen and end up in
-> nirvana.
->
-I personally feel the other way around. I tend to loose track of
-emails, so I prefer bugzilla.
-
-But it's not a problem for me to also attach it, if you prefer that
-
-Jaap
+What a strange illusion it is to suppose that beauty is goodness.
+-- Lev Tolstoj
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
