@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <47B063B6.6060900@wurmsdobler.org>
+Date: Mon, 11 Feb 2008 15:03:18 +0000
+From: Peter Wurmsdobler <peter@wurmsdobler.org>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <47B063B6.6060900@wurmsdobler.org>
-References: <47B063B6.6060900@wurmsdobler.org>
-Date: Mon, 11 Feb 2008 16:08:48 +0100
-Message-Id: <1202742528.7664.166.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] ALSA version for blueZ 3.26
+Subject: [Bluez-users] ALSA version for blueZ 3.26
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,23 +18,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Peter,
+Hello,
 
-> What version of ALSA is required to make BlueZ-utils 2.26 compile?
-> 
-> The latest audio/pcm_ioplug.h requires the struct 
-> snd_pcm_ioplug_callback to contain a "delay" function which is not yet 
-> present in the ALSA version 1.0.6 of my cross development environment 
-> comes with.
+What version of ALSA is required to make BlueZ-utils 2.26 compile?
 
-I don't know, but the Debian stable kernel has 1.0.13 and that should be
-a good start. My Ubuntu Gutsy box has 1.0.14 and I actually have 1.0.15
-on Fedora8.
+The latest audio/pcm_ioplug.h requires the struct 
+snd_pcm_ioplug_callback to contain a "delay" function which is not yet 
+present in the ALSA version 1.0.6 of my cross development environment 
+comes with.
 
-Regards
-
-Marcel
-
+peter
 
 
 -------------------------------------------------------------------------
