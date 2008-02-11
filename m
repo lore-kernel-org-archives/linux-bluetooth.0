@@ -1,15 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1202768715.7664.188.camel@violet>
-References: <1202751011.3491.165.camel@cookie.hadess.net>
-	<1202752232.7664.178.camel@violet>
-	<1202752359.3491.168.camel@cookie.hadess.net>
-	<1202768715.7664.188.camel@violet>
-Date: Mon, 11 Feb 2008 23:47:41 +0000
-Message-Id: <1202773661.3491.187.camel@cookie.hadess.net>
+In-Reply-To: <8a8adccc0802111316u2333479ds1a125e48f9dfa35e@mail.gmail.com>
+References: <8a8adccc0802101428j1eaa6c1by4c452adcda426687@mail.gmail.com>
+	<1202693554.7664.138.camel@violet>
+	<1202693988.3491.121.camel@cookie.hadess.net>
+	<8a8adccc0802111316u2333479ds1a125e48f9dfa35e@mail.gmail.com>
+Date: Tue, 12 Feb 2008 00:26:10 +0100
+Message-Id: <1202772370.7664.203.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Make search button (and discovery) work
+Subject: Re: [Bluez-devel] [PATCH] Simplify about dialog code
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,27 +23,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Jaap,
 
-On Mon, 2008-02-11 at 23:25 +0100, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > > > Seems that some bits of client.c got mistakenly commented. The #endif
-> > > > should be before the call to DiscoverDevices, not after.
-> > > > 
-> > > > So I fixed this up and finished the work to make the search button
-> > > > behave as expected. I guess we should have it by default now.
-> > > 
-> > > where do you need the extra marshal entry for?
-> > 
-> > For the client.c signal changes in bluetooth_client_class_init().
-> 
-> patch has been applied, but I removed the two g_message calls.
+> > > > Before you're holidays I sent you a patch which simplifies the about
+> > > > dialog code. We went on discussing it but didn't come to a conclusion,
+> > > > I think
+> > >
+> > > I am not going on holidays. At least not that I know of :)
+> > >
+> > > > In my opinion it's a good patch because:
+> > > >
+> > > > 1) The patch removes about 20 function calls
+> > > > 2) You don't need  to hookup signals to the about dialog
+> > > > 3) Eog, cheese, gnome-power-manager, nautilus, gedit to name a few all
+> > > > do it this way.
+> > >
+> > > Still not convinced.
+> >
+> > Using gtk_dialog_run() means that you're running the main loop from the
+> > about box code. Fixing this would add code. The patch Jaap sent removes
+> > a lot of code, and avoids things like double-about boxes, or crappy
+> > backtraces that show the about box callback function :)
+>
+> The patch even fixes bugs. So that should be enough reason to apply it, right?
+> Otherwise I'm interested in hearing your arguments against it.
 
-I forgot to mention those were there for debugging, and that they should
-be removed before commit. I hope they were at least useful for your
-testing :)
+this is the first time that I hear it actually fixes bugs (maybe I
+wasn't listen earlier), but actually you have to explain it. Telling me
+that it fixes bugs (that I am not aware of) isn't enough. Show me the
+bug and how it fixes it and it is highly likely that I simply go ahead
+and apply your patch.
 
-Thanks
+Btw. I did a new release and forgot to check if the patch would still
+apply. If not, care to redo it.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
