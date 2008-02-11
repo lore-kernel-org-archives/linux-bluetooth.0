@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1202693988.3491.121.camel@cookie.hadess.net>
-References: <8a8adccc0802101428j1eaa6c1by4c452adcda426687@mail.gmail.com>
-	<1202693554.7664.138.camel@violet>
-	<1202693988.3491.121.camel@cookie.hadess.net>
-Date: Tue, 12 Feb 2008 00:23:42 +0100
-Message-Id: <1202772222.7664.199.camel@violet>
+In-Reply-To: <1202752359.3491.168.camel@cookie.hadess.net>
+References: <1202751011.3491.165.camel@cookie.hadess.net>
+	<1202752232.7664.178.camel@violet>
+	<1202752359.3491.168.camel@cookie.hadess.net>
+Date: Mon, 11 Feb 2008 23:25:15 +0100
+Message-Id: <1202768715.7664.188.camel@violet>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Simplify about dialog code
+Subject: Re: [Bluez-devel] [PATCH] Make search button (and discovery) work
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,30 +24,17 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Bastien,
 
-> > > Before you're holidays I sent you a patch which simplifies the about
-> > > dialog code. We went on discussing it but didn't come to a conclusion,
-> > > I think
-> > 
-> > I am not going on holidays. At least not that I know of :)
-> > 
-> > > In my opinion it's a good patch because:
+> > > Seems that some bits of client.c got mistakenly commented. The #endif
+> > > should be before the call to DiscoverDevices, not after.
 > > > 
-> > > 1) The patch removes about 20 function calls
-> > > 2) You don't need  to hookup signals to the about dialog
-> > > 3) Eog, cheese, gnome-power-manager, nautilus, gedit to name a few all
-> > > do it this way.
+> > > So I fixed this up and finished the work to make the search button
+> > > behave as expected. I guess we should have it by default now.
 > > 
-> > Still not convinced.
+> > where do you need the extra marshal entry for?
 > 
-> Using gtk_dialog_run() means that you're running the main loop from the
-> about box code. Fixing this would add code. The patch Jaap sent removes
-> a lot of code, and avoids things like double-about boxes, or crappy
-> backtraces that show the about box callback function :)
+> For the client.c signal changes in bluetooth_client_class_init().
 
-I have really no idea what you are talking about. How does this change
-do all this magic?
-
-And what crappy backtraces?
+patch has been applied, but I removed the two g_message calls.
 
 Regards
 
