@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <47B08D48.7020202@aircable.net>
+Date: Mon, 11 Feb 2008 16:00:40 -0200
+From: Manuel Naranjo <manuel@aircable.net>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200802111731.m1BHVLTb009656@alumnus.caltech.edu>
-References: <200802111731.m1BHVLTb009656@alumnus.caltech.edu>
-Date: Tue, 12 Feb 2008 00:21:50 +0100
-Message-Id: <1202772110.7664.197.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] passkey-agent and auth-agent
+References: <200802111731.m1BHVQ9I009663@alumnus.caltech.edu>
+In-Reply-To: <200802111731.m1BHVQ9I009663@alumnus.caltech.edu>
+Subject: Re: [Bluez-users] failed PIN Code Request
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,24 +16,27 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Russel,
+Russell A. Bell escribi=F3:
+> 	Quoth Manuel Naranjo:
+> 	'If I'm not wrong it's not your headset the one that closes the
+> connection, but rather the kernel.
+> 	Solution:
+> 	ADDR=3D<SOMETHING> hcitootl cc $ADDR; hcitool auth $ADDR
+> 	Still not the preferred way but it works.'
+> 	I interpret the contents of hcidump to indicate that the
+> kernel closes the connection.  I wonder why.  What you proposed
+> doesn't work for me.
+>   =
 
-> 	Quoth Marcel Holtmann:
-> 	'they are not meant to be distributed at all. So nobody should
-> distribute them. They are purely example code and for developers
-> only.'
-> 	Where do the hoi polloi get passkey and auth agents?
+Russel is it much asking that you don't break the threads? It's hard to
+track your mails.
 
-actually bluez-gnome and kdebluetooth implement them for you.
-
-Regards
-
-Marcel
-
+If this doesn't work, then you have something else going on, maybe
+you're missing the passkey agent or something.
 
 
 -------------------------------------------------------------------------
