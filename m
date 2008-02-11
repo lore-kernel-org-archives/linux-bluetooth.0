@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 12 Feb 2008 07:47:12 -0500
-From: jayjwa <jayjwa@atr2.ath.cx>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <867146.70553.qm@web8414.mail.in.yahoo.com>
-Message-ID: <alpine.LNX.1.00.0802120734360.18433@nge2.ngu.pk>
-References: <867146.70553.qm@web8414.mail.in.yahoo.com>
-MIME-Version: 1.0
-Subject: Re: [Bluez-users] Headset not playing audio HELP PLEASE
+In-Reply-To: <200802111731.m1BHVLTb009656@alumnus.caltech.edu>
+References: <200802111731.m1BHVLTb009656@alumnus.caltech.edu>
+Date: Tue, 12 Feb 2008 00:21:50 +0100
+Message-Id: <1202772110.7664.197.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] passkey-agent and auth-agent
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,54 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi Russel,
 
-On Mon, 11 Feb 2008, pramod gurav wrote:
+> 	Quoth Marcel Holtmann:
+> 	'they are not meant to be distributed at all. So nobody should
+> distribute them. They are purely example code and for developers
+> only.'
+> 	Where do the hoi polloi get passkey and auth agents?
 
--> i tried adding options hci_usb force_scofix=1 to file etc/modprobe.d/bluez
--> but this file was not there I created it and added the option.
--> But no change
+actually bluez-gnome and kdebluetooth implement them for you.
 
-I'm not sure modprobe looks in that file. By default, it looks in 
-/etc/modprobe.conf. Run 'strings /sbin/modprobe | grep conf' and you can see 
-where it's looking.
+Regards
 
--> One more thing is i have no module called hci_usb found when I do
--> [Pramod@localhost ~]$ lsmod | grep hci
--> uhci_hcd               29072  0
+Marcel
 
-Hm. I wonder what is running your adapter then? Maybe it's compiled in? 
-If there is CONFIG_BT_HCIUSB=y in your kernel config, then it is.
-
-
--> This is some info i would like to share 
--> [Pramod@localhost ~]$ cat /etc/modules.conf
-->  #Bluez
--> #alias net-pf-31      bluez
--> #alias bt-proto-0     l2cap
--> alias net-pf-31 bluez
--> alias bt-proto-0 l2cap
--> alias bt-proto-2 sco
--> alias bt-proto-3 rfcomm
-
-That's an old file, and you can probably kill it. All that info should be in 
-the modprobe.conf now. Your alias for net-pf-31 should point to 'bluetooth', 
-as that is the module for bluetooth protocol on modern kernels. There is no 
-more 'bluez' module as far as I can tell.
-
-
--> [Pramod@localhost ~]$ /usr/local/sbin/hciconfig -a
--> hci0:   Type: USB
-->         BD Address: 00:0B:0D:33:9E:FB ACL MTU: 120:20 SCO MTU: 64:0
-->         UP RUNNING PSCAN ISCAN
-->         RX bytes:6912199 acl:71 sco:135480 events:72 errors:0
-->         TX bytes:1053 acl:35 sco:0 commands:30 errors:0
-->         Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
-->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-->         Link policy: HOLD PARK
-
-I have 'lp rswitch,hold,sniff,part' in my hcid.conf, so there is those names 
-above in "Link policy". I'm not sure if it matters here or not but I thought 
-I'd mention it.
 
 
 -------------------------------------------------------------------------
