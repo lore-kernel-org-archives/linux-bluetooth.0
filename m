@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1202752232.7664.178.camel@violet>
+In-Reply-To: <1202751011.3491.165.camel@cookie.hadess.net>
 References: <1202751011.3491.165.camel@cookie.hadess.net>
-	<1202752232.7664.178.camel@violet>
-Date: Mon, 11 Feb 2008 17:52:39 +0000
-Message-Id: <1202752359.3491.168.camel@cookie.hadess.net>
+Date: Mon, 11 Feb 2008 18:50:32 +0100
+Message-Id: <1202752232.7664.178.camel@violet>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] [PATCH] Make search button (and discovery) work
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -21,19 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Bastien,
 
-On Mon, 2008-02-11 at 18:50 +0100, Marcel Holtmann wrote:
-> Hi Bastien,
+> Seems that some bits of client.c got mistakenly commented. The #endif
+> should be before the call to DiscoverDevices, not after.
 > 
-> > Seems that some bits of client.c got mistakenly commented. The #endif
-> > should be before the call to DiscoverDevices, not after.
-> > 
-> > So I fixed this up and finished the work to make the search button
-> > behave as expected. I guess we should have it by default now.
-> 
-> where do you need the extra marshal entry for?
+> So I fixed this up and finished the work to make the search button
+> behave as expected. I guess we should have it by default now.
 
-For the client.c signal changes in bluetooth_client_class_init().
+where do you need the extra marshal entry for?
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
