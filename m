@@ -1,10 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47AFA9A7.3030100@aircable.net>
-Date: Sun, 10 Feb 2008 23:49:27 -0200
-From: Manuel Naranjo <manuel@aircable.net>
-MIME-Version: 1.0
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] CreateBonding while periodic scanning
+In-Reply-To: <1202693468.7664.135.camel@violet>
+References: <1202692346.7664.129.camel@violet>
+	<1202693028.3491.112.camel@cookie.hadess.net>
+	<1202693468.7664.135.camel@violet>
+Date: Mon, 11 Feb 2008 01:47:34 +0000
+Message-Id: <1202694454.3491.129.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [BlueZ-Announce] Release
+	of	bluez-libs-3.26	and	bluez-utils-3.26
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,35 +23,47 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello List,
 
-As I asked in the forums I'm trying to create a bonding to a device
-while I'm running a periodic scanning.
+On Mon, 2008-02-11 at 02:31 +0100, Marcel Holtmann wrote:
+> Hi Bastien,
+> 
+> > > this is an update release of the new stable versions of the Bluetooth
+> > > library and the utilities. This release is actually a cleanup release
+> > > and the first step towards the BlueZ 4.0 generation.
+> > > 
+> > > With this release all services are switched on by default and all old
+> > > school daemons are disabled. So all package maintainers, please keep
+> > > this in mind and adjust your packages.
+> > > 
+> > > The sources can be found at http://www.bluez.org/download.html
+> > 
+> > Which daemons do you call "old school"? Is this pand/dund?
+> 
+> yes. All this hidd, pand, dund etc. stuff that is more hacking around
+> than actually doing something.
 
-Thing is that for some reason hcid is blocking me to do this, and Marcel
-suggested removing the periodic inquiry check. But as he said, and I
-think the same, that check was created for a reason.
+Right, we weren't using those by default in Fedora either.
 
-The line that makes the conflict is this one (utils/hcid/adapter.c:
+> > Can we get rid of the tick boxes in the properties services tab now? :)
+> 
+> Actually we will, but not so quickly. We have to re-design parts of the
+> service infrastructure for 4.0 and then we see.
 
-static DBusHandlerResult adapter_create_bonding(DBusConnection *conn,
-                                                DBusMessage *msg, void
-*data)
-.....
+OK.
 
-if (adapter->discov_active || (adapter->pdiscov_active &&
-!adapter->pinq_idle))
-return error_discover_in_progress(conn, msg)
+> Btw. you need to update gnome-user-share since the obex-data-server-0.1
+> API now uses DBUS_TYPE_OBJECT_PATH and no strings anymore.
 
-pinq_idle is 0 in my case, so then I get a discovery in progress exception.
+I didn't see anything to port at first glance, but you're right. Fixed
+in SVN trunk.
 
-Marcel suggested that I change the code to "if (adapter->discov_active
-)" but still we would like to know what that check is made, so we can
-get a better solution.
+> And I am thinking about simply adding the support for FTP to bluez-gnome
+> since the dependencies of gnome-user-share are a little bit too much.
 
-Thanks,
-Manuel Naranjo
-Wireless Cables Inc.
+The same as bluez-gnome plus httpd and avahi. Could you add a way to
+disable the bluez-gnome code? I'm thinking of adding obexpush support in
+gnome-user-share as well, as it's the better place to have it, thinking
+desktop-wide.
 
 
 -------------------------------------------------------------------------
