@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 12 Feb 2008 10:47:08 -0800 (PST)
+Date: Tue, 12 Feb 2008 10:21:57 -0800 (PST)
 From: Jim Carter <jimc@math.ucla.edu>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20080212091420.4o1zmuk9usoocwck@www.domaingo-webmail.de>
-Message-ID: <Pine.LNX.4.64.0802121026580.3841@xena.cft.ca.us>
-References: <20080212091420.4o1zmuk9usoocwck@www.domaingo-webmail.de>
+In-Reply-To: <000e01c86d90$827b5c60$87721520$@de>
+Message-ID: <Pine.LNX.4.64.0802121001010.3841@xena.cft.ca.us>
+References: <000e01c86d90$827b5c60$87721520$@de>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] Using multiple bluetooth devices or WLAN creates
- sluggish sound
+Subject: Re: [Bluez-devel] FW: Loss concealment with SBC codec
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,28 +20,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Tue, 12 Feb 2008, mail@saschahoppe.de wrote:
+On Tue, 12 Feb 2008, Christian Hoene wrote:
 
-> But whenever I load a webpage via WLAN there is a drop-out in the  
-> music output. And when I try to use my Bluetooth mouse simultaneously  
-> with music playback everything is over. Whenever I move the mouse the  
-> music is totally paused until I stop moving the mouse.
-> 
-> Isn't bluetooth capable of supporting up to seven simultaneous  
-> devices? Wasn't it fixed in Bluetooth 1.2 that WLAN interferes with  
-> Bluetooth via Adaptive frequency hopping?
+> I am considering to include the BlueZ SBC codec into Ekiga in order to
+> support music over Internet Telephony. I have not understood the SBC codec
+> fully therefore I need a clarification on the following issues.
 
-It certainly sounds like trashed packets are not being retransmitted, and 
-if the dongle does Bluetooth 2.0 I start wondering about the Volis audio 
-gateway.  But my Russian isn't good enough to find the Bluetooth version 
-that it supports.
+I'm not a codec guru, but my experience with SBC has not been wonderful.  
+Using Motorola HT-820 phones, comparing Bluetooth/A2DP/SBC vs. the same 
+phones connected by the optional wire, the wired connection has very 
+noticeably better treble and bass response and is subjectively noticeably 
+clearer, on Chopin played directly off the CD (no other compression to 
+confound the judgment).  
 
-When I play music to headphones and Bluetooth 2.0 is used on both ends, I 
-have no trouble with interference from WiFi.  However, this is on a laptop 
-machine with an internal Bluetooth transceiver that coordinates with WiFi 
-so only one transmits at a time and they avoid transmitting when the other 
-service expects a scheduled packet.  (Dell Inspiron 6400 with Dell type 355 
-internal Bluetooth and Intel IWL3945abg WiFi.)
+While there's nothing wrong with including SBC in Ekiga, it should be 
+scored lower in negotiations than Vorbis (best in my opinion, plus having 
+the more sanitary politics) or MP3 (close second), among the commonly 
+available music codecs.  But if the other end knows it's going to be piping 
+the music to Bluetooth phones, you may or may not win by encoding as SBC at 
+the source, and the Bluetooth end might usefully insist on SBC.
+
+(Does the Bluetooth stack have a feature to swallow SBC coded material 
+directly, rather than insisting that the client decode SBC to raw, then the 
+audio service re-codes raw to SBC?)
+
+> If the CRC8 is wrong, does sbc_decode function conceals the lost frame? If
+> not, did you hear anything about a packet loss concealment algorithm for
+> SBC? Any work on that?
+
+Again I'm not a codec guru, but when I read the spec for SBC I didn't 
+notice any such thing, but I could have missed it.  In my experience, when 
+a packet is trashed and USB-2.0 retransmission is impossible, you just get 
+a brief gap in the sound.  It sounds like popcorn, loudness proportional to 
+the loudness of the surrounding music.  The effect is a lot worse if you 
+have a USB-1.1 dongle (I mistakenly bought 2 of them), which does no 
+retransmission.
+
+Hope this helps!
 
 James F. Carter          Voice 310 825 2897    FAX 310 206 6673
 UCLA-Mathnet;  6115 MSA; 405 Hilgard Ave.; Los Angeles, CA, USA 90095-1555
