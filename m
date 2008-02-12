@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47B203C8.2000503@wershofen.de>
-Date: Tue, 12 Feb 2008 21:38:32 +0100
-From: Wolfgang Wershofen <wolfgang@wershofen.de>
+Date: Tue, 12 Feb 2008 07:47:12 -0500
+From: jayjwa <jayjwa@atr2.ath.cx>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <867146.70553.qm@web8414.mail.in.yahoo.com>
+Message-ID: <alpine.LNX.1.00.0802120734360.18433@nge2.ngu.pk>
+References: <867146.70553.qm@web8414.mail.in.yahoo.com>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Using bluetooth as slave for dsnoop
+Subject: Re: [Bluez-users] Headset not playing audio HELP PLEASE
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,42 +16,65 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGkgZXZlcnlib2R5LAoKbWUgYW5kIHRoZSBndXlzIGZyb20gdGhlIHR3aW5rbGUgbWFpbGluZyBs
-aXN0IGhhdmUgYSBwcm9ibGVtIHdpdGggdXNpbmcKYSBibHVldG9vdGggaGVhZHNldCB3aXRoIHR3
-aW5rbGUuIEV2ZXJ5dGhpbmcgd29ya3MgZmluZSBleGNlcHQgZm9yIHRoZQptaWNyb3Bob25lLiBU
-aGF0IGlzLCBJIGNhbiBoZWFyIHBlb3BsZSB0YWxraW5nIG9uIHRoZSBvdGhlciBlbmQgbG91ZCBh
-bmQKY2xlYXIsIGJ1dCB0aGUgb3RoZXIgc2lkZSBvbmx5IGdldHMgbG91ZCB3aGl0ZSBzdGF0aWMg
-bm9pc2UgZnJvbSBtZS4KT3RoZXJ3aXNlLCB3aXRoIGFyZWNvcmQsIHRoZSBzb3VuZCByZWNvcmRp
-bmcgcnVucyB3aXRob3V0IGFueSBwcm9ibGVtcy4KCldlIGhhdmUgY29tZSBzbyBmYXIsIHRoYXQg
-d2UgdGhpbmssIGl0J3MgYSB0aW1pbmcgcHJvYmxlbSB3aXRoCm9wZW4vY2xvc2Ugb2YgdGhlIGFs
-c2EgZGV2aWNlLCB3aGVyZSBhIHN1YnNlcXVlbnQgb3BlbiBjb21lcyBiZWZvcmUgdGhlCmNsb3Nl
-IGluc3RydWN0aW9uIG9mIHRoZSBwcmV2aW91cyBjb25uZWN0aW9uIGhhcyBiZWVuIGZpbmlzaGVk
-LgoKU28gdGhlIGlkZWEgd2FzLCB0byB1c2UgdGhlIGFsc2EgcGx1Z2luIGRzbm9vcCB0byB0YWtl
-IGNhcmUgb2YgdGhlCmJsdWV0b290aCBjb25uZWN0aW9uIHJhdGhlciB0aGFuIHR3aW5rbGUgYW5k
-IHNlZSwgaWYgdGhhdCBoZWxwcy4gQnV0IEkKY2FuJ3QgZ2V0IHRoZSBibHVldG9vdGggZGV2aWNl
-IHRvIGFjdCBhcyBhIHNsYXZlIGZvciBkc25vb3AuIEhlcmUncyBvbmUKb2YgbXkgL2V0Yy9hc291
-bmQuY29uZiBhcHByb2FjaGVzLCBidXQgbm8gbWF0dGVyLCB3aGF0IEkgdHJ5LCB0aGV5IGFsbApk
-byBub3Qgd29yazoKCnBjbS5ibHVldG9vdGggewogICAgICAgICB0eXBlIGJsdWV0b290aAogICAg
-ICAgICBkZXZpY2UgIjAwOjA3OkE0OjA1OjE2OjZBIgogICAgICAgICBwcm9maWxlICJhdXRvIgp9
-CgpwY20uYnRfc2xhdmUgewogICAgICAgICB0eXBlIGRzbm9vcAogICAgICAgICBpcGNfa2V5IDEw
-MjQKICAgICAgICAgaXBjX2tleV9hZGRfdWlkIHRydWUKICAgICAgICAgc2xhdmUucGNtIGJsdWV0
-b290aAp9CgoKClRoaXMgaXMgd2hhdCBJIGdldCBmcm9tIHVzaW5nIGJ0X3NsYXZlIHdpdGggYXJl
-Y29yZDoKCndvbGxlQGJ1ZXJvOn4vdG1wPiBhcmVjb3JkIC12IC1EIGJ0X3NsYXZlIC1mIFMxNl9M
-RSAtYyAyIC9kZXYvbnVsbApBTFNBIGxpYiBwY21fZGlyZWN0LmM6MTQ3OTooX3NuZF9wY21fZGly
-ZWN0X2dldF9zbGF2ZV9pcGNfb2Zmc2V0KQpJbnZhbGlkIHR5cGUgJ2JsdWV0b290aCcgZm9yIHNs
-YXZlIFBDTQoKYXJlY29yZDogbWFpbjo1NjQ6IGF1ZGlvIG9wZW4gZXJyb3I6IERhcyBBcmd1bWVu
-dCBpc3QgdW5nw7xsdGlnCgoKQW55IGhpbnRzIG9uIGhvdyB0byB1c2UgYSBibHVldG9vdGggZGV2
-aWNlIGFzIGEgc2xhdmUgcGNtPyBIYXMgYW55Ym9keQpnb3Qgc29tZXRoaW5nIGxpa2UgdGhpcyB3
-b3JraW5nPyBBbnkgaGVscCBpcyBhcHByZXRpYXRlZC4KClRoeApXb2xmZ2FuZwoKCi0tIApHZWVr
-IGJ5IG5hdHVyZSwgTGludXggYnkgY2hvaWNlCgoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5u
-ZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBNaWNyb3NvZnQKRGVmeSBhbGwgY2hhbGxlbmdlcy4g
-TWljcm9zb2Z0KFIpIFZpc3VhbCBTdHVkaW8gMjAwOC4KaHR0cDovL2Nsay5hdGRtdC5jb20vTVJU
-L2dvL3ZzZTAxMjAwMDAwNzBtcnQvZGlyZWN0LzAxLwpfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwpCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNl
-cnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xp
-c3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
+
+On Mon, 11 Feb 2008, pramod gurav wrote:
+
+-> i tried adding options hci_usb force_scofix=1 to file etc/modprobe.d/bluez
+-> but this file was not there I created it and added the option.
+-> But no change
+
+I'm not sure modprobe looks in that file. By default, it looks in 
+/etc/modprobe.conf. Run 'strings /sbin/modprobe | grep conf' and you can see 
+where it's looking.
+
+-> One more thing is i have no module called hci_usb found when I do
+-> [Pramod@localhost ~]$ lsmod | grep hci
+-> uhci_hcd               29072  0
+
+Hm. I wonder what is running your adapter then? Maybe it's compiled in? 
+If there is CONFIG_BT_HCIUSB=y in your kernel config, then it is.
+
+
+-> This is some info i would like to share 
+-> [Pramod@localhost ~]$ cat /etc/modules.conf
+->  #Bluez
+-> #alias net-pf-31      bluez
+-> #alias bt-proto-0     l2cap
+-> alias net-pf-31 bluez
+-> alias bt-proto-0 l2cap
+-> alias bt-proto-2 sco
+-> alias bt-proto-3 rfcomm
+
+That's an old file, and you can probably kill it. All that info should be in 
+the modprobe.conf now. Your alias for net-pf-31 should point to 'bluetooth', 
+as that is the module for bluetooth protocol on modern kernels. There is no 
+more 'bluez' module as far as I can tell.
+
+
+-> [Pramod@localhost ~]$ /usr/local/sbin/hciconfig -a
+-> hci0:   Type: USB
+->         BD Address: 00:0B:0D:33:9E:FB ACL MTU: 120:20 SCO MTU: 64:0
+->         UP RUNNING PSCAN ISCAN
+->         RX bytes:6912199 acl:71 sco:135480 events:72 errors:0
+->         TX bytes:1053 acl:35 sco:0 commands:30 errors:0
+->         Features: 0xff 0xff 0x05 0x00 0x00 0x00 0x00 0x00
+->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+->         Link policy: HOLD PARK
+
+I have 'lp rswitch,hold,sniff,part' in my hcid.conf, so there is those names 
+above in "Link policy". I'm not sure if it matters here or not but I thought 
+I'd mention it.
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
