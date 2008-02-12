@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20080212154306.bpk8u6qmxwsscco8@wmlab.csie.ncu.edu.tw>
-References: <20080212154306.bpk8u6qmxwsscco8@wmlab.csie.ncu.edu.tw>
-Date: Tue, 12 Feb 2008 11:14:47 +0000
-Message-Id: <1202814887.3491.213.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Where could I find TODO for bluez-gnome?
+Message-ID: <20080212091420.4o1zmuk9usoocwck@www.domaingo-webmail.de>
+Date: Tue, 12 Feb 2008 09:14:20 +0100
+From: mail@saschahoppe.de
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] Using multiple bluetooth devices or WLAN creates
+	sluggish sound
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,16 +19,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hello,
 
-On Tue, 2008-02-12 at 15:43 +0800, Ming-I Hsieh wrote:
-> Hi, all:
-> 
-> Where could I find TODO list for bluez-gnome? In wiki.bluez, I only  
-> found the TODO list for the bluez-utils and kernel, and it seem be  
-> very old.
+first of all I need to say, that it was really easy to set bluetooth  
+sound up in Ubuntu Gutsy 7.10 with the instructions mentioned in the  
+Bluez wiki. I use a Voiis www.voiis.com Audio gateway and a Bluetooth  
+USB Dongle that is a class I device supporting Bluetooth v2.0 and the  
+A2DP-SRC protocol.
 
-You already posted this question a week ago:
-http://thread.gmane.org/gmane.linux.bluez.devel/15197
+I got it paired and can hear music with amarok for example in a really  
+good quality over my Hifi-amp.
+But whenever I load a webpage via WLAN there is a drop-out in the  
+music output. And when I try to use my Bluetooth mouse simultaneously  
+with music playback everything is over. Whenever I move the mouse the  
+music is totally paused until I stop moving the mouse.
+
+Isn't bluetooth capable of supporting up to seven simultaneous  
+devices? Wasn't it fixed in Bluetooth 1.2 that WLAN interferes with  
+Bluetooth via Adaptive frequency hopping?
+
+Is this a bug or can I somehow fix this behaviour.
+
+Thank you for any advice.
 
 
 
