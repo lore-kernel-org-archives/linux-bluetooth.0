@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Feb 2008 22:06:59 -0500
+Date: Mon, 11 Feb 2008 22:07:03 -0500
 From: Aristeu Sergio Rozanski Filho <aris@ruivo.org>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20080212030659.GC17385@jake.ruivo.org>
+Message-ID: <20080212030703.GD17385@jake.ruivo.org>
 MIME-Version: 1.0
-Subject: [Bluez-devel] [PATCH 2/4] input/device: add support to
-	connect/disconnect methods
+Subject: [Bluez-devel] [PATCH 3/4] input/fakehid: introduce support to
+	fakehid devices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,137 +19,223 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This patch adds two methods to fake_input structure, in order to
-prepare for fake_hid support.
+This patch adds support to fake HID devices. Instead of registering with
+kernel, the fake HID will be handled in user level and an uinput device
+will be created in order to get the events into input layer.
 
 ---
- input/device.c |   61 +++++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 38 insertions(+), 23 deletions(-)
+ input/Makefile.am |    3 +-
+ input/device.c    |   46 ++++++++++++++++++++++++++----------
+ input/device.h    |   12 +++++++++
+ input/fakehid.c   |   69 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ input/fakehid.h   |   20 +++++++++++++++
+ 5 files changed, 137 insertions(+), 13 deletions(-)
 
---- a/input/device.c	2008-02-04 22:26:28.000000000 -0500
-+++ b/input/device.c	2008-02-11 21:18:24.000000000 -0500
-@@ -59,11 +59,16 @@
+--- a/input/device.c	2008-02-04 22:29:58.000000000 -0500
++++ b/input/device.c	2008-02-11 21:08:48.000000000 -0500
+@@ -52,6 +52,7 @@
+ #include "error.h"
+ #include "manager.h"
+ #include "storage.h"
++#include "fakehid.h"
  
- #define UPDOWN_ENABLED		1
+ #define INPUT_DEVICE_INTERFACE	"org.bluez.input.Device"
  
-+#define FI_FLAG_CONNECTED	1
-+
- struct fake_input {
-+	int		flags;
- 	GIOChannel	*io;
- 	int		rfcomm; /* RFCOMM socket */
- 	int		uinput;	/* uinput socket */
- 	uint8_t		ch;	/* RFCOMM channel number */
-+	gboolean 	(*connect)(struct device *idev);
-+	int		(*disconnect)(struct device *idev);
- };
+@@ -61,16 +62,6 @@
  
+ #define FI_FLAG_CONNECTED	1
+ 
+-struct fake_input {
+-	int		flags;
+-	GIOChannel	*io;
+-	int		rfcomm; /* RFCOMM socket */
+-	int		uinput;	/* uinput socket */
+-	uint8_t		ch;	/* RFCOMM channel number */
+-	gboolean 	(*connect)(struct device *idev);
+-	int		(*disconnect)(struct device *idev);
+-};
+-
  struct device {
-@@ -759,6 +764,26 @@ failed:
- 	return FALSE;
+ 	bdaddr_t		src;
+ 	bdaddr_t		dst;
+@@ -1334,16 +1325,47 @@ int input_device_close_channels(bdaddr_t
+ 	return 0;
  }
  
-+static int fake_disconnect(struct device *idev)
++static gboolean fake_hid_connect(struct device *dev)
 +{
-+	struct fake_input *fake = idev->fake;
++	struct fake_hid *fhid = dev->fake->priv;
 +
-+	if (!fake->io)
-+		return -ENOTCONN;
++	return fhid->connect(dev->fake);
++}
 +
-+	g_io_channel_close(fake->io);
-+	g_io_channel_unref(fake->io);
-+	fake->io = NULL;
 +
-+	if (fake->uinput >= 0) {
-+		ioctl(fake->uinput, UI_DEV_DESTROY);
-+		close(fake->uinput);
-+		fake->uinput = -1;
++static int fake_hid_disconnect(struct device *dev)
++{
++	struct fake_hid *fhid = dev->fake->priv;
++
++	return fhid->disconnect(dev->fake);
++}
++
+ int input_device_connadd(bdaddr_t *src, bdaddr_t *dst)
+ {
+ 	struct device *idev;
+-	int err;
++	struct fake_hid *fake_hid;
++	int err = 0;
+ 
+ 	idev = find_device(src, dst);
+ 	if (!idev)
+ 		return -ENOENT;
+ 
+-	err = hidp_connadd(src, dst, idev->ctrl_sk, idev->intr_sk, idev->name);
++	fake_hid = is_fake_hid(idev->vendor, idev->product);
++	if (fake_hid) {
++		struct fake_input *fake;
++
++		err = ENOMEM;
++		fake = malloc(sizeof(struct fake_input));
++		if (fake != NULL) {
++			memset(fake, 0, sizeof(struct fake_input));
++
++			fake->connect = fake_hid_connect;
++			fake->disconnect = fake_hid_disconnect;
++			fake->priv = fake_hid;
++			err = fake_hid_connadd(fake, idev->intr_sk, fake_hid);
++		}
++	} else
++		err = hidp_connadd(src, dst, idev->ctrl_sk, idev->intr_sk, idev->name);
+ 	if (err < 0) {
+ 		close(idev->ctrl_sk);
+ 		close(idev->intr_sk);
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ b/input/fakehid.h	2008-02-11 20:58:49.000000000 -0500
+@@ -0,0 +1,20 @@
++#ifndef FAKEHID_H
++#define FAKEHID_H
++#include <glib.h>
++struct fake_hid;
++struct fake_input;
++
++struct fake_hid {
++	uint16_t vendor;
++	uint16_t product;
++	gboolean (*connect)(struct fake_input *fake_input);
++	int (*disconnect)(struct fake_input *fake_input);
++	gboolean (*event)(GIOChannel *chan, GIOCondition cond, gpointer data);
++	int (*setup_uinput)(struct fake_input *fake, struct fake_hid *fake_hid);
++};
++
++struct fake_hid *is_fake_hid(uint16_t vendor, uint16_t product);
++int fake_hid_connadd(struct fake_input *fake, int intr_sk,
++		     struct fake_hid *fake_hid);
++#endif	/* FAKEHID_H */
++
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ b/input/fakehid.c	2008-02-11 21:18:07.000000000 -0500
+@@ -0,0 +1,69 @@
++#include <stdio.h>
++#include <stdlib.h>
++#include <errno.h>
++#include <sys/types.h>
++#include <glib.h>
++#include <dbus/dbus.h>
++#include <bluetooth/bluetooth.h>
++#include <bluetooth/hidp.h>
++#include <bluetooth/l2cap.h>
++#include "logging.h"
++#include "device.h"
++#include "fakehid.h"
++
++#define FAKE_HID_ENTRY(v, p, c, d, i, e, s) { \
++	.vendor = BLUETOOTH_VENDOR_ID_##v, \
++	.product = BLUETOOTH_DEVICE_ID_##p, \
++	.connect = c, \
++	.disconnect = d, \
++	.event = e, \
++	.setup_uinput = s, \
 +	}
++
++static gboolean fake_hid_common_connect(struct fake_input *fake)
++{
++	return TRUE;
++}
++
++static int fake_hid_common_disconnect(struct fake_input *fake)
++{
++	return 0;
++}
++
++static struct fake_hid fake_hid_table[] = {
++	{ },
++};
++
++static inline int fake_hid_match_device(uint16_t vendor, uint16_t product,
++					struct fake_hid *fhid)
++{
++	return vendor == fhid->vendor && product == fhid->product;
++}
++
++struct fake_hid *is_fake_hid(uint16_t vendor, uint16_t product)
++{
++	int i;
++
++	for (i = 0; fake_hid_table[i].vendor != 0; i++)
++		if (fake_hid_match_device(vendor, product, &fake_hid_table[i]))
++			return &fake_hid_table[i];
++
++	return NULL;
++}
++
++int fake_hid_connadd(struct fake_input *fake, int intr_sk,
++		     struct fake_hid *fake_hid)
++{
++	if (fake_hid->setup_uinput(fake, fake_hid)) {
++		error("Error setting up uinput");
++		return ENOMEM;
++	}
++
++	fake->io = g_io_channel_unix_new(intr_sk);
++	g_io_channel_set_close_on_unref(fake->io, TRUE);
++	g_io_add_watch(fake->io, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++						(GIOFunc) fake_hid->event, fake);
 +
 +	return 0;
 +}
 +
- static int disconnect(struct device *idev, uint32_t flags)
- {
- 	struct fake_input *fake = idev->fake;
-@@ -768,20 +793,10 @@ static int disconnect(struct device *ide
+--- a/input/device.h	2008-02-04 22:29:58.000000000 -0500
++++ b/input/device.h	2008-02-11 21:06:49.000000000 -0500
+@@ -23,6 +23,18 @@
  
- 	/* Fake input disconnect */
- 	if (fake) {
--		if (!fake->io)
--			return -ENOTCONN;
--
--		g_io_channel_close(fake->io);
--		g_io_channel_unref(fake->io);
--		fake->io = NULL;
--
--		if (fake->uinput >= 0) {
--			ioctl(fake->uinput, UI_DEV_DESTROY);
--			close(fake->uinput);
--			fake->uinput = -1;
--		}
--
--		return 0;
-+		err = fake->disconnect(idev);
-+		if (!err)
-+			fake->flags &= ~FI_FLAG_CONNECTED;
-+		return err;
- 	}
+ #define L2CAP_PSM_HIDP_CTRL	0x11
+ #define L2CAP_PSM_HIDP_INTR	0x13
++struct device;
++
++struct fake_input {
++	int		flags;
++	GIOChannel	*io;
++	int		rfcomm; /* RFCOMM socket */
++	int		uinput;	/* uinput socket */
++	uint8_t		ch;	/* RFCOMM channel number */
++	gboolean 	(*connect)(struct device *dev);
++	int		(*disconnect)(struct device *dev);
++	void		*priv;
++};
  
- 	/* Standard HID disconnect */
-@@ -835,12 +850,8 @@ static int is_connected(struct device *i
- 	int ctl;
+ int input_device_register(DBusConnection *conn, bdaddr_t *src, bdaddr_t *dst,
+ 			struct hidp_connadd_req *hidp, const char **ppath);
+--- a/input/Makefile.am	2008-02-04 22:29:58.000000000 -0500
++++ b/input/Makefile.am	2008-02-04 22:30:02.000000000 -0500
+@@ -12,7 +12,8 @@ service_PROGRAMS = bluetoothd-service-in
  
- 	/* Fake input */
--	if (fake) {
--		if (fake->io)
--			return 1;
--		else
--			return 0;
--	}
-+	if (fake)
-+		return fake->flags & FI_FLAG_CONNECTED;
+ bluetoothd_service_input_SOURCES = main.c \
+ 	manager.h manager.c \
+-	server.h server.c device.h device.c storage.h storage.c
++	server.h server.c device.h device.c storage.h storage.c \
++	fakehid.c fakehid.h
  
- 	/* Standard HID */
- 	ctl = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HIDP);
-@@ -869,6 +880,7 @@ static DBusHandlerResult device_connect(
- 					DBusMessage *msg, void *data)
- {
- 	struct device *idev = data;
-+	struct fake_input *fake = idev->fake;
- 
- 	if (idev->pending_connect)
- 		return error_in_progress(conn, msg,
-@@ -880,16 +892,17 @@ static DBusHandlerResult device_connect(
- 	idev->pending_connect = dbus_message_ref(msg);
- 
- 	/* Fake input device */
--	if (idev->fake) {
--		if (rfcomm_connect(idev) < 0) {
-+	if (fake) {
-+		if (fake->connect(idev) < 0) {
- 			int err = errno;
- 			const char *str = strerror(err);
--			error("RFCOMM connect failed: %s(%d)", str, err);
-+			error("Connect failed: %s(%d)", str, err);
- 			dbus_message_unref(idev->pending_connect);
- 			idev->pending_connect = NULL;
- 			return error_connection_attempt_failed(conn,
- 					msg, err);
- 		}
-+		fake->flags |= FI_FLAG_CONNECTED;
- 		return DBUS_HANDLER_RESULT_HANDLED;
- 	}
- 
-@@ -1142,6 +1155,8 @@ int fake_input_register(DBusConnection *
- 
- 	idev->fake = g_new0(struct fake_input, 1);
- 	idev->fake->ch = ch;
-+	idev->fake->connect = rfcomm_connect;
-+	idev->fake->disconnect = fake_disconnect;
- 
- 	err = register_path(conn, path, idev);
- 
+ LDADD = $(top_builddir)/common/libhelper.a \
+ 		@GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
