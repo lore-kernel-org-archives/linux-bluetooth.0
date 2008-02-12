@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <20080212192318.7nc4zexu8c44gwoc@wmlab.csie.ncu.edu.tw>
-Date: Tue, 12 Feb 2008 19:23:18 +0800
-From: Ming-I Hsieh <mihs@wmlab.csie.ncu.edu.tw>
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <20080212154306.bpk8u6qmxwsscco8@wmlab.csie.ncu.edu.tw>
 In-Reply-To: <20080212154306.bpk8u6qmxwsscco8@wmlab.csie.ncu.edu.tw>
-MIME-Version: 1.0
+References: <20080212154306.bpk8u6qmxwsscco8@wmlab.csie.ncu.edu.tw>
+Date: Tue, 12 Feb 2008 11:14:47 +0000
+Message-Id: <1202814887.3491.213.camel@cookie.hadess.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Where could I find TODO for bluez-gnome?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,12 +20,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Thanks, I missed the response.
 
-Regards, Mihs
+On Tue, 2008-02-12 at 15:43 +0800, Ming-I Hsieh wrote:
+> Hi, all:
+> 
+> Where could I find TODO list for bluez-gnome? In wiki.bluez, I only  
+> found the TODO list for the bluez-utils and kernel, and it seem be  
+> very old.
 
-----------------------------------------------------------------
-This message was sent using IMP, the Internet Messaging Program.
+You already posted this question a week ago:
+http://thread.gmane.org/gmane.linux.bluez.devel/15197
+
 
 
 
