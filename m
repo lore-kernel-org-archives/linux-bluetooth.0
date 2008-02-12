@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300802121139p12c7e8d4y73e6d1cd995a0075@mail.gmail.com>
-Date: Tue, 12 Feb 2008 12:39:32 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <Pine.LNX.4.64.0802121001010.3841@xena.cft.ca.us>
+Date: Tue, 12 Feb 2008 10:47:08 -0800 (PST)
+From: Jim Carter <jimc@math.ucla.edu>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20080212091420.4o1zmuk9usoocwck@www.domaingo-webmail.de>
+Message-ID: <Pine.LNX.4.64.0802121026580.3841@xena.cft.ca.us>
+References: <20080212091420.4o1zmuk9usoocwck@www.domaingo-webmail.de>
 MIME-Version: 1.0
-References: <000e01c86d90$827b5c60$87721520$@de>
-	<Pine.LNX.4.64.0802121001010.3841@xena.cft.ca.us>
-Subject: Re: [Bluez-devel] FW: Loss concealment with SBC codec
+Subject: Re: [Bluez-devel] Using multiple bluetooth devices or WLAN creates
+ sluggish sound
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,33 +21,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hey
+On Tue, 12 Feb 2008, mail@saschahoppe.de wrote:
 
-> I'm not a codec guru, but my experience with SBC has not been wonderful.
+> But whenever I load a webpage via WLAN there is a drop-out in the  
+> music output. And when I try to use my Bluetooth mouse simultaneously  
+> with music playback everything is over. Whenever I move the mouse the  
+> music is totally paused until I stop moving the mouse.
+> 
+> Isn't bluetooth capable of supporting up to seven simultaneous  
+> devices? Wasn't it fixed in Bluetooth 1.2 that WLAN interferes with  
+> Bluetooth via Adaptive frequency hopping?
 
-the codec settings may make a difference here. 4 subband-encoded audio
-sounds better. There are also parts of the code we will target for
-better numerical accuracy once some bugfixes are complete.
+It certainly sounds like trashed packets are not being retransmitted, and 
+if the dongle does Bluetooth 2.0 I start wondering about the Volis audio 
+gateway.  But my Russian isn't good enough to find the Bluetooth version 
+that it supports.
 
-for devel-related issues, see http://wiki.bluez.org/wiki/SBC
+When I play music to headphones and Bluetooth 2.0 is used on both ends, I 
+have no trouble with interference from WiFi.  However, this is on a laptop 
+machine with an internal Bluetooth transceiver that coordinates with WiFi 
+so only one transmits at a time and they avoid transmitting when the other 
+service expects a scheduled packet.  (Dell Inspiron 6400 with Dell type 355 
+internal Bluetooth and Intel IWL3945abg WiFi.)
 
-> (Does the Bluetooth stack have a feature to swallow SBC coded material
-> directly, rather than insisting that the client decode SBC to raw, then the
-> audio service re-codes raw to SBC?)
-
-yes. If you use gstreamer, you can separate a2dp transmission from the
-codec. It can accept sbc coded material and with a gstreamer patch it
-can accept mp3 material (provided your headset has an mp3 decoder).
-
-> > If the CRC8 is wrong, does sbc_decode function conceals the lost frame? If
-> > not, did you hear anything about a packet loss concealment algorithm for
-> > SBC? Any work on that?
-
-there is no attempt at packet loss concealment, but we're not opposed
-to the idea :)
-
--- 
-Brad
+James F. Carter          Voice 310 825 2897    FAX 310 206 6673
+UCLA-Mathnet;  6115 MSA; 405 Hilgard Ave.; Los Angeles, CA, USA 90095-1555
+Email: jimc@math.ucla.edu  http://www.math.ucla.edu/~jimc (q.v. for PGP key)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
