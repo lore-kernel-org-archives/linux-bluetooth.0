@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Christian Hoene" <hoene@uni-tuebingen.de>
-To: <bluez-devel@lists.sourceforge.net>
-Date: Tue, 12 Feb 2008 17:01:20 +0100
-Message-ID: <000e01c86d90$827b5c60$87721520$@de>
+Message-ID: <20080212192318.7nc4zexu8c44gwoc@wmlab.csie.ncu.edu.tw>
+Date: Tue, 12 Feb 2008 19:23:18 +0800
+From: Ming-I Hsieh <mihs@wmlab.csie.ncu.edu.tw>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <20080212154306.bpk8u6qmxwsscco8@wmlab.csie.ncu.edu.tw>
+In-Reply-To: <20080212154306.bpk8u6qmxwsscco8@wmlab.csie.ncu.edu.tw>
 MIME-Version: 1.0
-Subject: [Bluez-devel] FW: Loss concealment with SBC codec
+Subject: Re: [Bluez-devel] Where could I find TODO for bluez-gnome?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,32 +16,16 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Dear developers,
+Thanks, I missed the response.
 
-I am considering to include the BlueZ SBC codec into Ekiga in order to
-support music over Internet Telephony. I have not understood the SBC codec
-fully therefore I need a clarification on the following issues.
+Regards, Mihs
 
-If the CRC8 is wrong, does sbc_decode function conceals the lost frame? If
-not, did you hear anything about a packet loss concealment algorithm for
-SBC? Any work on that?
-
-Thanks for your help
-
- Christian Hoene
-
-
-
---------------------------------------------------------
-Dr.-Ing. Christian Hoene
-Computer Networks and Internet, University of T=FCbingen
-Sand 13, 72076 T=FCbingen, Germany, Phone +49 7071 2970532
-http://net.informatik.uni-tuebingen.de/~hoene
-
+----------------------------------------------------------------
+This message was sent using IMP, the Internet Messaging Program.
 
 
 
