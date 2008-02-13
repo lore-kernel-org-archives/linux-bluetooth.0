@@ -1,162 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BAY102-W41CC3B366D95758BEC82D0F0240@phx.gbl>
-From: Robert Rawlins <robert_rawlins@hotmail.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Wed, 13 Feb 2008 16:58:28 +0000
-In-Reply-To: <1202920228.7664.419.camel@violet>
-References: <5d5443650802080456p78f33f07s3ec6ac4c4c1e789c@mail.gmail.com>
-	<20080208141056.GZ24072@matthew.ath.cx>
-	<5d5443650802110839u2f12eb01j603dcc436085c84d@mail.gmail.com>
-	<20080211164102.GA8137@berrange.com>
-	<BAY102-W409DB55A6A242470BDB930F02B0@phx.gbl>
-	<BAY102-W220E308B67B2F42DCEB5FFF0240@phx.gbl>
-	<1202920228.7664.419.camel@violet>
+Message-ID: <47B321B7.4080608@rtr.ca>
+Date: Wed, 13 Feb 2008 11:58:31 -0500
+From: Mark Lord <lkml@rtr.ca>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] Asynchronous SDP With DBUS API
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1722045774=="
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Alon Bar-Lev <alon.barlev@gmail.com>,
+	Dave Young <hidave.darkstar@gmail.com>, linux-kernel@vger.kernel.org,
+	marcel@holtmann.org, bluez-devel@lists.sourceforge.net
+Subject: Re: [BUG] rfcomm
+References: <200710231950.31313.alon.barlev@gmail.com>	<a8e1da0711051849ma591d4k6a816e2de7390347@mail.gmail.com>	<9e0cf0bf0711052149t5c9fe50j19d13e368690efb@mail.gmail.com>	<200802111757.56537.alon.barlev@gmail.com> <20080212235814.b4a2e565.akpm@linux-foundation.org>
+In-Reply-To: <20080212235814.b4a2e565.akpm@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
---===============1722045774==
-Content-Type: multipart/alternative;
-	boundary="_1a8bbde9-f39c-4a54-afbd-dbca2b67159e_"
+Andrew Morton wrote:
+> On Mon, 11 Feb 2008 17:57:54 +0200 Alon Bar-Lev <alon.barlev@gmail.com> wrote:
+> 
+>> On Tuesday 06 November 2007, Alon Bar-Lev wrote:
+>>> On 11/6/07, Dave Young <hidave.darkstar@gmail.com> wrote:
+>>>> Hi,
+>>>> sorry for reply again, this seems a diffrent issue ...
+>>> All that I do is running pppd over the rfcomm, suspending the system and resume.
+>>> I don't load any binary module.
+..
+>> Tried 2.6.24.1...
+..
+>> Feb 11 17:46:05 alon1 usb 3-1: new full speed USB device using uhci_hcd and address 8
+>> Feb 11 17:46:05 alon1 usb 3-1: configuration #1 chosen from 1 choice
+>> Feb 11 17:46:05 alon1 BUG: unable to handle kernel NULL pointer dereference at virtual address 00000008
+>> Feb 11 17:46:05 alon1 printing eip: c01b2da6 *pde = 00000000 
+>> Feb 11 17:46:05 alon1 Oops: 0000 [#1] PREEMPT 
+>> Feb 11 17:46:05 alon1 Modules linked in: aes_generic crypto_algapi ieee80211_crypt_ccmp ppp_deflate zlib_deflate zlib_inflate bsd_comp ppp_async thinkpad_acpi hwmon nvram vmnet(P) vmmon(P) tun radeon drm autofs4 ipv6 nf_nat_irc nf_nat_ftp nf_conntrack_irc nf_conntrack_ftp ipt_MASQUERADE iptable_nat nf_nat ipt_REJECT xt_tcpudp ipt_LOG xt_limit xt_state nf_conntrack_ipv4 nf_conntrack iptable_filter ip_tables x_tables rfcomm l2cap snd_pcm_oss snd_mixer_oss snd_seq_dummy snd_seq_oss snd_seq_midi_event snd_seq snd_seq_device ppp_generic slhc ioatdma dca cfq_iosched cpufreq_powersave cpufreq_ondemand cpufreq_conservative acpi_cpufreq freq_table uinput fan af_packet nls_cp1255 nls_iso8859_1 nls_utf8 nls_base hci_usb bluetooth pcmcia snd_intel8x0 snd_ac97_codec ac97_bus snd_pcm ipw2200 nsc_ircc snd_timer irda ieee80211 snd psmouse yenta_socket ehci_hcd pcspkr ieee80211_crypt e1000 rsrc_nonstatic uhci_hcd soundcore i2c_i801 intel_agp crc_ccitt thermal sr_mod pcmcia_core snd_page_al
+!
+>  lo!
+>>  c battery rtc firmware_class agpgart ac processor cdrom sg button unix usbcore evdev ext3 jbd ext2 mbcache loop ata_piix libata sd_mod scsi_mod
+>> Feb 11 17:46:05 alon1 
+>> Feb 11 17:46:05 alon1 Pid: 4, comm: events/0 Tainted: P        (2.6.24-gentoo-r1 #1)
+>> Feb 11 17:46:05 alon1 EIP: 0060:[<c01b2da6>] EFLAGS: 00010286 CPU: 0
+>> Feb 11 17:46:05 alon1 EIP is at sysfs_get_dentry+0x26/0x80
+>> Feb 11 17:46:05 alon1 EAX: 00000000 EBX: 00000000 ECX: 00000000 EDX: ebf21000
+>> Feb 11 17:46:05 alon1 ESI: eab4e880 EDI: f713bb40 EBP: f713bb40 ESP: f7c49f00
+>> Feb 11 17:46:05 alon1 DS: 007b ES: 007b FS: 0000 GS: 0000 SS: 0068
+>> Feb 11 17:46:05 alon1 Process events/0 (pid: 4, ti=f7c48000 task=f7c3efc0 task.ti=f7c48000)
+>> Feb 11 17:46:05 alon1 Stack: f7c97120 f7135a68 f7e71e10 c01b303d ffffffff ffffffff fffffffe c030ba9c 
+>> Feb 11 17:46:05 alon1 f7c97120 f7135a68 f2fefb40 f7c97120 f7135a68 f2fefb40 c030ba8e c01ce1fb 
+>> Feb 11 17:46:05 alon1 f75f1b00 c030ba8e f2fefb40 f75f1b00 f75f1b00 00000000 f7135a00 00000000 
+>> Feb 11 17:46:05 alon1 Call Trace:
+>> Feb 11 17:46:05 alon1 [<c01b303d>] sysfs_move_dir+0x3d/0x1f0
+>> Feb 11 17:46:05 alon1 [<c01ce1fb>] kobject_move+0x9b/0x120
+>> Feb 11 17:46:05 alon1 [<c0241701>] device_move+0x51/0x110
+>> Feb 11 17:46:05 alon1 [<f9a8adb0>] del_conn+0x0/0x40 [bluetooth]
+>> Feb 11 17:46:05 alon1 [<f9a8adc0>] del_conn+0x10/0x40 [bluetooth]
+>> Feb 11 17:46:05 alon1 [<c012c1a1>] run_workqueue+0x81/0x140
+>> Feb 11 17:46:05 alon1 [<c02c0c78>] schedule+0x168/0x2e0
+>> Feb 11 17:46:05 alon1 [<c012fc70>] autoremove_wake_function+0x0/0x50
+>> Feb 11 17:46:05 alon1 [<c012c9cb>] worker_thread+0x9b/0xf0
+>> Feb 11 17:46:05 alon1 [<c012fc70>] autoremove_wake_function+0x0/0x50
+>> Feb 11 17:46:05 alon1 [<c012c930>] worker_thread+0x0/0xf0
+>> Feb 11 17:46:05 alon1 [<c012f962>] kthread+0x42/0x70
+>> Feb 11 17:46:05 alon1 [<c012f920>] kthread+0x0/0x70
+>> Feb 11 17:46:05 alon1 [<c0104c2f>] kernel_thread_helper+0x7/0x18
+>> Feb 11 17:46:05 alon1 =======================
+>> Feb 11 17:46:05 alon1 Code: 26 00 00 00 00 57 89 c7 a1 50 1b 3a c0 56 53 8b 70 38 85 f6 74 08 8b 0e 85 c9 74 58 ff 06 8b 56 50 39 fa 74 47 89 fb eb 02 89 c3 <8b> 43 08 39 c2 75 f7 8b 46 08 83 c0 68 e8 98 e7 10 00 8b 43 10 
+>> Feb 11 17:46:05 alon1 EIP: [<c01b2da6>] sysfs_get_dentry+0x26/0x80 SS:ESP 0068:f7c49f00
+> 
+> A number of bluetooth fixes went into 2.6.25-rc1.  It would be interestig
+> to see if we fixed this.
+..
 
---_1a8bbde9-f39c-4a54-afbd-dbca2b67159e_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+I had a strange thing happen with 2.6.24[.0] the other day.
+My bluetooth serial dongles stopped working.
+Unloading/reloading modules and daemons had no effect.
+A system reboot cured it (for now).
 
-Hi Marcel,
-=20
-> Hi Robert,> > > I've been playing around with the DBUS API over the past =
-week or two> > and notice a large number of the methods implemented are asy=
-nchronous> > and send back signals when results from them are returned, how=
-ever,> > this doesn't appear to be the case with an SDP enquiry placed thro=
-ugh> > the service which appears to run synchronously.> > > > What's the re=
-ason behind this? are we not able to have it emit a> > signal such as 'serv=
-iceFound()' or something to that effect? is this> > down to a limitation of=
- the hardware? the stack? or am I just coding> > against the API incorrectl=
-y?> > > > Has anyone been able to find an Asynchronous implementation for S=
-DP> > enquiries? even if its some form of threaded work around.> > actually=
- D-Bus method calls are always asynchronous.> > Regards> > Marcel
-Ok, I see.
-=20
-Well, perhaps you can help me on an issue I've been having. At the moment I=
- find myself having two problems, firstly, it appears that whenever I perfo=
-rm an SDP within the application on an adapter which is in the middle of an=
- enquiry, the enquiry is terminated, is this usual behaviour? Should I perh=
-aps be looking at using the periodic discovery (which i note is listed as n=
-on blocking) and then terminate it once I've acquired the devices I require=
-?
-=20
-The reason I'm after asynchronous behaviour in my SDP enquiry is that at pr=
-esent, if I have a device in the office such as one of the girls down at re=
-ception who is a long distance away then they're phone takes a long time to=
- reply to an sdp request, resulting in the rest of my application having to=
- wait upon its response and unable to do anything else like running SDP's o=
-n other devices. In an ideal world the application would continue through i=
-ts processes able to perform service enquires on another device or two.
-=20
-What would you suggest as the best way to implement that behaviour?
-=20
-Thanks for your time Marcel,
-=20
-Robert
-_________________________________________________________________
-Telly addicts unite!
-http://www.searchgamesbox.com/tvtown.shtml=
+That's the first time I've had unfixable bluetooth trouble, well, ever I suppose.
+Just another useless data tidbit on 2.6.24.
 
---_1a8bbde9-f39c-4a54-afbd-dbca2b67159e_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<html>
-<head>
-<style>
-.hmmessage P
-{
-margin:0px;
-padding:0px
-}
-body.hmmessage
-{
-FONT-SIZE: 10pt;
-FONT-FAMILY:Tahoma
-}
-</style>
-</head>
-<body class=3D'hmmessage'>Hi Marcel,<BR>
-&nbsp;<BR>
-&gt; Hi Robert,<BR>&gt; <BR>&gt; &gt; I've been playing around with the DBU=
-S API over the past week or two<BR>&gt; &gt; and notice a large number of t=
-he methods implemented are asynchronous<BR>&gt; &gt; and send back signals =
-when results from them are returned, however,<BR>&gt; &gt; this doesn't app=
-ear to be the case with an SDP enquiry placed through<BR>&gt; &gt; the serv=
-ice which appears to run synchronously.<BR>&gt; &gt; <BR>&gt; &gt; What's t=
-he reason behind this? are we not able to have it emit a<BR>&gt; &gt; signa=
-l such as 'serviceFound()' or something to that effect? is this<BR>&gt; &gt=
-; down to a limitation of the hardware? the stack? or am I just coding<BR>&=
-gt; &gt; against the API incorrectly?<BR>&gt; &gt; <BR>&gt; &gt; Has anyone=
- been able to find an Asynchronous implementation for SDP<BR>&gt; &gt; enqu=
-iries? even if its some form of threaded work around.<BR>&gt; <BR>&gt; actu=
-ally D-Bus method calls are always asynchronous.<BR>&gt; <BR>&gt; Regards<B=
-R>&gt; <BR>&gt; Marcel<BR><BR>
-Ok, I see.<BR>
-&nbsp;<BR>
-Well, perhaps you can help me on&nbsp;an issue I've been having. At the mom=
-ent I find myself having two problems, firstly, it appears that whenever I =
-perform an SDP within the application on an adapter which is in the middle =
-of an enquiry, the enquiry is terminated, is this usual behaviour? Should I=
- perhaps be looking at using the periodic discovery (which i note is listed=
- as non blocking) and then terminate it once I've acquired the devices I re=
-quire?<BR>
-&nbsp;<BR>
-The reason I'm after asynchronous behaviour in my SDP enquiry is that at pr=
-esent, if I have a device in the office such as one of the girls down at re=
-ception who is a long distance away then they're phone takes a long time to=
- reply to an sdp request, resulting in the rest of my application having to=
- wait upon its response and unable to do anything else like running SDP's o=
-n other devices. In an ideal world the application would continue through i=
-ts processes able to perform service enquires on another device or two.<BR>
-&nbsp;<BR>
-What would you suggest as the best way to implement that behaviour?<BR>
-&nbsp;<BR>
-Thanks for your time Marcel,<BR>
-&nbsp;<BR>
-Robert<BR><br /><hr />Messenger on the move. <a href=3D'http://mobile.uk.ms=
-n.com/pc/messenger.aspx ' target=3D'_new'>Text MSN to 63463 now!</a></body>
-</html>=
-
---_1a8bbde9-f39c-4a54-afbd-dbca2b67159e_--
-
-
---===============1722045774==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1722045774==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1722045774==--
+-ml
