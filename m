@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <fourq4$ivu$1@ger.gmane.org>
-References: <fourq4$ivu$1@ger.gmane.org>
-Date: Wed, 13 Feb 2008 14:40:38 +0100
-Message-Id: <1202910039.7664.407.camel@violet>
+To: bluez-devel@lists.sourceforge.net
+From: pascal@pabr.org
+Date: Wed, 13 Feb 2008 14:37:08 +0100
+Message-ID: <fourq4$ivu$1@ger.gmane.org>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] hidraw support for Bluetooth HID devices
+Subject: [Bluez-devel] [PATCH] hidraw support for Bluetooth HID devices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,28 +18,39 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pascal,
+This patch exposes Bluetooth HID peripherals to userspace
+through the hidraw API, in addition to the input subsystem.
+This improves consistency between hidp and usbhid.
 
-> This patch exposes Bluetooth HID peripherals to userspace
-> through the hidraw API, in addition to the input subsystem.
-> This improves consistency between hidp and usbhid.
 
-it misses a Signed-off-by line.
+--- linux-2.6.24.2/net/bluetooth/hidp/core.c.orig       2008-02-13 13:28:26.000000000 +0100
++++ linux-2.6.24.2/net/bluetooth/hidp/core.c    2008-02-13 14:19:29.000000000 +0100
+@@ -40,6 +40,7 @@
 
-> --- linux-2.6.24.2/net/bluetooth/hidp/core.c.orig       2008-02-13 13:28:26.000000000 +0100
-> +++ linux-2.6.24.2/net/bluetooth/hidp/core.c    2008-02-13 14:19:29.000000000 +0100
-> @@ -40,6 +40,7 @@
-> 
->   #include <linux/input.h>
->   #include <linux/hid.h>
-> +#include <linux/hidraw.h>
+  #include <linux/input.h>
+  #include <linux/hid.h>
++#include <linux/hidraw.h>
 
-This looks like your editor can't handle inline very well.
+  #include <net/bluetooth/bluetooth.h>
+  #include <net/bluetooth/hci_core.h>
+@@ -589,6 +590,8 @@ static int hidp_session(void *arg)
+         if (session->hid) {
+                 if (session->hid->claimed & HID_CLAIMED_INPUT)
+                         hidinput_disconnect(session->hid);
++               if (session->hid->claimed & HID_CLAIMED_HIDRAW)
++                       hidraw_disconnect(session->hid);
+                 hid_free_device(session->hid);
+         }
 
-Regards
+@@ -741,6 +744,8 @@ static inline void hidp_setup_hid(struct
 
-Marcel
+         if (hidinput_connect(hid) == 0)
+                 hid->claimed |= HID_CLAIMED_INPUT;
++       if (hidraw_connect(hid) == 0)
++               hid->claimed |= HID_CLAIMED_HIDRAW;
+  }
 
+  int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock, struct socket *intr_sock)
 
 
 -------------------------------------------------------------------------
