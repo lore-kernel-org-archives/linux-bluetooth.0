@@ -1,10 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jesus Hinojosa <jhr0771@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Date: Wed, 13 Feb 2008 12:44:47 -0600
-Message-Id: <1202928287.29698.10.camel@localhost>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <5976F853A3B35845B6375F0C1FE13EB30315351E@hasmsx415.ger.corp.intel.com>
+References: <5976F853A3B35845B6375F0C1FE13EB303115489@hasmsx415.ger.corp.intel.com>
+	<1202487825.15090.308.camel@violet>
+	<5976F853A3B35845B6375F0C1FE13EB30315351E@hasmsx415.ger.corp.intel.com>
+Date: Wed, 13 Feb 2008 14:45:05 +0100
+Message-Id: <1202910306.7664.413.camel@violet>
 Mime-Version: 1.0
-Subject: [Bluez-users] want to use more than one profile
+Subject: Re: [Bluez-users] SDIO support
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,43 +22,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I have a MBT-S120 headset that works fine with skype using the the voice
-profile.
+Hi Claudio,
 
-.asoundrc
+> Does anybody know about an SDIO specific device tested with BlueZ stack?
+> Any modifications required to the generic driver?
 
-defaults.pcm.dmix_max_periods -1 
-pcm.bluetooth {
-   type bluetooth
-   device 00:0D:1A:40:0C:9E
-   profile "voice"   
-}
+I have the Socket SDIO card and that one works perfectly fine. It is a
+Type-B card, but we switch it back into Type-A mode. We don't need
+anything else than Type-A since we have a full Bluetooth stack running
+anyway.
 
-But the headset works great for listening to music with the hifi
-profile. but If i switch to the hifi profile ( or use "auto" ), the
-headset stops working for skype. 
-Is there a way to make it work for applications without having to edit
-the file everything i want to switch?
-Is it possible to have 2 configurations pointing to the same device ?
+http://www.holtmann.org/linux/bluetooth/sdio.html
 
-defaults.pcm.dmix_max_periods -1 
-pcm.headset {
-   type bluetooth
-   device 00:0D:1A:40:0C:9E
-   profile "voice"   
-}
-pcm.headphones {
-   type bluetooth
-   device 00:0D:1A:40:0C:9E
-   profile "hifi"   
-}
+The Socket SDIO actually contains a Bluetooth chip from Toshiba.
 
-Any help will be appreciated.
+I also have done initial tests with the BlueCore6 from CSR. The
+BlueCore6 contains a native SDIO interface. My prototype is still
+crashing and I never got a newer one. Hint :)
 
-I have bluez 3.25 
-kernel: gentoo-sources 2.6.20 
+Regards
 
-Thanks
+Marcel
+
 
 
 -------------------------------------------------------------------------
