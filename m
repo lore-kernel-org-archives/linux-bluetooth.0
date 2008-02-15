@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47B61DB5.6040507@wurmsdobler.org>
-Date: Fri, 15 Feb 2008 23:18:13 +0000
-From: Peter Wurmsdobler <peter@wurmsdobler.org>
+Message-ID: <47B61304.7070606@hccnet.nl>
+Date: Fri, 15 Feb 2008 23:32:36 +0100
+From: Remy Bosch <reboli@hccnet.nl>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <47B5B3FA.1050107@wurmsdobler.org>
-	<1203101519.7664.552.camel@violet>
-In-Reply-To: <1203101519.7664.552.camel@violet>
-Subject: Re: [Bluez-users] Missing: big picture
+References: <200802152219.m1FMJjLq019136@alumnus.caltech.edu>
+In-Reply-To: <200802152219.m1FMJjLq019136@alumnus.caltech.edu>
+Subject: Re: [Bluez-users] passkey agents
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,14 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello Marcel,
+Russell A. Bell wrote:
+> 	'why don't you simply use bluez-gnome or kdebluetooth.'
 
-many thanks for the explanations and your time. I will go through your 
-presentations and once I got around bluez try to contribute to the wiki.
+Or even better: "Why don't you write a passkey agent yourself?".
+I hear you :(
 
-Regards,
-peter
+Atm, I use bluez-gnome since it has the least dependencies... :/
 
+
+Good luck!
+
+Remy
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
