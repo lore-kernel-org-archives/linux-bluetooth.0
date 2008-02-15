@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Feb 2008 08:29:34 -0500
+Date: Fri, 15 Feb 2008 03:52:33 -0500
 From: jayjwa <jayjwa@atr2.ath.cx>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <279946.95245.qm@web8404.mail.in.yahoo.com>
-Message-ID: <alpine.LNX.1.00.0802150353420.19485@nge2.ngu.pk>
-References: <279946.95245.qm@web8404.mail.in.yahoo.com>
+In-Reply-To: <926260.91408.qm@web8408.mail.in.yahoo.com>
+Message-ID: <alpine.LNX.1.00.0802150310560.19485@nge2.ngu.pk>
+References: <926260.91408.qm@web8408.mail.in.yahoo.com>
 MIME-Version: 1.0
 Subject: Re: [Bluez-users] Headset not playing audio HELP PLEASE
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -21,44 +21,121 @@ Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 
+
 On Fri, 15 Feb 2008, pramod gurav wrote:
 
--> will you please send me the conf files So that I can rectify mines.
+-> Connections:
+-> When I press button on HS , I receive this on console(but no popup)
+-> [root@localhost Pramod]# Authorization request for device 00:0F:DE:B1:02:42
 
-Your configs look OK, but if you want them:
+There's nothing to popup, if you're using command line tools.
 
-wget --no-check-certificate https://atr2.ath.cx/~jayjwa/download/bt-configs.zip
-or
-curl -O -v -k https://atr2.ath.cx/~jayjwa/download/bt-configs.zip
+-> Now when I do
+-> [root@localhost Pramod]# hcitool conn
+-> Connections:
+->         > ACL 00:0F:DE:B1:02:42 handle 11 state 1 lm SLAVE AUTH ENCRYPT SECURE
 
-
--> Also I want to tell you that I have installed bt-sco but later on I read somewhere that this is older method to do. Is it write?
--> So I stoped there. Can I try btsco way?
--> But i dont have module snd_bt_sco.
--> please enlighten me on btsco .
-
-It's old and probably obsolete. It might not even be possible to use it 
-without installing old bluez libs/utilz and an old (possibly insecure) kernel. 
-Even doing all that work, there's no garentee that it will work any better. 
-You might still hit the same issue. I'd stay current, and make sure to see the 
-link in my last-to-this post about sco mtu.
-
-There's only so many configuration options you can try, and by now you've 
-tried just about all of them. At this point, you may be looking at an 
-incompatibility in one or both of your hardware components, or a bug in 
-either/both. That's why it would be helpful if you could try other hardware, 
-or try to find accounts of someone getting a working example using your 
-hardware on a similar setup. Then you could say either way if it's really a 
-hardware issue or not. Could be that it's not, but in searching for the cause 
-of an error/reason something's not working, it's one of the things you have to 
-consider. Because if it is the case, then no amount of config changes or 
-updates will help.
-
-By what you've posted, it looks correct and should be working, only it isn't. 
-The fact sound does work one way and not the other is very odd too. If it was 
-a config error, seems like neither would work.
+Seems OK.
 
 
+-> Its fine till here I think
+-> I am able record sound using
+-> [Pramod@localhost ~]$ arecord -D bluetooth -f S16_LE today.raw
+-> Recording WAVE 'today.raw' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
+-> I am able to do it.
+-> But when I Do 
+-> [Pramod@localhost ~]$ aplay -D bluetooth -t raw -f S16_LE today.raw
+-> Playing WAVE 'today.raw' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
+-> I am not able hear anything
+-> 
+-> This is my hciconfig
+-> [root@localhost Pramod]# /usr/local/sbin/hciconfig -a
+-> hci0:   Type: USB
+->         BD Address: 00:02:72:CE:5B:80 ACL MTU: 1017:8 SCO MTU: 64:0
+->         UP RUNNING PSCAN ISCAN
+->         RX bytes:5057856 acl:233 sco:99008 events:218 errors:0
+->         TX bytes:4708 acl:165 sco:0 commands:102 errors:0
+->         Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
+->         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+->         Link policy: RSWITCH HOLD SNIFF PARK
+->         Link mode: SLAVE ACCEPT
+->         Name: 'BlueZ (0)'
+->         Class: 0x080000
+->         Service Classes: Capturing
+->         Device Class: Miscellaneous,
+->         HCI Ver: 2.0 (0x3) HCI Rev: 0x204d LMP Ver: 2.0 (0x3) LMP Subver: 0x4127
+->         Manufacturer: Broadcom Corporation (15)
+-> 
+-> I see one difference in mine & yours at line number 2 end
+-> SCO MTU: 64:0 ----------mine 
+-> SCO 
+-> MTU: 
+-> 64:8 ----------yours
+
+Most of the ones I saw searching Google show non-zero integer:non-zero 
+integer. Maybe you have this issue (url probably wraps):
+
+http://www.google.com/group/fa.linux.kernel/t/590996bd6dbef4ba/d140c5b36f2cc567%23d140c5b36f2cc567?
+
+As someone on this group replied to it, maybe he can tell you more.
+
+Also, this part is really odd, it seems to show nothing is even sent for the 
+headset to play:
+
+RX bytes:5057856 acl:233 sco:99008
+TX bytes:4708 acl:165 sco:0   <------
+
+
+-> Also my         Service Classes: Capturing
+-> Is it OK??
+
+I don't think it makes a difference here. Alot of people leave the default 
+set. The numbers and what they mean to set that field I found from searching 
+the web.
+
+
+-> This is my hcidump when I was playing audio
+-> [root@localhost Pramod]# /usr/local/sbin/hcidump -i hci0 --asci
+-> HCI sniffer - Bluetooth packet analyzer ver 1.40
+-> device: hci0 snap_len: 1028 filter: 0xffffffff
+-> > SCO data: handle 1 flags 0x00 dlen 48
+->     . . . . . . k . . . . . . . x . . . . .
+->     . . . . _ . . . . . . . . . . . \ . . .
+->     . . . . E . . .
+-> > SCO data: handle 1 flags 0x00 dlen 48
+->     k . . . n . l . . . ' . : . . . B . a .
+->     . . 2 . p . . . . . . . u . " . \ . . .
+->     . . . . z . . .
+-> 
+-> I tried variations in audio.conf, but no changes .
+-> I need to try something else.
+
+As far as what you posted, it looks fine. So I'm really not sure myself why 
+it's not working. The only other thing I can think of is maybe in either the 
+adapter or the headset, there is a compatibility problem. That is, one or the 
+other (or both) may not work correctly with Linux/Bluez/the kernel driver 
+code. It would help alot if you could get your hands on some other hardware to 
+see. I suspect a problem with the adapter, because of this:
+
+SCO MTU: 64:0
+
+and
+
+TX bytes:4708 acl:165 sco:0
+
+I don't recall if you posted it...what does 'lsusb -v' show about your 
+adapter?
+
+
+-> One more thing If you dont mind. what is static struct usb_device_id blacklist_ids[]
+
+This is a data structure of what looks like USB devices that have some sort of 
+problems. Is your bluetooth adapter in there?
+
+
+-> Hope to get some way through it.
+
+I think I'm running out of suggestions :(
 
 
 -------------------------------------------------------------------------
