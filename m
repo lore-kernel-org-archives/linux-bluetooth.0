@@ -1,12 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47B61304.7070606@hccnet.nl>
-Date: Fri, 15 Feb 2008 23:32:36 +0100
-From: Remy Bosch <reboli@hccnet.nl>
-MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <200802152219.m1FMJjLq019136@alumnus.caltech.edu>
-In-Reply-To: <200802152219.m1FMJjLq019136@alumnus.caltech.edu>
-Subject: Re: [Bluez-users] passkey agents
+Date: Fri, 15 Feb 2008 14:19:46 -0800 (PST)
+From: "Russell A. Bell" <rbell@alumnus.caltech.edu>
+Message-Id: <200802152219.m1FMJjLq019136@alumnus.caltech.edu>
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] passkey agents
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,22 +13,17 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Russell A. Bell wrote:
-> 	'why don't you simply use bluez-gnome or kdebluetooth.'
+	'why don't you simply use bluez-gnome or kdebluetooth.'
+	A *desktop* - AAARRRRGGGHHH!!! - I would rather discard my
+bluetooth headset and buy one that works directly off the audio
+connection.  Using X is bad enough.
 
-Or even better: "Why don't you write a passkey agent yourself?".
-I hear you :(
-
-Atm, I use bluez-gnome since it has the least dependencies... :/
-
-
-Good luck!
-
-Remy
+russell bell
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
