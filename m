@@ -1,13 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: Brian Sammon <bluez-users@brisammon.fastmail.fm>
+From: Vladimir Pouzanov <farcaller@gmail.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-reply-to: <1203101519.7664.552.camel@violet> 
-References: <47B5B3FA.1050107@wurmsdobler.org>
-	<1203101519.7664.552.camel@violet>
-Mime-Version: 1.0
-Date: Sat, 16 Feb 2008 17:56:29 -0500
-Message-Id: <E1JQVxN-0003QN-UT@necz1>
-Subject: Re: [Bluez-users] Missing: big picture
+Date: Sat, 16 Feb 2008 23:39:06 +0200
+References: <200802161950.38151.farcaller@gmail.com>
+	<d89ddf300802161335r727a5999t1badade99759560b@mail.gmail.com>
+In-Reply-To: <d89ddf300802161335r727a5999t1badade99759560b@mail.gmail.com>
+MIME-Version: 1.0
+Message-Id: <200802162339.06631.farcaller@gmail.com>
+Subject: Re: [Bluez-users] BT headset doesn't work: SCO packet for unknown
+	connection
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,34 +18,88 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0558474265=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-> > I recognise that all the developers do a great job implementing features 
-> > and advancing fast. They do a great job, but are far too deep in the 
-> > matter in order to understand the comprehension difficulties of a 
-> > newcomer. Certainly all reasons why there is no "big picture". The 
-> > sparse collection of Wikis does not help either. Of course, look at the 
-> > code is always an option, but it is time consuming.
-> 
-> and that is the point why developers should never write documentation,
-> because they always have a total different view point. I would prefer to
-> have some newbie starting some documentation and let the developers
-> assist him on question. People with no knowledge do the best manuals,
+--===============0558474265==
+Content-Type: multipart/signed; boundary="nextPart1969171.A8z6bYoxyL";
+	protocol="application/pgp-signature"; micalg=pgp-sha1
+Content-Transfer-Encoding: 7bit
 
-The problem with this system is that you need someone to answer users questions.
-The developers don't seem to be doing that consistently on this list.  I've asked a few questions here in the past, in an attempt to get a conceptual overview of how things work, and they were either ignored, or I got an answer from another user, usually along the lines of "Try this, it worked for me", an answer that sometimes worked, but was not helpful in getting understanding.
+--nextPart1969171.A8z6bYoxyL
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Please, encourage the developers to read and respond to this list--or should the users be posting these kinds of questions on bluez-devel?
+On Saturday 16 February 2008 23:35:53 Brad Midgley wrote:
+> Hey
+>
+> I think that error indicates we can't do sco using your bluetooth
+> adapter. Which one is it?
+
+Bus 002 Device 009: ID 0b05:1712 ASUSTek Computer, Inc. BT-183 Bluetooth=20
+2.0+EDR adapter
+
+        Features: 0xff 0xff 0x8b 0xfe 0x9b 0xf9 0x00 0x80
+                <3-slot packets> <5-slot packets> <encryption> <slot offset>
+                <timing accuracy> <role switch> <hold mode> <sniff mode>
+                <park state> <RSSI> <channel quality> <SCO link> <HV2 packe=
+ts>
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
+                <transparent SCO> <broadcast encrypt> <EDR ACL 2 Mbps>
+                <EDR ACL 3 Mbps> <enhanced iscan> <interlaced iscan>
+                <interlaced pscan> <inquiry with RSSI> <extended SCO>
+                <EV4 packets> <EV5 packets> <AFH cap. slave>
+                <AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL>
+                <AFH cap. master> <AFH class. master> <EDR eSCO 2 Mbps>
+                <EDR eSCO 3 Mbps> <3-slot EDR eSCO> <extended features>
+
+=2D-=20
+Sincerely,
+Vladimir "Farcaller" Pouzanov                     Hack&Dev Team
+PGP/GPG: 0x3A40FF29                       <http://hackndev.com>
+=46ingerprint: FA36 877A 2DC3 B56F CAB5  7DB3 4C97 A596 3A40 FF29
+
+--nextPart1969171.A8z6bYoxyL
+Content-Type: application/pgp-signature; name=signature.asc 
+Content-Description: This is a digitally signed message part.
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.7 (GNU/Linux)
+
+iQEVAwUAR7dX+kyXpZY6QP8pAQIXZwgAr5aItfswqrKvV3QKOnISBnLOXxyv62AS
+Dw8L8BqF9FbQL2UBn9IgoMB2t0/RuBl84EZyuTGOD4vyy3hUuaIsunnm9jKGcDtK
+3ev+Ls66V5dwnrnhknBZ2gEE0YHTsMKzN5emGV3MMp6mPRjW+d0R8pmAV4Fzl7Tz
+vnHJQ2kFOqLixUGNGj96NSAfBPzOaheIB8ftYWuN00IMoTqxv9PyidLnPmz2+Dfj
+RJjxc8L+CEwBEGXAmiR0779VfNjUQPhWRAwqZ0FcfLg2jFr9VLBwU7LEhySCLq8Y
+xC7kmVGfGZFB5KJd28Gs7n4tHaAdi+k26LJAq6QLlVQIDHvZ5JnTzw==
+=Lkci
+-----END PGP SIGNATURE-----
+
+--nextPart1969171.A8z6bYoxyL--
 
 
+--===============0558474265==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============0558474265==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0558474265==--
