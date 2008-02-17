@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 17 Feb 2008 05:20:27 -0500
-From: jayjwa <jayjwa@atr2.ath.cx>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <961486.61640.qm@web8409.mail.in.yahoo.com>
-Message-ID: <alpine.LNX.1.00.0802170508090.10914@nge2.ngu.pk>
-References: <961486.61640.qm@web8409.mail.in.yahoo.com>
+Message-ID: <e34b02f0802161953q5c9cd905l8c9d27cf917e4e91@mail.gmail.com>
+Date: Sat, 16 Feb 2008 22:53:46 -0500
+From: "ct cwgt" <ct.cwgt@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] Headset not playing audio HELP PLEASE
+Subject: [Bluez-users] bluez from the ground up?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,68 +14,68 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1340844129=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+--===============1340844129==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_2930_27920062.1203220426933"
 
-On Fri, 15 Feb 2008, pramod gurav wrote:
+------=_Part_2930_27920062.1203220426933
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
--> I just tried changing some lines in /usr/src/linux/net/bluetooth/hci_event.c
--> and compiled the kernel..
+hello all,
 
-You can't just change values unless you know kernel/bluetooth programming ;)
+i am wondering if anyone can help me compile a complete list of kernel
+modules and packages required to get bluez running using a usb BT dongle
+under a 2.6 kernel.
 
+i know such a request may seem a bit odd but, i'm finding myself in a
+position where i'm being bitten by the automagical nature of linux package
+managers which handle dependencies. i've been tasked with sorting a bluez
+under a custom linux distro and am seeking assistance/advice on packages i
+can manually add/configure to support the use of a USB dongle.
 
--> SCO MTU: 64:8 this has changed 
--> but new problem is hwen I press button on HS link req comes but the connection is different this time
--> [root@localhost Pramod]# hcitool conn
--> Connections:
-->         > ACL 00:0F:DE:B1:02:42 handle 0 state 2 lm SLAVE
--> previously it used to be as
--> ->
+if anyone can point me toward documentation to help me with this task, i
+would appreciate it. as well, i'd like to compile this information with the
+hope of creating a distro agnostic bluez troubleshooting guide.
 
-That's what mine looks like before I press the button- then it does the 
-pass/auth step.
+thanks in advance!
 
+------=_Part_2930_27920062.1203220426933
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
--> [Pramod@localhost ~]$ aplay -D bluetooth -f S16_LE test.raw
--> there is a long wait and connections are
--> [root@localhost Pramod]# hcitool conn
--> Connections:
-->         > ACL 00:0F:DE:B1:02:43 handle 0 state 2 lm SLAVE 
-->         < ACL 00:0F:DE:B1:02:42 handle 0 state 5 lm MASTER
--> 
-->  00:0F:DE:B1:02:43 this is not my HS address(there is no other device near here)
--> 00:0F:DE:B1:02:42 this one is mine.
+hello all,<br><br>i am wondering if anyone can help me compile a complete list of kernel modules and packages required to get bluez running using a usb BT dongle under a 2.6 kernel.<br><br>i know such a request may seem a bit odd but, i&#39;m finding myself in a position where i&#39;m being bitten by the automagical nature of linux package managers which handle dependencies. i&#39;ve been tasked with sorting a bluez under a custom linux distro and am seeking assistance/advice on packages i can manually add/configure to support the use of a USB dongle.<br>
+<br>if anyone can point me toward documentation to help me with this task, i would appreciate it. as well, i&#39;d like to compile this information with the hope of creating a distro agnostic bluez troubleshooting guide.<br>
+<br>thanks in advance!<br>
 
-That's odd. Never saw a second address like that before...
-
--> planning to recompile the kernel with original hci_event.c
-
-According to the Gentoo Wiki, your HS does work with modern kernel/bluez. BTW, 
-last time when everything looked right but you didn't hear anything, did you 
-remember to turn up the alsa sound? When I reboot, alsa is always set to 0. I 
-use rexima/aumix to turn up the volumn. That's a common oversight. Other than 
-that, I really don't know why it's working.
-
--> As you said there might be a incompatibility issues in one of them(HS/dongle)
-
-The headset seems OK, from the wiki. You might look up the dongle, if you 
-didn't already.
+------=_Part_2930_27920062.1203220426933--
 
 
--> Can it happen that I might require to play the audio with certain frequency, rate or parameters which are supported by my HS(Its a Sony Ericsson HBH-602)?
-
-Not totally sure, but mine didn't require them. I'm assuming it used the 
-defaults in that case.
-
+--===============1340844129==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============1340844129==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1340844129==--
