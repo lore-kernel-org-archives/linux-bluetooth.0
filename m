@@ -1,13 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e29894ca0802200214j10a5d3f0l2665cb1544e6283f@mail.gmail.com>
-Date: Wed, 20 Feb 2008 12:14:25 +0200
-From: "=?ISO-8859-1?Q?Marc-Andr=E9_Lureau?=" <marcandre.lureau@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Date: Mon, 18 Feb 2008 15:29:41 +0100
+From: "Sebastian Henrich" <shss@gmx.de>
+In-Reply-To: <e1effdeb0802180539m2c00479fr6fb9ab82eb1fef8e@mail.gmail.com>
+Message-ID: <20080218142941.276620@gmx.net>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_21952_9435439.1203502465351"
-Subject: [Bluez-devel] Fix GLIB CRITICAL ** GStreamer - Could not convert
-	static caps
+References: <20080218122727.260720@gmx.net>
+	<e1effdeb0802180539m2c00479fr6fb9ab82eb1fef8e@mail.gmail.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>,
+	bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] Implementing PBAP
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,117 +18,87 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-------=_Part_21952_9435439.1203502465351
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+> On Feb 18, 2008 9:27 AM, Sebastian Henrich <shss@gmx.de> wrote:
+> > Hello,
+> >
+> > I want to implement the Phonebook Access Profile but I'm unable to find
+> a specification. Does somebody know where I can find it?
+> >
+> > By the way, is there a tcpdump like tool for bluetooth?
+> >
+> > Thanks
+> >
+> >   Sebastian
+> > --
+> > GMX FreeMail: 1 GB Postfach, 5 E-Mail-Adressen, 10 Free SMS.
+> > Alle Infos und kostenlose Anmeldung: http://www.gmx.net/de/go/freemail
+> >
+> >
+> -------------------------------------------------------------------------
+> > This SF.net email is sponsored by: Microsoft
+> > Defy all challenges. Microsoft(R) Visual Studio 2008.
+> > http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> > _______________________________________________
+> > Bluez-devel mailing list
+> > Bluez-devel@lists.sourceforge.net
+> > https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> >
+> =
 
-Hi there,
+> Hi Sebastian,
+> =
 
-patch attached.
+> the PBAP/PSE is already being developed. There is a development git
+> branch available at:
+> http://git.infradead.org/?p=3Dusers/cktakahasi/bluez-utils.git;a=3Dshortl=
+og;h=3Dgoe_service
 
-   fix GStreamer critical "Could not convert static caps":
-     - remove some trailing ';'
-     - stringify attributes value in caps (cosmetic)
+Sound good, I'll take a look.
 
+> =
 
---=20
-Marc-Andr=E9 Lureau
+> The specification is available in the Bluetooth SIG.
 
-------=_Part_21952_9435439.1203502465351
-Content-Type: text/x-diff;
-	name=0001-Fix-GStreamer-critical-Could-not-convert-static-cap.patch
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fcvq8xnz0
-Content-Disposition: attachment;
-	filename=0001-Fix-GStreamer-critical-Could-not-convert-static-cap.patch
+Where ca I find it there? I tried http://www.bluetooth.com/Bluetooth/Techno=
+logy/Building/Specifications/ but found nothing.
 
-RnJvbSBhNjQ0NTQ4YWYxNzZmN2E1MmU0Yzk5ZDM1MGNiNmY4OGEyNzkzOTJiIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBNYXJjLUFuZHJlIEx1cmVhdSA8bWFyY2FuZHJlLmx1cmVhdUBn
-bWFpbC5jb20+CkRhdGU6IFdlZCwgMjAgRmViIDIwMDggMTE6Mzc6MDAgKzAyMDAKU3ViamVjdDog
-W1BBVENIXSBGaXggR1N0cmVhbWVyIGNyaXRpY2FsICJDb3VsZCBub3QgY29udmVydCBzdGF0aWMg
-Y2FwcyIuCgpmaXggR1N0cmVhbWVyIGNyaXRpY2FsICJDb3VsZCBub3QgY29udmVydCBzdGF0aWMg
-Y2FwcyI6CiAtIHJlbW92ZSBzb21lIHRyYWlsaW5nICc7JwogLSBzdHJpbmdpZnkgYXR0cmlidXRl
-cyB2YWx1ZSBpbiBjYXBzCi0tLQogYXVkaW8vZ3N0YTJkcHNpbmsuYyAgfCAgICA2ICsrKy0tLQog
-YXVkaW8vZ3N0cnRwc2JjcGF5LmMgfCAgICA2ICsrKy0tLQogYXVkaW8vZ3N0c2JjZW5jLmMgICAg
-fCAgICA0ICsrLS0KIGF1ZGlvL2dzdHNiY3BhcnNlLmMgIHwgICAgNCArKy0tCiA0IGZpbGVzIGNo
-YW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDEwIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2F1
-ZGlvL2dzdGEyZHBzaW5rLmMgYi9hdWRpby9nc3RhMmRwc2luay5jCmluZGV4IDBiNjFlODIuLmQy
-NWNiZGUgMTAwNjQ0Ci0tLSBhL2F1ZGlvL2dzdGEyZHBzaW5rLmMKKysrIGIvYXVkaW8vZ3N0YTJk
-cHNpbmsuYwpAQCAtNTcsMTMgKzU3LDEzIEBAIHN0YXRpYyBHc3RTdGF0aWNQYWRUZW1wbGF0ZSBn
-c3RfYTJkcF9zaW5rX2ZhY3RvcnkgPQogCQkJR1NUX1NUQVRJQ19DQVBTKCJhdWRpby94LXNiYywg
-IgogCQkJCSJyYXRlID0gKGludCkgeyAxNjAwMCwgMzIwMDAsIDQ0MTAwLCA0ODAwMCB9LCAiCiAJ
-CQkJImNoYW5uZWxzID0gKGludCkgWyAxLCAyIF0sICIKLQkJCQkibW9kZSA9IChzdHJpbmcpIHsg
-bW9ubywgZHVhbCwgc3RlcmVvLCBqb2ludCB9LCAiCisJCQkJIm1vZGUgPSAoc3RyaW5nKSB7IFwi
-bW9ub1wiLCBcImR1YWxcIiwgXCJzdGVyZW9cIiwgXCJqb2ludFwiIH0sICIKIAkJCQkiYmxvY2tz
-ID0gKGludCkgeyA0LCA4LCAxMiwgMTYgfSwgIgogCQkJCSJzdWJiYW5kcyA9IChpbnQpIHsgNCwg
-OCB9LCAiCi0JCQkJImFsbG9jYXRpb24gPSAoc3RyaW5nKSB7IHNuciwgbG91ZG5lc3MgfSwgIgor
-CQkJCSJhbGxvY2F0aW9uID0gKHN0cmluZykgeyBcInNuclwiLCBcImxvdWRuZXNzXCIgfSwgIgog
-CQkJCSJiaXRwb29sID0gKGludCkgWyAyLCAiCiAJCQkJVEVNUExBVEVfTUFYX0JJVFBPT0xfU1RS
-ICIgXTsgIgotCQkJCSJhdWRpby9tcGVnOyIKKwkJCQkiYXVkaW8vbXBlZyIKIAkJCQkpKTsKIAog
-c3RhdGljIGdib29sZWFuIGdzdF9hMmRwX3NpbmtfaGFuZGxlX2V2ZW50KEdzdFBhZCAqcGFkLCBH
-c3RFdmVudCAqZXZlbnQpOwpkaWZmIC0tZ2l0IGEvYXVkaW8vZ3N0cnRwc2JjcGF5LmMgYi9hdWRp
-by9nc3RydHBzYmNwYXkuYwppbmRleCA3MGY1YmVmLi4zOWNmMTk3IDEwMDY0NAotLS0gYS9hdWRp
-by9nc3RydHBzYmNwYXkuYworKysgYi9hdWRpby9nc3RydHBzYmNwYXkuYwpAQCAtODAsMTEgKzgw
-LDExIEBAIHN0YXRpYyBHc3RTdGF0aWNQYWRUZW1wbGF0ZSBnc3RfcnRwX3NiY19wYXlfc2lua19m
-YWN0b3J5ID0KIAkJR1NUX1NUQVRJQ19DQVBTKCJhdWRpby94LXNiYywgIgogCQkJCSJyYXRlID0g
-KGludCkgeyAxNjAwMCwgMzIwMDAsIDQ0MTAwLCA0ODAwMCB9LCAiCiAJCQkJImNoYW5uZWxzID0g
-KGludCkgWyAxLCAyIF0sICIKLQkJCQkibW9kZSA9IChzdHJpbmcpIHsgbW9ubywgZHVhbCwgc3Rl
-cmVvLCBqb2ludCB9LCAiCisJCQkJIm1vZGUgPSAoc3RyaW5nKSB7IFwibW9ub1wiLCBcImR1YWxc
-IiwgXCJzdGVyZW9cIiwgXCJqb2ludFwiIH0sICIKIAkJCQkiYmxvY2tzID0gKGludCkgeyA0LCA4
-LCAxMiwgMTYgfSwgIgogCQkJCSJzdWJiYW5kcyA9IChpbnQpIHsgNCwgOCB9LCAiCi0JCQkJImFs
-bG9jYXRpb24gPSAoc3RyaW5nKSB7IHNuciwgbG91ZG5lc3MgfSwiCi0JCQkJImJpdHBvb2wgPSAo
-aW50KSBbIDIsIDY0IF07ICIpCisJCQkJImFsbG9jYXRpb24gPSAoc3RyaW5nKSB7IFwic25yXCIs
-IFwibG91ZG5lc3NcIiB9LCAiCisJCQkJImJpdHBvb2wgPSAoaW50KSBbIDIsIDY0IF0iKQogCSk7
-CiAKIHN0YXRpYyBHc3RTdGF0aWNQYWRUZW1wbGF0ZSBnc3RfcnRwX3NiY19wYXlfc3JjX2ZhY3Rv
-cnkgPQpkaWZmIC0tZ2l0IGEvYXVkaW8vZ3N0c2JjZW5jLmMgYi9hdWRpby9nc3RzYmNlbmMuYwpp
-bmRleCAwMzQyM2VjLi42NWUzZGE1IDEwMDY0NAotLS0gYS9hdWRpby9nc3RzYmNlbmMuYworKysg
-Yi9hdWRpby9nc3RzYmNlbmMuYwpAQCAtMTU3LDEwICsxNTcsMTAgQEAgc3RhdGljIEdzdFN0YXRp
-Y1BhZFRlbXBsYXRlIHNiY19lbmNfc3JjX2ZhY3RvcnkgPQogCQlHU1RfU1RBVElDX0NBUFMoImF1
-ZGlvL3gtc2JjLCAiCiAJCQkJInJhdGUgPSAoaW50KSB7IDE2MDAwLCAzMjAwMCwgNDQxMDAsIDQ4
-MDAwIH0sICIKIAkJCQkiY2hhbm5lbHMgPSAoaW50KSBbIDEsIDIgXSwgIgotCQkJCSJtb2RlID0g
-KHN0cmluZykgeyBtb25vLCBkdWFsLCBzdGVyZW8sIGpvaW50IH0sICIKKwkJCQkibW9kZSA9IChz
-dHJpbmcpIHsgXCJtb25vXCIsIFwiZHVhbFwiLCBcInN0ZXJlb1wiLCBcImpvaW50XCIgfSwgIgog
-CQkJCSJibG9ja3MgPSAoaW50KSB7IDQsIDgsIDEyLCAxNiB9LCAiCiAJCQkJInN1YmJhbmRzID0g
-KGludCkgeyA0LCA4IH0sICIKLQkJCQkiYWxsb2NhdGlvbiA9IChzdHJpbmcpIHsgc25yLCBsb3Vk
-bmVzcyB9LCIKKwkJCQkiYWxsb2NhdGlvbiA9IChzdHJpbmcpIHsgXCJzbnJcIiwgXCJsb3VkbmVz
-c1wiIH0sICIKIAkJCQkiYml0cG9vbCA9IChpbnQpIFsgIiBTQkNfRU5DX0JJVFBPT0xfTUlOX1NU
-UgogCQkJCSIsICIgU0JDX0VOQ19CSVRQT09MX01BWF9TVFIgIiBdIikpOwogCmRpZmYgLS1naXQg
-YS9hdWRpby9nc3RzYmNwYXJzZS5jIGIvYXVkaW8vZ3N0c2JjcGFyc2UuYwppbmRleCA3YjMwZGQy
-Li40NTIxYzU2IDEwMDY0NAotLS0gYS9hdWRpby9nc3RzYmNwYXJzZS5jCisrKyBiL2F1ZGlvL2dz
-dHNiY3BhcnNlLmMKQEAgLTUxLDEwICs1MSwxMCBAQCBzdGF0aWMgR3N0U3RhdGljUGFkVGVtcGxh
-dGUgc2JjX3BhcnNlX3NyY19mYWN0b3J5ID0KIAkJR1NUX1NUQVRJQ19DQVBTKCJhdWRpby94LXNi
-YywgIgogCQkJCSJyYXRlID0gKGludCkgeyAxNjAwMCwgMzIwMDAsIDQ0MTAwLCA0ODAwMCB9LCAi
-CiAJCQkJImNoYW5uZWxzID0gKGludCkgWyAxLCAyIF0sICIKLQkJCQkibW9kZSA9IChzdHJpbmcp
-IHsgbW9ubywgZHVhbCwgc3RlcmVvLCBqb2ludCB9LCAiCisJCQkJIm1vZGUgPSAoc3RyaW5nKSB7
-IFwibW9ub1wiLCBcImR1YWxcIiwgXCJzdGVyZW9cIiwgXCJqb2ludFwiIH0sICIKIAkJCQkiYmxv
-Y2tzID0gKGludCkgeyA0LCA4LCAxMiwgMTYgfSwgIgogCQkJCSJzdWJiYW5kcyA9IChpbnQpIHsg
-NCwgOCB9LCAiCi0JCQkJImFsbG9jYXRpb24gPSAoc3RyaW5nKSB7IHNuciwgbG91ZG5lc3MgfSwi
-CisJCQkJImFsbG9jYXRpb24gPSAoc3RyaW5nKSB7IFwic25yXCIsIFwibG91ZG5lc3NcIiB9LCIK
-IAkJCQkiYml0cG9vbCA9IChpbnQpIFsgMiwgNjQgXSwiCiAJCQkJInBhcnNlZCA9IChib29sZWFu
-KSB0cnVlIikpOwogCi0tIAoxLjUuNC4xLjM0Lmc5NGJmCgo=
-------=_Part_21952_9435439.1203502465351
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> =
+
+> Fell free to send patches and help us in the development.
+> =
+
+> Regards,
+> Claudio.
+> -- =
+
+> ---------------------------------------------------------
+> Claudio Takahasi
+> Instituto Nokia de Tecnologia - INdT
+> =
+
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2008.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+-- =
+
+Psssst! Schon vom neuen GMX MultiMessenger geh=F6rt?
+Der kann`s mit allen: http://www.gmx.net/de/go/multimessenger
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-------=_Part_21952_9435439.1203502465351
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-------=_Part_21952_9435439.1203502465351--
