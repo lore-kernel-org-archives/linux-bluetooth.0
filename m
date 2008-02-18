@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Feb 2008 03:49:52 +0100 (CET)
-From: Leszek Koltunski <leszek@3miasto.net.pl>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <47B96FE9.90900@wurmsdobler.org>
-Message-ID: <20080219034857.W43955@3miasto.net.pl>
-References: <47B96FE9.90900@wurmsdobler.org>
+Message-ID: <d89ddf300802181253g77fe8b85g2ab059b421a6647d@mail.gmail.com>
+Date: Mon, 18 Feb 2008 13:53:03 -0700
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <20080218154244.c5nqdwrvb4wcsgos@www.zarb.org>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] Connecting to a two-way headset
+References: <20080218154244.c5nqdwrvb4wcsgos@www.zarb.org>
+Subject: Re: [Bluez-users] BT headset doesn't work: SCO packet for unknown
+	connection
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,14 +21,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Guillaume
 
+> Better try this new version...
 
-On Mon, 18 Feb 2008, Peter Wurmsdobler wrote:
+What problem condition does this patch fix? Should Marcel be
+considering it for merging?
 
-> It is perhaps difficult not only for me to accept working bluez
-> components without understanding the underlying mechanisms.
-
-I second Peter here. We really need a 'big picture' document.
+-- 
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
