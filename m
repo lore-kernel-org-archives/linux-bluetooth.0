@@ -1,19 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e1effdeb0802180547k3115ca74y57a4c4adb769bab3@mail.gmail.com>
-Date: Mon, 18 Feb 2008 10:47:36 -0300
+Message-ID: <e1effdeb0802180539m2c00479fr6fb9ab82eb1fef8e@mail.gmail.com>
+Date: Mon, 18 Feb 2008 10:39:31 -0300
 From: "Claudio Takahasi" <cktakahasi@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20080215234021.GF10614@pangeia.com.br>
+In-Reply-To: <20080218122727.260720@gmx.net>
 MIME-Version: 1.0
-References: <200710231950.31313.alon.barlev@gmail.com>
-	<a8e1da0711051849ma591d4k6a816e2de7390347@mail.gmail.com>
-	<9e0cf0bf0711052149t5c9fe50j19d13e368690efb@mail.gmail.com>
-	<200802111757.56537.alon.barlev@gmail.com>
-	<20080212235814.b4a2e565.akpm@linux-foundation.org>
-	<a8e1da0802141928yabfd87ajfed0b009e1e79018@mail.gmail.com>
-	<a8e1da0802151513p34ad118i54ddd8f00e6e136@mail.gmail.com>
-	<20080215234021.GF10614@pangeia.com.br>
-Subject: Re: [Bluez-devel] sdptool segfault
+References: <20080218122727.260720@gmx.net>
+Subject: Re: [Bluez-devel] Implementing PBAP
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -27,45 +20,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Feb 15, 2008 8:40 PM, Nelson Murilo <nelson@pangeia.com.br> wrote:
+On Feb 18, 2008 9:27 AM, Sebastian Henrich <shss@gmx.de> wrote:
+> Hello,
 >
+> I want to implement the Phonebook Access Profile but I'm unable to find a specification. Does somebody know where I can find it?
 >
-> Hi,
+> By the way, is there a tcpdump like tool for bluetooth?
 >
-> I tried that command:
-> # sdptool add --channel=19 SP
-> Serial Port service registered
-> Segmentation fault
+> Thanks
 >
-> Any hints to fix it?
->
-> My enviromnent:
->
-> Kernel 2.6.24.2
-> hciconfig  hci0 revision
-> hci0:   Type: USB
->      BD Address: 00:1D:60:4E:XX:XX ACL MTU: 384:8 SCO MTU: 64:8
->      HCI 19.2
->      Chip version: BlueCore4-External
->      Max key size: 56 bit
->      SCO mapping:  HCI
->
-> # dmesg | grep -i blue
-> Bluetooth: Core ver 2.11
-> Bluetooth: HCI device and connection manager initialized
-> Bluetooth: HCI socket layer initialized
-> Bluetooth: HCI USB driver ver 2.9
-> Bluetooth: L2CAP ver 2.9
-> Bluetooth: L2CAP socket layer initialized
-> Bluetooth: RFCOMM socket layer initialized
-> Bluetooth: RFCOMM TTY layer initialized
-> Bluetooth: RFCOMM ver 1.8
->
->
-> Thanks in advance,
->
-> ./nelson -murilo
->
+>   Sebastian
+> --
+> GMX FreeMail: 1 GB Postfach, 5 E-Mail-Adressen, 10 Free SMS.
+> Alle Infos und kostenlose Anmeldung: http://www.gmx.net/de/go/freemail
 >
 > -------------------------------------------------------------------------
 > This SF.net email is sponsored by: Microsoft
@@ -77,11 +44,15 @@ On Feb 15, 2008 8:40 PM, Nelson Murilo <nelson@pangeia.com.br> wrote:
 > https://lists.sourceforge.net/lists/listinfo/bluez-devel
 >
 
-Hi Nelson,
+Hi Sebastian,
 
-I was not able to reproduce this bug.  Which utils/libs package
-version are you using?
-Send your stack/library trace to provide more details.
+the PBAP/PSE is already being developed. There is a development git
+branch available at:
+http://git.infradead.org/?p=users/cktakahasi/bluez-utils.git;a=shortlog;h=goe_service
+
+The specification is available in the Bluetooth SIG.
+
+Fell free to send patches and help us in the development.
 
 Regards,
 Claudio.
