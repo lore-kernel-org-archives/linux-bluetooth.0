@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47B96FE9.90900@wurmsdobler.org>
-Date: Mon, 18 Feb 2008 11:45:45 +0000
-From: Peter Wurmsdobler <peter@wurmsdobler.org>
+Message-ID: <47B96A15.9060706@hccnet.nl>
+Date: Mon, 18 Feb 2008 12:20:53 +0100
+From: Remy Bosch <reboli@hccnet.nl>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Connecting to a two-way headset
+References: <200802180124.m1I1OTHu028537@alumnus.caltech.edu>
+In-Reply-To: <200802180124.m1I1OTHu028537@alumnus.caltech.edu>
+Subject: Re: [Bluez-users] passkey agents
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,22 +20,16 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+Russell A. Bell wrote:
+> 	Where do I find a specification?
+>   
 
- >> I was prompted by a graphical (rather than command-line) prompt
- >> (seemingly from the applet) saying "Pairing request for device:
- >> HBH-PV702 (00:1C:A4:20:CE:BE) Enter passkey for authentication:"
-How is this "BlueTooth Applet" actually triggered such that it prompts 
-the user? What does it do (what code should I look in to understand)? 
-How would I replace what the Applet does by something else in an 
-embedded application, i.e. without gnome and kde?
+http://wiki.bluez.org/
 
-It is perhaps difficult not only for me to accept working bluez 
-components without understanding the underlying mechanisms.
+Has most things you'll need.
 
-Regards,
-peter
 
+Remy
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
