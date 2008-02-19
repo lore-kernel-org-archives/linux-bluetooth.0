@@ -1,12 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e378cfb20802190657m69936857ob676ad575842c222@mail.gmail.com>
-Date: Tue, 19 Feb 2008 20:27:49 +0530
-From: "Nel D" <newatlinux@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <47BAC7BC.7050503@wurmsdobler.org>
-MIME-Version: 1.0
-References: <47BAC7BC.7050503@wurmsdobler.org>
-Subject: Re: [Bluez-users] Unable to get on D-Bus
+From: Guillaume Bedot <littletux@zarb.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1203423876.7156.46.camel@localhost>
+References: <20080218154244.c5nqdwrvb4wcsgos@www.zarb.org>
+	<d89ddf300802181253g77fe8b85g2ab059b421a6647d@mail.gmail.com>
+	<1203423876.7156.46.camel@localhost>
+Date: Tue, 19 Feb 2008 14:28:16 +0100
+Message-Id: <1203427696.7156.55.camel@localhost>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] BT headset doesn't work: SCO packet
+	for	unknown	connection
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,29 +23,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 2/19/08, Peter Wurmsdobler <peter@wurmsdobler.org> wrote:
-> Hello,
->
-> This topic has already come up several times, but the respective answers
-> did not solve the problem for me. What happens is:
->
-> mx27# /usr/bin/dbus-daemon --system
-> mx27# /usr/sbin/hcid -n -f /etc/bluetooth/hcid.conf
-> hcid[1869]: Bluetooth HCI daemon
-> hcid[1869]: Could not become the primary owner of org.bluez
-> hcid[1869]: Unable to get on D-Bus
+Re,
+
+I also found a message from Louis JANG <louis@mizi.com>, posted to
+bluez-devel on Dec 17th, that contain alternative patches for this
+issue.
+
+Best regards,
+
+Guillaume B.
 
 
-I think one of the following cases are possible:
-
-1. An earlier hcid is already running. Check ps ax | grep hcid to confirm.
-or
-2. You are not root while running hcid .
-
-
-HTH.
-
-nel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
