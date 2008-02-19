@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47BB5F2D.8010706@wershofen.de>
-Date: Tue, 19 Feb 2008 23:58:53 +0100
-From: Wolfgang Wershofen <wolfgang@wershofen.de>
-MIME-Version: 1.0
+Message-Id: <F2F55768-54BB-4233-86CF-176E23D9786A@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <mailman.551346.1203302340.26582.bluez-users@lists.sourceforge.net>
-	<BLU140-W15FA67671DB5E1E6450FBECB220@phx.gbl>
-In-Reply-To: <BLU140-W15FA67671DB5E1E6450FBECB220@phx.gbl>
-Subject: Re: [Bluez-users] Twinkle and bluetooth headset's microphone
+In-Reply-To: <e34b02f0802161953q5c9cd905l8c9d27cf917e4e91@mail.gmail.com>
+Mime-Version: 1.0 (Apple Message framework v915)
+Date: Tue, 19 Feb 2008 21:45:51 +0100
+References: <e34b02f0802161953q5c9cd905l8c9d27cf917e4e91@mail.gmail.com>
+Subject: Re: [Bluez-users] bluez from the ground up?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,50 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-mountain rides schrieb:
+Hi,
+
+> i am wondering if anyone can help me compile a complete list of  
+> kernel modules and packages required to get bluez running using a  
+> usb BT dongle under a 2.6 kernel.
 >
-> A new challenge for the readers of the mailing list: getting the bluetooth headset's microphone working with Twinkle.
->
-> The sound from Twinkle comes through the headset loud and clear.
->
-> I tried the same for the Microphone: I selected "ALSA: other device", and in the corresponding "Other device" field, I entered the word "bluetooth".  But, after making those settings, no one can hear anything I'm saying through the headset and Twinkle.  Hmmmmm.
->   
-Same situation here. arecord works flawlessly, but the other end of a
-VOIP connection through twinkle only gets loud white noise from my side.
-There's actually a discussion about that on the twinkle mailing list and
-the developers there are pretty sure it's a timing problem. twinkle is
-rapidly opening and closing the alsa input device during a connection
-and it seems, the closing of the bluetooth device returns asynchronously
-and later than the next subsequent open instruction. That's at least my
-limited understanding of the problem.
-The twinkle guys are suspecting a bug in the bluetooth audio
-implementation, see the following quote from the ongoing discussion:
+> i know such a request may seem a bit odd but, i'm finding myself in  
+> a position where i'm being bitten by the automagical nature of linux  
+> package managers which handle dependencies. i've been tasked with  
+> sorting a bluez under a custom linux distro and am seeking  
+> assistance/advice on packages i can manually add/configure to  
+> support the use of a USB dongle.
 
-<quote>
+I don't get your request. The USB dongles always work and especially  
+when you use a distro. No matter which one.
 
-bluetooth has problems with twinkle!
-Anyway, rapid closing and reopening a handle isn't anything rogue at all. If 
-this is the source of the problem, it's clearly a bug in ALSA stack resp. the 
-bluez/pulseaudio plugins. Those plugins have to handle any timing issues with 
-their associated hardware. You never can guarantee that such a close-open 
-sequence never will occur, from *any* app - just twinkle is doing this 
-frequently. It's up to the bluez devs to write a (twinkle-inspired?) 
-testframe to provoke this error, and to harden their plugin so it handles 
-this correctly. I.E close() MUST NOT return premature (alias async), and 
-open() maybe has to wait until any "pending" close() has finished inside 
-driver.
+Regards
 
-</quote>
-
-So, now, we are at least two people with the same problem - maybe anyone from the bluez side will finally have a look into this matter now.
-
-cu
-Wolfgang
-
-
--- 
-Geek by nature, Linux by choice
-
+Marcel
 
 
 -------------------------------------------------------------------------
