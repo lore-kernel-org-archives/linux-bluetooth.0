@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <F2F55768-54BB-4233-86CF-176E23D9786A@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <e34b02f0802161953q5c9cd905l8c9d27cf917e4e91@mail.gmail.com>
-Mime-Version: 1.0 (Apple Message framework v915)
-Date: Tue, 19 Feb 2008 21:45:51 +0100
-References: <e34b02f0802161953q5c9cd905l8c9d27cf917e4e91@mail.gmail.com>
-Subject: Re: [Bluez-users] bluez from the ground up?
+Message-ID: <BLU140-W15FA67671DB5E1E6450FBECB220@phx.gbl>
+From: mountain rides <gstaad22@hotmail.com>
+To: <bluez-users@lists.sourceforge.net>
+Date: Tue, 19 Feb 2008 21:11:54 +0000
+In-Reply-To: <mailman.551346.1203302340.26582.bluez-users@lists.sourceforge.net>
+References: <mailman.551346.1203302340.26582.bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-users] Twinkle and bluetooth headset's microphone
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,31 +16,37 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
-
-> i am wondering if anyone can help me compile a complete list of  
-> kernel modules and packages required to get bluez running using a  
-> usb BT dongle under a 2.6 kernel.
->
-> i know such a request may seem a bit odd but, i'm finding myself in  
-> a position where i'm being bitten by the automagical nature of linux  
-> package managers which handle dependencies. i've been tasked with  
-> sorting a bluez under a custom linux distro and am seeking  
-> assistance/advice on packages i can manually add/configure to  
-> support the use of a USB dongle.
-
-I don't get your request. The USB dongles always work and especially  
-when you use a distro. No matter which one.
-
-Regards
-
-Marcel
 
 
+
+Thanks Leszek, you were right.  I didn't need to be bothering with hcitool =
+etc at all.  The Gnome applet had me sorted all along.  I guess my understa=
+nding stemmed from reading too many out-of-date web pages.
+
+A new challenge for the readers of the mailing list: getting the bluetooth =
+headset's microphone working with Twinkle.
+
+Twinkle is software I use to access my VOIP account (phone line).  I am abl=
+e to hear the people I talk to with Twinkle through the bluetooth headset h=
+aving having (A) created a ~/.asoundrc as explained in http://wiki.bluez.or=
+g/wiki/HOWTO/AudioDevices and (B), in Twinkle, opened Edit> System Settings=
+...> Audio and, for Speaker, selected "ALSA: other device" and then entered=
+ in the "Other device" field: the word "bluetooth".
+
+The sound from Twinkle comes through the headset loud and clear.
+
+I tried the same for the Microphone: I selected "ALSA: other device", and i=
+n the corresponding "Other device" field, I entered the word "bluetooth".  =
+But, after making those settings, no one can hear anything I'm saying throu=
+gh the headset and Twinkle.  Hmmmmm.
+_________________________________________________________________
+Climb to the top of the charts!=A0Play the word scramble challenge with sta=
+r power.
+http://club.live.com/star_shuffle.aspx?icid=3Dstarshuffle_wlmailtextlink_jan
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
