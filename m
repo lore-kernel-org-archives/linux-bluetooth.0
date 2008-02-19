@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47BB1A27.9090202@wurmsdobler.org>
-Date: Tue, 19 Feb 2008 18:04:23 +0000
-From: Peter Wurmsdobler <peter@wurmsdobler.org>
+Message-ID: <e378cfb20802190657m69936857ob676ad575842c222@mail.gmail.com>
+Date: Tue, 19 Feb 2008 20:27:49 +0530
+From: "Nel D" <newatlinux@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <47BAC7BC.7050503@wurmsdobler.org>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
 References: <47BAC7BC.7050503@wurmsdobler.org>
-	<e378cfb20802190657m69936857ob676ad575842c222@mail.gmail.com>
-In-Reply-To: <e378cfb20802190657m69936857ob676ad575842c222@mail.gmail.com>
 Subject: Re: [Bluez-users] Unable to get on D-Bus
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,28 +20,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
-
-many thanks for the hints.
-
-> 1. An earlier hcid is already running. Check ps ax | grep hcid to confirm.
-> 2. You are not root while running hcid .
-Neither. The reason was somewhere else.
-
-ltib configures bluez with prefix /usr , but moves some config 
-files/directories from /usr/etc to /etc . When I added dbus manually to 
-ltib, I ran configure with /usr , too, but without realising that then 
-dbus would not find the bluetooth related config file in 
-/usr/etc/dbus-1/system.d/, because ltib would have moved it to 
-/etc/dbus-1/system.d/.
-
-Solution: make sure that bluez and dbus use the same configuration 
-directories and that they are compiled with the same prefix.
-
-One step further. More problems expected.
-peter
+On 2/19/08, Peter Wurmsdobler <peter@wurmsdobler.org> wrote:
+> Hello,
+>
+> This topic has already come up several times, but the respective answers
+> did not solve the problem for me. What happens is:
+>
+> mx27# /usr/bin/dbus-daemon --system
+> mx27# /usr/sbin/hcid -n -f /etc/bluetooth/hcid.conf
+> hcid[1869]: Bluetooth HCI daemon
+> hcid[1869]: Could not become the primary owner of org.bluez
+> hcid[1869]: Unable to get on D-Bus
 
 
+I think one of the following cases are possible:
+
+1. An earlier hcid is already running. Check ps ax | grep hcid to confirm.
+or
+2. You are not root while running hcid .
+
+
+HTH.
+
+nel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
