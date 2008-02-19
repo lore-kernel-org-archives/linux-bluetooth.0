@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <77B155F2-6129-4953-932A-E3B62C7AA17B@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <47BB3B76.6000302@suse.de>
+Date: Tue, 19 Feb 2008 21:26:30 +0100
+From: Stefan Seyfried <seife@suse.de>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <E1JQVxN-0003QN-UT@necz1>
-Mime-Version: 1.0 (Apple Message framework v915)
-Date: Tue, 19 Feb 2008 21:43:58 +0100
-References: <47B5B3FA.1050107@wurmsdobler.org>
-	<1203101519.7664.552.camel@violet> <E1JQVxN-0003QN-UT@necz1>
-Subject: Re: [Bluez-users] Missing: big picture
+References: <47B96FE9.90900@wurmsdobler.org>
+In-Reply-To: <47B96FE9.90900@wurmsdobler.org>
+Subject: Re: [Bluez-users] Connecting to a two-way headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,60 +16,62 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Brian,
+Peter Wurmsdobler schrieb:
+> Hello,
+> =
 
->>> I recognise that all the developers do a great job implementing  
->>> features
->>> and advancing fast. They do a great job, but are far too deep in the
->>> matter in order to understand the comprehension difficulties of a
->>> newcomer. Certainly all reasons why there is no "big picture". The
->>> sparse collection of Wikis does not help either. Of course, look  
->>> at the
->>> code is always an option, but it is time consuming.
->>
->> and that is the point why developers should never write  
->> documentation,
->> because they always have a total different view point. I would  
->> prefer to
->> have some newbie starting some documentation and let the developers
->> assist him on question. People with no knowledge do the best manuals,
->
-> The problem with this system is that you need someone to answer  
-> users questions.
-> The developers don't seem to be doing that consistently on this  
-> list.  I've asked a few questions here in the past, in an attempt to  
-> get a conceptual overview of how things work, and they were either  
-> ignored, or I got an answer from another user, usually along the  
-> lines of "Try this, it worked for me", an answer that sometimes  
-> worked, but was not helpful in getting understanding.
->
-> Please, encourage the developers to read and respond to this list-- 
-> or should the users be posting these kinds of questions on bluez- 
-> devel?
+>  >> I was prompted by a graphical (rather than command-line) prompt
+>  >> (seemingly from the applet) saying "Pairing request for device:
+>  >> HBH-PV702 (00:1C:A4:20:CE:BE) Enter passkey for authentication:"
+> How is this "BlueTooth Applet" actually triggered such that it prompts =
 
-this works very well and a lot of people spent a lot of time to answer  
-questions on the mailing list and track down problems. However you  
-should read this first:
+> the user? What does it do (what code should I look in to understand)? =
 
-http://www.catb.org/~esr/faqs/smart-questions.html
+> How would I replace what the Applet does by something else in an =
 
-It is important to understand what you can expect and what not. Also  
-you go to #bluez on freenode.net and ask questions.
+> embedded application, i.e. without gnome and kde?
 
-My advise would be to start some documentation inside the wiki and  
-then ask questions. Asking them up-front without showing that you will  
-contribute to the project doesn't go good with any developers of any  
-open source project. The secret is to give something back and you  
-would be surprised how much help you can get quite quickly.
+I'll try to provide a little piece of the big picture here. Beware: i am not
+an expert on the matter and it might not be totally accurate, but it should=
+ be
+mostly correct.
 
-Regards
+The applet is acting as a "passkey-agent". To do this, it registers itself =
+as
+one at the hcid (via DBus).
+If hcid now detects that it needs a passkey, it asks the registered passkey
+agent for the passkey (via a DBus signal), the passkey-agent then asks the
+user and provides the passkey to hcid (again via DBus).
+hcid then uses the passkey to generate a link key, which is stored on the d=
+isk
+and later used for subsequent connections to the same device.
+If there is no passkey agent registered at the time the passkey is needed,
+access is denied.
 
-Marcel
+Question that popped up, but that i can't answer offhand:
+- can there be more than one passkey agent at a time? (not sure, but why no=
+t?)
+- where can i find a sample implementation? (answer: in passkey-agent.c)
 
+> It is perhaps difficult not only for me to accept working bluez =
+
+> components without understanding the underlying mechanisms.
+
+This is why it is a good idea to put the "Big Picture Document" together :-)
+
+Thanks,
+-- =
+
+Stefan Seyfried
+R&D Team Mobile Devices            |              "Any ideas, John?"
+SUSE LINUX Products GmbH, N=FCrnberg | "Well, surrounding them's out."
+
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
