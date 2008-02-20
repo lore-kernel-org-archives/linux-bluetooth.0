@@ -1,14 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BLU140-W26283824303DB9861C76B6CB230@phx.gbl>
-From: mountain rides <gstaad22@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Wed, 20 Feb 2008 19:38:57 +0000
-In-Reply-To: <mailman.560554.1203484395.26582.bluez-users@lists.sourceforge.net>
-References: <mailman.560554.1203484395.26582.bluez-users@lists.sourceforge.net>
+Message-ID: <d89ddf300802201007w6a68f3afx6e45221d670b0e2a@mail.gmail.com>
+Date: Wed, 20 Feb 2008 11:07:27 -0700
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <2cb4fa160802200707t4dac0126xd127c693bfe6023@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users]
-	=?windows-1256?q?Twinkle_and_bluetooth_headset=27s_?=
-	=?windows-1256?q?microphone=FE?=
+References: <2cb4fa160802200604x218c500eu29ba3e9d02ec383c@mail.gmail.com>
+	<5eee8c670802200626n73defb7xd313e80429ee691d@mail.gmail.com>
+	<2cb4fa160802200632l35a34860n86fd8564ee5c2437@mail.gmail.com>
+	<5eee8c670802200640k43610771ld8d78e7cb832d10d@mail.gmail.com>
+	<2cb4fa160802200707t4dac0126xd127c693bfe6023@mail.gmail.com>
+Subject: Re: [Bluez-users] I need the list of bluetooth II class 1 (100m)
+	adapters that work with BlueZ
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,29 +21,27 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="windows-1256"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-ClNvIGFzIGEgdXNlciwgaWRlYWxseSwgdG8gZ2V0IFR3aW5rbGUgY28tb3BlcmF0aW5nIHdpdGgg
-dGhlIGJsdWV0b290aCBoZWFkc2V0J3MgbWljcm9waG9uZSwgb25lIHNob3VsZCBuZWVkIG9ubHkg
-KEEpIHRvIGNyZWF0ZSBhbiB+Ly5hc291bmRyYyBmaWxlIGxvb2tpbmcgbGlrZSB0aGlzOgoKcGNt
-LmJsdWV0b290aCB7CiAgIHR5cGUgYmx1ZXRvb3RoCiAgIGRldmljZSAxMToyMjozMzo0NDo1NTo2
-Ngp9CgphbmQgdGhlbiAoQikgaW4gVHdpbmtsZSwgdG8gc2VsZWN0IEVkaXQ+IFN5c3RlbSBTZXR0
-aW5ncy4uLj4gQXVkaW8gYW5kIHNldCAiTWljcm9waG9uZSIgdG8gIkFMU0E6IG90aGVyIGRldmlj
-ZSIgYW5kIHB1dCAiYmx1ZXRvb3RoIiBpbiB0aGUgIk90aGVyIERldmljZSIgdGV4dC1maWVsZCwg
-Y29ycmVjdD8KCklzIHRoaXMgdG8gc2F5OiBJJ3ZlIGRvbmUgYWxsIGEgdXNlciBjYW4gZm9yIHRo
-ZSB0aW1lIGJlaW5nPyAgT3RoZXIgY29uZmlndXJhdGlvbiBpcyBvciBzaG91bGQgYmUgcmVxdWly
-ZWQ/CgpUaGFua3MuICBTb3JyeSB0byByZS1hc2sgdGhpcyBxdWVzdGlvbiwgSSBqdXN0IHdhbnRl
-ZCB0byBjbGFyaWZ5IHdoYXQgSSd2ZSB0cmllZCwgd2hpY2ggZG9lc24ndCBzZWVtIGxpa2UgbXVj
-aC4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18KQ2xpbWIgdG8gdGhlIHRvcCBvZiB0aGUgY2hhcnRzIaBQbGF5IHRoZSB3b3Jk
-IHNjcmFtYmxlIGNoYWxsZW5nZSB3aXRoIHN0YXIgcG93ZXIuCmh0dHA6Ly9jbHViLmxpdmUuY29t
-L3N0YXJfc2h1ZmZsZS5hc3B4P2ljaWQ9c3RhcnNodWZmbGVfd2xtYWlsdGV4dGxpbmtfamFuCgot
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogTWljcm9z
-b2Z0CkRlZnkgYWxsIGNoYWxsZW5nZXMuIE1pY3Jvc29mdChSKSBWaXN1YWwgU3R1ZGlvIDIwMDgu
-Cmh0dHA6Ly9jbGsuYXRkbXQuY29tL01SVC9nby92c2UwMTIwMDAwMDcwbXJ0L2RpcmVjdC8wMS8K
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotdXNl
-cnMgbWFpbGluZyBsaXN0CkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczov
-L2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo=
+Hey
+
+You might get close to 100m but you'll probably have to have class 1
+adapters with external antennas on both sides.
+
+On Feb 20, 2008 8:07 AM, Mohamed kash <kash82@gmail.com> wrote:
+> Did anybody try a bluetooth adapter that has an actual range close to 100
+> meters or more than 50 meters?
+
+-- 
+Brad
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
