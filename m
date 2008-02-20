@@ -1,262 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 20 Feb 2008 21:04:04 -0500
-From: Aristeu Sergio Rozanski Filho <aris@ruivo.org>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20080221020404.GU12444@cathedrallabs.org>
-References: <20080212030703.GD17385@jake.ruivo.org>
-	<20080212045808.GC4483@cathedrallabs.org>
+Message-ID: <47BC0C28.1030607@suse.de>
+Date: Wed, 20 Feb 2008 12:16:56 +0100
+From: Stefan Seyfried <seife@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20080212045808.GC4483@cathedrallabs.org>
-Subject: Re: [Bluez-devel] [PATCH 3/4] input/fakehid: introduce support
-	to	fakehid devices (V5)
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Cc: Alon Bar-Lev <alon.barlev@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>, marcel@holtmann.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [Bluez-devel] [BUG] rfcomm
+References: <200710231950.31313.alon.barlev@gmail.com>	<a8e1da0802141928yabfd87ajfed0b009e1e79018@mail.gmail.com>	<a8e1da0802151513p34ad118i54ddd8f00e6e136@mail.gmail.com>	<200802162349.59780.alon.barlev@gmail.com> <20080220103611.GA4027@darkstar.te-china.tietoenator.com>
+In-Reply-To: <20080220103611.GA4027@darkstar.te-china.tietoenator.com>
+Content-Type: text/plain; charset=ISO-8859-1
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-This patch adds support to fake HID devices. Instead of registering with
-kernel, the fake HID will be handled in user level and an uinput device
-will be created in order to get the events into input layer.
+Dave Young schrieb:
 
----
- input/Makefile.am |    3 +-
- input/device.c    |   64 +++++++++++++++++++++++++++++++++++++-----------------
- input/device.h    |   11 +++++++++
- input/fakehid.c   |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++
- input/fakehid.h   |   18 +++++++++++++++
- 5 files changed, 135 insertions(+), 21 deletions(-)
+>> Feb 16 23:41:33 alon1 BUG: unable to handle kernel NULL pointer dereference at virtual address 00000008
+>> Feb 16 23:41:33 alon1 printing eip: c01b2db6 *pde = 00000000 
+>> Feb 16 23:41:33 alon1 Oops: 0000 [#1] PREEMPT 
+>> Feb 16 23:41:33 alon1 Modules linked in: ppp_deflate zlib_deflate zlib_inflate bsd_comp ppp_async rfcomm l2cap hci_usb vmnet(P) vmmon(P) tun radeon drm autofs4 ipv6 aes_generic crypto_algapi ieee80211_crypt_ccmp nf_nat_irc nf_nat_ftp nf_conntrack_irc nf_conntrack_ftp ipt_MASQUERADE iptable_nat nf_nat ipt_REJECT xt_tcpudp ipt_LOG xt_limit xt_state nf_conntrack_ipv4 nf_conntrack iptable_filter ip_tables x_tables snd_pcm_oss snd_mixer_oss snd_seq_dummy snd_seq_oss snd_seq_midi_event snd_seq snd_seq_device bluetooth ppp_generic slhc ioatdma dca cfq_iosched cpufreq_powersave cpufreq_ondemand cpufreq_conservative acpi_cpufreq freq_table uinput fan af_packet nls_cp1255 nls_iso8859_1 nls_utf8 nls_base pcmcia snd_intel8x0 snd_ac97_codec ac97_bus snd_pcm nsc_ircc snd_timer ipw2200 thinkpad_acpi irda snd ehci_hcd yenta_socket uhci_hcd psmouse ieee80211 soundcore intel_agp hwmon rsrc_nonstatic pcspkr e1000 crc_ccitt snd_page_alloc i2c_i801 ieee80211_crypt pcmcia_core agpgart thermal b
+a
+>  ttery nvram rtc sr_mod ac sg firmware_class button processor cdrom unix usbcore evdev ext3 jbd ext2 mbcache loop ata_piix libata sd_mod scsi_mod
+>> Feb 16 23:41:33 alon1 
+>> Feb 16 23:41:33 alon1 Pid: 4, comm: events/0 Tainted: P        (2.6.24-gentoo-r2 #1)
+>> Feb 16 23:41:33 alon1 EIP: 0060:[<c01b2db6>] EFLAGS: 00010282 CPU: 0
+>> Feb 16 23:41:33 alon1 EIP is at sysfs_get_dentry+0x26/0x80
+>> Feb 16 23:41:33 alon1 EAX: 00000000 EBX: 00000000 ECX: 00000000 EDX: f48a2210
+>> Feb 16 23:41:33 alon1 ESI: f72eb900 EDI: f4803ae0 EBP: f4803ae0 ESP: f7c49efc
+>> Feb 16 23:41:33 alon1 hcid[7004]: HCI dev 0 registered
+>> Feb 16 23:41:33 alon1 DS: 007b ES: 007b FS: 0000 GS: 0000 SS: 0068
+>> Feb 16 23:41:33 alon1 Process events/0 (pid: 4, ti=f7c48000 task=f7c3efc0 task.ti=f7c48000)
+>> Feb 16 23:41:33 alon1 Stack: f7cb6140 f4822668 f7e71e10 c01b304d ffffffff ffffffff fffffffe c030ba9c 
+>> Feb 16 23:41:33 alon1 f7cb6140 f4822668 f6da6720 f7cb6140 f4822668 f6da6720 c030ba8e c01ce20b 
+>> Feb 16 23:41:33 alon1 f6e9dd00 c030ba8e f6da6720 f6e9dd00 f6e9dd00 00000000 f4822600 00000000 
+>> Feb 16 23:41:33 alon1 Call Trace:
+>> Feb 16 23:41:33 alon1 [<c01b304d>] sysfs_move_dir+0x3d/0x1f0
+>> Feb 16 23:41:33 alon1 [<c01ce20b>] kobject_move+0x9b/0x120
+>> Feb 16 23:41:33 alon1 [<c0241711>] device_move+0x51/0x110
+>> Feb 16 23:41:33 alon1 [<f9aaed80>] del_conn+0x0/0x70 [bluetooth]
+>> Feb 16 23:41:33 alon1 [<f9aaed99>] del_conn+0x19/0x70 [bluetooth]
+>> Feb 16 23:41:33 alon1 [<c012c1a1>] run_workqueue+0x81/0x140
+>> Feb 16 23:41:33 alon1 [<c02c0c88>] schedule+0x168/0x2e0
 
---- a/input/device.c	2008-02-12 00:03:49.000000000 -0500
-+++ b/input/device.c	2008-02-20 20:44:17.000000000 -0500
-@@ -52,6 +52,7 @@
- #include "error.h"
- #include "manager.h"
- #include "storage.h"
-+#include "fakehid.h"
- 
- #define INPUT_DEVICE_INTERFACE	"org.bluez.input.Device"
- 
-@@ -63,16 +64,6 @@
- 
- struct device;
- 
--struct fake_input {
--	int		flags;
--	GIOChannel	*io;
--	int		rfcomm; /* RFCOMM socket */
--	int		uinput;	/* uinput socket */
--	uint8_t		ch;	/* RFCOMM channel number */
--	gboolean	(*connect)(struct device *idev);
--	int		(*disconnect)(struct device *idev);
--};
--
- struct device {
- 	bdaddr_t		src;
- 	bdaddr_t		dst;
-@@ -1336,24 +1327,48 @@ int input_device_close_channels(bdaddr_t
- 	return 0;
- }
- 
-+static gboolean fake_hid_connect(struct device *dev)
-+{
-+	struct fake_hid *fhid = dev->fake->priv;
-+
-+	return fhid->connect(dev->fake);
-+}
-+
-+static int fake_hid_disconnect(struct device *dev)
-+{
-+	struct fake_hid *fhid = dev->fake->priv;
-+
-+	return fhid->disconnect(dev->fake);
-+}
-+
- int input_device_connadd(bdaddr_t *src, bdaddr_t *dst)
- {
- 	struct device *idev;
-+	struct fake_hid *fake_hid;
-+	struct fake_input *fake = NULL;
- 	int err;
- 
- 	idev = find_device(src, dst);
- 	if (!idev)
- 		return -ENOENT;
- 
--	err = hidp_connadd(src, dst, idev->ctrl_sk, idev->intr_sk, idev->name);
--	if (err < 0) {
--		close(idev->ctrl_sk);
--		close(idev->intr_sk);
--		idev->ctrl_sk = -1;
--		idev->intr_sk = -1;
--
--		return err;
--	}
-+	fake_hid = get_fake_hid(idev->vendor, idev->product);
-+	if (fake_hid) {
-+		err = -ENOMEM;
-+		fake = malloc(sizeof(struct fake_input));
-+		if (!fake)
-+			goto error;
-+
-+		memset(fake, 0, sizeof(struct fake_input));
-+
-+		fake->connect = fake_hid_connect;
-+		fake->disconnect = fake_hid_disconnect;
-+		fake->priv = fake_hid;
-+		err = fake_hid_connadd(fake, idev->intr_sk, fake_hid);
-+	} else
-+		err = hidp_connadd(src, dst, idev->ctrl_sk, idev->intr_sk, idev->name);
-+	if (err < 0)
-+		goto error;
- 
- 	idev->intr_watch = create_watch(idev->intr_sk, intr_watch_cb, idev);
- 	idev->ctrl_watch = create_watch(idev->ctrl_sk, ctrl_watch_cb, idev);
-@@ -1362,5 +1377,14 @@ int input_device_connadd(bdaddr_t *src, 
- 			INPUT_DEVICE_INTERFACE,
- 			"Connected",
- 			DBUS_TYPE_INVALID);
--	return 0;
-+exit:
-+	return err;
-+error:
-+	close(idev->ctrl_sk);
-+	close(idev->intr_sk);
-+	idev->ctrl_sk = -1;
-+	idev->intr_sk = -1;
-+	if (fake)
-+		free(fake);
-+	goto exit;
- }
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ b/input/fakehid.h	2008-02-20 20:37:40.000000000 -0500
-@@ -0,0 +1,18 @@
-+#ifndef FAKEHID_H
-+#define FAKEHID_H
-+#include <glib.h>
-+struct fake_hid;
-+struct fake_input;
-+
-+struct fake_hid {
-+	uint16_t vendor;
-+	uint16_t product;
-+	gboolean (*connect)(struct fake_input *fake_input);
-+	int (*disconnect)(struct fake_input *fake_input);
-+	gboolean (*event)(GIOChannel *chan, GIOCondition cond, gpointer data);
-+	int (*setup_uinput)(struct fake_input *fake, struct fake_hid *fake_hid);
-+};
-+struct fake_hid *get_fake_hid(uint16_t vendor, uint16_t product);
-+int fake_hid_connadd(struct fake_input *fake, int intr_sk,
-+		     struct fake_hid *fake_hid);
-+#endif	/* FAKEHID_H */
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ b/input/fakehid.c	2008-02-20 21:00:36.000000000 -0500
-@@ -0,0 +1,60 @@
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <errno.h>
-+#include <sys/types.h>
-+#include <glib.h>
-+#include <dbus/dbus.h>
-+#include <bluetooth/bluetooth.h>
-+#include <bluetooth/hidp.h>
-+#include <bluetooth/l2cap.h>
-+#include "logging.h"
-+#include "device.h"
-+#include "fakehid.h"
-+
-+static gboolean fake_hid_common_connect(struct fake_input *fake)
-+{
-+	return TRUE;
-+}
-+
-+static int fake_hid_common_disconnect(struct fake_input *fake)
-+{
-+	return 0;
-+}
-+
-+static struct fake_hid fake_hid_table[] = {
-+	{ },
-+};
-+
-+static inline int fake_hid_match_device(uint16_t vendor, uint16_t product,
-+					struct fake_hid *fhid)
-+{
-+	return vendor == fhid->vendor && product == fhid->product;
-+}
-+
-+struct fake_hid *get_fake_hid(uint16_t vendor, uint16_t product)
-+{
-+	int i;
-+
-+	for (i = 0; fake_hid_table[i].vendor != 0; i++)
-+		if (fake_hid_match_device(vendor, product, &fake_hid_table[i]))
-+			return &fake_hid_table[i];
-+
-+	return NULL;
-+}
-+
-+int fake_hid_connadd(struct fake_input *fake, int intr_sk,
-+		     struct fake_hid *fake_hid)
-+{
-+	if (fake_hid->setup_uinput(fake, fake_hid)) {
-+		error("Error setting up uinput");
-+		return ENOMEM;
-+	}
-+
-+	fake->io = g_io_channel_unix_new(intr_sk);
-+	g_io_channel_set_close_on_unref(fake->io, TRUE);
-+	g_io_add_watch(fake->io, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+						(GIOFunc) fake_hid->event, fake);
-+
-+	return 0;
-+}
-+
---- a/input/device.h	2008-02-12 00:03:49.000000000 -0500
-+++ b/input/device.h	2008-02-20 20:38:25.000000000 -0500
-@@ -23,6 +23,17 @@
- 
- #define L2CAP_PSM_HIDP_CTRL	0x11
- #define L2CAP_PSM_HIDP_INTR	0x13
-+struct device;
-+struct fake_input {
-+	int		flags;
-+	GIOChannel	*io;
-+	int		rfcomm; /* RFCOMM socket */
-+	int		uinput;	/* uinput socket */
-+	uint8_t		ch;	/* RFCOMM channel number */
-+	gboolean 	(*connect)(struct device *dev);
-+	int		(*disconnect)(struct device *dev);
-+	void		*priv;
-+};
- 
- int input_device_register(DBusConnection *conn, bdaddr_t *src, bdaddr_t *dst,
- 			struct hidp_connadd_req *hidp, const char **ppath);
---- a/input/Makefile.am	2008-02-12 00:03:49.000000000 -0500
-+++ b/input/Makefile.am	2008-02-12 00:03:52.000000000 -0500
-@@ -12,7 +12,8 @@ service_PROGRAMS = bluetoothd-service-in
- 
- bluetoothd_service_input_SOURCES = main.c \
- 	manager.h manager.c \
--	server.h server.c device.h device.c storage.h storage.c
-+	server.h server.c device.h device.c storage.h storage.c \
-+	fakehid.c fakehid.h
- 
- LDADD = $(top_builddir)/common/libhelper.a \
- 		@GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@
+> Could you try patch below?
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Works fine for me. Thanks. Together with the other two patches already taken
+by davem, this fixes all my current BT problems :-)
+
+> Defer hci_unregister_sysfs because hci device could be destructed
+> while hci conn devices still there.
+> 
+> Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
+> 
+> ---
+> net/bluetooth/hci_core.c |    4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff -upr linux/net/bluetooth/hci_core.c linux.new/net/bluetooth/hci_core.c
+> --- linux/net/bluetooth/hci_core.c	2008-02-20 18:27:28.000000000 +0800
+> +++ linux.new/net/bluetooth/hci_core.c	2008-02-20 18:28:34.000000000 +0800
+> @@ -901,8 +901,6 @@ int hci_unregister_dev(struct hci_dev *h
+>  
+>  	BT_DBG("%p name %s type %d", hdev, hdev->name, hdev->type);
+>  
+> -	hci_unregister_sysfs(hdev);
+> -
+>  	write_lock_bh(&hci_dev_list_lock);
+>  	list_del(&hdev->list);
+>  	write_unlock_bh(&hci_dev_list_lock);
+> @@ -914,6 +912,8 @@ int hci_unregister_dev(struct hci_dev *h
+>  
+>  	hci_notify(hdev, HCI_DEV_UNREG);
+>  
+> +	hci_unregister_sysfs(hdev);
+> +
+>  	__hci_dev_put(hdev);
+>  
+>  	return 0;
+-- 
+Stefan Seyfried
+R&D Team Mobile Devices            |              "Any ideas, John?"
+SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out."
+
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
