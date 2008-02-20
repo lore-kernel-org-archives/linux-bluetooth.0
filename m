@@ -1,128 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 20 Feb 2008 18:36:11 +0800
-From: Dave Young <hidave.darkstar@gmail.com>
-To: Alon Bar-Lev <alon.barlev@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
-	marcel@holtmann.org, bluez-devel@lists.sourceforge.net
-Subject: Re: [BUG] rfcomm
-Message-ID: <20080220103611.GA4027@darkstar.te-china.tietoenator.com>
-References: <200710231950.31313.alon.barlev@gmail.com> <a8e1da0802141928yabfd87ajfed0b009e1e79018@mail.gmail.com> <a8e1da0802151513p34ad118i54ddd8f00e6e136@mail.gmail.com> <200802162349.59780.alon.barlev@gmail.com>
+Message-ID: <e29894ca0802200214j10a5d3f0l2665cb1544e6283f@mail.gmail.com>
+Date: Wed, 20 Feb 2008 12:14:25 +0200
+From: "=?ISO-8859-1?Q?Marc-Andr=E9_Lureau?=" <marcandre.lureau@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <200802162349.59780.alon.barlev@gmail.com>
-List-ID: <bluez-devel.lists.sourceforge.net>
+Content-Type: multipart/mixed;
+	boundary="----=_Part_21952_9435439.1203502465351"
+Subject: [Bluez-devel] Fix GLIB CRITICAL ** GStreamer - Could not convert
+	static caps
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sat, Feb 16, 2008 at 11:49:58PM +0200, Alon Bar-Lev wrote:
-> On Saturday 16 February 2008, Dave Young wrote:
-> > Hi, alon
-> >=20
-> > Please try the attached patch, hope it fixes your problem.
-> >=20
-> > Regards
-> > dave
->=20
-> Does not work... :(
->=20
-> Alon.
->=20
-> Feb 16 23:41:33 alon1 usb 3-1: configuration #1 chosen from 1 choice
-> Feb 16 23:41:33 alon1 BUG: unable to handle kernel NULL pointer dereferen=
-ce at virtual address 00000008
-> Feb 16 23:41:33 alon1 printing eip: c01b2db6 *pde =3D 00000000=20
-> Feb 16 23:41:33 alon1 Oops: 0000 [#1] PREEMPT=20
-> Feb 16 23:41:33 alon1 Modules linked in: ppp_deflate zlib_deflate zlib_in=
-flate bsd_comp ppp_async rfcomm l2cap hci_usb vmnet(P) vmmon(P) tun radeon =
-drm autofs4 ipv6 aes_generic crypto_algapi ieee80211_crypt_ccmp nf_nat_irc =
-nf_nat_ftp nf_conntrack_irc nf_conntrack_ftp ipt_MASQUERADE iptable_nat nf_=
-nat ipt_REJECT xt_tcpudp ipt_LOG xt_limit xt_state nf_conntrack_ipv4 nf_con=
-ntrack iptable_filter ip_tables x_tables snd_pcm_oss snd_mixer_oss snd_seq_=
-dummy snd_seq_oss snd_seq_midi_event snd_seq snd_seq_device bluetooth ppp_g=
-eneric slhc ioatdma dca cfq_iosched cpufreq_powersave cpufreq_ondemand cpuf=
-req_conservative acpi_cpufreq freq_table uinput fan af_packet nls_cp1255 nl=
-s_iso8859_1 nls_utf8 nls_base pcmcia snd_intel8x0 snd_ac97_codec ac97_bus s=
-nd_pcm nsc_ircc snd_timer ipw2200 thinkpad_acpi irda snd ehci_hcd yenta_soc=
-ket uhci_hcd psmouse ieee80211 soundcore intel_agp hwmon rsrc_nonstatic pcs=
-pkr e1000 crc_ccitt snd_page_alloc i2c_i801 ieee80211_crypt pcmcia_core agp=
-gart thermal battery nvram rtc sr_mod ac sg firmware_class button processor=
- cdrom unix usbcore evdev ext3 jbd ext2 mbcache loop ata_piix libata sd_mod=
- scsi_mod
-> Feb 16 23:41:33 alon1=20
-> Feb 16 23:41:33 alon1 Pid: 4, comm: events/0 Tainted: P        (2.6.24-ge=
-ntoo-r2 #1)
-> Feb 16 23:41:33 alon1 EIP: 0060:[<c01b2db6>] EFLAGS: 00010282 CPU: 0
-> Feb 16 23:41:33 alon1 EIP is at sysfs_get_dentry+0x26/0x80
-> Feb 16 23:41:33 alon1 EAX: 00000000 EBX: 00000000 ECX: 00000000 EDX: f48a=
-2210
-> Feb 16 23:41:33 alon1 ESI: f72eb900 EDI: f4803ae0 EBP: f4803ae0 ESP: f7c4=
-9efc
-> Feb 16 23:41:33 alon1 hcid[7004]: HCI dev 0 registered
-> Feb 16 23:41:33 alon1 DS: 007b ES: 007b FS: 0000 GS: 0000 SS: 0068
-> Feb 16 23:41:33 alon1 Process events/0 (pid: 4, ti=3Df7c48000 task=3Df7c3=
-efc0 task.ti=3Df7c48000)
-> Feb 16 23:41:33 alon1 Stack: f7cb6140 f4822668 f7e71e10 c01b304d ffffffff=
- ffffffff fffffffe c030ba9c=20
-> Feb 16 23:41:33 alon1 f7cb6140 f4822668 f6da6720 f7cb6140 f4822668 f6da67=
-20 c030ba8e c01ce20b=20
-> Feb 16 23:41:33 alon1 f6e9dd00 c030ba8e f6da6720 f6e9dd00 f6e9dd00 000000=
-00 f4822600 00000000=20
-> Feb 16 23:41:33 alon1 Call Trace:
-> Feb 16 23:41:33 alon1 [<c01b304d>] sysfs_move_dir+0x3d/0x1f0
-> Feb 16 23:41:33 alon1 [<c01ce20b>] kobject_move+0x9b/0x120
-> Feb 16 23:41:33 alon1 [<c0241711>] device_move+0x51/0x110
-> Feb 16 23:41:33 alon1 [<f9aaed80>] del_conn+0x0/0x70 [bluetooth]
-> Feb 16 23:41:33 alon1 [<f9aaed99>] del_conn+0x19/0x70 [bluetooth]
-> Feb 16 23:41:33 alon1 [<c012c1a1>] run_workqueue+0x81/0x140
-> Feb 16 23:41:33 alon1 [<c02c0c88>] schedule+0x168/0x2e0
-> Feb 16 23:41:33 alon1 [<c012fc70>] autoremove_wake_function+0x0/0x50
-> Feb 16 23:41:33 alon1 [<c012c9cb>] worker_thread+0x9b/0xf0
-> Feb 16 23:41:33 alon1 [<c012fc70>] autoremove_wake_function+0x0/0x50
-> Feb 16 23:41:33 alon1 [<c012c930>] worker_thread+0x0/0xf0
-> Feb 16 23:41:33 alon1 [<c012f962>] kthread+0x42/0x70
-> Feb 16 23:41:33 alon1 [<c012f920>] kthread+0x0/0x70
-> Feb 16 23:41:33 alon1 [<c0104c2f>] kernel_thread_helper+0x7/0x18
-> Feb 16 23:41:33 alon1 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
-> Feb 16 23:41:33 alon1 Code: 26 00 00 00 00 57 89 c7 a1 50 1b 3a c0 56 53 =
-8b 70 38 85 f6 74 08 8b 0e 85 c9 74 58 ff 06 8b 56 50 39 fa 74 47 89 fb eb =
-02 89 c3 <8b> 43 08 39 c2 75 f7 8b 46 08 83 c0 68 e8 98 e7 10 00 8b 43 10=
-=20
-> Feb 16 23:41:33 alon1 EIP: [<c01b2db6>] sysfs_get_dentry+0x26/0x80 SS:ESP=
- 0068:f7c49efc
-> Feb 16 23:41:33 alon1 ---[ end trace aae864e9592acc1d ]---
-> Feb 16 23:41:33 alon1 hcid[7004]: HCI dev 0 up
-> Feb 16 23:41:33 alon1 hcid[7004]: Device hci0 has been added
-> Feb 16 23:41:33 alon1 hcid[7004]: Starting security manager 0
+------=_Part_21952_9435439.1203502465351
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Could you try patch below?
+Hi there,
+
+patch attached.
+
+   fix GStreamer critical "Could not convert static caps":
+     - remove some trailing ';'
+     - stringify attributes value in caps (cosmetic)
 
 
-Defer hci_unregister_sysfs because hci device could be destructed
-while hci conn devices still there.
+--=20
+Marc-Andr=E9 Lureau
 
-Signed-off-by: Dave Young <hidave.darkstar@gmail.com>
+------=_Part_21952_9435439.1203502465351
+Content-Type: text/x-diff;
+	name=0001-Fix-GStreamer-critical-Could-not-convert-static-cap.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fcvq8xnz0
+Content-Disposition: attachment;
+	filename=0001-Fix-GStreamer-critical-Could-not-convert-static-cap.patch
 
----
-net/bluetooth/hci_core.c |    4 ++--
-1 file changed, 2 insertions(+), 2 deletions(-)
+RnJvbSBhNjQ0NTQ4YWYxNzZmN2E1MmU0Yzk5ZDM1MGNiNmY4OGEyNzkzOTJiIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBNYXJjLUFuZHJlIEx1cmVhdSA8bWFyY2FuZHJlLmx1cmVhdUBn
+bWFpbC5jb20+CkRhdGU6IFdlZCwgMjAgRmViIDIwMDggMTE6Mzc6MDAgKzAyMDAKU3ViamVjdDog
+W1BBVENIXSBGaXggR1N0cmVhbWVyIGNyaXRpY2FsICJDb3VsZCBub3QgY29udmVydCBzdGF0aWMg
+Y2FwcyIuCgpmaXggR1N0cmVhbWVyIGNyaXRpY2FsICJDb3VsZCBub3QgY29udmVydCBzdGF0aWMg
+Y2FwcyI6CiAtIHJlbW92ZSBzb21lIHRyYWlsaW5nICc7JwogLSBzdHJpbmdpZnkgYXR0cmlidXRl
+cyB2YWx1ZSBpbiBjYXBzCi0tLQogYXVkaW8vZ3N0YTJkcHNpbmsuYyAgfCAgICA2ICsrKy0tLQog
+YXVkaW8vZ3N0cnRwc2JjcGF5LmMgfCAgICA2ICsrKy0tLQogYXVkaW8vZ3N0c2JjZW5jLmMgICAg
+fCAgICA0ICsrLS0KIGF1ZGlvL2dzdHNiY3BhcnNlLmMgIHwgICAgNCArKy0tCiA0IGZpbGVzIGNo
+YW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDEwIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2F1
+ZGlvL2dzdGEyZHBzaW5rLmMgYi9hdWRpby9nc3RhMmRwc2luay5jCmluZGV4IDBiNjFlODIuLmQy
+NWNiZGUgMTAwNjQ0Ci0tLSBhL2F1ZGlvL2dzdGEyZHBzaW5rLmMKKysrIGIvYXVkaW8vZ3N0YTJk
+cHNpbmsuYwpAQCAtNTcsMTMgKzU3LDEzIEBAIHN0YXRpYyBHc3RTdGF0aWNQYWRUZW1wbGF0ZSBn
+c3RfYTJkcF9zaW5rX2ZhY3RvcnkgPQogCQkJR1NUX1NUQVRJQ19DQVBTKCJhdWRpby94LXNiYywg
+IgogCQkJCSJyYXRlID0gKGludCkgeyAxNjAwMCwgMzIwMDAsIDQ0MTAwLCA0ODAwMCB9LCAiCiAJ
+CQkJImNoYW5uZWxzID0gKGludCkgWyAxLCAyIF0sICIKLQkJCQkibW9kZSA9IChzdHJpbmcpIHsg
+bW9ubywgZHVhbCwgc3RlcmVvLCBqb2ludCB9LCAiCisJCQkJIm1vZGUgPSAoc3RyaW5nKSB7IFwi
+bW9ub1wiLCBcImR1YWxcIiwgXCJzdGVyZW9cIiwgXCJqb2ludFwiIH0sICIKIAkJCQkiYmxvY2tz
+ID0gKGludCkgeyA0LCA4LCAxMiwgMTYgfSwgIgogCQkJCSJzdWJiYW5kcyA9IChpbnQpIHsgNCwg
+OCB9LCAiCi0JCQkJImFsbG9jYXRpb24gPSAoc3RyaW5nKSB7IHNuciwgbG91ZG5lc3MgfSwgIgor
+CQkJCSJhbGxvY2F0aW9uID0gKHN0cmluZykgeyBcInNuclwiLCBcImxvdWRuZXNzXCIgfSwgIgog
+CQkJCSJiaXRwb29sID0gKGludCkgWyAyLCAiCiAJCQkJVEVNUExBVEVfTUFYX0JJVFBPT0xfU1RS
+ICIgXTsgIgotCQkJCSJhdWRpby9tcGVnOyIKKwkJCQkiYXVkaW8vbXBlZyIKIAkJCQkpKTsKIAog
+c3RhdGljIGdib29sZWFuIGdzdF9hMmRwX3NpbmtfaGFuZGxlX2V2ZW50KEdzdFBhZCAqcGFkLCBH
+c3RFdmVudCAqZXZlbnQpOwpkaWZmIC0tZ2l0IGEvYXVkaW8vZ3N0cnRwc2JjcGF5LmMgYi9hdWRp
+by9nc3RydHBzYmNwYXkuYwppbmRleCA3MGY1YmVmLi4zOWNmMTk3IDEwMDY0NAotLS0gYS9hdWRp
+by9nc3RydHBzYmNwYXkuYworKysgYi9hdWRpby9nc3RydHBzYmNwYXkuYwpAQCAtODAsMTEgKzgw
+LDExIEBAIHN0YXRpYyBHc3RTdGF0aWNQYWRUZW1wbGF0ZSBnc3RfcnRwX3NiY19wYXlfc2lua19m
+YWN0b3J5ID0KIAkJR1NUX1NUQVRJQ19DQVBTKCJhdWRpby94LXNiYywgIgogCQkJCSJyYXRlID0g
+KGludCkgeyAxNjAwMCwgMzIwMDAsIDQ0MTAwLCA0ODAwMCB9LCAiCiAJCQkJImNoYW5uZWxzID0g
+KGludCkgWyAxLCAyIF0sICIKLQkJCQkibW9kZSA9IChzdHJpbmcpIHsgbW9ubywgZHVhbCwgc3Rl
+cmVvLCBqb2ludCB9LCAiCisJCQkJIm1vZGUgPSAoc3RyaW5nKSB7IFwibW9ub1wiLCBcImR1YWxc
+IiwgXCJzdGVyZW9cIiwgXCJqb2ludFwiIH0sICIKIAkJCQkiYmxvY2tzID0gKGludCkgeyA0LCA4
+LCAxMiwgMTYgfSwgIgogCQkJCSJzdWJiYW5kcyA9IChpbnQpIHsgNCwgOCB9LCAiCi0JCQkJImFs
+bG9jYXRpb24gPSAoc3RyaW5nKSB7IHNuciwgbG91ZG5lc3MgfSwiCi0JCQkJImJpdHBvb2wgPSAo
+aW50KSBbIDIsIDY0IF07ICIpCisJCQkJImFsbG9jYXRpb24gPSAoc3RyaW5nKSB7IFwic25yXCIs
+IFwibG91ZG5lc3NcIiB9LCAiCisJCQkJImJpdHBvb2wgPSAoaW50KSBbIDIsIDY0IF0iKQogCSk7
+CiAKIHN0YXRpYyBHc3RTdGF0aWNQYWRUZW1wbGF0ZSBnc3RfcnRwX3NiY19wYXlfc3JjX2ZhY3Rv
+cnkgPQpkaWZmIC0tZ2l0IGEvYXVkaW8vZ3N0c2JjZW5jLmMgYi9hdWRpby9nc3RzYmNlbmMuYwpp
+bmRleCAwMzQyM2VjLi42NWUzZGE1IDEwMDY0NAotLS0gYS9hdWRpby9nc3RzYmNlbmMuYworKysg
+Yi9hdWRpby9nc3RzYmNlbmMuYwpAQCAtMTU3LDEwICsxNTcsMTAgQEAgc3RhdGljIEdzdFN0YXRp
+Y1BhZFRlbXBsYXRlIHNiY19lbmNfc3JjX2ZhY3RvcnkgPQogCQlHU1RfU1RBVElDX0NBUFMoImF1
+ZGlvL3gtc2JjLCAiCiAJCQkJInJhdGUgPSAoaW50KSB7IDE2MDAwLCAzMjAwMCwgNDQxMDAsIDQ4
+MDAwIH0sICIKIAkJCQkiY2hhbm5lbHMgPSAoaW50KSBbIDEsIDIgXSwgIgotCQkJCSJtb2RlID0g
+KHN0cmluZykgeyBtb25vLCBkdWFsLCBzdGVyZW8sIGpvaW50IH0sICIKKwkJCQkibW9kZSA9IChz
+dHJpbmcpIHsgXCJtb25vXCIsIFwiZHVhbFwiLCBcInN0ZXJlb1wiLCBcImpvaW50XCIgfSwgIgog
+CQkJCSJibG9ja3MgPSAoaW50KSB7IDQsIDgsIDEyLCAxNiB9LCAiCiAJCQkJInN1YmJhbmRzID0g
+KGludCkgeyA0LCA4IH0sICIKLQkJCQkiYWxsb2NhdGlvbiA9IChzdHJpbmcpIHsgc25yLCBsb3Vk
+bmVzcyB9LCIKKwkJCQkiYWxsb2NhdGlvbiA9IChzdHJpbmcpIHsgXCJzbnJcIiwgXCJsb3VkbmVz
+c1wiIH0sICIKIAkJCQkiYml0cG9vbCA9IChpbnQpIFsgIiBTQkNfRU5DX0JJVFBPT0xfTUlOX1NU
+UgogCQkJCSIsICIgU0JDX0VOQ19CSVRQT09MX01BWF9TVFIgIiBdIikpOwogCmRpZmYgLS1naXQg
+YS9hdWRpby9nc3RzYmNwYXJzZS5jIGIvYXVkaW8vZ3N0c2JjcGFyc2UuYwppbmRleCA3YjMwZGQy
+Li40NTIxYzU2IDEwMDY0NAotLS0gYS9hdWRpby9nc3RzYmNwYXJzZS5jCisrKyBiL2F1ZGlvL2dz
+dHNiY3BhcnNlLmMKQEAgLTUxLDEwICs1MSwxMCBAQCBzdGF0aWMgR3N0U3RhdGljUGFkVGVtcGxh
+dGUgc2JjX3BhcnNlX3NyY19mYWN0b3J5ID0KIAkJR1NUX1NUQVRJQ19DQVBTKCJhdWRpby94LXNi
+YywgIgogCQkJCSJyYXRlID0gKGludCkgeyAxNjAwMCwgMzIwMDAsIDQ0MTAwLCA0ODAwMCB9LCAi
+CiAJCQkJImNoYW5uZWxzID0gKGludCkgWyAxLCAyIF0sICIKLQkJCQkibW9kZSA9IChzdHJpbmcp
+IHsgbW9ubywgZHVhbCwgc3RlcmVvLCBqb2ludCB9LCAiCisJCQkJIm1vZGUgPSAoc3RyaW5nKSB7
+IFwibW9ub1wiLCBcImR1YWxcIiwgXCJzdGVyZW9cIiwgXCJqb2ludFwiIH0sICIKIAkJCQkiYmxv
+Y2tzID0gKGludCkgeyA0LCA4LCAxMiwgMTYgfSwgIgogCQkJCSJzdWJiYW5kcyA9IChpbnQpIHsg
+NCwgOCB9LCAiCi0JCQkJImFsbG9jYXRpb24gPSAoc3RyaW5nKSB7IHNuciwgbG91ZG5lc3MgfSwi
+CisJCQkJImFsbG9jYXRpb24gPSAoc3RyaW5nKSB7IFwic25yXCIsIFwibG91ZG5lc3NcIiB9LCIK
+IAkJCQkiYml0cG9vbCA9IChpbnQpIFsgMiwgNjQgXSwiCiAJCQkJInBhcnNlZCA9IChib29sZWFu
+KSB0cnVlIikpOwogCi0tIAoxLjUuNC4xLjM0Lmc5NGJmCgo=
+------=_Part_21952_9435439.1203502465351
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-diff -upr linux/net/bluetooth/hci_core.c linux.new/net/bluetooth/hci_core.c
---- linux/net/bluetooth/hci_core.c	2008-02-20 18:27:28.000000000 +0800
-+++ linux.new/net/bluetooth/hci_core.c	2008-02-20 18:28:34.000000000 +0800
-@@ -901,8 +901,6 @@ int hci_unregister_dev(struct hci_dev *h
-=20
- 	BT_DBG("%p name %s type %d", hdev, hdev->name, hdev->type);
-=20
--	hci_unregister_sysfs(hdev);
--
- 	write_lock_bh(&hci_dev_list_lock);
- 	list_del(&hdev->list);
- 	write_unlock_bh(&hci_dev_list_lock);
-@@ -914,6 +912,8 @@ int hci_unregister_dev(struct hci_dev *h
-=20
- 	hci_notify(hdev, HCI_DEV_UNREG);
-=20
-+	hci_unregister_sysfs(hdev);
-+
- 	__hci_dev_put(hdev);
-=20
- 	return 0;
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+------=_Part_21952_9435439.1203502465351
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_21952_9435439.1203502465351--
