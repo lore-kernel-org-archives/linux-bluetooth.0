@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300802211758x4a8e9991t868cfe5081523803@mail.gmail.com>
-Date: Thu, 21 Feb 2008 18:58:26 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <50282bd30802211429h419f6342qb6ab4ac62cd20a69@mail.gmail.com>
+Message-ID: <50282bd30802211429h419f6342qb6ab4ac62cd20a69@mail.gmail.com>
+Date: Thu, 21 Feb 2008 19:29:48 -0300
+From: "Cidorvan Leite" <cidorvan@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-References: <50282bd30802211429h419f6342qb6ab4ac62cd20a69@mail.gmail.com>
-Subject: Re: [Bluez-devel] SBC optimizations
+Content-Type: multipart/mixed;
+	boundary="----=_Part_4690_8927023.1203632988946"
+Subject: [Bluez-devel] SBC optimizations
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,46 +16,122 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Cidorvan
+------=_Part_4690_8927023.1203632988946
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-How significant is the volume drop in 4 subbands? Should we just leave
-the decoder at 64 bit mults so we don't needlessly suffer quality
-issues on faster platforms?
+Hi!
 
-Brad
+I replaced the 64bits multiplies by 32bits and fixed the volume, now
+the encode and decode are >10% faster.
+Unfortunately, I couldn't keep the same volume for decode with 4 subbands...
 
-On Thu, Feb 21, 2008 at 3:29 PM, Cidorvan Leite <cidorvan@gmail.com> wrote:
-> Hi!
->
->  I replaced the 64bits multiplies by 32bits and fixed the volume, now
->  the encode and decode are >10% faster.
->  Unfortunately, I couldn't keep the same volume for decode with 4 subbands...
->
-> -------------------------------------------------------------------------
->  This SF.net email is sponsored by: Microsoft
->  Defy all challenges. Microsoft(R) Visual Studio 2008.
->  http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
->  Bluez-devel mailing list
->  Bluez-devel@lists.sourceforge.net
->  https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->
+------=_Part_4690_8927023.1203632988946
+Content-Type: text/x-patch; name=sbc.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fcxvd7ao0
+Content-Disposition: attachment; filename=sbc.patch
 
-
-
--- 
-Brad
+SW5kZXg6IHNiYy5jCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT0KUkNTIGZpbGU6IC9jdnNyb290L2JsdWV6L3V0aWxzL3Ni
+Yy9zYmMuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS42MQpkaWZmIC11IC1wIC1yMS42MSBzYmMu
+YwotLS0gc2JjLmMJMTkgRmViIDIwMDggMTk6NDc6MjUgLTAwMDAJMS42MQorKysgc2JjLmMJMjEg
+RmViIDIwMDggMjI6MDg6NTYgLTAwMDAKQEAgLTU1MSw3ICs1NTEsNyBAQCBzdGF0aWMgaW5saW5l
+IHZvaWQgc2JjX3N5bnRoZXNpemVfZm91cihzCiAJCQkJc3RydWN0IHNiY19mcmFtZSAqZnJhbWUs
+IGludCBjaCwgaW50IGJsaykKIHsKIAlpbnQgaSwgaiwgaywgaWR4OwotCXNiY19leHRlbmRlZF90
+IHJlczsKKwlzYmNfZml4ZWRfdCByZXM7CiAKIAlmb3IgKGkgPSAwOyBpIDwgODsgaSsrKSB7CiAJ
+CS8qIFNoaWZ0aW5nICovCkBAIC01OTIsNyArNTkyLDcgQEAgc3RhdGljIGlubGluZSB2b2lkIHNi
+Y19zeW50aGVzaXplX2VpZ2h0KAogCQkJCXN0cnVjdCBzYmNfZnJhbWUgKmZyYW1lLCBpbnQgY2gs
+IGludCBibGspCiB7CiAJaW50IGksIGosIGssIGlkeDsKLQlzYmNfZXh0ZW5kZWRfdCByZXM7CisJ
+c2JjX2ZpeGVkX3QgcmVzOwogCiAJZm9yIChpID0gMDsgaSA8IDE2OyBpKyspIHsKIAkJLyogU2hp
+ZnRpbmcgKi8KQEAgLTY2Nyw4ICs2NjcsNyBAQCBzdGF0aWMgdm9pZCBzYmNfZW5jb2Rlcl9pbml0
+KHN0cnVjdCBzYmNfCiAKIHN0YXRpYyBpbmxpbmUgdm9pZCBfc2JjX2FuYWx5emVfZm91cihjb25z
+dCBpbnQzMl90ICppbiwgaW50MzJfdCAqb3V0KQogewotCXNiY19maXhlZF90IHRbOF07Ci0Jc2Jj
+X2V4dGVuZGVkX3Qgc1s1XTsKKwlzYmNfZml4ZWRfdCB0WzhdLCBzWzVdOwogCiAJdFswXSA9IFND
+QUxFNF9TVEFHRTEoIC8qIFE4ICovCiAJCU1VTEEoX3NiY19wcm90b180WzBdLCBpbls4XSAtIGlu
+WzMyXSwgLyogUTE4ICovCkBAIC03NTIsOCArNzUxLDcgQEAgc3RhdGljIGlubGluZSB2b2lkIHNi
+Y19hbmFseXplX2ZvdXIoc3RydQogCiBzdGF0aWMgaW5saW5lIHZvaWQgX3NiY19hbmFseXplX2Vp
+Z2h0KGNvbnN0IGludDMyX3QgKmluLCBpbnQzMl90ICpvdXQpCiB7Ci0Jc2JjX2ZpeGVkX3QgdFs4
+XTsKLQlzYmNfZXh0ZW5kZWRfdCBzWzhdOworCXNiY19maXhlZF90IHRbOF0sIHNbOF07CiAKIAl0
+WzBdID0gU0NBTEU4X1NUQUdFMSggLyogUTEwICovCiAJCU1VTEEoX3NiY19wcm90b184WzBdLCAo
+aW5bMTZdIC0gaW5bNjRdKSwgLyogUTE4ID0gUTE4ICogUTAgKi8KSW5kZXg6IHNiY19tYXRoLmgK
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovdXRpbHMvc2JjL3NiY19tYXRoLmgs
+dgpyZXRyaWV2aW5nIHJldmlzaW9uIDEuMTcKZGlmZiAtdSAtcCAtcjEuMTcgc2JjX21hdGguaAot
+LS0gc2JjX21hdGguaAkxNSBGZWIgMjAwOCAxODowNjozMiAtMDAwMAkxLjE3CisrKyBzYmNfbWF0
+aC5oCTIxIEZlYiAyMDA4IDIyOjA4OjU2IC0wMDAwCkBAIC0yOCw0OSArMjgsNDUgQEAKICAgIGFs
+d2F5cyBiZSBjb3JyZWN0IGFuZCBldmVyeSBjb21waWxlciAqc2hvdWxkKiBnZW5lcmF0ZSBvcHRp
+bWFsIGNvZGUgKi8KICNkZWZpbmUgQVNSKHZhbCwgYml0cykgKCgtMiA+PiAxID09IC0xKSA/IFwK
+IAkJICgoaW50MzJfdCkodmFsKSkgPj4gKGJpdHMpIDogKChpbnQzMl90KSAodmFsKSkgLyAoMSA8
+PCAoYml0cykpKQotI2RlZmluZSBBU1JfNjQodmFsLCBiaXRzKSAoKC0yID4+IDEgPT0gLTEpID8g
+XAotCQkgKChsb25nIGxvbmcpKHZhbCkpID4+IChiaXRzKSA6ICgobG9uZyBsb25nKSAodmFsKSkg
+LyAoMSA8PCAoYml0cykpKQogCiAjZGVmaW5lIFNDQUxFX1BST1RPNF9UQkwJMTUKICNkZWZpbmUg
+U0NBTEVfQU5BNF9UQkwJCTE2Ci0jZGVmaW5lIFNDQUxFX1BST1RPOF9UQkwJMTUKLSNkZWZpbmUg
+U0NBTEVfQU5BOF9UQkwJCTE2Ci0jZGVmaW5lIFNDQUxFX1NQUk9UTzRfVEJMCTE2Ci0jZGVmaW5l
+IFNDQUxFX1NQUk9UTzhfVEJMCTE2Ci0jZGVmaW5lIFNDQUxFX05QUk9UTzRfVEJMCTEwCi0jZGVm
+aW5lIFNDQUxFX05QUk9UTzhfVEJMCTEyCi0jZGVmaW5lIFNDQUxFX1NBTVBMRVMJCTE0CisjZGVm
+aW5lIFNDQUxFX1BST1RPOF9UQkwJMTYKKyNkZWZpbmUgU0NBTEVfQU5BOF9UQkwJCTE3CisjZGVm
+aW5lIFNDQUxFX1NQUk9UTzRfVEJMCTE1CisjZGVmaW5lIFNDQUxFX1NQUk9UTzhfVEJMCTE0Cisj
+ZGVmaW5lIFNDQUxFX05QUk9UTzRfVEJMCTEzCisjZGVmaW5lIFNDQUxFX05QUk9UTzhfVEJMCTEx
+CiAjZGVmaW5lIFNDQUxFNF9TVEFHRTFfQklUUwkxNgotI2RlZmluZSBTQ0FMRTRfU1RBR0UyX0JJ
+VFMJMTYKLSNkZWZpbmUgU0NBTEU0X1NUQUdFRDFfQklUUwkxNAotI2RlZmluZSBTQ0FMRTRfU1RB
+R0VEMl9CSVRTCTE0Ci0jZGVmaW5lIFNDQUxFOF9TVEFHRTFfQklUUwkxNgotI2RlZmluZSBTQ0FM
+RThfU1RBR0UyX0JJVFMJMTYKLSNkZWZpbmUgU0NBTEU4X1NUQUdFRDFfQklUUwkxNAotI2RlZmlu
+ZSBTQ0FMRThfU1RBR0VEMl9CSVRTCTE0CisjZGVmaW5lIFNDQUxFNF9TVEFHRTJfQklUUwkxNQor
+I2RlZmluZSBTQ0FMRTRfU1RBR0VEMV9CSVRTCTEyCisjZGVmaW5lIFNDQUxFNF9TVEFHRUQyX0JJ
+VFMJMTYKKyNkZWZpbmUgU0NBTEU4X1NUQUdFMV9CSVRTCTE1CisjZGVmaW5lIFNDQUxFOF9TVEFH
+RTJfQklUUwkxNQorI2RlZmluZSBTQ0FMRThfU1RBR0VEMV9CSVRTCTE1CisjZGVmaW5lIFNDQUxF
+OF9TVEFHRUQyX0JJVFMJMTYKIAogdHlwZWRlZiBpbnQzMl90IHNiY19maXhlZF90OwotdHlwZWRl
+ZiBsb25nIGxvbmcgc2JjX2V4dGVuZGVkX3Q7CiAKLSNkZWZpbmUgU0NBTEU0X1NUQUdFMShzcmMp
+ICBBU1JfNjQoc3JjLCBTQ0FMRTRfU1RBR0UxX0JJVFMpCi0jZGVmaW5lIFNDQUxFNF9TVEFHRTIo
+c3JjKSAgQVNSXzY0KHNyYywgU0NBTEU0X1NUQUdFMl9CSVRTKQotI2RlZmluZSBTQ0FMRTRfU1RB
+R0VEMShzcmMpIEFTUl82NChzcmMsIFNDQUxFNF9TVEFHRUQxX0JJVFMpCi0jZGVmaW5lIFNDQUxF
+NF9TVEFHRUQyKHNyYykgQVNSXzY0KHNyYywgU0NBTEU0X1NUQUdFRDJfQklUUykKLSNkZWZpbmUg
+U0NBTEU4X1NUQUdFMShzcmMpICBBU1JfNjQoc3JjLCBTQ0FMRThfU1RBR0UxX0JJVFMpCi0jZGVm
+aW5lIFNDQUxFOF9TVEFHRTIoc3JjKSAgQVNSXzY0KHNyYywgU0NBTEU4X1NUQUdFMl9CSVRTKQot
+I2RlZmluZSBTQ0FMRThfU1RBR0VEMShzcmMpIEFTUl82NChzcmMsIFNDQUxFOF9TVEFHRUQxX0JJ
+VFMpCi0jZGVmaW5lIFNDQUxFOF9TVEFHRUQyKHNyYykgQVNSXzY0KHNyYywgU0NBTEU4X1NUQUdF
+RDJfQklUUykKKyNkZWZpbmUgU0NBTEU0X1NUQUdFMShzcmMpICBBU1Ioc3JjLCBTQ0FMRTRfU1RB
+R0UxX0JJVFMpCisjZGVmaW5lIFNDQUxFNF9TVEFHRTIoc3JjKSAgQVNSKHNyYywgU0NBTEU0X1NU
+QUdFMl9CSVRTKQorI2RlZmluZSBTQ0FMRTRfU1RBR0VEMShzcmMpIEFTUihzcmMsIFNDQUxFNF9T
+VEFHRUQxX0JJVFMpCisjZGVmaW5lIFNDQUxFNF9TVEFHRUQyKHNyYykgQVNSKHNyYywgU0NBTEU0
+X1NUQUdFRDJfQklUUykKKyNkZWZpbmUgU0NBTEU4X1NUQUdFMShzcmMpICBBU1Ioc3JjLCBTQ0FM
+RThfU1RBR0UxX0JJVFMpCisjZGVmaW5lIFNDQUxFOF9TVEFHRTIoc3JjKSAgQVNSKHNyYywgU0NB
+TEU4X1NUQUdFMl9CSVRTKQorI2RlZmluZSBTQ0FMRThfU1RBR0VEMShzcmMpIEFTUihzcmMsIFND
+QUxFOF9TVEFHRUQxX0JJVFMpCisjZGVmaW5lIFNDQUxFOF9TVEFHRUQyKHNyYykgQVNSKHNyYywg
+U0NBTEU4X1NUQUdFRDJfQklUUykKIAogI2RlZmluZSBTQkNfRklYRURfMCh2YWwpIHsgdmFsID0g
+MDsgfQotI2RlZmluZSBNVUwoYSwgYikgICAgICAgICgoc2JjX2V4dGVuZGVkX3QpKGEpICogKGIp
+KQorI2RlZmluZSBNVUwoYSwgYikgICAgICAgICgoYSkgKiAoYikpCiAjaWZkZWYgX19hcm1fXwog
+I2RlZmluZSBNVUxBKGEsIGIsIHJlcykgKHsJCQkJXAotCQlsb25nIGxvbmcgdG1wID0gcmVzOwkJ
+CVwKKwkJaW50IHRtcCA9IHJlczsJCQlcCiAJCV9fYXNtX18oCQkJCVwKLQkJCSJzbWxhbCAlUTAs
+ICVSMCwgJTIsICUzIglcCisJCQkibWxhICUwLCAlMiwgJTMsICUwIgkJXAogCQkJOiAiPSZyIiAo
+dG1wKQkJCVwKIAkJCTogIjAiICh0bXApLCAiciIgKGEpLCAiciIgKGIpKTsJXAogCQl0bXA7IH0p
+CiAjZWxzZQotI2RlZmluZSBNVUxBKGEsIGIsIHJlcykgICgoc2JjX2V4dGVuZGVkX3QpKGEpICog
+KGIpICsgKHJlcykpCisjZGVmaW5lIE1VTEEoYSwgYiwgcmVzKSAgKChhKSAqIChiKSArIChyZXMp
+KQogI2VuZGlmCg==
+------=_Part_4690_8927023.1203632988946
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+------=_Part_4690_8927023.1203632988946
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_4690_8927023.1203632988946--
