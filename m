@@ -1,49 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Sun, 24 Feb 2008 00:25:03 +0100
-Message-Id: <1203809103.28528.14.camel@californication>
+Date: Sat, 23 Feb 2008 13:36:03 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Tobias Klauser <tklauser@distanz.ch>
+Cc: marcel@holtmann.org, bluez-devel@lists.sourceforge.net,
+        Dave Young
+ <hidave.darkstar@gmail.com>
+Subject: Re: [PATCH] bluetooth: Make bnep_sock_cleanup() return void
+Message-Id: <20080223133603.e85b7bc2.akpm@linux-foundation.org>
+In-Reply-To: <20080223212620.GA8227@distanz.ch>
+References: <20080223212620.GA8227@distanz.ch>
 Mime-Version: 1.0
-Subject: [Bluez-devel] New mailing list for kernel development
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Content-Type: text/plain; charset=US-ASCII
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi Folks,
+On Sat, 23 Feb 2008 22:26:20 +0100 Tobias Klauser <tklauser@distanz.ch> wrote:
 
-since the Sourceforge team is not capable of reducing the spam to this
-mailing list while keeping it open for all people that wanna post to it,
-we have come to an agreement to no longer use it for kernel related
-development.
+> bnep_sock_cleanup() always returns 0 and its return value isn't used
+> anywhere in the code.
 
-We will still continue to talk about BlueZ related development for
-bluez-libs and bluez-utils, but I am restricting the list now to member
-only postings.
+Please cc netdev@vger.kernel.org on bluetooth patches.
 
-For all Bluetooth kernel things, please use the following list now:
+Apparently bluez-devel is a complete spamfest, and davem has set up
+linux-bluetooth@vger.kernel.org, but we haven't done anything with it yet.
 
-http://vger.kernel.org/vger-lists.html#linux-bluetooth
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+I guess we should put out an announcement and modify ./MAINTAINERS, etc. 
+ANy volunteers?
