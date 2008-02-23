@@ -1,10 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Sun, 24 Feb 2008 05:02:57 +0100
-Message-Id: <1203825777.28528.34.camel@californication>
+To: Andrew Morton <akpm@linux-foundation.org>
+In-Reply-To: <20080223133603.e85b7bc2.akpm@linux-foundation.org>
+References: <20080223212620.GA8227@distanz.ch>
+	<20080223133603.e85b7bc2.akpm@linux-foundation.org>
+Date: Sun, 24 Feb 2008 00:05:27 +0100
+Message-Id: <1203807927.28528.4.camel@californication>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Translation help for bluez-gnome
+Cc: Tobias Klauser <tklauser@distanz.ch>,
+	bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] [PATCH] bluetooth: Make bnep_sock_cleanup()
+	return void
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,16 +24,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Folks,
+Hi Andrew,
 
-I finally got around to setup a translation within Launchpad for the
-bluez-gnome trunk:
+> > bnep_sock_cleanup() always returns 0 and its return value isn't used
+> > anywhere in the code.
+> 
+> Please cc netdev@vger.kernel.org on bluetooth patches.
+> 
+> Apparently bluez-devel is a complete spamfest, and davem has set up
+> linux-bluetooth@vger.kernel.org, but we haven't done anything with it yet.
+> 
+> I guess we should put out an announcement and modify ./MAINTAINERS, etc. 
+> ANy volunteers?
 
-https://translations.launchpad.net/bluez-gnome/trunk/+pots/bluetooth-manager/
-
-So please start translating bluez-gnome there and then I can easily
-import these translation into the CVS and finally can make releases with
-an up-to-date translation.
+I do that.
 
 Regards
 
