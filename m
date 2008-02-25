@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BDDF9433-7A32-4CAB-B9C8-2A67635C8578@holtmann.org>
-References: <1203878261.2754.140.camel@cookie.hadess.net>
-	<BDDF9433-7A32-4CAB-B9C8-2A67635C8578@holtmann.org>
-Date: Mon, 25 Feb 2008 10:43:14 +0000
-Message-Id: <1203936194.2754.193.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Option for more-"gnomey" settings
+Message-ID: <d89ddf300802242256m699a9130se4257e4041f2b0b9@mail.gmail.com>
+Date: Sun, 24 Feb 2008 23:56:29 -0700
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <d89ddf300802242243t9503c11ye3d5d2bc7ae1cebb@mail.gmail.com>
+MIME-Version: 1.0
+References: <47666E1F.2000902@mizi.com>
+	<d89ddf300802242243t9503c11ye3d5d2bc7ae1cebb@mail.gmail.com>
+Subject: Re: [Bluez-devel] forcing SCO connection patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,64 +21,46 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Louis
 
-On Mon, 2008-02-25 at 03:08 +0100, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > As you know, I have a problem with a few settings in bluez-gnome not
-> > matching up with the philosophy/target for GNOME.
-> >
-> > Right now it's:
-> > - "Use HAL" settings, and associated device selection
-> 
-> you know that the class of device selection will disappear when  
-> enabling the HAL setting. I did that a few releases ago.
+I should clarify. It looks like the one Marcel saw was:
 
-Which is something that the HIG says shouldn't be done. The button
-should be visible, but disabled.
+-	if (!conn)
+-		goto unlock;
++	if (!conn) {
++		if (ev->link_type==SCO_LINK) {
++			conn = hci_conn_hash_lookup_ba(hdev, ESCO_LINK, &ev->bdaddr);
++			if (!conn)
++				goto unlock;
++			else
++				conn->type=SCO_LINK;
++			}
++	}
 
-I'm actually asking for the "Use HAL" checkbox to not even be there.
+but yours was
 
-> > - Sharing properties, which conflict with gnome-user-share (where we
-> > want to have most of the sharing preferences for GNOME, including
-> > sharing the screen using vino, etc.)
-> 
-> You can easily add an option to gnome-user-share for setting the GConf  
-> value that bluez-gnome is using. The whole incoming connection/accept  
-> thing should be handled inside bluetooth-applet.
+-	if (!conn)
+-		goto unlock;
++	if (!conn) {
++	    if (ev->link_type != ACL_LINK) {
++		int t = (ev->link_type == ESCO_LINK) ? SCO_LINK : ESCO_LINK;
++		conn = hci_conn_hash_lookup_ba(hdev, t, &ev->bdaddr);
++		if (conn)
++		    conn->type = ev->link_type;
++	    }
++	    if (!conn)
++	    	goto unlock;
++	}
 
-Any particular reasons that should be the case? There's no telling that
-the bluetooth-applet will be running when that happens.
+they both have indent/space issues but I'm not sure Marcel's other
+comment makes sense for what you did.
 
-> And as I mentioned the gnome-user-share dependency chain of the  
-> distros is crazy. As long as it drags Apache + WebDAV into my desktop,  
-> I am against it.
+It seems like the problem is ev->link_type might have the wrong value
+for the lookup to succeed, but I'm not sure what the big picture looks
+like here. Is this the best place to solve it or was this a quick
+workaround?
 
-Why is that so bad? It's a pretty small compared to say, docbook
-stylesheets (weighs in at 2.7 megs on an x86-64), and it means that all
-the sharing UI are in one place.
-
-> > Would you accept a patch to add a --enable-gnome to configure to hide
-> > those settings away when bluez-gnome is compiled for use in the GNOME
-> > desktop? Or would you prefer a run-time option?
-> 
-> I prefer if you use the GConf values that bluez-gnome uses and move  
-> all Bluetooth related interaction into bluetooth-applet instead of  
-> hacking it into some other applications and bloat the dependencies.
-
-Bloat what dependencies? We're not bloating the bluez-gnome
-dependencies, and gnome-user-share is already a default installation on
-many GNOME installations.
-
-> If you really wanna shrink the settings of bluetooth-properties, we  
-> can do that at runtime with a GConf setting. I have no problem with  
-> that. I am against compile time options.
-
-Ok. I'll prepare a patch for that. I guess this shouldn't have a UI
-though, right? :)
-
-Cheers
-
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
