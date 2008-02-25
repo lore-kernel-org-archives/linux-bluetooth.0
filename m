@@ -1,22 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <EB2E724A-6D73-4349-B937-7935A8C4BEFB@holtmann.org>
-References: <1200566602.26259.89.camel@cookie.hadess.net>
-	<1200663790.2676.3.camel@cookie.hadess.net>
-	<1201871693.2389.326.camel@cookie.hadess.net>
-	<1201882130.2389.334.camel@cookie.hadess.net>
-	<1201882826.2389.337.camel@cookie.hadess.net>
-	<1202300325.3491.21.camel@cookie.hadess.net>
-	<1202303303.3491.30.camel@cookie.hadess.net>
-	<1202345972.3491.42.camel@cookie.hadess.net>
-	<1203730228.2754.105.camel@cookie.hadess.net>
-	<1203877746.2754.134.camel@cookie.hadess.net>
-	<EB2E724A-6D73-4349-B937-7935A8C4BEFB@holtmann.org>
-Date: Mon, 25 Feb 2008 10:56:37 +0000
-Message-Id: <1203936997.2754.198.camel@cookie.hadess.net>
+In-Reply-To: <BDDF9433-7A32-4CAB-B9C8-2A67635C8578@holtmann.org>
+References: <1203878261.2754.140.camel@cookie.hadess.net>
+	<BDDF9433-7A32-4CAB-B9C8-2A67635C8578@holtmann.org>
+Date: Mon, 25 Feb 2008 10:43:14 +0000
+Message-Id: <1203936194.2754.193.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Updated sendto
+Subject: Re: [Bluez-devel] Option for more-"gnomey" settings
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -31,49 +22,62 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
-On Mon, 2008-02-25 at 03:21 +0100, Marcel Holtmann wrote:
+On Mon, 2008-02-25 at 03:08 +0100, Marcel Holtmann wrote:
 > Hi Bastien,
 > 
-> >>>
-> >>> And one that works with obex-data-server 0.1
-> >>
-> >> Updated against current CVS, and fix a memleak when getting the  
-> >> adapters
-> >> list. New main.c file attached as well, for easier review.
+> > As you know, I have a problem with a few settings in bluez-gnome not
+> > matching up with the philosophy/target for GNOME.
 > >
-> > Updated against current CVS.
+> > Right now it's:
+> > - "Use HAL" settings, and associated device selection
 > 
-> I've been through the main.c as whole and the actual patch. As you  
-> saw, I took the dialogs out of it since that made sense and was a sane  
-> way to do it. I mentioned that I want small patches and if they are  
-> small and logical, I apply them most of the times immediately. Smaller  
-> patches are easier to review. I am not taking a big chunk blindly.
+> you know that the class of device selection will disappear when  
+> enabling the HAL setting. I did that a few releases ago.
+
+Which is something that the HIG says shouldn't be done. The button
+should be visible, but disabled.
+
+I'm actually asking for the "Use HAL" checkbox to not even be there.
+
+> > - Sharing properties, which conflict with gnome-user-share (where we
+> > want to have most of the sharing preferences for GNOME, including
+> > sharing the screen using vino, etc.)
 > 
-> So current patch is not acceptable. It is actually bad. So first  
-> action must be to remove all these useless comments. An example is this:
+> You can easily add an option to gnome-user-share for setting the GConf  
+> value that bluez-gnome is using. The whole incoming connection/accept  
+> thing should be handled inside bluetooth-applet.
+
+Any particular reasons that should be the case? There's no telling that
+the bluetooth-applet will be running when that happens.
+
+> And as I mentioned the gnome-user-share dependency chain of the  
+> distros is crazy. As long as it drags Apache + WebDAV into my desktop,  
+> I am against it.
+
+Why is that so bad? It's a pretty small compared to say, docbook
+stylesheets (weighs in at 2.7 megs on an x86-64), and it means that all
+the sharing UI are in one place.
+
+> > Would you accept a patch to add a --enable-gnome to configure to hide
+> > those settings away when bluez-gnome is compiled for use in the GNOME
+> > desktop? Or would you prefer a run-time option?
 > 
-> +       /* Go into main loop */
->          gtk_main();
-> 
-> Put comments where the code is unclear and not were everybody knows  
-> what it is doing. This is a perfect example of wrongly commenting code.
+> I prefer if you use the GConf values that bluez-gnome uses and move  
+> all Bluetooth related interaction into bluetooth-applet instead of  
+> hacking it into some other applications and bloat the dependencies.
 
-Done locally.
+Bloat what dependencies? We're not bloating the bluez-gnome
+dependencies, and gnome-user-share is already a default installation on
+many GNOME installations.
 
-> Second of all, I am unhappy with all this usage of gtk_main_quit() in  
-> various functions. Can we not just structure the code a lot more  
-> cleaner to avoid multiple calls of it.
+> If you really wanna shrink the settings of bluetooth-properties, we  
+> can do that at runtime with a GConf setting. I have no problem with  
+> that. I am against compile time options.
 
-I don't understand what you mean there.
+Ok. I'll prepare a patch for that. I guess this shouldn't have a UI
+though, right? :)
 
->  Besides the signal handling, I  
-> would expect one extra call in case we automatically wanna close the  
-> progress dialog.
-
-Why? If there's no errors, why would you want to see it's finished? What
-information would be in the dialogue that could be useful?
-
-
+Cheers
 
 
 -------------------------------------------------------------------------
