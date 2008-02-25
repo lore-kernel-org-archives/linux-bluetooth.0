@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300802242256m699a9130se4257e4041f2b0b9@mail.gmail.com>
-Date: Sun, 24 Feb 2008 23:56:29 -0700
+Message-ID: <d89ddf300802242243t9503c11ye3d5d2bc7ae1cebb@mail.gmail.com>
+Date: Sun, 24 Feb 2008 23:43:22 -0700
 From: "Brad Midgley" <bmidgley@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <d89ddf300802242243t9503c11ye3d5d2bc7ae1cebb@mail.gmail.com>
+In-Reply-To: <47666E1F.2000902@mizi.com>
 MIME-Version: 1.0
 References: <47666E1F.2000902@mizi.com>
-	<d89ddf300802242243t9503c11ye3d5d2bc7ae1cebb@mail.gmail.com>
 Subject: Re: [Bluez-devel] forcing SCO connection patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -23,43 +22,21 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Louis
 
-I should clarify. It looks like the one Marcel saw was:
+>  When I tried to connect SCO channel with
+>  HCI_OP_SETUP_SYNC_CONN(LINK_TYPE_ESCO), some bluetooth headsets responds
+>  with LINK_TYPE_SCO because it did not support ESCO. But bluez couldn't
+>  handle this situation, and patch_hci_event.c is for this.
 
--	if (!conn)
--		goto unlock;
-+	if (!conn) {
-+		if (ev->link_type==SCO_LINK) {
-+			conn = hci_conn_hash_lookup_ba(hdev, ESCO_LINK, &ev->bdaddr);
-+			if (!conn)
-+				goto unlock;
-+			else
-+				conn->type=SCO_LINK;
-+			}
-+	}
+Marcel looked at this patch and came back with the comments below. Can
+you revisit it? I think some other people are seeing the same issues.
+The patch won't go upstream until Marcel likes it.
 
-but yours was
+the patch you sent me is fully broken. First of all the coding style
+is wrong. Does nobody have learned this by now? I always look for that
+first before even reading the patch. Second the case where an
+ESCO_LINK returns NULL is broken and will fall over and crash.
 
--	if (!conn)
--		goto unlock;
-+	if (!conn) {
-+	    if (ev->link_type != ACL_LINK) {
-+		int t = (ev->link_type == ESCO_LINK) ? SCO_LINK : ESCO_LINK;
-+		conn = hci_conn_hash_lookup_ba(hdev, t, &ev->bdaddr);
-+		if (conn)
-+		    conn->type = ev->link_type;
-+	    }
-+	    if (!conn)
-+	    	goto unlock;
-+	}
-
-they both have indent/space issues but I'm not sure Marcel's other
-comment makes sense for what you did.
-
-It seems like the problem is ev->link_type might have the wrong value
-for the lookup to succeed, but I'm not sure what the big picture looks
-like here. Is this the best place to solve it or was this a quick
-workaround?
-
+-- 
 Brad
 
 -------------------------------------------------------------------------
