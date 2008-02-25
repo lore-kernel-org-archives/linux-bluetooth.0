@@ -1,21 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <EB2E724A-6D73-4349-B937-7935A8C4BEFB@holtmann.org>
+Message-Id: <BDDF9433-7A32-4CAB-B9C8-2A67635C8578@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1203877746.2754.134.camel@cookie.hadess.net>
+In-Reply-To: <1203878261.2754.140.camel@cookie.hadess.net>
 Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Mon, 25 Feb 2008 03:21:44 +0100
-References: <1200566602.26259.89.camel@cookie.hadess.net>
-	<1200663790.2676.3.camel@cookie.hadess.net>
-	<1201871693.2389.326.camel@cookie.hadess.net>
-	<1201882130.2389.334.camel@cookie.hadess.net>
-	<1201882826.2389.337.camel@cookie.hadess.net>
-	<1202300325.3491.21.camel@cookie.hadess.net>
-	<1202303303.3491.30.camel@cookie.hadess.net>
-	<1202345972.3491.42.camel@cookie.hadess.net>
-	<1203730228.2754.105.camel@cookie.hadess.net>
-	<1203877746.2754.134.camel@cookie.hadess.net>
-Subject: Re: [Bluez-devel] [PATCH] Updated sendto
+Date: Mon, 25 Feb 2008 03:08:51 +0100
+References: <1203878261.2754.140.camel@cookie.hadess.net>
+Subject: Re: [Bluez-devel] Option for more-"gnomey" settings
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -31,40 +22,38 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Bastien,
 
->>>
->>> And one that works with obex-data-server 0.1
->>
->> Updated against current CVS, and fix a memleak when getting the  
->> adapters
->> list. New main.c file attached as well, for easier review.
+> As you know, I have a problem with a few settings in bluez-gnome not
+> matching up with the philosophy/target for GNOME.
 >
-> Updated against current CVS.
+> Right now it's:
+> - "Use HAL" settings, and associated device selection
 
-I've been through the main.c as whole and the actual patch. As you  
-saw, I took the dialogs out of it since that made sense and was a sane  
-way to do it. I mentioned that I want small patches and if they are  
-small and logical, I apply them most of the times immediately. Smaller  
-patches are easier to review. I am not taking a big chunk blindly.
+you know that the class of device selection will disappear when  
+enabling the HAL setting. I did that a few releases ago.
 
-So current patch is not acceptable. It is actually bad. So first  
-action must be to remove all these useless comments. An example is this:
+> - Sharing properties, which conflict with gnome-user-share (where we
+> want to have most of the sharing preferences for GNOME, including
+> sharing the screen using vino, etc.)
 
-+       /* Go into main loop */
-         gtk_main();
+You can easily add an option to gnome-user-share for setting the GConf  
+value that bluez-gnome is using. The whole incoming connection/accept  
+thing should be handled inside bluetooth-applet.
 
-Put comments where the code is unclear and not were everybody knows  
-what it is doing. This is a perfect example of wrongly commenting code.
+And as I mentioned the gnome-user-share dependency chain of the  
+distros is crazy. As long as it drags Apache + WebDAV into my desktop,  
+I am against it.
 
-Second of all, I am unhappy with all this usage of gtk_main_quit() in  
-various functions. Can we not just structure the code a lot more  
-cleaner to avoid multiple calls of it. Besides the signal handling, I  
-would expect one extra call in case we automatically wanna close the  
-progress dialog.
+> Would you accept a patch to add a --enable-gnome to configure to hide
+> those settings away when bluez-gnome is compiled for use in the GNOME
+> desktop? Or would you prefer a run-time option?
 
-After that, I like to see the current sendto patches to look like the  
-obex-send progress bar. It should be not that complicated.
+I prefer if you use the GConf values that bluez-gnome uses and move  
+all Bluetooth related interaction into bluetooth-applet instead of  
+hacking it into some other applications and bloat the dependencies.
 
-Then we go for sending multiple files after another.
+If you really wanna shrink the settings of bluetooth-properties, we  
+can do that at runtime with a GConf setting. I have no problem with  
+that. I am against compile time options.
 
 Regards
 
