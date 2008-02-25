@@ -1,12 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300802242243t9503c11ye3d5d2bc7ae1cebb@mail.gmail.com>
-Date: Sun, 24 Feb 2008 23:43:22 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <47666E1F.2000902@mizi.com>
-MIME-Version: 1.0
-References: <47666E1F.2000902@mizi.com>
-Subject: Re: [Bluez-devel] forcing SCO connection patch
+Message-Id: <EB2E724A-6D73-4349-B937-7935A8C4BEFB@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1203877746.2754.134.camel@cookie.hadess.net>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Mon, 25 Feb 2008 03:21:44 +0100
+References: <1200566602.26259.89.camel@cookie.hadess.net>
+	<1200663790.2676.3.camel@cookie.hadess.net>
+	<1201871693.2389.326.camel@cookie.hadess.net>
+	<1201882130.2389.334.camel@cookie.hadess.net>
+	<1201882826.2389.337.camel@cookie.hadess.net>
+	<1202300325.3491.21.camel@cookie.hadess.net>
+	<1202303303.3491.30.camel@cookie.hadess.net>
+	<1202345972.3491.42.camel@cookie.hadess.net>
+	<1203730228.2754.105.camel@cookie.hadess.net>
+	<1203877746.2754.134.camel@cookie.hadess.net>
+Subject: Re: [Bluez-devel] [PATCH] Updated sendto
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,24 +29,47 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Louis
+Hi Bastien,
 
->  When I tried to connect SCO channel with
->  HCI_OP_SETUP_SYNC_CONN(LINK_TYPE_ESCO), some bluetooth headsets responds
->  with LINK_TYPE_SCO because it did not support ESCO. But bluez couldn't
->  handle this situation, and patch_hci_event.c is for this.
+>>>
+>>> And one that works with obex-data-server 0.1
+>>
+>> Updated against current CVS, and fix a memleak when getting the  
+>> adapters
+>> list. New main.c file attached as well, for easier review.
+>
+> Updated against current CVS.
 
-Marcel looked at this patch and came back with the comments below. Can
-you revisit it? I think some other people are seeing the same issues.
-The patch won't go upstream until Marcel likes it.
+I've been through the main.c as whole and the actual patch. As you  
+saw, I took the dialogs out of it since that made sense and was a sane  
+way to do it. I mentioned that I want small patches and if they are  
+small and logical, I apply them most of the times immediately. Smaller  
+patches are easier to review. I am not taking a big chunk blindly.
 
-the patch you sent me is fully broken. First of all the coding style
-is wrong. Does nobody have learned this by now? I always look for that
-first before even reading the patch. Second the case where an
-ESCO_LINK returns NULL is broken and will fall over and crash.
+So current patch is not acceptable. It is actually bad. So first  
+action must be to remove all these useless comments. An example is this:
 
--- 
-Brad
++       /* Go into main loop */
+         gtk_main();
+
+Put comments where the code is unclear and not were everybody knows  
+what it is doing. This is a perfect example of wrongly commenting code.
+
+Second of all, I am unhappy with all this usage of gtk_main_quit() in  
+various functions. Can we not just structure the code a lot more  
+cleaner to avoid multiple calls of it. Besides the signal handling, I  
+would expect one extra call in case we automatically wanna close the  
+progress dialog.
+
+After that, I like to see the current sendto patches to look like the  
+obex-send progress bar. It should be not that complicated.
+
+Then we go for sending multiple files after another.
+
+Regards
+
+Marcel
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
