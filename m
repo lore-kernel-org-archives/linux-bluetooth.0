@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1e9e22610802260541n1f106067wf8d3090b7143f3a6@mail.gmail.com>
-Date: Tue, 26 Feb 2008 10:41:08 -0300
-From: "Addo Del Grossi" <addo.delgrossi@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <f21e7dc80802260306u19c9d35cv2b0dc181bb80159f@mail.gmail.com>
+Date: Tue, 26 Feb 2008 13:06:55 +0200
+From: "Choi Sonim" <choisonim@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-Subject: [Bluez-devel] HCI pageto configuration question
+Subject: [Bluez-devel] hciattach set_speed question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,56 +14,29 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0298538678=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0298538678==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_12958_31332178.1204033268907"
-
-------=_Part_12958_31332178.1204033268907
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 Hi,
 
-    It's possible set pageto configuration from individual connection or
-pageto configuration is general from all connection.
+I see that when hciattach.c set a new baud speed on the serial
+port, it executes:
 
-Att,
-Addo
+        cfsetospeed(ti, uart_speed(speed));
+        return tcsetattr(fd, TCSANOW, ti);
 
-------=_Part_12958_31332178.1204033268907
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+my question is why doesn't it have to execute cfsetispeed as well ?
+why only cfsetospeed ?
 
-Hi, <br><br>&nbsp;&nbsp;&nbsp; It&#39;s possible set pageto configuration from individual connection or pageto configuration is general from all connection.<br><br>Att,<br>Addo<br><br>
-
-------=_Part_12958_31332178.1204033268907--
-
-
---===============0298538678==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Thanks a lot
+choi
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============0298538678==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0298538678==--
