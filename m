@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ Hackers <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="=-mOzzerXVPxf+gc7WVXnm"
-Date: Wed, 27 Feb 2008 13:01:06 +0000
-Message-Id: <1204117266.2754.256.camel@cookie.hadess.net>
+From: Alok <develnewbie@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+Content-Type: multipart/mixed; boundary="=-ixNB105gTiavwFyDLKGj"
+Date: Wed, 27 Feb 2008 17:44:11 +0530
+Message-Id: <1204114452.25999.8.camel@greatbear>
 Mime-Version: 1.0
-Cc: twaugh@redhat.com
-Subject: [Bluez-devel] CUPS backend fixes
+Subject: [Bluez-devel] [HFP][Patch] Plugin.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,287 +19,325 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---=-mOzzerXVPxf+gc7WVXnm
+--=-ixNB105gTiavwFyDLKGj
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-Heya,
+Hi Marcel/Johan, 
 
-A few fixes, spotted by Tim Waugh.
+Attaching a patch for the telephony plugin framework. 
+I have added a 'configure' option (--enable-plugin) which compiles all
+the plugins (currently only test plugin). Then the specific plugin can
+be selected through audio.conf.
+Let me know what you think.
 
-- Use CUPS error codes:
-https://bugzilla.redhat.com/show_bug.cgi?id=435082
-- Output STATE information (we still need to do that when we add retry
-support):
-https://bugzilla.redhat.com/show_bug.cgi?id=435083
-- Use DEVICE_URI envvar if available:
-https://bugzilla.redhat.com/show_bug.cgi?id=435080
-- Also add better error reporting from hcrp_print() and spp_print()
+Marcel, can you approve and create the plugin files
+(audio/hfp_plugin_test.c and audio/hfp_plugin.h)? 
 
-There's 2 other bugs that are closely related and need more code
-movement:
-https://bugzilla.redhat.com/show_bug.cgi?id=435084
-https://bugzilla.redhat.com/show_bug.cgi?id=435081
+Thanks, 
+Alok.
 
-Cheers
-
---=-mOzzerXVPxf+gc7WVXnm
-Content-Disposition: attachment; filename=bluez-utils-cups-fixes-1.patch
-Content-Type: text/x-patch; name=bluez-utils-cups-fixes-1.patch;
-	charset=ISO-8859-1
+--=-ixNB105gTiavwFyDLKGj
+Content-Disposition: attachment; filename=patch
+Content-Type: text/x-patch; name=patch; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-Index: hcrp.c
+Index: acinclude.m4
 ===================================================================
-RCS file: /cvsroot/bluez/utils/cups/hcrp.c,v
-retrieving revision 1.7
-diff -u -p -u -p -r1.7 hcrp.c
---- hcrp.c	2 Feb 2008 03:37:26 -0000	1.7
-+++ hcrp.c	27 Feb 2008 12:59:29 -0000
-@@ -233,6 +233,8 @@ int hcrp_print(bdaddr_t *src, bdaddr_t *
- 		return 1;
- 	}
+RCS file: /cvsroot/bluez/utils/acinclude.m4,v
+retrieving revision 1.127
+diff -u -5 -p -r1.127 acinclude.m4
+--- acinclude.m4	22 Feb 2008 08:22:07 -0000	1.127
++++ acinclude.m4	26 Feb 2008 15:19:43 -0000
+@@ -60,14 +60,17 @@ AC_DEFUN([AC_INIT_BLUEZ], [
+ 	else
+ 		storagedir="${localstatedir}/lib/bluetooth"
+ 	fi
  
-+	fputs ("STATE: -connecting-to-device\n", stderr):
+ 	servicedir="${libdir}/bluetooth"
++	
++	plugindir="${libdir}/bluetooth"
+ 
+ 	AC_DEFINE_UNQUOTED(CONFIGDIR, "${configdir}", [Directory for the configuration files])
+ 	AC_DEFINE_UNQUOTED(STORAGEDIR, "${storagedir}", [Directory for the storage files])
+ 	AC_DEFINE_UNQUOTED(SERVICEDIR, "${servicedir}", [Directory for the service programs])
++	AC_DEFINE_UNQUOTED(PLUGINDIR, "${plugindir}", [Directory for the telephony plugins])
+ ])
+ 
+ AC_DEFUN([AC_PATH_BLUEZ], [
+ 	PKG_CHECK_MODULES(BLUEZ, bluez, dummy=yes, AC_MSG_ERROR(Bluetooth library is required))
+ 	AC_SUBST(BLUEZ_CFLAGS)
+@@ -184,10 +187,11 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	alsa_enable=${alsa_found}
+ 	obex_enable=${openobex_found}
+ 	glib_enable=no
+ 	gstreamer_enable=${gstreamer_found}
+ 	audio_enable=yes
++	plugin_enable=no
+ 	input_enable=yes
+ 	serial_enable=yes
+ 	network_enable=yes
+ 	sync_enable=no
+ 	echo_enable=no
+@@ -278,10 +282,14 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 
+ 	AC_ARG_ENABLE(audio, AC_HELP_STRING([--enable-audio], [enable audio service]), [
+ 		audio_enable=${enableval}
+ 	])
+ 
++	AC_ARG_ENABLE(plugin, AC_HELP_STRING([--enable-plugin], [enable telephony plugins]), [
++		plugin_enable=${enableval}
++	])
 +
- 	memset(&opts, 0, sizeof(opts));
- 	size = sizeof(opts);
+ 	AC_ARG_ENABLE(input, AC_HELP_STRING([--enable-input], [enable input service]), [
+ 		input_enable=${enableval}
+ 	])
  
-@@ -300,6 +302,13 @@ int hcrp_print(bdaddr_t *src, bdaddr_t *
- 				break;
+ 	AC_ARG_ENABLE(serial, AC_HELP_STRING([--enable-serial], [enable serial service]), [
+@@ -317,11 +325,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	])
  
- 			len = write(data_sk, buf, count);
-+			if (len < 0) {
-+				perror("ERROR: Error writing to device");
-+				close(data_sk);
-+				close(ctrl_sk);
-+				return 1;
-+			}
-+
- 			if (len != count)
- 				fprintf(stderr, "ERROR: Can't send complete data\n");
+ 	AC_ARG_ENABLE(dund, AC_HELP_STRING([--enable-dund], [install DUN daemon]), [
+ 		dund_enable=${enableval}
+ 	])
+-
+ 	
+ 	AC_ARG_ENABLE(test, AC_HELP_STRING([--enable-test], [install test programs]), [
+ 		test_enable=${enableval}
+ 	])
  
-Index: main.c
+@@ -413,10 +420,11 @@ AC_DEFUN([AC_ARG_BLUEZ], [
+ 	AM_CONDITIONAL(SBC, test "${alsa_enable}" = "yes" || test "${gstreamer_enable}" = "yes")
+ 	AM_CONDITIONAL(ALSA, test "${alsa_enable}" = "yes" && test "${alsa_found}" = "yes")
+ 	AM_CONDITIONAL(OBEX, test "${obex_enable}" = "yes" && test "${openobex_found}" = "yes")
+ 	AM_CONDITIONAL(GSTREAMER, test "${gstreamer_enable}" = "yes" && test "${gstreamer_found}" = "yes")
+ 	AM_CONDITIONAL(AUDIOSERVICE, test "${audio_enable}" = "yes")
++	AM_CONDITIONAL(PLUGIN, test "${plugin_enable}" = "yes")
+ 	AM_CONDITIONAL(INPUTSERVICE, test "${input_enable}" = "yes")
+ 	AM_CONDITIONAL(SERIALSERVICE, test "${serial_enable}" = "yes")
+ 	AM_CONDITIONAL(NETWORKSERVICE, test "${network_enable}" = "yes")
+ 	AM_CONDITIONAL(SYNCSERVICE, test "${sync_enable}" = "yes" && test "${opensync_found}" = "yes")
+ 	AM_CONDITIONAL(ECHOSERVICE, test "${echo_enable}" = "yes")
+Index: audio/Makefile.am
 ===================================================================
-RCS file: /cvsroot/bluez/utils/cups/main.c,v
-retrieving revision 1.8
-diff -u -p -u -p -r1.8 main.c
---- main.c	2 Feb 2008 03:37:26 -0000	1.8
-+++ main.c	27 Feb 2008 12:59:29 -0000
-@@ -43,6 +43,17 @@
- #include "dbus.h"
- #include "sdp-xml.h"
+RCS file: /cvsroot/bluez/utils/audio/Makefile.am,v
+retrieving revision 1.46
+diff -u -5 -p -r1.46 Makefile.am
+--- audio/Makefile.am	23 Jan 2008 15:18:15 -0000	1.46
++++ audio/Makefile.am	26 Feb 2008 15:19:43 -0000
+@@ -14,11 +14,22 @@ bluetoothd_service_audio_SOURCES = main.
+ 	manager.h manager.c headset.h headset.c ipc.h ipc.c unix.h unix.c \
+ 	device.h device.c gateway.h gateway.c \
+ 	sink.c sink.h avdtp.c avdtp.h a2dp.c a2dp.h control.c control.h
  
-+/* From cups/backend.h */
-+typedef enum cups_backend_e		/**** Backend exit codes ****/
-+{
-+  CUPS_BACKEND_OK = 0,			/* Job completed successfully */
-+  CUPS_BACKEND_FAILED = 1,		/* Job failed, use error-policy */
-+  CUPS_BACKEND_AUTH_REQUIRED = 2,	/* Job failed, authentication required */
-+  CUPS_BACKEND_HOLD = 3,		/* Job failed, hold job */
-+  CUPS_BACKEND_STOP = 4,		/* Job failed, stop queue */
-+  CUPS_BACKEND_CANCEL = 5		/* Job failed, cancel job */
-+} cups_backend_t;
+ bluetoothd_service_audio_LDADD = $(top_builddir)/common/libhelper.a \
+-				@GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@
++				@GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@ @GMODULE_LIBS@
 +
- extern int sdp_search_spp(sdp_session_t *sdp, uint8_t *channel);
- extern int sdp_search_hcrp(sdp_session_t *sdp, unsigned short *ctrl_psm, unsigned short *data_psm);
- 
-@@ -439,7 +450,7 @@ static DBusHandlerResult filter_func(DBu
- 	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- }
- 
--static void list_printers(void)
-+static gboolean list_printers(void)
- {
- 	/* 1. Connect to the bus
- 	 * 2. Get the manager
-@@ -457,15 +468,15 @@ static void list_printers(void)
- 
- 	conn = init_dbus(NULL, NULL, NULL);
- 	if (conn == NULL)
--		return;
-+		return FALSE;
- 
- 	dbus_error_init(&error);
- 	hcid_exists = dbus_bus_name_has_owner(conn, "org.bluez", &error);
- 	if (&error != NULL && dbus_error_is_set(&error))
--		return;
-+		return FALSE;
- 
- 	if (!hcid_exists)
--		return;
-+		return FALSE;
- 
- 	/* Get the default adapter */
- 	message = dbus_message_new_method_call("org.bluez", "/org/bluez",
-@@ -473,7 +484,7 @@ static void list_printers(void)
- 						"DefaultAdapter");
- 	if (message == NULL) {
- 		dbus_connection_unref(conn);
--		return;
-+		return FALSE;
- 	}
- 
- 	reply = dbus_connection_send_with_reply_and_block(conn,
-@@ -483,14 +494,14 @@ static void list_printers(void)
- 
- 	if (&error != NULL && dbus_error_is_set(&error)) {
- 		dbus_connection_unref(conn);
--		return;
-+		return FALSE;
- 	}
- 
- 	dbus_message_iter_init(reply, &reply_iter);
- 	if (dbus_message_iter_get_arg_type(&reply_iter) != DBUS_TYPE_STRING) {
- 		dbus_message_unref(reply);
- 		dbus_connection_unref(conn);
--		return;
-+		return FALSE;
- 	}
- 
- 	dbus_message_iter_get_basic(&reply_iter, &adapter);
-@@ -500,7 +511,7 @@ static void list_printers(void)
- 	if (!dbus_connection_add_filter(conn, filter_func, adapter, g_free)) {
- 		g_free(adapter);
- 		dbus_connection_unref(conn);
--		return;
-+		return FALSE;
- 	}
- 
- #define MATCH_FORMAT				\
-@@ -527,7 +538,7 @@ static void list_printers(void)
- 		dbus_message_unref(message);
- 		dbus_connection_unref(conn);
- 		g_free(adapter);
--		return;
-+		return FALSE;
- 	}
- 	dbus_message_unref(message);
- 
-@@ -538,6 +549,8 @@ static void list_printers(void)
- 	g_main_loop_run(loop);
- 
- 	dbus_connection_unref(conn);
++if PLUGIN
++plugindir = $(libdir)/bluetooth
 +
-+	return TRUE;
- }
- 
- /*
-@@ -552,6 +565,7 @@ int main(int argc, char *argv[])
- 	unsigned short ctrl_psm, data_psm;
- 	uint8_t channel, b[6];
- 	char *ptr, str[3], device[18], service[12];
-+	const char *uri;
- 	int i, err, fd, copies, proto;
- 
- 	/* Make sure status messages are not buffered */
-@@ -569,13 +583,15 @@ int main(int argc, char *argv[])
- #endif /* HAVE_SIGSET */
- 
- 	if (argc == 1) {
--		list_printers();
--		return 0;
-+		if (list_printers())
-+			return CUPS_BACKEND_OK;
-+		else
-+			return CUPS_BACKEND_FAILED;
- 	}
- 
- 	if (argc < 6 || argc > 7) {
- 		fprintf(stderr, "Usage: bluetooth job-id user title copies options [file]\n");
--		return 1;
-+		return CUPS_BACKEND_FAILED;
- 	}
- 
- 	if (argc == 6) {
-@@ -584,14 +600,18 @@ int main(int argc, char *argv[])
- 	} else {
- 		if ((fd = open(argv[6], O_RDONLY)) < 0) {
- 			perror("ERROR: Unable to open print file");
--			return 1;
-+			return CUPS_BACKEND_FAILED;
- 		}
- 		copies = atoi(argv[4]);
- 	}
- 
--	if (strncasecmp(argv[0], "bluetooth://", 12)) {
-+	uri = g_getenv("DEVICE_URI");
-+	if (!uri)
-+		uri = argv[0];
++plugin_LTLIBRARIES = hfp_plugin_test.la
 +
-+	if (strncasecmp(uri, "bluetooth://", 12)) {
- 		fprintf(stderr, "ERROR: No device URI found\n");
--		return 1;
-+		return CUPS_BACKEND_FAILED;
- 	}
++hfp_plugin_test_la_SOURCES = hfp_plugin_test.c hfp_plugin.h
++hfp_plugin_test_la_LDFLAGS = -module
++hfp_plugin_test_la_LIBADD = @GLIB_LIBS@
++hfp_plugin_test_la_CFLAGS = @GLIB_CFLAGS@
++endif
  
- 	ptr = argv[0] + 12;
-@@ -623,10 +643,12 @@ int main(int argc, char *argv[])
- 	fprintf(stderr, "DEBUG: %s device %s service %s fd %d copies %d\n",
- 			argv[0], device, service, fd, copies);
+ if ALSA
+ alsadir = $(libdir)/alsa-lib
  
-+	fputs ("STATE: +connecting-to-device\n", stderr);
-+
- 	sdp = sdp_connect(BDADDR_ANY, &bdaddr, SDP_RETRY_IF_BUSY);
- 	if (!sdp) {
- 		fprintf(stderr, "ERROR: Can't open Bluetooth connection\n");
--		return 1;
-+		return CUPS_BACKEND_FAILED;
- 	}
+ alsa_LTLIBRARIES = libasound_module_pcm_bluetooth.la libasound_module_ctl_bluetooth.la
+@@ -52,13 +63,12 @@ libgstbluetooth_la_LDFLAGS = -module -av
+ libgstbluetooth_la_LIBADD = @SBC_LIBS@ @GSTREAMER_LIBS@ -lgstaudio-0.10 -lgstrtp-0.10
+ libgstbluetooth_la_CFLAGS = @GSTREAMER_CFLAGS@ @SBC_CFLAGS@
+ endif
+ endif
  
- 	switch (proto) {
-@@ -650,7 +672,7 @@ int main(int argc, char *argv[])
+-AM_CFLAGS = @BLUEZ_CFLAGS@ @DBUS_CFLAGS@ @GLIB_CFLAGS@
++AM_CFLAGS = @BLUEZ_CFLAGS@ @DBUS_CFLAGS@ @GLIB_CFLAGS@ @GMODULE_CFLAGS@
  
- 	if (err) {
- 		fprintf(stderr, "ERROR: Can't get service information\n");
--		return 1;
-+		return CUPS_BACKEND_FAILED;
- 	}
+ INCLUDES = -I$(top_srcdir)/common
  
- 	switch (proto) {
-@@ -661,7 +683,7 @@ int main(int argc, char *argv[])
- 		err = hcrp_print(BDADDR_ANY, &bdaddr, ctrl_psm, data_psm, fd, copies);
- 		break;
- 	default:
--		err = 1;
-+		err = CUPS_BACKEND_FAILED;
- 		fprintf(stderr, "ERROR: Unsupported protocol\n");
- 		break;
- 	}
-Index: spp.c
+ EXTRA_DIST = audio.service audio.conf audio-api.txt test-audio asound.conf
+ 
+ MAINTAINERCLEANFILES = Makefile.in
+-
+Index: audio/audio.conf
 ===================================================================
-RCS file: /cvsroot/bluez/utils/cups/spp.c,v
+RCS file: /cvsroot/bluez/utils/audio/audio.conf,v
 retrieving revision 1.5
-diff -u -p -u -p -r1.5 spp.c
---- spp.c	2 Feb 2008 03:37:26 -0000	1.5
-+++ spp.c	27 Feb 2008 12:59:29 -0000
-@@ -65,6 +65,8 @@ int spp_print(bdaddr_t *src, bdaddr_t *d
- 		return 1;
- 	}
+diff -u -5 -p -r1.5 audio.conf
+--- audio/audio.conf	23 Jan 2008 13:27:30 -0000	1.5
++++ audio/audio.conf	26 Feb 2008 15:19:43 -0000
+@@ -30,9 +30,14 @@ VoiceTags=false
+ RejectingCalls=false
+ EnhancedCallStatus=false
+ EnhancedCallControl=false
+ ExtendedErrorResultCodes=false
  
-+	fputs ("STATE: -connecting-to-device\n", stderr):
++#HFP telephony plugin options
++Plugin=test
++#Values can be test, openmoko or telepathy based on 
++#the telephony system. 
 +
- 	/* Ignore SIGTERM signals if printing from stdin */
- 	if (fd == 0) {
- #ifdef HAVE_SIGSET
-@@ -86,9 +88,14 @@ int spp_print(bdaddr_t *src, bdaddr_t *d
- 			lseek(fd, 0, SEEK_SET);
- 		}
+ # Just an example of potential config options for the other interfaces
+ #[A2DP]
+ #SBCSources=1
+ #MPEG12Sources=0
+Index: audio/device.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/audio/device.c,v
+retrieving revision 1.26
+diff -u -5 -p -r1.26 device.c
+--- audio/device.c	2 Feb 2008 03:37:05 -0000	1.26
++++ audio/device.c	26 Feb 2008 15:19:43 -0000
+@@ -31,10 +31,11 @@
+ #include <unistd.h>
+ #include <sys/stat.h>
+ #include <netinet/in.h>
  
--		while ((len = read(fd, buf, sizeof(buf))) > 0) {
-+		while ((len = read(fd, buf, sizeof(buf))) > 0 && err >= 0) {
- 			err = write(sk, buf, len);
- 		}
-+		if (err < 0) {
-+			perror("ERROR: Error writing to device");
-+			close (sk);
-+			return 1;
-+		}
+ #include <glib.h>
++#include <gmodule.h>
+ #include <dbus/dbus.h>
  
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
+ #include <bluetooth/hci_lib.h>
+Index: audio/manager.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/audio/manager.c,v
+retrieving revision 1.90
+diff -u -5 -p -r1.90 manager.c
+--- audio/manager.c	19 Feb 2008 08:20:22 -0000	1.90
++++ audio/manager.c	26 Feb 2008 15:19:43 -0000
+@@ -35,10 +35,12 @@
+ #include <sys/stat.h>
+ #include <dirent.h>
+ #include <ctype.h>
+ #include <signal.h>
+ 
++#include <gmodule.h>
++
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
+ #include <bluetooth/hci_lib.h>
+ #include <bluetooth/rfcomm.h>
+ #include <bluetooth/sdp.h>
+@@ -105,10 +107,12 @@ static uint32_t hs_record_id = 0;
+ static uint32_t hf_record_id = 0;
+ 
+ static GIOChannel *hs_server = NULL;
+ static GIOChannel *hf_server = NULL;
+ 
++static GModule *hfp_plugin = NULL;
++
+ static struct enabled_interfaces enabled = {
+ 	.headset	= TRUE,
+ 	.gateway	= FALSE,
+ 	.sink		= TRUE,
+ 	.source		= FALSE,
+@@ -1534,10 +1538,39 @@ static GIOChannel *server_socket(uint8_t
  	}
  
+ 	return io;
+ }
+ 
++int load_hfp_plugin(GKeyFile *config)
++{
++	gchar *str = NULL;
++	GError *err = NULL;
++	char filename[PATH_MAX];
++
++        str = g_key_file_get_string(config, "Headset", "Plugin", &err);
++
++	if (err) {
++		debug("audio.conf: %s", err->message);
++		g_error_free(err);
++		err = NULL;
++		return -1;
++	}
++
++	snprintf(filename, sizeof(filename) - 1, "%s/hfp_plugin_%s.so", PLUGINDIR, str);
++	g_free(str);
++
++	debug("Plugin is %s", filename);
++	hfp_plugin = g_module_open(filename, G_MODULE_BIND_LAZY);
++
++	if (!hfp_plugin) {
++		debug("Error loading HFP plugin:%s", g_module_error ());
++		return -1;
++	}
++
++	return 0;
++}
++
+ static int headset_server_init(DBusConnection *conn, GKeyFile *config)
+ {
+ 	uint8_t chan = DEFAULT_HS_AG_CHANNEL;
+ 	sdp_buf_t buf;
+ 	gboolean no_hfp = FALSE;
+@@ -1582,15 +1615,22 @@ static int headset_server_init(DBusConne
+ 		return 0;
+ 
+ 	chan = DEFAULT_HF_AG_CHANNEL;
+ 
+ 	hf_server = server_socket(&chan);
++
+ 	if (!hf_server)
+ 		return -1;
+ 
++	if (load_hfp_plugin(config) < 0)
++		return -1;
++
+ 	features = headset_config_init(config);
+ 
++	if (features < 0)
++		return -1;
++
+ 	if (hfp_ag_record(&buf, chan, features) < 0) {
+ 		error("Unable to allocate new service record");
+ 		return -1;
+ 	}
+ 
+@@ -1721,10 +1761,15 @@ failed:
+ 
+ void audio_exit(void)
+ {
+ 	server_exit();
+ 
++	if (hfp_plugin) {
++		if (!g_module_close(hfp_plugin))
++			debug("Error Unloading plugin:%s", g_module_error ());
++	}
++
+ 	dbus_connection_destroy_object_path(connection, AUDIO_MANAGER_PATH);
+ 
+ 	dbus_connection_unref(connection);
+ 
+ 	connection = NULL;
+Index: audio/unix.c
+===================================================================
+RCS file: /cvsroot/bluez/utils/audio/unix.c,v
+retrieving revision 1.64
+diff -u -5 -p -r1.64 unix.c
+--- audio/unix.c	8 Feb 2008 17:43:48 -0000	1.64
++++ audio/unix.c	26 Feb 2008 15:19:44 -0000
+@@ -36,10 +36,11 @@
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/sdp.h>
+ #include <dbus/dbus.h>
+ #include <glib.h>
++#include <gmodule.h>
+ 
+ #include "logging.h"
+ #include "dbus.h"
+ #include "ipc.h"
+ #include "device.h"
 
---=-mOzzerXVPxf+gc7WVXnm
+--=-ixNB105gTiavwFyDLKGj
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -310,7 +347,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---=-mOzzerXVPxf+gc7WVXnm
+--=-ixNB105gTiavwFyDLKGj
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -321,4 +358,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-mOzzerXVPxf+gc7WVXnm--
+--=-ixNB105gTiavwFyDLKGj--
