@@ -1,9 +1,8 @@
 Return-Path: <cyrus@holtmann.org>
 Subject: Re: [Bluez-devel] forcing SCO connection patch
 From: Guillaume Bedot <littletux@zarb.org>
-To: Louis JANG <louis@mizi.com>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <47C62147.90007@mizi.com>
+To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <47C555E5.2000903@mizi.com>
 References: <47666E1F.2000902@mizi.com>
 	 <a8e1da0802242330l765b8b1ava62b857baf8a5568@mail.gmail.com>
 	 <47C28A33.4070102@mizi.com>
@@ -15,38 +14,34 @@ References: <47666E1F.2000902@mizi.com>
 	 <47C4C3D4.8010902@mizi.com>
 	 <2A7EF87C-1340-45D7-B457-F81799674B1E@holtmann.org>
 	 <47C555E5.2000903@mizi.com>
-	 <5D9353FF-6A69-4039-9033-C0EBD1CDA756@holtmann.org>
-	 <47C62147.90007@mizi.com>
-Content-Type: text/plain
-Date: Thu, 28 Feb 2008 11:57:04 +0100
-Message-Id: <1204196224.9466.15.camel@littletux>
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 27 Feb 2008 14:04:42 +0100
+Message-Id: <1204117482.6889.37.camel@localhost>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On jeu, 2008-02-28 at 11:49 +0900, Louis JANG wrote:
-> Hi Marcel,
-> 
-> I changed what you said below and attached patch again.
-> 
-> And did you check Guillaume's patch for this issue? his patch try to
-> find again when ev->link_type is SCO_LINK only. I think his way is
-> better than mine. I haven't saw other case (LM is not support esco but
-> ESCO_LINK is connected) and I think it shouldn't happen in a normal
-> situation.
+Re,
 
-Perhaps my patch fixes half of the issue, as it does not get a handle on
-the other case, and I just miss the point.
+Le mercredi 27 février 2008 à 21:21 +0900, Louis JANG a écrit :
+>  	conn = hci_conn_hash_lookup_ba(hdev, ev->link_type, &ev->bdaddr);
+> -	if (!conn)
+> -		goto unlock;
+> +	if (!conn) {
+> +		__u8 link_type = (ev->link_type == ESCO_LINK) ? SCO_LINK : ESCO_LINK;
+> +
+> +		conn = hci_conn_hash_lookup_ba(hdev, link_type, &ev->bdaddr);
+> +		if (!conn)
+> +			goto unlock;
 
-The cases represented in the "Messages Sequences Chart" are said to be
-"examples", and they cover all the possible cases.
-Maybe I just lack imagination.
+Does your patch handle re-negotiation of the SCO link back to an eSCO
+one ? Great.
 
-If I have no example, it doesn't matter : if it happens, the same issue
-will occur if the two link types aren't tried.
+And the style in your patch is better according to Marcel rules.
+
+I vote for yours.
 
 Best regards,
 
 Guillaume B.
-
 
