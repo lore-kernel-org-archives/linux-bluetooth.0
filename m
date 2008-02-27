@@ -1,11 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alok <develnewbie@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-Content-Type: multipart/mixed; boundary="=-ixNB105gTiavwFyDLKGj"
-Date: Wed, 27 Feb 2008 17:44:11 +0530
-Message-Id: <1204114452.25999.8.camel@greatbear>
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1E808724-F721-415C-90F9-09C1B6E52C55@holtmann.org>
+References: <1200566602.26259.89.camel@cookie.hadess.net>
+	<1200663790.2676.3.camel@cookie.hadess.net>
+	<1201871693.2389.326.camel@cookie.hadess.net>
+	<1201882130.2389.334.camel@cookie.hadess.net>
+	<1201882826.2389.337.camel@cookie.hadess.net>
+	<1202300325.3491.21.camel@cookie.hadess.net>
+	<1202303303.3491.30.camel@cookie.hadess.net>
+	<1202345972.3491.42.camel@cookie.hadess.net>
+	<1203730228.2754.105.camel@cookie.hadess.net>
+	<1203877746.2754.134.camel@cookie.hadess.net>
+	<EB2E724A-6D73-4349-B937-7935A8C4BEFB@holtmann.org>
+	<1203936997.2754.198.camel@cookie.hadess.net>
+	<1203971803.28528.91.camel@californication>
+	<1203988722.2754.220.camel@cookie.hadess.net>
+	<1E808724-F721-415C-90F9-09C1B6E52C55@holtmann.org>
+Content-Type: multipart/mixed; boundary="=-QgLXvfDhfAtUWQBY7bNv"
+Date: Wed, 27 Feb 2008 01:28:02 +0000
+Message-Id: <1204075682.2754.245.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel] [HFP][Patch] Plugin.
+Subject: Re: [Bluez-devel] [PATCH] Updated sendto
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,325 +35,1000 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---=-ixNB105gTiavwFyDLKGj
+--=-QgLXvfDhfAtUWQBY7bNv
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-Hi Marcel/Johan, 
 
-Attaching a patch for the telephony plugin framework. 
-I have added a 'configure' option (--enable-plugin) which compiles all
-the plugins (currently only test plugin). Then the specific plugin can
-be selected through audio.conf.
-Let me know what you think.
+On Tue, 2008-02-26 at 02:21 +0100, Marcel Holtmann wrote:
+<snip>
+> lets use gtk_main_quit() since the exit code doesn't really matter and  
+> show me an updated patch. I am still working through the whole thing.  
+> We need some simplifications here and there, because the code looks  
+> too complicated to me.
 
-Marcel, can you approve and create the plugin files
-(audio/hfp_plugin_test.c and audio/hfp_plugin.h)? 
+There's some bits of the code that aren't as easy to read as they could,
+but it's hard to take a step back when you've used to the code.
 
-Thanks, 
-Alok.
+Let me know which parts you don't like and we can rework them.
 
---=-ixNB105gTiavwFyDLKGj
-Content-Disposition: attachment; filename=patch
-Content-Type: text/x-patch; name=patch; charset=us-ascii
+Cheers
+
+--=-QgLXvfDhfAtUWQBY7bNv
+Content-Disposition: attachment; filename=bluez-gnome-new-sendto-10.patch
+Content-Type: text/x-patch; name=bluez-gnome-new-sendto-10.patch;
+	charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 
-Index: acinclude.m4
+Index: sendto/dialog.h
 ===================================================================
-RCS file: /cvsroot/bluez/utils/acinclude.m4,v
-retrieving revision 1.127
-diff -u -5 -p -r1.127 acinclude.m4
---- acinclude.m4	22 Feb 2008 08:22:07 -0000	1.127
-+++ acinclude.m4	26 Feb 2008 15:19:43 -0000
-@@ -60,14 +60,17 @@ AC_DEFUN([AC_INIT_BLUEZ], [
- 	else
- 		storagedir="${localstatedir}/lib/bluetooth"
- 	fi
+RCS file: /cvsroot/bluez/gnome/sendto/dialog.h,v
+retrieving revision 1.1
+diff -u -p -r1.1 dialog.h
+--- sendto/dialog.h	23 Feb 2008 06:20:17 -0000	1.1
++++ sendto/dialog.h	27 Feb 2008 01:25:10 -0000
+@@ -21,5 +21,7 @@
+  *
+  */
  
- 	servicedir="${libdir}/bluetooth"
-+	
-+	plugindir="${libdir}/bluetooth"
- 
- 	AC_DEFINE_UNQUOTED(CONFIGDIR, "${configdir}", [Directory for the configuration files])
- 	AC_DEFINE_UNQUOTED(STORAGEDIR, "${storagedir}", [Directory for the storage files])
- 	AC_DEFINE_UNQUOTED(SERVICEDIR, "${servicedir}", [Directory for the service programs])
-+	AC_DEFINE_UNQUOTED(PLUGINDIR, "${plugindir}", [Directory for the telephony plugins])
- ])
- 
- AC_DEFUN([AC_PATH_BLUEZ], [
- 	PKG_CHECK_MODULES(BLUEZ, bluez, dummy=yes, AC_MSG_ERROR(Bluetooth library is required))
- 	AC_SUBST(BLUEZ_CFLAGS)
-@@ -184,10 +187,11 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 	alsa_enable=${alsa_found}
- 	obex_enable=${openobex_found}
- 	glib_enable=no
- 	gstreamer_enable=${gstreamer_found}
- 	audio_enable=yes
-+	plugin_enable=no
- 	input_enable=yes
- 	serial_enable=yes
- 	network_enable=yes
- 	sync_enable=no
- 	echo_enable=no
-@@ -278,10 +282,14 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 
- 	AC_ARG_ENABLE(audio, AC_HELP_STRING([--enable-audio], [enable audio service]), [
- 		audio_enable=${enableval}
- 	])
- 
-+	AC_ARG_ENABLE(plugin, AC_HELP_STRING([--enable-plugin], [enable telephony plugins]), [
-+		plugin_enable=${enableval}
-+	])
++#include <glib.h>
 +
- 	AC_ARG_ENABLE(input, AC_HELP_STRING([--enable-input], [enable input service]), [
- 		input_enable=${enableval}
- 	])
+ gchar *show_browse_dialog(void);
+ GSList *show_select_dialog(void);
+Index: sendto/main.c
+===================================================================
+RCS file: /cvsroot/bluez/gnome/sendto/main.c,v
+retrieving revision 1.24
+diff -u -p -r1.24 main.c
+--- sendto/main.c	23 Feb 2008 06:20:17 -0000	1.24
++++ sendto/main.c	27 Feb 2008 01:25:10 -0000
+@@ -3,6 +3,8 @@
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
+  *  Copyright (C) 2005-2008  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2006-2007 Tadas Dailyda <tadas@dailyda.com>
++ *  Copyright (C) 2007 Bastien Nocera <hadess@hadess.net>
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+@@ -25,199 +27,618 @@
+ #include <config.h>
+ #endif
  
- 	AC_ARG_ENABLE(serial, AC_HELP_STRING([--enable-serial], [enable serial service]), [
-@@ -317,11 +325,10 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 	])
+-#include <dbus/dbus-glib.h>
  
- 	AC_ARG_ENABLE(dund, AC_HELP_STRING([--enable-dund], [install DUN daemon]), [
- 		dund_enable=${enableval}
- 	])
+ #include <glib/gi18n.h>
++#include <gtk/gtk.h>
+ 
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/time.h>
++#include <sys/types.h>
++
++#include <dbus/dbus-glib.h>
++#include <glib.h>
++#include <glib/gi18n.h>
++#include <glib/gstdio.h>
+ #include <gtk/gtk.h>
+ 
++#include "dbus-glue.h"
+ #include "marshal.h"
 -
- 	
- 	AC_ARG_ENABLE(test, AC_HELP_STRING([--enable-test], [install test programs]), [
- 		test_enable=${enableval}
- 	])
+ #include "dialog.h"
  
-@@ -413,10 +420,11 @@ AC_DEFUN([AC_ARG_BLUEZ], [
- 	AM_CONDITIONAL(SBC, test "${alsa_enable}" = "yes" || test "${gstreamer_enable}" = "yes")
- 	AM_CONDITIONAL(ALSA, test "${alsa_enable}" = "yes" && test "${alsa_found}" = "yes")
- 	AM_CONDITIONAL(OBEX, test "${obex_enable}" = "yes" && test "${openobex_found}" = "yes")
- 	AM_CONDITIONAL(GSTREAMER, test "${gstreamer_enable}" = "yes" && test "${gstreamer_found}" = "yes")
- 	AM_CONDITIONAL(AUDIOSERVICE, test "${audio_enable}" = "yes")
-+	AM_CONDITIONAL(PLUGIN, test "${plugin_enable}" = "yes")
- 	AM_CONDITIONAL(INPUTSERVICE, test "${input_enable}" = "yes")
- 	AM_CONDITIONAL(SERIALSERVICE, test "${serial_enable}" = "yes")
- 	AM_CONDITIONAL(NETWORKSERVICE, test "${network_enable}" = "yes")
- 	AM_CONDITIONAL(SYNCSERVICE, test "${sync_enable}" = "yes" && test "${opensync_found}" = "yes")
- 	AM_CONDITIONAL(ECHOSERVICE, test "${echo_enable}" = "yes")
-Index: audio/Makefile.am
-===================================================================
-RCS file: /cvsroot/bluez/utils/audio/Makefile.am,v
-retrieving revision 1.46
-diff -u -5 -p -r1.46 Makefile.am
---- audio/Makefile.am	23 Jan 2008 15:18:15 -0000	1.46
-+++ audio/Makefile.am	26 Feb 2008 15:19:43 -0000
-@@ -14,11 +14,22 @@ bluetoothd_service_audio_SOURCES = main.
- 	manager.h manager.c headset.h headset.c ipc.h ipc.c unix.h unix.c \
- 	device.h device.c gateway.h gateway.c \
- 	sink.c sink.h avdtp.c avdtp.h a2dp.c a2dp.h control.c control.h
+-static DBusGConnection *conn = NULL;
++#define MSEC_PER_SEC 1000000
  
- bluetoothd_service_audio_LDADD = $(top_builddir)/common/libhelper.a \
--				@GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@
-+				@GLIB_LIBS@ @DBUS_LIBS@ @BLUEZ_LIBS@ @GMODULE_LIBS@
-+
-+if PLUGIN
-+plugindir = $(libdir)/bluetooth
-+
-+plugin_LTLIBRARIES = hfp_plugin_test.la
-+
-+hfp_plugin_test_la_SOURCES = hfp_plugin_test.c hfp_plugin.h
-+hfp_plugin_test_la_LDFLAGS = -module
-+hfp_plugin_test_la_LIBADD = @GLIB_LIBS@
-+hfp_plugin_test_la_CFLAGS = @GLIB_CFLAGS@
-+endif
- 
- if ALSA
- alsadir = $(libdir)/alsa-lib
- 
- alsa_LTLIBRARIES = libasound_module_pcm_bluetooth.la libasound_module_ctl_bluetooth.la
-@@ -52,13 +63,12 @@ libgstbluetooth_la_LDFLAGS = -module -av
- libgstbluetooth_la_LIBADD = @SBC_LIBS@ @GSTREAMER_LIBS@ -lgstaudio-0.10 -lgstrtp-0.10
- libgstbluetooth_la_CFLAGS = @GSTREAMER_CFLAGS@ @SBC_CFLAGS@
- endif
- endif
- 
--AM_CFLAGS = @BLUEZ_CFLAGS@ @DBUS_CFLAGS@ @GLIB_CFLAGS@
-+AM_CFLAGS = @BLUEZ_CFLAGS@ @DBUS_CFLAGS@ @GLIB_CFLAGS@ @GMODULE_CFLAGS@
- 
- INCLUDES = -I$(top_srcdir)/common
- 
- EXTRA_DIST = audio.service audio.conf audio-api.txt test-audio asound.conf
- 
- MAINTAINERCLEANFILES = Makefile.in
+-static GtkWidget *dialog;
+-static GtkWidget *label_filename;
+-static GtkWidget *label_status;
+-static GtkWidget *progress;
 -
-Index: audio/audio.conf
-===================================================================
-RCS file: /cvsroot/bluez/utils/audio/audio.conf,v
-retrieving revision 1.5
-diff -u -5 -p -r1.5 audio.conf
---- audio/audio.conf	23 Jan 2008 13:27:30 -0000	1.5
-+++ audio/audio.conf	26 Feb 2008 15:19:43 -0000
-@@ -30,9 +30,14 @@ VoiceTags=false
- RejectingCalls=false
- EnhancedCallStatus=false
- EnhancedCallControl=false
- ExtendedErrorResultCodes=false
- 
-+#HFP telephony plugin options
-+Plugin=test
-+#Values can be test, openmoko or telepathy based on 
-+#the telephony system. 
+-static guint64 filesize = 0;
++/* DBus */
++static DBusGConnection *connection = NULL;
++static DBusGProxy *manager_proxy = NULL;
++static DBusGProxy *session_proxy = NULL;
++/* GTK */
++static GtkWidget *main_dialog, *from_label, *operation_label, *progress_bar;
++/* sending related */
++static gsize file_length = 0;
++static guint file_count = 0;
++static guint current_file = 0;
++static GSList *file_list = NULL;
++static guint byte_count = 0;
++static guint bytes_sent = 0;
++static gint64 first_transfer_time = 0;
++static gint64 last_update_time = 0;
 +
- # Just an example of potential config options for the other interfaces
- #[A2DP]
- #SBCSources=1
- #MPEG12Sources=0
-Index: audio/device.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/audio/device.c,v
-retrieving revision 1.26
-diff -u -5 -p -r1.26 device.c
---- audio/device.c	2 Feb 2008 03:37:05 -0000	1.26
-+++ audio/device.c	26 Feb 2008 15:19:43 -0000
-@@ -31,10 +31,11 @@
- #include <unistd.h>
- #include <sys/stat.h>
- #include <netinet/in.h>
- 
- #include <glib.h>
-+#include <gmodule.h>
- #include <dbus/dbus.h>
- 
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/hci.h>
- #include <bluetooth/hci_lib.h>
-Index: audio/manager.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/audio/manager.c,v
-retrieving revision 1.90
-diff -u -5 -p -r1.90 manager.c
---- audio/manager.c	19 Feb 2008 08:20:22 -0000	1.90
-+++ audio/manager.c	26 Feb 2008 15:19:43 -0000
-@@ -35,10 +35,12 @@
- #include <sys/stat.h>
- #include <dirent.h>
- #include <ctype.h>
- #include <signal.h>
- 
-+#include <gmodule.h>
++typedef enum {
++	BUTTONS_OK,
++	BUTTONS_RETRY_CANCEL,
++	BUTTONS_RETRY_SKIP_CANCEL
++} ButtonSet;
 +
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/hci.h>
- #include <bluetooth/hci_lib.h>
- #include <bluetooth/rfcomm.h>
- #include <bluetooth/sdp.h>
-@@ -105,10 +107,12 @@ static uint32_t hs_record_id = 0;
- static uint32_t hf_record_id = 0;
- 
- static GIOChannel *hs_server = NULL;
- static GIOChannel *hf_server = NULL;
- 
-+static GModule *hfp_plugin = NULL;
++/* Command line options */
++static gchar **files_to_send = NULL;
++static gchar *bdaddrstr = NULL;
++static gchar *device_name = NULL;
 +
- static struct enabled_interfaces enabled = {
- 	.headset	= TRUE,
- 	.gateway	= FALSE,
- 	.sink		= TRUE,
- 	.source		= FALSE,
-@@ -1534,10 +1538,39 @@ static GIOChannel *server_socket(uint8_t
- 	}
++#define DIALOG_RESPONSE_SKIP 1
++#define DIALOG_RESPONSE_RETRY 2
++
++static void error_occurred_cb(DBusGProxy *proxy, const gchar *error_name,
++			      const gchar *error_message, gpointer user_data);
++
++static const GOptionEntry options[] = {
++	{"dest", 'd', 0, G_OPTION_ARG_STRING, &bdaddrstr, 
++		"Bluetooth address of destination device", "BDADDR"},
++	{G_OPTION_REMAINING, '\0', 0, G_OPTION_ARG_FILENAME_ARRAY, &files_to_send},
++	{NULL}
++};
  
- 	return io;
+-static void response_callback(GtkWidget *dialog,
+-					gint response, gpointer user_data)
++static gint64 get_system_time(void)
+ {
+-	gtk_widget_destroy(dialog);
++	struct timeval tmp;
+ 
+-	gtk_main_quit();
++	gettimeofday(&tmp, NULL);
++	return (gint64)tmp.tv_usec + (gint64)tmp.tv_sec * G_GINT64_CONSTANT(1000000);
  }
  
-+int load_hfp_plugin(GKeyFile *config)
+-static void create_window(const gchar *filename)
++static gboolean is_palm_device(const gchar *bdaddr)
+ {
+-	GtkWidget *vbox;
+-	GtkWidget *label;
+-	gchar *text;
++	return (g_str_has_prefix(bdaddr, "00:04:6B")
++		|| g_str_has_prefix(bdaddr, "00:07:E0")
++		|| g_str_has_prefix(bdaddr, "00:0E:20"));
++}
+ 
+-	dialog = gtk_dialog_new_with_buttons(_("File Transfer"), NULL,
+-				GTK_DIALOG_NO_SEPARATOR,
+-				GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
++/* Return the local absolute filename for the file, and its size
++ * if the file exists and is stat()'able */
++static gchar *normalise_filename(const gchar *filename, gint64 *size)
 +{
-+	gchar *str = NULL;
-+	GError *err = NULL;
-+	char filename[PATH_MAX];
++	char *ret;
++	struct stat file_stat;
+ 
+-	gtk_window_set_default_size(GTK_WINDOW(dialog), 400, -1);
++	g_return_val_if_fail(filename != NULL, NULL);
++	g_return_val_if_fail(size != NULL, NULL);
+ 
+-	gtk_container_set_border_width(GTK_CONTAINER(dialog), 6);
++	if (g_str_has_prefix(filename, "file://")) {
++		ret = g_filename_from_uri(filename, NULL, NULL);
++		if (ret == NULL)
++			return NULL;
++	} else if (filename[0] == '/') {
++		ret = g_strdup(filename);
++	} else {
++		gchar *curdir;
 +
-+        str = g_key_file_get_string(config, "Headset", "Plugin", &err);
-+
-+	if (err) {
-+		debug("audio.conf: %s", err->message);
-+		g_error_free(err);
-+		err = NULL;
-+		return -1;
++		curdir = g_get_current_dir();
++		ret = g_build_filename(curdir, filename, NULL);
++		g_free(curdir);
 +	}
-+
-+	snprintf(filename, sizeof(filename) - 1, "%s/hfp_plugin_%s.so", PLUGINDIR, str);
-+	g_free(str);
-+
-+	debug("Plugin is %s", filename);
-+	hfp_plugin = g_module_open(filename, G_MODULE_BIND_LAZY);
-+
-+	if (!hfp_plugin) {
-+		debug("Error loading HFP plugin:%s", g_module_error ());
-+		return -1;
+ 
+-	vbox = gtk_vbox_new(FALSE, 6);
+-	gtk_container_set_border_width(GTK_CONTAINER(vbox), 12);
+-	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), vbox);
++	if (!g_file_test(ret, G_FILE_TEST_IS_REGULAR)) {
++		g_free(ret);
++		return NULL;
 +	}
+ 
+-	label = gtk_label_new(NULL);
+-	gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.0);
+-	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
++	if (!g_stat(ret, &file_stat)) {
++		*size = file_stat.st_size;
++	} else {
++		g_free(ret);
++		return NULL;
++	}
+ 
+-	label_filename = label;
++	return ret;
++}
+ 
+-	progress = gtk_progress_bar_new();
+-	gtk_box_pack_start(GTK_BOX(vbox), progress, FALSE, FALSE, 0);
++static gchar *get_device_name(void)
++{
++	DBusGConnection *connection;
++	DBusGProxy *manager;
++	GError *error = NULL;
++	gchar *name, **adapters;
++	guint i;
+ 
+-	label = gtk_label_new(NULL);
+-	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+-	gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.0);
+-	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 6);
++	name = NULL;
+ 
+-	label_status = label;
++	connection = dbus_g_bus_get(DBUS_BUS_SYSTEM, NULL);
++	if (connection == NULL)
++		return NULL;
 +
-+	return 0;
++	manager = dbus_g_proxy_new_for_name(connection, "org.bluez",
++					    "/org/bluez", "org.bluez.Manager");
++	if (!manager) {
++		dbus_g_connection_unref(connection);
++		return NULL;
++	}
+ 
+-	text = g_strdup_printf("<b>%s</b>", filename);
+-	gtk_label_set_markup(GTK_LABEL(label_filename), text);
+-	g_free(text);
++	if (!manager_list_adapters(manager, &adapters, &error)) {
++		g_object_unref(manager);
++		dbus_g_connection_unref(connection);
++		return NULL;
++	}
+ 
+-	gtk_label_set_markup(GTK_LABEL(label_status), _("Connecting..."));
++	for (i = 0; adapters[i] != NULL; i++) {
++		DBusGProxy *adapter;
+ 
+-	gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog),
+-						GTK_RESPONSE_CLOSE, FALSE);
++		adapter = dbus_g_proxy_new_for_name(connection, "org.bluez",
++						    adapters[i], "org.bluez.Adapter");
++		if (dbus_g_proxy_call(adapter, "GetRemoteName", NULL,
++				      G_TYPE_STRING, bdaddrstr, G_TYPE_INVALID,
++				      G_TYPE_STRING, &name, G_TYPE_INVALID)) {
++			if (name != NULL && name[0] != '\0') {
++				g_object_unref(adapter);
++				break;
++			}
++		}
++		g_object_unref(adapter);
++	}
+ 
+-	g_signal_connect(G_OBJECT(dialog), "response",
+-				G_CALLBACK(response_callback), NULL);
++	g_strfreev(adapters);
++	g_object_unref(manager);
++	dbus_g_connection_unref(connection);
+ 
+-	gtk_widget_show_all(dialog);
++	return name;
+ }
+ 
+-static void transfer_started(DBusGProxy *proxy, gchar *a, gchar *b,
+-					guint64 size, gpointer user_data)
++static gint show_error_dialog(GtkWindow *parent, ButtonSet buttons,
++			      const gchar *primary_text, const gchar *secondary_text)
+ {
+-	gchar *text;
++	GtkWidget *dialog;
++	gchar *primary_text_markup;
++	gint ret;
++
++	primary_text_markup = g_strdup_printf("<span weight=\"bold\" size=\"larger\">%s</span>", 
++					      primary_text);
++	dialog = gtk_message_dialog_new_with_markup(parent, 0, GTK_MESSAGE_ERROR, 
++						    buttons==BUTTONS_OK? GTK_BUTTONS_OK: GTK_BUTTONS_CANCEL, 
++						    primary_text_markup);
++	gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog),
++						 secondary_text);
++	if (buttons == BUTTONS_RETRY_SKIP_CANCEL) {
++		gtk_dialog_add_button(GTK_DIALOG(dialog), _("Skip"),
++				      DIALOG_RESPONSE_SKIP);
++	}
++	if (buttons != BUTTONS_OK) {
++		gtk_dialog_add_button(GTK_DIALOG(dialog), _("Retry"),
++				      DIALOG_RESPONSE_RETRY);
++	}
++	ret = gtk_dialog_run(GTK_DIALOG(dialog));
+ 
+-	filesize = size;
++	gtk_widget_destroy(dialog);
++	g_free(primary_text_markup);
++	return ret;
++}
+ 
+-	text = g_strdup_printf(_("Starting transfer of %jd bytes"), size);
+-	gtk_label_set_markup(GTK_LABEL(label_status), text);
+-	g_free(text);
++static gint show_connection_error_dialog(GtkWindow *parent, const gchar *bdaddr,
++					 const gchar *primary_text)
++{
++	if (!is_palm_device(bdaddrstr)) {
++		return show_error_dialog(parent,
++					 BUTTONS_RETRY_CANCEL,
++					 primary_text,
++					 _("Make sure that remote device is on and that it accepts Bluetooth connections."));
++	} else {
++		return show_error_dialog(parent,
++					 BUTTONS_RETRY_CANCEL,
++					 primary_text,
++					 _("Make sure \"Beam receive\" is enabled in the Power preferences, and Bluetooth is enabled, on your Palm device."));
++	}
 +}
 +
- static int headset_server_init(DBusConnection *conn, GKeyFile *config)
++static gint handle_file_sending_error(const gchar *error_text,
++				      const gchar *error_secondary_text)
++{
++	ButtonSet buttons;
++	gint response_id;
+ 
+-	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress), 0.0);
++	if (file_count > 1 && current_file < file_count - 1)
++		buttons = BUTTONS_RETRY_SKIP_CANCEL;
++	else
++		buttons = BUTTONS_RETRY_CANCEL;
++
++	response_id = show_error_dialog(GTK_WINDOW(main_dialog), buttons, 
++					error_text, error_secondary_text);
++
++	switch (response_id) {
++	case DIALOG_RESPONSE_SKIP:
++		current_file++;
++		bytes_sent += file_length;
++	case DIALOG_RESPONSE_RETRY:
++		return TRUE;
++	case GTK_RESPONSE_CANCEL:
++	default:
++		gtk_main_quit();
++		break;
++	}
++	return response_id;
+ }
+ 
+-static void transfer_progress(DBusGProxy *proxy,
+-					guint64 bytes, gpointer user_data)
++static void cancel_clicked_cb(GtkWidget *button, gpointer user_data)
  {
- 	uint8_t chan = DEFAULT_HS_AG_CHANNEL;
- 	sdp_buf_t buf;
- 	gboolean no_hfp = FALSE;
-@@ -1582,15 +1615,22 @@ static int headset_server_init(DBusConne
- 		return 0;
- 
- 	chan = DEFAULT_HF_AG_CHANNEL;
- 
- 	hf_server = server_socket(&chan);
++	gtk_main_quit();
++}
 +
- 	if (!hf_server)
- 		return -1;
++static void ui_init(void)
++{
++	GtkWidget *vbox, *vbox_parent, *table;
++	GtkWidget *label1, *label2, *label3, *target_label;
++	GtkWidget *button;
+ 	gchar *text;
+-	gdouble fraction;
  
-+	if (load_hfp_plugin(config) < 0)
-+		return -1;
+-	text = g_strdup_printf(_("Transfered %jd of %jd bytes"),
+-							bytes, filesize);
+-	gtk_label_set_markup(GTK_LABEL(label_status), text);
++	device_name = get_device_name();
 +
- 	features = headset_config_init(config);
++	/* main dialog */
++	main_dialog = gtk_dialog_new();
++	gtk_dialog_set_has_separator(GTK_DIALOG(main_dialog), FALSE);
++	gtk_window_set_title(GTK_WINDOW(main_dialog),
++			     _("Bluetooth file transfer"));
++	gtk_window_set_icon_name(GTK_WINDOW(main_dialog), "stock_bluetooth");
++	gtk_window_set_type_hint(GTK_WINDOW(main_dialog),
++				 GDK_WINDOW_TYPE_HINT_NORMAL);
++	gtk_window_set_position(GTK_WINDOW(main_dialog), GTK_WIN_POS_CENTER);
++	gtk_window_set_resizable(GTK_WINDOW(main_dialog), FALSE);
++	gtk_widget_set(main_dialog, "width-request", 400, NULL);
++	button = gtk_dialog_add_button(GTK_DIALOG(main_dialog),
++				       GTK_STOCK_CANCEL,
++				       GTK_RESPONSE_CANCEL);
++	g_signal_connect(G_OBJECT(button), "clicked",
++			 G_CALLBACK(cancel_clicked_cb), NULL);
++	gtk_container_set_border_width(GTK_CONTAINER(main_dialog), 6);
++
++	/* table elements */
++	from_label = gtk_label_new(NULL);
++	gtk_misc_set_alignment(GTK_MISC(from_label), 0, 0.5);
++	gtk_label_set_ellipsize(GTK_LABEL(from_label), PANGO_ELLIPSIZE_MIDDLE);
++	target_label = gtk_label_new(NULL);
++	gtk_misc_set_alignment(GTK_MISC(target_label), 0, 0.5);
++	gtk_label_set_ellipsize(GTK_LABEL(target_label), PANGO_ELLIPSIZE_END);
++	gtk_label_set_text(GTK_LABEL(target_label), device_name ? device_name : bdaddrstr);
++	label2 = gtk_label_new(NULL);
++	text = g_markup_printf_escaped("<b>%s</b>", _("From:"));
++	gtk_label_set_markup(GTK_LABEL(label2), text);
++	g_free(text);
++	label3 = gtk_label_new(NULL);
++	gtk_misc_set_alignment(GTK_MISC(label3), 1, 0.5);
++	text = g_markup_printf_escaped("<b>%s</b>", _("To:"));
++	gtk_label_set_markup(GTK_LABEL(label3), text);
+ 	g_free(text);
  
-+	if (features < 0)
-+		return -1;
+-	fraction = (gdouble) bytes / (gdouble) filesize;
+-	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress), fraction);
++	/* table */
++	table = gtk_table_new(2, 2, FALSE);
++	gtk_table_set_col_spacings(GTK_TABLE(table), 4);
++	gtk_table_set_row_spacings(GTK_TABLE(table), 4);
++	gtk_table_attach_defaults(GTK_TABLE(table), from_label, 1, 2, 0, 1);
++	gtk_table_attach_defaults(GTK_TABLE(table), target_label, 1, 2, 1, 2);
++	gtk_table_attach(GTK_TABLE(table), label2, 0, 1, 0, 1, GTK_FILL, 0, 0, 0);
++	gtk_table_attach(GTK_TABLE(table), label3, 0, 1, 1, 2, GTK_FILL, 0, 0, 0);
 +
- 	if (hfp_ag_record(&buf, chan, features) < 0) {
- 		error("Unable to allocate new service record");
- 		return -1;
++	/* vbox elements */
++	label1 = gtk_label_new(NULL);
++	gtk_misc_set_alignment(GTK_MISC(label1), 0, 0.5);
++	text = g_markup_printf_escaped("<span weight=\"bold\" size=\"larger\">%s</span>",
++				       _("Sending files via bluetooth"));
++	gtk_label_set_markup(GTK_LABEL(label1), text);
++	g_free(text);
++	progress_bar = gtk_progress_bar_new();
++	gtk_progress_bar_set_ellipsize(GTK_PROGRESS_BAR(progress_bar),
++				       PANGO_ELLIPSIZE_END);
++	gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar),
++				  _("Connecting..."));
++	operation_label = gtk_label_new(NULL);
++	gtk_misc_set_alignment(GTK_MISC(operation_label), 0, 0.5);
++	gtk_label_set_ellipsize(GTK_LABEL(operation_label), PANGO_ELLIPSIZE_END);
++
++	/* vbox */
++	vbox = gtk_vbox_new(FALSE, 0);
++	gtk_box_set_spacing(GTK_BOX(vbox), 6);
++	gtk_container_set_border_width(GTK_CONTAINER(vbox), 6);
++	gtk_box_pack_start_defaults(GTK_BOX(vbox), label1);
++	gtk_box_pack_start(GTK_BOX(vbox), table, TRUE, TRUE, 9);
++	gtk_box_pack_start_defaults(GTK_BOX(vbox), progress_bar);
++	gtk_box_pack_start(GTK_BOX(vbox), operation_label, TRUE, TRUE, 2);
++	vbox_parent = gtk_bin_get_child(GTK_BIN(main_dialog));
++	gtk_box_pack_start_defaults(GTK_BOX(vbox_parent), vbox);
++
++	gtk_widget_show_all(main_dialog);
+ }
+ 
+-static void transfer_completed(DBusGProxy *proxy, gpointer user_data)
++static gboolean send_one(gpointer user_data)
+ {
+-	gtk_label_set_markup(GTK_LABEL(label_status), _("Completed"));
++	const gchar *fname;
++	gint ret;
++	gchar *bname, *dirname;
++	GError *err = NULL;
++	gchar *operation_text, *operation_markup, *progressbar_text;
++
++	if ((fname = g_slist_nth_data(file_list, current_file))) {
++		/* there's a file to send */
++		dbus_g_proxy_call(session_proxy, "SendFile", &err,
++				  G_TYPE_STRING, fname, G_TYPE_INVALID, G_TYPE_INVALID);
++
++		if (err != NULL) {
++			ret = handle_file_sending_error(_("Unable to read file"),
++							err->message);
++			if (ret != GTK_RESPONSE_CANCEL) {
++				g_idle_add((GSourceFunc) send_one, NULL);
++			}
++			g_error_free(err);
++			return FALSE;
++		}
+ 
+-	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress), 1.0);
++		if (!first_transfer_time) {
++			first_transfer_time = get_system_time();
++		}
++		bname = g_path_get_basename(fname);
++		dirname = g_path_get_dirname(fname);
+ 
+-	dbus_g_proxy_call(proxy, "Disconnect", NULL, G_TYPE_INVALID,
+-							G_TYPE_INVALID);
++		operation_text = g_strdup_printf(_("Sending %s"), bname);
++		operation_markup = g_markup_printf_escaped("<i>%s</i>", operation_text);
++		progressbar_text = g_strdup_printf(_("Sending file: %d of %d"),
++						   current_file+1,
++						   file_count);
++		gtk_label_set_text(GTK_LABEL(from_label), dirname);
++		gtk_label_set_markup(GTK_LABEL(operation_label), operation_markup);
++		gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar),
++					  progressbar_text);
++
++		g_free(bname);
++		g_free(dirname);
++		g_free(operation_text);
++		g_free(operation_markup);
++		g_free(progressbar_text);
++	} else {
++		/* nothing left to send, time to quit */
++		gtk_main_quit();
++	}
++	return FALSE;
++}
+ 
+-	gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog),
+-						GTK_RESPONSE_CLOSE, TRUE);
++static void session_connected_cb(DBusGProxy *proxy, gpointer user_data)
++{
++	/* OBEX connect has succeeded, so start sending */
++	g_idle_add((GSourceFunc) send_one, NULL);
+ }
+ 
+-static void session_connected(DBusGProxy *proxy, gpointer user_data)
++static void transfer_started_cb(DBusGProxy *proxy, const gchar *filename,
++				const gchar *local_path, guint64 byte_count, gpointer user_data)
+ {
+-	gchar *filename = user_data;
+-	GError *error = NULL;
++	file_length = byte_count;
++}
+ 
+-	gtk_label_set_markup(GTK_LABEL(label_status), _("Connected"));
++static void transfer_cancelled_cb(DBusGProxy *proxy, gpointer user_data)
++{
++	gint ret;
++	gchar *error_text;
+ 
+-	dbus_g_proxy_call(proxy, "SendFile", &error,
+-				G_TYPE_STRING, filename, G_TYPE_INVALID,
+-							G_TYPE_INVALID);
+-
+-	if (error != NULL) {
+-		g_printerr("Sending of file %s failed: %s\n", filename,
+-							error->message);
+-		g_error_free(error);
+-		gtk_main_quit();
++	error_text = g_strdup_printf(_("An error occured while sending file '%s'"),
++				     (gchar *)g_slist_nth_data(file_list, current_file));
++	ret = handle_file_sending_error(error_text,
++					_("The remote device cancelled the transfer"));
++
++	if (ret != GTK_RESPONSE_CANCEL)
++		g_idle_add((GSourceFunc) send_one, NULL);
++
++	g_free(error_text);
++}
++
++static void transfer_progress_cb(DBusGProxy *proxy, guint64 bytes_transferred, gpointer user_data)
++{
++	gdouble frac;
++	guint actual_bytes_sent;
++	gint elapsed_time;
++	gint transfer_rate;
++	gint time_remaining;
++	gint64 current_time;
++	gchar *str, *str2;
++	gchar *progressbar_text;
++
++	/* update progress bar fraction */
++	actual_bytes_sent = bytes_sent + bytes_transferred;
++	frac = (gdouble)actual_bytes_sent / byte_count;
++	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), frac);
++
++	/* update progress bar text (time remaining)
++	 * (only update 4 times in a second) */
++	current_time = get_system_time();
++	elapsed_time = (current_time - first_transfer_time) / MSEC_PER_SEC;
++
++	if (last_update_time) {
++		if (current_time < last_update_time + MSEC_PER_SEC / 4)
++			return;
++		else
++			last_update_time = current_time;
++	} else {
++		last_update_time = current_time;
  	}
- 
-@@ -1721,10 +1761,15 @@ failed:
- 
- void audio_exit(void)
- {
- 	server_exit();
- 
-+	if (hfp_plugin) {
-+		if (!g_module_close(hfp_plugin))
-+			debug("Error Unloading plugin:%s", g_module_error ());
++
++	if (!elapsed_time)
++		return;
++
++	transfer_rate = actual_bytes_sent / elapsed_time;
++	if (transfer_rate == 0)
++		return;
++
++	time_remaining = (byte_count - actual_bytes_sent) / transfer_rate;
++
++	if (time_remaining >= 3600) {
++		str = g_strdup_printf(_("(%d:%02d:%d Remaining)"), 
++				      time_remaining / 3600,
++				      (time_remaining % 3600) / 60,
++				      (time_remaining % 3600) % 60);
++	} else {
++		str = g_strdup_printf(_("(%d:%02d Remaining)"), 
++				      time_remaining / 60,
++				      time_remaining % 60);
 +	}
 +
- 	dbus_connection_destroy_object_path(connection, AUDIO_MANAGER_PATH);
++	/* Translators:
++	 * Sending file 1 of 3 */
++	str2 = g_strdup_printf(_("Sending file %d of %d"),
++			       current_file + 1,
++			       file_count);
++	progressbar_text = g_strconcat(str2, " ", str, NULL);
++	gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar),
++				  progressbar_text);
++	g_free(str);
++	g_free(str2);
++	g_free(progressbar_text);
+ }
  
- 	dbus_connection_unref(connection);
+-static void create_notify(DBusGProxy *proxy,
+-				DBusGProxyCall *call, void *user_data)
++static void transfer_completed_cb(DBusGProxy *proxy, gpointer user_data)
++{
++	current_file++;
++	bytes_sent += file_length;
++
++	g_idle_add((GSourceFunc) send_one, NULL);
++}
++
++static void session_created_cb(DBusGProxy *proxy, DBusGProxyCall *call, gpointer user_data)
+ {
+ 	GError *error = NULL;
+ 	const gchar *path = NULL;
  
- 	connection = NULL;
-Index: audio/unix.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/audio/unix.c,v
-retrieving revision 1.64
-diff -u -5 -p -r1.64 unix.c
---- audio/unix.c	8 Feb 2008 17:43:48 -0000	1.64
-+++ audio/unix.c	26 Feb 2008 15:19:44 -0000
-@@ -36,10 +36,11 @@
+-	if (dbus_g_proxy_end_call(proxy, call, &error,
+-					DBUS_TYPE_G_OBJECT_PATH, &path,
+-						G_TYPE_INVALID) == FALSE) {
+-		gchar *text, *message;
+-
+-		if (error != NULL) {
+-			message = g_strdup(error->message);
+-			g_error_free(error);
+-		} else
+-			message = g_strdup(_("An unknown error occured"));
+-
+-		text = g_strdup_printf("<span foreground=\"red\">%s</span>",
+-								message);
+-		gtk_label_set_markup(GTK_LABEL(label_status), text);
+-		g_free(text);
+-
+-		g_free(message);
++	if (!dbus_g_proxy_end_call(proxy, call, &error,
++				   DBUS_TYPE_G_OBJECT_PATH, &path, G_TYPE_INVALID)) {
++		const gchar *error_name = NULL;
++		gint response_id;
++
++		if (error && error->code == DBUS_GERROR_REMOTE_EXCEPTION)
++			error_name = dbus_g_error_get_name(error);
++		if (error_name && !strcmp(error_name, "org.openobex.Error.ConnectionAttemptFailed")) {
++			response_id = show_connection_error_dialog(GTK_WINDOW(main_dialog), bdaddrstr, error->message);
++			if (response_id == DIALOG_RESPONSE_RETRY) {
++				/* Try to create Session again */
++				dbus_g_proxy_begin_call(manager_proxy,
++							"CreateBluetoothSession",
++							(DBusGProxyCallNotify) session_created_cb, NULL, NULL,
++							G_TYPE_STRING, bdaddrstr, G_TYPE_STRING, "opp",
++							G_TYPE_BOOLEAN, FALSE, G_TYPE_INVALID);
++				goto out;
++			}
++		} else {
++			show_error_dialog(GTK_WINDOW(main_dialog), BUTTONS_OK,
++					  error->message, "");
++		}
  
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/sdp.h>
- #include <dbus/dbus.h>
- #include <glib.h>
-+#include <gmodule.h>
+-		gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog),
+-						GTK_RESPONSE_CLOSE, TRUE);
+-		return;
++		gtk_main_quit();
++		goto out;
+ 	}
  
- #include "logging.h"
- #include "dbus.h"
- #include "ipc.h"
- #include "device.h"
+-	proxy = dbus_g_proxy_new_for_name(conn, "org.openobex",
+-						path, "org.openobex.Session");
++	session_proxy = dbus_g_proxy_new_for_name(connection,
++						       "org.openobex",
++						       path,
++						       "org.openobex.Session");
+ 
+-	dbus_g_proxy_add_signal(proxy, "Connected", G_TYPE_INVALID);
++	dbus_g_proxy_add_signal(session_proxy, "Connected",
++				G_TYPE_INVALID);
++
++	dbus_g_proxy_connect_signal(session_proxy, "Connected",
++				    G_CALLBACK(session_connected_cb), NULL, NULL);
++
++	dbus_g_proxy_add_signal(session_proxy, "TransferStarted",
++				G_TYPE_STRING, G_TYPE_STRING, G_TYPE_UINT64, G_TYPE_INVALID);
++
++	dbus_g_proxy_connect_signal(session_proxy, "TransferStarted",
++				    G_CALLBACK(transfer_started_cb), NULL, NULL);
+ 
+-	dbus_g_proxy_connect_signal(proxy, "Connected",
+-				G_CALLBACK(session_connected), user_data, NULL);
++	dbus_g_proxy_add_signal(session_proxy, "Cancelled",
++				G_TYPE_INVALID);
++
++	dbus_g_proxy_connect_signal(session_proxy, "Cancelled",
++				    G_CALLBACK(transfer_cancelled_cb), NULL, NULL);
+ 
+-	dbus_g_proxy_add_signal(proxy, "TransferStarted", G_TYPE_STRING,
+-				G_TYPE_STRING, G_TYPE_UINT64, G_TYPE_INVALID);
++	dbus_g_proxy_add_signal(session_proxy, "ErrorOccurred",
++				G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INVALID);
+ 
+-	dbus_g_proxy_connect_signal(proxy, "TransferStarted",
+-				G_CALLBACK(transfer_started), NULL, NULL);
++	dbus_g_proxy_connect_signal(session_proxy, "ErrorOccurred",
++				    G_CALLBACK(error_occurred_cb), NULL, NULL);
+ 
+-	dbus_g_proxy_add_signal(proxy, "TransferProgress",
+-						G_TYPE_UINT64, G_TYPE_INVALID);
++	dbus_g_proxy_add_signal(session_proxy, "TransferProgress",
++				G_TYPE_UINT64, G_TYPE_INVALID);
+ 
+-	dbus_g_proxy_connect_signal(proxy, "TransferProgress",
+-				G_CALLBACK(transfer_progress), NULL, NULL);
++	dbus_g_proxy_connect_signal(session_proxy, "TransferProgress",
++				    G_CALLBACK(transfer_progress_cb), NULL, NULL);
++
++	dbus_g_proxy_add_signal(session_proxy, "TransferCompleted", 
++				G_TYPE_INVALID);
+ 
+-	dbus_g_proxy_add_signal(proxy, "TransferCompleted", G_TYPE_INVALID);
++	dbus_g_proxy_connect_signal(session_proxy, "TransferCompleted",
++				    G_CALLBACK(transfer_completed_cb), NULL, NULL);
+ 
+-	dbus_g_proxy_connect_signal(proxy, "TransferCompleted",
+-				G_CALLBACK(transfer_completed), NULL, NULL);
++	dbus_g_proxy_call(session_proxy, "Connect", &error, G_TYPE_INVALID,
++			  G_TYPE_INVALID);
+ 
+-	dbus_g_proxy_call(proxy, "Connect", NULL, G_TYPE_INVALID,
+-							G_TYPE_INVALID);
++out:
++	if (error)
++		g_error_free(error);
++}
++
++static void error_occurred_cb(DBusGProxy *proxy, const gchar *error_name, const gchar *error_message, gpointer user_data)
++{
++	gint ret;
++	gboolean link_error = FALSE;
++	gchar *error_text;
++	const gchar *reason;
++
++	g_message("ErrorOccurred");
++	g_message("Error name: %s", error_name);
++	g_message("Error message: %s", error_message);
++
++	error_text = g_strdup_printf(_("An error occured while sending file '%s'"),
++				     (gchar *)g_slist_nth_data(file_list, current_file));
++	if (!strcmp(error_name, "org.openobex.Error.LinkError")) {
++		g_object_unref(G_OBJECT(session_proxy));
++		reason = _("Connection to remote device was lost");
++		link_error = TRUE;
++	} else if (!strcmp(error_name, "org.openobex.Error.Forbidden")) {
++		reason = _("Remote device rejected file");
++	} else {
++		reason = _("Unknown error");
++	}
++	ret = handle_file_sending_error(error_text, reason);
++
++	if (ret != GTK_RESPONSE_CANCEL) {
++		if (link_error) {
++			/* Need to reestablish connection */
++			dbus_g_proxy_begin_call(manager_proxy, "CreateBluetoothSession",
++						(DBusGProxyCallNotify) session_created_cb, NULL, NULL,
++						G_TYPE_STRING, bdaddrstr, G_TYPE_STRING, "opp",
++						G_TYPE_INVALID);
++		} else {
++			g_idle_add((GSourceFunc) send_one, NULL);
++		}
++	}
++
++
++	g_free(error_text);
++}
++
++static void free_mem(void)
++{
++	if (files_to_send)
++		g_strfreev(files_to_send);
++	g_free(bdaddrstr);
++
++	if (main_dialog)
++		gtk_widget_destroy (main_dialog);
++	if (G_IS_OBJECT(manager_proxy))
++		g_object_unref(G_OBJECT(manager_proxy));
++	if (G_IS_OBJECT(session_proxy))
++		g_object_unref (G_OBJECT(session_proxy));
++	g_slist_free(file_list);
+ }
+ 
+ static void name_owner_changed(DBusGProxy *proxy, const char *name,
+@@ -227,102 +648,121 @@ static void name_owner_changed(DBusGProx
+ 		gtk_main_quit();
+ }
+ 
+-static gchar *option_device = NULL;
+-
+-static GOptionEntry options[] = {
+-	{ "device", 0, 0, G_OPTION_ARG_STRING, &option_device,
+-				N_("Remote device to use"), "ADDRESS" },
+-	{ NULL },
+-};
+-
+ int main(int argc, char *argv[])
+ {
+-	DBusGProxy *proxy;
++	GOptionContext *option_context;
+ 	GError *error = NULL;
+-	GSList *filenames;
+-	gchar *filename, *address;
++	guint i;
+ 
+ 	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
+ 	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+ 	textdomain(GETTEXT_PACKAGE);
+ 
+-	error = NULL;
++	option_context = g_option_context_new("<file list>");
++	g_option_context_add_main_entries(option_context, options, GETTEXT_PACKAGE);
++	g_option_context_add_group(option_context, gtk_get_option_group(TRUE));
++	g_option_context_parse(option_context, &argc, &argv, &error);
++	g_option_context_free(option_context);
++	if (error) {
++		printf("Usage:\n");
++		printf("  %s [--dest=BDADDR] <file list>\n", g_get_prgname());
++		g_error_free(error);
++		free_mem();
++		return 0;
++	}
+ 
+-	if (gtk_init_with_args(&argc, &argv, "[FILE...]",
+-				options, GETTEXT_PACKAGE, &error) == FALSE) {
+-		if (error != NULL) {
+-			g_printerr("%s\n", error->message);
+-			g_error_free(error);
+-		} else
+-			g_printerr("An unknown error occurred\n");
+-
+-		gtk_exit(1);
+-	}
+-
+-	gtk_window_set_default_icon_name("bluetooth");
+-
+-	if (argc < 2) {
+-		filenames = show_select_dialog();
+-		if (filenames == NULL)
+-			gtk_exit(1);
+-	} else
+-		filenames = g_slist_append(NULL, g_strdup(argv[1]));
+-
+-	if (option_device == NULL) {
+-		address = show_browse_dialog();
+-		if (address == NULL) {
+-			g_slist_free(filenames);
+-			gtk_exit(1);
+-		}
+-	} else
+-		address = g_strdup(option_device);
++	gtk_init(&argc, &argv);
++
++	connection = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
++	if (!connection) {
++		show_error_dialog(NULL, GTK_BUTTONS_OK,
++				  _("Please verify that D-Bus is correctly installed and setup."), error->message);
++		g_error_free(error);
++		return 1;
++	}
+ 
+-	conn = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
+-	if (conn == NULL) {
+-		if (error != NULL) {
+-			g_printerr("Connecting to session bus failed: %s\n",
+-							error->message);
+-			g_error_free(error);
+-		} else
+-			g_print("An unknown error occured\n");
++	main_dialog = NULL;
++	from_label = NULL;
++	operation_label = NULL;
++	progress_bar = NULL;
++
++	/* get a list of files to send from command-line */
++	if (files_to_send)
++		file_count = g_strv_length(files_to_send);
++	else
++		file_count = 0;
++	for (i = 0; i < file_count; i++) {
++		file_list = g_slist_append(file_list,
++						g_strdup(*(files_to_send + i)));
++	}
++	/* show file chooser if no files were specified */
++	if (!file_count) {
++		file_list = show_select_dialog();
++		file_count = g_slist_length(file_list);
++	}
++	/* Check if there are some files to send */
++	if (!file_count) {
++		free_mem();
++		return 0;
++	}
++	/* Check for non regular and non existand files and
++	 * determine total bytes to send */
++	for (i = 0; i < file_count; i++) {
++		GSList *item;
++		gchar *path, *filename;
++		gint64 size;
++
++		item = g_slist_nth(file_list, i);
++		path = (gchar *) item->data;
++		filename = normalise_filename(path, &size);
++		if (filename == NULL) {
++			g_free(path);
++			file_list = g_slist_remove_link(file_list, item);
++			continue;
++		}
++		g_free(item->data);
++		item->data = filename;
++		byte_count += size;
++	}
+ 
+-		gtk_exit(1);
++	/* determine Bluetooth device to send to */
++	if (!bdaddrstr) {
++		bdaddrstr = show_browse_dialog();
++		if (!bdaddrstr) {
++			free_mem();
++			return 0;
++		}
+ 	}
+ 
+ 	dbus_g_object_register_marshaller(marshal_VOID__STRING_STRING_UINT64,
+-				G_TYPE_NONE, G_TYPE_STRING,
+-				G_TYPE_STRING, G_TYPE_UINT64, G_TYPE_INVALID);
+-
++					  G_TYPE_NONE, G_TYPE_STRING,
++					  G_TYPE_STRING, G_TYPE_UINT64, G_TYPE_INVALID);
++	dbus_g_object_register_marshaller(marshal_VOID__STRING_STRING,
++					  G_TYPE_NONE, G_TYPE_STRING,
++					  G_TYPE_STRING, G_TYPE_INVALID);
+ 	dbus_g_object_register_marshaller(marshal_VOID__UINT64,
+ 				G_TYPE_NONE, G_TYPE_UINT64, G_TYPE_INVALID);
+ 
+-	filename = g_slist_nth_data(filenames, 0);
+-
+-	create_window(filename);
++	ui_init();
+ 
+-	proxy = dbus_g_proxy_new_for_name(conn, "org.openobex",
+-				"/org/openobex", "org.openobex.Manager");
+-
+-	dbus_g_proxy_add_signal(proxy, "NameOwnerChanged",
+-		G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INVALID);
+-
+-	dbus_g_proxy_connect_signal(proxy, "NameOwnerChanged",
+-				G_CALLBACK(name_owner_changed), NULL, NULL);
+-
+-	dbus_g_proxy_begin_call(proxy, "CreateBluetoothSession",
+-				create_notify, filename, NULL,
+-				G_TYPE_STRING, address, G_TYPE_STRING, "opp",
++	manager_proxy = dbus_g_proxy_new_for_name(connection,
++						       "org.openobex",
++						       "/org/openobex",
++						       "org.openobex.Manager");
++	dbus_g_proxy_add_signal(manager_proxy, "NameOwnerChanged",
++				G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INVALID);
++	dbus_g_proxy_connect_signal(manager_proxy, "NameOwnerChanged",
++				    G_CALLBACK(name_owner_changed), NULL, NULL);
++
++	dbus_g_proxy_begin_call(manager_proxy, "CreateBluetoothSession",
++				(DBusGProxyCallNotify) session_created_cb, NULL, NULL,
++				G_TYPE_STRING, bdaddrstr, G_TYPE_STRING, "opp",
+ 				G_TYPE_INVALID);
+ 
+ 	gtk_main();
+ 
+-	g_object_unref(proxy);
+-
+-	dbus_g_connection_unref(conn);
+-
+-	g_free(address);
+-
+-	g_slist_free(filenames);
++	free_mem();
+ 
+ 	return 0;
+ }
++
 
---=-ixNB105gTiavwFyDLKGj
+--=-QgLXvfDhfAtUWQBY7bNv
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -347,7 +1038,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---=-ixNB105gTiavwFyDLKGj
+--=-QgLXvfDhfAtUWQBY7bNv
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -358,4 +1049,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-ixNB105gTiavwFyDLKGj--
+--=-QgLXvfDhfAtUWQBY7bNv--
