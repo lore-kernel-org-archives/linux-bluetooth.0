@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <1204246465.23667.1239722851@webmail.messagingengine.com>
+Message-Id: <1204246311.23160.1239722851@webmail.messagingengine.com>
 From: "Christopher Armstrong" <carmstrong@fastmail.com.au>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Date: Fri, 29 Feb 2008 11:54:24 +1100
+Date: Fri, 29 Feb 2008 11:51:51 +1100
 Subject: [Bluez-users] Difficulties establishing SCO link for Bluetooth
 	headset on PS3
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -543,36 +543,14 @@ sco_sock_destruct: sk c0006c0066b8a800
 And this I presume may be helpful:
 
 >hciconfig hci0 version
-hci0:   Type: USB   
+hci0:   Type: USB
         BD Address: 00:13:A9:E0:EC:B7 ACL MTU: 384:8 SCO MTU: 64:8
         HCI Ver: 2.0 (0x3) HCI Rev: 0xe18 LMP Ver: 2.0 (0x3) LMP Subver:
         0xe18
         Manufacturer: Cambridge Silicon Radio (10)
 
-* note that the Bluetooth device on the PS3 is integrated into the
-device unit.
+hciconfig hci0 features
 
->hciconfig hci0 features
-hci0:   Type: USB
-        BD Address: 00:13:A9:E0:EC:B7 ACL MTU: 384:8 SCO MTU: 64:8
-        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-                <3-slot packets> <5-slot packets> <encryption> <slot
-                offset>
-                <timing accuracy> <role switch> <hold mode> <sniff mode>
-                <park state> <RSSI> <channel quality> <SCO link> <HV2
-                packets>
-                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging
-                scheme>
-                <power control> <transparent SCO> <broadcast encrypt>
-                <EDR ACL 2 Mbps> <EDR ACL 3 Mbps> <enhanced iscan>
-                <interlaced iscan> <interlaced pscan> <inquiry with
-                RSSI>
-                <extended SCO> <EV4 packets> <EV5 packets> <AFH cap.
-                slave>
-                <AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL>
-                <AFH cap. master> <AFH class. master> <EDR eSCO 2 Mbps>
-                <EDR eSCO 3 Mbps> <3-slot EDR eSCO> <extended features>
---------------------------------------------------------------------------
 
 I have also tried reloadng hci_usb with the force_scofix=1 option as
 suggested by a previous message on this list from a person experiencing
@@ -581,13 +559,6 @@ getting this model of headset to work with Linux, or got headsets to
 work on the PS3? I don't mind changing to another headset, but I would
 really like to get this to work with a PS3 without the risk of frying
 more headsets.
-
-Does anyone have any suggestions as to things I can try? I am happy to
-write code, modify kernel modules, etc. if necessary.
-
-Thanks
-
-Christopher Armstrong
 -- 
   Christopher Armstrong
   carmstrong ^^AT^ fastmail dOT com /Dot/ au
