@@ -1,47 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [Bluez-devel] forcing SCO connection patch
-From: Guillaume Bedot <littletux@zarb.org>
-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <47C555E5.2000903@mizi.com>
-References: <47666E1F.2000902@mizi.com>
-	 <a8e1da0802242330l765b8b1ava62b857baf8a5568@mail.gmail.com>
-	 <47C28A33.4070102@mizi.com>
-	 <a8e1da0802250155u1b7af481va203849f68d9106b@mail.gmail.com>
-	 <47C2A7FA.2060902@mizi.com>
-	 <70692DDF-93B7-447E-ABEE-3CDBD94F15F1@holtmann.org>
-	 <47C38D40.3040809@mizi.com>
-	 <B96BD3FE-F490-4AD5-9315-ECD42CE9C728@holtmann.org>
-	 <47C4C3D4.8010902@mizi.com>
-	 <2A7EF87C-1340-45D7-B457-F81799674B1E@holtmann.org>
-	 <47C555E5.2000903@mizi.com>
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 27 Feb 2008 14:04:42 +0100
-Message-Id: <1204117482.6889.37.camel@localhost>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
-List-ID: <linux-bluetooth.vger.kernel.org>
+Message-Id: <9C4A112D-DB33-4C90-8A80-5B5400155016@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <A7BA29A9-413A-4A4D-BEFB-E2DEE7A4988F@holtmann.org>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Fri, 29 Feb 2008 21:31:02 +0200
+References: <47C7D90A.9020306@access-company.com>
+	<A7BA29A9-413A-4A4D-BEFB-E2DEE7A4988F@holtmann.org>
+Subject: Re: [Bluez-devel] [patch] alignment trap in hcid
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Re,
+On Feb 29, 2008, at 20:27, Marcel Holtmann wrote:
+>> I recently met an alignment trap in hcid.
+>> Some device sent me an sdp request and the answer had to be
+>> fragmented because the device reception buffer was very small.
+>> After that i saw alignment trap.
+>> The last trace I saw was : Continuation state size: 8
+>> The trace is located at sdpd/request.c : static sdp_cont_state_t
+>> *sdp_cstate_get(uint8_t *buffer)
+>> This function returns an unaligned pointer.
+>
+> this is so funny since I know it was there, but the new qualification
+> tests don't find it anymore :)
+>
+> Please fix the coding style. You are missing some spaces after the  
+> "if".
+>
+> Johan, please have second look at the patch. It looks good to me.
 
-Le mercredi 27 février 2008 à 21:21 +0900, Louis JANG a écrit :
->  	conn = hci_conn_hash_lookup_ba(hdev, ev->link_type, &ev->bdaddr);
-> -	if (!conn)
-> -		goto unlock;
-> +	if (!conn) {
-> +		__u8 link_type = (ev->link_type == ESCO_LINK) ? SCO_LINK : ESCO_LINK;
-> +
-> +		conn = hci_conn_hash_lookup_ba(hdev, link_type, &ev->bdaddr);
-> +		if (!conn)
-> +			goto unlock;
+Looks good to me too.
 
-Does your patch handle re-negotiation of the SCO link back to an eSCO
-one ? Great.
+Johan
 
-And the style in your patch is better according to Marcel rules.
-
-I vote for yours.
-
-Best regards,
-
-Guillaume B.
-
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
