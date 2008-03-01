@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jens-Erik Hansen <Jens-E.Hansen@gis.de>
-To: bluez-users@lists.sourceforge.net
-Date: Sat, 1 Mar 2008 18:27:11 +0100
+Message-ID: <b12debba0802291812v6cf778f5m2eb41a50d7b98280@mail.gmail.com>
+Date: Sat, 1 Mar 2008 10:12:13 +0800
+From: "=?GB2312?B?u8bA7brp?=" <peterlihong@gmail.com>
+To: Bluez-users@lists.sourceforge.net
+In-Reply-To: <b12debba0802290149r2d772241i407d79d3c2a568cd@mail.gmail.com>
 MIME-Version: 1.0
-Message-Id: <200803011827.11761.Jens-E.Hansen@gis.de>
-Subject: [Bluez-users] trouble with Belkin F8T012V and sco
+References: <b12debba0802290149r2d772241i407d79d3c2a568cd@mail.gmail.com>
+Subject: Re: [Bluez-users] Can an embeded development board emulate a
+	headphone?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,30 +21,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+ Marcel Holtmann talked about emulating a headphone in a article
+"Advanced Audio support for the BlueZ stack" in his web
+page(http://www.holtmann.org/linux/bluetooth/audio.html):
+To proceed further with the headphone emulation there must be a
+listening L2CAP service on PSM 25. At the moment there exists no
+program for doing this.
 
-using the Belkin F8T012V, a Broadcom based usb dongle, I have some trouble 
-with sco. If I ring somebody or receive a sip call I can hear the caller but 
-he only hears loud noise. This occurs not every time I use sip but very often 
-and I noticed that this mostly happens after some time of no sip activity.
+But the last modification of the web page is on November 29, 2004.
+Does there exist  the program listening L2CAP service on PSM 25 now?
 
-Could somebody please give me a hint if the Belkin dongle is supported by 
-bluez or how I can debug this behaviour further? How can I figure out if this 
-device is Broadcom Blutonium based?
-
-I read that hciconfig hci0 revision should either print "SCO mapping: HCI" 
-or "SCO mapping: PCM". Unfortunately my hciconfig hci revsion output looks 
-like:
-
-hci0:   Type: USB
-        BD Address: 00:0A:3A:72:7B:C9 ACL MTU: 1017:8 SCO MTU: 64:8
-        Firmware 7.67 / 14
-
-I assume this is not a good sign, on the other hand I'm able to pair a headset 
-with the dongle and e.g. obex ftp works.
-
-Greetings
-Jens
+-- 
+Peter
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
