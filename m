@@ -1,13 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <a8e1da0803021724h654f65ceif24b2035dc94a5ec@mail.gmail.com>
-Date: Mon, 3 Mar 2008 09:24:25 +0800
-From: "Dave Young" <hidave.darkstar@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <a8e1da0803021721m3145bc7fpd896760d4bed7d97@mail.gmail.com>
+From: Jens-Erik Hansen <Jens-E.Hansen@gis.de>
+To: bluez-users@lists.sourceforge.net
+Date: Sat, 1 Mar 2008 18:27:11 +0100
 MIME-Version: 1.0
-References: <5eee8c670802281451i392c0debq7a16286d76d33bfb@mail.gmail.com>
-	<a8e1da0803021721m3145bc7fpd896760d4bed7d97@mail.gmail.com>
-Subject: Re: [Bluez-users] hciconfig hci0 reset bug
+Message-Id: <200803011827.11761.Jens-E.Hansen@gis.de>
+Subject: [Bluez-users] trouble with Belkin F8T012V and sco
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,35 +18,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Mon, Mar 3, 2008 at 9:21 AM, Dave Young <hidave.darkstar@gmail.com> wrote:
-> On Fri, Feb 29, 2008 at 6:51 AM, Odysseus Flappington
->  <deriziotis@gmail.com> wrote:
->
->
-> > So, it turns out that in order for any external usb bluetooth adapters
->  >  to re-connect to paired input devices on reboot, you need to issue an
->  >  'hciconfig hci0 reset' command after rebooting in order to reconnect.
->  >
->  >  More info can be found in bug #133690 on Launchpad
->  >  (https://bugs.launchpad.net/ubuntu/+source/bluez-utils/+bug/133690).
->  >
->  >  This bug isn't Ubuntu-specific since I have reproduced in Fedora 8, so
->  >  I'm posting here.
->  >
->  >  Simply adding 'hciconfig hci0 reset' in /etc/default/bluetooth in
->  >  source would solve this bug. Is this a reasonable solution?
->  >
->  >  What is required in order to get a fix implemented?
+Hello,
 
-Sorry for previous blank reply.
+using the Belkin F8T012V, a Broadcom based usb dongle, I have some trouble 
+with sco. If I ring somebody or receive a sip call I can hear the caller but 
+he only hears loud noise. This occurs not every time I use sip but very often 
+and I noticed that this mostly happens after some time of no sip activity.
 
-For your problem, if you don't want to patch kernel you can also try
-load the bluetooth module with parameter "reset=1"
+Could somebody please give me a hint if the Belkin dongle is supported by 
+bluez or how I can debug this behaviour further? How can I figure out if this 
+device is Broadcom Blutonium based?
 
-Could you send the lsusb output?
+I read that hciconfig hci0 revision should either print "SCO mapping: HCI" 
+or "SCO mapping: PCM". Unfortunately my hciconfig hci revsion output looks 
+like:
 
-Regards
-dave
+hci0:   Type: USB
+        BD Address: 00:0A:3A:72:7B:C9 ACL MTU: 1017:8 SCO MTU: 64:8
+        Firmware 7.67 / 14
+
+I assume this is not a good sign, on the other hand I'm able to pair a headset 
+with the dongle and e.g. obex ftp works.
+
+Greetings
+Jens
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
