@@ -1,13 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47CBF4A5.1050308@aircable.net>
-Date: Mon, 03 Mar 2008 10:52:53 -0200
-From: Manuel Naranjo <manuel@aircable.net>
+Message-ID: <47CBC4FC.6010302@access-company.com>
+Date: Mon, 03 Mar 2008 10:29:32 +0100
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?= <frederic.dalleau@access-company.com>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <47AFA9A7.3030100@aircable.net> <47AFAE50.1040508@aircable.net>
-In-Reply-To: <47AFAE50.1040508@aircable.net>
-Content-Type: multipart/mixed; boundary="------------030406020805030509080100"
-Subject: Re: [Bluez-devel] CreateBonding while periodic scanning
+References: <47C7D90A.9020306@access-company.com>	<A7BA29A9-413A-4A4D-BEFB-E2DEE7A4988F@holtmann.org>
+	<9C4A112D-DB33-4C90-8A80-5B5400155016@gmail.com>
+In-Reply-To: <9C4A112D-DB33-4C90-8A80-5B5400155016@gmail.com>
+Content-Type: multipart/mixed; boundary="------------020106020308000504020306"
+Subject: Re: [Bluez-devel] [patch] alignment trap in hcid
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,75 +22,104 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 This is a multi-part message in MIME format.
---------------030406020805030509080100
-Content-Type: text/plain; charset=ISO-8859-1
+--------------020106020308000504020306
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 
-It's me or this mail passed through the list without much glory :S.
-> Sorry I forgot the patch.
->
-> I confirmed the patch worked for an old Broadcom based dongle (D-Link
-> BT122) and for a CSR Bluecore 4 based dongle (AIRcable Host XR).
->
-> The patch should apply against the bluez-utils-3.26 vanilla package
+
+Damn me, I always forget this space after ifs...
+Is there any way to test this, or hope it's ok ?
+
+Frederic
+
+Johan Hedberg wrote:
+> On Feb 29, 2008, at 20:27, Marcel Holtmann wrote:
 >   
->> Hello List,
+>>> I recently met an alignment trap in hcid.
+>>> Some device sent me an sdp request and the answer had to be
+>>> fragmented because the device reception buffer was very small.
+>>> After that i saw alignment trap.
+>>> The last trace I saw was : Continuation state size: 8
+>>> The trace is located at sdpd/request.c : static sdp_cont_state_t
+>>> *sdp_cstate_get(uint8_t *buffer)
+>>> This function returns an unaligned pointer.
+>>>       
+>> this is so funny since I know it was there, but the new qualification
+>> tests don't find it anymore :)
 >>
->> As I asked in the forums I'm trying to create a bonding to a device
->> while I'm running a periodic scanning.
+>> Please fix the coding style. You are missing some spaces after the  
+>> "if".
 >>
->> Thing is that for some reason hcid is blocking me to do this, and Marcel
->> suggested removing the periodic inquiry check. But as he said, and I
->> think the same, that check was created for a reason.
->>
->> The line that makes the conflict is this one (utils/hcid/adapter.c:
->>
->> static DBusHandlerResult adapter_create_bonding(DBusConnection *conn,
->>                                                 DBusMessage *msg, void
->> *data)
->> .....
->>
->> if (adapter->discov_active || (adapter->pdiscov_active &&
->> !adapter->pinq_idle))
->> return error_discover_in_progress(conn, msg)
->>
->> pinq_idle is 0 in my case, so then I get a discovery in progress exception.
->>
->> Marcel suggested that I change the code to "if (adapter->discov_active
->> )" but still we would like to know what that check is made, so we can
->> get a better solution.
->>
->> Thanks,
->> Manuel Naranjo
->> Wireless Cables Inc.
->>
->>
->>   
+>> Johan, please have second look at the patch. It looks good to me.
 >>     
 >
+> Looks good to me too.
+>
+> Johan
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2008.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 >   
 
 
---------------030406020805030509080100
+--------------020106020308000504020306
 Content-Type: text/x-patch;
- name="adapter.patch"
+ name="upf_hcid_align.patch"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline;
- filename="adapter.patch"
+ filename="upf_hcid_align.patch"
 
---- adapter.c.orig	2008-02-01 21:16:31.000000000 -0200
-+++ adapter.c	2008-02-10 23:50:31.000000000 -0200
-@@ -2216,7 +2216,7 @@
- 	str2ba(peer_addr, &peer_bdaddr);
+diff --git a/sdpd/request.c b/sdpd/request.c
+index 20e68b6..5e3c715 100644
+--- a/sdpd/request.c
++++ b/sdpd/request.c
+@@ -179,7 +179,10 @@ static sdp_cont_state_t *sdp_cstate_get(uint8_t *buffer)
  
- 	/* check if there is a pending discover: requested by D-Bus/non clients */
--	if (adapter->discov_active || (adapter->pdiscov_active && !adapter->pinq_idle))
-+	if (adapter->discov_active)
- 		return error_discover_in_progress(conn, msg);
+ 	pdata += sizeof(uint8_t);
+ 	if (cStateSize != 0) {
+-		sdp_cont_state_t *cstate = (sdp_cont_state_t *)pdata;
++		sdp_cont_state_t *cstate = malloc(sizeof(sdp_cont_state_t));
++		if (!cstate)
++			return NULL;
++		memcpy(cstate, (sdp_cont_state_t *)pdata, sizeof(sdp_cont_state_t));
+ 		debug("Cstate TS : 0x%lx", cstate->timestamp);
+ 		debug("Bytes sent : %d", cstate->cStateValue.maxBytesSent);
+ 		return cstate;
+@@ -408,6 +411,8 @@ static int service_search_req(sdp_req_t *req, sdp_buf_t *buf)
+ 	}
  
- 	pending_remote_name_cancel(adapter);
+ done:	
++	if (cstate)
++		free(cstate);
+ 	if (pattern)
+ 		sdp_list_free(pattern, free);
+ 
+@@ -593,6 +598,8 @@ static int service_attr_req(sdp_req_t *req, sdp_buf_t *buf)
+ 	buf->buf_size += sizeof(uint16_t);
+ 
+ done:
++	if (cstate)
++		free(cstate);
+ 	if (seq)
+                 sdp_list_free(seq, free);
+ 	if (status)
+@@ -754,6 +761,8 @@ static int service_search_attr_req(sdp_req_t *req, sdp_buf_t *buf)
+ 	}
+ 
+ done:
++	if (cstate)
++		free(cstate);
+ 	if (tmpbuf.data)
+ 		free(tmpbuf.data);
+ 	if (pattern)
 
---------------030406020805030509080100
+--------------020106020308000504020306
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -99,7 +129,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---------------030406020805030509080100
+--------------020106020308000504020306
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -110,4 +140,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---------------030406020805030509080100--
+--------------020106020308000504020306--
