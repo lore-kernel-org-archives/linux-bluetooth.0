@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47CBF4ED.8020506@aircable.net>
-Date: Mon, 03 Mar 2008 10:54:05 -0200
+Message-ID: <47CBF4A5.1050308@aircable.net>
+Date: Mon, 03 Mar 2008 10:52:53 -0200
 From: Manuel Naranjo <manuel@aircable.net>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <1203809103.28528.14.camel@californication>
-In-Reply-To: <1203809103.28528.14.camel@californication>
-Subject: Re: [Bluez-devel] New mailing list for kernel development
+References: <47AFA9A7.3030100@aircable.net> <47AFAE50.1040508@aircable.net>
+In-Reply-To: <47AFAE50.1040508@aircable.net>
+Content-Type: multipart/mixed; boundary="------------030406020805030509080100"
+Subject: Re: [Bluez-devel] CreateBonding while periodic scanning
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,39 +17,97 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
-Hurray!!!! It really worked, spam seems to be gone from the list :D finally.
-Cheers,
-Manuel
-> Hi Folks,
->
-> since the Sourceforge team is not capable of reducing the spam to this
-> mailing list while keeping it open for all people that wanna post to it,
-> we have come to an agreement to no longer use it for kernel related
-> development.
->
-> We will still continue to talk about BlueZ related development for
-> bluez-libs and bluez-utils, but I am restricting the list now to member
-> only postings.
->
-> For all Bluetooth kernel things, please use the following list now:
->
-> http://vger.kernel.org/vger-lists.html#linux-bluetooth
->
-> Regards
->
-> Marcel
+This is a multi-part message in MIME format.
+--------------030406020805030509080100
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
+It's me or this mail passed through the list without much glory :S.
+> Sorry I forgot the patch.
+>
+> I confirmed the patch worked for an old Broadcom based dongle (D-Link
+> BT122) and for a CSR Bluecore 4 based dongle (AIRcable Host XR).
+>
+> The patch should apply against the bluez-utils-3.26 vanilla package
+>   
+>> Hello List,
+>>
+>> As I asked in the forums I'm trying to create a bonding to a device
+>> while I'm running a periodic scanning.
+>>
+>> Thing is that for some reason hcid is blocking me to do this, and Marcel
+>> suggested removing the periodic inquiry check. But as he said, and I
+>> think the same, that check was created for a reason.
+>>
+>> The line that makes the conflict is this one (utils/hcid/adapter.c:
+>>
+>> static DBusHandlerResult adapter_create_bonding(DBusConnection *conn,
+>>                                                 DBusMessage *msg, void
+>> *data)
+>> .....
+>>
+>> if (adapter->discov_active || (adapter->pdiscov_active &&
+>> !adapter->pinq_idle))
+>> return error_discover_in_progress(conn, msg)
+>>
+>> pinq_idle is 0 in my case, so then I get a discovery in progress exception.
+>>
+>> Marcel suggested that I change the code to "if (adapter->discov_active
+>> )" but still we would like to know what that check is made, so we can
+>> get a better solution.
+>>
+>> Thanks,
+>> Manuel Naranjo
+>> Wireless Cables Inc.
+>>
+>>
+>>   
+>>     
+>
+>   
+
+
+--------------030406020805030509080100
+Content-Type: text/x-patch;
+ name="adapter.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="adapter.patch"
+
+--- adapter.c.orig	2008-02-01 21:16:31.000000000 -0200
++++ adapter.c	2008-02-10 23:50:31.000000000 -0200
+@@ -2216,7 +2216,7 @@
+ 	str2ba(peer_addr, &peer_bdaddr);
+ 
+ 	/* check if there is a pending discover: requested by D-Bus/non clients */
+-	if (adapter->discov_active || (adapter->pdiscov_active && !adapter->pinq_idle))
++	if (adapter->discov_active)
+ 		return error_discover_in_progress(conn, msg);
+ 
+ 	pending_remote_name_cancel(adapter);
+
+--------------030406020805030509080100
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--------------030406020805030509080100
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--------------030406020805030509080100--
