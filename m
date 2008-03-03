@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47CC3DF5.8070303@access-company.com>
-Date: Mon, 03 Mar 2008 19:05:41 +0100
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?= <frederic.dalleau@access-company.com>
+Message-ID: <004d01c87d58$5e4b5b10$6701a8c0@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: <bluez-devel@lists.sourceforge.net>
+Date: Mon, 3 Mar 2008 11:59:44 -0600
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] [patch] alsa plugin disconnection
+Subject: [Bluez-devel] org.bluez.Manager...Activate Service
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,15 +18,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Gents,
 
-This patch will allow alsa plugin to detect disconnection of devices and 
-return error to applications.
-Not all applications will handle this error, but at least it is available.
+I am experimenting with the 3.27 version of BlueZ (libs and utils), and am attempting to ActivateService for "audio" on 
+org.bluez.Manager (path /org/bluez) using dbus_connection_send_with_reply_and_block.  I am receiving the following error:
 
-Comments are welcome.
+Method "ActivateService" with signature "s" on interface "org.bluez.Manager" doesn't exist
 
-Frederic
+I get the same error calling from C++ and from Python.
+
+When I look into the source at ..utils/hcid/manager.c, I can see the signature is there (manager_methods, at line 352).  That is 
+also where the signature for (e.g.) "FindAdapter" is present, and I can call it successfully (returning "/org/bluez/hci0") with 
+virtually identical code.
+
+I have also (from Python) called "ListServices", returning "None", even though "input" is enabled to Autostart (see input.service in 
+/etc/bluetooth).
+
+/etc/bluetooth contains both audio.conf and audio.service, both appear to be correctly set up.
+
+The only things I can think of at this point is might be dependencies on levels of glib, dbus-glib, and dbus.  According to the rpms 
+(I am using the Mandriva distro), libdbus appears to be at version 0.92, dbus-glib appears to be at version 0.71 and glibc itself 
+appears to be at version 2.4.7.
+
+Are there dependencies on newer versions of these? (I know where to get them and will install them, if that is the case.)
+
+Thanks for any help and insight...
+
+David Stockwell
+Frequency One 
 
 
 -------------------------------------------------------------------------
