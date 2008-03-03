@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <DF89F810-C85E-46DA-B2B0-FF752B4B180E@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <24522.83.38.182.64.1204581811.squirrel@webmail.zundan.com>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Tue, 4 Mar 2008 03:45:09 +0100
-References: <24522.83.38.182.64.1204581811.squirrel@webmail.zundan.com>
-Subject: Re: [Bluez-devel] bluez-gnome 0.23 translated to Basque lang
+Message-ID: <24522.83.38.182.64.1204581811.squirrel@webmail.zundan.com>
+Date: Mon, 3 Mar 2008 23:03:31 +0100 (CET)
+From: dooteo@zundan.com
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] bluez-gnome 0.23 translated to Basque lang
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,46 +18,21 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Inaki,
+Hi all,
 
-> I'm I=F1aki Larra=F1aga (aka dooteo), GNOME's Basque translation team  =
+I'm I=F1aki Larra=F1aga (aka dooteo), GNOME's Basque translation team leade=
+r.
+I'd finished to translate bluez-gnome to Basque language.
 
-> leader.
-> I'd finished to translate bluez-gnome to Basque language.
->
-> Where can I submit translated PO file to be incluede into source code?
->
-> Please, don't use translation from translation.launchpad.net, because
-> there Basque transtors does _not_ follow translation style nor
-> terminology, and they doesn't use GNOME's translation memory.
+Where can I submit translated PO file to be incluede into source code?
 
-the launchpad.net translation area contains an entry for bluez-gnome's  =
+Please, don't use translation from translation.launchpad.net, because
+there Basque transtors does _not_ follow translation style nor
+terminology, and they doesn't use GNOME's translation memory.
 
-trunk and I am testing how we can translate using that infrastructure:
+Thanks and best regards,
 
-https://translations.launchpad.net/bluez-gnome/
-
-So my current plan is that you would upload your translation there and  =
-
-then I simply merge them from time to time into the CVS.
-
-I am not sure if this actually works out or not. This is pure testing  =
-
-at the moment since I don't wanna deal with translations at all. If  =
-
-this doesn't work out then I might have to consider switching to  =
-
-something else. However at least, I can report to the Ubuntu guys  =
-
-where there system needs improvement when dealing with upstream.
-
-So it seems I can lock down the translation and assign it to the GNOME  =
-
-translation team. Do you think that would be helpful?
-
-Regards
-
-Marcel
+Dooteo
 
 
 -------------------------------------------------------------------------
