@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <fb2ac3c90803041440l75dead88y8cd8dc9d23cf66a8@mail.gmail.com>
-Date: Tue, 4 Mar 2008 15:40:54 -0700
-From: "Andrew Jorgensen" <andrew.jorgensen@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <F5766422-47CD-4AD6-8C71-AD7D21BDB4BD@holtmann.org>
-MIME-Version: 1.0
+Message-Id: <F5766422-47CD-4AD6-8C71-AD7D21BDB4BD@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <fb2ac3c90803041411k3ea1426cib1e729b19053adce@mail.gmail.com>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Tue, 4 Mar 2008 23:25:44 +0100
 References: <fb2ac3c90803041411k3ea1426cib1e729b19053adce@mail.gmail.com>
-	<F5766422-47CD-4AD6-8C71-AD7D21BDB4BD@holtmann.org>
 Subject: Re: [Bluez-devel] CreateSecureDevice
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,27 +20,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Tue, Mar 4, 2008 at 3:25 PM, Marcel Holtmann
->  yes, it is too later and it would have broken the API. If
->  CreateSecureDevice returns with no such method error, you can always
->  fallback to CreateDevice.
+Hi Andrew,
 
-Hi Marcel,
+> I was wondering why there is a CreateDevice in org.bluez.input.Manager
+> if CreateSecureDevice will fall back to the same behavior if the
+> device in question does not support secure pairing.
+>
+> bluez-gnome switched to CreateSecureDevice after that method was added
+> which broke users who still had older bluez-utils (no changes to
+> require a newer bluez-utils were made).  Would it not have been better
+> to just add the security routines to the existing CreateDevice?  Is it
+> too late to change this now?
 
-Aren't you maintaining bluez-gnome?  Could you add this fallback to
-properties/input.c?
+yes, it is too later and it would have broken the API. If  
+CreateSecureDevice returns with no such method error, you can always  
+fallback to CreateDevice.
 
-I'm curious what you mean by "would have broken the API."  Do you mean
-if we were to remove the method now after it has been released?  If so
-then I agree, it's too late.
+Regards
 
-But I'm curious why a new method was added rather than new
-functionality to the existing method.  Are there new callbacks that
-would have broken existing clients?  I guess it's a moot point now
-though.
+Marcel
 
-Thanks,
-Andrew
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
