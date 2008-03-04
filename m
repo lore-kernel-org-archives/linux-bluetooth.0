@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2d5a2c100803041359h5d726e9fv5c144fcfc8fd17ae@mail.gmail.com>
-Date: Tue, 4 Mar 2008 18:59:13 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <47CC3EEB.6060105@access-company.com>
-MIME-Version: 1.0
-References: <47CC3DF5.8070303@access-company.com>
-	<47CC3EEB.6060105@access-company.com>
-Subject: Re: [Bluez-devel] [patch] alsa plugin disconnection
+From: dooteo <dooteo@zundan.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <DF89F810-C85E-46DA-B2B0-FF752B4B180E@holtmann.org>
+References: <24522.83.38.182.64.1204581811.squirrel@webmail.zundan.com>
+	<DF89F810-C85E-46DA-B2B0-FF752B4B180E@holtmann.org>
+Date: Tue, 04 Mar 2008 18:09:47 +0100
+Message-Id: <1204650587.3477.303.camel@desktop.zundan.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] bluez-gnome 0.23 translated to Basque lang
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,69 +17,64 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Committed, even though rhythmbox (alsasink) seems to not handle the
-disconnect properly.
-
-On Mon, Mar 3, 2008 at 3:09 PM, Fr=E9d=E9ric Dalleau
-<frederic.dalleau@access-company.com> wrote:
->
->  updated patch.
->
->
->
->  Fr=E9d=E9ric Dalleau wrote:
->  > Hi,
->  >
->  > This patch will allow alsa plugin to detect disconnection of devices a=
-nd
->  > return error to applications.
->  > Not all applications will handle this error, but at least it is availa=
-ble.
->  >
->  > Comments are welcome.
->  >
->  > Frederic
->  >
->  >
->  > ----------------------------------------------------------------------=
----
->  > This SF.net email is sponsored by: Microsoft
->  > Defy all challenges. Microsoft(R) Visual Studio 2008.
->  > http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
->  > _______________________________________________
->  > Bluez-devel mailing list
->  > Bluez-devel@lists.sourceforge.net
->  > https://lists.sourceforge.net/lists/listinfo/bluez-devel
->  >
->
->
-> -------------------------------------------------------------------------
->  This SF.net email is sponsored by: Microsoft
->  Defy all challenges. Microsoft(R) Visual Studio 2008.
->  http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
->  Bluez-devel mailing list
->  Bluez-devel@lists.sourceforge.net
->  https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->
-
-
-
--- =
-
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SGkgTWFyY2VsLAoKSW5rc2NhcGUgcHJvamVjdCB1c2VzIExhdW5jaHBhZC5uZXQsIGJ1dCB0cmFu
+c2xhdG9ycyBtdXN0IHNlbmQgUE8gZmlsZXMKYXMgYnVnIHRvIHRoZSBwcm9qZWN0LCBzbyB0aGVu
+IElua3NjYXBlIGRldmVsb3BlcnMgdGFrZSB0aGVtIGFuZCBwdXQKaW50byB0aGUgc291cmNlIGNv
+ZGUuIEl0IGNvdWxkIGJlIGEgd2F5IGZvciBibHVlei1nbm9tZSB0b28uIFNlZTogCgpodHRwczov
+L2J1Z3MubGF1bmNocGFkLm5ldC9idWdzLzE5ODEwMQoKT3RoZXIgd2F5IChJIHRoaW5rIHRoZSBi
+ZXN0KSwgdG8gbm90IHRha2UgY2FyZSBhYm91dCB0cmFuc2xhdGlvbiwgY291bGQKYmUgdG8gaW5j
+bHVkZSBhcyBHTk9NRSBwcm9qZWN0IGludG8gZ25vbWUub3JnIHNpdGUuLi4gVGhlcmUgd2UKKHRy
+YW5zbGF0b3JzKSB1c2UgU1ZOIHRvbyB0byBhY2Nlc3Mgc291cmNlIGNvZGUgKGNoZWNrb3V0L3Vw
+ZGF0ZSksIGFuZApvbmNlIGEgUE8gaXMgdXBkYXRlZCB3ZSBjb21taXQuIEFsbCBhY2Nlc3MgaXMg
+ZG9uZSBieSBTU0ggcGFzc3BocmFzZSwKYW5kIGFsbCBzb3VyY2UgIGNvZGUgaXMgdGFrZW4gYnkg
+bWFueSBHTlUvTGludXggZGlzdHJpYnV0aW9ucyAod2l0aAp0cmFuc2xhdGVkIGZpbGVzIG9mIGNv
+dXJzZSkgdG8gYmUgcGFja2V0IGludG8gdGhlaXIgcmVsZWFzZXMuCgpNb3N0IG9mIHRyYW5zbGF0
+b3JzIHVzZXMgS0JhYmVsIG9yIEd0cmFuc2xhdG9yIGxpa2UgdG9vbHMgdG8gdHJhbnNsYXRlCmFu
+ZCB1c2UgdHJhbnNsYXRpb24gbWVtb3JpZS4gaHR0cHM6Ly90cmFuc2xhdGlvbnMubGF1bmNocGFk
+Lm5ldCBoYXMKdHJhbnNsYXRpb24gbWVtb3JpZXMsIGJ1dCBzb21lIGNvbW11bml0eSB0cmFuc2xh
+dG9ycyBkb2Vzbid0IHVzZSB0aGVtLAphbmQgbWFrZSB3cm9uZyBzdHlsZSB0cmFuc2xhdGlvbnMu
+CgpCeSB0aGUgb3RoZXIgaGFuZCwgY2FuIEkgc3VibWl0IHRyYW5zbGF0ZWQgZmlsZSB0byB5b3Ug
+ZGlyZWN0bHk/IAoKQmVzdCByZWdhcmRzLAoKRG9vdGVvCgpKYXRvcnJpemtvIG1lenVhOiBhci4s
+IDIwMDgtMDMtMDQgMDM6NDUgKzAxMDAsIGVnaWxlYTogTWFyY2VsIEhvbHRtYW5uCj4gSGkgSW5h
+a2ksCj4gCj4gPiBJJ20gScOxYWtpIExhcnJhw7FhZ2EgKGFrYSBkb290ZW8pLCBHTk9NRSdzIEJh
+c3F1ZSB0cmFuc2xhdGlvbiB0ZWFtICAKPiA+IGxlYWRlci4KPiA+IEknZCBmaW5pc2hlZCB0byB0
+cmFuc2xhdGUgYmx1ZXotZ25vbWUgdG8gQmFzcXVlIGxhbmd1YWdlLgo+ID4KPiA+IFdoZXJlIGNh
+biBJIHN1Ym1pdCB0cmFuc2xhdGVkIFBPIGZpbGUgdG8gYmUgaW5jbHVlZGUgaW50byBzb3VyY2Ug
+Y29kZT8KPiA+Cj4gPiBQbGVhc2UsIGRvbid0IHVzZSB0cmFuc2xhdGlvbiBmcm9tIHRyYW5zbGF0
+aW9uLmxhdW5jaHBhZC5uZXQsIGJlY2F1c2UKPiA+IHRoZXJlIEJhc3F1ZSB0cmFuc3RvcnMgZG9l
+cyBfbm90XyBmb2xsb3cgdHJhbnNsYXRpb24gc3R5bGUgbm9yCj4gPiB0ZXJtaW5vbG9neSwgYW5k
+IHRoZXkgZG9lc24ndCB1c2UgR05PTUUncyB0cmFuc2xhdGlvbiBtZW1vcnkuCj4gCj4gdGhlIGxh
+dW5jaHBhZC5uZXQgdHJhbnNsYXRpb24gYXJlYSBjb250YWlucyBhbiBlbnRyeSBmb3IgYmx1ZXot
+Z25vbWUncyAgCj4gdHJ1bmsgYW5kIEkgYW0gdGVzdGluZyBob3cgd2UgY2FuIHRyYW5zbGF0ZSB1
+c2luZyB0aGF0IGluZnJhc3RydWN0dXJlOgo+IAo+IGh0dHBzOi8vdHJhbnNsYXRpb25zLmxhdW5j
+aHBhZC5uZXQvYmx1ZXotZ25vbWUvCj4gCj4gU28gbXkgY3VycmVudCBwbGFuIGlzIHRoYXQgeW91
+IHdvdWxkIHVwbG9hZCB5b3VyIHRyYW5zbGF0aW9uIHRoZXJlIGFuZCAgCj4gdGhlbiBJIHNpbXBs
+eSBtZXJnZSB0aGVtIGZyb20gdGltZSB0byB0aW1lIGludG8gdGhlIENWUy4KPiAKPiBJIGFtIG5v
+dCBzdXJlIGlmIHRoaXMgYWN0dWFsbHkgd29ya3Mgb3V0IG9yIG5vdC4gVGhpcyBpcyBwdXJlIHRl
+c3RpbmcgIAo+IGF0IHRoZSBtb21lbnQgc2luY2UgSSBkb24ndCB3YW5uYSBkZWFsIHdpdGggdHJh
+bnNsYXRpb25zIGF0IGFsbC4gSWYgIAo+IHRoaXMgZG9lc24ndCB3b3JrIG91dCB0aGVuIEkgbWln
+aHQgaGF2ZSB0byBjb25zaWRlciBzd2l0Y2hpbmcgdG8gIAo+IHNvbWV0aGluZyBlbHNlLiBIb3dl
+dmVyIGF0IGxlYXN0LCBJIGNhbiByZXBvcnQgdG8gdGhlIFVidW50dSBndXlzICAKPiB3aGVyZSB0
+aGVyZSBzeXN0ZW0gbmVlZHMgaW1wcm92ZW1lbnQgd2hlbiBkZWFsaW5nIHdpdGggdXBzdHJlYW0u
+Cj4gCj4gU28gaXQgc2VlbXMgSSBjYW4gbG9jayBkb3duIHRoZSB0cmFuc2xhdGlvbiBhbmQgYXNz
+aWduIGl0IHRvIHRoZSBHTk9NRSAgCj4gdHJhbnNsYXRpb24gdGVhbS4gRG8geW91IHRoaW5rIHRo
+YXQgd291bGQgYmUgaGVscGZ1bD8KPiAKPiBSZWdhcmRzCj4gCj4gTWFyY2VsCj4gCj4gCj4gLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLQo+IFRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogTWljcm9z
+b2Z0Cj4gRGVmeSBhbGwgY2hhbGxlbmdlcy4gTWljcm9zb2Z0KFIpIFZpc3VhbCBTdHVkaW8gMjAw
+OC4KPiBodHRwOi8vY2xrLmF0ZG10LmNvbS9NUlQvZ28vdnNlMDEyMDAwMDA3MG1ydC9kaXJlY3Qv
+MDEvCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KPiBC
+bHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKPiBCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5u
+ZXQKPiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1k
+ZXZlbAo+IAoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVk
+IGJ5OiBNaWNyb3NvZnQKRGVmeSBhbGwgY2hhbGxlbmdlcy4gTWljcm9zb2Z0KFIpIFZpc3VhbCBT
+dHVkaW8gMjAwOC4KaHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBtcnQv
+ZGlyZWN0LzAxLwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+XwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2Uu
+bmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRl
+dmVsCg==
