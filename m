@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: dooteo <dooteo@zundan.com>
+Message-Id: <DF89F810-C85E-46DA-B2B0-FF752B4B180E@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <DF89F810-C85E-46DA-B2B0-FF752B4B180E@holtmann.org>
+In-Reply-To: <24522.83.38.182.64.1204581811.squirrel@webmail.zundan.com>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Tue, 4 Mar 2008 03:45:09 +0100
 References: <24522.83.38.182.64.1204581811.squirrel@webmail.zundan.com>
-	<DF89F810-C85E-46DA-B2B0-FF752B4B180E@holtmann.org>
-Date: Tue, 04 Mar 2008 18:09:47 +0100
-Message-Id: <1204650587.3477.303.camel@desktop.zundan.com>
-Mime-Version: 1.0
 Subject: Re: [Bluez-devel] bluez-gnome 0.23 translated to Basque lang
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -17,64 +16,57 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGkgTWFyY2VsLAoKSW5rc2NhcGUgcHJvamVjdCB1c2VzIExhdW5jaHBhZC5uZXQsIGJ1dCB0cmFu
-c2xhdG9ycyBtdXN0IHNlbmQgUE8gZmlsZXMKYXMgYnVnIHRvIHRoZSBwcm9qZWN0LCBzbyB0aGVu
-IElua3NjYXBlIGRldmVsb3BlcnMgdGFrZSB0aGVtIGFuZCBwdXQKaW50byB0aGUgc291cmNlIGNv
-ZGUuIEl0IGNvdWxkIGJlIGEgd2F5IGZvciBibHVlei1nbm9tZSB0b28uIFNlZTogCgpodHRwczov
-L2J1Z3MubGF1bmNocGFkLm5ldC9idWdzLzE5ODEwMQoKT3RoZXIgd2F5IChJIHRoaW5rIHRoZSBi
-ZXN0KSwgdG8gbm90IHRha2UgY2FyZSBhYm91dCB0cmFuc2xhdGlvbiwgY291bGQKYmUgdG8gaW5j
-bHVkZSBhcyBHTk9NRSBwcm9qZWN0IGludG8gZ25vbWUub3JnIHNpdGUuLi4gVGhlcmUgd2UKKHRy
-YW5zbGF0b3JzKSB1c2UgU1ZOIHRvbyB0byBhY2Nlc3Mgc291cmNlIGNvZGUgKGNoZWNrb3V0L3Vw
-ZGF0ZSksIGFuZApvbmNlIGEgUE8gaXMgdXBkYXRlZCB3ZSBjb21taXQuIEFsbCBhY2Nlc3MgaXMg
-ZG9uZSBieSBTU0ggcGFzc3BocmFzZSwKYW5kIGFsbCBzb3VyY2UgIGNvZGUgaXMgdGFrZW4gYnkg
-bWFueSBHTlUvTGludXggZGlzdHJpYnV0aW9ucyAod2l0aAp0cmFuc2xhdGVkIGZpbGVzIG9mIGNv
-dXJzZSkgdG8gYmUgcGFja2V0IGludG8gdGhlaXIgcmVsZWFzZXMuCgpNb3N0IG9mIHRyYW5zbGF0
-b3JzIHVzZXMgS0JhYmVsIG9yIEd0cmFuc2xhdG9yIGxpa2UgdG9vbHMgdG8gdHJhbnNsYXRlCmFu
-ZCB1c2UgdHJhbnNsYXRpb24gbWVtb3JpZS4gaHR0cHM6Ly90cmFuc2xhdGlvbnMubGF1bmNocGFk
-Lm5ldCBoYXMKdHJhbnNsYXRpb24gbWVtb3JpZXMsIGJ1dCBzb21lIGNvbW11bml0eSB0cmFuc2xh
-dG9ycyBkb2Vzbid0IHVzZSB0aGVtLAphbmQgbWFrZSB3cm9uZyBzdHlsZSB0cmFuc2xhdGlvbnMu
-CgpCeSB0aGUgb3RoZXIgaGFuZCwgY2FuIEkgc3VibWl0IHRyYW5zbGF0ZWQgZmlsZSB0byB5b3Ug
-ZGlyZWN0bHk/IAoKQmVzdCByZWdhcmRzLAoKRG9vdGVvCgpKYXRvcnJpemtvIG1lenVhOiBhci4s
-IDIwMDgtMDMtMDQgMDM6NDUgKzAxMDAsIGVnaWxlYTogTWFyY2VsIEhvbHRtYW5uCj4gSGkgSW5h
-a2ksCj4gCj4gPiBJJ20gScOxYWtpIExhcnJhw7FhZ2EgKGFrYSBkb290ZW8pLCBHTk9NRSdzIEJh
-c3F1ZSB0cmFuc2xhdGlvbiB0ZWFtICAKPiA+IGxlYWRlci4KPiA+IEknZCBmaW5pc2hlZCB0byB0
-cmFuc2xhdGUgYmx1ZXotZ25vbWUgdG8gQmFzcXVlIGxhbmd1YWdlLgo+ID4KPiA+IFdoZXJlIGNh
-biBJIHN1Ym1pdCB0cmFuc2xhdGVkIFBPIGZpbGUgdG8gYmUgaW5jbHVlZGUgaW50byBzb3VyY2Ug
-Y29kZT8KPiA+Cj4gPiBQbGVhc2UsIGRvbid0IHVzZSB0cmFuc2xhdGlvbiBmcm9tIHRyYW5zbGF0
-aW9uLmxhdW5jaHBhZC5uZXQsIGJlY2F1c2UKPiA+IHRoZXJlIEJhc3F1ZSB0cmFuc3RvcnMgZG9l
-cyBfbm90XyBmb2xsb3cgdHJhbnNsYXRpb24gc3R5bGUgbm9yCj4gPiB0ZXJtaW5vbG9neSwgYW5k
-IHRoZXkgZG9lc24ndCB1c2UgR05PTUUncyB0cmFuc2xhdGlvbiBtZW1vcnkuCj4gCj4gdGhlIGxh
-dW5jaHBhZC5uZXQgdHJhbnNsYXRpb24gYXJlYSBjb250YWlucyBhbiBlbnRyeSBmb3IgYmx1ZXot
-Z25vbWUncyAgCj4gdHJ1bmsgYW5kIEkgYW0gdGVzdGluZyBob3cgd2UgY2FuIHRyYW5zbGF0ZSB1
-c2luZyB0aGF0IGluZnJhc3RydWN0dXJlOgo+IAo+IGh0dHBzOi8vdHJhbnNsYXRpb25zLmxhdW5j
-aHBhZC5uZXQvYmx1ZXotZ25vbWUvCj4gCj4gU28gbXkgY3VycmVudCBwbGFuIGlzIHRoYXQgeW91
-IHdvdWxkIHVwbG9hZCB5b3VyIHRyYW5zbGF0aW9uIHRoZXJlIGFuZCAgCj4gdGhlbiBJIHNpbXBs
-eSBtZXJnZSB0aGVtIGZyb20gdGltZSB0byB0aW1lIGludG8gdGhlIENWUy4KPiAKPiBJIGFtIG5v
-dCBzdXJlIGlmIHRoaXMgYWN0dWFsbHkgd29ya3Mgb3V0IG9yIG5vdC4gVGhpcyBpcyBwdXJlIHRl
-c3RpbmcgIAo+IGF0IHRoZSBtb21lbnQgc2luY2UgSSBkb24ndCB3YW5uYSBkZWFsIHdpdGggdHJh
-bnNsYXRpb25zIGF0IGFsbC4gSWYgIAo+IHRoaXMgZG9lc24ndCB3b3JrIG91dCB0aGVuIEkgbWln
-aHQgaGF2ZSB0byBjb25zaWRlciBzd2l0Y2hpbmcgdG8gIAo+IHNvbWV0aGluZyBlbHNlLiBIb3dl
-dmVyIGF0IGxlYXN0LCBJIGNhbiByZXBvcnQgdG8gdGhlIFVidW50dSBndXlzICAKPiB3aGVyZSB0
-aGVyZSBzeXN0ZW0gbmVlZHMgaW1wcm92ZW1lbnQgd2hlbiBkZWFsaW5nIHdpdGggdXBzdHJlYW0u
-Cj4gCj4gU28gaXQgc2VlbXMgSSBjYW4gbG9jayBkb3duIHRoZSB0cmFuc2xhdGlvbiBhbmQgYXNz
-aWduIGl0IHRvIHRoZSBHTk9NRSAgCj4gdHJhbnNsYXRpb24gdGVhbS4gRG8geW91IHRoaW5rIHRo
-YXQgd291bGQgYmUgaGVscGZ1bD8KPiAKPiBSZWdhcmRzCj4gCj4gTWFyY2VsCj4gCj4gCj4gLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLQo+IFRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogTWljcm9z
-b2Z0Cj4gRGVmeSBhbGwgY2hhbGxlbmdlcy4gTWljcm9zb2Z0KFIpIFZpc3VhbCBTdHVkaW8gMjAw
-OC4KPiBodHRwOi8vY2xrLmF0ZG10LmNvbS9NUlQvZ28vdnNlMDEyMDAwMDA3MG1ydC9kaXJlY3Qv
-MDEvCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KPiBC
-bHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKPiBCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5u
-ZXQKPiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1k
-ZXZlbAo+IAoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVk
-IGJ5OiBNaWNyb3NvZnQKRGVmeSBhbGwgY2hhbGxlbmdlcy4gTWljcm9zb2Z0KFIpIFZpc3VhbCBT
-dHVkaW8gMjAwOC4KaHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBtcnQv
-ZGlyZWN0LzAxLwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-XwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2Uu
-bmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRl
-dmVsCg==
+Hi Inaki,
+
+> I'm I=F1aki Larra=F1aga (aka dooteo), GNOME's Basque translation team  =
+
+> leader.
+> I'd finished to translate bluez-gnome to Basque language.
+>
+> Where can I submit translated PO file to be incluede into source code?
+>
+> Please, don't use translation from translation.launchpad.net, because
+> there Basque transtors does _not_ follow translation style nor
+> terminology, and they doesn't use GNOME's translation memory.
+
+the launchpad.net translation area contains an entry for bluez-gnome's  =
+
+trunk and I am testing how we can translate using that infrastructure:
+
+https://translations.launchpad.net/bluez-gnome/
+
+So my current plan is that you would upload your translation there and  =
+
+then I simply merge them from time to time into the CVS.
+
+I am not sure if this actually works out or not. This is pure testing  =
+
+at the moment since I don't wanna deal with translations at all. If  =
+
+this doesn't work out then I might have to consider switching to  =
+
+something else. However at least, I can report to the Ubuntu guys  =
+
+where there system needs improvement when dealing with upstream.
+
+So it seems I can lock down the translation and assign it to the GNOME  =
+
+translation team. Do you think that would be helpful?
+
+Regards
+
+Marcel
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
