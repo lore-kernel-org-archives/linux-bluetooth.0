@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-Date: Wed, 05 Mar 2008 16:48:29 -0500
+Message-ID: <d89ddf300803050603k17a30359g173ab08f0756ff49@mail.gmail.com>
+Date: Wed, 5 Mar 2008 07:03:45 -0700
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <2cb4fa160803050333j22a9bc9et68f30c2664d34061@mail.gmail.com>
 MIME-Version: 1.0
-From: idunno@when.com
-Message-Id: <8CA4D21C8A3F5D9-F78-233F@webmail-md08.sysops.aol.com>
-Subject: [Bluez-users] Logitech Travel Mouse
+References: <2cb4fa160803050333j22a9bc9et68f30c2664d34061@mail.gmail.com>
+Subject: Re: [Bluez-users] Question about bluetooth simultaneous connections
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,69 +16,45 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0667587109=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Mohomed, you'll get closer to 7 if you try to keep your device master
+on its connections. Something like calling a fn after estabishing
+connections:
 
---===============0667587109==
-Content-Type: multipart/alternative;
-	boundary="--------MB_8CA4D21C8A65838_F78_46C9_webmail-md08.sysops.aol.com"
+static void make_master(bdaddr_t bdaddr)
+{
+        uint8_t role = 0; // 0 means master
+        int dd, dev_id;
 
+        dev_id = hci_for_each_dev(HCI_UP, find_conn, (long) &bdaddr);
+        if (dev_id < 0) {
+                fprintf(stderr, "make_master: Not connected.\n");
+                return;
+        }
 
-----------MB_8CA4D21C8A65838_F78_46C9_webmail-md08.sysops.aol.com
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"
+        dd = hci_open_dev(dev_id);
+        if (dd < 0) {
+                perror("HCI device open failed");
+                return;
+        }
 
-I see it in the Bluetooth properties, and it says it's connected... I made it trusted, but I can't use it.
+        if (hci_switch_role(dd, &bdaddr, role, 10000) < 0) {
+                perror("Switch role request failed");
+        }
+        close(dd);
+}
 
-I untrusted it, and I still can't use it. 
-
-I've attempted pairing and unpairing them... I can't browse it (because it's a mouse..) and this is driving me rather mad.
-
-anyone have any ideas? please and thank you!
-
-________________________________________________________________________
-Stand above the crowd! Get a free email address that expresses who you are at http://domains.aol.com
-
-----------MB_8CA4D21C8A65838_F78_46C9_webmail-md08.sysops.aol.com
-Content-Transfer-Encoding: 7bit
-Content-Type: text/html; charset="us-ascii"
-
-<font face="Arial, Helvetica, sans-serif">I see it in the Bluetooth properties, and it says it's connected... I made it trusted, but I can't use it.<br>
-<br>
-I untrusted it, and I still can't use it. <br>
-<br>
-I've attempted pairing and unpairing them... I can't browse it (because it's a mouse..) and this is driving me rather mad.<br>
-<br>
-anyone have any ideas? please and thank you!<br>
-</font><div class="AOLPromoFooter">
-<hr style="margin-top:10px;" />
-Stand above the crowd! Let your email address express who you really are. <a href="http://domains.aol.com?ncid=aolwml00050000000003">Click Here... It's free!</a>
-</div>
-
-----------MB_8CA4D21C8A65838_F78_46C9_webmail-md08.sysops.aol.com--
-
-
---===============0667587109==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============0667587109==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0667587109==--
