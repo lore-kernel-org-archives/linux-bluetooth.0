@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ Hackers <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="=-1cB6oM5MTzcfYlLLCp3z"
-Date: Wed, 05 Mar 2008 23:45:19 +0000
-Message-Id: <1204760719.2640.83.camel@cookie.hadess.net>
+Content-Type: multipart/mixed; boundary="=-2oBwnddPIy9w75ICfBC9"
+Date: Wed, 05 Mar 2008 21:58:41 +0000
+Message-Id: <1204754321.2640.79.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: [Bluez-devel] [PATCH] Add some device types
+Subject: [Bluez-devel] [PATCH] Set "filter" property correctly
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,96 +19,68 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---=-1cB6oM5MTzcfYlLLCp3z
+--=-2oBwnddPIy9w75ICfBC9
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
 Heya,
 
-A patch to add tablets and joypads/joysticks to client.c.
-
-I'm currently reworking the device filter to suck a bit less.
+- Set the default property to "phones" in the test application
+- Fix setting filter properties in the device selection widget
 
 Cheers
 
---=-1cB6oM5MTzcfYlLLCp3z
-Content-Disposition: attachment; filename=bluez-gnome-add-device-types.patch
-Content-Type: text/x-patch; name=bluez-gnome-add-device-types.patch;
+--=-2oBwnddPIy9w75ICfBC9
+Content-Disposition: attachment; filename=bluez-gnome-set-filter-property.patch
+Content-Type: text/x-patch; name=bluez-gnome-set-filter-property.patch;
 	charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 
-Index: client.c
+Index: bluetooth-device-selection.c
 ===================================================================
-RCS file: /cvsroot/bluez/gnome/common/client.c,v
-retrieving revision 1.41
-diff -u -p -u -p -r1.41 client.c
---- client.c	11 Feb 2008 22:23:36 -0000	1.41
-+++ client.c	5 Mar 2008 23:41:16 -0000
-@@ -137,6 +137,10 @@ const gchar *bluetooth_type_to_string(gu
- 		return N_("Camera");
- 	case BLUETOOTH_TYPE_PRINTER:
- 		return N_("Printer");
-+	case BLUETOOTH_TYPE_JOYPAD:
-+		return N_("Joypad");
-+	case BLUETOOTH_TYPE_TABLET:
-+		return N_("Tablet");
- 	default:
- 		return N_("Unknown");
- 	}
-@@ -163,15 +167,28 @@ static guint class_to_type(guint32 class
- 	case 0x04:
- 		switch ((class & 0xfc) >> 2) {
- 		case 0x01:
-+		case 0x02:
- 			return BLUETOOTH_TYPE_HEADSET;
- 		}
+RCS file: /cvsroot/bluez/gnome/common/bluetooth-device-selection.c,v
+retrieving revision 1.17
+diff -u -p -u -p -r1.17 bluetooth-device-selection.c
+--- bluetooth-device-selection.c	12 Feb 2008 17:26:57 -0000	1.17
++++ bluetooth-device-selection.c	5 Mar 2008 21:56:29 -0000
+@@ -656,7 +656,7 @@ bluetooth_device_selection_set_property 
  		break;
- 	case 0x05:
- 		switch ((class & 0xc0) >> 6) {
-+		case 0x00:
-+			switch ((class & 0x1e) >> 2) {
-+			case 0x01:
-+			case 0x02:
-+				return BLUETOOTH_TYPE_JOYPAD;
-+			}
-+			break;
- 		case 0x01:
- 			return BLUETOOTH_TYPE_KEYBOARD;
- 		case 0x02:
--			return BLUETOOTH_TYPE_MOUSE;
-+			switch ((class & 0x1e) >> 2) {
-+			case 0x05:
-+				return BLUETOOTH_TYPE_TABLET;
-+			default:
-+				return BLUETOOTH_TYPE_MOUSE;
-+			}
- 		}
+ 	case PROP_DEVICE_TYPE_FILTER:
+ 		priv->device_type_filter = g_value_get_int (value);
+-		gtk_combo_box_set_active (GTK_COMBO_BOX(priv->device_type), priv->device_type_filter);
++		gtk_combo_box_set_active (GTK_COMBO_BOX(priv->device_type), priv->device_type_filter >> 1);
  		break;
- 	case 0x06:
-Index: client.h
+ 	case PROP_DEVICE_CATEGORY_FILTER:
+ 		priv->device_category_filter = g_value_get_int (value);
+Index: test-deviceselection.c
 ===================================================================
-RCS file: /cvsroot/bluez/gnome/common/client.h,v
-retrieving revision 1.23
-diff -u -p -u -p -r1.23 client.h
---- client.h	11 Feb 2008 22:23:36 -0000	1.23
-+++ client.h	5 Mar 2008 23:41:16 -0000
-@@ -86,10 +86,12 @@ enum {
- 	BLUETOOTH_TYPE_KEYBOARD   = 1 << 6,
- 	BLUETOOTH_TYPE_MOUSE      = 1 << 7,
- 	BLUETOOTH_TYPE_CAMERA     = 1 << 8,
--	BLUETOOTH_TYPE_PRINTER    = 1 << 9 
-+	BLUETOOTH_TYPE_PRINTER    = 1 << 9,
-+	BLUETOOTH_TYPE_JOYPAD     = 1 << 10,
-+	BLUETOOTH_TYPE_TABLET     = 1 << 11,
- };
+RCS file: /cvsroot/bluez/gnome/common/test-deviceselection.c,v
+retrieving revision 1.6
+diff -u -p -u -p -r1.6 test-deviceselection.c
+--- test-deviceselection.c	2 Feb 2008 04:09:39 -0000	1.6
++++ test-deviceselection.c	5 Mar 2008 21:56:29 -0000
+@@ -29,6 +29,7 @@
+ #include <gtk/gtk.h>
  
--#define BLUETOOTH_TYPE_NUM_TYPES 10
-+#define BLUETOOTH_TYPE_NUM_TYPES 12
- #define BLUETOOTH_TYPE_INPUT (BLUETOOTH_TYPE_KEYBOARD | BLUETOOTH_TYPE_MOUSE)
+ #include "bluetooth-device-selection.h"
++#include "client.h"
  
- const gchar *bluetooth_type_to_string(guint type);
+ static void device_selected_cb(GObject *object,
+ 			       GParamSpec *spec, gpointer user_data)
+@@ -78,7 +79,10 @@ int main(int argc, char **argv)
+ 	selector = bluetooth_device_selection_new("Select a Device to Setup");
+ 	gtk_container_set_border_width(GTK_CONTAINER(selector), 5);
+ 	gtk_widget_show(selector);
+-	g_object_set(selector, "show-search", TRUE, NULL);
++	g_object_set(selector,
++		     "show-search", TRUE,
++		     "device-type-filter", BLUETOOTH_TYPE_PHONE,
++		     NULL);
+ 	g_signal_connect(selector, "selected-device-changed",
+ 			 G_CALLBACK(select_device_changed), dialog);
+ 	g_signal_connect(selector, "notify::device-selected",
 
---=-1cB6oM5MTzcfYlLLCp3z
+--=-2oBwnddPIy9w75ICfBC9
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -118,7 +90,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---=-1cB6oM5MTzcfYlLLCp3z
+--=-2oBwnddPIy9w75ICfBC9
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -129,4 +101,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-1cB6oM5MTzcfYlLLCp3z--
+--=-2oBwnddPIy9w75ICfBC9--
