@@ -1,11 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1521D68760504C61837D70AA89588A3E@iMe>
-From: "Eng. Waleed Al-Rashoud" <iwaleed@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-References: <fqnfkk$9np$1@ger.gmane.org>
-Date: Thu, 6 Mar 2008 16:48:14 +0300
-MIME-Version: 1.0
-Subject: [Bluez-users] How to change the Hci packet size?
+From: Guillaume Bedot <littletux@zarb.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <alpine.LNX.1.00.0803052312120.7716@nge2.ngu.pk>
+References: <alpine.LNX.1.00.0803052312120.7716@nge2.ngu.pk>
+Date: Thu, 06 Mar 2008 09:49:25 +0100
+Message-Id: <1204793365.8023.9.camel@littletux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Headset not working, 2.6.24.x style
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,10 +20,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi, what it the largest packet size for the Hci? 
-Is it a configuration in the BlueZ or is it a configuration in the adapter?
-thanks
- 
+Hello,
+
+I guess you have a bluetooth =< 1.2 headset. It's a known issue,
+unfortunaletly it is not fixed yet.
+
+You can try this kernel patch and report if this works for you (for me
+it does) :
+http://lkml.org/lkml/diff/2008/2/25/530/1
+
+Regards,
+
+Guillaume B.
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
