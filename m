@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47D020D1.9020204@inov.pt>
-Date: Thu, 06 Mar 2008 16:50:25 +0000
-From: Jose Goncalves <jose.goncalves@inov.pt>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] Bug in compat_ppoll
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ Hackers <bluez-devel@lists.sourceforge.net>
+Date: Thu, 06 Mar 2008 16:09:18 +0000
+Message-Id: <1204819758.2640.123.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Device type filter ideas
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,43 +14,28 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Heya,
 
-When I was cross-compiling Bluez for a system without the ppoll() system
-call, I've found a bug on you ppoll() stub, compat_ppoll(), that causes
-rfcomm to eat all CPU power when called in this way:
+As can be seen after yesterday's commit, the device type filter in the
+selection widget is starting to get a bit long.
 
-$ rfcomm listen 0 1 <cmd>
+How about putting the work of adding new filters onto applications
+instead?
 
-After the RFCOMM connection is established and the command is executed
-the CPU load reaches 100%.
+I can think that sendto would add filters for Phones, Printers, and
+computers, as those are the most likely type of devices that could have
+obex available.
 
-This patch solved my problem:
+The "add input device" dialogue would have a macro filter "Input
+devices" filter, as well as more targetted "Mouse", "Keyboard", etc.
 
-diff -Naur bluez-utils-3.27.orig/common/ppoll.h
-bluez-utils-3.27/common/ppoll.h
---- bluez-utils-3.27.orig/common/ppoll.h    2007-05-20
-09:28:28.000000000 +0100
-+++ bluez-utils-3.27/common/ppoll.h 2008-03-06 15:56:02.000000000 +0000
-@@ -7,5 +7,10 @@
- static inline int compat_ppoll(struct pollfd *fds, nfds_t nfds,
-        const struct timespec *timeout, const sigset_t *sigmask)
- {
--   return poll(fds, nfds, timeout ? timeout->tv_sec * 1000 : 500);
-+   if (timeout =3D=3D NULL)
-+       return poll(fds, nfds, -1);
-+   else if (timeout->tv_sec =3D=3D 0)
-+       return poll(fds, nfds, 500);
-+   else
-+       return poll(fds, nfds, timeout->tv_sec * 1000);
- }
+What do you think?
 
-Regards,
-Jos=E9 Miguel Gon=E7alves
+Cheers
 
 
 -------------------------------------------------------------------------
