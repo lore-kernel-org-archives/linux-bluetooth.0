@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="----_=_NextPart_001_01C88022.89B7417C"
-Date: Fri, 7 Mar 2008 08:11:09 +0100
-Message-ID: <F89A3B5A7757E8459E51BB927E971C44149279@CSEXC11.cs.san.gva.es>
-References: <alpine.LNX.1.00.0803052312120.7716@nge2.ngu.pk><1204793365.8023.9.camel@littletux>
-	<alpine.LNX.1.00.0803061047380.3415@nge2.ngu.pk>
-From: "PEDRO MACANAS VALVERDE" <macanas_ped@gva.es>
+Message-ID: <75FAE26125E34CEBB2A6589F506A6784@iMe>
+From: "Eng. Waleed Al-Rashoud" <iwaleed@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Headset not working, 2.6.24.x style
+References: <fqnfkk$9np$1@ger.gmane.org> <1521D68760504C61837D70AA89588A3E@iMe>
+	<A3582650-894E-4E59-A156-42D2C5D973C0@holtmann.org>
+Date: Fri, 7 Mar 2008 02:11:58 +0300
+MIME-Version: 1.0
+Subject: Re: [Bluez-users] How to change the Hci packet size?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,133 +16,51 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
-
-------_=_NextPart_001_01C88022.89B7417C
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-De: bluez-users-bounces@lists.sourceforge.net en nombre de jayjwa
-Enviado el: jue 06/03/2008 16:57
-Para: BlueZ users
-Asunto: Re: [Bluez-users] Headset not working, 2.6.24.x style
+Thanks.. but I remember something in the Bluetooth standard like 'continue' 
+flag in each HCI packet.. Who is responsible to fill this?
+Thanks again marcel..
 
 
+--------------------------------------------------
+From: "Marcel Holtmann" <marcel@holtmann.org>
+Sent: Thursday, March 06, 2008 5:53 PM
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] How to change the Hci packet size?
 
+> Hi,
+>
+>> Hi, what it the largest packet size for the Hci?
+>> Is it a configuration in the BlueZ or is it a configuration in the
+>> adapter?
+>
+> don't bother in trying. The firmware inside the Bluetooth chip is
+> responsible for doing this job. It will pick the packet type that is
+> best suitable.
+>
+> Regards
+>
+> Marcel
+>
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2008.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users 
 
-
-On Thu, 6 Mar 2008, Guillaume Bedot wrote:
-
--> You can try this kernel patch and report if this works for you (for =
-me
--> it does) :
--> http://lkml.org/lkml/diff/2008/2/25/530/1
-
-
->It does indeed work. I applied the patch to 2.6.24.3 and the headset
-produces sound now. Thank you very much.
-
-I think we would propose include it in the upstream kernel.
-
-Regards.
-
-=20
-
-
-------_=_NextPart_001_01C88022.89B7417C
-Content-Type: application/ms-tnef;
-	name="winmail.dat"
-Content-Transfer-Encoding: base64
-
-eJ8+IgEHAQaQCAAEAAAAAAABAAEAAQeQBgAIAAAA5AQAAAAAAADoAAEIgAcAGAAAAElQTS5NaWNy
-b3NvZnQgTWFpbC5Ob3RlADEIAQ2ABAACAAAAAQABAAEEgAEANgAAAFJFOiBbQmx1ZXotdXNlcnNd
-IEhlYWRzZXQgbm90IHdvcmtpbmcsIDIuNi4yNC54IHN0eWxlAOcRAQWAAwAOAAAA2AcDAAcACAAL
-AAkABQAKAQEggAMADgAAANgHAwAHAAgADAAAAAUAAgEBCYABACEAAAA2REU4MTkxNjhFN0M1MzQw
-OTE5OEQxNUUxRjFBNDJERAAsBwEDkAYAdA0AADkAAAADACYAAQAAAAMANgAAAAAAQAA5AD3v5Woi
-gMgBHgA9AAEAAAAFAAAAUkU6IAAAAAACAUcAAQAAAC8AAABjPUVTO2E9IDtwPVNhbml0YXQ7bD1D
-U0VYQzExLTA4MDMwNzA3MTIwMFotNTY2AAAeAEkAAQAAADYAAABSZTogW0JsdWV6LXVzZXJzXSBI
-ZWFkc2V0IG5vdCB3b3JraW5nLCAyLjYuMjQueCBzdHlsZQAAAEAATgCAKbPUon/IAR4AWgABAAAA
-KgAAAGJsdWV6LXVzZXJzLWJvdW5jZXNAbGlzdHMuc291cmNlZm9yZ2UubmV0AAAAAgFbAAEAAABx
-AAAAAAAAAIErH6S+oxAZnW4A3QEPVAIAAAAAYmx1ZXotdXNlcnMtYm91bmNlc0BsaXN0cy5zb3Vy
-Y2Vmb3JnZS5uZXQAU01UUABibHVlei11c2Vycy1ib3VuY2VzQGxpc3RzLnNvdXJjZWZvcmdlLm5l
-dAAAAAACAVwAAQAAAC8AAABTTVRQOkJMVUVaLVVTRVJTLUJPVU5DRVNATElTVFMuU09VUkNFRk9S
-R0UuTkVUAAAeAF0AAQAAAAcAAABqYXlqd2EAAAIBXgABAAAANwAAAAAAAACBKx+kvqMQGZ1uAN0B
-D1QCAAAAAGpheWp3YQBTTVRQAGpheWp3YUBhdHIyLmF0aC5jeAAAAgFfAAEAAAAYAAAAU01UUDpK
-QVlKV0FAQVRSMi5BVEguQ1gAHgBmAAEAAAAFAAAAU01UUAAAAAAeAGcAAQAAACoAAABibHVlei11
-c2Vycy1ib3VuY2VzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAAAAB4AaAABAAAABQAAAFNNVFAAAAAA
-HgBpAAEAAAATAAAAamF5andhQGF0cjIuYXRoLmN4AAAeAHAAAQAAADIAAABbQmx1ZXotdXNlcnNd
-IEhlYWRzZXQgbm90IHdvcmtpbmcsIDIuNi4yNC54IHN0eWxlAAAAAgFxAAEAAAAbAAAAAch/ou+S
-OOaz63vxQ4O9Yt97CLSM7QAf3tQ6AB4AdAABAAAADAAAAEJsdWVaIHVzZXJzAB4AGgwBAAAAFwAA
-AFBFRFJPIE1BQ0FOQVMgVkFMVkVSREUAAB4AHQ4BAAAAMgAAAFtCbHVlei11c2Vyc10gSGVhZHNl
-dCBub3Qgd29ya2luZywgMi42LjI0Lnggc3R5bGUAAAACAQkQAQAAAHoFAAB2BQAA3w8AAExaRnWf
-bAJcAwAKAHJjcGcxMjWCMgNDaHRtbDEDMD8BAwH3CoACpAPjAgBjaMEKwHNldDAgBxMCgP8QAwBQ
-BFYIVQeyEdUOUQMB3RDXMgYABsMR1TMERhDZiRLvZjQDxlRhaANxbwKAEeMI7wn3OxovDjA1OxHS
-DGBjAFALCQFkMzaTEWALpTQgEAIqXA6yAwGQDhA5IDxIVE1ATCBkaXI9H5ByPD59H1MAIQMwIKFk
-b+cA4CChCrFccRoQIKEQ8G8DMCEFEWAfCzMe4CAARUxBRCDQHww3Nx/wVHBJVExFJP0e0A7wUiBl
-OiBbQgpBei0GdREwESBdIEhlYaJkETEgbm8FQHcFsAJrC4BnLCAyLjYCLh7QLnggc3R5pGxlJQ04
-NR/wLyY/ux+iCuMgLK8tvw4QNg7wwDxNRVRBIAWgAjBxCfB0PSIF4CATKkAwCjAqUDkx4TMxMzIK
-IilAYQeAPUdFTsBFUkFUT1Ik/SeBXywgJL8nUS7vH6E1EWA8cEJPRFkk/R5RNk9nBDk2H/BESVYg
-acRkPTqgT1dBJ7ALUAB5VGV4dDg2OPY0EWAgbyAAACIFIqMiYf8i/zhvOX86gDwfPS8+Oh8pnDY0
-Qho+bx+ENDgf8MBGT05UIGYA0DLw0xjUKqBpejLwMkILGDB/A7IB0D5PH2U70DeBQgti/Up5RCfA
-QEwU8CwgTDog5y0RYCAKMihFLQbgdW4RSCBzQGwEAHRzLg5zCGFIIAIQcmdlLv5uKSEJ8ClBBtAa
-MEGAU8DAamF5andhHwwwIO83gTORIPkLgGUKgUqfS6/hTL8gRW52BzAhwFMwLmxN/08PUBdqClAg
-MKA2LzAzLwHQMEeA8TAgOjU3VH9Vj1afV6/rWL9hVFAKwGFaz1vfUBf5KAJaIChjXr9fz2DfYe+T
-Yv9qpEFzUYB0b2Sv/2W/UBcnvyjPKd8q4GgPaR/rai8fOTU6MS9Hsm9fds//dN9170RbAcAg5wqi
-T+gKgPUfDDAkgS86YXiPeZ+AD/+BHz8fQC86Q0ILhD96ZW8B/3sMCrF2X4kPih+LL4VfRKj9H/BQ
-jO+N+Id/i39Hd0jPiwHxSkxPA6BUaHUqAJ06ME0KwV4SKgBHdQMQ/QtgdQeAZ0AJgHJyA2Aw8L9u
-HHq/e89535svnD0taw5YJmd0AoAg9z5P+VmvCGAwsAORILB5o0BoBACsIGsEkVqgIAqwdCLR6QBw
-ZCAaMHAZ0TqQIWBPo5NyogQgUqEgeaLhKP+mQgeAnS+eP59PoF+hb1BEzmkFQCHAB5ApIJofqD+/
-qU+qX6tvUDVrDzCgaBowBmYxMA6wdHA6Ly+0bGsO0C5SsbUjL0GQDwEgXgNeAF4ANS81MzAwLzEi
-SSwIkGxkHR8iZrhgC4AqsHtIWYJQM0BMSU5LILS//7XPttcZQAHxuGARIB+QGZD9AEF1Pjq5/7sP
-tuWDj5KK+4QfbopBJP6ub69/xM/F3z/G78f/yQ/KH7D/sg8gSb+s9DqQpMAJ4KTQcqIu0ED9pKBw
-C1AIkKTQo5BTwKRU+23wKhYzpKPSQtJQcgPKz+vL38zscANgZBzgB5FSQbukwXJgd9GAl7AAcGum
-c5Z2BJCjcG0c4Ggu1J//1a/M79pP21/cadGgo5HZAf53U8ByoL2QpNDXkaUQETB90MFjCkBT4azh
-C4DSM3X+cCqwGjAy0KPV2g13/8Ff/33/fwKRL9yffVQsEZDxjp9/j6+QvpNPlF+Vb5Z/cMBn/wsR
-UiDjz+Tf5e/m/+gP7j8/6i/rP+xP7V/4X850bmLEc3DO+VwnYQFA9R9/9i/3P/1v+V+Cb/RfA481
-/0eBbzA3vydgJgE00CAhINACfQrgAAAeADUQAQAAAD8AAAA8Rjg5QTNCNUE3NzU3RTg0NTlFNTFC
-QjkyN0U5NzFDNDQxNDkyNzlAQ1NFWEMxMS5jcy5zYW4uZ3ZhLmVzPgAAHgA5EAEAAACFAAAAPGFs
-cGluZS5MTlguMS4wMC4wODAzMDUyMzEyMTIwLjc3MTZAbmdlMi5uZ3UucGs+PDEyMDQ3OTMzNjUu
-ODAyMy45LmNhbWVsQGxpdHRsZXR1eD4gPGFscGluZS5MTlguMS4wMC4wODAzMDYxMDQ3MzgwLjM0
-MTVAbmdlMi5uZ3UucGs+AAAAAB4ARxABAAAADwAAAG1lc3NhZ2UvcmZjODIyAAALAPIQAQAAAB8A
-8xABAAAAeAAAAFIARQAlADMAQQAgAFsAQgBsAHUAZQB6AC0AdQBzAGUAcgBzAF0AIABIAGUAYQBk
-AHMAZQB0ACAAbgBvAHQAIAB3AG8AcgBrAGkAbgBnACwAIAAyAC4ANgAuADIANAAuAHgAIABzAHQA
-eQBsAGUALgBFAE0ATAAAAAsA9hAAAAAAQAAHMOKM42oigMgBQAAIMHxBt4kigMgBAwDeP69vAAAD
-APE/CgwAAB4A+D8BAAAAFwAAAFBFRFJPIE1BQ0FOQVMgVkFMVkVSREUAAAIB+T8BAAAATQAAAAAA
-AADcp0DIwEIQGrS5CAArL+GCAQAAAAAAAAAvTz1TQU5JVEFUL09VPVNBTklUQVQvQ049UkVDSVBJ
-RU5UUy9DTj0yNzQ4MTIwOEEAAAAAHgD6PwEAAAAVAAAAU3lzdGVtIEFkbWluaXN0cmF0b3IAAAAA
-AgH7PwEAAAAeAAAAAAAAANynQMjAQhAatLkIACsv4YIBAAAAAAAAAC4AAAADAP0/5AQAAAMAGUAA
-AAAAAwAaQAAAAAADAB1AAAAAAAMAHkAAAAAAHgAwQAEAAAAKAAAAMjc0ODEyMDhBAAAAHgAxQAEA
-AAAKAAAAMjc0ODEyMDhBAAAAHgAyQAEAAAAqAAAAYmx1ZXotdXNlcnMtYm91bmNlc0BsaXN0cy5z
-b3VyY2Vmb3JnZS5uZXQAAAAeADNAAQAAABMAAABqYXlqd2FAYXRyMi5hdGguY3gAAB4AOEABAAAA
-CgAAADI3NDgxMjA4QQAAAB4AOUABAAAAAgAAAC4AAAADAHZA/////wsAKQAAAAAACwAjAAAAAAAD
-AAYQrtK+PAMABxCvAQAAAwAQEAAAAAADABEQAQAAAB4ACBABAAAAZQAAAERFOkJMVUVaLVVTRVJT
-LUJPVU5DRVNATElTVFNTT1VSQ0VGT1JHRU5FVEVOTk9NQlJFREVKQVlKV0FFTlZJQURPRUw6SlVF
-MDYvMDMvMjAwODE2OjU3UEFSQTpCTFVFWlVTRVIAAAAAAgF/AAEAAAA/AAAAPEY4OUEzQjVBNzc1
-N0U4NDU5RTUxQkI5MjdFOTcxQzQ0MTQ5Mjc5QENTRVhDMTEuY3Muc2FuLmd2YS5lcz4AAO3o
-
-------_=_NextPart_001_01C88022.89B7417C
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-------_=_NextPart_001_01C88022.89B7417C
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
-------_=_NextPart_001_01C88022.89B7417C--
