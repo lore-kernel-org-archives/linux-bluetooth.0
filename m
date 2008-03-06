@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <fb2ac3c90803041440l75dead88y8cd8dc9d23cf66a8@mail.gmail.com>
-References: <fb2ac3c90803041411k3ea1426cib1e729b19053adce@mail.gmail.com>
-	<F5766422-47CD-4AD6-8C71-AD7D21BDB4BD@holtmann.org>
-	<fb2ac3c90803041440l75dead88y8cd8dc9d23cf66a8@mail.gmail.com>
-Date: Thu, 06 Mar 2008 11:56:31 +0100
-Message-Id: <1204800991.13254.8.camel@californication>
+In-Reply-To: <1204760719.2640.83.camel@cookie.hadess.net>
+References: <1204760719.2640.83.camel@cookie.hadess.net>
+Date: Thu, 06 Mar 2008 11:54:07 +0100
+Message-Id: <1204800847.13254.5.camel@californication>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] CreateSecureDevice
+Subject: Re: [Bluez-devel] [PATCH] Add some device types
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,26 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Andrew,
+Hi Bastien,
 
-> Aren't you maintaining bluez-gnome?  Could you add this fallback to
-> properties/input.c?
+> A patch to add tablets and joypads/joysticks to client.c.
 
-feel free to send a patch :)
+patch has been applied. Thanks.
 
-> I'm curious what you mean by "would have broken the API."  Do you mean
-> if we were to remove the method now after it has been released?  If so
-> then I agree, it's too late.
+> I'm currently reworking the device filter to suck a bit less.
 
-We can't add any parameters to an already established method call. And
-there are cases were we wanna use a device in an unpaired way.
-
-> But I'm curious why a new method was added rather than new
-> functionality to the existing method.  Are there new callbacks that
-> would have broken existing clients?  I guess it's a moot point now
-> though.
-
-See my point above. It is not that simple.
+Great.
 
 Regards
 
