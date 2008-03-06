@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47D03C82.9060009@suse.de>
-Date: Thu, 06 Mar 2008 19:48:34 +0100
-From: Stefan Seyfried <seife@suse.de>
+Message-ID: <47D020D1.9020204@inov.pt>
+Date: Thu, 06 Mar 2008 16:50:25 +0000
+From: Jose Goncalves <jose.goncalves@inov.pt>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] [patch]  make apitest more useful
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] Bug in compat_ppoll
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,35 +14,44 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-15"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This trivial 2-character patch makes apitest much more useful by allowing
-stuff like "apitest -l DiscoverDevices" to work like i'd expect it to:
+Hi,
 
---- /usr/bin/apitest	2008-03-02 19:22:20.000000000 +0100
-+++ /home/seife/bin/apitest.seife	2008-03-06 19:44:52.000000000 +0100
-@@ -415,7 +415,7 @@ class Tester:
-             self.dbus_dev_sig_setup()
-             print 'Listening for events...'
+When I was cross-compiling Bluez for a system without the ppoll() system
+call, I've found a bug on you ppoll() stub, compat_ppoll(), that causes
+rfcomm to eat all CPU power when called in this way:
 
--        elif self.cmd in mgr_cmds:
-+        if self.cmd in mgr_cmds:
-             try:
-                 self.dbus_mgr_setup()
-             except dbus.DBusException, e:
+$ rfcomm listen 0 1 <cmd>
 
+After the RFCOMM connection is established and the command is executed
+the CPU load reaches 100%.
 
-Now we can alias "hcitool scan" to "apitest -l DiscoverDevices" ;-)
--- =
+This patch solved my problem:
 
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg | "Well, surrounding them's out."
+diff -Naur bluez-utils-3.27.orig/common/ppoll.h
+bluez-utils-3.27/common/ppoll.h
+--- bluez-utils-3.27.orig/common/ppoll.h    2007-05-20
+09:28:28.000000000 +0100
++++ bluez-utils-3.27/common/ppoll.h 2008-03-06 15:56:02.000000000 +0000
+@@ -7,5 +7,10 @@
+ static inline int compat_ppoll(struct pollfd *fds, nfds_t nfds,
+        const struct timespec *timeout, const sigset_t *sigmask)
+ {
+-   return poll(fds, nfds, timeout ? timeout->tv_sec * 1000 : 500);
++   if (timeout =3D=3D NULL)
++       return poll(fds, nfds, -1);
++   else if (timeout->tv_sec =3D=3D 0)
++       return poll(fds, nfds, 500);
++   else
++       return poll(fds, nfds, timeout->tv_sec * 1000);
+ }
 
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
+Regards,
+Jos=E9 Miguel Gon=E7alves
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
