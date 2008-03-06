@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <75FAE26125E34CEBB2A6589F506A6784@iMe>
-From: "Eng. Waleed Al-Rashoud" <iwaleed@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-References: <fqnfkk$9np$1@ger.gmane.org> <1521D68760504C61837D70AA89588A3E@iMe>
-	<A3582650-894E-4E59-A156-42D2C5D973C0@holtmann.org>
-Date: Fri, 7 Mar 2008 02:11:58 +0300
+Message-ID: <47D037C4.2010505@suse.de>
+Date: Thu, 06 Mar 2008 19:28:20 +0100
+From: Stefan Seyfried <seife@suse.de>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] How to change the Hci packet size?
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <8CA4D21C8A3F5D9-F78-233F@webmail-md08.sysops.aol.com>
+In-Reply-To: <8CA4D21C8A3F5D9-F78-233F@webmail-md08.sysops.aol.com>
+Subject: Re: [Bluez-users] Logitech Travel Mouse
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,45 +16,44 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Thanks.. but I remember something in the Bluetooth standard like 'continue' 
-flag in each HCI packet.. Who is responsible to fill this?
-Thanks again marcel..
+idunno@when.com wrote:
+> I see it in the Bluetooth properties, and it says it's connected... I mad=
+e it trusted, but I can't use it.
+> =
 
+> I untrusted it, and I still can't use it. =
 
---------------------------------------------------
-From: "Marcel Holtmann" <marcel@holtmann.org>
-Sent: Thursday, March 06, 2008 5:53 PM
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] How to change the Hci packet size?
+> =
 
-> Hi,
->
->> Hi, what it the largest packet size for the Hci?
->> Is it a configuration in the BlueZ or is it a configuration in the
->> adapter?
->
-> don't bother in trying. The firmware inside the Bluetooth chip is
-> responsible for doing this job. It will pick the packet type that is
-> best suitable.
->
-> Regards
->
-> Marcel
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2008.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users 
+> I've attempted pairing and unpairing them... I can't browse it (because i=
+t's a mouse..) and this is driving me rather mad.
+> =
 
+> anyone have any ideas? please and thank you!
+
+Most people were successful following the instructions at
+http://en.opensuse.org/Bluetooth/kinputwizard and
+http://wiki.bluez.org/wiki/HOWTO/InputDevices
+
+I had to remove the device from the inputdevices and from trusted devices
+before i was able to reconnect it the last time i tried, but this might
+actually be a bug in kinputwizard, i have to verify that.
+
+Good luck,
+
+	Stefan
+-- =
+
+Stefan Seyfried
+R&D Team Mobile Devices            |              "Any ideas, John?"
+SUSE LINUX Products GmbH, N=FCrnberg | "Well, surrounding them's out."
+
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
