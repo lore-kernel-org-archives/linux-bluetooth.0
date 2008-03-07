@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <47D03C82.9060009@suse.de>
-References: <47D03C82.9060009@suse.de>
-Date: Fri, 07 Mar 2008 15:16:09 +0100
-Message-Id: <1204899369.28006.2.camel@californication>
+In-Reply-To: <1204818979.2640.117.camel@cookie.hadess.net>
+References: <1204818979.2640.117.camel@cookie.hadess.net>
+Date: Fri, 07 Mar 2008 15:15:26 +0100
+Message-Id: <1204899326.28006.0.camel@californication>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [patch]  make apitest more useful
+Subject: Re: [Bluez-devel] [PATCH] Show all the possibly known devices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,28 +20,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Stefan,
+Hi Bastien,
 
-> This trivial 2-character patch makes apitest much more useful by allowing
-> stuff like "apitest -l DiscoverDevices" to work like i'd expect it to:
+> This patch makes the default client.c show all the known devices,
+> including the seen remote devices. Those can be easily filtered using
+> the drop-downs at the bottom of the dialogue.
 > 
-> --- /usr/bin/apitest	2008-03-02 19:22:20.000000000 +0100
-> +++ /home/seife/bin/apitest.seife	2008-03-06 19:44:52.000000000 +0100
-> @@ -415,7 +415,7 @@ class Tester:
->              self.dbus_dev_sig_setup()
->              print 'Listening for events...'
-> 
-> -        elif self.cmd in mgr_cmds:
-> +        if self.cmd in mgr_cmds:
->              try:
->                  self.dbus_mgr_setup()
->              except dbus.DBusException, e:
-> 
-> 
-> Now we can alias "hcitool scan" to "apitest -l DiscoverDevices" ;-)
+> It also doesn't query remotely to avoid problems with asking for a name
+> for a device we don't know about anymore.
 
-the apitest is really only a test program, but I applied the patch
-neverless.
+it did some modification to the patch to honor the 80 characters width
+requirement :)
+
+Other than that, the patch has been applied.
 
 Regards
 
