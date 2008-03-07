@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <DF35A68F-4B41-448D-9C12-BB4FACED2D57@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1204819758.2640.123.camel@cookie.hadess.net>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Fri, 7 Mar 2008 19:36:13 +0100
-References: <1204819758.2640.123.camel@cookie.hadess.net>
-Subject: Re: [Bluez-devel] Device type filter ideas
+Date: Fri, 7 Mar 2008 16:06:55 +0100
+From: Stefan Seyfried <seife@suse.de>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20080307150655.GB11011@suse.de>
+References: <47D03C82.9060009@suse.de>
+	<1204899369.28006.2.camel@californication>
+MIME-Version: 1.0
+In-Reply-To: <1204899369.28006.2.camel@californication>
+Subject: Re: [Bluez-devel] [patch]  make apitest more useful
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,41 +17,35 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Hi Marcel,
 
-> As can be seen after yesterday's commit, the device type filter in the
-> selection widget is starting to get a bit long.
->
-> How about putting the work of adding new filters onto applications
-> instead?
+On Fri, Mar 07, 2008 at 03:16:09PM +0100, Marcel Holtmann wrote:
 
-I like to have something that GTK+ does with the File Dialog filters.  
-That would be the right approach.
+> the apitest is really only a test program,
 
-> I can think that sendto would add filters for Phones, Printers, and
-> computers, as those are the most likely type of devices that could  
-> have
-> obex available.
+I know :-)
+It is still useful to hand out to people for debugging their setup.
+As it is much more low level than bluez-gnome and kdebluetooth, it
+is easier to tell a bug reporter *exactly* what to do with apitest
+than with the grapical tools. That's why i bothered fixing that issue.
 
-We need a way to filter on service classes instead of major/minor  
-classes. Also we need  some support for Extended Inquiry cases where  
-we would get a list of UUIDs for free during inquiry.
+> but I applied the patch neverless.
 
-Before we extend the filters, we need to make the Device Selection  
-widget more generic. For example configureable title and be able to  
-hide the filters part. Take a lot at the current code for the wizard.  
-It looks ugly and is wrong in that context. Also in case of the wizard  
-we don't wanna show bonded and trusted devices at all. We already know  
-about them and wanna setup only new ones.
+Thanks. It now actually allows to test "DiscoverDevices" which is much
+more useful, even as testing tool only ;-)
+-- =
 
-Regards
+Stefan Seyfried
+R&D Team Mobile Devices            |              "Any ideas, John?"
+SUSE LINUX Products GmbH, N=FCrnberg | "Well, surrounding them's out." =
 
-Marcel
 
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
