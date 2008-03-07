@@ -1,15 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: dooteo <dooteo@zundan.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <D3BF31B1-0166-4138-AB2E-5725EEB73CFE@holtmann.org>
-References: <24522.83.38.182.64.1204581811.squirrel@webmail.zundan.com>
-	<DF89F810-C85E-46DA-B2B0-FF752B4B180E@holtmann.org>
-	<1204650587.3477.303.camel@desktop.zundan.com>
-	<D3BF31B1-0166-4138-AB2E-5725EEB73CFE@holtmann.org>
-Date: Sat, 08 Mar 2008 13:57:33 +0100
-Message-Id: <1204981053.3231.448.camel@desktop.zundan.com>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bluez-gnome 0.23 translated to Basque lang
+Message-ID: <e1effdeb0803071312y7caabb1fj9d8ab74ab6cc4672@mail.gmail.com>
+Date: Fri, 7 Mar 2008 18:12:51 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_8620_28301424.1204924371916"
+Subject: [Bluez-devel] [PATCH] bluez-libs leak
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,75 +16,68 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+------=_Part_8620_28301424.1204924371916
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 Hi Marcel,
 
-Don't worry, two days ago I inserted each translated message into
-Launchap . 
+I found a small leak. Please review the patch.
 
-Let me underline that Launchpad PO version is different from 0.23 (maybe
-TRUNK version?)
+run valgrind sdptool browse xx:xx:xx:xx:xx:xx to see the leak.
 
-So I hope Launchpad version will be usefull for  you :)
+Regards,
+Claudio.
+-- 
+---------------------------------------------------------
+Claudio Takahasi
+Instituto Nokia de Tecnologia - INdT
 
-Best regards,
+------=_Part_8620_28301424.1204924371916
+Content-Type: text/x-diff; name=leak01.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fdj8u7c80
+Content-Disposition: attachment; filename=leak01.patch
 
-Dooteo
-
-
-Jatorrizko mezua: or., 2008-03-07 19:45 +0100, egilea: Marcel Holtmann
-> Hi,
-> 
-> > Inkscape project uses Launchpad.net, but translators must send PO  
-> > files
-> > as bug to the project, so then Inkscape developers take them and put
-> > into the source code. It could be a way for bluez-gnome too. See:
-> >
-> > https://bugs.launchpad.net/bugs/198101
-> >
-> > Other way (I think the best), to not take care about translation,  
-> > could
-> > be to include as GNOME project into gnome.org site... There we
-> > (translators) use SVN too to access source code (checkout/update), and
-> > once a PO is updated we commit. All access is done by SSH passphrase,
-> > and all source  code is taken by many GNU/Linux distributions (with
-> > translated files of course) to be packet into their releases.
-> >
-> > Most of translators uses KBabel or Gtranslator like tools to translate
-> > and use translation memorie. https://translations.launchpad.net has
-> > translation memories, but some community translators doesn't use them,
-> > and make wrong style translations.
-> >
-> > By the other hand, can I submit translated file to you directly?
-> 
-> can't you simply upload your PO file into launchpad and I request a  
-> download of all translations just before I do the release. This way, I  
-> don't have to deal with the details.
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2008.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
-
+SW5kZXg6IHNyYy9zZHAuYwo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09ClJDUyBmaWxlOiAvY3Zzcm9vdC9ibHVlei9saWJz
+L3NyYy9zZHAuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS44MQpkaWZmIC11IC1yMS44MSBzZHAu
+YwotLS0gc3JjL3NkcC5jCTUgTWFyIDIwMDggMTk6MzA6MzIgLTAwMDAJMS44MQorKysgc3JjL3Nk
+cC5jCTcgTWFyIDIwMDggMjE6MDc6NDIgLTAwMDAKQEAgLTE1MzAsMTMgKzE1MzAsMTQgQEAKIAlp
+ZiAoc2RwZGF0YSAmJiBzZHBkYXRhLT5kdGQgPj0gU0RQX1NFUTggJiYgc2RwZGF0YS0+ZHRkIDw9
+IFNEUF9TRVEzMikgewogCQlzZHBfZGF0YV90ICpkOwogCQlmb3IgKGQgPSBzZHBkYXRhLT52YWwu
+ZGF0YXNlcTsgZDsgZCA9IGQtPm5leHQpIHsKLQkJCXV1aWRfdCAqdSA9IG1hbGxvYyhzaXplb2Yo
+dXVpZF90KSk7Ci0JCQltZW1zZXQoKGNoYXIgKil1LCAwLCBzaXplb2YodXVpZF90KSk7Ci0JCQlp
+ZiAoZC0+ZHRkID49IFNEUF9VVUlEMTYgJiYgZC0+ZHRkIDw9IFNEUF9VVUlEMTI4KSB7Ci0JCQkg
+IAkqdSA9IGQtPnZhbC51dWlkOwotCQkJICAJKnNlcXAgPSBzZHBfbGlzdF9hcHBlbmQoKnNlcXAs
+IHUpOwotCQkJfSBlbHNlCisJCQl1dWlkX3QgKnU7CisJCQlpZiAoZC0+ZHRkIDwgU0RQX1VVSUQx
+NiB8fCBkLT5kdGQgPiBTRFBfVVVJRDEyOCkKIAkJCQlnb3RvIGZhaWw7CisKKwkJCXUgPSBtYWxs
+b2Moc2l6ZW9mKHV1aWRfdCkpOworCQkJbWVtc2V0KChjaGFyICopdSwgMCwgc2l6ZW9mKHV1aWRf
+dCkpOworCQkJKnUgPSBkLT52YWwudXVpZDsKKwkJCSpzZXFwID0gc2RwX2xpc3RfYXBwZW5kKCpz
+ZXFwLCB1KTsKIAkJfQogCQlyZXR1cm4gMDsKIAl9Cg==
+------=_Part_8620_28301424.1204924371916
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+------=_Part_8620_28301424.1204924371916
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_8620_28301424.1204924371916--
