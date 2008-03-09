@@ -1,65 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47D40D4A.6070501@boerkel.de>
-Date: Sun, 09 Mar 2008 17:16:10 +0100
-From: =?ISO-8859-1?Q?Thomas_B=F6rkel?= <thomas@boerkel.de>
+Date: Sun, 9 Mar 2008 06:27:25 -0700 (PDT)
+From: binta sidibe <sidibebinta@yahoo.com>
+Reply-To: sidibebinta@yahoo.com
+Subject: Re: SDP discovery not working
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>,
+  bintasidibeh@hotmail.com
+In-Reply-To: <611B2C34-999E-411F-802F-95867D6E9DA0@holtmann.org>
 MIME-Version: 1.0
-To: Bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] HowTo DUN without dund?
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Content-Type: text/html; charset=us-ascii
+Message-ID: <167025.31999.qm@web57405.mail.re1.yahoo.com>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-HI!
+<table cellspacing='0' cellpadding='0' border='0' ><tr><td style='font: inherit;'><P><A href="mailto:root@ts7000:root">root@ts7000:root</A># modprobe rfcomm<BR><A href="mailto:root@ts7000:root">root@ts7000:root</A># modprobe l2cap<BR><A href="mailto:root@ts7000:root">root@ts7000:root</A># modprobe bluez<BR><A href="mailto:root@ts7000:root">root@ts7000:root</A># hciconfig hci0 up<BR><A href="mailto:root@ts7000:root">root@ts7000:root</A># hciconfig<BR>hci0:&nbsp;&nbsp; Type: USB<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: XX:XX:XX:XX:86:8A ACL MTU: 384:8&nbsp; SCO MTU: 64:8<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:69 acl:0 sco:0 events:8 errors:0<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:27 acl:0 sco:0 commands:7 errors:0</P>
+<P><A href="mailto:root@ts7000:root">root@ts7000:root</A># sdptool browse local<BR>Failed to connect to SDP server on FF:FF:FF:00:00:00: No such file or directory<BR></P>
+<P>&nbsp;</P>
+<P>that failed also. For the application that i am writing, only my client will be connecting to my server so i do not need the services advertised to other clients. Since rfcomm transport protocol has 30 channels, can i have my server listening to more than one channel at a time (a channel&nbsp;for each service offered) &nbsp;and then hardcode those channels in the client code so that my client can connect to the server based on the service it needs?</P>
+<P>Thanks Binta<BR>--- On <B>Fri, 3/7/08, Marcel Holtmann <I>&lt;marcel@holtmann.org&gt;</I></B> wrote:<BR></P>
+<BLOCKQUOTE style="PADDING-LEFT: 5px; MARGIN-LEFT: 5px; BORDER-LEFT: rgb(16,16,255) 2px solid">From: Marcel Holtmann &lt;marcel@holtmann.org&gt;<BR>Subject: Re: SDP discovery not working<BR>To: sidibebinta@yahoo.com<BR>Cc: "bluez-users@lists.sourceforge.net" &lt;bluez-users@lists.sourceforge.net&gt;, bintasidibeh@hotmail.com<BR>Date: Friday, March 7, 2008, 11:38 AM<BR><BR><PRE>Hi,
 
-I was using dund for connecting my Palm via a Bluetooth dongle to the 
-Internet.
+&gt; i need help with my bluetooth project. i have two boards TS7300 and  
+&gt; i have attached Dlink DT-120 on both. For my project, one is the  
+&gt; server and the other is the client. i want to have sevices offered  
+&gt; by my server so that my client can just connect to my servers SDP  
+&gt; server to get the port numbers. When i hard code the port number i  
+&gt; am using, my client can send message to my service...good. Now i  
+&gt; went a step ahead and tried to register a service on my server but  
+&gt; it fails to connect to local sdp server.
+&gt;
 
-This was working in Bluez 2.x and 3.23.
+you have to use "sdptool browse local" for that.
 
-Now, with newer versions of 3.x, dund seems to be gone and I can't find 
-information on how to enable and configure DUN without dund.
+Regards
 
-I was configuring the options for DUN in /etc/ppp/options.rfcomm0 like this:
-# You usually need this if there is no PAP authentication
-noauth
-# do not use modem control lines we aren't using a real serial line
-local
-# do not determinate local ip from hostname
-noipdefault
-# usefull ARP proxing
-proxyarp
-# Your own IP Address and the IP Address of the remote system
-192.168.0.2:192.168.0.47
-# And the netmask
-netmask 255.255.255.0
-# dns
-ms-dns 192.168.0.1
-# this is required for the non standard microsoft PPP negotiation
-connect "sleep 2; echo -n CLIENTSERVER"
+Marcel</PRE></BLOCKQUOTE></td></tr></table><br>
 
-And then I ran dund --listen.
-
-Where can I put this stuff now? I found /etc/bluetooth/rfcomm.conf, but 
-it does not seem to understand the keyword if the old config file.
-
-Thanks!
-
-Thomas
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+      <hr size=1>Never miss a thing.  <a href="http://us.rd.yahoo.com/evt=51438/*http://www.yahoo.com/r/hs"> Make Yahoo your homepage.</a>
