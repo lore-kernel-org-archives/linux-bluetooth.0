@@ -1,10 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1e9e22610803101718y7f11e322hb022b1ce722a23a1@mail.gmail.com>
-Date: Mon, 10 Mar 2008 21:18:17 -0300
-From: "Addo Del Grossi" <addo.delgrossi@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <2d5cd43e0803101020u702a60efkc712d122a9970a44@mail.gmail.com>
+Date: Mon, 10 Mar 2008 22:50:53 +0530
+From: "manuwela kanade" <manuwelak@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <A0E9FA39-0B62-4D12-B243-A8002AC48F37@holtmann.org>
 MIME-Version: 1.0
-Subject: [Bluez-users] Inquiry Power Level
+References: <2cb4fa160803050333j22a9bc9et68f30c2664d34061@mail.gmail.com>
+	<d89ddf300803050603k17a30359g173ab08f0756ff49@mail.gmail.com>
+	<59861CFE-213C-4E19-B3B9-9FD3875434B9@holtmann.org>
+	<2d5cd43e0803100324g683c6bdbl33f9025d9d673512@mail.gmail.com>
+	<A0E9FA39-0B62-4D12-B243-A8002AC48F37@holtmann.org>
+Subject: Re: [Bluez-users] Question about bluetooth simultaneous connections
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,56 +20,77 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0091027650=="
+Content-Type: multipart/mixed; boundary="===============1296897633=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0091027650==
+--===============1296897633==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_17224_9310595.1205194697024"
+	boundary="----=_Part_450_28707799.1205169653039"
 
-------=_Part_17224_9310595.1205194697024
+------=_Part_450_28707799.1205169653039
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi,
+Hello Sir,
 
-I am trying to set the inquiry transmit power level.
-Using command hciconfig and get option inqtpl.
-This configuration is depending bluetooth hardware ?
+Thank you so much for the reply. I will check the examples. Thank you.
 
-Command 1:
+Manuwela
 
-bc-00002:~# hciconfig hci0
-hci0:   Type: USB
-        BD Address: 00:11:E0:02:F7:3B ACL MTU: 384:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:1196 acl:0 sco:0 events:38 errors:0
-        TX bytes:481 acl:0 sco:0 commands:37 errors:0
+On 3/10/08, Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Manuwela,
+>
+>
+> > Please can you tell me how to use the L2CAP_LM_MASTER. Should it be
+> > defined while socket creation? And due to this switching of role, is
+> > it possible to send data simultaneously?? Because, we have tried to
+> > multithread and accept connections from multiple devices on the
+> > server, but it does not work... only one connection is accepted by
+> > server.
+>
+>
+> the bluez-utils contains a lot of examples on how to use it. Check the
+> files l2test.c and rctest.c for example.
+>
+>
+> Regards
+>
+> Marcel
+>
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2008.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
-Command 2:
-
-bc-00002:~# hciconfig hci0 inqtpl
-Can't read inquiry transmit power level on hci0: Input/output error (5)
-
-
-Att,
-Addo
-
-------=_Part_17224_9310595.1205194697024
+------=_Part_450_28707799.1205169653039
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi, <br><br>I am trying to set the inquiry transmit power level.<br>Using command hciconfig and get option inqtpl.<br>This configuration is depending bluetooth hardware ?<br><br>Command 1: <br><br>bc-00002:~# hciconfig hci0<br>
-hci0:&nbsp;&nbsp; Type: USB<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BD Address: 00:11:E0:02:F7:3B ACL MTU: 384:8 SCO MTU: 64:8<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UP RUNNING PSCAN ISCAN<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RX bytes:1196 acl:0 sco:0 events:38 errors:0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TX bytes:481 acl:0 sco:0 commands:37 errors:0<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>Command 2:<br><br>bc-00002:~# hciconfig hci0 inqtpl<br>Can&#39;t read inquiry transmit power level on hci0: Input/output error (5)<br><br><br>Att,<br>Addo<br>
+Hello Sir,<br>
+<br>
+Thank you so much for the reply. I will check the examples. Thank you.<br>
+<br>
+Manuwela<br><br><div><span class="gmail_quote">On 3/10/08, <b class="gmail_sendername">Marcel Holtmann</b> &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:</span><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+Hi Manuwela,<br> <br><br> &gt; Please can you tell me how to use the L2CAP_LM_MASTER. Should it be<br> &gt; defined while socket creation? And due to this switching of role, is<br> &gt; it possible to send data simultaneously?? Because, we have tried to<br>
+ &gt; multithread and accept connections from multiple devices on the<br> &gt; server, but it does not work... only one connection is accepted by<br> &gt; server.<br> <br> <br>the bluez-utils contains a lot of examples on how to use it. Check the<br>
+ files l2test.c and rctest.c for example.<br> <br><br> Regards<br> <br> Marcel<br> <br> <br> -------------------------------------------------------------------------<br> This SF.net email is sponsored by: Microsoft<br> Defy all challenges. Microsoft(R) Visual Studio 2008.<br>
+ <a href="http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/">http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/</a><br> _______________________________________________<br> Bluez-users mailing list<br> <a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a><br>
+ <a href="https://lists.sourceforge.net/lists/listinfo/bluez-users">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br> </blockquote></div><br>
 
-------=_Part_17224_9310595.1205194697024--
+------=_Part_450_28707799.1205169653039--
 
 
---===============0091027650==
+--===============1296897633==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -73,7 +100,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============0091027650==
+--===============1296897633==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -84,4 +111,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0091027650==--
+--===============1296897633==--
