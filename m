@@ -1,13 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
+From: dooteo <dooteo@zundan.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20080310143609.exuwdzs9gk4w48ss@wmlab.csie.ncu.edu.tw>
-References: <20080310143609.exuwdzs9gk4w48ss@wmlab.csie.ncu.edu.tw>
-Date: Mon, 10 Mar 2008 23:29:20 +0000
-Message-Id: <1205191760.30595.1.camel@cookie.hadess.net>
+In-Reply-To: <C76B423D-1AEB-4CDA-91FB-72A005E073C7@holtmann.org>
+References: <24522.83.38.182.64.1204581811.squirrel@webmail.zundan.com>
+	<DF89F810-C85E-46DA-B2B0-FF752B4B180E@holtmann.org>
+	<1204650587.3477.303.camel@desktop.zundan.com>
+	<D3BF31B1-0166-4138-AB2E-5725EEB73CFE@holtmann.org>
+	<1204981053.3231.448.camel@desktop.zundan.com>
+	<C76B423D-1AEB-4CDA-91FB-72A005E073C7@holtmann.org>
+Date: Mon, 10 Mar 2008 18:26:38 +0100
+Message-Id: <1205169999.3271.928.camel@desktop.zundan.com>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] bluez-gnome access volatile
-	while	adapter-changed
+Subject: Re: [Bluez-devel] bluez-gnome 0.23 translated to Basque lang
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,21 +25,48 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Marcel,
 
-On Mon, 2008-03-10 at 14:36 +0800, Ming-I Hsieh wrote:
-> Hi, all
+Basque translation is OKEY in 0.24 version (downloaded few minutes ago).
+
+Best regards,
+
+Dooteo
+
+Jatorrizko mezua: lr., 2008-03-08 20:28 +0100, egilea: Marcel Holtmann
+> Hi,
 > 
-> This is a patch for this bug. This bug adddress at  
-> bluetooth-device-select.c. While the dongle could be removed/inserted,  
-> the gnome-applet may crash due to access a 0x0 priv.
-
-Good catch, but wrong fix, as we shouldn't even be listening to that
-signal anymore. If you could please test the patch I uploaded at:
-http://bugzilla.gnome.org/show_bug.cgi?id=519791#c4
-
-I'll post it here for Marcel to apply if it fixes the problem for you.
-
-Cheers
+> > Don't worry, two days ago I inserted each translated message into
+> > Launchap .
+> >
+> > Let me underline that Launchpad PO version is different from 0.23  
+> > (maybe
+> > TRUNK version?)
+> 
+> can you check the 0.24 version? And launchpad.net should be translated  
+> using their trunk version of bluez-gnome. I would assume that the  
+> bluetooth-manager.pot get updated automatically, but that doesn't seem  
+> to be the case.
+> 
+> > So I hope Launchpad version will be usefull for  you :)
+> 
+> If I could use bzr to merge in the changes, that would be useful. The  
+> tarball download is actually not optimal.
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2008.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> 
 
 
 -------------------------------------------------------------------------
