@@ -1,16 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Andrew Kohlsmith (lists)" <aklists@mixdown.ca>
-To: bluez-users@lists.sourceforge.net
-Date: Tue, 11 Mar 2008 13:19:21 -0400
-References: <mailman.551346.1203302340.26582.bluez-users@lists.sourceforge.net>
-	<BLU140-W15FA67671DB5E1E6450FBECB220@phx.gbl>
-	<47BB5F2D.8010706@wershofen.de>
-In-Reply-To: <47BB5F2D.8010706@wershofen.de>
+Message-ID: <47D67444.9070803@judebert.com>
+Date: Tue, 11 Mar 2008 08:00:04 -0400
+From: bluez-users.10.judebert@spamgourmet.com
 MIME-Version: 1.0
-Message-Id: <200803111319.21563.aklists@mixdown.ca>
-Subject: Re: [Bluez-users] Twinkle and bluetooth headset's microphone
-Reply-To: akohlsmith-lists@mixdown.ca,
-	BlueZ users <bluez-users@lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
+Cc: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <47D40D4A.6070501@boerkel.de>
+	<2d5a2c100803091945p86ad034rd7a1ab2a58e63335@mail.gmail.com>
+In-Reply-To: <2d5a2c100803091945p86ad034rd7a1ab2a58e63335@mail.gmail.com>
+Subject: Re: [Bluez-users] HowTo DUN without dund?
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -23,18 +22,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On February 19, 2008 05:58:53 pm Wolfgang Wershofen wrote:
-> Anyway, rapid closing and reopening a handle isn't anything rogue at all.
+The referenced HOWTO is for programming a serial port.  Is there a HOWTO 
+for using DUN without dund that does not require programming?
 
-There was a fix committed to utils CVS not too long ago (1 week, maybe 2) 
-which fixes this by waiting a few seconds before actually closing down the 
-audio link to the headset.  It certainly solved my Twinkle problems.
+Thanks,
+Judebert
 
-Twinkle also released a new version last week which doesn't rapidly close and 
-reopen the audio device, so the problem has been fixed from both sides.
+Luiz Augusto von Dentz - luiz.dentz@gmail.com wrote:
+> We will probably support DUN in network service and possibly integrate
+> it into NetworkManager at some point, but for now you can use serial
+> service following the howto:
+> http://wiki.bluez.org/wiki/HOWTO/SerialConnections
+>
+>   
 
-Regards,
-Andrew
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
