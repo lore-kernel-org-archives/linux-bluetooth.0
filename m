@@ -1,14 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47D81428.4070605@verticon.com>
-Date: Wed, 12 Mar 2008 12:34:32 -0500
+Message-ID: <47D6F3BF.5060802@verticon.com>
+Date: Tue, 11 Mar 2008 16:03:59 -0500
 From: "John E. Conlon" <jconlon@verticon.com>
 MIME-Version: 1.0
-To: Guillaume Bedot <littletux@zarb.org>,
-	bluez-users@lists.sourceforge.net
-References: <47D6F3BF.5060802@verticon.com>
-	<1205321428.12305.9.camel@littletux>
-In-Reply-To: <1205321428.12305.9.camel@littletux>
-Subject: Re: [Bluez-users] make problem bluez-utils 3.28
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] make problem bluez-utils 3.28
 Reply-To: jconlon@verticon.com,
 	BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -23,55 +19,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Guillaume,
 
-Yes, I noticed the undeclared identifiers and did a google to see what I 
-could find and like you found it was declared in the sockios.h file. 
-I found a copy on the internet at
-http://tomoyo.sourceforge.jp/cgi-bin/lxr/source/include/linux/sockios.h#L120
-and did notice the referenced identifiers at lines 120-123.   But when I 
-looked at my /usr/include/linux/sockios.h those lines are missing.
-I guess that means I have an older version of these headers.
+I am attempting to update my Centos 4.6 to bluez 3.28.   Since I could 
+not find pre - compiled packages for Centos 4.6 I have been trying to 
+compile both bluez-libs and bluez-utils.  Encountered no problem with 
+bluez-libs.
 
-This file is supplied by:
-$ rpm -qf /usr/include/linux/sockios.h
-glibc-kernheaders-2.4-9.1.100.EL
-(the latest glibc-kernheaders for my system)
+On my first attempt to make the bluez-utils I encountered an error with 
+Configure stating I needed to upgrade the d-bus lib, did this (upgrade 
+to 1.0.2) but now
 
-and my Centos 4.6 kernel is
-$ uname -r
-2.6.9-67.0.4.ELsmp
+'make all' is failing to compile bluez-utils and exiting with the error:
 
-Is there still a way to compile bluez-utils 3.28 with my configuration?
+gcc -DHAVE_CONFIG_H -I. -I.. -I../common   -I/usr/include/dbus-1.0 
+-I/usr/lib/dbus-1.0/include    -I../eglib -Wall -O2 -D_FORTIFY_SOURCE=2 
+-MT bridge.o -MD -MP -MF .deps/bridge.Tpo -c -o bridge.o bridge.c
+bridge.c: In function `bridge_create':
+bridge.c:78: error: `SIOCBRADDBR' undeclared (first use in this function)
+bridge.c:78: error: (Each undeclared identifier is reported only once
+bridge.c:78: error: for each function it appears in.)
+bridge.c: In function `bridge_remove':
+bridge.c:94: error: `SIOCBRDELBR' undeclared (first use in this function)
+bridge.c: In function `bridge_add_interface':
+bridge.c:117: error: `SIOCBRADDIF' undeclared (first use in this function)
+make[2]: *** [bridge.o] Error 1
 
-thanks for your help,
-John
+I am a complete make file novice, (probably evident from the question)  
+how shall I precede to resolve this (configuration issue)?
 
+Thanks in advance for any suggestions,
 
-Guillaume Bedot wrote:
-> Hello,
->
-> On mar, 2008-03-11 at 16:03 -0500, John E. Conlon wrote:
->   
->> bridge.c:78: error: `SIOCBRADDBR' undeclared (first use in this function)
->>     
-> These types of messages usually mean you lack some headers (*.h).
->
-> Here, you need to install the kernel headers
-> ( http://www.google.fr/search?q=SIOCBRADDBR shows it's declared in
-> include/linux/sockios.h )
->
-> On CentOS, it seems to be in the kernel-devel package : 
-> http://lists.centos.org/pipermail/centos/2006-October/071307.html
->
-> Regards,
->
-> Guillaume B.
->
->
->
->   
-
+John Conlon
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
