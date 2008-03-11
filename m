@@ -1,11 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47D6F3BF.5060802@verticon.com>
-Date: Tue, 11 Mar 2008 16:03:59 -0500
-From: "John E. Conlon" <jconlon@verticon.com>
-MIME-Version: 1.0
+From: "Andrew Kohlsmith (lists)" <aklists@mixdown.ca>
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] make problem bluez-utils 3.28
-Reply-To: jconlon@verticon.com,
+Date: Tue, 11 Mar 2008 13:19:21 -0400
+References: <mailman.551346.1203302340.26582.bluez-users@lists.sourceforge.net>
+	<BLU140-W15FA67671DB5E1E6450FBECB220@phx.gbl>
+	<47BB5F2D.8010706@wershofen.de>
+In-Reply-To: <47BB5F2D.8010706@wershofen.de>
+MIME-Version: 1.0
+Message-Id: <200803111319.21563.aklists@mixdown.ca>
+Subject: Re: [Bluez-users] Twinkle and bluetooth headset's microphone
+Reply-To: akohlsmith-lists@mixdown.ca,
 	BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,37 +23,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+On February 19, 2008 05:58:53 pm Wolfgang Wershofen wrote:
+> Anyway, rapid closing and reopening a handle isn't anything rogue at all.
 
-I am attempting to update my Centos 4.6 to bluez 3.28.   Since I could 
-not find pre - compiled packages for Centos 4.6 I have been trying to 
-compile both bluez-libs and bluez-utils.  Encountered no problem with 
-bluez-libs.
+There was a fix committed to utils CVS not too long ago (1 week, maybe 2) 
+which fixes this by waiting a few seconds before actually closing down the 
+audio link to the headset.  It certainly solved my Twinkle problems.
 
-On my first attempt to make the bluez-utils I encountered an error with 
-Configure stating I needed to upgrade the d-bus lib, did this (upgrade 
-to 1.0.2) but now
+Twinkle also released a new version last week which doesn't rapidly close and 
+reopen the audio device, so the problem has been fixed from both sides.
 
-'make all' is failing to compile bluez-utils and exiting with the error:
-
-gcc -DHAVE_CONFIG_H -I. -I.. -I../common   -I/usr/include/dbus-1.0 
--I/usr/lib/dbus-1.0/include    -I../eglib -Wall -O2 -D_FORTIFY_SOURCE=2 
--MT bridge.o -MD -MP -MF .deps/bridge.Tpo -c -o bridge.o bridge.c
-bridge.c: In function `bridge_create':
-bridge.c:78: error: `SIOCBRADDBR' undeclared (first use in this function)
-bridge.c:78: error: (Each undeclared identifier is reported only once
-bridge.c:78: error: for each function it appears in.)
-bridge.c: In function `bridge_remove':
-bridge.c:94: error: `SIOCBRDELBR' undeclared (first use in this function)
-bridge.c: In function `bridge_add_interface':
-bridge.c:117: error: `SIOCBRADDIF' undeclared (first use in this function)
-make[2]: *** [bridge.o] Error 1
-
-I am a complete make file novice, (probably evident from the question)  
-how shall I precede to resolve this (configuration issue)?
-
-Thanks in advance for any suggestions,
-
-John Conlon
+Regards,
+Andrew
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
