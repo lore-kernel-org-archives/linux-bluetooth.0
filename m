@@ -1,15 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: prahal@yahoo.com,
-	BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1205436966.22400.4.camel@cyclope.server.maison>
-References: <1205436966.22400.4.camel@cyclope.server.maison>
-Date: Fri, 14 Mar 2008 01:07:06 +0100
-Message-Id: <1205453226.12951.12.camel@californication>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Date: Thu, 13 Mar 2008 21:32:28 +0100
+Message-Id: <1205440348.12951.9.camel@californication>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] shows error in logs if the
-	special	directories are not	defined and close the server if
-	failure to start obex	server
+Subject: [Bluez-devel] Moving towards a new API for BlueZ 4.0
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,20 +18,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Alban,
+Hi Folks,
 
-> This patch is made out of my attempt to start obex-data-server from
-> debian without xdg-user-dirs . It does not work as the glib special
-> directories are nto defined but worst than that :
-> - it did not tell in the log anything went wrong, 
-> - it did not close the server when it failed to start it and
-> sharing_enabled and received_enabled where not in sync with the server
-> state anymore because of that. applet was trying to create the server
-> while it was already running leading to socket already in use errors
-> after two attempts. 
-> This fixes those issues.
+so we are near to the end-of-lifetime for the BlueZ 3.x series. We will
+have only a few release left and the plan is to end it with the magic
+number 3.33 in a few weeks.
 
-patch has been applied. Thanks.
+Everybody is currently working hard at implemented the new features and
+API changes for the 4.x series. We will deprecated a big chunk of the
+D-Bus API and basically do major simplifications. For a preview you can
+check the new doc/ directory in the bluez-utils CVS repository. It
+contains documentation for the new manager, adapter, device and agent
+interfaces. The real new stuff is the device interface which will
+represent paired and known remote device. Also the agent interface
+changes a lot to implement what we have learned during the last two
+years of D-Bus usage within BlueZ.
+
+Most of the new API is already implemented and will be part of the 3.29
+release within the next few days. All new features are marked as
+experimental until we reach 4.0 and you have to start hcid with the -x
+option to enable them.
+
+Please review the interface APIs and do some early testing.
+
+More to come soon :)
 
 Regards
 
