@@ -1,11 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <310e0a8d0803160610pa6e8dfcs1669c67f25d30117@mail.gmail.com>
-Date: Sun, 16 Mar 2008 15:10:25 +0200
-From: "Stanislav Popov" <stancho@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <47DAB12D.2010303@verticon.com>
+Date: Fri, 14 Mar 2008 12:09:01 -0500
+From: "John E. Conlon" <jconlon@verticon.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] bluez-utils - PIN Helper without GTK
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+To: Guillaume Bedot <littletux@zarb.org>,
+	bluez-users@lists.sourceforge.net
+References: <47D6F3BF.5060802@verticon.com>	
+	<1205321428.12305.9.camel@littletux>
+	<47D81428.4070605@verticon.com>	
+	<1205425245.12305.34.camel@littletux>
+	<47D96949.1070105@verticon.com>
+	<1205499423.23737.17.camel@localhost>
+In-Reply-To: <1205499423.23737.17.camel@localhost>
+Subject: Re: [Bluez-users] make problem bluez-utils 3.28
+Reply-To: jconlon@verticon.com,
+	BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -14,35 +23,85 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello to all,
-
-I installed my bluetooth successfully and now I am able to use it.
-
-I would like to support auth connection
-but I do not have python gtk support.
-
-Some times ago I used a pin helper which does not depends on python gtk support.
-
-It was a simple bash script.
-
-Where can I download bluez-utils package which supports auth and does
-not depend on python GTK
-
-Thanks in advance!
-
--- 
-Regards,
-St. Popov
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGkgR3VpbGxhdW1lLAoKSSBmaWxlZCBhIENlbnRvcyBidWcgcmVnYXJkaW5nIHRoaXMgaXNzdWUu
+ICBJdCBpczoKaHR0cDovL2J1Z3MuY2VudG9zLm9yZy92aWV3LnBocD9pZD0yNzQ3CgpEaWQgSSBh
+Y2N1cmF0ZWx5IGRlc2NyaWJlIHRoZSBwcm9ibGVtIGluIHRoZSBidWcgcmVwb3J0PwoKdGhhbmtz
+IGZvciBhbGwgeW91ciBoZWxwLApKb2huCgoKCkd1aWxsYXVtZSBCZWRvdCB3cm90ZToKPiBMZSBq
+ZXVkaSAxMyBtYXJzIDIwMDggw6AgMTI6NTAgLTA1MDAsIEpvaG4gRS4gQ29ubG9uIGEgw6ljcml0
+IDogCj4gICAKPj4gR3VpbGxhdW1lIEJlZG90IHdyb3RlOgo+PiAgICAgCj4+PiBPbiBtZXIsIDIw
+MDgtMDMtMTIgYXQgMTI6MzQgLTA1MDAsIEpvaG4gRS4gQ29ubG9uIHdyb3RlOgo+Pj4gICAKPj4+
+ICAgICAgIAo+Pj4+IEhpIEd1aWxsYXVtZSwKPj4+Pgo+Pj4+IFllcywgSSBub3RpY2VkIHRoZSB1
+bmRlY2xhcmVkIGlkZW50aWZpZXJzIGFuZCBkaWQgYSBnb29nbGUgdG8gc2VlIHdoYXQgSSAKPj4+
+PiBjb3VsZCBmaW5kIGFuZCBsaWtlIHlvdSBmb3VuZCBpdCB3YXMgZGVjbGFyZWQgaW4gdGhlIHNv
+Y2tpb3MuaCBmaWxlLiAKPj4+PiBJIGZvdW5kIGEgY29weSBvbiB0aGUgaW50ZXJuZXQgYXQKPj4+
+PiBodHRwOi8vdG9tb3lvLnNvdXJjZWZvcmdlLmpwL2NnaS1iaW4vbHhyL3NvdXJjZS9pbmNsdWRl
+L2xpbnV4L3NvY2tpb3MuaCNMMTIwCj4+Pj4gYW5kIGRpZCBub3RpY2UgdGhlIHJlZmVyZW5jZWQg
+aWRlbnRpZmllcnMgYXQgbGluZXMgMTIwLTEyMy4gICBCdXQgd2hlbiBJIAo+Pj4+IGxvb2tlZCBh
+dCBteSAvdXNyL2luY2x1ZGUvbGludXgvc29ja2lvcy5oIHRob3NlIGxpbmVzIGFyZSBtaXNzaW5n
+Lgo+Pj4+IEkgZ3Vlc3MgdGhhdCBtZWFucyBJIGhhdmUgYW4gb2xkZXIgdmVyc2lvbiBvZiB0aGVz
+ZSBoZWFkZXJzLgo+Pj4+Cj4+Pj4gVGhpcyBmaWxlIGlzIHN1cHBsaWVkIGJ5Ogo+Pj4+ICQgcnBt
+IC1xZiAvdXNyL2luY2x1ZGUvbGludXgvc29ja2lvcy5oCj4+Pj4gICAgICAgICAKPiBZb3Ugd2Vy
+ZSByaWdodCwgdGhpcyBpcyB0aGUgZmlsZSB1c2VkIGZvciBjb21waWxpbmcuCj4KPiAgIAo+Pj4+
+ICAgICAKPj4+PiAgICAgICAgIAo+Pj4gVHJ5IGFsc28gOgo+Pj4gJCBycG0gLXFmIHNvY2tpb3Mu
+aAo+Pj4KPj4+IFlvdSdyZSB0b28gcHJlY2lzZSAhCj4+PiAgIAo+Pj4gICAgICAgCj4+IE5vdCBm
+b3IgY2VudG9zIEkgZ3Vlc3MgOi0pCj4+ICMgcnBtIC1xZiBzb2NraW9zLmgKPj4gZXJyb3I6IGZp
+bGUgc29ja2lvcy5oOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5Cj4+ICAgICAKPgo+IHJwbSAt
+cWYgb25seSBmaW5kcyB0aGUgaW5zdGFsbGVkIHBhY2thZ2UgdG8gd2hpY2ggYW4gZXhpc3Rpbmcg
+ZmlsZQo+IGJlbG9uZ3MuLi4KPiBNeSB0cmllcyB3ZXJlIGRvbmUgd2l0aCBvdXIgcnBtIHdyYXBw
+ZXIgInVycG1mIi4KPiBZb3UgbWF5IGhhdmUgdGhlIHNhbWUgZmVhdHVyZXMgaW5jbHVkZWQgaW4g
+Inl1bSIsIG1heWJlIGl0IHdvdWxkIHdvcmsKPiB3aXRoIDoKPiB5dW0gc2VhcmNoIHNvY2tpb3Mu
+aAo+Cj4gICAKPj4ga2VybmVsLXNtcC1kZXZlbC5pNjg2ICAgICAgICAgICAgICAgICAgICAyLjYu
+OS02Ny4wLjQuRUwgICAgICAgIGluc3RhbGxlZAo+PiBBdmFpbGFibGUgUGFja2FnZXMKPj4ga2Vy
+bmVsLXNtcC1kZXZlbC5pNTg2ICAgICAgICAgICAgICAgICAgICAyLjYuOS02Ny4wLjQuRUwgICAg
+ICAgIHVwZGF0ZQo+Pgo+PiBQYXJkb24gbXkgaWdub3JhbmNlIGJ1dCB3aGF0IGlzIHRoZSBkaWZm
+ZXJlbmNlIGJldHdlZW4gdGhlIHR3bz8gIEkgZGlkIAo+PiBub3QgdGhpbmsgSSBzaG91bGQgaW5z
+dGFsbCBib3RoPz8KPj4KPj4gICAgIAo+IE9uZSBvZiB0aGUgcGFja2FnZXMgaXMgZW5vdWdoICgg
+YW5kIHlvdSBuZWVkIG9ubHkgYSBmZXcgZmlsZXMgZnJvbQo+IHRoaXMgKS4KPgo+IEkgc2hvdWxk
+IGJlIHRoZSBvbmUgY29ycmVzcG9uZGluZyB0byB5b3VyIGtlcm5lbCAod2l0aCB0aGUgc2FtZSBj
+b25maWcpLgo+IElmICJ1bmFtZSAtbSIgc2hvd3MgaTY4NiwgdGhlbiB0aGUgcmlnaHQgcGFja2Fn
+ZSBpcyBpbnN0YWxsZWQuCj4gT3IgY2hlY2sgd2hpY2gga2VybmVsIHBhY2thZ2UocykgaXMgKGFy
+ZSkgaW5zdGFsbGVkIDoKPiB5dW0gbGlzdCBpbnN0YWxsZWQgfCBncmVwIGtlcm5lbAo+Cj4gICAK
+Pj4gaGVyZSBpcyB3aGF0IHRoZSAuaTY4NiBjb250YWlucwo+PiAjIHJwbSAtcWwga2VybmVsLXNt
+cC1kZXZlbCB8IGdyZXAgc29ja2lvcy5oCj4+IC91c3Ivc3JjL2tlcm5lbHMvMi42LjktNjcuMC40
+LkVMLXNtcC1pNjg2L2luY2x1ZGUvYXNtLWkzODYvc29ja2lvcy5oCj4+IC91c3Ivc3JjL2tlcm5l
+bHMvMi42LjktNjcuMC40LkVMLXNtcC1pNjg2L2luY2x1ZGUvbGludXgvc29ja2lvcy5oCj4+Cj4+
+IFNvIGFuIHVwZGF0ZWQgc29ja2lvcy5oIGlzIG9uIHRoZSBzeXN0ZW0gYXQsCj4+ICgvdXNyL3Ny
+Yy9rZXJuZWxzLzIuNi45LTY3LjAuNC5FTC1zbXAtaTY4Ni9pbmNsdWRlL2xpbnV4L3NvY2tpb3Mu
+aCkKPj4gYW5kIGl0IGNvbnRhaW5zIHRoZSBuZWVkZWQgaWRlbnRpZmllcnMuICAgSXMgaXQgcG9z
+c2libGUgdG8gY29tcGlsZSB0aGUgCj4+IGJsdWV6LXV0aWxzCj4+IGFnYWluc3QgaXQgaW5zdGVh
+ZCBvZiB0aGUgb25lIGluIG15IC91c3IvaW5jbHVkZS9saW51eC9zb2NraW9zLmggPz8KPj4gICAg
+IAo+IFRoZSBmaWxlIGlzIGFsc28gdGhlcmUuCj4KPiBZb3UgY2FuIGNoZWNrIHRoZSBkaWZmZXJl
+bmNlcyBiZXR3ZWVuIHRoZSBmaWxlcyB3aXRoIDoKPiBkaWZmIC91c3Ivc3JjL2tlcm5lbHMvMi42
+LjktNjcuMC40LkVMLXNtcC1pNjg2L2luY2x1ZGUvbGludXgvc29ja2lvcy5oIC91c3IvaW5jbHVk
+ZS9saW51eC9zb2NraW9zLmgKPgo+IElmIHRoZXJlIGFyZSBub3QgdG9vIG1hbnkgZGlmZmVyZW5j
+ZXMsIHlvdSBjYW4gdHJ5IDoKPiBtdiAvdXNyL2luY2x1ZGUvbGludXgvc29ja2lvcy5oIC91c3Iv
+aW5jbHVkZS9saW51eC9zb2NraW9zLmgub3JpZwo+IGNwIC91c3Ivc3JjL2tlcm5lbHMvMi42Ljkt
+NjcuMC40LkVMLXNtcC1pNjg2L2luY2x1ZGUvbGludXgvc29ja2lvcy5oIC91c3IvaW5jbHVkZS9s
+aW51eC9zb2NraW9zLmgKPiBUaGVuIHNlZSBpZiBpdCBjb21waWxlcywgYW5kIHdvcmtzIChJIGFk
+bWl0IHRoYXQncyBub3QgYW4gZWFzeSB0bwo+IG1haW50YWluIHNvbHV0aW9uIGluIHRoZSBsb25n
+IHRlcm0pLgo+Cj4gSSdtIG5vdCBzdXJlIHdoeSB5b3VyIGZpbGVzIGluIC91c3IvaW5jbHVkZSBh
+bmQgL3Vzci9zcmMgZGlmZmVyLgo+IE1pbmUgYXJlIGlkZW50aWNhbAo+ICggL3Vzci9pbmNsdWRl
+L2xpbnV4L3NvY2tpb3MuaAo+IGFuZCAvdXNyL3NyYy9saW51eC0yLjYuMjIuMTgtZGVza3RvcC0x
+bWR2L2luY2x1ZGUvbGludXgvc29ja2lvcy5oICkuCj4KPiBJJ2Qgc2F5IGl0J3MgYSBidWcgaW4g
+dGhlIGdsaWJjLWtlcm5oZWFkZXJzIHBhY2thZ2UsIG1heWJlIHlvdSBzaG91bGQKPiByZXBvcnQg
+dGhlIG1haW50YWluZXIuCj4gVGhlcmUgaXMgYSBidWcgbWFuYWdpbmcgc3lzdGVtIGF0IGh0dHA6
+Ly9idWdzLmNlbnRvcy5vcmcvbWFpbl9wYWdlLnBocAo+IE9yLCB5b3UgY2FuIHNlZSB3aG8gcGFj
+a2FnZWQgdGhlIGxhc3Qgd2l0aCAicnBtIC1xaSBnbGliYy1rZXJuaGVhZGVycyIsCj4gd2l0aCBh
+biBlbWFpbC4KPgo+IE91ciBrZXJuZWwtKi1kZXZlbCBwYWNrYWdlcyBhbHNvIGluY2x1ZGVzICgg
+b24gcHVycG9zZSwgdG8ga2VlcCB0aGUKPiBwYWNrYWdlcyBzbWFsbCApIGEgbGltaXRlZCBzZXQg
+b2YgbGludXggaGVhZGVycywgZm9yIGNvbXBpbGF0aW9uIG5lZWRzCj4gKCBleHRlcm5hbCBtb2R1
+bGVzLCBldGMgKS4KPgo+IFRoZSBuZXR3b3JrIHN1cHBvcnQgaW4gYmx1ZXogaXMgcmVjZW50LCBz
+byBpdCBtYXkgYmUgd2h5IHRoZXNlIHBhcnRzIG9mCj4gdGhlIGhlYWRlcnMgbWlzcyAobm90IG5l
+ZWRlZCBiZWZvcmUpLgo+Cj4gSG9wZSB0aGF0IGhlbHBzIGEgYml0Lgo+Cj4gUmVnYXJkcywKPgo+
+IEd1aWxsYXVtZSBCLgo+Cj4KPgo+Cj4gICAKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0
+IGVtYWlsIGlzIHNwb25zb3JlZCBieTogTWljcm9zb2Z0CkRlZnkgYWxsIGNoYWxsZW5nZXMuIE1p
+Y3Jvc29mdChSKSBWaXN1YWwgU3R1ZGlvIDIwMDguCmh0dHA6Ly9jbGsuYXRkbXQuY29tL01SVC9n
+by92c2UwMTIwMDAwMDcwbXJ0L2RpcmVjdC8wMS8KX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX18KQmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0CkJsdWV6LXVzZXJz
+QGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0
+cy9saXN0aW5mby9ibHVlei11c2Vycwo=
