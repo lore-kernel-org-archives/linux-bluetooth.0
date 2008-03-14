@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <42CCF85F-A627-496E-AEB3-5FD249D7FCC9@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1205519413.30595.228.camel@cookie.hadess.net>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Fri, 14 Mar 2008 19:59:59 +0100
+In-Reply-To: <20080313150643.GI8969@cathedrallabs.org>
 References: <20080313150643.GI8969@cathedrallabs.org>
-	<1205519413.30595.228.camel@cookie.hadess.net>
+Date: Fri, 14 Mar 2008 18:30:13 +0000
+Message-Id: <1205519413.30595.228.camel@cookie.hadess.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] [PATCH 1/2 v011] add support to fake HID devices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,32 +20,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
 
->> This patch adds support to fake HID devices. Instead of registering  
->> with
->> kernel, the fake HID will be handled in user level and an uinput  
->> device
->> will be created in order to get the events into input layer.
-> <snip>
->> +		fake = g_try_new0(struct fake_input, 1)
->
-> Missing a semi-colon.
->
->
->> +	if (fake)
->> +		gfree(fake);
->
-> g_free, not gfree.
->
-> Works fine after those changes.
+On Thu, 2008-03-13 at 11:06 -0400, Aristeu Rozanski wrote:
+> This patch adds support to fake HID devices. Instead of registering with
+> kernel, the fake HID will be handled in user level and an uinput device
+> will be created in order to get the events into input layer.
+<snip>
+> +		fake = g_try_new0(struct fake_input, 1)
 
-fixed everything, but I had to do some manual fixups for coding style  
-and so on. This patch is in. The other one isn't. I need an updated one.
+Missing a semi-colon.
 
-Regards
 
-Marcel
+> +	if (fake)
+> +		gfree(fake);
+
+g_free, not gfree.
+
+Works fine after those changes.
 
 
 -------------------------------------------------------------------------
