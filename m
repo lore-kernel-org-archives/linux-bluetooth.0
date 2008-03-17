@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <194c6ea30803161927r2411b317lb99c4e9fbe877676@mail.gmail.com>
+Date: Mon, 17 Mar 2008 10:27:59 +0800
+From: "dong yan" <semiydsemiyd@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Date: Mon, 17 Mar 2008 16:12:21 +0800
-Message-ID: <FFED2D1514034841A6270D98984E7D0C01E24A26@pdsmsx415.ccr.corp.intel.com>
-From: "Zhu, Peter J" <peter.j.zhu@intel.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] problem of dropped packet in RFCOMM socket programming
+Subject: [Bluez-devel] How to do HSP/HFP testing using bluez3.28?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,132 +18,57 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
-
-I'm a new guy in bluez progamming. If problem described here was already
-addressed, please let me know and forgive me. 
-
-I try to write a client/server application utilizing RFCOMM socket
-between bluetooth devices. Currently the two devices are both desktop
-armed with USB BT dongle. The connection and read/write are successful
-but I do see some data continuously and frequently sent by client was
-NOT received by server. For example I try to send a buffer of long data
-30 times with client but sometimes server can get only 28 times or 29
-times. Any solution or help are really really appreciated. Please see my
-simple programs below. 
-
-server programm:
-#include <stdio.h>
-#include <unistd.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/rfcomm.h>
-
-
-void do_proxy(int sockfd)
-{
-    ssize_t bytes_read;
-    char buf[1024] = {0};
-    int count = 0;
-
-again:
-    while ( (bytes_read = recv(sockfd, buf, sizeof(buf), 0)) > 0)
-        fprintf(stderr, "received [%s] %d lines\n", buf, ++count);
-    if (bytes_read < 0 && errno == EINTR)
-        goto again;
-    else if (bytes_read < 0)
-        perror("uh oh");
-
+Hi All:
+      Im using an ARM9 embeded system running linux2.6.18 and
+bluez3.28.Im using a bluetooth module named "STLC2500" with UART
+interface.Since the STLC2500 supports only sco over pcm, i connect the
+pcm interface of stlc2500 to the CPU's pcm pins.But...so far , i wasnt
+able to establish any SCO connections when testing HFP/HSP profile.
+Here's some details and questions:
+      1.How many ways do we have testing hsp/hfp using bluez?
+         I tried "hstest","hsplay", they all resulted in a "sco
+connection timed out" error.
+         I also tried modifying the asound.conf:
+pcm.bluetooth {
+  type bluetooth
+  device 00:0D:3C:EB:53:F0
+     profile hfp
 }
+Then use "aplay -D bluetooth /*.wav" to play the music. Then it shows:
+/ $ aplay -D bluetooth /tmp1/16000.wav
+audio[198]: Accepted new client connection on unix socket (fd=7)
+audio[198]: Audio API: received BT_GETCAPABILITIES_REQ
+audio[198]: Audio API: sending BT_GETCAPABILITIES_RSP
+ALSA lib pcm_bluetooth.c:1574:(bluetooth_init) BT_GETCAPABILITIES failed :
+Input/output error(5)
+aplay: main:564: audio open error: Input/output error
+audio[198]: Unix client disconnected (fd=7)
 
-int main(int argc, char **argv)
-{
-    struct sockaddr_rc loc_addr = { 0 }, rem_addr = { 0 };
-    char buf[1024] = { 0 };
-    int s, client, bytes_read;
-    unsigned int opt = sizeof(rem_addr);
+      Anyway, these methods didnt work out. Is there any other way of
+testing the hfp/hsp profiles?
+      2.My stlc2500 bluetooth chip does not support sco over hci. So i
+connected it with my cpu using pcm. My cpu has to play a pcm slave
+role, so stlc2500 has to be pcm master(the master generates pcm
+clk/sync). The problem is , the stlc2500 should be programmed to be
+master or slave , and the value of pcm clk/sync should also be
+programmed. According to its spec , it can be programmed through
+various HCI commands.....but i dont know which hci command is it?
+      Its also loaded with 2 patch files when it started, which the
+spec says can also set the value of pcm clk/sync values. The 2 files
+are from bluez-firmware-1.2.  Like this:
+       STLC2500 R4.2 12102005 12:40:14 ZAV100012
+       HW Id= V440BAA
+Loading file /lib/firmware/STLC2500_R4_02_04.ptc
+Loading file /lib/firmware/STLC2500_R4_02_02_WLAN.ssf
+      Is there anyway of modifying those patches so that i can change
+the pcm clk/sync(if i can)?
 
-    // allocate socket
-    s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+Thanks in advance.
 
-    // bind socket to port 1 of the first available bluetooth adapter
-    loc_addr.rc_family = AF_BLUETOOTH;
-    loc_addr.rc_bdaddr = *BDADDR_ANY;
-    loc_addr.rc_channel = 25;
-    bind(s, (struct sockaddr *)&loc_addr, sizeof(loc_addr));
-
-    // put socket into listening mode
-    listen(s, 1);
-
-    for (; ;) {
-        // accept one connection
-        client = accept(s, (struct sockaddr *)&rem_addr, &opt);
-
-        ba2str( &rem_addr.rc_bdaddr, buf );
-        fprintf(stderr, "accepted connection from %s\n", buf);
-        memset(buf, 0, sizeof(buf));
-        do_proxy(client);
-
-        // close connection
-        close(client);
-    }
-    close(s);
-    return 0;
-}
-
-client program:
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/rfcomm.h>
-
-int main(int argc, char **argv)
-{
-    struct sockaddr_rc addr = { 0 };
-    int s, status;
-    /*char dest[18] = "00:0E:9B:DA:7D:73";*/ /*JZHU26*/
-    /*char dest[18] = "00:17:00:2B:7A:6C";*/ /*V3*/
-    char dest[18] = "00:0A:94:02:71:04";
-    int i=0;
-    const char buf[] = "This is a very cool device for use for trial for
-test for examination";
- 
-
-    // allocate a socket
-    s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-
-    // set the connection parameters (who to connect to)
-    addr.rc_family = AF_BLUETOOTH;
-    addr.rc_channel = 25;
-    str2ba( dest, &addr.rc_bdaddr );
-
-    // connect to server
-    status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
-
-    // send a message
-    if( 0 == status ) {
-        while(i<30) {
-            status = send(s, buf, sizeof(buf), 0);
-            if( status < 0 ) {perror("uh oh "); break;}
-            i++;
-        }
-        fprintf(stderr, "sent %d\n", i);
-    }
-    if (status < 0)
-        perror("AAAA");
+Best Regards
 
 
-    close(s);
-    return 0;
-}
-
-
-
-Thanks,
-Peter
+semiyd
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
