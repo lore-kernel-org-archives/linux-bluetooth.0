@@ -1,10 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <8f5c4ad0803182345r5ff7fbc3v951ce38596436e3d@mail.gmail.com>
-Date: Wed, 19 Mar 2008 12:15:17 +0530
-From: Matt <chemvell@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Message-ID: <a8e1da0803180014u262a7ee0h25ff58a0e6363dfd@mail.gmail.com>
+Date: Tue, 18 Mar 2008 15:14:23 +0800
+From: "Dave Young" <hidave.darkstar@gmail.com>
+To: "Odysseus Flappington" <deriziotis@gmail.com>
+In-Reply-To: <5eee8c670803170528o44384744pe238c378953dbc02@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] Can't connect RFCOMM socket
+References: <5eee8c670802281451i392c0debq7a16286d76d33bfb@mail.gmail.com>
+	<a8e1da0803021721m3145bc7fpd896760d4bed7d97@mail.gmail.com>
+	<a8e1da0803021724h654f65ceif24b2035dc94a5ec@mail.gmail.com>
+	<5eee8c670803030335v49536053j136b8b46addb8129@mail.gmail.com>
+	<5eee8c670803031419k10c8e625p447f8f98ac27dcb9@mail.gmail.com>
+	<5eee8c670803170528o44384744pe238c378953dbc02@mail.gmail.com>
+Cc: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] hciconfig hci0 reset bug
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,109 +22,394 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1676357937=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1676357937==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_14148_11910076.1205909117729"
+On Mon, Mar 17, 2008 at 8:28 PM, Odysseus Flappington
+<deriziotis@gmail.com> wrote:
+> Hi Dave,
+>
+> So I got around to recompiling my kernel this weekend, and ran off a test on
+> the patch attached and it worked like a charm.
+>
+> I have to wonder though why the line was commented out in the first place.
+> Could it be because internal adapters don't need the line?
+>
+> Anyway, I'd love to see this fixed in future kernels. If there's anything
+> else I can do to help test, let me know. Now that I've got my head around
+> recompiling kernels again, I can probably turn around tests a lot faster.
 
-------=_Part_14148_11910076.1205909117729
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi thanks
 
-Hi,
+About the reset issue, I get some response from marcel about reset csr dongles
+-------- Marcel said :
+this is a clear NAK since you gonna break all old CSR based dongles.
+Within the Bluetooth 1.0b and 1.1 specification there was an issues
+with if HCI_Reset should only reset the Bluetooth internals or also
+the transport. So issuing HCI_Reset on an old dongle will cause an USB
+reset.
 
-                    I am using bluez-utils-3.28 and am trying to connect to
-a Nokia phone from my PC which has a BT dongle.I run hcid .I scan for other
-devies using hcitool scan..and connect to my Phone using....
+The solution is to find the build id when CSR produced correct
+firmware and set the HCI_RESET quirk based on that. I meant to do this
+for a long time, but so far never got around to inquiry the correct
+build id where this got fixed.
+--------
 
-$hcid &
-$passkey-agent --default 0000 &
-$ hcitool scan
-$ rfcomm connect 0 00:0E:6D:E0:E5:13 1
+But I think it's hard to find that build id, so ...
 
-The Phone asks for the pin . I enter "0000" as the PIN .After sometime I get
-the error message
-Can't connect RFCOMM socket: Resource temporarily unavailable.
+Regards
+dave
 
-hcidump shows that (After I enter the PIN on the phone )
-
-> HCI Event: PIN Code Request (0x16) plen 6
-< ACL data: handle 1 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0064 len 4 [psm 3]
-      RFCOMM(s): DISC: cr 1 dlci 2 pf 1 ilen 0 fcs 0xb8
-< ACL data: handle 1 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0064 len 4 [psm 3]
-      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
-< ACL data: handle 1 flags 0x02 dlen 12
-    L2CAP(s): Disconn req: dcid 0x0064 scid 0x0040
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> HCI Event: Number of Completed Packets (0x13) plen 5
-> ACL data: handle 1 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92
-> ACL data: handle 1 flags 0x02 dlen 8
-    L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
-> ACL data: handle 1 flags 0x02 dlen 12
-    L2CAP(s): Disconn rsp: dcid 0x0064 scid 0x0040
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-> HCI Event: Command Status (0x0f) plen 4
-> HCI Event: Disconn Complete (0x05) plen 4
-
-        I tried after removing the link keys
-(/var/lib/bluetooth/XX:XX:XX:XX:XX:XX/) .Still I get the same error..What
-could be the problem here..?
-       When I try the same thing with a PC with Fedora Core5 (without the
-latest bluez and passkey-agent), I am asked to enter the PIN when I enter it
-on the phone and the connection is successful..
-
-Thank you for your time and consideration,
-regards,
-Matt.
-
-------=_Part_14148_11910076.1205909117729
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi,<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I am using bluez-utils-3.28 and am trying to connect to a Nokia phone from my PC which has a BT dongle.I run hcid .I scan for other devies using hcitool scan..and connect to my Phone using....<br>
-<br>$hcid &amp;<br>$passkey-agent --default 0000 &amp;<br>$ hcitool scan<br>$ rfcomm connect 0 00:0E:6D:E0:E5:13 1<br><br>The Phone asks for the pin . I enter &quot;0000&quot; as the PIN .After sometime I get the error message <br>
-Can&#39;t connect RFCOMM socket: Resource temporarily unavailable.<br><br>hcidump shows that (After I enter the PIN on the phone )<br><br>&gt; HCI Event: PIN Code Request (0x16) plen 6<br>&lt; ACL data: handle 1 flags 0x02 dlen 8<br>
-&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0064 len 4 [psm 3]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RFCOMM(s): DISC: cr 1 dlci 2 pf 1 ilen 0 fcs 0xb8<br>&lt; ACL data: handle 1 flags 0x02 dlen 8<br>&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0064 len 4 [psm 3]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd<br>
-&lt; ACL data: handle 1 flags 0x02 dlen 12<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Disconn req: dcid 0x0064 scid 0x0040<br>&gt; HCI Event: Number of Completed Packets (0x13) plen 5<br>&gt; HCI Event: Number of Completed Packets (0x13) plen 5<br>
-&gt; HCI Event: Number of Completed Packets (0x13) plen 5<br>&gt; ACL data: handle 1 flags 0x02 dlen 8<br>&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0040 len 4 [psm 3]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92<br>&gt; ACL data: handle 1 flags 0x02 dlen 8<br>
-&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0040 len 4 [psm 3]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7<br>&gt; ACL data: handle 1 flags 0x02 dlen 12<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Disconn rsp: dcid 0x0064 scid 0x0040<br>&lt; HCI Command: Disconnect (0x01|0x0006) plen 3<br>
-&gt; HCI Event: Command Status (0x0f) plen 4<br>&gt; HCI Event: Disconn Complete (0x05) plen 4<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I tried after removing the link keys (/var/lib/bluetooth/XX:XX:XX:XX:XX:XX/) .Still I get the same error..What could be the problem here..?<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; When I try the same thing with a PC with Fedora Core5 (without the latest bluez and passkey-agent), I am asked to enter the PIN when I enter it on the phone and the connection is successful..<br><br>Thank you for your time and consideration,<br>
-regards,<br>Matt. <br><br><br>
-
-------=_Part_14148_11910076.1205909117729--
-
-
---===============1676357937==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+>
+> Many thanks,
+>
+>
+> Alex
+>
+> On 03/03/2008, Odysseus Flappington <deriziotis@gmail.com> wrote:
+> > Ok,
+> >
+> > I passed reset=1 to hci_usb by adding the following line to
+> > /etc/modprobe.d/options:
+> >
+> > options hci_usb reset=1
+> >
+> > and that's fixed the problem!
+> >
+> > Wasn't sure about my lsusb output, didn't seem to show very much, so
+> > here's my lsusb -v output for my bluetooth device:
+> >
+> > Bus 001 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd
+> > Bluetooth Dongle (HCI mode)
+> > Device Descriptor:
+> >   bLength                18
+> >   bDescriptorType         1
+> >   bcdUSB               2.00
+> >   bDeviceClass          224 Wireless
+> >   bDeviceSubClass         1 Radio Frequency
+> >   bDeviceProtocol         1 Bluetooth
+> >   bMaxPacketSize0        64
+> >   idVendor           0x0a12 Cambridge Silicon Radio, Ltd
+> >   idProduct          0x0001 Bluetooth Dongle (HCI mode)
+> >   bcdDevice           31.64
+> >   iManufacturer           0
+> >   iProduct                0
+> >   iSerial                 0
+> >   bNumConfigurations      1
+> >   Configuration Descriptor:
+> >     bLength                 9
+> >     bDescriptorType         2
+> >     wTotalLength          177
+> >     bNumInterfaces          2
+> >     bConfigurationValue     1
+> >     iConfiguration          0
+> >     bmAttributes         0xc0
+> >       Self Powered
+> >     MaxPower                0mA
+> >     Interface Descriptor:
+> >       bLength                 9
+> >       bDescriptorType         4
+> >       bInterfaceNumber        0
+> >       bAlternateSetting       0
+> >       bNumEndpoints           3
+> >       bInterfaceClass       224 Wireless
+> >       bInterfaceSubClass      1 Radio Frequency
+> >       bInterfaceProtocol      1 Bluetooth
+> >       iInterface              0
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x81  EP 1 IN
+> >         bmAttributes            3
+> >           Transfer Type            Interrupt
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0010  1x 16 bytes
+> >         bInterval               1
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x02  EP 2 OUT
+> >         bmAttributes            2
+> >           Transfer Type            Bulk
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0040  1x 64 bytes
+> >         bInterval               1
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x82  EP 2 IN
+> >         bmAttributes            2
+> >           Transfer Type            Bulk
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0040  1x 64 bytes
+> >         bInterval               1
+> >     Interface Descriptor:
+> >       bLength                 9
+> >       bDescriptorType         4
+> >       bInterfaceNumber        1
+> >       bAlternateSetting       0
+> >       bNumEndpoints           2
+> >       bInterfaceClass       224 Wireless
+> >       bInterfaceSubClass      1 Radio Frequency
+> >       bInterfaceProtocol      1 Bluetooth
+> >       iInterface              0
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x03  EP 3 OUT
+> >         bmAttributes            1
+> >           Transfer Type            Isochronous
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0000  1x 0 bytes
+> >         bInterval               1
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x83  EP 3 IN
+> >         bmAttributes            1
+> >           Transfer Type            Isochronous
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0000  1x 0 bytes
+> >         bInterval               1
+> >     Interface Descriptor:
+> >       bLength                 9
+> >       bDescriptorType         4
+> >       bInterfaceNumber        1
+> >       bAlternateSetting       1
+> >       bNumEndpoints           2
+> >       bInterfaceClass       224 Wireless
+> >       bInterfaceSubClass      1 Radio Frequency
+> >       bInterfaceProtocol      1 Bluetooth
+> >       iInterface              0
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x03  EP 3 OUT
+> >         bmAttributes            1
+> >           Transfer Type            Isochronous
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0009  1x 9 bytes
+> >         bInterval               1
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x83  EP 3 IN
+> >         bmAttributes            1
+> >           Transfer Type            Isochronous
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0009  1x 9 bytes
+> >         bInterval               1
+> >     Interface Descriptor:
+> >       bLength                 9
+> >       bDescriptorType         4
+> >       bInterfaceNumber        1
+> >       bAlternateSetting       2
+> >       bNumEndpoints           2
+> >       bInterfaceClass       224 Wireless
+> >       bInterfaceSubClass      1 Radio Frequency
+> >       bInterfaceProtocol      1 Bluetooth
+> >       iInterface              0
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x03  EP 3 OUT
+> >         bmAttributes            1
+> >           Transfer Type            Isochronous
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0011  1x 17 bytes
+> >         bInterval               1
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x83  EP 3 IN
+> >         bmAttributes            1
+> >           Transfer Type            Isochronous
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0011  1x 17 bytes
+> >         bInterval               1
+> >     Interface Descriptor:
+> >       bLength                 9
+> >       bDescriptorType         4
+> >       bInterfaceNumber        1
+> >       bAlternateSetting       3
+> >       bNumEndpoints           2
+> >       bInterfaceClass       224 Wireless
+> >       bInterfaceSubClass      1 Radio Frequency
+> >       bInterfaceProtocol      1 Bluetooth
+> >       iInterface              0
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x03  EP 3 OUT
+> >         bmAttributes            1
+> >           Transfer Type            Isochronous
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0019  1x 25 bytes
+> >         bInterval               1
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x83  EP 3 IN
+> >         bmAttributes            1
+> >           Transfer Type            Isochronous
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0019  1x 25 bytes
+> >         bInterval               1
+> >     Interface Descriptor:
+> >       bLength                 9
+> >       bDescriptorType         4
+> >       bInterfaceNumber        1
+> >       bAlternateSetting       4
+> >       bNumEndpoints           2
+> >       bInterfaceClass       224 Wireless
+> >       bInterfaceSubClass      1 Radio Frequency
+> >       bInterfaceProtocol      1 Bluetooth
+> >       iInterface              0
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x03  EP 3 OUT
+> >         bmAttributes            1
+> >           Transfer Type            Isochronous
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0021  1x 33 bytes
+> >         bInterval               1
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x83  EP 3 IN
+> >         bmAttributes            1
+> >           Transfer Type            Isochronous
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0021  1x 33 bytes
+> >         bInterval               1
+> >     Interface Descriptor:
+> >       bLength                 9
+> >       bDescriptorType         4
+> >       bInterfaceNumber        1
+> >       bAlternateSetting       5
+> >       bNumEndpoints           2
+> >       bInterfaceClass       224 Wireless
+> >       bInterfaceSubClass      1 Radio Frequency
+> >       bInterfaceProtocol      1 Bluetooth
+> >       iInterface              0
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x03  EP 3 OUT
+> >         bmAttributes            1
+> >           Transfer Type            Isochronous
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0031  1x 49 bytes
+> >         bInterval               1
+> >       Endpoint Descriptor:
+> >         bLength                 7
+> >         bDescriptorType         5
+> >         bEndpointAddress     0x83  EP 3 IN
+> >         bmAttributes            1
+> >           Transfer Type            Isochronous
+> >           Synch Type               None
+> >           Usage Type               Data
+> >         wMaxPacketSize     0x0031  1x 49 bytes
+> >         bInterval               1
+> > Device Status:     0x0001
+> >   Self Powered
+> >
+> > Thanks,
+> > Alex
+> >
+> >
+> >
+> >
+> > On 03/03/2008, Odysseus Flappington <deriziotis@gmail.com> wrote:
+> > > Hi Dave,
+> > >
+> > >  Thanks for the help. I can probably get a recompile of my kernel done
+> > >  by the end of the weekend, maybe end of week, if it'll help.
+> > >
+> > >  In the meantime, I'll try loading the bluetooth module with reset=1
+> > >  and get the lsusb output to you tonight when I get home from work.
+> > >
+> > >  Thanks,
+> > >  Alex (Jackflap)
+> > >
+> > >
+> > >  On 03/03/2008, Dave Young <hidave.darkstar@gmail.com> wrote:
+> > >  > On Mon, Mar 3, 2008 at 9:21 AM, Dave Young
+> <hidave.darkstar@gmail.com> wrote:
+> > >  >  > On Fri, Feb 29, 2008 at 6:51 AM, Odysseus Flappington
+> > >  >  >  <deriziotis@gmail.com> wrote:
+> > >  >  >
+> > >  >  >
+> > >  >  > > So, it turns out that in order for any external usb bluetooth
+> adapters
+> > >  >  >  >  to re-connect to paired input devices on reboot, you need to
+> issue an
+> > >  >  >  >  'hciconfig hci0 reset' command after rebooting in order to
+> reconnect.
+> > >  >  >  >
+> > >  >  >  >  More info can be found in bug #133690 on Launchpad
+> > >  >  >  >
+> (https://bugs.launchpad.net/ubuntu/+source/bluez-utils/+bug/133690).
+> > >  >  >  >
+> > >  >  >  >  This bug isn't Ubuntu-specific since I have reproduced in
+> Fedora 8, so
+> > >  >  >  >  I'm posting here.
+> > >  >  >  >
+> > >  >  >  >  Simply adding 'hciconfig hci0 reset' in /etc/default/bluetooth
+> in
+> > >  >  >  >  source would solve this bug. Is this a reasonable solution?
+> > >  >  >  >
+> > >  >  >  >  What is required in order to get a fix implemented?
+> > >  >
+> > >  >
+> > >  > Sorry for previous blank reply.
+> > >  >
+> > >  >  For your problem, if you don't want to patch kernel you can also try
+> > >  >  load the bluetooth module with parameter "reset=1"
+> > >  >
+> > >  >  Could you send the lsusb output?
+> > >  >
+> > >  >  Regards
+> > >  >
+> > >  > dave
+> > >  >
+> > >  >
+> > >  >
+> -------------------------------------------------------------------------
+> > >  >  This SF.net email is sponsored by: Microsoft
+> > >  >  Defy all challenges. Microsoft(R) Visual Studio 2008.
+> > >  >  http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> > >  >  _______________________________________________
+> > >  >  Bluez-users mailing list
+> > >  >  Bluez-users@lists.sourceforge.net
+> > >  >  https://lists.sourceforge.net/lists/listinfo/bluez-users
+> > >  >
+> > >
+> >
+>
+>
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1676357937==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1676357937==--
