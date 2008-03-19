@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47E149F2.7010005@suse.de>
-Date: Wed, 19 Mar 2008 18:14:26 +0100
-From: Stefan Seyfried <seife@suse.de>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] hid2hci error message wrong
+Message-Id: <A6B7F17C-B7E5-4A45-8208-D9C1FBC68C96@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: =?EUC-KR?B?wMzB1r+1?= <tkakel@naver.com>,
+	BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1e720e88bd7ce5a74be321703f24060d@i61813>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Wed, 19 Mar 2008 17:47:11 +0100
+References: <1e720e88bd7ce5a74be321703f24060d@i61813>
+Subject: Re: [Bluez-devel] I've found a bug in sdp_cstate_get() function.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,43 +17,33 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-15"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-the message is wrong:
+> I've found a bug in sdp_cstate_get() function.
+> (bluez-utils/dist/sdpd/request.c)
+>  -> memcpy(cstate, (sdp_cont_state_t *)pdata,  
+> sizeof(sdp_cont_state_t));
+> When running this code, "hcid daemon crash" occurred.(memory  
+> alignment error)
+>
+> I think there's a bug with (sdp_cont_state_t *)pdata in  
+> sdp_cstate_get() function.
+> I fixed this code.
+>  -> memcpy(cstate, pdata, sizeof(sdp_cont_state_t));
+> Now, hcid daemon doesn't die.
+>
 
-root@susi:~# hid2hci
-No devices in HCI mode found
+which version? This should have been fixed by now. Either in the  
+latest bluez-utils-3.28 or the CVS.
 
-Index: tools/hid2hci.c
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-RCS file: /cvsroot/bluez/utils/tools/hid2hci.c,v
-retrieving revision 1.18
-diff -u -p -r1.18 hid2hci.c
---- tools/hid2hci.c	2 Feb 2008 03:37:54 -0000	1.18
-+++ tools/hid2hci.c	19 Mar 2008 17:06:45 -0000
-@@ -332,7 +332,7 @@ int main(int argc, char *argv[])
- 	if (num <=3D 0) {
- 		if (!quiet)
- 			fprintf(stderr, "No devices in %s mode found\n",
--							mode ? "HID" : "HCI");
-+							mode ? "HCI" : "HID");
- 		exit(1);
- 	}
+Regards
 
--- =
+Marcel
 
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg | "Well, surrounding them's out."
-
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
