@@ -1,120 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <039f01c88a15$a848aaa0$6701a8c0@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: <marcel@holtmann.org>
+Cc: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+References: <1205440348.12951.9.camel@californication>
+Subject: Re: [Bluez-devel] Moving towards a new API for BlueZ 4.0
+Date: Wed, 19 Mar 2008 18:04:56 -0500
 MIME-Version: 1.0
-Message-Id: <1f1e24ea31c496efd62db585de7b01cf@i61823>
-Content-Type: multipart/alternative;
-	boundary="-------Boundary-Naver=_4e757aee39cce5164f689145c88a24ff"
-From: =?EUC-KR?B?wMzB1r+1?=<tkakel@naver.com>
-Subject: =?EUC-KR?B?UkU6IFJlOiBbQmx1ZXotZGV2ZWxdIEkndmUgZm91bmQgYSBi?=
-	=?EUC-KR?B?dWcgaW4gc2RwX2NzdGF0ZV9nZXQoKSBmdW5jdGlvbi4=?=
-Reply-To: =?EUC-KR?B?wMzB1r+1?=<tkakel@naver.com>
-Date: Thu, 20 Mar 2008 13:01:03 +0900
-To: =?EUC-KR?B?TWFyY2VsIEhvbHRtYW5u?=<marcel@holtmann.org>,
-	<bluez-devel@lists.sourceforge.net>
-in-reply-to: <A6B7F17C-B7E5-4A45-8208-D9C1FBC68C96@holtmann.org>
-references: <1e720e88bd7ce5a74be321703f24060d@i61813>
-	<A6B7F17C-B7E5-4A45-8208-D9C1FBC68C96@holtmann.org>
+Content-Type: text/plain;
+	charset="iso-8859-1"
 List-ID: <bluez-devel.lists.sourceforge.net>
 
----------Boundary-Naver=_4e757aee39cce5164f689145c88a24ff
-Content-Type: text/plain;
-	 charset="EUC-KR"
-Content-Transfer-Encoding: base64
+Marcel,
 
-SGksCiAKVGhlIHZlcnNpb24gaXMgbGF0ZXN0IGJsdWV6LXV0aWxzLTMuMjguCiAKVGhhbmtzLgog
-ClJlZ2FyZHMKam9veW91bmcuCiAKLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0KRnJvbTogIk1h
-cmNlbCBIb2x0bWFubiImbHQ7bWFyY2VsQGhvbHRtYW5uLm9yZyZndDsgClRvOiAiwMzB1r+1IiZs
-dDt0a2FrZWxAbmF2ZXIuY29tJmd0OzsgIkJsdWVaIGRldmVsb3BtZW50IiZsdDtibHVlei1kZXZl
-bEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQmZ3Q7CkNjOiAKU2VudDogMDgtMDMtMjAouPEpIDAxOjQ3
-OjExClN1YmplY3Q6IFJlOiBbQmx1ZXotZGV2ZWxdIEkndmUgZm91bmQgYSBidWcgaW4gc2RwX2Nz
-dGF0ZV9nZXQoKSBmdW5jdGlvbi4KSGksCj4gSSd2ZSBmb3VuZCBhIGJ1ZyBpbiBzZHBfY3N0YXRl
-X2dldCgpIGZ1bmN0aW9uLgo+IChibHVlei11dGlscy9kaXN0L3NkcGQvcmVxdWVzdC5jKQo+IC0+
-IG1lbWNweShjc3RhdGUsIChzZHBfY29udF9zdGF0ZV90ICopcGRhdGEsIAo+IHNpemVvZihzZHBf
-Y29udF9zdGF0ZV90KSk7Cj4gV2hlbiBydW5uaW5nIHRoaXMgY29kZSwgImhjaWQgZGFlbW9uIGNy
-YXNoIiBvY2N1cnJlZC4obWVtb3J5IAo+IGFsaWdubWVudCBlcnJvcikKPgo+IEkgdGhpbmsgdGhl
-cmUncyBhIGJ1ZyB3aXRoIChzZHBfY29udF9zdGF0ZV90ICopcGRhdGEgaW4gCj4gc2RwX2NzdGF0
-ZV9nZXQoKSBmdW5jdGlvbi4KPiBJIGZpeGVkIHRoaXMgY29kZS4KPiAtPiBtZW1jcHkoY3N0YXRl
-LCBwZGF0YSwgc2l6ZW9mKHNkcF9jb250X3N0YXRlX3QpKTsKPiBOb3csIGhjaWQgZGFlbW9uIGRv
-ZXNuJ3QgZGllLgo+CndoaWNoIHZlcnNpb24/IFRoaXMgc2hvdWxkIGhhdmUgYmVlbiBmaXhlZCBi
-eSBub3cuIEVpdGhlciBpbiB0aGUgCmxhdGVzdCBibHVlei11dGlscy0zLjI4IG9yIHRoZSBDVlMu
-ClJlZ2FyZHMKTWFyY2VsCiAKIAp0a2FrZWy01MDHILrtt86x1wq+yLPnx8+8vL/kLgo=
+Thanks for all of the great effort, especially in moving toward the DBus model.
 
----------Boundary-Naver=_4e757aee39cce5164f689145c88a24ff
-Content-Type: text/html;
-	 charset="EUC-KR"
-Content-Transfer-Encoding: base64
+I am currently going through the work done to date in audio/control.c (the implementation of AVRCP), and am trying to apply that to 
+an application connecting with an AVRCP on CSR's BlueLab 4.0 framework (implements BT2.1+).  I have some ideas, although I am still 
+making sure I understand what has been done to this point, and would like to participate in further development (although I am not 
+the best C developer).
 
-PGh0bWw+PGhlYWQ+PHN0eWxlPlAge21hcmdpbi10b3A6MnB4O21hcmdpbi1ib3R0b206MnB4O308
-L3N0eWxlPjwvaGVhZD48Ym9keT48ZGl2IHN0eWxlPSJmb250LXNpemU6MTBwdDsgZm9udC1mYW1p
-bHk6R3VsaW0sQXBwbGVHb3RoaWMsc2Fucy1zZXJpZjsiPjxQIHN0eWxlPSJGT05ULVNJWkU6IDEw
-cHQ7IEZPTlQtRkFNSUxZOiBHdWxpbSxBcHBsZUdvdGhpYyxzYW5zLXNlcmlmIj5IaSw8L1A+DQo8
-UCBzdHlsZT0iRk9OVC1TSVpFOiAxMHB0OyBGT05ULUZBTUlMWTogR3VsaW0sQXBwbGVHb3RoaWMs
-c2Fucy1zZXJpZiI+Jm5ic3A7PC9QPg0KPFAgc3R5bGU9IkZPTlQtU0laRTogMTBwdDsgRk9OVC1G
-QU1JTFk6IEd1bGltLEFwcGxlR290aGljLHNhbnMtc2VyaWYiPlRoZSB2ZXJzaW9uIGlzIGxhdGVz
-dCBibHVlei11dGlscy0zLjI4LjwvUD4NCjxQIHN0eWxlPSJGT05ULVNJWkU6IDEwcHQ7IEZPTlQt
-RkFNSUxZOiBHdWxpbSxBcHBsZUdvdGhpYyxzYW5zLXNlcmlmIj4mbmJzcDs8L1A+DQo8UCBzdHls
-ZT0iRk9OVC1TSVpFOiAxMHB0OyBGT05ULUZBTUlMWTogR3VsaW0sQXBwbGVHb3RoaWMsc2Fucy1z
-ZXJpZiI+VGhhbmtzLjwvUD4NCjxQIHN0eWxlPSJGT05ULVNJWkU6IDEwcHQ7IEZPTlQtRkFNSUxZ
-OiBHdWxpbSxBcHBsZUdvdGhpYyxzYW5zLXNlcmlmIj4mbmJzcDs8L1A+DQo8UCBzdHlsZT0iRk9O
-VC1TSVpFOiAxMHB0OyBGT05ULUZBTUlMWTogR3VsaW0sQXBwbGVHb3RoaWMsc2Fucy1zZXJpZiI+
-UmVnYXJkczxCUj5qb295b3VuZy48L1A+DQo8UCBzdHlsZT0iRk9OVC1TSVpFOiAxMHB0OyBGT05U
-LUZBTUlMWTogR3VsaW0sQXBwbGVHb3RoaWMsc2Fucy1zZXJpZiI+Jm5ic3A7PC9QPg0KPFAgc3R5
-bGU9IlBBRERJTkctUklHSFQ6IDBweDsgUEFERElORy1MRUZUOiAxMHB0OyBGT05ULVNJWkU6IDEw
-cHQ7IFBBRERJTkctQk9UVE9NOiAwcHg7IFBBRERJTkctVE9QOiAwcHg7IEZPTlQtRkFNSUxZOiBH
-dWxpbSxBcHBsZUdvdGhpYyxzYW5zLXNlcmlmIj4tLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLTxC
-Uj48Qj5Gcm9tOjwvQj4gIk1hcmNlbCBIb2x0bWFubiImbHQ7bWFyY2VsQGhvbHRtYW5uLm9yZyZn
-dDsgPEJSPjxCPlRvOjwvQj4gIsDMwda/tSImbHQ7dGtha2VsQG5hdmVyLmNvbSZndDs7ICJCbHVl
-WiBkZXZlbG9wbWVudCImbHQ7Ymx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Jmd0OzxC
-Uj48Qj5DYzo8L0I+IDxCUj48Qj5TZW50OjwvQj4gMDgtMDMtMjAouPEpIDAxOjQ3OjExPEJSPjxC
-PlN1YmplY3Q6PC9CPiBSZTogW0JsdWV6LWRldmVsXSBJJ3ZlIGZvdW5kIGEgYnVnIGluIHNkcF9j
-c3RhdGVfZ2V0KCkgZnVuY3Rpb24uPEJSPjxCUj5IaSw8QlI+PEJSPiZndDsgSSd2ZSBmb3VuZCBh
-IGJ1ZyBpbiBzZHBfY3N0YXRlX2dldCgpIGZ1bmN0aW9uLjxCUj4mZ3Q7IChibHVlei11dGlscy9k
-aXN0L3NkcGQvcmVxdWVzdC5jKTxCUj4mZ3Q7IC0mZ3Q7IG1lbWNweShjc3RhdGUsIChzZHBfY29u
-dF9zdGF0ZV90ICopcGRhdGEsIDxCUj4mZ3Q7IHNpemVvZihzZHBfY29udF9zdGF0ZV90KSk7PEJS
-PiZndDsgV2hlbiBydW5uaW5nIHRoaXMgY29kZSwgImhjaWQgZGFlbW9uIGNyYXNoIiBvY2N1cnJl
-ZC4obWVtb3J5IDxCUj4mZ3Q7IGFsaWdubWVudCBlcnJvcik8QlI+Jmd0OzxCUj4mZ3Q7IEkgdGhp
-bmsgdGhlcmUncyBhIGJ1ZyB3aXRoIChzZHBfY29udF9zdGF0ZV90ICopcGRhdGEgaW4gPEJSPiZn
-dDsgc2RwX2NzdGF0ZV9nZXQoKSBmdW5jdGlvbi48QlI+Jmd0OyBJIGZpeGVkIHRoaXMgY29kZS48
-QlI+Jmd0OyAtJmd0OyBtZW1jcHkoY3N0YXRlLCBwZGF0YSwgc2l6ZW9mKHNkcF9jb250X3N0YXRl
-X3QpKTs8QlI+Jmd0OyBOb3csIGhjaWQgZGFlbW9uIGRvZXNuJ3QgZGllLjxCUj4mZ3Q7PEJSPjxC
-Uj53aGljaCB2ZXJzaW9uPyBUaGlzIHNob3VsZCBoYXZlIGJlZW4gZml4ZWQgYnkgbm93LiBFaXRo
-ZXIgaW4gdGhlIDxCUj5sYXRlc3QgYmx1ZXotdXRpbHMtMy4yOCBvciB0aGUgQ1ZTLjxCUj48QlI+
-UmVnYXJkczxCUj48QlI+TWFyY2VsPEJSPjxCUj48QlI+PEJSPjwvUD48L2Rpdj48L2JvZHk+PC9o
-dG1sPgo8IS0tc3RhcnRfc2lnbmF0dXJlLS0+PFA+Jm5ic3A7PEJSPjwvUD48dGFibGUgY2VsbHNw
-YWNpbmc9MCBjZWxscGFkZGluZz0wIGJvcmRlcj0wIHdpZHRoPTEwMCU+Cjx0cj48dGQ+Cjx0YWJs
-ZSBjZWxsc3BhY2luZz0wIGNlbGxwYWRkaW5nPTAgd2lkdGg9MTAwJSBhbGlnbj1sZWZ0IGJvcmRl
-cj0wPgo8dGJvZHk+Cjx0cj48dGQgYmFja2dyb3VuZD0iaHR0cDovL2NhZmVpbWdzLm5hdmVyLmNv
-bS9pbWcvY29sb3JzZXQvd2hpdGUvYmdfZG90MDEuZ2lmIiBjb2xzcGFuPTIgaGVpZ2h0PTE+PC90
-ZD48L3RyPgo8dHI+PHRkIGNvbHNwYW49MiBoZWlnaHQ9OD48L3RkPjwvdHI+Cjx0cj4KPHRkIHZh
-bGlnbj10b3AgYWxpZ249bGVmdCB3aWR0aD03MD48YSBocmVmPSJodHRwOi8vYmxvZy5uYXZlci5j
-b20vdGtha2VsLmRvIiB0YXJnZXQ9X2JsYW5rPjxpbWcgaGVpZ2h0PTcwIHNyYz0iaHR0cDovL3N0
-YXRpYy5uYXZlci5jb20vbWFpbDQvaW1nX25vaW1hZ2UuZ2lmIiB3aWR0aD01NSBib3JkZXI9MD48
-L2E+PC90ZD4JCjx0ZCB2YWxpZ249dG9wIGFsaWduPWxlZnQ+PGEgaHJlZj0iaHR0cDovL2Jsb2cu
-bmF2ZXIuY29tL3RrYWtlbC5kbyIgdGFyZ2V0PV9ibGFuaz48Zm9udCBzdHlsZT0iZm9udC1mYW1p
-bHk6Z3VsaW07Y29sb3I6YmxhY2s7Zm9udC1zaXplOjlwdDtmb250LXdlaWdodDpib2xkO3RleHQt
-ZGVjb3JhdGlvbjpub25lIj50a2FrZWy01MDHILrtt86x1zwvZm9udD48L2E+Cjxicj48aW1nIGhl
-aWdodD01IHdpZHRoPTA+PGJyPjxhIGhyZWY9Imh0dHA6Ly9ibG9nLm5hdmVyLmNvbS90a2FrZWwu
-ZG8iIGNsYXNzPWMgdGFyZ2V0PV9ibGFuaz48Zm9udCBzdHlsZT0iZm9udC1mYW1pbHk6Z3VsaW07
-Y29sb3I6YmxhY2s7Zm9udC1zaXplOjlwdDtmb250LXdlaWdodDpub3JtYWw7dGV4dC1kZWNvcmF0
-aW9uOm5vbmUiPr7Is+fHz7y8v+QuPC9hPjwvdGQ+CjwvdHI+CjwvdGJvZHk+CjwvdGFibGU+Cjwv
-dGQ+PC90cj4KPC90YWJsZT48IS0tbmF2ZXJtYWlsLmZvb3Rlci5zdGFydC0tPg0KDQo8dGFibGUg
-d2lkdGg9IjEwMCUiIGJvcmRlcj0iMCIgY2VsbHBhZGRpbmc9IjAiIGNlbGxzcGFjaW5nPSIwIj4N
-Cjx0cj48dGQgY29sc3Bhbj0iMyIgaGVpZ2h0PSIyNSI+PC90ZD48L3RyPg0KPHRyPjx0ZCBjb2xz
-cGFuPSIzIiBoZWlnaHQ9IjEiIGJnY29sb3I9IiNFQ0VDRUMiPjwvdGQ+PC90cj4NCjx0cj48dGQg
-Y29sc3Bhbj0iMyIgaGVpZ2h0PSIxMiI+PC90ZD48L3RyPg0KPHRyPjx0ZCBhbGlnbj0icmlnaHQi
-IHN0eWxlPSJwYWRkaW5nLXJpZ2h0OjVweDsiPjxhIGhyZWY9Imh0dHA6Ly93d3cubmF2ZXIuY29t
-LyIgdGFyZ2V0PSJfYmxhbmsiIHN0eWxlPSJjb2xvcjojNEY0RjMwIj48aW1nIHNyYz0iaHR0cDov
-L3N0YXRpYy5uYXZlci5jb20vbWFpbDQvbGdfaGFwcHliZWVuXzAxLmdpZiIgd2lkdGg9IjUzIiBo
-ZWlnaHQ9IjI0IiBhbHQ9IiIgc3R5bGU9ImJvcmRlcjogbm9uZTsiPjwvYT48YSBocmVmPSJodHRw
-Oi8vaGFwcHliZWFuLm5hdmVyLmNvbS9tYWluL1NlY3Rpb25NYWluLm5obiIgdGFyZ2V0PSJfYmxh
-bmsiIHN0eWxlPSJjb2xvcjojNEY0RjMwIj48aW1nIHNyYz0iaHR0cDovL3N0YXRpYy5uYXZlci5j
-b20vbWFpbDQvbGdfaGFwcHliZWVuXzAyLmdpZiIgd2lkdGg9IjQ1IiBoZWlnaHQ9IjI0IiBhbHQ9
-IiIgc3R5bGU9ImJvcmRlcjogbm9uZTsiPjwvYT48L3RkPjwvdHI+DQo8dHI+PHRkIGNvbHNwYW49
-IjMiIGhlaWdodD0iMTQiPjwvdGQ+PC90cj4NCjwvdGFibGU+DQoNCjwhLS1uYXZlcm1haWwuZm9v
-dGVyLmVuZC0tPg0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KPHRhYmxlIHN0eWxl
-PSdkaXNwbGF5Om5vbmUnPjx0cj48dGQ+PElNRyBTUkM9Imh0dHA6Ly9tYWlsLm5hdmVyLmNvbS9u
-ZXdtYWlsY2hlY2svWWVSbnA2UkMxWHRacHhKNEt4bXNGemtDS3FKb0ZBdnJwNnB2Rm9pdk1vRS9G
-NjMwRnJVbUs2RjR0enZyS3gyWktxL3NXNkpaTXJrbnR6Q1RXSDNSTTZsNTc0ZVpwbT09LmdpZiIg
-Ym9yZGVyPTA+PC90ZD48L3RyPjwvdGFibGU+
+As things stand, it appears we could use more functions and callbacks to support UnitInfo, SubUnitInfo, Passthrough, and 
+VendorDependent (wherein Metadata resides), etc., and at the same time, I think we should not constrain the use cases to the simple 
+10-button remote that has been implemented to date.
 
----------Boundary-Naver=_4e757aee39cce5164f689145c88a24ff--
+At any rate, I would like to get involved, as I have immediate interest in moving this forward.  I do have the official Bluetooth 
+specs and the CSR IDE, so I think I could contribute from that front.
+
+Any interest?  Who should I communicate with?
+
+David Stockwell
+
+
+----- Original Message ----- 
+From: "Marcel Holtmann" <marcel@holtmann.org>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Sent: Thursday, March 13, 2008 3:32 PM
+Subject: [Bluez-devel] Moving towards a new API for BlueZ 4.0
+
+
+Hi Folks,
+
+so we are near to the end-of-lifetime for the BlueZ 3.x series. We will
+have only a few release left and the plan is to end it with the magic
+number 3.33 in a few weeks.
+
+Everybody is currently working hard at implemented the new features and
+API changes for the 4.x series. We will deprecated a big chunk of the
+D-Bus API and basically do major simplifications. For a preview you can
+check the new doc/ directory in the bluez-utils CVS repository. It
+contains documentation for the new manager, adapter, device and agent
+interfaces. The real new stuff is the device interface which will
+represent paired and known remote device. Also the agent interface
+changes a lot to implement what we have learned during the last two
+years of D-Bus usage within BlueZ.
+
+Most of the new API is already implemented and will be part of the 3.29
+release within the next few days. All new features are marked as
+experimental until we reach 4.0 and you have to start hcid with the -x
+option to enable them.
+
+Please review the interface APIs and do some early testing.
+
+More to come soon :)
+
+Regards
+
+Marcel
