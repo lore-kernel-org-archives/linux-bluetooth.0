@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Mar 2008 05:06:49 -0700 (PDT)
-From: panca sorin <psihozefir@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <BAY118-DAV2A9E7DD11DA546948B295C7070@phx.gbl>
+From: <ichane@hotmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+References: <BAY118-DAV93F8B33BE33C1D9FAEC00C7070@phx.gbl>
+	<47E12208.1050803@aircable.net>
+Date: Wed, 19 Mar 2008 23:42:38 +0800
 MIME-Version: 1.0
-Message-ID: <785953.33651.qm@web32608.mail.mud.yahoo.com>
-Subject: [Bluez-users] HowTo configure bnep and PANU
+Subject: Re: [Bluez-users] multiple rfcomm listen
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,51 +16,80 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1449482357=="
+Content-Type: multipart/mixed; boundary="===============1549962034=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1449482357==
-Content-Type: multipart/alternative; boundary="0-222900005-1206014809=:33651"
+--===============1549962034==
+Content-Type: text/plain; format=flowed; charset="big5"; reply-type=original
+Content-Transfer-Encoding: 7bit
 
---0-222900005-1206014809=:33651
-Content-Type: text/plain; charset=us-ascii
+Hi there:
 
-Hello!
-I just installed the 3.28 version of bluez-utils and co. I have a Sony Ericsson K800i 3G cell phone and I'm using it to connect to the Intenet over a USB cable. I want to use Bluetooth instead of that cable. I successfully managed to access phone's memory over Bluetooth and to transfer files. I'm running a vanilla kernel 2.6.23.16 and Gentoo on my amd64 laptop. I have a Bluetooth USB dongle.
+Sorry for the typo. I did use different rfcomm# to listen:
 
-The phone is configured to act as a router (i.e has two network interfaces, one connected to the Internet and one connected to my laptop using USB transport). Also, this phone is acting as a NAP while it is providing an Internet connection over Bluetooth. This role is not changable.
+>rfcomm listen 0 1 &
+>rfcomm listen 1 2 &
 
-Issue #1
-I reconfigured the kernel to have support for my dongle and for Bluetooth stack, including BNEP support compiled as module. The module is loaded but the /dev/bnep0 device doesn't exist. AFAIK, udev is supposed to create the device file once the module is loaded, or should I do that?
+But 2nd rfcomm client failed to connect as I mentioned earlier.
 
-Issue #2
-There is a HOWTO Network on your site that states that "PANU support isn't implemented yet".
-I configured the network.service to be autostart.enable=true and configured it to act as PANU. Is the HowTo outdated or not? Let's say I can manage to pass over issue #1. Will I be able to configure the Bluetooth network to act as PANU (I'm not a programmer so I won't be able to write code)?
+I wonder if it's USB dongle's problem which is the slave to two masters.
+If there is no "role switch",  rfcomm listen should be the slave of 
+connecting
+rfcomm clients (master).  Can it  be the potential problem (sync) for a 
+slave to the
+ multiple masters ?
 
-Thank you in advance for your help!
+Thanks a lot,
 
-Sorin.
- 
-
-
-
-      ____________________________________________________________________________________
-Looking for last minute shopping deals?  
-Find them fast with Yahoo! Search.  http://tools.search.yahoo.com/newsearch/category.php?category=shopping
---0-222900005-1206014809=:33651
-Content-Type: text/html; charset=us-ascii
-
-<html><head><style type="text/css"><!-- DIV {margin:0px;} --></style></head><body><div style="font-family:times new roman, new york, times, serif;font-size:12pt"><div>Hello!<br>I just installed the 3.28 version of bluez-utils and co. I have a Sony Ericsson K800i 3G cell phone and I'm using it to connect to the Intenet over a USB cable. I want to use Bluetooth instead of that cable. I successfully managed to access phone's memory over Bluetooth and to transfer files. I'm running a vanilla kernel 2.6.23.16 and Gentoo on my amd64 laptop. I have a Bluetooth USB dongle.<br><br>The phone is configured to act as a router (i.e has two network interfaces, one connected to the Internet and one connected to my laptop using USB transport). Also, this phone is acting as a NAP while it is providing an Internet connection over Bluetooth. This role is not changable.<br><br>Issue #1<br>I reconfigured the kernel to have support for my dongle and for Bluetooth stack,
- including BNEP support compiled as module. The module is loaded but the /dev/bnep0 device doesn't exist. AFAIK, udev is supposed to create the device file once the module is loaded, or should I do that?<br><br>Issue #2<br>There is a HOWTO Network on your site that states that "PANU support isn't implemented yet".<br>I configured the network.service to be autostart.enable=true and configured it to act as PANU. Is the HowTo outdated or not? Let's say I can manage to pass over issue #1. Will I be able to configure the Bluetooth network to act as PANU (I'm not a programmer so I won't be able to write code)?<br><br>Thank you in advance for your help!<br><br>Sorin.<br> </div></div><br>
+Chane
+----- Original Message ----- 
+From: "Manuel Naranjo" <manuel@aircable.net>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Sent: Wednesday, March 19, 2008 10:24 PM
+Subject: Re: [Bluez-users] multiple rfcomm listen
 
 
+> Chane,
+>> Can "rfcomm listen" accept multiple connections from rfcomm clients? I
+>> have tried two rfcomm listen as following:
+>> >rfcomm listen 0 1 &
+>> >rfcomm listen 0 2 &
+> rfcomm listen can listen to up to 7 concurrent connections, but not all
+> the connections to the same port (rfcomm# node). You should do:
+> rfcomm listen 0 1 &
+> rfcomm listen 1 2 &
+>
+> And when the connection is established you will get:
+> /dev/rfcomm0
+> /dev/rfcomm1
+>
+>
+>
+>
 
-      <hr size=1>Never miss a thing.  <a href="http://us.rd.yahoo.com/evt=51438/*http://www.yahoo.com/r/hs"> Make Yahoo your homepage.</a></body></html>
---0-222900005-1206014809=:33651--
+
+--------------------------------------------------------------------------------
 
 
---===============1449482357==
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2008.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+
+
+--------------------------------------------------------------------------------
+
+
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+
+
+
+--===============1549962034==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -68,7 +99,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1449482357==
+--===============1549962034==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -79,4 +110,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1449482357==--
+--===============1549962034==--
