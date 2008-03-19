@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BAY118-DAV93F8B33BE33C1D9FAEC00C7070@phx.gbl>
-From: <ichane@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Wed, 19 Mar 2008 14:50:57 +0800
+Message-ID: <8f5c4ad0803182345r5ff7fbc3v951ce38596436e3d@mail.gmail.com>
+Date: Wed, 19 Mar 2008 12:15:17 +0530
+From: Matt <chemvell@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] multiple rfcomm listen
+Subject: [Bluez-users] Can't connect RFCOMM socket
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,81 +14,91 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1067956012=="
+Content-Type: multipart/mixed; boundary="===============1676357937=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
-
---===============1067956012==
+--===============1676357937==
 Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0108_01C889D0.A3F5FFB0"
+	boundary="----=_Part_14148_11910076.1205909117729"
 
-This is a multi-part message in MIME format.
+------=_Part_14148_11910076.1205909117729
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-------=_NextPart_000_0108_01C889D0.A3F5FFB0
-Content-Type: text/plain;
-	charset="big5"
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-Hi, there:
+                    I am using bluez-utils-3.28 and am trying to connect to
+a Nokia phone from my PC which has a BT dongle.I run hcid .I scan for other
+devies using hcitool scan..and connect to my Phone using....
 
-Can "rfcomm listen" accept multiple connections from rfcomm clients? I =
-have tried two rfcomm listen as following:
+$hcid &
+$passkey-agent --default 0000 &
+$ hcitool scan
+$ rfcomm connect 0 00:0E:6D:E0:E5:13 1
 
->rfcomm listen 0 1 &
->rfcomm listen 0 2 &
+The Phone asks for the pin . I enter "0000" as the PIN .After sometime I get
+the error message
+Can't connect RFCOMM socket: Resource temporarily unavailable.
 
-Use another two PCs as rfcomm clients to connect. 1st rfcomm client can =
-connect to rfcomm server but
-2nd rfcomm client can not connect to rfcomm server.
+hcidump shows that (After I enter the PIN on the phone )
 
-Thanks for helps,
+> HCI Event: PIN Code Request (0x16) plen 6
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0064 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 2 pf 1 ilen 0 fcs 0xb8
+< ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0064 len 4 [psm 3]
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd
+< ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0064 scid 0x0040
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> HCI Event: Number of Completed Packets (0x13) plen 5
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92
+> ACL data: handle 1 flags 0x02 dlen 8
+    L2CAP(d): cid 0x0040 len 4 [psm 3]
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0064 scid 0x0040
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+> HCI Event: Command Status (0x0f) plen 4
+> HCI Event: Disconn Complete (0x05) plen 4
 
-chane
-------=_NextPart_000_0108_01C889D0.A3F5FFB0
-Content-Type: text/html;
-	charset="big5"
-Content-Transfer-Encoding: quoted-printable
+        I tried after removing the link keys
+(/var/lib/bluetooth/XX:XX:XX:XX:XX:XX/) .Still I get the same error..What
+could be the problem here..?
+       When I try the same thing with a PC with Fedora Core5 (without the
+latest bluez and passkey-agent), I am asked to enter the PIN when I enter it
+on the phone and the connection is successful..
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; charset=3Dbig5">
-<META content=3D"MSHTML 6.00.6000.16608" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT size=3D2>
-<DIV><FONT size=3D2>
-<DIV><FONT face=3DArial size=3D2>Hi, there:</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Can "rfcomm listen"&nbsp;accept =
-multiple=20
-connections from rfcomm clients? I have tried two rfcomm listen as=20
-following:</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>&gt;rfcomm listen 0 1 =
-&amp;</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>&gt;rfcomm listen 0 2 =
-&amp;</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Use another two PCs as rfcomm clients =
-to connect.=20
-1st rfcomm client can connect to rfcomm server but</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>2nd rfcomm client can not connect to =
-rfcomm=20
-server.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Thanks for helps,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial=20
-size=3D2>chane</FONT></DIV></FONT></DIV></FONT></DIV></BODY></HTML>
+Thank you for your time and consideration,
+regards,
+Matt.
 
-------=_NextPart_000_0108_01C889D0.A3F5FFB0--
+------=_Part_14148_11910076.1205909117729
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi,<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I am using bluez-utils-3.28 and am trying to connect to a Nokia phone from my PC which has a BT dongle.I run hcid .I scan for other devies using hcitool scan..and connect to my Phone using....<br>
+<br>$hcid &amp;<br>$passkey-agent --default 0000 &amp;<br>$ hcitool scan<br>$ rfcomm connect 0 00:0E:6D:E0:E5:13 1<br><br>The Phone asks for the pin . I enter &quot;0000&quot; as the PIN .After sometime I get the error message <br>
+Can&#39;t connect RFCOMM socket: Resource temporarily unavailable.<br><br>hcidump shows that (After I enter the PIN on the phone )<br><br>&gt; HCI Event: PIN Code Request (0x16) plen 6<br>&lt; ACL data: handle 1 flags 0x02 dlen 8<br>
+&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0064 len 4 [psm 3]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RFCOMM(s): DISC: cr 1 dlci 2 pf 1 ilen 0 fcs 0xb8<br>&lt; ACL data: handle 1 flags 0x02 dlen 8<br>&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0064 len 4 [psm 3]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd<br>
+&lt; ACL data: handle 1 flags 0x02 dlen 12<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Disconn req: dcid 0x0064 scid 0x0040<br>&gt; HCI Event: Number of Completed Packets (0x13) plen 5<br>&gt; HCI Event: Number of Completed Packets (0x13) plen 5<br>
+&gt; HCI Event: Number of Completed Packets (0x13) plen 5<br>&gt; ACL data: handle 1 flags 0x02 dlen 8<br>&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0040 len 4 [psm 3]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RFCOMM(s): UA: cr 1 dlci 2 pf 1 ilen 0 fcs 0x92<br>&gt; ACL data: handle 1 flags 0x02 dlen 8<br>
+&nbsp;&nbsp;&nbsp; L2CAP(d): cid 0x0040 len 4 [psm 3]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7<br>&gt; ACL data: handle 1 flags 0x02 dlen 12<br>&nbsp;&nbsp;&nbsp; L2CAP(s): Disconn rsp: dcid 0x0064 scid 0x0040<br>&lt; HCI Command: Disconnect (0x01|0x0006) plen 3<br>
+&gt; HCI Event: Command Status (0x0f) plen 4<br>&gt; HCI Event: Disconn Complete (0x05) plen 4<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I tried after removing the link keys (/var/lib/bluetooth/XX:XX:XX:XX:XX:XX/) .Still I get the same error..What could be the problem here..?<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; When I try the same thing with a PC with Fedora Core5 (without the latest bluez and passkey-agent), I am asked to enter the PIN when I enter it on the phone and the connection is successful..<br><br>Thank you for your time and consideration,<br>
+regards,<br>Matt. <br><br><br>
+
+------=_Part_14148_11910076.1205909117729--
 
 
-
---===============1067956012==
+--===============1676357937==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -98,7 +108,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1067956012==
+--===============1676357937==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -109,4 +119,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1067956012==--
+--===============1676357937==--
