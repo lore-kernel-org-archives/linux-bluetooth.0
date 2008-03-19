@@ -1,69 +1,171 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <039f01c88a15$a848aaa0$6701a8c0@freqonedev>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: <marcel@holtmann.org>
-Cc: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-References: <1205440348.12951.9.camel@californication>
-Subject: Re: [Bluez-devel] Moving towards a new API for BlueZ 4.0
-Date: Wed, 19 Mar 2008 18:04:56 -0500
+From: Reinout van Schouwen <reinouts@gnome.org>
+To: bluez-devel@lists.sourceforge.net
+Content-Type: multipart/mixed; boundary="=-VV+AiHRAcshrmZm1uaBI"
+Date: Wed, 19 Mar 2008 18:27:27 +0100
+Message-Id: <1205947647.10553.10.camel@reinout.rotterdam-cs.com>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Dutch translation
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
+
+
+--=-VV+AiHRAcshrmZm1uaBI
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+Hello all,
+
+Here's a 100% complete Dutch translation of bluetooth-manager. I hope
+you can include it in the next release.
+
+Note that I tried to upload it to Rosetta/Launchpad, but even though I
+am a registered translator there, it wouldn't allow me to. I don't know
+why but I have better things to do with my time than figuring that out.
+As far as I'm concerned, Rosetta is more of an extra hurdle than a
+convience. Please consider joining the GNOME translation project
+instead, or if you must use some web-based translation management,
+consider Transifex. Thanks.
+
+regards,
+
+-- 
+Reinout van Schouwen
+http://vanschouwen.info/
+
+--=-VV+AiHRAcshrmZm1uaBI
+Content-Disposition: attachment; filename=bluetooth-manager-nl.po.bz2
+Content-Type: application/x-bzip; name=bluetooth-manager-nl.po.bz2
+Content-Transfer-Encoding: base64
+
+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
+XckU4UJCDejscA==
+
+
+--=-VV+AiHRAcshrmZm1uaBI
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-List-ID: <bluez-devel.lists.sourceforge.net>
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Marcel,
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--=-VV+AiHRAcshrmZm1uaBI
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Thanks for all of the great effort, especially in moving toward the DBus model.
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-I am currently going through the work done to date in audio/control.c (the implementation of AVRCP), and am trying to apply that to 
-an application connecting with an AVRCP on CSR's BlueLab 4.0 framework (implements BT2.1+).  I have some ideas, although I am still 
-making sure I understand what has been done to this point, and would like to participate in further development (although I am not 
-the best C developer).
-
-As things stand, it appears we could use more functions and callbacks to support UnitInfo, SubUnitInfo, Passthrough, and 
-VendorDependent (wherein Metadata resides), etc., and at the same time, I think we should not constrain the use cases to the simple 
-10-button remote that has been implemented to date.
-
-At any rate, I would like to get involved, as I have immediate interest in moving this forward.  I do have the official Bluetooth 
-specs and the CSR IDE, so I think I could contribute from that front.
-
-Any interest?  Who should I communicate with?
-
-David Stockwell
-
-
------ Original Message ----- 
-From: "Marcel Holtmann" <marcel@holtmann.org>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Sent: Thursday, March 13, 2008 3:32 PM
-Subject: [Bluez-devel] Moving towards a new API for BlueZ 4.0
-
-
-Hi Folks,
-
-so we are near to the end-of-lifetime for the BlueZ 3.x series. We will
-have only a few release left and the plan is to end it with the magic
-number 3.33 in a few weeks.
-
-Everybody is currently working hard at implemented the new features and
-API changes for the 4.x series. We will deprecated a big chunk of the
-D-Bus API and basically do major simplifications. For a preview you can
-check the new doc/ directory in the bluez-utils CVS repository. It
-contains documentation for the new manager, adapter, device and agent
-interfaces. The real new stuff is the device interface which will
-represent paired and known remote device. Also the agent interface
-changes a lot to implement what we have learned during the last two
-years of D-Bus usage within BlueZ.
-
-Most of the new API is already implemented and will be part of the 3.29
-release within the next few days. All new features are marked as
-experimental until we reach 4.0 and you have to start hcid with the -x
-option to enable them.
-
-Please review the interface APIs and do some early testing.
-
-More to come soon :)
-
-Regards
-
-Marcel
+--=-VV+AiHRAcshrmZm1uaBI--
