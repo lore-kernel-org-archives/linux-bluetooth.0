@@ -1,16 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Robert P. J. Day" <rpjday@crashcourse.ca>
-In-Reply-To: <alpine.LFD.1.00.0803201043240.3714@localhost.localdomain>
-References: <alpine.LFD.1.00.0803151348180.24734@localhost.localdomain>
-	<1206021236.7678.12.camel@californication>
-	<alpine.LFD.1.00.0803201043240.3714@localhost.localdomain>
-Date: Thu, 20 Mar 2008 15:50:11 +0100
-Message-Id: <1206024611.7678.25.camel@californication>
-Mime-Version: 1.0
-Cc: bluez-devel@lists.sourceforge.net, maxk@qualcomm.com
-Subject: Re: [Bluez-devel] [PATCH] BLUETOOTH:  Use newer,
-	non-deprecated	__RW_LOCK_UNLOCKED macro.
+Message-Id: <20FBD040-B040-43F0-9A1F-E5EF97DA9B85@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <039f01c88a15$a848aaa0$6701a8c0@freqonedev>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Thu, 20 Mar 2008 11:49:47 -0300
+References: <1205440348.12951.9.camel@californication>
+	<039f01c88a15$a848aaa0$6701a8c0@freqonedev>
+Subject: Re: [Bluez-devel] Moving towards a new API for BlueZ 4.0
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,55 +21,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Robert,
+Hi David,
 
-> > > Signed-off-by: Robert P. J. Day <rpjday@crashcourse.ca>
-> > >
-> > > ---
-> > >
-> > >   not compile tested, but a fairly trivial transformation.
-> > >
-> > >
-> > >  net/bluetooth/hci_sock.c    |    2 +-
-> > >  net/bluetooth/l2cap.c       |    2 +-
-> > >  net/bluetooth/rfcomm/sock.c |    2 +-
-> > >  net/bluetooth/sco.c         |    2 +-
-> > >  4 files changed, 4 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> > > index b5d4019..1d36c09 100644
-> > > --- a/net/bluetooth/hci_sock.c
-> > > +++ b/net/bluetooth/hci_sock.c
-> > > @@ -84,7 +84,7 @@ static struct hci_sec_filter hci_sec_filter = {
-> > >  };
-> > >
-> > >  static struct bt_sock_list hci_sk_list = {
-> > > -	.lock = RW_LOCK_UNLOCKED
-> > > +	.lock = __RW_LOCK_UNLOCKED(hci_sk_list.lock)
-> > >  };
-> >
-> > is that the way we do init of locks now? I haven't realized that
-> > RW_LOCK_UNLOCKED is deprecated.
-> 
-> yup, see Documentation/spinlocks.txt:
-> 
-> "SPIN_LOCK_UNLOCKED and RW_LOCK_UNLOCKED defeat lockdep state tracking
-> and are hence deprecated.
-> 
-> "Please use DEFINE_SPINLOCK()/DEFINE_RWLOCK() or
-> __SPIN_LOCK_UNLOCKED()/__RW_LOCK_UNLOCKED() as appropriate for static
-> initialization."
+On Mar 19, 2008, at 20:04, David Stockwell wrote:
+>
+> Any interest?
 
-then add an Acked-by: Marcel Holtmann <marcel@holtmann.org> into your
-commit message and post it to the netdev mailing list (me on CC). This
-way it is faster since I am stuck with a heavy workload for the next
-BlueZ release.
+Sure. The current code (mostly written by me) is something rather  
+quickly put together to get the basic functionality in place.  
+Especially the metadata transfer would be nice to get implemented  
+since it's a mandatory feature for category 1 (player/recorder)  
+devices in version 1.3 of the specification.
 
-Regards
+> Who should I communicate with?
 
-Marcel
+In addition this list (as Marcel already mentioned) a good place to be  
+in contact with the developers is the #bluez channel on  
+irc.freenode.net.
 
-
+Johan
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
