@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1ffb4b070803202045w31d2ca9lcc66d0a51aef8c@mail.gmail.com>
-Date: Thu, 20 Mar 2008 23:45:54 -0400
-From: "Mike Lee" <eemike@gmail.com>
-To: bluez-devel <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Subject: [Bluez-devel] Is there any bluez audio source(a2src) implementation
+From: Guillaume Bedot <littletux@zarb.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1206021127.7678.10.camel@californication>
+References: <987924.86360.qm@web8403.mail.in.yahoo.com>
+	<1206021127.7678.10.camel@californication>
+Date: Thu, 20 Mar 2008 19:00:14 +0100
+Message-Id: <1206036014.16320.33.camel@littletux>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] assertion failed for passkey-agent
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,60 +17,35 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2081465618=="
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============2081465618==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_5974_24227889.1206071154897"
-
-------=_Part_5974_24227889.1206071154897
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi all
-
-I am hacking the bluez audio coding.
-I saw that bluez implement audio sink profile in remote device.
-Is there any ppl working on audio source profile?
-
-And there is a gstreamer sbc decoder, but how can i create the audio stream
-from remote side?
-
-Mike Lee
-
-------=_Part_5974_24227889.1206071154897
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi all<br><br>I am hacking the bluez audio coding. <br>I saw that bluez implement audio sink profile in remote device.<br>Is there any ppl working on audio source profile?<br><br>And there is a gstreamer sbc decoder, but how can i create the audio stream <br>
-from remote side?<br><br>Mike Lee<br>
-
-------=_Part_5974_24227889.1206071154897--
-
-
---===============2081465618==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============2081465618==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============2081465618==--
+TGUgamV1ZGkgMjAgbWFycyAyMDA4IMOgIDE0OjUyICswMTAwLCBNYXJjZWwgSG9sdG1hbm4gYSDD
+qWNyaXQgOgo+IEhpIFBhcm1vZCwKPiAKPiA+IFdoZW4gSSBydW4gCj4gPiAjIHBhc3NrZXktYWdl
+bnQgLS1kZWZhdWx0IDAwMDAgJgo+ID4gWzFdIDQwMTYKPiA+IDQwMTY6IGFzc2VydGlvbiBmYWls
+ZWQgIigqKGNvbnN0IGNoYXIqKV9EQlVTX0ZVTkNUSU9OX05BTUUpICE9ICdfJyIKPiA+IGZpbGUg
+ImRidXMtY29ubmVjdGlvbi5jIiBsaW5lIDI4NzcgZnVuY3Rpb24KPiA+IF9kYnVzX2Nvbm5lY3Rp
+b25fcmVhZF93cml0ZV9kaXNwYXRjaAo+ID4gCj4gPiBbMV0rICBBYm9ydGVkICAgICAgICAgICAg
+ICAgICBwYXNza2V5LWFnZW50IC0tZGVmYXVsdCAwMDAwCj4gPiAKPiA+IEkgdHJpZWQgZ29pbmcg
+aW50byBwYXNza2V5IHNvdXJjZSBjb2RlIGJ1dC4uLi5jb3VsZCBnZXQgbm90aGluZy4uLgoKTm90
+IHN1cmUsIGkgZ2V0IDoKJCBwYXNza2V5LWFnZW50IC0tZGVmYXVsdCAwMDAwCkNhbid0IHJlZ2lz
+dGVyIHBhc3NrZXkgYWdlbnQKVGhlIG5hbWUgb3JnLmJsdWV6IHdhcyBub3QgcHJvdmlkZWQgYnkg
+YW55IC5zZXJ2aWNlIGZpbGVzCgo+IEkgcmVhbGx5IGRvbid0IGtub3cuIFRoZSBsYXN0IHRpbWUg
+SSB0ZXN0ZWQgaXQsIGl0IHdvcmtzIGZpbmUuIEhvd2V2ZXIKPiBwYXNza2V5LWFnZW50LmMgaXMg
+cmVhbGx5IG9ubHkgYW4gZXhhbXBsZS4KCkkgY291bGQgZ2V0IHRoZSBoZWFkc2V0IHRvIHBhaXIg
+d2l0aCB0aGUgYmx1ZXRvb3RoLXdpemFyZCBmcm9tCmJsdWV6LXV0aWxzLCBidXQgeW91J2xsIG5l
+ZWQgdG8gbW9kaWZ5IHRoZSBhZGRyZXNzIGFuZCBQSU4gY29kZSBpbiB0aGUKc291cmNlLgoKTWF5
+YmUgaW4gYSBmZXcgcmVsZWFzZSB0aGUgbmV3IGdyYXBoaWNhbCBpbnRlcmZhY2Ugd2lsbCBiZSBj
+b21wbGV0ZS4uLgoKU29tZXRpbWUgYWdvIHlvdSBjb3VsZCBzZXQgYSBkZWZhdWx0IHBpbiBjb2Rl
+CmluIC9ldGMvYmx1ZXRvb3RoL2hjaWQuY29uZiAuCgpPciB1c2UgYSAvYmluL2JsdWVwaW4gc2Ny
+aXB0IHRoYXQgZWNob2VzIHRoZSBwaW4gY29kZSBzdG9yZWQKaW4gL2V0Yy9ibHVldG9vdGgvcGlu
+LCBidXQgaXQgc2VlbXMgaXQgZG9lc24ndCB3b3JrIGFueW1vcmUuCgpJdCBzZWVtcyB0aGVyZSBp
+cyBhIG5ldyB3YXkgdG8gZG8gaXQuCgpSZWdhcmRzLAoKR3VpbGxhdW1lIEIuCgoKLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6IE1pY3Jvc29mdApEZWZ5
+IGFsbCBjaGFsbGVuZ2VzLiBNaWNyb3NvZnQoUikgVmlzdWFsIFN0dWRpbyAyMDA4LgpodHRwOi8v
+Y2xrLmF0ZG10LmNvbS9NUlQvZ28vdnNlMDEyMDAwMDA3MG1ydC9kaXJlY3QvMDEvCl9fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1haWxp
+bmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5z
+b3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
