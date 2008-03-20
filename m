@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20080313141810.GH8969@cathedrallabs.org>
-References: <20080313141810.GH8969@cathedrallabs.org>
-Date: Thu, 20 Mar 2008 15:02:36 +0100
-Message-Id: <1206021756.7678.20.camel@californication>
+To: "Robert P. J. Day" <rpjday@crashcourse.ca>
+In-Reply-To: <alpine.LFD.1.00.0803151348180.24734@localhost.localdomain>
+References: <alpine.LFD.1.00.0803151348180.24734@localhost.localdomain>
+Date: Thu, 20 Mar 2008 14:53:56 +0100
+Message-Id: <1206021236.7678.12.camel@californication>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH 2/2 v010] add support to ps3 blu-ray	remote
+Cc: maxk@qualcomm.com, bluez-devel@lists.sf.net
+Subject: Re: [Bluez-devel] [PATCH] BLUETOOTH:  Use newer,
+	non-deprecated	__RW_LOCK_UNLOCKED macro.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,12 +22,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Aristeu,
+Hi Robert,
 
-> And finally, adding support to PS3 remote controller.
+> Signed-off-by: Robert P. J. Day <rpjday@crashcourse.ca>
+> 
+> ---
+> 
+>   not compile tested, but a fairly trivial transformation.
+> 
+> 
+>  net/bluetooth/hci_sock.c    |    2 +-
+>  net/bluetooth/l2cap.c       |    2 +-
+>  net/bluetooth/rfcomm/sock.c |    2 +-
+>  net/bluetooth/sco.c         |    2 +-
+>  4 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+> index b5d4019..1d36c09 100644
+> --- a/net/bluetooth/hci_sock.c
+> +++ b/net/bluetooth/hci_sock.c
+> @@ -84,7 +84,7 @@ static struct hci_sec_filter hci_sec_filter = {
+>  };
+> 
+>  static struct bt_sock_list hci_sk_list = {
+> -	.lock = RW_LOCK_UNLOCKED
+> +	.lock = __RW_LOCK_UNLOCKED(hci_sk_list.lock)
+>  };
 
-I need one patch that cleanly applies against CVS and I need it now.
-Otherwise this won't make it into the next release.
+is that the way we do init of locks now? I haven't realized that
+RW_LOCK_UNLOCKED is deprecated.
 
 Regards
 
