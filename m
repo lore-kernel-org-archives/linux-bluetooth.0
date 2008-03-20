@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Robert P. J. Day" <rpjday@crashcourse.ca>
-In-Reply-To: <alpine.LFD.1.00.0803151348180.24734@localhost.localdomain>
-References: <alpine.LFD.1.00.0803151348180.24734@localhost.localdomain>
-Date: Thu, 20 Mar 2008 14:53:56 +0100
-Message-Id: <1206021236.7678.12.camel@californication>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <987924.86360.qm@web8403.mail.in.yahoo.com>
+References: <987924.86360.qm@web8403.mail.in.yahoo.com>
+Date: Thu, 20 Mar 2008 14:52:07 +0100
+Message-Id: <1206021127.7678.10.camel@californication>
 Mime-Version: 1.0
-Cc: maxk@qualcomm.com, bluez-devel@lists.sf.net
-Subject: Re: [Bluez-devel] [PATCH] BLUETOOTH:  Use newer,
-	non-deprecated	__RW_LOCK_UNLOCKED macro.
+Cc: bluez-users@brisammon.fastmail.fm
+Subject: Re: [Bluez-devel] assertion failed for passkey-agent
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,35 +21,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Robert,
+Hi Parmod,
 
-> Signed-off-by: Robert P. J. Day <rpjday@crashcourse.ca>
+> When I run 
+> # passkey-agent --default 0000 &
+> [1] 4016
+> 4016: assertion failed "(*(const char*)_DBUS_FUNCTION_NAME) != '_'"
+> file "dbus-connection.c" line 2877 function
+> _dbus_connection_read_write_dispatch
 > 
-> ---
+> [1]+  Aborted                 passkey-agent --default 0000
 > 
->   not compile tested, but a fairly trivial transformation.
-> 
-> 
->  net/bluetooth/hci_sock.c    |    2 +-
->  net/bluetooth/l2cap.c       |    2 +-
->  net/bluetooth/rfcomm/sock.c |    2 +-
->  net/bluetooth/sco.c         |    2 +-
->  4 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index b5d4019..1d36c09 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -84,7 +84,7 @@ static struct hci_sec_filter hci_sec_filter = {
->  };
-> 
->  static struct bt_sock_list hci_sk_list = {
-> -	.lock = RW_LOCK_UNLOCKED
-> +	.lock = __RW_LOCK_UNLOCKED(hci_sk_list.lock)
->  };
+> I tried going into passkey source code but....could get nothing...
 
-is that the way we do init of locks now? I haven't realized that
-RW_LOCK_UNLOCKED is deprecated.
+I really don't know. The last time I tested it, it works fine. However
+passkey-agent.c is really only an example.
 
 Regards
 
