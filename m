@@ -1,13 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <20FBD040-B040-43F0-9A1F-E5EF97DA9B85@gmail.com>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <039f01c88a15$a848aaa0$6701a8c0@freqonedev>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Thu, 20 Mar 2008 11:49:47 -0300
-References: <1205440348.12951.9.camel@californication>
-	<039f01c88a15$a848aaa0$6701a8c0@freqonedev>
-Subject: Re: [Bluez-devel] Moving towards a new API for BlueZ 4.0
+In-Reply-To: <1206023809.30595.435.camel@cookie.hadess.net>
+References: <20080313141810.GH8969@cathedrallabs.org>
+	<1206021756.7678.20.camel@californication>
+	<1206023809.30595.435.camel@cookie.hadess.net>
+Date: Thu, 20 Mar 2008 15:48:22 +0100
+Message-Id: <1206024502.7678.22.camel@californication>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH 2/2 v010] add support to	ps3	blu-ray	remote
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,25 +22,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi David,
+Hi Bastien,
 
-On Mar 19, 2008, at 20:04, David Stockwell wrote:
->
-> Any interest?
+> > > And finally, adding support to PS3 remote controller.
+> > 
+> > I need one patch that cleanly applies against CVS and I need it now.
+> > Otherwise this won't make it into the next release.
+> 
+> Updated patch attached.
 
-Sure. The current code (mostly written by me) is something rather  
-quickly put together to get the basic functionality in place.  
-Especially the metadata transfer would be nice to get implemented  
-since it's a mandatory feature for category 1 (player/recorder)  
-devices in version 1.3 of the specification.
+patch is in. With minor modifications :)
 
-> Who should I communicate with?
+Regards
 
-In addition this list (as Marcel already mentioned) a good place to be  
-in contact with the developers is the #bluez channel on  
-irc.freenode.net.
+Marcel
 
-Johan
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
