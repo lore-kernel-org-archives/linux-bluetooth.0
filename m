@@ -1,14 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <2C7F847B-F79A-47B3-8347-144419853156@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <47E248FF.60402@infitsrl.com>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Thu, 20 Mar 2008 13:45:51 +0100
+To: =?EUC-KR?B?wMzB1r+1?= <tkakel@naver.com>
+In-Reply-To: <1f1e24ea31c496efd62db585de7b01cf@i61823>
 References: <1e720e88bd7ce5a74be321703f24060d@i61813>
 	<A6B7F17C-B7E5-4A45-8208-D9C1FBC68C96@holtmann.org>
-	<47E248FF.60402@infitsrl.com>
-Subject: Re: [Bluez-devel] RFCOMM sockets
+	<1f1e24ea31c496efd62db585de7b01cf@i61823>
+Message-Id: <2047F6C8-DC0F-46AE-BCBC-D26E01AE8DEE@holtmann.org>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Thu, 20 Mar 2008 13:43:02 +0100
+Cc: bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] I've found a bug in sdp_cstate_get() function.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,26 +23,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Fabrizio,
+Hi,
 
-> I have 3 embedded devices with temperature sensor. This devices are
-> accessed from a pc with linux reading data with rfcomm socket, isn't
-> need to make sdp query for channel because rfcomm channels are
-> statically assigned (it's lab equipment).
+> The version is latest bluez-utils-3.28.
 >
-> I need to read the 3 devices almost at same time and I've done a  
-> little
-> C application using GLib IOChannels and non-blocking socket to read
-> data from the devices. All works fine but if a device it's off the
-> connection to the others it's slow, my impression is it waits timeout
-> from the first device.
-> I can understand why if I have 3 rfcomm connections issued in
-> non-blocking way these influences each other.
+>
 
-because if you have to open ACL baseband connections, then it takes  
-time. Especially when they fail. The baseband connections can not be  
-done in parallel when it is the same host controller. You can use  
-hciconfig to change the page timeout.
+we fixed it in the CVS. So that should be taken care of when we  
+release bluez-utils-3.29.
 
 Regards
 
