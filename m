@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Stockwell <dstockwell@frequency-one.com>
-In-Reply-To: <039f01c88a15$a848aaa0$6701a8c0@freqonedev>
-References: <1205440348.12951.9.camel@californication>
-	<039f01c88a15$a848aaa0$6701a8c0@freqonedev>
-Date: Thu, 20 Mar 2008 14:50:14 +0100
-Message-Id: <1206021014.7678.7.camel@californication>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <47E149F2.7010005@suse.de>
+References: <47E149F2.7010005@suse.de>
+Date: Thu, 20 Mar 2008 14:46:17 +0100
+Message-Id: <1206020777.7678.5.camel@californication>
 Mime-Version: 1.0
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Moving towards a new API for BlueZ 4.0
+Subject: Re: [Bluez-devel] hid2hci error message wrong
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,28 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi David,
+Hi Stefan,
 
-> Thanks for all of the great effort, especially in moving toward the DBus model.
+> the message is wrong:
 > 
-> I am currently going through the work done to date in audio/control.c (the implementation of AVRCP), and am trying to apply that to 
-> an application connecting with an AVRCP on CSR's BlueLab 4.0 framework (implements BT2.1+).  I have some ideas, although I am still 
-> making sure I understand what has been done to this point, and would like to participate in further development (although I am not 
-> the best C developer).
-> 
-> As things stand, it appears we could use more functions and callbacks to support UnitInfo, SubUnitInfo, Passthrough, and 
-> VendorDependent (wherein Metadata resides), etc., and at the same time, I think we should not constrain the use cases to the simple 
-> 10-button remote that has been implemented to date.
-> 
-> At any rate, I would like to get involved, as I have immediate interest in moving this forward.  I do have the official Bluetooth 
-> specs and the CSR IDE, so I think I could contribute from that front.
-> 
-> Any interest?  Who should I communicate with?
+> root@susi:~# hid2hci
+> No devices in HCI mode found
 
-go ahead and do so. Patches are always welcome. However, please start a
-new thread for it.
+patch has been applied. Thanks.
 
 Regards
+
+Marcel
 
 
 
