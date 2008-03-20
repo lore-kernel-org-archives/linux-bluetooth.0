@@ -1,13 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <987924.86360.qm@web8403.mail.in.yahoo.com>
-References: <987924.86360.qm@web8403.mail.in.yahoo.com>
-Date: Thu, 20 Mar 2008 14:52:07 +0100
-Message-Id: <1206021127.7678.10.camel@californication>
+To: David Stockwell <dstockwell@frequency-one.com>
+In-Reply-To: <039f01c88a15$a848aaa0$6701a8c0@freqonedev>
+References: <1205440348.12951.9.camel@californication>
+	<039f01c88a15$a848aaa0$6701a8c0@freqonedev>
+Date: Thu, 20 Mar 2008 14:50:14 +0100
+Message-Id: <1206021014.7678.7.camel@californication>
 Mime-Version: 1.0
-Cc: bluez-users@brisammon.fastmail.fm
-Subject: Re: [Bluez-devel] assertion failed for passkey-agent
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Moving towards a new API for BlueZ 4.0
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,25 +22,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Parmod,
+Hi David,
 
-> When I run 
-> # passkey-agent --default 0000 &
-> [1] 4016
-> 4016: assertion failed "(*(const char*)_DBUS_FUNCTION_NAME) != '_'"
-> file "dbus-connection.c" line 2877 function
-> _dbus_connection_read_write_dispatch
+> Thanks for all of the great effort, especially in moving toward the DBus model.
 > 
-> [1]+  Aborted                 passkey-agent --default 0000
+> I am currently going through the work done to date in audio/control.c (the implementation of AVRCP), and am trying to apply that to 
+> an application connecting with an AVRCP on CSR's BlueLab 4.0 framework (implements BT2.1+).  I have some ideas, although I am still 
+> making sure I understand what has been done to this point, and would like to participate in further development (although I am not 
+> the best C developer).
 > 
-> I tried going into passkey source code but....could get nothing...
+> As things stand, it appears we could use more functions and callbacks to support UnitInfo, SubUnitInfo, Passthrough, and 
+> VendorDependent (wherein Metadata resides), etc., and at the same time, I think we should not constrain the use cases to the simple 
+> 10-button remote that has been implemented to date.
+> 
+> At any rate, I would like to get involved, as I have immediate interest in moving this forward.  I do have the official Bluetooth 
+> specs and the CSR IDE, so I think I could contribute from that front.
+> 
+> Any interest?  Who should I communicate with?
 
-I really don't know. The last time I tested it, it works fine. However
-passkey-agent.c is really only an example.
+go ahead and do so. Patches are always welcome. However, please start a
+new thread for it.
 
 Regards
-
-Marcel
 
 
 
