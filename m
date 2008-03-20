@@ -1,15 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: =?EUC-KR?B?wMzB1r+1?= <tkakel@naver.com>
-In-Reply-To: <1f1e24ea31c496efd62db585de7b01cf@i61823>
+Message-ID: <47E248FF.60402@infitsrl.com>
+Date: Thu, 20 Mar 2008 12:22:39 +0100
+From: Fabrizio Guglielmino <guglielmino@infitsrl.com>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
 References: <1e720e88bd7ce5a74be321703f24060d@i61813>
 	<A6B7F17C-B7E5-4A45-8208-D9C1FBC68C96@holtmann.org>
-	<1f1e24ea31c496efd62db585de7b01cf@i61823>
-Message-Id: <2047F6C8-DC0F-46AE-BCBC-D26E01AE8DEE@holtmann.org>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Thu, 20 Mar 2008 13:43:02 +0100
-Cc: bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] I've found a bug in sdp_cstate_get() function.
+In-Reply-To: <A6B7F17C-B7E5-4A45-8208-D9C1FBC68C96@holtmann.org>
+Subject: [Bluez-devel] RFCOMM sockets
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,19 +21,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hi all,
+I have 3 embedded devices with temperature sensor. This devices are 
+accessed from a pc with linux reading data with rfcomm socket, isn't 
+need to make sdp query for channel because rfcomm channels are 
+statically assigned (it's lab equipment).
 
-> The version is latest bluez-utils-3.28.
->
->
+I need to read the 3 devices almost at same time and I've done a little 
+C application using GLib IOChannels and non-blocking socket to read
+data from the devices. All works fine but if a device it's off the 
+connection to the others it's slow, my impression is it waits timeout 
+from the first device.
+I can understand why if I have 3 rfcomm connections issued in 
+non-blocking way these influences each other.
 
-we fixed it in the CVS. So that should be taken care of when we  
-release bluez-utils-3.29.
+I'm using BlueZ 3.22 on a debian 4.0 whith kernel version 2.6.22
 
-Regards
-
-Marcel
-
+Thanks
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
