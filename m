@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <8f5c4ad0803170205n2d83d3d8of2a0e1a4e7ad12ea@mail.gmail.com>
-References: <8f5c4ad0803170205n2d83d3d8of2a0e1a4e7ad12ea@mail.gmail.com>
-Date: Thu, 20 Mar 2008 14:55:39 +0100
-Message-Id: <1206021339.7678.16.camel@californication>
+In-Reply-To: <310e0a8d0803160610pa6e8dfcs1669c67f25d30117@mail.gmail.com>
+References: <310e0a8d0803160610pa6e8dfcs1669c67f25d30117@mail.gmail.com>
+Date: Thu, 20 Mar 2008 14:54:48 +0100
+Message-Id: <1206021288.7678.14.camel@californication>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Test suite for Bluez
+Subject: Re: [Bluez-users] bluez-utils - PIN Helper without GTK
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,14 +20,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Paul,
+Hi,
 
->                     Are there any test suites available for testting
-> the APIs provided by bluez-libs other than the test programs that
-> comes with bluez-utils?
+> I installed my bluetooth successfully and now I am able to use it.
+> 
+> I would like to support auth connection
+> but I do not have python gtk support.
+> 
+> Some times ago I used a pin helper which does not depends on python gtk support.
+> 
+> It was a simple bash script.
+> 
+> Where can I download bluez-utils package which supports auth and does
+> not depend on python GTK
 
-no test suite exists, but there are a lot of Python examples inside the
-source code.
+nothing depends on a Python GTK pin helper (actually it is called
+passkey agent).
 
 Regards
 
