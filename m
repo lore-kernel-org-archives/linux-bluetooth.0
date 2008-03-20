@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Guillaume Bedot <littletux@zarb.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <310e0a8d0803200701r4277dd6p3fa88c76e1d4a09d@mail.gmail.com>
+Message-ID: <310e0a8d0803200701r4277dd6p3fa88c76e1d4a09d@mail.gmail.com>
+Date: Thu, 20 Mar 2008 16:01:10 +0200
+From: "Stanislav Popov" <stancho@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1206021288.7678.14.camel@californication>
+MIME-Version: 1.0
 References: <310e0a8d0803160610pa6e8dfcs1669c67f25d30117@mail.gmail.com>
 	<1206021288.7678.14.camel@californication>
-	<310e0a8d0803200701r4277dd6p3fa88c76e1d4a09d@mail.gmail.com>
-Date: Thu, 20 Mar 2008 17:01:35 +0100
-Message-Id: <1206028895.16320.18.camel@littletux>
-Mime-Version: 1.0
 Subject: Re: [Bluez-users] bluez-utils - PIN Helper without GTK
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -18,27 +17,73 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-TGUgamV1ZGkgMjAgbWFycyAyMDA4IMOgIDE2OjAxICswMjAwLCBTdGFuaXNsYXYgUG9wb3YgYSDD
-qWNyaXQgOgo+IFRoYW5rIHlvdSBmb3IgeW91ciBhbnN3ZXIhCj4gCj4gQWN0dWFsbHkgSSBtYW5h
-Z2VkIHRvIGluc3RhbGwgYmx1ZXotdXRpbHMgYW5kIGFueXJlbW90ZSAoY29udHJvbCBteSBwYwo+
-IHZpYSBibHVldG9vdGgpLgo+IGJ1dCB3aGVuIEkgdXAgdGhlIGhjaTAgaW50ZXJmYWNlIHdpdGgg
-YXV0aCBvciBlbmNyeXB0IGZsYWdzIHRoZW4gbXkgcGMKPiBpcyBub3QgZGlzY292ZXJlZCBieSBt
-eSBwaG9uZS4KPiAKPiBJZiBvbmx5IGlzY2FuIGFuZCBwaXNjYW4gZmxhZ3MgYXJlIHNldCwgdGhl
-biBldmVyeXRoaW5nIHdvcmtzLCBidXQgaXQKPiBub3QgcmVxdWlyZXMgYXV0aC4KCklmIHlvdSBh
-bHJlYWR5IGtub3cgdGhlIGRldmljZSBhZGRyZXNzIChhbmQgZG9uJ3QgbmVlZCB0byB1c2UKZGlz
-Y292ZXJ5KSwgZG9lcyBpdCB3b3JrID8KCj4gCj4gSSByZW1lbWJlZCB0aGF0IHNvbWUgbW9udGhz
-IGFnbyBQSU4gYXV0aCB3YXMgd29ya2luZyBmb3IgbWUgYnV0IHVzaW5nCj4gY29tcGlsZWQgYmx1
-ZXotbGlicyBhbmQgYmx1ZXotdXRpbHMKPiBwYWNrYWdlcyBvbiBPcGVuV1JUIGRpc3Ryby4KCkN1
-cnJlbnRseSwgSSBnZXQgdGhlIFBJTiBkaWFsb2cgZm9yIGEgcGhvbmUsIGJ1dCBub3Qgd2l0aCBh
-IGhlYWRzZXQgaW4KcGFpcmluZyBtb2RlID8hCgpSZWdhcmRzLAoKR3VpbGxhdW1lIEIuCgoKCi0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBNaWNyb3Nv
-ZnQKRGVmeSBhbGwgY2hhbGxlbmdlcy4gTWljcm9zb2Z0KFIpIFZpc3VhbCBTdHVkaW8gMjAwOC4K
-aHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBtcnQvZGlyZWN0LzAxLwpf
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei11c2Vy
-cyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8v
-bGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
+Thank you for your answer!
+
+Actually I managed to install bluez-utils and anyremote (control my pc
+via bluetooth).
+but when I up the hci0 interface with auth or encrypt flags then my pc
+is not discovered by my phone.
+
+If only iscan and piscan flags are set, then everything works, but it
+not requires auth.
+
+I remembed that some months ago PIN auth was working for me but using
+compiled bluez-libs and bluez-utils
+packages on OpenWRT distro.
+
+Regards,
+Stanislav Popov
+
+On Thu, Mar 20, 2008 at 3:54 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi,
+>
+>
+>  > I installed my bluetooth successfully and now I am able to use it.
+>  >
+>  > I would like to support auth connection
+>  > but I do not have python gtk support.
+>  >
+>  > Some times ago I used a pin helper which does not depends on python gtk support.
+>  >
+>  > It was a simple bash script.
+>  >
+>  > Where can I download bluez-utils package which supports auth and does
+>  > not depend on python GTK
+>
+>  nothing depends on a Python GTK pin helper (actually it is called
+>  passkey agent).
+>
+>  Regards
+>
+>  Marcel
+>
+>
+>
+>  -------------------------------------------------------------------------
+>  This SF.net email is sponsored by: Microsoft
+>  Defy all challenges. Microsoft(R) Visual Studio 2008.
+>  http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+>  _______________________________________________
+>  Bluez-users mailing list
+>  Bluez-users@lists.sourceforge.net
+>  https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+
+
+
+-- 
+Regards,
+St. Popov
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
