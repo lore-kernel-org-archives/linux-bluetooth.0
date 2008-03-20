@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1205747533.8285.10.camel@linuxpc9.mylocaldomain.com>
-References: <1205747533.8285.10.camel@linuxpc9.mylocaldomain.com>
-Date: Thu, 20 Mar 2008 14:56:36 +0100
-Message-Id: <1206021396.7678.18.camel@californication>
+In-Reply-To: <8f5c4ad0803170205n2d83d3d8of2a0e1a4e7ad12ea@mail.gmail.com>
+References: <8f5c4ad0803170205n2d83d3d8of2a0e1a4e7ad12ea@mail.gmail.com>
+Date: Thu, 20 Mar 2008 14:55:39 +0100
+Message-Id: <1206021339.7678.16.camel@californication>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] problems with permissions for sdp local
+Subject: Re: [Bluez-users] Test suite for Bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,23 +20,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Wolfgang,
+Hi Paul,
 
-> I am using a USB-bluetooth dongle to my mobile phone.
-> 
-> Everything seems to work fine when I am logged in as root.
-> As normal user kbluetoothd complains
-> 
-> >Failed to connect to the SDP server.
-> >Please make sure that sdpd is running
-> >without it, other devices will not be able to find out
-> >which services your computer offers.
-> 
-> When I run 'sdptool browse local' as normal user I get:
-> >Failed to connect to SDP server on FF:FF:FF:00:00:00: Permission denied
+>                     Are there any test suites available for testting
+> the APIs provided by bluez-libs other than the test programs that
+> comes with bluez-utils?
 
-have you started hcid with the -s option? Do you have SELinux or
-something alike activated?
+no test suite exists, but there are a lot of Python examples inside the
+source code.
 
 Regards
 
