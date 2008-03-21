@@ -1,14 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1ffb4b070803220226n35f4363dpd63491528914ab74@mail.gmail.com>
-Date: Sat, 22 Mar 2008 05:26:57 -0400
-From: "Mike Lee" <eemike@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <2d5a2c100803210641h220d4de2md9392f7752796169@mail.gmail.com>
+Message-ID: <e91dafd20803210756i5c127104j6001362ffabb8ed1@mail.gmail.com>
+Date: Fri, 21 Mar 2008 15:56:40 +0100
+From: mcINEK <mcinek@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-References: <1ffb4b070803202045w31d2ca9lcc66d0a51aef8c@mail.gmail.com>
-	<2d5a2c100803210641h220d4de2md9392f7752796169@mail.gmail.com>
-Subject: Re: [Bluez-devel] Is there any bluez audio source(a2src)
-	implementation
+Subject: [Bluez-devel] sdp connection problem
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,153 +14,80 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1428107694=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1428107694==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_10848_8427806.1206178017320"
+Hi!
 
-------=_Part_10848_8427806.1206178017320
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+I've got an application, which gets info about bluetooth devices around.
+Therefore I need many sdp sessions. I figured, it is not possible to make
+few connections at the same time, so I do it one by one.
 
-Hi Luiz
+Sometimes, even if previous session was closed by sdp_close, the next
+sdp_connect gives me Too many links error. Usually it helps just to wait
+some time. Therefore I wrote this code:
 
-Thanks, i found the audio source code. But when i compile the source, it
-seems there are missing files. I search over the repository and git
-snapshot, i could not find gsta2dpbin.c/h. but audio/Makefile refer to thes=
-e
-two files.
+do
+{
+  session = sdp_connect(&local, &addr, SDP_RETRY_IF_BUSY | SDP_WAIT_ON_CLOSE);
+  if(!session)
+    sleep(5);
+} while(!session && (errno == 31 || errno == 16 || errno == 117));
 
-mv -f .deps/libgstbluetooth_la-gstrtpsbcpay.Tpo .deps/libgstbluetooth_la-
-gstrtpsbcpay.Plo
-make: *** No rule to make target `gsta2dpbin.c', needed by
-`libgstbluetooth_la-gsta2dpbin.lo'.  Stop.
+But this gives me an kernel error! (sometimes even Panic):
 
-Regards,
-Mike,Lee
-On Fri, Mar 21, 2008 at 9:41 AM, Luiz Augusto von Dentz <
-luiz.dentz@gmail.com> wrote:
+WARNING: at lib/kref.c:33 kref_get()
+[<c001fd14>] (dump_stack+0x0/0x14) from [<c00d607c>] (kref_get+0x54/0x64)
+[<c00d6028>] (kref_get+0x0/0x64) from [<c00d5120>] (kobject_get+0x18/0x20)
+ r4:c19ea8f0
+[<c00d5108>] (kobject_get+0x0/0x20) from [<c00f6ee8>] (get_device+0x1c/0x28)
+ r4:c0262040
+[<c00f6ecc>] (get_device+0x0/0x28) from [<c00f7b40>] (device_add+0x14/0x4d4)
+[<c00f7b2c>] (device_add+0x0/0x4d4) from [<bf038fd8>]
+(add_conn+0x18/0x90 [bluetooth])
+[<bf038fc0>] (add_conn+0x0/0x90 [bluetooth]) from [<c0041f24>]
+(run_workqueue+0xa8/0x15c)
+ r5:bf038fc0 r4:c0262040
+[<c0041e7c>] (run_workqueue+0x0/0x15c) from [<c004219c>]
+(worker_thread+0x5c/0xb8)
+ r6:c0277fb0 r5:c0262048 r4:c0262040
+[<c0042140>] (worker_thread+0x0/0xb8) from [<c0045cc8>] (kthread+0x74/0x80)
+ r6:00000000 r5:c0042140 r4:fffffffc
+[<c0045c54>] (kthread+0x0/0x80) from [<c0033d74>] (do_exit+0x0/0x838)
+ r5:00000000 r4:00000000
+kobject_add failed for acl0016B8A0CF63 with -EEXIST, don't try to
+register things with the same name in the same directory.
+[<c001fd14>] (dump_stack+0x0/0x14) from [<c00d5490>]
+(kobject_shadow_add+0x158/0x1b8)
+[<c00d5338>] (kobject_shadow_add+0x0/0x1b8) from [<c00d5504>]
+(kobject_add+0x14/0x18)
+ r8:00000000 r7:00000000 r6:c0276000 r5:c1819a88 r4:c19ff9c0
+[<c00d54f0>] (kobject_add+0x0/0x18) from [<c00f7bb8>] (device_add+0x8c/0x4d4)
+[<c00f7b2c>] (device_add+0x0/0x4d4) from [<bf038fd8>]
+(add_conn+0x18/0x90 [bluetooth])
+[<bf038fc0>] (add_conn+0x0/0x90 [bluetooth]) from [<c0041f24>]
+(run_workqueue+0xa8/0x15c)
+ r5:bf038fc0 r4:c0262040
+[<c0041e7c>] (run_workqueue+0x0/0x15c) from [<c004219c>]
+(worker_thread+0x5c/0xb8)
+ r6:c0277fb0 r5:c0262048 r4:c0262040
+[<c0042140>] (worker_thread+0x0/0xb8) from [<c0045cc8>] (kthread+0x74/0x80)
+ r6:00000000 r5:c0042140 r4:fffffffc
+[<c0045c54>] (kthread+0x0/0x80) from [<c0033d74>] (do_exit+0x0/0x838)
+ r5:00000000 r4:00000000
+add_conn: Failed to register connection device
 
-> I've been working in the audio sink implementation (...Audio.Source
-> interface),
-> but because of the changes we are now doing for bluez 4.0 I left that
-> unfinished.
->
-> The code is available in my branch audio-source:
->
-> http://git.infradead.org/users/vudentz/bluez-utils.git?a=3Dlog;h=3Drefs/h=
-eads/audio-source
->
-> I was already able to configure streams between 2 linux boxes, but
-> there is no plugin to
-> handle the streams yet.
->
-> This task is also available in gsoc page, so any student interested may
-> apply:
-> http://wiki.bluez.org/wiki/GSoC2008
->
-> --
-> Luiz Augusto von Dentz
-> Engenheiro de Computa=E7=E3o
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2008.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
+Am I doing something wrong?
 
-
-
---=20
------------
-Mike Lee
-
-------=_Part_10848_8427806.1206178017320
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi Luiz<br><br>Thanks, i found the audio source code. But when i compile th=
-e source, it seems there are missing files. I search over the repository an=
-d git snapshot, i could not find gsta2dpbin.c/h. but audio/Makefile refer t=
-o these two files. <br>
-<br>mv -f .deps/libgstbluetooth_la-gstrtpsbcpay.Tpo .deps/libgstbluetooth_l=
-a-gstrtpsbcpay.Plo<br>make: *** No rule to make target `gsta2dpbin.c&#39;, =
-needed by `libgstbluetooth_la-gsta2dpbin.lo&#39;.&nbsp; Stop.<br><br>Regard=
-s,<br>
-Mike,Lee<br><div class=3D"gmail_quote">On Fri, Mar 21, 2008 at 9:41 AM, Lui=
-z Augusto von Dentz &lt;<a href=3D"mailto:luiz.dentz@gmail.com">luiz.dentz@=
-gmail.com</a>&gt; wrote:<br><blockquote class=3D"gmail_quote" style=3D"bord=
-er-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-l=
-eft: 1ex;">
-I&#39;ve been working in the audio sink implementation (...Audio.Source int=
-erface),<br>
-but because of the changes we are now doing for bluez 4.0 I left that<br>
-unfinished.<br>
-<br>
-The code is available in my branch audio-source:<br>
-<a href=3D"http://git.infradead.org/users/vudentz/bluez-utils.git?a=3Dlog;h=
-=3Drefs/heads/audio-source" target=3D"_blank">http://git.infradead.org/user=
-s/vudentz/bluez-utils.git?a=3Dlog;h=3Drefs/heads/audio-source</a><br>
-<br>
-I was already able to configure streams between 2 linux boxes, but<br>
-there is no plugin to<br>
-handle the streams yet.<br>
-<br>
-This task is also available in gsoc page, so any student interested may app=
-ly:<br>
-<a href=3D"http://wiki.bluez.org/wiki/GSoC2008" target=3D"_blank">http://wi=
-ki.bluez.org/wiki/GSoC2008</a><br>
-<br>
---<br>
-Luiz Augusto von Dentz<br>
-Engenheiro de Computa=E7=E3o<br>
-<br>
--------------------------------------------------------------------------<b=
-r>
-This SF.net email is sponsored by: Microsoft<br>
-Defy all challenges. Microsoft(R) Visual Studio 2008.<br>
-<a href=3D"http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/" target=
-=3D"_blank">http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/</a><br>
-_______________________________________________<br>
-Bluez-devel mailing list<br>
-<a href=3D"mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sour=
-ceforge.net</a><br>
-<a href=3D"https://lists.sourceforge.net/lists/listinfo/bluez-devel" target=
-=3D"_blank">https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br=
->
-</blockquote></div><br><br clear=3D"all"><br>-- <br>-----------<br>Mike Lee
-
-------=_Part_10848_8427806.1206178017320--
-
-
---===============1428107694==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Best Regards,
+Marcin
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1428107694==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1428107694==--
