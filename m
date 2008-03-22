@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 23 Mar 2008 14:09:20 +0100
-From: Gaele Strootman <gaele@guruburu.com>
-To: bluez-users@lists.sourceforge.net
-Message-id: <47E65680.1010102@guruburu.com>
-MIME-version: 1.0
-Subject: [Bluez-users] "Can't get device information: Too many links"
+Message-Id: <402D92F0-24B2-4FF8-AFC4-85765D09296B@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <b5c34db00803220246y5941f4d7p14bfa6af06c5b9b1@mail.gmail.com>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Sat, 22 Mar 2008 14:43:07 +0100
+References: <b5c34db00803220246y5941f4d7p14bfa6af06c5b9b1@mail.gmail.com>
+Subject: Re: [Bluez-users] bluetooth compilation regarded
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,53 +22,73 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi,
 
-I have a problem connecting both an Apple wireless keyboard and mouse to
-an USB Bluetooth adapter on Ubuntu Gutsy (AMD64). I can connect either
-the mouse or keyboard, but not both. The error message I get is "Can't
-get device information: Too many links".
+> I am trying to compile bluez-libs-3.27 & bluez-utils-3.27 for mips32  
+> and I use buildroot's toolchain and i get following errors
+>
+> Compilation Steps:
+>
+> export PATH=/home/newbuild/buildroot/build_mipsel/staging_dir/bin: 
+> $PATH <toolchain path>
+>
+> Libs:
+> >./configure --host=mipsel-linux --prefix=/usr --enable-shared=no -- 
+> enable-static=yes
+> >make
+> >make install DESTDIR=/home/newbuild/bluez/bluez-libs-3.27/install
+>
+> Utils:
+> >./configure --build=mipsel-linux --with-bluez=/home/newbuild/bluez/ 
+> bluez-libs-3.27/install/usr CPPFLAGS="-D__KERNEL__ "
+> >make
+>
+> and following is the error
+>
+> make  all-recursive
+> make[1]: Entering directory `/home/newbuild/bluez/bluez-utils-3.27'
+> Making all in sbc
+> make[2]: Entering directory `/home/newbuild/bluez/bluez-utils-3.27/ 
+> sbc'
+> make[2]: Nothing to be done for `all'.
+> make[2]: Leaving directory `/home/newbuild/bluez/bluez-utils-3.27/sbc'
+> Making all in eglib
+> make[2]: Entering directory `/home/newbuild/bluez/bluez-utils-3.27/ 
+> eglib'
+> make[2]: Nothing to be done for `all'.
+> make[2]: Leaving directory `/home/newbuild/bluez/bluez-utils-3.27/ 
+> eglib'
+> Making all in common
+> make[2]: Entering directory `/home/newbuild/bluez/bluez-utils-3.27/ 
+> common'
+> make[2]: Nothing to be done for `all'.
+> make[2]: Leaving directory `/home/newbuild/bluez/bluez-utils-3.27/ 
+> common'
+> Making all in sdpd
+> make[2]: Entering directory `/home/newbuild/bluez/bluez-utils-3.27/ 
+> sdpd'
+> gcc -DHAVE_CONFIG_H -I. -I.. -I../common  -D__KERNEL__  -I../eglib - 
+> Wall -O2 -D_FORTIFY_SOURCE=2 -MT service.o -MD -MP -MF .deps/ 
+> service.Tpo -c -o service.o service.c
+> service.c: In function 'update_svclass_list':
+> service.c:87: error: 'sdp_record_t' has no member named 'svclass'
+> service.c:90: error: 'sdp_record_t' has no member named 'svclass'
+> service.c: In function 'create_ext_inquiry_response':
+> service.c:188: error: 'sdp_record_t' has no member named 'svclass'
+> service.c:191: error: 'sdp_record_t' has no member named 'svclass'
+> service.c:200: error: 'sdp_record_t' has no member named 'svclass'
+> service.c:206: error: 'sdp_record_t' has no member named 'svclass'
+> make[2]: *** [service.o] Error 1
+> make[2]: Leaving directory `/home/newbuild/bluez/bluez-utils-3.27/ 
+> sdpd'
+> make[1]: *** [all-recursive] Error 1
+> make[1]: Leaving directory `/home/newbuild/bluez/bluez-utils-3.27'
+> make: *** [all] Error 2
 
-Unfortunately I didn't find any explanation on Bluez error messages.
-What's going on?
+it tries to compile against an old version of libbluetooth. Make sure  
+you really compile against bluez-libs-3.27.
 
-$ lsusb
-Bus 001 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
-Dongle (HCI mode)
+Regards
 
-$ hciconfig -a
-hci0:   Type: USB
-        BD Address: 00:15:83:YY:YY:YY ACL MTU: 310:10 SCO MTU: 64:8
-        UP RUNNING PSCAN
-        RX bytes:59304 acl:2646 sco:0 events:568 errors:0
-        TX bytes:4847 acl:189 sco:0 commands:173 errors:0
-        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH HOLD SNIFF PARK
-        Link mode: SLAVE ACCEPT
-        Name: 'slimpy-0'
-        Class: 0x080104
-        Service Classes: Capturing
-        Device Class: Computer, Desktop workstation
-        HCI Ver: 2.0 (0x3) HCI Rev: 0xc5c LMP Ver: 2.0 (0x3) LMP Subver:
-0xc5c
-        Manufacturer: Cambridge Silicon Radio (10)
-
-$ hcitool scan
-Scanning ...
-        00:1E:52:XX:XX:XX       My Mouse
-
-$ sudo hidd --connect 00:1E:52:XX:XX:XX
-Can't get device information: Too many links
-
-I used instructions from a guy with the same setup, except for the USB
-adapter which is a D-Link DBT-120:
-http://travismetcalf.com/blog/2008/02/02/sharing-an-apple-keyboard-and-mouse-between-leopard-and-ubuntu/
-
-Any help appreciated.
-
-Gaele
-
--- 
-Gaele Strootman   http://gaele.guruburu.com   http://www.guruburu.com
+Marcel
 
 
 -------------------------------------------------------------------------
