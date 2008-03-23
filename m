@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1e9e22610803240814r3b0a9f05g603b485c8b1bb0ec@mail.gmail.com>
-Date: Mon, 24 Mar 2008 12:14:19 -0300
-From: "Addo Del Grossi" <addo.delgrossi@gmail.com>
+Message-ID: <89b6ba3a0803231540t258807bdk703d843a18a63a3e@mail.gmail.com>
+Date: Sun, 23 Mar 2008 23:40:21 +0100
+From: "Patryk Zawadzki" <patrys@pld-linux.org>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] hci_conn_info definition
+Subject: [Bluez-users] Recent bluez-gnome problems
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,68 +14,39 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1863314536=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1863314536==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_10607_26363585.1206371659867"
+Hi guys,
 
-------=_Part_10607_26363585.1206371659867
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+I'm in the middle of packaging bluez-gnome 0.25 for PLD Linux. I
+already have obex-data-server (with --enable-system-config) packaged
+but hit a strange problem.
 
-Hi Guys,
+The interface is visible and hcid is running. I've noticed the
+transfer service is no longer part of bluez-utils. First I was unable
+to get bluez to a point where it detects any devices. I can see my
+laptop from my cell phone but not the other way araound. After bonding
+(initialized from the phone) I can send files from my laptop to my
+cell phone (it shows bonded devices even if discovery fails to work).
+I can't send any files from the phone and I can't browse the phone
+contents (phone asks for permission but nautilus shows "connect
+failed" when trying to use gvfs-mount obex://[...]/).
 
-    I am using the struct hci_conn_info.
-    What is the definition the attributes handle and state?
-    What are the possible values for the attribute state?
+bluez-* is 3.29, obex-data-server is 0.3
 
-    struct hci_conn_info {
-        __u16    handle;
-        bdaddr_t bdaddr;
-        __u8     type;
-        __u8     out;
-        __u16    state;
-        __u32    link_mode;
-    };
+Any help appreciated. Thanks in advance.
 
-
-Att,
-Addo
-
-------=_Part_10607_26363585.1206371659867
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi Guys, <br><br>&nbsp;&nbsp;&nbsp; I am using the struct hci_conn_info.<br>&nbsp;&nbsp;&nbsp; What is the definition the attributes handle and state?<br>&nbsp;&nbsp;&nbsp; What are the possible values for the attribute state?<br><br>&nbsp;&nbsp;&nbsp; struct hci_conn_info {<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; __u16&nbsp;&nbsp;&nbsp; handle;<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; bdaddr_t bdaddr;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; __u8&nbsp;&nbsp;&nbsp;&nbsp; type;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; __u8&nbsp;&nbsp;&nbsp;&nbsp; out;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; __u16&nbsp;&nbsp;&nbsp; state;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; __u32&nbsp;&nbsp;&nbsp; link_mode;<br>&nbsp;&nbsp;&nbsp; };<br><br><br>Att,<br>Addo<br>
-
-------=_Part_10607_26363585.1206371659867--
-
-
---===============1863314536==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+Patryk Zawadzki
+PLD Linux Distribution
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1863314536==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1863314536==--
