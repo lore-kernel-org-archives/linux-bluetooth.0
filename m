@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300803231250v4d2914a8ie368820a0993a41d@mail.gmail.com>
-Date: Sun, 23 Mar 2008 13:50:21 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Subject: [Bluez-users] gui pairing issues with windows mobile 6
+Date: Sun, 23 Mar 2008 14:09:20 +0100
+From: Gaele Strootman <gaele@guruburu.com>
+To: bluez-users@lists.sourceforge.net
+Message-id: <47E65680.1010102@guruburu.com>
+MIME-version: 1.0
+Subject: [Bluez-users] "Can't get device information: Too many links"
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,29 +18,56 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi
+Hi,
 
-Has anyone noticed issues when pairing with windows devices?
+I have a problem connecting both an Apple wireless keyboard and mouse to
+an USB Bluetooth adapter on Ubuntu Gutsy (AMD64). I can connect either
+the mouse or keyboard, but not both. The error message I get is "Can't
+get device information: Too many links".
 
-Using an at&t tilt and bluez-gnome from gutsy, I tried a dozen times
-to pair my laptop and the phone. I'd initiate ppp from the laptop, the
-confirm dialog and pin dialog would appear on the phone, the gnome pin
-dialog would appear, then the phone would close the connection.
-hcidump showed the laptop sending the pin and then immediately getting
-a disconnection from the remote end. bluez-utils is from a recent cvs
-head so it's not the best setup for making it reproducible.
+Unfortunately I didn't find any explanation on Bluez error messages.
+What's going on?
 
-I logged out and used passkey-agent from cvs head and the pairing
-completed the first time.
+$ lsusb
+Bus 001 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
+Dongle (HCI mode)
 
-My n810 was able to pair with it on the first try, using the gui.
+$ hciconfig -a
+hci0:   Type: USB
+        BD Address: 00:15:83:YY:YY:YY ACL MTU: 310:10 SCO MTU: 64:8
+        UP RUNNING PSCAN
+        RX bytes:59304 acl:2646 sco:0 events:568 errors:0
+        TX bytes:4847 acl:189 sco:0 commands:173 errors:0
+        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF PARK
+        Link mode: SLAVE ACCEPT
+        Name: 'slimpy-0'
+        Class: 0x080104
+        Service Classes: Capturing
+        Device Class: Computer, Desktop workstation
+        HCI Ver: 2.0 (0x3) HCI Rev: 0xc5c LMP Ver: 2.0 (0x3) LMP Subver:
+0xc5c
+        Manufacturer: Cambridge Silicon Radio (10)
 
-I will be able to try bluez-gnome from head or the last release when I
-have normal network access again, but at the moment I'm just relieved
-that I have something that is working.
+$ hcitool scan
+Scanning ...
+        00:1E:52:XX:XX:XX       My Mouse
+
+$ sudo hidd --connect 00:1E:52:XX:XX:XX
+Can't get device information: Too many links
+
+I used instructions from a guy with the same setup, except for the USB
+adapter which is a D-Link DBT-120:
+http://travismetcalf.com/blog/2008/02/02/sharing-an-apple-keyboard-and-mouse-between-leopard-and-ubuntu/
+
+Any help appreciated.
+
+Gaele
 
 -- 
-Brad
+Gaele Strootman   http://gaele.guruburu.com   http://www.guruburu.com
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
