@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <89b6ba3a0803231540t258807bdk703d843a18a63a3e@mail.gmail.com>
-Date: Sun, 23 Mar 2008 23:40:21 +0100
-From: "Patryk Zawadzki" <patrys@pld-linux.org>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <d89ddf300803231250v4d2914a8ie368820a0993a41d@mail.gmail.com>
+Date: Sun, 23 Mar 2008 13:50:21 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] Recent bluez-gnome problems
+Subject: [Bluez-users] gui pairing issues with windows mobile 6
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,29 +18,29 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi guys,
+Hi
 
-I'm in the middle of packaging bluez-gnome 0.25 for PLD Linux. I
-already have obex-data-server (with --enable-system-config) packaged
-but hit a strange problem.
+Has anyone noticed issues when pairing with windows devices?
 
-The interface is visible and hcid is running. I've noticed the
-transfer service is no longer part of bluez-utils. First I was unable
-to get bluez to a point where it detects any devices. I can see my
-laptop from my cell phone but not the other way araound. After bonding
-(initialized from the phone) I can send files from my laptop to my
-cell phone (it shows bonded devices even if discovery fails to work).
-I can't send any files from the phone and I can't browse the phone
-contents (phone asks for permission but nautilus shows "connect
-failed" when trying to use gvfs-mount obex://[...]/).
+Using an at&t tilt and bluez-gnome from gutsy, I tried a dozen times
+to pair my laptop and the phone. I'd initiate ppp from the laptop, the
+confirm dialog and pin dialog would appear on the phone, the gnome pin
+dialog would appear, then the phone would close the connection.
+hcidump showed the laptop sending the pin and then immediately getting
+a disconnection from the remote end. bluez-utils is from a recent cvs
+head so it's not the best setup for making it reproducible.
 
-bluez-* is 3.29, obex-data-server is 0.3
+I logged out and used passkey-agent from cvs head and the pairing
+completed the first time.
 
-Any help appreciated. Thanks in advance.
+My n810 was able to pair with it on the first try, using the gui.
+
+I will be able to try bluez-gnome from head or the last release when I
+have normal network access again, but at the moment I'm just relieved
+that I have something that is working.
 
 -- 
-Patryk Zawadzki
-PLD Linux Distribution
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
