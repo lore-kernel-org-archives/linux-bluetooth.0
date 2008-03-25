@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e1effdeb0803251302p7df8a96di186a11bf316ba44a@mail.gmail.com>
-Date: Tue, 25 Mar 2008 17:02:51 -0300
-From: "Claudio Takahasi" <cktakahasi@gmail.com>
+Message-ID: <d89ddf300803250739ga372a9fy6d1aa4eff033be0e@mail.gmail.com>
+Date: Tue, 25 Mar 2008 08:39:33 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1e9e22610803240814r3b0a9f05g603b485c8b1bb0ec@mail.gmail.com>
+In-Reply-To: <8f5c4ad0803250600q4b36a962w27e57fc3210ebd09@mail.gmail.com>
 MIME-Version: 1.0
-References: <1e9e22610803240814r3b0a9f05g603b485c8b1bb0ec@mail.gmail.com>
-Subject: Re: [Bluez-users] hci_conn_info definition
+References: <8f5c4ad0803250501x51e5cac8m7c21a6e41460c644@mail.gmail.com>
+	<d89ddf300803250516j6cf27fdbjf0740759b823435a@mail.gmail.com>
+	<8f5c4ad0803250600q4b36a962w27e57fc3210ebd09@mail.gmail.com>
+Subject: Re: [Bluez-users] ACL connection handle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,61 +22,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Mon, Mar 24, 2008 at 12:14 PM, Addo Del Grossi
-<addo.delgrossi@gmail.com> wrote:
-> Hi Guys,
->
->     I am using the struct hci_conn_info.
->     What is the definition the attributes handle and state?
->     What are the possible values for the attribute state?
->
->     struct hci_conn_info {
->         __u16    handle;
->          bdaddr_t bdaddr;
->         __u8     type;
->         __u8     out;
->         __u16    state;
->         __u32    link_mode;
->     };
->
->
-> Att,
-> Addo
->
-> -------------------------------------------------------------------------
->  This SF.net email is sponsored by: Microsoft
->  Defy all challenges. Microsoft(R) Visual Studio 2008.
->  http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
->  Bluez-users mailing list
->  Bluez-users@lists.sourceforge.net
->  https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
+Matt
 
+this would be a good topic for bluez-devel. Are you subscribed over there?
 
-Hi Addo,
+>    I am using the infineon.When I play through the uart, I will give -D
+> bluetooth option to aplay  and this  will create an acl as well as sco
+> connection and route audio through uart.But if I am  using the pcm interface
+> , I will  route  audio to the pcm interface  on the host connected to the bt
+> module and use aplay without the bluetooth option right?,So I have to create
+> an acl connection and then use the hcitool cmd to  switch the SCO interface
+> before I do aplay .So is that necessary to give the command from inside the
+> audio service ?How would I establish the acl connection? Can I use rfcomm
+> connect ?
 
-Connection handle identifies a logical channel between the host and controller.
-Possible state values are:
+The bt alsa plugin does only make sense when getting audio over hci,
+but the audio service was designed so you could use d-bus to make it
+negotiate the connection and then get the audio through another route,
+eg the pcm.
 
-/* Connection and socket states */
-enum {
-        BT_CONNECTED = 1, /* Equal to TCP_ESTABLISHED to make net code happy */
-        BT_OPEN,
-        BT_BOUND,
-        BT_LISTEN,
-        BT_CONNECT,
-        BT_CONNECT2,
-        BT_CONFIG,
-        BT_DISCONN,
-        BT_CLOSED
-};
+You could run the bluetooth negotiation yourself when going through
+pcm, but it would be better use of the infrastructure to patch the
+audio service so it can be used for both the pcm and hci cases. iirc,
+the audio service assumes you'll use one kind of routing the whole
+time you run it, so that would have to be changed to be a runtime
+setting set through d-bus.
+
+The audio service might be patched to, for example, invoke an external
+program between establishing the acl and sco connections. that could
+take an acl handle and do the infineon magic.
+
+I'm not sure there is a way to pull this off in a way that Marcel
+would accept upstream, but even if you have to do a custom patch to
+the audio service to make it work the way you need it I think you'll
+be able to pull it together more quickly.
 
 -- 
----------------------------------------------------------
-Claudio Takahasi
-Instituto Nokia de Tecnologia - INdT
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
