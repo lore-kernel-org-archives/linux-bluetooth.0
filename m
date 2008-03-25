@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 26 Mar 2008 09:11:11 +0800
-From: "liu_xx" <liu_xx@sina.com>
-To: "bluez-devel" <bluez-devel@lists.sourceforge.net>
-Mime-Version: 1.0
-Message-Id: <20080326011113.1AF5018599@smtp.sina.com.cn>
-Subject: [Bluez-devel] Headset has no sound
+Message-ID: <051f01c88e7f$2e73f040$6701a8c0@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Date: Tue, 25 Mar 2008 08:50:25 -0500
+MIME-Version: 1.0
+Subject: [Bluez-devel] Minimum Version of GStreamer for bluez-utils-3.29?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,49 +14,98 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0590453532=="
+Content-Type: multipart/mixed; boundary="===============0931860946=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0590453532==
+This is a multi-part message in MIME format.
+
+--===============0931860946==
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_051C_01C88E55.44717630"
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_051C_01C88E55.44717630
 Content-Type: text/plain;
-	charset="gb2312"
-Content-Transfer-Encoding: 7bit
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,everyone
+bluez-utils-3.29 does not compile: failing in compilation of =
+gstrtpsbcpay.c,
+@201: implicit declaration of gst_adapter_copy, and
+@208: 'GstBaseRtpPayloadClass' has no member named 'handle_event'
 
-All seems ok, but no sound. I use FC6 OS.
-#btsco -v 00:12:A1:00:12:6C :
-btsco v0.42
-Device is 1:0
-Voice setting: 0x0060
-RFCOMM channel 8 connected
-Using interface hci0
+It appears GStreamer is only up to 0.10.9 or thereabouts.  What is the =
+minimum/expected version of GStreamer 0.10 for bluez-utils-3.29? =
+According to the GStreamer site, the current version is 0.10.18, as of =
+just a few days ago.
 
-#lsusb
-Bus 004 Device 005: ID 1310:0001 Roper Class 1 Bluetooth Dongle
+Another question: I do not intend to use streaming audio in this =
+application, and I have to ask why all of this is bundled into the audio =
+module at this fairly deep layer?  Seems to be a bit too bundled, =
+leading to too many dependencies, unless everybody is intent on =
+developing headset applications.
 
-#aplay -D plughw:Headset /usr/share/sounds/shutdown1.wav
+DS
+------=_NextPart_000_051C_01C88E55.44717630
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-I can hear nothing but 'ssss'.  using hcidump can see data sent.
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.6000.16608" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>bluez-utils-3.29 does not compile: =
+failing in=20
+compilation of gstrtpsbcpay.c,</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>@201: implicit declaration of =
+gst_adapter_copy,=20
+and</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2>@208: 'GstBaseRtpPayloadClass' has no =
+member named=20
+'handle_event'</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>It appears GStreamer is only up to =
+0.10.9 or=20
+thereabouts.&nbsp; What is the minimum/expected version of GStreamer =
+0.10 for=20
+bluez-utils-3.29? According to the GStreamer site, the current version =
+is=20
+0.10.18, as of just a few days ago.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Another question:&nbsp;I do not intend =
+to use=20
+streaming audio in this application, and I have to ask why all of this =
+is=20
+bundled into the audio module at this fairly deep layer?&nbsp; Seems to =
+be a bit=20
+too bundled, leading to too many dependencies, unless everybody is =
+intent on=20
+developing headset applications.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>DS</FONT></DIV></BODY></HTML>
 
-Can anyone give me some ideas? Thanks.
+------=_NextPart_000_051C_01C88E55.44717630--
 
 
 
-
---===============0590453532==
+--===============0931860946==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 -------------------------------------------------------------------------
-Check out the new SourceForge.net Marketplace.
-It's the best place to buy or sell services for
-just about anything Open Source.
-http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
---===============0590453532==
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============0931860946==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -67,4 +116,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============0590453532==--
+--===============0931860946==--
