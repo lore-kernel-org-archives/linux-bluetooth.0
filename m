@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <39C940F5-0157-43EB-9841-D5B7D35CCBF9@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <47EA8056.8090500@idlum.be>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Wed, 26 Mar 2008 18:05:42 +0100
-References: <47EA8056.8090500@idlum.be>
-Subject: Re: [Bluez-devel] Cached friendly names never updated when changed
+Message-ID: <47EA8056.8090500@idlum.be>
+Date: Wed, 26 Mar 2008 17:56:54 +0100
+From: Pierre-Yves Paulus <py@idlum.be>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Content-Type: multipart/mixed; boundary="------------070508060503090805070705"
+Subject: [Bluez-devel] Cached friendly names never updated when changed
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,37 +15,87 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pierre-Yves,
+This is a multi-part message in MIME format.
+--------------070508060503090805070705
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> It seems that once a friendly name has been cached to /var/lib/ 
-> bluetooth/*/names, RemoteNameUpdated signals contain this cached  
-> name forever, and user is never informed of a name change unless  
-> those "names" files are deleted.
+Hello,
 
-the names are never updated once retrieved. At least not via an  
-inquiry run. If you connect to a remote device, it will update the  
-name. Another option is Extended Inquiry support if you have the  
-hardware for it.
+It seems that once a friendly name has been cached to 
+/var/lib/bluetooth/*/names, RemoteNameUpdated signals contain this 
+cached name forever, and user is never informed of a name change unless 
+those "names" files are deleted.
 
-The reason behind this is that the remote name operation is too  
-expensive if you don't have an ACL link between two devices. And a lot  
-of times the name doesn't change so often or it is unimportant anyway.
+It can be easily tested using the small python program attached. Just 
+start it and play around with your device's friendly name, and with 
+/var/lib/bluetooth/*/names (for example simply delete it).
 
-Regards
+So is there a way to get notified when a device's name has actually 
+changed? Maybe I didn't wait long enough? According to the signal's name 
+("RemoteNameUpdated"), I would expect to be notified when the name 
+actually change.
 
-Marcel
+Best Regards,
+Pierre-Yves
 
+--------------070508060503090805070705
+Content-Type: text/x-python;
+ name="namesresolver.py"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="namesresolver.py"
+
+#!/usr/bin/python
+
+import dbus
+import dbus.glib
+import gobject
+
+def rem_dev_name_signal(address, name):
+        print 'Signal: RemoteNameUpdated(%s, %s)' % (address, name)
+
+def disc_completed_signal():
+        adapter.DiscoverDevices()
+
+bus = dbus.SystemBus();
+
+bus.add_signal_receiver(rem_dev_name_signal, 'RemoteNameUpdated', 'org.bluez.Adapter', 'org.bluez', '/org/bluez/hci0')
+bus.add_signal_receiver(disc_completed_signal, 'DiscoveryCompleted', 'org.bluez.Adapter', 'org.bluez', '/org/bluez/hci0')
+
+obj = bus.get_object('org.bluez', '/org/bluez/hci0')
+adapter = dbus.Interface(obj, 'org.bluez.Adapter')
+
+adapter.DiscoverDevices()
+
+gobject.threads_init()
+dbus.glib.init_threads()
+main_loop = gobject.MainLoop()
+main_loop.run()
+
+--------------070508060503090805070705
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+--------------070508060503090805070705
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--------------070508060503090805070705--
