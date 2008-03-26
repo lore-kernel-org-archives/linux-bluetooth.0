@@ -1,12 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <81E635B3-43C3-4956-B5ED-D9C4BFE8E235@holtmann.org>
+Message-Id: <6F34AFC6-0E93-4CDD-BDFB-376BD964FCFB@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <89b6ba3a0803231540t258807bdk703d843a18a63a3e@mail.gmail.com>
+In-Reply-To: <d89ddf300803250739ga372a9fy6d1aa4eff033be0e@mail.gmail.com>
 Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Wed, 26 Mar 2008 17:29:55 +0100
-References: <89b6ba3a0803231540t258807bdk703d843a18a63a3e@mail.gmail.com>
-Subject: Re: [Bluez-users] Recent bluez-gnome problems
+Date: Wed, 26 Mar 2008 17:27:38 +0100
+References: <8f5c4ad0803250501x51e5cac8m7c21a6e41460c644@mail.gmail.com>
+	<d89ddf300803250516j6cf27fdbjf0740759b823435a@mail.gmail.com>
+	<8f5c4ad0803250600q4b36a962w27e57fc3210ebd09@mail.gmail.com>
+	<d89ddf300803250739ga372a9fy6d1aa4eff033be0e@mail.gmail.com>
+Subject: Re: [Bluez-users] ACL connection handle
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,29 +23,50 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Patryk,
+Hi Brad,
 
-> I'm in the middle of packaging bluez-gnome 0.25 for PLD Linux. I
-> already have obex-data-server (with --enable-system-config) packaged
-> but hit a strange problem.
-
-don't use --enable-system-config unless you know what this implies.  
-Running ODS inside the user session is good enough.
-
-> The interface is visible and hcid is running. I've noticed the
-> transfer service is no longer part of bluez-utils. First I was unable
-> to get bluez to a point where it detects any devices. I can see my
-> laptop from my cell phone but not the other way araound. After bonding
-> (initialized from the phone) I can send files from my laptop to my
-> cell phone (it shows bonded devices even if discovery fails to work).
-> I can't send any files from the phone and I can't browse the phone
-> contents (phone asks for permission but nautilus shows "connect
-> failed" when trying to use gvfs-mount obex://[...]/).
+>>   I am using the infineon.When I play through the uart, I will give  
+>> -D
+>> bluetooth option to aplay  and this  will create an acl as well as  
+>> sco
+>> connection and route audio through uart.But if I am  using the pcm  
+>> interface
+>> , I will  route  audio to the pcm interface  on the host connected  
+>> to the bt
+>> module and use aplay without the bluetooth option right?,So I have  
+>> to create
+>> an acl connection and then use the hcitool cmd to  switch the SCO  
+>> interface
+>> before I do aplay .So is that necessary to give the command from  
+>> inside the
+>> audio service ?How would I establish the acl connection? Can I use  
+>> rfcomm
+>> connect ?
 >
-> bluez-* is 3.29, obex-data-server is 0.3
+> The bt alsa plugin does only make sense when getting audio over hci,
+> but the audio service was designed so you could use d-bus to make it
+> negotiate the connection and then get the audio through another route,
+> eg the pcm.
+>
+> You could run the bluetooth negotiation yourself when going through
+> pcm, but it would be better use of the infrastructure to patch the
+> audio service so it can be used for both the pcm and hci cases. iirc,
+> the audio service assumes you'll use one kind of routing the whole
+> time you run it, so that would have to be changed to be a runtime
+> setting set through d-bus.
+>
+> The audio service might be patched to, for example, invoke an external
+> program between establishing the acl and sco connections. that could
+> take an acl handle and do the infineon magic.
+>
+> I'm not sure there is a way to pull this off in a way that Marcel
+> would accept upstream, but even if you have to do a custom patch to
+> the audio service to make it work the way you need it I think you'll
+> be able to pull it together more quickly.
 
-I don't see a problem here. The latest bluez-gnome has options to  
-enable file transfer and push service.
+shouldn't be a big problem, but in general this belongs into the  
+kernel since userspace is not dealing with ACL and SCO/eSCO connection  
+handling.
 
 Regards
 
