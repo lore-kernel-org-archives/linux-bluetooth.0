@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sumeet VERMA <sumeet.verma@st.com>
-To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
-Date: Wed, 26 Mar 2008 12:01:26 +0530
-Message-ID: <000901c88f0b$09c88e90$832fc70a@dlh.st.com>
+Message-ID: <194c6ea30803252300o387570b1s8b2ba96f01d7a462@mail.gmail.com>
+Date: Wed, 26 Mar 2008 14:00:20 +0800
+From: "dong yan" <semiydsemiyd@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <00e801c88ef7$1381d040$832fc70a@dlh.st.com>
 MIME-Version: 1.0
-In-Reply-To: <194c6ea30803252300o387570b1s8b2ba96f01d7a462@mail.gmail.com>
+References: <BAY117-W512E12E372AF6367AFF61C0FC0@phx.gbl>
+	<00e801c88ef7$1381d040$832fc70a@dlh.st.com>
 Subject: Re: [Bluez-users] How to enable eSCO in linux 2.6.18?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -19,34 +21,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi
-Are you using a minikit? What is the version of STLC2500 chip you are using?
-In case you are using minikit along with motherboard you have to enable the
-codec. Otherwise you will not hear any sound.
-
-Regards,
-Sumeet 
-
------Original Message-----
-From: bluez-users-bounces@lists.sourceforge.net
-[mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of dong yan
-Sent: Wednesday, March 26, 2008 11:30 AM
-To: BlueZ users
-Subject: Re: [Bluez-users] How to enable eSCO in linux 2.6.18?
-
 Hi Sumeet VERMA:
 
    Thanks a lot!
-   As a matter of fact , im using ST's bluetooth chip STLC2500. This chip
-can't establish SCO connections under linux 2.6.18, so i had to try eSCO
-connection.....that's why i want this esco patch.  i applied your patch and
-eSCO seems to be connected. But still there's no sound coming out of my
-bluetooth headset...
-When i tried to disconnect the esco channel , hcid reports an error.....
-Please refer to the details in this log:
+   As a matter of fact , im using ST's bluetooth chip STLC2500. This
+chip can't establish SCO connections under linux 2.6.18, so i had to
+try eSCO connection.....that's why i want this esco patch.  i applied
+your patch and eSCO seems to be connected. But still there's no sound
+coming out of my bluetooth headset...
+When i tried to disconnect the esco channel , hcid reports an
+error..... Please refer to the details in this log:
 (I use 'hstest' from bluez-utils to test the SCO/eSCO.)
 
- $ hstest play /tmp1/1.wav 00:0D:3C:EB:53:F0 1 Voice setting: 0x0060
+ $ hstest play /tmp1/1.wav 00:0D:3C:EB:53:F0 1
+Voice setting: 0x0060
 hcid[173]: link_key_request (sba=00:80:E1:00:AB:BA, dba=00:0D:3C:EB:53:F0)
 hcid[173]: link_key_request (sba=00:80:E1:00:AB:BA, dba=00:0D:3C:EB:53:F0)
 RFCOMM channel connected
@@ -59,9 +47,9 @@ hcid[173]: link_key_request (sba=00:80:E1:00:AB:BA, dba=00:0D:3C:EB:53:F0)
 / $
 / $ hcid[173]: Disconnection failed: 0x0c
 
-At the sametime , if i use another  USB bluetooth module instead of STLC2500
-, i can hear the music with my bluetooth headset after established SCO
-connection.
+At the sametime , if i use another  USB bluetooth module instead of
+STLC2500 , i can hear the music with my bluetooth headset after
+established SCO connection.
 
 Please, let me know if you have any other suggestions,thanks!!
 
@@ -83,11 +71,11 @@ semiyd
 >
 >
 > Hi All:
->        I want to enable eSCO function in linux 2.6.18 for a certain 
-> reason.... I know that 2.6.23 with the bluez-2.6.23mh1 patch can 
-> enable simple eSCO support. But since i can't upgrade my kernel to 
-> 2.6.23+ , is there any patches that can be applied on a 2.6.18 kernel 
-> in order to make eSCO connections ?
+>        I want to enable eSCO function in linux 2.6.18 for a certain
+> reason.... I know that 2.6.23 with the bluez-2.6.23mh1 patch can enable
+> simple eSCO support. But since i can't upgrade my kernel to 2.6.23+ , is
+> there any patches that can be applied on a 2.6.18 kernel in order to make
+> eSCO connections ?
 >
 >
 >
@@ -107,29 +95,18 @@ semiyd
 > http://www.live.com/getstarted.aspx
 >
 >
-> ----------------------------------------------------------------------
-> --- Check out the new SourceForge.net Marketplace.
-> It's the best place to buy or sell services for just about anything 
-> Open Source.
-> http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marke
-> tplace _______________________________________________
+> -------------------------------------------------------------------------
+> Check out the new SourceForge.net Marketplace.
+> It's the best place to buy or sell services for
+> just about anything Open Source.
+> http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+> _______________________________________________
 > Bluez-users mailing list
 > Bluez-users@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-users
 >
 >
 >
-
--------------------------------------------------------------------------
-Check out the new SourceForge.net Marketplace.
-It's the best place to buy or sell services for just about anything Open
-Source.
-http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
