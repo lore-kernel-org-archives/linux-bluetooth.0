@@ -1,10 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BAY118-DAV9D9EC1C84DCF7A987834CC7FE0@phx.gbl>
-From: <ichane@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Thu, 27 Mar 2008 10:10:10 +0800
-MIME-Version: 1.0
-Subject: [Bluez-users] sdptool add service
+Message-Id: <77B64B1C-EB7C-4543-898D-BDE66C48BBD7@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <89b6ba3a0803260937i21870643xa2207770239d469a@mail.gmail.com>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Wed, 26 Mar 2008 17:40:20 +0100
+References: <89b6ba3a0803231540t258807bdk703d843a18a63a3e@mail.gmail.com>
+	<81E635B3-43C3-4956-B5ED-D9C4BFE8E235@holtmann.org>
+	<89b6ba3a0803260937i21870643xa2207770239d469a@mail.gmail.com>
+Subject: Re: [Bluez-users] Recent bluez-gnome problems
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,104 +18,63 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1000278713=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+Hi Patryk,
 
---===============1000278713==
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0040_01C88FF2.BDB2AC00"
+>>> I'm in the middle of packaging bluez-gnome 0.25 for PLD Linux. I
+>>> already have obex-data-server (with --enable-system-config) packaged
+>>> but hit a strange problem.
+>> don't use --enable-system-config unless you know what this implies.
+>> Running ODS inside the user session is good enough.
+>
+> So you suggest we disable it in distro builds? Will do. I thought it
+> only affected system bus activation?
 
-This is a multi-part message in MIME format.
+don't use system bus activation. It would run ODS as root and remote  
+attackers can overwrite system files.
 
-------=_NextPart_000_0040_01C88FF2.BDB2AC00
-Content-Type: text/plain;
-	charset="big5"
-Content-Transfer-Encoding: quoted-printable
+>>> The interface is visible and hcid is running. I've noticed the
+>>> transfer service is no longer part of bluez-utils. First I was  
+>>> unable
+>>> to get bluez to a point where it detects any devices. I can see my
+>>> laptop from my cell phone but not the other way araound. After  
+>>> bonding
+>>> (initialized from the phone) I can send files from my laptop to my
+>>> cell phone (it shows bonded devices even if discovery fails to  
+>>> work).
+>>> I can't send any files from the phone and I can't browse the phone
+>>> contents (phone asks for permission but nautilus shows "connect
+>>> failed" when trying to use gvfs-mount obex://[...]/).
+>>>
+>>> bluez-* is 3.29, obex-data-server is 0.3
+>> I don't see a problem here. The latest bluez-gnome has options to
+>> enable file transfer and push service.
+>
+> yes, the options are there but there seems to be a problem with device
+> discovery somewhere in my setup. Is running hcid enough for the device
+> detection to work? It seems only the already paired devices show up
+> (it worked fine at least with bluez-gnome 0.15) so I assume it only
+> displays a memorized list of devices not doing discovery at all. How
+> do I debug it? I'm a programmer so if you point me to the right
+> internals I think I could fix the issues or at least provide you with
+> more info.
 
-Hi there:
+That should have been fixed with the latest bluez-gnome version.
 
-Do I need to add service manually using sdptool add? I got different
-results using pand and rfcomm listen as servers.
+Regards
 
-1. >pand -s -M --role=3DNAP=20
-After run the command above, no need to run "sdptool add NAP". The
-service is already registered to sdpd.
+Marcel
 
-2.>rfcomm listen 1 1
-Need to run sdptool add SP to register SPP service to sdpd.
-
-Am I correct?
-
-Thanks a lot,
-
-Chane
-------=_NextPart_000_0040_01C88FF2.BDB2AC00
-Content-Type: text/html;
-	charset="big5"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; charset=3Dbig5">
-<META content=3D"MSHTML 6.00.6000.16608" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>Hi there:</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Do I need to add service manually using =
-sdptool=20
-add? I got different</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>results using pand and rfcomm listen as =
-
-servers.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>1. &gt;pand -s -M --role=3DNAP =
-</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>After run the command above, no need to =
-run=20
-"sdptool add NAP". The</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>service is already registered to =
-sdpd.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>2.&gt;rfcomm listen 1 1</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>Need to run sdptool add SP to register =
-SPP service=20
-to sdpd.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Am I correct?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Thanks a lot,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Chane</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0040_01C88FF2.BDB2AC00--
-
-
-
---===============1000278713==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
---===============1000278713==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1000278713==--
