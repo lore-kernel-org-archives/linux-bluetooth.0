@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <C3D78946-632C-429E-81CB-21AE890691E2@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <47EB9D01.6090400@idlum.be>
+Date: Thu, 27 Mar 2008 14:11:29 +0100
+From: Pierre-Yves Paulus <py@idlum.be>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <5c1c70820803262332g43a1269bnfcfc21cd378b28db@mail.gmail.com>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Thu, 27 Mar 2008 16:00:46 +0100
-References: <5c1c70820803262332g43a1269bnfcfc21cd378b28db@mail.gmail.com>
-Subject: Re: [Bluez-devel] SDP across multiple radios
+References: <47EA8056.8090500@idlum.be>
+	<39C940F5-0157-43EB-9841-D5B7D35CCBF9@holtmann.org>
+In-Reply-To: <39C940F5-0157-43EB-9841-D5B7D35CCBF9@holtmann.org>
+Subject: Re: [Bluez-devel] Cached friendly names never updated when changed
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,36 +21,113 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pooyan,
+Hi Marcel,
 
-> If I've got a system with more than one bluetooth adapter (eg, it has
-> hci0, hci1, and hc2), and I then wish to publish a service, I
-> currently use AddServiceRecordFromXML.  This works, but it appears
-> that there is no way to specify which adapter that service applies to.
->
-> For example, if I have three adapters, can I make it so that I
-> advertise a given service only on two of the radios but not the third?
-> (I want to be able to control which radios are offering which
-> services to clients.)
->
-> I'm testing this by making one call to the dbus
-> AddServiceRecordFromXML API (as mentioned above), and then querying
-> the results using "sdptool browse <bdaddr>" from another computer, but
-> I see the same service on each of the three bdaddrs.
+Thanks for your fast answer.
 
-that is a limitation of the current D-Bus API. We fixed that with the  
-new API that got introduced with bluez-utils-3.29. There you can  
-register records on a per adapter basis.
+>> It seems that once a friendly name has been cached to /var/lib/ 
+>> bluetooth/*/names, RemoteNameUpdated signals contain this cached  
+>> name forever, and user is never informed of a name change unless  
+>> those "names" files are deleted.
+> 
+> the names are never updated once retrieved. At least not via an  
+> inquiry run. If you connect to a remote device, it will update the  
+> name. Another option is Extended Inquiry support if you have the  
+> hardware for it.
+> 
+> The reason behind this is that the remote name operation is too  
+> expensive if you don't have an ACL link between two devices. And a lot  
+> of times the name doesn't change so often or it is unimportant anyway.
 
-> I note the the command line equivalent "sdptool add ..." also has no
-> way to specify radios.
+It makes a lot of sense, at least for the python example I submitted, 
+which was only performing calls to "DiscoverDevices".
 
-It actually has the -i hciX switch.
+But I've encountered another situation, where bluez' caching behaviour 
+produces some nonsense. I have no simple test application to provide, 
+but it is quite simple to explain and understand.
 
-Regards
+I've an application which performs a continuous inquiry (eg when it gets 
+DiscoveryCompleted, it calls DiscoverDevices() and so on). In the 
+meantime, this application does also perform sdp extraction and rfcomm 
+connections to the detected devices. Here is a record of all 
+RemoteNameUpdated signals from a particular device:
 
-Marcel
+I delete /var/lib/bluetooth/*/names, set my device's name to "Name 1", 
+and start my application
 
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+
+So far so good. At this point I set my device's name to "Name2": I start 
+to get mixed values (I understand that "Name1" are sent out from the 
+discovery, and thus use the cached value as you explainded above, and 
+"Name2" are from the other operations, which are actually getting the 
+current name, because they do connect to the device)
+
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name1
+
+At this point I delete /var/lib/bluetooth/*/names. As cache is recreated 
+with the current value (Name2) everything looks good again
+
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+
+At this point, I change my device's name to "Name3". Things get mixed up 
+again.
+
+RemoteNameUpdated signal received: 006057BB4D92 - Name3
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name3
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name3
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+RemoteNameUpdated signal received: 006057BB4D92 - Name3
+RemoteNameUpdated signal received: 006057BB4D92 - Name2
+
+So, shouldn't the cached value get updated when bluez gets a different 
+name later on?
+
+Best Regards,
+Pierre-Yves
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
