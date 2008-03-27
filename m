@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <70BC25E2-2162-4792-938B-4FE91F0A6032@holtmann.org>
+Message-Id: <8AE6C0B8-481C-4388-B089-B78050E7E6E2@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <47EB7AC4.30700@access-company.com>
+In-Reply-To: <47EB9D01.6090400@idlum.be>
 Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Thu, 27 Mar 2008 16:09:12 +0100
-References: <47EA7502.0@access-company.com>
-	<D1F8014E-5892-4B2A-9219-99670FC1EA60@holtmann.org>
-	<47EB7AC4.30700@access-company.com>
-Subject: Re: [Bluez-devel] HID certification using PTS
+Date: Thu, 27 Mar 2008 16:06:15 +0100
+References: <47EA8056.8090500@idlum.be>
+	<39C940F5-0157-43EB-9841-D5B7D35CCBF9@holtmann.org>
+	<47EB9D01.6090400@idlum.be>
+Subject: Re: [Bluez-devel] Cached friendly names never updated when changed
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,48 +22,117 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frederic,
+Hi Pierre-Yves,
 
->>> - currently, when performing a CreateDevice, input service connects
->>> then
->>> disconnects from remote device. This makes some tests failed.
->>> What do you think if this does not disconnect (and create classic
->>> device
->>> connection) ?
+>>> It seems that once a friendly name has been cached to /var/lib/
+>>> bluetooth/*/names, RemoteNameUpdated signals contain this cached
+>>> name forever, and user is never informed of a name change unless
+>>> those "names" files are deleted.
 >>
->> does using CreateSecureDevice helps? Can you verify with bluez-
->> utils-3.29 and see if it is still a problem?
->
-> I tried with CreateSecureDevice and latest 3.29 version but PTS  
-> tests failed.
-> I think this is related to the disconnection in Create*Device process.
-> What do you think if disconnection is removed from this process ? Or  
-> add a new API, something like CreateAndConnectSecureDevice ?
-
-can you please check the service records of the PTS. Does it set the  
-reconnect value to TRUE. Please check hcidump and see if CreateDevice  
-actually connects the control and interrupt PSM.
-
-Does it help if you call CreateDevice() and then Connect() to pass the  
-test.
-
->>> - when kernel (2.6.22) receives a VIRTUAL_CABLE_UNPLUG from PTS  
->>> (tests
->>> TC_HOS_HCR_BV_02_I and TC_HOS_HCR_BV_04_I) it does not close the  
->>> L2CAP
->>> channels as PTS waits for.
->>> I take a look in 2.6.22 sources, and it seems to me this  
->>> disconnection
->>> should happen, am I right ?
->>> Is it fixed in later kernel ?
+>> the names are never updated once retrieved. At least not via an
+>> inquiry run. If you connect to a remote device, it will update the
+>> name. Another option is Extended Inquiry support if you have the
+>> hardware for it.
 >>
->> I recall that there was a fix for this.
+>> The reason behind this is that the remote name operation is too
+>> expensive if you don't have an ACL link between two devices. And a  
+>> lot
+>> of times the name doesn't change so often or it is unimportant  
+>> anyway.
 >
-> Do you remember if this has been integrated in kernel ?
-> I take a look to latest kernel (2.6.24) and do not see any change  
-> that seems to be related to this problem.
+> It makes a lot of sense, at least for the python example I submitted,
+> which was only performing calls to "DiscoverDevices".
+>
+> But I've encountered another situation, where bluez' caching behaviour
+> produces some nonsense. I have no simple test application to provide,
+> but it is quite simple to explain and understand.
+>
+> I've an application which performs a continuous inquiry (eg when it  
+> gets
+> DiscoveryCompleted, it calls DiscoverDevices() and so on). In the
+> meantime, this application does also perform sdp extraction and rfcomm
+> connections to the detected devices. Here is a record of all
+> RemoteNameUpdated signals from a particular device:
+>
+> I delete /var/lib/bluetooth/*/names, set my device's name to "Name 1",
+> and start my application
+>
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+>
+> So far so good. At this point I set my device's name to "Name2": I  
+> start
+> to get mixed values (I understand that "Name1" are sent out from the
+> discovery, and thus use the cached value as you explainded above, and
+> "Name2" are from the other operations, which are actually getting the
+> current name, because they do connect to the device)
+>
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name1
+>
+> At this point I delete /var/lib/bluetooth/*/names. As cache is  
+> recreated
+> with the current value (Name2) everything looks good again
+>
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+>
+> At this point, I change my device's name to "Name3". Things get  
+> mixed up
+> again.
+>
+> RemoteNameUpdated signal received: 006057BB4D92 - Name3
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name3
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name3
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+> RemoteNameUpdated signal received: 006057BB4D92 - Name3
+> RemoteNameUpdated signal received: 006057BB4D92 - Name2
+>
+> So, shouldn't the cached value get updated when bluez gets a different
+> name later on?
 
-Please include the hcidump -X -V output for this case.
+this indeed looks like a bug. Seems like the new name is not written  
+to disk. Can you re-produce this with bluez-utils-3.29?
 
 Regards
 
