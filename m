@@ -1,15 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <89b6ba3a0803271229r239c74b9od9d3c28132886921@mail.gmail.com>
-Date: Thu, 27 Mar 2008 20:29:33 +0100
-From: "Patryk Zawadzki" <patrys@pld-linux.org>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <77B64B1C-EB7C-4543-898D-BDE66C48BBD7@holtmann.org>
+Message-ID: <47EBEB82.4050509@wurmsdobler.org>
+Date: Thu, 27 Mar 2008 18:46:26 +0000
+From: Peter Wurmsdobler <peter@wurmsdobler.org>
 MIME-Version: 1.0
-References: <89b6ba3a0803231540t258807bdk703d843a18a63a3e@mail.gmail.com>
-	<81E635B3-43C3-4956-B5ED-D9C4BFE8E235@holtmann.org>
-	<89b6ba3a0803260937i21870643xa2207770239d469a@mail.gmail.com>
-	<77B64B1C-EB7C-4543-898D-BDE66C48BBD7@holtmann.org>
-Subject: Re: [Bluez-users] Recent bluez-gnome problems
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <47EBC8ED.1010301@wurmsdobler.org>
+	<0FA03047-ABCC-476A-824D-BA5A2D1831FE@holtmann.org>
+In-Reply-To: <0FA03047-ABCC-476A-824D-BA5A2D1831FE@holtmann.org>
+Subject: Re: [Bluez-users] Could not find org.bluez interface
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,26 +21,46 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Wed, Mar 26, 2008 at 5:40 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
->  > yes, the options are there but there seems to be a problem with device
->  > discovery somewhere in my setup. Is running hcid enough for the device
->  > detection to work? It seems only the already paired devices show up
->  > (it worked fine at least with bluez-gnome 0.15) so I assume it only
->  > displays a memorized list of devices not doing discovery at all. How
->  > do I debug it? I'm a programmer so if you point me to the right
->  > internals I think I could fix the issues or at least provide you with
->  > more info.
->  That should have been fixed with the latest bluez-gnome version.
+Hello Marcel,
 
-As mentioned eaerlier, we are already shipping bluez-gnome 0.25 and
-bluez-{libs,utils} 3.29
+> might be, but I don't have enough information to tell you. Can you get  
+> the full error message. Or test it with a simple Python script.
+Unfortunately I cannot really provide that much information, as the 
+single error message comes from QTopia. So it is not a bluez issue, but 
+I hope to get some hints.
 
-If it works for everyone else it has to be related to our setup so
-please point me in the right direction for debugging.
+Digging into the Qtopia 4.3 code, I see that the private part of the 
+constructor of QBluetoothLocalDeviceManager contains a new 
+QDBusInterface with the parameters mentioned before. Adding some log 
+messages reveals:
 
--- 
-Patryk Zawadzki
-PLD Linux Distribution
+Bluetooth : new QDBusInterface("org.bluez", "/org/bluez", 
+"org.bluez.Manager", dbc);
+
+Bluetooth : QDBusAbstractInterfacePrivate::QDBusAbstractInterfacePrivate 
+dynamic
+
+Bluetooth : QDBusAbstractInterfacePrivate::QDBusAbstractInterfacePrivate 
+service =  "org.bluez"
+
+Bluetooth : QDBusConnectionPrivate::getNameOwner:  service = "org.bluez"
+
+Bluetooth : QDBusConnectionPrivate::getNameOwner:  message = 
+QDBusMessage(type=MethodCall, service="org.freedesktop.DBus", 
+path="/org/freedesktop/DBus", interface="org.freedesktop.DBus", 
+member="GetNameOwner", signature="", contents=(QString("org.bluez")) )
+
+Bluetooth : QDBusAbstractInterfacePrivate::QDBusAbstractInterfacePrivate 
+currentOwner isEmpty, error = 
+"org.freedesktop.DBus.Error.NameHasNoOwner"
+Could not find org.bluez interface
+
+Maybe you have an idea what is going wrong, and I will continue to dig 
+deeper.
+
+Regards,
+peter
+
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
