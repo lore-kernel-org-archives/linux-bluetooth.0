@@ -1,13 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47EB9D01.6090400@idlum.be>
-Date: Thu, 27 Mar 2008 14:11:29 +0100
-From: Pierre-Yves Paulus <py@idlum.be>
+Message-ID: <003901c8900a$a282e860$6701a8c0@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Date: Thu, 27 Mar 2008 08:01:11 -0500
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <47EA8056.8090500@idlum.be>
-	<39C940F5-0157-43EB-9841-D5B7D35CCBF9@holtmann.org>
-In-Reply-To: <39C940F5-0157-43EB-9841-D5B7D35CCBF9@holtmann.org>
-Subject: Re: [Bluez-devel] Cached friendly names never updated when changed
+Subject: [Bluez-devel] TODO: --enable/--disable options in bluez-utils
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,124 +14,116 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0922283857=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+This is a multi-part message in MIME format.
 
-Thanks for your fast answer.
+--===============0922283857==
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0036_01C88FE0.B8BE88C0"
 
->> It seems that once a friendly name has been cached to /var/lib/ 
->> bluetooth/*/names, RemoteNameUpdated signals contain this cached  
->> name forever, and user is never informed of a name change unless  
->> those "names" files are deleted.
-> 
-> the names are never updated once retrieved. At least not via an  
-> inquiry run. If you connect to a remote device, it will update the  
-> name. Another option is Extended Inquiry support if you have the  
-> hardware for it.
-> 
-> The reason behind this is that the remote name operation is too  
-> expensive if you don't have an ACL link between two devices. And a lot  
-> of times the name doesn't change so often or it is unimportant anyway.
+This is a multi-part message in MIME format.
 
-It makes a lot of sense, at least for the python example I submitted, 
-which was only performing calls to "DiscoverDevices".
+------=_NextPart_000_0036_01C88FE0.B8BE88C0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-But I've encountered another situation, where bluez' caching behaviour 
-produces some nonsense. I have no simple test application to provide, 
-but it is quite simple to explain and understand.
+Subsequent to yesterday's post, I found all of the configure options to =
+enable/disable various options.
 
-I've an application which performs a continuous inquiry (eg when it gets 
-DiscoveryCompleted, it calls DiscoverDevices() and so on). In the 
-meantime, this application does also perform sdp extraction and rfcomm 
-connections to the detected devices. Here is a record of all 
-RemoteNameUpdated signals from a particular device:
+In my application, I have no real need (at this point, at least) for =
+audio streaming, and I might like to diable -gstreamer, -alsa, and =
+similar options.  Probably would also disable -serial and certain other =
+profiles.
 
-I delete /var/lib/bluetooth/*/names, set my device's name to "Name 1", 
-and start my application
+And there are other things, like --enable-usb, which if I disable it =
+might turn off my USB-connected Bluetooth dongle.
 
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
+However, at this point I am using --enable-all, since there is no real =
+documentation of the dependencies.  Any chance these might be =
+documented: with 27 options, that's about 268 million permutations, =
+which would take a while to figure out...
 
-So far so good. At this point I set my device's name to "Name2": I start 
-to get mixed values (I understand that "Name1" are sent out from the 
-discovery, and thus use the cached value as you explainded above, and 
-"Name2" are from the other operations, which are actually getting the 
-current name, because they do connect to the device)
+Something for the TODO list?
 
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name1
+David Stockwell
 
-At this point I delete /var/lib/bluetooth/*/names. As cache is recreated 
-with the current value (Name2) everything looks good again
 
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
+------=_NextPart_000_0036_01C88FE0.B8BE88C0
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-At this point, I change my device's name to "Name3". Things get mixed up 
-again.
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.6000.16608" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV>
+<DIV><FONT face=3DArial size=3D2>Subsequent to yesterday's post, =
+</FONT><FONT=20
+face=3DArial size=3D2>I found all of the configure options to =
+enable/disable various=20
+options.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>In my application, I have no real need =
+(at this=20
+point, at least) for audio streaming, and I might like to diable =
+-gstreamer,=20
+-alsa, and similar options.&nbsp; Probably would also disable -serial =
+and=20
+certain other profiles.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>And there are other things, like =
+--enable-usb,=20
+which if I disable it might turn off my USB-connected Bluetooth=20
+dongle.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>However, at this point I am using =
+--enable-all,=20
+since there is no real documentation of the dependencies.&nbsp; Any =
+chance these=20
+might be documented: with 27 options, that's about 268 million =
+permutations,=20
+which would take a while to figure out...</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Something for the TODO =
+list?</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>David Stockwell</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV></DIV></BODY></HTML>
 
-RemoteNameUpdated signal received: 006057BB4D92 - Name3
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name3
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name3
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
-RemoteNameUpdated signal received: 006057BB4D92 - Name3
-RemoteNameUpdated signal received: 006057BB4D92 - Name2
+------=_NextPart_000_0036_01C88FE0.B8BE88C0--
 
-So, shouldn't the cached value get updated when bluez gets a different 
-name later on?
 
-Best Regards,
-Pierre-Yves
+
+--===============0922283857==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+--===============0922283857==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0922283857==--
