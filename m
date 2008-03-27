@@ -1,17 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <A0B79457-4255-49EB-BDA5-A3D2B903B75C@holtmann.org>
+Message-Id: <83810412-22B0-461B-9307-48269B59E8FA@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <d89ddf300803262043qba89bb8r1a24ce91b04b5e45@mail.gmail.com>
+In-Reply-To: <BAY118-DAV9D9EC1C84DCF7A987834CC7FE0@phx.gbl>
 Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Thu, 27 Mar 2008 16:10:32 +0100
-References: <8f5c4ad0803250501x51e5cac8m7c21a6e41460c644@mail.gmail.com>
-	<d89ddf300803250516j6cf27fdbjf0740759b823435a@mail.gmail.com>
-	<8f5c4ad0803250600q4b36a962w27e57fc3210ebd09@mail.gmail.com>
-	<d89ddf300803250739ga372a9fy6d1aa4eff033be0e@mail.gmail.com>
-	<6F34AFC6-0E93-4CDD-BDFB-376BD964FCFB@holtmann.org>
-	<d89ddf300803262043qba89bb8r1a24ce91b04b5e45@mail.gmail.com>
-Subject: Re: [Bluez-users] ACL connection handle
+Date: Thu, 27 Mar 2008 15:58:35 +0100
+References: <BAY118-DAV9D9EC1C84DCF7A987834CC7FE0@phx.gbl>
+Subject: Re: [Bluez-users] sdptool add service
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -25,23 +20,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Brad,
+Hi Chane,
 
->> shouldn't be a big problem, but in general this belongs into the
->> kernel since userspace is not dealing with ACL and SCO/eSCO  
->> connection
->> handling.
+> Do I need to add service manually using sdptool add? I got different
+> results using pand and rfcomm listen as servers.
 >
-> I'll agree it would be cleaner in kernel. If it's to be handled in the
-> kernel then I think we need some way like an ioctl so the userspace
-> app can tell the kernel, before opening the sco connection, whether it
-> should happen on pcm or hci. It would be handy to have a way for the
-> app to ask the kernel where sco is going, in case the preferred
-> transport wasn't available.
+> 1. >pand -s -M --role=NAP
+> After run the command above, no need to run "sdptool add NAP". The
+> service is already registered to sdpd.
 
-we would need to push the actual code into the drivers since the core  
-has to stay vendor free. For selecting the routing we could use a  
-socket option.
+the pand will register service records for you. Why are you not using  
+the network service?
+
+> 2.>rfcomm listen 1 1
+> Need to run sdptool add SP to register SPP service to sdpd.
+
+Yes, you need to register your own service record. However using the  
+serial service might be a better idea here.
 
 Regards
 
