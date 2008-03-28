@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <7c3475fe0803291753v54b5cab7y46ae7fa3a5a4fa81@mail.gmail.com>
-Date: Sun, 30 Mar 2008 01:53:51 +0100
-From: "Phillip Berndt" <phillip.berndt@googlemail.com>
+Date: Fri, 28 Mar 2008 13:33:11 +0100
+From: Gaele Strootman <gaele@guruburu.com>
+In-reply-to: <47E65680.1010102@guruburu.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <7c3475fe0803291751q5e831d44ra758cc42969cc65f@mail.gmail.com>
-MIME-Version: 1.0
-References: <7c3475fe0803291751q5e831d44ra758cc42969cc65f@mail.gmail.com>
-Subject: [Bluez-users] Making the PC behave like a headset
+Message-id: <47ECE587.8070809@guruburu.com>
+MIME-version: 1.0
+References: <47E65680.1010102@guruburu.com>
+Subject: Re: [Bluez-users] "Can't get device information: Too many links"
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,40 +20,61 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+So far I haven't received any answer. Is this mailing list the right
+platform to ask a question like the one below? I'm looking for an
+explanation of Bluez error messages.
 
-I'm trying to make my PC behave like a bluetooth headset. I already read
-through the HSP specification and some code implementing its headset
-part.  (namely a bluetooth plugin for Asterisk and the
-"ProjectBluezHandfree" [1]).
 
-Here's what I did, in order:
- * Create a RFComm listener socket for the control connection
- * Register at local SDP server (according to the specs: L2CAP, RFCOMM,
-  generic audio and headset profile, headset service class)
- * Create a SCO listener socket for the audio connection
-  (SOCK_SEQPACKET & BTPROTO_SCO - bind, listen & accept like with other
-  sockets)
- * A RFComm handler responds to incoming RINGs.
+Gaele Strootman wrote:
+> Hi,
+>
+> I have a problem connecting both an Apple wireless keyboard and mouse to
+> an USB Bluetooth adapter on Ubuntu Gutsy (AMD64). I can connect either
+> the mouse or keyboard, but not both. The error message I get is "Can't
+> get device information: Too many links".
+>
+> Unfortunately I didn't find any explanation on Bluez error messages.
+> What's going on?
+>
+> $ lsusb
+> Bus 001 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
+> Dongle (HCI mode)
+>
+> $ hciconfig -a
+> hci0:   Type: USB
+>         BD Address: 00:15:83:YY:YY:YY ACL MTU: 310:10 SCO MTU: 64:8
+>         UP RUNNING PSCAN
+>         RX bytes:59304 acl:2646 sco:0 events:568 errors:0
+>         TX bytes:4847 acl:189 sco:0 commands:173 errors:0
+>         Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF PARK
+>         Link mode: SLAVE ACCEPT
+>         Name: 'slimpy-0'
+>         Class: 0x080104
+>         Service Classes: Capturing
+>         Device Class: Computer, Desktop workstation
+>         HCI Ver: 2.0 (0x3) HCI Rev: 0xc5c LMP Ver: 2.0 (0x3) LMP Subver:
+> 0xc5c
+>         Manufacturer: Cambridge Silicon Radio (10)
+>
+> $ hcitool scan
+> Scanning ...
+>         00:1E:52:XX:XX:XX       My Mouse
+>
+> $ sudo hidd --connect 00:1E:52:XX:XX:XX
+> Can't get device information: Too many links
+>
+> I used instructions from a guy with the same setup, except for the USB
+> adapter which is a D-Link DBT-120:
+> http://travismetcalf.com/blog/2008/02/02/sharing-an-apple-keyboard-and-mouse-between-leopard-and-ubuntu/
+>
+> Any help appreciated.
+>
+> Gaele
+>
+>   
 
-I also changed my dongle's (CSR chipset) service class to audio and told
-my mobile to use the "headset".
-
-The RFcomm part seems to work: The mobile connects to the PC on incoming
-calls. The PC responds. The mobile accepts the call.
-
-As far as I understand the specification, the mobile should establish a
-SCO link to my PC at that point.  This, however, does not happen.
-
-What do I do wrong?
-
-Thanks in advance,
-Phillip Berndt
-
-Ps. I do not subscribe the ML, please cc to my address
-
-[1]
-http://wall4.soft.uni-linz.ac.at/_wiki/tiki-index.php?page=ProjectBluezHandsfree
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
