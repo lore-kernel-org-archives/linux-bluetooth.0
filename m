@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47EDAEED.4000302@aircable.net>
-Date: Fri, 28 Mar 2008 23:52:29 -0300
-From: Manuel Naranjo <manuel@aircable.net>
-MIME-Version: 1.0
+Message-Id: <FC207646-9302-4A18-85DF-E054BE10A81D@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] CreateProxy usage?
+In-Reply-To: <019401c8912b$e1876ff0$6701a8c0@freqonedev>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Sat, 29 Mar 2008 02:03:52 +0100
+References: <019401c8912b$e1876ff0$6701a8c0@freqonedev>
+Subject: Re: [Bluez-devel] Experimental Mode: org.bluez.Adapter
+	Methods/Signals
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,23 +21,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello guys,
+Hi David,
 
-I've spent the last 6 hours hitting my head against the wall to get
-proxy to work.
+> In the adapter.c code (bluez-utils-3.29), there are a number of 4.x  
+> methods and signals, which are enabled when hcid is run in  
+> experimental mode (-x in startup).
+>
+> There are a whole lot of others that are labeled as "deprecated",  
+> but which are currently available when hcid is in experimental mode,  
+> as well as when it is not.  Are these in fact going to be dropped  
+> when 4.x is released?
 
-I've been able to create a port, and register it, by calling CreateProxy
-and then proxy.Enable() but it seems that there's no way to tell when
-you get a new connection, or I'm wrong?
+yes, with 4.0 all old ones will be dropped.
 
-What I want to do is rather simple, make a simple spp server in python,
-so I started using the serial service. I know I can go the old rfcomm
-socket way, but would like to avoid it.
+> On a similar topic:
+>
+> When the 4.x methods are registered, they register on bus  
+> "org.bluez", with interface "org.bluez.Adapter", but unlike 3.x, the  
+> path they use is not "/org/bluez/hci0" but just "/hci0" (for the  
+> default case).  Is this intentional and the future direction of  
+> bluez-dbus?
 
-BTW shouldn't CreateProxy accept 'ssp' along with 128 UUID?
+Yes. However use DefaultAdapter() or FindAdapter() to get the path.  
+Hardcoded paths will fail in the future.
 
-Thanks,
-Manuel
+> I ask because when I tried calling DiscoverDevices, it would fail  
+> when I called with path "/org/bluez/hci0", but would run when I  
+> called it with path "/hci0".  But, the funny thing is that because  
+> the RemoteDeviceFound signal is registered to both the old path and  
+> the new path, the signals come back on "/org/bluez/hci0".
+
+That is a bug in the 3.29 release and is already fixed in CVS.
+
+> Interestingly enough, when I register callbacks for  
+> DiscoveryStarted, RemoteDeviceFound, and DiscoveryCompleted against  
+> proxies that reference both the old and new path, I find that  
+> signals for DiscoveryStarted and DiscoveryCompleted come back  
+> against both paths, but the actual RemoteDeviceFound (and  
+> RemoteNameUpdated) comes back only against the 3.x path.
+
+The RemoteDeviceFound will be a DeviceFound within 4.x and it will be  
+a dictionary that can include the name if available.
+
+Regards
+
+Marcel
 
 
 -------------------------------------------------------------------------
