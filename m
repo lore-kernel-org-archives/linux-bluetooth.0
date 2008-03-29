@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <066CB63F-17CC-4CBC-9630-E2E83FAEFAFD@gmail.com>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1e30dc0a0803290118s1f1d6a2ek7293f899cf1b2367@mail.gmail.com>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Sat, 29 Mar 2008 12:14:29 +0200
-References: <1e30dc0a0803290118s1f1d6a2ek7293f899cf1b2367@mail.gmail.com>
-Subject: Re: [Bluez-devel] About the Audio AVRCP
+Message-ID: <1e30dc0a0803290118s1f1d6a2ek7293f899cf1b2367@mail.gmail.com>
+Date: Sat, 29 Mar 2008 16:18:25 +0800
+From: "=?GB2312?B?zfS3vQ==?=" <fwen8810@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] About the Audio AVRCP
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,31 +14,57 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============0177835505=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGksCgpPbiBNYXIgMjksIDIwMDgsIGF0IDEwOjE4LCDmsarmlrkgd3JvdGU6Cj4KPiAgICAgICAg
-ICBJIGFtIHNlYXJjaGluZyB0aGUgQVBJcyBhYm91dCBBdWRpbyBBVlJDUC4gSSBoYXZlIHJlYWQg
-dGhlICAKPiB3aWtpICxJIGNhbid0IGZpbmQgYW55IGRldGFpbCBkb2N1bWVudCBhYm91dCB0aGUg
-QVBJcyBmb3IgQXVkaW8gIAo+IEFWUkNQLiBJcyB0aGVyZSBhbnlvbmUgd2hvIGhhcyBzb21lIGRv
-Y3VlbW50cyBhYm91dCB0aGUgQVZSQ1AgQVBJPwoKVGhlIGN1cnJlbnQgQVBJIGlzIHJlYWxseSBx
-dWl0ZSBzaW1wbGUuIFlvdSd2ZSBnb3QgdGhlICAKQ29udHJvbC5Db25uZWN0KCkgYW5kIENvbnRy
-b2wuRGlzY29ubmVjdCgpIEQtQnVzIG1ldGhvZHMsIHdoaWNoIHlvdSAgCmRvbid0IG5lY2Vzc2Fy
-ZWx5IGV2ZW4gbmVlZCB0byB1c2Ugc2luY2UgQVZSQ1Agd2lsbCBiZSBhdXRvbWF0aWNhbGx5ICAK
-Y29ubmVjdGVkIGlmIGF2YWlsYWJsZSB3aGVuIHlvdSBjb25uZWN0IEEyRFAuIEFsc28sIG9ubHkg
-dGhlIFRHIHJvbGUgIAppcyBhdmFpbGFibGUgYW5kIHRoZSByZWNlaXZlZCBrZXkgcHJlc3MgZXZl
-bnRzIGFyZSBmb3J3YXJkZWQgdGhyb3VnaCAgCnVpbnB1dCB0byB0aGUga2VybmVsIChmcm9tIHdo
-ZXJlIGUuZy4geW91ciBYIHNlcnZlciBzaG91bGQgcGljayB0aGVtICAKdXAgYXV0b21hdGljYWxs
-eSkuIFRoZSBuZXh0IHN0ZXBzIGFyZSB0byBpbXBsZW1lbnQgbW9yZSBrZXkgY29kZSAgCm1hcHBp
-bmdzLCBhZGQgbWV0YWRhdGEgdHJhbnNmZXIgc3VwcG9ydCBhcyB3ZWxsIGFzIGFkZCBzb21lIENU
-ICAKZnVuY3Rpb25hbGl0eSAoZS5nLiBhYmlsaXR5IHRvIHNlbmQgdm9sdW1lIHVwL2Rvd24gY29t
-bWFuZHMgdG8gdGhlICAKaGVhZHNldCkuCgpKb2hhbgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCkNoZWNrIG91
-dCB0aGUgbmV3IFNvdXJjZUZvcmdlLm5ldCBNYXJrZXRwbGFjZS4KSXQncyB0aGUgYmVzdCBwbGFj
-ZSB0byBidXkgb3Igc2VsbCBzZXJ2aWNlcyBmb3IKanVzdCBhYm91dCBhbnl0aGluZyBPcGVuIFNv
-dXJjZS4KaHR0cDovL2FkLmRvdWJsZWNsaWNrLm5ldC9jbGs7MTY0MjE2MjM5OzEzNTAzMDM4O3c/
-aHR0cDovL3NmLm5ldC9tYXJrZXRwbGFjZQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlz
-dHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xp
-c3RpbmZvL2JsdWV6LWRldmVsCg==
+--===============0177835505==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_14558_12699245.1206778705848"
+
+------=_Part_14558_12699245.1206778705848
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hello
+         I am searching the APIs about Audio AVRCP. I have read the wiki ,I
+can't find any detail document about the APIs for Audio AVRCP. Is there
+anyone who has some docuemnts about the AVRCP API?
+        Thanks!
+
+------=_Part_14558_12699245.1206778705848
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<div>Hello</div>
+<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I am searching the APIs about Audio&nbsp;AVRCP. I have read the wiki ,I can&#39;t find any detail document about the APIs for Audio&nbsp;AVRCP. Is there anyone who&nbsp;has some docuemnts about the AVRCP API?</div>
+<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Thanks!</div>
+
+------=_Part_14558_12699245.1206778705848--
+
+
+--===============0177835505==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+Check out the new SourceForge.net Marketplace.
+It's the best place to buy or sell services for
+just about anything Open Source.
+http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+--===============0177835505==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0177835505==--
