@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <6238307d0803310509n15d73cb1wee14c9470e443d72@mail.gmail.com>
-Date: Mon, 31 Mar 2008 14:09:15 +0200
-From: "=?ISO-8859-1?Q?Kai_R=F6mer?=" <smirfi@googlemail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <6238307d0803310503t724dedcfo9e9e587e87d41b8d@mail.gmail.com>
-MIME-Version: 1.0
-References: <6238307d0803310503t724dedcfo9e9e587e87d41b8d@mail.gmail.com>
-Subject: [Bluez-users] Fwd: Socket CF Bluetooth Adapter with mpc5200
+From: Thomas Hartwig <t.hartwig.news@itth.com>
+Date: Mon, 31 Mar 2008 01:08:03 +0200
+Message-ID: <fsp6gj$8qt$1@ger.gmane.org>
+Mime-Version: 1.0
+Subject: [Bluez-users] bluetooth as generic audio device for kde and gnome
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,14 +18,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello!
+Do you have any experiences how to integrate a connected headset into
+KDE 3 (Fedora 8) and Gnome? This should apply for mixers and other sound
+players.
+In the Control-Center of KDE I can override the default audio device to
+"bluetooth" which is working fine for all KDE players. I can not do this
+in Gnome or have not found a place to do this. Also switching between
+the output devices is not as easy.
+Is there an other possible way, to do this add a lower level at ALSA? So
+the device is chosen automatically whenever the headset is connected or not?
 
- I want to use the CF-Bluetooth adapter from Socket in my TQM5200 board
- with integrated CF slot. How can i activate the card in Kernel?
+Thanks for some hints or a link
+Thomas
 
- Can i use this card with a standard usb card reader?
-
- greetings Kai
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
