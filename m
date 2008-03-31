@@ -1,13 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47F0E819.6000503@aircable.net>
-Date: Mon, 31 Mar 2008 10:33:13 -0300
-From: Manuel Naranjo <manuel@aircable.net>
+Message-ID: <BAY107-W467598E882F42FE079C35D8FA0@phx.gbl>
+From: Adolfo Bulfoni <iaquintovski@hotmail.com>
+To: "bluez-devel@lists.sourceforge.net" <bluez-devel@lists.sourceforge.net>
+Date: Mon, 31 Mar 2008 12:22:33 +0200
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <47EDAEED.4000302@aircable.net>	<52DF986C-FC13-4F04-81F7-6A269B0EB0D1@holtmann.org>	<47F05CEF.8040300@aircable.net>
-	<200803311404.06902.denis.kenzior@trolltech.com>
-In-Reply-To: <200803311404.06902.denis.kenzior@trolltech.com>
-Subject: Re: [Bluez-devel] CreateProxy usage?
+Subject: [Bluez-devel] restart periodic inquiry
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,15 +19,17 @@ Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
-> >From our experience using RFCOMM ttys is not a good idea.  The bluetooth 
-> rfcomm tty driver in the kernel is too unreliable in certain situations.  We 
-> actually have to patch our device kernels in order to get it working somewhat 
-> correctly.  
->   
-I know that RFcomm tty is a bit buggy, I've been investigating on ways
-to implement a user-space tty device, but I can't find anything that can
-apply to a 2.6 kernel. There's a hole framework but for the 2.4 branch.
 
+Hi all,
+
+I'm currently working with DBUS and GLIB. I have made a function that calls StartPeriodicDiscovery(). Everything works fine but, at certain point, I want to stop and restart it and here problems arise: when I call StopPeriodicDiscovery() my program exits and I can't call again StartPeriodicDiscovery. My program exits just after the StopPeriodicInquiry() is performed, and I dont call the g_main_loop_quit(loop) function. Is it a normal behaviour?
+For me it is necessary to restart the inquiry procedure in some cases. Is there a way to restart the periodic discovery or should I move to the normal inquiry procedure? With the standard inquiry procedure I could call CancelInquiry and then I could start the inquiry procedure again.
+Thanks all!
+
+Adolfo
+_________________________________________________________________
+Cerchi una palestra vicino a casa? La trovi con Live Search Maps
+ http://maps.live.it
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
