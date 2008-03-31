@@ -1,43 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ Hackers <bluez-devel@lists.sourceforge.net>
-Date: Sat, 01 Mar 2008 14:16:56 +0000
-Message-Id: <1204381016.18674.36.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Subject: [Bluez-devel] ObexFTP on Nokia 3650?
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Message-Id: <C5EBD7EB-6863-4B52-A4E2-15B772609FCA@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <6238307d0803310509n15d73cb1wee14c9470e443d72@mail.gmail.com>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Mon, 31 Mar 2008 18:51:58 +0200
+References: <6238307d0803310503t724dedcfo9e9e587e87d41b8d@mail.gmail.com>
+	<6238307d0803310509n15d73cb1wee14c9470e443d72@mail.gmail.com>
+Subject: Re: [Bluez-users] Fwd: Socket CF Bluetooth Adapter with mpc5200
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Heya,
+Hi Kai,
 
-Trying to find out why this Nokia 3650 gives out _very_ broken and empty
-folder listing when using ObexFTP:
+> I want to use the CF-Bluetooth adapter from Socket in my TQM5200 board
+> with integrated CF slot. How can i activate the card in Kernel?
 
-<?xml version="1.0"?>    <!DOCTYPE folder-listing
-SYSTEM"obex-folder-listing.dtd">    <folder-listing
-version="1.0"></folder-listing>
+depends on the version of the card. Some use the dtl1_cs driver.  
+Others need to use hciattach to announce the serial port to the kernel.
 
-I've seen some mention of it on mailing-lists, but no final word:
-http://lists.apple.com/archives/Bluetooth-dev/2003/Jul/msg00008.html
+> Can i use this card with a standard usb card reader?
 
-Any ideas?
+No.
+
+Regards
+
+Marcel
 
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+Check out the new SourceForge.net Marketplace.
+It's the best place to buy or sell services for
+just about anything Open Source.
+http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
