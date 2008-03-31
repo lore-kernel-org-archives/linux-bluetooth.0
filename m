@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <9ABEE439-610E-470F-AC7E-C2A611337022@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <47F0620F.8020606@aircable.net>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Mon, 31 Mar 2008 06:09:35 +0200
-References: <47EDAEED.4000302@aircable.net>	<B8CF2082-9389-42C2-9518-CFA5F4F2E5A9@holtmann.org>	<47F059B9.5030003@aircable.net>	<52DF986C-FC13-4F04-81F7-6A269B0EB0D1@holtmann.org>	<47F05CEF.8040300@aircable.net>
-	<CA77AEF1-2E8A-4EDB-A806-563338C34565@holtmann.org>
-	<47F0620F.8020606@aircable.net>
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
+To: bluez-devel@lists.sourceforge.net
+Date: Mon, 31 Mar 2008 14:04:06 +1000
+References: <47EDAEED.4000302@aircable.net>
+	<52DF986C-FC13-4F04-81F7-6A269B0EB0D1@holtmann.org>
+	<47F05CEF.8040300@aircable.net>
+In-Reply-To: <47F05CEF.8040300@aircable.net>
+MIME-Version: 1.0
+Message-Id: <200803311404.06902.denis.kenzior@trolltech.com>
 Subject: Re: [Bluez-devel] CreateProxy usage?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,28 +22,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Manuel,
+Manuel,
 
->> how do you wanna transfer the data? D-Bus is not for data transfer
-> Via a dev file the same way the rfcomm tool does, we just create
-> /dev/rfcomm# or maybe new socket?
+> Ok if it's not there why not creating it? I can do it I think. Is there
+> any convention on how to do this? Any API proposal?
 >
-> I think the main idea is hiding the hole socket functionality, so  
-> maybe
-> creating a new socket for accessing to the established connection
-> doesn't make any sense. But maybe creating a node on runtime and then
-> telling the programmer over d-bus that the connection status makes  
-> sense.
+> I would say it should be something like:
+> methods:
+> listenRFcomm
+> closeRFcomm
 >
-> Ideas? I don't think I'm fully out of the path.
+> signals:
+> RFcommConnected
+> RfcommDisconnected
+>
+> Does it make any sense at all? I would say that maybe not, but it might
+> be a good idea to have an rfcomm wrapper. Something that creates the
+> rfcomm port, makes the connection and then just returns the rfcomm
+> device. Ideas?
 
-go and write up a proper proposal for that API and make an  
-implementation.
+>>From our experience using RFCOMM ttys is not a good idea.  The bluetooth 
+rfcomm tty driver in the kernel is too unreliable in certain situations.  We 
+actually have to patch our device kernels in order to get it working somewhat 
+correctly.  
 
-Regards
+The CreateProxy is still your best bet, or you can use bluetooth rfcomm 
+sockets and do it yourself.
 
-Marcel
-
+Regards,
+-Denis
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
