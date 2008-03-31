@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47F0EE21.8060607@aircable.net>
-Date: Mon, 31 Mar 2008 10:58:57 -0300
+Message-ID: <47F0E819.6000503@aircable.net>
+Date: Mon, 31 Mar 2008 10:33:13 -0300
 From: Manuel Naranjo <manuel@aircable.net>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <47EDAEED.4000302@aircable.net>	<B8CF2082-9389-42C2-9518-CFA5F4F2E5A9@holtmann.org>	<47F059B9.5030003@aircable.net>	<52DF986C-FC13-4F04-81F7-6A269B0EB0D1@holtmann.org>	<47F05CEF.8040300@aircable.net>	<CA77AEF1-2E8A-4EDB-A806-563338C34565@holtmann.org>	<47F0620F.8020606@aircable.net>
-	<9ABEE439-610E-470F-AC7E-C2A611337022@holtmann.org>
-In-Reply-To: <9ABEE439-610E-470F-AC7E-C2A611337022@holtmann.org>
+References: <47EDAEED.4000302@aircable.net>	<52DF986C-FC13-4F04-81F7-6A269B0EB0D1@holtmann.org>	<47F05CEF.8040300@aircable.net>
+	<200803311404.06902.denis.kenzior@trolltech.com>
+In-Reply-To: <200803311404.06902.denis.kenzior@trolltech.com>
 Subject: Re: [Bluez-devel] CreateProxy usage?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,19 +21,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
-> go and write up a proper proposal for that API and make an  
-> implementation.
+
+> >From our experience using RFCOMM ttys is not a good idea.  The bluetooth 
+> rfcomm tty driver in the kernel is too unreliable in certain situations.  We 
+> actually have to patch our device kernels in order to get it working somewhat 
+> correctly.  
 >   
-Ok I had investigated, and you're right, it doesn't make any sense to
-make a DBUS api. We will need a socket anyway, so it's easier using the
-socket interface.
-
-I will write some simple samples and put them on the wiki so others can
-use them.
-
-Thanks,
-Manuel
+I know that RFcomm tty is a bit buggy, I've been investigating on ways
+to implement a user-space tty device, but I can't find anything that can
+apply to a 2.6 kernel. There's a hole framework but for the 2.4 branch.
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
