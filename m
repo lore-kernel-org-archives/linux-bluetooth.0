@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47F05CEF.8040300@aircable.net>
-Date: Mon, 31 Mar 2008 00:39:27 -0300
-From: Manuel Naranjo <manuel@aircable.net>
-MIME-Version: 1.0
+Message-Id: <52DF986C-FC13-4F04-81F7-6A269B0EB0D1@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <47EDAEED.4000302@aircable.net>	<B8CF2082-9389-42C2-9518-CFA5F4F2E5A9@holtmann.org>	<47F059B9.5030003@aircable.net>
-	<52DF986C-FC13-4F04-81F7-6A269B0EB0D1@holtmann.org>
-In-Reply-To: <52DF986C-FC13-4F04-81F7-6A269B0EB0D1@holtmann.org>
+In-Reply-To: <47F059B9.5030003@aircable.net>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Mon, 31 Mar 2008 05:31:17 +0200
+References: <47EDAEED.4000302@aircable.net>
+	<B8CF2082-9389-42C2-9518-CFA5F4F2E5A9@holtmann.org>
+	<47F059B9.5030003@aircable.net>
 Subject: Re: [Bluez-devel] CreateProxy usage?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,34 +22,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel,
-> in the most cases this is a hardware port. It can be emulated, but  
-> that is not the usual case.
->   
-Ouu ok. Not good for me then.
+Hi Manuel,
 
-> You can't really do that over D-Bus. Use the native RFCOMM sockets  
-> from the Bluetooth library.
->   
-Ok if it's not there why not creating it? I can do it I think. Is there
-any convention on how to do this? Any API proposal?
+>> the proxy is what it is called. A proxy. So you need to have a
+>> Unix,TCP or TTY server to connect to.
+>>
+> Ok good, what would be a TTY server in this case? I can imagine a TCP
+> server, but a TTY server? Never heard of it.
 
-I would say it should be something like:
-methods:
-listenRFcomm
-closeRFcomm
+in the most cases this is a hardware port. It can be emulated, but  
+that is not the usual case.
 
-signals:
-RFcommConnected
-RfcommDisconnected
+> Maybe it wasn't CreateProxy the one I should be using. I just need to
+> create an RFcomm port, and then wait until someone connects to it,
+> should I use createPort then?
 
-Does it make any sense at all? I would say that maybe not, but it might
-be a good idea to have an rfcomm wrapper. Something that creates the
-rfcomm port, makes the connection and then just returns the rfcomm
-device. Ideas?
+You can't really do that over D-Bus. Use the native RFCOMM sockets  
+from the Bluetooth library.
 
-Thanks,
-Manuel
+Regards
+
+Marcel
+
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
