@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <C5EBD7EB-6863-4B52-A4E2-15B772609FCA@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <6238307d0803310509n15d73cb1wee14c9470e443d72@mail.gmail.com>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Mon, 31 Mar 2008 18:51:58 +0200
+Message-ID: <6238307d0803310509n15d73cb1wee14c9470e443d72@mail.gmail.com>
+Date: Mon, 31 Mar 2008 14:09:15 +0200
+From: "=?ISO-8859-1?Q?Kai_R=F6mer?=" <smirfi@googlemail.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <6238307d0803310503t724dedcfo9e9e587e87d41b8d@mail.gmail.com>
+MIME-Version: 1.0
 References: <6238307d0803310503t724dedcfo9e9e587e87d41b8d@mail.gmail.com>
-	<6238307d0803310509n15d73cb1wee14c9470e443d72@mail.gmail.com>
-Subject: Re: [Bluez-users] Fwd: Socket CF Bluetooth Adapter with mpc5200
+Subject: [Bluez-users] Fwd: Socket CF Bluetooth Adapter with mpc5200
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,22 +20,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Kai,
+Hello!
 
-> I want to use the CF-Bluetooth adapter from Socket in my TQM5200 board
-> with integrated CF slot. How can i activate the card in Kernel?
+ I want to use the CF-Bluetooth adapter from Socket in my TQM5200 board
+ with integrated CF slot. How can i activate the card in Kernel?
 
-depends on the version of the card. Some use the dtl1_cs driver.  
-Others need to use hciattach to announce the serial port to the kernel.
+ Can i use this card with a standard usb card reader?
 
-> Can i use this card with a standard usb card reader?
-
-No.
-
-Regards
-
-Marcel
-
+ greetings Kai
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
