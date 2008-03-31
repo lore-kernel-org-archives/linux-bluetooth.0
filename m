@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <C788EA15-8D46-4917-B97F-9F42F230C9FB@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <47F0EE21.8060607@aircable.net>
+Date: Mon, 31 Mar 2008 10:58:57 -0300
+From: Manuel Naranjo <manuel@aircable.net>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <BAY107-W467598E882F42FE079C35D8FA0@phx.gbl>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Mon, 31 Mar 2008 18:50:53 +0200
-References: <BAY107-W467598E882F42FE079C35D8FA0@phx.gbl>
-Subject: Re: [Bluez-devel] restart periodic inquiry
+References: <47EDAEED.4000302@aircable.net>	<B8CF2082-9389-42C2-9518-CFA5F4F2E5A9@holtmann.org>	<47F059B9.5030003@aircable.net>	<52DF986C-FC13-4F04-81F7-6A269B0EB0D1@holtmann.org>	<47F05CEF.8040300@aircable.net>	<CA77AEF1-2E8A-4EDB-A806-563338C34565@holtmann.org>	<47F0620F.8020606@aircable.net>
+	<9ABEE439-610E-470F-AC7E-C2A611337022@holtmann.org>
+In-Reply-To: <9ABEE439-610E-470F-AC7E-C2A611337022@holtmann.org>
+Subject: Re: [Bluez-devel] CreateProxy usage?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,30 +21,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Adolfo,
+Hi Marcel,
+> go and write up a proper proposal for that API and make an  
+> implementation.
+>   
+Ok I had investigated, and you're right, it doesn't make any sense to
+make a DBUS api. We will need a socket anyway, so it's easier using the
+socket interface.
 
-> I'm currently working with DBUS and GLIB. I have made a function  
-> that calls StartPeriodicDiscovery(). Everything works fine but, at  
-> certain point, I want to stop and restart it and here problems  
-> arise: when I call StopPeriodicDiscovery() my program exits and I  
-> can't call again StartPeriodicDiscovery. My program exits just after  
-> the StopPeriodicInquiry() is performed, and I dont call the  
-> g_main_loop_quit(loop) function. Is it a normal behaviour?
-> For me it is necessary to restart the inquiry procedure in some  
-> cases. Is there a way to restart the periodic discovery or should I  
-> move to the normal inquiry procedure? With the standard inquiry  
-> procedure I could call CancelInquiry and then I could start the  
-> inquiry procedure again.
+I will write some simple samples and put them on the wiki so others can
+use them.
 
-sounds like a bug to me. However if you close the D-Bus connection, it  
-will stop the periodic inquiry for you. If the application dies that  
-started it, hcid will actually stop it for you. Meaning your  
-application has to be running to start periodic inquiry.
-
-Regards
-
-Marcel
-
+Thanks,
+Manuel
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
