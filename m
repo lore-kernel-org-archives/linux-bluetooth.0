@@ -1,14 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Denis KENZIOR <denis.kenzior@trolltech.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Thu, 3 Apr 2008 09:37:08 +1000
-References: <47EDAEED.4000302@aircable.net>
-	<200803311404.06902.denis.kenzior@trolltech.com>
-	<47F3AEBC.9010407@idlum.be>
-In-Reply-To: <47F3AEBC.9010407@idlum.be>
+Message-ID: <2d5a2c100804021257r43decf07o9f70c93b11bf3a87@mail.gmail.com>
+Date: Wed, 2 Apr 2008 16:57:58 -0300
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-Message-Id: <200804030937.08794.denis.kenzior@trolltech.com>
-Subject: Re: [Bluez-devel] CreateProxy usage?
+Subject: [Bluez-devel] RequestMode implementation
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,57 +14,51 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pierre-Yves,
+Hello all,
 
-> I've observed the same thing: rfcomm ttys are not reliable. I've
-> reported several time Oopses related to them, and so far each time one
-> Oops/Warning/Bug is fixed, another one happens. Basically, I know no
-> kernel version which is robust regarding rfcomm ttys.
+For people not present in irc today, Ive been implementing the support
+of "sessions" for
+adapter.RequestMode, the code is already in cvs if someone want to take a l=
+ook.
 
-We haven't observed this in the newer kernels, but I'm sure they exist.
+The idea is that the application should no longer use, even though it
+still could,
+adapter.SetMode or in case of the new adapter.SetProperty("Mode", but use
+RequestMode that will monitor the lifetime of the application and restore t=
+he
+"global" mode when the "session" is released.
 
->
-> At the moment I'm looking for a reliable alternative to the ttys. From
-> what I understand, using an rfcomm socket instead of the ttys would be a
-> solution, as they are reputed more reliable. But going the socket's way
->   would mean abandonning the DBus API and linking against the bluetooth
-> lib, or am I mistaken? My application is currently only accessing BlueZ
-> through this DBus API, and it is indeed a great API. It would be sad to
-> have to abandon that to get reliable rfcomm functionnality.
->
-> I've no experience at all with the rfcomm sockets from the Bluetooth
-> library (so take what I say with the required amount of salt). Wouldn't
-> a solution be to allow opening sockets through the DBus serial service,
-> instead of the current rfcomm ttys-only approach? I'm talking mostly
-> about the ConnectService and ConnectServiceFromAdapter in the serial
-> manager hierarchy.
+The logic behind the RequestMode is:
+  - It can only set "connectable" or "discoverable" modes, so should
+not interfere much.
+  - Session can temporary request a higher mode than the global mode.
+  - By the time a session is active discoverable timeout is not enabled.
+  - It supports multiples applications, the higher requested mode prevail.
+  - Requested modes should be accepted by agent every time a higher mode is
+requested.
+  - All requests are appended to a list, the session will live until
+the last application releases
+it.
+  - After the last application using the session exit the mode changes
+back to global mode.
+  - SetMode/SetProperty("Mode" takes effects on either session mode
+and global mode if
+it is higher and just in global mode if it is lower. (alternatively it
+can ask the agent if the
+ application can lower the session mode).
 
-Using sockets is fairly trivial, there are plenty of examples of how to use 
-RFCOMM sockets in the bluez-utils.  Look under test/rctest.c for instance.  
-You don't need to link against libbluetooth if you don't want to (e.g. for 
-GPL license reasons), however you will have to re-invent some functionality 
-yourself (e.g. Address parsing, etc).  
+Lets check if this logic is ok and so check with some use cases if
+there are some we can't
+handle.
 
-You will need some form of socket no matter what you do (e.g. use Bluetooth 
-sockets directly, or use the Serial Proxy, which will still require unix 
-domain or tcp sockets)
+-- =
 
-As a shameless plug, Qtopia has a much simplified socket API: 
-http://doc.trolltech.com/qtopia4.3/qtopiabluetooth.html.
-
->
-> Denis, could you also expand further about the kind of patching you
-> perform on your kernels, regarding rfcomm tty's reliability?
-
-See my patch submission from a few days ago.  Basically the current bugs are 
-that tty doesn't do proper echoing and data can get lost during socket->tty 
-adaptation (so a serious problem for HFP, GPS, etc)
-
--Denis
+Luiz Augusto von Dentz
+Engenheiro de Computa=E7=E3o
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
