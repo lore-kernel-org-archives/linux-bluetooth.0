@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2d5a2c100804021257r43decf07o9f70c93b11bf3a87@mail.gmail.com>
-Date: Wed, 2 Apr 2008 16:57:58 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Message-ID: <47F3B2C3.5050000@idlum.be>
+Date: Wed, 02 Apr 2008 18:22:27 +0200
+From: Pierre-Yves Paulus <py@idlum.be>
 MIME-Version: 1.0
-Subject: [Bluez-devel] RequestMode implementation
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <47EDAEED.4000302@aircable.net>	<52DF986C-FC13-4F04-81F7-6A269B0EB0D1@holtmann.org>	<47F05CEF.8040300@aircable.net>	<200803311404.06902.denis.kenzior@trolltech.com>	<47F3AEBC.9010407@idlum.be>
+	<47F3B09F.5070709@aircable.net>
+In-Reply-To: <47F3B09F.5070709@aircable.net>
+Subject: Re: [Bluez-devel] CreateProxy usage?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,51 +17,27 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello all,
+Hi Manuel,
 
-For people not present in irc today, Ive been implementing the support
-of "sessions" for
-adapter.RequestMode, the code is already in cvs if someone want to take a l=
-ook.
+> You don't need to link against bluez AFAIK, you only link against the
+> sockets library which is included in libc. I'll try to write a wiki page
+> today, the other day I had some troubles with my electric power
+> provider, and forgot to make the wiki page.
 
-The idea is that the application should no longer use, even though it
-still could,
-adapter.SetMode or in case of the new adapter.SetProperty("Mode", but use
-RequestMode that will monitor the lifetime of the application and restore t=
-he
-"global" mode when the "session" is released.
+That would be great! A I said, I've no idea about rfcomm sockets, so 
+example code would help me get up to speed.
 
-The logic behind the RequestMode is:
-  - It can only set "connectable" or "discoverable" modes, so should
-not interfere much.
-  - Session can temporary request a higher mode than the global mode.
-  - By the time a session is active discoverable timeout is not enabled.
-  - It supports multiples applications, the higher requested mode prevail.
-  - Requested modes should be accepted by agent every time a higher mode is
-requested.
-  - All requests are appended to a list, the session will live until
-the last application releases
-it.
-  - After the last application using the session exit the mode changes
-back to global mode.
-  - SetMode/SetProperty("Mode" takes effects on either session mode
-and global mode if
-it is higher and just in global mode if it is lower. (alternatively it
-can ask the agent if the
- application can lower the session mode).
+> But I've been able to write 2 examples on as master, the other as slave
+> using python and dbus, and I have C code around I can use too.
 
-Lets check if this logic is ok and so check with some use cases if
-there are some we can't
-handle.
+Very promising :-)
 
--- =
-
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+Best Regards,
+Pierre-Yves
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
