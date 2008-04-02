@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47F3B09F.5070709@aircable.net>
-Date: Wed, 02 Apr 2008 13:13:19 -0300
-From: Manuel Naranjo <manuel@aircable.net>
+Message-ID: <47F3AEBC.9010407@idlum.be>
+Date: Wed, 02 Apr 2008 18:05:16 +0200
+From: Pierre-Yves Paulus <py@idlum.be>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <47EDAEED.4000302@aircable.net>	<52DF986C-FC13-4F04-81F7-6A269B0EB0D1@holtmann.org>	<47F05CEF.8040300@aircable.net>	<200803311404.06902.denis.kenzior@trolltech.com>
-	<47F3AEBC.9010407@idlum.be>
-In-Reply-To: <47F3AEBC.9010407@idlum.be>
+References: <47EDAEED.4000302@aircable.net>	<52DF986C-FC13-4F04-81F7-6A269B0EB0D1@holtmann.org>	<47F05CEF.8040300@aircable.net>
+	<200803311404.06902.denis.kenzior@trolltech.com>
+In-Reply-To: <200803311404.06902.denis.kenzior@trolltech.com>
 Subject: Re: [Bluez-devel] CreateProxy usage?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,15 +21,42 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pierre-Yves,
-You don't need to link against bluez AFAIK, you only link against the
-sockets library which is included in libc. I'll try to write a wiki page
-today, the other day I had some troubles with my electric power
-provider, and forgot to make the wiki page.
-But I've been able to write 2 examples on as master, the other as slave
-using python and dbus, and I have C code around I can use too.
-Cheers,
-Manuel
+Hi,
+
+>>>From our experience using RFCOMM ttys is not a good idea.  The bluetooth 
+> rfcomm tty driver in the kernel is too unreliable in certain situations.  We 
+> actually have to patch our device kernels in order to get it working somewhat 
+> correctly.  
+
+I've observed the same thing: rfcomm ttys are not reliable. I've 
+reported several time Oopses related to them, and so far each time one 
+Oops/Warning/Bug is fixed, another one happens. Basically, I know no 
+kernel version which is robust regarding rfcomm ttys.
+
+At the moment I'm looking for a reliable alternative to the ttys. From 
+what I understand, using an rfcomm socket instead of the ttys would be a 
+solution, as they are reputed more reliable. But going the socket's way 
+  would mean abandonning the DBus API and linking against the bluetooth 
+lib, or am I mistaken? My application is currently only accessing BlueZ 
+through this DBus API, and it is indeed a great API. It would be sad to 
+have to abandon that to get reliable rfcomm functionnality.
+
+I've no experience at all with the rfcomm sockets from the Bluetooth 
+library (so take what I say with the required amount of salt). Wouldn't 
+a solution be to allow opening sockets through the DBus serial service, 
+instead of the current rfcomm ttys-only approach? I'm talking mostly 
+about the ConnectService and ConnectServiceFromAdapter in the serial 
+manager hierarchy.
+
+Denis, could you also expand further about the kind of patching you 
+perform on your kernels, regarding rfcomm tty's reliability?
+
+Regards,
+Pierre-Yves
+
+
+
+
 
 
 -------------------------------------------------------------------------
