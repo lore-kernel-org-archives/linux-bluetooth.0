@@ -1,10 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Apr 2008 00:47:04 -0700 (PDT)
-From: Mahtab Hossain <mahtab_hossain2002@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <e1effdeb0804031523h16862892x3de16fab5cc0c257@mail.gmail.com>
+Date: Thu, 3 Apr 2008 19:23:56 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <47F4D47A.1070107@kameleon-media.com>
 MIME-Version: 1.0
-Message-ID: <878714.13630.qm@web50507.mail.re2.yahoo.com>
-Subject: [Bluez-users] BlueZ and Headset
+References: <62cd80200804030132v1f26d36oe01f034811eec84@mail.gmail.com>
+	<47F4D47A.1070107@kameleon-media.com>
+Subject: Re: [Bluez-users] pand Connection failed. Permission denied(13)
+	BlueZ 3.28
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,98 +18,91 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0539277976=="
+Content-Type: multipart/mixed; boundary="===============0587784857=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0539277976==
-Content-Type: multipart/alternative; boundary="0-1274830340-1207295224=:13630"
-Content-Transfer-Encoding: 8bit
+--===============0587784857==
+Content-Type: text/plain; charset=GB2312
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
 
---0-1274830340-1207295224=:13630
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-Hi,
-
-I have a Nokia HDW-3 which has been used with btsco successfully before in Fedora 4. Now, it seems I can't somehow pair it.
-
-Here is my hcid.conf file look like:
-options {
-        # Automatically initialize new devices
-        autoinit yes;
-
-        security user;
-
-        pairing multi;
-
-        # Default PIN code for incoming connections
-        passkey "BlueZ";
-}
-
-hcitool scan or inq can find the headset. And I also have successfully paired with my Motorola Mobile Phone (entering PIN at both Phone and Laptop side) - so I think pairing can be done with the current state of my bluez stack.
-
-The hcidump -X -V always gives me the following results whenever I try to connect with my headset or run some command like, hcitool info <bt-addr of headset> or send direct command like CreateBonding through dbus or even when I switch-on my headset (I wonder why my dongle wants to connect with the headset since I have not saved any information of my headset in the Laptop).
-
-HCI sniffer - Bluetooth packet analyzer ver 1.40
-device: hci0 snap_len: 1028 filter: 0xffffffff
-> HCI Event: Connect Request (0x04) plen 10
-    bdaddr 00:03:89:B0:58:91 class 0x200404 type ACL
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-    bdaddr 00:03:89:B0:58:91 role 0x01
-    Role: Slave
-> HCI Event: Command Status (0x0f) plen 4
-    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr 00:03:89:B0:58:91
-< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
-    bdaddr 00:03:89:B0:58:91
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Negative Reply (0x01|0x000c) ncmd 1
-    status 0x00 bdaddr 00:03:89:B0:58:91
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x06 handle 42 bdaddr 00:03:89:B0:58:91 type ACL encrypt 0x00
-    Error: PIN or Key Missing
-
-These are my current bluetooth packages:
-
-rpm -qa | grep bluez*
-
-bluez-utils-3.20-6.fc8
-gnome-bluetooth-0.10.0-1.fc8
-bluez-libs-3.20-1.fc8
-bluez-hcidump-1.40-1.fc8
-bluez-utils-cups-3.20-6.fc8
-bluez-gnome-0.14-8.fc8
-bluez-gnome-analyzer-0.14-8.fc8
-pybluez-0.9.2-1.fc7
-bluez-utils-alsa-3.20-6.fc8
-gnome-bluetooth-libs-0.10.0-1.fc8
-bluez-libs-devel-3.20-1.fc8
-
-It would be really helpful if somebody can point me somewhere why the pairing isn't happening.
-
-Thanks
-Mahtab
-
-       
----------------------------------
-You rock. That's why Blockbuster's offering you one month of Blockbuster Total Access, No Cost.
---0-1274830340-1207295224=:13630
-Content-Type: text/html; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-
-Hi,<br><br>I have a Nokia HDW-3 which has been used with btsco successfully before in Fedora 4. Now, it seems I can't somehow pair it.<br><br>Here is my hcid.conf file look like:<br>options {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # Automatically initialize new devices<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; autoinit yes;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; security user;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pairing multi;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # Default PIN code for incoming connections<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; passkey "BlueZ";<br>}<br><br>hcitool scan or inq can find the headset. And I also have successfully paired with my Motorola Mobile Phone (entering PIN at both Phone and Laptop side) - so I think pairing can be done with the current state of my bluez stack.<br><br>The hcidump -X -V always gives me the following results whenever I try to connect with my headset or run some command
- like, hcitool info &lt;bt-addr of headset&gt; or send direct command like CreateBonding through dbus or even when I switch-on my headset (I wonder why my dongle wants to connect with the headset since I have not saved any information of my headset in the Laptop).<br><br>HCI sniffer - Bluetooth packet analyzer ver 1.40<br>device: hci0 snap_len: 1028 filter: 0xffffffff<br>&gt; HCI Event: Connect Request (0x04) plen 10<br>&nbsp;&nbsp;&nbsp; bdaddr 00:03:89:B0:58:91 class 0x200404 type ACL<br>&lt; HCI Command: Accept Connection Request (0x01|0x0009) plen 7<br>&nbsp;&nbsp;&nbsp; bdaddr 00:03:89:B0:58:91 role 0x01<br>&nbsp;&nbsp;&nbsp; Role: Slave<br>&gt; HCI Event: Command Status (0x0f) plen 4<br>&nbsp;&nbsp;&nbsp; Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1<br>&gt; HCI Event: Link Key Request (0x17) plen 6<br>&nbsp;&nbsp;&nbsp; bdaddr 00:03:89:B0:58:91<br>&lt; HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6<br>&nbsp;&nbsp;&nbsp; bdaddr
- 00:03:89:B0:58:91<br>&gt; HCI Event: Command Complete (0x0e) plen 10<br>&nbsp;&nbsp;&nbsp; Link Key Request Negative Reply (0x01|0x000c) ncmd 1<br>&nbsp;&nbsp;&nbsp; status 0x00 bdaddr 00:03:89:B0:58:91<br>&gt; HCI Event: Connect Complete (0x03) plen 11<br>&nbsp;&nbsp;&nbsp; status 0x06 handle 42 bdaddr 00:03:89:B0:58:91 type ACL encrypt 0x00<br>&nbsp;&nbsp;&nbsp; Error: PIN or Key Missing<br><br>These are my current bluetooth packages:<br><br>rpm -qa | grep bluez*<br><br>bluez-utils-3.20-6.fc8<br>gnome-bluetooth-0.10.0-1.fc8<br>bluez-libs-3.20-1.fc8<br>bluez-hcidump-1.40-1.fc8<br>bluez-utils-cups-3.20-6.fc8<br>bluez-gnome-0.14-8.fc8<br>bluez-gnome-analyzer-0.14-8.fc8<br>pybluez-0.9.2-1.fc7<br>bluez-utils-alsa-3.20-6.fc8<br>gnome-bluetooth-libs-0.10.0-1.fc8<br>bluez-libs-devel-3.20-1.fc8<br><br>It would be really helpful if somebody can point me somewhere why the pairing isn't happening.<br><br>Thanks<br>Mahtab<br><p>&#32;
+T24gVGh1LCBBcHIgMywgMjAwOCBhdCA5OjU4IEFNLCBMYXVyZW50IEJBUkJJRVIKPGxiYXJiaWVy
+QGthbWVsZW9uLW1lZGlhLmNvbT4gd3JvdGU6Cj4gcm9vdCA/Cj4KPiAgwO7M7yBhIKimY3JpdCA6
+Cj4KPgo+ID4gSGVsbG8sZ3V5czoKPiAgPgo+ICA+IEkgdXNlIHRoZSBuZXdlc3QgMy4yOCB2ZXJz
+aW9uIG9mIEJsdWVaIGFuZCB0d28gYmx1ZXRvb3RoIGRldmljZXMgdG8KPiAgPiBzZXR1cCB0aGUg
+UEFOIG5ldHdvcmsgb24gdHdvIGRpZmZlcmVudCBMaW51eCBib3guCj4gID4KPiAgPiB0aGUgU0VS
+VkVSIHNpZGUgcnVubmluZyBkYnVzLWRhZW1vbixoY2lkIGFuZCBwYW5kIGRhZW1vbiBsaWtlIHRo
+YXQ6Cj4gID4KPiAgPiA4MTgwID8gU3MgMDowMCAvc2Jpbi9oY2lkIC1zIC1mIC9ldGMvYmx1ZXRv
+b3RoL2hjaWQuY29uZgo+ICA+IDgxODMgPyBTIDA6MDAgL2xpYi9ibHVldG9vdGgvYmx1ZXRvb3Ro
+ZC1zZXJ2aWNlLWlucHV0Cj4gID4gODE4NCA/IFMgMDowMCAvbGliL2JsdWV0b290aC9ibHVldG9v
+dGhkLXNlcnZpY2UtbmV0d29yawo+ICA+IDgxODUgPyBTIDA6MDAgL2xpYi9ibHVldG9vdGgvYmx1
+ZXRvb3RoZC1zZXJ2aWNlLXNlcmlhbAo+ICA+IDgxODkgPyBTcyAwOjAwIHBhbmQgLS1saXN0ZW4g
+LS1tYXN0ZXIgLS1yb2xlIE5BUCAtLWV0aGVybmV0IGJuZXAwCj4gID4gLS1kZXZpY2UgMDA6QTA6
+QjA6RTA6NDg6MjUKPiAgPgo+ICA+Cj4gID4gYW5kIHRoZW4sdGhlIENMSUVOVCBzaWRlIHJ1biBp
+biBhIHNpbXBsZSB3YXkgbGlrZSB0aGlzOgo+ICA+IHBhbmQgLS1jb25uZWN0IDAwOkEwOkIwOkUw
+OjQ4OjI1Cj4gID4KPiAgPiB0aGUgRVJST1IgaXMgOiBwYW5kWzgxOTFdOiBDb25uZWN0aW9uIGZh
+aWxlZC4gUGVybWlzc2lvbiBkZW5pZWQoMTMpCj4gID4KPiAgPiB0aGUgc3lzIExPRyBpcyBsaXN0
+IGJlbG93Ogo+ICA+Cj4gID4gQXByIDMgMTc6MTU6MDUgYmlwMzEzIGhjaWRbODE4MF06IEJsdWV0
+b290aCBIQ0kgZGFlbW9uCj4gID4gQXByIDMgMTc6MTU6MDUgYmlwMzEzIGhjaWRbODE4MF06IEhD
+SSBkZXYgMCByZWdpc3RlcmVkCj4gID4gQXByIDMgMTc6MTU6MDUgYmlwMzEzIGhjaWRbODE4MF06
+IEhDSSBkZXYgMCBhbHJlYWR5IHVwCj4gID4gQXByIDMgMTc6MTU6MDUgYmlwMzEzIGhjaWRbODE4
+MF06IERldmljZSBoY2kwIGhhcyBiZWVuIGFkZGVkCj4gID4gQXByIDMgMTc6MTU6MDUgYmlwMzEz
+IGhjaWRbODE4MF06IFN0YXJ0aW5nIHNlY3VyaXR5IG1hbmFnZXIgMAo+ICA+IEFwciAzIDE3OjE1
+OjA1IGJpcDMxMyBoY2lkWzgxODBdOiBEZXZpY2UgaGNpMCBoYXMgYmVlbiBhY3RpdmF0ZWQKPiAg
+PiBBcHIgMyAxNzoxNTowNSBiaXAzMTMgaGNpZFs4MTgwXTogU3RhcnRpbmcgU0RQIHNlcnZlcgo+
+ICA+IEFwciAzIDE3OjE1OjA1IGJpcDMxMyBoY2lkWzgxODBdOiBDcmVhdGVkIGxvY2FsIHNlcnZl
+ciBhdAo+ICA+IHVuaXg6YWJzdHJhY3Q9L3Zhci9ydW4vZGJ1cy1CQkFpYkZrTXZJLGd1aWQ9YTVh
+YmZmYzY2YjFkMzI3MTMzZDc2ZTM4NDdmNDkyMDkKPiAgPiBBcHIgMyAxNzoxNTowNSBiaXAzMTMg
+aW5wdXRbODE4M106IEJsdWV0b290aCBJbnB1dCBkYWVtb24KPiAgPiBBcHIgMyAxNzoxNTowNSBi
+aXAzMTMgaW5wdXRbODE4M106IFJlZ2lzdGVyZWQgaW5wdXQgbWFuYWdlcgo+ICA+IHBhdGg6L29y
+Zy9ibHVlei9pbnB1dAo+ICA+IEFwciAzIDE3OjE1OjA1IGJpcDMxMyBuZXR3b3JrWzgxODRdOiBC
+bHVldG9vdGggTmV0d29yayBkYWVtb24KPiAgPiBBcHIgMyAxNzoxNTowNSBiaXAzMTMgc2VyaWFs
+WzgxODVdOiBCbHVldG9vdGggU2VyaWFsIFBvcnQgZGFlbW9uCj4gID4gQXByIDMgMTc6MTU6MDUg
+YmlwMzEzIHNlcmlhbFs4MTg1XTogUmVnaXN0ZXJlZCBtYW5hZ2VyCj4gID4gcGF0aDovb3JnL2Js
+dWV6L3NlcmlhbAo+ICA+IEFwciAzIDE3OjE1OjA1IGJpcDMxMyBuZXR3b3JrWzgxODRdOiBSZWdp
+c3RlcmVkIG1hbmFnZXIKPiAgPiBwYXRoOi9vcmcvYmx1ZXovbmV0d29yawo+ICA+IEFwciAzIDE3
+OjE1OjA1IGJpcDMxMyBuZXR3b3JrWzgxODRdOiBSZWdpc3RlcmVkIHNlcnZlcgo+ICA+IHBhdGg6
+L29yZy9ibHVlei9uZXR3b3JrL25hcAo+ICA+IEFwciAzIDE3OjE1OjA1IGJpcDMxMyBuZXR3b3Jr
+WzgxODRdOiBSZWdpc3RlcmVkIHNlcnZlcgo+ICA+IHBhdGg6L29yZy9ibHVlei9uZXR3b3JrL2du
+Cj4gID4gQXByIDMgMTc6MTU6MDUgYmlwMzEzIG5ldHdvcmtbODE4NF06IFJlZ2lzdGVyZWQgc2Vy
+dmVyCj4gID4gcGF0aDovb3JnL2JsdWV6L25ldHdvcmsvcGFudQo+ICA+IEFwciAzIDE3OjE3OjMz
+IGJpcDMxMyBwYW5kWzgxODldOiBCbHVldG9vdGggUEFOIGRhZW1vbiB2ZXJzaW9uIDMuMjgKPiAg
+PiBBcHIgMyAxNzoxODoxNiBiaXAzMTMgcGFuZFs4MTkxXTogQ29ubmVjdGlvbiBmYWlsZWQuIFBl
+cm1pc3Npb24gZGVuaWVkKDEzKQo+ICA+Cj4gID4gUGxlYXNlIGdpdmUgbWUgc29tZSBpZGVhLCBv
+ciBJJ20gZ29pbmcgdG8gbG9vayBpbnRvIHRoZSBzb3VjZSBjb2RlIG9mCj4gID4gYm5lcF9hY2Nl
+cHRfY29ubmVjdGlvbiB0byB0cnkgdG8gZmluZCB3aGF0IGhhcyBoYXBwZW5lZC4KPiAgPgo+ICA+
+IFRoYW5rcyAsZXZlcnlvbmUuCj4gID4KPiAgPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiAgPgo+ICA+IC0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0KPiAgPiBDaGVjayBvdXQgdGhlIG5ldyBTb3VyY2VGb3JnZS5uZXQgTWFy
+a2V0cGxhY2UuCj4gID4gSXQncyB0aGUgYmVzdCBwbGFjZSB0byBidXkgb3Igc2VsbCBzZXJ2aWNl
+cyBmb3IKPiAgPiBqdXN0IGFib3V0IGFueXRoaW5nIE9wZW4gU291cmNlLgo+ICA+IGh0dHA6Ly9h
+ZC5kb3VibGVjbGljay5uZXQvY2xrOzE2NDIxNjIzOTsxMzUwMzAzODt3P2h0dHA6Ly9zZi5uZXQv
+bWFya2V0cGxhY2UKPiAgPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiAgPgo+ICA+IF9fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCj4gID4gQmx1ZXotdXNlcnMgbWFpbGlu
+ZyBsaXN0Cj4gID4gQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cj4gID4gaHR0cHM6
+Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMKPiAgPgo+
+Cj4KPiAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+ICBDaGVjayBvdXQgdGhlIG5ldyBTb3VyY2VGb3JnZS5u
+ZXQgTWFya2V0cGxhY2UuCj4gIEl0J3MgdGhlIGJlc3QgcGxhY2UgdG8gYnV5IG9yIHNlbGwgc2Vy
+dmljZXMgZm9yCj4gIGp1c3QgYWJvdXQgYW55dGhpbmcgT3BlbiBTb3VyY2UuCj4gIGh0dHA6Ly9h
+ZC5kb3VibGVjbGljay5uZXQvY2xrOzE2NDIxNjIzOTsxMzUwMzAzODt3P2h0dHA6Ly9zZi5uZXQv
+bWFya2V0cGxhY2UKPiAgX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX18KPiAgQmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0Cj4gIEJsdWV6LXVzZXJzQGxpc3RzLnNv
+dXJjZWZvcmdlLm5ldAo+ICBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0
+aW5mby9ibHVlei11c2Vycwo+CgpIaSBsZWV0YW5kLAoKQW5vdGhlciBjb21tZW50LCB0cnkgdXNl
+IHRoZSBuZXR3b3JrIHNlcnZpY2UuIFlvdSBjYW4gZmluZCBhIEhPV1RPIGF0OgpodHRwOi8vd2lr
+aS5ibHVlei5vcmcvd2lraS9IT1dUTy9OZXR3b3JrQ29ubmVjdGlvbnMKCllvdSBjYW4ndCBydW4g
+cGFuZCBhbmQgdGhlIG5ldHdvcmsgc2VydmljZSBhdCBzYW1lIHRpbWUgaWYgeW91IGhhdmUgYQpz
+ZXJ2ZXIgZW5hYmxlZC4KClJlZ2FyZHMsCkNsYXVkaW8uCi0tIAotLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KQ2xhdWRpbyBUYWthaGFzaSAo
+a3JhdSkKSW5zdGl0dXRvIE5va2lhIGRlIFRlY25vbG9naWEgLSBJTmRUCmphYmJlcjogY2xhdWRp
+by50YWthaGFzaUBnbWFpbC5jb20KTW9iaWxlOiArNTUgODEgODg4NjQ3NzkK
 
 
-
-      <hr size=1>You rock. That's why Blockbuster's offering you <a href="http://us.rd.yahoo.com/evt=47523/*http://tc.deals.yahoo.com/tc/blockbuster/text5.com">one month of Blockbuster Total Access</a>, No Cost.
---0-1274830340-1207295224=:13630--
-
-
---===============0539277976==
+--===============0587784857==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -116,7 +113,7 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
---===============0539277976==
+--===============0587784857==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -127,4 +124,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0539277976==--
+--===============0587784857==--
