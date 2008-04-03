@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <16c4cb990804040152m6a6a3eecsc8ff1539cd5df158@mail.gmail.com>
-Date: Fri, 4 Apr 2008 14:22:02 +0530
-From: "rahul tank" <rahul.tank@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <e1effdeb0804031514l1e77383g663840e8f9ebc6e0@mail.gmail.com>
+Date: Thu, 3 Apr 2008 19:14:05 -0300
+From: "Claudio Takahasi" <cktakahasi@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <B10BC768-DFF3-4BD0-AA58-15D692BF3E64@infitsrl.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] Loading plugin error
+References: <47F269F7.3000105@infitsrl.com>
+	<B10BC768-DFF3-4BD0-AA58-15D692BF3E64@infitsrl.com>
+Subject: Re: [Bluez-devel] DBUS StartPeriodicDiscovery
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,133 +17,123 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1205985107=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1205985107==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_6023_30286410.1207299122961"
-
-------=_Part_6023_30286410.1207299122961
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi,
-  I am trying to use the new bluez-utils-3.30 (libs-3.30).  This version
-implements the new plugin architecture.
-I have compiled the bluez-utils-3.30 with "--enable-audio".
-
-However when i run hcid i get the following errors:
-
-rahul@rahul:~/development/build330/sbin$ sudo ./hcid -n -s -d
-hcid[32716]: Bluetooth HCI daemon
-hcid[32716]: Enabling debug information
-hcid[32716]: HCI dev 0 registered
-hcid[32716]: HCI dev 0 already up
-hcid[32716]: Device hci0 has been added
-hcid[32716]: Starting security manager 0
-hcid[32716]: Device hci0 has been activated
-hcid[32716]: Starting SDP server
-hcid[32716]: Adding rec : 0x8093388
-hcid[32716]: with handle : 0x1
-hcid[32716]: Adding rec : 0x80936c8
-hcid[32716]: with handle : 0x0
-hcid[32716]: Service classes 0x00
-hcid[32716]: Loading plugins
-/home/rahul/development/build330/lib/bluetooth/plugins
-hcid[32716]: Can't load plugin:
-/home/rahul/development/build330/lib/bluetooth/plugins/libnetwork.so:
-invalid mode for dlopen(): Invalid argument
-hcid[32716]: Can't load plugin:
-/home/rahul/development/build330/lib/bluetooth/plugins/libserial.so: invalid
-mode for dlopen(): Invalid argument
-hcid[32716]: Can't load plugin:
-/home/rahul/development/build330/lib/bluetooth/plugins/libinput.so: invalid
-mode for dlopen(): Invalid argument
-hcid[32716]: Can't load plugin:
-/home/rahul/development/build330/lib/bluetooth/plugins/libaudio.so: invalid
-mode for dlopen(): Invalid argument
-hcid[32716]: child 32717 exited
-hcid[32716]: /org/bluez: org.bluez.Security.RegisterDefaultPasskeyAgent()
-hcid[32716]: name_listener_add(:1.65)
-hcid[32716]: Default passkey agent (:1.65, /org/bluez/passkey) registered
-hcid[32716]: child 32718 exited
-hcid[32716]: /org/bluez:
-org.bluez.Security.RegisterDefaultAuthorizationAgent()
-hcid[32716]: Default authorization agent (:1.65, /org/bluez/auth) registered
-hcid[32716]: /org/bluez/hci0: org.bluez.Adapter.GetName()
-
-
-
-
-The plugins are present in the mentioned directory
-
-rahul@rahul:~/development/build330/sbin$ ls -l
-/home/rahul/development/build330/lib/bluetooth/plugins/
-total 1236
--rw-r--r-- 1 rahul rahul 319346 2008-04-04 13:44 libaudio.a
--rwxr-xr-x 1 rahul rahul    860 2008-04-04 14:09 libaudio.la
--rwxr-xr-x 1 rahul rahul 267899 2008-04-04 14:09 libaudio.so
--rw-r--r-- 1 rahul rahul 109184 2008-04-04 13:44 libinput.a
--rwxr-xr-x 1 rahul rahul    860 2008-04-04 14:09 libinput.la
--rwxr-xr-x 1 rahul rahul  98282 2008-04-04 14:09 libinput.so
--rw-r--r-- 1 rahul rahul 120862 2008-04-04 13:44 libnetwork.a
--rwxr-xr-x 1 rahul rahul    872 2008-04-04 14:09 libnetwork.la
--rwxr-xr-x 1 rahul rahul 106683 2008-04-04 14:09 libnetwork.so
--rw-r--r-- 1 rahul rahul  90674 2008-04-04 13:44 libserial.a
--rwxr-xr-x 1 rahul rahul    866 2008-04-04 14:09 libserial.la
--rwxr-xr-x 1 rahul rahul  86910 2008-04-04 14:09 libserial.so
-
-
-Any pointers would be appreciated .
-
-thanks,
- rahul !!
-
-------=_Part_6023_30286410.1207299122961
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi,<br>&nbsp; I am trying to use the new bluez-utils-3.30 (libs-3.30).&nbsp; This version implements the new plugin architecture.<br>I have compiled the bluez-utils-3.30 with &quot;--enable-audio&quot;.<br><br>However when i run hcid i get the following errors:<br>
-<br>rahul@rahul:~/development/build330/sbin$ sudo ./hcid -n -s -d<br>hcid[32716]: Bluetooth HCI daemon<br>hcid[32716]: Enabling debug information<br>hcid[32716]: HCI dev 0 registered<br>hcid[32716]: HCI dev 0 already up<br>
-hcid[32716]: Device hci0 has been added<br>hcid[32716]: Starting security manager 0<br>hcid[32716]: Device hci0 has been activated<br>hcid[32716]: Starting SDP server<br>hcid[32716]: Adding rec : 0x8093388<br>hcid[32716]: with handle : 0x1<br>
-hcid[32716]: Adding rec : 0x80936c8<br>hcid[32716]: with handle : 0x0<br>hcid[32716]: Service classes 0x00<br>hcid[32716]: Loading plugins /home/rahul/development/build330/lib/bluetooth/plugins<br>hcid[32716]: Can&#39;t load plugin: /home/rahul/development/build330/lib/bluetooth/plugins/libnetwork.so: invalid mode for dlopen(): Invalid argument<br>
-hcid[32716]: Can&#39;t load plugin: /home/rahul/development/build330/lib/bluetooth/plugins/libserial.so: invalid mode for dlopen(): Invalid argument<br>hcid[32716]: Can&#39;t load plugin: /home/rahul/development/build330/lib/bluetooth/plugins/libinput.so: invalid mode for dlopen(): Invalid argument<br>
-hcid[32716]: Can&#39;t load plugin: /home/rahul/development/build330/lib/bluetooth/plugins/libaudio.so: invalid mode for dlopen(): Invalid argument<br>hcid[32716]: child 32717 exited<br>hcid[32716]: /org/bluez: org.bluez.Security.RegisterDefaultPasskeyAgent()<br>
-hcid[32716]: name_listener_add(:1.65)<br>hcid[32716]: Default passkey agent (:1.65, /org/bluez/passkey) registered<br>hcid[32716]: child 32718 exited<br>hcid[32716]: /org/bluez: org.bluez.Security.RegisterDefaultAuthorizationAgent()<br>
-hcid[32716]: Default authorization agent (:1.65, /org/bluez/auth) registered<br>hcid[32716]: /org/bluez/hci0: org.bluez.Adapter.GetName()<br><br><br><br><br>The plugins are present in the mentioned directory<br><br>rahul@rahul:~/development/build330/sbin$ ls -l /home/rahul/development/build330/lib/bluetooth/plugins/<br>
-total 1236<br>-rw-r--r-- 1 rahul rahul 319346 2008-04-04 13:44 libaudio.a<br>-rwxr-xr-x 1 rahul rahul&nbsp;&nbsp;&nbsp; 860 2008-04-04 14:09 <a href="http://libaudio.la">libaudio.la</a><br>-rwxr-xr-x 1 rahul rahul 267899 2008-04-04 14:09 libaudio.so<br>
--rw-r--r-- 1 rahul rahul 109184 2008-04-04 13:44 libinput.a<br>-rwxr-xr-x 1 rahul rahul&nbsp;&nbsp;&nbsp; 860 2008-04-04 14:09 <a href="http://libinput.la">libinput.la</a><br>-rwxr-xr-x 1 rahul rahul&nbsp; 98282 2008-04-04 14:09 libinput.so<br>
--rw-r--r-- 1 rahul rahul 120862 2008-04-04 13:44 libnetwork.a<br>-rwxr-xr-x 1 rahul rahul&nbsp;&nbsp;&nbsp; 872 2008-04-04 14:09 <a href="http://libnetwork.la">libnetwork.la</a><br>-rwxr-xr-x 1 rahul rahul 106683 2008-04-04 14:09 libnetwork.so<br>
--rw-r--r-- 1 rahul rahul&nbsp; 90674 2008-04-04 13:44 libserial.a<br>-rwxr-xr-x 1 rahul rahul&nbsp;&nbsp;&nbsp; 866 2008-04-04 14:09 <a href="http://libserial.la">libserial.la</a><br>-rwxr-xr-x 1 rahul rahul&nbsp; 86910 2008-04-04 14:09 libserial.so<br>
-<br><br>Any pointers would be appreciated .<br><br>thanks,<br>&nbsp;rahul !!<br><br>
-
-------=_Part_6023_30286410.1207299122961--
+On Thu, Apr 3, 2008 at 5:41 PM, Fabrizio Guglielmino
+<guglielmino@infitsrl.com> wrote:
+> I try to give more info about the problem hoping someone can give me a
+> little help.
+>
+> I compiled the example from :
+> http://wiki.bluez.org/wiki/HOWTO/DiscoveringDevices (the "glib with C" one),
+> used on laptop with ubuntu :all ok, on a pc with debian :all ok, on ebox
+> 2300sx with debian 4.0 NOTHING (no errors no responses).
+>
+> - dbus is running
+> - hcid is running
+> - if I make "hcitool scan" I can see the nearest bluetooth devices
+> - In syslog the only messages are "hcid[1794]: name_listener_add(:1.1)" and
+> "hcid[1794]: DiscoverDevices requestor at :1.1 exited before the operation
+> finished" (I've stopped the program after about 6/7 minutes of no-output)
+>
+> I think problem is dbus related but I don't know where to look, I also tried
+> "dbus-send --system --type=method_call --print-reply --dest=org.bluez
+> /org/bluez/hci0 org.bluez.Adapter.GetMode" to interact with dbus and all
+> works fine so the problem may be in Discovery related methods.
+>
+>
+> Suggestion?
+> Many thanks
+>
+>
+>
+> Il giorno 01/apr/08, alle ore 18:59, Fabrizio Guglielmino ha scritto:
+>
+>
+>
+> Hi all,
+> I've made a software using  DBUS StartPeriodicDiscovery monitoring in
+> (almost) realtime bluetooth devices in range.
+> I've already used this software with many computer and bluetooth dongles
+> without any problem (I've user it on a Asus eee with ubuntu and kernel
+> 2.6.22, in a debian with kernel 2.6.23 and so on).
+>
+> Now I've installed it on a ebox 2300SX
+> (http://www.compactpc.com.tw/ebox-2300SX.htm) using a customized debian
+> 4.0 to run on compact flash with kernel 2.6.22.
+> I have two different problem :
+> - When I made a proxy call to StartPeriodicDiscovery sometime i receive
+> the response "Invalid argument", but if I made hciconfig hci0 reset
+> before running the problem doesn't appear
+> - Events generated by StartPeriodicDiscovery (eg. RemoteDeviceFound) are
+> never called
+>
+> I can see the led of the bluetooth dongle blinking whene proxy call to
+> StartPeriodicDiscovery  doesn't give error so I think periodic inquiry
+> is running (I have not verified with hcidump because at the moment isnt'
+> installed on the device and I can't install it )
+>
+> The big difference from the 2300sx and the other installation is it
+> doesn't have math coporcessor so I have compiled the kernel to support
+> math emulation but I can't think this is the cause of my problems (why
+> bluez should use math coprocessor?). Also in the dmesg of the device I
+> found some error about ACPI ("ACPI: Unable to load the System
+> Description Tables" and "pnp: PnP ACPI: disabled"), I'm not expert of
+> ACPI but I think may cause some problems to usb devices...
+>
+> Can someone give me a starting point to found the problem?
+>
+> Many thanks
+> Fabrizio
+>
+> -------------------------------------------------------------------------
+> Check out the new SourceForge.net Marketplace.
+> It's the best place to buy or sell services for
+> just about anything Open Source.
+> http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+> -------------------------------------------------------------------------
+>  Check out the new SourceForge.net Marketplace.
+>  It's the best place to buy or sell services for
+>  just about anything Open Source.
+>
+> http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+> _______________________________________________
+>  Bluez-devel mailing list
+>  Bluez-devel@lists.sourceforge.net
+>  https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+>
 
 
---===============1205985107==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi Fabrizio,
+
+Discover process is automatically canceled when the client exits.
+dbus-send will not work, try d-feet or other client that keeps the
+D-Bus connection opened.
+
+Regards,
+Claudio.
+
+-- 
+---------------------------------------------------------
+Claudio Takahasi (krau)
+Instituto Nokia de Tecnologia - INdT
+jabber: claudio.takahasi@gmail.com
+Mobile: +55 81 88864779
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
---===============1205985107==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1205985107==--
