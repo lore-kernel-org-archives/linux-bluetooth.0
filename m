@@ -1,13 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <47F4D47A.1070107@kameleon-media.com>
-Date: Thu, 03 Apr 2008 14:58:34 +0200
-From: Laurent BARBIER <lbarbier@kameleon-media.com>
+Message-ID: <62cd80200804030132v1f26d36oe01f034811eec84@mail.gmail.com>
+Date: Thu, 3 Apr 2008 17:32:12 +0900
+From: "=?ISO-2022-JP?B?GyRCTXtFRBsoQg==?=" <leetand@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <62cd80200804030132v1f26d36oe01f034811eec84@mail.gmail.com>
-In-Reply-To: <62cd80200804030132v1f26d36oe01f034811eec84@mail.gmail.com>
-Subject: Re: [Bluez-users] pand Connection failed. Permission denied(13)
- BlueZ 3.28
+Subject: [Bluez-users] pand Connection failed. Permission denied(13) BlueZ
+	3.28
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,67 +15,112 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============1994023477=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-cm9vdCA/CgrmnY7nlLAgYSDDqWNyaXQgOgo+IEhlbGxvLGd1eXM6Cj4KPiBJIHVzZSB0aGUgbmV3
-ZXN0IDMuMjggdmVyc2lvbiBvZiBCbHVlWiBhbmQgdHdvIGJsdWV0b290aCBkZXZpY2VzIHRvIAo+
-IHNldHVwIHRoZSBQQU4gbmV0d29yayBvbiB0d28gZGlmZmVyZW50IExpbnV4IGJveC4KPgo+IHRo
-ZSBTRVJWRVIgc2lkZSBydW5uaW5nIGRidXMtZGFlbW9uLGhjaWQgYW5kIHBhbmQgZGFlbW9uIGxp
-a2UgdGhhdDoKPgo+IDgxODAgPyBTcyAwOjAwIC9zYmluL2hjaWQgLXMgLWYgL2V0Yy9ibHVldG9v
-dGgvaGNpZC5jb25mCj4gODE4MyA/IFMgMDowMCAvbGliL2JsdWV0b290aC9ibHVldG9vdGhkLXNl
-cnZpY2UtaW5wdXQKPiA4MTg0ID8gUyAwOjAwIC9saWIvYmx1ZXRvb3RoL2JsdWV0b290aGQtc2Vy
-dmljZS1uZXR3b3JrCj4gODE4NSA/IFMgMDowMCAvbGliL2JsdWV0b290aC9ibHVldG9vdGhkLXNl
-cnZpY2Utc2VyaWFsCj4gODE4OSA/IFNzIDA6MDAgcGFuZCAtLWxpc3RlbiAtLW1hc3RlciAtLXJv
-bGUgTkFQIC0tZXRoZXJuZXQgYm5lcDAgCj4gLS1kZXZpY2UgMDA6QTA6QjA6RTA6NDg6MjUKPgo+
-Cj4gYW5kIHRoZW4sdGhlIENMSUVOVCBzaWRlIHJ1biBpbiBhIHNpbXBsZSB3YXkgbGlrZSB0aGlz
-Ogo+IHBhbmQgLS1jb25uZWN0IDAwOkEwOkIwOkUwOjQ4OjI1Cj4KPiB0aGUgRVJST1IgaXMgOiBw
-YW5kWzgxOTFdOiBDb25uZWN0aW9uIGZhaWxlZC4gUGVybWlzc2lvbiBkZW5pZWQoMTMpCj4KPiB0
-aGUgc3lzIExPRyBpcyBsaXN0IGJlbG93Ogo+Cj4gQXByIDMgMTc6MTU6MDUgYmlwMzEzIGhjaWRb
-ODE4MF06IEJsdWV0b290aCBIQ0kgZGFlbW9uCj4gQXByIDMgMTc6MTU6MDUgYmlwMzEzIGhjaWRb
-ODE4MF06IEhDSSBkZXYgMCByZWdpc3RlcmVkCj4gQXByIDMgMTc6MTU6MDUgYmlwMzEzIGhjaWRb
-ODE4MF06IEhDSSBkZXYgMCBhbHJlYWR5IHVwCj4gQXByIDMgMTc6MTU6MDUgYmlwMzEzIGhjaWRb
-ODE4MF06IERldmljZSBoY2kwIGhhcyBiZWVuIGFkZGVkCj4gQXByIDMgMTc6MTU6MDUgYmlwMzEz
-IGhjaWRbODE4MF06IFN0YXJ0aW5nIHNlY3VyaXR5IG1hbmFnZXIgMAo+IEFwciAzIDE3OjE1OjA1
-IGJpcDMxMyBoY2lkWzgxODBdOiBEZXZpY2UgaGNpMCBoYXMgYmVlbiBhY3RpdmF0ZWQKPiBBcHIg
-MyAxNzoxNTowNSBiaXAzMTMgaGNpZFs4MTgwXTogU3RhcnRpbmcgU0RQIHNlcnZlcgo+IEFwciAz
-IDE3OjE1OjA1IGJpcDMxMyBoY2lkWzgxODBdOiBDcmVhdGVkIGxvY2FsIHNlcnZlciBhdCAKPiB1
-bml4OmFic3RyYWN0PS92YXIvcnVuL2RidXMtQkJBaWJGa012SSxndWlkPWE1YWJmZmM2NmIxZDMy
-NzEzM2Q3NmUzODQ3ZjQ5MjA5Cj4gQXByIDMgMTc6MTU6MDUgYmlwMzEzIGlucHV0WzgxODNdOiBC
-bHVldG9vdGggSW5wdXQgZGFlbW9uCj4gQXByIDMgMTc6MTU6MDUgYmlwMzEzIGlucHV0WzgxODNd
-OiBSZWdpc3RlcmVkIGlucHV0IG1hbmFnZXIgCj4gcGF0aDovb3JnL2JsdWV6L2lucHV0Cj4gQXBy
-IDMgMTc6MTU6MDUgYmlwMzEzIG5ldHdvcmtbODE4NF06IEJsdWV0b290aCBOZXR3b3JrIGRhZW1v
-bgo+IEFwciAzIDE3OjE1OjA1IGJpcDMxMyBzZXJpYWxbODE4NV06IEJsdWV0b290aCBTZXJpYWwg
-UG9ydCBkYWVtb24KPiBBcHIgMyAxNzoxNTowNSBiaXAzMTMgc2VyaWFsWzgxODVdOiBSZWdpc3Rl
-cmVkIG1hbmFnZXIgCj4gcGF0aDovb3JnL2JsdWV6L3NlcmlhbAo+IEFwciAzIDE3OjE1OjA1IGJp
-cDMxMyBuZXR3b3JrWzgxODRdOiBSZWdpc3RlcmVkIG1hbmFnZXIgCj4gcGF0aDovb3JnL2JsdWV6
-L25ldHdvcmsKPiBBcHIgMyAxNzoxNTowNSBiaXAzMTMgbmV0d29ya1s4MTg0XTogUmVnaXN0ZXJl
-ZCBzZXJ2ZXIgCj4gcGF0aDovb3JnL2JsdWV6L25ldHdvcmsvbmFwCj4gQXByIDMgMTc6MTU6MDUg
-YmlwMzEzIG5ldHdvcmtbODE4NF06IFJlZ2lzdGVyZWQgc2VydmVyIAo+IHBhdGg6L29yZy9ibHVl
-ei9uZXR3b3JrL2duCj4gQXByIDMgMTc6MTU6MDUgYmlwMzEzIG5ldHdvcmtbODE4NF06IFJlZ2lz
-dGVyZWQgc2VydmVyIAo+IHBhdGg6L29yZy9ibHVlei9uZXR3b3JrL3BhbnUKPiBBcHIgMyAxNzox
-NzozMyBiaXAzMTMgcGFuZFs4MTg5XTogQmx1ZXRvb3RoIFBBTiBkYWVtb24gdmVyc2lvbiAzLjI4
-Cj4gQXByIDMgMTc6MTg6MTYgYmlwMzEzIHBhbmRbODE5MV06IENvbm5lY3Rpb24gZmFpbGVkLiBQ
-ZXJtaXNzaW9uIGRlbmllZCgxMykKPgo+IFBsZWFzZSBnaXZlIG1lIHNvbWUgaWRlYSwgb3IgSSdt
-IGdvaW5nIHRvIGxvb2sgaW50byB0aGUgc291Y2UgY29kZSBvZiAKPiBibmVwX2FjY2VwdF9jb25u
-ZWN0aW9uIHRvIHRyeSB0byBmaW5kIHdoYXQgaGFzIGhhcHBlbmVkLgo+Cj4gVGhhbmtzICxldmVy
-eW9uZS4KPgo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+Cj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IENoZWNrIG91
-dCB0aGUgbmV3IFNvdXJjZUZvcmdlLm5ldCBNYXJrZXRwbGFjZS4KPiBJdCdzIHRoZSBiZXN0IHBs
-YWNlIHRvIGJ1eSBvciBzZWxsIHNlcnZpY2VzIGZvcgo+IGp1c3QgYWJvdXQgYW55dGhpbmcgT3Bl
-biBTb3VyY2UuCj4gaHR0cDovL2FkLmRvdWJsZWNsaWNrLm5ldC9jbGs7MTY0MjE2MjM5OzEzNTAz
-MDM4O3c/aHR0cDovL3NmLm5ldC9tYXJrZXRwbGFjZQo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+Cj4gX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KPiBCbHVlei11c2Vy
-cyBtYWlsaW5nIGxpc3QKPiBCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPiBodHRw
-czovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo+ICAg
-CgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLQpDaGVjayBvdXQgdGhlIG5ldyBTb3VyY2VGb3JnZS5uZXQgTWFy
-a2V0cGxhY2UuCkl0J3MgdGhlIGJlc3QgcGxhY2UgdG8gYnV5IG9yIHNlbGwgc2VydmljZXMgZm9y
-Cmp1c3QgYWJvdXQgYW55dGhpbmcgT3BlbiBTb3VyY2UuCmh0dHA6Ly9hZC5kb3VibGVjbGljay5u
-ZXQvY2xrOzE2NDIxNjIzOTsxMzUwMzAzODt3P2h0dHA6Ly9zZi5uZXQvbWFya2V0cGxhY2UKX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotdXNlcnMg
-bWFpbGluZyBsaXN0CkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xp
-c3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo=
+--===============1994023477==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_277_32967026.1207211532428"
+
+------=_Part_277_32967026.1207211532428
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hello,guys:
+
+I use the newest 3.28 version of BlueZ and two bluetooth devices to setup
+the PAN  network on two different Linux box.
+
+the SERVER side running dbus-daemon,hcid and pand daemon like that:
+
+ 8180 ?        Ss     0:00 /sbin/hcid -s -f /etc/bluetooth/hcid.conf
+ 8183 ?        S      0:00 /lib/bluetooth/bluetoothd-service-input
+ 8184 ?        S      0:00 /lib/bluetooth/bluetoothd-service-network
+ 8185 ?        S      0:00 /lib/bluetooth/bluetoothd-service-serial
+ 8189 ?        Ss     0:00 pand --listen --master --role NAP --ethernet
+bnep0 --device 00:A0:B0:E0:48:25
+
+
+and then,the CLIENT side run in a simple way like this:
+pand --connect 00:A0:B0:E0:48:25
+
+the ERROR is :  pand[8191]: Connection failed. Permission denied(13)
+
+the sys LOG is list below:
+
+Apr  3 17:15:05 bip313 hcid[8180]: Bluetooth HCI daemon
+Apr  3 17:15:05 bip313 hcid[8180]: HCI dev 0 registered
+Apr  3 17:15:05 bip313 hcid[8180]: HCI dev 0 already up
+Apr  3 17:15:05 bip313 hcid[8180]: Device hci0 has been added
+Apr  3 17:15:05 bip313 hcid[8180]: Starting security manager 0
+Apr  3 17:15:05 bip313 hcid[8180]: Device hci0 has been activated
+Apr  3 17:15:05 bip313 hcid[8180]: Starting SDP server
+Apr  3 17:15:05 bip313 hcid[8180]: Created local server at
+unix:abstract=/var/run/dbus-BBAibFkMvI,guid=a5abffc66b1d327133d76e3847f49209
+Apr  3 17:15:05 bip313 input[8183]: Bluetooth Input daemon
+Apr  3 17:15:05 bip313 input[8183]: Registered input manager
+path:/org/bluez/input
+Apr  3 17:15:05 bip313 network[8184]: Bluetooth Network daemon
+Apr  3 17:15:05 bip313 serial[8185]: Bluetooth Serial Port daemon
+Apr  3 17:15:05 bip313 serial[8185]: Registered manager
+path:/org/bluez/serial
+Apr  3 17:15:05 bip313 network[8184]: Registered manager
+path:/org/bluez/network
+Apr  3 17:15:05 bip313 network[8184]: Registered server
+path:/org/bluez/network/nap
+Apr  3 17:15:05 bip313 network[8184]: Registered server
+path:/org/bluez/network/gn
+Apr  3 17:15:05 bip313 network[8184]: Registered server
+path:/org/bluez/network/panu
+Apr  3 17:17:33 bip313 pand[8189]: Bluetooth PAN daemon version 3.28
+Apr  3 17:18:16 bip313 pand[8191]: Connection failed. Permission denied(13)
+
+Please give me some idea, or I'm going to look into the souce code of
+bnep_accept_connection to try to find what has happened.
+
+Thanks ,everyone.
+
+------=_Part_277_32967026.1207211532428
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hello,guys:<br><br>I use the newest 3.28 version of BlueZ and two bluetooth devices to setup the PAN&nbsp; network on two different Linux box.<br><br>the SERVER side running dbus-daemon,hcid and pand daemon like that:<br><br>&nbsp;8180 ?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Ss&nbsp;&nbsp;&nbsp;&nbsp; 0:00 /sbin/hcid -s -f /etc/bluetooth/hcid.conf<br>
+&nbsp;8183 ?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; S&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0:00 /lib/bluetooth/bluetoothd-service-input<br>&nbsp;8184 ?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; S&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0:00 /lib/bluetooth/bluetoothd-service-network<br>&nbsp;8185 ?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; S&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0:00 /lib/bluetooth/bluetoothd-service-serial<br>&nbsp;8189 ?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Ss&nbsp;&nbsp;&nbsp;&nbsp; 0:00 pand --listen --master --role NAP --ethernet bnep0 --device 00:A0:B0:E0:48:25<br>
+<br><br>and then,the CLIENT side run in a simple way like this:&nbsp; <br>pand --connect 00:A0:B0:E0:48:25<br><br>the ERROR is :&nbsp; pand[8191]: Connection failed. Permission denied(13)<br><br>the sys LOG is list below:<br><br>Apr&nbsp; 3 17:15:05 bip313 hcid[8180]: Bluetooth HCI daemon<br>
+Apr&nbsp; 3 17:15:05 bip313 hcid[8180]: HCI dev 0 registered<br>Apr&nbsp; 3 17:15:05 bip313 hcid[8180]: HCI dev 0 already up<br>Apr&nbsp; 3 17:15:05 bip313 hcid[8180]: Device hci0 has been added<br>Apr&nbsp; 3 17:15:05 bip313 hcid[8180]: Starting security manager 0<br>
+Apr&nbsp; 3 17:15:05 bip313 hcid[8180]: Device hci0 has been activated<br>Apr&nbsp; 3 17:15:05 bip313 hcid[8180]: Starting SDP server<br>Apr&nbsp; 3 17:15:05 bip313 hcid[8180]: Created local server at unix:abstract=/var/run/dbus-BBAibFkMvI,guid=a5abffc66b1d327133d76e3847f49209<br>
+Apr&nbsp; 3 17:15:05 bip313 input[8183]: Bluetooth Input daemon<br>Apr&nbsp; 3 17:15:05 bip313 input[8183]: Registered input manager path:/org/bluez/input<br>Apr&nbsp; 3 17:15:05 bip313 network[8184]: Bluetooth Network daemon<br>Apr&nbsp; 3 17:15:05 bip313 serial[8185]: Bluetooth Serial Port daemon<br>
+Apr&nbsp; 3 17:15:05 bip313 serial[8185]: Registered manager path:/org/bluez/serial<br>Apr&nbsp; 3 17:15:05 bip313 network[8184]: Registered manager path:/org/bluez/network<br>Apr&nbsp; 3 17:15:05 bip313 network[8184]: Registered server path:/org/bluez/network/nap<br>
+Apr&nbsp; 3 17:15:05 bip313 network[8184]: Registered server path:/org/bluez/network/gn<br>Apr&nbsp; 3 17:15:05 bip313 network[8184]: Registered server path:/org/bluez/network/panu<br>Apr&nbsp; 3 17:17:33 bip313 pand[8189]: Bluetooth PAN daemon version 3.28<br>
+Apr&nbsp; 3 17:18:16 bip313 pand[8191]: Connection failed. Permission denied(13)<br><br>Please give me some idea, or I&#39;m going to look into the souce code of bnep_accept_connection to try to find what has happened.<br><br>
+Thanks ,everyone.<br><br>
+
+------=_Part_277_32967026.1207211532428--
+
+
+--===============1994023477==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+Check out the new SourceForge.net Marketplace.
+It's the best place to buy or sell services for
+just about anything Open Source.
+http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+--===============1994023477==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1994023477==--
