@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Apr 2008 15:38:17 +0200
-From: Stefan Seyfried <seife@suse.de>
+Message-ID: <16c4cb990804040328i3af92a0x2db7d7297d323d31@mail.gmail.com>
+Date: Fri, 4 Apr 2008 15:58:31 +0530
+From: "rahul tank" <rahul.tank@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20080404133817.GA8298@suse.de>
-References: <16c4cb990804040152m6a6a3eecsc8ff1539cd5df158@mail.gmail.com>
-	<16c4cb990804040328i3af92a0x2db7d7297d323d31@mail.gmail.com>
+In-Reply-To: <16c4cb990804040152m6a6a3eecsc8ff1539cd5df158@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <16c4cb990804040328i3af92a0x2db7d7297d323d31@mail.gmail.com>
+References: <16c4cb990804040152m6a6a3eecsc8ff1539cd5df158@mail.gmail.com>
 Subject: Re: [Bluez-devel] Loading plugin error
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -17,81 +16,158 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: multipart/mixed; boundary="===============0084502636=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Fri, Apr 04, 2008 at 03:58:31PM +0530, rahul tank wrote:
-> Ok .. i tried compiling bluez-utils with --enable-glib option and it solv=
-ed
-> the issue.
+--===============0084502636==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_6370_18799672.1207304911495"
 
-It did not for me.
-I configured like this:
+------=_Part_6370_18799672.1207304911495
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-./configure --prefix=3D/usr \
-	--mandir=3D/usr/share/man \
-	--sysconfdir=3D/etc \
-	--libdir=3D/usr/lib \
-	--libexecdir=3D/lib \
-	--localstatedir=3D/var \
-	--enable-pie \
-	--enable-all --enable-glib
+Ok .. i tried compiling bluez-utils with --enable-glib option and it solved
+the issue.
 
-(enable-all should IIUC include enable-glib, but i used it anyway, it did n=
-ot
-change anything)
+thanks,
+ rahul !!
 
-starting hcid with "-x -s" gives:
+On Fri, Apr 4, 2008 at 2:22 PM, rahul tank <rahul.tank@gmail.com> wrote:
 
-hcid[10053]: Bluetooth HCI daemon
-hcid[10053]: HCI dev 0 registered
-hcid[10053]: HCI dev 0 already up
-hcid[10053]: Device hci0 has been added
-hcid[10053]: Starting security manager 0
-hcid[10053]: Device hci0 has been activated
-hcid[10053]: Starting SDP server
-hcid[10053]: Can't load plugin: /usr/lib/bluetooth/plugins/libaudio.so: inv=
-alid mode for dlopen(): Invalid argument
-hcid[10053]: Can't load plugin: /usr/lib/bluetooth/plugins/libserial.so: in=
-valid mode for dlopen(): Invalid argument
-hcid[10053]: Can't load plugin: /usr/lib/bluetooth/plugins/libnetwork.so: i=
-nvalid mode for dlopen(): Invalid argument
-hcid[10053]: Can't load plugin: /usr/lib/bluetooth/plugins/libinput.so: inv=
-alid mode for dlopen(): Invalid argument
+> Hi,
+>   I am trying to use the new bluez-utils-3.30 (libs-3.30).  This version
+> implements the new plugin architecture.
+> I have compiled the bluez-utils-3.30 with "--enable-audio".
+>
+> However when i run hcid i get the following errors:
+>
+> rahul@rahul:~/development/build330/sbin$ sudo ./hcid -n -s -d
+> hcid[32716]: Bluetooth HCI daemon
+> hcid[32716]: Enabling debug information
+> hcid[32716]: HCI dev 0 registered
+> hcid[32716]: HCI dev 0 already up
+> hcid[32716]: Device hci0 has been added
+> hcid[32716]: Starting security manager 0
+> hcid[32716]: Device hci0 has been activated
+> hcid[32716]: Starting SDP server
+> hcid[32716]: Adding rec : 0x8093388
+> hcid[32716]: with handle : 0x1
+> hcid[32716]: Adding rec : 0x80936c8
+> hcid[32716]: with handle : 0x0
+> hcid[32716]: Service classes 0x00
+> hcid[32716]: Loading plugins
+> /home/rahul/development/build330/lib/bluetooth/plugins
+> hcid[32716]: Can't load plugin:
+> /home/rahul/development/build330/lib/bluetooth/plugins/libnetwork.so:
+> invalid mode for dlopen(): Invalid argument
+> hcid[32716]: Can't load plugin:
+> /home/rahul/development/build330/lib/bluetooth/plugins/libserial.so: invalid
+> mode for dlopen(): Invalid argument
+> hcid[32716]: Can't load plugin:
+> /home/rahul/development/build330/lib/bluetooth/plugins/libinput.so: invalid
+> mode for dlopen(): Invalid argument
+> hcid[32716]: Can't load plugin:
+> /home/rahul/development/build330/lib/bluetooth/plugins/libaudio.so: invalid
+> mode for dlopen(): Invalid argument
+> hcid[32716]: child 32717 exited
+> hcid[32716]: /org/bluez: org.bluez.Security.RegisterDefaultPasskeyAgent()
+> hcid[32716]: name_listener_add(:1.65)
+> hcid[32716]: Default passkey agent (:1.65, /org/bluez/passkey) registered
+> hcid[32716]: child 32718 exited
+> hcid[32716]: /org/bluez:
+> org.bluez.Security.RegisterDefaultAuthorizationAgent()
+> hcid[32716]: Default authorization agent (:1.65, /org/bluez/auth)
+> registered
+> hcid[32716]: /org/bluez/hci0: org.bluez.Adapter.GetName()
+>
+>
+>
+>
+> The plugins are present in the mentioned directory
+>
+> rahul@rahul:~/development/build330/sbin$ ls -l
+> /home/rahul/development/build330/lib/bluetooth/plugins/
+> total 1236
+> -rw-r--r-- 1 rahul rahul 319346 2008-04-04 13:44 libaudio.a
+> -rwxr-xr-x 1 rahul rahul    860 2008-04-04 14:09 libaudio.la
+> -rwxr-xr-x 1 rahul rahul 267899 2008-04-04 14:09 libaudio.so
+> -rw-r--r-- 1 rahul rahul 109184 2008-04-04 13:44 libinput.a
+> -rwxr-xr-x 1 rahul rahul    860 2008-04-04 14:09 libinput.la
+> -rwxr-xr-x 1 rahul rahul  98282 2008-04-04 14:09 libinput.so
+> -rw-r--r-- 1 rahul rahul 120862 2008-04-04 13:44 libnetwork.a
+> -rwxr-xr-x 1 rahul rahul    872 2008-04-04 14:09 libnetwork.la
+> -rwxr-xr-x 1 rahul rahul 106683 2008-04-04 14:09 libnetwork.so
+> -rw-r--r-- 1 rahul rahul  90674 2008-04-04 13:44 libserial.a
+> -rwxr-xr-x 1 rahul rahul    866 2008-04-04 14:09 libserial.la
+> -rwxr-xr-x 1 rahul rahul  86910 2008-04-04 14:09 libserial.so
+>
+>
+> Any pointers would be appreciated .
+>
+> thanks,
+>  rahul !!
+>
+>
 
-The plugins are available, unstripped etc:
-seife@susi:~> file /usr/lib/bluetooth/plugins/*so
-/usr/lib/bluetooth/plugins/libaudio.so:   ELF 32-bit LSB shared object, Int=
-el 80386, version 1 (SYSV), not stripped
-/usr/lib/bluetooth/plugins/libinput.so:   ELF 32-bit LSB shared object, Int=
-el 80386, version 1 (SYSV), not stripped
-/usr/lib/bluetooth/plugins/libnetwork.so: ELF 32-bit LSB shared object, Int=
-el 80386, version 1 (SYSV), not stripped
-/usr/lib/bluetooth/plugins/libserial.so:  ELF 32-bit LSB shared object, Int=
-el 80386, version 1 (SYSV), not stripped
+------=_Part_6370_18799672.1207304911495
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Probably i'm doing something stupid, but i have no idea what ;-)
+Ok .. i tried compiling bluez-utils with --enable-glib option and it solved the issue. <br><br>thanks,<br>&nbsp;rahul !!<br><br><div class="gmail_quote">On Fri, Apr 4, 2008 at 2:22 PM, rahul tank &lt;<a href="mailto:rahul.tank@gmail.com">rahul.tank@gmail.com</a>&gt; wrote:<br>
+<blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hi,<br>&nbsp; I am trying to use the new bluez-utils-3.30 (libs-3.30).&nbsp; This version implements the new plugin architecture.<br>
+I have compiled the bluez-utils-3.30 with &quot;--enable-audio&quot;.<br><br>However when i run hcid i get the following errors:<br>
+<br>rahul@rahul:~/development/build330/sbin$ sudo ./hcid -n -s -d<br>hcid[32716]: Bluetooth HCI daemon<br>hcid[32716]: Enabling debug information<br>hcid[32716]: HCI dev 0 registered<br>hcid[32716]: HCI dev 0 already up<br>
 
-Thanks,
+hcid[32716]: Device hci0 has been added<br>hcid[32716]: Starting security manager 0<br>hcid[32716]: Device hci0 has been activated<br>hcid[32716]: Starting SDP server<br>hcid[32716]: Adding rec : 0x8093388<br>hcid[32716]: with handle : 0x1<br>
 
-	seife
--- =
+hcid[32716]: Adding rec : 0x80936c8<br>hcid[32716]: with handle : 0x0<br>hcid[32716]: Service classes 0x00<br>hcid[32716]: Loading plugins /home/rahul/development/build330/lib/bluetooth/plugins<br>hcid[32716]: Can&#39;t load plugin: /home/rahul/development/build330/lib/bluetooth/plugins/libnetwork.so: invalid mode for dlopen(): Invalid argument<br>
 
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg | "Well, surrounding them's out." =
+hcid[32716]: Can&#39;t load plugin: /home/rahul/development/build330/lib/bluetooth/plugins/libserial.so: invalid mode for dlopen(): Invalid argument<br>hcid[32716]: Can&#39;t load plugin: /home/rahul/development/build330/lib/bluetooth/plugins/libinput.so: invalid mode for dlopen(): Invalid argument<br>
+
+hcid[32716]: Can&#39;t load plugin: /home/rahul/development/build330/lib/bluetooth/plugins/libaudio.so: invalid mode for dlopen(): Invalid argument<br>hcid[32716]: child 32717 exited<br>hcid[32716]: /org/bluez: org.bluez.Security.RegisterDefaultPasskeyAgent()<br>
+
+hcid[32716]: name_listener_add(:1.65)<br>hcid[32716]: Default passkey agent (:1.65, /org/bluez/passkey) registered<br>hcid[32716]: child 32718 exited<br>hcid[32716]: /org/bluez: org.bluez.Security.RegisterDefaultAuthorizationAgent()<br>
+
+hcid[32716]: Default authorization agent (:1.65, /org/bluez/auth) registered<br>hcid[32716]: /org/bluez/hci0: org.bluez.Adapter.GetName()<br><br><br><br><br>The plugins are present in the mentioned directory<br><br>rahul@rahul:~/development/build330/sbin$ ls -l /home/rahul/development/build330/lib/bluetooth/plugins/<br>
+
+total 1236<br>-rw-r--r-- 1 rahul rahul 319346 2008-04-04 13:44 libaudio.a<br>-rwxr-xr-x 1 rahul rahul&nbsp;&nbsp;&nbsp; 860 2008-04-04 14:09 <a href="http://libaudio.la" target="_blank">libaudio.la</a><br>-rwxr-xr-x 1 rahul rahul 267899 2008-04-04 14:09 libaudio.so<br>
+
+-rw-r--r-- 1 rahul rahul 109184 2008-04-04 13:44 libinput.a<br>-rwxr-xr-x 1 rahul rahul&nbsp;&nbsp;&nbsp; 860 2008-04-04 14:09 <a href="http://libinput.la" target="_blank">libinput.la</a><br>-rwxr-xr-x 1 rahul rahul&nbsp; 98282 2008-04-04 14:09 libinput.so<br>
+
+-rw-r--r-- 1 rahul rahul 120862 2008-04-04 13:44 libnetwork.a<br>-rwxr-xr-x 1 rahul rahul&nbsp;&nbsp;&nbsp; 872 2008-04-04 14:09 <a href="http://libnetwork.la" target="_blank">libnetwork.la</a><br>-rwxr-xr-x 1 rahul rahul 106683 2008-04-04 14:09 libnetwork.so<br>
+
+-rw-r--r-- 1 rahul rahul&nbsp; 90674 2008-04-04 13:44 libserial.a<br>-rwxr-xr-x 1 rahul rahul&nbsp;&nbsp;&nbsp; 866 2008-04-04 14:09 <a href="http://libserial.la" target="_blank">libserial.la</a><br>-rwxr-xr-x 1 rahul rahul&nbsp; 86910 2008-04-04 14:09 libserial.so<br>
+
+<br><br>Any pointers would be appreciated .<br><br>thanks,<br><font color="#888888">&nbsp;rahul !!<br><br>
+</font></blockquote></div><br>
+
+------=_Part_6370_18799672.1207304911495--
 
 
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
+--===============0084502636==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+--===============0084502636==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0084502636==--
