@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Apr 2008 19:39:13 +0200
+Date: Fri, 4 Apr 2008 15:38:17 +0200
 From: Stefan Seyfried <seife@suse.de>
 To: bluez-devel@lists.sourceforge.net
-Message-ID: <20080404173913.GA27374@suse.de>
+Message-ID: <20080404133817.GA8298@suse.de>
 References: <16c4cb990804040152m6a6a3eecsc8ff1539cd5df158@mail.gmail.com>
 	<16c4cb990804040328i3af92a0x2db7d7297d323d31@mail.gmail.com>
-	<20080404133817.GA8298@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20080404133817.GA8298@suse.de>
+In-Reply-To: <16c4cb990804040328i3af92a0x2db7d7297d323d31@mail.gmail.com>
 Subject: Re: [Bluez-devel] Loading plugin error
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -22,52 +21,61 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Fri, Apr 04, 2008 at 03:38:17PM +0200, Stefan Seyfried wrote:
-> On Fri, Apr 04, 2008 at 03:58:31PM +0530, rahul tank wrote:
-> > Ok .. i tried compiling bluez-utils with --enable-glib option and it so=
-lved
-> > the issue.
-> =
+On Fri, Apr 04, 2008 at 03:58:31PM +0530, rahul tank wrote:
+> Ok .. i tried compiling bluez-utils with --enable-glib option and it solv=
+ed
+> the issue.
 
-> It did not for me.
-> I configured like this:
-> =
+It did not for me.
+I configured like this:
 
-> ./configure --prefix=3D/usr \
-> 	--mandir=3D/usr/share/man \
-> 	--sysconfdir=3D/etc \
-> 	--libdir=3D/usr/lib \
-> 	--libexecdir=3D/lib \
-> 	--localstatedir=3D/var \
-> 	--enable-pie \
-> 	--enable-all --enable-glib
+./configure --prefix=3D/usr \
+	--mandir=3D/usr/share/man \
+	--sysconfdir=3D/etc \
+	--libdir=3D/usr/lib \
+	--libexecdir=3D/lib \
+	--localstatedir=3D/var \
+	--enable-pie \
+	--enable-all --enable-glib
 
-Ok, doing a "make clean" after changing configure options was necessary.
-Now it works.
+(enable-all should IIUC include enable-glib, but i used it anyway, it did n=
+ot
+change anything)
 
-> =
+starting hcid with "-x -s" gives:
 
-> (enable-all should IIUC include enable-glib, but i used it anyway, it did=
- not
-> change anything)
+hcid[10053]: Bluetooth HCI daemon
+hcid[10053]: HCI dev 0 registered
+hcid[10053]: HCI dev 0 already up
+hcid[10053]: Device hci0 has been added
+hcid[10053]: Starting security manager 0
+hcid[10053]: Device hci0 has been activated
+hcid[10053]: Starting SDP server
+hcid[10053]: Can't load plugin: /usr/lib/bluetooth/plugins/libaudio.so: inv=
+alid mode for dlopen(): Invalid argument
+hcid[10053]: Can't load plugin: /usr/lib/bluetooth/plugins/libserial.so: in=
+valid mode for dlopen(): Invalid argument
+hcid[10053]: Can't load plugin: /usr/lib/bluetooth/plugins/libnetwork.so: i=
+nvalid mode for dlopen(): Invalid argument
+hcid[10053]: Can't load plugin: /usr/lib/bluetooth/plugins/libinput.so: inv=
+alid mode for dlopen(): Invalid argument
 
-This still applies: i gave "--enable-all" and this should, according to the
-configure --help output also enable glib:
-...
-  --enable-all            enable all extra options below
-  --enable-inotify        enable inotify support
-  --enable-hal            enable HAL support
-  --enable-usb            enable USB support
-  --enable-alsa           enable ALSA support
-  --enable-glib           enable GLib support
-  --enable-gstreamer      enable GStreamer support
-...
+The plugins are available, unstripped etc:
+seife@susi:~> file /usr/lib/bluetooth/plugins/*so
+/usr/lib/bluetooth/plugins/libaudio.so:   ELF 32-bit LSB shared object, Int=
+el 80386, version 1 (SYSV), not stripped
+/usr/lib/bluetooth/plugins/libinput.so:   ELF 32-bit LSB shared object, Int=
+el 80386, version 1 (SYSV), not stripped
+/usr/lib/bluetooth/plugins/libnetwork.so: ELF 32-bit LSB shared object, Int=
+el 80386, version 1 (SYSV), not stripped
+/usr/lib/bluetooth/plugins/libserial.so:  ELF 32-bit LSB shared object, Int=
+el 80386, version 1 (SYSV), not stripped
 
-But it didn't.
-Also, IMHO we should refuse to build the plugins if glib is not enabled.
-Unfortunately i know next to nothing about auto$foo, so i have no patch
-handy :-(
+Probably i'm doing something stupid, but i have no idea what ;-)
 
+Thanks,
+
+	seife
 -- =
 
 Stefan Seyfried
