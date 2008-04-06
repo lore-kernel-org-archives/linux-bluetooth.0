@@ -1,13 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Sun, 6 Apr 2008 19:58:31 -0500
-Message-ID: <E6FF208A16840D4EBAA31D261B15A506F29F23@ausx3mpc121.aus.amer.dell.com>
-References: <1207335282.19116.5.camel@mlimonciello><1207341998.32219.1.camel@mlimonciello><1207351025.13201.328.camel@cookie.hadess.net><E6FF208A16840D4EBAA31D261B15A506F29F16@ausx3mpc121.aus.amer.dell.com>
-	<1207521725.3396.4.camel@cookie.hadess.net>
-From: <Mario_Limonciello@Dell.com>
-To: <hadess@hadess.net>, <bluez-devel@lists.sourceforge.net>
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <E6FF208A16840D4EBAA31D261B15A506F29F16@ausx3mpc121.aus.amer.dell.com>
+References: <1207335282.19116.5.camel@mlimonciello>
+	<1207341998.32219.1.camel@mlimonciello>
+	<1207351025.13201.328.camel@cookie.hadess.net>
+	<E6FF208A16840D4EBAA31D261B15A506F29F16@ausx3mpc121.aus.amer.dell.com>
+Date: Sun, 06 Apr 2008 23:42:04 +0100
+Message-Id: <1207521725.3396.4.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Cc: Mario_Limonciello@Dell.com
 Subject: Re: [Bluez-devel] [PATCH] Add HID->HCI switching
-	supportfornewer	Dell BT cards
+	support	fornewer	Dell BT cards
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,27 +25,6 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Bastien,
-
-I don't believe the BlueZ/hci_usb setup can currently store the pairing in the adapter, but I'll investigate this week.  Currently the infrastructure should allow a pairing that was set in Windows to still live inside the adapter and transition to Linux per my understanding.
-
-I'll see what documentation I can obtain from our Bluetooth Team that would be available for public release.  No promises there though :)
-
-
-Mario Limonciello 
-Dell | Linux Engineering 
-Desk : (512) 723-0582 
-Mario_Limonciello@Dell.com 
-
-
-
------Original Message-----
-From: Bastien Nocera [mailto:hadess@hadess.net]
-Sent: Sun 4/6/2008 5:42 PM
-To: BlueZ development
-Cc: Limonciello, Mario
-Subject: Re: [Bluez-devel] [PATCH] Add HID->HCI switching supportfornewer	Dell BT cards
- 
 
 On Sat, 2008-04-05 at 10:58 -0500, Mario_Limonciello@Dell.com wrote:
 > Bastien,
@@ -71,7 +54,6 @@ work properly.
 Any documentation about the Dell kit would help.
 
 Cheers
-
 
 
 -------------------------------------------------------------------------
