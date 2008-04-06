@@ -1,13 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 6 Apr 2008 18:06:46 +0200
-From: Michael Domann <profbunny@gmx.de>
+Message-ID: <f3217ae20804051800g66c77965odda1a4747fec4a83@mail.gmail.com>
+Date: Sat, 5 Apr 2008 22:00:03 -0300
+From: "Alex Castillo" <acastillova@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Message-Id: <20080406180646.19797d60.profbunny@gmx.de>
-In-Reply-To: <d89ddf300804050728x6795ce41icdba9606e4601bb@mail.gmail.com>
-References: <1207325086.23019.67.camel@goya.uc3m.es>
-	<d89ddf300804050728x6795ce41icdba9606e4601bb@mail.gmail.com>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] laptop-headset pairing script
+MIME-Version: 1.0
+Subject: [Bluez-users] Mxpwr = 0 in CSR Class 1 and receive problems with
+	bcm2035
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,22 +19,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Sat, 5 Apr 2008 08:28:54 -0600
-"Brad Midgley" <bmidgley@gmail.com> wrote:
+Hi, Everybody,
 
-> Javi
-> 
-> >  I would like to know how I can make laptop-headset pairing in rc.3, that
-> >  is whithout X-server.
-> 
-> you would use the agent api to provide a pin. See bluez-utils/doc/agent-api.txt
-> 
-> -- 
-> Brad
-> 
-can you please provide the script when its finish?
+I am concern, about the information that give me the
+/proc/bus/usb/devices, show me MxPwr= 0mA, and I think that should be
+MaxPwr = 100mA, I have another one that is Class 2, and should be 10mA
+as well.... :(
 
-thanks michael
+I have a broadcom bcm2035 Usb, and show me Maxpwr = 100mA, its ok, but
+when I do a service discovery, like an sdptool, I never got the
+service of the mobile phones.. like obex channel..... class
+
+bcm2035:
+hci0:   Type: USB
+        BD Address: 00:18:F8:89:7E:CA ACL MTU: 377:10 SCO MTU: 64:8
+        Firmware 0.3 / 9
+blue2@blue2:~$ hciconfig hci0 version
+hci0:   Type: USB
+        BD Address: 00:18:F8:89:7E:CA ACL MTU: 377:10 SCO MTU: 64:8
+        HCI Ver: 1.2 (0x2) HCI Rev: 0x0 LMP Ver: 1.2 (0x2) LMP Subver: 0x309
+        Manufacturer: Broadcom Corporation (15)
+
+
+
+someone, can give some information, about this two issues,  CSR: Class
+1 with Mxpwr=0mA,
+and the problem that i have with the bcm2035
+
+many thanks,
+
+Alex
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
