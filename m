@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Andrew Kohlsmith (lists)" <aklists@mixdown.ca>
+Date: Sun, 6 Apr 2008 18:06:46 +0200
+From: Michael Domann <profbunny@gmx.de>
 To: bluez-users@lists.sourceforge.net
-Date: Mon, 7 Apr 2008 09:56:23 -0400
-References: <Pine.LNX.4.64.0804071115190.866@arimo.local>
-In-Reply-To: <Pine.LNX.4.64.0804071115190.866@arimo.local>
-MIME-Version: 1.0
-Message-Id: <200804070956.23449.aklists@mixdown.ca>
-Subject: Re: [Bluez-users] Emulating a gps receiver
-Reply-To: akohlsmith-lists@mixdown.ca,
-	BlueZ users <bluez-users@lists.sourceforge.net>
+Message-Id: <20080406180646.19797d60.profbunny@gmx.de>
+In-Reply-To: <d89ddf300804050728x6795ce41icdba9606e4601bb@mail.gmail.com>
+References: <1207325086.23019.67.camel@goya.uc3m.es>
+	<d89ddf300804050728x6795ce41icdba9606e4601bb@mail.gmail.com>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] laptop-headset pairing script
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,37 +21,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On April 7, 2008 04:34:54 am arimo@iki.fi wrote:
->   I could connect an ordinary  receiver to Linux  box and read it's
-> output but as a   Bluetooth newbie i do not have any clue how to  make a
-> computer looks like a receiver.
+On Sat, 5 Apr 2008 08:28:54 -0600
+"Brad Midgley" <bmidgley@gmail.com> wrote:
 
-You're looking for the local device class definition 
-in /etc/bluetooth/hcid.conf.  It's a bitfield.  Googleing for hcid.conf gives 
-me one of my favourite documentation sites, die.net: 
+> Javi
+> 
+> >  I would like to know how I can make laptop-headset pairing in rc.3, that
+> >  is whithout X-server.
+> 
+> you would use the agent api to provide a pin. See bluez-utils/doc/agent-api.txt
+> 
+> -- 
+> Brad
+> 
+can you please provide the script when its finish?
 
-http://linux.die.net/man/5/hcid.conf
-
-About halfway down you can see what the device class is composed of and what 
-each bit means.
-
->   I can search the bt devices with the phone and computer is listed there
-> but apparently i had to run some daemon to link the bluetooth and rfcomm
-> devices together. According my experiences so far this application is not
-> rfcomm:-(
-
-I imagine you want to use rfcomm; it has a 'listen' command that would allow 
-you to attach your own utility (which spits NMEA sentences out to stdout) to 
-an rfcomm channel.
-
-You may also have to configure an SDP record to "advertise" the rfcomm port to 
-the phone you're testing with.  "sdptool add" would probably be what you want 
-here.
-
-I'm not an expert either, but us newbies have to stick together and pull 
-ourselves out of this muck.  :-)
-
--A.
+thanks michael
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
