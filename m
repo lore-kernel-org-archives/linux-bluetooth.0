@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300804070735n2f107af4ge23848cc96f7ff20@mail.gmail.com>
-Date: Mon, 7 Apr 2008 08:35:29 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: arimo@iki.fi, "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200804070956.23449.aklists@mixdown.ca>
-MIME-Version: 1.0
+From: "Andrew Kohlsmith (lists)" <aklists@mixdown.ca>
+To: bluez-users@lists.sourceforge.net
+Date: Mon, 7 Apr 2008 09:56:23 -0400
 References: <Pine.LNX.4.64.0804071115190.866@arimo.local>
-	<200804070956.23449.aklists@mixdown.ca>
+In-Reply-To: <Pine.LNX.4.64.0804071115190.866@arimo.local>
+MIME-Version: 1.0
+Message-Id: <200804070956.23449.aklists@mixdown.ca>
 Subject: Re: [Bluez-users] Emulating a gps receiver
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Reply-To: akohlsmith-lists@mixdown.ca,
+	BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,26 +21,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Guys
+On April 7, 2008 04:34:54 am arimo@iki.fi wrote:
+>   I could connect an ordinary  receiver to Linux  box and read it's
+> output but as a   Bluetooth newbie i do not have any clue how to  make a
+> computer looks like a receiver.
 
-If you set up gpsd, you can do this in a straightforward way, assuming
-rfcomm0 is available:
+You're looking for the local device class definition 
+in /etc/bluetooth/hcid.conf.  It's a bitfield.  Googleing for hcid.conf gives 
+me one of my favourite documentation sites, die.net: 
 
-sdptool add SP
-rfcomm -r watch 0 1 sh -c "gpspipe -r >/dev/rfcomm0" &
+http://linux.die.net/man/5/hcid.conf
 
-the first command advertises a serial port on channel 1, the second
-sets up a listener that will repeat the nmea stream over channel 1
-whenever someone connects on it.
+About halfway down you can see what the device class is composed of and what 
+each bit means.
 
-there may be ways to make gpsd put out a pre-recorded stream, or you
-could write your own app that runs in place of gpspipe and slowly
-sends out your nmea log in eg 1-second intervals.
+>   I can search the bt devices with the phone and computer is listed there
+> but apparently i had to run some daemon to link the bluetooth and rfcomm
+> devices together. According my experiences so far this application is not
+> rfcomm:-(
 
-Andrew's device class suggestion may be required for some devices, but
-I didn't need it for a pocketpc or my n800.
+I imagine you want to use rfcomm; it has a 'listen' command that would allow 
+you to attach your own utility (which spits NMEA sentences out to stdout) to 
+an rfcomm channel.
 
-Brad
+You may also have to configure an SDP record to "advertise" the rfcomm port to 
+the phone you're testing with.  "sdptool add" would probably be what you want 
+here.
+
+I'm not an expert either, but us newbies have to stick together and pull 
+ourselves out of this muck.  :-)
+
+-A.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
