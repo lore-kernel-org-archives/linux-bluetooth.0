@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BAY118-DAV3F4C2E9D80FB360F79BC7C7F20@phx.gbl>
-From: <ichane@hotmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-References: <BAY118-DAV9D9EC1C84DCF7A987834CC7FE0@phx.gbl>
-	<83810412-22B0-461B-9307-48269B59E8FA@holtmann.org>
-Date: Tue, 8 Apr 2008 09:39:20 +0800
+Date: Mon, 7 Apr 2008 22:00:35 +0300 (EEST)
+From: Ari Moisio <arimo@iki.fi>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d89ddf300804070735n2f107af4ge23848cc96f7ff20@mail.gmail.com>
+Message-ID: <Pine.LNX.4.64.0804072148110.866@arimo.local>
+References: <Pine.LNX.4.64.0804071115190.866@arimo.local>
+	<200804070956.23449.aklists@mixdown.ca>
+	<d89ddf300804070735n2f107af4ge23848cc96f7ff20@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] sdptool add service
+Subject: Re: [Bluez-users] Emulating a gps receiver
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,67 +22,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi, there:
+Hello
 
-Thanks for the reply.
-
-Hi, there:
-
-Thanks for the reply.
-
-I observe that "sdptool add SP" always sets rfcomm channel to 1.
-Thus, "rfcomm listen 0 2" which should set channel to 2 does not
-correctly set to SDP's service record for other rfcomm clients
-to use channel 2 to make rfcomm connection.
-
-Is there any way to set rfcomm channel to SDP's service record
-in addition to channel 1 ?
-
-Thanks a lot,
-
-Chane
-
------ Original Message ----- 
-From: "Marcel Holtmann" <marcel@holtmann.org>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Sent: Thursday, March 27, 2008 10:58 PM
-Subject: Re: [Bluez-users] sdptool add service
+  Thanks.  Fixed class definition and added SP to service. Rfcomm appears 
+to be little old in Debian (3.7), it did not recognize the watch command 
+and i had to split the given command for two separate commands but this is 
+not a problem.  Sending a nmea log  one line in second with simple script 
+worked perfectly:-)
 
 
-> Hi Chane,
+
+-- 
+mr. M01510
+
+
+On Mon, 7 Apr 2008, Brad Midgley wrote:
+
+> Guys
 >
->> Do I need to add service manually using sdptool add? I got different
->> results using pand and rfcomm listen as servers.
->>
->> 1. >pand -s -M --role=NAP
->> After run the command above, no need to run "sdptool add NAP". The
->> service is already registered to sdpd.
+> If you set up gpsd, you can do this in a straightforward way, assuming
+> rfcomm0 is available:
 >
-> the pand will register service records for you. Why are you not using
-> the network service?
+> sdptool add SP
+> rfcomm -r watch 0 1 sh -c "gpspipe -r >/dev/rfcomm0" &
 >
->> 2.>rfcomm listen 1 1
->> Need to run sdptool add SP to register SPP service to sdpd.
+> the first command advertises a serial port on channel 1, the second
+> sets up a listener that will repeat the nmea stream over channel 1
+> whenever someone connects on it.
 >
-> Yes, you need to register your own service record. However using the
-> serial service might be a better idea here.
+> there may be ways to make gpsd put out a pre-recorded stream, or you
+> could write your own app that runs in place of gpspipe and slowly
+> sends out your nmea log in eg 1-second intervals.
 >
-> Regards
+> Andrew's device class suggestion may be required for some devices, but
+> I didn't need it for a pocketpc or my n800.
 >
-> Marcel
+> Brad
 >
 >
-> -------------------------------------------------------------------------
-> Check out the new SourceForge.net Marketplace.
-> It's the best place to buy or sell services for
-> just about anything Open Source.
-> http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-> 
-
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
