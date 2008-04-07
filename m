@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2d5a2c100804071035l37bf1643ta41a2c65f1c8f31b@mail.gmail.com>
-Date: Mon, 7 Apr 2008 14:35:50 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <49f5aca0804070731j7d3a7349ta29461fad6808231@mail.gmail.com>
+Message-ID: <49f5aca0804070738l47fce53ey2b15ec7550ea10d0@mail.gmail.com>
+Date: Mon, 7 Apr 2008 16:38:58 +0200
+From: "Pedro Vivancos" <pedro.vivancos@vocali.net>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-References: <49f5aca0804070731j7d3a7349ta29461fad6808231@mail.gmail.com>
-Subject: Re: [Bluez-devel] C program for capturing AnswerRequested signal
+Subject: [Bluez-devel] Vala example of DiscoveringDevices Howto does not work
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,38 +14,68 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: multipart/mixed; boundary="===============0843307684=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Please install dbus-glib documentation and take a look, some parameters of
-dbus_g_proxy_new_for_name are wrong.
+--===============0843307684==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_1650_31561524.1207579138213"
 
-You have to call ActivateService then you receive the bus name of the servi=
-ce,
-the object path is normally /org/bluez/<sevice name>. At this point it shou=
-ld
-be possible to connect to service signals.
+------=_Part_1650_31561524.1207579138213
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-ps: After 3.28 it is not really necessary to call ActivateService anymore, =
-the
-bus name is actually the same as hcid since service are all plugins now.
+Dear all,
 
--- =
+When I try to compile the vala example of DiscoveringDevice
+Howto<http://wiki.bluez.org/wiki/HOWTO/DiscoveringDevices>I get the
+following error:
 
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+$ valac --pkg dbus-glib-1 -o bluetooth bluetooth.vala
+bluetooth.vala:8.31-8.31: error: syntax error, unexpected ;, expecting {
+
+** ERROR **: file parser.y: line 2182 (yyparse): should not be reached
+aborting...
+
+Does anyone manage to compile it?
+
+Thanks in advance.
+Pedro
+
+------=_Part_1650_31561524.1207579138213
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Dear all,<br><br>When I try to compile the vala example of <a href="http://wiki.bluez.org/wiki/HOWTO/DiscoveringDevices">DiscoveringDevice Howto</a> I get the following error:<br><br>$ valac --pkg dbus-glib-1 -o bluetooth bluetooth.vala<br>
+bluetooth.vala:8.31-8.31: error: syntax error, unexpected ;, expecting {<br><br>** ERROR **: file parser.y: line 2182 (yyparse): should not be reached<br>aborting...<br><br>Does anyone manage to compile it?<br><br>Thanks in advance.<br>
+Pedro<br>
+
+------=_Part_1650_31561524.1207579138213--
+
+
+--===============0843307684==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference =
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
+Register now and save $200. Hurry, offer ends at 11:59 p.m., 
+Monday, April 7! Use priority code J8TLD2. 
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+--===============0843307684==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Register now and save $200. Hurry, offer ends at 11:59 p.m., =
-
-Monday, April 7! Use priority code J8TLD2. =
-
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/java=
-one
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0843307684==--
