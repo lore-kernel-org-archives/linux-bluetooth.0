@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <49f5aca0804080148s3c430926n84a740de8370384c@mail.gmail.com>
+Date: Tue, 8 Apr 2008 10:48:51 +0200
+From: "Pedro Vivancos" <pedro.vivancos@vocali.net>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Date: Tue, 8 Apr 2008 14:19:19 +0200
-Message-ID: <EADBA796DAC6CB4089D6C9FC6A87773501DFEDB4@ERLM862A.ww001.siemens.net>
-From: "Krause, Bernd" <bernd.bk.krause@siemens.com>
-To: <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] need implementation for dfutool via uart;
-	what does usb_control_msg?
+Subject: [Bluez-devel] Problems with "CreateHeadset" method
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,128 +14,55 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1787561428=="
+Content-Type: multipart/mixed; boundary="===============0570552355=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
-
---===============1787561428==
-Content-class: urn:content-classes:message
+--===============0570552355==
 Content-Type: multipart/alternative;
-	boundary="----_=_NextPart_001_01C89972.CABC4BEA"
+	boundary="----=_Part_4675_26644549.1207644531537"
 
-This is a multi-part message in MIME format.
+------=_Part_4675_26644549.1207644531537
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-------_=_NextPart_001_01C89972.CABC4BEA
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Dear friends,
 
-Hello,
-=20
-I need an implementation for the dfu-functionality via uart. For this
-purpose, I need to know
-what the function usb_control_msg writes exactly to the usb-Device to
-duplicate for example
-the header for uart.
-I was unable to find an exact implementation of this function with e.g.
-the given parameters
-(USB_TYPE_CLASS | USB_DIR_IN | USB_RECIP_INTERFACE, DFU_UPLOAD). I only
-found the
-functions usb_start_wait_urb
-<http://www.srcdoc.com/linux_2.2.26/usb_8c.html#a41>  and usb_submit_urb
-<http://www.srcdoc.com/linux_2.2.26/usb_8c.html#a38> , but I can't find
-out what is really send via usb.
-Can anybody tell me what this function sends to the device? And if
-anyone knows, it is possible
-to rewrite this functionality for uart?
-=20
-Thanks for help,
-Best Regards, Bernd Krause
+I get an error when I call the CreateHeadset method of
+org.bluez.audio.Manager interface by using the C sentences:
 
-Siemens AG
-Medical Solutions
-MED MR PLM ST SCC
-Allee am Roethelheimpark 2
-91052 Erlangen, Germany
-Tel.:=20
-Fax:=20
-mailto:bernd.bk.krause@siemens.com
-=20
+char *headset;
+dbus_g_proxy_call(audio, "CreateHeadset", &error, G_TYPE_STRING,
+"00:16:94:03:60:1B", G_TYPE_INVALID, G_TYPE_STRING, &headsetPath,
+G_TYPE_INVALID);
 
-------_=_NextPart_001_01C89972.CABC4BEA
-Content-Type: text/html;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+The error message is:
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Dus-ascii">
-<META content=3D"MSHTML 6.00.2900.3268" name=3DGENERATOR></HEAD>
-<BODY>
-<DIV><FONT size=3D2><SPAN class=3D106451612-08042008>
-<DIV><SPAN class=3D162253311-08042008><FONT =
-face=3DArial>Hello,</FONT></SPAN></DIV>
-<DIV><SPAN class=3D162253311-08042008><FONT =
-face=3DArial></FONT></SPAN>&nbsp;</DIV>
-<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial>I need an =
-implementation=20
-for the dfu-functionality via uart. For this purpose, I need to=20
-know</FONT></SPAN></DIV>
-<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial>what the =
-function=20
-usb_control_msg writes exactly to the usb-Device to duplicate for=20
-example</FONT></SPAN></DIV>
-<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial>the header for=20
-uart.</FONT></SPAN></DIV>
-<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial>I was unable to =
-find an=20
-exact implementation of this function with e.g. the given=20
-parameters</FONT></SPAN></DIV>
-<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial>(USB_TYPE_CLASS =
-|=20
-USB_DIR_IN | USB_RECIP_INTERFACE,&nbsp;DFU_UPLOAD).<SPAN=20
-class=3D106451612-08042008> I only found the</SPAN></FONT></SPAN></DIV>
-<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial><SPAN=20
-class=3D106451612-08042008>functions <A class=3Dcode=20
-href=3D"http://www.srcdoc.com/linux_2.2.26/usb_8c.html#a41">usb_start_wai=
-t_urb</A>&nbsp;and=20
-<A class=3Dcode=20
-href=3D"http://www.srcdoc.com/linux_2.2.26/usb_8c.html#a38">usb_submit_ur=
-b</A>,=20
-but I can't find out what is really send via =
-usb.</SPAN></FONT></SPAN></DIV>
-<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial>Can anybody =
-tell me what=20
-this function sends to the device? And if anyone knows, it is=20
-possible</FONT></SPAN></DIV>
-<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial>to rewrite this =
+Method "CreateHeadset" with signature "s" on interface
+"org.bluez.audio.Manager" doesn't exist
 
-functionality for uart?</FONT></SPAN></DIV>
-<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
-<DIV align=3Dleft><SPAN class=3D162253311-08042008></SPAN><FONT =
-face=3DArial>T<SPAN=20
-class=3D162253311-08042008>hanks for help,</SPAN></FONT></DIV>
-<DIV align=3Dleft><FONT size=3D+0><SPAN =
-class=3D162253311-08042008></SPAN><SPAN=20
-class=3D162253311-08042008></SPAN><FONT face=3DArial size=3D2>B<SPAN=20
-class=3D162253311-08042008>est Regards, </SPAN>Bernd=20
-Krause</FONT></FONT></DIV></SPAN></FONT></DIV>
-<DIV><FONT face=3DArial size=3D2><BR>Siemens AG<BR>Medical =
-Solutions<BR>MED MR PLM=20
-ST SCC<BR>Allee am Roethelheimpark 2<BR>91052 Erlangen, Germany<BR>Tel.: =
+but I read that there is a method "string CreateHeadset(string address)" in
+the audio api.
 
-<BR>Fax: <BR>mailto:<A=20
-href=3D"mailto:bernd.bk.krause@siemens.com">bernd.bk.krause@siemens.com</=
-A></FONT></DIV>
-<DIV>&nbsp;</DIV></BODY></HTML>
+Can anyone help me?
 
-------_=_NextPart_001_01C89972.CABC4BEA--
+Thank you very much.
+Pedro
+
+------=_Part_4675_26644549.1207644531537
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Dear friends,<br><br>I get an error when I call the CreateHeadset method of org.bluez.audio.Manager interface by using the C sentences: <br><br>char *headset;<br>dbus_g_proxy_call(audio, &quot;CreateHeadset&quot;, &amp;error, G_TYPE_STRING, &quot;00:16:94:03:60:1B&quot;, G_TYPE_INVALID, G_TYPE_STRING, &amp;headsetPath, G_TYPE_INVALID);<br>
+<br>The error message is:<br><br>Method &quot;CreateHeadset&quot; with signature &quot;s&quot; on interface &quot;org.bluez.audio.Manager&quot; doesn&#39;t exist<br><br>but I read that there is a method &quot;string CreateHeadset(string address)&quot; in the audio api.<br>
+<br>Can anyone help me?<br><br>Thank you very much.<br>Pedro<br clear="all"><br>
+
+------=_Part_4675_26644549.1207644531537--
 
 
---===============1787561428==
+--===============0570552355==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -147,7 +73,7 @@ This SF.net email is sponsored by the 2008 JavaOne(SM) Conference
 Register now and save $200. Hurry, offer ends at 11:59 p.m., 
 Monday, April 7! Use priority code J8TLD2. 
 http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
---===============1787561428==
+--===============0570552355==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -158,4 +84,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1787561428==--
+--===============0570552355==--
