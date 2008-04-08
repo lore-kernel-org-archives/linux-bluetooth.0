@@ -1,13 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ Hackers <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1207446435.26353.1.camel@californication>
-References: <1207446435.26353.1.camel@californication>
-Content-Type: multipart/mixed; boundary="=-MWe2Ygrw2M1dbZmYL3Of"
-Date: Tue, 08 Apr 2008 17:28:57 +0100
-Message-Id: <1207672137.3396.52.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [BlueZ-Announce] Release of bluez-gnome-0.26
+MIME-Version: 1.0
+Date: Tue, 8 Apr 2008 14:19:19 +0200
+Message-ID: <EADBA796DAC6CB4089D6C9FC6A87773501DFEDB4@ERLM862A.ww001.siemens.net>
+From: "Krause, Bernd" <bernd.bk.krause@siemens.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] need implementation for dfutool via uart;
+	what does usb_control_msg?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,137 +15,128 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============1787561428=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+This is a multi-part message in MIME format.
 
---=-MWe2Ygrw2M1dbZmYL3Of
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+--===============1787561428==
+Content-class: urn:content-classes:message
+Content-Type: multipart/alternative;
+	boundary="----_=_NextPart_001_01C89972.CABC4BEA"
 
-On Sun, 2008-04-06 at 03:47 +0200, Marcel Holtmann wrote:
-> Hi Folks,
-> 
-> this is the twenty-sixth release of the gnome package for BlueZ. It
-> contains a new version of the sendto application and translation
-> updates.
-> 
-> The sources can be found at http://www.bluez.org/download.html
+This is a multi-part message in MIME format.
 
-Another patch. This one gives you a better error message when you have a
-Palm device, as well as changing the "ETA" message to match that of
-Nautilus.
+------_=_NextPart_001_01C89972.CABC4BEA
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Cheers
+Hello,
+=20
+I need an implementation for the dfu-functionality via uart. For this
+purpose, I need to know
+what the function usb_control_msg writes exactly to the usb-Device to
+duplicate for example
+the header for uart.
+I was unable to find an exact implementation of this function with e.g.
+the given parameters
+(USB_TYPE_CLASS | USB_DIR_IN | USB_RECIP_INTERFACE, DFU_UPLOAD). I only
+found the
+functions usb_start_wait_urb
+<http://www.srcdoc.com/linux_2.2.26/usb_8c.html#a41>  and usb_submit_urb
+<http://www.srcdoc.com/linux_2.2.26/usb_8c.html#a38> , but I can't find
+out what is really send via usb.
+Can anybody tell me what this function sends to the device? And if
+anyone knows, it is possible
+to rewrite this functionality for uart?
+=20
+Thanks for help,
+Best Regards, Bernd Krause
 
---=-MWe2Ygrw2M1dbZmYL3Of
-Content-Disposition: attachment; filename=bluez-gnome-sendto-palm.patch
-Content-Type: text/x-patch; name=bluez-gnome-sendto-palm.patch;
-	charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Siemens AG
+Medical Solutions
+MED MR PLM ST SCC
+Allee am Roethelheimpark 2
+91052 Erlangen, Germany
+Tel.:=20
+Fax:=20
+mailto:bernd.bk.krause@siemens.com
+=20
 
-Index: sendto/dialog.h
-===================================================================
-RCS file: /cvsroot/bluez/gnome/sendto/dialog.h,v
-retrieving revision 1.2
-diff -u -p -u -p -r1.2 dialog.h
---- sendto/dialog.h	5 Apr 2008 23:59:11 -0000	1.2
-+++ sendto/dialog.h	8 Apr 2008 15:53:07 -0000
-@@ -21,5 +21,7 @@
-  *
-  */
- 
-+#include <glib.h>
-+
- gchar *show_browse_dialog(void);
- gchar **show_select_dialog(void);
-Index: sendto/main.c
-===================================================================
-RCS file: /cvsroot/bluez/gnome/sendto/main.c,v
-retrieving revision 1.27
-diff -u -p -u -p -r1.27 main.c
---- sendto/main.c	6 Apr 2008 01:26:23 -0000	1.27
-+++ sendto/main.c	8 Apr 2008 15:53:08 -0000
-@@ -78,6 +78,13 @@ static void response_callback(GtkWidget 
- 	gtk_main_quit();
- }
- 
-+static gboolean is_palm_device(const gchar *bdaddr)
-+{
-+	return (g_str_has_prefix(bdaddr, "00:04:6B")
-+		|| g_str_has_prefix(bdaddr, "00:07:E0")
-+		|| g_str_has_prefix(bdaddr, "00:0E:20"));
-+}
-+
- static void create_window(void)
- {
- 	GtkWidget *vbox;
-@@ -260,15 +267,15 @@ static void transfer_progress(DBusGProxy
- 	remaining_time = (total_size - current_sent) / transfer_rate;
- 
- 	if (remaining_time >= 3600)
--		time = g_strdup_printf(_("ETA %d:%02d:%02d"),
-+		time = g_strdup_printf(_("%d:%02d:%02d Remaining"),
- 					remaining_time / 3600,
- 					(remaining_time % 3600) / 60,
- 					(remaining_time % 3600) % 60);
- 	else
--		time = g_strdup_printf(_("ETA %d:%02d"),
-+		time = g_strdup_printf(_("%d:%02d Remaining"),
- 				remaining_time / 60, remaining_time % 60);
- 
--	if (transfer_rate >= 1000)
-+	if (transfer_rate >= 3000)
- 		rate = g_strdup_printf(_("%d KB/s"), transfer_rate / 1000);
- 	else
- 		rate = g_strdup_printf(_("%d B/s"), transfer_rate);
-@@ -312,6 +319,29 @@ static void session_connected(DBusGProxy
- 	send_file(proxy);
- }
- 
-+static gchar *get_error_message(GError *error)
-+{
-+	char *message;
-+
-+	if (error != NULL) {
-+		const gchar *error_name;
-+
-+		if (error && error->code == DBUS_GERROR_REMOTE_EXCEPTION)
-+			error_name = dbus_g_error_get_name(error);
-+		else
-+			error_name = NULL;
-+
-+		if (error_name && !strcmp(error_name, "org.openobex.Error.ConnectionAttemptFailed") && is_palm_device(option_device)) {
-+			message = g_strdup (_("Make sure that remote device is on and that it accepts Bluetooth connections."));
-+		} else {
-+			message = g_strdup(error->message);
-+		}
-+	} else
-+		message = g_strdup(_("An unknown error occured"));
-+
-+	return message;
-+}
-+
- static void create_notify(DBusGProxy *proxy,
- 				DBusGProxyCall *call, void *user_data)
- {
-@@ -323,12 +353,9 @@ static void create_notify(DBusGProxy *pr
- 						G_TYPE_INVALID) == FALSE) {
- 		gchar *text, *message;
- 
--		if (error != NULL) {
--			message = g_strdup(error->message);
-+		message = get_error_message(error);
-+		if (error != NULL)
- 			g_error_free(error);
--		} else
--			message = g_strdup(_("An unknown error occured"));
--
- 		text = g_strdup_printf("<span foreground=\"red\">%s</span>",
- 								message);
- 		gtk_label_set_markup(GTK_LABEL(label_status), text);
+------_=_NextPart_001_01C89972.CABC4BEA
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
---=-MWe2Ygrw2M1dbZmYL3Of
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Dus-ascii">
+<META content=3D"MSHTML 6.00.2900.3268" name=3DGENERATOR></HEAD>
+<BODY>
+<DIV><FONT size=3D2><SPAN class=3D106451612-08042008>
+<DIV><SPAN class=3D162253311-08042008><FONT =
+face=3DArial>Hello,</FONT></SPAN></DIV>
+<DIV><SPAN class=3D162253311-08042008><FONT =
+face=3DArial></FONT></SPAN>&nbsp;</DIV>
+<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial>I need an =
+implementation=20
+for the dfu-functionality via uart. For this purpose, I need to=20
+know</FONT></SPAN></DIV>
+<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial>what the =
+function=20
+usb_control_msg writes exactly to the usb-Device to duplicate for=20
+example</FONT></SPAN></DIV>
+<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial>the header for=20
+uart.</FONT></SPAN></DIV>
+<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial>I was unable to =
+find an=20
+exact implementation of this function with e.g. the given=20
+parameters</FONT></SPAN></DIV>
+<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial>(USB_TYPE_CLASS =
+|=20
+USB_DIR_IN | USB_RECIP_INTERFACE,&nbsp;DFU_UPLOAD).<SPAN=20
+class=3D106451612-08042008> I only found the</SPAN></FONT></SPAN></DIV>
+<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial><SPAN=20
+class=3D106451612-08042008>functions <A class=3Dcode=20
+href=3D"http://www.srcdoc.com/linux_2.2.26/usb_8c.html#a41">usb_start_wai=
+t_urb</A>&nbsp;and=20
+<A class=3Dcode=20
+href=3D"http://www.srcdoc.com/linux_2.2.26/usb_8c.html#a38">usb_submit_ur=
+b</A>,=20
+but I can't find out what is really send via =
+usb.</SPAN></FONT></SPAN></DIV>
+<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial>Can anybody =
+tell me what=20
+this function sends to the device? And if anyone knows, it is=20
+possible</FONT></SPAN></DIV>
+<DIV><SPAN class=3D162253311-08042008><FONT face=3DArial>to rewrite this =
+
+functionality for uart?</FONT></SPAN></DIV>
+<DIV><FONT face=3DArial></FONT>&nbsp;</DIV>
+<DIV align=3Dleft><SPAN class=3D162253311-08042008></SPAN><FONT =
+face=3DArial>T<SPAN=20
+class=3D162253311-08042008>hanks for help,</SPAN></FONT></DIV>
+<DIV align=3Dleft><FONT size=3D+0><SPAN =
+class=3D162253311-08042008></SPAN><SPAN=20
+class=3D162253311-08042008></SPAN><FONT face=3DArial size=3D2>B<SPAN=20
+class=3D162253311-08042008>est Regards, </SPAN>Bernd=20
+Krause</FONT></FONT></DIV></SPAN></FONT></DIV>
+<DIV><FONT face=3DArial size=3D2><BR>Siemens AG<BR>Medical =
+Solutions<BR>MED MR PLM=20
+ST SCC<BR>Allee am Roethelheimpark 2<BR>91052 Erlangen, Germany<BR>Tel.: =
+
+<BR>Fax: <BR>mailto:<A=20
+href=3D"mailto:bernd.bk.krause@siemens.com">bernd.bk.krause@siemens.com</=
+A></FONT></DIV>
+<DIV>&nbsp;</DIV></BODY></HTML>
+
+------_=_NextPart_001_01C89972.CABC4BEA--
+
+
+--===============1787561428==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -158,7 +147,7 @@ This SF.net email is sponsored by the 2008 JavaOne(SM) Conference
 Register now and save $200. Hurry, offer ends at 11:59 p.m., 
 Monday, April 7! Use priority code J8TLD2. 
 http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
---=-MWe2Ygrw2M1dbZmYL3Of
+--===============1787561428==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -169,4 +158,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-MWe2Ygrw2M1dbZmYL3Of--
+--===============1787561428==--
