@@ -1,11 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BLU117-W350837E07CCCAD9D0B092E88F20@phx.gbl>
-From: Benson Dong <dongas86.dev@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Tue, 8 Apr 2008 11:32:12 +0800
+Message-ID: <BAY118-DAV3F4C2E9D80FB360F79BC7C7F20@phx.gbl>
+From: <ichane@hotmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+References: <BAY118-DAV9D9EC1C84DCF7A987834CC7FE0@phx.gbl>
+	<83810412-22B0-461B-9307-48269B59E8FA@holtmann.org>
+Date: Tue, 8 Apr 2008 09:39:20 +0800
 MIME-Version: 1.0
-Subject: [Bluez-users] SDP couldn't discovery any device or service
-	(stlc2500)
+Subject: Re: [Bluez-users] sdptool add service
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,86 +16,77 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi, there:
 
-The environment i used is BT Module (STLC2500) with bluez 3.26 running on M=
-ontavista kernel 2.6.18.
+Thanks for the reply.
 
-Here is hciconfig output:
-# hciconfig -a
-hci0: Type: UART
-BD Address: 00:80:E1:00:AB:BA ACL MTU: 1021:7 SCO MTU: 0:0
-UP RUNNING PSCAN ISCAN
-RX bytes:718 acl:0 sco:0 events:23 errors:0
-TX bytes:369 acl:0 sco:0 commands:23 errors:0
-Features: 0xff 0xeb 0x8d 0xfe 0x9b 0xe9 0x00 0x00
-Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-Link policy: RSWITCH HOLD SNIFF PARK
-Link mode: ACCEPT MASTER
-Name: 'BlueZ (0)'
-Class: 0x080100
-Service Classes: Capturing
-Device Class: Computer, Uncategorized
-HCI Ver: 2.0 (0x3) HCI Rev: 0x402 LMP Ver: 2.0 (0x3) LMP Subver: 0x520
-Manufacturer: ST Microelectronics (48)
+Hi, there:
 
-I wonder only from the output of 'hciconfig -a ',could i make sure that the=
- BT Module i used has really got up?
+Thanks for the reply.
 
-The following is the output from 'hcidump -x -V &' when trying 'sdptool bro=
-wse' and 'hcitool scan':
-# hcidump -x -V &
-# HCI sniffer - Bluetooth packet analyzer ver 1.41
-device: hci0 snap_len: 1028 filter: 0xffffffff
-# sdptool browse
-Inquiring ...
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-lap 0x9e8b33 len 10 num 20
-> HCI Event: Command Status (0x0f) plen 4
-Inquiry (0x01|0x0001) status 0x00 ncmd 1
-> HCI Event: Inquiry Complete (0x01) plen 1
-status 0x00
-> HCI Event: Command Status (0x0f) plen 4
-Unknown (0x00|0x0000) status 0x00 ncmd 2
-# hcitool scan
-Scanning ...
-< HCI Command: Inquiry (0x01|0x0001) plen 5
-lap 0x9e8b33 len 8 num 0
-> HCI Event: Command Status (0x0f) plen 4
-Inquiry (0x01|0x0001) status 0x00 ncmd 1
-> HCI Event: Inquiry Complete (0x01) plen 1
-status 0x00
-> HCI Event: Command Status (0x0f) plen 4
-Unknown (0x00|0x0000) status 0x00 ncmd 2
+I observe that "sdptool add SP" always sets rfcomm channel to 1.
+Thus, "rfcomm listen 0 2" which should set channel to 2 does not
+correctly set to SDP's service record for other rfcomm clients
+to use channel 2 to make rfcomm connection.
 
-It couldn't discovery any services with 'sdptool browse' or 'hcitool scan' =
-,although there's a bt headset openned.
-It seems that it has a right 'hciconfig -a' output ,but still could not wor=
-k.Is it a hardware problem or software problem?
+Is there any way to set rfcomm channel to SDP's service record
+in addition to channel 1 ?
 
-Could someone give me some hints?
-Any help would be much appreciated!
+Thanks a lot,
 
-Best Regards
-Benson
+Chane
+
+----- Original Message ----- 
+From: "Marcel Holtmann" <marcel@holtmann.org>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Sent: Thursday, March 27, 2008 10:58 PM
+Subject: Re: [Bluez-users] sdptool add service
 
 
-_________________________________________________________________
-Connect to the next generation of MSN Messenger=A0
-http://imagine-msn.com/messenger/launch80/default.aspx?locale=3Den-us&sourc=
-e=3Dwlmailtagline
+> Hi Chane,
+>
+>> Do I need to add service manually using sdptool add? I got different
+>> results using pand and rfcomm listen as servers.
+>>
+>> 1. >pand -s -M --role=NAP
+>> After run the command above, no need to run "sdptool add NAP". The
+>> service is already registered to sdpd.
+>
+> the pand will register service records for you. Why are you not using
+> the network service?
+>
+>> 2.>rfcomm listen 1 1
+>> Need to run sdptool add SP to register SPP service to sdpd.
+>
+> Yes, you need to register your own service record. However using the
+> serial service might be a better idea here.
+>
+> Regards
+>
+> Marcel
+>
+>
+> -------------------------------------------------------------------------
+> Check out the new SourceForge.net Marketplace.
+> It's the best place to buy or sell services for
+> just about anything Open Source.
+> http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+> 
+
+
 -------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference =
-
-Register now and save $200. Hurry, offer ends at 11:59 p.m., =
-
-Monday, April 7! Use priority code J8TLD2. =
-
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/java=
-one
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
+Register now and save $200. Hurry, offer ends at 11:59 p.m., 
+Monday, April 7! Use priority code J8TLD2. 
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
