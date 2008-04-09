@@ -1,79 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 Apr 2008 09:32:54 +0200
-From: martin f krafft <madduck@madduck.net>
-To: bluez-devel@lists.sourceforge.net
-Message-ID: <20080411073254.GB23249@lapse.madduck.net>
+Message-ID: <012d01c899d5$e7236740$6701a8c0@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Cc: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+References: <00bd01c89901$26af9f80$6701a8c0@freqonedev> <2B4A186F-49DD-4131-ABB7-46E79D1A9DE8@holtmann.org> <00f801c899a1$946db020$6701a8c0@freqonedev> <7698E157-DB74-482D-9442-2B9C035B5A62@holtmann.org> <012801c899cd$447eb880$6701a8c0@freqonedev> <1D6A3083-03A3-4698-A040-DD010CC4EBAD@holtmann.org>
+Subject: Re: [Bluez-devel] UPDATE: org.bluez.Adapter Methods/Signals
+Date: Tue, 8 Apr 2008 19:08:54 -0500
 MIME-Version: 1.0
-Subject: [Bluez-devel] SCO patch works on (Debian) 2.6.24 (was: Updated SCO
-	flow control	patch: 2.6.23)
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Content-Type: text/plain;
+	charset="iso-8859-1"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Fabien Chevalier <fabchevalier <at> free.fr> writes:
-> As for sco-flowcontrol-v4.4.diff, which is against 2.6.22-mh3, i didn't 
-> manage to test it due to broken sco behaviour. 
+Thanks.  After digging into ~/bluez-utils-3.30/doc/... the situation became significantly more clear.  I see the names of the 
+xxx-api.txt are also changed, which is why I did not find them before...sigh.
 
-Hi,
+All the best,
 
-I have just compiled a Debian 2.6.24 with the v4.4 patch: it applied
-and compiled cleanly.
+DS
+----- Original Message ----- 
+From: "Marcel Holtmann" <marcel@holtmann.org>
+To: "David Stockwell" <dstockwell@frequency-one.com>
+Cc: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Sent: Tuesday, April 08, 2008 6:36 PM
+Subject: Re: [Bluez-devel] UPDATE: org.bluez.Adapter Methods/Signals
 
-And it works most of the time with my BT500v headset (sco)! Thank
-you for that.
 
-Is there any ETA on when this patch will make it into the kernel
-mainline?
+Hi David,
 
-Unfortunately, sometimes I see the
+> That "flame" was uncalled for.  I have attached file bluez-
+> utils-3.30/hcid/dbus-api.txt
 
-  Critical: Opening ALSA driver failed:
-  snd_pcm_hw_params_set_rate(8287) failed: Invalid argument
+actually I mentioned before that you only will see DeviceFound on /
+hci0 and if you look into the doc/ directory you see the documentation
+for the new API. I mailed an update to the mailing list that mentioned
+that from now on forward I am going to put new documentation there.
 
-log output from twinkle and then I can't hear anything from the
-other side and I am not sure they can hear me.
+> The section describing the org.bluez.Adapter interface contains the
+> following (emphasis added):
+>
+>  void DiscoverDevices()
+>
+>   This method starts the device discovery procedure. This
+>   includes an inquiry procedure and remote device name
+>   resolving.
+>
+>   On start up this process will generate a DiscoveryStarted
+>   signal and then return ***RemoteDeviceFound*** and also
+>   ***RemoteNameUpdated*** signals. If the procedure has been
+>   finished an DiscoveryCompleted signal will be sent.
+>
+>   Possible errors: org.bluez.Error.NotReady
+>      org.bluez.Error.Failed
+>      org.bluez.Error.InProgress
+>      org.bluez.Error.NoSuchAdapter
+>
+>  void DiscoverDevicesWithoutNameResolving()
+>
+>   This method starts the device discovery procedure. This
+>   includes an inquiry and an optional remote device name
+>   resolving. The remote names can be retrieved with
+>   GetRemoteName and in the case a name doesn't exist it
+>   will be queued for later resolving and GetRemoteName
+>   will return an error.
+>
+>   While this procedure is running every found device
+>   will be returned with ***RemoteDeviceFound***. While
+>   DiscoverDevices() automatically resolves unknown
+>   devices names and sends ***RemoteNameUpdated*** in this
+>   case it will only happen if GetRemoteName has been
+>   called and no previously stored name is available.
+>
+>   Possible errors: org.bluez.Error.NotReady
+>      org.bluez.Error.Failed
+>      org.bluez.Error.InProgress
+>      org.bluez.Error.NoSuchAdapter
+>
+> Note well: not "DeviceFound", but "RemoteDeviceFound".
 
-At other times, the headset just disconnects before my softphone
-even tries to set up the call with:
+Check doc/adapter-api.txt and you will see. I might mix up stuff from
+time to time, but most times I mean exactly what I say. Also using
+introspection utility like d-feet would have shown you this.
 
-  headsetd[25077]: Changing state: Zombie-->Streaming
-  headsetd[25077]: Appli closed socket
-  headsetd[25077]: Changing state: Streaming-->Zombie
-  headsetd[25077]: Nobody uses SCO channel anymore, closing it.
-  headsetd[25077]: Changing state: Zombie-->Connected
+> The file I attached is the only dbus-api-txt found in the entire
+> bluez-utils-3.30 tree.   So, it appears the documentation is out of
+> date; after digging into the code at adapter.c, I found signals
+> DeviceCreated, DeviceRemoved, and DeviceFound in the adapter_signals
+> table.  I will implement "catches" for them, now, and expect that
+> this problem will go away.
 
-and then the application will sit forever saying it's "Trying".
+No. The documentation is all there. Depending on your entry point is
+either / or /org/bluez you have to follow a different API.
 
-If you have any suggestions, I'd love to hear them.
-I will write back if I find out more...
+Regards
 
--- 
-martin;              (greetings from the heart of the sun.)
-  \____ echo mailto: !#^."<*>"|tr "<*> mailto:" net@madduck
- 
-"by accepting this brick through your window, you accept it as is
- and agree to my disclaimer of all warranties, express or implied,
- as well as disclaimers of all liability, direct, indirect,
- consequential or incidental, that may arise from the installation
- of this brick into your building."                 -- seen on irc
- 
-spamtraps: madduck.bogus@madduck.net
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
-Don't miss this year's exciting event. There's still time to save $100. 
-Use priority code J8TL2D2. 
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Marcel
