@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <194c6ea30804110126l560d9e5dj149ef955aca93e3c@mail.gmail.com>
-Date: Fri, 11 Apr 2008 16:26:56 +0800
-From: "dong yan" <semiydsemiyd@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <000901c88f0b$09c88e90$832fc70a@dlh.st.com>
 MIME-Version: 1.0
-References: <194c6ea30803252300o387570b1s8b2ba96f01d7a462@mail.gmail.com>
-	<000901c88f0b$09c88e90$832fc70a@dlh.st.com>
-Subject: Re: [Bluez-users] How to enable eSCO in linux 2.6.18?
+Message-ID: <47FD7999.000059.14457@bjapp32>
+Date: Thu, 10 Apr 2008 10:21:13 +0800 (CST)
+From: "=?gb2312?B?ZmVuZ3poaWZ1?=" <fengzhifu@tom.com>
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users]
+ =?gb2312?B?V2hvIGNhbiB0ZWxsIG1lIGEgdXRpbGl0eSB0byBjb250cm9sIHJlbW8=?=
+ =?gb2312?B?dGUgQUcu?=
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,153 +16,129 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0818412860=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Sumeet VERMA:
 
-    I'm just writing this to tell you that your esco patch for 2.6.18
-works well.I modified some settings within the sff file , use "hstest"
-to establish an esco connection and then send the audio data directly
-into pcm interface connected to stlc2500. Now i can play/record music
-on esco.
-    Thanks for the patch!
+--===============0818412860==
+Content-Type: Multipart/Alternative;
+	boundary="Boundary-=_TtiENXsDnkEwHYcAzkiucIbgHnUY"
 
-Best Regards
 
-semiyd
+--Boundary-=_TtiENXsDnkEwHYcAzkiucIbgHnUY
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 
-2008/3/26, Sumeet VERMA <sumeet.verma@st.com>:
-> Hi
-> Are you using a minikit? What is the version of STLC2500 chip you are using?
-> In case you are using minikit along with motherboard you have to enable the
-> codec. Otherwise you will not hear any sound.
->
-> Regards,
-> Sumeet
->
-> -----Original Message-----
-> From: bluez-users-bounces@lists.sourceforge.net
-> [mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of dong yan
-> Sent: Wednesday, March 26, 2008 11:30 AM
-> To: BlueZ users
-> Subject: Re: [Bluez-users] How to enable eSCO in linux 2.6.18?
->
-> Hi Sumeet VERMA:
->
->   Thanks a lot!
->   As a matter of fact , im using ST's bluetooth chip STLC2500. This chip
-> can't establish SCO connections under linux 2.6.18, so i had to try eSCO
-> connection.....that's why i want this esco patch.  i applied your patch and
-> eSCO seems to be connected. But still there's no sound coming out of my
-> bluetooth headset...
-> When i tried to disconnect the esco channel , hcid reports an error.....
-> Please refer to the details in this log:
-> (I use 'hstest' from bluez-utils to test the SCO/eSCO.)
->
->  $ hstest play /tmp1/1.wav 00:0D:3C:EB:53:F0 1 Voice setting: 0x0060
-> hcid[173]: link_key_request (sba=00:80:E1:00:AB:BA, dba=00:0D:3C:EB:53:F0)
-> hcid[173]: link_key_request (sba=00:80:E1:00:AB:BA, dba=00:0D:3C:EB:53:F0)
-> RFCOMM channel connected
-> KERNEL:sco_connect(): type=2,eSCO
->
-> SCO audio channel connected (handle 8, mtu 60)
-> hcid[173]: link_key_request (sba=00:80:E1:00:AB:BA, dba=00:0D:3C:EB:53:F0)
->
->
-> / $
-> / $ hcid[173]: Disconnection failed: 0x0c
->
-> At the sametime , if i use another  USB bluetooth module instead of STLC2500
-> , i can hear the music with my bluetooth headset after established SCO
-> connection.
->
-> Please, let me know if you have any other suggestions,thanks!!
->
-> semiyd
->
->
-> 2008/3/26, Sumeet VERMA <sumeet.verma@st.com>:
-> > Hi
-> > Please find attached the esco patch for 2.6.18
-> >
-> > Sumeet
-> >
-> > -----Original Message-----
-> > From: bluez-users-bounces@lists.sourceforge.net
-> > [mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of
-> > Sent: Tuesday, March 25, 2008 11:41 AM
-> > To: bluez-users@lists.sourceforge.net
-> > Subject: [Bluez-users] How to enable eSCO in linux 2.6.18?
-> >
-> >
-> > Hi All:
-> >        I want to enable eSCO function in linux 2.6.18 for a certain
-> > reason.... I know that 2.6.23 with the bluez-2.6.23mh1 patch can
-> > enable simple eSCO support. But since i can't upgrade my kernel to
-> > 2.6.23+ , is there any patches that can be applied on a 2.6.18 kernel
-> > in order to make eSCO connections ?
-> >
-> >
-> >
-> > Thanks
-> >
-> >
-> >
-> >
-> > semiyd
-> >
-> >
-> >
-> >
-> >
-> > _________________________________________________________________
-> > News, entertainment and everything you care about at Live.com. Get it now!
-> > http://www.live.com/getstarted.aspx
-> >
-> >
-> > ----------------------------------------------------------------------
-> > --- Check out the new SourceForge.net Marketplace.
-> > It's the best place to buy or sell services for just about anything
-> > Open Source.
-> > http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marke
-> > tplace _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> > https://lists.sourceforge.net/lists/listinfo/bluez-users
-> >
-> >
-> >
->
-> -------------------------------------------------------------------------
-> Check out the new SourceForge.net Marketplace.
-> It's the best place to buy or sell services for just about anything Open
-> Source.
-> http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->
-> -------------------------------------------------------------------------
-> Check out the new SourceForge.net Marketplace.
-> It's the best place to buy or sell services for
-> just about anything Open Source.
-> http://ad.doubleclick.net/clk;164216239;13503038;w?http://sf.net/marketplace
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+SGkNCg0KSSBoYXZlIHBvcnRlZCB0aGUgYmx1ZXoobGlicywgdXRpbHMpIDMuMjggdG8gYSBh
+cm0gcGxhdGZvcm0sIHRoZSBvcyBrZXJuZWwgaXMgbGludXggMi42LiANCg0KVGhlIGZ1bmN0
+aW9uIEkgd2FudCB0byBpbXBsZW1lbnQgaXMgbGlrZSBhIGJsdWV0b290aCBlYXJwaG9uZS4g
+V2hlbiBhIGNhbGwgaXMgcmVjZWl2ZWQsIHRoZSBwaG9uZShBRykgY2FuIGNvbm5lY3QgdG8g
+dGhlIGJvYXJkKGhlYWRzZXQpLiBzbyBJIHdhbnQgYSBibHVleiBzZXJ2aWNlIG9yIHV0aWxp
+dHkgdG8gbm90aWZ5IHRoZSBpbmNvbWluZyBjYWxsLCBhbmQgSSBjYW4gY29udHJvbCB0aGUg
+Y29ubmVjdGlvbiBieSBpdCBlaXRoZXIuIEJ1dCBJIGNhbid0IGZpbmQgdGhpcyB1dGlsaXR5
+LiANCg0KSSBoYXZlIHJlYWQgYW5kIHRlc3RlZCB0aGUgaGVhZHNldCBmdWNudGlvbiBiZWxv
+bmcgdG8gdGhlIGF1ZGlvIHNlcnZpY2UsIEkgdGhpbmsgSSBjYW4gY29udHJvbCByZW1vdGUg
+aGVhZHNldCBieSBpdCwgYnV0IGNhbid0IGNvbnRyb2wgcmVtb3RlIEFHIGJ5IGl0LiAgTWF5
+YmUgeW91IGNhbiB0ZWxsIG1lIGEgc2VydmljZS4NCg0KIA0KDQpUaGFua3MgYWxsLg0KIA0K
+DQo=
+--Boundary-=_TtiENXsDnkEwHYcAzkiucIbgHnUY
+Content-Type: text/html; charset="gb2312"
+Content-Transfer-Encoding: base64
+
+SGk8YnI+PGJyPkkgaGF2ZSBwb3J0ZWQgdGhlIGJsdWV6KGxpYnMsIHV0aWxzKSAzLjI4IHRv
+IGEgYXJtIHBsYXRmb3JtLCB0aGUgb3Mga2VybmVsIGlzIGxpbnV4IDIuNi4gPGJyPjxicj5U
+aGUgZnVuY3Rpb24gSSB3YW50IHRvIGltcGxlbWVudCBpcyBsaWtlIGEgYmx1ZXRvb3RoIGVh
+cnBob25lLiBXaGVuIGEgY2FsbCBpcyByZWNlaXZlZCwgdGhlIHBob25lKEFHKSBjYW4gY29u
+bmVjdCB0byB0aGUgYm9hcmQoaGVhZHNldCkuIHNvIEkgd2FudCBhIGJsdWV6IHNlcnZpY2Ug
+b3IgdXRpbGl0eSB0byBub3RpZnkgdGhlIGluY29taW5nIGNhbGwsIGFuZCBJIGNhbiBjb250
+cm9sIHRoZSBjb25uZWN0aW9uIGJ5IGl0IGVpdGhlci4gQnV0IEkgY2FuJ3QgZmluZCB0aGlz
+IHV0aWxpdHkuIDxicj48YnI+SSBoYXZlIHJlYWQgYW5kIHRlc3RlZCB0aGUgaGVhZHNldCBm
+dWNudGlvbiBiZWxvbmcgdG8gdGhlIGF1ZGlvIHNlcnZpY2UsIEkgdGhpbmsgSSBjYW4gY29u
+dHJvbCByZW1vdGUgaGVhZHNldCBieSBpdCwgYnV0IGNhbid0IGNvbnRyb2wgcmVtb3RlIEFH
+IGJ5IGl0LiAgTWF5YmUgeW91IGNhbiB0ZWxsIG1lIGEgc2VydmljZS48YnI+PGJyPiA8YnI+
+PGJyPlRoYW5rcyBhbGwuPGJyPiA8YnI+PCEtLSB1cmxmaWxlcyAtLT48YnI+PGJyPjwhLS0g
+Zm9vdGVyIC0tPjxicj48YnI+Cjx0YWJsZSBjZWxscGFkZGluZz0iMSIgY2VsbHNwYWNpbmc9
+IjEiIGJvcmRlcj0iMCIgc3R5bGU9Im1hcmdpbi10b3A6MTBweDsiPgogIDx0cj4gCiAgPHRk
+Pgo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQo8YnI+
+CiA8QSB0aXRsZT0iv+zAtLrNztLSu8bwz+3K3FRPTcPit9HTys/ksMmjoSC/tL+0s/3ByzEu
+NUejrLu509DKssO0o78iICBocmVmPSJodHRwOi8vYmpjZ2kuMTYzLm5ldC9jZ2ktYmluL25l
+d3JlZy5jZ2k/CnJmPTA1MDYwMiIgIHRhcmdldD0iX2JsYW5rIj48Zm9udCBjb2xvcj0iRTcw
+RDg4IiB0YXJnZXQ9Il9ibGFuayI+v+zAtLrNztLSu8bwz+3K3FRPTcPit9HTys/ksMmjoSC/
+tL+0s/3ByzEuNUejrLu509DKssO0o788L2ZvbnQ+PGltZyAKc3JjPSJodHRwOi8vbWFpbC50
+b20uY29tL2ltYWdlcy9tYWlsLzA1MDMyOC9wYWdlXzAyLmdpZiIgIGJvcmRlcj0iMCIgd2lk
+dGg9IjM3IiAKaGVpZ2h0PSIzMyI+PC9BPgo8YnI+Cjxicj4KPGEgaHJlZj0iaHR0cDovL3Zp
+cC50b20uY29tL2luZm8vZ2dkXzA2MDMwMS9pbmRleF90bWFpbC5odG1sIiB0YXJnZXQ9Il9i
+bGFuayI+PGltZyBzcmM9Imh0dHA6Ly9tYWlsLnRvbS5jb20vaW1hZ2VzL3ZpcC92aXBfYWQv
+bWFpbF9zY2UuZ2lmIiBib3JkZXI9IjAiIGFsaWduPSJhYnNib3R0b20iPjwvYT4gIDxhIGhy
+ZWY9Imh0dHA6Ly9iYnMubGFkeS50b20uY29tL2Jicy5waHA/Zm9ydW1pZD03MDMiIHRhcmdl
+dD0iX2JsYW5rIj6/tL+0xa7Iy7a81NrBxMqyw7Q/PC9hPiAgPGEgaHJlZj0iaHR0cDovL3Bp
+Yy50b20uY29tLyIgdGFyZ2V0PSJfYmxhbmsiPsPAzby+ocnNPC9hPiAgPGEgaHJlZj0iaHR0
+cDovL2Jicy5uZXdzLnRvbS5jb20vYmJzLnBocD9mb3J1bWlkPTY5NyIgdGFyZ2V0PSJfYmxh
+bmsiPsHEzOzKwL3nPC9hPgogPCEtLUEgdGl0bGU9IrmyzazM5dHps6y088jdwb+jobOsx7+3
+wNP5o6HXqNK1ybG2vqOh16jStbfAwKy7+KOhIiBocmVmPSJodHRwOi8vYmpjZ2kuMTYzLm5l
+dC9jZ2ktYmluL25ld3JlZy5jZ2k/CnJmPTA1MDYwMiIgdGFyZ2V0PSJfYmxhbmsiPjxmb250
+IGNvbG9yPSJFNzBEODgiPtTaz9/Jsba+o6Gwssirzsi2qKOhs6zHv7fA0/mjoTwvZm9udD48
+L0EtLT4KPGJyPgo8YnI+CsP30Me98Mf6w+K30cvNKDxhIGhyZWY9Imh0dHA6Ly9tbS50b20u
+Y29tL2l2ci8iIHRhcmdldD0iX2JsYW5rIj5odHRwOi8vbW0udG9tLmNvbS9pdnIvPC9hPimj
+ujxhIGhyZWY9Imh0dHA6Ly9mcy50b20uY29tL2l2ci9zZWFyY2hfaXZycmluZy5waHA/U2lu
+Z2VyTmFtZT3W3L3cwtcmdXNlcl9pZD0zJmNvZGVfaWQ9MDAwMDAwIiB0YXJnZXQ9Il9ibGFu
+ayI+1ty93MLXPC9hPiA8YSBocmVmPSJodHRwOi8vZnMudG9tLmNvbS9pdnIvc2VhcmNoX2l2
+cnJpbmcucGhwP1Npbmdlck5hbWU9wda/ob3cJnVzZXJfaWQ9MyZjb2RlX2lkPTAwMDAwMCIg
+dGFyZ2V0PSJfYmxhbmsiPsHWv6G93DwvYT4gPGEgaHJlZj0iaHR0cDovL2ZzLnRvbS5jb20v
+aXZyL3NlYXJjaF9pdnJyaW5nLnBocD9TaW5nZXJOYW1lPcXTwfomdXNlcl9pZD0zJmNvZGVf
+aWQ9MDAwMDAwIiB0YXJnZXQ9Il9ibGFuayI+xdPB+jwvYT4gPGEgaHJlZj0iaHR0cDovL2Zz
+LnRvbS5jb20vaXZyL3NlYXJjaF9pdnJyaW5nLnBocD9TaW5nZXJOYW1lPdXFu93DwyZ1c2Vy
+X2lkPTMmY29kZV9pZD0wMDAwMDAiIHRhcmdldD0iX2JsYW5rIj7Vxbvdw8M8L2E+PGJyPgo8
+YnI+Cr6isay46Mf6vqHH6bXjKDxhIGhyZWY9Imh0dHA6Ly9tbS50b20uY29tL2l2ci8iIHRh
+cmdldD0iX2JsYW5rIj5odHRwOi8vbW0udG9tLmNvbS9pdnIvPC9hPimjujxhIGhyZWY9Imh0
+dHA6Ly9mcy50b20uY29tL2l2ci9zZW5kX3N0ZXAxLnBocD9JZD0zOTI0NCZ1c2VyX2lkPTMm
+Y29kZV9pZD13NTU1IiB0YXJnZXQ9Il9ibGFuayI+u/TUqrzXPC9hPiA8YSBocmVmPSJodHRw
+Oi8vZnMudG9tLmNvbS9pdnIvc2VuZF9zdGVwMS5waHA/SWQ9MzgzOTcmdXNlcl9pZD0zJmNv
+ZGVfaWQ9dzU1NSIgdGFyZ2V0PSJfYmxhbmsiPryqz+nI/bGmPC9hPiA8YSBocmVmPSJodHRw
+Oi8vZnMudG9tLmNvbS9pdnIvc2VuZF9zdGVwMS5waHA/SWQ9MzkzMzUmdXNlcl9pZD0zJmNv
+ZGVfaWQ9dzU1NSIgdGFyZ2V0PSJfYmxhbmsiPsjL1so8L2E+IDxhIGhyZWY9Imh0dHA6Ly9m
+cy50b20uY29tL2l2ci9zZW5kX3N0ZXAxLnBocD9JZD0zOTMyNSZ1c2VyX2lkPTMmY29kZV9p
+ZD13NTU1IiB0YXJnZXQ9Il9ibGFuayI+styy2TwvYT48YnI+Cjxicj4K7MW/4bLKweXD4rfR
+y80oPGEgaHJlZj0iaHR0cDovL21tLnRvbS5jb20vY2FpbGluZy8iIHRhcmdldD0iX2JsYW5r
+Ij5odHRwOi8vbW0udG9tLmNvbS9jYWlsaW5nLzwvYT4po7o8YSBocmVmPSJodHRwOi8vZnMu
+dG9tLmNvbS9jYWlsaW5nL3NlYXJjaC5waHA/Q3VyUGFnZT0xJnVzZXJfaWQ9MyZDYXRhbG9n
+PSZwaG9uZV9udW09JlNlYXJjaEJ5PXJpbmcmS2V5d29yZD0lRDYlREMlQkQlREMlQzIlRDcl
+QjAlRUYlQzQlRTMlQkQlRDMlQjUlRTclQkIlQjAiIHRhcmdldD0iX2JsYW5rIj7W3L3cwtew
+78TjvdO157uwPC9hPiA8YSBocmVmPSJodHRwOi8vZnMudG9tLmNvbS9jYWlsaW5nL3NlYXJj
+aC5waHA/Q3VyUGFnZT0xJnVzZXJfaWQ9MyZDYXRhbG9nPSZwaG9uZV9udW09JlNlYXJjaEJ5
+PXJpbmcmS2V5d29yZD0lQzIlRTklQjclQjMlQzUlQUUlQzUlRjMlRDMlRDEiIHRhcmdldD0i
+X2JsYW5rIj7C6bezxa7F89PRPC9hPiA8YSBocmVmPSJodHRwOi8vZnMudG9tLmNvbS9jYWls
+aW5nL3NlYXJjaC5waHA/Q3VyUGFnZT0xJnVzZXJfaWQ9MyZDYXRhbG9nPSZwaG9uZV9udW09
+JlNlYXJjaEJ5PXJpbmcmS2V5d29yZD0lQzYlREYlQzAlRUYlQ0YlRTMiIHRhcmdldD0iX2Js
+YW5rIj7G38Dvz+M8L2E+IDxhIGhyZWY9Imh0dHA6Ly9mcy50b20uY29tL2NhaWxpbmcvc2Vh
+cmNoLnBocD9DdXJQYWdlPTEmdXNlcl9pZD0zJkNhdGFsb2c9JnBob25lX251bT0mU2VhcmNo
+Qnk9cmluZyZLZXl3b3JkPSVEMCVBMSVCMyVDNyVCOSVDQSVDQSVDMiIgdGFyZ2V0PSJfYmxh
+bmsiPtChs8e5ysrCPC9hPgoKPGJyPgoKCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09CiAgPC90ZD4KICA8L3RyPgo8L3RhYmxlPg==
+--Boundary-=_TtiENXsDnkEwHYcAzkiucIbgHnUY--
+
+
+--===============0818412860==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
 Don't miss this year's exciting event. There's still time to save $100. 
 Use priority code J8TL2D2. 
 http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+--===============0818412860==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0818412860==--
