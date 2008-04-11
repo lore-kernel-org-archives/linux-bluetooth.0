@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <E673024B-BC5B-44C7-806D-38CA69FD680E@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <194c6ea30804110133x276fd249p245cb6cbfd699f48@mail.gmail.com>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Fri, 11 Apr 2008 10:44:12 +0200
-References: <194c6ea30804110133x276fd249p245cb6cbfd699f48@mail.gmail.com>
-Subject: Re: [Bluez-users] bluez3.30 audio/serial plugin issue
+Message-ID: <194c6ea30804110133x276fd249p245cb6cbfd699f48@mail.gmail.com>
+Date: Fri, 11 Apr 2008 16:33:06 +0800
+From: "dong yan" <semiydsemiyd@gmail.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-users] bluez3.30 audio/serial plugin issue
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,37 +18,67 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi All:
 
->    i just upgraded my bluez from 3.26 to 3.30...It's said that all
-> audio/serial...services are moved into plugin libraries...
->    It seems i got a problem while loading these new plugins,here's  
-> the log:
->
-> hcid[173]: Bluetooth HCI daemon
-> hcid[173]: Enabling debug information
-> hcid[173]: HCI dev 0 registered
-> hcid[173]: Starting SDP server
-> hcid[173]: Adding rec : 0x4d8c0
-> hcid[173]: with handle : 0x1
-> hcid[173]: Adding rec : 0x4d980
-> hcid[173]: with handle : 0x0
-> hcid[173]: Service classes 0x00
-> hcid[173]: Creation of inotify context failed
->
-> hcid[173]: Loading plugins /bluetooth//lib/bluetooth/plugins
-> hcid[173]: Can't load plugin:
-> /bluetooth//lib/bluetooth/plugins/libaudio.so: invalid mode for
-> dlopen(): Invalid argument
+    i just upgraded my bluez from 3.26 to 3.30...It's said that all
+audio/serial...services are moved into plugin libraries...
+    It seems i got a problem while loading these new plugins,here's the log:
 
-it seems the solution to this is to use --enable-glib. For some reason  
-our eglib plugin loader doesn't work always. I never saw this problem  
-and still can't reproduce it.
+hcid[173]: Bluetooth HCI daemon
+hcid[173]: Enabling debug information
+hcid[173]: HCI dev 0 registered
+hcid[173]: Starting SDP server
+hcid[173]: Adding rec : 0x4d8c0
+hcid[173]: with handle : 0x1
+hcid[173]: Adding rec : 0x4d980
+hcid[173]: with handle : 0x0
+hcid[173]: Service classes 0x00
+hcid[173]: Creation of inotify context failed
 
-Regards
+hcid[173]: Loading plugins /bluetooth//lib/bluetooth/plugins
+hcid[173]: Can't load plugin:
+/bluetooth//lib/bluetooth/plugins/libaudio.so: invalid mode for
+dlopen(): Invalid argument
+hcid[173]: Can't load plugin:
+/bluetooth//lib/bluetooth/plugins/libnetwork.so: invalid mode for
+dlopen(): Invalid argument
+hcid[173]: Can't load plugin:
+/bluetooth//lib/bluetooth/plugins/libinput.so: invalid mode for
+dlopen(): Invalid argument
+hcid[173]: Can't load plugin:
+/bluetooth//lib/bluetooth/plugins/libserial.so: invalid mode for
+dlopen(): Invalid argument
 
-Marcel
+hcid[173]: Registering service object: ident=serial, name=Serial
+service (/org/bluez/service_serial)
+hcid[173]: Registering service object: ident=audio, name=Audio service
+(/org/bluez/service_audio)
+hcid[173]: Registering service object: ident=input, name=Input service
+(/org/bluez/service_input)
+hcid[173]: Registering service object: ident=echo, name=Echo service
+(/org/bluez/service_echo)
+hcid[173]: Registering service object: ident=network, name=Network
+service (/org/bluez/service_network)
+hcid[173]: HCI dev 0 up
+hcid[173]: Device hci0 has been added
+hcid[173]: Starting security manager 0
+hcid[173]: Device hci0 has been activated
+hcid[173]: child 179 exited
+hcid[173]: /org/bluez: org.bluez.Security.RegisterDefaultPasskeyAgent()
+hcid[173]: name_listener_add(:1.1)
+hcid[173]: Default passkey agent (:1.1, /org/bluez/passkey_agent_178) registered
+hcid[173]: child 191 exited
 
+
+
+
+Anybody help me pls?
+
+
+
+Thanks in advance
+
+semiyd
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
