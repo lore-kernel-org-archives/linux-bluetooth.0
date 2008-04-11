@@ -1,13 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1207672137.3396.52.camel@cookie.hadess.net>
-References: <1207446435.26353.1.camel@californication>
-	<1207672137.3396.52.camel@cookie.hadess.net>
-Date: Fri, 11 Apr 2008 12:31:46 +0200
-Message-Id: <1207909906.1098.2.camel@californication>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [BlueZ-Announce] Release of bluez-gnome-0.26
+Date: Fri, 11 Apr 2008 09:32:54 +0200
+From: martin f krafft <madduck@madduck.net>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20080411073254.GB23249@lapse.madduck.net>
+MIME-Version: 1.0
+Subject: [Bluez-devel] SCO patch works on (Debian) 2.6.24 (was: Updated SCO
+	flow control	patch: 2.6.23)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,25 +19,54 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Bastien,
+Fabien Chevalier <fabchevalier <at> free.fr> writes:
+> As for sco-flowcontrol-v4.4.diff, which is against 2.6.22-mh3, i didn't 
+> manage to test it due to broken sco behaviour. 
 
-> Another patch. This one gives you a better error message when you have a
-> Palm device, as well as changing the "ETA" message to match that of
-> Nautilus.
+Hi,
 
-the patch has been committed, but in a total different form. Can I just
-remind you to comply with the coding style (aka whitespaces) and please
-don't do such complex code.
+I have just compiled a Debian 2.6.24 with the v4.4 patch: it applied
+and compiled cleanly.
 
-if () if () if () makes my brain hurt. I prefer if (!) return etc. A
-good rule is that if a line hits the 80 characters marker, then the code
-is too complex.
+And it works most of the time with my BT500v headset (sco)! Thank
+you for that.
 
-Regards
+Is there any ETA on when this patch will make it into the kernel
+mainline?
 
-Marcel
+Unfortunately, sometimes I see the
 
+  Critical: Opening ALSA driver failed:
+  snd_pcm_hw_params_set_rate(8287) failed: Invalid argument
 
+log output from twinkle and then I can't hear anything from the
+other side and I am not sure they can hear me.
+
+At other times, the headset just disconnects before my softphone
+even tries to set up the call with:
+
+  headsetd[25077]: Changing state: Zombie-->Streaming
+  headsetd[25077]: Appli closed socket
+  headsetd[25077]: Changing state: Streaming-->Zombie
+  headsetd[25077]: Nobody uses SCO channel anymore, closing it.
+  headsetd[25077]: Changing state: Zombie-->Connected
+
+and then the application will sit forever saying it's "Trying".
+
+If you have any suggestions, I'd love to hear them.
+I will write back if I find out more...
+
+-- 
+martin;              (greetings from the heart of the sun.)
+  \____ echo mailto: !#^."<*>"|tr "<*> mailto:" net@madduck
+ 
+"by accepting this brick through your window, you accept it as is
+ and agree to my disclaimer of all warranties, express or implied,
+ as well as disclaimers of all liability, direct, indirect,
+ consequential or incidental, that may arise from the installation
+ of this brick into your building."                 -- seen on irc
+ 
+spamtraps: madduck.bogus@madduck.net
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
