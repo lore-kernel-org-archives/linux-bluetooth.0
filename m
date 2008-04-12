@@ -1,13 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48008B46.3080601@suse.de>
-Date: Sat, 12 Apr 2008 12:13:26 +0200
-From: Stefan Seyfried <seife@suse.de>
+Message-ID: <d9423ca50804120115r62f29349n96d2244ff4fb39ea@mail.gmail.com>
+Date: Sat, 12 Apr 2008 12:15:41 +0400
+From: "Kirill Trofimov" <sinnus@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <194c6ea30804110133x276fd249p245cb6cbfd699f48@mail.gmail.com>
-	<E673024B-BC5B-44C7-806D-38CA69FD680E@holtmann.org>
-In-Reply-To: <E673024B-BC5B-44C7-806D-38CA69FD680E@holtmann.org>
-Subject: Re: [Bluez-users] bluez3.30 audio/serial plugin issue
+Subject: [Bluez-users] Interrupted system call (4)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,42 +14,86 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: multipart/mixed; boundary="===============2144045319=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> it seems the solution to this is to use --enable-glib. For some reason  =
+--===============2144045319==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_9940_23586732.1207988141844"
 
-> our eglib plugin loader doesn't work always. I never saw this problem  =
+------=_Part_9940_23586732.1207988141844
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> and still can't reproduce it.
+Hello.
 
-If you want to debug it, i could e.g. provide you with a qemu image of
-openSUSE FACTORY where it is reproducible.
+I configured bluetooth a2dp support for my Jabra bt620s. In audacious player
+I can hear sound but in console I see the following messages:
 
-OTOH, if eglib is going away anyway, maybe there are more important things =
-to
-debug ;-)
--- =
+...
+ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted
+system call (4)
+ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted
+system call (4)
+ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted
+system call (4)
+ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted
+system call (4)
+ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted
+system call (4)
+ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted
+system call (4)
+ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted
+system call (4)
+ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted
+system call (4)
+ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted
+system call (4)
+...
 
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg | "Well, surrounding them's out."
+I get it every time while music is playing. What does it mean? How can I be
+defeated from it?
+Thank you!
 
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
+-- 
+..:: second hand dreams ::..
+
+------=_Part_9940_23586732.1207988141844
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hello.<br><br>I configured bluetooth a2dp support for my Jabra bt620s. In audacious player I can hear sound but in console I see the following messages:<br><br>...<br>ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted system call (4)<br>
+ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted system call (4)<br>ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted system call (4)<br>ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted system call (4)<br>
+ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted system call (4)<br>ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted system call (4)<br>ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted system call (4)<br>
+ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted system call (4)<br>ALSA lib pcm_bluetooth.c:238:(playback_hw_thread) poll error: Interrupted system call (4)<br>...<br clear="all"><br>I get it every time while music is playing. What does it mean? How can I be defeated from it?<br>
+Thank you!<br><br>-- <br>..:: second hand dreams ::..
+
+------=_Part_9940_23586732.1207988141844--
+
+
+--===============2144045319==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference =
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
+Don't miss this year's exciting event. There's still time to save $100. 
+Use priority code J8TL2D2. 
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+--===============2144045319==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Don't miss this year's exciting event. There's still time to save $100. =
-
-Use priority code J8TL2D2. =
-
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/java=
-one
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============2144045319==--
