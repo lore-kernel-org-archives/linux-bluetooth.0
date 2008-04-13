@@ -1,14 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Sun, 13 Apr 2008 11:34:49 -0500
-Message-ID: <E6FF208A16840D4EBAA31D261B15A506F29F5C@ausx3mpc121.aus.amer.dell.com>
-References: <1207335282.19116.5.camel@mlimonciello><1207341998.32219.1.camel@mlimonciello><1207351025.13201.328.camel@cookie.hadess.net><E6FF208A16840D4EBAA31D261B15A506F29F16@ausx3mpc121.aus.amer.dell.com><1207521725.3396.4.camel@cookie.hadess.net>
-	<E6FF208A16840D4EBAA31D261B15A506F29F23@ausx3mpc121.aus.amer.dell.com>
-From: <Mario_Limonciello@Dell.com>
-To: <bluez-devel@lists.sourceforge.net>, <hadess@hadess.net>,
-	<bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] [PATCH] Add HID->HCI
-	switchingsupportfornewer	Dell BT cards
+Date: Sun, 13 Apr 2008 19:18:08 +0800
+Message-ID: <FFED2D1514034841A6270D98984E7D0C0207E3AE@pdsmsx415.ccr.corp.intel.com>
+From: "Zhu, Peter J" <peter.j.zhu@intel.com>
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Unable to read data via RFCOMM socket from a JSR82
+	program running on phone
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,90 +19,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Bastien,
+Hi,
 
-I spoke with some folks regarding documentation, and they are weighing
-their options on the best route to do development on these devices.
-(Releasing documentation, or doing patches themselves and submitting).
+These days I tried to write one RFCOMM socket server that reads input
+from a JSR82 client running on a phone but failed. My server program
+runs on a Ubuntu gutsy distribution. This server registers a service
+with a unique UUID and client looks for this service and send some
+string request to server once found and then server sends back some
+string data response to client. That's it. 
 
-Speaking of which, has my patch been applied to the tree yet?
+>>From both log of JSR82 client and hcidump output in linux host, I can
+see this service is successfully found and a successful connection is
+setup between linux host and phone. This successful connection can also
+be verified by both "hcitool con" and "l2ping". l2ping means L2CAP layer
+communication is good, I think. The accept() of this server is
+succesful, as well. But at same time,  read() with sockid returned by
+accept() just blocks,  and hcidump output shows that no data is read
+from low level host interface. 
 
+Another info that might be useful is that I also wrote a bluez C client
+with RFCOMM socket that does same thing as JSR82 client. The blueZ C
+client runs in the other linux machine. The result is perfectly good,
+with everything going very smooth as expected. Noticeably, this
+linux-linux successful communication doesn't require any pin
+input/pairing process. That's a bit strange. 
 
-Mario Limonciello 
-Dell | Linux Engineering 
-Desk : (512) 723-0582 
-Mario_Limonciello@Dell.com 
-
-
-
------Original Message-----
-From: bluez-devel-bounces@lists.sourceforge.net on behalf of Mario_Limonciello@Dell.com
-Sent: Sun 4/6/2008 7:58 PM
-To: hadess@hadess.net; bluez-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [PATCH] Add HID->HCI switchingsupportfornewer	Dell BT cards
- 
-Bastien,
-
-I don't believe the BlueZ/hci_usb setup can currently store the pairing in the adapter, but I'll investigate this week.  Currently the infrastructure should allow a pairing that was set in Windows to still live inside the adapter and transition to Linux per my understanding.
-
-I'll see what documentation I can obtain from our Bluetooth Team that would be available for public release.  No promises there though :)
-
-
-Mario Limonciello 
-Dell | Linux Engineering 
-Desk : (512) 723-0582 
-Mario_Limonciello@Dell.com 
+Any help or info is extremely appreciated. Thanks to bluez and linux and
+all people here. 
 
 
-
------Original Message-----
-From: Bastien Nocera [mailto:hadess@hadess.net]
-Sent: Sun 4/6/2008 5:42 PM
-To: BlueZ development
-Cc: Limonciello, Mario
-Subject: Re: [Bluez-devel] [PATCH] Add HID->HCI switching supportfornewer	Dell BT cards
- 
-
-On Sat, 2008-04-05 at 10:58 -0500, Mario_Limonciello@Dell.com wrote:
-> Bastien,
-> 
-> I'll be glad to update the coding style to match the rest of the
-> source.  Please see the updated attachment.  Both of these adapters
-> are just bluetooth cards that ship on the laptop, not the dongles that
-> come with a keyboard or mouse.
-> 
-> This is the way the cards function in Windows, and the way that they
-> were intended to function.  When paired with a HID keyboard and/or
-> mouse, they have the ability to store that pairing in the firmware.
-> That's why they have the two modes.
-
-Right. Do you have any documentation on how to store that pairing
-information inside the adapter, or does it work out of the box in Linux
-already?
-
-> In reading your question, do you have a problem with a particular
-> mouse &/or keyboard combo that the dongle isn't working 'out of the
-> box'?
-
-I've mainly got experience with Logitech dongles and Apple internal
-adapters that do the same, but we're lacking documentation to make those
-work properly.
-
-Any documentation about the Dell kit would help.
-
-Cheers
-
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
-Register now and save $200. Hurry, offer ends at 11:59 p.m., 
-Monday, April 7! Use priority code J8TLD2. 
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+-Peter
 
 
 -------------------------------------------------------------------------
