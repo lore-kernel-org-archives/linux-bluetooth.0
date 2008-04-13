@@ -1,11 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <454aa2ad0804150046l5930b4b0r153d30ed08633d45@mail.gmail.com>
-Date: Tue, 15 Apr 2008 15:46:33 +0800
-From: "=?GB2312?B?0O3V1NTG?=" <proteus2002@gmail.com>
-To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-devel] How can I use the console for input of pin code
-	instead of the window "/usr/bin/bluez-pin"?
+Date: Sun, 13 Apr 2008 11:34:49 -0500
+Message-ID: <E6FF208A16840D4EBAA31D261B15A506F29F5C@ausx3mpc121.aus.amer.dell.com>
+References: <1207335282.19116.5.camel@mlimonciello><1207341998.32219.1.camel@mlimonciello><1207351025.13201.328.camel@cookie.hadess.net><E6FF208A16840D4EBAA31D261B15A506F29F16@ausx3mpc121.aus.amer.dell.com><1207521725.3396.4.camel@cookie.hadess.net>
+	<E6FF208A16840D4EBAA31D261B15A506F29F23@ausx3mpc121.aus.amer.dell.com>
+From: <Mario_Limonciello@Dell.com>
+To: <bluez-devel@lists.sourceforge.net>, <hadess@hadess.net>,
+	<bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [PATCH] Add HID->HCI
+	switchingsupportfornewer	Dell BT cards
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,97 +18,102 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1936357388=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1936357388==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_3745_26474728.1208245593596"
+Bastien,
 
-------=_Part_3745_26474728.1208245593596
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+I spoke with some folks regarding documentation, and they are weighing
+their options on the best route to do development on these devices.
+(Releasing documentation, or doing patches themselves and submitting).
 
-Hi,
-
-when we use "hcitool cc [mac]",
-a windows "/usr/bin/bluez-pin" pops up , and requires us to input pin code
-for paring.
-
-Now I want to use console for input of pin code, because I want to use it in
-embedded system which has no GUI.
-
-So I debugged the code to find out which sentence pops up
-/usr/bin/bluez-pin.
-It turned out to be this sentence in bluez-lib-3.30:
-
-hci.c
-
-int hci_send_cmd(int dd, uint16_t ogf, uint16_t ocf, uint8_t plen, void
-*param)
-{
-  .........
-
-  /*****************************here pops up
-/usr/bin/bluez-pin***********************************************/
-    while (writev(dd, iv, ivn) < 0) {
-        if (errno == EAGAIN || errno == EINTR)
-            continue;
-        return -1;
-    }
-    return 0;
-}
+Speaking of which, has my patch been applied to the tree yet?
 
 
-I don't know why it is this sentence that pops up /usr/bin/bluez-pin.
-Can anyone tell me the reason?
-And how should I change source codes so that I can use the console for input
-of pin code?
-
-Thanks!
-
-Proteus
-
-------=_Part_3745_26474728.1208245593596
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi,<br><br>when we use &quot;hcitool cc [mac]&quot;, <br>a windows &quot;/usr/bin/bluez-pin&quot; pops up , and requires us to input pin code for paring.<br><br>Now I want to use console for input of pin code, because I want to use it in embedded system which has no GUI.<br>
-
-<br>So I debugged the code to find out which sentence pops up /usr/bin/bluez-pin.<br>It turned out to be this sentence in bluez-lib-3.30:<br><br>hci.c<br><br>int hci_send_cmd(int dd, uint16_t ogf, uint16_t ocf, uint8_t plen, void *param)<br>
-
-{<br>&nbsp; .........<br><br>&nbsp; /****************************<div id="mb_0">*here pops up /usr/bin/bluez-pin***********************************************/<br>&nbsp;&nbsp;&nbsp; while (<span style="color: rgb(51, 51, 153);">writev(dd, iv, ivn) &lt; 0</span>) { <br>
-
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if (errno == EAGAIN || errno == EINTR)<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; continue;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return -1;<br>&nbsp;&nbsp;&nbsp; }<br>&nbsp;&nbsp;&nbsp; return 0;<br>}<br><br><br>I don&#39;t know why it is this sentence that pops up /usr/bin/bluez-pin.<br>Can anyone tell me the reason?<br>
-
-And how should I change source codes so that I can use the console for input of pin code?<br><br>Thanks!<br><br>Proteus</div>
-
-------=_Part_3745_26474728.1208245593596--
+Mario Limonciello 
+Dell | Linux Engineering 
+Desk : (512) 723-0582 
+Mario_Limonciello@Dell.com 
 
 
---===============1936357388==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+
+-----Original Message-----
+From: bluez-devel-bounces@lists.sourceforge.net on behalf of Mario_Limonciello@Dell.com
+Sent: Sun 4/6/2008 7:58 PM
+To: hadess@hadess.net; bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] [PATCH] Add HID->HCI switchingsupportfornewer	Dell BT cards
+ 
+Bastien,
+
+I don't believe the BlueZ/hci_usb setup can currently store the pairing in the adapter, but I'll investigate this week.  Currently the infrastructure should allow a pairing that was set in Windows to still live inside the adapter and transition to Linux per my understanding.
+
+I'll see what documentation I can obtain from our Bluetooth Team that would be available for public release.  No promises there though :)
+
+
+Mario Limonciello 
+Dell | Linux Engineering 
+Desk : (512) 723-0582 
+Mario_Limonciello@Dell.com 
+
+
+
+-----Original Message-----
+From: Bastien Nocera [mailto:hadess@hadess.net]
+Sent: Sun 4/6/2008 5:42 PM
+To: BlueZ development
+Cc: Limonciello, Mario
+Subject: Re: [Bluez-devel] [PATCH] Add HID->HCI switching supportfornewer	Dell BT cards
+ 
+
+On Sat, 2008-04-05 at 10:58 -0500, Mario_Limonciello@Dell.com wrote:
+> Bastien,
+> 
+> I'll be glad to update the coding style to match the rest of the
+> source.  Please see the updated attachment.  Both of these adapters
+> are just bluetooth cards that ship on the laptop, not the dongles that
+> come with a keyboard or mouse.
+> 
+> This is the way the cards function in Windows, and the way that they
+> were intended to function.  When paired with a HID keyboard and/or
+> mouse, they have the ability to store that pairing in the firmware.
+> That's why they have the two modes.
+
+Right. Do you have any documentation on how to store that pairing
+information inside the adapter, or does it work out of the box in Linux
+already?
+
+> In reading your question, do you have a problem with a particular
+> mouse &/or keyboard combo that the dongle isn't working 'out of the
+> box'?
+
+I've mainly got experience with Logitech dongles and Apple internal
+adapters that do the same, but we're lacking documentation to make those
+work properly.
+
+Any documentation about the Dell kit would help.
+
+Cheers
+
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
+Register now and save $200. Hurry, offer ends at 11:59 p.m., 
+Monday, April 7! Use priority code J8TLD2. 
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
 Don't miss this year's exciting event. There's still time to save $100. 
 Use priority code J8TL2D2. 
 http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
---===============1936357388==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1936357388==--
