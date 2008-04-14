@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <15840.82.115.163.144.1208171593.squirrel@posta.7girello.net>
+Date: Mon, 14 Apr 2008 13:13:13 +0200 (CEST)
+From: "Jimmi" <jimmi@libero.it>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Date: Tue, 15 Apr 2008 09:59:04 +0800
-Message-ID: <FFED2D1514034841A6270D98984E7D0C020C7159@pdsmsx415.ccr.corp.intel.com>
-From: "Zhu, Peter J" <peter.j.zhu@intel.com>
-To: <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Unable to read data via RFCOMM socket from a JSR82
-	program running on phone
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] bluez3.30 audio/serial plugin issue
+Reply-To: jimmi@libero.it,
+	BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,36 +19,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Marcel Holtmann <marcel <at> holtmann.org> writes:
+> I would like to ignore it, but I can't. Can you do a ls -la inside the
+> installed plugins directory. Maybe libtool is messing this up. Or
+> maybe is still tries to load the *.la files and fails, because of
 
-These days I tried to write one RFCOMM socket server that reads input
-from a JSR82 client running on a phone but failed. My server program
-runs on a Ubuntu gutsy distribution. This server registers a service
-with a unique UUID and client looks for this service and send some
-string request to server once found and then server sends back some
-string data response to client. That's it. 
+Same problem here, Marcel. I run Archlinux with kernel 2.6.24 on my laptop
+and after upgrading today to bluez 3.30 I got the same error.
 
->>From both log of JSR82 client and hcidump output in linux host, I can
-see this service is successfully found and a successful connection is
-setup between linux host and phone. This successful connection can also
-be verified by both "hcitool con" and "l2ping". l2ping means L2CAP layer
-communication is good, I think. The accept() of this server is
-succesful, as well. But at same time,  read() with sockid returned by
-accept() just blocks,  and hcidump output shows that no data is read
-from low level host interface. 
+The plugin directory looks as follow:
+# ls -ll /usr/lib/bluetooth/plugins/
+totale 296
+-rwxr-xr-x 1 root root 132972 13 apr 09:49 libaudio.so
+-rwxr-xr-x 1 root root  52504 13 apr 09:49 libinput.so
+-rwxr-xr-x 1 root root  58111 13 apr 09:49 libnetwork.so
+-rwxr-xr-x 1 root root  50857 13 apr 09:49 libserial.so
 
-Another info that might be useful is that I also wrote a bluez C client
-with RFCOMM socket that does same thing as JSR82 client. The blueZ C
-client runs in the other linux machine. The result is perfectly good,
-with everything going very smooth as expected. Noticeably, this
-linux-linux successful communication doesn't require any pin
-input/pairing process. That's a bit strange. 
+BTW where should I put the option --enable-glib?
 
-Any help or info is extremely appreciated. Thanks to bluez and linux and
-all people here. 
+If you have any other debugging procedure I'll be glad to try them.
 
-
--Peter
+Thanks in advance
+Jimmi
 
 
 -------------------------------------------------------------------------
