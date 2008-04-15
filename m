@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alok <develnewbie@gmail.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="=-kSb8mfAgV7JeHKS7Sj7H"
-Date: Tue, 15 Apr 2008 16:19:10 +0530
-Message-Id: <1208256550.28663.5.camel@greatbear>
-Mime-Version: 1.0
-Subject: [Bluez-devel] [Gateway] Initial Patch
+Message-ID: <454aa2ad0804150046l5930b4b0r153d30ed08633d45@mail.gmail.com>
+Date: Tue, 15 Apr 2008 15:46:33 +0800
+From: "=?GB2312?B?0O3V1NTG?=" <proteus2002@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] How can I use the console for input of pin code
+	instead of the window "/usr/bin/bluez-pin"?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,453 +15,78 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============1936357388=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+--===============1936357388==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_3745_26474728.1208245593596"
 
---=-kSb8mfAgV7JeHKS7Sj7H
-Content-Type: text/plain
+------=_Part_3745_26474728.1208245593596
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Johan, 
+Hi,
 
-Here is the initial patch for gateway. 
-This patch includes: 
+when we use "hcitool cc [mac]",
+a windows "/usr/bin/bluez-pin" pops up , and requires us to input pin code
+for paring.
 
-Removal of "Enabled" option checking. 
-Name changed for hs_server/hf_server.
-Initial gateway framework.
+Now I want to use console for input of pin code, because I want to use it in
+embedded system which has no GUI.
 
-Let me know.
+So I debugged the code to find out which sentence pops up
+/usr/bin/bluez-pin.
+It turned out to be this sentence in bluez-lib-3.30:
 
--Alok. 
+hci.c
+
+int hci_send_cmd(int dd, uint16_t ogf, uint16_t ocf, uint8_t plen, void
+*param)
+{
+  .........
+
+  /*****************************here pops up
+/usr/bin/bluez-pin***********************************************/
+    while (writev(dd, iv, ivn) < 0) {
+        if (errno == EAGAIN || errno == EINTR)
+            continue;
+        return -1;
+    }
+    return 0;
+}
 
 
---=-kSb8mfAgV7JeHKS7Sj7H
-Content-Disposition: attachment; filename=patch
-Content-Type: text/x-patch; name=patch; charset=us-ascii
+I don't know why it is this sentence that pops up /usr/bin/bluez-pin.
+Can anyone tell me the reason?
+And how should I change source codes so that I can use the console for input
+of pin code?
+
+Thanks!
+
+Proteus
+
+------=_Part_3745_26474728.1208245593596
+Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Index: manager.c
-===================================================================
-RCS file: /cvsroot/bluez/utils/audio/manager.c,v
-retrieving revision 1.96
-diff -u -5 -p -r1.96 manager.c
---- manager.c	27 Mar 2008 23:07:19 -0000	1.96
-+++ manager.c	15 Apr 2008 10:47:16 -0000
-@@ -100,15 +100,19 @@ static DBusConnection *connection = NULL
- static struct device *default_hs = NULL;
- static struct device *default_dev = NULL;
- 
- static GSList *devices = NULL;
- 
--static uint32_t hs_record_id = 0;
--static uint32_t hf_record_id = 0;
-+static uint32_t hsp_ag_record_id = 0;
-+static uint32_t hfp_ag_record_id = 0;
- 
--static GIOChannel *hs_server = NULL;
--static GIOChannel *hf_server = NULL;
-+static uint32_t hsp_hs_record_id = 0;
-+
-+static GIOChannel *hsp_ag_server = NULL; /*Headset Gateway server*/
-+static GIOChannel *hfp_ag_server = NULL; /*Hands-free Gateway server*/
-+
-+static GIOChannel *hsp_hs_server = NULL;
- 
- static struct enabled_interfaces enabled = {
- 	.headset	= TRUE,
- 	.gateway	= FALSE,
- 	.sink		= TRUE,
-@@ -224,14 +228,14 @@ gboolean server_is_enabled(uint16_t svc)
- {
- 	gboolean ret;
- 
- 	switch (svc) {
- 	case HEADSET_SVCLASS_ID:
--		ret = (hs_server != NULL);
-+		ret = (hsp_ag_server != NULL);
- 		break;
- 	case HANDSFREE_SVCLASS_ID:
--		ret = (hf_server != NULL);
-+		ret = (hfp_ag_server != NULL);
- 		break;
- 	case AUDIO_SINK_SVCLASS_ID:
- 		return enabled.sink;
- 	case AV_REMOTE_TARGET_SVCLASS_ID:
- 	case AV_REMOTE_SVCLASS_ID:
-@@ -1180,12 +1184,12 @@ static sdp_record_t *hsp_ag_record(uint8
- 		return NULL;
- 
- 	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
- 	root = sdp_list_append(0, &root_uuid);
- 	sdp_set_browse_groups(record, root);
--
- 	sdp_uuid16_create(&svclass_uuid, HEADSET_AGW_SVCLASS_ID);
-+
- 	svclass_id = sdp_list_append(0, &svclass_uuid);
- 	sdp_uuid16_create(&ga_svclass_uuid, GENERIC_AUDIO_SVCLASS_ID);
- 	svclass_id = sdp_list_append(svclass_id, &ga_svclass_uuid);
- 	sdp_set_service_classes(record, svclass_id);
- 
-@@ -1204,11 +1208,10 @@ static sdp_record_t *hsp_ag_record(uint8
- 	proto[1] = sdp_list_append(proto[1], channel);
- 	apseq = sdp_list_append(apseq, proto[1]);
- 
- 	aproto = sdp_list_append(0, apseq);
- 	sdp_set_access_protos(record, aproto);
--
- 	sdp_set_info_attr(record, "Headset Audio Gateway", 0, 0);
- 
- 	sdp_data_free(channel);
- 	sdp_list_free(proto[0], 0);
- 	sdp_list_free(proto[1], 0);
-@@ -1219,10 +1222,65 @@ static sdp_record_t *hsp_ag_record(uint8
- 	sdp_list_free(svclass_id, 0);
- 
- 	return record;
- }
- 
-+static sdp_record_t *hsp_hs_record(uint8_t ch)
-+{
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	uuid_t root_uuid, svclass_uuid, ga_svclass_uuid;
-+	uuid_t l2cap_uuid, rfcomm_uuid;
-+	sdp_profile_desc_t profile;
-+	sdp_record_t *record;
-+	sdp_list_t *aproto, *proto[2];
-+	sdp_data_t *channel;
-+
-+	record = sdp_record_alloc();
-+	if (!record)
-+		return NULL;
-+
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(0, &root_uuid);
-+	sdp_set_browse_groups(record, root);
-+	sdp_uuid16_create(&svclass_uuid, HEADSET_SVCLASS_ID);
-+
-+	svclass_id = sdp_list_append(0, &svclass_uuid);
-+	sdp_uuid16_create(&ga_svclass_uuid, GENERIC_AUDIO_SVCLASS_ID);
-+	svclass_id = sdp_list_append(svclass_id, &ga_svclass_uuid);
-+	sdp_set_service_classes(record, svclass_id);
-+
-+	sdp_uuid16_create(&profile.uuid, HEADSET_PROFILE_ID);
-+	profile.version = 0x0100;
-+	pfseq = sdp_list_append(0, &profile);
-+	sdp_set_profile_descs(record, pfseq);
-+
-+	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
-+	proto[0] = sdp_list_append(0, &l2cap_uuid);
-+	apseq = sdp_list_append(0, proto[0]);
-+
-+	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
-+	proto[1] = sdp_list_append(0, &rfcomm_uuid);
-+	channel = sdp_data_alloc(SDP_UINT8, &ch);
-+	proto[1] = sdp_list_append(proto[1], channel);
-+	apseq = sdp_list_append(apseq, proto[1]);
-+
-+	aproto = sdp_list_append(0, apseq);
-+	sdp_set_access_protos(record, aproto);
-+	sdp_set_info_attr(record, "Headset", 0, 0);
-+
-+	sdp_data_free(channel);
-+	sdp_list_free(proto[0], 0);
-+	sdp_list_free(proto[1], 0);
-+	sdp_list_free(apseq, 0);
-+	sdp_list_free(pfseq, 0);
-+	sdp_list_free(aproto, 0);
-+	sdp_list_free(root, 0);
-+	sdp_list_free(svclass_id, 0);
-+
-+	return record;
-+}
-+
- static sdp_record_t *hfp_ag_record(uint8_t ch, uint32_t feat)
- {
- 	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
- 	uuid_t root_uuid, svclass_uuid, ga_svclass_uuid;
- 	uuid_t l2cap_uuid, rfcomm_uuid;
-@@ -1348,11 +1406,11 @@ static gboolean ag_io_cb(GIOChannel *cha
- 	if (cli_sk < 0) {
- 		error("accept: %s (%d)", strerror(errno), errno);
- 		return TRUE;
- 	}
- 
--	if (chan == hs_server) {
-+	if (chan == hsp_ag_server) {
- 		hfp_active = FALSE;
- 		uuid = HSP_AG_UUID;
- 	} else {
- 		hfp_active = TRUE;
- 		uuid = HFP_AG_UUID;
-@@ -1389,10 +1447,16 @@ failed:
- 	headset_close_rfcomm(device);
- 
- 	return TRUE;
- }
- 
-+static gboolean hs_io_cb(GIOChannel *chan, GIOCondition cond, void *data)
-+{
-+	/*Stub*/
-+	return TRUE;
-+}
-+
- static GIOChannel *server_socket(uint8_t *channel, gboolean master)
- {
- 	int sock, lm;
- 	struct sockaddr_rc addr;
- 	socklen_t sa_len;
-@@ -1452,11 +1516,11 @@ static int headset_server_init(DBusConne
- 	sdp_record_t *record;
- 	gboolean hfp = TRUE, master = TRUE;
- 	GError *err = NULL;
- 	uint32_t features;
- 
--	if (!(enabled.headset || enabled.gateway))
-+	if (!enabled.headset)
- 		return 0;
- 
- 	if (config) {
- 		gboolean tmp;
- 
-@@ -1477,12 +1541,12 @@ static int headset_server_init(DBusConne
- 			err = NULL;
- 		} else
- 			hfp = tmp;
- 	}
- 
--	hs_server = server_socket(&chan, master);
--	if (!hs_server)
-+	hsp_ag_server = server_socket(&chan, master);
-+	if (!hsp_ag_server)
- 		return -1;
- 
- 	record = hsp_ag_record(chan);
- 	if (!record) {
- 		error("Unable to allocate new service record");
-@@ -1490,28 +1554,28 @@ static int headset_server_init(DBusConne
- 	}
- 
- 	if (add_record_to_server(BDADDR_ANY, record) < 0) {
- 		error("Unable to register HS AG service record");
- 		sdp_record_free(record);
--		g_io_channel_unref(hs_server);
--		hs_server = NULL;
-+		g_io_channel_unref(hsp_ag_server);
-+		hsp_ag_server = NULL;
- 		return -1;
- 	}
--	hs_record_id = record->handle;
-+	hsp_ag_record_id = record->handle;
- 
--	g_io_add_watch(hs_server, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+	g_io_add_watch(hsp_ag_server, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
- 				(GIOFunc) ag_io_cb, NULL);
- 
- 	features = headset_config_init(config);
- 
- 	if (!hfp)
- 		return 0;
- 
- 	chan = DEFAULT_HF_AG_CHANNEL;
- 
--	hf_server = server_socket(&chan, master);
--	if (!hf_server)
-+	hfp_ag_server = server_socket(&chan, master);
-+	if (!hfp_ag_server)
- 		return -1;
- 
- 	record = hfp_ag_record(chan, features);
- 	if (!record) {
- 		error("Unable to allocate new service record");
-@@ -1519,42 +1583,100 @@ static int headset_server_init(DBusConne
- 	}
- 
- 	if (add_record_to_server(BDADDR_ANY, record) < 0) {
- 		error("Unable to register HF AG service record");
- 		sdp_record_free(record);
--		g_io_channel_unref(hf_server);
--		hf_server = NULL;
-+		g_io_channel_unref(hfp_ag_server);
-+		hfp_ag_server = NULL;
- 		return -1;
- 	}
--	hf_record_id = record->handle;
-+	hfp_ag_record_id = record->handle;
- 
--	g_io_add_watch(hf_server, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+	g_io_add_watch(hfp_ag_server, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
- 			(GIOFunc) ag_io_cb, NULL);
- 
- 	return 0;
- }
- 
-+static int gateway_server_init(DBusConnection *conn, GKeyFile *config)
-+{
-+	uint8_t chan = DEFAULT_HSP_HS_CHANNEL;
-+	sdp_record_t *record;
-+	gboolean master = TRUE;
-+	GError *err = NULL;
-+
-+	if (!enabled.gateway)
-+		return 0;
-+
-+	if (config) {
-+		gboolean tmp;
-+
-+		tmp = g_key_file_get_boolean(config, "General", "Master",
-+						&err);
-+		if (err) {
-+			debug("audio.conf: %s", err->message);
-+			g_error_free(err);
-+			err = NULL;
-+		} else
-+			master = tmp;
-+	}
-+
-+	hsp_hs_server = server_socket(&chan, master);
-+	if (!hsp_hs_server)
-+		return -1;
-+
-+	record = hsp_hs_record(chan);
-+	if (!record) {
-+		error("Unable to allocate new service record");
-+		return -1;
-+	}
-+
-+	if (add_record_to_server(BDADDR_ANY, record) < 0) {
-+		error("Unable to register HSP HS service record");
-+		sdp_record_free(record);
-+		g_io_channel_unref(hsp_hs_server);
-+		hsp_hs_server = NULL;
-+		return -1;
-+	}
-+	hsp_hs_record_id = record->handle;
-+
-+	g_io_add_watch(hsp_hs_server, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				(GIOFunc) hs_io_cb, NULL);
-+	debug("ALOK:Gateway");
-+	return 0;
-+}
-+
- static void server_exit(void)
- {
--	if (hs_record_id) {
--		remove_record_from_server(hs_record_id);
--		hs_record_id = 0;
-+	if (hsp_ag_record_id) {
-+		remove_record_from_server(hsp_ag_record_id);
-+		hsp_ag_record_id = 0;
- 	}
- 
--	if (hs_server) {
--		g_io_channel_unref(hs_server);
--		hs_server = NULL;
-+	if (hsp_ag_server) {
-+		g_io_channel_unref(hsp_ag_server);
-+		hsp_ag_server = NULL;
- 	}
- 
--	if (hf_record_id) {
--		remove_record_from_server(hf_record_id);
--		hf_record_id = 0;
-+	if (hsp_hs_record_id) {
-+		remove_record_from_server(hsp_hs_record_id);
-+		hsp_hs_record_id = 0;
- 	}
- 
--	if (hf_server) {
--		g_io_channel_unref(hf_server);
--		hf_server = NULL;
-+	if (hsp_hs_server) {
-+		g_io_channel_unref(hsp_hs_server);
-+		hsp_hs_server = NULL;
-+	}
-+
-+	if (hfp_ag_record_id) {
-+		remove_record_from_server(hfp_ag_record_id);
-+		hfp_ag_record_id = 0;
-+	}
-+
-+	if (hfp_ag_server) {
-+		g_io_channel_unref(hfp_ag_server);
-+		hfp_ag_server = NULL;
- 	}
- }
- 
- int audio_manager_init(DBusConnection *conn, GKeyFile *config)
- {
-@@ -1562,30 +1684,10 @@ int audio_manager_init(DBusConnection *c
- 	GError *err = NULL;
- 
- 	connection = dbus_connection_ref(conn);
- 
- 	if (config) {
--		str = g_key_file_get_string(config, "General", "Enable", &err);
--
--		if (err) {
--			debug("audio.conf: %s", err->message);
--			g_error_free(err);
--			err = NULL;
--		} else {
--			if (strstr(str, "Headset"))
--				enabled.headset = TRUE;
--			if (strstr(str, "Gateway"))
--				enabled.gateway = TRUE;
--			if (strstr(str, "Sink"))
--				enabled.sink = TRUE;
--			if (strstr(str, "Source"))
--				enabled.source = TRUE;
--			if (strstr(str, "Control"))
--				enabled.control = TRUE;
--			g_free(str);
--		}
--
- 		str = g_key_file_get_string(config, "General", "Disable", &err);
- 
- 		if (err) {
- 			debug("audio.conf: %s", err->message);
- 			g_error_free(err);
-@@ -1614,10 +1716,15 @@ int audio_manager_init(DBusConnection *c
- 	if (enabled.headset) {
- 		if (headset_server_init(conn, config) < 0)
- 			goto failed;
- 	}
- 
-+	if (enabled.gateway) {
-+		if (gateway_server_init(conn, config) < 0)
-+			goto failed;
-+	}
-+
- 	if (enabled.source || enabled.sink) {
- 		if (a2dp_init(conn, config) < 0)
- 			goto failed;
- 	}
- 
-Index: gateway.h
-===================================================================
-RCS file: /cvsroot/bluez/utils/audio/gateway.h,v
-retrieving revision 1.8
-diff -u -5 -p -r1.8 gateway.h
---- gateway.h	2 Feb 2008 03:37:05 -0000	1.8
-+++ gateway.h	15 Apr 2008 10:47:16 -0000
-@@ -22,10 +22,13 @@
-  *
-  */
- 
- #define AUDIO_GATEWAY_INTERFACE "org.bluez.audio.Gateway"
- 
-+#define DEFAULT_HSP_HS_CHANNEL 6
-+#define DEFAULT_HFP_HS_CHANNEL 7
-+
- int gateway_init(DBusConnection *conn, gboolean disable_hfp, gboolean sco_hci);
- 
- void gateway_exit(void);
- 
- gboolean gateway_is_enabled(uint16_t svc);
+Hi,<br><br>when we use &quot;hcitool cc [mac]&quot;, <br>a windows &quot;/usr/bin/bluez-pin&quot; pops up , and requires us to input pin code for paring.<br><br>Now I want to use console for input of pin code, because I want to use it in embedded system which has no GUI.<br>
 
---=-kSb8mfAgV7JeHKS7Sj7H
+<br>So I debugged the code to find out which sentence pops up /usr/bin/bluez-pin.<br>It turned out to be this sentence in bluez-lib-3.30:<br><br>hci.c<br><br>int hci_send_cmd(int dd, uint16_t ogf, uint16_t ocf, uint8_t plen, void *param)<br>
+
+{<br>&nbsp; .........<br><br>&nbsp; /****************************<div id="mb_0">*here pops up /usr/bin/bluez-pin***********************************************/<br>&nbsp;&nbsp;&nbsp; while (<span style="color: rgb(51, 51, 153);">writev(dd, iv, ivn) &lt; 0</span>) { <br>
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if (errno == EAGAIN || errno == EINTR)<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; continue;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return -1;<br>&nbsp;&nbsp;&nbsp; }<br>&nbsp;&nbsp;&nbsp; return 0;<br>}<br><br><br>I don&#39;t know why it is this sentence that pops up /usr/bin/bluez-pin.<br>Can anyone tell me the reason?<br>
+
+And how should I change source codes so that I can use the console for input of pin code?<br><br>Thanks!<br><br>Proteus</div>
+
+------=_Part_3745_26474728.1208245593596--
+
+
+--===============1936357388==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -472,7 +97,7 @@ This SF.net email is sponsored by the 2008 JavaOne(SM) Conference
 Don't miss this year's exciting event. There's still time to save $100. 
 Use priority code J8TL2D2. 
 http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
---=-kSb8mfAgV7JeHKS7Sj7H
+--===============1936357388==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -483,4 +108,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-kSb8mfAgV7JeHKS7Sj7H--
+--===============1936357388==--
