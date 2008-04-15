@@ -1,15 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <4805151F.1010309@jlab.org>
+Date: Tue, 15 Apr 2008 16:50:39 -0400
+From: Chris Carlin <carlin@jlab.org>
 MIME-Version: 1.0
-Date: Thu, 17 Apr 2008 14:56:54 +0800
-Message-ID: <FFED2D1514034841A6270D98984E7D0C020FF4B8@pdsmsx415.ccr.corp.intel.com>
-In-Reply-To: <cc1649d10804141954h1be91b0an8b7e5bc6bfe8660b@mail.gmail.com>
-References: <FFED2D1514034841A6270D98984E7D0C020C7159@pdsmsx415.ccr.corp.intel.com>
-	<cc1649d10804141954h1be91b0an8b7e5bc6bfe8660b@mail.gmail.com>
-From: "Zhu, Peter J" <peter.j.zhu@intel.com>
-To: "Vlad Skarzhevskyy" <skarzhevskyy@gmail.com>,
-	"BlueZ users" <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Unable to read data via RFCOMM socket from a
-	JSR82 program running on phone
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Mysterious regression: Link authentication time out
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,29 +18,30 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Vlad
+I've been using three Dell branded bluetooth keyboards (P/N DH953) just fine for
+months. Now they've simultaneously stopped working, and system logs have the
+following repeated every time the keyboard tries to connect:
 
-Firstly thank you so much for giving this useful infomation. Yes, I
-tested it between MIDlet running on phone and that MIDlet running on
-desktop. Runs very well.  But that's between two JSR82 applications
-rather than between a JSR82 and a C application utilizing bluez. Do you
-have such case in hand so that I can test?  Thank you again.
+Apr 15 16:16:14 [hcid] Link authentication failed: Connection timed out (110)
+Apr 15 16:16:14 [hcid] link_key_request (sba=***, dba=***)
 
-Peter 
+with *** replaced by the respective addresses.
 
-Vlad Skarzhevskyy wrote:
-> Hi Peter
->   We at bluecove.org constantly testing connections from JSR-82 on top
-> of BlueZ on Linux to client on Mobile phone L2CAP or RFCOMM and back.
-> No problems detected in BlueZ.
->   Make sure you are connecting to right service!
-> 
->   Look at this application as test
-> http://snapshot.bluecove.org/bluecove-examples/bluecove-tester/  it
-> runs on Linux and the MIDLet version can be installed on the phone.
-> 
-> --
-> Vlad
+These are three completely independent keyboards miles apart. The
+computers use various brands and chipsets in their bluetooth dongles, which themselves are variety of combinations of bluetooth version and class, and which continue to work flawlessly with mice, A2DP, etc. They run Bluez versions between 3.28 and 3.30, Linux kernels 2.6.23/4
+
+As I said, all three keyboards had been working fine for six months to a year--so good was my experience that I kept buying new ones and recommending them. Yet despite this record all three stopped working within a single week. I didn't
+make any changes to the systems during that time--no upgrades, no bluez
+configuration changes, nothing.
+
+I've replaced batteries, deleted and re-paired, restarted, re-pined, and
+everything else but with no luck. 
+
+Anyone have any idea what might be going on here? Has there been a worldwide
+death of these keyboards?
+
+~Chris
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
