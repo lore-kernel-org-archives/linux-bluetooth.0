@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48047668.9010908@powercraft.nl>
-Date: Tue, 15 Apr 2008 11:33:28 +0200
-From: Jelle de Jong <jelledejong@powercraft.nl>
+Message-ID: <194c6ea30804142026j670952dake4b521389687f8ad@mail.gmail.com>
+Date: Tue, 15 Apr 2008 11:26:45 +0800
+From: "dong yan" <semiydsemiyd@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <E673024B-BC5B-44C7-806D-38CA69FD680E@holtmann.org>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <4802424D.4060901@powercraft.nl>
-In-Reply-To: <4802424D.4060901@powercraft.nl>
-Subject: Re: [Bluez-users] Bluetooth - Bluetake Presenter BTU-01
+References: <194c6ea30804110133x276fd249p245cb6cbfd699f48@mail.gmail.com>
+	<E673024B-BC5B-44C7-806D-38CA69FD680E@holtmann.org>
+Subject: Re: [Bluez-users] bluez3.30 audio/serial plugin issue
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,40 +21,58 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Jelle de Jong wrote:
-> This message contains the following attachment(s):
-> Bluetooth - Bluetake Presenter BTU-01.txt
-> data.bin
-> 
-> Hello everybody,
-> 
-> Thank you for all the work on the bluetooth stack for linux.
-> 
-> I bought a new device named "Bluetake Presenter BTU-01". However I cant 
-> get it fuctioning. And I was hoping somebody can tell me wat to do. I 
-> attaced information about the device as attacements.
-> 
-> When the device is connected with hidd it makes a input event. But i 
-> cant get a functional device out of it. I think its a sort of keyboard 
-> but i dont really know.
-> 
-> Does somebody know what to do?
-> 
-> Kind regards,
-> 
-> Jelle
-> 
+Hi Marcel:
 
-Hello everybody,
+    problem solved by adding --enable-glib.thanks.
 
-Did I sent my previous message to the wrong mailing list, since I did 
-not receive any response?
 
-Any ideas what to do?
 
-Kind regards,
+semiyd
 
-Jelle
+
+2008/4/11, Marcel Holtmann <marcel@holtmann.org>:
+> Hi,
+>
+> >    i just upgraded my bluez from 3.26 to 3.30...It's said that all
+> > audio/serial...services are moved into plugin libraries...
+> >    It seems i got a problem while loading these new plugins,here's
+> > the log:
+> >
+> > hcid[173]: Bluetooth HCI daemon
+> > hcid[173]: Enabling debug information
+> > hcid[173]: HCI dev 0 registered
+> > hcid[173]: Starting SDP server
+> > hcid[173]: Adding rec : 0x4d8c0
+> > hcid[173]: with handle : 0x1
+> > hcid[173]: Adding rec : 0x4d980
+> > hcid[173]: with handle : 0x0
+> > hcid[173]: Service classes 0x00
+> > hcid[173]: Creation of inotify context failed
+> >
+> > hcid[173]: Loading plugins /bluetooth//lib/bluetooth/plugins
+> > hcid[173]: Can't load plugin:
+> > /bluetooth//lib/bluetooth/plugins/libaudio.so: invalid mode for
+> > dlopen(): Invalid argument
+>
+> it seems the solution to this is to use --enable-glib. For some reason
+> our eglib plugin loader doesn't work always. I never saw this problem
+> and still can't reproduce it.
+>
+> Regards
+>
+> Marcel
+>
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by the 2008 JavaOne(SM) Conference
+> Don't miss this year's exciting event. There's still time to save $100.
+> Use priority code J8TL2D2.
+> http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
