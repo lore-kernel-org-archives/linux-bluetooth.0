@@ -1,11 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48092EF6.3090603@powercraft.nl>
-Date: Sat, 19 Apr 2008 01:29:58 +0200
-From: Jelle de Jong <jelledejong@powercraft.nl>
+Message-ID: <a7f7fb4f0804181511y2fe86120n3c169670f4cb7ff5@mail.gmail.com>
+Date: Sat, 19 Apr 2008 00:11:22 +0200
+From: "Unai Uribarri" <unaiur@gmail.com>
+To: bluez-users@lists.sourceforge.net
+In-Reply-To: <a7f7fb4f0804181445q349985a8kd8cde5185ad3c5a9@mail.gmail.com>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="------------080406000302090101060401"
-Subject: [Bluez-users] Samsung WEP210 Bluetooth Headset
+References: <a7f7fb4f0804181445q349985a8kd8cde5185ad3c5a9@mail.gmail.com>
+Subject: Re: [Bluez-users] Link encryption failed: Input/output error
+	(Belkin F8T013)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,270 +17,228 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============1544219369=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------080406000302090101060401
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+--===============1544219369==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_1165_20384574.1208556682803"
+
+------=_Part_1165_20384574.1208556682803
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-This message contains the following attachment(s):
-Samsung WEP210 Bluetooth Headset.txt
-simple-agent
+Ohh, this dongle works in Windows because the driver disables the encription
+for HID devices.
 
-Hello everybody,
+So spying Windows drivers is no solution.
 
-I bought a new headset and am trying to get it working under debian sid 
-3.30-2 bluez-utils
 
-However i cant connect to the device when it is in pairing mode.
+On Fri, Apr 18, 2008 at 11:45 PM, Unai Uribarri <unaiur@gmail.com> wrote:
 
-I have attached my working files with a lot of background information.
+> Hello folks,
+>
+> I have a Sony Ericsson K800i phone, which I use as a remote control for my
+> Linux media center, using a bluetooth 1.1 CSR dongle.
+>
+> But using a Belkin F8T013, a Bluetooth 2.0 USB dongle, the phone can't
+> connect to any computer running Linux, neither in an Pentium 4 running
+> Ubuntu 07.10 nor a PowerPC G4 running Ubuntu 08.04. I get the following
+> output on the console:
+>
+> hcid[7355]: link_key_request (sba=00:0A:3A:6E:0A:C7,
+> dba=00:1D:28:2D:39:33)
+> input[7358]: Incoming connection on PSM 17
+> input[7358]: Incoming connection on PSM 19
+> hcid[7355]: /org/bluez: org.bluez.Database.RequestAuthorization()
+> input[7358]: Link encryption failed: Input/output error (5)
+>
+> If I strace the input daemon, I get the following output:
+>
+> poll([{fd=5, events=POLLIN, revents=POLLIN}, {fd=6, events=POLLIN}, {fd=4,
+> events=POLLIN}], 3, -1) = 1
+> accept(5, {sa_family=AF_BLUETOOTH,
+> sa_data="\21\00039-(\35\0\1#\371\244\0\0"}, [10]) = 7
+> getsockname(7, {sa_family=AF_BLUETOOTH,
+> sa_data="\21\0\307\nn:\n\00039-(\35\0"}, [10]) = 0
+> time(NULL)                              = 1208554156
+> stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> writev(2, [{"input[7358]: Incoming connection on PSM 17", 42}, {"\n", 1}],
+> 2) = 43
+> send(3, "<31>Apr 18 23:29:16 input[7358]: Incoming connection on PSM 17",
+> 62, MSG_NOSIGNAL) = 62
+> poll([{fd=6, events=POLLIN, revents=POLLIN}, {fd=4, events=POLLIN}, {fd=5,
+> events=POLLIN}], 3, -1) = 1
+> accept(6, {sa_family=AF_BLUETOOTH,
+> sa_data="\23\00039-(\35\0\30v\5\10\10\0"}, [10]) = 8
+> getsockname(8, {sa_family=AF_BLUETOOTH,
+> sa_data="\23\0\307\nn:\n\00039-(\35\0"}, [10]) = 0
+> time(NULL)                              = 1208554156
+> stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> writev(2, [{"input[7358]: Incoming connection on PSM 19", 42}, {"\n", 1}],
+> 2) = 43
+> send(3, "<31>Apr 18 23:29:16 input[7358]: Incoming connection on PSM 19",
+> 62, MSG_NOSIGNAL) = 62
+> gettimeofday({1208554156, 773967}, NULL) = 0
+> writev(4,
+> [{"l\1\0\1\35\0\0\0\17\0\0\0x\0\0\0\1\1o\0\n\0\0\0/org/bluez\0\0\0\0\0\0\6\1s\0\t\0\0\0org.bluez\0\0\0\0\0\0\0\2\1s\0\22\0\0\0org.bluez.Database\0\0\0\0\0\0\3\1s\0"...,
+> 136}, {"\21\0\0\00000:1D:28:2D:39:33\0\0\0\0\0\0\0\0", 29}], 2) = 165
+> gettimeofday({1208554156, 774555}, NULL) = 0
+> poll([{fd=4, events=POLLIN, revents=POLLIN}, {fd=5, events=POLLIN}, {fd=6,
+> events=POLLIN}], 3, 25000) = 1
+> gettimeofday({1208554156, 776093}, NULL) = 0
+> read(4,
+> "l\2\1\1\0\0\0\0\365\0\0\0\'\0\0\0\6\1s\0\6\0\0\0:1.569\0\0\5\1u\0\17\0\0\0\7\1s\0\6\0\0\0:1.568\0\0",
+> 2048) = 56
+> read(4, 0x8059f78, 2048)                = -1 EAGAIN (Resource temporarily
+> unavailable)
+> gettimeofday({1208554156, 776764}, NULL) = 0
+> gettimeofday({1208554156, 776957}, NULL) = 0
+> gettimeofday({1208554156, 777150}, NULL) = 0
+> poll([{fd=5, events=POLLIN}, {fd=6, events=POLLIN}, {fd=4,
+> events=POLLIN}], 3, 0) = 0
+> socket(PF_BLUETOOTH, SOCK_RAW, 6)       = 9
+> open("/var/lib/bluetooth/00:0A:3A:6E:0A:C7/input", O_RDONLY) = 10
+> flock(10, LOCK_SH)                      = 0
+> fstat64(10, {st_mode=S_IFREG|0644, st_size=290, ...}) = 0
+> mmap2(NULL, 290, PROT_READ, MAP_SHARED, 10, 0) = 0xb7f6f000
+> munmap(0xb7f6f000, 290)                 = 0
+> flock(10, LOCK_UN)                      = 0
+> close(10)                               = 0
+> open("/var/lib/bluetooth/00:0A:3A:6E:0A:C7/linkkeys", O_RDONLY) = 10
+> flock(10, LOCK_SH)                      = 0
+> fstat64(10, {st_mode=S_IFREG|0600, st_size=55, ...}) = 0
+> mmap2(NULL, 55, PROT_READ, MAP_SHARED, 10, 0) = 0xb7f6f000
+> munmap(0xb7f6f000, 55)                  = 0
+> flock(10, LOCK_UN)                      = 0
+> close(10)                               = 0
+> socket(PF_BLUETOOTH, SOCK_RAW, 1)       = 10
+> ioctl(10, 0x800448d2, 0x805cbc0)        = 0
+> ioctl(10, 0x800448d3, 0xbf9c561c)       = 0
+> close(10)                               = 0
+> socket(PF_BLUETOOTH, SOCK_RAW, 1)       = 10
+> bind(10, {sa_family=AF_BLUETOOTH,
+> sa_data="\0\0CW\234\277Vg\234\277h\206\5\10"}, 4) = 0
+> ioctl(10, 0x800448d5, 0x8058668)        = 0
+> getsockopt(10, SOL_IP, IP_TTL, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\362\333",
+> [16]) = 0
+> setsockopt(10, SOL_IP, IP_TTL, "\20\0\0\0@\300\0\0\0\0\0\0\21\4\0\0", 16)
+> = 0
+> writev(10, [{"\1", 1}, {"\21\4\2", 3}, {"\v\0", 2}], 3) = 6
+> poll([{fd=10, events=POLLIN, revents=POLLIN}], 1, 1000) = 1
+> read(10, "\4\17\4\0\1\21\4", 260)       = 7
+> poll([{fd=10, events=POLLIN, revents=POLLIN}], 1, 990) = 1
+> read(10, "\4\6\3\0\v\0", 260)           = 6
+> setsockopt(10, SOL_IP, IP_TTL, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\362\333", 16)
+> = 0
+> getsockopt(10, SOL_IP, IP_TTL, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\362\333",
+> [16]) = 0
+> setsockopt(10, SOL_IP, IP_TTL, "\20\0\0\0\0\301\0\0\0\0\0\0\23\4\0\0", 16)
+> = 0
+> writev(10, [{"\1", 1}, {"\23\4\3", 3}, {"\v\0\1", 3}], 3) = 7
+> poll([{fd=10, events=POLLIN, revents=POLLIN}], 1, 1000) = 1
+> read(10, "\4\17\4\0\1\23\4", 260)       = 7
+> poll([{fd=10, events=POLLIN, revents=POLLIN}], 1, 990) = 1
+> read(10, "\4\10\4$\v\0\0", 260)         = 7
+> setsockopt(10, SOL_IP, IP_TTL, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\362\333", 16)
+> = 0
+> time(NULL)                              = 1208554156
+> stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> writev(2, [{"input[7358]: Link encryption failed: Input/output error (5)",
+> 59}, {"\n", 1}], 2) = 60
+> send(3, "<27>Apr 18 23:29:16 input[7358]: Link encryption failed:
+> Input/output error (5)", 79, MSG_NOSIGNAL) = 79
+> close(10)                               = 0
+> close(9)                                = 0
+> close(7)                                = 0
+> close(8)                                = 0
+>
+> The interesting part is this line:
+>
+> read(10, "\4\10\4$\v\0\0", 260)         = 7
+>
+> $ (0x24) is the error code; LMP PDU Not Allowed.
+>
+> I can use this dongle in Windows without problem. Does anyone know how to
+> spy Windows? Any other idea?
+>
+> Thanks.
+>
+>
 
-Can somebody help me to get the device working.
-
-Kind regards,
-
-Jelle
-
---------------080406000302090101060401
-Content-Type: text/plain;
- name="Samsung WEP210 Bluetooth Headset.txt"
+------=_Part_1165_20384574.1208556682803
+Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="Samsung WEP210 Bluetooth Headset.txt"
+Content-Disposition: inline
 
-#!/bin/bash
+Ohh, this dongle works in Windows because the driver disables the encription for HID devices.<br><br>So spying Windows drivers is no solution.<br><br><br><div class="gmail_quote">On Fri, Apr 18, 2008 at 11:45 PM, Unai Uribarri &lt;<a href="mailto:unaiur@gmail.com">unaiur@gmail.com</a>&gt; wrote:<br>
+<blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hello folks,<br><br>I have a Sony Ericsson K800i phone, which I use as a remote control for my Linux media center, using a bluetooth 1.1 CSR dongle.<br>
+<br>But using a Belkin F8T013, a Bluetooth 2.0 USB dongle, the phone can&#39;t connect to any computer running Linux, neither in an Pentium 4 running Ubuntu 07.10 nor a PowerPC G4 running Ubuntu 08.04. I get the following output on the console:<br>
 
-http://gentoo-wiki.com/HOWTO_use_a_bluetooth_headset
-http://www.wahlau.org/failed_getting_bluetooth_headset_to_work_with_ubuntu_edgy_eft
-http://www.think-future.de/wiki/index.php?title=Bluetooth
+<br>hcid[7355]: link_key_request (sba=00:0A:3A:6E:0A:C7, dba=00:1D:28:2D:39:33)<br>input[7358]: Incoming connection on PSM 17<br>input[7358]: Incoming connection on PSM 19<br>hcid[7355]: /org/bluez: org.bluez.Database.RequestAuthorization()<br>
 
-sudo cp /etc/bluetooth/audio.conf /etc/bluetooth/audio.conf.backup
-sudo mv /etc/bluetooth/audio.conf.backup /etc/bluetooth/audio.conf
+input[7358]: Link encryption failed: Input/output error (5)<br><br>If I strace the input daemon, I get the following output:<br><br>poll([{fd=5, events=POLLIN, revents=POLLIN}, {fd=6, events=POLLIN}, {fd=4, events=POLLIN}], 3, -1) = 1<br>
 
+accept(5, {sa_family=AF_BLUETOOTH, sa_data=&quot;\21\00039-(\35\0\1#\371\244\0\0&quot;}, [10]) = 7<br>getsockname(7, {sa_family=AF_BLUETOOTH, sa_data=&quot;\21\0\307\nn:\n\00039-(\35\0&quot;}, [10]) = 0<br>time(NULL)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1208554156<br>
 
-cp $HOME/.asoundrc $HOME/.asoundrc.backup
+stat64(&quot;/etc/localtime&quot;, {st_mode=S_IFREG|0644, st_size=946, ...}) = 0<br>stat64(&quot;/etc/localtime&quot;, {st_mode=S_IFREG|0644, st_size=946, ...}) = 0<br>stat64(&quot;/etc/localtime&quot;, {st_mode=S_IFREG|0644, st_size=946, ...}) = 0<br>
 
-# step 1: install bluetooth alsa software
-sudo apt-get install bluetooth-alsa bluez-utils
+writev(2, [{&quot;input[7358]: Incoming connection on PSM 17&quot;, 42}, {&quot;\n&quot;, 1}], 2) = 43<br>send(3, &quot;&lt;31&gt;Apr 18 23:29:16 input[7358]: Incoming connection on PSM 17&quot;, 62, MSG_NOSIGNAL) = 62<br>
 
-# step 2: enable bluetooth alsa service
+poll([{fd=6, events=POLLIN, revents=POLLIN}, {fd=4, events=POLLIN}, {fd=5, events=POLLIN}], 3, -1) = 1<br>accept(6, {sa_family=AF_BLUETOOTH, sa_data=&quot;\23\00039-(\35\0\30v\5\10\10\0&quot;}, [10]) = 8<br>getsockname(8, {sa_family=AF_BLUETOOTH, sa_data=&quot;\23\0\307\nn:\n\00039-(\35\0&quot;}, [10]) = 0<br>
 
+time(NULL)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1208554156<br>stat64(&quot;/etc/localtime&quot;, {st_mode=S_IFREG|0644, st_size=946, ...}) = 0<br>stat64(&quot;/etc/localtime&quot;, {st_mode=S_IFREG|0644, st_size=946, ...}) = 0<br>
 
-echo '[Bluetooth Service]
-Identifier=audio
-Name=Audio service
-Description=Bluetooth Audio service
-Autostart=true' | sudo tee /etc/bluetooth/audio.conf
+stat64(&quot;/etc/localtime&quot;, {st_mode=S_IFREG|0644, st_size=946, ...}) = 0<br>writev(2, [{&quot;input[7358]: Incoming connection on PSM 19&quot;, 42}, {&quot;\n&quot;, 1}], 2) = 43<br>send(3, &quot;&lt;31&gt;Apr 18 23:29:16 input[7358]: Incoming connection on PSM 19&quot;, 62, MSG_NOSIGNAL) = 62<br>
 
-echo '[Bluetooth Service]
-Identifier=audio
-Name=Audio service
-Description=Bluetooth Audio service
-Autostart=true' | sudo tee /etc/bluetooth/audio.service
+gettimeofday({1208554156, 773967}, NULL) = 0<br>writev(4, [{&quot;l\1\0\1\35\0\0\0\17\0\0\0x\0\0\0\1\1o\0\n\0\0\0/org/bluez\0\0\0\0\0\0\6\1s\0\t\0\0\0org.bluez\0\0\0\0\0\0\0\2\1s\0\22\0\0\0org.bluez.Database\0\0\0\0\0\0\3\1s\0&quot;..., 136}, {&quot;\21\0\0\00000:1D:28:2D:39:33\0\0\0\0\0\0\0\0&quot;, 29}], 2) = 165<br>
 
-cat /etc/bluetooth/audio.service
+gettimeofday({1208554156, 774555}, NULL) = 0<br>poll([{fd=4, events=POLLIN, revents=POLLIN}, {fd=5, events=POLLIN}, {fd=6, events=POLLIN}], 3, 25000) = 1<br>gettimeofday({1208554156, 776093}, NULL) = 0<br>read(4, &quot;l\2\1\1\0\0\0\0\365\0\0\0\&#39;\0\0\0\6\1s\0\6\0\0\0:1.569\0\0\5\1u\0\17\0\0\0\7\1s\0\6\0\0\0:1.568\0\0&quot;, 2048) = 56<br>
 
-cat /etc/bluetooth/audio.conf
+read(4, 0x8059f78, 2048)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = -1 EAGAIN (Resource temporarily unavailable)<br>gettimeofday({1208554156, 776764}, NULL) = 0<br>gettimeofday({1208554156, 776957}, NULL) = 0<br>gettimeofday({1208554156, 777150}, NULL) = 0<br>
 
-hcitool scan
-20:07:09:15:A9:5A
-sudo sdptool browse 20:07:09:15:A9:5A
+poll([{fd=5, events=POLLIN}, {fd=6, events=POLLIN}, {fd=4, events=POLLIN}], 3, 0) = 0<br>socket(PF_BLUETOOTH, SOCK_RAW, 6)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 9<br>open(&quot;/var/lib/bluetooth/00:0A:3A:6E:0A:C7/input&quot;, O_RDONLY) = 10<br>flock(10, LOCK_SH)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>
 
-sudo sdptool search HS
-Inquiring ...
-Searching for HS on 20:07:09:15:A9:5A ...
-Service Name: Headset
-Service RecHandle: 0x10001
-Service Class ID List:
-  "Headset" (0x1108)
-  "Generic Audio" (0x1203)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 2
-Language Base Attr List:
-  code_ISO639: 0x656e
-  encoding:    0x6a
-  base_offset: 0x100
-Profile Descriptor List:
-  "Headset" (0x1108)
-    Version: 0x0100
+fstat64(10, {st_mode=S_IFREG|0644, st_size=290, ...}) = 0<br>mmap2(NULL, 290, PROT_READ, MAP_SHARED, 10, 0) = 0xb7f6f000<br>munmap(0xb7f6f000, 290)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>flock(10, LOCK_UN)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>close(10)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>
 
-echo 'pcm.bluetooth {
-   type bluetooth
-   device 20:07:09:15:A9:5A
-   profile "auto"
-}' | tee --append $HOME/.asoundrc
+open(&quot;/var/lib/bluetooth/00:0A:3A:6E:0A:C7/linkkeys&quot;, O_RDONLY) = 10<br>flock(10, LOCK_SH)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>fstat64(10, {st_mode=S_IFREG|0600, st_size=55, ...}) = 0<br>mmap2(NULL, 55, PROT_READ, MAP_SHARED, 10, 0) = 0xb7f6f000<br>
 
-sudo hcitool cc 20:07:09:15:A9:5A
+munmap(0xb7f6f000, 55)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>flock(10, LOCK_UN)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>close(10)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>socket(PF_BLUETOOTH, SOCK_RAW, 1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 10<br>ioctl(10, 0x800448d2, 0x805cbc0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>
 
-cat $HOME/.asoundrc
+ioctl(10, 0x800448d3, 0xbf9c561c)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>close(10)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>socket(PF_BLUETOOTH, SOCK_RAW, 1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 10<br>bind(10, {sa_family=AF_BLUETOOTH, sa_data=&quot;\0\0CW\234\277Vg\234\277h\206\5\10&quot;}, 4) = 0<br>
 
-sudo /etc/init.d/bluetooth restart
-sudo /etc/init.d/alsa-utils restart
+ioctl(10, 0x800448d5, 0x8058668)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>getsockopt(10, SOL_IP, IP_TTL, &quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\362\333&quot;, [16]) = 0<br>setsockopt(10, SOL_IP, IP_TTL, &quot;\20\0\0\0@\300\0\0\0\0\0\0\21\4\0\0&quot;, 16) = 0<br>
 
-sudo apt-get install mplayer
+writev(10, [{&quot;\1&quot;, 1}, {&quot;\21\4\2&quot;, 3}, {&quot;\v\0&quot;, 2}], 3) = 6<br>poll([{fd=10, events=POLLIN, revents=POLLIN}], 1, 1000) = 1<br>read(10, &quot;\4\17\4\0\1\21\4&quot;, 260)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 7<br>poll([{fd=10, events=POLLIN, revents=POLLIN}], 1, 990) = 1<br>
 
-mplayer -ao alsa:device=bluetooth test.mp3
-arecord -D bluetooth -f S16_LE | aplay -D bluetooth -f S16_LE
+read(10, &quot;\4\6\3\0\v\0&quot;, 260)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 6<br>setsockopt(10, SOL_IP, IP_TTL, &quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\362\333&quot;, 16) = 0<br>getsockopt(10, SOL_IP, IP_TTL, &quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\362\333&quot;, [16]) = 0<br>
 
-sudo modprobe snd-bt-sco
-dbus-send --system --dest=org.bluez /org/bluez/hci0 org.bluez.Adapter.SetMode string:discoverable
-btsco -v  20:07:09:15:A9:5A
-sudo a2dpd
+setsockopt(10, SOL_IP, IP_TTL, &quot;\20\0\0\0\0\301\0\0\0\0\0\0\23\4\0\0&quot;, 16) = 0<br>writev(10, [{&quot;\1&quot;, 1}, {&quot;\23\4\3&quot;, 3}, {&quot;\v\0\1&quot;, 3}], 3) = 7<br>poll([{fd=10, events=POLLIN, revents=POLLIN}], 1, 1000) = 1<br>
 
-pcm.bluetooth {
-    type plug
-    slave {
-       pcm "bluetooth_hw"
-    }
-}
+read(10, &quot;\4\17\4\0\1\23\4&quot;, 260)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 7<br>poll([{fd=10, events=POLLIN, revents=POLLIN}], 1, 990) = 1<br>read(10, &quot;\4\10\4$\v\0\0&quot;, 260)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 7<br>setsockopt(10, SOL_IP, IP_TTL, &quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\362\333&quot;, 16) = 0<br>
 
-pcm.bluetooth_hw {
-    type bluetooth
-    device 00:0B:2E:5B:30:E6
-}
+time(NULL)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1208554156<br>stat64(&quot;/etc/localtime&quot;, {st_mode=S_IFREG|0644, st_size=946, ...}) = 0<br>stat64(&quot;/etc/localtime&quot;, {st_mode=S_IFREG|0644, st_size=946, ...}) = 0<br>
 
-sudo hidd --connect 20:07:09:15:A9:5A
-sudo l2ping 20:07:09:15:A9:5A
+stat64(&quot;/etc/localtime&quot;, {st_mode=S_IFREG|0644, st_size=946, ...}) = 0<br>writev(2, [{&quot;input[7358]: Link encryption failed: Input/output error (5)&quot;, 59}, {&quot;\n&quot;, 1}], 2) = 60<br>send(3, &quot;&lt;27&gt;Apr 18 23:29:16 input[7358]: Link encryption failed: Input/output error (5)&quot;, 79, MSG_NOSIGNAL) = 79<br>
 
-passkey-agent 0000 20:07:09:15:A9:5A
+close(10)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>close(9)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>close(7)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br>close(8)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<br><br>The interesting part is this line:<br>
 
-echo 0000 | sudo tee /etc/bluetooth/pin
+<br>read(10, &quot;\4\10\4$\v\0\0&quot;, 260)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 7<br>
+<br>$ (0x24) is the error code; LMP PDU Not Allowed.<br><br>I can use this dongle in Windows without problem. Does anyone know how to spy Windows? Any other idea?<br><br>Thanks.<br><br>
+</blockquote></div><br>
 
-sdptool search 20:07:09:15:A9:5A
-hcitool cc 20:07:09:15:A9:5A
-sudo /etc/init.d/syslog restart
-
-sudo /etc/init.d/sysklogd start
-sudo /etc/init.d/klogd start
-
-sudo cat /var/log/syslog
-
-sudo vim /etc/bluetooth/hcid.conf
-pin_helper /etc/bluetooth/feed-pin.sh;
+------=_Part_1165_20384574.1208556682803--
 
 
-echo '#!/bin/sh
-echo "PIN:0000"' | sudo tee /etc/bluetooth/feed-pin.sh
-
-
-Apr 19 00:56:29 debian-eeepc hcid[5705]: Audio API: received BT_GETCAPABILITIES_REQ
-Apr 19 00:56:29 debian-eeepc hcid[5705]: Audio API: sending BT_GETCAPABILITIES_RSP
-Apr 19 00:56:29 debian-eeepc hcid[5705]: Audio API: received BT_SETCONFIGURATION_REQ
-Apr 19 00:56:29 debian-eeepc hcid[5705]: config sco - device = 20:07:09:15:A9:5A access_mode = 2
-Apr 19 00:56:32 debian-eeepc hcid[5705]: pin_code_request (sba=00:1B:DC:00:32:71, dba=20:07:09:15:A9:5A)
-Apr 19 00:56:32 debian-eeepc hcid[5705]: connect(): Connection refused (111)
-Apr 19 00:56:32 debian-eeepc hcid[5705]: config failed
-Apr 19 00:56:32 debian-eeepc hcid[5705]: Audio API: sending BT_SETCONFIGURATION_RSP
-
-Package: bluez-utils
-Version: 3.30-2
-
-
-
-dbus-send --system --type=method_call --print-reply --dest=":1.20" \
-/org/bluez/audio org.bluez.audio.Manager.CreateDevice string:20:07:09:15:A9:5A
-
-dbus-send --system --type=method_call --print-reply --dest=":1.20" \
-"/org/bluez/audio/device0" org.bluez.audio.Sink.Connect
-
-sudo python simple-agent
-Agent registered
-RequestPasskey (/hci0/dev_20_07_09_15_A9_5A)
-
-
-Apr 19 01:24:29 debian-eeepc hcid[2353]: Audio API: received BT_GETCAPABILITIES_REQ
-Apr 19 01:24:29 debian-eeepc hcid[2353]: Audio API: sending BT_GETCAPABILITIES_RSP
-Apr 19 01:24:29 debian-eeepc hcid[2353]: Audio API: received BT_SETCONFIGURATION_REQ
-Apr 19 01:24:29 debian-eeepc hcid[2353]: config sco - device = 20:07:09:15:A9:5A access_mode = 2
-Apr 19 01:24:33 debian-eeepc hcid[2353]: link_key_request (sba=00:1B:DC:00:32:71, dba=20:07:09:15:A9:5A)
-Apr 19 01:24:36 debian-eeepc kernel: usb 1-2: USB disconnect, address 4
-Apr 19 01:24:36 debian-eeepc hcid[2353]: HCI dev 0 down
-Apr 19 01:24:36 debian-eeepc hcid[2353]: Stopping security manager 0
-Apr 19 01:24:36 debian-eeepc hcid[2353]: Device hci0 has been disabled
-Apr 19 01:24:36 debian-eeepc hcid[2353]: connect(): Software caused connection abort (103)
-Apr 19 01:24:36 debian-eeepc hcid[2353]: config failed
-Apr 19 01:24:36 debian-eeepc hcid[2353]: Audio API: sending BT_SETCONFIGURATION_RSP
-Apr 19 01:24:37 debian-eeepc hcid[2353]: HCI dev 0 unregistered
-Apr 19 01:24:37 debian-eeepc hcid[2353]: Unregister path: /org/bluez/hci0
-Apr 19 01:24:37 debian-eeepc hcid[2353]: Device hci0 has been removed
-Apr 19 01:24:37 debian-eeepc kernel: usb 1-2: new full speed USB device using uhci_hcd and address 5
-Apr 19 01:24:37 debian-eeepc kernel: usb 1-2: configuration #1 chosen from 1 choice
-
---------------080406000302090101060401
-Content-Type: text/plain;
- name="simple-agent"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="simple-agent"
-
-#!/usr/bin/python
-
-import gobject
-
-import dbus
-import dbus.service
-import dbus.mainloop.glib
-
-class Agent(dbus.service.Object):
-	@dbus.service.method("org.bluez.Agent",
-					in_signature="", out_signature="")
-	def Release(self):
-		print "Release"
-		mainloop.quit()
-
-	@dbus.service.method("org.bluez.Agent",
-					in_signature="os", out_signature="")
-	def Authorize(self, device, uuid):
-		print "Authorize (" + device + ", " + uuid + ")"
-		return
-
-	@dbus.service.method("org.bluez.Agent",
-					in_signature="o", out_signature="s")
-	def RequestPasskey(self, device):
-		print "RequestPasskey (" + device + ")"
-		return "0000"
-
-	@dbus.service.method("org.bluez.Agent",
-					in_signature="s", out_signature="")
-	def ConfirmModeChange(self, mode):
-		print "ConfirmModeChange (" + mode + ")"
-		return
-
-	@dbus.service.method("org.bluez.Agent",
-					in_signature="", out_signature="")
-	def Cancel(self):
-		print "Cancel"
-		return
-
-if __name__ == '__main__':
-	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-
-	bus = dbus.SystemBus()
-	manager = dbus.Interface(bus.get_object("org.bluez", "/"),
-							"org.bluez.Manager")
-
-	path = manager.DefaultAdapter()
-	adapter = dbus.Interface(bus.get_object("org.bluez", path),
-							"org.bluez.Adapter")
-
-	path = "/test/agent"
-	object = Agent(bus, path)
-
-	adapter.RegisterAgent(path)
-	print "Agent registered"
-
-	mainloop = gobject.MainLoop()
-	mainloop.run()
-
-	#adapter.UnregisterAgent(path)
-	#print "Agent unregistered"
-
---------------080406000302090101060401
+--===============1544219369==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -289,7 +249,7 @@ This SF.net email is sponsored by the 2008 JavaOne(SM) Conference
 Don't miss this year's exciting event. There's still time to save $100. 
 Use priority code J8TL2D2. 
 http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
---------------080406000302090101060401
+--===============1544219369==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -300,4 +260,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---------------080406000302090101060401--
+--===============1544219369==--
