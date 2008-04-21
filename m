@@ -1,10 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alok <develnewbie@gmail.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Date: Tue, 22 Apr 2008 23:45:05 +0530
-Message-Id: <1208888105.16346.18.camel@greatbear>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Telephony plugin framework
+MIME-Version: 1.0
+Date: Mon, 21 Apr 2008 11:36:19 -0500
+Message-ID: <E6FF208A16840D4EBAA31D261B15A506F29F90@ausx3mpc121.aus.amer.dell.com>
+References: <1207335282.19116.5.camel@mlimonciello><1207341998.32219.1.camel@mlimonciello><1207351025.13201.328.camel@cookie.hadess.net><E6FF208A16840D4EBAA31D261B15A506F29F16@ausx3mpc121.aus.amer.dell.com><1207521725.3396.4.camel@cookie.hadess.net><E6FF208A16840D4EBAA31D261B15A506F29F23@ausx3mpc121.aus.amer.dell.com>
+	<E6FF208A16840D4EBAA31D261B15A506F29F5C@ausx3mpc121.aus.amer.dell.com>
+From: <Mario_Limonciello@Dell.com>
+To: <bluez-devel@lists.sourceforge.net>,
+	<bluez-devel@lists.sourceforge.net>, <hadess@hadess.net>,
+	<bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] [PATCH] Add HID->HCIswitchingsupportfornewer	Dell
+	BT cards
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,53 +23,119 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel/Johan, 
+Hi Guys,
 
-Here is the summary of the telephony plugin framework discussion we had
-on IRC. Can you please verify it? 
+I've seen at least one other patch that flew by added to CVS already.  Are there any other objections that just haven't been vocalized regarding this patch?
+
+Regards, 
+
+Mario Limonciello 
+Dell | Linux Engineering 
+Mario_Limonciello@Dell.com 
 
 
-1. 'hcid' maintains a list of 'telephony devices'[a GList]. it also
-exports methods to create, destroy, update these devices.
 
-2. 'hcid' also maintains a list of 'telephony drivers'[a GList]. it also
-exports methods to register, unregister  these drivers.
-     
-3. 'hcid' exports telephony methods. (which will be called by the
-services).
-
-4. A service(example: audio) will register a telephony device with
-'hcid' using 'register_telephony_device()'.
-
-5. A telephony plugin will register a telephony driver with 'hcid' using
-'register_telephony_driver()'.
-
-6. Once the driver is registered, it scans through the list of devices,
-and if a suitable registered device is found (matches the driver name to
-device name, like in the linux kernel), it calls the 'probe' of the
-driver.  
-
-Question. What information does the 'struct device' going to hold? In
-linux device driver senario, it holds the resource (IRQ, memory etc)
-information. 
+-----Original Message-----
+From: bluez-devel-bounces@lists.sourceforge.net on behalf of Mario_Limonciello@Dell.com
+Sent: Sun 4/13/2008 11:34 AM
+To: bluez-devel@lists.sourceforge.net; hadess@hadess.net; bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] [PATCH] Add HID->HCIswitchingsupportfornewer	Dell BT cards
  
-7. The probe function can initializes the telephony subsystem. It also
-registers a structure of "callbacks" with hcid. These callbacks are
-function pointers to the C functions in the plugin which interact with
-the telephony system.
+Bastien,
 
-8. These callbacks will allow services to call functions in the
-plugin(via hcid).
+I spoke with some folks regarding documentation, and they are weighing
+their options on the best route to do development on these devices.
+(Releasing documentation, or doing patches themselves and submitting).
 
-9. But to allow the plugin to notify the services (a response to a
-previously issued command or issuing a new command to the audio
-service), it uses a hcid exported function
-'update_telephony_status(telephony_device)'. 
-
-10. The service will take action on the changed status of the device. 
+Speaking of which, has my patch been applied to the tree yet?
 
 
--Alok.
+Mario Limonciello 
+Dell | Linux Engineering 
+Desk : (512) 723-0582 
+Mario_Limonciello@Dell.com 
+
+
+
+-----Original Message-----
+From: bluez-devel-bounces@lists.sourceforge.net on behalf of Mario_Limonciello@Dell.com
+Sent: Sun 4/6/2008 7:58 PM
+To: hadess@hadess.net; bluez-devel@lists.sourceforge.net
+Subject: Re: [Bluez-devel] [PATCH] Add HID->HCI switchingsupportfornewer	Dell BT cards
+ 
+Bastien,
+
+I don't believe the BlueZ/hci_usb setup can currently store the pairing in the adapter, but I'll investigate this week.  Currently the infrastructure should allow a pairing that was set in Windows to still live inside the adapter and transition to Linux per my understanding.
+
+I'll see what documentation I can obtain from our Bluetooth Team that would be available for public release.  No promises there though :)
+
+
+Mario Limonciello 
+Dell | Linux Engineering 
+Desk : (512) 723-0582 
+Mario_Limonciello@Dell.com 
+
+
+
+-----Original Message-----
+From: Bastien Nocera [mailto:hadess@hadess.net]
+Sent: Sun 4/6/2008 5:42 PM
+To: BlueZ development
+Cc: Limonciello, Mario
+Subject: Re: [Bluez-devel] [PATCH] Add HID->HCI switching supportfornewer	Dell BT cards
+ 
+
+On Sat, 2008-04-05 at 10:58 -0500, Mario_Limonciello@Dell.com wrote:
+> Bastien,
+> 
+> I'll be glad to update the coding style to match the rest of the
+> source.  Please see the updated attachment.  Both of these adapters
+> are just bluetooth cards that ship on the laptop, not the dongles that
+> come with a keyboard or mouse.
+> 
+> This is the way the cards function in Windows, and the way that they
+> were intended to function.  When paired with a HID keyboard and/or
+> mouse, they have the ability to store that pairing in the firmware.
+> That's why they have the two modes.
+
+Right. Do you have any documentation on how to store that pairing
+information inside the adapter, or does it work out of the box in Linux
+already?
+
+> In reading your question, do you have a problem with a particular
+> mouse &/or keyboard combo that the dongle isn't working 'out of the
+> box'?
+
+I've mainly got experience with Logitech dongles and Apple internal
+adapters that do the same, but we're lacking documentation to make those
+work properly.
+
+Any documentation about the Dell kit would help.
+
+Cheers
+
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
+Register now and save $200. Hurry, offer ends at 11:59 p.m., 
+Monday, April 7! Use priority code J8TLD2. 
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
+Don't miss this year's exciting event. There's still time to save $100. 
+Use priority code J8TL2D2. 
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 
 -------------------------------------------------------------------------
