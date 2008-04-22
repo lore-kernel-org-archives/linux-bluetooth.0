@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Florian Echtler <floe@butterbrot.org>
-To: bluez-devel@lists.sourceforge.net
-Date: Wed, 23 Apr 2008 13:37:31 +0200
-Message-Id: <1208950651.6611.167.camel@pancake>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Question about hci_create_connection and clock offset
+Date: Tue, 22 Apr 2008 11:23:09 -0700 (PDT)
+From: Jim Carter <jimc@math.ucla.edu>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1208888105.16346.18.camel@greatbear>
+Message-ID: <Pine.LNX.4.64.0804221120250.5120@xena.cft.ca.us>
+References: <1208888105.16346.18.camel@greatbear>
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Telephony plugin framework
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,64 +20,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello everyone,
+On Tue, 22 Apr 2008, Alok wrote:
 
-I'm trying to find the fastest possible way to get RSSI values for
-Bluetooth devices. So far, my code looks like this:
+> 1. 'hcid' maintains a list of 'telephony devices'[a GList]. it also
+> exports methods to create, destroy, update these devices.
 
-    dev_id = hci_get_route(NULL);
-    hci_devinfo(dev_id,&di);
-...
-    num_rsp = hci_inquiry(dev_id, len, max_rsp, NULL, &ii, flags);
-...
-    for (i = 0; i < num_rsp; i++) {
-	uint16_t myhandle;
-	if (hci_create_connection(
-		sock,
-		&(ii+i)->bdaddr,
-		htobs(di.pkt_type & ACL_PTYPE_MASK),
-		(ii+i)->clock_offset,
-		0,
-		&myhandle,
-		0
-	) < 0) perror("hci_create_con");
-	
-	if (hci_read_rssi(sock, myhandle, &rssi, 0) < 0)
-		rssi = -127;
-	hci_disconnect(sock, myhandle, HCI_OE_USER_ENDED_CONNECTION, 0);
-...
-    }
+Sorry, I'm not a regular participant in this thread so I may not be 
+understanding something: which devices qualify to be "telephony devices"?  
+Only those that announce availability of a HSP service?  Is an A2DP 
+headphone forever disqualified (unless it has dual HSP capability which 
+some of them do)?
 
-Now, while this works, I feel it's really slow.
+I assume the SDP thread in hcid will take care of registering the 
+qualifying devices.
 
-Can somebody please enlighten me to the meaning of parameters 3-5 of
-hci_create_connection? I also would be grateful for some mid-level
-description of the Bluetooth protocol..
-What I believe to know is this:
-
-- ptype: Packet types which are allowed for this connection. 
-  Intersection of what the device supports and all ACL packet types.
-
-- clock offset: difference in ticks between local device clock and
-  target device clock. My limited Bluetooth knowledge made me think that
-  when I specify the offset from hci_inquiry, the connection should be 
-  created faster, as the clock offset doesn't have to be calculated
-  again. However, I don't really see a difference when I just set this
-  to 0.
-
-- rswitch: Allow role switch. Not a difference either..
-
-I know that somebody posted a while ago that L2CAP should be preferred
-for such tasks, but IIRC, opening an L2CAP connection requires
-authentication/pairing while this method doesn't.
-
-Please correct my half-knowledge, where appropriate :-)
-
-Thanks for your help,
-Yours, Florian
--- 
-0666 - Filemode of the Beast
-
+James F. Carter          Voice 310 825 2897    FAX 310 206 6673
+UCLA-Mathnet;  6115 MSA; 405 Hilgard Ave.; Los Angeles, CA, USA 90095-1555
+Email: jimc@math.ucla.edu  http://www.math.ucla.edu/~jimc (q.v. for PGP key)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
