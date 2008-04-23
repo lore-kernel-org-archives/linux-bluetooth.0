@@ -1,13 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Florian Echtler <floe@butterbrot.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1208950651.6611.167.camel@pancake>
-References: <1208950651.6611.167.camel@pancake>
-Date: Wed, 23 Apr 2008 15:07:50 +0200
-Message-Id: <1208956070.6611.173.camel@pancake>
+To: bluez-devel@lists.sourceforge.net
+Date: Wed, 23 Apr 2008 13:37:31 +0200
+Message-Id: <1208950651.6611.167.camel@pancake>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Question about hci_create_connection and
-	clock	offset
+Subject: [Bluez-devel] Question about hci_create_connection and clock offset
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,16 +18,60 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-A short followup to my own post: In the list archives, I've read
-multiple times that the hci_* API is more or less deprecated and D-Bus
-is the future. 
+Hello everyone,
 
-However, what I'm trying to do - repeating inquiries in one thread,
-checking RSSI in another one (even for devices that haven't been seen by
-the last inquiries) - doesn't seem possible in the D-Bus API, as there
-is no function to create a low-level ACL connection to a device
-address..?
+I'm trying to find the fastest possible way to get RSSI values for
+Bluetooth devices. So far, my code looks like this:
 
+    dev_id = hci_get_route(NULL);
+    hci_devinfo(dev_id,&di);
+...
+    num_rsp = hci_inquiry(dev_id, len, max_rsp, NULL, &ii, flags);
+...
+    for (i = 0; i < num_rsp; i++) {
+	uint16_t myhandle;
+	if (hci_create_connection(
+		sock,
+		&(ii+i)->bdaddr,
+		htobs(di.pkt_type & ACL_PTYPE_MASK),
+		(ii+i)->clock_offset,
+		0,
+		&myhandle,
+		0
+	) < 0) perror("hci_create_con");
+	
+	if (hci_read_rssi(sock, myhandle, &rssi, 0) < 0)
+		rssi = -127;
+	hci_disconnect(sock, myhandle, HCI_OE_USER_ENDED_CONNECTION, 0);
+...
+    }
+
+Now, while this works, I feel it's really slow.
+
+Can somebody please enlighten me to the meaning of parameters 3-5 of
+hci_create_connection? I also would be grateful for some mid-level
+description of the Bluetooth protocol..
+What I believe to know is this:
+
+- ptype: Packet types which are allowed for this connection. 
+  Intersection of what the device supports and all ACL packet types.
+
+- clock offset: difference in ticks between local device clock and
+  target device clock. My limited Bluetooth knowledge made me think that
+  when I specify the offset from hci_inquiry, the connection should be 
+  created faster, as the clock offset doesn't have to be calculated
+  again. However, I don't really see a difference when I just set this
+  to 0.
+
+- rswitch: Allow role switch. Not a difference either..
+
+I know that somebody posted a while ago that L2CAP should be preferred
+for such tasks, but IIRC, opening an L2CAP connection requires
+authentication/pairing while this method doesn't.
+
+Please correct my half-knowledge, where appropriate :-)
+
+Thanks for your help,
 Yours, Florian
 -- 
 0666 - Filemode of the Beast
