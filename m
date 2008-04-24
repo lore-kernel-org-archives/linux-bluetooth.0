@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Phil Endecott" <spam_from_bluez_users@chezphil.org>
-To: <bluez-users@lists.sourceforge.net>
-Date: Thu, 24 Apr 2008 16:32:00 +0100
-Message-ID: <1209051120274@dmwebmail.dmwebmail.chezphil.org>
-In-Reply-To: <5eee8c670804231250s471d74aei656686225a35e5f0@mail.gmail.com>
-References: <5eee8c670804231250s471d74aei656686225a35e5f0@mail.gmail.com>
+Message-ID: <f9d4bd30804240557v1d6d3187o59fcba455f57b82d@mail.gmail.com>
+Date: Thu, 24 Apr 2008 09:57:40 -0300
+From: "Claudio Takahasi" <claudio.takahasi@openbossa.org>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <a7f7fb4f0804181511y2fe86120n3c169670f4cb7ff5@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] Apple wireless keyboard
+References: <a7f7fb4f0804181445q349985a8kd8cde5185ad3c5a9@mail.gmail.com>
+	<a7f7fb4f0804181511y2fe86120n3c169670f4cb7ff5@mail.gmail.com>
+Subject: Re: [Bluez-users] Link encryption failed: Input/output error
+	(Belkin F8T013)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,93 +22,182 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Odysseus Flappington wrote:
-> I was also getting "UP RUNNING PSCAN ISCAN", unlike the initial bug-reporter
-> but the 'hciconfig hci0 reset' command on reboot fixed the problem with my
-> Apple keyboard. Have you actually tried it?
+On Fri, Apr 18, 2008 at 7:11 PM, Unai Uribarri <unaiur@gmail.com> wrote:
+> Ohh, this dongle works in Windows because the driver disables the encription
+> for HID devices.
+>
+> So spying Windows drivers is no solution.
+>
+>
+>
+>
+> On Fri, Apr 18, 2008 at 11:45 PM, Unai Uribarri <unaiur@gmail.com> wrote:
+>
+> > Hello folks,
+> >
+> > I have a Sony Ericsson K800i phone, which I use as a remote control for my
+> Linux media center, using a bluetooth 1.1 CSR dongle.
+> >
+> > But using a Belkin F8T013, a Bluetooth 2.0 USB dongle, the phone can't
+> connect to any computer running Linux, neither in an Pentium 4 running
+> Ubuntu 07.10 nor a PowerPC G4 running Ubuntu 08.04. I get the following
+> output on the console:
+> >
+> > hcid[7355]: link_key_request (sba=00:0A:3A:6E:0A:C7,
+> dba=00:1D:28:2D:39:33)
+> > input[7358]: Incoming connection on PSM 17
+> > input[7358]: Incoming connection on PSM 19
+> > hcid[7355]: /org/bluez: org.bluez.Database.RequestAuthorization()
+> > input[7358]: Link encryption failed: Input/output error (5)
+> >
+> > If I strace the input daemon, I get the following output:
+> >
+> > poll([{fd=5, events=POLLIN, revents=POLLIN}, {fd=6, events=POLLIN}, {fd=4,
+> events=POLLIN}], 3, -1) = 1
+> > accept(5, {sa_family=AF_BLUETOOTH,
+> sa_data="\21\00039-(\35\0\1#\371\244\0\0"}, [10]) = 7
+> > getsockname(7, {sa_family=AF_BLUETOOTH,
+> sa_data="\21\0\307\nn:\n\00039-(\35\0"}, [10]) = 0
+> > time(NULL)                              = 1208554156
+> > stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> > stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> > stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> > writev(2, [{"input[7358]: Incoming connection on PSM 17", 42}, {"\n", 1}],
+> 2) = 43
+> > send(3, "<31>Apr 18 23:29:16 input[7358]: Incoming connection on PSM 17",
+> 62, MSG_NOSIGNAL) = 62
+> > poll([{fd=6, events=POLLIN, revents=POLLIN}, {fd=4, events=POLLIN}, {fd=5,
+> events=POLLIN}], 3, -1) = 1
+> > accept(6, {sa_family=AF_BLUETOOTH,
+> sa_data="\23\00039-(\35\0\30v\5\10\10\0"}, [10]) = 8
+> > getsockname(8, {sa_family=AF_BLUETOOTH,
+> sa_data="\23\0\307\nn:\n\00039-(\35\0"}, [10]) = 0
+> > time(NULL)                              = 1208554156
+> > stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> > stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> > stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> > writev(2, [{"input[7358]: Incoming connection on PSM 19", 42}, {"\n", 1}],
+> 2) = 43
+> > send(3, "<31>Apr 18 23:29:16 input[7358]: Incoming connection on PSM 19",
+> 62, MSG_NOSIGNAL) = 62
+> > gettimeofday({1208554156, 773967}, NULL) = 0
+> > writev(4,
+> [{"l\1\0\1\35\0\0\0\17\0\0\0x\0\0\0\1\1o\0\n\0\0\0/org/bluez\0\0\0\0\0\0\6\1s\0\t\0\0\0org.bluez\0\0\0\0\0\0\0\2\1s\0\22\0\0\0org.bluez.Database\0\0\0\0\0\0\3\1s\0"...,
+> 136}, {"\21\0\0\00000:1D:28:2D:39:33\0\0\0\0\0\0\0\0", 29}], 2) = 165
+> > gettimeofday({1208554156, 774555}, NULL) = 0
+> > poll([{fd=4, events=POLLIN, revents=POLLIN}, {fd=5, events=POLLIN}, {fd=6,
+> events=POLLIN}], 3, 25000) = 1
+> > gettimeofday({1208554156, 776093}, NULL) = 0
+> > read(4,
+> "l\2\1\1\0\0\0\0\365\0\0\0\'\0\0\0\6\1s\0\6\0\0\0:1.569\0\0\5\1u\0\17\0\0\0\7\1s\0\6\0\0\0:1.568\0\0",
+> 2048) = 56
+> > read(4, 0x8059f78, 2048)                = -1 EAGAIN (Resource temporarily
+> unavailable)
+> > gettimeofday({1208554156, 776764}, NULL) = 0
+> > gettimeofday({1208554156, 776957}, NULL) = 0
+> > gettimeofday({1208554156, 777150}, NULL) = 0
+> > poll([{fd=5, events=POLLIN}, {fd=6, events=POLLIN}, {fd=4,
+> events=POLLIN}], 3, 0) = 0
+> > socket(PF_BLUETOOTH, SOCK_RAW, 6)       = 9
+> > open("/var/lib/bluetooth/00:0A:3A:6E:0A:C7/input", O_RDONLY) = 10
+> > flock(10, LOCK_SH)                      = 0
+> > fstat64(10, {st_mode=S_IFREG|0644, st_size=290, ...}) = 0
+> > mmap2(NULL, 290, PROT_READ, MAP_SHARED, 10, 0) = 0xb7f6f000
+> > munmap(0xb7f6f000, 290)                 = 0
+> > flock(10, LOCK_UN)                      = 0
+> > close(10)                               = 0
+> > open("/var/lib/bluetooth/00:0A:3A:6E:0A:C7/linkkeys", O_RDONLY) = 10
+> > flock(10, LOCK_SH)                      = 0
+> > fstat64(10, {st_mode=S_IFREG|0600, st_size=55, ...}) = 0
+> > mmap2(NULL, 55, PROT_READ, MAP_SHARED, 10, 0) = 0xb7f6f000
+> > munmap(0xb7f6f000, 55)                  = 0
+> > flock(10, LOCK_UN)                      = 0
+> > close(10)                               = 0
+> > socket(PF_BLUETOOTH, SOCK_RAW, 1)       = 10
+> > ioctl(10, 0x800448d2, 0x805cbc0)        = 0
+> > ioctl(10, 0x800448d3, 0xbf9c561c)       = 0
+> > close(10)                               = 0
+> > socket(PF_BLUETOOTH, SOCK_RAW, 1)       = 10
+> > bind(10, {sa_family=AF_BLUETOOTH,
+> sa_data="\0\0CW\234\277Vg\234\277h\206\5\10"}, 4) = 0
+> > ioctl(10, 0x800448d5, 0x8058668)        = 0
+> > getsockopt(10, SOL_IP, IP_TTL, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\362\333",
+> [16]) = 0
+> > setsockopt(10, SOL_IP, IP_TTL, "\20\0\0\0@\300\0\0\0\0\0\0\21\4\0\0", 16)
+> = 0
+> > writev(10, [{"\1", 1}, {"\21\4\2", 3}, {"\v\0", 2}], 3) = 6
+> > poll([{fd=10, events=POLLIN, revents=POLLIN}], 1, 1000) = 1
+> > read(10, "\4\17\4\0\1\21\4", 260)       = 7
+> > poll([{fd=10, events=POLLIN, revents=POLLIN}], 1, 990) = 1
+> > read(10, "\4\6\3\0\v\0", 260)           = 6
+> > setsockopt(10, SOL_IP, IP_TTL, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\362\333", 16)
+> = 0
+> > getsockopt(10, SOL_IP, IP_TTL, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\362\333",
+> [16]) = 0
+> > setsockopt(10, SOL_IP, IP_TTL, "\20\0\0\0\0\301\0\0\0\0\0\0\23\4\0\0", 16)
+> = 0
+> > writev(10, [{"\1", 1}, {"\23\4\3", 3}, {"\v\0\1", 3}], 3) = 7
+> > poll([{fd=10, events=POLLIN, revents=POLLIN}], 1, 1000) = 1
+> > read(10, "\4\17\4\0\1\23\4", 260)       = 7
+> > poll([{fd=10, events=POLLIN, revents=POLLIN}], 1, 990) = 1
+> > read(10, "\4\10\4$\v\0\0", 260)         = 7
+> > setsockopt(10, SOL_IP, IP_TTL, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\362\333", 16)
+> = 0
+> > time(NULL)                              = 1208554156
+> > stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> > stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> > stat64("/etc/localtime", {st_mode=S_IFREG|0644, st_size=946, ...}) = 0
+> > writev(2, [{"input[7358]: Link encryption failed: Input/output error (5)",
+> 59}, {"\n", 1}], 2) = 60
+> > send(3, "<27>Apr 18 23:29:16 input[7358]: Link encryption failed:
+> Input/output error (5)", 79, MSG_NOSIGNAL) = 79
+> > close(10)                               = 0
+> > close(9)                                = 0
+> > close(7)                                = 0
+> > close(8)                                = 0
+> >
+> > The interesting part is this line:
+> >
+> > read(10, "\4\10\4$\v\0\0", 260)         = 7
+> >
+> > $ (0x24) is the error code; LMP PDU Not Allowed.
+> >
+> > I can use this dongle in Windows without problem. Does anyone know how to
+> spy Windows? Any other idea?
+> >
+> > Thanks.
+> >
+> >
+>
+>
+> -------------------------------------------------------------------------
+>  This SF.net email is sponsored by the 2008 JavaOne(SM) Conference
+>  Don't miss this year's exciting event. There's still time to save $100.
+>  Use priority code J8TL2D2.
+>
+> http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+> _______________________________________________
+>  Bluez-users mailing list
+>  Bluez-users@lists.sourceforge.net
+>  https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
+>
 
-Yes, see below.  On more investigation it's less like the bug that you 
-linked to than I initially suggested; it's time-consuming to work out 
-exactly what makes it fail since some long timeouts seem to be 
-involved.  Today I booted the PC and switched on the keyboard and it 
-all worked for a few hours; I was then out for most of the afternoon 
-and this is what happened:
+Hi Unai,
 
-Apr 24 13:29:42 egypt hcid[2850]: link_key_request 
-(sba=00:11:67:00:00:00, dba=00:1E:52:F9:60:2C)
-Apr 24 13:29:43 egypt hidd[2859]: New HID device 00:1E:52:F9:60:2C 
-(Apple Inc. Keyboard)
-Apr 24 13:29:43 egypt kernel: input: Apple Inc. Keyboard as /class/input/input8
-Apr 24 13:46:48 egypt -- MARK --
-Apr 24 13:59:54 egypt hcid[2850]: link_key_request 
-(sba=00:11:67:00:00:00, dba=00:1E:52:F9:60:2C)
-Apr 24 13:59:54 egypt hidd[2859]: New HID device 00:1E:52:F9:60:2C 
-(Apple Inc. Keyboard)
-Apr 24 13:59:54 egypt kernel: input: Apple Inc. Keyboard as /class/input/input9
-Apr 24 14:30:06 egypt hcid[2850]: link_key_request 
-(sba=00:11:67:00:00:00, dba=00:1E:52:F9:60:2C)
-Apr 24 14:30:07 egypt hidd[2859]: New HID device 00:1E:52:F9:60:2C 
-(Apple Inc. Keyboard)
-Apr 24 14:30:07 egypt kernel: input: Apple Inc. Keyboard as /class/input/input10
-Apr 24 14:46:48 egypt -- MARK --
-Apr 24 15:00:19 egypt hcid[2850]: link_key_request 
-(sba=00:11:67:00:00:00, dba=00:1E:52:F9:60:2C)
-Apr 24 15:00:19 egypt hidd[2859]: New HID device 00:1E:52:F9:60:2C 
-(Apple Inc. Keyboard)
-Apr 24 15:00:19 egypt kernel: input: Apple Inc. Keyboard as /class/input/input11
-Apr 24 15:17:01 egypt /USR/SBIN/CRON[17207]: (root) CMD (   run-parts 
---report /etc/cron.hourly)
-Apr 24 15:30:32 egypt hcid[2850]: link_key_request 
-(sba=00:11:67:00:00:00, dba=00:1E:52:F9:60:2C)
-Apr 24 15:30:32 egypt hidd[2859]: New HID device 00:1E:52:F9:60:2C 
-(Apple Inc. Keyboard)
-Apr 24 15:30:32 egypt kernel: input: Apple Inc. Keyboard as /class/input/input12
-Apr 24 15:46:48 egypt -- MARK --
-Apr 24 16:00:32 egypt kernel: hci_acl_tx_to: hci0 ACL tx timeout
-Apr 24 16:00:32 egypt kernel: hci_acl_tx_to: hci0 killing stalled ACL 
-connection 2C:60:F9:52:1E:00
-Apr 24 16:00:32 egypt kernel: hci_acl_tx_to: hci0 ACL tx timeout
-Apr 24 16:00:32 egypt kernel: hci_acl_tx_to: hci0 killing stalled ACL 
-connection 2C:60:F9:52:1E:00
+Please send the hcidump log(run hcidump -X) and the sdp record of your
+phone(run sdptool browse --raw --l2cap xx:xx:xx:xx:xx:xx)
 
-So it looks like there is some sort of keep-alive that re-connects it 
-every 30 mins (curiously almost exactly on the half-hours), until at 
-16:00 it failed with those timeout messages.  It's now 16:21 and the 
-keyboard isn't working (though it is still on).  If I power-cycle it, 
-it tries to reconnect (flashing LED) but I see nothing in the syslog.  
-If I then hciconfig hci0 reset I get this:
-
-Apr 24 16:23:37 egypt hcid[2850]: HCI dev 0 down
-Apr 24 16:23:37 egypt hcid[2850]: Stopping security manager 0
-Apr 24 16:23:37 egypt hcid[2850]: Device hci0 has been disabled
-Apr 24 16:23:37 egypt kernel: uhci_hcd 0000:00:10.2: release dev 2 
-ep83-ISO, period 1, phase 0, 22 us
-Apr 24 16:23:37 egypt kernel: uhci_hcd 0000:00:10.2: release dev 2 
-ep81-INT, period 1, phase 0, 23 us
-Apr 24 16:23:37 egypt kernel: uhci_hcd 0000:00:10.2: reserve dev 2 
-ep81-INT, period 1, phase 0, 23 us
-Apr 24 16:23:37 egypt kernel: uhci_hcd 0000:00:10.2: reserve dev 2 
-ep83-ISO, period 1, phase 0, 22 us
-Apr 24 16:23:47 egypt kernel: uhci_hcd 0000:00:10.2: release dev 2 
-ep83-ISO, period 1, phase 0, 22 us
-Apr 24 16:23:47 egypt kernel: uhci_hcd 0000:00:10.2: release dev 2 
-ep81-INT, period 1, phase 0, 23 us
-
-and the keyboard still doesn't work.  If I replug the USB dongle, it 
-all starts working again.
-
-So I think this is a lower-level problem with this USB dongle.  I 
-noticed that there was a quirks entry in the kernel - HCI_RESET - for a 
-device with a similar but not identical USB id (1131:1001 rather than 
-1131:1004).  Maybe this is related.
-
-Anyway, I have ordered a different dongle that might have the CSR chip 
-with the HID proxy mode.  With luck that will make it all much simpler.
-
-Regards,  Phil
+Weird, according to the code encryption is applied for keyboard subclass only.
 
 
-
+Regards,
+-- 
+--
+Claudio Takahasi
+Instituto Nokia de Tecnologia
+Recife - Pernambuco - Brasil
++55 81 30879999
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
