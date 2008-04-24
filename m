@@ -1,42 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Florian Echtler <floe@butterbrot.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1209043097.12684.6.camel@violet.holtmann.net>
-References: <1208950651.6611.167.camel@pancake>
-	<1208956070.6611.173.camel@pancake>
-	<E8B28499-36A8-493E-A680-2AA6126617BB@holtmann.org>
-	<1209038634.6611.209.camel@pancake>
-	<1209043097.12684.6.camel@violet.holtmann.net>
-Date: Thu, 24 Apr 2008 22:38:45 +0200
-Message-Id: <1209069525.6611.216.camel@pancake.floe.gotdns.org>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Question
-	about	hci_create_connection	and	clock	offset
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Message-ID: <70c1792a0804241205s17ef0f61wbe29cb9d8fc2cfff@mail.gmail.com>
+Date: Thu, 24 Apr 2008 12:05:40 -0700
+From: "Fredrick Smithson" <fredricksmithson@gmail.com>
+To: bluez-users@lists.sourceforge.net,
+	bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-users] Qualification of products based on bluez
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-> And no matter what you try, creating an ACL baseband connection is most
-> expensive operation in Bluetooth. So it takes time and that it takes
-> even more time if you have to wait for the page timeout if the device is
-> not in range.
-Hmm, ok.. I see that I'm probably still lacking some background
-knowledge here. Can you suggest a document besides the official spec
-that offers a detailed explanation of baseband and link manager?
+Hi,
 
-Thanks, Yours, Florian
--- 
-0666 - Filemode of the Beast
+I am looking for some advice on Bluetooth qualification of products
+based on bluez.
+I notice that bluez is already Bluetooth certified:
 
+http://www.bluez.org/qualification.html
+
+On bluetooth.org I see 4 certifications,
+
+PRD 2.0  	  B013645   	BlueZ Protocol Stack  	  BlueZ   	 Samsung
+Electronics Co., Ltd.  	Component (Tested)  	07-Jan-2008
+PRD 2.0 	B013444 	BlueZ Host Stack 	BlueZ Host Stack 	Nokia
+Corporation 	Host Subsystem 	08-Nov-2007
+PRD 2.0 	B010348 	BlueZ Protocol Stack 	TomTom GO 	TomTom 	Host
+Subsystem 	21-Dec-2006 	QPID:B0214400
+PRD 1.0 	B0214400 	BlueZ Protocol Stack 	BlueZ 	Tom Tom BV 	Subsystem
+	11-Apr-2005 	QDID:B010348
+
+I am wondering if new Bluetooth products based on bluez need to
+certify the bluez subsystem stack again, or if we can use the existing
+certifications and just certify our BT profiles that exist above the
+bluez GAP/RFCOMM/SDP stack. If we can use existing certifications,
+which one is most appropriate.
+
+I ask this question since we are not affiliated with any of the
+company's with existing bluez certifications, so I am not sure if we
+can use there certifications.
+
+I think this is an important question for company's considering using
+bluez to develop new products, and any advice would be appreciated. I
+have heard it can take months to qualify the subsystem stack, it would
+be great if we can use the existing qualifications.
+
+Regards,
+Nick
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
@@ -44,6 +62,6 @@ Don't miss this year's exciting event. There's still time to save $100.
 Use priority code J8TL2D2. 
 http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
