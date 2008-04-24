@@ -1,8 +1,8 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5307d89f0804250448v26195ffdsf7bc22fba64e65fe@mail.gmail.com>
-Date: Fri, 25 Apr 2008 13:48:54 +0200
+Message-ID: <5307d89f0804241256s5164d81cy474924918f878eaa@mail.gmail.com>
+Date: Thu, 24 Apr 2008 21:56:57 +0200
 From: "Patrick Libert" <patrick.libert@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
 Subject: [Bluez-users] Problem a2dp
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
