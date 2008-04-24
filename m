@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: "Phil Endecott" <spam_from_bluez_users@chezphil.org>
 To: <bluez-users@lists.sourceforge.net>
-Date: Thu, 24 Apr 2008 16:49:32 +0100
-Message-ID: <1209052172510@dmwebmail.dmwebmail.chezphil.org>
-In-Reply-To: <2D804CC1-0304-47A8-B67F-00814B3BE516@gmail.com>
-References: <2D804CC1-0304-47A8-B67F-00814B3BE516@gmail.com>
+Date: Thu, 24 Apr 2008 16:32:00 +0100
+Message-ID: <1209051120274@dmwebmail.dmwebmail.chezphil.org>
+In-Reply-To: <5eee8c670804231250s471d74aei656686225a35e5f0@mail.gmail.com>
+References: <5eee8c670804231250s471d74aei656686225a35e5f0@mail.gmail.com>
 MIME-Version: 1.0
 Subject: Re: [Bluez-users] Apple wireless keyboard
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -20,64 +20,90 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Johan,
+Odysseus Flappington wrote:
+> I was also getting "UP RUNNING PSCAN ISCAN", unlike the initial bug-reporter
+> but the 'hciconfig hci0 reset' command on reboot fixed the problem with my
+> Apple keyboard. Have you actually tried it?
 
-Johan Hedberg wrote:
->> - Installing a kernel with the bluetooth modules.
->> - Installing bluez-utils.
->> - Starting hidd and hcid (enabling them in /etc/default/bluetooth on
->> this Debian box)
->
-> This might have been the first step that went wrong. hidd has been  
-> superseded by the input service already some time ago.
+Yes, see below.  On more investigation it's less like the bug that you 
+linked to than I initially suggested; it's time-consuming to work out 
+exactly what makes it fail since some long timeouts seem to be 
+involved.  Today I booted the PC and switched on the keyboard and it 
+all worked for a few hours; I was then out for most of the afternoon 
+and this is what happened:
 
-I'm using the Debian package of bluez-utils version 3.30-3, following 
-their instructions in /usr/share/doc/bluez-utils/README.Debian.gz.  
-I've already submitted some suggested changes to this document, so if 
-there are some more things that they need to update, let me know and 
-I'll file a report.
+Apr 24 13:29:42 egypt hcid[2850]: link_key_request 
+(sba=00:11:67:00:00:00, dba=00:1E:52:F9:60:2C)
+Apr 24 13:29:43 egypt hidd[2859]: New HID device 00:1E:52:F9:60:2C 
+(Apple Inc. Keyboard)
+Apr 24 13:29:43 egypt kernel: input: Apple Inc. Keyboard as /class/input/input8
+Apr 24 13:46:48 egypt -- MARK --
+Apr 24 13:59:54 egypt hcid[2850]: link_key_request 
+(sba=00:11:67:00:00:00, dba=00:1E:52:F9:60:2C)
+Apr 24 13:59:54 egypt hidd[2859]: New HID device 00:1E:52:F9:60:2C 
+(Apple Inc. Keyboard)
+Apr 24 13:59:54 egypt kernel: input: Apple Inc. Keyboard as /class/input/input9
+Apr 24 14:30:06 egypt hcid[2850]: link_key_request 
+(sba=00:11:67:00:00:00, dba=00:1E:52:F9:60:2C)
+Apr 24 14:30:07 egypt hidd[2859]: New HID device 00:1E:52:F9:60:2C 
+(Apple Inc. Keyboard)
+Apr 24 14:30:07 egypt kernel: input: Apple Inc. Keyboard as /class/input/input10
+Apr 24 14:46:48 egypt -- MARK --
+Apr 24 15:00:19 egypt hcid[2850]: link_key_request 
+(sba=00:11:67:00:00:00, dba=00:1E:52:F9:60:2C)
+Apr 24 15:00:19 egypt hidd[2859]: New HID device 00:1E:52:F9:60:2C 
+(Apple Inc. Keyboard)
+Apr 24 15:00:19 egypt kernel: input: Apple Inc. Keyboard as /class/input/input11
+Apr 24 15:17:01 egypt /USR/SBIN/CRON[17207]: (root) CMD (   run-parts 
+--report /etc/cron.hourly)
+Apr 24 15:30:32 egypt hcid[2850]: link_key_request 
+(sba=00:11:67:00:00:00, dba=00:1E:52:F9:60:2C)
+Apr 24 15:30:32 egypt hidd[2859]: New HID device 00:1E:52:F9:60:2C 
+(Apple Inc. Keyboard)
+Apr 24 15:30:32 egypt kernel: input: Apple Inc. Keyboard as /class/input/input12
+Apr 24 15:46:48 egypt -- MARK --
+Apr 24 16:00:32 egypt kernel: hci_acl_tx_to: hci0 ACL tx timeout
+Apr 24 16:00:32 egypt kernel: hci_acl_tx_to: hci0 killing stalled ACL 
+connection 2C:60:F9:52:1E:00
+Apr 24 16:00:32 egypt kernel: hci_acl_tx_to: hci0 ACL tx timeout
+Apr 24 16:00:32 egypt kernel: hci_acl_tx_to: hci0 killing stalled ACL 
+connection 2C:60:F9:52:1E:00
 
-> You can check  
-> whether it's enabled e.g. with the bluetooth-properties app that comes  
-> with bluez-gnome (assuming you use Gnome).
+So it looks like there is some sort of keep-alive that re-connects it 
+every 30 mins (curiously almost exactly on the half-hours), until at 
+16:00 it failed with those timeout messages.  It's now 16:21 and the 
+keyboard isn't working (though it is still on).  If I power-cycle it, 
+it tries to reconnect (flashing LED) but I see nothing in the syslog.  
+If I then hciconfig hci0 reset I get this:
 
-I'm not using Gnome.
+Apr 24 16:23:37 egypt hcid[2850]: HCI dev 0 down
+Apr 24 16:23:37 egypt hcid[2850]: Stopping security manager 0
+Apr 24 16:23:37 egypt hcid[2850]: Device hci0 has been disabled
+Apr 24 16:23:37 egypt kernel: uhci_hcd 0000:00:10.2: release dev 2 
+ep83-ISO, period 1, phase 0, 22 us
+Apr 24 16:23:37 egypt kernel: uhci_hcd 0000:00:10.2: release dev 2 
+ep81-INT, period 1, phase 0, 23 us
+Apr 24 16:23:37 egypt kernel: uhci_hcd 0000:00:10.2: reserve dev 2 
+ep81-INT, period 1, phase 0, 23 us
+Apr 24 16:23:37 egypt kernel: uhci_hcd 0000:00:10.2: reserve dev 2 
+ep83-ISO, period 1, phase 0, 22 us
+Apr 24 16:23:47 egypt kernel: uhci_hcd 0000:00:10.2: release dev 2 
+ep83-ISO, period 1, phase 0, 22 us
+Apr 24 16:23:47 egypt kernel: uhci_hcd 0000:00:10.2: release dev 2 
+ep81-INT, period 1, phase 0, 23 us
 
-> You will need to tell the  
-> input service about your keyboard using the CreateDevice D-Bus method  
-> call (maybe bluetooth-properties even supports doing this through its  
-> GUI). Some python examples can nevertheless be found in the BlueZ  
-> wiki: http://wiki.bluez.org/wiki/HOWTO/InputDevices
+and the keyboard still doesn't work.  If I replug the USB dongle, it 
+all starts working again.
 
->> - Running hcitool scan to get the keyboard address (which I've now
->> written on the back)
->> - Running hidd --connect <addr> and typing 1234RET on the keyboard
->
-> Both of these are fine but instead of using hidd you'd use the Connect  
-> method that the input service provides (I think there's an example of  
-> that too in the wiki).
+So I think this is a lower-level problem with this USB dongle.  I 
+noticed that there was a quirks entry in the kernel - HCI_RESET - for a 
+device with a similar but not identical USB id (1131:1001 rather than 
+1131:1004).  Maybe this is related.
 
-Hmm.  So rather than running "hcitool scan" and "hidd --conect <addr>", 
-I have to write a few lines of python (a language I've never used) to 
-communicate over dbus (a protocol that I've never used) to this "input 
-service" thing?  If that's the case, then I can't say this looks like 
-an improvement in usability.
+Anyway, I have ordered a different dongle that might have the CSR chip 
+with the HID proxy mode.  With luck that will make it all much simpler.
 
->> So
->> after I reboot the keyboard should be able to connect without user
->> interaction.  But so far I have failed to make this happen.
->
-> Probably because you don't have a HID server to accept the incoming  
-> connection request.
-
-hidd --master --server is started by the Debian init.d script.
-
-See my other messages for my further thoughts about why this is not 
-working; I think it's a lower-level problem.
-
-
-Regards, Phil.
-
+Regards,  Phil
 
 
 
