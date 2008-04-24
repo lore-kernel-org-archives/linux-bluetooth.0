@@ -1,12 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <48075B6A.2060308@access-company.com>
-References: <48075B6A.2060308@access-company.com>
-Date: Thu, 24 Apr 2008 19:42:21 +0200
-Message-Id: <1209058941.12684.37.camel@violet.holtmann.net>
+In-Reply-To: <1209038634.6611.209.camel@pancake>
+References: <1208950651.6611.167.camel@pancake>
+	<1208956070.6611.173.camel@pancake>
+	<E8B28499-36A8-493E-A680-2AA6126617BB@holtmann.org>
+	<1209038634.6611.209.camel@pancake>
+Date: Thu, 24 Apr 2008 15:18:17 +0200
+Message-Id: <1209043097.12684.6.camel@violet.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [patch] BNEP/PAN Qualification issues
+Subject: Re: [Bluez-devel] Question about
+	hci_create_connection	and	clock	offset
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,30 +24,39 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frederic,
+Hi Florian,
 
-> I got my hand over a BNEP and PAN test plan and tried to pass it with 
-> current PAN implementation (pand, not network service). I met several 
-> issues and tried to find some solutions to them.
+> > > However, what I'm trying to do - repeating inquiries in one thread,
+> > > checking RSSI in another one (even for devices that haven't been  
+> > > seen by
+> > > the last inquiries) - doesn't seem possible in the D-Bus API, as there
+> > > is no function to create a low-level ACL connection to a device
+> > > address..?
+> > what do you expect from the RSSI value that you get from an active ACL  
+> > link. It is different from the RSSI value you get via inquiry anyway.
+> Well, that wouldn't matter, as I'm going to put all that into a wrapper
+> class anyway.
 > 
-> * Handling of 32 and 128 bits uuids,
-> * Correct response to invalid uuids,
-> * Respond to control messages before connection setup,
-> * Handling of bnep extension together with general headers,
-> * Handling of bnep extensions together with setup connection requests.
-> * Forwarding of unknown BNEP extensions (not available for broadcast, 
-> advice requested),
-> * Give up pan connection after 30 seconds,
+> Maybe a word about what I'm trying to do - as you may have guessed
+> already, it's about proximity sensing. I've put a minimal Dbus interface
+> into my wrapper class and it's actually working quite nicely. However,
+> some of the devices which I'm working with - e.g., Motorola mobile
+> phones - have a hardcoded discoverable timeout of 3 minutes.
 > 
-> The result of that work is two patchs, one for the kernel (based on 
-> latest git) and one for pand (a bit old that one I fear). However, it 
-> should be easy to get similar patch for network service.
+> This makes things a bit more difficult for me, as these phones suddenly
+> vanish from the list which the Dbus interface is providing, even if they
+> are still in range. With the hci_* interface, I can simply try to open
+> an ACL connection and get the RSSI value to see if they are just
+> invisible. How do I do this with Dbus?
 
-I need both patches in unified diff format (-u). I am not a machine and
-can't read context diffs.
+and that RSSI value is totally different from the one you get via an
+inquiry and thus you can't put them together. If you could, I would have
+done this inside the kernel.
 
-Please break up the kernel patch in small chunks that solve each
-problem. It is easier for me to review them and then apply them.
+And no matter what you try, creating an ACL baseband connection is most
+expensive operation in Bluetooth. So it takes time and that it takes
+even more time if you have to wait for the page timeout if the device is
+not in range.
 
 Regards
 
