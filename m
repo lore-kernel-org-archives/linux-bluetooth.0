@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-users@lists.sourceforge.net
+From: "Phil Endecott" <spam_from_bluez_users@chezphil.org>
+To: <bluez-users@lists.sourceforge.net>
+Date: Thu, 24 Apr 2008 16:49:32 +0100
+Message-ID: <1209052172510@dmwebmail.dmwebmail.chezphil.org>
+In-Reply-To: <2D804CC1-0304-47A8-B67F-00814B3BE516@gmail.com>
+References: <2D804CC1-0304-47A8-B67F-00814B3BE516@gmail.com>
 MIME-Version: 1.0
-Date: Thu, 24 Apr 2008 13:22:57 -0400
-Message-ID: <3088.1209057777@foxharp.boston.ma.us>
-From: Paul Fox <pgf@foxharp.boston.ma.us>
-Subject: [Bluez-users] large latency with rfcomm serial?
+Subject: Re: [Bluez-users] Apple wireless keyboard
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,63 +20,67 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hi --
+Hi Johan,
 
-i'm new to bluetooth.
+Johan Hedberg wrote:
+>> - Installing a kernel with the bluetooth modules.
+>> - Installing bluez-utils.
+>> - Starting hidd and hcid (enabling them in /etc/default/bluetooth on
+>> this Debian box)
+>
+> This might have been the first step that went wrong. hidd has been  
+> superseded by the input service already some time ago.
 
-i have a dbt-120 bluetooth receiver dongle that i'm using to
-connect to a gps unit (for the record, an i-blue 737).  i'm
-running fc7.
+I'm using the Debian package of bluez-utils version 3.30-3, following 
+their instructions in /usr/share/doc/bluez-utils/README.Debian.gz.  
+I've already submitted some suggested changes to this document, so if 
+there are some more things that they need to update, let me know and 
+I'll file a report.
 
-i'm seeing large latency values (2 to 3 seconds) on character
-delivery.  are there any well-known gotcha's i should be aware
-of that might cause this kind of thing?
+> You can check  
+> whether it's enabled e.g. with the bluetooth-properties app that comes  
+> with bluez-gnome (assuming you use Gnome).
 
-here's the scenario:
+I'm not using Gnome.
 
-i have two GPS devices.  one's a direct USB plug-in, the other is
-the bluetooth device mentioned above.
+> You will need to tell the  
+> input service about your keyboard using the CreateDevice D-Bus method  
+> call (maybe bluetooth-properties even supports doing this through its  
+> GUI). Some python examples can nevertheless be found in the BlueZ  
+> wiki: http://wiki.bluez.org/wiki/HOWTO/InputDevices
 
-the direct plugin unit works fine.  when tracking motion, it
-tends to lag about a second behind "real-time", which is normal
-for gps.
+>> - Running hcitool scan to get the keyboard address (which I've now
+>> written on the back)
+>> - Running hidd --connect <addr> and typing 1234RET on the keyboard
+>
+> Both of these are fine but instead of using hidd you'd use the Connect  
+> method that the input service provides (I think there's an example of  
+> that too in the wiki).
 
-the BT device, however, lags real-time by a full 3 or 4 seconds --
-long enough that it can cause real confusion while navigating.
-(i.e., it says you're coming up to a turn 4 seconds after you've
-passed it.)
+Hmm.  So rather than running "hcitool scan" and "hidd --conect <addr>", 
+I have to write a few lines of python (a language I've never used) to 
+communicate over dbus (a protocol that I've never used) to this "input 
+service" thing?  If that's the case, then I can't say this looks like 
+an improvement in usability.
 
-if i connect both devices at once, and simply watch the output
-from each (by connecting directly to their respective tty device
-nodes), it's clear that the output from the BT unit is way
-behind.  the devices are stationary, so the positions aren't
-changing, but the GPS timestamps that come across in the BT data
-are 3 or 4 seconds behind those from the non-BT device.
+>> So
+>> after I reboot the keyboard should be able to connect without user
+>> interaction.  But so far I have failed to make this happen.
+>
+> Probably because you don't have a HID server to accept the incoming  
+> connection request.
 
-since they clearly both get the same time from the satellites,
-the time skew is happening either withing the GPS receiver, or
-within the bluetooth stack.  to try and determine which, i
-figured out how use a windows box (same dbt-120 dongle, same gps
-unit), and did the comparison again.  the BT device was on windows,
-the direct-connect device still on linux.  the timestamps in the
-messages coming from the two seemed pretty much in sync.
+hidd --master --server is started by the Debian init.d script.
 
-so my current feeling is that i'm losing 2 to 3 seconds in the
-bluetooth stack.  any ideas?  any config values to check?
+See my other messages for my further thoughts about why this is not 
+working; I think it's a lower-level problem.
 
-paul
 
-p.s. vital statistics:
-    machine is an OLPC XO laptop.  
-    kernel is OLPC-built 2.6.22
-    modules were built later, from a matching kernel tree.
-    yum bluez packages:
-	bluez-gnome.i386  0.8-2.fc7
-	bluez-libs.i386   3.9-1.fc7
-	bluez-utils.i386  3.9-2.fc7
+Regards, Phil.
 
-=---------------------
- paul fox, pgf@foxharp.boston.ma.us (arlington, ma, where it's 66.6 degrees)
+
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
