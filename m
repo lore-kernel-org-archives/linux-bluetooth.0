@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48125593.8030903@gmail.com>
-Date: Sat, 26 Apr 2008 01:05:07 +0300
-From: Firas Assad <hayolist@gmail.com>
+Message-ID: <2a9506370804251313q3a7bf876wbc8f4acb185b9c5@mail.gmail.com>
+Date: Fri, 25 Apr 2008 17:13:50 -0300
+From: "Vinicius Gomes" <vcgomes@users.sourceforge.net>
+To: joao.vita@gmail.com, larry.olj@gmail.com, jerry87905@gmail.com,
+	hayolie@gmail.com, tadas.dailyda@gmail.com
+In-Reply-To: <2a9506370804251218g4bcc206au685cc6e6a25a93f3@mail.gmail.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 References: <2a9506370804251218g4bcc206au685cc6e6a25a93f3@mail.gmail.com>
-	<2a9506370804251313q3a7bf876wbc8f4acb185b9c5@mail.gmail.com>
-In-Reply-To: <2a9506370804251313q3a7bf876wbc8f4acb185b9c5@mail.gmail.com>
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] Welcome to BlueZ
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,38 +22,50 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello, my name is Firas Assaad and I'm one of the students working on a 
-BlueZ project for Google Summer of Code 2008. This will be a great 
-opportunity to get involved in some serious project and to learn all 
-sorts of new skills. I'm relatively new to the free software scene so I 
-hope you tolerate me being dumb often. :P
+Adding the bluez-devel list to CC.
 
-My project is HFP Emulation, which aims to implement the Hands-Free 
-Profile (HFP) to allow the computer to work as a hands-free audio 
-device. I'd mainly implement the hands-free unit role in gateway.c based 
-on the HFP specifications. It sounds like a fun project right now, but I 
-wonder if I'd still think that in three months (hopefully I would...!)
+On Fri, Apr 25, 2008 at 4:18 PM, Vinicius Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> Hi GSoC'ers,
+>
+>  I should have sent this email earlier, but anyway...
+>
+>  First of all: Congratulations to all!
+>
+>  Now, to the boring part...
+>
+>  As there are some BlueZ developers that aren't yet fully aware of that
+>  projects are
+>  included in Google Summer of Code, i would like that each of one of
+>  you could send
+>  an email to the bluez-devel list with a few lines explaining the
+>  project you are
+>  working on.
+>
+>  It would be also nice if you sent some info about yourselves, like: nick on IRC,
+>  where you are from, timezone, name (first name/last name/nick) to use
+>  in emails and
+>  private msgs.
+>
+>  Like it is said in the GSoC timeline we are in the community bonding
+>  period, I think
+>  a great way to start this is: to get the CVS version, play with it,
+>  read the code
+>  (and/or spec, if aplicable) and have some problems ;-) . Other ideas are very
+>  much welcome.
+>
+>  Let the fun begin,
+>
+>  Cheers,
+>  --
+>  Vinicius Gomes
+>  INdT - Instituto Nokia de Tecnologia
+>
 
-I'm on the IRC channel as much as I could, I use the nick 'otarid'. I'm 
-a Palestinian living in Kuwait (just south of Iraq), which makes my time 
-zone +3 UTC all around the year (no daylight saving time here).
 
-I'm fairly busy currently, as most students would be (exams, projects, 
-etc.), so I might not be too productive. I should have a lot of free 
-time by June (could be as far as 10th of June, not sure yet) and can 
-focus all my energy on the project then. I'll still try to do research 
-and contact my mentor to understand things better before coding begins. 
-Hopefully it'd be a fun and useful experience to all involved. It's nice 
-to be part of this community, and I hope to get the most of it.
-
-Here are some links of interest:
-My Google Summer of Code project page: 
-http://code.google.com/soc/2008/bluez/appinfo.html?csaid=1F4C750B5CD9DB30
-A blog I set up for it: http://randomgsoc.blogspot.com/
-
-Regards,
-
-Firas Assaad
+-- 
+Vinicius Gomes
+INdT - Instituto Nokia de Tecnologia
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
