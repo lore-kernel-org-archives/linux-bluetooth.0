@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4812F973.8030502@powercraft.nl>
-Date: Sat, 26 Apr 2008 11:44:19 +0200
-From: Jelle de Jong <jelledejong@powercraft.nl>
+Message-ID: <5307d89f0804250448v26195ffdsf7bc22fba64e65fe@mail.gmail.com>
+Date: Fri, 25 Apr 2008 13:48:54 +0200
+From: "Patrick Libert" <patrick.libert@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] mini bluetooth projector
+Subject: [Bluez-users] Problem a2dp
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,17 +18,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello everybody,
+Hello,
+I used Ubuntu Gutsy Gibbon(7.10) and my bluetooth stereo headset is
+working perfectly.
+Now, I upgraded Ubuntu to 8.4 and my bluetooth headset doesn't work anymore.
+Error message:  ALSA lib pcm_bluetooth.c:1553:(bluetooth_init)
+BT_GETCAPABILITIES failed : Input/output error(5)
 
-I was wondering if anybody know of a portable mini beamer that supports 
-the bluetooth stack. So we I can sent and project information on fast 
-presentation.
-
-Any ideas?
-
-Kind regards,
-
-Jelle
+Can anybody help, please.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
