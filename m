@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <231dafb50804260527h71946b24w1cf366b449d809ce@mail.gmail.com>
-Date: Sat, 26 Apr 2008 06:27:52 -0600
-From: "Dark Shadow" <shadowofdarkness@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Message-ID: <4812F973.8030502@powercraft.nl>
+Date: Sat, 26 Apr 2008 11:44:19 +0200
+From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
-Subject: [Bluez-users] Turn a laptop into a bluetooth headset
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] mini bluetooth projector
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,11 +18,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Is it possible to do that with a BT dongle. I would like to be able to
-record the calls and talk with the standard audio out or using a
-computer headset. Or maybe even my real BT headset.
+Hello everybody,
 
-I am running Ubuntu 8.04 64bit
+I was wondering if anybody know of a portable mini beamer that supports 
+the bluetooth stack. So we I can sent and project information on fast 
+presentation.
+
+Any ideas?
+
+Kind regards,
+
+Jelle
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
