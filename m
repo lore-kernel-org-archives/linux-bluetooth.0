@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300804261327u2daf894fudee9a9944eddf9e3@mail.gmail.com>
-Date: Sat, 26 Apr 2008 14:27:45 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
+Message-ID: <231dafb50804260527h71946b24w1cf366b449d809ce@mail.gmail.com>
+Date: Sat, 26 Apr 2008 06:27:52 -0600
+From: "Dark Shadow" <shadowofdarkness@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <231dafb50804260527h71946b24w1cf366b449d809ce@mail.gmail.com>
 MIME-Version: 1.0
-References: <231dafb50804260527h71946b24w1cf366b449d809ce@mail.gmail.com>
-Subject: Re: [Bluez-users] Turn a laptop into a bluetooth headset
+Subject: [Bluez-users] Turn a laptop into a bluetooth headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,18 +18,11 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Mr Shadow
+Is it possible to do that with a BT dongle. I would like to be able to
+record the calls and talk with the standard audio out or using a
+computer headset. Or maybe even my real BT headset.
 
-There is a google summer of code project to do that, but no really
-good way to do it currently.
-
-On Sat, Apr 26, 2008 at 6:27 AM, Dark Shadow <shadowofdarkness@gmail.com> wrote:
-> Is it possible to do that with a BT dongle. I would like to be able to
->  record the calls and talk with the standard audio out or using a
->  computer headset. Or maybe even my real BT headset.
-
--- 
-Brad
+I am running Ubuntu 8.04 64bit
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
