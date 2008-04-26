@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <782ce16c0804270751g3007607fy127ed8b207fc56ba@mail.gmail.com>
-Date: Sun, 27 Apr 2008 11:51:33 -0300
-From: "=?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?=" <joao.vita@gmail.com>
+Message-ID: <00c401c8a7ef$22a266f0$6701a8c0@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Date: Sat, 26 Apr 2008 17:44:48 -0500
 MIME-Version: 1.0
-Subject: [Bluez-devel] GSoC Project - Integration of Bluetooth Audio with
-	PulseAudio
+Subject: [Bluez-devel] WRT Bluez-utils-3.30 plugins failing at startup
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,45 +14,20 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGVsbG8gZXZlcnlib2R5IQoKTXkgbmFtZSBpcyBKb8OjbyBQYXVsbyBSZWNoaSBWaXRhLCBJJ20g
-dGhlIHN0dWRlbnQgd2hvIHdpbGwgYmUgd29ya2luZwp3aXRoIHlvdSBvbiB0aGUgaW50ZWdyYXRp
-b24gb2YgQlRBdWRpbyB3aXRoIHRoZSBzb3VuZCBzZXJ2ZXIKUHVsc2VBdWRpby4gRmlyc3QsIEkg
-d291bGQgbGlrZSB0byB0aGFuayBhbGwgb2YgeW91IGd1eXMgZm9yIGdpdmluZyBtZQp0aGlzIG9w
-cG9ydHVuaXR5LiBJdCdzIG15IGZpcnN0IHRpbWUgd29ya2luZyB3aXRoIEJsdWVaIGFzIGEgZGV2
-ZWxvcGVyCihJIHVzZSBCbHVlWiBhcyBhIHVzZXIsIHdpdGggYSBtb3VzZSBhbmQgYSBTQ08gaGVh
-ZHNldCkgYW5kIGFsc28gbXkKZmlyc3QgdGltZSBjb250cmlidXRpbmcgdG8gYW55IEZMT1NTIHBy
-b2plY3QuIEknbSBhIGdyYWR1YXRlIHN0dWRlbnQKYXQgQ2FtcGluYXMgVW5pdmVyc2l0eSwgQ2Ft
-cGluYXMsIFNQLCBCcmF6aWwgKEdNVC0zKS4KCkFib3V0IHRoZSBwcm9qZWN0LCBhdCBmaXJzdCB0
-aGUgaWRlYSB3YXMgdG8gbWFrZSB0aGUgQlRBdWRpbyBkZXZpY2VzCnRvIGJlIHNob3duIGJ5IEhB
-TCwgYXMgdmlydHVhbCBkZXZpY2VzLiBMYXR0ZXIsIGR1cmluZyB0aGUgYXBwbGljYXRpb24KcmFu
-a2luZyBwcm9jZXNzLCBWdWRlbnR6ICh3aG8ncyB0aGUgbWVudG9yIG9mIHRoaXMgcHJvamVjdCkg
-dG9sZCBtZQp0aGF0IEhBTCBpcyBub3QgZ29pbmcgdG8gc3VwcG9ydCB2aXJ0dWFsIGRldmljZXMs
-IGFuZCBhc2tlZCB0byBjaGFuZ2UKdGhlIGFwcGxpY2F0aW9uIGZvY3VzaW5nIGluIFB1bHNlQXVk
-aW8gaW50ZWdyYXRpb24uCgpJJ20gbm90IHByZXR0eSBzdXJlIGFib3V0IGhvdyB0aGUgaW50ZWdy
-YXRpb24gaXMgZ29pbmcgdG8gaGFwcGVuLiBPbmUKaWRlYSBpcyB0byBpbXBsZW1lbnQgdHdvIG1v
-ZHVsZXMgaW4gUEEsIGEgQlQgc2luayAocGxheWJhY2spIGFuZApzb3VyY2UgKHJlY29yZCkuIEFs
-c28sIHRoZXJlIHdpbGwgYmUgYSBuZWVkIHRvIHNvbWV0aGluZyBvbiBQQSB0bwpkZXRlY3QgQlQg
-ZGV2aWNlcywgc2ltaWxhciB0byB0aGUgbW9kdWxlLWRldGVjdC1oYWwgb2YgUEEuCgpUaGUgYWJz
-dHJhY3Qgb2YgdGhlIEdTb0MgYXBwbGljYXRpb24gY2FuIGJlIGZvdW5kIGF0Cmh0dHA6Ly9jb2Rl
-Lmdvb2dsZS5jb20vc29jLzIwMDgvYmx1ZXovYXBwaW5mby5odG1sP2NzYWlkPTIyMTg5OTk3NDhC
-NDE4QUUKCkFsc28sIEJyYWQgTWlkZ2xleSwgd2hvJ3MgaW50ZXJlc3RlZCBpbiB0aGUgcHJvamVj
-dCwgbWFkZSBhIHBhZ2UgYXQKdGhlIGJsdWV6IHRyYWMuIEkgZGlkbid0IHdyaXRlIG5vdGhpbmcg
-dGhlcmUgeWV0LCBidXQgSSB0aGluayBpdCdzCmdvbm5hIGJlIGEgZ29vZCBwbGFjZSB0byB3cml0
-ZSBhYm91dCB0aGUgcHJvamVjdC4KCklmIG9uZSB3YW50cyB0byBkaXNjdXNzIGFib3V0IHRoZSBw
-cm9qZWN0LCBmZWVsIGZyZWUgdG8gcGluZyBtZSBvbgojYmx1ZXosIG15IG5pY2sgaXMganBydml0
-YS4gQWxzbywgZmVlbCBmcmVlIHRvIGVtYWlsIG1lIGluIHByaXZhdGUsIGlmCnlvdSB3YW50LgoK
-Q2hlZXJzIQoKLS0gCkpvw6NvIFBhdWxvIFJlY2hpIFZpdGEKTVNjIENvbXB1dGVyIFNjaWVuY2Ug
-U3R1ZGVudApDb21wdXRlciBFbmdpbmVlcgpJQy9VTklDQU1QCi0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhp
-cyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5IHRoZSAyMDA4IEphdmFPbmUoU00pIENvbmZl
-cmVuY2UgCkRvbid0IG1pc3MgdGhpcyB5ZWFyJ3MgZXhjaXRpbmcgZXZlbnQuIFRoZXJlJ3Mgc3Rp
-bGwgdGltZSB0byBzYXZlICQxMDAuIApVc2UgcHJpb3JpdHkgY29kZSBKOFRMMkQyLiAKaHR0cDov
-L2FkLmRvdWJsZWNsaWNrLm5ldC9jbGs7MTk4NzU3NjczOzEzNTAzMDM4O3A/aHR0cDovL2phdmEu
-c3VuLmNvbS9qYXZhb25lCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vm
-b3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1
-ZXotZGV2ZWwK
+I see a few changes in the CVS and will download the latest versions of plugin.c (and .h) to see if that clears things up...
+
+David Stockwell
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
+Don't miss this year's exciting event. There's still time to save $100. 
+Use priority code J8TL2D2. 
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
