@@ -1,15 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Fabrice =?iso-8859-1?q?M=E9nard?= <menard.fabrice@orange.fr>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Mon, 28 Apr 2008 18:57:28 +0200
-References: <mailman.350.1208724257.4128.gnome-bluetooth@lists.usefulinc.com>
-	<258e79980804201348m13d574a7t924676eded86b291@mail.gmail.com>
-	<258e79980804201354l7d3aac0bx795f1f5e3533449d@mail.gmail.com>
-In-Reply-To: <258e79980804201354l7d3aac0bx795f1f5e3533449d@mail.gmail.com>
+Message-ID: <231dafb50804261820l52f84b95ra955299c2f4fa0d2@mail.gmail.com>
+Date: Sat, 26 Apr 2008 19:20:26 -0600
+From: "Dark Shadow" <shadowofdarkness@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <d89ddf300804261327u2daf894fudee9a9944eddf9e3@mail.gmail.com>
 MIME-Version: 1.0
-Message-Id: <200804281857.28308.menard.fabrice@orange.fr>
-Subject: Re: [Bluez-users] Bluetooth Mouse and kbd looses connection after
-	some time of inactivity
+References: <231dafb50804260527h71946b24w1cf366b449d809ce@mail.gmail.com>
+	<d89ddf300804261327u2daf894fudee9a9944eddf9e3@mail.gmail.com>
+Subject: Re: [Bluez-users] Turn a laptop into a bluetooth headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,46 +17,43 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Sunday 20 April 2008 22:54:07 simone malacarne wrote:
-> I have a logitech dinovo bluetooth mouse and keyboard on a Ubuntu 64bit
-> box.
+Thanks
+
+On Sat, Apr 26, 2008 at 2:27 PM, Brad Midgley <bmidgley@gmail.com> wrote:
+> Mr Shadow
 >
->   I can pair both easily using the tray applet, and they both work
->   flawlessly initially.
->   However, after some time of inactivity (Not using one mouse for some
->   time, Going away from the System, etc) the connection is lost and
->   won't be re-established, even after moving the mouse constantly.
->   In bluetooth manager i can see the both devices are still listed like
->  connected.
+>  There is a google summer of code project to do that, but no really
+>  good way to do it currently.
 >
->   To make them work again i have to manual disconnect them. After that i
->   can move the mouse and click the kbd and they reconnect immediatly.
 >
-See http://article.gmane.org/gmane.linux.bluez.user/12988/match=3Ddinovo+la=
-st
-Maybe your answer is there.
-
-Regards,
--- =
-
-M=E9nard Fabrice
-menard.fabrice@orange.fr
-
-
+>  On Sat, Apr 26, 2008 at 6:27 AM, Dark Shadow <shadowofdarkness@gmail.com> wrote:
+>  > Is it possible to do that with a BT dongle. I would like to be able to
+>  >  record the calls and talk with the standard audio out or using a
+>  >  computer headset. Or maybe even my real BT headset.
+>
+>  --
+>  Brad
+>
+>  -------------------------------------------------------------------------
+>  This SF.net email is sponsored by the 2008 JavaOne(SM) Conference
+>  Don't miss this year's exciting event. There's still time to save $100.
+>  Use priority code J8TL2D2.
+>  http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+>  _______________________________________________
+>  Bluez-users mailing list
+>  Bluez-users@lists.sourceforge.net
+>  https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference =
-
-Don't miss this year's exciting event. There's still time to save $100. =
-
-Use priority code J8TL2D2. =
-
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/java=
-one
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
+Don't miss this year's exciting event. There's still time to save $100. 
+Use priority code J8TL2D2. 
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
