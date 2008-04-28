@@ -1,11 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48171A58.8060200@powercraft.nl>
-Date: Tue, 29 Apr 2008 14:53:44 +0200
-From: Jelle de Jong <jelledejong@powercraft.nl>
-MIME-Version: 1.0
+From: Fabrice =?iso-8859-1?q?M=E9nard?= <menard.fabrice@orange.fr>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] step by step - how to get your bluetooth stereo
- headset fully working with the bluez software stack under linux
+Date: Mon, 28 Apr 2008 18:57:28 +0200
+References: <mailman.350.1208724257.4128.gnome-bluetooth@lists.usefulinc.com>
+	<258e79980804201348m13d574a7t924676eded86b291@mail.gmail.com>
+	<258e79980804201354l7d3aac0bx795f1f5e3533449d@mail.gmail.com>
+In-Reply-To: <258e79980804201354l7d3aac0bx795f1f5e3533449d@mail.gmail.com>
+MIME-Version: 1.0
+Message-Id: <200804281857.28308.menard.fabrice@orange.fr>
+Subject: Re: [Bluez-users] Bluetooth Mouse and kbd looses connection after
+	some time of inactivity
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,61 +19,46 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello everybody,
+On Sunday 20 April 2008 22:54:07 simone malacarne wrote:
+> I have a logitech dinovo bluetooth mouse and keyboard on a Ubuntu 64bit
+> box.
+>
+>   I can pair both easily using the tray applet, and they both work
+>   flawlessly initially.
+>   However, after some time of inactivity (Not using one mouse for some
+>   time, Going away from the System, etc) the connection is lost and
+>   won't be re-established, even after moving the mouse constantly.
+>   In bluetooth manager i can see the both devices are still listed like
+>  connected.
+>
+>   To make them work again i have to manual disconnect them. After that i
+>   can move the mouse and click the kbd and they reconnect immediatly.
+>
+See http://article.gmane.org/gmane.linux.bluez.user/12988/match=3Ddinovo+la=
+st
+Maybe your answer is there.
 
-I have been playing around with bluetooth devices under linux the last 
-month or so. I got some very good and some very bad experience with it.
+Regards,
+-- =
 
-I am planning to create some wiki pages when I can get things working 
-100%. However I still got some major issues that I need to overcome.
-
-I bought a Motorola Bluetooth S805 stereo headset. It should get the 
-following functionality:
-
-- Playback of stereo quality audio without distortions and without delay 
-when playing audio and video at the same time.
-- Generic playback controls like playpause/stop/next/previous.
-- Internal microphone to record audio, used for audio recordings and 
-audio video conferences.
-
-I was planning to get things up and running step by step:
-- alsa configuration
-- bluetooth configuration
-- input device configuration
-
-So the alsa configuration exist out of:
--- handle multiple audio streams (slave devices)
--- make the device default or as a plugin
--- use multiple bluetooth headset for the same audio (conference)
--- use multiple bluetooth headset per user based (multiseat)
--- force audio to use the correct bit-rate and frequency for the devices?
--- set-up correct buffer so that playback is without distortions of out 
-of sync audio and video. (testing with totem-xine?)
--- configure multiple profiles for stereo recording/playback
-
-Would somebody be willing to sent his working alsa configuration files 
-that can do some of the above functions:
-
-On this moment the headset plays stereo audio, but when watching video 
-with and audio dvd on totem-xine the audio is out of sync and when 
-scrolling or skipping chapters it get worse and hidd can even crash with 
-segmentation faults. There is also a lot of noise distortions.
-
-Kind regards,
-
-Jelle
+M=E9nard Fabrice
+menard.fabrice@orange.fr
 
 
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
-Don't miss this year's exciting event. There's still time to save $100. 
-Use priority code J8TL2D2. 
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference =
+
+Don't miss this year's exciting event. There's still time to save $100. =
+
+Use priority code J8TL2D2. =
+
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/java=
+one
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
