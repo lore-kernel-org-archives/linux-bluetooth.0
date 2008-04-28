@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300804281346y5b8d41bav944ae3d32aba376@mail.gmail.com>
-Date: Mon, 28 Apr 2008 14:46:09 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1209405939.17679.157.camel@violet.holtmann.net>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <d89ddf300804261337y599d34d5p4454238c08cb9698@mail.gmail.com>
 References: <d89ddf300804261337y599d34d5p4454238c08cb9698@mail.gmail.com>
-	<1209405939.17679.157.camel@violet.holtmann.net>
+Date: Mon, 28 Apr 2008 20:05:39 +0200
+Message-Id: <1209405939.17679.157.camel@violet.holtmann.net>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] exports for pulseaudio
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -17,38 +16,37 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel
-
->  have ipc.[ch] and these files have LGPL license so they can be copied
->  out of the side bluez-utils source code and used by other libraries or
->  systems. Nothing has changed here. It is the job of the external plugin
->  developers to keep this in sync with bluez-utils. No API guarantee.
-
-ok
-
->  For SBC the same thing applies at the moment.
-
-fortunately the codec is self-contained so api breakage won't occur.
-Quality or speed improvements might need to get synchronized from time
-to time.
-
-There is one fix in the quality of the internal sbc codec that I
-should push into the old libsbc, assuming we don't just kill off the
-standalone libsbc altogether.
-
--- 
-Brad
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
-Don't miss this year's exciting event. There's still time to save $100. 
-Use priority code J8TL2D2. 
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SGkgQnJhZCwKCj4gSSd2ZSBiZWVuIGxvb2tpbmcgb3ZlciB0aGUgcHVsc2UgaW50ZWdyYXRpb24g
+cHJvYmxlbS4gSSdkIGxpa2UgdG8gaGVscAo+IGdldCBpc3N1ZXMgb3V0IG9mIHRoZSB3YXkgZm9y
+IEpvw6NvIFZpdGEgdG8gbWFrZSBzb21lIGdvb2QgaGVhZHdheS4KPiAKPiBNYXliZSB0aGUgYmln
+Z2VzdCBpc3N1ZSBpcyB3ZSBuZWVkIHRvIGV4cG9ydCBzb21lIGZ1bmN0aW9ucyBmb3IKPiBnZXR0
+aW5nIHRoZSBhdWRpbyBzdHJlYW0gc29ja2V0LiBJdCB3b3VsZCBhbHNvIG1ha2UgYSBsb3Qgb2Yg
+c2Vuc2UgdG8KPiBwcm92aWRlIGFjY2VzcyB0byB0aGUgc2JjIGNvZGVjIGF0IHRoZSBzYW1lIHRp
+bWUuIEEgbmF0aXZlIHB1bHNlCj4gcGx1Z2luIHdpbGwgbmVlZCBkaXJlY3QgYWNjZXNzIHRvIGRv
+IGl0cyBvd24gc2JjIGVuY29kaW5nLiBIb3BlZnVsbHkKPiBMZW5uYXJ0IHdpbGwgYmUgb2sgd2l0
+aCB0aGUgaWRlYSBvZiBzb21lIG1pbmltYWwgY29kZWMgaGFuZGxpbmcgaW4gYQo+IHBsdWdpbi0t
+SSBjYW4ndCBzZWUgYW55IG90aGVyIHdheSBhcm91bmQgaXQuCgp0aGUgYWdyZWVtZW50IGZyb20g
+dGhlIG1haWxpbmcgbGlzdCBvciBJUkMgKGNhbid0IHJlbWVtYmVyKSB3YXMgdGhhdCB3ZQpoYXZl
+IGlwYy5bY2hdIGFuZCB0aGVzZSBmaWxlcyBoYXZlIExHUEwgbGljZW5zZSBzbyB0aGV5IGNhbiBi
+ZSBjb3BpZWQKb3V0IG9mIHRoZSBzaWRlIGJsdWV6LXV0aWxzIHNvdXJjZSBjb2RlIGFuZCB1c2Vk
+IGJ5IG90aGVyIGxpYnJhcmllcyBvcgpzeXN0ZW1zLiBOb3RoaW5nIGhhcyBjaGFuZ2VkIGhlcmUu
+IEl0IGlzIHRoZSBqb2Igb2YgdGhlIGV4dGVybmFsIHBsdWdpbgpkZXZlbG9wZXJzIHRvIGtlZXAg
+dGhpcyBpbiBzeW5jIHdpdGggYmx1ZXotdXRpbHMuIE5vIEFQSSBndWFyYW50ZWUuCgpGb3IgU0JD
+IHRoZSBzYW1lIHRoaW5nIGFwcGxpZXMgYXQgdGhlIG1vbWVudC4gVW5sZXNzIHdlIHJlYWxseSBk
+byBmcmVlemUKdGhlIEFQSSAoYW5kIHRoYXQgb25seSBoYXBwZW5zIGlmIGFuIGF1ZGlvIGV4cGVy
+dHMgZnJvbSBhIHByb2plY3QgbGlrZQpHU3RyZWFtZXIgb3Igc2ltaWxhciB0ZWxscyBtZSBpdCBp
+cyBhIGdvb2QgQVBJKSwgZXh0ZXJuYWwgcGx1Z2lucyBoYXZlCnRvIGNvcHkgdGhlIHdob2xlIHRo
+aW5nIGFuZCBzeW5jIGl0IHdpdGggYmx1ZXotdXRpbHMuCgpSZWdhcmRzCgpNYXJjZWwKCgoKLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnkgdGhlIDIwMDgg
+SmF2YU9uZShTTSkgQ29uZmVyZW5jZSAKRG9uJ3QgbWlzcyB0aGlzIHllYXIncyBleGNpdGluZyBl
+dmVudC4gVGhlcmUncyBzdGlsbCB0aW1lIHRvIHNhdmUgJDEwMC4gClVzZSBwcmlvcml0eSBjb2Rl
+IEo4VEwyRDIuIApodHRwOi8vYWQuZG91YmxlY2xpY2submV0L2NsazsxOTg3NTc2NzM7MTM1MDMw
+Mzg7cD9odHRwOi8vamF2YS5zdW4uY29tL2phdmFvbmUKX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRl
+dmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9s
+aXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
