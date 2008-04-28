@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48172BB6.8040303@suse.de>
-Date: Tue, 29 Apr 2008 16:07:50 +0200
-From: Stefan Seyfried <seife@suse.de>
+Message-ID: <d89ddf300804281346y5b8d41bav944ae3d32aba376@mail.gmail.com>
+Date: Mon, 28 Apr 2008 14:46:09 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1209405939.17679.157.camel@violet.holtmann.net>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <012d01c8a8d3$4669be00$6701a8c0@freqonedev>
-In-Reply-To: <012d01c8a8d3$4669be00$6701a8c0@freqonedev>
-Subject: Re: [Bluez-devel] Bluez-utils-3.30 (patched) plugins failing at
-	startup
+References: <d89ddf300804261337y599d34d5p4454238c08cb9698@mail.gmail.com>
+	<1209405939.17679.157.camel@violet.holtmann.net>
+Subject: Re: [Bluez-devel] exports for pulseaudio
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,37 +17,37 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-David Stockwell wrote:
-> As stated in my last message, I caught up with all recent patches from hc=
-id, and now find that when initializing the libxxxxx.so =
+Marcel
 
-> plugins, the call to g_module_open STILL fails as shown in the following:
+>  have ipc.[ch] and these files have LGPL license so they can be copied
+>  out of the side bluez-utils source code and used by other libraries or
+>  systems. Nothing has changed here. It is the job of the external plugin
+>  developers to keep this in sync with bluez-utils. No API guarantee.
 
+ok
 
-configure with "--enable-glib" (even if you did enable-all, this does not
-enable glib) and that sould be it.
--- =
+>  For SBC the same thing applies at the moment.
 
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg | "Well, surrounding them's out."
+fortunately the codec is self-contained so api breakage won't occur.
+Quality or speed improvements might need to get synchronized from time
+to time.
 
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
+There is one fix in the quality of the internal sbc codec that I
+should push into the old libsbc, assuming we don't just kill off the
+standalone libsbc altogether.
+
+-- 
+Brad
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference =
-
-Don't miss this year's exciting event. There's still time to save $100. =
-
-Use priority code J8TL2D2. =
-
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/java=
-one
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
+Don't miss this year's exciting event. There's still time to save $100. 
+Use priority code J8TL2D2. 
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
