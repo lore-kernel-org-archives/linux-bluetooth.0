@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4817DAE3.6050406@gmail.com>
-Date: Wed, 30 Apr 2008 14:35:15 +1200
-From: Terry Johnson <terryrjohnson@gmail.com>
-MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <48171A58.8060200@powercraft.nl>
-In-Reply-To: <48171A58.8060200@powercraft.nl>
-Subject: Re: [Bluez-users] step by step - how to get your bluetooth stereo
- headset fully working with the bluez software stack under linux
+In-reply-to: <3088.1209057777@foxharp.boston.ma.us> 
+References: <3088.1209057777@foxharp.boston.ma.us>
+MIME-Version: 1.0
+Date: Tue, 29 Apr 2008 09:02:39 -0400
+Message-ID: <8453.1209474159@foxharp.boston.ma.us>
+From: Paul Fox <pgf@foxharp.boston.ma.us>
+Subject: Re: [Bluez-users] large latency with rfcomm serial?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,78 +20,85 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi All,
+i sent this several days ago -- are there really no opinions
+on whether the linux BT stack could introduce 2-3 second
+character latencies for serial data?
 
-I've got a BlueAnt T8 that I've had working under Ubuntu for about 10 
-seconds. Ever since that early success, the device will pair, but that's 
-about the extent of it.
+i'll start debugging it soon, i guess.
 
-I've installed Blueman and that works marvelously, except for getting 
-actual audio out. I'm running out of hair and wish there was some 
-documented way to debug this process. Even being able to identify the 
-failing subsystem would be wonderful. If such a process could be 
-detailed in a Wiki I'd be more than grateful.
+paul
 
-Terry
+paul wrote:
+ > hi --
+ > 
+ > i'm new to bluetooth.
+ > 
+ > i have a dbt-120 bluetooth receiver dongle that i'm using to
+ > connect to a gps unit (for the record, an i-blue 737).  i'm
+ > running fc7.
+ > 
+ > i'm seeing large latency values (2 to 3 seconds) on character
+ > delivery.  are there any well-known gotcha's i should be aware
+ > of that might cause this kind of thing?
+ > 
+ > here's the scenario:
+ > 
+ > i have two GPS devices.  one's a direct USB plug-in, the other is
+ > the bluetooth device mentioned above.
+ > 
+ > the direct plugin unit works fine.  when tracking motion, it
+ > tends to lag about a second behind "real-time", which is normal
+ > for gps.
+ > 
+ > the BT device, however, lags real-time by a full 3 or 4 seconds --
+ > long enough that it can cause real confusion while navigating.
+ > (i.e., it says you're coming up to a turn 4 seconds after you've
+ > passed it.)
+ > 
+ > if i connect both devices at once, and simply watch the output
+ > from each (by connecting directly to their respective tty device
+ > nodes), it's clear that the output from the BT unit is way
+ > behind.  the devices are stationary, so the positions aren't
+ > changing, but the GPS timestamps that come across in the BT data
+ > are 3 or 4 seconds behind those from the non-BT device.
+ > 
+ > since they clearly both get the same time from the satellites,
+ > the time skew is happening either withing the GPS receiver, or
+ > within the bluetooth stack.  to try and determine which, i
+ > figured out how use a windows box (same dbt-120 dongle, same gps
+ > unit), and did the comparison again.  the BT device was on windows,
+ > the direct-connect device still on linux.  the timestamps in the
+ > messages coming from the two seemed pretty much in sync.
+ > 
+ > so my current feeling is that i'm losing 2 to 3 seconds in the
+ > bluetooth stack.  any ideas?  any config values to check?
+ > 
+ > paul
+ > 
+ > p.s. vital statistics:
+ >     machine is an OLPC XO laptop.  
+ >     kernel is OLPC-built 2.6.22
+ >     modules were built later, from a matching kernel tree.
+ >     yum bluez packages:
+ > 	bluez-gnome.i386  0.8-2.fc7
+ > 	bluez-libs.i386   3.9-1.fc7
+ > 	bluez-utils.i386  3.9-2.fc7
+ > 
+ > =---------------------
+ >  paul fox, pgf@foxharp.boston.ma.us (arlington, ma, where it's 66.6 degrees)
+ > 
+ > -------------------------------------------------------------------------
+ > This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
+ > Don't miss this year's exciting event. There's still time to save $100. 
+ > Use priority code J8TL2D2. 
+ > http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+ > _______________________________________________
+ > Bluez-users mailing list
+ > Bluez-users@lists.sourceforge.net
+ > https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-
-Jelle de Jong wrote:
-> Hello everybody,
->
-> I have been playing around with bluetooth devices under linux the last 
-> month or so. I got some very good and some very bad experience with it.
->
-> I am planning to create some wiki pages when I can get things working 
-> 100%. However I still got some major issues that I need to overcome.
->
-> I bought a Motorola Bluetooth S805 stereo headset. It should get the 
-> following functionality:
->
-> - Playback of stereo quality audio without distortions and without delay 
-> when playing audio and video at the same time.
-> - Generic playback controls like playpause/stop/next/previous.
-> - Internal microphone to record audio, used for audio recordings and 
-> audio video conferences.
->
-> I was planning to get things up and running step by step:
-> - alsa configuration
-> - bluetooth configuration
-> - input device configuration
->
-> So the alsa configuration exist out of:
-> -- handle multiple audio streams (slave devices)
-> -- make the device default or as a plugin
-> -- use multiple bluetooth headset for the same audio (conference)
-> -- use multiple bluetooth headset per user based (multiseat)
-> -- force audio to use the correct bit-rate and frequency for the devices?
-> -- set-up correct buffer so that playback is without distortions of out 
-> of sync audio and video. (testing with totem-xine?)
-> -- configure multiple profiles for stereo recording/playback
->
-> Would somebody be willing to sent his working alsa configuration files 
-> that can do some of the above functions:
->
-> On this moment the headset plays stereo audio, but when watching video 
-> with and audio dvd on totem-xine the audio is out of sync and when 
-> scrolling or skipping chapters it get worse and hidd can even crash with 
-> segmentation faults. There is also a lot of noise distortions.
->
-> Kind regards,
->
-> Jelle
->
->
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
-> Don't miss this year's exciting event. There's still time to save $100. 
-> Use priority code J8TL2D2. 
-> http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->   
+=---------------------
+ paul fox, pgf@foxharp.boston.ma.us (arlington, ma, where it's 53.6 degrees)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
