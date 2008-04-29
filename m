@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <e378cfb20804290739j3c21e692ja6a692c086d1a3e9@mail.gmail.com>
+Date: Tue, 29 Apr 2008 20:09:02 +0530
+From: "Nel D" <newatlinux@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Date: Tue, 29 Apr 2008 22:46:57 +0800
 MIME-Version: 1.0
-Message-Id: <200804292246.57527.Jerry87905@gmail.com>
-From: Dylan <jerry87905@gmail.com>
-Subject: [Bluez-devel] [GSoC 2008]bluez-python
+Subject: [Bluez-devel] Non bluetooth base UUID
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,29 +18,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Greetings everyone,
-I should send this earlier, ok....
-First I wanna thank you guys for giving me this great opportunity. I believe 
-it will be a pleasure to work with Bluez Develop team.
-My name is Li Dongyang and bluez-python is a high level python binding to 
-bluez using dbus-python. It will just face to Bluez 4.X API.
+Hi,
+   Am trying to write a SyncML client over obex  (server / client).
+However i found that SyncML based profiles use a UUID that is not
+based on the bluetooth base UUID.
 
-Currently we've encountred 2 problems.
-One is about the mainloop.Many dbus and bluez operations need a mainloop,
-and an option is let the user specify the mainloop they wanna use, and we 
-check the type of the mainloop, and import dbus.mainloop.glib(for gmainloop) 
-or dbus.mainloop.qt(for qt4 mainloop) and many other mainloops , and then set 
-it as the default mainloop.
-Another is about the plugin system, when new plugin come out, an option is to 
-use org.freedesktop.DBus.Introspectable get the API xml, however, this makes 
-we difficult to modify the method. for example, we want DefaultHeadset() of 
-bluez-python return an object(not the dbus object) instance of AudioDevice or 
-Headset, not the dbus object path.
+e.g. Obex SyncMl client has the 128 bit UUID of the form
+0000002-0000-1000-8000-0002ee000002.
 
-Anyone wanna discuss about bluez-python, fell free to mail me or ping me at 
-#bluez, my nick is missed(GMT +8)
 
-Cheers
+Am sorry if am asking a trivial question, but how do i convert this
+128 bit UUID in hex form ? which is required to be filled in SDP
+records.
+
+
+regards,
+  nel
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
