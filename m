@@ -1,15 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <821c07e60804292333g4271303lfade6b403acfb8b@mail.gmail.com>
-Date: Wed, 30 Apr 2008 09:33:07 +0300
-From: walmis <walmis@gmail.com>
+Message-ID: <5c1c70820804292308n63620353sc9b5224e962817c8@mail.gmail.com>
+Date: Wed, 30 Apr 2008 15:38:45 +0930
+From: "Pooyan McSporran" <duckfreezone@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <2d5a2c100804291906i261e1bqf5e91539d9cd9df8@mail.gmail.com>
 MIME-Version: 1.0
-References: <1209501760.14773.13.camel@ubuntu>
-	<2d5a2c100804291906i261e1bqf5e91539d9cd9df8@mail.gmail.com>
-Subject: Re: [Bluez-devel] bluetoothd-service-network fails to execute ifup
-	scripts from network.conf after repeated connection attempts
-	(Patched)
+Subject: [Bluez-devel] Kernel warnings
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,172 +14,54 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1846672037=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1846672037==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_820_11432682.1209537187373"
+I have been doing some testing of a bluetooth application using 4
+BT2.0 class 1 radios (via a powered USB hub), on a 2.6.24.4 system.
+(Vanilla kernel on a x86 Gentoo system).  Occasionally I'd see these
+in the kernel log:
 
-------=_Part_820_11432682.1209537187373
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+Apr 30 14:20:32 localhost sysfs: duplicate filename 'acl001237424A6A'
+can not be created
+Apr 30 14:20:32 localhost WARNING: at fs/sysfs/dir.c:424 sysfs_add_one()
+Apr 30 14:20:32 localhost Pid: 776, comm: btaddconn Not tainted 2.6.24.4v03 #1
+Apr 30 14:20:32 localhost [<c0177c2a>] sysfs_add_one+0x54/0xb7
+Apr 30 14:20:32 localhost [<c0178775>] sysfs_create_link+0x9a/0xe5
+Apr 30 14:20:32 localhost [<c0177756>] sysfs_add_file+0x47/0x65
+Apr 30 14:20:32 localhost [<c0201532>] bus_add_device+0x94/0xde
+Apr 30 14:20:32 localhost [<c0200575>] device_add+0x23a/0x43e
+Apr 30 14:20:32 localhost [<d0841324>] add_conn+0x0/0x67 [bluetooth]
+Apr 30 14:20:32 localhost [<d0841341>] add_conn+0x1d/0x67 [bluetooth]
+Apr 30 14:20:32 localhost [<c011e9ab>] run_workqueue+0x6b/0xdf
+Apr 30 14:20:32 localhost [<c029f012>] schedule+0x1f3/0x20d
+Apr 30 14:20:32 localhost [<c011ef9f>] worker_thread+0x0/0x81
+Apr 30 14:20:32 localhost [<c011f013>] worker_thread+0x74/0x81
+Apr 30 14:20:32 localhost [<c0121441>] autoremove_wake_function+0x0/0x35
+Apr 30 14:20:32 localhost [<c01212ea>] kthread+0x36/0x5c
+Apr 30 14:20:32 localhost [<c01212b4>] kthread+0x0/0x5c
+Apr 30 14:20:32 localhost [<c0102f13>] kernel_thread_helper+0x7/0x10
+Apr 30 14:20:32 localhost =======================
+Apr 30 14:20:32 localhost add_conn: Failed to register connection device
 
-T24gV2VkLCBBcHIgMzAsIDIwMDggYXQgNTowNiBBTSwgTHVpeiBBdWd1c3RvIHZvbiBEZW50eiA8
-Cmx1aXouZGVudHpAZ21haWwuY29tPiB3cm90ZToKCj4gSGVsbG8sCj4KPiBPbiBUdWUsIEFwciAy
-OSwgMjAwOCBhdCA1OjQyIFBNLCBWYWxtYW50YXMgPHdhbG1pc0BnbWFpbC5jb20+IHdyb3RlOgo+
-ID4gQWZ0ZXIgY29ubmVjdGluZyB0byBhIHNlcnZlciDvu79vbmNlLCB0aGUgcmVsZXZlbnQgc2Ny
-aXB0cyBpbiBuZXR3b3JrLmNvbmYKPiA+ICBhcmUgZXhlY3V0ZWQsIGFuZCBwYW4qIGFuZCBibmVw
-KiBpbnRlcmZhY2VzIGNvbWUgdXAsIGJ1dCB3aGVuIHlvdQo+ID4gIGRpc2Nvbm5lY3QgYW5kCj4g
-PiAgcmVjb25uZWN0IHRoZSBzZWNvbmQgdGltZSwgbmVpdGhlciB0aGUgc2NyaXB0IGdldHMgZXhl
-Y3V0ZWQsIG5vciB0aGUKPiA+ICBpbnRlcmZhY2UgY29tZXMgdXAgYW5kIHRoaXMgbWFrZXMgdGhl
-IGNvbm5lY3Rpb24gdW51c2FibGUuIChZb3Ugd291bGQKPiA+ICBoYXZlIHRvIG1hbnVhbGx5IGJy
-aW5nIGl0IHVwIHdpdGggImlmY29uZmlnIGJuZXAwIHVwIiApCj4KPiBUaGUgYnJpZGdlIG9uIHNl
-cnZlciBzaWRlIHdhcyBhbHJlYWR5IHVwIEkgc3VwcG9zZWQsIHNvIGl0IGlzIHBvaW50bGVzcyB0
-bwo+IGV4ZWN1dGUgdGhlIHNjcmlwdCBhZ2FpbiBhbmQgYWdhaW4sIGJ1dCB5b3UgbWF5IGhhdmUg
-Zm91bmQgYSBidWcgb24KPiBjbGllbnQgc2lkZSBpZiB3aGF0IHlvdSBhcmUgc2F5aW5nIGlzIHRo
-YXQgdGhlIGJuZXAgaW50ZXJmYWNlIGRvZXMgbm90Cj4gY29tZSB1cCBhIHNlY29uZCB0aW1lLgoK
-ClllcywgYnJpZGdlcyBzaG91bGQgY29tZSB1cCBvbmx5IG9uY2UgYW5kIG5vcGUsIG5vdCBvbiB0
-aGUgY2xpZW50IHNpZGUsIHRoZQpzZXJ2ZXIgc2lkZSwgdGhlIGJuZXBYIGluIHRoZSBicmlkZ2Ug
-ZG9lcyBub3QgY29tZSB1cCBhZnRlciB0aGUgZmlyc3QKcmVjb25uZWN0LiBTcGVudCBob3VycyBm
-aWd1cmluZyBvdXQgd2h5IHRoZXJlIHdhcyBubyBuZXR3b3JrIHdpdGggbXkgUERBLAphbmQgaWZj
-b25maWcgYm5lcDAgdXAgZG9uZSB0aGUgdHJpY2suCgo+Cj4KPiA+ICBDb3JyZWN0IGJlaGF2aW91
-cjoKPiA+ICBDb25uZWN0aW9uIDEgKCBzZXJ2ZXIgcGFuMCAoR04pICkKPiA+ICAgbXktaWZ1cCBn
-ZXRzIGV4ZWN1dGVkIHdpdGggcGFuMCBhcmd1bWVudAo+ID4gICBteS1pZnVwIGdldHMgZXhlY3V0
-ZWQgd2l0aCBibmVwMCBhcmd1bWVudAo+ID4KPiA+ICBEaXNjb25uZWN0IC8gQ29ubmVjdCAyICgg
-c2VydmVyIHBhbjAgKEdOKSApCj4gPiAgIG15LWlmdXAgZ2V0cyBleGVjdXRlZCB3aXRoIGJuZXAw
-IGFyZ3VtZW50Cj4gPgo+ID4gIERpc2Nvbm5lY3QgLyBDb25uZWN0IDMgKCBzZXJ2ZXIgcGFuMCAo
-R04pICkKPiA+ICAgbXktaWZ1cCBnZXRzIGV4ZWN1dGVkIHdpdGggYm5lcDAgYXJndW1lbnQKPiA+
-Cj4KPiBObyBuZWVkIHRvIGV4ZWN1dGUgYW55IHNjcmlwdCBvbiBibmVwWCBhdCBhbGwsIHlvdSBz
-ZWVtcyB0byBhY3R1YWxseQo+IG1pc3VuZGVyc3Rvb2QgdGhlIHdheSBpdCBzaG91bGQgZ29lcywg
-ZWFjaCBibmVwWCBpbnRlcmZhY2UgYWx3YXlzCj4gZXhlY3V0ZSB0aGUgUEFOVSBzY3JpcHQgb24g
-Y2xpZW50IHNpZGUsIG9uIHNlcnZlciBpdCBpcyB0aGUgc2FtZSBpZiB0aGUKPiByb2xlIGlzIFBB
-TlUsIEdOIGFuZCBOQVAgdXNlcyBicmlkZ2VzIHNvIHRoZSBibmVwWCBkb2Vzbid0IG5lZWQgYW55
-Cj4gY29uZmlndXJhdGlvbiBiZXNpZGVzIGJyaW5nIHRoZW0gdXAsIHRoYXRzIHdoeSB0aGVyZSBp
-cyBhIGJuZXBfaWZfdXAoZGV2LAo+IDApCj4gd2hlcmUgMCBtZWFucyBkbyBub3QgZXhlY3V0ZSBh
-bnkgc2NyaXB0IGFzIHRoaXMgaW50ZXJmYWNlIHdpbGwgYmUgYWRkZWQKPiB0byBhIGJyaWRnZS4K
-CgpUaGVyZSdzIGEgYm9udXMsIHRoaXMgd2F5IHlvdSBjYW4ga25vdyB3aGVuIGEgY2xpZW50IGhh
-cyBjb25uZWN0ZWQgYW5kIGRvCnNvbWUgc3R1ZmYuIFRvIG15IGtub3dsZWRnZSB0aGlzIGlzIHRo
-ZSBvbmx5IHdheS4gVW5sZXNzIHNvbWVvbmUgZGV2ZWxvcHMKZGJ1cyBzaWduYWxzIGZvciB0aGlz
-LiBXZWxsLCBpdCdzIG5vdCBUSEFUIG5lY2Vzc2FyeSwgYnV0IGZpeGluZyB0aGUgYnVnIGkKbWVu
-dGlvbmVkIGFib3ZlIGluIHRoaXMgZW1haWwgaXMuCgoKPgo+Cj4gcHM6IGl0IHJlYWxseSBoZWxw
-cyBpZiB5b3UgaW5jbHVkZSB3aGF0IHZlcnNpb24gYXJlIHlvdSB0ZXN0aW5nIGFuZCB3aGF0Cj4g
-bmV0d29yawo+IHNlcnZpY2UgaXMgcHJpbnRpbmcuCgoKU29ycnkgaSBmb3Jnb3QsIGl0J3MgYmx1
-ZXotdXRpbHMgMy4yNiBhbmQgaSdsbCBwcm92aWRlIG91dHB1dCBsYXRlcgoKPgo+Cj4KPiAtLQo+
-IEx1aXogQXVndXN0byB2b24gRGVudHoKPiBFbmdlbmhlaXJvIGRlIENvbXB1dGHDp8Ojbwo+IC0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0KPiBUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnkgdGhlIDIw
-MDggSmF2YU9uZShTTSkgQ29uZmVyZW5jZQo+IERvbid0IG1pc3MgdGhpcyB5ZWFyJ3MgZXhjaXRp
-bmcgZXZlbnQuIFRoZXJlJ3Mgc3RpbGwgdGltZSB0byBzYXZlICQxMDAuCj4gVXNlIHByaW9yaXR5
-IGNvZGUgSjhUTDJEMi4KPgo+IGh0dHA6Ly9hZC5kb3VibGVjbGljay5uZXQvY2xrOzE5ODc1NzY3
-MzsxMzUwMzAzODtwP2h0dHA6Ly9qYXZhLnN1bi5jb20vamF2YW9uZQo+IF9fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCj4gQmx1ZXotZGV2ZWwgbWFpbGluZyBs
-aXN0Cj4gQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cj4gaHR0cHM6Ly9saXN0cy5z
-b3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwKPgo=
-------=_Part_820_11432682.1209537187373
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+I'm finding it hard to reliably reproduce this behaviour, but I'm
+fairly sure it was when I was trying to connect many devices via SPP
+connections.  I'm happy to try harder to reproduce it if it is indeed
+a real problem, but if it's just noise then I'm equally happy to
+ignore it :)
 
-PGJyPjxicj48ZGl2IGNsYXNzPSJnbWFpbF9xdW90ZSI+T24gV2VkLCBBcHIgMzAsIDIwMDggYXQg
-NTowNiBBTSwgTHVpeiBBdWd1c3RvIHZvbiBEZW50eiAmbHQ7PGEgaHJlZj0ibWFpbHRvOmx1aXou
-ZGVudHpAZ21haWwuY29tIj5sdWl6LmRlbnR6QGdtYWlsLmNvbTwvYT4mZ3Q7IHdyb3RlOjxicj48
-YmxvY2txdW90ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJib3JkZXItbGVmdDogMXB4IHNv
-bGlkIHJnYigyMDQsIDIwNCwgMjA0KTsgbWFyZ2luOiAwcHQgMHB0IDBwdCAwLjhleDsgcGFkZGlu
-Zy1sZWZ0OiAxZXg7Ij4KSGVsbG8sPGJyPgo8ZGl2IGNsYXNzPSJJaDJFM2QiPjxicj4KT24gVHVl
-LCBBcHIgMjksIDIwMDggYXQgNTo0MiBQTSwgVmFsbWFudGFzICZsdDs8YSBocmVmPSJtYWlsdG86
-d2FsbWlzQGdtYWlsLmNvbSI+d2FsbWlzQGdtYWlsLmNvbTwvYT4mZ3Q7IHdyb3RlOjxicj4KJmd0
-OyBBZnRlciBjb25uZWN0aW5nIHRvIGEgc2VydmVyIO+7v29uY2UsIHRoZSByZWxldmVudCBzY3Jp
-cHRzIGluIG5ldHdvcmsuY29uZjxicj4KJmd0OyAmbmJzcDthcmUgZXhlY3V0ZWQsIGFuZCBwYW4q
-IGFuZCBibmVwKiBpbnRlcmZhY2VzIGNvbWUgdXAsIGJ1dCB3aGVuIHlvdTxicj4KJmd0OyAmbmJz
-cDtkaXNjb25uZWN0IGFuZDxicj4KJmd0OyAmbmJzcDtyZWNvbm5lY3QgdGhlIHNlY29uZCB0aW1l
-LCBuZWl0aGVyIHRoZSBzY3JpcHQgZ2V0cyBleGVjdXRlZCwgbm9yIHRoZTxicj4KJmd0OyAmbmJz
-cDtpbnRlcmZhY2UgY29tZXMgdXAgYW5kIHRoaXMgbWFrZXMgdGhlIGNvbm5lY3Rpb24gdW51c2Fi
-bGUuIChZb3Ugd291bGQ8YnI+CiZndDsgJm5ic3A7aGF2ZSB0byBtYW51YWxseSBicmluZyBpdCB1
-cCB3aXRoICZxdW90O2lmY29uZmlnIGJuZXAwIHVwJnF1b3Q7ICk8YnI+Cjxicj4KPC9kaXY+VGhl
-IGJyaWRnZSBvbiBzZXJ2ZXIgc2lkZSB3YXMgYWxyZWFkeSB1cCBJIHN1cHBvc2VkLCBzbyBpdCBp
-cyBwb2ludGxlc3MgdG88YnI+CmV4ZWN1dGUgdGhlIHNjcmlwdCBhZ2FpbiBhbmQgYWdhaW4sIGJ1
-dCB5b3UgbWF5IGhhdmUgZm91bmQgYSBidWcgb248YnI+CmNsaWVudCBzaWRlIGlmIHdoYXQgeW91
-IGFyZSBzYXlpbmcgaXMgdGhhdCB0aGUgYm5lcCBpbnRlcmZhY2UgZG9lcyBub3Q8YnI+CmNvbWUg
-dXAgYSBzZWNvbmQgdGltZS48L2Jsb2NrcXVvdGU+PGRpdj48YnI+WWVzLCBicmlkZ2VzIHNob3Vs
-ZCBjb21lIHVwIG9ubHkgb25jZSBhbmQgbm9wZSwgbm90IG9uIHRoZSBjbGllbnQgc2lkZSwgdGhl
-IHNlcnZlciBzaWRlLCB0aGUgYm5lcFggaW4gdGhlIGJyaWRnZSBkb2VzIG5vdCBjb21lIHVwIGFm
-dGVyIHRoZSBmaXJzdCByZWNvbm5lY3QuIFNwZW50IGhvdXJzIGZpZ3VyaW5nIG91dCB3aHkgdGhl
-cmUgd2FzIG5vIG5ldHdvcmsgd2l0aCBteSBQREEsIGFuZCBpZmNvbmZpZyBibmVwMCB1cCBkb25l
-IHRoZSB0cmljay48L2Rpdj4KPGJsb2NrcXVvdGUgY2xhc3M9ImdtYWlsX3F1b3RlIiBzdHlsZT0i
-Ym9yZGVyLWxlZnQ6IDFweCBzb2xpZCByZ2IoMjA0LCAyMDQsIDIwNCk7IG1hcmdpbjogMHB0IDBw
-dCAwcHQgMC44ZXg7IHBhZGRpbmctbGVmdDogMWV4OyI+PGJyPgo8ZGl2IGNsYXNzPSJJaDJFM2Qi
-Pjxicj4KJmd0OyAmbmJzcDtDb3JyZWN0IGJlaGF2aW91cjo8YnI+CiZndDsgJm5ic3A7Q29ubmVj
-dGlvbiAxICggc2VydmVyIHBhbjAgKEdOKSApPGJyPgomZ3Q7ICZuYnNwOyBteS1pZnVwIGdldHMg
-ZXhlY3V0ZWQgd2l0aCBwYW4wIGFyZ3VtZW50PGJyPgomZ3Q7ICZuYnNwOyBteS1pZnVwIGdldHMg
-ZXhlY3V0ZWQgd2l0aCBibmVwMCBhcmd1bWVudDxicj4KJmd0Ozxicj4KJmd0OyAmbmJzcDtEaXNj
-b25uZWN0IC8gQ29ubmVjdCAyICggc2VydmVyIHBhbjAgKEdOKSApPGJyPgomZ3Q7ICZuYnNwOyBt
-eS1pZnVwIGdldHMgZXhlY3V0ZWQgd2l0aCBibmVwMCBhcmd1bWVudDxicj4KJmd0Ozxicj4KJmd0
-OyAmbmJzcDtEaXNjb25uZWN0IC8gQ29ubmVjdCAzICggc2VydmVyIHBhbjAgKEdOKSApPGJyPgom
-Z3Q7ICZuYnNwOyBteS1pZnVwIGdldHMgZXhlY3V0ZWQgd2l0aCBibmVwMCBhcmd1bWVudDxicj4K
-Jmd0Ozxicj4KPGJyPgo8L2Rpdj5ObyBuZWVkIHRvIGV4ZWN1dGUgYW55IHNjcmlwdCBvbiBibmVw
-WCBhdCBhbGwsIHlvdSBzZWVtcyB0byBhY3R1YWxseTxicj4KbWlzdW5kZXJzdG9vZCB0aGUgd2F5
-IGl0IHNob3VsZCBnb2VzLCBlYWNoIGJuZXBYIGludGVyZmFjZSBhbHdheXM8YnI+CmV4ZWN1dGUg
-dGhlIFBBTlUgc2NyaXB0IG9uIGNsaWVudCBzaWRlLCBvbiBzZXJ2ZXIgaXQgaXMgdGhlIHNhbWUg
-aWYgdGhlPGJyPgpyb2xlIGlzIFBBTlUsIEdOIGFuZCBOQVAgdXNlcyBicmlkZ2VzIHNvIHRoZSBi
-bmVwWCBkb2VzbiYjMzk7dCBuZWVkIGFueTxicj4KY29uZmlndXJhdGlvbiBiZXNpZGVzIGJyaW5n
-IHRoZW0gdXAsIHRoYXRzIHdoeSB0aGVyZSBpcyBhIGJuZXBfaWZfdXAoZGV2LCAwKTxicj4Kd2hl
-cmUgMCBtZWFucyBkbyBub3QgZXhlY3V0ZSBhbnkgc2NyaXB0IGFzIHRoaXMgaW50ZXJmYWNlIHdp
-bGwgYmUgYWRkZWQ8YnI+CnRvIGEgYnJpZGdlLjwvYmxvY2txdW90ZT48ZGl2Pjxicj5UaGVyZSYj
-Mzk7cyBhIGJvbnVzLCB0aGlzIHdheSB5b3UgY2FuIGtub3cgd2hlbiBhIGNsaWVudCBoYXMgY29u
-bmVjdGVkIGFuZCBkbyBzb21lIHN0dWZmLiBUbyBteSBrbm93bGVkZ2UgdGhpcyBpcyB0aGUgb25s
-eSB3YXkuIFVubGVzcyBzb21lb25lIGRldmVsb3BzIGRidXMgc2lnbmFscyBmb3IgdGhpcy4gV2Vs
-bCwgaXQmIzM5O3Mgbm90IFRIQVQgbmVjZXNzYXJ5LCBidXQgZml4aW5nIHRoZSBidWcgaSBtZW50
-aW9uZWQgYWJvdmUgaW4gdGhpcyBlbWFpbCBpcy48YnI+CiZuYnNwOzwvZGl2PjxibG9ja3F1b3Rl
-IGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9ImJvcmRlci1sZWZ0OiAxcHggc29saWQgcmdiKDIw
-NCwgMjA0LCAyMDQpOyBtYXJnaW46IDBwdCAwcHQgMHB0IDAuOGV4OyBwYWRkaW5nLWxlZnQ6IDFl
-eDsiPjxicj4KPGJyPgpwczogaXQgcmVhbGx5IGhlbHBzIGlmIHlvdSBpbmNsdWRlIHdoYXQgdmVy
-c2lvbiBhcmUgeW91IHRlc3RpbmcgYW5kIHdoYXQgbmV0d29yazxicj4Kc2VydmljZSBpcyBwcmlu
-dGluZy48L2Jsb2NrcXVvdGU+PGRpdj48YnI+U29ycnkgaSBmb3Jnb3QsIGl0JiMzOTtzIGJsdWV6
-LXV0aWxzIDMuMjYgYW5kIGkmIzM5O2xsIHByb3ZpZGUgb3V0cHV0IGxhdGVyPGJyPjwvZGl2Pjxi
-bG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9ImJvcmRlci1sZWZ0OiAxcHggc29s
-aWQgcmdiKDIwNCwgMjA0LCAyMDQpOyBtYXJnaW46IDBwdCAwcHQgMHB0IDAuOGV4OyBwYWRkaW5n
-LWxlZnQ6IDFleDsiPgo8YnI+Cjxicj4KPGJyPgotLTxicj4KTHVpeiBBdWd1c3RvIHZvbiBEZW50
-ejxicj4KRW5nZW5oZWlybyBkZSBDb21wdXRhw6fDo288YnI+Ci0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS08YnI+
-ClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieSB0aGUgMjAwOCBKYXZhT25lKFNNKSBD
-b25mZXJlbmNlPGJyPgpEb24mIzM5O3QgbWlzcyB0aGlzIHllYXImIzM5O3MgZXhjaXRpbmcgZXZl
-bnQuIFRoZXJlJiMzOTtzIHN0aWxsIHRpbWUgdG8gc2F2ZSAkMTAwLjxicj4KVXNlIHByaW9yaXR5
-IGNvZGUgSjhUTDJEMi48YnI+CjxhIGhyZWY9Imh0dHA6Ly9hZC5kb3VibGVjbGljay5uZXQvY2xr
-OzE5ODc1NzY3MzsxMzUwMzAzODtwP2h0dHA6Ly9qYXZhLnN1bi5jb20vamF2YW9uZSIgdGFyZ2V0
-PSJfYmxhbmsiPmh0dHA6Ly9hZC5kb3VibGVjbGljay5uZXQvY2xrOzE5ODc1NzY3MzsxMzUwMzAz
-ODtwP2h0dHA6Ly9qYXZhLnN1bi5jb20vamF2YW9uZTwvYT48YnI+Cl9fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fPGJyPgpCbHVlei1kZXZlbCBtYWlsaW5nIGxp
-c3Q8YnI+CjxhIGhyZWY9Im1haWx0bzpCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQi
-PkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldDwvYT48YnI+CjxhIGhyZWY9Imh0dHBz
-Oi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsIiB0YXJn
-ZXQ9Il9ibGFuayI+aHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8v
-Ymx1ZXotZGV2ZWw8L2E+PGJyPgo8L2Jsb2NrcXVvdGU+PC9kaXY+PGJyPgo=
-------=_Part_820_11432682.1209537187373--
-
-
---===============1846672037==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+A search of the archives shows that this was a problem in older
+versions of the kernel, but those messages imply it shouldn't be
+happening in this version of the kernel.  I plan to try it on 2.6.25
+soon.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
 Don't miss this year's exciting event. There's still time to save $100. 
 Use priority code J8TL2D2. 
 http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
---===============1846672037==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1846672037==--
