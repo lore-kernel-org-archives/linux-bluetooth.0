@@ -1,10 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5c1c70820804292308n63620353sc9b5224e962817c8@mail.gmail.com>
-Date: Wed, 30 Apr 2008 15:38:45 +0930
-From: "Pooyan McSporran" <duckfreezone@gmail.com>
+Message-ID: <2d5a2c100804291906i261e1bqf5e91539d9cd9df8@mail.gmail.com>
+Date: Tue, 29 Apr 2008 23:06:24 -0300
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1209501760.14773.13.camel@ubuntu>
 MIME-Version: 1.0
-Subject: [Bluez-devel] Kernel warnings
+References: <1209501760.14773.13.camel@ubuntu>
+Subject: Re: [Bluez-devel] bluetoothd-service-network fails to execute ifup
+	scripts from network.conf after repeated connection attempts
+	(Patched)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,54 +18,44 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I have been doing some testing of a bluetooth application using 4
-BT2.0 class 1 radios (via a powered USB hub), on a 2.6.24.4 system.
-(Vanilla kernel on a x86 Gentoo system).  Occasionally I'd see these
-in the kernel log:
-
-Apr 30 14:20:32 localhost sysfs: duplicate filename 'acl001237424A6A'
-can not be created
-Apr 30 14:20:32 localhost WARNING: at fs/sysfs/dir.c:424 sysfs_add_one()
-Apr 30 14:20:32 localhost Pid: 776, comm: btaddconn Not tainted 2.6.24.4v03 #1
-Apr 30 14:20:32 localhost [<c0177c2a>] sysfs_add_one+0x54/0xb7
-Apr 30 14:20:32 localhost [<c0178775>] sysfs_create_link+0x9a/0xe5
-Apr 30 14:20:32 localhost [<c0177756>] sysfs_add_file+0x47/0x65
-Apr 30 14:20:32 localhost [<c0201532>] bus_add_device+0x94/0xde
-Apr 30 14:20:32 localhost [<c0200575>] device_add+0x23a/0x43e
-Apr 30 14:20:32 localhost [<d0841324>] add_conn+0x0/0x67 [bluetooth]
-Apr 30 14:20:32 localhost [<d0841341>] add_conn+0x1d/0x67 [bluetooth]
-Apr 30 14:20:32 localhost [<c011e9ab>] run_workqueue+0x6b/0xdf
-Apr 30 14:20:32 localhost [<c029f012>] schedule+0x1f3/0x20d
-Apr 30 14:20:32 localhost [<c011ef9f>] worker_thread+0x0/0x81
-Apr 30 14:20:32 localhost [<c011f013>] worker_thread+0x74/0x81
-Apr 30 14:20:32 localhost [<c0121441>] autoremove_wake_function+0x0/0x35
-Apr 30 14:20:32 localhost [<c01212ea>] kthread+0x36/0x5c
-Apr 30 14:20:32 localhost [<c01212b4>] kthread+0x0/0x5c
-Apr 30 14:20:32 localhost [<c0102f13>] kernel_thread_helper+0x7/0x10
-Apr 30 14:20:32 localhost =======================
-Apr 30 14:20:32 localhost add_conn: Failed to register connection device
-
-I'm finding it hard to reliably reproduce this behaviour, but I'm
-fairly sure it was when I was trying to connect many devices via SPP
-connections.  I'm happy to try harder to reproduce it if it is indeed
-a real problem, but if it's just noise then I'm equally happy to
-ignore it :)
-
-A search of the archives shows that this was a problem in older
-versions of the kernel, but those messages imply it shouldn't be
-happening in this version of the kernel.  I plan to try it on 2.6.25
-soon.
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
-Don't miss this year's exciting event. There's still time to save $100. 
-Use priority code J8TL2D2. 
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SGVsbG8sCgpPbiBUdWUsIEFwciAyOSwgMjAwOCBhdCA1OjQyIFBNLCBWYWxtYW50YXMgPHdhbG1p
+c0BnbWFpbC5jb20+IHdyb3RlOgo+IEFmdGVyIGNvbm5lY3RpbmcgdG8gYSBzZXJ2ZXIg77u/b25j
+ZSwgdGhlIHJlbGV2ZW50IHNjcmlwdHMgaW4gbmV0d29yay5jb25mCj4gIGFyZSBleGVjdXRlZCwg
+YW5kIHBhbiogYW5kIGJuZXAqIGludGVyZmFjZXMgY29tZSB1cCwgYnV0IHdoZW4geW91Cj4gIGRp
+c2Nvbm5lY3QgYW5kCj4gIHJlY29ubmVjdCB0aGUgc2Vjb25kIHRpbWUsIG5laXRoZXIgdGhlIHNj
+cmlwdCBnZXRzIGV4ZWN1dGVkLCBub3IgdGhlCj4gIGludGVyZmFjZSBjb21lcyB1cCBhbmQgdGhp
+cyBtYWtlcyB0aGUgY29ubmVjdGlvbiB1bnVzYWJsZS4gKFlvdSB3b3VsZAo+ICBoYXZlIHRvIG1h
+bnVhbGx5IGJyaW5nIGl0IHVwIHdpdGggImlmY29uZmlnIGJuZXAwIHVwIiApCgpUaGUgYnJpZGdl
+IG9uIHNlcnZlciBzaWRlIHdhcyBhbHJlYWR5IHVwIEkgc3VwcG9zZWQsIHNvIGl0IGlzIHBvaW50
+bGVzcyB0bwpleGVjdXRlIHRoZSBzY3JpcHQgYWdhaW4gYW5kIGFnYWluLCBidXQgeW91IG1heSBo
+YXZlIGZvdW5kIGEgYnVnIG9uCmNsaWVudCBzaWRlIGlmIHdoYXQgeW91IGFyZSBzYXlpbmcgaXMg
+dGhhdCB0aGUgYm5lcCBpbnRlcmZhY2UgZG9lcyBub3QKY29tZSB1cCBhIHNlY29uZCB0aW1lLgoK
+PiAgQ29ycmVjdCBiZWhhdmlvdXI6Cj4gIENvbm5lY3Rpb24gMSAoIHNlcnZlciBwYW4wIChHTikg
+KQo+ICAgbXktaWZ1cCBnZXRzIGV4ZWN1dGVkIHdpdGggcGFuMCBhcmd1bWVudAo+ICAgbXktaWZ1
+cCBnZXRzIGV4ZWN1dGVkIHdpdGggYm5lcDAgYXJndW1lbnQKPgo+ICBEaXNjb25uZWN0IC8gQ29u
+bmVjdCAyICggc2VydmVyIHBhbjAgKEdOKSApCj4gICBteS1pZnVwIGdldHMgZXhlY3V0ZWQgd2l0
+aCBibmVwMCBhcmd1bWVudAo+Cj4gIERpc2Nvbm5lY3QgLyBDb25uZWN0IDMgKCBzZXJ2ZXIgcGFu
+MCAoR04pICkKPiAgIG15LWlmdXAgZ2V0cyBleGVjdXRlZCB3aXRoIGJuZXAwIGFyZ3VtZW50Cj4K
+Ck5vIG5lZWQgdG8gZXhlY3V0ZSBhbnkgc2NyaXB0IG9uIGJuZXBYIGF0IGFsbCwgeW91IHNlZW1z
+IHRvIGFjdHVhbGx5Cm1pc3VuZGVyc3Rvb2QgdGhlIHdheSBpdCBzaG91bGQgZ29lcywgZWFjaCBi
+bmVwWCBpbnRlcmZhY2UgYWx3YXlzCmV4ZWN1dGUgdGhlIFBBTlUgc2NyaXB0IG9uIGNsaWVudCBz
+aWRlLCBvbiBzZXJ2ZXIgaXQgaXMgdGhlIHNhbWUgaWYgdGhlCnJvbGUgaXMgUEFOVSwgR04gYW5k
+IE5BUCB1c2VzIGJyaWRnZXMgc28gdGhlIGJuZXBYIGRvZXNuJ3QgbmVlZCBhbnkKY29uZmlndXJh
+dGlvbiBiZXNpZGVzIGJyaW5nIHRoZW0gdXAsIHRoYXRzIHdoeSB0aGVyZSBpcyBhIGJuZXBfaWZf
+dXAoZGV2LCAwKQp3aGVyZSAwIG1lYW5zIGRvIG5vdCBleGVjdXRlIGFueSBzY3JpcHQgYXMgdGhp
+cyBpbnRlcmZhY2Ugd2lsbCBiZSBhZGRlZAp0byBhIGJyaWRnZS4KCnBzOiBpdCByZWFsbHkgaGVs
+cHMgaWYgeW91IGluY2x1ZGUgd2hhdCB2ZXJzaW9uIGFyZSB5b3UgdGVzdGluZyBhbmQgd2hhdCBu
+ZXR3b3JrCnNlcnZpY2UgaXMgcHJpbnRpbmcuCgoKLS0gCkx1aXogQXVndXN0byB2b24gRGVudHoK
+RW5nZW5oZWlybyBkZSBDb21wdXRhw6fDo28KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBl
+bWFpbCBpcyBzcG9uc29yZWQgYnkgdGhlIDIwMDggSmF2YU9uZShTTSkgQ29uZmVyZW5jZSAKRG9u
+J3QgbWlzcyB0aGlzIHllYXIncyBleGNpdGluZyBldmVudC4gVGhlcmUncyBzdGlsbCB0aW1lIHRv
+IHNhdmUgJDEwMC4gClVzZSBwcmlvcml0eSBjb2RlIEo4VEwyRDIuIApodHRwOi8vYWQuZG91Ymxl
+Y2xpY2submV0L2NsazsxOTg3NTc2NzM7MTM1MDMwMzg7cD9odHRwOi8vamF2YS5zdW4uY29tL2ph
+dmFvbmUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1
+ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApo
+dHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
