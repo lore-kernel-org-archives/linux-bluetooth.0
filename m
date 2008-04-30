@@ -1,15 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 From: Valmantas <walmis@gmail.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1209584183.28053.2.camel@ubuntu>
+In-Reply-To: <2d5a2c100804301137w1a555aefh87f364275b41048c@mail.gmail.com>
 References: <1209501760.14773.13.camel@ubuntu>
 	<2d5a2c100804291906i261e1bqf5e91539d9cd9df8@mail.gmail.com>
 	<821c07e60804292333g4271303lfade6b403acfb8b@mail.gmail.com>
 	<1209548744.5829.5.camel@ubuntu>
 	<2d5a2c100804301137w1a555aefh87f364275b41048c@mail.gmail.com>
-	<1209584183.28053.2.camel@ubuntu>
-Date: Wed, 30 Apr 2008 22:38:37 +0300
-Message-Id: <1209584317.28053.4.camel@ubuntu>
+Date: Wed, 30 Apr 2008 22:36:23 +0300
+Message-Id: <1209584183.28053.2.camel@ubuntu>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] bluetoothd-service-network fails to execute
 	ifup	scripts from network.conf after repeated connection
@@ -27,27 +26,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Wed, 2008-04-30 at 22:36 +0300, Valmantas wrote:
-> On Wed, 2008-04-30 at 15:37 -0300, Luiz Augusto von Dentz wrote:
-> > What seems to be triggering the problem is that bnep_if_down is not
-> > been called on disconnect than
-> > the g_slist_find is causing the problem on bnep_if_up as it turn to
-> > return without bringing up the
-> > interface.
-> > 
-> > Also please make sure you test this against cvs, so we avoid redoing
-> > work already done.
-> > 
+On Wed, 2008-04-30 at 15:37 -0300, Luiz Augusto von Dentz wrote:
+> What seems to be triggering the problem is that bnep_if_down is not
+> been called on disconnect than
+> the g_slist_find is causing the problem on bnep_if_up as it turn to
+> return without bringing up the
+> interface.
 > 
-> How can i know when the connection has been broken?
-> 
-> bnep_io() does not seem to get called on disconnect.
-> 
-> Also i found another bug, NAP bridge does not get initialized.
-> 
+> Also please make sure you test this against cvs, so we avoid redoing
+> work already done.
 > 
 
-I mean connect_setup_event() not bnep_io
+How can i know when the connection has been broken?
+
+bnep_io() does not seem to get called on disconnect.
+
+Also i found another bug, NAP bridge does not get initialized.
+
 
 
 -------------------------------------------------------------------------
