@@ -1,17 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300805020635k168c72b7tac1502e905f1c30a@mail.gmail.com>
-Date: Fri, 2 May 2008 07:35:04 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <48199A3D.6030800@powercraft.nl>
+Message-ID: <481ACD06.9000003@powercraft.nl>
+Date: Fri, 02 May 2008 10:12:54 +0200
+From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
-References: <48171A58.8060200@powercraft.nl> <4817DAE3.6050406@gmail.com>
-	<d89ddf300804291959m6589b95fse31e8227c37c8f1f@mail.gmail.com>
-	<4818E1B3.6000900@powercraft.nl>
-	<d89ddf300804302008h651289d5q82eaf8f054c697a8@mail.gmail.com>
-	<48199A3D.6030800@powercraft.nl>
-Subject: Re: [Bluez-users] step by step - how to get your bluetooth stereo
-	headset fully working with the bluez software stack under linux
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <48196709.9030104@magtech.com.au> <481993DB.20608@powercraft.nl>
+	<481A648B.9020501@magtech.com.au>
+In-Reply-To: <481A648B.9020501@magtech.com.au>
+Subject: Re: [Bluez-users] Bluez + dbus for ARM solutions?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -25,46 +21,86 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Jelle
+Aras Vaichas wrote:
+> Jelle de Jong wrote:
+>> Aras Vaichas wrote:
+>>   
+>>> Hi,
+>>>
+>>> can someone point me to where I can find scripts/patches that will help
+>>> me build ARM cross-compiled versions of Bluez + dbus for ARM?
+>>>
+>>> Is there a well know set of dbus+bluez versions that are known to work
+>>> for cross-compiling, or does everyone just hack the configure files
+>>> until it works?
+>>>
+>>> I'm currently stuck in dependency hell trying to get dbus to
+>>> cross-compile. So far I've got expat, bluez-libs,  and libusb compiled.
+>>>
+>>> I saw that someone recommended Scratchbox (for dbus) but I'd rather not
+>>> do that because I am able to cross-compile every single other library
+>>> and application for my distribution (including Python) without requiring
+>>> a method like Scratchbox.
+>>>
+>>> Aras Vaichas
+>>>     
+>> Have you looked at the Debian arm packages? I believe Debian has almost 
+>> all packages compiled for arm. But I may be missing something...
+>>   
+> Yes I did start by going through the Debian website and downloading all
+> the packages that looked they were required for Bluetooth networking.
+> 
+> e.g. bluez-utils_3.7-1_arm.deb, dbus_1.0.2-1_arm.deb,
+> hal_0.5.8.1-9_arm.deb, libbluetooth2_3.7-1_arm.deb,
+> libc6_2.3.6.ds1-13etch5_arm.deb, ppp_2.4.4rel-8_arm.deb,
+> libdbus-1-3_1.0.2-1_arm.deb, libexpat1_1.95.8-3.4_arm.deb,
+> libusb-0.1-4_0.1.12-5_arm.deb, lsb-base_3.1-23.2etch1_all.deb
+> 
+> We run a minimal, fully customised embedded Linux system with limited
+> space. The problem is that the Debian ARM packages are  compiled with
+> many options that we don't need. We currently don't run dbus or hal
+> because we just haven't needed them.
+> 
+> The dependency list isn't too bad for all those packages:
+> 
+>         /lib/ld-linux.so.2 (0x40000000)
+>         libX11.so.6 => not found
+>         libbluetooth.so.2 => not found
+>         libc.so.6 => /lib/libc.so.6 (0x4001e000)
+>         libdbus-1.so.3 => not found
+>         libdbus-glib-1.so.2 => not found
+>         libexpat.so.1 => not found
+>         libglib-2.0.so.0 => not found
+>         libgobject-2.0.so.0 => not found
+>         libhal-storage.so.1 => not found
+>         libhal.so.1 => not found
+>         libm.so.6 => /lib/libm.so.6 (0x4001e000)
+>         libpthread.so.0 => /lib/libpthread.so.0 (0x4014e000)
+>         librt.so.1 => /lib/librt.so.1 (0x4001e000)
+>         libusb-0.1.so.4 => not found
+>         libvolume_id.so.0 => not found
+> 
+> Then I saw that dbus required X11 ... so I started cross-compiling
+> everything from source and that's about the time that the pain began.
+> 
+> I can probably use the Debian package method for development purposes,
+> but ideally I'd require custom configured versions of these applications.
+> 
+> Aras
 
->  xine and alsa do not work very well.... and for now there will be no
->  attempts to fix this...?
+I know the pain you are feeling, however the only solution is to change 
+the way developers create there software and how they recommend the 
+build process to the distribution package maintainers.
 
-some combinations are problemaic, but it's tricky and there's a lot to do...
+Please read the below documents, improve them and help us spread create 
+a basis for a good sustainable solution:
 
->  1. How can we make bluez reserve 278kbps for an a2dp headset?
+http://www.powercraft.nl/temp/emdebian-innovating-apt-get-to-become-future-ready-r2.zip
+http://wiki.debian.org/EmdebianImprovedApt
 
-we don't have quality of service. it's not even in the current spec.
+Kind regards,
 
-what you are seeing sounds more like a bug... if there is a single
-piconet, no scans are being started, then we should get good
-consistent throughput.
-
->  2. How can we make bluez force all a2dp headsets to become master
->  instead of slave?
-
-other services have to behave too. since there isn't a way to tell
-services individually to role switch, the best we can do is put this
-in hcid.conf. (I think you already did this)
-
-lm accept,master;
-lp hold,sniff,park;
-
->  3. How can we make bluez continue to sent data to the headset even when
->  a new bluetooth devices connects.
-
-iirc, it's outbound connections from your computer that briefly create
-a scatternet until the role switch happens. there's no way around it.
-
->  4. Will pulse and gstreamer and bluez be able to work on a 200 MHz ARM
->  system.... please keep things usable for embedded devices...
-
-I've noticed gstreamer does take too much cpu, but everything else
-behaves. I've been testing this stuff on a 400mhz gumstix... I like to
-see it scale down too.
-
--- 
-Brad
+Jelle de Jong
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
