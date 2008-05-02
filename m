@@ -1,10 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gmail <patnjer12@gmail.com>
-To: bluez-users@lists.sourceforge.net
-Date: Sat, 03 May 2008 09:22:38 -0400
-Message-Id: <1209820958.6736.12.camel@richard-desktop>
-Mime-Version: 1.0
-Subject: [Bluez-users] Disable Notify Bubble?
+Message-ID: <d89ddf300805020635k168c72b7tac1502e905f1c30a@mail.gmail.com>
+Date: Fri, 2 May 2008 07:35:04 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <48199A3D.6030800@powercraft.nl>
+MIME-Version: 1.0
+References: <48171A58.8060200@powercraft.nl> <4817DAE3.6050406@gmail.com>
+	<d89ddf300804291959m6589b95fse31e8227c37c8f1f@mail.gmail.com>
+	<4818E1B3.6000900@powercraft.nl>
+	<d89ddf300804302008h651289d5q82eaf8f054c697a8@mail.gmail.com>
+	<48199A3D.6030800@powercraft.nl>
+Subject: Re: [Bluez-users] step by step - how to get your bluetooth stereo
+	headset fully working with the bluez software stack under linux
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,35 +21,57 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-77u/CiAgICAgICAgSSBoYXZlIGEgTG9naXRlY2ggTVg1MDAwIGtleWJvYXJkLiAgSXQgdGVuZHMg
-dG8gZGlzY29ubmVjdCBmcm9tCiAgICAgICAgdGhlCiAgICAgICAgY29tcHV0ZXIgYWZ0ZXIgYSBm
-ZXcgbWludXRlcyBvZiBub24tdXNlLiBJIGhhdmUgZm91bmQgdGhhdCB0aGlzCiAgICAgICAgaXMK
-ICAgICAgICB0eXBpY2FsIG9mIHRoaXMga2V5Ym9hcmQgYW5kIG5vIG9uZSBoYXMgcHJvdmlkZWQg
-YSBzb2x1dGlvbiB5ZXQuCiAgICAgICAgVGhlCiAgICAgICAgb25seSB3YXkgdG8gZ2V0IGl0IGJh
-Y2sgaXMgdG8gYnJlYWsgb3V0IHRoZSB3aXJlZCBrZXlib2FyZCBhbmQKICAgICAgICBlbnRlciB0
-aGUKICAgICAgICBjb21tYW5kICAgc3VkbyAvZXRjL2luaXQuZC9ibHVldG9vdGggcmVzdGFydC4g
-ICAKICAgICAgICAKICAgICAgICB3aGF0IHNvbWUgb24gdGhlIHVidW50dSBmb3J1bXMgc3VnZ2Vz
-dGVkIGlzIHRvIGVudGVyIHRoZQogICAgICAgIGZvbGxvd2luZyBpbnRvCiAgICAgICAgY3JvbnRh
-YgogICAgICAgIAogICAgICAgICogKiAqICogKiB2YWw9YGhjaWNvbmZpZyAtYSAyPi9kZXYvbnVs
-bCB8IGhlYWQgLWMgMWA7IFsgLXoKICAgICAgICAkdmFsIF0KICAgICAgICAmJiAvZXRjL2luaXQu
-ZC9ibHVldG9vdGggcmVzdGFydAogICAgICAgIAogICAgICAgIHdoaWNoIHdvcmtzIGdyZWF0LCBi
-dXQgbm93IGkgZ2V0IGEgbm90aWZ5IGJ1YmJsZSBzdGF0aW5nIHRoYXQgbXkKICAgICAgICAiYQog
-ICAgICAgIGRldmljZSBoYXMgYmVlbiBtYWRlIGRpc2NvdmVyYWJsZSIgZXZlcnkgYWJvdXQgNjAg
-c2Vjb25kcy4gIAogICAgICAgIElzIHRoZXJlIGEgd2F5IHRvIGRpc2FibGUgdGhpcyBub3RpZmlj
-YXRpb24/CiAgICAgICAgCiAgICAgICAgYW5kIGkgZ3Vlc3MgdGhlIGJpZ2dlciBxdWVzdGlvbiwg
-dGhvdWdoIG5vdCB3aGF0IGkgbmVlZCBmb3IgdGhlCiAgICAgICAgbW9tZW50LAogICAgICAgIGlz
-IGNhbiB5b3UgcHJvdmlkZSBhIHBhdGNoIHRoYXQgd2lsbCBmaXggdGhpcyBpc3N1ZT8KICAgICAg
-ICAKICAgICAgICBUaGFuayBZb3UKICAgICAgICAKICAgICAgICAKICAgICAgICAKCgotLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieSB0aGUgMjAwOCBKYXZh
-T25lKFNNKSBDb25mZXJlbmNlIApEb24ndCBtaXNzIHRoaXMgeWVhcidzIGV4Y2l0aW5nIGV2ZW50
-LiBUaGVyZSdzIHN0aWxsIHRpbWUgdG8gc2F2ZSAkMTAwLiAKVXNlIHByaW9yaXR5IGNvZGUgSjhU
-TDJEMi4gCmh0dHA6Ly9hZC5kb3VibGVjbGljay5uZXQvY2xrOzE5ODc1NzY3MzsxMzUwMzAzODtw
-P2h0dHA6Ly9qYXZhLnN1bi5jb20vamF2YW9uZQpfX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fXwpCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNA
-bGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3Rz
-L2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
+Jelle
+
+>  xine and alsa do not work very well.... and for now there will be no
+>  attempts to fix this...?
+
+some combinations are problemaic, but it's tricky and there's a lot to do...
+
+>  1. How can we make bluez reserve 278kbps for an a2dp headset?
+
+we don't have quality of service. it's not even in the current spec.
+
+what you are seeing sounds more like a bug... if there is a single
+piconet, no scans are being started, then we should get good
+consistent throughput.
+
+>  2. How can we make bluez force all a2dp headsets to become master
+>  instead of slave?
+
+other services have to behave too. since there isn't a way to tell
+services individually to role switch, the best we can do is put this
+in hcid.conf. (I think you already did this)
+
+lm accept,master;
+lp hold,sniff,park;
+
+>  3. How can we make bluez continue to sent data to the headset even when
+>  a new bluetooth devices connects.
+
+iirc, it's outbound connections from your computer that briefly create
+a scatternet until the role switch happens. there's no way around it.
+
+>  4. Will pulse and gstreamer and bluez be able to work on a 200 MHz ARM
+>  system.... please keep things usable for embedded devices...
+
+I've noticed gstreamer does take too much cpu, but everything else
+behaves. I've been testing this stuff on a 400mhz gumstix... I like to
+see it scale down too.
+
+-- 
+Brad
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
+Don't miss this year's exciting event. There's still time to save $100. 
+Use priority code J8TL2D2. 
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
