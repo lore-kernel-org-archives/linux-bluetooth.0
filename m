@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-From: Dick <dm@chello.nl>
-Date: Mon, 5 May 2008 18:35:46 +0000 (UTC)
-Message-ID: <loom.20080505T183523-563@post.gmane.org>
-References: <loom.20080503T183003-377@post.gmane.org>
-	<aed4d4a30805041328t712b2296ja78d1e8352354fd4@mail.gmail.com>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Restart input service
+MIME-Version: 1.0
+Date: Mon, 5 May 2008 10:32:00 -0700
+Message-ID: <F60A3CE9E807BE49B5F56BD80B894D2001688376@sc-exch03.marvell.com>
+From: "Angus Ainslie" <aainslie@marvell.com>
+To: <bluez-users@lists.sourceforge.net>
+Subject: [Bluez-users] Bluez 3.30 audio service problems
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,7 +18,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Panayiotis Modestou thanks a lot, it works!
+Hi,
+
+I have a working blues libs and utils 3.24 . To try out some of the
+sbcenc optimizations I've been trying to get bluez 3.30 running. When I
+try to start the audio service I get this error 
+
+[root@Linux /]#dbus-send --system --print-reply --dest=org.bluez
+/org/bluez org.bluez.Manager.ActivateService string:audio
+Error org.bluez.Error.Failed: Exec format error
+
+Has anyone seen something ike this before ?
+
+Thanks
+Angus
+
+Senior Firmware Developer
+Automotive Systems Group
+Marvell Semiconductor
 
 
 -------------------------------------------------------------------------
