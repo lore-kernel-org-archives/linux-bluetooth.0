@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2d5a2c100805051440p42bbbeb5ic02a6db5b41733c7@mail.gmail.com>
-Date: Mon, 5 May 2008 18:40:26 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1210020130.10069.5.camel@ubuntu>
+From: Tim Chick <chick@computergeek.freeserve.co.uk>
+To: bluez-devel@lists.sourceforge.net
+Date: Mon, 5 May 2008 21:50:46 +0100
+References: <481B2525.3090600@kernelconcepts.de>
+In-Reply-To: <481B2525.3090600@kernelconcepts.de>
 MIME-Version: 1.0
-References: <1210020130.10069.5.camel@ubuntu>
-Subject: Re: [Bluez-devel] network - NAP (pan1) bridge is not initialized
-	(patch)
+Message-Id: <200805052150.50832.chick@computergeek.freeserve.co.uk>
+Subject: Re: [Bluez-devel] Sychip/Murata WLBT8111 experience?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,36 +16,33 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Sorry but NAP is not as simple as GN, thats why the NAP bridge is not
-being created by network service.
-NAP server can really be consider a bluetooth router so we probably
-need something more advanced than
-creating a normal bridge. Perhaps we can use a daemon that can handle
-this 'router' functionality, but Im
-afraid it still doesn't exists.
+On Friday 02 May 2008 15:28:53 Nils Faerber wrote:
+> Hi!
+> By some lucky coincidence I have a development board with a
+> Sychip/Murata WLBT8111 on it laying on my desk.
+> I try to get the UART HCI to respond but so far it is not recognised by
+> BlueZ. I see that the module sends data about every 300 to 400
+> miliseconds but with any baudrate I tried BlueZ only sais "h4_recv:
+> Unknown HCI packet type...".
+>
+> So, has anyone else yet experience with that chip?
+> Any hints or tricks to make it behave?
+>
+You might like to try BCSP protocol?
 
-I still need to check what is going on in case of GN server, but I
-guess the debug normally helps so I will
-probably make them available in cvs.
+Cheers,
+TIm
 
--- =
-
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference =
-
-Don't miss this year's exciting event. There's still time to save $100. =
-
-Use priority code J8TL2D2. =
-
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/java=
-one
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
+Don't miss this year's exciting event. There's still time to save $100. 
+Use priority code J8TL2D2. 
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
