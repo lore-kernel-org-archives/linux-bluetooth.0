@@ -1,13 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4820230F.2060306@suse.de>
-Date: Tue, 06 May 2008 11:21:19 +0200
-From: Stefan Seyfried <seife@suse.de>
+Message-ID: <821c07e60805060158n6feef306ydf75680f99743f1@mail.gmail.com>
+Date: Tue, 6 May 2008 10:58:17 +0200
+From: walmis <walmis@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <2d5a2c100805051440p42bbbeb5ic02a6db5b41733c7@mail.gmail.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <1210038664.15029.20.camel@violet.holtmann.net>
-In-Reply-To: <1210038664.15029.20.camel@violet.holtmann.net>
-Subject: Re: [Bluez-devel] [BlueZ-Announce] Release of bluez-libs-3.31 and
-	bluez-utils-3.31
+References: <1210020130.10069.5.camel@ubuntu>
+	<2d5a2c100805051440p42bbbeb5ic02a6db5b41733c7@mail.gmail.com>
+Subject: Re: [Bluez-devel] network - NAP (pan1) bridge is not initialized
+	(patch)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,49 +18,113 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: multipart/mixed; boundary="===============1427956993=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> Hi Folks,
-> =
+--===============1427956993==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_1305_14556695.1210064297516"
 
-> this is an update release of the new stable versions of the Bluetooth
-> library and the utilities. This release fixes various bugs from the
-> plugin transition and introduces the first attempts of creating a
-> Bluetooth helper library for GLib.
-> =
+------=_Part_1305_14556695.1210064297516
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
 
-> Currently the full service infrastructure is still available, but with
-> the next release this might change. So please prepare yourself it.
+SSBnZW5lcmF0ZSBhbiBpZnVwIHNjcmlwdCB3aXRoIG15IGFwcGxpY2F0aW9uLCBhbmQgd2hlbiBw
+YW4xIGNvbWVzIHVwLCBpdAphdXRvbWF0aWNhbGx5IGNvbmZpZ3VyZXMgaXQsIGFkZHMgbWFzcXVl
+cmFkaW5nIHRvIGlwdGFibGVzIGFuZCBydW5zIGRoY3AKZGFlbW9uIChJJ3ZlIGltcGxlbWVudGVk
+IGxvY2tzLCBzbyBvbmx5IG9uZSBkaGNwZCBpbnN0YW5jZSBpcyBsYXVuY2hlZCwgYW5kCnNpbmds
+ZSBpcHRhYmxlcyBlbnRyeSBpcyBhZGRlZCkuIEFuZCB0aGlzIHNldHVwIHJ1bnMgcGVyZmVjdGx5
+IGZvciBtZS4KCkluIG15IG9waW5pb24gdGhpcyBwYXRjaCBpcyBiZXR0ZXIgdGhhbiBub3RoaW5n
+LCB1bnRpbCBhIHByb3BlciBzb2x1dGlvbiBpcwpkZXZlbG9wZWQuCgpSZWdhcmRzCgpPbiBNb24s
+IE1heSA1LCAyMDA4IGF0IDExOjQwIFBNLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDwKbHVpei5k
+ZW50ekBnbWFpbC5jb20+IHdyb3RlOgoKPiBTb3JyeSBidXQgTkFQIGlzIG5vdCBhcyBzaW1wbGUg
+YXMgR04sIHRoYXRzIHdoeSB0aGUgTkFQIGJyaWRnZSBpcyBub3QKPiBiZWluZyBjcmVhdGVkIGJ5
+IG5ldHdvcmsgc2VydmljZS4KPiBOQVAgc2VydmVyIGNhbiByZWFsbHkgYmUgY29uc2lkZXIgYSBi
+bHVldG9vdGggcm91dGVyIHNvIHdlIHByb2JhYmx5Cj4gbmVlZCBzb21ldGhpbmcgbW9yZSBhZHZh
+bmNlZCB0aGFuCj4gY3JlYXRpbmcgYSBub3JtYWwgYnJpZGdlLiBQZXJoYXBzIHdlIGNhbiB1c2Ug
+YSBkYWVtb24gdGhhdCBjYW4gaGFuZGxlCj4gdGhpcyAncm91dGVyJyBmdW5jdGlvbmFsaXR5LCBi
+dXQgSW0KPiBhZnJhaWQgaXQgc3RpbGwgZG9lc24ndCBleGlzdHMuCj4KPiBJIHN0aWxsIG5lZWQg
+dG8gY2hlY2sgd2hhdCBpcyBnb2luZyBvbiBpbiBjYXNlIG9mIEdOIHNlcnZlciwgYnV0IEkKPiBn
+dWVzcyB0aGUgZGVidWcgbm9ybWFsbHkgaGVscHMgc28gSSB3aWxsCj4gcHJvYmFibHkgbWFrZSB0
+aGVtIGF2YWlsYWJsZSBpbiBjdnMuCj4KPiAtLQo+IEx1aXogQXVndXN0byB2b24gRGVudHoKPiBF
+bmdlbmhlaXJvIGRlIENvbXB1dGHDp8Ojbwo+Cj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IFRoaXMgU0Yu
+bmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieSB0aGUgMjAwOCBKYXZhT25lKFNNKSBDb25mZXJlbmNl
+Cj4gRG9uJ3QgbWlzcyB0aGlzIHllYXIncyBleGNpdGluZyBldmVudC4gVGhlcmUncyBzdGlsbCB0
+aW1lIHRvIHNhdmUgJDEwMC4KPiBVc2UgcHJpb3JpdHkgY29kZSBKOFRMMkQyLgo+Cj4gaHR0cDov
+L2FkLmRvdWJsZWNsaWNrLm5ldC9jbGs7MTk4NzU3NjczOzEzNTAzMDM4O3A/aHR0cDovL2phdmEu
+c3VuLmNvbS9qYXZhb25lCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18KPiBCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKPiBCbHVlei1kZXZlbEBsaXN0cy5z
+b3VyY2Vmb3JnZS5uZXQKPiBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0
+aW5mby9ibHVlei1kZXZlbAo+Cg==
+------=_Part_1305_14556695.1210064297516
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
 
-Might be an issue with my build, but i get this
+SSBnZW5lcmF0ZSBhbiBpZnVwIHNjcmlwdCB3aXRoIG15IGFwcGxpY2F0aW9uLCBhbmQgd2hlbiBw
+YW4xIGNvbWVzIHVwLCBpdCBhdXRvbWF0aWNhbGx5IGNvbmZpZ3VyZXMgaXQsIGFkZHMgbWFzcXVl
+cmFkaW5nIHRvIGlwdGFibGVzIGFuZCBydW5zIGRoY3AgZGFlbW9uIChJJiMzOTt2ZSBpbXBsZW1l
+bnRlZCBsb2Nrcywgc28gb25seSBvbmUgZGhjcGQgaW5zdGFuY2UgaXMgbGF1bmNoZWQsIGFuZCBz
+aW5nbGUgaXB0YWJsZXMgZW50cnkgaXMgYWRkZWQpLiBBbmQgdGhpcyBzZXR1cCBydW5zIHBlcmZl
+Y3RseSBmb3IgbWUuPGJyPgo8YnI+SW4gbXkgb3BpbmlvbiB0aGlzIHBhdGNoIGlzIGJldHRlciB0
+aGFuIG5vdGhpbmcsIHVudGlsIGEgcHJvcGVyIHNvbHV0aW9uIGlzIGRldmVsb3BlZC48YnI+PGJy
+PlJlZ2FyZHM8YnI+PGJyPjxkaXYgY2xhc3M9ImdtYWlsX3F1b3RlIj5PbiBNb24sIE1heSA1LCAy
+MDA4IGF0IDExOjQwIFBNLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6ICZsdDs8YSBocmVmPSJtYWls
+dG86bHVpei5kZW50ekBnbWFpbC5jb20iPmx1aXouZGVudHpAZ21haWwuY29tPC9hPiZndDsgd3Jv
+dGU6PGJyPgo8YmxvY2txdW90ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJib3JkZXItbGVm
+dDogMXB4IHNvbGlkIHJnYigyMDQsIDIwNCwgMjA0KTsgbWFyZ2luOiAwcHQgMHB0IDBwdCAwLjhl
+eDsgcGFkZGluZy1sZWZ0OiAxZXg7Ij5Tb3JyeSBidXQgTkFQIGlzIG5vdCBhcyBzaW1wbGUgYXMg
+R04sIHRoYXRzIHdoeSB0aGUgTkFQIGJyaWRnZSBpcyBub3Q8YnI+CmJlaW5nIGNyZWF0ZWQgYnkg
+bmV0d29yayBzZXJ2aWNlLjxicj4KTkFQIHNlcnZlciBjYW4gcmVhbGx5IGJlIGNvbnNpZGVyIGEg
+Ymx1ZXRvb3RoIHJvdXRlciBzbyB3ZSBwcm9iYWJseTxicj4KbmVlZCBzb21ldGhpbmcgbW9yZSBh
+ZHZhbmNlZCB0aGFuPGJyPgpjcmVhdGluZyBhIG5vcm1hbCBicmlkZ2UuIFBlcmhhcHMgd2UgY2Fu
+IHVzZSBhIGRhZW1vbiB0aGF0IGNhbiBoYW5kbGU8YnI+CnRoaXMgJiMzOTtyb3V0ZXImIzM5OyBm
+dW5jdGlvbmFsaXR5LCBidXQgSW08YnI+CmFmcmFpZCBpdCBzdGlsbCBkb2VzbiYjMzk7dCBleGlz
+dHMuPGJyPgo8YnI+Ckkgc3RpbGwgbmVlZCB0byBjaGVjayB3aGF0IGlzIGdvaW5nIG9uIGluIGNh
+c2Ugb2YgR04gc2VydmVyLCBidXQgSTxicj4KZ3Vlc3MgdGhlIGRlYnVnIG5vcm1hbGx5IGhlbHBz
+IHNvIEkgd2lsbDxicj4KcHJvYmFibHkgbWFrZSB0aGVtIGF2YWlsYWJsZSBpbiBjdnMuPGJyPgo8
+YnI+Ci0tPGJyPgpMdWl6IEF1Z3VzdG8gdm9uIERlbnR6PGJyPgpFbmdlbmhlaXJvIGRlIENvbXB1
+dGHDp8Ojbzxicj4KPGJyPgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tPGJyPgpUaGlzIFNGLm5ldCBlbWFpbCBp
+cyBzcG9uc29yZWQgYnkgdGhlIDIwMDggSmF2YU9uZShTTSkgQ29uZmVyZW5jZTxicj4KRG9uJiMz
+OTt0IG1pc3MgdGhpcyB5ZWFyJiMzOTtzIGV4Y2l0aW5nIGV2ZW50LiBUaGVyZSYjMzk7cyBzdGls
+bCB0aW1lIHRvIHNhdmUgJDEwMC48YnI+ClVzZSBwcmlvcml0eSBjb2RlIEo4VEwyRDIuPGJyPgo8
+YSBocmVmPSJodHRwOi8vYWQuZG91YmxlY2xpY2submV0L2NsazsxOTg3NTc2NzM7MTM1MDMwMzg7
+cD9odHRwOi8vamF2YS5zdW4uY29tL2phdmFvbmUiIHRhcmdldD0iX2JsYW5rIj5odHRwOi8vYWQu
+ZG91YmxlY2xpY2submV0L2NsazsxOTg3NTc2NzM7MTM1MDMwMzg7cD9odHRwOi8vamF2YS5zdW4u
+Y29tL2phdmFvbmU8L2E+PGJyPgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fXzxicj4KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0PGJyPgo8YSBocmVmPSJtYWls
+dG86Qmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Ij5CbHVlei1kZXZlbEBsaXN0cy5z
+b3VyY2Vmb3JnZS5uZXQ8L2E+PGJyPgo8YSBocmVmPSJodHRwczovL2xpc3RzLnNvdXJjZWZvcmdl
+Lm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbCIgdGFyZ2V0PSJfYmxhbmsiPmh0dHBzOi8v
+bGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsPC9hPjxicj4K
+PC9ibG9ja3F1b3RlPjwvZGl2Pjxicj4K
+------=_Part_1305_14556695.1210064297516--
 
-hcid[32361]: Can't load plugin: /usr/lib64/bluetooth/plugins/libserial.so:
-undefined symbol: g_ascii_isxdigit
 
-I did not change anything in the build system (apart from removing
-"--enable-glib" again).
--- =
-
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg | "Well, surrounding them's out."
-
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
+--===============1427956993==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference =
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
+Don't miss this year's exciting event. There's still time to save $100. 
+Use priority code J8TL2D2. 
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+--===============1427956993==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Don't miss this year's exciting event. There's still time to save $100. =
-
-Use priority code J8TL2D2. =
-
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/java=
-one
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1427956993==--
