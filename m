@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <231dafb50805061750q505ea32dob418b6fd417c1231@mail.gmail.com>
-Date: Tue, 6 May 2008 18:50:49 -0600
-From: "Dark Shadow" <shadowofdarkness@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Message-ID: <4820674A.1030404@ticino.com>
+Date: Tue, 06 May 2008 16:12:26 +0200
+From: 98132 <98132@ticino.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] Receiving OBEX pushes stopped working
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] problem with hcitool scan
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,28 +14,120 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1475396927=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I am using Ubuntu 8.04 and my bluetooth connection used to work
-perfect, but then one it just stopped receiving files from my phone.
-with the phone saying service not supported.
+This is a multi-part message in MIME format.
+--===============1475396927==
+Content-Type: multipart/alternative;
+	boundary="------------030809080404030908050407"
 
-I am using stock settings with the exception of turning on the ability
-to receive file from gnomes BT gui. I can still send files from my
-laptop to the phone fine. By right clicking and doing a "send to"
+This is a multi-part message in MIME format.
+--------------030809080404030908050407
+Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Content-Transfer-Encoding: 7bit
 
-When I boot the Ubuntu 8.04 livecd and turn on receiving files
-everything works perfect so it must be some setting on my computer but
-I never messed with anything since my dongle "just works"
+Hello, i've a problem with hcitool
+
+software versions:
+
+kernel:  2.6.22-14-generic
+bluez:   bluez-utils  3.19-0ubuntu3           
+
+when i use /hcitool scan/ i have the following result:
+
+first device (mobile phone) (3 try with hcitool scan)
+/00:12:*52*:3D:38:B5  n/a      /--> correct/
+00:12:*D2*:3D:38:B5 n/a       /--> wrong/
+00:12:D2:3D:38:*B4 *n/a      /--> wrong
+/
+/second device (mobile phone) (5 try with hcitool scan)/
+*00:1E:4C*:E2:F1:5C xxx     /--> correct
+/00:1E*:7C*:E2:F1:5C xxx      /--> wrong
+/00:1E:*4C*:*F2*:F1:5C xxx     /--> wrong
+/*C0:9F:CC*:E2:F1:5C xxx    /--> wrong//
+/*00:96:4C*:E2:F1:5C xxx    /--> wrong//
+/
+/the devices are only two but the address are different.
+if i try to ping (l2ping), only the first address is correct.
+Can you explain me what is wrong?
+thanks!
+
+signo
+
+
+
+
+
+
+--------------030809080404030908050407
+Content-Type: text/html; charset=ISO-8859-2
+Content-Transfer-Encoding: 8bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+Hello, i've a problem with hcitool<br>
+<br>
+software versions:<br>
+<br>
+kernel:  2.6.22-14-generic<br>
+bluez:   bluez-utils  3.19-0ubuntu3            <br>
+<br>
+when i use <i>hcitool scan</i> i have the following result:<br>
+<br>
+first device (mobile phone) (3 try with hcitool scan)<br>
+<i>00:12:<b>52</b>:3D:38:B5  n/a      </i>--&gt; correct<i><br>
+00:12:<b>D2</b>:3D:38:B5 n/a       </i>--&gt; wrong<i><br>
+00:12:D2:3D:38:<b>B4 </b>n/a      </i>--&gt; wrong<br>
+<i><br>
+</i>second device (mobile phone) (5 try with hcitool scan)<i><br>
+<b>00:1E:4C</b>:E2:F1:5C xxx     </i>--&gt; correct<br>
+<i>00:1E<b>:7C</b>:E2:F1:5C xxx      </i>--&gt; wrong<br>
+<i>00:1E:<b>4C</b>:<b>F2</b>:F1:5C xxx     </i>--&gt; wrong<br>
+<i><b>C0:9F:CC</b>:E2:F1:5C xxx    </i>--&gt; wrong<i></i><br>
+<i><b>00:96:4C</b>:E2:F1:5C xxx    </i>--&gt; wrong<i></i><br>
+<i><br>
+</i>the devices are only two but the address are different.<br>
+if i try to ping (l2ping), only the first address is correct.<br>
+Can you explain me what is wrong?<br>
+thanks!<br>
+<br>
+signo<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+</body>
+</html>
+
+--------------030809080404030908050407--
+
+
+--===============1475396927==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
 Don't miss this year's exciting event. There's still time to save $100. 
 Use priority code J8TL2D2. 
 http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+--===============1475396927==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1475396927==--
