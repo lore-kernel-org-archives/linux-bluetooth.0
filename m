@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4822BECD.4050505@ticino.com>
-Date: Thu, 08 May 2008 10:50:21 +0200
-From: 98132 <98132@ticino.com>
+Message-ID: <231dafb50805061750q505ea32dob418b6fd417c1231@mail.gmail.com>
+Date: Tue, 6 May 2008 18:50:49 -0600
+From: "Dark Shadow" <shadowofdarkness@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: Re: [Bluez-users] problem with hcitool scan
+Subject: [Bluez-users] Receiving OBEX pushes stopped working
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,12 +18,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Problem solved!
-Don't buy 1cts $ bluetooth dongle (taiwan)...
+I am using Ubuntu 8.04 and my bluetooth connection used to work
+perfect, but then one it just stopped receiving files from my phone.
+with the phone saying service not supported.
 
-the problem is the dongle and not the hcitool!
+I am using stock settings with the exception of turning on the ability
+to receive file from gnomes BT gui. I can still send files from my
+laptop to the phone fine. By right clicking and doing a "send to"
 
-bye
+When I boot the Ubuntu 8.04 livecd and turn on receiving files
+everything works perfect so it must be some setting on my computer but
+I never messed with anything since my dongle "just works"
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
