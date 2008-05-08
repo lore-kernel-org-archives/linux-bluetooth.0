@@ -1,21 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2d5a2c100805080643o48975593y8967e0846db41ab6@mail.gmail.com>
-Date: Thu, 8 May 2008 10:43:20 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <821c07e60805072256p382b2147jd4f1db83d710228b@mail.gmail.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-References: <1209501760.14773.13.camel@ubuntu>
-	<2d5a2c100804291906i261e1bqf5e91539d9cd9df8@mail.gmail.com>
-	<821c07e60804292333g4271303lfade6b403acfb8b@mail.gmail.com>
-	<1209548744.5829.5.camel@ubuntu>
-	<2d5a2c100804301137w1a555aefh87f364275b41048c@mail.gmail.com>
-	<1209584183.28053.2.camel@ubuntu>
-	<2d5a2c100805061527xd2b77b5m5ac18ec210428888@mail.gmail.com>
-	<821c07e60805072256p382b2147jd4f1db83d710228b@mail.gmail.com>
-Subject: Re: [Bluez-devel] bluetoothd-service-network fails to execute ifup
-	scripts from network.conf after repeated connection attempts
-	(Patched)
+Message-ID: <OFF3115D22.C0D6DB3F-ON65257443.00365A89-65257443.003776A2@lntinfotech.com>
+From: Saurabh.Mukadam@lntinfotech.com
+Date: Thu, 8 May 2008 15:25:18 +0530
+Subject: [Bluez-devel] BlueZ API Documentation
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,39 +15,109 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: multipart/mixed; boundary="===============0470267718=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+This is a multipart message in MIME format.
+--===============0470267718==
+Content-Type: multipart/alternative;
+	boundary="=_alternative 003776A065257443_="
 
-Great, so at least GN is now working as expected, as I said before NAP
-is more complicated even though we could return its bridge and leave
-to user script to deal with dhcp server/NAT this code was in cvs
-before but Marcel requested to remove it since we have no interface to
-change any script configuration (ip range, routing interface...). But
-you have a point saying it is not a big deal to leave NAP bridge for
-user to create and configure and network service still announce it
-without any verification, it might be better to return the bridge
-creation to network service and when possible hook the bridge to
-connman(http://www.moblin.org/projects/projects_connman.php) when it
-comes to support access points.
+This is a multipart message in MIME format.
+--=_alternative 003776A065257443_=
+Content-Type: text/plain; charset="US-ASCII"
 
--- =
+I am new to this mailing list and trying to evaluate BlueZ for one of my 
+application requirement. I didnt find any updated BlueZ API Documentation, 
+If any one can help me
 
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+
+
+Thanks
+Saurabh Mukadam,
+-------------------------------------------------------------------------------------------
+
+" The price of success is hard work, dedication to the job
+   at hand, and the determination that whether we win or
+   lose, we have applied the best of ourselves to the task
+   at hand."
+
+Larsen & Toubro Infotech Ltd.
+www.Lntinfotech.com
+
+This Document is classified as: 
+
+L&T Infotech Proprietary   L&T Infotech Confidential   L&T Infotech 
+Internal Use Only   L&T Infotech General Business 
+
+This Email may contain confidential or privileged information for the 
+intended recipient (s) If you are not the intended recipient, please do 
+not use or disseminate the information, notify the sender and delete it 
+from your system. 
+
+______________________________________________________________________
+--=_alternative 003776A065257443_=
+Content-Type: text/html; charset="US-ASCII"
+
+
+<br><font size=2 face="Trebuchet MS">I am new to this mailing list and
+trying to evaluate BlueZ for one of my application requirement. I didnt
+find any updated BlueZ API Documentation, If any one can help me</font>
+<br>
+<br>
+<br>
+<br><font size=2 face="Trebuchet MS">Thanks<br>
+Saurabh Mukadam,<br>
+-------------------------------------------------------------------------------------------<br>
+<br>
+&quot; The price of success is hard work, dedication to the job<br>
+ &nbsp; at hand, and the determination that whether we win or<br>
+ &nbsp; lose, we have applied the best of ourselves to the task<br>
+ &nbsp; at hand.&quot;<br>
+<b><br>
+Larsen &amp; Toubro Infotech Ltd.</b></font><font size=2 color=blue face="Trebuchet MS"><u><br>
+</u></font><a href=http://www.lntinfotech.com/><font size=2 color=blue face="Trebuchet MS"><u>www.Lntinfotech.com</u></font></a><font size=2 face="Trebuchet MS"><br>
+<br>
+This Document is classified as: <br>
+<br>
+</font><input type=checkbox name=F1_chkbox checked value=on><font size=2 face="Trebuchet MS">L&amp;T
+Infotech Proprietary &nbsp; </font><input type=checkbox name=F1_chkbox value=on><font size=2 face="Trebuchet MS">L&amp;T
+Infotech Confidential &nbsp; </font><input type=checkbox name=F1_chkbox value=on><font size=2 face="Trebuchet MS">L&amp;T
+Infotech Internal Use Only &nbsp; </font><input type=checkbox name=F1_chkbox value=on><font size=2 face="Trebuchet MS">L&amp;T
+Infotech General Business &nbsp; <br>
+<br>
+This Email may contain confidential or privileged information for the intended
+recipient (s) If you are not the intended recipient, please do not use
+or disseminate the information, notify the sender and delete it from your
+system. </font>
+
+<BR>
+______________________________________________________________________<BR>
+
+--=_alternative 003776A065257443_=--
+
+
+--===============0470267718==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference =
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
+Don't miss this year's exciting event. There's still time to save $100. 
+Use priority code J8TL2D2. 
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+--===============0470267718==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Don't miss this year's exciting event. There's still time to save $100. =
-
-Use priority code J8TL2D2. =
-
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/java=
-one
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0470267718==--
