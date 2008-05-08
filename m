@@ -1,21 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <E6FF208A16840D4EBAA31D261B15A506F29F90@ausx3mpc121.aus.amer.dell.com>
-References: <1207335282.19116.5.camel@mlimonciello>
-	<1207341998.32219.1.camel@mlimonciello>
-	<1207351025.13201.328.camel@cookie.hadess.net>
-	<E6FF208A16840D4EBAA31D261B15A506F29F16@ausx3mpc121.aus.amer.dell.com>
-	<1207521725.3396.4.camel@cookie.hadess.net>
-	<E6FF208A16840D4EBAA31D261B15A506F29F23@ausx3mpc121.aus.amer.dell.com>
-	<E6FF208A16840D4EBAA31D261B15A506F29F5C@ausx3mpc121.aus.amer.dell.com>
-	<E6FF208A16840D4EBAA31D261B15A506F29F90@ausx3mpc121.aus.amer.dell.com>
-Date: Fri, 09 May 2008 11:40:04 +0200
-Message-Id: <1210326004.28002.20.camel@violet.holtmann.net>
-Mime-Version: 1.0
-Cc: hadess@hadess.net
-Subject: Re: [Bluez-devel] [PATCH] Add	HID->HCIswitchingsupportfornewer	Dell
-	BT cards
+Message-ID: <2d5a2c100805080643o48975593y8967e0846db41ab6@mail.gmail.com>
+Date: Thu, 8 May 2008 10:43:20 -0300
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <821c07e60805072256p382b2147jd4f1db83d710228b@mail.gmail.com>
+MIME-Version: 1.0
+References: <1209501760.14773.13.camel@ubuntu>
+	<2d5a2c100804291906i261e1bqf5e91539d9cd9df8@mail.gmail.com>
+	<821c07e60804292333g4271303lfade6b403acfb8b@mail.gmail.com>
+	<1209548744.5829.5.camel@ubuntu>
+	<2d5a2c100804301137w1a555aefh87f364275b41048c@mail.gmail.com>
+	<1209584183.28053.2.camel@ubuntu>
+	<2d5a2c100805061527xd2b77b5m5ac18ec210428888@mail.gmail.com>
+	<821c07e60805072256p382b2147jd4f1db83d710228b@mail.gmail.com>
+Subject: Re: [Bluez-devel] bluetoothd-service-network fails to execute ifup
+	scripts from network.conf after repeated connection attempts
+	(Patched)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,28 +25,38 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Mario,
+Hi,
 
-> I've seen at least one other patch that flew by added to CVS already.  Are there any other objections that just haven't been vocalized regarding this patch?
+Great, so at least GN is now working as expected, as I said before NAP
+is more complicated even though we could return its bridge and leave
+to user script to deal with dhcp server/NAT this code was in cvs
+before but Marcel requested to remove it since we have no interface to
+change any script configuration (ip range, routing interface...). But
+you have a point saying it is not a big deal to leave NAP bridge for
+user to create and configure and network service still announce it
+without any verification, it might be better to return the bridge
+creation to network service and when possible hook the bridge to
+connman(http://www.moblin.org/projects/projects_connman.php) when it
+comes to support access points.
 
-that was me being lazy or too busy. Whatever you wanna call it. Patch
-has been committed to the CVS in a slight modified version.
+-- =
 
-Regards
-
-Marcel
-
-
+Luiz Augusto von Dentz
+Engenheiro de Computa=E7=E3o
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
-Don't miss this year's exciting event. There's still time to save $100. 
-Use priority code J8TL2D2. 
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+This SF.net email is sponsored by the 2008 JavaOne(SM) Conference =
+
+Don't miss this year's exciting event. There's still time to save $100. =
+
+Use priority code J8TL2D2. =
+
+http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/java=
+one
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
