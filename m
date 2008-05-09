@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <482448F7.80806@powercraft.nl>
+Date: Fri, 09 May 2008 14:52:07 +0200
+From: Jelle de Jong <jelledejong@powercraft.nl>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1210324444433@dmwebmail.dmwebmail.chezphil.org>
-References: <1210324444433@dmwebmail.dmwebmail.chezphil.org>
-Date: Fri, 09 May 2008 14:31:39 +0200
-Message-Id: <1210336299.28002.24.camel@violet.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Apple wireless keyboard [hid2hci]
+References: <4819B1A7.2070702@powercraft.nl>
+	<1210336757.28002.31.camel@violet.holtmann.net>
+In-Reply-To: <1210336757.28002.31.camel@violet.holtmann.net>
+Cc: Brad Midgley <bmidgley@gmail.com>
+Subject: Re: [Bluez-users] audio segment with audio glitches
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,39 +22,45 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Phil,
+Marcel Holtmann wrote:
+> Hi Jelle,
+> 
+>> I extracted an audio segment that has the glitches with bluetooth.
+>>
+>> http://filebin.ca/pugrs/glitch.wav
+>> (I can sent the file again if needed)
+>>
+>> My headset has both bluetooth connection and analogue. The glitches only 
+>> happen with the bluetooth connection. I tested it with totem-xine and 
+>> totem-gstreamer. They both have the glitches.
+>>
+>> Also you really have to listen carefully, I have the idea it is only on 
+>> the right channel also it does not happens always. My first guess would 
+>> be some kind of parameter overflow...
+>>
+>> Hope this issue becomes reproducible.
+> 
+> please re-test with bluez-utils-3.31 and always state the version that
+> you are using. Otherwise nobody can you tell you anything.
+> 
+> Regards
+> 
+> Marcel
 
-> I've acquired a second USB bluetooth dongle, and this one does have a
-> CSR chip:
-> 
-> $ lsusb|grep -i bluetooth
-> Bus 003 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
-> Dongle (HCI mode)
-> 
-> I've got this working in normal Bluetooth mode in the same way that I
-> did with the other dongle and it works.  But I have failed to put it
-> into HID mode.  Am I doing the right thing?  I've tried this either
-> with the keyboard connected in HCI mode or with it not connected, with
-> the bluez daemons running or not running, and in all cases I get:
-> 
-> # hid2hci --tohid
-> Switching device 0a12:0001 to HID mode failed (Broken pipe)
-> 
-> strace shows this:
-> 
-> open("/dev/bus/usb/003/002", O_RDWR)    = 3
-> ioctl(3, USBDEVFS_CONTROL, 0xbfa9f64c)  = -1 EPIPE (Broken pipe)
-> 
-> Does anyone have any clues?  According to the kernel's
-> Documentation/usb/error-codes.txt, EPIPE means that the endpoint is stalled.
+I received a new headset device original Motorola s9 and did some more 
+testing, and this device does not have the audio glitch! but the 
+Motorola s805 definitely has the glitch. The glitch only happens with 
+high quality audio, but it does also only happen with bluez, the Toshiba 
+stack under windows works fine with the same audio segment.
 
-not all CSR dongles are HID proxy dongles. Actually the majority of them
-are not.
+I attached all device info in an other tread on this mailinglist.
 
-Regards
+I will test the bluez-utils-3.31 system is there a easy to use Debian 
+package for it?
 
-Marcel
+Kind regards,
 
+Jelle
 
 
 -------------------------------------------------------------------------
