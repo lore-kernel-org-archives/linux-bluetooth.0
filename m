@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <482448F7.80806@powercraft.nl>
-Date: Fri, 09 May 2008 14:52:07 +0200
-From: Jelle de Jong <jelledejong@powercraft.nl>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <4819B1A7.2070702@powercraft.nl>
-	<1210336757.28002.31.camel@violet.holtmann.net>
-In-Reply-To: <1210336757.28002.31.camel@violet.holtmann.net>
-Cc: Brad Midgley <bmidgley@gmail.com>
-Subject: Re: [Bluez-users] audio segment with audio glitches
+In-Reply-To: <71df535a0804301429n1b7b44a9m44fa533a1afe4ed1@mail.gmail.com>
+References: <71df535a0804301429n1b7b44a9m44fa533a1afe4ed1@mail.gmail.com>
+Date: Fri, 09 May 2008 14:43:08 +0200
+Message-Id: <1210336988.28002.37.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Can I change the BD ADDR from a device?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,57 +16,23 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> Hi Jelle,
-> 
->> I extracted an audio segment that has the glitches with bluetooth.
->>
->> http://filebin.ca/pugrs/glitch.wav
->> (I can sent the file again if needed)
->>
->> My headset has both bluetooth connection and analogue. The glitches only 
->> happen with the bluetooth connection. I tested it with totem-xine and 
->> totem-gstreamer. They both have the glitches.
->>
->> Also you really have to listen carefully, I have the idea it is only on 
->> the right channel also it does not happens always. My first guess would 
->> be some kind of parameter overflow...
->>
->> Hope this issue becomes reproducible.
-> 
-> please re-test with bluez-utils-3.31 and always state the version that
-> you are using. Otherwise nobody can you tell you anything.
-> 
-> Regards
-> 
-> Marcel
-
-I received a new headset device original Motorola s9 and did some more 
-testing, and this device does not have the audio glitch! but the 
-Motorola s805 definitely has the glitch. The glitch only happens with 
-high quality audio, but it does also only happen with bluez, the Toshiba 
-stack under windows works fine with the same audio segment.
-
-I attached all device info in an other tread on this mailinglist.
-
-I will test the bluez-utils-3.31 system is there a easy to use Debian 
-package for it?
-
-Kind regards,
-
-Jelle
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
-Don't miss this year's exciting event. There's still time to save $100. 
-Use priority code J8TL2D2. 
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGkgUGVkcm8sCgo+IGkgbmVlZCB0byBjaGFuZ2UgdGhlIGJkYWRkciBhbmQgY291bGRuwrR0IGxv
+Y2F0ZSBhIGxpbmUgY29tbW5hbmQgb3IgYW4KPiBvcHRpb24gdG8gZG8gdGhpcy4uLiBpIHRoaW5r
+IHRoaXMgY2hhbmdlIGNhbiBiZSBlYXN5IGxpa2UgY2hhbmdlIHRoZQo+IE1BQyBvZiBhbiB3aXJl
+bGVzcyBOSUMsIGJ1dCBpIGNhbsK0dCBmaW5kIGhvdyEKPiBhbnlvbmUgY2FuIGhlbHAgbWU/Cgpm
+b3Igc29tZSBtYW51ZmFjdHVyZXMgeW91IGNhbiBkbyBpdCB3aXRoIGJkYWRkciBjb21tYW5kLCBi
+dXQgdGhpcyBpcyBhdAp5b3VyIG93biByaXNrLiBEb24ndCBkbyBpdCB1bnRpbCB5b3Uga25vdyB3
+aGF0IHlvdSBhcmUgZG9pbmcuCgpSZWdhcmRzCgpNYXJjZWwKCgoKLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpU
+aGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnkgdGhlIDIwMDggSmF2YU9uZShTTSkgQ29u
+ZmVyZW5jZSAKRG9uJ3QgbWlzcyB0aGlzIHllYXIncyBleGNpdGluZyBldmVudC4gVGhlcmUncyBz
+dGlsbCB0aW1lIHRvIHNhdmUgJDEwMC4gClVzZSBwcmlvcml0eSBjb2RlIEo4VEwyRDIuIApodHRw
+Oi8vYWQuZG91YmxlY2xpY2submV0L2NsazsxOTg3NTc2NzM7MTM1MDMwMzg7cD9odHRwOi8vamF2
+YS5zdW4uY29tL2phdmFvbmUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18KQmx1ZXotdXNlcnMgbWFpbGluZyBsaXN0CkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJj
+ZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9i
+bHVlei11c2Vycwo=
