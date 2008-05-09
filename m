@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1210337400.28002.40.camel@violet.holtmann.net>
+In-Reply-To: <1209541359.31036.35.camel@pancake>
 References: <1209541359.31036.35.camel@pancake>
-	<1210337400.28002.40.camel@violet.holtmann.net>
-Date: Fri, 09 May 2008 14:19:19 +0100
-Message-Id: <1210339159.3070.35.camel@cookie.hadess.net>
+Date: Fri, 09 May 2008 14:50:00 +0200
+Message-Id: <1210337400.28002.40.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] bluez-gnome and OBEX DBus names
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -21,23 +20,49 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Fri, 2008-05-09 at 14:50 +0200, Marcel Holtmann wrote:
-<snip>
-> > how is the average user (yes, there are such things now ;-) expected to
-> > know how to set these *!$%& directories? I needed 20 minutes of glib
-> > source diving to find the relevant code - why doesn't Gnome, e.g., set
-> > this automatically?
+Hi Florian,
+
+> I'm running bluez-gnome 0.26 and obex-data-server 0.3 from Gentoo. My
+> Bluetooth setup is running fine, with the exception of OBEX reception.
+> When I start the bluetooth-applet from a shell, I get the warning
+> "Bluetooth OBEX start failed: Invalid path". A bit of dbus-monitoring
+> shows that this error comes from the OBEX server:
 > 
-> Actually GNOME should do this. However if you kept upgrading GNOME over
-> time from an old installation, it might have missed it. Don't ask me
-> details, but for a clean installation it is set.
+> method call sender=:1.96 -> dest=org.openobex
+> path=/org/openobex/server1; interface=org.openobex.Server; member=Start
+>    string ""
+>    boolean true
+>    boolean true
+> 
+> error sender=:1.94 -> dest=:1.96
+> error_name=org.openobex.Error.InvalidArguments reply_serial=16
+>    string "Invalid path"
+> 
+> A look in ods-server.c shows that it's testing for the first parameter
+> of the method call to be an existing directory, but the bluetooth-applet
+> is passing an empty string.. and this is because the applet uses
+> g_get_user_special_dir(G_USER_DIRECTORY_PUBLIC_SHARE) and
+> g_get_user_special_dir(G_USER_DIRECTORY_DOWNLOAD) to retrieve the
+> directory names.
+> 
+> So, I now have one suggestion - see the attached patch, two small error
+> checks to make debugging this _much_ easier - and one question:
 
-Not GNOME actually, but xdg-user-dirs[1]. A decent installation should
-have this running in the user's session, and Nautilus allows you to
-rename/move the directories and keep the configuration up-to-date as
-expected.
+the patch has been applied. Thanks.
 
-[1]: http://freedesktop.org/wiki/Software/xdg-user-dirs
+> how is the average user (yes, there are such things now ;-) expected to
+> know how to set these *!$%& directories? I needed 20 minutes of glib
+> source diving to find the relevant code - why doesn't Gnome, e.g., set
+> this automatically?
+
+Actually GNOME should do this. However if you kept upgrading GNOME over
+time from an old installation, it might have missed it. Don't ask me
+details, but for a clean installation it is set.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
