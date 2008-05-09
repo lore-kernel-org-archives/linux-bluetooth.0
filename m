@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1209541359.31036.35.camel@pancake>
-References: <1209541359.31036.35.camel@pancake>
-Date: Fri, 09 May 2008 14:50:00 +0200
-Message-Id: <1210337400.28002.40.camel@violet.holtmann.net>
+In-Reply-To: <a7bd466f0804301759v37b6c732t59a85cf94998291c@mail.gmail.com>
+References: <a7bd466f0804301759v37b6c732t59a85cf94998291c@mail.gmail.com>
+Date: Fri, 09 May 2008 14:42:13 +0200
+Message-Id: <1210336933.28002.35.camel@violet.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bluez-gnome and OBEX DBus names
+Subject: Re: [Bluez-devel] Usage of BondingCreated()
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,44 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Florian,
+Hi Biranchi,
 
-> I'm running bluez-gnome 0.26 and obex-data-server 0.3 from Gentoo. My
-> Bluetooth setup is running fine, with the exception of OBEX reception.
-> When I start the bluetooth-applet from a shell, I get the warning
-> "Bluetooth OBEX start failed: Invalid path". A bit of dbus-monitoring
-> shows that this error comes from the OBEX server:
-> 
-> method call sender=:1.96 -> dest=org.openobex
-> path=/org/openobex/server1; interface=org.openobex.Server; member=Start
->    string ""
->    boolean true
->    boolean true
-> 
-> error sender=:1.94 -> dest=:1.96
-> error_name=org.openobex.Error.InvalidArguments reply_serial=16
->    string "Invalid path"
-> 
-> A look in ods-server.c shows that it's testing for the first parameter
-> of the method call to be an existing directory, but the bluetooth-applet
-> is passing an empty string.. and this is because the applet uses
-> g_get_user_special_dir(G_USER_DIRECTORY_PUBLIC_SHARE) and
-> g_get_user_special_dir(G_USER_DIRECTORY_DOWNLOAD) to retrieve the
-> directory names.
-> 
-> So, I now have one suggestion - see the attached patch, two small error
-> checks to make debugging this _much_ easier - and one question:
+>      I am new to Bluez and dbus.I am trying to get the pairing status
+> of a device.
+>      I think I can use the Signals from the Dbus daemon when a pairing
+> is done using
+> BondingCreated().
+>   But I am not sure how to connect to a dbus daemon and how to pass
+> the
+> BondingCreated() method to the daemon to get the status.
 
-the patch has been applied. Thanks.
+check the dbus.freedesktop.org or wiki.bluez.org for details on how to
+use D-Bus.
+ 
+>    If anyone has used BondingCreated() to find out the pairing status,
+> please let 
+> me know abou it. 
 
-> how is the average user (yes, there are such things now ;-) expected to
-> know how to set these *!$%& directories? I needed 20 minutes of glib
-> source diving to find the relevant code - why doesn't Gnome, e.g., set
-> this automatically?
-
-Actually GNOME should do this. However if you kept upgrading GNOME over
-time from an old installation, it might have missed it. Don't ask me
-details, but for a clean installation it is set.
+It is a signal. So you can call it. You have to us HasBonding() method.
 
 Regards
 
