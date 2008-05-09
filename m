@@ -1,16 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <482566B0.9020708@powercraft.nl>
-Date: Sat, 10 May 2008 11:11:12 +0200
-From: Jelle de Jong <jelledejong@powercraft.nl>
+Message-ID: <be0d0f5e0805091434o26b8595eg9e7bbe57e920a2b5@mail.gmail.com>
+Date: Fri, 9 May 2008 17:34:27 -0400
+From: RC <patnjer12@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1210336684.28002.29.camel@violet.holtmann.net>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <48171A58.8060200@powercraft.nl>
-	<482356E2.3050909@jlab.org>	<482413B0.4010900@powercraft.nl>
-	<48244A74.7080307@powercraft.nl>
-In-Reply-To: <48244A74.7080307@powercraft.nl>
-Content-Type: multipart/mixed; boundary="------------060601040105030008050208"
-Subject: Re: [Bluez-users] step by step - how to get your bluetooth stereo
- headset fully working with the bluez software stack under linux
+References: <1209820958.6736.12.camel@richard-desktop>
+	<1210336684.28002.29.camel@violet.holtmann.net>
+Subject: Re: [Bluez-users] Disable Notify Bubble?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,246 +17,136 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0658002562=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------060601040105030008050208
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+--===============0658002562==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_3431_18130527.1210368867526"
 
-Jelle de Jong wrote:
-> Jelle de Jong wrote:
->> Chris Carlin wrote:
->>> Just to finish this up, Jelle, what type of bluetooth adapter do you 
->>> have?
->>>
->>> ~Chris
->>>
->>> Jelle de Jong wrote:
->>>> Hello everybody,
->>>>
->>>> I have been playing around with bluetooth devices under linux the 
->>>> last month or so. I got some very good and some very bad experience 
->>>> with it.
->>>>
->>>> I am planning to create some wiki pages when I can get things 
->>>> working 100%. However I still got some major issues that I need to 
->>>> overcome.
->>>>
->>>> I bought a Motorola Bluetooth S805 stereo headset. It should get the 
->>>> following functionality:
->>>>
->>>> - Playback of stereo quality audio without distortions and without 
->>>> delay when playing audio and video at the same time.
->>>> - Generic playback controls like playpause/stop/next/previous.
->>>> - Internal microphone to record audio, used for audio recordings and 
->>>> audio video conferences.
->>>>
->>>> I was planning to get things up and running step by step:
->>>> - alsa configuration
->>>> - bluetooth configuration
->>>> - input device configuration
->>>>
->>>> So the alsa configuration exist out of:
->>>> -- handle multiple audio streams (slave devices)
->>>> -- make the device default or as a plugin
->>>> -- use multiple bluetooth headset for the same audio (conference)
->>>> -- use multiple bluetooth headset per user based (multiseat)
->>>> -- force audio to use the correct bit-rate and frequency for the 
->>>> devices?
->>>> -- set-up correct buffer so that playback is without distortions of 
->>>> out of sync audio and video. (testing with totem-xine?)
->>>> -- configure multiple profiles for stereo recording/playback
->>>>
->>>> Would somebody be willing to sent his working alsa configuration 
->>>> files that can do some of the above functions:
->>>>
->>>> On this moment the headset plays stereo audio, but when watching 
->>>> video with and audio dvd on totem-xine the audio is out of sync and 
->>>> when scrolling or skipping chapters it get worse and hidd can even 
->>>> crash with segmentation faults. There is also a lot of noise 
->>>> distortions.
->>
->>
->> I attached the information about the bluetooth adapter.
->>
->> Is it a good idea to create some bug reports, then i can put all the 
->> information on one central place, and hopefully can also track the 
->> progress.
->>
->> I switched back to alsa and lib-xine because gstreamer does not 
->> handles dvd playback very well, and pulse creates a to heavy cpu load 
->> for my system.
->>
->> When playing back a dvd with totem with lib-xine and my bluetooth 
->> headset i got a few killer issues, that are directly bluez related:
->>
->> 1. when playing dvd audio, there is a audio conversion/compression 
->> problem, how higher the audio quality how greater the audio glitches. 
->> It is a really anoying glitch, it a sort of click sound.
->>
->> A/52 2.0 (stereo)
->> 48000 Hz
->> 224 kbps
->>
->> 2. When my headset connects its becomes a slave by default, and i am 
->> also using a bluetooth mouse, that is master by default. When i move 
->> my mouse the audio stops and i need to pause and play to resync audio 
->> and video. I now execute sudo hcitool sr 00:0C:55:D1:C9:78 master 
->> everytime i start using the headset, but this causes the bluetooth 
->> mouse cursor to shock when playing high quality sound. And its not a 
->> cpu issue i am not using 100%. So i got a real bandwidth priority 
->> issue with bluez....?
->>
->> Thanks in advance,
->>
->> Jelle
->>
-> 
-> I got a new device Motorola s9 today and did some more testing, it also 
-> has the issue that it connects in a way that when using other bluetooth 
-> devices the audio stops. When I manually set the device as master my 
-> bluetooth mouse is somewhat more responding then with the Motorola s805 
-> headset. But a reminder that everything works 100% fully under windows, 
-> so it should be possible to use the devices 100% with bluez somehow...
-> 
-> I attached device and hcitool info in addition the my previous message.
-
-I bought an other new bt-2400p bluetooth adapter for testing, with this 
-adapter i cant get my devices manually in master mode:
-
-sudo hcitool con
-Connections:
-	< ACL 00:0D:FD:18:6E:3C handle 12 state 1 lm SLAVE ENCRYPT
-
-sudo hcitool sr 00:0D:FD:18:6E:3C master
-Switch role request failed: Input/output error
-
-I notished that when using only one bluetooth device greats a stable 
-audio stream when using a bluethooth headset But when using multiple 
-devices like a bluetooth headset and bluetooth mouse. The audio streams 
-keeps getting interrupted for a few seconds, this happens also when not 
-  touching the mouse and when both when the headset is in slave or 
-master mode.
-
-I attached all the device adapter information.
-
-Can somebody enlight me why this is all happening?
-
-Thanks in advance,
-
-Jelle
-
---------------060601040105030008050208
-Content-Type: text/plain;
-	name="cirago bluethooth usb adapter micro BTA-3210.txt"
+------=_Part_3431_18130527.1210368867526
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: base64
-Content-Disposition: inline;
-	filename="cirago bluethooth usb adapter micro BTA-3210.txt"
+Content-Disposition: inline
 
-c3VkbyBoY2ljb25maWcgLWEKaGNpMDogICBUeXBlOiBVU0IKICAgIEJEIEFkZHJlc3M6IDAw
-OjFCOkRDOjAwOjNFOjBCIEFDTCBNVFU6IDMxMDoxMCBTQ08gTVRVOiA2NDo4CiAgICBVUCBS
-VU5OSU5HIFBTQ0FOIElTQ0FOCiAgICBSWCBieXRlczo0NzA1MSBhY2w6MjcwMiBzY286MCBl
-dmVudHM6MTg2IGVycm9yczowCiAgICBUWCBieXRlczoxNjIyIGFjbDozOSBzY286MCBjb21t
-YW5kczo2MSBlcnJvcnM6MAogICAgRmVhdHVyZXM6IDB4ZmYgMHhmZiAweDhmIDB4ZmUgMHg5
-YiAweGY5IDB4MDAgMHg4MAogICAgUGFja2V0IHR5cGU6IERNMSBETTMgRE01IERIMSBESDMg
-REg1IEhWMSBIVjIgSFYzCiAgICBMaW5rIHBvbGljeTogUlNXSVRDSCBIT0xEIFNOSUZGIFBB
-UksKICAgIExpbmsgbW9kZTogU0xBVkUgQUNDRVBUCiAgICBOYW1lOiAnW2RlYmlhbi1lZWVw
-Y10gLyBCVCBEZXZpY2UgMCcKICAgIENsYXNzOiAweDA4MDEwOAogICAgU2VydmljZSBDbGFz
-c2VzOiBDYXB0dXJpbmcKICAgIERldmljZSBDbGFzczogQ29tcHV0ZXIsIFNlcnZlcgogICAg
-SENJIFZlcjogMi4wICgweDMpIEhDSSBSZXY6IDB4YzVjIExNUCBWZXI6IDIuMCAoMHgzKSBM
-TVAgU3VidmVyOiAweGM1YwogICAgTWFudWZhY3R1cmVyOiBDYW1icmlkZ2UgU2lsaWNvbiBS
-YWRpbyAoMTApCgpzdWRvIGhjaWNvbmZpZyBoY2kwIGZlYXR1cmVzCmhjaTA6ICAgVHlwZTog
-VVNCCiAgICBCRCBBZGRyZXNzOiAwMDoxQjpEQzowMDozRTowQiBBQ0wgTVRVOiAzMTA6MTAg
-U0NPIE1UVTogNjQ6OAogICAgRmVhdHVyZXM6IDB4ZmYgMHhmZiAweDhmIDB4ZmUgMHg5YiAw
-eGY5IDB4MDAgMHg4MAogICAgICAgIDwzLXNsb3QgcGFja2V0cz4gPDUtc2xvdCBwYWNrZXRz
-PiA8ZW5jcnlwdGlvbj4gPHNsb3Qgb2Zmc2V0PgogICAgICAgIDx0aW1pbmcgYWNjdXJhY3k+
-IDxyb2xlIHN3aXRjaD4gPGhvbGQgbW9kZT4gPHNuaWZmIG1vZGU+CiAgICAgICAgPHBhcmsg
-c3RhdGU+IDxSU1NJPiA8Y2hhbm5lbCBxdWFsaXR5PiA8U0NPIGxpbms+IDxIVjIgcGFja2V0
-cz4KICAgICAgICA8SFYzIHBhY2tldHM+IDx1LWxhdyBsb2c+IDxBLWxhdyBsb2c+IDxDVlNE
-PiA8cGFnaW5nIHNjaGVtZT4KICAgICAgICA8cG93ZXIgY29udHJvbD4gPHRyYW5zcGFyZW50
-IFNDTz4gPGJyb2FkY2FzdCBlbmNyeXB0PgogICAgICAgIDxFRFIgQUNMIDIgTWJwcz4gPEVE
-UiBBQ0wgMyBNYnBzPiA8ZW5oYW5jZWQgaXNjYW4+CiAgICAgICAgPGludGVybGFjZWQgaXNj
-YW4+IDxpbnRlcmxhY2VkIHBzY2FuPiA8aW5xdWlyeSB3aXRoIFJTU0k+CiAgICAgICAgPGV4
-dGVuZGVkIFNDTz4gPEVWNCBwYWNrZXRzPiA8RVY1IHBhY2tldHM+IDxBRkggY2FwLiBzbGF2
-ZT4KICAgICAgICA8QUZIIGNsYXNzLiBzbGF2ZT4gPDMtc2xvdCBFRFIgQUNMPiA8NS1zbG90
-IEVEUiBBQ0w+CiAgICAgICAgPEFGSCBjYXAuIG1hc3Rlcj4gPEFGSCBjbGFzcy4gbWFzdGVy
-PiA8RURSIGVTQ08gMiBNYnBzPgogICAgICAgIDxFRFIgZVNDTyAzIE1icHM+IDwzLXNsb3Qg
-RURSIGVTQ08+IDxleHRlbmRlZCBmZWF0dXJlcz4K
---------------060601040105030008050208
-Content-Type: text/plain;
- name="trust micro bluetooth usb adapter 15606.txt"
+eWVzLCBpdCBpcyB3cm9uZy4uLgpidXQgdGhlcmUgYXJlIGJ1ZyByZXBvcnRzIGZvciBpdCwgYW5k
+IG5vdGhpbmcgdGhhdCBpIGNhbiBmaW5kIHRoYXQgd29ya3MuLi4KZnJvbSB0aGUgdWJ1bnR1IGZv
+cnVtcyBubyBvbmUgd2l0aCBhbiBNWDUwMDAga2V5Ym9hcmQgY2FuIG1haW50YWluIGEKY29ubmVj
+dGlvbiwgYW5kIHRoZSBzb2x1dGlvbiBwcm92aWRlZCB3YXMgdGhhdCBpdCB3YXMgYW4gaXNzdWUg
+Y3JlYXRlZCBieQpMb2dpdGVjaCAtIHRodXMgdGhleSBuZWVkZWQgdG8gZml4IGl0Li4uCgp3aGF0
+IGkgaGF2ZSBiYXNpY2FsbHkgZG9uZSBpcyBzZXQgYSBzY3JpcHQgdGhhdCBpZiB0aGUgZGV2aWNl
+IGRpc2Nvbm5lY3RzCnRoZSBibHVldG9vdGggd2lsbCByZXN0YXJ0IGV2ZXJ5IG1pbnV0ZSB1bnRp
+bCBpdCByZWNvbm5lY3RzCnNvIGkgYW0ganVzdCB1c2luZyBteSBtb3VzZSBmb3IgYW4gZXh0ZW5k
+ZWQgcGVyaW9kIHRpbWUgaSBzdGFydCBnZXR0aW5nIHRoaXMKYnViYmxlLgoKZG8geW91IHRoaW5r
+IHRoaXMgd2lsbCBicmVhayBzb21ldGhpbmc/CgpPbiBGcmksIE1heSA5LCAyMDA4IGF0IDg6Mzgg
+QU0sIE1hcmNlbCBIb2x0bWFubiA8bWFyY2VsQGhvbHRtYW5uLm9yZz4gd3JvdGU6Cgo+IEhpLAo+
+IO+7vwo+ID4gICAgICAgICBJIGhhdmUgYSBMb2dpdGVjaCBNWDUwMDAga2V5Ym9hcmQuICBJdCB0
+ZW5kcyB0byBkaXNjb25uZWN0IGZyb20KPiA+ICAgICAgICAgdGhlCj4gPiAgICAgICAgIGNvbXB1
+dGVyIGFmdGVyIGEgZmV3IG1pbnV0ZXMgb2Ygbm9uLXVzZS4gSSBoYXZlIGZvdW5kIHRoYXQgdGhp
+cwo+ID4gICAgICAgICBpcwo+ID4gICAgICAgICB0eXBpY2FsIG9mIHRoaXMga2V5Ym9hcmQgYW5k
+IG5vIG9uZSBoYXMgcHJvdmlkZWQgYSBzb2x1dGlvbiB5ZXQuCj4gPiAgICAgICAgIFRoZQo+ID4g
+ICAgICAgICBvbmx5IHdheSB0byBnZXQgaXQgYmFjayBpcyB0byBicmVhayBvdXQgdGhlIHdpcmVk
+IGtleWJvYXJkIGFuZAo+ID4gICAgICAgICBlbnRlciB0aGUKPiA+ICAgICAgICAgY29tbWFuZCAg
+IHN1ZG8gL2V0Yy9pbml0LmQvYmx1ZXRvb3RoIHJlc3RhcnQuCj4gPgo+ID4gICAgICAgICB3aGF0
+IHNvbWUgb24gdGhlIHVidW50dSBmb3J1bXMgc3VnZ2VzdGVkIGlzIHRvIGVudGVyIHRoZQo+ID4g
+ICAgICAgICBmb2xsb3dpbmcgaW50bwo+ID4gICAgICAgICBjcm9udGFiCj4gPgo+ID4gICAgICAg
+ICAqICogKiAqICogdmFsPWBoY2ljb25maWcgLWEgMj4vZGV2L251bGwgfCBoZWFkIC1jIDFgOyBb
+IC16Cj4gPiAgICAgICAgICR2YWwgXQo+ID4gICAgICAgICAmJiAvZXRjL2luaXQuZC9ibHVldG9v
+dGggcmVzdGFydAo+ID4KPiA+ICAgICAgICAgd2hpY2ggd29ya3MgZ3JlYXQsIGJ1dCBub3cgaSBn
+ZXQgYSBub3RpZnkgYnViYmxlIHN0YXRpbmcgdGhhdCBteQo+ID4gICAgICAgICAiYQo+ID4gICAg
+ICAgICBkZXZpY2UgaGFzIGJlZW4gbWFkZSBkaXNjb3ZlcmFibGUiIGV2ZXJ5IGFib3V0IDYwIHNl
+Y29uZHMuCj4gPiAgICAgICAgIElzIHRoZXJlIGEgd2F5IHRvIGRpc2FibGUgdGhpcyBub3RpZmlj
+YXRpb24/Cj4gPgo+ID4gICAgICAgICBhbmQgaSBndWVzcyB0aGUgYmlnZ2VyIHF1ZXN0aW9uLCB0
+aG91Z2ggbm90IHdoYXQgaSBuZWVkIGZvciB0aGUKPiA+ICAgICAgICAgbW9tZW50LAo+ID4gICAg
+ICAgICBpcyBjYW4geW91IHByb3ZpZGUgYSBwYXRjaCB0aGF0IHdpbGwgZml4IHRoaXMgaXNzdWU/
+Cj4KPiB5b3UgZ2V0IHRoZSBidWJibGUsIGJlY2F1c2UgeW91IGFyZSBkb2luZyBzb21ldGhpbmcg
+dG90YWxseSB3cm9uZy4gRG9uJ3QKPiBjYWxsIHJlc2V0IGFsbCB0aGUgdGltZS4gSXQgaXMgd3Jv
+bmcuIEFzIHNpbXBsZSBhcyB0aGF0Lgo+Cj4gV3JpdGUgYSBwcm9wZXIgYnVnIHJlcG9ydCBmb3Ig
+dGhlIGlucHV0IHNlcnZpY2UuCj4KPiBSZWdhcmRzCj4KPiBNYXJjZWwKPgo+Cj4KPiAtLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tCj4gVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5IHRoZSAyMDA4IEph
+dmFPbmUoU00pIENvbmZlcmVuY2UKPiBEb24ndCBtaXNzIHRoaXMgeWVhcidzIGV4Y2l0aW5nIGV2
+ZW50LiBUaGVyZSdzIHN0aWxsIHRpbWUgdG8gc2F2ZSAkMTAwLgo+IFVzZSBwcmlvcml0eSBjb2Rl
+IEo4VEwyRDIuCj4KPiBodHRwOi8vYWQuZG91YmxlY2xpY2submV0L2NsazsxOTg3NTc2NzM7MTM1
+MDMwMzg7cD9odHRwOi8vamF2YS5zdW4uY29tL2phdmFvbmUKPiBfX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IEJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdAo+
+IEJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNl
+Zm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCj4K
+------=_Part_3431_18130527.1210368867526
+Content-Type: text/html; charset=UTF-8
 Content-Transfer-Encoding: base64
-Content-Disposition: inline;
-	filename="trust micro bluetooth usb adapter 15606.txt"
+Content-Disposition: inline
 
-c3VkbyBoY2ljb25maWcgLWEKaGNpMDogICBUeXBlOiBVU0IKICAgIEJEIEFkZHJlc3M6IDAw
-OjFCOkRDOjAwOjMyOjcxIEFDTCBNVFU6IDMxMDoxMCBTQ08gTVRVOiA2NDo4CiAgICBVUCBS
-VU5OSU5HIFBTQ0FOIElTQ0FOCiAgICBSWCBieXRlczo5NjcgYWNsOjAgc2NvOjAgZXZlbnRz
-OjI3IGVycm9yczowCiAgICBUWCBieXRlczozNjAgYWNsOjAgc2NvOjAgY29tbWFuZHM6MjYg
-ZXJyb3JzOjAKICAgIEZlYXR1cmVzOiAweGZmIDB4ZmYgMHg4ZiAweGZlIDB4OWIgMHhmOSAw
-eDAwIDB4ODAKICAgIFBhY2tldCB0eXBlOiBETTEgRE0zIERNNSBESDEgREgzIERINSBIVjEg
-SFYyIEhWMwogICAgTGluayBwb2xpY3k6IFJTV0lUQ0ggSE9MRCBTTklGRiBQQVJLCiAgICBM
-aW5rIG1vZGU6IFNMQVZFIEFDQ0VQVAogICAgTmFtZTogJ1tkZWJpYW4tZWVlcGNdIC8gQlQg
-RGV2aWNlIDAnCiAgICBDbGFzczogMHgwODAxMDgKICAgIFNlcnZpY2UgQ2xhc3NlczogQ2Fw
-dHVyaW5nCiAgICBEZXZpY2UgQ2xhc3M6IENvbXB1dGVyLCBTZXJ2ZXIKICAgIEhDSSBWZXI6
-IDIuMCAoMHgzKSBIQ0kgUmV2OiAweGM1YyBMTVAgVmVyOiAyLjAgKDB4MykgTE1QIFN1YnZl
-cjogMHhjNWMKICAgIE1hbnVmYWN0dXJlcjogQ2FtYnJpZGdlIFNpbGljb24gUmFkaW8gKDEw
-KQoKc3VkbyBoY2ljb25maWcgaGNpMCBmZWF0dXJlcwpoY2kwOiAgIFR5cGU6IFVTQgogICAg
-QkQgQWRkcmVzczogMDA6MUI6REM6MDA6MzI6NzEgQUNMIE1UVTogMzEwOjEwIFNDTyBNVFU6
-IDY0OjgKICAgIEZlYXR1cmVzOiAweGZmIDB4ZmYgMHg4ZiAweGZlIDB4OWIgMHhmOSAweDAw
-IDB4ODAKICAgICAgICA8My1zbG90IHBhY2tldHM+IDw1LXNsb3QgcGFja2V0cz4gPGVuY3J5
-cHRpb24+IDxzbG90IG9mZnNldD4KICAgICAgICA8dGltaW5nIGFjY3VyYWN5PiA8cm9sZSBz
-d2l0Y2g+IDxob2xkIG1vZGU+IDxzbmlmZiBtb2RlPgogICAgICAgIDxwYXJrIHN0YXRlPiA8
-UlNTST4gPGNoYW5uZWwgcXVhbGl0eT4gPFNDTyBsaW5rPiA8SFYyIHBhY2tldHM+CiAgICAg
-ICAgPEhWMyBwYWNrZXRzPiA8dS1sYXcgbG9nPiA8QS1sYXcgbG9nPiA8Q1ZTRD4gPHBhZ2lu
-ZyBzY2hlbWU+CiAgICAgICAgPHBvd2VyIGNvbnRyb2w+IDx0cmFuc3BhcmVudCBTQ08+IDxi
-cm9hZGNhc3QgZW5jcnlwdD4KICAgICAgICA8RURSIEFDTCAyIE1icHM+IDxFRFIgQUNMIDMg
-TWJwcz4gPGVuaGFuY2VkIGlzY2FuPgogICAgICAgIDxpbnRlcmxhY2VkIGlzY2FuPiA8aW50
-ZXJsYWNlZCBwc2Nhbj4gPGlucXVpcnkgd2l0aCBSU1NJPgogICAgICAgIDxleHRlbmRlZCBT
-Q08+IDxFVjQgcGFja2V0cz4gPEVWNSBwYWNrZXRzPiA8QUZIIGNhcC4gc2xhdmU+CiAgICAg
-ICAgPEFGSCBjbGFzcy4gc2xhdmU+IDwzLXNsb3QgRURSIEFDTD4gPDUtc2xvdCBFRFIgQUNM
-PgogICAgICAgIDxBRkggY2FwLiBtYXN0ZXI+IDxBRkggY2xhc3MuIG1hc3Rlcj4gPEVEUiBl
-U0NPIDIgTWJwcz4KICAgICAgICA8RURSIGVTQ08gMyBNYnBzPiA8My1zbG90IEVEUiBlU0NP
-PiA8ZXh0ZW5kZWQgZmVhdHVyZXM+Cg==
---------------060601040105030008050208
-Content-Type: text/plain;
-	name="trust ultra small bluetooth 2 usb adapter bt-2400p.txt"
-Content-Transfer-Encoding: base64
-Content-Disposition: inline;
-	filename="trust ultra small bluetooth 2 usb adapter bt-2400p.txt"
+eWVzLCBpdCBpcyB3cm9uZy4uLjxicj5idXQgdGhlcmUgYXJlIGJ1ZyByZXBvcnRzIGZvciBpdCwg
+YW5kIG5vdGhpbmcgdGhhdCBpIGNhbiBmaW5kIHRoYXQgd29ya3MuLi4gZnJvbSB0aGUgdWJ1bnR1
+IGZvcnVtcyBubyBvbmUgd2l0aCBhbiBNWDUwMDAga2V5Ym9hcmQgY2FuIG1haW50YWluIGEgY29u
+bmVjdGlvbiwgYW5kIHRoZSBzb2x1dGlvbiBwcm92aWRlZCB3YXMgdGhhdCBpdCB3YXMgYW4gaXNz
+dWUgY3JlYXRlZCBieSBMb2dpdGVjaCAtIHRodXMgdGhleSBuZWVkZWQgdG8gZml4IGl0Li4uPGJy
+Pgo8YnI+d2hhdCBpIGhhdmUgYmFzaWNhbGx5IGRvbmUgaXMgc2V0IGEgc2NyaXB0IHRoYXQgaWYg
+dGhlIGRldmljZSBkaXNjb25uZWN0cyB0aGUgYmx1ZXRvb3RoIHdpbGwgcmVzdGFydCBldmVyeSBt
+aW51dGUgdW50aWwgaXQgcmVjb25uZWN0czxicj5zbyBpIGFtIGp1c3QgdXNpbmcgbXkgbW91c2Ug
+Zm9yIGFuIGV4dGVuZGVkIHBlcmlvZCB0aW1lIGkgc3RhcnQgZ2V0dGluZyB0aGlzIGJ1YmJsZS4m
+bmJzcDsmbmJzcDsgPGJyPgo8YnI+ZG8geW91IHRoaW5rIHRoaXMgd2lsbCBicmVhayBzb21ldGhp
+bmc/PGJyPjxicj48ZGl2IGNsYXNzPSJnbWFpbF9xdW90ZSI+T24gRnJpLCBNYXkgOSwgMjAwOCBh
+dCA4OjM4IEFNLCBNYXJjZWwgSG9sdG1hbm4gJmx0OzxhIGhyZWY9Im1haWx0bzptYXJjZWxAaG9s
+dG1hbm4ub3JnIj5tYXJjZWxAaG9sdG1hbm4ub3JnPC9hPiZndDsgd3JvdGU6PGJyPjxibG9ja3F1
+b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9ImJvcmRlci1sZWZ0OiAxcHggc29saWQgcmdi
+KDIwNCwgMjA0LCAyMDQpOyBtYXJnaW46IDBwdCAwcHQgMHB0IDAuOGV4OyBwYWRkaW5nLWxlZnQ6
+IDFleDsiPgpIaSw8YnI+Cu+7vzxicj4KPGRpdj48ZGl2PjwvZGl2PjxkaXYgY2xhc3M9IldqM0M3
+YyI+Jmd0OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgSSBoYXZlIGEgTG9naXRlY2ggTVg1
+MDAwIGtleWJvYXJkLiAmbmJzcDtJdCB0ZW5kcyB0byBkaXNjb25uZWN0IGZyb208YnI+CiZndDsg
+Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IHRoZTxicj4KJmd0OyAmbmJzcDsgJm5ic3A7ICZu
+YnNwOyAmbmJzcDsgY29tcHV0ZXIgYWZ0ZXIgYSBmZXcgbWludXRlcyBvZiBub24tdXNlLiBJIGhh
+dmUgZm91bmQgdGhhdCB0aGlzPGJyPgomZ3Q7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyBp
+czxicj4KJmd0OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgdHlwaWNhbCBvZiB0aGlzIGtl
+eWJvYXJkIGFuZCBubyBvbmUgaGFzIHByb3ZpZGVkIGEgc29sdXRpb24geWV0Ljxicj4KJmd0OyAm
+bmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgVGhlPGJyPgomZ3Q7ICZuYnNwOyAmbmJzcDsgJm5i
+c3A7ICZuYnNwOyBvbmx5IHdheSB0byBnZXQgaXQgYmFjayBpcyB0byBicmVhayBvdXQgdGhlIHdp
+cmVkIGtleWJvYXJkIGFuZDxicj4KJmd0OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgZW50
+ZXIgdGhlPGJyPgomZ3Q7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyBjb21tYW5kICZuYnNw
+OyBzdWRvIC9ldGMvaW5pdC5kL2JsdWV0b290aCByZXN0YXJ0Ljxicj4KJmd0Ozxicj4KJmd0OyAm
+bmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgd2hhdCBzb21lIG9uIHRoZSB1YnVudHUgZm9ydW1z
+IHN1Z2dlc3RlZCBpcyB0byBlbnRlciB0aGU8YnI+CiZndDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsg
+Jm5ic3A7IGZvbGxvd2luZyBpbnRvPGJyPgomZ3Q7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNw
+OyBjcm9udGFiPGJyPgomZ3Q7PGJyPgomZ3Q7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAq
+ICogKiAqICogdmFsPWBoY2ljb25maWcgLWEgMiZndDsvZGV2L251bGwgfCBoZWFkIC1jIDFgOyBb
+IC16PGJyPgomZ3Q7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAkdmFsIF08YnI+CiZndDsg
+Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZhbXA7JmFtcDsgL2V0Yy9pbml0LmQvYmx1ZXRv
+b3RoIHJlc3RhcnQ8YnI+CiZndDs8YnI+CiZndDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7
+IHdoaWNoIHdvcmtzIGdyZWF0LCBidXQgbm93IGkgZ2V0IGEgbm90aWZ5IGJ1YmJsZSBzdGF0aW5n
+IHRoYXQgbXk8YnI+CiZndDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZxdW90O2E8YnI+
+CiZndDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IGRldmljZSBoYXMgYmVlbiBtYWRlIGRp
+c2NvdmVyYWJsZSZxdW90OyBldmVyeSBhYm91dCA2MCBzZWNvbmRzLjxicj4KJmd0OyAmbmJzcDsg
+Jm5ic3A7ICZuYnNwOyAmbmJzcDsgSXMgdGhlcmUgYSB3YXkgdG8gZGlzYWJsZSB0aGlzIG5vdGlm
+aWNhdGlvbj88YnI+CiZndDs8YnI+CiZndDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IGFu
+ZCBpIGd1ZXNzIHRoZSBiaWdnZXIgcXVlc3Rpb24sIHRob3VnaCBub3Qgd2hhdCBpIG5lZWQgZm9y
+IHRoZTxicj4KJmd0OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgbW9tZW50LDxicj4KJmd0
+OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgaXMgY2FuIHlvdSBwcm92aWRlIGEgcGF0Y2gg
+dGhhdCB3aWxsIGZpeCB0aGlzIGlzc3VlPzxicj4KPGJyPgo8L2Rpdj48L2Rpdj55b3UgZ2V0IHRo
+ZSBidWJibGUsIGJlY2F1c2UgeW91IGFyZSBkb2luZyBzb21ldGhpbmcgdG90YWxseSB3cm9uZy4g
+RG9uJiMzOTt0PGJyPgpjYWxsIHJlc2V0IGFsbCB0aGUgdGltZS4gSXQgaXMgd3JvbmcuIEFzIHNp
+bXBsZSBhcyB0aGF0Ljxicj4KPGJyPgpXcml0ZSBhIHByb3BlciBidWcgcmVwb3J0IGZvciB0aGUg
+aW5wdXQgc2VydmljZS48YnI+Cjxicj4KUmVnYXJkczxicj4KPGJyPgpNYXJjZWw8YnI+Cjxicj4K
+PGJyPgo8YnI+Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS08YnI+ClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25z
+b3JlZCBieSB0aGUgMjAwOCBKYXZhT25lKFNNKSBDb25mZXJlbmNlPGJyPgpEb24mIzM5O3QgbWlz
+cyB0aGlzIHllYXImIzM5O3MgZXhjaXRpbmcgZXZlbnQuIFRoZXJlJiMzOTtzIHN0aWxsIHRpbWUg
+dG8gc2F2ZSAkMTAwLjxicj4KVXNlIHByaW9yaXR5IGNvZGUgSjhUTDJEMi48YnI+CjxhIGhyZWY9
+Imh0dHA6Ly9hZC5kb3VibGVjbGljay5uZXQvY2xrOzE5ODc1NzY3MzsxMzUwMzAzODtwP2h0dHA6
+Ly9qYXZhLnN1bi5jb20vamF2YW9uZSIgdGFyZ2V0PSJfYmxhbmsiPmh0dHA6Ly9hZC5kb3VibGVj
+bGljay5uZXQvY2xrOzE5ODc1NzY3MzsxMzUwMzAzODtwP2h0dHA6Ly9qYXZhLnN1bi5jb20vamF2
+YW9uZTwvYT48YnI+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fPGJyPgpCbHVlei11c2VycyBtYWlsaW5nIGxpc3Q8YnI+CjxhIGhyZWY9Im1haWx0bzpCbHVl
+ei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQiPkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZv
+cmdlLm5ldDwvYT48YnI+CjxhIGhyZWY9Imh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xp
+c3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzIiB0YXJnZXQ9Il9ibGFuayI+aHR0cHM6Ly9saXN0cy5z
+b3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnM8L2E+PGJyPgo8L2Jsb2Nr
+cXVvdGU+PC9kaXY+PGJyPgo=
+------=_Part_3431_18130527.1210368867526--
 
-c3VkbyBoY2ljb25maWcgaGNpMCAtYQpoY2kwOiAgIFR5cGU6IFVTQgogICAgQkQgQWRkcmVz
-czogMDA6MDI6NzI6MTM6MDY6NDIgQUNMIE1UVTogMTAxNzo4IFNDTyBNVFU6IDY0OjgKICAg
-IFVQIFJVTk5JTkcgUFNDQU4gSVNDQU4KICAgIFJYIGJ5dGVzOjI0OTE2IGFjbDoyMDE5IHNj
-bzowIGV2ZW50czo2MTIgZXJyb3JzOjAKICAgIFRYIGJ5dGVzOjE3NDg0MzQgYWNsOjIxMzMg
-c2NvOjAgY29tbWFuZHM6MzkgZXJyb3JzOjAKICAgIEZlYXR1cmVzOiAweGZmIDB4ZmYgMHg4
-ZCAweGZlIDB4OWIgMHhmOSAweDAwIDB4ODAKICAgIFBhY2tldCB0eXBlOiBETTEgRE0zIERN
-NSBESDEgREgzIERINSBIVjEgSFYyIEhWMwogICAgTGluayBwb2xpY3k6IFJTV0lUQ0ggSE9M
-RCBTTklGRiBQQVJLCiAgICBMaW5rIG1vZGU6IFNMQVZFIEFDQ0VQVAogICAgTmFtZTogJ1tk
-ZWJpYW4tZWVlcGNdIC8gQlQgRGV2aWNlIDAnCiAgICBDbGFzczogMHgwODAxMDAKICAgIFNl
-cnZpY2UgQ2xhc3NlczogQ2FwdHVyaW5nCiAgICBEZXZpY2UgQ2xhc3M6IENvbXB1dGVyLCBV
-bmNhdGVnb3JpemVkCiAgICBIQ0kgVmVyOiAyLjAgKDB4MykgSENJIFJldjogMHg0MDAwIExN
-UCBWZXI6IDIuMCAoMHgzKSBMTVAgU3VidmVyOiAweDQzMGUKICAgIE1hbnVmYWN0dXJlcjog
-QnJvYWRjb20gQ29ycG9yYXRpb24gKDE1KQoKc3VkbyBoY2ljb25maWcgaGNpMCBmZWF0dXJl
-cwpoY2kwOiAgIFR5cGU6IFVTQgogICAgQkQgQWRkcmVzczogMDA6MDI6NzI6MTM6MDY6NDIg
-QUNMIE1UVTogMTAxNzo4IFNDTyBNVFU6IDY0OjgKICAgIEZlYXR1cmVzOiAweGZmIDB4ZmYg
-MHg4ZCAweGZlIDB4OWIgMHhmOSAweDAwIDB4ODAKICAgICAgICA8My1zbG90IHBhY2tldHM+
-IDw1LXNsb3QgcGFja2V0cz4gPGVuY3J5cHRpb24+IDxzbG90IG9mZnNldD4KICAgICAgICA8
-dGltaW5nIGFjY3VyYWN5PiA8cm9sZSBzd2l0Y2g+IDxob2xkIG1vZGU+IDxzbmlmZiBtb2Rl
-PgogICAgICAgIDxwYXJrIHN0YXRlPiA8UlNTST4gPGNoYW5uZWwgcXVhbGl0eT4gPFNDTyBs
-aW5rPiA8SFYyIHBhY2tldHM+CiAgICAgICAgPEhWMyBwYWNrZXRzPiA8dS1sYXcgbG9nPiA8
-QS1sYXcgbG9nPiA8Q1ZTRD4gPHBvd2VyIGNvbnRyb2w+CiAgICAgICAgPHRyYW5zcGFyZW50
-IFNDTz4gPGJyb2FkY2FzdCBlbmNyeXB0PiA8RURSIEFDTCAyIE1icHM+CiAgICAgICAgPEVE
-UiBBQ0wgMyBNYnBzPiA8ZW5oYW5jZWQgaXNjYW4+IDxpbnRlcmxhY2VkIGlzY2FuPgogICAg
-ICAgIDxpbnRlcmxhY2VkIHBzY2FuPiA8aW5xdWlyeSB3aXRoIFJTU0k+IDxleHRlbmRlZCBT
-Q08+CiAgICAgICAgPEVWNCBwYWNrZXRzPiA8RVY1IHBhY2tldHM+IDxBRkggY2FwLiBzbGF2
-ZT4KICAgICAgICA8QUZIIGNsYXNzLiBzbGF2ZT4gPDMtc2xvdCBFRFIgQUNMPiA8NS1zbG90
-IEVEUiBBQ0w+CiAgICAgICAgPEFGSCBjYXAuIG1hc3Rlcj4gPEFGSCBjbGFzcy4gbWFzdGVy
-PiA8RURSIGVTQ08gMiBNYnBzPgogICAgICAgIDxFRFIgZVNDTyAzIE1icHM+IDwzLXNsb3Qg
-RURSIGVTQ08+IDxleHRlbmRlZCBmZWF0dXJlcz4K
---------------060601040105030008050208
+
+--===============0658002562==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -270,7 +157,7 @@ This SF.net email is sponsored by the 2008 JavaOne(SM) Conference
 Don't miss this year's exciting event. There's still time to save $100. 
 Use priority code J8TL2D2. 
 http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
---------------060601040105030008050208
+--===============0658002562==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -281,4 +168,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---------------060601040105030008050208--
+--===============0658002562==--
