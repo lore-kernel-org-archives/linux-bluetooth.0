@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <be0d0f5e0805091434o26b8595eg9e7bbe57e920a2b5@mail.gmail.com>
-Date: Fri, 9 May 2008 17:34:27 -0400
-From: RC <patnjer12@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1210336684.28002.29.camel@violet.holtmann.net>
+From: "Phil Endecott" <spam_from_bluez_users@chezphil.org>
+To: <bluez-users@lists.sourceforge.net>
+Date: Fri, 09 May 2008 17:45:57 +0100
+Message-ID: <1210351557416@dmwebmail.dmwebmail.chezphil.org>
+In-Reply-To: <1210336299.28002.24.camel@violet.holtmann.net>
+References: <1210336299.28002.24.camel@violet.holtmann.net>
 MIME-Version: 1.0
-References: <1209820958.6736.12.camel@richard-desktop>
-	<1210336684.28002.29.camel@violet.holtmann.net>
-Subject: Re: [Bluez-users] Disable Notify Bubble?
+Subject: Re: [Bluez-users] Apple wireless keyboard [hid2hci]
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,155 +16,73 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0658002562=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0658002562==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_3431_18130527.1210368867526"
+Marcel Holtmann wrote:
+> Hi Phil,
+>
+>> I've acquired a second USB bluetooth dongle, and this one does have a
+>> CSR chip:
+>> 
+>> $ lsusb|grep -i bluetooth
+>> Bus 003 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
+>> Dongle (HCI mode)
+>> 
+>> I've got this working in normal Bluetooth mode in the same way that I
+>> did with the other dongle and it works.  But I have failed to put it
+>> into HID mode.  Am I doing the right thing?  I've tried this either
+>> with the keyboard connected in HCI mode or with it not connected, with
+>> the bluez daemons running or not running, and in all cases I get:
+>> 
+>> # hid2hci --tohid
+>> Switching device 0a12:0001 to HID mode failed (Broken pipe)
+>> 
+>> strace shows this:
+>> 
+>> open("/dev/bus/usb/003/002", O_RDWR)    = 3
+>> ioctl(3, USBDEVFS_CONTROL, 0xbfa9f64c)  = -1 EPIPE (Broken pipe)
+>> 
+>> Does anyone have any clues?  According to the kernel's
+>> Documentation/usb/error-codes.txt, EPIPE means that the endpoint is stalled.
+>
+> not all CSR dongles are HID proxy dongles. Actually the majority of them
+> are not.
 
-------=_Part_3431_18130527.1210368867526
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+Right.  But mine matches the USB vendor/product ID in the table in 
+hid2hci.c.  So even in that case, it might not support HID proxy mode, 
+right?  (I have a vague recollection of a firmware upgrade possibility 
+using a windows program, but I may be thinking of something else; does 
+that ring a bell with anyone?)
 
-eWVzLCBpdCBpcyB3cm9uZy4uLgpidXQgdGhlcmUgYXJlIGJ1ZyByZXBvcnRzIGZvciBpdCwgYW5k
-IG5vdGhpbmcgdGhhdCBpIGNhbiBmaW5kIHRoYXQgd29ya3MuLi4KZnJvbSB0aGUgdWJ1bnR1IGZv
-cnVtcyBubyBvbmUgd2l0aCBhbiBNWDUwMDAga2V5Ym9hcmQgY2FuIG1haW50YWluIGEKY29ubmVj
-dGlvbiwgYW5kIHRoZSBzb2x1dGlvbiBwcm92aWRlZCB3YXMgdGhhdCBpdCB3YXMgYW4gaXNzdWUg
-Y3JlYXRlZCBieQpMb2dpdGVjaCAtIHRodXMgdGhleSBuZWVkZWQgdG8gZml4IGl0Li4uCgp3aGF0
-IGkgaGF2ZSBiYXNpY2FsbHkgZG9uZSBpcyBzZXQgYSBzY3JpcHQgdGhhdCBpZiB0aGUgZGV2aWNl
-IGRpc2Nvbm5lY3RzCnRoZSBibHVldG9vdGggd2lsbCByZXN0YXJ0IGV2ZXJ5IG1pbnV0ZSB1bnRp
-bCBpdCByZWNvbm5lY3RzCnNvIGkgYW0ganVzdCB1c2luZyBteSBtb3VzZSBmb3IgYW4gZXh0ZW5k
-ZWQgcGVyaW9kIHRpbWUgaSBzdGFydCBnZXR0aW5nIHRoaXMKYnViYmxlLgoKZG8geW91IHRoaW5r
-IHRoaXMgd2lsbCBicmVhayBzb21ldGhpbmc/CgpPbiBGcmksIE1heSA5LCAyMDA4IGF0IDg6Mzgg
-QU0sIE1hcmNlbCBIb2x0bWFubiA8bWFyY2VsQGhvbHRtYW5uLm9yZz4gd3JvdGU6Cgo+IEhpLAo+
-IO+7vwo+ID4gICAgICAgICBJIGhhdmUgYSBMb2dpdGVjaCBNWDUwMDAga2V5Ym9hcmQuICBJdCB0
-ZW5kcyB0byBkaXNjb25uZWN0IGZyb20KPiA+ICAgICAgICAgdGhlCj4gPiAgICAgICAgIGNvbXB1
-dGVyIGFmdGVyIGEgZmV3IG1pbnV0ZXMgb2Ygbm9uLXVzZS4gSSBoYXZlIGZvdW5kIHRoYXQgdGhp
-cwo+ID4gICAgICAgICBpcwo+ID4gICAgICAgICB0eXBpY2FsIG9mIHRoaXMga2V5Ym9hcmQgYW5k
-IG5vIG9uZSBoYXMgcHJvdmlkZWQgYSBzb2x1dGlvbiB5ZXQuCj4gPiAgICAgICAgIFRoZQo+ID4g
-ICAgICAgICBvbmx5IHdheSB0byBnZXQgaXQgYmFjayBpcyB0byBicmVhayBvdXQgdGhlIHdpcmVk
-IGtleWJvYXJkIGFuZAo+ID4gICAgICAgICBlbnRlciB0aGUKPiA+ICAgICAgICAgY29tbWFuZCAg
-IHN1ZG8gL2V0Yy9pbml0LmQvYmx1ZXRvb3RoIHJlc3RhcnQuCj4gPgo+ID4gICAgICAgICB3aGF0
-IHNvbWUgb24gdGhlIHVidW50dSBmb3J1bXMgc3VnZ2VzdGVkIGlzIHRvIGVudGVyIHRoZQo+ID4g
-ICAgICAgICBmb2xsb3dpbmcgaW50bwo+ID4gICAgICAgICBjcm9udGFiCj4gPgo+ID4gICAgICAg
-ICAqICogKiAqICogdmFsPWBoY2ljb25maWcgLWEgMj4vZGV2L251bGwgfCBoZWFkIC1jIDFgOyBb
-IC16Cj4gPiAgICAgICAgICR2YWwgXQo+ID4gICAgICAgICAmJiAvZXRjL2luaXQuZC9ibHVldG9v
-dGggcmVzdGFydAo+ID4KPiA+ICAgICAgICAgd2hpY2ggd29ya3MgZ3JlYXQsIGJ1dCBub3cgaSBn
-ZXQgYSBub3RpZnkgYnViYmxlIHN0YXRpbmcgdGhhdCBteQo+ID4gICAgICAgICAiYQo+ID4gICAg
-ICAgICBkZXZpY2UgaGFzIGJlZW4gbWFkZSBkaXNjb3ZlcmFibGUiIGV2ZXJ5IGFib3V0IDYwIHNl
-Y29uZHMuCj4gPiAgICAgICAgIElzIHRoZXJlIGEgd2F5IHRvIGRpc2FibGUgdGhpcyBub3RpZmlj
-YXRpb24/Cj4gPgo+ID4gICAgICAgICBhbmQgaSBndWVzcyB0aGUgYmlnZ2VyIHF1ZXN0aW9uLCB0
-aG91Z2ggbm90IHdoYXQgaSBuZWVkIGZvciB0aGUKPiA+ICAgICAgICAgbW9tZW50LAo+ID4gICAg
-ICAgICBpcyBjYW4geW91IHByb3ZpZGUgYSBwYXRjaCB0aGF0IHdpbGwgZml4IHRoaXMgaXNzdWU/
-Cj4KPiB5b3UgZ2V0IHRoZSBidWJibGUsIGJlY2F1c2UgeW91IGFyZSBkb2luZyBzb21ldGhpbmcg
-dG90YWxseSB3cm9uZy4gRG9uJ3QKPiBjYWxsIHJlc2V0IGFsbCB0aGUgdGltZS4gSXQgaXMgd3Jv
-bmcuIEFzIHNpbXBsZSBhcyB0aGF0Lgo+Cj4gV3JpdGUgYSBwcm9wZXIgYnVnIHJlcG9ydCBmb3Ig
-dGhlIGlucHV0IHNlcnZpY2UuCj4KPiBSZWdhcmRzCj4KPiBNYXJjZWwKPgo+Cj4KPiAtLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tCj4gVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5IHRoZSAyMDA4IEph
-dmFPbmUoU00pIENvbmZlcmVuY2UKPiBEb24ndCBtaXNzIHRoaXMgeWVhcidzIGV4Y2l0aW5nIGV2
-ZW50LiBUaGVyZSdzIHN0aWxsIHRpbWUgdG8gc2F2ZSAkMTAwLgo+IFVzZSBwcmlvcml0eSBjb2Rl
-IEo4VEwyRDIuCj4KPiBodHRwOi8vYWQuZG91YmxlY2xpY2submV0L2NsazsxOTg3NTc2NzM7MTM1
-MDMwMzg7cD9odHRwOi8vamF2YS5zdW4uY29tL2phdmFvbmUKPiBfX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fXwo+IEJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdAo+
-IEJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNl
-Zm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCj4K
-------=_Part_3431_18130527.1210368867526
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
+Does anyone reading this actually have one of these elusive devices in 
+their possession?  If so I'd love to know the brand etc. and even to 
+get a photo.  I know it still doesn't guarantee anything, but it would 
+be better than my current "random guess" approach to finding one.
 
-eWVzLCBpdCBpcyB3cm9uZy4uLjxicj5idXQgdGhlcmUgYXJlIGJ1ZyByZXBvcnRzIGZvciBpdCwg
-YW5kIG5vdGhpbmcgdGhhdCBpIGNhbiBmaW5kIHRoYXQgd29ya3MuLi4gZnJvbSB0aGUgdWJ1bnR1
-IGZvcnVtcyBubyBvbmUgd2l0aCBhbiBNWDUwMDAga2V5Ym9hcmQgY2FuIG1haW50YWluIGEgY29u
-bmVjdGlvbiwgYW5kIHRoZSBzb2x1dGlvbiBwcm92aWRlZCB3YXMgdGhhdCBpdCB3YXMgYW4gaXNz
-dWUgY3JlYXRlZCBieSBMb2dpdGVjaCAtIHRodXMgdGhleSBuZWVkZWQgdG8gZml4IGl0Li4uPGJy
-Pgo8YnI+d2hhdCBpIGhhdmUgYmFzaWNhbGx5IGRvbmUgaXMgc2V0IGEgc2NyaXB0IHRoYXQgaWYg
-dGhlIGRldmljZSBkaXNjb25uZWN0cyB0aGUgYmx1ZXRvb3RoIHdpbGwgcmVzdGFydCBldmVyeSBt
-aW51dGUgdW50aWwgaXQgcmVjb25uZWN0czxicj5zbyBpIGFtIGp1c3QgdXNpbmcgbXkgbW91c2Ug
-Zm9yIGFuIGV4dGVuZGVkIHBlcmlvZCB0aW1lIGkgc3RhcnQgZ2V0dGluZyB0aGlzIGJ1YmJsZS4m
-bmJzcDsmbmJzcDsgPGJyPgo8YnI+ZG8geW91IHRoaW5rIHRoaXMgd2lsbCBicmVhayBzb21ldGhp
-bmc/PGJyPjxicj48ZGl2IGNsYXNzPSJnbWFpbF9xdW90ZSI+T24gRnJpLCBNYXkgOSwgMjAwOCBh
-dCA4OjM4IEFNLCBNYXJjZWwgSG9sdG1hbm4gJmx0OzxhIGhyZWY9Im1haWx0bzptYXJjZWxAaG9s
-dG1hbm4ub3JnIj5tYXJjZWxAaG9sdG1hbm4ub3JnPC9hPiZndDsgd3JvdGU6PGJyPjxibG9ja3F1
-b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9ImJvcmRlci1sZWZ0OiAxcHggc29saWQgcmdi
-KDIwNCwgMjA0LCAyMDQpOyBtYXJnaW46IDBwdCAwcHQgMHB0IDAuOGV4OyBwYWRkaW5nLWxlZnQ6
-IDFleDsiPgpIaSw8YnI+Cu+7vzxicj4KPGRpdj48ZGl2PjwvZGl2PjxkaXYgY2xhc3M9IldqM0M3
-YyI+Jmd0OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgSSBoYXZlIGEgTG9naXRlY2ggTVg1
-MDAwIGtleWJvYXJkLiAmbmJzcDtJdCB0ZW5kcyB0byBkaXNjb25uZWN0IGZyb208YnI+CiZndDsg
-Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IHRoZTxicj4KJmd0OyAmbmJzcDsgJm5ic3A7ICZu
-YnNwOyAmbmJzcDsgY29tcHV0ZXIgYWZ0ZXIgYSBmZXcgbWludXRlcyBvZiBub24tdXNlLiBJIGhh
-dmUgZm91bmQgdGhhdCB0aGlzPGJyPgomZ3Q7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyBp
-czxicj4KJmd0OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgdHlwaWNhbCBvZiB0aGlzIGtl
-eWJvYXJkIGFuZCBubyBvbmUgaGFzIHByb3ZpZGVkIGEgc29sdXRpb24geWV0Ljxicj4KJmd0OyAm
-bmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgVGhlPGJyPgomZ3Q7ICZuYnNwOyAmbmJzcDsgJm5i
-c3A7ICZuYnNwOyBvbmx5IHdheSB0byBnZXQgaXQgYmFjayBpcyB0byBicmVhayBvdXQgdGhlIHdp
-cmVkIGtleWJvYXJkIGFuZDxicj4KJmd0OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgZW50
-ZXIgdGhlPGJyPgomZ3Q7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyBjb21tYW5kICZuYnNw
-OyBzdWRvIC9ldGMvaW5pdC5kL2JsdWV0b290aCByZXN0YXJ0Ljxicj4KJmd0Ozxicj4KJmd0OyAm
-bmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgd2hhdCBzb21lIG9uIHRoZSB1YnVudHUgZm9ydW1z
-IHN1Z2dlc3RlZCBpcyB0byBlbnRlciB0aGU8YnI+CiZndDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsg
-Jm5ic3A7IGZvbGxvd2luZyBpbnRvPGJyPgomZ3Q7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNw
-OyBjcm9udGFiPGJyPgomZ3Q7PGJyPgomZ3Q7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAq
-ICogKiAqICogdmFsPWBoY2ljb25maWcgLWEgMiZndDsvZGV2L251bGwgfCBoZWFkIC1jIDFgOyBb
-IC16PGJyPgomZ3Q7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAkdmFsIF08YnI+CiZndDsg
-Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZhbXA7JmFtcDsgL2V0Yy9pbml0LmQvYmx1ZXRv
-b3RoIHJlc3RhcnQ8YnI+CiZndDs8YnI+CiZndDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7
-IHdoaWNoIHdvcmtzIGdyZWF0LCBidXQgbm93IGkgZ2V0IGEgbm90aWZ5IGJ1YmJsZSBzdGF0aW5n
-IHRoYXQgbXk8YnI+CiZndDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZxdW90O2E8YnI+
-CiZndDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IGRldmljZSBoYXMgYmVlbiBtYWRlIGRp
-c2NvdmVyYWJsZSZxdW90OyBldmVyeSBhYm91dCA2MCBzZWNvbmRzLjxicj4KJmd0OyAmbmJzcDsg
-Jm5ic3A7ICZuYnNwOyAmbmJzcDsgSXMgdGhlcmUgYSB3YXkgdG8gZGlzYWJsZSB0aGlzIG5vdGlm
-aWNhdGlvbj88YnI+CiZndDs8YnI+CiZndDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IGFu
-ZCBpIGd1ZXNzIHRoZSBiaWdnZXIgcXVlc3Rpb24sIHRob3VnaCBub3Qgd2hhdCBpIG5lZWQgZm9y
-IHRoZTxicj4KJmd0OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgbW9tZW50LDxicj4KJmd0
-OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgaXMgY2FuIHlvdSBwcm92aWRlIGEgcGF0Y2gg
-dGhhdCB3aWxsIGZpeCB0aGlzIGlzc3VlPzxicj4KPGJyPgo8L2Rpdj48L2Rpdj55b3UgZ2V0IHRo
-ZSBidWJibGUsIGJlY2F1c2UgeW91IGFyZSBkb2luZyBzb21ldGhpbmcgdG90YWxseSB3cm9uZy4g
-RG9uJiMzOTt0PGJyPgpjYWxsIHJlc2V0IGFsbCB0aGUgdGltZS4gSXQgaXMgd3JvbmcuIEFzIHNp
-bXBsZSBhcyB0aGF0Ljxicj4KPGJyPgpXcml0ZSBhIHByb3BlciBidWcgcmVwb3J0IGZvciB0aGUg
-aW5wdXQgc2VydmljZS48YnI+Cjxicj4KUmVnYXJkczxicj4KPGJyPgpNYXJjZWw8YnI+Cjxicj4K
-PGJyPgo8YnI+Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS08YnI+ClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25z
-b3JlZCBieSB0aGUgMjAwOCBKYXZhT25lKFNNKSBDb25mZXJlbmNlPGJyPgpEb24mIzM5O3QgbWlz
-cyB0aGlzIHllYXImIzM5O3MgZXhjaXRpbmcgZXZlbnQuIFRoZXJlJiMzOTtzIHN0aWxsIHRpbWUg
-dG8gc2F2ZSAkMTAwLjxicj4KVXNlIHByaW9yaXR5IGNvZGUgSjhUTDJEMi48YnI+CjxhIGhyZWY9
-Imh0dHA6Ly9hZC5kb3VibGVjbGljay5uZXQvY2xrOzE5ODc1NzY3MzsxMzUwMzAzODtwP2h0dHA6
-Ly9qYXZhLnN1bi5jb20vamF2YW9uZSIgdGFyZ2V0PSJfYmxhbmsiPmh0dHA6Ly9hZC5kb3VibGVj
-bGljay5uZXQvY2xrOzE5ODc1NzY3MzsxMzUwMzAzODtwP2h0dHA6Ly9qYXZhLnN1bi5jb20vamF2
-YW9uZTwvYT48YnI+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fPGJyPgpCbHVlei11c2VycyBtYWlsaW5nIGxpc3Q8YnI+CjxhIGhyZWY9Im1haWx0bzpCbHVl
-ei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQiPkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZv
-cmdlLm5ldDwvYT48YnI+CjxhIGhyZWY9Imh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xp
-c3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzIiB0YXJnZXQ9Il9ibGFuayI+aHR0cHM6Ly9saXN0cy5z
-b3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnM8L2E+PGJyPgo8L2Jsb2Nr
-cXVvdGU+PC9kaXY+PGJyPgo=
-------=_Part_3431_18130527.1210368867526--
+On the other hand, if I won't be able to get HID proxy mode to work, I 
+need to understand some more about how normal bluetooth keyboard mode 
+works.  In particular, the kernel has some input quirks for Apple 
+keyboards that seem to be keyed on the USB vendor/product IDs; for 
+example, FN+UP => PgUp.  These don't seem to be applied on my system, 
+presumably because the USB ID matching has nothing to do with bluetooth 
+devices.  How is this supposed to work?
+
+Cheers,
+
+Phil.
 
 
---===============0658002562==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
 Don't miss this year's exciting event. There's still time to save $100. 
 Use priority code J8TL2D2. 
 http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
---===============0658002562==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0658002562==--
