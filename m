@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <482586CE.50107@in.tum.de>
-Date: Sat, 10 May 2008 13:28:14 +0200
-From: Aleksandar Kanchev <kanchev@in.tum.de>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] bluez dbus
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <f9d4bd30805091252j4fdb59ddrfed908cf6af4ef46@mail.gmail.com>
+References: <f9d4bd30805091252j4fdb59ddrfed908cf6af4ef46@mail.gmail.com>
+Date: Sat, 10 May 2008 03:11:53 +0200
+Message-Id: <1210381913.28002.42.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH]Service Search Request bug
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,13 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Hi Claudio,
 
-would someone please explain to me why does bluez support D-Bus? What 
-are the advantages by using dbus instead of simply linking and using the 
-bluez C library?
+> Please review the attached patch.
+> 
+> I found this error when I was using OBEX Data Server. There is a
+> "short" description here:
+> http://pastebin.com/m7b65cb6e
 
-Thanks
+patch looks good to me and I committed it. Thanks.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
