@@ -1,16 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300805110726ie34d4flcf02d6a435531c09@mail.gmail.com>
-Date: Sun, 11 May 2008 08:26:01 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4826A7E7.3060303@powercraft.nl>
+Message-ID: <4826F4E2.80200@gmx.de>
+Date: Sun, 11 May 2008 15:30:10 +0200
+From: Johannes Luber <jaluber@gmx.de>
 MIME-Version: 1.0
-References: <48171A58.8060200@powercraft.nl> <482356E2.3050909@jlab.org>
-	<482413B0.4010900@powercraft.nl> <48244A74.7080307@powercraft.nl>
-	<482566B0.9020708@powercraft.nl> <48268568.9080704@jlab.org>
-	<4826A7E7.3060303@powercraft.nl>
-Subject: Re: [Bluez-users] step by step - how to get your bluetooth stereo
-	headset fully working with the bluez software stack under linux
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <1209820958.6736.12.camel@richard-desktop>	<1210336684.28002.29.camel@violet.holtmann.net>
+	<be0d0f5e0805091434o26b8595eg9e7bbe57e920a2b5@mail.gmail.com>
+In-Reply-To: <be0d0f5e0805091434o26b8595eg9e7bbe57e920a2b5@mail.gmail.com>
+Subject: Re: [Bluez-users] Disable Notify Bubble?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,29 +17,78 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Jelle
-
->  With my trust ultra small bluetooth 2 usb adapter bt-2400p i got the
->  following messages:
->  kernel: l2cap_recv_acldata: Unexpected continuation frame (len 0)
->  last message repeated 151 times
-
-what chip is in the bt-2400p? I thought that would be the perfect
-thing to add bluetooth to an eee without opening it up.
-
--- 
-Brad
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
-Don't miss this year's exciting event. There's still time to save $100. 
-Use priority code J8TL2D2. 
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+UkMgc2NocmllYjoKPiB5ZXMsIGl0IGlzIHdyb25nLi4uCj4gYnV0IHRoZXJlIGFyZSBidWcgcmVw
+b3J0cyBmb3IgaXQsIGFuZCBub3RoaW5nIHRoYXQgaSBjYW4gZmluZCB0aGF0IAo+IHdvcmtzLi4u
+IGZyb20gdGhlIHVidW50dSBmb3J1bXMgbm8gb25lIHdpdGggYW4gTVg1MDAwIGtleWJvYXJkIGNh
+biAKPiBtYWludGFpbiBhIGNvbm5lY3Rpb24sIGFuZCB0aGUgc29sdXRpb24gcHJvdmlkZWQgd2Fz
+IHRoYXQgaXQgd2FzIGFuIAo+IGlzc3VlIGNyZWF0ZWQgYnkgTG9naXRlY2ggLSB0aHVzIHRoZXkg
+bmVlZGVkIHRvIGZpeCBpdC4uLgo+IAo+IHdoYXQgaSBoYXZlIGJhc2ljYWxseSBkb25lIGlzIHNl
+dCBhIHNjcmlwdCB0aGF0IGlmIHRoZSBkZXZpY2UgCj4gZGlzY29ubmVjdHMgdGhlIGJsdWV0b290
+aCB3aWxsIHJlc3RhcnQgZXZlcnkgbWludXRlIHVudGlsIGl0IHJlY29ubmVjdHMKPiBzbyBpIGFt
+IGp1c3QgdXNpbmcgbXkgbW91c2UgZm9yIGFuIGV4dGVuZGVkIHBlcmlvZCB0aW1lIGkgc3RhcnQg
+Z2V0dGluZyAKPiB0aGlzIGJ1YmJsZS4gIAo+IAo+IGRvIHlvdSB0aGluayB0aGlzIHdpbGwgYnJl
+YWsgc29tZXRoaW5nPwoKQ2FuIHlvdSBwb3N0IHRoZSBzY3JpcHQ/IEknZCBsaWtlIHRvIHRyeSBp
+dCBvdXQgbXlzZWxmLgoKVGhhbmtzIGluIGFkdmFuY2UhCkpvaGFubmVzCj4gCj4gT24gRnJpLCBN
+YXkgOSwgMjAwOCBhdCA4OjM4IEFNLCBNYXJjZWwgSG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5v
+cmcgCj4gPG1haWx0bzptYXJjZWxAaG9sdG1hbm4ub3JnPj4gd3JvdGU6Cj4gCj4gICAgIEhpLAo+
+ICAgICDvu78KPiAgICAgID4gICAgICAgICBJIGhhdmUgYSBMb2dpdGVjaCBNWDUwMDAga2V5Ym9h
+cmQuICBJdCB0ZW5kcyB0bwo+ICAgICBkaXNjb25uZWN0IGZyb20KPiAgICAgID4gICAgICAgICB0
+aGUKPiAgICAgID4gICAgICAgICBjb21wdXRlciBhZnRlciBhIGZldyBtaW51dGVzIG9mIG5vbi11
+c2UuIEkgaGF2ZSBmb3VuZAo+ICAgICB0aGF0IHRoaXMKPiAgICAgID4gICAgICAgICBpcwo+ICAg
+ICAgPiAgICAgICAgIHR5cGljYWwgb2YgdGhpcyBrZXlib2FyZCBhbmQgbm8gb25lIGhhcyBwcm92
+aWRlZCBhCj4gICAgIHNvbHV0aW9uIHlldC4KPiAgICAgID4gICAgICAgICBUaGUKPiAgICAgID4g
+ICAgICAgICBvbmx5IHdheSB0byBnZXQgaXQgYmFjayBpcyB0byBicmVhayBvdXQgdGhlIHdpcmVk
+Cj4gICAgIGtleWJvYXJkIGFuZAo+ICAgICAgPiAgICAgICAgIGVudGVyIHRoZQo+ICAgICAgPiAg
+ICAgICAgIGNvbW1hbmQgICBzdWRvIC9ldGMvaW5pdC5kL2JsdWV0b290aCByZXN0YXJ0Lgo+ICAg
+ICAgPgo+ICAgICAgPiAgICAgICAgIHdoYXQgc29tZSBvbiB0aGUgdWJ1bnR1IGZvcnVtcyBzdWdn
+ZXN0ZWQgaXMgdG8gZW50ZXIgdGhlCj4gICAgICA+ICAgICAgICAgZm9sbG93aW5nIGludG8KPiAg
+ICAgID4gICAgICAgICBjcm9udGFiCj4gICAgICA+Cj4gICAgICA+ICAgICAgICAgKiAqICogKiAq
+IHZhbD1gaGNpY29uZmlnIC1hIDI+L2Rldi9udWxsIHwgaGVhZCAtYyAxYDsgWyAtego+ICAgICAg
+PiAgICAgICAgICR2YWwgXQo+ICAgICAgPiAgICAgICAgICYmIC9ldGMvaW5pdC5kL2JsdWV0b290
+aCByZXN0YXJ0Cj4gICAgICA+Cj4gICAgICA+ICAgICAgICAgd2hpY2ggd29ya3MgZ3JlYXQsIGJ1
+dCBub3cgaSBnZXQgYSBub3RpZnkgYnViYmxlIHN0YXRpbmcKPiAgICAgdGhhdCBteQo+ICAgICAg
+PiAgICAgICAgICJhCj4gICAgICA+ICAgICAgICAgZGV2aWNlIGhhcyBiZWVuIG1hZGUgZGlzY292
+ZXJhYmxlIiBldmVyeSBhYm91dCA2MCBzZWNvbmRzLgo+ICAgICAgPiAgICAgICAgIElzIHRoZXJl
+IGEgd2F5IHRvIGRpc2FibGUgdGhpcyBub3RpZmljYXRpb24/Cj4gICAgICA+Cj4gICAgICA+ICAg
+ICAgICAgYW5kIGkgZ3Vlc3MgdGhlIGJpZ2dlciBxdWVzdGlvbiwgdGhvdWdoIG5vdCB3aGF0IGkg
+bmVlZAo+ICAgICBmb3IgdGhlCj4gICAgICA+ICAgICAgICAgbW9tZW50LAo+ICAgICAgPiAgICAg
+ICAgIGlzIGNhbiB5b3UgcHJvdmlkZSBhIHBhdGNoIHRoYXQgd2lsbCBmaXggdGhpcyBpc3N1ZT8K
+PiAKPiAgICAgeW91IGdldCB0aGUgYnViYmxlLCBiZWNhdXNlIHlvdSBhcmUgZG9pbmcgc29tZXRo
+aW5nIHRvdGFsbHkgd3JvbmcuIERvbid0Cj4gICAgIGNhbGwgcmVzZXQgYWxsIHRoZSB0aW1lLiBJ
+dCBpcyB3cm9uZy4gQXMgc2ltcGxlIGFzIHRoYXQuCj4gCj4gICAgIFdyaXRlIGEgcHJvcGVyIGJ1
+ZyByZXBvcnQgZm9yIHRoZSBpbnB1dCBzZXJ2aWNlLgo+IAo+ICAgICBSZWdhcmRzCj4gCj4gICAg
+IE1hcmNlbAo+IAo+IAo+IAo+ICAgICAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gICAgIFRoaXMgU0YubmV0
+IGVtYWlsIGlzIHNwb25zb3JlZCBieSB0aGUgMjAwOCBKYXZhT25lKFNNKSBDb25mZXJlbmNlCj4g
+ICAgIERvbid0IG1pc3MgdGhpcyB5ZWFyJ3MgZXhjaXRpbmcgZXZlbnQuIFRoZXJlJ3Mgc3RpbGwg
+dGltZSB0byBzYXZlICQxMDAuCj4gICAgIFVzZSBwcmlvcml0eSBjb2RlIEo4VEwyRDIuCj4gICAg
+IGh0dHA6Ly9hZC5kb3VibGVjbGljay5uZXQvY2xrOzE5ODc1NzY3MzsxMzUwMzAzODtwP2h0dHA6
+Ly9qYXZhLnN1bi5jb20vamF2YW9uZQo+ICAgICBfX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fXwo+ICAgICBCbHVlei11c2VycyBtYWlsaW5nIGxpc3QKPiAgICAg
+Qmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cj4gICAgIDxtYWlsdG86Qmx1ZXotdXNl
+cnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Pgo+ICAgICBodHRwczovL2xpc3RzLnNvdXJjZWZvcmdl
+Lm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo+IAo+IAo+IAo+IC0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LQo+IAo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiBUaGlzIFNGLm5ldCBlbWFpbCBpcyBzcG9uc29yZWQg
+YnkgdGhlIDIwMDggSmF2YU9uZShTTSkgQ29uZmVyZW5jZSAKPiBEb24ndCBtaXNzIHRoaXMgeWVh
+cidzIGV4Y2l0aW5nIGV2ZW50LiBUaGVyZSdzIHN0aWxsIHRpbWUgdG8gc2F2ZSAkMTAwLiAKPiBV
+c2UgcHJpb3JpdHkgY29kZSBKOFRMMkQyLiAKPiBodHRwOi8vYWQuZG91YmxlY2xpY2submV0L2Ns
+azsxOTg3NTc2NzM7MTM1MDMwMzg7cD9odHRwOi8vamF2YS5zdW4uY29tL2phdmFvbmUKPiAKPiAK
+PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0KPiAKPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwo+IEJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdAo+IEJsdWV6LXVzZXJzQGxp
+c3RzLnNvdXJjZWZvcmdlLm5ldAo+IGh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3Rz
+L2xpc3RpbmZvL2JsdWV6LXVzZXJzCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBlbWFp
+bCBpcyBzcG9uc29yZWQgYnkgdGhlIDIwMDggSmF2YU9uZShTTSkgQ29uZmVyZW5jZSAKRG9uJ3Qg
+bWlzcyB0aGlzIHllYXIncyBleGNpdGluZyBldmVudC4gVGhlcmUncyBzdGlsbCB0aW1lIHRvIHNh
+dmUgJDEwMC4gClVzZSBwcmlvcml0eSBjb2RlIEo4VEwyRDIuIApodHRwOi8vYWQuZG91YmxlY2xp
+Y2submV0L2NsazsxOTg3NTc2NzM7MTM1MDMwMzg7cD9odHRwOi8vamF2YS5zdW4uY29tL2phdmFv
+bmUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXot
+dXNlcnMgbWFpbGluZyBsaXN0CkJsdWV6LXVzZXJzQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRw
+czovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei11c2Vycwo=
