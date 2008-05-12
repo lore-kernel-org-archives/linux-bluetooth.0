@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2d5a2c100805120740r6e716ad8ob5a6a7a506e05f90@mail.gmail.com>
-Date: Mon, 12 May 2008 11:40:40 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1210600054.16390.55.camel@violet.holtmann.net>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <094BCE01AFBE9646AF220B0B3F367AAB030C0117@pdsmsx413.ccr.corp.intel.com>
 References: <094BCE01AFBE9646AF220B0B3F367AAB030C0117@pdsmsx413.ccr.corp.intel.com>
-	<1210600054.16390.55.camel@violet.holtmann.net>
+Date: Mon, 12 May 2008 15:47:34 +0200
+Message-Id: <1210600054.16390.55.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Cc: bluez-devel@lists.sf.net
 Subject: Re: [Bluez-devel] I can't use 3.31 release,
-	but 3.19 release works on the same platform
+	but 3.19 release works	on the same platform
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,38 +18,37 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Halley,
-
-It looks like you have some problem in your configuration otherwise
-you shouldn't be getting this:
-
-ALSA lib pcm_bluetooth.c:1517:(audioservice_expect) Bogus message
-BT_GETCAPABILITIES_REQ received while BT_GETCAPABILITIES_RSP was
-expected
-
-Could you please send us the hcid output, then we can help configuring
-it correctly, also make sure you are really
-installing the new alsa plugin as marcel said.
-
--- =
-
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference =
-
-Don't miss this year's exciting event. There's still time to save $100. =
-
-Use priority code J8TL2D2. =
-
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/java=
-one
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SGkgSGFsbGV5LAoKPiDjgIDjgIBNeSBCbHVldG9vdGggZWFycGhvbmUgaXMgTW90b3JvbGEgSFQ4
+MjAuIAo+IAo+IOOAgOOAgAo+IAo+IOOAgOOAgDEuIFdoZW4gSSB0cnkgdG8gdXNlIGJsdWV6LXV0
+aWxzIDMuMzEgb24gbXkgZGVza3RvcCAoVWJ1bnR1Ny4xMCksCj4gdGhlcmUgYXJlIHNvbWUgaXNz
+dWVzOiAoYnV0IHRoZXJlIGlzIG5vIHN1Y2ggaXNzdWUgd2hlbiBJIHVzZSAzLjE5Cj4gdmVyc2lv
+biBvbiB0aGlzIHNhbWUgcGxhdGZvcm0pLiBTaG91bGQgSSB1cGRhdGUgc29tZSBvdGhlciBwYWNr
+YWdlCj4gYmVzaWRlcyBibHVlei11dGlscyBhbmQgYmx1ZXotbGlicz8KCnBsZWFzZSBtYWtlIHN1
+cmUgdGhlIHJpZ2h0IHBjbV9ibHVldG9vdGggcGx1Z2luIGlzIGxvYWRlZC4gSXQgbmVlZHMgdG8K
+YmUgaW5zdGFsbGVkIGluIC91c3IvbGliL2Fsc2EtbGliLiBJZiB5b3UgaW5zdGFsbGVkIGl0IHdp
+dGggYSBkaWZmZXJlbnQKcHJlZml4IGFuZCBpdCBlbmRzIHVwIGluIC91c3IvbG9jYS9saWIvYWxz
+YS1saWIgdGhlbiBpdCB3b24ndCB3b3JrLiBUaGUKYXVkaW8gc2VydmljZSBuZWVkcyB0byBiZSB1
+c2VkIHdpdGggdGhlIG1hdGNoaW5nIHBsdWdpbi4KCj4g44CA44CAMi4gV2hlbiBJIHVzZSBibHVl
+ei11dGlscyAzLjE5IHZlcnNpb24sIGFwcGxpY2F0aW9uIGNhbGxzCj4gc25kX3BjbV9od19wYXJh
+bXMoKSBzb21ldGltZXMgd2lsbCBnb3QgcmV0dXJuIHZhbHVlICIxIi4gKFRoZSBmdW5jdGlvbgo+
+IGRlc2NyaXB0aW9uIHNheXMgaXQgd2lsbCBiZSAwIGZvciBzdWNjZXNzIGFuZCBuZWdhdGl2ZSBu
+dW1iZXIgZm9yCj4gZmFpbHVyZSkuIFRoZSBwb3NpdGl2ZSB2YWx1ZSBtYWtlcyBtZSBwdXp6bGVk
+LgoKVGhpcyBpcyBhIHF1ZXN0aW9uIGZvciB0aGUgQUxTQSBndXlzLiBJIHJlYWxseSBoYXZlIG5v
+IGNsdWUuCgo+IDMuIFVidW50dSBoYXJkeSBoYXMgaW5jbHVkZWQgYmx1ZXotdXRpbHMgMy4yNiB2
+ZXJzaW9uOyBidXQgSSBmb3VuZAo+IHRoZXJlIGFyZSBtYW55IFhSdW4gZXJyb3JzIHdoZW4gSSB1
+c2UgaGVsaXggZW5naW5lLgoKVGhlIGF1ZGlvIHNlcnZpY2UgaGFzIGJlZW4gaW1wcm92ZWQgYSBs
+b3Qgb2YgMy4yNiBhbmQgdGh1cyBpdCBtaWdodApzaW1wbHkgbWlzcyBhIHBhdGNoLiBIb3dldmVy
+IGZvciBtZSBpdCBpcyBhbHJlYWR5IHRvbyBvbGQgdG8gcmVtZW1iZXIKYW55IGRldGFpbHMuCgpS
+ZWdhcmRzCgpNYXJjZWwKCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5ldCBlbWFpbCBpcyBz
+cG9uc29yZWQgYnkgdGhlIDIwMDggSmF2YU9uZShTTSkgQ29uZmVyZW5jZSAKRG9uJ3QgbWlzcyB0
+aGlzIHllYXIncyBleGNpdGluZyBldmVudC4gVGhlcmUncyBzdGlsbCB0aW1lIHRvIHNhdmUgJDEw
+MC4gClVzZSBwcmlvcml0eSBjb2RlIEo4VEwyRDIuIApodHRwOi8vYWQuZG91YmxlY2xpY2submV0
+L2NsazsxOTg3NTc2NzM7MTM1MDMwMzg7cD9odHRwOi8vamF2YS5zdW4uY29tL2phdmFvbmUKX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwg
+bWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xp
+c3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
