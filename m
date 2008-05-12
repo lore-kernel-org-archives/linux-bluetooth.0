@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <231dafb50805061750q505ea32dob418b6fd417c1231@mail.gmail.com>
-References: <231dafb50805061750q505ea32dob418b6fd417c1231@mail.gmail.com>
-Date: Mon, 12 May 2008 15:50:03 +0200
-Message-Id: <1210600203.16390.60.camel@violet.holtmann.net>
+In-Reply-To: <4820674A.1030404@ticino.com>
+References: <4820674A.1030404@ticino.com>
+Date: Mon, 12 May 2008 15:48:45 +0200
+Message-Id: <1210600125.16390.57.camel@violet.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Receiving OBEX pushes stopped working
+Subject: Re: [Bluez-users] problem with hcitool scan
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,16 +22,13 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi,
 
-> I am using Ubuntu 8.04 and my bluetooth connection used to work
-> perfect, but then one it just stopped receiving files from my phone.
-> with the phone saying service not supported.
+> software versions:
 > 
-> I am using stock settings with the exception of turning on the ability
-> to receive file from gnomes BT gui. I can still send files from my
-> laptop to the phone fine. By right clicking and doing a "send to"
+> kernel:  2.6.22-14-generic
+> bluez:   bluez-utils  3.19-0ubuntu3            
 
-your xdg-user-dir settings might not be in place. Check the mailing list
-archive for a similar posting.
+try bluez-utils-3.31 and see if these issues are gone. I think we fixed
+them already.
 
 Regards
 
