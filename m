@@ -1,15 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-From: Laurent Almeras <lntalm@free.fr>
 To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <mailman.182757.1209832934.29930.bluez-devel@lists.sourceforge.net>
-References: <mailman.182757.1209832934.29930.bluez-devel@lists.sourceforge.net>
-Date: Tue, 13 May 2008 22:23:52 +0200
-Message-Id: <1210710233.3028.22.camel@localhost.localdomain>
+From: Dick <dick@mrns.nl>
+Date: Tue, 13 May 2008 19:29:28 +0000 (UTC)
+Message-ID: <loom.20080513T192547-127@post.gmane.org>
+References: <1210610729.3700.4.camel@localhost.localdomain>
+	<1210612771.16390.66.camel@violet.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Link authentication problem with Logitech Dinovo
-	Edge
-Reply-To: lntalm@free.fr,
-	BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel]
+	=?utf-8?q?bug_report=3A_trouble_reconnecting_keyboa?=
+	=?utf-8?q?rd=09after=09timeout?=
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -22,38 +22,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Marcel Holtmann <marcel <at> holtmann.org> writes:
+> why don't you use bluez-utils-3.31. The 3.25 release is quite old.
+3.25 is the latest packaged version from my distribution, I've version bumped it
+manually, I hope this works :)
 
-> Date: Sat, 03 May 2008 18:42:14 +0200
-> From: Laurent Almeras <lntalm@free.fr>
-> Subject: [Bluez-devel] Link authentication problem with Logitech
-> 	Dinovo Edge
-> To: bluez-devel@lists.sourceforge.net
-> Message-ID: <1209832934.29676.14.camel@localhost.localdomain>
-> Content-Type: text/plain; charset="us-ascii"
-> 
-> Hello,
-> 
-> 
-> I'm currently experiencing connection problem with my Logitech Dinovo
-> keyboard. I can realise pairing via gnome bluetooth-applet (popup asks
-> for passkey, I type in on computer, then on keyboard => popup says all
-> is fine). But then, each time I type a key on the bt keyboard, I have
-> the following message in /var/log/messages and the connection fails (in
-> the gnome bluetooth program, connect icon appears for 2 seconds then
-> disappear).
+> What does /sys/class/bluetooth/hci0/idle_timeout say?
+zero (0)
 
-I'm no longer experiencing this problem. After downgrading/upgrading
-several times, gnome UI asks me to authorize my keyboard (yes/no dialog)
-in place of asking a pin pairing (pin entry dialog). I don't know why ;
-but now my keyboard works fine.
+I'll post a new report when one of my bluetooth input devices can't reconnect.
 
-
-Thanks for your work
-
-
-
-Laurent
+Thanks so far,
+Dick
 
 
 -------------------------------------------------------------------------
