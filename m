@@ -1,14 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-From: Dick <dick@mrns.nl>
-Date: Tue, 13 May 2008 19:29:28 +0000 (UTC)
-Message-ID: <loom.20080513T192547-127@post.gmane.org>
-References: <1210610729.3700.4.camel@localhost.localdomain>
-	<1210612771.16390.66.camel@violet.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel]
-	=?utf-8?q?bug_report=3A_trouble_reconnecting_keyboa?=
-	=?utf-8?q?rd=09after=09timeout?=
+MIME-Version: 1.0
+Date: Tue, 13 May 2008 11:39:52 -0700
+Message-ID: <F60A3CE9E807BE49B5F56BD80B894D20016883A5@sc-exch03.marvell.com>
+References: <F60A3CE9E807BE49B5F56BD80B894D20016883A4@sc-exch03.marvell.com>
+From: "Angus Ainslie" <aainslie@marvell.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] A2dpsink with bluez 3.31
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,19 +19,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann <marcel <at> holtmann.org> writes:
-> why don't you use bluez-utils-3.31. The 3.25 release is quite old.
-3.25 is the latest packaged version from my distribution, I've version bumped it
-manually, I hope this works :)
+> -----Original Message-----
+> From: bluez-devel-bounces@lists.sourceforge.net 
+> [mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf 
+> Of Angus Ainslie
+> Sent: Tuesday, May 13, 2008 10:55 AM
+> To: bluez-devel@lists.sourceforge.net
+> Subject: [Bluez-devel] A2dpsink with bluez 3.31
+> 
+> I've got an application that was running with a2dp under bluez 3.24 .
+> With bluez 3.31 there seems to be some children added to the 
+> a2dp sink.
+> The fakesink child transitions nicely from NULL to READY to 
+> PAUSED. The a2d2psink transtions from NULL to READY but never 
+> makes it to PAUSED.
 
-> What does /sys/class/bluetooth/hci0/idle_timeout say?
-zero (0)
+Looking closer it's the filter child that transitions properly. The
+fakesink and a2dpsink always stay READY.
 
-I'll post a new report when one of my bluetooth input devices can't reconnect.
-
-Thanks so far,
-Dick
-
+Angus
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft 
