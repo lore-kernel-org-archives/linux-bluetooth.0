@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 14 May 2008 00:26:59 +0300
-From: Micha <michf@post.tau.ac.il>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20080514002659.23ad9039@vivalunalitshi.luna.local>
-Mime-Version: 1.0
-Subject: [Bluez-users] Connecting to a bluetooth device as a serial port
+MIME-Version: 1.0
+Date: Tue, 13 May 2008 09:43:49 -0700
+Message-ID: <F60A3CE9E807BE49B5F56BD80B894D20016883A3@sc-exch03.marvell.com>
+References: <F60A3CE9E807BE49B5F56BD80B894D2001688376@sc-exch03.marvell.com>
+	<1210600280.16390.62.camel@violet.holtmann.net>
+From: "Angus Ainslie" <aainslie@marvell.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Subject: Re: [Bluez-users] Bluez 3.30 audio service problems
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,12 +20,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I have a legos mindstorms nxt brick that I want to control from matlab. As far
-as I can tell matlab doesn't know bluetooth but it can work with serial ports.
-How do I setup the bluetooth connection as a serial port so that I can connect
-to it using matlab to send/receive data?
+Thanks, That was the fix. 
 
-Thanks
+-----Original Message-----
+From: bluez-users-bounces@lists.sourceforge.net
+[mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Marcel
+Holtmann
+Sent: Monday, May 12, 2008 7:51 AM
+To: BlueZ users
+Subject: Re: [Bluez-users] Bluez 3.30 audio service problems
+
+
+
+do a "sudo rm /etc/bluetooth/*.service" and then it should work again.
+We converted all services into plugin and they all will be autoloaded at
+hcid startup.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft 
