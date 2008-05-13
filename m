@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 13 May 2008 11:39:52 -0700
-Message-ID: <F60A3CE9E807BE49B5F56BD80B894D20016883A5@sc-exch03.marvell.com>
-References: <F60A3CE9E807BE49B5F56BD80B894D20016883A4@sc-exch03.marvell.com>
+Date: Tue, 13 May 2008 09:55:21 -0700
+Message-ID: <F60A3CE9E807BE49B5F56BD80B894D20016883A4@sc-exch03.marvell.com>
 From: "Angus Ainslie" <aainslie@marvell.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] A2dpsink with bluez 3.31
+To: <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] A2dpsink with bluez 3.31
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,25 +18,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-> -----Original Message-----
-> From: bluez-devel-bounces@lists.sourceforge.net 
-> [mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf 
-> Of Angus Ainslie
-> Sent: Tuesday, May 13, 2008 10:55 AM
-> To: bluez-devel@lists.sourceforge.net
-> Subject: [Bluez-devel] A2dpsink with bluez 3.31
-> 
-> I've got an application that was running with a2dp under bluez 3.24 .
-> With bluez 3.31 there seems to be some children added to the 
-> a2dp sink.
-> The fakesink child transitions nicely from NULL to READY to 
-> PAUSED. The a2d2psink transtions from NULL to READY but never 
-> makes it to PAUSED.
+I've got an application that was running with a2dp under bluez 3.24 .
+With bluez 3.31 there seems to be some children added to the a2dp sink.
+The fakesink child transitions nicely from NULL to READY to PAUSED. The
+a2d2psink transtions from NULL to READY but never makes it to PAUSED.
 
-Looking closer it's the filter child that transitions properly. The
-fakesink and a2dpsink always stay READY.
+Is there a description of how the new children and a2dpsink should
+interact?
+Does it need a different initialization scheme from the 3.24 sink ?
 
+Thanks
 Angus
+
+Senior Firmware Developer
+Automotive Systems Group
+Marvell Semiconductor
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft 
