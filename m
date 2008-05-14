@@ -1,14 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 14 May 2008 17:56:24 +0300
-From: Anssi Saari <anssi.saari@modeemi.fi>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20080514145623.GA7111@jolt.modeemi.cs.tut.fi>
-References: <6238307d0803310503t724dedcfo9e9e587e87d41b8d@mail.gmail.com>
-	<6238307d0803310509n15d73cb1wee14c9470e443d72@mail.gmail.com>
-	<C5EBD7EB-6863-4B52-A4E2-15B772609FCA@holtmann.org>
+Date: Wed, 14 May 2008 13:24:24 +0200
+From: mulata@gmx.de
+Message-ID: <20080514112424.56650@gmx.net>
 MIME-Version: 1.0
-In-Reply-To: <C5EBD7EB-6863-4B52-A4E2-15B772609FCA@holtmann.org>
-Subject: Re: [Bluez-users] Fwd: Socket CF Bluetooth Adapter with mpc5200
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Using bluez-utils from another application
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,23 +18,28 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On Mon, Mar 31, 2008 at 06:51:58PM +0200, Marcel Holtmann wrote:
-> Hi Kai,
-> 
-> > I want to use the CF-Bluetooth adapter from Socket in my TQM5200 board
-> > with integrated CF slot. How can i activate the card in Kernel?
-> 
-> depends on the version of the card. Some use the dtl1_cs driver.  
-> Others need to use hciattach to announce the serial port to the kernel.
+Hi!
 
-Old thread, but did the dtl1_cs driver get fixed at some point? I still
-have an old Socket CF card using that chipset somewhere, but the driver
-wasn't very useful when I last used it back in 2005 or so. Basically I
-got frequent hangs at EDGE speeds to my cell phone, with the blazing
-speed of 5 kB/s or so. Ejecting and inserting the card was needed to
-get it working again.
+Just installed bluez-libs-2.25 and bluez-utils-2.25.
+I know there are more recent versions avaiable but since Im developping for an Embedded Linux System based on ARM9 my resources are very limited and I was not able to compile "libdbus" which is necessary for the recent version of bluez.However... the installed versions are working fine. 
+By the way Im using a 2.2.21 Kernel, but the bluetooth related stuff is patched to 2.2.26.
+My goal is to use functionalities provided by hciconfig and hcitool in another C Program. Finally this features (e.g. Listing active local bluetooth devices, do a scan for remote devices, ask for available services) will be visualized graphically in this C programm.
 
+So there are basically tow ways:
+- System Calls like system("hciconfig") (which is not very handy and beautiful)
+- Using the Library
 
+Concerning the second point (using Library) I did some research in hciconfig.c.
+I expected that there a some higher-level functions that I can call from another C programm by including the necessary header files.
+But it seems there must be also done some low-level stuff, like opening a HCI socket.
+
+If anybody has some experience or hints in using bluez-lib from another application please let me know.
+
+Thanks,
+Johannes
+-- 
+Ist Ihr Browser Vista-kompatibel? Jetzt die neuesten 
+Browser-Versionen downloaden: http://www.gmx.net/de/go/browser
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft 
