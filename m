@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Wed, 14 May 2008 14:58:22 -0700
-Message-ID: <F60A3CE9E807BE49B5F56BD80B894D20016883BC@sc-exch03.marvell.com>
-References: <F60A3CE9E807BE49B5F56BD80B894D20016883A4@sc-exch03.marvell.com><F60A3CE9E807BE49B5F56BD80B894D20016883A5@sc-exch03.marvell.com><F60A3CE9E807BE49B5F56BD80B894D20016883B2@sc-exch03.marvell.com><de4879e80805141048w108a1e94n2486c92cab3d5692@mail.gmail.com>
-	<de4879e80805141056g6bfea53dwbdd8ff217d54d7c3@mail.gmail.com>
+Date: Wed, 14 May 2008 14:40:57 -0700
+Message-ID: <F60A3CE9E807BE49B5F56BD80B894D20016883BA@sc-exch03.marvell.com>
+References: <F60A3CE9E807BE49B5F56BD80B894D20016883A4@sc-exch03.marvell.com><F60A3CE9E807BE49B5F56BD80B894D20016883A5@sc-exch03.marvell.com><F60A3CE9E807BE49B5F56BD80B894D20016883B2@sc-exch03.marvell.com>
+	<de4879e80805141048w108a1e94n2486c92cab3d5692@mail.gmail.com>
 From: "Angus Ainslie" <aainslie@marvell.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 Subject: Re: [Bluez-devel] A2dpsink with bluez 3.31
@@ -20,62 +20,57 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+The pipeline gets built up in our application. The queue sink goes into
+a typefinder src which builds the pipeline below.
 
-Sorry I can't provide the media files. I tried a number of different
-ones that were encoded with different encoders. They were all avi
-containers with mpeg4 video and mp3 audio.
 
-The headsets I tried were a Motorola HT820 and a Motorola S805.
+neonsrc -> queue0 -> typefinder -> avidemux -> queue1 -> mpeg4dec ->
+overlay2sink
+                                |
+                                 ->  queue2 -> mp3dec -> volume ->
+audioconvert -> sbcenc -> a2dpsink device=BT_MAC_ADDR
+
 
 > -----Original Message-----
 > From: bluez-devel-bounces@lists.sourceforge.net 
 > [mailto:bluez-devel-bounces@lists.sourceforge.net] On Behalf 
 > Of thiagoss
-> Sent: Wednesday, May 14, 2008 11:56 AM
+> Sent: Wednesday, May 14, 2008 11:48 AM
 > To: BlueZ development
 > Subject: Re: [Bluez-devel] A2dpsink with bluez 3.31
 > 
-> And, if you could, the media file you are trying to play and 
-> the headset model
+> Could you, please, show us with the pipeline you were using?
 > 
 > 
-> On Wed, May 14, 2008 at 2:48 PM, thiagoss 
-> <thiagossantos@gmail.com> wrote:
-> 
-> 
-> 	Could you, please, show us with the pipeline you were using?
-> 
-> 
-> 	On Wed, May 14, 2008 at 1:40 PM, Angus Ainslie 
+> On Wed, May 14, 2008 at 1:40 PM, Angus Ainslie 
 > <aainslie@marvell.com> wrote:
+> 
+> 
+> 	It seems the a2dpsink for 3.31 has different audio 
+> format requirements.
+> 	
+> 	Adding audioconvert to the pipeline fixed my problem.
 > 	
 > 
-> 		It seems the a2dpsink for 3.31 has different 
-> audio format requirements.
-> 		
-> 		Adding audioconvert to the pipeline fixed my problem.
-> 		
 > 
-> 
-> 		>
-> 		> Looking closer it's the filter child that transitions
-> 		> properly. The fakesink and a2dpsink always stay READY.
-> 		>
-> 		> Angus
-> 		>
-> 		
-> 		
+> 	>
+> 	> Looking closer it's the filter child that transitions
+> 	> properly. The fakesink and a2dpsink always stay READY.
+> 	>
+> 	> Angus
+> 	>
+> 	
+> 	
 > --------------------------------------------------------------
 > -----------
-> 		This SF.net email is sponsored by: Microsoft
-> 		Defy all challenges. Microsoft(R) Visual Studio 2008.
-> 		http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> 		_______________________________________________
-> 		Bluez-devel mailing list
-> 		Bluez-devel@lists.sourceforge.net
-> 		https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 		
-> 
+> 	This SF.net email is sponsored by: Microsoft
+> 	Defy all challenges. Microsoft(R) Visual Studio 2008.
+> 	http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> 	_______________________________________________
+> 	Bluez-devel mailing list
+> 	Bluez-devel@lists.sourceforge.net
+> 	https://lists.sourceforge.net/lists/listinfo/bluez-devel
+> 	
 > 
 > 
 > 
