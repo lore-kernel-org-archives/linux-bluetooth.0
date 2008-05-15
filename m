@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1210786481.4797.4.camel@localhost.localdomain>
-References: <1210786481.4797.4.camel@localhost.localdomain>
-Content-Type: multipart/mixed; boundary="=-oPCzenOg2CPAu7TU/fRj"
-Date: Thu, 15 May 2008 16:15:04 +0200
-Message-Id: <1210860904.7025.50.camel@violet.holtmann.net>
+In-Reply-To: <482AE9AB.8060105@suse.de>
+References: <482AE9AB.8060105@suse.de>
+Date: Thu, 15 May 2008 11:39:09 +0200
+Message-Id: <1210844349.7025.33.camel@violet.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bug report: trouble reconnecting keyboard
-	after	timeout
+Subject: Re: [Bluez-devel] Mouse not reconnecting after Timeout
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,84 +16,52 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Stefan,
 
---=-oPCzenOg2CPAu7TU/fRj
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-
-Hi Dick,
-
-> I upgraded bluez-utils and bluez-libs (3.31) and it didn't help.
+> My Logitech MX LASER does not reconnect after the idle timeout.
+> If i either pull the dongle and replug it or switch off the mouse and switch
+> it back on or do a
 > 
-> I've attached a logfile, I hope it's sufficient.
+>  dbus-send --system --type=method_call \
+>            --dest=org.bluez /org/bluez/hci0 \
+>            org.bluez.Adapter.DisconnectRemoteDevice \
+>            string:"00:07:61:3F:1B:6D"
 > 
-> My mouse and keyboard couldn't connect, I've reconnected them by
-> manually disconnecting them in bluetooth-applet.
+> then it reconnects fine.
+> This happens with all dongles (The internal one in my hp2510p, one of the CSR
+> based HAMA mini-dongles, ...)
+> 
+> I'm running 2.6.25.3 and bluez-{libs,utils}-3.31 with btusb (but it also
+> happened with hci_usb).
+> My DELL BT Keyboard and other mice are working fine and reconnecting after
+> timeout. I have reports of similar symptoms from apple bt-keyboard users.
 
-if I am not mistaken, then the attached kernel patch will fix this
-issue.
+so the first assumption is that we are causing this disconnect with the
+idle timeout setting. I committed a patch to the CVS that disables the
+timeout and provides a input.conf setting that would allow to change it
+without re-compiling. So we can actually set this to 1 minute for
+testing and see what happens.
+
+If this actually fixes it, then it is only an interim fix since the real
+problem is that we are disconnecting the remote device wrongly. Current
+guess is that we still keep a reference count somewhere. Either inside
+the kernel or in user-space.
 
 Regards
 
 Marcel
 
 
---=-oPCzenOg2CPAu7TU/fRj
-Content-Disposition: attachment; filename=patch
-Content-Type: text/x-patch; name=patch; charset=utf-8
-Content-Transfer-Encoding: 7bit
-
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 519cdb9..96434d7 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -581,6 +581,12 @@ static int hidp_session(void *arg)
- 		hid_free_device(session->hid);
- 	}
- 
-+	/* Wakeup user-space polling for socket errors */
-+	session->intr_sock->sk->sk_err = EUNATCH;
-+	session->ctrl_sock->sk->sk_err = EUNATCH;
-+
-+	hidp_schedule(session);
-+
- 	fput(session->intr_sock->file);
- 
- 	wait_event_timeout(*(ctrl_sk->sk_sleep),
-@@ -879,6 +885,10 @@ int hidp_del_connection(struct hidp_conndel_req *req)
- 			skb_queue_purge(&session->ctrl_transmit);
- 			skb_queue_purge(&session->intr_transmit);
- 
-+			/* Wakeup user-space polling for socket errors */
-+			session->intr_sock->sk->sk_err = EUNATCH;
-+			session->ctrl_sock->sk->sk_err = EUNATCH;
-+
- 			/* Kill session thread */
- 			atomic_inc(&session->terminate);
- 			hidp_schedule(session);
-
---=-oPCzenOg2CPAu7TU/fRj
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft 
 Defy all challenges. Microsoft(R) Visual Studio 2008. 
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---=-oPCzenOg2CPAu7TU/fRj
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---=-oPCzenOg2CPAu7TU/fRj--
