@@ -1,13 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <482C1DEE.8000405@earthlink.net>
-Date: Thu, 15 May 2008 06:26:38 -0500
-From: "Mumia W.." <paduille.4061.mumia.w+nospam@earthlink.net>
+Message-ID: <482C233C.5060808@powercraft.nl>
+Date: Thu, 15 May 2008 13:49:16 +0200
+From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <482AB4AD.50803@earthlink.net>
-	<1210844479.7025.35.camel@violet.holtmann.net>
-In-Reply-To: <1210844479.7025.35.camel@violet.holtmann.net>
-Subject: Re: [Bluez-users] Anycom USB-250 unseen by hcitool
+Content-Type: multipart/mixed; boundary="------------000703020902000209020604"
+Subject: [Bluez-users] Nokia BH-801 why??
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,61 +15,177 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 05/15/2008 04:41 AM, Marcel Holtmann wrote:
-> Hi Mumia,
-> 
->> Hello. I recently bought an Anycom USB-250 Bluetooth 
->> adapter, and I'm trying to get it to work with my Palm 
->> Tungsten E2 so that I can get online on the E2.
->>
->> However, I can't get it to work. When I run "hcitool scan", 
->> I get this error message: "Device is not available: No such 
->> device."
-> 
-> check with hciconfig -a and make sure that either the hci_usb or btusb 
-> driver is loaded.
-> 
-> Regards
-> 
-> Marcel
-> 
+This is a multi-part message in MIME format.
+--------------000703020902000209020604
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thanks Marcel; "hciconfig -a" returns nothing:
+So got an other new headset with the hope it would work...
 
-$ hciconfig -a
-$
+The nokia website sad it was bluetooth 2.0 instead of the 1.0 headset i 
+first tried. But I does not work... Can somebody please enlight me why?
 
-After I manually load hci_usb, "hciconfig -a" returns this:
+Kind regards,
 
-$ hciconfig -a
-hci0:   Type: USB
-         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
-         DOWN
-         RX bytes:0 acl:0 sco:0 events:0 errors:0
-         TX bytes:0 acl:0 sco:0 commands:0 errors:0
+Jelle
 
-However, I don't have the btusb module, and I can't see any way to build 
-it from "make menuconfig." When I configured my kernel before, I enabled 
-/everything/ related to bluetooth. :-?
+--------------000703020902000209020604
+Content-Type: text/plain;
+ name="trust micro bluetooth usb adapter 15606.txt"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+	filename="trust micro bluetooth usb adapter 15606.txt"
 
-Hmm, "hcitool" still doesn't see my bluetooth dongle:
+c3VkbyBoY2ljb25maWcgLWEKaGNpMDogICBUeXBlOiBVU0IKICAgIEJEIEFkZHJlc3M6IDAw
+OjFCOkRDOjAwOjMyOjcxIEFDTCBNVFU6IDMxMDoxMCBTQ08gTVRVOiA2NDo4CiAgICBVUCBS
+VU5OSU5HIFBTQ0FOIElTQ0FOCiAgICBSWCBieXRlczo5NjcgYWNsOjAgc2NvOjAgZXZlbnRz
+OjI3IGVycm9yczowCiAgICBUWCBieXRlczozNjAgYWNsOjAgc2NvOjAgY29tbWFuZHM6MjYg
+ZXJyb3JzOjAKICAgIEZlYXR1cmVzOiAweGZmIDB4ZmYgMHg4ZiAweGZlIDB4OWIgMHhmOSAw
+eDAwIDB4ODAKICAgIFBhY2tldCB0eXBlOiBETTEgRE0zIERNNSBESDEgREgzIERINSBIVjEg
+SFYyIEhWMwogICAgTGluayBwb2xpY3k6IFJTV0lUQ0ggSE9MRCBTTklGRiBQQVJLCiAgICBM
+aW5rIG1vZGU6IFNMQVZFIEFDQ0VQVAogICAgTmFtZTogJ1tkZWJpYW4tZWVlcGNdIC8gQlQg
+RGV2aWNlIDAnCiAgICBDbGFzczogMHgwODAxMDgKICAgIFNlcnZpY2UgQ2xhc3NlczogQ2Fw
+dHVyaW5nCiAgICBEZXZpY2UgQ2xhc3M6IENvbXB1dGVyLCBTZXJ2ZXIKICAgIEhDSSBWZXI6
+IDIuMCAoMHgzKSBIQ0kgUmV2OiAweGM1YyBMTVAgVmVyOiAyLjAgKDB4MykgTE1QIFN1YnZl
+cjogMHhjNWMKICAgIE1hbnVmYWN0dXJlcjogQ2FtYnJpZGdlIFNpbGljb24gUmFkaW8gKDEw
+KQoKc3VkbyBoY2ljb25maWcgaGNpMCBmZWF0dXJlcwpoY2kwOiAgIFR5cGU6IFVTQgogICAg
+QkQgQWRkcmVzczogMDA6MUI6REM6MDA6MzI6NzEgQUNMIE1UVTogMzEwOjEwIFNDTyBNVFU6
+IDY0OjgKICAgIEZlYXR1cmVzOiAweGZmIDB4ZmYgMHg4ZiAweGZlIDB4OWIgMHhmOSAweDAw
+IDB4ODAKICAgICAgICA8My1zbG90IHBhY2tldHM+IDw1LXNsb3QgcGFja2V0cz4gPGVuY3J5
+cHRpb24+IDxzbG90IG9mZnNldD4KICAgICAgICA8dGltaW5nIGFjY3VyYWN5PiA8cm9sZSBz
+d2l0Y2g+IDxob2xkIG1vZGU+IDxzbmlmZiBtb2RlPgogICAgICAgIDxwYXJrIHN0YXRlPiA8
+UlNTST4gPGNoYW5uZWwgcXVhbGl0eT4gPFNDTyBsaW5rPiA8SFYyIHBhY2tldHM+CiAgICAg
+ICAgPEhWMyBwYWNrZXRzPiA8dS1sYXcgbG9nPiA8QS1sYXcgbG9nPiA8Q1ZTRD4gPHBhZ2lu
+ZyBzY2hlbWU+CiAgICAgICAgPHBvd2VyIGNvbnRyb2w+IDx0cmFuc3BhcmVudCBTQ08+IDxi
+cm9hZGNhc3QgZW5jcnlwdD4KICAgICAgICA8RURSIEFDTCAyIE1icHM+IDxFRFIgQUNMIDMg
+TWJwcz4gPGVuaGFuY2VkIGlzY2FuPgogICAgICAgIDxpbnRlcmxhY2VkIGlzY2FuPiA8aW50
+ZXJsYWNlZCBwc2Nhbj4gPGlucXVpcnkgd2l0aCBSU1NJPgogICAgICAgIDxleHRlbmRlZCBT
+Q08+IDxFVjQgcGFja2V0cz4gPEVWNSBwYWNrZXRzPiA8QUZIIGNhcC4gc2xhdmU+CiAgICAg
+ICAgPEFGSCBjbGFzcy4gc2xhdmU+IDwzLXNsb3QgRURSIEFDTD4gPDUtc2xvdCBFRFIgQUNM
+PgogICAgICAgIDxBRkggY2FwLiBtYXN0ZXI+IDxBRkggY2xhc3MuIG1hc3Rlcj4gPEVEUiBl
+U0NPIDIgTWJwcz4KICAgICAgICA8RURSIGVTQ08gMyBNYnBzPiA8My1zbG90IEVEUiBlU0NP
+PiA8ZXh0ZW5kZWQgZmVhdHVyZXM+Cg==
+--------------000703020902000209020604
+Content-Type: text/plain;
+	name="trust ultra small bluetooth 2 usb adapter bt-2400p.txt"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+	filename="trust ultra small bluetooth 2 usb adapter bt-2400p.txt"
 
-$ hcitool scan
-Device is not available: No such device
+c3VkbyBoY2ljb25maWcgaGNpMCAtYQpoY2kwOiAgIFR5cGU6IFVTQgogICAgQkQgQWRkcmVz
+czogMDA6MDI6NzI6MTM6MDY6NDIgQUNMIE1UVTogMTAxNzo4IFNDTyBNVFU6IDY0OjgKICAg
+IFVQIFJVTk5JTkcgUFNDQU4gSVNDQU4KICAgIFJYIGJ5dGVzOjI0OTE2IGFjbDoyMDE5IHNj
+bzowIGV2ZW50czo2MTIgZXJyb3JzOjAKICAgIFRYIGJ5dGVzOjE3NDg0MzQgYWNsOjIxMzMg
+c2NvOjAgY29tbWFuZHM6MzkgZXJyb3JzOjAKICAgIEZlYXR1cmVzOiAweGZmIDB4ZmYgMHg4
+ZCAweGZlIDB4OWIgMHhmOSAweDAwIDB4ODAKICAgIFBhY2tldCB0eXBlOiBETTEgRE0zIERN
+NSBESDEgREgzIERINSBIVjEgSFYyIEhWMwogICAgTGluayBwb2xpY3k6IFJTV0lUQ0ggSE9M
+RCBTTklGRiBQQVJLCiAgICBMaW5rIG1vZGU6IFNMQVZFIEFDQ0VQVAogICAgTmFtZTogJ1tk
+ZWJpYW4tZWVlcGNdIC8gQlQgRGV2aWNlIDAnCiAgICBDbGFzczogMHgwODAxMDAKICAgIFNl
+cnZpY2UgQ2xhc3NlczogQ2FwdHVyaW5nCiAgICBEZXZpY2UgQ2xhc3M6IENvbXB1dGVyLCBV
+bmNhdGVnb3JpemVkCiAgICBIQ0kgVmVyOiAyLjAgKDB4MykgSENJIFJldjogMHg0MDAwIExN
+UCBWZXI6IDIuMCAoMHgzKSBMTVAgU3VidmVyOiAweDQzMGUKICAgIE1hbnVmYWN0dXJlcjog
+QnJvYWRjb20gQ29ycG9yYXRpb24gKDE1KQoKc3VkbyBoY2ljb25maWcgaGNpMCBmZWF0dXJl
+cwpoY2kwOiAgIFR5cGU6IFVTQgogICAgQkQgQWRkcmVzczogMDA6MDI6NzI6MTM6MDY6NDIg
+QUNMIE1UVTogMTAxNzo4IFNDTyBNVFU6IDY0OjgKICAgIEZlYXR1cmVzOiAweGZmIDB4ZmYg
+MHg4ZCAweGZlIDB4OWIgMHhmOSAweDAwIDB4ODAKICAgICAgICA8My1zbG90IHBhY2tldHM+
+IDw1LXNsb3QgcGFja2V0cz4gPGVuY3J5cHRpb24+IDxzbG90IG9mZnNldD4KICAgICAgICA8
+dGltaW5nIGFjY3VyYWN5PiA8cm9sZSBzd2l0Y2g+IDxob2xkIG1vZGU+IDxzbmlmZiBtb2Rl
+PgogICAgICAgIDxwYXJrIHN0YXRlPiA8UlNTST4gPGNoYW5uZWwgcXVhbGl0eT4gPFNDTyBs
+aW5rPiA8SFYyIHBhY2tldHM+CiAgICAgICAgPEhWMyBwYWNrZXRzPiA8dS1sYXcgbG9nPiA8
+QS1sYXcgbG9nPiA8Q1ZTRD4gPHBvd2VyIGNvbnRyb2w+CiAgICAgICAgPHRyYW5zcGFyZW50
+IFNDTz4gPGJyb2FkY2FzdCBlbmNyeXB0PiA8RURSIEFDTCAyIE1icHM+CiAgICAgICAgPEVE
+UiBBQ0wgMyBNYnBzPiA8ZW5oYW5jZWQgaXNjYW4+IDxpbnRlcmxhY2VkIGlzY2FuPgogICAg
+ICAgIDxpbnRlcmxhY2VkIHBzY2FuPiA8aW5xdWlyeSB3aXRoIFJTU0k+IDxleHRlbmRlZCBT
+Q08+CiAgICAgICAgPEVWNCBwYWNrZXRzPiA8RVY1IHBhY2tldHM+IDxBRkggY2FwLiBzbGF2
+ZT4KICAgICAgICA8QUZIIGNsYXNzLiBzbGF2ZT4gPDMtc2xvdCBFRFIgQUNMPiA8NS1zbG90
+IEVEUiBBQ0w+CiAgICAgICAgPEFGSCBjYXAuIG1hc3Rlcj4gPEFGSCBjbGFzcy4gbWFzdGVy
+PiA8RURSIGVTQ08gMiBNYnBzPgogICAgICAgIDxFRFIgZVNDTyAzIE1icHM+IDwzLXNsb3Qg
+RURSIGVTQ08+IDxleHRlbmRlZCBmZWF0dXJlcz4K
+--------------000703020902000209020604
+Content-Type: text/plain;
+ name="nokia-bh-801-information.txt"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+ filename="nokia-bh-801-information.txt"
 
-:-?
+aGNpdG9vbCBzY2FuClNjYW5uaW5nIC4uLgogICAgMDA6NTM6NTM6RkI6N0U6OUMgICBOb2tp
+YSBCSC04MDEKCnN1ZG8gaGNpdG9vbCBpbmZvIDAwOjUzOjUzOkZCOjdFOjlDClJlcXVlc3Rp
+bmcgaW5mb3JtYXRpb24gLi4uCiAgICBCRCBBZGRyZXNzOiAgMDA6NTM6NTM6RkI6N0U6OUMK
+ICAgIERldmljZSBOYW1lOiBOb2tpYSBCSC04MDEKICAgIExNUCBWZXJzaW9uOiAyLjAgKDB4
+MykgTE1QIFN1YnZlcnNpb246IDB4MjEyYgogICAgTWFudWZhY3R1cmVyOiBCcm9hZGNvbSBD
+b3Jwb3JhdGlvbiAoMTUpCiAgICBGZWF0dXJlczogMHhiYyAweGZlIDB4OGYgMHg3ZSAweDE4
+IDB4MTggMHgwMCAweDgwCiAgICAgICAgPGVuY3J5cHRpb24+IDxzbG90IG9mZnNldD4gPHRp
+bWluZyBhY2N1cmFjeT4gPHJvbGUgc3dpdGNoPgogICAgICAgIDxzbmlmZiBtb2RlPiA8UlNT
+ST4gPGNoYW5uZWwgcXVhbGl0eT4gPFNDTyBsaW5rPiA8SFYyIHBhY2tldHM+CiAgICAgICAg
+PEhWMyBwYWNrZXRzPiA8dS1sYXcgbG9nPiA8QS1sYXcgbG9nPiA8Q1ZTRD4gPHBhZ2luZyBz
+Y2hlbWU+CiAgICAgICAgPHBvd2VyIGNvbnRyb2w+IDx0cmFuc3BhcmVudCBTQ08+IDxicm9h
+ZGNhc3QgZW5jcnlwdD4KICAgICAgICA8RURSIEFDTCAyIE1icHM+IDxFRFIgQUNMIDMgTWJw
+cz4gPGVuaGFuY2VkIGlzY2FuPgogICAgICAgIDxpbnRlcmxhY2VkIGlzY2FuPiA8aW50ZXJs
+YWNlZCBwc2Nhbj4gPGlucXVpcnkgd2l0aCBSU1NJPgogICAgICAgIDxBRkggY2FwLiBzbGF2
+ZT4gPEFGSCBjbGFzcy4gc2xhdmU+IDxBRkggY2FwLiBtYXN0ZXI+CiAgICAgICAgPEFGSCBj
+bGFzcy4gbWFzdGVyPiA8ZXh0ZW5kZWQgZmVhdHVyZXM+CgpNYXkgMTUgMTM6Mzk6NTUgZGVi
+aWFuLWVlZXBjIGhjaWRbODk5MV06IEF1ZGlvIEFQSTogc2VuZGluZyBCVF9HRVRDQVBBQklM
+SVRJRVNfUlNQCk1heSAxNSAxMzozOTo1NSBkZWJpYW4tZWVlcGMgaGNpZFs4OTkxXTogQXVk
+aW8gQVBJOiByZWNlaXZlZCBCVF9TRVRDT05GSUdVUkFUSU9OX1JFUQpNYXkgMTUgMTM6Mzk6
+NTUgZGViaWFuLWVlZXBjIGhjaWRbODk5MV06IGNvbmZpZyBzY28gLSBkZXZpY2UgPSAwMDo1
+Mzo1MzpGQjo3RTo5QyBhY2Nlc3NfbW9kZSA9IDEKTWF5IDE1IDEzOjM5OjU3IGRlYmlhbi1l
+ZWVwYyBoY2lkWzg5OTFdOiBsaW5rX2tleV9yZXF1ZXN0IChzYmE9MDA6MDI6NzI6MTM6MDY6
+NDIsIGRiYT0wMDo1Mzo1MzpGQjo3RTo5QykKTWF5IDE1IDEzOjM5OjU3IGRlYmlhbi1lZWVw
+YyBrZXJuZWw6IGhjaV9zY29kYXRhX3BhY2tldDogaGNpMCBTQ08gcGFja2V0IGZvciB1bmtu
+b3duIGNvbm5lY3Rpb24gaGFuZGxlIDEKTWF5IDE1IDEzOjM5OjU3IGRlYmlhbi1lZWVwYyBs
+YXN0IG1lc3NhZ2UgcmVwZWF0ZWQgMyB0aW1lcwpNYXkgMTUgMTM6Mzk6NTcgZGViaWFuLWVl
+ZXBjIGtlcm5lbDogaGNpX3Njb2RhdGFfcGFja2V0OiBoY2kwIFNDTyBwYWNrZXQgZm9yIHVu
+a25vd24gY29ubmVjdGlvbiBoYW5kbGUgMQpNYXkgMTUgMTM6Mzk6NTcgZGViaWFuLWVlZXBj
+IGxhc3QgbWVzc2FnZSByZXBlYXRlZCAxMyB0aW1lcwpNYXkgMTUgMTM6Mzk6NTcgZGViaWFu
+LWVlZXBjIGhjaWRbODk5MV06IEJhZGx5IGZvcm1hdGVkIG9yIHVucmVjb2duaXplZCBjb21t
+YW5kOiBBVCtDQ1dBPTEKTWF5IDE1IDEzOjM5OjU3IGRlYmlhbi1lZWVwYyBoY2lkWzg5OTFd
+OiBCYWRseSBmb3JtYXRlZCBvciB1bnJlY29nbml6ZWQgY29tbWFuZDogQVQrQ09QUz0zLDAK
+TWF5IDE1IDEzOjM5OjU3IGRlYmlhbi1lZWVwYyBrZXJuZWw6IGhjaV9zY29kYXRhX3BhY2tl
+dDogaGNpMCBTQ08gcGFja2V0IGZvciB1bmtub3duIGNvbm5lY3Rpb24gaGFuZGxlIDEKTWF5
+IDE1IDEzOjM5OjU3IGRlYmlhbi1lZWVwYyBsYXN0IG1lc3NhZ2UgcmVwZWF0ZWQgMiB0aW1l
+cwpNYXkgMTUgMTM6Mzk6NTcgZGViaWFuLWVlZXBjIGhjaWRbODk5MV06IEJhZGx5IGZvcm1h
+dGVkIG9yIHVucmVjb2duaXplZCBjb21tYW5kOiBBVCtDTUVFPTEKTWF5IDE1IDEzOjM5OjU3
+IGRlYmlhbi1lZWVwYyBrZXJuZWw6IGhjaV9zY29kYXRhX3BhY2tldDogaGNpMCBTQ08gcGFj
+a2V0IGZvciB1bmtub3duIGNvbm5lY3Rpb24gaGFuZGxlIDEKTWF5IDE1IDEzOjQwOjI4IGRl
+Ymlhbi1lZWVwYyBsYXN0IG1lc3NhZ2UgcmVwZWF0ZWQgMTAxOTAgdGltZXMKCgo=
+--------------000703020902000209020604
+Content-Type: text/plain;
+ name="asoundrc"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+ filename="asoundrc"
 
-
+cGNtLmhlYWRzZXQgewogICAgdHlwZSBibHVldG9vdGgKICAgICN+IGRldmljZSAwMDowRDox
+ODpBMDozNTo3MAogICAgZGV2aWNlIDAwOjUzOjUzOkZCOjdFOjlDICMgTm9raWEgQkgtODAx
+CiAgICAjfiBkZXZpY2UgMDA6MEM6NTU6RDE6Qzk6NzggIyBNb3Rvcm9sYSBTODA1CiAgICAj
+fiBkZXZpY2UgMDA6MEQ6RkQ6MTg6NkU6M0MgIyBtb3Rvcm9sYSBzOQogICAgI34gcHJvZmls
+ZSBoaWZpCiAgICBwcm9maWxlIHZvaWNlCiAgICAjcHJvZmlsZSBhdXRvCn0KcGNtLnNvZnR2
+b2wgewogICAgdHlwZSBzb2Z0dm9sCiAgICBzbGF2ZS5wY20gaGVhZHNldAogICAgY29udHJv
+bC5uYW1lIEhlYWRzZXQKICAgIGNvbnRyb2wuY2FyZCAwCn0KcGNtLiFkZWZhdWx0IHsKICAg
+ICN+IHR5cGUgaHcKICAgICN+IGNhcmQgMAogICAgdHlwZSBwbHVnCiAgICBzbGF2ZS5wY20g
+c29mdHZvbAp9Cg==
+--------------000703020902000209020604
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft 
 Defy all challenges. Microsoft(R) Visual Studio 2008. 
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--------------000703020902000209020604
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--------------000703020902000209020604--
