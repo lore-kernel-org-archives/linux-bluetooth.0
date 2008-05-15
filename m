@@ -1,12 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <482AE9AB.8060105@suse.de>
-References: <482AE9AB.8060105@suse.de>
-Date: Thu, 15 May 2008 11:39:09 +0200
-Message-Id: <1210844349.7025.33.camel@violet.holtmann.net>
+In-Reply-To: <094BCE01AFBE9646AF220B0B3F367AAB03105FE2@pdsmsx413.ccr.corp.intel.com>
+References: <094BCE01AFBE9646AF220B0B3F367AAB03105C80@pdsmsx413.ccr.corp.intel.com>
+	<029E5BE7F699594398CA44E3DDF5544401DD1643@swsmsx413.ger.corp.intel.com>
+	<094BCE01AFBE9646AF220B0B3F367AAB03105FE2@pdsmsx413.ccr.corp.intel.com>
+Date: Thu, 15 May 2008 09:42:51 +0200
+Message-Id: <1210837371.7025.10.camel@violet.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Mouse not reconnecting after Timeout
+Cc: "Wong, James Sing Toh" <james.sing.toh.wong@intel.com>,
+	"Guo,  Young" <young.guo@intel.com>,
+	"Holtmann,  Marcel" <marcel.holtmann@intel.com>
+Subject: Re: [Bluez-devel] An Issue with A2dpd and some suggestions
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,52 +21,37 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Stefan,
-
-> My Logitech MX LASER does not reconnect after the idle timeout.
-> If i either pull the dongle and replug it or switch off the mouse and switch
-> it back on or do a
-> 
->  dbus-send --system --type=method_call \
->            --dest=org.bluez /org/bluez/hci0 \
->            org.bluez.Adapter.DisconnectRemoteDevice \
->            string:"00:07:61:3F:1B:6D"
-> 
-> then it reconnects fine.
-> This happens with all dongles (The internal one in my hp2510p, one of the CSR
-> based HAMA mini-dongles, ...)
-> 
-> I'm running 2.6.25.3 and bluez-{libs,utils}-3.31 with btusb (but it also
-> happened with hci_usb).
-> My DELL BT Keyboard and other mice are working fine and reconnecting after
-> timeout. I have reports of similar symptoms from apple bt-keyboard users.
-
-so the first assumption is that we are causing this disconnect with the
-idle timeout setting. I committed a patch to the CVS that disables the
-timeout and provides a input.conf setting that would allow to change it
-without re-compiling. So we can actually set this to 1 minute for
-testing and see what happens.
-
-If this actually fixes it, then it is only an interim fix since the real
-problem is that we are disconnecting the remote device wrongly. Current
-guess is that we still keep a reference count somewhere. Either inside
-the kernel or in user-space.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft 
-Defy all challenges. Microsoft(R) Visual Studio 2008. 
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SGkgSGFsbGV5LAoKPiDjgIDjgIBJIGtub3cgbGl0dGxlIG9mIEFMU0Egb3IgQmx1ZXosIHNvIEkg
+ZG9uJ3Qga25vdyB0aGUgZGV0YWlsIGluc2lkZS4KPiDjgIDjgIAxLiBhdHRhY2hlZCBsb2cgZmls
+ZXM6Cj4g44CA44CAICAgQmx1ZS1zdGFydHVwLmxvZzogdGhlIGxvZyBpbmZvcm1hdGlvbiB3aGVu
+ICJoY2lkIC1kIC1uIiBzdGFydCB0byBydW4KPiDjgIDjgIAgICBCbHVlei1wbGF5LmxvZzogZHVy
+aW5nIGEgaGVsaXggYmFzZWQgcGxheWVyIHBsYXliYWNrIGFuIGF1ZGlvIHN0cmVhbSwgdGhlIGxv
+ZyBpbmZvcm1hdGlvbiBmcm9tIGhjaWQuCj4g44CA44CACj4g44CA44CAMi4gQUxTQSBhcGkgCj4g
+44CA44CAIHNuZF9wY21faHdfcGFyYW1zKCkgLS0+IHNuZF9wY21fcHJlcGFyZSgpIC0tPiBwY20t
+PmZhc3Rfb3BzLT5wcmVwYXJlKHBjbS0+ZmFzdF9vcF9hcmcpCj4g44CA44CASSBndWVzcyBpdCB3
+aWxsIGNhbGwgdG8gKGZyb20gcHJpbnRmIGxvZywgaXQgZG9lcykKPiDjgIDjgIBGaWxlOiBhdWRp
+by9wY21fYmx1ZXRvb3RoLmMgCj4g44CA44CARnVuY3Rpb246IGJsdWV0b290aF9wcmVwYXJlKCkK
+PiDjgIDjgIBBbmQgaW4gdGhpcyBmdW5jdGlvbiwgaXQgd2lsbCB1c2UgdGhlIHJldHVybiB2YWx1
+ZSBmcm9tIHdyaXRlKGRhdGEtPnBpcGVmZFsxXSwmYywxKSBhcyBpdHMgKGJsdWV0b290aF9wcmVw
+YXJlKSByZXR1cm4gdmFsdWUuLS0tLSBJIHRoaW5rIHRoZSBwb3NpdGl2ZSByZXR1cm4gdmFsdWUg
+IjEiIHdhcyBjcmVhdGUgaGVyZTsgCj4g44CA44CAYnV0IEkgZG9uJ3Qga25vdyB3aGV0aGVyIHRo
+ZXJlIHNob3VsZCBiZSBzb21lIHBsYWNlIHRvIHRyYW5zbGF0ZSB0aGlzIHZhbHVlIHRvIGEgdmFs
+aWQgcmV0dXJuIHZhbHVlIG9mIEFMU0EgQVBJLiBBbmQgSSBhbHNvIGRvbid0IHdoYXQgIjEiIGlz
+IHZhbGlkIHJldHVybiB2YWx1ZSBmcm9tIHRoZSB3cml0ZSgpIGZ1bmN0aW9uLgoKZ29vZCBjYXRj
+aC4gSXQgaXMgb3VyIGZhdWx0IGFuZCBhY3R1YWxseSBhIHN0dXBpZCBvdmVyc2lnaHQgb24gb3Vy
+IHNpZGUuCldlIGhhdmUgdG8gZG8gdGhpcyB3cml0aW5nIDEgYnl0ZSBpbnRvIHRoZSBwaXBlIHRv
+IHdha2V1cCB0aGUgY2xpZW50cy4KU28gd3JpdGluZyBvbmUgYnl0ZSBzdWNjZXNzZnVsbHkgZG9l
+c24ndCBnaXZlIHVzIDAuIEl0IGdpdmVzIHVzIDEgYW5kIHNvCnRoZXJlIHlvdSBnb3QgeW91ciB3
+cm9uZyB2YWx1ZS4KCkkgZml4ZWQgdGhpcyBpbiB0aGUgQ1ZTIG5vdy4gVGhhbmtzIGZvciB0aGUg
+YW5hbHlzaXMuCgpSZWdhcmRzCgpNYXJjZWwKCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLm5l
+dCBlbWFpbCBpcyBzcG9uc29yZWQgYnk6IE1pY3Jvc29mdCAKRGVmeSBhbGwgY2hhbGxlbmdlcy4g
+TWljcm9zb2Z0KFIpIFZpc3VhbCBTdHVkaW8gMjAwOC4gCmh0dHA6Ly9jbGsuYXRkbXQuY29tL01S
+VC9nby92c2UwMTIwMDAwMDcwbXJ0L2RpcmVjdC8wMS8KX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRl
+dmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9s
+aXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
