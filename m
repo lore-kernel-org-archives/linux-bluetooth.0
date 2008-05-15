@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <482C1DEE.8000405@earthlink.net>
+Date: Thu, 15 May 2008 06:26:38 -0500
+From: "Mumia W.." <paduille.4061.mumia.w+nospam@earthlink.net>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <482C1DEE.8000405@earthlink.net>
 References: <482AB4AD.50803@earthlink.net>
 	<1210844479.7025.35.camel@violet.holtmann.net>
-	<482C1DEE.8000405@earthlink.net>
-Date: Thu, 15 May 2008 15:37:34 +0200
-Message-Id: <1210858654.7025.48.camel@violet.holtmann.net>
-Mime-Version: 1.0
+In-Reply-To: <1210844479.7025.35.camel@violet.holtmann.net>
 Subject: Re: [Bluez-users] Anycom USB-250 unseen by hcitool
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -22,49 +21,49 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Mumia,
+On 05/15/2008 04:41 AM, Marcel Holtmann wrote:
+> Hi Mumia,
+> 
+>> Hello. I recently bought an Anycom USB-250 Bluetooth 
+>> adapter, and I'm trying to get it to work with my Palm 
+>> Tungsten E2 so that I can get online on the E2.
+>>
+>> However, I can't get it to work. When I run "hcitool scan", 
+>> I get this error message: "Device is not available: No such 
+>> device."
+> 
+> check with hciconfig -a and make sure that either the hci_usb or btusb 
+> driver is loaded.
+> 
+> Regards
+> 
+> Marcel
+> 
 
-> >> Hello. I recently bought an Anycom USB-250 Bluetooth 
-> >> adapter, and I'm trying to get it to work with my Palm 
-> >> Tungsten E2 so that I can get online on the E2.
-> >>
-> >> However, I can't get it to work. When I run "hcitool scan", 
-> >> I get this error message: "Device is not available: No such 
-> >> device."
-> > 
-> > check with hciconfig -a and make sure that either the hci_usb or btusb 
-> > driver is loaded.
-> > 
-> > Regards
-> > 
-> > Marcel
-> > 
-> 
-> Thanks Marcel; "hciconfig -a" returns nothing:
-> 
-> $ hciconfig -a
-> $
-> 
-> After I manually load hci_usb, "hciconfig -a" returns this:
-> 
-> $ hciconfig -a
-> hci0:   Type: USB
->          BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
->          DOWN
->          RX bytes:0 acl:0 sco:0 events:0 errors:0
->          TX bytes:0 acl:0 sco:0 commands:0 errors:0
-> 
-> However, I don't have the btusb module, and I can't see any way to build 
-> it from "make menuconfig." When I configured my kernel before, I enabled 
-> /everything/ related to bluetooth. :-?
-> 
-> Hmm, "hcitool" still doesn't see my bluetooth dongle:
+Thanks Marcel; "hciconfig -a" returns nothing:
 
-hciconfig hci0 up :)
+$ hciconfig -a
+$
 
-Regards
+After I manually load hci_usb, "hciconfig -a" returns this:
 
-Marcel
+$ hciconfig -a
+hci0:   Type: USB
+         BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
+         DOWN
+         RX bytes:0 acl:0 sco:0 events:0 errors:0
+         TX bytes:0 acl:0 sco:0 commands:0 errors:0
+
+However, I don't have the btusb module, and I can't see any way to build 
+it from "make menuconfig." When I configured my kernel before, I enabled 
+/everything/ related to bluetooth. :-?
+
+Hmm, "hcitool" still doesn't see my bluetooth dongle:
+
+$ hcitool scan
+Device is not available: No such device
+
+:-?
 
 
 
