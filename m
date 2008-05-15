@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <200805141058.13430.petr.palacky@coduco.com>
-References: <200805141058.13430.petr.palacky@coduco.com>
-Date: Thu, 15 May 2008 11:43:45 +0200
-Message-Id: <1210844625.7025.38.camel@violet.holtmann.net>
+In-Reply-To: <482AB4AD.50803@earthlink.net>
+References: <482AB4AD.50803@earthlink.net>
+Date: Thu, 15 May 2008 11:41:19 +0200
+Message-Id: <1210844479.7025.35.camel@violet.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluez and more than two USB dongles in one HUB
+Subject: Re: [Bluez-users] Anycom USB-250 unseen by hcitool
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,18 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Petr,
+Hi Mumia,
 
-> I have problem with using more than two USB dongles in one USB port using 4
-> (and more)-port USB-HUB (with or without power supply)...
+> Hello. I recently bought an Anycom USB-250 Bluetooth
+> adapter, and I'm trying to get it to work with my Palm
+> Tungsten E2 so that I can get online on the E2.
 > 
-> I have many USB dongles for testing purposes, the same with USB HUBs.
-> If I connect two dongles into HUB everything works well, but if I want to 
-> attach third (and more) they will not be activated via bluez stack...
+> However, I can't get it to work. When I run "hcitool scan",
+> I get this error message: "Device is not available: No such
+> device."
 
-try to load the hci_usb driver with the isoc=0 option or use the btusb
-driver instead. If that doesn't help, mailing the USB guys, because this
-is more an USB problem then a Bluetooth issue.
+check with hciconfig -a and make sure that either the hci_usb or btusb
+driver is loaded.
 
 Regards
 
