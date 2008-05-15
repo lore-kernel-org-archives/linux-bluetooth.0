@@ -1,13 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <482CB297.7060706@earthlink.net>
-Date: Thu, 15 May 2008 17:00:55 -0500
-From: "Mumia W.." <paduille.4061.mumia.w+nospam@earthlink.net>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <482AB4AD.50803@earthlink.net>	<1210844479.7025.35.camel@violet.holtmann.net>	<482C1DEE.8000405@earthlink.net>
-	<1210858654.7025.48.camel@violet.holtmann.net>
-In-Reply-To: <1210858654.7025.48.camel@violet.holtmann.net>
-Subject: Re: [Bluez-users] Anycom USB-250 unseen by hcitool
+In-Reply-To: <20080515145933.161540@gmx.net>
+References: <20080514112424.56650@gmx.net>
+	<1210844175.7025.29.camel@violet.holtmann.net>
+	<20080515145933.161540@gmx.net>
+Date: Thu, 15 May 2008 17:02:11 +0200
+Message-Id: <1210863731.7025.53.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Using bluez-utils from another application
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,39 +18,45 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 05/15/2008 08:37 AM, Marcel Holtmann wrote:
-> 
-> hciconfig hci0 up :)
-> 
-> Regards
-> 
-> Marcel
-> 
-
-Thanks very much Marcel. That gets me much closer, but when I start dund 
-like so:
-
-hcid
-sdpd
-dund --nodetach --listen --persist --msdun call palm
-
-and when I tell my Palm E2 to search for a bluetooth network connection, 
-nothing appears on my computer screen, and the Palm doesn't find 
-anything to connect to.
-
-"Hcitool scan" can find my Palm, but my Palm cannot find
-my computer's bluetooth adapter.
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft 
-Defy all challenges. Microsoft(R) Visual Studio 2008. 
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGkgSm9oYW5uZXMsCgo+IHRoYW5rcyBmb3IgeW91ciBoaW50Lgo+IAo+IEkndmUgdHJpZWQgdG8g
+Y29tcGlsZSBzb21lIG9mIHRoZSByZWNlbnQgVmVyc2lvbnMgb2YgZGJ1cyBhZ2Fpbi4gQnV0IGl0
+IGFsd2F5cyBmYWlscyB3aXRoOgo+IAo+IGlmIGFybS1saW51eC1nY2MgLURIQVZFX0NPTkZJR19I
+IC1JLiAtSS4gLUkuLiAtSS4uICAtSS91c3IvaW5jbHVkZSAtRERCVVNfTE9DQUxFRElSPVwiL29w
+dC9kZXZlbC90b29sY2hhaW5zL2FybTkvYXJtLWxpbnV4L3NoYXJlL2xvY2FsZVwiIC1EREJVU19D
+T01QSUxBVElPTiAtRERCVVNfREFFTU9ORElSPVwiL29wdC9kZXZlbC90b29sY2hhaW5zL2FybTkv
+YXJtLWxpbnV4L2JpblwiIC1EREJVU19NQUNISU5FX1VVSURfRklMRT1cIiIvb3B0L2RldmVsL3Rv
+b2xjaGFpbnMvYXJtOS9hcm0tbGludXgvdmFyL2xpYi9kYnVzL21hY2hpbmUtaWQiXCIgICAgLWcg
+LU8yIC1XYWxsIC1XY2hhci1zdWJzY3JpcHRzIC1XbWlzc2luZy1kZWNsYXJhdGlvbnMgLVdtaXNz
+aW5nLXByb3RvdHlwZXMgLVduZXN0ZWQtZXh0ZXJucyAtV3BvaW50ZXItYXJpdGggLVdjYXN0LWFs
+aWduIC1XZmxvYXQtZXF1YWwgLVdzaWduLWNvbXBhcmUgLWZuby1jb21tb24gLWZQSUMgLU1UIGRi
+dXMtbGF1bmNoLm8gLU1EIC1NUCAtTUYgIi5kZXBzL2RidXMtbGF1bmNoLlRwbyIgLWMgLW8gZGJ1
+cy1sYXVuY2gubyBkYnVzLWxhdW5jaC5jOyBcCj4gICAgICAgICB0aGVuIG12IC1mICIuZGVwcy9k
+YnVzLWxhdW5jaC5UcG8iICIuZGVwcy9kYnVzLWxhdW5jaC5QbyI7IGVsc2Ugcm0gLWYgIi5kZXBz
+L2RidXMtbGF1bmNoLlRwbyI7IGV4aXQgMTsgZmkKPiBkYnVzLWxhdW5jaC5jOiBJbiBGdW5rdGlv
+biDCu2tpbGxfYnVzX3doZW5fc2Vzc2lvbl9lbmRzwqs6Cj4gZGJ1cy1sYXVuY2guYzo0MTM6IGVy
+cm9yOiBpbXBvc3NpYmxlIGNvbnN0cmFpbnQgaW4gYGFzbScKPiBkYnVzLWxhdW5jaC5jOjQxNDog
+ZXJyb3I6IGltcG9zc2libGUgY29uc3RyYWludCBpbiBgYXNtJwo+IGRidXMtbGF1bmNoLmM6NDQ1
+OiBlcnJvcjogaW1wb3NzaWJsZSBjb25zdHJhaW50IGluIGBhc20nCj4gZGJ1cy1sYXVuY2guYzo0
+NDQ6IGVycm9yOiBpbXBvc3NpYmxlIGNvbnN0cmFpbnQgaW4gYGFzbScKPiBkYnVzLWxhdW5jaC5j
+OjQ1MTogZXJyb3I6IGltcG9zc2libGUgY29uc3RyYWludCBpbiBgYXNtJwo+IGRidXMtbGF1bmNo
+LmM6NDc1OiBlcnJvcjogaW1wb3NzaWJsZSBjb25zdHJhaW50IGluIGBhc20nCj4gCj4gQW55d2F5
+IHRoaXMgaXMgbm90IHlvdXIgcHJvYmxlbSwgYnV0IGFueSBoZWxwIGlzIHdlbGNvbWUuCj4gTWF5
+YmVlIG15IGhlYWRlciBmaWxlcyBhcmUgdG9vIG9sZCBzaW5jZSBpbSB1c2luZyBhcyBjcm9zcyBj
+b21waWxlciBhcm0tbGludXgtZ2NjIDMuMy4zLgoKbWFpbCBpdCB0byB0aGUgRC1CdXMgbWFpbGlu
+ZyBsaXN0LiBUaGV5IHNob3VsZCBrbm93IGhvdyB0byBmaXggdGhpcy4gSWYKeW91IGRvbid0IGdl
+dCBhIHJlc3BvbnNlIHdpdGhpbiBhIHdlZWssIG1haWwgdGhlbSBhZ2Fpbi4gU29tZXRpbWVzIHRo
+ZXNlCmd1eXMgYXJlIHRvbyBidXN5IHRvIGFuc3dlciByaWdodCBhd2F5LgoKPiBNYXliZWUgSSBj
+YW4gY29tcGlsZSBhbiBvbGRlciB2ZXJzaW9uIG9mIGRidXMuCj4gSG93ZXZlciwgd2hpY2ggZGJ1
+cyB2ZXJzaW9uIG5lZWRzIGJsdWV6LXV0aWxzIGF0IGxlYXN0PwoKV2UgcmVxdWlyZSBhdCBsZWFz
+dCAxLjAueCwgYnV0IDEuMi54IHdvdWxkIGJlIGJldHRlci4KClJlZ2FyZHMKCk1hcmNlbAoKCgot
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogTWljcm9z
+b2Z0IApEZWZ5IGFsbCBjaGFsbGVuZ2VzLiBNaWNyb3NvZnQoUikgVmlzdWFsIFN0dWRpbyAyMDA4
+LiAKaHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBtcnQvZGlyZWN0LzAx
+LwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei11
+c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBz
+Oi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
