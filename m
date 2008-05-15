@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <482C07CF.3070505@powercraft.nl>
-Date: Thu, 15 May 2008 11:52:15 +0200
-From: Jelle de Jong <jelledejong@powercraft.nl>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <20080514112424.56650@gmx.net>
-	<1210844175.7025.29.camel@violet.holtmann.net>
-In-Reply-To: <1210844175.7025.29.camel@violet.holtmann.net>
-Subject: [Bluez-users] i would like to donate a bunch of non working
-	bluetooth hardware
+In-Reply-To: <20080514002659.23ad9039@vivalunalitshi.luna.local>
+References: <20080514002659.23ad9039@vivalunalitshi.luna.local>
+Date: Thu, 15 May 2008 11:51:14 +0200
+Message-Id: <1210845074.7025.46.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Connecting to a bluetooth device as a serial port
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,21 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello everybody,
+Hi Micha,
 
-I have been trying to get a good bluetooth experience with stereo audio, 
-  voice device, pointer devices. I got two non 100% working devices, and 
-i would like to donate them to a developer that has the skills and time 
-to improve bluez with better support. If a developer can sent his 
-postage address to my email. I will send a package to you.
+> I have a legos mindstorms nxt brick that I want to control from matlab. As far
+> as I can tell matlab doesn't know bluetooth but it can work with serial ports.
+> How do I setup the bluetooth connection as a serial port so that I can connect
+> to it using matlab to send/receive data?
 
-The devices are a voice headset, and a stereo headset. and if you also 
-have experience with xorg evdev a presentation pointer keyboard devices 
-that has no driver.
+look into the RFCOMM support of BlueZ.
 
-Kind regards,
+Regards
 
-Jelle de Jong
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft 
