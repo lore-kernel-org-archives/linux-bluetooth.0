@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20080515145933.161540@gmx.net>
+Date: Thu, 15 May 2008 16:59:33 +0200
+From: mulata@gmx.de
+In-Reply-To: <1210844175.7025.29.camel@violet.holtmann.net>
+Message-ID: <20080515145933.161540@gmx.net>
+MIME-Version: 1.0
 References: <20080514112424.56650@gmx.net>
 	<1210844175.7025.29.camel@violet.holtmann.net>
-	<20080515145933.161540@gmx.net>
-Date: Thu, 15 May 2008 17:02:11 +0200
-Message-Id: <1210863731.7025.53.camel@violet.holtmann.net>
-Mime-Version: 1.0
+To: BlueZ users <bluez-users@lists.sourceforge.net>
 Subject: Re: [Bluez-users] Using bluez-utils from another application
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -18,45 +17,148 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGkgSm9oYW5uZXMsCgo+IHRoYW5rcyBmb3IgeW91ciBoaW50Lgo+IAo+IEkndmUgdHJpZWQgdG8g
-Y29tcGlsZSBzb21lIG9mIHRoZSByZWNlbnQgVmVyc2lvbnMgb2YgZGJ1cyBhZ2Fpbi4gQnV0IGl0
-IGFsd2F5cyBmYWlscyB3aXRoOgo+IAo+IGlmIGFybS1saW51eC1nY2MgLURIQVZFX0NPTkZJR19I
-IC1JLiAtSS4gLUkuLiAtSS4uICAtSS91c3IvaW5jbHVkZSAtRERCVVNfTE9DQUxFRElSPVwiL29w
-dC9kZXZlbC90b29sY2hhaW5zL2FybTkvYXJtLWxpbnV4L3NoYXJlL2xvY2FsZVwiIC1EREJVU19D
-T01QSUxBVElPTiAtRERCVVNfREFFTU9ORElSPVwiL29wdC9kZXZlbC90b29sY2hhaW5zL2FybTkv
-YXJtLWxpbnV4L2JpblwiIC1EREJVU19NQUNISU5FX1VVSURfRklMRT1cIiIvb3B0L2RldmVsL3Rv
-b2xjaGFpbnMvYXJtOS9hcm0tbGludXgvdmFyL2xpYi9kYnVzL21hY2hpbmUtaWQiXCIgICAgLWcg
-LU8yIC1XYWxsIC1XY2hhci1zdWJzY3JpcHRzIC1XbWlzc2luZy1kZWNsYXJhdGlvbnMgLVdtaXNz
-aW5nLXByb3RvdHlwZXMgLVduZXN0ZWQtZXh0ZXJucyAtV3BvaW50ZXItYXJpdGggLVdjYXN0LWFs
-aWduIC1XZmxvYXQtZXF1YWwgLVdzaWduLWNvbXBhcmUgLWZuby1jb21tb24gLWZQSUMgLU1UIGRi
-dXMtbGF1bmNoLm8gLU1EIC1NUCAtTUYgIi5kZXBzL2RidXMtbGF1bmNoLlRwbyIgLWMgLW8gZGJ1
-cy1sYXVuY2gubyBkYnVzLWxhdW5jaC5jOyBcCj4gICAgICAgICB0aGVuIG12IC1mICIuZGVwcy9k
-YnVzLWxhdW5jaC5UcG8iICIuZGVwcy9kYnVzLWxhdW5jaC5QbyI7IGVsc2Ugcm0gLWYgIi5kZXBz
-L2RidXMtbGF1bmNoLlRwbyI7IGV4aXQgMTsgZmkKPiBkYnVzLWxhdW5jaC5jOiBJbiBGdW5rdGlv
-biDCu2tpbGxfYnVzX3doZW5fc2Vzc2lvbl9lbmRzwqs6Cj4gZGJ1cy1sYXVuY2guYzo0MTM6IGVy
-cm9yOiBpbXBvc3NpYmxlIGNvbnN0cmFpbnQgaW4gYGFzbScKPiBkYnVzLWxhdW5jaC5jOjQxNDog
-ZXJyb3I6IGltcG9zc2libGUgY29uc3RyYWludCBpbiBgYXNtJwo+IGRidXMtbGF1bmNoLmM6NDQ1
-OiBlcnJvcjogaW1wb3NzaWJsZSBjb25zdHJhaW50IGluIGBhc20nCj4gZGJ1cy1sYXVuY2guYzo0
-NDQ6IGVycm9yOiBpbXBvc3NpYmxlIGNvbnN0cmFpbnQgaW4gYGFzbScKPiBkYnVzLWxhdW5jaC5j
-OjQ1MTogZXJyb3I6IGltcG9zc2libGUgY29uc3RyYWludCBpbiBgYXNtJwo+IGRidXMtbGF1bmNo
-LmM6NDc1OiBlcnJvcjogaW1wb3NzaWJsZSBjb25zdHJhaW50IGluIGBhc20nCj4gCj4gQW55d2F5
-IHRoaXMgaXMgbm90IHlvdXIgcHJvYmxlbSwgYnV0IGFueSBoZWxwIGlzIHdlbGNvbWUuCj4gTWF5
-YmVlIG15IGhlYWRlciBmaWxlcyBhcmUgdG9vIG9sZCBzaW5jZSBpbSB1c2luZyBhcyBjcm9zcyBj
-b21waWxlciBhcm0tbGludXgtZ2NjIDMuMy4zLgoKbWFpbCBpdCB0byB0aGUgRC1CdXMgbWFpbGlu
-ZyBsaXN0LiBUaGV5IHNob3VsZCBrbm93IGhvdyB0byBmaXggdGhpcy4gSWYKeW91IGRvbid0IGdl
-dCBhIHJlc3BvbnNlIHdpdGhpbiBhIHdlZWssIG1haWwgdGhlbSBhZ2Fpbi4gU29tZXRpbWVzIHRo
-ZXNlCmd1eXMgYXJlIHRvbyBidXN5IHRvIGFuc3dlciByaWdodCBhd2F5LgoKPiBNYXliZWUgSSBj
-YW4gY29tcGlsZSBhbiBvbGRlciB2ZXJzaW9uIG9mIGRidXMuCj4gSG93ZXZlciwgd2hpY2ggZGJ1
-cyB2ZXJzaW9uIG5lZWRzIGJsdWV6LXV0aWxzIGF0IGxlYXN0PwoKV2UgcmVxdWlyZSBhdCBsZWFz
-dCAxLjAueCwgYnV0IDEuMi54IHdvdWxkIGJlIGJldHRlci4KClJlZ2FyZHMKCk1hcmNlbAoKCgot
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tClRoaXMgU0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogTWljcm9z
-b2Z0IApEZWZ5IGFsbCBjaGFsbGVuZ2VzLiBNaWNyb3NvZnQoUikgVmlzdWFsIFN0dWRpbyAyMDA4
-LiAKaHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBtcnQvZGlyZWN0LzAx
-LwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei11
-c2VycyBtYWlsaW5nIGxpc3QKQmx1ZXotdXNlcnNAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBz
-Oi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LXVzZXJzCg==
+Hi Marcel,
+
+thanks for your hint.
+
+I've tried to compile some of the recent Versions of dbus again. But it alw=
+ays fails with:
+
+if arm-linux-gcc -DHAVE_CONFIG_H -I. -I. -I.. -I..  -I/usr/include -DDBUS_L=
+OCALEDIR=3D\"/opt/devel/toolchains/arm9/arm-linux/share/locale\" -DDBUS_COM=
+PILATION -DDBUS_DAEMONDIR=3D\"/opt/devel/toolchains/arm9/arm-linux/bin\" -D=
+DBUS_MACHINE_UUID_FILE=3D\""/opt/devel/toolchains/arm9/arm-linux/var/lib/db=
+us/machine-id"\"    -g -O2 -Wall -Wchar-subscripts -Wmissing-declarations -=
+Wmissing-prototypes -Wnested-externs -Wpointer-arith -Wcast-align -Wfloat-e=
+qual -Wsign-compare -fno-common -fPIC -MT dbus-launch.o -MD -MP -MF ".deps/=
+dbus-launch.Tpo" -c -o dbus-launch.o dbus-launch.c; \
+        then mv -f ".deps/dbus-launch.Tpo" ".deps/dbus-launch.Po"; else rm =
+-f ".deps/dbus-launch.Tpo"; exit 1; fi
+dbus-launch.c: In Funktion =BBkill_bus_when_session_ends=AB:
+dbus-launch.c:413: error: impossible constraint in `asm'
+dbus-launch.c:414: error: impossible constraint in `asm'
+dbus-launch.c:445: error: impossible constraint in `asm'
+dbus-launch.c:444: error: impossible constraint in `asm'
+dbus-launch.c:451: error: impossible constraint in `asm'
+dbus-launch.c:475: error: impossible constraint in `asm'
+
+Anyway this is not your problem, but any help is welcome.
+Maybee my header files are too old since im using as cross compiler arm-lin=
+ux-gcc 3.3.3.
+
+Maybee I can compile an older version of dbus.
+However, which dbus version needs bluez-utils at least?
+
+Thanks
+Johannes
+
+
+-------- Original-Nachricht --------
+> Datum: Thu, 15 May 2008 11:36:15 +0200
+> Von: Marcel Holtmann <marcel@holtmann.org>
+> An: BlueZ users <bluez-users@lists.sourceforge.net>
+> Betreff: Re: [Bluez-users] Using bluez-utils from another application
+
+> Hi Johannes,
+> =
+
+> > Just installed bluez-libs-2.25 and bluez-utils-2.25.
+> > I know there are more recent versions avaiable but since Im developping
+> for an Embedded Linux System based on ARM9 my resources are very limited
+> and I was not able to compile "libdbus" which is necessary for the recent
+> version of bluez.However... the installed versions are working fine. =
+
+> =
+
+> your version is ancient. I have the release date as January 2006 and
+> this means it is over two years old. That is a full lifetime in the
+> Linux world.
+> =
+
+> I am simply not buying the D-Bus cross-compilation issue. Sorry, but it
+> is not that hard.
+> =
+
+> > By the way Im using a 2.2.21 Kernel, but the bluetooth related stuff is
+> patched to 2.2.26.
+> =
+
+> We never had a 2.2.21 kernel with Bluetooth support.
+> =
+
+> > My goal is to use functionalities provided by hciconfig and hcitool in
+> another C Program. Finally this features (e.g. Listing active local
+> bluetooth devices, do a scan for remote devices, ask for available servic=
+es) will
+> be visualized graphically in this C programm.
+> =
+
+> You are going to duplicate all the work that has been done for now
+> reason. Spending the time to cross-compile D-Bus would be better
+> invested.
+> =
+
+> > So there are basically tow ways:
+> > - System Calls like system("hciconfig") (which is not very handy and
+> beautiful)
+> > - Using the Library
+> =
+
+> Again, cross-compile D-Bus and use our D-Bus based API. It is more
+> elegant than any low-level stuff will ever be.
+> =
+
+> > Concerning the second point (using Library) I did some research in
+> hciconfig.c.
+> > I expected that there a some higher-level functions that I can call from
+> another C programm by including the necessary header files.
+> > But it seems there must be also done some low-level stuff, like opening
+> a HCI socket.
+> =
+
+> Yes. You always have to open a HCI raw socket to do raw packet
+> manipulation.
+> =
+
+> Regards
+> =
+
+> Marcel
+> =
+
+> =
+
+> =
+
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft =
+
+> Defy all challenges. Microsoft(R) Visual Studio 2008. =
+
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+-- =
+
+Martin Kupf
+
+249 Spiele f=FCr nur 1 Preis. Die GMX Spieleflatrate schon ab 9,90 Euro.
+Neu: Asterix bei den Olympischen Spielen: http://flat.games.gmx.de
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft =
+
+Defy all challenges. Microsoft(R) Visual Studio 2008. =
+
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
