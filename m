@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 15 May 2008 07:43:23 -0700
-Message-ID: <F60A3CE9E807BE49B5F56BD80B894D20016883BD@sc-exch03.marvell.com>
-References: <F60A3CE9E807BE49B5F56BD80B894D20016883B3@sc-exch03.marvell.com>
-	<1210844689.7025.40.camel@violet.holtmann.net>
-From: "Angus Ainslie" <aainslie@marvell.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Alsa and asoundrc
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <482C1DEE.8000405@earthlink.net>
+References: <482AB4AD.50803@earthlink.net>
+	<1210844479.7025.35.camel@violet.holtmann.net>
+	<482C1DEE.8000405@earthlink.net>
+Date: Thu, 15 May 2008 15:37:34 +0200
+Message-Id: <1210858654.7025.48.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Anycom USB-250 unseen by hcitool
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,51 +22,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-> -----Original Message-----
-> From: bluez-users-bounces@lists.sourceforge.net 
-> [mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf 
-> Of Marcel Holtmann
-> Sent: Thursday, May 15, 2008 3:45 AM
-> To: BlueZ users
-> Subject: Re: [Bluez-users] Alsa and asoundrc
+Hi Mumia,
+
+> >> Hello. I recently bought an Anycom USB-250 Bluetooth 
+> >> adapter, and I'm trying to get it to work with my Palm 
+> >> Tungsten E2 so that I can get online on the E2.
+> >>
+> >> However, I can't get it to work. When I run "hcitool scan", 
+> >> I get this error message: "Device is not available: No such 
+> >> device."
+> > 
+> > check with hciconfig -a and make sure that either the hci_usb or btusb 
+> > driver is loaded.
+> > 
+> > Regards
+> > 
+> > Marcel
+> > 
 > 
-> Hi Angus,
->
-> not that I remember. Show your .asoundrc and post the output 
-> from calling hcid -n -d. It might indicate what is going wrong.
+> Thanks Marcel; "hciconfig -a" returns nothing:
 > 
-> Regards
+> $ hciconfig -a
+> $
 > 
-> Marcel
+> After I manually load hci_usb, "hciconfig -a" returns this:
 > 
+> $ hciconfig -a
+> hci0:   Type: USB
+>          BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
+>          DOWN
+>          RX bytes:0 acl:0 sco:0 events:0 errors:0
+>          TX bytes:0 acl:0 sco:0 commands:0 errors:0
+> 
+> However, I don't have the btusb module, and I can't see any way to build 
+> it from "make menuconfig." When I configured my kernel before, I enabled 
+> /everything/ related to bluetooth. :-?
+> 
+> Hmm, "hcitool" still doesn't see my bluetooth dongle:
 
-Hi Marcel,
+hciconfig hci0 up :)
 
-I don't think it was the .asoundrc but I included it at the end anyway.
+Regards
 
-The 2 problems I found were 
-
-1) it wasn't finding libasound_module_pcm_bluetooth.so until I added
-/usr/lib/alsa-lib to my LD_LIBRARY_PATH
-
-2) Because the library wasn't found at boot the sound service needed to
-be restarted.
-
-Angus
+Marcel
 
 
-asoundrc:
-
-pcm.!default {
-    type bluetooth
-    device 00:07:A4:F1:AE:13
-    profile "hifi"
-}
-pcm.headphones {
-    type bluetooth
-    device 00:07:A4:F1:AE:13
-    profile "hifi"
-}
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft 
