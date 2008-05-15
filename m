@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <F60A3CE9E807BE49B5F56BD80B894D20016883B3@sc-exch03.marvell.com>
-References: <F60A3CE9E807BE49B5F56BD80B894D20016883B3@sc-exch03.marvell.com>
-Date: Thu, 15 May 2008 11:44:49 +0200
-Message-Id: <1210844689.7025.40.camel@violet.holtmann.net>
+In-Reply-To: <200805141058.13430.petr.palacky@coduco.com>
+References: <200805141058.13430.petr.palacky@coduco.com>
+Date: Thu, 15 May 2008 11:43:45 +0200
+Message-Id: <1210844625.7025.38.camel@violet.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Alsa and asoundrc
+Subject: Re: [Bluez-users] Bluez and more than two USB dongles in one HUB
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,15 +20,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Angus,
+Hi Petr,
 
-> I had alsa and .asoundrc working under 3.24 . Now under bluez 3.31 the
-> device can't be found. 
+> I have problem with using more than two USB dongles in one USB port using 4
+> (and more)-port USB-HUB (with or without power supply)...
 > 
-> Is there a configuration change for alsa ? A new audio.conf option ?
+> I have many USB dongles for testing purposes, the same with USB HUBs.
+> If I connect two dongles into HUB everything works well, but if I want to 
+> attach third (and more) they will not be activated via bluez stack...
 
-not that I remember. Show your .asoundrc and post the output from
-calling hcid -n -d. It might indicate what is going wrong.
+try to load the hci_usb driver with the isoc=0 option or use the btusb
+driver instead. If that doesn't help, mailing the USB guys, because this
+is more an USB problem then a Bluetooth issue.
 
 Regards
 
