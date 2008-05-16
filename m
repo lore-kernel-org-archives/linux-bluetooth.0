@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Wang Baisheng <baisheng.wang.cn@gmail.com>
+Date: Fri, 16 May 2008 10:50:24 +0100
+From: martin f krafft <madduck@madduck.net>
 To: bluez-devel@lists.sourceforge.net
-Date: Fri, 16 May 2008 20:25:43 -0400
+Message-ID: <20080516095024.GA15889@lapse.madduck.net>
+References: <20080411073254.GB23249@lapse.madduck.net>
 MIME-Version: 1.0
-Message-Id: <200805162025.43120.baisheng.wang.cn@gmail.com>
-Subject: [Bluez-devel] sound quality is very slow when using helix player.
+In-Reply-To: <20080411073254.GB23249@lapse.madduck.net>
+Subject: [Bluez-devel] SCO flow control patch for 2.6.25 (was: SCO patch
+	works on	(Debian) 2.6.24)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,29 +17,79 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0605941502=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
-Hi, All
+--===============0605941502==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Nq2Wo0NMKNjxTN9z"
+Content-Disposition: inline
 
-	I've found sound quality is very low using helix player through bluez audio 
-service.
-	My kernel is 2.6.22 and bluez is 3.31.
 
-	Any idea ?
+--Nq2Wo0NMKNjxTN9z
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-	Thanks.
+also sprach martin f krafft <madduck@madduck.net> [2008.04.11.0832 +0100]:
+> I have just compiled a Debian 2.6.24 with the v4.4 patch: it applied
+> and compiled cleanly.
+>=20
+> And it works most of the time with my BT500v headset (sco)! Thank
+> you for that.
 
-BRs, 
-Baisheng
+It's been about 5 weeks without any real trouble and certainly no
+kernel crash! Great work!
+
+Will there be a patch for 2.6.25? I tried to port it, but it seems
+non-trivial... so I better leave it to those with a clue.
+
+--=20
+martin | http://madduck.net/ | http://two.sentenc.es/
+=20
+"the duration of passion is proportionate
+ with the original resistance of the woman."
+                                                   -- honor=E9 de balzac
+=20
+spamtraps: madduck.bogus@madduck.net
+
+--Nq2Wo0NMKNjxTN9z
+Content-Type: application/pgp-signature; name="digital_signature_gpg.asc"
+Content-Description: Digital signature (see http://martin-krafft.net/gpg/)
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFILVjgIgvIgzMMSnURAijZAJ4hLn2gl3/zsJqZkRDiQPqmCGzLhgCeLmzK
+OAtETqgtwpg96Dyl7qDbIjA=
+=zK3J
+-----END PGP SIGNATURE-----
+
+--Nq2Wo0NMKNjxTN9z--
+
+
+--===============0605941502==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft 
 Defy all challenges. Microsoft(R) Visual Studio 2008. 
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============0605941502==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0605941502==--
