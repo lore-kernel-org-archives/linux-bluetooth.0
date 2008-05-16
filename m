@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 May 2008 16:08:01 -0700 (PDT)
-From: Michael Oh <michaeloh1@yahoo.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-Message-ID: <884634.96017.qm@web81308.mail.mud.yahoo.com>
-Subject: Re: [Bluez-users] Losing SCO connection
+In-Reply-To: <3e9cdced0805160215k26da6656x36a6005400c55c50@mail.gmail.com>
+References: <3e9cdced0805160215k26da6656x36a6005400c55c50@mail.gmail.com>
+Date: Fri, 16 May 2008 11:31:07 +0200
+Message-Id: <1210930267.7025.79.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] arm cross-compile problem with sockios.h
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,60 +16,72 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-It seems like some phones just don't like having a SCO connection up when v=
-oice call is not in progress.=A0 So instead of actively trying to connect t=
-o the phone, I just let the phone connect to my SCO listener socket as need=
-ed and I don't have the disconnect problem anymore.=A0 i.e. I just had to r=
-everse the server/client direction in my app.
-There's one remaining problem though.=A0 Occasionally, I hear garbage voice=
- on the receive side of SCO.=A0 hcidump shows maybe the 16-bit samples are =
-in wrong endianness.=A0 This stays like that until the SCO is closed and re=
-established.=A0 Anyone seen this problem?=A0=A0 I will try out a CSR dongle=
- also.
-Thanks,
-Michael
+Hi Fritz,
 
------ Original Message ----
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Sent: Thursday, May 15, 2008 2:50:32 AM
-Subject: Re: [Bluez-users] Losing SCO connection
+> I try to cross compile blueu-utils 3-31 with my linux-arm-gcc
+> crosscompiler.
+> 
+> the build-process fails at the following position:
+> 
+> bin/sh ../libtool --tag=CC   --mode=compile arm-linux-gcc
+> -DHAVE_CONFIG_H -I. -I.. -I../common -I../hcid -I../sdpd
+> -I/opt/devel/toolchains/arm9/arm-linux/include/dbus-1.0
+> -I/opt/devel/toolchains/arm9/arm-linux/lib/dbus-1.0/include -I../eglib
+> -Wall -O2 -D_FORTIFY_SOURCE=2 -MT bridge.lo -MD -MP
+> -MF .deps/bridge.Tpo -c -o bridge.lo bridge.c
+>  arm-linux-gcc -DHAVE_CONFIG_H -I. -I.. -I../common -I../hcid
+> -I../sdpd -I/opt/devel/toolchains/arm9/arm-linux/include/dbus-1.0
+> -I/opt/devel/toolchains/arm9/arm-linux/lib/dbus-1.0/include -I../eglib
+> -Wall -O2 -D_FORTIFY_SOURCE=2 -MT bridge.lo -MD -MP
+> -MF .deps/bridge.Tpo -c bridge.c  -fPIC -DPIC -o .libs/bridge.o
+> bridge.c: In function `bridge_create':
+> bridge.c:82: error: `SIOCBRADDBR' undeclared (first use in this
+> function)
+> bridge.c:82: error: (Each undeclared identifier is reported only once
+> bridge.c:82: error: for each function it appears in.)
+> bridge.c: In function `bridge_remove':
+> bridge.c:98: error: `SIOCBRDELBR' undeclared (first use in this
+> function)
+> bridge.c: In function `bridge_add_interface':
+> bridge.c:121: error: `SIOCBRADDIF' undeclared (first use in this
+> function)
+> make[2]: *** [bridge.lo] Fehler 1
+> 
+> Taking a look at my arm toolchain folder in the header
+> include/linux/sockios.h the defines are missing.
+> 
+> Taking a look at my local build system (i386)
+> in /usr/include/linux/sockios.h the defines are there.
+> 
+> But both headers are the same version @(#)sockios.h   1.0.2
+> 03/09/93.
+> 
+> If i add the necessary defines to the header of my cross-compiler the
+> described error doesn't occur anymore, but
+> I run into the following:
+> 
+> bin/sh ../libtool --tag=CC   --mode=compile arm-linux-gcc
+> -DHAVE_CONFIG_H -I. -I.. -I../common -I../hcid
+> -I/opt/devel/toolchains/arm9/arm-linux/include/dbus-1.0
+> -I/opt/devel/toolchains/arm9/arm-linux/lib/dbus-1.0/include -I../eglib
+> -Wall -O2 -D_FORTIFY_SOURCE=2 -MT device.lo -MD -MP
+> -MF .deps/device.Tpo -c -o device.lo device.c
+>  arm-linux-gcc -DHAVE_CONFIG_H -I. -I.. -I../common -I../hcid
+> -I/opt/devel/toolchains/arm9/arm-linux/include/dbus-1.0
+> -I/opt/devel/toolchains/arm9/arm-linux/lib/dbus-1.0/include -I../eglib
+> -Wall -O2 -D_FORTIFY_SOURCE=2 -MT device.lo -MD -MP
+> -MF .deps/device.Tpo -c device.c  -fPIC -DPIC -o .libs/device.o
+> device.c: In function `hidp_connadd':
+> device.c:531: error: `ENOKEY' undeclared (first use in this function)
+> device.c:531: error: (Each undeclared identifier is reported only once
+> device.c:531: error: for each function it appears in.)
+> make[2]: *** [device.lo] Fehler 1
 
-Hi Michael,
-
-> I wrote a little app that tries to support the hands-free (HF) profile bu=
-t I am having trouble keeping the SCO connection alive.=A0 Using an RFCOMM =
-connection, I am able to establish the HF Service Level Connection per HF P=
-rofile specification and then create an SCO connection to a mobile phone.=
-=A0 But SCO seems to get disconnected by the phone after about 40-50msec of=
- bidirectional voice data.=A0 I can reconnect SCO but the phone disconnects=
- it again.=A0 Once in a while, this problem doesn't occur and SCO stays ali=
-ve.=A0 When this happens, I can tear down and bring up the HF setup repeate=
-dly without any problem unless I power cycle the phone or the linux machine=
-.=A0 I would like to make it work on consistent basis.
-> Please note that I am using the bluez lib only. I am not relying on the "=
-services" utilities in the bluez-util package (I turned them all off).=A0 A=
-lso, my SDP setup code seems to operate okay (i.e. output of "sdptool brows=
-e local" looks fine)
-> Setup:
->=A0 =A0 - Fedora 8 with
->=A0 =A0 =A0 =A0 kernel 2.6.24.4
->=A0 =A0 =A0 =A0 bluez-lib 3.20
->=A0 =A0 =A0 =A0 L2CAP v2.9
->=A0 =A0 =A0 =A0 RFCOMM v1.8
->=A0 =A0 =A0 =A0 SCO v0.5
->=A0 =A0 - Bluetooth dongle: Targus with Broadcom 2045=A0 =A0 - phone: Noki=
-a 6085
-> I have tried another phone and another BT dongle and the problem is still=
- there so I am leaning it's either my code or bluez...
-
-did you try a CSR based dongle? It looks like the remote side is
-disconnecting. Maybe it has something to do with your HFP control
-channel handling. Can't really tell.
+replace it with EACCES. I changed the CVS to do them same already.
 
 Regards
 
@@ -76,26 +90,8 @@ Marcel
 
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft =
-
-Defy all challenges. Microsoft(R) Visual Studio 2008. =
-
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
-
-
-      =
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft =
-
-Defy all challenges. Microsoft(R) Visual Studio 2008. =
-
+This SF.net email is sponsored by: Microsoft 
+Defy all challenges. Microsoft(R) Visual Studio 2008. 
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
 _______________________________________________
 Bluez-users mailing list
