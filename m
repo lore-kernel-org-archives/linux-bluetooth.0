@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <75FB41F6-49E1-4CEE-8A7F-87DCF21645F5@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3e9cdced0805170741i202cfe62kef18ca9a0c2e30c@mail.gmail.com>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Sat, 17 May 2008 16:47:02 +0200
-References: <3e9cdced0805170741i202cfe62kef18ca9a0c2e30c@mail.gmail.com>
-Subject: Re: [Bluez-users] using bluez dbus interface exposed from hcid with
+Message-ID: <3e9cdced0805170741i202cfe62kef18ca9a0c2e30c@mail.gmail.com>
+Date: Sat, 17 May 2008 16:41:02 +0200
+From: "Fritz Code" <codefritz@googlemail.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-users] using bluez dbus interface exposed from hcid with
 	plain c code
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -17,60 +15,92 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0048900222=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Fritz,
+--===============0048900222==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_3270_14366084.1211035262394"
 
-> since I don't have resources for Glib or another abstraction layer  
-> on my Embedded Linux I can only use plain C for communication with  
-> bluez through dbus.
-> But so far I've only find howto's with GLib or Qt etc.
-> Are there any documents that describe my case (plain c  
-> communication) ?
->
-> For general understanding of the bluez architecture and tools, a  
-> statement and a question:
->
-> hcid is the daemon which exposes different Interfaces through dbus,  
-> e.g. the Interface "Adapter".
-> Another Application can access bluez functionalities through dbus by  
-> using the Interfaces exposed from hcid. (hopefully also by using  
-> plain C).
->
-> E.g.: You want to develop an application "example-app" which should  
-> list available local buetooth devices, remote devices and its  
-> services.
-> In this case it is enough to start hcid and use its Interface  
-> "Adapter" from "example-app" ?
->
-> The other tools like, hcitool, hciconfig etc. are not necessary,  
-> they are own applications, right.
-> In order to use bluez features from another application (through  
-> dbus) the only tool/util needed is hcid?
-> And this is configured by hcid.conf?
+------=_Part_3270_14366084.1211035262394
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-if you use bluez-utils-3.31 or any later release, the only thing you  
-need is hcid. It will do everything for you. The only exception is if  
-your adapter is connected via an UART and using hci_uart driver, then  
-you also need hciattach, but that is it.
+Hi,
 
-And of course you can write a client application using D-Bus low-level  
-(libdbus) only. It is a little bit more work than using high level  
-languages, but it is possible. I still have plans to provide a D-Bus  
-only replacement for hciconfig, hcitool etc.
+since I don't have resources for Glib or another abstraction layer on my
+Embedded Linux I can only use plain C for communication with bluez through
+dbus.
+But so far I've only find howto's with GLib or Qt etc.
+Are there any documents that describe my case (plain c communication) ?
 
-Regards
+For general understanding of the bluez architecture and tools, a statement
+and a question:
 
-Marcel
+hcid is the daemon which exposes different Interfaces through dbus, e.g. the
+Interface "Adapter".
+Another Application can access bluez functionalities through dbus by using
+the Interfaces exposed from hcid. (hopefully also by using plain C).
 
+E.g.: You want to develop an application "example-app" which should list
+available local buetooth devices, remote devices and its services.
+In this case it is enough to start hcid and use its Interface "Adapter" from
+"example-app" ?
+
+The other tools like, hcitool, hciconfig etc. are not necessary, they are
+own applications, right.
+In order to use bluez features from another application (through dbus) the
+only tool/util needed is hcid?
+And this is configured by hcid.conf?
+
+
+
+Thanks...
+
+
+
+
+
+-- 
+Regards,
+--Codefritz
+
+------=_Part_3270_14366084.1211035262394
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi,<br><br>since I don&#39;t have resources for Glib or another abstraction layer on my Embedded Linux I can only use plain C for communication with bluez through dbus.<br>But so far I&#39;ve only find howto&#39;s with GLib or Qt etc. <br>
+Are there any documents that describe my case (plain c communication) ?<br><br>For general understanding of the bluez architecture and tools, a statement and a question:<br><br>hcid is the daemon which exposes different Interfaces through dbus, e.g. the Interface &quot;Adapter&quot;.<br>
+Another Application can access bluez functionalities through dbus by using the Interfaces exposed from hcid. (hopefully also by using plain C).<br><br>E.g.: You want to develop an application &quot;example-app&quot; which should list available local buetooth devices, remote devices and its services.<br>
+In this case it is enough to start hcid and use its Interface &quot;Adapter&quot; from &quot;example-app&quot; ?<br><br>The other tools like, hcitool, hciconfig etc. are not necessary, they are own applications, right.<br>
+In order to use bluez features from another application (through dbus) the only tool/util needed is hcid?<br>And this is configured by hcid.conf?<br><br><br><br>Thanks... <br><br><br><br><br clear="all"><br>-- <br>Regards,<br>
+--Codefritz<br><br><br><br>
+
+------=_Part_3270_14366084.1211035262394--
+
+
+--===============0048900222==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft 
 Defy all challenges. Microsoft(R) Visual Studio 2008. 
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============0048900222==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0048900222==--
