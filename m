@@ -1,17 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <B53765C4-04DD-4C57-8697-2F118FE37213@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Sun, 18 May 2008 05:05:50 -0400
+From: jayjwa <jayjwa@atr2.ath.cx>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3e9cdced0805180132n2831ca34x905f45e174e35fbc@mail.gmail.com>
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Sun, 18 May 2008 11:10:18 +0200
-References: <3e9cdced0805170741i202cfe62kef18ca9a0c2e30c@mail.gmail.com>
-	<75FB41F6-49E1-4CEE-8A7F-87DCF21645F5@holtmann.org>
-	<3e9cdced0805171138r278aad56i9d1af3dfea5ca7c0@mail.gmail.com>
-	<CD0EBC4C-69FC-4FAB-940C-28ED6308376A@holtmann.org>
-	<3e9cdced0805180132n2831ca34x905f45e174e35fbc@mail.gmail.com>
-Subject: Re: [Bluez-users] using bluez dbus interface exposed from hcid with
-	plain c code
+In-Reply-To: <482C233C.5060808@powercraft.nl>
+Message-ID: <alpine.LNX.1.00.0805180455510.25212@nge2.ngu.pk>
+References: <482C233C.5060808@powercraft.nl>
+MIME-Version: 1.0
+Subject: Re: [Bluez-users] Nokia BH-801 why??
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -25,22 +20,58 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Fritz,
 
-> well in my doc folder I can only find four txt's which list the  
-> Interfaces and some methods, but since there a types like "string"  
-> used it seems it is not supposed to be used as low level c interface.
-> And I would really appreciate a step-by-step tutorial with some  
-> examples how to use low-level C interface of bluez with dbus.
 
-what has strings to do with not using low-level API. Please start with  
-a D-Bus beginners tutorial since I can't really guide you through this  
-one. There is enough example code within the bluez-utils source and on  
-the web that will get you started.
+On Thu, 15 May 2008, Jelle de Jong wrote:
 
-Regards
+-> So got an other new headset with the hope it would work...
+-> 
+-> The nokia website sad it was bluetooth 2.0 instead of the 1.0 headset i first
+-> tried. But I does not work... Can somebody please enlight me why?
 
-Marcel
+sudo hcitool info 00:53:53:FB:7E:9C
+Requesting information ...
+     BD Address:  00:53:53:FB:7E:9C
+     Device Name: Nokia BH-801
+     LMP Version: 2.0 (0x3) LMP Subversion: 0x212b
+     Manufacturer: Broadcom Corporation (15)
+     Features: 0xbc 0xfe 0x8f 0x7e 0x18 0x18 0x00 0x80
+         <encryption> <slot offset> <timing accuracy> <role switch>
+         <sniff mode> <RSSI> <channel quality> <SCO link> <HV2 packets>
+
+Still looks like a plain SCO                 ^^^^^^^
+
+         <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
+         <power control> <transparent SCO> <broadcast encrypt>
+         <EDR ACL 2 Mbps> <EDR ACL 3 Mbps> <enhanced iscan>
+         <interlaced iscan> <interlaced pscan> <inquiry with RSSI>
+         <AFH cap. slave> <AFH class. slave> <AFH cap. master>
+         <AFH class. master> <extended features>
+
+
+
+May 15 13:39:57 debian-eeepc hcid[8991]: Badly formated or unrecognized 
+command: AT+CCWA=1
+May 15 13:39:57 debian-eeepc hcid[8991]: Badly formated or unrecognized 
+command: AT+COPS=3,0
+May 15 13:39:57 debian-eeepc kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection
+handle 1
+May 15 13:39:57 debian-eeepc last message repeated 2 times
+May 15 13:39:57 debian-eeepc hcid[8991]: Badly formated or unrecognized 
+command: AT+CMEE=1
+May 15 13:39:57 debian-eeepc kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection
+handle 1
+May 15 13:40:28 debian-eeepc last message repeated 10190 times
+
+
+
+The error messages also look like those when eSCO gets sent to a SCO only 
+device. Maybe it's possible for bluetooth 2.0 devices to still be SCO-only? I 
+don't know the qualifications ...
+
+
 
 
 -------------------------------------------------------------------------
