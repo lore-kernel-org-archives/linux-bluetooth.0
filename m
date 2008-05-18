@@ -1,11 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <bf85d3b80805180425g59ec3394r6f7d8f6fd929ad50@mail.gmail.com>
-Date: Sun, 18 May 2008 13:25:06 +0200
-From: "Lukasz Wierzbicki" <lukasz.wierzbicki@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <482FF471.6070708@powercraft.nl>
+Date: Sun, 18 May 2008 11:18:41 +0200
+From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
-Subject: [Bluez-users] error in the article about PAN connection with
-	bluetooth device?
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <482C233C.5060808@powercraft.nl>
+	<alpine.LNX.1.00.0805180455510.25212@nge2.ngu.pk>
+In-Reply-To: <alpine.LNX.1.00.0805180455510.25212@nge2.ngu.pk>
+Subject: Re: [Bluez-users] Nokia BH-801 why??
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,27 +17,73 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGksCgpJJ3ZlIGp1c3QgcmVhZCBhcnRpY2xlIC0gaHR0cDovL2JsdWV6LnNvdXJjZWZvcmdlLm5l
-dC9jb250cmliL0hPV1RPLVBBTi4KQmVjYXVzZSBJIHdhbnQgdG8gY3JlYXRlIHNvbWUgc21hbGwg
-bmV0d29yayBvbiBibHVldG9vdGggZGV2aWNlIEkgbWFkZQpzb21lIHRlc3RzLiBJIG5vdGljZWQg
-dGhhdCB3aGVuIHdlIGNyZWF0ZWQgYnJpZGdlIHdpdGggYm5lcFggaW50ZXJmYWNlCmFuZCBldGgw
-IGludGVyZmFjZShmb3IgZXhhbXBsZSkgdGhlcmUgYXJlIHNvbWUgcHJvYmxlbXMgd2l0aApjb25u
-ZWN0aW9uICh0aGVyZSBhcmUgcHJvYmxlbSB3aXRoIGNvbm5lY3Rpb24gYmV0d2VlbiBuZXR3b3Jr
-cykuCkZ1dGhlcm1vcmUsIEkgdGhpbmsgd2UgZG9uJ3QgbmVlZCB0aGF0IGJyaWRnZSwgb25seSBi
-cmlkZ2Ugd2UgbmVlZCBpcwp0aGF0ICwgd2hpY2ggZ2F0aGVyIGJuZXBYIGludGVyZmFjZS4KV2hl
-biBJIGRvbid0IGFkZCBldGgwIGludGVyZmFjZSB0byBicmlkZ2UgZXZlcnl0aGluZyB3b3JrIGZp
-bmUuIEkndmUKbWVudGlvbmVkIGFib3V0IEV0aGVybmV0IEJyaWRnaW5nIHNlY3Rpb24gaW4geW91
-ciBhcnRpY2xlLgoKQXQgdGhlIGVuZCwgdGhhbmtzIGZvciBncmVhdCBob3d0byA7KQoKLS0gCsWB
-dWthc3ogV2llcnpiaWNraQpodHRwOi8vd3d3Lmx1a2FzendpZXJ6Ymlja2kueHQucGwKV2Fyc2F3
-IFVuaXZlcnNpdHkgb2YgVGVjaG5vbG9neQpNZW1iZXIgb2YgRVNOIFBXCi0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBNaWNyb3NvZnQgCkRlZnkgYWxs
-IGNoYWxsZW5nZXMuIE1pY3Jvc29mdChSKSBWaXN1YWwgU3R1ZGlvIDIwMDguIApodHRwOi8vY2xr
-LmF0ZG10LmNvbS9NUlQvZ28vdnNlMDEyMDAwMDA3MG1ydC9kaXJlY3QvMDEvCl9fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxpbmcg
-bGlzdApCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3Vy
-Y2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
+jayjwa wrote:
+> 
+> On Thu, 15 May 2008, Jelle de Jong wrote:
+> 
+> -> So got an other new headset with the hope it would work...
+> -> 
+> -> The nokia website sad it was bluetooth 2.0 instead of the 1.0 headset i first
+> -> tried. But I does not work... Can somebody please enlight me why?
+> 
+> sudo hcitool info 00:53:53:FB:7E:9C
+> Requesting information ...
+>      BD Address:  00:53:53:FB:7E:9C
+>      Device Name: Nokia BH-801
+>      LMP Version: 2.0 (0x3) LMP Subversion: 0x212b
+>      Manufacturer: Broadcom Corporation (15)
+>      Features: 0xbc 0xfe 0x8f 0x7e 0x18 0x18 0x00 0x80
+>          <encryption> <slot offset> <timing accuracy> <role switch>
+>          <sniff mode> <RSSI> <channel quality> <SCO link> <HV2 packets>
+> 
+> Still looks like a plain SCO                 ^^^^^^^
+> 
+>          <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
+>          <power control> <transparent SCO> <broadcast encrypt>
+>          <EDR ACL 2 Mbps> <EDR ACL 3 Mbps> <enhanced iscan>
+>          <interlaced iscan> <interlaced pscan> <inquiry with RSSI>
+>          <AFH cap. slave> <AFH class. slave> <AFH cap. master>
+>          <AFH class. master> <extended features>
+> 
+> 
+> 
+> May 15 13:39:57 debian-eeepc hcid[8991]: Badly formated or unrecognized 
+> command: AT+CCWA=1
+> May 15 13:39:57 debian-eeepc hcid[8991]: Badly formated or unrecognized 
+> command: AT+COPS=3,0
+> May 15 13:39:57 debian-eeepc kernel: hci_scodata_packet: hci0 SCO packet for 
+> unknown connection
+> handle 1
+> May 15 13:39:57 debian-eeepc last message repeated 2 times
+> May 15 13:39:57 debian-eeepc hcid[8991]: Badly formated or unrecognized 
+> command: AT+CMEE=1
+> May 15 13:39:57 debian-eeepc kernel: hci_scodata_packet: hci0 SCO packet for 
+> unknown connection
+> handle 1
+> May 15 13:40:28 debian-eeepc last message repeated 10190 times
+> 
+> 
+> 
+> The error messages also look like those when eSCO gets sent to a SCO only 
+> device. Maybe it's possible for bluetooth 2.0 devices to still be SCO-only? I 
+> don't know the qualifications ...
+
+Yes, it seem so but does this feature <EDR ACL 3 Mbps> not indicate that 
+its a 2.0 device?
+
+Thanks in advance,
+
+Jelle
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft 
+Defy all challenges. Microsoft(R) Visual Studio 2008. 
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
