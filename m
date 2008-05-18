@@ -1,13 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48308188.60706@earthlink.net>
-Date: Sun, 18 May 2008 14:20:40 -0500
-From: "Mumia W.." <paduille.4061.mumia.w+nospam@earthlink.net>
+Date: Sun, 18 May 2008 14:36:02 +0100 (BST)
+From: Chris Rankin <rankincj@yahoo.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <482AB4AD.50803@earthlink.net>	<1210844479.7025.35.camel@violet.holtmann.net>	<482C1DEE.8000405@earthlink.net>
-	<1210858654.7025.48.camel@violet.holtmann.net>
-In-Reply-To: <1210858654.7025.48.camel@violet.holtmann.net>
-Subject: Re: [Bluez-users] Anycom USB-250 unseen by hcitool
+Message-ID: <508684.60714.qm@web52902.mail.re2.yahoo.com>
+Cc: rankincj@yahoo.com
+Subject: Re: [Bluez-users] USB dongle cannot pair with A2DP speakers
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,138 +19,56 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 05/15/2008 08:37 AM, Marcel Holtmann wrote:
-> Mumia wrote:
->>
->> Hmm, "hcitool" still doesn't see my bluetooth dongle:
+> I had a pairing & timing problem like this with an at&t tilt. It might
+> work for you to log out of the machine and from the console, run
 > 
-> hciconfig hci0 up :)
+> passkey-agent --default 0000 &
 > 
-> Regards
-> 
-> Marcel
-> 
+> then attempt the connection using command-line tools (like aplay in your case).
 
-Thanks Marcel, but the network connection still doesn't work.
+Hi,
 
-I do this:
-hcid
-sdpd
-dund --nodetach --listen --persist --msdun call palm
+Thanks for the reply. I'm not sure that this is a timing issue, because I did manage to "win" the
+race once or twice, and it still didn't work. However, I tried your suggestion with the
+passkey-agent, and aplay failed with this error:
 
-And then I tell my Palm E2's bluetooth system to search for a network 
-connection, but the E2 never finds anything, and "dund" never displays 
-anything other than "dund[3984]: Bluetooth DUN daemon version 3.7."
+ALSA lib pcm_bluetooth.c:1589:(bluetooth_init) BT_GETCAPABILITIES failed : Input/output error(5)
+aplay: main:546: audio open error: Input/output error
 
-How do I get dund communicating with my PDA?
+This "Input/output error" is the same error I get when I "win" the race to enter the passkey with
+bluez-gnome. Interestingly, my laptop's bluetooth adaptor doesn't suffer from this race - the
+connection with the speakers stays up until I can send the pin code.
 
-Here is a listing of my /etc/bluetooth directory:
-total 12
--rw-r--r-- 1 root root 1272 2008-05-17 07:18 hcid.conf
--rw-r--r-- 1 root root    5 2008-05-17 20:44 pin
--rw-r--r-- 1 root root  396 2008-05-17 07:49 rfcomm.conf
+To be honest, I don't think I've ever managed to use something with the particular Belkin adapter,
+although my only other bluetooth device is a headset. (Is Voice/SCO supposed to work in an
+unpatched 2.6.25.x kernel?) Apparently, I have a v2.0 adapter although it's meant to be backwards
+compatible with v1.2. Both this adapter and my laptop are using Broadcom chips, and here is the
+hciconfig output from my (working) laptop:
 
-I've included below my hcid.conf, pin, and rfcomm.conf. Please help me 
-get my adapter working.
+hci0:   Type: USB
+        BD Address: 00:19:7E:EB:29:5A ACL MTU: 1017:8 SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN 
+        RX bytes:2810088 acl:37 sco:55020 events:84 errors:0
+        TX bytes:1241 acl:34 sco:0 commands:51 errors:0
+        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+        Link policy: RSWITCH HOLD SNIFF PARK 
+        Link mode: SLAVE ACCEPT 
+        Name: 'lantern.modemnet-0'
+        Class: 0x000404
+        Service Classes: Unspecified
+        Device Class: Audio/Video, Device conforms to the Headset profile
+        HCI Ver: 2.0 (0x3) HCI Rev: 0x212b LMP Ver: 2.0 (0x3) LMP Subver: 0x41d3
+        Manufacturer: Broadcom Corporation (15)
 
-P.S.
-I've been looking at this document: 
-http://howto.pilot-link.org/bluesync/ga.html . I follow the procedures, 
-but I never get any messages from dund like those in the document.
-
-Below are the files in my /etc/bluetooth directory:
-
-----------hcid.conf------------
-#
-# HCI daemon configuration file.
-#
-
-# HCId options
-options {
-	# Automatically initialize new devices
-	autoinit yes;
-
-	# Security Manager mode
-	#   none - Security manager disabled
-	#   auto - Use local PIN for incoming connections
-	#   user - Always ask user for a PIN
-	#
-	# security user;
-	security auto;
-
-	# Pairing mode
-	#   none  - Pairing disabled
-	#   multi - Allow pairing with already paired devices
-	#   once  - Pair once and deny successive attempts
-	pairing multi;
-
-	# Default PIN code for incoming connections
-	passkey "1234";
-}
-
-# Default settings for HCI devices
-device {
-	# Local device name
-	#   %d - device id
-	#   %h - host name
-	# name "%h-%d";
-	name "mybluetooth";
-
-	# Local device class
-	class 0x3e0100;
-
-	# Default packet type
-	#pkt_type DH1,DM1,HV1;
-
-	# Inquiry and Page scan
-	iscan enable; pscan enable;
-
-	# Default link mode
-	#   none   - no specific policy
-	#   accept - always accept incoming connections
-	#   master - become master on incoming connections,
-	#            deny role switch on outgoing connections
-	lm accept;
-
-	# Default link policy
-	#   none    - no specific policy
-	#   rswitch - allow role switch
-	#   hold    - allow hold mode
-	#   sniff   - allow sniff mode
-	#   park    - allow park mode
-	lp rswitch,hold,sniff,park;
-}
-
--------------pin------------
-1234
-
-------------rfccomm.conf-----------
-#
-# RFCOMM configuration file.
-#
-
-#rfcomm0 {
-#	# Automatically bind the device at startup
-#	bind no;
-#
-#	# Bluetooth address of the device
-#	device 11:22:33:44:55:66;
-#
-#	# RFCOMM channel for the connection
-#	channel	1;
-#
-#	# Description of the connection
-#	comment "Example Bluetooth device";
-#}
-
-rfcomm0 {
-	bind yes;
-	device **:**:**:**:**:**;
-	channel 1;
-	comment "My Bluetooth device";
-}
+Cheers,
+Chris
 
 
+
+      __________________________________________________________
+Sent from Yahoo! Mail.
+A Smarter Email http://uk.docs.yahoo.com/nowyoucan.html
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft 
