@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 18 May 2008 05:05:50 -0400
-From: jayjwa <jayjwa@atr2.ath.cx>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <482C233C.5060808@powercraft.nl>
-Message-ID: <alpine.LNX.1.00.0805180455510.25212@nge2.ngu.pk>
-References: <482C233C.5060808@powercraft.nl>
+Message-ID: <482FEEB6.5080206@powercraft.nl>
+Date: Sun, 18 May 2008 10:54:14 +0200
+From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] Nokia BH-801 why??
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <599220.56466.qm@web52910.mail.re2.yahoo.com>
+	<d89ddf300805172222o51bcc456q55df259facc1c156@mail.gmail.com>
+In-Reply-To: <d89ddf300805172222o51bcc456q55df259facc1c156@mail.gmail.com>
+Subject: Re: [Bluez-users] USB dongle cannot pair with A2DP speakers
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,59 +21,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Brad Midgley wrote:
+> Chris
+> 
+> I had a pairing & timing problem like this with an at&t tilt. It might
+> work for you to log out of the machine and from the console, run
+> 
+>  passkey-agent --default 0000 &
+> 
+> then attempt the connection using command-line tools (like aplay in your case).
+> 
+> Brad
 
+Brad can you sent me the script or binary of the passkey-agent tool, 
+because I don't have it in my distribution (debian-sid) and my python 
+dbus simple-agent script is not able to registration it self anymore.
 
-On Thu, 15 May 2008, Jelle de Jong wrote:
+Thanks in advance,
 
--> So got an other new headset with the hope it would work...
--> 
--> The nokia website sad it was bluetooth 2.0 instead of the 1.0 headset i first
--> tried. But I does not work... Can somebody please enlight me why?
-
-sudo hcitool info 00:53:53:FB:7E:9C
-Requesting information ...
-     BD Address:  00:53:53:FB:7E:9C
-     Device Name: Nokia BH-801
-     LMP Version: 2.0 (0x3) LMP Subversion: 0x212b
-     Manufacturer: Broadcom Corporation (15)
-     Features: 0xbc 0xfe 0x8f 0x7e 0x18 0x18 0x00 0x80
-         <encryption> <slot offset> <timing accuracy> <role switch>
-         <sniff mode> <RSSI> <channel quality> <SCO link> <HV2 packets>
-
-Still looks like a plain SCO                 ^^^^^^^
-
-         <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme>
-         <power control> <transparent SCO> <broadcast encrypt>
-         <EDR ACL 2 Mbps> <EDR ACL 3 Mbps> <enhanced iscan>
-         <interlaced iscan> <interlaced pscan> <inquiry with RSSI>
-         <AFH cap. slave> <AFH class. slave> <AFH cap. master>
-         <AFH class. master> <extended features>
-
-
-
-May 15 13:39:57 debian-eeepc hcid[8991]: Badly formated or unrecognized 
-command: AT+CCWA=1
-May 15 13:39:57 debian-eeepc hcid[8991]: Badly formated or unrecognized 
-command: AT+COPS=3,0
-May 15 13:39:57 debian-eeepc kernel: hci_scodata_packet: hci0 SCO packet for 
-unknown connection
-handle 1
-May 15 13:39:57 debian-eeepc last message repeated 2 times
-May 15 13:39:57 debian-eeepc hcid[8991]: Badly formated or unrecognized 
-command: AT+CMEE=1
-May 15 13:39:57 debian-eeepc kernel: hci_scodata_packet: hci0 SCO packet for 
-unknown connection
-handle 1
-May 15 13:40:28 debian-eeepc last message repeated 10190 times
-
-
-
-The error messages also look like those when eSCO gets sent to a SCO only 
-device. Maybe it's possible for bluetooth 2.0 devices to still be SCO-only? I 
-don't know the qualifications ...
-
-
-
+Jelle
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft 
