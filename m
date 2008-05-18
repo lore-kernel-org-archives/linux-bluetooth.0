@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 18 May 2008 14:36:02 +0100 (BST)
-From: Chris Rankin <rankincj@yahoo.com>
+Message-ID: <bf85d3b80805180425g59ec3394r6f7d8f6fd929ad50@mail.gmail.com>
+Date: Sun, 18 May 2008 13:25:06 +0200
+From: "Lukasz Wierzbicki" <lukasz.wierzbicki@gmail.com>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Message-ID: <508684.60714.qm@web52902.mail.re2.yahoo.com>
-Cc: rankincj@yahoo.com
-Subject: Re: [Bluez-users] USB dongle cannot pair with A2DP speakers
+Subject: [Bluez-users] error in the article about PAN connection with
+	bluetooth device?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,66 +15,27 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-> I had a pairing & timing problem like this with an at&t tilt. It might
-> work for you to log out of the machine and from the console, run
-> 
-> passkey-agent --default 0000 &
-> 
-> then attempt the connection using command-line tools (like aplay in your case).
-
-Hi,
-
-Thanks for the reply. I'm not sure that this is a timing issue, because I did manage to "win" the
-race once or twice, and it still didn't work. However, I tried your suggestion with the
-passkey-agent, and aplay failed with this error:
-
-ALSA lib pcm_bluetooth.c:1589:(bluetooth_init) BT_GETCAPABILITIES failed : Input/output error(5)
-aplay: main:546: audio open error: Input/output error
-
-This "Input/output error" is the same error I get when I "win" the race to enter the passkey with
-bluez-gnome. Interestingly, my laptop's bluetooth adaptor doesn't suffer from this race - the
-connection with the speakers stays up until I can send the pin code.
-
-To be honest, I don't think I've ever managed to use something with the particular Belkin adapter,
-although my only other bluetooth device is a headset. (Is Voice/SCO supposed to work in an
-unpatched 2.6.25.x kernel?) Apparently, I have a v2.0 adapter although it's meant to be backwards
-compatible with v1.2. Both this adapter and my laptop are using Broadcom chips, and here is the
-hciconfig output from my (working) laptop:
-
-hci0:   Type: USB
-        BD Address: 00:19:7E:EB:29:5A ACL MTU: 1017:8 SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN 
-        RX bytes:2810088 acl:37 sco:55020 events:84 errors:0
-        TX bytes:1241 acl:34 sco:0 commands:51 errors:0
-        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-        Link policy: RSWITCH HOLD SNIFF PARK 
-        Link mode: SLAVE ACCEPT 
-        Name: 'lantern.modemnet-0'
-        Class: 0x000404
-        Service Classes: Unspecified
-        Device Class: Audio/Video, Device conforms to the Headset profile
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x212b LMP Ver: 2.0 (0x3) LMP Subver: 0x41d3
-        Manufacturer: Broadcom Corporation (15)
-
-Cheers,
-Chris
-
-
-
-      __________________________________________________________
-Sent from Yahoo! Mail.
-A Smarter Email http://uk.docs.yahoo.com/nowyoucan.html
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft 
-Defy all challenges. Microsoft(R) Visual Studio 2008. 
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+SGksCgpJJ3ZlIGp1c3QgcmVhZCBhcnRpY2xlIC0gaHR0cDovL2JsdWV6LnNvdXJjZWZvcmdlLm5l
+dC9jb250cmliL0hPV1RPLVBBTi4KQmVjYXVzZSBJIHdhbnQgdG8gY3JlYXRlIHNvbWUgc21hbGwg
+bmV0d29yayBvbiBibHVldG9vdGggZGV2aWNlIEkgbWFkZQpzb21lIHRlc3RzLiBJIG5vdGljZWQg
+dGhhdCB3aGVuIHdlIGNyZWF0ZWQgYnJpZGdlIHdpdGggYm5lcFggaW50ZXJmYWNlCmFuZCBldGgw
+IGludGVyZmFjZShmb3IgZXhhbXBsZSkgdGhlcmUgYXJlIHNvbWUgcHJvYmxlbXMgd2l0aApjb25u
+ZWN0aW9uICh0aGVyZSBhcmUgcHJvYmxlbSB3aXRoIGNvbm5lY3Rpb24gYmV0d2VlbiBuZXR3b3Jr
+cykuCkZ1dGhlcm1vcmUsIEkgdGhpbmsgd2UgZG9uJ3QgbmVlZCB0aGF0IGJyaWRnZSwgb25seSBi
+cmlkZ2Ugd2UgbmVlZCBpcwp0aGF0ICwgd2hpY2ggZ2F0aGVyIGJuZXBYIGludGVyZmFjZS4KV2hl
+biBJIGRvbid0IGFkZCBldGgwIGludGVyZmFjZSB0byBicmlkZ2UgZXZlcnl0aGluZyB3b3JrIGZp
+bmUuIEkndmUKbWVudGlvbmVkIGFib3V0IEV0aGVybmV0IEJyaWRnaW5nIHNlY3Rpb24gaW4geW91
+ciBhcnRpY2xlLgoKQXQgdGhlIGVuZCwgdGhhbmtzIGZvciBncmVhdCBob3d0byA7KQoKLS0gCsWB
+dWthc3ogV2llcnpiaWNraQpodHRwOi8vd3d3Lmx1a2FzendpZXJ6Ymlja2kueHQucGwKV2Fyc2F3
+IFVuaXZlcnNpdHkgb2YgVGVjaG5vbG9neQpNZW1iZXIgb2YgRVNOIFBXCi0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNvcmVkIGJ5OiBNaWNyb3NvZnQgCkRlZnkgYWxs
+IGNoYWxsZW5nZXMuIE1pY3Jvc29mdChSKSBWaXN1YWwgU3R1ZGlvIDIwMDguIApodHRwOi8vY2xr
+LmF0ZG10LmNvbS9NUlQvZ28vdnNlMDEyMDAwMDA3MG1ydC9kaXJlY3QvMDEvCl9fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxpbmcg
+bGlzdApCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3Vy
+Y2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
