@@ -1,13 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <3e9cdced0805200428w4bb37ae6xd95094f33a583a39@mail.gmail.com>
-Date: Tue, 20 May 2008 13:28:10 +0200
+Message-ID: <3e9cdced0805200104nf8cbc16r24ac63f874c8e9d0@mail.gmail.com>
+Date: Tue, 20 May 2008 10:04:21 +0200
 From: "Fritz Code" <codefritz@googlemail.com>
 To: bluez-users@lists.sourceforge.net
-In-Reply-To: <3e9cdced0805200104nf8cbc16r24ac63f874c8e9d0@mail.gmail.com>
 MIME-Version: 1.0
-References: <3e9cdced0805200104nf8cbc16r24ac63f874c8e9d0@mail.gmail.com>
-Subject: Re: [Bluez-users] Cant receive signals from Adapter (low-level dbus
-	API)
+Content-Type: multipart/mixed; boundary="----=_Part_53_27858130.1211270661954"
+Subject: [Bluez-users] Cant receive signals from Adapter (low-level dbus API)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,95 +15,146 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0533847351=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0533847351==
+------=_Part_53_27858130.1211270661954
 Content-Type: multipart/alternative;
-	boundary="----=_Part_260_18793332.1211282890395"
+	boundary="----=_Part_54_32032955.1211270661954"
 
-------=_Part_260_18793332.1211282890395
+------=_Part_54_32032955.1211270661954
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Well I did some further investigation concerning this problem and can
-provide you more details.
-Bluez doesn't generate an event in cases it is supposed to.
-I have started the dbus-monitor, if I plug an USB BLuetooth dongle to my USB
-port dbus-monitor lists signal from /org/bluez.
-I also get a signal when i remove the device.
-But I can't see any activity on the dbus when ich e.g. scan for remote
-devices or if I change the name of the local device.
+Hi,
 
-Has anybody an idea why bluez doesn't emit the expected signals?
+attached is a small test application.
+With this application I want to test the handling of signals from bluez
+Adapter.
+Therefore I always change the name of my bluetooth device, in order to make
+the adapter to
+generate a signal.
+Unfortunately I cant receive this signal.
+I can set and get the name correctly.
+BUt it seems I receive at least some signals:
+When I start the application I get a signal with value :1.20
+If I remove my usb bluetooth dongle I get a signal with value off.
 
-thanks,
-Fritz
 
 
-On Tue, May 20, 2008 at 10:04 AM, Fritz Code <codefritz@googlemail.com>
-wrote:
 
-> Hi,
->
-> attached is a small test application.
-> With this application I want to test the handling of signals from bluez
-> Adapter.
-> Therefore I always change the name of my bluetooth device, in order to make
-> the adapter to
-> generate a signal.
-> Unfortunately I cant receive this signal.
-> I can set and get the name correctly.
-> BUt it seems I receive at least some signals:
-> When I start the application I get a signal with value :1.20
-> If I remove my usb bluetooth dongle I get a signal with value off.
->
->
->
->
-> In another application I had the same problem (receiving not the expected
-> signals: e.g.: DiscoveryStarted() ... )
->  when I sent signal DiscoverDevices.
->
->
-> thanks.
->
-> --
-> Regards,
-> --Codefritz
->
->
->
->
+In another application I had the same problem (receiving not the expected
+signals: e.g.: DiscoveryStarted() ... )
+ when I sent signal DiscoverDevices.
 
+
+thanks.
 
 -- 
 Regards,
 --Codefritz
 
-------=_Part_260_18793332.1211282890395
+------=_Part_54_32032955.1211270661954
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Well I did some further investigation concerning this problem and can provide you more details.<br>Bluez doesn&#39;t generate an event in cases it is supposed to.<br>I have started the dbus-monitor, if I plug an USB BLuetooth dongle to my USB port dbus-monitor lists signal from /org/bluez.<br>
-I also get a signal when i remove the device.<br>But I can&#39;t see any activity on the dbus when ich e.g. scan for remote devices or if I change the name of the local device. <br><br>Has anybody an idea why bluez doesn&#39;t emit the expected signals?<br>
-<br>thanks,<br>Fritz<br><br><br><div class="gmail_quote">On Tue, May 20, 2008 at 10:04 AM, Fritz Code &lt;<a href="mailto:codefritz@googlemail.com">codefritz@googlemail.com</a>&gt; wrote:<br><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
 Hi,<br><br>attached is a small test application.<br>With this application I want to test the handling of signals from bluez Adapter.<br>Therefore I always change the name of my bluetooth device, in order to make the adapter to <br>
-
 generate a signal.<br>Unfortunately I cant receive this signal.<br>I can set and get the name correctly.<br>BUt it seems I receive at least some signals:<br>When I start the application I get a signal with value :1.20<br>
-
 If I remove my usb bluetooth dongle I get a signal with value off.<br><br><br><br><br>In another application I had the same problem (receiving not the expected signals: e.g.: DiscoveryStarted() ... )<br>&nbsp;when I sent signal DiscoverDevices.<br>
+<br><br>thanks.<br><br>-- <br>Regards,<br>--Codefritz<br><br><br><br>
 
-<br><br>thanks.<br><font color="#888888"><br>-- <br>Regards,<br>--Codefritz<br><br><br><br>
-</font></blockquote></div><br><br clear="all"><br>-- <br>Regards,<br>--Codefritz<br><br><br><br>
+------=_Part_54_32032955.1211270661954--
 
-------=_Part_260_18793332.1211282890395--
+------=_Part_53_27858130.1211270661954
+Content-Type: text/x-csrc; name=test.c
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fgg73a9f0
+Content-Disposition: attachment; filename=test.c
 
-
---===============0533847351==
+I2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlIDxzdGRsaWIuaD4KI2luY2x1ZGUgPGRidXMvZGJ1
+cy5oPgoKCmludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikKewogICAgREJ1c0Nvbm5lY3Rp
+b24gKmNvbm47CiAgICBEQnVzTWVzc2FnZSAqbXNnLCAqcmVwbHk7CiAgICBEQnVzRXJyb3IgZXJy
+OwogICAgREJ1c01lc3NhZ2VJdGVyIGFyZ3M7CiAgICBjb25zdCBjaGFyICphZGRyOwogICAgY29u
+c3QgY2hhciAqbmFtZTsKICAgIGNvbnN0IGNoYXIgKm1hbnVmOwogICAgdm9pZCAqc2lndmFsdWU7
+CgogICAgY2hhciBkaXNwTXNnWzEwXTsKICAgIGNoYXIgKm5hbWVzWzVdID0geyAidGVzdDEiLCAi
+dGVzdDIiLCAidGVzdDMiLCAidGVzdDQiLCAidGVzdDUifTsKCiAgICBpbnQgaT0wOwoKICAgIGRi
+dXNfZXJyb3JfaW5pdCgmZXJyKTsKCiAgICBwcmludGYoIkNvbm5lY3RpbmcgdG8gdGhlIGJ1cyAu
+Li5cbiIpOwogICAgY29ubiA9IGRidXNfYnVzX2dldChEQlVTX0JVU19TWVNURU0sICZlcnIpOwog
+ICAgaWYgKGRidXNfZXJyb3JfaXNfc2V0KCZlcnIpKSB7IAogICAgICBmcHJpbnRmKHN0ZGVyciwg
+IkNvbm5lY3Rpb24gRXJyb3IgKCVzKVxuIiwgZXJyLm1lc3NhZ2UpOwogICAgICBkYnVzX2Vycm9y
+X2ZyZWUoJmVycik7IAogICB9CiAgICBpZiAoTlVMTCA9PSBjb25uKSB7IAogICAgICBleGl0KDEp
+OwogICAgfQogICAgCiAgICAKCiAgICAvLyBhZGQgYSBydWxlIGZvciB3aGljaCBtZXNzYWdlcyB3
+ZSB3YW50IHRvIHNlZSAgICAKICAgIGRidXNfYnVzX2FkZF9tYXRjaChjb25uLCAKIAkgCSAgICAg
+ICAidHlwZT0nc2lnbmFsJyxpbnRlcmZhY2U9J29yZy5ibHVlei5BZGFwdGVyJyIsIAoJICAgCSAg
+ICAgICAmZXJyKTsgLy8gc2VlIHNpZ25hbHMgZnJvbSB0aGUgZ2l2ZW4gaW50ZXJmYWNlCiAgICBk
+YnVzX2Nvbm5lY3Rpb25fZmx1c2goY29ubik7CiAgICBpZiAoZGJ1c19lcnJvcl9pc19zZXQoJmVy
+cikpIHsgCiAgICAgIGZwcmludGYoc3RkZXJyLCAiTWF0Y2ggRXJyb3IgKCVzKVxuIiwgZXJyLm1l
+c3NhZ2UpOwogICAgICBleGl0KDEpOyAKICAgIH0gICAgCiAgICAKICAgIGk9MDsKCiAgICB3aGls
+ZSAoMSkgeyAgICAgIAogICAgICBkYnVzX2Nvbm5lY3Rpb25fcmVhZF93cml0ZShjb25uLCAwKTsK
+ICAgICAgbXNnID0gZGJ1c19jb25uZWN0aW9uX3BvcF9tZXNzYWdlKGNvbm4pOyAgICAgIAoKICAg
+ICAgaWYgKE5VTEwgPT0gbXNnKSB7IAoJcHJpbnRmKCJHZXROYW1lKCk6Iik7Cgltc2cgPSBkYnVz
+X21lc3NhZ2VfbmV3X21ldGhvZF9jYWxsKCJvcmcuYmx1ZXoiLCAiL29yZy9ibHVlei9oY2kwIiwK
+CQkJCQkgICAib3JnLmJsdWV6LkFkYXB0ZXIiLCAiR2V0TmFtZSIpOwoJcmVwbHkgPSBkYnVzX2Nv
+bm5lY3Rpb25fc2VuZF93aXRoX3JlcGx5X2FuZF9ibG9jayhjb25uLCBtc2csIC0xLCBOVUxMKTsK
+CWRidXNfbWVzc2FnZV9nZXRfYXJncyhyZXBseSwgTlVMTCwgREJVU19UWVBFX1NUUklORywgJm5h
+bWUsIERCVVNfVFlQRV9JTlZBTElEKTsKCXByaW50ZigiICVzXG4iLCBuYW1lKTsKCWRidXNfbWVz
+c2FnZV91bnJlZihtc2cpOwoJZGJ1c19tZXNzYWdlX3VucmVmKHJlcGx5KTsgCgoJaWYgKGk9PTQp
+CgkgIGk9MDsKCSAgCglwcmludGYoIlNldE5hbWUoKTogJXNcbiIsIG5hbWVzW2krK10pOwoJbXNn
+ID0gZGJ1c19tZXNzYWdlX25ld19tZXRob2RfY2FsbCgib3JnLmJsdWV6IiwgIi9vcmcvYmx1ZXov
+aGNpMCIsCgkJCQkJICAgIm9yZy5ibHVlei5BZGFwdGVyIiwgIlNldE5hbWUiKTsKCWlmICghZGJ1
+c19tZXNzYWdlX2FwcGVuZF9hcmdzKG1zZywKCQkJCSAgICAgIERCVVNfVFlQRV9TVFJJTkcsICZu
+YW1lc1tpXSwJCQkJICAgICAgCgkJCQkgICAgICBEQlVTX1RZUEVfSU5WQUxJRCkpIHsKCSAgZnBy
+aW50ZihzdGRlcnIsICJSYW4gb3V0IG9mIG1lbW9yeSB3aGlsZSBjb25zdHJ1Y3RpbmcgYXJnc1xu
+Iik7CgkgIGV4aXQoRVhJVF9GQUlMVVJFKTsKCX0KCWRidXNfbWVzc2FnZV9zZXRfbm9fcmVwbHko
+bXNnLCBUUlVFKTsJCglpZiAoIWRidXNfY29ubmVjdGlvbl9zZW5kKGNvbm4sIG1zZywgTlVMTCkp
+IHsKCSAgZnByaW50ZihzdGRlcnIsICJSYW4gb3V0IG9mIG1lbW9yeSB3aGlsZSBxdWV1ZWluZyBt
+ZXNzYWdlXG4iKTsKCSAgZXhpdChFWElUX0ZBSUxVUkUpOwoJfQoJCglkYnVzX2Nvbm5lY3Rpb25f
+Zmx1c2goY29ubik7CQoJZGJ1c19tZXNzYWdlX3VucmVmKG1zZyk7CQoJCglzbGVlcCgxKTsKCWNv
+bnRpbnVlOwogICAgICB9CiAgICAgIAogICAgICBwcmludGYoIiEhZ290IGEgbWVzc2FnZSEhXG4i
+KTsKICAgICAgLy8gY2hlY2sgaWYgdGhlIG1lc3NhZ2UgaXMgYSBzaWduYWwgZnJvbSB0aGUgY29y
+cmVjdCBpbnRlcmZhY2UKICAgICAgLy8gYW5kIHdpdGggdGhlIGNvcnJlY3QgbmFtZQogICAgICAv
+LyAgICBpZiAoZGJ1c19tZXNzYWdlX2lzX3NpZ25hbChtc2csICJvcmcuYmx1ZXouQWRhcHRlciIs
+ICJOYW1lQ2hhbmdlZCIpKSB7CgkvLyByZWFkIHRoZSBwYXJhbWV0ZXJzCglpZiAoIWRidXNfbWVz
+c2FnZV9pdGVyX2luaXQobXNnLCAmYXJncykpCgkgIGZwcmludGYoc3RkZXJyLCAiTWVzc2FnZSBo
+YXMgbm8gYXJndW1lbnRzIVxuIik7IAoJZWxzZSBpZiAoREJVU19UWVBFX1NUUklORyAhPSBkYnVz
+X21lc3NhZ2VfaXRlcl9nZXRfYXJnX3R5cGUoJmFyZ3MpKSAKCSAgZnByaW50ZihzdGRlcnIsICJB
+cmd1bWVudCBpcyBub3Qgc3RyaW5nIVxuIik7IAoJZWxzZSB7CgkgIGRidXNfbWVzc2FnZV9pdGVy
+X2dldF9iYXNpYygmYXJncywgJnNpZ3ZhbHVlKTsKCSAgcHJpbnRmKCJHb3QgU2lnbmFsIHdpdGgg
+dmFsdWUgJXNcbiIsIChjaGFyKilzaWd2YWx1ZSk7Cgl9CgkvLyAgICAgIH0KICAgICAgCiAgICAg
+IC8vIGZyZWUgdGhlIG1lc3NhZ2UKICAgICAgZGJ1c19tZXNzYWdlX3VucmVmKG1zZyk7CiAgICB9
+ICAgICAgCgoKCgogICAgICByZXR1cm4gMDsKCgoKCgoKCiAgICAvKgogICAgcHJpbnRmKCJEaXNj
+b3ZlckRldmljZXMoKTpcbiIpOwogICAgbXNnID0gZGJ1c19tZXNzYWdlX25ld19tZXRob2RfY2Fs
+bCgib3JnLmJsdWV6IiwgIi9vcmcvYmx1ZXovaGNpMCIsCgkJCQkgICAgICAgIm9yZy5ibHVlei5B
+ZGFwdGVyIiwgIkRpc2NvdmVyRGV2aWNlcyIpOwogICAgaWYgKCFkYnVzX2Nvbm5lY3Rpb25fc2Vu
+ZCAoY29ubiwgbXNnLCBOVUxMKSkKICAgICAgICBmcHJpbnRmIChzdGRlcnIsICJlcnJvciBzZW5k
+aW5nIG1lc3NhZ2VcbiIpOwogICAgZGJ1c19tZXNzYWdlX3VucmVmKG1zZyk7CiAgICBkYnVzX2Nv
+bm5lY3Rpb25fZmx1c2goY29ubik7CiAgICAqLwoKCgogICAgICAvKgoKICAgIHByaW50ZigiR2V0
+QWRkcmVzcygpOiIpOwogICAgbXNnID0gZGJ1c19tZXNzYWdlX25ld19tZXRob2RfY2FsbCgib3Jn
+LmJsdWV6IiwgIi9vcmcvYmx1ZXovaGNpMCIsCgkJCQkgICAgICAgIm9yZy5ibHVlei5BZGFwdGVy
+IiwgIkdldEFkZHJlc3MiKTsKICAgIHJlcGx5ID0gZGJ1c19jb25uZWN0aW9uX3NlbmRfd2l0aF9y
+ZXBseV9hbmRfYmxvY2soY29ubiwgbXNnLCAtMSwgTlVMTCk7CiAgICBkYnVzX21lc3NhZ2VfZ2V0
+X2FyZ3MocmVwbHksIE5VTEwsIERCVVNfVFlQRV9TVFJJTkcsICZhZGRyLCBEQlVTX1RZUEVfSU5W
+QUxJRCk7CiAgICBwcmludGYoIiAlc1xuIiwgYWRkcik7CiAgICBkYnVzX21lc3NhZ2VfdW5yZWYo
+bXNnKTsKICAgIGRidXNfbWVzc2FnZV91bnJlZihyZXBseSk7IAoKCgogICAgcHJpbnRmKCJHZXRN
+YW51ZmFjdHVyZXIoKToiKTsKICAgIG1zZyA9IGRidXNfbWVzc2FnZV9uZXdfbWV0aG9kX2NhbGwo
+Im9yZy5ibHVleiIsICIvb3JnL2JsdWV6L2hjaTAiLAoJCQkJICAgICAgICJvcmcuYmx1ZXouQWRh
+cHRlciIsICJHZXRNYW51ZmFjdHVyZXIiKTsKICAgIHJlcGx5ID0gZGJ1c19jb25uZWN0aW9uX3Nl
+bmRfd2l0aF9yZXBseV9hbmRfYmxvY2soY29ubiwgbXNnLCAtMSwgTlVMTCk7CiAgICBkYnVzX21l
+c3NhZ2VfZ2V0X2FyZ3MocmVwbHksIE5VTEwsIERCVVNfVFlQRV9TVFJJTkcsICZtYW51ZiwgREJV
+U19UWVBFX0lOVkFMSUQpOwogICAgcHJpbnRmKCIgJXNcbiIsIG1hbnVmKTsKICAgIGRidXNfbWVz
+c2FnZV91bnJlZihtc2cpOwogICAgZGJ1c19tZXNzYWdlX3VucmVmKHJlcGx5KTsgCgoKCgoKICAg
+IHByaW50ZigiR2V0TmFtZSgpOiIpOwogICAgbXNnID0gZGJ1c19tZXNzYWdlX25ld19tZXRob2Rf
+Y2FsbCgib3JnLmJsdWV6IiwgIi9vcmcvYmx1ZXovaGNpMCIsCiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJvcmcuYmx1ZXouQWRhcHRlciIsICJHZXRO
+YW1lIik7CiAgICByZXBseSA9IGRidXNfY29ubmVjdGlvbl9zZW5kX3dpdGhfcmVwbHlfYW5kX2Js
+b2NrKGNvbm4sIG1zZywgLTEsIE5VTEwpOwogICAgZGJ1c19tZXNzYWdlX2dldF9hcmdzKHJlcGx5
+LCBOVUxMLCBEQlVTX1RZUEVfU1RSSU5HLCAmbmFtZSwgREJVU19UWVBFX0lOVkFMSUQpOwogICAg
+cHJpbnRmKCIgJXNcbiIsIG5hbWUpOwogICAgZGJ1c19tZXNzYWdlX3VucmVmKG1zZyk7CiAgICBk
+YnVzX21lc3NhZ2VfdW5yZWYocmVwbHkpOyAKCgoKCiAgICBkYnVzX2Nvbm5lY3Rpb25fY2xvc2Uo
+Y29ubik7CgogICAgcmV0dXJuIDA7Ki8KfQo=
+------=_Part_53_27858130.1211270661954
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -115,7 +164,7 @@ Content-Disposition: inline
 This SF.net email is sponsored by: Microsoft 
 Defy all challenges. Microsoft(R) Visual Studio 2008. 
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============0533847351==
+------=_Part_53_27858130.1211270661954
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -126,4 +175,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0533847351==--
+------=_Part_53_27858130.1211270661954--
