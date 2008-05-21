@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <8c8e9de90805191851k796f8df3g7e24cdfb4d5e7fab@mail.gmail.com>
-References: <8c8e9de90805191851k796f8df3g7e24cdfb4d5e7fab@mail.gmail.com>
-Date: Wed, 21 May 2008 16:34:33 +0200
-Message-Id: <1211380473.13248.67.camel@californication>
+In-Reply-To: <4328a52e0805210458w1438f361ub1eb28976e4a3efa@mail.gmail.com>
+References: <4328a52e0805210458w1438f361ub1eb28976e4a3efa@mail.gmail.com>
+Date: Wed, 21 May 2008 16:33:29 +0200
+Message-Id: <1211380409.13248.65.camel@californication>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Is there any way to see baseband packet?
+Subject: Re: [Bluez-users] Bluetooth-properties "Out of memory"
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,17 +20,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Yuchih,
+Hi Artem,
 
-> I would like to see LT-addr field in the baseband packet.
-> Is there any way to see baseband packet instead of hcidump HCI packet?
-> I know one of the solution is to use Bluetooth Protocol Analyzer(ex.
-> FTS4BT).
-> But since I have usb Bluetooth adapter to receive baseband packets
-> from air,
-> it is possible to dump baseband packet, right?
+> I'm having issues with bluetooth-properties (the one which is in
+> Ubuntu 8.04)
+> When I ran bleutooth-config and try to add a device it crashes
+> displaying this message:
+> 
+> "process 10105: arguments to dbus_message_new_method_call() were
+> incorrect, assertion "_dbus_check_is_valid_path (path)" failed in file
+> dbus-message.c line 1074.
+> This is normally a bug in some application using the D-Bus library.
+> 
+> ** ERROR **: Out of memory
+> aborting...
+> Aborted"
 
-with a normal dongle this is not possible. You need a sniffer for it.
+this really doesn't help me. Can you try to use the latest bluez-gnome
+and see if that issues still exists.
 
 Regards
 
