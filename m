@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <4328a52e0805210458w1438f361ub1eb28976e4a3efa@mail.gmail.com>
-References: <4328a52e0805210458w1438f361ub1eb28976e4a3efa@mail.gmail.com>
-Date: Wed, 21 May 2008 16:33:29 +0200
-Message-Id: <1211380409.13248.65.camel@californication>
+In-Reply-To: <20080520195829.320270@gmx.net>
+References: <20080520195829.320270@gmx.net>
+Date: Wed, 21 May 2008 16:32:40 +0200
+Message-Id: <1211380360.13248.63.camel@californication>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Bluetooth-properties "Out of memory"
+Subject: Re: [Bluez-users] bluetooth keyboard - Kernel 2.4.21
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,24 +20,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Artem,
+Hi Martin,
 
-> I'm having issues with bluetooth-properties (the one which is in
-> Ubuntu 8.04)
-> When I ran bleutooth-config and try to add a device it crashes
-> displaying this message:
-> 
-> "process 10105: arguments to dbus_message_new_method_call() were
-> incorrect, assertion "_dbus_check_is_valid_path (path)" failed in file
-> dbus-message.c line 1074.
-> This is normally a bug in some application using the D-Bus library.
-> 
-> ** ERROR **: Out of memory
-> aborting...
-> Aborted"
+> can I use a bluetooth keyboard with my Kernerl 2.4.2?
+> I have compiled and installed the mos revent version of bluez utils and lib.
 
-this really doesn't help me. Can you try to use the latest bluez-gnome
-and see if that issues still exists.
+if you have a hidp.o kernel module maybe, but don't expect any real
+support for an ancient 2.4 kernel. Switch to the 2.6 kernel series.
 
 Regards
 
