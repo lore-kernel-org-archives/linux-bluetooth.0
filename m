@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4328a52e0805210458w1438f361ub1eb28976e4a3efa@mail.gmail.com>
-Date: Wed, 21 May 2008 21:58:10 +1000
-From: "Artem Skvira" <artem.skvira@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <48336FD4.9040803@judebert.com>
+Date: Tue, 20 May 2008 20:41:56 -0400
+From: bluez-users.10.judebert@spamgourmet.com
 MIME-Version: 1.0
-Subject: [Bluez-users] Bluetooth-properties "Out of memory"
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] Syncing a Treo 680
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,69 +14,51 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1812310513=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1812310513==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_1647_21069456.1211371090324"
+Okay, I've read the Wiki.  I've checked out multiple different 
+webpages.  I've been subscribed to the mailing list for weeks.  I'm so 
+confused I barely know where to start.
 
-------=_Part_1647_21069456.1211371090324
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+All I want is to sync my Treo with my computer.  Specifically, I want to 
+back up my data and install programs -- I don't need Outlook 
+functionality or even a list of my appointments in a desktop 
+application.  Just backup and install.
 
-Hi all,
+I read here that I shouldn't use dund, but the Wiki points me to a 
+webpage that points me to a tutorial that uses dund. 
 
-I'm having issues with bluetooth-properties (the one which is in Ubuntu
-8.04)
-When I ran bleutooth-config and try to add a device it crashes displaying
-this message:
+I don't program in Python.  Java, C/C++, PHP, and Perl, but not Python.  
+I don't want to have to learn Python to sync my phone; I'm busy 
+supporting other Open Source projects and just don't have the spare time.
 
-"process 10105: arguments to dbus_message_new_method_call() were incorrect,
-assertion "_dbus_check_is_valid_path (path)" failed in file dbus-message.c
-line 1074.
-This is normally a bug in some application using the D-Bus library.
+So, I will donate $20 via PayPal to anyone who can provide me with 
+step-by-step instructions allowing me to sync my Treo 680 with my Debian 
+Unstable computer through my Kensington K33348 dongle using available 
+packages and configuration files.  I will use this knowledge to create a 
+page on/for the wiki so other users can avoid the trouble.
 
-** ERROR **: Out of memory
-aborting...
-Aborted"
+I understand the first step here is 'hcitool scan' and 'hciconfig'.
 
-Is that something what can be fixed?
+$ sudo hcitool scan
+Scanning ... (blue light flashes on my dongle)
+$ sudo hciconfig
+hci0:    Type: USB
+    BD Address: 00:19:15:5A:B8:FD ACL MTU: 1017:8 SCO MTU: 64:8
+    UP RUNNING PSCAN ISCAN
+    RX bytes:694 acl:0 sco:0 events:25 errors:0
+    TX bytes:353 acl:0 sco:0 commands:23 errors:0
 
-Thanks!
-
-------=_Part_1647_21069456.1211371090324
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi all,<br><br>I&#39;m having issues with bluetooth-properties (the one which is in Ubuntu 8.04)<br>When I ran bleutooth-config and try to add a device it crashes displaying this message:<br><br>&quot;process 10105: arguments to dbus_message_new_method_call() were incorrect, assertion &quot;_dbus_check_is_valid_path (path)&quot; failed in file dbus-message.c line 1074.<br>
-This is normally a bug in some application using the D-Bus library.<br><br>** ERROR **: Out of memory<br>aborting...<br>Aborted&quot;<br><br>Is that something what can be fixed?<br><br>Thanks!<br>
-
-------=_Part_1647_21069456.1211371090324--
-
-
---===============1812310513==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Respectfully,
+Judebert
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft 
 Defy all challenges. Microsoft(R) Visual Studio 2008. 
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1812310513==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1812310513==--
