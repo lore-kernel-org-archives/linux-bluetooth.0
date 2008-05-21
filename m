@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20080520195829.320270@gmx.net>
-References: <20080520195829.320270@gmx.net>
-Date: Wed, 21 May 2008 16:32:40 +0200
-Message-Id: <1211380360.13248.63.camel@californication>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] bluetooth keyboard - Kernel 2.4.21
+Message-ID: <4328a52e0805210458w1438f361ub1eb28976e4a3efa@mail.gmail.com>
+Date: Wed, 21 May 2008 21:58:10 +1000
+From: "Artem Skvira" <artem.skvira@gmail.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-users] Bluetooth-properties "Out of memory"
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,29 +14,69 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1812310513=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Martin,
+--===============1812310513==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_1647_21069456.1211371090324"
 
-> can I use a bluetooth keyboard with my Kernerl 2.4.2?
-> I have compiled and installed the mos revent version of bluez utils and lib.
+------=_Part_1647_21069456.1211371090324
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-if you have a hidp.o kernel module maybe, but don't expect any real
-support for an ancient 2.4 kernel. Switch to the 2.6 kernel series.
+Hi all,
 
-Regards
+I'm having issues with bluetooth-properties (the one which is in Ubuntu
+8.04)
+When I ran bleutooth-config and try to add a device it crashes displaying
+this message:
 
-Marcel
+"process 10105: arguments to dbus_message_new_method_call() were incorrect,
+assertion "_dbus_check_is_valid_path (path)" failed in file dbus-message.c
+line 1074.
+This is normally a bug in some application using the D-Bus library.
+
+** ERROR **: Out of memory
+aborting...
+Aborted"
+
+Is that something what can be fixed?
+
+Thanks!
+
+------=_Part_1647_21069456.1211371090324
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi all,<br><br>I&#39;m having issues with bluetooth-properties (the one which is in Ubuntu 8.04)<br>When I ran bleutooth-config and try to add a device it crashes displaying this message:<br><br>&quot;process 10105: arguments to dbus_message_new_method_call() were incorrect, assertion &quot;_dbus_check_is_valid_path (path)&quot; failed in file dbus-message.c line 1074.<br>
+This is normally a bug in some application using the D-Bus library.<br><br>** ERROR **: Out of memory<br>aborting...<br>Aborted&quot;<br><br>Is that something what can be fixed?<br><br>Thanks!<br>
+
+------=_Part_1647_21069456.1211371090324--
 
 
+--===============1812310513==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft 
 Defy all challenges. Microsoft(R) Visual Studio 2008. 
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============1812310513==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1812310513==--
