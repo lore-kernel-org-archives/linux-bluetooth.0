@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48357D9C.9080009@access-company.com>
-Date: Thu, 22 May 2008 16:05:16 +0200
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?= <frederic.dalleau@access-company.com>
-MIME-Version: 1.0
+Message-Id: <5D487EED-A2B2-4AEA-AA7B-9EC8681157C0@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <48075B6A.2060308@access-company.com>	<1209058941.12684.37.camel@violet.holtmann.net>	<48355289.7070906@access-company.com>
-	<5D487EED-A2B2-4AEA-AA7B-9EC8681157C0@holtmann.org>
-In-Reply-To: <5D487EED-A2B2-4AEA-AA7B-9EC8681157C0@holtmann.org>
+In-Reply-To: <48355289.7070906@access-company.com>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Thu, 22 May 2008 13:48:32 +0200
+References: <48075B6A.2060308@access-company.com>
+	<1209058941.12684.37.camel@violet.holtmann.net>
+	<48355289.7070906@access-company.com>
 Subject: Re: [Bluez-devel] [patch] BNEP/PAN Qualification issues
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,26 +22,56 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Frederic,
 
->> A part of the patch si to move handling of incoming setup_conn_req  
->> in kernel. In order to keep pan working with older kernel, some  
->> differenciation must be done. How to achieve this ?
->>     
+>>> I got my hand over a BNEP and PAN test plan and tried to pass it  
+>>> with current PAN implementation (pand, not network service). I met  
+>>> several issues and tried to find some solutions to them.
+>>>
+>>> * Handling of 32 and 128 bits uuids,
+>>> * Correct response to invalid uuids,
+>>> * Respond to control messages before connection setup,
+>>> * Handling of bnep extension together with general headers,
+>>> * Handling of bnep extensions together with setup connection  
+>>> requests.
+>>> * Forwarding of unknown BNEP extensions (not available for  
+>>> broadcast, advice requested),
+>>> * Give up pan connection after 30 seconds,
+>>>
+>>> The result of that work is two patchs, one for the kernel (based  
+>>> on latest git) and one for pand (a bit old that one I fear).  
+>>> However, it should be easy to get similar patch for network service.
+>>>
+>>
+>> I need both patches in unified diff format (-u). I am not a machine  
+>> and
+>> can't read context diffs.
+>>
+>> Please break up the kernel patch in small chunks that solve each
+>> problem. It is easier for me to review them and then apply them.
+>>
 >
-> I don't know yet. Can we first fix the issues that don't need  
-> modifications within the kernel. I prefer not modifying the kernel at  
-> all at the moment.
+> Sorry for long delay, i was ooto. Will split patch and send with -u.
+> For now here is first patch for pand and network service.
 >
->   
+> Give up pan connection after 30 seconds
+> TP/BNEP/CTRL/BV-02-C
 
-I understand.
-My problem is that some tests require grouping several messages into 
-one. In particular, the setup_conn_req can be sent together with a 
-control extension TP/BNEP/CTRL/BV-19-C.
-The current extension processing is to skip everything and I'm not sure 
-the control message can be handled at application level.
+patch looks good to me.
 
-Frederic
+Luiz, feel free to apply it.
+
+> A part of the patch si to move handling of incoming setup_conn_req  
+> in kernel. In order to keep pan working with older kernel, some  
+> differenciation must be done. How to achieve this ?
+
+I don't know yet. Can we first fix the issues that don't need  
+modifications within the kernel. I prefer not modifying the kernel at  
+all at the moment.
+
+Regards
+
+Marcel
 
 
 -------------------------------------------------------------------------
