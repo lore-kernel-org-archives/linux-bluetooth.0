@@ -1,14 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48355289.7070906@access-company.com>
-Date: Thu, 22 May 2008 13:01:29 +0200
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?= <frederic.dalleau@access-company.com>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <48075B6A.2060308@access-company.com>
-	<1209058941.12684.37.camel@violet.holtmann.net>
-In-Reply-To: <1209058941.12684.37.camel@violet.holtmann.net>
-Content-Type: multipart/mixed; boundary="------------070507090508010003050809"
-Subject: Re: [Bluez-devel] [patch] BNEP/PAN Qualification issues
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Stockwell <dstockwell@frequency-one.com>
+In-Reply-To: <015401c8bbb3$4de51ce0$6701a8c0@freqonedev>
+References: <013e01c8bb99$b4ba5580$6701a8c0@freqonedev>
+	<E0A89313-87C7-4C2B-B91E-5D4326DD27DD@holtmann.org>
+	<015401c8bbb3$4de51ce0$6701a8c0@freqonedev>
+Message-Id: <71A309EC-AAA0-42AF-994D-E5E9CF553682@holtmann.org>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Thu, 22 May 2008 09:54:02 +0200
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Issues with BlueZ v3.31 Object Path Naming
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,162 +19,66 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------070507090508010003050809
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi David,
 
-Hi,
-
->> I got my hand over a BNEP and PAN test plan and tried to pass it with 
->> current PAN implementation (pand, not network service). I met several 
->> issues and tried to find some solutions to them.
->>
->> * Handling of 32 and 128 bits uuids,
->> * Correct response to invalid uuids,
->> * Respond to control messages before connection setup,
->> * Handling of bnep extension together with general headers,
->> * Handling of bnep extensions together with setup connection requests.
->> * Forwarding of unknown BNEP extensions (not available for broadcast, 
->> advice requested),
->> * Give up pan connection after 30 seconds,
->>
->> The result of that work is two patchs, one for the kernel (based on 
->> latest git) and one for pand (a bit old that one I fear). However, it 
->> should be easy to get similar patch for network service.
->>     
+> Thanks for the quick response; I do appreciate it and the effort all  
+> of you have expended in marshaling this migration to DBus. I
+> fully appreciate the benefits!
 >
-> I need both patches in unified diff format (-u). I am not a machine and
-> can't read context diffs.
+> I also appreciate that prepending every path with "/org/bluez" was  
+> more than a little redundant...
+> So, under 4.X: the Manager's path is "/";
+> the Adapter's path is "/hci<n>";
+> the device's path is "/hci<n>/dev_<remote address>"
+
+that is correct.
+
+> Still, the audio device paths will be /org/bluez/device<n>,  
+> correct?  Or will it just be /device<n>, or perhaps /hci<n>/device<n>?
+
+We are going to re-design that part of the API during the next week.  
+Once that is done, they will also be deprecated. The idea here is that  
+we have a generic remote device object path now and we will use it for  
+every service instead of having every service to do this all over again.
+
+> Also, the old paths are documented in doc/xxx-api.txt.  I will be  
+> happy to provide updates.
+
+I that is so, then that is a bug on my side. It shouldn't be. At least  
+not intentionally :)
+
+> I will also proceed to dig through the code to straighten out the  
+> naming per the new names (assuming "experimental" is set).
 >
-> Please break up the kernel patch in small chunks that solve each
-> problem. It is easier for me to review them and then apply them.
->   
+> One more issue: in manager.c and adapter.c, the _init functions  
+> enable the new Methods and Signals if experimental is set, then
+> enables the old Methods and Signals (even if they have the same  
+> names) after that.
+>
+> If experimental is set, should we not turn off the old methods and  
+> signals?  If you refer to my previous posts, you will find that
+> when Discovery is completed, signals are returned against the old  
+> and new paths/signals simultaneously; very confusing, but now that
+> I see how things work, I understand why it has been happening.
 
-Sorry for long delay, i was ooto. Will split patch and send with -u.
-For now here is first patch for pand and network service.
+We can't break the old API during the 3.x releases. So the new one can  
+be enabled for testing. Disabling the old one at the same time will  
+break to many applications.
 
-Give up pan connection after 30 seconds
-TP/BNEP/CTRL/BV-02-C
+Regards
 
+Marcel
 
-Marcel, Luiz,
-A part of the patch si to move handling of incoming setup_conn_req in 
-kernel. In order to keep pan working with older kernel, some 
-differenciation must be done. How to achieve this ?
-
-Regards,
-Frederic
-
-
-
---------------070507090508010003050809
-Content-Type: text/x-patch;
- name="pand.timeout.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="pand.timeout.patch"
-
-diff --git a/pand/bnep.c b/pand/bnep.c
-index 604ed55..88c1184 100644
---- a/pand/bnep.c
-+++ b/pand/bnep.c
-@@ -259,6 +259,7 @@ int bnep_create_connection(int sk, uint16_t role, uint16_t svc, char *dev)
- 	struct __service_16 *s;
- 	unsigned char pkt[BNEP_MTU];
- 	int r;
-+	struct timeval t = { 30, 0 };
- 
- 	/* Send request */
- 	req = (void *) pkt;
-@@ -269,6 +270,8 @@ int bnep_create_connection(int sk, uint16_t role, uint16_t svc, char *dev)
- 	s->dst = htons(svc);
- 	s->src = htons(role);
- 
-+	setsockopt(sk, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
-+
- 	if (send(sk, pkt, sizeof(*req) + sizeof(*s), 0) < 0)
- 		return -1;
- 
-@@ -278,6 +281,9 @@ receive:
- 	if (r <= 0)
- 		return -1;
- 
-+	t.tv_sec = 0;
-+	setsockopt(sk, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
-+
- 	errno = EPROTO;
- 
- 	if (r < sizeof(*rsp))
-
---------------070507090508010003050809
-Content-Type: text/x-patch;
- name="network.timeout.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="network.timeout.patch"
-
-diff --git a/network/connection.c b/network/connection.c
-index 057fbba..9d09e83 100644
---- a/network/connection.c
-+++ b/network/connection.c
-@@ -109,6 +109,7 @@ static gboolean bnep_connect_cb(GIOChannel *chan, GIOCondition cond,
- 	int sk;
- 	DBusMessage *reply;
- 	const char *pdev;
-+	struct timeval t = { 0, 0 };
- 
- 	if (cond & G_IO_NVAL)
- 		return FALSE;
-@@ -155,6 +156,8 @@ static gboolean bnep_connect_cb(GIOChannel *chan, GIOCondition cond,
- 
- 	sk = g_io_channel_unix_get_fd(chan);
- 
-+	setsockopt(sk, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
-+
- 	if (bnep_connadd(sk, BNEP_SVC_PANU, nc->dev)) {
- 		error("%s could not be added", nc->dev);
- 		goto failed;
-@@ -196,6 +199,7 @@ static int bnep_connect(struct network_conn *nc)
- 	unsigned char pkt[BNEP_MTU];
- 	GIOChannel *io;
- 	int err = 0;
-+	struct timeval t = { 30, 0 };
- 
- 	/* Send request */
- 	req = (void *) pkt;
-@@ -206,6 +210,8 @@ static int bnep_connect(struct network_conn *nc)
- 	s->dst = htons(nc->id);
- 	s->src = htons(BNEP_SVC_PANU);
- 
-+	setsockopt(nc->sk, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
-+
- 	io = g_io_channel_unix_new(nc->sk);
- 	g_io_channel_set_close_on_unref(io, FALSE);
- 
-
---------------070507090508010003050809
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---------------070507090508010003050809
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---------------070507090508010003050809--
