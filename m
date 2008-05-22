@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
+Message-Id: <944126E1-548D-4EF1-88A6-8505A42E17E3@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: David Stockwell <dstockwell@frequency-one.com>
-In-Reply-To: <01d801c8bc5a$027798d0$6701a8c0@freqonedev>
-References: <01d801c8bc5a$027798d0$6701a8c0@freqonedev>
-Message-Id: <D0DBF0CD-7285-47DF-ACD9-9F1F23A58BD2@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <01e501c8bc60$e20638c0$6701a8c0@freqonedev>
 Mime-Version: 1.0 (Apple Message framework v919.2)
-Date: Fri, 23 May 2008 01:17:13 +0200
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Problems with returning Default Adapter in
-	C-Glib-DBus code
+Date: Fri, 23 May 2008 01:16:24 +0200
+References: <01e501c8bc60$e20638c0$6701a8c0@freqonedev>
+Subject: Re: [Bluez-devel] bluez hcid v3.31 main.conf
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,40 +22,21 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi David,
 
-> Since upgrading to 3.32 (and possibly before), I have been having a  
-> problem with calling the new, experimental DefaultAdapter method  
-> against the "/".  When I do so, it properly returns the Adapter path  
-> "/hci0", but fails with the following error: Unregistered object at  
-> path '/hci0'.
+> On startup, hcid attempts to load_config(CONFIGDIR "main.conf").   
+> However, main.conf is missing.  This may have been a recent change  
+> in that in hcid.h, HCID_CONFIG_FILE refers to CONFIGDIR "hcid.conf".
 >
-> Prior to this, I used to call what was effectively the old  
-> DefaultAdapter using the "/org/bluez" path and returning the old  
-> string version of the Adapter path, receiving "/org/bluez/hci0".
+> When I attempt to substitute HCID_CONFIG_FILE to load_config,  
+> load_config chokes on what is in that file.
 >
-> Output of my failing program is as follows (also, in  
-> DefaultAdapterOut.txt):
->
-> after dbus_g_proxy_new_for_name (dMgrObj)
->  bus:       org.bluez
->  path:      /
->  interface: org.bluez.Manager
-> Failed to get DefaultAdapter: Unregistered object at path '/hci0'
-> At the same time, I called dbus-send to see if this was some more  
-> fundamental failure, but calls against both paths are successful, as  
-> shown in the following (DefaultAdapter.txt):
->
-> [dstockwell@freqonec001 ~]$ dbus-send --system --type=method_call -- 
-> print-reply --dest=org.bluez /org/bluez  
-> org.bluez.Manager.DefaultAdapter
-> method return sender=:1.12 -> dest=:1.22
->    string "/org/bluez/hci0"
-> [dstockwell@freqonec001 ~]$ dbus-send --system --type=method_call -- 
-> print-reply --dest=org.bluez / org.bluez.Manager.DefaultAdapter
-> method return sender=:1.12 -> dest=:1.23
->    object path "/hci0"
+> So, what is/should be contained in main.conf?  Is the correct, or  
+> what should it be?  (In general, using a "magic filename" like  
+> "main.conf" is not a great practice, and perhaps makes the code base  
+> harder to maintain, especially when a #define with a similar purpose  
+> already exists in the headers...)
 
-you have to give an object path instead of a string when using "/ 
-hci0". That is the big change :)
+the main.conf contains settings for plugin loading. The file name is  
+not set in stone yet. Simply ignore that error :)
 
 Regards
 
