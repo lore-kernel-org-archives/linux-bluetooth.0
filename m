@@ -1,13 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BAYC1-PASMTP03A4A985863B45F15785E6ADC10@CEZ.ICE>
-Date: Fri, 23 May 2008 13:12:56 -0400
-From: Wendell MacKenzie <mackendw@sympatico.ca>
+Message-ID: <4836F095.1070507@achilles.org>
+Date: Fri, 23 May 2008 17:28:05 +0100
+From: "R.K. Harle" <robert.harle@achilles.org>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <48336FD4.9040803@judebert.com>
-	<F60A3CE9E807BE49B5F56BD80B894D20016883DF@sc-exch03.marvell.com>
-In-Reply-To: <F60A3CE9E807BE49B5F56BD80B894D20016883DF@sc-exch03.marvell.com>
-Subject: Re: [Bluez-users] Syncing a Treo 680
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] L2Ping and RSSI
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,82 +19,22 @@ Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 
-This helped me:
+Dear all,
 
-http://www.gurulabs.com/goodies/Using_Linux_and_Bluetooth_DUN_with_the_Treo650.php
+I'm interested in what communication is possible with unpaired bluetooth 
+devices.  I am aware that I can ping an unpaired device using L2ping and 
+the hardware address of the device.  I'd like to know whether I can get 
+any link information from a ping, such as RSSI?  All the HCI tools seem 
+to require a 'proper' (authenticated, paired) connection.
 
-Angus Ainslie wrote:
->> -----Original Message-----
->> From: bluez-users-bounces@lists.sourceforge.net 
->> [mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf 
->> Of bluez-users.10.judebert@spamgourmet.com
->> Sent: Tuesday, May 20, 2008 6:42 PM
->> To: bluez-users@lists.sourceforge.net
->> Subject: [Bluez-users] Syncing a Treo 680
->>
->> Okay, I've read the Wiki.  I've checked out multiple 
->> different webpages.  I've been subscribed to the mailing list 
->> for weeks.  I'm so confused I barely know where to start.
->>
->> All I want is to sync my Treo with my computer.  
->> Specifically, I want to back up my data and install programs 
->> -- I don't need Outlook functionality or even a list of my 
->> appointments in a desktop application.  Just backup and install.
->>
->> I read here that I shouldn't use dund, but the Wiki points me 
->> to a webpage that points me to a tutorial that uses dund. 
->>
->> I don't program in Python.  Java, C/C++, PHP, and Perl, but 
->> not Python.  
->> I don't want to have to learn Python to sync my phone; I'm 
->> busy supporting other Open Source projects and just don't 
->> have the spare time.
->>
->> So, I will donate $20 via PayPal to anyone who can provide me 
->> with step-by-step instructions allowing me to sync my Treo 
->> 680 with my Debian Unstable computer through my Kensington 
->> K33348 dongle using available packages and configuration 
->> files.  I will use this knowledge to create a page on/for the 
->> wiki so other users can avoid the trouble.
->>
->> I understand the first step here is 'hcitool scan' and 'hciconfig'.
->>
->> $ sudo hcitool scan
->> Scanning ... (blue light flashes on my dongle) $ sudo hciconfig
->> hci0:    Type: USB
->>     BD Address: 00:19:15:5A:B8:FD ACL MTU: 1017:8 SCO MTU: 64:8
->>     UP RUNNING PSCAN ISCAN
->>     RX bytes:694 acl:0 sco:0 events:25 errors:0
->>     TX bytes:353 acl:0 sco:0 commands:23 errors:0
->>
->> Respectfully,
->> Judebert
->>
->>     
->
->
-> Hi Judebert,
->
-> There a howto on pilot-link's site. It not only allows you to
-> backup/install. You could also sync to evolution or surf the web.
->
-> The page is old but should still be valid for new devices. I use a
-> similar setup to sync and surf on my Treo 650.
->
-> http://howto.pilot-link.org/bluesync/
->
-> Angus
->
-> -------------------------------------------------------------------------
-> This SF.net email is sponsored by: Microsoft
-> Defy all challenges. Microsoft(R) Visual Studio 2008.
-> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
->   
+And, if anyone has the time, I'd love to better understand the 
+difference between an unpaired connection as established by l2ping (I'm 
+going by the code) and a full bluetooth HCItool-compatible connection 
+which I assume requires pairing.  The official standard is not what I'd 
+describe as especially accessible..!
+
+Thanks,
+Rob.
 
 
 -------------------------------------------------------------------------
