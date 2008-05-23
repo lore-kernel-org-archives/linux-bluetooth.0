@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48379DBC.50504@judebert.com>
-Date: Sat, 24 May 2008 00:46:52 -0400
-From: bluez-users.10.judebert@spamgourmet.com
+Message-ID: <BAYC1-PASMTP03A4A985863B45F15785E6ADC10@CEZ.ICE>
+Date: Fri, 23 May 2008 13:12:56 -0400
+From: Wendell MacKenzie <mackendw@sympatico.ca>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
+To: BlueZ users <bluez-users@lists.sourceforge.net>
 References: <48336FD4.9040803@judebert.com>
 	<F60A3CE9E807BE49B5F56BD80B894D20016883DF@sc-exch03.marvell.com>
 In-Reply-To: <F60A3CE9E807BE49B5F56BD80B894D20016883DF@sc-exch03.marvell.com>
@@ -21,60 +21,84 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I gave both pages a fair shake.  Short story: I'm still willing to 
-provide $20 for a walkthrough.  Long story: I had the following problems:
 
-Wendell MacKenzie - mackendw@sympatico.ca wrote:
-> This helped me:
+This helped me:
+
+http://www.gurulabs.com/goodies/Using_Linux_and_Bluetooth_DUN_with_the_Treo650.php
+
+Angus Ainslie wrote:
+>> -----Original Message-----
+>> From: bluez-users-bounces@lists.sourceforge.net 
+>> [mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf 
+>> Of bluez-users.10.judebert@spamgourmet.com
+>> Sent: Tuesday, May 20, 2008 6:42 PM
+>> To: bluez-users@lists.sourceforge.net
+>> Subject: [Bluez-users] Syncing a Treo 680
+>>
+>> Okay, I've read the Wiki.  I've checked out multiple 
+>> different webpages.  I've been subscribed to the mailing list 
+>> for weeks.  I'm so confused I barely know where to start.
+>>
+>> All I want is to sync my Treo with my computer.  
+>> Specifically, I want to back up my data and install programs 
+>> -- I don't need Outlook functionality or even a list of my 
+>> appointments in a desktop application.  Just backup and install.
+>>
+>> I read here that I shouldn't use dund, but the Wiki points me 
+>> to a webpage that points me to a tutorial that uses dund. 
+>>
+>> I don't program in Python.  Java, C/C++, PHP, and Perl, but 
+>> not Python.  
+>> I don't want to have to learn Python to sync my phone; I'm 
+>> busy supporting other Open Source projects and just don't 
+>> have the spare time.
+>>
+>> So, I will donate $20 via PayPal to anyone who can provide me 
+>> with step-by-step instructions allowing me to sync my Treo 
+>> 680 with my Debian Unstable computer through my Kensington 
+>> K33348 dongle using available packages and configuration 
+>> files.  I will use this knowledge to create a page on/for the 
+>> wiki so other users can avoid the trouble.
+>>
+>> I understand the first step here is 'hcitool scan' and 'hciconfig'.
+>>
+>> $ sudo hcitool scan
+>> Scanning ... (blue light flashes on my dongle) $ sudo hciconfig
+>> hci0:    Type: USB
+>>     BD Address: 00:19:15:5A:B8:FD ACL MTU: 1017:8 SCO MTU: 64:8
+>>     UP RUNNING PSCAN ISCAN
+>>     RX bytes:694 acl:0 sco:0 events:25 errors:0
+>>     TX bytes:353 acl:0 sco:0 commands:23 errors:0
+>>
+>> Respectfully,
+>> Judebert
+>>
+>>     
 >
-> http://www.gurulabs.com/goodies/Using_Linux_and_Bluetooth_DUN_with_the_Treo650.php
->   
-That page is set up for Red Hat.  Debian doesn't have the bluez-pin 
-package, and its hcid.conf is a little different: it contains the PIN, 
-and doesn't have a dbus_pin_helper (not in any of the packages, either). 
-There's also no system-config-security-level.  Nevertheless, everything 
-seems to go well, until I enter my PIN. Even when I set up the 
-"feed-pin.sh" file, I get an error dialog on the Treo 680 titled 
-"Bluetooth Security": "Unable to add ComputerName-0 to your trusted 
-device list."
-
-Angus Ainslie - aainslie@marvell.com wrote:
+>
+> Hi Judebert,
+>
+> There a howto on pilot-link's site. It not only allows you to
+> backup/install. You could also sync to evolution or surf the web.
+>
 > The page is old but should still be valid for new devices. I use a
 > similar setup to sync and surf on my Treo 650.
 >
 > http://howto.pilot-link.org/bluesync/
+>
+> Angus
+>
+> -------------------------------------------------------------------------
+> This SF.net email is sponsored by: Microsoft
+> Defy all challenges. Microsoft(R) Visual Studio 2008.
+> http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 >   
-This page also requires packages not available on Debian: bluez-lib, 
-bluez-pan and bluez-sdp.  The Palm pieces seem more relevant to my Treo; 
-however, the Treo seems to already have a Bluetooth HotSync profile.  It 
-has a nice little tutorial that, after the equivalent of figure 5-8, 
-says I have to set up a virtual serial port on my computer.  I assume 
-that's what hcid, pand, and rfcomm are doing, and carry on.  Actually 
-clicking the "Launch HotSync" button leads to a message: "Connecting 
-with the desktop using ComputerName-0", followed by an error dialog 
-titled "HotSync Problem": "Unable to initiate HotSync operation because 
-the port is in use by another application."
 
-I assume this is because it never asked for a PIN, but I just don't 
-know.  When I carry on, adding the /etc/bluetooth/pin file as instructed 
-in Chapter 6, I get the same "Unable to add" message as above.
-
-Since $20 is at stake, and I'm awake, I figured I'd give it another 
-try.  I installed bluez-gnome and ran the bluetooth-applet from the 
-command line.  From there I enabled "Automatically authorize incoming 
-requests".  This time when I tried to add the computer to my trusted 
-devices, the bluetooth-applet prompted me for a passkey; when I had 
-entered the same passkey on both devices, it claimed to have verified my 
-phone.
-
-Unfortunately, I still got the "port is in use" error.  I went back 
-through the second link, added my computer as a network, and tried to 
-follow the setup in Chapter 7.1 for surfing the web (because Chapter 7.2 
-says that I need the pppd set up here), but I don't have sdpd running, 
-and I don't know where to find it.
-
-Respectfully,
-Judebert
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
