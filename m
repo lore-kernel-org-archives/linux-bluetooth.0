@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <685df2130805241855v3ebc7fd5wef3fab700c3a5c4a@mail.gmail.com>
-Date: Sat, 24 May 2008 21:55:25 -0400
-From: "Joshua Bryant" <josh@bryantweb.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <48382933.3030209@earthlink.net>
+Date: Sat, 24 May 2008 09:41:55 -0500
+From: "Mumia W.." <paduille.4061.mumia.w+nospam@earthlink.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] Change Default Headset not working
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <mailman.308836.1211604429.29930.bluez-users@lists.sourceforge.net>
+	<1211618718.4244.27.camel@goya.uc3m.es>
+In-Reply-To: <1211618718.4244.27.camel@goya.uc3m.es>
+Subject: Re: [Bluez-users] Bluez-users Digest, Vol 25, Issue 18
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,92 +17,39 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0491862726=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0491862726==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_11694_10699960.1211680525170"
+On 05/24/2008 03:45 AM, Javi F Gorostiza wrote:
+> Hello,
+> I've parched and compiled the kernel-2.6.23.17 to get headsetd working.
+> And everything is allright BUT one detail. When I open an alsa pcm_sco
+> device to capture the data form a BT headset, in the console a lot of
+> DEBUG messages arises. They are so much that the functionality of my
+> application decreases, and I cannot see the usefull information in the
+> console...it's really horrible.
+> I think that all those DEBUG messages are relationated with an option in
+> the kernel (.config file) but I can find it at all.
+> Does anybody know how to switch off these information, please?
+> Thanks,
+> J
+> 
 
-------=_Part_11694_10699960.1211680525170
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+You can control what kernel messages get to the console by using the 
+"dmesg" program. For example, try this:
 
-The command to change the default headset is not working for me. I change
-the default headset, but mplayer continues to connect to the old default
-headset. Bluez is changing the default headset, but mplayer does not connect
-to the new default headset.
+dmesg -n4
 
-My .asoundrc:
+By the way, your message was confusing because you replied to the digest 
+message rather than to an individual message in the digest.
 
-pcm.headset {
-type bluetooth
-}
-
-   $ dbus-send --system --type=method_call --print-reply --dest=":1.27"
-/org/bluez/audio org.bluez.audio.Manager.DefaultDevice
-   method return sender=:1.27 -> dest=:1.33 reply_serial=2
-      string "/org/bluez/audio/device1"
-
-   $ dbus-send --system --type=method_call --print-reply --dest=":1.27"
-   /org/bluez/audio org.bluez.audio.Manager.ChangeDefaultDevice
-string:/org/bluez/audio/device0
-   method return sender=:1.27 -> dest=:1.34 reply_serial=2
-
-   $ dbus-send --system --type=method_call --print-reply --dest=":1.27"
-   /org/bluez/audio org.bluez.audio.Manager.DefaultDevice
-method return sender=:1.27 -> dest=:1.35 reply_serial=2
-      string "/org/bluez/audio/device0"
-
-Why does mplayer still connect to the old default headset after the change?
-
-Thanks for your help-
-Josh
-
-------=_Part_11694_10699960.1211680525170
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-The command to change the default headset is not working for me. I
-change the default headset, but mplayer continues to connect to the old
-default headset. Bluez is changing the default headset, but
-mplayer does not connect to the new default headset.<br>
-<br>My .asoundrc:<br><br>pcm.headset {<br>type bluetooth<br>}<br><br>
- &nbsp;&nbsp; $ dbus-send --system --type=method_call --print-reply --dest=&quot;:1.27&quot; /org/bluez/audio org.bluez.audio.Manager.DefaultDevice<br><div id="1f3d" class="ArwC7c ckChnd">
- &nbsp; &nbsp;method return sender=:1.27 -&gt; dest=:1.33 reply_serial=2<br>
- &nbsp; &nbsp; &nbsp; string &quot;/org/bluez/audio/device1&quot;<br><br>
- &nbsp; &nbsp;$ dbus-send --system --type=method_call --print-reply --dest=&quot;:1.27&quot;<br>
- &nbsp; &nbsp;/org/bluez/audio org.bluez.audio.Manager.ChangeDefaultDevice&nbsp; string:/org/bluez/audio/device0<br>
- &nbsp; &nbsp;method return sender=:1.27 -&gt; dest=:1.34 reply_serial=2<br><br>
- &nbsp; &nbsp;$ dbus-send --system --type=method_call --print-reply --dest=&quot;:1.27&quot;<br>
- &nbsp; &nbsp;/org/bluez/audio org.bluez.audio.Manager.DefaultDevice<br>method return sender=:1.27 -&gt; dest=:1.35 reply_serial=2<br>
- &nbsp; &nbsp; &nbsp; string &quot;/org/bluez/audio/device0&quot;<br><br>Why does mplayer still connect to the old default headset after the change?<br><br>Thanks for your help-<br>Josh</div><br><br><br>
-
-------=_Part_11694_10699960.1211680525170--
-
-
---===============0491862726==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============0491862726==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0491862726==--
