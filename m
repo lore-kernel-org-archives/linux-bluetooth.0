@@ -1,48 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <11f816ab0805240306p7c6ce7f2n9ab5f779343339b1@mail.gmail.com>
-Date: Sat, 24 May 2008 12:06:07 +0200
-From: Luca <lucamarturana@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <025301c8bd58$5066df70$6701a8c0@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Cc: "Marcel Holtmann" <marcel@holtmann.org>,
+	"Johan Hedberg" <johan.hedberg@gmail.com>
+Subject: Quick Check: calling ListDevices method of Adapter in DBus-GLib-C++
+Date: Fri, 23 May 2008 23:40:33 -0500
 MIME-Version: 1.0
-Subject: [Bluez-devel] Simulate a bluetooth keyboard from a pc
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0250_01C8BD2E.64EE1910"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi to all,
+This is a multi-part message in MIME format.
 
-I would create a software that simulates a bluetooth keyboard using
-the keyboard of the pc and a bluetooth dongle. Can this be done with
-bluez libs? I read the documentation of bluez-libs and bluez-utils but
-I didn't understand same things:
+------=_NextPart_000_0250_01C8BD2E.64EE1910
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-1. The bluez-utils input dbus interface is used to connect a bluetooth
-keyboard to the pc, isn't it? So it's the opposite of that I need?
-2. I have to create an HIDP server? Can this be done with bluez-libs?
-How can this be done? Are there same examples on how to create a HIDP
-server with bluez libs and C?
-3. bluez-python seems that don't support HIDP servers, right? So I must use C.
+It appears to me that the proper GType that matches up with an Array of =
+Object Paths is:
 
-I hope that I have explained fine my question, if it's not tell me to
-explain again.
-Thanks for the attention and excuse me for my bad english!
+dbus_g_type_get_collection("GSList", DBUS_TYPE_G_OBJECT_PATH)
 
-Regards
+This returns a pointer to a singly-linked list (GSList), which one may =
+iterate through using g_slist_foreach, which calls an iterator function =
+for each Object Path in the list.
 
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+A gpointer passed to the iterator function contains the Device path: =
+(e.g., /hci0/dev_00_00_00_00_00_00), and may be cast to a (const char *) =
+for processing as a C/C++ string.
+
+Do I have this right, or is there a better way to attack this?
+
+DS
+------=_NextPart_000_0250_01C8BD2E.64EE1910
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.6000.16640" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>It appears to me that the proper GType =
+that matches=20
+up with an Array of Object Paths is:</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>dbus_g_type_get_collection("GSList",=20
+DBUS_TYPE_G_OBJECT_PATH)</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>This returns a pointer to a =
+singly-linked list=20
+(GSList), which one may iterate through using g_slist_foreach, which =
+calls an=20
+iterator function for each Object Path in the list.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>A gpointer passed to the iterator =
+function contains=20
+the Device path: (e.g., /hci0/dev_00_00_00_00_00_00), and may be cast to =
+a=20
+(const char *) for processing as a C/C++ string.</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>Do I have this right, or is there a =
+better way to=20
+attack this?</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>DS</FONT></DIV></BODY></HTML>
+
+------=_NextPart_000_0250_01C8BD2E.64EE1910--
