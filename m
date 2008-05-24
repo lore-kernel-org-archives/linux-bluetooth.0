@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <11f816ab0805240306p7c6ce7f2n9ab5f779343339b1@mail.gmail.com>
-References: <11f816ab0805240306p7c6ce7f2n9ab5f779343339b1@mail.gmail.com>
-Date: Sat, 24 May 2008 11:08:13 +0100
-Message-Id: <1211623693.3566.149.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Simulate a bluetooth keyboard from a pc
+Message-ID: <11f816ab0805240306p7c6ce7f2n9ab5f779343339b1@mail.gmail.com>
+Date: Sat, 24 May 2008 12:06:07 +0200
+From: Luca <lucamarturana@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] Simulate a bluetooth keyboard from a pc
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,16 +18,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sat, 2008-05-24 at 12:06 +0200, Luca wrote:
-> Hi to all,
-> 
-> I would create a software that simulates a bluetooth keyboard using
-> the keyboard of the pc and a bluetooth dongle.
+Hi to all,
 
-http://mulliner.org/bluetooth/xkbdbthid.php
+I would create a software that simulates a bluetooth keyboard using
+the keyboard of the pc and a bluetooth dongle. Can this be done with
+bluez libs? I read the documentation of bluez-libs and bluez-utils but
+I didn't understand same things:
 
-Cheers
+1. The bluez-utils input dbus interface is used to connect a bluetooth
+keyboard to the pc, isn't it? So it's the opposite of that I need?
+2. I have to create an HIDP server? Can this be done with bluez-libs?
+How can this be done? Are there same examples on how to create a HIDP
+server with bluez libs and C?
+3. bluez-python seems that don't support HIDP servers, right? So I must use C.
 
+I hope that I have explained fine my question, if it's not tell me to
+explain again.
+Thanks for the attention and excuse me for my bad english!
+
+Regards
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
