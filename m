@@ -1,11 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 May 2008 05:21:36 -0400
-From: jayjwa <jayjwa@atr2.ath.cx>
+From: "Alex S. Brown, PMP IPMA-C" <alex@rlprj.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <alpine.LNX.1.00.0805280355410.22621@nge2.ngu.pk>
-MIME-Version: 1.0
-Subject: [Bluez-users] bluez-utils-3.32: something broke?
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Wed, 28 May 2008 00:15:05 -0400
+Message-Id: <1211948105.2802.11.camel@owl>
+Mime-Version: 1.0
+Subject: [Bluez-users] Headset Noise Half the Time -- How to Apply This Fix??
+Reply-To: alex@rlprj.com,
+	BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,119 +19,188 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+I am using a Motorola H700 headset with Ubuntu 8.04 (Bluez 3.26ubuntu6),
+and I am seeing the exact same symptoms as Andrea did in her April post
+(see below). About half the time, the headset connects properly. The
+other half the time either the microphone or the speakers are filled
+with noise. It is not like normal interference; it sounds like the
+computer is misinterpreting the audio codec.
 
-Where to start? To put it simply, it used to work, now it doesn't. ;)
-I upgraded to 3.32 and everything went haywire. Audio stopped working, plus 
-I'm seeing alot of weird error messages.
+I would like to apply Andrea's fix, but I have no idea how to do it. Her
+solution is posted under this link, and I also quoted it below:
+<http://sourceforge.net/mailarchive/message.php?msg_id=20080414100543.GA9430%40duo.random>
 
-This used to work playing on my bt headset:
+Here are my questions:
+1. Has this fix somehow been incorporated into the latest build? (I
+cannot find detailed release notes to tell one way or the other)
+2. If not, should I go to the latest released version, and then add
+Andrea's fixes according to the diff, then rebuild? Should I go back to
+the 3.30 version that she mentions instead?
+3. Is anyone else seeing this same problem? Is there a better solution?
 
-sox -t ogg file.ogg -t alsa pcm.bluetooth
+I really had trouble following the thread. I see notes like "the patch
+is not OK if applied like this" and recommendations to use "my previous
+patch instead".
 
-Now:
+Sorry if I am asking too basic a question. I know something about
+utilities like diff, but I am really uncertain about applying a patch
+like this one. I am just not sure about what actually worked and what
+did not from reading the previous post.
 
-ALSA lib pcm_bluetooth.c:1505:(audioservice_recv) Error receiving data from
-audio service: Success(0)
-ALSA lib pcm_bluetooth.c:1521:(audioservice_expect) Bogus message
-BT_SETCONFIGURATION_REQ received while BT_SETCONFIGURATION_RSP was expected
-sox soxio: Can't open output file `pcm.bluetooth': cannot set parameters
-
-hcid segfaulted on the first test. The bluetooth USB dongle "hangs", flashing 
-endlessly. The sco counts stay at zero.
-
-
-2008-05-28T03:50:07.678634-04:00 vdrl hcid[3348]: Bluetooth HCI daemon
-2008-05-28T03:50:07.686778-04:00 vdrl hcid[3348]: Parsing
-/etc/bluetooth/main.conf failed: No such file or directory
-
-main.conf? Never saw that before. What are the service-*.xml files for? Where 
-to install?
-
-2008-05-28T03:50:07.686794-04:00 vdrl hcid[3348]: HCI dev 0 
-registered
-2008-05-28T03:50:07.688100-04:00 vdrl hcid[3348]: HCI dev 0 already up
-2008-05-28T03:50:07.688730-04:00 vdrl hcid[3348]: Device hci0 has been added
-2008-05-28T03:50:07.690768-04:00 vdrl hcid[3348]: Starting security manager
-0
-2008-05-28T03:50:07.729056-04:00 vdrl hcid[3348]: Device hci0 has been
-activated
-2008-05-28T03:50:07.729095-04:00 vdrl hcid[3348]: Starting SDP server
-2008-05-28T03:50:07.729107-04:00 vdrl hcid[3348]: Can't create GN bridge
-2008-05-28T03:50:07.729117-04:00 vdrl hcid[3348]: Registered manager
-path:/org/bluez/network
-2008-05-28T03:50:07.729129-04:00 vdrl hcid[3348]: Registered server
-path:/org/bluez/network/nap
-2008-05-28T03:50:07.729139-04:00 vdrl hcid[3348]: Registered server
-path:/org/bluez/network/gn
-2008-05-28T03:50:07.729150-04:00 vdrl hcid[3348]: Registered server
-path:/org/bluez/network/panu
-2008-05-28T03:50:07.729202-04:00 vdrl hcid[3348]: Registered manager
-path:/org/bluez/serial
-2008-05-28T03:50:07.729213-04:00 vdrl hcid[3348]: Registered input manager
-path:/org/bluez/input
-2008-05-28T03:50:07.730615-04:00 vdrl hcid[3348]: Unix socket created: 18
-2008-05-28T03:50:07.739750-04:00 vdrl hcid[3348]: Registered manager
-path:/org/bluez/audio
-2008-05-28T03:50:07.739785-04:00 vdrl hcid[3348]: 
-Loading device 00:1A:45:01:F9:42 (headset )
-2008-05-28T03:50:07.739796-04:00 vdrl hcid[3348]: Setting 00:1A:45:01:F9:42
-as default device
-2008-05-28T03:50:07.739807-04:00 vdrl hcid[3348]: Starting experimental
-netlink support
-
-^^^^^^^^^^^^  I thought this could be the trouble, so I hid it and built 
-again. Same results.
+Thanks,
+Alex
 
 
-2008-05-28T03:50:07.739818-04:00 vdrl hcid[3348]: Failed to find Bluetooth
-netlink family
-2008-05-28T03:50:07.739829-04:00 vdrl hcid[3348]: Can't init plugin
-/usr/lib/bluetooth/plugins/libnetlink.so
+> [Bluez-users] howto wep 500
+> From: Andrea Arcangeli <andrea@cp...> - 2008-04-21 01:09
+> 
+> I didn't receive any feedback so far, so I give it a second try this
+> weekend.
+> 
+> So the S16_LE stream sometime was byte swapped (big endian format
+> instead of little endian, randomly). Verified with hcidump with
+> arecord (only fragment reassembly and usb code was involved, so it
+> couldn't be anything in userland, and quickly it become clear it's a
+> bug in the headset firmware). This always happens in all isocs
+> supporting 16 bit transfers (and some isocs just returns partial
+> garbage or a zero stream). voice 0x40 in isoc=2 also returns streams
+> of zeros or garbage. So I tried voice 0x40 in isoc=1 and it returns
+> nothing sane too.
+> 
+> So I figured out the phone had to be using alaw or mulaw. I thought
+> alaw and mulaw should work with isochronous alternative 2 too (default
+> of hci_usb) but it doesn't with my headset (alt 2 supports 1 16bit
+> channel or 2 8bit channels for two bluetooth handles in the same
+> isochronous endpoint).
+> 
+> Luckily I kept trying in all possible ways and finally I got it
+> working perfectly by adding to modules.d a file like this:
+> 
+> options hci_usb isoc=1
+> 
+> And adding this line at the end of /etc/init.d/bluetooth start:
+> 
+> hciconfig hci0 voice 0x240
+> 
+> After this I had to patch bluez-utils-3.30 and to recompile it 16bit
+> for skype, and now skype works perfectly with my headset. I've still a
+> minor issue with twinkle, the capture doesn't produce crystal clear
+> sound. I use a-law for all my asterisk voip so in theory twinkle
+> should learn to forward the packets generated by the headset directly
+> to the network without converting them to S16_LE, but arecord |aplay
+> in S16_LE mode returns a fine good sound quality too through the plug
+> device, so even if it converts back and forth it's ok.
+> 
+> diff -ur
+> bluez-utils-3.30/audio/pcm_bluetooth.c /var/tmp/portage/net-wireless/bluez-utils-3.30/work/bluez-utils-3.30/audio/pcm_bluetooth.c
+> --- bluez-utils-3.30/audio/pcm_bluetooth.c 2008-04-14
+> 04:03:03.000000000 +0200
+> +++ /var/tmp/portage/net-wireless/bluez-utils-3.30/work/bluez-utils-3.30/audio/pcm_bluetooth.c 2008-04-20 07:35:01.000000000 +0200
+> @@ -462,7 +462,9 @@
+> }
+> 
+> data->transport = setconf_rsp->transport;
+> - data->link_mtu = setconf_rsp->link_mtu;
+> + if (data->link_mtu != setconf_rsp->link_mtu)
+> + SNDERR("BT_SETCONFIGURATION link_mtu ignored: %d",
+> + setconf_rsp->link_mtu);
+> 
+> return 0;
+> }
+> @@ -1157,7 +1159,8 @@
+> SND_PCM_ACCESS_MMAP_INTERLEAVED
+> };
+> unsigned int format_list[] = {
+> - SND_PCM_FORMAT_S16_LE
+> + //SND_PCM_FORMAT_S16_LE
+> + SND_PCM_FORMAT_A_LAW
+> };
+> int err;
+> 
+> @@ -1629,10 +1632,13 @@
+> data->io.callback = stream == SND_PCM_STREAM_PLAYBACK ?
+> &bluetooth_a2dp_playback :
+> &bluetooth_a2dp_capture;
+> - else
+> + else {
+> data->io.callback = stream == SND_PCM_STREAM_PLAYBACK ?
+> &bluetooth_hsp_playback :
+> &bluetooth_hsp_capture;
+> + data->link_mtu = 48;
+> + data->link_mtu = 24;
+> + }
+> 
+> err = snd_pcm_ioplug_create(&data->io, name, stream, mode);
+> if (err < 0)
+> diff -ur
+> bluez-utils-3.30/audio/unix.c /var/tmp/portage/net-wireless/bluez-utils-3.30/work/bluez-utils-3.30/audio/unix.c
+> --- bluez-utils-3.30/audio/unix.c 2008-04-03 01:01:44.000000000 +0200
+> +++ /var/tmp/portage/net-wireless/bluez-utils-3.30/work/bluez-utils-3.30/audio/unix.c 2008-04-20 06:12:25.000000000 +0200
+> @@ -285,6 +285,7 @@
+> rsp->transport = BT_CAPABILITIES_TRANSPORT_SCO;
+> rsp->access_mode = client->access_mode;
+> rsp->link_mtu = 48;
+> + rsp->link_mtu = 24;
+> 
+> client->data_fd = headset_get_sco_fd(dev);
+> 
+> 
+> 
+> this is my .asoundrc:
+> 
+> pcm.bluetooth_raw {
+> type bluetooth
+> device 00:02:78:29:3F:D4
+> profile "voice"
+> }
+> 
+> pcm.bluetooth {
+> type plug
+> slave {
+> pcm "bluetooth_raw"
+> }
+> }
+> 
+> The patch is not ok if applied like this. My previous patch instead
+> should be applied as I sent it as it includes a fix for everyone. The
+> ideal I guess is to read the voice in the same way hciconfig does it,
+> and if the a-law bit or mu-law bit are set, the link_mtu should be
+> assumed 24 bytes instead of 48, and the alsa initialization should use
+> A_LAW/MU_LAW instead of S16_LE. I can't work on this until next
+> weekend at the earliest, so I hope somebody else will clean this up
+> sooner now that the problem is understood ;). I suspect asterisk
+> bluetooth supports also hardcodes 48 bytes and doesn't support
+> anything but voice 0x60, it'd be nice not to hardcode those things and
+> to be dynamic in function of the hciconfig setting, even better would
+> be to match the headset features and to autodetect it per-connection
+> instead of per-hci device.
+> 
+> My headset should work with most if not all recent cellphones, so this
+> also means cellphones prefers a-law/mu-law to S16_LE if supported by
+> the headset. 
 
-It does exist and I installed this particular "netlink' lib (there's about 4: 
-rtnetlink, nfnetlink, iproute2's libnetlink, and this libnl-1).
+-- 
+Alex S. Brown, PMP, IPMA-C
+Owner, President and CEO (Chief Everything Officer)
+Real-Life Projects, Inc.
+When you don't have time to waste...
 
-2008-05-28T03:50:12.747879-04:00 vdrl hcid[3348]: Default authorization
-/agent (:1.10, /org/bluez/auth_agent_3352) registered
-2008-05-28T03:50:34.813665-04:00 vdrl hcid[3348]: Default passkey agent
-/(:1.11, /org/bluez/passkey_agent_3355) registered
-2008-05-28T03:51:00.171619-04:00 vdrl hcid[3348]: Audio API: received
-/BT_GETCAPABILITIES_REQ
-2008-05-28T03:51:00.171649-04:00 vdrl hcid[3348]: Audio API: sending
-/BT_GETCAPABILITIES_RSP
-2008-05-28T03:51:00.173225-04:00 vdrl hcid[3348]: Audio API: received
-/BT_SETCONFIGURATION_REQ
-2008-05-28T03:51:00.173300-04:00 vdrl hcid[3348]: config sco - device =
-/00:1A:45:01:F9:42 access_mode = 2
-2008-05-28T03:51:03.900979-04:00 vdrl hcid[3348]: link_key_request
-/(sba=00:0A:3A:7C:5C:74, dba=00:1A:45:01:F9:42)
-2008-05-28T03:51:06.571723-04:00 vdrl hcid[3348]: connect: Socket operation
-/on non-socket (88)
-2008-05-28T03:51:07.762096-04:00 vdrl hcid[3348]: Badly formated or
-/unrecognized command: AT+BTRH?
+alex@rlprj.com
+http://www.rlprj.com
++1 908 428 2048
 
-Very similar to the errors I got before patching the kernel to support SCO.
+My articles: http://www.alexsbrown.com
 
+Network with me at
+OpenBC/XING: https://www.xing.com/profile/AlexS_Brown
+LinkedIn: http://www.linkedin.com/in/alexsbrown
+Facebook: http://www.facebook.com/people/Alex_S_Brown/575587928
 
-2008-05-28T03:51:58.718581-04:00 vdrl hcid[3348]: Audio API: received
-/BT_GETCAPABILITIES_REQ
-2008-05-28T03:51:58.718607-04:00 vdrl hcid[3348]: Audio API: sending
-/BT_GETCAPABILITIES_RSP
-2008-05-28T03:51:58.720113-04:00 vdrl hcid[3348]: Audio API: received
-/BT_SETCONFIGURATION_REQ
-2008-05-28T03:51:58.720155-04:00 vdrl hcid[3348]: config sco - device =
-/00:1A:45:01:F9:42 access_mode = 2
-2008-05-28T03:52:02.251505-04:00 vdrl hcid[3348]: link_key_request
-/(sba=00:0A:3A:7C:5C:74, dba=00:1A:45:01:F9:42)
-2008-05-28T03:52:04.914254-04:00 vdrl hcid[3348]: connect: Invalid argument
-/(22)
-2008-05-28T03:52:06.341660-04:00 vdrl hcid[3348]: Badly formated or
-/unrecognized command: AT+BTRH?
-
-As nothing I tried worked, I put back bluez-utils-3.31 and the problems 
-disappeared. bluez-libs-3.32 appears OK, but bluez-utils-3.32 has some serious 
-issues.
-2.6.25.3 w/sco patch built with gcc-4.3.0, x86.
+Want to learn more?
+Sign up for my free newsletter at
+http://www.alexsbrown.com/newsletter.html
+Take one of my on-line classes at
+http://www.rlprj.com/onlinetraining.html
 
 
 -------------------------------------------------------------------------
