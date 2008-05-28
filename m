@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Alex S. Brown, PMP IPMA-C" <alex@rlprj.com>
+Message-ID: <efbc7ae90805271708t4b4b92c0j841b93f1217c727e@mail.gmail.com>
+Date: Tue, 27 May 2008 17:08:29 -0700
+From: "Milosh Milosavljevic" <milosh.milosavljevic@gmail.com>
 To: bluez-users@lists.sourceforge.net
-Date: Wed, 28 May 2008 00:15:05 -0400
-Message-Id: <1211948105.2802.11.camel@owl>
-Mime-Version: 1.0
-Subject: [Bluez-users] Headset Noise Half the Time -- How to Apply This Fix??
-Reply-To: alex@rlprj.com,
-	BlueZ users <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-users] Jabra JX10 Headset
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -15,199 +14,99 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0410766340=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I am using a Motorola H700 headset with Ubuntu 8.04 (Bluez 3.26ubuntu6),
-and I am seeing the exact same symptoms as Andrea did in her April post
-(see below). About half the time, the headset connects properly. The
-other half the time either the microphone or the speakers are filled
-with noise. It is not like normal interference; it sounds like the
-computer is misinterpreting the audio codec.
+--===============0410766340==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_7041_11233770.1211933309602"
 
-I would like to apply Andrea's fix, but I have no idea how to do it. Her
-solution is posted under this link, and I also quoted it below:
-<http://sourceforge.net/mailarchive/message.php?msg_id=20080414100543.GA9430%40duo.random>
+------=_Part_7041_11233770.1211933309602
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Here are my questions:
-1. Has this fix somehow been incorporated into the latest build? (I
-cannot find detailed release notes to tell one way or the other)
-2. If not, should I go to the latest released version, and then add
-Andrea's fixes according to the diff, then rebuild? Should I go back to
-the 3.30 version that she mentions instead?
-3. Is anyone else seeing this same problem? Is there a better solution?
+I have Jabra JX10 BT headset. Used it successfully on Fedora 7 with btsco
+and snd-bt-sco. Skype, Ekiga, TeamSpeak working flowlessly. When I tried
+them on Fedora 9 it seems to connect and pair right-away but no sound. I
+tried steps from your tutorial on bluez wiki. First to put device address
+into .asoundrc without any profile, with "auto" profile, with "voice"
+profile and none of it worked. I got device listed in Skype though.
 
-I really had trouble following the thread. I see notes like "the patch
-is not OK if applied like this" and recommendations to use "my previous
-patch instead".
-
-Sorry if I am asking too basic a question. I know something about
-utilities like diff, but I am really uncertain about applying a patch
-like this one. I am just not sure about what actually worked and what
-did not from reading the previous post.
-
-Thanks,
-Alex
+pcm.bluetooth {
+   type bluetooth
+   device <my bt address>
+}
 
 
-> [Bluez-users] howto wep 500
-> From: Andrea Arcangeli <andrea@cp...> - 2008-04-21 01:09
-> 
-> I didn't receive any feedback so far, so I give it a second try this
-> weekend.
-> 
-> So the S16_LE stream sometime was byte swapped (big endian format
-> instead of little endian, randomly). Verified with hcidump with
-> arecord (only fragment reassembly and usb code was involved, so it
-> couldn't be anything in userland, and quickly it become clear it's a
-> bug in the headset firmware). This always happens in all isocs
-> supporting 16 bit transfers (and some isocs just returns partial
-> garbage or a zero stream). voice 0x40 in isoc=2 also returns streams
-> of zeros or garbage. So I tried voice 0x40 in isoc=1 and it returns
-> nothing sane too.
-> 
-> So I figured out the phone had to be using alaw or mulaw. I thought
-> alaw and mulaw should work with isochronous alternative 2 too (default
-> of hci_usb) but it doesn't with my headset (alt 2 supports 1 16bit
-> channel or 2 8bit channels for two bluetooth handles in the same
-> isochronous endpoint).
-> 
-> Luckily I kept trying in all possible ways and finally I got it
-> working perfectly by adding to modules.d a file like this:
-> 
-> options hci_usb isoc=1
-> 
-> And adding this line at the end of /etc/init.d/bluetooth start:
-> 
-> hciconfig hci0 voice 0x240
-> 
-> After this I had to patch bluez-utils-3.30 and to recompile it 16bit
-> for skype, and now skype works perfectly with my headset. I've still a
-> minor issue with twinkle, the capture doesn't produce crystal clear
-> sound. I use a-law for all my asterisk voip so in theory twinkle
-> should learn to forward the packets generated by the headset directly
-> to the network without converting them to S16_LE, but arecord |aplay
-> in S16_LE mode returns a fine good sound quality too through the plug
-> device, so even if it converts back and forth it's ok.
-> 
-> diff -ur
-> bluez-utils-3.30/audio/pcm_bluetooth.c /var/tmp/portage/net-wireless/bluez-utils-3.30/work/bluez-utils-3.30/audio/pcm_bluetooth.c
-> --- bluez-utils-3.30/audio/pcm_bluetooth.c 2008-04-14
-> 04:03:03.000000000 +0200
-> +++ /var/tmp/portage/net-wireless/bluez-utils-3.30/work/bluez-utils-3.30/audio/pcm_bluetooth.c 2008-04-20 07:35:01.000000000 +0200
-> @@ -462,7 +462,9 @@
-> }
-> 
-> data->transport = setconf_rsp->transport;
-> - data->link_mtu = setconf_rsp->link_mtu;
-> + if (data->link_mtu != setconf_rsp->link_mtu)
-> + SNDERR("BT_SETCONFIGURATION link_mtu ignored: %d",
-> + setconf_rsp->link_mtu);
-> 
-> return 0;
-> }
-> @@ -1157,7 +1159,8 @@
-> SND_PCM_ACCESS_MMAP_INTERLEAVED
-> };
-> unsigned int format_list[] = {
-> - SND_PCM_FORMAT_S16_LE
-> + //SND_PCM_FORMAT_S16_LE
-> + SND_PCM_FORMAT_A_LAW
-> };
-> int err;
-> 
-> @@ -1629,10 +1632,13 @@
-> data->io.callback = stream == SND_PCM_STREAM_PLAYBACK ?
-> &bluetooth_a2dp_playback :
-> &bluetooth_a2dp_capture;
-> - else
-> + else {
-> data->io.callback = stream == SND_PCM_STREAM_PLAYBACK ?
-> &bluetooth_hsp_playback :
-> &bluetooth_hsp_capture;
-> + data->link_mtu = 48;
-> + data->link_mtu = 24;
-> + }
-> 
-> err = snd_pcm_ioplug_create(&data->io, name, stream, mode);
-> if (err < 0)
-> diff -ur
-> bluez-utils-3.30/audio/unix.c /var/tmp/portage/net-wireless/bluez-utils-3.30/work/bluez-utils-3.30/audio/unix.c
-> --- bluez-utils-3.30/audio/unix.c 2008-04-03 01:01:44.000000000 +0200
-> +++ /var/tmp/portage/net-wireless/bluez-utils-3.30/work/bluez-utils-3.30/audio/unix.c 2008-04-20 06:12:25.000000000 +0200
-> @@ -285,6 +285,7 @@
-> rsp->transport = BT_CAPABILITIES_TRANSPORT_SCO;
-> rsp->access_mode = client->access_mode;
-> rsp->link_mtu = 48;
-> + rsp->link_mtu = 24;
-> 
-> client->data_fd = headset_get_sco_fd(dev);
-> 
-> 
-> 
-> this is my .asoundrc:
-> 
-> pcm.bluetooth_raw {
-> type bluetooth
-> device 00:02:78:29:3F:D4
-> profile "voice"
-> }
-> 
-> pcm.bluetooth {
-> type plug
-> slave {
-> pcm "bluetooth_raw"
-> }
-> }
-> 
-> The patch is not ok if applied like this. My previous patch instead
-> should be applied as I sent it as it includes a fix for everyone. The
-> ideal I guess is to read the voice in the same way hciconfig does it,
-> and if the a-law bit or mu-law bit are set, the link_mtu should be
-> assumed 24 bytes instead of 48, and the alsa initialization should use
-> A_LAW/MU_LAW instead of S16_LE. I can't work on this until next
-> weekend at the earliest, so I hope somebody else will clean this up
-> sooner now that the problem is understood ;). I suspect asterisk
-> bluetooth supports also hardcodes 48 bytes and doesn't support
-> anything but voice 0x60, it'd be nice not to hardcode those things and
-> to be dynamic in function of the hciconfig setting, even better would
-> be to match the headset features and to autodetect it per-connection
-> instead of per-hci device.
-> 
-> My headset should work with most if not all recent cellphones, so this
-> also means cellphones prefers a-law/mu-law to S16_LE if supported by
-> the headset. 
 
--- 
-Alex S. Brown, PMP, IPMA-C
-Owner, President and CEO (Chief Everything Officer)
-Real-Life Projects, Inc.
-When you don't have time to waste...
+Second I tried with python script. With that one I managed to connect and
+pair my headset (got the popup to type PIN). When I called Play method I was
+getting NotAvailable bluez exception.
 
-alex@rlprj.com
-http://www.rlprj.com
-+1 908 428 2048
+import dbus
+bus = dbus.SystemBus()
+manager = dbus.Interface(bus.get_object('org.bluez', '/org/bluez'),
+'org.bluez.Manager')
+bus_id = manager.ActivateService('audio')
+audio = dbus.Interface(bus.get_object(bus_id, '/org/bluez/audio'),
+'org.bluez.audio.Manager')
 
-My articles: http://www.alexsbrown.com
+path = audio.CreateHeadset('<my bt address>')
+#audio.ChangeDefaultHeadset(path) #change the device to be used by default
+headset = dbus.Interface (bus.get_object(bus_id, path),
+'org.bluez.audio.Headset')
+#Connect and Play are not required in PCM mode
+headset.Connect()
+headset.Play()
 
-Network with me at
-OpenBC/XING: https://www.xing.com/profile/AlexS_Brown
-LinkedIn: http://www.linkedin.com/in/alexsbrown
-Facebook: http://www.facebook.com/people/Alex_S_Brown/575587928
 
-Want to learn more?
-Sign up for my free newsletter at
-http://www.alexsbrown.com/newsletter.html
-Take one of my on-line classes at
-http://www.rlprj.com/onlinetraining.html
+I also tried btsco. Got the latest version, compiled it and installed it.
+Module snd_bt_sco loaded properly but I am getting the following exception:
 
+btsco v0.5c
+Error: control open (hw:1): No such file or directory
+Error: Can't find device. Bail
+
+
+Any help is greatly appreciated,
+Milosh
+
+------=_Part_7041_11233770.1211933309602
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+I have Jabra JX10 BT headset. Used it successfully on Fedora 7 with btsco and snd-bt-sco. Skype, Ekiga, TeamSpeak working flowlessly. When I tried them on Fedora 9 it seems to connect and pair right-away but no sound. I tried steps from your tutorial on bluez wiki. First to put device address into .asoundrc without any profile, with &quot;auto&quot; profile, with &quot;voice&quot; profile and none of it worked. I got device listed in Skype though. <br>
+<br><pre class="wiki">pcm.bluetooth {<br>   type bluetooth<br>   device &lt;my bt address&gt;<br>}<br></pre><br><br>Second I tried with python script. With that one I managed to connect and pair my headset (got the popup to type PIN). When I called Play method I was getting NotAvailable bluez exception. <br>
+<br><pre>import dbus<br>bus = dbus.SystemBus()<br>manager = dbus.Interface(bus.get_object(&#39;org.bluez&#39;, &#39;/org/bluez&#39;), &#39;org.bluez.Manager&#39;)<br>bus_id = manager.ActivateService(&#39;audio&#39;)<br>audio = dbus.Interface(bus.get_object(bus_id, &#39;/org/bluez/audio&#39;), &#39;org.bluez.audio.Manager&#39;)<br>
+<br>path = audio.CreateHeadset(&#39;&lt;my bt address&gt;&#39;)<br>#audio.ChangeDefaultHeadset(path) #change the device to be used by default<br>headset = dbus.Interface (bus.get_object(bus_id, path), &#39;org.bluez.audio.Headset&#39;)<br>
+#Connect and Play are not required in PCM mode<br>headset.Connect()<br>headset.Play()<br></pre><br>I also tried btsco. Got the latest version, compiled it and installed it. Module snd_bt_sco loaded properly but I am getting the following exception:<br>
+<br>btsco v0.5c<br>Error: control open (hw:1): No such file or directory<br>Error: Can&#39;t find device. Bail<br><br><br>Any help is greatly appreciated,<br>Milosh<br>
+
+------=_Part_7041_11233770.1211933309602--
+
+
+--===============0410766340==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============0410766340==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0410766340==--
