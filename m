@@ -1,14 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 May 2008 07:03:20 +0200
-From: Didier Link <didier@famille-link.fr>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-ID: <20080530070320.714258f3@neutrino.cosmos.net>
-In-Reply-To: <1210860904.7025.50.camel@violet.holtmann.net>
-References: <1210786481.4797.4.camel@localhost.localdomain>
-	<1210860904.7025.50.camel@violet.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bug report: trouble reconnecting keyboard after
- timeout
+Message-ID: <e378cfb20805272343y6ebe27cdqe2efbad230be02fc@mail.gmail.com>
+Date: Wed, 28 May 2008 12:13:08 +0530
+From: "Nel D" <newatlinux@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] syncml issue
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,35 +14,167 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpMZSBUaHUs
-IDE1IE1heSAyMDA4IDE2OjE1OjA0ICswMjAwLA0KTWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9s
-dG1hbm4ub3JnPiBhIMOpY3JpdCA6DQoNCkhpIEJsdWV6IHRlYW0sDQoNCj4gSGkgRGljaywNCj4g
-DQo+ID4gSSB1cGdyYWRlZCBibHVlei11dGlscyBhbmQgYmx1ZXotbGlicyAoMy4zMSkgYW5kIGl0
-IGRpZG4ndCBoZWxwLg0KPiA+IA0KPiA+IEkndmUgYXR0YWNoZWQgYSBsb2dmaWxlLCBJIGhvcGUg
-aXQncyBzdWZmaWNpZW50Lg0KPiA+IA0KPiA+IE15IG1vdXNlIGFuZCBrZXlib2FyZCBjb3VsZG4n
-dCBjb25uZWN0LCBJJ3ZlIHJlY29ubmVjdGVkIHRoZW0gYnkNCj4gPiBtYW51YWxseSBkaXNjb25u
-ZWN0aW5nIHRoZW0gaW4gYmx1ZXRvb3RoLWFwcGxldC4NCj4gDQo+IGlmIEkgYW0gbm90IG1pc3Rh
-a2VuLCB0aGVuIHRoZSBhdHRhY2hlZCBrZXJuZWwgcGF0Y2ggd2lsbCBmaXggdGhpcw0KPiBpc3N1
-ZS4NCg0KSSd2ZSB0aGUgc2FtZSBpc3N1ZSB0aGFuIERpY2sgd2l0aCBhIERpbm92byBrZXlib2Fy
-ZCttb3VzZSBhbmQgSSd2ZQ0KYXBwbGllZCB5b3VyIHBhdGNoIHNpbmNlIDIgd2Vla3MuIEl0IHdv
-cmtzIHBlcmZlY3RseSAhIFNpbmNlIHllYXJzIG9mDQpkZWNvbm5lY3RpbmcgcHJvYmxlbSB3aXRo
-IG15IExvZ2l0ZWNoIHByb2R1Y3RzIGl0J3Mgbm93IGEgcGxlYXN1cmUgdG8NCnVzZSBpdCB3aXRo
-IGJsdWV6IHN0YWNrICEgVGhhbmtzIGEgbG90ICEhIDopDQoNClJlZ2FyZHMuDQoNCkRpZGllcg0K
-DQotIC0tIA0KRGlkaWVyIExpbmsgPGRpZGllckBmYW1pbGxlLWxpbmsuZnI+DQpKYWJiZXIgOiBk
-aWRpZXJfbGlua0BqYWJiZXIuZnINCk1TTiA6IHphbmZpYkBob3RtYWlsLmZyDQpTSVAgOiBaYW5m
-aWJAZWtpZ2EubmV0DQoNCkNsw6kgR1BHIDogNzVCQUM5RUUNCi0tLS0tQkVHSU4gUEdQIFNJR05B
-VFVSRS0tLS0tDQpWZXJzaW9uOiBHbnVQRyB2Mi4wLjkgKEdOVS9MaW51eCkNCg0KaUVZRUFSRUNB
-QVlGQWtnL2lwd0FDZ2tRa3lQd2luVzZ5ZTdiVndDYkJxMEtwc29tUmJNY1EzOW1tV215R2tYSQ0K
-blN3QW4zd2pvOUg4TDZIUGNLMFlyTUltNXJlejErUVMNCj1VNFVSDQotLS0tLUVORCBQR1AgU0lH
-TkFUVVJFLS0tLS0NCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNv
-cmVkIGJ5OiBNaWNyb3NvZnQKRGVmeSBhbGwgY2hhbGxlbmdlcy4gTWljcm9zb2Z0KFIpIFZpc3Vh
-bCBTdHVkaW8gMjAwOC4KaHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBt
-cnQvZGlyZWN0LzAxLwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9y
-Z2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6
-LWRldmVsCg==
+Hi,
+ Am trying to write a syncml client which is on top of
+obex-data-server(ods)  on the linux machine. I have changed the ods
+source appropriately that so that it registers SDP records for SYNCMl
+client.
+
+However once i initiate a syncronization , i get the following output
+for hcidump -XV
+
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0041
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 1 reason 0x16
+    Reason: Connection Terminated by Local Host
+> HCI Event: Connect Request (0x04) plen 10
+    bdaddr 00:08:1B:87:DC:CD class 0x020104 type ACL
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+    bdaddr 00:08:1B:87:DC:CD role 0x00
+    Role: Master
+> HCI Event: Command Status (0x0f) plen 4
+    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+> HCI Event: Role Change (0x12) plen 8
+    status 0x00 bdaddr 00:08:1B:87:DC:CD role 0x00
+    Role: Master
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 1 bdaddr 00:08:1B:87:DC:CD type ACL encrypt 0x00
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+    handle 1
+> HCI Event: Max Slots Change (0x1b) plen 3
+    handle 1 slots 5
+> HCI Event: Command Status (0x0f) plen 4
+    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
+    handle 1 policy 0x0e
+    Link policy: HOLD SNIFF PARK
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0040
+< ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040 result 0 status 0
+      Connection successful
+> HCI Event: Command Complete (0x0e) plen 6
+    Write Link Policy Settings (0x02|0x000d) ncmd 1
+    status 0x00 handle 1
+< HCI Command: Change Connection Packet Type (0x01|0x000f) plen 4
+    handle 1 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+    Change Connection Packet Type (0x01|0x000f) status 0x00 ncmd 1
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:08:1B:87:DC:CD mode 2 clkoffset 0x0000
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> HCI Event: Connection Packet Type Changed (0x1d) plen 5
+    status 0x00 handle 1 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> ACL data: handle 1 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 1024
+< ACL data: handle 1 flags 0x02 dlen 18
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
+      Success
+      MTU 1024
+< ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> HCI Event: Connection Packet Type Changed (0x1d) plen 5
+    status 0x00 handle 1 ptype 0xcc18
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Read Remote Supported Features (0x0b) plen 11
+    status 0x00 handle 1
+    Features: 0xff 0xff 0x8f 0xf8 0x18 0x18 0x00 0x80
+> ACL data: handle 1 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+> ACL data: handle 1 flags 0x02 dlen 24
+    L2CAP(d): cid 0x0040 len 20 [psm 1]
+        SDP SSA Req: tid 0x0 len 0xf
+          pat uuid-16 0x0100 (L2CAP)
+          max 1016
+          aid(s) 0x0000 - 0xffff
+          cont 00
+< ACL data: handle 1 flags 0x02 dlen 121
+    L2CAP(d): cid 0x0040 len 117 [psm 1]
+        SDP SSA Rsp: tid 0x0 len 0x70
+          count 109
+          record #0
+              aid 0x0000 (SrvRecHndl)
+                 uint 0x10004
+              aid 0x0001 (SrvClassIDList)
+                 < uuid-128 00000002-0000-1000-8000-0002ee000002 >
+              aid 0x0004 (ProtocolDescList)
+                 < < uuid-16 0x0100 (L2CAP) > <
+                 uuid-16 0x0003 (RFCOMM) uint 0xa > <
+                 uuid-16 0x0008 (OBEX) > >
+              aid 0x0005 (BrwGrpList)
+                 < uuid-16 0x1002 (PubBrwsGrp) >
+              aid 0x0009 (BTProfileDescList)
+                 < < uuid-128 00000002-0000-1000-8000-0002ee000002
+uint 0x100 > >
+              aid 0x0100 (SrvName)
+                 str "SyncML Client"
+          cont 00
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+    status 0x00 bdaddr 00:08:1B:87:DC:CD name 'CELUNITE-72200B'
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 24
+    L2CAP(d): cid 0x0040 len 20 [psm 1]
+        SDP SSA Req: tid 0x1 len 0xf
+          pat uuid-16 0x1200 (PNPInfo)
+<-------------     PNPInfo ??
+          max 1016
+          aid(s) 0x0000 - 0xffff
+          cont 00
+< ACL data: handle 1 flags 0x02 dlen 14
+    L2CAP(d): cid 0x0040 len 10 [psm 1]
+        SDP SSA Rsp: tid 0x1 len 0x5
+          count 2
+          cont 00
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0040
+< ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0040
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+    handle 1 reason 0x13
+    Reason: Remote User Terminated Connection
+> HCI Event: Command Status (0x0f) plen 4
+    Disconnect (0x01|0x0006) status 0x00 ncmd 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 1 packets 1
+> ACL data: handle 1 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0041
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 1 reason 0x16
+    Reason: Connection Terminated by Local Host
+
+
+My query is  that what is this PNPInfo ??? , and what sdp record is
+expected to be returned .
+
+pointers, if any, would be highly appreciated.
+
+thanks in advance,
+ nel
+
+-------------------------------------------------------------------------
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
