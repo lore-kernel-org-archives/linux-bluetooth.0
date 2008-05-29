@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <3e9cdced0805290503g68474663n975cb2d1e7fc8e7a@mail.gmail.com>
-Date: Thu, 29 May 2008 14:03:46 +0200
-From: "Fritz Code" <codefritz@googlemail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <a481fbf0805290401g57804562h34ef5147852256c9@mail.gmail.com>
+Date: Thu, 29 May 2008 07:01:00 -0400
+From: "Raymond Ingles" <sorceror171@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <1945.124.170.117.82.1212030264.squirrel@www.magtech.com.au>
 MIME-Version: 1.0
-Subject: [Bluez-users] correlation of hidd, hidp and the service Input
+References: <1945.124.170.117.82.1212030264.squirrel@www.magtech.com.au>
+Subject: Re: [Bluez-users] DUND pre-pppd script
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,73 +16,32 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1264859406=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1264859406==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_9978_28007372.1212062626625"
+On Wed, May 28, 2008 at 11:04 PM,  <arasv@magtech.com.au> wrote:
+> Hi,
+>
+> I need to determine my ppp IP address pair before I run pppd.
+>
+> The reason is that I have several network interfaces running at once on my
+> system so I need to choose an IP address in a subnet that is not already
+> taken.
 
-------=_Part_9978_28007372.1212062626625
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+ There are three private network ranges:
+http://en.wikipedia.org/wiki/Private_network
 
-Hi,
-
-since I want to use a bluetooth keyboard in my Kernel 2.4.21 I'm analyzing
-hidd, hidp and the Input service.
-At the same time I take a look at the alternative bthid from
-http://klausler.com/msbtkb-linux.html
-
-bthid consists of a daemon which implements the sdp stuff it establishes
-connection to a hid device and send all received data to the kernel modul
-fake through a character device.
-The kernel module simply forwads the received commands to the input kernel
-module to get in keycodes into the kernel. That's it basically.
-
-Well what are the tasks of all the bluez HID parts:  hidd, hidp, the Input
-Service, and how to they work/communicate with each other ?
-The problem is that I cant make the kernel module hidp run under my 2.4
-Kernel, maybe I can adapt it or replace it by another module.
-
--- 
-Regards,
---Codefritz
-
-------=_Part_9978_28007372.1212062626625
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi,<br><br>since I want to use a bluetooth keyboard in my Kernel 2.4.21 I&#39;m analyzing hidd, hidp and the Input service.<br>At the same time I take a look at the alternative bthid from <a href="http://klausler.com/msbtkb-linux.html">http://klausler.com/msbtkb-linux.html</a><br>
-<br>bthid consists of a daemon which implements the sdp stuff it establishes connection to a hid device and send all received data to the kernel modul fake through a character device.<br>The kernel module simply forwads the received commands to the input kernel module to get in keycodes into the kernel. That&#39;s it basically.<br>
-<br>Well what are the tasks of all the bluez HID parts:&nbsp; hidd, hidp, the Input Service, and how to they work/communicate with each other ?<br>The problem is that I cant make the kernel module hidp run under my 2.4 Kernel, maybe I can adapt it or replace it by another module.<br clear="all">
-<br>-- <br>Regards,<br>--Codefritz<br><br><br><br>
-
-------=_Part_9978_28007372.1212062626625--
-
-
---===============1264859406==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+ Almost always, you can find a range that's not going to be used by
+any other NIC in the system. If my home network is on a 10.x subnet,
+for example, and I'm letting people dial up via modem to a 192.168.x
+range, I could use a 172.16.x address range for DUN.
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
 Defy all challenges. Microsoft(R) Visual Studio 2008.
 http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
---===============1264859406==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1264859406==--
