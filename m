@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <483F3DE8.5040807@magtech.com.au>
-Date: Fri, 30 May 2008 09:36:08 +1000
-From: Aras Vaichas <arasv@magtech.com.au>
-MIME-Version: 1.0
+Message-Id: <DB4454DF-1BB6-48C6-9868-53EF65E3271E@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <1945.124.170.117.82.1212030264.squirrel@www.magtech.com.au>
-	<a481fbf0805290401g57804562h34ef5147852256c9@mail.gmail.com>
-In-Reply-To: <a481fbf0805290401g57804562h34ef5147852256c9@mail.gmail.com>
-Subject: Re: [Bluez-users] DUND pre-pppd script
+In-Reply-To: <alpine.LNX.1.00.0805280355410.22621@nge2.ngu.pk>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Thu, 29 May 2008 22:48:32 +0200
+References: <alpine.LNX.1.00.0805280355410.22621@nge2.ngu.pk>
+Subject: Re: [Bluez-users] bluez-utils-3.32: something broke?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,58 +20,160 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Raymond Ingles wrote:
-> On Wed, May 28, 2008 at 11:04 PM,  <arasv@magtech.com.au> wrote:
->   
->> Hi,
->>
->> I need to determine my ppp IP address pair before I run pppd.
->>
->> The reason is that I have several network interfaces running at once on my
->> system so I need to choose an IP address in a subnet that is not already
->> taken.
->>     
+Hi,
+
+> Where to start? To put it simply, it used to work, now it doesn't. ;)
+> I upgraded to 3.32 and everything went haywire. Audio stopped  
+> working, plus
+> I'm seeing alot of weird error messages.
 >
->  There are three private network ranges:
-> http://en.wikipedia.org/wiki/Private_network
+> This used to work playing on my bt headset:
 >
->  Almost always, you can find a range that's not going to be used by
-> any other NIC in the system. If my home network is on a 10.x subnet,
-> for example, and I'm letting people dial up via modem to a 192.168.x
-> range, I could use a 172.16.x address range for DUN.
->   
-Thanks, I should have been more explicit in my original email.
+> sox -t ogg file.ogg -t alsa pcm.bluetooth
+>
+> Now:
+>
+> ALSA lib pcm_bluetooth.c:1505:(audioservice_recv) Error receiving  
+> data from
+> audio service: Success(0)
+> ALSA lib pcm_bluetooth.c:1521:(audioservice_expect) Bogus message
+> BT_SETCONFIGURATION_REQ received while BT_SETCONFIGURATION_RSP was  
+> expected
+> sox soxio: Can't open output file `pcm.bluetooth': cannot set  
+> parameters
+>
+> hcid segfaulted on the first test. The bluetooth USB dongle "hangs",  
+> flashing
+> endlessly. The sco counts stay at zero.
 
-My device has eth0, usb0, ppp0 and possibly wlan0.
+can you get us the backtrace of it. Sounds like a real bug.
 
-eth0 can be static, link-local or dhcp.
-wlan0 can be static, link-local or dhcp.
-usb0 is chosen to be on a private network range at connection time that
-doesn't conflict with any of the above.
-ppp0 is chosen to be on a private network range at connection time that
-doesn't conflict with any of the above.
+> 2008-05-28T03:50:07.678634-04:00 vdrl hcid[3348]: Bluetooth HCI daemon
+> 2008-05-28T03:50:07.686778-04:00 vdrl hcid[3348]: Parsing
+> /etc/bluetooth/main.conf failed: No such file or directory
+>
+> main.conf? Never saw that before. What are the service-*.xml files  
+> for? Where
+> to install?
 
-So you see that I have to choose an unused subnet dynamically in order
-to keep everything happy and working. The problem is that pppd doesn't
-seem to allow for choosing the IP address via a script.
+Don't worry. If not present it will use proper defaults. That is not  
+an issue.
 
-To choose the free subnet I've written a script in Python that searches
-all three 3 private network spaces against the existing connections and
-then outputs a suitable range in various formats like ifconfig, pppd,
-dhcpd.conf.
+> 2008-05-28T03:50:07.686794-04:00 vdrl hcid[3348]: HCI dev 0
+> registered
+> 2008-05-28T03:50:07.688100-04:00 vdrl hcid[3348]: HCI dev 0 already up
+> 2008-05-28T03:50:07.688730-04:00 vdrl hcid[3348]: Device hci0 has  
+> been added
+> 2008-05-28T03:50:07.690768-04:00 vdrl hcid[3348]: Starting security  
+> manager
+> 0
+> 2008-05-28T03:50:07.729056-04:00 vdrl hcid[3348]: Device hci0 has been
+> activated
+> 2008-05-28T03:50:07.729095-04:00 vdrl hcid[3348]: Starting SDP server
+> 2008-05-28T03:50:07.729107-04:00 vdrl hcid[3348]: Can't create GN  
+> bridge
+> 2008-05-28T03:50:07.729117-04:00 vdrl hcid[3348]: Registered manager
+> path:/org/bluez/network
+> 2008-05-28T03:50:07.729129-04:00 vdrl hcid[3348]: Registered server
+> path:/org/bluez/network/nap
+> 2008-05-28T03:50:07.729139-04:00 vdrl hcid[3348]: Registered server
+> path:/org/bluez/network/gn
+> 2008-05-28T03:50:07.729150-04:00 vdrl hcid[3348]: Registered server
+> path:/org/bluez/network/panu
+> 2008-05-28T03:50:07.729202-04:00 vdrl hcid[3348]: Registered manager
+> path:/org/bluez/serial
+> 2008-05-28T03:50:07.729213-04:00 vdrl hcid[3348]: Registered input  
+> manager
+> path:/org/bluez/input
+> 2008-05-28T03:50:07.730615-04:00 vdrl hcid[3348]: Unix socket  
+> created: 18
+> 2008-05-28T03:50:07.739750-04:00 vdrl hcid[3348]: Registered manager
+> path:/org/bluez/audio
+> 2008-05-28T03:50:07.739785-04:00 vdrl hcid[3348]:
+> Loading device 00:1A:45:01:F9:42 (headset )
+> 2008-05-28T03:50:07.739796-04:00 vdrl hcid[3348]: Setting 00:1A: 
+> 45:01:F9:42
+> as default device
+> 2008-05-28T03:50:07.739807-04:00 vdrl hcid[3348]: Starting  
+> experimental
+> netlink support
+>
+> ^^^^^^^^^^^^  I thought this could be the trouble, so I hid it and  
+> built
+> again. Same results.
+>
+>
+> 2008-05-28T03:50:07.739818-04:00 vdrl hcid[3348]: Failed to find  
+> Bluetooth
+> netlink family
+> 2008-05-28T03:50:07.739829-04:00 vdrl hcid[3348]: Can't init plugin
+> /usr/lib/bluetooth/plugins/libnetlink.so
+>
+> It does exist and I installed this particular "netlink' lib (there's  
+> about 4:
+> rtnetlink, nfnetlink, iproute2's libnetlink, and this libnl-1).
 
-I think that I can solve this problem by configuring dund to call a pppd
-wrapper which calculates the correct, non-colliding, subnet and then
-passed on the arguments to pppd.
+That is not an issue. You can ignore this.
 
-Aras
+> 2008-05-28T03:50:12.747879-04:00 vdrl hcid[3348]: Default  
+> authorization
+> /agent (:1.10, /org/bluez/auth_agent_3352) registered
+> 2008-05-28T03:50:34.813665-04:00 vdrl hcid[3348]: Default passkey  
+> agent
+> /(:1.11, /org/bluez/passkey_agent_3355) registered
+> 2008-05-28T03:51:00.171619-04:00 vdrl hcid[3348]: Audio API: received
+> /BT_GETCAPABILITIES_REQ
+> 2008-05-28T03:51:00.171649-04:00 vdrl hcid[3348]: Audio API: sending
+> /BT_GETCAPABILITIES_RSP
+> 2008-05-28T03:51:00.173225-04:00 vdrl hcid[3348]: Audio API: received
+> /BT_SETCONFIGURATION_REQ
+> 2008-05-28T03:51:00.173300-04:00 vdrl hcid[3348]: config sco -  
+> device =
+> /00:1A:45:01:F9:42 access_mode = 2
+> 2008-05-28T03:51:03.900979-04:00 vdrl hcid[3348]: link_key_request
+> /(sba=00:0A:3A:7C:5C:74, dba=00:1A:45:01:F9:42)
+> 2008-05-28T03:51:06.571723-04:00 vdrl hcid[3348]: connect: Socket  
+> operation
+> /on non-socket (88)
+> 2008-05-28T03:51:07.762096-04:00 vdrl hcid[3348]: Badly formated or
+> /unrecognized command: AT+BTRH?
+>
+> Very similar to the errors I got before patching the kernel to  
+> support SCO.
 
+That is weird. Have either Luiz or Johan look into that. You can ping  
+them on IRC.
 
+> 2008-05-28T03:51:58.718581-04:00 vdrl hcid[3348]: Audio API: received
+> /BT_GETCAPABILITIES_REQ
+> 2008-05-28T03:51:58.718607-04:00 vdrl hcid[3348]: Audio API: sending
+> /BT_GETCAPABILITIES_RSP
+> 2008-05-28T03:51:58.720113-04:00 vdrl hcid[3348]: Audio API: received
+> /BT_SETCONFIGURATION_REQ
+> 2008-05-28T03:51:58.720155-04:00 vdrl hcid[3348]: config sco -  
+> device =
+> /00:1A:45:01:F9:42 access_mode = 2
+> 2008-05-28T03:52:02.251505-04:00 vdrl hcid[3348]: link_key_request
+> /(sba=00:0A:3A:7C:5C:74, dba=00:1A:45:01:F9:42)
+> 2008-05-28T03:52:04.914254-04:00 vdrl hcid[3348]: connect: Invalid  
+> argument
+> /(22)
+> 2008-05-28T03:52:06.341660-04:00 vdrl hcid[3348]: Badly formated or
+> /unrecognized command: AT+BTRH?
+>
+> As nothing I tried worked, I put back bluez-utils-3.31 and the  
+> problems
+> disappeared. bluez-libs-3.32 appears OK, but bluez-utils-3.32 has  
+> some serious
+> issues.
+> 2.6.25.3 w/sco patch built with gcc-4.3.0, x86.
 
-______________________________________________________________________
-This email has been scanned by the MessageLabs Email Security System.
-For more information please visit http://www.messagelabs.com/email 
-______________________________________________________________________
+The SCO patch should not be needed at all.
+
+Regards
+
+Marcel
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
