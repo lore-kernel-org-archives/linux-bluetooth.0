@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-From: Dick <dick@mrns.nl>
-Date: Fri, 30 May 2008 06:49:40 +0000 (UTC)
-Message-ID: <loom.20080530T064650-617@post.gmane.org>
+Date: Fri, 30 May 2008 07:03:20 +0200
+From: Didier Link <didier@famille-link.fr>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Message-ID: <20080530070320.714258f3@neutrino.cosmos.net>
+In-Reply-To: <1210860904.7025.50.camel@violet.holtmann.net>
 References: <1210786481.4797.4.camel@localhost.localdomain>
 	<1210860904.7025.50.camel@violet.holtmann.net>
-	<20080530070320.714258f3@neutrino.cosmos.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] bug report: trouble reconnecting keyboard after
-	timeout
+ timeout
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,25 +18,35 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Ahem, sorry for the late response ;-)
-
-It improved a lot, but it doesn't work perfectly yet. I'm suspecting the cause
-is low batteries, I'll keep you posted!
-
-Thank you very much
-
-Dick
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpMZSBUaHUs
+IDE1IE1heSAyMDA4IDE2OjE1OjA0ICswMjAwLA0KTWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9s
+dG1hbm4ub3JnPiBhIMOpY3JpdCA6DQoNCkhpIEJsdWV6IHRlYW0sDQoNCj4gSGkgRGljaywNCj4g
+DQo+ID4gSSB1cGdyYWRlZCBibHVlei11dGlscyBhbmQgYmx1ZXotbGlicyAoMy4zMSkgYW5kIGl0
+IGRpZG4ndCBoZWxwLg0KPiA+IA0KPiA+IEkndmUgYXR0YWNoZWQgYSBsb2dmaWxlLCBJIGhvcGUg
+aXQncyBzdWZmaWNpZW50Lg0KPiA+IA0KPiA+IE15IG1vdXNlIGFuZCBrZXlib2FyZCBjb3VsZG4n
+dCBjb25uZWN0LCBJJ3ZlIHJlY29ubmVjdGVkIHRoZW0gYnkNCj4gPiBtYW51YWxseSBkaXNjb25u
+ZWN0aW5nIHRoZW0gaW4gYmx1ZXRvb3RoLWFwcGxldC4NCj4gDQo+IGlmIEkgYW0gbm90IG1pc3Rh
+a2VuLCB0aGVuIHRoZSBhdHRhY2hlZCBrZXJuZWwgcGF0Y2ggd2lsbCBmaXggdGhpcw0KPiBpc3N1
+ZS4NCg0KSSd2ZSB0aGUgc2FtZSBpc3N1ZSB0aGFuIERpY2sgd2l0aCBhIERpbm92byBrZXlib2Fy
+ZCttb3VzZSBhbmQgSSd2ZQ0KYXBwbGllZCB5b3VyIHBhdGNoIHNpbmNlIDIgd2Vla3MuIEl0IHdv
+cmtzIHBlcmZlY3RseSAhIFNpbmNlIHllYXJzIG9mDQpkZWNvbm5lY3RpbmcgcHJvYmxlbSB3aXRo
+IG15IExvZ2l0ZWNoIHByb2R1Y3RzIGl0J3Mgbm93IGEgcGxlYXN1cmUgdG8NCnVzZSBpdCB3aXRo
+IGJsdWV6IHN0YWNrICEgVGhhbmtzIGEgbG90ICEhIDopDQoNClJlZ2FyZHMuDQoNCkRpZGllcg0K
+DQotIC0tIA0KRGlkaWVyIExpbmsgPGRpZGllckBmYW1pbGxlLWxpbmsuZnI+DQpKYWJiZXIgOiBk
+aWRpZXJfbGlua0BqYWJiZXIuZnINCk1TTiA6IHphbmZpYkBob3RtYWlsLmZyDQpTSVAgOiBaYW5m
+aWJAZWtpZ2EubmV0DQoNCkNsw6kgR1BHIDogNzVCQUM5RUUNCi0tLS0tQkVHSU4gUEdQIFNJR05B
+VFVSRS0tLS0tDQpWZXJzaW9uOiBHbnVQRyB2Mi4wLjkgKEdOVS9MaW51eCkNCg0KaUVZRUFSRUNB
+QVlGQWtnL2lwd0FDZ2tRa3lQd2luVzZ5ZTdiVndDYkJxMEtwc29tUmJNY1EzOW1tV215R2tYSQ0K
+blN3QW4zd2pvOUg4TDZIUGNLMFlyTUltNXJlejErUVMNCj1VNFVSDQotLS0tLUVORCBQR1AgU0lH
+TkFUVVJFLS0tLS0NCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5uZXQgZW1haWwgaXMgc3BvbnNv
+cmVkIGJ5OiBNaWNyb3NvZnQKRGVmeSBhbGwgY2hhbGxlbmdlcy4gTWljcm9zb2Z0KFIpIFZpc3Vh
+bCBTdHVkaW8gMjAwOC4KaHR0cDovL2Nsay5hdGRtdC5jb20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBt
+cnQvZGlyZWN0LzAxLwpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9y
+Z2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6
+LWRldmVsCg==
