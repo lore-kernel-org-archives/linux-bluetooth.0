@@ -1,13 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 30 May 2008 11:41:59 +0530
-Message-ID: <8F72DB7755DD6249B3C46D88BE7F5C0B03EEABCD@bgsmsx411.gar.corp.intel.com>
-In-Reply-To: <C1EE57B5-6047-4C5D-9DD7-0A1E6651AD83@holtmann.org>
-References: <8F72DB7755DD6249B3C46D88BE7F5C0B03EEA6D5@bgsmsx411.gar.corp.intel.com>
-	<C1EE57B5-6047-4C5D-9DD7-0A1E6651AD83@holtmann.org>
-From: "Mottadi, Kishore" <kishore.mottadi@intel.com>
+Message-ID: <d89ddf300805291910n15430303r71fc22c0a1c689ca@mail.gmail.com>
+Date: Thu, 29 May 2008 20:10:40 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Disable BlueZ profiles
+In-Reply-To: <483F3DE8.5040807@magtech.com.au>
+MIME-Version: 1.0
+References: <1945.124.170.117.82.1212030264.squirrel@www.magtech.com.au>
+	<a481fbf0805290401g57804562h34ef5147852256c9@mail.gmail.com>
+	<483F3DE8.5040807@magtech.com.au>
+Subject: Re: [Bluez-users] DUND pre-pppd script
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,63 +22,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Aras
 
-Thanks for your reply....
-For IOPT testing SDP and L2CAP modules should be enough.
-My understanding is that for DUN/HFP/FAX the flow in the stack is
-something like the following:
-AT Commands--> RFCOMM-->L2CAP--> low level drivers 
+> I think that I can solve this problem by configuring dund to call a pppd
+> wrapper which calculates the correct, non-colliding, subnet and then
+> passed on the arguments to pppd.
 
-And for the FTP and BIP profiles the flow is:
+although there is no way to coax dund to pass the remote btaddr
+address on to a wrapper script, we should be able to figure it out.
 
-OBEX--> RFCOMM-->L2CAP --> low level drivers
+tell dund to use the wrapper:
+dund --pppd=mypppd ...
 
-So, in theory if RFCOMM and OBEX modules are removed from the linux
-kernel (Eg rmmod rfcomm), the DUN/HSP/FAX/FTP and BIP profiles should be
-disabled.
+in the mypppd wrapper:
+#!/bin/sh
+BTADDR=`rfcomm show $2 | cut -d ' ' -f2`
+# set LOCAL, REMOTE based on the BTADDR
+pppd LOCAL:REMOTE $*
 
-Similarly, removing bnep.ko from the kernel should disable PAN profile.
-Is that a correct interpretation??
-Also, How do I use bluez-utils-3.32 to disable certain profiles?
+if dund were changed then the tty might no longer be on $2.
+in my scenario at least, LOCAL would always be 0.0.0.0 and something
+like /etc/ppp/ip-up.d/bridge would bridge pppX:
 
-Regards
-Kishore.
+#!/bin/sh
+# $2 is the ppp interface name
+brctl addif pan0 $2
 
+should be fun to see if any of this works :)
 
------Original Message-----
-From: bluez-users-bounces@lists.sourceforge.net
-[mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Marcel
-Holtmann
-Sent: Friday, May 30, 2008 2:15 AM
-To: BlueZ users
-Subject: Re: [Bluez-users] Disable BlueZ profiles
-
-Hi Kishore,
-
-> We found there are some unnecessary profile can be discovered when  
-> doing Bluetooth Inter-Op Testing such as  DUN, FTP, FAX, PAN, BIP,  
-> HFP. How can I remove/disable these profiles?
->
-with bluez-utils-3.32 you have an option to disable certain profiles  
-and only test some part. However having all profiles enabled should  
-not be a problem at all. So what is your issue regarding inter-op  
-testing?
-
-Regards
-
-Marcel
-
-
-------------------------------------------------------------------------
--
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+-- 
+Brad
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
