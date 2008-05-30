@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 May 2008 09:34:51 -0700 (PDT)
-From: Jim Carter <jimc@math.ucla.edu>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <FE07A25A-8396-4E23-9633-B5D03B3BF896@gmail.com>
-Message-ID: <Pine.LNX.4.64.0805300855120.10076@simba.math.ucla.edu>
-References: <FE07A25A-8396-4E23-9633-B5D03B3BF896@gmail.com>
+Message-ID: <483FD030.5080404@powercraft.nl>
+Date: Fri, 30 May 2008 12:00:16 +0200
+From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <FE07A25A-8396-4E23-9633-B5D03B3BF896@gmail.com>
+In-Reply-To: <FE07A25A-8396-4E23-9633-B5D03B3BF896@gmail.com>
 Subject: Re: [Bluez-devel] Use cases for dynamically loading/unloading
 	plugins?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -21,59 +21,48 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Fri, 30 May 2008, Johan Hedberg wrote:
-
+Johan Hedberg wrote:
+> Hi,
+> 
+> As you may know recent BlueZ versions (since 3.30) and the upcoming  
+> 4.x branch will use plugins for several different purposes, including  
+> local bluetooth services (e.g. audio, input, network, etc) which were  
+> previously implemented as separate processes. For the separate process  
+> case we had an API for starting and stopping services but currently  
+> there is no D-Bus methods planned to allow loading or unloading of  
+> plugins at runtime. Instead, there only is a configuration file (/etc/ 
+> bluetooth/main.conf added in 3.32) which can be used to specify which  
+> plugins should not be loaded when hcid starts.
+> 
 > We were today debating with the developers whether it would be useful  
 > to have a D-Bus API for dynamically loading and unloading of installed  
-> plugins ... So, we would like to  
+> plugins but couldn't really reach a consensus. Personally I have a  
+> "gut" feeling that these would be good to have but don't really have a  
+> really good use case for it. Marcel otoh doesn't feel a need for it  
+> and won't add the API without good use cases. So, we would like to  
 > hear any needs (with use cases) that people on this list might have  
 > for this feature.
+> 
+> Johan
 
-I'm using my Nokia 770 with 64 Mb RAM and no swap file.  Having finished 
-listening to classic Lawrence Welk MP3's :-) I want to run the web browser, 
-which is a memory hog.  A2DP service, go away!  
+ From a general point of view, I would say the following:
 
-Incoming voice chat: I want to listen/talk to it now, not after a massive 
-0.5 Mb of shared libraries are mapped.  I would want HSP/HFP ready to go, 
-starting from boot, if I were into voice chat.  But with the option to shut 
-it down if I have a resource problem. 
+Dynamically loading functionality is an very good thing! This means no 
+resources are lost during startup and only features are only loaded when 
+needed.
 
-I do the pairing procedure on a new Bluetooth keyboard or mouse.  
-Presumably I now want to actually type something.  hcid would automatically 
-load the plugin for HID, right?  
+If we uses bluez in a mobile device, resources take up power and speed. 
+Having a dynamic feature that loads "input" and "audio" plugins when 
+such devices really are connected would be a great. No need for users to 
+manually enable disable features.
 
-Returning to the voice chat case, it's tempting to add to the chat software 
-(ekiga?  gizmo?  skype?) a feature to send the "prepare HSP" message when 
-it starts up, but I think that's commingling protocol layers.  I'm not 
-really expert in audio multiplexing, but I believe the PulseAudio people 
-are talking about creating their own plugin for a Bluetooth sink or source, 
-that knows the Bluez API and could potentially send such a message.  Or 
-maybe the better place is in ALSA, when the Bluetooth audio sink/source is 
-actually opened.  Or even better (or worse?), it should be possible to 
-begin to open the source/sink with nothing connected to it, and the Bluez 
-side will take care of loading the plugin and *finding* a headset to 
-connect to the source/sink.  (If there were none, the open would eventually 
-fail.)
+Both from usability and technical point of view i would suggest 
+dynamically loading and unloading plugins.
 
-On the API details, I think it's a really bad idea to entitle the method 
-call "load plugin" or "get rid of plugin", because it commits the 
-implementer to actually having plugins that can be loaded -- as well as 
-committing in advance to the names of the plugins.  I would prefer to 
-advertise the method as "prepare for quick action on [protocol]", or "done 
-with [protocol] for now".  The names of the protocols are defined in the 
-Bluetooth spec, and presumably software developers can rely on them to not 
-change.
+Thanks in advance,
 
-I'm thinking about automatically unloading plugins after a period of 
-non-use.  I wonder if the timeout should be a parameter to the "prepare 
-protocol" method, or should be in a static configuration file, or both.
+Jelle
 
-Here's another use case: one of the plugins has a bug.  Often (but far from 
-always) you can work around bugs by unloading the plugin and reloading it.
-
-James F. Carter          Voice 310 825 2897    FAX 310 206 6673
-UCLA-Mathnet;  6115 MSA; 520 Portola Plaza; Los Angeles, CA, USA  90095-1555
-Email: jimc@math.ucla.edu    http://www.math.ucla.edu/~jimc (q.v. for PGP key)
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
