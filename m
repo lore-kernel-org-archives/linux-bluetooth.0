@@ -1,15 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300805300851x77b16608g4ab85d7128adcd12@mail.gmail.com>
-Date: Fri, 30 May 2008 09:51:18 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <d89ddf300805291910n15430303r71fc22c0a1c689ca@mail.gmail.com>
-MIME-Version: 1.0
-References: <1945.124.170.117.82.1212030264.squirrel@www.magtech.com.au>
-	<a481fbf0805290401g57804562h34ef5147852256c9@mail.gmail.com>
-	<483F3DE8.5040807@magtech.com.au>
-	<d89ddf300805291910n15430303r71fc22c0a1c689ca@mail.gmail.com>
-Subject: Re: [Bluez-users] DUND pre-pppd script
+Message-Id: <88186C47-7987-48D0-969F-6444968D2869@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <8F72DB7755DD6249B3C46D88BE7F5C0B03EEABCD@bgsmsx411.gar.corp.intel.com>
+Mime-Version: 1.0 (Apple Message framework v919.2)
+Date: Fri, 30 May 2008 08:54:39 +0200
+References: <8F72DB7755DD6249B3C46D88BE7F5C0B03EEA6D5@bgsmsx411.gar.corp.intel.com>
+	<C1EE57B5-6047-4C5D-9DD7-0A1E6651AD83@holtmann.org>
+	<8F72DB7755DD6249B3C46D88BE7F5C0B03EEABCD@bgsmsx411.gar.corp.intel.com>
+Subject: Re: [Bluez-users] Disable BlueZ profiles
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,23 +22,46 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-fwiw,
+Hi Kishore,
 
-this does work with some mods since linux won't bridge ppp. you still
-have to ipmasq the 192.168.42.0 subnet in this example... but the
-mypppd script can be simplified to a sort of poor man's dhcp server.
-(trim the leases if you ever really connect 255 devices over the
-lifetime of the server :)
+> Thanks for your reply....
+> For IOPT testing SDP and L2CAP modules should be enough.
+> My understanding is that for DUN/HFP/FAX the flow in the stack is
+> something like the following:
+> AT Commands--> RFCOMM-->L2CAP--> low level drivers
+>
+> And for the FTP and BIP profiles the flow is:
+>
+> OBEX--> RFCOMM-->L2CAP --> low level drivers
+>
+> So, in theory if RFCOMM and OBEX modules are removed from the linux
+> kernel (Eg rmmod rfcomm), the DUN/HSP/FAX/FTP and BIP profiles  
+> should be
+> disabled.
+>
+> Similarly, removing bnep.ko from the kernel should disable PAN  
+> profile.
+> Is that a correct interpretation??
+> Also, How do I use bluez-utils-3.32 to disable certain profiles?
 
-#!/bin/sh
-LEASES=/var/run/mypppd.leases
-grep -q $DUN_BDADDR $LEASES || echo $DUN_BDADDR >>$LEASES
-LOCAL=192.168.32.10
-REMOTE=192.168.42.`grep -n $DUN_BDADDR $LEASES | cut -d : -f1`
-pppd $LOCAL:$REMOTE $*
+the kernel only implements protocols and not profiles. And loading a  
+module that implements a protocol doesn't mean that a profile becomes  
+available. Also some protocols like OBEX, SDP and AVDTP are  
+implemented in userspace.
 
--- 
-Brad
+The bluez-utils-3.32 has multiple options to handle these cases.  
+Normally would not touch any of them and simply go ahead with the  
+testing. They don't affect you. However if you do wanna change stuff  
+look at the /etc/bluetooth/*.conf files (some of them might not be  
+installed by default). So you have main.conf where you can disable  
+certain plugins (plugins represent profile collections) and  
+audio.conf, network.conf and input.conf. The bluez-utils source code  
+contains example config for all plugins.
+
+Regards
+
+Marcel
+
 
 -------------------------------------------------------------------------
 This SF.net email is sponsored by: Microsoft
