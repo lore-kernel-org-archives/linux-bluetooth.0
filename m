@@ -1,113 +1,170 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <f9d4bd30805011546r4511609dned47cc9021dbe88d@mail.gmail.com>
-Date: Thu, 1 May 2008 19:46:11 -0300
-From: "Claudio Takahasi" <claudio.takahasi@openbossa.org>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Date: Sat, 31 May 2008 04:29:40 -0400
+From: jayjwa <jayjwa@atr2.ath.cx>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <DB4454DF-1BB6-48C6-9868-53EF65E3271E@holtmann.org>
+Message-ID: <alpine.LNX.1.00.0805310402120.8061@nge2.ngu.pk>
+References: <alpine.LNX.1.00.0805280355410.22621@nge2.ngu.pk>
+	<DB4454DF-1BB6-48C6-9868-53EF65E3271E@holtmann.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_9444_7189898.1209681971977"
-Subject: [Bluez-devel] [PATCH]Trusted verification for service authorization
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
-
-------=_Part_9444_7189898.1209681971977
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi Marcel,
-
-here is the patch to check global and service trust before request for
-authorization.
-
-The code was basically copied from RequestAuthorization method. Any
-idea why BDADDR_ANY is being used?
-
-"read_trust(BDADDR_ANY, ..."
-Using this adapter address, service based "trust" will be applied to
-all adapters. Do you want this behavior?
-
-ps: tested using network service only, I don't have headsets or input
-devices at home.
-
-Regards,
-Claudio.
-
--- 
---
-Claudio Takahasi
-Instituto Nokia de Tecnologia
-Recife - Pernambuco - Brasil
-+55 81 30879999
-
-------=_Part_9444_7189898.1209681971977
-Content-Type: text/x-diff; name=trust01.patch
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ffpx7hq10
-Content-Disposition: attachment; filename=trust01.patch
-
-SW5kZXg6IGhjaWQvZGJ1cy1zZXJ2aWNlLmMKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTogL2N2c3Jvb3Qv
-Ymx1ZXovdXRpbHMvaGNpZC9kYnVzLXNlcnZpY2UuYyx2CnJldHJpZXZpbmcgcmV2aXNpb24gMS4x
-NDgKZGlmZiAtdSAtcjEuMTQ4IGRidXMtc2VydmljZS5jCi0tLSBoY2lkL2RidXMtc2VydmljZS5j
-CTEgTWF5IDIwMDggMTM6NTI6MjcgLTAwMDAJMS4xNDgKKysrIGhjaWQvZGJ1cy1zZXJ2aWNlLmMJ
-MSBNYXkgMjAwOCAyMjozMTo1NyAtMDAwMApAQCAtMTIzNiw2ICsxMjM2LDcgQEAKIAogCWdfZnJl
-ZShhdXRoKTsKIH0KKwogaW50IHNlcnZpY2VfcmVxX2F1dGgoYmRhZGRyX3QgKnNyYywgYmRhZGRy
-X3QgKmRzdCwKIAkJY29uc3QgY2hhciAqdXVpZCwgc2VydmljZV9hdXRoX2NiIGNiLCB2b2lkICp1
-c2VyX2RhdGEpCiB7CkBAIC0xMjQzLDcgKzEyNDQsOSBAQAogCXN0cnVjdCBhZGFwdGVyICphZGFw
-dGVyOwogCXN0cnVjdCBkZXZpY2UgKmRldmljZTsKIAlzdHJ1Y3QgYWdlbnQgKmFnZW50OworCXN0
-cnVjdCBzZXJ2aWNlICpzZXJ2aWNlOwogCWNoYXIgYWRkcmVzc1sxOF07CisJZ2Jvb2xlYW4gdHJ1
-c3RlZDsKIAogCWFkYXB0ZXIgPSBiYTJhZGFwdGVyKHNyYyk7CiAJaWYgKCFhZGFwdGVyKQpAQCAt
-MTI1OSwxMCArMTI2MiwxOCBAQAogCWlmICghZGV2aWNlKQogCQlyZXR1cm4gLUVQRVJNOwogCi0J
-aWYgKCFzZWFyY2hfc2VydmljZV9ieV91dWlkKHV1aWQpKQorCXNlcnZpY2UgPSBzZWFyY2hfc2Vy
-dmljZV9ieV91dWlkKHV1aWQpOworCWlmICghc2VydmljZSkKIAkJcmV0dXJuIC1FUEVSTTsKIAot
-CS8qIEZJWE1FOiBNaXNzaW5nIGNoZWNrIHRydXN0ZWQgZmlsZSBlbnRyaWVzICovCisJdHJ1c3Rl
-ZCA9IHJlYWRfdHJ1c3Qoc3JjLCBhZGRyZXNzLCBHTE9CQUxfVFJVU1QpOworCWlmICghdHJ1c3Rl
-ZCkKKwkJdHJ1c3RlZCA9IHJlYWRfdHJ1c3QoQkRBRERSX0FOWSwgYWRkcmVzcywgc2VydmljZS0+
-aWRlbnQpOworCisJaWYgKHRydXN0ZWQpIHsKKwkJY2IoTlVMTCwgdXNlcl9kYXRhKTsKKwkJcmV0
-dXJuIDA7CisJfQogCiAJYWdlbnQgPSAoZGV2aWNlLT5hZ2VudCA/IDogYWRhcHRlci0+YWdlbnQp
-OwogCWlmICghYWdlbnQpCkluZGV4OiBuZXR3b3JrL3NlcnZlci5jCj09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KUkNTIGZp
-bGU6IC9jdnNyb290L2JsdWV6L3V0aWxzL25ldHdvcmsvc2VydmVyLmMsdgpyZXRyaWV2aW5nIHJl
-dmlzaW9uIDEuOTMKZGlmZiAtdSAtcjEuOTMgc2VydmVyLmMKLS0tIG5ldHdvcmsvc2VydmVyLmMJ
-MSBNYXkgMjAwOCAxMzo1MjoyOCAtMDAwMAkxLjkzCisrKyBuZXR3b3JrL3NlcnZlci5jCTEgTWF5
-IDIwMDggMjI6MzE6NTggLTAwMDAKQEAgLTU5MiwxNCArNTkyLDE2IEBACiAJCWdvdG8gcmVwbHk7
-CiAJfQogCisJc2V0dXAgPSBzZXR1cF9zZXNzaW9uX25ldyhhZGRyZXNzLCBkc3Rfcm9sZSwgc3Jj
-X3JvbGUsIHNrLCB0by0+d2F0Y2gpOworCiAJLyogV2FpdCBhdXRob3JpemF0aW9uIGJlZm9yZSBy
-ZXBseSBzdWNjZXNzICovCiAJaWYgKGF1dGhvcml6ZV9jb25uZWN0aW9uKG5zLCBhZGRyZXNzKSA8
-IDApIHsKKwkJc2V0dXBfc2Vzc2lvbl9mcmVlKHNldHVwKTsKKwkJc2V0dXAgPSBOVUxMOwogCQly
-c3AgPSBCTkVQX0NPTk5fTk9UX0FMTE9XRUQ7CiAJCWdvdG8gcmVwbHk7CiAJfQogCi0Jc2V0dXAg
-PSBzZXR1cF9zZXNzaW9uX25ldyhhZGRyZXNzLCBkc3Rfcm9sZSwgc3JjX3JvbGUsIHNrLCB0by0+
-d2F0Y2gpOwotCiAJZ19zb3VyY2VfcmVtb3ZlKHRvLT5pZCk7CiAJdG8tPmlkID0gMDsKIAo=
-------=_Part_9444_7189898.1209681971977
+Subject: Re: [Bluez-users] bluez-utils-3.32: something broke?
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
+
+
+
+
+On Thu, 29 May 2008, Marcel Holtmann wrote:
+
+-> > 2.6.25.3 w/sco patch built with gcc-4.3.0, x86.
+-> 
+-> The SCO patch should not be needed at all.
+
+
+After reversing the patch and rebuilting 2.6.25.4, I can most certainly say it 
+is needed for SCO-only headsets being sent to from eSCO/SCO bluetooth 
+adapters.
+
+2008-05-31T04:08:58-04:00 vdrl kernel: usb 3-2: new full speed USB device 
+using uhci_hcd and address 2
+2008-05-31T04:08:58-04:00 vdrl kernel: usb 3-2: configuration #1 chosen from 1 
+choice
+2008-05-31T04:08:58-04:00 vdrl kernel: usb 3-2: New USB device found, 
+idVendor=050d, idProduct=0121
+2008-05-31T04:08:58-04:00 vdrl kernel: usb 3-2: New USB device strings: Mfr=1, 
+Product=2, SerialNumber=0
+2008-05-31T04:08:58-04:00 vdrl kernel: usb 3-2: Product: BELKIN BLUETOOTH USB 
+ADAPTER CL. 1
+2008-05-31T04:08:58-04:00 vdrl kernel: usb 3-2: Manufacturer: Broadcom Corp
+2008-05-31T04:09:52.396255-04:00 vdrl hcid[1916]: Bluetooth HCI daemon
+2008-05-31T04:09:52.429271-04:00 vdrl hcid[1916]: HCI dev 0 registered
+2008-05-31T04:09:52.429877-04:00 vdrl hcid[1916]: Starting SDP server
+2008-05-31T04:09:52.496084-04:00 vdrl hcid[1916]: Can't create GN bridge
+2008-05-31T04:09:52.496250-04:00 vdrl hcid[1916]: Registered manager 
+path:/org/bluez/network
+2008-05-31T04:09:52.511086-04:00 vdrl hcid[1916]: Registered server 
+path:/org/bluez/network/nap
+2008-05-31T04:09:52.511435-04:00 vdrl hcid[1916]: Registered server 
+path:/org/bluez/network/gn
+2008-05-31T04:09:52.511734-04:00 vdrl hcid[1916]: Registered server 
+path:/org/bluez/network/panu
+2008-05-31T04:09:52.520654-04:00 vdrl hcid[1916]: Registering service
+2008-05-31T04:09:52.539779-04:00 vdrl hcid[1916]: Registered manager 
+path:/org/bluez/serial
+2008-05-31T04:09:52.539969-04:00 vdrl hcid[1916]: Registering service
+2008-05-31T04:09:52.542778-04:00 vdrl hcid[1916]: Registered input manager 
+path:/org/bluez/input
+2008-05-31T04:09:52.543005-04:00 vdrl hcid[1916]: Registering service
+2008-05-31T04:09:52.565451-04:00 vdrl hcid[1916]: Unix socket created: 18
+2008-05-31T04:09:52.587640-04:00 vdrl hcid[1916]: Registered manager 
+path:/org/bluez/audio
+2008-05-31T04:09:52.603416-04:00 vdrl hcid[1916]: Loading device 
+00:1A:45:01:F9:42 (headset )
+2008-05-31T04:09:52.611591-04:00 vdrl hcid[1916]: Setting 00:1A:45:01:F9:42 as 
+default device
+2008-05-31T04:09:52.611709-04:00 vdrl hcid[1916]: Registering service
+2008-05-31T04:09:52.612459-04:00 vdrl hcid[1916]: HCI dev 0 up
+2008-05-31T04:09:52.612588-04:00 vdrl hcid[1916]: Device hci0 has been added
+2008-05-31T04:09:52.618162-04:00 vdrl hcid[1916]: Starting security manager 0
+2008-05-31T04:09:52.651570-04:00 vdrl hcid[1916]: Device hci0 has been 
+activated
+2008-05-31T04:09:55.140881-04:00 vdrl hcid[1916]: Default passkey agent (:1.5, 
+/org/bluez/passkey_agent_1919) registered
+2008-05-31T04:09:59.939386-04:00 vdrl hcid[1916]: Default authorization agent 
+(:1.6, /org/bluez/auth_agent_1920) registered
+2008-05-31T04:10:21.442155-04:00 vdrl hcid[1916]: link_key_request 
+(sba=00:0A:3A:7C:5C:74, dba=00:1A:45:01:F9:42)
+2008-05-31T04:10:22.553064-04:00 vdrl hcid[1916]: link_key_notify 
+(sba=00:0A:3A:7C:5C:74, dba=00:1A:45:01:F9:42)
+2008-05-31T04:10:27.911891-04:00 vdrl hcid[1916]: Badly formated or 
+unrecognized command: AT+BTRH?
+2008-05-31T04:10:53.210714-04:00 vdrl hcid[1916]: Audio API: received 
+BT_GETCAPABILITIES_REQ
+2008-05-31T04:10:53.210855-04:00 vdrl hcid[1916]: Audio API: sending 
+BT_GETCAPABILITIES_RSP
+2008-05-31T04:10:53.225439-04:00 vdrl hcid[1916]: Audio API: received 
+BT_SETCONFIGURATION_REQ
+2008-05-31T04:10:53.225556-04:00 vdrl hcid[1916]: config sco - device = 
+00:1A:45:01:F9:42 access_mode = 2
+2008-05-31T04:10:53-04:00 vdrl kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection handle 1
+2008-05-31T04:10:53-04:00 vdrl kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection handle 1
+2008-05-31T04:10:53-04:00 vdrl kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection handle 1
+2008-05-31T04:10:53-04:00 vdrl kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection handle 1
+2008-05-31T04:10:53-04:00 vdrl kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection handle 1
+2008-05-31T04:10:53-04:00 vdrl kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection handle 1
+2008-05-31T04:10:53-04:00 vdrl kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection handle 1
+2008-05-31T04:10:53-04:00 vdrl kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection handle 1
+2008-05-31T04:10:53-04:00 vdrl kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection handle 1
+2008-05-31T04:10:53-04:00 vdrl kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection handle 1
+2008-05-31T04:10:53-04:00 vdrl kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection handle 1
+2008-05-31T04:10:53-04:00 vdrl kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection handle 1
+2008-05-31T04:10:53-04:00 vdrl kernel: hci_scodata_packet: hci0 SCO packet for 
+unknown connection handle 1
+
+...
+
+
+
+( continues endlessly. I had to pull the dongle to stop it. I also need
+   to look up duplicate mesg reporting limiting in rsyslog ;)  )
+
+
+usb 2-2: USB disconnect, address 2
+
+
+This is the patch I've been using for awhile now:
+
+
+--- linux-2.6.23/net/bluetooth/hci_event.c.orig 2008-02-26 12:46:36.000000000+0900
++++ linux-2.6.23/net/bluetooth/hci_event.c      2008-02-26 12:47:23.000000000+0900
+@@ -1313,8 +1313,15 @@
+         hci_dev_lock(hdev);
+
+         conn = hci_conn_hash_lookup_ba(hdev, ev->link_type, &ev->bdaddr);
+-       if (!conn)
+-               goto unlock;
++       if (!conn) {
++               __u8 link_type = (ev->link_type == ESCO_LINK) ? SCO_LINK : ESCO_LINK;
++
++               conn = hci_conn_hash_lookup_ba(hdev, link_type, &ev->bdaddr);
++               if (conn)
++                       conn->type = ev->link_type;
++               else
++                       goto unlock;
++       }
+
+         if (!ev->status) {
+                 conn->handle = __le16_to_cpu(ev->handle);
+
+
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
-Don't miss this year's exciting event. There's still time to save $100. 
-Use priority code J8TL2D2. 
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
-------=_Part_9444_7189898.1209681971977
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
-------=_Part_9444_7189898.1209681971977--
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
