@@ -1,13 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48463F6F.6010500@magtech.com.au>
-Date: Wed, 04 Jun 2008 17:08:31 +1000
-From: Aras Vaichas <arasv@magtech.com.au>
+Message-ID: <4328a52e0806030654g62e8c4aepe9a7f2ea4386ef6b@mail.gmail.com>
+Date: Tue, 3 Jun 2008 13:54:10 +0000
+From: "Artem Skvira" <artem.skvira@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <1945.124.170.117.82.1212030264.squirrel@www.magtech.com.au>
-	<d89ddf300805290539q2401bcx915d0b0756824409@mail.gmail.com>
-In-Reply-To: <d89ddf300805290539q2401bcx915d0b0756824409@mail.gmail.com>
-Subject: Re: [Bluez-users] DUND pre-pppd script
+Subject: [Bluez-users] bluez-gnome-0.26: out of memory
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,61 +14,73 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1939476263=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Brad Midgley wrote:
-> Aras
->
->   
->> I need to determine my ppp IP address pair before I run pppd.
->>     
->
-> I ran into this when setting up a bluetooth AP for use with a couple
-> of nokia devices. They are using dun not pan, and I wanted to assign
-> different addresses to each device. I had to hardcode the ip addresses
-> in the nokias' dialup config which wasn't very satisfying.
->
->   
+--===============1939476263==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_13579_19022256.1212501250501"
 
-Thanks for the replies and ideas. What I've done is this:
+------=_Part_13579_19022256.1212501250501
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-#!/bin/sh
-IP_PAIR=`safeip -p`
-pppd $1 $2 ${IP_PAIR} $3 $4 $5 $6 $7 $8 $9
+Hi all,
+
+I have an issue with bluetooth on my ubuntu hardy. Basically, when I
+ran *bluetooth-properties
+*
+and try to add a device, I get this error message:
+
+"process 24083: arguments to dbus_message_new_method_call() were incorrect,
+assertion "_dbus_check_is_valid_path (path)" failed in file dbus-message.c
+line 1074.
+This is normally a bug in some application using the D-Bus library.
+
+** ERROR **: Out of memory
+aborting...
+Aborted"
+
+I installed 0.26 as you Marcel suggested, but it didn't solve the problem.
+
+Now I'm wondering is there anything else I can look into and try ti fix?
+May be there's some information/logs I can post here?
+
+Thanks!
+
+------=_Part_13579_19022256.1212501250501
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi all,<br><br>I have an issue with bluetooth on my ubuntu hardy. Basically, when I ran <b>bluetooth-properties </b><br>and try to add a device, I get this error message:<br><br>&quot;process 24083: arguments to dbus_message_new_method_call() were incorrect, assertion &quot;_dbus_check_is_valid_path (path)&quot; failed in file dbus-message.c line 1074.<br>
+This is normally a bug in some application using the D-Bus library.<br><br>** ERROR **: Out of memory<br>aborting...<br>Aborted&quot;<br><br>I installed 0.26 as you Marcel suggested, but it didn&#39;t solve the problem.<br>
+<br>Now I&#39;m wondering is there anything else I can look into and try ti fix?<br>May be there&#39;s some information/logs I can post here?<br><br>Thanks!<br><br>
+
+------=_Part_13579_19022256.1212501250501--
 
 
-safeip is a Python script I wrote which finds a private subnet of size 2
-that is not in use anywhere on the system. Option -p returns the data
-like so: IP1:IP2
-
-I just pass this IP pair on to pppd as well as all the other information
-that dund passes on from itself and the /etc/default/bluetooth file.
-
-Works quite well regardless of the state of (almost) any other possible
-network configuration. I can also connect from multiple devices and it
-just dishes out a new IP pair every time.
-
-my /etc/default/bluetooth file has:
-DUND_OPTIONS="--listen --persist --channel 3 --msdun --pppd pppd_pre.sh
-crtscts 115200 ms-dns 10.0.0.1
-
-I haven't fixed the ms-dns entry yet, but that is easily done
-
-Aras
-
-______________________________________________________________________
-This email has been scanned by the MessageLabs Email Security System.
-For more information please visit http://www.messagelabs.com/email 
-______________________________________________________________________
+--===============1939476263==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
-Check out the new SourceForge.net Marketplace.
-It's the best place to buy or sell services for
-just about anything Open Source.
-http://sourceforge.net/services/buy/index.php
+This SF.net email is sponsored by: Microsoft
+Defy all challenges. Microsoft(R) Visual Studio 2008.
+http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
+--===============1939476263==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1939476263==--
