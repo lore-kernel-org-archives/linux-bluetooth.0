@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 04 Jun 2008 10:39:29 +0200
-From: mulata@gmx.de
-Message-ID: <20080604083929.250690@gmx.net>
+Message-ID: <48463F6F.6010500@magtech.com.au>
+Date: Wed, 04 Jun 2008 17:08:31 +1000
+From: Aras Vaichas <arasv@magtech.com.au>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] hcid and pairing problems
+References: <1945.124.170.117.82.1212030264.squirrel@www.magtech.com.au>
+	<d89ddf300805290539q2401bcx915d0b0756824409@mail.gmail.com>
+In-Reply-To: <d89ddf300805290539q2401bcx915d0b0756824409@mail.gmail.com>
+Subject: Re: [Bluez-users] DUND pre-pppd script
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,61 +17,54 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi!
+Brad Midgley wrote:
+> Aras
+>
+>   
+>> I need to determine my ppp IP address pair before I run pppd.
+>>     
+>
+> I ran into this when setting up a bluetooth AP for use with a couple
+> of nokia devices. They are using dun not pan, and I wanted to assign
+> different addresses to each device. I had to hardcode the ip addresses
+> in the nokias' dialup config which wasn't very satisfying.
+>
+>   
 
-Im using hcid 3.31 on Kernel 2.4.21
-In order to use a bluetooth keyboard I've installed Peter's bthid.
-With the Logitech Desktop 550 MX it works really fine so far, since this ke=
-yboard has no pairing process.
+Thanks for the replies and ideas. What I've done is this:
 
-But now I have another Keyboard (Keysonic) which goes through the whole pai=
-ring process and I have problems.
-I know I probably can't get any support here for bthid but the problem seem=
-s to be related to the pairing process which is actually handled by hcid.
-After scanning for the keyboard I can establish a connection with bthid. hc=
-itool says:
-Connections:
-        < ACL 00:18:00:00:61:45 handle 6 state 1 lm MASTER
+#!/bin/sh
+IP_PAIR=`safeip -p`
+pppd $1 $2 ${IP_PAIR} $3 $4 $5 $6 $7 $8 $9
 
-So this looks good so far.
-But I cant pair the devices.
 
-hcid.conf is set to "security auto", "pairing multi", "passkey 1234".
-So usually the pairing process looks like that, right:
-1. bthid connects the keyboard
-2. keyboard asks bthid for a pin
-3. bthid forwards this request to hcid
-3 hcid provides the pin through bthid to the keyboard automatically (securi=
-ty is auto in hcid.conf)
-4 I have to type the pin in the keyboard and press enter
-5 pairing should be done
+safeip is a Python script I wrote which finds a private subnet of size 2
+that is not in use anywhere on the system. Option -p returns the data
+like so: IP1:IP2
 
-Is this correct?
-The problem is I dont get any feedback during this process, no echo and no =
-prompt etc.
+I just pass this IP pair on to pppd as well as all the other information
+that dund passes on from itself and the /etc/default/bluetooth file.
 
-If I set security to user in hcid.conf actually hcid should ask me for a ke=
-y to enter, but this doesn't happen either.
+Works quite well regardless of the state of (almost) any other possible
+network configuration. I can also connect from multiple devices and it
+just dishes out a new IP pair every time.
 
-Anyway after a while bthid says this:
-bthid[980]: read error 1 on Control channel: Operation not permitted
+my /etc/default/bluetooth file has:
+DUND_OPTIONS="--listen --persist --channel 3 --msdun --pppd pppd_pre.sh
+crtscts 115200 ms-dns 10.0.0.1
 
-Thanks for any help...
+I haven't fixed the ms-dns entry yet, but that is easily done
 
-martin.
+Aras
 
-PS, Marcel: Sorry but I really can't switch to Kernel 2.6 and with getting =
-good results with the Logitech Keyboard I think others should work, too
--- =
-
-Martin Kupf
-
-Super-Aktion nur in der GMX Spieleflat: 10 Tage f=FCr 1 Euro.
-=DCber 180 Spiele downloaden: http://flat.games.gmx.de
+______________________________________________________________________
+This email has been scanned by the MessageLabs Email Security System.
+For more information please visit http://www.messagelabs.com/email 
+______________________________________________________________________
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
