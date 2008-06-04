@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48491A97.1080508@email.it>
-Date: Fri, 06 Jun 2008 13:08:07 +0200
-From: Pietro Battiston <toobaz@email.it>
-MIME-Version: 1.0
+Message-ID: <3e9cdced0806040500l6f85cd1en58eb86dad87b8b80@mail.gmail.com>
+Date: Wed, 4 Jun 2008 14:00:45 +0200
+From: "Fritz Code" <codefritz@googlemail.com>
 To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] Problem with hamlet exagerate adapter
+MIME-Version: 1.0
+Subject: [Bluez-users] description for output of hcidump
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,49 +14,61 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0671064461=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I have problems with a Hamlet USB-bluetooth dongle.
+--===============0671064461==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_1092_18169781.1212580845384"
 
-It is correctly recognized (I run a 64 bit Ubuntu Hardy) and I was able
-to connect to two different cellular phones, and send pictures from pc
-to phone and vice versa. However, it sometimes stops working. I
-conjectured this is a problem with the reception of large amounts of
-data, but I'm not sure.
+------=_Part_1092_18169781.1212580845384
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-For example, when I tried to sync my Nokia phone (using multisync), the
-syncml-obex-client always gave an error, but sometimes it did
-immediately, other times it started transferring and then stopped.
-Similarly, when I try to explore the content of the phones, it starts
-ok, I can even see the folders, then after a while it stops
-(particularly often if I try to copy some files on the PC; in that case
-nautilus also gets stuck to 100% of CPU). Often, when it stops, I'm not
-even able no more to just send pictures, and I have to unplug the dongle
-(/etc/init.d/bluetooth restart seems not being enough).
+Hi,
 
-Here's the output of "hciconfig hci0 version":
-hci0:    Type: USB
-    BD Address: 00:10:60:D1:64:C2 ACL MTU: 384:8 SCO MTU: 64:8
-    HCI Ver: 2.0 (0x3) HCI Rev: 0x7a6 LMP Ver: 2.0 (0x3) LMP Subver: 0x7a6
-    Manufacturer: Cambridge Silicon Radio (10)
+is there anywhere a document / tutorial that decribes the output of hcidump?
 
-If there is any other useful data that I can collect, I'd be glad to
-help. I have absolutely no idea of how to debug a bluetooth connection,
-and dmesg shows nothing interesting.
+e.g. HCI Event: Mode Change (0x14) plen 6
 
-Pietro Battiston
+thanks
 
-(P.S: is this the right mailing list to send bugs to or should I write
-to "developers"?)
+-- 
+Regards,
+--Codefritz
+
+------=_Part_1092_18169781.1212580845384
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hi,<br><br>is there anywhere a document / tutorial that decribes the output of hcidump?<br><br>e.g. HCI Event: Mode Change (0x14) plen 6<br><br>thanks<br clear="all"><br>-- <br>Regards,<br>--Codefritz<br><br><br><br>
+
+------=_Part_1092_18169781.1212580845384--
+
+
+--===============0671064461==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
+--===============0671064461==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0671064461==--
