@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 06 Jun 2008 14:31:06 +0200
-From: Jan Lana <Jan.Lana@Sun.COM>
+Message-ID: <4f9823290806052359u6a325c21mc02ae7ea7573e993@mail.gmail.com>
+Date: Fri, 6 Jun 2008 08:59:51 +0200
+From: "Reto Bachmann" <reto.bachmann@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Message-id: <20080606123106.GE14966@czech.sun.com>
-MIME-version: 1.0
-Subject: [Bluez-devel] headset and headsetAG profile
-Reply-To: Jan Lana <Jan.Lana@Sun.COM>,
-	BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <4f9823290806052357t16eb42a1m1cfc31816ac8701c@mail.gmail.com>
+MIME-Version: 1.0
+References: <4f9823290806050015n233db796ibdd73ee8eb3c4b7d@mail.gmail.com>
+	<4f9823290806052357t16eb42a1m1cfc31816ac8701c@mail.gmail.com>
+Subject: [Bluez-devel] Fwd: getRemoteName uncached
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -15,35 +17,62 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0185558145=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+--===============0185558145==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_479_22820058.1212735592022"
 
-I would like to make a gateway bt phone <-> skype. One way is to
-implement H[SF]P profile on computer side and have an alsa device for
-autio stream.
+------=_Part_479_22820058.1212735592022
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Please correct me if I am wrong:
- - utils/audio/headset.c implements H[SF]P:AG - it simulate audio
-   gateway (phone) and try to connect to a headset (H[SF]P:HF) (sdptool
-   add HFAG)
- - HFP:HF is supported by sdptool but not implemented yet (sdptool add
-   HF)
+Hello,
 
-I would like to participate on H[SF]P:HF implementation - does anybody
-works on H[SF]P:HF implementation? I have found that lot of things are
-already prepared ...
+For my Application I need always the "actual" name of the remote-device, so
+I want to determine the uncached name. So is there any chance to clear the
+cache or to find out the real name?
 
-- jan
+Thanks,
+
+Reto
+
+------=_Part_479_22820058.1212735592022
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Hello,<br><br>For my Application I need always the &quot;actual&quot; name of the
+remote-device, so I want to determine the uncached name. So is there
+any chance to clear the cache or to find out the real name?<br><br>Thanks,<br><font color="#888888">
+<br>Reto</font>
+
+------=_Part_479_22820058.1212735592022--
+
+
+--===============0185558145==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
+--===============0185558145==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0185558145==--
