@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <484DD790.3050905@gmail.com>
-Date: Mon, 09 Jun 2008 18:23:28 -0700
-From: Xamindar <junkxamindar@gmail.com>
+Date: Mon, 9 Jun 2008 16:05:50 -0700 (PDT)
+From: hong zhang <henryzhang62@yahoo.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] configure computer for a certain pin?
+Message-ID: <410600.16036.qm@web57902.mail.re3.yahoo.com>
+Subject: [Bluez-users] bluez commands
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,21 +18,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-There must be a way to set my computer to always expect a specific pin 
-number so I don't have to type it on the computer to pair a device.  I 
-am building a carpc and will be using a pan network through my cell 
-phone for internet. This carpc will not have a keyboard to enter a pin 
-in case I need to repair the device. I guess I could pair it when there 
-IS a keyboard attached but I figure it would be more convenient to not 
-have to.
+List,
 
-Is there a way to just set up bluez to expect a certain pin number and 
-to allow a pair if I enter that number on the other device?  The carpc 
-has the gnome bluetooth applet running that takes care of pairing right 
-now. Would I have to disable that?  I don't see any options in it to 
-accomplish what I want.
+Does any document descripe bluez commands?
+My fedora 8 does not return info for "man rfcommd".
 
-Thanks for any help
+---henry
+
+
+      
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
