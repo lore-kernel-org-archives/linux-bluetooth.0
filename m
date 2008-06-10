@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <484EF658.7080006@earthlink.net>
-Date: Tue, 10 Jun 2008 16:47:04 -0500
-From: "Mumia W.." <paduille.4061.mumia.w+nospam@earthlink.net>
-MIME-Version: 1.0
+Date: Tue, 10 Jun 2008 15:31:48 -0400
+From: jayjwa <jayjwa@atr2.ath.cx>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <971056.49705.qm@web57912.mail.re3.yahoo.com>
-In-Reply-To: <971056.49705.qm@web57912.mail.re3.yahoo.com>
-Subject: Re: [Bluez-users] bluez commands
+In-Reply-To: <78f7ab620806070154h7ddbbec2o928fab039d3c6381@mail.gmail.com>
+Message-ID: <alpine.LNX.1.00.0806101520060.4175@nge2.ngu.pk>
+References: <78f7ab620806070154h7ddbbec2o928fab039d3c6381@mail.gmail.com>
+MIME-Version: 1.0
+Subject: Re: [Bluez-users] "SCO packet for unknown connection" trouble with
+ Motorla H500 headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,50 +21,51 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 06/10/2008 12:18 PM, hong zhang wrote:
-> --- "Mumia W.."
-> <paduille.4061.mumia.w+nospam@earthlink.net> wrote:
+
+On Sat, 7 Jun 2008, S?bastien Barth?lemy wrote:
+
+-> I'm trying to use a  Motorola H500 headset (SCO) on an ubuntu hardy
+-> heron computer with
+->  - bluez-utils version 3.26-0ubuntu6.
+->  - linux 2.6.24-18-generic
+->  - my dell latitude integrated bluetooth;
+
+2.6.25.5 as of a few days ago
+bluez-lib-3.32
+bluez-utils-3.31
+Belkin/Broadcom, Jabra BT135
+
+-> However, it does not work (no sound), and syslog is flooded by
+->  thinbox kernel: [ 5830.621543] hci_scodata_packet: hci0 SCO packet
+-> for unknown connection handle 46
+-> messages
+-> 
+-> When I ctrl+c mplayer, I can hear a "biip"
+
+Sounds familiar.
+
+-> Thus I have two problems
+->  - the headset is not working
+->  - syslog is flooded
+
+There's 3 'syslogs' I know of, the old one I had did rate limiting 
+automatically. It was an old one with syslogd/klogd that needed dozens of 
+patches to compile. My new one, rsyslog, needed a line in the config file. I 
+guess it depends on which one you have installed.
+
 > 
->> On 06/09/2008 06:05 PM, hong zhang wrote:
->>> List,
->>>
->>> Does any document descripe bluez commands?
->>> My fedora 8 does not return info for "man
->> rfcommd".
->>> ---henry
->>>
->> Have you tried "man rfcomm" ?
->>
-> Mumia,
-> 
-> Thanks.
-> But where can I get all bluez commands?
-> 
-> ---henry
->
+-> What is the root of these problems ? What is their status ?
 
-On Debian, I can do "dpkg -L bluez-utils" to get a list of all the files 
-in a package. Some of those files will be manual pages. I'm sure that 
-there is a equivalent command for Fedora 8.
+The SCO part is in-kernel, I believe.
 
-These are the bluez-related manual pages on my Debian 4.0 system:
 
-/usr/share/man/man1/dund.1.gz
-/usr/share/man/man1/hidd.1.gz
-/usr/share/man/man1/pand.1.gz
-/usr/share/man/man1/rfcomm.1.gz
-/usr/share/man/man1/sdptool.1.gz
-/usr/share/man/man1/ciptool.1.gz
-/usr/share/man/man1/hcitool.1.gz
-/usr/share/man/man5/hcid.conf.5.gz
-/usr/share/man/man8/hcid.8.gz
-/usr/share/man/man8/hid2hci.8.gz
-/usr/share/man/man8/l2ping.8.gz
-/usr/share/man/man8/sdpd.8.gz
-/usr/share/man/man8/hciattach.8.gz
-/usr/share/man/man8/hciconfig.8.gz
+-> I read Jawya messages
+-> http://sourceforge.net/mailarchive/message.php?msg_name=alpine.LNX.1.00.0806021644270.9709%40nge2.ngu.pk
+-> and I'm not sure this is fixed in new kernel/bluez versions, is it the
+-> case ?
 
-I hope this helps you.
+When I built 2.6.25.5 a few days ago, I applied the patch right off and it 
+works now, so likely there was no changes in that part of the code.
 
 
 -------------------------------------------------------------------------
