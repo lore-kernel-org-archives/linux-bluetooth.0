@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Jun 2008 09:42:31 +0200
-From: "Martin Kupf" <mulata@gmx.de>
-In-Reply-To: <20080609163110.282100@gmx.net>
-Message-ID: <20080610074231.39470@gmx.net>
+Message-ID: <484DD790.3050905@gmail.com>
+Date: Mon, 09 Jun 2008 18:23:28 -0700
+From: Xamindar <junkxamindar@gmail.com>
 MIME-Version: 1.0
-References: <20080609163110.282100@gmx.net>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] pairing problems
+Subject: [Bluez-users] configure computer for a certain pin?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,106 +14,25 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I did some more research and I figured out that I will have to use the Inpu=
-tService of bluez.
-So with the dbus Interface of bluez I think have to do the following steps,=
- right?:
-ActiveService (input)
-CreateDevice (bdaddr of keyboard)
-Connect()
-CreateDevice looks for a link key and if it finds one, an authorized connec=
-tion can be established with Connect() I guess.
+There must be a way to set my computer to always expect a specific pin 
+number so I don't have to type it on the computer to pair a device.  I 
+am building a carpc and will be using a pan network through my cell 
+phone for internet. This carpc will not have a keyboard to enter a pin 
+in case I need to repair the device. I guess I could pair it when there 
+IS a keyboard attached but I figure it would be more convenient to not 
+have to.
 
->>From the point that an auhorized connection is established (this can be rec=
-ognized if hcitool con returns a connection with AUTH at the end of the lin=
-e) I can start bthid and use the keyboard.
+Is there a way to just set up bluez to expect a certain pin number and 
+to allow a pair if I enter that number on the other device?  The carpc 
+has the gnome bluetooth applet running that takes care of pairing right 
+now. Would I have to disable that?  I don't see any options in it to 
+accomplish what I want.
 
-
-Thanks for any hints
--mulata
-
-PS: Sorry that I have published a similar thread (email) with my google acc=
-ount, but I have at the moment huge roubel with my google mail account..
-
-
-
-
--------- Original-Nachricht --------
-> Datum: Mon, 09 Jun 2008 18:31:10 +0200
-> Von: mulata@gmx.de
-> An: bluez-users@lists.sourceforge.net
-> Betreff: [Bluez-users] pairing problems
-
-> Hi!
-> After an initial I always have to go through the complete pairing process,
-> there is no reconnect.
-> =
-
-> I want to use a Bluetooth keyboard and it works fine so far, but there are
-> some problems after the initial pairing.
-> =
-
-> To get the keyboard wokring I do the following steps:
-> =
-
-> hcid and passkey-agent are running.
-> =
-
-> hcitool scan
-> hcitool cc <bdaddr>
-> After this step hcitool con lists a established connection to the keyboard
-> auth <bdaddr>
-> Enter PIN on keyboard
-> =
-
-> Now the entry in hcitool con changes to AUTH
-> So the connection is authorized and established and the keyboard works (I
-> use bthid, anyway the process of authorization and pairing is done by hci=
-d,
-> and hcitools)
-> =
-
-> Usually from now this initial pairing process shouldnt be necessary for
-> further sessions, but unfortunately it is.
-> In oder to use the keyboard again (after disabling it) I have to go
-> through the whole process again, but befor I have to /var/lib/bluetooth/*
-> =
-
-> So how can I establish further connections without the whole pairing
-> process?
-> =
-
-> thanks
-> -- =
-
-> Martin Kupf
-> =
-
-> Psssst! Schon vom neuen GMX MultiMessenger geh=F6rt?
-> Der kann`s mit allen: http://www.gmx.net/de/go/multimessenger
-> =
-
-> -------------------------------------------------------------------------
-> Check out the new SourceForge.net Marketplace.
-> It's the best place to buy or sell services for
-> just about anything Open Source.
-> http://sourceforge.net/services/buy/index.php
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
-
--- =
-
-Martin Kupf
-
-Der GMX SmartSurfer hilft bis zu 70% Ihrer Onlinekosten zu sparen! =
-
-Ideal f=FCr Modem und ISDN: http://www.gmx.net/de/go/smartsurfer
+Thanks for any help
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
