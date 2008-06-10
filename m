@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Jun 2008 10:21:48 -0700 (PDT)
+Date: Tue, 10 Jun 2008 10:18:57 -0700 (PDT)
 From: hong zhang <henryzhang62@yahoo.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <20080610093240.17970@gmx.net>
+In-Reply-To: <484DFEAC.6040506@earthlink.net>
 MIME-Version: 1.0
-Message-ID: <793776.37171.qm@web57914.mail.re3.yahoo.com>
-Subject: Re: [Bluez-users] pairing problems
+Message-ID: <971056.49705.qm@web57912.mail.re3.yahoo.com>
+Subject: Re: [Bluez-users] bluez commands
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,217 +19,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Martin,
+Mumia,
 
-What do you do to turn on these messages?
+Thanks.
+But where can I get all bluez commands?
 
 ---henry
 
---- Martin Kupf <mulata@gmx.de> wrote:
+--- "Mumia W.."
+<paduille.4061.mumia.w+nospam@earthlink.net> wrote:
 
-> Well I try to start the Input Service but the binary
-> bluetoothd-input-service is missing.
-> If I compile (with --enable-input-service) the
-> binary doesn't get created either.
-> But anyway what exaclty is the task of the Input
-> Service?
-> I might not have to need it since I have to use
-> bthid.
-> Anyway I did some further tests in order to be able
-> to use the keyboard after an initial pairing without
-> the need of entering a pin again.
+> On 06/09/2008 06:05 PM, hong zhang wrote:
+> > List,
+> > 
+> > Does any document descripe bluez commands?
+> > My fedora 8 does not return info for "man
+> rfcommd".
+> > 
+> > ---henry
+> > 
+> 
+> Have you tried "man rfcomm" ?
 > 
 > 
-> A link key is present in
-> /var/lib/bluettoth/my_host_device/xx.xx.xx.xx.xx/
-> created by the initial pairing.
 > 
-> If I press a key the keyboard tries to reconnect, at
-> the same time bthid is running with -a, -e option
-> (enables encryption and auth. support). 
 > 
-> hcid outputs:  : link_key_request
-> (sba=00:04:0E:8B:AE:92, dba=00:18:00:00:61:45)
+>
+-------------------------------------------------------------------------
+> Check out the new SourceForge.net Marketplace.
+> It's the best place to buy or sell services for
+> just about anything Open Source.
+> http://sourceforge.net/services/buy/index.php
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-users
 > 
-> Hcidump says the following:
-> 
->  HCI Event: Connect Request (0x04) plen 10
->   45 61 00 00 18 00 40 25 00 01
-> < HCI Command: Accept Connection Request
-> (0x01|0x0009) plen 7
->   45 61 00 00 18 00 01
-> > HCI Event: Command Status (0x0f) plen 4
->   00 01 09 04
-> > HCI Event: Connect Complete (0x03) plen 11
->   00 05 00 45 61 00 00 18 00 01 00
-> < HCI Command: Write Link Policy Settings
-> (0x02|0x000d) plen 4
->   05 00 0F 00
-> > HCI Event: Max Slots Change (0x1b) plen 3
->   05 00 05
-> > HCI Event: Command Complete (0x0e) plen 6
->   01 0D 08 00 05 00
-> < HCI Command: Change Connection Packet Type
-> (0x01|0x000f) plen 4
->   05 00 18 CC
-> > HCI Event: Command Status (0x0f) plen 4
->   00 01 0F 04
-> > HCI Event: Connection Packet Type Changed (0x1d)
-> plen 5
->   00 05 00 18 CC
-> > ACL data: handle 5 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 17 scid 0x0040
-> < ACL data: handle 5 flags 0x02 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040
-> result 1 status 1
->       Connection pending - Authentication pending
-> < HCI Command: Authentication Requested
-> (0x01|0x0011) plen 2
->   05 00
-> > HCI Event: Command Status (0x0f) plen 4
->   00 01 11 04
-> > HCI Event: Link Key Request (0x17) plen 6
->   45 61 00 00 18 00
-> > HCI Event: Number of Completed Packets (0x13) plen
-> 5
->   01 05 00 01 00
-> < HCI Command: Remote Name Request (0x01|0x0019)
-> plen 10
->   45 61 00 00 18 00 02 00 00 00
-> > HCI Event: Command Status (0x0f) plen 4
->   00 01 19 04
-> < HCI Command: Link Key Request Reply (0x01|0x000b)
-> plen 22
->   45 61 00 00 18 00 64 0B D8 84 94 21 CB AD 4E 68 2C
-> C8 8B C3
->   C7 88
-> > HCI Event: Command Complete (0x0e) plen 10
->   01 0B 04 00 45 61 00 00 18 00
-> > HCI Event: Remote Name Req Complete (0x07) plen
-> 255
->   00 45 61 00 00 18 00 42 54 4B 42 2D 36 31 34 35 00
-> 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 00 00 00
->   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> > HCI Event: Auth Complete (0x06) plen 3
->   00 05 00
-> < HCI Command: Set Connection Encryption
-> (0x01|0x0013) plen 3
->   05 00 01
-> > HCI Event: Command Status (0x0f) plen 4
->   00 01 13 04
-> > HCI Event: Encrypt Change (0x08) plen 4
->   00 05 00 01
-> < ACL data: handle 5 flags 0x02 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0040
-> result 0 status 0
->       Connection successful
-> > HCI Event: Number of Completed Packets (0x13) plen
-> 5
->   01 05 00 01 00
-> > ACL data: handle 5 flags 0x02 dlen 12
->     L2CAP(s): Config req: dcid 0x0040 flags 0x00
-> clen 0
-> < ACL data: handle 5 flags 0x02 dlen 14
->     L2CAP(s): Config rsp: scid 0x0040 flags 0x00
-> result 0 clen 0
->       Success
-> < ACL data: handle 5 flags 0x02 dlen 12
->     L2CAP(s): Config req: dcid 0x0040 flags 0x00
-> clen 0
-> > HCI Event: Number of Completed Packets (0x13) plen
-> 5
->   01 05 00 01 00
-> > HCI Event: Number of Completed Packets (0x13) plen
-> 5
->   01 05 00 01 00
-> > ACL data: handle 5 flags 0x02 dlen 14
->     L2CAP(s): Config rsp: scid 0x0040 flags 0x00
-> result 0 clen 0
->       Success
-> > HCI Event: Encrypt Change (0x08) plen 4
->   00 05 00 00
-> > HCI Event: Role Change (0x12) plen 8
->   00 45 61 00 00 18 00 00
-> > HCI Event: Max Slots Change (0x1b) plen 3
->   05 00 05
-> > HCI Event: Encrypt Change (0x08) plen 4
->   00 05 00 01
-> > ACL data: handle 5 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 19 scid 0x0041
-> < ACL data: handle 5 flags 0x02 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041
-> result 0 status 0
->       Connection successful
-> > HCI Event: Number of Completed Packets (0x13) plen
-> 5
->   01 05 00 01 00
-> > ACL data: handle 5 flags 0x02 dlen 12
->     L2CAP(s): Config req: dcid 0x0041 flags 0x00
-> clen 0
-> < ACL data: handle 5 flags 0x02 dlen 14
->     L2CAP(s): Config rsp: scid 0x0041 flags 0x00
-> result 0 clen 0
->       Success
-> < ACL data: handle 5 flags 0x02 dlen 12
->     L2CAP(s): Config req: dcid 0x0041 flags 0x00
-> clen 0
-> > HCI Event: Number of Completed Packets (0x13) plen
-> 5
->   01 05 00 01 00
-> > HCI Event: Number of Completed Packets (0x13) plen
-> 5
->   01 05 00 01 00
-> > ACL data: handle 5 flags 0x02 dlen 14
->     L2CAP(s): Config rsp: scid 0x0041 flags 0x00
-> result 0 clen 0
->       Success
-> < ACL data: handle 5 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 1 scid 0x0042
-> > HCI Event: Number of Completed Packets (0x13) plen
-> 5
->   01 05 00 01 00
-> > ACL data: handle 5 flags 0x02 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0042 scid 0x0042
-> result 1 status 2
->       Connection pending - Authorization pending
-> > ACL data: handle 5 flags 0x02 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0042 scid 0x0042
-> result 0 status 0
->       Connection successful
-> < ACL data: handle 5 flags 0x02 dlen 12
->     L2CAP(s): Config req: dcid 0x0042 flags 0x00
-> clen 0
-> > ACL data: handle 5 flags 0x02 dlen 12
->     L2CAP(s): Config req: dcid 0x0042 flags 0x00
-> clen 0
-> < ACL data: handle 5 flags 0x02 dlen 14
->     L2CAP(s): Config rsp: scid 0x0042 flags 0x00
-> result 0 clen 0
->       Success
-> 
-=== message truncated ===
 
 
 
