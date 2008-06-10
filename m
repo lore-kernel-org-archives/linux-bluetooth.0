@@ -1,10 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <eba8281a0806111502j7caebdeav83e3fc038b0c943f@mail.gmail.com>
-Date: Wed, 11 Jun 2008 23:02:57 +0100
-From: "Valerio Valerio" <vdv100@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <782ce16c0806100712v637a0130w4aa448fa8de0140f@mail.gmail.com>
+Date: Tue, 10 Jun 2008 11:12:01 -0300
+From: "=?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?=" <joao.vita@gmail.com>
+To: "PulseAudio Discussion List" <pulseaudio-discuss@mail.0pointer.de>,
+	"BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20080604200738.GA27091@tango.0pointer.de>
 MIME-Version: 1.0
-Subject: [Bluez-devel] Listen a already open socket by the OS
+References: <20080604200738.GA27091@tango.0pointer.de>
+Subject: Re: [Bluez-devel] Summary of the PulseAudio/Bluetooth discussions
+	at the BlueZ meeting in Helsinki
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,72 +18,123 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1465630572=="
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1465630572==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_24832_4103514.1213221777946"
-
-------=_Part_24832_4103514.1213221777946
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi,
-
-I'm a GSoC student working with Bluez, but for other org.
-I need to listen a already open socket by the OS, but when a try to
-overwrite (bind) I get a "already in use error", exist any function or
-alternative to just listen the socket ?
-I want to listen the HID channels (psm 17 and 19).
-
-Thanks in advance.
-
-Cheers,
-
---=20
-Val=E9rio Val=E9rio
-
-http://www.valeriovalerio.org
-
-------=_Part_24832_4103514.1213221777946
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-Hi,<br><br>I&#39;m a GSoC student working with Bluez, but for other org.<br=
->I need to listen a already open socket by the OS, but when a try to overwr=
-ite (bind) I get a &quot;already in use error&quot;, exist any function or =
-alternative to just listen the socket ?<br>
-I want to listen the HID channels (psm 17 and 19).<br><br>Thanks in advance=
-.<br clear=3D"all"><br>Cheers, <br><br>-- <br>Val=E9rio Val=E9rio<br><br><a=
- href=3D"http://www.valeriovalerio.org">http://www.valeriovalerio.org</a>
-
-------=_Part_24832_4103514.1213221777946--
-
-
---===============1465630572==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
--------------------------------------------------------------------------
-Check out the new SourceForge.net Marketplace.
-It's the best place to buy or sell services for
-just about anything Open Source.
-http://sourceforge.net/services/buy/index.php
---===============1465630572==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1465630572==--
+SGVsbG8gTGVubmFydCwgTHVpeiBhbmQgYWxsIG90aGVyIGRldnMhCgpGaXJzdCwgc2luY2UgSSB0
+aGluayBzb21lIG1heSBub3Qga25vdyB3aGF0IGlzIHRoaXMgYWxsIGFib3V0Cihlc3BlY2lhbGx5
+IFBBIHBlb3BsZSksIEkgd29ya2luZyBvbiBnZXR0aW5nIFB1bHNlQXVkaW8gdG8gc3VwcG9ydApi
+bHVldG9vdGggZGV2aWNlcywgYXMgYSBHU29DMjAwOCBwcm9qZWN0LiBUaGF0J3MgdGhlIHdheSBw
+ZW9wbGUgaW4KQmx1ZVogdGhpbmsgaXMgdGhlIGJlc3QgdG8gc3VwcG9ydCBBMkRQIChzdGVyZW8p
+IGF1ZGlvIGRldmljZXMgaW4KbGludXgsIHNpbmNlIEFMU0EgaXMgbm90IHdlbGwgc3VpdGVkIGZv
+ciBuZXR3b3JrIGRldmljZXMuCgpUaGFua3MgTGVubmFydCBmb3IgeW91ciBleHBsYW5hdGlvbnMs
+IGl0IGhlbHBlZCBtZSBhIGxvdCB0byB1bmRlcnN0YW5kCmhvdyBpdCBoYXZlIHRvIGJlIGRvbmUu
+CgpJJ3ZlIHN0YXJ0ZWQgd29ya2luZyBvbiBtb2R1bGUtYmx1ZXRvb3RoLWRpc2NvdmVyIGZpcnN0
+LCBlc3BlY2lhbGx5CmJlY2F1c2UgSSBkb24ndCBoYXZlIGFueSBBMkRQIGRldmljZSBmb3IgdGVz
+dGluZyByaWdodCBub3cuIEknbGwgbWFrZQppdCBjYWxsIHNvbWUgc3R1YiB3aGlsZSB0aGUgZGV2
+aWNlIG1vZHVsZSBpcyBub3Qgd29ya2luZy4gVGhlIGNvZGUKcmlnaHQgbm93IGRvZXMgdGhlIHNh
+bWUgYXMgYmx1ZXotdXRpbHMvaGNpZC9saXN0X2RldmljZXMsIG5vdyBJJ2xsCnN0YXJ0IHRvIGZp
+bHRlciB3aGF0IGFyZSB0aGUgZGV2aWNlcyBvZiBpbnRlcmVzdCBmb3IgUEEuIEkgaGF2ZW4ndApi
+ZWVuIGFibGUgdG8gdG91Y2ggdGhlIGNvZGUgc2luY2UgVGh1cnNkYXksIGJlY2F1c2Ugb2YgYSBz
+ZW1pbmFyIHRoYXQKSSBoYWQgdG8gcHJlc2VudCBhdCBzY2hvb2wsIGJ1dCB0aGlzIHdlZWsgSSds
+bCBiZSB3b3JraW5nIG9uIGl0LgoKLS0gCkpvw6NvIFBhdWxvIFJlY2hpIFZpdGEKTVNjIENvbXB1
+dGVyIFNjaWVuY2UgU3R1ZGVudApDb21wdXRlciBFbmdpbmVlcgpJQyAvIFVuaWNhbXAKCmlyYy5m
+cmVlbm9kZS5uZXQ6IGpwcnZpdGEKCk9uIFdlZCwgSnVuIDQsIDIwMDggYXQgNTowNyBQTSwgTGVu
+bmFydCBQb2V0dGVyaW5nCjxsZW5uYXJ0QHBvZXR0ZXJpbmcubmV0PiB3cm90ZToKPiBIZXlhIQo+
+Cj4gKEx1aXosIHBsZWFzZSBmb3J3YXJkIHRoaXMgdG8gdGhlIGJsdWV6IE1MISkKPgo+IFNvLCBo
+ZXJlJ3MgbXkgc3VtbWFyeSBvZiB0aGUgZ3JhbmQgcGxhbiB0byBnZXQgUEEgYW5kIEJUIHdvcmtp
+bmcgd2VsbAo+IHRvZ2V0aGVyLiBUaGlzIGlzIGJhc2ljYWxseSB0aGUgcmVzdWx0IG9mIHRoZSBh
+dWRpbyBkaXNjdXNzaW9ucyBkdXJpbmcKPiB0aGUgQmx1ZVogTWVldGluZyB3ZSBoYWQgaW4gSGVs
+c2lua2kgdGhhdCBlbmRlZCB0b2RheS4gRXNwZWNpYWxseSBmb3IKPiB5b3UsIEpvw6NvLVBhdWxv
+LCB0aGlzIG1pZ2h0IGJlIHZlcnkgaW50ZXJlc3RpbmchCj4KPiBUaGVyZSBzaG91bGQgYmUgdHdv
+IG5ldyBQQSBtb2R1bGVzLCBtb2R1bGUtYmx1ZXRvb3RoLWRpc2NvdmVyIGFuZAo+IG1vZHVsZS1i
+bHVldG9vdGgtZGV2aWNlLiBUaGUgZm9ybWVyIHdpbGwgdXNlIEQtQnVzIHRvIGNvbm5lY3QgdG8g
+dGhlCj4gQmx1ZVogc3lzdGVtIHNlcnZpY2VzIGFuZCB3aGVuZXZlciBhIG5ldyBCVCBhdWRpbyBk
+ZXZpY2VzIGFwcGVhcnMgbG9hZAo+IG9uZSBtLWJ0LWRldmljZSBpbnN0YW5jZSBmb3IgaXQuIChh
+cyBhIHNpZGUgbm9kZTogaW4gY29udHJhc3QgdG8gbGludXgKPiBrZXJuZWwgbW9kdWxlcywgUEEg
+bW9kdWxlcyBjYW4gYmUgbG9hZGVkIG1vcmUgdGhhbiBvbmNlIGF0IHRoZSBzYW1lCj4gdGltZSku
+Cj4KPiBUaGUgbGF0dGVyLCBtLWJ0LWRldmljZSwgdGhlbiBjb25uZWN0cyB0byB0aGUgQmx1ZVog
+YXVkaW8gc2VydmljZSB2aWEgb25lCj4gQmx1ZVogc3BlY2lmaWMgd2VsbCBrbm93biB1bml4IHNv
+Y2tldCwgY29uZmlndXJlcyBhIGNvbm5lY3Rpb24gdG8gdGhlCj4gQlQgZGV2aWNlLCBnZXRzIGEg
+QlQgc29ja2V0IGZkIHBhc3NlZCBpbiB2aWEgdGhlIHVuaXggc29ja2V0IGFuZCB0aGVuCj4gaGFu
+ZHMgdGhpcyBvdmVyIHRvIGl0cyBSVCB0aHJlYWQuIFRoZSBjb2RlIGZvciB0aGlzIHdvdWxkIGFj
+dHVhbGx5IGJlCj4gdmVyeSBzaW1pbGFyIHRvIG1vZHVsZS1lc2Qtc2luayB3aGljaCB3ZSBzaGlw
+IGFscmVhZHkuIG0tZXNkLXMgaXMgYQo+IHNpbmsgZm9yIFBBIHRoYXQgaGFuZHMgZGF0YSB0byBh
+biBleGlzdGluZyBFc291bkQgc2VydmVyLiBJdCdzIGJhc2ljCj4gc3RydWN0dXJlIGlzIHZlcnkg
+c2ltaWxhcjogd2UgZmlyc3QgY29uZmlndXJlIHRoZSBFU0QgY29ubmVjdGlvbiBmcm9tCj4gdGhl
+IG1haW4gdGhyZWFkIHZpYSBleGNoYW5naW5nIGEgZmV3IHNpbXBsZSBwYWNrZXRzIGFuZCB0aGVu
+IGhhbmQgdGhlCj4gYWN0dWFsIGNvbW11bmljYXRpb24gc29ja2V0IHRvIHRoZSBSVCB0aHJlYWQg
+Zm9yIHRoZSBhY3R1YWwgd29yay4gVGhlCj4gYmlnIGRpZmZlcmVuY2UgaW4gbG9naWMgaXMgbW9z
+dGx5IHRoYXQgdGhlIEJUIG1vZHVsZSBuZWVkcyB0byBlbmNvZGUKPiB0aGUgYXVkaW8gZGF0YSB0
+byBTQkMvU0NPIGZpcnN0LCB3aGlsZSB0aGUgRVNEIG1vZHVsZSBqdXN0IHNwaXRzIHJhdwo+IFBD
+TSB0byB0aGUgVENQIHN0cmVhbS4gQW5kIHRoZW4sIHRoZSB0aW1pbmcgbmVlZHMgdG8gYmUgaW1w
+bGVtZW50ZWQKPiBkaWZmZXJlbnRseS4KPgo+IE5laXRoZXIgRVNEIG5vciBBMkRQL1NDTyBwcm92
+aWRlIGFueSByZWFzb25hYmxlIHRpbWluZwo+IHNvdXJjZS4gSG93ZXZlciwgdGhlIFRDUCBzb2Nr
+ZXQgdXNlZCBieSBFU0QgcHJvdmlkZXMgZmxvdyBjb250cm9sCj4gd2hpY2ggd2UgbWlzdXNlIGZv
+ciB0aW1pbmcgZXN0aW1hdGlvbi4gVW5mb3J0dW5hdGVseSBBMkRQL1NDTyBkb2Vzbid0Cj4gZXZl
+biBwcm92aWRlIHRoYXQsIHNvIHdlIG5lZWQgdG8gcm9sbCBvdXIgb3duIHRpbWluZyBhbGwgdGhl
+IHRpbWUgLS0KPiB3aXRoIHRoZSBleGNlcHRpb24gdGhhdCBmb3IgdGhlIFNDTyBjYXNlIHdlIGNh
+biBwcm9iYWJseSBkZWR1Y2UgdGhlCj4gcmVtb3RlIGNsb2NrIGZyb20gdGhlIHRpbWUgd2UgZ2V0
+IHRoZSByZWNvcmRpbmcgcGFja2V0cyBmbG93aW5nCj4gaW4uIFNpbmNlIGZvciBBMkRQIHdlIG1v
+c3RseSBsYWNrIHJlY29yZGluZyBzdXBwb3J0IHdlIGRvbid0IGhhdmUgdGhhdAo+IGNsb2NrIGFu
+ZCB3ZSBoYXZlIG5vIG90aGVyIG9wdGlvbiB0aGFuIGp1c3QgdXNpbmcgdGhlIHJhdyBsb2NhbCBj
+bG9jay4KPiBUaGUgQlQgc29ja2V0IHVzZXMgREdSQU0vU0VRUEFDS0VUIGFzIHNvY2tldCB0eXBl
+LCBUaGlzIHNob3VsZAo+IGFjdHVhbGx5IG1ha2UgdGhpbmdzIG11Y2ggZWFzaWVyIHRoYW4gZm9y
+IHRoZSBtLWUtcyBjYXNlLCBzaW5jZSBwYWNrZXQKPiBkZXNlcmlsaXphdGlvbiBpcyBtdWNoIGVh
+c2llci4KPgo+IFNpbmNlIHdlIG9ubHkgaGF2ZSBhIHNpbmdsZSBzb2NrZXQgZm9yIGJvdGggcmVj
+b3JkaW5nIGFuZCBwbGF5YmFjawo+IG0tYnQtZGV2aWNlIHNob3VsZCByZWdpc3RlciBib3RoIGEg
+c2luayBhbmQgYSBzb3VyY2UgYXQgdGhlIHNhbWUgdGltZQo+IGFuZCBydW4gaXQgZnJvbSB0aGUg
+c2FtZSBSVCB0aHJlYWQuIFRoaXMgaXMgc2ltaWxhciB0byB3aGF0IG1vZHVsZS1vc3MKPiBkb2Vz
+LCBidXQgZGlmZmVyZW50IGZyb20gZS5nLiB0aGUgYWxzYSBtb2R1bGVzIHdoaWNoIHJ1biB0aGUg
+c2luayBhbmQKPiB0aGUgc291cmNlIGZyb20gc2VwZXJhdGUgdGhyZWFkcy4KPgo+IFRoZSBzZXBl
+cmF0aW9uIG9mIG0tYnQtZGlzY292ZXIgYW5kIG0tYnQtZGV2aWNlIGlzIHZlcnkgc2ltaWxhciB0
+byB0aGUKPiBzZXBlcmF0aW9uIGJldHdlZW4gbW9kdWxlLWhhbCBhbmQgbW9kdWxlLWFsc2Ete3Np
+bmssc291cmNlfSBvcgo+IG1vZHVsZS16ZXJvY29uZi1kaXNjb3ZlciBhbmQgbW9kdWxlLXR1bm5l
+bC4KPgo+IFRvIGltcHJvdmUgdGhlIHRpbWluZyBlc3RpbWF0aW9uLCB0aGUgQmx1ZVogdGVhbSB3
+aWxsIGFkZCBzdXBwb3J0IGZvcgo+IGFuZCBTSU9DT1VUUS9TSU9DSU5RIG9uIHRoZSBCVCBhdWRp
+byBzb2NrZXQuIFRoaXMgc2hvdWxkIHRlbGwgdXMgaG93Cj4gbWFueSBieXRlcyBhcmUgYnVmZmVy
+ZWQgbG9jYWxseS4gT2YgY291cnNlLCB3ZSBzdGlsbCB3b3VsZCBoYXZlIG5vCj4gaWRlYSBob3cg
+bWFueSBieXRlcyBhcmUgYnVmZmVyZWQgb24gdGhlIHJlY2Vpdm5nIHNpZGUsIGJ1dCBpdCB3b3Vs
+ZAo+IGhlbHAgdXMgYXQgbGVhc3QgYSBiaXQgdG8gbWFrZSBvdXIgdGltaW5nIG1vcmUgcmVsaWFi
+bGUuIEFsc28sIHRoZXkKPiB3YW50IHRvIGFkZCBhIG5ldyBzb2Nrb3B0IHdoaWNoIHdvdWxkIGFs
+bG93IHVzIHRvIHF1ZXJ5IHRoZSBCVCBjbG9jawo+IG9mIHRoZSBCVCBkZXZpY2UuIFdlIGNhbiBw
+cm9iYWJseSBhc3N1bWUgdGhhdCB0aGUgYXVkaW8gY2xvY2sgb2YgdGhlCj4gQlQgZGV2aWNlIGlz
+IGRlcGVuZGFudCBvciBpZGVudGljYWwgdG8gdGhlIEJUIGNsb2NrLiBUaGlzIHdvdWxkIGFsbG93
+Cj4gdXMgdG8gbWFrZSBzdXJlIHdlIHN0YXkgaW4gc3luYyB3aXRoIHRoZSBkZXZpY2UgYXMgbXVj
+aCBhcyBwb3NzaWJsZSwKPiBldmVuIHRvdWdoIHdlIHN0aWxsIHdvdWxkIGhhdmUgbm8gaWRlYSBh
+Ym91dCB0aGUgYWN0dWFsIGxhdGVuY3kuCj4KPiBUaGUgZmlyc3Qgc3RlcCB0byBpbXBsZW1lbnQg
+aXMgY2VydGFpbmx5IG0tYnQtZGV2aWNlIHdpdGhvdXQgYW55IGZhbmN5Cj4gdGltaW5nLiBUaGUg
+bmV4dCBzdGVwIHdvdWxkIGJlIG0tYnQtZGlzY292ZXIgYW5kIGZpbmFsbHksIHRoZSBmYW5jaWVy
+Cj4gdGltaW5nIGVzdGltYXRpb24gc2hvdWxkIGJlIGltcGxlbWVudGVkLiBBbmQgZmluYWxseSB0
+aGUgbmF0aXZlIHZvbHVtZQo+IHN1cHBvcnQgc2hvdWxkIGJlIGltcGxlbWVudGVkLgo+Cj4gbS1i
+dC1kZXZpY2Ugd291bGQgcHJvYmFibHkgbm90IHVzZSBELUJ1cyBpdHNlbGYgYXQgYWxsLiBPbmx5
+Cj4gbS1idC1kaXNjb3ZlciB3b3VsZC4KPgo+IEV2ZW50dWFsbHkgdGhlIGJ0YXVkaW8gdW5peCBz
+b2NrZXQgc2hvdWxkIGFsc28gYmUgdXNlZCB0byBwYXNzIHRoZSBrZXkKPiBldmVudHMgZnJvbSB0
+aGUgYnQgaGVhZCBzZXQuIEknZCBuZWVkIHRvIGFkZCBhIHNpbXBsZSBzdWJzeXN0ZW0gdG8KPiBw
+YXNzIHRoZW0gb24gdG8gdGhlIGFwcGxpY2F0aW9uIHRoZW4uIFRob3NlIGtleXByZXNzZXMgd291
+bGQgdGhlbiBiZQo+IHBhc3NlZCB0byB0aGUgYXBwbGljYXRpb24gaW5saW5lIHZpYSB0aGUgYXVk
+aW8gQVBJLiBPbiBvbmUgaGFuZCBJIHNlZQo+IHRoYXQgaXQgd291bGQgYmUgZ29vZCBzZW5kIHRo
+ZSBrZXkgZXZlbnRzIGlubGluZSB0byBtYWtlIGNsZWFyIHRvCj4gd2hpY2ggYXVkaW8gZGV2aWNl
+IHRoZXkgYmVsb25nLiBPVE9IIEkgaGF2ZSBhIGJhZCBmZWVsaW5nIGFib3V0IHRoaXMKPiBiZWNh
+dXNlIEkgZG9uJ3Qgd2FudCB0byBhZGQgeWV0IGFub3RoZXIga2V5IGV2ZW50IHN1YnN5c3RlbSwg
+aW4KPiBhZGR0aW9uIHRvIFhJRSwgdGhlIGxpbnV4IGlucHV0IHN0dWZmIGFuZCBldmVuIEhBTC4g
+V2UgbmVlZCB0byB0aGluawo+IGFib3V0IHRoaXMgYSBiaXQgbW9yZS4gKEl0IGlzIGludGVyZXN0
+aW5nIHRvIG5vdGUsIHRoYXQgaGF2aW5nIHRoZQo+IHNvdW5kIHNlcnZlciBmb3J3YXJkICJwYXVz
+ZSIgYW5kICJyZXN1bWUiIHJlcXVlc3QgdG8gYXBwbGljYXRpb25zIGlzCj4gb24gdGhlIHRvZG8g
+bGlzdCBhbnl3YXksIHRvIGFsbG93IHBvbGljeSBtb2R1bGVzIHRvIHJlcXVlc3QgbXVzaWMKPiBw
+bGF5YmFjayBzdG9wcGluZyBvbiBpbWNvbWluZyBwaG9uZSBjYWxscyBhbmQgc3VjaGxpa2UuIFNv
+IGRvaW5nIHRoZQo+IGZ1bGwgImF1ZGlvIGtleSIgc2V0IG9mIGtleXByZXNzZXMgd291bGQgYmUg
+YSBzaW1wbGUgZXh0ZW5zaW9uIG9mCj4gdGhhdC4pCj4KPiBNYXJjZWwsIEpvaGFuLCBMdWl6LCBN
+YXJjLUFuZHLDqSwgQ2xhdWRpbywgZGlkIEkgbWlzcyBhbnl0aGluZz8KPgo+IExlbm5hcnQKPgo+
+IC0tCj4gTGVubmFydCBQb2V0dGVyaW5nICAgICAgICAgICAgICAgICAgICAgICAgUmVkIEhhdCwg
+SW5jLgo+IGxlbm5hcnQgW2F0XSBwb2V0dGVyaW5nIFtkb3RdIG5ldCAgICAgICAgIElDUSMgMTEw
+NjA1NTMKPiBodHRwOi8vMHBvaW50ZXIubmV0L2xlbm5hcnQvICAgICAgICAgICBHbnVQRyAweDFB
+MDE1Q0M0Cj4KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpDaGVjayBvdXQgdGhlIG5ldyBTb3VyY2VGb3JnZS5u
+ZXQgTWFya2V0cGxhY2UuCkl0J3MgdGhlIGJlc3QgcGxhY2UgdG8gYnV5IG9yIHNlbGwgc2Vydmlj
+ZXMgZm9yCmp1c3QgYWJvdXQgYW55dGhpbmcgT3BlbiBTb3VyY2UuCmh0dHA6Ly9zb3VyY2Vmb3Jn
+ZS5uZXQvc2VydmljZXMvYnV5L2luZGV4LnBocApfX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxA
+bGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3Rz
+L2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
