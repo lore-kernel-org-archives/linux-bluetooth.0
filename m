@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <000001c8ca8d$2d47aa50$87d6fef0$%park@samsung.com>
-References: <000001c8ca8d$2d47aa50$87d6fef0$%park@samsung.com>
-Date: Tue, 10 Jun 2008 02:37:36 +0200
-Message-Id: <1213058256.17870.8.camel@violet.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] BlueZ 3.32 HSP SCO Bug Report & Solution
+Date: Tue, 10 Jun 2008 09:01:47 +0900
+From: =?ks_c_5601-1987?B?udrC+b+t?= <chanyeol.park@samsung.com>
+In-reply-to: 
+To: =?ks_c_5601-1987?B?J7nawvm/rSc=?= <chanyeol.park@samsung.com>,
+	bluez-devel@lists.sourceforge.net
+Message-id: <000001c8ca8d$2d47aa50$87d6fef0$%park@samsung.com>
+MIME-version: 1.0
+References: 
+Subject: [Bluez-devel] BlueZ 3.32 HSP SCO Bug Report & Solution
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,44 +17,46 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="ks_c_5601-1987"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-
-> Recently I found BlueZ 3.32 HSP SCO connection bug.
-> 
-> Fortunately I fix the bug as follows. 
-> 
-> 
-> In the function "sco_connect (glib-helper.c)"
-> Bluez 3.32 code doesn't handle socket variable "sk"
-> 
-> So I add "socket file descriptor save routine"
-> 
-> 636 : io_cxtf->fd=sk;
-> 
-> 
-> If you have any question about my idea, don't hesitate to tell me ^^
-> 
-> If possible , could you let me know how to check out/check in my code ?
-
-can you please check with the latest CVS. I like to know if that issue
-is still present or if we actually fixed in the meantime.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-Check out the new SourceForge.net Marketplace.
-It's the best place to buy or sell services for
-just about anything Open Source.
-http://sourceforge.net/services/buy/index.php
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+RGVhciBBbGwKCgpSZWNlbnRseSBJIGZvdW5kIEJsdWVaIDMuMzIgSFNQIFNDTyBjb25uZWN0aW9u
+IGJ1Zy4KCkZvcnR1bmF0ZWx5IEkgZml4IHRoZSBidWcgYXMgZm9sbG93cy4gCgoKSW4gdGhlIGZ1
+bmN0aW9uICJzY29fY29ubmVjdCAoZ2xpYi1oZWxwZXIuYykiCkJsdWV6IDMuMzIgY29kZSBkb2Vz
+bid0IGhhbmRsZSBzb2NrZXQgdmFyaWFibGUgInNrIgoKU28gSSBhZGQgInNvY2tldCBmaWxlIGRl
+c2NyaXB0b3Igc2F2ZSByb3V0aW5lIgoKNjM2IDogaW9fY3h0Zi0+ZmQ9c2s7CgoKSWYgeW91IGhh
+dmUgYW55IHF1ZXN0aW9uIGFib3V0IG15IGlkZWEsIGRvbid0IGhlc2l0YXRlIHRvIHRlbGwgbWUg
+Xl4KCklmIHBvc3NpYmxlICwgY291bGQgeW91IGxldCBtZSBrbm93IGhvdyB0byBjaGVjayBvdXQv
+Y2hlY2sgaW4gbXkgY29kZSA/CgoKudogwvkgv60oQ2hhbi15ZW9sIFBhcmspCkVuZ2luZWVyCgpT
+L1cgUGxhdGZvcm0gTGFiLiAKVGVsZWNvbW11bmljYXRpb24gUiZEIENlbnRlcgpTQU1TVU5HIEVM
+RUNUUk9OSUNTIENPLiwgTFRELgoKVGVsIDogKzgyLTMxLTI3OS01OTQxIApNb2JpbGUgOiArODIt
+MTAtOTk3OC01OTQxCkUtbWFpbCA6IGNoYW55ZW9sLnBhcmtAc2Ftc3VuZy5jb20KCi0tLS0tT3Jp
+Z2luYWwgTWVzc2FnZS0tLS0tCkZyb206IGJsdWV6LWFubm91bmNlLWJvdW5jZXNAbGlzdHMuc291
+cmNlZm9yZ2UubmV0IFttYWlsdG86Ymx1ZXotYW5ub3VuY2UtCmJvdW5jZXNAbGlzdHMuc291cmNl
+Zm9yZ2UubmV0XSBPbiBCZWhhbGYgT2YgTWFyY2VsIEhvbHRtYW5uClNlbnQ6IFdlZG5lc2RheSwg
+TWF5IDIxLCAyMDA4IDc6MTggQU0KVG86IEJsdWVaIE1haWxpbmcgTGlzdApTdWJqZWN0OiBbQmx1
+ZVotQW5ub3VuY2VdIFJlbGVhc2Ugb2YgYmx1ZXotbGlicy0zLjMyIGFuZCBibHVlei11dGlscy0z
+LjMyCgpIaSBGb2xrcywKCnRoaXMgaXMgYW4gdXBkYXRlIHJlbGVhc2Ugb2YgdGhlIG5ldyBzdGFi
+bGUgdmVyc2lvbnMgb2YgdGhlIEJsdWV0b290aApsaWJyYXJ5IGFuZCB0aGUgdXRpbGl0aWVzLiBU
+aGlzIHJlbGVhc2UgZml4ZXMgc29tZSBidWdzIGluIHRoZSBpbnB1dCBhbmQKYXVkaW8gc3VwcG9y
+dCBhbmQgcmVtb3ZlcyBtb3JlIG9ic29sZXRlIGNvZGUuIFRoZSBCbHVldG9vdGggaGVscGVyCmxp
+YnJhcnkgYWxzbyBnb3QgbW9yZSBjbGllbnQgYW5kIHNlcnZlciBzdXBwb3J0LgoKVGhlIG9sZCBz
+ZXJ2aWNlIGluZnJhc3RydWN0dXJlIGhhcyBiZWVuIG5vdyBjb21wbGV0ZWx5IHJlbW92ZWQgYW5k
+IHRoZQpjb3JlIGRhZW1vbiBjYW4gbm8gbG9uZ2VyIGJlIHVzZWQgdG8gc3RhcnQgb3RoZXIgcHJv
+Y2Vzc2VzLgoKVGhlIHNvdXJjZXMgY2FuIGJlIGZvdW5kIGF0IGh0dHA6Ly93d3cuYmx1ZXoub3Jn
+L2Rvd25sb2FkLmh0bWwKClJlZ2FyZHMKCk1hcmNlbAoKCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClRoaXMg
+U0YubmV0IGVtYWlsIGlzIHNwb25zb3JlZCBieTogTWljcm9zb2Z0IApEZWZ5IGFsbCBjaGFsbGVu
+Z2VzLiBNaWNyb3NvZnQoUikgVmlzdWFsIFN0dWRpbyAyMDA4LiAKaHR0cDovL2Nsay5hdGRtdC5j
+b20vTVJUL2dvL3ZzZTAxMjAwMDAwNzBtcnQvZGlyZWN0LzAxLwpfX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlWi1Bbm5vdW5jZSBtYWlsaW5nIGxpc3QK
+Qmx1ZVotQW5ub3VuY2VAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNl
+Zm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWFubm91bmNlCgoKLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LQpDaGVjayBvdXQgdGhlIG5ldyBTb3VyY2VGb3JnZS5uZXQgTWFya2V0cGxhY2UuCkl0J3MgdGhl
+IGJlc3QgcGxhY2UgdG8gYnV5IG9yIHNlbGwgc2VydmljZXMgZm9yCmp1c3QgYWJvdXQgYW55dGhp
+bmcgT3BlbiBTb3VyY2UuCmh0dHA6Ly9zb3VyY2Vmb3JnZS5uZXQvc2VydmljZXMvYnV5L2luZGV4
+LnBocApfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVl
+ei1kZXZlbCBtYWlsaW5nIGxpc3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0
+dHBzOi8vbGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
