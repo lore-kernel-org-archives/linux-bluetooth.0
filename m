@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <484EFFCF.90708@earthlink.net>
-Date: Tue, 10 Jun 2008 17:27:27 -0500
+Message-ID: <484EF658.7080006@earthlink.net>
+Date: Tue, 10 Jun 2008 16:47:04 -0500
 From: "Mumia W.." <paduille.4061.mumia.w+nospam@earthlink.net>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <793776.37171.qm@web57914.mail.re3.yahoo.com>
-In-Reply-To: <793776.37171.qm@web57914.mail.re3.yahoo.com>
-Subject: Re: [Bluez-users] pairing problems
+References: <971056.49705.qm@web57912.mail.re3.yahoo.com>
+In-Reply-To: <971056.49705.qm@web57912.mail.re3.yahoo.com>
+Subject: Re: [Bluez-users] bluez commands
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,29 +20,50 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 06/10/2008 12:21 PM, hong zhang wrote:
-> --- Martin Kupf <mulata@gmx.de> wrote:
->> [...]
->> Hcidump says the following:
->>
->>  HCI Event: Connect Request (0x04) plen 10
->>   45 61 00 00 18 00 40 25 00 01
->> < HCI Command: Accept Connection Request
->> (0x01|0x0009) plen 7
->>   45 61 00 00 18 00 01
->>> HCI Event: Command Status (0x0f) plen 4
->>   00 01 09 04
-
-> Martin,
+On 06/10/2008 12:18 PM, hong zhang wrote:
+> --- "Mumia W.."
+> <paduille.4061.mumia.w+nospam@earthlink.net> wrote:
 > 
-> What do you do to turn on these messages?
+>> On 06/09/2008 06:05 PM, hong zhang wrote:
+>>> List,
+>>>
+>>> Does any document descripe bluez commands?
+>>> My fedora 8 does not return info for "man
+>> rfcommd".
+>>> ---henry
+>>>
+>> Have you tried "man rfcomm" ?
+>>
+> Mumia,
+> 
+> Thanks.
+> But where can I get all bluez commands?
 > 
 > ---henry
-> 
+>
 
-Although I'm not too familiar with the command, Martin mentioned
-"hcidump." Read "man hcidump"
+On Debian, I can do "dpkg -L bluez-utils" to get a list of all the files 
+in a package. Some of those files will be manual pages. I'm sure that 
+there is a equivalent command for Fedora 8.
 
+These are the bluez-related manual pages on my Debian 4.0 system:
+
+/usr/share/man/man1/dund.1.gz
+/usr/share/man/man1/hidd.1.gz
+/usr/share/man/man1/pand.1.gz
+/usr/share/man/man1/rfcomm.1.gz
+/usr/share/man/man1/sdptool.1.gz
+/usr/share/man/man1/ciptool.1.gz
+/usr/share/man/man1/hcitool.1.gz
+/usr/share/man/man5/hcid.conf.5.gz
+/usr/share/man/man8/hcid.8.gz
+/usr/share/man/man8/hid2hci.8.gz
+/usr/share/man/man8/l2ping.8.gz
+/usr/share/man/man8/sdpd.8.gz
+/usr/share/man/man8/hciattach.8.gz
+/usr/share/man/man8/hciconfig.8.gz
+
+I hope this helps you.
 
 
 -------------------------------------------------------------------------
