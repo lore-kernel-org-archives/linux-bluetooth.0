@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <03d101c8cc50$d2aa8660$0132a8c0@Raymondpc>
-From: "skyflame" <skyflame@21cn.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>,
-	<attaboyu@163.com>, "hong zhang" <henryzhang62@yahoo.com>
-Date: Thu, 12 Jun 2008 13:54:47 +0800
+Message-ID: <eba8281a0806111502j7caebdeav83e3fc038b0c943f@mail.gmail.com>
+Date: Wed, 11 Jun 2008 23:02:57 +0100
+From: "Valerio Valerio" <vdv100@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-devel] How to run up CSR chip without eeprom with BLUEZ ?
+Subject: [Bluez-devel] Listen a already open socket by the OS
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,169 +14,53 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1839415883=="
+Content-Type: multipart/mixed; boundary="===============1465630572=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
-
---===============1839415883==
+--===============1465630572==
 Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_03CE_01C8CC93.E07CC030"
+	boundary="----=_Part_24832_4103514.1213221777946"
 
-This is a multi-part message in MIME format.
+------=_Part_24832_4103514.1213221777946
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-------=_NextPart_000_03CE_01C8CC93.E07CC030
-Content-Type: text/plain;
-	charset="gb2312"
-Content-Transfer-Encoding: base64
+Hi,
 
-SGkNCg0KICAgIEkgcG9zdCB0aGlzIHF1ZXN0aW9uIG9uIGJsdWV6LXVzZXIgYmVmb3JlICwgQnV0
-IEkgdGhpbmsgaGVyZSBtaWdodCBiZSB0aGUgcmlnaHQgcGxhY2UgLCBzbyBJIHB1dCBpdCBoZXJl
-IGFnYWluLg0KDQogICAgTXkgY2hpcCBpcyBDU1IncyBiYzQgQTA2IFJvbSB3aGljaCBkbyBub3Qg
-aGF2ZSBlZXByb20gYW5kIG5lZWQgdG8gc2VuZCBwc2tleSB0byBpbml0IGFmdGVyIHBvd2VyIHVw
-Lg0KDQogICBUaGFua3MgdG8gYXR0YWJveXUgYW5kIGhlbnJ5ICwgVGhleSB0b2xkIG1lIGEgd2F5
-IHRvIGRvIGl0IHdpdGggZm9sbG93aW5nIHByb2Nlc3MgOg0KDQoxLiBhZGQgLS1lbmFibGUtYmNj
-bWQgZmVhdHVyZSB3aGlsZSBjb25maWd1cmUgdGhlIGJsdWV6LXV0aWxzDQoyLiB1c2UgYmNjbWQg
-YWZ0ZXIgaGNpMCBpcyB1cDoNCjMuICRiY2NtZCAtdCBoY2kgcHNsb2FkIC1yIC9jc3IucHNyDQoN
-CiAgIEJ1dCBJIHRyeSBpdCAsIGFuZCBtZWV0IHNvbWUgcHJvYmxlbToNCg0KICAgdGhlIGJsdWV6
-LXV0aWxzL3Rvb2xzL2V4YW1wbGUucHNyIHNlZW1zIG5vdCBjb21wbHkgd2l0aCBteSBjaGlwLCBz
-byBJIHdyaXRlIGFub3RoZXIgb25lIGFzOg0KDQovLyBQU0tFWV9BTkFfRlJFUQ0KJjAxZmUgPSAw
-RkEwDQoNCi8vIFBTS0VZX1VBUlRfQkFVRF9SQVRFDQomMDFiZSA9IDBFQkYNCg0KQW5kIHRoZW4g
-YWZ0ZXIgaGNpY29uZmlnIGhjaTAgdXAgSSB1c2UNCg0KYmNjbWQgLXQgaGNpIHBzbG9hZCAtciBj
-c3IucHNyDQoNCnRoZSB0d28ga2V5IGlzIHdyaXRlIHN1Y2Nlc3NmdWxseSAsIGJ1dCBpZiBJIGVu
-YWJsZSB0aGUgZGVidWcgSSBjYW4gc2VlIHRoZSBjaGlwIGNvbnRpbnVlIHRvIHJlY2VpdmUgbWVz
-c2FnZXMgLCBzZWVtcyBzb21ldGhpbmcgd3Jvbmcgd2l0aCB0aGUgaGVhZC4NCg0KSSByZW1vdmUg
-dGhlIGRlYnVnIG1lc3NhZ2Ugc28gdGhhdCB5b3UgY2FuIHNlZSB0aGUgbG9nIG1vcmUgY2xlYXI6
-DQoNCn4gIyANCn4gIyBiY2NtZCAtdCBoY2kgcHNsb2FkIGNzci5wc3INCkxvYWRpbmcgUFNLRVlf
-QU5BX0ZSRVEgLi4uIGRvbmUNCkxvYWRpbmcgUFNLRVlfVUFSVF9CQVVEUkFURSAuLi4gZG9uZQ0K
-DQppZiBJIHVzaW5nIC1yIGluIHBzbG9hZCB0aGUgcmVzdWx0IGlzIDoNCg0KfiAjIGJjY21kIC10
-IGhjaSBwc2xvYWQgLXIgY3NyLnBzcg0KTG9hZGluZyBQU0tFWV9BTkFfRlJFUSAuLi4gZG9uZQ0K
-TG9hZGluZyBQU0tFWV9VQVJUX0JBVURSQVRFIC4uLiBkb25lDQp+ICMgDQp+ICMgYmNzcF9yZWN2
-OiBFcnJvciBpbiBCQ1NQIGhkciBjaGVja3N1bQ0KDQpib3RoIG9uZSBjb3VsZCBub3Qgd29yayBm
-b3IgaGNpdG9vbCBzY2FuOg0KDQp+ICMgaGNpdG9vbCAtaSBoY2kwIHNjYW4NClNjYW5uaW5nIC4u
-Lg0KSW5xdWlyeSBmYWlsZWQ6IENvbm5lY3Rpb24gdGltZWQgb3V0DQoNCmFuZCBhcyBsb25nIGFz
-IHRoaXMgYmNzcF9yZWN2OiBFcnJvciBpbiBCQ1NQIGhkciBjaGVja3N1bSBoYXBwZW4NCnRoZSBi
-Y3NwIGludGVyZmFjZSBzZWVtcyBkZWFkICwgdHlwZSBiY2NtZCBhZ2FpbiB3aWxsIHNob3cgOg0K
-DQp+ICMgYmNjbWQgLXQgaGNpIHBzbG9hZCAtciBjc3IucHNyDQpDYW4ndCByZWFkIHZlcnNpb24g
-aW5mbyBmb3IgaGNpMDogQ29ubmVjdGlvbiB0aW1lZCBvdXQgKDExMCkNCg0Kc2VlbXMgYWZ0ZXIg
-d2FybSByZXNldCB0aGUgY29ubmVjdGlvbiBpcyBiYWQuDQoNClNvICwgSSB3b25kZXIsIHdoZW4g
-dXNpbmcgaGNpYXR0YWNoIHRoZSBiYXVkcmF0ZSBpcyBzZXQgdG8gMTE1MjAwDQpidXQgYWZ0ZXIg
-dGhlIHVhcnRfYmF1ZHJhdGUgaXMgc2V0LCB0aGUgYmF1ZHJhdGUgaXMgc2V0IHRvIDkyMTYwMCBp
-dCBtaWdodCBjYXVzZSB0aGUgcHJvYmxlbQ0KDQpUaGVuIEkgc2V0ICYwMWJlID0gMDFkOCB0byBr
-ZWVwIHRoZSBiYXVkcmF0ZSBhcyAxMTUyMDANCg0KQnV0IHN0aWxsIHRoZSBzYW1lLg0KDQpUaGVu
-IGlmIEkgcmVtb3ZlIHRoZSB1YXJ0X2JhdWRfcmF0ZSBzZXR0aW5nIGZyb20gdGhlIHBzciBmaWxl
-DQoNCnRoZSB3YXJtIHJlYm9vdCBpcyBvazoNCg0KfiAjIGJjY21kIC10IGhjaSBwc2xvYWQgLXIg
-Y3NyLnBzcg0KTG9hZGluZyBQU0tFWV9BTkFfRlJFUSAuLi4gZG9uZQ0KDQpidXQgdGhlIGNoaXAg
-c2VlbXMgdG8gbG9zdCB0aGUgc3luYyBhbmQgZ28gYmFjayB0byB0aGUgdHNoeSBzdGF0ZSAhDQoN
-Cn4gIyBoY2l0b29sIC1pIGhjaTAgc2Nhbg0KU2Nhbm5pbmcgLi4uDQpiY3NwX3BrdF9jdWxsOiBQ
-ZWVyIGFja2VkIGludmFsaWQgcGFja2V0DQpiY3NwX2hhbmRsZV9sZV9wa3Q6IEZvdW5kIGEgTEUg
-c3luYyBwa3QsIGNhcmQgaGFzIHJlc2V0DQpiY3NwX3BrdF9jdWxsOiBQZWVyIGFja2VkIGludmFs
-aWQgcGFja2V0DQpiY3NwX2hhbmRsZV9sZV9wa3Q6IEZvdW5kIGEgTEUgc3luYyBwa3QsIGNhcmQg
-aGFzIHJlc2V0DQpiY3NwX3BrdF9jdWxsOiBQZWVyIGFja2VkIGludmFsaWQgcGFja2V0DQouDQou
-DQouDQouDQoNCg0Kd2hhdCBpcyB0aGUgcmlnaHQgcHJvY2VzcyA/IENhbiBhbnkgb25lIGhlbHAg
-bWUgb3V0ID8NClRoYW5rcw0KDQpSYXltb25kDQoNCg0K
+I'm a GSoC student working with Bluez, but for other org.
+I need to listen a already open socket by the OS, but when a try to
+overwrite (bind) I get a "already in use error", exist any function or
+alternative to just listen the socket ?
+I want to listen the HID channels (psm 17 and 19).
 
-------=_NextPart_000_03CE_01C8CC93.E07CC030
-Content-Type: text/html;
-	charset="gb2312"
-Content-Transfer-Encoding: base64
+Thanks in advance.
 
-PCFET0NUWVBFIEhUTUwgUFVCTElDICItLy9XM0MvL0RURCBIVE1MIDQuMCBUcmFuc2l0aW9uYWwv
-L0VOIj4NCjxIVE1MPjxIRUFEPg0KPE1FVEEgaHR0cC1lcXVpdj1Db250ZW50LVR5cGUgY29udGVu
-dD0idGV4dC9odG1sOyBjaGFyc2V0PWdiMjMxMiI+DQo8TUVUQSBjb250ZW50PSJNU0hUTUwgNi4w
-MC4yOTAwLjMzMTQiIG5hbWU9R0VORVJBVE9SPg0KPFNUWUxFPjwvU1RZTEU+DQo8L0hFQUQ+DQo8
-Qk9EWSBiZ0NvbG9yPSNmZmZmZmY+DQo8RElWPjxGT05UIHNpemU9Mj4NCjxESVY+PEZPTlQgc2l6
-ZT0yPkhpPC9GT05UPjwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNwOzwvRElW
-Pg0KPERJVj4mbmJzcDsmbmJzcDsmbmJzcDsgSSBwb3N0IHRoaXMgcXVlc3Rpb24gb24gYmx1ZXot
-dXNlciBiZWZvcmUgLCBCdXQgSSANCnRoaW5rJm5ic3A7aGVyZSBtaWdodCBiZSB0aGUgcmlnaHQg
-cGxhY2UgLCBzbyBJIHB1dCBpdCBoZXJlIGFnYWluLjwvRElWPg0KPERJVj4mbmJzcDs8L0RJVj4N
-CjxESVY+Jm5ic3A7Jm5ic3A7Jm5ic3A7IE15IGNoaXAgaXMgQ1NSJ3MgYmM0IEEwNiBSb20gd2hp
-Y2ggZG8gbm90IGhhdmUgZWVwcm9tIA0KYW5kIG5lZWQgdG8gc2VuZCBwc2tleSB0byBpbml0IGFm
-dGVyIHBvd2VyIHVwLjwvRElWPg0KPERJVj4mbmJzcDs8L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0y
-PiZuYnNwOyZuYnNwOyBUaGFua3MgdG8gYXR0YWJveXUgYW5kIGhlbnJ5ICwgVGhleSB0b2xkIG1l
-IGEgd2F5IA0KdG8gZG8gaXQgd2l0aCBmb2xsb3dpbmcgcHJvY2VzcyA6PC9GT05UPjwvRElWPg0K
-PERJVj48Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNwOzwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+
-MS4gYWRkIC0tZW5hYmxlLWJjY21kIGZlYXR1cmUgd2hpbGUgY29uZmlndXJlIHRoZSANCmJsdWV6
-LXV0aWxzPEJSPjIuIHVzZSBiY2NtZCBhZnRlciBoY2kwIGlzIHVwOjxCUj4zLiAkYmNjbWQgLXQg
-aGNpIHBzbG9hZCAtciANCi9jc3IucHNyPC9GT05UPjwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+
-PEZPTlQgc2l6ZT0yPjwvRk9OVD4mbmJzcDs8L0RJVj4NCjxESVY+DQo8RElWPjxGT05UIHNpemU9
-Mj4mbmJzcDsmbmJzcDsmbmJzcDtCdXQgSSB0cnkgaXQgLCBhbmQgbWVldCBzb21lIA0KcHJvYmxl
-bTo8L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQo8
-RElWPjxGT05UIHNpemU9Mj4mbmJzcDsmbmJzcDsmbmJzcDt0aGUgPC9GT05UPjxGT05UIA0Kc2l6
-ZT0zPmJsdWV6LXV0aWxzL3Rvb2xzL2V4YW1wbGUucHNyIHNlZW1zIG5vdCBjb21wbHkgd2l0aCBt
-eSBjaGlwLCBzbyBJIHdyaXRlIA0KYW5vdGhlciBvbmUgYXM6PC9GT05UPjwvRElWPg0KPERJVj48
-Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNwOzwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+Ly8gUFNL
-RVlfQU5BX0ZSRVE8QlI+JmFtcDswMWZlID0gMEZBMDwvRk9OVD48L0RJVj4NCjxESVY+PEZPTlQg
-c2l6ZT0yPjwvRk9OVD4mbmJzcDs8L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPi8vIFBTS0VZX1VB
-UlRfQkFVRF9SQVRFPEJSPiZhbXA7MDFiZSA9IDBFQkY8L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05U
-IHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj5BbmQgdGhlbiBh
-ZnRlciBoY2ljb25maWcgaGNpMCB1cCBJIHVzZTwvRk9OVD48L0RJVj4NCjxESVY+PEZPTlQgc2l6
-ZT0yPjwvRk9OVD4mbmJzcDs8L0RJVj4NCjxESVY+YmNjbWQgLXQgaGNpIHBzbG9hZCAtciBjc3Iu
-cHNyPEJSPjwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+dGhlIHR3byBrZXkgaXMgd3JpdGUgc3Vj
-Y2Vzc2Z1bGx5ICwgYnV0IGlmIEkgZW5hYmxlIHRoZSBkZWJ1ZyANCkkgY2FuIHNlZSZuYnNwO3Ro
-ZSBjaGlwIGNvbnRpbnVlIHRvIHJlY2VpdmUgbWVzc2FnZXMgLCBzZWVtcyBzb21ldGhpbmcgd3Jv
-bmcgDQp3aXRoIHRoZSBoZWFkLjwvRk9OVD48L0RJVj4NCjxESVY+PC9GT05UPjxGT05UIHNpemU9
-Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj5JIHJlbW92ZSB0
-aGUgZGVidWcgbWVzc2FnZSBzbyB0aGF0IHlvdSBjYW4gc2VlIHRoZSBsb2cgbW9yZSANCmNsZWFy
-OjwvRk9OVD48L0RJVj4NCjxESVY+Jm5ic3A7PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj5+ICMg
-PEJSPn4gIyBiY2NtZCAtdCBoY2kgcHNsb2FkIGNzci5wc3I8QlI+TG9hZGluZyANClBTS0VZX0FO
-QV9GUkVRIC4uLiBkb25lPEJSPkxvYWRpbmcgUFNLRVlfVUFSVF9CQVVEUkFURSAuLi4gZG9uZTwv
-Rk9OVD48L0RJVj4NCjxESVY+Jm5ic3A7PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj5pZiBJIHVz
-aW5nIC1yIGluIHBzbG9hZCB0aGUgcmVzdWx0IGlzIDo8L0ZPTlQ+PC9ESVY+DQo8RElWPiZuYnNw
-OzwvRElWPg0KPERJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPn4gIyBiY2NtZCAtdCBoY2kgcHNsb2Fk
-IC1yIGNzci5wc3I8QlI+TG9hZGluZyBQU0tFWV9BTkFfRlJFUSANCi4uLiBkb25lPEJSPkxvYWRp
-bmcgUFNLRVlfVUFSVF9CQVVEUkFURSAuLi4gZG9uZTxCUj5+ICMgPEJSPn4gIyBiY3NwX3JlY3Y6
-IEVycm9yIA0KaW4gQkNTUCBoZHIgY2hlY2tzdW08L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05UIHNp
-emU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj5ib3RoIG9uZSBjb3Vs
-ZCBub3Qgd29yayBmb3IgaGNpdG9vbCBzY2FuOjwvRk9OVD48L0RJVj4NCjxESVY+PEZPTlQgc2l6
-ZT0yPjwvRk9OVD4mbmJzcDs8L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPn4gIyBoY2l0b29sIC1p
-IGhjaTAgc2NhbjxCUj5TY2FubmluZyAuLi48QlI+SW5xdWlyeSBmYWlsZWQ6IA0KQ29ubmVjdGlv
-biB0aW1lZCBvdXQ8L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7
-PC9ESVY+DQo8RElWPg0KPERJVj5hbmQgYXMgbG9uZyBhcyB0aGlzIGJjc3BfcmVjdjogRXJyb3Ig
-aW4gQkNTUCBoZHIgY2hlY2tzdW0gaGFwcGVuPC9ESVY+DQo8RElWPnRoZSBiY3NwIGludGVyZmFj
-ZSBzZWVtcyBkZWFkICwgdHlwZSBiY2NtZCBhZ2FpbiB3aWxsIHNob3cgOjwvRElWPg0KPERJVj4m
-bmJzcDs8L0RJVj4NCjxESVY+fiAjIGJjY21kIC10IGhjaSBwc2xvYWQgLXIgY3NyLnBzcjxCUj5D
-YW4ndCByZWFkIHZlcnNpb24gaW5mbyBmb3IgaGNpMDogDQpDb25uZWN0aW9uIHRpbWVkIG91dCAo
-MTEwKTwvRElWPjwvRElWPg0KPERJVj4mbmJzcDs8L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPnNl
-ZW1zIGFmdGVyIHdhcm0gcmVzZXQgdGhlIGNvbm5lY3Rpb24gaXMgYmFkLjwvRk9OVD48L0RJVj4N
-CjxESVY+PEZPTlQgc2l6ZT0yPjwvRk9OVD4mbmJzcDs8L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0y
-PlNvICwgSSB3b25kZXIsIHdoZW4gdXNpbmcgaGNpYXR0YWNoIHRoZSBiYXVkcmF0ZSBpcyBzZXQg
-DQp0byZuYnNwOzExNTIwMDwvRk9OVD48L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPmJ1dCBhZnRl
-ciB0aGUgdWFydF9iYXVkcmF0ZSBpcyBzZXQsIHRoZSBiYXVkcmF0ZSBpcyBzZXQgdG8gDQo5MjE2
-MDAgaXQgbWlnaHQgY2F1c2UgdGhlIHByb2JsZW08L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05UIHNp
-emU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj5UaGVuIEkgc2V0ICZh
-bXA7MDFiZSA9IDAxZDggdG8ga2VlcCB0aGUgYmF1ZHJhdGUgYXMgDQoxMTUyMDA8L0ZPTlQ+PC9E
-SVY+DQo8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQo8RElWPjxGT05UIHNp
-emU9Mj5CdXQgc3RpbGwgdGhlIHNhbWUuPC9GT05UPjwvRElWPg0KPERJVj4mbmJzcDs8L0RJVj4N
-CjxESVY+DQo8RElWPjxGT05UIHNpemU9Mj5UaGVuIGlmIEkgcmVtb3ZlIHRoZSB1YXJ0X2JhdWRf
-cmF0ZSBzZXR0aW5nIGZyb20gdGhlIHBzciANCmZpbGU8L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05U
-IHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj50aGUgd2FybSBy
-ZWJvb3QgaXMgb2s6PC9GT05UPjwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNw
-OzwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+fiAjIGJjY21kIC10IGhjaSBwc2xvYWQgLXIgY3Ny
-LnBzcjxCUj5Mb2FkaW5nIFBTS0VZX0FOQV9GUkVRIA0KLi4uIGRvbmU8L0ZPTlQ+PC9ESVY+DQo8
-RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj5i
-dXQgdGhlIGNoaXAgc2VlbXMgdG8gbG9zdCB0aGUgc3luYyBhbmQgZ28gYmFjayB0byANCnRoZSZu
-YnNwO3RzaHkgc3RhdGUgITwvRk9OVD48L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPjwvRk9OVD4m
-bmJzcDs8L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPn4gIyBoY2l0b29sIC1pIGhjaTAgc2NhbjxC
-Uj5TY2FubmluZyAuLi48QlI+YmNzcF9wa3RfY3VsbDogDQpQZWVyIGFja2VkIGludmFsaWQgcGFj
-a2V0PEJSPmJjc3BfaGFuZGxlX2xlX3BrdDogRm91bmQgYSBMRSBzeW5jIHBrdCwgY2FyZCBoYXMg
-DQpyZXNldDwvRk9OVD48L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPmJjc3BfcGt0X2N1bGw6IFBl
-ZXIgYWNrZWQgaW52YWxpZCBwYWNrZXQ8L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj5i
-Y3NwX2hhbmRsZV9sZV9wa3Q6IEZvdW5kIGEgTEUgc3luYyBwa3QsIGNhcmQgaGFzIA0KcmVzZXQ8
-QlI+YmNzcF9wa3RfY3VsbDogUGVlciBhY2tlZCBpbnZhbGlkIHBhY2tldDwvRk9OVD48L0RJVj48
-L0RJVj4NCjxESVY+LjwvRElWPg0KPERJVj4uPC9ESVY+DQo8RElWPi48L0RJVj4NCjxESVY+Ljwv
-RElWPg0KPERJVj4mbmJzcDs8L0RJVj4NCjxESVY+Jm5ic3A7PC9ESVY+DQo8RElWPndoYXQgaXMg
-dGhlIHJpZ2h0IHByb2Nlc3MgPyBDYW4gYW55IG9uZSBoZWxwIG1lIG91dCA/PC9ESVY+DQo8RElW
-PlRoYW5rczwvRElWPg0KPERJVj4mbmJzcDs8L0RJVj4NCjxESVY+UmF5bW9uZDwvRElWPg0KPERJ
-Vj4mbmJzcDs8L0RJVj4NCjxESVY+Jm5ic3A7PC9ESVY+DQo8RElWPiZuYnNwOzwvRElWPjwvRElW
-PjwvRk9OVD48L0RJVj48L0JPRFk+PC9IVE1MPg0K
+Cheers,
 
-------=_NextPart_000_03CE_01C8CC93.E07CC030--
+--=20
+Val=E9rio Val=E9rio
+
+http://www.valeriovalerio.org
+
+------=_Part_24832_4103514.1213221777946
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi,<br><br>I&#39;m a GSoC student working with Bluez, but for other org.<br=
+>I need to listen a already open socket by the OS, but when a try to overwr=
+ite (bind) I get a &quot;already in use error&quot;, exist any function or =
+alternative to just listen the socket ?<br>
+I want to listen the HID channels (psm 17 and 19).<br><br>Thanks in advance=
+.<br clear=3D"all"><br>Cheers, <br><br>-- <br>Val=E9rio Val=E9rio<br><br><a=
+ href=3D"http://www.valeriovalerio.org">http://www.valeriovalerio.org</a>
+
+------=_Part_24832_4103514.1213221777946--
 
 
-
---===============1839415883==
+--===============1465630572==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -188,7 +71,7 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
---===============1839415883==
+--===============1465630572==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -199,4 +82,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1839415883==--
+--===============1465630572==--
