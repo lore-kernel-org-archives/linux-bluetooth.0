@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 Jun 2008 11:04:03 -0700 (PDT)
-From: hong zhang <henryzhang62@yahoo.com>
-To: colorant <colorant@163.com>,
-	BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <01a301c8cb66$dea24ba0$0132a8c0@Raymondpc>
-MIME-Version: 1.0
-Message-ID: <797597.98326.qm@web57906.mail.re3.yahoo.com>
-Subject: Re: [Bluez-users] How to use Bluez with CSR chip ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <95bb57cb0806110251xe9cc530v80224cfd836aef05@mail.gmail.com>
+References: <95bb57cb0806110251xe9cc530v80224cfd836aef05@mail.gmail.com>
+Date: Wed, 11 Jun 2008 15:15:55 +0200
+Message-Id: <1213190155.17870.28.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] compile on apple
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,184 +20,35 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Raymond,
+Hi Nico,
 
-I have a few questions.
+> i've tried to compile Bluez on macbookpro and came across error:
+> 
+> /bin/sh ../libtool --tag=CC   --mode=compile gcc -DHAVE_CONFIG_H -I.
+> -I.. -I../include    -Wall -O2 -D_FORTIFY_SOURCE=2 -MT bluetooth.lo
+> -MD -MP -MF .deps/bluetooth.Tpo -c -o bluetooth.lo bluetooth.c
+> mkdir .libs
+>  gcc -DHAVE_CONFIG_H -I. -I.. -I../include -Wall -O2
+> -D_FORTIFY_SOURCE=2 -MT bluetooth.lo -MD -MP -MF .deps/bluetooth.Tpo
+> -c bluetooth.c  -fno-common -DPIC -o .libs/bluetooth.o
+> bluetooth.c:35:20: error: malloc.h: No such file or directory
+> In file included from bluetooth.c:39:
+> ../include/bluetooth/bluetooth.h:36:20: error: endian.h: No such file
+> or directory
+> ../include/bluetooth/bluetooth.h:37:22: error: byteswap.h: No such
+> file or directory
+> 
+> does macros included in endian.h & byteswap.h can be coded in a
+> portable way ?
 
-1. Do you use CSR bleutooth stack from CSR?
-2. If you use Bluez, you must use bluetooth stack 
-   comes with kernel.
-3. How is CSR chip initialized? by eeprom?
+I can fix the malloc.h include, because that is not needed, but for the
+others, I have no idea. Maybe or maybe not.
 
+Regards
 
-I believe you use CSR stack then you cannot use Bluez
-utilities.
-
---henry
-
---- colorant <colorant@163.com> wrote:
-
-> Hi henry
-> 
->     Thanks for you reply.
-> 
->     Yes , I am using BC4 A06 Rom version on an arm
-> based embedded board.
-> 
->     So this one must set pskey before running right
-> ?
-> 
->     I try to run the CSR's demo first to set the
-> right pskey and run the 
-> chip up.
->     After I exit the demo, I can use pc to detect
-> the chip.
-> 
->     While , then I use :
-> 
->     hciattach /dev/ttyS1 bcsp 921600
-> 
->     to attach ttyS1 to hci0
-> 
->     after that , The PC can not detect the chip
-> anymore.
-> 
->     and then I try
->     hciconfig hci0 up
->     it can bring up the hci0 interface , but the pc
-> still don't detect the 
-> chip.
-> 
->     for kernel , I only insert bluetooth.ko and
-> hci_uart.ko
-> 
->     So , can you kindly figure out what might be
-> wrong in my operation ?
-> 
->     Seems to me the hciattach operation reset the
-> chip. And I might need to 
-> modify the hciattach , or ?
-> 
-> Raymond
-> 
-> ----- Original Message ----- 
-> From: "hong zhang" <henryzhang62@yahoo.com>
-> To: "BlueZ users"
-> <bluez-users@lists.sourceforge.net>
-> Sent: Wednesday, June 11, 2008 8:57 AM
-> Subject: Re: [Bluez-users] How to use Bluez with CSR
-> chip ?
-> 
-> 
-> > Raymond,
-> >
-> > CSR bc4 is initialized in two ways based on your
-> > design. I assum your board is embedded. One is by
-> > eeprom and one is using command after build. You
-> need
-> > to provide more information.
-> >
-> > You have to make sure your CSR bc4 chip on your
-> board
-> > is up first before using bluez.
-> >
-> > Regular talking here is based on x86.
-> >
-> > ---henry
-> >
-> > --- colorant <colorant@163.com> wrote:
-> >
-> >> Hi
-> >>
-> >>     I am not sure is this the proper place to put
-> up
-> >> this question, if not ,
-> >> please correct me.
-> >>
-> >>     I was trying to run bluez on our board with
-> bc4
-> >> chip. This chip need to
-> >> set pskey before it can run
-> >>
-> >>     I use hciattach and hciconfig to bring up the
-> >> hci0 interface.
-> >>
-> >>     Then I try hcitool hci0 scan with my earphone
-> >> open.
-> >>
-> >>     Nothing happend.
-> >>
-> >>     while, if I using CSR's bchs a2dp demo , it's
-> >> ok, I can play music. say
-> >> hardware is ok.
-> >>
-> >>     My question is :
-> >>
-> >>     1. To enable bluez with csr chip, is there
-> >> anything need to do vs the
-> >> standard kernel and bluez package ? Some config
-> >> need?
-> >>
-> >>     2. Did I need to place the bootrap init
-> sequence
-> >> for the bc4 chip in
-> >> some place if I using bluez ? say in kernel or in
-> >> the bluez user space
-> >> scripts? Or , the standard kernel and bluez
-> utility
-> >> already hand it, But I
-> >> just do the wrong way ?
-> >>
-> >>
-> >> Many thanks.
-> >> Raymond
-> >>
-> >>
-> >>
-> >>
-> >>
-> >
->
--------------------------------------------------------------------------
-> >> Check out the new SourceForge.net Marketplace.
-> >> It's the best place to buy or sell services for
-> >> just about anything Open Source.
-> >> http://sourceforge.net/services/buy/index.php
-> >> _______________________________________________
-> >> Bluez-users mailing list
-> >> Bluez-users@lists.sourceforge.net
-> >>
-> >
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-> >>
-> >
-> >
-> >
-> >
-> >
-> >
->
--------------------------------------------------------------------------
-> > Check out the new SourceForge.net Marketplace.
-> > It's the best place to buy or sell services for
-> > just about anything Open Source.
-> > http://sourceforge.net/services/buy/index.php
-> > _______________________________________________
-> > Bluez-users mailing list
-> > Bluez-users@lists.sourceforge.net
-> >
->
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-> > 
-> 
-> 
-> 
-> 
+Marcel
 
 
-
-      
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
