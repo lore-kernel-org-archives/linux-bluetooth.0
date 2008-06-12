@@ -1,10 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <039501c8cc45$fe46ed50$0132a8c0@Raymondpc>
-From: "colorant" <colorant@163.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>,
-	<attaboyu@163.com>, "hong zhang" <henryzhang62@yahoo.com>
-Date: Thu, 12 Jun 2008 12:37:16 +0800
+Date: Wed, 11 Jun 2008 20:15:53 -0700 (PDT)
+From: hong zhang <henryzhang62@yahoo.com>
+To: colorant <colorant@163.com>,
+	BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <02de01c8cc20$d57f2b00$0132a8c0@Raymondpc>
 MIME-Version: 1.0
+Message-ID: <817869.1711.qm@web57911.mail.re3.yahoo.com>
 Subject: Re: [Bluez-users] How to use Bluez with CSR chip ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -15,161 +16,231 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1075503464=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+That means you need bccmd to initialize your csr chip.
 
---===============1075503464==
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0392_01C8CC89.0C250E00"
+--- colorant <colorant@163.com> wrote:
 
-This is a multi-part message in MIME format.
+> Hi Henry
+> 
+>     1,2: nop, I use standard stack come with kernel,
+> I use csr's demo just 
+> to test the hardware is ok.
+>     3: the csr chip I use is initialized by sending
+> cmd after power up .
+> 
+> Raymond
+> 
+> 
+> ----- Original Message ----- 
+> From: "hong zhang" <henryzhang62@yahoo.com>
+> To: "colorant" <colorant@163.com>; "BlueZ users" 
+> <bluez-users@lists.sourceforge.net>
+> Sent: Thursday, June 12, 2008 2:04 AM
+> Subject: Re: [Bluez-users] How to use Bluez with CSR
+> chip ?
+> 
+> 
+> > Raymond,
+> >
+> > I have a few questions.
+> >
+> > 1. Do you use CSR bleutooth stack from CSR?
+> > 2. If you use Bluez, you must use bluetooth stack
+> >   comes with kernel.
+> > 3. How is CSR chip initialized? by eeprom?
+> >
+> >
+> > I believe you use CSR stack then you cannot use
+> Bluez
+> > utilities.
+> >
+> > --henry
+> >
+> > --- colorant <colorant@163.com> wrote:
+> >
+> >> Hi henry
+> >>
+> >>     Thanks for you reply.
+> >>
+> >>     Yes , I am using BC4 A06 Rom version on an
+> arm
+> >> based embedded board.
+> >>
+> >>     So this one must set pskey before running
+> right
+> >> ?
+> >>
+> >>     I try to run the CSR's demo first to set the
+> >> right pskey and run the
+> >> chip up.
+> >>     After I exit the demo, I can use pc to detect
+> >> the chip.
+> >>
+> >>     While , then I use :
+> >>
+> >>     hciattach /dev/ttyS1 bcsp 921600
+> >>
+> >>     to attach ttyS1 to hci0
+> >>
+> >>     after that , The PC can not detect the chip
+> >> anymore.
+> >>
+> >>     and then I try
+> >>     hciconfig hci0 up
+> >>     it can bring up the hci0 interface , but the
+> pc
+> >> still don't detect the
+> >> chip.
+> >>
+> >>     for kernel , I only insert bluetooth.ko and
+> >> hci_uart.ko
+> >>
+> >>     So , can you kindly figure out what might be
+> >> wrong in my operation ?
+> >>
+> >>     Seems to me the hciattach operation reset the
+> >> chip. And I might need to
+> >> modify the hciattach , or ?
+> >>
+> >> Raymond
+> >>
+> >> ----- Original Message ----- 
+> >> From: "hong zhang" <henryzhang62@yahoo.com>
+> >> To: "BlueZ users"
+> >> <bluez-users@lists.sourceforge.net>
+> >> Sent: Wednesday, June 11, 2008 8:57 AM
+> >> Subject: Re: [Bluez-users] How to use Bluez with
+> CSR
+> >> chip ?
+> >>
+> >>
+> >> > Raymond,
+> >> >
+> >> > CSR bc4 is initialized in two ways based on
+> your
+> >> > design. I assum your board is embedded. One is
+> by
+> >> > eeprom and one is using command after build.
+> You
+> >> need
+> >> > to provide more information.
+> >> >
+> >> > You have to make sure your CSR bc4 chip on your
+> >> board
+> >> > is up first before using bluez.
+> >> >
+> >> > Regular talking here is based on x86.
+> >> >
+> >> > ---henry
+> >> >
+> >> > --- colorant <colorant@163.com> wrote:
+> >> >
+> >> >> Hi
+> >> >>
+> >> >>     I am not sure is this the proper place to
+> put
+> >> up
+> >> >> this question, if not ,
+> >> >> please correct me.
+> >> >>
+> >> >>     I was trying to run bluez on our board
+> with
+> >> bc4
+> >> >> chip. This chip need to
+> >> >> set pskey before it can run
+> >> >>
+> >> >>     I use hciattach and hciconfig to bring up
+> the
+> >> >> hci0 interface.
+> >> >>
+> >> >>     Then I try hcitool hci0 scan with my
+> earphone
+> >> >> open.
+> >> >>
+> >> >>     Nothing happend.
+> >> >>
+> >> >>     while, if I using CSR's bchs a2dp demo ,
+> it's
+> >> >> ok, I can play music. say
+> >> >> hardware is ok.
+> >> >>
+> >> >>     My question is :
+> >> >>
+> >> >>     1. To enable bluez with csr chip, is there
+> >> >> anything need to do vs the
+> >> >> standard kernel and bluez package ? Some
+> config
+> >> >> need?
+> >> >>
+> >> >>     2. Did I need to place the bootrap init
+> >> sequence
+> >> >> for the bc4 chip in
+> >> >> some place if I using bluez ? say in kernel or
+> in
+> >> >> the bluez user space
+> >> >> scripts? Or , the standard kernel and bluez
+> >> utility
+> >> >> already hand it, But I
+> >> >> just do the wrong way ?
+> >> >>
+> >> >>
+> >> >> Many thanks.
+> >> >> Raymond
+> >> >>
+> >> >>
+> >> >>
+> >> >>
+> >> >>
+> >> >
+> >>
+> >
+>
+-------------------------------------------------------------------------
+> >> >> Check out the new SourceForge.net Marketplace.
+> >> >> It's the best place to buy or sell services
+> for
+> >> >> just about anything Open Source.
+> >> >> http://sourceforge.net/services/buy/index.php
+> >> >>
+> _______________________________________________
+> >> >> Bluez-users mailing list
+> >> >> Bluez-users@lists.sourceforge.net
+> >> >>
+> >> >
+> >>
+> >
+>
+https://lists.sourceforge.net/lists/listinfo/bluez-users
+> >> >>
+> >> >
+> >> >
+> >> >
+> >> >
+> >> >
+> >> >
+> >>
+> >
+>
+-------------------------------------------------------------------------
+> >> > Check out the new SourceForge.net Marketplace.
+> >> > It's the best place to buy or sell services for
+> 
+=== message truncated ===
 
-------=_NextPart_000_0392_01C8CC89.0C250E00
-Content-Type: text/plain;
-	charset="gb2312"
-Content-Transfer-Encoding: base64
-
-SGkgYXR0YWJveXUgYW5kIGhlbnJ5DQoNCiAgIFRoYW5rcyBzbyBtdWNoIGZvciB5b3VyIGtpbmRs
-eSBoZWxwIQ0KDQogICAgSSB0cnkgaXQgLCBhbmQgbWVldCBzb21lIHByb2JsZW06DQoNCiAgICB0
-aGUgYmx1ZXotdXRpbHMvdG9vbHMvZXhhbXBsZS5wc3Igc2VlbXMgbm90IGNvbXBseSB3aXRoIG15
-IGNoaXAsIHNvIEkgd3JpdGUgYW5vdGhlciBvbmUgYXM6DQoNCi8vIFBTS0VZX0FOQV9GUkVRDQom
-MDFmZSA9IDBGQTANCg0KLy8gUFNLRVlfVUFSVF9CQVVEX1JBVEUNCiYwMWJlID0gMEVCRg0KDQoN
-CkkgdHJ5IHdpdGggdGhlIGNzcidzIGRlbW8gYmVmb3JlICwgaWYgaXQgc2V0IHRoaXMgdHdvIHBz
-a2V5ICwgdGhlIGNoaXAgY2FuIHdvcmsgd2VsbC4NCg0KQW5kIHRoZW4gYWZ0ZXIgaGNpY29uZmln
-IGhjaTAgdXAgSSB1c2UNCg0KYmNjbWQgLXQgaGNpIHBzbG9hZCAtciBjc3IucHNyDQoNCnRoZSB0
-d28ga2V5IGlzIHdyaXRlIHN1Y2Nlc3NmdWxseSAsIGJ1dCB0aGVuIHRoZSBjaGlwIGNvbnRpbnVl
-IHRvIHJlY2VpdmUgbWVzc2FnZXMgLCBzZWVtcyBzb21ldGhpbmcgd3JvbmcuDQoNCkNhbiB5b3Ug
-c2VuZCBtZSB5b3VyIHBzciBmaWxlIHRvIGhhdmUgYSByZWZlcmVuY2UgLCBvciB5b3UgY2FuIHBv
-aW50IG91dCBhbnl0aGluZyB3cm9uZyBpbiBteSBwcm9jZXNzID8NCg0KQnkgdGhlIHdheSwgaWYg
-SSB3YW50IHRvIHJlYWQgYSBwc2tleSwgaG93IGNhbiBJIGRvID8NCg0KSSByZW1vdmUgdGhlIGRl
-YnVnIG1lc3NhZ2Ugc28gdGhhdCB5b3UgY2FuIHNlZSB0aGUgbG9nIG1vcmUgY2xlYXI6DQoNCiAg
-fiAjIA0KICB+ICMgYmNjbWQgLXQgaGNpIHBzbG9hZCBjc3IucHNyDQogIExvYWRpbmcgUFNLRVlf
-QU5BX0ZSRVEgLi4uIGRvbmUNCiAgTG9hZGluZyBQU0tFWV9VQVJUX0JBVURSQVRFIC4uLiBkb25l
-DQoNCiAgX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0K
-DQogIGlmIEkgdXNpbmcgLXIgaW4gcHNsb2FkIHRoZSByZXN1bHQgaXMgOg0KDQogIH4gIyBiY2Nt
-ZCAtdCBoY2kgcHNsb2FkIC1yIGNzci5wc3INCiAgTG9hZGluZyBQU0tFWV9BTkFfRlJFUSAuLi4g
-ZG9uZQ0KICBMb2FkaW5nIFBTS0VZX1VBUlRfQkFVRFJBVEUgLi4uIGRvbmUNCiAgfiAjIA0KICB+
-ICMgYmNzcF9yZWN2OiBFcnJvciBpbiBCQ1NQIGhkciBjaGVja3N1bQ0KDQogIGJvdGggb25lIGNv
-dWxkIG5vdCB3b3JrIGZvciBoY2l0b29sIHNjYW46DQoNCiAgfiAjIGhjaXRvb2wgLWkgaGNpMCBz
-Y2FuDQogIFNjYW5uaW5nIC4uLg0KICBJbnF1aXJ5IGZhaWxlZDogQ29ubmVjdGlvbiB0aW1lZCBv
-dXQNCg0KICBzZWVtcyBhZnRlciB3YXJtIHJlc2V0IHRoZSBjb25uZWN0aW9uIGlzIGJhZC4NCg0K
-ICBTbyAsIEkgd29uZGVyLCB3aGVuIHVzaW5nIGhjaWF0dGFjaCB0aGUgYmF1ZHJhdGUgaXMgc2V0
-IHRvIDExNTIwMA0KICBidXQgYWZ0ZXIgdGhlIHVhcnRfYmF1ZHJhdGUgaXMgc2V0LCB0aGUgYmF1
-ZHJhdGUgaXMgc2V0IHRvIDkyMTYwMA0KICB0aGVuIGhvdyBjYW4gdGhlIGhjaSBpbnRlcmZhY2Ug
-d29yayBhbnltb3JlID8gc2luY2UgaXQgaXMgc2V0IHRvIDExNTIwMCwgYW5kIEkgY2FuIG5vdCB1
-c2UgYmNjbWQgdG8gc2V0IHRoZSBwc2tleSBiZWZvcmUgaGNpYXR0YWNoIGlzIGRvbmUuDQoNCiAg
-SSBkaWQgbmVlZCB0byBjaGFuZ2UgdGhlIGJhdWRyYXRlLCBmb3IgdGhpcyBjYXNlICwgaG93IGNh
-biBJIGFjaGlldmUgaXQgPw0KDQoNCiAgUmF5bW9uZA0KDQo=
-
-------=_NextPart_000_0392_01C8CC89.0C250E00
-Content-Type: text/html;
-	charset="gb2312"
-Content-Transfer-Encoding: base64
-
-PCFET0NUWVBFIEhUTUwgUFVCTElDICItLy9XM0MvL0RURCBIVE1MIDQuMCBUcmFuc2l0aW9uYWwv
-L0VOIj4NCjxIVE1MPjxIRUFEPg0KPE1FVEEgaHR0cC1lcXVpdj1Db250ZW50LVR5cGUgY29udGVu
-dD0idGV4dC9odG1sOyBjaGFyc2V0PWdiMjMxMiI+DQo8TUVUQSBjb250ZW50PSJNU0hUTUwgNi4w
-MC4yOTAwLjMzMTQiIG5hbWU9R0VORVJBVE9SPg0KPFNUWUxFPjwvU1RZTEU+DQo8L0hFQUQ+DQo8
-Qk9EWSBiZ0NvbG9yPSNmZmZmZmY+DQo8RElWPjxGT05UIHNpemU9Mj5IaSBhdHRhYm95dSBhbmQg
-aGVucnk8L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+
-DQo8RElWPjxGT05UIHNpemU9Mj4mbmJzcDsmbmJzcDsgVGhhbmtzIHNvIG11Y2ggZm9yIHlvdXIg
-a2luZGx5IGhlbHAhDQo8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQo8RElW
-PjxGT05UIHNpemU9Mj4mbmJzcDsmbmJzcDsmbmJzcDsgSSB0cnkgaXQgLCBhbmQgbWVldCBzb21l
-IA0KcHJvYmxlbTo8L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7
-PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj4mbmJzcDsmbmJzcDsmbmJzcDsgdGhlIDwvRk9OVD48
-Rk9OVCANCnNpemU9Mz5ibHVlei11dGlscy90b29scy9leGFtcGxlLnBzciBzZWVtcyBub3QgY29t
-cGx5IHdpdGggbXkgY2hpcCwgc28gSSB3cml0ZSANCmFub3RoZXIgb25lIGFzOjwvRk9OVD48L0RJ
-Vj4NCjxESVY+PEZPTlQgc2l6ZT0yPjwvRk9OVD4mbmJzcDs8L0RJVj4NCjxESVY+PEZPTlQgc2l6
-ZT0yPi8vIFBTS0VZX0FOQV9GUkVRPEJSPiZhbXA7MDFmZSA9IDBGQTA8L0ZPTlQ+PC9ESVY+DQo8
-RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj4v
-LyBQU0tFWV9VQVJUX0JBVURfUkFURTxCUj4mYW1wOzAxYmUgPSAwRUJGPC9GT05UPjwvRElWPg0K
-PERJVj48Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNwOzwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+
-PC9GT05UPiZuYnNwOzwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+SSB0cnkgd2l0aCB0aGUgY3Ny
-J3MgZGVtbyBiZWZvcmUmbmJzcDssIGlmIGl0IHNldCB0aGlzIHR3byANCnBza2V5ICwgdGhlIGNo
-aXAgY2FuIHdvcmsgd2VsbC48L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+
-Jm5ic3A7PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj5BbmQgdGhlbiBhZnRlciBoY2ljb25maWcg
-aGNpMCB1cCBJIHVzZTwvRk9OVD48L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPjwvRk9OVD4mbmJz
-cDs8L0RJVj4NCjxESVY+YmNjbWQgLXQgaGNpIHBzbG9hZCAtciBjc3IucHNyPEJSPjwvRElWPg0K
-PERJVj48Rk9OVCBzaXplPTI+dGhlIHR3byBrZXkgaXMgd3JpdGUgc3VjY2Vzc2Z1bGx5ICwgYnV0
-IHRoZW4gdGhlIGNoaXAgY29udGludWUgDQp0byByZWNlaXZlIG1lc3NhZ2VzICwgc2VlbXMgc29t
-ZXRoaW5nIHdyb25nLjwvRk9OVD48L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPjwvRk9OVD4mbmJz
-cDs8L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPkNhbiB5b3Ugc2VuZCBtZSB5b3VyIHBzciBmaWxl
-IHRvIGhhdmUgYSByZWZlcmVuY2UgLCBvciB5b3UgY2FuIA0KcG9pbnQgb3V0IGFueXRoaW5nIHdy
-b25nIGluIG15IHByb2Nlc3MgPzwvRk9OVD48L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPjwvRk9O
-VD4mbmJzcDs8L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPkJ5IHRoZSB3YXksIGlmIEkgd2FudCB0
-byByZWFkIGEgcHNrZXksIGhvdyBjYW4gSSBkbyANCj88L0ZPTlQ+PC9ESVY+PC9GT05UPjwvRElW
-Pg0KPERJVj48Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNwOzwvRElWPg0KPERJVj48Rk9OVCBzaXpl
-PTI+SSByZW1vdmUgdGhlIGRlYnVnIG1lc3NhZ2Ugc28gdGhhdCB5b3UgY2FuIHNlZSB0aGUgbG9n
-IG1vcmUgDQpjbGVhcjo8L0ZPTlQ+PC9ESVY+DQo8QkxPQ0tRVU9URSBkaXI9bHRyIA0Kc3R5bGU9
-IlBBRERJTkctUklHSFQ6IDBweDsgUEFERElORy1MRUZUOiA1cHg7IE1BUkdJTi1MRUZUOiA1cHg7
-IEJPUkRFUi1MRUZUOiAjMDAwMDAwIDJweCBzb2xpZDsgTUFSR0lOLVJJR0hUOiAwcHgiPg0KICA8
-RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6ZT0y
-Pn4gIyA8QlI+fiAjIGJjY21kIC10IGhjaSBwc2xvYWQgY3NyLnBzcjxCUj5Mb2FkaW5nIA0KICBQ
-U0tFWV9BTkFfRlJFUSAuLi4gZG9uZTxCUj5Mb2FkaW5nIFBTS0VZX1VBUlRfQkFVRFJBVEUgLi4u
-IGRvbmU8L0ZPTlQ+PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6ZT0yPjwvRk9OVD4mbmJzcDs8L0RJ
-Vj4NCiAgPERJVj48Rk9OVCANCiAgc2l6ZT0yPl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX188L0ZPTlQ+PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6ZT0yPjwv
-Rk9OVD4mbmJzcDs8L0RJVj4NCiAgPERJVj48Rk9OVCBzaXplPTI+aWYgSSB1c2luZyAtciBpbiBw
-c2xvYWQgdGhlIHJlc3VsdCBpcyA6PC9GT05UPjwvRElWPg0KICA8RElWPjxGT05UIHNpemU9Mj48
-L0ZPTlQ+Jm5ic3A7PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6ZT0yPn4gIyBiY2NtZCAtdCBoY2kg
-cHNsb2FkIC1yIGNzci5wc3I8QlI+TG9hZGluZyBQU0tFWV9BTkFfRlJFUSANCiAgLi4uIGRvbmU8
-QlI+TG9hZGluZyBQU0tFWV9VQVJUX0JBVURSQVRFIC4uLiBkb25lPEJSPn4gIyA8QlI+fiAjIGJj
-c3BfcmVjdjogDQogIEVycm9yIGluIEJDU1AgaGRyIGNoZWNrc3VtPC9GT05UPjwvRElWPg0KICA8
-RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6ZT0y
-PmJvdGggb25lIGNvdWxkIG5vdCB3b3JrIGZvciBoY2l0b29sIHNjYW46PC9GT05UPjwvRElWPg0K
-ICA8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6
-ZT0yPn4gIyBoY2l0b29sIC1pIGhjaTAgc2NhbjxCUj5TY2FubmluZyAuLi48QlI+SW5xdWlyeSBm
-YWlsZWQ6IA0KICBDb25uZWN0aW9uIHRpbWVkIG91dDwvRk9OVD48L0RJVj4NCiAgPERJVj48Rk9O
-VCBzaXplPTI+PC9GT05UPiZuYnNwOzwvRElWPg0KICA8RElWPjxGT05UIHNpemU9Mj5zZWVtcyBh
-ZnRlciB3YXJtIHJlc2V0IHRoZSBjb25uZWN0aW9uIGlzIGJhZC48L0ZPTlQ+PC9ESVY+DQogIDxE
-SVY+PEZPTlQgc2l6ZT0yPjwvRk9OVD4mbmJzcDs8L0RJVj4NCiAgPERJVj48Rk9OVCBzaXplPTI+
-U28gLCBJIHdvbmRlciwgd2hlbiB1c2luZyBoY2lhdHRhY2ggdGhlIGJhdWRyYXRlIGlzIHNldCAN
-CiAgdG8mbmJzcDsxMTUyMDA8L0ZPTlQ+PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6ZT0yPmJ1dCBh
-ZnRlciB0aGUgdWFydF9iYXVkcmF0ZSBpcyBzZXQsIHRoZSBiYXVkcmF0ZSBpcyBzZXQgdG8gDQog
-IDkyMTYwMDwvRk9OVD48L0RJVj4NCiAgPERJVj48Rk9OVCBzaXplPTI+dGhlbiBob3cgY2FuIHRo
-ZSBoY2kgaW50ZXJmYWNlIHdvcmsgYW55bW9yZSA/IHNpbmNlIGl0IGlzIA0KICBzZXQgdG8gMTE1
-MjAwLCBhbmQgSSBjYW4gbm90IHVzZSBiY2NtZCB0byBzZXQgdGhlIHBza2V5IGJlZm9yZSBoY2lh
-dHRhY2ggaXMgDQogIGRvbmUuPC9GT05UPjwvRElWPg0KICA8RElWPjxGT05UIHNpemU9Mj48L0ZP
-TlQ+Jm5ic3A7PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6ZT0yPkkgZGlkIG5lZWQgdG8gY2hhbmdl
-IHRoZSBiYXVkcmF0ZSwgZm9yIHRoaXMgY2FzZSAsIGhvdyBjYW4gSSANCiAgYWNoaWV2ZSBpdCA/
-PC9GT05UPjwvRElWPg0KICA8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQog
-IDxESVY+PEZPTlQgc2l6ZT0yPjwvRk9OVD4mbmJzcDs8L0RJVj4NCiAgPERJVj48Rk9OVCBzaXpl
-PTI+UmF5bW9uZDwvRk9OVD48L0RJVj4NCiAgPERJVj48Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNw
-OzwvRElWPg0KICA8QkxPQ0tRVU9URSBkaXI9bHRyIA0KICBzdHlsZT0iUEFERElORy1SSUdIVDog
-MHB4OyBQQURESU5HLUxFRlQ6IDVweDsgTUFSR0lOLUxFRlQ6IDVweDsgQk9SREVSLUxFRlQ6ICMw
-MDAwMDAgMnB4IHNvbGlkOyBNQVJHSU4tUklHSFQ6IDBweCI+DQogICAgPERJViBzdHlsZT0iRk9O
-VDogOXB0IMvOzOUiPiZuYnNwOzwvRElWPjwvQkxPQ0tRVU9URT48L0JMT0NLUVVPVEU+PC9CT0RZ
-PjwvSFRNTD4NCg==
-
-------=_NextPart_000_0392_01C8CC89.0C250E00--
 
 
-
-
-
---===============1075503464==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+      
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
---===============1075503464==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1075503464==--
