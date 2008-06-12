@@ -1,13 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <95bb57cb0806120201i63c7c753m4d72c9ed9138ee8e@mail.gmail.com>
-Date: Thu, 12 Jun 2008 11:01:28 +0200
-From: "nico bats" <sl1200mk2@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <1213190155.17870.28.camel@violet.holtmann.net>
+Message-ID: <039501c8cc45$fe46ed50$0132a8c0@Raymondpc>
+From: "colorant" <colorant@163.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>,
+	<attaboyu@163.com>, "hong zhang" <henryzhang62@yahoo.com>
+Date: Thu, 12 Jun 2008 12:37:16 +0800
 MIME-Version: 1.0
-References: <95bb57cb0806110251xe9cc530v80224cfd836aef05@mail.gmail.com>
-	<1213190155.17870.28.camel@violet.holtmann.net>
-Subject: Re: [Bluez-users] compile on apple
+Subject: Re: [Bluez-users] How to use Bluez with CSR chip ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,123 +15,142 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1096128933=="
+Content-Type: multipart/mixed; boundary="===============1075503464=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1096128933==
+This is a multi-part message in MIME format.
+
+--===============1075503464==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_40678_1318446.1213261288889"
+	boundary="----=_NextPart_000_0392_01C8CC89.0C250E00"
 
-------=_Part_40678_1318446.1213261288889
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+This is a multi-part message in MIME format.
 
-hi,
-following this page(
-http://wiki.openmoko.org/wiki/User:SNMoore#Patch_to_work_around_byteswap.h_and_endian.h_errors_on_OS_X),
-byteswap macro can be re-written and use  <machine/endian.h> as header
+------=_NextPart_000_0392_01C8CC89.0C250E00
+Content-Type: text/plain;
+	charset="gb2312"
+Content-Transfer-Encoding: base64
 
-maybe it worth the try
-++
+SGkgYXR0YWJveXUgYW5kIGhlbnJ5DQoNCiAgIFRoYW5rcyBzbyBtdWNoIGZvciB5b3VyIGtpbmRs
+eSBoZWxwIQ0KDQogICAgSSB0cnkgaXQgLCBhbmQgbWVldCBzb21lIHByb2JsZW06DQoNCiAgICB0
+aGUgYmx1ZXotdXRpbHMvdG9vbHMvZXhhbXBsZS5wc3Igc2VlbXMgbm90IGNvbXBseSB3aXRoIG15
+IGNoaXAsIHNvIEkgd3JpdGUgYW5vdGhlciBvbmUgYXM6DQoNCi8vIFBTS0VZX0FOQV9GUkVRDQom
+MDFmZSA9IDBGQTANCg0KLy8gUFNLRVlfVUFSVF9CQVVEX1JBVEUNCiYwMWJlID0gMEVCRg0KDQoN
+CkkgdHJ5IHdpdGggdGhlIGNzcidzIGRlbW8gYmVmb3JlICwgaWYgaXQgc2V0IHRoaXMgdHdvIHBz
+a2V5ICwgdGhlIGNoaXAgY2FuIHdvcmsgd2VsbC4NCg0KQW5kIHRoZW4gYWZ0ZXIgaGNpY29uZmln
+IGhjaTAgdXAgSSB1c2UNCg0KYmNjbWQgLXQgaGNpIHBzbG9hZCAtciBjc3IucHNyDQoNCnRoZSB0
+d28ga2V5IGlzIHdyaXRlIHN1Y2Nlc3NmdWxseSAsIGJ1dCB0aGVuIHRoZSBjaGlwIGNvbnRpbnVl
+IHRvIHJlY2VpdmUgbWVzc2FnZXMgLCBzZWVtcyBzb21ldGhpbmcgd3JvbmcuDQoNCkNhbiB5b3Ug
+c2VuZCBtZSB5b3VyIHBzciBmaWxlIHRvIGhhdmUgYSByZWZlcmVuY2UgLCBvciB5b3UgY2FuIHBv
+aW50IG91dCBhbnl0aGluZyB3cm9uZyBpbiBteSBwcm9jZXNzID8NCg0KQnkgdGhlIHdheSwgaWYg
+SSB3YW50IHRvIHJlYWQgYSBwc2tleSwgaG93IGNhbiBJIGRvID8NCg0KSSByZW1vdmUgdGhlIGRl
+YnVnIG1lc3NhZ2Ugc28gdGhhdCB5b3UgY2FuIHNlZSB0aGUgbG9nIG1vcmUgY2xlYXI6DQoNCiAg
+fiAjIA0KICB+ICMgYmNjbWQgLXQgaGNpIHBzbG9hZCBjc3IucHNyDQogIExvYWRpbmcgUFNLRVlf
+QU5BX0ZSRVEgLi4uIGRvbmUNCiAgTG9hZGluZyBQU0tFWV9VQVJUX0JBVURSQVRFIC4uLiBkb25l
+DQoNCiAgX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0K
+DQogIGlmIEkgdXNpbmcgLXIgaW4gcHNsb2FkIHRoZSByZXN1bHQgaXMgOg0KDQogIH4gIyBiY2Nt
+ZCAtdCBoY2kgcHNsb2FkIC1yIGNzci5wc3INCiAgTG9hZGluZyBQU0tFWV9BTkFfRlJFUSAuLi4g
+ZG9uZQ0KICBMb2FkaW5nIFBTS0VZX1VBUlRfQkFVRFJBVEUgLi4uIGRvbmUNCiAgfiAjIA0KICB+
+ICMgYmNzcF9yZWN2OiBFcnJvciBpbiBCQ1NQIGhkciBjaGVja3N1bQ0KDQogIGJvdGggb25lIGNv
+dWxkIG5vdCB3b3JrIGZvciBoY2l0b29sIHNjYW46DQoNCiAgfiAjIGhjaXRvb2wgLWkgaGNpMCBz
+Y2FuDQogIFNjYW5uaW5nIC4uLg0KICBJbnF1aXJ5IGZhaWxlZDogQ29ubmVjdGlvbiB0aW1lZCBv
+dXQNCg0KICBzZWVtcyBhZnRlciB3YXJtIHJlc2V0IHRoZSBjb25uZWN0aW9uIGlzIGJhZC4NCg0K
+ICBTbyAsIEkgd29uZGVyLCB3aGVuIHVzaW5nIGhjaWF0dGFjaCB0aGUgYmF1ZHJhdGUgaXMgc2V0
+IHRvIDExNTIwMA0KICBidXQgYWZ0ZXIgdGhlIHVhcnRfYmF1ZHJhdGUgaXMgc2V0LCB0aGUgYmF1
+ZHJhdGUgaXMgc2V0IHRvIDkyMTYwMA0KICB0aGVuIGhvdyBjYW4gdGhlIGhjaSBpbnRlcmZhY2Ug
+d29yayBhbnltb3JlID8gc2luY2UgaXQgaXMgc2V0IHRvIDExNTIwMCwgYW5kIEkgY2FuIG5vdCB1
+c2UgYmNjbWQgdG8gc2V0IHRoZSBwc2tleSBiZWZvcmUgaGNpYXR0YWNoIGlzIGRvbmUuDQoNCiAg
+SSBkaWQgbmVlZCB0byBjaGFuZ2UgdGhlIGJhdWRyYXRlLCBmb3IgdGhpcyBjYXNlICwgaG93IGNh
+biBJIGFjaGlldmUgaXQgPw0KDQoNCiAgUmF5bW9uZA0KDQo=
 
-On Wed, Jun 11, 2008 at 3:15 PM, Marcel Holtmann <marcel@holtmann.org>
-wrote:
+------=_NextPart_000_0392_01C8CC89.0C250E00
+Content-Type: text/html;
+	charset="gb2312"
+Content-Transfer-Encoding: base64
 
-> Hi Nico,
->
-> > i've tried to compile Bluez on macbookpro and came across error:
-> >
-> > /bin/sh ../libtool --tag=CC   --mode=compile gcc -DHAVE_CONFIG_H -I.
-> > -I.. -I../include    -Wall -O2 -D_FORTIFY_SOURCE=2 -MT bluetooth.lo
-> > -MD -MP -MF .deps/bluetooth.Tpo -c -o bluetooth.lo bluetooth.c
-> > mkdir .libs
-> >  gcc -DHAVE_CONFIG_H -I. -I.. -I../include -Wall -O2
-> > -D_FORTIFY_SOURCE=2 -MT bluetooth.lo -MD -MP -MF .deps/bluetooth.Tpo
-> > -c bluetooth.c  -fno-common -DPIC -o .libs/bluetooth.o
-> > bluetooth.c:35:20: error: malloc.h: No such file or directory
-> > In file included from bluetooth.c:39:
-> > ../include/bluetooth/bluetooth.h:36:20: error: endian.h: No such file
-> > or directory
-> > ../include/bluetooth/bluetooth.h:37:22: error: byteswap.h: No such
-> > file or directory
-> >
-> > does macros included in endian.h & byteswap.h can be coded in a
-> > portable way ?
->
-> I can fix the malloc.h include, because that is not needed, but for the
-> others, I have no idea. Maybe or maybe not.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> Check out the new SourceForge.net Marketplace.
-> It's the best place to buy or sell services for
-> just about anything Open Source.
-> http://sourceforge.net/services/buy/index.php
-> _______________________________________________
-> Bluez-users mailing list
-> Bluez-users@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-users
->
+PCFET0NUWVBFIEhUTUwgUFVCTElDICItLy9XM0MvL0RURCBIVE1MIDQuMCBUcmFuc2l0aW9uYWwv
+L0VOIj4NCjxIVE1MPjxIRUFEPg0KPE1FVEEgaHR0cC1lcXVpdj1Db250ZW50LVR5cGUgY29udGVu
+dD0idGV4dC9odG1sOyBjaGFyc2V0PWdiMjMxMiI+DQo8TUVUQSBjb250ZW50PSJNU0hUTUwgNi4w
+MC4yOTAwLjMzMTQiIG5hbWU9R0VORVJBVE9SPg0KPFNUWUxFPjwvU1RZTEU+DQo8L0hFQUQ+DQo8
+Qk9EWSBiZ0NvbG9yPSNmZmZmZmY+DQo8RElWPjxGT05UIHNpemU9Mj5IaSBhdHRhYm95dSBhbmQg
+aGVucnk8L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+
+DQo8RElWPjxGT05UIHNpemU9Mj4mbmJzcDsmbmJzcDsgVGhhbmtzIHNvIG11Y2ggZm9yIHlvdXIg
+a2luZGx5IGhlbHAhDQo8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQo8RElW
+PjxGT05UIHNpemU9Mj4mbmJzcDsmbmJzcDsmbmJzcDsgSSB0cnkgaXQgLCBhbmQgbWVldCBzb21l
+IA0KcHJvYmxlbTo8L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7
+PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj4mbmJzcDsmbmJzcDsmbmJzcDsgdGhlIDwvRk9OVD48
+Rk9OVCANCnNpemU9Mz5ibHVlei11dGlscy90b29scy9leGFtcGxlLnBzciBzZWVtcyBub3QgY29t
+cGx5IHdpdGggbXkgY2hpcCwgc28gSSB3cml0ZSANCmFub3RoZXIgb25lIGFzOjwvRk9OVD48L0RJ
+Vj4NCjxESVY+PEZPTlQgc2l6ZT0yPjwvRk9OVD4mbmJzcDs8L0RJVj4NCjxESVY+PEZPTlQgc2l6
+ZT0yPi8vIFBTS0VZX0FOQV9GUkVRPEJSPiZhbXA7MDFmZSA9IDBGQTA8L0ZPTlQ+PC9ESVY+DQo8
+RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj4v
+LyBQU0tFWV9VQVJUX0JBVURfUkFURTxCUj4mYW1wOzAxYmUgPSAwRUJGPC9GT05UPjwvRElWPg0K
+PERJVj48Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNwOzwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+
+PC9GT05UPiZuYnNwOzwvRElWPg0KPERJVj48Rk9OVCBzaXplPTI+SSB0cnkgd2l0aCB0aGUgY3Ny
+J3MgZGVtbyBiZWZvcmUmbmJzcDssIGlmIGl0IHNldCB0aGlzIHR3byANCnBza2V5ICwgdGhlIGNo
+aXAgY2FuIHdvcmsgd2VsbC48L0ZPTlQ+PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+
+Jm5ic3A7PC9ESVY+DQo8RElWPjxGT05UIHNpemU9Mj5BbmQgdGhlbiBhZnRlciBoY2ljb25maWcg
+aGNpMCB1cCBJIHVzZTwvRk9OVD48L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPjwvRk9OVD4mbmJz
+cDs8L0RJVj4NCjxESVY+YmNjbWQgLXQgaGNpIHBzbG9hZCAtciBjc3IucHNyPEJSPjwvRElWPg0K
+PERJVj48Rk9OVCBzaXplPTI+dGhlIHR3byBrZXkgaXMgd3JpdGUgc3VjY2Vzc2Z1bGx5ICwgYnV0
+IHRoZW4gdGhlIGNoaXAgY29udGludWUgDQp0byByZWNlaXZlIG1lc3NhZ2VzICwgc2VlbXMgc29t
+ZXRoaW5nIHdyb25nLjwvRk9OVD48L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPjwvRk9OVD4mbmJz
+cDs8L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPkNhbiB5b3Ugc2VuZCBtZSB5b3VyIHBzciBmaWxl
+IHRvIGhhdmUgYSByZWZlcmVuY2UgLCBvciB5b3UgY2FuIA0KcG9pbnQgb3V0IGFueXRoaW5nIHdy
+b25nIGluIG15IHByb2Nlc3MgPzwvRk9OVD48L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPjwvRk9O
+VD4mbmJzcDs8L0RJVj4NCjxESVY+PEZPTlQgc2l6ZT0yPkJ5IHRoZSB3YXksIGlmIEkgd2FudCB0
+byByZWFkIGEgcHNrZXksIGhvdyBjYW4gSSBkbyANCj88L0ZPTlQ+PC9ESVY+PC9GT05UPjwvRElW
+Pg0KPERJVj48Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNwOzwvRElWPg0KPERJVj48Rk9OVCBzaXpl
+PTI+SSByZW1vdmUgdGhlIGRlYnVnIG1lc3NhZ2Ugc28gdGhhdCB5b3UgY2FuIHNlZSB0aGUgbG9n
+IG1vcmUgDQpjbGVhcjo8L0ZPTlQ+PC9ESVY+DQo8QkxPQ0tRVU9URSBkaXI9bHRyIA0Kc3R5bGU9
+IlBBRERJTkctUklHSFQ6IDBweDsgUEFERElORy1MRUZUOiA1cHg7IE1BUkdJTi1MRUZUOiA1cHg7
+IEJPUkRFUi1MRUZUOiAjMDAwMDAwIDJweCBzb2xpZDsgTUFSR0lOLVJJR0hUOiAwcHgiPg0KICA8
+RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6ZT0y
+Pn4gIyA8QlI+fiAjIGJjY21kIC10IGhjaSBwc2xvYWQgY3NyLnBzcjxCUj5Mb2FkaW5nIA0KICBQ
+U0tFWV9BTkFfRlJFUSAuLi4gZG9uZTxCUj5Mb2FkaW5nIFBTS0VZX1VBUlRfQkFVRFJBVEUgLi4u
+IGRvbmU8L0ZPTlQ+PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6ZT0yPjwvRk9OVD4mbmJzcDs8L0RJ
+Vj4NCiAgPERJVj48Rk9OVCANCiAgc2l6ZT0yPl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX188L0ZPTlQ+PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6ZT0yPjwv
+Rk9OVD4mbmJzcDs8L0RJVj4NCiAgPERJVj48Rk9OVCBzaXplPTI+aWYgSSB1c2luZyAtciBpbiBw
+c2xvYWQgdGhlIHJlc3VsdCBpcyA6PC9GT05UPjwvRElWPg0KICA8RElWPjxGT05UIHNpemU9Mj48
+L0ZPTlQ+Jm5ic3A7PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6ZT0yPn4gIyBiY2NtZCAtdCBoY2kg
+cHNsb2FkIC1yIGNzci5wc3I8QlI+TG9hZGluZyBQU0tFWV9BTkFfRlJFUSANCiAgLi4uIGRvbmU8
+QlI+TG9hZGluZyBQU0tFWV9VQVJUX0JBVURSQVRFIC4uLiBkb25lPEJSPn4gIyA8QlI+fiAjIGJj
+c3BfcmVjdjogDQogIEVycm9yIGluIEJDU1AgaGRyIGNoZWNrc3VtPC9GT05UPjwvRElWPg0KICA8
+RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6ZT0y
+PmJvdGggb25lIGNvdWxkIG5vdCB3b3JrIGZvciBoY2l0b29sIHNjYW46PC9GT05UPjwvRElWPg0K
+ICA8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6
+ZT0yPn4gIyBoY2l0b29sIC1pIGhjaTAgc2NhbjxCUj5TY2FubmluZyAuLi48QlI+SW5xdWlyeSBm
+YWlsZWQ6IA0KICBDb25uZWN0aW9uIHRpbWVkIG91dDwvRk9OVD48L0RJVj4NCiAgPERJVj48Rk9O
+VCBzaXplPTI+PC9GT05UPiZuYnNwOzwvRElWPg0KICA8RElWPjxGT05UIHNpemU9Mj5zZWVtcyBh
+ZnRlciB3YXJtIHJlc2V0IHRoZSBjb25uZWN0aW9uIGlzIGJhZC48L0ZPTlQ+PC9ESVY+DQogIDxE
+SVY+PEZPTlQgc2l6ZT0yPjwvRk9OVD4mbmJzcDs8L0RJVj4NCiAgPERJVj48Rk9OVCBzaXplPTI+
+U28gLCBJIHdvbmRlciwgd2hlbiB1c2luZyBoY2lhdHRhY2ggdGhlIGJhdWRyYXRlIGlzIHNldCAN
+CiAgdG8mbmJzcDsxMTUyMDA8L0ZPTlQ+PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6ZT0yPmJ1dCBh
+ZnRlciB0aGUgdWFydF9iYXVkcmF0ZSBpcyBzZXQsIHRoZSBiYXVkcmF0ZSBpcyBzZXQgdG8gDQog
+IDkyMTYwMDwvRk9OVD48L0RJVj4NCiAgPERJVj48Rk9OVCBzaXplPTI+dGhlbiBob3cgY2FuIHRo
+ZSBoY2kgaW50ZXJmYWNlIHdvcmsgYW55bW9yZSA/IHNpbmNlIGl0IGlzIA0KICBzZXQgdG8gMTE1
+MjAwLCBhbmQgSSBjYW4gbm90IHVzZSBiY2NtZCB0byBzZXQgdGhlIHBza2V5IGJlZm9yZSBoY2lh
+dHRhY2ggaXMgDQogIGRvbmUuPC9GT05UPjwvRElWPg0KICA8RElWPjxGT05UIHNpemU9Mj48L0ZP
+TlQ+Jm5ic3A7PC9ESVY+DQogIDxESVY+PEZPTlQgc2l6ZT0yPkkgZGlkIG5lZWQgdG8gY2hhbmdl
+IHRoZSBiYXVkcmF0ZSwgZm9yIHRoaXMgY2FzZSAsIGhvdyBjYW4gSSANCiAgYWNoaWV2ZSBpdCA/
+PC9GT05UPjwvRElWPg0KICA8RElWPjxGT05UIHNpemU9Mj48L0ZPTlQ+Jm5ic3A7PC9ESVY+DQog
+IDxESVY+PEZPTlQgc2l6ZT0yPjwvRk9OVD4mbmJzcDs8L0RJVj4NCiAgPERJVj48Rk9OVCBzaXpl
+PTI+UmF5bW9uZDwvRk9OVD48L0RJVj4NCiAgPERJVj48Rk9OVCBzaXplPTI+PC9GT05UPiZuYnNw
+OzwvRElWPg0KICA8QkxPQ0tRVU9URSBkaXI9bHRyIA0KICBzdHlsZT0iUEFERElORy1SSUdIVDog
+MHB4OyBQQURESU5HLUxFRlQ6IDVweDsgTUFSR0lOLUxFRlQ6IDVweDsgQk9SREVSLUxFRlQ6ICMw
+MDAwMDAgMnB4IHNvbGlkOyBNQVJHSU4tUklHSFQ6IDBweCI+DQogICAgPERJViBzdHlsZT0iRk9O
+VDogOXB0IMvOzOUiPiZuYnNwOzwvRElWPjwvQkxPQ0tRVU9URT48L0JMT0NLUVVPVEU+PC9CT0RZ
+PjwvSFRNTD4NCg==
 
-------=_Part_40678_1318446.1213261288889
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-hi,<br>following this page(<a href="http://wiki.openmoko.org/wiki/User:SNMoore#Patch_to_work_around_byteswap.h_and_endian.h_errors_on_OS_X">http://wiki.openmoko.org/wiki/User:SNMoore#Patch_to_work_around_byteswap.h_and_endian.h_errors_on_OS_X</a>), byteswap macro can be re-written and use&nbsp; &lt;machine/endian.h&gt; as header<br>
-<br>maybe it worth the try<br>++ <br><br><div class="gmail_quote">On Wed, Jun 11, 2008 at 3:15 PM, Marcel Holtmann &lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:<br><blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
-Hi Nico,<br>
-<div><div></div><div class="Wj3C7c"><br>
-&gt; i&#39;ve tried to compile Bluez on macbookpro and came across error:<br>
-&gt;<br>
-&gt; /bin/sh ../libtool --tag=CC &nbsp; --mode=compile gcc -DHAVE_CONFIG_H -I.<br>
-&gt; -I.. -I../include &nbsp; &nbsp;-Wall -O2 -D_FORTIFY_SOURCE=2 -MT bluetooth.lo<br>
-&gt; -MD -MP -MF .deps/bluetooth.Tpo -c -o bluetooth.lo bluetooth.c<br>
-&gt; mkdir .libs<br>
-&gt; &nbsp;gcc -DHAVE_CONFIG_H -I. -I.. -I../include -Wall -O2<br>
-&gt; -D_FORTIFY_SOURCE=2 -MT bluetooth.lo -MD -MP -MF .deps/bluetooth.Tpo<br>
-&gt; -c bluetooth.c &nbsp;-fno-common -DPIC -o .libs/bluetooth.o<br>
-&gt; bluetooth.c:35:20: error: malloc.h: No such file or directory<br>
-&gt; In file included from bluetooth.c:39:<br>
-&gt; ../include/bluetooth/bluetooth.h:36:20: error: endian.h: No such file<br>
-&gt; or directory<br>
-&gt; ../include/bluetooth/bluetooth.h:37:22: error: byteswap.h: No such<br>
-&gt; file or directory<br>
-&gt;<br>
-&gt; does macros included in endian.h &amp; byteswap.h can be coded in a<br>
-&gt; portable way ?<br>
-<br>
-</div></div>I can fix the malloc.h include, because that is not needed, but for the<br>
-others, I have no idea. Maybe or maybe not.<br>
-<br>
-Regards<br>
-<br>
-Marcel<br>
-<br>
-<br>
-<br>
--------------------------------------------------------------------------<br>
-Check out the new SourceForge.net Marketplace.<br>
-It&#39;s the best place to buy or sell services for<br>
-just about anything Open Source.<br>
-<a href="http://sourceforge.net/services/buy/index.php" target="_blank">http://sourceforge.net/services/buy/index.php</a><br>
-_______________________________________________<br>
-Bluez-users mailing list<br>
-<a href="mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a><br>
-<a href="https://lists.sourceforge.net/lists/listinfo/bluez-users" target="_blank">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br>
-</blockquote></div><br>
-
-------=_Part_40678_1318446.1213261288889--
+------=_NextPart_000_0392_01C8CC89.0C250E00--
 
 
---===============1096128933==
+
+
+
+--===============1075503464==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -144,7 +161,7 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
---===============1096128933==
+--===============1075503464==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -155,4 +172,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1096128933==--
+--===============1075503464==--
