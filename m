@@ -1,10 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <20080612204135.qbeehdkkasog4o88@webmail.cloudsprinter.com>
-Date: Thu, 12 Jun 2008 20:41:35 +0100
-From: neil@cloudsprinter.com
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] changing a USB blutooth dongle mac address
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <3e9cdced0806120412ic2904bai44cd6eee00179c2f@mail.gmail.com>
+References: <3e9cdced0806120309i7d7dd9e7ta299c4bd5c325437@mail.gmail.com>
+	<1213266546.17870.44.camel@violet.holtmann.net>
+	<3e9cdced0806120337p5043c4celf7092d086f937691@mail.gmail.com>
+	<3e9cdced0806120412ic2904bai44cd6eee00179c2f@mail.gmail.com>
+Date: Thu, 12 Jun 2008 15:09:44 +0200
+Message-Id: <1213276184.17870.52.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] implement hcitool cc call with dbus interface
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,33 +23,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi Fritz,
 
-sorry if this has been here before, but i have been driving my self  
-mad on google and trying things, i am working on a bluegiga access  
-server box, i need to be able to make the box think my computer is one  
-of the phones in its oui list for testing, there for i need to change  
-the mac address of my usb dongle.
+> Ok taking a look at hcitool.c I understand.
+> I will simply take the functions hci_open_dev and
+> hci_create_connection (provided by bluez-lib) in order to implement
+> the 
+> hcitool cc call in my application. So the kernel handles the low-level
+> stuff like socket-calls etc ....
 
-ive been messing around with various bits and bobs on my command line  
-but not sure if everything i have been doing is totally wrong.
+I am serious here. If you are trying to do this, then you are doing
+something wrong. Your application should not deal with low-level ACL
+link establishment.
 
-last month i was not a hardware programmer... please help
+> But anyway is there a way to do that through  the comfortable dbus
+> interface? I guess not.
 
-if this kind of procedure is not one that should be in the public  
-domain then please direct mail me
+No and that is because it is not needed.
 
-and clues suggestions or advice greatly received
+Regards
 
-i have built bluez from source with --enable-all , not really sure  
-what commands i want to use or how to directly access the stick
-
-Neil
-(UK)
-
-
-
-
-
+Marcel
 
 
 
