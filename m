@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3e9cdced0806120412ic2904bai44cd6eee00179c2f@mail.gmail.com>
+In-Reply-To: <3e9cdced0806120337p5043c4celf7092d086f937691@mail.gmail.com>
 References: <3e9cdced0806120309i7d7dd9e7ta299c4bd5c325437@mail.gmail.com>
 	<1213266546.17870.44.camel@violet.holtmann.net>
 	<3e9cdced0806120337p5043c4celf7092d086f937691@mail.gmail.com>
-	<3e9cdced0806120412ic2904bai44cd6eee00179c2f@mail.gmail.com>
-Date: Thu, 12 Jun 2008 15:09:44 +0200
-Message-Id: <1213276184.17870.52.camel@violet.holtmann.net>
+Date: Thu, 12 Jun 2008 15:08:31 +0200
+Message-Id: <1213276111.17870.50.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users] implement hcitool cc call with dbus interface
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -25,21 +24,33 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi Fritz,
 
-> Ok taking a look at hcitool.c I understand.
-> I will simply take the functions hci_open_dev and
-> hci_create_connection (provided by bluez-lib) in order to implement
-> the 
-> hcitool cc call in my application. So the kernel handles the low-level
-> stuff like socket-calls etc ....
+> hm but I have to setup a connection manually just like hcitool does
+> (hcitool cc --role=s) in my programm.
+> Is there now way to do that through the comfortable dbus interface? 
+> So just the same as hcitool cc --role=s <bdaddr> (this establishes a
+> ACL connection, right? ) but more comfortable to implement
+> error-handling etc.
 
-I am serious here. If you are trying to do this, then you are doing
-something wrong. Your application should not deal with low-level ACL
-link establishment.
+let me repeat this. You should not do this at all! If a layer like
+L2CAP, RFCOMM, SDP or whatever needs an ACL link, the kernel will create
+it for you. No need to deal with it. So even in the case you issue a
+manual HCI_Create_Connection, the kernel will take this down for you
+after 2 seconds, if it has no users.
 
-> But anyway is there a way to do that through  the comfortable dbus
-> interface? I guess not.
+So again, don't deal with low-level ACL links by yourself. Your program
+has no idea what it is doing anyway.
 
-No and that is because it is not needed.
+> >you don't have to do that at all. Never ever establish ACL links by
+> >yourself. Let the kernel do it for you. 
+> 
+> In which ways does the kernel that for me, or how can I initiate it?
+> I thought this can be done with socket-calls etc. as it done by a lot
+> of tools like hcitool etc.
+
+Call l2test -P 1 -n <bdaddr> and it will connect to the PSM for SDP and
+the kernel will create the ACL in the background for you. Creating an
+ACL link only is not useful at all. You always have to run a higher
+level protocol.
 
 Regards
 
