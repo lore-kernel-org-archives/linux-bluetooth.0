@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <060701c8cf51$f8730fd0$0132a8c0@Raymondpc>
-From: "skyflame" <skyflame@21cn.com>
-To: "Sanja Kolundzija" <Sanja.Kolundzija@hermes-softlab.com>,
-	"BlueZ development" <bluez-devel@lists.sourceforge.net>,
-	<attaboyu@163.com>, "hong zhang" <henryzhang62@yahoo.com>
-References: <03d101c8cc50$d2aa8660$0132a8c0@Raymondpc>
-	<499929A843E2C541A8AD31A881A2B6A201965229@hsl-lj-mail.hermes.si>
-Date: Mon, 16 Jun 2008 09:40:33 +0800
+Message-ID: <eba8281a0806131353m67d78395md62074bfa13bc9a9@mail.gmail.com>
+Date: Fri, 13 Jun 2008 21:53:09 +0100
+From: "Valerio Valerio" <vdv100@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <2d5a2c100806131229l79022c48w65489072f2e6ca36@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] How to run up CSR chip without eeprom with BLUEZ ?
+References: <eba8281a0806111502j7caebdeav83e3fc038b0c943f@mail.gmail.com>
+	<2d5a2c100806131229l79022c48w65489072f2e6ca36@mail.gmail.com>
+Subject: Re: [Bluez-devel] Listen a already open socket by the OS
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,103 +17,151 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============0390235030=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Sanja
+--===============0390235030==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_32420_8094931.1213390389635"
 
-    Thanks for your instruction !!
-    I found it behavior on my board a little different from you :
+------=_Part_32420_8094931.1213390389635
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-If  I using -r in the bccmd:
+Hi,
 
-~ # bccmd -t bcsp -d /dev/ttyS1 psload -r csr.psr
-Loading PSKEY_ANA_FREQ ... done
-Loading PSKEY_UART_BAUDRATE ... done
-Loading PSKEY_UART_SEQ_WINSIZE ... done
-Loading PSKEY_BDADDR ... done
-Loading PSKEY_PCM_CONFIG32 ... done
-Loading PSKEY_PCM_FORMAT ... done
-Loading PSKEY_HOSTIO_MAP_SCO_PCM ... done
-Loading PSKEY_HOSTIO_MAP_SCO_CODEC ... done
-Loading PSKEY_CODEC_PIO ... done
-Loading PSKEY_ANA_FTRIM ... done
-~ #
-~ # hciattach -s 921600 /dev/ttyS1 bcsp 921600
-BCSP initialization timed out
+2008/6/13 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
 
-It won't work,
-If I don't do reset at the same cmd, but instead do it seperately:
+> I supposed you are the OpenMoko student in charge of remote control.
 
-~ # bccmd -t bcsp -d /dev/ttyS1 psload csr.psr
-Loading PSKEY_ANA_FREQ ... done
-Loading PSKEY_UART_BAUDRATE ... done
-Loading PSKEY_UART_SEQ_WINSIZE ... done
-Loading PSKEY_BDADDR ... done
-Loading PSKEY_PCM_CONFIG32 ... done
-Loading PSKEY_PCM_FORMAT ... done
-Loading PSKEY_HOSTIO_MAP_SCO_PCM ... done
-Loading PSKEY_HOSTIO_MAP_SCO_CODEC ... done
-Loading PSKEY_CODEC_PIO ... done
-Loading PSKEY_ANA_FTRIM ... done
-~ #
-~ # bccmd -t bcsp -d /dev/ttyS1 warmreset
-~ #
-~ # hciattach -s 921600 /dev/ttyS1 bcsp 921600
-~ #
-~ # hciconfig hci0 up
-~ #
+Yap you are right :)
 
-Seems it can connect to the chip, but still, pskey don't set right , I can 
-read it out and see it's still the reset value ......
+>
+> You better join #bluez @ freenode to stay tunned about bluetooth and
+> BlueZ, now about HID channels, we already are listen them in hcid, so
+> you don't need to worry if you are running hcid for the server part.
+> The tricky part is the client side, when the device act as a
+> mouse/keyboard, Im afraid there is no library to assist you with HID
+> protocol and I think you cannot connect in such psm without being root
+> either. If Im correct about those points then I think it is better to
+> code the missing HID support inside bluez-utils.
 
-~ # bccmd psget -s 0x0 0x01be
-UART Baud rate: 0x0000 (0)
 
-I try to use following cmd to see whether the cmd is write in to the chip, 
-but :
+Yes the psm 17 (control channel) require root, because is one of the
+reserved psm,  my previous problem is that I had the hidd server running in
+the client side, if I disable it I can listen the sockets that I need
+without problems.
 
-~ # bccmd -t bcsp -d /dev/ttyS1 psget -s 0x0 0x1be
-UART Baud rate: 0x0000 (0)
-~ #
-~ # bccmd -t bcsp -d /dev/ttyS1 psset -s 0x0 0x1be 0x0ebf
-~ #
-~ # bccmd -t bcsp -d /dev/ttyS1 psget -s 0x0 0x1be
-UART Baud rate: 0x0000 (0)
+If one of the BlueZ developer with knowledge of HID, give some orientation
+for a while, maybe I can do some code that can be useful for other
+developers and integrated in the bluez-utils.
 
-seems chip just reset it self between two bccmd with bcsp protocol, and lost 
-everything write to it.
+Best regards,
 
-But if I set up the pskey use hci protocol after hciconfig up, it's ok. but 
-reset lost the connection:
+--=20
+Val=E9rio Val=E9rio
 
-~ # hciattach -s 38400 /dev/ttyS1 bcsp
-~ #
-~ # hciconfig hci0 up
-~ #
-~ # bccmd psget -s 0x0 0x1be
-UART Baud rate: 0x0000 (0)
-~ #
-~ # bccmd psset -s 0x0 0x1be 0x01d8
-~ #
-~ # bccmd psget -s 0x0 0x1be
-UART Baud rate: 0x01d8 (472)
+http://www.valeriovalerio.org
 
-~ # bccmd warmreset
-~ # ~ # bcsp_recv: Error in BCSP hdr checksum
 
-Sigh ... Do you have any idea what might be wrong for my operation ?
+>
+> --
+> Luiz Augusto von Dentz
+> Engenheiro de Computa=E7=E3o
+>
+> -------------------------------------------------------------------------
+> Check out the new SourceForge.net Marketplace.
+> It's the best place to buy or sell services for
+> just about anything Open Source.
+> http://sourceforge.net/services/buy/index.php
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
-Raymond
+------=_Part_32420_8094931.1213390389635
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
+Hi,<br><br><div class=3D"gmail_quote">2008/6/13 Luiz Augusto von Dentz &lt;=
+<a href=3D"mailto:luiz.dentz@gmail.com">luiz.dentz@gmail.com</a>&gt;:<br><b=
+lockquote class=3D"gmail_quote" style=3D"border-left: 1px solid rgb(204, 20=
+4, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">
+I supposed you are the OpenMoko student in charge of remote control.</block=
+quote><div>Yap you are right :) <br></div><blockquote class=3D"gmail_quote"=
+ style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.=
+8ex; padding-left: 1ex;">
+<br>
+You better join #bluez @ freenode to stay tunned about bluetooth and<br>
+BlueZ, now about HID channels, we already are listen them in hcid, so<br>
+you don&#39;t need to worry if you are running hcid for the server part.<br=
+>
+The tricky part is the client side, when the device act as a<br>
+mouse/keyboard, Im afraid there is no library to assist you with HID<br>
+protocol and I think you cannot connect in such psm without being root<br>
+either. If Im correct about those points then I think it is better to<br>
+code the missing HID support inside bluez-utils.</blockquote><div>&nbsp;</d=
+iv><div>Yes the psm 17 (control channel) require root, because is one of th=
+e reserved psm,&nbsp; my previous problem is that I had the hidd server run=
+ning in the client side, if I disable it I can listen the sockets that I ne=
+ed without problems.<br>
+<br>If one of the BlueZ developer with knowledge of HID, give some orientat=
+ion for a while, maybe I can do some code that can be useful for other deve=
+lopers and integrated in the bluez-utils.<br><br>Best regards,<br><br>-- <b=
+r>
+Val=E9rio Val=E9rio<br><br><a href=3D"http://www.valeriovalerio.org">http:/=
+/www.valeriovalerio.org</a><br><br></div><blockquote class=3D"gmail_quote" =
+style=3D"border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8=
+ex; padding-left: 1ex;">
+<br>
+<br>
+--<br>
+Luiz Augusto von Dentz<br>
+Engenheiro de Computa=E7=E3o<br>
+<br>
+-------------------------------------------------------------------------<b=
+r>
+Check out the new SourceForge.net Marketplace.<br>
+It&#39;s the best place to buy or sell services for<br>
+just about anything Open Source.<br>
+<a href=3D"http://sourceforge.net/services/buy/index.php" target=3D"_blank"=
+>http://sourceforge.net/services/buy/index.php</a><br>
+_______________________________________________<br>
+Bluez-devel mailing list<br>
+<a href=3D"mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sour=
+ceforge.net</a><br>
+<a href=3D"https://lists.sourceforge.net/lists/listinfo/bluez-devel" target=
+=3D"_blank">https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br=
+>
+</blockquote></div><br><br clear=3D"all"><br><br>
+
+------=_Part_32420_8094931.1213390389635--
+
+
+--===============0390235030==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
+--===============0390235030==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0390235030==--
