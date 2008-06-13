@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2d5a2c100806131229l79022c48w65489072f2e6ca36@mail.gmail.com>
-Date: Fri, 13 Jun 2008 16:29:47 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <eba8281a0806111502j7caebdeav83e3fc038b0c943f@mail.gmail.com>
 MIME-Version: 1.0
-References: <eba8281a0806111502j7caebdeav83e3fc038b0c943f@mail.gmail.com>
-Subject: Re: [Bluez-devel] Listen a already open socket by the OS
+Date: Fri, 13 Jun 2008 10:55:19 +0200
+Message-ID: <499929A843E2C541A8AD31A881A2B6A201965229@hsl-lj-mail.hermes.si>
+In-Reply-To: <03d101c8cc50$d2aa8660$0132a8c0@Raymondpc>
+References: <03d101c8cc50$d2aa8660$0132a8c0@Raymondpc>
+From: "Sanja Kolundzija" <Sanja.Kolundzija@hermes-softlab.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>,
+	<attaboyu@163.com>, "hong zhang" <henryzhang62@yahoo.com>
+Subject: Re: [Bluez-devel] How to run up CSR chip without eeprom with BLUEZ ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,20 +21,49 @@ Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-I supposed you are the OpenMoko student in charge of remote control.
-You better join #bluez @ freenode to stay tunned about bluetooth and
-BlueZ, now about HID channels, we already are listen them in hcid, so
-you don't need to worry if you are running hcid for the server part.
-The tricky part is the client side, when the device act as a
-mouse/keyboard, Im afraid there is no library to assist you with HID
-protocol and I think you cannot connect in such psm without being root
-either. If Im correct about those points then I think it is better to
-code the missing HID support inside bluez-utils.
+> what is the right process ? Can any one help me out ?
+> Thanks
+=A0
+> Raymond
 
--- =
 
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+Hi Raymond,
+
+we are using BC6 ROM, and also had problems initializing it. This is the pr=
+ocedure that works for us:
+
+1. We run bccmd before hciattach!
+
+bccmd -t BCSP -d /dev/ttyS2 psload -r pskeys.psr
+
+Obviously, BC6 is connected to ttyS2. =
+
+
+pskeys.psr looks like this:
+=A0
+// PSKEY_BDADDR
+&0001 =3D 0044 5566 0033 1122
+// PSKEY_UART_BAUDRATE - 921600
+&01be =3D 0ebf
+// PSKEY_ANA_FREQ
+&01fe =3D 6590
+
+Before executing bccmd, chip has baudrate 38400. After executing bccmd, bau=
+drate will be 921600, so hciattach has to use that speed.=A0
+
+bccmd without -r didn't work for us.
+=A0
+
+2. Now we run hciattach:
+
+hciattach -s 921600 /dev/ttyS2 bcsp 921600 noflow
+
+After this we do hciconfig hci0 reset, and continue working with hci0 devic=
+e normally from BlueZ.
+
+Regards,
+Sanja
+
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
