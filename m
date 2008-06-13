@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e96e9eeb0806130555j17b6e8a8ue893fd868cf5b2a5@mail.gmail.com>
-Date: Fri, 13 Jun 2008 15:55:24 +0300
+Message-ID: <e96e9eeb0806130507u139f58a2sa7094a65f9ecff17@mail.gmail.com>
+Date: Fri, 13 Jun 2008 15:07:46 +0300
 From: "Voni Hakau" <hakauvoni@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] hcid: can't init device hci0: connection timed out
-	(110)
+Subject: [Bluez-users] Bluez build problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,17 +20,22 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi all,
 
-I get the following from hcid when I try to setup my device:
+I'm cross compiling bluez-util to my platform, so I use something like
+--prefix=/path/to/my/platform/root/filesystem/usr. Everything builds
+and installs perfectly.
 
-Dec 31 18:04:17 18 daemon.info hcid[852]: HCI dev 0 registered
-Dec 31 18:04:27 18 daemon.err hcid[859]: Can't init device hci0:
-Connection timed out (110)
+But, in my platform, bluez now thinks that all the files are located
+in the path /path/to/my/platform/root/filesystem/usr (it is hard coded
+in the binaries), which doesn't really exists on the platform - it was
+just on my host, where I built my root fs for the platform. I need to
+install everything on my host to that path, but on the platform I need
+bluez to ignore it...
 
-Any ideas ?
+Any suggestions ? I can always use --prefix=/usr and then manually
+copy all the files to /path/to/my/platform/root/filesystem/usr but
+that is too hard... there must be a better way..
 
-(bluez-libs/utils 3.32)
-
-Thanks,
+Thank you!
 Voni
 
 -------------------------------------------------------------------------
