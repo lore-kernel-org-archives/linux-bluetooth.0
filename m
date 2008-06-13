@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <04bd01c8cd07$ab7f7020$0132a8c0@Raymondpc>
+Message-ID: <049e01c8ccf1$013a4600$0132a8c0@Raymondpc>
 From: "skyflame" <skyflame@21cn.com>
 To: "hong zhang" <henryzhang62@yahoo.com>,
 	"BlueZ development" <bluez-devel@lists.sourceforge.net>,
 	<attaboyu@163.com>
-References: <230309.30571.qm@web57914.mail.re3.yahoo.com>
-Date: Fri, 13 Jun 2008 11:43:39 +0800
+References: <564535.96437.qm@web57901.mail.re3.yahoo.com>
+Date: Fri, 13 Jun 2008 09:01:22 +0800
 MIME-Version: 1.0
 Subject: Re: [Bluez-devel] How to run up CSR chip without eeprom with BLUEZ ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -21,39 +21,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi
 
 
 > Raymond,
 >
-> One year ago, I have a project using CSR wifi and
-> bluetooth. If demo does not use bluez, that means it
-> uses CSR bluetooth stack not bluez stack from kernel.
-> Why do you think you are using bluez stack?
-> I feel you are using CSR bluetooth stack.
-
-Both the demo and bluez is compiled by myself, I use different software to 
-test it
-So I know exactly what stack I am using.
-
-> Can you tell me what you do to invoke kernel
-> bluetooth?
+> Have you tried to use psr file from your demo package.
+> If demo package works then its psr file should be
+> good.
 >
 
-When I using CSR's BCHS stack, it's build with the demo in a single app and 
-the only relation with kernel is the uart driver.
+Hi Heny
 
-While when using bluez, I insert bluetooth.ko and hci_uart.ko
+the csr's demo do not use bluez , it is so called bchs, and it don't have 
+psr file , it send the pskey in it's startup function.
 
-and I use hciattach which will use bluez-libs. So I am for sure it's using 
-Bluez stack instead of csr's
+I send the same pskey by psr file yesterday, it's not working
 
+And I think the problem is not what kind of pskey I should send :
 
+But , if I set the uart baudrate with pskey, after warm reset, the 
+connection with the chip is lost.
 
-> You need to make it clear how do you bring up bluex
-> stack.
->
-> ---henry
+If I do not set the baudrate pskey, after warm reset, the chip turn to it's 
+start stat call tshy stat ... and then every thing went wrong.
+
+Do you encounter such things? Can you set the baudrate and after warmreset 
+the chip still work ?
+
+Thanks.
+
+> I only have experience for CSR with eeprom where psr
+> file is preload.
+
 
 
 -------------------------------------------------------------------------
