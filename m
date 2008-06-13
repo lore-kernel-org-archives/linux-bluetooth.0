@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4852914F.6020209@earthlink.net>
-Date: Fri, 13 Jun 2008 10:25:03 -0500
-From: "Mumia W.." <paduille.4061.mumia.w+nospam@earthlink.net>
+Message-ID: <e96e9eeb0806130555j17b6e8a8ue893fd868cf5b2a5@mail.gmail.com>
+Date: Fri, 13 Jun 2008 15:55:24 +0300
+From: "Voni Hakau" <hakauvoni@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-References: <e96e9eeb0806130507u139f58a2sa7094a65f9ecff17@mail.gmail.com>
-In-Reply-To: <e96e9eeb0806130507u139f58a2sa7094a65f9ecff17@mail.gmail.com>
-Subject: Re: [Bluez-users] Bluez build problem
+Subject: [Bluez-users] hcid: can't init device hci0: connection timed out
+	(110)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,58 +19,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On 06/13/2008 07:07 AM, Voni Hakau wrote:
-> Hi all,
-> 
-> I'm cross compiling bluez-util to my platform, so I use something like
-> --prefix=/path/to/my/platform/root/filesystem/usr. Everything builds
-> and installs perfectly.
-> 
-> But, in my platform, bluez now thinks that all the files are located
-> in the path /path/to/my/platform/root/filesystem/usr (it is hard coded
-> in the binaries), which doesn't really exists on the platform - it was
-> just on my host, where I built my root fs for the platform. I need to
-> install everything on my host to that path, but on the platform I need
-> bluez to ignore it...
-> 
-> Any suggestions ? I can always use --prefix=/usr and then manually
-> copy all the files to /path/to/my/platform/root/filesystem/usr but
-> that is too hard... there must be a better way..
-> 
-> Thank you!
-> Voni
-> 
+Hi all,
 
-Hi Voni.
+I get the following from hcid when I try to setup my device:
 
-Try to create a package instead. Use --prefix=/usr when you configure, 
-but use DESTDIR=/tmp/buildplace when you install.
+Dec 31 18:04:17 18 daemon.info hcid[852]: HCI dev 0 registered
+Dec 31 18:04:27 18 daemon.err hcid[859]: Can't init device hci0:
+Connection timed out (110)
 
-That should install the files to /tmp/buildplace. Use tar(1) to create a 
-tarball of the files in /tmp/buildplace, or even better, use a packager 
-for your preferred platform.
+Any ideas ?
 
-During configuration, your command line might look like this:
+(bluez-libs/utils 3.32)
 
-make --prefix=/usr
-
-When you "install" the package, you'll use this command:
-
-make install DESTDIR=/tmp/buildplace
-
-Obviously, the files won't be installed to the right place. No problem, 
-use tar(1).
-
-cd /tmp/buildplace
-tar czf /tmp/bluez-x.xx-i386.tar.gz *
-
-Now you have a tarball that you can install wherever you wish, including 
-the correct place for your platform, 
-/path/to/my/platform/root/filesystem/usr.
-
-Good luck.
-
-
+Thanks,
+Voni
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
