@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e96e9eeb0806130507u139f58a2sa7094a65f9ecff17@mail.gmail.com>
-Date: Fri, 13 Jun 2008 15:07:46 +0300
-From: "Voni Hakau" <hakauvoni@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Message-ID: <20080613114741.aegcm62tc0gcwscs@webmail.cloudsprinter.com>
+Date: Fri, 13 Jun 2008 11:47:41 +0100
+From: neil@cloudsprinter.com
+To: bluez-users@lists.sourceforge.net
+References: <20080612204135.qbeehdkkasog4o88@webmail.cloudsprinter.com>
+	<e378cfb20806122242u67c866d6vddecf3f42ce30c4b@mail.gmail.com>
+In-Reply-To: <e378cfb20806122242u67c866d6vddecf3f42ce30c4b@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] Bluez build problem
+Subject: Re: [Bluez-users] changing a USB blutooth dongle mac address
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,25 +21,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi all,
+Quoting Nel D <newatlinux@gmail.com>:
 
-I'm cross compiling bluez-util to my platform, so I use something like
---prefix=/path/to/my/platform/root/filesystem/usr. Everything builds
-and installs perfectly.
+> On Fri, Jun 13, 2008 at 1:11 AM,  <neil@cloudsprinter.com> wrote:
+>>
+>> sorry if this has been here before, but i have been driving my self
+>> mad on google and trying things, i am working on a bluegiga access
+>> server box, i need to be able to make the box think my computer is one
+>> of the phones in its oui list for testing, there for i need to change
+>> the mac address of my usb dongle.
+>
+> My understanding of your question is that you want a bluetooth enabled
+> device look up as a phone when it is searched by other bluetooth
+> enabled device. If this is what you want to perform then i guess you
+> can do it by editing the file  /etc/bluetooth/hcid.conf   to set the
+> device class. "man hcid" should tell you what bits need to be set.
+>
 
-But, in my platform, bluez now thinks that all the files are located
-in the path /path/to/my/platform/root/filesystem/usr (it is hard coded
-in the binaries), which doesn't really exists on the platform - it was
-just on my host, where I built my root fs for the platform. I need to
-install everything on my host to that path, but on the platform I need
-bluez to ignore it...
+thanks.. seems i have been totally wasting my time.. i need to chage  
+the bletooth class of device, not mess with the mac address
 
-Any suggestions ? I can always use --prefix=/usr and then manually
-copy all the files to /path/to/my/platform/root/filesystem/usr but
-that is too hard... there must be a better way..
+someone else pointed me to this.. which should help.. i thoguht i'd  
+post it here incase someone else is having my issues ;)
 
-Thank you!
-Voni
+http://bluetooth-pentest.narod.ru/software/bluetooth_class_of_device-service_generator.html
+
+
+
+
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
