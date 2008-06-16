@@ -1,16 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
+To: bluez-devel@lists.sourceforge.net
+Date: Mon, 16 Jun 2008 10:10:44 +0800
 MIME-Version: 1.0
-Date: Mon, 16 Jun 2008 21:52:24 +0200
-Message-ID: <499929A843E2C541A8AD31A881A2B6A2019C136C@hsl-lj-mail.hermes.si>
-In-Reply-To: <060701c8cf51$f8730fd0$0132a8c0@Raymondpc>
-References: <03d101c8cc50$d2aa8660$0132a8c0@Raymondpc>
-	<499929A843E2C541A8AD31A881A2B6A201965229@hsl-lj-mail.hermes.si>
-	<060701c8cf51$f8730fd0$0132a8c0@Raymondpc>
-From: "Sanja Kolundzija" <Sanja.Kolundzija@hermes-softlab.com>
-To: "skyflame" <skyflame@21cn.com>,
-	"BlueZ development" <bluez-devel@lists.sourceforge.net>,
-	<attaboyu@163.com>, "hong zhang" <henryzhang62@yahoo.com>
-Subject: Re: [Bluez-devel] How to run up CSR chip without eeprom with BLUEZ ?
+Message-Id: <200806161010.44193.Jerry87905@gmail.com>
+From: Dylan <jerry87905@gmail.com>
+Subject: [Bluez-devel] [GSOC 2008]bluez-python away for the exams
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,56 +18,12 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Raymond,
-
-> If  I using -r in the bccmd:
->
-> ~ # bccmd -t bcsp -d /dev/ttyS1 psload -r csr.psr
-> Loading PSKEY_ANA_FREQ ... done
-> Loading PSKEY_UART_BAUDRATE ... done
-> Loading PSKEY_UART_SEQ_WINSIZE ... done
-> Loading PSKEY_BDADDR ... done
-> Loading PSKEY_PCM_CONFIG32 ... done
-> Loading PSKEY_PCM_FORMAT ... done
-> Loading PSKEY_HOSTIO_MAP_SCO_PCM ... done
-> Loading PSKEY_HOSTIO_MAP_SCO_CODEC ... done
-> Loading PSKEY_CODEC_PIO ... done
-> Loading PSKEY_ANA_FTRIM ... done
-> ~ #
-> ~ # hciattach -s 921600 /dev/ttyS1 bcsp 921600
-> BCSP initialization timed out
-
-Which baud rate do you set in your .psr file? You should use the same
-speed in hciattach command, otherwise chip will be initialized to one
-speed, and hciattach will try to connect using another one.
-
-
-> I try to use following cmd to see whether the cmd is write in to the
-chip, 
-> but :
->
-> ~ # bccmd -t bcsp -d /dev/ttyS1 psget -s 0x0 0x1be
-> UART Baud rate: 0x0000 (0)
-> ~ #
-> ~ # bccmd -t bcsp -d /dev/ttyS1 psset -s 0x0 0x1be 0x0ebf
-> ~ #
-> ~ # bccmd -t bcsp -d /dev/ttyS1 psget -s 0x0 0x1be
-> UART Baud rate: 0x0000 (0)
->
-> seems chip just reset it self between two bccmd with bcsp protocol,
-and lost 
-> everything write to it.
-
-Yes, I had the same behaviour, and only if I use -r with first bccmd
-things worked. Reading the fault code returned FAULT_HOSTIO_INVALID_ACK
-(the chip received a BCSP ACK for a message it has not sent) - based on
-this I conclude that repeating bccmd messes the chips state machine
-during BCHS protocol initialization.
-
-Regards,
-Sanja
-
-
+Hi, everyone,
+  This is Li Dongyang working on bluez-python as a GSoC 2008 student,
+and I've got 10 exams till 27th, so I'll be away for the exams.
+I'll be home at 27th, night, then I can finish the Agent's async_callbacks and 
+send another mail describing the situations of bluez-python.
+Cheers,
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
