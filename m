@@ -1,16 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <06df01c8d01a$725bb900$0132a8c0@Raymondpc>
-From: "skyflame" <skyflame@21cn.com>
-To: "Sanja Kolundzija" <Sanja.Kolundzija@hermes-softlab.com>,
-	"BlueZ development" <bluez-devel@lists.sourceforge.net>,
-	<attaboyu@163.com>, "hong zhang" <henryzhang62@yahoo.com>
-References: <03d101c8cc50$d2aa8660$0132a8c0@Raymondpc>
-	<499929A843E2C541A8AD31A881A2B6A201965229@hsl-lj-mail.hermes.si>
-	<060701c8cf51$f8730fd0$0132a8c0@Raymondpc>
-	<499929A843E2C541A8AD31A881A2B6A2019C136C@hsl-lj-mail.hermes.si>
-Date: Tue, 17 Jun 2008 09:34:49 +0800
-MIME-Version: 1.0
-Subject: Re: [Bluez-devel] How to run up CSR chip without eeprom with BLUEZ ?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <b32d44000806161421k58d4f107m4961ccac72a5bb8b@mail.gmail.com>
+References: <b32d44000806161327u680c290au54fd21f2fef1d58e@mail.gmail.com>
+	<1213649948.21932.37.camel@violet.holtmann.net>
+	<b32d44000806161421k58d4f107m4961ccac72a5bb8b@mail.gmail.com>
+Date: Mon, 16 Jun 2008 23:37:01 +0200
+Message-Id: <1213652221.21932.42.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] SDP payload processing vulnerability
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -24,98 +22,47 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Glenn,
 
+> > the SDP part has always been the weak point in every Bluetooth stack.
+> > Our server side it pretty good, but it seems the client one is really
+> > bad and I must admit that I never looked into in that in details.
+> 
+> I'm concerned that hcid is also vulnerable to this (which would make
+> it both a server and a client problem?).
 
-Hi Sanja
+in theory it is, but you have to trigger a SDP client transaction first
+and it is almost impossible to do this remotely. Yes, I can think of
+tricks on how to do that, but that is besides the point here.
 
-> If  I using -r in the bccmd:
->
-> ~ # bccmd -t bcsp -d /dev/ttyS1 psload -r csr.psr
-> Loading PSKEY_ANA_FREQ ... done
-> Loading PSKEY_UART_BAUDRATE ... done
-> Loading PSKEY_UART_SEQ_WINSIZE ... done
-> Loading PSKEY_BDADDR ... done
-> Loading PSKEY_PCM_CONFIG32 ... done
-> Loading PSKEY_PCM_FORMAT ... done
-> Loading PSKEY_HOSTIO_MAP_SCO_PCM ... done
-> Loading PSKEY_HOSTIO_MAP_SCO_CODEC ... done
-> Loading PSKEY_CODEC_PIO ... done
-> Loading PSKEY_ANA_FTRIM ... done
-> ~ #
-> ~ # hciattach -s 921600 /dev/ttyS1 bcsp 921600
-> BCSP initialization timed out
+> > Changing the API is really a problem here. We can't do that. At least
+> > not that easily. We can extend the API with more safe calls and then
+> > slowly move over the clients.
+> 
+> That sounds good.  I can write safe versions of the parsing routines
+> and move everything I can find over to the new API; old clients will
+> still work with the old (unsafe) API.  This may present some
+> maintenance challenges since there will be 2x parsing code, but it is
+> better than leaving security holes everywhere.
 
-> Which baud rate do you set in your .psr file? You should use the same
-> speed in hciattach command, otherwise chip will be initialized to one
-> speed, and hciattach will try to connect using another one.
+You can have the old API call the new one with a NULL parameter and yes,
+it might be confusing, but it is better than breaking the API.
 
-I did set it to 0xebf for 921600:
-this is my psr file , actually I wirte this psr file according to the value 
-I used in CSR bchs stack's boot_strap , these setting in bchs's stack can 
-make the chip working normally :
+Please use the BlueZ coding style when doing the patch and have small
+pieces. I am not going to review the whole think as once. Please send
+small updates. It is faster this way.
 
-// PSKEY_ANA_FREQ
-&01fe = 0FA0
+> Is bluez.org currently down?  I can't seem to get at the latest version...
 
-// PSKEY_UART_BAUD_RATE
-&01be = 0EBF
+Yeah. The server lost its routing information. I am working on it.
 
+Use the CVS at bluez.sf.net or the GIT clone at git.infradead.org since
+patches against the last release are outdated.
 
-// PSKEY_UART_SEQ_WINSIZE
-&0407 = 0006
+Regards
 
-// BDADDR
-&0001 = 1122 3344 5566 7788
+Marcel
 
-// PCM_CONFIG32
-&01b3 = 0080 0906
-
-// PCM_FORMAT
-&01b6 = 0060
-
-// MAP_SCO_PCM
-&01ab = 0001
-
-// MAP_SCO_CODEC
-&01b0 = 0000
-
-// CODEC_PIO
-&01b9 = 000b
-
-// ANA_FTRIM
-&01f6 = 0025
-
-> I try to use following cmd to see whether the cmd is write in to the
-chip,
-> but :
->
-> ~ # bccmd -t bcsp -d /dev/ttyS1 psget -s 0x0 0x1be
-> UART Baud rate: 0x0000 (0)
-> ~ #
-> ~ # bccmd -t bcsp -d /dev/ttyS1 psset -s 0x0 0x1be 0x0ebf
-> ~ #
-> ~ # bccmd -t bcsp -d /dev/ttyS1 psget -s 0x0 0x1be
-> UART Baud rate: 0x0000 (0)
->
-> seems chip just reset it self between two bccmd with bcsp protocol,
-and lost
-> everything write to it.
-
-> Yes, I had the same behaviour, and only if I use -r with first bccmd
-> things worked. Reading the fault code returned FAULT_HOSTIO_INVALID_ACK
-> (the chip received a BCSP ACK for a message it has not sent) - based on
-> this I conclude that repeating bccmd messes the chips state machine
-> during BCHS protocol initialization.
-
-Thanks god, I finally find something that work the same way as you 8 ) 
-though this is also not so promising...
-I had plan to modify the bccmd to set the pskey and read the pskey at one 
-time, to see what make the bccmd not working for second time. Maybe it help 
-to understand the stack behavior.
-
-Thanks.
-
-Raymond
 
 
 -------------------------------------------------------------------------
