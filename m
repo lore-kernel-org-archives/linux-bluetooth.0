@@ -1,14 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <084501c8d0dc$9e41e400$0132a8c0@Raymondpc>
-From: "skyflame" <skyflame@21cn.com>
-To: "hong zhang" <henryzhang62@yahoo.com>,
-	"Sanja Kolundzija" <Sanja.Kolundzija@hermes-softlab.com>,
-	"BlueZ development" <bluez-devel@lists.sourceforge.net>,
-	<attaboyu@163.com>
-References: <44771.82692.qm@web57911.mail.re3.yahoo.com>
-Date: Wed, 18 Jun 2008 08:45:33 +0800
+Date: Tue, 17 Jun 2008 17:57:00 +0200
+From: Alexander Kerner <lunohod@gmx.de>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20080617155700.GA22485@hosaka.homeunix.net>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] How to run up CSR chip without eeprom with BLUEZ ?
+Cc: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] Simultaneous ingoing and outgoing connections issue
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,20 +19,71 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Henry
+
+Hello!
+
+I have a problem running bt server and client at one time on one machine.
+Inquiry scan and ingoing conenctions do not work when an outgoing connection is
+active. I can reproduce it using only rctest utility. The machine is visible to
+other bt devices and the clients can connect, but when I start 
+"rctest -n <random bt address>" the machine cannot be discovered and the 
+incoming connections stop working until rctest is stopped. hcidump shows only
+the outgoing connection attempt and nothing else. 
+
+I tested on two different machines with different bt devices and the behaviour
+is the same.
 
 
-> Why do not you guys use PStool provided by CSR to
-> generate psr file? It will reduce lots of hassle
-> experienced for initialization.
-> 
+Regards
 
-I only have bluesuit v1.22 on hand, do you got v2.0?
-Also , I do not have casira board on hand 8  )
+Alexander
 
 
-> ---henry
-> 
+1. bluez 3.32, usb dongle EPOX BT-DG02
+
+hci0:   Type: USB
+        BD Address: 00:04:61:80:2C:DB ACL MTU: 192:8 SCO MTU: 64:8
+        HCI Ver: 1.1 (0x1) HCI Rev: 0x110 LMP Ver: 1.1 (0x1) LMP Subver: 0x110
+        Manufacturer: Cambridge Silicon Radio (10)
+hci0:   Type: USB
+        BD Address: 00:04:61:80:2C:DB ACL MTU: 192:8 SCO MTU: 64:8
+        HCI 14.3
+        Chip version: BlueCore02-External (ES2)
+        Max key size: 56 bit
+        SCO mapping:  HCI
+hci0:   Type: USB
+        BD Address: 00:04:61:80:2C:DB ACL MTU: 192:8 SCO MTU: 64:8
+        Features: 0xff 0xff 0x0b 0x00 0x00 0x00 0x00 0x00
+                <3-slot packets> <5-slot packets> <encryption> <slot offset> 
+                <timing accuracy> <role switch> <hold mode> <sniff mode> 
+                <park state> <RSSI> <channel quality> <SCO link> <HV2 packets> 
+                <HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme> 
+                <transparent SCO>
+
+2. bluez 3.29, hp compaq 6910p with built-in BT
+
+hci0:	Type: USB
+	BD Address: 00:1A:6B:88:42:AA ACL MTU: 1017:8 SCO MTU: 64:8
+	HCI Ver: 2.0 (0x3) HCI Rev: 0x2129 LMP Ver: 2.0 (0x3) LMP Subver: 0x41cf
+	Manufacturer: Broadcom Corporation (15)
+hci0:	Type: USB
+	BD Address: 00:1A:6B:88:42:AA ACL MTU: 1017:8 SCO MTU: 64:8
+	Firmware 41.65 / 207
+hci0:	Type: USB
+	BD Address: 00:1A:6B:88:42:AA ACL MTU: 1017:8 SCO MTU: 64:8
+	Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+		<3-slot packets> <5-slot packets> <encryption> <slot offset> 
+		<timing accuracy> <role switch> <hold mode> <sniff mode> 
+		<park state> <RSSI> <channel quality> <SCO link> <HV2 packets> 
+		<HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme> 
+		<power control> <transparent SCO> <broadcast encrypt> 
+		<EDR ACL 2 Mbps> <EDR ACL 3 Mbps> <enhanced iscan> 
+		<interlaced iscan> <interlaced pscan> <inquiry with RSSI> 
+		<extended SCO> <EV4 packets> <EV5 packets> <AFH cap. slave> 
+		<AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL> 
+		<AFH cap. master> <AFH class. master> <EDR eSCO 2 Mbps> 
+		<EDR eSCO 3 Mbps> <3-slot EDR eSCO> <extended features> 
+
 
 
 -------------------------------------------------------------------------
