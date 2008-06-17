@@ -1,18 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 17 Jun 2008 10:25:09 +0200
-Message-ID: <499929A843E2C541A8AD31A881A2B6A2019C1525@hsl-lj-mail.hermes.si>
-In-Reply-To: <078501c8d02f$587b1200$0132a8c0@Raymondpc>
-References: <03d101c8cc50$d2aa8660$0132a8c0@Raymondpc>
-	<499929A843E2C541A8AD31A881A2B6A201965229@hsl-lj-mail.hermes.si>
-	<060701c8cf51$f8730fd0$0132a8c0@Raymondpc>
-	<499929A843E2C541A8AD31A881A2B6A2019C136C@hsl-lj-mail.hermes.si>
+Message-ID: <07dc01c8d052$bb617080$0132a8c0@Raymondpc>
+From: "skyflame" <skyflame@21cn.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+References: <03d101c8cc50$d2aa8660$0132a8c0@Raymondpc><499929A843E2C541A8AD31A881A2B6A201965229@hsl-lj-mail.hermes.si><060701c8cf51$f8730fd0$0132a8c0@Raymondpc><499929A843E2C541A8AD31A881A2B6A2019C136C@hsl-lj-mail.hermes.si>
 	<078501c8d02f$587b1200$0132a8c0@Raymondpc>
-From: "Sanja Kolundzija" <Sanja.Kolundzija@hermes-softlab.com>
-To: "skyflame" <skyflame@21cn.com>,
-	"BlueZ development" <bluez-devel@lists.sourceforge.net>,
-	<attaboyu@163.com>, "hong zhang" <henryzhang62@yahoo.com>
-Subject: Re: [Bluez-devel] How to run up CSR chip without eeprom with BLUEZ ?
+Date: Tue, 17 Jun 2008 16:18:18 +0800
+MIME-Version: 1.0
+Subject: [Bluez-devel] What't the difference between HIDD / HID2HCI /
+	Bluetoothd-service-input ?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -26,26 +21,34 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Raymond,
+Hi
 
-great that it works! These CSR ROM devices can be really frustrating.
+    I want to run up an hid daemon to connect hid device.
 
->     (  However, It is really strange here, without setting this value,
-why 
-> hciattach can connect the chip for the first time, while do a
-warmreset , it 
-> won't ? Is csr's chip do a self uart baudrate adjustment to match the
-host 
-> for the first time ? )
+    I notice that there are several bin as :
 
-Yes, you are right, they perform auto-baud procedure at the beginning.
-They don't have any value set, but guess from the incoming message what
-is the baud rate. That's why if you look with the scope at signals, you
-see that chip doesn't reply to the first message from the processor, but
-needs typically few messages to guess the baud rate.
+    hidd
+    hid2hci
+    bluetoothd-service-input
 
-Regards,
-Sanja
+    I try to figure out what is their difference by man, however , the man 
+has only very short description. And also , I did not find many documents on 
+how to write the related config files for each bluez daemons.
+
+    So
+    1. Is there any good documents on describe the setting of different 
+bluez daemons ? Or is there any good sample on setting up the daemons from 
+scratch on embedded board ?
+    2. I can see on pc and on some system, it run bluetoothd-service-input 
+but no hidd found. Is that hidd is out of date and replaced ?
+    3. Is the same situation with bluetoothd-service-audio and etc ?
+    4. Is that possible to use bluez to simulate a hid device ? say 
+providing mouse function instead of acting as a server to use bt mouse ?
+
+Thanks.
+
+Raymond 
+
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
