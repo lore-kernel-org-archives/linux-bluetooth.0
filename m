@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48590D7A.6030706@gmail.com>
-Date: Wed, 18 Jun 2008 14:28:26 +0100
+Message-ID: <4858E396.7020208@suse.de>
+Date: Wed, 18 Jun 2008 12:29:42 +0200
+From: Stefan Seyfried <seife@suse.de>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-From: Gareth R White <garethrwhite@gmail.com>
-Subject: [Bluez-users] Monitoring BT traffic
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <3e9cdced0806140254u1fdcc62dq4333252ba2d01662@mail.gmail.com>
+In-Reply-To: <3e9cdced0806140254u1fdcc62dq4333252ba2d01662@mail.gmail.com>
+Subject: Re: [Bluez-users] different versions of bluez depending on
+	distribution
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,48 +17,48 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Fritz Code wrote:
+> Well there seem to be different bluez versions depending on the
+> distribution. E.g. on my (old) SuSE 10.2 System bluez is installed in
+> version 3.7 (its supposed to be newer than the latest official bluez pack=
+age
+> - strange!) ?
+> But the latest release of the public bluez.org download-section is 3.32?
 
-I want to monitor realtime BlueTooth data to/from a Wiimote controller 
-as it's being used to play a game on Nintendo's Wii.
-(apologies if this is off-topic for this mailing list - if I get no
-replies I'll try elsewhere)
+I'd say that 7 < 32.
 
-There are a couple of possible ways I can imagine of doing this:
+> Do the the distributors compile their own bluez packages and at the same
+> time change the version-number?
 
-Set up Linux PC as a bridge between 2 BlueTooth devices (a Wii and a 
-Wiimote).
-Connect the Wiimote and Ubuntu so that motion data from the Wiimote is 
-received by the PC (and saved for later analysis). Also establish a 
-connection between the PC and the Wii, and forward all data between the 
-Wiimote and the Wii.
-This might cause additional lag, and I'm not even sure if this is
-technically feasible.
+I don't
 
-Multiple connect.
-Have the PC and the Wii simultaneously connect to the same Wiimote.
-Am I right in thinking this is not even possible with BlueTooth?
+> I also figured out some differences e.g. in the arguments of the request
+> message, sent out after a create_bonding.
+> Why do they make such changes?
 
-Passive monitoring.
-Is there any way to monitor BT traffic between a directly connected
-Wiimote and Wii? I've heard of BlueTooth sniffers which are apparently
-rather expensive. How easy would it be to interrogate this data and
-interpret it as Wii motion data?
+I'm pretty sure i didn't. Probably it's just that 3.7 had different handling
+than 3.32 has.
 
-Are there any applications that'll do this, and if not then how complex
-does this task sound to build using any available libraries (is Bluez 
-even where I should be looking?)
+> I think this strategy is sort of confusing because you don't know exactly
+> the differences of official bluez packages and the adpated of your
+> distribution...
 
-I'm a C++ / Python programmer but don't know where to find the 
-appropriate Linux (Ubuntu 8.04) source and BlueTooth specs.
-Any help or suggestions much appreciated!
+I add only very few patches to the package. Sometimes it's fixes backported
+from newer releases after the version freeze for the distribution, sometimes
+it's some special stuff needed for interaction with the system, which might
+not (yet) be upstream, but that is pretty rare.
+-- =
 
-Cheers,
-Gareth
+Stefan Seyfried
+R&D Team Mobile Devices            |              "Any ideas, John?"
+SUSE LINUX Products GmbH, N=FCrnberg | "Well, surrounding them's out."
+
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
