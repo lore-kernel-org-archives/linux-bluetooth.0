@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <046701c8d25f$0dcf13a0$6701a8c0@freqonedev>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Date: Thu, 19 Jun 2008 17:51:44 -0500
-MIME-Version: 1.0
-Subject: [Bluez-devel] Fw: Next Release, and Device.DiscoverServices
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <038c01c8d152$2d0fc1f0$6701a8c0@freqonedev>
+References: <038c01c8d152$2d0fc1f0$6701a8c0@freqonedev>
+Date: Wed, 18 Jun 2008 17:04:03 +0200
+Message-Id: <1213801443.19872.6.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Next Release, and Device.DiscoverServices
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,159 +16,70 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1188819611=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
+Hi David,
 
---===============1188819611==
-Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0464_01C8D235.23342A20"
+> I have been working with Adapter.CreateDevice, and have been
+> frustrated by finding that the list of UUIDs returned by
+> Device.GetProperties is always empty.  (Getting the connectivity right
+> is a necessary precursor to implementation of AVRCP with Metadata.)
 
-This is a multi-part message in MIME format.
+the CreateDevice needs some more magic in case the remote device has no
+public browse group.
 
-------=_NextPart_000_0464_01C8D235.23342A20
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Currently we have in device.c the following struct:
 
-I think I answered my question when I saw the tag for release 3.33 show =
-up on cvs.bluez.sourceforge.net.
+static uint16_t uuid_list[] = {
+        PUBLIC_BROWSE_GROUP,
+        HID_SVCLASS_ID,
+        GENERIC_AUDIO_SVCLASS_ID,
+        ADVANCED_AUDIO_SVCLASS_ID,
+        AV_REMOTE_SVCLASS_ID,
+        0
+};
 
-For now, I have pulled only REL-3_33 and not subsequent patches -- to =
-see if this new release answers my questions WRT UUIDs in GetProperties, =
-etc., connecting with SSP, and the like.
+So in case the public browse group fails, it will go through the list of
+additional UUIDs and search for them. So your AVRCP case should be
+handled.
+ 
+> Looking at the CVS, I see all have been quite busy, including adding a
+> new DiscoverServices method, which I presume will do the querying of
+> the remote SDP and filling in the list of UUIDs.  Am I correct?
 
-I also hope you are successful in getting the bluez.org site back up; it =
-must have been a serious problem to take it down for so long...
+So DiscoverServices will update the UUID list of course, but normally
+there should be no need to call it. CreateDevice needs to be fixed to do
+the right job.
 
-Best regards,
-David Stockwell
+The DiscoverServices is mainly for applications that need access to the
+full service record. Stuff like obex-data-server for example.
+ 
+> I also see a lot of work around BT2.1 and SSP.
 
------ Original Message -----=20
-From: David Stockwell=20
-To: BlueZ development=20
-Sent: Wednesday, June 18, 2008 9:47 AM
-Subject: Next Release, and Device.DiscoverServices
+Yep. We are almost done with. However you will need kernel changes to
+make this work.
+ 
+> Given all of that, I am about to pull everything down from CVS, but am
+> wondering if you are about to do another release (don't want to waste
+> any effort if things are stabilizing enough to release again in a few
+> days).
 
+I wanna do the release actually today.
 
-I have been working with Adapter.CreateDevice, and have been frustrated =
-by finding that the list of UUIDs returned by Device.GetProperties is =
-always empty.  (Getting the connectivity right is a necessary precursor =
-to implementation of AVRCP with Metadata.)
+Regards
 
-Looking at the CVS, I see all have been quite busy, including adding a =
-new DiscoverServices method, which I presume will do the querying of the =
-remote SDP and filling in the list of UUIDs.  Am I correct?
-
-I also see a lot of work around BT2.1 and SSP.
-
-Given all of that, I am about to pull everything down from CVS, but am =
-wondering if you are about to do another release (don't want to waste =
-any effort if things are stabilizing enough to release again in a few =
-days).
-
-All the best,
-DS
-------=_NextPart_000_0464_01C8D235.23342A20
-Content-Type: text/html;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD>
-<META http-equiv=3DContent-Type content=3D"text/html; =
-charset=3Diso-8859-1">
-<META content=3D"MSHTML 6.00.6000.16674" name=3DGENERATOR>
-<STYLE></STYLE>
-</HEAD>
-<BODY bgColor=3D#ffffff>
-<DIV><FONT face=3DArial size=3D2>I think I answered my question when I =
-saw the tag=20
-for release 3.33 show up on cvs.bluez.sourceforge.net.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>For now, I have pulled only REL-3_33 =
-and not=20
-subsequent patches --&nbsp;to see if this new release answers my =
-questions WRT=20
-UUIDs in GetProperties, etc., connecting with SSP, and the =
-like.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I also hope you are successful in =
-getting the=20
-bluez.org site back up; it must have been a serious problem to take it =
-down for=20
-so long...</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Best regards,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>David Stockwell</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV style=3D"FONT: 10pt arial">----- Original Message -----=20
-<DIV style=3D"BACKGROUND: #e4e4e4; font-color: black"><B>From:</B> <A=20
-title=3Ddstockwell@frequency-one.com=20
-href=3D"mailto:dstockwell@frequency-one.com">David Stockwell</A> </DIV>
-<DIV><B>To:</B> <A title=3Dbluez-devel@lists.sourceforge.net=20
-href=3D"mailto:bluez-devel@lists.sourceforge.net">BlueZ development</A> =
-</DIV>
-<DIV><B>Sent:</B> Wednesday, June 18, 2008 9:47 AM</DIV>
-<DIV><B>Subject:</B> Next Release, and =
-Device.DiscoverServices</DIV></DIV>
-<DIV><BR></DIV>
-<DIV><FONT face=3DArial size=3D2>I have been working with =
-Adapter.CreateDevice, and=20
-have been frustrated by finding that the list of UUIDs returned by=20
-Device.GetProperties is always empty.&nbsp; (Getting the connectivity =
-right is a=20
-necessary precursor to implementation of AVRCP with =
-Metadata.)</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Looking at the CVS, I see all have been =
-quite busy,=20
-including adding a new DiscoverServices method, which I presume will do =
-the=20
-querying of the remote SDP and filling in the list of UUIDs.&nbsp; Am I=20
-correct?</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>I also see&nbsp;a lot of work around =
-BT2.1 and=20
-SSP.</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>Given all of that, I am about to pull =
-everything=20
-down from CVS, but am wondering if you are about to do another release =
-(don't=20
-want to waste any effort if things are stabilizing enough to release =
-again in a=20
-few days).</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
-<DIV><FONT face=3DArial size=3D2>All the best,</FONT></DIV>
-<DIV><FONT face=3DArial size=3D2>DS</FONT></DIV></BODY></HTML>
-
-------=_NextPart_000_0464_01C8D235.23342A20--
+Marcel
 
 
-
---===============1188819611==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
---===============1188819611==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1188819611==--
