@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <016a01c8d27c$2c0a4f70$6e01a8c0@Raymondpc>
-From: "colorant" <colorant@163.com>
+Message-ID: <a481fbf0806190642u6732d93ew7aec2f17d05dc4d8@mail.gmail.com>
+Date: Thu, 19 Jun 2008 09:42:36 -0400
+From: "Raymond Ingles" <sorceror171@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-References: <a481fbf0806190642u6732d93ew7aec2f17d05dc4d8@mail.gmail.com>
-Date: Fri, 20 Jun 2008 10:20:13 +0800
 MIME-Version: 1.0
-Subject: [Bluez-users] How to using security "Auto" in pairing ,
-	I tried but not working ?
+Subject: [Bluez-users] Remote desktop via Bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,110 +18,23 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi
+On Wed, Jun 18, 2008 at 11:54 PM, umeshyv <umeshyv@gmail.com> wrote:
 
-    I do not have passkey-agent running , so I try to use auto for security 
-and hope it can send back the passkey auto.
+> I think everyone are aware of windows vista ,you can access its desktop
+> using your mobile with bluetooth enabled on your mobile and on your host
+> using Remote Desktop application on your mobile is it possible to do the
+> same on suse linux 10.1.waiting for your suggestions
 
-My setting in hcid.conf is as below :
+ Yes, depending on what kind of 'mobile' you have. First, get
+networking to work. For example, if you have a Palm-based system, if
+you can remote hotsync over bluetooth, then you should be able to do
+remote desktop. There are several ways to remotely view the screen
+with Linux. There's a linux RDP (Microsofts' "Remote Desktop
+Protocol") server here: http://xrdp.sourceforge.net/
 
-options {
-        # Automatically initialize new devices
-        autoinit yes;
-
-        # Security Manager mode
-        #   none - Security manager disabled
-        #   auto - Use local PIN for incoming connections
-        #   user - Always ask user for a PIN
-        #
-        security auto;
-
-        # Pairing mode
-        #   none  - Pairing disabled
-        #   multi - Allow pairing with already paired devices
-        #   once  - Pair once and deny successive attempts
-        pairing multi;
-
-        # Do the same as "hciconfig hci0 down" when SetMode("off")
-        # is called.
-        offmode devdown;
-
-        # Default PIN code for incoming connections
-        passkey "1234";
-}
-
-But this don't work :
-
-When I try to start the bonding process following 
-http://wiki.bluez.org/wiki/HOWTO/Bonding
-The output of hcidump :
-
-~ # dbus-send --system --type=method_call --print-reply --dest=org.bluez 
-/org/bluez/hci0 org.bluez.Adapter.CreateBonding string:00:02:72:B0:00:26
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-    bdaddr 00:02:72:B0:00:26 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
-    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> HCI Event: Command Status (0x0f) plen 4
-    Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> HCI Event: Connect Complete (0x03) plen 11
-    status 0x00 handle 42 bdaddr 00:02:72:B0:00:26 type ACL encrypt 0x00
-< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
-    handle 42
-> HCI Event: Command Status (0x0f) plen 4
-    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
-> HCI Event: Max Slots Change (0x1b) plen 3
-    handle 42 slots 5
-> HCI Event: Command Status (0x0f) plen 4
-    Unknown (0x00|0x0000) status 0x00 ncmd 1
-< HCI Command: Write Link Policy Settings (0x02|0x000d) plen 4
-    handle 42 policy 0x0f
-    Link policy: RSWITCH HOLD SNIFF PARK
-> HCI Event: Command Complete (0x0e) plen 6
-    Write Link Policy Settings (0x02|0x000d) ncmd 1
-    status 0x00 handle 42
-< HCI Command: Remote Name Request (0x01|0x0019) plen 10
-    bdaddr 00:02:72:B0:00:26 mode 2 clkoffset 0x0000
-> HCI Event: Read Remote Supported Features (0x0b) plen 11
-    status 0x00 handle 42
-    Features: 0xff 0xff 0x05 0x38 0x18 0x18 0x00 0x00
-> HCI Event: Command Status (0x0f) plen 4
-    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-< HCI Command: Authentication Requested (0x01|0x0011) plen 2
-    handle 42
-> HCI Event: Command Status (0x0f) plen 4
-    Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr 00:02:72:B0:00:26
-< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
-    bdaddr 00:02:72:B0:00:26
-> HCI Event: Remote Name Req Complete (0x07) plen 255
-    status 0x00 bdaddr 00:02:72:B0:00:26 name 'Raymond-pc'
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Negative Reply (0x01|0x000c) ncmd 1
-    status 0x00 bdaddr 00:02:72:B0:00:26
-> HCI Event: PIN Code Request (0x16) plen 6
-    bdaddr 00:02:72:B0:00:26
-< HCI Command: PIN Code Request Negative Reply (0x01|0x000e) plen 6
-    bdaddr 00:02:72:B0:00:26
-> HCI Event: Command Complete (0x0e) plen 10
-    PIN Code Request Negative Reply (0x01|0x000e) ncmd 1
-    status 0x00 bdaddr 00:02:72:B0:00:26
-> HCI Event: Auth Complete (0x06) plen 3
-    status 0x06 handle 42
-    Error: PIN or Key Missing
-
-According to the wiki, this is the senario that : no passkey agent available 
-or rejection
-
-But , Since I using security "auto", why it still looking for an agent ?
-
-Raymond
-
-
-
-
-
-
+ However, I think the VNC stuff is a bit more mature. VNC is a
+different implementation of the same 'remote desktop' idea. I've used
+this on my Palm: http://palmvnc2.free.fr/
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
