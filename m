@@ -1,85 +1,164 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <04fa01c8d2f6$65597b50$6701a8c0@freqonedev>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Cc: "Marcel Holtmann" <marcel@holtmann.org>
-References: <038c01c8d152$2d0fc1f0$6701a8c0@freqonedev> <1213801443.19872.6.camel@violet.holtmann.net>
-Subject: Re: [Bluez-devel] Next Release, and Device.DiscoverServices
-Date: Fri, 20 Jun 2008 11:55:05 -0500
+From: Denis KENZIOR <denis.kenzior@trolltech.com>
+To: bluez-devel@lists.sourceforge.net
+Date: Fri, 20 Jun 2008 16:37:41 +1000
 MIME-Version: 1.0
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_1A1WIAlKG/ooqky"
+Message-Id: <200806201637.41547.denis.kenzior@trolltech.com>
+Subject: [Bluez-devel] [PATCH] [resubmit] Don't throw out pending data on
+	rfcomm tty
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
+
+--Boundary-00=_1A1WIAlKG/ooqky
 Content-Type: text/plain;
-	charset="iso-8859-1"
-List-ID: <bluez-devel.lists.sourceforge.net>
+  charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Marcel,
+=A0Fix the problem of disappearing packets when the socket is meant to be
+=A0 =A0 used as an rfcomm tty server. =A0The data needs to be queued since
+=A0 =A0 packets might arrive after the socket has been connected, but
+=A0 =A0 before the tty has been opened
 
-Thanks for the feedback.  Upgrading to 3.33 resolved the immediate problem with accessing UUIDs, and I do get the correct UUID from 
-the remote (hurray!).
+Signed-off-by: Denis Kenzior <denis.kenzior@trolltech.com>
 
-FWIW, with SSP I intend to use only the "Just Works" model at this point, keeping the handshake as simple as possible (not a highly 
-secure application).  So, the capability parameter will be "NoInputOutput", if I am reading the code correctly (adapter.c). 
-Hopefully, that will "JustWork", and I can proceed with the effort I originally undertook.  At any rate, I will be watching CVS 
-closely...
+--Boundary-00=_1A1WIAlKG/ooqky
+Content-Type: text/x-diff; charset="us-ascii";
+	name="rfcomm-tty-keep-pending-data.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="rfcomm-tty-keep-pending-data.patch"
 
-All the best, and good luck with that server.  It always seems that just when you think you can trust a system's to be reliable, 
-that's when the hard drive crashes...
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index 8fcca08..9b5825f 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -77,6 +77,8 @@ struct rfcomm_dev {
+ 	struct device		*tty_dev;
+ 
+ 	atomic_t 		wmem_alloc;
++
++	struct sk_buff_head	pending;
+ };
+ 
+ static LIST_HEAD(rfcomm_dev_list);
+@@ -263,8 +265,25 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+ 
+ 	init_waitqueue_head(&dev->wait);
+ 	tasklet_init(&dev->wakeup_task, rfcomm_tty_wakeup, (unsigned long) dev);
++	skb_queue_head_init(&dev->pending);
+ 
+ 	rfcomm_dlc_lock(dlc);
++
++	if (req->flags & (1 << RFCOMM_REUSE_DLC)) {
++		struct sk_buff *skb;
++		struct sock *sk = dlc->owner;
++
++		BUG_ON(!sk);
++
++		rfcomm_dlc_throttle(dlc);
++
++		while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
++			skb_orphan(skb);
++			atomic_sub(skb->len, &sk->sk_rmem_alloc);
++			skb_queue_tail(&dev->pending, skb);
++		}
++	}
++
+ 	dlc->data_ready   = rfcomm_dev_data_ready;
+ 	dlc->state_change = rfcomm_dev_state_change;
+ 	dlc->modem_status = rfcomm_dev_modem_status;
+@@ -542,11 +561,16 @@ static void rfcomm_dev_data_ready(struct rfcomm_dlc *dlc, struct sk_buff *skb)
+ 	struct rfcomm_dev *dev = dlc->owner;
+ 	struct tty_struct *tty;
+ 
+-	if (!dev || !(tty = dev->tty)) {
++	if (!dev) {
+ 		kfree_skb(skb);
+ 		return;
+ 	}
+ 
++	if (!(tty = dev->tty) || !skb_queue_empty(&dev->pending)) {
++		skb_queue_tail(&dev->pending, skb);
++		return;
++	}
++
+ 	BT_DBG("dlc %p tty %p len %d", dlc, tty, skb->len);
+ 
+ 	tty_insert_flip_string(tty, skb->data, skb->len);
+@@ -630,6 +654,30 @@ static void rfcomm_tty_wakeup(unsigned long arg)
+ #endif
+ }
+ 
++static void rfcomm_tty_copy_pending(struct rfcomm_dev *dev)
++{
++	struct tty_struct *tty = dev->tty;
++	struct sk_buff *skb;
++	int inserted = 0;
++
++	if (!tty)
++		return;
++
++	BT_DBG("dev %p tty %p", dev, tty);
++
++	rfcomm_dlc_lock(dev->dlc);
++
++	while ((skb = skb_dequeue(&dev->pending))) {
++		inserted += tty_insert_flip_string(tty, skb->data, skb->len);
++		kfree_skb(skb);
++	}
++
++	rfcomm_dlc_unlock(dev->dlc);
++
++	if (inserted)
++		tty_flip_buffer_push(tty);
++}
++
+ static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
+ {
+ 	DECLARE_WAITQUEUE(wait, current);
+@@ -694,6 +742,10 @@ static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
+ 	if (err == 0)
+ 		device_move(dev->tty_dev, rfcomm_get_device(dev));
+ 
++	rfcomm_tty_copy_pending(dev);
++
++	rfcomm_dlc_unthrottle(dev->dlc);
++
+ 	return err;
+ }
+ 
 
-DS
------ Original Message ----- 
-From: "Marcel Holtmann" <marcel@holtmann.org>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Sent: Wednesday, June 18, 2008 10:04 AM
-Subject: Re: [Bluez-devel] Next Release, and Device.DiscoverServices
+--Boundary-00=_1A1WIAlKG/ooqky
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
+-------------------------------------------------------------------------
+Check out the new SourceForge.net Marketplace.
+It's the best place to buy or sell services for
+just about anything Open Source.
+http://sourceforge.net/services/buy/index.php
+--Boundary-00=_1A1WIAlKG/ooqky
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Hi David,
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
-> I have been working with Adapter.CreateDevice, and have been
-> frustrated by finding that the list of UUIDs returned by
-> Device.GetProperties is always empty.  (Getting the connectivity right
-> is a necessary precursor to implementation of AVRCP with Metadata.)
-
-the CreateDevice needs some more magic in case the remote device has no
-public browse group.
-
-Currently we have in device.c the following struct:
-
-static uint16_t uuid_list[] = {
-        PUBLIC_BROWSE_GROUP,
-        HID_SVCLASS_ID,
-        GENERIC_AUDIO_SVCLASS_ID,
-        ADVANCED_AUDIO_SVCLASS_ID,
-        AV_REMOTE_SVCLASS_ID,
-        0
-};
-
-So in case the public browse group fails, it will go through the list of
-additional UUIDs and search for them. So your AVRCP case should be
-handled.
-
-> Looking at the CVS, I see all have been quite busy, including adding a
-> new DiscoverServices method, which I presume will do the querying of
-> the remote SDP and filling in the list of UUIDs.  Am I correct?
-
-So DiscoverServices will update the UUID list of course, but normally
-there should be no need to call it. CreateDevice needs to be fixed to do
-the right job.
-
-The DiscoverServices is mainly for applications that need access to the
-full service record. Stuff like obex-data-server for example.
-
-> I also see a lot of work around BT2.1 and SSP.
-
-Yep. We are almost done with. However you will need kernel changes to
-make this work.
-
-> Given all of that, I am about to pull everything down from CVS, but am
-> wondering if you are about to do another release (don't want to waste
-> any effort if things are stabilizing enough to release again in a few
-> days).
-
-I wanna do the release actually today.
-
-Regards
-
-Marcel
+--Boundary-00=_1A1WIAlKG/ooqky--
