@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <01ac01c8d2a1$3afebdc0$6e01a8c0@Raymondpc>
-From: "colorant" <colorant@163.com>
+Message-ID: <b5c34db00806192054x3d7e24fck19d4581767f7a811@mail.gmail.com>
+Date: Fri, 20 Jun 2008 09:24:46 +0530
+From: umeshyv <umeshyv@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-References: <a481fbf0806190642u6732d93ew7aec2f17d05dc4d8@mail.gmail.com>
-	<016a01c8d27c$2c0a4f70$6e01a8c0@Raymondpc>
-Date: Fri, 20 Jun 2008 14:45:29 +0800
+In-Reply-To: <a481fbf0806190642u6732d93ew7aec2f17d05dc4d8@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] How to using security "Auto" in pairing ,
-	I tried but not working ?
+References: <a481fbf0806190642u6732d93ew7aec2f17d05dc4d8@mail.gmail.com>
+Subject: Re: [Bluez-users] Remote desktop via Bluez
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,64 +16,61 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1170222527=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi
+--===============1170222527==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_8657_27194148.1213934086917"
 
-I found in some way , it works, as below:
+------=_Part_8657_27194148.1213934086917
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> Hi
->
->    I do not have passkey-agent running , so I try to use auto for security
-> and hope it can send back the passkey auto.
->
-> My setting in hcid.conf is as below :
->
-> options {
->        # Automatically initialize new devices
->        autoinit yes;
->        security auto;
->        pairing multi;
->        offmode devdown;
->        # Default PIN code for incoming connections
->        passkey "1234";
-> }
->
-> But this don't work :
+Hi Mr.Raymond,
 
-I found the behavior is :
+I have sony erricisson k750i mobile and bluetooth enabled on my mobile and
+laptop's bluetooth and from my mobile i used remote desktop application
+(under entertainment this demo is available in youtube.com) and the same
+thing i want to use on suse linux with usb bluetooth dongle.As you suggested
+RDP and VNC will these both support  suse linux 10.1 .How do I proceed.
 
-If I initiate a bonding through dbus, this won't working.
-But if the bonding request is initiate from remote, this auto security 
-setting can work , and will send the passkey as in the conf file.
+--
+Umesh
 
-If I using security user, and use passkey-agent --default <pin> as the 
-agent.
-Then , no matter the bonding is initiate from which side , it will always 
-working.
+------=_Part_8657_27194148.1213934086917
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Is the auto procedure designed to doing so  ?
+Hi Mr.Raymond,<br><br>I have sony erricisson k750i mobile and bluetooth enabled on my mobile and laptop&#39;s bluetooth and from my mobile i used remote desktop application (under entertainment this demo is available in <a href="http://youtube.com">youtube.com</a>) and the same thing i want to use on suse linux with usb bluetooth dongle.As you suggested RDP and VNC will these both support&nbsp; suse linux 10.1 .How do I proceed.<br>
+<br>--<br>Umesh<br>
 
-Thanks.
-
-Raymond
+------=_Part_8657_27194148.1213934086917--
 
 
-
-
-
-
-
-
+--===============1170222527==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
+--===============1170222527==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1170222527==--
