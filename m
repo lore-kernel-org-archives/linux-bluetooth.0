@@ -1,15 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Andrew Kohlsmith (lists)" <aklists@mixdown.ca>
-To: bluez-devel@lists.sourceforge.net
-Date: Sun, 22 Jun 2008 17:24:02 -0400
-References: <485C7396.8090208@gmail.com> <1214024240.25820.66.camel@violet>
-	<485DB200.7000509@gmail.com>
-In-Reply-To: <485DB200.7000509@gmail.com>
-MIME-Version: 1.0
-Message-Id: <200806221724.03009.aklists@mixdown.ca>
-Subject: Re: [Bluez-devel] RSSI value in floating point
-Reply-To: akohlsmith-lists@mixdown.ca,
-	BlueZ development <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Stockwell <dstockwell@frequency-one.com>
+In-Reply-To: <04fa01c8d2f6$65597b50$6701a8c0@freqonedev>
+References: <038c01c8d152$2d0fc1f0$6701a8c0@freqonedev>
+	<1213801443.19872.6.camel@violet.holtmann.net>
+	<04fa01c8d2f6$65597b50$6701a8c0@freqonedev>
+Date: Fri, 20 Jun 2008 19:07:57 +0200
+Message-Id: <1213981677.25820.57.camel@violet>
+Mime-Version: 1.0
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Next Release, and Device.DiscoverServices
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -22,14 +23,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On June 21, 2008 09:59:28 pm Khairulmizam Samsudin wrote:
->  1. Thanks. That saved me a lot of time
->  2. Assuming that I purchase a development kit. Would it be possible to
-> modify bluetooth stack to achieve the objective?
+Hi David,
 
-Why?  Is it so difficult to say floatrssi = (float)intrssi/(float)INT_MAX?
+> Thanks for the feedback.  Upgrading to 3.33 resolved the immediate problem with accessing UUIDs, and I do get the correct UUID from 
+> the remote (hurray!).
+> 
+> FWIW, with SSP I intend to use only the "Just Works" model at this point, keeping the handshake as simple as possible (not a highly 
+> secure application).  So, the capability parameter will be "NoInputOutput", if I am reading the code correctly (adapter.c). 
+> Hopefully, that will "JustWork", and I can proceed with the effort I originally undertook.  At any rate, I will be watching CVS 
+> closely...
 
--A.
+you will need some kernel patches to make SSP work. I am going to
+publish them soon. Just finished the last testing of unlikely error and
+corner cases.
+
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
