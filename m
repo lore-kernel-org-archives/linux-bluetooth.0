@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Denis KENZIOR <denis.kenzior@trolltech.com>
 To: bluez-devel@lists.sourceforge.net
-Date: Fri, 20 Jun 2008 15:04:07 +1000
+Date: Fri, 20 Jun 2008 14:09:13 +1000
 MIME-Version: 1.0
 Content-Type: Multipart/Mixed;
-  boundary="Boundary-00=_HpzWIOM/BKew0l+"
-Message-Id: <200806201504.07195.denis.kenzior@trolltech.com>
-Subject: [Bluez-devel] [PATCH] Fixes for RFCOMM #2
+  boundary="Boundary-00=_p1yWIyi4kOW0ifA"
+Message-Id: <200806201409.13306.denis.kenzior@trolltech.com>
+Subject: [Bluez-devel] [PATCH] Fixes for RFCOMM
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,27 +19,32 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---Boundary-00=_HpzWIOM/BKew0l+
+--Boundary-00=_p1yWIyi4kOW0ifA
 Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-rfcomm-keep-tty-data:
-=A0 =A0 Fix the problem of disappearing packets when the socket is meant to=
- be
-=A0 =A0 used as an rfcomm tty server. =A0The data needs to be queued since
-=A0 =A0 packets might arrive after the socket has been connected, but
-=A0 =A0 before the tty has been opened
+Marcel,
 
-Signed-off-by: Denis Kenzior <denis.kenzior@trolltech.com>
+Here's a cleaned up version of the fixes for RFCOMM:
+
+rfcomm-keep-tty-data:
+    Fix the problem of disappearing packets when the socket is meant to be
+    used as an rfcomm tty server.  The data needs to be queued since
+    packets might arrive after the socket has been connected, but
+    before the tty has been opened
+
+rfcomm-tty-no-canonical:
+    Let the tty driver be non-canonical by default.  Fixes some issues
+    with canonical mode not being handled properly in rfcomm_tty_write.
 
 rfcomm-keep-modem-status:
-=A0 =A0 Keep the modem status around in case the tty really needs it.
+    Keep the modem status around in case the tty really needs it.
 
-Signed-off-by: Denis Kenzior <denis.kenzior@trolltech.com>
+-Denis
 
---Boundary-00=_HpzWIOM/BKew0l+
+--Boundary-00=_p1yWIyi4kOW0ifA
 Content-Type: text/x-diff; charset="us-ascii";
 	name="rfcomm-keep-modem-status.patch"
 Content-Transfer-Encoding: 7bit
@@ -47,53 +52,73 @@ Content-Disposition: attachment;
 	filename="rfcomm-keep-modem-status.patch"
 
 diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
-index 98ec7a3..d74094d 100644
+index 98ec7a3..368628f 100644
 --- a/include/net/bluetooth/rfcomm.h
 +++ b/include/net/bluetooth/rfcomm.h
-@@ -180,6 +180,7 @@ struct rfcomm_dlc {
- 	u8            addr;
- 	u8            priority;
- 	u8            v24_sig;
-+	u8            remote_v24_sig;
- 	u8            mscex;
+@@ -193,7 +193,8 @@ struct rfcomm_dlc {
  
- 	u32           link_mode;
+ 	void (*data_ready)(struct rfcomm_dlc *d, struct sk_buff *skb);
+ 	void (*state_change)(struct rfcomm_dlc *d, int err);
+-	void (*modem_status)(struct rfcomm_dlc *d, u8 v24_sig);
++	void (*modem_status)(struct rfcomm_dlc *d);
++	u8            remote_v24_sig;
+ };
+ 
+ /* DLC and session flags */
 diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 0c2c937..2e37bb0 100644
+index e4142ea..6a97f02 100644
 --- a/net/bluetooth/rfcomm/core.c
 +++ b/net/bluetooth/rfcomm/core.c
-@@ -1459,6 +1459,7 @@ static int rfcomm_recv_msc(struct rfcomm_session *s, int cr, struct sk_buff *skb
+@@ -1458,8 +1458,9 @@ static int rfcomm_recv_msc(struct rfcomm_session *s, int cr, struct sk_buff *skb
  			clear_bit(RFCOMM_TX_THROTTLED, &d->flags);
  
  		rfcomm_dlc_lock(d);
 +		d->remote_v24_sig = msc->v24_sig;
  		if (d->modem_status)
- 			d->modem_status(d, msc->v24_sig);
+-			d->modem_status(d, msc->v24_sig);
++			d->modem_status(d);
  		rfcomm_dlc_unlock(d);
+ 
+ 		rfcomm_send_msc(s, 0, dlci, msc->v24_sig);
 diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index 2488027..41041ff 100644
+index db27f3f..68023be 100644
 --- a/net/bluetooth/rfcomm/tty.c
 +++ b/net/bluetooth/rfcomm/tty.c
-@@ -271,6 +271,9 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+@@ -87,7 +87,7 @@ static DEFINE_RWLOCK(rfcomm_dev_lock);
+ 
+ static void rfcomm_dev_data_ready(struct rfcomm_dlc *dlc, struct sk_buff *skb);
+ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err);
+-static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig);
++static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc);
+ 
+ static void rfcomm_tty_wakeup(unsigned long arg);
+ 
+@@ -292,6 +292,9 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
  
  	dlc->owner = dev;
  	dev->dlc   = dlc;
 +
 +	/* Update the modem_status, call under lock */
-+	rfcomm_dev_modem_status(dlc, dlc->remote_v24_sig);
++	rfcomm_dev_modem_status(dlc);
  	rfcomm_dlc_unlock(dlc);
  
  	/* It's safe to call __module_get() here because socket already
-@@ -588,6 +591,7 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
+@@ -619,9 +622,12 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
  	}
  }
  
+-static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig)
 +/* This is called under dlc lock, so we can safely mess with dlc here */
- static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig)
++static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc)
  {
  	struct rfcomm_dev *dev = dlc->owner;
++	u8 v24_sig = dlc->remote_v24_sig;
++
+ 	if (!dev)
+ 		return;
+ 
 
---Boundary-00=_HpzWIOM/BKew0l+
+--Boundary-00=_p1yWIyi4kOW0ifA
 Content-Type: text/x-diff; charset="us-ascii";
 	name="rfcomm-keep-tty-data.patch"
 Content-Transfer-Encoding: 7bit
@@ -101,7 +126,7 @@ Content-Disposition: attachment;
 	filename="rfcomm-keep-tty-data.patch"
 
 diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 2e37bb0..a90fe94 100644
+index 0c2c937..e4142ea 100644
 --- a/net/bluetooth/rfcomm/core.c
 +++ b/net/bluetooth/rfcomm/core.c
 @@ -457,7 +457,6 @@ int rfcomm_dlc_send(struct rfcomm_dlc *d, struct sk_buff *skb)
@@ -112,7 +137,7 @@ index 2e37bb0..a90fe94 100644
  	skb_queue_tail(&d->tx_queue, skb);
  
  	if (!test_bit(RFCOMM_TX_THROTTLED, &d->flags))
-@@ -1675,6 +1674,7 @@ static inline int rfcomm_process_tx(struct rfcomm_dlc *d)
+@@ -1674,6 +1673,7 @@ static inline int rfcomm_process_tx(struct rfcomm_dlc *d)
  		return skb_queue_len(&d->tx_queue);
  
  	while (d->tx_credits && (skb = skb_dequeue(&d->tx_queue))) {
@@ -121,19 +146,20 @@ index 2e37bb0..a90fe94 100644
  		if (err < 0) {
  			skb_queue_head(&d->tx_queue, skb);
 diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index 41041ff..0600c54 100644
+index c919187..f2a2e1c 100644
 --- a/net/bluetooth/rfcomm/tty.c
 +++ b/net/bluetooth/rfcomm/tty.c
-@@ -77,6 +77,8 @@ struct rfcomm_dev {
+@@ -77,6 +77,9 @@ struct rfcomm_dev {
  	struct device		*tty_dev;
  
  	atomic_t 		wmem_alloc;
 +
-+	struct sk_buff_head	pending_queue;
++	struct sk_buff_head	rx_queue;
++	atomic_t		rxq_mem_alloc;
  };
  
  static LIST_HEAD(rfcomm_dev_list);
-@@ -88,6 +90,8 @@ static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig);
+@@ -88,6 +91,8 @@ static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig);
  
  static void rfcomm_tty_wakeup(unsigned long arg);
  
@@ -142,7 +168,7 @@ index 41041ff..0600c54 100644
  /* ---- Device functions ---- */
  static void rfcomm_dev_destruct(struct rfcomm_dev *dev)
  {
-@@ -207,6 +211,8 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+@@ -207,6 +212,8 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
  	struct rfcomm_dev *dev;
  	struct list_head *head = &rfcomm_dev_list, *p;
  	int err = 0;
@@ -151,27 +177,28 @@ index 41041ff..0600c54 100644
  
  	BT_DBG("id %d channel %d", req->dev_id, req->channel);
  
-@@ -263,8 +269,19 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+@@ -263,8 +270,20 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
  
  	init_waitqueue_head(&dev->wait);
  	tasklet_init(&dev->wakeup_task, rfcomm_tty_wakeup, (unsigned long) dev);
-+	skb_queue_head_init(&dev->pending_queue);
++	skb_queue_head_init(&dev->rx_queue);
++	atomic_set(&dev->rxq_mem_alloc, 0);
  
  	rfcomm_dlc_lock(dlc);
 +
 +	if ((req->flags & (1 << RFCOMM_REUSE_DLC)) && (sk = dlc->owner)) {
-+		rfcomm_dlc_throttle(dlc);
 +		while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
 +			skb_orphan(skb);
 +			atomic_sub(skb->len, &sk->sk_rmem_alloc);
-+			skb_queue_tail(&dev->pending_queue, skb);
++			atomic_add(skb->len, &dev->rxq_mem_alloc);
++			skb_queue_tail(&dev->rx_queue, skb);
 +		}
 +	}
 +
  	dlc->data_ready   = rfcomm_dev_data_ready;
  	dlc->state_change = rfcomm_dev_state_change;
  	dlc->modem_status = rfcomm_dev_modem_status;
-@@ -542,11 +559,16 @@ static void rfcomm_dev_data_ready(struct rfcomm_dlc *dlc, struct sk_buff *skb)
+@@ -539,11 +558,21 @@ static void rfcomm_dev_data_ready(struct rfcomm_dlc *dlc, struct sk_buff *skb)
  	struct rfcomm_dev *dev = dlc->owner;
  	struct tty_struct *tty;
  
@@ -181,15 +208,20 @@ index 41041ff..0600c54 100644
  		return;
  	}
  
-+	if (!(tty = dev->tty) || !skb_queue_empty(&dev->pending_queue)) {
-+		skb_queue_tail(&dev->pending_queue, skb);
++	if (!(tty = dev->tty) || !skb_queue_empty(&dev->rx_queue)) {
++		atomic_add(skb->len, &dev->rxq_mem_alloc);
++		skb_queue_tail(&dev->rx_queue, skb);
++
++		if (atomic_read(&dev->rxq_mem_alloc) >= RFCOMM_MAX_CREDITS * RFCOMM_DEFAULT_MTU * 10)
++			rfcomm_dlc_throttle(dlc);
++
 +		return;
 +	}
 +
  	BT_DBG("dlc %p tty %p len %d", dlc, tty, skb->len);
  
  	tty_insert_flip_string(tty, skb->data, skb->len);
-@@ -631,6 +653,33 @@ static void rfcomm_tty_wakeup(unsigned long arg)
+@@ -627,6 +656,33 @@ static void rfcomm_tty_wakeup(unsigned long arg)
  #endif
  }
  
@@ -207,7 +239,7 @@ index 41041ff..0600c54 100644
 +	rfcomm_dlc_lock(dev->dlc);
 +
 +	inserted = 0;
-+	while ((skb = skb_dequeue(&dev->pending_queue))) {
++	while ((skb = skb_dequeue(&dev->rx_queue))) {
 +		inserted += tty_insert_flip_string(tty, skb->data, skb->len);
 +		kfree_skb(skb);
 +	}
@@ -223,7 +255,7 @@ index 41041ff..0600c54 100644
  static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
  {
  	DECLARE_WAITQUEUE(wait, current);
-@@ -695,6 +744,8 @@ static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
+@@ -691,6 +747,8 @@ static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
  	if (err == 0)
  		device_move(dev->tty_dev, rfcomm_get_device(dev));
  
@@ -233,7 +265,27 @@ index 41041ff..0600c54 100644
  }
  
 
---Boundary-00=_HpzWIOM/BKew0l+
+--Boundary-00=_p1yWIyi4kOW0ifA
+Content-Type: text/x-diff; charset="us-ascii";
+	name="rfcomm-tty-no-canonical-default.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename="rfcomm-tty-no-canonical-default.patch"
+
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index f2a2e1c..e1b7976 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -1181,6 +1181,7 @@ int rfcomm_init_ttys(void)
+ 	rfcomm_tty_driver->flags	= TTY_DRIVER_REAL_RAW | TTY_DRIVER_DYNAMIC_DEV;
+ 	rfcomm_tty_driver->init_termios	= tty_std_termios;
+ 	rfcomm_tty_driver->init_termios.c_cflag	= B9600 | CS8 | CREAD | HUPCL | CLOCAL;
++	rfcomm_tty_driver->init_termios.c_lflag &= ~ICANON;
+ 	tty_set_operations(rfcomm_tty_driver, &rfcomm_ops);
+ 
+ 	if (tty_register_driver(rfcomm_tty_driver)) {
+
+--Boundary-00=_p1yWIyi4kOW0ifA
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -244,7 +296,7 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
---Boundary-00=_HpzWIOM/BKew0l+
+--Boundary-00=_p1yWIyi4kOW0ifA
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -255,4 +307,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---Boundary-00=_HpzWIOM/BKew0l+--
+--Boundary-00=_p1yWIyi4kOW0ifA--
