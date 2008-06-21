@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <485C7396.8090208@gmail.com>
-References: <485C7396.8090208@gmail.com>
-Date: Sat, 21 Jun 2008 06:57:20 +0200
-Message-Id: <1214024240.25820.66.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] RSSI value in floating point
+Message-ID: <485C7396.8090208@gmail.com>
+Date: Sat, 21 Jun 2008 11:20:54 +0800
+From: Khairulmizam Samsudin <xource@gmail.com>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] RSSI value in floating point
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,17 +20,12 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
 
-> I have inspect bluez-libs codes and seems that some modification can 
-> make it happen. However, would the devices it self return RSSI in 
-> floating point?
+I have inspect bluez-libs codes and seems that some modification can 
+make it happen. However, would the devices it self return RSSI in 
+floating point?
 
-simple answer is no. The RSSI is a signed integer.
-
-Regards
-
-Marcel
-
-
+regards
+xource
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
