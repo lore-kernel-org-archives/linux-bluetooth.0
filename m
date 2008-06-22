@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <141182A5-019F-43A8-B772-AA194053CF83@gmail.com>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <alpine.LNX.1.00.0806021644270.9709@nge2.ngu.pk>
-Mime-Version: 1.0 (Apple Message framework v924)
-Date: Sun, 22 Jun 2008 23:58:56 +0300
-References: <alpine.LNX.1.00.0806021644270.9709@nge2.ngu.pk>
-Subject: Re: [Bluez-users] bluez-3.22: hcid segfault
+In-Reply-To: <3e9cdced0806210213i412a870dnfdde87de30e3ea63@mail.gmail.com>
+References: <3e9cdced0806210213i412a870dnfdde87de30e3ea63@mail.gmail.com>
+Date: Sun, 22 Jun 2008 03:44:13 +0200
+Message-Id: <1214099053.7046.1.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] problemes using passkeyagent d-bus interface
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,22 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Hi Fritz,
 
-On Jun 3, 2008, at 0:56, jayjwa wrote:
-> I researched the hcid segfault further. It seems to be in  
-> libaudio.so. These binaries were compiled with no optimization,  
-> debug symbols, and --enable-debug switch. Most of my libs have their  
-> symbols as well.
->
-> hcid[10625]: segfault at 10 ip b7c65586 sp bfe39700 error 6 in  
-> libaudio.so[b7c5b000+1e000]
+>  did everything to implement a passkey-agent. ( using bluez 3.31)
+> The problem is, althouth I've implemented everything the same way, and
+> it definitely should be right, only the method "Reqest" gets
+> called, but the other ones, Keypress. Cancel, Confirm, Complete not?
+> Using dbus-monitor I can only see Signals but no method-calls, so I
+> dont know if the method calls get executed.
 
-I took a look at the code that the backtrace refers to and it has been  
-changed a little bit since 3.32. Could you try with 3.33 or even  
-better with CVS HEAD and see if the problem still exists?
+the other ones are for Simple Pairing support and where never
+implemented properly. Starting with bluez-utils-3.33 we do have Simple
+Pairing support, but we it will we only supported on the the 4.x D-Bus
+API with the new interfaces. You can call hcid -x to switch it on and
+all documentation is inside the doc/ directory.
 
-Johan
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
