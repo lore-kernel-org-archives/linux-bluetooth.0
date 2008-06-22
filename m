@@ -1,15 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: akohlsmith-lists@mixdown.ca,
-	BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <200806221724.03009.aklists@mixdown.ca>
+From: "Andrew Kohlsmith (lists)" <aklists@mixdown.ca>
+To: bluez-devel@lists.sourceforge.net
+Date: Sun, 22 Jun 2008 17:24:02 -0400
 References: <485C7396.8090208@gmail.com> <1214024240.25820.66.camel@violet>
-	<485DB200.7000509@gmail.com>  <200806221724.03009.aklists@mixdown.ca>
-Date: Mon, 23 Jun 2008 00:07:38 +0200
-Message-Id: <1214172458.7046.15.camel@violet>
-Mime-Version: 1.0
+	<485DB200.7000509@gmail.com>
+In-Reply-To: <485DB200.7000509@gmail.com>
+MIME-Version: 1.0
+Message-Id: <200806221724.03009.aklists@mixdown.ca>
 Subject: Re: [Bluez-devel] RSSI value in floating point
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Reply-To: akohlsmith-lists@mixdown.ca,
+	BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -22,25 +22,14 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Andrew,
+On June 21, 2008 09:59:28 pm Khairulmizam Samsudin wrote:
+>  1. Thanks. That saved me a lot of time
+>  2. Assuming that I purchase a development kit. Would it be possible to
+> modify bluetooth stack to achieve the objective?
 
-> >  1. Thanks. That saved me a lot of time
-> >  2. Assuming that I purchase a development kit. Would it be possible to
-> > modify bluetooth stack to achieve the objective?
-> 
-> Why?  Is it so difficult to say floatrssi = (float)intrssi/(float)INT_MAX?
+Why?  Is it so difficult to say floatrssi = (float)intrssi/(float)INT_MAX?
 
-so and that gives you anything because? The hardware returns a signed
-integer and converting that into float is useless.
-
-Also the RSSI value retrieved from an already established connection is
-different than the one you get during inquiry.
-
-Regards
-
-Marcel
-
-
+-A.
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
