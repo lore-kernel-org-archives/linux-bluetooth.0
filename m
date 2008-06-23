@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52cf60ee0806230639r6e620b2en4b2a2cc5f060d52f@mail.gmail.com>
-Date: Mon, 23 Jun 2008 09:39:21 -0400
-From: "Jui-Hao Chiang" <windtracekimo@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-devel] Multiple SCO connections
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <ef9938ec0806121252p17878962x186ef28e81b1a86c@mail.gmail.com>
+References: <ef9938ec0806121252p17878962x186ef28e81b1a86c@mail.gmail.com>
+Date: Mon, 23 Jun 2008 03:12:24 +0200
+Message-Id: <1214183544.7046.32.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] sdpd doesn't always collect
+	non-persistent	service records
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,29 +21,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Dear All:
-I am currently trying to extend a bluetooth channel driver
-(chan_mobile) for Asterisk (a VoIP PBX).
-Now I have a few questions about SCO in bluez stack.
-(1) Does latest Bluez support multiple SCO from one USB dongle to
-multiple cell phones (Hands-Free Profile)?
-According to this discussion thread
-http://thread.gmane.org/gmane.linux.bluez.devel/12893/focus=12903, the
-hci_usb.c is not patched to fully support multiple SCO links for a
-single USB dongle. (But the weird thing is the original poster gets
-things to work by only removing wrong usage in socket setting).
+Hi Albert,
 
-(2) Is there any simple way to test the simultaneous SCO connections
-from one dongle to two cell phones? By using socket, I know we can
-send data and receive from the remote side. But as for interacting
-with cell phone's Hand's Free Profile, is there any simple way? such
-as pressing the button on the phone?
+> When using the libbluetooth SDP API, records registered that do not
+> have SDP_RECORD_PERSIST are not always collected by sdpd when the sdp
+> session is closed.  I think the attached patch should help.
 
-(3) Is there any way to check the packet type of baseband controller
-of the USB bluetooth dongle (HV2 or HV3..)? since the hci_dump or
-hcitool can only retrieve or dump the hci message.
+thanks for the patch. I had to simplify it a little bit, but I finally
+got around in committing it.
 
-Thanks.
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
