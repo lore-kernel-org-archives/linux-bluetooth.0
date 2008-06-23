@@ -1,14 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <ef9938ec0806121252p17878962x186ef28e81b1a86c@mail.gmail.com>
-References: <ef9938ec0806121252p17878962x186ef28e81b1a86c@mail.gmail.com>
-Date: Mon, 23 Jun 2008 03:12:24 +0200
-Message-Id: <1214183544.7046.32.camel@violet>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] sdpd doesn't always collect
-	non-persistent	service records
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+From: "Andrew Kohlsmith (lists)" <aklists@mixdown.ca>
+To: bluez-devel@lists.sourceforge.net
+Date: Sun, 22 Jun 2008 21:02:49 -0400
+References: <485C7396.8090208@gmail.com>
+	<200806221724.03009.aklists@mixdown.ca>
+	<1214172458.7046.15.camel@violet>
+In-Reply-To: <1214172458.7046.15.camel@violet>
+MIME-Version: 1.0
+Message-Id: <200806222102.49872.aklists@mixdown.ca>
+Subject: Re: [Bluez-devel] RSSI value in floating point
+Reply-To: akohlsmith-lists@mixdown.ca,
+	BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,20 +23,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Albert,
+On June 22, 2008 06:07:38 pm Marcel Holtmann wrote:
+> so and that gives you anything because? The hardware returns a signed
+> integer and converting that into float is useless.
 
-> When using the libbluetooth SDP API, records registered that do not
-> have SDP_RECORD_PERSIST are not always collected by sdpd when the sdp
-> session is closed.  I think the attached patch should help.
+I did not say it would be any more useful; I merely asked him why he can't 
+convert it to float on his own instead of demanding the stack do it.
 
-thanks for the patch. I had to simplify it a little bit, but I finally
-got around in committing it.
+> Also the RSSI value retrieved from an already established connection is
+> different than the one you get during inquiry.
 
-Regards
+Interesting; is the RF PA AGC set differently during inquiry?
 
-Marcel
-
-
+-A.
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
