@@ -1,16 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Andrew Kohlsmith (lists)" <aklists@mixdown.ca>
+Message-ID: <52cf60ee0806221746s4d1876ednd394f4ad9ff69171@mail.gmail.com>
+Date: Sun, 22 Jun 2008 20:46:37 -0400
+From: "Jui-Hao Chiang" <windtracekimo@gmail.com>
 To: bluez-devel@lists.sourceforge.net
-Date: Sun, 22 Jun 2008 21:02:49 -0400
-References: <485C7396.8090208@gmail.com>
-	<200806221724.03009.aklists@mixdown.ca>
-	<1214172458.7046.15.camel@violet>
-In-Reply-To: <1214172458.7046.15.camel@violet>
 MIME-Version: 1.0
-Message-Id: <200806222102.49872.aklists@mixdown.ca>
-Subject: Re: [Bluez-devel] RSSI value in floating point
-Reply-To: akohlsmith-lists@mixdown.ca,
-	BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] Multiple SCO connections
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,30 +14,90 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1610666165=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On June 22, 2008 06:07:38 pm Marcel Holtmann wrote:
-> so and that gives you anything because? The hardware returns a signed
-> integer and converting that into float is useless.
+--===============1610666165==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_22544_19672943.1214181997719"
 
-I did not say it would be any more useful; I merely asked him why he can't 
-convert it to float on his own instead of demanding the stack do it.
+------=_Part_22544_19672943.1214181997719
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> Also the RSSI value retrieved from an already established connection is
-> different than the one you get during inquiry.
+Dear All:
+I am currently trying to extend a bluetooth channel driver (chan_mobile) for
+Asterisk (a VoIP PBX).
+Now I have a few questions about SCO in bluez stack.
+(1) Does latest Bluez support multiple SCO from one USB dongle to multiple
+cell phones (Hands-Free Profile)?
+According to this discussion thread
+http://thread.gmane.org/gmane.linux.bluez.devel/12893/focus=12903, the
+hci_usb.c is not patched to fully support multiple SCO links for a single
+USB dongle. (But the weird thing is the original poster gets things to work
+by only removing wrong usage in socket setting).
 
-Interesting; is the RF PA AGC set differently during inquiry?
+(2) Is there any simple way to test the simultaneous SCO connections from
+one dongle to two cell phones? By using socket, I know we can send data and
+receive from the remote side. But as for interacting with cell phone's
+Hand's Free Profile, is there any simple way? such as pressing the button on
+the phone?
 
--A.
+(3) Is there any way to check the packet type of baseband controller of the
+USB bluetooth dongle (HV2 or HV3..)? since the hci_dump or hcitool can only
+retrieve or dump the hci message.
+
+Thanks.
+
+------=_Part_22544_19672943.1214181997719
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Dear All:
+<br>I am currently trying to extend a bluetooth channel driver (chan_mobile) 
+for Asterisk (a VoIP PBX).
+<br>Now I have a few questions about SCO in bluez stack.
+<br>(1) Does latest Bluez support multiple SCO from one USB dongle to 
+multiple cell phones (Hands-Free Profile)?
+<br>According to this discussion thread 
+<a class="moz-txt-link-freetext" href="http://thread.gmane.org/gmane.linux.bluez.devel/12893/focus=12903">http://thread.gmane.org/gmane.linux.bluez.devel/12893/focus=12903</a>, the 
+hci_usb.c is not patched to fully support multiple SCO links for a 
+single USB dongle. (But the weird thing is the original poster gets 
+things to work by only removing wrong usage in socket setting).
+<br>
+<br>(2) Is there any simple way to test the simultaneous SCO connections 
+from one dongle to two cell phones? By using socket, I know we can send 
+data and receive from the remote side. But as for interacting with cell 
+phone&#39;s Hand&#39;s Free Profile, is there any simple way? such as pressing 
+the button on the phone?<br>
+<br>(3) Is there any way to check the packet type of baseband controller of the USB bluetooth dongle (HV2 or HV3..)? since the hci_dump or hcitool can only retrieve or dump the hci message.<br><br>Thanks.
+
+------=_Part_22544_19672943.1214181997719--
+
+
+--===============1610666165==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
+--===============1610666165==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1610666165==--
