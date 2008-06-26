@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-From: Jui-Hao Chiang <windtracekimo@gmail.com>
-Date: Thu, 26 Jun 2008 22:42:47 +0000 (UTC)
-Message-ID: <loom.20080626T223113-455@post.gmane.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <52cf60ee0806261127r15b88ccod1bdba8d42ed4e59@mail.gmail.com>
 References: <52cf60ee0806261127r15b88ccod1bdba8d42ed4e59@mail.gmail.com>
-	<1214514474.23682.42.camel@violet>
+Date: Thu, 26 Jun 2008 23:07:54 +0200
+Message-Id: <1214514474.23682.42.camel@violet>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Meaning of hcitool -i dev con
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -20,38 +20,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann <marcel <at> holtmann.org> writes:
+Hi,
 
-> > 	> SCO 00:19:2C:D5:90:DF handle 2 state 1 lm SLAVE
-> > 	< ACL 00:19:2C:D5:90:DF handle 1 state 1 lm MASTER ENCRYPT
-> > 
-> > Does this mean that the USB adapter is playing TWO roles (master and
-> > slave) at the same moment??
+> I am currently using Cyber-Blue Bluetooth USB adapter and Motorola
+> Razr V3 for experiments.
+> My goal is to use one adapter to open 3 SCO connections with 3 V3 cell phones.
+> The chan_mobile in Asterisk gives me the way to connect the adapter to
+> one phone. But when I use hcitool -i hci1 con to show the connections,
+> I don't know how to explain the output (00:19:2C:D5:90:DF is cell
+> phone's address):
 > 
-> that is for the SCO connection. The ACL connection is the one that
-> counts. The SCO depends on the ACL connection.
+> Connections:
+> 	> SCO 00:19:2C:D5:90:DF handle 2 state 1 lm SLAVE
+> 	< ACL 00:19:2C:D5:90:DF handle 1 state 1 lm MASTER ENCRYPT
 > 
-> Actually the the SCO/eSCO connections don't have a link mode. It is an
-> issue how these information are presented.
-> 
-> Regards
-> 
-> Marcel
-> 
-Thank you for the explanation.
-This explains the output from hci command and hcidump.
-Your words also reminds me that standard has said "before creating SCO, a ACL
-link must exist".
-But I am still confused about the handle.
-If ACL first use handle 0, does that mean the upcoming SCO will use handle 0? 
-Or another one?
+> Does this mean that the USB adapter is playing TWO roles (master and
+> slave) at the same moment??
 
-If you have some time, please also try to look at my previous post "Multiple SCO
-connections".
+that is for the SCO connection. The ACL connection is the one that
+counts. The SCO depends on the ACL connection.
 
-Sincerely,
-Jui-Hao
+Actually the the SCO/eSCO connections don't have a link mode. It is an
+issue how these information are presented.
 
+Regards
+
+Marcel
 
 
 
