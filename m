@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <782ce16c0806261638y7b882ac9o74d56229ebd72d95@mail.gmail.com>
-Date: Thu, 26 Jun 2008 20:38:33 -0300
-From: "=?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?=" <joao.vita@gmail.com>
-To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-In-Reply-To: <2d5a2c100806261048p3d7b4c1bh412b222ca59b49e5@mail.gmail.com>
-MIME-Version: 1.0
-References: <2d5a2c100806261048p3d7b4c1bh412b222ca59b49e5@mail.gmail.com>
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Google Summer of Code
+To: bluez-devel@lists.sourceforge.net
+From: Jui-Hao Chiang <windtracekimo@gmail.com>
+Date: Thu, 26 Jun 2008 22:42:47 +0000 (UTC)
+Message-ID: <loom.20080626T223113-455@post.gmane.org>
+References: <52cf60ee0806261127r15b88ccod1bdba8d42ed4e59@mail.gmail.com>
+	<1214514474.23682.42.camel@violet>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Meaning of hcitool -i dev con
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,30 +16,51 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGVsbG8gTHVpeiwKCkknbSBpbiBhIGJpZyBodXJyeSB0aGlzIHdlZWssIGJlY2F1c2Ugb2YgZmlu
-YWwgZXhhbXMgYW5kIHJlcG9ydHMuIEknbGwKYmUgYWJsZSB0byB3cml0ZSBhIHJlcG9ydCBvbiB0
-aGUgd2lraSB0aGlzIHdlZWtlbmQuCgpPbiBUaHUsIEp1biAyNiwgMjAwOCBhdCAyOjQ4IFBNLCBM
-dWl6IEF1Z3VzdG8gdm9uIERlbnR6CjxsdWl6LmRlbnR6QGdtYWlsLmNvbT4gd3JvdGU6Cj4gSGks
-Cj4KPiBUaGUgbWlkLXRlcm0gZXZhbHVhdGlvbiBpcyBhYm91dCB0byBiZWdpbiAoanVseSA3IC0g
-MTQpLCBzbyBtZW50b3JzIGJlCj4gcHJlcGFyZWQgdG8gZXZhbHVhdGUgeW91ciBzdHVkZW50LiBJ
-J3ZlIGNyZWF0ZWQgb25lIHBhZ2UgZm9yIGVhY2gKPiBwcm9qZWN0IG9uIG91ciB3aWtpICh3aWtp
-LmJsdWV6Lm9yZykgd2hlcmUgYW55IHJlbGV2YW50IGluZm9ybWF0aW9uCj4gY2FuIGJlIG1haW50
-YWluZWQgYnkgZWl0aGVyIHRoZSBzdHVkZW50IG9yIHRoZSBtZW50b3IuCj4gTWFyY2VsIGFza2Vk
-IGluIHRoZSBsYXN0IG1lZXRpbmcgaW4gSGVsc2lua2kgdG8gYXNrIHRvIHN0dWRlbnQgdG8KPiB3
-cml0ZSByZXBvcnRzIHBlcmlvZGljYWxseSB0byB0aGUgbGlzdCAod2Vla2x5IG9yIGJpLXdlZWts
-eSksIHNvCj4gZXZlcnlib2R5IHN0YXkgdHVubmVkIGFib3V0IHRoZSBwcm9qZWN0cy4gVGhlIHJl
-cG9ydHMgY2FuIGFsc28gYmUKPiB3cml0dGVuIGluIHRoZSB3aWtpIGFzIHNvbWUgc3R1ZGVudHMv
-bWVudG9ycyBhcmUgYWxyZWFkeSBkb2luZy4KPgoKCgotLSAKSm/Do28gUGF1bG8gUmVjaGkgVml0
-YQpNU2MgQ29tcHV0ZXIgU2NpZW5jZSBTdHVkZW50CkNvbXB1dGVyIEVuZ2luZWVyCklDIC8gVW5p
-Y2FtcAoKaXJjLmZyZWVub2RlLm5ldDoganBydml0YQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCkNoZWNrIG91
-dCB0aGUgbmV3IFNvdXJjZUZvcmdlLm5ldCBNYXJrZXRwbGFjZS4KSXQncyB0aGUgYmVzdCBwbGFj
-ZSB0byBidXkgb3Igc2VsbCBzZXJ2aWNlcyBmb3IKanVzdCBhYm91dCBhbnl0aGluZyBPcGVuIFNv
-dXJjZS4KaHR0cDovL3NvdXJjZWZvcmdlLm5ldC9zZXJ2aWNlcy9idXkvaW5kZXgucGhwCl9fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1h
-aWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0
-cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
+Marcel Holtmann <marcel <at> holtmann.org> writes:
+
+> > 	> SCO 00:19:2C:D5:90:DF handle 2 state 1 lm SLAVE
+> > 	< ACL 00:19:2C:D5:90:DF handle 1 state 1 lm MASTER ENCRYPT
+> > 
+> > Does this mean that the USB adapter is playing TWO roles (master and
+> > slave) at the same moment??
+> 
+> that is for the SCO connection. The ACL connection is the one that
+> counts. The SCO depends on the ACL connection.
+> 
+> Actually the the SCO/eSCO connections don't have a link mode. It is an
+> issue how these information are presented.
+> 
+> Regards
+> 
+> Marcel
+> 
+Thank you for the explanation.
+This explains the output from hci command and hcidump.
+Your words also reminds me that standard has said "before creating SCO, a ACL
+link must exist".
+But I am still confused about the handle.
+If ACL first use handle 0, does that mean the upcoming SCO will use handle 0? 
+Or another one?
+
+If you have some time, please also try to look at my previous post "Multiple SCO
+connections".
+
+Sincerely,
+Jui-Hao
+
+
+
+
+-------------------------------------------------------------------------
+Check out the new SourceForge.net Marketplace.
+It's the best place to buy or sell services for
+just about anything Open Source.
+http://sourceforge.net/services/buy/index.php
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
