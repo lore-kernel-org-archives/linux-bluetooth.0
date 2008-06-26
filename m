@@ -1,10 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <52cf60ee0806261127r15b88ccod1bdba8d42ed4e59@mail.gmail.com>
+To: bluez-devel@lists.sourceforge.net
+From: Jui-Hao Chiang <windtracekimo@gmail.com>
+Date: Thu, 26 Jun 2008 20:56:45 +0000 (UTC)
+Message-ID: <loom.20080626T205559-101@post.gmane.org>
 References: <52cf60ee0806261127r15b88ccod1bdba8d42ed4e59@mail.gmail.com>
-Date: Thu, 26 Jun 2008 23:07:54 +0200
-Message-Id: <1214514474.23682.42.camel@violet>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Meaning of hcitool -i dev con
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -20,8 +19,10 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Jui-Hao Chiang <windtracekimo <at> gmail.com> writes:
 
+> 
+> Hi, dear all:
 > I am currently using Cyber-Blue Bluetooth USB adapter and Motorola
 > Razr V3 for experiments.
 > My goal is to use one adapter to open 3 SCO connections with 3 V3 cell phones.
@@ -36,16 +37,37 @@ Hi,
 > 
 > Does this mean that the USB adapter is playing TWO roles (master and
 > slave) at the same moment??
+> 
+> Hope some one can give some hint.
+> Best regards
+> 
+> -------------------------------------------------------------------------
+> Check out the new SourceForge.net Marketplace.
+> It's the best place to buy or sell services for
+> just about anything Open Source.
+> http://sourceforge.net/services/buy/index.php
+> 
 
-that is for the SCO connection. The ACL connection is the one that
-counts. The SCO depends on the ACL connection.
 
-Actually the the SCO/eSCO connections don't have a link mode. It is an
-issue how these information are presented.
+I just tried to use the following to query the link mode of the adapter
+[command]
+hcitool -i hci1 cmd 0x02 0x0009 0x02 0x00
+[output]
+< HCI Command: ogf 0x02, ocf 0x0009, plen 2
+  02 00 
+> HCI Event: 0x0e plen 7
+  01 09 08 00 02 00 00 
+(If I did not make anything wrong)
+0x02 is the OGF for Link Policy Command
+0x0009 is the OCF for HCI_Role_Discovery
+0x02 0x00 is the unit16 of connection handle
 
-Regards
+At the same time, I use "hcidump -i hci1 -w log" to listen, and then use
+wireshark to view the log.
+The last byte of HCI Event shows the current role is Master for this connection
+handle.
+So it seems confusing that "hcitool -i hci1 con" shows "Slave".
 
-Marcel
 
 
 
