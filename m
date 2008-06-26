@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e378cfb20806260738h70567942r1ae96fb723d12bb9@mail.gmail.com>
-Date: Thu, 26 Jun 2008 20:08:07 +0530
-From: "Nel D" <newatlinux@gmail.com>
+Message-ID: <d89ddf300806260726w7582e5b4lba29322f5ea2b9cd@mail.gmail.com>
+Date: Thu, 26 Jun 2008 08:26:03 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <a1c657a80806252303p2563497fs70b548dbbe4f3388@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] AVRCP failure
+References: <a1c657a80806252303p2563497fs70b548dbbe4f3388@mail.gmail.com>
+Subject: Re: [Bluez-users] Sbc encode optimization
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,24 +20,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
-  Am using the current bluez-{utils/libs} and a 2.6.24-19-generic
-(hardy) kernel.
+Paul
 
-Am trying to stream A2Dp data on my motorola S9 headset. When i run
-hcid, i see the following lines.
+> I see "There are a couple of optimizations the codec could see but it
+> performs reasonably on 200MHz+ devices. " on the wiki.bluez.org site.
+> Would you tell me how to optimise the sbc encode for arm926ejs? Thanks.
 
+The input data is copied a couple of times inside the encoder. It
+would be faster if it was not being copied.
 
-hcid[18926]: link_key_request (sba=00:13:64:11:74:83, dba=00:0A:3D:36:E2:54)
-hcid[18926]: Can't open input device: No such file or directory (2)
-hcid[18926]: AVRCP: failed to init uinput for Motorola S9
+There are places, like the precomputed tables, that could be
+represented in 16 bits. There was no advantage to doing this on the TI
+arm chip but it might be a different result for other chips.
 
-
-I am able to hear music with ease, but i would still like to know what
-causes this warning,, what am i missing (some modules).?
-
-thanks in advance,
- nel !!
+-- 
+Brad
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
