@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <loom.20080626T223113-455@post.gmane.org>
-References: <52cf60ee0806261127r15b88ccod1bdba8d42ed4e59@mail.gmail.com>
-	<1214514474.23682.42.camel@violet>
-	<loom.20080626T223113-455@post.gmane.org>
-Date: Fri, 27 Jun 2008 04:51:38 +0200
-Message-Id: <1214535098.19001.3.camel@violet>
+In-Reply-To: <1214310088.6643.87.camel@peura.elisa-laajakaista.fi>
+References: <1214310088.6643.87.camel@peura.elisa-laajakaista.fi>
+Date: Fri, 27 Jun 2008 01:42:44 +0100
+Message-Id: <1214527364.4435.14.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Meaning of hcitool -i dev con
+Subject: Re: [Bluez-devel] Making library out of bluez-gnome
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,47 +16,56 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-
-> > > 	> SCO 00:19:2C:D5:90:DF handle 2 state 1 lm SLAVE
-> > > 	< ACL 00:19:2C:D5:90:DF handle 1 state 1 lm MASTER ENCRYPT
-> > > 
-> > > Does this mean that the USB adapter is playing TWO roles (master and
-> > > slave) at the same moment??
-> > 
-> > that is for the SCO connection. The ACL connection is the one that
-> > counts. The SCO depends on the ACL connection.
-> > 
-> > Actually the the SCO/eSCO connections don't have a link mode. It is an
-> > issue how these information are presented.
-> >
-> Thank you for the explanation.
-> This explains the output from hci command and hcidump.
-> Your words also reminds me that standard has said "before creating SCO, a ACL
-> link must exist".
-> But I am still confused about the handle.
-> If ACL first use handle 0, does that mean the upcoming SCO will use handle 0? 
-> Or another one?
-
-the handle 0 is invalid first of all. The ACL link gets a handle and the
-SCO link gets its own handle. Like you see it in the example above.
-
-Regards
-
-Marcel
-
-
-
--------------------------------------------------------------------------
-Check out the new SourceForge.net Marketplace.
-It's the best place to buy or sell services for
-just about anything Open Source.
-http://sourceforge.net/services/buy/index.php
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+T24gVHVlLCAyMDA4LTA2LTI0IGF0IDE1OjIxICswMzAwLCBBbnR0aSBLYWlqYW5tw6RraSB3cm90
+ZToKPiBIZWxsbyBsaXN0IQo+IAo+IEknbSBkZXZlbG9waW5nIGEgcHJvamVjdFsxXSB0aGF0IG5l
+ZWRzIHRvIHByb3ZpZGUgdGhlIHVzZXIgYSB3YXkgdG8KPiBzZWxlY3Tvu79bMl0gYSBCbHVldG9v
+dGggZGV2aWNlIGZyb20gYSBsaXN0IG9mIGRpc2NvdmVyZWQgZGV2aWNlcy4KPiAKPiBJIG5vdGlj
+ZWQgdGhhdCBnbm9tZS1ibHVleiBhcHBsZXQgaGFzIGEgdmVyeSBuaWNlIGRldmljZSBzZWxlY3Rv
+ciBhbmQKPiB0aGF0IGdvdCBtZSBicm93c2luZyB0aG91Z2ggdGhlIGNvZGUuIFVuZm9ydHVuYXRl
+bHkgSSBkaXNjb3ZlcmVkIHRoYXQKPiBibHVlei1nbm9tZSBjcmVhdGVzIG9ubHkgYSBzdGF0aWMg
+bGlicmFyeSBsaWJjb21tb24uYSB0aGF0IGNvbnRhaW5zIHRoZQo+IGRldmljZSBzZWxlY3RvciAo
+Y29tbW9uL2JsdWV0b290aC1kZXZpY2Utc2VsZWN0aW9uLmMpIGZvciBwcml2YXRlIHVzZS4KPiAK
+PiBOb3cgdGhlcmUgaXMgdHdvIG9wdGlvbnMgdGhlIHdheSBJIHNlZSBpdC4gRWl0aGVyIEkgaGF2
+ZSBhIHByaXZhdGUgY29weQo+IG9mIGJsdWV6LWdub21lIHBhY2thZ2Ugb3IgYmx1ZXotZ25vbWUg
+aXMgbWFkZSB0byBiZSBhIHNoYXJlZCBsaWJyYXJ5Lgo8c25pcD4KClRoZSB3aG9sZSBwcm9ibGVt
+IGlzIG1ha2luZyBzdXJlIHRoZSBBUEkgaXMgZ29vZCBlbm91Z2ggZm9yIGFwcGxpY2F0aW9ucwp0
+byB1c2UuIEZvciBleGFtcGxlLCBNYXJjZWwgd2FudHMgdG8gYWxsb3cgc2VhcmNoaW5nIG9mIGRl
+dmljZXMgYnkgVVVJRC4KCkFuZCBJJ2QgbGlrZSB0byBmaXggdXAgdGhlIEFQSSB0byBhbGxvdyBh
+ZGRpbmcgZmlsdGVycyB0aGF0IGVuY29tcGFzcwptb3JlIHRoYW4gYSBzaW5nbGUgdHlwZSBvZiBk
+ZXZpY2UgKGVnLiBpbnB1dCBkZXZpY2VzIHdvdWxkIGJlIGtleWJvYXJkcywKbWljZSwgam95c3Rp
+Y2tzLCBhbmQgb3RoZXIgaW5wdXQgZGV2aWNlcykuCgo+IEhlcmUgYXJlIHNvbWUgd2lzaGVzIGZy
+b20gdG9wIG9mIG15IGhlYWQgcmVnYXJkaW5nIHRoZSBkZXZpY2Ugc2VsZWN0b3I6Cj4gIDEuIHJl
+bW92ZSB0aGUgY2FwdGlvbiBvZiB0aGUgbGlzdAo+ICAgICAtIGxldCB0aGUgZGV2ZWxvcGVyIHBy
+b3ZpZGUgYSBjYXB0aW9uIGJlc3Qgc3VpdGVkIGZvcgo+ICAgICAgIGhpcyBhcHBsaWNhdGlvbgoK
+VGhhdCdzIGFscmVhZHkgcG9zc2libGUsIHlvdSBzZXQgaXQgd2hlbiBjYWxsaW5nCmJsdWV0b290
+aF9kZXZpY2Vfc2VsZWN0aW9uX25ldygpLgoKPiAgMi4gcHV0IHRoZSBmaWx0ZXIgaW4gR3RrRXhw
+YW5kZXIKPiAgICAgLSBGaWx0ZXJzIGFyZSBub3QgdXNlZCBmb3IgYnkgdGhlIG1vc3Qgb2YgdGhl
+IHVzZXJzLCB0aHVzIGl0J3MKPiAgICAgICBjb252ZW5pZW50IHRvIGhhdmUgdGhlbSBoaWRkZW4g
+YnkgZGVmYXVsdC4gCgpXaHk/Cgo+ICAzLiBtYWtlIHRoZSBmaWx0ZXIgY29tcGxldGVseSBoaWRk
+ZW4KPiAgICAtIHRoaXMgY29tYmluZWQgd2l0aCB0aGUgMS4gd291bGQgbWFrZSB0aGUgd2lkZ2V0
+IGFwcGVhciBqdXN0Cj4gICAgICBsaWtlIEd0a1RyZWVWaWV3Cj4gICAgLSB0aGlzIGlzIGFscmVh
+ZHkgYWNoaWV2YWJsZSwgYnV0IHRoZXJlIHNlZW1zIHRvIGJlIGEgYnVnLiBJZiBib3RoIG9mCj4g
+ICAgICB0aGUgZmlsdGVyIGZpZWxkcyBhcmUgaGlkZGVuIHRoZSBjYXB0aW9uIGlzIHN0aWxsIHNo
+b3duLgo+ICAgICAgU2VlIGFuIGF0dGFjaGVkIHBhdGNoLgoKSSBkb24ndCBzZWUgd2hhdCB0aGUg
+cHJvYmxlbSBpcyBoZXJlLgoKPiAgNC4gaGF2ZSBhbHRlcm5hdGl2ZSBmaWx0ZXJzIGluIHJpZ2h0
+LWNsaWNrIHBvcC11cCBtZW51Cj4gICAgIC0gdmVyeSBoYW5keSBmb3IgdGlnaHQgcGxhY2VzCgpJ
+J20gbm90IHN1cmUgdGhhdCdzIHVzZWZ1bC4KCj4gIDUuIGFkZCBwcm9wZXJ0eSBmb3Igc2VsZWN0
+ZWQgZGV2aWNlIG5hbWUuIEl0J3MgYWx3YXlzIG5pY2UgdG8gYmUgYWJsZQo+ICAgICB0byBzaG93
+IHRoZSB1c2VyIGEgbmljZSBuYW1lIGluc3RlYWQgb2YgYmx1ZXRvb3RoIGFkZHJlc3MuCj4gICAg
+IC0gc2VlIGFuIGF0dGFjaGVkIHBhdGNoLgoKVGhhdCdzIHVzZWZ1bCwgYXMgaXQgYWxsb3dzIHVz
+IHRvIGF2b2lkIGFub3RoZXIgbG9va3VwLCBhbHRob3VnaCBpdCdzCmNsb3NlIHRvIGZyZWUgYXMg
+aGNpZCB3b3VsZCBoYXZlIGNhY2hlZCBpdC4KCkZZSSwgeW91J3JlIGxlYWtpbmcgYSBjb3B5IG9m
+IHRoZSBuYW1lIHRob3VnaCwgYXMgZ3RrX3RyZWVfbW9kZWxfZ2V0KCkKd2lsbCBtYWtlIGEgY29w
+eSBvZiB0aGUgdmFsdWUsIGFzIHdlbGwgYXMgZ192YWx1ZV9zZXRfc3RyaW5nKCkuIFVzZQpnX3Zh
+bHVlX3Rha2Vfc3RyaW5nKCkuCgoKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KQ2hlY2sgb3V0IHRoZSBuZXcg
+U291cmNlRm9yZ2UubmV0IE1hcmtldHBsYWNlLgpJdCdzIHRoZSBiZXN0IHBsYWNlIHRvIGJ1eSBv
+ciBzZWxsIHNlcnZpY2VzIGZvcgpqdXN0IGFib3V0IGFueXRoaW5nIE9wZW4gU291cmNlLgpodHRw
+Oi8vc291cmNlZm9yZ2UubmV0L3NlcnZpY2VzL2J1eS9pbmRleC5waHAKX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0
+CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZv
+cmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
