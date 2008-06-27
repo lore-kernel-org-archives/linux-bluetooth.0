@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1214595750.6131.32.camel@bongo>
+In-Reply-To: <1214593557.6131.26.camel@bongo>
 References: <1214593557.6131.26.camel@bongo>
-	<024a01c8d88d$5515a790$6701a8c0@freqonedev>
-	<1214595750.6131.32.camel@bongo>
-Date: Sat, 28 Jun 2008 00:24:31 +0200
-Message-Id: <1214605471.11537.2.camel@violet.holtmann.net>
+Date: Sat, 28 Jun 2008 00:23:58 +0200
+Message-Id: <1214605438.11537.0.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Wizard patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -24,15 +22,23 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Michael,
 
-> > Is this version working against the old DBus interface, the new, experimental interface, or does it matter?
+> I have attached a patch against 0.27 (it applies cleanly against CVS) to
+> complete the wizard in the bluez-gnome source tree.
 > 
-> The old DBus interface.  I don't know about the new interface.
+> Here's what my patch does in summary, details below:
+> Wizard dialog shows list of device types we know how to handle (only
+> mouse/keyboard/headset right now).  Then, it tries to connect to the
+> appropriate bluetooth dbus service and trust the device.  Basically the
+> same code steps the Properties -> Services tab does, but more
+> wizardy.  :)
 > 
-> It shouldn't matter much.  The important stuff was UI changes.  The new
-> dbus stuff was added in common/client, so if and when that gets ported
-> to our new interface overlords, my changes will too.
+> I made changes to cleanup the wizard interface (removed a couple of
+> pages that had low signal/noise ratio) and made several of the
+> bluetooth_client capable of giving feedback about the operation via a
+> callback.
 
-it is not that simple, but I will look into that at some point.
+looks nice. However you have to break this up into pieces for. Sent
+small patches and I can quickly review and commit them.
 
 Regards
 
