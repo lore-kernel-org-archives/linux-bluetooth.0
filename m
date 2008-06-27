@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 27 Jun 2008 21:16:16 -0400
-From: jayjwa <jayjwa@atr2.ath.cx>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <141182A5-019F-43A8-B772-AA194053CF83@gmail.com>
-Message-ID: <alpine.LNX.1.10.0806272104530.24625@nge2.ngu.pk>
-References: <alpine.LNX.1.00.0806021644270.9709@nge2.ngu.pk>
-	<141182A5-019F-43A8-B772-AA194053CF83@gmail.com>
-MIME-Version: 1.0
-Subject: Re: [Bluez-users] bluez-3.22: hcid segfault
+In-Reply-To: <BLU141-W22D2691CD07EA18D07469AD9A20@phx.gbl>
+References: <BLU141-W22D2691CD07EA18D07469AD9A20@phx.gbl>
+Date: Sat, 28 Jun 2008 00:27:05 +0200
+Message-Id: <1214605625.11537.7.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] FW: hid2hci for the new iMAC
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,21 +20,50 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi Axel,
 
-On Sun, 22 Jun 2008, Johan Hedberg wrote:
+> I've looked around but it seems there is no one having faced this problem: I have a new 24" iMac (Core 2 Duo) with integrated bluetooth (Broadcom 2045).
+> Starting with Linux (2.6.24, bluez ver. 3.30) I am unable to switch the bluetooth HID device to HCI.
+> 
+> This is my lsusb:
+> 
+> root@uranus:~# lsusb -t
+> Bus#  7
+> `-Dev#   1 Vendor 0x1d6b Product 0x0002
+>   `-Dev#   2 Vendor 0x05ac Product 0x8502
+> Bus#  6
+> `-Dev#   1 Vendor 0x1d6b Product 0x0002
+> Bus#  5
+> `-Dev#   1 Vendor 0x1d6b Product 0x0001
+>   `-Dev#   2 Vendor 0x05ac Product 0x8242
+> Bus#  4
+> `-Dev#   1 Vendor 0x1d6b Product 0x0001
+> Bus#  3
+> `-Dev#   1 Vendor 0x1d6b Product 0x0001
+> Bus#  2
+> `-Dev#   1 Vendor 0x1d6b Product 0x0001
+> Bus#  1
+> `-Dev#   1 Vendor 0x1d6b Product 0x0001
+>   `-Dev#   3 Vendor 0x0a5c Product 0x4500
+>     |-Dev#   4 Vendor 0x05ac Product 0x820f
+>     |-Dev#   5 Vendor 0x05ac Product 0x820a
+>     `-Dev#   6 Vendor 0x05ac Product 0x820b
+> 
+> Where the 820f is the Apple Bluetooth device and the 820a is the HID keyobard and the 820b is the HID mouse (both bluetooth).
+> 
+> I have tried to add 820f id to the hid2hci.c with switch_hidproxy but it didn't go through.
+> 
+> If I reset the hci device the lsusb output does not change (as was in the previous mac case). That's why I guess something has been changed in BT implementation and the previous method does not apply.
+>  
+> Now how can I find the way to switch the device in HCI? in other word how can I write (in case is necessary) the switch_imac procedure?
 
+try "modprobe hci_usb reset=1". And please send us the content
+of /proc/bus/usb/devices and what lsusb tells you.
 
+Regards
 
--> > hcid[10625]: segfault at 10 ip b7c65586 sp bfe39700 error 6 in
--> > libaudio.so[b7c5b000+1e000]
--> 
--> I took a look at the code that the backtrace refers to and it has been
--> changed a little bit since 3.32. Could you try with 3.33 or even better with
--> CVS HEAD and see if the problem still exists?
+Marcel
 
-
-Must be a lag in this digest... anyway, I see 3.34 is out, so I'll see what 
-happens with those.
 
 
 -------------------------------------------------------------------------
