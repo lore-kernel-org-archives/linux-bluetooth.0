@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <02c901c8d8be$25698f80$6701a8c0@freqonedev>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-References: <028701c8d897$74b68880$6701a8c0@freqonedev>
-	<4C97DD70-6B7E-43A0-8BB0-A1F4328EAEA4@gmail.com>
-Date: Fri, 27 Jun 2008 20:27:34 -0500
-MIME-Version: 1.0
-Subject: Re: [Bluez-devel] Connecting to audio_service.Control (or
-	otherinterfaces)
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1214593557.6131.26.camel@bongo>
+References: <1214593557.6131.26.camel@bongo>
+Date: Fri, 27 Jun 2008 23:44:07 +0100
+Message-Id: <1214606647.4435.71.camel@cookie.hadess.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Wizard patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,54 +20,37 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Thanks...I missed seeing the new doc/audio-api.txt
+On Fri, 2008-06-27 at 15:05 -0400, Michael Terry wrote:
+> Hello, all!
+> 
+> I have attached a patch against 0.27 (it applies cleanly against CVS) to
+> complete the wizard in the bluez-gnome source tree.
 
-It appears to be the old Headset and Sink, with new object path.  That said, the mechanics (esp. SDP browse and pairing) appear to 
-be more integrated and I will be trying these out ASAP.
+-	item = gtk_menu_item_new_with_label(_("Setup New Device"));
++	item = gtk_menu_item_new_with_label(_("Connect New Device..."));
 
-DS
------ Original Message ----- 
-From: "Johan Hedberg" <johan.hedberg@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Sent: Friday, June 27, 2008 4:18 PM
-Subject: Re: [Bluez-devel] Connecting to audio_service.Control (or otherinterfaces)
+This is wrong, as we'll probably want to plug in more setup for future
+device types. For example, when adding a phone, we'll want to check
+whether it supports SyncML, and automatically set it up in the sync
+program.
 
+The setup_services() service call shouldn't be needed, as all the
+services are enabled by default.
 
-Hi David,
+In bluetooth_client_available_services(), you also need to add joypads,
+and every other input devices to that list.
 
-On Jun 27, 2008, at 23:50, David Stockwell wrote:
-> That said: is it still your intent (or that of the development
-> group) that the Object Path for audio-connected devices will be /org/
-> bluez/audio/device<n> (where "n" is 0-based)?
++			// If caller didn't specify a forced type, determine it from device
+info
 
-In 4.0 with hcid and the plugins there is only one object path
-hierarchy and a single object path per remote device (created by
-CreateDevice or CreatePairedDevice). These paths have some generic
-name plus the remote address and I don't remember right now how it
-looks like. Try out those Create*Device methods and find out :)
+Don't use C++-style comments.
 
-> I assume that one would have to do any/all pairing against the
-> org.bluez.Adapter object (e.g., object path /hci0), creating a
-> Device object (e.g., /hci0/dev_00_02_5B_01_A4_74) before connecting
-> to the audio Service and creating the audio Device (using the BT
-> Address of the remote device, e.g., 00:02:5B:01:A4:74).  Do I have
-> this right?
+I personally don't really like adding setup calls in client.c, which
+should really only be used for discovery.
 
-No. In 4.x only one method call is needed to set up a new device.
-Calling CreateDevice or CreatePairedDevice will cause hcid to perform
-SDP discovery and if it finds audio profiles a callback will be fired
-into the audio plugin which in turn will register the necessary audio
-specific D-Bus interfaces for the new device object.
+The rest looks alright to me, looking over it quickly.
 
-> How much of what is in audio-api.txt is or will be obsolete under 4.x?
-
-Any API docs outside of the doc/ subdirectory are obsolete. You can
-find the 4.x audio API in doc/audio-api.txt
-
-Johan
-
-
-
+Cheers
 
 
 -------------------------------------------------------------------------
