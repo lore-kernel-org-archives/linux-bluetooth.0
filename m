@@ -1,78 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <A4049608-9C65-47B6-9207-59A94B346A47@gmail.com>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <025201c8d891$75c10260$6701a8c0@freqonedev>
-Mime-Version: 1.0 (Apple Message framework v924)
-Date: Sat, 28 Jun 2008 00:10:39 +0300
-References: <025201c8d891$75c10260$6701a8c0@freqonedev>
-Subject: Re: [Bluez-devel] org.bluez.Agent interface vs.
-	org.bluez.PasskeyAgent and org.bluez.AuthorizationAgent
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Message-ID: <028701c8d897$74b68880$6701a8c0@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Cc: "Marcel Holtmann" <marcel@holtmann.org>,
+	"Johan Hedberg" <johan.hedberg@gmail.com>
+Subject: Connecting to audio_service.Control (or other interfaces)
+Date: Fri, 27 Jun 2008 15:50:34 -0500
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0284_01C8D86D.897BB580"
+List-ID: <bluez-devel.lists.sourceforge.net>
 
-Hi David,
+This is a multi-part message in MIME format.
 
-On Jun 27, 2008, at 23:07, David Stockwell wrote:
-> So, what is the future of these; is it the org.bluez.Agent, as  
-> described in bluez-utils-3.34/doc/agent-api.txt?  Or is it the old  
-> PasskeyAgent and AuthorizationAgent described in hcid/dbus-api.txt?
+------=_NextPart_000_0284_01C8D86D.897BB580
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-org.bluez.Agent is the "future" as you put it. It gets enabled through  
-the -x switch in 3.x versions. For 4.x the old PasskeyAgent and  
-AuthorizationAgent will go away.
+The interface descriptions for audio-api.txt appear to be somewhat =
+stagnant (for one area, you are probably waiting for me).
 
-> Also, the daemon/ directory used to contain sample code for a  
-> passkey agent and an authorization agent.  If as I assume these need  
-> to move over to the .Agent interface, are there plans to provide a  
-> design example for these (or a combined agent daemon)?
+That said: is it still your intent (or that of the development group) =
+that the Object Path for audio-connected devices will be =
+/org/bluez/audio/device<n> (where "n" is 0-based)?
 
-There already is one. Take a look at hcid/simple-agent
+I assume that one would have to do any/all pairing against the =
+org.bluez.Adapter object (e.g., object path /hci0), creating a Device =
+object (e.g., /hci0/dev_00_02_5B_01_A4_74) before connecting to the =
+audio Service and creating the audio Device (using the BT Address of the =
+remote device, e.g., 00:02:5B:01:A4:74).  Do I have this right?
 
-> Has the gnome agent been modified to the "experimental" interface?
+How much of what is in audio-api.txt is or will be obsolete under 4.x?
 
-This one I'll have to let Marcel answer since he's responsible for it.
+David Stockwell
+------=_NextPart_000_0284_01C8D86D.897BB580
+Content-Type: text/html;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-> When starting the sample passkey agent, it is possible to provide a  
-> path that the agent uses as its object path (in function  
-> register_agent, with the call to  
-> dbus_connection_register_object_path).  I assume that this path is  
-> what we would pass to "Adapter.CreatePairedDevice" as the object  
-> path of the agent, with the capabilities string.  Am I correct?
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; =
+charset=3Diso-8859-1">
+<META content=3D"MSHTML 6.00.6000.16674" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT face=3DArial size=3D2>The interface descriptions for =
+audio-api.txt appear=20
+to be somewhat stagnant (for one area, you are probably waiting for=20
+me).</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>That said: is it still your intent (or =
+that of the=20
+development group) that the Object Path for audio-connected devices will =
 
-Yes. However in the CreatePairedDevice case the agent can't be  
-implemented by anyone else except the caller (since hcid identifies  
-the location of the agent by the unique name of the sender of  
-CreatePairedDevice) so typically it would be a different  
-implementation that the generic agent registered through RegisterAgent.
+</FONT><FONT face=3DArial size=3D2>be /org/bluez/audio/device&lt;n&gt; =
+(where "n" is=20
+0-based)?</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>I assume that one would have to do =
+any/all pairing=20
+against the org.bluez.Adapter object (e.g., object path /hci0), creating =
+a=20
+Device object (e.g., /hci0/dev_00_02_5B_01_A4_74) before connecting to =
+the audio=20
+Service and creating the audio Device (using the BT Address of the =
+remote=20
+device, e.g., 00:02:5B:01:A4:74).&nbsp; Do I have this =
+right?</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>How much of what is in audio-api.txt =
+is&nbsp;or=20
+will be obsolete under 4.x?</FONT></DIV>
+<DIV><FONT face=3DArial size=3D2></FONT>&nbsp;</DIV>
+<DIV><FONT face=3DArial size=3D2>David =
+Stockwell</FONT></DIV></BODY></HTML>
 
-> Any constraints on what this object path contains (for example: "/ 
-> com/frequency-one")?  I assume it must be unique and must not clash  
-> with the other paths under org.bluez.
-
-There are no constraints as long as it's a valid object path. The  
-agent's path resides in the agents object path hierarchy which is  
-totally independent from hcid's object path hierarchy (since they  
-reside withing two different processes).
-
-Johan
-
--------------------------------------------------------------------------
-Check out the new SourceForge.net Marketplace.
-It's the best place to buy or sell services for
-just about anything Open Source.
-http://sourceforge.net/services/buy/index.php
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+------=_NextPart_000_0284_01C8D86D.897BB580--
