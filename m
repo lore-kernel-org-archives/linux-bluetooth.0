@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Michael Terry <michael.terry@canonical.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1214593557.6131.26.camel@bongo>
-References: <1214593557.6131.26.camel@bongo>
-Date: Fri, 27 Jun 2008 15:18:42 -0400
-Message-Id: <1214594322.6131.28.camel@bongo>
+To: bluez-devel@lists.sourceforge.net
+Date: Fri, 27 Jun 2008 15:05:57 -0400
+Message-Id: <1214593557.6131.26.camel@bongo>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Wizard patch
+Subject: [Bluez-devel] Wizard patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,34 +14,124 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1158489290=="
+Content-Type: multipart/mixed; boundary="===============0655028733=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---===============1158489290==
+--===============0655028733==
 Content-Type: multipart/signed; micalg=pgp-sha1;
 	protocol="application/pgp-signature";
-	boundary="=-FzuERotqYW9Dwwk2LIKu"
+	boundary="=-eyPjwTXXnJ4uIvCZunoY"
 
 
---=-FzuERotqYW9Dwwk2LIKu
-Content-Type: multipart/mixed; boundary="=-YxVoisW2TowkQn0K+eE/"
+--=-eyPjwTXXnJ4uIvCZunoY
+Content-Type: multipart/mixed; boundary="=-22DnaLjCWJZjHATnjIc+"
 
 
---=-YxVoisW2TowkQn0K+eE/
+--=-22DnaLjCWJZjHATnjIc+
 Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 
-Whoops, here's a fixed patch that actually installs the binary.
+Hello, all!
 
+I have attached a patch against 0.27 (it applies cleanly against CVS) to
+complete the wizard in the bluez-gnome source tree.
+
+Here's what my patch does in summary, details below:
+Wizard dialog shows list of device types we know how to handle (only
+mouse/keyboard/headset right now).  Then, it tries to connect to the
+appropriate bluetooth dbus service and trust the device.  Basically the
+same code steps the Properties -> Services tab does, but more
+wizardy.  :)
+
+I made changes to cleanup the wizard interface (removed a couple of
+pages that had low signal/noise ratio) and made several of the
+bluetooth_client capable of giving feedback about the operation via a
+callback.
+
+
+Details of changes:
+
+applet/main.c:
+	Uncomments code to add a menu item for the wizard.
+
+common/bluetooth-device-selection.c:
+	Fixes broken code to set current filter programmatically.
+
+common/client.[ch]:
+	setup_services():
+	Note presence of audio and input services on startup
+
+	bluetooth_client_get_name():
+	Gets user-visible device name for a path
+
+	bluetooth_client_available_services():
+	Returns a mask of the device types supported by services the client
+knows about.  Not actually used by the rest of my code, but it seemed
+possibly useful to one day not show unsupported device types in the
+wizard if we wanted to.
+
+	bluetooth_client_cancel_call():
+	Cancels an async call for a particular adapter/address combo.  This is
+slightly janky because it only allows for one call at a time per pair,
+but that's all that we ever need right now.
+
+	connect_to_service():
+	Handles service-specific calls to initiate a device connection.  Stuff
+like CreateSecureDevice or CreateHeadset.
+=09
+	bluetooth_client_connect():
+	Kicks off a call to connect_to_service
+=09
+	bluetooth_client_create_bonding():
+	bluetooth_client_remove_bonding():
+	bluetooth_client_set_trusted():
+	bluetooth_client_remove_trust():
+	Modified to allow callbacks
+
+common/dbus.xml:
+	Add input.CreateSecureDevice and audio.CreateHeadset
+
+properties/adapter.c:
+	Update a few calls to client functions do to above prototype changes
+
+wizard/agent.[ch]:
+	Mostly a copy of applet/agent.c, except:
+		it only holds passkey code (no auth code)
+		it shows dialogs immediately wrt a parent window
+
+wizard/main.c:
+	Comment out intro and info pages -- I think the intro page just gets in
+the user's way and there was no content in info page, and even if there
+was, it would probably also just get in user's way.
+
+	I added a pulsing progress bar to the pairing page to give some
+feedback.
+
+	I changed wording from 'setup' and 'pair' to 'connect'.  I figure that
+is more user-friendly (since no real setting up is done by user and they
+probably think in terms of connecting to devices not pairing with them).
+
+	Pairing process is two-step: bluetooth_client_connect followed by
+bluetooth_client_set_trusted.
+
+	Show an error if either step fails.
+
+	Connect to agent code to display a password prompt immediately in front
+of user instead of via bluetooth applet.
+
+wizard/Makefile.am:
+	Install bluetooth-wizard and add agent.[ch]
+
+Thanks!
 -mt
 
---=-YxVoisW2TowkQn0K+eE/
+--=-22DnaLjCWJZjHATnjIc+
 Content-Description: 
-Content-Disposition: attachment; filename=wizard2.diff
-Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=bluez-wizard.diff
 Content-Type: text/x-patch; charset=UTF-8
+Content-Transfer-Encoding: base64
 
 ZGlmZiAtcnVwTiBibHVlei1nbm9tZS0wLjI3Lm9yaWcvYXBwbGV0L21haW4uYyBibHVlei1nbm9t
 ZS0wLjI3L2FwcGxldC9tYWluLmMNCi0tLSBibHVlei1nbm9tZS0wLjI3Lm9yaWcvYXBwbGV0L21h
@@ -863,37 +951,32 @@ cnVwTiBibHVlei1nbm9tZS0wLjI3Lm9yaWcvd2l6YXJkL01ha2VmaWxlLmFtIGJsdWV6LWdub21l
 LTAuMjcvd2l6YXJkL01ha2VmaWxlLmFtDQotLS0gYmx1ZXotZ25vbWUtMC4yNy5vcmlnL3dpemFy
 ZC9NYWtlZmlsZS5hbQkyMDA4LTA2LTI3IDE0OjEyOjQ5LjAwMDAwMDAwMCAtMDQwMA0KKysrIGJs
 dWV6LWdub21lLTAuMjcvd2l6YXJkL01ha2VmaWxlLmFtCTIwMDgtMDYtMjcgMTQ6MTM6MDUuMDAw
-MDAwMDAwIC0wNDAwDQpAQCAtMSw3ICsxLDcgQEANCiANCi1ub2luc3RfUFJPR1JBTVMgPSBibHVl
-dG9vdGgtd2l6YXJkDQorYmluX1BST0dSQU1TID0gYmx1ZXRvb3RoLXdpemFyZA0KIA0KLWJsdWV0
-b290aF93aXphcmRfU09VUkNFUyA9IG1haW4uYw0KK2JsdWV0b290aF93aXphcmRfU09VUkNFUyA9
-IG1haW4uYyBhZ2VudC5jIGFnZW50LmgNCiANCiBibHVldG9vdGhfd2l6YXJkX0xEQUREID0gQEdU
-S19MSUJTQCBAREJVU19MSUJTQCBcDQogCQkkKHRvcF9idWlsZGRpcikvY29tbW9uL2xpYmNvbW1v
-bi5hDQpAQCAtMTMsNyArMTMsNyBAQCBBTV9DRkxBR1MgPSBAREJVU19DRkxBR1NAIEBHVEtfQ0ZM
-QUdTQA0KIA0KIElOQ0xVREVTID0gLUkkKHRvcF9zcmNkaXIpL2NvbW1vbiAtSSQodG9wX2J1aWxk
-ZGlyKS9jb21tb24NCiANCi1ub2luc3RfTUFOUyA9IGJsdWV0b290aC13aXphcmQuMQ0KK21hbl9N
-QU5TID0gYmx1ZXRvb3RoLXdpemFyZC4xDQogDQogRVhUUkFfRElTVCA9ICQobm9pbnN0X01BTlMp
-DQogDQo=
+MDAwMDAwIC0wNDAwDQpAQCAtMSw3ICsxLDcgQEANCiANCiBub2luc3RfUFJPR1JBTVMgPSBibHVl
+dG9vdGgtd2l6YXJkDQogDQotYmx1ZXRvb3RoX3dpemFyZF9TT1VSQ0VTID0gbWFpbi5jDQorYmx1
+ZXRvb3RoX3dpemFyZF9TT1VSQ0VTID0gbWFpbi5jIGFnZW50LmMgYWdlbnQuaA0KIA0KIGJsdWV0
+b290aF93aXphcmRfTERBREQgPSBAR1RLX0xJQlNAIEBEQlVTX0xJQlNAIFwNCiAJCSQodG9wX2J1
+aWxkZGlyKS9jb21tb24vbGliY29tbW9uLmENCk==
 
 
---=-YxVoisW2TowkQn0K+eE/--
+--=-22DnaLjCWJZjHATnjIc+--
 
---=-FzuERotqYW9Dwwk2LIKu
+--=-eyPjwTXXnJ4uIvCZunoY
 Content-Type: application/pgp-signature; name=signature.asc
 Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.6 (GNU/Linux)
 
-iD8DBQBIZT0S53i2YxNrdi0RAh5pAKCuh+j1gOLsc5w4Em2a8ikUcQZUEQCgv/KB
-evHx0ZewlTqQm8b4iSRr8W4=
-=34S5
+iD8DBQBIZToV53i2YxNrdi0RAjLtAKDCsWtHeYE6uURsJhnZfJOZ4bLUdACfbnQq
+UiDb91If+69GgirfH5Bb+a4=
+=xWRT
 -----END PGP SIGNATURE-----
 
---=-FzuERotqYW9Dwwk2LIKu--
+--=-eyPjwTXXnJ4uIvCZunoY--
 
 
 
---===============1158489290==
+--===============0655028733==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -904,7 +987,7 @@ Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
---===============1158489290==
+--===============0655028733==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -915,4 +998,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---===============1158489290==--
+--===============0655028733==--
