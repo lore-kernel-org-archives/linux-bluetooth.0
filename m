@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <4C97DD70-6B7E-43A0-8BB0-A1F4328EAEA4@gmail.com>
+Message-Id: <A4049608-9C65-47B6-9207-59A94B346A47@gmail.com>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <028701c8d897$74b68880$6701a8c0@freqonedev>
+In-Reply-To: <025201c8d891$75c10260$6701a8c0@freqonedev>
 Mime-Version: 1.0 (Apple Message framework v924)
-Date: Sat, 28 Jun 2008 00:18:08 +0300
-References: <028701c8d897$74b68880$6701a8c0@freqonedev>
-Subject: Re: [Bluez-devel] Connecting to audio_service.Control (or other
-	interfaces)
+Date: Sat, 28 Jun 2008 00:10:39 +0300
+References: <025201c8d891$75c10260$6701a8c0@freqonedev>
+Subject: Re: [Bluez-devel] org.bluez.Agent interface vs.
+	org.bluez.PasskeyAgent and org.bluez.AuthorizationAgent
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,37 +23,49 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi David,
 
-On Jun 27, 2008, at 23:50, David Stockwell wrote:
-> That said: is it still your intent (or that of the development  
-> group) that the Object Path for audio-connected devices will be /org/ 
-> bluez/audio/device<n> (where "n" is 0-based)?
+On Jun 27, 2008, at 23:07, David Stockwell wrote:
+> So, what is the future of these; is it the org.bluez.Agent, as  
+> described in bluez-utils-3.34/doc/agent-api.txt?  Or is it the old  
+> PasskeyAgent and AuthorizationAgent described in hcid/dbus-api.txt?
 
-In 4.0 with hcid and the plugins there is only one object path  
-hierarchy and a single object path per remote device (created by  
-CreateDevice or CreatePairedDevice). These paths have some generic  
-name plus the remote address and I don't remember right now how it  
-looks like. Try out those Create*Device methods and find out :)
+org.bluez.Agent is the "future" as you put it. It gets enabled through  
+the -x switch in 3.x versions. For 4.x the old PasskeyAgent and  
+AuthorizationAgent will go away.
 
-> I assume that one would have to do any/all pairing against the  
-> org.bluez.Adapter object (e.g., object path /hci0), creating a  
-> Device object (e.g., /hci0/dev_00_02_5B_01_A4_74) before connecting  
-> to the audio Service and creating the audio Device (using the BT  
-> Address of the remote device, e.g., 00:02:5B:01:A4:74).  Do I have  
-> this right?
+> Also, the daemon/ directory used to contain sample code for a  
+> passkey agent and an authorization agent.  If as I assume these need  
+> to move over to the .Agent interface, are there plans to provide a  
+> design example for these (or a combined agent daemon)?
 
-No. In 4.x only one method call is needed to set up a new device.  
-Calling CreateDevice or CreatePairedDevice will cause hcid to perform  
-SDP discovery and if it finds audio profiles a callback will be fired  
-into the audio plugin which in turn will register the necessary audio  
-specific D-Bus interfaces for the new device object.
+There already is one. Take a look at hcid/simple-agent
 
-> How much of what is in audio-api.txt is or will be obsolete under 4.x?
+> Has the gnome agent been modified to the "experimental" interface?
 
-Any API docs outside of the doc/ subdirectory are obsolete. You can  
-find the 4.x audio API in doc/audio-api.txt
+This one I'll have to let Marcel answer since he's responsible for it.
+
+> When starting the sample passkey agent, it is possible to provide a  
+> path that the agent uses as its object path (in function  
+> register_agent, with the call to  
+> dbus_connection_register_object_path).  I assume that this path is  
+> what we would pass to "Adapter.CreatePairedDevice" as the object  
+> path of the agent, with the capabilities string.  Am I correct?
+
+Yes. However in the CreatePairedDevice case the agent can't be  
+implemented by anyone else except the caller (since hcid identifies  
+the location of the agent by the unique name of the sender of  
+CreatePairedDevice) so typically it would be a different  
+implementation that the generic agent registered through RegisterAgent.
+
+> Any constraints on what this object path contains (for example: "/ 
+> com/frequency-one")?  I assume it must be unique and must not clash  
+> with the other paths under org.bluez.
+
+There are no constraints as long as it's a valid object path. The  
+agent's path resides in the agents object path hierarchy which is  
+totally independent from hcid's object path hierarchy (since they  
+reside withing two different processes).
 
 Johan
-
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
