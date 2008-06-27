@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-Id: <4C97DD70-6B7E-43A0-8BB0-A1F4328EAEA4@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1214593557.6131.26.camel@bongo>
-References: <1214593557.6131.26.camel@bongo>
-Date: Sat, 28 Jun 2008 00:23:58 +0200
-Message-Id: <1214605438.11537.0.camel@violet.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Wizard patch
+In-Reply-To: <028701c8d897$74b68880$6701a8c0@freqonedev>
+Mime-Version: 1.0 (Apple Message framework v924)
+Date: Sat, 28 Jun 2008 00:18:08 +0300
+References: <028701c8d897$74b68880$6701a8c0@freqonedev>
+Subject: Re: [Bluez-devel] Connecting to audio_service.Control (or other
+	interfaces)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,30 +21,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Michael,
+Hi David,
 
-> I have attached a patch against 0.27 (it applies cleanly against CVS) to
-> complete the wizard in the bluez-gnome source tree.
-> 
-> Here's what my patch does in summary, details below:
-> Wizard dialog shows list of device types we know how to handle (only
-> mouse/keyboard/headset right now).  Then, it tries to connect to the
-> appropriate bluetooth dbus service and trust the device.  Basically the
-> same code steps the Properties -> Services tab does, but more
-> wizardy.  :)
-> 
-> I made changes to cleanup the wizard interface (removed a couple of
-> pages that had low signal/noise ratio) and made several of the
-> bluetooth_client capable of giving feedback about the operation via a
-> callback.
+On Jun 27, 2008, at 23:50, David Stockwell wrote:
+> That said: is it still your intent (or that of the development  
+> group) that the Object Path for audio-connected devices will be /org/ 
+> bluez/audio/device<n> (where "n" is 0-based)?
 
-looks nice. However you have to break this up into pieces for. Sent
-small patches and I can quickly review and commit them.
+In 4.0 with hcid and the plugins there is only one object path  
+hierarchy and a single object path per remote device (created by  
+CreateDevice or CreatePairedDevice). These paths have some generic  
+name plus the remote address and I don't remember right now how it  
+looks like. Try out those Create*Device methods and find out :)
 
-Regards
+> I assume that one would have to do any/all pairing against the  
+> org.bluez.Adapter object (e.g., object path /hci0), creating a  
+> Device object (e.g., /hci0/dev_00_02_5B_01_A4_74) before connecting  
+> to the audio Service and creating the audio Device (using the BT  
+> Address of the remote device, e.g., 00:02:5B:01:A4:74).  Do I have  
+> this right?
 
-Marcel
+No. In 4.x only one method call is needed to set up a new device.  
+Calling CreateDevice or CreatePairedDevice will cause hcid to perform  
+SDP discovery and if it finds audio profiles a callback will be fired  
+into the audio plugin which in turn will register the necessary audio  
+specific D-Bus interfaces for the new device object.
 
+> How much of what is in audio-api.txt is or will be obsolete under 4.x?
+
+Any API docs outside of the doc/ subdirectory are obsolete. You can  
+find the 4.x audio API in doc/audio-api.txt
+
+Johan
 
 
 -------------------------------------------------------------------------
