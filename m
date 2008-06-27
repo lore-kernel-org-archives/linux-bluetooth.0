@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <A4049608-9C65-47B6-9207-59A94B346A47@gmail.com>
-References: <025201c8d891$75c10260$6701a8c0@freqonedev>
-	<A4049608-9C65-47B6-9207-59A94B346A47@gmail.com>
-Date: Sat, 28 Jun 2008 00:25:12 +0200
-Message-Id: <1214605512.11537.4.camel@violet.holtmann.net>
+In-Reply-To: <1214595750.6131.32.camel@bongo>
+References: <1214593557.6131.26.camel@bongo>
+	<024a01c8d88d$5515a790$6701a8c0@freqonedev>
+	<1214595750.6131.32.camel@bongo>
+Date: Sat, 28 Jun 2008 00:24:31 +0200
+Message-Id: <1214605471.11537.2.camel@violet.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] org.bluez.Agent interface
-	vs.	org.bluez.PasskeyAgent and org.bluez.AuthorizationAgent
+Subject: Re: [Bluez-devel] Wizard patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,13 +22,17 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi David,
+Hi Michael,
 
-> > Has the gnome agent been modified to the "experimental" interface?
+> > Is this version working against the old DBus interface, the new, experimental interface, or does it matter?
 > 
-> This one I'll have to let Marcel answer since he's responsible for it.
+> The old DBus interface.  I don't know about the new interface.
+> 
+> It shouldn't matter much.  The important stuff was UI changes.  The new
+> dbus stuff was added in common/client, so if and when that gets ported
+> to our new interface overlords, my changes will too.
 
-there is no support for the 4.x API in bluez-gnome.
+it is not that simple, but I will look into that at some point.
 
 Regards
 
