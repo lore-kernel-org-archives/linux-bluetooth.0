@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <87855ac60806281145h5a1e8b5as206369c7a63f9076@mail.gmail.com>
-Date: Sat, 28 Jun 2008 12:45:41 -0600
-From: "Arren Lex" <arrenlex@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-In-Reply-To: <87855ac60806281140k3f915cb4i3a94a459d3c1542b@mail.gmail.com>
+Message-ID: <02c901c8d8be$25698f80$6701a8c0@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+References: <028701c8d897$74b68880$6701a8c0@freqonedev>
+	<4C97DD70-6B7E-43A0-8BB0-A1F4328EAEA4@gmail.com>
+Date: Fri, 27 Jun 2008 20:27:34 -0500
 MIME-Version: 1.0
-References: <87855ac60806281140k3f915cb4i3a94a459d3c1542b@mail.gmail.com>
-Subject: [Bluez-devel] Regression: previously perfect dongle is now unusable.
+Subject: Re: [Bluez-devel] Connecting to audio_service.Control (or
+	otherinterfaces)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,29 +21,55 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hey, all. I have a "RocketFish" branded USB bluetooth adapter, which
-dmesg identifies thus:
-input: Broadcom Corp BCM2045B3 ROM as /class/input/input9
-input,hidraw3: USB HID v1.11 Keyboard [Broadcom Corp BCM2045B3 ROM] on
-usb-0000:00:10.2-2.2
-usb 4-2.3: new full speed USB device using uhci_hcd and address 7
-usb 4-2.3: configuration #1 chosen from 1 choice
-input: Broadcom Corp BCM2045B3 ROM as /class/input/input10
-input,hidraw4: USB HID v1.11 Mouse [Broadcom Corp BCM2045B3 ROM] on
-usb-0000:00:10.2-2.3
+Thanks...I missed seeing the new doc/audio-api.txt
 
-In Jan\Feb 2008, this dongle worked perfectly for me. It created hci0
-when plugged in, and after issuing a "hciconfig hci0 reset" I was able
-to search devices, use it to transfer data from my phone and even
-control the mouse with my wiimote. However, I recently (mid-June 2008)
-tried the dongle again, and now no hci devices are created at all, and
-all of the commands fail.
+It appears to be the old Headset and Sink, with new object path.  That said, the mechanics (esp. SDP browse and pairing) appear to 
+be more integrated and I will be trying these out ASAP.
 
-I'm not sure where to start looking for the regression. Would it be in
-the kernel? The library? The userspace tools? Does anyone have some
-idea of what might have happened?
+DS
+----- Original Message ----- 
+From: "Johan Hedberg" <johan.hedberg@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Sent: Friday, June 27, 2008 4:18 PM
+Subject: Re: [Bluez-devel] Connecting to audio_service.Control (or otherinterfaces)
 
-Thanks in advance.
+
+Hi David,
+
+On Jun 27, 2008, at 23:50, David Stockwell wrote:
+> That said: is it still your intent (or that of the development
+> group) that the Object Path for audio-connected devices will be /org/
+> bluez/audio/device<n> (where "n" is 0-based)?
+
+In 4.0 with hcid and the plugins there is only one object path
+hierarchy and a single object path per remote device (created by
+CreateDevice or CreatePairedDevice). These paths have some generic
+name plus the remote address and I don't remember right now how it
+looks like. Try out those Create*Device methods and find out :)
+
+> I assume that one would have to do any/all pairing against the
+> org.bluez.Adapter object (e.g., object path /hci0), creating a
+> Device object (e.g., /hci0/dev_00_02_5B_01_A4_74) before connecting
+> to the audio Service and creating the audio Device (using the BT
+> Address of the remote device, e.g., 00:02:5B:01:A4:74).  Do I have
+> this right?
+
+No. In 4.x only one method call is needed to set up a new device.
+Calling CreateDevice or CreatePairedDevice will cause hcid to perform
+SDP discovery and if it finds audio profiles a callback will be fired
+into the audio plugin which in turn will register the necessary audio
+specific D-Bus interfaces for the new device object.
+
+> How much of what is in audio-api.txt is or will be obsolete under 4.x?
+
+Any API docs outside of the doc/ subdirectory are obsolete. You can
+find the 4.x audio API in doc/audio-api.txt
+
+Johan
+
+
+
+
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
