@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <782ce16c0806281423i6b77a19cte5020c66fa47c4fd@mail.gmail.com>
-Date: Sat, 28 Jun 2008 18:23:37 -0300
-From: "=?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?=" <joao.vita@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Message-ID: <87855ac60806281145h5a1e8b5as206369c7a63f9076@mail.gmail.com>
+Date: Sat, 28 Jun 2008 12:45:41 -0600
+From: "Arren Lex" <arrenlex@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+In-Reply-To: <87855ac60806281140k3f915cb4i3a94a459d3c1542b@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] bluez-pulseaudio status
+References: <87855ac60806281140k3f915cb4i3a94a459d3c1542b@mail.gmail.com>
+Subject: [Bluez-devel] Regression: previously perfect dongle is now unusable.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,31 +16,40 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGVsbG8gbGlzdCwKCkkndmUgcHVibGlzaGVkIHRoZSBmaXJzdCBiaXQgb2YgY29kZSByZWxhdGVk
-IHRvIGJsdWV6LXB1bHNlYXVkaW8gdG9kYXkuCgpGb3Igbm93IHRoZXJlIGp1c3QgYSBwcm90b3R5
-cGUgb2Ygd2hhdCB2ZXJ5IHNvb24gd2lsbCBiZQptb2R1bGUtYnQtZGlzY292ZXIuIEl0IGRvZXMg
-cHJldHR5IG11Y2ggd2hhdApibHVlei11dGlscy9oY2lkL2xpc3RfZGV2aWNlcyBkb2VzLCBidXQg
-aXMgd3JpdHRlbiBpbiBDLiBJJ3ZlIHN0YXJ0ZWQKdG8gd3JpdGUgdGhlIG1vZHVsZS1idC1kaXNj
-b3ZlciBpdCBzZWxmLCBidXQgSSBoYWQgdG8gcG9zdHBvbmUgaXQgYQpiaXQgYmVjYXVzZSBvZiB1
-bml2ZXJzaXR5IGZpbmFsIGV4YW1zLiBJIGhvcGUgdGhpcyB3ZWVrIEknbGwgaGF2ZSBpdApkb25l
-LgoKSSdtIHB1Ymxpc2hpbmcgdGhlIHNvdXJjZSBjb2RlIG9uCmh0dHA6Ly9jb2RlLmdvb2dsZS5j
-b20vcC9ibHVlei1wdWxzZWF1ZGlvLyAsIGJlY2F1c2UgSSdsbCBuZWVkIHRvCnB1Ymxpc2ggaXQg
-dGhlcmUgYW55d2F5LCBhcyBhIEdTb0MgcmVxdWlyZW1lbnQuIEknbGwgYWxzbyBjcmVhdGUgYSBn
-aXQKY2xvbmUgb2YgcHVsc2VhdWRpbyAoc2luY2UgbW9kdWxlcyBzaG91bGQgYmUgZGV2ZWxvcGVk
-IGluLXRyZWUpIGFuZAp3b3JrIG9uIGl0LCBzbyBMZW5uYXJ0IHdpbGwgYmUgYWJsZSB0byBwdWxs
-IGl0IGludG8gcHVsc2VhdWRpbwptYWluc3RyZWFtLiBJJ2xsIHB1Ymxpc2ggYSBsaW5rIGhlcmUg
-QVNBUC4KClRoaXMgc3RhdHVzIG1lc3NhZ2UgaXMgYWxzbyBvbiB0aGUgd2lraSBhdApodHRwOi8v
-d2lraS5ibHVlei5vcmcvd2lraS9QdWxzZUludGVncmF0aW9uCgotLSAKSm/Do28gUGF1bG8gUmVj
-aGkgVml0YQpNU2MgQ29tcHV0ZXIgU2NpZW5jZSBTdHVkZW50CkNvbXB1dGVyIEVuZ2luZWVyCklD
-IC8gVW5pY2FtcAoKaXJjLmZyZWVub2RlLm5ldDoganBydml0YQotLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCkNo
-ZWNrIG91dCB0aGUgbmV3IFNvdXJjZUZvcmdlLm5ldCBNYXJrZXRwbGFjZS4KSXQncyB0aGUgYmVz
-dCBwbGFjZSB0byBidXkgb3Igc2VsbCBzZXJ2aWNlcyBmb3IKanVzdCBhYm91dCBhbnl0aGluZyBP
-cGVuIFNvdXJjZS4KaHR0cDovL3NvdXJjZWZvcmdlLm5ldC9zZXJ2aWNlcy9idXkvaW5kZXgucGhw
-Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRl
-dmVsIG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6
-Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
+Hey, all. I have a "RocketFish" branded USB bluetooth adapter, which
+dmesg identifies thus:
+input: Broadcom Corp BCM2045B3 ROM as /class/input/input9
+input,hidraw3: USB HID v1.11 Keyboard [Broadcom Corp BCM2045B3 ROM] on
+usb-0000:00:10.2-2.2
+usb 4-2.3: new full speed USB device using uhci_hcd and address 7
+usb 4-2.3: configuration #1 chosen from 1 choice
+input: Broadcom Corp BCM2045B3 ROM as /class/input/input10
+input,hidraw4: USB HID v1.11 Mouse [Broadcom Corp BCM2045B3 ROM] on
+usb-0000:00:10.2-2.3
+
+In Jan\Feb 2008, this dongle worked perfectly for me. It created hci0
+when plugged in, and after issuing a "hciconfig hci0 reset" I was able
+to search devices, use it to transfer data from my phone and even
+control the mouse with my wiimote. However, I recently (mid-June 2008)
+tried the dongle again, and now no hci devices are created at all, and
+all of the commands fail.
+
+I'm not sure where to start looking for the regression. Would it be in
+the kernel? The library? The userspace tools? Does anyone have some
+idea of what might have happened?
+
+Thanks in advance.
+
+-------------------------------------------------------------------------
+Check out the new SourceForge.net Marketplace.
+It's the best place to buy or sell services for
+just about anything Open Source.
+http://sourceforge.net/services/buy/index.php
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
