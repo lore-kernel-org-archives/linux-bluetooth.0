@@ -1,15 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: Antti =?ISO-8859-1?Q?Kaijanm=E4ki?= <antti@kaijanmaki.net>
+From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1214548448.6624.61.camel@peura.elisa-laajakaista.fi>
-References: <1214310088.6643.87.camel@peura.elisa-laajakaista.fi>
-	<1214527364.4435.14.camel@cookie.hadess.net>
-	<1214548448.6624.61.camel@peura.elisa-laajakaista.fi>
-Content-Type: multipart/mixed; boundary="=-py1BkfIU6/qwJGLgbjFN"
-Date: Mon, 30 Jun 2008 08:47:36 +0300
-Message-Id: <1214804856.7011.8.camel@peura.elisa-laajakaista.fi>
+In-Reply-To: <782ce16c0806291326q339ee6cbw585a190e0c8eee0e@mail.gmail.com>
+References: <782ce16c0806281423i6b77a19cte5020c66fa47c4fd@mail.gmail.com>
+	<1214701232.4435.113.camel@cookie.hadess.net>
+	<782ce16c0806291326q339ee6cbw585a190e0c8eee0e@mail.gmail.com>
+Date: Sun, 29 Jun 2008 23:31:33 +0100
+Message-Id: <1214778693.4435.129.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Making library out of bluez-gnome
+Subject: Re: [Bluez-devel] bluez-pulseaudio status
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,94 +18,24 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+On Sun, 2008-06-29 at 17:26 -0300, Jo=E3o Paulo Rechi Vita wrote:
+> I have no idea, but I commit to copy here any updates I make there =3D)
 
---=-py1BkfIU6/qwJGLgbjFN
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Working around the broken technology :)
 
-pe, 2008-06-27 kello 09:34 +0300, Antti Kaijanm=C3=A4ki kirjoitti:=20
-> pe, 2008-06-27 kello 01:42 +0100, Bastien Nocera kirjoitti:=20
-> > On Tue, 2008-06-24 at 15:21 +0300, Antti Kaijanm=C3=A4ki wrote:
-> > > Hello list!
-> > >=20
+Thanks Jo=E3o :)
 
-<snip>
-
-> > >  5. add property for selected device name. It's always nice to be abl=
-e
-> > >     to show the user a nice name instead of bluetooth address.
-> > >     - see an attached patch.
-> >=20
-> > That's useful, as it allows us to avoid another lookup, although it's
-> > close to free as hcid would have cached it.
->=20
-> True, but then yet another API must be used to make the lookup.=20
->=20
->=20
-> > FYI, you're leaking a copy of the name though, as gtk_tree_model_get()
-> > will make a copy of the value, as well as g_value_set_string(). Use
-> > g_value_take_string().
->=20
-> Yes, true. thanks! I thought that g_value_set_string() would not make a
-> copy of the string. I just adapted the "device-selected" property so I
-> suppose it's also leaking memory.=20
-
-patch attached.
-It's against clean CVS without my other modifications.
-
-
-> Br,
-> Antti
-
---=-py1BkfIU6/qwJGLgbjFN
-Content-Disposition: attachment;
-	filename*0=fix_memory_leak_in_bluetooth_device_selection_get_property.pa;
-	filename*1=tch
-Content-Type: text/x-patch;
-	name=fix_memory_leak_in_bluetooth_device_selection_get_property.patch;
-	charset=utf-8
-Content-Transfer-Encoding: 7bit
-
-Index: common/bluetooth-device-selection.c
-===================================================================
-RCS file: /cvsroot/bluez/gnome/common/bluetooth-device-selection.c,v
-retrieving revision 1.20
-diff -u -p -r1.20 bluetooth-device-selection.c
---- common/bluetooth-device-selection.c	12 Mar 2008 21:03:38 -0000	1.20
-+++ common/bluetooth-device-selection.c	30 Jun 2008 05:42:40 -0000
-@@ -686,7 +686,7 @@ bluetooth_device_selection_get_property 
- 
- 	switch (prop_id) {
- 	case PROP_DEVICE_SELECTED:
--		g_value_set_string (value, bluetooth_device_selection_get_selected_device (self));
-+		g_value_take_string (value, bluetooth_device_selection_get_selected_device (self));
- 		break;
- 	case PROP_SHOW_BONDING:
- 		g_value_set_boolean (value, priv->show_bonded);
-
---=-py1BkfIU6/qwJGLgbjFN
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
---=-py1BkfIU6/qwJGLgbjFN
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---=-py1BkfIU6/qwJGLgbjFN--
