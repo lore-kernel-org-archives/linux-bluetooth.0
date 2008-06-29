@@ -1,13 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <782ce16c0806291326q339ee6cbw585a190e0c8eee0e@mail.gmail.com>
-Date: Sun, 29 Jun 2008 17:26:17 -0300
-From: "=?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?=" <joao.vita@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1214701232.4435.113.camel@cookie.hadess.net>
+To: bluez-devel@lists.sourceforge.net
+Date: Mon, 30 Jun 2008 00:22:18 +0800
 MIME-Version: 1.0
-References: <782ce16c0806281423i6b77a19cte5020c66fa47c4fd@mail.gmail.com>
-	<1214701232.4435.113.camel@cookie.hadess.net>
-Subject: Re: [Bluez-devel] bluez-pulseaudio status
+Message-Id: <200806300022.18249.Jerry87905@gmail.com>
+From: Li Dongyang <jerry87905@gmail.com>
+Subject: [Bluez-devel] [GSoC2008]bluez-python status
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,32 +14,102 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SSBoYXZlIG5vIGlkZWEsIGJ1dCBJIGNvbW1pdCB0byBjb3B5IGhlcmUgYW55IHVwZGF0ZXMgSSBt
-YWtlIHRoZXJlID0pCgpPbiBTYXQsIEp1biAyOCwgMjAwOCBhdCAxMDowMCBQTSwgQmFzdGllbiBO
-b2NlcmEgPGhhZGVzc0BoYWRlc3MubmV0PiB3cm90ZToKPiBPbiBTYXQsIDIwMDgtMDYtMjggYXQg
-MTg6MjMgLTAzMDAsIEpvw6NvIFBhdWxvIFJlY2hpIFZpdGEgd3JvdGU6Cj4gPHNuaXA+Cj4+IFRo
-aXMgc3RhdHVzIG1lc3NhZ2UgaXMgYWxzbyBvbiB0aGUgd2lraSBhdAo+PiBodHRwOi8vd2lraS5i
-bHVlei5vcmcvd2lraS9QdWxzZUludGVncmF0aW9uCj4KPiBTdHVwaWQgcXVlc3Rpb24gb2YgdGhl
-IGRheTogaG93IGRvIHlvdSBzdWJzY3JpYmUgdG8gY2hhbmdlcyBpbiBhIHBhZ2UgaW4KPiBUcmFj
-J3MgV2lraT8KPgo+Cj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IENoZWNrIG91dCB0aGUgbmV3IFNvdXJj
-ZUZvcmdlLm5ldCBNYXJrZXRwbGFjZS4KPiBJdCdzIHRoZSBiZXN0IHBsYWNlIHRvIGJ1eSBvciBz
-ZWxsIHNlcnZpY2VzIGZvcgo+IGp1c3QgYWJvdXQgYW55dGhpbmcgT3BlbiBTb3VyY2UuCj4gaHR0
-cDovL3NvdXJjZWZvcmdlLm5ldC9zZXJ2aWNlcy9idXkvaW5kZXgucGhwCj4gX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KPiBCbHVlei1kZXZlbCBtYWlsaW5n
-IGxpc3QKPiBCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPiBodHRwczovL2xpc3Rz
-LnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo+CgoKCi0tIApKb8Oj
-byBQYXVsbyBSZWNoaSBWaXRhCk1TYyBDb21wdXRlciBTY2llbmNlIFN0dWRlbnQKQ29tcHV0ZXIg
-RW5naW5lZXIKSUMgLyBVbmljYW1wCgppcmMuZnJlZW5vZGUubmV0OiBqcHJ2aXRhCi0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0KQ2hlY2sgb3V0IHRoZSBuZXcgU291cmNlRm9yZ2UubmV0IE1hcmtldHBsYWNlLgpJ
-dCdzIHRoZSBiZXN0IHBsYWNlIHRvIGJ1eSBvciBzZWxsIHNlcnZpY2VzIGZvcgpqdXN0IGFib3V0
-IGFueXRoaW5nIE9wZW4gU291cmNlLgpodHRwOi8vc291cmNlZm9yZ2UubmV0L3NlcnZpY2VzL2J1
-eS9pbmRleC5waHAKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdl
-Lm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1k
-ZXZlbAo=
+hi, everyone,
+  This is Li Dongyang working on bluez-python as a GSoC 2008 project.
+  Now I'm at home and just pushed Agent to gitorious.
+  The git repo is here: http://gitorious.org/projects/bluez-python
+  and the wiki page is here: http://wiki.bluez.org/wiki/bluez-python
+  I update the wiki after every change.
+  so far we have done:
+  Manager, Adapter, Device and Agent classes according to the BlueZ 4.0 API.
+  every class(except Agent) have a method HandleSignal(handler, signal) to 
+make you deal with spec signals with your own handler.
+
+Manager:
+  The Manager is a singleton since many managers won't make sense, If you 
+wanna have mainloop support, you should pass an arg to Manager's __init__ 
+describing which mainloop you wanna have, like "manager = 
+bluez.Manager('gobject')" will have gobject support. Mainloops supported 
+currently are 'gobject', 'pyqt4' and 'ecore'.
+  Manager have a method  called GetAdapter(pattern=None), if the pattern is 
+None by default, it will call the DefaultAdapter() on the bluez dbus 
+interface, init an instance of Adapter with the return value(object path of 
+the default adapter), then return the Adapter instance. Otherwise it will 
+call FindAdapter(pattern). the pattern could be 'hci0' 
+or "00:11:22:33:44:55".
+ and the ListAdapter() return a list of Agent instances, not object paths.
+also a CreateAgent() for Agent usage, more details in the Agent section.
+
+Adapter:
+  The methods return instance of Device instead of object path, also some 
+require instance of Device or Agent instead of object path, others act same 
+as doc/adapter-api.txt
+
+Device:
+  add one more method GetObjectPath() to return object path. others same as 
+doc/device-api.txt
+
+Agent:
+  add one more method GetObjectPath(), same as Device's
+  by default the Agent acts as hcid/simple-agent, you can inherit the Agent 
+and use AgentMethod decorator to define your own agent.
+  The CreateAgent(cls=Agent, obj_path='/org/bluez/Agent') of Manager is used 
+to init an agent, please notice the agent need mainloop support to init.
+  if you call CreateAgent() without args, it will give you the default Agent 
+instance and the object path is '/org/bluez/Agent'. if you wanna define your 
+own agent, you can do as follows:
+
+import bluez
+import gobject
+
+class my_agent(bluez.Agent):
+    @bluez.AgentMethod
+    def ConfirmModeChange(self, mode):
+          print mode
+
+manager = bluez.Manager('gobject')
+adapter = manager.GetAdapter()
+agent = manager.CreateAgent(my_agent)
+adapter.RegisterAgent(agent)
+mainloop = gobject.MainLoop()
+try:
+    mainloop.run()
+except KeyboardInterrupt:
+    mainloop.quit()
+
+This example can make my_agent, and just overwrite the ConfirmModeChange() 
+method.
+If you wish to overwrite agent method with async_callbacks, just do this:
+
+class my_agent(bluez.Agent):
+    @AgentMethod
+    def ConfirmModeChange(self, mode, success_callback, error_callback)
+
+and AgentMethod will check the arg of the method with inspect module, if the 
+len(arg) is 3 more than the in-signature(including the 'self'), it will build 
+up async_callbacks tuple and pass it to decorator dbus.service.method, that's 
+how the async_callbacks works.
+
+If you have better ideas, or feed back, please do contact me, your suggestions 
+are really very important. Thanks in advance!
+You can reach me at: Jerry87905@gmail.com
+or missed at irc.freenode.org
+
+ps: The ISP I use at home always reset my connection to freenode every 3-5 
+minutes, so the best way is to mail me.
+Cheers,
+Li Dongyang
+
+-------------------------------------------------------------------------
+Check out the new SourceForge.net Marketplace.
+It's the best place to buy or sell services for
+just about anything Open Source.
+http://sourceforge.net/services/buy/index.php
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
