@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <782ce16c0806291326q339ee6cbw585a190e0c8eee0e@mail.gmail.com>
+Message-ID: <782ce16c0806291326q339ee6cbw585a190e0c8eee0e@mail.gmail.com>
+Date: Sun, 29 Jun 2008 17:26:17 -0300
+From: "=?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?=" <joao.vita@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1214701232.4435.113.camel@cookie.hadess.net>
+MIME-Version: 1.0
 References: <782ce16c0806281423i6b77a19cte5020c66fa47c4fd@mail.gmail.com>
 	<1214701232.4435.113.camel@cookie.hadess.net>
-	<782ce16c0806291326q339ee6cbw585a190e0c8eee0e@mail.gmail.com>
-Date: Sun, 29 Jun 2008 23:31:33 +0100
-Message-Id: <1214778693.4435.129.camel@cookie.hadess.net>
-Mime-Version: 1.0
 Subject: Re: [Bluez-devel] bluez-pulseaudio status
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -18,24 +17,32 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="utf-8"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Sun, 2008-06-29 at 17:26 -0300, Jo=E3o Paulo Rechi Vita wrote:
-> I have no idea, but I commit to copy here any updates I make there =3D)
-
-Working around the broken technology :)
-
-Thanks Jo=E3o :)
-
-
--------------------------------------------------------------------------
-Check out the new SourceForge.net Marketplace.
-It's the best place to buy or sell services for
-just about anything Open Source.
-http://sourceforge.net/services/buy/index.php
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+SSBoYXZlIG5vIGlkZWEsIGJ1dCBJIGNvbW1pdCB0byBjb3B5IGhlcmUgYW55IHVwZGF0ZXMgSSBt
+YWtlIHRoZXJlID0pCgpPbiBTYXQsIEp1biAyOCwgMjAwOCBhdCAxMDowMCBQTSwgQmFzdGllbiBO
+b2NlcmEgPGhhZGVzc0BoYWRlc3MubmV0PiB3cm90ZToKPiBPbiBTYXQsIDIwMDgtMDYtMjggYXQg
+MTg6MjMgLTAzMDAsIEpvw6NvIFBhdWxvIFJlY2hpIFZpdGEgd3JvdGU6Cj4gPHNuaXA+Cj4+IFRo
+aXMgc3RhdHVzIG1lc3NhZ2UgaXMgYWxzbyBvbiB0aGUgd2lraSBhdAo+PiBodHRwOi8vd2lraS5i
+bHVlei5vcmcvd2lraS9QdWxzZUludGVncmF0aW9uCj4KPiBTdHVwaWQgcXVlc3Rpb24gb2YgdGhl
+IGRheTogaG93IGRvIHlvdSBzdWJzY3JpYmUgdG8gY2hhbmdlcyBpbiBhIHBhZ2UgaW4KPiBUcmFj
+J3MgV2lraT8KPgo+Cj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+IENoZWNrIG91dCB0aGUgbmV3IFNvdXJj
+ZUZvcmdlLm5ldCBNYXJrZXRwbGFjZS4KPiBJdCdzIHRoZSBiZXN0IHBsYWNlIHRvIGJ1eSBvciBz
+ZWxsIHNlcnZpY2VzIGZvcgo+IGp1c3QgYWJvdXQgYW55dGhpbmcgT3BlbiBTb3VyY2UuCj4gaHR0
+cDovL3NvdXJjZWZvcmdlLm5ldC9zZXJ2aWNlcy9idXkvaW5kZXgucGhwCj4gX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KPiBCbHVlei1kZXZlbCBtYWlsaW5n
+IGxpc3QKPiBCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKPiBodHRwczovL2xpc3Rz
+LnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo+CgoKCi0tIApKb8Oj
+byBQYXVsbyBSZWNoaSBWaXRhCk1TYyBDb21wdXRlciBTY2llbmNlIFN0dWRlbnQKQ29tcHV0ZXIg
+RW5naW5lZXIKSUMgLyBVbmljYW1wCgppcmMuZnJlZW5vZGUubmV0OiBqcHJ2aXRhCi0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0KQ2hlY2sgb3V0IHRoZSBuZXcgU291cmNlRm9yZ2UubmV0IE1hcmtldHBsYWNlLgpJ
+dCdzIHRoZSBiZXN0IHBsYWNlIHRvIGJ1eSBvciBzZWxsIHNlcnZpY2VzIGZvcgpqdXN0IGFib3V0
+IGFueXRoaW5nIE9wZW4gU291cmNlLgpodHRwOi8vc291cmNlZm9yZ2UubmV0L3NlcnZpY2VzL2J1
+eS9pbmRleC5waHAKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X18KQmx1ZXotZGV2ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdl
+Lm5ldApodHRwczovL2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1k
+ZXZlbAo=
