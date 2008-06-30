@@ -1,11 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Terry <michael.terry@canonical.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1214605438.11537.0.camel@violet.holtmann.net>
+In-Reply-To: <1214832022.6764.10.camel@bongo>
 References: <1214593557.6131.26.camel@bongo>
 	<1214605438.11537.0.camel@violet.holtmann.net>
-Date: Mon, 30 Jun 2008 09:51:55 -0400
-Message-Id: <1214833915.6764.17.camel@bongo>
+	<1214830311.6764.2.camel@bongo>
+	<1214830640.11537.39.camel@violet.holtmann.net>
+	<1214832022.6764.10.camel@bongo>
+Date: Mon, 30 Jun 2008 16:07:23 +0200
+Message-Id: <1214834843.11537.44.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Wizard patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -17,224 +20,36 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1413379517=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Michael,
 
---===============1413379517==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="=-FPLpKk2lIUFMTPOWpdP8"
+> > please use the coding style that is present in the file you are
+> > working
+> > on. This includes whitespaces and indentation.
+> 
+> Sure.  I thought I did, but I missed a tab, which is what I assume you
+> were referring to?
+> 
+> Tab-complete patch attached.
 
+there was one SOMETHING-1 where you should have done SOMETHING - 1. I
+fixed that and the patch has been committed.
 
---=-FPLpKk2lIUFMTPOWpdP8
-Content-Type: multipart/mixed; boundary="=-kyBrnpg1UWerIjVFLjTf"
+Regards
 
-
---=-kyBrnpg1UWerIjVFLjTf
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On Sat, 2008-06-28 at 00:23 +0200, Marcel Holtmann wrote:
-> looks nice. However you have to break this up into pieces for. Sent
-> small patches and I can quickly review and commit them.
-
-Here's a patch to add support for connecting to devices via the client code=
-.  This patch depends on the callback patch.
-
-It finds known services on startup (in setup_services()).  Bastien
-suggested that we don't need to call setup_services() since those
-services are enabled by default, but I'm not quite sure what he meant.
-We need to call it to get the service bus IDs so that we can then get
-DBusGProxies for them.
-
-It adds the function bluetooth_client_available_services() which gives
-back a type mask for services that were detected.  Basically which
-devices are likely to succeed from a bluetooth_client_connect() call.
-
-=EF=BB=BFbluetooth_client_connect() does device-specific connection handlin=
-g.
-It only handles a few types right now (input and headset).
-
--mt
-
---=-kyBrnpg1UWerIjVFLjTf
-Content-Disposition: attachment; filename=services.diff
-Content-Type: text/x-patch; name=services.diff; charset=utf-8
-Content-Transfer-Encoding: base64
-
-ZGlmZiAtdXByIC4uL2JsdWV6LWdub21lLWNhbGxiYWNrL2NvbW1vbi9jbGllbnQuYyAuL2NvbW1v
-bi9jbGllbnQuYw0KLS0tIC4uL2JsdWV6LWdub21lLWNhbGxiYWNrL2NvbW1vbi9jbGllbnQuYwky
-MDA4LTA2LTMwIDA5OjA0OjU3LjAwMDAwMDAwMCAtMDQwMA0KKysrIC4vY29tbW9uL2NsaWVudC5j
-CTIwMDgtMDYtMzAgMDk6MzU6NTIuMDAwMDAwMDAwIC0wNDAwDQpAQCAtNDgsNiArNDgsOCBAQCBz
-dHJ1Y3QgX0JsdWV0b290aENsaWVudFByaXZhdGUgew0KIA0KIAlEQnVzR0Nvbm5lY3Rpb24gKmNv
-bm47DQogCURCdXNHUHJveHkgKm1hbmFnZXJfb2JqZWN0Ow0KKwlEQnVzR1Byb3h5ICppbnB1dF9z
-ZXJ2aWNlOw0KKwlEQnVzR1Byb3h5ICphdWRpb19zZXJ2aWNlOw0KIAlHdGtUcmVlU3RvcmUgKnN0
-b3JlOw0KIAlnY2hhciAqZGVmYXVsdF9hZGFwdGVyOw0KIH07DQpAQCAtOTM1LDYgKzkzNywzMyBA
-QCBzdGF0aWMgdm9pZCBzZXR1cF9tYW5hZ2VyKEJsdWV0b290aENsaWVuDQogCQlnX2Vycm9yX2Zy
-ZWUoZXJyb3IpOw0KIH0NCiANCitzdGF0aWMgdm9pZCBzZXR1cF9zZXJ2aWNlcyhCbHVldG9vdGhD
-bGllbnQgKmNsaWVudCkNCit7DQorCUJsdWV0b290aENsaWVudFByaXZhdGUgKnByaXYgPSBCTFVF
-VE9PVEhfQ0xJRU5UX0dFVF9QUklWQVRFKGNsaWVudCk7DQorCWdjaGFyICpidXNuYW1lID0gTlVM
-TDsNCisNCisJcHJpdi0+aW5wdXRfc2VydmljZSA9IE5VTEw7DQorCXByaXYtPmF1ZGlvX3NlcnZp
-Y2UgPSBOVUxMOw0KKw0KKwlpZiAoZGJ1c19nX3Byb3h5X2NhbGwocHJpdi0+bWFuYWdlcl9vYmpl
-Y3QsICJBY3RpdmF0ZVNlcnZpY2UiLCBOVUxMLA0KKwkgICAgICAgICAgICAgICAgICAgICAgR19U
-WVBFX1NUUklORywgImlucHV0IiwgR19UWVBFX0lOVkFMSUQsDQorCSAgICAgICAgICAgICAgICAg
-ICAgICBHX1RZUEVfU1RSSU5HLCAmYnVzbmFtZSwgR19UWVBFX0lOVkFMSUQpKSB7DQorCQlwcml2
-LT5pbnB1dF9zZXJ2aWNlID0gZGJ1c19nX3Byb3h5X25ld19mb3JfbmFtZShwcml2LT5jb25uLCBi
-dXNuYW1lLA0KKwkJICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIi9vcmcvYmx1ZXovaW5wdXQiLA0KKwkJICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIm9yZy5ibHVlei5pbnB1dC5NYW5hZ2VyIik7DQorCQlnX2ZyZWUo
-YnVzbmFtZSk7DQorCX0NCisNCisJaWYgKGRidXNfZ19wcm94eV9jYWxsKHByaXYtPm1hbmFnZXJf
-b2JqZWN0LCAiQWN0aXZhdGVTZXJ2aWNlIiwgTlVMTCwNCisJICAgICAgICAgICAgICAgICAgICAg
-IEdfVFlQRV9TVFJJTkcsICJhdWRpbyIsIEdfVFlQRV9JTlZBTElELA0KKwkgICAgICAgICAgICAg
-ICAgICAgICAgR19UWVBFX1NUUklORywgJmJ1c25hbWUsIEdfVFlQRV9JTlZBTElEKSkgew0KKwkJ
-cHJpdi0+YXVkaW9fc2VydmljZSA9IGRidXNfZ19wcm94eV9uZXdfZm9yX25hbWUocHJpdi0+Y29u
-biwgYnVzbmFtZSwNCisJCSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICIvb3JnL2JsdWV6L2F1ZGlvIiwNCisJCSAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICJvcmcuYmx1ZXouYXVkaW8uTWFuYWdlciIpOw0KKwkJZ19m
-cmVlKGJ1c25hbWUpOw0KKwl9DQorfQ0KKw0KIHN0YXRpYyB2b2lkIG5hbWVfb3duZXJfY2hhbmdl
-ZChEQnVzR1Byb3h5ICpvYmplY3QsIGNvbnN0IGNoYXIgKm5hbWUsDQogCQkJY29uc3QgY2hhciAq
-cHJldiwgY29uc3QgY2hhciAqbmV3LCBncG9pbnRlciB1c2VyX2RhdGEpDQogew0KQEAgLTk4NCw2
-ICsxMDEzLDggQEAgc3RhdGljIHZvaWQgYmx1ZXRvb3RoX2NsaWVudF9maW5hbGl6ZShHTw0KIAln
-X2ZyZWUocHJpdi0+ZGVmYXVsdF9hZGFwdGVyKTsNCiAJZ19vYmplY3RfdW5yZWYoR19PQkpFQ1Qo
-cHJpdi0+c3RvcmUpKTsNCiAJZ19vYmplY3RfdW5yZWYgKHByaXYtPm1hbmFnZXJfb2JqZWN0KTsN
-CisJZ19vYmplY3RfdW5yZWYgKHByaXYtPmlucHV0X3NlcnZpY2UpOw0KKwlnX29iamVjdF91bnJl
-ZiAocHJpdi0+YXVkaW9fc2VydmljZSk7DQogfQ0KIA0KIHN0YXRpYyB2b2lkIGJsdWV0b290aF9j
-bGllbnRfaW5pdChCbHVldG9vdGhDbGllbnQgKmNsaWVudCkNCkBAIC0xMDAwLDYgKzEwMzEsOCBA
-QCBzdGF0aWMgdm9pZCBibHVldG9vdGhfY2xpZW50X2luaXQoQmx1ZXRvDQogCXNldHVwX2RidXMo
-Y2xpZW50KTsNCiANCiAJc2V0dXBfbWFuYWdlcihjbGllbnQpOw0KKw0KKwlzZXR1cF9zZXJ2aWNl
-cyhjbGllbnQpOw0KIH0NCiANCiBzdGF0aWMgdm9pZCBibHVldG9vdGhfY2xpZW50X3NldF9wcm9w
-ZXJ0eShHT2JqZWN0ICpvYmplY3QsIGd1aW50IHByb3BfaWQsDQpAQCAtMTA4NSw2ICsxMTE4LDE5
-IEBAIEJsdWV0b290aENsaWVudCAqYmx1ZXRvb3RoX2NsaWVudF9uZXcodm8NCiAJfQ0KIH0NCiAN
-CitpbnQgYmx1ZXRvb3RoX2NsaWVudF9hdmFpbGFibGVfc2VydmljZXMoQmx1ZXRvb3RoQ2xpZW50
-ICpjbGllbnQpDQorew0KKwlCbHVldG9vdGhDbGllbnRQcml2YXRlICpwcml2ID0gQkxVRVRPT1RI
-X0NMSUVOVF9HRVRfUFJJVkFURShjbGllbnQpOw0KKwlpbnQgcnYgPSAwOw0KKw0KKwlpZiAocHJp
-di0+aW5wdXRfc2VydmljZSkNCisJCXJ2IHw9IEJMVUVUT09USF9UWVBFX0lOUFVUOw0KKwlpZiAo
-cHJpdi0+YXVkaW9fc2VydmljZSkNCisJCXJ2IHw9IEJMVUVUT09USF9UWVBFX0hFQURTRVQ7DQor
-DQorCXJldHVybiBydjsNCit9DQorDQogZ2Jvb2xlYW4gYmx1ZXRvb3RoX2NsaWVudF9yZWdpc3Rl
-cl9wYXNza2V5X2FnZW50KEJsdWV0b290aENsaWVudCAqY2xpZW50LA0KIAkJY29uc3QgY2hhciAq
-cGF0aCwgY29uc3QgY2hhciAqYWRkcmVzcywgY29uc3Qgdm9pZCAqaW5mbykNCiB7DQpAQCAtMTEz
-MSw2ICsxMTc3LDg5IEBAIHN0YXRpYyB2b2lkIGNhbGxfcmVwbHlfcyhEQnVzR1Byb3h5ICpwcm8N
-CiAJY2FsbF9yZXBseShwcm94eSwgZXJyb3IsIHVzZXJkYXRhKTsNCiB9DQogDQorc3RhdGljIGdi
-b29sZWFuIGNvbm5lY3RfdG9fc2VydmljZShCbHVldG9vdGhDbGllbnQgKmNsaWVudCwgREJ1c0dQ
-cm94eSAqb2JqZWN0LA0KKwkJCQkJCWNvbnN0IGdjaGFyICphZGRyZXNzLCBndWludCB0eXBlLA0K
-KwkJCQkJCWdwb2ludGVyIHVzZXJkYXRhKQ0KK3sNCisJQmx1ZXRvb3RoQ2xpZW50UHJpdmF0ZSAq
-cHJpdiA9IEJMVUVUT09USF9DTElFTlRfR0VUX1BSSVZBVEUoY2xpZW50KTsNCisJREJ1c0dQcm94
-eUNhbGwgKmNhbGwgPSBOVUxMOw0KKw0KKwkvKiBTcGVjaWFsIGNhc2UgdGhlIGZldyB0eXBlcyB3
-ZSBjYW4gaGFuZGxlICovDQorCWlmICh0eXBlICYgQkxVRVRPT1RIX1RZUEVfSU5QVVQpDQorCQlj
-YWxsID0gaW5wdXRfY3JlYXRlX3NlY3VyZV9kZXZpY2VfYXN5bmMocHJpdi0+aW5wdXRfc2Vydmlj
-ZSwgYWRkcmVzcywNCisJCQkJCWNhbGxfcmVwbHlfcywgdXNlcmRhdGEpOw0KKwllbHNlIGlmICh0
-eXBlICYgQkxVRVRPT1RIX1RZUEVfSEVBRFNFVCkNCisJCWNhbGwgPSBhdWRpb19jcmVhdGVfaGVh
-ZHNldF9hc3luYyhwcml2LT5hdWRpb19zZXJ2aWNlLCBhZGRyZXNzLA0KKwkJCQkJY2FsbF9yZXBs
-eV9zLCB1c2VyZGF0YSk7DQorDQorCWdfb2JqZWN0X3NldF9kYXRhKEdfT0JKRUNUKG9iamVjdCks
-ICJjYWxsIiwgY2FsbCk7DQorCXJldHVybiBjYWxsICE9IE5VTEw7DQorfQ0KKw0KK2dib29sZWFu
-IGJsdWV0b290aF9jbGllbnRfY29ubmVjdChCbHVldG9vdGhDbGllbnQgKmNsaWVudCwgZ3VpbnQg
-dHlwZSwNCisJCQkJCWdjaGFyICphZGFwdGVyLCBjb25zdCBnY2hhciAqYWRkcmVzcywNCisJCQkJ
-CWJsdWV0b290aF9jbGllbnRfY2FsbF9yZXBseSBjYWxsYmFjaywNCisJCQkJCWdwb2ludGVyIHVz
-ZXJkYXRhKQ0KK3sNCisJQmx1ZXRvb3RoQ2xpZW50UHJpdmF0ZSAqcHJpdiA9IEJMVUVUT09USF9D
-TElFTlRfR0VUX1BSSVZBVEUoY2xpZW50KTsNCisJR3RrVHJlZUl0ZXIgaXRlcjsNCisJZ2Jvb2xl
-YW4gY29udDsNCisNCisJaWYgKGFkYXB0ZXIgPT0gTlVMTCkNCisJCWFkYXB0ZXIgPSBwcml2LT5k
-ZWZhdWx0X2FkYXB0ZXI7DQorDQorCWlmIChhZGFwdGVyID09IE5VTEwpDQorCQlyZXR1cm4gRkFM
-U0U7DQorDQorCWNvbnQgPSBndGtfdHJlZV9tb2RlbF9nZXRfaXRlcl9maXJzdChHVEtfVFJFRV9N
-T0RFTChwcml2LT5zdG9yZSksICZpdGVyKTsNCisNCisJd2hpbGUgKGNvbnQgPT0gVFJVRSkgew0K
-KwkJREJ1c0dQcm94eSAqb2JqZWN0Ow0KKwkJZ2NoYXIgKnBhdGg7DQorDQorCQlndGtfdHJlZV9t
-b2RlbF9nZXQoR1RLX1RSRUVfTU9ERUwocHJpdi0+c3RvcmUpLCAmaXRlciwNCisJCQkJCQlDT0xV
-TU5fUEFUSCwgJnBhdGgsDQorCQkJCQkJQ09MVU1OX09CSkVDVCwgJm9iamVjdCwgLTEpOw0KKw0K
-KwkJaWYgKGdfYXNjaWlfc3RyY2FzZWNtcChwYXRoLCBhZGFwdGVyKSA9PSAwKSB7DQorCQkJREJ1
-c0dBc3luY0RhdGEgKnN0dWZmOw0KKwkJCWdib29sZWFuIGNvbnQ7DQorCQkJR3RrVHJlZUl0ZXIg
-Y2hpbGQ7DQorDQorCQkJc3R1ZmYgPSBnX25ldyAoREJ1c0dBc3luY0RhdGEsIDEpOw0KKwkJCXN0
-dWZmLT5jYiA9IEdfQ0FMTEJBQ0sgKGNhbGxiYWNrKTsNCisJCQlzdHVmZi0+dXNlcmRhdGEgPSB1
-c2VyZGF0YTsNCisNCisJCQkvKiBJZiBjYWxsZXIgZGlkbid0IHNwZWNpZnkgYSBmb3JjZWQgdHlw
-ZSwgZGV0ZXJtaW5lIGl0IGZyb20gZGV2aWNlIGluZm8gKi8NCisJCQlpZiAodHlwZSA9PSAwIHx8
-IHR5cGUgPT0gQkxVRVRPT1RIX1RZUEVfQU5ZKSB7DQorCQkJCWNvbnQgPSBndGtfdHJlZV9tb2Rl
-bF9pdGVyX2NoaWxkcmVuKEdUS19UUkVFX01PREVMKHByaXYtPnN0b3JlKSwNCisJCQkJCQkJCQkJ
-JmNoaWxkLCAmaXRlcik7DQorDQorCQkJCXdoaWxlIChjb250ID09IFRSVUUpIHsNCisJCQkJCWdj
-aGFyICp2YWx1ZTsNCisNCisJCQkJCWd0a190cmVlX21vZGVsX2dldChHVEtfVFJFRV9NT0RFTChw
-cml2LT5zdG9yZSksICZjaGlsZCwNCisJCQkJCQkJCQlDT0xVTU5fQUREUkVTUywgJnZhbHVlLCAt
-MSk7DQorDQorCQkJCQlpZiAoZ19hc2NpaV9zdHJjYXNlY21wKGFkZHJlc3MsIHZhbHVlKSA9PSAw
-KSB7DQorCQkJCQkJZ3RrX3RyZWVfbW9kZWxfZ2V0KEdUS19UUkVFX01PREVMKHByaXYtPnN0b3Jl
-KSwgJmNoaWxkLA0KKwkJCQkJCQkJCUNPTFVNTl9UWVBFLCAmdHlwZSwgLTEpOw0KKwkJCQkJCWJy
-ZWFrOw0KKwkJCQkJfQ0KKw0KKwkJCQkJY29udCA9IGd0a190cmVlX21vZGVsX2l0ZXJfbmV4dChH
-VEtfVFJFRV9NT0RFTChwcml2LT5zdG9yZSksICZjaGlsZCk7DQorCQkJCX0NCisJCQl9DQorDQor
-CQkJcmV0dXJuIGNvbm5lY3RfdG9fc2VydmljZShjbGllbnQsIG9iamVjdCwgYWRkcmVzcywgdHlw
-ZSwgc3R1ZmYpOw0KKwkJfQ0KKw0KKwkJY29udCA9IGd0a190cmVlX21vZGVsX2l0ZXJfbmV4dChH
-VEtfVFJFRV9NT0RFTChwcml2LT5zdG9yZSksICZpdGVyKTsNCisJfQ0KKw0KKwlyZXR1cm4gRkFM
-U0U7DQorfQ0KKw0KIGdib29sZWFuIGJsdWV0b290aF9jbGllbnRfY3JlYXRlX2JvbmRpbmcoQmx1
-ZXRvb3RoQ2xpZW50ICpjbGllbnQsDQogCQkJCQlnY2hhciAqYWRhcHRlciwgY29uc3QgZ2NoYXIg
-KmFkZHJlc3MsDQogCQkJCQlibHVldG9vdGhfY2xpZW50X2NhbGxfcmVwbHkgY2FsbGJhY2ssDQpk
-aWZmIC11cHIgLi4vYmx1ZXotZ25vbWUtY2FsbGJhY2svY29tbW9uL2NsaWVudC5oIC4vY29tbW9u
-L2NsaWVudC5oDQotLS0gLi4vYmx1ZXotZ25vbWUtY2FsbGJhY2svY29tbW9uL2NsaWVudC5oCTIw
-MDgtMDYtMzAgMDk6MDM6NDQuMDAwMDAwMDAwIC0wNDAwDQorKysgLi9jb21tb24vY2xpZW50LmgJ
-MjAwOC0wNi0zMCAwOTo0MzoxMy4wMDAwMDAwMDAgLTA0MDANCkBAIC0xMDEsOCArMTAxLDE2IEBA
-IGdib29sZWFuIGJsdWV0b290aF9jbGllbnRfcmVnaXN0ZXJfcGFzc2sNCiANCiB0eXBlZGVmIHZv
-aWQgKCpibHVldG9vdGhfY2xpZW50X2NhbGxfcmVwbHkpIChHRXJyb3IgKmVycm9yLCBncG9pbnRl
-ciBkYXRhKTsNCiANCitpbnQgYmx1ZXRvb3RoX2NsaWVudF9hdmFpbGFibGVfc2VydmljZXMoQmx1
-ZXRvb3RoQ2xpZW50ICpzZWxmKTsNCisNCiBnYm9vbGVhbiBibHVldG9vdGhfY2xpZW50X2NhbmNl
-bF9jYWxsKEJsdWV0b290aENsaWVudCAqc2VsZiwNCiAJCQkJCWdjaGFyICphZGFwdGVyLCBjb25z
-dCBnY2hhciAqYWRkcmVzcyk7DQorDQorLyogU2V0ICd0eXBlJyB0byBub24temVybyB0byBmb3Jj
-ZSBhIGNlcnRhaW4gdHlwZSBjb25uZWN0aW9uIC0tIHVzZWZ1bCBmb3IgZHVtYiBkZXZpY2VzICov
-DQorZ2Jvb2xlYW4gYmx1ZXRvb3RoX2NsaWVudF9jb25uZWN0KEJsdWV0b290aENsaWVudCAqc2Vs
-ZiwgZ3VpbnQgdHlwZSwNCisJCQkJCWdjaGFyICphZGFwdGVyLCBjb25zdCBnY2hhciAqYWRkcmVz
-cywNCisJCQkJCWJsdWV0b290aF9jbGllbnRfY2FsbF9yZXBseSBjYWxsYmFjaywNCisJCQkJCWdw
-b2ludGVyIGRhdGEpOw0KIGdib29sZWFuIGJsdWV0b290aF9jbGllbnRfY3JlYXRlX2JvbmRpbmco
-Qmx1ZXRvb3RoQ2xpZW50ICpzZWxmLA0KIAkJCQkJZ2NoYXIgKmFkYXB0ZXIsIGNvbnN0IGdjaGFy
-ICphZGRyZXNzLA0KIAkJCQkJYmx1ZXRvb3RoX2NsaWVudF9jYWxsX3JlcGx5IGNhbGxiYWNrLA0K
-ZGlmZiAtdXByIC4uL2JsdWV6LWdub21lLWNhbGxiYWNrL2NvbW1vbi9kYnVzLnhtbCAuL2NvbW1v
-bi9kYnVzLnhtbA0KLS0tIC4uL2JsdWV6LWdub21lLWNhbGxiYWNrL2NvbW1vbi9kYnVzLnhtbAky
-MDA4LTA2LTMwIDA4OjU1OjMxLjAwMDAwMDAwMCAtMDQwMA0KKysrIC4vY29tbW9uL2RidXMueG1s
-CTIwMDgtMDYtMzAgMDk6Mzg6NTkuMDAwMDAwMDAwIC0wNDAwDQpAQCAtOTgsNCArOTgsMjAgQEAN
-CiAgICAgICA8YXJnIHR5cGU9InMiIG5hbWU9ImFkZHJlc3MiLz4NCiAgICAgPC9tZXRob2Q+DQog
-ICA8L2ludGVyZmFjZT4NCisNCisgIDxpbnRlcmZhY2UgbmFtZT0iaW5wdXQiPg0KKyAgICA8bWV0
-aG9kIG5hbWU9IkNyZWF0ZVNlY3VyZURldmljZSI+DQorICAgICAgPGFubm90YXRpb24gbmFtZT0i
-b3JnLmZyZWVkZXNrdG9wLkRCdXMuR0xpYi5Bc3luYyIgdmFsdWU9IiIvPg0KKyAgICAgIDxhcmcg
-dHlwZT0icyIgbmFtZT0iYWRkcmVzcyIvPg0KKyAgICAgIDxhcmcgdHlwZT0icyIgZGlyZWN0aW9u
-PSJvdXQiLz4NCisgICAgPC9tZXRob2Q+DQorICA8L2ludGVyZmFjZT4NCisNCisgIDxpbnRlcmZh
-Y2UgbmFtZT0iYXVkaW8iPg0KKyAgICA8bWV0aG9kIG5hbWU9IkNyZWF0ZUhlYWRzZXQiPg0KKyAg
-ICAgIDxhbm5vdGF0aW9uIG5hbWU9Im9yZy5mcmVlZGVza3RvcC5EQnVzLkdMaWIuQXN5bmMiIHZh
-bHVlPSIiLz4NCisgICAgICA8YXJnIHR5cGU9InMiIG5hbWU9ImFkZHJlc3MiLz4NCisgICAgICA8
-YXJnIHR5cGU9InMiIGRpcmVjdGlvbj0ib3V0Ii8+DQorICAgIDwvbWV0aG9kPg0KKyAgPC9pbnRl
-cmZhY2U+DQogPC9ub2RlPg0K
+Marcel
 
 
---=-kyBrnpg1UWerIjVFLjTf--
-
---=-FPLpKk2lIUFMTPOWpdP8
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
-
-iD8DBQBIaOT753i2YxNrdi0RAmt+AJ9rUAi43Anhs768iwU6R6rgaGfSmACgmcvM
-2sJM6jN7a1K3V6M2gM5MSgM=
-=UuaP
------END PGP SIGNATURE-----
-
---=-FPLpKk2lIUFMTPOWpdP8--
-
-
-
---===============1413379517==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
---===============1413379517==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1413379517==--
