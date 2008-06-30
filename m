@@ -1,17 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1214809038.7011.13.camel@peura.elisa-laajakaista.fi>
-References: <1214310088.6643.87.camel@peura.elisa-laajakaista.fi>
-	<1214527364.4435.14.camel@cookie.hadess.net>
-	<1214548448.6624.61.camel@peura.elisa-laajakaista.fi>
-	<1214804856.7011.8.camel@peura.elisa-laajakaista.fi>
-	<1214806701.11537.14.camel@violet.holtmann.net>
-	<1214809038.7011.13.camel@peura.elisa-laajakaista.fi>
-Date: Mon, 30 Jun 2008 10:02:23 +0200
-Message-Id: <1214812943.11537.20.camel@violet.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Making library out of bluez-gnome
+Date: Mon, 30 Jun 2008 13:04:01 +0530 (IST)
+From: ashok pundit <ashokgautam15@yahoo.com>
+To: Bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Message-ID: <716558.46862.qm@web94708.mail.in2.yahoo.com>
+Subject: [Bluez-devel] Regarding calculation of hash value for mobile phones
+	using Bluetooth services.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,40 +15,75 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1498396529=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Antti,
+--===============1498396529==
+Content-Type: multipart/alternative; boundary="0-1257024511-1214811241=:46862"
 
-> > > > Yes, true. thanks! I thought that g_value_set_string() would not make a
-> > > > copy of the string. I just adapted the "device-selected" property so I
-> > > > suppose it's also leaking memory. 
-> > > 
-> > > patch attached.
-> > > It's against clean CVS without my other modifications.
-> > 
-> > please resend all patches and make sure that you use the exact same
-> > coding style that is used in the file you modify.
-> 
-> done. patches attached.
+--0-1257024511-1214811241=:46862
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-you have to fix your editor. It keeps adding single tabs on empty lines.
-Don't do this. I had to fix this manually. Other than that, your patches
-are committed to the CVS. Thanks.
+Dear All=0A=0AWe are working on a application that calculates an integer va=
+lue=0A(called hash value of mobile) for mobile device based on Bluetooth=0A=
+services available on mobile phone. I am using following algorithm=0AStep 1=
+: Search all services available on mobile phone.=0AStep 2: Calculate hash v=
+alue by using formula =E2=88=91(chi*reci)=0A=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 Where chi is channel number and reci is record handler=0A=
+ith service.=0A=0AHere we have bit confusion in Step 1 of algorithm. We are=
+ not sure=0Aabout using the service group to search services. We have to ch=
+oice=0Ahere either RFCOMM(ox 0003) or PublicBrowseGroup(ox1002). It will be=
+=0Agreat help to us, if you tell the which option is better and why.=0A=0AT=
+hanks and Regards=0AAshok Pundit=0A=0A=0A=0A      Bollywood, fun, friendshi=
+p, sports and more. You name it, we have it on http://in.promos.yahoo.com/g=
+roups/bestofyahoo/
+--0-1257024511-1214811241=:46862
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Regards
+<html><head><style type=3D"text/css"><!-- DIV {margin:0px;} --></style></he=
+ad><body><div style=3D"font-family:times new roman, new york, times, serif;=
+font-size:12pt"><DIV></DIV>=0A<DIV>Dear All<BR><BR>We are working on a appl=
+ication that calculates an integer value<BR>(called hash value of mobile) f=
+or mobile device based on Bluetooth<BR>services available on mobile phone. =
+I am using following algorithm<BR>Step 1: Search all services available on =
+mobile phone.<BR>Step 2: Calculate hash value by using formula =E2=88=91(ch=
+i*reci)<BR>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Where chi is ch=
+annel number and reci is record handler<BR>ith service.<BR><BR>Here we have=
+ bit confusion in Step 1 of algorithm. We are not sure<BR>about using the s=
+ervice group to search services. We have to choice<BR>here either RFCOMM(ox=
+ 0003) or PublicBrowseGroup(ox1002). It will be<BR>great help to us, if you=
+ tell the which option is better and why.<BR></DIV>=0A<DIV>Thanks and Regar=
+ds<BR>Ashok Pundit<BR></DIV></div><br>=0A=0A=0A      <!--6--><hr size=3D1><=
+/hr> Explore your hobbies and interests. <a href=3D"http://in.rd.yahoo.com/=
+tagline_groups_6/*http://in.promos.yahoo.com/groups/">Click here to begin.<=
+/a></body></html>
+--0-1257024511-1214811241=:46862--
 
-Marcel
 
 
+--===============1498396529==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
+--===============1498396529==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1498396529==--
