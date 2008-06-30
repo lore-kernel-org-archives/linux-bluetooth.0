@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Terry <michael.terry@canonical.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1214830640.11537.39.camel@violet.holtmann.net>
+Message-ID: <035501c8dab3$5596b380$6701a8c0@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
 References: <1214593557.6131.26.camel@bongo>
-	<1214605438.11537.0.camel@violet.holtmann.net>
-	<1214830311.6764.2.camel@bongo>
-	<1214830640.11537.39.camel@violet.holtmann.net>
-Date: Mon, 30 Jun 2008 09:20:22 -0400
-Message-Id: <1214832022.6764.10.camel@bongo>
-Mime-Version: 1.0
+	<1214606647.4435.71.camel@cookie.hadess.net>
+	<031301c8da4d$0bce3720$6701a8c0@freqonedev>
+	<1214813891.4435.149.camel@cookie.hadess.net>
+Date: Mon, 30 Jun 2008 08:15:12 -0500
+MIME-Version: 1.0
 Subject: Re: [Bluez-devel] Wizard patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,123 +18,65 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0826626542=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---===============0826626542==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="=-g4Da5s9Iv9ENE2W4p8fQ"
+----- Original Message ----- 
+From: "Bastien Nocera" <hadess@hadess.net>
+To: "David Stockwell" <dstockwell@frequency-one.com>
+Sent: Monday, June 30, 2008 3:18 AM
+Subject: Re: [Bluez-devel] Wizard patch
 
 
---=-g4Da5s9Iv9ENE2W4p8fQ
-Content-Type: multipart/mixed; boundary="=-FUOcn3zF5aADIHBezsfW"
+> On Sun, 2008-06-29 at 20:03 -0500, David Stockwell wrote:
+>> Out of curiosity, why not use C++ style (//) comments?  Do you prefer
+>> the older /*...*/ comments?  Or is there some other reason.
+>
+> C++-style comments are for temporary comments. Almost all C codebases
+> refuse to have C++-style comments in permanent code.
 
+Fair enough.  Also the case that C-compilers sometimes do not handle // 
+comments.
+>
+>> FWIW, it seems to me that most of the code (e.g, the DBus code) is
+>> almost completely uncommented...hence very hard to figure out how
+>> it actually works, or even how it is intended to work.
+>
+> There's documentation for D-Bus in */*.txt in bluez-utils. If the
+> documentation isn't good enough, either send questions asking for
+> clarifications, or patches.
 
---=-FUOcn3zF5aADIHBezsfW
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+I read the docs and when the code works as expected it is good enough. 
+However, I have had a number of problems making the code work (partially 
+implemented "experimental" 4.x features in release 3.33 and before).
 
-On Mon, 2008-06-30 at 14:57 +0200, Marcel Holtmann wrote:
-> please use the coding style that is present in the file you are
-> working
-> on. This includes whitespaces and indentation.
+Also, figuring out how to handle some of the formats (e.g., the "dict" 
+with variant) are a bit hard to figure out without a code example.  SO, 
+I often have to dig into the actual code and figure out just what is 
+going on.
+>
+> BTW, could you please: reply to the list, quote properly, not 
+> top-post,
+> and make sure lines are cut to 72 chars in length. I know it's hard
+> using Outlook...
+>
 
-Sure.  I thought I did, but I missed a tab, which is what I assume you
-were referring to?
+OK, I normally respond to the list (note that I have not contacted you 
+before, and will not again), but had a couple of questions about the 
+stylistic points you raised, which I had not seen before.
 
-Tab-complete patch attached.
+I think you will also see that this is plain text, cut to 72 chars. 
+Easy to do. 
 
--mt
-
---=-FUOcn3zF5aADIHBezsfW
-Content-Disposition: attachment; filename=selector2.diff
-Content-Type: text/x-patch; name=selector2.diff; charset=utf-8
-Content-Transfer-Encoding: base64
-
-SW5kZXg6IGNvbW1vbi9ibHVldG9vdGgtZGV2aWNlLXNlbGVjdGlvbi5jDQo9PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQpS
-Q1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovZ25vbWUvY29tbW9uL2JsdWV0b290aC1kZXZpY2Utc2Vs
-ZWN0aW9uLmMsdg0KcmV0cmlldmluZyByZXZpc2lvbiAxLjIzDQpkaWZmIC11IC1wIC1yMS4yMyBi
-bHVldG9vdGgtZGV2aWNlLXNlbGVjdGlvbi5jDQotLS0gY29tbW9uL2JsdWV0b290aC1kZXZpY2Ut
-c2VsZWN0aW9uLmMJMzAgSnVuIDIwMDggMDc6NTk6MjkgLTAwMDAJMS4yMw0KKysrIGNvbW1vbi9i
-bHVldG9vdGgtZGV2aWNlLXNlbGVjdGlvbi5jCTMwIEp1biAyMDA4IDEzOjE3OjQzIC0wMDAwDQpA
-QCAtOTEsNiArOTEsMTUgQEAgYmx1ZXRvb3RoX2RldmljZV9jYXRlZ29yeV90b19zdHJpbmcgKGlu
-dA0KIAl9DQogfQ0KIA0KK3N0YXRpYyBpbnQNCitpbnRfbG9nMihpbnQgdikNCit7DQorCWludCBy
-diA9IDA7DQorCXdoaWxlICh2ID4+PSAxKQ0KKwkJcnYrKzsNCisJcmV0dXJuIHJ2Ow0KK30NCisN
-CiBzdGF0aWMgdm9pZA0KIG5hbWVfdG9fdGV4dCAoR3RrVHJlZVZpZXdDb2x1bW4gKmNvbHVtbiwg
-R3RrQ2VsbFJlbmRlcmVyICpjZWxsLA0KIAkgICAgICBHdGtUcmVlTW9kZWwgKm1vZGVsLCBHdGtU
-cmVlSXRlciAqaXRlciwgZ3BvaW50ZXIgZGF0YSkNCkBAIC02MDksNyArNjE4LDcgQEAgYmx1ZXRv
-b3RoX2RldmljZV9zZWxlY3Rpb25faW5pdChCbHVldG9vdA0KIAl9DQogCWdfc2lnbmFsX2Nvbm5l
-Y3QgKEdfT0JKRUNUIChwcml2LT5kZXZpY2VfdHlwZSksICJjaGFuZ2VkIiwNCiAJCQkgIEdfQ0FM
-TEJBQ0soZmlsdGVyX3R5cGVfY2hhbmdlZF9jYiksIHNlbGYpOw0KLQlndGtfY29tYm9fYm94X3Nl
-dF9hY3RpdmUgKEdUS19DT01CT19CT1gocHJpdi0+ZGV2aWNlX3R5cGUpLCBwcml2LT5kZXZpY2Vf
-dHlwZV9maWx0ZXIpOw0KKwlndGtfY29tYm9fYm94X3NldF9hY3RpdmUgKEdUS19DT01CT19CT1go
-cHJpdi0+ZGV2aWNlX3R5cGUpLCBpbnRfbG9nMihwcml2LT5kZXZpY2VfdHlwZV9maWx0ZXIpKTsN
-CiAJaWYgKHByaXYtPnNob3dfZGV2aWNlX3R5cGUpIHsNCiAJCWd0a193aWRnZXRfc2hvdyAocHJp
-di0+ZGV2aWNlX3R5cGVfbGFiZWwpOw0KIAkJZ3RrX3dpZGdldF9zaG93IChwcml2LT5kZXZpY2Vf
-dHlwZSk7DQpAQCAtNjk2LDcgKzcwNSw3IEBAIGJsdWV0b290aF9kZXZpY2Vfc2VsZWN0aW9uX3Nl
-dF9wcm9wZXJ0eSANCiAJCWJyZWFrOw0KIAljYXNlIFBST1BfREVWSUNFX1RZUEVfRklMVEVSOg0K
-IAkJcHJpdi0+ZGV2aWNlX3R5cGVfZmlsdGVyID0gZ192YWx1ZV9nZXRfaW50ICh2YWx1ZSk7DQot
-CQlndGtfY29tYm9fYm94X3NldF9hY3RpdmUgKEdUS19DT01CT19CT1gocHJpdi0+ZGV2aWNlX3R5
-cGUpLCBwcml2LT5kZXZpY2VfdHlwZV9maWx0ZXIgPj4gMSk7DQorCQlndGtfY29tYm9fYm94X3Nl
-dF9hY3RpdmUgKEdUS19DT01CT19CT1gocHJpdi0+ZGV2aWNlX3R5cGUpLCBpbnRfbG9nMihwcml2
-LT5kZXZpY2VfdHlwZV9maWx0ZXIpKTsNCiAJCWJyZWFrOw0KIAljYXNlIFBST1BfREVWSUNFX0NB
-VEVHT1JZX0ZJTFRFUjoNCiAJCXByaXYtPmRldmljZV9jYXRlZ29yeV9maWx0ZXIgPSBnX3ZhbHVl
-X2dldF9pbnQgKHZhbHVlKTsNCkBAIC03ODgsNyArNzk3LDcgQEAgYmx1ZXRvb3RoX2RldmljZV9z
-ZWxlY3Rpb25fY2xhc3NfaW5pdCAoQg0KIAkJCQkJCQkJCQkJICBOVUxMLCBOVUxMLCBUUlVFLCBH
-X1BBUkFNX1JFQURXUklURSkpOw0KIAlnX29iamVjdF9jbGFzc19pbnN0YWxsX3Byb3BlcnR5IChH
-X09CSkVDVF9DTEFTUyhrbGFzcyksDQogCQkJCQkgUFJPUF9ERVZJQ0VfVFlQRV9GSUxURVIsIGdf
-cGFyYW1fc3BlY19pbnQgKCJkZXZpY2UtdHlwZS1maWx0ZXIiLCBOVUxMLCBOVUxMLA0KLQkJCQkJ
-CQkJCQkgICAgMCwgQkxVRVRPT1RIX1RZUEVfTlVNX1RZUEVTLCAwLCBHX1BBUkFNX1JFQURXUklU
-RSkpOw0KKwkJCQkJCQkJCQkgICAgMSwgMSA8PCAoQkxVRVRPT1RIX1RZUEVfTlVNX1RZUEVTLTEp
-LCAxLCBHX1BBUkFNX1JFQURXUklURSkpOw0KIAlnX29iamVjdF9jbGFzc19pbnN0YWxsX3Byb3Bl
-cnR5IChHX09CSkVDVF9DTEFTUyhrbGFzcyksDQogCQkJCQkgUFJPUF9ERVZJQ0VfQ0FURUdPUllf
-RklMVEVSLCBnX3BhcmFtX3NwZWNfaW50ICgiZGV2aWNlLWNhdGVnb3J5LWZpbHRlciIsIE5VTEws
-IE5VTEwsDQogCQkJCQkgCQkJCQkJMCwgQkxVRVRPT1RIX0NBVEVHT1JZX05VTV9DQVRFR09SSUVT
-LCAwLCBHX1BBUkFNX1JFQURXUklURSkpOw0K
-
-
---=-FUOcn3zF5aADIHBezsfW--
-
---=-g4Da5s9Iv9ENE2W4p8fQ
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
-
-iD8DBQBIaN2W53i2YxNrdi0RAtVEAJ0SiBsFbrDr8BR11Zx4l4Y/ID74YgCfT05J
-DsoIuf5WfIhmWzs7n/ksqSA=
-=sHFw
------END PGP SIGNATURE-----
-
---=-g4Da5s9Iv9ENE2W4p8fQ--
-
-
-
---===============0826626542==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
 It's the best place to buy or sell services for
 just about anything Open Source.
 http://sourceforge.net/services/buy/index.php
---===============0826626542==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0826626542==--
