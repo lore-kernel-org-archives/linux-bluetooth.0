@@ -1,16 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-From: Antti =?ISO-8859-1?Q?Kaijanm=E4ki?= <antti@kaijanmaki.net>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1214812943.11537.20.camel@violet.holtmann.net>
+In-Reply-To: <1214809038.7011.13.camel@peura.elisa-laajakaista.fi>
 References: <1214310088.6643.87.camel@peura.elisa-laajakaista.fi>
 	<1214527364.4435.14.camel@cookie.hadess.net>
 	<1214548448.6624.61.camel@peura.elisa-laajakaista.fi>
 	<1214804856.7011.8.camel@peura.elisa-laajakaista.fi>
 	<1214806701.11537.14.camel@violet.holtmann.net>
 	<1214809038.7011.13.camel@peura.elisa-laajakaista.fi>
-	<1214812943.11537.20.camel@violet.holtmann.net>
-Date: Mon, 30 Jun 2008 11:14:23 +0300
-Message-Id: <1214813663.7011.21.camel@peura.elisa-laajakaista.fi>
+Date: Mon, 30 Jun 2008 10:02:23 +0200
+Message-Id: <1214812943.11537.20.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Making library out of bluez-gnome
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -26,35 +25,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-ma, 2008-06-30 kello 10:02 +0200, Marcel Holtmann kirjoitti:
-> Hi Antti,
-> 
-> > > > > Yes, true. thanks! I thought that g_value_set_string() would not make a
-> > > > > copy of the string. I just adapted the "device-selected" property so I
-> > > > > suppose it's also leaking memory. 
-> > > > 
-> > > > patch attached.
-> > > > It's against clean CVS without my other modifications.
+Hi Antti,
+
+> > > > Yes, true. thanks! I thought that g_value_set_string() would not make a
+> > > > copy of the string. I just adapted the "device-selected" property so I
+> > > > suppose it's also leaking memory. 
 > > > 
-> > > please resend all patches and make sure that you use the exact same
-> > > coding style that is used in the file you modify.
+> > > patch attached.
+> > > It's against clean CVS without my other modifications.
 > > 
-> > done. patches attached.
+> > please resend all patches and make sure that you use the exact same
+> > coding style that is used in the file you modify.
 > 
-> you have to fix your editor. It keeps adding single tabs on empty lines.
-> Don't do this. I had to fix this manually. 
+> done. patches attached.
 
-Sorry. I didn't notice that. I'm going back and forth between emacs and
-anjuta so this one is all my fault.
+you have to fix your editor. It keeps adding single tabs on empty lines.
+Don't do this. I had to fix this manually. Other than that, your patches
+are committed to the CVS. Thanks.
 
+Regards
 
-> Other than that, your patches
-> are committed to the CVS. Thanks.
-
-great!
-
- -- Antti
-
+Marcel
 
 
 
