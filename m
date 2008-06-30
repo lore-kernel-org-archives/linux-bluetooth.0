@@ -1,53 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48196709.9030104@magtech.com.au>
-Date: Thu, 01 May 2008 16:45:29 +1000
-From: Aras Vaichas <arasv@magtech.com.au>
+Message-ID: <2d5a2c100806301527y21f80385vc75acdf9da62029c@mail.gmail.com>
+Date: Mon, 30 Jun 2008 19:27:00 -0300
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <035501c8dab3$5596b380$6701a8c0@freqonedev>
 MIME-Version: 1.0
-To: Bluez Users <bluez-users@lists.sourceforge.net>
-Subject: [Bluez-users] Bluez + dbus for ARM solutions?
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+References: <1214593557.6131.26.camel@bongo>
+	<1214606647.4435.71.camel@cookie.hadess.net>
+	<031301c8da4d$0bce3720$6701a8c0@freqonedev>
+	<1214813891.4435.149.camel@cookie.hadess.net>
+	<035501c8dab3$5596b380$6701a8c0@freqonedev>
+Subject: Re: [Bluez-devel] Wizard patch
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="iso-8859-1"
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Hello David,
 
-can someone point me to where I can find scripts/patches that will help
-me build ARM cross-compiled versions of Bluez + dbus for ARM?
+> I read the docs and when the code works as expected it is good enough.
+> However, I have had a number of problems making the code work (partially
+> implemented "experimental" 4.x features in release 3.33 and before).
 
-Is there a well know set of dbus+bluez versions that are known to work
-for cross-compiling, or does everyone just hack the configure files
-until it works?
+You should first understand that the documentation in doc/ are dbus
+specifications, they are not normal method calls or gobject signals.
+You seems to be confused by using dbus-glib and not really knowing
+what dbus is doing, we don't document how to use the API in terms of
+language bindings, because it is open to the application developer to
+choose between the bindings and the binding itself should document how
+it map the different signatures.
 
-I'm currently stuck in dependency hell trying to get dbus to
-cross-compile. So far I've got expat, bluez-libs,  and libusb compiled.
+> Also, figuring out how to handle some of the formats (e.g., the "dict"
+> with variant) are a bit hard to figure out without a code example.  SO,
+> I often have to dig into the actual code and figure out just what is
+> going on.
 
-I saw that someone recommended Scratchbox (for dbus) but I'd rather not
-do that because I am able to cross-compile every single other library
-and application for my distribution (including Python) without requiring
-a method like Scratchbox.
+See my point here, just because dbus-glib maps the signature a{sv}
+(that is the real "dict") to a GHashTable using a GValue doesn't mean
+any other binding will do the same. It's up to the binding to provides
+this kind of documentation not the dbus API which should not be tied
+to a single binding.
 
-Aras Vaichas
+This tutorial should cover what you want:
+http://dbus.freedesktop.org/doc/dbus-tutorial.html
 
-______________________________________________________________________
-This email has been scanned by the MessageLabs Email Security System.
-For more information please visit http://www.messagelabs.com/email 
-______________________________________________________________________
+-- =
+
+Luiz Augusto von Dentz
+Engenheiro de Computa=E7=E3o
 
 -------------------------------------------------------------------------
-This SF.net email is sponsored by the 2008 JavaOne(SM) Conference 
-Don't miss this year's exciting event. There's still time to save $100. 
-Use priority code J8TL2D2. 
-http://ad.doubleclick.net/clk;198757673;13503038;p?http://java.sun.com/javaone
+Check out the new SourceForge.net Marketplace.
+It's the best place to buy or sell services for
+just about anything Open Source.
+http://sourceforge.net/services/buy/index.php
 _______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
