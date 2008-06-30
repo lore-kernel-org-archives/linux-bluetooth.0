@@ -1,16 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e96e9eeb0806300506l1aaeaf6bje93db6f4f5af880e@mail.gmail.com>
-Date: Mon, 30 Jun 2008 15:06:41 +0300
-From: "Voni Hakau" <hakauvoni@gmail.com>
-To: "Mumia W.." <paduille.4061.mumia.w+nospam@earthlink.net>
-In-Reply-To: <4856EC25.5040508@earthlink.net>
+Date: Sun, 29 Jun 2008 21:57:28 -0400
+From: jayjwa <jayjwa@atr2.ath.cx>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <alpine.LNX.1.10.0806292110440.10816@nge2.ngu.pk>
 MIME-Version: 1.0
-References: <e96e9eeb0806130507u139f58a2sa7094a65f9ecff17@mail.gmail.com>
-	<4852914F.6020209@earthlink.net>
-	<e96e9eeb0806160505m44d366e7if9cea8e1d3c6978b@mail.gmail.com>
-	<4856EC25.5040508@earthlink.net>
-Cc: BlueZ users <bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] Bluez build problem
+Subject: [Bluez-users] obexd usage?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -24,62 +18,134 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi !
 
-On Tue, Jun 17, 2008 at 1:41 AM, Mumia W..
-<paduille.4061.mumia.w+nospam@earthlink.net> wrote:
-> But DESTDIR is used during "make install," and as you figured, you can use
-> the platform's prefix.
->
-> Note that some programs don't use the DESTDIR variable, but almost all do.
->
 
-I have successfully built expat,dbus and bluez-libs with this idea, but it seems
-that bluez-utils doesn't like it..
+I'm trying out obexd, but I can't get it to do much. I've had opd working for 
+obex-push before, and sent vcards and such from a phone to computer. No SDP 
+records show for obex-push now. When I send an object from a remote device, 
+nothing is transfered to the computer, and the remote system reports an error.
 
-Here is my configure command:
-BLUEZ_CFLAGS=-I/path/to/my/platform/root/usr/include
-BLUEZ_LIBS="-L/path/to/my/platform/root/usr/lib -lbluetooth"
-DBUS_LIBS="-L/path/to/my/platform/root/usr/lib -ldbus-1"
-DBUS_CFLAGS="-I/path/to/my/platform/root/usr/include/dbus-1.0
--I/path/to/my/platform/root/usr/include/dbus-1.0/include"
-CPPFLAGS=-I/path/to/my/platform/root/usr/include
-LDFLAGS=-L/path/to/my/platform/root/usr/lib ./configure --prefix=/usr
---host=arm-linux --mandir=/usr/share/man --sysconfdir=/etc
---localstatedir=/var --libexecdir=/lib
+Am I correct in that dbus might start the server by looking 
+at /usr/share/dbus-1/services/org.openobex.service? This file points to the 
+binary w/its parameters:
 
-configure runs ok, and then make runs a little until it is doing this:
-arm-linux-gcc -I/path/to/my/platform/root/usr/include
--I/path/to/my/platform/root/usr/include/dbus-1.0
--I/path/to/my/platform/root/usr/include/dbus-1.0/include -I../eglib
--I../gdbus -DPLUGINDIR=\"/usr/lib/bluetooth/plugins\" -Wall -O2
--D_FORTIFY_SOURCE=2 -o hcid main.o -rdynamic
--L/path/to/my/platform/root/usr/lib libhciserver.a
-../sdpd/libsdpserver.a ../common/libhelper.a ../gdbus/.libs/libgdbus.a
-../eglib/.libs/libeglib.a -ldl /usr/lib/libdbus-1.so
-/path/to/my/platform/root/usr/lib/libbluetooth.so   -Wl,--rpath
--Wl,/path/to/my/platform/root/usr/lib -Wl,--rpath
--Wl,/path/to/my/platform/root/usr/lib
-/usr/lib/libdbus-1.so: file not recognized: File format not recognized
-collect2: ld returned 1 exit status
+[D-BUS Service]
+Name=org.openobex
+Exec=/usr/sbin/obexd --root /var/btroot --auto-accept --opp
 
-we can see that it tried to use my host libdbus-1.so, and it ignores
-the DBUS_LIBS variable..
+Trying to start obexd from the command line usually results in nothing:
 
-did i do something wrong ?
-maybe it is a bug in bluez ? do you know how to fix it or bypass it ?
-I tried to look in the Makefiles themselves to change this behavior
-but didn't find it..
+#obexd --help
 
-Thank you again for this wonderful assistance !
-Voni
+I figured out some command lines by strings'ing the binary.
 
-(btw, I even tried to set up
-PKG_CONFIG_PATH=/path/to/my/platform/root/usr/lib/pkgconfig
-but it didn't help...)
+#obexd --root /var/btroot --auto-accept --opp
+#obexd
+#obexd --debug
+No server selected (use either --opp or --ftp or both)
+#obexd --debug --opp
+#
 
->
->
+I did manage to get one message that alludes to X11, but this is the console, 
+so I'm not sure what that has to do with it. Neither obexd nor dbus link any 
+X11 libs.
+
+# obexd -n --root /var/btroot --auto-accept --opp
+dbus-launch failed to autolaunch D-Bus session: Autolaunch error: X11 
+initialization failed.
+
+
+DBus is there:
+
+daemon   15185  0.0  0.1   2568   652 ?        Ss   20:59   0:00 
+/usr/bin/dbus-daemon --system
+
+
+#sdptool browse local | grep -i obex
+
+#
+
+The only thing in syslog at the point I tried to send the file was:
+
+2008-06-29T21:08:42.105241-04:00 vdrl obexd[15242]: Enabling debug information
+2008-06-29T21:17:44.336818-04:00 vdrl obexd[15393]: Enabling debug information
+2008-06-29T21:39:49.280026-04:00 vdrl rsyslogd:-- MARK --
+2008-06-29T21:42:17.914270-04:00 vdrl hcid[15199]: link_key_request 
+(sba=00:0A:3A:7C:5C:74, dba=00:1C:62:19:B1:6A)
+
+
+
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+   . j . . b . . L G   V X 8 3 0 0 . . . .
+   . . . . . . . . . . . . . . . . . . . .
+   . . . . . . . . . . . . . . . . . . . .
+   . . . . . . . . . . . . . . . . . . . .
+   . . . . . . . . . . . . . . . . . . . .
+   . . . . . . . . . . . . . . . . . . . .
+   . . . . . . . . . . . . . . . . . . . .
+   . . . . . . . . . . . . . . . . . . . .
+   . . . . . . . . . . . . . . . . . . . .
+   . . . . . . . . . . . . . . . . . . . .
+   . . . . . . . . . . . . . . . . . . . .
+   . . . . . . . . . . . . . . . . . . . .
+   . . . . . . . . . . . . . . .
+> HCI Event: Number of Completed Packets (0x13) plen 5
+   . . . . .
+> ACL data: handle 11 flags 0x02 dlen 12
+     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 0
+< ACL data: handle 11 flags 0x02 dlen 18
+     L2CAP(s): Config rsp: scid 0x0070 flags 0x00 result 0 clen 4
+       MTU 672
+< ACL data: handle 11 flags 0x02 dlen 12
+     L2CAP(s): Config req: dcid 0x0070 flags 0x00 clen 0
+> ACL data: handle 11 flags 0x02 dlen 14
+     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+       Success
+> ACL data: handle 11 flags 0x02 dlen 22
+     L2CAP(d): cid 0x0040 len 18 [psm 1]
+         SDP SSA Req: tid 0x0 len 0xd
+           pat uuid-16 0x1105 (OBEXObjPush)
+           max 48
+           aid(s) 0x0004 (ProtocolDescList)
+           cont 00
+< ACL data: handle 11 flags 0x02 dlen 14
+     L2CAP(d): cid 0x0070 len 10 [psm 1]
+         SDP SSA Rsp: tid 0x0 len 0x5
+           count 2
+           cont 00
+> ACL data: handle 11 flags 0x02 dlen 12
+     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0070
+< ACL data: handle 11 flags 0x02 dlen 12
+     L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0070
+> HCI Event: Number of Completed Packets (0x13) plen 5
+   . . . . .
+> HCI Event: Disconn Complete (0x05) plen 4
+   . . . .
+
+
+
+Not sure if this helps:
+
+# dbus-monitor --system --monitor
+
+signal sender=org.freedesktop.DBus -> dest=:1.3 path=/org/freedesktop/DBus; 
+interface=org.freedesktop.DBus; member=NameAcquired
+    string ":1.3"
+signal sender=:1.0 -> dest=(null destination) path=/org/bluez/hci0; 
+interface=org.bluez.Adapter; member=RemoteDeviceConnected
+    string "00:1C:62:19:B1:6A"
+signal sender=:1.0 -> dest=(null destination) path=/org/bluez/hci0; 
+interface=org.bluez.Adapter; member=RemoteNameUpdated
+    string "00:1C:62:19:B1:6A"
+    string "LG VX8300"
+signal sender=:1.0 -> dest=(null destination) path=/org/bluez/hci0; 
+interface=org.bluez.Adapter; member=RemoteDeviceDisconnected   string 
+"00:1C:62:19:B1:6A"
+
+
+How to use obexd?
+
+
 
 -------------------------------------------------------------------------
 Check out the new SourceForge.net Marketplace.
