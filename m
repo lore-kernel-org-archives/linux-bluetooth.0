@@ -1,12 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1214833915.6764.17.camel@bongo>
+In-Reply-To: <1214852035.6764.40.camel@bongo>
 References: <1214593557.6131.26.camel@bongo>
 	<1214605438.11537.0.camel@violet.holtmann.net>
-	<1214833915.6764.17.camel@bongo>
-Date: Tue, 01 Jul 2008 03:16:09 +0200
-Message-Id: <1214874969.11537.75.camel@violet.holtmann.net>
+	<1214831713.6764.8.camel@bongo>
+	<1214834796.11537.42.camel@violet.holtmann.net>
+	<1214841475.6764.37.camel@bongo>
+	<1214841780.11537.48.camel@violet.holtmann.net>
+	<1214852035.6764.40.camel@bongo>
+Date: Tue, 01 Jul 2008 03:10:53 +0200
+Message-Id: <1214874653.11537.69.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] Wizard patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -18,42 +22,37 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-SGkgTWljaGFlbCwKCj4gPiBsb29rcyBuaWNlLiBIb3dldmVyIHlvdSBoYXZlIHRvIGJyZWFrIHRo
-aXMgdXAgaW50byBwaWVjZXMgZm9yLiBTZW50Cj4gPiBzbWFsbCBwYXRjaGVzIGFuZCBJIGNhbiBx
-dWlja2x5IHJldmlldyBhbmQgY29tbWl0IHRoZW0uCj4gCj4gSGVyZSdzIGEgcGF0Y2ggdG8gYWRk
-IHN1cHBvcnQgZm9yIGNvbm5lY3RpbmcgdG8gZGV2aWNlcyB2aWEgdGhlIGNsaWVudCBjb2RlLiAg
-VGhpcyBwYXRjaCBkZXBlbmRzIG9uIHRoZSBjYWxsYmFjayBwYXRjaC4KPiAKPiBJdCBmaW5kcyBr
-bm93biBzZXJ2aWNlcyBvbiBzdGFydHVwIChpbiBzZXR1cF9zZXJ2aWNlcygpKS4gIEJhc3RpZW4K
-PiBzdWdnZXN0ZWQgdGhhdCB3ZSBkb24ndCBuZWVkIHRvIGNhbGwgc2V0dXBfc2VydmljZXMoKSBz
-aW5jZSB0aG9zZQo+IHNlcnZpY2VzIGFyZSBlbmFibGVkIGJ5IGRlZmF1bHQsIGJ1dCBJJ20gbm90
-IHF1aXRlIHN1cmUgd2hhdCBoZSBtZWFudC4KPiBXZSBuZWVkIHRvIGNhbGwgaXQgdG8gZ2V0IHRo
-ZSBzZXJ2aWNlIGJ1cyBJRHMgc28gdGhhdCB3ZSBjYW4gdGhlbiBnZXQKPiBEQnVzR1Byb3hpZXMg
-Zm9yIHRoZW0uCgpzbyBzdGFydGluZyB3aXRoIGJsdWV6LXV0aWxzLTMuMzMgZXZlcnl0aGluZyBp
-cyBhIHBsdWdpbiBhbmQgd2lsbCBiZQphdmFpbGFibGUgdW5kZXIgdGhlIG9yZy5ibHVleiBzZXJ2
-aWNlIG5hbWUuIFNvIHdlIGNvdWxkIHNpbXBseSBpZ25vcmUKdGhpcyBhbmQgZmFpbCB0aGUgb3Ro
-ZXIgY2FzZXMuCgpJZiB5b3Ugd2FubmEgY2hlY2sgYXZhaWxhYmxlIHNlcnZpY2VzIHRoZW4geW91
-IHNob3VsZCB1c2UgTGlzdFNlcnZpY2VzCmFuZCByZXRyaWV2ZSB0aGUgc2VydmljZSBvYmplY3Rz
-LiBPbiB0aGVzZSBvYmplY3RzIHlvdSBjYW4gYWxzbyBjYWxsCkdldEJ1c05hbWUgdG8gZ2V0IHRo
-ZSBidXMgbmFtZSBvZiB0aGUgc2VydmljZS4gVGhpcyB3aWxsIHRoZW4gb25seSB3b3JrCmZvciBh
-Y3RpdmF0ZWQgc2VydmljZXMsIGJ1dCB0aGF0IGlzIGFjdHVhbGx5IGZpbmUuIFRoZSBkaXN0cm9z
-IGVuYWJsZQp0aGVtIGJ5IGRlZmF1bHQgYW55d2F5IG9yIHRoZXkgYXJlIHBsdWdpbnMgYW5kIGxv
-YWRlZCBhbGwgdGhlbS4KCj4gSXQgYWRkcyB0aGUgZnVuY3Rpb24gYmx1ZXRvb3RoX2NsaWVudF9h
-dmFpbGFibGVfc2VydmljZXMoKSB3aGljaCBnaXZlcwo+IGJhY2sgYSB0eXBlIG1hc2sgZm9yIHNl
-cnZpY2VzIHRoYXQgd2VyZSBkZXRlY3RlZC4gIEJhc2ljYWxseSB3aGljaAo+IGRldmljZXMgYXJl
-IGxpa2VseSB0byBzdWNjZWVkIGZyb20gYSBibHVldG9vdGhfY2xpZW50X2Nvbm5lY3QoKSBjYWxs
-Lgo+IAo+IO+7v2JsdWV0b290aF9jbGllbnRfY29ubmVjdCgpIGRvZXMgZGV2aWNlLXNwZWNpZmlj
-IGNvbm5lY3Rpb24gaGFuZGxpbmcuCj4gSXQgb25seSBoYW5kbGVzIGEgZmV3IHR5cGVzIHJpZ2h0
-IG5vdyAoaW5wdXQgYW5kIGhlYWRzZXQpLgoKUGxlYXNlIHN0b3AgdXNpbmcgdGhlIHZhcmlhYmxl
-IG5hbWUgcnYgZm9yIHJldHVybiB2YWx1ZS4gRWl0aGVyIHVzZSBlcnIKb3IgY2FsbCBpdCByZXN1
-bHQgb3Igc29tZXRoaW5nLgoKUmVnYXJkcwoKTWFyY2VsCgoKCi0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KQ2hl
-Y2sgb3V0IHRoZSBuZXcgU291cmNlRm9yZ2UubmV0IE1hcmtldHBsYWNlLgpJdCdzIHRoZSBiZXN0
-IHBsYWNlIHRvIGJ1eSBvciBzZWxsIHNlcnZpY2VzIGZvcgpqdXN0IGFib3V0IGFueXRoaW5nIE9w
-ZW4gU291cmNlLgpodHRwOi8vc291cmNlZm9yZ2UubmV0L3NlcnZpY2VzL2J1eS9pbmRleC5waHAK
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQmx1ZXotZGV2
-ZWwgbWFpbGluZyBsaXN0CkJsdWV6LWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldApodHRwczov
-L2xpc3RzLnNvdXJjZWZvcmdlLm5ldC9saXN0cy9saXN0aW5mby9ibHVlei1kZXZlbAo=
+Hi Michael,
+
+> > > Except that one of my other patches adds a new cancelable function
+> > > _connect().  So we would need maybe specific cancel_bonding and
+> > > cancel_connect functions.
+> > 
+> > sounds good to me. The bonding case is special since it can only do one
+> > at a time.
+> 
+> OK, attached is callback2.diff, which only allows canceling a create_bonding call.  Updated other patches to follow.
+
+please only change create_bonding and leave the others alone. Also you
+cast a little bit too much for my taste. For example void pointers need
+to extra cast.
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+Check out the new SourceForge.net Marketplace.
+It's the best place to buy or sell services for
+just about anything Open Source.
+http://sourceforge.net/services/buy/index.php
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
