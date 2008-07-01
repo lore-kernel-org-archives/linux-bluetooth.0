@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-From: Jui-Hao Chiang <windtracekimo@gmail.com>
-Date: Tue, 1 Jul 2008 13:32:16 +0000 (UTC)
-Message-ID: <loom.20080701T131823-958@post.gmane.org>
-References: <loom.20080627T113221-342@post.gmane.org>
-	<1214568439.9706.8.camel@greatbear>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1214840891.6764.27.camel@bongo>
+References: <1214593557.6131.26.camel@bongo>
+	<1214605438.11537.0.camel@violet.holtmann.net>
+	<1214840891.6764.27.camel@bongo>
+Date: Tue, 01 Jul 2008 03:24:00 +0200
+Message-Id: <1214875440.11537.83.camel@violet.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] =?utf-8?q?Questions_about_SCO_support_hci=5Fusb?=
+Subject: Re: [Bluez-devel] Wizard patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,35 +22,50 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,  
-> I think Marcel has written a new usb driver(btusb) which does support 
-> multiple SCO connections(I am not sure).
-I find out one tihing: when I try to build up the linux 2.6.24.
-The description of btusb itself says "no SCO support now".
-Thus, I guess I should abandon this solution. 
+Hi Michael,
 
-> The patch was for hci_usb.c. Me and Whoopie had tested it for 2
-> simultaneous SCO connections. If your using hci_usb, you will need the
-> alternate setting patch.
+> > looks nice. However you have to break this up into pieces for. Sent
+> > small patches and I can quickly review and commit them.
+> 
+> And here's the actual wizard UI patch.  It's a bit large, but not
+> terribly break-down-able.
 
-Could someone give me some suggestions about the patch things?
-(which linux kernel and which version of patch)
-I know there are two steps
-(1) sco_flowcontrol: 
-It seems sco-flowcontrol-v4.3.diff is successful in 2.6.23 from this article
-http://thread.gmane.org/gmane.linux.bluez.devel/13852
-But why there are two revisions for that? and the latest one is "wrong patch
-from whoopie"
-http://bluetooth-alsa.cvs.sourceforge.net/
-bluetooth-alsa/plugz/patches/sco-flowcontrol-v4.3.diff?view=log
-(2) alternate setting
-there is a latest patch by Alok
-http://thread.gmane.org/gmane.linux.bluez.devel/12893/focus=12903
-But I don't know which kernel version it is against?
+first of all the bluetooth_client_get_name part should be a separate
+patch.
 
-Appreciate any help
-Bests regards,
-Jui-Hao
+Then the modification to the applet code to show the extra entry can be
+a separate patch, too.
+
+Same goes for the part where you actually enable the installation of the
+bluetooth-wizard program.
+
+Leave these all out, because I don't bother and we will apply them once
+the UI change is committed.
+
+> It adds the passkey code for the UI and modifies the UI a bit, as I
+> mentioned in previous emails.
+
+Lets do the UI changes without the passkey stuff. We should get the
+wizard working. If no device specific passkey is provided, it will fall
+back to the applet anyway and that is fine for the first step.
+
+I also don't like that you copy the agent.[ch] files. This needs some
+extra thinking and hence first the UI and then the agent part.
+
+> Bastien suggested that the applet label to launch the wizard should
+> continue to be "Setup" and not "Connect" because we may want to do more
+> setup for certain device types in the future.  That may be true, but
+> some of that would be automatic (like the SyncML example he cited) and
+> so wouldn't be visible from the user's perspective.
+
+I am for "Setup. Using "Connect" is wrong here. If you wanna connect to
+a previously setup device, then we have to add shortcuts to the applet
+menu to do so.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
