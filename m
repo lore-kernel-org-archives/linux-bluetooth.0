@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <04d401c8dbac$28051a20$6701a8c0@freqonedev>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-References: <1214593557.6131.26.camel@bongo><1214606647.4435.71.camel@cookie.hadess.net><031301c8da4d$0bce3720$6701a8c0@freqonedev><1214813891.4435.149.camel@cookie.hadess.net><035501c8dab3$5596b380$6701a8c0@freqonedev>
-	<2d5a2c100806301527y21f80385vc75acdf9da62029c@mail.gmail.com>
-Date: Tue, 1 Jul 2008 13:56:20 -0500
+Message-ID: <486A6392.6080008@access-company.com>
+Date: Tue, 01 Jul 2008 19:04:18 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?= <frederic.dalleau@access-company.com>
 MIME-Version: 1.0
-Subject: Re: [Bluez-devel] Wizard patch
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <48075B6A.2060308@access-company.com>	<1209058941.12684.37.camel@violet.holtmann.net>	<48355289.7070906@access-company.com>	<5D487EED-A2B2-4AEA-AA7B-9EC8681157C0@holtmann.org>
+	<48357D9C.9080009@access-company.com>
+In-Reply-To: <48357D9C.9080009@access-company.com>
+Content-Type: multipart/mixed; boundary="------------010103000302050103000407"
+Subject: Re: [Bluez-devel] [patch] BNEP/PAN Qualification issues
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,122 +18,218 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello David,
+This is a multi-part message in MIME format.
+--------------010103000302050103000407
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 8bit
 
->>Hello Luis
+Marcel, Luiz
 
-> I read the docs and when the code works as expected it is good enough.
-> However, I have had a number of problems making the code work =
+>>> A part of the patch si to move handling of incoming setup_conn_req  
+>>> in kernel. In order to keep pan working with older kernel, some  
+>>> differenciation must be done. How to achieve this ?
+>>>     
+>>>       
+>> I don't know yet. Can we first fix the issues that don't need  
+>> modifications within the kernel. I prefer not modifying the kernel at  
+>> all at the moment. 
+>>     
+>
+> I understand.
+> My problem is that some tests require grouping several messages into 
+> one. In particular, the setup_conn_req can be sent together with a 
+> control extension TP/BNEP/CTRL/BV-19-C.
+> The current extension processing is to skip everything and I'm not sure 
+> the control message can be handled at application level.
+>   
 
-> (partially
-> implemented "experimental" 4.x features in release 3.33 and before).
+I wake up this thread,
 
-You should first understand that the documentation in doc/ are dbus
-specifications, they are not normal method calls or gobject signals.
-You seems to be confused by using dbus-glib and not really knowing
-what dbus is doing, we don't document how to use the API in terms of
-language bindings, because it is open to the application developer to
-choose between the bindings and the binding itself should document how
-it map the different signatures.
+I'm working at making this easier to integrate but it will makes a bunch 
+of patches.
+Let's start with the small and self contained.
 
->> REPLY (sorry, but Outlook SUX)
+Resend patch for bluez-utils, and network service timeout  (after 
+SETUP_CONN_REQ is sent and no answer for  30 sec, disconnect)
 
->> I appreciate that fact.  I also recognize that Python does an awful =
+Other patch adds a parameter to bnep module for disabling header 
+compression.
 
->> lot for the user, and that perhaps I could develop all of this in =
+Let me know what you think.
+Regards,
 
->> Python...but at this point, I am choosing to use C/C++ and hence, =
-
->> must use the GLib binding.
-
->> Really, my comment was about the fact that some of the features =
-
->> documented in the /doc directory are not quite working, and in fact =
-
->> are still coming into existance. As a result, when I run into a =
-
->> problem I cannot figure out what is really going on (is it my code, =
-
->> or is it something missing in Bluez) without digging through the =
-
->> Bluez source.  Which has very little documentation (even at the file =
-
->> level).  Again, when everything is working, the doc files will be =
-
->> fine.  Just, for now, they are not quite enough.
-
->> The question you may be asking is why I do not just develop to the =
-
->> 3.x API?  Why would I do that when in just a few months I would have =
-
->> to throw all of that away?  (See: bluez-gnome).
-
-> Also, figuring out how to handle some of the formats (e.g., the "dict"
-> with variant) are a bit hard to figure out without a code example. =
-
-> SO,
-> I often have to dig into the actual code and figure out just what is
-> going on.
-
-See my point here, just because dbus-glib maps the signature a{sv}
-(that is the real "dict") to a GHashTable using a GValue doesn't mean
-any other binding will do the same. It's up to the binding to provides
-this kind of documentation not the dbus API which should not be tied
-to a single binding.
-
->> Got it, frankly the Glib binding docs are not very complete. As with =
-
->> most programs, the documentation handles the most simplistic cases, =
-
->> and ignores the fact that someone might Actually Want To Use It.  I =
-
->> did find the DBUS Test directory and got a lot of help from seeing =
-
->> how the validation tests were coded.
-
-This tutorial should cover what you want:
-http://dbus.freedesktop.org/doc/dbus-tutorial.html
-
->> I have read this tutorial in detail and understood it.  However, the =
-
->> coverage was still inadequate for a{sv} (dict) and array{string} =
-
->> ({as}).  At one point, I also had problems with object paths, but =
-
->> again, with Marcel giving me a hint as to the proper incantation, I =
-
->> was able to work that out.
-
->> That said, after finding a few more-complex code examples (especially =
-
->> the validation code), I have now figured the structures out. =
-
->> Everything I need to do for now is (apparently) working, and now I am =
-
->> moving on to getting SSP going between Bluez and my device =
-
->> (programmed with the CSR BT stack).
-
->> Thanks again for your response.
-
--- =
-
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+Frédéric DALLEAU
 
 
 
+--------------010103000302050103000407
+Content-Type: text/x-diff;
+	name="0006-Add-compress-parameter-to-bnep-module.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+	filename="0006-Add-compress-parameter-to-bnep-module.patch"
+
+>>From 3aad408454114436898ea668377a44745e9cad52 Mon Sep 17 00:00:00 2001
+From: fred <fred@fred-laptop.(none)>
+Date: Tue, 1 Jul 2008 15:44:24 +0200
+Subject: [PATCH] Add compress parameter to bnep module
+
+---
+ net/bluetooth/bnep/core.c |    8 ++++++--
+ 1 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index d494b0b..84b00d3 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -62,6 +62,7 @@
+ #endif
+ 
+ #define VERSION "1.3"
++static unsigned int compress = 0x03;
+ 
+ static LIST_HEAD(bnep_session_list);
+ static DECLARE_RWSEM(bnep_session_sem);
+@@ -593,10 +594,10 @@ static inline int bnep_tx_frame(struct bnep_session *s, struct sk_buff *skb)
+ 	iv[il++] = (struct kvec) { &type, 1 };
+ 	len++;
+ 
+-	if (!compare_ether_addr(eh->h_dest, s->eh.h_source))
++	if ((compress & 0x01) && !compare_ether_addr(eh->h_dest, s->eh.h_source))
+ 		type |= 0x01;
+ 
+-	if (!compare_ether_addr(eh->h_source, s->eh.h_dest))
++	if ((compress & 0x02) && !compare_ether_addr(eh->h_source, s->eh.h_dest))
+ 		type |= 0x02;
+ 
+ 	if (type)
+@@ -898,6 +899,9 @@ static void __exit bnep_exit(void)
+ module_init(bnep_init);
+ module_exit(bnep_exit);
+ 
++module_param(compress, uint, 0644);
++MODULE_PARM_DESC(compress, "Compress BNEP headers before sending (0x01 src, 0x02 dst, 0x03 both)");
++
+ MODULE_AUTHOR("David Libault <david.libault@inventel.fr>, Maxim Krasnyansky <maxk@qualcomm.com>");
+ MODULE_DESCRIPTION("Bluetooth BNEP ver " VERSION);
+ MODULE_VERSION(VERSION);
+-- 
+1.5.3.GIT
+
+
+--------------010103000302050103000407
+Content-Type: text/x-diff;
+	name="utils-0001-Add-30s-timeout-to-setup-connection-phase.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+	filename*0="utils-0001-Add-30s-timeout-to-setup-connection-phase.patch"
+
+>>From 157045ed03558efb120e5ed30e0d334c0ef9b598 Mon Sep 17 00:00:00 2001
+From: fred <fred@fred-laptop.(none)>
+Date: Tue, 1 Jul 2008 18:30:47 +0200
+Subject: [PATCH] Add 30s timeout to setup connection phase
+
+---
+ network/connection.c |    6 ++++++
+ pand/bnep.c          |    6 ++++++
+ 2 files changed, 12 insertions(+), 0 deletions(-)
+
+diff --git a/network/connection.c b/network/connection.c
+index d2fd85c..5b9c293 100644
+--- a/network/connection.c
++++ b/network/connection.c
+@@ -152,6 +152,7 @@ static gboolean bnep_connect_cb(GIOChannel *chan, GIOCondition cond,
+ 	int sk;
+ 	DBusMessage *reply;
+ 	const char *pdev;
++	struct timeval t = { 0, 0 };
+ 
+ 	if (cond & G_IO_NVAL)
+ 		return FALSE;
+@@ -198,6 +199,8 @@ static gboolean bnep_connect_cb(GIOChannel *chan, GIOCondition cond,
+ 
+ 	sk = g_io_channel_unix_get_fd(chan);
+ 
++	setsockopt(sk, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
++
+ 	if (bnep_connadd(sk, BNEP_SVC_PANU, nc->dev)) {
+ 		error("%s could not be added", nc->dev);
+ 		goto failed;
+@@ -241,6 +244,7 @@ static int bnep_connect(struct network_conn *nc)
+ 	unsigned char pkt[BNEP_MTU];
+ 	GIOChannel *io;
+ 	int err = 0;
++	struct timeval t = { 30, 0 };
+ 
+ 	/* Send request */
+ 	req = (void *) pkt;
+@@ -251,6 +255,8 @@ static int bnep_connect(struct network_conn *nc)
+ 	s->dst = htons(nc->id);
+ 	s->src = htons(BNEP_SVC_PANU);
+ 
++	setsockopt(nc->sk, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
++
+ 	io = g_io_channel_unix_new(nc->sk);
+ 	g_io_channel_set_close_on_unref(io, FALSE);
+ 
+diff --git a/pand/bnep.c b/pand/bnep.c
+index 604ed55..88c1184 100644
+--- a/pand/bnep.c
++++ b/pand/bnep.c
+@@ -259,6 +259,7 @@ int bnep_create_connection(int sk, uint16_t role, uint16_t svc, char *dev)
+ 	struct __service_16 *s;
+ 	unsigned char pkt[BNEP_MTU];
+ 	int r;
++	struct timeval t = { 30, 0 };
+ 
+ 	/* Send request */
+ 	req = (void *) pkt;
+@@ -269,6 +270,8 @@ int bnep_create_connection(int sk, uint16_t role, uint16_t svc, char *dev)
+ 	s->dst = htons(svc);
+ 	s->src = htons(role);
+ 
++	setsockopt(sk, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
++
+ 	if (send(sk, pkt, sizeof(*req) + sizeof(*s), 0) < 0)
+ 		return -1;
+ 
+@@ -278,6 +281,9 @@ receive:
+ 	if (r <= 0)
+ 		return -1;
+ 
++	t.tv_sec = 0;
++	setsockopt(sk, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(t));
++
+ 	errno = EPROTO;
+ 
+ 	if (r < sizeof(*rsp))
+-- 
+1.5.3.GIT
+
+
+--------------010103000302050103000407
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
+--------------010103000302050103000407
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--------------010103000302050103000407--
