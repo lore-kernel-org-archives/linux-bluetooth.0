@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3e9cdced0807020150p7fa242ecw724c38fa47b956dd@mail.gmail.com>
-References: <3e9cdced0807020150p7fa242ecw724c38fa47b956dd@mail.gmail.com>
-Date: Wed, 02 Jul 2008 11:12:38 +0200
-Message-Id: <1214989958.11537.170.camel@violet.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] CancelBondingProcess -> Not authorized
+Message-ID: <3e9cdced0807020150p7fa242ecw724c38fa47b956dd@mail.gmail.com>
+Date: Wed, 2 Jul 2008 10:50:32 +0200
+From: "Fritz Code" <codefritz@googlemail.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-users] CancelBondingProcess -> Not authorized
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,33 +14,65 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1128745313=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Fritz,
+--===============1128745313==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_82_24365924.1214988632810"
 
-> Want to cancel a running bonding process by sending
-> CancelBondingProcess.
-> But as a reply I get Not authorized, unfortunately.
-> What might be the problem (However, I'm root)? 
+------=_Part_82_24365924.1214988632810
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-only the program (with the unique D-Bus bus id) can call this method.
-Same as that we will cancel any attempt automatically if the caller
-dies.
+Want to cancel a running bonding process by sending CancelBondingProcess.
+But as a reply I get Not authorized, unfortunately.
+What might be the problem (However, I'm root)?
 
-Regards
+In case I can send this message how can i detect a correct cancellation of
+the BondingProcess?
+In dbus-api.txt I've read something about the Signal AthenticationCanceled
+but from which Interface gets this send?
 
-Marcel
+thanks
+
+-- 
+Regards,
+--Codefritz
+
+------=_Part_82_24365924.1214988632810
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Want to cancel a running bonding process by sending CancelBondingProcess.<br>But as a reply I get Not authorized, unfortunately.<br>What might be the problem (However, I&#39;m root)? <br><br>In case I can send this message how can i detect a correct cancellation of the BondingProcess?<br>
+In dbus-api.txt I&#39;ve read something about the Signal AthenticationCanceled but from which Interface gets this send?<br><br>thanks<br clear="all"><br>-- <br>Regards,<br>--Codefritz<br><br><br><br>
+
+------=_Part_82_24365924.1214988632810--
 
 
+--===============1128745313==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
+--===============1128745313==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1128745313==--
