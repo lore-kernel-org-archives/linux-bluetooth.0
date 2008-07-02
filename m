@@ -1,10 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <3e9cdced0807020150p7fa242ecw724c38fa47b956dd@mail.gmail.com>
-Date: Wed, 2 Jul 2008 10:50:32 +0200
-From: "Fritz Code" <codefritz@googlemail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <e96e9eeb0807020056v224e3dccsb4d0288bd532051d@mail.gmail.com>
+Date: Wed, 2 Jul 2008 10:56:46 +0300
+From: "Voni Hakau" <hakauvoni@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <alpine.LNX.1.10.0807011047300.6029@nge2.ngu.pk>
 MIME-Version: 1.0
-Subject: [Bluez-users] CancelBondingProcess -> Not authorized
+References: <e96e9eeb0806130507u139f58a2sa7094a65f9ecff17@mail.gmail.com>
+	<4852914F.6020209@earthlink.net>
+	<e96e9eeb0806160505m44d366e7if9cea8e1d3c6978b@mail.gmail.com>
+	<4856EC25.5040508@earthlink.net>
+	<e96e9eeb0806300506l1aaeaf6bje93db6f4f5af880e@mail.gmail.com>
+	<e96e9eeb0806300509w12d1dfaen3f00db7732db80c8@mail.gmail.com>
+	<alpine.LNX.1.10.0807011047300.6029@nge2.ngu.pk>
+Cc: marcel@holtmann.org
+Subject: Re: [Bluez-users] Bluez build problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,65 +23,32 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1128745313=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1128745313==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_82_24365924.1214988632810"
+On Tue, Jul 1, 2008 at 6:09 PM, jayjwa <jayjwa@atr2.ath.cx> wrote:
 
-------=_Part_82_24365924.1214988632810
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> -> > we can see that it tried to use my host's libdbus-1.so, and it ignores
+> -> > the DBUS_LIBS variable..
 
-Want to cancel a running bonding process by sending CancelBondingProcess.
-But as a reply I get Not authorized, unfortunately.
-What might be the problem (However, I'm root)?
+> Perhaps the library is mentioned in a libtool (.la) file? You should be able
+> to change the Makefiles if needed. Looking in 3.34 utils, I see your libdbus-1
+> is mentioned in lots of places (found with `rgrep -r 'dbus-1' . | most ` while
+> cwd was /tmp/bluez-utils-3.34):
 
-In case I can send this message how can i detect a correct cancellation of
-the BondingProcess?
-In dbus-api.txt I've read something about the Signal AthenticationCanceled
-but from which Interface gets this send?
+So you think too that there is a bug in bluez-utils ? That it ignores
+the DBUS_LIBS environment variable ?
 
-thanks
-
--- 
-Regards,
---Codefritz
-
-------=_Part_82_24365924.1214988632810
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Want to cancel a running bonding process by sending CancelBondingProcess.<br>But as a reply I get Not authorized, unfortunately.<br>What might be the problem (However, I&#39;m root)? <br><br>In case I can send this message how can i detect a correct cancellation of the BondingProcess?<br>
-In dbus-api.txt I&#39;ve read something about the Signal AthenticationCanceled but from which Interface gets this send?<br><br>thanks<br clear="all"><br>-- <br>Regards,<br>--Codefritz<br><br><br><br>
-
-------=_Part_82_24365924.1214988632810--
-
-
---===============1128745313==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Thank you
+Voni
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
---===============1128745313==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1128745313==--
