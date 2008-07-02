@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <486BCD3C.7090203@endrelia.com>
-Date: Wed, 02 Jul 2008 14:47:24 -0400
-From: Frank Mandarino <fmandarino@endrelia.com>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <004b01c8da77$c65e95b0$531bc110$%park@samsung.com>
-	<1214806529.11537.12.camel@violet.holtmann.net>
-In-Reply-To: <1214806529.11537.12.camel@violet.holtmann.net>
-Content-Type: multipart/mixed; boundary="------------030003070806070906000808"
-Subject: Re: [Bluez-devel] bccmd(csr_bcsp.c) bug Report
+From: Marcel Holtmann <marcel@holtmann.org>
+To: ssc@tziranda.com,
+	BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <op.udnvhhfuyxjop7@capela.tziranda.net>
+References: <op.udnvhhfuyxjop7@capela.tziranda.net>
+Date: Wed, 02 Jul 2008 14:26:05 +0200
+Message-Id: <1215001565.11537.184.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] obexd problems in ftp and opush server
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,102 +17,109 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------030003070806070906000808
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Hi,
 
-Marcel Holtmann wrote:
-> Hi,
+> I'm trying to put a working obex server with both opush and ftp on an arm  
+> based board. It is a minimal system without much capacity and as such it  
+> does not even has an graphical system. It is based in linux kernel  
+> 2.6.20-4.
 > 
->> I think that do_command function (csr_bcsp.c) could have a problem 
->>
->> if we receive both UBCSP_PACKET_SENT and UBCSP_PACKET_RECEIVED
->> simultaneously from ubcsp_poll function.
->>
->> An expected scenario is that UBCSP_PACKET_SENT comes earlier than
->> UBCSP_PACKET_RECEIVED.
->>
->> But if we get them at the same time this could be a problem because
->> “sent=1” is located after checking “sent==1”.
->>
->> It means that this program doesn’t know UBCSP_PACKET_SENT even if we
->> already receive it.
+> I successfully build dbus-1.2.1, bluez-libs-3.35, bluez-utils-3.35,  
+> bluez-hcidump-1.42, openobex-1.3, obexftp-0.22 and now obexd-0.1. The  
+> obexftpd server included in obexftp does work but does not support opush  
+> so I tried obexd.
 > 
-> please sent a patch (unified diff) for it.
 > 
-> Regards
 > 
-> Marcel
+> 
+> To get obexd fully running, and since it is a minimal system, I performed  
+> the following steps:
+> 
+> arm-linux-dbus-uuidgen --ensure
+> ln -s /usr/bin/arm-linux-dbus-launch /usr/bin/dbus-launch
+> 
+> dbus-daemon --system
+> hcid -x -s -d
+> dbus-daemon --session --print-address --fork
+> 
+> export DBUS_SESSION_BUS_ADDRESS=unix:path=/usr/var/run/dbus/system_bus_soc
+> ket,guid=4ac461b547be180a59ec802748690912
+> 
+> obexd -n -d -r /mnt/ -a -o -f
+> 
+> 
+> 
+> 
+> With such settings and trying a obex push from a nokia phone to the board  
+> I get the following which results in a failed sending:
+> 
+> / # ./obexd -n -d --root /mnt/ -a -o -f
+> obexd[817]: Enabling debug information
+> obexd[817]: Registered: OBEX OPUSH server, record handle: 0x10004, folder:  
+> /mnt/
+> obexd[817]: Registered: OBEX FTP server, record handle: 0x10005, folder:  
+> /mnt/
+> manager_init: conn 0x1bcb0
+> obexd[817]: New connection from: 00:1E:A4:A6:0C:30 channel: 9
+> obexd[817]: REQHINT(0x1), CONNECT(0x0), (null)(0x0)
+> obexd[817]: REQ(0x2), CONNECT(0x0), (null)(0x0)
+> obexd[817]: Version: 0x10. Flags: 0x00  OBEX packet length: 65535
+> obexd[817]: Resizing stream chunks to 65335
+> obexd[817]: REQDONE(0x3), CONNECT(0x0), (null)(0x0)
+> obexd[817]: REQHINT(0x1), PUT(0x2), (null)(0x0)
+> obexd[817]: REQCHECK(0xb), PUT(0x2), (null)(0x0)
+> obexd[817]: OBEX_HDR_NAME: (null)
+> obexd[817]: OBEX_HDR_LENGTH: 7650
+> obexd[817]: OBEX_HDR_TYPE: image/jpeg
+> obexd[817]: REQDONE(0x3), PUT(0x2), (null)(0x0)
+> 
+> I noticed that OBEX_HDR_NAME was (null) and as I already had a functioning  
+> obexftpd server from the openobex project I copy pasted a few lines of  
+> code to the obex.c file, more precisely to the following function:
+> 
+> static gboolean check_put(obex_t *obex, obex_objext_t *obj)
+> 
+> Making a diff between the original and the new for the changes:
+> 463a464,470
+> >             static char *name = NULL;
+> >            if( (name = malloc(hlen / 2)))	{
+> >                 OBEX_UnicodeToChar((uint8_t *)name, hd.bs, hlen);
+> >                 fprintf(stderr, "put file name: %s\n", name);
+> >             }
+> >
+> 466c473,476
+> < 			debug("OBEX_HDR_NAME: %s", os->name);
+> ---
+> >            os->name = name;
+> >            debug("OBEX_HDR_NAME: %s", os->name);
 
-Hi Marcel,
+unified diffs please since it is to hard to read context diffs or alike
+for my brain :)
 
-I sent in a patch for this back in August 2006
-(http://article.gmane.org/gmane.linux.bluez.devel/8836).
+> This put the opush functioning in my case but certainly is not a solution  
+> and I would like to know why It might be happening and if the problem is  
+> on my side. Basically g_convert is not returning anything useful in my  
+> case.
 
-The patch still applies to the latest CVS source.  I have attached it to
-this post.
+Jump on #obexd IRC channel on freenode.net. There are some update
+pending and I am going for a 0.2 release end of this week.
 
 Regards
-../fam
--- 
-Frank Mandarino                                fmandarino(a)endrelia.com
-Endrelia Technologies Inc.
-Toronto, Ontario, Canada
 
---------------030003070806070906000808
-Content-Type: text/plain;
- name="csr_bcsp.c.txt"
-Content-Transfer-Encoding: base64
-Content-Disposition: inline;
- filename="csr_bcsp.c.txt"
+Marcel
 
-SW5kZXg6IHV0aWxzL3Rvb2xzL2Nzcl9iY3NwLmMKPT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQpSQ1MgZmlsZTog
-L2N2c3Jvb3QvYmx1ZXovdXRpbHMvdG9vbHMvY3NyX2Jjc3AuYyx2CnJldHJpZXZpbmcgcmV2
-aXNpb24gMS42CmRpZmYgLXUgLXIxLjYgY3NyX2Jjc3AuYwotLS0gdXRpbHMvdG9vbHMvY3Ny
-X2Jjc3AuYwkyNiBKdWwgMjAwNiAxMzozMjo0NSAtMDAwMAkxLjYKKysrIHV0aWxzL3Rvb2xz
-L2Nzcl9iY3NwLmMJMzAgQXVnIDIwMDYgMTU6MDY6NTYgLTAwMDAKQEAgLTE4OCwxOSArMTg4
-LDYgQEAKIAl3aGlsZSAoMSkgewogCQlkZWxheSA9IHViY3NwX3BvbGwoJmFjdGl2aXR5KTsK
-IAotCQlpZiAoYWN0aXZpdHkgJiBVQkNTUF9QQUNLRVRfUkVDRUlWRUQpIHsKLQkJCWlmIChz
-ZW50ICYmIHJlY2VpdmVfcGFja2V0LmNoYW5uZWwgPT0gNSAmJgotCQkJCQlyZWNlaXZlX3Bh
-Y2tldC5wYXlsb2FkWzBdID09IDB4ZmYpIHsKLQkJCQltZW1jcHkocnAsIHJlY2VpdmVfcGFj
-a2V0LnBheWxvYWQsCi0JCQkJCQkJcmVjZWl2ZV9wYWNrZXQubGVuZ3RoKTsKLQkJCQlicmVh
-azsKLQkJCX0KLQotCQkJcmVjZWl2ZV9wYWNrZXQubGVuZ3RoID0gNTEyOwotCQkJdWJjc3Bf
-cmVjZWl2ZV9wYWNrZXQoJnJlY2VpdmVfcGFja2V0KTsKLQkJCXRpbWVvdXQgPSAwOwotCQl9
-Ci0KIAkJaWYgKGFjdGl2aXR5ICYgVUJDU1BfUEFDS0VUX1NFTlQpIHsKIAkJCXN3aXRjaCAo
-dmFyaWQpIHsKIAkJCWNhc2UgQ1NSX1ZBUklEX0NPTERfUkVTRVQ6CkBAIC0yMTQsNiArMjAx
-LDE5IEBACiAJCQl0aW1lb3V0ID0gMDsKIAkJfQogCisJCWlmIChhY3Rpdml0eSAmIFVCQ1NQ
-X1BBQ0tFVF9SRUNFSVZFRCkgeworCQkJaWYgKHNlbnQgJiYgcmVjZWl2ZV9wYWNrZXQuY2hh
-bm5lbCA9PSA1ICYmCisJCQkJCXJlY2VpdmVfcGFja2V0LnBheWxvYWRbMF0gPT0gMHhmZikg
-eworCQkJCW1lbWNweShycCwgcmVjZWl2ZV9wYWNrZXQucGF5bG9hZCwKKwkJCQkJCQlyZWNl
-aXZlX3BhY2tldC5sZW5ndGgpOworCQkJCWJyZWFrOworCQkJfQorCisJCQlyZWNlaXZlX3Bh
-Y2tldC5sZW5ndGggPSA1MTI7CisJCQl1YmNzcF9yZWNlaXZlX3BhY2tldCgmcmVjZWl2ZV9w
-YWNrZXQpOworCQkJdGltZW91dCA9IDA7CisJCX0KKwogCQlpZiAoZGVsYXkpIHsKIAkJCXVz
-bGVlcChkZWxheSAqIDEwMCk7CiAK
---------------030003070806070906000808
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
---------------030003070806070906000808
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---------------030003070806070906000808--
