@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
+From: Florian Echtler <floe@butterbrot.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1214985447.12540.11.camel@pancake>
-References: <1214985447.12540.11.camel@pancake>
-Date: Wed, 02 Jul 2008 10:34:47 +0100
-Message-Id: <1214991287.5014.48.camel@cookie.hadess.net>
+Date: Wed, 02 Jul 2008 09:57:27 +0200
+Message-Id: <1214985447.12540.11.camel@pancake>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] MX900 Mouse, bluez-gnome and reconnect
+Subject: [Bluez-devel] MX900 Mouse, bluez-gnome and reconnect
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,25 +18,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Wed, 2008-07-02 at 09:57 +0200, Florian Echtler wrote:
-> Hi everyone,
-> 
-> I have a Logitech MX900 Bluetooth mouse which works fine after I open
-> bluetooth-properties, select Services -> Input Service and add it to the
-> list. However, I have to repeat that every morning after the mouse fell
-> asleep overnight (even if I put it into the charger). Moreover, when I
-> don't remove it from the input device list first, bluetooth-properties
-> crashes.
-> 
-> Does anyone have a hint how to get around this?
+Hi everyone,
 
-You need this kernel patch:
-http://git.kernel.org/?p=linux/kernel/git/holtmann/bluetooth-2.6.git;a=commitdiff_plain;h=c14bf10817f09ffc15e7f16e97d8119cd04c3ca8
+I have a Logitech MX900 Bluetooth mouse which works fine after I open
+bluetooth-properties, select Services -> Input Service and add it to the
+list. However, I have to repeat that every morning after the mouse fell
+asleep overnight (even if I put it into the charger). Moreover, when I
+don't remove it from the input device list first, bluetooth-properties
+crashes.
 
-It's already in Ubuntu, and it's also in kernel-2.6.25.9-76.fc9 for
-Fedora.
+Does anyone have a hint how to get around this?
 
-Cheers
+Yours, Florian
+-- 
+0666 - Filemode of the Beast
 
 
 -------------------------------------------------------------------------
