@@ -1,19 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 3 Jul 2008 18:18:42 -0400
-From: jayjwa <jayjwa@atr2.ath.cx>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <e96e9eeb0807020056v224e3dccsb4d0288bd532051d@mail.gmail.com>
-Message-ID: <alpine.LNX.1.10.0807031813010.5583@nge2.ngu.pk>
-References: <e96e9eeb0806130507u139f58a2sa7094a65f9ecff17@mail.gmail.com>
-	<4852914F.6020209@earthlink.net>
-	<e96e9eeb0806160505m44d366e7if9cea8e1d3c6978b@mail.gmail.com>
-	<4856EC25.5040508@earthlink.net>
-	<e96e9eeb0806300506l1aaeaf6bje93db6f4f5af880e@mail.gmail.com>
-	<e96e9eeb0806300509w12d1dfaen3f00db7732db80c8@mail.gmail.com>
-	<alpine.LNX.1.10.0807011047300.6029@nge2.ngu.pk>
-	<e96e9eeb0807020056v224e3dccsb4d0288bd532051d@mail.gmail.com>
-MIME-Version: 1.0
-Subject: Re: [Bluez-users] Bluez build problem
+To: bluez-users@lists.sourceforge.net
+From: Jui-Hao Chiang <windtracekimo@gmail.com>
+Date: Thu, 3 Jul 2008 17:53:49 +0000 (UTC)
+Message-ID: <loom.20080703T174456-410@post.gmane.org>
+References: <loom.20080703T025528-873@post.gmane.org>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] scotest problem
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -27,24 +19,22 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+I just tried to install Ubuntu 7.10 (linux 2.6.22) 
+And the scotest works between two PCs (each with a usb dongle on it)
+After that, I rebuild with the patched kernel 2.6.23 in an old way
+(make all modules_install install;  mkinitramfs /boot/initrd-2.6.23 2.6.23)
+But the thing becomes worse that "hcitool -i hci0 scan" can't see anything.
+There are some error message in the dmesg
+hci_usb_isoc_rx_submit: hci0 isoc rx submit failed urb ee84b414 err -90
 
+Actually I have also tested the patched kernel in Ubuntu 6.06, and it works in a
+half way.
+(The the client can send and receive packet while the server just halt on
+"Receiving..")
+What could be the reason? is there any better way to try this?
+Hope someone can share the experience.
 
-On Wed, 2 Jul 2008, Voni Hakau wrote:
-
--> > Perhaps the library is mentioned in a libtool (.la) file? You should be able
--> > to change the Makefiles if needed. Looking in 3.34 utils, I see your libdbus-1
--> > is mentioned in lots of places (found with `rgrep -r 'dbus-1' . | most ` while
--> > cwd was /tmp/bluez-utils-3.34):
--> 
--> So you think too that there is a bug in bluez-utils ? That it ignores
--> the DBUS_LIBS environment variable ?
-
-Honestly, I'm not sure. Note that vars like DBUS_LIBS can be set in many 
-places, and there is an order in which they take preference. You might be 
-setting it, only to have to cancelled by a higher-preference assignment some 
-place else. If that is how it is designed to be, it's not a bug; it's hard to 
-tell without the actual problem in front of me. It built OK here, but then I'm 
-not cross compiling, which is a bit trickier.
+Really really need help
 
 
 -------------------------------------------------------------------------
