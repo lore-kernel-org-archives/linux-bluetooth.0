@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <066701c8de28$51a90a70$6701a8c0@freqonedev>
+Message-ID: <064f01c8de1d$9af192c0$6701a8c0@freqonedev>
 From: "David Stockwell" <dstockwell@frequency-one.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Date: Fri, 4 Jul 2008 17:50:11 -0500
+Date: Fri, 4 Jul 2008 16:33:29 -0500
 MIME-Version: 1.0
-Subject: [Bluez-devel] One more suggestion regarding Agent
+Subject: [Bluez-devel] A thought about Adapter.CreatePairedDevice
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,84 +18,93 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is also based on my previous experimentation.
+Currently CreatePairedDevice requires the remote device address, plus 
+the Object Path of a pairing agent (interface org.bluez.Agent), plus a 
+string listing the pairing capabilities.
 
-There may be a valid use-case to allow for the Agent to be a separate 
-process.  However, there needs to be a way to designate the BusName of 
-the connection from the other Agent process to the System bus.
+If an agent for the Adapter is already registered, this is redundant at 
+best, and confusing at worst.
 
-For RegisterAgent and CreatePairedDevice, the syntax of the Object Path 
-is simply "/net/frequencyone/authorize", which defaults to an object in 
-the same process and using the process'es connection to the system bus.
+In my mucking around with my Agent (see my other manifesto...), I tried 
+an experiment to see if it was possible to make a method polymorphic, 
+and I found that DBus has no objections.  It introspects well (although 
+d-feet does not recognizes only the first definition), and when I send a 
+message using dbus-send, dbus routes the incoming message to the version 
+of the Method with a matching signature.  Sweet.
 
-I thought that one might incorporate the Bus Name/connection name into 
-the Object Path.  For example, one might say:
+So, my suggestion is: in adapter.c in setting up the adapter_methods 
+table, add an additional method definition sort of like the following:
 
-"net.frequencyone:/net/frequencyone/authorize", which would point the 
-bus name to "net.frequencyone", and the object would be attached to that 
-"well-known name" (i.e., "net.frequencyone").
-
-Alternatively, one might enter:
-
-":1.57:/net/frequencyone/authorize", which would reference the unique 
-connection name and the object path.  This would raise a problem with 
-passing the current unique connection name from the agent to the 
-application.  Unless there was some way to search the System bus for 
-connections providing a given Object Path, or the unique name was shared 
-via a pipe or shared memory, this would probably not be a great 
-approach, but would still be within the realm of possibility.
-
-However, in either case, the fact remains that the alternative formats 
-do not confirm to the standard for a DBUS_TYPE_OBJECT_PATH, or its Glib 
-binding version: DBUS_TYPE_G_OBJECT_PATH.
-
-If it appears that this is a desirable added functionality (providing 
-for the Agent as an external process), we might provide for it by 
-additional definitions for the RegisterAgent and CreatePairedDevice 
-methods of Adapter.  For example:
-
++++++
+/* starting at line 4257 */
 static GDBusMethodTable adapter_methods[] = {
 ...
  { "CreatePairedDevice", "sos", "o", create_paired_device,
       G_DBUS_METHOD_FLAG_ASYNC},
- { "CreatePairedDevice", "soss", "o", create_paired_device_ext,
+ { "CreatePairedDevice", "s", "o", create_paired_device_noagnt,
       G_DBUS_METHOD_FLAG_ASYNC},
-...
- { "RegisterAgent", "os", "", register_agent        },
- { "RegisterAgent", "oss", "o", register_agent_ext},
 ...
 }
 
-A proxy call to call the RegisterAgent method might look like the 
-following:
++++++
 
-dbus_g_proxy_call(dHciObj, "RegisterAgent", &gError,
-    DBUS_TYPE_G_OBJECT_PATH, "/net/frequencyone/authorize,
-    G_TYPE_STRING, "NoInputOutput",
-    G_TYPE_STRING, "net.frequencyone",
-    G_TYPE_INVALID,
-    G_TYPE_INVALID)
+The second one is the version that does not require the object path for 
+the Agent, nor the capabilities.
 
-In the unique connection name case, it might be:
+Then, add an additional function, right after create_paired_device, to 
+handle the new version of the message:
 
-dbus_g_proxy_call(dHciObj, "RegisterAgent", &gError,
-    DBUS_TYPE_G_OBJECT_PATH, "/net/frequencyone/authorize,
-    G_TYPE_STRING, "NoInputOutput",
-    G_TYPE_STRING, ":1.57",
-    G_TYPE_INVALID,
-    G_TYPE_INVALID)
++++++
 
-Of course, if the Agent code is registered and contained within the 
-current process, the call would remain:
+/* starting at line 4011 */
+static DBusMessage *create_paired_device(DBusConnection *conn,
+     DBusMessage *msg, void *data)
+{
+ const gchar *address, *agent_path, *capability;
+ uint8_t cap;
 
-dbus_g_proxy_call(dHciObj, "RegisterAgent", &gError,
-    DBUS_TYPE_G_OBJECT_PATH, "/net/frequencyone/authorize,
-    G_TYPE_STRING, "NoInputOutput",
-    G_TYPE_INVALID,
-    G_TYPE_INVALID)
+ if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &address,
+     DBUS_TYPE_OBJECT_PATH, &agent_path,
+     DBUS_TYPE_STRING, &capability,
+      DBUS_TYPE_INVALID) == FALSE)
+  return invalid_args(msg);
 
-Any comments, including the basic questions around whether this should 
-be done at all?
+ if (check_address(address) < 0)
+  return invalid_args(msg);
+
+ cap = parse_io_capability(capability);
+ if (cap == IO_CAPABILITY_INVALID)
+  return invalid_args(msg);
+
+ return create_bonding(conn, msg, address, agent_path, cap, data);
+}
+
+/* new function to support agent-less CreatePairedDevice */
+
+static DBusMessage *create_paired_device_noagnt(DBusConnection *conn,
+     DBusMessage *msg, void *data)
+{
+ const gchar *address, *agent_path, *capability;
+ uint8_t cap;
+
+ if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &address,
+      DBUS_TYPE_INVALID) == FALSE)
+  return invalid_args(msg);
+
+ if (check_address(address) < 0)
+  return invalid_args(msg);
+
+ return create_bonding(conn, msg, address, NULL, NULL, data);
+}
+
++++++
+
+There would need to be a couple of additional changes in create_bonding 
+to (a) just use the adapter-wide Agent when the agent_path parameter is 
+NULL, and (b) throw an error when the agent_path is null, and 
+adapter->agent is also null.
+
+Any comments?  If no major objections, I'll submit a patch against 3.35
 
 David Stockwell
 Frequency One 
