@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rui Pedro Lopes <rlopes@ipb.pt>
-To: bluez-devel@lists.sourceforge.net
-Date: Sat, 05 Jul 2008 08:00:01 +0100
-Message-Id: <1215241201.17606.7.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Forward and Backward keys on presenter
+Message-ID: <066701c8de28$51a90a70$6701a8c0@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Date: Fri, 4 Jul 2008 17:50:11 -0500
+MIME-Version: 1.0
+Subject: [Bluez-devel] One more suggestion regarding Agent
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,129 +14,99 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2053508511=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+This is also based on my previous experimentation.
 
---===============2053508511==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="=-Tt/KEyBA7uH4txM3OJLU"
+There may be a valid use-case to allow for the Agent to be a separate 
+process.  However, there needs to be a way to designate the BusName of 
+the connection from the other Agent process to the System bus.
 
+For RegisterAgent and CreatePairedDevice, the syntax of the Object Path 
+is simply "/net/frequencyone/authorize", which defaults to an object in 
+the same process and using the process'es connection to the system bus.
 
---=-Tt/KEyBA7uH4txM3OJLU
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+I thought that one might incorporate the Bus Name/connection name into 
+the Object Path.  For example, one might say:
 
-Hi all!
+"net.frequencyone:/net/frequencyone/authorize", which would point the 
+bus name to "net.frequencyone", and the object would be attached to that 
+"well-known name" (i.e., "net.frequencyone").
 
-I have a microsoft notebook presenter mouse 8000
-(http://www.microsoft.com/hardware/Presenter/productdetails.aspx?pid=3D085)=
- and I have managed to have it working (as a mouse). When switching to pres=
-enter mode, the multimedia keys work (volume up and down), but the forward =
-and backword keys do not. I tried to get the key codes with xev, but nothin=
-g shows up. Even the scan code (with showkey -s or with getscancode - http:=
-//keytouch.sourceforge.net/) nothing shows up.
+Alternatively, one might enter:
 
-However, with hcidump I can see that something goes through:
+":1.57:/net/frequencyone/authorize", which would reference the unique 
+connection name and the object path.  This would raise a problem with 
+passing the current unique connection name from the agent to the 
+application.  Unless there was some way to search the System bus for 
+connections providing a given Object Path, or the unique name was shared 
+via a pipe or shared memory, this would probably not be a great 
+approach, but would still be within the realm of possibility.
 
-(as a mouse)
-> 02 32 20 0B 00 07 00 41 00 A1 11 00 FF 00 00 00=20
-> 02 32 20 0B 00 07 00 41 00 A1 11 00 FE FF 00 00=20
-> 02 32 20 0B 00 07 00 41 00 A1 16 00 00 0F 00 00=20
-> 04 14 06 00 2E 00 00 00 00=20
-> 02 32 20 0B 00 07 00 41 00 A1 16 00 00 00 00 00=20
-(switching to presenter)
-> 04 14 06 00 2E 00 02 A2 00=20
-> 04 14 06 00 32 00 00 00 00=20
-> 04 14 06 00 32 00 02 4E 00=20
-(pressing forward key)
-> 02 32 20 0B 00 07 00 41 00 A1 16 00 00 00 00 00=20
-> 02 32 20 0B 00 07 00 41 00 A1 16 00 00 00 00 00=20
-(switching to mouse)
-> 04 14 06 00 32 00 00 00 00=20
-> 04 14 06 00 32 00 02 1E 00=20
-> 04 14 06 00 32 00 00 00 00=20
-> 04 14 06 00 32 00 02 4E 00=20
+However, in either case, the fact remains that the alternative formats 
+do not confirm to the standard for a DBUS_TYPE_OBJECT_PATH, or its Glib 
+binding version: DBUS_TYPE_G_OBJECT_PATH.
 
-(as a mouse)
-> ACL data: handle 50 flags 0x02 dlen 11
-    L2CAP(d): cid 0x0041 len 7 [psm 0]
-      A1 16 00 00 08 00 00=20
-> HCI Event: Mode Change (0x14) plen 6
-  00 32 00 00 00 00=20
-> HCI Event: Mode Change (0x14) plen 6
-  00 32 00 02 1E 00=20
-> ACL data: handle 50 flags 0x02 dlen 11
-    L2CAP(d): cid 0x0041 len 7 [psm 0]
-      A1 16 00 00 00 00 00=20
-(switching to presenter)
-> HCI Event: Mode Change (0x14) plen 6
-  00 32 00 00 00 00=20
-> HCI Event: Mode Change (0x14) plen 6
-  00 32 00 02 4E 00=20
-(pressing forward key)
-> ACL data: handle 50 flags 0x02 dlen 11
-    L2CAP(d): cid 0x0041 len 7 [psm 0]
-      A1 16 00 00 0E 00 00=20
-> HCI Event: Mode Change (0x14) plen 6
-  00 32 00 00 00 00=20
-> HCI Event: Mode Change (0x14) plen 6
-  00 32 00 02 1E 00=20
-> ACL data: handle 50 flags 0x02 dlen 11
-    L2CAP(d): cid 0x0041 len 7 [psm 0]
-      A1 16 00 00 00 00 00=20
-(back to mouse mode)
-> HCI Event: Mode Change (0x14) plen 6
-  00 32 00 00 00 00=20
-> HCI Event: Mode Change (0x14) plen 6
-  00 32 00 02 4E 00=20
+If it appears that this is a desirable added functionality (providing 
+for the Agent as an external process), we might provide for it by 
+additional definitions for the RegisterAgent and CreatePairedDevice 
+methods of Adapter.  For example:
 
-I do not know how to interpret this information. Does anyone knows if
-the problem is related to the bluetooth part or to X?
-Is there any possibility of getting it working?
+static GDBusMethodTable adapter_methods[] = {
+...
+ { "CreatePairedDevice", "sos", "o", create_paired_device,
+      G_DBUS_METHOD_FLAG_ASYNC},
+ { "CreatePairedDevice", "soss", "o", create_paired_device_ext,
+      G_DBUS_METHOD_FLAG_ASYNC},
+...
+ { "RegisterAgent", "os", "", register_agent        },
+ { "RegisterAgent", "oss", "o", register_agent_ext},
+...
+}
 
-Cheers,
+A proxy call to call the RegisterAgent method might look like the 
+following:
 
-/rp
+dbus_g_proxy_call(dHciObj, "RegisterAgent", &gError,
+    DBUS_TYPE_G_OBJECT_PATH, "/net/frequencyone/authorize,
+    G_TYPE_STRING, "NoInputOutput",
+    G_TYPE_STRING, "net.frequencyone",
+    G_TYPE_INVALID,
+    G_TYPE_INVALID)
 
---=-Tt/KEyBA7uH4txM3OJLU
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
+In the unique connection name case, it might be:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
+dbus_g_proxy_call(dHciObj, "RegisterAgent", &gError,
+    DBUS_TYPE_G_OBJECT_PATH, "/net/frequencyone/authorize,
+    G_TYPE_STRING, "NoInputOutput",
+    G_TYPE_STRING, ":1.57",
+    G_TYPE_INVALID,
+    G_TYPE_INVALID)
 
-iD8DBQBIbxvxAhGrHSs5PNIRAtJJAJ9T4mQBp5uZsvmt7cIBepmQkDAI6ACg30pd
-VjQwNqhmssWdWt4iiBZ8kAQ=
-=GKHR
------END PGP SIGNATURE-----
+Of course, if the Agent code is registered and contained within the 
+current process, the call would remain:
 
---=-Tt/KEyBA7uH4txM3OJLU--
+dbus_g_proxy_call(dHciObj, "RegisterAgent", &gError,
+    DBUS_TYPE_G_OBJECT_PATH, "/net/frequencyone/authorize,
+    G_TYPE_STRING, "NoInputOutput",
+    G_TYPE_INVALID,
+    G_TYPE_INVALID)
 
+Any comments, including the basic questions around whether this should 
+be done at all?
 
+David Stockwell
+Frequency One 
 
---===============2053508511==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
---===============2053508511==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============2053508511==--
