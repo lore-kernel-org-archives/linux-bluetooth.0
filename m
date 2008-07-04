@@ -1,10 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-From: Norbert Unterberg <nunterberg@gmail.com>
-Date: Fri, 04 Jul 2008 22:55:23 +0200
-Message-ID: <g4m2nu$j88$1@ger.gmane.org>
-Mime-Version: 1.0
-Subject: [Bluez-users] Override default inquiry mode?
+Date: Fri, 4 Jul 2008 18:33:13 +0200
+From: Martin Mueller <lists@sig21.net>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <20080704163313.GN8715@caesar.sig21.net>
+References: <200807030237.57723.bluez-users-mlist@malte-wetz.de>
+	<alpine.LNX.1.10.0807031905300.5583@nge2.ngu.pk>
+	<20080704161718.14c7ddc3.profbunny@gmx.de>
+MIME-Version: 1.0
+In-Reply-To: <20080704161718.14c7ddc3.profbunny@gmx.de>
+Subject: Re: [Bluez-users] Headset not working (was: Belkin
+	USB-Dongle	blocks USB subsystem)
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,23 +23,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Moin,
 
-I have got one of those tiny bluetooth USB adapters
-(http://www.anycom.com/products/bluetooth_it_pc_accessoires/?id=102&group_id=3,
-Broadcom chipset) and want to use it on my EEE PC. However, it does not work as
-I hoped.
+On Fri, Jul 04, 2008 at 04:17:18PM +0200, Michael Domann wrote:
+> 
+> if i understand it right, i need the patch, but i don't know how can i get the patch. do you have a link for me?
 
-The adapter only works after setting the inquiry mode from RSSI/Extended to
-standard mode using
-hciconfig hcio reset
-hciconfig hci0 inqmode 0
+You can get the patch from:
 
-Is there any way to tell the bluetooth stack (i.e. in one of its config files)
-to always use the standard mode for this adapter, or even for all adapters?
+http://bluetooth-alsa.cvs.sourceforge.net/*checkout*/bluetooth-alsa/plugz/patches/sco-flowcontrol-v4.4.diff?revision=1.1
 
-Norbert
+But the following section doesn't apply anymore to my 2.6.25 debian
+kernel maybe someone knows how to fix it:
 
+diff -ru linux-2.6.22-mh3/net/bluetooth/hci_conn.c linux-2.6.22-mh3-sco-flowcontrol/net/bluetooth/hci_conn.c
+--- linux-2.6.22-mh3/net/bluetooth/hci_conn.c	2007-10-10 15:12:04.000000000 +0200
++++ linux-2.6.22-mh3-sco-flowcontrol/net/bluetooth/hci_conn.c	2007-10-10 14:31:19.000000000 +0200
+
+@@ -208,6 +228,11 @@
+ 
+        skb_queue_head_init(&conn->data_q);
+ 
++       hrtimer_init(&conn->tx_timer, CLOCK_MONOTONIC, HRTIMER_NORESTART);
++
++       if(type == SCO_LINK)
++               conn->tx_timer.function = hci_sco_tx_timer;
++
+        init_timer(&conn->disc_timer);
+        conn->disc_timer.function = hci_conn_timeout;
+        conn->disc_timer.data = (unsigned long) conn;
+@@ -217,6 +242,7 @@
+
+bye
+  MM
+--
+A: Because it messes up the order in which people normally read text.
+Q: Why is top-posting such a bad thing?
+A: Top-posting.
+Q: What is the most annoying thing in e-mail?
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
