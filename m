@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <098701c8def5$0eebd730$6701a8c0@freqonedev>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-References: <066701c8de28$51a90a70$6701a8c0@freqonedev>
-	<1215277418.4349.1.camel@californication>
-Date: Sat, 5 Jul 2008 18:15:44 -0500
-MIME-Version: 1.0
-Subject: Re: [Bluez-devel] Adapter.RegisterAgent
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1215241201.17606.7.camel@localhost>
+References: <1215241201.17606.7.camel@localhost>
+Date: Sat, 05 Jul 2008 19:21:35 +0200
+Message-Id: <1215278495.4349.23.camel@californication>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Forward and Backward keys on presenter
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,44 +20,78 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi, Marcel.
+Hi Rui,
 
-> Hi David,
->
->> There may be a valid use-case to allow for the Agent to be a separate
->> process.  However, there needs to be a way to designate the BusName 
->> of
->> the connection from the other Agent process to the System bus.
->
-> I really have no idea what you are talking about. The agent can always
-> be a separate process. The agent for CreatePairedDevice must be the 
-> same
-> process as the caller. That is on purpose.
-
-Actually, in RegisterAgent, the agent cannot (now) be a separate 
-process, because the path name provided is a DBus Object Path only. What 
-is used is the unique connection name of the process calling 
-RegisterAgent.  Line 4143 of adapter.c:
-
-    name = dbus_message_get_sender(msg);
-
-One other point: if the Object Path is not found, no error is thrown. 
-The syslog indicates that the agent was registered, although it will 
-never work.
-
-WRT CreatePairedAgent in the same process, fine enough.  I can 
-understand the rationale.  Got it.
-
-Best...
->
-> Regards
->
-> Marcel
->
->
->
->
+> I have a microsoft notebook presenter mouse 8000
+> (http://www.microsoft.com/hardware/Presenter/productdetails.aspx?pid=085) and I have managed to have it working (as a mouse). When switching to presenter mode, the multimedia keys work (volume up and down), but the forward and backword keys do not. I tried to get the key codes with xev, but nothing shows up. Even the scan code (with showkey -s or with getscancode - http://keytouch.sourceforge.net/) nothing shows up.
 > 
+> However, with hcidump I can see that something goes through:
+> 
+> (as a mouse)
+> > 02 32 20 0B 00 07 00 41 00 A1 11 00 FF 00 00 00 
+> > 02 32 20 0B 00 07 00 41 00 A1 11 00 FE FF 00 00 
+> > 02 32 20 0B 00 07 00 41 00 A1 16 00 00 0F 00 00 
+> > 04 14 06 00 2E 00 00 00 00 
+> > 02 32 20 0B 00 07 00 41 00 A1 16 00 00 00 00 00 
+> (switching to presenter)
+> > 04 14 06 00 2E 00 02 A2 00 
+> > 04 14 06 00 32 00 00 00 00 
+> > 04 14 06 00 32 00 02 4E 00 
+> (pressing forward key)
+> > 02 32 20 0B 00 07 00 41 00 A1 16 00 00 00 00 00 
+> > 02 32 20 0B 00 07 00 41 00 A1 16 00 00 00 00 00 
+> (switching to mouse)
+> > 04 14 06 00 32 00 00 00 00 
+> > 04 14 06 00 32 00 02 1E 00 
+> > 04 14 06 00 32 00 00 00 00 
+> > 04 14 06 00 32 00 02 4E 00 
+> 
+> (as a mouse)
+> > ACL data: handle 50 flags 0x02 dlen 11
+>     L2CAP(d): cid 0x0041 len 7 [psm 0]
+>       A1 16 00 00 08 00 00 
+> > HCI Event: Mode Change (0x14) plen 6
+>   00 32 00 00 00 00 
+> > HCI Event: Mode Change (0x14) plen 6
+>   00 32 00 02 1E 00 
+> > ACL data: handle 50 flags 0x02 dlen 11
+>     L2CAP(d): cid 0x0041 len 7 [psm 0]
+>       A1 16 00 00 00 00 00 
+> (switching to presenter)
+> > HCI Event: Mode Change (0x14) plen 6
+>   00 32 00 00 00 00 
+> > HCI Event: Mode Change (0x14) plen 6
+>   00 32 00 02 4E 00 
+> (pressing forward key)
+> > ACL data: handle 50 flags 0x02 dlen 11
+>     L2CAP(d): cid 0x0041 len 7 [psm 0]
+>       A1 16 00 00 0E 00 00 
+> > HCI Event: Mode Change (0x14) plen 6
+>   00 32 00 00 00 00 
+> > HCI Event: Mode Change (0x14) plen 6
+>   00 32 00 02 1E 00 
+> > ACL data: handle 50 flags 0x02 dlen 11
+>     L2CAP(d): cid 0x0041 len 7 [psm 0]
+>       A1 16 00 00 00 00 00 
+> (back to mouse mode)
+> > HCI Event: Mode Change (0x14) plen 6
+>   00 32 00 00 00 00 
+> > HCI Event: Mode Change (0x14) plen 6
+>   00 32 00 02 4E 00 
+> 
+> I do not know how to interpret this information. Does anyone knows if
+> the problem is related to the bluetooth part or to X?
+> Is there any possibility of getting it working?
+
+the generic HID driver inside the kernel will handle this part. So to
+convert all buttons, it might need some quirks to be setup. However I
+have no idea which ones are needed since I don't have one of these
+devices at home for testing.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
