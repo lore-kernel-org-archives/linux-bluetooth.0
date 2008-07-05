@@ -1,14 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BLU141-W20653273F28C7F4A9B8897D9950@phx.gbl>
-From: Axel Dine <axel__17@hotmail.com>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Sat, 5 Jul 2008 21:45:51 -1000
-In-Reply-To: <BLU141-W404351BCDF08C600D9561AD99E0@phx.gbl>
-References: <BLU141-W9DECA08385BE097483FADD99E0@phx.gbl>
-	<1214889282.11537.115.camel@violet.holtmann.net>
-	<BLU141-W404351BCDF08C600D9561AD99E0@phx.gbl>
-MIME-Version: 1.0
-Subject: Re: [Bluez-users] FW: hid2hci for the new iMAC
+To: bluez-users@lists.sourceforge.net
+Mime-Version: 1.0
+Date: Sat, 05 Jul 2008 22:26:19 +0200
+From: Anders Eriksson <aeriksson@fastmail.fm>
+Message-Id: <20080705202619.BE84B2C400A@tippex.mynet.homeunix.org>
+Subject: [Bluez-users] Concurrent bt usages?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -23,24 +19,26 @@ Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 
-Hi everybody,
-I finally get everythng work ;)
-I post my experience here:
+So, I just discvered hidd and the fact that my two cellphones can act as 
+keyboards. Neat!
 
-http://idebian.wordpress.com/2008/07/06/manage-hid-bluetooth-devices-in-linux/
+However, they can only to so one at a time. :-( Why is that?
 
-just as a reference for everybody else need it.
+The reason I started fiddling with bluetooth (this time) was that I want to 
+set up a "base station" to:
 
-Marcel: is there any chance we can have the modification to the kernel module (for the reset issue)
-and the HID quirks for the keyboard (0x022d) included in 2.6.26?
+1) Continuously monitor which bt devices are in range (el cheapo surveillance 
+system)
+2) Allow friends to upload photos from their phones when wisiting
+3) Use a (any) phone as remote to contol a media center.
 
-Thanks again for your support.
-Regards
-AxeL
+Is it possible to do all this at the same time, or should I read the above 
+hidd experience as a at-most-one-thing-at-a-time-mate indication? If so, 
+what's the best approach to a "time sharing" system for my one bt dongle?
 
-_________________________________________________________________
-Making the world a better place one message at a time.
-http://www.imtalkathon.com/?source=EML_WLH_Talkathon_BetterPlace
+/Anders
+
+
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
