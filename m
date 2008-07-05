@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 To: bluez-users@lists.sourceforge.net
+From: Norbert Unterberg <nunterberg@gmail.com>
+Date: Sat, 05 Jul 2008 21:39:09 +0200
+Message-ID: <g4oikf$lpd$1@ger.gmane.org>
+References: <g4m2nu$j88$1@ger.gmane.org>
+	<1215278356.4349.19.camel@californication>
 Mime-Version: 1.0
-Date: Sat, 05 Jul 2008 22:26:19 +0200
-From: Anders Eriksson <aeriksson@fastmail.fm>
-Message-Id: <20080705202619.BE84B2C400A@tippex.mynet.homeunix.org>
-Subject: [Bluez-users] Concurrent bt usages?
+In-Reply-To: <1215278356.4349.19.camel@californication>
+Subject: Re: [Bluez-users] Override default inquiry mode?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,25 +21,50 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Marcel Holtmann wrote:
 
-So, I just discvered hidd and the fact that my two cellphones can act as 
-keyboards. Neat!
+>> I have got one of those tiny bluetooth USB adapters
+>> (http://www.anycom.com/products/bluetooth_it_pc_accessoires/?id=102&group_id=3,
+>> Broadcom chipset) and want to use it on my EEE PC. However, it does not work as
+>> I hoped.
+>>
+>> The adapter only works after setting the inquiry mode from RSSI/Extended to
+>> standard mode using
+>> hciconfig hcio reset
+>> hciconfig hci0 inqmode 0
+>>
+>> Is there any way to tell the bluetooth stack (i.e. in one of its config files)
+>> to always use the standard mode for this adapter, or even for all adapters?
+> 
+> what is your problem with using a better inquiry mode? We haven't had
+> any problem with this in a long long time. Your application might be
+> broken actually if it can't deal with more advanced inquiry modes.
 
-However, they can only to so one at a time. :-( Why is that?
+The problem is notwith my application but with hciconfig and hcitool:
 
-The reason I started fiddling with bluetooth (this time) was that I want to 
-set up a "base station" to:
+asus-931342168:/root> hciconfig -a
+hci0:   Type: USB
+         BD Address: 00:0A:3A:82:06:80 ACL MTU: 1021:8 SCO MTU: 64:1
+         UP RUNNING
+         RX bytes:163 acl:0 sco:0 events:19 errors:0
+         TX bytes:564 acl:0 sco:0 commands:19 errors:0
+         Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x79 0x83
+         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+         Link policy: RSWITCH HOLD SNIFF PARK
+         Link mode: SLAVE ACCEPT
+Can't read local name on hci0: Input/output error (5)
+asus-931342168:/root> hcitool scan
+Scanning ...
+Inquiry failed: Connection timed out
 
-1) Continuously monitor which bt devices are in range (el cheapo surveillance 
-system)
-2) Allow friends to upload photos from their phones when wisiting
-3) Use a (any) phone as remote to contol a media center.
+I guess it is a problem with the bluetooth adapter's firmware.
 
-Is it possible to do all this at the same time, or should I read the above 
-hidd experience as a at-most-one-thing-at-a-time-mate indication? If so, 
-what's the best approach to a "time sharing" system for my one bt dongle?
+> However hcid.conf should have a inqmode setting.
 
-/Anders
+I'll try. Is there a hcid.conf reference? man hcid.conf does not show a 
+inqmode setting.
+
+Norbert
 
 
 -------------------------------------------------------------------------
