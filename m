@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-From: Norbert Unterberg <nunterberg@gmail.com>
-Date: Sat, 05 Jul 2008 21:39:09 +0200
-Message-ID: <g4oikf$lpd$1@ger.gmane.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <g4m2nu$j88$1@ger.gmane.org>
 References: <g4m2nu$j88$1@ger.gmane.org>
-	<1215278356.4349.19.camel@californication>
+Date: Sat, 05 Jul 2008 19:19:16 +0200
+Message-Id: <1215278356.4349.19.camel@californication>
 Mime-Version: 1.0
-In-Reply-To: <1215278356.4349.19.camel@californication>
 Subject: Re: [Bluez-users] Override default inquiry mode?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -21,50 +20,31 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
+Hi Norbert,
 
->> I have got one of those tiny bluetooth USB adapters
->> (http://www.anycom.com/products/bluetooth_it_pc_accessoires/?id=102&group_id=3,
->> Broadcom chipset) and want to use it on my EEE PC. However, it does not work as
->> I hoped.
->>
->> The adapter only works after setting the inquiry mode from RSSI/Extended to
->> standard mode using
->> hciconfig hcio reset
->> hciconfig hci0 inqmode 0
->>
->> Is there any way to tell the bluetooth stack (i.e. in one of its config files)
->> to always use the standard mode for this adapter, or even for all adapters?
+> I have got one of those tiny bluetooth USB adapters
+> (http://www.anycom.com/products/bluetooth_it_pc_accessoires/?id=102&group_id=3,
+> Broadcom chipset) and want to use it on my EEE PC. However, it does not work as
+> I hoped.
 > 
-> what is your problem with using a better inquiry mode? We haven't had
-> any problem with this in a long long time. Your application might be
-> broken actually if it can't deal with more advanced inquiry modes.
+> The adapter only works after setting the inquiry mode from RSSI/Extended to
+> standard mode using
+> hciconfig hcio reset
+> hciconfig hci0 inqmode 0
+> 
+> Is there any way to tell the bluetooth stack (i.e. in one of its config files)
+> to always use the standard mode for this adapter, or even for all adapters?
 
-The problem is notwith my application but with hciconfig and hcitool:
+what is your problem with using a better inquiry mode? We haven't had
+any problem with this in a long long time. Your application might be
+broken actually if it can't deal with more advanced inquiry modes.
 
-asus-931342168:/root> hciconfig -a
-hci0:   Type: USB
-         BD Address: 00:0A:3A:82:06:80 ACL MTU: 1021:8 SCO MTU: 64:1
-         UP RUNNING
-         RX bytes:163 acl:0 sco:0 events:19 errors:0
-         TX bytes:564 acl:0 sco:0 commands:19 errors:0
-         Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x79 0x83
-         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-         Link policy: RSWITCH HOLD SNIFF PARK
-         Link mode: SLAVE ACCEPT
-Can't read local name on hci0: Input/output error (5)
-asus-931342168:/root> hcitool scan
-Scanning ...
-Inquiry failed: Connection timed out
+However hcid.conf should have a inqmode setting.
 
-I guess it is a problem with the bluetooth adapter's firmware.
+Regards
 
-> However hcid.conf should have a inqmode setting.
+Marcel
 
-I'll try. Is there a hcid.conf reference? man hcid.conf does not show a 
-inqmode setting.
-
-Norbert
 
 
 -------------------------------------------------------------------------
