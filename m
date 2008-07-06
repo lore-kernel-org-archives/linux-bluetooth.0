@@ -1,14 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Malte J. Wetz" <bluez-users-mlist@malte-wetz.de>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Mon, 7 Jul 2008 12:55:06 +0200
-References: <200807030237.57723.bluez-users-mlist@malte-wetz.de>
-	<20080704163313.GN8715@caesar.sig21.net>
-	<alpine.LNX.1.10.0807060641520.7069@nge2.ngu.pk>
-In-Reply-To: <alpine.LNX.1.10.0807060641520.7069@nge2.ngu.pk>
+Message-ID: <a7f7fb4f0807060741x586127dcr97f432225a42fd1c@mail.gmail.com>
+Date: Sun, 6 Jul 2008 16:41:18 +0200
+From: "Unai Uribarri" <unaiur@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Message-Id: <200807071255.06344.bluez-users-mlist@malte-wetz.de>
-Subject: Re: [Bluez-users] Headset not working
+Subject: [Bluez-users] What bt dongle to buy
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,73 +14,61 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-15"
+Content-Type: multipart/mixed; boundary="===============0998216815=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Am Sonntag, 6. Juli 2008 schrieb jayjwa:
-> On Fri, 4 Jul 2008, Martin Mueller wrote:
-> -> You can get the patch from:
-> http://bluetooth-alsa.cvs.sourceforge.net/*checkout*/bluetooth-alsa/plugz
->/patches/sco-flowcontrol-v4.4.diff?revision=3D1.1 ->
->
-> We seem to be talking about different patches. I am refering to the one
-> needed to allow older bluetooth (I think it's 1.2?) headsets to work with
-> newer kernels, that deals with SCO/ESCO. The one above modifies another
-> file. Below is the one I use, and it's working now even on linux-2.6.25.9
-> (kernel.org) that I'm currently using.
+--===============0998216815==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_10088_4218506.1215355278652"
 
-Well, as I wrote before, I'm already using the SCO/ESCO patch and it does =
+------=_Part_10088_4218506.1215355278652
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-not work.
+Hello,
 
-The patch proposed by Martin does apply to current kernel (you just have to =
+I want to buy a BT 2.0/2.1 USB dongle that works well with linux. My last
+two dongles doesn't work correctly.
 
-add =BB-F10=AB to your patch command as some line have moved beyond the def=
-ault =
+The Belkin one doesn't support data encryption, and the bluetooth 2.0
+receiver that comes with Logitech Keyboards gets reseted when a keyboard
+tries to connect.
 
-fuzz). But it does no good. Now, whenever I play back something via the =
+Thanks.
 
-headset, the entire kernel freezes and even Magic SysRq won't anymore. Only =
+------=_Part_10088_4218506.1215355278652
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-a hard reset gets me out of there.
+Hello,<br><br>I want to buy a BT 2.0/2.1 USB dongle that works well with linux. My last two dongles doesn&#39;t work correctly.<br><br>The Belkin one doesn&#39;t support data encryption, and the bluetooth 2.0 receiver that comes with Logitech Keyboards gets reseted when a keyboard tries to connect.<br>
+<br>Thanks.<br>
 
-Log files is insuspicous:
-
-Jul  7 12:41:37 triton hcid[8053]: Audio API: received =
-
-BT_GETCAPABILITIES_REQ
-Jul  7 12:41:37 triton hcid[8053]: Audio API: sending BT_GETCAPABILITIES_RSP
-Jul  7 12:41:37 triton hcid[8053]: Audio API: received =
-
-BT_SETCONFIGURATION_REQ
-Jul  7 12:41:37 triton hcid[8053]: config sco - device =3D 00:13:17:CF:C3:D=
-5 =
-
-access_mode =3D 2
-Jul  7 12:41:40 triton hcid[8053]: pin_code_request (sba=3D00:0A:3A:81:33:1=
-C, =
-
-dba=3D00:13:17:CF:C3:D5)
-<freeze here>
+------=_Part_10088_4218506.1215355278652--
 
 
-hci_usb is loaded with force_scofix=3D1. I cannot see any differences.
-
-Still confused,
-  Malte
-
--- =
-
-Malte J. Wetz  <mail@malte-wetz.de>
-Homepage: www.malte-wetz.de (PGP/GPG Keys available on homepage)
+--===============0998216815==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
+--===============0998216815==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============0998216815==--
