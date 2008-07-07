@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 Jul 2008 13:32:58 +0200
-From: Martin Mueller <lists@sig21.net>
+From: "Malte J. Wetz" <bluez-users-mlist@malte-wetz.de>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <20080707113258.GR8715@caesar.sig21.net>
+Date: Mon, 7 Jul 2008 12:55:06 +0200
 References: <200807030237.57723.bluez-users-mlist@malte-wetz.de>
 	<20080704163313.GN8715@caesar.sig21.net>
 	<alpine.LNX.1.10.0807060641520.7069@nge2.ngu.pk>
-	<200807071255.06344.bluez-users-mlist@malte-wetz.de>
+In-Reply-To: <alpine.LNX.1.10.0807060641520.7069@nge2.ngu.pk>
 MIME-Version: 1.0
-In-Reply-To: <200807071255.06344.bluez-users-mlist@malte-wetz.de>
+Message-Id: <200807071255.06344.bluez-users-mlist@malte-wetz.de>
 Subject: Re: [Bluez-users] Headset not working
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -19,37 +18,66 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="iso-8859-15"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
-
-On Mon, Jul 07, 2008 at 12:55:06PM +0200, Malte J. Wetz wrote:
+Am Sonntag, 6. Juli 2008 schrieb jayjwa:
+> On Fri, 4 Jul 2008, Martin Mueller wrote:
+> -> You can get the patch from:
+> http://bluetooth-alsa.cvs.sourceforge.net/*checkout*/bluetooth-alsa/plugz
+>/patches/sco-flowcontrol-v4.4.diff?revision=3D1.1 ->
 >
-> Well, as I wrote before, I'm already using the SCO/ESCO patch and it
-> does not work.
+> We seem to be talking about different patches. I am refering to the one
+> needed to allow older bluetooth (I think it's 1.2?) headsets to work with
+> newer kernels, that deals with SCO/ESCO. The one above modifies another
+> file. Below is the one I use, and it's working now even on linux-2.6.25.9
+> (kernel.org) that I'm currently using.
 
-Hmm, do you have the bluetooth dongle connected via an USB-hub? If
-yes, try plugging the dongle directly into the mainboard. In my setup
-I can't use bt-dongles connected to hub for SCO, even though the rest
-like rfcomm, l2ping, etc work.
+Well, as I wrote before, I'm already using the SCO/ESCO patch and it does =
 
-> The patch proposed by Martin does apply to current kernel (you just
-> have to add =BB-F10=AB to your patch command as some line have moved
-> beyond the default fuzz). But it does no good. Now, whenever I play
-> back something via the headset, the entire kernel freezes and even
-> Magic SysRq won't anymore. Only a hard reset gets me out of there.
+not work.
 
-What a luck I wasn't able to apply it. ;-)
+The patch proposed by Martin does apply to current kernel (you just have to =
 
-bye
-  MM
---
-A: Because it messes up the order in which people normally read text.
-Q: Why is top-posting such a bad thing?
-A: Top-posting.
-Q: What is the most annoying thing in e-mail?
+add =BB-F10=AB to your patch command as some line have moved beyond the def=
+ault =
+
+fuzz). But it does no good. Now, whenever I play back something via the =
+
+headset, the entire kernel freezes and even Magic SysRq won't anymore. Only =
+
+a hard reset gets me out of there.
+
+Log files is insuspicous:
+
+Jul  7 12:41:37 triton hcid[8053]: Audio API: received =
+
+BT_GETCAPABILITIES_REQ
+Jul  7 12:41:37 triton hcid[8053]: Audio API: sending BT_GETCAPABILITIES_RSP
+Jul  7 12:41:37 triton hcid[8053]: Audio API: received =
+
+BT_SETCONFIGURATION_REQ
+Jul  7 12:41:37 triton hcid[8053]: config sco - device =3D 00:13:17:CF:C3:D=
+5 =
+
+access_mode =3D 2
+Jul  7 12:41:40 triton hcid[8053]: pin_code_request (sba=3D00:0A:3A:81:33:1=
+C, =
+
+dba=3D00:13:17:CF:C3:D5)
+<freeze here>
+
+
+hci_usb is loaded with force_scofix=3D1. I cannot see any differences.
+
+Still confused,
+  Malte
+
+-- =
+
+Malte J. Wetz  <mail@malte-wetz.de>
+Homepage: www.malte-wetz.de (PGP/GPG Keys available on homepage)
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
