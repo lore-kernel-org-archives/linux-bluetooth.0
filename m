@@ -1,10 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <b5c34db00807080214q56dea4a3i53212e0f0f4775cb@mail.gmail.com>
-Date: Tue, 8 Jul 2008 14:44:00 +0530
-From: umeshyv <umeshyv@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+From: "Malte J. Wetz" <bluez-users-mlist@malte-wetz.de>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Date: Mon, 7 Jul 2008 14:15:59 +0200
+References: <200807030237.57723.bluez-users-mlist@malte-wetz.de>
+	<200807071255.06344.bluez-users-mlist@malte-wetz.de>
+	<20080707113258.GR8715@caesar.sig21.net>
+In-Reply-To: <20080707113258.GR8715@caesar.sig21.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] bluetooth compilation and usage regarding
+Message-Id: <200807071416.00057.bluez-users-mlist@malte-wetz.de>
+Subject: Re: [Bluez-users] Headset not working
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,71 +18,31 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0081760874=="
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0081760874==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_7323_7021869.1215508440539"
+Am Montag, 7. Juli 2008 schrieb Martin Mueller:
+> Hmm, do you have the bluetooth dongle connected via an USB-hub?
 
-------=_Part_7323_7021869.1215508440539
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Currently, the Belkin dongle is connected directly to my mainboard. But I =
 
-Hi Sir,
-I am currently working mips32 architecture i 've usb host in the processor
-to that i inserted bluetooth dongle and corresponding drivers hav be put and
-i successfully compiled bluetooth libs and utils and now i am trying higher
-version i couldnt compile and resulting in errors moreover my target is i
-need to transfer files from my mobile to target and vice versa and I dont
-the procedure to be followed.Can you help me in compilation procedure and
-the application I required.I use buildroot's toolchain for all other
-compilation.waiting for your valuable suggestions.
+also tried my USB-Hub (active powered). Either way, it does not work.
 
-Thanks & Regards
-Umesh
+-- =
 
-------=_Part_7323_7021869.1215508440539
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Malte J. Wetz  <mail@malte-wetz.de>
+Homepage: www.malte-wetz.de (PGP/GPG Keys available on homepage)
 
-Hi Sir,<br>I am currently working mips32 architecture i &#39;ve usb host in
-the processor to that i inserted bluetooth dongle and corresponding
-drivers hav be put and i successfully compiled bluetooth libs and utils
-and now i am trying higher version i couldnt compile and resulting in
-errors moreover my target is i need to transfer files from my mobile to
-target and vice versa and I dont the procedure to be followed.Can you
-help me in compilation procedure and the application I required.I use
-buildroot&#39;s toolchain for all other compilation.waiting for your
-valuable suggestions.<br>
-<br>Thanks &amp; Regards<br>Umesh
-
-------=_Part_7323_7021869.1215508440539--
-
-
---===============0081760874==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Verhandle nur, wenn Du in jedem Fall Profit davontr=E4gst!
+                                        -- Ferengi-Erwerbsregel Nr. 42
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
---===============0081760874==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============0081760874==--
