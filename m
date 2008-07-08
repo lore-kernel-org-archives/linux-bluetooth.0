@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Bram Jansen" <bramsbox@gmail.com>
-To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
+Message-Id: <E1F40683-65D7-49AC-A515-44D9035ED97A@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <AE1FAD2818FF4B8E90DE8C156874A782@radon>
+Mime-Version: 1.0 (Apple Message framework v926)
+Date: Tue, 8 Jul 2008 20:37:59 +0300
 References: <AE1FAD2818FF4B8E90DE8C156874A782@radon>
-	<E1F40683-65D7-49AC-A515-44D9035ED97A@gmail.com>
-Date: Wed, 9 Jul 2008 11:28:21 +0200
-Message-ID: <A11CE28965CC41E7BAE76CD934C7F6F0@radon>
-MIME-Version: 1.0
-In-Reply-To: <E1F40683-65D7-49AC-A515-44D9035ED97A@gmail.com>
 Subject: Re: [Bluez-users] Can't connect RFCOMM socket: Host is down
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
@@ -20,23 +19,6 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
-
-Hi Johan,
-
-This did the trick.
-Thanks a lot.
-
-Regards,
-
-Bram
-
------Original Message-----
-From: bluez-users-bounces@lists.sourceforge.net
-[mailto:bluez-users-bounces@lists.sourceforge.net] On Behalf Of Johan
-Hedberg
-Sent: 08 July 2008 19:38
-To: BlueZ users
-Subject: Re: [Bluez-users] Can't connect RFCOMM socket: Host is down
 
 Hi Bram,
 
@@ -65,17 +47,6 @@ the remote address (which is why you see "01:00:...") and use the
 channel 1 which is the default when no channel has been specified.
 
 Johan
-
--------------------------------------------------------------------------
-Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
-Studies have shown that voting for your favorite open source project,
-along with a healthy diet, reduces your potential for chronic lameness
-and boredom. Vote Now at http://www.sourceforge.net/community/cca08
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
-
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
