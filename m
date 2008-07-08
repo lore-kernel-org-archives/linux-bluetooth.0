@@ -1,12 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4873BB89.5030109@aircable.net>
-Date: Tue, 08 Jul 2008 16:10:01 -0300
-From: Manuel Naranjo <manuel@aircable.net>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <48728258.6080809@aircable.net>
 References: <48728258.6080809@aircable.net>
-	<1215549694.26279.6.camel@californication>
-In-Reply-To: <1215549694.26279.6.camel@californication>
+Date: Tue, 08 Jul 2008 22:41:34 +0200
+Message-Id: <1215549694.26279.6.camel@californication>
+Mime-Version: 1.0
 Subject: Re: [Bluez-devel] No more binary SDP registration in new 4.0 API?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -21,23 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
-> the idea is not to use binary SDP records at all anymore. Also we wanna
-> move the record registration and service authorization into a plugin and
-> don't have this in the Adapter interface anymore.
->   
-Ok got it. So then to work with binary records you should use bluelib 
-right? Or this is going to be deprecated too?.
+Hi Manuel,
 
-Thing is that in cases like BIP you wanna work with binary stuff, 
-embedding xml records in your code might not be a good idea at all.
+> I've been asking this the hole weekend on the irc channel, but yet no 
+> one could tell me if this is a bug or a feature, or what ever.
+> 
+> On Dbus api 3.X you could register binary sdp records over dbus, but new 
+> api can't I all ready implemented adding records, I need to implement 
+> the update records. But I would like to know if it makes sense to commit 
+> this patch or not.
 
-In fact the patch I created was to start making obex-data-server use the 
-new API, but this was some how a boomer. What shall we do? Use sdplib, 
-or go with xml strings?
+the idea is not to use binary SDP records at all anymore. Also we wanna
+move the record registration and service authorization into a plugin and
+don't have this in the Adapter interface anymore.
 
-Thanks,
-Manuel
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
