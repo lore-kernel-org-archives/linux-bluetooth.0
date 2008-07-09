@@ -1,19 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Terry <michael.terry@canonical.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1214874653.11537.69.camel@violet.holtmann.net>
-References: <1214593557.6131.26.camel@bongo>
-	<1214605438.11537.0.camel@violet.holtmann.net>
-	<1214831713.6764.8.camel@bongo>
-	<1214834796.11537.42.camel@violet.holtmann.net>
-	<1214841475.6764.37.camel@bongo>
-	<1214841780.11537.48.camel@violet.holtmann.net>
-	<1214852035.6764.40.camel@bongo>
-	<1214874653.11537.69.camel@violet.holtmann.net>
-Date: Wed, 09 Jul 2008 10:28:10 -0400
-Message-Id: <1215613690.26958.2.camel@bongo>
+In-Reply-To: <4873BB89.5030109@aircable.net>
+References: <48728258.6080809@aircable.net>
+	<1215549694.26279.6.camel@californication>
+	<4873BB89.5030109@aircable.net>
+Date: Wed, 09 Jul 2008 02:26:59 +0200
+Message-Id: <1215563219.4586.6.camel@californication>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Wizard patch
+Subject: Re: [Bluez-devel] No more binary SDP registration in new 4.0 API?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -23,169 +18,45 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0919768272=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Manuel,
 
---===============0919768272==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="=-WIzd5HeRyN5Jo/bSF5lo"
+> > the idea is not to use binary SDP records at all anymore. Also we wanna
+> > move the record registration and service authorization into a plugin and
+> > don't have this in the Adapter interface anymore.
+> >   
+> Ok got it. So then to work with binary records you should use bluelib 
+> right? Or this is going to be deprecated too?.
 
+yes, the access via SDP Unix socket will also go away.
 
---=-WIzd5HeRyN5Jo/bSF5lo
-Content-Type: multipart/mixed; boundary="=-2rvw5XUnMkhr5K2rsEdh"
+> Thing is that in cases like BIP you wanna work with binary stuff, 
+> embedding xml records in your code might not be a good idea at all.
+> 
+> In fact the patch I created was to start making obex-data-server use the 
+> new API, but this was some how a boomer. What shall we do? Use sdplib, 
+> or go with xml strings?
 
+I think the best is to move this all into a plugin and then we could
+have a plugin that provides binary record registration. However I am not
+a big fan of doing SDP without XML anymore. Building the record with the
+current C function is painful and leads to errors or memory leaks.
 
---=-2rvw5XUnMkhr5K2rsEdh
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Regards
 
-Hello, Marcel.
-
-On Tue, 2008-07-01 at 03:10 +0200, Marcel Holtmann wrote:
-> please only change create_bonding and leave the others alone. Also you
-> cast a little bit too much for my taste. For example void pointers
-> need
-> to extra cast.
-
-Attached is callback3.diff which only modifies create_bonding.
-
-I'm not sure which casts you felt were unnecessary.  I don't think I
-cast any void pointers.
-
--mt
-
---=-2rvw5XUnMkhr5K2rsEdh
-Content-Disposition: attachment; filename=callback3.diff
-Content-Transfer-Encoding: base64
-Content-Type: text/x-patch; name=callback3.diff; charset=utf-8
-
-SW5kZXg6IGNvbW1vbi9jbGllbnQuYw0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KUkNTIGZpbGU6IC9jdnNyb290L2Js
-dWV6L2dub21lL2NvbW1vbi9jbGllbnQuYyx2DQpyZXRyaWV2aW5nIHJldmlzaW9uIDEuNDQNCmRp
-ZmYgLXUgLXAgLXIxLjQ0IGNsaWVudC5jDQotLS0gY29tbW9uL2NsaWVudC5jCTEyIE1hciAyMDA4
-IDIxOjAzOjM4IC0wMDAwCTEuNDQNCisrKyBjb21tb24vY2xpZW50LmMJOSBKdWwgMjAwOCAxNDoy
-MzozOCAtMDAwMA0KQEAgLTExMTUsMTEgKzExMTUsMjAgQEAgZ2Jvb2xlYW4gYmx1ZXRvb3RoX2Ns
-aWVudF9yZWdpc3Rlcl9wYXNzaw0KIHN0YXRpYyB2b2lkIGNyZWF0ZV9ib25kaW5nX3JlcGx5KERC
-dXNHUHJveHkgKnByb3h5LA0KIAkJCQkJR0Vycm9yICplcnJvciwgZ3BvaW50ZXIgdXNlcmRhdGEp
-DQogew0KLQkvL2dfcHJpbnRmKCJjcmVhdGUgYm9uZGluZyByZXBseVxuIik7DQorCURCdXNHQXN5
-bmNEYXRhICpkYXRhID0gKERCdXNHQXN5bmNEYXRhKikgdXNlcmRhdGE7DQorCWdfb2JqZWN0X3Nl
-dF9kYXRhKEdfT0JKRUNUKHByb3h5KSwgImJvbmRpbmctY2FsbCIsIE5VTEwpOw0KKwlpZiAoZGF0
-YSAmJiBkYXRhLT5jYikgew0KKwkJKCooYmx1ZXRvb3RoX2NsaWVudF9jYWxsX3JlcGx5KWRhdGEt
-PmNiKSAoZXJyb3IsIGRhdGEtPnVzZXJkYXRhKTsNCisJCWdfZnJlZShkYXRhKTsNCisJfQ0KKwlp
-ZiAoZXJyb3IpDQorCQlnX2Vycm9yX2ZyZWUoZXJyb3IpOw0KIH0NCiANCiBnYm9vbGVhbiBibHVl
-dG9vdGhfY2xpZW50X2NyZWF0ZV9ib25kaW5nKEJsdWV0b290aENsaWVudCAqY2xpZW50LA0KLQkJ
-CQkJZ2NoYXIgKmFkYXB0ZXIsIGNvbnN0IGdjaGFyICphZGRyZXNzKQ0KKwkJCQkJZ2NoYXIgKmFk
-YXB0ZXIsIGNvbnN0IGdjaGFyICphZGRyZXNzLA0KKwkJCQkJYmx1ZXRvb3RoX2NsaWVudF9jYWxs
-X3JlcGx5IGNhbGxiYWNrLA0KKwkJCQkJZ3BvaW50ZXIgdXNlcmRhdGEpDQogew0KIAlCbHVldG9v
-dGhDbGllbnRQcml2YXRlICpwcml2ID0gQkxVRVRPT1RIX0NMSUVOVF9HRVRfUFJJVkFURShjbGll
-bnQpOw0KIAlHdGtUcmVlSXRlciBpdGVyOw0KQEAgLTExNDIsOSArMTE1MSwxNSBAQCBnYm9vbGVh
-biBibHVldG9vdGhfY2xpZW50X2NyZWF0ZV9ib25kaW5nDQogCQkJCQkJQ09MVU1OX09CSkVDVCwg
-Jm9iamVjdCwgLTEpOw0KIA0KIAkJaWYgKGdfYXNjaWlfc3RyY2FzZWNtcChwYXRoLCBhZGFwdGVy
-KSA9PSAwKSB7DQotCQkJYWRhcHRlcl9jcmVhdGVfYm9uZGluZ19hc3luYyhvYmplY3QsIGFkZHJl
-c3MsDQotCQkJCQkJY3JlYXRlX2JvbmRpbmdfcmVwbHksIE5VTEwpOw0KLQkJCXJldHVybiBUUlVF
-Ow0KKwkJCURCdXNHUHJveHlDYWxsICpjYWxsOw0KKwkJCURCdXNHQXN5bmNEYXRhICpzdHVmZjsN
-CisJCQlzdHVmZiA9IGdfbmV3KERCdXNHQXN5bmNEYXRhLCAxKTsNCisJCQlzdHVmZi0+Y2IgPSBH
-X0NBTExCQUNLKGNhbGxiYWNrKTsNCisJCQlzdHVmZi0+dXNlcmRhdGEgPSB1c2VyZGF0YTsNCisJ
-CQljYWxsID0gYWRhcHRlcl9jcmVhdGVfYm9uZGluZ19hc3luYyhvYmplY3QsIGFkZHJlc3MsDQor
-CQkJCQkJY3JlYXRlX2JvbmRpbmdfcmVwbHksIHN0dWZmKTsNCisJCQlnX29iamVjdF9zZXRfZGF0
-YShHX09CSkVDVChvYmplY3QpLCAiYm9uZGluZy1jYWxsIiwgY2FsbCk7DQorCQkJcmV0dXJuIGNh
-bGwgIT0gTlVMTDsNCiAJCX0NCiANCiAJCWNvbnQgPSBndGtfdHJlZV9tb2RlbF9pdGVyX25leHQo
-R1RLX1RSRUVfTU9ERUwocHJpdi0+c3RvcmUpLCAmaXRlcik7DQpAQCAtMTM4Niw2ICsxNDAxLDQ2
-IEBAIGdib29sZWFuIGJsdWV0b290aF9jbGllbnRfY2FuY2VsX2Rpc2NvdmUNCiAJcmV0dXJuIEZB
-TFNFOw0KIH0NCiANCitnYm9vbGVhbiBibHVldG9vdGhfY2xpZW50X2NhbmNlbF9ib25kaW5nKEJs
-dWV0b290aENsaWVudCAqY2xpZW50LA0KKwkJCQkJZ2NoYXIgKmFkYXB0ZXIsIGNvbnN0IGdjaGFy
-ICphZGRyZXNzKQ0KK3sNCisJQmx1ZXRvb3RoQ2xpZW50UHJpdmF0ZSAqcHJpdiA9IEJMVUVUT09U
-SF9DTElFTlRfR0VUX1BSSVZBVEUoY2xpZW50KTsNCisJR3RrVHJlZUl0ZXIgaXRlcjsNCisJZ2Jv
-b2xlYW4gY29udDsNCisNCisJaWYgKGFkYXB0ZXIgPT0gTlVMTCkNCisJCWFkYXB0ZXIgPSBwcml2
-LT5kZWZhdWx0X2FkYXB0ZXI7DQorDQorCWlmIChhZGFwdGVyID09IE5VTEwpDQorCQlyZXR1cm4g
-RkFMU0U7DQorDQorCWNvbnQgPSBndGtfdHJlZV9tb2RlbF9nZXRfaXRlcl9maXJzdChHVEtfVFJF
-RV9NT0RFTChwcml2LT5zdG9yZSksICZpdGVyKTsNCisNCisJd2hpbGUgKGNvbnQgPT0gVFJVRSkg
-ew0KKwkJREJ1c0dQcm94eSAqb2JqZWN0Ow0KKwkJZ2NoYXIgKnBhdGg7DQorDQorCQlndGtfdHJl
-ZV9tb2RlbF9nZXQoR1RLX1RSRUVfTU9ERUwocHJpdi0+c3RvcmUpLCAmaXRlciwNCisJCQkJCQlD
-T0xVTU5fUEFUSCwgJnBhdGgsDQorCQkJCQkJQ09MVU1OX09CSkVDVCwgJm9iamVjdCwgLTEpOw0K
-Kw0KKwkJaWYgKGdfYXNjaWlfc3RyY2FzZWNtcChwYXRoLCBhZGFwdGVyKSA9PSAwKSB7DQorCQkJ
-REJ1c0dQcm94eUNhbGwgKmNhbGw7DQorCQkJY2FsbCA9IChEQnVzR1Byb3h5Q2FsbCAqKWdfb2Jq
-ZWN0X2dldF9kYXRhKEdfT0JKRUNUKG9iamVjdCksICJib25kaW5nLWNhbGwiKTsNCisJCQlpZiAo
-Y2FsbCAhPSBOVUxMKSB7DQorCQkJCWRidXNfZ19wcm94eV9jYW5jZWxfY2FsbChvYmplY3QsIGNh
-bGwpOw0KKwkJCQlnX29iamVjdF9zZXRfZGF0YShHX09CSkVDVChvYmplY3QpLCAiYm9uZGluZy1j
-YWxsIiwgTlVMTCk7DQorCQkJCXJldHVybiBUUlVFOw0KKwkJCX0NCisJCQlyZXR1cm4gRkFMU0U7
-DQorCQl9DQorDQorCQljb250ID0gZ3RrX3RyZWVfbW9kZWxfaXRlcl9uZXh0KEdUS19UUkVFX01P
-REVMKHByaXYtPnN0b3JlKSwgJml0ZXIpOw0KKwl9DQorDQorCXJldHVybiBGQUxTRTsNCit9DQor
-DQogR3RrVHJlZU1vZGVsICpibHVldG9vdGhfY2xpZW50X2dldF9tb2RlbChCbHVldG9vdGhDbGll
-bnQgKmNsaWVudCkNCiB7DQogCUJsdWV0b290aENsaWVudFByaXZhdGUgKnByaXYgPSBCTFVFVE9P
-VEhfQ0xJRU5UX0dFVF9QUklWQVRFKGNsaWVudCk7DQpJbmRleDogY29tbW9uL2NsaWVudC5oDQo9
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09DQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovZ25vbWUvY29tbW9uL2NsaWVudC5o
-LHYNCnJldHJpZXZpbmcgcmV2aXNpb24gMS4yNA0KZGlmZiAtdSAtcCAtcjEuMjQgY2xpZW50LmgN
-Ci0tLSBjb21tb24vY2xpZW50LmgJNiBNYXIgMjAwOCAxMDo1NDoyOSAtMDAwMAkxLjI0DQorKysg
-Y29tbW9uL2NsaWVudC5oCTkgSnVsIDIwMDggMTQ6MjM6MzggLTAwMDANCkBAIC05OSw3ICs5OSwx
-MyBAQCBjb25zdCBnY2hhciAqYmx1ZXRvb3RoX3R5cGVfdG9fc3RyaW5nKGd1DQogZ2Jvb2xlYW4g
-Ymx1ZXRvb3RoX2NsaWVudF9yZWdpc3Rlcl9wYXNza2V5X2FnZW50KEJsdWV0b290aENsaWVudCAq
-c2VsZiwNCiAJCWNvbnN0IGNoYXIgKnBhdGgsIGNvbnN0IGNoYXIgKmFkZHJlc3MsIGNvbnN0IHZv
-aWQgKmluZm8pOw0KIA0KK3R5cGVkZWYgdm9pZCAoKmJsdWV0b290aF9jbGllbnRfY2FsbF9yZXBs
-eSkgKEdFcnJvciAqZXJyb3IsIGdwb2ludGVyIGRhdGEpOw0KKw0KIGdib29sZWFuIGJsdWV0b290
-aF9jbGllbnRfY3JlYXRlX2JvbmRpbmcoQmx1ZXRvb3RoQ2xpZW50ICpzZWxmLA0KKwkJCQkJZ2No
-YXIgKmFkYXB0ZXIsIGNvbnN0IGdjaGFyICphZGRyZXNzLA0KKwkJCQkJYmx1ZXRvb3RoX2NsaWVu
-dF9jYWxsX3JlcGx5IGNhbGxiYWNrLA0KKwkJCQkJZ3BvaW50ZXIgZGF0YSk7DQorZ2Jvb2xlYW4g
-Ymx1ZXRvb3RoX2NsaWVudF9jYW5jZWxfYm9uZGluZyhCbHVldG9vdGhDbGllbnQgKnNlbGYsDQog
-CQkJCQlnY2hhciAqYWRhcHRlciwgY29uc3QgZ2NoYXIgKmFkZHJlc3MpOw0KIGdib29sZWFuIGJs
-dWV0b290aF9jbGllbnRfcmVtb3ZlX2JvbmRpbmcoQmx1ZXRvb3RoQ2xpZW50ICpzZWxmLA0KIAkJ
-CQkJZ2NoYXIgKmFkYXB0ZXIsIGNvbnN0IGdjaGFyICphZGRyZXNzKTsNCkluZGV4OiB3aXphcmQv
-bWFpbi5jDQo9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09DQpSQ1MgZmlsZTogL2N2c3Jvb3QvYmx1ZXovZ25vbWUvd2l6YXJk
-L21haW4uYyx2DQpyZXRyaWV2aW5nIHJldmlzaW9uIDEuMzENCmRpZmYgLXUgLXAgLXIxLjMxIG1h
-aW4uYw0KLS0tIHdpemFyZC9tYWluLmMJNiBKdW4gMjAwOCAxNTowODozMiAtMDAwMAkxLjMxDQor
-Kysgd2l6YXJkL21haW4uYwk5IEp1bCAyMDA4IDE0OjIzOjM4IC0wMDAwDQpAQCAtMTIwLDcgKzEy
-MCw3IEBAIHN0YXRpYyB2b2lkIHByZXBhcmVfY2FsbGJhY2soR3RrV2lkZ2V0ICoNCiAJCQkJCSIv
-b3JnL2JsdWV6L2FwcGxldCIsIGFkZHJlc3MsDQogCQkJCQkmZGJ1c19nbGliX3Bhc3NrZXlfYWdl
-bnRfb2JqZWN0X2luZm8pOw0KIA0KLQkJYmx1ZXRvb3RoX2NsaWVudF9jcmVhdGVfYm9uZGluZyhj
-bGllbnQsIE5VTEwsIGFkZHJlc3MpOw0KKwkJYmx1ZXRvb3RoX2NsaWVudF9jcmVhdGVfYm9uZGlu
-ZyhjbGllbnQsIE5VTEwsIGFkZHJlc3MsIE5VTEwsIE5VTEwpOw0KIA0KIAkJZ3RrX2xhYmVsX3Nl
-dF9tYXJrdXAoR1RLX0xBQkVMKGxhYmVsX3BhaXJpbmcpLCBhZGRyZXNzKTsNCiAJCWd0a19sYWJl
-bF9zZXRfbWFya3VwKEdUS19MQUJFTChsYWJlbF9wYXNza2V5KSwgcGFzc2tleSk7DQo=
+Marcel
 
 
---=-2rvw5XUnMkhr5K2rsEdh--
-
---=-WIzd5HeRyN5Jo/bSF5lo
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
-
-iD8DBQBIdMr653i2YxNrdi0RAqc8AJ9ZVapi81rtLhH7WW3rZAY0cmsgPgCgkK31
-//PitJ1+FYGoysPaMLXMf8I=
-=J3tL
------END PGP SIGNATURE-----
-
---=-WIzd5HeRyN5Jo/bSF5lo--
-
-
-
---===============0919768272==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
---===============0919768272==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0919768272==--
