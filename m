@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 Jul 2008 14:11:03 +0530 (IST)
-From: pramod gurav <pramod_gurav_etc@yahoo.co.in>
-To: Bluez-users@lists.sourceforge.net
+Date: Thu, 10 Jul 2008 13:24:01 -0400
+From: jayjwa <jayjwa@atr2.ath.cx>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <AE1FAD2818FF4B8E90DE8C156874A782@radon>
+Message-ID: <alpine.LNX.1.10.0807101158320.25000@nge2.ngu.pk>
+References: <AE1FAD2818FF4B8E90DE8C156874A782@radon>
 MIME-Version: 1.0
-Message-ID: <482219.47678.qm@web8401.mail.in.yahoo.com>
-Subject: [Bluez-users] BRF6350 support
+Subject: Re: [Bluez-users] Can't connect RFCOMM socket: Host is down
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,64 +16,59 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1777792966=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1777792966==
-Content-Type: multipart/alternative; boundary="0-463745896-1215765663=:47678"
 
---0-463745896-1215765663=:47678
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 8 Jul 2008, Bram Jansen wrote:
 
-Hi All,=0AI am working on arm platform. I want to configure TI's brf6350 bl=
-uetooth chip on UART.=0AI read some of the mail on the list. I came to know=
- that hci_ll.c provides support for brf6350.=0ASupport for these chip is be=
-ing added to bluez hciattach.=0AIs the hci lower level support in kernel en=
-ough to drive the chip?=0AWhere would I get the brf script file for my chip=
-?=0A Thanks and Best regards=0A=0A=0APramod=0A=0A=0A=0A      Download prohi=
-bited? No problem. CHAT from any browser, without download. Go to http://in=
-.messenger.yahoo.com/webmessengerpromo.php/
---0-463745896-1215765663=:47678
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+-> I'm trying to connect my Debian Etch box to the DUN service to any phone I
+-> have. For some reason rfcomm isn't happy and is not able to make a
+-> connection.
 
-<html><head><style type=3D"text/css"><!-- DIV {margin:0px;} --></style></he=
-ad><body><div style=3D"font-family:times new roman, new york, times, serif;=
-font-size:12pt">Hi All,<br>I am working on arm platform. I want to configur=
-e TI's brf6350 bluetooth chip on UART.<br>I read some of the mail on the li=
-st. I came to know that hci_ll.c provides support for brf6350.<br>Support f=
-or these chip is being added to bluez hciattach.<br>Is the hci lower level =
-support in kernel enough to drive the chip?<br>Where would I get the brf sc=
-ript file for my chip?<div>&nbsp;</div>Thanks and Best regards<br><br><div>=
-Pramod<div><br></div></div></div><br>=0A=0A=0A      <!--7--><hr size=3D1></=
-hr> Meet people who discuss and share your passions. <a href=3D"http://in.r=
-d.yahoo.com/tagline_groups_7/*http://in.promos.yahoo.com/groups/bestofyahoo=
-/"> Join them now.</a></body></html>
---0-463745896-1215765663=:47678--
+-> 1.	passkey-agent -default 0000 
+-> 2.	hcitool cc <bdaddr> 
+-> 3.	hcitool auth <bdaddr> 
+-> 
+-> a.	pairing succeeded and my box are in the phones's paired devices list
+-> 
+-> 
+-> 4.	rfcomm bind <bdaddr> 1 (channel is correctly found with sdptool)
+-> works fine but gives a strange bdaddr for the phone it binds to. 
+-> 
+-> a.	rfcomm0: 01:00:00:00:00:00 channel 1 clean
+
+Not sure if there are typo's or not here, but those aren't the correct command 
+syntaxes as-written.
+
+I'm assuming you have a phone that has a modem inside and is advertising the 
+DUN service via bluetooth and you'd like to make the computer connect to the 
+phone and cause the modem to dial out, taking the connection for the computer? 
+This is the case with my LG cellphone. There are two ways, with the dund 
+binary handling rfcomm itself, or with you calling the rfcomm binary to get 
+the device, then giving that to pppd.
 
 
---===============1777792966==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+passkey-agent --default <PIN> <bt addr> &
+auth-agent &
+rfcomm bind 0 <bt addr> 1
+   (to bind chan. 1 at /dev/rfcomm0. )
+
+Then use /dev/rfcomm0 for the pppd connection. If I remember correctly, you 
+don't have to do the 'hcitool cc/auth' part at all.
+
+
+
+
+
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
---===============1777792966==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1777792966==--
