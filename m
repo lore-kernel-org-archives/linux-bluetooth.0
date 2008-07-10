@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 Jul 2008 15:29:39 +0800 (CST)
-From: attaboyu@163.com
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Message-ID: <13504425.775781215674979125.JavaMail.coremail@app168.163.com>
-In-Reply-To: <30022094.644201215658920968.JavaMail.coremail@bj163app77.163.com>
-References: <30022094.644201215658920968.JavaMail.coremail@bj163app77.163.com>
+Date: Thu, 10 Jul 2008 11:02:00 +0800 (CST)
+From: attaboyu <attaboyu@163.com>
+To: "'BlueZ users'" <bluez-users@lists.sourceforge.net>
+Message-ID: <30022094.644201215658920968.JavaMail.coremail@bj163app77.163.com>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] Can't send file to bluetooth obex server
+Subject: [Bluez-users] Can't send file to bluetooth obex server
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,52 +14,17 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1991318034=="
+Content-Type: multipart/mixed; boundary="===============1217157759=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1991318034==
+--===============1217157759==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_205743_8511970.1215674979124"
+	boundary="----=_Part_170788_18623895.1215658920966"
 
-------=_Part_205743_8511970.1215674979124
+------=_Part_170788_18623895.1215658920966
 Content-Type: text/plain; charset=gbk
-Content-Transfer-Encoding: quoted-printable
-
- hi
-
- after read the openobex code, i find out if the obex_test work as server, =
-it definitely run to  obex_transport.c line 115-126 which list below:
-
-=20
-             DEBUG(4, "Data available on server socket\n");
-            /* Accept : create the connected socket */
-            ret =3D obex_transport_accept(self);
-
-            /* Tell the app to perform the OBEX_Accept() */
-            if(self->keepserver)
-                obex_deliver_event(self, OBEX_EV_ACCEPTHINT,
-                           0, 0, FALSE);
-            /* Otherwise, just disconnect the server */
-            if((ret >=3D 0) && (! self->keepserver)) {
-                obex_transport_disconnect_server(self);
-            }
-  the server really accept connection of the client and return 0, but the s=
-elf->keepserver=3D=3D0, so it suddenly run to obex_transport_disconnect_ser=
-ver(self).
-
-=20
-after that, obex_transport_handle_input return 0 which course the "Timeout =
-while doing OBEX_HandleInput()" issue out
-
-how to fix this problem=20
---
-
- Best Regards
- ------------
- Tony
-
-
+Content-Transfer-Encoding: 7bit
 
  hi all
 
@@ -70,8 +33,7 @@ how to fix this problem=20
  bluez-libs-3.12, bluez-utils-3.12, bluez-hcidump-1.37, openobex-1.3
  my platform is arm based system(local).
 
- 1.if the local(arm based) send file to remote(usb dongle on PC) as openobe=
-x work in client, it's totally OK.
+ 1.if the local(arm based) send file to remote(usb dongle on PC) as openobex work in client, it's totally OK.
 $obex_test -b 00:17:cd:60:00:5c 1
 Using Bluetooth RFCOMM transport
 OBEX Interactive test client/server.
@@ -79,7 +41,7 @@ OBEX Interactive test client/server.
 Connect OK!
 Version: 0x10. Flags: 0x00
 > p hello.txt hw.txt
-PUT file (local, remote)> name=3Dhello.txt, size=3D31
+PUT file (local, remote)> name=hello.txt, size=31
 PUT successful!
 > q
 
@@ -88,13 +50,11 @@ $obex_test -b ff:ff:ff:00:00:00 9
 Using Bluetooth RFCOMM transport
 OBEX Interactive test client/server.
 > s
- at this time, the remote(usb dongle on pc) try to connect local and send a=
- file to it, then the obex server go wrong like this:
+ at this time, the remote(usb dongle on pc) try to connect local and send a file to it, then the obex server go wrong like this:
 
 Timeout while doing OBEX_HandleInput()
 
-the file transfer failed every time when my arm based system work as obex s=
-erver, here is the hcidump data, a little long.
+the file transfer failed every time when my arm based system work as obex server, here is the hcidump data, a little long.
 
 HCI sniffer - Bluetooth packet analyzer ver 1.37
 > HCI Event: Connect Request (0x04) plen 10
@@ -181,13 +141,13 @@ HCI sniffer - Bluetooth packet analyzer ver 1.37
 > HCI Event: Number of Completed Packets (0x13) plen 5
 > ACL data: handle 42 flags 0x02 dlen 16
     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
-      MTU 1710=20
+      MTU 1710 
 < ACL data: handle 42 flags 0x02 dlen 14
     L2CAP(s): Config rsp: scid 0x0095 flags 0x00 result 0 clen 0
       Success
 < ACL data: handle 42 flags 0x02 dlen 16
     L2CAP(s): Config req: dcid 0x0095 flags 0x00 clen 4
-      MTU 1024=20
+      MTU 1024 
 > HCI Event: Number of Completed Packets (0x13) plen 5
 > HCI Event: Number of Completed Packets (0x13) plen 5
 > ACL data: handle 42 flags 0x02 dlen 14
@@ -195,10 +155,10 @@ HCI sniffer - Bluetooth packet analyzer ver 1.37
       Success
 > ACL data: handle 42 flags 0x02 dlen 8
     L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c=20
+      RFCOMM(s): SABM: cr 1 dlci 0 pf 1 ilen 0 fcs 0x1c 
 < ACL data: handle 42 flags 0x02 dlen 8
     L2CAP(d): cid 0x0095 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7=20
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7 
 > HCI Event: Number of Completed Packets (0x13) plen 5
 > ACL data: handle 42 flags 0x02 dlen 18
     L2CAP(d): cid 0x0040 len 14 [psm 3]
@@ -213,10 +173,10 @@ HCI sniffer - Bluetooth packet analyzer ver 1.37
 > HCI Event: Number of Completed Packets (0x13) plen 5
 > ACL data: handle 42 flags 0x02 dlen 8
     L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): SABM: cr 1 dlci 18 pf 1 ilen 0 fcs 0x32=20
+      RFCOMM(s): SABM: cr 1 dlci 18 pf 1 ilen 0 fcs 0x32 
 < ACL data: handle 42 flags 0x02 dlen 8
     L2CAP(d): cid 0x0095 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 18 pf 1 ilen 0 fcs 0xf9=20
+      RFCOMM(s): UA: cr 1 dlci 18 pf 1 ilen 0 fcs 0xf9 
 < ACL data: handle 42 flags 0x02 dlen 12
     L2CAP(d): cid 0x0095 len 8 [psm 3]
       RFCOMM(s): MSC CMD: cr 0 dlci 0 pf 0 ilen 4 fcs 0xaa mcc_len 2
@@ -241,7 +201,7 @@ HCI sniffer - Bluetooth packet analyzer ver 1.37
       RFCOMM(d): UIH: cr 1 dlci 18 pf 1 ilen 0 fcs 0xd2 credits 100
 > ACL data: handle 42 flags 0x02 dlen 15
     L2CAP(d): cid 0x0040 len 11 [psm 3]
-      RFCOMM(d): UIH: cr 1 dlci 18 pf 0 ilen 7 fcs 0xce=20
+      RFCOMM(d): UIH: cr 1 dlci 18 pf 0 ilen 7 fcs 0xce 
         OBEX: Connect cmd(f): len 7 version 1.0 flags 0 mtu 32573
 < ACL data: handle 42 flags 0x02 dlen 9
     L2CAP(d): cid 0x0095 len 5 [psm 3]
@@ -258,17 +218,17 @@ HCI sniffer - Bluetooth packet analyzer ver 1.37
 > HCI Event: Number of Completed Packets (0x13) plen 5
 > ACL data: handle 42 flags 0x02 dlen 8
     L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): DISC: cr 1 dlci 18 pf 1 ilen 0 fcs 0xd3=20
+      RFCOMM(s): DISC: cr 1 dlci 18 pf 1 ilen 0 fcs 0xd3 
 < ACL data: handle 42 flags 0x02 dlen 8
     L2CAP(d): cid 0x0095 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 18 pf 1 ilen 0 fcs 0xf9=20
+      RFCOMM(s): UA: cr 1 dlci 18 pf 1 ilen 0 fcs 0xf9 
 > HCI Event: Number of Completed Packets (0x13) plen 5
 > ACL data: handle 42 flags 0x02 dlen 8
     L2CAP(d): cid 0x0040 len 4 [psm 3]
-      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd=20
+      RFCOMM(s): DISC: cr 1 dlci 0 pf 1 ilen 0 fcs 0xfd 
 < ACL data: handle 42 flags 0x02 dlen 8
     L2CAP(d): cid 0x0095 len 4 [psm 3]
-      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7=20
+      RFCOMM(s): UA: cr 1 dlci 0 pf 1 ilen 0 fcs 0xd7 
 > HCI Event: Number of Completed Packets (0x13) plen 5
 > ACL data: handle 42 flags 0x02 dlen 12
     L2CAP(s): Disconn req: dcid 0x0040 scid 0x0095
@@ -277,15 +237,14 @@ HCI sniffer - Bluetooth packet analyzer ver 1.37
 > HCI Event: Number of Completed Packets (0x13) plen 5
 > HCI Event: Disconn Complete (0x05) plen 4
 
-I can't figure it out. is the server side need an agent to comfirm the clie=
-nt's request?
+I can't figure it out. is the server side need an agent to comfirm the client's request?
 who can help me out , many thanks in advance!
 
 tony
 
-=20
-=20
-=20
+ 
+ 
+ 
 
 --
 
@@ -293,52 +252,21 @@ tony
  ------------
  Tony
 
-
-
-
-=D4=A8=B2=A8=C0=AB=D5=AC =BA=FE=BE=B0=C8=CB=C9=FA
-------=_Part_205743_8511970.1215674979124
+------=_Part_170788_18623895.1215658920966
 Content-Type: text/html; charset=gbk
 Content-Transfer-Encoding: quoted-printable
 
-<div>&nbsp;hi<br><br>&nbsp;after read the openobex code, i find out if the =
-obex_test work as server, it definitely run to&nbsp; obex_transport.c line =
-115-126 which list below:<br></div><div>&nbsp;</div><div>&nbsp;&nbsp;&nbsp;=
- &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DEBUG(4, "Data available on se=
-rver socket\n");<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbs=
-p;/* Accept : create the connected socket */<br>&nbsp;&nbsp; &nbsp;&nbsp;&n=
-bsp; &nbsp;&nbsp;&nbsp; &nbsp;ret =3D obex_transport_accept(self);<br><br>&=
-nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;/* Tell the app to =
-perform the OBEX_Accept() */<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp=
-;&nbsp; &nbsp;if(self-&gt;keepserver)<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &n=
-bsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;obex_deliver_event(self, OBEX_EV_=
-ACCEPTHINT,<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nb=
-sp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 0, 0, FA=
-LSE);<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;/* Otherw=
-ise, just disconnect the server */<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp=
-;&nbsp;&nbsp; &nbsp;if((ret &gt;=3D 0) &amp;&amp; (! self-&gt;keepserver)) =
-{<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; =
-&nbsp;obex_transport_disconnect_server(self);<br>&nbsp;&nbsp; &nbsp;&nbsp;&=
-nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>&nbsp; the server really accept connect=
-ion of the client and return 0, but the self-&gt;keepserver=3D=3D0, so it s=
-uddenly run to obex_transport_disconnect_server(self).<br></div><div>&nbsp;=
-</div><div>after that, obex_transport_handle_input return 0 which course th=
-e "Timeout while doing OBEX_HandleInput()" issue out<br><br>how to fix this=
- problem <br>--<br>
-<div>&nbsp;Best Regards<br>&nbsp;------------<br>&nbsp;Tony<br></div>
-</div><br> <blockquote id=3D"isReplyContent" style=3D"border-left: 1px soli=
-d rgb(204, 204, 204); margin: 0px 0px 0px 0.8ex; padding-left: 1ex;"><div>&=
-nbsp;hi all<br><br>&nbsp;I've got a problem to send file to my bluetooth ob=
-ex server.<br>&nbsp;my toolchain:<br>&nbsp;bluez-libs-3.12, bluez-utils-3.1=
-2, bluez-hcidump-1.37, openobex-1.3<br>&nbsp;my platform is arm based syste=
-m(local).<br><br>&nbsp;1.if the local(arm based) send file to remote(usb do=
-ngle on PC) as openobex work in client, it's totally OK.<br>$obex_test -b 0=
-0:17:cd:60:00:5c 1<br>Using Bluetooth RFCOMM transport<br>OBEX Interactive =
-test client/server.<br>&gt; c<br>Connect OK!<br>Version: 0x10. Flags: 0x00<=
-br>&gt; p hello.txt hw.txt<br>PUT file (local, remote)&gt; name=3Dhello.txt=
-, size=3D31<br>PUT successful!<br>&gt; q<br><br>&nbsp;2.if the local(arm ba=
-sed) work as obex server, it always go wrong.<br>$obex_test -b ff:ff:ff:00:=
-00:00 9<br>Using Bluetooth RFCOMM transport<br>
+<div>&nbsp;hi all<br><br>&nbsp;I've got a problem to send file to my blueto=
+oth obex server.<br>&nbsp;my toolchain:<br>&nbsp;bluez-libs-3.12, bluez-uti=
+ls-3.12, bluez-hcidump-1.37, openobex-1.3<br>&nbsp;my platform is arm based=
+ system(local).<br><br>&nbsp;1.if the local(arm based) send file to remote(=
+usb dongle on PC) as openobex work in client, it's totally OK.<br>$obex_tes=
+t -b 00:17:cd:60:00:5c 1<br>Using Bluetooth RFCOMM transport<br>OBEX Intera=
+ctive test client/server.<br>&gt; c<br>Connect OK!<br>Version: 0x10. Flags:=
+ 0x00<br>&gt; p hello.txt hw.txt<br>PUT file (local, remote)&gt; name=3Dhel=
+lo.txt, size=3D31<br>PUT successful!<br>&gt; q<br><br>&nbsp;2.if the local(=
+arm based) work as obex server, it always go wrong.<br>$obex_test -b ff:ff:=
+ff:00:00:00 9<br>Using Bluetooth RFCOMM transport<br>
 OBEX Interactive test client/server.<br>
 &gt; s<br>&nbsp;at this time, the remote(usb dongle on pc) try to connect l=
 ocal and send a file to it, then the obex server go wrong like this:<br><br=
@@ -512,20 +440,15 @@ side need an agent to comfirm the client's request?<br>who can help me out =
 <div>&nbsp;Best Regards<br>&nbsp;------------<br>&nbsp;Tony<br></div>
 </div><br><!-- footer --><br>=20
 <hr>
-<font style=3D"font-size: 12px; line-height: 15px;"></font><a style=3D"font=
--size: 12px; line-height: 15px; color: blue; text-decoration: underline;" h=
-ref=3D"http://popme.163.com/link/003984_0707_2982.html">=D4=A8=B2=A8=C0=AB=
-=D5=AC =BA=FE=BE=B0=C8=CB=C9=FA</a></blockquote><br><!-- footer --><br>=20
-<hr>
 <font style=3D"font-size:12px;line-height:15px;"></font><a style=3D"font-si=
 ze:12px;line-height:15px; color:blue; text-decoration:underline;" href=3D"h=
 ttp://popme.163.com/link/003984_0707_2982.html">=D4=A8=B2=A8=C0=AB=D5=AC =
 =BA=FE=BE=B0=C8=CB=C9=FA</a>
-------=_Part_205743_8511970.1215674979124--
+------=_Part_170788_18623895.1215658920966--
 
 
 
---===============1991318034==
+--===============1217157759==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -536,7 +459,7 @@ Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
---===============1991318034==
+--===============1217157759==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -547,4 +470,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1991318034==--
+--===============1217157759==--
