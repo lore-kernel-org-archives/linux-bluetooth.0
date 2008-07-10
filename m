@@ -5,8 +5,8 @@ In-Reply-To: <bd5b16740807092236k22c63049vad40852d61147c3f@mail.gmail.com>
 References: <00695C9C8F8B4448856F48142B4AA2012032A21E@dnce02.ent.ti.com>
 	<1215662827.24462.2.camel@californication>
 	<bd5b16740807092236k22c63049vad40852d61147c3f@mail.gmail.com>
-Date: Fri, 11 Jul 2008 08:14:57 +0200
-Message-Id: <1215756897.9744.10.camel@californication>
+Date: Thu, 10 Jul 2008 14:33:23 +0200
+Message-Id: <1215693203.9744.0.camel@californication>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] [PATCH] Add support for Texas Instruments' chips
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -29,9 +29,10 @@ Hi Ohad,
 > 
 > I'm gonna have to put some common definitions in hciattach.h then
 > (mainly struct uart_t).
+> 
+> Is that ok ?
 
-I did the hard work and put this into CVS as I see it should be done.
-Please double check if that is working for you.
+no. Do the same as I did for hciattach_st.c
 
 Regards
 
