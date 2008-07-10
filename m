@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 Jul 2008 16:50:48 +0800 (CST)
+Date: Thu, 10 Jul 2008 15:29:39 +0800 (CST)
 From: attaboyu@163.com
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Message-ID: <7505472.835991215679848984.JavaMail.coremail@app168.163.com>
-In-Reply-To: <13504425.775781215674979125.JavaMail.coremail@app168.163.com>
-References: <13504425.775781215674979125.JavaMail.coremail@app168.163.com>
-	<30022094.644201215658920968.JavaMail.coremail@bj163app77.163.com>
+Message-ID: <13504425.775781215674979125.JavaMail.coremail@app168.163.com>
+In-Reply-To: <30022094.644201215658920968.JavaMail.coremail@bj163app77.163.com>
+References: <30022094.644201215658920968.JavaMail.coremail@bj163app77.163.com>
 MIME-Version: 1.0
 Subject: Re: [Bluez-users] Can't send file to bluetooth obex server
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -17,48 +16,17 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0870367806=="
+Content-Type: multipart/mixed; boundary="===============1991318034=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============0870367806==
+--===============1991318034==
 Content-Type: multipart/alternative;
-	boundary="----=_Part_221790_23245181.1215679848983"
+	boundary="----=_Part_205743_8511970.1215674979124"
 
-------=_Part_221790_23245181.1215679848983
+------=_Part_205743_8511970.1215674979124
 Content-Type: text/plain; charset=gbk
 Content-Transfer-Encoding: quoted-printable
-
- after reading the code, i find a way to transport file from remote(client)=
- to local(server) through obex_test like this:
-
-$obex_test -b ff:ff:ff:00:00:00 9
-Using Bluetooth RFCOMM transport
-OBEX Interactive test client/server.
-> s
-Timeout while doing OBEX_HandleInput()
-> s
-Server request finished!
-Disconnect done!
-
-because of the self->fd is -1,when run "s" command first time, and the acce=
-pt function will initialize it after remote connection, so when run "s" sec=
-ond time the self->fd is available, then the server can receive the data th=
-at remote device sent.
-
-
- is this a bug or feature? pls give me some advise.
-
-=20
-
---
-
- Best Regards
- ------------
- Tony
-
-
-=D4=DA2008-07-10=A3=ACattaboyu@163.com =D0=B4=B5=C0=A3=BA
 
  hi
 
@@ -329,52 +297,34 @@ tony
 
 
 =D4=A8=B2=A8=C0=AB=D5=AC =BA=FE=BE=B0=C8=CB=C9=FA
-
-
-=D4=A8=B2=A8=C0=AB=D5=AC =BA=FE=BE=B0=C8=CB=C9=FA
-------=_Part_221790_23245181.1215679848983
+------=_Part_205743_8511970.1215674979124
 Content-Type: text/html; charset=gbk
 Content-Transfer-Encoding: quoted-printable
 
-<div>&nbsp;after reading the code, i find a way to transport file from remo=
-te(client) to local(server) through obex_test like this:<br><br>$<font colo=
-r=3D"#f00000">obex_test -b ff:ff:ff:00:00:00 9</font><br>Using Bluetooth RF=
-COMM transport<br>OBEX Interactive test client/server.<br>&gt; <font color=
-=3D"#f00000">s</font><br>Timeout while doing OBEX_HandleInput()<br>&gt; <fo=
-nt color=3D"#f00000">s</font><br>Server request finished!<br>Disconnect don=
-e!<br><br>because of the <font color=3D"#f00000">self-&gt;fd is -1</font>,w=
-hen run "s" command first time, and the accept function will initialize it =
-after remote connection, so when run "s" second time the self-&gt;fd is ava=
-ilable, then the server can receive the data that remote device sent.<br><b=
-r></div><div>&nbsp;is this a bug or feature? pls give me some advise.<br></=
-div><div>&nbsp;</div><div><br>--<br>
-<div>&nbsp;Best Regards<br>&nbsp;------------<br>&nbsp;Tony<br></div>
-</div><br>=D4=DA2008-07-10=A3=ACattaboyu@163.com =D0=B4=B5=C0=A3=BA<br> <bl=
-ockquote id=3D"isReplyContent" style=3D"border-left: 1px solid rgb(204, 204=
-, 204); margin: 0px 0px 0px 0.8ex; padding-left: 1ex;"><div>&nbsp;hi<br><br=
->&nbsp;after read the openobex code, i find out if the obex_test work as se=
-rver, it definitely run to&nbsp; obex_transport.c line 115-126 which list b=
-elow:<br></div><div>&nbsp;</div><div>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; =
-&nbsp;&nbsp;&nbsp;&nbsp; DEBUG(4, "Data available on server socket\n");<br>=
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;/* Accept : create=
- the connected socket */<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nb=
-sp; &nbsp;ret =3D obex_transport_accept(self);<br><br>&nbsp;&nbsp; &nbsp;&n=
-bsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;/* Tell the app to perform the OBEX_Acc=
-ept() */<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if(sel=
-f-&gt;keepserver)<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nb=
-sp;&nbsp;&nbsp; &nbsp;obex_deliver_event(self, OBEX_EV_ACCEPTHINT,<br>&nbsp=
-;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbs=
-p;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 0, 0, FALSE);<br>&nbsp;&nbsp=
-; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;/* Otherwise, just disconnect=
- the server */<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;=
-if((ret &gt;=3D 0) &amp;&amp; (! self-&gt;keepserver)) {<br>&nbsp;&nbsp; &n=
-bsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;obex_transport=
-_disconnect_server(self);<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&n=
-bsp; &nbsp;}<br>&nbsp; the server really accept connection of the client an=
-d return 0, but the self-&gt;keepserver=3D=3D0, so it suddenly run to obex_=
-transport_disconnect_server(self).<br></div><div>&nbsp;</div><div>after tha=
-t, obex_transport_handle_input return 0 which course the "Timeout while doi=
-ng OBEX_HandleInput()" issue out<br><br>how to fix this problem <br>--<br>
+<div>&nbsp;hi<br><br>&nbsp;after read the openobex code, i find out if the =
+obex_test work as server, it definitely run to&nbsp; obex_transport.c line =
+115-126 which list below:<br></div><div>&nbsp;</div><div>&nbsp;&nbsp;&nbsp;=
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; DEBUG(4, "Data available on se=
+rver socket\n");<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbs=
+p;/* Accept : create the connected socket */<br>&nbsp;&nbsp; &nbsp;&nbsp;&n=
+bsp; &nbsp;&nbsp;&nbsp; &nbsp;ret =3D obex_transport_accept(self);<br><br>&=
+nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;/* Tell the app to =
+perform the OBEX_Accept() */<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp=
+;&nbsp; &nbsp;if(self-&gt;keepserver)<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &n=
+bsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;obex_deliver_event(self, OBEX_EV_=
+ACCEPTHINT,<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nb=
+sp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 0, 0, FA=
+LSE);<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;/* Otherw=
+ise, just disconnect the server */<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp=
+;&nbsp;&nbsp; &nbsp;if((ret &gt;=3D 0) &amp;&amp; (! self-&gt;keepserver)) =
+{<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; =
+&nbsp;obex_transport_disconnect_server(self);<br>&nbsp;&nbsp; &nbsp;&nbsp;&=
+nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>&nbsp; the server really accept connect=
+ion of the client and return 0, but the self-&gt;keepserver=3D=3D0, so it s=
+uddenly run to obex_transport_disconnect_server(self).<br></div><div>&nbsp;=
+</div><div>after that, obex_transport_handle_input return 0 which course th=
+e "Timeout while doing OBEX_HandleInput()" issue out<br><br>how to fix this=
+ problem <br>--<br>
 <div>&nbsp;Best Regards<br>&nbsp;------------<br>&nbsp;Tony<br></div>
 </div><br> <blockquote id=3D"isReplyContent" style=3D"border-left: 1px soli=
 d rgb(204, 204, 204); margin: 0px 0px 0px 0.8ex; padding-left: 1ex;"><div>&=
@@ -567,20 +517,15 @@ side need an agent to comfirm the client's request?<br>who can help me out =
 ref=3D"http://popme.163.com/link/003984_0707_2982.html">=D4=A8=B2=A8=C0=AB=
 =D5=AC =BA=FE=BE=B0=C8=CB=C9=FA</a></blockquote><br><!-- footer --><br>=20
 <hr>
-<font style=3D"font-size: 12px; line-height: 15px;"></font><a style=3D"font=
--size: 12px; line-height: 15px; color: blue; text-decoration: underline;" h=
-ref=3D"http://popme.163.com/link/003984_0707_2982.html">=D4=A8=B2=A8=C0=AB=
-=D5=AC =BA=FE=BE=B0=C8=CB=C9=FA</a></blockquote><br><!-- footer --><br>=20
-<hr>
 <font style=3D"font-size:12px;line-height:15px;"></font><a style=3D"font-si=
 ze:12px;line-height:15px; color:blue; text-decoration:underline;" href=3D"h=
 ttp://popme.163.com/link/003984_0707_2982.html">=D4=A8=B2=A8=C0=AB=D5=AC =
 =BA=FE=BE=B0=C8=CB=C9=FA</a>
-------=_Part_221790_23245181.1215679848983--
+------=_Part_205743_8511970.1215674979124--
 
 
 
---===============0870367806==
+--===============1991318034==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -591,7 +536,7 @@ Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
---===============0870367806==
+--===============1991318034==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -602,4 +547,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============0870367806==--
+--===============1991318034==--
