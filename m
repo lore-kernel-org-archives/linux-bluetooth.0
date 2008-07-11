@@ -1,12 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <bd5b16740807110200s36c7d3a8tcca300ceaee229ed@mail.gmail.com>
-Date: Fri, 11 Jul 2008 12:00:31 +0300
+Message-ID: <bd5b16740807110152m1baa74fub46f92d57dc51683@mail.gmail.com>
+Date: Fri, 11 Jul 2008 11:52:30 +0300
 From: "Ohad Ben-Cohen" <ohad@bencohen.org>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <254448.46514.qm@web8401.mail.in.yahoo.com>
+In-Reply-To: <1215766203.9744.30.camel@californication>
 MIME-Version: 1.0
-References: <254448.46514.qm@web8401.mail.in.yahoo.com>
-Subject: Re: [Bluez-devel] brf6350 chip support
+References: <00695C9C8F8B4448856F48142B4AA2012032A21E@dnce02.ent.ti.com>
+	<1215662827.24462.2.camel@californication>
+	<bd5b16740807092236k22c63049vad40852d61147c3f@mail.gmail.com>
+	<1215756897.9744.10.camel@californication>
+	<00695C9C8F8B4448856F48142B4AA2012032A21F@dnce02.ent.ti.com>
+	<1215765452.9744.29.camel@californication>
+	<bd5b16740807110138k5ba2f03fj85b7b3d261e17c9a@mail.gmail.com>
+	<1215766203.9744.30.camel@californication>
+Subject: Re: [Bluez-devel] [PATCH] Add support for Texas Instruments' chips
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,35 +27,21 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pramod,
+On Fri, Jul 11, 2008 at 11:50 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> done.
 
-On Fri, Jul 11, 2008 at 11:39 AM, pramod gurav
-<pramod_gurav_etc@yahoo.co.in> wrote:
-> Hi All,
-> I am working on arm platform. I want to configure TI's brf6350 bluetooth
-> chip on UART.
-> I read some of the mail on the list. I came to know that hci_ll.c provides
-> support for brf6350.
-> Support for these chip is being added to bluez hciattach.
-> Is the hci lower level support in kernel enough to drive the chip?
-> Where would I get the brf script file for my chip?
+Marcel, thank you for your work.
 
-I've just answered your first post of this question.
-
-For the general interest, questions about TI's bluetooth chips can be
-sent to brflinux-devel@lists.sourceforge.net. Additional patches and
-code can be downloaded from http://brflinux.sourceforge.net/.
-
-Best Regards,
+BR,
 Ohad.
 
 >
-> Thanks and Best regards
+> Regards
 >
-> Pramod
+> Marcel
 >
-> ________________________________
-> Unlimited freedom, unlimited storage. Get it now
+>
+>
 > -------------------------------------------------------------------------
 > Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 > Studies have shown that voting for your favorite open source project,
@@ -58,7 +51,6 @@ Ohad.
 > Bluez-devel mailing list
 > Bluez-devel@lists.sourceforge.net
 > https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
 >
 
 -------------------------------------------------------------------------
