@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <486BCD3C.7090203@endrelia.com>
-References: <004b01c8da77$c65e95b0$531bc110$%park@samsung.com>
-	<1214806529.11537.12.camel@violet.holtmann.net>
-	<486BCD3C.7090203@endrelia.com>
-Date: Fri, 11 Jul 2008 08:49:19 +0200
-Message-Id: <1215758959.9744.18.camel@californication>
+In-Reply-To: <486BD582.9050004@aircable.net>
+References: <486BD582.9050004@aircable.net>
+Date: Fri, 11 Jul 2008 08:20:12 +0200
+Message-Id: <1215757212.9744.13.camel@californication>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] bccmd(csr_bcsp.c) bug Report
+Subject: Re: [Bluez-devel] [PATCH] CreateBonding while periodic scanning
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,15 +20,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frank,
+Hi Manuel,
 
-> I sent in a patch for this back in August 2006
-> (http://article.gmane.org/gmane.linux.bluez.devel/8836).
+> I've sent this patch before, but for some reason I didn't got either a 
+> positive or even negative response.
 > 
-> The patch still applies to the latest CVS source.  I have attached it to
-> this post.
+> Problem is like this, when we're doing a periodic scan we should be able 
+> to do bonding, but according to the code we can't, so then something is 
+> wrong, either we can't do periodic scanning, or we need to fix a bug.
 
-committed to the CVS now. Thanks.
+so in general you should be able to create an ACL link when even in
+inquiry phase. So in theory it should stop periodic inquiry and then
+create the ACL link and then continue. We might have hit some chip
+limitations here and this is why it was there. I removed it since it low
+risk. No so many applications use periodic inquiry :)
 
 Regards
 
