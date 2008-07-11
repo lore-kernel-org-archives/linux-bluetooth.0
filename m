@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <009101c8e398$9cbf3550$6701a8c0@freqonedev>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-References: <0a3901c8e03c$0fd66eb0$6701a8c0@freqonedev>
-	<4877BFBE.70305@evilgenius.de>
-Date: Fri, 11 Jul 2008 15:56:33 -0500
+Message-ID: <4877BFBE.70305@evilgenius.de>
+Date: Fri, 11 Jul 2008 22:17:02 +0200
+From: Martin Karger <martin@evilgenius.de>
 MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <0a3901c8e03c$0fd66eb0$6701a8c0@freqonedev>
+In-Reply-To: <0a3901c8e03c$0fd66eb0$6701a8c0@freqonedev>
 Subject: Re: [Bluez-devel] SSP testing and BlueZ
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -20,38 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello Martin
-
-> David Stockwell wrote:
->> While attempting to test SSP with 3.34-3.35, I found that I was 
->> unable
->> to pair with SSP; I was able to pair with the legacy
->> pin-request/response mode.  I checked the HCI level of my aging BT
->> dongle (somehow this sounds a bit "dirty"), and found that it was 
->> only
->> HCI 1.1 compliant.  Replacing it with a BT2.0+EDR compliant dongle, I
->> found that it still would not pair with SSP.
->>
->> Consulting with CSR, they confirmed that unless both devices are
->> Bluetooth HCI 2.1 compliant, SSP will not work; it will always fall 
->> back
->> to Legacy pairing.
->>
->> I searched yesterday for HCI 2.1-compliant dongles, and found only 
->> one,
->> from Logitec (not Logitech) in Japan.  These are not available in the 
->> US
->> market.
->>
->
-> you can update CSRs BT2.0 with 2.1 Firmware. That should work. I think
-> you can download the firmware on the csr support site.
->
-I will give this a shot.  Thanks.  Will also need to see if my even 
-newer dongle can be upgraded.
-DS
->
+David Stockwell wrote:
+> While attempting to test SSP with 3.34-3.35, I found that I was unable 
+> to pair with SSP; I was able to pair with the legacy 
+> pin-request/response mode.  I checked the HCI level of my aging BT 
+> dongle (somehow this sounds a bit "dirty"), and found that it was only 
+> HCI 1.1 compliant.  Replacing it with a BT2.0+EDR compliant dongle, I 
+> found that it still would not pair with SSP.
 > 
+> Consulting with CSR, they confirmed that unless both devices are 
+> Bluetooth HCI 2.1 compliant, SSP will not work; it will always fall back 
+> to Legacy pairing.
+> 
+> I searched yesterday for HCI 2.1-compliant dongles, and found only one, 
+> from Logitec (not Logitech) in Japan.  These are not available in the US 
+> market.
+> 
+
+you can update CSRs BT2.0 with 2.1 Firmware. That should work. I think
+you can download the firmware on the csr support site.
 
 
 -------------------------------------------------------------------------
