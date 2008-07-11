@@ -1,17 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <bd5b16740807110138k5ba2f03fj85b7b3d261e17c9a@mail.gmail.com>
-References: <00695C9C8F8B4448856F48142B4AA2012032A21E@dnce02.ent.ti.com>
-	<1215662827.24462.2.camel@californication>
-	<bd5b16740807092236k22c63049vad40852d61147c3f@mail.gmail.com>
-	<1215756897.9744.10.camel@californication>
-	<00695C9C8F8B4448856F48142B4AA2012032A21F@dnce02.ent.ti.com>
-	<1215765452.9744.29.camel@californication>
-	<bd5b16740807110138k5ba2f03fj85b7b3d261e17c9a@mail.gmail.com>
-Date: Fri, 11 Jul 2008 10:50:03 +0200
-Message-Id: <1215766203.9744.30.camel@californication>
-Mime-Version: 1.0
+Message-ID: <bd5b16740807110143m3e1253bct2a5e270ab4b269dd@mail.gmail.com>
+Date: Fri, 11 Jul 2008 11:43:30 +0300
+From: "Ohad Ben-Cohen" <ohad@bencohen.org>
+To: "pramod gurav" <pramod_gurav_etc@yahoo.co.in>,
+	"BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <693063.42845.qm@web8402.mail.in.yahoo.com>
+MIME-Version: 1.0
+References: <693063.42845.qm@web8402.mail.in.yahoo.com>
+Cc: brflinux-devel@lists.sourceforge.net
 Subject: Re: [Bluez-devel] [PATCH] Add support for Texas Instruments' chips
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -26,27 +22,95 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Ohad,
+Hi Pramod,
 
-> On Fri, Jul 11, 2008 at 11:37 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > No I didn't. You sent it without any copyright note. Please check your
-> > original patch.
-> 
-> You are right, it was only on my second patch with the separate
-> hciattach_ti.c file.
-> Can you please add:
-> 
-> Copyright (C) 2007-2008  Texas Instruments, Inc.
-> 
-> to the hciattach_ti.c file ?
+On Fri, Jul 11, 2008 at 9:12 AM, pramod gurav
+<pramod_gurav_etc@yahoo.co.in> wrote:
+> Hi Ohad
+> Sorry to break the link.
+> I am working on arm platform. I want to configure TI's brf6350 on UART.
+> I read some of the mail on the list. I came to know that hci_ll.c provides
+> support for brf6350.
+> Is the hci lower level support in kernel enough to drive the chip?
 
-done.
+Yes.
 
-Regards
+> What else I have to do at kernel side to bring UP my brf6350?
 
-Marcel
+In general, if you are using 2.6.24 or higher, you don't need to do anything.
+Otherwise, you will have to patch it with the HCILL patch.
 
+That said, there are additional power management features we wrote for
+the OMAP platform (e.g., the chip can wake up the host on Bluetooth
+acitivity).
+If you're interested in those patches, take a look at
+http://brflinux.sourceforge.net/.
 
+> Where would I get the brf script file for my chip?
+
+That depends on the chip version and several decisions you should make.
+We have a dedicated mailing list for that - please write to
+brflinux-devel@lists.sourceforge.net for further assistance.
+
+(you can subscribe to the list at
+https://lists.sourceforge.net/lists/listinfo/brflinux-devel)
+
+Best Regards,
+Ohad.
+
+>
+> Your response is much awaited.
+> Thanks and Best regards
+>
+> Pramod
+>
+> ----- Original Message ----
+> From: Marcel Holtmann <marcel@holtmann.org>
+> To: BlueZ development <bluez-devel@lists.sourceforge.net>
+> Sent: Thursday, 10 July, 2008 6:03:23 PM
+> Subject: Re: [Bluez-devel] [PATCH] Add support for Texas Instruments' chips
+>
+> Hi Ohad,
+>
+>> > please put all the TI code into hciattach_ti.c and then I gonna apply
+>> > this patch.
+>>
+>> I'm gonna have to put some common definitions in hciattach.h then
+>> (mainly struct uart_t).
+>>
+>> Is that ok ?
+>
+> no. Do the same as I did for hciattach_st.c
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
+> Studies have shown that voting for your favorite open source project,
+> along with a healthy diet, reduces your potential for chronic lameness
+> and boredom. Vote Now at http://www.sourceforge.net/community/cca08
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+> ________________________________
+> From Chandigarh to Chennai - find friends all over India. Click here.
+> -------------------------------------------------------------------------
+> Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
+> Studies have shown that voting for your favorite open source project,
+> along with a healthy diet, reduces your potential for chronic lameness
+> and boredom. Vote Now at http://www.sourceforge.net/community/cca08
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
+>
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
