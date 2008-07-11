@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-From: Jui-Hao Chiang <windtracekimo@gmail.com>
-Date: Mon, 14 Jul 2008 02:30:16 +0000 (UTC)
-Message-ID: <loom.20080714T020902-534@post.gmane.org>
-Mime-Version: 1.0
-Subject: [Bluez-devel] =?utf-8?q?Questions_when_tracing_the_hci=5Fusb?=
+Message-ID: <009101c8e398$9cbf3550$6701a8c0@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+References: <0a3901c8e03c$0fd66eb0$6701a8c0@freqonedev>
+	<4877BFBE.70305@evilgenius.de>
+Date: Fri, 11 Jul 2008 15:56:33 -0500
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] SSP testing and BlueZ
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,22 +20,38 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello, I am starting tracing the source code of hci_usb, and want to test the
-Alternative Setting patches from Alok. But I have some questions:
+Hello Martin
 
-(1) In hci_usb_isoc_rx_submit, I saw the usb_rcvisocpipe are initializing
-settings for Host-side. But why is it necessary to call usb_submit_urb() to send
-the urb, and then repeat infinitely in hci_usb_rx_complete when the returned
-count is 0? Is that mandatory to do this to permit the usb device to send data
-up to Host?
-
-(2) Why the isoc is set to 2 in the beginning? What will happen when we set it
-to something like "5" in the beginning? (Alok's patches seems to dynamically
-adjust it depending on  hdev->conn_hash.sco_num)
-
-Thanks,
-Jui-Hao
-
+> David Stockwell wrote:
+>> While attempting to test SSP with 3.34-3.35, I found that I was 
+>> unable
+>> to pair with SSP; I was able to pair with the legacy
+>> pin-request/response mode.  I checked the HCI level of my aging BT
+>> dongle (somehow this sounds a bit "dirty"), and found that it was 
+>> only
+>> HCI 1.1 compliant.  Replacing it with a BT2.0+EDR compliant dongle, I
+>> found that it still would not pair with SSP.
+>>
+>> Consulting with CSR, they confirmed that unless both devices are
+>> Bluetooth HCI 2.1 compliant, SSP will not work; it will always fall 
+>> back
+>> to Legacy pairing.
+>>
+>> I searched yesterday for HCI 2.1-compliant dongles, and found only 
+>> one,
+>> from Logitec (not Logitech) in Japan.  These are not available in the 
+>> US
+>> market.
+>>
+>
+> you can update CSRs BT2.0 with 2.1 Firmware. That should work. I think
+> you can download the firmware on the csr support site.
+>
+I will give this a shot.  Thanks.  Will also need to see if my even 
+newer dongle can be upgraded.
+DS
+>
+> 
 
 
 -------------------------------------------------------------------------
