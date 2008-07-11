@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <b5c34db00807120046x59487a57m4df465e34de32574@mail.gmail.com>
-Date: Sat, 12 Jul 2008 13:16:44 +0530
-From: umeshyv <umeshyv@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Date: Fri, 11 Jul 2008 15:09:50 +0530 (IST)
+From: pramod gurav <pramod_gurav_etc@yahoo.co.in>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_1800_3598435.1215848804338"
-Subject: [Bluez-users] bluetooth compilation and usage regarding
+Message-ID: <796960.85710.qm@web8401.mail.in.yahoo.com>
+Subject: Re: [Bluez-users] BRF6350 support
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,288 +14,122 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============1596994532=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-------=_Part_1800_3598435.1215848804338
-Content-Type: multipart/alternative;
-	boundary="----=_Part_1801_13056230.1215848804339"
+--===============1596994532==
+Content-Type: multipart/alternative; boundary="0-1671343121-1215769190=:85710"
 
-------=_Part_1801_13056230.1215848804339
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+--0-1671343121-1215769190=:85710
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi to all,
+Sorry Ohad=0AThey were sent once but to different mailing list.=0AAnyways i=
+'ll take care it won't happen again.=0A=0A Thanks and Best regards=0A=0A=0A=
+Pramod=0A=0A=0A=0A----- Original Message ----=0AFrom: Ohad Ben-Cohen <ohad@=
+bencohen.org>=0ATo: BlueZ users <bluez-users@lists.sourceforge.net>=0ASent:=
+ Friday, 11 July, 2008 2:47:19 PM=0ASubject: Re: [Bluez-users] BRF6350 supp=
+ort=0A=0AHi Pramod,=0A=0APlease don't send the same question so many times.=
+=0AI will shortly repeat my answer for the general interest.=0A=0AOn Fri, J=
+ul 11, 2008 at 11:41 AM, pramod gurav=0A<pramod_gurav_etc@yahoo.co.in> wrot=
+e:=0A> Hi All,=0A> I am working on arm platform. I want to configure TI's b=
+rf6350 bluetooth=0A> chip on UART.=0A> I read some of the mail on the list.=
+ I came to know that hci_ll.c provides=0A> support for brf6350.=0A> Support=
+ for these chip is being added to bluez hciattach.=0A> Is the hci lower lev=
+el support in kernel enough to drive the chip?=0A=0AYes, though you may wan=
+t to add platform-specific power management=0Afeatures that let you control=
+ the chip power leg and/or let the chip=0Awake up the host in case of a blu=
+etooth acitivity.=0AYou can take a look how we did that on the OMAP 2430 pl=
+atform at=0Ahttp://brflinux.sourceforge.net/.=0A=0A> Where would I get the =
+brf script file for my chip?=0A=0AThat depends on your specific chip versio=
+n and personal preferences.=0A=0AWe have a dedicated list for supporting TI=
+'s chip - please send your=0Aquestion there (for details visit the site I m=
+entioned above).=0A=0ABR,=0AOhad.=0A>=0A> Thanks and Best regards=0A>=0A> P=
+ramod=0A>=0A> ________________________________=0A> Meet people who discuss =
+and share your passions. Join them now.=0A> -------------------------------=
+------------------------------------------=0A> Sponsored by: SourceForge.ne=
+t Community Choice Awards: VOTE NOW!=0A> Studies have shown that voting for=
+ your favorite open source project,=0A> along with a healthy diet, reduces =
+your potential for chronic lameness=0A> and boredom. Vote Now at http://www=
+.sourceforge.net/community/cca08=0A> ______________________________________=
+_________=0A> Bluez-users mailing list=0A> Bluez-users@lists.sourceforge.ne=
+t=0A> https://lists.sourceforge.net/lists/listinfo/bluez-users=0A>=0A>=0A=
+=0A------------------------------------------------------------------------=
+-=0ASponsored by: SourceForge.net Community Choice Awards: VOTE NOW!=0AStud=
+ies have shown that voting for your favorite open source project,=0Aalong w=
+ith a healthy diet, reduces your potential for chronic lameness=0Aand bored=
+om. Vote Now at http://www.sourceforge.net/community/cca08=0A______________=
+_________________________________=0ABluez-users mailing list=0ABluez-users@=
+lists.sourceforge.net=0Ahttps://lists.sourceforge.net/lists/listinfo/bluez-=
+users=0A=0A=0A=0A      Share files, take polls, and make new friends - all =
+under one roof. Go to http://in.promos.yahoo.com/groups/
+--0-1671343121-1215769190=:85710
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I am trying to compile 3.32  version of bluetooth .Still locked with
-errors.I attached what I have done please check it and explain where I am
-doing wrong.I want to cross compile it to mips and i need to achieve file
-transfer from my mobile to target board(mips32 architecture) and remote
-desktop access from k750i mobile.waiting for valuable suggestions.
+<html><head><style type=3D"text/css"><!-- DIV {margin:0px;} --></style></he=
+ad><body><div style=3D"font-family:times new roman, new york, times, serif;=
+font-size:12pt">Sorry Ohad<br>They were sent once but to different mailing =
+list.<br>Anyways i'll take care it won't happen again.<br><div>&nbsp;</div>=
+Thanks and Best regards<br><br><div>Pramod<div><br></div><div style=3D"font=
+-family: times new roman,new york,times,serif; font-size: 12pt;"><br><div s=
+tyle=3D"font-family: arial,helvetica,sans-serif; font-size: 10pt;">----- Or=
+iginal Message ----<br>From: Ohad Ben-Cohen &lt;ohad@bencohen.org&gt;<br>To=
+: BlueZ users &lt;bluez-users@lists.sourceforge.net&gt;<br>Sent: Friday, 11=
+ July, 2008 2:47:19 PM<br>Subject: Re: [Bluez-users] BRF6350 support<br><br=
+>Hi Pramod,<br><br>Please don't send the same question so many times.<br>I =
+will shortly repeat my answer for the general interest.<br><br>On Fri, Jul =
+11, 2008 at 11:41 AM, pramod gurav<br>&lt;<a
+ ymailto=3D"mailto:pramod_gurav_etc@yahoo.co.in" href=3D"mailto:pramod_gura=
+v_etc@yahoo.co.in">pramod_gurav_etc@yahoo.co.in</a>&gt; wrote:<br>&gt; Hi A=
+ll,<br>&gt; I am working on arm platform. I want to configure TI's brf6350 =
+bluetooth<br>&gt; chip on UART.<br>&gt; I read some of the mail on the list=
+. I came to know that hci_ll.c provides<br>&gt; support for brf6350.<br>&gt=
+; Support for these chip is being added to bluez hciattach.<br>&gt; Is the =
+hci lower level support in kernel enough to drive the chip?<br><br>Yes, tho=
+ugh you may want to add platform-specific power management<br>features that=
+ let you control the chip power leg and/or let the chip<br>wake up the host=
+ in case of a bluetooth acitivity.<br>You can take a look how we did that o=
+n the OMAP 2430 platform at<br><a href=3D"http://brflinux.sourceforge.net/"=
+ target=3D"_blank">http://brflinux.sourceforge.net/</a>.<br><br>&gt; Where =
+would I get the brf script file for my chip?<br><br>That depends on your
+ specific chip version and personal preferences.<br><br>We have a dedicated=
+ list for supporting TI's chip - please send your<br>question there (for de=
+tails visit the site I mentioned above).<br><br>BR,<br>Ohad.<br>&gt;<br>&gt=
+; Thanks and Best regards<br>&gt;<br>&gt; Pramod<br>&gt;<br>&gt; __________=
+______________________<br>&gt; Meet people who discuss and share your passi=
+ons. Join them now.<br>&gt; -----------------------------------------------=
+--------------------------<br>&gt; Sponsored by: SourceForge.net Community =
+Choice Awards: VOTE NOW!<br>&gt; Studies have shown that voting for your fa=
+vorite open source project,<br>&gt; along with a healthy diet, reduces your=
+ potential for chronic lameness<br>&gt; and boredom. Vote Now at <a href=3D=
+"http://www.sourceforge.net/community/cca08" target=3D"_blank">http://www.s=
+ourceforge.net/community/cca08</a><br>&gt; ________________________________=
+_______________<br>&gt; Bluez-users mailing list<br>&gt; <a
+ ymailto=3D"mailto:Bluez-users@lists.sourceforge.net" href=3D"mailto:Bluez-=
+users@lists.sourceforge.net">Bluez-users@lists.sourceforge.net</a><br>&gt; =
+<a href=3D"https://lists.sourceforge.net/lists/listinfo/bluez-users" target=
+=3D"_blank">https://lists.sourceforge.net/lists/listinfo/bluez-users</a><br=
+>&gt;<br>&gt;<br><br>------------------------------------------------------=
+-------------------<br>Sponsored by: SourceForge.net Community Choice Award=
+s: VOTE NOW!<br>Studies have shown that voting for your favorite open sourc=
+e project,<br>along with a healthy diet, reduces your potential for chronic=
+ lameness<br>and boredom. Vote Now at <a href=3D"http://www.sourceforge.net=
+/community/cca08" target=3D"_blank">http://www.sourceforge.net/community/cc=
+a08</a><br>_______________________________________________<br>Bluez-users m=
+ailing list<br><a ymailto=3D"mailto:Bluez-users@lists.sourceforge.net"
+ href=3D"mailto:Bluez-users@lists.sourceforge.net">Bluez-users@lists.source=
+forge.net</a><br><a href=3D"https://lists.sourceforge.net/lists/listinfo/bl=
+uez-users" target=3D"_blank">https://lists.sourceforge.net/lists/listinfo/b=
+luez-users</a><br></div></div></div></div><br>=0A=0A=0A      <!--6--><hr si=
+ze=3D1></hr> Explore your hobbies and interests. <a href=3D"http://in.rd.ya=
+hoo.com/tagline_groups_6/*http://in.promos.yahoo.com/groups/">Click here to=
+ begin.</a></body></html>
+--0-1671343121-1215769190=:85710--
 
-Regards
-Umesh
 
-------=_Part_1801_13056230.1215848804339
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi to all,<br><br>I am trying to compile 3.32&nbsp; version of bluetooth .Still locked with
-errors.I attached what I have done please check it and explain where I
-am doing wrong.I want to cross compile it to mips and i need to achieve file transfer from my mobile to target board(mips32 architecture) and remote desktop access from k750i mobile.waiting for valuable suggestions.<br><br>
-Regards<br>Umesh<br>
-
-------=_Part_1801_13056230.1215848804339--
-
-------=_Part_1800_3598435.1215848804338
-Content-Type: text/plain; name=bluetooth1.txt
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fijwusx00
-Content-Disposition: attachment; filename=bluetooth1.txt
-
-Q29tcGlsaW5nIEJsdWV0b290aCBsaWJyYXJpZXMKCj5BcHBseSBCdWlsZHJvb3Qgb3IgVG9vbGNo
-YWluIFBhdGgKPi4vY29uZmlndXJlIC0taG9zdD1taXBzZWwtbGludXggLS1wcmVmaXg9L3VzciAt
-LWVuYWJsZS1zaGFyZWQ9bm8gLS1lbmFibGUtc3RhdGljPXllcwo+bWFrZQo+bWFrZSBpbnN0YWxs
-IERFU1RESVI9L2hvbWUvbmV3YnVpbGQvYmx1ZS9ibHVlei1saWJzLTMuMzIvaW5zdGFsbAoKQ29t
-cGlsaW5nIEJsdWV0b290aCBVdGlscwoKbGludXg6L2hvbWUvbmV3YnVpbGQvYmx1ZS9ibHVlei11
-dGlscy0zLjMyICMgZXhwb3J0IEJMVUVaX0NGTEFHUz0tSSAvaG9tZS9uZXdidWlsZC9ibHVlL2Js
-dWV6LWxpYnMtMy4zMi9pbnN0YWxsL3Vzci9pbmNsdWRlCmxpbnV4Oi9ob21lL25ld2J1aWxkL2Js
-dWUvYmx1ZXotdXRpbHMtMy4zMiAjIGV4cG9ydCBCTFVFWl9MSUJTPSItTC9ob21lL25ld2J1aWxk
-L2JsdWUvYmx1ZXotbGlicy0zLjMyL2luc3RhbGwvdXNyL2xpYiAtbGJsdWV0b290aCIKbGludXg6
-L2hvbWUvbmV3YnVpbGQvYmx1ZS9ibHVlei11dGlscy0zLjMyICMgLi9jb25maWd1cmUgLS1ob3N0
-PW1pcHNlbC1saW51eCAtLXdpdGgtYmx1ZXo9L2hvbWUvbmV3YnVpbGQvYmx1ZS9ibHVlei1saWJz
-LTMuMzIvaW5zdGFsbC91c3IvIENQUEZMQUdTPSItRF9fS0VSTkVMX18iCmxpbnV4Oi9ob21lL25l
-d2J1aWxkL2JsdWUvYmx1ZXotdXRpbHMtMy4zMiAjIG1ha2UKbWlwc2VsLWxpbnV4LWdjYyAtREhB
-VkVfQ09ORklHX0ggLUkuIC1JLi4gICAtRF9fS0VSTkVMX18gLUkvdXNyL2xvY2FsL2luY2x1ZGUv
-ZGJ1cy0xLjAgLUkvdXNyL2xvY2FsL2xpYi9kYnVzLTEuMC9pbmNsdWRlICAgLUkuLi9lZ2xpYiAt
-SS4uL2dkYnVzIC1XYWxsIC1PMiAtRF9GT1JUSUZZX1NPVVJDRT0yIC1NVCBnbGliLWhlbHBlci5v
-IC1NRCAtTVAgLU1GIC5kZXBzL2dsaWItaGVscGVyLlRwbyAtYyAtbyBnbGliLWhlbHBlci5vIGds
-aWItaGVscGVyLmMKZ2xpYi1oZWxwZXIuYzozNTozMzogZXJyb3I6IGJsdWV0b290aC9ibHVldG9v
-dGguaDogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQpnbGliLWhlbHBlci5jOjM2OjMwOiBlcnJv
-cjogYmx1ZXRvb3RoL3JmY29tbS5oOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CmdsaWItaGVs
-cGVyLmM6Mzc6Mjk6IGVycm9yOiBibHVldG9vdGgvbDJjYXAuaDogTm8gc3VjaCBmaWxlIG9yIGRp
-cmVjdG9yeQpnbGliLWhlbHBlci5jOjM4OjI3OiBlcnJvcjogYmx1ZXRvb3RoL3Njby5oOiBObyBz
-dWNoIGZpbGUgb3IgZGlyZWN0b3J5CmdsaWItaGVscGVyLmM6Mzk6Mjc6IGVycm9yOiBibHVldG9v
-dGgvc2RwLmg6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKZ2xpYi1oZWxwZXIuYzo0MDozMTog
-ZXJyb3I6IGJsdWV0b290aC9zZHBfbGliLmg6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKSW4g
-ZmlsZSBpbmNsdWRlZCBmcm9tIGdsaWItaGVscGVyLmM6NDQ6CmdsaWItaGVscGVyLmg6MjY6IHdh
-cm5pbmc6IHR5cGUgZGVmYXVsdHMgdG8gJ2ludCcgaW4gZGVjbGFyYXRpb24gb2YgJ2JkYWRkcl90
-JwpnbGliLWhlbHBlci5oOjI2OiBlcnJvcjogZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJlZm9y
-ZSAnKicgdG9rZW4KZ2xpYi1oZWxwZXIuaDoyODogZXJyb3I6IGV4cGVjdGVkICcpJyBiZWZvcmUg
-JyonIHRva2VuCmdsaWItaGVscGVyLmg6MzE6IHdhcm5pbmc6IHR5cGUgZGVmYXVsdHMgdG8gJ2lu
-dCcgaW4gZGVjbGFyYXRpb24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5oOjMxOiBlcnJvcjog
-ZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJlZm9yZSAnKicgdG9rZW4KZ2xpYi1oZWxwZXIuaDoz
-NDogd2FybmluZzogdHlwZSBkZWZhdWx0cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAnYmRh
-ZGRyX3QnCmdsaWItaGVscGVyLmg6MzQ6IGVycm9yOiBleHBlY3RlZCAnOycsICcsJyBvciAnKScg
-YmVmb3JlICcqJyB0b2tlbgpnbGliLWhlbHBlci5oOjM4OiBlcnJvcjogZXhwZWN0ZWQgJyknIGJl
-Zm9yZSAnKicgdG9rZW4KZ2xpYi1oZWxwZXIuaDozOTogZXJyb3I6IGV4cGVjdGVkICcpJyBiZWZv
-cmUgJyonIHRva2VuCmdsaWItaGVscGVyLmg6NDM6IHdhcm5pbmc6IHR5cGUgZGVmYXVsdHMgdG8g
-J2ludCcgaW4gZGVjbGFyYXRpb24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5oOjQzOiBlcnJv
-cjogZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJlZm9yZSAnKicgdG9rZW4KZ2xpYi1oZWxwZXIu
-aDo0NTogd2FybmluZzogdHlwZSBkZWZhdWx0cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAn
-YmRhZGRyX3QnCmdsaWItaGVscGVyLmg6NDU6IGVycm9yOiBleHBlY3RlZCAnOycsICcsJyBvciAn
-KScgYmVmb3JlICcqJyB0b2tlbgpnbGliLWhlbHBlci5oOjQ3OiB3YXJuaW5nOiB0eXBlIGRlZmF1
-bHRzIHRvICdpbnQnIGluIGRlY2xhcmF0aW9uIG9mICdiZGFkZHJfdCcKZ2xpYi1oZWxwZXIuaDo0
-NzogZXJyb3I6IGV4cGVjdGVkICc7JywgJywnIG9yICcpJyBiZWZvcmUgJyonIHRva2VuCmdsaWIt
-aGVscGVyLmg6NTA6IHdhcm5pbmc6IHR5cGUgZGVmYXVsdHMgdG8gJ2ludCcgaW4gZGVjbGFyYXRp
-b24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5oOjUwOiBlcnJvcjogZXhwZWN0ZWQgJzsnLCAn
-LCcgb3IgJyknIGJlZm9yZSAnKicgdG9rZW4KZ2xpYi1oZWxwZXIuaDo1Mjogd2FybmluZzogdHlw
-ZSBkZWZhdWx0cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAnYmRhZGRyX3QnCmdsaWItaGVs
-cGVyLmg6NTI6IGVycm9yOiBleHBlY3RlZCAnOycsICcsJyBvciAnKScgYmVmb3JlICcqJyB0b2tl
-bgpnbGliLWhlbHBlci5oOjU1OiB3YXJuaW5nOiB0eXBlIGRlZmF1bHRzIHRvICdpbnQnIGluIGRl
-Y2xhcmF0aW9uIG9mICdiZGFkZHJfdCcKZ2xpYi1oZWxwZXIuaDo1NTogZXJyb3I6IGV4cGVjdGVk
-ICc7JywgJywnIG9yICcpJyBiZWZvcmUgJyonIHRva2VuCmdsaWItaGVscGVyLmM6NDY6IGVycm9y
-OiBleHBlY3RlZCBkZWNsYXJhdGlvbiBzcGVjaWZpZXJzIG9yICcuLi4nIGJlZm9yZSAnYmRhZGRy
-X3QnCmdsaWItaGVscGVyLmM6NDY6IGVycm9yOiBleHBlY3RlZCBkZWNsYXJhdGlvbiBzcGVjaWZp
-ZXJzIG9yICcuLi4nIGJlZm9yZSAnYmRhZGRyX3QnCmdsaWItaGVscGVyLmM6NzA6IGVycm9yOiBl
-eHBlY3RlZCBzcGVjaWZpZXItcXVhbGlmaWVyLWxpc3QgYmVmb3JlICdidF9pb19jYWxsYmFja190
-JwpnbGliLWhlbHBlci5jOjc2OiBlcnJvcjogZXhwZWN0ZWQgc3BlY2lmaWVyLXF1YWxpZmllci1s
-aXN0IGJlZm9yZSAnYmRhZGRyX3QnCmdsaWItaGVscGVyLmM6IEluIGZ1bmN0aW9uICdzZWFyY2hf
-Y29udGV4dF9jbGVhbnVwJzoKZ2xpYi1oZWxwZXIuYzo4NzogZXJyb3I6ICdzdHJ1Y3Qgc2VhcmNo
-X2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ2Rlc3Ryb3knCmdsaWItaGVscGVyLmM6ODg6
-IGVycm9yOiAnc3RydWN0IHNlYXJjaF9jb250ZXh0JyBoYXMgbm8gbWVtYmVyIG5hbWVkICdkZXN0
-cm95JwpnbGliLWhlbHBlci5jOjg4OiBlcnJvcjogJ3N0cnVjdCBzZWFyY2hfY29udGV4dCcgaGFz
-IG5vIG1lbWJlciBuYW1lZCAndXNlcl9kYXRhJwpnbGliLWhlbHBlci5jOiBJbiBmdW5jdGlvbiAn
-c2VhcmNoX2NvbXBsZXRlZF9jYic6CmdsaWItaGVscGVyLmM6OTY6IGVycm9yOiAnc2RwX2xpc3Rf
-dCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCmdsaWItaGVscGVyLmM6
-OTY6IGVycm9yOiAoRWFjaCB1bmRlY2xhcmVkIGlkZW50aWZpZXIgaXMgcmVwb3J0ZWQgb25seSBv
-bmNlCmdsaWItaGVscGVyLmM6OTY6IGVycm9yOiBmb3IgZWFjaCBmdW5jdGlvbiBpdCBhcHBlYXJz
-IGluLikKZ2xpYi1oZWxwZXIuYzo5NjogZXJyb3I6ICdyZWNzJyB1bmRlY2xhcmVkIChmaXJzdCB1
-c2UgaW4gdGhpcyBmdW5jdGlvbikKZ2xpYi1oZWxwZXIuYzoxMDE6IGVycm9yOiAnU0RQX1NWQ19T
-RUFSQ0hfQVRUUl9SU1AnIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQpn
-bGliLWhlbHBlci5jOjEwNjogd2FybmluZzogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rp
-b24gJ3NkcF9leHRyYWN0X3NlcXR5cGUnCmdsaWItaGVscGVyLmM6MTEyOiBlcnJvcjogJ3NkcF9y
-ZWNvcmRfdCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCmdsaWItaGVs
-cGVyLmM6MTEyOiBlcnJvcjogJ3JlYycgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVu
-Y3Rpb24pCmdsaWItaGVscGVyLmM6MTE2OiB3YXJuaW5nOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBv
-ZiBmdW5jdGlvbiAnc2RwX2V4dHJhY3RfcGR1JwpnbGliLWhlbHBlci5jOjEyMTogd2FybmluZzog
-aW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ3NkcF9yZWNvcmRfZnJlZScKZ2xpYi1o
-ZWxwZXIuYzoxMjg6IHdhcm5pbmc6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdz
-ZHBfbGlzdF9hcHBlbmQnCmdsaWItaGVscGVyLmM6MTMyOiB3YXJuaW5nOiBpbXBsaWNpdCBkZWNs
-YXJhdGlvbiBvZiBmdW5jdGlvbiAnc2RwX2Nsb3NlJwpnbGliLWhlbHBlci5jOjEzMjogZXJyb3I6
-ICdzdHJ1Y3Qgc2VhcmNoX2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ3Nlc3Npb24nCmds
-aWItaGVscGVyLmM6MTMzOiBlcnJvcjogJ3N0cnVjdCBzZWFyY2hfY29udGV4dCcgaGFzIG5vIG1l
-bWJlciBuYW1lZCAnY2InCmdsaWItaGVscGVyLmM6MTM0OiBlcnJvcjogJ3N0cnVjdCBzZWFyY2hf
-Y29udGV4dCcgaGFzIG5vIG1lbWJlciBuYW1lZCAnY2InCmdsaWItaGVscGVyLmM6MTM0OiBlcnJv
-cjogJ3N0cnVjdCBzZWFyY2hfY29udGV4dCcgaGFzIG5vIG1lbWJlciBuYW1lZCAndXNlcl9kYXRh
-JwpnbGliLWhlbHBlci5jOiBJbiBmdW5jdGlvbiAnc2VhcmNoX3Byb2Nlc3NfY2InOgpnbGliLWhl
-bHBlci5jOjE0OTogd2FybmluZzogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ3Nk
-cF9wcm9jZXNzJwpnbGliLWhlbHBlci5jOjE0OTogZXJyb3I6ICdzdHJ1Y3Qgc2VhcmNoX2NvbnRl
-eHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ3Nlc3Npb24nCmdsaWItaGVscGVyLmM6MTU2OiBlcnJv
-cjogJ3N0cnVjdCBzZWFyY2hfY29udGV4dCcgaGFzIG5vIG1lbWJlciBuYW1lZCAnc2Vzc2lvbicK
-Z2xpYi1oZWxwZXIuYzoxNTc6IGVycm9yOiAnc3RydWN0IHNlYXJjaF9jb250ZXh0JyBoYXMgbm8g
-bWVtYmVyIG5hbWVkICdjYicKZ2xpYi1oZWxwZXIuYzoxNTg6IGVycm9yOiAnc3RydWN0IHNlYXJj
-aF9jb250ZXh0JyBoYXMgbm8gbWVtYmVyIG5hbWVkICdjYicKZ2xpYi1oZWxwZXIuYzoxNTg6IGVy
-cm9yOiAnc3RydWN0IHNlYXJjaF9jb250ZXh0JyBoYXMgbm8gbWVtYmVyIG5hbWVkICd1c2VyX2Rh
-dGEnCmdsaWItaGVscGVyLmM6IEluIGZ1bmN0aW9uICdjb25uZWN0X3dhdGNoJzoKZ2xpYi1oZWxw
-ZXIuYzoxNjg6IGVycm9yOiAnc2RwX2xpc3RfdCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRo
-aXMgZnVuY3Rpb24pCmdsaWItaGVscGVyLmM6MTY4OiBlcnJvcjogJ3NlYXJjaCcgdW5kZWNsYXJl
-ZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCmdsaWItaGVscGVyLmM6MTY4OiBlcnJvcjog
-J2F0dHJpZHMnIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQpnbGliLWhl
-bHBlci5jOjE2ODogd2FybmluZzogbGVmdC1oYW5kIG9wZXJhbmQgb2YgY29tbWEgZXhwcmVzc2lv
-biBoYXMgbm8gZWZmZWN0CmdsaWItaGVscGVyLmM6MTg0OiB3YXJuaW5nOiBpbXBsaWNpdCBkZWNs
-YXJhdGlvbiBvZiBmdW5jdGlvbiAnc2RwX3NldF9ub3RpZnknCmdsaWItaGVscGVyLmM6MTg0OiBl
-cnJvcjogJ3N0cnVjdCBzZWFyY2hfY29udGV4dCcgaGFzIG5vIG1lbWJlciBuYW1lZCAnc2Vzc2lv
-bicKZ2xpYi1oZWxwZXIuYzoxODk6IGVycm9yOiAnc3RydWN0IHNlYXJjaF9jb250ZXh0JyBoYXMg
-bm8gbWVtYmVyIG5hbWVkICd1dWlkJwpnbGliLWhlbHBlci5jOjE5MTogd2FybmluZzogaW1wbGlj
-aXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ3NkcF9zZXJ2aWNlX3NlYXJjaF9hdHRyX2FzeW5j
-JwpnbGliLWhlbHBlci5jOjE5MTogZXJyb3I6ICdzdHJ1Y3Qgc2VhcmNoX2NvbnRleHQnIGhhcyBu
-byBtZW1iZXIgbmFtZWQgJ3Nlc3Npb24nCmdsaWItaGVscGVyLmM6MTkyOiBlcnJvcjogJ1NEUF9B
-VFRSX1JFUV9SQU5HRScgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCmds
-aWItaGVscGVyLmM6MTkzOiB3YXJuaW5nOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlv
-biAnc2RwX2xpc3RfZnJlZScKZ2xpYi1oZWxwZXIuYzoyMDg6IGVycm9yOiAnc3RydWN0IHNlYXJj
-aF9jb250ZXh0JyBoYXMgbm8gbWVtYmVyIG5hbWVkICdzZXNzaW9uJwpnbGliLWhlbHBlci5jOjIw
-OTogZXJyb3I6ICdzdHJ1Y3Qgc2VhcmNoX2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ2Ni
-JwpnbGliLWhlbHBlci5jOjIxMDogZXJyb3I6ICdzdHJ1Y3Qgc2VhcmNoX2NvbnRleHQnIGhhcyBu
-byBtZW1iZXIgbmFtZWQgJ2NiJwpnbGliLWhlbHBlci5jOjIxMDogZXJyb3I6ICdzdHJ1Y3Qgc2Vh
-cmNoX2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ3VzZXJfZGF0YScKZ2xpYi1oZWxwZXIu
-YzogQXQgdG9wIGxldmVsOgpnbGliLWhlbHBlci5jOjIxNzogd2FybmluZzogdHlwZSBkZWZhdWx0
-cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAnYmRhZGRyX3QnCmdsaWItaGVscGVyLmM6MjE3
-OiBlcnJvcjogZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJlZm9yZSAnKicgdG9rZW4KZ2xpYi1o
-ZWxwZXIuYzoyNDk6IHdhcm5pbmc6IHR5cGUgZGVmYXVsdHMgdG8gJ2ludCcgaW4gZGVjbGFyYXRp
-b24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5jOjI0OTogZXJyb3I6IGV4cGVjdGVkICc7Jywg
-JywnIG9yICcpJyBiZWZvcmUgJyonIHRva2VuCmdsaWItaGVscGVyLmM6MjcwOiB3YXJuaW5nOiB0
-eXBlIGRlZmF1bHRzIHRvICdpbnQnIGluIGRlY2xhcmF0aW9uIG9mICdiZGFkZHJfdCcKZ2xpYi1o
-ZWxwZXIuYzoyNzA6IGVycm9yOiBleHBlY3RlZCAnOycsICcsJyBvciAnKScgYmVmb3JlICcqJyB0
-b2tlbgpnbGliLWhlbHBlci5jOjI4MDogZXJyb3I6IGV4cGVjdGVkICcpJyBiZWZvcmUgJyonIHRv
-a2VuCmdsaWItaGVscGVyLmM6MzI4OiBlcnJvcjogZXhwZWN0ZWQgJyknIGJlZm9yZSAnKicgdG9r
-ZW4KZ2xpYi1oZWxwZXIuYzogSW4gZnVuY3Rpb24gJ3Jlc29sdmVfbmFtZXMnOgpnbGliLWhlbHBl
-ci5jOjQxNTogd2FybmluZzogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ21lbXNl
-dCcKZ2xpYi1oZWxwZXIuYzo0MTU6IHdhcm5pbmc6IGluY29tcGF0aWJsZSBpbXBsaWNpdCBkZWNs
-YXJhdGlvbiBvZiBidWlsdC1pbiBmdW5jdGlvbiAnbWVtc2V0JwpnbGliLWhlbHBlci5jOiBBdCB0
-b3AgbGV2ZWw6CmdsaWItaGVscGVyLmM6NDI5OiBlcnJvcjogZXhwZWN0ZWQgZGVjbGFyYXRpb24g
-c3BlY2lmaWVycyBvciAnLi4uJyBiZWZvcmUgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5jOjQyOTog
-ZXJyb3I6IGV4cGVjdGVkIGRlY2xhcmF0aW9uIHNwZWNpZmllcnMgb3IgJy4uLicgYmVmb3JlICdi
-ZGFkZHJfdCcKZ2xpYi1oZWxwZXIuYzogSW4gZnVuY3Rpb24gJ3JmY29tbV9yZXNvbHZlcic6Cmds
-aWItaGVscGVyLmM6NDMxOiBlcnJvcjogc3RvcmFnZSBzaXplIG9mICdob3N0JyBpc24ndCBrbm93
-bgpnbGliLWhlbHBlci5jOjQzMTogZXJyb3I6IHN0b3JhZ2Ugc2l6ZSBvZiAncGVlcicgaXNuJ3Qg
-a25vd24KZ2xpYi1oZWxwZXIuYzo0NDE6IHdhcm5pbmc6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9m
-IGZ1bmN0aW9uICdiYWNweScKZ2xpYi1oZWxwZXIuYzo0NDE6IGVycm9yOiAnc3JjJyB1bmRlY2xh
-cmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikKZ2xpYi1oZWxwZXIuYzo0NDI6IGVycm9y
-OiAnZHN0JyB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikKZ2xpYi1oZWxw
-ZXIuYzo0MzE6IHdhcm5pbmc6IHVudXNlZCB2YXJpYWJsZSAncGVlcicKZ2xpYi1oZWxwZXIuYzo0
-MzE6IHdhcm5pbmc6IHVudXNlZCB2YXJpYWJsZSAnaG9zdCcKZ2xpYi1oZWxwZXIuYzogQXQgdG9w
-IGxldmVsOgpnbGliLWhlbHBlci5jOjQ0NzogZXJyb3I6IGV4cGVjdGVkIGRlY2xhcmF0aW9uIHNw
-ZWNpZmllcnMgb3IgJy4uLicgYmVmb3JlICdiZGFkZHJfdCcKZ2xpYi1oZWxwZXIuYzo0NDc6IGVy
-cm9yOiBleHBlY3RlZCBkZWNsYXJhdGlvbiBzcGVjaWZpZXJzIG9yICcuLi4nIGJlZm9yZSAnYmRh
-ZGRyX3QnCmdsaWItaGVscGVyLmM6IEluIGZ1bmN0aW9uICdsMmNhcF9yZXNvbHZlcic6CmdsaWIt
-aGVscGVyLmM6NDQ5OiBlcnJvcjogc3RvcmFnZSBzaXplIG9mICdob3N0JyBpc24ndCBrbm93bgpn
-bGliLWhlbHBlci5jOjQ0OTogZXJyb3I6IHN0b3JhZ2Ugc2l6ZSBvZiAncGVlcicgaXNuJ3Qga25v
-d24KZ2xpYi1oZWxwZXIuYzo0NTk6IGVycm9yOiAnc3JjJyB1bmRlY2xhcmVkIChmaXJzdCB1c2Ug
-aW4gdGhpcyBmdW5jdGlvbikKZ2xpYi1oZWxwZXIuYzo0NjA6IGVycm9yOiAnZHN0JyB1bmRlY2xh
-cmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikKZ2xpYi1oZWxwZXIuYzo0NDk6IHdhcm5p
-bmc6IHVudXNlZCB2YXJpYWJsZSAncGVlcicKZ2xpYi1oZWxwZXIuYzo0NDk6IHdhcm5pbmc6IHVu
-dXNlZCB2YXJpYWJsZSAnaG9zdCcKZ2xpYi1oZWxwZXIuYzogQXQgdG9wIGxldmVsOgpnbGliLWhl
-bHBlci5jOjQ2NTogZXJyb3I6IGV4cGVjdGVkIGRlY2xhcmF0aW9uIHNwZWNpZmllcnMgb3IgJy4u
-LicgYmVmb3JlICdiZGFkZHJfdCcKZ2xpYi1oZWxwZXIuYzo0NjU6IGVycm9yOiBleHBlY3RlZCBk
-ZWNsYXJhdGlvbiBzcGVjaWZpZXJzIG9yICcuLi4nIGJlZm9yZSAnYmRhZGRyX3QnCmdsaWItaGVs
-cGVyLmM6IEluIGZ1bmN0aW9uICdzY29fcmVzb2x2ZXInOgpnbGliLWhlbHBlci5jOjQ2NzogZXJy
-b3I6IHN0b3JhZ2Ugc2l6ZSBvZiAnaG9zdCcgaXNuJ3Qga25vd24KZ2xpYi1oZWxwZXIuYzo0Njc6
-IGVycm9yOiBzdG9yYWdlIHNpemUgb2YgJ3BlZXInIGlzbid0IGtub3duCmdsaWItaGVscGVyLmM6
-NDc3OiBlcnJvcjogJ3NyYycgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24p
-CmdsaWItaGVscGVyLmM6NDc4OiBlcnJvcjogJ2RzdCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGlu
-IHRoaXMgZnVuY3Rpb24pCmdsaWItaGVscGVyLmM6NDY3OiB3YXJuaW5nOiB1bnVzZWQgdmFyaWFi
-bGUgJ3BlZXInCmdsaWItaGVscGVyLmM6NDY3OiB3YXJuaW5nOiB1bnVzZWQgdmFyaWFibGUgJ2hv
-c3QnCmdsaWItaGVscGVyLmM6IEluIGZ1bmN0aW9uICdsaXN0ZW5fY2InOgpnbGliLWhlbHBlci5j
-OjQ5MDogZXJyb3I6ICdiZGFkZHJfdCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVu
-Y3Rpb24pCmdsaWItaGVscGVyLmM6NDkwOiBlcnJvcjogZXhwZWN0ZWQgJzsnIGJlZm9yZSAnc3Jj
-JwpnbGliLWhlbHBlci5jOjUwMzogd2FybmluZzogaW5jb21wYXRpYmxlIGltcGxpY2l0IGRlY2xh
-cmF0aW9uIG9mIGJ1aWx0LWluIGZ1bmN0aW9uICdtZW1zZXQnCmdsaWItaGVscGVyLmM6NTA4OiBl
-cnJvcjogJ3N0cnVjdCBpb19jb250ZXh0JyBoYXMgbm8gbWVtYmVyIG5hbWVkICdyZXNvbHZlcicK
-Z2xpYi1oZWxwZXIuYzo1MDk6IGVycm9yOiAnc3RydWN0IGlvX2NvbnRleHQnIGhhcyBubyBtZW1i
-ZXIgbmFtZWQgJ3Jlc29sdmVyJwpnbGliLWhlbHBlci5jOjUwOTogZXJyb3I6ICdzcmMnIHVuZGVj
-bGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQpnbGliLWhlbHBlci5jOjUwOTogZXJy
-b3I6ICdkc3QnIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQpnbGliLWhl
-bHBlci5jOjUyMDogZXJyb3I6ICdzdHJ1Y3QgaW9fY29udGV4dCcgaGFzIG5vIG1lbWJlciBuYW1l
-ZCAnY2InCmdsaWItaGVscGVyLmM6NTIxOiBlcnJvcjogJ3N0cnVjdCBpb19jb250ZXh0JyBoYXMg
-bm8gbWVtYmVyIG5hbWVkICdjYicKZ2xpYi1oZWxwZXIuYzo1MjE6IGVycm9yOiAnc3RydWN0IGlv
-X2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ3VzZXJfZGF0YScKZ2xpYi1oZWxwZXIuYzo1
-MjY6IGVycm9yOiAnc3RydWN0IGlvX2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ2NiJwpn
-bGliLWhlbHBlci5jOjUyNzogZXJyb3I6ICdzdHJ1Y3QgaW9fY29udGV4dCcgaGFzIG5vIG1lbWJl
-ciBuYW1lZCAnY2InCmdsaWItaGVscGVyLmM6NTI3OiBlcnJvcjogJ3N0cnVjdCBpb19jb250ZXh0
-JyBoYXMgbm8gbWVtYmVyIG5hbWVkICd1c2VyX2RhdGEnCmdsaWItaGVscGVyLmM6IEluIGZ1bmN0
-aW9uICdjb25uZWN0X2NiJzoKZ2xpYi1oZWxwZXIuYzo1NTU6IGVycm9yOiAnYmRhZGRyX3QnIHVu
-ZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQpnbGliLWhlbHBlci5jOjU1NTog
-ZXJyb3I6IGV4cGVjdGVkICc7JyBiZWZvcmUgJ3NyYycKZ2xpYi1oZWxwZXIuYzo1NzE6IGVycm9y
-OiAnc3RydWN0IGlvX2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ3Jlc29sdmVyJwpnbGli
-LWhlbHBlci5jOjU3MjogZXJyb3I6ICdzdHJ1Y3QgaW9fY29udGV4dCcgaGFzIG5vIG1lbWJlciBu
-YW1lZCAncmVzb2x2ZXInCmdsaWItaGVscGVyLmM6NTcyOiBlcnJvcjogJ3NyYycgdW5kZWNsYXJl
-ZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCmdsaWItaGVscGVyLmM6NTcyOiBlcnJvcjog
-J2RzdCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCmdsaWItaGVscGVy
-LmM6NTgwOiBlcnJvcjogJ3N0cnVjdCBpb19jb250ZXh0JyBoYXMgbm8gbWVtYmVyIG5hbWVkICdj
-YicKZ2xpYi1oZWxwZXIuYzo1ODE6IGVycm9yOiAnc3RydWN0IGlvX2NvbnRleHQnIGhhcyBubyBt
-ZW1iZXIgbmFtZWQgJ2NiJwpnbGliLWhlbHBlci5jOjU4MTogZXJyb3I6ICdzdHJ1Y3QgaW9fY29u
-dGV4dCcgaGFzIG5vIG1lbWJlciBuYW1lZCAndXNlcl9kYXRhJwpnbGliLWhlbHBlci5jOiBBdCB0
-b3AgbGV2ZWw6CmdsaWItaGVscGVyLmM6NjE0OiB3YXJuaW5nOiB0eXBlIGRlZmF1bHRzIHRvICdp
-bnQnIGluIGRlY2xhcmF0aW9uIG9mICdiZGFkZHJfdCcKZ2xpYi1oZWxwZXIuYzo2MTQ6IGVycm9y
-OiBleHBlY3RlZCAnOycsICcsJyBvciAnKScgYmVmb3JlICcqJyB0b2tlbgpnbGliLWhlbHBlci5j
-OjY0ODogd2FybmluZzogdHlwZSBkZWZhdWx0cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAn
-YmRhZGRyX3QnCmdsaWItaGVscGVyLmM6NjQ4OiBlcnJvcjogZXhwZWN0ZWQgJzsnLCAnLCcgb3Ig
-JyknIGJlZm9yZSAnKicgdG9rZW4KZ2xpYi1oZWxwZXIuYzo2OTE6IHdhcm5pbmc6IHR5cGUgZGVm
-YXVsdHMgdG8gJ2ludCcgaW4gZGVjbGFyYXRpb24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5j
-OjY5MTogZXJyb3I6IGV4cGVjdGVkICc7JywgJywnIG9yICcpJyBiZWZvcmUgJyonIHRva2VuCmds
-aWItaGVscGVyLmM6NzEwOiB3YXJuaW5nOiB0eXBlIGRlZmF1bHRzIHRvICdpbnQnIGluIGRlY2xh
-cmF0aW9uIG9mICdiZGFkZHJfdCcKZ2xpYi1oZWxwZXIuYzo3MTA6IGVycm9yOiBleHBlY3RlZCAn
-OycsICcsJyBvciAnKScgYmVmb3JlICcqJyB0b2tlbgpnbGliLWhlbHBlci5jOjczNjogd2Fybmlu
-ZzogdHlwZSBkZWZhdWx0cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAnYmRhZGRyX3QnCmds
-aWItaGVscGVyLmM6NzM2OiBlcnJvcjogZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJlZm9yZSAn
-KicgdG9rZW4KZ2xpYi1oZWxwZXIuYzo3NzA6IHdhcm5pbmc6IHR5cGUgZGVmYXVsdHMgdG8gJ2lu
-dCcgaW4gZGVjbGFyYXRpb24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5jOjc3MDogZXJyb3I6
-IGV4cGVjdGVkICc7JywgJywnIG9yICcpJyBiZWZvcmUgJyonIHRva2VuCmdsaWItaGVscGVyLmM6
-ODAwOiB3YXJuaW5nOiB0eXBlIGRlZmF1bHRzIHRvICdpbnQnIGluIGRlY2xhcmF0aW9uIG9mICdi
-ZGFkZHJfdCcKZ2xpYi1oZWxwZXIuYzo4MDA6IGVycm9yOiBleHBlY3RlZCAnOycsICcsJyBvciAn
-KScgYmVmb3JlICcqJyB0b2tlbgpnbGliLWhlbHBlci5jOiBJbiBmdW5jdGlvbiAnY3JlYXRlX2lv
-X2NvbnRleHQnOgpnbGliLWhlbHBlci5jOjgzMjogZXJyb3I6ICdzdHJ1Y3QgaW9fY29udGV4dCcg
-aGFzIG5vIG1lbWJlciBuYW1lZCAnY2InCmdsaWItaGVscGVyLmM6ODMzOiBlcnJvcjogJ3N0cnVj
-dCBpb19jb250ZXh0JyBoYXMgbm8gbWVtYmVyIG5hbWVkICdyZXNvbHZlcicKZ2xpYi1oZWxwZXIu
-Yzo4MzQ6IGVycm9yOiAnc3RydWN0IGlvX2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ3Vz
-ZXJfZGF0YScKZ2xpYi1oZWxwZXIuYzogQXQgdG9wIGxldmVsOgpnbGliLWhlbHBlci5jOjg0ODog
-d2FybmluZzogdHlwZSBkZWZhdWx0cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAnYmRhZGRy
-X3QnCmdsaWItaGVscGVyLmM6ODQ4OiBlcnJvcjogZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJl
-Zm9yZSAnKicgdG9rZW4KZ2xpYi1oZWxwZXIuYzo4Njc6IHdhcm5pbmc6IHR5cGUgZGVmYXVsdHMg
-dG8gJ2ludCcgaW4gZGVjbGFyYXRpb24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5jOjg2Nzog
-ZXJyb3I6IGV4cGVjdGVkICc7JywgJywnIG9yICcpJyBiZWZvcmUgJyonIHRva2VuCmdsaWItaGVs
-cGVyLmM6ODc4OiB3YXJuaW5nOiB0eXBlIGRlZmF1bHRzIHRvICdpbnQnIGluIGRlY2xhcmF0aW9u
-IG9mICdiZGFkZHJfdCcKZ2xpYi1oZWxwZXIuYzo4Nzg6IGVycm9yOiBleHBlY3RlZCAnOycsICcs
-JyBvciAnKScgYmVmb3JlICcqJyB0b2tlbgpnbGliLWhlbHBlci5jOjg4Nzogd2FybmluZzogdHlw
-ZSBkZWZhdWx0cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAnYmRhZGRyX3QnCmdsaWItaGVs
-cGVyLmM6ODg3OiBlcnJvcjogZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJlZm9yZSAnKicgdG9r
-ZW4KZ2xpYi1oZWxwZXIuYzo5MDY6IHdhcm5pbmc6IHR5cGUgZGVmYXVsdHMgdG8gJ2ludCcgaW4g
-ZGVjbGFyYXRpb24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5jOjkwNjogZXJyb3I6IGV4cGVj
-dGVkICc7JywgJywnIG9yICcpJyBiZWZvcmUgJyonIHRva2VuCmdsaWItaGVscGVyLmM6OTI1OiB3
-YXJuaW5nOiB0eXBlIGRlZmF1bHRzIHRvICdpbnQnIGluIGRlY2xhcmF0aW9uIG9mICdiZGFkZHJf
-dCcKZ2xpYi1oZWxwZXIuYzo5MjU6IGVycm9yOiBleHBlY3RlZCAnOycsICcsJyBvciAnKScgYmVm
-b3JlICcqJyB0b2tlbgpnbGliLWhlbHBlci5jOjk0NTogd2FybmluZzogdHlwZSBkZWZhdWx0cyB0
-byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAnYmRhZGRyX3QnCmdsaWItaGVscGVyLmM6OTQ1OiBl
-cnJvcjogZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJlZm9yZSAnKicgdG9rZW4KbWFrZVsyXTog
-KioqIFtnbGliLWhlbHBlci5vXSBFcnJvciAxCm1ha2VbMl06IExlYXZpbmcgZGlyZWN0b3J5IGAv
-aG9tZS9uZXdidWlsZC9ibHVlL2JsdWV6LXV0aWxzLTMuMzIvY29tbW9uJwptYWtlWzFdOiAqKiog
-W2FsbC1yZWN1cnNpdmVdIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC9ob21l
-L25ld2J1aWxkL2JsdWUvYmx1ZXotdXRpbHMtMy4zMicKbWFrZTogKioqIFthbGxdIEVycm9yIDIK
-bGludXg6L2hvbWUvbmV3YnVpbGQvYmx1ZS9ibHVlei11dGlscy0zLjMyICMKCgo=
-------=_Part_1800_3598435.1215848804338
+--===============1596994532==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -308,7 +140,7 @@ Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
-------=_Part_1800_3598435.1215848804338
+--===============1596994532==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -319,4 +151,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-------=_Part_1800_3598435.1215848804338--
+--===============1596994532==--
