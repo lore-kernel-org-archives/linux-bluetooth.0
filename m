@@ -1,14 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <bd5b16740807110143m3e1253bct2a5e270ab4b269dd@mail.gmail.com>
-Date: Fri, 11 Jul 2008 11:43:30 +0300
-From: "Ohad Ben-Cohen" <ohad@bencohen.org>
-To: "pramod gurav" <pramod_gurav_etc@yahoo.co.in>,
-	"BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <693063.42845.qm@web8402.mail.in.yahoo.com>
+Date: Fri, 11 Jul 2008 14:09:51 +0530 (IST)
+From: pramod gurav <pramod_gurav_etc@yahoo.co.in>
+To: bluez-users@brisammon.fastmail.fm,
+	bluez-devel <bluez-devel@lists.sourceforge.net>
 MIME-Version: 1.0
-References: <693063.42845.qm@web8402.mail.in.yahoo.com>
-Cc: brflinux-devel@lists.sourceforge.net
-Subject: Re: [Bluez-devel] [PATCH] Add support for Texas Instruments' chips
+Message-ID: <254448.46514.qm@web8401.mail.in.yahoo.com>
+Subject: [Bluez-devel] brf6350 chip support
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,106 +15,64 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1143382196=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pramod,
+--===============1143382196==
+Content-Type: multipart/alternative; boundary="0-869500841-1215765591=:46514"
 
-On Fri, Jul 11, 2008 at 9:12 AM, pramod gurav
-<pramod_gurav_etc@yahoo.co.in> wrote:
-> Hi Ohad
-> Sorry to break the link.
-> I am working on arm platform. I want to configure TI's brf6350 on UART.
-> I read some of the mail on the list. I came to know that hci_ll.c provides
-> support for brf6350.
-> Is the hci lower level support in kernel enough to drive the chip?
+--0-869500841-1215765591=:46514
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Yes.
+Hi All,=0AI am working on arm platform. I want to configure TI's brf6350 bl=
+uetooth chip on UART.=0AI read some of the mail on the list. I came to know=
+ that hci_ll.c provides support for brf6350.=0ASupport for these chip is be=
+ing added to bluez hciattach.=0AIs the hci lower level support in kernel en=
+ough to drive the chip?=0AWhere would I get the brf script file for my chip=
+?=0A Thanks and Best regards=0A=0A=0APramod=0A=0A=0A=0A      Bring your gan=
+g together. Do your thing. Find your favourite Yahoo! group at http://in.pr=
+omos.yahoo.com/groups/
+--0-869500841-1215765591=:46514
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> What else I have to do at kernel side to bring UP my brf6350?
+<html><head><style type=3D"text/css"><!-- DIV {margin:0px;} --></style></he=
+ad><body><div style=3D"font-family:times new roman, new york, times, serif;=
+font-size:12pt">Hi All,<br>I am working on arm platform. I want to configur=
+e TI's brf6350 bluetooth chip on UART.<br>I read some of the mail on the li=
+st. I came to know that hci_ll.c provides support for brf6350.<br>Support f=
+or these chip is being added to bluez hciattach.<br>Is the hci lower level =
+support in kernel enough to drive the chip?<br>Where would I get the brf sc=
+ript file for my chip?<div>&nbsp;</div>Thanks and Best regards<br><br><div>=
+Pramod<div><br></div></div></div><br>=0A=0A=0A      <!--2--><hr size=3D1></=
+hr> Unlimited freedom, unlimited storage. <a href=3D"http://in.rd.yahoo.com=
+/tagline_mail_2/*http://help.yahoo.com/l/in/yahoo/mail/yahoomail/tools/tool=
+s-08.html/">Get it now</a></body></html>
+--0-869500841-1215765591=:46514--
 
-In general, if you are using 2.6.24 or higher, you don't need to do anything.
-Otherwise, you will have to patch it with the HCILL patch.
 
-That said, there are additional power management features we wrote for
-the OMAP platform (e.g., the chip can wake up the host on Bluetooth
-acitivity).
-If you're interested in those patches, take a look at
-http://brflinux.sourceforge.net/.
-
-> Where would I get the brf script file for my chip?
-
-That depends on the chip version and several decisions you should make.
-We have a dedicated mailing list for that - please write to
-brflinux-devel@lists.sourceforge.net for further assistance.
-
-(you can subscribe to the list at
-https://lists.sourceforge.net/lists/listinfo/brflinux-devel)
-
-Best Regards,
-Ohad.
-
->
-> Your response is much awaited.
-> Thanks and Best regards
->
-> Pramod
->
-> ----- Original Message ----
-> From: Marcel Holtmann <marcel@holtmann.org>
-> To: BlueZ development <bluez-devel@lists.sourceforge.net>
-> Sent: Thursday, 10 July, 2008 6:03:23 PM
-> Subject: Re: [Bluez-devel] [PATCH] Add support for Texas Instruments' chips
->
-> Hi Ohad,
->
->> > please put all the TI code into hciattach_ti.c and then I gonna apply
->> > this patch.
->>
->> I'm gonna have to put some common definitions in hciattach.h then
->> (mainly struct uart_t).
->>
->> Is that ok ?
->
-> no. Do the same as I did for hciattach_st.c
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
-> Studies have shown that voting for your favorite open source project,
-> along with a healthy diet, reduces your potential for chronic lameness
-> and boredom. Vote Now at http://www.sourceforge.net/community/cca08
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
-> ________________________________
-> From Chandigarh to Chennai - find friends all over India. Click here.
-> -------------------------------------------------------------------------
-> Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
-> Studies have shown that voting for your favorite open source project,
-> along with a healthy diet, reduces your potential for chronic lameness
-> and boredom. Vote Now at http://www.sourceforge.net/community/cca08
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
->
+--===============1143382196==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
+--===============1143382196==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1143382196==--
