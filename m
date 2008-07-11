@@ -1,11 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 Jul 2008 14:09:51 +0530 (IST)
-From: pramod gurav <pramod_gurav_etc@yahoo.co.in>
-To: bluez-users@brisammon.fastmail.fm,
-	bluez-devel <bluez-devel@lists.sourceforge.net>
+Message-ID: <bd5b16740807110138k5ba2f03fj85b7b3d261e17c9a@mail.gmail.com>
+Date: Fri, 11 Jul 2008 11:38:40 +0300
+From: "Ohad Ben-Cohen" <ohad@bencohen.org>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1215765452.9744.29.camel@californication>
 MIME-Version: 1.0
-Message-ID: <254448.46514.qm@web8401.mail.in.yahoo.com>
-Subject: [Bluez-devel] brf6350 chip support
+References: <00695C9C8F8B4448856F48142B4AA2012032A21E@dnce02.ent.ti.com>
+	<1215662827.24462.2.camel@californication>
+	<bd5b16740807092236k22c63049vad40852d61147c3f@mail.gmail.com>
+	<1215756897.9744.10.camel@californication>
+	<00695C9C8F8B4448856F48142B4AA2012032A21F@dnce02.ent.ti.com>
+	<1215765452.9744.29.camel@californication>
+Subject: Re: [Bluez-devel] [PATCH] Add support for Texas Instruments' chips
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,64 +21,51 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1143382196=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1143382196==
-Content-Type: multipart/alternative; boundary="0-869500841-1215765591=:46514"
+Hi Marcel,
 
---0-869500841-1215765591=:46514
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Jul 11, 2008 at 11:37 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> No I didn't. You sent it without any copyright note. Please check your
+> original patch.
 
-Hi All,=0AI am working on arm platform. I want to configure TI's brf6350 bl=
-uetooth chip on UART.=0AI read some of the mail on the list. I came to know=
- that hci_ll.c provides support for brf6350.=0ASupport for these chip is be=
-ing added to bluez hciattach.=0AIs the hci lower level support in kernel en=
-ough to drive the chip?=0AWhere would I get the brf script file for my chip=
-?=0A Thanks and Best regards=0A=0A=0APramod=0A=0A=0A=0A      Bring your gan=
-g together. Do your thing. Find your favourite Yahoo! group at http://in.pr=
-omos.yahoo.com/groups/
---0-869500841-1215765591=:46514
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+You are right, it was only on my second patch with the separate
+hciattach_ti.c file.
+Can you please add:
 
-<html><head><style type=3D"text/css"><!-- DIV {margin:0px;} --></style></he=
-ad><body><div style=3D"font-family:times new roman, new york, times, serif;=
-font-size:12pt">Hi All,<br>I am working on arm platform. I want to configur=
-e TI's brf6350 bluetooth chip on UART.<br>I read some of the mail on the li=
-st. I came to know that hci_ll.c provides support for brf6350.<br>Support f=
-or these chip is being added to bluez hciattach.<br>Is the hci lower level =
-support in kernel enough to drive the chip?<br>Where would I get the brf sc=
-ript file for my chip?<div>&nbsp;</div>Thanks and Best regards<br><br><div>=
-Pramod<div><br></div></div></div><br>=0A=0A=0A      <!--2--><hr size=3D1></=
-hr> Unlimited freedom, unlimited storage. <a href=3D"http://in.rd.yahoo.com=
-/tagline_mail_2/*http://help.yahoo.com/l/in/yahoo/mail/yahoomail/tools/tool=
-s-08.html/">Get it now</a></body></html>
---0-869500841-1215765591=:46514--
+Copyright (C) 2007-2008  Texas Instruments, Inc.
 
+to the hciattach_ti.c file ?
 
---===============1143382196==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Thanks,
+Ohad.
+
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
+> Studies have shown that voting for your favorite open source project,
+> along with a healthy diet, reduces your potential for chronic lameness
+> and boredom. Vote Now at http://www.sourceforge.net/community/cca08
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
---===============1143382196==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1143382196==--
