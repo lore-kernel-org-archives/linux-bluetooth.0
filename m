@@ -1,13 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Heston James - Cold Beans" <heston.james@coldbeans.co.uk>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-References: <486BD582.9050004@aircable.net>	<1215757212.9744.13.camel@californication>	<00de01c8e32e$213a9fb0$63afdf10$@james@coldbeans.co.uk>
-	<1215765115.9744.24.camel@californication>
-In-Reply-To: <1215765115.9744.24.camel@californication>
-Date: Fri, 11 Jul 2008 09:34:35 +0100
-Message-ID: <00e201c8e330$f9f3d0e0$eddb72a0$@james@coldbeans.co.uk>
-MIME-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] CreateBonding while periodic scanning
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <00695C9C8F8B4448856F48142B4AA2012032A21F@dnce02.ent.ti.com>
+References: <00695C9C8F8B4448856F48142B4AA2012032A21E@dnce02.ent.ti.com>
+	<1215662827.24462.2.camel@californication>
+	<bd5b16740807092236k22c63049vad40852d61147c3f@mail.gmail.com>
+	, <1215756897.9744.10.camel@californication>
+	<00695C9C8F8B4448856F48142B4AA2012032A21F@dnce02.ent.ti.com>
+Date: Fri, 11 Jul 2008 10:37:32 +0200
+Message-Id: <1215765452.9744.29.camel@californication>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [PATCH] Add support for Texas Instruments' chips
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,23 +24,24 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Ohad,
 
-> with the normal inquiry it is this way. You have to cancel that before
-> you can do anything else. Nothing you can do about it. The periodic
-> inquiry is special since it is meant to cancel itself on connection
-> attempts and then automatically resume.
+> > I did the hard work and put this into CVS as I see it should be done.
+> > Please double check if that is working for you.
+> 
+> It is.
 
-Ok, that's fair enough, at least I know what the score is now. Periodic
-sounds like my best solution then.
+good.
 
-> I applied that patch and it will be in bluez-utils-3.36 release.
+> One note: you took away TI's Copyright line and I don't think lawyers here will like that. Can you please add it back ?
 
-Excellent stuff.
+No I didn't. You sent it without any copyright note. Please check your
+original patch.
 
-Cheers Marcel,
+Regards
 
-Heston
+Marcel
+
 
 
 -------------------------------------------------------------------------
