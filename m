@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <b5c34db00807140342x40baaa59w593b512ab4964d59@mail.gmail.com>
-Date: Mon, 14 Jul 2008 16:12:51 +0530
+Message-ID: <b5c34db00807120046x59487a57m4df465e34de32574@mail.gmail.com>
+Date: Sat, 12 Jul 2008 13:16:44 +0530
 From: umeshyv <umeshyv@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] bluetooth compilation version3.36 -regarding
+Content-Type: multipart/mixed;
+	boundary="----=_Part_1800_3598435.1215848804338"
+Subject: [Bluez-users] bluetooth compilation and usage regarding
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,184 +16,288 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1882343340=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1882343340==
+------=_Part_1800_3598435.1215848804338
 Content-Type: multipart/alternative;
-	boundary="----=_Part_61409_21860202.1216032171750"
+	boundary="----=_Part_1801_13056230.1215848804339"
 
-------=_Part_61409_21860202.1216032171750
+------=_Part_1801_13056230.1215848804339
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
 Hi to all,
-I started compiling bluetooth libs and utils version 3.36 ,I followed the
-earlier methods but following are the errors,please rectify me where I am
-going wrong and for version 3.32 I submitted the compilation errors and I am
-stuck up with it.
 
-Compiling Bluetooth libraries
+I am trying to compile 3.32  version of bluetooth .Still locked with
+errors.I attached what I have done please check it and explain where I am
+doing wrong.I want to cross compile it to mips and i need to achieve file
+transfer from my mobile to target board(mips32 architecture) and remote
+desktop access from k750i mobile.waiting for valuable suggestions.
 
->Apply Buildroot or Toolchain Path
->./configure --host=mipsel-linux --prefix=/usr --enable-shared=no
---enable-static=yes
->make
->make install DESTDIR=/home/newbuild/blue/bluez-libs-3.36/install
-
-Compiling Bluetooth Utils
-
-linux:/home/newbuild/blue/bluez-utils-3.36 # export BLUEZ_CFLAGS=-I
-/home/newbuild/blue/bluez-libs-3.32/install/usr/include
-linux:/home/newbuild/blue/bluez-utils-3.36 # export
-BLUEZ_LIBS="-L/home/newbuild/blue/bluez-libs-3.32/install/usr/lib
--lbluetooth"
-linux:/home/newbuild/blue/bluez-utils-3.36 # ./configure --host=mipsel-linux
---with-bluez=/home/newbuild/blue/bluez-libs-3.36/install/usr/
-CPPFLAGS="-D__KERNEL__"
-After configuration
-configure: WARNING: If you wanted to set the --build type, don't use --host.
-    If a cross compiler is detected then cross compile mode will be used.
-checking for a BSD-compatible install... /usr/bin/install -c
-checking whether build environment is sane... yes
-checking for a thread-safe mkdir -p... /bin/mkdir -p
-checking for gawk... gawk
-checking whether make sets $(MAKE)... yes
-checking for mipsel-linux-strip... mipsel-linux-strip
-checking whether to enable maintainer-specific portions of Makefiles... no
-checking for mipsel-linux-gcc... mipsel-linux-gcc
-checking for C compiler default output file name... a.out
-checking whether the C compiler works... yes
-checking whether we are cross compiling... yes
-checking for suffix of executables...
-checking for suffix of object files... o
-checking whether we are using the GNU C compiler... yes
-checking whether mipsel-linux-gcc accepts -g... yes
-checking for mipsel-linux-gcc option to accept ISO C89... none needed
-checking for style of include used by make... GNU
-checking dependency style of mipsel-linux-gcc... gcc3
-checking whether mipsel-linux-gcc accepts -fPIE... yes
-checking for a BSD-compatible install... /usr/bin/install -c
-checking for bison... bison -y
-checking for flex... flex
-checking lex output file root... lex.yy
-checking lex library... none needed
-checking whether yytext is a pointer... no
-checking build system type... i686-pc-linux-gnu
-checking host system type... mipsel-unknown-linux-gnu
-checking for a sed that does not truncate output... /usr/bin/sed
-checking for grep that handles long lines and -e... /usr/bin/grep
-checking for egrep... /usr/bin/grep -E
-checking for ld used by mipsel-linux-gcc...
-/home/newbuild/buildroot/build_mipsel/staging_dir/mipsel-linux-uclibc/bin/ld
-checking if the linker
-(/home/newbuild/buildroot/build_mipsel/staging_dir/mipsel-linux-uclibc/bin/ld)
-is GNU ld... yes
-checking for
-/home/newbuild/buildroot/build_mipsel/staging_dir/mipsel-linux-uclibc/bin/ld
-option to reload object files... -r
-checking for BSD-compatible nm...
-/home/newbuild/buildroot/build_mipsel/staging_dir/bin/mipsel-linux-nm -B
-checking whether ln -s works... yes
-checking how to recognize dependent libraries... pass_all
-checking how to run the C preprocessor... mipsel-linux-gcc -E
-checking for ANSI C header files... yes
-checking for sys/types.h... yes
-checking for sys/stat.h... yes
-checking for stdlib.h... yes
-checking for string.h... yes
-checking for memory.h... yes
-checking for strings.h... yes
-checking for inttypes.h... yes
-checking for stdint.h... yes
-checking for unistd.h... yes
-checking dlfcn.h usability... yes
-checking dlfcn.h presence... yes
-checking for dlfcn.h... yes
-checking the maximum length of command line arguments... 98304
-checking command to parse
-/home/newbuild/buildroot/build_mipsel/staging_dir/bin/mipsel-linux-nm -B
-output from mipsel-linux-gcc object... ok
-checking for objdir... .libs
-checking for mipsel-linux-ar... mipsel-linux-ar
-checking for mipsel-linux-ranlib... mipsel-linux-ranlib
-checking for mipsel-linux-strip... (cached) mipsel-linux-strip
-checking if mipsel-linux-gcc supports -fno-rtti -fno-exceptions... no
-checking for mipsel-linux-gcc option to produce PIC... -fPIC
-checking if mipsel-linux-gcc PIC flag -fPIC works... yes
-checking if mipsel-linux-gcc static flag -static works... yes
-checking if mipsel-linux-gcc supports -c -o file.o... yes
-checking whether the mipsel-linux-gcc linker
-(/home/newbuild/buildroot/build_mipsel/staging_dir/mipsel-linux-uclibc/bin/ld)
-supports shared libraries... yes
-checking whether -lc should be explicitly linked in... no
-checking dynamic linker characteristics... GNU/Linux ld.so
-checking how to hardcode library paths into programs... immediate
-checking whether stripping libraries is possible... yes
-checking if libtool supports shared libraries... yes
-checking whether to build shared libraries... yes
-checking whether to build static libraries... no
-configure: creating libtool
-checking for ppoll... yes
-checking for mipsel-linux-pkg-config... no
-checking for pkg-config... /usr/bin/pkg-config
-configure: WARNING: In the future, Autoconf will not detect cross-tools
-whose name does not start with the host triplet.  If you think this
-configuration is useful to you, please write to autoconf@gnu.org.
-checking pkg-config is at least version 0.9.0... yes
-checking for BLUEZ... yes
-checking for GLIB... no
-checking for GMODULE... no
-checking for dlopen in -ldl... yes
-checking for DBUS... no
-configure: error: D-Bus library is required
-
-linux:/home/newbuild/blue/bluez-utils-3.32 # make
-
-linux:/home/newbuild/blue/bluez-utils-3.36 # make
-make: *** No targets specified and no makefile found.  Stop.
-
-Waiting for valuable suggestions
-
-Thanks & Regards
+Regards
 Umesh
 
-------=_Part_61409_21860202.1216032171750
+------=_Part_1801_13056230.1215848804339
 Content-Type: text/html; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
 
-Hi to all,<br>I started compiling bluetooth libs and utils version 3.36 ,I followed the earlier methods but following are the errors,please rectify me where I am going wrong and for version 3.32 I submitted the compilation errors and I am stuck up with it.<br>
-<br>Compiling Bluetooth libraries<br><br>&gt;Apply Buildroot or Toolchain Path<br>&gt;./configure --host=mipsel-linux --prefix=/usr --enable-shared=no --enable-static=yes<br>&gt;make<br>&gt;make install DESTDIR=/home/newbuild/blue/bluez-libs-3.36/install<br>
-<br>Compiling Bluetooth Utils<br><br>linux:/home/newbuild/blue/bluez-utils-3.36 # export BLUEZ_CFLAGS=-I /home/newbuild/blue/bluez-libs-3.32/install/usr/include<br>linux:/home/newbuild/blue/bluez-utils-3.36 # export BLUEZ_LIBS=&quot;-L/home/newbuild/blue/bluez-libs-3.32/install/usr/lib -lbluetooth&quot;<br>
-linux:/home/newbuild/blue/bluez-utils-3.36 # ./configure --host=mipsel-linux --with-bluez=/home/newbuild/blue/bluez-libs-3.36/install/usr/ CPPFLAGS=&quot;-D__KERNEL__&quot;<br>After configuration <br>configure: WARNING: If you wanted to set the --build type, don&#39;t use --host.<br>
-&nbsp;&nbsp;&nbsp; If a cross compiler is detected then cross compile mode will be used.<br>checking for a BSD-compatible install... /usr/bin/install -c<br>checking whether build environment is sane... yes<br>checking for a thread-safe mkdir -p... /bin/mkdir -p<br>
-checking for gawk... gawk<br>checking whether make sets $(MAKE)... yes<br>checking for mipsel-linux-strip... mipsel-linux-strip<br>checking whether to enable maintainer-specific portions of Makefiles... no<br>checking for mipsel-linux-gcc... mipsel-linux-gcc<br>
-checking for C compiler default output file name... a.out<br>checking whether the C compiler works... yes<br>checking whether we are cross compiling... yes<br>checking for suffix of executables...<br>checking for suffix of object files... o<br>
-checking whether we are using the GNU C compiler... yes<br>checking whether mipsel-linux-gcc accepts -g... yes<br>checking for mipsel-linux-gcc option to accept ISO C89... none needed<br>checking for style of include used by make... GNU<br>
-checking dependency style of mipsel-linux-gcc... gcc3<br>checking whether mipsel-linux-gcc accepts -fPIE... yes<br>checking for a BSD-compatible install... /usr/bin/install -c<br>checking for bison... bison -y<br>checking for flex... flex<br>
-checking lex output file root... lex.yy<br>checking lex library... none needed<br>checking whether yytext is a pointer... no<br>checking build system type... i686-pc-linux-gnu<br>checking host system type... mipsel-unknown-linux-gnu<br>
-checking for a sed that does not truncate output... /usr/bin/sed<br>checking for grep that handles long lines and -e... /usr/bin/grep<br>checking for egrep... /usr/bin/grep -E<br>checking for ld used by mipsel-linux-gcc... /home/newbuild/buildroot/build_mipsel/staging_dir/mipsel-linux-uclibc/bin/ld<br>
-checking if the linker (/home/newbuild/buildroot/build_mipsel/staging_dir/mipsel-linux-uclibc/bin/ld) is GNU ld... yes<br>checking for /home/newbuild/buildroot/build_mipsel/staging_dir/mipsel-linux-uclibc/bin/ld option to reload object files... -r<br>
-checking for BSD-compatible nm... /home/newbuild/buildroot/build_mipsel/staging_dir/bin/mipsel-linux-nm -B<br>checking whether ln -s works... yes<br>checking how to recognize dependent libraries... pass_all<br>checking how to run the C preprocessor... mipsel-linux-gcc -E<br>
-checking for ANSI C header files... yes<br>checking for sys/types.h... yes<br>checking for sys/stat.h... yes<br>checking for stdlib.h... yes<br>checking for string.h... yes<br>checking for memory.h... yes<br>checking for strings.h... yes<br>
-checking for inttypes.h... yes<br>checking for stdint.h... yes<br>checking for unistd.h... yes<br>checking dlfcn.h usability... yes<br>checking dlfcn.h presence... yes<br>checking for dlfcn.h... yes<br>checking the maximum length of command line arguments... 98304<br>
-checking command to parse /home/newbuild/buildroot/build_mipsel/staging_dir/bin/mipsel-linux-nm -B output from mipsel-linux-gcc object... ok<br>checking for objdir... .libs<br>checking for mipsel-linux-ar... mipsel-linux-ar<br>
-checking for mipsel-linux-ranlib... mipsel-linux-ranlib<br>checking for mipsel-linux-strip... (cached) mipsel-linux-strip<br>checking if mipsel-linux-gcc supports -fno-rtti -fno-exceptions... no<br>checking for mipsel-linux-gcc option to produce PIC... -fPIC<br>
-checking if mipsel-linux-gcc PIC flag -fPIC works... yes<br>checking if mipsel-linux-gcc static flag -static works... yes<br>checking if mipsel-linux-gcc supports -c -o file.o... yes<br>checking whether the mipsel-linux-gcc linker (/home/newbuild/buildroot/build_mipsel/staging_dir/mipsel-linux-uclibc/bin/ld) supports shared libraries... yes<br>
-checking whether -lc should be explicitly linked in... no<br>checking dynamic linker characteristics... GNU/Linux ld.so<br>checking how to hardcode library paths into programs... immediate<br>checking whether stripping libraries is possible... yes<br>
-checking if libtool supports shared libraries... yes<br>checking whether to build shared libraries... yes<br>checking whether to build static libraries... no<br>configure: creating libtool<br>checking for ppoll... yes<br>
-checking for mipsel-linux-pkg-config... no<br>checking for pkg-config... /usr/bin/pkg-config<br>configure: WARNING: In the future, Autoconf will not detect cross-tools<br>whose name does not start with the host triplet.&nbsp; If you think this<br>
-configuration is useful to you, please write to <a href="mailto:autoconf@gnu.org">autoconf@gnu.org</a>.<br>checking pkg-config is at least version <a href="http://0.9.0.">0.9.0.</a>.. yes<br>checking for BLUEZ... yes<br>checking for GLIB... no<br>
-checking for GMODULE... no<br>checking for dlopen in -ldl... yes<br>checking for DBUS... no<br>configure: error: D-Bus library is required<br><br>linux:/home/newbuild/blue/bluez-utils-3.32 # make<br><br>linux:/home/newbuild/blue/bluez-utils-3.36 # make<br>
-make: *** No targets specified and no makefile found.&nbsp; Stop.<br><br>Waiting for valuable suggestions<br><br>Thanks &amp; Regards<br>Umesh<br>
+Hi to all,<br><br>I am trying to compile 3.32&nbsp; version of bluetooth .Still locked with
+errors.I attached what I have done please check it and explain where I
+am doing wrong.I want to cross compile it to mips and i need to achieve file transfer from my mobile to target board(mips32 architecture) and remote desktop access from k750i mobile.waiting for valuable suggestions.<br><br>
+Regards<br>Umesh<br>
 
-------=_Part_61409_21860202.1216032171750--
+------=_Part_1801_13056230.1215848804339--
 
+------=_Part_1800_3598435.1215848804338
+Content-Type: text/plain; name=bluetooth1.txt
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fijwusx00
+Content-Disposition: attachment; filename=bluetooth1.txt
 
---===============1882343340==
+Q29tcGlsaW5nIEJsdWV0b290aCBsaWJyYXJpZXMKCj5BcHBseSBCdWlsZHJvb3Qgb3IgVG9vbGNo
+YWluIFBhdGgKPi4vY29uZmlndXJlIC0taG9zdD1taXBzZWwtbGludXggLS1wcmVmaXg9L3VzciAt
+LWVuYWJsZS1zaGFyZWQ9bm8gLS1lbmFibGUtc3RhdGljPXllcwo+bWFrZQo+bWFrZSBpbnN0YWxs
+IERFU1RESVI9L2hvbWUvbmV3YnVpbGQvYmx1ZS9ibHVlei1saWJzLTMuMzIvaW5zdGFsbAoKQ29t
+cGlsaW5nIEJsdWV0b290aCBVdGlscwoKbGludXg6L2hvbWUvbmV3YnVpbGQvYmx1ZS9ibHVlei11
+dGlscy0zLjMyICMgZXhwb3J0IEJMVUVaX0NGTEFHUz0tSSAvaG9tZS9uZXdidWlsZC9ibHVlL2Js
+dWV6LWxpYnMtMy4zMi9pbnN0YWxsL3Vzci9pbmNsdWRlCmxpbnV4Oi9ob21lL25ld2J1aWxkL2Js
+dWUvYmx1ZXotdXRpbHMtMy4zMiAjIGV4cG9ydCBCTFVFWl9MSUJTPSItTC9ob21lL25ld2J1aWxk
+L2JsdWUvYmx1ZXotbGlicy0zLjMyL2luc3RhbGwvdXNyL2xpYiAtbGJsdWV0b290aCIKbGludXg6
+L2hvbWUvbmV3YnVpbGQvYmx1ZS9ibHVlei11dGlscy0zLjMyICMgLi9jb25maWd1cmUgLS1ob3N0
+PW1pcHNlbC1saW51eCAtLXdpdGgtYmx1ZXo9L2hvbWUvbmV3YnVpbGQvYmx1ZS9ibHVlei1saWJz
+LTMuMzIvaW5zdGFsbC91c3IvIENQUEZMQUdTPSItRF9fS0VSTkVMX18iCmxpbnV4Oi9ob21lL25l
+d2J1aWxkL2JsdWUvYmx1ZXotdXRpbHMtMy4zMiAjIG1ha2UKbWlwc2VsLWxpbnV4LWdjYyAtREhB
+VkVfQ09ORklHX0ggLUkuIC1JLi4gICAtRF9fS0VSTkVMX18gLUkvdXNyL2xvY2FsL2luY2x1ZGUv
+ZGJ1cy0xLjAgLUkvdXNyL2xvY2FsL2xpYi9kYnVzLTEuMC9pbmNsdWRlICAgLUkuLi9lZ2xpYiAt
+SS4uL2dkYnVzIC1XYWxsIC1PMiAtRF9GT1JUSUZZX1NPVVJDRT0yIC1NVCBnbGliLWhlbHBlci5v
+IC1NRCAtTVAgLU1GIC5kZXBzL2dsaWItaGVscGVyLlRwbyAtYyAtbyBnbGliLWhlbHBlci5vIGds
+aWItaGVscGVyLmMKZ2xpYi1oZWxwZXIuYzozNTozMzogZXJyb3I6IGJsdWV0b290aC9ibHVldG9v
+dGguaDogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQpnbGliLWhlbHBlci5jOjM2OjMwOiBlcnJv
+cjogYmx1ZXRvb3RoL3JmY29tbS5oOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CmdsaWItaGVs
+cGVyLmM6Mzc6Mjk6IGVycm9yOiBibHVldG9vdGgvbDJjYXAuaDogTm8gc3VjaCBmaWxlIG9yIGRp
+cmVjdG9yeQpnbGliLWhlbHBlci5jOjM4OjI3OiBlcnJvcjogYmx1ZXRvb3RoL3Njby5oOiBObyBz
+dWNoIGZpbGUgb3IgZGlyZWN0b3J5CmdsaWItaGVscGVyLmM6Mzk6Mjc6IGVycm9yOiBibHVldG9v
+dGgvc2RwLmg6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKZ2xpYi1oZWxwZXIuYzo0MDozMTog
+ZXJyb3I6IGJsdWV0b290aC9zZHBfbGliLmg6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKSW4g
+ZmlsZSBpbmNsdWRlZCBmcm9tIGdsaWItaGVscGVyLmM6NDQ6CmdsaWItaGVscGVyLmg6MjY6IHdh
+cm5pbmc6IHR5cGUgZGVmYXVsdHMgdG8gJ2ludCcgaW4gZGVjbGFyYXRpb24gb2YgJ2JkYWRkcl90
+JwpnbGliLWhlbHBlci5oOjI2OiBlcnJvcjogZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJlZm9y
+ZSAnKicgdG9rZW4KZ2xpYi1oZWxwZXIuaDoyODogZXJyb3I6IGV4cGVjdGVkICcpJyBiZWZvcmUg
+JyonIHRva2VuCmdsaWItaGVscGVyLmg6MzE6IHdhcm5pbmc6IHR5cGUgZGVmYXVsdHMgdG8gJ2lu
+dCcgaW4gZGVjbGFyYXRpb24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5oOjMxOiBlcnJvcjog
+ZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJlZm9yZSAnKicgdG9rZW4KZ2xpYi1oZWxwZXIuaDoz
+NDogd2FybmluZzogdHlwZSBkZWZhdWx0cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAnYmRh
+ZGRyX3QnCmdsaWItaGVscGVyLmg6MzQ6IGVycm9yOiBleHBlY3RlZCAnOycsICcsJyBvciAnKScg
+YmVmb3JlICcqJyB0b2tlbgpnbGliLWhlbHBlci5oOjM4OiBlcnJvcjogZXhwZWN0ZWQgJyknIGJl
+Zm9yZSAnKicgdG9rZW4KZ2xpYi1oZWxwZXIuaDozOTogZXJyb3I6IGV4cGVjdGVkICcpJyBiZWZv
+cmUgJyonIHRva2VuCmdsaWItaGVscGVyLmg6NDM6IHdhcm5pbmc6IHR5cGUgZGVmYXVsdHMgdG8g
+J2ludCcgaW4gZGVjbGFyYXRpb24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5oOjQzOiBlcnJv
+cjogZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJlZm9yZSAnKicgdG9rZW4KZ2xpYi1oZWxwZXIu
+aDo0NTogd2FybmluZzogdHlwZSBkZWZhdWx0cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAn
+YmRhZGRyX3QnCmdsaWItaGVscGVyLmg6NDU6IGVycm9yOiBleHBlY3RlZCAnOycsICcsJyBvciAn
+KScgYmVmb3JlICcqJyB0b2tlbgpnbGliLWhlbHBlci5oOjQ3OiB3YXJuaW5nOiB0eXBlIGRlZmF1
+bHRzIHRvICdpbnQnIGluIGRlY2xhcmF0aW9uIG9mICdiZGFkZHJfdCcKZ2xpYi1oZWxwZXIuaDo0
+NzogZXJyb3I6IGV4cGVjdGVkICc7JywgJywnIG9yICcpJyBiZWZvcmUgJyonIHRva2VuCmdsaWIt
+aGVscGVyLmg6NTA6IHdhcm5pbmc6IHR5cGUgZGVmYXVsdHMgdG8gJ2ludCcgaW4gZGVjbGFyYXRp
+b24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5oOjUwOiBlcnJvcjogZXhwZWN0ZWQgJzsnLCAn
+LCcgb3IgJyknIGJlZm9yZSAnKicgdG9rZW4KZ2xpYi1oZWxwZXIuaDo1Mjogd2FybmluZzogdHlw
+ZSBkZWZhdWx0cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAnYmRhZGRyX3QnCmdsaWItaGVs
+cGVyLmg6NTI6IGVycm9yOiBleHBlY3RlZCAnOycsICcsJyBvciAnKScgYmVmb3JlICcqJyB0b2tl
+bgpnbGliLWhlbHBlci5oOjU1OiB3YXJuaW5nOiB0eXBlIGRlZmF1bHRzIHRvICdpbnQnIGluIGRl
+Y2xhcmF0aW9uIG9mICdiZGFkZHJfdCcKZ2xpYi1oZWxwZXIuaDo1NTogZXJyb3I6IGV4cGVjdGVk
+ICc7JywgJywnIG9yICcpJyBiZWZvcmUgJyonIHRva2VuCmdsaWItaGVscGVyLmM6NDY6IGVycm9y
+OiBleHBlY3RlZCBkZWNsYXJhdGlvbiBzcGVjaWZpZXJzIG9yICcuLi4nIGJlZm9yZSAnYmRhZGRy
+X3QnCmdsaWItaGVscGVyLmM6NDY6IGVycm9yOiBleHBlY3RlZCBkZWNsYXJhdGlvbiBzcGVjaWZp
+ZXJzIG9yICcuLi4nIGJlZm9yZSAnYmRhZGRyX3QnCmdsaWItaGVscGVyLmM6NzA6IGVycm9yOiBl
+eHBlY3RlZCBzcGVjaWZpZXItcXVhbGlmaWVyLWxpc3QgYmVmb3JlICdidF9pb19jYWxsYmFja190
+JwpnbGliLWhlbHBlci5jOjc2OiBlcnJvcjogZXhwZWN0ZWQgc3BlY2lmaWVyLXF1YWxpZmllci1s
+aXN0IGJlZm9yZSAnYmRhZGRyX3QnCmdsaWItaGVscGVyLmM6IEluIGZ1bmN0aW9uICdzZWFyY2hf
+Y29udGV4dF9jbGVhbnVwJzoKZ2xpYi1oZWxwZXIuYzo4NzogZXJyb3I6ICdzdHJ1Y3Qgc2VhcmNo
+X2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ2Rlc3Ryb3knCmdsaWItaGVscGVyLmM6ODg6
+IGVycm9yOiAnc3RydWN0IHNlYXJjaF9jb250ZXh0JyBoYXMgbm8gbWVtYmVyIG5hbWVkICdkZXN0
+cm95JwpnbGliLWhlbHBlci5jOjg4OiBlcnJvcjogJ3N0cnVjdCBzZWFyY2hfY29udGV4dCcgaGFz
+IG5vIG1lbWJlciBuYW1lZCAndXNlcl9kYXRhJwpnbGliLWhlbHBlci5jOiBJbiBmdW5jdGlvbiAn
+c2VhcmNoX2NvbXBsZXRlZF9jYic6CmdsaWItaGVscGVyLmM6OTY6IGVycm9yOiAnc2RwX2xpc3Rf
+dCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCmdsaWItaGVscGVyLmM6
+OTY6IGVycm9yOiAoRWFjaCB1bmRlY2xhcmVkIGlkZW50aWZpZXIgaXMgcmVwb3J0ZWQgb25seSBv
+bmNlCmdsaWItaGVscGVyLmM6OTY6IGVycm9yOiBmb3IgZWFjaCBmdW5jdGlvbiBpdCBhcHBlYXJz
+IGluLikKZ2xpYi1oZWxwZXIuYzo5NjogZXJyb3I6ICdyZWNzJyB1bmRlY2xhcmVkIChmaXJzdCB1
+c2UgaW4gdGhpcyBmdW5jdGlvbikKZ2xpYi1oZWxwZXIuYzoxMDE6IGVycm9yOiAnU0RQX1NWQ19T
+RUFSQ0hfQVRUUl9SU1AnIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQpn
+bGliLWhlbHBlci5jOjEwNjogd2FybmluZzogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rp
+b24gJ3NkcF9leHRyYWN0X3NlcXR5cGUnCmdsaWItaGVscGVyLmM6MTEyOiBlcnJvcjogJ3NkcF9y
+ZWNvcmRfdCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCmdsaWItaGVs
+cGVyLmM6MTEyOiBlcnJvcjogJ3JlYycgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVu
+Y3Rpb24pCmdsaWItaGVscGVyLmM6MTE2OiB3YXJuaW5nOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBv
+ZiBmdW5jdGlvbiAnc2RwX2V4dHJhY3RfcGR1JwpnbGliLWhlbHBlci5jOjEyMTogd2FybmluZzog
+aW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ3NkcF9yZWNvcmRfZnJlZScKZ2xpYi1o
+ZWxwZXIuYzoxMjg6IHdhcm5pbmc6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdz
+ZHBfbGlzdF9hcHBlbmQnCmdsaWItaGVscGVyLmM6MTMyOiB3YXJuaW5nOiBpbXBsaWNpdCBkZWNs
+YXJhdGlvbiBvZiBmdW5jdGlvbiAnc2RwX2Nsb3NlJwpnbGliLWhlbHBlci5jOjEzMjogZXJyb3I6
+ICdzdHJ1Y3Qgc2VhcmNoX2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ3Nlc3Npb24nCmds
+aWItaGVscGVyLmM6MTMzOiBlcnJvcjogJ3N0cnVjdCBzZWFyY2hfY29udGV4dCcgaGFzIG5vIG1l
+bWJlciBuYW1lZCAnY2InCmdsaWItaGVscGVyLmM6MTM0OiBlcnJvcjogJ3N0cnVjdCBzZWFyY2hf
+Y29udGV4dCcgaGFzIG5vIG1lbWJlciBuYW1lZCAnY2InCmdsaWItaGVscGVyLmM6MTM0OiBlcnJv
+cjogJ3N0cnVjdCBzZWFyY2hfY29udGV4dCcgaGFzIG5vIG1lbWJlciBuYW1lZCAndXNlcl9kYXRh
+JwpnbGliLWhlbHBlci5jOiBJbiBmdW5jdGlvbiAnc2VhcmNoX3Byb2Nlc3NfY2InOgpnbGliLWhl
+bHBlci5jOjE0OTogd2FybmluZzogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ3Nk
+cF9wcm9jZXNzJwpnbGliLWhlbHBlci5jOjE0OTogZXJyb3I6ICdzdHJ1Y3Qgc2VhcmNoX2NvbnRl
+eHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ3Nlc3Npb24nCmdsaWItaGVscGVyLmM6MTU2OiBlcnJv
+cjogJ3N0cnVjdCBzZWFyY2hfY29udGV4dCcgaGFzIG5vIG1lbWJlciBuYW1lZCAnc2Vzc2lvbicK
+Z2xpYi1oZWxwZXIuYzoxNTc6IGVycm9yOiAnc3RydWN0IHNlYXJjaF9jb250ZXh0JyBoYXMgbm8g
+bWVtYmVyIG5hbWVkICdjYicKZ2xpYi1oZWxwZXIuYzoxNTg6IGVycm9yOiAnc3RydWN0IHNlYXJj
+aF9jb250ZXh0JyBoYXMgbm8gbWVtYmVyIG5hbWVkICdjYicKZ2xpYi1oZWxwZXIuYzoxNTg6IGVy
+cm9yOiAnc3RydWN0IHNlYXJjaF9jb250ZXh0JyBoYXMgbm8gbWVtYmVyIG5hbWVkICd1c2VyX2Rh
+dGEnCmdsaWItaGVscGVyLmM6IEluIGZ1bmN0aW9uICdjb25uZWN0X3dhdGNoJzoKZ2xpYi1oZWxw
+ZXIuYzoxNjg6IGVycm9yOiAnc2RwX2xpc3RfdCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRo
+aXMgZnVuY3Rpb24pCmdsaWItaGVscGVyLmM6MTY4OiBlcnJvcjogJ3NlYXJjaCcgdW5kZWNsYXJl
+ZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCmdsaWItaGVscGVyLmM6MTY4OiBlcnJvcjog
+J2F0dHJpZHMnIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQpnbGliLWhl
+bHBlci5jOjE2ODogd2FybmluZzogbGVmdC1oYW5kIG9wZXJhbmQgb2YgY29tbWEgZXhwcmVzc2lv
+biBoYXMgbm8gZWZmZWN0CmdsaWItaGVscGVyLmM6MTg0OiB3YXJuaW5nOiBpbXBsaWNpdCBkZWNs
+YXJhdGlvbiBvZiBmdW5jdGlvbiAnc2RwX3NldF9ub3RpZnknCmdsaWItaGVscGVyLmM6MTg0OiBl
+cnJvcjogJ3N0cnVjdCBzZWFyY2hfY29udGV4dCcgaGFzIG5vIG1lbWJlciBuYW1lZCAnc2Vzc2lv
+bicKZ2xpYi1oZWxwZXIuYzoxODk6IGVycm9yOiAnc3RydWN0IHNlYXJjaF9jb250ZXh0JyBoYXMg
+bm8gbWVtYmVyIG5hbWVkICd1dWlkJwpnbGliLWhlbHBlci5jOjE5MTogd2FybmluZzogaW1wbGlj
+aXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ3NkcF9zZXJ2aWNlX3NlYXJjaF9hdHRyX2FzeW5j
+JwpnbGliLWhlbHBlci5jOjE5MTogZXJyb3I6ICdzdHJ1Y3Qgc2VhcmNoX2NvbnRleHQnIGhhcyBu
+byBtZW1iZXIgbmFtZWQgJ3Nlc3Npb24nCmdsaWItaGVscGVyLmM6MTkyOiBlcnJvcjogJ1NEUF9B
+VFRSX1JFUV9SQU5HRScgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCmds
+aWItaGVscGVyLmM6MTkzOiB3YXJuaW5nOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlv
+biAnc2RwX2xpc3RfZnJlZScKZ2xpYi1oZWxwZXIuYzoyMDg6IGVycm9yOiAnc3RydWN0IHNlYXJj
+aF9jb250ZXh0JyBoYXMgbm8gbWVtYmVyIG5hbWVkICdzZXNzaW9uJwpnbGliLWhlbHBlci5jOjIw
+OTogZXJyb3I6ICdzdHJ1Y3Qgc2VhcmNoX2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ2Ni
+JwpnbGliLWhlbHBlci5jOjIxMDogZXJyb3I6ICdzdHJ1Y3Qgc2VhcmNoX2NvbnRleHQnIGhhcyBu
+byBtZW1iZXIgbmFtZWQgJ2NiJwpnbGliLWhlbHBlci5jOjIxMDogZXJyb3I6ICdzdHJ1Y3Qgc2Vh
+cmNoX2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ3VzZXJfZGF0YScKZ2xpYi1oZWxwZXIu
+YzogQXQgdG9wIGxldmVsOgpnbGliLWhlbHBlci5jOjIxNzogd2FybmluZzogdHlwZSBkZWZhdWx0
+cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAnYmRhZGRyX3QnCmdsaWItaGVscGVyLmM6MjE3
+OiBlcnJvcjogZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJlZm9yZSAnKicgdG9rZW4KZ2xpYi1o
+ZWxwZXIuYzoyNDk6IHdhcm5pbmc6IHR5cGUgZGVmYXVsdHMgdG8gJ2ludCcgaW4gZGVjbGFyYXRp
+b24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5jOjI0OTogZXJyb3I6IGV4cGVjdGVkICc7Jywg
+JywnIG9yICcpJyBiZWZvcmUgJyonIHRva2VuCmdsaWItaGVscGVyLmM6MjcwOiB3YXJuaW5nOiB0
+eXBlIGRlZmF1bHRzIHRvICdpbnQnIGluIGRlY2xhcmF0aW9uIG9mICdiZGFkZHJfdCcKZ2xpYi1o
+ZWxwZXIuYzoyNzA6IGVycm9yOiBleHBlY3RlZCAnOycsICcsJyBvciAnKScgYmVmb3JlICcqJyB0
+b2tlbgpnbGliLWhlbHBlci5jOjI4MDogZXJyb3I6IGV4cGVjdGVkICcpJyBiZWZvcmUgJyonIHRv
+a2VuCmdsaWItaGVscGVyLmM6MzI4OiBlcnJvcjogZXhwZWN0ZWQgJyknIGJlZm9yZSAnKicgdG9r
+ZW4KZ2xpYi1oZWxwZXIuYzogSW4gZnVuY3Rpb24gJ3Jlc29sdmVfbmFtZXMnOgpnbGliLWhlbHBl
+ci5jOjQxNTogd2FybmluZzogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ21lbXNl
+dCcKZ2xpYi1oZWxwZXIuYzo0MTU6IHdhcm5pbmc6IGluY29tcGF0aWJsZSBpbXBsaWNpdCBkZWNs
+YXJhdGlvbiBvZiBidWlsdC1pbiBmdW5jdGlvbiAnbWVtc2V0JwpnbGliLWhlbHBlci5jOiBBdCB0
+b3AgbGV2ZWw6CmdsaWItaGVscGVyLmM6NDI5OiBlcnJvcjogZXhwZWN0ZWQgZGVjbGFyYXRpb24g
+c3BlY2lmaWVycyBvciAnLi4uJyBiZWZvcmUgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5jOjQyOTog
+ZXJyb3I6IGV4cGVjdGVkIGRlY2xhcmF0aW9uIHNwZWNpZmllcnMgb3IgJy4uLicgYmVmb3JlICdi
+ZGFkZHJfdCcKZ2xpYi1oZWxwZXIuYzogSW4gZnVuY3Rpb24gJ3JmY29tbV9yZXNvbHZlcic6Cmds
+aWItaGVscGVyLmM6NDMxOiBlcnJvcjogc3RvcmFnZSBzaXplIG9mICdob3N0JyBpc24ndCBrbm93
+bgpnbGliLWhlbHBlci5jOjQzMTogZXJyb3I6IHN0b3JhZ2Ugc2l6ZSBvZiAncGVlcicgaXNuJ3Qg
+a25vd24KZ2xpYi1oZWxwZXIuYzo0NDE6IHdhcm5pbmc6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9m
+IGZ1bmN0aW9uICdiYWNweScKZ2xpYi1oZWxwZXIuYzo0NDE6IGVycm9yOiAnc3JjJyB1bmRlY2xh
+cmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikKZ2xpYi1oZWxwZXIuYzo0NDI6IGVycm9y
+OiAnZHN0JyB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikKZ2xpYi1oZWxw
+ZXIuYzo0MzE6IHdhcm5pbmc6IHVudXNlZCB2YXJpYWJsZSAncGVlcicKZ2xpYi1oZWxwZXIuYzo0
+MzE6IHdhcm5pbmc6IHVudXNlZCB2YXJpYWJsZSAnaG9zdCcKZ2xpYi1oZWxwZXIuYzogQXQgdG9w
+IGxldmVsOgpnbGliLWhlbHBlci5jOjQ0NzogZXJyb3I6IGV4cGVjdGVkIGRlY2xhcmF0aW9uIHNw
+ZWNpZmllcnMgb3IgJy4uLicgYmVmb3JlICdiZGFkZHJfdCcKZ2xpYi1oZWxwZXIuYzo0NDc6IGVy
+cm9yOiBleHBlY3RlZCBkZWNsYXJhdGlvbiBzcGVjaWZpZXJzIG9yICcuLi4nIGJlZm9yZSAnYmRh
+ZGRyX3QnCmdsaWItaGVscGVyLmM6IEluIGZ1bmN0aW9uICdsMmNhcF9yZXNvbHZlcic6CmdsaWIt
+aGVscGVyLmM6NDQ5OiBlcnJvcjogc3RvcmFnZSBzaXplIG9mICdob3N0JyBpc24ndCBrbm93bgpn
+bGliLWhlbHBlci5jOjQ0OTogZXJyb3I6IHN0b3JhZ2Ugc2l6ZSBvZiAncGVlcicgaXNuJ3Qga25v
+d24KZ2xpYi1oZWxwZXIuYzo0NTk6IGVycm9yOiAnc3JjJyB1bmRlY2xhcmVkIChmaXJzdCB1c2Ug
+aW4gdGhpcyBmdW5jdGlvbikKZ2xpYi1oZWxwZXIuYzo0NjA6IGVycm9yOiAnZHN0JyB1bmRlY2xh
+cmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikKZ2xpYi1oZWxwZXIuYzo0NDk6IHdhcm5p
+bmc6IHVudXNlZCB2YXJpYWJsZSAncGVlcicKZ2xpYi1oZWxwZXIuYzo0NDk6IHdhcm5pbmc6IHVu
+dXNlZCB2YXJpYWJsZSAnaG9zdCcKZ2xpYi1oZWxwZXIuYzogQXQgdG9wIGxldmVsOgpnbGliLWhl
+bHBlci5jOjQ2NTogZXJyb3I6IGV4cGVjdGVkIGRlY2xhcmF0aW9uIHNwZWNpZmllcnMgb3IgJy4u
+LicgYmVmb3JlICdiZGFkZHJfdCcKZ2xpYi1oZWxwZXIuYzo0NjU6IGVycm9yOiBleHBlY3RlZCBk
+ZWNsYXJhdGlvbiBzcGVjaWZpZXJzIG9yICcuLi4nIGJlZm9yZSAnYmRhZGRyX3QnCmdsaWItaGVs
+cGVyLmM6IEluIGZ1bmN0aW9uICdzY29fcmVzb2x2ZXInOgpnbGliLWhlbHBlci5jOjQ2NzogZXJy
+b3I6IHN0b3JhZ2Ugc2l6ZSBvZiAnaG9zdCcgaXNuJ3Qga25vd24KZ2xpYi1oZWxwZXIuYzo0Njc6
+IGVycm9yOiBzdG9yYWdlIHNpemUgb2YgJ3BlZXInIGlzbid0IGtub3duCmdsaWItaGVscGVyLmM6
+NDc3OiBlcnJvcjogJ3NyYycgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24p
+CmdsaWItaGVscGVyLmM6NDc4OiBlcnJvcjogJ2RzdCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGlu
+IHRoaXMgZnVuY3Rpb24pCmdsaWItaGVscGVyLmM6NDY3OiB3YXJuaW5nOiB1bnVzZWQgdmFyaWFi
+bGUgJ3BlZXInCmdsaWItaGVscGVyLmM6NDY3OiB3YXJuaW5nOiB1bnVzZWQgdmFyaWFibGUgJ2hv
+c3QnCmdsaWItaGVscGVyLmM6IEluIGZ1bmN0aW9uICdsaXN0ZW5fY2InOgpnbGliLWhlbHBlci5j
+OjQ5MDogZXJyb3I6ICdiZGFkZHJfdCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVu
+Y3Rpb24pCmdsaWItaGVscGVyLmM6NDkwOiBlcnJvcjogZXhwZWN0ZWQgJzsnIGJlZm9yZSAnc3Jj
+JwpnbGliLWhlbHBlci5jOjUwMzogd2FybmluZzogaW5jb21wYXRpYmxlIGltcGxpY2l0IGRlY2xh
+cmF0aW9uIG9mIGJ1aWx0LWluIGZ1bmN0aW9uICdtZW1zZXQnCmdsaWItaGVscGVyLmM6NTA4OiBl
+cnJvcjogJ3N0cnVjdCBpb19jb250ZXh0JyBoYXMgbm8gbWVtYmVyIG5hbWVkICdyZXNvbHZlcicK
+Z2xpYi1oZWxwZXIuYzo1MDk6IGVycm9yOiAnc3RydWN0IGlvX2NvbnRleHQnIGhhcyBubyBtZW1i
+ZXIgbmFtZWQgJ3Jlc29sdmVyJwpnbGliLWhlbHBlci5jOjUwOTogZXJyb3I6ICdzcmMnIHVuZGVj
+bGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQpnbGliLWhlbHBlci5jOjUwOTogZXJy
+b3I6ICdkc3QnIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQpnbGliLWhl
+bHBlci5jOjUyMDogZXJyb3I6ICdzdHJ1Y3QgaW9fY29udGV4dCcgaGFzIG5vIG1lbWJlciBuYW1l
+ZCAnY2InCmdsaWItaGVscGVyLmM6NTIxOiBlcnJvcjogJ3N0cnVjdCBpb19jb250ZXh0JyBoYXMg
+bm8gbWVtYmVyIG5hbWVkICdjYicKZ2xpYi1oZWxwZXIuYzo1MjE6IGVycm9yOiAnc3RydWN0IGlv
+X2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ3VzZXJfZGF0YScKZ2xpYi1oZWxwZXIuYzo1
+MjY6IGVycm9yOiAnc3RydWN0IGlvX2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ2NiJwpn
+bGliLWhlbHBlci5jOjUyNzogZXJyb3I6ICdzdHJ1Y3QgaW9fY29udGV4dCcgaGFzIG5vIG1lbWJl
+ciBuYW1lZCAnY2InCmdsaWItaGVscGVyLmM6NTI3OiBlcnJvcjogJ3N0cnVjdCBpb19jb250ZXh0
+JyBoYXMgbm8gbWVtYmVyIG5hbWVkICd1c2VyX2RhdGEnCmdsaWItaGVscGVyLmM6IEluIGZ1bmN0
+aW9uICdjb25uZWN0X2NiJzoKZ2xpYi1oZWxwZXIuYzo1NTU6IGVycm9yOiAnYmRhZGRyX3QnIHVu
+ZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQpnbGliLWhlbHBlci5jOjU1NTog
+ZXJyb3I6IGV4cGVjdGVkICc7JyBiZWZvcmUgJ3NyYycKZ2xpYi1oZWxwZXIuYzo1NzE6IGVycm9y
+OiAnc3RydWN0IGlvX2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ3Jlc29sdmVyJwpnbGli
+LWhlbHBlci5jOjU3MjogZXJyb3I6ICdzdHJ1Y3QgaW9fY29udGV4dCcgaGFzIG5vIG1lbWJlciBu
+YW1lZCAncmVzb2x2ZXInCmdsaWItaGVscGVyLmM6NTcyOiBlcnJvcjogJ3NyYycgdW5kZWNsYXJl
+ZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCmdsaWItaGVscGVyLmM6NTcyOiBlcnJvcjog
+J2RzdCcgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCmdsaWItaGVscGVy
+LmM6NTgwOiBlcnJvcjogJ3N0cnVjdCBpb19jb250ZXh0JyBoYXMgbm8gbWVtYmVyIG5hbWVkICdj
+YicKZ2xpYi1oZWxwZXIuYzo1ODE6IGVycm9yOiAnc3RydWN0IGlvX2NvbnRleHQnIGhhcyBubyBt
+ZW1iZXIgbmFtZWQgJ2NiJwpnbGliLWhlbHBlci5jOjU4MTogZXJyb3I6ICdzdHJ1Y3QgaW9fY29u
+dGV4dCcgaGFzIG5vIG1lbWJlciBuYW1lZCAndXNlcl9kYXRhJwpnbGliLWhlbHBlci5jOiBBdCB0
+b3AgbGV2ZWw6CmdsaWItaGVscGVyLmM6NjE0OiB3YXJuaW5nOiB0eXBlIGRlZmF1bHRzIHRvICdp
+bnQnIGluIGRlY2xhcmF0aW9uIG9mICdiZGFkZHJfdCcKZ2xpYi1oZWxwZXIuYzo2MTQ6IGVycm9y
+OiBleHBlY3RlZCAnOycsICcsJyBvciAnKScgYmVmb3JlICcqJyB0b2tlbgpnbGliLWhlbHBlci5j
+OjY0ODogd2FybmluZzogdHlwZSBkZWZhdWx0cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAn
+YmRhZGRyX3QnCmdsaWItaGVscGVyLmM6NjQ4OiBlcnJvcjogZXhwZWN0ZWQgJzsnLCAnLCcgb3Ig
+JyknIGJlZm9yZSAnKicgdG9rZW4KZ2xpYi1oZWxwZXIuYzo2OTE6IHdhcm5pbmc6IHR5cGUgZGVm
+YXVsdHMgdG8gJ2ludCcgaW4gZGVjbGFyYXRpb24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5j
+OjY5MTogZXJyb3I6IGV4cGVjdGVkICc7JywgJywnIG9yICcpJyBiZWZvcmUgJyonIHRva2VuCmds
+aWItaGVscGVyLmM6NzEwOiB3YXJuaW5nOiB0eXBlIGRlZmF1bHRzIHRvICdpbnQnIGluIGRlY2xh
+cmF0aW9uIG9mICdiZGFkZHJfdCcKZ2xpYi1oZWxwZXIuYzo3MTA6IGVycm9yOiBleHBlY3RlZCAn
+OycsICcsJyBvciAnKScgYmVmb3JlICcqJyB0b2tlbgpnbGliLWhlbHBlci5jOjczNjogd2Fybmlu
+ZzogdHlwZSBkZWZhdWx0cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAnYmRhZGRyX3QnCmds
+aWItaGVscGVyLmM6NzM2OiBlcnJvcjogZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJlZm9yZSAn
+KicgdG9rZW4KZ2xpYi1oZWxwZXIuYzo3NzA6IHdhcm5pbmc6IHR5cGUgZGVmYXVsdHMgdG8gJ2lu
+dCcgaW4gZGVjbGFyYXRpb24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5jOjc3MDogZXJyb3I6
+IGV4cGVjdGVkICc7JywgJywnIG9yICcpJyBiZWZvcmUgJyonIHRva2VuCmdsaWItaGVscGVyLmM6
+ODAwOiB3YXJuaW5nOiB0eXBlIGRlZmF1bHRzIHRvICdpbnQnIGluIGRlY2xhcmF0aW9uIG9mICdi
+ZGFkZHJfdCcKZ2xpYi1oZWxwZXIuYzo4MDA6IGVycm9yOiBleHBlY3RlZCAnOycsICcsJyBvciAn
+KScgYmVmb3JlICcqJyB0b2tlbgpnbGliLWhlbHBlci5jOiBJbiBmdW5jdGlvbiAnY3JlYXRlX2lv
+X2NvbnRleHQnOgpnbGliLWhlbHBlci5jOjgzMjogZXJyb3I6ICdzdHJ1Y3QgaW9fY29udGV4dCcg
+aGFzIG5vIG1lbWJlciBuYW1lZCAnY2InCmdsaWItaGVscGVyLmM6ODMzOiBlcnJvcjogJ3N0cnVj
+dCBpb19jb250ZXh0JyBoYXMgbm8gbWVtYmVyIG5hbWVkICdyZXNvbHZlcicKZ2xpYi1oZWxwZXIu
+Yzo4MzQ6IGVycm9yOiAnc3RydWN0IGlvX2NvbnRleHQnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ3Vz
+ZXJfZGF0YScKZ2xpYi1oZWxwZXIuYzogQXQgdG9wIGxldmVsOgpnbGliLWhlbHBlci5jOjg0ODog
+d2FybmluZzogdHlwZSBkZWZhdWx0cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAnYmRhZGRy
+X3QnCmdsaWItaGVscGVyLmM6ODQ4OiBlcnJvcjogZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJl
+Zm9yZSAnKicgdG9rZW4KZ2xpYi1oZWxwZXIuYzo4Njc6IHdhcm5pbmc6IHR5cGUgZGVmYXVsdHMg
+dG8gJ2ludCcgaW4gZGVjbGFyYXRpb24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5jOjg2Nzog
+ZXJyb3I6IGV4cGVjdGVkICc7JywgJywnIG9yICcpJyBiZWZvcmUgJyonIHRva2VuCmdsaWItaGVs
+cGVyLmM6ODc4OiB3YXJuaW5nOiB0eXBlIGRlZmF1bHRzIHRvICdpbnQnIGluIGRlY2xhcmF0aW9u
+IG9mICdiZGFkZHJfdCcKZ2xpYi1oZWxwZXIuYzo4Nzg6IGVycm9yOiBleHBlY3RlZCAnOycsICcs
+JyBvciAnKScgYmVmb3JlICcqJyB0b2tlbgpnbGliLWhlbHBlci5jOjg4Nzogd2FybmluZzogdHlw
+ZSBkZWZhdWx0cyB0byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAnYmRhZGRyX3QnCmdsaWItaGVs
+cGVyLmM6ODg3OiBlcnJvcjogZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJlZm9yZSAnKicgdG9r
+ZW4KZ2xpYi1oZWxwZXIuYzo5MDY6IHdhcm5pbmc6IHR5cGUgZGVmYXVsdHMgdG8gJ2ludCcgaW4g
+ZGVjbGFyYXRpb24gb2YgJ2JkYWRkcl90JwpnbGliLWhlbHBlci5jOjkwNjogZXJyb3I6IGV4cGVj
+dGVkICc7JywgJywnIG9yICcpJyBiZWZvcmUgJyonIHRva2VuCmdsaWItaGVscGVyLmM6OTI1OiB3
+YXJuaW5nOiB0eXBlIGRlZmF1bHRzIHRvICdpbnQnIGluIGRlY2xhcmF0aW9uIG9mICdiZGFkZHJf
+dCcKZ2xpYi1oZWxwZXIuYzo5MjU6IGVycm9yOiBleHBlY3RlZCAnOycsICcsJyBvciAnKScgYmVm
+b3JlICcqJyB0b2tlbgpnbGliLWhlbHBlci5jOjk0NTogd2FybmluZzogdHlwZSBkZWZhdWx0cyB0
+byAnaW50JyBpbiBkZWNsYXJhdGlvbiBvZiAnYmRhZGRyX3QnCmdsaWItaGVscGVyLmM6OTQ1OiBl
+cnJvcjogZXhwZWN0ZWQgJzsnLCAnLCcgb3IgJyknIGJlZm9yZSAnKicgdG9rZW4KbWFrZVsyXTog
+KioqIFtnbGliLWhlbHBlci5vXSBFcnJvciAxCm1ha2VbMl06IExlYXZpbmcgZGlyZWN0b3J5IGAv
+aG9tZS9uZXdidWlsZC9ibHVlL2JsdWV6LXV0aWxzLTMuMzIvY29tbW9uJwptYWtlWzFdOiAqKiog
+W2FsbC1yZWN1cnNpdmVdIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC9ob21l
+L25ld2J1aWxkL2JsdWUvYmx1ZXotdXRpbHMtMy4zMicKbWFrZTogKioqIFthbGxdIEVycm9yIDIK
+bGludXg6L2hvbWUvbmV3YnVpbGQvYmx1ZS9ibHVlei11dGlscy0zLjMyICMKCgo=
+------=_Part_1800_3598435.1215848804338
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -202,7 +308,7 @@ Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
---===============1882343340==
+------=_Part_1800_3598435.1215848804338
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -213,4 +319,4 @@ Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
 
---===============1882343340==--
+------=_Part_1800_3598435.1215848804338--
