@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Jul 2008 09:18:32 -0600
-From: Robert Moskowitz <rgm@htt-consult.com>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-Message-ID: <487B6E48.70807@htt-consult.com>
+Message-ID: <b5c34db00807140500w4ee2aca0v51ebd8c3ad0bd657@mail.gmail.com>
+Date: Mon, 14 Jul 2008 17:30:37 +0530
+From: umeshyv <umeshyv@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <795908.2168.qm@web8401.mail.in.yahoo.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] Centos/RHEL has old version of Bluez -- what to do?
+References: <795908.2168.qm@web8401.mail.in.yahoo.com>
+Subject: Re: [Bluez-users] bluetooth compilation version3.36 -regarding
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,52 +16,55 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1477383743=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I am using Centos 5.2.  It has bluez-utils-3.7-2*
+--===============1477383743==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_62222_6566602.1216036837894"
 
-I realize this is quite old and I have a lot of bluetooth plans.
+------=_Part_62222_6566602.1216036837894
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-I would like to update to a more current bluez version, but have a 
-number of concerns.  Like the impact on my other bluez rpms:
+Hi Pramod,
+Still I dont get how compile dbus and i am using version 3.36
 
-bluez-gnome-0.5-5.fc6.i386.rpm
-bluez-hcidump-1.32-1.i386.rpm
-bluez-libs-3.7-1.i386.rpm
-bluez-utils-3.7-2.el5.centos.i386.rpm
-bluez-utils-cups-3.7-2.el5.centos.i386.rpm
-gnome-bluetooth-0.7.0-10.2.el5.i386.rpm
-gnome-bluetooth-libs-0.7.0-10.2.el5.i386.rpm
+Regards
+Umesh
 
+------=_Part_62222_6566602.1216036837894
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-I suppose if I knew what I was doing enough to rebuild all these rpms, I 
-could get this to work.  So I have a few questions:
+Hi Pramod,<br>Still I dont get how compile dbus and i am using version 3.36<br><br>Regards<br>Umesh<br>
 
-I want to use Asterisk's chan_mobile that pairs the system to a 
-bluetooth phone for a cellular trunk.
-I want to run a PAN.
-I want a Bluetooth headset for my SIP phone and stereo for my  mp3 playing.
-
-Given these modest wants:
-
-Will it work with bluez 3.7?
-Will it be hard to get it to work and keep working with 3.7?
-Has anyone built more current rpms for Centos 5.2?
-Is anyone willing to help me built more current rpms for Centos 5.2?
-
-Thanks and good day to you all!
+------=_Part_62222_6566602.1216036837894--
 
 
-
+--===============1477383743==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
 Studies have shown that voting for your favorite open source project,
 along with a healthy diet, reduces your potential for chronic lameness
 and boredom. Vote Now at http://www.sourceforge.net/community/cca08
+--===============1477383743==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1477383743==--
