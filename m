@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <01f301c8e787$6ebf2140$6701a8c0@freqonedev>
-From: "David Stockwell" <dstockwell@frequency-one.com>
+Message-ID: <e96e9eeb0807160834n6eb74e3dn133d7abfb333d07b@mail.gmail.com>
+Date: Wed, 16 Jul 2008 18:34:37 +0300
+From: "Voni Hakau" <hakauvoni@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-References: <e96e9eeb0807160834n6eb74e3dn133d7abfb333d07b@mail.gmail.com>
-Date: Wed, 16 Jul 2008 16:03:40 -0500
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] bluez-utils 3.36: Unable to get on D-Bus
+Subject: [Bluez-users] bluez-utils 3.36: Unable to get on D-Bus
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,46 +18,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-I have also seen this since 3.35, and suspect that somehow the name 
-org.bluez is not being released when shutting down the previous version. 
-This does not make much sense though, sinee when the hcid shuts down or 
-dies, the name should be released as a basic function of DBus.
+Hi all,
 
-When I have seen this recently, I just reboot...all my years working 
-with Micro$oft...
+I get the following error:
 
-DS
------ Original Message ----- 
-From: "Voni Hakau" <hakauvoni@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-Sent: Wednesday, July 16, 2008 10:34 AM
-Subject: [Bluez-users] bluez-utils 3.36: Unable to get on D-Bus
+# hcid -n -s -d
+hcid[467]: Bluetooth HCI daemon
+hcid[467]: Enabling debug information
+hcid[467]: Unable to get on D-Bus
 
+Can someone please help me how to debug this ?
 
-> Hi all,
->
-> I get the following error:
->
-> # hcid -n -s -d
-> hcid[467]: Bluetooth HCI daemon
-> hcid[467]: Enabling debug information
-> hcid[467]: Unable to get on D-Bus
->
-> Can someone please help me how to debug this ?
->
-> I use bluez-utils 3.36 with the newest d-bus.
->
-> I got d-bus up and running (dbus-daemon --system is running, and I the
-> UNIX domain socket file is created).
->
-> Any ideas ?
->
-> Thank you
-> Voni
->
->
-> 
+I use bluez-utils 3.36 with the newest d-bus.
 
+I got d-bus up and running (dbus-daemon --system is running, and I the
+UNIX domain socket file is created).
+
+Any ideas ?
+
+Thank you
+Voni
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
