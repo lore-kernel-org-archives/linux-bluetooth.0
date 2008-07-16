@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e96e9eeb0807160834n6eb74e3dn133d7abfb333d07b@mail.gmail.com>
-Date: Wed, 16 Jul 2008 18:34:37 +0300
-From: "Voni Hakau" <hakauvoni@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Message-ID: <487D5A3E.4050004@earthlink.net>
+Date: Tue, 15 Jul 2008 21:17:34 -0500
+From: "Mumia W.." <paduille.4061.mumia.w+nospam@earthlink.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] bluez-utils 3.36: Unable to get on D-Bus
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <487D3344.1000306@mvista.com>
+In-Reply-To: <487D3344.1000306@mvista.com>
+Subject: Re: [Bluez-users] compatible bluetooth devices
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,26 +20,19 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi all,
+On 07/15/2008 06:31 PM, Dave Jiang wrote:
+> Does anyone know where I can find an up to date list of compatible bluetooth 
+> devices with Linux? I have found references to this link:
+> http://www.holtmann.org/linux/bluetooth/features.html
+> 
+> But there doesn't seem to be anything there at the moment and google has no 
+> cached page either.... Thanks!
+> 
 
-I get the following error:
+I have a copy of features.html from before the website
+change, but I need Marcel Holtmann to give me permission to post it.
 
-# hcid -n -s -d
-hcid[467]: Bluetooth HCI daemon
-hcid[467]: Enabling debug information
-hcid[467]: Unable to get on D-Bus
 
-Can someone please help me how to debug this ?
-
-I use bluez-utils 3.36 with the newest d-bus.
-
-I got d-bus up and running (dbus-daemon --system is running, and I the
-UNIX domain socket file is created).
-
-Any ideas ?
-
-Thank you
-Voni
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
