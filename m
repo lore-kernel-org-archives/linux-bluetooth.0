@@ -1,66 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <a1d1ffe0807171449m5fb5a5aauce8bd14fa05d8719@mail.gmail.com>
-Date: Thu, 17 Jul 2008 17:49:42 -0400
-From: Sam <rotisseriecat@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: bluez-utils compilation error.
-In-Reply-To: <a1d1ffe0807170424r7ae9fa84pa55a504432a8e70e@mail.gmail.com>
+Message-ID: <487F9160.20909@suse.de>
+Date: Thu, 17 Jul 2008 20:37:20 +0200
+From: Stefan Seyfried <seife@suse.de>
 MIME-Version: 1.0
+To: nased0 <nased0@aster.pl>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Bluez-utils-3.36 hidd daemon does not compile on Suse 11 x64
+References: <1059545251.20080712172856@aster.pl>
+In-Reply-To: <1059545251.20080712172856@aster.pl>
 Content-Type: text/plain; charset=ISO-8859-1
-References: <a1d1ffe0807170424r7ae9fa84pa55a504432a8e70e@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm still encountering compile errors for bluez-utils.  Here are the
-bash commands used:
+nased0 wrote:
+> Suse 11 64-bit distribution does not have a hidd daemon file included,
+> therefore its Bluetooth configurators only pretend to work.
 
-cd '/home/g/bluez-libs-3.36'
-./configure --prefix=/g
-make
-sudo make install
+I'd be interested in what you think is "only pretending to work". I don't want
+to rule out a packaging flaw on my side, but at least for me it is working
+fine with HID devices and rfcomm/dialup.
 
-cd home/g/bluez-utils-3.36
-./configure --prefix=/g --mandir=/g/share/man  --sysconfdir=/etc
---localstatedir=/var --libexecdir=/lib --enable-all
-make
-sudo make install
+> I think that Suse 11 x64 distro developers were not able to
+> compile is also.
 
-Here's the error:
+I strongly object to that suspicion ;-)
+It's not included on purpose, since it is obsoleted by input-service, as
+Marcel already stated.
 
-make  all-am
-make[3]: Entering directory `/home/g/bluez-utils-3.36/hcid'
-gcc -DHAVE_CONFIG_H -I. -I.. -I../common -I../sdpd
--I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include
--I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include
--I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include   -I../gdbus
--DPLUGINDIR=\""/g/lib/bluetooth/plugins"\" -Wall -O2
--D_FORTIFY_SOURCE=2 -fPIE -MT security.o -MD -MP -MF
-.deps/security.Tpo -c -o security.o security.c
-security.c: In function 'link_key_request':
-security.c:279: error: storage size of 'req' isn't known
-security.c:291: error: 'HCIGETAUTHINFO' undeclared (first use in this function)
-security.c:291: error: (Each undeclared identifier is reported only once
-security.c:291: error: for each function it appears in.)
-security.c:279: warning: unused variable 'req'
-security.c: At top level:
-security.c:1037: fatal error: opening dependency file
-.deps/security.Tpo: Permission denied
-compilation terminated.
-make[3]: *** [security.o] Error 1
-make[3]: Leaving directory `/home/g/bluez-utils-3.36/hcid'
-make[2]: *** [all] Error 2
-make[2]: Leaving directory `/home/g/bluez-utils-3.36/hcid'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/home/g/bluez-utils-3.36'
-make: *** [all] Error 2
+http://en.opensuse.org/Bluetooth might contain useful information to help you
+set up your devices.
 
+Have fun,
 
-I did compile/install the libs first, though they are out of order in
-the full bash pastebin: http://paste.ubuntu.com/27889/
-If anyone can help, it'd be greatly appreciated!
-(Is it possible to find a .deb package of bluez-utils with all the
-tools enabled?)
+	Stefan
+-- 
+Stefan Seyfried
+R&D Team Mobile Devices            |              "Any ideas, John?"
+SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out."
 
-Thank you,
-
-Sam
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
