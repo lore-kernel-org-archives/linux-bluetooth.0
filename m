@@ -1,10 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <488048F2.7070303@wurmsdobler.org>
-Date: Fri, 18 Jul 2008 08:40:34 +0100
-From: Peter Wurmsdobler <peter@wurmsdobler.org>
+Message-ID: <e96e9eeb0807170117q184cab4dk317fa92d04771b42@mail.gmail.com>
+Date: Thu, 17 Jul 2008 11:17:19 +0300
+From: "Voni Hakau" <hakauvoni@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <2A1E7937-4DA2-4B00-8EBD-10DC50269D54@gmail.com>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] HCI commands for testing
+References: <e96e9eeb0807160834n6eb74e3dn133d7abfb333d07b@mail.gmail.com>
+	<e378cfb20807170101iec7c9e5jfeb3aa1afe9e01e@mail.gmail.com>
+	<2A1E7937-4DA2-4B00-8EBD-10DC50269D54@gmail.com>
+Subject: Re: [Bluez-users] bluez-utils 3.36: Unable to get on D-Bus
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,27 +22,36 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+Hi all,
 
-Our mx27 based system contains a APM6628 module which itself comprises a 
-bluetooth and wifi part. In the context of testing the bluetooth part 
-(built on a BC4-ROM), we would like to put it into a test mode using HCI 
-commands, both the "Remote Loopback Mode" and the "Device Under Test 
-Mode". From the specification I can see that there are hex codes defined 
-for these commands (only OCF, 0x0002 and 0x0003, respectively). I would 
-like to use hcitool on the host:
+On Thu, Jul 17, 2008 at 11:06 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Another common cause of this error is that the user hasn't installed
+> the D-Bus policy configuration for BlueZ into /etc/dbus-1/system.d
+> (the hcid/bluetooth.conf file).
 
-mx27# hcitool -i hci0 cmd 0x06 0x0003
+YES ! that was it. more or less. Actually I did have those files in
+/etc/dbus-1/system.d, but I found out that my dbus used
+/usr/etc/dbus-1/system.d for some reason (I cross compiled it with
+--prefix=/usr). So I copied the files over there and voila it works. I
+have no clue why it chose to work with /usr/etc instead of /etc
+though.
 
-Unfortunately, the BC4-ROM does not seem to recognise the command 
-(perhaps the OGF) and hcidump tells me that the command is 'Unknown'. My 
-question is now, what are the exact OCF and OGF values to be used with 
-hcitool in order to to put the BC4-ROM into "Remote Loopback Mode" and 
-"Device Under Test Mode"?
+Thank you all for the help!
+Voni
 
-Many thanks for any hint,
-peter
-
+>
+> Johan
+>
+> -------------------------------------------------------------------------
+> This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
+> Build the coolest Linux based applications with Moblin SDK & win great prizes
+> Grand prize is a trip for two to an Open Source event anywhere in the world
+> http://moblin-contest.org/redirect.php?banner_id=100&url=/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
+>
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
