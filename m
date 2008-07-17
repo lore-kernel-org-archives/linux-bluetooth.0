@@ -1,33 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: installation instructions
+Subject: Re: bluez-utils compilation error.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: alscheinine@tuffmail.us
+To: Sam <rotisseriecat@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <487CEEFE.5000502@tuffmail.us>
-References: <487CEEFE.5000502@tuffmail.us>
+In-Reply-To: <a1d1ffe0807170424r7ae9fa84pa55a504432a8e70e@mail.gmail.com>
+References: <a1d1ffe0807170424r7ae9fa84pa55a504432a8e70e@mail.gmail.com>
 Content-Type: text/plain
-Date: Thu, 17 Jul 2008 14:13:18 +0200
-Message-Id: <1216296798.22564.14.camel@violet.holtmann.net>
+Date: Thu, 17 Jul 2008 14:11:07 +0200
+Message-Id: <1216296667.22564.11.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alan,
+I Sam,
 
-> For bluez-libs-3.36 the package-specific installation
-> instructions are in README (the INSTALL file has only
-> generic instructions).  In the README file it is writtern
-> 
-> In order to compile Bluetooth libraries you need following software packages:
->          - Linux Bluetooth protocol stack (BlueZ)
->          - GCC compiler
-> 
-> But what do you mean by "Linux Bluetooth protocol stack (BlueZ)"?
-> Usually such a message describes the _prerequisites_, not the package
-> in which the file is found!!!  Does the phrase mean that the
-> kernel drivers must be available?
+> Hello. I'm having a bit of trouble compiling bluez-utils using the
+> .tar.gz source. I need to run this configuration to enable all the
+> tools (dfutool, etc.)
 
-it means the the Bluetooth protocol stack in the kernel is needed.
+and you might wanna read the ChangeLog and see that it requires
+bluez-libs-3.36.
 
 Regards
 
