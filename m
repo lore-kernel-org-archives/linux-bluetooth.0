@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <6d88f6c90807170457i756736efg8d737685e4cb4d0e@mail.gmail.com>
-Date: Thu, 17 Jul 2008 13:57:48 +0200
-From: "=?ISO-8859-1?Q?David_Garc=EDa?=" <dav.garcia@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <487F148F.7030109@access-company.com>
+Date: Thu, 17 Jul 2008 11:44:47 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?= <frederic.dalleau@access-company.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] SCO support in 2.6.25 kernel
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <48075B6A.2060308@access-company.com>	<1209058941.12684.37.camel@violet.holtmann.net>	<48355289.7070906@access-company.com>	<5D487EED-A2B2-4AEA-AA7B-9EC8681157C0@holtmann.org>	<48357D9C.9080009@access-company.com>
+	<486A6392.6080008@access-company.com>
+In-Reply-To: <486A6392.6080008@access-company.com>
+Subject: Re: [Bluez-devel] [patch] BNEP/PAN Qualification issues
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,71 +17,88 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1686377421=="
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============1686377421==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_950_9392550.1216295868614"
+Any updates?
 
-------=_Part_950_9392550.1216295868614
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi,
-
-I'm trying to compile BlueZ 3.36 for a version of Puppy Linux based on
-kernel 2.6.25.4 and I'm stuck on how to make SCO work with this kernel.
-
-I have searched this list trying to gather all the information I could about
-the famous SCO flow control patch, because the sources from bluetooth-alsa
-project doesn't have a specific kernel patch for 2.6.25.
-I don't even know whether it is still necessary.
-
-Could anyone explain all this a bit please?
-If I still have to apply a patch & recompile the kernel, can anyone tell me
-where can I get the appropiate patch?
-
-Thanks very much for your effort.
-
-Best regards,
-   David
-
-------=_Part_950_9392550.1216295868614
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div dir="ltr">Hi,<br><br>I&#39;m trying to compile BlueZ 3.36 for a version of Puppy Linux based on kernel <a href="http://2.6.25.4">2.6.25.4</a> and I&#39;m stuck on how to make SCO work with this kernel.<br><br>I have searched this list trying to gather all the information I could about the famous SCO flow control patch, because the sources from bluetooth-alsa project doesn&#39;t have a specific kernel patch for <a href="http://2.6.25.">2.6.25.</a><br>
-I don&#39;t even know whether it is still necessary.<br><br>Could anyone explain all this a bit please?<br>If I still have to apply a patch &amp; recompile the kernel, can anyone tell me where can I get the appropiate patch?<br>
-<br>Thanks very much for your effort.<br><br>Best regards,<br>&nbsp;&nbsp; David<br><br>
-</div>
-
-------=_Part_950_9392550.1216295868614--
+Fr=E9d=E9ric DALLEAU
 
 
---===============1686377421==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+
+
+Fr=E9d=E9ric Dalleau wrote:
+> Marcel, Luiz
+>
+>>>> A part of the patch si to move handling of incoming setup_conn_req  =
+
+>>>> in kernel. In order to keep pan working with older kernel, some  =
+
+>>>> differenciation must be done. How to achieve this ?
+>>>>           =
+
+>>> I don't know yet. Can we first fix the issues that don't need  =
+
+>>> modifications within the kernel. I prefer not modifying the kernel =
+
+>>> at  all at the moment.     =
+
+>>
+>> I understand.
+>> My problem is that some tests require grouping several messages into =
+
+>> one. In particular, the setup_conn_req can be sent together with a =
+
+>> control extension TP/BNEP/CTRL/BV-19-C.
+>> The current extension processing is to skip everything and I'm not =
+
+>> sure the control message can be handled at application level.
+>>   =
+
+>
+> I wake up this thread,
+>
+> I'm working at making this easier to integrate but it will makes a =
+
+> bunch of patches.
+> Let's start with the small and self contained.
+>
+> Resend patch for bluez-utils, and network service timeout  (after =
+
+> SETUP_CONN_REQ is sent and no answer for  30 sec, disconnect)
+>
+> Other patch adds a parameter to bnep module for disabling header =
+
+> compression.
+>
+> Let me know what you think.
+> Regards,
+>
+> Fr=E9d=E9ric DALLEAU
+>
+>
+> ------------------------------------------------------------------------
+>
+> -------------------------------------------------------------------------
+> Sponsored by: SourceForge.net Community Choice Awards: VOTE NOW!
+> Studies have shown that voting for your favorite open source project,
+> along with a healthy diet, reduces your potential for chronic lameness
+> and boredom. Vote Now at http://www.sourceforge.net/community/cca08
+> ------------------------------------------------------------------------
+>
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great prizes
+Build the coolest Linux based applications with Moblin SDK & win great priz=
+es
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=100&url=/
---===============1686377421==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============1686377421==--
