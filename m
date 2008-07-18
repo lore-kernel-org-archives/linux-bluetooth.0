@@ -1,59 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4880ED2C.1020203@aster.pl>
-Date: Fri, 18 Jul 2008 21:21:16 +0200
-From: Pawel Witas <nased0@aster.pl>
+Message-ID: <f8a8efe40807180054n4c932f99k8fc7710940c97b47@mail.gmail.com>
+Date: Fri, 18 Jul 2008 09:54:08 +0200
+From: Mateusz <m.patelak@gmail.com>
+To: Sam <rotisseriecat@gmail.com>
+Subject: Re: bluez-utils compilation error.
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <a1d1ffe0807171449m5fb5a5aauce8bd14fa05d8719@mail.gmail.com>
 MIME-Version: 1.0
-To: public-linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@hugh.gmane.org
-Subject: Re: Bluez-utils-3.36 hidd daemon does not compile on Suse 11 x64
-Content-Type: text/plain; charset=ISO-8859-2
+Content-Type: text/plain; charset=ISO-8859-1
+References: <a1d1ffe0807170424r7ae9fa84pa55a504432a8e70e@mail.gmail.com>
+	 <a1d1ffe0807171449m5fb5a5aauce8bd14fa05d8719@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+2008/7/17 Sam <rotisseriecat@gmail.com>:
+> I'm still encountering compile errors for bluez-utils.  Here are the
+> bash commands used:
+>
+> cd '/home/g/bluez-libs-3.36'
+> ./configure --prefix=/g
+> make
+> sudo make install
+>
+> cd home/g/bluez-utils-3.36
+> ./configure --prefix=/g --mandir=/g/share/man  --sysconfdir=/etc
+> --localstatedir=/var --libexecdir=/lib --enable-all
 
+Are you sure your --prefix should not be /usr/lib for both libs and utils?
 
-nased0 wrote:
-> > Suse 11 64-bit distribution does not have a hidd daemon file included,
-> > therefore its Bluetooth configurators only pretend to work.
-
-I'd be interested in what you think is "only pretending to work". I
-don't want
-to rule out a packaging flaw on my side, but at least for me it is working
-fine with HID devices and rfcomm/dialup.
-
-> > I think that Suse 11 x64 distro developers were not able to
-> > compile is also.
-
-I strongly object to that suspicion  ;-)
-It's not included on purpose, since it is obsoleted by input-service, as
-Marcel already stated.
-
-http://en.opensuse.org/Bluetooth might contain useful information to
-help you
-set up your devices.
-
-Have fun,
-
-	Stefan
-
-I'm using Gnome, not KDE and Gnome configurator could not start my MS
-Wireless Laser Mouse 8000.
-I have a Compal JFL-92 laptop with integrated BT and Suse 11 x64.
-I tried to configure my mouse manually according to some howto's found
-on the web, but the final step was starting the hidd daemon.
-When I compiled hidd (old version 2.25) and typed command:
- hidd --connect 00:17:FA:8A:BD:0B
-and pressed a button at the bottom of my mouse
-the mouse started to move my cursor.
-
-I don't need anything more from BT, I can connect my Nokia phone by USB
-cable with much less effort, but I hate wired mouses and USB radio mouse
- plugs, which I'd have to remove before transporting my laptop in my bag.
-
-Just try to test Suse 11 x64 with Gnome on configuration similar to mine.
-I propose to include hidd daemon in Suse 11, to allow to configure BT
-manually (even if it is not needed by your configurators).
-
-Regards
-
-Pawel
-
+> make
+> sudo make install
+>
+> Here's the error:
+>
+> make  all-am
+> make[3]: Entering directory `/home/g/bluez-utils-3.36/hcid'
+> gcc -DHAVE_CONFIG_H -I. -I.. -I../common -I../sdpd
+> -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include
+> -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include
+> -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include   -I../gdbus
+> -DPLUGINDIR=\""/g/lib/bluetooth/plugins"\" -Wall -O2
+> -D_FORTIFY_SOURCE=2 -fPIE -MT security.o -MD -MP -MF
+> .deps/security.Tpo -c -o security.o security.c
+> security.c: In function 'link_key_request':
+> security.c:279: error: storage size of 'req' isn't known
+> security.c:291: error: 'HCIGETAUTHINFO' undeclared (first use in this function)
+> security.c:291: error: (Each undeclared identifier is reported only once
+> security.c:291: error: for each function it appears in.)
+> security.c:279: warning: unused variable 'req'
+> security.c: At top level:
+> security.c:1037: fatal error: opening dependency file
+> .deps/security.Tpo: Permission denied
+> compilation terminated.
+> make[3]: *** [security.o] Error 1
+> make[3]: Leaving directory `/home/g/bluez-utils-3.36/hcid'
+> make[2]: *** [all] Error 2
+> make[2]: Leaving directory `/home/g/bluez-utils-3.36/hcid'
+> make[1]: *** [all-recursive] Error 1
+> make[1]: Leaving directory `/home/g/bluez-utils-3.36'
+> make: *** [all] Error 2
+>
+>
+> I did compile/install the libs first, though they are out of order in
+> the full bash pastebin: http://paste.ubuntu.com/27889/
+> If anyone can help, it'd be greatly appreciated!
+> (Is it possible to find a .deb package of bluez-utils with all the
+> tools enabled?)
+>
+> Thank you,
+>
+> Sam
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
