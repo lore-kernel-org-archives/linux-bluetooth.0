@@ -1,50 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48834E84.4040005@suse.de>
-Date: Sun, 20 Jul 2008 16:41:08 +0200
-From: Stefan Seyfried <seife@suse.de>
-MIME-Version: 1.0
-To: Pawel Witas <nased0@aster.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Bluez-utils-3.36 hidd daemon does not compile on Suse 11 x64
-References: <4880ED2C.1020203@aster.pl>
-In-Reply-To: <4880ED2C.1020203@aster.pl>
-Content-Type: text/plain; charset=ISO-8859-2
+Subject: Re: [PATCH] Bluetooth: fix oops in rfcomm tty code (v2)
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Vegard Nossum <vegard.nossum@gmail.com>
+Cc: Maxim Krasnyansky <maxk@qualcomm.com>,
+	Dave Young <hidave.darkstar@gmail.com>,
+	Soeren Sonnenburg <kernel@nn7.de>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20080719211227.GA14173@localhost.localdomain>
+References: <20080719211227.GA14173@localhost.localdomain>
+Content-Type: text/plain
+Date: Sat, 19 Jul 2008 23:38:20 +0200
+Message-Id: <1216503500.8411.110.camel@violet.holtmann.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Pawel Witas wrote:
+Hi Vegard,
 
-> I'm using Gnome, not KDE and Gnome configurator could not start my MS
-> Wireless Laser Mouse 8000.
+> This is a resend of a patch I sent earlier. It fixes a reproducible
+> oops (see http://lkml.org/lkml/2008/7/13/89 for test case), and I'd
+> be very happy for some feedback from Bluetooth people. Can this be
+> included for testing somewhere? I don't have any bluetooth devices
+> myself, so all my testing is limited to creating/releasing devices
+> with ioctl (I'm not sure that's good enough).
+> 
+> Dave: I have extended the rfcomm_dev_lock to include all the setup and
+> teardown of a single device. On second thought, it doesn't really make
+> sense to use a separate lock for that. May I have your opinion on this
+> second version? (I've fixed the comments/BUG_ON that you pointed out.)
 
-You can still use kdebluetooth under gnome to configure input devices.
-Anyway - if the gnome bluetooth applet does not work for you, then you should
-file a bug report here.
+it seems it is the actually the first time, I see this one. Anyway, so
+holding that lock is a bad idea. Fixing this the right way might be
+tricky since the TTY layer is involved here and own the kobject. So I
+would say we have to make sure that the RFCOMM TTY will hangup when
+calling RELEASEDEV or otherwise fail.
 
-> I have a Compal JFL-92 laptop with integrated BT and Suse 11 x64.
-> I tried to configure my mouse manually according to some howto's found
-> on the web, but the final step was starting the hidd daemon.
-> When I compiled hidd (old version 2.25) and typed command:
->  hidd --connect 00:17:FA:8A:BD:0B
-> and pressed a button at the bottom of my mouse
-> the mouse started to move my cursor.
+Regards
 
-I still won't include hidd for openSUSE since it's obsoleted and will be gone
-with 4.0 anyway.
+Marcel
 
-> Just try to test Suse 11 x64 with Gnome on configuration similar to mine.
-> I propose to include hidd daemon in Suse 11, to allow to configure BT
-> manually (even if it is not needed by your configurators).
 
-use the d-bus methods as described on
-http://wiki.bluez.org/wiki/HOWTO/InputDevices if you don't want to use
-kinputwizard or the bluez-gnome applet.
-
-Have fun.
--- 
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out."
-
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
