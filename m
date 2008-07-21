@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
-From: Jeremy Goodwill <skatewalking@gmail.com>
-Date: Mon, 21 Jul 2008 05:49:59 +0000 (UTC)
-Message-ID: <loom.20080721T053030-510@post.gmane.org>
+From: Jui-Hao Chiang <windtracekimo@gmail.com>
+Date: Mon, 21 Jul 2008 03:05:26 +0000 (UTC)
+Message-ID: <loom.20080721T023453-583@post.gmane.org>
+References: <loom.20080714T020902-534@post.gmane.org>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Combinations of multiple BT dongles,
-	master/slave role change
+Subject: Re: [Bluez-devel] =?utf-8?q?Questions_when_tracing_the_hci=5Fusb?=
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,34 +19,54 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all,
+> (1) In hci_usb_isoc_rx_submit, I saw the usb_rcvisocpipe are 
+> initializing settings for Host-side.
+> But why is it necessary to call usb_submit_urb() to send
+> the urb, and then repeat infinitely in hci_usb_rx_complete 
+> when the returned count is 0? 
+> Is that mandatory to do this to permit the usb device to send data
+> up to Host?
 
-Pls bear with me if I have missed out some fundamentals of Bluez/Bluetooth.
+Answering to myself
+The USB host controls the transactions on the USB bus.
+If host wants to retrieve the data from the USB device, 
+it needs to initiate the transaction by submitting a request 
+packet down to the USB bus (using the IN pipe).
+Correct me if I am wrong.
 
-My question is:
+> (2) Why the isoc is set to 2 in the beginning? 
+> What will happen when we set it to something like "5" in the beginning? 
+> (Alok's patches seems to dynamically
+> adjust it depending on  hdev->conn_hash.sco_num)
 
-Using following topology
+>>From the HCI USB Transport Layer spec., 
+interface 1 has the following requirement:
+* alternative setting 0 is for "No active voice channels"
+* alternative setting 1 is for "One voice channel with 8-bit encoding"
+* alternative setting 2 is for "Two voice channels with 8-bit encoding 
+& One voice channel with 16-bit encoding"
 
-Machine (with Bluez stack) connected to 2 USB dongles:
--dongle A
--dongle B
+I have tried to setup three PCs, each with a bluetooth usb adapter.
+http://www.cyber-blue.com/products_info.asp?id=19&code=AC
+PC1 is configured as Master role, and PC2 is Slave.
+The scotest can be used to send one SCO voice traffic from PC2 to PC1.
+But when I use another PC3 to connect to PC1,
+there is no connection request event found in PC1.
+(tried alternative settings from 2 to 5)
 
-The following procedure is performed:
-1) dongle A connects to device C
-2) role switch of dongle A to master
-3) connection becomes active
-4) dongle B connects to device D
-5) role switch of dongle B to master
-6) connection becomes active
+I am wandering it's the adapter problem or the hci_usb problem? 
+since so many people are using CSR adapter
+(which product are you guys using?)
 
-At this point, will channel collision occur?  Is Bluez aware of the different
-channels that each connected dongle is using and therefore avoid using the same
-ones? 
+The following page is my tracing to the hci_usb, just for sharing.
+http://docs.google.com/
+View?docID=ajgdxrgpktxt_149gqvt45cw&revision=_latest
 
-Thanks in advance,
-Jer
+It's not a beautiful document.
+But I really hope to find some comments from 
+someone who is working on multiple SCO.
 
-
+Bests, Jui-Hao
 
 
 
