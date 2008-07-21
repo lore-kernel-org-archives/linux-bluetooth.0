@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-From: Jui-Hao Chiang <windtracekimo@gmail.com>
-Date: Tue, 22 Jul 2008 03:21:35 +0000 (UTC)
-Message-ID: <loom.20080722T031618-791@post.gmane.org>
-References: <loom.20080714T020902-534@post.gmane.org>
-	<loom.20080721T023453-583@post.gmane.org>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] =?utf-8?q?Questions_when_tracing_the_hci=5Fusb?=
+Message-ID: <4884E6D3.8020102@suse.de>
+Date: Mon, 21 Jul 2008 21:43:15 +0200
+From: Stefan Seyfried <seife@suse.de>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <4884D04F.9000800@suse.de>
+In-Reply-To: <4884D04F.9000800@suse.de>
+Subject: Re: [Bluez-devel] Mouse connect problem, since 3.36?
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,36 +16,42 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-15"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
- 
-> I have tried to setup three PCs, each with a bluetooth usb adapter.
-> http://www.cyber-blue.com/products_info.asp?id=19&code=AC
-> PC1 is configured as Master role, and PC2 is Slave.
-> The scotest can be used to send one SCO voice traffic from PC2 to PC1.
-> But when I use another PC3 to connect to PC1,
-> there is no connection request event found in PC1.
-> (tried alternative settings from 2 to 5)
+Stefan Seyfried wrote:
 
-I find out one weird condition.
-Once we dynamically call usb_set_interface somewhere else.
-(In Alok's patch, it adjust it when hci_notify is triggered,
-and the new isoc alternative setting will depend on sco_num)
-The resubmit status in hci_usb_rx_complete fail with status -90.
-Afterwards, no resubmit will keep working.
+> The mouse will not reconnect until I issue a "Connect" again.
 
-Is there any problem to call usb_set_interface besides of the probe phase?
+One more thing: the mouse no longer seems to "time out". Before, after 30
+minutes of inactivity, the mouse would disconnect and when moving it, it wo=
+uld
+reconnect with a message like:
 
+input: Logitech MX1000 mouse as
+/devices/pci0000:00/0000:00:1d.0/usb1/1-1/1-1:1.0/hci0/acl0007613F1B6D/inpu=
+t/input8
 
+This is no longer the case. If i leave the machine for some time, the keybo=
+ard
+reconnects and gets new input device, but the mouse just continues to work
+without such a log message.
+-- =
 
+Stefan Seyfried
+R&D Team Mobile Devices            |              "Any ideas, John?"
+SUSE LINUX Products GmbH, N=FCrnberg | "Well, surrounding them's out."
+
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great prizes
+Build the coolest Linux based applications with Moblin SDK & win great priz=
+es
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=100&url=/
+http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
