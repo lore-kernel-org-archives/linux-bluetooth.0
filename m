@@ -1,81 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: fix oops in rfcomm tty code (v2)
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Vegard Nossum <vegard.nossum@gmail.com>
-Cc: Maxim Krasnyansky <maxk@qualcomm.com>,
-	Dave Young <hidave.darkstar@gmail.com>,
-	Soeren Sonnenburg <kernel@nn7.de>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <19f34abd0807202351w52b45bc9m6ba5133af696748b@mail.gmail.com>
-References: <20080719211227.GA14173@localhost.localdomain>
-	 <1216503500.8411.110.camel@violet.holtmann.net>
-	 <19f34abd0807202351w52b45bc9m6ba5133af696748b@mail.gmail.com>
-Content-Type: text/plain
-Date: Mon, 21 Jul 2008 12:31:13 +0200
-Message-Id: <1216636273.31819.25.camel@californication>
-Mime-Version: 1.0
+Date: Mon, 21 Jul 2008 11:29:47 +0200
+From: Matthias =?ISO-8859-1?Q?Bl=E4sing?=
+	<matthias.blaesing@rwth-aachen.de>
+Subject: Bluetooth audio and nokia HDW-3 do not work
+To: linux-bluetooth@vger.kernel.org
+Message-id: <1216632588.24708.9.camel@enterprise.glx>
+MIME-version: 1.0
+Content-type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature"; boundary="=-HgDKODQWmuCvey8HK9xN"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vegard,
 
-> >> This is a resend of a patch I sent earlier. It fixes a reproducible
-> >> oops (see http://lkml.org/lkml/2008/7/13/89 for test case), and I'd
-> >> be very happy for some feedback from Bluetooth people. Can this be
-> >> included for testing somewhere? I don't have any bluetooth devices
-> >> myself, so all my testing is limited to creating/releasing devices
-> >> with ioctl (I'm not sure that's good enough).
-> >>
-> >> Dave: I have extended the rfcomm_dev_lock to include all the setup and
-> >> teardown of a single device. On second thought, it doesn't really make
-> >> sense to use a separate lock for that. May I have your opinion on this
-> >> second version? (I've fixed the comments/BUG_ON that you pointed out.)
-> >
-> > it seems it is the actually the first time, I see this one. Anyway, so
-> > holding that lock is a bad idea. Fixing this the right way might be
-> > tricky since the TTY layer is involved here and own the kobject. So I
-> > would say we have to make sure that the RFCOMM TTY will hangup when
-> > calling RELEASEDEV or otherwise fail.
-> 
-> On Mon, Jul 21, 2008 at 7:14 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> >> The patch titled
-> >>      Bluetooth: fix oops in rfcomm tty code
-> >> has been added to the -mm tree.  Its filename is
-> >>      bluetooth-fix-oops-in-rfcomm-tty-code-v2.patch
-> >>
-> > just a quick note that I am not okay with this patch. Holding the lock
-> > isn't the right solution since it would also block any other application
-> > from creating new devices. We can't do this.
-> 
-> Hi,
-> 
-> We are not holding the lock across any ioctl/syscall boundary, which
-> would be an error anyway.
-> 
-> The lock now additionally protects the calls to:
-> 
->     tty_register_device
->     tty_unregister_device
->     device_create_file
-> 
-> I don't think these functions block or do anything with the device
-> apart from just registering/unregistering the files.
-> 
-> Can you please explain in more detail what is wrong with the patch?
-> Where are we preventing other applications from creating new devices?
-> My intention was to prevent other applications from creating the
-> _same_ devices while they are still in use, although attempting to
-> register a new device (with an already-in-use ID) should simply fail,
-> and not block.
+--=-HgDKODQWmuCvey8HK9xN
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-I see an issue when a malicious application like the test program keeps
-the TTY open. Then we would block any other TTY creation. Even if it is
-a different TTY or process.
+Hello,
 
-Regards
+I had a bluetooth headset (Nokia HDW-3)  running once (it was in the
+times of btsco (I think the whole package was calles bluetooth-alsa). As
+I understand bluetooth audio should be its successor. Ok - I tried it
+and got nothing. I have the 0.36 Version of bluez installed (compiled
+from the debian package).
 
-Marcel
+This is the .asoundrc:
 
+pcm.bluetooth {
+   type bluetooth
+   device 00:03:89:51:8F:12
+   profile "voice"
+}
+
+ctl.bluetooth {
+   type bluetooth
+   device 00:03:89:51:8F:12
+   profile "voice"
+}
+
+When I connect the headset and try to play sound from mplayer:
+
+mplayer -ao alsa:device=3Dbluetooth <audio file>
+
+I get these entries in syslog:
+
+Jul 21 10:01:29 enterprise hcid[20068]: link_key_request (sba=3D00:03:7A:AA=
+:A9:34, dba=3D00:03:89:51:8F:12)
+Jul 21 10:01:30 enterprise hcid[20068]: link_key_notify (sba=3D00:03:7A:AA:=
+A9:34, dba=3D00:03:89:51:8F:12)
+Jul 21 10:01:38 enterprise hcid[20068]: Audio API: received BT_GETCAPABILIT=
+IES_REQ
+Jul 21 10:01:38 enterprise hcid[20068]: Audio API: sending BT_GETCAPABILITI=
+ES_RSP
+Jul 21 10:01:38 enterprise hcid[20068]: Audio API: received BT_SETCONFIGURA=
+TION_REQ
+Jul 21 10:01:38 enterprise hcid[20068]: config sco - device =3D 00:03:89:51=
+:8F:12 access_mode =3D 2
+
+Mplayer is frozen and when I try to stop mplayer (Control-C) it reports,
+that it was interrupted in ao2_init (the name implies, that it didn't
+send anything).
+
+Trying to set the volume by using amixer leeds to a flood of the syslog
+with these messages:
+
+Jul 21 09:53:08 enterprise hcid[20068]: Audio API: sending BT_CONTROL_RSP
+Jul 21 09:53:08 enterprise hcid[20068]: Audio API: received BT_CONTROL_REQ
+Jul 21 09:53:08 enterprise hcid[20068]: Audio API: sending BT_CONTROL_RSP
+Jul 21 09:53:08 enterprise hcid[20068]: Audio API: received BT_CONTROL_REQ
+Jul 21 09:53:08 enterprise hcid[20068]: Audio API: sending BT_CONTROL_RSP
+Jul 21 09:53:08 enterprise hcid[20068]: Audio API: received BT_CONTROL_REQ
+Jul 21 09:53:08 enterprise hcid[20068]: Audio API: sending BT_CONTROL_RSP
+Jul 21 09:53:08 enterprise hcid[20068]: Audio API: received BT_CONTROL_REQ
+Jul 21 09:53:08 enterprise hcid[20068]: Audio API: sending BT_CONTROL_RSP
+
+I really don't know where to look further - any help is appretiated=20
+
+Thanks in advance
+
+Matthias
+
+--=20
+So long and thanks for all the fish!
+
+--=-HgDKODQWmuCvey8HK9xN
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: Dies ist ein digital signierter Nachrichtenteil
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEABECAAYFAkiEVwcACgkQwuNy6qcbS9XwZACfd/7mpgP00nSLB8P6tIyj+Osu
+OzkAn3ZcJZlRJlMZ3hKh+uHv/AtPMt+A
+=rcSH
+-----END PGP SIGNATURE-----
+
+--=-HgDKODQWmuCvey8HK9xN--
 
