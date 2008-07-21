@@ -1,40 +1,151 @@
 Return-Path: <cyrus@holtmann.org>
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Message-Id: <05565665-4792-4522-B346-DD1C5EEDB4CE@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Ben Collins <ben.collins@canonical.com>
-In-Reply-To: <1216656014.7585.146.camel@cunning>
-Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
-Mime-Version: 1.0 (Apple Message framework v928.1)
-Subject: Re: [PATCH 3/7] bluetooth: Add quirks for a few hci_usb devices
-Date: Tue, 22 Jul 2008 01:30:14 +0200
-References: <E1KKl4I-00068H-S6@swissweb.swissdisk.com> <1216616891.8411.114.camel@violet.holtmann.net> <1216656014.7585.146.camel@cunning>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 21 Jul 2008 19:32:10 +0200
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Maxim Krasnyansky <maxk@qualcomm.com>,
+	Dave Young <hidave.darkstar@gmail.com>
+Cc: Soeren Sonnenburg <kernel@nn7.de>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: fix oops in rfcomm tty code (v3)
+Message-ID: <20080721173210.GA10710@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+From: Vegard Nossum <vegard.nossum@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ben,
+Hi,
 
-> Preface: The "Broadcom" device is on unreleased hardware, so I can't
-> disclose the actual model.
+I've respun the patch, now addressing Marcel's comments.
 
-then put on your todo list to update this entry once you can.
+The change is basically that we _don't_ hold the &rfcomm_dev_lock while
+registering tty devices. Instead, to prevent the race, we unregister the
+device *before* it's removed from the list.
 
-> When the Dell 370 and 410 BT adapters are put into BT radio mode, they
-> need to be prepared like many other Broadcom adapters.
+Does this look any better? I think that if I don't make it this time, I
+will give up and let somebody else fix it :-)
+
+I've tested it briefly and it doesn't block the creation of new devices,
+however, it seems that the device is now deleted as soon as the first
+socket is closed, which means that in order to create /dev/rfcomm0 and
+also open it, in the test program, the first socket must not be closed
+before the device is opened. I'm sure if this is the intended behaviour?
+
+Thanks,
+
+
+Vegard
+
+
+>From 5be8c4d5011f23d5e2b116f4965a6c6061d049a5 Mon Sep 17 00:00:00 2001
+From: Vegard Nossum <vegard.nossum@gmail.com>
+Date: Sun, 13 Jul 2008 19:02:11 +0200
+Subject: [PATCH] Bluetooth: fix oops in rfcomm tty code
+
+Soeren Sonnenburg reported:
+> this oops happened after a couple of s2ram cycles so it might be very
+> well crap. However I somehow triggered it by /etc/init.d/bluetooth
+> stop/start's which also call hid2hci maybe even a connection was about
+> to be established at that time. As I remember having seen a problem like
+> this before I thought I report it (even though I have a madwifi tainted
+> kernel).
 >
-> Also, add quirk Broadcom 2046 devices with HCI_RESET. Reference for  
-> this
-> bug: https://launchpad.net/bugs/249448
->
-> CC: linux-bluetooth@vger.kernel.org
-> Signed-off-by: Michael Frey <michael.frey@canonical.com>
-> Signed-off-by: Mario Limonciello <Mario_Limonciello@Dell.com>
-> Signed-off-by: Tim Gardner <tim.gardner@canonical.com>
-> Signed-off-by: Ben Collins <ben.collins@canonical.com>
+> kobject_add_internal failed for rfcomm0 with -EEXIST, don't try to register things with the same name in the same directory.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+It turns out that the following sequence of actions will reproduce the
+oops:
 
-Regards
+  1. Create a new rfcomm device (using RFCOMMCREATEDEV ioctl)
+  2. (Try to) open the device
+  3. Release the rfcomm device (using RFCOMMRELEASEDEV ioctl)
 
-Marcel
+At this point, the "rfcomm?" tty is still in use, but the device is gone
+from the internal rfcomm list, so the device id can be reused.
 
+  4. Create a new rfcomm device with the same device id as before
+
+And now kobject will complain that the tty already exists.
+
+(See http://lkml.org/lkml/2008/7/13/89 for a reproducible test-case.)
+
+This patch attempts to correct this by only removing the device from the
+internal rfcomm list of devices at the final unregister, so that the id
+won't get reused until the device has been completely destructed.
+
+This should be safe as the RFCOMM_TTY_RELEASED bit will be set for the
+device and prevent the device from being reopened after it has been
+released.
+
+We also fix a race (which would lead to the same oops) by unregistering
+with the tty layer before the device is taken off the list of devices.
+
+Thanks to Dave Young for additional suggestions.
+
+Reported-by: Soeren Sonnenburg <kernel@nn7.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Maxim Krasnyansky <maxk@qualcomm.com>
+Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: Dave Young <hidave.darkstar@gmail.com>
+Signed-off-by: Vegard Nossum <vegard.nossum@gmail.com>
+---
+ net/bluetooth/rfcomm/tty.c |   24 ++++++++++++------------
+ 1 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index d3340dd..ef4bdaa 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -96,9 +96,13 @@ static void rfcomm_dev_destruct(struct rfcomm_dev *dev)
+ 	BT_DBG("dev %p dlc %p", dev, dlc);
+ 
+ 	/* Refcount should only hit zero when called from rfcomm_dev_del()
+-	   which will have taken us off the list. Everything else are
+-	   refcounting bugs. */
+-	BUG_ON(!list_empty(&dev->list));
++	   which will have set the RFCOMM_TTY_RELEASED bit. Everything else
++	   are refcounting bugs. */
++	BUG_ON(!test_bit(RFCOMM_TTY_RELEASED, &dev->flags));
++
++	tty_unregister_device(rfcomm_tty_driver, dev->id);
++
++	write_lock_bh(&rfcomm_dev_lock);
+ 
+ 	rfcomm_dlc_lock(dlc);
+ 	/* Detach DLC if it's owned by this dev */
+@@ -108,7 +112,9 @@ static void rfcomm_dev_destruct(struct rfcomm_dev *dev)
+ 
+ 	rfcomm_dlc_put(dlc);
+ 
+-	tty_unregister_device(rfcomm_tty_driver, dev->id);
++	list_del_init(&dev->list);
++
++	write_unlock_bh(&rfcomm_dev_lock);
+ 
+ 	kfree(dev);
+ 
+@@ -127,10 +133,8 @@ static inline void rfcomm_dev_put(struct rfcomm_dev *dev)
+ 	/* The reason this isn't actually a race, as you no
+ 	   doubt have a little voice screaming at you in your
+ 	   head, is that the refcount should never actually
+-	   reach zero unless the device has already been taken
+-	   off the list, in rfcomm_dev_del(). And if that's not
+-	   true, we'll hit the BUG() in rfcomm_dev_destruct()
+-	   anyway. */
++	   reach zero unless we've already set the
++	   RFCOMM_TTY_RELEASED bit in rfcomm_dev_del(). */
+ 	if (atomic_dec_and_test(&dev->refcnt))
+ 		rfcomm_dev_destruct(dev);
+ }
+@@ -335,10 +339,6 @@ static void rfcomm_dev_del(struct rfcomm_dev *dev)
+ 	else
+ 		set_bit(RFCOMM_TTY_RELEASED, &dev->flags);
+ 
+-	write_lock_bh(&rfcomm_dev_lock);
+-	list_del_init(&dev->list);
+-	write_unlock_bh(&rfcomm_dev_lock);
+-
+ 	rfcomm_dev_put(dev);
+ }
+ 
+-- 
+1.5.5.1
