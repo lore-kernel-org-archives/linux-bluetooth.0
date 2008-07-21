@@ -1,90 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <19f34abd0807202351w52b45bc9m6ba5133af696748b@mail.gmail.com>
-Date: Mon, 21 Jul 2008 08:51:42 +0200
-From: "Vegard Nossum" <vegard.nossum@gmail.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: fix oops in rfcomm tty code (v2)
-Cc: "Maxim Krasnyansky" <maxk@qualcomm.com>,
-	"Dave Young" <hidave.darkstar@gmail.com>,
-	"Soeren Sonnenburg" <kernel@nn7.de>,
-	"David Woodhouse" <dwmw2@infradead.org>,
-	"Andrew Morton" <akpm@linux-foundation.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <1216503500.8411.110.camel@violet.holtmann.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-References: <20080719211227.GA14173@localhost.localdomain>
-	 <1216503500.8411.110.camel@violet.holtmann.net>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH 3/7] bluetooth: Add quirks for a few hci_usb devices
+From: Ben Collins <ben.collins@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+In-Reply-To: <1216616891.8411.114.camel@violet.holtmann.net>
+References: <E1KKl4I-00068H-S6@swissweb.swissdisk.com>
+	 <1216616891.8411.114.camel@violet.holtmann.net>
+Content-Type: text/plain
+Date: Mon, 21 Jul 2008 01:54:16 -0400
+Message-Id: <1216619656.7585.104.camel@cunning>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Jul 19, 2008 at 11:38 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Vegard,
->
->> This is a resend of a patch I sent earlier. It fixes a reproducible
->> oops (see http://lkml.org/lkml/2008/7/13/89 for test case), and I'd
->> be very happy for some feedback from Bluetooth people. Can this be
->> included for testing somewhere? I don't have any bluetooth devices
->> myself, so all my testing is limited to creating/releasing devices
->> with ioctl (I'm not sure that's good enough).
->>
->> Dave: I have extended the rfcomm_dev_lock to include all the setup and
->> teardown of a single device. On second thought, it doesn't really make
->> sense to use a separate lock for that. May I have your opinion on this
->> second version? (I've fixed the comments/BUG_ON that you pointed out.)
->
-> it seems it is the actually the first time, I see this one. Anyway, so
-> holding that lock is a bad idea. Fixing this the right way might be
-> tricky since the TTY layer is involved here and own the kobject. So I
-> would say we have to make sure that the RFCOMM TTY will hangup when
-> calling RELEASEDEV or otherwise fail.
+On Mon, 2008-07-21 at 07:08 +0200, Marcel Holtmann wrote:
+> Hi Ben,
+> 
+> > When the Dell 370 and 410 BT adapters are put into BT radio mode, they
+> > need to be prepared like many other Broadcom adapters.
+> > 
+> > Also, add quirk Broadcom 2046 devices with HCI_RESET.
+> > 
+> > CC: linux-bluetooth@vger.kernel.org
+> > Signed-off-by: Michael Frey <michael.frey@canonical.com>
+> > Signed-off-by: Mario Limonciello <Mario_Limonciello@Dell.com>
+> > Signed-off-by: Tim Gardner <tim.gardner@canonical.com>
+> > Signed-off-by: Ben Collins <ben.collins@canonical.com>
+> > ---
+> >  drivers/bluetooth/hci_usb.c |    7 +++++++
+> >  1 files changed, 7 insertions(+), 0 deletions(-)
+> > 
+> > diff --git a/drivers/bluetooth/hci_usb.c b/drivers/bluetooth/hci_usb.c
+> > index 192522e..0254a6b 100644
+> > --- a/drivers/bluetooth/hci_usb.c
+> > +++ b/drivers/bluetooth/hci_usb.c
+> > @@ -134,6 +134,13 @@ static struct usb_device_id blacklist_ids[] = {
+> >  
+> >  	/* Dell laptop with Broadcom chip */
+> >  	{ USB_DEVICE(0x413c, 0x8126), .driver_info = HCI_RESET | HCI_WRONG_SCO_MTU },
+> > +	/* Dell Wireless 370 */
+> > +	{ USB_DEVICE(0x413c, 0x8156), .driver_info = HCI_RESET | HCI_WRONG_SCO_MTU },
+> > +	/* Dell Wireless 410 */
+> > +	{ USB_DEVICE(0x413c, 0x8152), .driver_info = HCI_RESET | HCI_WRONG_SCO_MTU },
+> > +        
+> > +        /* Broadcom 2046 */
+> > +        { USB_DEVICE(0x0a5c, 0x2151), .driver_info = HCI_RESET },
+> 
+> do me a favor and use tabs and not whitespaces here. And is this the
+> latest Apple machine that has a Broadcom instead of a CSR chip in it. If
+> so, then let the comment reflect this.
 
-On Mon, Jul 21, 2008 at 7:14 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
->> The patch titled
->>      Bluetooth: fix oops in rfcomm tty code
->> has been added to the -mm tree.  Its filename is
->>      bluetooth-fix-oops-in-rfcomm-tty-code-v2.patch
->>
-> just a quick note that I am not okay with this patch. Holding the lock
-> isn't the right solution since it would also block any other application
-> from creating new devices. We can't do this.
+Whoops. That slipped through. I've no idea what system that device
+actually came from. I'd have to ask Michael, since he was the one who
+reported it. I'll resend a corrected patch in the morning.
 
-Hi,
-
-We are not holding the lock across any ioctl/syscall boundary, which
-would be an error anyway.
-
-The lock now additionally protects the calls to:
-
-    tty_register_device
-    tty_unregister_device
-    device_create_file
-
-I don't think these functions block or do anything with the device
-apart from just registering/unregistering the files.
-
-Can you please explain in more detail what is wrong with the patch?
-Where are we preventing other applications from creating new devices?
-My intention was to prevent other applications from creating the
-_same_ devices while they are still in use, although attempting to
-register a new device (with an already-in-use ID) should simply fail,
-and not block.
-
-Thank you,
-
-
-Vegard
-
--- 
-"The animistic metaphor of the bug that maliciously sneaked in while
-the programmer was not looking is intellectually dishonest as it
-disguises that the error is the programmer's own creation."
-	-- E. W. Dijkstra, EWD1036
-
-
-
--- 
-"The animistic metaphor of the bug that maliciously sneaked in while
-the programmer was not looking is intellectually dishonest as it
-disguises that the error is the programmer's own creation."
-	-- E. W. Dijkstra, EWD1036
+Thanks Marcel.
