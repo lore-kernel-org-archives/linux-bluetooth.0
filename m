@@ -1,13 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <4885C0C9.7000308@idlum.be>
+Date: Tue, 22 Jul 2008 13:13:13 +0200
+From: Pierre-Yves Paulus <py@idlum.be>
+MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <4885C0C9.7000308@idlum.be>
-References: <4885C0C9.7000308@idlum.be>
-Date: Tue, 22 Jul 2008 15:20:34 +0200
-Message-Id: <1216732834.31819.31.camel@californication>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Unexpected error / chronology trying to
-	extract	sdp handles
+Subject: [Bluez-devel] Unexpected error / chronology trying to extract sdp
+	handles
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,33 +19,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Pierre-Yves,
+Hello,
 
-> I'm running v3.34. I know it's not the latest. But I've observed what I 
-> describe below on virtually any previous 3.x version.
-> 
-> Somewhere in my code, I perform a call to 
-> Adapter.GetRemoteServiceHandles(btAddress, match). This call blocks as 
-> expected. A few seconds later, I get a RemoteDeviceConnected signal. 
-> Great, looking good. But about 30s after the first call, 
-> GetRemoteServiceHandles finally returns, by throwing a 
-> ConnectionAttemptFailed. The RemoteDeviceDisconnected event arrives at 
-> the same time than the expection.
-> 
-> How can I get I get a ConnectionAttempFailed while I have received a 
-> "Connected" signal previously? Is it to be expected? How should such 
-> apparent non-sense be dealt with? Or perhaps I'm mislead by the 
-> (apparently obvious) "ConnectionAttemptFailed" name?
+I'm running v3.34. I know it's not the latest. But I've observed what I 
+describe below on virtually any previous 3.x version.
 
-the SDP connection establishment might fail. This is different from from
-any low-level ACL link that you see. Run hcidump -X -V and see what
-actually does happen.
+Somewhere in my code, I perform a call to 
+Adapter.GetRemoteServiceHandles(btAddress, match). This call blocks as 
+expected. A few seconds later, I get a RemoteDeviceConnected signal. 
+Great, looking good. But about 30s after the first call, 
+GetRemoteServiceHandles finally returns, by throwing a 
+ConnectionAttemptFailed. The RemoteDeviceDisconnected event arrives at 
+the same time than the expection.
 
-Regards
+How can I get I get a ConnectionAttempFailed while I have received a 
+"Connected" signal previously? Is it to be expected? How should such 
+apparent non-sense be dealt with? Or perhaps I'm mislead by the 
+(apparently obvious) "ConnectionAttemptFailed" name?
 
-Marcel
-
-
+Thanks in advance,
+Best Regards.
+Pierre-Yves
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
