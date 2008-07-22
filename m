@@ -1,59 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4885B849.7040201@wurmsdobler.org>
-Date: Tue, 22 Jul 2008 11:36:57 +0100
-From: Peter Wurmsdobler <peter@wurmsdobler.org>
+Message-ID: <a8e1da0807212202o342fea25w3bf650f05986f65@mail.gmail.com>
+Date: Tue, 22 Jul 2008 13:02:33 +0800
+From: "Dave Young" <hidave.darkstar@gmail.com>
+To: "Odysseus Flappington" <deriziotis@gmail.com>
+Subject: Re: [Bluez-users] hciconfig hci0 reset bug
+Cc: "Marcel Holtmann" <marcel@holtmann.org>,
+	"BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <5eee8c670807211353u49afeb71gc7aa02ce15b684a@mail.gmail.com>
 MIME-Version: 1.0
-To: bluez-users@lists.sourceforge.net
-Subject: [Bluez-users] #define OGF_TESTING_CMD potentially wrong?
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Content-Type: text/plain; charset=UTF-8
+References: <5eee8c670802281451i392c0debq7a16286d76d33bfb@mail.gmail.com>
+	 <a8e1da0803021724h654f65ceif24b2035dc94a5ec@mail.gmail.com>
+	 <5eee8c670803030335v49536053j136b8b46addb8129@mail.gmail.com>
+	 <5eee8c670803031419k10c8e625p447f8f98ac27dcb9@mail.gmail.com>
+	 <5eee8c670803170528o44384744pe238c378953dbc02@mail.gmail.com>
+	 <a8e1da0803180014u262a7ee0h25ff58a0e6363dfd@mail.gmail.com>
+	 <5eee8c670803201019q4703c779wbb597b806cf4d7c@mail.gmail.com>
+	 <a8e1da0803211729l1fdfeeb5ie22c70652bc1e76a@mail.gmail.com>
+	 <9CBA2065-DBBE-4342-BF35-2C24BDF829C5@holtmann.org>
+	 <5eee8c670807211353u49afeb71gc7aa02ce15b684a@mail.gmail.com>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-Hello,
+On Tue, Jul 22, 2008 at 4:53 AM, Odysseus Flappington
+<deriziotis@gmail.com> wrote:
+> Hi Marcel,
+>
+> I keep reading kernel developers saying that we should be persistent, so I'm
+> following up on this, has any progress been made regarding the following
+> issue?
 
-a few days ago I posted a message concerning testing, i.e. on how to put 
-a Bluetooth module into the test modes specified in the Bluetooth 
-specification Core 2.1 (27.07.2007) using:
+Hi, I ever tried to implement it, but I'm occupied by other projects.
 
-	hcitool cmd <OGF> <OCF> [params]
+The key problem is that bluetooth drivers can only set the flags
+during the probe now, but we need to send bluetooth commands to get
+the revision.
 
-In concrete I was interested in HCI_Write_Loopback_Mode and 
-HCI_Enable_Device_Under_Test_Mode, for which OCF are defined as 0x0002 
-and 0x0003, respectively. OGF is defined as 0x06 in the specification.
+>
+> This one's a bit of an old one, regarding bluetooth adapters after a certain
+> build number to require a reset command every boot before they'll work
+> properly, I've attached a previous discussion as a reminder to the issue.
+>
+> If there's anything I can do (non-code writing though), please let me know,
+> I'll be glad to help get this sorted.
+>
+> Alexander Deriziotis
+>
+> On 26/03/2008, Marcel Holtmann <marcel@holtmann.org> wrote:
+>>
+>> Hi Dave,
+>>
+>>>> I've been looking around to see if I could figure out the build id where
+>>>> the
+>>>> dongles started shipping with the correct HCI_Reset. I think I may have
+>>>> found something.
+>>>
+>>> Thanks a lot.
+>>>
+>>> Marcel, I think it's what you want.  I would like to file a patch.
+>>
+>> yes, but I already got it via CSR internals. They have always been helpful
+>> when it comes to BlueZ. CSR is an open source friendly company. I didn't
+>> have time to actually produce that patch since we have to turn the whole
+>> logic around.
+>>
+>> Regards
+>>
+>> Marcel
+>>
+>
+>
 
-hcitool delivers the command at the bluetooth module. However, hcidump, 
-which uses #defines and tables from bluez-libs, resolves this commands 
-as Unknown, as it would defined in include/hci.h
-
-#define OGF_TESTING_CMD 0x3e
-
-If I used OGF=0x3e in the above hcitool command, hcidump would resolve 
-the string correctly, but the bluetooth module would not do what it was 
-told to do.
-
-To me it appears that the #define in hci.h is potentially wrong, or 
-maybe refers to an older version of the specification, when testing 
-might have been vendor specific.
-
-Best regards,
-peter
 
 
--------------------------------------------------------------------------
-This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great prizes
-Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=100&url=/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+-- 
+Regards
+dave
