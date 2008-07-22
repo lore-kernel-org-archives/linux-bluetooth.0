@@ -1,11 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4885C0C9.7000308@idlum.be>
-Date: Tue, 22 Jul 2008 13:13:13 +0200
-From: Pierre-Yves Paulus <py@idlum.be>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Unexpected error / chronology trying to extract sdp
-	handles
+To: bluez-devel@lists.sourceforge.net
+From: Jui-Hao Chiang <windtracekimo@gmail.com>
+Date: Tue, 22 Jul 2008 03:21:35 +0000 (UTC)
+Message-ID: <loom.20080722T031618-791@post.gmane.org>
+References: <loom.20080714T020902-534@post.gmane.org>
+	<loom.20080721T023453-583@post.gmane.org>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] =?utf-8?q?Questions_when_tracing_the_hci=5Fusb?=
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,27 +20,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+ 
+> I have tried to setup three PCs, each with a bluetooth usb adapter.
+> http://www.cyber-blue.com/products_info.asp?id=19&code=AC
+> PC1 is configured as Master role, and PC2 is Slave.
+> The scotest can be used to send one SCO voice traffic from PC2 to PC1.
+> But when I use another PC3 to connect to PC1,
+> there is no connection request event found in PC1.
+> (tried alternative settings from 2 to 5)
 
-I'm running v3.34. I know it's not the latest. But I've observed what I 
-describe below on virtually any previous 3.x version.
+I find out one weird condition.
+Once we dynamically call usb_set_interface somewhere else.
+(In Alok's patch, it adjust it when hci_notify is triggered,
+and the new isoc alternative setting will depend on sco_num)
+The resubmit status in hci_usb_rx_complete fail with status -90.
+Afterwards, no resubmit will keep working.
 
-Somewhere in my code, I perform a call to 
-Adapter.GetRemoteServiceHandles(btAddress, match). This call blocks as 
-expected. A few seconds later, I get a RemoteDeviceConnected signal. 
-Great, looking good. But about 30s after the first call, 
-GetRemoteServiceHandles finally returns, by throwing a 
-ConnectionAttemptFailed. The RemoteDeviceDisconnected event arrives at 
-the same time than the expection.
+Is there any problem to call usb_set_interface besides of the probe phase?
 
-How can I get I get a ConnectionAttempFailed while I have received a 
-"Connected" signal previously? Is it to be expected? How should such 
-apparent non-sense be dealt with? Or perhaps I'm mislead by the 
-(apparently obvious) "ConnectionAttemptFailed" name?
 
-Thanks in advance,
-Best Regards.
-Pierre-Yves
+
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
