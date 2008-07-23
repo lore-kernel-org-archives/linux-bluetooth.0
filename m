@@ -1,136 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <488870AF.3080601@krevsbech.dk>
-Date: Thu, 24 Jul 2008 14:08:15 +0200
-From: Kasper Revsbech <mail@krevsbech.dk>
-MIME-Version: 1.0
+Message-ID: <3837d8b10807231531h36402a71g3ee5ac500a5dc45@mail.gmail.com>
+Date: Wed, 23 Jul 2008 17:31:30 -0500
+From: "keith preston" <keithpre@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: RFCOMM server multiple client connections
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [PATCH] bluez a2dp alsa fix
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_Part_95411_978661.1216852290295"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi everyone.
-I am trying do do a simple client server setup  with bluez.
-I can manage to have a client and a server on rfcomm sockets where the 
-server listen on a socket and accept a connection from the client by 
-connect. But then if I set the server back to accepting without putting 
-down the one client connection it doesn't accept a new connection.
-When I read thought the documentation I can find on Bluez and Bluetooth 
-in general it seems like it should be possible to multiplex serveal 
-virtual rfcomm connections  on one actual connection. But however I 
-really can get it working and can't find any code where they do 
-something similar.
+------=_Part_95411_978661.1216852290295
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Hope that someone can give me a hint...
+There is a small bug in pcm_bluetooth.c.   Typically in an alsa write
+call you return the number of samples(frames) that you have processed.
+  However in this case where we don't have a full block to encode in
+SBC, we return basically return (incoming_buffer_size) %
+(SBC_Encode_Block_size).   This is correct in the case where
+(incoming_buffer_size) < (SBC_Encode_Block_size), however is wrong
+when (incoming_buffer_size) > (SBC_Encode_Block_size), because this
+statement ignores previously processed blocks.  This is a small one
+line fix.   Patch is attached.    Also I don't know if anyone is
+actively working on this, but this section of code is rather
+inefficent.   The memcopy is only needed when partial blocks are found
+and there are way too many repeated calculations inside the for loop.
+ I guess a patch for that will come another day though.
 
-/Kasper Revsbech
+Keith Preston
 
+------=_Part_95411_978661.1216852290295
+Content-Type: text/x-patch; name=return-correct-number-of-frames.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fj0iawez0
+Content-Disposition: attachment;
+ filename=return-correct-number-of-frames.patch
 
-Here is a example of what I have tried to make it work:
-
-Client:
---------------------------
-
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/rfcomm.h>
-#define number_of_connections 5
-
-int main(int argc, char **argv)
-{
- 
-  struct sockaddr_rc addr = { 0 };
-  int s[number_of_connections], status, getpeer_status;
-    char dest[18] = "00:11:67:05:4f:dc";
-    struct sockaddr peer_address;
-    int namelen = sizeof(peer_address),i;
-
-    // set the connection parameters (who to connect to)
-    addr.rc_family = AF_BLUETOOTH;
-    addr.rc_channel = (uint8_t) 1;
-    str2ba( dest, &addr.rc_bdaddr );
-   
-for (i=0 ;i=(number_of_connections-1);i++){
-   
-      s[i] = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-
-  
-     /*connect to server*/
-      status = connect(s[i], (struct sockaddr *)&addr, sizeof(addr));
-   
-   
-    // send a message
-    if( status == 0 ) {
-      status = write(s[i], "hello!", 6);
-    }
-
-    if( status < 0 ) perror("uh oh");
-    }
-  
-
-
-
-    for (i=0 ;i=(number_of_connections-1);i++){
-      close(s[i]);
-    }  
-
-    return 0;
-}
-
------------------------------------
-Server:
------------------------------------
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/rfcomm.h>
-#define number_of_connections 5
-
-int main(int argc, char **argv)
-{
-    struct sockaddr_rc loc_addr = { 0 }, rem_addr = { 0 };
-    char buf[1024] = { 0 };
-    int s, client[number_of_connections], bytes_read;
-    socklen_t opt = sizeof(rem_addr);
-    int i;
-    // allocate socket
-    s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-
-    // bind socket to port 1 of the first available
-    // local bluetooth adapter
-    loc_addr.rc_family = AF_BLUETOOTH;
-    loc_addr.rc_bdaddr = *BDADDR_ANY;
-    loc_addr.rc_channel = (uint8_t) 1;
-    bind(s, (struct sockaddr *)&loc_addr, sizeof(loc_addr));
-
-    // put socket into listening mode
-    listen(s, number_of_connections);
-    for (i=0 ;i=(number_of_connections-1);i++){
-
-    // accept one connection
-      client[i] = accept(s, (struct sockaddr *)&rem_addr, &opt);
-
-      ba2str( &rem_addr.rc_bdaddr, buf );
-      fprintf(stderr, "accepted connection from %s\n", buf);
-      memset(buf, 0, sizeof(buf));
-
-      // read data from the client
-      bytes_read = read(client[i], buf, sizeof(buf));
-      if( bytes_read > 0 ) {
-        printf("received [%s]\n", buf);
-      }
-    }
-   
-    // close connection
-      for (i=0 ;i=(number_of_connections-1);i++){
-       close(client[i]);
-     }
-     close(s);
-    return 0;
-
-
-
+ZGlmZiAtTmF1ciBibHVlei11dGlscy0zLjM2Lm9yaWcvYXVkaW8vcGNtX2JsdWV0b290aC5jIGJs
+dWV6LXV0aWxzLTMuMzYvYXVkaW8vcGNtX2JsdWV0b290aC5jCi0tLSBibHVlei11dGlscy0zLjM2
+Lm9yaWcvYXVkaW8vcGNtX2JsdWV0b290aC5jCTIwMDgtMDctMjMgMTc6MTM6MTMuMDAwMDAwMDAw
+IC0wNTAwCisrKyBibHVlei11dGlscy0zLjM2L2F1ZGlvL3BjbV9ibHVldG9vdGguYwkyMDA4LTA3
+LTIzIDE3OjEzOjU2LjAwMDAwMDAwMCAtMDUwMApAQCAtMTAzMiw3ICsxMDMyLDcgQEAKIAkJLyog
+UmVtZW1iZXIgd2UgaGF2ZSBzb21lIGZyYW1lcyBpbiB0aGUgcGlwZSBub3cgKi8KIAkJZGF0YS0+
+Y291bnQgKz0gZnJhbWVzX3RvX3JlYWQgKiBmcmFtZV9zaXplOwogCQlpZiAoZGF0YS0+Y291bnQg
+IT0gYTJkcC0+Y29kZXNpemUpIHsKLQkJCXJldCA9IGZyYW1lc190b19yZWFkOworCQkJcmV0ICs9
+IGZyYW1lc190b19yZWFkOwogCQkJZ290byBkb25lOwogCQl9CiAK
+------=_Part_95411_978661.1216852290295--
