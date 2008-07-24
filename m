@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2d5a2c100807241345x48a0b1co22975c0fb0e0c8d9@mail.gmail.com>
-Date: Thu, 24 Jul 2008 17:45:59 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <3837d8b10807241238r3284fdb6q60f4c86265146756@mail.gmail.com>
+Message-ID: <3837d8b10807241238r3284fdb6q60f4c86265146756@mail.gmail.com>
+Date: Thu, 24 Jul 2008 14:38:47 -0500
+From: "keith preston" <keithpre@gmail.com>
+To: bluez-devel@lists.sourceforge.net
 MIME-Version: 1.0
-References: <3837d8b10807241238r3284fdb6q60f4c86265146756@mail.gmail.com>
-Subject: Re: [Bluez-devel] [PATCH] a2dp_write patch
+Content-Type: multipart/mixed;
+	boundary="----=_Part_106413_3766246.1216928327061"
+Subject: [Bluez-devel] [PATCH] a2dp_write patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,32 +16,141 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello Keith,
+------=_Part_106413_3766246.1216928327061
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Well done, now Im wondering if it isn't possible to use alsa buffer
-all the time instead of copying to a temporary buffer? I mean can't we
-just point to the first pcm frame processed but not encoded? (If not
-freed already by alsa)
-Also there is some code duplication, but still the idea is very good.
-If you could please check the performance with oprofile.
+This is a patch to rewrite a2dp_write to avoid memory copies.   It
+does this by only using the temporary buffer if we are dealing with
+partial buffers.  I see a little bit of a speedup with my embedded
+device, however sbc encoding usually takes the most time.
 
+This also fixes a small bug in pcm_bluetooth.c.   Typically in an alsa
+write call you return the number of samples(frames) that you have
+processed.  However in this case where we don't have a full block to
+encode in SBC, we return basically return (incoming_buffer_size) %
+(SBC_Encode_Block_size).   This is correct in the case where
+(incoming_buffer_size) < (SBC_Encode_Block_size), however is wrong
+when (incoming_buffer_size) > (SBC_Encode_Block_size), because this
+statement ignores previously processed blocks.
 
--- =
+Keith Preston
 
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+------=_Part_106413_3766246.1216928327061
+Content-Type: text/x-patch; name=a2dp_write.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fj1robxx0
+Content-Disposition: attachment; filename=a2dp_write.patch
+
+LS0tIGJsdWV6LXV0aWxzLTMuMzYub3JpZy9hdWRpby9wY21fYmx1ZXRvb3RoLmMJMjAwOC0wNy0y
+MyAxNzoxMzoxMy4wMDAwMDAwMDAgLTA1MDAKKysrIGJsdWV6LXV0aWxzLTMuMzYvYXVkaW8vcGNt
+X2JsdWV0b290aC5jCTIwMDgtMDctMjQgMTM6NTA6MzEuMDAwMDAwMDAwIC0wNTAwCkBAIC05NzQs
+MjEgKzk3NCwyNSBAQAogCXN0cnVjdCBibHVldG9vdGhfZGF0YSAqZGF0YSA9IGlvLT5wcml2YXRl
+X2RhdGE7CiAJc3RydWN0IGJsdWV0b290aF9hMmRwICphMmRwID0gJmRhdGEtPmEyZHA7CiAJc25k
+X3BjbV9zZnJhbWVzX3QgcmV0ID0gMDsKLQlzbmRfcGNtX3VmcmFtZXNfdCBmcmFtZXNfdG9fcmVh
+ZCwgZnJhbWVzX2xlZnQgPSBzaXplOwotCWludCBmcmFtZV9zaXplLCBlbmNvZGVkLCB3cml0dGVu
+OworCWludCBmcmFtZV9zaXplLCBlbmNvZGVkLCB3cml0dGVuLCBieXRlc19sZWZ0OwogCXVpbnQ4
+X3QgKmJ1ZmY7Ci0KIAlEQkcoImFyZWFzLT5zdGVwPSV1IGFyZWFzLT5maXJzdD0ldSBvZmZzZXQ9
+JWx1IHNpemU9JWx1IiwKIAkJCQlhcmVhcy0+c3RlcCwgYXJlYXMtPmZpcnN0LCBvZmZzZXQsIHNp
+emUpOwogCURCRygiaHdfcHRyPSVsdSBhcHBsX3B0cj0lbHUgZGlmZj0lbHUiLCBpby0+aHdfcHRy
+LCBpby0+YXBwbF9wdHIsCiAJCQlpby0+YXBwbF9wdHIgLSBpby0+aHdfcHRyKTsKIAorCS8qIENh
+bHV0YXRlIHN0YXJ0aW5nIHBvaW50ZXJzICovCisJZnJhbWVfc2l6ZSA9IGFyZWFzLT5zdGVwIC8g
+ODsKKwlieXRlc19sZWZ0ID0gc2l6ZSAqIGZyYW1lX3NpemU7CisJYnVmZiA9ICh1aW50OF90ICop
+IGFyZWFzLT5hZGRyICsKKwkJKGFyZWFzLT5maXJzdCArIGFyZWFzLT5zdGVwICogKG9mZnNldCkp
+IC8gODsKKwkvKiBDaGVjayBmb3IgdW5kZXJydW4gKi8KIAlpZiAoaW8tPmh3X3B0ciA+IGlvLT5h
+cHBsX3B0cikgewogCQlyZXQgPSBibHVldG9vdGhfcGxheWJhY2tfc3RvcChpbyk7CiAJCWlmIChy
+ZXQgPT0gMCkKIAkJCXJldCA9IC1FUElQRTsKIAkJZGF0YS0+cmVzZXQgPSAxOwotCQlnb3RvIGRv
+bmU7CisJCXJldHVybiByZXQ7CiAJfQogCiAJLyogQ2hlY2sgaWYgd2Ugc2hvdWxkIGF1dG9zdGFy
+dCAqLwpAQCAtMTAwMywzOSArMTAwNywxOCBAQAogCQkJaWYgKGlvLT5hcHBsX3B0ciA+PSB0aHJl
+c2hvbGQpIHsKIAkJCQlyZXQgPSBzbmRfcGNtX3N0YXJ0KGlvLT5wY20pOwogCQkJCWlmIChyZXQg
+IT0gMCkKLQkJCQkJZ290byBkb25lOworCQkJCQlyZXR1cm4gcmV0OwogCQkJfQogCQl9CiAKIAkJ
+c25kX3BjbV9zd19wYXJhbXNfZnJlZShzd3BhcmFtcyk7CiAJfQogCi0Jd2hpbGUgKGZyYW1lc19s
+ZWZ0ID4gMCkgewotCQlmcmFtZV9zaXplID0gYXJlYXMtPnN0ZXAgLyA4OwotCi0JCWlmICgoZGF0
+YS0+Y291bnQgKyBmcmFtZXNfbGVmdCAqIGZyYW1lX3NpemUpIDw9IGEyZHAtPmNvZGVzaXplKQot
+CQkJZnJhbWVzX3RvX3JlYWQgPSBmcmFtZXNfbGVmdDsKLQkJZWxzZQotCQkJZnJhbWVzX3RvX3Jl
+YWQgPSAoYTJkcC0+Y29kZXNpemUgLSBkYXRhLT5jb3VudCkgLyBmcmFtZV9zaXplOwotCi0JCURC
+RygiY291bnQ9JWQgZnJhbWVzX3RvX3JlYWQ9JWx1IiwgZGF0YS0+Y291bnQsIGZyYW1lc190b19y
+ZWFkKTsKLQkJREJHKCJhMmRwLmNvdW50PSVkIGRhdGEubGlua19tdHU9JWQiLCBhMmRwLT5jb3Vu
+dCwgZGF0YS0+bGlua19tdHUpOwotCi0JCS8qIEZJWE1FOiBJZiBzdGF0ZSBpcyBub3Qgc3RyZWFt
+aW5nIHRoZW4gcmV0dXJuICovCi0KLQkJLyogUmVhZHkgZm9yIG1vcmUgZGF0YSAqLwotCQlidWZm
+ID0gKHVpbnQ4X3QgKikgYXJlYXMtPmFkZHIgKwotCQkJKGFyZWFzLT5maXJzdCArIGFyZWFzLT5z
+dGVwICogKG9mZnNldCArIHJldCkpIC8gODsKKwkvKiBDaGVjayBpZiB3ZSBoYXZlIGFueSBsZWZ0
+IG92ZXIgZGF0YSBmcm9tIHRoZSBsYXN0IHdyaXRlICovCisJaWYoZGF0YS0+Y291bnQgPiAwICYm
+ICgoYnl0ZXNfbGVmdCAtIGRhdGEtPmNvdW50KSA+PSBhMmRwLT5jb2Rlc2l6ZSkpIHsKKwkJaW50
+IGFkZGl0aW9uYWxfYnl0ZXNfbmVlZGVkID0gYTJkcC0+Y29kZXNpemUgLSBkYXRhLT5jb3VudDsK
+IAkJbWVtY3B5KGRhdGEtPmJ1ZmZlciArIGRhdGEtPmNvdW50LCBidWZmLAotCQkJCWZyYW1lX3Np
+emUgKiBmcmFtZXNfdG9fcmVhZCk7Ci0KLQkJLyogUmVtZW1iZXIgd2UgaGF2ZSBzb21lIGZyYW1l
+cyBpbiB0aGUgcGlwZSBub3cgKi8KLQkJZGF0YS0+Y291bnQgKz0gZnJhbWVzX3RvX3JlYWQgKiBm
+cmFtZV9zaXplOwotCQlpZiAoZGF0YS0+Y291bnQgIT0gYTJkcC0+Y29kZXNpemUpIHsKLQkJCXJl
+dCA9IGZyYW1lc190b19yZWFkOwotCQkJZ290byBkb25lOwotCQl9Ci0KKwkJCQlhZGRpdGlvbmFs
+X2J5dGVzX25lZWRlZCk7CiAJCS8qIEVub3VnaCBkYXRhIHRvIGVuY29kZSAoc2JjIHdhbnRzIDFr
+IGJsb2NrcykgKi8KIAkJZW5jb2RlZCA9IHNiY19lbmNvZGUoJihhMmRwLT5zYmMpLCBkYXRhLT5i
+dWZmZXIsIGEyZHAtPmNvZGVzaXplLAogCQkJCQlhMmRwLT5idWZmZXIgKyBhMmRwLT5jb3VudCwK
+QEAgLTEwNDUsMzUgKzEwMjgsNjUgQEAKIAkJCURCRygiRW5jb2RpbmcgZXJyb3IgJWQiLCBlbmNv
+ZGVkKTsKIAkJCWdvdG8gZG9uZTsKIAkJfQotCi0JCWRhdGEtPmNvdW50IC09IGVuY29kZWQ7CisJ
+CS8qIEluY3JlbWVudCBhMmRwIGJ1ZmZlcnMgKi8KIAkJYTJkcC0+Y291bnQgKz0gd3JpdHRlbjsK
+IAkJYTJkcC0+ZnJhbWVfY291bnQrKzsKIAkJYTJkcC0+c2FtcGxlcyArPSBlbmNvZGVkIC8gZnJh
+bWVfc2l6ZTsKIAkJYTJkcC0+bnNhbXBsZXMgKz0gZW5jb2RlZCAvIGZyYW1lX3NpemU7Ci0KLQkJ
+REJHKCJlbmNvZGVkPSVkICB3cml0dGVuPSVkIGNvdW50PSVkIiwgZW5jb2RlZCwKLQkJCQl3cml0
+dGVuLCBhMmRwLT5jb3VudCk7Ci0KIAkJLyogTm8gc3BhY2UgbGVmdCBmb3IgYW5vdGhlciBmcmFt
+ZSB0aGVuIHNlbmQgKi8KIAkJaWYgKGEyZHAtPmNvdW50ICsgd3JpdHRlbiA+PSBkYXRhLT5saW5r
+X210dSkgewogCQkJYXZkdHBfd3JpdGUoZGF0YSk7CiAJCQlEQkcoInNlbmRpbmcgcGFja2V0ICVk
+LCBjb3VudCAlZCwgbGlua19tdHUgJXUiLAogCQkJCQlhMmRwLT5zZXFfbnVtLCBhMmRwLT5jb3Vu
+dCwKIAkJCQkJZGF0YS0+bGlua19tdHUpOwotCQl9Ci0KLQkJcmV0ICs9IGZyYW1lc190b19yZWFk
+OwotCQlmcmFtZXNfbGVmdCAtPSBmcmFtZXNfdG9fcmVhZDsKKwkJfQkJCisJCS8qIEluY3JlbWVu
+dCB1cCBidWZmIHBvaW50ZXIgdG8gdGFrZSBpbnRvIGFjY291bnQgdGhlIGRhdGEgcHJvY2Vzc2Vk
+ICovCisJCWJ1ZmYgKz0gYWRkaXRpb25hbF9ieXRlc19uZWVkZWQ7CisJCWJ5dGVzX2xlZnQgLT0g
+YWRkaXRpb25hbF9ieXRlc19uZWVkZWQ7CisJCS8qIFNpbmNlIGRhdGEgaGFzIGJlZW4gcHJvY2Vz
+cyBtYXJrIGl0IGFzIHplcm8gKi8KKwkJZGF0YS0+Y291bnQgPSAwOwogCX0KIAotCS8qIG5vdGU6
+IHNvbWUgQUxTQSBhcHBzIHdpbGwgZ2V0IGNvbmZ1c2VkIG90aGVyd2lzZSAqLwotCWlmIChyZXQg
+PiBzaXplKQotCQlyZXQgPSBzaXplOworCisJLyogUHJvY2VzcyB0aGlzIGJ1ZmZlciBpbiBmdWxs
+IGNodW5rcyAqLworCXdoaWxlKCBieXRlc19sZWZ0ID49IGEyZHAtPmNvZGVzaXplKQorCXsKKwkJ
+LyogRW5vdWdoIGRhdGEgdG8gZW5jb2RlIChzYmMgd2FudHMgMWsgYmxvY2tzKSAqLworCQllbmNv
+ZGVkID0gc2JjX2VuY29kZSgmKGEyZHAtPnNiYyksIGJ1ZmYsIGEyZHAtPmNvZGVzaXplLAorCQkJ
+CQlhMmRwLT5idWZmZXIgKyBhMmRwLT5jb3VudCwKKwkJCQkJc2l6ZW9mKGEyZHAtPmJ1ZmZlcikg
+LSBhMmRwLT5jb3VudCwKKwkJCQkJJndyaXR0ZW4pOworCQlpZiAoZW5jb2RlZCA8PSAwKSB7CisJ
+CQlEQkcoIkVuY29kaW5nIGVycm9yICVkIiwgZW5jb2RlZCk7CisJCQlnb3RvIGRvbmU7CisJCX0K
+KwkJLyogSW5jcmVtZW50IHVwIGJ1ZmYgcG9pbnRlciB0byB0YWtlIGludG8gYWNjb3VudCB0aGUg
+ZGF0YSBwcm9jZXNzZWQgKi8KKwkJYnVmZiArPSBhMmRwLT5jb2Rlc2l6ZTsKKwkJYnl0ZXNfbGVm
+dCAtPSBhMmRwLT5jb2Rlc2l6ZTsKKwkJLyogSW5jcmVtZW50IGEyZHAgYnVmZmVycyAqLworCQlh
+MmRwLT5jb3VudCArPSB3cml0dGVuOworCQlhMmRwLT5mcmFtZV9jb3VudCsrOworCQlhMmRwLT5z
+YW1wbGVzICs9IGVuY29kZWQgLyBmcmFtZV9zaXplOworCQlhMmRwLT5uc2FtcGxlcyArPSBlbmNv
+ZGVkIC8gZnJhbWVfc2l6ZTsKKwkJLyogTm8gc3BhY2UgbGVmdCBmb3IgYW5vdGhlciBmcmFtZSB0
+aGVuIHNlbmQgKi8KKwkJaWYgKGEyZHAtPmNvdW50ICsgd3JpdHRlbiA+PSBkYXRhLT5saW5rX210
+dSkgeworCQkJYXZkdHBfd3JpdGUoZGF0YSk7CisJCQlwcmludGYoInNlbmRpbmcgcGFja2V0ICVk
+LCBjb3VudCAlZCwgbGlua19tdHUgJXUiLAorCQkJCQlhMmRwLT5zZXFfbnVtLCBhMmRwLT5jb3Vu
+dCwKKwkJCQkJZGF0YS0+bGlua19tdHUpOworCQl9CQkKKwl9CisJLyogQ29weSB0aGUgZXh0cmEg
+dG8gb3VyIHRlbXAgYnVmZmVyIGZvciB0aGUgbmV4dCB3cml0ZSAqLworCWlmKGJ5dGVzX2xlZnQg
+PiAwKSB7CisJCW1lbWNweShkYXRhLT5idWZmZXIgKyBkYXRhLT5jb3VudCwgYnVmZiwKKwkJCQli
+eXRlc19sZWZ0KTsKKwkJZGF0YS0+Y291bnQgKz0gYnl0ZXNfbGVmdDsKKwkJYnl0ZXNfbGVmdCA9
+IDA7CisJfQogCiBkb25lOgotCURCRygicmV0dXJuaW5nICVsZCIsIHJldCk7Ci0JcmV0dXJuIHJl
+dDsKKwlEQkcoInJldHVybmluZyAlbGQiLCBzaXplIC0gYnl0ZXNfbGVmdCAvIGZyYW1lX3NpemUp
+OworCXJldHVybiBzaXplIC0gYnl0ZXNfbGVmdCAvIGZyYW1lX3NpemU7CiB9CiAKIHN0YXRpYyBp
+bnQgYmx1ZXRvb3RoX3BsYXliYWNrX2RlbGF5KHNuZF9wY21faW9wbHVnX3QgKmlvLAo=
+------=_Part_106413_3766246.1216928327061
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great priz=
-es
+Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
+------=_Part_106413_3766246.1216928327061
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+------=_Part_106413_3766246.1216928327061--
