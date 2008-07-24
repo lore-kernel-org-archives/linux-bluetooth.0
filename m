@@ -1,49 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48897AB7.20700@krevsbech.dk>
-Date: Fri, 25 Jul 2008 09:03:19 +0200
-From: Kasper Revsbech <mail@krevsbech.dk>
+Message-ID: <3837d8b10807241234g2ae04118la17598d4fda4925@mail.gmail.com>
+Date: Thu, 24 Jul 2008 14:34:27 -0500
+From: "keith preston" <keithpre@gmail.com>
+To: "Brad Midgley" <bmidgley@gmail.com>
+Subject: Re: [PATCH] bluez a2dp alsa fix
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <d89ddf300807241229yb209730r71b77af2966ca60b@mail.gmail.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: RFCOMM server multiple client connections
-References: <488870AF.3080601@krevsbech.dk> <1216908785.7820.13.camel@californication>
-In-Reply-To: <1216908785.7820.13.camel@californication>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=ISO-8859-1
+References: <3837d8b10807231531h36402a71g3ee5ac500a5dc45@mail.gmail.com>
+	 <d89ddf300807241229yb209730r71b77af2966ca60b@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann skrev:
-> Hi Kasper,
->
->   
->> I am trying do do a simple client server setup  with bluez.
->> I can manage to have a client and a server on rfcomm sockets where the 
->> server listen on a socket and accept a connection from the client by 
->> connect. But then if I set the server back to accepting without putting 
->> down the one client connection it doesn't accept a new connection.
->> When I read thought the documentation I can find on Bluez and Bluetooth 
->> in general it seems like it should be possible to multiplex serveal 
->> virtual rfcomm connections  on one actual connection. But however I 
->> really can get it working and can't find any code where they do 
->> something similar.
->>     
->
-> are the clients running on multiple adapters.If they run on the sameadapter, it won't work. RFCOMM is not a layer that assign dynamic
-> channels numbers to each connection (like L2CAP does) and thus once a
-> RFCOMM channel is in use (the pair is bdaddr:channel) then you can
-> connect to it twice.
->
->   
-Exactly the client sockets are all originated from the same adapter. 
-What I want to do is by some libsocks tricks to emulate a native tcp/ip 
-socket and provide nearly the same interface. So far I have been using 
-RFCOMM. As I understand you, this setup with multiple sockets 
-connections from each host is possible using a l2cap socket instead. 
-Which leads into the next question. Reading documentation on Bluetooth 
-stacks in general some seems to provide a SOCK_STREAM type using l2cap. 
-However this does not seems to be the case in the Bluez stack. So is 
-there a way to have a somehow reliable stream connection  allowing 
-multiple connections from each host?
+Sorry I'll forward it on.   Someone should probably change this page:
+http://www.bluez.org/development/lists/
 
-Regards and thanks a lot
+To list all of the mailing lists.
 
-Kasper Revsbech
+Keith Preston
+
+
+On Thu, Jul 24, 2008 at 2:29 PM, Brad Midgley <bmidgley@gmail.com> wrote:
+> Keith
+>
+> I may be wrong but I thought this list was for kernel issues.
+> bluez-devel might be better for userland.
+>
+> I guess we have a similar problem in bluetooth_hsp_write. I can't make
+> the commit... when we're on git then everything will be good again.
+>
+> On Wed, Jul 23, 2008 at 4:31 PM, keith preston <keithpre@gmail.com> wrote:
+>>  However in this case where we don't have a full block to encode in
+>> SBC, we return basically return (incoming_buffer_size) %
+>> (SBC_Encode_Block_size).   This is correct in the case where
+>> (incoming_buffer_size) < (SBC_Encode_Block_size), however is wrong
+>> when (incoming_buffer_size) > (SBC_Encode_Block_size), because this
+>> statement ignores previously processed blocks.
+>
+> --
+> Brad
+>
