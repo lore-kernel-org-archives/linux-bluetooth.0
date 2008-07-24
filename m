@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4888BE96.5030304@suse.de>
-Date: Thu, 24 Jul 2008 19:40:38 +0200
-From: Stefan Seyfried <seife@suse.de>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <4884D04F.9000800@suse.de> <4884E6D3.8020102@suse.de>
-In-Reply-To: <4884E6D3.8020102@suse.de>
-Subject: Re: [Bluez-devel] Mouse connect problem, since 3.36?
+In-Reply-To: <488602EB.4000704@idlum.be>
+References: <4885C0C9.7000308@idlum.be>
+	<1216732834.31819.31.camel@californication> <488602EB.4000704@idlum.be>
+Date: Thu, 24 Jul 2008 16:18:33 +0200
+Message-Id: <1216909113.7820.16.camel@californication>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Unexpected error / chronology trying to
+	extract	sdp handles
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,44 +18,42 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-15"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Stefan Seyfried wrote:
-> Stefan Seyfried wrote:
-> =
+Hi Pierre-Yves,
 
->> The mouse will not reconnect until I issue a "Connect" again.
+> > the SDP connection establishment might fail. This is different from from
+> > any low-level ACL link that you see. Run hcidump -X -V and see what
+> > actually does happen.
+> 
+> Ok, so depending on when I get it, ConnectionAttempFailed might mean 
+> "ACL link establishment failed", or "SDP connection failed", or 
+> something else when triggered from elsewhere.
 
-Today i updated a machine that worked fine 2 weeks ago (it was in warranty
-repair), probably still with 3.32, to 3.36 and it now fails exactly the sam=
-e.
-I had to re-pair the keyboard and mouse, though, since they were used on the
-replacement machine in between.
+my guess in this case it means SDP connection failed since that is what
+you requesting. It should not tell you about failures in other layers
+since you don't care about them.
 
-Is there anything I need to do to help debugging this? Does anybody else see
-this? I'll be unavailable for three weeks from Friday evening, so if there's
-something quick to check for me, please say so now ;-)
+> And it is my duty to correctly figure out what it does mean at any given 
+> time. Is it right?
 
-Thanks,
+In this case run hcidump -X -V to actually figure out what happens. It
+is always possible that we have a bug somewhere that nobody has
+triggered before.
 
-	Stefan
--- =
+Regards
 
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, N=FCrnberg | "Well, surrounding them's out."
+Marcel
 
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG N=FCrnberg)
+
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great priz=
-es
+Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
