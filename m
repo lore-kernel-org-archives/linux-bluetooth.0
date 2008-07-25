@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <eba8281a0807260826w7e695b6elfeeee5f7c4c3ec47@mail.gmail.com>
-Date: Sat, 26 Jul 2008 16:26:34 +0100
-From: "Valerio Valerio" <vdv100@gmail.com>
+Message-ID: <3837d8b10807250948l20d30a1ld9f2867b382f54f7@mail.gmail.com>
+Date: Fri, 25 Jul 2008 11:48:15 -0500
+From: "keith preston" <keithpre@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <2d5a2c100807241345x48a0b1co22975c0fb0e0c8d9@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-devel] PassKey Agent question
+References: <3837d8b10807241238r3284fdb6q60f4c86265146756@mail.gmail.com>
+	<2d5a2c100807241345x48a0b1co22975c0fb0e0c8d9@mail.gmail.com>
+Subject: Re: [Bluez-devel] [PATCH] a2dp_write patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,87 +17,36 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0793585248=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============0793585248==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_11785_10370883.1217085994227"
+> Well done, now Im wondering if it isn't possible to use alsa buffer
+> all the time instead of copying to a temporary buffer?
 
-------=_Part_11785_10370883.1217085994227
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+You definitely can't depend on the buffer still being there.   There
+are two options, you can just refuse to process any part of the buffer
+that is not a certain size, or you can do what we are trying to do and
+store it off temporarily.   I think the last is the best solution,
+because it makes it easier on the our clients,  we have to deal with
+the extra instead of an application needed to deal with half processed
+buffers.
 
-Hi,
-
-I'm doing a program that use bluetooth for  the OpenMoko phones, I need a
-passkey agent to allow paring from some devices that resquest that, after I
-wrote the a passKey agent I notice that by default the hcid.conf file in th=
-e
-OpenMoko file system have the security mode set to "auto", so my passkey
-agent don't get called, if I change it to "user" everything works fine.
-After some search I found a lot of confusing information so my questions ar=
-e
-:
-
-- the Bluez-pin helper in no longer supported right ?
-- By default the security mode is set to "auto" ?
-- Is possible to change it with some bluez util or command ?
-
-Thanks in advance.
-
-Cheers,
-
---=20
-Val=E9rio Val=E9rio
-
-http://www.valeriovalerio.org
-
-------=_Part_11785_10370883.1217085994227
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-
-<div dir=3D"ltr">Hi,<br><br>I&#39;m doing a program that use bluetooth for&=
-nbsp; the OpenMoko phones, I need a passkey agent to allow paring from some=
- devices that resquest that, after I wrote the a passKey agent I notice tha=
-t by default the hcid.conf file in the OpenMoko file system have the securi=
-ty mode set to &quot;auto&quot;, so my passkey agent don&#39;t get called, =
-if I change it to &quot;user&quot; everything works fine.<br>
-After some search I found a lot of confusing information so my questions ar=
-e :<br><br>- the Bluez-pin helper in no longer supported right ?<br>- By de=
-fault the security mode is set to &quot;auto&quot; ?<br>- Is possible to ch=
-ange it with some bluez util or command ?<br>
-<br>Thanks in advance.<br><br>Cheers, <br clear=3D"all"><br>-- <br>Val=E9ri=
-o Val=E9rio<br><br><a href=3D"http://www.valeriovalerio.org">http://www.val=
-eriovalerio.org</a><br>
-</div>
-
-------=_Part_11785_10370883.1217085994227--
-
-
---===============0793585248==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+ I mean can't we
+> just point to the first pcm frame processed but not encoded? (If not
+> freed already by alsa)
+> Also there is some code duplication, but still the idea is very good.
+> If you could please check the performance with oprofile.
+>
+>
+> --
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
 Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
---===============0793585248==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============0793585248==--
