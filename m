@@ -1,15 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <782ce16c0807261647n281704efv3051d50a48f52265@mail.gmail.com>
-Date: Sat, 26 Jul 2008 20:47:24 -0300
-From: "=?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?=" <joao.vita@gmail.com>
+Message-ID: <eba8281a0807260826w7e695b6elfeeee5f7c4c3ec47@mail.gmail.com>
+Date: Sat, 26 Jul 2008 16:26:34 +0100
+From: "Valerio Valerio" <vdv100@gmail.com>
 To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1214778693.4435.129.camel@cookie.hadess.net>
 MIME-Version: 1.0
-References: <782ce16c0806281423i6b77a19cte5020c66fa47c4fd@mail.gmail.com>
-	<1214701232.4435.113.camel@cookie.hadess.net>
-	<782ce16c0806291326q339ee6cbw585a190e0c8eee0e@mail.gmail.com>
-	<1214778693.4435.129.camel@cookie.hadess.net>
-Subject: Re: [Bluez-devel] bluez-pulseaudio status
+Subject: [Bluez-devel] PassKey Agent question
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,33 +14,87 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed; boundary="===============0793585248=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-RGV2aWNlIGRpc2NvdmVyeSBpcyBhbG1vc3QgY29tcGxldGUsIHRocm91Z2ggbW9kdWxlLWJ0LWRp
-c2NvdmVyLiBUbyBiZQpjb21wbGV0ZSwgZHluYW1pYyBkZXRlY3Rpb24gc2hvdWxkIGJlIGFkZGVk
-LCBhbmQgaXQgd2lsbCBiZSBkb25lIHNvb24uClNvbWUgd29yayBvbiBtb2R1bGUtYnQtZGV2aWNl
-IGhhcyBhbHJlYWR5IHN0YXJ0ZWQuCgpDb2RlIGlzIGJlaW5nIHB1Ymxpc2hlZCBpbiBnaXQ6Ly9n
-aXRvcmlvdXMub3JnL3B1bHNlYXVkaW8vbWFpbmxpbmUuZ2l0CiwgaW4gYSBicmFuY2ggY2FsbGVk
-IGJ0LiBJJ20ga2VlcGluZyB0aGUgbWFzdGVyIGJyYW5jaCB1cC10by1kYXRlIHdpdGgKbWFpbiBw
-dWxzZWF1ZGlvLCBhbmQgcmViYXNpbmcgbXkgYnJhbmNoIG9uIGl0LCBmcm9tIHRpbWUgdG8gdGlt
-ZS4KClRoaXMgc3RhdHVzIG1lc3NhZ2UgaXMgYWxzbyBvbiB0aGUgQmx1ZVogd2lraSBhdApodHRw
-Oi8vd2lraS5ibHVlei5vcmcvd2lraS9QdWxzZUludGVncmF0aW9uCgpJZiB5b3Ugd2FudCB0byB0
-ZXN0IGl0LCBJICpoaWdobHkqIHJlY29tbWVuZCByZWFkaW5nIFB1bHNlQXVkaW8gMC45LjExCnJl
-bGVhc2Ugbm90ZXMgb24KaHR0cHM6Ly90YW5nby4wcG9pbnRlci5kZS9waXBlcm1haWwvcHVsc2Vh
-dWRpby1kaXNjdXNzLzIwMDgtSnVseS8wMDIwODMuaHRtbApOZWl0aGVyIHRoZSBkZXZlbG9wbWVu
-dCB2ZXJzaW9uIG5vciAwLjkuMTEgYXJlIHZlcnkgc3RhYmxlIHJpZ2h0IG5vdy4KVGhleSBhcmUg
-dXNhYmxlLCBidXQgdHJ5IGl0IGF0IHlvdXIgb3duIHJpc2suCgpDb21tZW50cyAvIHN1Z2dlc3Rp
-b25zIGFyZSB2ZXJ5IHdlbGNvbWVkLgoKLS0gCkpvw6NvIFBhdWxvIFJlY2hpIFZpdGEKTVNjIENv
-bXB1dGVyIFNjaWVuY2UgU3R1ZGVudApDb21wdXRlciBFbmdpbmVlcgpJQyAvIFVuaWNhbXAKCmly
-Yy5mcmVlbm9kZS5uZXQ6IGpwcnZpdGEKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLk5ldCBlbWFp
-bCBpcyBzcG9uc29yZWQgYnkgdGhlIE1vYmxpbiBZb3VyIE1vdmUgRGV2ZWxvcGVyJ3MgY2hhbGxl
-bmdlCkJ1aWxkIHRoZSBjb29sZXN0IExpbnV4IGJhc2VkIGFwcGxpY2F0aW9ucyB3aXRoIE1vYmxp
-biBTREsgJiB3aW4gZ3JlYXQgcHJpemVzCkdyYW5kIHByaXplIGlzIGEgdHJpcCBmb3IgdHdvIHRv
-IGFuIE9wZW4gU291cmNlIGV2ZW50IGFueXdoZXJlIGluIHRoZSB3b3JsZApodHRwOi8vbW9ibGlu
-LWNvbnRlc3Qub3JnL3JlZGlyZWN0LnBocD9iYW5uZXJfaWQ9MTAwJnVybD0vCl9fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRldmVsIG1haWxpbmcg
-bGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3Vy
-Y2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
+--===============0793585248==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_11785_10370883.1217085994227"
+
+------=_Part_11785_10370883.1217085994227
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi,
+
+I'm doing a program that use bluetooth for  the OpenMoko phones, I need a
+passkey agent to allow paring from some devices that resquest that, after I
+wrote the a passKey agent I notice that by default the hcid.conf file in th=
+e
+OpenMoko file system have the security mode set to "auto", so my passkey
+agent don't get called, if I change it to "user" everything works fine.
+After some search I found a lot of confusing information so my questions ar=
+e
+:
+
+- the Bluez-pin helper in no longer supported right ?
+- By default the security mode is set to "auto" ?
+- Is possible to change it with some bluez util or command ?
+
+Thanks in advance.
+
+Cheers,
+
+--=20
+Val=E9rio Val=E9rio
+
+http://www.valeriovalerio.org
+
+------=_Part_11785_10370883.1217085994227
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+<div dir=3D"ltr">Hi,<br><br>I&#39;m doing a program that use bluetooth for&=
+nbsp; the OpenMoko phones, I need a passkey agent to allow paring from some=
+ devices that resquest that, after I wrote the a passKey agent I notice tha=
+t by default the hcid.conf file in the OpenMoko file system have the securi=
+ty mode set to &quot;auto&quot;, so my passkey agent don&#39;t get called, =
+if I change it to &quot;user&quot; everything works fine.<br>
+After some search I found a lot of confusing information so my questions ar=
+e :<br><br>- the Bluez-pin helper in no longer supported right ?<br>- By de=
+fault the security mode is set to &quot;auto&quot; ?<br>- Is possible to ch=
+ange it with some bluez util or command ?<br>
+<br>Thanks in advance.<br><br>Cheers, <br clear=3D"all"><br>-- <br>Val=E9ri=
+o Val=E9rio<br><br><a href=3D"http://www.valeriovalerio.org">http://www.val=
+eriovalerio.org</a><br>
+</div>
+
+------=_Part_11785_10370883.1217085994227--
+
+
+--===============0793585248==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+-------------------------------------------------------------------------
+This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
+Build the coolest Linux based applications with Moblin SDK & win great prizes
+Grand prize is a trip for two to an Open Source event anywhere in the world
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
+--===============0793585248==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============0793585248==--
