@@ -1,21 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Jul 2008 17:39:56 +0530 (IST)
+Date: Mon, 28 Jul 2008 18:29:51 +0530 (IST)
 From: pavan_savoy@indiatimes.com
-To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, maxk@qualcomm.com
-Message-ID: <1882591226.12271217333396980.JavaMail.root@mbv7.indiatimes.com>
-Subject: HCI_Reset and Notification to User-Space
+To: Majordomo@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Message-ID: <673335200.654421217249991946.JavaMail.root@mbv7.indiatimes.com>
+Subject: Understanding UART bluetooth ..
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-I am trying to understand the HCI_RESET procedure and the notification of new device to the user-space, in case of a UART Bluetooth device.
+I had a question on hciattach / hcid & related to hci-core.c, If I know I have a bluetooth device on ttyS0.. and I do a 
+#hciattach ttyS0 <with_relevant_parameters>
 
-What I am trying to understand is, in what place of hciattach does the whole system, [through dbus] get to know the existance of the bt device and what call [from which module] does that notification go to the user-space.
+will the whole system know [using dbus & hcid, that a new device  has been added, if so who exactly does this ? ]
 
-Just a brief about the hciattach / notification to user-space and socket setup.
+I mean I could only find hci_open_dev, but no other dbus or hcid functions to notify...
 
+does hci_notify does the same ? which is being called on hci_open_dev?
 
-Thanks in advance.
-Pavan
+Thanks..
