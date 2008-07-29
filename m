@@ -1,32 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Jul 2008 19:10:54 +0530 (IST)
-From: pavan_savoy@indiatimes.com
-To: Ohad Ben-Cohen <ohad@bencohen.org>
-Cc: linux-bluetooth@vger.kernel.org
-Message-ID: <1399758677.27391217338854603.JavaMail.root@mbv7.indiatimes.com>
-In-Reply-To: <bd5b16740807290603r4cdc6fbbg1e19ffcda836c70e@mail.gmail.com>
+Message-ID: <bd5b16740807290603r4cdc6fbbg1e19ffcda836c70e@mail.gmail.com>
+Date: Tue, 29 Jul 2008 16:03:20 +0300
+From: "Ohad Ben-Cohen" <ohad@bencohen.org>
+To: pavan_savoy@indiatimes.com
 Subject: Re: HCI_Reset and Notification to User-Space
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1882591226.12271217333396980.JavaMail.root@mbv7.indiatimes.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=ISO-8859-1
+References: <1882591226.12271217333396980.JavaMail.root@mbv7.indiatimes.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-Thank you,
-
-Also hci_notify notifies a HCI_DEV_REG event thru' the notifier chain, what I couldnt get was, how does HCI-daemon wait on it.
-(related to g_io_add_watch or something was my guess, but not sure..., or is it using the Stack-Internal Socket Events? which would require hci_dev_open to be called.)
-
-I until now had thought notifier chains are used only for inter-kernel notifications. I guess I was wrong.
-
-Please clarify.
-
-
------ Original Message -----
-From: Ohad Ben-Cohen <ohad@bencohen.org>
-To: pavan savoy <pavan_savoy@indiatimes.com>
-Cc: linux-bluetooth@vger.kernel.org
-Sent: Tue, 29 Jul 2008 18:33:20 +0530 (IST)
-Subject: Re: HCI_Reset and Notification to User-Space
 
 Hi Pavan,
 
@@ -54,4 +38,3 @@ Ohad.
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
-
