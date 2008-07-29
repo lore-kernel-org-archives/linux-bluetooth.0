@@ -1,58 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1214852035.6764.40.camel@bongo>
-References: <1214593557.6131.26.camel@bongo>
-	<1214605438.11537.0.camel@violet.holtmann.net>
-	<1214831713.6764.8.camel@bongo>
-	<1214834796.11537.42.camel@violet.holtmann.net>
-	<1214841475.6764.37.camel@bongo>
-	<1214841780.11537.48.camel@violet.holtmann.net>
-	<1214852035.6764.40.camel@bongo>
-Date: Tue, 01 Jul 2008 03:10:53 +0200
-Message-Id: <1214874653.11537.69.camel@violet.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Wizard patch
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Message-ID: <2342E2FF-BAE3-4236-8E9C-AF2F9DAFB0BD@soe.ucsd.edu>
+From: Ricky Huang <rhhuang@soe.ucsd.edu>
+To: <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0 (Apple Message framework v926)
+Date: Tue, 29 Jul 2008 16:56:17 -0700
+Subject: [Bluez-users] How to turn off advertised SDP services?
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+Sender: bluez-users-bounces@lists.sourceforge.net
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Michael,
+When I do a 'sdptool browse local' I see a list of advertised services  
+such as "Headset Audio Gateway", "AVRCP TG", "Audio Source" and etc.   
+I remember there /used/ to be service conf files that I can control  
+which services are on/off, but I can't find them any more.  It is  
+possible to "sdptool remove" the services, but they come back after  
+reboot...
 
-> > > Except that one of my other patches adds a new cancelable function
-> > > _connect().  So we would need maybe specific cancel_bonding and
-> > > cancel_connect functions.
-> > 
-> > sounds good to me. The bonding case is special since it can only do one
-> > at a time.
-> 
-> OK, attached is callback2.diff, which only allows canceling a create_bonding call.  Updated other patches to follow.
+I am wondering how to turn them off for good.
 
-please only change create_bonding and leave the others alone. Also you
-cast a little bit too much for my taste. For example void pointers need
-to extra cast.
-
-Regards
-
-Marcel
-
+Thanks in advance.
 
 
 -------------------------------------------------------------------------
-Check out the new SourceForge.net Marketplace.
-It's the best place to buy or sell services for
-just about anything Open Source.
-http://sourceforge.net/services/buy/index.php
+This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
+Build the coolest Linux based applications with Moblin SDK & win great prizes
+Grand prize is a trip for two to an Open Source event anywhere in the world
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
 _______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
