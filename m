@@ -1,51 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Jul 2008 15:48:44 -0400 (EDT)
-From: Paul Waldo <paul@waldoware.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <5238820.3721217360924997.JavaMail.root@mercury.waldo.home>
-In-Reply-To: <9605549.3701217360717346.JavaMail.root@mercury.waldo.home>
-Subject: Trouble Connecting to NAP on Linux
+Message-ID: <4f436aae0807290745i74ac09b6xee4f4e01037e3cbd@mail.gmail.com>
+Date: Tue, 29 Jul 2008 17:45:36 +0300
+From: "Ohad Ben-Cohen" <ohad@bencohen.org>
+To: pavan_savoy@indiatimes.com
+Subject: Re: HCI_Reset and Notification to User-Space
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <723119697.28261217339091256.JavaMail.root@mbv7.indiatimes.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=ISO-8859-1
+References: <1399758677.27391217338854603.JavaMail.root@mbv7.indiatimes.com>
+	 <723119697.28261217339091256.JavaMail.root@mbv7.indiatimes.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+On Tue, Jul 29, 2008 at 4:44 PM,  <pavan_savoy@indiatimes.com> wrote:
+> Also I couldnt trace the hci_init_req, which does the HCI_RESET, read_BD addr, local name..etc..
+>
+> Who calls it ?
 
-I'm new to bluetooth, and got in over my head.  I have a Windows box that is acting as a Network Access Point as well as a PAN Server.  I have a laptop that I want to connect to the access point via bluetooth so it can access the Internet.  The laptop can connect to the NAP and the GN just fine when running Windows, but when the laptop is running linux, I get errors.  It can connect to the GN, but not the NAP:
-
-************Start transcript*************************** 
-root@paul-laptop:~# pand --killall
-root@paul-laptop:~# pand --connect 11:11:11:11:11:11 --service GN -n
-pand[17097]: Bluetooth PAN daemon version 3.26
-pand[17097]: Connecting to 11:11:11:11:11:11
-pand[17097]: bnep0 connected
-root@paul-laptop:~# pand --killall
-root@paul-laptop:~# pand --connect 11:11:11:11:11:11 --service NAP -n
-pand[17123]: Bluetooth PAN daemon version 3.26
-pand[17123]: Connecting to 11:11:11:11:11:11
-pand[17123]: Connect to 11:11:11:11:11:11 failed. Protocol error(71)
-
-
-[turn off GN service on server]
-
-
-root@paul-laptop:~# pand --connect 11:11:11:11:11:11 --service NAP -n
-pand[17797]: Bluetooth PAN daemon version 3.26
-pand[17797]: Connecting to 11:11:11:11:11:11
-pand[17797]: Connect to 11:11:11:11:11:11 failed. Connection refused(111)
-************End transcript*************************** 
-
-Here are the specifics of the Machines:
-SERVER
-Windows XP
-BlueSoleil 1.6.1.4
-All security turned off
-
-CLIENT
-Linux (Kubuntu 8.04 Hardy, AMD64)
-bluez 3.26
-
-I've googled everything I can think of.  Any help would be greatly appreciated.  Thanks in advance!
-
-Paul
+hci_dev_open. indirectly, using __hci_request.
