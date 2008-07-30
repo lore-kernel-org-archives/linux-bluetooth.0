@@ -1,33 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48919D91.3070703@krevsbech.dk>
-Date: Thu, 31 Jul 2008 13:10:09 +0200
-From: Kasper Revsbech <mail@krevsbech.dk>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: How to set packet type and how to see which packet type is in use
- ?
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Cc: <linux-bluetooth@vger.kernel.org>
+Message-Id: <DD9EC22E-3BA0-4D69-A17A-FA781C66E1B6@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Roland Aigner <Roland.Aigner@orderman.com>
+In-Reply-To: <6A4EB330DD166248AA1B8AFB38D26471019C26C8@exchange.orderman.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v928.1)
+Subject: Re: BlueZ and Bluetooth Qualification
+Date: Wed, 30 Jul 2008 08:57:16 +0200
+References: <6A4EB330DD166248AA1B8AFB38D26471019C26C8@exchange.orderman.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
-I am trying to compare some different Bluetooth setup. Doing that I 
-would like to try with different baseband packet types.
-So far I have been trying in two scenarios using hciconfig hci0 ptype 
-<type> and that seems to work, at least in the case where I am using 
-RFCOMM sockets for communication. But judging from the transfer rate it 
-does not seem to work using a PAND/BNEP setup. This leads to the 
-following questions:
+Hi Roland,
 
- - How can I observe the currently uses packet type? I have been trying 
-with hcidump and even parsed it with wireshark but can't really find the 
-identifier that identifies witch packet type currently  is in use.
+> Sorry if this question was asked before, but appearantly I am not good
+> enough in finding the correct search terms ;)
+>
+> Scenario:
+> I want to build a device which uses a BT-chipset from CSR, linux for  
+> ARM
+> (e.g. TI OMAP) and BlueZ for at least SPP usage.
+>
+> 1) If I want to sell this device with, what certifications and
+> qualifications for BT would I need?
 
- - Can I by somehow set the packettype using setsocktop() on a rfcomm 
-socket ? I have been look to find documentation on the content of the 
-sockopt struc used but can't really find any. I have also tried looking 
-in the code but can't figure out how to manipulate the packet type else 
-that using hciconfig
+this needs a Bluetooth host stack qualification with SSP.
 
-Thanks
-Kasper Revsbech
+> 2) If I update the kernel/drivers/my own application (aka "firmware)
+> would I need to requalify something?
+
+Depending on what you change. This has to be decided case by case.
+
+> 3) If I update the BlueZ version would I need to requalify something?
+
+Again, case by case decision.
+
+> 4) If I choose to add another profile to the system (e.g. Handsfree)
+> would I need to qualify the whole system again or only the Profile I
+> want to add?
+
+If you build a modular qualification with components, then you can re- 
+use components. If you do it as end-product, then you have to do the  
+whole thing again.
+
+Regards
+
+Marcel
+
