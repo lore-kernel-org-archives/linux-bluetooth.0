@@ -1,54 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-From: Mats Karlsson <mkn0014@gmail.com>
-Date: Mon, 2 Jun 2008 17:51:29 +0000 (UTC)
-Message-ID: <loom.20080602T174639-887@post.gmane.org>
-References: <4531BD65.1020107@gmail.com> <1160917860.23675.7.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] PIN Authentication Problems on MDV 2007
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+From: Oliver Neukum <oliver@neukum.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [rfc]btusb with SCO support
+Date: Thu, 31 Jul 2008 17:21:33 +0200
+Cc: linux-bluetooth@vger.kernel.org,
+ linux-usb@vger.kernel.org
+References: <200807311452.24166.oliver@neukum.org> <94E72E02-9C26-4FB4-8E0E-414B08E43F6A@holtmann.org>
+In-Reply-To: <94E72E02-9C26-4FB4-8E0E-414B08E43F6A@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Message-Id: <200807311721.34299.oliver@neukum.org>
+List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann <marcel <at> holtmann.org> writes:
+Am Donnerstag 31 Juli 2008 16:03:13 schrieb Marcel Holtmann:
+> yeah, I was afraid of that switching the alternate settings is not as =A0
+> easy as the spec. might think. Personally I think it is a broken =A0
+> specification anyway. So the best assumption is that we have one SCO =A0
+> connection and that is either 8-bit or 16-bit. So we do the switching =A0
+> when we get the notify() callback for a changed voice setting.
 
-> Hi Manuel,
->
-> starting with bluez-utils-3.x the PIN helper concept has been replaced
-> with a passkey agent interface. You need to run a passkey agent to get
-> you PIN request dialog. One example would be bt-applet from the
-> bluez-gnome package.
-> 
-> Regards
-> 
-> Marcel
+That's problematic because in the notify() callback you cannot sleep,
+can you? In addition, a device is legally allowed to take a lot of time
+to switch altsettings.
 
-Marcel,
-
-Witch passkey agent is recommended on machines with only console interface
-(CLI), example: Servers and appliances ?
-
-Is the passkey-agent.c still a example or has it matured to a non example code ?
-
-
-Kind regards
-Mats
-
-
--------------------------------------------------------------------------
-This SF.net email is sponsored by: Microsoft
-Defy all challenges. Microsoft(R) Visual Studio 2008.
-http://clk.atdmt.com/MRT/go/vse0120000070mrt/direct/01/
-_______________________________________________
-Bluez-users mailing list
-Bluez-users@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-users
+	Regards
+		Oliver
