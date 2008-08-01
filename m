@@ -3,29 +3,42 @@ Subject: Re: [rfc]btusb with SCO support
 From: Marcel Holtmann <marcel@holtmann.org>
 To: Oliver Neukum <oliver@neukum.org>
 Cc: linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org
-In-Reply-To: <200808011232.36918.oliver@neukum.org>
+In-Reply-To: <200807311721.34299.oliver@neukum.org>
 References: <200807311452.24166.oliver@neukum.org>
 	 <94E72E02-9C26-4FB4-8E0E-414B08E43F6A@holtmann.org>
-	 <200808011232.36918.oliver@neukum.org>
+	 <200807311721.34299.oliver@neukum.org>
 Content-Type: text/plain
-Date: Fri, 01 Aug 2008 19:43:38 +0200
-Message-Id: <1217612618.7819.6.camel@californication>
+Date: Fri, 01 Aug 2008 19:42:26 +0200
+Message-Id: <1217612547.7819.3.camel@californication>
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-usb-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Oliver,
 
-> > Also the HCI_RESET thing needs to be turn-around. We always do  
-> > HCI_RESET except for some chips where it will break (old CSR ones for  
-> > example).
+> > yeah, I was afraid of that switching the alternate settings is not as  
+> > easy as the spec. might think. Personally I think it is a broken  
+> > specification anyway. So the best assumption is that we have one SCO  
+> > connection and that is either 8-bit or 16-bit. So we do the switching  
+> > when we get the notify() callback for a changed voice setting.
 > 
-> OK, I am making a separate patch. I've looked at 2.6.26-mh. It seems
-> to do the reset only for quirky devices. Is the reversal just planned or am
-> I looking at the wrong trees?
+> That's problematic because in the notify() callback you cannot sleep,
+> can you? In addition, a device is legally allowed to take a lot of time
+> to switch altsettings.
 
-the reversal is just planned, but we should do it soon since we need the
-reset quirk for almost every Broadcom chip.
+that was not my point. My point was to switch between first or second
+alternate setting when you get the notify() callback for a changed voice
+setting. Check with the "hciconfig hci0 voice 0x0040" command.
+
+We have to do it in a work queue and that is fine, but then when we get
+a connection add notify(), then we only have to start the SCO URBs. This
+leaves the only broken case where we have to switch the alternate
+setting, because the second SCO channel got established.
+
+Question is if selecting the 2nd alternate setting and not submitting
+the URBs for it is a good idea or if that will still consume bandwidth
+and power. And thus it would be better to use the first alternate
+setting that is meant for the case with no SCO connections.
 
 Regards
 
