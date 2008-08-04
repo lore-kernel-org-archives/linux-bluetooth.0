@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: henryzhang62@yahoo.com,
+Date: Mon, 4 Aug 2008 10:38:16 -0700 (PDT)
+From: hong zhang <henryzhang62@yahoo.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Message-ID: <706796.10994.qm@web57915.mail.re3.yahoo.com>
+Subject: [Bluez-users] SDIO for bluetooth
+Reply-To: henryzhang62@yahoo.com,
 	BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <706796.10994.qm@web57915.mail.re3.yahoo.com>
-References: <706796.10994.qm@web57915.mail.re3.yahoo.com>
-Date: Mon, 04 Aug 2008 22:25:09 +0200
-Message-Id: <1217881509.7819.14.camel@californication>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] SDIO for bluetooth
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,19 +19,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Henry,
+Marcel,
 
-> What kind of machine should I use for Bluetooth with SDIO connection?
-> Current one is for serial port.
+What kind of machine should I use for Bluetooth with SDIO connection?
+Current one is for serial port.
 
-any laptop with SDHCI adapter will work. I am using the Lenovo X61 right
-now for testing.
-
-Regards
-
-Marcel
+---henry
 
 
+      
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
