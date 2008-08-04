@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <C4BCF969.1654%paul.wachendorf@7p-group.com>
-References: <C4BCF969.1654%paul.wachendorf@7p-group.com>
-Date: Mon, 04 Aug 2008 22:26:25 +0200
-Message-Id: <1217881585.7819.16.camel@californication>
+To: henryzhang62@yahoo.com,
+	BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <706796.10994.qm@web57915.mail.re3.yahoo.com>
+References: <706796.10994.qm@web57915.mail.re3.yahoo.com>
+Date: Mon, 04 Aug 2008 22:25:09 +0200
+Message-Id: <1217881509.7819.14.camel@californication>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] Dbus Function to Set the Major Device Class
+Subject: Re: [Bluez-users] SDIO for bluetooth
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,16 +21,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Paul,
+Hi Henry,
 
-> Is there an other config file like hcid.conf? (I'm using version 3.30-1 of
-> libbluetooth2 from the debian reposetory at
-> http://bluez.sourceforge.net/download/debian).
-> Or should setting the device class work at hcid.conf?
-> I'm working on an test scenario and would be great if I'd be able to fully
-> simulate mobile Phones.
+> What kind of machine should I use for Bluetooth with SDIO connection?
+> Current one is for serial port.
 
-for the 3.x series use hcid.conf for changing this setting.
+any laptop with SDHCI adapter will work. I am using the Lenovo X61 right
+now for testing.
 
 Regards
 
