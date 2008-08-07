@@ -1,17 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <486A6392.6080008@access-company.com>
-References: <48075B6A.2060308@access-company.com>
-	<1209058941.12684.37.camel@violet.holtmann.net>
-	<48355289.7070906@access-company.com>
-	<5D487EED-A2B2-4AEA-AA7B-9EC8681157C0@holtmann.org>
-	<48357D9C.9080009@access-company.com>
-	<486A6392.6080008@access-company.com>
-Date: Fri, 08 Aug 2008 00:34:23 +0200
-Message-Id: <1218148463.7819.44.camel@californication>
+In-Reply-To: <3837d8b10807250948l20d30a1ld9f2867b382f54f7@mail.gmail.com>
+References: <3837d8b10807241238r3284fdb6q60f4c86265146756@mail.gmail.com>
+	<2d5a2c100807241345x48a0b1co22975c0fb0e0c8d9@mail.gmail.com>
+	<3837d8b10807250948l20d30a1ld9f2867b382f54f7@mail.gmail.com>
+Date: Fri, 08 Aug 2008 00:06:40 +0200
+Message-Id: <1218146801.7819.40.camel@californication>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [patch] BNEP/PAN Qualification issues
+Subject: Re: [Bluez-devel] [PATCH] a2dp_write patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,21 +22,20 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Frederic,
+Hi Keith,
 
-> I'm working at making this easier to integrate but it will makes a bunch 
-> of patches.
-> Let's start with the small and self contained.
+> > Well done, now Im wondering if it isn't possible to use alsa buffer
+> > all the time instead of copying to a temporary buffer?
 > 
-> Resend patch for bluez-utils, and network service timeout  (after 
-> SETUP_CONN_REQ is sent and no answer for  30 sec, disconnect)
+> You definitely can't depend on the buffer still being there.   There
+> are two options, you can just refuse to process any part of the buffer
+> that is not a certain size, or you can do what we are trying to do and
+> store it off temporarily.   I think the last is the best solution,
+> because it makes it easier on the our clients,  we have to deal with
+> the extra instead of an application needed to deal with half processed
+> buffers.
 
-I applied the bluez-utils patches to our 4.x repository.
-
-> Other patch adds a parameter to bnep module for disabling header 
-> compression.
-
-I am going through that one know.
+I applied your patch to the BlueZ 4.x repository. Thanks.
 
 Regards
 
