@@ -1,10 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <73BDD852208F403CB708EBFA9AED92A0@freqonedev>
-From: "David Stockwell" <dstockwell@frequency-one.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-Date: Mon, 11 Aug 2008 13:18:40 -0500
-MIME-Version: 1.0
-Subject: [Bluez-devel] Question about Bluez-4.1 Object Paths
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <486A6392.6080008@access-company.com>
+References: <48075B6A.2060308@access-company.com>
+	<1209058941.12684.37.camel@violet.holtmann.net>
+	<48355289.7070906@access-company.com>
+	<5D487EED-A2B2-4AEA-AA7B-9EC8681157C0@holtmann.org>
+	<48357D9C.9080009@access-company.com>
+	<486A6392.6080008@access-company.com>
+Date: Fri, 08 Aug 2008 00:34:23 +0200
+Message-Id: <1218148463.7819.44.camel@californication>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [patch] BNEP/PAN Qualification issues
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,19 +25,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Gents,
+Hi Frederic,
 
-After installing 4.1 yesterday, I noticed that the object paths for 
-org.bluez.Adapter and org.bluez.Device have changed: both are now 
-prefixed with "/org/bluez", probably reflecting the recent firestorm 
-with the DBus folks.  So now, the object path for the "zero-th" adapter 
-is not "/hci0", but "/org/bluez/hci0" as it was for the "legacy" DBus 
-interface.
+> I'm working at making this easier to integrate but it will makes a bunch 
+> of patches.
+> Let's start with the small and self contained.
+> 
+> Resend patch for bluez-utils, and network service timeout  (after 
+> SETUP_CONN_REQ is sent and no answer for  30 sec, disconnect)
 
-At the same time, the object path for org.bluez.Manager is still "/". 
-Is this intentional, or an oversight?
+I applied the bluez-utils patches to our 4.x repository.
 
-David Stockwell 
+> Other patch adds a parameter to bnep module for disabling header 
+> compression.
+
+I am going through that one know.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
