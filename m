@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48A305A1.8030006@laposte.net>
-Date: Wed, 13 Aug 2008 18:02:41 +0200
-From: gegetel <geo.cherchetout@laposte.net>
-MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] sco-flowcontrol for 2.6.24 kernels
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <73BDD852208F403CB708EBFA9AED92A0@freqonedev>
+References: <73BDD852208F403CB708EBFA9AED92A0@freqonedev>
+Date: Mon, 11 Aug 2008 21:29:25 +0200
+Message-Id: <1218482965.25524.20.camel@californication>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Question about Bluez-4.1 Object Paths
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,14 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
-I vote for this wish already formulated by Xuan B. in 1875201 bug: 
-http://sourceforge.net/tracker/index.php?func=detail&aid=1875201&group_id=116589&atid=678258
-Thank you very much to the hacker who will make it, if this is possible.
-Sco-flowcontrol-v4.3.diff patch could be applied to most of the .h and .c 
-files and sco-flowcontrol-v4.4.diff to hci_events.c but the make of that 
-hybrid kernel aborts.
-Please, don't laugh, i don't know what i do. ;-)
+Hi David,
+
+> After installing 4.1 yesterday, I noticed that the object paths for 
+> org.bluez.Adapter and org.bluez.Device have changed: both are now 
+> prefixed with "/org/bluez", probably reflecting the recent firestorm 
+> with the DBus folks.  So now, the object path for the "zero-th" adapter 
+> is not "/hci0", but "/org/bluez/hci0" as it was for the "legacy" DBus 
+> interface.
+
+the object path of the adapter and device interfaces need to be
+discovered via functions like ListAdapters and ListDevices. Relying on
+stable object path names is wrong. I will change them randomly from
+release to release if I have to. Any application that will break because
+of this is a broken application.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
