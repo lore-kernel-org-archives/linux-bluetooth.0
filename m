@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300808130948s425d5df7ybe5252654d5a3ea@mail.gmail.com>
-Date: Wed, 13 Aug 2008 10:48:05 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <48A305A1.8030006@laposte.net>
+Message-ID: <48A305A1.8030006@laposte.net>
+Date: Wed, 13 Aug 2008 18:02:41 +0200
+From: gegetel <geo.cherchetout@laposte.net>
 MIME-Version: 1.0
-References: <48A305A1.8030006@laposte.net>
-Subject: Re: [Bluez-devel] sco-flowcontrol for 2.6.24 kernels
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] sco-flowcontrol for 2.6.24 kernels
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,18 +18,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-hi
+Hello,
+I vote for this wish already formulated by Xuan B. in 1875201 bug: 
+http://sourceforge.net/tracker/index.php?func=detail&aid=1875201&group_id=116589&atid=678258
+Thank you very much to the hacker who will make it, if this is possible.
+Sco-flowcontrol-v4.3.diff patch could be applied to most of the .h and .c 
+files and sco-flowcontrol-v4.4.diff to hci_events.c but the make of that 
+hybrid kernel aborts.
+Please, don't laugh, i don't know what i do. ;-)
 
-> I vote for this wish already formulated by Xuan B. in 1875201 bug:
-> http://sourceforge.net/tracker/index.php?func=detail&aid=1875201&group_id=116589&atid=678258
-> Thank you very much to the hacker who will make it, if this is possible.
-
-this was never merged upstream and now the patch seems like a dead
-end. The btusb driver has a sco driver that is a work in progress.
-That's more promising but won't give you instant satisfaction :)
-
--- 
-Brad
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
