@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-From: Jui-Hao Chiang <windtracekimo@gmail.com>
-Date: Fri, 15 Aug 2008 13:42:23 +0000 (UTC)
-Message-ID: <loom.20080815T133352-774@post.gmane.org>
-Mime-Version: 1.0
-Subject: [Bluez-devel] How to know the packet loss ratio of SCO socket
+Message-ID: <48A48BB9.2070105@laposte.net>
+Date: Thu, 14 Aug 2008 21:47:05 +0200
+From: gegetel <geo.cherchetout@laposte.net>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <48A305A1.8030006@laposte.net>
+	<d89ddf300808130948s425d5df7ybe5252654d5a3ea@mail.gmail.com>
+In-Reply-To: <d89ddf300808130948s425d5df7ybe5252654d5a3ea@mail.gmail.com>
+Subject: Re: [Bluez-devel] sco-flowcontrol for 2.6.24 kernels
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,40 +17,29 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi, all:
-as the title said, I am writing a simple server-client socket program for SCO
-connection. While client is sending the SCO packet to server, it attaches a
-sequence number to it. Then I want server to estimate the packet loss.
-[Client program is as the following]
-for (i = 0; i < 48, i++) buf[i] = 0x7f;
-while (1) {
-  *(uint32_t *)buf = htobl(seq);
-  *(uint32_t *)(buf+4) = htobs(48);
-  if (send(sockfd, buf, 48, 0) < 0) break;
-  seq++;
-  usleep(1)
-}
+Le 13.08.2008 18:48, *Brad Midgley* a =E9crit fort =E0 propos :
 
-However, on the server side, the data is total different, and I am not able to
-get the sequence number (the hcidump -x also shows different data content as I
-expect. Also, it's weird that the content is repeated)
+> this was never merged upstream and now the patch seems like a dead
+> end. The btusb driver has a sco driver that is a work in progress.
+> That's more promising but won't give you instant satisfaction :)
 
-Is this data encoded? or is there anyway to know the packet loss ratio of the
-SCO connection?
+Thank you Brad for this reassuring answer. I can wait since i have patched =
+a =
 
-Bests,
-Jui-Hao
+2.6.23 kernel and can use heatsetd with Twinkle. :-)
+
 
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great prizes
+Build the coolest Linux based applications with Moblin SDK & win great priz=
+es
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=100&url=/
+http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
