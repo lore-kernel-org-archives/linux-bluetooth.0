@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <4A619A8D-9BE8-4082-B28E-4F3EC19A6546@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <loom.20080815T133352-774@post.gmane.org>
-Mime-Version: 1.0 (Apple Message framework v928.1)
-Date: Fri, 15 Aug 2008 19:26:39 +0200
-References: <loom.20080815T133352-774@post.gmane.org>
-Subject: Re: [Bluez-devel] How to know the packet loss ratio of SCO socket
+Message-ID: <6A01CB6FD5D845BAB337067E073F0D44@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+References: <73BDD852208F403CB708EBFA9AED92A0@freqonedev>
+	<1218482965.25524.20.camel@californication>
+Date: Fri, 15 Aug 2008 09:20:06 -0500
+MIME-Version: 1.0
+Subject: Re: [Bluez-devel] Question about Bluez-4.1 Object Paths
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,40 +20,43 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Jui-Hao,
+Greetings, Marcel
 
-> as the title said, I am writing a simple server-client socket  
-> program for SCO
-> connection. While client is sending the SCO packet to server, it  
-> attaches a
-> sequence number to it. Then I want server to estimate the packet loss.
-> [Client program is as the following]
-> for (i = 0; i < 48, i++) buf[i] = 0x7f;
-> while (1) {
->  *(uint32_t *)buf = htobl(seq);
->  *(uint32_t *)(buf+4) = htobs(48);
->  if (send(sockfd, buf, 48, 0) < 0) break;
->  seq++;
->  usleep(1)
-> }
+BTW: Not sure what is going on with the lists, but I just got your 
+response in the digest today.  Good thing we have irc.
+
+> Hi David,
 >
-> However, on the server side, the data is total different, and I am  
-> not able to
-> get the sequence number (the hcidump -x also shows different data  
-> content as I
-> expect. Also, it's weird that the content is repeated)
+>> After installing 4.1 yesterday, I noticed that the object paths for
+>> org.bluez.Adapter and org.bluez.Device have changed: both are now
+>> prefixed with "/org/bluez", probably reflecting the recent firestorm
+>> with the DBus folks.  So now, the object path for the "zero-th" 
+>> adapter
+>> is not "/hci0", but "/org/bluez/hci0" as it was for the "legacy" DBus
+>> interface.
 >
-> Is this data encoded? or is there anyway to know the packet loss  
-> ratio of the
-> SCO connection?
+> the object path of the adapter and device interfaces need to be
+> discovered via functions like ListAdapters and ListDevices. Relying on
+> stable object path names is wrong. I will change them randomly from
+> release to release if I have to. Any application that will break 
+> because
+> of this is a broken application.
 
-SCO are voice connections and they are CVSD encoded. It is not a  
-reliable data transport. Use L2CAP or RFCOMM for that.
+Agree with the requirement to discover adapter and device interface 
+object paths.
 
-Regards
+Also noted that we are still using "/" for org.bluez.Manager, and 
+appreciate your "reasons" for doing so ;-) (raising Havoc, so to speak).
 
-Marcel
-
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+>
+> 
 
 
 -------------------------------------------------------------------------
