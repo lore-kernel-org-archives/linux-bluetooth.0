@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 To: bluez-devel@lists.sourceforge.net
 From: Jui-Hao Chiang <windtracekimo@gmail.com>
-Date: Sun, 17 Aug 2008 21:53:16 +0000 (UTC)
-Message-ID: <loom.20080817T214007-401@post.gmane.org>
+Date: Fri, 15 Aug 2008 18:50:43 +0000 (UTC)
+Message-ID: <loom.20080815T184330-967@post.gmane.org>
+References: <loom.20080815T133352-774@post.gmane.org>
+	<4A619A8D-9BE8-4082-B28E-4F3EC19A6546@holtmann.org>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Question about cvsd input and output
+Subject: Re: [Bluez-devel] How to know the packet loss ratio of SCO socket
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,26 +20,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi, all
+Hi, Marcel
+> 
+> SCO are voice connections and they are CVSD encoded. It is not a  
+> reliable data transport. Use L2CAP or RFCOMM for that.
+> 
+> Regards
+> 
+> Marcel
 
-I have looked all the old articles, but still have a question.
-In the Bluetooth spec, it said the CVSD input shall be 64ksample/s and 16-bit
-linear PCM.
-It also says the output of the CVSD decoder are 16-bit linear PCM
-digital samples, at a sampling frequency of 8 ksample/sec.
+I think you are right.
+My original purpose is to test the voice quality when 12 SCO server-client pairs
+are running in the same room (which means 12 small piconets contending the
+channel, although each pair has its own frequency hopping pattern).
 
-I am a little confused about the data rate of the input side (64k*16bit =
-1024kbps), which seems 8 times faster than the output of decoder.
+Is there any good way to gather the voice quality information? (actually I don't
+know how to tell a voice qualify is "acceptable" to human ears. is there any
+good references?)
 
-Besides, I tried to open a SCO socket between two adapters (scotest), and the
-maximum data rate in one direction is 128kbps.
-Thus, I don't think we can actually feed 64ksamples/sec, 16-bit voice data into
-the CVSD codec of the adapter. 
-
-Am I right? or it's just the limitation of my adapter
-(Cyber Blue, Bluetooth EDR USB dongles,class II,V2.0)?
-
-Bests
+Thanks,
+Jui-Hao
 
 
 -------------------------------------------------------------------------
