@@ -1,11 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48A901E6.8060801@theforce.com.au>
-Date: Mon, 18 Aug 2008 15:00:22 +1000
-From: Grahame Jordan <gbj@theforce.com.au>
+Message-ID: <48A5C79D.3090007@gmail.com>
+Date: Fri, 15 Aug 2008 11:14:53 -0700
+From: Xamindar <junkxamindar@gmail.com>
 MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Cc: "General mailing list for gumstix users." <gumstix-users@lists.sourceforge.net>
-Subject: [Bluez-users] stalled ACL connection
+References: <b7bab9650808101623h1b9ca61fhe4725368c4987e0d@mail.gmail.com>
+	<d89ddf300808110209k46949860n3c525a7dd7e7b341@mail.gmail.com>
+	<48A401B2.1070705@gmail.com>
+In-Reply-To: <48A401B2.1070705@gmail.com>
+Subject: Re: [Bluez-users] bluetooth tethering to at&t phone issues
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,40 +22,40 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+Does anyone know how to set up bluetooth pan the *new* way? As in not 
+using the old daemon? I searched the blues wiki and found that I need to 
+create a /etc/bluetooth/network.conf file but it fails to explain what 
+to do after that. All else I could find was dbus info on setting it up 
+which suggests there should he a program or script out there to do this. 
+Does anyone know? Or is this a closely guarded secret that only the 
+bluez devs know about?
 
-We are using a gumstix with Kernel 2.6.18gum with bluez-libs-2.24 and bluez-utils-2.24
-
-Our device was setup as slave for PAN
-PAND_OPTIONS="--role PANU --service GN --connect 00:15:83:C6:78:0f --persist"
-
-This was connecting well with the BlueSoleil Windows BT Stack
-However the BlueSoleil stack is fairly promiscuous and can trash other setting on a Windows machine.
-
-We are using a 
-Bus 006 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
-which works with native WindowsXP SP2+ Bluetooth stack.
-
-However the Windows stack requires that the PAN on our device is set to Master
-PAND_OPTIONS="--role GN --service PANU --connect 00:15:83:C6:78:0f --persist"
-
-Since it has been set to Master it does connect OK but it seems to consistently drop off after at least 12 hours of operation.
-
-When I restarted the bluetooth stack I got this message.
-
-Stopping Bluetooth subsystem:hci_acl_tx_to: hci0 ACL tx timeout
-hci_acl_tx_to: hci0 killing stalled ACL connection 71:78:C6:83:15:00
-hci_acl_tx_to: hci0 ACL tx timeout
-hci_acl_tx_to: hci0 killing stalled ACL connection 71:78:C6:83:15:00
- pand dund rfcomm hidd sdpd hcid ttyS3.
-
-
-Any help appreciated.
-
-Thanks
-
-Grahame Jordan
-
+Xamindar wrote:
+> 
+> 
+> Brad Midgley wrote:
+>> Jared
+>>
+>>> to do it the new way). Recently it started acting a little flaky. any
+>>> streaming videos would stop after the first few seconds, emerge sync 
+>>> would
+>>> either take forever to get started or stop halfway, and downloading any
+>>> larger files would fail.
+>>
+>> I've noticed some issues like that and it seemed like it might be
+>> something happening on the att network. I have been updating my system
+>> to the latest ubuntu, so it's possible there was a subtle regression
+>> somewhere.
+>>
+>> I haven't done a lot of testing, but I haven't noticed the issue when
+>> using dun on my n810. (I have a tilt that I used the
+>> soft-reset-after-hard-reset trick on so dun didn't get disabled)
+>>
+> 
+> Do you think maybe this could be the phones issue? I'll have to test a 
+> different phone to see if it still happens. I noticed when the internet 
+> stops working the phone also can't access the internet for a while 
+> afterward. I either wait a while or reboot the phone and it's back again.
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
