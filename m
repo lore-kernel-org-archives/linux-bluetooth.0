@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <alpine.LNX.1.10.0808181917120.32359@nge2.ngu.pk>
-References: <alpine.LNX.1.10.0808181917120.32359@nge2.ngu.pk>
-Date: Tue, 19 Aug 2008 09:02:45 +0200
-Message-Id: <1219129365.7591.76.camel@violet.holtmann.net>
+In-Reply-To: <3e9cdced0808180622k6185e215k6017ce2ba0cadd15@mail.gmail.com>
+References: <3e9cdced0808180622k6185e215k6017ce2ba0cadd15@mail.gmail.com>
+Date: Tue, 19 Aug 2008 09:00:01 +0200
+Message-Id: <1219129201.7591.73.camel@violet.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] bluez-4.1: Pairing Broken?
+Subject: Re: [Bluez-users] old patches - where to get from?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,54 +22,24 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi,
 
-> I changed bluez-* to the 4.x branch. Everything went pretty smooth, despite 
-> massive changes. After about 4 hours, I had everything in place. I go to test 
-> the first connection/device, and ...
-> 
-> 
-> share/dbus-1 # passkey-agent --default 0000 00:1A:45:01:F9:42 &
-> 
-> Can't register passkey agent
-> Method "RegisterDefaultPasskeyAgent" with signature "s" on interface
-> "org.bluez.Security" doesn't exist
-> 
-> [1] 4173
-> [1]  + exit 1     passkey-agent --default 0000 00:1A:45:01:F9:42
-> 
-> 
-> 
-> bluez-4.1/src # Can't register authorization agent
-> 
-> Method "RegisterDefaultAuthorizationAgent" with signature "s" on interface
-> "org.bluez.Security" doesn't exist
+> I would like to get the patch to provide bluez bluetooth support for
+> Kernel 2.4.21.
+> Some weeks ago this patch was available at bluez.org or
+> holtmann.org.Unfortunately it isn't anymore. 
+> And can anybody tell me what this patch makes? I guess it provides
+> support for additional bluetooth devices as far as I kown for the AVM
+> bluefritz usb dongel?
+> Any other changes?
 
-that is expected. We remove the 3.x API. I also mentioned on
-www.bluez.org that bluez-gnome will break with 4.x right now.
+the 2.4 kernel is no longer supported. That is an ancient kernel. You
+should not be using that one.
 
-> bluetoothd[4803]: hcid_dbus_bonding_process_complete: status=00
-> bluetoothd[4803]: hcid_dbus_bonding_process_complete: no pending auth request
-> bluetoothd[4803]: Accepted new client connection on unix socket (fd=22)
-> bluetoothd[4803]: Audio API: received BT_GETCAPABILITIES_REQ
-> bluetoothd[4803]: Audio API: sending BT_GETCAPABILITIES_RSP
-> bluetoothd[4803]: Unix client disconnected (fd=22)
-> 
-> 
-> 
-> No! :-(
-> 
-> media/ogg # sox -t ogg ./file.ogg -t alsa pcm.bluetooth
-> 
-> ALSA lib pcm_bluetooth.c:1619:(bluetooth_init) BT_GETCAPABILITIES failed : 
-> Input/output error(5)
-> sox soxio: Can't open output file `pcm.bluetooth': cannot open audio device
-> 
-> -2- root@vdrl media/ogg # hcitool con
-> Connections:
-> 
-> 
-> Now all I can get are the expected authentication error type messages:
+> Another question: Why is the bluetooth bluez subsystem distributed in
+> the two folders drivers/bluetooth and net/bluetooth?
+> So at which location is what implemented?
 
-That is not a pairing issue. That is an audio service issue.
+I think that is quite clear. Protocols in net/bluetooth and drivers in
+driver/bluetooth.
 
 Regards
 
