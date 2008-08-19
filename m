@@ -1,103 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oliver@neukum.org>
+Date: Tue, 19 Aug 2008 10:49:35 -0400 (EDT)
+From: Alan Stern <stern@rowland.harvard.edu>
 To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [patch]race condition in btusb disconnect() handling
-Date: Tue, 19 Aug 2008 17:14:49 +0200
-Cc: linux-bluetooth@vger.kernel.org,
- linux-usb@vger.kernel.org
-References: <200808191423.52657.oliver@neukum.org> <200808191605.40987.oliver@neukum.org> <1219156278.7591.145.camel@violet.holtmann.net>
-In-Reply-To: <1219156278.7591.145.camel@violet.holtmann.net>
+cc: Oliver Neukum <oliver@neukum.org>,  <linux-bluetooth@vger.kernel.org>,
+     <linux-usb@vger.kernel.org>
+Subject: Re: [rfc]btusb with SCO support
+In-Reply-To: <1219132369.7591.98.camel@violet.holtmann.net>
+Message-ID: <Pine.LNX.4.44L0.0808191032250.2669-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200808191714.50309.oliver@neukum.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am Dienstag 19 August 2008 16:31:18 schrieb Marcel Holtmann:
-> Hi Oliver,
+On Tue, 19 Aug 2008, Marcel Holtmann wrote:
+
+> Hi Alan,
 > 
-> > > > First you release the interface, then you unregister the hci.
-> > > 
-> > > Putting it after hci_unregister_dev is an issue. The unregister will
-> > > call __hci_dev_put and then in return will call the destruct callback
-> > > which will free the data pointer.
-> > > 
-> > > So either we use hci_dev_hold or make sure that disconnect can only
-> > > disable the SCO interface. That comes directly with the first comment
-> > > from you.
+> > > example have the USB core queue submitted URBs until the new alternate
+> > > setting has been selected?
 > > 
-> > Here is a new version. I am afraid normal hci_dev_hold would fail if
-> > the disconnect happens because the btusb module is being unloaded.
+> > this one's for you. Is there a deeper reason we enable and disable endpoints
+> > therein?
+
+There is.  Endpoint properties can and do differ between altsettings.  
+In order to work properly, the host controller hardware needs to be
+aware of changes in the endpoint properties.  The only way to
+accomplish this is to disable the endpoints for the altsetting going
+away (thereby flushing their properties from the controller hardware)  
+and then to enable the endpoints for the altsetting coming into
+existence.
+
+> just let me give you details on rational behind my question. A Bluetooth
+> USB device uses two interfaces. The first one for control (commands),
+> interrupt (event) and bulk (ACL data) endpoints. The second interface
+> contains the isoc (SCO data) endpoints.
 > 
-> the btusb_stop_traffic change is bogus. You don't need that. The flush
-> callback will be called to ensure that all TX traffic is released.
+> T:  Bus=02 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+> D:  Ver= 2.00 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0bf8 ProdID=1003 Rev=53.42
+> C:* #Ifs= 3 Cfg#= 1 Atr=c0 MxPwr=  0mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
 
-OK.
+What is that last interface for?  It doesn't appear to be very useful, 
+with no endpoints (and no driver)...
 
-> I am not sure about hci_dev_hold. We ensure that a reference count to
-> the module is hold when the HCI device is brought up.
+> The second interface contains 6 alternate settings and you have to
+> select them based on your voice setting (8-bit or 16-bit) and the number
+> of SCO connections (0-3).
+> 
+> The Bluetooth specification has the details, but when using 16-bit input
+> data and one SCO connection, you have to select alternate setting #2. If
+> no SCO connections are open, we have to go with setting #0.
 
-But won't the module be marked as going away and make try_module_get()
-fail?
+And presumably, if the number of SCO connections increases from one to 
+two then you need to switch to yet another altsetting -- while keeping 
+the existing connection intact, yes?
 
-	Regards
-		Oliver
+> So we can't have isoc URBs running all them time since that would drain
+> power. The old hci_usb did it this way and was an obvious issue showing
+> up on powertop.
+> 
+> The Bluetooth subsystem calls our notify() callback when the number of
+> connection or the voice setting changes. However this context can't
+> sleep and thus we can't call usb_set_interface().
 
-Signed-off-by: Oliver Neukum <oneukum@suse.de>
+That's the real problem.  Why doesn't opening or closing a connection 
+take place in a sleepable process context?
 
----
+> Right now are using a
+> workqueue, but that is not an optimal solution since as Oliver pointed
+> correctly out, we have no idea when this gets scheduled.
+> 
+> My question is if we can have a usb_set_interface() version that we can
+> call from interrupt context and that will queue the URBs that we submit
+> in between until the new alternate setting has been selected.
+> 
+> I personally think the Bluetooth USB specification is broken and a bad
+> design, but that is what we have at the moment.
 
---- linux-2.6.27-rc3/drivers/bluetooth/btusb.c.marcel	2008-08-19 10:21:51.000000000 +0200
-+++ linux-2.6.27-rc3/drivers/bluetooth/btusb.c	2008-08-19 15:50:06.000000000 +0200
-@@ -169,6 +169,7 @@ static struct usb_device_id blacklist_ta
- struct btusb_data {
- 	struct hci_dev       *hdev;
- 	struct usb_device    *udev;
-+	struct usb_interface *acl;
- 	struct usb_interface *isoc;
- 
- 	spinlock_t lock;
-@@ -822,6 +827,7 @@ static int btusb_probe(struct usb_interf
- 	}
- 
- 	data->udev = interface_to_usbdev(intf);
-+	data->acl = intf;
- 
- 	spin_lock_init(&data->lock);
- 
-@@ -890,7 +896,7 @@ static int btusb_probe(struct usb_interf
- 
- 	if (data->isoc) {
- 		err = usb_driver_claim_interface(&btusb_driver,
--							data->isoc, NULL);
-+							data->isoc, data);
- 		if (err < 0) {
- 			hci_free_dev(hdev);
- 			kfree(data);
-@@ -922,13 +928,23 @@ static void btusb_disconnect(struct usb_
- 
- 	hdev = data->hdev;
- 
--	if (data->isoc)
--		usb_driver_release_interface(&btusb_driver, data->isoc);
-+	/* make sure we have a reference */
-+	__hci_dev_hold(hdev);
- 
--	usb_set_intfdata(intf, NULL);
-+	usb_set_intfdata(data->acl, NULL);
-+	if (data->isoc)
-+		usb_set_intfdata(data->isoc, NULL);
- 
-+	/* unregister before releasing any interface */
- 	hci_unregister_dev(hdev);
- 
-+	if (intf == data->isoc)
-+		usb_driver_release_interface(&btusb_driver, data->acl);
-+	else if (data->isoc)
-+		usb_driver_release_interface(&btusb_driver, data->isoc);
-+
-+	/* release the reference */
-+	__hci_dev_put(hdev);
- 	hci_free_dev(hdev);
- }
- 
+I don't know how much of this comes from the Bluetooth USB spec and how 
+much comes from the design of the Bluetooth subsystem.  It sounds like 
+you're being asked to do too much in too short a time.
+
+Is it possible to change the subsystem design so that, for example, in
+addition to getting a notify() callback when the connection settings
+change, you also call a ready() function in the subsystem core to tell
+it when the new settings are ready for use?
+
+If not, and you are forced to rely on queuing URBs for later 
+submission, then I think it might be more appropriate to do this 
+queuing in the Bluetooth driver code rather than in usbcore.  You could 
+have an entire anchor devoted to deferred URBs.
+
+Alan Stern
