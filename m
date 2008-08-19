@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <3e9cdced0808180622k6185e215k6017ce2ba0cadd15@mail.gmail.com>
-References: <3e9cdced0808180622k6185e215k6017ce2ba0cadd15@mail.gmail.com>
-Date: Tue, 19 Aug 2008 09:00:01 +0200
-Message-Id: <1219129201.7591.73.camel@violet.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] old patches - where to get from?
+Message-ID: <3e9cdced0808182355q1607df84gd6b8e319251bbbbb@mail.gmail.com>
+Date: Tue, 19 Aug 2008 08:55:10 +0200
+From: "Fritz Code" <codefritz@googlemail.com>
+To: bluez-users@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-users] bluez.wiki.org
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,43 +14,60 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1844973291=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+--===============1844973291==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_36206_8852895.1219128910832"
 
-> I would like to get the patch to provide bluez bluetooth support for
-> Kernel 2.4.21.
-> Some weeks ago this patch was available at bluez.org or
-> holtmann.org.Unfortunately it isn't anymore. 
-> And can anybody tell me what this patch makes? I guess it provides
-> support for additional bluetooth devices as far as I kown for the AVM
-> bluefritz usb dongel?
-> Any other changes?
+------=_Part_36206_8852895.1219128910832
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-the 2.4 kernel is no longer supported. That is an ancient kernel. You
-should not be using that one.
+since there is no link from the official bluez site bluez.org to
+bluez.wiki.org I'm wondering if the wiki is out of date?
 
-> Another question: Why is the bluetooth bluez subsystem distributed in
-> the two folders drivers/bluetooth and net/bluetooth?
-> So at which location is what implemented?
+It seems its hard to get good documentation about bluez.
 
-I think that is quite clear. Protocols in net/bluetooth and drivers in
-driver/bluetooth.
+-- 
+Regards,
+--Codefritz
 
-Regards
+------=_Part_36206_8852895.1219128910832
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Marcel
+<div dir="ltr">since there is no link from the official bluez site <a href="http://bluez.org">bluez.org</a> to <a href="http://bluez.wiki.org">bluez.wiki.org</a> I&#39;m wondering if the wiki is out of date?<br><br>It seems its hard to get good documentation about bluez.<br clear="all">
+<br>-- <br>Regards,<br>--Codefritz<br><br><br><br><br>
+</div>
+
+------=_Part_36206_8852895.1219128910832--
 
 
+--===============1844973291==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
 Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
+--===============1844973291==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1844973291==--
