@@ -1,107 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oliver@neukum.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: [patch]race condition in btusb disconnect() handling
-Date: Tue, 19 Aug 2008 14:23:52 +0200
-Cc: linux-bluetooth@vger.kernel.org,
- linux-usb@vger.kernel.org
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200808191423.52657.oliver@neukum.org>
+Subject: Re: [rfc]btusb with SCO support
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Oliver Neukum <oliver@neukum.org>
+Cc: linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org,
+	Alan Stern <stern@rowland.harvard.edu>
+In-Reply-To: <200808190930.59698.oliver@neukum.org>
+References: <200807311452.24166.oliver@neukum.org>
+	 <200808190903.05919.oliver@neukum.org>
+	 <1219130384.7591.83.camel@violet.holtmann.net>
+	 <200808190930.59698.oliver@neukum.org>
+Content-Type: text/plain
+Date: Tue, 19 Aug 2008 09:52:49 +0200
+Message-Id: <1219132369.7591.98.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-btusb has some races in disconnect()
+Hi Alan,
 
-- it doesn't deal with only the iso interface disconnected
-- it releases the data interface before unregistering the iso interface
-- it isn't carefull to kill all URBs in case of soft disconnect
+> > example have the USB core queue submitted URBs until the new alternate
+> > setting has been selected?
+> 
+> this one's for you. Is there a deeper reason we enable and disable endpoints
+> therein?
 
-Signed-off-by: Oliver Neukum <oneukum@suse.de>
+just let me give you details on rational behind my question. A Bluetooth
+USB device uses two interfaces. The first one for control (commands),
+interrupt (event) and bulk (ACL data) endpoints. The second interface
+contains the isoc (SCO data) endpoints.
 
-	Regards
-		Oliver
----
+T:  Bus=02 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0bf8 ProdID=1003 Rev=53.42
+C:* #Ifs= 3 Cfg#= 1 Atr=c0 MxPwr=  0mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
 
---- linux-2.6.27-rc3/drivers/bluetooth/btusb.c.marcel	2008-08-19 10:21:51.000000000 +0200
-+++ linux-2.6.27-rc3/drivers/bluetooth/btusb.c	2008-08-19 14:04:49.000000000 +0200
-@@ -169,6 +169,7 @@ static struct usb_device_id blacklist_ta
- struct btusb_data {
- 	struct hci_dev       *hdev;
- 	struct usb_device    *udev;
-+	struct usb_interface *acl;
- 	struct usb_interface *isoc;
- 
- 	spinlock_t lock;
-@@ -523,6 +524,14 @@ static int btusb_open(struct hci_dev *hd
- 	return err;
- }
- 
-+static void btusb_stop_traffic(struct btusb_data *data)
-+{
-+	usb_kill_anchored_urbs(&data->intr_anchor);
-+	usb_kill_anchored_urbs(&data->bulk_anchor);
-+	usb_kill_anchored_urbs(&data->isoc_anchor);
-+	usb_kill_anchored_urbs(&data->tx_anchor);
-+}
-+
- static int btusb_close(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hdev->driver_data;
-@@ -535,13 +544,9 @@ static int btusb_close(struct hci_dev *h
- 	flush_work(&data->work);
- 
- 	clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
--	usb_kill_anchored_urbs(&data->intr_anchor);
--
- 	clear_bit(BTUSB_BULK_RUNNING, &data->flags);
--	usb_kill_anchored_urbs(&data->bulk_anchor);
--
- 	clear_bit(BTUSB_INTR_RUNNING, &data->flags);
--	usb_kill_anchored_urbs(&data->intr_anchor);
-+	btusb_stop_traffic(data);
- 
- 	return 0;
- }
-@@ -822,6 +827,7 @@ static int btusb_probe(struct usb_interf
- 	}
- 
- 	data->udev = interface_to_usbdev(intf);
-+	data->acl = intf;
- 
- 	spin_lock_init(&data->lock);
- 
-@@ -890,7 +896,7 @@ static int btusb_probe(struct usb_interf
- 
- 	if (data->isoc) {
- 		err = usb_driver_claim_interface(&btusb_driver,
--							data->isoc, NULL);
-+							data->isoc, data);
- 		if (err < 0) {
- 			hci_free_dev(hdev);
- 			kfree(data);
-@@ -922,13 +928,21 @@ static void btusb_disconnect(struct usb_
- 
- 	hdev = data->hdev;
- 
-+	usb_set_intfdata(data->acl, NULL);
- 	if (data->isoc)
--		usb_driver_release_interface(&btusb_driver, data->isoc);
--
--	usb_set_intfdata(intf, NULL);
-+		usb_set_intfdata(data->isoc, NULL);
- 
-+	/* unregister before releasing any interface */
- 	hci_unregister_dev(hdev);
- 
-+	cancel_work_sync(&data->work);
-+	btusb_stop_traffic(data);
-+
-+	if (intf == data->isoc)
-+		usb_driver_release_interface(&btusb_driver, data->acl);
-+	else if (data->isoc)
-+		usb_driver_release_interface(&btusb_driver, data->isoc);
-+
- 	hci_free_dev(hdev);
- }
- 
+The second interface contains 6 alternate settings and you have to
+select them based on your voice setting (8-bit or 16-bit) and the number
+of SCO connections (0-3).
+
+The Bluetooth specification has the details, but when using 16-bit input
+data and one SCO connection, you have to select alternate setting #2. If
+no SCO connections are open, we have to go with setting #0.
+
+T:  Bus=02 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0bf8 ProdID=1003 Rev=53.42
+C:* #Ifs= 3 Cfg#= 1 Atr=c0 MxPwr=  0mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:* If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
+
+So we can't have isoc URBs running all them time since that would drain
+power. The old hci_usb did it this way and was an obvious issue showing
+up on powertop.
+
+The Bluetooth subsystem calls our notify() callback when the number of
+connection or the voice setting changes. However this context can't
+sleep and thus we can't call usb_set_interface(). Right now are using a
+workqueue, but that is not an optimal solution since as Oliver pointed
+correctly out, we have no idea when this gets scheduled.
+
+My question is if we can have a usb_set_interface() version that we can
+call from interrupt context and that will queue the URBs that we submit
+in between until the new alternate setting has been selected.
+
+I personally think the Bluetooth USB specification is broken and a bad
+design, but that is what we have at the moment.
+
+Regards
+
+Marcel
+
+
