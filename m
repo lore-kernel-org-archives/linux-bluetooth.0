@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Aug 2008 16:04:24 -0700 (PDT)
-From: hong zhang <henryzhang62@yahoo.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <48AAAE22.8090800@earthlink.net>
+Date: Tue, 19 Aug 2008 06:27:30 -0500
+From: "Mumia W.." <paduille.4061.mumia.w+nospam@earthlink.net>
 MIME-Version: 1.0
-Message-ID: <382531.424.qm@web57905.mail.re3.yahoo.com>
-Subject: [Bluez-users] should I use hciattach for my USB dongle?
-Reply-To: henryzhang62@yahoo.com,
-	BlueZ users <bluez-users@lists.sourceforge.net>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <3e9cdced0808182355q1607df84gd6b8e319251bbbbb@mail.gmail.com>
+	<1219135792.7591.113.camel@violet.holtmann.net>
+In-Reply-To: <1219135792.7591.113.camel@violet.holtmann.net>
+Subject: Re: [Bluez-users] bluez.wiki.org
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -19,18 +21,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-List,
+On 08/19/2008 03:49 AM, Marcel Holtmann wrote:
+> Hi,
+> 
+>> since there is no link from the official bluez site bluez.org to
+>> bluez.wiki.org I'm wondering if the wiki is out of date?
+>>
+>> It seems its hard to get good documentation about bluez.
+> 
+> you can get an account on www.bluez.org and start improving the
+> documentation.
+> 
+> Regards
+> 
+> Marcel
+> 
 
-I have a USB dongle connected to my desktop. "hciconfig hci0 up" returns "can't open HCI socket.:Address family not supported by protocol". 
+I have a local copy of the old bluez hardware compatability list (the 
+features list). Can you give me permission to distribute the document 
+and its information?
 
-For serial port, run "hciattach /dev/ttyS1 bcsp 115200". But my dongle is self initialized with its own eeprom with USB port. 
-
-What should I do to setup my dongle and make it work with my cell phone?
-
----henry
-
-
-      
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
