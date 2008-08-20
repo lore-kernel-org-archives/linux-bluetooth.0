@@ -1,39 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
+From: Oliver Neukum <oliver@neukum.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 Subject: Re: [rfc/rft]power management for btusb
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Oliver Neukum <oliver@neukum.org>
-Cc: Pavel Machek <pavel@suse.cz>, Stefan Seyfried <seife@suse.de>,
-	linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org
-In-Reply-To: <200808201405.19720.oliver@neukum.org>
-References: <200808201142.52620.oliver@neukum.org>
-	 <1219227484.7591.318.camel@violet.holtmann.net>
-	 <200808201405.19720.oliver@neukum.org>
-Content-Type: text/plain
-Date: Wed, 20 Aug 2008 14:34:43 +0200
-Message-Id: <1219235683.7591.326.camel@violet.holtmann.net>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 20 Aug 2008 14:05:19 +0200
+Cc: Pavel Machek <pavel@suse.cz>,
+ Stefan Seyfried <seife@suse.de>,
+ linux-bluetooth@vger.kernel.org,
+ linux-usb@vger.kernel.org
+References: <200808201142.52620.oliver@neukum.org> <1219227484.7591.318.camel@violet.holtmann.net>
+In-Reply-To: <1219227484.7591.318.camel@violet.holtmann.net>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200808201405.19720.oliver@neukum.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Oliver,
-
-> > What are the semantics for usb_autopm_{get,put}_interface? Can we expect
-> > to always get a suspend() and resume() callback?
+Am Mittwoch 20 August 2008 12:18:04 schrieb Marcel Holtmann:
+> Hi Oliver,
 > 
-> usb_autopm_get_interface() guarantees that after it returns successsfully
-> the interface (and teh device with it) remains unautosuspended until you
-> call usb_autopm_put_interface. The calls stack with a counter.
+> > this implements very simple power management for btusb.
+> > Comments?
 > 
-> You'll get a resume() callback only if the device was actually suspended.
+> looks a little but too much.
 
-so a device didn't start out suspended? Too bad, otherwise you could cut
-the logic in the driver a lot.
+How so?
 
-I tried to run this on my Quad G5, but I never see suspend() or resume()
-called. Do I have to do something to make autosuspend work?
+> What are the semantics for usb_autopm_{get,put}_interface? Can we expect
+> to always get a suspend() and resume() callback?
 
-Regards
+usb_autopm_get_interface() guarantees that after it returns successsfully
+the interface (and teh device with it) remains unautosuspended until you
+call usb_autopm_put_interface. The calls stack with a counter.
 
-Marcel
+You'll get a resume() callback only if the device was actually suspended.
 
+> So in open(), do we have to actually start the interrupt URB or can we
+> just wait for resume() to be happening?
 
+We have to start the URB.
+
+> I don't wanna misuse the *_RUNNING bits. They are only there to make
+> sure that we non re-submit the URBs.
+
+Do you suggest making a copy of these bits at suspend() time?
+
+	Regards
+		Oliver
