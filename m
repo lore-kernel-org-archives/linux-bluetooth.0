@@ -1,54 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oliver@neukum.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [rfc/rft]power management for btusb
-Date: Wed, 20 Aug 2008 16:00:56 +0200
-Cc: Pavel Machek <pavel@suse.cz>,
- Stefan Seyfried <seife@suse.de>,
- linux-bluetooth@vger.kernel.org,
- linux-usb@vger.kernel.org
-References: <200808201142.52620.oliver@neukum.org> <200808201534.11557.oliver@neukum.org> <1219239575.7591.336.camel@violet.holtmann.net>
-In-Reply-To: <1219239575.7591.336.camel@violet.holtmann.net>
+Date: Wed, 20 Aug 2008 09:50:53 -0400 (EDT)
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Dave Higton <DAVE.HIGTON@nice.com>
+cc: Marcel Holtmann <marcel@holtmann.org>,
+	Oliver Neukum <oliver@neukum.org>,
+	<linux-bluetooth@vger.kernel.org>, <linux-usb@vger.kernel.org>
+Subject: RE: [rfc]btusb with SCO support
+In-Reply-To: <B710AFF518DE29459D5752E7B15256D7D08101@souexc02.eu.nice.com>
+Message-ID: <Pine.LNX.4.44L0.0808200942280.2463-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Message-Id: <200808201600.56584.oliver@neukum.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am Mittwoch 20 August 2008 15:39:35 schrieb Marcel Holtmann:
-> Hi Oliver,
-> 
-> > > > > > > > > > > I tried to run this on my Quad G5, but I never see suspend() or resume()
-> > > > > > > > > > > called. Do I have to do something to make autosuspend work?
-> > > > > > > > > > 
-> > > > > > > > > > echo "auto" > $(directry in sysfs for device)/power/level
-> > > > > > > > > > And you'll see power events in syslog only if you compile with
-> > > > > > > > > > CONFIG_USB_DEBUG
-> > > > > > > > > 
-> > > > > > > > > I only seem to see power/wakeup entries. I don't have power/level. Am I
-> > > > > > > > > missing some configuration option?
-> > > > > > > > 
-> > > > > > > > Probably CONFIG_USB_SUSPEND
-> > > > > > > 
-> > > > > > > that one is on of course. Do you think it makes a difference that it is
-> > > > > > > PowerPC system I am testing this with?
-> > > > > > 
-> > > > > > If it does make a difference, that's a bug. Runtime PM should work
-> > > > > > anyway.
-> > > > > 
-> > > > > I really don't see any calls to suspend() and I am missing the
-> > > > > power/level option. This is the latest 2.6.27-rc3-git tree from Linus.
-> > > > 
-> > > > Odd. Send /proc/config.gz please.
-> > > 
-> > > there you go. It is a nice Quad G5 machine.
-> > 
-> > That should work. Did you perhaps forget to remake your initrd?
-> 
-> no initrd on this system.
+On Wed, 20 Aug 2008, Dave Higton wrote:
 
-It should work. Are you perhaps looking at the interface level as opposed
-to the device level?
+> > Since these are isoc URBs anyway, shouldn't you simply drop them until
+> > the new altsetting is ready?  That's a lot easier than trying to keep
+> > track of them and deferring them (which doesn't make much sense for
+> > Isochronous data).
+> 
+> If they were scheduled before an altsetting change, they must be plain
+> wrong for the new altsetting - and indeed the new altsetting could be
+> 0, in which case they wouldn't be sent anyway.  So it seems to me that
+> they should be dropped.
 
-	Regards
-		Oliver
+That's not a good description of the situation.  The URBs were
+scheduled _after_ an altsetting change was requested but _before_ the
+change took place.  Therefore the URBs are designed for the new
+altsetting and so are wrong for the altsetting in effect at the time of
+submission.  (Indeed, the old altsetting might be 0, in which case
+submission would fail anyway.)  So they should be dropped.
+
+> The only difference it makes, from the POV of the outside world, is an
+> ever so slight change in the time the stream is switched off.
+
+No.  Since the submission or transmission of those URBs would have 
+failed anyway (if they were submitted before the altsetting change 
+occurred), they wouldn't get delivered in either case.  The length of 
+time the stream is off is the time required to switch altsettings -- 
+and that simply is unavoidable.
+
+The other possibility suggested was to delay submitting the URBs until
+after the new altsetting was in place.  That is a bad idea because it
+means delaying the delivery of isoc data, which makes no sense -- the
+whole idea of an isochronous stream is that the information should be
+delivered as quickly as possible and it doesn't much matter if some of
+it gets lost.
+
+Alan Stern
+
