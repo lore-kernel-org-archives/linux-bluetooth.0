@@ -1,30 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 20 Aug 2008 11:35:20 -0400 (EDT)
-From: Alan Stern <stern@rowland.harvard.edu>
+From: Oliver Neukum <oliver@neukum.org>
 To: Marcel Holtmann <marcel@holtmann.org>
-cc: Oliver Neukum <oliver@neukum.org>, Pavel Machek <pavel@suse.cz>,
-    Stefan Seyfried <seife@suse.de>,  <linux-bluetooth@vger.kernel.org>,
-     <linux-usb@vger.kernel.org>
 Subject: Re: [rfc/rft]power management for btusb
+Date: Wed, 20 Aug 2008 17:33:12 +0200
+Cc: Pavel Machek <pavel@suse.cz>,
+ Stefan Seyfried <seife@suse.de>,
+ linux-bluetooth@vger.kernel.org,
+ linux-usb@vger.kernel.org
+References: <200808201142.52620.oliver@neukum.org> <200808201600.56584.oliver@neukum.org> <1219245914.7591.338.camel@violet.holtmann.net>
 In-Reply-To: <1219245914.7591.338.camel@violet.holtmann.net>
-Message-ID: <Pine.LNX.4.44L0.0808201132200.2806-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain;
+  charset="utf-8"
+Message-Id: <200808201733.13718.oliver@neukum.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 20 Aug 2008, Marcel Holtmann wrote:
+Am Mittwoch 20 August 2008 17:25:14 schrieb Marcel Holtmann:
+
+Hi,
 
 > finally I found the device and setting it to auto makes it actually
 > suspend. Why is this not default? The driver has to enable it anyway.
 
-If there's no driver then it would take effect right away.  This causes 
-problems for devices during startup -- the period of time from device 
-discovery to driver binding is long enough (because there's so much 
-other activity during bootup) that the device can autosuspend before 
-the driver is there to prevent it.
+for too many class drivers some devices survive suspension and others crash.
+We don't want the lists of such devices in kernel space.
 
-For well-behaved devices this wouldn't matter.  But unfortunately there 
-are lots of devices which break when they suspend.  That's why 
-level = auto is not the default.
-
-Alan Stern
+	Regards
+		Oliver
