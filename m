@@ -1,47 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-Date: Wed, 20 Aug 2008 16:43:01 -0400
+Date: Wed, 20 Aug 2008 09:29:17 -0700 (PDT)
+From: hong zhang <henryzhang62@yahoo.com>
+Reply-To: henryzhang62@yahoo.com
+Subject: Re: [Bluez-users] should I use hciattach for my USB dongle?
+To: BlueZ users <bluez-users@lists.sourceforge.net>,
+  Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1219227530.7591.320.camel@violet.holtmann.net>
 MIME-Version: 1.0
-From: uweklatt@aol.com
-Message-Id: <8CAD11C78BACC63-1150-2AED@FWM-D27.sysops.aol.com>
-Subject: [Bluez-users] passkey-agent doesnt work,
-	without pin everything is working
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
-List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
-List-Post: <mailto:bluez-users@lists.sourceforge.net>
-List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
-	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Sender: bluez-users-bounces@lists.sourceforge.net
-Errors-To: bluez-users-bounces@lists.sourceforge.net
+Content-Type: text/plain; charset=us-ascii
+Message-ID: <350540.27361.qm@web57908.mail.re3.yahoo.com>
+List-ID: <bluez-users.lists.sourceforge.net>
 
-SGVsbG8sCgpJIGNvbXBpbGVkIGEgMi42LjI2IEtlcm5lbCAoeDg2KSB3aXRoIGJsdWV6LXV0aWwg
-My43LgpJIHdhbnQgdG8gdXNlIGEgVVNCIGJsdWV0b290aCBkb25nbGUgdG8gY29ubmVjdCB0byBh
-IFJGQ09NTSBTUFAgZGV2aWNlLgoKV2hlbiBJIGRpc2FibGUgYXV0aCBpbiB0YXJnZXQgZGV2aWNl
-IEkgZ290IGEgd29ya2luZyBjb25uZWN0aW9uLgpXaGVuIEkgd2FudCB0byB1c2UgYXV0aCAoZS5n
-ICIxMjM0IikgdGhlIGZvbGxvd2luZyBoYXBwZW5zOgoKPnBhc3NrZXktYWdlbnQgMTIzNCAwMDow
-Qjo1Mzp4eDp4eDp4eCAmCj5jYXQgL2Rldi9yZmNvbW0wCj5QYXNza2V5IHNlcnZpY2UgaGFzIGJl
-ZW4gcmVsZWFzZWQKPnByb2Nlc3MgMzI4MDogQXBwbGljYXRpb25zIG11c3Qgbm90IGNsb3NlIHNo
-YXJlZCBjb25uZWN0aW9ucyAtIHNlZSAKZGJ1c19jb25uZWN0aW9uX2Nsb3NlKCkgZG9jcy4gVGhp
-cyBpcyBhIGJ1ZyBpbiB0aGUgYXBwbGljYXRpb24uCj5jYXQ6IC9kZXYvcmZjb21tMDogSW52YWxp
-ZCBleGNoYW5nZQo+WzFdKyAgRG9uZSAgICAgICAgICAgICAgICAgICAgcGFzc2tleS1hZ2VudCAx
-MjM0IDAwOjBCOjUzOnh4Onh4Onh4CgpJIHRyaWVkIHRvIGFkZCBrZXkgdG8gL3Zhci9saWIvYmx1
-ZXRvb3RoLzAwOjBCOjUzOnh4Onh4Onh4L3BpbmNvZGVzClRoaXMgZG9lc250IHdvcmsgZWl0aGVy
-LgoKQW55IGhpbnRzPwoKVGhhbmtzClV3ZQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KQU9MIGVNYWlsIGF1ZiBJ
-aHJlbSBIYW5keSEgQWIgc29mb3J0IGvDtm5uZW4gU2llIGF1Y2ggdW50ZXJ3ZWdzIElocmUgQU9M
-IAplbWFpbCBhYnJ1ZmVuLiBSZWdpc3RyaWVyZW4gU2llIHNpY2ggamV0enQga29zdGVubG9zLgoK
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLk5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnkgdGhlIE1v
-YmxpbiBZb3VyIE1vdmUgRGV2ZWxvcGVyJ3MgY2hhbGxlbmdlCkJ1aWxkIHRoZSBjb29sZXN0IExp
-bnV4IGJhc2VkIGFwcGxpY2F0aW9ucyB3aXRoIE1vYmxpbiBTREsgJiB3aW4gZ3JlYXQgcHJpemVz
-CkdyYW5kIHByaXplIGlzIGEgdHJpcCBmb3IgdHdvIHRvIGFuIE9wZW4gU291cmNlIGV2ZW50IGFu
-eXdoZXJlIGluIHRoZSB3b3JsZApodHRwOi8vbW9ibGluLWNvbnRlc3Qub3JnL3JlZGlyZWN0LnBo
-cD9iYW5uZXJfaWQ9MTAwJnVybD0vCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxpbmcgbGlzdApCbHVlei11c2Vyc0BsaXN0cy5z
-b3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGlu
-Zm8vYmx1ZXotdXNlcnMK
+Marcel,
+
+Yes, it does not complain after loading hci_usb. 
+Where can I get howto document to do send/receive picture, voice, etc. with other bluetooth device?
+
+I google but do not get good information.
+
+
+---henry
+
+
+--- On Wed, 8/20/08, Marcel Holtmann <marcel@holtmann.org> wrote:
+
+> From: Marcel Holtmann <marcel@holtmann.org>
+> Subject: Re: [Bluez-users] should I use hciattach for my USB dongle?
+> To: henryzhang62@yahoo.com, "BlueZ users" <bluez-users@lists.sourceforge.net>
+> Date: Wednesday, August 20, 2008, 5:18 AM
+> Hi,
+> 
+> > I have a USB dongle connected to my desktop.
+> "hciconfig hci0 up" returns "can't open
+> HCI socket.:Address family not supported by protocol". 
+> > 
+> > For serial port, run "hciattach /dev/ttyS1 bcsp
+> 115200". But my dongle is self initialized with its own
+> eeprom with USB port. 
+> > 
+> > What should I do to setup my dongle and make it work
+> with my cell phone?
+> 
+> either the hci_usb or btusb driver will be used. Make sure
+> that all
+> modules are loaded.
+> 
+> Regards
+> 
+> Marcel
+
+
+      
