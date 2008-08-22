@@ -1,11 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-From: Jui-Hao Chiang <windtracekimo@gmail.com>
-Date: Fri, 22 Aug 2008 14:03:09 +0000 (UTC)
-Message-ID: <loom.20080822T132657-838@post.gmane.org>
-References: <loom.20080822T022926-635@post.gmane.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <20080822073628.GA5989@piper.oerlikon.madduck.net>
+References: <20080822073628.GA5989@piper.oerlikon.madduck.net>
+Date: Fri, 22 Aug 2008 10:33:35 +0200
+Message-Id: <1219394015.7591.441.camel@violet.holtmann.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Problem automatic flush timeout
+Subject: Re: [Bluez-devel] SCO flowcontrol patch v4.4 on 2.6.25/6
+	causes	hardlocks when	connecting to BT device
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,29 +21,33 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
-What I found in net/bluetooth/hci_core.c and net/bluetooth/hci_event.c are
-(1) the "Flush Occured Event" (ocf 0x11) is not handled in hci_event
-(2) while the user socket keeps pushing the data via 
-l2cap_sock_sendmsg->l2cap_do_send->hci_send_acl
-->hci_sched_tx->hci_tx_task->hci_sched_acl
+Hi Martin,
 
-Eventually it stops in hci_sched_acl when checking hdev->acl_cnt.
-I consider that hdev->acl_cnt means: "the number of ACL packet we can push to
-hci_usb".
+> > I have just compiled a Debian 2.6.24 with the v4.4 patch: it applied
+> > and compiled cleanly.
+> > 
+> > And it works most of the time with my BT500v headset (sco)! Thank
+> > you for that.
+> 
+> So I used to have a working Bluetooth setup with 2.6.24, and it also
+> still works. However, the kernel developers have moved on, and even
+> though the sco-flowcontrol v4.4 patch applies to 2.6.25/6 as well
+> [0], the resulting 2.6.25 and 2.6.26 kernels both freeze hard when
+> I try to connect to the headset.
+> 
+> 0. http://bugs.debian.org/493098
+> 
+> Does anyone have an idea what could be going on? How can I help
+> debug this? Is there a newer patch floating around somewhere?
 
-Thus, I think the possible way to handle this event is to
-(1) add in "include/net/bluetooth/hci.h"
-#define HCI_EV_FLUSH_OCCURED 0x11
-(2) catch the event in hci_event_packet, and do the following (same as
-hci_num_comp_pkts_evt)
-if ((++ hdev->acl_cnt) > hdev->acl_pkts) hdev->acl_cnt = hdev->acl_pkts;
-(3) decrement the conn->sent by
-atomic_sub(count, &conn->sent);
+what about not using that patch at all? I am using the new audio
+interface without that patch. And you wanna use the btusb driver and
+since 2.6.27-rc4 that one actually has SCO support.
 
-Please correct me if I am wrong.
+Regards
 
-Jui-Hao
+Marcel
+
 
 
 -------------------------------------------------------------------------
