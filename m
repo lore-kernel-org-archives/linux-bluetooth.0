@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-users@lists.sourceforge.net
-From: Uwe Klatt <uweklatt@aol.com>
-Date: Thu, 21 Aug 2008 20:37:33 +0000 (UTC)
-Message-ID: <loom.20080821T203555-798@post.gmane.org>
-References: <8CAD11C78BACC63-1150-2AED@FWM-D27.sysops.aol.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <29864107.209971219300902616.JavaMail.coremail@bj163app120.163.com>
+References: <29864107.209971219300902616.JavaMail.coremail@bj163app120.163.com>
+Date: Fri, 22 Aug 2008 10:34:35 +0200
+Message-Id: <1219394075.7591.442.camel@violet.holtmann.net>
 Mime-Version: 1.0
-Subject: [Bluez-users] =?utf-8?q?Solved=3A_passkey-agent_doesnt_work=2C=09?=
-	=?utf-8?q?without_pin_everything_is_working?=
+Subject: Re: [Bluez-users] where to download bluez patch for kernel-2.6.10
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,12 +20,15 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Update!
+Hi Tony,
 
-With newer bluez-util (3.36) everthing works!
+>  where to download bluez patch for kernel-2.6.10?
 
-Thanks for reading
-Uwe
+what about using a more recent kernel like 2.6.26 instead.
+
+Regards
+
+Marcel
 
 
 
