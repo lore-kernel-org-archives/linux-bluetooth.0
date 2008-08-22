@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-To: bluez-devel@lists.sourceforge.net
-From: Jui-Hao Chiang <windtracekimo@gmail.com>
-Date: Sat, 23 Aug 2008 19:33:31 +0000 (UTC)
-Message-ID: <loom.20080823T192730-77@post.gmane.org>
-References: <loom.20080822T022926-635@post.gmane.org>
-Mime-Version: 1.0
-Subject: [Bluez-devel] [Patch] Flush Occurred Event
+Message-ID: <a8a143bd0808221123n58701677k2c7cae39809d857@mail.gmail.com>
+Date: Fri, 22 Aug 2008 20:23:52 +0200
+From: "Johannes Niederloehner" <johannes.niederloehner@gmail.com>
+To: "bluez devel" <bluez-devel@lists.sourceforge.net>
+MIME-Version: 1.0
+Subject: [Bluez-devel] bug/problem in 3.36 utils with non GLib (missing
+	adapter info when registering a passkey-agent)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,83 +15,159 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1466147568=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
->
-The following is a patch against 2.6.22 kernel to catch HCI "Flush Occurred"
-event. (meaningful for ACL; useless for SCO)
+--===============1466147568==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_33825_24811982.1219429432398"
 
-One more thing to NOTICE is that the handle in the event packet from my adapter
-seems to be "Big Endian", so that I use ntohs to convert it.
-Normally it should be __le16_to_cpu(ev->handle)
+------=_Part_33825_24811982.1219429432398
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-diff -r linux-source-2.6.22/include/net/bluetooth/hci_core.h
-patch-2.6.22/include/net/bluetooth/hci_core.h
-27a28
-> 
-diff -r linux-source-2.6.22/include/net/bluetooth/hci.h
-patch-2.6.22/include/net/bluetooth/hci.h
-587a588,595
-> /* Flush Occurred Event JuiHao --*/
-> #define HCI_EV_FLUSH_OCCURRED	0x11
-> #define NUM_OF_FLUSH_PKT	0x1
-> struct hci_ev_flush_occurred {
-> 	__le16   handle;
-> } __attribute__ ((packed));
-> /* --Flush Occurred Event JuiHao */
-> 
-diff -r linux-source-2.6.22/net/bluetooth/hci_event.c
-patch-2.6.22/net/bluetooth/hci_event.c
-854a855,882
-> /* Flush Occurred packet JuiHao*/
-> static inline void hci_flush_occurred_evt(struct hci_dev *hdev, struct sk_buff
-*skb)
-> {
-> 	struct hci_ev_flush_occurred *ev = (struct hci_ev_flush_occurred *) skb->data;
-> 	struct hci_conn *conn;
-> 	
-> 	tasklet_disable(&hdev->tx_task);
-> 
-> 	BT_DBG("handle is %x, skb->len %d\n", ev->handle, skb->len);	
-> 
-> 	/* The handle returned is probably Big Endian such that  __le16_to_cpu is
-useless*/
-> 	conn = hci_conn_hash_lookup_handle(hdev, ntohs(ev->handle));
-> 
-> 	if (conn) {
-> 		atomic_sub(NUM_OF_FLUSH_PKT, &conn->sent);
-> 
-> 		if (conn->type == ACL_LINK) {
-> 			if ((hdev->acl_cnt += NUM_OF_FLUSH_PKT) > hdev->acl_pkts)
-> 				hdev->acl_cnt = hdev->acl_pkts;
-> 		}
-> 		BT_DBG("conn %p type %d hdev->acl_cnt %d conn->sent %d",
-> 			conn, conn->type, hdev->acl_cnt, atomic_read(&conn->sent));
-> 	}
-> 	hci_sched_tx(hdev);
-> 
-> 	tasklet_enable(&hdev->tx_task);
-> }
-> 
-1289a1318,1322
-> 	/* handle Flush Occurred Event JuiHao --*/
-> 	case HCI_EV_FLUSH_OCCURRED:
-> 		hci_flush_occurred_evt(hdev, skb);
-> 		break;	
-> 	/* -- handle Flush Occurred Event JuiHao */
+Posted this on bluez-users' list, sorry it better should be posted here:
+I think t
 
-Bests,
-Jui-Hao
+---------- Forwarded message ----------
+From: Johannes Niederloehner <johannes.niederloehner@gmail.com>
+Date: Thu, Aug 21, 2008 at 1:24 AM
+Subject: in 3.36 registering security interface without adapter?
+To: bluez-users@lists.sourceforge.net
 
+
+
+Having some trouble after updating vom 3.31 to 3.36 with registering a
+passkeyagent.
+Taking a look at the sources I'm wondering couple of things.
+
+in 3.31:
+
+after adding a new adapter...hcid_dbus_register_device calls
+dbus_connection_create_object_path and this function of dbus-hci.c adds in
+data->user_data the adapter name/path (e.g /org/bluez/hci0)
+
+When a new passkeyagent registers calling the method register_passkey_agent
+from the method table security_methods (via the generic_table from
+dbus-helper.c)
+ the following doesn't fail, since data isnt null:
+
+if (!data) {
+        error("register_passkey_agent called without any adapter info!");
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
+
+
+In contrary in 3.36 dbus-helper.c is removed and you are more using GLib
+stuff.
+
+the mentioned function hcid_dbus_register_device of dbus-hci.c calls
+security_init without passing the adapter name. security_init finally calls
+g_dbus_register_interface without providing adapter name.
+
+finally if register_passkey_agent gets called,   the following,  _does
+fails_ :
+
+if (!data) {
+        error("register_passkey_agent called without any adapter info!");
+        return NULL;
+    }
+
+since the user_data was never filled.
+
+Everything seems also to be related with the usage of GLib or I mean because
+I disabled the usage of that Lib and your own implementation is used instead
+
+Is this a problem, isn't it?
+Sorry if I have demonstrated the problem not clearly. In that case just drop
+me a line I'll try again tomorrow after having some more sleep.
+
+
+Thanks,
+Johannes N.
+
+------=_Part_33825_24811982.1219429432398
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<div dir="ltr">Posted this on bluez-users&#39; list, sorry it better should be posted here:<br>I think t<br><br><div class="gmail_quote">---------- Forwarded message ----------<br>From: <b class="gmail_sendername">Johannes Niederloehner</b> <span dir="ltr">&lt;<a href="mailto:johannes.niederloehner@gmail.com">johannes.niederloehner@gmail.com</a>&gt;</span><br>
+Date: Thu, Aug 21, 2008 at 1:24 AM<br>Subject: in 3.36 registering security interface without adapter?<br>To: <a href="mailto:bluez-users@lists.sourceforge.net">bluez-users@lists.sourceforge.net</a><br><br><br><div dir="ltr">
+<table><tbody><tr><td><br></td></tr></tbody></table>Having some trouble after updating vom 3.31 to 3.36 with registering a passkeyagent.<br>
+Taking a look at the sources I&#39;m wondering couple of things.<br>
+<br>
+in 3.31:<br>
+<br>
+after adding a new adapter...hcid_dbus_register_device calls
+dbus_connection_create_object_path and this function of dbus-hci.c adds
+in data-&gt;user_data the adapter name/path (e.g /org/bluez/hci0)<br>
+<br>
+When a new passkeyagent registers calling the method
+register_passkey_agent from the method table security_methods (via the
+generic_table from dbus-helper.c) <br>
+&nbsp;the following doesn&#39;t fail, since data isnt null:<br>
+<br>
+if (!data) {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; error(&quot;register_passkey_agent called without any adapter info!&quot;);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;<br>
+&nbsp;&nbsp;&nbsp; }<br>
+<br>
+<br>
+<br>
+In contrary in 3.36 dbus-helper.c is removed and you are more using GLib stuff.<br>
+<br>
+the mentioned function hcid_dbus_register_device of dbus-hci.c calls
+security_init without passing the adapter name. security_init finally
+calls g_dbus_register_interface without providing adapter name.<br>
+<br>
+finally if register_passkey_agent gets called, &nbsp; the following,&nbsp; _does fails_ :<br>
+<br>
+if (!data) {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; error(&quot;register_passkey_agent called without any adapter info!&quot;);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return NULL;<br>
+&nbsp;&nbsp;&nbsp; }<br>
+<br>
+since the user_data was never filled.<br>
+<br>
+Everything seems also to be related with the usage of GLib or I mean
+because I disabled the usage of that Lib and your own implementation is
+used instead<br>
+<br>
+Is this a problem, isn&#39;t it?<br>
+Sorry if I have demonstrated the problem not clearly. In that case just
+drop me a line I&#39;ll try again tomorrow after having some more sleep.<br>
+<br>
+<br>
+Thanks,<br>
+Johannes N.</div>
+</div><br></div>
+
+------=_Part_33825_24811982.1219429432398--
+
+
+--===============1466147568==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
 Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
+--===============1466147568==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============1466147568==--
