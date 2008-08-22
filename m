@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e96e9eeb0808250349s6491c78bub21ee742c2e1a795@mail.gmail.com>
-Date: Mon, 25 Aug 2008 13:49:04 +0300
-From: "Voni Hakau" <hakauvoni@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Date: Fri, 22 Aug 2008 07:15:51 -0400
+From: jayjwa <jayjwa@atr2.ath.cx>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <a8a143bd0808201624u5b5b5fc0p2f35cccfbfd8e63@mail.gmail.com>
+Message-ID: <alpine.LNX.1.10.0808220708370.4439@nge2.ngu.pk>
+References: <a8a143bd0808201624u5b5b5fc0p2f35cccfbfd8e63@mail.gmail.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] easiest way to get OBEX support (client/server) ?
+Subject: Re: [Bluez-users] in 3.36 registering security interface without
+ adapter?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,19 +21,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi all,
 
-What is the easiest way (/package?) to get OBEX support on top of Bluez ?
+On Thu, 21 Aug 2008, Johannes Niederloehner wrote:
 
-I saw that there are two obex servers in bluez.org - obexd-0.3 and
-obex-data-server-0.3.2.
+-> Having some trouble after updating vom 3.31 to 3.36 with registering a
+-> passkeyagent.
 
-What's the difference between those two ? which one should I pick ?
+-> Everything seems also to be related with the usage of GLib or I mean because
+-> I disabled the usage of that Lib and your own implementation is used instead
 
-And - where can I find OBEX client ?
+It might well be glib related as you say, because I have used passkey-agent 
+with no trouble on 3.36, my current version.
 
-Thank you all for the help
-Voni
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
