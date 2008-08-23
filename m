@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48B12B25.2080700@sssup.it>
-Date: Sun, 24 Aug 2008 11:34:29 +0200
-From: Ludovico Cavedon <cavedon@sssup.it>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <488CDD7C.40708@sssup.it>
-	<19396E3B-AC04-4896-9435-F4BB61DA1075@gmail.com>
-In-Reply-To: <19396E3B-AC04-4896-9435-F4BB61DA1075@gmail.com>
-Subject: Re: [Bluez-devel] Why always disconnect the headset?
+To: bluez-devel@lists.sourceforge.net
+From: Jui-Hao Chiang <windtracekimo@gmail.com>
+Date: Sat, 23 Aug 2008 21:13:13 +0000 (UTC)
+Message-ID: <loom.20080823T211230-83@post.gmane.org>
+References: <loom.20080822T022926-635@post.gmane.org>
+	<loom.20080823T192730-77@post.gmane.org>
+	<1219522965.7591.482.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [Patch] Flush Occurred Event
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,36 +21,82 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Johan,
+Hi, Marcel, please see if it is ok
+Marcel Holtmann <marcel <at> holtmann.org> writes:
 
-Johan Hedberg wrote:
-> On Jul 27, 2008, at 23:41, Ludovico Cavedon wrote:
->> I noticed that every time an application closes a SCO audio device, my
->> headset gets disconnected (HEADSET_STATE_DISCONNECTED). This means  
->> that
->> when the application reopens the device, it requires some seconds to  
->> get
->> the audio working.
->>
->> So, why is the headset disconnected and not just left in the state
->> HEADSET_STATE_CONNECTED? (i.e. the same stat that the headset enters
->> when I turn it on and pairs with my pc).
 > 
-> You didn't mention which version of BlueZ you use, but in recent  
-> versions the logic is such that only implicitly created connections  
-> are automatically disconnected (after a 3 second timeout) but  
-> explicitly created connections stay up until you manually disconnect  
-> them. An implicitly created connection would be one caused by an ALSA  
-> application when it opens the audio device. Connections that fall into  
-> the explicitly created category are those that happen when you turn  
-> the headset on and it connects to the PC or when you call the  
-> Headset.Connect() D-Bus method and the PC connects to the headset.
+> against 2.6.27-rc4 please and in unified diff format. I am not even
+> going to bother reading context diffs.
+> 
+> Regards
+> 
+> Marcel
 
-Sorry I forgot: I am using 3.26 provided with Ubuntu hardy.
-Good news, I'll update my bluez version!
+diff -ru orig/include/net/bluetooth/hci.h new/include/net/bluetooth/hci.h
+--- orig/include/net/bluetooth/hci.h	2008-08-23 11:42:08.000000000 -0400
++++ new/include/net/bluetooth/hci.h	2008-08-23 11:44:22.000000000 -0400
+@@ -682,6 +682,12 @@
+ 	__le16   opcode;
+ } __attribute__ ((packed));
+ 
++#define HCI_EV_FLUSH_OCCURRED   0x11
++#define NUM_OF_FLUSH_PKT        0x1
++struct hci_ev_flush_occurred {
++        __le16   handle;
++} __attribute__ ((packed));
++
+ #define HCI_EV_ROLE_CHANGE		0x12
+ struct hci_ev_role_change {
+ 	__u8     status;
+diff -ru orig/net/bluetooth/hci_event.c new/net/bluetooth/hci_event.c
+--- orig/net/bluetooth/hci_event.c	2008-08-23 11:42:12.000000000 -0400
++++ new/net/bluetooth/hci_event.c	2008-08-23 11:50:36.000000000 -0400
+@@ -1398,6 +1398,32 @@
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static inline void hci_flush_occurred_evt(struct hci_dev *hdev, struct sk_buff
+*skb)
++{
++	struct hci_ev_flush_occurred *ev = (struct hci_ev_flush_occurred *) skb->data;
++	struct hci_conn *conn;
++	
++	tasklet_disable(&hdev->tx_task);
++
++	BT_DBG("handle is %x, skb->len %d\n", ev->handle, skb->len);	
++
++	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
++
++	if (conn) {
++		atomic_sub(NUM_OF_FLUSH_PKT, &conn->sent);
++
++		if (conn->type == ACL_LINK) {
++			if ((hdev->acl_cnt += NUM_OF_FLUSH_PKT) > hdev->acl_pkts)
++				hdev->acl_cnt = hdev->acl_pkts;
++		}
++		BT_DBG("conn %p type %d hdev->acl_cnt %d conn->sent %d",
++			conn, conn->type, hdev->acl_cnt, atomic_read(&conn->sent));
++	}
++	hci_sched_tx(hdev);
++
++	tasklet_enable(&hdev->tx_task);
++}
++
+ static inline void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_num_comp_pkts *ev = (void *) skb->data;
+@@ -1894,6 +1920,10 @@
+ 		hci_remote_host_features_evt(hdev, skb);
+ 		break;
+ 
++	case HCI_EV_FLUSH_OCCURRED:
++		hci_flush_occurred_evt(hdev, skb);
++		break;	
++
+ 	default:
+ 		BT_DBG("%s event 0x%x", hdev->name, event);
+ 		break;
 
-Thank you for your answer,
-Ludovico
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
