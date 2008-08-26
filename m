@@ -1,49 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Rafael J. Wysocki" <rjw@sisk.pl>
+Date: Tue, 26 Aug 2008 12:05:19 +0200
+From: Pavel Machek <pavel@suse.cz>
 To: Oliver Neukum <oliver@neukum.org>
-Subject: Re: btusb hibernation/suspend breakage in current -git
-Date: Tue, 26 Aug 2008 12:10:08 +0200
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- linux-pm@lists.linux-foundation.org,
- linux-bluetooth@vger.kernel.org,
- Pavel Machek <pavel@suse.cz>,
- linux-usb@vger.kernel.org,
- Stefan Seyfried <seife@suse.de>
-References: <200808221520.19791.oliver@neukum.org> <200808261136.05666.rjw@sisk.pl> <200808261143.20459.oliver@neukum.org>
-In-Reply-To: <200808261143.20459.oliver@neukum.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Stefan Seyfried <seife@suse.de>,
+	linux-bluetooth@vger.kernel.org,
+	linux-pm@lists.linux-foundation.org, linux-usb@vger.kernel.org
+Subject: Re: [rft]autosuspend for btusb
+Message-ID: <20080826100519.GA1599@elf.ucw.cz>
+References: <200808221520.19791.oliver@neukum.org> <200808221551.57225.oliver@neukum.org> <1219415470.7591.472.camel@violet.holtmann.net> <200808251243.47569.oliver@neukum.org> <20080826095647.GA30913@elf.ucw.cz>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200808261210.09665.rjw@sisk.pl>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20080826095647.GA30913@elf.ucw.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday, 26 of August 2008, Oliver Neukum wrote:
-> Am Dienstag 26 August 2008 11:36:04 schrieb Rafael J. Wysocki:
-> > [Sorry for the delayed reply.]
-> >=20
-> > On Monday, 25 of August 2008, Oliver Neukum wrote:
-> > > Am Montag 25 August 2008 13:54:31 schrieb Marcel Holtmann:
-> > > > Oliver, can you come up with a small test patch, that just kills al=
-l =A0
-> > > > URB when suspend and submits the interrupt ones at resume. Such a =
-=A0
-> > > > patch might have to be merged for 2.6.27 if it fixes this problem.
-> > >=20
-> > > Rafael,
-> > >=20
-> > > this patch implemts suspend/resume for btusb and fixes a disconnect
-> > > problem. Does it help you?
-> >=20
-> > Yes, the patch appears to help.
-> >=20
-> > I haven't had a single crash since I applied it.  I'm going to test it =
-a bit
-> > more today, though.
->=20
-> Good. Can you test what happens if you unplug the device while suspended
-> and hibernated?
+On Tue 2008-08-26 11:56:47, Pavel Machek wrote:
+> On Mon 2008-08-25 12:43:46, Oliver Neukum wrote:
+> > Am Freitag 22 August 2008 16:31:10 schrieb Marcel Holtmann:
+> > > > > Please explain the tx_in_flight stuff to me. It looks unneeded since we
+> > > > > anchor all TX URBs anyway.
+> > > > 
+> > > > The completion of an URB may happen after the autosuspend timeout passed.
+> > > > But we cannot use the pm counters as they are not accessible in interrupt.
+> > > > Hence we must maintain a counter ourselves.
+> > > 
+> > > Can we not just check the number of URBs in the anchor? I am against
+> > > just duplicating a counter, but then lets call it it what it is to make
+> > > it gets not misused. It is a purely a PM counter.
+> > > 
+> > 
+> > An excellent suggestion allowing major simplifications. This version works
+> > for me. It required an extension of the anchor API, so it obsoletes
+> > the split-up you've done. Therefore the whole thing comes as a big patch
+> > against rc4, easy to test.
+> 
+> I could not get it to apply over -rc4-git, usb seems to be changing
+> under us :-(. After manual fixup (conflict was in comment), I still
+> get
+> 
+>   LD      .tmp_vmlinux1
+> drivers/built-in.o: In function `btusb_suspend':
+> btusb.c:(.text+0x20a578): undefined reference to `usb_anchor_empty'
+> drivers/built-in.o: In function `btusb_resume':
+> btusb.c:(.text+0x20ade6): undefined reference to `usb_get_from_anchor'
+> btusb.c:(.text+0x20ae01): undefined reference to
+> `usb_scuttle_anchored_urbs'
+> make: *** [.tmp_vmlinux1] Error 1
+> 40.09user 7.55system 47.97 (0m47.971s) elapsed 99.34%CPU
+> pavel@amd:/data/l/linux-good$
+> 
+> ...probably the "already applied" patch it complained about was not so
+> applied after all.
+> 
+> ...ok, I got it to apply, compile, resulting patch is attached.
 
-It's built-in, I can't unplug it. :-)
 
-Thanks,
-Rafael
+And it worked for me, but suspend died. I'll verify if that's a
+problem in vanilla -rc4-git, too.
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
