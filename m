@@ -1,50 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Rafael J. Wysocki" <rjw@sisk.pl>
-To: Oliver Neukum <oliver@neukum.org>
+Date: Wed, 27 Aug 2008 11:10:32 +0200
+From: Pavel Machek <pavel@suse.cz>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Rafael J.Wysocki" <rjw@sisk.pl>, Oliver Neukum <oliver@neukum.org>,
+	Stefan Seyfried <seife@suse.de>,
+	linux-pm@lists.linux-foundation.org,
+	linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org
 Subject: Re: btusb hibernation/suspend breakage in current -git
-Date: Wed, 27 Aug 2008 15:04:55 +0200
-Cc: Stefan Seyfried <seife@suse.de>,
- Marcel Holtmann <marcel@holtmann.org>,
- linux-pm@lists.linux-foundation.org,
- linux-bluetooth@vger.kernel.org,
- Pavel Machek <pavel@suse.cz>,
- linux-usb@vger.kernel.org
-References: <200808221520.19791.oliver@neukum.org> <200808270128.16052.rjw@sisk.pl> <200808270955.12511.oliver@neukum.org>
-In-Reply-To: <200808270955.12511.oliver@neukum.org>
+Message-ID: <20080827091031.GA1688@elf.ucw.cz>
+References: <200808221520.19791.oliver@neukum.org> <200808262044.54445.rjw@sisk.pl> <200808262153.18240.oliver@neukum.org> <200808270128.16052.rjw@sisk.pl> <5E249C07-0710-49B2-B352-87DDA85E891D@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Message-Id: <200808271504.56824.rjw@sisk.pl>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <5E249C07-0710-49B2-B352-87DDA85E891D@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday, 27 of August 2008, Oliver Neukum wrote:
-> Am Mittwoch 27 August 2008 01:28:15 schrieb Rafael J. Wysocki:
-> > > This doesn't explain the original failure. Can you comment out the su=
-pport
-> > > for suspend/resume in the driver and try again?
-> >=20
-> > With that commented out, I'm able to reproduce the failure. =A0With the=
- original
-> > patch, I'm not.
->=20
-> Now we know a driver without support for suspend/resume breaks suspend and
-> hibernate. We need to find out whether this is limited to btusb or everyt=
-hing.
+On Wed 2008-08-27 07:22:58, Marcel Holtmann wrote:
+> Hi Rafael,
+>
+>>>>>>> Good. Can you test what happens if you unplug the device while 
+>>>>>>> suspended
+>>>>>>> and hibernated?
+>>>>>>
+>>>>>> It's built-in, I can't unplug it. :-)
+>>>>>
+>>>>> Maybe you can disable it in the BIOS, but this might change the DSDT / 
+>>>>> other
+>>>>> system configuration, so it might break resume in other ways :-(
+>>>>
+>>>> There is a switch that's supposed to disable the radio (rfkill or 
+>>>> something).
+>>>> I used it to switch the radio off while the box was waking up from 
+>>>> hibernation
+>>>> and kbluetooth didn't find the adapter after the resume.  After I've 
+>>>> pressed
+>>>> the "radio off" button again, the bluetooth appears to be functional 
+>>>> again.
+>>>>
+>>>> However, this "radio off" button is shared between bluetooth and 
+>>>> wireless
+>>>> (b43) and there are some surprising interactions.  Nothing seems to be 
+>>>> broken,
+>>>> though.
+>>>
+>>> This doesn't explain the original failure. Can you comment out the 
+>>> support
+>>> for suspend/resume in the driver and try again?
+>>
+>> With that commented out, I'm able to reproduce the failure.  With the 
+>> original
+>> patch, I'm not.
+>
+> I've never seen any issues with the suspend/resume and btusb, but I must 
+> admit that I am using an X61 and in that case pm-utils has a magic hack to 
+> disable Bluetooth before suspend and this means a clean disconnect from the 
+> USB bus.
 
-I'm quite confident it's specific to bluetooth, because I only need to turn
-the bluetooth user space off, most importantly hcid, to make the problem go
-away even without the patch (that is, without the patch I don't even have to
-uload btusb before suspend if the bluetoot user land is not running).
+I was using x60 _without_ that script, and it was okay for long long
+time, but it has problems now. Something regressed somewhere.
 
-> Can you test with anotherrrrr driver, like a mouse and remove suspend/res=
-ume
-> from usbhid? If this is specific to btusb we have a fix, if not, I am afr=
-aid
-> this has to be bisected.
+Rafael, could you try if 2.6.26 suspends ok if you don't unload
+anything?
 
-Is that really necessary?
-
-I can do that, but first I'll check if 2.6.26 is fine.
-
-Thanks,
-Rafael
+								Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
