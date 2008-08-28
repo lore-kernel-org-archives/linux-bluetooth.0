@@ -1,13 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 29 Aug 2008 08:13:03 -0400
-From: jayjwa <jayjwa@atr2.ath.cx>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <e96e9eeb0808250356u595a3005t6a0046ee5fc67622@mail.gmail.com>
-Message-ID: <alpine.LNX.1.10.0808290445110.26779@nge2.ngu.pk>
-References: <e96e9eeb0808250349s6491c78bub21ee742c2e1a795@mail.gmail.com>
-	<e96e9eeb0808250356u595a3005t6a0046ee5fc67622@mail.gmail.com>
+Message-ID: <a1c657a80808280257h681e02bdl6de2e132d9bafc5@mail.gmail.com>
+Date: Thu, 28 Aug 2008 17:57:30 +0800
+From: salyer <salyer.hy@gmail.com>
+To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] easiest way to get OBEX support (client/server) ?
+Subject: [Bluez-users] # hcid[246]: Disconnection failed: 0x0c
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,51 +14,71 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============1947399001=="
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+--===============1947399001==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_1737_25600274.1219917450215"
+
+------=_Part_1737_25600274.1219917450215
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+Dear sir ,
+    when i killed the hstest process , i get the "# hcid[246]: Disconnection
+failed: 0x0c" error,
+My platform :
+OMAP5912OSK
+BT module :
+ST  bt module
+Linux kernel:
+2.6.18
+
+I might conclude that the error is from the Bluetooth HCI driver in the
+kernel. The 0x0C indicates that the ST module is in a state that can not
+close the connection, would you give me some comments ? Thank you very much
+!!!
+
+-- 
+Best Regards!
+
+------=_Part_1737_25600274.1219917450215
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+<div dir="ltr">Dear sir ,<br>&nbsp;&nbsp;&nbsp; when i killed the hstest process , i get the &quot;# hcid[246]: Disconnection failed: 0x0c&quot; error,<br>My platform :<br>OMAP5912OSK <br>BT module :<br>ST&nbsp; bt module<br>Linux kernel:<br>
+2.6.18<br><br>I might conclude that the error is from the Bluetooth HCI driver in the kernel. 
+The 0x0C indicates that the ST 
+module is in a state that can not close the connection, would you give me some comments ? Thank you very much !!!<br clear="all"><br>-- <br>Best Regards!<br>
+</div>
+
+------=_Part_1737_25600274.1219917450215--
 
 
-On Mon, 25 Aug 2008, Voni Hakau wrote:
-
--> 
--> Another question related - what about OpenOBEX ? is it recommended ?
--> how does it differ from the obex servers hosted on bluez website ?
--> 
--> Thanks!
--> 
--> On Mon, Aug 25, 2008 at 1:49 PM, Voni Hakau <hakauvoni@gmail.com> wrote:
--> > Hi all,
--> >
--> > What is the easiest way (/package?) to get OBEX support on top of Bluez ?
--> >
--> > I saw that there are two obex servers in bluez.org - obexd-0.3 and
--> > obex-data-server-0.3.2.
--> >
--> > What's the difference between those two ? which one should I pick ?
--> >
--> > And - where can I find OBEX client ?
-
-
-I've tried obex-data-server and obexd, but I couldn't get either one working. 
-I asked on the list but there wasn't a reply. The one I use currently is one I 
-found, made by someone, and patched a bit to compile here by myself. Credits 
-are in the files, but I can't remember the author right now. It has both 
-server and client. It is as it is, I can't say how functional or secure it is, 
-but it meets my needs. You'll need openobex, glib, bluez, zlib, pcre and 
-be able to compile stuff with it. I also use obexftp and obexfs.
-
-
-ftp://atr2.ath.cx/pub/linux/source/src-3/obexpush-p1.tar.bz2
-
+--===============1947399001==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
 Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
+--===============1947399001==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
+
+--===============1947399001==--
