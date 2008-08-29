@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Fri, 29 Aug 2008 08:22:59 -0400
+From: jayjwa <jayjwa@atr2.ath.cx>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <a1c657a80808280257h681e02bdl6de2e132d9bafc5@mail.gmail.com>
-References: <a1c657a80808280257h681e02bdl6de2e132d9bafc5@mail.gmail.com>
-Date: Sat, 30 Aug 2008 11:08:46 +0200
-Message-Id: <1220087326.7145.38.camel@californication>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] # hcid[246]: Disconnection failed: 0x0c
+In-Reply-To: <42300.41687.qm@web8406.mail.in.yahoo.com>
+Message-ID: <alpine.LNX.1.10.0808290815350.26779@nge2.ngu.pk>
+References: <42300.41687.qm@web8406.mail.in.yahoo.com>
+MIME-Version: 1.0
+Subject: Re: [Bluez-users] Does not work BT headset
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,29 +20,49 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
 
-> 
->     when i killed the hstest process , i get the "# hcid[246]:
-> Disconnection failed: 0x0c" error,
-> My platform :
-> OMAP5912OSK 
-> BT module :
-> ST  bt module
-> Linux kernel:
-> 2.6.18
-> 
-> I might conclude that the error is from the Bluetooth HCI driver in
-> the kernel. The 0x0C indicates that the ST module is in a state that
-> can not close the connection, would you give me some comments ? Thank
-> you very much !!!
 
-hstest is so old and possibly broken. Actually even your kernel in
-question is oo old. Don't use any of these anymore.
+On Thu, 28 Aug 2008, pramod gurav wrote:
 
-Regards
+-> Send the output  of
+-> $ hcitool conn
+-> It should show both SCO and ACL connections.
+-> 
+-> and have you run 
+-> $ passkey-agent --default 0000 &
+-> try running this. This is way to set the PIN for authentication.
+->  And how do you connect before running mplayer?
+-> When you run mplayer it will automatically establish connection. So no need to do it manually if you are doing so.
 
-Marcel
+The audio player should make the connection itself, I think. Also, he seems to 
+have the passkey-agent:
+
+-> Aug 27 19:08:10 darkstar hcid[5728]: Default passkey agent (:1.43,
+-> /org/bluez/passkey_agent_5737) registered
+
+
+I've always used it like so:
+
+passkey-agent --default 0000 <bt address of remote device> &
+
+
+Does it work with no remote address specified (could be)?
+
+
+I think it's the auth-agent that is not running. It may be needed. I always 
+start this too.
+
+auth-agent &
+
+Here:
+
+-> Aug 27 19:12:13 darkstar audio[5741]: Access denied: Authorization agent
+-> does not exist
+
+
+Is the headset an older Bluetooth 1.* device, or the newer 2.*? If it's 1.*, 
+then it won't work without patching the kernel.
+
 
 
 
