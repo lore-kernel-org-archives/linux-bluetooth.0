@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 29 Aug 2008 08:22:59 -0400
+Date: Fri, 29 Aug 2008 08:13:03 -0400
 From: jayjwa <jayjwa@atr2.ath.cx>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <42300.41687.qm@web8406.mail.in.yahoo.com>
-Message-ID: <alpine.LNX.1.10.0808290815350.26779@nge2.ngu.pk>
-References: <42300.41687.qm@web8406.mail.in.yahoo.com>
+In-Reply-To: <e96e9eeb0808250356u595a3005t6a0046ee5fc67622@mail.gmail.com>
+Message-ID: <alpine.LNX.1.10.0808290445110.26779@nge2.ngu.pk>
+References: <e96e9eeb0808250349s6491c78bub21ee742c2e1a795@mail.gmail.com>
+	<e96e9eeb0808250356u595a3005t6a0046ee5fc67622@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Bluez-users] Does not work BT headset
+Subject: Re: [Bluez-users] easiest way to get OBEX support (client/server) ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,48 +23,37 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 
 
-On Thu, 28 Aug 2008, pramod gurav wrote:
+On Mon, 25 Aug 2008, Voni Hakau wrote:
 
--> Send the output  of
--> $ hcitool conn
--> It should show both SCO and ACL connections.
 -> 
--> and have you run 
--> $ passkey-agent --default 0000 &
--> try running this. This is way to set the PIN for authentication.
-->  And how do you connect before running mplayer?
--> When you run mplayer it will automatically establish connection. So no need to do it manually if you are doing so.
-
-The audio player should make the connection itself, I think. Also, he seems to 
-have the passkey-agent:
-
--> Aug 27 19:08:10 darkstar hcid[5728]: Default passkey agent (:1.43,
--> /org/bluez/passkey_agent_5737) registered
-
-
-I've always used it like so:
-
-passkey-agent --default 0000 <bt address of remote device> &
-
-
-Does it work with no remote address specified (could be)?
+-> Another question related - what about OpenOBEX ? is it recommended ?
+-> how does it differ from the obex servers hosted on bluez website ?
+-> 
+-> Thanks!
+-> 
+-> On Mon, Aug 25, 2008 at 1:49 PM, Voni Hakau <hakauvoni@gmail.com> wrote:
+-> > Hi all,
+-> >
+-> > What is the easiest way (/package?) to get OBEX support on top of Bluez ?
+-> >
+-> > I saw that there are two obex servers in bluez.org - obexd-0.3 and
+-> > obex-data-server-0.3.2.
+-> >
+-> > What's the difference between those two ? which one should I pick ?
+-> >
+-> > And - where can I find OBEX client ?
 
 
-I think it's the auth-agent that is not running. It may be needed. I always 
-start this too.
-
-auth-agent &
-
-Here:
-
--> Aug 27 19:12:13 darkstar audio[5741]: Access denied: Authorization agent
--> does not exist
+I've tried obex-data-server and obexd, but I couldn't get either one working. 
+I asked on the list but there wasn't a reply. The one I use currently is one I 
+found, made by someone, and patched a bit to compile here by myself. Credits 
+are in the files, but I can't remember the author right now. It has both 
+server and client. It is as it is, I can't say how functional or secure it is, 
+but it meets my needs. You'll need openobex, glib, bluez, zlib, pcre and 
+be able to compile stuff with it. I also use obexftp and obexfs.
 
 
-Is the headset an older Bluetooth 1.* device, or the newer 2.*? If it's 1.*, 
-then it won't work without patching the kernel.
-
-
+ftp://atr2.ath.cx/pub/linux/source/src-3/obexpush-p1.tar.bz2
 
 
 -------------------------------------------------------------------------
