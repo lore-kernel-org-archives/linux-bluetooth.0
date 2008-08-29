@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Nick Pelly <npelly@google.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Fri, 29 Aug 2008 16:00:03 -0700
-Message-Id: <1220050803-30362-1-git-send-email-npelly@google.com>
-Subject: [Bluez-devel] [PATCH] Advertise Telephony service class when device
-	offers headset AG or handsfree AG
+Message-ID: <25BA763748F34FF6A428E1AE776B1E32@freqonedev>
+From: "David Stockwell" <dstockwell@frequency-one.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+Date: Fri, 29 Aug 2008 06:06:55 -0500
+MIME-Version: 1.0
+Subject: [Bluez-devel] "Gather Write"/writev call and BlueZ driver...
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -14,30 +14,22 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
----
- src/sdpd-service.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+Not sure who to address this to (Marcel, maybe?), but does the Bluetooth 
+driver support the writev call?
 
-diff --git a/src/sdpd-service.c b/src/sdpd-service.c
-index cf120b8..df9017e 100644
---- a/src/sdpd-service.c
-+++ b/src/sdpd-service.c
-@@ -125,6 +125,8 @@ static void update_svclass_list(void)
- 		case INTERCOM_SVCLASS_ID:
- 		case FAX_SVCLASS_ID:
- 		case SAP_SVCLASS_ID:
-+		case HEADSET_AGW_SVCLASS_ID:
-+		case HANDSFREE_AGW_SVCLASS_ID:
- 			val |= 0x40;	/* Telephony */
- 			break;
- 		case AUDIO_SOURCE_SVCLASS_ID:
--- 
-1.5.5
+The reason for asking is that in AVRCP+Metadata I need to implement 
+fragmentation in AVCTP.  Of course, I can just sling chunks of the big 
+AVRCP packet into AVCTP buffers, pre-pending with the appropriate AVCTP 
+header, but was wondering if there might be a more elegant solution 
+(using writev to write the header, then the appropriate piece of the 
+AVRCP packet).
+
+David Stockwell
+Frequency One 
 
 
 -------------------------------------------------------------------------
