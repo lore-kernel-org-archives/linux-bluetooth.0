@@ -1,10 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <36fee7420808300506t430fa556u8ba8a9e866d44f5e@mail.gmail.com>
-Date: Sat, 30 Aug 2008 20:06:40 +0800
-From: "Wei Lei" <weilei84@gmail.com>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] Using bluez in virtual machine
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <e96e9eeb0808300144y19c285a0l7156e6fb9a415547@mail.gmail.com>
+References: <e96e9eeb0808250349s6491c78bub21ee742c2e1a795@mail.gmail.com>
+	<e96e9eeb0808250356u595a3005t6a0046ee5fc67622@mail.gmail.com>
+	<alpine.LNX.1.10.0808290445110.26779@nge2.ngu.pk>
+	<e96e9eeb0808300011k1d65b69fkb58f33c256aabf0f@mail.gmail.com>
+	<1220088875.7145.58.camel@californication>
+	<e96e9eeb0808300144y19c285a0l7156e6fb9a415547@mail.gmail.com>
+Date: Sat, 30 Aug 2008 12:50:26 +0200
+Message-Id: <1220093426.7145.86.camel@californication>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] easiest way to get OBEX support (client/server) ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,97 +21,59 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1465703260=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1465703260==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_34095_29832170.1220098000521"
+Hi Voni,
 
-------=_Part_34095_29832170.1220098000521
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> > The current assumption is it runs in the user session and hence
+> > requiring a D-Bus session bus. However the end goal is to give the
+> > choice to run it at system level if you don't have a fine grained
+> > security model anyway.
+> >
+> > For these case it really helps if you just state what you wanna do with
+> > it. Otherwise we will focus on our current plans and do everything else
+> > when we have time. Also patches are always welcome.
+> 
+> I need to be able to demonstrate OBEX profiles on a bluez-based
+> embedded system which is very early in its development. No GUI
+> whatsover. I only have the shell. I have DBUS obviously (although I
+> only run system session currently). It's really important because this
+> way managers here will be able to choose between bluez and other
+> stacks.
 
-Hi,
+just go into the code and replace SESSION with SYSTEM and create a D-Bus
+security policy file for org.openobex.
 
-It appears to me that using USB Bluetooth adapters with bluez facilities is
-possible in a virtual machine, when the USB port is delegated to the guest
-OS. However It did not work when I experiment, the host OS is Windows XP and
-guest OS is ubuntu-8.04. I am using VMWare workstation 5. Could someone tell
-where the problem is?
+> I guess that currently my only option is obexftp  ?  Unfortunately it
+> doesn't cross compile cleanly.. (I did manage to cross compile
+> openobex without a problem though).
+> 
+> IIRC the obex project in the bluez cvs worked pretty nice on a PC.
+> unfortunately we use expat and not libxml so I can't use it on my
+> embedded system..
 
-I have configured VMWare to use windows USB devices. When a bluetooth
-adapter is plugged in, tail -f /var/log/messages shows the usb device is
-connected.
+I am not touching that code anymore, but that could be easily fixed :)
 
-$ lsusb shows:
-Bus 001 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
-Dongle (HCI mode)
+You will have to do some development since you can't expect that you can
+just take open source stuff without any integration work. And that is
+exactly what you have to do, integrate it. If patches come up during
+this, then send them upstream and we likely include them and then next
+time (next product) the integration work goes down.
 
-But `hcitool dev` shows no device is connected. This is part of the strace
-log:
+Regards
 
-socket(PF_BLUETOOTH, SOCK_RAW, 1)       = 3
-brk(0)                                  = 0x8052000
-brk(0x8073000)                          = 0x8073000
-ioctl(3, 0x800448d2, 0x8052008)         = 0
-close(3)                                = 0
-exit_group(0)                           = ?
-Wei Lei
-
-------=_Part_34095_29832170.1220098000521
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div dir="ltr"><div>Hi,</div>
-<div>&nbsp;</div>
-<div>It appears to me that using USB Bluetooth adapters with bluez facilities is possible in a virtual machine, when the&nbsp;USB port is delegated to the guest OS. However It did not work when I experiment,&nbsp;the host OS is Windows XP and guest OS is ubuntu-8.04. I am using VMWare workstation 5. Could someone tell where the problem is?</div>
-
-<div>&nbsp;</div>
-<div>I have configured VMWare to use windows USB devices. When a bluetooth adapter is plugged in,&nbsp;tail -f /var/log/messages shows the usb device is connected.&nbsp;</div>
-<div>&nbsp;</div>
-<div>$&nbsp;lsusb shows:</div>
-<div>Bus 001 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)</div>
-<div>&nbsp;</div>
-<div>But&nbsp;`hcitool dev` shows no device is connected. This is part of the strace log:</div>
-<div>&nbsp;</div>
-<div>socket(PF_BLUETOOTH, SOCK_RAW, 1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 3</div>
-<div>brk(0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0x8052000</div>
-<div>brk(0x8073000)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0x8073000</div>
-<div>ioctl(3, 0x800448d2, 0x8052008)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0</div>
-<div>close(3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0</div>
-<div>exit_group(0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ?<br></div>
-<div>Wei Lei</div>
-<div>&nbsp;</div>
-<div>&nbsp;</div>
-<div>&nbsp;</div></div>
-
-------=_Part_34095_29832170.1220098000521--
+Marcel
 
 
---===============1465703260==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
 Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
---===============1465703260==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1465703260==--
