@@ -1,10 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e96e9eeb0808300018m19b922a4i4060960b0ab91fb3@mail.gmail.com>
-Date: Sat, 30 Aug 2008 10:18:37 +0300
+Message-ID: <e96e9eeb0808300016l7b0118cbj13c8e410cd8dcb95@mail.gmail.com>
+Date: Sat, 30 Aug 2008 10:16:09 +0300
 From: "Voni Hakau" <hakauvoni@gmail.com>
 To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+In-Reply-To: <alpine.LNX.1.10.0808290445110.26779@nge2.ngu.pk>
 MIME-Version: 1.0
-Subject: [Bluez-users] no one here uses OPP/FTP ?
+References: <e96e9eeb0808250349s6491c78bub21ee742c2e1a795@mail.gmail.com>
+	<e96e9eeb0808250356u595a3005t6a0046ee5fc67622@mail.gmail.com>
+	<alpine.LNX.1.10.0808290445110.26779@nge2.ngu.pk>
+Subject: Re: [Bluez-users] easiest way to get OBEX support (client/server) ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -18,17 +22,13 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hi people,
+On Fri, Aug 29, 2008 at 3:13 PM, jayjwa <jayjwa@atr2.ath.cx> wrote:
+> I've tried obex-data-server and obexd, but I couldn't get either one working.
+> I asked on the list but there wasn't a reply. The one I use currently is one I
 
-do you use OPP or FTP profiles using Bluez ?
-
-Can you please tell how ? which package do you use ?
-
-I'm looking for simple, command line, ftp/opp profiles, client and
-server, for embedded system...
-
-thank you
-voni
+Also there is an 'obex' project in the bluez cvs, i think it is obex
+client, but i can't use it because it requires libxml and we use
+libexpat in our embedded system (libxml is bloated!)
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
