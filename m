@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <35c90d960808300037h242dbf5fkd584bf552ed50190@mail.gmail.com>
+In-Reply-To: <35c90d960808300016t1ea8b8eq638a399e7d04b1e9@mail.gmail.com>
 References: <1220050803-30362-1-git-send-email-npelly@google.com>
 	<1220086722.7145.33.camel@californication>
 	<35c90d960808300016t1ea8b8eq638a399e7d04b1e9@mail.gmail.com>
-	<1220088521.7145.51.camel@californication>
-	<35c90d960808300037h242dbf5fkd584bf552ed50190@mail.gmail.com>
-Date: Sat, 30 Aug 2008 12:04:19 +0200
-Message-Id: <1220090659.7145.71.camel@californication>
+Date: Sat, 30 Aug 2008 11:28:41 +0200
+Message-Id: <1220088521.7145.51.camel@californication>
 Mime-Version: 1.0
 Subject: Re: [Bluez-devel] [PATCH] Advertise Telephony service class
 	when	device offers headset AG or handsfree AG
@@ -27,49 +25,39 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Nick,
 
-> So I looked at the headset and handsfree spec, they do not require
-> that AG's set the telephony bit. sigh.
+>         >  src/sdpd-service.c |    2 ++
+>         >  1 files changed, 2 insertions(+), 0 deletions(-)
+>         >
+>         > diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+>         > index cf120b8..df9017e 100644
+>         > --- a/src/sdpd-service.c
+>         > +++ b/src/sdpd-service.c
+>         > @@ -125,6 +125,8 @@ static void update_svclass_list(void)
+>         >               case INTERCOM_SVCLASS_ID:
+>         >               case FAX_SVCLASS_ID:
+>         >               case SAP_SVCLASS_ID:
+>         > +             case HEADSET_AGW_SVCLASS_ID:
+>         > +             case HANDSFREE_AGW_SVCLASS_ID:
+>         >                       val |= 0x40;    /* Telephony */
+>         >                       break;
+>         >               case AUDIO_SOURCE_SVCLASS_ID:
+>         
+>         
+>         do you have a reference to a spec. for this one. The automatic
+>         service
+>         class adjustment has been done according to the spec.
 > 
-> But I can tell you for a fact that the Nokia 616 carkit will not pair
-> unless you set the telephony bit. That is what triggered this patch.
+> I didn't even know there existed a spec for these service classes. I
+> thought they were rather arbitrary. But it certainly makes sense that
+> if offer headset or handsfree audio gateway you are a telephone.
 
-that looks like a really broken device to me. How can it pass the
-qualification if it mandates that bit. Is PTS setting it by accident.
+you wish, but it doesn't work this way. Every profile spec. clearly
+states which service classes have to enabled for every role. Like it
+clearly shows how the SDP record has to look.
 
-> We have yet to find a device (and we have tested hundreds now) that is
-> not compatible because of the telephony bit. It is a safe change to
-> make.
-
-Check your patch with PTS headset/handsfree and the IOP part. I am not
-sure if we can just enable service bits as we like.
-
-So in case I can be convinced to take this patch, it has to be in a
-separate case statement and with a comment that the Nokia 616 is just a
-plain stupid broken device and that is why we did it. The spec. doesn't
-mandate this.
-
-I also realized that the Nokia 616 might just is lucky in the interop
-department since most phones also implement DUN, FAX or SAP and thus the
-telephony bit is set.
-
-This brings me to another question, why don't you just use the serial
-proxy support we have and point it to one of the multiplexed TTYs of
-your GSM unit. Then you get DUN support and that broken Nokia device
-would also work :)
-
-So what about the desktop case that enables HS-AG and HF-AG? Are these
-phones? Does headset profile really mean that you have to be phone. Not
-likely. With the GSM requirements of handsfree, maybe.
-
-> So sure, you can reject the patch on the basis that it is not mandated
-> by the specification. But if you care about compatibility then it
-> seems like a good change to make. Especially since you now ignore the
-> service class in hcid.conf so there is no easy way to override.
-
-Even before you had no way to set. The automatic service bit
-manipulation would have overwritten it. You can actually just call out
-to hciconfig if you really wanna overwrite it, but that is a pretty bad
-idea. It gives you more pain than anything else.
+I spent quite some time getting this done so no developer has to worry
+about service classes anymore. So I really need the reference from the
+headset and hansfree specs. before I touch this.
 
 Regards
 
