@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <31384302.881251219914534417.JavaMail.coremail@bj163app113.163.com>
-References: <31384302.881251219914534417.JavaMail.coremail@bj163app113.163.com>
-Date: Sat, 30 Aug 2008 11:09:57 +0200
-Message-Id: <1220087397.7145.40.camel@californication>
+In-Reply-To: <a1c657a80808280257h681e02bdl6de2e132d9bafc5@mail.gmail.com>
+References: <a1c657a80808280257h681e02bdl6de2e132d9bafc5@mail.gmail.com>
+Date: Sat, 30 Aug 2008 11:08:46 +0200
+Message-Id: <1220087326.7145.38.camel@californication>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] noisey while run hstest
+Subject: Re: [Bluez-users] # hcid[246]: Disconnection failed: 0x0c
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -22,11 +22,23 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi,
 
-> hstest is not working right, please let me break it down.
+> 
+>     when i killed the hstest process , i get the "# hcid[246]:
+> Disconnection failed: 0x0c" error,
+> My platform :
+> OMAP5912OSK 
+> BT module :
+> ST  bt module
+> Linux kernel:
+> 2.6.18
+> 
+> I might conclude that the error is from the Bluetooth HCI driver in
+> the kernel. The 0x0C indicates that the ST module is in a state that
+> can not close the connection, would you give me some comments ? Thank
+> you very much !!!
 
-stop right here. The hstest program is not really useful. You can just
-use the audio service directly. Check wiki.bluez.org for further
-instructions on how to set this up.
+hstest is so old and possibly broken. Actually even your kernel in
+question is oo old. Don't use any of these anymore.
 
 Regards
 
