@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <e96e9eeb0808300011k1d65b69fkb58f33c256aabf0f@mail.gmail.com>
+In-Reply-To: <e96e9eeb0808300016l7b0118cbj13c8e410cd8dcb95@mail.gmail.com>
 References: <e96e9eeb0808250349s6491c78bub21ee742c2e1a795@mail.gmail.com>
 	<e96e9eeb0808250356u595a3005t6a0046ee5fc67622@mail.gmail.com>
 	<alpine.LNX.1.10.0808290445110.26779@nge2.ngu.pk>
-	<e96e9eeb0808300011k1d65b69fkb58f33c256aabf0f@mail.gmail.com>
-Date: Sat, 30 Aug 2008 11:34:35 +0200
-Message-Id: <1220088875.7145.58.camel@californication>
+	<e96e9eeb0808300016l7b0118cbj13c8e410cd8dcb95@mail.gmail.com>
+Date: Sat, 30 Aug 2008 11:30:04 +0200
+Message-Id: <1220088604.7145.52.camel@californication>
 Mime-Version: 1.0
 Subject: Re: [Bluez-users] easiest way to get OBEX support (client/server) ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
@@ -26,35 +26,14 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 Hi Voni,
 
 > > I've tried obex-data-server and obexd, but I couldn't get either one working.
+> > I asked on the list but there wasn't a reply. The one I use currently is one I
 > 
-> maybe they only give dbus api ? and they are not meant to be used from
-> the command line ?
+> Also there is an 'obex' project in the bluez cvs, i think it is obex
+> client, but i can't use it because it requires libxml and we use
+> libexpat in our embedded system (libxml is bloated!)
 
-obexd is only a server and it needs some interaction with the UI to some
-degree for authorization callbacks and so on. Feel free to propose
-patches since we can add switches for a fully command line based use
-cases.
-
-The current assumption is it runs in the user session and hence
-requiring a D-Bus session bus. However the end goal is to give the
-choice to run it at system level if you don't have a fine grained
-security model anyway.
-
-For these case it really helps if you just state what you wanna do with
-it. Otherwise we will focus on our current plans and do everything else
-when we have time. Also patches are always welcome.
-
-> > I asked on the list but there wasn't a reply.
-> 
-> I also tried on IRC but no one responded..  :(
-
-Be patient. Even while some of us look online 24/7, we are not :)
-
-> > I also use obexftp and obexfs.
-> 
-> What is obexfs btw ?
-
-OpenOBEX into FUSE integration.
+I kept the repository there as an example. It is old and hasn't been
+updated in a long time.
 
 Regards
 
