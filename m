@@ -1,15 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <e96e9eeb0808300016l7b0118cbj13c8e410cd8dcb95@mail.gmail.com>
-References: <e96e9eeb0808250349s6491c78bub21ee742c2e1a795@mail.gmail.com>
-	<e96e9eeb0808250356u595a3005t6a0046ee5fc67622@mail.gmail.com>
-	<alpine.LNX.1.10.0808290445110.26779@nge2.ngu.pk>
-	<e96e9eeb0808300016l7b0118cbj13c8e410cd8dcb95@mail.gmail.com>
-Date: Sat, 30 Aug 2008 11:30:04 +0200
-Message-Id: <1220088604.7145.52.camel@californication>
+In-Reply-To: <e96e9eeb0808300018m19b922a4i4060960b0ab91fb3@mail.gmail.com>
+References: <e96e9eeb0808300018m19b922a4i4060960b0ab91fb3@mail.gmail.com>
+Date: Sat, 30 Aug 2008 11:25:09 +0200
+Message-Id: <1220088309.7145.46.camel@californication>
 Mime-Version: 1.0
-Subject: Re: [Bluez-users] easiest way to get OBEX support (client/server) ?
+Subject: Re: [Bluez-users] no one here uses OPP/FTP ?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -25,15 +22,20 @@ Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 Hi Voni,
 
-> > I've tried obex-data-server and obexd, but I couldn't get either one working.
-> > I asked on the list but there wasn't a reply. The one I use currently is one I
+> do you use OPP or FTP profiles using Bluez ?
 > 
-> Also there is an 'obex' project in the bluez cvs, i think it is obex
-> client, but i can't use it because it requires libxml and we use
-> libexpat in our embedded system (libxml is bloated!)
+> Can you please tell how ? which package do you use ?
+> 
+> I'm looking for simple, command line, ftp/opp profiles, client and
+> server, for embedded system...
 
-I kept the repository there as an example. It is old and hasn't been
-updated in a long time.
+all of them are based on OpenOBEX and it includes demo clients by
+itself. Also obexd and obex-data-server might be a good choice for you.
+Especially the obexd will be interesting since it is heavily developed
+at the moment and besides Bluetooth, it should also support USB OBEX
+gadgets at some point in the future. I give obexd my blessing for a
+server on embedded systems. It also suppose to be part of the next Maemo
+development platform.
 
 Regards
 
