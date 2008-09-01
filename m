@@ -1,398 +1,390 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48BD97A8.1010201@pook.es>
-Date: Tue, 02 Sep 2008 21:44:40 +0200
+Message-ID: <48BC6CEC.8040602@pook.es>
+Date: Tue, 02 Sep 2008 00:30:04 +0200
 From: Stuart Pook <linux-bluetooth4@pook.es>
 MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: bluez 4.2 + linux 2.6.27-rc5 -> no audio interface
-References: <48BC6CEC.8040602@pook.es>
-In-Reply-To: <48BC6CEC.8040602@pook.es>
+Subject: bluez 4.2 + linux 2.6.27-rc5 -> no audio interface
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi
 
-I reinstalled bluez-4.2 (without recompiling) and now I get a little 
-further. I still cannot hear any music on my Jabra JX10 but I have a 
-"Headset service on RFCOMM channel 2".  When I try aplay I get 
-"unix_sendmsg_fd: Bad file descriptor(9)" and "resume failed" or 
-"connect(): Connection timed out (110)" and "Unable to lock headset". 
-After arecord I get "unix_sendmsg_fd: Bad file descriptor(9)" and 
-"resume failed" after a 40 second timeout.
+I decided to try bluez-4.2 with my Jabra JX10 Bluetooth headset. I ran
+bluetoothd. It says that it has registered interfaces for
+org.bluez.network.Router, org.bluez.network.Hub, org.bluez.network.Peer
+and org.bluez.serial.ProxyManager but nothing about an audio service. It
+does load the /usr/local/lib/bluetooth/plugins/audio.so plugin. The
+python script bluez-4.2/audio/test-audio says
+"org.freedesktop.DBus.Error.UnknownMethod: Method "ActivateService" with
+signature "s" on interface "org.bluez.Manager" doesn't exist".
 
-What do these messages mean?
+Running arecord just says "BT_GETCAPABILITIES failed : Input/output
+error(5)".
 
-When I run aplay and arecord, the headset beeps. When the connection is 
-underway, I can press the headset's buttons and bluetoothd writes out a 
-message "Received AT+CKPD=200".
+I created /etc/bluetooth/audio.conf and modified my ~/.asoundrc.
 
-thanks for your time!
+What else do I need to do to get bluetooth audio working?
+
+I am running linux 2.6.27-rc5 because I want to try the new btusb driver
+and it's SCO over USB support.
+
+In
+http://[2001:4860:0:1001::28]/search?q=cache:AJmIOP3i9YIJ:pastebin.ca/raw/1094961+bluetoothd+Registered+interface+org.bluez&hl=en&ct=clnk&cd=15 
+
+I saw that bluetoothd can say "Registered interface
+org.bluez.audio.Headset on path /org/bluez/hci0/dev_". Does it have to
+contact the bluetooth headset before registering the
+org.bluez.audio.Headset interface?
+
+When I run bluetoothd, dbus-monitor --system says "
+interface=org.bluez.Manager; member=AdapterAdded".
+
+src/test-discovery, src/test-device, and src/test-adapter all work.
+
+Any help would be most welcome.
+
+thanks
 Stuart
 
-These are the messages written to /var/log/daemon.log. I used logger(1) 
-to insert into the log the aplay & arecord commands I executed.
+PS I also tried creating /etc/bluetooth/rfcomm.conf but I don't really
+know what to put in it.
 
-
-Sep  2 21:20:15 kooka bluetoothd[23192]: Bluetooth daemon
-Sep  2 21:20:15 kooka bluetoothd[23192]: Enabling debug information
-Sep  2 21:20:15 kooka bluetoothd[23192]: parsing main.conf
-Sep  2 21:20:15 kooka bluetoothd[23192]: offmode=NoScan
-Sep  2 21:20:15 kooka bluetoothd[23192]: discovto=0
-Sep  2 21:20:15 kooka bluetoothd[23192]: pageto=8192
-Sep  2 21:20:15 kooka bluetoothd[23192]: name=%h-%d
-Sep  2 21:20:15 kooka bluetoothd[23192]: class=0x000100
-Sep  2 21:20:15 kooka bluetoothd[23192]: Starting SDP server
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding rec : 0xb8ba9a98
-Sep  2 21:20:15 kooka bluetoothd[23192]: with handle : 0x1
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding rec : 0xb8baba80
-Sep  2 21:20:15 kooka bluetoothd[23192]: with handle : 0x0
-Sep  2 21:20:15 kooka bluetoothd[23192]: Service classes 0x00
-Sep  2 21:20:15 kooka bluetoothd[23192]: Loading plugins 
-/usr/local/lib/bluetooth/plugins
-Sep  2 21:20:15 kooka bluetoothd[23192]: 
-/usr/local/lib/bluetooth/plugins/audio.so
-Sep  2 21:20:15 kooka bluetoothd[23192]: Unix socket created: 11
-Sep  2 21:20:15 kooka bluetoothd[23192]: 
-/usr/local/lib/bluetooth/plugins/serial.so
-Sep  2 21:20:15 kooka bluetoothd[23192]: 
-/usr/local/lib/bluetooth/plugins/network.so
-Sep  2 21:20:15 kooka bluetoothd[23192]: Parsing 
-/etc/bluetooth/network.conf failed: No such file or directory
-Sep  2 21:20:15 kooka bluetoothd[23192]: Config options: 
-InterfacePrefix=bnep%d, PANU_Script=(null), GN_Script=(null), 
-NAP_Script=(null), GN_Interface=pan0, NAP_Interface=pan1, Security=true
-Sep  2 21:20:15 kooka bluetoothd[23192]: bridge pan0 created
-Sep  2 21:20:15 kooka bluetoothd[23192]: 
-/usr/local/lib/bluetooth/plugins/input.so
-Sep  2 21:20:15 kooka bluetoothd[23192]: input.conf: Key file does not 
-have key 'IdleTimeout'
-Sep  2 21:20:15 kooka bluetoothd[23192]: HCI dev 0 registered
-Sep  2 21:20:15 kooka bluetoothd[23192]: child 23194 exited
-Sep  2 21:20:15 kooka bluetoothd[23192]: HCI dev 0 up
-Sep  2 21:20:15 kooka bluetoothd[23192]: headset_server_probe: path 
+: root@kooka; bluetoothd -dn
+bluetoothd[4160]: Bluetooth daemon
+bluetoothd[4160]: Enabling debug information
+bluetoothd[4160]: parsing main.conf
+bluetoothd[4160]: offmode=NoScan
+bluetoothd[4160]: discovto=0
+bluetoothd[4160]: pageto=8192
+bluetoothd[4160]: name=%h-%d
+bluetoothd[4160]: class=0x000100
+bluetoothd[4160]: Starting SDP server
+bluetoothd[4160]: Adding rec : 0xb8bcaa98
+bluetoothd[4160]: with handle : 0x1
+bluetoothd[4160]: Adding rec : 0xb8bcca80
+bluetoothd[4160]: with handle : 0x0
+bluetoothd[4160]: Service classes 0x00
+bluetoothd[4160]: Loading plugins /usr/local/lib/bluetooth/plugins
+bluetoothd[4160]: /usr/local/lib/bluetooth/plugins/audio.so
+bluetoothd[4160]: Unix socket created: 11
+bluetoothd[4160]: /usr/local/lib/bluetooth/plugins/serial.so
+bluetoothd[4160]: /usr/local/lib/bluetooth/plugins/network.so
+bluetoothd[4160]: Parsing /etc/bluetooth/network.conf failed: No such
+file or directory
+bluetoothd[4160]: Config options: InterfacePrefix=bnep%d,
+PANU_Script=(null), GN_Script=(null), NAP_Script=(null),
+GN_Interface=pan0, NAP_Interface=pan1, Security=true
+bluetoothd[4160]: bridge pan0 created
+bluetoothd[4160]: /usr/local/lib/bluetooth/plugins/input.so
+bluetoothd[4160]: input.conf: Key file does not have key 'IdleTimeout'
+bluetoothd[4160]: HCI dev 0 registered
+bluetoothd[4160]: HCI dev 0 already up
+bluetoothd[4160]: headset_server_probe: path /org/bluez/hci0
+bluetoothd[4160]: Couldn't find record for : 0x10000
+bluetoothd[4160]: Adding record with handle 0x10000
+bluetoothd[4160]: Adding rec : 0xb8bcf760
+bluetoothd[4160]: with handle : 0x10000
+bluetoothd[4160]: Service classes 0x00
+bluetoothd[4160]: a2dp_server_probe: path /org/bluez/hci0
+bluetoothd[4160]: SEP 0xb8bcd3b8 registered: type:0 codec:0 seid:1
+bluetoothd[4160]: Couldn't find record for : 0x10001
+bluetoothd[4160]: Adding record with handle 0x10001
+bluetoothd[4160]: Adding rec : 0xb8bcd8a0
+bluetoothd[4160]: with handle : 0x10001
+bluetoothd[4160]: Service classes 0x08
+bluetoothd[4160]: avrcp_server_probe: path /org/bluez/hci0
+bluetoothd[4160]: Couldn't find record for : 0x10002
+bluetoothd[4160]: Adding record with handle 0x10002
+bluetoothd[4160]: Adding rec : 0xb8bcd5c0
+bluetoothd[4160]: with handle : 0x10002
+bluetoothd[4160]: Service classes 0x08
+bluetoothd[4160]: Couldn't find record for : 0x10003
+bluetoothd[4160]: Adding record with handle 0x10003
+bluetoothd[4160]: Adding rec : 0xb8bcdd58
+bluetoothd[4160]: with handle : 0x10003
+bluetoothd[4160]: Service classes 0x08
+bluetoothd[4160]: proxy_probe: path /org/bluez/hci0
+bluetoothd[4160]: Registered interface org.bluez.serial.ProxyManager on
+path /org/bluez/hci0
+bluetoothd[4160]: network_server_probe: path /org/bluez/hci0
+bluetoothd[4160]: Couldn't find record for : 0x10004
+bluetoothd[4160]: Adding record with handle 0x10004
+bluetoothd[4160]: Adding rec : 0xb8bd05c0
+bluetoothd[4160]: with handle : 0x10004
+bluetoothd[4160]: Service classes 0x0a
+bluetoothd[4160]: register_server_record: got record id 0x10004
+bluetoothd[4160]: Registered interface org.bluez.network.Peer on path
 /org/bluez/hci0
-Sep  2 21:20:15 kooka bluetoothd[23192]: Couldn't find record for : 0x10000
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding record with handle 0x10000
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding rec : 0xb8bae760
-Sep  2 21:20:15 kooka bluetoothd[23192]: with handle : 0x10000
-Sep  2 21:20:15 kooka bluetoothd[23192]: Service classes 0x00
-Sep  2 21:20:15 kooka bluetoothd[23192]: a2dp_server_probe: path 
+bluetoothd[4160]: network_server_probe: path /org/bluez/hci0
+bluetoothd[4160]: Couldn't find record for : 0x10005
+bluetoothd[4160]: Adding record with handle 0x10005
+bluetoothd[4160]: Adding rec : 0xb8bd0be8
+bluetoothd[4160]: with handle : 0x10005
+bluetoothd[4160]: Service classes 0x0a
+bluetoothd[4160]: register_server_record: got record id 0x10005
+bluetoothd[4160]: Registered interface org.bluez.network.Hub on path
 /org/bluez/hci0
-Sep  2 21:20:15 kooka bluetoothd[23192]: SEP 0xb8bac3d8 registered: 
-type:0 codec:0 seid:1
-Sep  2 21:20:15 kooka bluetoothd[23192]: Couldn't find record for : 0x10001
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding record with handle 0x10001
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding rec : 0xb8bac8a0
-Sep  2 21:20:15 kooka bluetoothd[23192]: with handle : 0x10001
-Sep  2 21:20:15 kooka bluetoothd[23192]: Service classes 0x08
-Sep  2 21:20:15 kooka bluetoothd[23192]: avrcp_server_probe: path 
+bluetoothd[4160]: network_server_probe: path /org/bluez/hci0
+bluetoothd[4160]: Couldn't find record for : 0x10006
+bluetoothd[4160]: Adding record with handle 0x10006
+bluetoothd[4160]: Adding rec : 0xb8bd1210
+bluetoothd[4160]: with handle : 0x10006
+bluetoothd[4160]: Service classes 0x0a
+bluetoothd[4160]: register_server_record: got record id 0x10006
+bluetoothd[4160]: Registered interface org.bluez.network.Router on path
 /org/bluez/hci0
-Sep  2 21:20:15 kooka bluetoothd[23192]: Couldn't find record for : 0x10002
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding record with handle 0x10002
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding rec : 0xb8bac5e0
-Sep  2 21:20:15 kooka bluetoothd[23192]: with handle : 0x10002
-Sep  2 21:20:15 kooka bluetoothd[23192]: Service classes 0x08
-Sep  2 21:20:15 kooka bluetoothd[23192]: Couldn't find record for : 0x10003
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding record with handle 0x10003
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding rec : 0xb8bacd58
-Sep  2 21:20:15 kooka bluetoothd[23192]: with handle : 0x10003
-Sep  2 21:20:15 kooka bluetoothd[23192]: Service classes 0x08
-Sep  2 21:20:15 kooka bluetoothd[23192]: proxy_probe: path /org/bluez/hci0
-Sep  2 21:20:15 kooka bluetoothd[23192]: Registered interface 
-org.bluez.serial.ProxyManager on path /org/bluez/hci0
-Sep  2 21:20:15 kooka bluetoothd[23192]: network_server_probe: path 
-/org/bluez/hci0
-Sep  2 21:20:15 kooka bluetoothd[23192]: Couldn't find record for : 0x10004
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding record with handle 0x10004
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding rec : 0xb8baf5c0
-Sep  2 21:20:15 kooka bluetoothd[23192]: with handle : 0x10004
-Sep  2 21:20:15 kooka bluetoothd[23192]: Service classes 0x0a
-Sep  2 21:20:15 kooka bluetoothd[23192]: register_server_record: got 
-record id 0x10004
-Sep  2 21:20:15 kooka bluetoothd[23192]: Registered interface 
-org.bluez.network.Peer on path /org/bluez/hci0
-Sep  2 21:20:15 kooka bluetoothd[23192]: network_server_probe: path 
-/org/bluez/hci0
-Sep  2 21:20:15 kooka bluetoothd[23192]: Couldn't find record for : 0x10005
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding record with handle 0x10005
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding rec : 0xb8bafbe8
-Sep  2 21:20:15 kooka bluetoothd[23192]: with handle : 0x10005
-Sep  2 21:20:15 kooka bluetoothd[23192]: Service classes 0x0a
-Sep  2 21:20:15 kooka bluetoothd[23192]: register_server_record: got 
-record id 0x10005
-Sep  2 21:20:15 kooka bluetoothd[23192]: Registered interface 
-org.bluez.network.Hub on path /org/bluez/hci0
-Sep  2 21:20:15 kooka bluetoothd[23192]: network_server_probe: path 
-/org/bluez/hci0
-Sep  2 21:20:15 kooka bluetoothd[23192]: Couldn't find record for : 0x10006
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding record with handle 0x10006
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adding rec : 0xb8bb0210
-Sep  2 21:20:15 kooka bluetoothd[23192]: with handle : 0x10006
-Sep  2 21:20:15 kooka bluetoothd[23192]: Service classes 0x0a
-Sep  2 21:20:15 kooka bluetoothd[23192]: register_server_record: got 
-record id 0x10006
-Sep  2 21:20:15 kooka bluetoothd[23192]: Registered interface 
-org.bluez.network.Router on path /org/bluez/hci0
-Sep  2 21:20:15 kooka bluetoothd[23192]: Creating device 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx
-Sep  2 21:20:15 kooka bluetoothd[23192]: Probe drivers for 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx
-Sep  2 21:20:15 kooka bluetoothd[23192]: Found Headset record
-Sep  2 21:20:15 kooka bluetoothd[23192]: Discovered Headset service on 
-RFCOMM channel 2
-Sep  2 21:20:15 kooka bluetoothd[23192]: Registered interface 
-org.bluez.audio.Headset on path /org/bluez/hci0/dev_00_1A_45_2F_xx_xx
-Sep  2 21:20:15 kooka bluetoothd[23192]: headset_probe: path 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx
-Sep  2 21:20:15 kooka bluetoothd[23192]: Registered interface 
-org.bluez.input.Device on path /org/bluez/hci0/dev_00_1A_45_2F_xx_xx
-Sep  2 21:20:15 kooka bluetoothd[23192]: Creating device 
-/org/bluez/hci0/dev_00_14_A7_74_D3_AF
-Sep  2 21:20:15 kooka bluetoothd[23192]: Creating device 
-/org/bluez/hci0/dev_00_03_89_B7_F8_D3
-Sep  2 21:20:15 kooka bluetoothd[23192]: Creating device 
-/org/bluez/hci0/dev_00_0A_94_94_4F_B3
-Sep  2 21:20:15 kooka bluetoothd[23192]: Creating device 
-/org/bluez/hci0/dev_00_03_89_DC_5C_9F
-Sep  2 21:20:15 kooka bluetoothd[23192]: Creating device 
-/org/bluez/hci0/dev_00_03_89_DC_FC_EC
-Sep  2 21:20:15 kooka bluetoothd[23192]: Creating device 
-/org/bluez/hci0/dev_00_03_89_FE_E6_19
-Sep  2 21:20:15 kooka bluetoothd[23192]: Creating device 
-/org/bluez/hci0/dev_00_0E_6D_8F_91_6A
-Sep  2 21:20:15 kooka bluetoothd[23192]: Creating device 
-/org/bluez/hci0/dev_00_17_E5_E6_25_AB
-Sep  2 21:20:15 kooka bluetoothd[23192]: Creating device 
-/org/bluez/hci0/dev_00_17_E5_16_88_6C
-Sep  2 21:20:15 kooka bluetoothd[23192]: Creating device 
-/org/bluez/hci0/dev_00_17_E5_0C_EA_70
-Sep  2 21:20:15 kooka bluetoothd[23192]: Adapter /org/bluez/hci0 has 
-been enabled
-Sep  2 21:20:15 kooka bluetoothd[23192]: Starting security manager 0
-Sep  2 21:20:15 kooka bluetoothd[23192]: child 23199 exited
-Sep  2 21:20:36 kooka logger: aplay -D JX10 -f S16_LE /dev/zero
-Sep  2 21:20:36 kooka bluetoothd[23192]: Accepted new client connection 
-on unix socket (fd=20)
-Sep  2 21:20:36 kooka bluetoothd[23192]: Audio API: received 
-BT_GETCAPABILITIES_REQ
-Sep  2 21:20:36 kooka bluetoothd[23192]: Audio API: sending 
-BT_GETCAPABILITIES_RSP
-Sep  2 21:20:36 kooka bluetoothd[23192]: Audio API: received 
-BT_SETCONFIGURATION_REQ
-Sep  2 21:20:36 kooka bluetoothd[23192]: config sco - device = 
-00:1A:45:2F:xx:xx access_mode = 2
-Sep  2 21:20:36 kooka bluetoothd[23192]: 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx: Connecting to 00:1A:45:2F:xx:xx 
-channel 2
-Sep  2 21:20:36 kooka bluetoothd[23192]: State changed 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx: HEADSET_STATE_DISCONNECTED -> 
-HEADSET_STATE_CONNECT_IN_PROGRESS
-Sep  2 21:20:39 kooka bluetoothd[23192]: link_key_request 
-(sba=00:0C:41:E1:xx:xx, dba=00:1A:45:2F:xx:xx)
-Sep  2 21:20:39 kooka bluetoothd[23192]: kernel auth requirements = 0x00
-Sep  2 21:20:39 kooka bluetoothd[23192]: stored link key type = 0x00
-Sep  2 21:20:40 kooka bluetoothd[23192]: 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx: Connected to 00:1A:45:2F:xx:xx
-Sep  2 21:20:40 kooka bluetoothd[23192]: State changed 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx: HEADSET_STATE_CONNECT_IN_PROGRESS 
--> HEADSET_STATE_CONNECTED
-Sep  2 21:20:40 kooka bluetoothd[23192]: State changed 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx: HEADSET_STATE_CONNECTED -> 
-HEADSET_STATE_PLAY_IN_PROGRESS
-Sep  2 21:21:20 kooka bluetoothd[23192]: connect(): Connection timed out 
-(110)
-Sep  2 21:21:20 kooka bluetoothd[23192]: Audio API: sending 
-BT_SETCONFIGURATION_RSP
-Sep  2 21:21:20 kooka bluetoothd[23192]: State changed 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx: HEADSET_STATE_PLAY_IN_PROGRESS -> 
-HEADSET_STATE_CONNECTED
-Sep  2 21:21:20 kooka bluetoothd[23192]: Audio API: received 
-BT_STREAMSTART_REQ
-Sep  2 21:21:20 kooka bluetoothd[23192]: Audio API: sending 
-BT_STREAMSTART_RSP
-Sep  2 21:21:20 kooka bluetoothd[23192]: Audio API: sending BT_STREAMFD_IND
-Sep  2 21:21:20 kooka bluetoothd[23192]: unix_sendmsg_fd: Bad file 
-descriptor(9)
-Sep  2 21:21:20 kooka bluetoothd[23192]: resume failed
-Sep  2 21:21:20 kooka bluetoothd[23192]: Audio API: sending 
-BT_STREAMSTART_RSP
-Sep  2 21:21:20 kooka bluetoothd[23192]: Unix client disconnected (fd=20)
-Sep  2 21:21:38 kooka logger: aplay -D JX10 -f S16_LE /dev/zero
-Sep  2 21:21:38 kooka bluetoothd[23192]: Accepted new client connection 
-on unix socket (fd=20)
-Sep  2 21:21:38 kooka bluetoothd[23192]: Audio API: received 
-BT_GETCAPABILITIES_REQ
-Sep  2 21:21:38 kooka bluetoothd[23192]: Audio API: sending 
-BT_GETCAPABILITIES_RSP
-Sep  2 21:21:38 kooka bluetoothd[23192]: Audio API: received 
-BT_SETCONFIGURATION_REQ
-Sep  2 21:21:38 kooka bluetoothd[23192]: config sco - device = 
-00:1A:45:2F:xx:xx access_mode = 2
-Sep  2 21:21:38 kooka bluetoothd[23192]: State changed 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx: HEADSET_STATE_CONNECTED -> 
-HEADSET_STATE_PLAY_IN_PROGRESS
-Sep  2 21:21:42 kooka bluetoothd[23192]: Received AT+CKPD=200
-Sep  2 21:21:45 kooka bluetoothd[23192]: Received AT+VGS=04
-Sep  2 21:22:18 kooka bluetoothd[23192]: connect(): Connection timed out 
-(110)
-Sep  2 21:22:18 kooka bluetoothd[23192]: Unable to lock headset
-Sep  2 21:22:18 kooka bluetoothd[23192]: config failed
-Sep  2 21:22:18 kooka bluetoothd[23192]: Audio API: sending 
-BT_SETCONFIGURATION_RSP
-Sep  2 21:22:18 kooka bluetoothd[23192]: State changed 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx: HEADSET_STATE_PLAY_IN_PROGRESS -> 
-HEADSET_STATE_CONNECTED
-Sep  2 21:22:18 kooka bluetoothd[23192]: Unix client disconnected (fd=20)
-Sep  2 21:22:23 kooka logger: aplay -D JX10 -f S16_LE /dev/zero
-Sep  2 21:22:23 kooka bluetoothd[23192]: Accepted new client connection 
-on unix socket (fd=20)
-Sep  2 21:22:23 kooka bluetoothd[23192]: Audio API: received 
-BT_GETCAPABILITIES_REQ
-Sep  2 21:22:23 kooka bluetoothd[23192]: Audio API: sending 
-BT_GETCAPABILITIES_RSP
-Sep  2 21:22:23 kooka bluetoothd[23192]: Audio API: received 
-BT_SETCONFIGURATION_REQ
-Sep  2 21:22:23 kooka bluetoothd[23192]: config sco - device = 
-00:1A:45:2F:xx:xx access_mode = 2
-Sep  2 21:22:23 kooka bluetoothd[23192]: State changed 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx: HEADSET_STATE_CONNECTED -> 
-HEADSET_STATE_PLAY_IN_PROGRESS
-Sep  2 21:23:03 kooka bluetoothd[23192]: connect(): Connection timed out 
-(110)
-Sep  2 21:23:03 kooka bluetoothd[23192]: Unable to lock headset
-Sep  2 21:23:03 kooka bluetoothd[23192]: config failed
-Sep  2 21:23:03 kooka bluetoothd[23192]: Audio API: sending 
-BT_SETCONFIGURATION_RSP
-Sep  2 21:23:03 kooka bluetoothd[23192]: State changed 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx: HEADSET_STATE_PLAY_IN_PROGRESS -> 
-HEADSET_STATE_CONNECTED
-Sep  2 21:23:03 kooka bluetoothd[23192]: Unix client disconnected (fd=20)
-Sep  2 21:23:29 kooka logger: arecord -D JX10  -f S16_LE
-Sep  2 21:23:29 kooka bluetoothd[23192]: Accepted new client connection 
-on unix socket (fd=20)
-Sep  2 21:23:29 kooka bluetoothd[23192]: Audio API: received 
-BT_GETCAPABILITIES_REQ
-Sep  2 21:23:29 kooka bluetoothd[23192]: Audio API: sending 
-BT_GETCAPABILITIES_RSP
-Sep  2 21:23:29 kooka bluetoothd[23192]: Audio API: received 
-BT_SETCONFIGURATION_REQ
-Sep  2 21:23:29 kooka bluetoothd[23192]: config sco - device = 
-00:1A:45:2F:xx:xx access_mode = 1
-Sep  2 21:23:29 kooka bluetoothd[23192]: State changed 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx: HEADSET_STATE_CONNECTED -> 
-HEADSET_STATE_PLAY_IN_PROGRESS
-Sep  2 21:24:09 kooka bluetoothd[23192]: connect(): Connection timed out 
-(110)
-Sep  2 21:24:09 kooka bluetoothd[23192]: Audio API: sending 
-BT_SETCONFIGURATION_RSP
-Sep  2 21:24:09 kooka bluetoothd[23192]: State changed 
-/org/bluez/hci0/dev_00_1A_45_2F_xx_xx: HEADSET_STATE_PLAY_IN_PROGRESS -> 
-HEADSET_STATE_CONNECTED
-Sep  2 21:24:09 kooka bluetoothd[23192]: Audio API: received 
-BT_STREAMSTART_REQ
-Sep  2 21:24:09 kooka bluetoothd[23192]: Audio API: sending 
-BT_STREAMSTART_RSP
-Sep  2 21:24:09 kooka bluetoothd[23192]: Audio API: sending BT_STREAMFD_IND
-Sep  2 21:24:09 kooka bluetoothd[23192]: unix_sendmsg_fd: Bad file 
-descriptor(9)
-Sep  2 21:24:09 kooka bluetoothd[23192]: resume failed
-Sep  2 21:24:09 kooka bluetoothd[23192]: Audio API: sending 
-BT_STREAMSTART_RSP
-Sep  2 21:24:09 kooka bluetoothd[23192]: Unix client disconnected (fd=20)
+bluetoothd[4160]: Creating device /org/bluez/hci0/dev_00_14_A7_74_xx_xx
+bluetoothd[4160]: Creating device /org/bluez/hci0/dev_00_03_89_B7_xx_xx
+bluetoothd[4160]: Creating device /org/bluez/hci0/dev_00_0A_94_94_xx_xx
+bluetoothd[4160]: Creating device /org/bluez/hci0/dev_00_03_89_DC_xx_xx
+bluetoothd[4160]: Creating device /org/bluez/hci0/dev_00_03_89_DC_xx_xx
+bluetoothd[4160]: Creating device /org/bluez/hci0/dev_00_03_89_FE_xx_xx
+bluetoothd[4160]: Creating device /org/bluez/hci0/dev_00_0E_6D_8F_xx_xx
+bluetoothd[4160]: Creating device /org/bluez/hci0/dev_00_17_E5_E6_xx_xx
+bluetoothd[4160]: Creating device /org/bluez/hci0/dev_00_17_E5_16_xx_xx
+bluetoothd[4160]: Creating device /org/bluez/hci0/dev_00_17_E5_0C_xx_xx
+bluetoothd[4160]: Creating device /org/bluez/hci0/dev_00_1A_45_2F_xx_xx
+bluetoothd[4160]: Adapter /org/bluez/hci0 has been enabled
+bluetoothd[4160]: Starting security manager 0
+bluetoothd[4160]: child 4162 exited
+bluetoothd[4160]: child 4164 exited
+bluetoothd[4160]: Accepted new client connection on unix socket (fd=20)
+bluetoothd[4160]: Audio API: received BT_GETCAPABILITIES_REQ
+bluetoothd[4160]: Audio API: sending BT_GETCAPABILITIES_RSP
+bluetoothd[4160]: Unix client disconnected (fd=20)
+bluetoothd[4160]: Accepted new client connection on unix socket (fd=20)
+bluetoothd[4160]: Audio API: received BT_GETCAPABILITIES_REQ
+bluetoothd[4160]: Audio API: sending BT_GETCAPABILITIES_RSP
+bluetoothd[4160]: Unix client disconnected (fd=20)
+.....
 
-:; sdptool  records 00:1A:45:2F:xx:xx
-Service Name: Hands-Free unit
-Service RecHandle: 0x10000
-Service Class ID List:
-   "Handsfree" (0x111e)
-   "Generic Audio" (0x1203)
-Protocol Descriptor List:
-   "L2CAP" (0x0100)
-   "RFCOMM" (0x0003)
-     Channel: 1
-Language Base Attr List:
-   code_ISO639: 0x656e
-   encoding:    0x6a
-   base_offset: 0x100
-Profile Descriptor List:
-   "Handsfree" (0x111e)
-     Version: 0x0105
 
-Service Name: Headset
-Service RecHandle: 0x10001
-Service Class ID List:
-   "Headset" (0x1108)
-   "Generic Audio" (0x1203)
-Protocol Descriptor List:
-   "L2CAP" (0x0100)
-   "RFCOMM" (0x0003)
-     Channel: 2
-Language Base Attr List:
-   code_ISO639: 0x656e
-   encoding:    0x6a
-   base_offset: 0x100
-Profile Descriptor List:
-   "Headset" (0x1108)
-     Version: 0x0100
+:; ./bluez-4.2/audio/test-audio
+Traceback (most recent call last):
+    File "./bluez-4.2/audio/test-audio", line 10, in <module>
+      conn = manager.ActivateService('audio')
+    File "/var/lib/python-support/python2.5/dbus/proxies.py", line 68, in
+__call__
+      return self._proxy_method(*args, **keywords)
+    File "/var/lib/python-support/python2.5/dbus/proxies.py", line 140,
+in __call__
+      **keywords)
+    File "/var/lib/python-support/python2.5/dbus/connection.py", line
+622, in call_blocking
+      message, timeout)
+dbus.exceptions.DBusException: org.freedesktop.DBus.Error.UnknownMethod:
+Method "ActivateService" with signature "s" on interface
+"org.bluez.Manager" doesn't exist
 
-:; lsmod | grep usb
-usb_storage            77960  1
-usbhid                 37924  0
-hid                    35660  1 usbhid
-ff_memless              6216  1 usbhid
-snd_usb_audio          72288  1
-snd_usb_lib            15168  1 snd_usb_audio
-snd_rawmidi            20512  2 snd_usb_lib,snd_seq_midi
-snd_hwdep               8004  1 snd_usb_audio
-btusb                  11864  22291
-bluetooth              49184  9 sco,bnep,rfcomm,l2cap,btusb
-snd_pcm                64708  3 snd_usb_audio,snd_hda_intel
-snd                    47480  13 
-snd_usb_audio,snd_seq_oss,snd_seq,snd_rawmidi,snd_seq_device,snd_hwdep,snd_mixer_oss,snd_hda_intel,snd_pcm,snd_timer
 
-:; logger -p daemon.info  "arecord -D JX10  -f S16_LE"; arecord -D JX10 
-  -f S16_LE
-Recording WAVE 'stdin' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
-ALSA lib pcm_bluetooth.c:464:(bluetooth_hsp_hw_params) 
-BT_SETCONFIGURATION failed : Input/output error(5)
-arecord: set_params:979: Unable to install hw params:
-ACCESS:  RW_INTERLEAVED
-FORMAT:  S16_LE
-SUBFORMAT:  STD
-SAMPLE_BITS: 16
-FRAME_BITS: 16
-CHANNELS: 1
-RATE: 8000
-PERIOD_TIME: 125000
-PERIOD_SIZE: 1000
-PERIOD_BYTES: 2000
-PERIODS: 4
-BUFFER_TIME: 500000
-BUFFER_SIZE: 4000
-BUFFER_BYTES: 8000
-TICK_TIME: [0 0]
-:; logger -p daemon.info  "aplay -D JX10  -f S16_LE /dev/zero";  aplay 
--D JX10  -f S16_LE /dev/zero
-Playing raw data '/dev/zero' : Signed 16 bit Little Endian, Rate 8000 
-Hz, Mono
-ALSA lib pcm_bluetooth.c:464:(bluetooth_hsp_hw_params) 
-BT_SETCONFIGURATION failed : Input/output error(5)
-aplay: set_params:979: Unable to install hw params:
-ACCESS:  RW_INTERLEAVED
-FORMAT:  S16_LE
-SUBFORMAT:  STD
-SAMPLE_BITS: 16
-FRAME_BITS: 16
-CHANNELS: 1
-RATE: 8000
-PERIOD_TIME: 125000
-PERIOD_SIZE: 1000
-PERIOD_BYTES: 2000
-PERIODS: 4
-BUFFER_TIME: 500000
-BUFFER_SIZE: 4000
-BUFFER_BYTES: 8000
-TICK_TIME: [0 0]
+:; arecord -D JX10  -f S16_LE | wc -c
+ALSA lib pcm_bluetooth.c:1619:(bluetooth_init) BT_GETCAPABILITIES failed
+: Input/output error(5)
+arecord: main:564: audio open error: Input/output error
+0
 
+:; less ~/.asoundrc
+pcm.JX10 {
+          type bluetooth
+          device "00:1A:45:2F:xx:xx" # Jabra JX10 series 2
+}
+:; cat /etc/bluetooth/audio.conf
+# Configuration file for the audio service
+
+# This section contains options which are not specific to any
+# particular interface
+[General]
+
+# Switch to master role for incoming connections (defaults to true)
+Master=true
+
+# If we want to disable support for specific services
+# Defaults to supporting all implemented services
+Disable=Control,Source
+
+# SCO routing. Either PCM or HCI (in which case audio is routed to/from
+ALSA)
+# Defaults to HCI
+SCORouting=PCM
+
+# Headset interface specific options (i.e. options which affect how the
+audio
+# service interacts with remote headset devices)
+[Headset]
+
+# Set to true to support HFP (in addition to HSP only which is the default)
+# Defaults to false
+HFP=false
+
+# HFP Gateway features
+# Defaults to false
+3WayCalling=false
+EchoCancelNoiseCancel=false
+VoiceRecognition=false
+InBandRingtone=false
+VoiceTags=false
+RejectingCalls=false
+EnhancedCallStatus=false
+EnhancedCallControl=false
+ExtendedErrorResultCodes=false
+
+# Just an example of potential config options for the other interfaces
+[A2DP]
+SBCSources=1
+MPEG12Sources=0
+SBCSinks=
+MPEG12Sinks=
+:; cat /etc/bluetooth/main.conf
+[General]
+
+# List of plugins that should not be loaded on bluetoothd startup
+#DisablePlugins = network,input
+
+# Default adaper name
+# %h - substituted for hostname
+# %d - substituted for adapter id
+Name = %h-%d
+
+# Default device class. Only the major and minor device class bits are
+# considered
+Class = 0x000100
+
+# How long to stay in discoverable mode before going back to
+non-discoverable
+# The value is in seconds. Default is 180, i.e. 3 minutes.
+# 0 = disable timer, i.e. stay discoverable forever
+DiscoverableTimeout = 0
+
+# Use some other page timeout than the controller default one
+# (16384 = 10 seconds)
+PageTimeout = 8192
+
+# Behaviour for Adapter.SetProperty("mode", "off")
+# Possible values: "DevDown", "NoScan" (default)
+OffMode = NoScan
+
+
+:; uname -a
+Linux kooka 2.6.27-rc5 #1 SMP Sat Aug 30 16:48:04 CEST 2008 i686 GNU/Linux
+
+:; cat /etc/dbus-1/system.d/bluetooth.conf
+<!-- This configuration file specifies the required security policies
+       for Bluetooth core daemon to work. -->
+
+<!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus Configuration
+1.0//EN"
+   "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
+<busconfig>
+
+    <!-- ../system.conf have denied everything, so we just punch some
+holes -->
+
+    <policy user="root">
+      <allow own="org.bluez"/>
+    </policy>
+
+    <policy at_console="true">
+      <allow send_path="/"/>
+      <allow send_path="/org/bluez"/>
+
+      <allow send_destination="org.bluez.Manager"/>
+      <allow receive_sender="org.bluez.Manager"/>
+
+      <allow send_destination="org.bluez.Adapter"/>
+      <allow receive_sender="org.bluez.Adapter"/>
+
+      <allow send_destination="org.bluez.Device"/>
+      <allow receive_sender="org.bluez.Device"/>
+    </policy>
+
+: root@kooka;  dbus-monitor  --system
+signal sender=org.freedesktop.DBus -> dest=:1.78
+path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
+member=NameAcquired
+     string ":1.78"
+signal sender=org.freedesktop.DBus -> dest=(null destination)
+path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
+member=NameOwnerChanged
+     string "org.bluez"
+     string ":1.76"
+     string ""
+signal sender=org.freedesktop.DBus -> dest=(null destination)
+path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
+member=NameOwnerChanged
+     string ":1.76"
+     string ":1.76"
+     string ""
+signal sender=org.freedesktop.DBus -> dest=(null destination)
+path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
+member=NameOwnerChanged
+     string ":1.79"
+     string ""
+     string ":1.79"
+signal sender=org.freedesktop.DBus -> dest=(null destination)
+path=/org/freedesktop/DBus; interface=org.freedesktop.DBus;
+member=NameOwnerChanged
+     string "org.bluez"
+     string ""
+     string ":1.79"
+signal sender=:1.79 -> dest=(null destination) path=/;
+interface=org.bluez.Manager; member=AdapterAdded
+     object path "/org/bluez/hci0"
+signal sender=:1.79 -> dest=(null destination) path=/org/bluez/hci0;
+interface=org.bluez.Adapter; member=PropertyChanged
+     string "Mode"
+     variant       string "off"
+signal sender=:1.79 -> dest=(null destination) path=/;
+interface=org.bluez.Manager; member=DefaultAdapterChanged
+     object path "/org/bluez/hci0"
+
+:; src/test-discovery
+[ 00:16:AE:xx:xx:xx ]
+     RSSI = 0
+     Name = Livebox-A328
+     Class = 0x520300
+     Address = 00:xx:xx:xx:xx:xx
+:;  src/test-device name 00:1A:45:2F:xx:xx
+Jabra JX10 series 2
+:; src/test-device class 00:1A:45:2F:xx:xx
+0x200404
+:; src/test-device trusted 00:1A:45:2F:xx:xx
+0
+:; src/test-adapter address
+00:0C:xx:xx:xx:xx
+
+:; network/test-network
+Traceback (most recent call last):
+   File "network/test-network", line 10, in <module>
+     conn = manager.ActivateService('network')
+   File "/var/lib/python-support/python2.5/dbus/proxies.py", line 68, in 
+__call__
+     return self._proxy_method(*args, **keywords)
+   File "/var/lib/python-support/python2.5/dbus/proxies.py", line 140, 
+in __call__
+     **keywords)
+   File "/var/lib/python-support/python2.5/dbus/connection.py", line 
+622, in call_blocking
+     message, timeout)
+dbus.exceptions.DBusException: org.freedesktop.DBus.Error.UnknownMethod: 
+Method "ActivateService" with signature "s" on interface 
+"org.bluez.Manager" doesn't exist
+
+:; serial/test-serial
+Traceback (most recent call last):
+   File "serial/test-serial", line 12, in <module>
+     conn = manager.ActivateService('serial')
+   File "/var/lib/python-support/python2.5/dbus/proxies.py", line 68, in 
+__call__
+     return self._proxy_method(*args, **keywords)
+   File "/var/lib/python-support/python2.5/dbus/proxies.py", line 140, 
+in __call__
+     **keywords)
+   File "/var/lib/python-support/python2.5/dbus/connection.py", line 
+622, in call_blocking
+     message, timeout)
+dbus.exceptions.DBusException: org.freedesktop.DBus.Error.UnknownMethod: 
+Method "ActivateService" with signature "s" on interface 
+"org.bluez.Manager" doesn't exist
 
