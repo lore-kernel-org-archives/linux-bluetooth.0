@@ -1,69 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ Mailing List <bluez-announce@lists.sourceforge.net>
-Date: Wed, 03 Sep 2008 17:49:56 +0200
-Message-Id: <1220456996.6714.46.camel@californication>
-Mime-Version: 1.0
-Cc: bluez-users@lists.sourceforge.net,
-	bluez-devel@lists.sourceforge.net
-Subject: [BlueZ-Announce] Closing down the mailing lists at SourceForge
-Reply-To: bluez-users@lists.sourceforge.net
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-announce>,
-	<mailto:bluez-announce-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-announce>
-List-Post: <mailto:bluez-announce@lists.sourceforge.net>
-List-Help: <mailto:bluez-announce-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-announce>,
-	<mailto:bluez-announce-request@lists.sourceforge.net?subject=subscribe>
+Message-ID: <5e088bd90809012200t1d4d6d1ft72b32f1593eecdbb@mail.gmail.com>
+Date: Mon, 1 Sep 2008 22:00:24 -0700
+From: "Steve Sakoman" <sakoman@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+MIME-Version: 1.0
+Subject: [Bluez-devel] Difficulties with hciattach and W2CBW003-001 module
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
 Content-Type: text/plain; charset="us-ascii"
-Sender: bluez-announce-bounces@lists.sourceforge.net
-Errors-To: bluez-announce-bounces@lists.sourceforge.net
-List-ID: <bluez-devel.lists.sourceforge.net>
+Sender: bluez-devel-bounces@lists.sourceforge.net
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Folks,
+I am working to bring up new embedded hardware using the wi2wi
+W2CBW003-001 module.
 
-the infrastructure of the BlueZ project has been undergone significant
-changes to accommodate the developers needs. This also results in the
-fact that the service providing by SourceForge is not really good enough
-for us anymore.
+The -001 version of the module communicates via uart at 921600 baud.
 
-The first big step was to finally switch away from CVS as source code
-management system. It was clear that I will not switch to Subversion
-since that is as broken as CVS. The only real alternative was GIT. So
-starting with the bluez-4.0 release everything has been switched over. I
-also decided to move the whole repositories over to kernel.org since
-their infrastructure is excellent and works very well.
+My kernel is 2.6.27-rc3 and I am using bluez 3.33.  Kernel options are:
 
-The next step was to move the download repositories over to kernel.org
-since they do a really great job at mirroring and have good enough
-bandwidth.
+CONFIG_BT=y
+CONFIG_BT_L2CAP=y
+CONFIG_BT_SCO=y
+CONFIG_BT_RFCOMM=y
+CONFIG_BT_RFCOMM_TTY=y
+CONFIG_BT_BNEP=y
+CONFIG_BT_BNEP_MC_FILTER=y
+CONFIG_BT_BNEP_PROTO_FILTER=y
+CONFIG_BT_HIDP=y
 
-The last step is to close down the mailing list served by SourceForge. I
-was always disappointed with their email service. It was slow, full of
-spam and sometimes broken for days. I simply don't believe in having
-subscriber only mailing lists. This is not how open source should be
-done. Some time ago we created linux-bluetooth@vger.kernel.org since the
-mail admins at kernel.org really know what they are doing. We are
-already using this for the kernel development and in the future this
-will become the only mailing list.
+#
+# Bluetooth device drivers
+#
+CONFIG_BT_HCIUSB=m
+CONFIG_BT_HCIUSB_SCO=y
+# CONFIG_BT_HCIBTSDIO is not set
+CONFIG_BT_HCIUART=y
+CONFIG_BT_HCIUART_H4=y
+CONFIG_BT_HCIUART_BCSP=y
 
-So it is a good idea to subscribe to linux-bluetooth@vger.kernel.org as
-soon as possible since the SourceForge mailing lists will close down end
-of the year.
+When launching hciattach I get a timeout error:
 
-The announcement mailing list has been quiet for some time now. With the
-new www.bluez.org website we do have a proper RSS enabled blog. Please
-use that one if you wanna stay up-to-date with releases and other
-important information.
+root@overo:~# hciattach -n ttyS1 csr
+Initialization timed out.
 
-For everybody who was subscribed to the commit mailing list, you can now
-also use RSS from the GIT web interface on kernel.org.
+By adding a few debug printf's I determined that hciattach is timing
+out in read_hci_event waiting for a valid response from the module.
 
-Regards
+Digging a little deeper I discovered that as the module comes out of
+reset it sends 3 valid HCI event packets:
 
-Marcel
+04 0f 04 00 01 00 00
+04 30 01 77
+04 ff 1b 83 02 00 0d 00 0d 00 00 10 00  00 77 00 03 00 00 f9 01 00 00
+00 00 00 00 00 00 00
 
+These are "eaten" by hciattach during its serial port flush
+operations.  Then hciattach sends a command to read the build ID of
+the module, and the module responds with these 6 bytes:
 
+80, 47, 00, 00, ff,  fc , fc
+
+and then silence.  There is approximately a 2 second delay between the
+first fc byte and the second.  Further commands elicit no response.
+
+I don't have specs for the module so I am not able to fully decode all
+3 packets the module sends after reset.  The first (Command Status
+event) seems to make sense, the second (Encryption Key Refresh
+Complete event) seems to not have the right number of parameters, and
+the since the third is a vendor specific event I have no clue what it
+means :-)
+
+The 6 bytes sent in response to the command seem to make no sense at all.
+
+Any suggestions on where to go from here?  This has me quite baffled!
+
+Steve
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
@@ -71,6 +89,6 @@ Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
 _______________________________________________
-BlueZ-Announce mailing list
-BlueZ-Announce@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-announce
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
