@@ -1,52 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <AD5919F0-1D89-4AF8-9BF2-296976BAE6AD@wizai.com>
-From: Florian Schwehn <f.schwehn@wizai.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
-Mime-Version: 1.0 (Apple Message framework v926)
-Subject: problem with obex-data-server service requests
-Date: Thu, 4 Sep 2008 23:50:09 +0200
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: James Cloos <cloos@jhcloos.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [BlueZ-Announce] Closing down the mailing lists at SourceForge
+In-Reply-To: <1220456996.6714.46.camel@californication> (Marcel Holtmann's
+	message of "Wed, 03 Sep 2008 17:49:56 +0200")
+References: <1220456996.6714.46.camel@californication>
+Date: Thu, 04 Sep 2008 02:11:45 -0400
+Message-ID: <m363pc4eyv.fsf@lugabout.jhcloos.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello!
+>>>>> "Marcel" == Marcel Holtmann <marcel@holtmann.org> writes:
 
-I have a strange issue with the obex data server. I try to write a  
-program that should accept files that are sent by mobile phones via opp.
-When I try to send a file, some mobile phones always come up with  
-messages like 'Sending failed'. hcidump produces the following output:
+Marcel> The announcement mailing list has been quiet for some time
+Marcel> now. With the new www.bluez.org website we do have a proper RSS
+Marcel> enabled blog. Please use that one if you wanna stay up-to-date
+Marcel> with releases and other important information.
 
- > ACL data: handle 11 flags 0x02 dlen 17
-     L2CAP(d): cid 0x0040 len 13 [psm 1]
-         SDP SS Req: tid 0x1 len 0x8
-           pat uuid-16 0x1105 (OBEXObjPush)
-           max 65535
-           cont 00
-< ACL data: handle 11 flags 0x02 dlen 14
-     L2CAP(d): cid 0x0040 len 10 [psm 1]
-         SDP SS Rsp: tid 0x1 len 0x5
-           count 0
-           cont 00
+Please also CC announcements to the linux-bluetooth list; rss is not a
+useful replacement for a mailing list.
 
+Marcel> For everybody who was subscribed to the commit mailing list, you
+Marcel> can now also use RSS from the GIT web interface on kernel.org.
 
-When I try to send a file to my program from a linux PC with bluez- 
-gnome everything works as exspected and hcidump prints the following  
-lines:
+The contrib/hooks/post-receive-email file in the git repo does a great
+job of sending out email notifications.  (And I see that you are using
+it for the obexd.git repo.)  That would be an ideal way to make commit
+notices available.
 
- > ACL data: handle 12 flags 0x02 dlen 17
-     L2CAP(d): cid 0x0040 len 13 [psm 1]
-         SDP SS Req: tid 0x0 len 0x8
-           pat uuid-16 0x1105 (OBEXObjPush)
-           max 64
-           cont 00
-< ACL data: handle 12 flags 0x02 dlen 18
-     L2CAP(d): cid 0x0040 len 14 [psm 1]
-         SDP SS Rsp: tid 0x0 len 0x9
-           count 1
-           handle 0x10004
-           cont 00
+And kudos for moving to kernel.org.
 
-The difference between the outputs hcidump creates makes no sense to  
-me. Do you have any ideas?
-
-Thanks in advance, Florian.
+-JimC
+-- 
+James Cloos <cloos@jhcloos.com>         OpenPGP: 1024D/ED7DAEA6
