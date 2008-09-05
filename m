@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-15?q?Fr=E9d=E9ric?= <frederic.mantegazza@gbiloba.org>
-To: bluez-users@lists.sourceforge.net
-Date: Sun, 7 Sep 2008 09:32:20 +0200
-MIME-Version: 1.0
-Message-Id: <200809070932.20176.frederic.mantegazza@gbiloba.org>
-Subject: [Bluez-users] pybluez under windows XP : irprops.cpl
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Peter Wurmsdobler <peter@wurmsdobler.org>
+In-Reply-To: <48C1160B.7060705@wurmsdobler.org>
+References: <48C1160B.7060705@wurmsdobler.org>
+Date: Fri, 05 Sep 2008 18:55:55 +0200
+Message-Id: <1220633755.6714.83.camel@californication>
+Mime-Version: 1.0
+Cc: Bluez-users@lists.sourceforge.net
+Subject: Re: [Bluez-users] rfcomm tty lost packets
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,40 +17,42 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-15"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+Hi Peter,
 
-I have a problem runing pybluez under XP. When I import bluetooth module, I =
+> It appears that rfcomm tty packets are lost on my linux 2.6.22 based 
+> embedded system at the startup, but also during the bluetooth 
+> connection. There are patches to fix that on :
+> 
+> http://git.kernel.org/?p=linux%2Fkernel%2Fgit%2Faegl%2Flinux-2.6.git&a=search&h=HEAD&st=commit&s=kenzior 
+> 
+> 
+> However, these patches appear to be against a newer version of the 
+> kernel. Is it safe to apply the patches mentioned above manually?
 
-have an error message telling me that the irprops.cpl lib can't be found. =
+that kernel is ancient and the patches might work or not. I am not
+planning to look through the list of changes and check if it might
+create any possible race conditions.
 
-It happens on import _msbt.
+> Is there an alternative to "upgrade" the bluez part of the kernel and 
+> apply the patches?
 
-I didn't find any usefull information on the net; all solutions are talking =
+No.
 
-about bluetooth-agent to be removed. But I didn't find any =
+Regards
 
-bluetooth-agent. I installed the bluesoleil software which comes with my =
+Marcel
 
-adapter (a Trendnet TBW-104UB).
 
-Any idea?
-
--- =
-
-    Fr=E9d=E9ric
-
-    http://www.gbiloba.org
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great priz=
-es
+Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
