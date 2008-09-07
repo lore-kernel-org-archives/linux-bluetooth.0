@@ -1,11 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 10 Sep 2008 17:50:55 +0100
-From: "wolf@hivenetworks.net" <wolf@hivenetworks.net>
+Date: Sun, 7 Sep 2008 12:44:27 -0700 (PDT)
+From: hong zhang <henryzhang62@yahoo.com>
 To: bluez-users@lists.sourceforge.net
-Message-ID: <20080910175055.2d1586e1@mordor>
-Mime-Version: 1.0
-Subject: [Bluez-users] multiple OBEX PUSH connections
-Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+MIME-Version: 1.0
+Message-ID: <496701.86720.qm@web57915.mail.re3.yahoo.com>
+Subject: [Bluez-users] why my laptop with fedora 8 cannot be discoverred?
+Reply-To: henryzhang62@yahoo.com,
+	BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,36 +19,26 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hello.
+List,
 
-this question might reveal my ignorance of the underlying
-protocol but i was wondering if (and how) i can establish 
-to obexpush connections to different target devices through 
-one bluetooth device.
+I have a USB dongle with CSR chip. 
+"iscan enable;pscan enable" are in hcid.conf.
+It can send file to my cell phone using gnome-obex-send.
+even l2ping to my cell phone returns 0 bytes.
 
-when i have one device hci0 and try to push a file
-(e.g. using ussp-push) to different devices simultanously
+It can discover my cell phone and other BT devices.
+But my cell phone could not discover my USB dongle.
 
-# ussp-push /dev/rfcomm1 foobar.jpg thanks.jpg 
-# ussp-push /dev/rfcomm1 foobar.jpg thanks.jpg 
+I add discovto 0 in hcid.conf and mode discoverable in /var/lib/.../config. Both are not help.
 
-i will get:
+Any clue?
 
-Can' t open tty: Too many links
-Error while doing OBEX_HandleInput()
-__obex_connect: error=-1
-Unable to connect to the server
-Error
+Thanks.
 
-i just give ussp-push as an example here, seems to be a problem
-with other tools as well.
+---henry
 
-im asking this here because i actaully wonder what is causing this 
-problem hier? is it the way bluetooth works itself? or is
-it a limitation i could work around on the software side?
 
-thanks,
-wolf.
+      
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
