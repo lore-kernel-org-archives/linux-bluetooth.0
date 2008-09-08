@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48C58092.7060103@free.fr>
-Date: Mon, 08 Sep 2008 21:44:18 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
-To: Johan Hedberg <johan.hedberg@nokia.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Type: multipart/mixed; boundary="------------070702050502060002000003"
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Crash bug in bluez-4.4
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <48C562D4.9020005@free.fr>
+References: <48C0E513.1040304@free.fr>
+	<1220633911.6714.86.camel@californication> <48C562D4.9020005@free.fr>
+Date: Mon, 08 Sep 2008 20:06:59 +0200
+Message-Id: <1220897219.11655.2.camel@californication>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Some bluez-gnome 1.2 bugs
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,102 +17,55 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------070702050502060002000003
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi Fabien,
 
-Hi All,
+> >> I just started to play recently with bluez 4.x.
+> >>
+> >> I found at least two very annoying bugs in the bluez-gnome-1.2 wizard:
+> >>    - On my debian testing system,  the wizard does not allow me to enter
+> >> the pin code. The pin code just gets displayed a fraction of second an
+> >> then disappears. As a consequence the default 123456 pin code gets used
+> >> and pairing fails.
+> > 
+> > I am working on improving the PIN handling way, but at the same time I
+> > have to make sure that it works with Simple Pairing and in the most
+> > simple way. It is not that easy.
+> 
+> I just retried with the latest 1.3 release. This time i am able to pair 
+> my headset. :-)
 
-Just found a funny bug, steps to reproduce below:
+it is not perfect yet. Just a quick hack to pick 0000 as PIN code for
+headset devices.
 
-1) make sure you have no headset whatsoever configured in bluez (fresh
-empty setup)
+> > Also for some devices the PIN code needs to be random instead of 123456.
+> > 
+> >>    - If i try to go back to the first wizard page where my bluetooth
+> >> device is displayed, it is already selected. I have no way to go to the
+> >> next page : the next button stays grey whatever i do. (screenshot attached).
+> > 
+> > Hold shift while selecting to unselect and then select again. I know
+> > that this is broken.
+> 
+> Looks you fixed that too :-).
 
-2) Configure your asoundrc with empty bluetooth parameters
+It was actually pretty simple to fix.
 
-pcm.bluetooth {
-         type bluetooth
-}
+Regards
 
-ctl.bluetooth {
-         type bluetooth
-}
-
-3)Launch your favourite ALSA base player, configure "bluetooth" as
-output device
-
-4) Hit play.
-
-5) *BANG*
-bluetoothd[17227]: Parsing
-/usr/local/stow/bluez-4.4/etc/bluetooth/audio.conf failed: No such file
-or directory
-bluetoothd[17227]: Unix socket created: 13
-bluetoothd[17227]: Telephony plugin initialized
-bluetoothd[17227]: HFP AG features: (none)
-bluetoothd[17227]: Accepted new client connection on unix socket (fd=10)
-bluetoothd[17227]: Audio API: received BT_GETCAPABILITIES_REQ
-Erreur de segmentation
-palomino:/usr/local/stow#
+Marcel
 
 
-Path attached fixes the bug... by removing three lines of code that seem 
-to me not only a premature, but also bogus optimization :-(, that 
-prevent us to trying to return the first element of an empty gslist.
-
-However i'm not that familiar with that manager stuff and might be 
-wrong, so please double check that ;-)
-
-Cheers,
-
-Fabien
-
-
-
---------------070702050502060002000003
-Content-Type: text/plain;
- name="audio-plugin-crashbug-fix.diff"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="audio-plugin-crashbug-fix.diff"
-
---- manager.c.orig	2008-09-08 21:22:06.000000000 +0200
-+++ manager.c	2008-09-08 21:22:11.000000000 +0200
-@@ -999,9 +999,6 @@
- {
- 	GSList *l;
- 
--	if (!bacmp(bda, BDADDR_ANY) && !interface && !connected)
--		return devices->data;
--
- 	for (l = devices; l != NULL; l = l->next) {
- 		struct audio_device *dev = l->data;
- 
-
---------------070702050502060002000003
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
 Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
---------------070702050502060002000003
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---------------070702050502060002000003--
