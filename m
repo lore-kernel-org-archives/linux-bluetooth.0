@@ -2,12 +2,12 @@ Return-Path: <cyrus@holtmann.org>
 To: "Support for Openmoko Device Owners" <support@lists.openmoko.org>
 Subject: Intermittant bluetooth keyboard - more
 Cc: linux-bluetooth@vger.kernel.org
-From: Daniel Benoy <daniel.benoy@execulink.com>
-Date: Mon, 8 Sep 2008 13:25:35 -0400
+From: Daniel Benoy <daniel@benoy.name>
+Date: Mon, 8 Sep 2008 13:26:11 -0400
 MIME-Version: 1.0
 Content-Type: text/plain;
   charset="iso-8859-1"
-Message-Id: <200809081325.35266.daniel.benoy@execulink.com>
+Message-Id: <200809081326.11761.daniel@benoy.name>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
