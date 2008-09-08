@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48C562D4.9020005@free.fr>
-Date: Mon, 08 Sep 2008 19:37:24 +0200
+Message-ID: <48C561A2.10508@free.fr>
+Date: Mon, 08 Sep 2008 19:32:18 +0200
 From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <48C0E513.1040304@free.fr>
-	<1220633911.6714.86.camel@californication>
-In-Reply-To: <1220633911.6714.86.camel@californication>
-Subject: Re: [Bluez-devel] Some bluez-gnome 1.2 bugs
+References: <48BEE75C.9050008@free.fr> <E1Kc15h-0005JF-7V@thinkpad>
+In-Reply-To: <E1Kc15h-0005JF-7V@thinkpad>
+Subject: Re: [Bluez-devel] Sniff mode issues regarding Sony Ericsson
+ headsets: kernel patch proposal.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,45 +21,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> Hi Fabien,
-> 
->> I just started to play recently with bluez 4.x.
->>
->> I found at least two very annoying bugs in the bluez-gnome-1.2 wizard:
->>    - On my debian testing system,  the wizard does not allow me to enter
->> the pin code. The pin code just gets displayed a fraction of second an
->> then disappears. As a consequence the default 123456 pin code gets used
->> and pairing fails.
-> 
-> I am working on improving the PIN handling way, but at the same time I
-> have to make sure that it works with Simple Pairing and in the most
-> simple way. It is not that easy.
+Hi Brian,
 
-I just retried with the latest 1.3 release. This time i am able to pair 
-my headset. :-)
+This headset is supposed to work, the issue is that sometimes it can be 
+very slow to connect...
 
-> 
-> Also for some devices the PIN code needs to be random instead of 123456.
-> 
->>    - If i try to go back to the first wizard page where my bluetooth
->> device is displayed, it is already selected. I have no way to go to the
->> next page : the next button stays grey whatever i do. (screenshot attached).
-> 
-> Hold shift while selecting to unselect and then select again. I know
-> that this is broken.
-
-Looks you fixed that too :-).
-
-Thanks,
+Cheers,
 
 Fabien
 
 
+
+Brian Sammon wrote:
+> No wonder I couldn't get my HBH-DS980 to work!
 > 
-> Regards
-> 
-> Marcel
+> This kind of information belongs on the wiki.
+> I've created http://wiki.bluez.org/wiki/HardwareCompatibility
+> and http://wiki.bluez.org/wiki/MotorolaHBHDS9x0 as a start, but I don't really 
+> understand the issue, so it would be good if someone who understands it better 
+> could flesh out the wiki article.
 > 
 > 
 > 
