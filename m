@@ -1,13 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48C561A2.10508@free.fr>
-Date: Mon, 08 Sep 2008 19:32:18 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <48BEE75C.9050008@free.fr> <E1Kc15h-0005JF-7V@thinkpad>
-In-Reply-To: <E1Kc15h-0005JF-7V@thinkpad>
-Subject: Re: [Bluez-devel] Sniff mode issues regarding Sony Ericsson
- headsets: kernel patch proposal.
+In-Reply-To: <48C4E8E6.7090906@access-company.com>
+References: <48075B6A.2060308@access-company.com>
+	<1209058941.12684.37.camel@violet.holtmann.net>
+	<48355289.7070906@access-company.com>
+	<5D487EED-A2B2-4AEA-AA7B-9EC8681157C0@holtmann.org>
+	<48357D9C.9080009@access-company.com>	<486A6392.6080008@access-company.com>
+	<1218148463.7819.44.camel@californication>
+	<48C4E8E6.7090906@access-company.com>
+Date: Mon, 08 Sep 2008 11:32:14 +0200
+Message-Id: <1220866334.6714.142.camel@californication>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] [patch] BNEP/PAN Qualification issues
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,39 +26,32 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Brian,
+Hi Frederic,
 
-This headset is supposed to work, the issue is that sometimes it can be 
-very slow to connect...
+> Great you could start integrating.
+> Please find attached the remaining patches.
 
-Cheers,
+the 0001 patch contains an extra setup variable that is not used in the
+patch at all. Remove it from it.
 
-Fabien
+The 0002 patch mixes the non-understood changes with the setup changes.
+Also can we just use flags variable in the session instead of setup. The
+UUID handling could be done a little bit more elegant.
 
+What is the point behind 0003 patch?
 
+I think 0004 patch needs some cleanup. It looks too hackish.
 
-Brian Sammon wrote:
-> No wonder I couldn't get my HBH-DS980 to work!
-> 
-> This kind of information belongs on the wiki.
-> I've created http://wiki.bluez.org/wiki/HardwareCompatibility
-> and http://wiki.bluez.org/wiki/MotorolaHBHDS9x0 as a start, but I don't really 
-> understand the issue, so it would be good if someone who understands it better 
-> could flesh out the wiki article.
-> 
-> 
-> 
-> -------------------------------------------------------------------------
-> This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-> Build the coolest Linux based applications with Moblin SDK & win great prizes
-> Grand prize is a trip for two to an Open Source event anywhere in the world
-> http://moblin-contest.org/redirect.php?banner_id=100&url=/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
-> 
-> 
+The 0006 patch is not how we handle this. Either use the exported
+version number of the BNEP module or we have to add an ioctl for it.
+
+Please don't hijack a thread for this and send these patches one by one
+to linux-bluetooth@vger.kernel.org.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
