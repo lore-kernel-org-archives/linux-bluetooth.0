@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1220456996.6714.46.camel@californication>
-References: <1220456996.6714.46.camel@californication>
-Date: Tue, 09 Sep 2008 01:29:56 +0100
-Message-Id: <1220920196.24928.39.camel@cookie.hadess.net>
+In-Reply-To: <1220904984.8005.8.camel@pancake.floe.gotdns.org>
+References: <1220904984.8005.8.camel@pancake.floe.gotdns.org>
+Date: Mon, 08 Sep 2008 21:38:48 +0100
+Message-Id: <1220906328.24928.9.camel@cookie.hadess.net>
 Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Closing down the mailing lists at SourceForge
+Subject: Re: [Bluez-devel] Can't connect to Trust Bluetooth mouse..
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,31 +20,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Wed, 2008-09-03 at 17:49 +0200, Marcel Holtmann wrote:
-> Hi Folks,
+On Mon, 2008-09-08 at 22:16 +0200, Florian Echtler wrote:
+> Hello everyone,
+> 
+> I just bought a Trust Bluetooth Mouse 15351. However, I can't connect to
+> it via bluez-gnome, nor via hcitool. Here's what hcidump shows when I
+> try:
 <snip>
-> The last step is to close down the mailing list served by SourceForge. I
-> was always disappointed with their email service. It was slow, full of
-> spam and sometimes broken for days. I simply don't believe in having
-> subscriber only mailing lists. This is not how open source should be
-> done. Some time ago we created linux-bluetooth@vger.kernel.org since the
-> mail admins at kernel.org really know what they are doing. We are
-> already using this for the kernel development and in the future this
-> will become the only mailing list.
+> Unfortunately, I have to admit I can't really make sense out of this,
+> except that it seems that the mouse terminates the connection after the
+> "Remote Name Request" command.. I have bluez 3.36 installed.
+> 
+> Could anybody give me a hint?
 
-http://vger.kernel.org/vger-lists.html#linux-bluetooth
+In my experience with a similarly cheap Trust mouse, my advice is:
+change the batteries to known working ones, check that they make contact
+properly.
 
-<snip>
-> The announcement mailing list has been quiet for some time now. With the
-> new www.bluez.org website we do have a proper RSS enabled blog. Please
-> use that one if you wanna stay up-to-date with releases and other
-> important information.
-
-The RSS feed isn't mentioned anywhere in the page, only in the source,
-which is alright if you use Firefox:
-http://www.bluez.org/feed/
-
-Cheers
+I'm lucky the one I bought was just a test mouse, not something I'd
+really use...
 
 
 -------------------------------------------------------------------------
