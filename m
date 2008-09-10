@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <f7f1f99b0809132042w25abc645y19f68e215ed6902c@mail.gmail.com>
-Date: Sun, 14 Sep 2008 11:42:41 +0800
-From: "Mark Leo" <mark9.lee@gmail.com>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <mailman.0.1221363360.11907.bluez-users@lists.sourceforge.net>
-MIME-Version: 1.0
-References: <mailman.0.1221363360.11907.bluez-users@lists.sourceforge.net>
-Subject: Re: [Bluez-users] confirm bda0174cd7dd79a78545a6772d174111f338d378
+Date: Wed, 10 Sep 2008 17:50:55 +0100
+From: "wolf@hivenetworks.net" <wolf@hivenetworks.net>
+To: bluez-users@lists.sourceforge.net
+Message-ID: <20080910175055.2d1586e1@mordor>
+Mime-Version: 1.0
+Subject: [Bluez-users] multiple OBEX PUSH connections
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,67 +14,47 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1958050066=="
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1958050066==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_127329_4542316.1221363761852"
+hello.
 
-------=_Part_127329_4542316.1221363761852
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+this question might reveal my ignorance of the underlying
+protocol but i was wondering if (and how) i can establish 
+to obexpush connections to different target devices through 
+one bluetooth device.
 
-Hello,evryone,
-When I ported the Bluez to ARM, can't do pairing because Dbus can't start:
-*/etc/rc2.d/S20dbus start*
- Who can send me one shell file for start  dbus,such as:* /etc/rc2.d/S20dbus
-*
-**
-Thanks
+when i have one device hci0 and try to push a file
+(e.g. using ussp-push) to different devices simultanously
 
-Mark
+# ussp-push /dev/rfcomm1 foobar.jpg thanks.jpg 
+# ussp-push /dev/rfcomm1 foobar.jpg thanks.jpg 
 
-------=_Part_127329_4542316.1221363761852
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+i will get:
 
-<div dir="ltr"><div>Hello,evryone, </div>
-<div>When I ported the Bluez to ARM, can&#39;t do pairing&nbsp;because Dbus can&#39;t start:</div>
-<div><em><strong>/etc/rc2.d/S20dbus start</strong></em></div>
-<div>&nbsp;Who can send me one shell file for start&nbsp; dbus,such as:<em><strong> /etc/rc2.d/S20dbus</strong></em></div>
-<div><strong><em></em></strong>&nbsp;</div>
-<div>Thanks</div>
-<div>&nbsp;</div>
-<div>Mark</div>
-<div>&nbsp;</div></div>
+Can' t open tty: Too many links
+Error while doing OBEX_HandleInput()
+__obex_connect: error=-1
+Unable to connect to the server
+Error
 
-------=_Part_127329_4542316.1221363761852--
+i just give ussp-push as an example here, seems to be a problem
+with other tools as well.
 
+im asking this here because i actaully wonder what is causing this 
+problem hier? is it the way bluetooth works itself? or is
+it a limitation i could work around on the software side?
 
---===============1958050066==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+thanks,
+wolf.
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
 Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
---===============1958050066==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1958050066==--
