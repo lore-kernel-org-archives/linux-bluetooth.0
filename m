@@ -1,11 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
+From: Florian Echtler <floe@butterbrot.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="=-78eV+lJnfIzEJ2iyNBo+"
-Date: Fri, 12 Sep 2008 18:25:07 +0100
-Message-Id: <1221240307.24928.279.camel@cookie.hadess.net>
+In-Reply-To: <1221203646.4280.5.camel@bernd.floe.gotdns.org>
+References: <1220904984.8005.8.camel@pancake.floe.gotdns.org>
+	<1220906328.24928.9.camel@cookie.hadess.net>
+	<1221203646.4280.5.camel@bernd.floe.gotdns.org>
+Date: Fri, 12 Sep 2008 09:22:47 +0200
+Message-Id: <1221204167.4280.8.camel@bernd.floe.gotdns.org>
 Mime-Version: 1.0
-Subject: [Bluez-devel] Couple of patches for bluez/bluez-gnome
+Subject: Re: [Bluez-devel] Can't connect to Trust Bluetooth mouse..
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,139 +18,55 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0699999958=="
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 
---=-78eV+lJnfIzEJ2iyNBo+
+--===============0699999958==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="=-/a5I7rVFBdmsNVhz/DgF"
+
+
+--=-/a5I7rVFBdmsNVhz/DgF
 Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-Cheers
+> And nothing else anymore, even after I click the connect button. Just an
+> empty window labeled "connecting to device..", but nothing else happens
+> (especially no bluetooth communication). In the console,
+> bluetooth-properties shows:
+>=20
+> ** (bluetooth-properties:7171): CRITICAL **: dbus_g_proxy_begin_call:
+> assertion `DBUS_IS_G_PROXY (proxy)' failed
+>=20
+> So I'm getting suspicious that this is in fact a DBus problem.. any
+> ideas?
+P.S. When I try to connect from the command line (using the commands
+from http://wiki.bluez.org/wiki/HOWTO/InputDevices), the connection and
+the mouse work! So I'm starting to get really confused now, the problem
+seems to be in bluetooth-properties itself.. ?
 
---=-78eV+lJnfIzEJ2iyNBo+
-Content-Disposition: attachment;
-	filename=0001-Reorder-popup-menu-and-clarify-some-menu-items.patch
-Content-Type: application/mbox;
-	name=0001-Reorder-popup-menu-and-clarify-some-menu-items.patch
-Content-Transfer-Encoding: 7bit
+Yours, Florian
 
->>From 61e758711e81804514c999bf08d278858aa01705 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Fri, 12 Sep 2008 17:32:00 +0100
-Subject: [PATCH] Reorder popup menu, and clarify some menu items
+--=-/a5I7rVFBdmsNVhz/DgF
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: Dies ist ein digital signierter Nachrichtenteil
 
-* Reorder the menu to have the about menu item at the bottom (I'd remove
-it completely, as the properties window should already have credits in
-the UI itself)
-* Add ellipsis for menu items that open up new dialogues
-* Make sure that "browse device" is clarified as browsing for files, all
-the users seem to be mistaken thinking it might pairing their audio
-headsets...
-* Remove a separator, there's enough of them as it is
----
- applet/main.c |   20 +++++++++-----------
- 1 files changed, 9 insertions(+), 11 deletions(-)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.9 (GNU/Linux)
 
-diff --git a/applet/main.c b/applet/main.c
-index 8dec5a6..5cf6a18 100644
---- a/applet/main.c
-+++ b/applet/main.c
-@@ -183,7 +183,7 @@ static void browse_callback(GObject *widget, gpointer user_data)
- 	GtkWidget *dialog;
- 	GtkWidget *selector;
- 
--	dialog = gtk_dialog_new_with_buttons(_("Browse Devices"),
-+	dialog = gtk_dialog_new_with_buttons(_("Browse Files on Device"),
- 				NULL, GTK_DIALOG_NO_SEPARATOR,
- 				GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
- 				GTK_STOCK_CONNECT, GTK_RESPONSE_ACCEPT, NULL);
-@@ -285,12 +285,6 @@ static GtkWidget *create_popupmenu(void)
- 	gtk_widget_show(item);
- 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
- 
--	item = gtk_image_menu_item_new_from_stock(GTK_STOCK_ABOUT, NULL);
--	g_signal_connect(item, "activate",
--				G_CALLBACK(about_callback), NULL);
--	gtk_widget_show(item);
--	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
--
- 	item = gtk_separator_menu_item_new();
- 	gtk_widget_show(item);
- 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-@@ -302,9 +296,8 @@ static GtkWidget *create_popupmenu(void)
- 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
- 
- 	menuitem_sendto = item;
--
- #if 0
--	item = gtk_image_menu_item_new_with_label(_("Browse Device..."));
-+	item = gtk_image_menu_item_new_with_label(_("Browse files on device..."));
- 	g_signal_connect(item, "activate",
- 				G_CALLBACK(browse_callback), NULL);
- 	gtk_widget_show(item);
-@@ -312,14 +305,19 @@ static GtkWidget *create_popupmenu(void)
- 
- 	menuitem_browse = item;
- #endif
-+	item = gtk_menu_item_new_with_label(_("Setup new device.."));
-+	g_signal_connect(item, "activate",
-+				G_CALLBACK(wizard_callback), NULL);
-+	gtk_widget_show(item);
-+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
- 
- 	item = gtk_separator_menu_item_new();
- 	gtk_widget_show(item);
- 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
- 
--	item = gtk_menu_item_new_with_label(_("Setup New Device"));
-+	item = gtk_image_menu_item_new_from_stock(GTK_STOCK_ABOUT, NULL);
- 	g_signal_connect(item, "activate",
--				G_CALLBACK(wizard_callback), NULL);
-+				G_CALLBACK(about_callback), NULL);
- 	gtk_widget_show(item);
- 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
- 
--- 
-1.6.0.1
+iEYEABECAAYFAkjKGMcACgkQ7CzyshGvathGCACgladd3I0y3lI58stNJ4mxeJqz
+9zUAoKZvWIf3x/Ob+1MXNJjwG0uesrmF
+=FOn1
+-----END PGP SIGNATURE-----
+
+--=-/a5I7rVFBdmsNVhz/DgF--
 
 
---=-78eV+lJnfIzEJ2iyNBo+
-Content-Disposition: attachment;
-	filename=0001-Fix-the-adapter-name-never-getting-saved.patch
-Content-Type: application/mbox;
-	name=0001-Fix-the-adapter-name-never-getting-saved.patch
-Content-Transfer-Encoding: 7bit
 
->>From dfc9c609513799087f506fa7d236033a79dac407 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Fri, 12 Sep 2008 17:15:01 +0100
-Subject: [PATCH] Fix the adapter name never getting saved
-
-Unless you modify the adapter name, it will never be saved on startup,
-and bluez-gnome will get an empty adapter name.
----
- src/adapter.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
-
-diff --git a/src/adapter.c b/src/adapter.c
-index 301fb36..ac41c7e 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2401,6 +2401,8 @@ int adapter_start(struct btd_adapter *adapter)
- 
- 	memcpy(dev->name, name, 248);
- 
-+	write_local_name(&di.bdaddr, name);
-+
- 	if (!(features[6] & LMP_SIMPLE_PAIR))
- 		goto setup;
- 
--- 
-1.6.0.1
-
-
---=-78eV+lJnfIzEJ2iyNBo+
+--===============0699999958==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -158,7 +77,7 @@ This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
 Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
---=-78eV+lJnfIzEJ2iyNBo+
+--===============0699999958==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -169,4 +88,4 @@ Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
 
---=-78eV+lJnfIzEJ2iyNBo+--
+--===============0699999958==--
