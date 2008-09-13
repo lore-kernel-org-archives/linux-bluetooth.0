@@ -1,13 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48CC195A.8000106@free.fr>
-Date: Sat, 13 Sep 2008 21:49:46 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
+Message-ID: <d89ddf300809131212h2e1fbfb6k4d4d50763b2a0299@mail.gmail.com>
+Date: Sat, 13 Sep 2008 13:12:15 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <f21e7dc80809131154s7d0b7e99t23201743f65e1f50@mail.gmail.com>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <48CBE24E.6080507@free.fr>
-	<1221325424.6695.45.camel@californication>
-In-Reply-To: <1221325424.6695.45.camel@californication>
-Subject: Re: [Bluez-devel] Some Audio error handling fixes.
+References: <f21e7dc80809131026g15f66f3eq81980dc507607065@mail.gmail.com>
+	<1221330440.6695.53.camel@californication>
+	<f21e7dc80809131132udb89654hf2b76149b4b03203@mail.gmail.com>
+	<1221331676.6695.55.camel@californication>
+	<f21e7dc80809131154s7d0b7e99t23201743f65e1f50@mail.gmail.com>
+Subject: Re: [Bluez-devel] A2DP over DBUS
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,50 +24,25 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Choi
 
-> 
-> actually the convention is that if it is a return value, then we use a
-> negative error value. If it is a parameter, we use the positive one. So
-> the connection_lost change is wrong (it was wrong before though). Please
-> fix this too.
+> That's interesting. What about platforms like Android that are only
+> Java (If I am not wrong) ? Can they connect directly to those sockets
+> from Java applications ?
 
-Ok, that might be quite a huge patch though... it has been that way for 
-so long... virtually every function will be impacted :-(
+Check the android API docs. I'd heard the API for bluetooth was
+incomplete in the latest android but I haven't read up.
 
-> 
->> While reading the latest code, i noticed common/error.{c, h} is gone...
->> There's a new one in src/, but with only one generic
->> error handling routine. I have the feeling this is a big step backwards,
->> as DBUS error names get duplicated into each service
->> again and again, paving the way for un unmanageable level of error
->> strings fragmentation :-( What do you guys think ?
-> 
-> It is not a big step backwards since we are using libgdbus error
-> functions now and there are more simpler. There is a problem with the
-> strings returned for a specific error, but I don't really thing it is
-> that big of a problem.
+The sun embedded java APIs specify a way to run L2CAP (at least) using
+java. Can't remember about SCO. Android breaks with the sun API (for
+good reason).
 
-Ok i see the thing now. By that i guess that all error handling outside 
-of g_dbus_create_error are on their way out ?
+The right way to do it in android would be integrating the bt audio
+services with their multimedia hooks, so you wouldn't deal with the
+underlying implementation.
 
-I guess those ones should be replaced with g_dbus equivalents ?
-./src/adapter.c:static DBusHandlerResult error_failed(DBusConnection *conn,
-
-./src/adapter.c:static DBusHandlerResult 
-error_connection_attempt_failed(DBusConnection *conn,
-
-
-> 
-> In the long term we might get btd_error_* or alike functions since then
-> the plugins can use them. However right now every plugin has to handle
-> its own errors.
-> 
-Thanks for the explanation,
-
-Cheers,
-
-Fabien
+-- 
+Brad
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
