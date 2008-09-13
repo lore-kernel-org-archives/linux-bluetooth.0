@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <f21e7dc80809131026g15f66f3eq81980dc507607065@mail.gmail.com>
-Date: Sat, 13 Sep 2008 20:26:56 +0300
-From: "Choi Sonim" <choisonim@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-MIME-Version: 1.0
-Subject: [Bluez-devel] A2DP over DBUS
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <89b6ba3a0809130753w372172cbv730836fee3390c0e@mail.gmail.com>
+References: <89b6ba3a0809130749m74d1fe79y42d00b802238757d@mail.gmail.com>
+	<89b6ba3a0809130753w372172cbv730836fee3390c0e@mail.gmail.com>
+Date: Sat, 13 Sep 2008 19:07:42 +0200
+Message-Id: <1221325662.6695.47.camel@californication>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Use proper categories for desktop file
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,15 +21,18 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi all,
+Hi Patryk,
 
-I have a question about how Bluez works with A2DP over DBUS.
+> bluetooth-properties.desktop should list GTK;GNOME;Settings;HardwareSettings; as
+> categories.
 
-How does the application sends the data packets (the actual music) to
-bluez ? via dbus ? isn't this slow ?
+I included a patch for it. Thanks.
 
-thank you all,
-Choi
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
