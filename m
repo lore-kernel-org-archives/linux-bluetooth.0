@@ -1,44 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <2d5a2c100809121946g4c485792i485b8771f9813823@mail.gmail.com>
+Date: Fri, 12 Sep 2008 23:46:02 -0300
+From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+To: "David Woodhouse" <dwmw2@infradead.org>
 Subject: Re: Input pairing broken again
-From: David Woodhouse <dwmw2@infradead.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <2d5a2c100809121946g4c485792i485b8771f9813823@mail.gmail.com>
+In-Reply-To: <1221273507.10249.20.camel@macbook.infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 References: <1221265310.10249.10.camel@macbook.infradead.org>
 	 <1221272245.10249.18.camel@macbook.infradead.org>
 	 <1221273507.10249.20.camel@macbook.infradead.org>
-	 <2d5a2c100809121946g4c485792i485b8771f9813823@mail.gmail.com>
-Content-Type: text/plain
-Date: Fri, 12 Sep 2008 19:52:53 -0700
-Message-Id: <1221274373.10249.25.camel@macbook.infradead.org>
-Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2008-09-12 at 23:46 -0300, Luiz Augusto von Dentz wrote:
-> Both seems good, but please use debug instead of printf. Btw does your
-> first patch solves the problem?
+Both seems good, but please use debug instead of printf. Btw does your
+first patch solves the problem?
 
-Oops. I meant to remove the printf before I sent the patch :)
+On Fri, Sep 12, 2008 at 11:38 PM, David Woodhouse <dwmw2@infradead.org> wrote:
+> While we're at it, let's fix init_browse() not to abort completely when
+> it finds one driver asking for a UUID that another driver already
+> wanted, and to eliminate duplicates of the UUIDs in uuid_list[] too...
+>
+> diff --git a/src/device.c b/src/device.c
+> index b90861b..cae29f8 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -1022,11 +1023,29 @@ static void init_browse(struct browse_req *req)
+>
+>                for (i = 0; driver->uuids[i]; i++) {
+>                        char *uuid;
+> -
+> +                       int j;
+> +
+> +                       /* Eliminate duplicates of UUIDs in uuid_list[]... */
+> +                       if (strlen(driver->uuids[i]) == 36 &&
+> +                           !strncmp(driver->uuids[i], "0000", 4) &&
+> +                           !strcasecmp(driver->uuids[i] + 8,
+> +                                       "-0000-1000-8000-00805F9B34FB")) {
+> +                               uint16_t uuid16 = strtol(driver->uuids[i],
+> +                                                        NULL, 16);
+> +                               for (j = 0; uuid_list[j]; j++) {
+> +                                       if (uuid16 == uuid_list[j])
+> +                                               continue;
+> +                               }
+> +
+> +                       }
+> +                       /* ... and of UUIDs another driver already asked for */
+>                        if (g_slist_find_custom(req->uuids, driver->uuids[i],
+> -                                       (GCompareFunc) strcasecmp))
+> -                               return;
+> -
+> +                                               (GCompareFunc) strcasecmp)) {
+> +                               printf("match on %s: return\n", driver->uuids[i]);
+> +                               continue;
+> +                       }
+> +                       printf("Add uuid %s for driver %s\n",
+> +                              driver->uuids[i], driver->name);
+>                        uuid = g_strdup(driver->uuids[i]);
+>                        req->uuids = g_slist_append(req->uuids, uuid);
+>                }
+>
+> --
+> David Woodhouse                            Open Source Technology Centre
+> David.Woodhouse@intel.com                              Intel Corporation
+>
+>
 
-Have committed both to git://git.infradead.org/~dwmw2/bluez.git without
-the printf.
 
-Before my first patch, look closely at the handling of req->search_uuid
-in browse_cb().
-
-Note that it's incremented _every_ time we end up back in browse_cb().
-
-Even when we've already finished going through the uuid_list[] array,
-and we're supposed to be iterating through req->uuids.
-
-So what happens is we handle everything in the uuid_list[] until we
-reach the zero at the end. Then we handle the first item from
-req->uuids, then we trawl through the memory _after_ uuid_list[],
-treating it as more uuids to search for until we reach another zero.
-Then we handle the second item from req->uuids, then...
 
 -- 
-David Woodhouse                            Open Source Technology Centre
-David.Woodhouse@intel.com                              Intel Corporation
-
+Luiz Augusto von Dentz
+Engenheiro de Computação
