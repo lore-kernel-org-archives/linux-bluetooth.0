@@ -1,14 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48CC0FA7.8050608@free.fr>
-Date: Sat, 13 Sep 2008 21:08:23 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
+Message-ID: <f21e7dc80809131154s7d0b7e99t23201743f65e1f50@mail.gmail.com>
+Date: Sat, 13 Sep 2008 21:54:55 +0300
+From: "Choi Sonim" <choisonim@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1221331676.6695.55.camel@californication>
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <48CBE24E.6080507@free.fr>
-	<2d5a2c100809130912td49e70idede84fb148e2a21@mail.gmail.com>
-In-Reply-To: <2d5a2c100809130912td49e70idede84fb148e2a21@mail.gmail.com>
-Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: Re: [Bluez-devel] Some Audio error handling fixes.
+References: <f21e7dc80809131026g15f66f3eq81980dc507607065@mail.gmail.com>
+	<1221330440.6695.53.camel@californication>
+	<f21e7dc80809131132udb89654hf2b76149b4b03203@mail.gmail.com>
+	<1221331676.6695.55.camel@californication>
+Subject: Re: [Bluez-devel] A2DP over DBUS
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,21 +23,40 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Luiz,
+Hi Marcel,
 
-Thanks for the quick answer,
+On Sat, Sep 13, 2008 at 9:47 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Can you please explain briefly what's the underlying method that the
+>> plugin uses to send the data to bluez then ? does it directly uses
+>> sockets and sends it to the kernel ?
+>
+> direct SCO or L2CAP sockets to have a low latency and to avoid copying
+> data around.
 
-I'm gonna have a look to that right away...
+That's interesting. What about platforms like Android that are only
+Java (If I am not wrong) ? Can they connect directly to those sockets
+from Java applications ?
 
-Fabien
+Thank you a lot
+Choi
 
-> Hi,
-> 
-> Looks good to me, can you configure a git tree to pull from? If you
-> don't have a host you can use http://gitorious.org/projects/bluez,
-> just create an account and clone repository.
-> 
-
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
+> Build the coolest Linux based applications with Moblin SDK & win great prizes
+> Grand prize is a trip for two to an Open Source event anywhere in the world
+> http://moblin-contest.org/redirect.php?banner_id=100&url=/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
