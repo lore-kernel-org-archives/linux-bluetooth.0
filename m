@@ -1,78 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <f7f1f99b0809160648q34f551c3sb0607a37ff16a9ef@mail.gmail.com>
-Date: Tue, 16 Sep 2008 21:48:21 +0800
-From: "Mark Leo" <mark9.lee@gmail.com>
-To: bluez-devel@lists.sourceforge.net
+Message-ID: <48CCE0AF.1090008@free.fr>
+Date: Sun, 14 Sep 2008 12:00:15 +0200
+From: Fabien Chevalier <fabchevalier@free.fr>
 MIME-Version: 1.0
-Subject: [Bluez-devel] BT bond issue!
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1301085776=="
-Sender: bluez-devel-bounces@lists.sourceforge.net
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Sniff mode issues regarding	Sony	Ericsson	headsets:
+ kernel	patch proposal.
+References: <48BEE75C.9050008@free.fr>	 <1220471377.6714.52.camel@californication>  <48CC2BEE.7020207@free.fr>	 <1221350729.6695.72.camel@californication>  <48CCCA22.5090001@free.fr> <1221384171.6695.85.camel@californication>
+In-Reply-To: <1221384171.6695.85.camel@californication>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+List-ID: <bluez-devel.lists.sourceforge.net>
 
---===============1301085776==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_6357_27610502.1221572901903"
+Hi Marcel,
 
-------=_Part_6357_27610502.1221572901903
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+>>>> Here are patches against 2.6.27-rc6 and latest bluez git that add 
+>>>> support for point 1 below.
+>>> problem with these patches is that they are a layer violation between
+>>> L2CAP and HCI. 
+>> Yes that is true but that is nothing that isn't already existing. Same 
+>> trick is used for L2CAP_CONNINFO.
+> 
+> no they don't. Look at the code. It is nicely abstracted on how we
+> handle the two layers.
 
-Hello,everyone:
-I'm porting BLuez to embedded Linux 2.6.21, the remote BT device can be
-scan, but the device can't be bonded with passkey_agent, the reason is:can't
-find dbus config shell to start up it, who can send me one?
-Is here another solution to do the BT bond at BlueZ?
-Thanks.
-BRs
-Mark
+Having a closer look to the code, it looks that only write access to HCI 
+layer variables is forbidden. There are numerous places in the code 
+where L2CAP for instance goes and peeks some HCI values. I think i 
+skipped that distinction in my first understanding of the code.
 
-------=_Part_6357_27610502.1221572901903
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Anyway, i'm gonna stop chatting and starting to fix that too :-).
 
-<div dir="ltr"><div>Hello,everyone:</div>
-<div>I&#39;m porting BLuez to embedded Linux 2.6.21, the remote BT device can be scan, but the device can&#39;t be bonded with passkey_agent, the reason is:can&#39;t find&nbsp;dbus&nbsp;config shell to start up it, who can send me one?</div>
+> 
+>>> It should also work on incoming and outgoing connections
+>>> the same way. 
+>> I'm not following you there...
+> 
+> We wanna be able to set this on a server socket and also enforce it on a
+> connection we created.
+> 
+>>> Also when using socket options, I prefer that we set them
+>>> and store the value and the execute it once the connections is up.
+>> Agreed. I was just too lazy to do that :-)
+> 
+> Lazy doesn't get it upstream :)
 
-<div>Is here another solution to do the BT bond at BlueZ?</div>
-<div>Thanks.</div>
-<div>BRs</div>
-<div>Mark</div>
-<div>&nbsp;</div></div>
+lol :-)
 
-------=_Part_6357_27610502.1221572901903--
+> 
+>>> Personally I prefer if we would enhance hci_send_acl() to indicate that
+>>> we expect it got get out of any power state before processing this data
+>>> packet.
+>>>
 
+That sounds reasonable...
 
---===============1301085776==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+>>> And of course this socket option also has to work for RFCOMM.
+>> That's pretty much useless as i don't know if that will ever get used.
+>> However that's not much work, i can do it if that makes you happy. ;-)
+> 
+> I treat RFCOMM and L2CAP the same. If we implement something for one
+> protocol, we do have to do the same for the other.
+> 
+>> Do you have any comments on the user-land side or is it how you see things ?
+> 
+> Actually I do have to figure out the exact naming, but it is basically
+> set this option once approach. And the kernel will do the rest.
+> 
+Agreed.
 
--------------------------------------------------------------------------
-This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great prizes
-Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=100&url=/
---===============1301085776==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+So i'm gonna start coding now to see of things are going...
 
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
+Cheers,
 
---===============1301085776==--
+Fabien
