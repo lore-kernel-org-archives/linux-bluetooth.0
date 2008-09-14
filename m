@@ -1,13 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48CCC7CE.2000400@free.fr>
-Date: Sun, 14 Sep 2008 10:14:06 +0200
-From: Fabien Chevalier <fabchevalier@free.fr>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <48CBE24E.6080507@free.fr> <48CC2789.6010203@free.fr>
-	<1221339462.6695.62.camel@californication>
-In-Reply-To: <1221339462.6695.62.camel@californication>
-Subject: Re: [Bluez-devel] Some Audio error handling fixes.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Fabien Chevalier <fabchevalier@free.fr>
+In-Reply-To: <48CC2BEE.7020207@free.fr>
+References: <48BEE75C.9050008@free.fr>
+	<1220471377.6714.52.camel@californication> <48CC2BEE.7020207@free.fr>
+Date: Sun, 14 Sep 2008 02:05:29 +0200
+Message-Id: <1221350729.6695.72.camel@californication>
+Mime-Version: 1.0
+Cc: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] Sniff mode issues regarding
+	Sony	Ericsson	headsets: kernel	patch proposal.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,29 +23,27 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-devel-bounces@lists.sourceforge.net
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Marcel,
+Hi Fabien,
 
-> Hi Fabien,
-> 
->> Updated patchset attached !
-> 
-> does connection_lost() handles a positive error message properly?
+> Here are patches against 2.6.27-rc6 and latest bluez git that add 
+> support for point 1 below.
 
-Yes. This is the change line 30 of the patch.
-Only thing connection_lost does is call finalize_discovery().
+problem with these patches is that they are a layer violation between
+L2CAP and HCI. It should also work on incoming and outgoing connections
+the same way. Also when using socket options, I prefer that we set them
+and store the value and the execute it once the connections is up.
 
-> 
->> Luiz: I tried to find some doc to get started on gitorious but didn't 
->> found any... how to i create my remote clone ?
-> 
-> I would prefer having a tree to pull from, because that makes my life a
-> lot easier.
+Personally I prefer if we would enhance hci_send_acl() to indicate that
+we expect it got get out of any power state before processing this data
+packet.
 
-I'm on it... :-)
+And of course this socket option also has to work for RFCOMM.
 
-Regards,
+Regards
 
-Fabien
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
