@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
+From: Dirk Vornheder <dirk_vornheder@yahoo.de>
 To: bluez-users@lists.sourceforge.net
-To: bluez-users@lists.sourceforge.net
-Date: Tue, 16 Sep 2008 12:46:50 +0100
-Message-ID: <YCQ6BUzm.1221565610.4609910.fma@alezan.org>
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric?= <frederic.mantegazza@gbiloba.org>
+Date: Mon, 15 Sep 2008 23:16:25 +0200
 MIME-Version: 1.0
-Subject: [Bluez-users] Issue with discover_devices() in PyGTK GUI
+Message-Id: <200809152316.25937.dirk_vornheder@yahoo.de>
+Subject: [Bluez-users] bluez 4.6 and undefined symbols
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,46 +14,46 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+Hi !
 
-Hello,
+After installing bluez 4.6 i get the following messages during boot
 
-In my PyGTK app., I want to retreive available bluetooth devices. I try
-to use discover_devices(), without success. I always get:
+Sep 15 22:16:43 pcneu hcid[5034]: Bluetooth HCI daemon
+Sep 15 22:16:43 pcneu hcid[5034]: Starting SDP server
+Sep 15 22:16:43 pcneu hcid[5034]: Can't load plugin: 
+/usr/lib/bluetooth/plugins/network.so: undefined symbol: device_get_path
+Sep 15 22:16:43 pcneu hcid[5034]: Can't load plugin: 
+/usr/lib/bluetooth/plugins/service.so: undefined symbol: adapter_get_path
+Sep 15 22:16:43 pcneu hcid[5034]: Can't load plugin: 
+/usr/lib/bluetooth/plugins/input.so: undefined symbol: device_get_path
+Sep 15 22:16:43 pcneu hcid[5034]: Can't load plugin: 
+/usr/lib/bluetooth/plugins/serial.so: undefined symbol: device_get_path
+Sep 15 22:16:43 pcneu hcid[5034]: Can't load plugin: 
+/usr/lib/bluetooth/plugins/audio.so: undefined symbol: device_get_path
+Sep 15 22:16:43 pcneu hcid[5034]: HCI dev 0 registered
+Sep 15 22:16:43 pcneu hcid[5034]: HCI dev 0 up
+Sep 15 22:16:43 pcneu hcid[5034]: Device hci0 has been added
+Sep 15 22:16:43 pcneu hcid[5034]: Starting security manager 0
 
-Traceback (most recent call last):
-  File
-"/home/fma/develop/papywizard/trunk/papywizard/controller/bluetoothChooserC=
-ontroller.py",
-line 123, in refreshView
-    devices =3D bluetooth.discover_devices(lookup_names=3DTrue)
-  File "/usr/lib/python2.5/site-packages/bluetooth/bluez.py", line 17,
-in discover_devices
-    sock =3D _gethcisock ()
-  File "/usr/lib/python2.5/site-packages/bluetooth/bluez.py", line 226,
-in _gethcisock
-    raise BluetoothError ("error accessing bluetooth device")
-BluetoothError: error accessing bluetooth device
+I use openSUSE 11.0 and Kernel 2.6.27rc6 !
 
-But it only occurs from the PyGTK app; it works fine from ipython...
+Dirk
 
-Are there some know issues with graphical toolkits? Is it a threading
-process (the function id called in a dialog, from the main loop of gtk)?
 
-Thanks,
+		
+___________________________________________________________ 
+Telefonate ohne weitere Kosten vom PC zum PC: http://messenger.yahoo.de
 
---
-   Fr=E9d=E9ric
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great priz=
-es
+Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
