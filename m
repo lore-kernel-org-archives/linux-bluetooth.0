@@ -1,49 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: btusb suspend/resume bug...
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Miller <davem@davemloft.net>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-In-Reply-To: <20080916.155123.181085856.davem@davemloft.net>
-References: <20080916.155123.181085856.davem@davemloft.net>
-Content-Type: text/plain
-Date: Wed, 17 Sep 2008 18:17:49 +0200
-Message-Id: <1221668269.6782.8.camel@californication>
+Date: Tue, 16 Sep 2008 15:51:23 -0700 (PDT)
+Message-Id: <20080916.155123.181085856.davem@davemloft.net>
+To: marcel@holtmann.org
+CC: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: btusb suspend/resume bug...
+From: David Miller <davem@davemloft.net>
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
 
-> Marcel, others, please bring some kind of closure to this
-> regression list entry:
-> 
-> Bug-Entry	: http://bugzilla.kernel.org/show_bug.cgi?id=11442
-> Subject		: btusb hibernation/suspend breakage in current -git
-> Submitter	: Rafael J. Wysocki <rjw@sisk.pl>
-> Date		: 2008-08-25 11:37 (19 days old)
-> References	: http://marc.info/?l=linux-bluetooth&m=121966402012074&w=4
-> Handled-By	: Oliver Neukum <oliver@neukum.org>
-> Patch		: http://marc.info/?l=linux-bluetooth&m=121967226027323&w=4
-> 
-> There is a patch, it is tested, so the only course of action at
-> this point is to merge the fix or declare that this really isn't
-> a regression.
-> 
-> My impression is the later, because the driver btusb is replacing
-> doesn't handle suspend/resume either.  Isn't that right?
+Marcel, others, please bring some kind of closure to this
+regression list entry:
 
-the original patch that I had was expecting changes in the USB subsystem
-that I deemed to much at this point. However Oliver got a patch that
-would make it work without the USB changes. I am still testing it.
+Bug-Entry	: http://bugzilla.kernel.org/show_bug.cgi?id=11442
+Subject		: btusb hibernation/suspend breakage in current -git
+Submitter	: Rafael J. Wysocki <rjw@sisk.pl>
+Date		: 2008-08-25 11:37 (19 days old)
+References	: http://marc.info/?l=linux-bluetooth&m=121966402012074&w=4
+Handled-By	: Oliver Neukum <oliver@neukum.org>
+Patch		: http://marc.info/?l=linux-bluetooth&m=121967226027323&w=4
 
-Let me see if I get some free minutes during the PlumbersConf to get
-this fully tested.
+There is a patch, it is tested, so the only course of action at
+this point is to merge the fix or declare that this really isn't
+a regression.
 
-Actually hci_usb is handling suspend/resume to some degree. So we could
-count this as regression.
-
-Regards
-
-Marcel
-
-
+My impression is the later, because the driver btusb is replacing
+doesn't handle suspend/resume either.  Isn't that right?
