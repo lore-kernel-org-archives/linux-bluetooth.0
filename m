@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BLU127-W448E17AE87F57A18021F6B884C0@phx.gbl>
-From: peng sss <sara200t@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Wed, 17 Sep 2008 11:12:21 -0600
+Message-ID: <8c7950360809160950m35e259e0r76d1dac49be67d1b@mail.gmail.com>
+Date: Tue, 16 Sep 2008 12:50:54 -0400
+From: "Shane Volpe" <shanevolpe@gmail.com>
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
 MIME-Version: 1.0
-Subject: [Bluez-users] Is it possible to send a message to an unconnected
- device. (from Newbie)
+Subject: [Bluez-users] Help with setting up NAP
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -19,16 +18,44 @@ Content-Type: text/plain; charset="us-ascii"
 Sender: bluez-users-bounces@lists.sourceforge.net
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
+I'm trying to understand the best way to set up a device as a NAP.
+The old way I performed this was by using pand with the following
+options:
+PAND_OPTIONS=" --secure --listen --master --role  NAP
+--devup=/etc/bluetooth/pan/dev-up"
 
-Dear all,
+Moving forward I want to use dbus commands and configure the NAP the
+*right* way.
 
-      I am just wondering whether if it is possible to send a message to an unconnected device with no pairing. (if I have already known the address of the target device.) 
-My goal here is to safe some time from making a connection. 
+Here is my current understanding from the wiki you can completely set
+up everything via dbus or you can configure the basic settings using
+.service files (/etc/bluetooth) and the network.conf file.
 
-Best regards,
-Newbie
-_________________________________________________________________
+Here is what I think I should do:
+1.) Set up a service file:
+[Bluetooth Service]
+Identifier=network
+Name=Network service
+Description=Bluetooth Personal Area Network service
+Autostart=true
 
+2.) It looks like the network.conf default setting are good for what I
+want to do.
+
+3.) Issue dbus commands to start NAP.  This is were I'm confused and
+NEED HELP, I'm not sure what all needs to be done here to allow a PANU
+device to connect to my NAP device.
+Once I have the connection (bnepX) I know what to do, just set up a
+bridge (pan0) and set up any forwarding/NAT/firewall rules using
+standard iptables/masq commands against the pan0.
+
+I believe the example on the wiki
+(http://wiki.bluez.org/wiki/HOWTO/NetworkConnections) details how to
+have a PANU device connect to a pre-existing NAP but I do not believe
+it details how to set up the NAP which is really what I want to
+accomplish.
+Regards,
+Shane
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
