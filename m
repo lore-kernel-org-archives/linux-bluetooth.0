@@ -1,41 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48D16DA5.4070207@optaros.com>
-Date: Wed, 17 Sep 2008 15:50:45 -0500
-From: Bobby Beckmann <bobby@optaros.com>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Getting the driver to recognize my bluetooth device
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: btusb suspend/resume bug...
+From: Marcel Holtmann <marcel@holtmann.org>
+To: David Miller <davem@davemloft.net>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+In-Reply-To: <20080916.155123.181085856.davem@davemloft.net>
+References: <20080916.155123.181085856.davem@davemloft.net>
+Content-Type: text/plain
+Date: Wed, 17 Sep 2008 18:17:49 +0200
+Message-Id: <1221668269.6782.8.camel@californication>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Dave,
 
-I'm trying to get my laptop's bluetooth chip to be recognized by the 
-driver. I have a Dell Latitude E6500 running 2.6.27-rc6. From lsusb, I 
-get this output:
+> Marcel, others, please bring some kind of closure to this
+> regression list entry:
+> 
+> Bug-Entry	: http://bugzilla.kernel.org/show_bug.cgi?id=11442
+> Subject		: btusb hibernation/suspend breakage in current -git
+> Submitter	: Rafael J. Wysocki <rjw@sisk.pl>
+> Date		: 2008-08-25 11:37 (19 days old)
+> References	: http://marc.info/?l=linux-bluetooth&m=121966402012074&w=4
+> Handled-By	: Oliver Neukum <oliver@neukum.org>
+> Patch		: http://marc.info/?l=linux-bluetooth&m=121967226027323&w=4
+> 
+> There is a patch, it is tested, so the only course of action at
+> this point is to merge the fix or declare that this really isn't
+> a regression.
+> 
+> My impression is the later, because the driver btusb is replacing
+> doesn't handle suspend/resume either.  Isn't that right?
 
-Bus 003 Device 002: ID 0a5c:4500 Broadcom Corp.
-Device Descriptor:
-  bLength                18
-  bDescriptorType         1
-  bcdUSB               2.00
-  bDeviceClass            9 Hub
-  bDeviceSubClass         0 Unused
-  bDeviceProtocol         0 Full speed (or root) hub
-  bMaxPacketSize0         8
-  idVendor           0x0a5c Broadcom Corp.
-  idProduct          0x4500
-  bcdDevice            1.00
-  iManufacturer           1 Broadcom
-  iProduct                2 BCM2046B1
+the original patch that I had was expecting changes in the USB subsystem
+that I deemed to much at this point. However Oliver got a patch that
+would make it work without the USB changes. I am still testing it.
+
+Let me see if I get some free minutes during the PlumbersConf to get
+this fully tested.
+
+Actually hci_usb is handling suspend/resume to some degree. So we could
+count this as regression.
+
+Regards
+
+Marcel
 
 
-
-Now, the device is reporting that it's a hub, but the product is most 
-certainly a bluetooth chip from Broadcom. I tried adding the 0a5c:4500 
-to the btusb driver, but the driver didn't seem to try to initialize the 
-device. Does anyone have any ideas on what I could do to debug this?
-
-Thanks for your help,
-Bobby
