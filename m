@@ -1,60 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48D22F30.1060301@suse.de>
-Date: Thu, 18 Sep 2008 12:36:32 +0200
-From: Stefan Seyfried <seife@suse.de>
+Message-ID: <d89ddf300809171409o45e6c3cbva4ac6e075bc6b184@mail.gmail.com>
+Date: Wed, 17 Sep 2008 15:09:07 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "Bobby Beckmann" <bobby@optaros.com>
+Subject: Re: Getting the driver to recognize my bluetooth device
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <48D16DA5.4070207@optaros.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Bastien Nocera <hadess@hadess.net>,
-	David Woodhouse <dwmw2@infradead.org>
-Subject: Re: Packaging question
-References: <48C685F1.9040905@suse.de>	 <1221084945.13336.31.camel@californication>  <48C8D96A.6060900@suse.de> <1221237288.6695.19.camel@californication>
-In-Reply-To: <1221237288.6695.19.camel@californication>
-Content-Type: text/plain; charset=ISO-8859-15
+Content-Type: text/plain; charset=ISO-8859-1
+References: <48D16DA5.4070207@optaros.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+you need to run hid2hci
 
-Marcel Holtmann wrote:
->> So for now I'll go for the above list of packages, with libbluetooth3 instead
->> of bluez-libs.
-> 
-> the Fedora packaging guidelines are kinda clear about how to name
-> library packages. Same as for Debian. I don't know about SuSE.
+here's another similar machine & notes.
+http://www.avalpa.com/assets/andrea/studio15/debian_on_dell_studio15.html
 
-The openSUSE packaging guidelines are what made me change the name to
-libbluetooth3 ;)
+On Wed, Sep 17, 2008 at 2:50 PM, Bobby Beckmann <bobby@optaros.com> wrote:
+> Hi all,
+>
+> I'm trying to get my laptop's bluetooth chip to be recognized by the driver.
+> I have a Dell Latitude E6500 running 2.6.27-rc6. From lsusb, I get this
+> output:
+>
+> Bus 003 Device 002: ID 0a5c:4500 Broadcom Corp.
+> Device Descriptor:
+>  bLength                18
+>  bDescriptorType         1
+>  bcdUSB               2.00
+>  bDeviceClass            9 Hub
+>  bDeviceSubClass         0 Unused
+>  bDeviceProtocol         0 Full speed (or root) hub
+>  bMaxPacketSize0         8
+>  idVendor           0x0a5c Broadcom Corp.
+>  idProduct          0x4500
+>  bcdDevice            1.00
+>  iManufacturer           1 Broadcom
+>  iProduct                2 BCM2046B1
+>
+>
+>
+> Now, the device is reporting that it's a hub, but the product is most
+> certainly a bluetooth chip from Broadcom. I tried adding the 0a5c:4500 to
+> the btusb driver, but the driver didn't seem to try to initialize the
+> device. Does anyone have any ideas on what I could do to debug this?
+>
+> Thanks for your help,
+> Bobby
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-> This is basically about the build dependencies and changing the devel
-> package name means that you would need to adjust all sources relying on
-> it.
 
-Yes, understood and considered. However, the build gurus solved that with some
-RPM specfile magic for me ;)
 
-Another question, also related to packaging:
-
-How should the bluetoothd be started nowadays?
-
-dbus-activation with a service-file like this one?
-root@stoetzler:~# cat /usr/share/dbus-1/system-services/org.bluez.service
-[D-BUS Service]
-Name=org.bluez
-Exec=/etc/init.d/bluetooth start
-User=root
-
-But then, who will start it before XDM fires up? Has anybody already hacked up
-a nice way to just start it on adapter hotplug? Some HAL magic maybe?
-
-I had that old udev rule hack that would call the init script at adapter
-plugin, but that's ugly and racy (because it typically starts before DBus is
-started).
-
-Any innovative ideas?
 -- 
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out."
-
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
+Brad
