@@ -1,34 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: btusb reset quirk for MacBook Pro
-From: David Woodhouse <dwmw2@infradead.org>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain
-Date: Thu, 18 Sep 2008 13:30:58 -0700
-Message-Id: <1221769858.3573.69.camel@macbook.infradead.org>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <48D29276.5060708@suse.de>
+Date: Thu, 18 Sep 2008 19:40:06 +0200
+From: Stefan Seyfried <seife@suse.de>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Bastien Nocera <hadess@hadess.net>,
+	David Woodhouse <dwmw2@infradead.org>
+Subject: Re: Packaging question
+References: <48C685F1.9040905@suse.de>	 <1221084945.13336.31.camel@californication>  <48C8D96A.6060900@suse.de>	 <1221237288.6695.19.camel@californication>  <48D22F30.1060301@suse.de> <1221758180.6782.22.camel@californication>
+In-Reply-To: <1221758180.6782.22.camel@californication>
+Content-Type: text/plain; charset=ISO-8859-15
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Without this, my new shinybook tends to boot up either giving I/O errors
-on 'hciconfig -a', or complaining about packets from non-existent ACL
-connections.
+Marcel Holtmann wrote:
+>> I had that old udev rule hack that would call the init script at adapter
+>> plugin, but that's ugly and racy (because it typically starts before DBus is
+>> started).
+>>
+>> Any innovative ideas?
+> 
+> we had the discussion for Fedora and we want to start it via udev,
+> however then we need D-Bus before udev runs and that is not an option
+> right now. So the current solution is to just do it via init.d, but in
+> the future we want udev.
 
-Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
+What about the old hack that I had back in the old days that would let hcid
+wait until D-Bus came up? ;-) One problem with init.d is that the daemon is
+running, even if there is no device plugged in...
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 6a01068..c46c299 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -157,6 +157,8 @@ static struct usb_device_id blacklist_table[] = {
- 	/* Frontline ComProbe Bluetooth Sniffer */
- 	{ USB_DEVICE(0x16d3, 0x0002), .driver_info = BTUSB_SNIFFER },
- 
-+	/* MacBook Pro 4,1 */
-+	{ USB_DEVICE(0x05ac, 0x820f), .driver_info = BTUSB_RESET },
- 	{ }	/* Terminating entry */
- };
- 
+> The D-Bus service activation is nice, but makes
+> problems when you wanna use the mouse and keyboard early.
+
+Yes, I already noticed that :)
 -- 
-David Woodhouse                            Open Source Technology Centre
-David.Woodhouse@intel.com                              Intel Corporation
+Stefan Seyfried
+R&D Team Mobile Devices            |              "Any ideas, John?"
+SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out."
 
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
