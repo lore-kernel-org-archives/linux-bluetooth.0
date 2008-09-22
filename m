@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48D80826.9070502@pook.es>
-Date: Mon, 22 Sep 2008 23:03:34 +0200
-From: Stuart Pook <bluez56@pook.es>
+Message-ID: <48D80465.9080703@powercraft.nl>
+Date: Mon, 22 Sep 2008 22:47:33 +0200
+From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
-To: bluez-devel@lists.sourceforge.net
-Subject: [Bluez-devel] "unable to install hw params" to bluetooth (SCO)
- headset (was: btusb+sco failing to play sound through Jabra BT500v headset)
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Subject: [Bluez-devel] key agent for bluez cli only
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,29 +17,20 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello
+Hello everybody,
 
-I have read Martin's messages concerning his Jabra BT500v bluetooth headset.
+I am looking for a solution to sent a key when a device is requesting
+this. I hope somebody can help me out, I have attached a log file, that
+also include some found issues.
 
-I have similar problems with my Jabra JX10 headset.  I have installed 
-bluez-4.4. When I run aplay with a 2.6.26 kernel, aplay works. When I 
-run aplay with linux 2.6.27-rc5 I can hear a hiss when my PC connects to 
-the headset but no music.
+pin_code_request (sba=00:1B:DC:00:32:71, dba=00:0D:FD:18:6E:3C)
+connect(): Permission denied (13)
+discovery failed
 
-I have written a long bug report on 
-http://bugzilla.kernel.org/show_bug.cgi?id=11514 with the output of 
-hcidump -X -V and the messages from bluetoothd. Could someone have a 
-look and give me a hint about what I might be doing wrong? Has anyone 
-had any luck with Jabra headsets and 2.6.27-rc5 or should I buy a 
-different brand of headset? Marcel Holtmann said that "It simply works 
-for me." What headsets have you tested?
+Best regards,
 
-aplay always says "Unable to install hw params" after bluetoothd says 
-"connect(): Connection timed out (110)" but hcidump shows lots of SCO 
-packets being sent to the headset.
+Jelle
 
-thanks
-Stuart
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
