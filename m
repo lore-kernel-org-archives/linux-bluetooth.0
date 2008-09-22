@@ -1,13 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48D95F28.4000708@stephan.co.uk>
-Date: Tue, 23 Sep 2008 22:27:04 +0100
-From: Stephan de Georgio <sd@stephan.co.uk>
+Message-ID: <48D80826.9070502@pook.es>
+Date: Mon, 22 Sep 2008 23:03:34 +0200
+From: Stuart Pook <bluez56@pook.es>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <48C43D87.2040705@stephan.co.uk>
-	<d89ddf300809071430jb7d0303yea3173504c0894aa@mail.gmail.com>
-In-Reply-To: <d89ddf300809071430jb7d0303yea3173504c0894aa@mail.gmail.com>
-Subject: Re: [Bluez-devel] Motorola DC800
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] "unable to install hw params" to bluetooth (SCO)
+ headset (was: btusb+sco failing to play sound through Jabra BT500v headset)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,40 +18,29 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Brad,
+Hello
 
- >afaik, this is still only possible using "a2recv" in the old btsco 
-project.
+I have read Martin's messages concerning his Jabra BT500v bluetooth headset.
 
-Is a2recv not for streaming audio from the DC800 to the PC?  I'm trying 
-to stream audio from the PC to the DC800.  I can't seem to find any 
-documentation on a2recv except the small snippet below from the 
-bluetooth-alsa build page.
+I have similar problems with my Jabra JX10 headset.  I have installed 
+bluez-4.4. When I run aplay with a 2.6.26 kernel, aplay works. When I 
+run aplay with linux 2.6.27-rc5 I can hear a hiss when my PC connects to 
+the headset but no music.
 
- >The A2DP sink code receives a stream from another device. Run it with:
- > hciconfig hci0 class 0x200404
- > sdptool add A2SNK
- > ./a2recv
+I have written a long bug report on 
+http://bugzilla.kernel.org/show_bug.cgi?id=11514 with the output of 
+hcidump -X -V and the messages from bluetoothd. Could someone have a 
+look and give me a hint about what I might be doing wrong? Has anyone 
+had any luck with Jabra headsets and 2.6.27-rc5 or should I buy a 
+different brand of headset? Marcel Holtmann said that "It simply works 
+for me." What headsets have you tested?
 
- >It will try to bind to the bluetooth adapter and send audio out to 
-/dev/dsp.
+aplay always says "Unable to install hw params" after bluetoothd says 
+"connect(): Connection timed out (110)" but hcidump shows lots of SCO 
+packets being sent to the headset.
 
-I have installed the btsco package and tried running this and a2recv 
-just hangs with no output.  Is there something else I need to do before 
-running a2recv?
-
-I've also tried the command
-
-mpg123 --au - file.mp3 | ./a2play bdaddr
-
-where bdaddr is the address of the DC800, but this give no audio output 
-either.
-
-Any help would be very much appreciated.
-
-Regards,
-Stephan
-
+thanks
+Stuart
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
