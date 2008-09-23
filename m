@@ -1,172 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: First pass at HAL device class plugin
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary="=-TB2AbL6OIb4c0EQY0La7"
-Date: Tue, 23 Sep 2008 17:06:25 -0700
-Message-Id: <1222214785.10497.127.camel@snoogens.fab.redhat.com>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <48D9399F.4000804@suse.de>
+Date: Tue, 23 Sep 2008 20:46:55 +0200
+From: Stefan Seyfried <seife@suse.de>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Bastien Nocera <hadess@hadess.net>,
+	David Woodhouse <dwmw2@infradead.org>
+Subject: Re: Packaging question
+References: <48C685F1.9040905@suse.de>	 <1221084945.13336.31.camel@californication>  <48C8D96A.6060900@suse.de>	 <1221237288.6695.19.camel@californication>  <48D22F30.1060301@suse.de>	 <1221758180.6782.22.camel@californication>  <48D29276.5060708@suse.de> <1221770377.6782.32.camel@californication>
+In-Reply-To: <1221770377.6782.32.camel@californication>
+Content-Type: text/plain; charset=ISO-8859-15
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Marcel (and everybody else still listening),
 
---=-TB2AbL6OIb4c0EQY0La7
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Marcel Holtmann wrote:
+> if we go always polling the D-Bus and try to re-connect it is bad, too.
+> The solution is to make sure that D-Bus is always running and will never
+> die. Everything else is just wrong and will break.
 
-Probably doesn't work, and it's missing some exported functionality to
-set the device class on the actual adapter (and have it written).
+Yes, this was obviously meant as a joke.
 
---=-TB2AbL6OIb4c0EQY0La7
-Content-Disposition: attachment; filename="0001-First-pass-at-a-HAL-plugin-to-set-the-device-class.patch"
-Content-Type: text/x-patch; name="0001-First-pass-at-a-HAL-plugin-to-set-the-device-class.patch"; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+This is what I have packaged for now:
 
->From bb925e0a397dbbec2a60f39e65ff19c3d5e58d0b Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Tue, 23 Sep 2008 17:03:06 -0700
-Subject: [PATCH] First pass at a HAL plugin to set the device class
+- DBus activation for bluetoothd (actually runs the init script)
+- udev events run a helper script /lib/udev/bluetooth.sh which basically
+  consists of:
 
----
- plugins/hal-adapter-class.c |  126 +++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 126 insertions(+), 0 deletions(-)
- create mode 100644 plugins/hal-adapter-class.c
+  #!/bin/sh
+  [ x"$ACTION" != xadd ] && exit 0
+  touch /var/run/bluetooth-adapter-present
+  /bin/dbus-send --system --type=method_call \
+                 --print-reply --reply-timeout=1000 \
+                 --dest=org.bluez / org.bluez.hello
 
-diff --git a/plugins/hal-adapter-class.c b/plugins/hal-adapter-class.c
-new file mode 100644
-index 0000000..c5dae5c
---- /dev/null
-+++ b/plugins/hal-adapter-class.c
-@@ -0,0 +1,126 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2004-2008  Marcel Holtmann <marcel@holtmann.org>
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <errno.h>
-+#include <unistd.h>
-+
-+#include <bluetooth/bluetooth.h>
-+
-+#include <glib.h>
-+#include <hal/libhal.h>
-+#include <gdbus.h>
-+
-+#include "plugin.h"
-+#include "adapter.h"
-+#include "logging.h"
-+
-+static guint32 get_form_factor(LibHalContext *ctx)
-+{
-+	char *formfactor;
-+	guint32 ret;
-+
-+	ret = 1 << 8; /* Computer major class */
-+	formfactor = libhal_device_get_property_string(ctx,
-+				"/org/freedesktop/Hal/devices/computer",
-+						"system.formfactor", NULL);
-+
-+	if (formfactor == NULL)
-+		return ret;
-+
-+	if (g_str_equal(formfactor, "laptop"))
-+		ret += (1 << 2) + (1 << 3);
-+	else if (g_str_equal(formfactor, "desktop"))
-+		ret += 1 << 2;
-+	else if (g_str_equal(formfactor, "server"))
-+		ret += 1 << 3;
-+	else if (g_str_equal(formfactor, "handheld"))
-+		ret += 1 << 4;
-+
-+	g_free (formfactor);
-+
-+	return ret;
-+}
-+
-+static int hal_adapter_class_probe(struct btd_adapter *adapter)
-+{
-+	DBusConnection *conn;
-+	LibHalContext *ctx = NULL;
-+	guint32 class;
-+
-+	conn = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
-+
-+	ctx = libhal_ctx_new();
-+	if (libhal_ctx_set_dbus_connection(ctx, conn) == FALSE) {
-+		libhal_ctx_free(ctx);
-+		dbus_connection_unref(conn);
-+		return -EIO;
-+	}
-+
-+	if (libhal_ctx_init(ctx, NULL) == FALSE) {
-+		g_warning("Unable to init HAL context");
-+		libhal_ctx_free(ctx);
-+		dbus_connection_unref(conn);
-+		return -EIO;
-+	}
-+
-+	class = get_form_factor (ctx);
-+	debug ("0: 0x%X", class);
-+#if 0
-+	adapter_set_class (adapter, class);
-+	dbus_g_proxy_call(object, "SetMajorClass", NULL,
-+		G_TYPE_STRING, "computer", G_TYPE_INVALID, G_TYPE_INVALID);
-+	dbus_g_proxy_call(object, "SetMinorClass", NULL,
-+		G_TYPE_STRING, formfactor, G_TYPE_INVALID, G_TYPE_INVALID);
-+	g_free (formfactor);
-+#endif
-+	libhal_ctx_free(ctx);
-+	dbus_connection_unref(conn);
-+
-+	return 0;
-+}
-+
-+static struct btd_adapter_driver hal_adapter_class = {
-+	.name	= "hal-adapter-class",
-+	.probe	= hal_adapter_class_probe,
-+	.remove	= NULL,
-+};
-+
-+static int hal_adapter_class_init(void)
-+{
-+	debug("Setup HAL Adapter Class plugin");
-+
-+	return btd_register_adapter_driver(&hal_adapter_class);
-+}
-+
-+static void hal_adapter_class_exit(void)
-+{
-+	debug("Cleanup HAL Adapter Class plugin");
-+
-+	btd_unregister_adapter_driver(&hal_adapter_class);
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE("hal", hal_adapter_class_init, hal_adapter_class_exit)
+- a "bluetooth-coldplug" init script that checks for the existence of the
+  bluetooth-adapter-present file and runs the "normal" init script (This could
+  all be put   into the normal init script, but I had reasons for splitting
+  it up).
+
+So the coldplug case will be handled by the second init script, but still the
+bluetoothd will only be started if an adapter is present.
+
+Maybe this is kind of a solution until we get DBus started early enough to
+make the problem go away.
+
+Another thought: what prevents us from making bluetoothd exit as soon as all
+adapters are unplugged? Is it useful for anything without hardware present
+(can you alter settings etc)?
+
+Thanks (and have fun in Portland ;)
+
+	Stefan
+
 -- 
-1.6.0.1
+Stefan Seyfried
+R&D Team Mobile Devices            |              "Any ideas, John?"
+SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out."
 
-
---=-TB2AbL6OIb4c0EQY0La7--
-
+This footer brought to you by insane German lawmakers:
+SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
