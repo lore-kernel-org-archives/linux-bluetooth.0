@@ -1,66 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 23 Sep 2008 15:00:00 +0200
-From: martin f krafft <madduck@madduck.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [Bluez-devel] "unable to install hw params" to bluetooth (SCO)
-	headset
-Message-ID: <20080923130000.GA848@piper.oerlikon.madduck.net>
-References: <20080822073628.GA5989@piper.oerlikon.madduck.net> <1219394015.7591.441.camel@violet.holtmann.net> <20080826163544.GA5068@lapse.rw.madduck.net> <8C64B784-7758-40B0-AE1B-C15F475693D4@holtmann.org> <20080905162654.GA17843@lapse.rw.madduck.net> <1220634042.6714.89.camel@californication>
+Date: Tue, 23 Sep 2008 14:09:53 +0530 (IST)
+From: pavan_savoy@indiatimes.com
+To: denis kenzior <denis.kenzior@trolltech.com>
+Cc: linux-bluetooth@vger.kernel.org
+Message-ID: <867478754.8791222159193326.JavaMail.root@mbv7.indiatimes.com>
+In-Reply-To: <63475.65.249.24.198.1222100847.squirrel@ice-gw.trolltech.com.au>
+Subject: Re: OpenOBEX ObexFTPd problem on BlueZ
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="DocE+STaALJfprDB"
-In-Reply-To: <1220634042.6714.89.camel@californication>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Thanks, the current situation works for me. 
+Windows [MS generic bluetooth radio] bluetooth stack has send and recieve file features, for this...
 
---DocE+STaALJfprDB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+If I run "obexftpd" on board and do a send file [without PASSKEY] feature, then it works.
 
-also sprach Marcel Holtmann <marcel@holtmann.org> [2008.09.05.1900 +0200]:
-> actually I have none. It simply works for me. And I have tested it a
-> lot. There are some rare conditions where the btusb driver is off on the
-> 16-bit boundaries, but I am looking at a fix for it. However this will
-> not disturb the audio service. You just don't here anything.
+If I click on recieve file on PC and do a obexftp it doesn't work.
+However If I do a sdptool browse and get to know the channel number (1) and then give it to obexftp, it seems to work.
 
-Ported original thread from SF list:
-  http://article.gmane.org/gmane.linux.bluez.devel/16060
+Now, the question...
+1. How do I enable the passkey feature [bluepin doesn't exist in 3.36] ?
+**All option of security in hcid.conf has the same effect...
 
-I can reproduce the exact same error with a BT250 hooked up via
-a different bluetooth adapter to an amd64 machine this time (the
-last one was i386), running 2.6.26.
+2. How I check the services of my board, to make it work for other stacks??
+[even the services request from current setup doesn;t seem to work, its like the sdp server is not started at all on blueZ side, even though the messages show it runs...]
 
-Stuart Pook told me about bluez-utils 4.4 [0] - I am still using 3.36
-[1], but the wiki page says that I need 3.16 or newer. Would
-I have better luck with 4.4? Where does this stuff come in anyway?
-I am running hcid in the background, but I know too little about
-ALSA or Bluetooth to be able to see how the two interlink. The wiki
-mentions a btaudiod, which 3.36 seems not to have. Is that needed?
 
-0. http://article.gmane.org/gmane.linux.bluez.devel/16113
-1. http://bugs.debian.org/499529
+Thanks in advance.
 
---=20
-martin | http://madduck.net/ | http://two.sentenc.es/
-=20
-"sometimes the urge to do bad is nearly overpowering"
-                                                          -- ben horne
-=20
-spamtraps: madduck.bogus@madduck.net
 
---DocE+STaALJfprDB
-Content-Type: application/pgp-signature; name="digital_signature_gpg.asc"
-Content-Description: Digital signature (see http://martin-krafft.net/gpg/)
-Content-Disposition: inline
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
+----- Original Message -----
+From: Denis Kenzior <denis.kenzior@trolltech.com>
+To: pavan savoy <pavan_savoy@indiatimes.com>
+Cc: linux-bluetooth@vger.kernel.org
+Sent: Mon, 22 Sep 2008 21:57:27 +0530 (IST)
+Subject: Re: OpenOBEX ObexFTPd problem on BlueZ
 
-iEYEARECAAYFAkjY6E0ACgkQIgvIgzMMSnUozwCgxR+QX4+0zK/bkfBeOzOSEXct
-U7AAn1IByJYJnuo5LOOcJngAAXP/jVY2
-=hH5Q
------END PGP SIGNATURE-----
+Hi,
 
---DocE+STaALJfprDB--
+You actually need to register the SDP record for the Windows application
+to know what RFCOMM port to connect to.  You need to use sdptool or better
+yet use the BlueZ DBUS API for registering SDP records.
+
+To get you started, if you're using obexftpd as a PUSH server, use:
+sdptool add --channel=<obexftpd rfcomm channel> opush
+or ftp, use:
+sdptool add --channel=<obexftpd rfcomm channel> ftp
+
+If you want to use the BlueZ DBUS API, use the
+AddServiceRecordFromXML and pass in the record in XML format.
+
+To get a sample of how the XML record looks like, you can run:
+sdptool get --xml <record handle, most likely 0x10000>
+
+For more, I suggest you read the BlueZ DBUS API documentation.
+
+Regards,
+-Denis
+
+> Hi,
+>
+>
+> I have the BlueZ utilities cross-compiled to a particular Arm- target, and
+> cannot get the openobex working.
+>
+> I start of the server,
+> $ hcid -s
+> $ hciattach -- with relevant parameters
+> $ hciconfig -a -- doesnt show any Service classes
+> $ obexftpd -c ./ -b -- throws up a msg waiting for connection
+> $ hciconfig -a -- now shows the Capturing, Object transfer as service
+> classes
+>
+>
+> But If I start an windows application, to connect to this device, it shows
+> services not found.
+>
+> Any other hints as to properly starting off obexftpd and using obexftp
+> client?
+>
+
+
+
+-----------------------------------------
+Nokia Pty Ltd, Level 1, 53 Brandl St, Eight Mile Plains, 4113, Queensland, Australia
+
+
+
+--
+Will the all new Indica Vista zip ahead of the Suzuki Swift? Read the expert review on Zigwheels.com
+http://zigwheels.com/b2cam/reviewsDetails.action?name=Ro11_20080829&path=/INDT/Reviews/Ro11_20080829&page=1&pagecount=9
