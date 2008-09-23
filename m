@@ -1,61 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <61467.65.249.24.198.1222188249.squirrel@ice-gw.trolltech.com.au>
-In-Reply-To: <867478754.8791222159193326.JavaMail.root@mbv7.indiatimes.com>
-References: <63475.65.249.24.198.1222100847.squirrel@ice-gw.trolltech.com.au>
-    <867478754.8791222159193326.JavaMail.root@mbv7.indiatimes.com>
-Date: Wed, 24 Sep 2008 02:44:09 +1000 (EST)
-Subject: Re: OpenOBEX ObexFTPd problem on BlueZ
-From: "Denis Kenzior" <denis.kenzior@trolltech.com>
-To: pavan_savoy@indiatimes.com
-Cc: "denis kenzior" <denis.kenzior@trolltech.com>,
-	linux-bluetooth@vger.kernel.org
-Reply-To: denis.kenzior@trolltech.com
+Message-ID: <48D8F101.9040802@pook.es>
+Date: Tue, 23 Sep 2008 15:37:05 +0200
+From: Stuart Pook <linux-bluetooth4@pook.es>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+To: martin f krafft <madduck@madduck.net>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [Bluez-devel] "unable to install hw params" to bluetooth (SCO)
+ headset
+References: <20080822073628.GA5989@piper.oerlikon.madduck.net> <1219394015.7591.441.camel@violet.holtmann.net> <20080826163544.GA5068@lapse.rw.madduck.net> <8C64B784-7758-40B0-AE1B-C15F475693D4@holtmann.org> <20080905162654.GA17843@lapse.rw.madduck.net> <1220634042.6714.89.camel@californication> <20080923130000.GA848@piper.oerlikon.madduck.net>
+In-Reply-To: <20080923130000.GA848@piper.oerlikon.madduck.net>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On 23/09/08 15:00, martin f krafft wrote:
+> I can reproduce the exact same error with a BT250 hooked up via
+> a different bluetooth adapter to an amd64 machine this time (the
+> last one was i386), running 2.6.26.
 
-> Thanks, the current situation works for me.
-> Windows [MS generic bluetooth radio] bluetooth stack has send and recieve
-> file features, for this...
->
-> If I run "obexftpd" on board and do a send file [without PASSKEY] feature,
-> then it works.
->
-> If I click on recieve file on PC and do a obexftp it doesn't work.
-> However If I do a sdptool browse and get to know the channel number (1)
-> and then give it to obexftp, it seems to work.
+I as said on http://bugzilla.kernel.org/show_bug.cgi?id=11514 aplay and 
+my JX10 headset work with bluez-4.4 and linux 2.6.26. I only get the 
+"unable to install hw params" error on 2.6.27-rc5.
 
-Obexftp doesn't perform SDP queries, it assumes a certain default channel.
+> Stuart Pook told me about bluez-utils 4.4 [0] - I am still using 3.36
+> [1], but the wiki page says that I need 3.16 or newer. Would
+> I have better luck with 4.4? Where does this stuff come in anyway?
 
->
-> Now, the question...
-> 1. How do I enable the passkey feature [bluepin doesn't exist in 3.36] ?
-> **All option of security in hcid.conf has the same effect...
+I would suggest using bluez-4.x and checking that your headset works 
+with a 2.6.26 kernel. Note don't use SCO headsets and linux 2.6.26 for 
+too long as using SCO and the old hci_usb driver will cause your machine 
+to hard crash sooner or later. The new btusb driver gained SCO support 
+in 2.6.27-rc4.
 
-You need to implement a passkey agent.  See the bluez-utils source for an
-example.  Basically you need to implement the org.bluez.PasskeyAgent API.
+> I am running hcid in the background, but I know too little about
+> ALSA or Bluetooth to be able to see how the two interlink. The wiki
+> mentions a btaudiod, which 3.36 seems not to have. Is that needed?
 
->
-> 2. How I check the services of my board, to make it work for other
-> stacks??
-> [even the services request from current setup doesn;t seem to work, its
-> like the sdp server is not started at all on blueZ side, even though the
-> messages show it runs...]
+I don't remember btaudiob. Bluetoothd has replaced hcid. If you run 
+"bluetoothd -d -n" you will see that aplay (via the bluetooth alsa 
+libraries) contacts bluetoothd and that it is bluetoothd that connects 
+to the headset (at least that is how I understand things).
 
-SDP server by default does not contain any records since no services are
-started.  You can browse local services by running:
-'sdptool browse local'
+Be careful when you install bluez-4.x that you replace the alsa 
+bluetooth libraries that aplay uses. I can tell you more about this if 
+required.
 
-Obexftp does not register any SDP records.  You need to look around for
-proper obex daemon that integrates with bluez.  Look for obex-data-server
-or obexd or write one yourself.
+I have added hcidump -XV dumps of the communication between my machine 
+and my JX10 headset using 2.6.27-rc5 to the bug report mentioned above. 
+Tomorrow I'll add hcidump -XV using 2.6.26 so that we can see the 
+differences.
 
--Denis
-
-
-
------------------------------------------
-Nokia Pty Ltd, Level 1, 53 Brandl St, Eight Mile Plains, 4113, Queensland, Australia
+Stuart
