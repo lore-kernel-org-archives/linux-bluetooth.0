@@ -1,29 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 Subject: Re: bluetoothd crasher
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1222300535.10497.198.camel@snoogens.fab.redhat.com>
+From: Bastien Nocera <hadess@hadess.net>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1222298318.10497.187.camel@snoogens.fab.redhat.com>
 References: <1222297746.10497.186.camel@snoogens.fab.redhat.com>
 	 <1222298318.10497.187.camel@snoogens.fab.redhat.com>
-	 <1222300535.10497.198.camel@snoogens.fab.redhat.com>
-Content-Type: text/plain
-Date: Thu, 25 Sep 2008 02:13:47 +0200
-Message-Id: <1222301627.6481.4.camel@californication>
+Content-Type: multipart/mixed; boundary="=-q2P+btQcFjAuwoKI9x/G"
+Date: Wed, 24 Sep 2008 16:55:35 -0700
+Message-Id: <1222300535.10497.198.camel@snoogens.fab.redhat.com>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
 
-> > > The current bluetoothd crashes on resume from suspend. Here's the valgrind output:
-> 
-> Patch attached, thanks to Johan for helping out.
+--=-q2P+btQcFjAuwoKI9x/G
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-a slight modified patch has been applied. Thanks.
+On Wed, 2008-09-24 at 16:18 -0700, Bastien Nocera wrote:
+> On Wed, 2008-09-24 at 16:09 -0700, Bastien Nocera wrote:
+> > Heya,
+> > 
+> > The current bluetoothd crashes on resume from suspend. Here's the valgrind output:
 
-Regards
+Patch attached, thanks to Johan for helping out.
 
-Marcel
+Cheers
 
+--=-q2P+btQcFjAuwoKI9x/G
+Content-Disposition: attachment; filename="bluez-bluetoothd-crasher.patch"
+Content-Type: text/x-patch; name="bluez-bluetoothd-crasher.patch"; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+diff --git a/src/security.c b/src/security.c
+index fd2535f..6a9a5c4 100644
+--- a/src/security.c
++++ b/src/security.c
+@@ -46,6 +46,7 @@
+ 
+ #include <dbus/dbus.h>
+ 
++#include "hcid.h"
+ #include "logging.h"
+ #include "textfile.h"
+ 
+@@ -789,6 +790,27 @@ static inline void conn_request(int dev, bdaddr_t *sba, void *ptr)
+ 	write_remote_class(sba, &evt->bdaddr, class);
+ }
+ 
++static void delete_channel(GIOChannel *chan)
++{
++	gint i, found;
++
++	/* Look for the GIOChannel in the table */
++	found = -1;
++	for (i = 0; i < HCI_MAX_DEV; i++) {
++		if (io_data[i].channel == chan) {
++			found = i;
++			break;
++		}
++	}
++
++	if (found == -1) {
++		g_warning("IO channel not found in the io_data table");
++		return;
++	}
++
++	stop_security_manager(i);
++}
++
+ static gboolean io_security_event(GIOChannel *chan, GIOCondition cond, gpointer data)
+ {
+ 	unsigned char buf[HCI_MAX_EVENT_SIZE], *ptr = buf;
+@@ -799,14 +821,14 @@ static gboolean io_security_event(GIOChannel *chan, GIOCondition cond, gpointer
+ 	GIOError err;
+ 
+ 	if (cond & (G_IO_NVAL | G_IO_HUP | G_IO_ERR)) {
+-		g_io_channel_unref(chan);
++		delete_channel(chan);
+ 		return FALSE;
+ 	}
+ 
+ 	if ((err = g_io_channel_read(chan, (gchar *) buf, sizeof(buf), &len))) {
+ 		if (err == G_IO_ERROR_AGAIN)
+ 			return TRUE;
+-		g_io_channel_unref(chan);
++		delete_channel(chan);
+ 		return FALSE;
+ 	}
+ 
+
+--=-q2P+btQcFjAuwoKI9x/G--
 
