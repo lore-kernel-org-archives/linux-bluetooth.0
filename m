@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <6306c640809260237p117a46e9t9d14e54eb25a1faa@mail.gmail.com>
-Date: Fri, 26 Sep 2008 15:07:55 +0530
-From: "Ram kumar" <ramkumar.research@gmail.com>
+Message-ID: <2ced936d0809241116v67a7090dub5730b07b8409384@mail.gmail.com>
+Date: Wed, 24 Sep 2008 18:16:38 +0000
+From: "Breno Jacinto" <breno@freeunix.com.br>
 To: bluez-users@lists.sourceforge.net
 MIME-Version: 1.0
-Subject: [Bluez-users] Bluez-Utils: Flex and ENOKEY error
+Subject: [Bluez-users] pand --search functionality
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,133 +14,72 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hi,
-      I have successfully cross compiled bluez-libs for my AT91SAM9260
-which has arm926ej-s processor core.
+Hello,
 
-VERSION:Bluez-utils-3.36 and 3.34
-                Linux-2.6.25
+   I'm experimenting with the Bluetooth PAN Profile, and as documented
+in the HOWTO http://bluez.sourceforge.net/contrib/HOWTO-PAN, as well
+as in the man page, it is said:
 
-But when i compile Bluez-utils i am facing lot of errors.Inside the
-bluez-utils i have read the README file.
+To make life easier in case you don't know the device address of your desir=
+ed
+communication partner, the optional parameter '--search' allows you to sear=
+ch
+for PAN communication partners, e.g.:
+	# pand --role PANU --search [duration]
 
-It says Bluez-utils needs BISON,FLEX,USBLIBRARY and GCC.
+performs Bluetooth inquiry for PAN devices in the vicinity and tries to
+connect to any discovered device. The search continues for no longer than
+'duration' units of 1.28 seconds.
 
-Do i have to cross compile BISON,FLEX for the Bluez-utils to cross compile????
+    When trying this command and taking a look at /var/log/messages,
+pand *only* searches for NAP nodes, failing to connect to any PANU or
+GN nodes. Even if I force the --role option to GN or PANU, it still
+only searches for NAP nodes. Is this an expected behavior or a bug?
 
-When i configure the bluez-utils without cross compiling bison and flex.
+     Some output for better understanding: scanning 2 PANU nodes :
 
-[root@localhost bluez-utils-3.36]# ./configure --host=arm-linux
---prefix=/opt/atmel/devkit-4.1.2-uclibc3/
---libdir=/opt/atmel/devkit-4.1.2-uclibc3/lib
---includedir=/opt/atmel/devkit-4.1.2-uclibc3/include
---with-kernel=/testing3/buildroot/project_build_arm/airbox/linux-2.6.24
+Sep 24 17:27:11 (none) pand[11737]: Bluetooth PAN daemon version 3.12
+Sep 24 17:27:11 (none) pand[11737]: Inquiring
+Sep 24 17:27:11 (none) pand[11737]: Searching for NAP on 00:11:B1:07:A2:29
+Sep 24 17:27:13 (none) pand[11737]: Searching for NAP on 00:1B:33:9D:33:53
 
-it configures well.
+     It keeps searching for NAP nodes and does not connect. Now, I
+changed the first node to NAP, and here's what I get:
 
-But when i type make it gives the error.....
+Sep 24 18:01:35 (none) pand[11877]: Searching for NAP on 00:11:B1:07:A2:29
+Sep 24 18:01:35 (none) pand[11877]: Connecting to 00:11:B1:07:A2:29
+Sep 24 18:01:35 (none) pand[11877]: bnep0 connected
+Sep 24 18:01:35 (none) pand[11877]: Searching for NAP on 00:1B:33:9D:33:53
 
-storage.c: In function 'encrypt_link':
-storage.c:286: error: 'ENOKEY' undeclared (first use in this function)
-storage.c:286: error: (Each undeclared identifier is reported only once
-storage.c:286: error: for each function it appears in.)
-make[2]: *** [storage.lo] Error 1
-make[2]: Leaving directory `/bttesting/bluez-utils-3.36/input'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/bttesting/bluez-utils-3.36'
-make: *** [all] Error 2
+     So... I still dont get it. If anyone can clarify this, please do
+so. Software versions:
 
-so i disabled the input option by supplying the key --disable-input.
+Bluetooth PAN daemon version 3.12
+Kernel 2.6.21.5 - Distribution BackTrack 3.0
 
-[root@localhost bluez-utils-3.36]# ./configure --host=arm-linux
---prefix=/opt/atmel/devkit-4.1.2-uclibc3/
---libdir=/opt/atmel/devkit-4.1.2-uclibc3/lib
---includedir=/opt/atmel/devkit-4.1.2-uclibc3/include
---with-kernel=/testing3/buildroot/project_build_arm/airbox/linux-2.6.24
---disable-input.
+best regards.
 
-Then the cross-compiling succeeds.But When i transfer the tools like
-hciconfig,hciattach,,,etc to the target and try to execute it says
+-- =
 
-Segmentation fault.
+-- =
 
-Hence i thought i should cross compile BISON and FLEX.So i have cross
-compiled BISON and FLEX using buildroot.
-
-Again Bluez-libs has compiled properly.
-
-But Bluez-utils failed in the configure step.
-
-[root@localhost bluez-utils-3.36]# ./configure --host=arm-linux
---prefix=/opt/atmel/devkit-4.1.2-uclibc3/
---libdir=/opt/atmel/devkit-4.1.2-uclibc3/lib
---includedir=/opt/atmel/devkit-4.1.2-uclibc3/include
---with-kernel=/testing3/buildroot/project_build_arm/airbox/linux-2.6.24
-
-it says.....
-
-configure: WARNING: If you wanted to set the --build type, don't use --host.
-    If a cross compiler is detected then cross compile mode will be used.
-checking for a BSD-compatible install... /usr/bin/install -c
-checking whether build environment is sane... yes
-checking for a thread-safe mkdir -p... /bin/mkdir -p
-checking for gawk... gawk
-checking whether make sets $(MAKE)... yes
-checking for arm-linux-strip... arm-linux-strip
-checking whether to enable maintainer-specific portions of Makefiles... no
-checking for arm-linux-gcc... arm-linux-gcc
-checking for C compiler default output file name... a.out
-checking whether the C compiler works... yes
-checking whether we are cross compiling... yes
-checking for suffix of executables...
-checking for suffix of object files... o
-checking whether we are using the GNU C compiler... yes
-checking whether arm-linux-gcc accepts -g... yes
-checking for arm-linux-gcc option to accept ISO C89... none needed
-checking for style of include used by make... GNU
-checking dependency style of arm-linux-gcc... gcc3
-checking whether arm-linux-gcc accepts -fPIE... yes
-checking for a BSD-compatible install... /usr/bin/install -c
-checking for bison... bison -y
-checking for flex... flex
-checking lex output file root... configure: error: cannot find output
-from flex; giving up
-
-i don't know why it is failing with lex and flex??? .Is there any
-patch i should apply to cross compile ?????
-
-Please guide me to solve this error.
-
-Any "How to document" on cross compiling bluez-utils for arm will be
-helpful to me...
-
-NOTE: I have exported the CC and other environment variables by using a script.
-# source btscript
-
-This is the script file.
-
-#! /bin/bash
-export GCC=arm-linux-gcc
-export CC=arm-linux-gcc
-export CXX=arm-linux-gcc
-export LD=arm-linux-ld
-export NM=arm-linux-nm
-export RANLIB=arm-linux-ranlib
-export AS=arm-linux-as
-export PKG_CONFIG_SYSROOT=/opt/atmel/devkit-4.1.2-uclibc3
-export PATH=/opt/atmel/devkit-4.1.2-uclibc3/bin:${PATH
-
-Regards,
-Ram
+:: Breno Jacinto ::
+:: breno - at - gprt.ufpe.br ::
+:: FingerPrint ::
+ 2F15 8A61 F566 E442 8581
+ E3C0 EFF4 E202 74B7 7484
+:: Persistir no dif=EDcil =E9 a =FAnica maneira de torn=E1-lo f=E1cil algum=
+ dia. ::
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great prizes
+Build the coolest Linux based applications with Moblin SDK & win great priz=
+es
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=100&url=/
+http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
