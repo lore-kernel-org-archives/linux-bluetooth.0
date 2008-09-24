@@ -2,93 +2,37 @@ Return-Path: <cyrus@holtmann.org>
 Subject: Re: bluetoothd crasher
 From: Bastien Nocera <hadess@hadess.net>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1222298318.10497.187.camel@snoogens.fab.redhat.com>
+In-Reply-To: <1222297746.10497.186.camel@snoogens.fab.redhat.com>
 References: <1222297746.10497.186.camel@snoogens.fab.redhat.com>
-	 <1222298318.10497.187.camel@snoogens.fab.redhat.com>
-Content-Type: multipart/mixed; boundary="=-q2P+btQcFjAuwoKI9x/G"
-Date: Wed, 24 Sep 2008 16:55:35 -0700
-Message-Id: <1222300535.10497.198.camel@snoogens.fab.redhat.com>
+Content-Type: text/plain
+Date: Wed, 24 Sep 2008 16:18:38 -0700
+Message-Id: <1222298318.10497.187.camel@snoogens.fab.redhat.com>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Wed, 2008-09-24 at 16:09 -0700, Bastien Nocera wrote:
+> Heya,
+> 
+> The current bluetoothd crashes on resume from suspend. Here's the valgrind output:
 
---=-q2P+btQcFjAuwoKI9x/G
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+And the crash itself:
+#0  malloc_consolidate (av=<value optimized out>) at malloc.c:4841
+#1  0x002e1b2d in _int_malloc (av=<value optimized out>, bytes=<value optimized out>) at malloc.c:4184
+#2  0x002e368f in __libc_calloc (n=<value optimized out>, elem_size=<value optimized out>) at malloc.c:3901
+#3  0x002d7a7d in open_memstream (bufloc=Could not find the frame base for "open_memstream".
+) at memstream.c:86
+#4  0x00350088 in __vsyslog_chk (pri=<value optimized out>, flag=<value optimized out>, fmt=<value optimized out>, ap=<value optimized out>) at ../misc/syslog.c:169
+#5  0x003505d7 in __vsyslog (pri=Could not find the frame base for "__vsyslog".
+) at ../misc/syslog.c:326
+#6  0xb7ff5e68 in vinfo (format=0xb7ffcf75 "HCI dev %d unregistered", ap=0xbffff0b4 "") at logging.c:36
+#7  0xb7ff5e3a in info (format=0xb7ffcf75 "HCI dev %d unregistered") at logging.c:45
+#8  0xb7fdc1a9 in device_event (chan=0xb800a3d0, si=0xbffff10b) at main.c:544
+#9  0xb7fdc0ed in io_stack_event (chan=0xb800a3d0, cond=G_IO_IN, data=0x0) at main.c:595
+#10 0x001a524d in ?? () from /lib/libglib-2.0.so.0
+#11 0x0016e218 in g_main_context_dispatch () from /lib/libglib-2.0.so.0
+#12 0x001718c3 in ?? () from /lib/libglib-2.0.so.0
+#13 0x00171de2 in g_main_loop_run () from /lib/libglib-2.0.so.0
+#14 0xb7fdc7a4 in main (argc=1, argv=0xbffff7e4) at main.c:750
 
-On Wed, 2008-09-24 at 16:18 -0700, Bastien Nocera wrote:
-> On Wed, 2008-09-24 at 16:09 -0700, Bastien Nocera wrote:
-> > Heya,
-> > 
-> > The current bluetoothd crashes on resume from suspend. Here's the valgrind output:
-
-Patch attached, thanks to Johan for helping out.
-
-Cheers
-
---=-q2P+btQcFjAuwoKI9x/G
-Content-Disposition: attachment; filename="bluez-bluetoothd-crasher.patch"
-Content-Type: text/x-patch; name="bluez-bluetoothd-crasher.patch"; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-
-diff --git a/src/security.c b/src/security.c
-index fd2535f..6a9a5c4 100644
---- a/src/security.c
-+++ b/src/security.c
-@@ -46,6 +46,7 @@
- 
- #include <dbus/dbus.h>
- 
-+#include "hcid.h"
- #include "logging.h"
- #include "textfile.h"
- 
-@@ -789,6 +790,27 @@ static inline void conn_request(int dev, bdaddr_t *sba, void *ptr)
- 	write_remote_class(sba, &evt->bdaddr, class);
- }
- 
-+static void delete_channel(GIOChannel *chan)
-+{
-+	gint i, found;
-+
-+	/* Look for the GIOChannel in the table */
-+	found = -1;
-+	for (i = 0; i < HCI_MAX_DEV; i++) {
-+		if (io_data[i].channel == chan) {
-+			found = i;
-+			break;
-+		}
-+	}
-+
-+	if (found == -1) {
-+		g_warning("IO channel not found in the io_data table");
-+		return;
-+	}
-+
-+	stop_security_manager(i);
-+}
-+
- static gboolean io_security_event(GIOChannel *chan, GIOCondition cond, gpointer data)
- {
- 	unsigned char buf[HCI_MAX_EVENT_SIZE], *ptr = buf;
-@@ -799,14 +821,14 @@ static gboolean io_security_event(GIOChannel *chan, GIOCondition cond, gpointer
- 	GIOError err;
- 
- 	if (cond & (G_IO_NVAL | G_IO_HUP | G_IO_ERR)) {
--		g_io_channel_unref(chan);
-+		delete_channel(chan);
- 		return FALSE;
- 	}
- 
- 	if ((err = g_io_channel_read(chan, (gchar *) buf, sizeof(buf), &len))) {
- 		if (err == G_IO_ERROR_AGAIN)
- 			return TRUE;
--		g_io_channel_unref(chan);
-+		delete_channel(chan);
- 		return FALSE;
- 	}
- 
-
---=-q2P+btQcFjAuwoKI9x/G--
 
