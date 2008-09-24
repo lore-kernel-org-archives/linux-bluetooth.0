@@ -1,146 +1,183 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Port bluetooth-sendto to BlueZ 4.x
-From: Bastien Nocera <hadess@hadess.net>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1222225071.22725.0.camel@californication>
-References: <1222217742.10497.130.camel@snoogens.fab.redhat.com>
-	 <1222225071.22725.0.camel@californication>
-Content-Type: multipart/mixed; boundary="=-AydLESLOt01Bt8Ka5ft4"
-Date: Wed, 24 Sep 2008 11:18:55 -0700
-Message-Id: <1222280335.10497.177.camel@snoogens.fab.redhat.com>
-Mime-Version: 1.0
+Message-ID: <48DA1762.7050206@nokia.com>
+Date: Wed, 24 Sep 2008 13:33:06 +0300
+From: Ville Tervo <ville.tervo@nokia.com>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC] DUT mode support for kernel
+Content-Type: multipart/mixed;
+ boundary="------------050306040307020706050708"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
---=-AydLESLOt01Bt8Ka5ft4
-Content-Type: text/plain
+This is a multi-part message in MIME format.
+--------------050306040307020706050708
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Wed, 2008-09-24 at 04:57 +0200, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > Patch attached.
-> 
-> it doesn't apply against upstream GIT and please also fix the coding
-> style.
+Hi,
 
-I blame git for allowing me to do stupid things. Fixed patch attached.
+In good old days the only action needed to enable DUT mode was "hcitool 
+cmd 0x06 0x0003" or similar. However now after having full connection 
+tracking also for incoming connection this doesn't work anymore.
 
-Cheers
+At least R&S tester does only ACL link to the device and therefore BlueZ 
+disconnects it after 10 secs. Connection tracking needs to be disabled 
+somehow. I prepared one proposal how to deal with it. The disable DUT 
+mode command is missing because the Spec says the DUT mode is disabled 
+by resetting the chip. Thus it can be done with "hciconfig hci0 reset" 
+command.
 
---=-AydLESLOt01Bt8Ka5ft4
-Content-Disposition: attachment; filename="0001-Fix-getting-names-of-remote-devices.patch"
-Content-Type: text/x-patch; name="0001-Fix-getting-names-of-remote-devices.patch"; charset="UTF-8"
+With this patch against bluetooth-2.6 tree the DUT mode is enabled by 
+echoing "enabled\n" to new sysfs entry. Maybe some other interface 
+should be used instead?
+
+Any comments?
+
+-- 
+Ville
+
+
+--------------050306040307020706050708
+Content-Type: text/x-patch;
+ name="0001--BLUETOOTH-DUT-mode-support.patch"
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="0001--BLUETOOTH-DUT-mode-support.patch"
 
-diff --git a/sendto/main.c b/sendto/main.c
-index afa8036..b01dafc 100644
---- a/sendto/main.c
-+++ b/sendto/main.c
-@@ -415,52 +415,75 @@ static void create_notify(DBusGProxy *proxy,
- 							G_TYPE_INVALID);
+>From 2b50cc6a4cb4715ae3a83a41c4c3d2d76c66fdd7 Mon Sep 17 00:00:00 2001
+From: Ville Tervo <ville.tervo@nokia.com>
+Date: Wed, 24 Sep 2008 13:25:43 +0300
+Subject: [PATCH] [BLUETOOTH] DUT mode support
+
+Bluetooth specification has command to enable special mode in bluetooth
+chip called Device Under Test (DUT) mode. It is used to measure
+for example RF performance of the Bluetooth hardware design. This patch
+adds kernel support for DUT mode.
+
+Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 3cc2949..1279788 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -72,6 +72,8 @@ enum {
+ 	HCI_INQUIRY,
+ 
+ 	HCI_RAW,
++
++	HCI_DUT_MODE,
+ };
+ 
+ /* HCI ioctl defines */
+@@ -577,6 +579,11 @@ struct hci_rp_read_bd_addr {
+ 	bdaddr_t bdaddr;
+ } __attribute__ ((packed));
+ 
++#define HCI_OP_ENABLE_DUT_MODE		0x1803
++struct hci_rp_enable_dut_mode {
++	__u8	status;
++} __attribute__ ((packed));
++
+ /* ---- HCI Events ---- */
+ #define HCI_EV_INQUIRY_COMPLETE		0x01
+ 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 46a43b7..019cd93 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -355,6 +355,9 @@ static inline void hci_conn_put(struct hci_conn *conn)
+ 				timeo = msecs_to_jiffies(10);
+ 		} else
+ 			timeo = msecs_to_jiffies(10);
++
++		if (test_bit(HCI_DUT_MODE, &conn->hdev->flags) && !conn->out)
++			return;
+ 		mod_timer(&conn->disc_timer, jiffies + timeo);
+ 	}
+ }
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index ad7a553..6d024df 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -535,6 +535,16 @@ static void hci_cc_read_bd_addr(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_req_complete(hdev, rp->status);
  }
  
-+static gchar *get_name(DBusGProxy *device)
++static void hci_cc_enable_dut_mode(struct hci_dev *hdev, struct sk_buff *skb)
 +{
-+	GHashTable *hash;
++	struct hci_rp_enable_dut_mode *rp = (void *) skb->data;
 +
-+	if (dbus_g_proxy_call(device, "GetProperties", NULL,
-+			      G_TYPE_INVALID, dbus_g_type_get_map("GHashTable", G_TYPE_STRING, G_TYPE_VALUE),
-+			      &hash, G_TYPE_INVALID) != FALSE) {
-+		GValue *value;
-+		char *name;
++	if (!rp->status)
++		set_bit(HCI_DUT_MODE, &hdev->flags);
 +
-+		value = g_hash_table_lookup(hash, "Name");
-+		name = value ? g_value_dup_string(value) : NULL;
-+		g_hash_table_destroy(hash);
-+		return name;
-+	}
-+
-+	return NULL;
++	hci_req_complete(hdev, rp->status);
 +}
 +
- static gchar *get_device_name(const gchar *address)
+ static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
  {
- 	DBusGConnection *connection;
--	DBusGProxy *manager, *proxy;
--	gchar *adapter, *name;
-+	DBusGProxy *manager;
-+	GPtrArray *adapters;
-+	gchar *name;
-+	guint i;
+ 	BT_DBG("%s status 0x%x", hdev->name, status);
+@@ -1294,6 +1304,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
+ 		hci_cc_read_bd_addr(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_ENABLE_DUT_MODE:
++		hci_cc_enable_dut_mode(hdev, skb);
++		break;
 +
-+	name = NULL;
+ 	default:
+ 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
+ 		break;
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index f4f6615..05c5b61 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -356,6 +356,27 @@ static ssize_t store_sniff_min_interval(struct device *dev, struct device_attrib
+ 	return count;
+ }
  
- 	connection = dbus_g_bus_get(DBUS_BUS_SYSTEM, NULL);
- 	if (connection == NULL)
--		return NULL;
-+		return name;
- 
- 	manager = dbus_g_proxy_new_for_name(connection, "org.bluez",
--						"/", "org.bluez.Manager");
-+					    "/", "org.bluez.Manager");
- 	if (manager == NULL) {
- 		dbus_g_connection_unref(connection);
--		return NULL;
-+		return name;
- 	}
- 
--	if (dbus_g_proxy_call(manager, "DefaultAdapter", NULL, G_TYPE_INVALID,
--			G_TYPE_STRING, &adapter, G_TYPE_INVALID) == FALSE) {
-+	if (dbus_g_proxy_call(manager, "ListAdapters", NULL,
-+			      G_TYPE_INVALID, dbus_g_type_get_collection("GPtrArray", DBUS_TYPE_G_OBJECT_PATH), &adapters,
-+			      G_TYPE_INVALID) == FALSE) {
- 		g_object_unref(manager);
- 		dbus_g_connection_unref(connection);
--		return NULL;
-+		return name;
- 	}
- 
--	g_object_unref(manager);
--
--	proxy = dbus_g_proxy_new_for_name(connection, "org.bluez",
--						adapter, "org.bluez.Adapter");
--	if (proxy == NULL) {
--		g_free(adapter);
--		dbus_g_connection_unref(connection);
--		return NULL;
--	}
--
--	g_free(adapter);
--
--	if (dbus_g_proxy_call(proxy, "GetRemoteName", NULL,
--			G_TYPE_STRING, address, G_TYPE_INVALID,
--			G_TYPE_STRING, &name, G_TYPE_INVALID) == FALSE) {
--		g_object_unref(proxy);
--		dbus_g_connection_unref(connection);
--		return NULL;
-+	for (i = 0; i < adapters->len && name == NULL; i++)
-+	{
-+		DBusGProxy *adapter;
-+		char *device_path;
++static ssize_t show_dut_mode(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct hci_dev *hdev = dev_get_drvdata(dev);
 +
-+		adapter = dbus_g_proxy_new_for_name(connection, "org.bluez",
-+						    g_ptr_array_index(adapters, i), "org.bluez.Adapter");
-+		if (dbus_g_proxy_call(adapter, "FindDevice", NULL,
-+				      G_TYPE_STRING, address, G_TYPE_INVALID,
-+				      DBUS_TYPE_G_OBJECT_PATH, &device_path, G_TYPE_INVALID) != FALSE) {
-+			DBusGProxy *device;
-+			device = dbus_g_proxy_new_for_name(connection, "org.bluez", device_path, "org.bluez.Device");
-+			name = get_name(device);
-+			g_object_unref(device);
-+			break;
-+		}
-+		g_object_unref(adapter);
- 	}
++	return sprintf(buf, "%s\n", test_bit(HCI_DUT_MODE, &hdev->flags) ? "enabled" : "disabled");
++}
++
++static ssize_t store_dut_mode(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
++{
++	struct hci_dev *hdev = dev_get_drvdata(dev);
++	int err;
++
++	if (!test_bit(HCI_DUT_MODE, &hdev->flags) && !strncmp(buf, "enabled\n", count)) {
++		err = hci_send_cmd(hdev, HCI_OP_ENABLE_DUT_MODE, 0, NULL);
++		if (err < 0)
++			return err;
++	}
++
++	return count;
++}
++
+ static DEVICE_ATTR(type, S_IRUGO, show_type, NULL);
+ static DEVICE_ATTR(name, S_IRUGO, show_name, NULL);
+ static DEVICE_ATTR(class, S_IRUGO, show_class, NULL);
+@@ -372,6 +393,7 @@ static DEVICE_ATTR(sniff_max_interval, S_IRUGO | S_IWUSR,
+ 				show_sniff_max_interval, store_sniff_max_interval);
+ static DEVICE_ATTR(sniff_min_interval, S_IRUGO | S_IWUSR,
+ 				show_sniff_min_interval, store_sniff_min_interval);
++static DEVICE_ATTR(dut_mode, S_IRUGO | S_IWUSR, show_dut_mode, store_dut_mode);
  
--	g_object_unref(proxy);
--
-+	g_ptr_array_free(adapters, TRUE);
-+	g_object_unref(manager);
- 	dbus_g_connection_unref(connection);
+ static struct attribute *bt_host_attrs[] = {
+ 	&dev_attr_type.attr,
+@@ -386,6 +408,7 @@ static struct attribute *bt_host_attrs[] = {
+ 	&dev_attr_idle_timeout.attr,
+ 	&dev_attr_sniff_max_interval.attr,
+ 	&dev_attr_sniff_min_interval.attr,
++	&dev_attr_dut_mode.attr,
+ 	NULL
+ };
  
- 	return name;
+-- 
+1.5.6.3
 
---=-AydLESLOt01Bt8Ka5ft4--
+
+--------------050306040307020706050708--
