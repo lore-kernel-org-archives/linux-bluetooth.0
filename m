@@ -1,52 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Fix building bluez-gnome in a custom prefix
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary="=-T8f1DKFZb4xZo445r5Lk"
-Date: Wed, 24 Sep 2008 14:03:43 -0700
-Message-Id: <1222290223.10497.183.camel@snoogens.fab.redhat.com>
+Subject: Re: [RFC] DUT mode support for kernel
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Ville Tervo <ville.tervo@nokia.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <48DA1762.7050206@nokia.com>
+References: <48DA1762.7050206@nokia.com>
+Content-Type: text/plain
+Date: Wed, 24 Sep 2008 20:42:37 +0200
+Message-Id: <1222281757.6481.0.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Ville,
 
---=-T8f1DKFZb4xZo445r5Lk
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+> In good old days the only action needed to enable DUT mode was "hcitool 
+> cmd 0x06 0x0003" or similar. However now after having full connection 
+> tracking also for incoming connection this doesn't work anymore.
+> 
+> At least R&S tester does only ACL link to the device and therefore BlueZ 
+> disconnects it after 10 secs. Connection tracking needs to be disabled 
+> somehow. I prepared one proposal how to deal with it. The disable DUT 
+> mode command is missing because the Spec says the DUT mode is disabled 
+> by resetting the chip. Thus it can be done with "hciconfig hci0 reset" 
+> command.
+> 
+> With this patch against bluetooth-2.6 tree the DUT mode is enabled by 
+> echoing "enabled\n" to new sysfs entry. Maybe some other interface 
+> should be used instead?
 
+just remove the whole sysfs crap around it. Listen to the command status
+from the DUT change and then still use hcitool cmd for entering it.
 
+Regards
 
---=-T8f1DKFZb4xZo445r5Lk
-Content-Disposition: attachment; filename="0001-Fix-building-in-a-custom-prefix.patch"
-Content-Type: text/x-patch; name="0001-Fix-building-in-a-custom-prefix.patch"; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Marcel
 
->From 987348e19a9b2cab05666165d85b19d8eb06f0c3 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Wed, 24 Sep 2008 11:34:02 -0700
-Subject: [PATCH] Fix building in a custom prefix
-
-We need to pass ACLOCAL_FLAGS to aclocal, otherwise it'll be ignored
-Patch from Michael Monreal <michael.monreal@gmx.net>
----
- bootstrap |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/bootstrap b/bootstrap
-index eeb7635..5def899 100755
---- a/bootstrap
-+++ b/bootstrap
-@@ -1,6 +1,6 @@
- #!/bin/sh
- 
--aclocal && \
-+aclocal $ACLOCAL_FLAGS && \
-     autoheader && \
- 	intltoolize --automake --copy --force &&
- 	    automake --add-missing --copy && \
--- 
-1.6.0.1
-
-
---=-T8f1DKFZb4xZo445r5Lk--
 
