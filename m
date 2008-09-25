@@ -1,27 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 26 Sep 2008 15:42:04 +0530 (IST)
-From: pavan_savoy@indiatimes.com
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <192276372.30251222423924733.JavaMail.root@mbv7.indiatimes.com>
-Subject: Can't read simple pairing mode on hci0: Input/output error
+Date: Thu, 25 Sep 2008 14:59:09 -0700 (PDT)
+From: Chris Rankin <rankincj@yahoo.com>
+Reply-To: rankincj@yahoo.com
+Subject: Re: Bluetooth 2.1 USB adapter!
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1222385258.6442.10.camel@californication>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <89571.30445.qm@web52912.mail.re2.yahoo.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+--- On Fri, 26/9/08, Marcel Holtmann <marcel@holtmann.org> wrote:
+> can you point us to the exact model number and maybe a picture or shop
+> where I could order one.
 
-I get this message immaterial of the settings I do to 
+Heh, I should charge Belkin a commission ... ;-)
 
-hcid.conf --> security [none:auto:user] and pairing [none:once:multi], during hcid restart.
-What should be the problem ?
+http://www.dabs.com/ProductView.aspx?Quicklinx=3D564Q
 
-Also all my OBEX transfers work without the passkey authentication, but with passkey authentication, even if security is auto and passkey hard-coded.
+or (for a better picture)
 
-Thanks in advance
-Pavan
+http://www.argos.co.uk/static/Product/partNumber/6756035/Trail/searchtext%3=
+EBLUETOOTH.htm
 
+The model number is: F8T016
 
---
-Will the all new Indica Vista zip ahead of the Suzuki Swift? Read the expert review on Zigwheels.com
-http://zigwheels.com/b2cam/reviewsDetails.action?name=Ro11_20080829&path=/INDT/Reviews/Ro11_20080829&page=1&pagecount=9
+And once I'd warmed it in a hot fire for a short time, I noticed some other=
+ markings on it which (translated from the Elvish) read:
+
+FCC ID:K7SF8T016
+IC:3623A-F8T016
+
+There's also a version of this adapter with 100m range, should you ever wis=
+h to share your bluetooth link with all of your neighbours.
+
+And yes, it really *is* this small! I was planning on installing it permane=
+ntly in the back of one of my machines, or risk losing it completely, but t=
+he machine then refused to boot. (It's an old machine with USB 1.1 ports at=
+ the back; it might be confused by the adapter's "hub on a chip", or possib=
+ly by the adapter's built-in keyboard and mouse devices.)
+
+Now that we know how to get it working, I will be able to experiment with i=
+t further.
+
+Cheers,
+Chris
+=0A=0A=0A      
