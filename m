@@ -1,95 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <48DB29BF.2040603@nokia.com>
+Date: Thu, 25 Sep 2008 09:03:43 +0300
 From: Ville Tervo <ville.tervo@nokia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ville Tervo <ville.tervo@nokia.com>
-Subject: [PATCH 1/1] [BLUETOOTH] Disable incoming connection tracking in DUT mode
-Date: Thu, 25 Sep 2008 10:59:01 +0300
-Message-Id: <1222329541-4898-1-git-send-email-ville.tervo@nokia.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+To: ext Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] DUT mode support for kernel
+References: <48DA1762.7050206@nokia.com> <1222281757.6481.0.camel@californication>
+In-Reply-To: <1222281757.6481.0.camel@californication>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bluetooth testers establish only low level connection and they won't
-connect to any service. If connection tracking is enabled the connection
-will drop in 10 seconds. This patch adds support for detecting DUT mode
-event and disables incoming connection tracking is status code was
-succesfull.
+Hi Marcel,
 
-Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
----
- include/net/bluetooth/hci.h      |    7 +++++++
- include/net/bluetooth/hci_core.h |    3 +++
- net/bluetooth/hci_event.c        |   12 ++++++++++++
- 3 files changed, 22 insertions(+), 0 deletions(-)
+ext Marcel Holtmann wrote:
+> Hi Ville,
+> 
+>>
+>> With this patch against bluetooth-2.6 tree the DUT mode is enabled by 
+>> echoing "enabled\n" to new sysfs entry. Maybe some other interface 
+>> should be used instead?
+> 
+> just remove the whole sysfs crap around it. Listen to the command status
+> from the DUT change and then still use hcitool cmd for entering it.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 3cc2949..1279788 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -72,6 +72,8 @@ enum {
- 	HCI_INQUIRY,
- 
- 	HCI_RAW,
-+
-+	HCI_DUT_MODE,
- };
- 
- /* HCI ioctl defines */
-@@ -577,6 +579,11 @@ struct hci_rp_read_bd_addr {
- 	bdaddr_t bdaddr;
- } __attribute__ ((packed));
- 
-+#define HCI_OP_ENABLE_DUT_MODE		0x1803
-+struct hci_rp_enable_dut_mode {
-+	__u8	status;
-+} __attribute__ ((packed));
-+
- /* ---- HCI Events ---- */
- #define HCI_EV_INQUIRY_COMPLETE		0x01
- 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 46a43b7..019cd93 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -355,6 +355,9 @@ static inline void hci_conn_put(struct hci_conn *conn)
- 				timeo = msecs_to_jiffies(10);
- 		} else
- 			timeo = msecs_to_jiffies(10);
-+
-+		if (test_bit(HCI_DUT_MODE, &conn->hdev->flags) && !conn->out)
-+			return;
- 		mod_timer(&conn->disc_timer, jiffies + timeo);
- 	}
- }
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index ad7a553..f2227d0 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -535,6 +535,14 @@ static void hci_cc_read_bd_addr(struct hci_dev *hdev, struct sk_buff *skb)
- 	hci_req_complete(hdev, rp->status);
- }
- 
-+static void hci_cc_enable_dut_mode(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_rp_enable_dut_mode *rp = (void *) skb->data;
-+
-+	if (!rp->status)
-+		set_bit(HCI_DUT_MODE, &hdev->flags);
-+}
-+
- static inline void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- {
- 	BT_DBG("%s status 0x%x", hdev->name, status);
-@@ -1294,6 +1302,10 @@ static inline void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *sk
- 		hci_cc_read_bd_addr(hdev, skb);
- 		break;
- 
-+	case HCI_OP_ENABLE_DUT_MODE:
-+		hci_cc_enable_dut_mode(hdev, skb);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%x", hdev->name, opcode);
- 		break;
+OK. New patch without sysfs crap will follow soon. I was just one step 
+too far and was thinking about removal of raw hci sockets :)
+
 -- 
-1.5.6.3
-
+Ville
