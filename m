@@ -1,73 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 25 Sep 2008 14:00:18 -0700 (PDT)
+Date: Thu, 25 Sep 2008 13:50:48 -0700 (PDT)
 From: Chris Rankin <rankincj@yahoo.com>
 Reply-To: rankincj@yahoo.com
-Subject: Re: Bluetooth 2.1 USB adapter!
-To: Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: Cannot pair A2DP speakers with Belkin Bluetooth adapter
+To: johan.hedberg@gmail.com
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1222381386.6442.8.camel@californication>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Message-ID: <267849.8211.qm@web52908.mail.re2.yahoo.com>
+Message-ID: <521317.58816.qm@web52911.mail.re2.yahoo.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---- On Thu, 25/9/08, Marcel Holtmann <marcel@holtmann.org> wrote:
-> load btusb or hci_usb with reset=3D1 and if that helps, I can
-> add a quirk for this dongle.
+> For those two low-level test commands the behavior you describe is  
+> perfectly normal and expected. However, they certainly aren't a proper  
+> way to initiate pairing. Where did you get the idea that this is the  
+> right way to do pairing? If it was in some BlueZ documentation we  
+> should fix it ASAP. You might want to check the bluez wiki for some  
+> ways to perform pairing (hint: search for "CreateBonding"):
+> http://wiki.bluez.org/wiki/HOWTO/Bonding
 
-Yes, that certainly did the trick :-) !! There's a bit of noise in the dmes=
-g log from usbhid:
+Johan,
 
-usb 4-1: new full speed USB device using uhci_hcd and address 28
-usb 4-1: configuration #1 chosen from 1 choice
-hub 4-1:1.0: USB hub found
-hub 4-1:1.0: 3 ports detected
-usb 4-1.1: new full speed USB device using uhci_hcd and address 29
-usb 4-1.1: configuration #1 chosen from 1 choice
-input: HID 0a5c:4502 as /class/input/input18
-input,hidraw0: USB HID v1.11 Keyboard [HID 0a5c:4502] on usb-0000:00:1d.2-1=
-.1
-usb 4-1.2: new full speed USB device using uhci_hcd and address 30
-usb 4-1.2: configuration #1 chosen from 1 choice
-input: HID 0a5c:4503 as /class/input/input19
-input,hidraw1: USB HID v1.11 Mouse [HID 0a5c:4503] on usb-0000:00:1d.2-1.2
-usb 4-1.3: new full speed USB device using uhci_hcd and address 31
-usb 4-1.3: configuration #1 chosen from 1 choice
-usbhid: input irq status -75 received
-usbhid: input irq status -75 received
-usbhid: input irq status -75 received
-usbhid: input irq status -75 received
-usbhid: input irq status -75 received
-usbhid: input irq status -75 received
-usbhid: input irq status -75 received
-usbhid: input irq status -75 received
-usbhid: input irq status -75 received
-usbhid: input irq status -75 received
-usbhid: input irq status -75 received
-usbhid: input irq status -75 received
-usbhid: input irq status -75 received
-usbhid: input irq status -75 received
-usbhid: input irq status -75 received
+Sorry for the long delay in responding; I've only just found your reply.
 
-But it does actually (seem to) work now:
+As to my approach to pairing, I was driven to such extremes by a lack of working alternatives :-). Pairing the speakers with the laptop was easy - I was prompted for a PIN code, entered it, and all was well. However, when I tried to do the same for the desktop, the PIN-entry dialog box would always vanish before I could type more than the first digit! As a result, I resorted to lower- and lower-level techniques to find out what on Earth was going wrong.
 
-# hciconfig -a hci1
-hci1:=09Type: USB
-=09BD Address: 00:0A:3A:83:76:DA ACL MTU: 1021:8 SCO MTU: 64:1
-=09UP RUNNING PSCAN=20
-=09RX bytes:2536 acl:0 sco:0 events:37 errors:0
-=09TX bytes:628 acl:0 sco:0 commands:37 errors:0
-=09Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x79 0x83
-=09Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3=20
-=09Link policy: HOLD SNIFF PARK=20
-=09Link mode: SLAVE ACCEPT=20
-=09Name: 'whatever-1'
-=09Class: 0x080104
-=09Service Classes: Capturing
-=09Device Class: Computer, Desktop workstation
-=09HCI Ver: 2.1 (0x4) HCI Rev: 0x5184 LMP Ver: 2.1 (0x4) LMP Subver: 0x420e
-=09Manufacturer: Broadcom Corporation (15)
+I actually cracked the problem *only this morning*, having discovered hcidump last night! (This is a problem that's been on the back-burner for a while...) What appears to have been happening is that the speakers only allow devices to bond with them for a few minutes after the speakers are switched on. (This isn't made at all clear in the manual.) If you try to pair after that then the speakers ignore you and just drop the connection. More significantly, they don't even keep the connection alive long enough to respond to (i.e. reject) an outstanding attempt to send a PIN. What I eventually did was the following:
+
+* Run hcidump -V in one window
+* Run l2ping <bdaddr> in another window to open a connection and *keep* it open.
+* Run hciconfig auth <bdaddr> in a third window.
+
+And no, this didn't work either. But it did at least allow the speakers *refusal* to bond to appear in the dump output :-). Once it became clear that a) the speakers did possess a "pairing mode", and b) that the speakers weren't *in* "pairing mode" then bonding them to the adapter became easy.
+
+As to the Linux Bluetooth documentation, it appears that BT support has evolved rapidly and significantly over the past year or two, and Google has a looong memory. Much of the advice I was digging up seemed out-of-date. Also, it all expected bonding to Just Work, and none of the errors I was seeing gave any indication of what the underlying problem actually was. For example, I think ALSA's error from aplay was about a GET CAPABILITIES call failing. Similarly, a Connect() call from Python just gave an I/O error.
+
+Anyway - it all works NOW :-).
 
 Thanks,
 Chris
-=0A=0A=0A      
+
+
+
+      
