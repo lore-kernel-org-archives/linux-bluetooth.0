@@ -1,144 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----_=_NextPart_001_01C92109.6BFAED25"
-Subject: [PATCH] Make bluetooth-sendto functional with ODS SVN head
-Date: Sat, 27 Sep 2008 20:27:10 -0500
-Message-ID: <FA7963CC89065B49AED46A6F797F0FA6F28691@AUSX3MPC128.aus.amer.dell.com>
-From: <Mario_Limonciello@Dell.com>
-To: <linux-bluetooth@vger.kernel.org>
+Message-Id: <3B81408E-617A-46F5-A8D2-89C70E4E97FD@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <48DD699C.9090307@dell.com>
+Content-Type: multipart/mixed; boundary=Apple-Mail-6--570359728
+Mime-Version: 1.0 (Apple Message framework v929.2)
+Subject: Re: Bluetoothd crashing on 4.7
+Date: Sun, 28 Sep 2008 00:12:56 +0300
+References: <48DD699C.9090307@dell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
 
-------_=_NextPart_001_01C92109.6BFAED25
+--Apple-Mail-6--570359728
 Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	charset=US-ASCII;
+	format=flowed;
+	delsp=yes
+Content-Transfer-Encoding: 7bit
 
-Hi:
+Hi Mario,
 
-In trying to verify that all functionality is working in the 4.x stack, =
-I found bluetooth-sendto to be fairly broken.  You can't use it with a =
-release version of ODS because the release version only supports 3.x.  =
-The SVN head version changed APIs though for the 4.x stuff, and expects =
-different behavior.
+On Sep 27, 2008, at 2:00, Mario Limonciello wrote:
+> I recently packaged bluez 4.7 for possible inclusion in Ubuntu  
+> intrepid
+> [1].  Upon doing some basic testing with it, I've run into a situation
+> where when I try to pair with a keyboard, bluetoothd crashes.  If I  
+> run
+> it under valgrind, bluetoothd survives the crash, and the keyboard  
+> works
+> [2].  If I run it with gdb, it comes down, and I get a trace at
+> least[3].  If I run it without a debugger, keyboard doesn't properly  
+> work.
 
-The attached patch makes it work with SVN head of ODS.  This should be =
-used in conjunction with Bastien's patch.
+This is probably caused by my cleanup/rewrite patches for the pairing  
+logic in 4.7. Based on the gdb trace the attached patch should fix the  
+issue. It's also pushed to the kernel.org git and should appear in the  
+next release.
 
-Regards
+Johan
 
-Mario Limonciello=20
-Dell | Linux Engineering=20
-Mario_Limonciello@Dell.com=20
-
-
-
-------_=_NextPart_001_01C92109.6BFAED25
-Content-Type: text/x-patch;
-	name="05_bluetooth_sendto_dbus-snd.patch"
-Content-Transfer-Encoding: base64
-Content-Description: 05_bluetooth_sendto_dbus-snd.patch
+--Apple-Mail-6--570359728
 Content-Disposition: attachment;
-	filename="05_bluetooth_sendto_dbus-snd.patch"
+	filename=bluetoothd-segfault.patch
+Content-Type: application/octet-stream;
+	x-unix-mode=0664;
+	name="bluetoothd-segfault.patch"
+Content-Transfer-Encoding: 7bit
 
-ZGlmZiAtTnVyIC14ICcqLm9yaWcnIC14ICcqficgYmx1ZXotZ25vbWUtMS41L2NvbW1vbi9tYXJz
-aGFsLmxpc3QgYmx1ZXotZ25vbWUtMS41Lm5ldy9jb21tb24vbWFyc2hhbC5saXN0Ci0tLSBibHVl
-ei1nbm9tZS0xLjUvY29tbW9uL21hcnNoYWwubGlzdAkyMDA4LTA4LTI0IDE2OjE0OjI0LjAwMDAw
-MDAwMCAtMDUwMAorKysgYmx1ZXotZ25vbWUtMS41Lm5ldy9jb21tb24vbWFyc2hhbC5saXN0CTIw
-MDgtMDktMjcgMjA6MTc6MzcuMDAwMDAwMDAwIC0wNTAwCkBAIC0zLDMgKzMsNCBAQAogVk9JRDpT
-VFJJTkcsU1RSSU5HCiBWT0lEOlNUUklORyxTVFJJTkcsVUlOVDY0CiBWT0lEOlVJTlQ2NAorVk9J
-RDpTVFJJTkcsU1RSSU5HLFNUUklORwpkaWZmIC1OdXIgLXggJyoub3JpZycgLXggJyp+JyBibHVl
-ei1nbm9tZS0xLjUvc2VuZHRvL21haW4uYyBibHVlei1nbm9tZS0xLjUubmV3L3NlbmR0by9tYWlu
-LmMKLS0tIGJsdWV6LWdub21lLTEuNS9zZW5kdG8vbWFpbi5jCTIwMDgtMDktMjcgMjA6MTc6MzAu
-MDAwMDAwMDAwIC0wNTAwCisrKyBibHVlei1nbm9tZS0xLjUubmV3L3NlbmR0by9tYWluLmMJMjAw
-OC0wOS0yNyAyMDoxNzozNS4wMDAwMDAwMDAgLTA1MDAKQEAgLTYwLDYgKzYwLDggQEAKIHN0YXRp
-YyBnaW50NjQgZmlyc3RfdXBkYXRlID0gMDsKIHN0YXRpYyBnaW50NjQgbGFzdF91cGRhdGUgPSAw
-OwogCitzdGF0aWMgREJ1c0dQcm94eSAqc2Vzc2lvbl9wcm94eSA9IE5VTEw7CisKIHN0YXRpYyBn
-Y2hhciAqZmlsZW5hbWVfdG9fcGF0aChjb25zdCBnY2hhciAqZmlsZW5hbWUpCiB7CiAJR0ZpbGUg
-KmZpbGU7CkBAIC0zNTAsNyArMzUyLDE2IEBACiBzdGF0aWMgdm9pZCBlcnJvcl9vY2N1cnJlZChE
-QnVzR1Byb3h5ICpwcm94eSwgY29uc3QgZ2NoYXIgKm5hbWUsCiAJCQkJY29uc3QgZ2NoYXIgKm1l
-c3NhZ2UsIGdwb2ludGVyIHVzZXJfZGF0YSkKIHsKLQl0cmFuc2Zlcl9jb21wbGV0ZWQocHJveHks
-IHVzZXJfZGF0YSk7CisJZ3RrX3Byb2dyZXNzX2Jhcl9zZXRfdGV4dChHVEtfUFJPR1JFU1NfQkFS
-KHByb2dyZXNzKSwKKwkJCQkJCQlfKCJFcnJvciBPY2N1cnJlZCIpKTsKKwkJCQkJCQkKKwlnY2hh
-ciAqdGV4dCA9IGdfc3RyZHVwX3ByaW50ZigiPHNwYW4gZm9yZWdyb3VuZD1cInJlZFwiPiVzPC9z
-cGFuPiIsCisJCQkJCQkJCW1lc3NhZ2UpOworCWd0a19sYWJlbF9zZXRfbWFya3VwKEdUS19MQUJF
-TChsYWJlbF9zdGF0dXMpLCB0ZXh0KTsKKwlnX2ZyZWUodGV4dCk7CisKKwlndGtfZGlhbG9nX3Nl
-dF9yZXNwb25zZV9zZW5zaXRpdmUoR1RLX0RJQUxPRyhkaWFsb2cpLAorCQkJCQkJR1RLX1JFU1BP
-TlNFX0NMT1NFLCBUUlVFKTsKIH0KIAogc3RhdGljIHZvaWQgc2Vzc2lvbl9jb25uZWN0ZWQoREJ1
-c0dQcm94eSAqcHJveHksIGdwb2ludGVyIHVzZXJfZGF0YSkKQEAgLTM1OSw3ICszNzAsNyBAQAog
-CiAJZmlyc3RfdXBkYXRlID0gZ2V0X3N5c3RlbV90aW1lKCk7CiAKLQlzZW5kX2ZpbGUocHJveHkp
-OworCXNlbmRfZmlsZShzZXNzaW9uX3Byb3h5KTsKIH0KIAogI2RlZmluZSBPUEVOT0JFWF9DT05O
-RUNUSU9OX0ZBSUxFRCAib3JnLm9wZW5vYmV4LkVycm9yLkNvbm5lY3Rpb25BdHRlbXB0RmFpbGVk
-IgpAQCAtNDAzLDYwICs0MTQsNDEgQEAKIAlpZiAoZGJ1c19nX3Byb3h5X2VuZF9jYWxsKHByb3h5
-LCBjYWxsLCAmZXJyb3IsCiAJCQkJCURCVVNfVFlQRV9HX09CSkVDVF9QQVRILCAmcGF0aCwKIAkJ
-CQkJCUdfVFlQRV9JTlZBTElEKSA9PSBGQUxTRSkgewotCQlnY2hhciAqdGV4dCwgKm1lc3NhZ2U7
-CisJCWdjaGFyICptZXNzYWdlOwogCiAJCW1lc3NhZ2UgPSBnZXRfZXJyb3JfbWVzc2FnZShlcnJv
-cik7CiAKLQkJdGV4dCA9IGdfc3RyZHVwX3ByaW50ZigiPHNwYW4gZm9yZWdyb3VuZD1cInJlZFwi
-PiVzPC9zcGFuPiIsCi0JCQkJCQkJCW1lc3NhZ2UpOwotCQlndGtfbGFiZWxfc2V0X21hcmt1cChH
-VEtfTEFCRUwobGFiZWxfc3RhdHVzKSwgdGV4dCk7Ci0JCWdfZnJlZSh0ZXh0KTsKKwkJZXJyb3Jf
-b2NjdXJyZWQocHJveHksTlVMTCxtZXNzYWdlLE5VTEwpOwogCiAJCWdfZnJlZShtZXNzYWdlKTsK
-IAotCQlndGtfZGlhbG9nX3NldF9yZXNwb25zZV9zZW5zaXRpdmUoR1RLX0RJQUxPRyhkaWFsb2cp
-LAotCQkJCQkJR1RLX1JFU1BPTlNFX0NMT1NFLCBUUlVFKTsKIAkJcmV0dXJuOwogCX0KLQotCXBy
-b3h5ID0gZGJ1c19nX3Byb3h5X25ld19mb3JfbmFtZShjb25uLCAib3JnLm9wZW5vYmV4IiwKKwlz
-ZXNzaW9uX3Byb3h5ID0gZGJ1c19nX3Byb3h5X25ld19mb3JfbmFtZShjb25uLCAib3JnLm9wZW5v
-YmV4IiwKIAkJCQkJCXBhdGgsICJvcmcub3Blbm9iZXguU2Vzc2lvbiIpOwogCi0JZGJ1c19nX3By
-b3h5X2FkZF9zaWduYWwocHJveHksICJDb25uZWN0ZWQiLCBHX1RZUEVfSU5WQUxJRCk7Ci0KLQlk
-YnVzX2dfcHJveHlfY29ubmVjdF9zaWduYWwocHJveHksICJDb25uZWN0ZWQiLAotCQkJCUdfQ0FM
-TEJBQ0soc2Vzc2lvbl9jb25uZWN0ZWQpLCBOVUxMLCBOVUxMKTsKKwlkYnVzX2dfcHJveHlfYWRk
-X3NpZ25hbChzZXNzaW9uX3Byb3h5LCAiQ2FuY2VsbGVkIiwgR19UWVBFX0lOVkFMSUQpOwogCi0J
-ZGJ1c19nX3Byb3h5X2FkZF9zaWduYWwocHJveHksICJFcnJvck9jY3VycmVkIiwKLQkJCQlHX1RZ
-UEVfU1RSSU5HLCBHX1RZUEVfU1RSSU5HLCBHX1RZUEVfSU5WQUxJRCk7Ci0KLQlkYnVzX2dfcHJv
-eHlfY29ubmVjdF9zaWduYWwocHJveHksICJFcnJvck9jY3VycmVkIiwKLQkJCQlHX0NBTExCQUNL
-KGVycm9yX29jY3VycmVkKSwgTlVMTCwgTlVMTCk7Ci0KLQlkYnVzX2dfcHJveHlfYWRkX3NpZ25h
-bChwcm94eSwgIkNhbmNlbGxlZCIsIEdfVFlQRV9JTlZBTElEKTsKLQotCWRidXNfZ19wcm94eV9j
-b25uZWN0X3NpZ25hbChwcm94eSwgIkNhbmNlbGxlZCIsCisJZGJ1c19nX3Byb3h5X2Nvbm5lY3Rf
-c2lnbmFsKHNlc3Npb25fcHJveHksICJDYW5jZWxsZWQiLAogCQkJCUdfQ0FMTEJBQ0sodHJhbnNm
-ZXJfY2FuY2VsbGVkKSwgTlVMTCwgTlVMTCk7CiAKLQlkYnVzX2dfcHJveHlfYWRkX3NpZ25hbChw
-cm94eSwgIlRyYW5zZmVyU3RhcnRlZCIsIEdfVFlQRV9TVFJJTkcsCisJZGJ1c19nX3Byb3h5X2Fk
-ZF9zaWduYWwoc2Vzc2lvbl9wcm94eSwgIlRyYW5zZmVyU3RhcnRlZCIsIEdfVFlQRV9TVFJJTkcs
-CiAJCQkJR19UWVBFX1NUUklORywgR19UWVBFX1VJTlQ2NCwgR19UWVBFX0lOVkFMSUQpOwogCi0J
-ZGJ1c19nX3Byb3h5X2Nvbm5lY3Rfc2lnbmFsKHByb3h5LCAiVHJhbnNmZXJTdGFydGVkIiwKKwlk
-YnVzX2dfcHJveHlfY29ubmVjdF9zaWduYWwoc2Vzc2lvbl9wcm94eSwgIlRyYW5zZmVyU3RhcnRl
-ZCIsCiAJCQkJR19DQUxMQkFDSyh0cmFuc2Zlcl9zdGFydGVkKSwgTlVMTCwgTlVMTCk7CiAKLQlk
-YnVzX2dfcHJveHlfYWRkX3NpZ25hbChwcm94eSwgIlRyYW5zZmVyUHJvZ3Jlc3MiLAorCWRidXNf
-Z19wcm94eV9hZGRfc2lnbmFsKHNlc3Npb25fcHJveHksICJUcmFuc2ZlclByb2dyZXNzIiwKIAkJ
-CQkJCUdfVFlQRV9VSU5UNjQsIEdfVFlQRV9JTlZBTElEKTsKIAotCWRidXNfZ19wcm94eV9jb25u
-ZWN0X3NpZ25hbChwcm94eSwgIlRyYW5zZmVyUHJvZ3Jlc3MiLAorCWRidXNfZ19wcm94eV9jb25u
-ZWN0X3NpZ25hbChzZXNzaW9uX3Byb3h5LCAiVHJhbnNmZXJQcm9ncmVzcyIsCiAJCQkJR19DQUxM
-QkFDSyh0cmFuc2Zlcl9wcm9ncmVzcyksIE5VTEwsIE5VTEwpOwogCi0JZGJ1c19nX3Byb3h5X2Fk
-ZF9zaWduYWwocHJveHksICJUcmFuc2ZlckNvbXBsZXRlZCIsIEdfVFlQRV9JTlZBTElEKTsKKwlk
-YnVzX2dfcHJveHlfYWRkX3NpZ25hbChzZXNzaW9uX3Byb3h5LCAiVHJhbnNmZXJDb21wbGV0ZWQi
-LCBHX1RZUEVfSU5WQUxJRCk7CiAKLQlkYnVzX2dfcHJveHlfY29ubmVjdF9zaWduYWwocHJveHks
-ICJUcmFuc2ZlckNvbXBsZXRlZCIsCisJZGJ1c19nX3Byb3h5X2Nvbm5lY3Rfc2lnbmFsKHNlc3Np
-b25fcHJveHksICJUcmFuc2ZlckNvbXBsZXRlZCIsCiAJCQkJR19DQUxMQkFDSyh0cmFuc2Zlcl9j
-b21wbGV0ZWQpLCBOVUxMLCBOVUxMKTsKIAotCWRidXNfZ19wcm94eV9jYWxsKHByb3h5LCAiQ29u
-bmVjdCIsIE5VTEwsIEdfVFlQRV9JTlZBTElELAotCQkJCQkJCUdfVFlQRV9JTlZBTElEKTsKIH0K
-IAogc3RhdGljIGdjaGFyICpnZXRfbmFtZShEQnVzR1Byb3h5ICpkZXZpY2UpCkBAIC02NDUsNiAr
-NjM3LDE0IEBACiAKIAlkYnVzX2dfb2JqZWN0X3JlZ2lzdGVyX21hcnNoYWxsZXIobWFyc2hhbF9W
-T0lEX19VSU5UNjQsCiAJCQkJR19UWVBFX05PTkUsIEdfVFlQRV9VSU5UNjQsIEdfVFlQRV9JTlZB
-TElEKTsKKwkJCQkKKwlkYnVzX2dfb2JqZWN0X3JlZ2lzdGVyX21hcnNoYWxsZXIobWFyc2hhbF9W
-T0lEX19TVFJJTkdfU1RSSU5HX1NUUklORywKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIEdfVFlQRV9OT05FLAorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgREJVU19UWVBFX0dfT0JKRUNUX1BBVEgsCisgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBHX1RZUEVfU1RSSU5HLAorICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgR19UWVBFX1NUUklORywKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIEdfVFlQRV9JTlZBTElEKTsKKwogCiAJZGV2aWNlX25hbWUgPSBnZXRfZGV2aWNl
-X25hbWUob3B0aW9uX2RldmljZSk7CiAJaWYgKGRldmljZV9uYW1lID09IE5VTEwpCkBAIC02NjEs
-NiArNjYxLDE4IEBACiAJZGJ1c19nX3Byb3h5X2Nvbm5lY3Rfc2lnbmFsKHByb3h5LCAiTmFtZU93
-bmVyQ2hhbmdlZCIsCiAJCQkJR19DQUxMQkFDSyhuYW1lX293bmVyX2NoYW5nZWQpLCBOVUxMLCBO
-VUxMKTsKIAorCWRidXNfZ19wcm94eV9hZGRfc2lnbmFsKHByb3h5LCAiU2Vzc2lvbkNvbm5lY3Rl
-ZCIsIERCVVNfVFlQRV9HX09CSkVDVF9QQVRILCBHX1RZUEVfSU5WQUxJRCk7CisKKwlkYnVzX2df
-cHJveHlfY29ubmVjdF9zaWduYWwocHJveHksICJTZXNzaW9uQ29ubmVjdGVkIiwKKwkJCQlHX0NB
-TExCQUNLKHNlc3Npb25fY29ubmVjdGVkKSwgTlVMTCwgTlVMTCk7CisKKwlkYnVzX2dfcHJveHlf
-YWRkX3NpZ25hbChwcm94eSwgIlNlc3Npb25Db25uZWN0RXJyb3IiLAorCQkJCURCVVNfVFlQRV9H
-X09CSkVDVF9QQVRILCBHX1RZUEVfU1RSSU5HLCBHX1RZUEVfU1RSSU5HLCBHX1RZUEVfSU5WQUxJ
-RCk7CisKKwlkYnVzX2dfcHJveHlfY29ubmVjdF9zaWduYWwocHJveHksICJTZXNzaW9uQ29ubmVj
-dEVycm9yIiwKKwkJCQlHX0NBTExCQUNLKGVycm9yX29jY3VycmVkKSwgTlVMTCwgTlVMTCk7CisK
-KwogCWRidXNfZ19wcm94eV9iZWdpbl9jYWxsKHByb3h5LCAiQ3JlYXRlQmx1ZXRvb3RoU2Vzc2lv
-biIsCiAJCQkJY3JlYXRlX25vdGlmeSwgTlVMTCwgTlVMTCwKIAkJCQlHX1RZUEVfU1RSSU5HLCBv
-cHRpb25fZGV2aWNlLAo=
+commit cccde44377fc5bb5d9db51ca6b4fcb790c7d24ba
+Author: Johan Hedberg <johan.hedberg@nokia.com>
+Date:   Sat Sep 27 14:08:42 2008 -0700
 
-------_=_NextPart_001_01C92109.6BFAED25--
+    Fix potential NULL pointer dereference
+
+diff --git a/src/dbus-hci.c b/src/dbus-hci.c
+index 795df0a..eea166e 100644
+--- a/src/dbus-hci.c
++++ b/src/dbus-hci.c
+@@ -518,7 +518,7 @@ void hcid_dbus_bonding_process_complete(bdaddr_t *local, bdaddr_t *peer,
+ 
+ 	bonding = adapter_get_bonding_info(adapter);
+ 
+-	if (bacmp(&bonding->bdaddr, peer))
++	if (bonding && bacmp(&bonding->bdaddr, peer))
+ 		bonding = NULL;
+ 
+ 	if (status == 0) {
+
+--Apple-Mail-6--570359728
+Content-Type: text/plain;
+	charset=US-ASCII;
+	format=flowed
+Content-Transfer-Encoding: 7bit
+
+
+
+--Apple-Mail-6--570359728--
