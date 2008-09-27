@@ -1,28 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 1/1] [BLUETOOTH] Disable incoming connection tracking
-	in DUT mode
+Subject: Re: btusb reset quirk for MacBook Pro
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Ville Tervo <ville.tervo@nokia.com>
+To: David Woodhouse <dwmw2@infradead.org>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1222329541-4898-1-git-send-email-ville.tervo@nokia.com>
-References: <1222329541-4898-1-git-send-email-ville.tervo@nokia.com>
+In-Reply-To: <1221769858.3573.69.camel@macbook.infradead.org>
+References: <1221769858.3573.69.camel@macbook.infradead.org>
 Content-Type: text/plain
-Date: Sat, 27 Sep 2008 07:29:10 +0200
-Message-Id: <1222493350.7093.11.camel@californication>
+Date: Sat, 27 Sep 2008 06:33:16 +0200
+Message-Id: <1222489996.7093.8.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ville,
+Hi David,
 
-> Bluetooth testers establish only low level connection and they won't
-> connect to any service. If connection tracking is enabled the connection
-> will drop in 10 seconds. This patch adds support for detecting DUT mode
-> event and disables incoming connection tracking is status code was
-> succesfull.
+> Without this, my new shinybook tends to boot up either giving I/O errors
+> on 'hciconfig -a', or complaining about packets from non-existent ACL
+> connections.
 
-I think we should just put the device into RAW mode. Having another flag
-for DUT is not useful and RAW mode is already handled special.
+a similar patch been merged into Linus tree. Thanks.
 
 Regards
 
