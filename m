@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
 Content-Type: multipart/mixed;
-	boundary="----_=_NextPart_001_01C92192.4C866249"
-Subject: [PATCH] Add ability to start wizard from properties
-Date: Sun, 28 Sep 2008 12:47:29 -0500
-Message-ID: <FA7963CC89065B49AED46A6F797F0FA6F28696@AUSX3MPC128.aus.amer.dell.com>
+	boundary="----_=_NextPart_001_01C92192.127A0A0A"
+Subject: [PATCH] Start wizard when left clicked
+Date: Sun, 28 Sep 2008 12:45:53 -0500
+Message-ID: <FA7963CC89065B49AED46A6F797F0FA6F28695@AUSX3MPC128.aus.amer.dell.com>
 From: <Mario_Limonciello@Dell.com>
 To: <linux-bluetooth@vger.kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,18 +12,18 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 This is a multi-part message in MIME format.
 
-------_=_NextPart_001_01C92192.4C866249
+------_=_NextPart_001_01C92192.127A0A0A
 Content-Type: text/plain;
 	charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 
 Hi:
 
-When packaged, generally the Bluetooth properties application is added =
-to the Preferences menu as a configuration tool for Bluetooth.  This =
-leaves a gap in the experience since there is no way to configure "New" =
-devices by following that flow.  This patch adds a button to the UI that =
-will spawn the wizard to allow users to pair.
+Currently the applet doesn't seem to respond to any actions when left =
+clicked unless it's blinking.  This is counter intuitive from the =
+expectation that something will happen when left clicked.  Attached is a =
+patch that will spawn the wizard when left clicked, or stop blinking if =
+it was.
 
 Regards
 
@@ -31,35 +31,36 @@ Mario Limonciello=20
 Dell | Linux Engineering=20
 Mario_Limonciello@Dell.com=20
 
-------_=_NextPart_001_01C92192.4C866249
+------_=_NextPart_001_01C92192.127A0A0A
 Content-Type: text/x-patch;
-	name="07_add_wizard_preferences.patch"
+	name="08_start_wizard_left_click.patch"
 Content-Transfer-Encoding: base64
-Content-Description: 07_add_wizard_preferences.patch
+Content-Description: 08_start_wizard_left_click.patch
 Content-Disposition: attachment;
-	filename="07_add_wizard_preferences.patch"
+	filename="08_start_wizard_left_click.patch"
 
-ZGlmZiAtTnVyIC14ICcqLm9yaWcnIC14ICcqficgYmx1ZXotZ25vbWUtMS41L3Byb3BlcnRpZXMv
-bWFpbi5jIGJsdWV6LWdub21lLTEuNS5uZXcvcHJvcGVydGllcy9tYWluLmMKLS0tIGJsdWV6LWdu
-b21lLTEuNS9wcm9wZXJ0aWVzL21haW4uYwkyMDA4LTA4LTI0IDExOjA1OjUwLjAwMDAwMDAwMCAt
-MDUwMAorKysgYmx1ZXotZ25vbWUtMS41Lm5ldy9wcm9wZXJ0aWVzL21haW4uYwkyMDA4LTA5LTI4
-IDEyOjE5OjQ2LjAwMDAwMDAwMCAtMDUwMApAQCAtNTEsNiArNTEsMTYgQEAKIAlndGtfbWFpbl9x
-dWl0KCk7CiB9CiAKK3N0YXRpYyB2b2lkIHdpemFyZF9jYWxsYmFjayhHT2JqZWN0ICp3aWRnZXQs
-IGdwb2ludGVyIHVzZXJfZGF0YSkKK3sKKyAgICAgICAgY29uc3QgY2hhciAqY29tbWFuZCA9ICJi
-bHVldG9vdGgtd2l6YXJkIjsKKworICAgICAgICBpZiAoIWdfc3Bhd25fY29tbWFuZF9saW5lX2Fz
-eW5jKGNvbW1hbmQsIE5VTEwpKQorICAgICAgICAgICAgICAgIGdfcHJpbnRlcnIoIkNvdWxkbid0
-IGV4ZWN1dGUgY29tbWFuZDogJXNcbiIsIGNvbW1hbmQpOworCisJY2xvc2VfY2FsbGJhY2sod2lk
-Z2V0LHVzZXJfZGF0YSk7Cit9CisKIHN0YXRpYyBHdGtXaWRnZXQgKmNyZWF0ZV93aW5kb3coR3Rr
-V2lkZ2V0ICpub3RlYm9vaykKIHsKIAlHdGtXaWRnZXQgKndpbmRvdzsKQEAgLTc2LDYgKzg2LDEx
-IEBACiAJZ3RrX2J1dHRvbl9ib3hfc2V0X2xheW91dChHVEtfQlVUVE9OX0JPWChidXR0b25ib3gp
-LCBHVEtfQlVUVE9OQk9YX0VORCk7CiAJZ3RrX2JveF9wYWNrX3N0YXJ0KEdUS19CT1godmJveCks
-IGJ1dHRvbmJveCwgRkFMU0UsIEZBTFNFLCAwKTsKIAorCWJ1dHRvbiA9IGd0a19idXR0b25fbmV3
-X3dpdGhfbW5lbW9uaWMoXygiU2V0dXAgX05ldyBEZXZpY2UiKSk7CisJZ3RrX2NvbnRhaW5lcl9h
-ZGQoR1RLX0NPTlRBSU5FUihidXR0b25ib3gpLCBidXR0b24pOworCWdfc2lnbmFsX2Nvbm5lY3Qo
-R19PQkpFQ1QoYnV0dG9uKSwgImNsaWNrZWQiLAorCQkJCQlHX0NBTExCQUNLKHdpemFyZF9jYWxs
-YmFjayksIHdpbmRvdyk7CisKIAlidXR0b24gPSBndGtfYnV0dG9uX25ld19mcm9tX3N0b2NrKEdU
-S19TVE9DS19DTE9TRSk7CiAJZ3RrX2NvbnRhaW5lcl9hZGQoR1RLX0NPTlRBSU5FUihidXR0b25i
-b3gpLCBidXR0b24pOwogCWdfc2lnbmFsX2Nvbm5lY3QoR19PQkpFQ1QoYnV0dG9uKSwgImNsaWNr
-ZWQiLAo=
+ZGlmZiAtTnVyIC14ICcqLm9yaWcnIC14ICcqficgYmx1ZXotZ25vbWUtMS41L2FwcGxldC9tYWlu
+LmMgYmx1ZXotZ25vbWUtMS41Lm5ldy9hcHBsZXQvbWFpbi5jCi0tLSBibHVlei1nbm9tZS0xLjUv
+YXBwbGV0L21haW4uYwkyMDA4LTA5LTEzIDEyOjM0OjExLjAwMDAwMDAwMCAtMDUwMAorKysgYmx1
+ZXotZ25vbWUtMS41Lm5ldy9hcHBsZXQvbWFpbi5jCTIwMDgtMDktMjggMTI6Mzc6NTMuMDAwMDAw
+MDAwIC0wNTAwCkBAIC0xNzYsNyArMTc2LDEwIEBACiAKIHN0YXRpYyB2b2lkIGFjdGl2YXRlX2Nh
+bGxiYWNrKEdPYmplY3QgKndpZGdldCwgZ3BvaW50ZXIgdXNlcl9kYXRhKQogewotCXNob3dfYWdl
+bnRzKCk7CisJaWYgKHF1ZXJ5X2JsaW5raW5nKCkpCisJCXNob3dfYWdlbnRzKCk7CisJZWxzZQor
+CQl3aXphcmRfY2FsbGJhY2sod2lkZ2V0LHVzZXJfZGF0YSk7CiB9CiAKIHN0YXRpYyB2b2lkIHBv
+cHVwX2NhbGxiYWNrKEdPYmplY3QgKndpZGdldCwgZ3VpbnQgYnV0dG9uLApkaWZmIC1OdXIgLXgg
+Jyoub3JpZycgLXggJyp+JyBibHVlei1nbm9tZS0xLjUvYXBwbGV0L25vdGlmeS5jIGJsdWV6LWdu
+b21lLTEuNS5uZXcvYXBwbGV0L25vdGlmeS5jCi0tLSBibHVlei1nbm9tZS0xLjUvYXBwbGV0L25v
+dGlmeS5jCTIwMDgtMDgtMjQgMTE6MDU6NTAuMDAwMDAwMDAwIC0wNTAwCisrKyBibHVlei1nbm9t
+ZS0xLjUubmV3L2FwcGxldC9ub3RpZnkuYwkyMDA4LTA5LTI4IDEyOjM3OjU2LjAwMDAwMDAwMCAt
+MDUwMApAQCAtMTMwLDMgKzEzMCw4IEBACiB7CiAJZ3RrX3N0YXR1c19pY29uX3NldF9ibGlua2lu
+ZyhzdGF0dXNpY29uLCBGQUxTRSk7CiB9CisKK2dib29sZWFuIHF1ZXJ5X2JsaW5raW5nKHZvaWQp
+Cit7CisJcmV0dXJuIGd0a19zdGF0dXNfaWNvbl9nZXRfYmxpbmtpbmcoc3RhdHVzaWNvbik7Cit9
+CmRpZmYgLU51ciAteCAnKi5vcmlnJyAteCAnKn4nIGJsdWV6LWdub21lLTEuNS9hcHBsZXQvbm90
+aWZ5LmggYmx1ZXotZ25vbWUtMS41Lm5ldy9hcHBsZXQvbm90aWZ5LmgKLS0tIGJsdWV6LWdub21l
+LTEuNS9hcHBsZXQvbm90aWZ5LmgJMjAwOC0wOC0yNCAxMTowNTo1MC4wMDAwMDAwMDAgLTA1MDAK
+KysrIGJsdWV6LWdub21lLTEuNS5uZXcvYXBwbGV0L25vdGlmeS5oCTIwMDgtMDktMjggMTI6Mzc6
+NTYuMDAwMDAwMDAwIC0wNTAwCkBAIC0zNCwzICszNCw0IEBACiAKIHZvaWQgZW5hYmxlX2JsaW5r
+aW5nKHZvaWQpOwogdm9pZCBkaXNhYmxlX2JsaW5raW5nKHZvaWQpOworZ2Jvb2xlYW4gcXVlcnlf
+Ymxpbmtpbmcodm9pZCk7Cg==
 
-------_=_NextPart_001_01C92192.4C866249--
+------_=_NextPart_001_01C92192.127A0A0A--
