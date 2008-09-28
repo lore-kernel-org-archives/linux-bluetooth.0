@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2ced936d0809281240k46c15812va7c80172bd0b92c9@mail.gmail.com>
-Date: Sun, 28 Sep 2008 16:40:00 -0300
-From: "Breno Jacinto" <breno@freeunix.com.br>
-To: bluez-users@lists.sourceforge.net
-MIME-Version: 1.0
-Subject: [Bluez-users] BNEP Broadcasting
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <722F286E5CF54C459DDA462B750B07CE08876B3BC7@pdsmsx502.ccr.corp.intel.com>
+References: <722F286E5CF54C459DDA462B750B07CE08876B3BC7@pdsmsx502.ccr.corp.intel.com>
+Date: Sun, 28 Sep 2008 11:24:38 +0200
+Message-Id: <1222593878.9600.4.camel@californication>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Does scotest work in bluez4.7?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,53 +16,29 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hello,
+Hi Zhigang,
+> 
+> I can't use scotest command when I installed the 4.7 package.
+> Does I need install other package look like bluez-utils?
+> If yes,which version could be best for test?
 
-   I'm working on an experiment involving the Bluetooth network with
-the PAN profile enabled and BNEP implemented in a simple scenario: one
-master node with the GN role enabled, and another one with the PANU
-role.
+actually scotest is pretty bad for testing. It is really low-level and
+would only work with BlueZ to BlueZ connections.
 
-   According to the BNEP spec, page 16, it's said:
+Regards
 
-"Either the destination or the source address may be an IEEE Ethernet
-address, if
-the actual destination/source is an IEEE device and not a Bluetooth device.
-BNEP shall use IEEE Ethernet broadcast and multicast addresses for the sour=
-ce
-and/or destination addresses for broadcast and multicast packets."
+Marcel
 
-   So, I suppose that broadcasting should be supported in a BNEP
-network, just like an Ethernet network? I'm concerned about this
-because I'm trying to broadcast a message from PANU to other devices
-(in this case, just the master) and vice-versa, without any success.
 
-    If someone is aware of how this could be achieved, or if I'm
-misunderstanding something, please share your opnion.
-
-best regards,
-
--- =
-
--- =
-
-:: Breno Jacinto ::
-:: breno - at - gprt.ufpe.br ::
-:: FingerPrint ::
-   2F15 8A61 F566 E442 8581
-   E3C0 EFF4 E202 74B7 7484
-:: Persistir no dif=EDcil =E9 a =FAnica maneira de torn=E1-lo f=E1cil algum=
- dia.  ::
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great priz=
-es
+Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
