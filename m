@@ -1,117 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 29 Sep 2008 23:47:52 +0530
-From: Rabin Vincent <rabin@rab.in>
-To: Justin Mattock <justinmattock@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Subject: Re: BUG kmalloc-16: Object already free
-Message-ID: <20080929181752.GA2027@debian>
-References: <dd18b0c30809281554g11ac7275x819812935b6ac68f@mail.gmail.com>
+Message-ID: <9bd2f8970809290947l51182d4u1ddd951dd8f321c5@mail.gmail.com>
+Date: Tue, 30 Sep 2008 01:47:12 +0900
+From: "Emmet Hikory" <persia@ubuntu.com>
+Sender: emmet.hikory@gmail.com
+To: "Bastien Nocera" <hadess@hadess.net>
+Subject: Re: [PATCH] Make bluetooth-properties fit on smaller displays
+Cc: Mario_Limonciello@dell.com, marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <1222701730.3311.76.camel@cookie.hadess.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <dd18b0c30809281554g11ac7275x819812935b6ac68f@mail.gmail.com>
-Sender: Rabin Vincent <rabin.vincent@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+References: <FA7963CC89065B49AED46A6F797F0FA6F28694@AUSX3MPC128.aus.amer.dell.com>
+	 <1222679240.1825.14.camel@violet.holtmann.net>
+	 <1222679724.3311.53.camel@cookie.hadess.net>
+	 <FA7963CC89065B49AED46A6F797F0FA6F28698@AUSX3MPC128.aus.amer.dell.com>
+	 <1222701730.3311.76.camel@cookie.hadess.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Sep 28, 2008 at 03:54:23PM -0700, Justin Mattock wrote:
-> After frying my system, I'm finally up and
-> running. Not sure if this was due to a git-pull
-> (only be a few days since the last pull), or what:
-> when waking from suspend I see this
-> (I know it says tainted in it, so this will be the only noise you'll
-> here from me on this);
-> 
-> [  274.327003] =============================================================================
-> [  274.327528] BUG kmalloc-16: Object already free
-> [  274.327877] -----------------------------------------------------------------------------
-> [  274.327879]
-> [  274.327890] INFO: Allocated in btusb_open+0x82/0x16f [btusb] age=0
-> cpu=1 pid=3763
-> [  274.327899] INFO: Freed in btusb_open+0x13d/0x16f [btusb] age=0
-> cpu=1 pid=3763
-> [  274.327905] INFO: Slab 0xc139a100 objects=64 used=62 fp=0xdcd08100
-> flags=0x400000c3
+On Tue, Sep 30, 2008 at 12:22 AM, Bastien Nocera <hadess@hadess.net> wrote:
+> On Mon, 2008-09-29 at 10:05 -0500, Mario_Limonciello@Dell.com wrote:
+>> Hi Bastien & Marcel:
+>>
+>> Here's the screenshots as requested:
+>>
+>> Old: http://imagebin.org/27644
+>>
+>> New: http://imagebin.org/27643
+>>
+>> A lot of these MID devices don't have screens bigger than 1024x600
+>> (some 800x600 depending on their aspect ratio).  This change really
+>> just reorganizes the GUI so that both laptops and MID devices can use
+>> the same layout.  I'm attaching an updated patch relative to 1.6.
+>
+> Both versions would fit on both those screens. What's wrong with leaving
+> it as is? In the worst case, I'd move the contextual buttons to the side
+> of the treeview, instead of underneath, and add labels to those buttons.
 
-There's a commit in the latest git which looks like it will solve the
-btusb suspend/resume issues: 5fbcd260.. ("[Bluetooth] Fix USB disconnect
-handling of btusb driver").
+    Good day.  I adapted the suggested patch for this from one
+previously shipped in Ubuntu by Michael Frey and Loic Minier.
 
-Marcel / linux-bluetooth, I think this double free is a separate issue
-with the error handling, and the following patch should fix it.
+    My actual test screens were 1024x600 (intel driver) and 800x600
+(vesa driver), running under the hildon-desktop environment.  If I'm
+running in clean GNOME@96DPI, the default looks OK, but there is only
+space for two or three devices.  If I'm running under hildon-desktop,
+there's only space for one device.  As one of these screens is
+actually 247 DPI, running at 96 DPI tends to make everything nearly
+unreadably small.  Note that I've also tested with GNOME+devilspie, to
+force maximisation, which created a bit more space, but not hugely
+more space.
 
----
-From: Rabin Vincent <rabin@rab.in>
-Subject: [PATCH] btusb, bpa10x: fix double frees on error paths
+    In practice, I use a keyboard, headset, communication to a yet
+smaller portable device, and communication to my laptop.  I'd like to
+add a mouse, GPS device, and printer.  I'm experimenting with a
+"bluetooth handset" for making VoIP calls, which would be a separate
+audio device for ekiga/empathy.  As a result, my device listing easily
+exceeds the limits imposed by the vertical layout on a small screen.
+Whlie this may be an exceptional case, I think "mouse, keyboard,
+headset, phone, printer" isn't an unreasonable list of accessories,
+even for a regular laptop user.
 
-Justin Mattock reported this double free in btusb:
+    One possible solution would be to write a separate hildon front
+end, which is probably the best solution for 640x480 or 800x480, but
+for 800x600 and 1024x600, the use case for using themed GNOME with
+higher DPI hinting is strong enough that having a separate front-end
+seems confusing.
 
-  BUG kmalloc-16: Object already free
-  -----------------------------------------------------------------------------
+    Mind you, I don't want to limit the experience on high-resolution
+low-DPI screens, and will admit that I don't have the equipment to
+properly test this use case.  If the consensus is that it the result
+of moving the device listing to the right creates an unpleasant
+experience for these users, then perhaps it is not a sensible default.
 
-  INFO: Allocated in btusb_open+0x82/0x16f [btusb] age=3D0 cpu=3D1 pid=3D3763
-  INFO: Freed in btusb_open+0x13d/0x16f [btusb] age=3D0 cpu=3D1 pid=3D3763
-
-This occurs because the urb's transfer buffer is being freed separately
-in the error path even though the URB_FREE_BUFFER transfer_flag is set
-on the urb.
-
-There are similar cases elsewhere in btusb and in bpa10x.  Fix all of
-them by removing the additional kfree()'s.
-
-Reported-by: Justin Mattock <justinmattock@gmail.com>
-Signed-off-by: Rabin Vincent <rabin@rab.in>
----
- drivers/bluetooth/bpa10x.c |    2 --
- drivers/bluetooth/btusb.c  |    3 ---
- 2 files changed, 0 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
-index 1e55a65..32f3a8e 100644
---- a/drivers/bluetooth/bpa10x.c
-+++ b/drivers/bluetooth/bpa10x.c
-@@ -256,7 +256,6 @@ static inline int bpa10x_submit_intr_urb(struct hci_dev *hdev)
- 		BT_ERR("%s urb %p submission failed (%d)",
- 						hdev->name, urb, -err);
- 		usb_unanchor_urb(urb);
--		kfree(buf);
- 	}
- 
- 	usb_free_urb(urb);
-@@ -298,7 +297,6 @@ static inline int bpa10x_submit_bulk_urb(struct hci_dev *hdev)
- 		BT_ERR("%s urb %p submission failed (%d)",
- 						hdev->name, urb, -err);
- 		usb_unanchor_urb(urb);
--		kfree(buf);
- 	}
- 
- 	usb_free_urb(urb);
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 29ae998..262e9be 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -271,7 +271,6 @@ static int btusb_submit_intr_urb(struct hci_dev *hdev)
- 		BT_ERR("%s urb %p submission failed (%d)",
- 						hdev->name, urb, -err);
- 		usb_unanchor_urb(urb);
--		kfree(buf);
- 	}
- 
- 	usb_free_urb(urb);
-@@ -354,7 +353,6 @@ static int btusb_submit_bulk_urb(struct hci_dev *hdev)
- 		BT_ERR("%s urb %p submission failed (%d)",
- 						hdev->name, urb, -err);
- 		usb_unanchor_urb(urb);
--		kfree(buf);
- 	}
- 
- 	usb_free_urb(urb);
-@@ -475,7 +473,6 @@ static int btusb_submit_isoc_urb(struct hci_dev *hdev)
- 		BT_ERR("%s urb %p submission failed (%d)",
- 						hdev->name, urb, -err);
- 		usb_unanchor_urb(urb);
--		kfree(buf);
- 	}
- 
- 	usb_free_urb(urb);
 -- 
-1.5.6.5
+Emmet HIKORY
