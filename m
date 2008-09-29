@@ -1,31 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48E0FB63.4000601@suse.de>
-Date: Mon, 29 Sep 2008 17:59:31 +0200
-From: Stefan Seyfried <seife@suse.de>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: bluez-gnome: how to turn adapter off?
-Content-Type: text/plain; charset=ISO-8859-15
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: RE: [PATCH] Make bluetooth-properties fit on smaller displays
+From: Bastien Nocera <hadess@hadess.net>
+To: Mario_Limonciello@Dell.com
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+In-Reply-To: <FA7963CC89065B49AED46A6F797F0FA6F28698@AUSX3MPC128.aus.amer.dell.com>
+References: 
+	 <FA7963CC89065B49AED46A6F797F0FA6F28694@AUSX3MPC128.aus.amer.dell.com>
+	 <1222679240.1825.14.camel@violet.holtmann.net>
+	 <1222679724.3311.53.camel@cookie.hadess.net>
+	 <FA7963CC89065B49AED46A6F797F0FA6F28698@AUSX3MPC128.aus.amer.dell.com>
+Content-Type: text/plain
+Date: Mon, 29 Sep 2008 16:22:10 +0100
+Message-Id: <1222701730.3311.76.camel@cookie.hadess.net>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Mon, 2008-09-29 at 10:05 -0500, Mario_Limonciello@Dell.com wrote:
+> Hi Bastien & Marcel:
+> 
+> Here's the screenshots as requested:
+> 
+> Old: http://imagebin.org/27644
+> 
+> New: http://imagebin.org/27643
+> 
+> A lot of these MID devices don't have screens bigger than 1024x600
+> (some 800x600 depending on their aspect ratio).  This change really
+> just reorganizes the GUI so that both laptops and MID devices can use
+> the same layout.  I'm attaching an updated patch relative to 1.6.
 
-I now got several bugreports from people searching for the button to turn
-their bluetooth device off in the bluetooth-applet. I seem to remember that
-there was the setting "off" (in addition to "Hidden", "Always visible",
-"Temporary visible") in previous versions. So what's the rationale for
-removing it (users seem to expect to find it there)? And if I remember
-incorrectly: could we place such a button there?
-
-Thanks,
-
-	Stefan
-
--- 
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out."
-
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
+Both versions would fit on both those screens. What's wrong with leaving
+it as is? In the worst case, I'd move the contextual buttons to the side
+of the treeview, instead of underneath, and add labels to those buttons.
