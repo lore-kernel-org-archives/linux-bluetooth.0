@@ -1,34 +1,143 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----_=_NextPart_001_01C92245.0C870DAE"
 Subject: RE: [PATCH] Make bluetooth-properties fit on smaller displays
-From: Bastien Nocera <hadess@hadess.net>
-To: Mario_Limonciello@Dell.com
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-In-Reply-To: <FA7963CC89065B49AED46A6F797F0FA6F28698@AUSX3MPC128.aus.amer.dell.com>
-References: 
-	 <FA7963CC89065B49AED46A6F797F0FA6F28694@AUSX3MPC128.aus.amer.dell.com>
-	 <1222679240.1825.14.camel@violet.holtmann.net>
-	 <1222679724.3311.53.camel@cookie.hadess.net>
-	 <FA7963CC89065B49AED46A6F797F0FA6F28698@AUSX3MPC128.aus.amer.dell.com>
-Content-Type: text/plain
-Date: Mon, 29 Sep 2008 16:22:10 +0100
-Message-Id: <1222701730.3311.76.camel@cookie.hadess.net>
-Mime-Version: 1.0
+Date: Mon, 29 Sep 2008 10:05:16 -0500
+Message-ID: <FA7963CC89065B49AED46A6F797F0FA6F28698@AUSX3MPC128.aus.amer.dell.com>
+References: <FA7963CC89065B49AED46A6F797F0FA6F28694@AUSX3MPC128.aus.amer.dell.com><1222679240.1825.14.camel@violet.holtmann.net> <1222679724.3311.53.camel@cookie.hadess.net>
+From: <Mario_Limonciello@Dell.com>
+To: <hadess@hadess.net>,
+	<marcel@holtmann.org>
+Cc: <linux-bluetooth@vger.kernel.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2008-09-29 at 10:05 -0500, Mario_Limonciello@Dell.com wrote:
-> Hi Bastien & Marcel:
-> 
-> Here's the screenshots as requested:
-> 
-> Old: http://imagebin.org/27644
-> 
-> New: http://imagebin.org/27643
-> 
-> A lot of these MID devices don't have screens bigger than 1024x600
-> (some 800x600 depending on their aspect ratio).  This change really
-> just reorganizes the GUI so that both laptops and MID devices can use
-> the same layout.  I'm attaching an updated patch relative to 1.6.
+This is a multi-part message in MIME format.
 
-Both versions would fit on both those screens. What's wrong with leaving
-it as is? In the worst case, I'd move the contextual buttons to the side
-of the treeview, instead of underneath, and add labels to those buttons.
+------_=_NextPart_001_01C92245.0C870DAE
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Hi Bastien & Marcel:
+
+Here's the screenshots as requested:
+
+Old: http://imagebin.org/27644
+
+New: http://imagebin.org/27643
+
+A lot of these MID devices don't have screens bigger than 1024x600 (some =
+800x600 depending on their aspect ratio).  This change really just =
+reorganizes the GUI so that both laptops and MID devices can use the =
+same layout.  I'm attaching an updated patch relative to 1.6.
+
+Regards
+
+Mario Limonciello=20
+Dell | Linux Engineering=20
+Mario_Limonciello@Dell.com=20
+
+
+
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org on behalf of Bastien Nocera
+Sent: Mon 9/29/2008 4:15 AM
+To: Marcel Holtmann
+Cc: Limonciello, Mario; linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Make bluetooth-properties fit on smaller displays
+=20
+On Mon, 2008-09-29 at 11:07 +0200, Marcel Holtmann wrote:
+> Hi Mario,
+>=20
+> > Ubuntu was carrying a "hildon" patch to make the =
+bluetooth-properties application fit on smaller form factors for lpia.  =
+We've adapted the patch to be applicable to all platforms.  It changes =
+the layout of the bluetooth-properties window to be better for small =
+displays without a loss of functionality.
+>=20
+> I have no idea what this patch tries to achieve. How will this save
+> space on small displays?
+
+A before/after screenshot would be useful indeed. If it's a good layout,
+it should probably be used by default.
+
+--
+To unsubscribe from this list: send the line "unsubscribe =
+linux-bluetooth" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+------_=_NextPart_001_01C92245.0C870DAE
+Content-Type: text/x-patch;
+	name="06_preferences-horizontal-layout.patch"
+Content-Transfer-Encoding: base64
+Content-Description: 06_preferences-horizontal-layout.patch
+Content-Disposition: attachment;
+	filename="06_preferences-horizontal-layout.patch"
+
+ZGlmZiAtTnVyIC14ICcqLm9yaWcnIC14ICcqficgYmx1ZXotZ25vbWUtMS42L3Byb3BlcnRpZXMv
+YWRhcHRlci5jIGJsdWV6LWdub21lLTEuNi5uZXcvcHJvcGVydGllcy9hZGFwdGVyLmMKLS0tIGJs
+dWV6LWdub21lLTEuNi9wcm9wZXJ0aWVzL2FkYXB0ZXIuYwkyMDA4LTA5LTI5IDA3OjA4OjUwLjAw
+MDAwMDAwMCAtMDUwMAorKysgYmx1ZXotZ25vbWUtMS42Lm5ldy9wcm9wZXJ0aWVzL2FkYXB0ZXIu
+YwkyMDA4LTA5LTI5IDA5OjU1OjM2LjAwMDAwMDAwMCAtMDUwMApAQCAtMjQ2LDE2ICsyNDYsMTAg
+QEAKIAl9CiAKIAl1cGRhdGVfYnV0dG9ucyhhZGFwdGVyLCBwYWlyZWQsIHRydXN0ZWQsIGNvbm5l
+Y3RlZCk7Ci0KLQlpZiAoc2VsZWN0ZWQgPT0gVFJVRSkgewotCQlndGtfd2lkZ2V0X3Nob3coYWRh
+cHRlci0+YnV0dG9uX2Rpc2Nvbm5lY3QpOwotCQlndGtfd2lkZ2V0X3Nob3coYWRhcHRlci0+YnV0
+dG9uX3RydXN0ZWQpOwotCQlndGtfd2lkZ2V0X3Nob3coYWRhcHRlci0+YnV0dG9uX2RlbGV0ZSk7
+Ci0JfSBlbHNlIHsKLQkJZ3RrX3dpZGdldF9oaWRlKGFkYXB0ZXItPmJ1dHRvbl9kaXNjb25uZWN0
+KTsKLQkJZ3RrX3dpZGdldF9oaWRlKGFkYXB0ZXItPmJ1dHRvbl90cnVzdGVkKTsKLQkJZ3RrX3dp
+ZGdldF9oaWRlKGFkYXB0ZXItPmJ1dHRvbl9kZWxldGUpOwotCX0KKwkKKwlndGtfd2lkZ2V0X3Nl
+dF9zZW5zaXRpdmUoYWRhcHRlci0+YnV0dG9uX2Rpc2Nvbm5lY3Qsc2VsZWN0ZWQpOworCWd0a193
+aWRnZXRfc2V0X3NlbnNpdGl2ZShhZGFwdGVyLT5idXR0b25fdHJ1c3RlZCxzZWxlY3RlZCk7CisJ
+Z3RrX3dpZGdldF9zZXRfc2Vuc2l0aXZlKGFkYXB0ZXItPmJ1dHRvbl9kZWxldGUsc2VsZWN0ZWQp
+OwogfQogCiBzdGF0aWMgdm9pZCByb3dfY2FsbGJhY2soR3RrVHJlZU1vZGVsICptb2RlbCwgR3Rr
+VHJlZVBhdGggICpwYXRoLApAQCAtNDYxLDcgKzQ1NSw3IEBACiAJYWRhcHRlci0+ZGlzY292ZXJh
+YmxlID0gZGlzY292ZXJhYmxlOwogCWFkYXB0ZXItPnRpbWVvdXRfdmFsdWUgPSB0aW1lb3V0Owog
+Ci0JbWFpbmJveCA9IGd0a192Ym94X25ldyhGQUxTRSwgMTgpOworCW1haW5ib3ggPSBndGtfaGJv
+eF9uZXcoRkFMU0UsIDEyKTsKIAlndGtfY29udGFpbmVyX3NldF9ib3JkZXJfd2lkdGgoR1RLX0NP
+TlRBSU5FUihtYWluYm94KSwgMTIpOwogCiAJZ3RrX25vdGVib29rX3ByZXBlbmRfcGFnZShHVEtf
+Tk9URUJPT0soYWRhcHRlci0+bm90ZWJvb2spLApAQCAtNDcxLDYgKzQ2NSw5IEBACiAKIAlhZGFw
+dGVyLT5jaGlsZCA9IG1haW5ib3g7CiAKKwltYWluYm94ID0gZ3RrX3Zib3hfbmV3IChGQUxTRSwg
+MTgpOworCWd0a19jb250YWluZXJfYWRkKEdUS19DT05UQUlORVIgKEdUS19DT05UQUlORVIgKGFk
+YXB0ZXItPmNoaWxkKSksIG1haW5ib3gpOworCiAJdmJveCA9IGd0a192Ym94X25ldyhGQUxTRSwg
+Nik7CiAJZ3RrX2JveF9wYWNrX3N0YXJ0KEdUS19CT1gobWFpbmJveCksIHZib3gsIEZBTFNFLCBG
+QUxTRSwgMCk7CiAKQEAgLTU2OSw3ICs1NjYsNyBAQAogCWVudHJ5ID0gZ3RrX2VudHJ5X25ldygp
+OwogCWd0a19lbnRyeV9zZXRfbWF4X2xlbmd0aChHVEtfRU5UUlkoZW50cnkpLCAyNDgpOwogCWd0
+a193aWRnZXRfc2V0X3NpemVfcmVxdWVzdChlbnRyeSwgMjQwLCAtMSk7Ci0JZ3RrX2JveF9wYWNr
+X3N0YXJ0KEdUS19CT1godmJveCksIGVudHJ5LCBUUlVFLCBUUlVFLCAwKTsKKwlndGtfYm94X3Bh
+Y2tfc3RhcnQoR1RLX0JPWCh2Ym94KSwgZW50cnksIEZBTFNFLCBGQUxTRSwgMCk7CiAKIAlpZiAo
+bmFtZSAhPSBOVUxMKQogCQlndGtfZW50cnlfc2V0X3RleHQoR1RLX0VOVFJZKGVudHJ5KSwgbmFt
+ZSk7CkBAIC01ODIsNyArNTc5LDcgQEAKIAkJCQkJR19DQUxMQkFDSyhmb2N1c19jYWxsYmFjayks
+IGFkYXB0ZXIpOwogCiAJdmJveCA9IGd0a192Ym94X25ldyhGQUxTRSwgNik7Ci0JZ3RrX2JveF9w
+YWNrX3N0YXJ0KEdUS19CT1gobWFpbmJveCksIHZib3gsIFRSVUUsIFRSVUUsIDApOworCWd0a19i
+b3hfcGFja19zdGFydChHVEtfQk9YKGFkYXB0ZXItPmNoaWxkKSwgdmJveCwgVFJVRSwgVFJVRSwg
+MCk7CiAKIAlsYWJlbCA9IGNyZWF0ZV9sYWJlbChfKCJLbm93biBkZXZpY2VzIikpOwogCWd0a19i
+b3hfcGFja19zdGFydChHVEtfQk9YKHZib3gpLCBsYWJlbCwgRkFMU0UsIEZBTFNFLCAwKTsKQEAg
+LTYzNCw4ICs2MzEsOCBAQAogCQkJCQkJR1RLX0lDT05fU0laRV9CVVRUT04pOwogCWd0a19jb250
+YWluZXJfYWRkKEdUS19DT05UQUlORVIoYnV0dG9uKSwgaW1hZ2UpOwogCWd0a19jb250YWluZXJf
+c2V0X2JvcmRlcl93aWR0aChHVEtfQ09OVEFJTkVSKGJ1dHRvbiksIDApOwotCWd0a193aWRnZXRf
+c2V0X25vX3Nob3dfYWxsKGJ1dHRvbiwgVFJVRSk7CiAJZ3RrX3dpZGdldF9zaG93KGltYWdlKTsK
+KwlndGtfd2lkZ2V0X3NldF9zZW5zaXRpdmUoYnV0dG9uLEZBTFNFKTsKIAlndGtfYm94X3BhY2tf
+ZW5kKEdUS19CT1goYnV0dG9uYm94KSwgYnV0dG9uLCBGQUxTRSwgRkFMU0UsIDApOwogCWd0a19i
+dXR0b25fYm94X3NldF9jaGlsZF9zZWNvbmRhcnkoR1RLX0JVVFRPTl9CT1goYnV0dG9uYm94KSwK
+IAkJCQkJCQkJYnV0dG9uLCBUUlVFKTsKQEAgLTY1MSw4ICs2NDgsOCBAQAogCQkJCQkJR1RLX0lD
+T05fU0laRV9CVVRUT04pOwogCWd0a19jb250YWluZXJfYWRkKEdUS19DT05UQUlORVIoYnV0dG9u
+KSwgaW1hZ2UpOwogCWd0a19jb250YWluZXJfc2V0X2JvcmRlcl93aWR0aChHVEtfQ09OVEFJTkVS
+KGJ1dHRvbiksIDApOwotCWd0a193aWRnZXRfc2V0X25vX3Nob3dfYWxsKGJ1dHRvbiwgVFJVRSk7
+CiAJZ3RrX3dpZGdldF9zaG93KGltYWdlKTsKKwlndGtfd2lkZ2V0X3NldF9zZW5zaXRpdmUoYnV0
+dG9uLEZBTFNFKTsKIAlndGtfYm94X3BhY2tfZW5kKEdUS19CT1goYnV0dG9uYm94KSwgYnV0dG9u
+LCBGQUxTRSwgRkFMU0UsIDApOwogCWd0a19idXR0b25fYm94X3NldF9jaGlsZF9zZWNvbmRhcnko
+R1RLX0JVVFRPTl9CT1goYnV0dG9uYm94KSwKIAkJCQkJCQkJYnV0dG9uLCBUUlVFKTsKQEAgLTY2
+OCw4ICs2NjUsOCBAQAogCQkJCQkJR1RLX0lDT05fU0laRV9CVVRUT04pOwogCWd0a19jb250YWlu
+ZXJfYWRkKEdUS19DT05UQUlORVIoYnV0dG9uKSwgaW1hZ2UpOwogCWd0a19jb250YWluZXJfc2V0
+X2JvcmRlcl93aWR0aChHVEtfQ09OVEFJTkVSKGJ1dHRvbiksIDApOwotCWd0a193aWRnZXRfc2V0
+X25vX3Nob3dfYWxsKGJ1dHRvbiwgVFJVRSk7CiAJZ3RrX3dpZGdldF9zaG93KGltYWdlKTsKKwln
+dGtfd2lkZ2V0X3NldF9zZW5zaXRpdmUoYnV0dG9uLEZBTFNFKTsKIAlndGtfYm94X3BhY2tfZW5k
+KEdUS19CT1goYnV0dG9uYm94KSwgYnV0dG9uLCBGQUxTRSwgRkFMU0UsIDApOwogCWd0a19idXR0
+b25fYm94X3NldF9jaGlsZF9zZWNvbmRhcnkoR1RLX0JVVFRPTl9CT1goYnV0dG9uYm94KSwKIAkJ
+CQkJCQkJYnV0dG9uLCBUUlVFKTsK
+
+------_=_NextPart_001_01C92245.0C870DAE--
