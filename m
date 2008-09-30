@@ -1,10 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <6306c640809290516g7390f19cte38c2dc1cc7a1dc@mail.gmail.com>
-Date: Mon, 29 Sep 2008 17:46:04 +0530
-From: "Ram kumar" <ramkumar.research@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Message-ID: <48E2524E.1040705@wurmsdobler.org>
+Date: Tue, 30 Sep 2008 17:22:38 +0100
+From: Peter Wurmsdobler <peter@wurmsdobler.org>
 MIME-Version: 1.0
-Subject: [Bluez-users] UART drivers for CSR BC04-ROM
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+References: <000001c92311$869c0d80$93d42880$@savary@kerlink.fr>
+In-Reply-To: <000001c92311$869c0d80$93d42880$@savary@kerlink.fr>
+Subject: Re: [Bluez-users] bccmd 3.36 for arm
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -17,19 +19,15 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-hi,
-     I am using a wi2wi module which has inbuilt CSR BC04-ROM BT module.
+Salut Pierre,
+> I search the "bccmd" binary (bluez-utils-3.36) for ARM. It's really
+> important and I cannot compile it. Where can I find it?
+In bluez-utils 3.26 it was tools/bccmd.c . In order to have it compiled 
+bluez-utils needs to be configured:
+	./configure --enable-bccmd
+Hope this helps,
+peter
 
-Please let me know whether the uart drivers are available for this CSR
-BC04-ROM BT module in the bluez stack.
-
-I am not able to find any info on this particular chip.But generally
-the site says that it has supported CSR chips.So i need to know
-whether this particular CSR chip is supported or not ????
-
-
-Regards,
-Ram
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
