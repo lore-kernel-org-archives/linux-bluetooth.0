@@ -1,85 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48E2A4D5.8020509@dtsp.co.nz>
-Date: Wed, 01 Oct 2008 11:14:45 +1300
-From: David Sainty <david.sainty@dtsp.co.nz>
-MIME-Version: 1.0
-To: Mario_Limonciello@Dell.com
-CC: marcel@holtmann.org, hadess@hadess.net,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Make bluetooth-properties fit on smaller displays
-References: <FA7963CC89065B49AED46A6F797F0FA6F28694@AUSX3MPC128.aus.amer.dell.com>	 <1222679240.1825.14.camel@violet.holtmann.net>	 <1222679724.3311.53.camel@cookie.hadess.net>	 <FA7963CC89065B49AED46A6F797F0FA6F28698@AUSX3MPC128.aus.amer.dell.com>	 <1222701730.3311.76.camel@cookie.hadess.net>  <48E1DCA8.2040005@dtsp.co.nz> <1222762649.1825.56.camel@violet.holtmann.net> <48E1E9D3.8050202@dtsp.co.nz> <FA7963CC89065B49AED46A6F797F0FA6F2869C@AUSX3MPC128.aus.amer.dell.com>
-In-Reply-To: <FA7963CC89065B49AED46A6F797F0FA6F2869C@AUSX3MPC128.aus.amer.dell.com>
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Subject: Re: [Bug 11442] btusb suspend/resume bug...
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Rafael J. Wysocki" <rjw@sisk.pl>
+Cc: David Miller <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	bugme-daemon@bugzilla.kernel.org
+In-Reply-To: <200809302344.42615.rjw@sisk.pl>
+References: <20080916.155123.181085856.davem@davemloft.net>
+	 <200809271541.15963.rjw@sisk.pl>
+	 <1222754141.1825.55.camel@violet.holtmann.net>
+	 <200809302344.42615.rjw@sisk.pl>
+Content-Type: text/plain
+Date: Wed, 01 Oct 2008 00:03:49 +0200
+Message-Id: <1222812229.1825.65.camel@violet.holtmann.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-xdpyinfo says the DPI is 100x101... heh...
+Hi Rafael,
 
-  dimensions:    800x480 pixels (203x121 millimeters)
-  resolution:    100x101 dots per inch
+> > > > >> Rafael, can you pull from my tree and test the changes:
+> > > > >>
+> > > > >> git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/ 
+> > > > >> bluetooth-2.6.git
+> > > > >>
+> > > > >> It would be interesting if these fixes are enough.
+> > > > >
+> > > > > They appear to be enough.  I haven't had any suspend/resume failures  
+> > > > > with them
+> > > > > applied.
+> > > > 
+> > > > so it works _without_ applying patch-btusb-suspend.
+> > > 
+> > > Well, unfortunately I spoke too soon.
+> > > 
+> > > I'm still seeing post-hibernation crashes triggered by the bluetooth user land
+> > > trying to use the device handled by btusb.  They happen every second
+> > > hibernation, more or less, and apparently they are oopses in various code
+> > > paths not directly related to bluetooth, like ext3 (memory corruption or
+> > > what?).
+> > 
+> > I pushed two extra patches to my bluetooth-2.6 repository:
+> > 
+> > git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6.git
+> > 
+> > One is fixing a double-free in the error path. This error path can be
+> > triggered during suspend/resume if the USB core just disconnects the
+> > device. Please check if that fixes it for you.
+> > 
+> > > With patch-btusb-suspend applied I don't see them (actually I have to use
+> > > a slightly modified version of the patch which is appended).
+> > > 
+> > > Interestingly enough, suspend to RAM works without any visible problems.
+> > 
+> > As Oliver said, the USB core should do the right thing when no suspend
+> > and resume callbacks are provided. I looked through the code so many
+> > times now and I am running out of ideas what can happen.
+> > 
+> > Lets try it one last time without the suspend patch, but the double free
+> > fix and see if that works. Otherwise I really give up.
+> 
+> This time I cannot reproduce the hibernation issue without the suspend patch,
+> so it appears that your double-free fix works for me.
 
-In reality it's around 133dpi (153mm x 92mm).
+great. So I push these for 2.6.27 and then for 2.6.28, we can add full
+suspend and auto-suspend and remote-wakeup support. Thanks for testing.
 
+Regards
 
-Mario_Limonciello@Dell.com wrote:
-> Hi Folks:
->
-> I would think the DPI of the environment is playing into this.  David, what DPI is on your EEE?
->
-> Regards
->
-> Mario Limonciello 
-> Dell | Linux Engineering 
-> Mario_Limonciello@Dell.com 
->
->
->
-> -----Original Message-----
-> From: David Sainty [mailto:david.sainty@dtsp.co.nz]
-> Sent: Tue 9/30/2008 3:56 AM
-> To: Marcel Holtmann
-> Cc: Bastien Nocera; Limonciello, Mario; linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH] Make bluetooth-properties fit on smaller displays
->  
-> Marcel Holtmann wrote:
->   
->> Hi David,
->>
->>   
->>     
->>>>> A lot of these MID devices don't have screens bigger than 1024x600
->>>>> (some 800x600 depending on their aspect ratio).  This change really
->>>>> just reorganizes the GUI so that both laptops and MID devices can use
->>>>> the same layout.  I'm attaching an updated patch relative to 1.6.
->>>>>     
->>>>>         
->>>>>           
->>>> Both versions would fit on both those screens. What's wrong with leaving
->>>> it as is? In the worst case, I'd move the contextual buttons to the side
->>>> of the treeview, instead of underneath, and add labels to those buttons.
->>>>   
->>>>       
->>>>         
->>> The preferences dialog on an Eee PC (701) screen is a real pain, it is 
->>> too big vertically.  800x480 screen, plus a window manager bar at the 
->>> bottom, plus some chunky window decorations up the top.  For a window to 
->>> fit conveniently on a standard Eee PC screen it needs to be 422 pixels 
->>> vertically it looks like (the standard decorations are VERY chunky :)
->>>     
->>>       
->> the dialog ix 420x420 and thus it should fit.
->>   
->>     
-> Interesting - that's not what I'm seeing.  I've just tried xwininfo on 
-> bluez-gnome-1.7 on both an Eee PC and a full sized PC (possibly with 
-> slightly different support library versions).
->
-> Full sized PC geometry for the preferences window is 420x521.  EeePC 
-> geometry for the same is 420x523.
->   I'm not sure where the 2 pixel difference comes from (I don't think 
-> the geometry here is including the window manager decorations).  But 
-> neither are close to 420x420.  You weren't thinking 420x520 perchance?
->
->   
+Marcel
 
 
