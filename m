@@ -1,76 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Subject: RE: [PATCH] Make bluetooth-properties fit on smaller displays
-Date: Tue, 30 Sep 2008 08:38:02 -0500
-Message-ID: <FA7963CC89065B49AED46A6F797F0FA6F2869C@AUSX3MPC128.aus.amer.dell.com>
-References: <FA7963CC89065B49AED46A6F797F0FA6F28694@AUSX3MPC128.aus.amer.dell.com>	 <1222679240.1825.14.camel@violet.holtmann.net>	 <1222679724.3311.53.camel@cookie.hadess.net>	 <FA7963CC89065B49AED46A6F797F0FA6F28698@AUSX3MPC128.aus.amer.dell.com>	 <1222701730.3311.76.camel@cookie.hadess.net>  <48E1DCA8.2040005@dtsp.co.nz> <1222762649.1825.56.camel@violet.holtmann.net> <48E1E9D3.8050202@dtsp.co.nz>
-From: <Mario_Limonciello@Dell.com>
-To: <david.sainty@dtsp.co.nz>,
-	<marcel@holtmann.org>
-Cc: <hadess@hadess.net>,
-	<linux-bluetooth@vger.kernel.org>
+Subject: Re: bluez-gnome: how to turn adapter off?
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Stefan Seyfried <seife@suse.de>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <1222769841.3311.127.camel@cookie.hadess.net>
+References: <48E0FB63.4000601@suse.de>
+	 <1222704357.3311.87.camel@cookie.hadess.net>  <48E1004F.20605@suse.de>
+	 <1222720796.3311.101.camel@cookie.hadess.net>
+	 <1222744734.1825.36.camel@violet.holtmann.net>
+	 <1222769841.3311.127.camel@cookie.hadess.net>
+Content-Type: text/plain
+Date: Tue, 30 Sep 2008 12:29:21 +0200
+Message-Id: <1222770561.1825.59.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Folks:
+Hi Bastien,
 
-I would think the DPI of the environment is playing into this.  David, =
-what DPI is on your EEE?
+> > > > Ok, so I remembered wrong ;-) How about adding a "disable this adapter"
+> > > > option? Would a patch that implements this be welcome?
+> > > 
+> > > I'd like a patch implementing HAL killswitching. DannyK can explain to
+> > > you how that's supposed to work.
+> > > 
+> > > I saw this as a single toggle menu item in the right-click, allowing you
+> > > to enable/disable the main Bluetooth adapter on laptops. If there's a
+> > > killswitch present, and there's 0 or 1 adapter (and the adapter matches
+> > > the expected device) then the Bluetooth icon would shown grayed out.
+> > 
+> > so I added killswitch support to bluetooth-properties. Works pretty good
+> > enough for me.
+> > 
+> > I like having a grayed out icon, but for that to work, we first need to
+> > have some who actually draws it in all resolutions for us.
+> 
+> GTK+ doesn't use separate pixbufs for those type of icons, but generates
+> them on the fly with gdk_pixbuf_saturate_and_pixelate().
+> 
+> new_pixbuf = gdk_pixbuf_copy (original);
+> gdk_pixbuf_saturate_and_pixelate(original, new_pixbuf, 0.8, TRUE);
+> 
+> And then set "new_pixbuf" as the image for the status icon. This will be
+> a bit convoluted in the actual code as you're using icon names, and we'd
+> need to 1) know whether we have a killswitch, and whether it's enabled
+> and 2) modify the status icon to use the pixbuf.
+
+as long as we have to poll the killswitch from HAL, this is never going
+to get merged into bluez-gnome. I want async notifications.
 
 Regards
 
-Mario Limonciello=20
-Dell | Linux Engineering=20
-Mario_Limonciello@Dell.com=20
+Marcel
 
 
-
------Original Message-----
-From: David Sainty [mailto:david.sainty@dtsp.co.nz]
-Sent: Tue 9/30/2008 3:56 AM
-To: Marcel Holtmann
-Cc: Bastien Nocera; Limonciello, Mario; linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Make bluetooth-properties fit on smaller displays
-=20
-Marcel Holtmann wrote:
-> Hi David,
->
->  =20
->>>> A lot of these MID devices don't have screens bigger than 1024x600
->>>> (some 800x600 depending on their aspect ratio).  This change really
->>>> just reorganizes the GUI so that both laptops and MID devices can =
-use
->>>> the same layout.  I'm attaching an updated patch relative to 1.6.
->>>>    =20
->>>>        =20
->>> Both versions would fit on both those screens. What's wrong with =
-leaving
->>> it as is? In the worst case, I'd move the contextual buttons to the =
-side
->>> of the treeview, instead of underneath, and add labels to those =
-buttons.
->>>  =20
->>>      =20
->> The preferences dialog on an Eee PC (701) screen is a real pain, it =
-is=20
->> too big vertically.  800x480 screen, plus a window manager bar at the =
-
->> bottom, plus some chunky window decorations up the top.  For a window =
-to=20
->> fit conveniently on a standard Eee PC screen it needs to be 422 =
-pixels=20
->> vertically it looks like (the standard decorations are VERY chunky :)
->>    =20
->
-> the dialog ix 420x420 and thus it should fit.
->  =20
-Interesting - that's not what I'm seeing.  I've just tried xwininfo on=20
-bluez-gnome-1.7 on both an Eee PC and a full sized PC (possibly with=20
-slightly different support library versions).
-
-Full sized PC geometry for the preferences window is 420x521.  EeePC=20
-geometry for the same is 420x523.
-  I'm not sure where the 2 pixel difference comes from (I don't think=20
-the geometry here is including the window manager decorations).  But=20
-neither are close to 420x420.  You weren't thinking 420x520 perchance?
