@@ -1,64 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [Bug 11442] btusb suspend/resume bug...
+Subject: Re: Bluetooth 2.1 USB adapter!
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Rafael J. Wysocki" <rjw@sisk.pl>
-Cc: David Miller <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	bugme-daemon@bugzilla.kernel.org
-In-Reply-To: <200809271541.15963.rjw@sisk.pl>
-References: <20080916.155123.181085856.davem@davemloft.net>
-	 <200809222342.46735.rjw@sisk.pl>
-	 <8C4643EC-E6D9-47D3-8A27-04A2B3CDC6CC@holtmann.org>
-	 <200809271541.15963.rjw@sisk.pl>
+To: rankincj@yahoo.com
+Cc: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <742628.51370.qm@web52910.mail.re2.yahoo.com>
+References: <742628.51370.qm@web52910.mail.re2.yahoo.com>
 Content-Type: text/plain
-Date: Tue, 30 Sep 2008 07:55:40 +0200
-Message-Id: <1222754141.1825.55.camel@violet.holtmann.net>
+Date: Tue, 30 Sep 2008 07:43:20 +0200
+Message-Id: <1222753400.1825.49.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafael,
+Hi Chris,
 
-> > >> Rafael, can you pull from my tree and test the changes:
-> > >>
-> > >> git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/ 
-> > >> bluetooth-2.6.git
-> > >>
-> > >> It would be interesting if these fixes are enough.
-> > >
-> > > They appear to be enough.  I haven't had any suspend/resume failures  
-> > > with them
-> > > applied.
+> > http://www.argos.co.uk/static/Product/partNumber/6756035/Trail/searchtext%3EBLUETOOTH.htm
 > > 
-> > so it works _without_ applying patch-btusb-suspend.
+> > The one at Argos says it's a 2.0 version. I guess those
+> > aren't the same pieces of hardware?
 > 
-> Well, unfortunately I spoke too soon.
-> 
-> I'm still seeing post-hibernation crashes triggered by the bluetooth user land
-> trying to use the device handled by btusb.  They happen every second
-> hibernation, more or less, and apparently they are oopses in various code
-> paths not directly related to bluetooth, like ext3 (memory corruption or
-> what?).
+> Well, the picture is *identical* to the adapter I bought, and I bought this one at Argos too ;-).
 
-I pushed two extra patches to my bluetooth-2.6 repository:
-
-git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6.git
-
-One is fixing a double-free in the error path. This error path can be
-triggered during suspend/resume if the USB core just disconnects the
-device. Please check if that fixes it for you.
-
-> With patch-btusb-suspend applied I don't see them (actually I have to use
-> a slightly modified version of the patch which is appended).
-> 
-> Interestingly enough, suspend to RAM works without any visible problems.
-
-As Oliver said, the USB core should do the right thing when no suspend
-and resume callbacks are provided. I looked through the code so many
-times now and I am running out of ideas what can happen.
-
-Lets try it one last time without the suspend patch, but the double free
-fix and see if that works. Otherwise I really give up.
+even the Targus one still says Bluetooth 2.0, but it is real 2.1
+hardware. I bought two more before I left Portland :)
 
 Regards
 
