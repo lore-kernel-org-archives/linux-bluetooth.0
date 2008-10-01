@@ -1,48 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48E3F51B.6050001@dell.com>
-Date: Wed, 01 Oct 2008 17:09:31 -0500
-From: Mario Limonciello <mario_limonciello@dell.com>
+Message-ID: <48E3B3BF.6070205@pook.es>
+Date: Wed, 01 Oct 2008 19:30:39 +0200
+From: Stuart Pook <kernel6org@pook.es>
 MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Untrusted input devices by default
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig8CD2AFFFF772775FF086F32E"
+To: David Sainty <david.sainty@dtsp.co.nz>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: bluez-4.9 + 2.6.27-rc8 + SCO headset -> bluetoothd: connect:
+ Operation not permitted
+References: <48E29416.3030402@pook.es> <48E2B59A.7020600@dtsp.co.nz>
+In-Reply-To: <48E2B59A.7020600@dtsp.co.nz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig8CD2AFFFF772775FF086F32E
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+On 01/10/08 01:26, David Sainty wrote:
+> Stuart Pook wrote:
+>> Er, what headsets do work? Please let me know. The Jabra JX10 "features
+>> Bluetooth 2.0 and e-SCO for improved audio quality and MultiPoint
+>> capability for connecting to 2 devices at once". Could that be
+>> what is causing the problem?
+> I use a Sony DR-BT20NX stereo headset, with both my kneetop and my phone 
+> attached (they don't play at once, but the phone can interrupt the audio 
+> playback).  It works great! (*)
 
-Hello:
+I'd like to use my headset to do VoIP via my PC. Do you do that or is 
+the communication just from your PC to the headset?
 
-In my efforts to get BlueZ 4.x into Intrepid a question was posed.  How
-come input devices don't default to "Trusted" when paired in the
-Wizard?  This makes for a weird experience the next time you reboot (or
-disconnect the device for that matter) that you need to give it
-"authorization".
+I wonder if my problems are due to my old dongle. I have an old 
+Bluetooth 1.2 Linksys USBBT100 USB dongle. Perhaps it has problems 
+talking to my Bluetooth 2.0 headset.
 
-Regards
---=20
-Mario Limonciello
-*Dell | Linux Engineering*
-mario_limonciello@dell.com
+I would like a class I Bluetooth 2.x USB dongle. Does anyone have any 
+suggestions? I could buy a Belkin F8T012fr1 (class I & v2.0) or a Belkin 
+F8T017ng (class I & v2.1). http://www.bluez.org/ mentions the F8T016 and 
+its required quirks. I suppose that the F8T017ng is just the class I 
+version. Would it require the same quirks I wonder?
 
-
---------------enig8CD2AFFFF772775FF086F32E
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iD8DBQFI4/Ub2CrZjkA73YsRAoJlAJ0QM6RbcennDxin0LJipfZ+rRFeqwCgiDTZ
-g7dG3cg/kEl61eBz7I1C62g=
-=uzLx
------END PGP SIGNATURE-----
-
---------------enig8CD2AFFFF772775FF086F32E--
+Stuart
