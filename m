@@ -1,47 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Oliver Neukum <oliver@neukum.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
- linux-usb@vger.kernel.org,
- linux-bluetooth@vger.kernel.org,
- Pavel Machek <pavel@ucw.cz>
-Subject: fix bug in suspend/resume code of btusb
-Date: Thu, 2 Oct 2008 22:32:06 +0200
+Message-ID: <48E3F51B.6050001@dell.com>
+Date: Wed, 01 Oct 2008 17:09:31 -0500
+From: Mario Limonciello <mario_limonciello@dell.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200810022232.07165.oliver@neukum.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Untrusted input devices by default
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enig8CD2AFFFF772775FF086F32E"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig8CD2AFFFF772775FF086F32E
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-this fixes an issue in btusb's suspend/resume support that strikes if
-the adapter is suspended while the hci is down.
-This probably fixes the bug Pavel sees with autosuspend and fixes a bug
-for me. I am currently looking at issues with new hardware, but with this patch
-it should work at least for the best hardware.
+Hello:
 
-What tree should I base a clean patch against?
+In my efforts to get BlueZ 4.x into Intrepid a question was posed.  How
+come input devices don't default to "Trusted" when paired in the
+Wizard?  This makes for a weird experience the next time you reboot (or
+disconnect the device for that matter) that you need to give it
+"authorization".
 
-Signed-off-by: Oliver Neukum <oneukum@suse.de>
+Regards
+--=20
+Mario Limonciello
+*Dell | Linux Engineering*
+mario_limonciello@dell.com
 
-	Regards
-		Oliver
 
+--------------enig8CD2AFFFF772775FF086F32E
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
----
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index ef24515..47ff028 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1072,6 +1069,10 @@ static int btusb_resume(struct usb_interface *intf)
- 			clear_bit(HCI_RUNNING, &hdev->flags);
- 			return ret;
- 		}
-+	} else {
-+		spin_lock_irq(&data->lock);
-+		clear_bit(BTUSB_SUSPENDING, &data->flags);
-+		spin_unlock_irq(&data->lock);
- 	}
- 
- 	if (hdev->conn_hash.acl_num > 0) {
+iD8DBQFI4/Ub2CrZjkA73YsRAoJlAJ0QM6RbcennDxin0LJipfZ+rRFeqwCgiDTZ
+g7dG3cg/kEl61eBz7I1C62g=
+=uzLx
+-----END PGP SIGNATURE-----
+
+--------------enig8CD2AFFFF772775FF086F32E--
