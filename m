@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: Guillaume Bedot <littletux@zarb.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1223039753.11272.40.camel@violet.holtmann.net>
+In-Reply-To: <1223038029.6671.5.camel@localhost>
 References: <1223038029.6671.5.camel@localhost>
-	<1223039753.11272.40.camel@violet.holtmann.net>
-Date: Fri, 03 Oct 2008 20:40:38 +0200
-Message-Id: <1223059238.7062.8.camel@localhost>
+Date: Fri, 03 Oct 2008 15:15:53 +0200
+Message-Id: <1223039753.11272.40.camel@violet.holtmann.net>
 Mime-Version: 1.0
+Cc: cooker@mandrivalinux.org
 Subject: Re: [Bluez-devel] User security mode patch
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -17,27 +17,29 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-TGUgdmVuZHJlZGkgMDMgb2N0b2JyZSAyMDA4IMOgIDE1OjE1ICswMjAwLCBNYXJjZWwgSG9sdG1h
-bm4gYSDDqWNyaXQgOiAKPiBIaSBHdWlsbGF1bWUsCj4gCj4gPiBPbiBteSBjb29rZXIgYm94IChp
-IHN0aWxsIHVzZSAzLjM2IHRob3VnaCksIHdpdGggdGhlIGRlZmF1bHQgaGNpZC5jb25mCj4gPiBm
-aWxlLCBpIGNhbid0IHBhaXIgd2l0aCBteSBwaG9uZSB1bmxlc3MgaSBjb21tZW50IG91dCB0aGUK
-PiA+IHBhc3NrZXk9IkJsdWVaIiBsaW5lLCBvciBhcHBseSB0aGUgam9pbmVkIHBhdGNoLgo+IAo+
-IHlvdXIgcGF0Y2ggaXMgY2hhbmdpbmcgbm90aGluZy4gVGhhdCBpcyBub3QgaXQgYXQgYWxsLgo+
-IAo+IFJlZ2FyZHMKPiAKPiBNYXJjZWwKClJpZ2h0LCB0aGUgc2hvcnRlciB3b3JrYXJvdW5kIHdh
-cyBhY3R1YWxseSB0byByZXN0YXJ0IGhjaWQsIHdoaWNoIEkgZGlkCmFmdGVyIHRoZSByZWJ1aWxk
-LCBhbmQgYWZ0ZXIgdGhlIGNvbmZpZyBjaGFuZ2UgOi0pCgpTdGlsbCBzb21ldGhpbmcgZ29lcyB3
-cm9uZyB3aGVuIGxhdW5jaGluZyBoY2lkIHRoZSBmaXJzdCB0aW1lIGFuZCBJJ2xsCmhhdmUgdG8g
-ZmluZCB3aGF0Li4uIHNvbWV0aGluZyB0byBkbyB3aXRoIG91ciBwYXRjaGVkIHBhc3NrZXktYWdl
-bnQKbWF5YmUuCgpSZWdhcmRzLAoKR3VpbGxhdW1lIEIuCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlz
-IFNGLk5ldCBlbWFpbCBpcyBzcG9uc29yZWQgYnkgdGhlIE1vYmxpbiBZb3VyIE1vdmUgRGV2ZWxv
-cGVyJ3MgY2hhbGxlbmdlCkJ1aWxkIHRoZSBjb29sZXN0IExpbnV4IGJhc2VkIGFwcGxpY2F0aW9u
-cyB3aXRoIE1vYmxpbiBTREsgJiB3aW4gZ3JlYXQgcHJpemVzCkdyYW5kIHByaXplIGlzIGEgdHJp
-cCBmb3IgdHdvIHRvIGFuIE9wZW4gU291cmNlIGV2ZW50IGFueXdoZXJlIGluIHRoZSB3b3JsZApo
-dHRwOi8vbW9ibGluLWNvbnRlc3Qub3JnL3JlZGlyZWN0LnBocD9iYW5uZXJfaWQ9MTAwJnVybD0v
-Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LWRl
-dmVsIG1haWxpbmcgbGlzdApCbHVlei1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6
-Ly9saXN0cy5zb3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotZGV2ZWwK
+Hi Guillaume,
+
+> On my cooker box (i still use 3.36 though), with the default hcid.conf
+> file, i can't pair with my phone unless i comment out the
+> passkey="BlueZ" line, or apply the joined patch.
+
+your patch is changing nothing. That is not it at all.
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
+Build the coolest Linux based applications with Moblin SDK & win great prizes
+Grand prize is a trip for two to an Open Source event anywhere in the world
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
