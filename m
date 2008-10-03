@@ -1,46 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Keeping ACL link around after DBUS CreateBonding()
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Nick Pelly <npelly@google.com>
-Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
-In-Reply-To: <35c90d960810022342p1fca607x4be774ae9e675fd9@mail.gmail.com>
-References: <35c90d960810021747j56d5bc2ie62c10ade0026694@mail.gmail.com>
-	 <1223015762.11272.30.camel@violet.holtmann.net>
-	 <35c90d960810022342p1fca607x4be774ae9e675fd9@mail.gmail.com>
+Subject: Re: Untrusted input devices by default
+From: David Woodhouse <dwmw2@infradead.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Mario Limonciello <mario_limonciello@dell.com>,  "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1223015855.11272.34.camel@violet.holtmann.net>
+References: <48E3F51B.6050001@dell.com>
+	 <1223015855.11272.34.camel@violet.holtmann.net>
 Content-Type: text/plain
-Date: Fri, 03 Oct 2008 08:56:25 +0200
-Message-Id: <1223016985.11272.38.camel@violet.holtmann.net>
+Date: Fri, 03 Oct 2008 07:53:11 +0100
+Message-Id: <1223016791.3328.9.camel@macbook.infradead.org>
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nick,
-
-> >> I have memories of one of you talking about a custom change to bluez
-> >> to not immediately drop the ACL link once DBUS CreateBonding() has
-> >> finished (so that SDP can then be done on that link).
-> >>
-> >> Do you know the patch to do this? I am currently experimenting with
-> >> changing the timer expiry in hci_conn_put() for disc_timer. Maybe
-> >> there's a nicer way.
-> >
-> > do you have a trace in BTSnoop format for me. We are using L2CAP raw
-> > sockets for bonding and thus the default 2 seconds disconnect timeout
-> > applies. Enough time to get SDP started on the same link. If the remote
-> > side however decides to disconnect us, we are out of luck.
+On Fri, 2008-10-03 at 08:37 +0200, Marcel Holtmann wrote:
 > 
-> For this situation the ACL connection is not complete, so the 10ms
-> timeout applies. I have a patch to use the 2 second timeout code path
-> for both connecting and connected. I wonder if this would be useful in
-> mainline, or if this is just a strange behavior of our BRF6300 (it
-> completes pin code and link key before the ACL link is reported as
-> connected). I'll send you some logs tomorrow if that would still help.
+> > In my efforts to get BlueZ 4.x into Intrepid a question was posed.  How
+> > come input devices don't default to "Trusted" when paired in the
+> > Wizard?  This makes for a weird experience the next time you reboot (or
+> > disconnect the device for that matter) that you need to give it
+> > "authorization".
+> 
+> that is a bug. We should set the input device as trusted after we
+> connected to it. Any chance you have a patch for it?
 
-that is not strange behavior. That is just a device in security mode 3.
-The important question is who disconnects the link.
+I thought I was testing this a couple of weeks ago and it was working
+fine.
 
-Regards
-
-Marcel
-
-
+-- 
+David Woodhouse                            Open Source Technology Centre
+David.Woodhouse@intel.com                              Intel Corporation
