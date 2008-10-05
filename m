@@ -1,450 +1,385 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48E91E6F.1030202@pook.es>
-Date: Sun, 05 Oct 2008 22:07:11 +0200
+Message-ID: <48E912C1.6030707@pook.es>
+Date: Sun, 05 Oct 2008 21:17:21 +0200
 From: Stuart Pook <kernel6org@pook.es>
 MIME-Version: 1.0
 To: Johan Hedberg <johan.hedberg@gmail.com>
 CC: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: bluez-4.11 + 2.6.27-rc8 + SCO headset -> Invalid read of size
- 4
+Subject: Re: bluez-4.11 + 2.6.27-rc8 + SCO headset -> bluetoothd: connect():
+ Connection timed out (110)
 References: <48E29416.3030402@pook.es> <48E2B59A.7020600@dtsp.co.nz>	 <48E3B3BF.6070205@pook.es>	 <2d5a2c100810032047s47bec394w828852079d64e591@mail.gmail.com>	 <48E752A7.70600@pook.es> <1223121068.11272.46.camel@violet.holtmann.net> <48E7FB1E.8000504@pook.es> <48B8929D-29F9-4352-9C81-E95FDBC09876@gmail.com>
 In-Reply-To: <48B8929D-29F9-4352-9C81-E95FDBC09876@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: multipart/mixed;
+ boundary="------------030006040701000601090000"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+This is a multi-part message in MIME format.
+--------------030006040701000601090000
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+On 05/10/08 19:50, Johan Hedberg wrote:
+> On Oct 5, 2008, at 1:24, Stuart Pook wrote:
+>> not for me :-( I am once again getting the "aplay: set_params:979:
+>> Unable to install hw params:" message after a 40 second delay.
+>> The headset hisses softly to me during these 40 seconds.
+>> The error message from bluetoothd is "connect(): Connection timed out 
+>> (110)"
+> This seems to be some other error than the one that was fixed in 4.11. 
+> Could you try to get a hcidump of when this happens. It might be able to 
+> tell more about what's going on.
+
+Ok, the dump is attached.  I removed 40 seconds of
+
+ > SCO data: handle 45 flags 0x00 dlen 48
+     0000: eb ff ee 00 a7 00 81 00  b4 00 77 00 8d 00 65 00  ..........w...e.
+     0010: c3 ff 61 ff fa fe 12 ff  66 ff 3d ff aa ff 1c 00  ..a.....f.=.....
+     0020: f0 ff 12 00 40 00 2d 00  21 00 2b 00 3a 00 ec ff  ....@.-.!.+.:...
+
+which made the file a lot shorter. I can send the full 3Mb file if
+necessary but perhaps not to the whole list.
 
 >> Sometimes bluetoothd segfaults.
 > That's something more serious. Could you please try to produce a 
 > backtrace, either with gdb or valgrind. Thanks!
 
-valgrind is easy
+I guess that I'll have to learn how to use valgrind again.
 
-BTW, all the files in /usr/local/stow/bluez-4.11 are symlinked
-into /usr/local using stow.
+thanks for your help.
 
-I can get this error by running "aplay -D JX10 lib/alarm.wav"
-a few times with a 15 second delay before killing aplay with
-control-C. It happened three times tonight.
+Stuart
 
-Let me know if I can help in any other way.
+PS this is still with my old Bluetooth 1.2 0a12:0001 Cambridge Silicon Radio
+bluetooth dongle and my Jabra JX10 Series II headset
 
-This is the interesting output from valgrind:
+bluetoothd[28762]: Received AT+CIND=?
+bluetoothd[28762]: Received AT+CIND?
+bluetoothd[28762]: Received AT+CMER=3, 0, 0, 1
+bluetoothd[28762]: Event reporting (CMER): mode=3, ind=1
+bluetoothd[28762]: HFP Service Level Connection established
+bluetoothd[28762]: telephony-dummy: device 0xb96e64d0 connected
+bluetoothd[28762]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_CONNECTED
+bluetoothd[28762]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_CONNECTED -> HEADSET_STATE_PLAY_IN_PROGRESS
+bluetoothd[28762]: Received AT+VGS=12
+bluetoothd[28762]: connect(): Connection timed out (110)
+bluetoothd[28762]: Audio API: sending BT_SETCONFIGURATION_RSP
+bluetoothd[28762]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_PLAY_IN_PROGRESS -> HEADSET_STATE_CONNECTED
+bluetoothd[28762]: Audio API: received BT_STREAMSTART_REQ
+bluetoothd[28762]: Audio API: sending BT_STREAMSTART_RSP
+bluetoothd[28762]: Audio API: sending BT_STREAMFD_IND
+bluetoothd[28762]: unix_sendmsg_fd: Bad file descriptor(9)
+bluetoothd[28762]: resume failed
+bluetoothd[28762]: Audio API: sending BT_STREAMSTART_RSP
+bluetoothd[28762]: Unix client disconnected (fd=23)
+bluetoothd[28762]: No matching connection for handle 45
 
-bluetoothd[15123]: connect(): Connection timed out (110)
-==15123== Invalid read of size 4
-==15123==    at 0x490CBF3: (within /usr/lib/libdbus-1.so.3.4.0)
-==15123==    by 0x4911DD1: dbus_message_get_sender (in /usr/lib/libdbus-1.so.3.4.0)
-==15123==    by 0x49155C0: dbus_message_new_error (in /usr/lib/libdbus-1.so.3.4.0)
-==15123==    by 0x1361D: error_common_reply (in /usr/local/stow/bluez-4.11/sbin/bluetoothd)
-==15123==    by 0x4ED9D2C: error_connection_attempt_failed (in /usr/local/stow/bluez-4.11/lib/bluetooth/plugins/audio.so)
-==15123==    by 0x4EDAEA2: rfcomm_connect_cb (in /usr/local/stow/bluez-4.11/lib/bluetooth/plugins/audio.so)
-==15123==    by 0x2165E: connect_cb (in /usr/local/stow/bluez-4.11/sbin/bluetoothd)
-==15123==    by 0x48B465C: (within /usr/lib/libglib-2.0.so.0.1600.6)
-==15123==    by 0x487E1B7: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.1600.6)
-==15123==    by 0x4881852: (within /usr/lib/libglib-2.0.so.0.1600.6)
-==15123==    by 0x4881D71: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.1600.6)
-==15123==    by 0xA410: main (in /usr/local/stow/bluez-4.11/sbin/bluetoothd)
-==15123==  Address 0x464c45b3 is not stack'd, malloc'd or (recently) free'd
 
-This what I ran (note where I typed control-C twice)
+--------------030006040701000601090000
+Content-Type: text/plain;
+ name="2.6.27-rc8-bluez-4.11.txt-trim"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+ filename="2.6.27-rc8-bluez-4.11.txt-trim"
 
-:; while sleep 15; do aplay -D JX10 lib/alarm.wav ; done
-Playing WAVE 'lib/alarm.wav' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
-aplay: set_params:979: Unable to install hw params:
-ACCESS:  RW_INTERLEAVED
-FORMAT:  S16_LE
-SUBFORMAT:  STD
-SAMPLE_BITS: 16
-FRAME_BITS: 16
-CHANNELS: 1
-RATE: 8000
-PERIOD_TIME: 125000
-PERIOD_SIZE: 1000
-PERIOD_BYTES: 2000
-PERIODS: 4
-BUFFER_TIME: 500000
-BUFFER_SIZE: 4000
-BUFFER_BYTES: 8000
-TICK_TIME: [0 0]
-Playing WAVE 'lib/alarm.wav' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
-ALSA lib pcm_bluetooth.c:464:(bluetooth_hsp_hw_params) BT_SETCONFIGURATION failed : Input/output error(5)
-aplay: set_params:979: Unable to install hw params:
-ACCESS:  RW_INTERLEAVED
-FORMAT:  S16_LE
-SUBFORMAT:  STD
-SAMPLE_BITS: 16
-FRAME_BITS: 16
-CHANNELS: 1
-RATE: 8000
-PERIOD_TIME: 125000
-PERIOD_SIZE: 1000
-PERIOD_BYTES: 2000
-PERIODS: 4
-BUFFER_TIME: 500000
-BUFFER_SIZE: 4000
-BUFFER_BYTES: 8000
-TICK_TIME: [0 0]
-Playing WAVE 'lib/alarm.wav' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
-ALSA lib pcm_bluetooth.c:464:(bluetooth_hsp_hw_params) BT_SETCONFIGURATION failed : Input/output error(5)
-aplay: set_params:979: Unable to install hw params:
-ACCESS:  RW_INTERLEAVED
-FORMAT:  S16_LE
-SUBFORMAT:  STD
-SAMPLE_BITS: 16
-FRAME_BITS: 16
-CHANNELS: 1
-RATE: 8000
-PERIOD_TIME: 125000
-PERIOD_SIZE: 1000
-PERIOD_BYTES: 2000
-PERIODS: 4
-BUFFER_TIME: 500000
-BUFFER_SIZE: 4000
-BUFFER_BYTES: 8000
-TICK_TIME: [0 0]
-Playing WAVE 'lib/alarm.wav' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
-^CAborted by signal Interrupt...
-Playing WAVE 'lib/alarm.wav' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
-ALSA lib pcm_bluetooth.c:464:(bluetooth_hsp_hw_params) BT_SETCONFIGURATION failed : Input/output error(5)
-aplay: set_params:979: Unable to install hw params:
-ACCESS:  RW_INTERLEAVED
-FORMAT:  S16_LE
-SUBFORMAT:  STD
-SAMPLE_BITS: 16
-FRAME_BITS: 16
-CHANNELS: 1
-RATE: 8000
-PERIOD_TIME: 125000
-PERIOD_SIZE: 1000
-PERIOD_BYTES: 2000
-PERIODS: 4
-BUFFER_TIME: 500000
-BUFFER_SIZE: 4000
-BUFFER_BYTES: 8000
-TICK_TIME: [0 0]
-Playing WAVE 'lib/alarm.wav' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
-ALSA lib pcm_bluetooth.c:464:(bluetooth_hsp_hw_params) BT_SETCONFIGURATION failed : Input/output error(5)
-aplay: set_params:979: Unable to install hw params:
-ACCESS:  RW_INTERLEAVED
-FORMAT:  S16_LE
-SUBFORMAT:  STD
-SAMPLE_BITS: 16
-FRAME_BITS: 16
-CHANNELS: 1
-RATE: 8000
-PERIOD_TIME: 125000
-PERIOD_SIZE: 1000
-PERIOD_BYTES: 2000
-PERIODS: 4
-BUFFER_TIME: 500000
-BUFFER_SIZE: 4000
-BUFFER_BYTES: 8000
-TICK_TIME: [0 0]
-Playing WAVE 'lib/alarm.wav' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
-ALSA lib pcm_bluetooth.c:464:(bluetooth_hsp_hw_params) BT_SETCONFIGURATION failed : Input/output error(5)
-aplay: set_params:979: Unable to install hw params:
-ACCESS:  RW_INTERLEAVED
-FORMAT:  S16_LE
-SUBFORMAT:  STD
-SAMPLE_BITS: 16
-FRAME_BITS: 16
-CHANNELS: 1
-RATE: 8000
-PERIOD_TIME: 125000
-PERIOD_SIZE: 1000
-PERIOD_BYTES: 2000
-PERIODS: 4
-BUFFER_TIME: 500000
-BUFFER_SIZE: 4000
-BUFFER_BYTES: 8000
-TICK_TIME: [0 0]
-Playing WAVE 'lib/alarm.wav' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
-^CAborted by signal Interrupt...
-bt_audio_service_open: connect() failed: Connection refused (111)
-aplay: main:564: audio open error: Connection refused
-
-Here is the complete log:
-
-: root@kooka; valgrind /usr/local/sbin/bluetoothd -dn
-==15123== Memcheck, a memory error detector.
-==15123== Copyright (C) 2002-2007, and GNU GPL'd, by Julian Seward et al.
-==15123== Using LibVEX rev 1854, a library for dynamic binary translation.
-==15123== Copyright (C) 2004-2007, and GNU GPL'd, by OpenWorks LLP.
-==15123== Using valgrind-3.3.1-Debian, a dynamic binary instrumentation framework.
-==15123== Copyright (C) 2000-2007, and GNU GPL'd, by Julian Seward et al.
-==15123== For more details, rerun with: -v
-==15123==
-bluetoothd[15123]: Bluetooth daemon
-bluetoothd[15123]: Enabling debug information
-bluetoothd[15123]: parsing main.conf
-bluetoothd[15123]: offmode=NoScan
-bluetoothd[15123]: discovto=0
-bluetoothd[15123]: pageto=8192
-bluetoothd[15123]: name=%h-%d
-bluetoothd[15123]: class=0x000100
-bluetoothd[15123]: inqmode=0
-bluetoothd[15123]: Starting SDP server
-bluetoothd[15123]: Loading plugins /usr/local/lib/bluetooth/plugins
-bluetoothd[15123]: /usr/local/lib/bluetooth/plugins/audio.so
-bluetoothd[15123]: Parsing /etc/bluetooth/audio.conf failed: No such file or directory
-bluetoothd[15123]: Unix socket created: 11
-bluetoothd[15123]: Telephony plugin initialized
-bluetoothd[15123]: HFP AG features: "Ability to reject a call" "Enhanced call status" "Extended Error Result Codes"
-bluetoothd[15123]: /usr/local/lib/bluetooth/plugins/serial.so
-bluetoothd[15123]: /usr/local/lib/bluetooth/plugins/hal.so
-bluetoothd[15123]: /usr/local/lib/bluetooth/plugins/service.so
-bluetoothd[15123]: /usr/local/lib/bluetooth/plugins/network.so
-bluetoothd[15123]: Parsing /etc/bluetooth/network.conf failed: No such file or directory
-bluetoothd[15123]: Config options: InterfacePrefix=bnep%d, PANU_Script=(null), GN_Script=(null), NAP_Script=(null), GN_Interface=pan0, NAP_Interface=pan1, Security=true
-==15123== Warning: noted but unhandled ioctl 0x89a0 with no size/direction hints
-==15123==    This could cause spurious value errors to appear.
-==15123==    See README_MISSING_SYSCALL_OR_IOCTL for guidance on writing a proper wrapper.
-bluetoothd[15123]: bridge pan0 created
-bluetoothd[15123]: /usr/local/lib/bluetooth/plugins/input.so
-bluetoothd[15123]: input.conf: Key file does not have key 'IdleTimeout'
-bluetoothd[15123]: HCI dev 0 registered
-bluetoothd[15123]: child 15132 forked
-bluetoothd[15123]: HCI dev 0 already up
-bluetoothd[15123]: headset_server_probe: path /org/bluez/hci0
-bluetoothd[15123]: Adding record with handle 0x10000
-==15132==
-==15132== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 84 from 2)
-==15132== malloc/free: in use at exit: 30,100 bytes in 352 blocks.
-==15132== malloc/free: 751 allocs, 399 frees, 290,809 bytes allocated.
-==15132== For counts of detected errors, rerun with: -v
-==15132== searching for pointers to 352 not-freed blocks.
-==15132== checked 145,996 bytes.
-==15132==
-==15132== LEAK SUMMARY:
-==15132==    definitely lost: 0 bytes in 0 blocks.
-==15132==      possibly lost: 744 bytes in 3 blocks.
-==15132==    still reachable: 29,356 bytes in 349 blocks.
-==15132==         suppressed: 0 bytes in 0 blocks.
-==15132== Rerun with --leak-check=full to see details of leaked memory.
-bluetoothd[15123]: Adding record with handle 0x10001
-bluetoothd[15123]: a2dp_server_probe: path /org/bluez/hci0
-bluetoothd[15123]: SEP 0x4b311d0 registered: type:0 codec:0 seid:1
-bluetoothd[15123]: Adding record with handle 0x10002
-bluetoothd[15123]: avrcp_server_probe: path /org/bluez/hci0
-bluetoothd[15123]: Adding record with handle 0x10003
-bluetoothd[15123]: Adding record with handle 0x10004
-bluetoothd[15123]: proxy_probe: path /org/bluez/hci0
-bluetoothd[15123]: Registered interface org.bluez.SerialProxyManager on path /org/bluez/hci0
-bluetoothd[15123]: service_probe: path /org/bluez/hci0
-bluetoothd[15123]: Registered interface org.bluez.Service on path /org/bluez/hci0
-bluetoothd[15123]: network_server_probe: path /org/bluez/hci0
-bluetoothd[15123]: Adding record with handle 0x10005
-bluetoothd[15123]: register_server_record: got record id 0x10005
-bluetoothd[15123]: Registered interface org.bluez.NetworkPeer on path /org/bluez/hci0
-bluetoothd[15123]: network_server_probe: path /org/bluez/hci0
-bluetoothd[15123]: Adding record with handle 0x10006
-bluetoothd[15123]: register_server_record: got record id 0x10006
-bluetoothd[15123]: Registered interface org.bluez.NetworkHub on path /org/bluez/hci0
-bluetoothd[15123]: network_server_probe: path /org/bluez/hci0
-bluetoothd[15123]: Adding record with handle 0x10007
-bluetoothd[15123]: register_server_record: got record id 0x10007
-bluetoothd[15123]: Registered interface org.bluez.NetworkRouter on path /org/bluez/hci0
-bluetoothd[15123]: Creating device /org/bluez/hci0/dev_00_1A_45_2F_49_98
-bluetoothd[15123]: Probe drivers for /org/bluez/hci0/dev_00_1A_45_2F_49_98
-bluetoothd[15123]: Found Headset record
-bluetoothd[15123]: Discovered Headset service on RFCOMM channel 2
-bluetoothd[15123]: Registered interface org.bluez.Headset on path /org/bluez/hci0/dev_00_1A_45_2F_49_98
-bluetoothd[15123]: Found Hansfree record
-bluetoothd[15123]: Discovered Handsfree service on RFCOMM channel 1
-bluetoothd[15123]: headset_probe: path /org/bluez/hci0/dev_00_1A_45_2F_49_98
-bluetoothd[15123]: Registered interface org.bluez.Input on path /org/bluez/hci0/dev_00_1A_45_2F_49_98
-bluetoothd[15123]: Creating device /org/bluez/hci0/dev_00_14_A7_74_D3_AF
-bluetoothd[15123]: Creating device /org/bluez/hci0/dev_00_03_89_B7_F8_D3
-bluetoothd[15123]: Creating device /org/bluez/hci0/dev_00_0A_94_94_4F_B3
-bluetoothd[15123]: Creating device /org/bluez/hci0/dev_00_03_89_DC_5C_9F
-bluetoothd[15123]: Creating device /org/bluez/hci0/dev_00_03_89_DC_FC_EC
-bluetoothd[15123]: Creating device /org/bluez/hci0/dev_00_03_89_FE_E6_19
-bluetoothd[15123]: Creating device /org/bluez/hci0/dev_00_0E_6D_8F_91_6A
-bluetoothd[15123]: Creating device /org/bluez/hci0/dev_00_17_E5_E6_25_AB
-bluetoothd[15123]: Creating device /org/bluez/hci0/dev_00_17_E5_16_88_6C
-bluetoothd[15123]: Creating device /org/bluez/hci0/dev_00_17_E5_0C_EA_70
-bluetoothd[15123]: Adapter /org/bluez/hci0 has been enabled
-bluetoothd[15123]: Starting security manager 0
-bluetoothd[15123]: child 15132 exited
-bluetoothd[15123]: Computer is classified as desktop
-bluetoothd[15123]: Current device class is 0x4a0104
-bluetoothd[15123]: Setting 0x000104 for major/minor device class
-bluetoothd[15123]: Accepted new client connection on unix socket (fd=23)
-bluetoothd[15123]: Audio API: received BT_GETCAPABILITIES_REQ
-bluetoothd[15123]: Audio API: sending BT_GETCAPABILITIES_RSP
-bluetoothd[15123]: Audio API: received BT_SETCONFIGURATION_REQ
-bluetoothd[15123]: config sco - device = 00:1A:45:2F:49:98 access_mode = 2
-bluetoothd[15123]: /org/bluez/hci0/dev_00_1A_45_2F_49_98: Connecting to 00:1A:45:2F:49:98 channel 1
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
-bluetoothd[15123]: adapter_get_device(00:1A:45:2F:49:98)
-bluetoothd[15123]: link_key_request (sba=00:0C:41:E1:FF:30, dba=00:1A:45:2F:49:98)
-bluetoothd[15123]: kernel auth requirements = 0x04
-bluetoothd[15123]: stored link key type = 0x00
-bluetoothd[15123]: connect(): Connection timed out (110)
-bluetoothd[15123]: Audio API: sending BT_SETCONFIGURATION_RSP
-bluetoothd[15123]: telephony-dummy: device 0x4b707b0 disconnected
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_DISCONNECTED
-bluetoothd[15123]: Audio API: received BT_STREAMSTART_REQ
-bluetoothd[15123]: Audio API: sending BT_STREAMSTART_RSP
-bluetoothd[15123]: Audio API: sending BT_STREAMFD_IND
-bluetoothd[15123]: unix_sendmsg_fd: Bad file descriptor(9)
-bluetoothd[15123]: resume failed
-bluetoothd[15123]: Audio API: sending BT_STREAMSTART_RSP
-bluetoothd[15123]: Unix client disconnected (fd=23)
-bluetoothd[15123]: Accepted new client connection on unix socket (fd=23)
-bluetoothd[15123]: Audio API: received BT_GETCAPABILITIES_REQ
-bluetoothd[15123]: Audio API: sending BT_GETCAPABILITIES_RSP
-bluetoothd[15123]: Audio API: received BT_SETCONFIGURATION_REQ
-bluetoothd[15123]: config sco - device = 00:1A:45:2F:49:98 access_mode = 2
-bluetoothd[15123]: /org/bluez/hci0/dev_00_1A_45_2F_49_98: Connecting to 00:1A:45:2F:49:98 channel 1
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
-bluetoothd[15123]: adapter_get_device(00:1A:45:2F:49:98)
-bluetoothd[15123]: link_key_request (sba=00:0C:41:E1:FF:30, dba=00:1A:45:2F:49:98)
-bluetoothd[15123]: kernel auth requirements = 0x04
-bluetoothd[15123]: stored link key type = 0x00
-bluetoothd[15123]: connect(): Connection reset by peer (104)
-bluetoothd[15123]: Unable to lock headset
-bluetoothd[15123]: config failed
-bluetoothd[15123]: Audio API: sending BT_SETCONFIGURATION_RSP
-bluetoothd[15123]: telephony-dummy: device 0x4b707b0 disconnected
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_DISCONNECTED
-bluetoothd[15123]: Unix client disconnected (fd=23)
-bluetoothd[15123]: Accepted new client connection on unix socket (fd=23)
-bluetoothd[15123]: Audio API: received BT_GETCAPABILITIES_REQ
-bluetoothd[15123]: Audio API: sending BT_GETCAPABILITIES_RSP
-bluetoothd[15123]: Audio API: received BT_SETCONFIGURATION_REQ
-bluetoothd[15123]: config sco - device = 00:1A:45:2F:49:98 access_mode = 2
-bluetoothd[15123]: /org/bluez/hci0/dev_00_1A_45_2F_49_98: Connecting to 00:1A:45:2F:49:98 channel 1
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
-bluetoothd[15123]: adapter_get_device(00:1A:45:2F:49:98)
-bluetoothd[15123]: link_key_request (sba=00:0C:41:E1:FF:30, dba=00:1A:45:2F:49:98)
-bluetoothd[15123]: kernel auth requirements = 0x04
-bluetoothd[15123]: stored link key type = 0x00
-bluetoothd[15123]: connect(): Connection timed out (110)
-bluetoothd[15123]: Unable to lock headset
-bluetoothd[15123]: config failed
-bluetoothd[15123]: Audio API: sending BT_SETCONFIGURATION_RSP
-bluetoothd[15123]: telephony-dummy: device 0x4b707b0 disconnected
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_DISCONNECTED
-bluetoothd[15123]: Unix client disconnected (fd=23)
-bluetoothd[15123]: Accepted new client connection on unix socket (fd=23)
-bluetoothd[15123]: Audio API: received BT_GETCAPABILITIES_REQ
-bluetoothd[15123]: Audio API: sending BT_GETCAPABILITIES_RSP
-bluetoothd[15123]: Audio API: received BT_SETCONFIGURATION_REQ
-bluetoothd[15123]: config sco - device = 00:1A:45:2F:49:98 access_mode = 2
-bluetoothd[15123]: /org/bluez/hci0/dev_00_1A_45_2F_49_98: Connecting to 00:1A:45:2F:49:98 channel 1
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
-bluetoothd[15123]: adapter_get_device(00:1A:45:2F:49:98)
-bluetoothd[15123]: link_key_request (sba=00:0C:41:E1:FF:30, dba=00:1A:45:2F:49:98)
-bluetoothd[15123]: kernel auth requirements = 0x04
-bluetoothd[15123]: stored link key type = 0x00
-bluetoothd[15123]: Unix client disconnected (fd=23)
-bluetoothd[15123]: telephony-dummy: device 0x4b707b0 disconnected
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_DISCONNECTED
-bluetoothd[15123]: Accepted new client connection on unix socket (fd=23)
-bluetoothd[15123]: Audio API: received BT_GETCAPABILITIES_REQ
-bluetoothd[15123]: Audio API: sending BT_GETCAPABILITIES_RSP
-bluetoothd[15123]: Audio API: received BT_SETCONFIGURATION_REQ
-bluetoothd[15123]: config sco - device = 00:1A:45:2F:49:98 access_mode = 2
-bluetoothd[15123]: /org/bluez/hci0/dev_00_1A_45_2F_49_98: Connecting to 00:1A:45:2F:49:98 channel 1
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
-bluetoothd[15123]: connect(): Connection timed out (110)
-bluetoothd[15123]: Unable to lock headset
-bluetoothd[15123]: config failed
-bluetoothd[15123]: Audio API: sending BT_SETCONFIGURATION_RSP
-bluetoothd[15123]: telephony-dummy: device 0x4b707b0 disconnected
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_DISCONNECTED
-bluetoothd[15123]: Unix client disconnected (fd=23)
-bluetoothd[15123]: Accepted new client connection on unix socket (fd=23)
-bluetoothd[15123]: Audio API: received BT_GETCAPABILITIES_REQ
-bluetoothd[15123]: Audio API: sending BT_GETCAPABILITIES_RSP
-bluetoothd[15123]: Audio API: received BT_SETCONFIGURATION_REQ
-bluetoothd[15123]: config sco - device = 00:1A:45:2F:49:98 access_mode = 2
-bluetoothd[15123]: /org/bluez/hci0/dev_00_1A_45_2F_49_98: Connecting to 00:1A:45:2F:49:98 channel 1
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
-bluetoothd[15123]: adapter_get_device(00:1A:45:2F:49:98)
-bluetoothd[15123]: link_key_request (sba=00:0C:41:E1:FF:30, dba=00:1A:45:2F:49:98)
-bluetoothd[15123]: kernel auth requirements = 0x04
-bluetoothd[15123]: stored link key type = 0x00
-bluetoothd[15123]: connect(): Connection timed out (110)
-bluetoothd[15123]: Unable to lock headset
-bluetoothd[15123]: config failed
-bluetoothd[15123]: Audio API: sending BT_SETCONFIGURATION_RSP
-bluetoothd[15123]: telephony-dummy: device 0x4b707b0 disconnected
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_DISCONNECTED
-bluetoothd[15123]: Unix client disconnected (fd=23)
-bluetoothd[15123]: Accepted new client connection on unix socket (fd=23)
-bluetoothd[15123]: Audio API: received BT_GETCAPABILITIES_REQ
-bluetoothd[15123]: Audio API: sending BT_GETCAPABILITIES_RSP
-bluetoothd[15123]: Audio API: received BT_SETCONFIGURATION_REQ
-bluetoothd[15123]: config sco - device = 00:1A:45:2F:49:98 access_mode = 2
-bluetoothd[15123]: /org/bluez/hci0/dev_00_1A_45_2F_49_98: Connecting to 00:1A:45:2F:49:98 channel 1
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
-bluetoothd[15123]: adapter_get_device(00:1A:45:2F:49:98)
-bluetoothd[15123]: connect(): Connection timed out (110)
-bluetoothd[15123]: Unable to lock headset
-bluetoothd[15123]: config failed
-bluetoothd[15123]: Audio API: sending BT_SETCONFIGURATION_RSP
-bluetoothd[15123]: telephony-dummy: device 0x4b707b0 disconnected
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_DISCONNECTED
-bluetoothd[15123]: Unix client disconnected (fd=23)
-bluetoothd[15123]: Accepted new client connection on unix socket (fd=23)
-bluetoothd[15123]: Audio API: received BT_GETCAPABILITIES_REQ
-bluetoothd[15123]: Audio API: sending BT_GETCAPABILITIES_RSP
-bluetoothd[15123]: Audio API: received BT_SETCONFIGURATION_REQ
-bluetoothd[15123]: config sco - device = 00:1A:45:2F:49:98 access_mode = 2
-bluetoothd[15123]: /org/bluez/hci0/dev_00_1A_45_2F_49_98: Connecting to 00:1A:45:2F:49:98 channel 1
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_DISCONNECTED -> HEADSET_STATE_CONNECT_IN_PROGRESS
-bluetoothd[15123]: adapter_get_device(00:1A:45:2F:49:98)
-bluetoothd[15123]: link_key_request (sba=00:0C:41:E1:FF:30, dba=00:1A:45:2F:49:98)
-bluetoothd[15123]: kernel auth requirements = 0x04
-bluetoothd[15123]: stored link key type = 0x00
-bluetoothd[15123]: Unix client disconnected (fd=23)
-bluetoothd[15123]: telephony-dummy: device 0x4b707b0 disconnected
-bluetoothd[15123]: State changed /org/bluez/hci0/dev_00_1A_45_2F_49_98: HEADSET_STATE_CONNECT_IN_PROGRESS -> HEADSET_STATE_DISCONNECTED
-bluetoothd[15123]: connect(): Connection timed out (110)
-==15123== Invalid read of size 4
-==15123==    at 0x490CBF3: (within /usr/lib/libdbus-1.so.3.4.0)
-==15123==    by 0x4911DD1: dbus_message_get_sender (in /usr/lib/libdbus-1.so.3.4.0)
-==15123==    by 0x49155C0: dbus_message_new_error (in /usr/lib/libdbus-1.so.3.4.0)
-==15123==    by 0x1361D: error_common_reply (in /usr/local/stow/bluez-4.11/sbin/bluetoothd)
-==15123==    by 0x4ED9D2C: error_connection_attempt_failed (in /usr/local/stow/bluez-4.11/lib/bluetooth/plugins/audio.so)
-==15123==    by 0x4EDAEA2: rfcomm_connect_cb (in /usr/local/stow/bluez-4.11/lib/bluetooth/plugins/audio.so)
-==15123==    by 0x2165E: connect_cb (in /usr/local/stow/bluez-4.11/sbin/bluetoothd)
-==15123==    by 0x48B465C: (within /usr/lib/libglib-2.0.so.0.1600.6)
-==15123==    by 0x487E1B7: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.1600.6)
-==15123==    by 0x4881852: (within /usr/lib/libglib-2.0.so.0.1600.6)
-==15123==    by 0x4881D71: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.1600.6)
-==15123==    by 0xA410: main (in /usr/local/stow/bluez-4.11/sbin/bluetoothd)
-==15123==  Address 0x464c45b3 is not stack'd, malloc'd or (recently) free'd
-==15123==
-==15123== Process terminating with default action of signal 11 (SIGSEGV)
-==15123==  Access not within mapped region at address 0x464C45B3
-==15123==    at 0x490CBF3: (within /usr/lib/libdbus-1.so.3.4.0)
-==15123==    by 0x4911DD1: dbus_message_get_sender (in /usr/lib/libdbus-1.so.3.4.0)
-==15123==    by 0x49155C0: dbus_message_new_error (in /usr/lib/libdbus-1.so.3.4.0)
-==15123==    by 0x1361D: error_common_reply (in /usr/local/stow/bluez-4.11/sbin/bluetoothd)
-==15123==    by 0x4ED9D2C: error_connection_attempt_failed (in /usr/local/stow/bluez-4.11/lib/bluetooth/plugins/audio.so)
-==15123==    by 0x4EDAEA2: rfcomm_connect_cb (in /usr/local/stow/bluez-4.11/lib/bluetooth/plugins/audio.so)
-==15123==    by 0x2165E: connect_cb (in /usr/local/stow/bluez-4.11/sbin/bluetoothd)
-==15123==    by 0x48B465C: (within /usr/lib/libglib-2.0.so.0.1600.6)
-==15123==    by 0x487E1B7: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.1600.6)
-==15123==    by 0x4881852: (within /usr/lib/libglib-2.0.so.0.1600.6)
-==15123==    by 0x4881D71: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.1600.6)
-==15123==    by 0xA410: main (in /usr/local/stow/bluez-4.11/sbin/bluetoothd)
-==15123==
-==15123== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 84 from 2)
-==15123== malloc/free: in use at exit: 46,759 bytes in 872 blocks.
-==15123== malloc/free: 3,266 allocs, 2,394 frees, 1,953,427 bytes allocated.
-==15123== For counts of detected errors, rerun with: -v
-==15123== searching for pointers to 872 not-freed blocks.
-==15123== checked 161,856 bytes.
-==15123==
-==15123== LEAK SUMMARY:
-==15123==    definitely lost: 594 bytes in 10 blocks.
-==15123==      possibly lost: 744 bytes in 3 blocks.
-==15123==    still reachable: 45,421 bytes in 859 blocks.
-==15123==         suppressed: 0 bytes in 0 blocks.
-==15123== Rerun with --leak-check=full to see details of leaked memory.
-Segmentation fault
-
+SENJIHNuaWZmZXIgLSBCbHVldG9vdGggcGFja2V0IGFuYWx5emVyIHZlciAxLjQyCmRldmlj
+ZTogaGNpMCBzbmFwX2xlbjogMTAyOCBmaWx0ZXI6IDB4ZmZmZmZmZmYKPCBIQ0kgQ29tbWFu
+ZDogQ3JlYXRlIENvbm5lY3Rpb24gKDB4MDF8MHgwMDA1KSBwbGVuIDEzCiAgICBiZGFkZHIg
+MDA6MUE6NDU6MkY6NDk6OTggcHR5cGUgMHhjYzE4IHJzd2l0Y2ggMHgwMSBjbGtvZmZzZXQg
+MHgwMDAwCiAgICBQYWNrZXQgdHlwZTogRE0xIERNMyBETTUgREgxIERIMyBESDUgCj4gSENJ
+IEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0CiAgICBDcmVhdGUgQ29ubmVj
+dGlvbiAoMHgwMXwweDAwMDUpIHN0YXR1cyAweDAwIG5jbWQgMQo+IEhDSSBFdmVudDogQ29u
+bmVjdCBDb21wbGV0ZSAoMHgwMykgcGxlbiAxMQogICAgc3RhdHVzIDB4MDAgaGFuZGxlIDQx
+IGJkYWRkciAwMDoxQTo0NToyRjo0OTo5OCB0eXBlIEFDTCBlbmNyeXB0IDB4MDAKPCBIQ0kg
+Q29tbWFuZDogUmVhZCBSZW1vdGUgU3VwcG9ydGVkIEZlYXR1cmVzICgweDAxfDB4MDAxYikg
+cGxlbiAyCiAgICBoYW5kbGUgNDEKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBm
+KSBwbGVuIDQKICAgIFJlYWQgUmVtb3RlIFN1cHBvcnRlZCBGZWF0dXJlcyAoMHgwMXwweDAw
+MWIpIHN0YXR1cyAweDAwIG5jbWQgMAo+IEhDSSBFdmVudDogUGFnZSBTY2FuIFJlcGV0aXRp
+b24gTW9kZSBDaGFuZ2UgKDB4MjApIHBsZW4gNwogICAgYmRhZGRyIDAwOjFBOjQ1OjJGOjQ5
+Ojk4IG1vZGUgMQo+IEhDSSBFdmVudDogTWF4IFNsb3RzIENoYW5nZSAoMHgxYikgcGxlbiAz
+CiAgICBoYW5kbGUgNDEgc2xvdHMgNQo+IEhDSSBFdmVudDogQ29tbWFuZCBTdGF0dXMgKDB4
+MGYpIHBsZW4gNAogICAgVW5rbm93biAoMHgwMHwweDAwMDApIHN0YXR1cyAweDAwIG5jbWQg
+MQo8IEhDSSBDb21tYW5kOiBSZW1vdGUgTmFtZSBSZXF1ZXN0ICgweDAxfDB4MDAxOSkgcGxl
+biAxMAogICAgYmRhZGRyIDAwOjFBOjQ1OjJGOjQ5Ojk4IG1vZGUgMiBjbGtvZmZzZXQgMHgw
+MDAwCj4gSENJIEV2ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0CiAgICBSZW1v
+dGUgTmFtZSBSZXF1ZXN0ICgweDAxfDB4MDAxOSkgc3RhdHVzIDB4MDAgbmNtZCAxCj4gSENJ
+IEV2ZW50OiBSZWFkIFJlbW90ZSBTdXBwb3J0ZWQgRmVhdHVyZXMgKDB4MGIpIHBsZW4gMTEK
+ICAgIHN0YXR1cyAweDAwIGhhbmRsZSA0MQogICAgRmVhdHVyZXM6IDB4YmYgMHhmZSAweDhi
+IDB4ZjggMHgxYiAweDE4IDB4MDAgMHg4MAo8IEFDTCBkYXRhOiBoYW5kbGUgNDEgZmxhZ3Mg
+MHgwMiBkbGVuIDEwCiAgICBMMkNBUChzKTogSW5mbyByZXE6IHR5cGUgMgo+IEhDSSBFdmVu
+dDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhhbmRs
+ZSA0MSBwYWNrZXRzIDEKPiBBQ0wgZGF0YTogaGFuZGxlIDQxIGZsYWdzIDB4MDIgZGxlbiAx
+NgogICAgTDJDQVAocyk6IEluZm8gcnNwOiB0eXBlIDIgcmVzdWx0IDAKICAgICAgRXh0ZW5k
+ZWQgZmVhdHVyZSBtYXNrIDB4MDAwMAo8IEFDTCBkYXRhOiBoYW5kbGUgNDEgZmxhZ3MgMHgw
+MiBkbGVuIDEyCiAgICBMMkNBUChzKTogQ29ubmVjdCByZXE6IHBzbSAzIHNjaWQgMHgwMDQw
+Cj4gQUNMIGRhdGE6IGhhbmRsZSA0MSBmbGFncyAweDAyIGRsZW4gMTYKICAgIEwyQ0FQKHMp
+OiBDb25uZWN0IHJzcDogZGNpZCAweDAwNTAgc2NpZCAweDAwNDAgcmVzdWx0IDEgc3RhdHVz
+IDIKICAgICAgQ29ubmVjdGlvbiBwZW5kaW5nIC0gQXV0aG9yaXphdGlvbiBwZW5kaW5nCj4g
+SENJIEV2ZW50OiBSZW1vdGUgTmFtZSBSZXEgQ29tcGxldGUgKDB4MDcpIHBsZW4gMjU1CiAg
+ICBzdGF0dXMgMHgwMCBiZGFkZHIgMDA6MUE6NDU6MkY6NDk6OTggbmFtZSAnSmFicmEgSlgx
+MCBzZXJpZXMgMicKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAo
+MHgxMykgcGxlbiA1CiAgICBoYW5kbGUgNDEgcGFja2V0cyAxCj4gSENJIEV2ZW50OiBMaW5r
+IEtleSBSZXF1ZXN0ICgweDE3KSBwbGVuIDYKICAgIGJkYWRkciAwMDoxQTo0NToyRjo0OTo5
+OAo8IEhDSSBDb21tYW5kOiBMaW5rIEtleSBSZXF1ZXN0IFJlcGx5ICgweDAxfDB4MDAwYikg
+cGxlbiAyMgogICAgYmRhZGRyIDAwOjFBOjQ1OjJGOjQ5Ojk4IGtleSBGNjMzMzFDRTJEMERC
+Q0ExOTBEQzczQzkzMENENjExNwo+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgw
+ZSkgcGxlbiAxMAogICAgTGluayBLZXkgUmVxdWVzdCBSZXBseSAoMHgwMXwweDAwMGIpIG5j
+bWQgMQogICAgc3RhdHVzIDB4MDAgYmRhZGRyIDAwOjFBOjQ1OjJGOjQ5Ojk4Cj4gQUNMIGRh
+dGE6IGhhbmRsZSA0MSBmbGFncyAweDAyIGRsZW4gMTYKICAgIEwyQ0FQKHMpOiBDb25uZWN0
+IHJzcDogZGNpZCAweDAwNTAgc2NpZCAweDAwNDAgcmVzdWx0IDAgc3RhdHVzIDAKICAgICAg
+Q29ubmVjdGlvbiBzdWNjZXNzZnVsCjwgQUNMIGRhdGE6IGhhbmRsZSA0MSBmbGFncyAweDAy
+IGRsZW4gMTYKICAgIEwyQ0FQKHMpOiBDb25maWcgcmVxOiBkY2lkIDB4MDA1MCBmbGFncyAw
+eDAwIGNsZW4gNAogICAgICBNVFUgMTAxMyAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21w
+bGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1CiAgICBoYW5kbGUgNDEgcGFja2V0cyAxCj4g
+QUNMIGRhdGE6IGhhbmRsZSA0MSBmbGFncyAweDAyIGRsZW4gMTQKICAgIEwyQ0FQKHMpOiBD
+b25maWcgcnNwOiBzY2lkIDB4MDA0MCBmbGFncyAweDAwIHJlc3VsdCAwIGNsZW4gMAogICAg
+ICBTdWNjZXNzCj4gQUNMIGRhdGE6IGhhbmRsZSA0MSBmbGFncyAweDAyIGRsZW4gMTYKICAg
+IEwyQ0FQKHMpOiBDb25maWcgcmVxOiBkY2lkIDB4MDA0MCBmbGFncyAweDAwIGNsZW4gNAog
+ICAgICBNVFUgMTAxMyAKPCBBQ0wgZGF0YTogaGFuZGxlIDQxIGZsYWdzIDB4MDIgZGxlbiAx
+OAogICAgTDJDQVAocyk6IENvbmZpZyByc3A6IHNjaWQgMHgwMDUwIGZsYWdzIDB4MDAgcmVz
+dWx0IDAgY2xlbiA0CiAgICAgIE1UVSAxMDEzIAo8IEFDTCBkYXRhOiBoYW5kbGUgNDEgZmxh
+Z3MgMHgwMiBkbGVuIDgKICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDUwIGxlbiA0IFtwc20gM10K
+ICAgICAgUkZDT01NKHMpOiBTQUJNOiBjciAxIGRsY2kgMCBwZiAxIGlsZW4gMCBmY3MgMHgx
+YyAKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxl
+biA1CiAgICBoYW5kbGUgNDEgcGFja2V0cyAxCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29t
+cGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQogICAgaGFuZGxlIDQxIHBhY2tldHMgMQo+
+IEFDTCBkYXRhOiBoYW5kbGUgNDEgZmxhZ3MgMHgwMiBkbGVuIDgKICAgIEwyQ0FQKGQpOiBj
+aWQgMHgwMDQwIGxlbiA0IFtwc20gM10KICAgICAgUkZDT01NKHMpOiBVQTogY3IgMSBkbGNp
+IDAgcGYgMSBpbGVuIDAgZmNzIDB4ZDcgCjwgQUNMIGRhdGE6IGhhbmRsZSA0MSBmbGFncyAw
+eDAyIGRsZW4gMTgKICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDUwIGxlbiAxNCBbcHNtIDNdCiAg
+ICAgIFJGQ09NTShzKTogUE4gQ01EOiBjciAxIGRsY2kgMCBwZiAwIGlsZW4gMTAgZmNzIDB4
+NzAgbWNjX2xlbiA4CiAgICAgIGRsY2kgMiBmcmFtZV90eXBlIDAgY3JlZGl0X2Zsb3cgMTUg
+cHJpIDcgYWNrX3RpbWVyIDAKICAgICAgZnJhbWVfc2l6ZSAxMDA4IG1heF9yZXRyYW5zIDAg
+Y3JlZGl0cyA3Cj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKDB4
+MTMpIHBsZW4gNQogICAgaGFuZGxlIDQxIHBhY2tldHMgMQo+IEFDTCBkYXRhOiBoYW5kbGUg
+NDEgZmxhZ3MgMHgwMiBkbGVuIDE4CiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4gMTQg
+W3BzbSAzXQogICAgICBSRkNPTU0ocyk6IFBOIFJTUDogY3IgMCBkbGNpIDAgcGYgMCBpbGVu
+IDEwIGZjcyAweGFhIG1jY19sZW4gOAogICAgICBkbGNpIDIgZnJhbWVfdHlwZSAwIGNyZWRp
+dF9mbG93IDE0IHByaSA3IGFja190aW1lciAwCiAgICAgIGZyYW1lX3NpemUgMTI3IG1heF9y
+ZXRyYW5zIDAgY3JlZGl0cyAwCjwgQUNMIGRhdGE6IGhhbmRsZSA0MSBmbGFncyAweDAyIGRs
+ZW4gOAogICAgTDJDQVAoZCk6IGNpZCAweDAwNTAgbGVuIDQgW3BzbSAzXQogICAgICBSRkNP
+TU0ocyk6IFNBQk06IGNyIDEgZGxjaSAyIHBmIDEgaWxlbiAwIGZjcyAweDU5IAo+IEhDSSBF
+dmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhh
+bmRsZSA0MSBwYWNrZXRzIDEKPiBBQ0wgZGF0YTogaGFuZGxlIDQxIGZsYWdzIDB4MDIgZGxl
+biA4CiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4gNCBbcHNtIDNdCiAgICAgIFJGQ09N
+TShzKTogVUE6IGNyIDEgZGxjaSAyIHBmIDEgaWxlbiAwIGZjcyAweDkyIAo8IEFDTCBkYXRh
+OiBoYW5kbGUgNDEgZmxhZ3MgMHgwMiBkbGVuIDEyCiAgICBMMkNBUChkKTogY2lkIDB4MDA1
+MCBsZW4gOCBbcHNtIDNdCiAgICAgIFJGQ09NTShzKTogTVNDIENNRDogY3IgMSBkbGNpIDAg
+cGYgMCBpbGVuIDQgZmNzIDB4NzAgbWNjX2xlbiAyCiAgICAgIGRsY2kgMiBmYyAwIHJ0YyAx
+IHJ0ciAxIGljIDAgZHYgMSBiMSAwIGIyIDAgYjMgMCBsZW4gMAo+IEFDTCBkYXRhOiBoYW5k
+bGUgNDEgZmxhZ3MgMHgwMiBkbGVuIDEyCiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBsZW4g
+OCBbcHNtIDNdCiAgICAgIFJGQ09NTShzKTogTVNDIENNRDogY3IgMCBkbGNpIDAgcGYgMCBp
+bGVuIDQgZmNzIDB4YWEgbWNjX2xlbiAyCiAgICAgIGRsY2kgMiBmYyAwIHJ0YyAxIHJ0ciAx
+IGljIDAgZHYgMCBiMSAwIGIyIDAgYjMgMCBsZW4gMAo8IEFDTCBkYXRhOiBoYW5kbGUgNDEg
+ZmxhZ3MgMHgwMiBkbGVuIDEyCiAgICBMMkNBUChkKTogY2lkIDB4MDA1MCBsZW4gOCBbcHNt
+IDNdCiAgICAgIFJGQ09NTShzKTogTVNDIFJTUDogY3IgMSBkbGNpIDAgcGYgMCBpbGVuIDQg
+ZmNzIDB4NzAgbWNjX2xlbiAyCiAgICAgIGRsY2kgMiBmYyAwIHJ0YyAxIHJ0ciAxIGljIDAg
+ZHYgMCBiMSAwIGIyIDAgYjMgMCBsZW4gMAo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBs
+ZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhhbmRsZSA0MSBwYWNrZXRzIDEKPiBI
+Q0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1CiAg
+ICBoYW5kbGUgNDEgcGFja2V0cyAxCj4gQUNMIGRhdGE6IGhhbmRsZSA0MSBmbGFncyAweDAy
+IGRsZW4gMTIKICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxlbiA4IFtwc20gM10KICAgICAg
+UkZDT01NKHMpOiBNU0MgUlNQOiBjciAwIGRsY2kgMCBwZiAwIGlsZW4gNCBmY3MgMHhhYSBt
+Y2NfbGVuIDIKICAgICAgZGxjaSAyIGZjIDAgcnRjIDEgcnRyIDEgaWMgMCBkdiAxIGIxIDAg
+YjIgMCBiMyAwIGxlbiAwCjwgQUNMIGRhdGE6IGhhbmRsZSA0MSBmbGFncyAweDAyIGRsZW4g
+OQogICAgTDJDQVAoZCk6IGNpZCAweDAwNTAgbGVuIDUgW3BzbSAzXQogICAgICBSRkNPTU0o
+ZCk6IFVJSDogY3IgMSBkbGNpIDIgcGYgMSBpbGVuIDAgZmNzIDB4ODYgY3JlZGl0cyAzMwo+
+IEFDTCBkYXRhOiBoYW5kbGUgNDEgZmxhZ3MgMHgwMiBkbGVuIDkKICAgIEwyQ0FQKGQpOiBj
+aWQgMHgwMDQwIGxlbiA1IFtwc20gM10KICAgICAgUkZDT01NKGQpOiBVSUg6IGNyIDAgZGxj
+aSAyIHBmIDEgaWxlbiAwIGZjcyAweDVjIGNyZWRpdHMgMTUKPiBIQ0kgRXZlbnQ6IE51bWJl
+ciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1CiAgICBoYW5kbGUgNDEgcGFj
+a2V0cyAxCj4gQUNMIGRhdGE6IGhhbmRsZSA0MSBmbGFncyAweDAyIGRsZW4gMTkKICAgIEwy
+Q0FQKGQpOiBjaWQgMHgwMDQwIGxlbiAxNSBbcHNtIDNdCiAgICAgIFJGQ09NTShkKTogVUlI
+OiBjciAwIGRsY2kgMiBwZiAwIGlsZW4gMTEgZmNzIDB4NDAgCiAgICAgIDAwMDA6IDQxIDU0
+IDJiIDQyIDUyIDUzIDQ2IDNkICAzMiAzNyAwZCAgICAgICAgICAgICAgICAgQVQrQlJTRj0y
+Ny4KPCBBQ0wgZGF0YTogaGFuZGxlIDQxIGZsYWdzIDB4MDIgZGxlbiAyMQogICAgTDJDQVAo
+ZCk6IGNpZCAweDAwNTAgbGVuIDE3IFtwc20gM10KICAgICAgUkZDT01NKGQpOiBVSUg6IGNy
+IDEgZGxjaSAyIHBmIDAgaWxlbiAxMyBmY3MgMHg5YSAKICAgICAgMDAwMDogMGQgMGEgMmIg
+NDIgNTIgNTMgNDYgM2QgIDMzIDM1IDMyIDBkIDBhICAgICAgICAgICAuLitCUlNGPTM1Mi4u
+CjwgQUNMIGRhdGE6IGhhbmRsZSA0MSBmbGFncyAweDAyIGRsZW4gMTQKICAgIEwyQ0FQKGQp
+OiBjaWQgMHgwMDUwIGxlbiAxMCBbcHNtIDNdCiAgICAgIFJGQ09NTShkKTogVUlIOiBjciAx
+IGRsY2kgMiBwZiAwIGlsZW4gNiBmY3MgMHg5YSAKICAgICAgMDAwMDogMGQgMGEgNGYgNGIg
+MGQgMGEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAuLk9LLi4KPiBIQ0kgRXZl
+bnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1CiAgICBoYW5k
+bGUgNDEgcGFja2V0cyAxCj4gSENJIEV2ZW50OiBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tl
+dHMgKDB4MTMpIHBsZW4gNQogICAgaGFuZGxlIDQxIHBhY2tldHMgMQo+IEFDTCBkYXRhOiBo
+YW5kbGUgNDEgZmxhZ3MgMHgwMiBkbGVuIDE5CiAgICBMMkNBUChkKTogY2lkIDB4MDA0MCBs
+ZW4gMTUgW3BzbSAzXQogICAgICBSRkNPTU0oZCk6IFVJSDogY3IgMCBkbGNpIDIgcGYgMSBp
+bGVuIDEwIGZjcyAweDVjIGNyZWRpdHMgMgogICAgICAwMDAwOiA0MSA1NCAyYiA0MyA0OSA0
+ZSA0NCAzZCAgM2YgMGQgICAgICAgICAgICAgICAgICAgIEFUK0NJTkQ9Py4KPCBBQ0wgZGF0
+YTogaGFuZGxlIDQxIGZsYWdzIDB4MDIgZGxlbiAxMzUKICAgIEwyQ0FQKGQpOiBjaWQgMHgw
+MDUwIGxlbiAxMzEgW3BzbSAzXQogICAgICBSRkNPTU0oZCk6IFVJSDogY3IgMSBkbGNpIDIg
+cGYgMCBpbGVuIDEyNyBmY3MgMHg5YSAKICAgICAgMDAwMDogMGQgMGEgMmIgNDMgNDkgNGUg
+NDQgM2EgIDI4IDIyIDYyIDYxIDc0IDc0IDYzIDY4ICAuLitDSU5EOigiYmF0dGNoCiAgICAg
+IDAwMTA6IDY3IDIyIDJjIDI4IDMwIDJkIDM1IDI5ICAyOSAyYyAyOCAyMiA3MyA2OSA2NyA2
+ZSAgZyIsKDAtNSkpLCgic2lnbgogICAgICAwMDIwOiA2MSA2YyAyMiAyYyAyOCAzMCAyZCAz
+NSAgMjkgMjkgMmMgMjggMjIgNzMgNjUgNzIgIGFsIiwoMC01KSksKCJzZXIKICAgICAgMDAz
+MDogNzYgNjkgNjMgNjUgMjIgMmMgMjggMzAgIDJjIDMxIDI5IDI5IDJjIDI4IDIyIDYzICB2
+aWNlIiwoMCwxKSksKCJjCiAgICAgIDAwNDA6IDYxIDZjIDZjIDIyIDJjIDI4IDMwIDJjICAz
+MSAyOSAyOSAyYyAyOCAyMiA2MyA2MSAgYWxsIiwoMCwxKSksKCJjYQogICAgICAwMDUwOiA2
+YyA2YyA3MyA2NSA3NCA3NSA3MCAyMiAgMmMgMjggMzAgMmQgMzMgMjkgMjkgMmMgIGxsc2V0
+dXAiLCgwLTMpKSwKICAgICAgMDA2MDogMjggMjIgNjMgNjEgNmMgNmMgNjggNjUgIDZjIDY0
+IDIyIDJjIDI4IDMwIDJkIDMyICAoImNhbGxoZWxkIiwoMC0yCiAgICAgIDAwNzA6IDI5IDI5
+IDJjIDI4IDIyIDcyIDZmIDYxICA2ZCAyMiAyYyAyOCAzMCAyYyAzMSAgICAgKSksKCJyb2Ft
+IiwoMCwxCjwgQUNMIGRhdGE6IGhhbmRsZSA0MSBmbGFncyAweDAyIGRsZW4gMTIKICAgIEwy
+Q0FQKGQpOiBjaWQgMHgwMDUwIGxlbiA4IFtwc20gM10KICAgICAgUkZDT01NKGQpOiBVSUg6
+IGNyIDEgZGxjaSAyIHBmIDAgaWxlbiA0IGZjcyAweDlhIAogICAgICAwMDAwOiAyOSAyOSAw
+ZCAwYSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICkpLi4KPCBBQ0wg
+ZGF0YTogaGFuZGxlIDQxIGZsYWdzIDB4MDIgZGxlbiAxNAogICAgTDJDQVAoZCk6IGNpZCAw
+eDAwNTAgbGVuIDEwIFtwc20gM10KICAgICAgUkZDT01NKGQpOiBVSUg6IGNyIDEgZGxjaSAy
+IHBmIDAgaWxlbiA2IGZjcyAweDlhIAogICAgICAwMDAwOiAwZCAwYSA0ZiA0YiAwZCAwYSAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC4uT0suLgo+IEhDSSBFdmVudDogTnVt
+YmVyIG9mIENvbXBsZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhhbmRsZSA0MSBw
+YWNrZXRzIDEKPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgx
+MykgcGxlbiA1CiAgICBoYW5kbGUgNDEgcGFja2V0cyAxCj4gSENJIEV2ZW50OiBOdW1iZXIg
+b2YgQ29tcGxldGVkIFBhY2tldHMgKDB4MTMpIHBsZW4gNQogICAgaGFuZGxlIDQxIHBhY2tl
+dHMgMQo+IEFDTCBkYXRhOiBoYW5kbGUgNDEgZmxhZ3MgMHgwMiBkbGVuIDE4CiAgICBMMkNB
+UChkKTogY2lkIDB4MDA0MCBsZW4gMTQgW3BzbSAzXQogICAgICBSRkNPTU0oZCk6IFVJSDog
+Y3IgMCBkbGNpIDIgcGYgMSBpbGVuIDkgZmNzIDB4NWMgY3JlZGl0cyAzCiAgICAgIDAwMDA6
+IDQxIDU0IDJiIDQzIDQ5IDRlIDQ0IDNmICAwZCAgICAgICAgICAgICAgICAgICAgICAgQVQr
+Q0lORD8uCjwgQUNMIGRhdGE6IGhhbmRsZSA0MSBmbGFncyAweDAyIGRsZW4gMzEKICAgIEwy
+Q0FQKGQpOiBjaWQgMHgwMDUwIGxlbiAyNyBbcHNtIDNdCiAgICAgIFJGQ09NTShkKTogVUlI
+OiBjciAxIGRsY2kgMiBwZiAwIGlsZW4gMjMgZmNzIDB4OWEgCiAgICAgIDAwMDA6IDBkIDBh
+IDJiIDQzIDQ5IDRlIDQ0IDNhICAzNSAyYyAzNSAyYyAzMSAyYyAzMCAyYyAgLi4rQ0lORDo1
+LDUsMSwwLAogICAgICAwMDEwOiAzMCAyYyAzMCAyYyAzMCAwZCAwYSAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIDAsMCwwLi4KPCBBQ0wgZGF0YTogaGFuZGxlIDQxIGZsYWdzIDB4
+MDIgZGxlbiAxNAogICAgTDJDQVAoZCk6IGNpZCAweDAwNTAgbGVuIDEwIFtwc20gM10KICAg
+ICAgUkZDT01NKGQpOiBVSUg6IGNyIDEgZGxjaSAyIHBmIDAgaWxlbiA2IGZjcyAweDlhIAog
+ICAgICAwMDAwOiAwZCAwYSA0ZiA0YiAwZCAwYSAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIC4uT0suLgo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBsZXRlZCBQYWNrZXRz
+ICgweDEzKSBwbGVuIDUKICAgIGhhbmRsZSA0MSBwYWNrZXRzIDEKPiBIQ0kgRXZlbnQ6IE51
+bWJlciBvZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1CiAgICBoYW5kbGUgNDEg
+cGFja2V0cyAxCj4gQUNMIGRhdGE6IGhhbmRsZSA0MSBmbGFncyAweDAyIGRsZW4gMjgKICAg
+IEwyQ0FQKGQpOiBjaWQgMHgwMDQwIGxlbiAyNCBbcHNtIDNdCiAgICAgIFJGQ09NTShkKTog
+VUlIOiBjciAwIGRsY2kgMiBwZiAxIGlsZW4gMTkgZmNzIDB4NWMgY3JlZGl0cyAyCiAgICAg
+IDAwMDA6IDQxIDU0IDJiIDQzIDRkIDQ1IDUyIDNkICAzMyAyYyAyMCAzMCAyYyAyMCAzMCAy
+YyAgQVQrQ01FUj0zLCAwLCAwLAogICAgICAwMDEwOiAyMCAzMSAwZCAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAxLgo8IEhDSSBDb21tYW5kOiBBZGQgU0NP
+IENvbm5lY3Rpb24gKDB4MDF8MHgwMDA3KSBwbGVuIDQKICAgIGhhbmRsZSA0MSBwdHlwZSAw
+eDAwZTAKICAgIFBhY2tldCB0eXBlOiBIVjEgSFYyIEhWMyAKPCBBQ0wgZGF0YTogaGFuZGxl
+IDQxIGZsYWdzIDB4MDIgZGxlbiAxNAogICAgTDJDQVAoZCk6IGNpZCAweDAwNTAgbGVuIDEw
+IFtwc20gM10KICAgICAgUkZDT01NKGQpOiBVSUg6IGNyIDEgZGxjaSAyIHBmIDAgaWxlbiA2
+IGZjcyAweDlhIAogICAgICAwMDAwOiAwZCAwYSA0ZiA0YiAwZCAwYSAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIC4uT0suLgo+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBs
+ZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUKICAgIGhhbmRsZSA0MSBwYWNrZXRzIDEKPiBI
+Q0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDQKICAgIEFkZCBTQ08gQ29u
+bmVjdGlvbiAoMHgwMXwweDAwMDcpIHN0YXR1cyAweDAwIG5jbWQgMQo+IEhDSSBFdmVudDog
+TWF4IFNsb3RzIENoYW5nZSAoMHgxYikgcGxlbiAzCiAgICBoYW5kbGUgNDEgc2xvdHMgMQo+
+IEFDTCBkYXRhOiBoYW5kbGUgNDEgZmxhZ3MgMHgwMiBkbGVuIDE3Cj4gQUNMIGRhdGE6IGhh
+bmRsZSA0MSBmbGFncyAweDAxIGRsZW4gMgogICAgTDJDQVAoZCk6IGNpZCAweDAwNDAgbGVu
+IDE1IFtwc20gM10KICAgICAgUkZDT01NKGQpOiBVSUg6IGNyIDAgZGxjaSAyIHBmIDEgaWxl
+biAxMCBmY3MgMHg1YyBjcmVkaXRzIDEKICAgICAgMDAwMDogNDEgNTQgMmIgNTYgNDcgNTMg
+M2QgMzEgIDMyIDBkICAgICAgICAgICAgICAgICAgICBBVCtWR1M9MTIuCjwgQUNMIGRhdGE6
+IGhhbmRsZSA0MSBmbGFncyAweDAyIGRsZW4gMTQKICAgIEwyQ0FQKGQpOiBjaWQgMHgwMDUw
+IGxlbiAxMCBbcHNtIDNdCiAgICAgIFJGQ09NTShkKTogVUlIOiBjciAxIGRsY2kgMiBwZiAw
+IGlsZW4gNiBmY3MgMHg5YSAKICAgICAgMDAwMDogMGQgMGEgNGYgNGIgMGQgMGEgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAuLk9LLi4KPiBIQ0kgRXZlbnQ6IE51bWJlciBv
+ZiBDb21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1CiAgICBoYW5kbGUgNDEgcGFja2V0
+cyAxCj4gSENJIEV2ZW50OiBDb25uZWN0IENvbXBsZXRlICgweDAzKSBwbGVuIDExCiAgICBz
+dGF0dXMgMHgwMCBoYW5kbGUgNDUgYmRhZGRyIDAwOjFBOjQ1OjJGOjQ5Ojk4IHR5cGUgU0NP
+IGVuY3J5cHQgMHgwMAo+IEhDSSBFdmVudDogTWF4IFNsb3RzIENoYW5nZSAoMHgxYikgcGxl
+biAzCiAgICBoYW5kbGUgNDEgc2xvdHMgMwo+IFNDTyBkYXRhOiBoYW5kbGUgNDUgZmxhZ3Mg
+MHgwMCBkbGVuIDQ4CiAgICAwMDAwOiAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAgMDAgMDAg
+MDAgMDAgMDAgMDAgMDAgMDAgIC4uLi4uLi4uLi4uLi4uLi4KICAgIDAwMTA6IDAwIDAwIDAw
+IDAwIDAwIDAwIDAwIDAwICAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAgLi4uLi4uLi4uLi4u
+Li4uLgogICAgMDAyMDogMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgIDAwIDAwIDAwIDAwIDAw
+IDAwIDAwIDAwICAuLi4uLi4uLi4uLi4uLi4uCj4gU0NPIGRhdGE6IGhhbmRsZSA0NSBmbGFn
+cyAweDAwIGRsZW4gNDgKICAgIDAwMDA6IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwICAwMCAw
+MCAwMCAwMCAwMCAwMCAwMCAwMCAgLi4uLi4uLi4uLi4uLi4uLgogICAgMDAxMDogMDAgMDAg
+MDAgMDAgMDAgMDAgMDAgMDAgIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwICAuLi4uLi4uLi4u
+Li4uLi4uCiAgICAwMDIwOiAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAgMDAgMDAgMDAgMDAg
+MDAgMDAgMDAgMDAgIC4uLi4uLi4uLi4uLi4uLi4KPiBTQ08gZGF0YTogaGFuZGxlIDQ1IGZs
+YWdzIDB4MDAgZGxlbiA0OAogICAgMDAwMDogMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgIDAw
+IDAwIDAwIDAwIDAwIDAwIDAwIDAwICAuLi4uLi4uLi4uLi4uLi4uCiAgICAwMDEwOiAwMCAw
+MCAwMCAwMCAwMCAwMCAwMCAwMCAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgIC4uLi4uLi4u
+Li4uLi4uLi4KICAgIDAwMjA6IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwICAwMCAwMCAwMCAw
+MCAwMCAwMCAwMCAwMCAgLi4uLi4uLi4uLi4uLi4uLgo+IFNDTyBkYXRhOiBoYW5kbGUgNDUg
+ZmxhZ3MgMHgwMCBkbGVuIDQ4CiAgICAwMDAwOiAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAg
+MDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgIC4uLi4uLi4uLi4uLi4uLi4KICAgIDAwMTA6IDAw
+IDAwIDAwIDAwIDAwIDAwIDAwIDAwICAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAgLi4uLi4u
+Li4uLi4uLi4uLgogICAgMDAyMDogMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgIDAwIDAwIDAw
+IDAwIDAwIDAwIDAwIDAwICAuLi4uLi4uLi4uLi4uLi4uCj4gU0NPIGRhdGE6IGhhbmRsZSA0
+NSBmbGFncyAweDAwIGRsZW4gNDgKICAgIDAwMDA6IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAw
+ICAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAgLi4uLi4uLi4uLi4uLi4uLgogICAgMDAxMDog
+MDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwICAuLi4u
+Li4uLi4uLi4uLi4uCiAgICAwMDIwOiAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAgMDAgMDAg
+MDAgMDAgMDAgMDAgMDAgMDAgIC4uLi4uLi4uLi4uLi4uLi4KPiBTQ08gZGF0YTogaGFuZGxl
+IDQ1IGZsYWdzIDB4MDAgZGxlbiA0OAogICAgMDAwMDogMDAgMDAgMDAgMDAgMDAgMDAgMDAg
+MDAgIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwICAuLi4uLi4uLi4uLi4uLi4uCiAgICAwMDEw
+OiAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgIC4u
+Li4uLi4uLi4uLi4uLi4KICAgIDAwMjA6IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwICAwMCAw
+MCAwMCAwMCAwMCAwMCAwMCAwMCAgLi4uLi4uLi4uLi4uLi4uLgo+IFNDTyBkYXRhOiBoYW5k
+bGUgNDUgZmxhZ3MgMHgwMCBkbGVuIDQ4CiAgICAwMDAwOiAwMCAwMCAwMCAwMCAwMCAwMCAw
+MCAwMCAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgIC4uLi4uLi4uLi4uLi4uLi4KICAgIDAw
+MTA6IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwICAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAg
+Li4uLi4uLi4uLi4uLi4uLgogICAgMDAyMDogMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgIDAw
+IDAwIDAwIDAwIDAwIDAwIDAwIDAwICAuLi4uLi4uLi4uLi4uLi4uCj4gU0NPIGRhdGE6IGhh
+bmRsZSA0NSBmbGFncyAweDAwIGRsZW4gNDgKICAgIDAwMDA6IDAwIDAwIDAwIDAwIDAwIDAw
+IDAwIDAwICAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAgLi4uLi4uLi4uLi4uLi4uLgogICAg
+MDAxMDogMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAw
+ICAuLi4uLi4uLi4uLi4uLi4uCiAgICAwMDIwOiAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAg
+MDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgIC4uLi4uLi4uLi4uLi4uLi4KPiBTQ08gZGF0YTog
+aGFuZGxlIDQ1IGZsYWdzIDB4MDAgZGxlbiA0OAogICAgMDAwMDogMDAgMDAgMDAgMDAgMDAg
+MDAgMDAgMDAgIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwICAuLi4uLi4uLi4uLi4uLi4uCiAg
+ICAwMDEwOiAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAgMDAgMDAgMDAgMDAgMDAgMDAgMDAg
+MDAgIC4uLi4uLi4uLi4uLi4uLi4KICAgIDAwMjA6IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAw
+ICAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAgLi4uLi4uLi4uLi4uLi4uLgpbLi4uLi4uLi4u
+XQogICAgMDAwMDogMDggMDAgNTEgMDAgNGQgMDAgZjIgZmYgIGNmIGZmIDA5IDAwIDJiIDAw
+IGU3IGZmICAuLlEuTS4uLi4uLi4rLi4uCiAgICAwMDEwOiBhMiBmZiBiYyBmZiAxZiAwMCAy
+MiAwMCAgZTQgZmYgZTkgZmYgZTIgZmYgMDUgMDAgIC4uLi4uLiIuLi4uLi4uLi4KICAgIDAw
+MjA6IDMxIDAwIDEzIDAwIDAyIDAwIGY1IGZmICAxZiAwMCA0NCAwMCBlNSBmZiBiMiBmZiAg
+MS4uLi4uLi4uLkQuLi4uLgo+IFNDTyBkYXRhOiBoYW5kbGUgNDUgZmxhZ3MgMHgwMCBkbGVu
+IDQ4CiAgICAwMDAwOiBjMiBmZiBjMyBmZiBlZiBmZiBmZCBmZiAgMDMgMDAgMWIgMDAgMWUg
+MDAgMzMgMDAgIC4uLi4uLi4uLi4uLi4uMy4KICAgIDAwMTA6IDBlIDAwIGNlIGZmIGQ2IGZm
+IGNkIGZmICBmYiBmZiA1MCAwMCAwOCAwMCBlOCBmZiAgLi4uLi4uLi4uLlAuLi4uLgogICAg
+MDAyMDogMTIgMDAgZTcgZmYgMDUgMDAgMWEgMDAgIGYzIGZmIGZjIGZmIGU3IGZmIGU3IGZm
+ICAuLi4uLi4uLi4uLi4uLi4uCjwgSENJIENvbW1hbmQ6IERpc2Nvbm5lY3QgKDB4MDF8MHgw
+MDA2KSBwbGVuIDMKICAgIGhhbmRsZSA0NSByZWFzb24gMHgxMwogICAgUmVhc29uOiBSZW1v
+dGUgVXNlciBUZXJtaW5hdGVkIENvbm5lY3Rpb24KPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3Rh
+dHVzICgweDBmKSBwbGVuIDQKICAgIERpc2Nvbm5lY3QgKDB4MDF8MHgwMDA2KSBzdGF0dXMg
+MHgwMCBuY21kIDEKPiBTQ08gZGF0YTogaGFuZGxlIDQ1IGZsYWdzIDB4MDAgZGxlbiA0OAog
+ICAgMDAwMDogZjAgZmYgYzMgZmYgYWIgZmYgZGMgZmYgIDIyIDAwIDFmIDAwIDE4IDAwIDBm
+IDAwICAuLi4uLi4uLiIuLi4uLi4uCiAgICAwMDEwOiBkZCBmZiBkOCBmZiBmYiBmZiAyNCAw
+MCAgMjEgMDAgMjAgMDAgNDcgMDAgMTUgMDAgIC4uLi4uLiQuIS4gLkcuLi4KICAgIDAwMjA6
+IGNiIGZmIGE3IGZmIGNkIGZmIDJkIDAwICBmOCBmZiBkOCBmZiAwOCAwMCBkNiBmZiAgLi4u
+Li4uLS4uLi4uLi4uLgo+IFNDTyBkYXRhOiBoYW5kbGUgNDUgZmxhZ3MgMHgwMCBkbGVuIDQ4
+CiAgICAwMDAwOiBmNSBmZiAxYyAwMCBmZCBmZiAzNiAwMCAgMmEgMDAgZjMgZmYgMWMgMDAg
+MDMgMDAgIC4uLi4uLjYuKi4uLi4uLi4KICAgIDAwMTA6IGQ5IGZmIDAyIDAwIDBiIDAwIDBh
+IDAwICBmZCBmZiBkMyBmZiBkMiBmZiBkYiBmZiAgLi4uLi4uLi4uLi4uLi4uLgogICAgMDAy
+MDogZTggZmYgMGEgMDAgMmEgMDAgMmYgMDAgIDBlIDAwIGJjIGZmIGIzIGZmIDEwIDAwICAu
+Li4uKi4vLi4uLi4uLi4uCj4gU0NPIGRhdGE6IGhhbmRsZSA0NSBmbGFncyAweDAwIGRsZW4g
+NDgKICAgIDAwMDA6IGRjIGZmIGM3IGZmIDIzIDAwIGUyIGZmICBjYSBmZiBmNCBmZiBmMCBm
+ZiBmZSBmZiAgLi4uLiMuLi4uLi4uLi4uLgogICAgMDAxMDogZjYgZmYgMGMgMDAgMjIgMDAg
+MWQgMDAgIDEzIDAwIDEzIDAwIDJhIDAwIDA0IDAwICAuLi4uIi4uLi4uLi4qLi4uCiAgICAw
+MDIwOiAwOCAwMCAyYSAwMCBmYSBmZiBlMyBmZiAgZTUgZmYgMWEgMDAgM2MgMDAgZjEgZmYg
+IC4uKi4uLi4uLi4uLjwuLi4KPiBTQ08gZGF0YTogaGFuZGxlIDQ1IGZsYWdzIDB4MDAgZGxl
+biA0OAogICAgMDAwMDogZmYgZmYgMGEgMDAgYzQgZmYgZWQgZmYgIDE0IDAwIGI4IGZmIDhj
+IGZmIGZiIGZmICAuLi4uLi4uLi4uLi4uLi4uCiAgICAwMDEwOiAwOSAwMCBiNCBmZiBmNCBm
+ZiAwYSAwMCAgYzMgZmYgZTMgZmYgMWEgMDAgMDMgMDAgIC4uLi4uLi4uLi4uLi4uLi4KICAg
+IDAwMjA6IGQ4IGZmIGVjIGZmIGZlIGZmIDA4IDAwICAzMyAwMCAwYiAwMCAwNyAwMCA0NyAw
+MCAgLi4uLi4uLi4zLi4uLi5HLgo+IFNDTyBkYXRhOiBoYW5kbGUgNDUgZmxhZ3MgMHgwMCBk
+bGVuIDQ4CiAgICAwMDAwOiAwYSAwMCBkZiBmZiAxNCAwMCAyNyAwMCAgMzIgMDAgMjQgMDAg
+ZmQgZmYgZmYgZmYgIC4uLi4uLicuMi4kLi4uLi4KICAgIDAwMTA6IDAyIDAwIGVkIGZmIGM1
+IGZmIGE2IGZmICBjNiBmZiAwMiAwMCBlOCBmZiBjNSBmZiAgLi4uLi4uLi4uLi4uLi4uLgog
+ICAgMDAyMDogZmIgZmYgZjUgZmYgZTUgZmYgMDUgMDAgIDBmIDAwIDA2IDAwIGRmIGZmIDBl
+IDAwICAuLi4uLi4uLi4uLi4uLi4uCj4gU0NPIGRhdGE6IGhhbmRsZSA0NSBmbGFncyAweDAw
+IGRsZW4gNDgKICAgIDAwMDA6IDQ1IDAwIDE3IDAwIDBkIDAwIGZhIGZmICBkOCBmZiBmNCBm
+ZiAxZCAwMCA0NyAwMCAgRS4uLi4uLi4uLi4uLi5HLgogICAgMDAxMDogMzkgMDAgMDMgMDAg
+ZGEgZmYgZGYgZmYgIDAwIDAwIGVhIGZmIGZlIGZmIDE4IDAwICA5Li4uLi4uLi4uLi4uLi4u
+CiAgICAwMDIwOiBjZCBmZiBjMyBmZiBlMyBmZiBjYyBmZiAgZDAgZmYgZmQgZmYgMTcgMDAg
+MTIgMDAgIC4uLi4uLi4uLi4uLi4uLi4KPiBIQ0kgRXZlbnQ6IERpc2Nvbm4gQ29tcGxldGUg
+KDB4MDUpIHBsZW4gNAogICAgc3RhdHVzIDB4MDAgaGFuZGxlIDQ1IHJlYXNvbiAweDE2CiAg
+ICBSZWFzb246IENvbm5lY3Rpb24gVGVybWluYXRlZCBieSBMb2NhbCBIb3N0Cj4gU0NPIGRh
+dGE6IGhhbmRsZSA0NSBmbGFncyAweDAwIGRsZW4gNDgKICAgIDAwMDA6IDEzIDAwIGYzIGZm
+IGQ2IGZmIDAxIDAwICAyMSAwMCAxNiAwMCAwNCAwMCAwMCAwMCAgLi4uLi4uLi4hLi4uLi4u
+LgogICAgMDAxMDogZjUgZmYgZmUgZmYgMjQgMDAgZWMgZmYgIGQzIGZmIDE1IDAwIGZjIGZm
+IGU3IGZmICAuLi4uJC4uLi4uLi4uLi4uCiAgICAwMDIwOiAwMCAwMCBmYSBmZiBmMSBmZiAw
+YSAwMCAgMmYgMDAgZWYgZmYgYjYgZmYgYzEgZmYgIC4uLi4uLi4uLy4uLi4uLi4KPiBTQ08g
+ZGF0YTogaGFuZGxlIDQ1IGZsYWdzIDB4MDAgZGxlbiA0OAogICAgMDAwMDogOWUgZmYgMGYg
+MDAgOTMgMDAgMDEgMDAgIGM3IGZmIDIxIDAwIDEyIDAwIDJlIDAwICAuLi4uLi4uLi4uIS4u
+Li4uCiAgICAwMDEwOiA5NiBmZiAyNCBmZiA5ZCAwMSBhYiAwMCAgMGQgZmQgNzkgMDAgOGUg
+MDAgZmMgZmUgIC4uJC4uLi4uLi55Li4uLi4KICAgIDAwMjA6IGU0IDAzIGMzIGZmIDA3IGZk
+IGQ3IDAwICA0YiBmZSBmNSBmZiAyYSAwMCAzZCBmZSAgLi4uLi4uLi5LLi4uKi49Lgo+IEhD
+SSBFdmVudDogTWF4IFNsb3RzIENoYW5nZSAoMHgxYikgcGxlbiAzCiAgICBoYW5kbGUgNDEg
+c2xvdHMgNQo=
+--------------030006040701000601090000--
