@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-Id: <0AF54F7F-8AEB-409F-BB0F-47B772A16099@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <0K8900APWM7YNG00@ae0043mbx01.mail.slb.com>
-References: <0K8900APWM7YNG00@ae0043mbx01.mail.slb.com>
-Date: Sun, 05 Oct 2008 18:50:44 +0200
-Message-Id: <1223225444.11272.114.camel@violet.holtmann.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Bluez and OSS-4
+In-Reply-To: <0K8900APARTING30@ae0043mbx01.mail.slb.com>
+Mime-Version: 1.0 (Apple Message framework v929.2)
+Date: Sun, 5 Oct 2008 17:10:15 +0200
+References: <0K89001SP271DK10@ae0043mbx01.mail.slb.com>
+	<0K8900APARTING30@ae0043mbx01.mail.slb.com>
+Subject: Re: [Bluez-devel] Simple pairing script instead of bluez-gnome
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,18 +22,21 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi John,
 
-> Are there any particular plans for bluez to work with OSS-4 as well as alsa?
+On Oct 5, 2008, at 16:19, John Frankish wrote:
+> $ simple-agent hci0 00:1E:45:8B:2A:33
+> Traceback (most recent call last):
+>   File "/usr/local/bin/simple-agent", line 3, in <module>
+>     import gobject
+> ImportError: No module named gobject
+>
+> I guess this means that either bluez-4.11 should be compiled against
+> python, or (more likely) I need some kind of python glib module?
 
-we support ALSA, GStreamer and PulseAudio. What else do we need? Stuff
-like OSS-4 and Helix are not well accepted in the community, but feel
-free to work on it, but I doubt that any open source developer will
-bother with it.
+That means that you're missing the glib bindings for python.  
+Additionally you'll also need the D-Bus python bindings to use the  
+script.
 
-Regards
-
-Marcel
-
-
+Johan
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
