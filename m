@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 07 Oct 2008 11:43:54 +0400
-From: John Frankish <frankish@dubai.oilfield.slb.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-id: <0K8C00FQXYTBUG70@ae0043mbx01.mail.slb.com>
-MIME-version: 1.0
-References: <0K89001SP271DK10@ae0043mbx01.mail.slb.com>
-	<0K8900APARTING30@ae0043mbx01.mail.slb.com>
-Subject: Re: [Bluez-devel] Simple pairing script instead of bluez-gnome
+In-Reply-To: <0K8900APWM7YNG00@ae0043mbx01.mail.slb.com>
+References: <0K8900APWM7YNG00@ae0043mbx01.mail.slb.com>
+Date: Sun, 05 Oct 2008 18:50:44 +0200
+Message-Id: <1223225444.11272.114.camel@violet.holtmann.net>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] Bluez and OSS-4
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,35 +19,19 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-At 19:10 05-10-08, you wrote:
->Hi John,
->
->On Oct 5, 2008, at 16:19, John Frankish wrote:
-> > $ simple-agent hci0 00:1E:45:8B:2A:33
-> > Traceback (most recent call last):
-> >   File "/usr/local/bin/simple-agent", line 3, in <module>
-> >     import gobject
-> > ImportError: No module named gobject
-> >
-> > I guess this means that either bluez-4.11 should be compiled against
-> > python, or (more likely) I need some kind of python glib module?
->
->That means that you're missing the glib bindings for python.
->Additionally you'll also need the D-Bus python bindings to use the
->script.
->
->Johan
->
->------------
-Hi Johan,
+Hi John,
 
-The dbus-python bindings don't seem too big a deal, but as per google 
-there seem to be plenty of issues with the python-glib bindings. Is 
-there a particular site/tarball you could recommend that is known to 
-work with the bluez scripts like simple-agent?
+> Are there any particular plans for bluez to work with OSS-4 as well as alsa?
 
-Thanks
-John
+we support ALSA, GStreamer and PulseAudio. What else do we need? Stuff
+like OSS-4 and Helix are not well accepted in the community, but feel
+free to work on it, but I doubt that any open source developer will
+bother with it.
+
+Regards
+
+Marcel
+
 
 
 -------------------------------------------------------------------------
