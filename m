@@ -1,29 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Don't show (null) in wizard
-From: David Woodhouse <dwmw2@infradead.org>
-To: Mario_Limonciello@Dell.com
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <FA7963CC89065B49AED46A6F797F0FA6F286AA@AUSX3MPC128.aus.amer.dell.com>
-References: <FA7963CC89065B49AED46A6F797F0FA6F286AA@AUSX3MPC128.aus.amer.dell.com>
-Content-Type: text/plain
-Date: Mon, 06 Oct 2008 07:25:46 +0100
-Message-Id: <1223274346.28401.54.camel@macbook.infradead.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----_=_NextPart_001_01C9277B.CB604F57"
+Subject: [PATCH] Don't show (null) in wizard
+Date: Mon, 6 Oct 2008 01:21:21 -0500
+Message-ID: <FA7963CC89065B49AED46A6F797F0FA6F286AA@AUSX3MPC128.aus.amer.dell.com>
+From: <Mario_Limonciello@Dell.com>
+To: <linux-bluetooth@vger.kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2008-10-06 at 01:21 -0500, Mario_Limonciello@Dell.com wrote:
-> I've noticed that the wizard will show (null) if the device name is
-> not yet recognized when pairing.  This is a bit confusing to the user
-> experience.  The attached patch makes the behavior a little bit
-> better.
+This is a multi-part message in MIME format.
 
-Thanks; I noticed that too a couple of days ago but hadn't got round to
-the patch yet.
+------_=_NextPart_001_01C9277B.CB604F57
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-Perhaps showing the bdaddr would be better, though?
+Hi:
 
--- 
-David Woodhouse                            Open Source Technology Centre
-David.Woodhouse@intel.com                              Intel Corporation
+I've noticed that the wizard will show (null) if the device name is not =
+yet recognized when pairing.  This is a bit confusing to the user =
+experience.  The attached patch makes the behavior a little bit better.
 
+Regards
+
+Mario Limonciello=20
+Dell | Linux Engineering=20
+Mario_Limonciello@Dell.com=20
+
+
+
+------_=_NextPart_001_01C9277B.CB604F57
+Content-Type: text/x-patch;
+	name="07_null_device_name.patch"
+Content-Transfer-Encoding: base64
+Content-Description: 07_null_device_name.patch
+Content-Disposition: attachment;
+	filename="07_null_device_name.patch"
+
+ZGlmZiAtTnVyIC14ICcqLm9yaWcnIC14ICcqficgYmx1ZXotZ25vbWUtMS44L3dpemFyZC9tYWlu
+LmMgYmx1ZXotZ25vbWUtMS44Lm5ldy93aXphcmQvbWFpbi5jCi0tLSBibHVlei1nbm9tZS0xLjgv
+d2l6YXJkL21haW4uYwkyMDA4LTEwLTA0IDE0OjMyOjU2LjAwMDAwMDAwMCAtMDUwMAorKysgYmx1
+ZXotZ25vbWUtMS44Lm5ldy93aXphcmQvbWFpbi5jCTIwMDgtMTAtMDYgMDE6MTg6NTQuMDAwMDAw
+MDAwIC0wNTAwCkBAIC0zNjIsNiArMzYyLDggQEAKIAkJZ19mcmVlKHRhcmdldF9hZGRyZXNzKTsK
+IAkJdGFyZ2V0X2FkZHJlc3MgPSBhZGRyZXNzOwogCisJCWlmIChuYW1lID09IE5VTEwpCisJCQlu
+YW1lID0gImRldmljZSI7CiAJCWdfZnJlZSh0YXJnZXRfbmFtZSk7CiAJCXRhcmdldF9uYW1lID0g
+bmFtZTsKIAo=
+
+------_=_NextPart_001_01C9277B.CB604F57--
