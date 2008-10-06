@@ -1,71 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluez/git + 2.6.27-rc8 + Belkin F8T017 -> Can't read class of
-	adapter
+Subject: Re: Keeping ACL link around after DBUS CreateBonding()
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Stuart Pook <kernel6org@pook.es>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <48EA893E.2000704@pook.es>
-References: <48E29416.3030402@pook.es> <48E2B59A.7020600@dtsp.co.nz>
-	 <48E3B3BF.6070205@pook.es>
-	 <2d5a2c100810032047s47bec394w828852079d64e591@mail.gmail.com>
-	 <48E752A7.70600@pook.es> <1223121068.11272.46.camel@violet.holtmann.net>
-	 <48E7FB1E.8000504@pook.es> <48B8929D-29F9-4352-9C81-E95FDBC09876@gmail.com>
-	 <48E91E6F.1030202@pook.es> <A34AC171-77C2-4377-A60C-60A2793A2297@gmail.com>
-		 <48EA7770.30307@pook.es> <1223325944.11272.227.camel@violet.holtmann.net>
-	 <48EA893E.2000704@pook.es>
+To: Nick Pelly <npelly@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <35c90d960810061442r5edb776blbdf420ac067e9f9c@mail.gmail.com>
+References: <35c90d960810021747j56d5bc2ie62c10ade0026694@mail.gmail.com>
+	 <1223015762.11272.30.camel@violet.holtmann.net>
+	 <35c90d960810022342p1fca607x4be774ae9e675fd9@mail.gmail.com>
+	 <1223016985.11272.38.camel@violet.holtmann.net>
+	 <35c90d960810060918l5887aedya50893238ca3aee7@mail.gmail.com>
+	 <1223310384.11272.209.camel@violet.holtmann.net>
+	 <35c90d960810061442r5edb776blbdf420ac067e9f9c@mail.gmail.com>
 Content-Type: text/plain
-Date: Tue, 07 Oct 2008 00:38:54 +0200
-Message-Id: <1223332734.11272.244.camel@violet.holtmann.net>
+Date: Tue, 07 Oct 2008 00:33:55 +0200
+Message-Id: <1223332435.11272.240.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stuart,
+Hi Nick,
 
-> I hope that the quirk will make it into 2.6.27.
+> Attached is the btsnoop from the CreateBonding()
 > 
-> :; cat  /proc/bus/usb/devices
->
-> T:  Bus=01 Lev=02 Prnt=03 Port=02 Cnt=03 Dev#=  6 Spd=12  MxCh= 0
-> D:  Ver= 2.00 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=050d ProdID=0017 Rev= 2.91
-> S:  Manufacturer=Broadcom Corp
-> S:  Product=BLUETOOTH USB +EDR ADAPTER Class 1 v2.1 UHE
-> S:  SerialNumber=000A3A8494D9
-> C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=  2mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  32 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  32 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  64 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
+> Note the "Create Connection Cancel" right after completing bonding.
+> This is what this patch tries to address - allow 2 seconds before
+> disconnecting the ACL link instead of 10 ms for this scenario.
 
-I doubt it since it is not in yet. Show me the output of hciconfig -a
-for this so I can create a patch for it.
+so the actual questions is why we end up here:
 
-What is the exact model number of this one. Do you have to have a link
-to the product website by any chance.
+> HCI Event: Link Key Notification (0x18) plen 23
+    bdaddr 00:19:7F:64:DA:C5 key E3E8A7783875D177851DC9F0EEEB474D type 0
+    Type: Combination Key
+< HCI Command: Create Connection Cancel (0x01|0x0008) plen 6
+    bdaddr 00:19:7F:64:DA:C5
+< HCI Command: Create Connection Cancel (0x01|0x0008) plen 6
+    bdaddr 00:19:7F:64:DA:C5
+> HCI Event: Command Complete (0x0e) plen 10
+    Create Connection Cancel (0x01|0x0008) ncmd 1
+    status 0x00 bdaddr 00:19:7F:64:DA:C5
+> HCI Event: Command Complete (0x0e) plen 10
+    Create Connection Cancel (0x01|0x0008) ncmd 1
+    status 0x00 bdaddr 00:19:7F:64:DA:C5
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x02 handle 1 bdaddr 00:19:7F:64:DA:C5 type ACL encrypt 0x01
+    Error: Unknown Connection Identifier
+
+The problem is not the kernel since the kernel is doing the right thing
+here. If the last user goes away and we haven't established ACL then we
+cancel it instead of letting it timeout.
+
+So the CreateBonding is actually broken here. CreateBonding should only
+close the L2CAP raw socket (the one we use for bonding), when we get
+Auth Complete (in that case 2 seconds apply) or when we get the Link Key
+Notification before Connect Complete, it has to wait until Connect
+Complete to close it.
+
+Johan, please check if your modified code in 4.x actually does the right
+thing for security mode 3. Or if we still have the same issue.
+
+> Also note that the "Create Connection Cancel" takes 40 seconds to
+> return from the BRF6300. To me this looks like a unrelated issue with
+> the TI chip (and I have a separate conversation going on with TI about
+> it).
+
+The double Create Connection Cancel and not rejecting one with an error
+code is an issue of the TI chip. It should not allow that. Question
+still is why do we send it twice.
 
 Regards
 
