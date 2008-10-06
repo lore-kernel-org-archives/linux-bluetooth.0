@@ -1,30 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <14CF8002-9C68-48AF-AAB7-783C16CAC8CA@gmail.com>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <48EA93F7.4060000@pook.es>
-Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
-Mime-Version: 1.0 (Apple Message framework v929.2)
-Subject: Re: bluez/git + 2.6.27-rc8 + bluetoothd -> SIGSEGV
-Date: Tue, 7 Oct 2008 07:34:38 +0200
-References: <48E29416.3030402@pook.es> <48E2B59A.7020600@dtsp.co.nz>	 <48E3B3BF.6070205@pook.es>	 <2d5a2c100810032047s47bec394w828852079d64e591@mail.gmail.com>	 <48E752A7.70600@pook.es> <1223121068.11272.46.camel@violet.holtmann.net>	 <48E7FB1E.8000504@pook.es> <48B8929D-29F9-4352-9C81-E95FDBC09876@gmail.com>	 <48E91E6F.1030202@pook.es> <A34AC171-77C2-4377-A60C-60A2793A2297@gmail.com>	 <0ED1CF2A-40D0-4A82-BAED-21F90B6466ED@gmail.com> <48EA6D84.7020101@pook.es>	 <632D4195-1EFF-4191-98D9-4A0953223590@gmail.com> <48EA7B66.1050208@pook.es>	 <1223326990.11272.229.camel@violet.holtmann.net> <48EA7ED9.9080801@pook.es> <1223328106.11272.232.camel@violet.holtmann.net> <48EA93F7.4060000@pook.es>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <48EA9C74.5060402@pook.es>
+Date: Tue, 07 Oct 2008 01:17:08 +0200
+From: Stuart Pook <kernel6org@pook.es>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Johan Hedberg <johan.hedberg@gmail.com>,
+ BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: bluez/git + 2.6.27-rc8 + Belkin F8T017 -> works with reset=1
+References: <48E29416.3030402@pook.es> <48E2B59A.7020600@dtsp.co.nz>	 <48E3B3BF.6070205@pook.es>	 <2d5a2c100810032047s47bec394w828852079d64e591@mail.gmail.com>	 <48E752A7.70600@pook.es> <1223121068.11272.46.camel@violet.holtmann.net>	 <48E7FB1E.8000504@pook.es> <48B8929D-29F9-4352-9C81-E95FDBC09876@gmail.com>	 <48E91E6F.1030202@pook.es> <A34AC171-77C2-4377-A60C-60A2793A2297@gmail.com>		 <48EA7770.30307@pook.es> <1223325944.11272.227.camel@violet.holtmann.net>	 <48EA893E.2000704@pook.es> <1223332734.11272.244.camel@violet.holtmann.net>
+In-Reply-To: <1223332734.11272.244.camel@violet.holtmann.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stuart,
+hi Marcel
 
-On Oct 7, 2008, at 0:40, Stuart Pook wrote:
->>> :; grep ' -g' Makefile
->>> CFLAGS = -Wall -O2 -D_FORTIFY_SOURCE=2 -fPIC -g -O0
->> that is indeed strange. You should be able to get a proper backtrace.
->
-> yes. I ran src/.libs/bluetoothd, it core dumped,
-> but I still cannot get a reasonable backtrace. Weird.
+> I doubt it since it is not in yet. Show me the output of hciconfig -a
+> for this so I can create a patch for it.
 
-Please do a "git pull". The segfault shouln't occur anymore (a  
-probable cause of it was a bug in common/glib-helper.c which Luiz  
-fixed yesterday). Also, if you have the chance come to the #bluez  
-channel on freenode where most bluez developers hang out (you'd have  
-e.g. found out about the fix much earlier that way).
+see below
 
-Johan
+> What is the exact model number of this one. Do you have to have a link
+> to the product website by any chance.
+
+Belkin
+Bluetooth Adapter
+Model:  F8T017
+FCC ID: K7SF8T017
+
+When I ordered the dongle I ordered a F8T017ng but the "ng"
+is not indicated on the dongle or on the packaging.
+
+http://catalog.belkin.com/IWCatProductPage.process?Product_Id=454427
+http://www.belkin.com/uk/support/article/?lid=enu&pid=F8T017ng&aid=10334&scid=0
+
+: root@kooka; hciconfig -a
+hci0:	Type: USB
+	BD Address: 00:0A:3A:84:94:D9 ACL MTU: 1021:8 SCO MTU: 64:1
+	UP RUNNING
+	RX bytes:844 acl:0 sco:0 events:46 errors:0
+	TX bytes:2609 acl:0 sco:0 commands:46 errors:0
+	Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x79 0x83
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+	Link policy: RSWITCH HOLD SNIFF PARK
+	Link mode: SLAVE ACCEPT
+	Name: 'kooka-0'
+	Class: 0x4a0104
+	Service Classes: Networking, Capturing, Telephony
+	Device Class: Computer, Desktop workstation
+	HCI Ver: 2.1 (0x4) HCI Rev: 0x5123 LMP Ver: 2.1 (0x4) LMP Subver: 0x420e
+	Manufacturer: Broadcom Corporation (15)
+
+This dongle has a small button. I'm not sure yet but it seemed that
+the dongle didn't want to work until I pressed the button.
+I'll check next time.
+
+thanks
+Stuart
