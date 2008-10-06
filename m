@@ -1,45 +1,22 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] btsdio: fix tx error path
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Tomas Winkler <tomas.winkler@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <1223283914-18238-1-git-send-email-tomas.winkler@intel.com>
-References: <1223283914-18238-1-git-send-email-tomas.winkler@intel.com>
-Content-Type: text/plain
-Date: Mon, 06 Oct 2008 12:54:50 +0200
-Message-Id: <1223290490.11272.149.camel@violet.holtmann.net>
-Mime-Version: 1.0
+Message-Id: <0ED1CF2A-40D0-4A82-BAED-21F90B6466ED@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <A34AC171-77C2-4377-A60C-60A2793A2297@gmail.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v929.2)
+Subject: Re: bluez-4.11 + 2.6.27-rc8 + SCO headset -> Invalid read of size 4
+Date: Mon, 6 Oct 2008 12:52:29 +0200
+References: <48E29416.3030402@pook.es> <48E2B59A.7020600@dtsp.co.nz>	 <48E3B3BF.6070205@pook.es>	 <2d5a2c100810032047s47bec394w828852079d64e591@mail.gmail.com>	 <48E752A7.70600@pook.es> <1223121068.11272.46.camel@violet.holtmann.net> <48E7FB1E.8000504@pook.es> <48B8929D-29F9-4352-9C81-E95FDBC09876@gmail.com> <48E91E6F.1030202@pook.es> <A34AC171-77C2-4377-A60C-60A2793A2297@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tomas,
+Hi Stuart,
 
-> This patch fixes accumulating of the header
-> in case packet was requeued in the error path.
-> 
-> Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  drivers/bluetooth/btsdio.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
-> index 58630cc..e4724b8 100644
-> --- a/drivers/bluetooth/btsdio.c
-> +++ b/drivers/bluetooth/btsdio.c
-> @@ -91,6 +91,7 @@ static int btsdio_tx_packet(struct btsdio_data *data, struct sk_buff *skb)
->  
->  	err = sdio_writesb(data->func, REG_TDAT, skb->data, skb->len);
->  	if (err < 0) {
-> +		skb_pop(skb, 4);
->  		sdio_writeb(data->func, 0x01, REG_PC_WRT, NULL);
->  		return err;
->  	}
+I think I managed to fix the segfault issue. The valgrind backtrace  
+was actually misleading/incorrect but I managed to get a proper one  
+with gdb. Could you try the latest git and see if the segfault is  
+gone? Unfortunately this still leaves you with the original issue of  
+your player bailing out too early.
 
-please do at least a compile test. It is skb_pull() and not skb_pop().
-
-Regards
-
-Marcel
-
-
+Johan
