@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <b5c34db00810060156g3b9f8283xd88b8a0419867ded@mail.gmail.com>
-Date: Mon, 6 Oct 2008 14:26:59 +0530
-From: umeshyv <umeshyv@gmail.com>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>
-In-Reply-To: <6306c640809260237p117a46e9t9d14e54eb25a1faa@mail.gmail.com>
+Message-ID: <BLU122-W235D3BB30CEAE0876237B8E6390@phx.gbl>
+From: Kasamsetty Divakar <divani_k@hotmail.com>
+To: <bluez-users@lists.sourceforge.net>
+Date: Mon, 6 Oct 2008 13:13:25 +0530
 MIME-Version: 1.0
-References: <6306c640809260237p117a46e9t9d14e54eb25a1faa@mail.gmail.com>
-Subject: Re: [Bluez-users] Bluez-Utils: Flex and ENOKEY error
+Subject: [Bluez-users] Bluez for HFP
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,54 +14,27 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1383159544543052802=="
+Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1383159544543052802==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_50651_21238437.1223283419467"
 
-------=_Part_50651_21238437.1223283419467
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hi,
+How to test the HFP profile in bluez , [VOIP softwares like skype or any other VOIP solutions]. Any member using this Profile kindly write a small how to test the HFP feature.
 
-Hi Ram,
-Have you cross compiled bluez libs & utils 3.36 successfully
+I am using bluez4.6 . should i also install anyother software apart from Bluez Software to make VOIP[For VOIP should can i use Skype ?] calls via HandsFree Headset.
+thanks & regards,
+Regards,
+sm
 
-Regards
-Umesh
-
-------=_Part_50651_21238437.1223283419467
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-<div dir="ltr"><br>Hi Ram,<br>Have you cross compiled bluez libs &amp; utils 3.36 successfully <br><br>Regards<br>Umesh<br></div>
-
-------=_Part_50651_21238437.1223283419467--
-
-
---===============1383159544543052802==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+_________________________________________________________________
+Searching for weekend getaways? Try Live.com
+http://www.live.com/?scope=video&form=MICOAL
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
 Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
---===============1383159544543052802==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1383159544543052802==--
