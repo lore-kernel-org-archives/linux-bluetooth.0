@@ -1,31 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: fix bug in suspend/resume code of btusb
+Subject: Re: [PATCH] btsdio: fix tx error path
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Oliver Neukum <oliver@neukum.org>
-Cc: linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Pavel Machek <pavel@ucw.cz>
-In-Reply-To: <200810022232.07165.oliver@neukum.org>
-References: <200810022232.07165.oliver@neukum.org>
+To: Tomas Winkler <tomas.winkler@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <1223283914-18238-1-git-send-email-tomas.winkler@intel.com>
+References: <1223283914-18238-1-git-send-email-tomas.winkler@intel.com>
 Content-Type: text/plain
-Date: Mon, 06 Oct 2008 13:09:11 +0200
-Message-Id: <1223291351.11272.156.camel@violet.holtmann.net>
+Date: Mon, 06 Oct 2008 12:54:50 +0200
+Message-Id: <1223290490.11272.149.camel@violet.holtmann.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Oliver,
+Hi Tomas,
 
-> this fixes an issue in btusb's suspend/resume support that strikes if
-> the adapter is suspended while the hci is down.
-> This probably fixes the bug Pavel sees with autosuspend and fixes a bug
-> for me. I am currently looking at issues with new hardware, but with this patch
-> it should work at least for the best hardware.
+> This patch fixes accumulating of the header
+> in case packet was requeued in the error path.
 > 
-> What tree should I base a clean patch against?
+> Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btsdio.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+> index 58630cc..e4724b8 100644
+> --- a/drivers/bluetooth/btsdio.c
+> +++ b/drivers/bluetooth/btsdio.c
+> @@ -91,6 +91,7 @@ static int btsdio_tx_packet(struct btsdio_data *data, struct sk_buff *skb)
+>  
+>  	err = sdio_writesb(data->func, REG_TDAT, skb->data, skb->len);
+>  	if (err < 0) {
+> +		skb_pop(skb, 4);
+>  		sdio_writeb(data->func, 0x01, REG_PC_WRT, NULL);
+>  		return err;
+>  	}
 
-can you send patches against my bluetooth-testing tree:
-
-http://git.kernel.org/?p=linux/kernel/git/holtmann/bluetooth-testing.git;a=summary
+please do at least a compile test. It is skb_pull() and not skb_pop().
 
 Regards
 
