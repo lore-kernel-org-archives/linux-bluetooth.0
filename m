@@ -1,72 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <35c90d960810060918l5887aedya50893238ca3aee7@mail.gmail.com>
-Date: Mon, 6 Oct 2008 18:18:54 +0200
-From: "Nick Pelly" <npelly@google.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: Keeping ACL link around after DBUS CreateBonding()
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1223016985.11272.38.camel@violet.holtmann.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <35c90d960810021747j56d5bc2ie62c10ade0026694@mail.gmail.com>
-	 <1223015762.11272.30.camel@violet.holtmann.net>
-	 <35c90d960810022342p1fca607x4be774ae9e675fd9@mail.gmail.com>
-	 <1223016985.11272.38.camel@violet.holtmann.net>
+Subject: RE: [PATCH V2] btsdio: fix tx error path
+Date: Mon, 6 Oct 2008 14:05:41 +0200
+Message-ID: <C07C4589BE74A34981C3C3525EE1F801048A1516@hasmsx412.ger.corp.intel.com>
+In-Reply-To: <1223294503.11272.158.camel@violet.holtmann.net>
+References: <1223293223-21162-1-git-send-email-tomas.winkler@intel.com> <1223294503.11272.158.camel@violet.holtmann.net>
+From: "Winkler, Tomas" <tomas.winkler@intel.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Cc: <linux-bluetooth@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Oct 3, 2008 at 8:56 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Nick,
+
+
+>-----Original Message-----
+>From: Marcel Holtmann [mailto:marcel@holtmann.org]
+>Sent: Monday, October 06, 2008 2:02 PM
+>To: Winkler, Tomas
+>Cc: linux-bluetooth@vger.kernel.org; linux-kernel@vger.kernel.org
+>Subject: Re: [PATCH V2] btsdio: fix tx error path
 >
->> >> I have memories of one of you talking about a custom change to bluez
->> >> to not immediately drop the ACL link once DBUS CreateBonding() has
->> >> finished (so that SDP can then be done on that link).
->> >>
->> >> Do you know the patch to do this? I am currently experimenting with
->> >> changing the timer expiry in hci_conn_put() for disc_timer. Maybe
->> >> there's a nicer way.
->> >
->> > do you have a trace in BTSnoop format for me. We are using L2CAP raw
->> > sockets for bonding and thus the default 2 seconds disconnect timeout
->> > applies. Enough time to get SDP started on the same link. If the remote
->> > side however decides to disconnect us, we are out of luck.
+>Hi Tomas,
+>
+>> This patch fixes accumulating of the header
+>> in case packet was requeued in the error path.
 >>
->> For this situation the ACL connection is not complete, so the 10ms
->> timeout applies. I have a patch to use the 2 second timeout code path
->> for both connecting and connected. I wonder if this would be useful in
->> mainline, or if this is just a strange behavior of our BRF6300 (it
->> completes pin code and link key before the ACL link is reported as
->> connected). I'll send you some logs tomorrow if that would still help.
+>> Signed-off-by: Tomas Winkler <tomas.winkler@intel.com>
+>> Cc: Marcel Holtmann <marcel@holtmann.org>
+>> ---
+>>  drivers/bluetooth/btsdio.c |    1 +
+>>  1 files changed, 1 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+>> index 58630cc..c422e89 100644
+>> --- a/drivers/bluetooth/btsdio.c
+>> +++ b/drivers/bluetooth/btsdio.c
+>> @@ -91,6 +91,7 @@ static int btsdio_tx_packet(struct btsdio_data
+*data,
+>struct sk_buff *skb)
+>>
+>>  	err =3D sdio_writesb(data->func, REG_TDAT, skb->data, skb->len);
+>>  	if (err < 0) {
+>> +		skb_pull(skb, 4);
+>>  		sdio_writeb(data->func, 0x01, REG_PC_WRT, NULL);
+>>  		return err;
+>>  	}
 >
-> that is not strange behavior. That is just a device in security mode 3.
-> The important question is who disconnects the link.
+>thanks, but I already fixed that one manually in my tree :)
 
-We (bluez kernel stack) disconnect the link due to the 10 ms timeout
-that applies when the ACL link is in CONNECT. Here is a patch to use
-the 2 second time out during CONNECT phase as well as CONNECTED. Does
-this patch seem reasonable? It looks like just CONNECT || CONNECTED is
-sufficient, but there are other modes like CONNECT2.
+Yeah I guessed that, resubmitted just for the protocol.
+Tomas
 
-commit 0876dd6c7c3c5827c21bb0804453a249de234953
-Author: Nick Pelly <npelly@google.com>
-Date:   Fri Oct 3 16:07:50 2008 -0700
+---------------------------------------------------------------------
+Intel Israel (74) Limited
 
-    bluetooth: Drop ACL link after 2 seconds not 10 ms when connecting.
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3446bc9..a2b0e09 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -341,7 +341,7 @@ static inline void hci_conn_put(struct hci_conn *conn)
-                unsigned long timeo;
-                if (conn->type == ACL_LINK) {
-                        del_timer(&conn->idle_timer);
--                       if (conn->state == BT_CONNECTED) {
-+                       if (conn->state == BT_CONNECTED || conn->state
-== BT_CONNECT) {
-                                timeo = msecs_to_jiffies(HCI_DISCONN_TIMEOUT);
-                                if (!conn->out)
-                                        timeo *= 2;
-
-
-
-Nick
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
