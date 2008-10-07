@@ -1,72 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48EB9FCF.6070907@dell.com>
-Date: Tue, 07 Oct 2008 12:43:43 -0500
-From: Mario Limonciello <mario_limonciello@dell.com>
+Message-ID: <c2a31c480810070309g6bc3fe47oa41d47f1dc6b03b8@mail.gmail.com>
+Date: Tue, 7 Oct 2008 15:39:39 +0530
+From: "sreevani medhahal" <sreevani.medhahal@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: regarding headset test
 MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: SCO headset not working with 4.12
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig0A5FC26C2879D58BF50FCF4F"
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig0A5FC26C2879D58BF50FCF4F
-Content-Type: multipart/mixed;
- boundary="------------060605040605020505070505"
+Hi,
 
-This is a multi-part message in MIME format.
---------------060605040605020505070505
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+ I have the following query...
+1)    Headset Model Number: motorola HT820
+when i tried hstest play new.wav <bd_addr> channel_no
+here what should be the channel no ?
+$./hstest play email.wav  00:07:A4:B7:51:8D 1
+Voice setting: 0x0060
+RFCOMM channel connected
+Can't connect SCO audio channel: Address already in use
 
-Hi:
-
-I recently upgraded to bluez-4.12 and added in the SCO patch that came
-shortly after the 4.12 release.  It seems that my SCO headset is
-connecting, and receiving commands for volume levels, etc, but doesn't
-actually play back any audio.  I was trying to use the test/hstest app
-to verify like this:
-
-    ./hstest play /usr/share/sounds/alsa/Front_Center.wav
-    00:19:7F:30:47:AB 1
-    Voice setting: 0x0060
-    RFCOMM channel connected
-    SCO audio channel connected (handle 1, mtu 64)
-
-It just idles there sitting at that until I hit ctrl-c.  I've attached
-bluetoothd -nd output as well.
-
-
-Regards
---=20
-Mario Limonciello
-*Dell | Linux Engineering*
-mario_limonciello@dell.com
-
---------------060605040605020505070505
-Content-Type: text/x-log;
- name="bluetoothd.log"
-Content-Transfer-Encoding: base64
-Content-Disposition: inline;
- filename="bluetoothd.log"
+output of :$ hciconfig -a
+hci0:	Type: USB
+	BD Address: 00:02:5B:02:97:76 ACL MTU: 310:10 SCO MTU: 64:8
+	UP RUNNING PSCAN
+	RX bytes:203468 acl:2048 sco:274 events:9024 errors:5
+	TX bytes:1274949 acl:5837 sco:0 commands:740 errors:0
+	Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x59 0x83
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+	Link policy: RSWITCH HOLD SNIFF PARK
+	Link mode: SLAVE ACCEPT
+	Name: 'training01-0'
+	Class: 0x2a0100
+	Service Classes: Networking, Capturing, Audio
+	Device Class: Computer, Uncategorized
+	HCI Ver: 2.1 (0x4) HCI Rev: 0x1306 LMP Ver: 2.1 (0x4) LMP Subver: 0x1306
+	Manufacturer: Cambridge Silicon Radio (10)
 
 
---------------060605040605020505070505--
 
---------------enig0A5FC26C2879D58BF50FCF4F
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+I tried mailing on the bluez-users list :but no luck (hence attempting it here)
+2)
+I am using
+    Headset Model Number: motorola HT820
 
-iEYEARECAAYFAkjrn88ACgkQ2CrZjkA73YtgpgCghTAD2FYx55Glw3AWrUsIq5/m
-UcoAnj4cjdq9ZghfIuYVkNReq6SMKt0V
-=OYXz
------END PGP SIGNATURE-----
+Contents of .asoundrc is as below:
+ cat ~/.asoundrc
+pcm.bluetooth {
+ type bluetooth
+ device 00:07:A4:B7:51:8D
+}
 
---------------enig0A5FC26C2879D58BF50FCF4F--
+using bluez4.6 & kernel 2.6.27.rc6
+
+when i use
+$aplay -D bluetooth -f S16_LE shutdown1.wav
+Playing WAVE 'shutdown1.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Stere
+I am able to hear it in my HT820
+
+where as when i do
+1)
+arecord -D bluetooth -r 44100 -f S16_LE new.wav
+Recording WAVE 'new.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Mono
+I kept the above command running for few seconds & then pressed ctrl-c.
+there is new.wav file created of size just 44 bytes & when i try aplay
+on this nothing is heard( i think this is due to no recording on this
+file).
+2) I get the following error For
+ I use the below command to hear what i have said in the microphone.!
+$ arecord -Dplug:bluetooth -f S16_LE | aplay -D bluetooth -f S16_LE
+Recording WAVE 'stdin' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
+ALSA lib pcm_bluetooth.c:712:(bluetooth_a2dp_hw_params)
+BT_SETCONFIGURATION failed : Input/output error(5)
+arecord: set_params:1015: Unable to install hw params:
+ACCESS:  RW_INTERLEAVED
+FORMAT:  S16_LE
+SUBFORMAT:  STD
+SAMPLE_BITS: 16
+FRAME_BITS: 16
+CHANNELS: 1
+RATE: 8000
+PERIOD_TIME: 128000
+PERIOD_SIZE: 1024
+PERIOD_BYTES: 2048
+PERIODS: 6
+BUFFER_TIME: 768000
+BUFFER_SIZE: 6144
+BUFFER_BYTES: 12288
+TICK_TIME: 0
+aplay: playback:2148: read error
+Let me know if i need to specify any other information.
+regards,
+S M
