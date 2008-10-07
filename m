@@ -1,54 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2f1d248c0810062355r2871da61td3cca6b66a9d77a6@mail.gmail.com>
-Date: Tue, 7 Oct 2008 14:55:18 +0800
-From: "chen chong" <byrbzdl@gmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: How to disable authentication when using bluetooth on Linux?
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <14CF8002-9C68-48AF-AAB7-783C16CAC8CA@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <48EA93F7.4060000@pook.es>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
+Mime-Version: 1.0 (Apple Message framework v929.2)
+Subject: Re: bluez/git + 2.6.27-rc8 + bluetoothd -> SIGSEGV
+Date: Tue, 7 Oct 2008 07:34:38 +0200
+References: <48E29416.3030402@pook.es> <48E2B59A.7020600@dtsp.co.nz>	 <48E3B3BF.6070205@pook.es>	 <2d5a2c100810032047s47bec394w828852079d64e591@mail.gmail.com>	 <48E752A7.70600@pook.es> <1223121068.11272.46.camel@violet.holtmann.net>	 <48E7FB1E.8000504@pook.es> <48B8929D-29F9-4352-9C81-E95FDBC09876@gmail.com>	 <48E91E6F.1030202@pook.es> <A34AC171-77C2-4377-A60C-60A2793A2297@gmail.com>	 <0ED1CF2A-40D0-4A82-BAED-21F90B6466ED@gmail.com> <48EA6D84.7020101@pook.es>	 <632D4195-1EFF-4191-98D9-4A0953223590@gmail.com> <48EA7B66.1050208@pook.es>	 <1223326990.11272.229.camel@violet.holtmann.net> <48EA7ED9.9080801@pook.es> <1223328106.11272.232.camel@violet.holtmann.net> <48EA93F7.4060000@pook.es>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, all
+Hi Stuart,
 
-When pushing a file to bluetooth mobile phone from a Linux PC, how to
-disable bluetooth authentication mechanism (in kernel or user level ?
-), so that the phone won't prompt a window ask for PIN code?
+On Oct 7, 2008, at 0:40, Stuart Pook wrote:
+>>> :; grep ' -g' Makefile
+>>> CFLAGS = -Wall -O2 -D_FORTIFY_SOURCE=2 -fPIC -g -O0
+>> that is indeed strange. You should be able to get a proper backtrace.
+>
+> yes. I ran src/.libs/bluetoothd, it core dumped,
+> but I still cannot get a reasonable backtrace. Weird.
 
+Please do a "git pull". The segfault shouln't occur anymore (a  
+probable cause of it was a bug in common/glib-helper.c which Luiz  
+fixed yesterday). Also, if you have the chance come to the #bluez  
+channel on freenode where most bluez developers hang out (you'd have  
+e.g. found out about the fix much earlier that way).
 
-I'm a freshman on bluez, now I'm trying to write an application on
-Linux PC,  to send files to mobile phones with OBEX. The PC has a USB
-bluetooth stick to communication with the phone.
-
-Now I have successfully sent a file to phone using the following commands:
-1. "hcitool scan" and "sdptool browse"
-2. "passkey-agent --default 1234" and "ussp-push --dev 0
-BTADDR@CHANNEL desk.jpg desk.jpg"
-
-but the phone ask for a PIN code at the start.
-
-To get rid of this, I had tried to comment out
-"start_security_manager()" in bluez-utils-3.7/hcid/main.c,  and
-recompile it, then restart the bluetooth service. But PIN code was
-still prompted, and after if I input some characters,  the command
-"ussp-push --dev 0 --debug  BTADDR@CHANNEL desk.jpg desk.jpg", failed
-with the following error:
-
-root@debian:~/bluetooth# pushing file desk.jpg
-name=desk.jpg, size=24762
-__obex_connect: client_context_t = 0x80540f0
-Registered transport
-Set user data
-Created new objext
-cobex_write
-Local device 00:01:02:03:04:01
-Remote device 00:01:02:03:04:05 (11)
-Write error: Transport endpoint is not connected
-obex_event: client_context_t = 0x80540f0
-cobex_disconnect
-Link broken!
-Started a new request
-cobex_close
-__obex_connect: error=-2
-Unable to connect to the server
-Error
+Johan
