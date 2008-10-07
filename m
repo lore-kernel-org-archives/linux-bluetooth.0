@@ -1,35 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 Oct 2008 13:49:03 +0530 (IST)
-From: pavan_savoy@indiatimes.com
-To: chen chong <byrbzdl@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Message-ID: <983112175.268321223367543360.JavaMail.root@mbv7.indiatimes.com>
-In-Reply-To: <2f1d248c0810070057g3155e1b2x559a72579b55404b@mail.gmail.com>
+Message-ID: <2f1d248c0810070057g3155e1b2x559a72579b55404b@mail.gmail.com>
+Date: Tue, 7 Oct 2008 15:57:54 +0800
+From: "chen chong" <byrbzdl@gmail.com>
+To: pavan_savoy@indiatimes.com
 Subject: Re: How to disable authentication when using bluetooth on Linux?
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <1254090219.258871223363746800.JavaMail.root@mbv7.indiatimes.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=ISO-8859-1
+References: <2f1d248c0810062355r2871da61td3cca6b66a9d77a6@mail.gmail.com>
+	 <1254090219.258871223363746800.JavaMail.root@mbv7.indiatimes.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-Hi,
-
-You can try out couple of steps, to test ...
-
-1. whether the change in "security" settings actually reflect on interface..
-
-Try and pair with the device, with security "none" or "auto", and if you get relevant messages on remote device, then its fine.
-
-2. If the above is successful, then it must be something very specific to obex lib you are using, I've used obexftp + openObex and didn't find any such problems. [with security "none" and "auto"]
-
-Regards,
-Pavan
-
------ Original Message -----
-From: chen chong <byrbzdl@gmail.com>
-To: pavan savoy <pavan_savoy@indiatimes.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Sent: Tue, 7 Oct 2008 13:27:54 +0530 (IST)
-Subject: Re: How to disable authentication when using bluetooth on Linux?
 
 Hi, Pavan
 
@@ -172,13 +154,3 @@ Kris
 > Will the all new Indica Vista zip ahead of the Suzuki Swift? Read the expert review on Zigwheels.com
 > http://zigwheels.com/b2cam/reviewsDetails.action?name=Ro11_20080829&path=/INDT/Reviews/Ro11_20080829&page=1&pagecount=9
 >
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
---
-Will the all new Indica Vista zip ahead of the Suzuki Swift? Read the expert review on Zigwheels.com
-http://zigwheels.com/b2cam/reviewsDetails.action?name=Ro11_20080829&path=/INDT/Reviews/Ro11_20080829&page=1&pagecount=9
