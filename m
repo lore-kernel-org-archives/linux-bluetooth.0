@@ -1,86 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <ac8af0be0810080159h712b0f8drdffa49dc57d7afb5@mail.gmail.com>
-Date: Wed, 8 Oct 2008 16:59:54 +0800
-From: "Zhao Forrest" <forrest.zhao@gmail.com>
+Date: Wed, 8 Oct 2008 02:08:34 -0300
+From: =?utf-8?Q?Rog=C3=A9rio?= Brito <rbrito@ime.usp.br>
 To: linux-bluetooth@vger.kernel.org
-Subject: PBAP storage plugin API proposal
-Cc: forrest.zhao@gmail.com
+Subject: Help getting bluetooth disabled
+Message-ID: <20081008050833.GA15051@ime.usp.br>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="liOOAslEiF7prFVr"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi experts,
 
-I'm implementing PBAP server based on obexd. In order to support
-various PBAP backend storage each type of PBAP backend storage should
-be implemented as a plugin of PBAP server. So we propose the initial
-PBAP storage plugin API as follows. Basically the bellows are defined
-in pbap_storage_plugin.h
-====================================================================
-typedef void* pullphonebook_t;
-typedef void* pullvcardlisting_t;
-typedef void* pullvcardentry_t;
+--liOOAslEiF7prFVr
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-struct pbap_storage_operations {
-        pullphonebook_t* (*pullphonebook_init) (const gchar *object_name,
-                          guint64 filter, guint8 format,
-                          guint16 max_list_count, guint16 list_start_offset,
-                          guint16 *phonebook_size, guint8 *new_missed_calls);
-        gint32 (*pullphonebook) (pullphonebook_t *handle, guint8 *buf,
-                guint16 buf_len);
-        void (*pullphonebook_free) (pullphonebook_t *handle);
+Dear developers,
 
-        pullvcardlisting_t* (*pullvcardlisting_init) (const gchar *object_name,
-                             guint8 order, guint8 search_attr, gchar
-*search_val,
-                             guint16 max_list_count, guint16 list_start_offset,
-                             guint16 *phonebook_size, guint8 *new_missed_calls);
-        gint32 (*pullvcardlisting) (pullvcardlisting_t *handle, guint8 *buf,
-                guint16 buf_len);
-        void (*pullvcardlisting_free) (pullvcardlisting_t *handle);
+I got this past july a notebook that has what seems to be a strange way
+of dealing with wireless devices: there is a button (which I suspect is
+called rfkill) that, when pressed, enables *both* bluetooth and wifi,
+with the respective leds being lit.
 
-        pullvcardentry_t* (*pullvcardentry_init) (const gchar *object_name,
-                           guint64 filter, guint8 format);
-        gint32 (*pullvcardentry) (pullvcardentry_t *handle, guint8 *buf,
-                                  guint16 buf_len);
-        void (*pullvcardentry_free) (pullvcardentry_t *handle);
-};
+I don't have any bluetooth device. Saving energy here is paramount as
+the battery life is quite short.
 
-guint8 pbap_storage_operations_register(struct pbap_storage_operations *ops);
+According to the manual, under Windows Vista (which is what came with
+the box, but which I never used), this button is supposed to cycle
+between 4 states:
 
-struct obex_pbap_storage_plugin_desc {
-        const char *name;
-        int (*init) (void);
-        void (*exit) (void);
-};
+* both disabled;
+* bluetooth enabled & wifi enabled;
+* bluetooth disabled & wifi enabled;
+* bluetooth enabled & wifi disabled.
 
-#define OBEX_PBAP_STORAGE_PLUGIN_DEFINE(name,init,exit) \
-                struct obex_pbap_storage_plugin_desc
-obex_pbap_storage_plugin_desc = { \
-                        name, init, exit \
-                };
-====================================================================
-The plugin framework is similar to the one used in bluez and obexd. A
-particular PBAP storage plugin program should define its own "struct
-pbap_storage_operations" and call pbap_storage_operations_register()
-in obex_pbap_storage_plugin_desc.init() to register these callback
-functions to PBAP server.
+Unfortunately, under Linux (tested with Ubuntu's 8.10 pre-releases,
+which includes a kernel based on 2.6.27-rc*, if I understand it
+correctly), it is all or nothing: both disabled or both enabled.
 
-Here we use "pullphonebook" as an example to explain the PBAP storage
-plugin API usage.
-For example when OBEX PBAP server receives a "PullPhoneBook" request
-from PBAP client, it first calls
-pbap_storage_ops->pullphonebook_init() to get a handle, phonebook_size
-and new_missed_calls as returned value; then it calls
-pbap_storage_ops-> pullphonebook() to get the phonebook object until
-the return value is 0; lastly it calls pbap_storage_ops->
-pullphonebook_free() to release the handle.
+If I launch powertop, it recommends to disable bluetooth with
+"hciconfig hci down; rmmod hci_usb", but the led of bluetooth is still
+lit and I fear that the device is still drawing power from the battery.
 
-The PBAP spec is at
-http://www.bluetooth.com/NR/rdonlyres/58FC38BF-9ED6-49FF-81CF-E0B95B130D72/7761/PBAP_SPEC_V10r00.pdf.
+Is there any way to get it to disable completely the device?
 
-Your comments are welcome!
+Just as extra information, this is an Itautec Note N8320 notebook, with
+a Core 2 Duo T7250 CPU, ICH8 chipset and Intel's 3945abg wifi and a
+Realtek GigE driven by r8169 module (which I still have not had the
+opportunity to use).
 
-Thanks,
-Forrest
+If any further information is desired, please let me know. I can post
+the dmesg logs, lspci output, lsusb, as I am really willing to get this
+situation settled (and possibly working as on Windows as it was reported
+by the support people from the manufacturer).
+
+Again, if any further information is needed, please let me know.
+
+
+Thanks, Rog=C3=A9rio Brito.
+
+P.S.: Please, I would kindly ask to be included in Cc'ies, as I am not
+subscribed to the list.
+--=20
+Rog=C3=A9rio Brito : rbrito@{mackenzie,ime.usp}.br : GPG key 1024D/7C2CAEB8
+http://www.ime.usp.br/~rbrito : http://meusite.mackenzie.com.br/rbrito
+Projects: algorithms.berlios.de : lame.sf.net : vrms.alioth.debian.org
+
+--liOOAslEiF7prFVr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFI7EBRCFqbMnwsrrgRAkvaAKDESTtkcFg4Ba7xWMhdZQrWrW2geACfW9qX
+NspkfcUy0L54LHzKoBw3JWg=
+=/bHo
+-----END PGP SIGNATURE-----
+
+--liOOAslEiF7prFVr--
