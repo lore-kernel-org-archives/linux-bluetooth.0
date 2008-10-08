@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 12 Oct 2008 15:36:19 +0400
-From: John Frankish <frankish@dubai.oilfield.slb.com>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-id: <0K8M00558IWUCYD0@ae0043mbx01.mail.slb.com>
-MIME-version: 1.0
-Subject: [Bluez-devel] Pairing with a Headset
+To: bluez-devel@lists.sourceforge.net
+From: Jui-Hao Chiang <windtracekimo@gmail.com>
+Date: Wed, 8 Oct 2008 18:57:34 +0000 (UTC)
+Message-ID: <loom.20081008T184606-189@post.gmane.org>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Using multiple process on single SCO socket
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,52 +18,50 @@ Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi,
+I am currently simulating a duplex voice traffic on a single SCO link.
+(two adapters connect with one single SCO user level socket).
+On each side, after connected, I fork another process to perform the write
+operations, and the parent process will perform the read operaions.
+The pseudo code looks like the following
 
-I'm using bluez-4.12/bluez-gnome-1.8 and tried out pairing my laptop 
-with a SE HBH-610 headset
+connect(sockfd);
+if (!fork()) { /* child process */
+  while (1) {
+    if (write(sockfd) < 0) break;
+  }
+  close(sockfd);
+  return 0;
+}
+/* parent process */
+while(1) {
+  if (read(sockfd) < 0) break;
+}
+close(sockfd);
 
-A couple of questions:
 
-Q1 Using bluetooth-wizard, I got this.
+But after one side close the connection, the other side of the PC has this oops.
+BUG: unable to handle kernel NULL pointer dereference at virtual address 00000058
+Call Trace:
+[memcpy_fromiovec+55/96] memcpy_fromiovec+0x37/0x60
+[<f8bc6fa9>] sco_sock_sendmsg+0x119/0x160 [sco]
+[sock_aio_write+285/304] sock_aio_write+0x11d/0x130
+[getnstimeofday+54/208] getnstimeofday+0x36/0xd0
+[do_sync_write+213/288] do_sync_write+0xd5/0x120
+[hrtimer_try_to_cancel+60/144] hrtimer_try_to_cancel+0x3c/0x90
+[autoremove_wake_function+0/80] autoremove_wake_function+0x0/0x50
+[hrtimer_wakeup+0/32] hrtimer_wakeup+0x0/0x20
+[vfs_write+346/368] vfs_write+0x15a/0x170
+[sys_write+65/112] sys_write+0x41/0x70
 
-Connecting to null now...
-Please enter the following PIN code: 0000
+Is there any safe way to run two processes on a single SCO socket?
+Originally I use the following way, but actually these two direction traffic
+will block each other.
 
-Since I could not enter anything on the headset, I waited 20-30s and 
-then, as per bluetoothd -n, the pairing seemed to work:
-
-bluetoothd[6061]: Discovery session 0xb96d4098 with :1.1 activated
-bluetoothd[6061]: Discovery session 0xb96d4098 with :1.1 deactivated
-bluetoothd[6061]: link_key_request (sba=00:10:C6:56:F4:9F, 
-dba=00:12:EE:A6:1D:F4)
-bluetoothd[6061]: pin_code_request (sba=00:10:C6:56:F4:9F, 
-dba=00:12:EE:A6:1D:F4)
-bluetoothd[6061]: link_key_notify (sba=00:10:C6:56:F4:9F, 
-dba=00:12:EE:A6:1D:F4)
-bluetoothd[6061]: Registered interface org.bluez.Headset on path 
-/org/bluez/hci0/dev_00_12_EE_A6_1D_F4
-bluetoothd[6061]: Registered interface org.bluez.Input on path 
-/org/bluez/hci0/dev_00_12_EE_A6_1D_F4
-
-If I pair the headset with a phone, I need to enter 0000 on the 
-phone, after which there is a beeping in the headset until I press 
-the headset  button and the pairing is complete.
-
-Did I miss something in the setup to use a bt headset or is the 
-bluez-gnome logic not quite right for a headset?
-
-Q2 My os uses 2.6.26 and I have the following bt modules loaded:
-
-Module                  Size  Used by
-sco                     9472  2
-bnep                   11264  2
-rfcomm                 29328  4
-l2cap                  17920  16 bnep,rfcomm
-hci_usb                13084  3
-bluetooth              42852  11 sco,bnep,rfcomm,l2cap,hci_usb
-
-Do I need to apply the seven bt patches for 2.6.26 or will the 
-headset work as is - i.e. is the btusb (?) module required for sco to work?
+while(1) {
+  if (write(sockfd) < 0) break;
+  if (read(sockfd) < 0) break;
+}
+close(sockfd);
 
 
 -------------------------------------------------------------------------
