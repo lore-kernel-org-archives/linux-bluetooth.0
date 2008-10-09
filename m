@@ -1,58 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Fix PS3 BD remote "pairing"
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary="=-LhpKj1B8c5Bybz9MVUJT"
-Date: Fri, 10 Oct 2008 01:14:36 +0100
-Message-Id: <1223597676.22125.0.camel@snoogens.fab.redhat.com>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <ac8af0be0810081843i8bd6bd3g7282b11e3e9c8b1e@mail.gmail.com>
+Date: Thu, 9 Oct 2008 09:43:30 +0800
+From: "Zhao Forrest" <forrest.zhao@gmail.com>
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Subject: Re: PBAP storage plugin API proposal
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1223457456.11272.254.camel@violet.holtmann.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <ac8af0be0810080159h712b0f8drdffa49dc57d7afb5@mail.gmail.com>
+	 <1223457456.11272.254.camel@violet.holtmann.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+>
+> use the generic per plugin defines and its init and exit functions and
+> then provide methods to register and unregister the operations.
+>
+Yes. My proposed PBAP storage API follows this rule, but lacks the
+method to unregister the operations. Will add it later.
 
---=-LhpKj1B8c5Bybz9MVUJT
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+> Please keep in mind that in theory we can load more than one of these
+> phonebook "drivers".
+>
+Do you mean obexd could load multiple PBAP server plugin instances
+at the same time?
+Or one PBAP server instance could load multiple PBAP storage plugins
+at the same time?
 
-The PS3 BD remote doesn't really want to be paired, CreateDevice on
-it will be enough to get the it connected and working.
-
-Cheers
-
---=-LhpKj1B8c5Bybz9MVUJT
-Content-Disposition: attachment; filename="0001-Fix-PS3-BD-remote-pairing.patch"
-Content-Type: text/x-patch; name="0001-Fix-PS3-BD-remote-pairing.patch"; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-
->From dd1c0184849b12bbda466a2f6bef3d5ff9a1b825 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Fri, 10 Oct 2008 01:12:18 +0100
-Subject: [PATCH] Fix PS3 BD remote "pairing"
-
-The PS3 BD remote doesn't really want to be paired, CreateDevice on
-it will be enough to get the it connected and working.
----
- wizard/main.c |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
-
-diff --git a/wizard/main.c b/wizard/main.c
-index cf731e7..ef61f90 100644
---- a/wizard/main.c
-+++ b/wizard/main.c
-@@ -208,6 +208,10 @@ static void prepare_callback(GtkWidget *assistant,
- 		if (target_type == BLUETOOTH_TYPE_MOUSE)
- 			path = NULL;
- 
-+		/* PS3 BD Remote */
-+		if (g_str_equal(target_name, "BD Remote Control") == TRUE)
-+			path = NULL;
-+
- 		bluetooth_client_create_device(client, target_address,
- 					path, create_callback, assistant);
- 	}
--- 
-1.6.0.1
-
-
---=-LhpKj1B8c5Bybz9MVUJT--
-
+Thanks,
+Forrest
