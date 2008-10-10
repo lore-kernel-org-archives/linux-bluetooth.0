@@ -1,23 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Add OUI check for the PS3 BD remote
+Subject: Re: [Bugme-new] [Bug 11733] New: Possible btusb refcount leak
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Bastien Nocera <hadess@hadess.net>
+To: Andrew Morton <akpm@linux-foundation.org>
 Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1223652739.22125.3.camel@snoogens.fab.redhat.com>
-References: <1223652739.22125.3.camel@snoogens.fab.redhat.com>
+In-Reply-To: <20081010121922.af9721ed.akpm@linux-foundation.org>
+References: <bug-11733-10286@http.bugzilla.kernel.org/>
+	 <20081010121922.af9721ed.akpm@linux-foundation.org>
 Content-Type: text/plain
-Date: Sat, 11 Oct 2008 00:58:45 +0200
-Message-Id: <1223679525.4397.18.camel@californication>
+Date: Sat, 11 Oct 2008 00:53:06 +0200
+Message-Id: <1223679186.4397.16.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Andrew,
 
-the patch has been applied, but != FALSE is also == TRUE. We don't need
-double negation ;)
+> bugme-daemon@bugzilla.kernel.org wrote:
+> 
+> > http://bugzilla.kernel.org/show_bug.cgi?id=11733
+> 
+> What should I do with bluetooth reports?  I can send them to linux-bluetooth,
+> but that's a bit irritating if everyone is already monitornig them?
 
-regards
+I am fine with you sending them to linux-bluetooth.
+
+Regards
 
 Marcel
 
