@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BLU127-W5086F7E6B9F25F84000E5688300@phx.gbl>
-From: Ichigo Bleach <sara200t@hotmail.com>
-To: <bluez-users@lists.sourceforge.net>
-Date: Wed, 15 Oct 2008 07:11:54 -0500
+To: bluez-users@lists.sourceforge.net
+To: "BlueZ users" <bluez-users@lists.sourceforge.net>
+Date: Fri, 10 Oct 2008 14:06:04 +0100
+Message-ID: <OkDjSYF4.1223643964.0334430.fma@alezan.org>
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric?= <frederic.mantegazza@gbiloba.org>
 MIME-Version: 1.0
-Subject: [Bluez-users] Is "HCI_Read_Rssi" is the only option to get RSSI
- value from "Non-discoverable" Device?
+Subject: [Bluez-users] Using a bluetooth dongle as a slave device
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,34 +15,34 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
 
-Dear all,
+Hello,
 
-         I am trying to develop bluetooth positioning system. I am at the point of successfully getting the RSSI value using the Inquiry_result_with_rssi with no problem.
-However, as the security is concerned, I do not want leave the other Bluetooth device in discoverable mode. Therefore, sending inquiry_result_with_rssi will not work any more due to, in non-discoverable mode, the other Bluetooth will not reply to my inquiry.
+I have a usb dongle to add bluetooth support to ma machine. I mainly use
+it to connect to a bluetooth-to-serial converter, and make tests. My
+final application runs on a Nokia, which has build-in bluetooth.
 
+Now, I would like to simulate, on my machine, the hardware connected to
+the bluetooth-to-serial device, so that I can connect to it from my
+Nokia.
 
-My questions are:
+The problem is: how can I use my dongle as a slave, as a
+bluetooth-to-serial device, to be more precise?
 
-1.) Do I have only one option left to get the rssi value that is to use the "HCI_Read_Rssi" with the connected device? If there is any other option, please kindly let me know. 
+Thanks for you help,
 
-2.) Let say if i know the Bt_address of the other end and they are paired (with no connection), If there is a way, I can ask the rssi value from the other end directly?
-
-Thank you very much in advance,
-
-Newbie
-
-_________________________________________________________________
-
+--
+   Fr=E9d=E9ric
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great prizes
+Build the coolest Linux based applications with Moblin SDK & win great priz=
+es
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=100&url=/
+http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
