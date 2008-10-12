@@ -1,10 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: bluez-devel@lists.sourceforge.net
-Date: Mon, 13 Oct 2008 11:56:45 +0100
-Message-Id: <1223895405.31961.3048.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Subject: [Bluez-devel] Device not connected but working?
+Message-ID: <48F23B66.7030605@powercraft.nl>
+Date: Sun, 12 Oct 2008 20:01:10 +0200
+From: Jelle de Jong <jelledejong@powercraft.nl>
+MIME-Version: 1.0
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+References: <48F1F7C0.4040705@powercraft.nl>
+	<1223819361.31961.1763.camel@cookie.hadess.net>
+In-Reply-To: <1223819361.31961.1763.camel@cookie.hadess.net>
+Subject: Re: [Bluez-devel] Sony Bluetooth BD Remote Control
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,35 +20,51 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Heya,
+Bastien Nocera wrote:
+> On Sun, 2008-10-12 at 15:12 +0200, Jelle de Jong wrote:
+>> -----BEGIN PGP SIGNED MESSAGE-----
+>> Hash: SHA1
+> <snip>
+>> Hello everybody,
+>>
+>> I bought a bluetooth remote for a bluetooth mobile system that I am
+>> trying to built. (bluetooth remote, speakers, mouse, keyboard, headset, gps)
+>>
+>> However I can't get the device to work out of the box... I have found
+>> some script and some tools on the internet but this is not very
+>> maintainable (and I could not get it to work)
+>>
+>> I am wondering what is needed to create a good healthy maintainable
+>> system to get the remote working out of the box after connecting to it
+>> with bluez...? So how do we create out of the box support for bluetooth
+>> devices?
+>>
+>> hidd[3688]: New HID device 00:1E:3D:15:0A:4F (Sony Computer
+> 
+> There's no hidd support for the PS3 BD remote. Use bluez-{utils,libs}
+> 3.36, or use the latest versions of bluez and bluez-gnome (and make sure
+> your version has that patch[1]).
+> 
+> And don't use that "Linux driver" horror that requires networking...
+> 
+> [1]:
+> http://git.kernel.org/?p=bluetooth/bluez-gnome.git;a=commit;h=c99b105989a216dd4565228ba7dc3b2702f4a6ad
+> 
 
-Using bluez 4.13, I have a slight problem with a mouse not showing up as
-connected.
+Thank you for the information,
 
-GetProperties() on the device tells me:
-dbus.Dictionary({dbus.String(u'Name'): dbus.String(u'Trust Bluetooth
-Mouse', variant_level=1), dbus.String(u'Paired'): dbus.Boolean(False,
-variant_level=1), dbus.String(u'Adapter'):
-dbus.ObjectPath('/org/bluez/hci0', variant_level=1),
-dbus.String(u'Alias'): dbus.String(u'Trust Bluetooth Mouse',
-variant_level=1), dbus.String(u'Connected'): dbus.Boolean(False,
-variant_level=1), dbus.String(u'UUIDs'):
-dbus.Array([dbus.String(u'00001124-0000-1000-8000-00805f9b34fb')],
-signature=dbus.Signature('s'), variant_level=1),
-dbus.String(u'Address'): dbus.String(u'00:0A:94:C0:AB:9B',
+I currently use bluez-utils_3.36-2_i386.deb and bluetooth_3.36-2_all.deb
+on my debian sid system this is version 3.36 as suggested. I don't know
+if the patch is applied on the package. Should the device have worked on
+my system?
 
-org.bluez.Input.IsConnected() says:
-1
+But I am kind of curious what is needed to get such device working in
+the source code and how keys are mapped.
 
-$ hidd --show
-00:0A:94:C0:AB:9B Trust Bluetooth Mouse [0000:0000] connected
+Kind regards,
 
-Turning the mouse on and off will sometimes show the connection as being
-up, and sometimes not.
+Jelle
 
-Is this normal?
-
-Cheers
 
 
 -------------------------------------------------------------------------
