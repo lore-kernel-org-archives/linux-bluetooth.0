@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48F1F7C0.4040705@powercraft.nl>
-Date: Sun, 12 Oct 2008 15:12:32 +0200
-From: Jelle de Jong <jelledejong@powercraft.nl>
-MIME-Version: 1.0
+Date: Sun, 12 Oct 2008 15:36:19 +0400
+From: John Frankish <frankish@dubai.oilfield.slb.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="------------070004070302030405090402"
-Subject: [Bluez-devel] Sony Bluetooth BD Remote Control
+Message-id: <0K8M00558IWUCYD0@ae0043mbx01.mail.slb.com>
+MIME-version: 1.0
+Subject: [Bluez-devel] Pairing with a Headset
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,252 +14,64 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------070004070302030405090402
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Hi,
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+I'm using bluez-4.12/bluez-gnome-1.8 and tried out pairing my laptop 
+with a SE HBH-610 headset
 
-This message contains the following attachment(s):
-Jelle de Jong - Installation Guide - Sony Bluetooth BD Remote Control -
-2008-10-10 - v0.1.1j.txt
+A couple of questions:
 
-Hello everybody,
+Q1 Using bluetooth-wizard, I got this.
 
-I bought a bluetooth remote for a bluetooth mobile system that I am
-trying to built. (bluetooth remote, speakers, mouse, keyboard, headset, gps)
+Connecting to null now...
+Please enter the following PIN code: 0000
 
-However I can't get the device to work out of the box... I have found
-some script and some tools on the internet but this is not very
-maintainable (and I could not get it to work)
+Since I could not enter anything on the headset, I waited 20-30s and 
+then, as per bluetoothd -n, the pairing seemed to work:
 
-I am wondering what is needed to create a good healthy maintainable
-system to get the remote working out of the box after connecting to it
-with bluez...? So how do we create out of the box support for bluetooth
-devices?
+bluetoothd[6061]: Discovery session 0xb96d4098 with :1.1 activated
+bluetoothd[6061]: Discovery session 0xb96d4098 with :1.1 deactivated
+bluetoothd[6061]: link_key_request (sba=00:10:C6:56:F4:9F, 
+dba=00:12:EE:A6:1D:F4)
+bluetoothd[6061]: pin_code_request (sba=00:10:C6:56:F4:9F, 
+dba=00:12:EE:A6:1D:F4)
+bluetoothd[6061]: link_key_notify (sba=00:10:C6:56:F4:9F, 
+dba=00:12:EE:A6:1D:F4)
+bluetoothd[6061]: Registered interface org.bluez.Headset on path 
+/org/bluez/hci0/dev_00_12_EE_A6_1D_F4
+bluetoothd[6061]: Registered interface org.bluez.Input on path 
+/org/bluez/hci0/dev_00_12_EE_A6_1D_F4
 
-hidd[3688]: New HID device 00:1E:3D:15:0A:4F (Sony Computer
-Entertainment Inc BD Remote Control)
-kernel: [18419.605288] input: Sony Computer Entertainment Inc BD Remote
-Control as /class/input/input12
+If I pair the headset with a phone, I need to enter 0000 on the 
+phone, after which there is a beeping in the headset until I press 
+the headset  button and the pairing is complete.
 
-Any help is appreciated,
+Did I miss something in the setup to use a bt headset or is the 
+bluez-gnome logic not quite right for a headset?
 
-Kind regards,
+Q2 My os uses 2.6.26 and I have the following bt modules loaded:
 
-Jelle de Jong
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+Module                  Size  Used by
+sco                     9472  2
+bnep                   11264  2
+rfcomm                 29328  4
+l2cap                  17920  16 bnep,rfcomm
+hci_usb                13084  3
+bluetooth              42852  11 sco,bnep,rfcomm,l2cap,hci_usb
 
-iJwEAQECAAYFAkjx974ACgkQ1WclBW9j5Hn+owQAnGdjX0hXkCQBDO35sGmnA+U+
-JjXTjkoFefNoem0b5NEeNvUUhwWF5Ogcdtd/tCyZ0YFhXn5w8NBlbWeMFMg1JX7L
-o8Tnrj4wi6y6viJoZ1mk+CyIKPigEiqe7aQkahbiTB0LAC7H28/0Nz/AXGStyoE0
-50yksr2u8P0gDmpiDm0=
-=36g8
------END PGP SIGNATURE-----
+Do I need to apply the seven bt patches for 2.6.26 or will the 
+headset work as is - i.e. is the btusb (?) module required for sco to work?
 
---------------070004070302030405090402
-Content-Type: text/plain;
-	name="Jelle de Jong - Installation Guide - Sony Bluetooth BD Remote
-	Control - 2008-10-10- v0.1.1j.txt"
-Content-Transfer-Encoding: base64
-Content-Disposition: inline;
-	filename*0="Jelle de Jong - Installation Guide - Sony Bluetooth BD
-	Remot"; filename*1="e Control - 2008-10-10 - v0.1.1j.txt"
-
-IyEvYmluL3NoICMganVzdCBmb3IgaGlnaGxpZ2h0aW5nIHRoaXMgaXMgbm90IGEgc2NyaXB0
-CgojIGNyZWF0b3I6IEplbGxlIGRlIEpvbmcgPGplbGxlZGVqb25nIGF0IHBvd2VyY3JhZnQg
-ZG90IGNvbT4KCiMgYmFja2dyb3VuZDogaW5mb3JtYXRpb246IGh0dHA6Ly93d3cyLmFwZWJv
-eC5vcmcvd29yZHByZXNzL3Byb2dyYW1taW5nLzI4LwojIGJhY2tncm91bmQ6IGluZm9ybWF0
-aW9uOiBodHRwOi8vYW50LnN0YXJpa292Lmdvb2dsZXBhZ2VzLmNvbS9saW51eGRyaXZlcmZv
-cnNvbnliZHJlbW90ZQoKU2ltdWx0YW5lb3VzbHkgcHJlc3MgIlN0YXJ0IiBhbmQgIkVudGVy
-IiBidXR0b25zIG9uIHRoZSByZW1vdGUgZm9yIGFib3V0IDUgc2Vjb25kcywgdG8gZ2V0IHRo
-ZSBkZXZpY2UgaW4gcGFpcmluZyBtb2RlLgoKc3VkbyAvZXRjL2luaXQuZC9zeXNrbG9nZCBz
-dGFydApzdWRvIC9ldGMvaW5pdC5kL2tsb2dkIHN0YXJ0CnN1ZG8gL2V0Yy9pbml0LmQvYmx1
-ZXRvb3RoIHJlc3RhcnQKc3VkbyB0YWlsIC0tbGluZXM9MTAwIC0tZm9sbG93IC92YXIvbG9n
-L3N5c2xvZwoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCmhjaXRvb2wgc2NhbgogICAgU2Nhbm5pbmcg
-Li4uCiAgICAgICAgMDA6MUU6M0Q6MTU6MEE6NEYgICBCRCBSZW1vdGUgQ29udHJvbAoKLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tCnN1ZG8gaGlkZCAtLWNvbm5lY3QgMDA6MUU6M0Q6MTU6MEE6NEYK
-ICAgIGhpZGQ6IE5ldyBISUQgZGV2aWNlIDAwOjFFOjNEOjE1OjBBOjRGIChTb255IENvbXB1
-dGVyIEVudGVydGFpbm1lbnQgSW5jIEJEIFJlbW90ZSBDb250cm9sKQogICAga2VybmVsOiBb
-MTU5MjYuNzI0MjM1XSBpbnB1dDogU29ueSBDb21wdXRlciBFbnRlcnRhaW5tZW50IEluYyBC
-RCBSZW1vdGUgQ29udHJvbCBhcyAvY2xhc3MvaW5wdXQvaW5wdXQxMQoKLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tCnN1ZG8gaGNpdG9vbCBpbmZvIDAwOjFFOjNEOjE1OjBBOjRGCiAgICBSZXF1ZXN0
-aW5nIGluZm9ybWF0aW9uIC4uLgogICAgICAgIEJEIEFkZHJlc3M6ICAwMDoxRTozRDoxNTow
-QTo0RgogICAgICAgIERldmljZSBOYW1lOiBCRCBSZW1vdGUgQ29udHJvbAogICAgICAgIExN
-UCBWZXJzaW9uOiAyLjAgKDB4MykgTE1QIFN1YnZlcnNpb246IDB4MjI5CiAgICAgICAgTWFu
-dWZhY3R1cmVyOiBCcm9hZGNvbSBDb3Jwb3JhdGlvbiAoMTUpCiAgICAgICAgRmVhdHVyZXM6
-IDB4YmMgMHgwMiAweDA0IDB4MzggMHgwOCAweDAwIDB4MDAgMHgwMAogICAgICAgICAgICA8
-ZW5jcnlwdGlvbj4gPHNsb3Qgb2Zmc2V0PiA8dGltaW5nIGFjY3VyYWN5PiA8cm9sZSBzd2l0
-Y2g+CiAgICAgICAgICAgIDxzbmlmZiBtb2RlPiA8UlNTST4gPHBvd2VyIGNvbnRyb2w+IDxl
-bmhhbmNlZCBpc2Nhbj4KICAgICAgICAgICAgPGludGVybGFjZWQgaXNjYW4+IDxpbnRlcmxh
-Y2VkIHBzY2FuPiA8QUZIIGNhcC4gc2xhdmU+CgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KZWNobyAn
-SElERF9PUFRJT05TPSItLWNvbm5lY3QgMDA6MUU6M0Q6MTU6MEE6NEYgLS1zZXJ2ZXIiJyB8
-IHN1ZG8gdGVlIC0tYXBwZW5kIC9ldGMvZGVmYXVsdC9ibHVldG9vdGgKY2F0IC9ldGMvZGVm
-YXVsdC9ibHVldG9vdGgKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpjYXQgL2V0Yy9kZWZhdWx0L2Js
-dWV0b290aAogICAgSElERF9FTkFCTEVEPTEKICAgIEhJRERfT1BUSU9OUz0iLS1zZWFyY2gg
-LS1zZXJ2ZXIiCiAgICBISUREX09QVElPTlM9Ii0tY29ubmVjdCAxMToxMToxMToxMToxNzo5
-NSAtLXNlcnZlciIKICAgIEhJRERfT1BUSU9OUz0iLS1jb25uZWN0IDAwOjA3OjYxOjBGOjRB
-OjYwIC0tc2VydmVyIgogICAgSElERF9PUFRJT05TPSItLWNvbm5lY3QgMDA6MUU6M0Q6MTU6
-MEE6NEYgLS1zZXJ2ZXIiCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0Kc2RwdG9vbCBicm93c2UgMDA6
-MUU6M0Q6MTU6MEE6NEYKICAgIEJyb3dzaW5nIDAwOjFFOjNEOjE1OjBBOjRGIC4uLgogICAg
-U2VydmljZSBOYW1lOiBCRCBSZW1vdGUgQ29udHJvbAogICAgU2VydmljZSBEZXNjcmlwdGlv
-bjogQkQgUmVtb3RlIENvbnRyb2wKICAgIFNlcnZpY2UgUHJvdmlkZXI6IFNvbnkgQ29tcHV0
-ZXIgRW50ZXJ0YWlubWVudCBJbmMKICAgIFNlcnZpY2UgUmVjSGFuZGxlOiAweDEwMDAwCiAg
-ICBTZXJ2aWNlIENsYXNzIElEIExpc3Q6CiAgICAgICJIdW1hbiBJbnRlcmZhY2UgRGV2aWNl
-IiAoMHgxMTI0KQogICAgUHJvdG9jb2wgRGVzY3JpcHRvciBMaXN0OgogICAgICAiTDJDQVAi
-ICgweDAxMDApCiAgICAgICAgUFNNOiAxNwogICAgICAiSElEUCIgKDB4MDAxMSkKICAgIExh
-bmd1YWdlIEJhc2UgQXR0ciBMaXN0OgogICAgICBjb2RlX0lTTzYzOTogMHg2NTZlCiAgICAg
-IGVuY29kaW5nOiAgICAweDZhCiAgICAgIGJhc2Vfb2Zmc2V0OiAweDEwMAogICAgUHJvZmls
-ZSBEZXNjcmlwdG9yIExpc3Q6CiAgICAgICJIdW1hbiBJbnRlcmZhY2UgRGV2aWNlIiAoMHgx
-MTI0KQogICAgICAgIFZlcnNpb246IDB4MDEwMAoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCnN1ZG8g
-aGNpdG9vbCBjb24KICAgIENvbm5lY3Rpb25zOgogICAgICAgIDwgQUNMIDAwOjFFOjNEOjE1
-OjBBOjRGIGhhbmRsZSA0MiBzdGF0ZSAxIGxtIE1BU1RFUgoKLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-CnVkZXZpbmZvIC1hIC1wICQodWRldmluZm8gLXEgcGF0aCAtbiAvZGV2L2lucHV0L2V2ZW50
-MTEpCiAgICBVZGV2aW5mbyBzdGFydHMgd2l0aCB0aGUgZGV2aWNlIHNwZWNpZmllZCBieSB0
-aGUgZGV2cGF0aCBhbmQgdGhlbgogICAgd2Fsa3MgdXAgdGhlIGNoYWluIG9mIHBhcmVudCBk
-ZXZpY2VzLiBJdCBwcmludHMgZm9yIGV2ZXJ5IGRldmljZQogICAgZm91bmQsIGFsbCBwb3Nz
-aWJsZSBhdHRyaWJ1dGVzIGluIHRoZSB1ZGV2IHJ1bGVzIGtleSBmb3JtYXQuCiAgICBBIHJ1
-bGUgdG8gbWF0Y2gsIGNhbiBiZSBjb21wb3NlZCBieSB0aGUgYXR0cmlidXRlcyBvZiB0aGUg
-ZGV2aWNlCiAgICBhbmQgdGhlIGF0dHJpYnV0ZXMgZnJvbSBvbmUgc2luZ2xlIHBhcmVudCBk
-ZXZpY2UuCgogICAgICBsb29raW5nIGF0IGRldmljZSAnL2NsYXNzL2lucHV0L2lucHV0MTEv
-ZXZlbnQxMSc6CiAgICAgICAgS0VSTkVMPT0iZXZlbnQxMSIKICAgICAgICBTVUJTWVNURU09
-PSJpbnB1dCIKICAgICAgICBEUklWRVI9PSIiCgogICAgICBsb29raW5nIGF0IHBhcmVudCBk
-ZXZpY2UgJy9jbGFzcy9pbnB1dC9pbnB1dDExJzoKICAgICAgICBLRVJORUxTPT0iaW5wdXQx
-MSIKICAgICAgICBTVUJTWVNURU1TPT0iaW5wdXQiCiAgICAgICAgRFJJVkVSUz09IiIKICAg
-ICAgICBBVFRSU3tuYW1lfT09IlNvbnkgQ29tcHV0ZXIgRW50ZXJ0YWlubWVudCBJbmMgQkQg
-UmVtb3RlIENvbnRyb2wiCiAgICAgICAgQVRUUlN7cGh5c309PSIwMDoxQjpEQzowMDozMjo3
-MSIKICAgICAgICBBVFRSU3t1bmlxfT09IjAwOjFFOjNEOjE1OjBBOjRGIgogICAgICAgIEFU
-VFJTe21vZGFsaWFzfT09ImlucHV0OmIwMDA1djA1NENwMDMwNmUwMTAwLWUwLGtyYW1sc2Z3
-IgoKICAgICAgbG9va2luZyBhdCBwYXJlbnQgZGV2aWNlICcvZGV2aWNlcy9wY2kwMDAwOjAw
-LzAwMDA6MDA6MWQuMC91c2IxLzEtMi8xLTI6MS4wL2hjaTAvYWNsMDAxRTNEMTUwQTRGJzoK
-ICAgICAgICBLRVJORUxTPT0iYWNsMDAxRTNEMTUwQTRGIgogICAgICAgIFNVQlNZU1RFTVM9
-PSJibHVldG9vdGgiCiAgICAgICAgRFJJVkVSUz09IiIKICAgICAgICBBVFRSU3t0eXBlfT09
-IkFDTCIKICAgICAgICBBVFRSU3thZGRyZXNzfT09IjAwOjFFOjNEOjE1OjBBOjRGIgoKICAg
-ICAgbG9va2luZyBhdCBwYXJlbnQgZGV2aWNlICcvZGV2aWNlcy9wY2kwMDAwOjAwLzAwMDA6
-MDA6MWQuMC91c2IxLzEtMi8xLTI6MS4wL2hjaTAnOgogICAgICAgIEtFUk5FTFM9PSJoY2kw
-IgogICAgICAgIFNVQlNZU1RFTVM9PSJibHVldG9vdGgiCiAgICAgICAgRFJJVkVSUz09IiIK
-ICAgICAgICBBVFRSU3t0eXBlfT09IlVTQiIKICAgICAgICBBVFRSU3tuYW1lfT09IkJsdWVa
-ICgwKSIKICAgICAgICBBVFRSU3tjbGFzc309PSIweDA4MDEwMCIKICAgICAgICBBVFRSU3th
-ZGRyZXNzfT09IjAwOjFCOkRDOjAwOjMyOjcxIgogICAgICAgIEFUVFJTe2ZlYXR1cmVzfT09
-IjB4ZmZmZjhmZmU5YmY5MDA4MCIKICAgICAgICBBVFRSU3ttYW51ZmFjdHVyZXJ9PT0iMTAi
-CiAgICAgICAgQVRUUlN7aGNpX3ZlcnNpb259PT0iMyIKICAgICAgICBBVFRSU3toY2lfcmV2
-aXNpb259PT0iMzE2NCIKICAgICAgICBBVFRSU3tpbnF1aXJ5X2NhY2hlfT09IjAwOjFFOjNE
-OjE1OjBBOjRGIDEgMiAwIDB4MDAyNTBjIDB4Mjk0ZCAtNTEgMzkwNTMzNCIKICAgICAgICBB
-VFRSU3tpZGxlX3RpbWVvdXR9PT0iMCIKICAgICAgICBBVFRSU3tzbmlmZl9tYXhfaW50ZXJ2
-YWx9PT0iODAwIgogICAgICAgIEFUVFJTe3NuaWZmX21pbl9pbnRlcnZhbH09PSI4MCIKCiAg
-ICAgIGxvb2tpbmcgYXQgcGFyZW50IGRldmljZSAnL2RldmljZXMvcGNpMDAwMDowMC8wMDAw
-OjAwOjFkLjAvdXNiMS8xLTIvMS0yOjEuMCc6CiAgICAgICAgS0VSTkVMUz09IjEtMjoxLjAi
-CiAgICAgICAgU1VCU1lTVEVNUz09InVzYiIKICAgICAgICBEUklWRVJTPT0iaGNpX3VzYiIK
-ICAgICAgICBBVFRSU3tiSW50ZXJmYWNlTnVtYmVyfT09IjAwIgogICAgICAgIEFUVFJTe2JB
-bHRlcm5hdGVTZXR0aW5nfT09IiAwIgogICAgICAgIEFUVFJTe2JOdW1FbmRwb2ludHN9PT0i
-MDMiCiAgICAgICAgQVRUUlN7YkludGVyZmFjZUNsYXNzfT09ImUwIgogICAgICAgIEFUVFJT
-e2JJbnRlcmZhY2VTdWJDbGFzc309PSIwMSIKICAgICAgICBBVFRSU3tiSW50ZXJmYWNlUHJv
-dG9jb2x9PT0iMDEiCiAgICAgICAgQVRUUlN7bW9kYWxpYXN9PT0idXNiOnYwQTEycDAwMDFk
-MzE2NGRjRTBkc2MwMWRwMDFpY0UwaXNjMDFpcDAxIgoKICAgICAgbG9va2luZyBhdCBwYXJl
-bnQgZGV2aWNlICcvZGV2aWNlcy9wY2kwMDAwOjAwLzAwMDA6MDA6MWQuMC91c2IxLzEtMic6
-CiAgICAgICAgS0VSTkVMUz09IjEtMiIKICAgICAgICBTVUJTWVNURU1TPT0idXNiIgogICAg
-ICAgIERSSVZFUlM9PSJ1c2IiCiAgICAgICAgQVRUUlN7Y29uZmlndXJhdGlvbn09PSIiCiAg
-ICAgICAgQVRUUlN7Yk51bUludGVyZmFjZXN9PT0iIDIiCiAgICAgICAgQVRUUlN7YkNvbmZp
-Z3VyYXRpb25WYWx1ZX09PSIxIgogICAgICAgIEFUVFJTe2JtQXR0cmlidXRlc309PSI4MCIK
-ICAgICAgICBBVFRSU3tiTWF4UG93ZXJ9PT0iICAwbUEiCiAgICAgICAgQVRUUlN7dXJibnVt
-fT09IjE1MTY4OCIKICAgICAgICBBVFRSU3tpZFZlbmRvcn09PSIwYTEyIgogICAgICAgIEFU
-VFJTe2lkUHJvZHVjdH09PSIwMDAxIgogICAgICAgIEFUVFJTe2JjZERldmljZX09PSIzMTY0
-IgogICAgICAgIEFUVFJTe2JEZXZpY2VDbGFzc309PSJlMCIKICAgICAgICBBVFRSU3tiRGV2
-aWNlU3ViQ2xhc3N9PT0iMDEiCiAgICAgICAgQVRUUlN7YkRldmljZVByb3RvY29sfT09IjAx
-IgogICAgICAgIEFUVFJTe2JOdW1Db25maWd1cmF0aW9uc309PSIxIgogICAgICAgIEFUVFJT
-e2JNYXhQYWNrZXRTaXplMH09PSI2NCIKICAgICAgICBBVFRSU3tzcGVlZH09PSIxMiIKICAg
-ICAgICBBVFRSU3tidXNudW19PT0iMSIKICAgICAgICBBVFRSU3tkZXZudW19PT0iMiIKICAg
-ICAgICBBVFRSU3t2ZXJzaW9ufT09IiAyLjAwIgogICAgICAgIEFUVFJTe21heGNoaWxkfT09
-IjAiCiAgICAgICAgQVRUUlN7cXVpcmtzfT09IjB4MCIKICAgICAgICBBVFRSU3thdXRob3Jp
-emVkfT09IjEiCgogICAgICBsb29raW5nIGF0IHBhcmVudCBkZXZpY2UgJy9kZXZpY2VzL3Bj
-aTAwMDA6MDAvMDAwMDowMDoxZC4wL3VzYjEnOgogICAgICAgIEtFUk5FTFM9PSJ1c2IxIgog
-ICAgICAgIFNVQlNZU1RFTVM9PSJ1c2IiCiAgICAgICAgRFJJVkVSUz09InVzYiIKICAgICAg
-ICBBVFRSU3tjb25maWd1cmF0aW9ufT09IiIKICAgICAgICBBVFRSU3tiTnVtSW50ZXJmYWNl
-c309PSIgMSIKICAgICAgICBBVFRSU3tiQ29uZmlndXJhdGlvblZhbHVlfT09IjEiCiAgICAg
-ICAgQVRUUlN7Ym1BdHRyaWJ1dGVzfT09ImUwIgogICAgICAgIEFUVFJTe2JNYXhQb3dlcn09
-PSIgIDBtQSIKICAgICAgICBBVFRSU3t1cmJudW19PT0iMzkiCiAgICAgICAgQVRUUlN7aWRW
-ZW5kb3J9PT0iMWQ2YiIKICAgICAgICBBVFRSU3tpZFByb2R1Y3R9PT0iMDAwMSIKICAgICAg
-ICBBVFRSU3tiY2REZXZpY2V9PT0iMDIwNiIKICAgICAgICBBVFRSU3tiRGV2aWNlQ2xhc3N9
-PT0iMDkiCiAgICAgICAgQVRUUlN7YkRldmljZVN1YkNsYXNzfT09IjAwIgogICAgICAgIEFU
-VFJTe2JEZXZpY2VQcm90b2NvbH09PSIwMCIKICAgICAgICBBVFRSU3tiTnVtQ29uZmlndXJh
-dGlvbnN9PT0iMSIKICAgICAgICBBVFRSU3tiTWF4UGFja2V0U2l6ZTB9PT0iNjQiCiAgICAg
-ICAgQVRUUlN7c3BlZWR9PT0iMTIiCiAgICAgICAgQVRUUlN7YnVzbnVtfT09IjEiCiAgICAg
-ICAgQVRUUlN7ZGV2bnVtfT09IjEiCiAgICAgICAgQVRUUlN7dmVyc2lvbn09PSIgMS4xMCIK
-ICAgICAgICBBVFRSU3ttYXhjaGlsZH09PSIyIgogICAgICAgIEFUVFJTe3F1aXJrc309PSIw
-eDAiCiAgICAgICAgQVRUUlN7YXV0aG9yaXplZH09PSIxIgogICAgICAgIEFUVFJTe21hbnVm
-YWN0dXJlcn09PSJMaW51eCAyLjYuMjYtMS02ODYgdWhjaV9oY2QiCiAgICAgICAgQVRUUlN7
-cHJvZHVjdH09PSJVSENJIEhvc3QgQ29udHJvbGxlciIKICAgICAgICBBVFRSU3tzZXJpYWx9
-PT0iMDAwMDowMDoxZC4wIgogICAgICAgIEFUVFJTe2F1dGhvcml6ZWRfZGVmYXVsdH09PSIx
-IgoKICAgICAgbG9va2luZyBhdCBwYXJlbnQgZGV2aWNlICcvZGV2aWNlcy9wY2kwMDAwOjAw
-LzAwMDA6MDA6MWQuMCc6CiAgICAgICAgS0VSTkVMUz09IjAwMDA6MDA6MWQuMCIKICAgICAg
-ICBTVUJTWVNURU1TPT0icGNpIgogICAgICAgIERSSVZFUlM9PSJ1aGNpX2hjZCIKICAgICAg
-ICBBVFRSU3t2ZW5kb3J9PT0iMHg4MDg2IgogICAgICAgIEFUVFJTe2RldmljZX09PSIweDI2
-NTgiCiAgICAgICAgQVRUUlN7c3Vic3lzdGVtX3ZlbmRvcn09PSIweDEwNDMiCiAgICAgICAg
-QVRUUlN7c3Vic3lzdGVtX2RldmljZX09PSIweDgyZDgiCiAgICAgICAgQVRUUlN7Y2xhc3N9
-PT0iMHgwYzAzMDAiCiAgICAgICAgQVRUUlN7aXJxfT09IjIzIgogICAgICAgIEFUVFJTe2xv
-Y2FsX2NwdXN9PT0iZmYiCiAgICAgICAgQVRUUlN7bG9jYWxfY3B1bGlzdH09PSIwLTciCiAg
-ICAgICAgQVRUUlN7bW9kYWxpYXN9PT0icGNpOnYwMDAwODA4NmQwMDAwMjY1OHN2MDAwMDEw
-NDNzZDAwMDA4MkQ4YmMwQ3NjMDNpMDAiCiAgICAgICAgQVRUUlN7YnJva2VuX3Bhcml0eV9z
-dGF0dXN9PT0iMCIKICAgICAgICBBVFRSU3ttc2lfYnVzfT09IiIKCiAgICAgIGxvb2tpbmcg
-YXQgcGFyZW50IGRldmljZSAnL2RldmljZXMvcGNpMDAwMDowMCc6CiAgICAgICAgS0VSTkVM
-Uz09InBjaTAwMDA6MDAiCiAgICAgICAgU1VCU1lTVEVNUz09IiIKICAgICAgICBEUklWRVJT
-PT0iIgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCnN1ZG8gZXZ0ZXN0IC9kZXYvaW5wdXQvZXZlbnQx
-MQoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tCnN1ZG8gYXB0LWdldCBpbnN0YWxsIGxpYmJsdWV0b290
-aC1kZXYKCmNkIGJkcmVtb3RlLTAuMi8KbWFrZQogICAgZ2NjIC1PMyBiZHJlbW90ZWQuYyAt
-byBiZHJlbW90ZWQgLWxwdGhyZWFkCgpzdWRvIGNwIC0tdmVyYm9zZSAgYmRyZW1vdGVkIC91
-c3IvYmluL2JkcmVtb3RlZAogICAgYGJkcmVtb3RlZCcgLT4gYC91c3IvYmluL2JkcmVtb3Rl
-ZCcKc3VkbyBjaG1vZCAtLXZlcmJvc2UgNzU1IC91c3IvYmluL2JkcmVtb3RlZAogICAgbW9k
-ZSBvZiBgL3Vzci9iaW4vYmRyZW1vdGVkJyBjaGFuZ2VkIHRvIDA3NTUgKHJ3eHIteHIteCkK
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tCgpzdWRvIGhpZGQgLS1raWxsIDAwOjFFOjNEOjE1OjBBOjRG
-CnN1ZG8gaGNpdG9vbCBjb24KICAgIENvbm5lY3Rpb25zOgoKYmRyZW1vdGVkIC1oCnN1ZG8g
-YmRyZW1vdGVkIC1hIDAwOjFFOjNEOjE1OjBBOjRGIC1wIDg4ODggLWQgNCAtbgogICAgZGV0
-PTAsIHBvcnQ9ODg4OCwgdG1vdXQ9NjAsIHJlcD0xMCwgZGViPTQsIGFkZHI9MDA6MUU6M0Q6
-MTU6MEE6NEYKICAgIENhbid0IGxpc3RlbiBvbiBISUQgY29udHJvbCBjaGFubmVsOiBBZGRy
-ZXNzIGFscmVhZHkgaW4gdXNlCiAgICBCVEJEIHRyeSB0byByZWNvbm5lY3QuCiAgICBDYW4n
-dCBsaXN0ZW4gb24gSElEIGNvbnRyb2wgY2hhbm5lbDogQWRkcmVzcyBhbHJlYWR5IGluIHVz
-ZQogICAgQlRCRCB0cnkgdG8gcmVjb25uZWN0LgoKc3VkbyAvZXRjL2luaXQuZC9saXJjIHN0
-b3AKc3VkbyBsaXJjZCAtSCBudWxsIC0tY29ubmVjdCAxMjcuMC4wLjE6ODg4OAppcncKICAg
-ICMgbm8gb3V0cHV0CgpzdWRvIGtpbGxhbGwgLTkgYmRyZW1vdGVkCnN1ZG8ga2lsbGFsbCAt
-OSBsaXJjZAoKc3VkbyBiZHJlbW90ZWQgLWEgMDA6MUU6M0Q6MTU6MEE6NEYgLXAgODg4OAog
-ICAgIyAxMDAlIGNwdSBsb2FkLi4uLgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K
---------------070004070302030405090402
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
 Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
---------------070004070302030405090402
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---------------070004070302030405090402--
