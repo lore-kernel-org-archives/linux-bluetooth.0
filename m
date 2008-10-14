@@ -1,54 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Better debug when failing to probe a device
+Subject: [PATCH] Update udev rules for udev 098 and newer
 From: Bastien Nocera <hadess@hadess.net>
 To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="=-NOpqaFhj4YYSAYGQXNAb"
-Date: Tue, 14 Oct 2008 22:01:07 +0100
-Message-Id: <1224018067.5268.854.camel@cookie.hadess.net>
+Content-Type: multipart/mixed; boundary="=-3wH/yr3DU3ciwsOS7SQn"
+Date: Tue, 14 Oct 2008 22:00:37 +0100
+Message-Id: <1224018037.5268.850.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---=-NOpqaFhj4YYSAYGQXNAb
+--=-3wH/yr3DU3ciwsOS7SQn
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-The previous error message was a bit terse.
+As per https://bugzilla.redhat.com/show_bug.cgi?id=246840
+and the udev release notes, update the udev rules for newer
+versions of udev (>= 098).
 
---=-NOpqaFhj4YYSAYGQXNAb
-Content-Disposition: attachment; filename="0002-Better-debug-when-failing-to-probe-a-device.patch"
-Content-Type: text/x-patch; name="0002-Better-debug-when-failing-to-probe-a-device.patch"; charset="ISO-8859-1"
+--=-3wH/yr3DU3ciwsOS7SQn
+Content-Disposition: attachment; filename="0001-Update-udev-rules-for-udev-098-and-newer.patch"
+Content-Type: text/x-patch; name="0001-Update-udev-rules-for-udev-098-and-newer.patch"; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 
->From 5c71324238e5380530a298bb63ec9d79b7a1f219 Mon Sep 17 00:00:00 2001
+>From fcf1518fd2cc804d339b07d1bfbfd9386ac5da22 Mon Sep 17 00:00:00 2001
 From: Bastien Nocera <hadess@hadess.net>
-Date: Tue, 14 Oct 2008 21:58:51 +0100
-Subject: [PATCH] Better debug when failing to probe a device
+Date: Tue, 14 Oct 2008 21:58:02 +0100
+Subject: [PATCH] Update udev rules for udev 098 and newer
 
-The previous error message was a bit terse.
+As per https://bugzilla.redhat.com/show_bug.cgi?id=246840
+and the udev release notes, update the udev rules for newer
+versions of udev (>= 098).
 ---
- src/device.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ scripts/bluetooth.rules |   24 ++++++++++++------------
+ 1 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 7294d3c..2a48406 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -646,8 +646,8 @@ void device_probe_drivers(struct btd_device *device, GSList *uuids)
+diff --git a/scripts/bluetooth.rules b/scripts/bluetooth.rules
+index 0957225..072335f 100644
+--- a/scripts/bluetooth.rules
++++ b/scripts/bluetooth.rules
+@@ -1,35 +1,35 @@
+ # Brain Boxes BL-620 Bluetooth Adapter
+-SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="Brain Boxes", SYSFS{prod_id2}=="Bluetooth PC Card", ENV{HCIOPTS}="bboxes", RUN+="bluetooth_serial"
++SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="Brain Boxes", ATTRS{prod_id2}=="Bluetooth PC Card", ENV{HCIOPTS}="bboxes", RUN+="bluetooth_serial"
  
- 			err = driver->probe(device, probe_uuids);
- 			if (err < 0) {
--				error("probe failed for driver %s",
--							driver->name);
-+				error("probe failed with driver %s for device %s",
-+							driver->name, device->path);
+ # Xircom CreditCard Bluetooth Adapter
+-SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="Xircom", SYSFS{prod_id3}=="CBT", ENV{HCIOPTS}="xircom", RUN+="bluetooth_serial"
++SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="Xircom", ATTRS{prod_id3}=="CBT", ENV{HCIOPTS}="xircom", RUN+="bluetooth_serial"
  
- 				g_free(driver_data);
- 				g_slist_free(probe_uuids);
+ # Xircom RealPort2 Bluetooth Adapter
+-SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="Xircom", SYSFS{prod_id3}=="CBT", ENV{HCIOPTS}="xircom", RUN+="bluetooth_serial"
++SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="Xircom", ATTRS{prod_id3}=="CBT", ENV{HCIOPTS}="xircom", RUN+="bluetooth_serial"
+ 
+ # IBM Bluetooth PC Card II
+-SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="IBM", SYSFS{prod_id2}=="Bluetooth PC Card II", ENV{HCIOPTS}="tdk", RUN+="bluetooth_serial"
++SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="IBM", ATTRS{prod_id2}=="Bluetooth PC Card II", ENV{HCIOPTS}="tdk", RUN+="bluetooth_serial"
+ 
+ # TDK Bluetooth PC Card
+-SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="TDK", SYSFS{prod_id2}=="Bluetooth PC Card II", ENV{HCIOPTS}="tdk", RUN+="bluetooth_serial"
++SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="TDK", ATTRS{prod_id2}=="Bluetooth PC Card II", ENV{HCIOPTS}="tdk", RUN+="bluetooth_serial"
+ 
+ # AmbiCom BT2000C Bluetooth PC/CF Card
+-SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="AmbiCom BT2000C", SYSFS{prod_id2}=="Bluetooth PC/CF Card", ENV{HCIOPTS}="bt2000c", RUN+="bluetooth_serial"
++SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="AmbiCom BT2000C", ATTRS{prod_id2}=="Bluetooth PC/CF Card", ENV{HCIOPTS}="bt2000c", RUN+="bluetooth_serial"
+ 
+ # COM One Platinium Bluetooth PC Card
+-SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="COM1 SA", SYSFS{prod_id2}=="MC310 CARD", ENV{HCIOPTS}="comone", RUN+="bluetooth_serial"
++SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="COM1 SA", ATTRS{prod_id2}=="MC310 CARD", ENV{HCIOPTS}="comone", RUN+="bluetooth_serial"
+ 
+ # Sphinx PICO Card
+-SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="SPHINX", SYSFS{prod_id2}=="BT-CARD", ENV{HCIOPTS}="picocard", RUN+="bluetooth_serial"
++SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="SPHINX", ATTRS{prod_id2}=="BT-CARD", ENV{HCIOPTS}="picocard", RUN+="bluetooth_serial"
+ 
+ # H-Soft blue+Card
+-SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="H-Soft", SYSFS{prod_id2}=="Blue+CARD", ENV{HCIOPTS}="$sysfs{manf_id},$sysfs{card_id}", RUN+="bluetooth_serial"
++SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="H-Soft", ATTRS{prod_id2}=="Blue+CARD", ENV{HCIOPTS}="$sysfs{manf_id},$sysfs{card_id}", RUN+="bluetooth_serial"
+ 
+ # Compaq iPAQ Bluetooth Sleeve, Belkin F8T020, any other muppet who used an OXCF950 and didn't bother to program it appropriately.
+-SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="CF CARD", SYSFS{prod_id2}=="GENERIC", ENV{HCIOPTS}="$sysfs{manf_id},$sysfs{card_id}", RUN+="bluetooth_serial"
++SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="CF CARD", ATTRS{prod_id2}=="GENERIC", ENV{HCIOPTS}="$sysfs{manf_id},$sysfs{card_id}", RUN+="bluetooth_serial"
+ 
+ # Zoom Bluetooth Card and Sitecom CN-504 Card
+-SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="PCMCIA", SYSFS{prod_id2}=="Bluetooth Card", ENV{HCIOPTS}="zoom", RUN+="bluetooth_serial"
++SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="PCMCIA", ATTRS{prod_id2}=="Bluetooth Card", ENV{HCIOPTS}="zoom", RUN+="bluetooth_serial"
+ 
+ # CC&C BT0100M
+-SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="Bluetooth BT0100M", ENV{HCIOPTS}="bcsp 115200", RUN+="bluetooth_serial"
++SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="Bluetooth BT0100M", ENV{HCIOPTS}="bcsp 115200", RUN+="bluetooth_serial"
 -- 
 1.5.5.2
 
 
---=-NOpqaFhj4YYSAYGQXNAb--
+--=-3wH/yr3DU3ciwsOS7SQn--
 
