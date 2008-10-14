@@ -1,95 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Update udev rules for udev 098 and newer
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="=-3wH/yr3DU3ciwsOS7SQn"
-Date: Tue, 14 Oct 2008 22:00:37 +0100
-Message-Id: <1224018037.5268.850.camel@cookie.hadess.net>
-Mime-Version: 1.0
+Message-ID: <f9d4bd30810141147o60a2b0ban3773a949b5c6c236@mail.gmail.com>
+Date: Tue, 14 Oct 2008 15:47:29 -0300
+From: "Claudio Takahasi" <claudio.takahasi@openbossa.org>
+To: "Bastien Nocera" <hadess@hadess.net>
+Subject: Re: [PATCH] Fix possible crash on startup
+Cc: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+	"Johan Hedberg" <johan.hedberg@gmail.com>,
+	"BlueZ development" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1223907411.31961.3251.camel@cookie.hadess.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <1223766202.31961.868.camel@cookie.hadess.net>
+	 <FA1352D8-03D2-4979-99A4-5EFE5EB8872E@gmail.com>
+	 <2d5a2c100810130643h81e09f0qc3c9cd57602867e7@mail.gmail.com>
+	 <1223907411.31961.3251.camel@cookie.hadess.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+2008/10/13 Bastien Nocera <hadess@hadess.net>:
+> On Mon, 2008-10-13 at 10:43 -0300, Luiz Augusto von Dentz wrote:
+>> Hi,
+>>
+>> I guess we can make all driver to do the discover on Connect if the
+>> record is not available, similar to what is done in audio.
+>
+> I'm not certain whether the problem is no record, or a broken one.
+>
+> This is the file causing problems, the device line that causes the crash
+> is the one starting with 00:1E:45:AD:F1:96. So there is data, but it
+> probably isn't parsed properly.
+>
+> Cheers
+>
 
---=-3wH/yr3DU3ciwsOS7SQn
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Hi,
 
-As per https://bugzilla.redhat.com/show_bug.cgi?id=246840
-and the udev release notes, update the udev rules for newer
-versions of udev (>= 098).
+The source of this problem is an invalid sequence in the service
+record. See entry 00:1E:45:AD:F1:96#02008007 in sdp record file.
+About the Johan's questions:
+1. we can access rec->handle directly, we have to fix it
+2. service record is necessary, at least HIDDescriptorList
 
---=-3wH/yr3DU3ciwsOS7SQn
-Content-Disposition: attachment; filename="0001-Update-udev-rules-for-udev-098-and-newer.patch"
-Content-Type: text/x-patch; name="0001-Update-udev-rules-for-udev-098-and-newer.patch"; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-
->From fcf1518fd2cc804d339b07d1bfbfd9386ac5da22 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Tue, 14 Oct 2008 21:58:02 +0100
-Subject: [PATCH] Update udev rules for udev 098 and newer
-
-As per https://bugzilla.redhat.com/show_bug.cgi?id=246840
-and the udev release notes, update the udev rules for newer
-versions of udev (>= 098).
----
- scripts/bluetooth.rules |   24 ++++++++++++------------
- 1 files changed, 12 insertions(+), 12 deletions(-)
-
-diff --git a/scripts/bluetooth.rules b/scripts/bluetooth.rules
-index 0957225..072335f 100644
---- a/scripts/bluetooth.rules
-+++ b/scripts/bluetooth.rules
-@@ -1,35 +1,35 @@
- # Brain Boxes BL-620 Bluetooth Adapter
--SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="Brain Boxes", SYSFS{prod_id2}=="Bluetooth PC Card", ENV{HCIOPTS}="bboxes", RUN+="bluetooth_serial"
-+SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="Brain Boxes", ATTRS{prod_id2}=="Bluetooth PC Card", ENV{HCIOPTS}="bboxes", RUN+="bluetooth_serial"
- 
- # Xircom CreditCard Bluetooth Adapter
--SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="Xircom", SYSFS{prod_id3}=="CBT", ENV{HCIOPTS}="xircom", RUN+="bluetooth_serial"
-+SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="Xircom", ATTRS{prod_id3}=="CBT", ENV{HCIOPTS}="xircom", RUN+="bluetooth_serial"
- 
- # Xircom RealPort2 Bluetooth Adapter
--SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="Xircom", SYSFS{prod_id3}=="CBT", ENV{HCIOPTS}="xircom", RUN+="bluetooth_serial"
-+SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="Xircom", ATTRS{prod_id3}=="CBT", ENV{HCIOPTS}="xircom", RUN+="bluetooth_serial"
- 
- # IBM Bluetooth PC Card II
--SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="IBM", SYSFS{prod_id2}=="Bluetooth PC Card II", ENV{HCIOPTS}="tdk", RUN+="bluetooth_serial"
-+SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="IBM", ATTRS{prod_id2}=="Bluetooth PC Card II", ENV{HCIOPTS}="tdk", RUN+="bluetooth_serial"
- 
- # TDK Bluetooth PC Card
--SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="TDK", SYSFS{prod_id2}=="Bluetooth PC Card II", ENV{HCIOPTS}="tdk", RUN+="bluetooth_serial"
-+SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="TDK", ATTRS{prod_id2}=="Bluetooth PC Card II", ENV{HCIOPTS}="tdk", RUN+="bluetooth_serial"
- 
- # AmbiCom BT2000C Bluetooth PC/CF Card
--SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="AmbiCom BT2000C", SYSFS{prod_id2}=="Bluetooth PC/CF Card", ENV{HCIOPTS}="bt2000c", RUN+="bluetooth_serial"
-+SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="AmbiCom BT2000C", ATTRS{prod_id2}=="Bluetooth PC/CF Card", ENV{HCIOPTS}="bt2000c", RUN+="bluetooth_serial"
- 
- # COM One Platinium Bluetooth PC Card
--SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="COM1 SA", SYSFS{prod_id2}=="MC310 CARD", ENV{HCIOPTS}="comone", RUN+="bluetooth_serial"
-+SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="COM1 SA", ATTRS{prod_id2}=="MC310 CARD", ENV{HCIOPTS}="comone", RUN+="bluetooth_serial"
- 
- # Sphinx PICO Card
--SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="SPHINX", SYSFS{prod_id2}=="BT-CARD", ENV{HCIOPTS}="picocard", RUN+="bluetooth_serial"
-+SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="SPHINX", ATTRS{prod_id2}=="BT-CARD", ENV{HCIOPTS}="picocard", RUN+="bluetooth_serial"
- 
- # H-Soft blue+Card
--SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="H-Soft", SYSFS{prod_id2}=="Blue+CARD", ENV{HCIOPTS}="$sysfs{manf_id},$sysfs{card_id}", RUN+="bluetooth_serial"
-+SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="H-Soft", ATTRS{prod_id2}=="Blue+CARD", ENV{HCIOPTS}="$sysfs{manf_id},$sysfs{card_id}", RUN+="bluetooth_serial"
- 
- # Compaq iPAQ Bluetooth Sleeve, Belkin F8T020, any other muppet who used an OXCF950 and didn't bother to program it appropriately.
--SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="CF CARD", SYSFS{prod_id2}=="GENERIC", ENV{HCIOPTS}="$sysfs{manf_id},$sysfs{card_id}", RUN+="bluetooth_serial"
-+SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="CF CARD", ATTRS{prod_id2}=="GENERIC", ENV{HCIOPTS}="$sysfs{manf_id},$sysfs{card_id}", RUN+="bluetooth_serial"
- 
- # Zoom Bluetooth Card and Sitecom CN-504 Card
--SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="PCMCIA", SYSFS{prod_id2}=="Bluetooth Card", ENV{HCIOPTS}="zoom", RUN+="bluetooth_serial"
-+SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="PCMCIA", ATTRS{prod_id2}=="Bluetooth Card", ENV{HCIOPTS}="zoom", RUN+="bluetooth_serial"
- 
- # CC&C BT0100M
--SUBSYSTEM=="tty", BUS=="pcmcia", SYSFS{prod_id1}=="Bluetooth BT0100M", ENV{HCIOPTS}="bcsp 115200", RUN+="bluetooth_serial"
-+SUBSYSTEM=="tty", SUBSYSTEMS=="pcmcia", ATTRS{prod_id1}=="Bluetooth BT0100M", ENV{HCIOPTS}="bcsp 115200", RUN+="bluetooth_serial"
+Claudio
 -- 
-1.5.5.2
-
-
---=-3wH/yr3DU3ciwsOS7SQn--
-
+--
+Claudio Takahasi
+Instituto Nokia de Tecnologia
+Recife - Pernambuco - Brasil
++55 81 30879999
