@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <782ce16c0810141705r34818889iea8db59ee3c4096d@mail.gmail.com>
-Date: Wed, 15 Oct 2008 02:05:04 +0200
-From: "=?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?=" <joao.vita@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <20081006020934.GA20717@tango.0pointer.de>
-MIME-Version: 1.0
-References: <20081006020934.GA20717@tango.0pointer.de>
-Subject: [Bluez-devel] Fwd: [pulseaudio-discuss] [ANNOUNCE] PulseAudio 0.9.13
+Date: Tue, 14 Oct 2008 20:26:49 +0200
+From: Andre Roth <lynx@netlabs.org>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20081014202649.47e57db0@netlabs.org>
+Mime-Version: 1.0
+Subject: [Bluez-devel] BT_GETCAPABILITIES failed
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,35 +14,82 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="iso-8859-1"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Qmx1ZXRvb3RoIHN1cHBvcnQgaXMgbm93IGluIG1haW5zdHJlYW0gUHVsc2VBdWRpbyEKCgotLS0t
-LS0tLS0tIEZvcndhcmRlZCBtZXNzYWdlIC0tLS0tLS0tLS0KRnJvbTogTGVubmFydCBQb2V0dGVy
-aW5nIDxsZW5uYXJ0QHBvZXR0ZXJpbmcubmV0PgpEYXRlOiBNb24sIE9jdCA2LCAyMDA4IGF0IDQ6
-MDkgQU0KU3ViamVjdDogW3B1bHNlYXVkaW8tZGlzY3Vzc10gW0FOTk9VTkNFXSBQdWxzZUF1ZGlv
-IDAuOS4xMwpUbzogUHVsc2VBdWRpbyBEaXNjdXNzaW9uIExpc3QgPHB1bHNlYXVkaW8tZGlzY3Vz
-c0BtYWlsLjBwb2ludGVyLmRlPgoKCkhleWEhCgpUaGlzIGlzIG1vc3RseSBhIGJ1Z2ZpeCByZWxl
-YXNlLiBIb3dldmVyLCBpdCBjb250YWlucyBzb21lIG1pbm9yIEFQSQphZGRpdGlvbnMgYW5kIG5l
-dyBCbHVldG9vdGggc3VwcG9ydCAoZXhwZXJpbWVudGFsIGZvciBub3cpIGNvbnRyaWJ1dGVkCmJ5
-IEdvb2dsZSBTdW1tZXIgU3R1ZGVudCBKb8OjbyBQYXVsbyBSZWNoaSBWaXRhLgoKaHR0cDovLzBw
-b2ludGVyLmRlL2xlbm5hcnQvcHJvamVjdHMvcHVsc2VhdWRpby9wdWxzZWF1ZGlvLTAuOS4xMy50
-YXIuZ3oKCkNoYW5nZXM6CgpodHRwOi8vcHVsc2VhdWRpby5vcmcvbWlsZXN0b25lLzAuOS4xMwoK
-TGVubmFydAoKLS0KTGVubmFydCBQb2V0dGVyaW5nICAgICAgICAgICAgICAgICAgICAgICAgUmVk
-IEhhdCwgSW5jLgpsZW5uYXJ0IFthdF0gcG9ldHRlcmluZyBbZG90XSBuZXQgICAgICAgICBJQ1Ej
-IDExMDYwNTUzCmh0dHA6Ly8wcG9pbnRlci5uZXQvbGVubmFydC8gICAgICAgICAgIEdudVBHIDB4
-MUEwMTVDQzQKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
-cHVsc2VhdWRpby1kaXNjdXNzIG1haWxpbmcgbGlzdApwdWxzZWF1ZGlvLWRpc2N1c3NAbWFpbC4w
-cG9pbnRlci5kZQpodHRwczovL3RhbmdvLjBwb2ludGVyLmRlL21haWxtYW4vbGlzdGluZm8vcHVs
-c2VhdWRpby1kaXNjdXNzCgoKCi0tIApKb8OjbyBQYXVsbyBSZWNoaSBWaXRhCk1TYyBDb21wdXRl
-ciBTY2llbmNlIFN0dWRlbnQKQ29tcHV0ZXIgRW5naW5lZXIKSUMgLyBVbmljYW1wCmh0dHA6Ly9q
-cHJ2aXRhLndvcmRwcmVzcy5jb20vCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KVGhpcyBTRi5OZXQgZW1haWwg
-aXMgc3BvbnNvcmVkIGJ5IHRoZSBNb2JsaW4gWW91ciBNb3ZlIERldmVsb3BlcidzIGNoYWxsZW5n
-ZQpCdWlsZCB0aGUgY29vbGVzdCBMaW51eCBiYXNlZCBhcHBsaWNhdGlvbnMgd2l0aCBNb2JsaW4g
-U0RLICYgd2luIGdyZWF0IHByaXplcwpHcmFuZCBwcml6ZSBpcyBhIHRyaXAgZm9yIHR3byB0byBh
-biBPcGVuIFNvdXJjZSBldmVudCBhbnl3aGVyZSBpbiB0aGUgd29ybGQKaHR0cDovL21vYmxpbi1j
-b250ZXN0Lm9yZy9yZWRpcmVjdC5waHA/YmFubmVyX2lkPTEwMCZ1cmw9LwpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpCbHVlei1kZXZlbCBtYWlsaW5nIGxp
-c3QKQmx1ZXotZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNl
-Zm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL2JsdWV6LWRldmVsCg==
+
+Hello, =
+
+
+I'm trying to get my headset working, a HBH-610a from sony-ericsson.
+It worked with the old hci_usb and the flow-control patches until kernel
+2.6.21.5
+
+My setup:
+- kernel 2.6.27 or vmlinuz-2.6.26-mh7
+- bluez-utils 4.13
+- bluez-gnome-1.8
+- bluez-firmware-1.2 (unsure if needed)
+
+I'm starting bluetoothd and I'm able to pair the headset using the
+bluetooth-wizard. The pairing sometimes crashes the kernel with
+2.6.26-mh7. =
+
+
+My .asoundrc:
+pcm.headset {
+   type bluetooth
+   device 00:12:EE:A6:FC:1E
+}
+
+But when I'm trying to record audio from the headset I get the
+following, independent of prior pairing or not:
+
+$ arecord -D headset -f S16_LE test.wav
+ALSA lib pcm_bluetooth.c:1516:(audioservice_recv) trying to receive msg fro=
+m audio service...
+ALSA lib pcm_bluetooth.c:1520:(audioservice_recv) Received BT_GETCAPABILITI=
+ES_RSP
+ALSA lib pcm_bluetooth.c:1624:(bluetooth_init) BT_GETCAPABILITIES failed : =
+Input/output error(5)
+arecord: main:564: audio open error: Input/output error
+
+I tracked it down to the function manager_find_device in
+audio/manager.c, called from handle_getcapabilities_req in
+audio/unix.c:
+
+    struct audio_device *manager_find_device(const bdaddr_t *bda,
+                                             const char *interface,
+                                             gboolean connected)
+    {
+        GSList *l;
+        for (l =3D devices; l !=3D NULL; l =3D l->next) {
+ =
+
+since devices is NULL, the function fails. no pairing or connection
+attempt. the functions audio_manager_init and manager_get_device are
+never called, which would probably fill up the linked list.
+
+Here my questions:
+- what am I doing wrong ?
+- is the procedure right for arecord/aplay ?
+- what can I do to help ?
+
+regards
+
+ andr=E9
+
+--
+Andre Roth   | <lynx@netlabs.org>
+GPG: FADF988E| 0959 4D7C F8ED DF4B 90A6  CF71 9EDF 52D1 FADF 988E
+
+-------------------------------------------------------------------------
+This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
+Build the coolest Linux based applications with Moblin SDK & win great priz=
+es
+Grand prize is a trip for two to an Open Source event anywhere in the world
+http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
