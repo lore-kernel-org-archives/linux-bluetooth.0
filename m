@@ -1,14 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 15 Oct 2008 17:50:35 +0400
+From: John Frankish <frankish@dubai.oilfield.slb.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <48F5E741.7020907@powercraft.nl>
-References: <48F1F7C0.4040705@powercraft.nl>
-	<1223819361.31961.1763.camel@cookie.hadess.net>
-	<48F5E741.7020907@powercraft.nl>
-Date: Wed, 15 Oct 2008 14:54:53 +0100
-Message-Id: <1224078893.5268.2962.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] Sony Bluetooth BD Remote Control
+Message-id: <0K8S00J8S94H5090@ae0043mbx01.mail.slb.com>
+MIME-version: 1.0
+Subject: Re: [Bluez-devel] Pairing with a Headset
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,27 +17,38 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Wed, 2008-10-15 at 14:51 +0200, Jelle de Jong wrote:
-<snip>
-> I have been working hard to get the bluetooth remote working, but
-> without success. I build new non official debian packages of the latest
-> git. I installed them with success. Loaded the new daemon tried to
-> connect with the bluetooth-wizard but it will not pair/connect. With the
-> hidd system is does connect but the situation is exactly the same as
-> with the ordinal report.
-> 
-> What commands are needed to get the device working? I would like to be
-> able to use xbindings --key to attach commands/keybindings to the keys.
-> 
-> See the attachment for all the steps I did, the new trials are on the
-> end of the documents.
+At 15:36 12-10-08, you wrote:
+>Hi,
+>
+>I'm using bluez-4.12/bluez-gnome-1.8 and tried out pairing my laptop
+>with a SE HBH-610 headset
+>
+>A couple of questions:
+>
+>snip
+>
+>Q2 My os uses 2.6.26 and I have the following bt modules loaded:
+>
+>Module                  Size  Used by
+>sco                     9472  2
+>bnep                   11264  2
+>rfcomm                 29328  4
+>l2cap                  17920  16 bnep,rfcomm
+>hci_usb                13084  3
+>bluetooth              42852  11 sco,bnep,rfcomm,l2cap,hci_usb
+>
+>Do I need to apply the seven bt patches for 2.6.26 or will the
+>headset work as is - i.e. is the btusb (?) module required for sco to work?
+>-------------------------------------------------------------------------
+So, after applying patch-mh7 and recompiling, I get the btusb module 
+instead of hci_usb
 
-I mentioned it in the past, I'll mention it again: DO NOT USE HIDD.
+When pairing using bluez-gnome, everything proceeds as normal up 
+until the "pairing complete" message at which point the system 
+freezes and the only way out is to switch off.
 
-It doesn't have support for the PS3 BD remote. Make sure you have the
-latest git, I fixed the input event generation for the remote yesterday.
-
-Cheers
+It's difficult to trouble-shoot as this system is totally ram based - 
+did anybody else see this problem? 
 
 
 -------------------------------------------------------------------------
