@@ -1,27 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Update udev rules for udev 098 and newer
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Bastien Nocera <hadess@hadess.net>
+Subject: Re: [PATCHes] Better buttons in adapter properties
+From: Bastien Nocera <hadess@hadess.net>
+To: David Sainty <david.sainty@dtsp.co.nz>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1224018037.5268.850.camel@cookie.hadess.net>
-References: <1224018037.5268.850.camel@cookie.hadess.net>
+In-Reply-To: <48F52A51.6010506@dtsp.co.nz>
+References: <1224003756.5268.371.camel@cookie.hadess.net>
+	 <48F523EC.9010007@dtsp.co.nz>
+	 <1224025489.5268.1049.camel@cookie.hadess.net>
+	 <48F52A51.6010506@dtsp.co.nz>
 Content-Type: text/plain
-Date: Thu, 16 Oct 2008 01:39:10 +0200
-Message-Id: <1224113950.28173.35.camel@californication>
+Date: Wed, 15 Oct 2008 23:06:51 +0100
+Message-Id: <1224108411.5268.3681.camel@cookie.hadess.net>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+On Wed, 2008-10-15 at 12:25 +1300, David Sainty wrote:
+<snip>
+> 800x480 full screen.  But the standard window manager decorations on the 
+> EeePC make anything taller than 422 pixels start to not fit.
 
-> As per https://bugzilla.redhat.com/show_bug.cgi?id=246840
-> and the udev release notes, update the udev rules for newer
-> versions of udev (>= 098).
+I think we can easily reduce the space taken by the visibility and
+friendly name sections. I'll try to get a patch ready tomorrow.
 
-patch has been applied. Thanks.
-
-Regards
-
-Marcel
-
+Cheers
 
