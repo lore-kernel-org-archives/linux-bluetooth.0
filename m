@@ -1,13 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <BLU127-W5086F7E6B9F25F84000E5688300@phx.gbl>
-References: <BLU127-W5086F7E6B9F25F84000E5688300@phx.gbl>
-Date: Wed, 15 Oct 2008 17:23:34 +0200
-Message-Id: <1224084214.4764.14.camel@californication>
-Mime-Version: 1.0
-Subject: Re: [Bluez-users] Is "HCI_Read_Rssi" is the only option to get	RSSI
-	value from "Non-discoverable" Device?
+Message-ID: <BLU127-W5086F7E6B9F25F84000E5688300@phx.gbl>
+From: Ichigo Bleach <sara200t@hotmail.com>
+To: <bluez-users@lists.sourceforge.net>
+Date: Wed, 15 Oct 2008 07:11:54 -0500
+MIME-Version: 1.0
+Subject: [Bluez-users] Is "HCI_Read_Rssi" is the only option to get RSSI
+ value from "Non-discoverable" Device?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,18 +18,24 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
 
->          I am trying to develop bluetooth positioning system. I am at the point of successfully getting the RSSI value using the Inquiry_result_with_rssi with no problem.
-> However, as the security is concerned, I do not want leave the other Bluetooth device in discoverable mode. Therefore, sending inquiry_result_with_rssi will not work any more due to, in non-discoverable mode, the other Bluetooth will not reply to my inquiry.
+Dear all,
 
-the RSSI value you get from Inquiry_Result_With_RSSI and from Read_RSSI
-are _not_ the same.
+         I am trying to develop bluetooth positioning system. I am at the point of successfully getting the RSSI value using the Inquiry_result_with_rssi with no problem.
+However, as the security is concerned, I do not want leave the other Bluetooth device in discoverable mode. Therefore, sending inquiry_result_with_rssi will not work any more due to, in non-discoverable mode, the other Bluetooth will not reply to my inquiry.
 
-Regards
 
-Marcel
+My questions are:
 
+1.) Do I have only one option left to get the rssi value that is to use the "HCI_Read_Rssi" with the connected device? If there is any other option, please kindly let me know. 
+
+2.) Let say if i know the Bt_address of the other end and they are paired (with no connection), If there is a way, I can ask the rssi value from the other end directly?
+
+Thank you very much in advance,
+
+Newbie
+
+_________________________________________________________________
 
 
 -------------------------------------------------------------------------
