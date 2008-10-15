@@ -1,31 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Oct 2008 07:10:37 +0000 (GMT)
-From: =?euc-kr?B?udrC+b+t?= <chanyeol.park@samsung.com>
-Subject: Could you explain how to discover remote devices without periodic
- inquiry ?
-To: linux-bluetooth@vger.kernel.org
-Reply-to: chanyeol.park@samsung.com
-Message-id: <22696206.256481224054636606.JavaMail.weblogic@epml03>
-MIME-version: 1.0
-MIME-version: 1.0
-Content-type: text/plain; charset=euc-kr
+Subject: [PATCH] Fix Apple Wireless keyboard pairing?
+From: Bastien Nocera <hadess@hadess.net>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="=-eobfszUDYa3sHApVJP8U"
+Date: Wed, 15 Oct 2008 02:06:23 +0100
+Message-Id: <1224032783.5268.1418.camel@cookie.hadess.net>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-RGVhciBhbGwuDQpDb3VsZCB5b3UgZXhwbGFpbiBob3cgdG8gZGlzY292ZXIgcmVtb3RlIGRldmlj
-ZXMgd2l0aG91dCBwZXJpb2RpYyBpbnF1aXJ5ID8gDQpXaGVuIEkgc2VuZCBkYnVzIGNvbW1hbmQg
-obBkYnVzLXNlbmQgLS1zeXN0ZW0gLS10eXBlPW1ldGhvZF9jYWxsICAtLWRlc3Q9Im9yZy5ibHVl
-eiIgL29yZy9ibHVlei9oY2kwIG9yZy5ibHVlei5BZGFwdGVyLlN0YXJ0RGlzY292ZXJ5obAsIEJs
-dWV0b290aCBtb2R1bGUgc3RhcnRzIHBlcmlvZGljIHNlYXJjaC4gDQoNCkkganVzdCB3YW50IG9u
-bHkgbm9ybWFsIHNlYXJjaC4gRXZlbiB0aG91Z2ggSSBoYXZlIGFuIGV4cGVyaWVuY2Ugb2YgQmx1
-ZXogMy54LiBpdCdzIG5vdCBlYXN5IHRvIHVzZSBCbHVlWiA0LnggQVBJLiAgDQoNClNvbWVib2R5
-oa9zIGxpdHRsZSBoZWxwIGNvdWxkIGJlIHZlcnkgaGVscGZ1bC4gDQoNCg0KVGhhbmsgJiBSZWdh
-cmRzIAkJDQogICAgICAgICAgICAgICAgICAgIA0KQ2hhbnllb2wtUGFyaw0KRW5naW5lZXIJCSAg
-DQogICAgICAgICAgICANCk1vYmlsZSBTL1cgUGxhdGZvcm0gTGFiLiAgICAgICAgICAgICANClRl
-bGVjb21tdW5pY2F0aW9uIFImRCBDZW50ZXIgICAgICAgICAgICANClNBTVNVTkcgRUxFQ1RST05J
-Q1MgQ08uLCBMVEQuICAgICAgICAgICAgDQogICAgICAgICAgICANClRlbCA6ICs4Mi0zMS0yNzkt
-NTk0MSAgICAgICAgICAgICAgICAgICAgICAgICANCk1vYmlsZSA6ICs4Mi0xMC05OTc4LTU5NDEg
-ICAgICAgICAgICANCkUtbWFpbCA6IGNoYW55ZW9sLnBhcmtAc2Ftc3VuZy5jb20gICAgICAgICAg
-ICANCiANCiANCiA=
 
+--=-eobfszUDYa3sHApVJP8U
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+Heya,
+
+If anyone has an Apple Wireless keyboard to test pairing against. I
+believe the attached patch to be correct. Otherwise Apple keyboards
+(which use the same OUI) will get a PIN of 0000.
+
+Cheers
+
+--=-eobfszUDYa3sHApVJP8U
+Content-Disposition: attachment; filename="bluez-apple-wireless-kbd.patch"
+Content-Type: text/x-patch; name="bluez-apple-wireless-kbd.patch"; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+
+diff --git a/wizard/main.c b/wizard/main.c
+index 0854913..0340063 100644
+--- a/wizard/main.c
++++ b/wizard/main.c
+@@ -62,9 +62,10 @@ static gboolean pincode_callback(DBusGMethodInvocation *context,
+ 	const char *pincode = target_pincode;
+ 	gchar *text;
+ 
+-	/* Apple Wireless and Mighty Mouse */
+-	if (g_str_has_prefix(target_address, "00:0A:95:") == TRUE ||
+-			g_str_has_prefix(target_address, "00:14:51:") == TRUE)
++	/* Apple Wireless and Mighty Mouse, and just the mice */
++	if ((g_str_has_prefix(target_address, "00:0A:95:") == TRUE ||
++			g_str_has_prefix(target_address, "00:14:51:") == TRUE) &&
++	    target_type == BLUETOOTH_TYPE_MOUSE)
+ 		pincode = "0000";
+ 
+ 	/* Most headsets are using 0000 as pincode */
+
+--=-eobfszUDYa3sHApVJP8U--
 
