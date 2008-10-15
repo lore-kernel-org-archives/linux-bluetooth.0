@@ -1,18 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <48F6301E.30607@powercraft.nl>
-References: <48F1F7C0.4040705@powercraft.nl>
-	<1223819361.31961.1763.camel@cookie.hadess.net>
-	<48F5E741.7020907@powercraft.nl>
-	<1224078893.5268.2962.camel@cookie.hadess.net>
-	<1224083365.5268.3130.camel@cookie.hadess.net>
-	<1224083803.4764.8.camel@californication>
-	<48F6301E.30607@powercraft.nl>
-Date: Wed, 15 Oct 2008 23:05:43 +0100
-Message-Id: <1224108343.5268.3679.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Subject: Re: [Bluez-devel] [PATCH] Re:  Sony Bluetooth BD Remote Control
+Message-ID: <48F63E95.4010605@slackdot.org>
+Date: Wed, 15 Oct 2008 15:03:49 -0400
+From: deker <deker@slackdot.org>
+MIME-Version: 1.0
+To: bluez-devel@lists.sourceforge.net
+Subject: [Bluez-devel] Some questions about audio on embedded systems
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,29 +17,26 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-On Wed, 2008-10-15 at 20:02 +0200, Jelle de Jong wrote:
-<snip>
-> Thank you all for the patches and the support, after rebuilding
-> everything and trying things out. The bluetooth-applet wizzard system
-> tolled me it connected successfully. See the log below.
-> 
-> However how can I know actually use the device? I tried xbindings --key
-> to catch a key and bind it to something useful. I feel like I am back to
-> point one with the old hidd system...
+Hi,
 
-Then you need something that can listen to the event from the Linux
-input layer device. On Fedora it will probably be through lirc, and
-gnome-lirc-properties:
-http://bugzilla.gnome.org/show_bug.cgi?id=555802
+ I'm doing some research for an upcoming project where I'll need to use 
+a bluetooth headset for audio (send & recv) with a gumstix. I found the 
+following two pages:
 
-If your setup isn't customised, you should at least see some keys as
-having keysyms under X. Launch xev and press the "Play" key.
+http://bluetooth-alsa.sourceforge.net/embed.html
+http://bluetooth-alsa.sourceforge.net/embedv1.html
 
-But you'll see that something like lirc will be necessary to take full
-advantage of the remote.
+which have great information, but I'm curious as to which is the most 
+current/correct. Specifically, I'm wondering what the current status of 
+SCO audio with the gumstix (and just on regular PCs frankly) is. I 
+understand that the blues-alsa project is moving away from btsco toward 
+plugz, but didn't know how this would affect me on a gumstix.
 
-Cheers
+Any info would be greatly appreciated.
 
+Thanks,
+
+-d
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
