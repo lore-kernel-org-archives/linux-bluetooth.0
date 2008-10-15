@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?iso-8859-15?q?Fr=E9d=E9ric?= <frederic.mantegazza@gbiloba.org>
+Message-ID: <BLU127-W16B80F725862BEFF8D88BF88300@phx.gbl>
+From: Ichigo Bleach <sara200t@hotmail.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-Date: Thu, 16 Oct 2008 17:18:56 +0200
-References: <OkDjSYF4.1223643964.0334430.fma@alezan.org>
-In-Reply-To: <OkDjSYF4.1223643964.0334430.fma@alezan.org>
+Date: Wed, 15 Oct 2008 14:07:48 -0500
+In-Reply-To: <1224084214.4764.14.camel@californication>
+References: <BLU127-W5086F7E6B9F25F84000E5688300@phx.gbl>
+	<1224084214.4764.14.camel@californication>
 MIME-Version: 1.0
-Message-Id: <200810161718.56780.frederic.mantegazza@gbiloba.org>
-Subject: Re: [Bluez-users] Using a bluetooth dongle as a slave device
+Subject: Re: [Bluez-users] Is "HCI_Read_Rssi" is the only option to
+	get	RSSI	value from "Non-discoverable" Device?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,36 +18,62 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-15"
+Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-On vendredi 10 octobre 2008, Fr=E9d=E9ric wrote:
 
-> I have a usb dongle to add bluetooth support to ma machine. I mainly use
-> it to connect to a bluetooth-to-serial converter, and make tests. My
-> final application runs on a Nokia, which has build-in bluetooth.
+Thank you Marcel for your reply.
+
+As you pointed out, I went back and read the spec and found that it is absolutly true.
+
+My understanding, Read_RSSI will give the result after compare with the golden recieve power range, instead the Inq_result_with_rssi will just give me the real power recieve in dBm.
+
+I think I would be better off go with the inquiry option. However, my next concern is:
+
+1.) Can the Non-discoverable mode device response to the inquiry_result_with_rssi of the connected device or not-conected but pair device(Known the address)?
+
+Thank you very much for your time.
+
+Best regards,
+
+
+> From: marcel@holtmann.org
+> To: bluez-users@lists.sourceforge.net
+> Date: Wed, 15 Oct 2008 17:23:34 +0200
+> Subject: Re: [Bluez-users] Is "HCI_Read_Rssi" is the only option to get RSSI value from "Non-discoverable" Device?
 >
-> Now, I would like to simulate, on my machine, the hardware connected to
-> the bluetooth-to-serial device, so that I can connect to it from my
-> Nokia.
+> Hi,
 >
-> The problem is: how can I use my dongle as a slave, as a
-> bluetooth-to-serial device, to be more precise?
+>> I am trying to develop bluetooth positioning system. I am at the point of successfully getting the RSSI value using the Inquiry_result_with_rssi with no problem.
+>> However, as the security is concerned, I do not want leave the other Bluetooth device in discoverable mode. Therefore, sending inquiry_result_with_rssi will not work any more due to, in non-discoverable mode, the other Bluetooth will not reply to my inquiry.
+>
+> the RSSI value you get from Inquiry_Result_With_RSSI and from Read_RSSI
+> are _not_ the same.
+>
+> Regards
+>
+> Marcel
+>
+>
+>
+> -------------------------------------------------------------------------
+> This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
+> Build the coolest Linux based applications with Moblin SDK & win great prizes
+> Grand prize is a trip for two to an Open Source event anywhere in the world
+> http://moblin-contest.org/redirect.php?banner_id=100&url=/
+> _______________________________________________
+> Bluez-users mailing list
+> Bluez-users@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-users
 
-No idea?
+_________________________________________________________________
 
--- =
-
-    Fr=E9d=E9ric
-
-    http://www.gbiloba.org
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great priz=
-es
+Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
