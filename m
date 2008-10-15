@@ -1,42 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <e91dafd20810150632m56ba981am28f3489c0661690b@mail.gmail.com>
-Date: Wed, 15 Oct 2008 15:32:21 +0200
-From: mcINEK <mcinek@gmail.com>
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Subject: Re: [ BUG ] acl sysfs entry remains after connection error
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1223479873.4397.0.camel@californication>
+Message-ID: <48F5BA5C.2080304@comcast.net>
+Date: Wed, 15 Oct 2008 02:39:40 -0700
+From: Brian Rogers <brian_rogers@comcast.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <e91dafd20810080800o30fe2fb0v7a537715e14c44fa@mail.gmail.com>
-	 <1223479873.4397.0.camel@californication>
+To: Mario Limonciello <mario_limonciello@dell.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: SCO headset not working with 4.12
+References: <48EB9FCF.6070907@dell.com>
+In-Reply-To: <48EB9FCF.6070907@dell.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2008/10/8 Marcel Holtmann <marcel@holtmann.org>:
-> Hi,
+Mario Limonciello wrote:
+> Hi:
 >
->> I've found a bug in bluetooth stack.
->>
->> I use bluetooth on ARM Linux machine to simultaneously send pictures
->> to 2 or 3 devices.
->> In a L2CAP connection stage (socket L2CAP 'connect') sometimes I get a
->> 'Connection timeout error',
->> which is not a disaster because I can try to connect again. However
->> very often I get a kernel error,
->> which tells me that there is a duplicate entry in sysfs (acl...).
->>
->> I've checked, and indeed acl connection entries are not removed from
->> sysfs after a connection fail.
->>
->> How can I fix this?
->>
->> PS. I've got latest 2.6.26 kernel.
+> I recently upgraded to bluez-4.12 and added in the SCO patch that came
+> shortly after the 4.12 release.  It seems that my SCO headset is
+> connecting, and receiving commands for volume levels, etc, but doesn't
+> actually play back any audio.  I was trying to use the test/hstest app
+> to verify like this:
 >
-> the latest kernel is 2.6.27-rc9. Please confirm that this problem still
-> exists.
+>     ./hstest play /usr/share/sounds/alsa/Front_Center.wav
+>     00:19:7F:30:47:AB 1
+>     Voice setting: 0x0060
+>     RFCOMM channel connected
+>     SCO audio channel connected (handle 1, mtu 64)
+>
+> It just idles there sitting at that until I hit ctrl-c.  I've attached
+> bluetoothd -nd output as well.
+>   
+I've noticed this as well with the bluez 4.12 build that's currently 
+included in Intrepid. My test is to output to the headset using mplayer 
+and the alsa plugin. It doesn't always fail to start playing, but when 
+it does fail I get the same endless delay. But with a few tries, 
+sometimes requiring a restart of headsetd, it will eventually start 
+working, and it usually continues to work.
 
-I've updated and after some tests problem seems to be fixed!
+My Bluetooth device is this:
+Bus 003 Device 004: ID 0a5c:2101 Broadcom Corp. A-Link BlueUsbA2 Bluetooth
 
-Thanks.
+And my headset is the Jabra BT350.
 
-Marcin
