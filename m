@@ -1,44 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48F5BA5C.2080304@comcast.net>
-Date: Wed, 15 Oct 2008 02:39:40 -0700
-From: Brian Rogers <brian_rogers@comcast.net>
-MIME-Version: 1.0
-To: Mario Limonciello <mario_limonciello@dell.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: SCO headset not working with 4.12
-References: <48EB9FCF.6070907@dell.com>
-In-Reply-To: <48EB9FCF.6070907@dell.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Date: Wed, 15 Oct 2008 07:10:37 +0000 (GMT)
+From: =?euc-kr?B?udrC+b+t?= <chanyeol.park@samsung.com>
+Subject: Could you explain how to discover remote devices without periodic
+ inquiry ?
+To: linux-bluetooth@vger.kernel.org
+Reply-to: chanyeol.park@samsung.com
+Message-id: <22696206.256481224054636606.JavaMail.weblogic@epml03>
+MIME-version: 1.0
+MIME-version: 1.0
+Content-type: text/plain; charset=euc-kr
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Mario Limonciello wrote:
-> Hi:
->
-> I recently upgraded to bluez-4.12 and added in the SCO patch that came
-> shortly after the 4.12 release.  It seems that my SCO headset is
-> connecting, and receiving commands for volume levels, etc, but doesn't
-> actually play back any audio.  I was trying to use the test/hstest app
-> to verify like this:
->
->     ./hstest play /usr/share/sounds/alsa/Front_Center.wav
->     00:19:7F:30:47:AB 1
->     Voice setting: 0x0060
->     RFCOMM channel connected
->     SCO audio channel connected (handle 1, mtu 64)
->
-> It just idles there sitting at that until I hit ctrl-c.  I've attached
-> bluetoothd -nd output as well.
->   
-I've noticed this as well with the bluez 4.12 build that's currently 
-included in Intrepid. My test is to output to the headset using mplayer 
-and the alsa plugin. It doesn't always fail to start playing, but when 
-it does fail I get the same endless delay. But with a few tries, 
-sometimes requiring a restart of headsetd, it will eventually start 
-working, and it usually continues to work.
+RGVhciBhbGwuDQpDb3VsZCB5b3UgZXhwbGFpbiBob3cgdG8gZGlzY292ZXIgcmVtb3RlIGRldmlj
+ZXMgd2l0aG91dCBwZXJpb2RpYyBpbnF1aXJ5ID8gDQpXaGVuIEkgc2VuZCBkYnVzIGNvbW1hbmQg
+obBkYnVzLXNlbmQgLS1zeXN0ZW0gLS10eXBlPW1ldGhvZF9jYWxsICAtLWRlc3Q9Im9yZy5ibHVl
+eiIgL29yZy9ibHVlei9oY2kwIG9yZy5ibHVlei5BZGFwdGVyLlN0YXJ0RGlzY292ZXJ5obAsIEJs
+dWV0b290aCBtb2R1bGUgc3RhcnRzIHBlcmlvZGljIHNlYXJjaC4gDQoNCkkganVzdCB3YW50IG9u
+bHkgbm9ybWFsIHNlYXJjaC4gRXZlbiB0aG91Z2ggSSBoYXZlIGFuIGV4cGVyaWVuY2Ugb2YgQmx1
+ZXogMy54LiBpdCdzIG5vdCBlYXN5IHRvIHVzZSBCbHVlWiA0LnggQVBJLiAgDQoNClNvbWVib2R5
+oa9zIGxpdHRsZSBoZWxwIGNvdWxkIGJlIHZlcnkgaGVscGZ1bC4gDQoNCg0KVGhhbmsgJiBSZWdh
+cmRzIAkJDQogICAgICAgICAgICAgICAgICAgIA0KQ2hhbnllb2wtUGFyaw0KRW5naW5lZXIJCSAg
+DQogICAgICAgICAgICANCk1vYmlsZSBTL1cgUGxhdGZvcm0gTGFiLiAgICAgICAgICAgICANClRl
+bGVjb21tdW5pY2F0aW9uIFImRCBDZW50ZXIgICAgICAgICAgICANClNBTVNVTkcgRUxFQ1RST05J
+Q1MgQ08uLCBMVEQuICAgICAgICAgICAgDQogICAgICAgICAgICANClRlbCA6ICs4Mi0zMS0yNzkt
+NTk0MSAgICAgICAgICAgICAgICAgICAgICAgICANCk1vYmlsZSA6ICs4Mi0xMC05OTc4LTU5NDEg
+ICAgICAgICAgICANCkUtbWFpbCA6IGNoYW55ZW9sLnBhcmtAc2Ftc3VuZy5jb20gICAgICAgICAg
+ICANCiANCiANCiA=
 
-My Bluetooth device is this:
-Bus 003 Device 004: ID 0a5c:2101 Broadcom Corp. A-Link BlueUsbA2 Bluetooth
-
-And my headset is the Jabra BT350.
 
