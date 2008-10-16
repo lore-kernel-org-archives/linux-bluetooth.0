@@ -1,10 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: Galaha Shine <galaha.a.s@gmail.com>
-To: bluez-devel@lists.sourceforge.net
-Date: Fri, 17 Oct 2008 00:31:24 +0800
-Message-Id: <1224174684.22702.11.camel@alex-laptop>
-Mime-Version: 1.0
-Subject: [Bluez-devel] how to change volume for a2dp headset?
+Message-ID: <d89ddf300810151952x68f90edfh69aaf5efba6b1fb7@mail.gmail.com>
+Date: Wed, 15 Oct 2008 20:52:04 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <64207.71.207.70.33.1224123822.squirrel@gallery.slackdot.org>
+MIME-Version: 1.0
+References: <48F63E95.4010605@slackdot.org>
+	<d89ddf300810151713red04b2dx1f58d00bc1ba3ed1@mail.gmail.com>
+	<64207.71.207.70.33.1224123822.squirrel@gallery.slackdot.org>
+Subject: Re: [Bluez-devel] Some questions about audio on embedded systems
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,24 +21,126 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-hi,
+Deker
 
-I just wonder if it is possible to change a2dp headset volume by D-bus
-command?
+The hciattach etc patches for gumstix are buried in their openembedded
+package, but come to think of it that was special case stuff for the
+internal adapter. You'll use an external so you should be able to use
+the latest and greatest packaging of bluez. That might mean replacing
+the gumstix packge with something direct from the OE guys. You might
+need to learn more about how OE packages and distros work.
 
-I notice there is a D-bus API SetSpeakerGain in bluez 3.36. I've try it
-with my sco headset and it works. But it doesn't work when I try it with
-a a2dp headset. Dbus returns an error that is unconnected. Then I
-download bluez 4.13 which is the latest build. I notice that API
-SetSpeakerGain becomes deprecated. Meanwhile I find control-api.txt
-which seems haven't been implemented yet. 
+To test things on your laptop, use the docs at wiki.bluez.org to set
+up audio. You might be able to use d-bus calls to get the HFP
+negotiation you need. It's easiest to prototype that stuff in python
+using the examples in the wiki.
 
-Could anybody give me a hint how to control a2dp headset from host side
-by D-bus command?
+Brad
 
-regards,
-Galaha
+On Wed, Oct 15, 2008 at 8:23 PM,  <deker@slackdot.org> wrote:
+> Brad,
+>
+>  Thanks for the pointers. I was getting a little confused WRT what was the
+> current best path. Where can I find info on the hciattach patches, etc? I
+> don't recall seeing anything about that in my searching.
+>
+> I figured I'd have to use a different BT module, so I'm working with
+> prototyping on a laptop until I get my gumstix gear together. I need to
+> figure out how to use the HFP to get handsfree device events, and I figure
+> that may take a bit of time.
+>
+> Thanks again,
+>
+> -d
+>
+>> Deker
+>>
+>> The best option is to use the most recent bluez version you can and
+>> use the built-in audio service it provides. btsco and plugz are both
+>> dead ends. There is a little bit of hackery you'll have to do with eg
+>> hciattach which has patches that can't go upstream. See the gumstix
+>> openembedded package for details. Make sure you ask the gumstix folks
+>> because I believe they have a newer bluez than the default one you get
+>> in their openembedded environment.
+>>
+>> As far as hardware, if you're not using a prototype of the next
+>> gumstix board then you should add a bluetooth USB adapter that has a
+>> CSR chip in it to a verdex board. The integrated bluetooth module has
+>> not been used successfully for SCO.
+>>
+>> Brad
+>>
+>> On Wed, Oct 15, 2008 at 1:03 PM, deker <deker@slackdot.org> wrote:
+>>> Hi,
+>>>
+>>>  I'm doing some research for an upcoming project where I'll need to use
+>>> a bluetooth headset for audio (send & recv) with a gumstix. I found the
+>>> following two pages:
+>>>
+>>> http://bluetooth-alsa.sourceforge.net/embed.html
+>>> http://bluetooth-alsa.sourceforge.net/embedv1.html
+>>>
+>>> which have great information, but I'm curious as to which is the most
+>>> current/correct. Specifically, I'm wondering what the current status of
+>>> SCO audio with the gumstix (and just on regular PCs frankly) is. I
+>>> understand that the blues-alsa project is moving away from btsco toward
+>>> plugz, but didn't know how this would affect me on a gumstix.
+>>>
+>>> Any info would be greatly appreciated.
+>>>
+>>> Thanks,
+>>>
+>>> -d
+>>>
+>>> -------------------------------------------------------------------------
+>>> This SF.Net email is sponsored by the Moblin Your Move Developer's
+>>> challenge
+>>> Build the coolest Linux based applications with Moblin SDK & win great
+>>> prizes
+>>> Grand prize is a trip for two to an Open Source event anywhere in the
+>>> world
+>>> http://moblin-contest.org/redirect.php?banner_id=100&url=/
+>>> _______________________________________________
+>>> Bluez-devel mailing list
+>>> Bluez-devel@lists.sourceforge.net
+>>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>>>
+>>
+>>
+>>
+>> --
+>> Brad Midgley
+>>
+>> -------------------------------------------------------------------------
+>> This SF.Net email is sponsored by the Moblin Your Move Developer's
+>> challenge
+>> Build the coolest Linux based applications with Moblin SDK & win great
+>> prizes
+>> Grand prize is a trip for two to an Open Source event anywhere in the
+>> world
+>> http://moblin-contest.org/redirect.php?banner_id=100&url=/
+>> _______________________________________________
+>> Bluez-devel mailing list
+>> Bluez-devel@lists.sourceforge.net
+>> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>>
+>
+>
+> -------------------------------------------------------------------------
+> This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
+> Build the coolest Linux based applications with Moblin SDK & win great prizes
+> Grand prize is a trip for two to an Open Source event anywhere in the world
+> http://moblin-contest.org/redirect.php?banner_id=100&url=/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+>
 
+
+
+-- 
+Brad Midgley
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
