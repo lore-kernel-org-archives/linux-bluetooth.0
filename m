@@ -1,15 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <89b6ba3a0810190855g2aa8bd00v9fe2c782fe5efb3e@mail.gmail.com>
-Date: Sun, 19 Oct 2008 17:55:53 +0200
-From: "Patryk Zawadzki" <patrys@pld-linux.org>
-To: "BlueZ users" <bluez-users@lists.sourceforge.net>,
-	"BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <48FA49A4.9040908@powercraft.nl>
-MIME-Version: 1.0
-References: <mailman.81198.1224358186.3608.bluez-users@lists.sourceforge.net>
-	<89b6ba3a0810181248u29129a09v50c7befde6741e5b@mail.gmail.com>
-	<48FA49A4.9040908@powercraft.nl>
-Subject: Re: [Bluez-devel] [Bluez-users] Motorola S9 and BlueZ 4.14
+Message-Id: <9038C689-4CCE-403B-8F7A-F3C3C98C877A@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <48F79CEC.2020803@slackdot.org>
+Mime-Version: 1.0 (Apple Message framework v929.2)
+Date: Fri, 17 Oct 2008 00:54:40 +0300
+References: <48F79CEC.2020803@slackdot.org>
+Subject: Re: [Bluez-devel] bluez audio questions
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -22,43 +19,55 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-After some digging in the current GIT head:
+Hi,
 
-bluetoothd[20589]: AVCTP: connected to 00:0D:FD:15:F0:3E
-bluetoothd[20589]: AVRCP: uinput initialized for 00:0D:FD:15:F0:3E
-bluetoothd[20589]: AVDTP: incoming connect from 00:0D:FD:15:F0:3E
-DEBUG: trying to change from OPEN to OPEN
-bluetoothd[20589]: stream state change failed: Input/output error
+On Oct 16, 2008, at 22:58, deker wrote:
+> So, per Brad's advice I've been following the audio HOWTO at
+> http://wiki.bluez.org/wiki/HOWTO/AudioDevices
 
-So for me it tries to change the stream state top OPEN twice.
+Unfortunately the wiki hasn't been updated for 4.x. The instructions  
+there only apply for 3.x. Any help updating it for 4.x is appreciated  
+(the only reason that hasn't happened is lack of time).
 
-Another debugging effort with pulseaudio bluetooth init:
+> I seem to either not be getting something, or bluez has changed it's
+> dbus interface for audio dramatically. Looking at the HOWTO, it would
+> appear that I have to active the audio service before I can send audio
+> to a device. Great, no problem. Ok, one
+> problem...org.bluez.Manager.ActivateService doesn't seem to exist.
+> Looking at the dbus API spec in the 4.13 source tarball doesn't list  
+> it,
+> and looking at dbus with D-Feet I see what matches the API listed in  
+> the
+> docs. Is there some new method for service activation I'm missing?
 
-bluetoothd[20589]: Received SET_CONFIGURATION_CMD
-DEBUG: initializing stream sock to -1
-[...]
-bluetoothd[20851]: Audio API: received BT_SETCONFIGURATION_REQ
-bluetoothd[20851]: config a2dp - device = 00:0D:FD:15:F0:3E access_mode = 2
-bluetoothd[20851]: codec sbc - frequency = 2 channel_mode = 1
-allocation = 1 subbands = 1 blocks = 1 bitpool = 44
-bluetoothd[20851]: a2dp_source_config: selected SEP 0xb851c630
-bluetoothd[20851]: avdtp_ref(0xb8521398): ref=4
-bluetoothd[20851]: setup_ref(0xb8519490): ref=1
-bluetoothd[20851]: setup_ref(0xb8519490): ref=2
-bluetoothd[20851]: SEP 0xb851c630 locked
-DEBUG: stream sock is -1
-bluetoothd[20851]: Unable to get stream transport
-bluetoothd[20851]: config failed
+If you're interested about the differences between 3.x and 4.x I'm  
+sure you'll find discussion about it in the mailing list archives  
+(probably linux-bluetooth though since that's the official one these  
+days) and iirc Marcel even wrote an article about it in the bluez blog  
+(www.bluez.org).
+The API reference documentation itself is available in the doc  
+subdirectory of bluez.
 
-The stream socket does not seem to be set anywhere else along the way
-(added debug prints to all stream socket changes in bluez code).
-That's why get_transport returns FALSE. Still not sure if the bug is
-in pulseaudio or in bluez.
+> Any help is appreciated. I really don't feel like this should be  
+> rocket
+> surgery, I guess I just haven't found the bluez-audio Rosetta Stone  
+> yet...
 
-Also sending this to bluez-devel, please don't shoot me for crossposting.
+Setting up a headset with 4.x should in theory be much simpler than  
+with 3.x. First you need to pair the headset, discover its services  
+and create a D-Bus object for it. This is all done with just one  
+operation in 4.x, which is by calling the CreatePairedDevice method.  
+You can either use some GUI like bluetooth-wizard from bluez-gnome to  
+do this or if you're just using the command line you could use the  
+simple-agent python script from the test subdirectory:
+./simple-agent hci0 <headset address>
+It'll ask you for the pin on stdin.
 
--- 
-Patryk Zawadzki
+After this first step you should be able to use your headset the same  
+way as you did with 3.x. E.g. with alsa have your .asoundrc set up and  
+configure your favorite alsa application to the entry in it.
+
+Johan
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
