@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <316F0BAC-515D-4FAF-9465-F0F8A75AB058@gmail.com>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+Message-ID: <48F7AEE4.1030305@powercraft.nl>
+Date: Thu, 16 Oct 2008 23:15:16 +0200
+From: Jelle de Jong <jelledejong@powercraft.nl>
+MIME-Version: 1.0
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <48F7AEE4.1030305@powercraft.nl>
-Mime-Version: 1.0 (Apple Message framework v929.2)
-Date: Fri, 17 Oct 2008 00:34:17 +0300
 References: <4514.83.160.35.87.1224187105.squirrel@webmail.xs4all.nl>
-	<48F7AEE4.1030305@powercraft.nl>
+In-Reply-To: <4514.83.160.35.87.1224187105.squirrel@webmail.xs4all.nl>
 Subject: Re: [Bluez-users] Bluez 4.XX pincode authorisation HOW can i use
-	it??
+ it??
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -21,14 +20,44 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi,
+menno van der klein wrote:
+> Hello Marcel,
+> 
+> I hope that i can send you this question about bluez. I search all over
+> the internet but i cant find a solution to resolve tghis problem.
+> 
+> When i use the new apt-get version 4.10 bluez on debian, this will work
+> OK. But the only problem is my phone (Motorola L6) doesn't accept any
+> pincode from the linux box.
+> 
+> Before i create a file named hcid.conf and put a pin in it or i use the
+> pin-helper application (tar.gz file in the doc directory). This works well
+> for the normal 3.X version.
+> 
+> The version 4.XX has currently on debian no HCID application and therefore
+> there is also no hcid.conf in the /etc/bluetooth directory with a pincode.
+> Also the passkey application (who i transfer from the old bluez 3.X
+> version to the new one) doesn;t work also NOT and give various errors.
+> 
+> Can you give me a solution that i can create a pincode on my linux box and
+> that my mobile phone accept them with the bluez 4.X version in the command
+> prompt (i use no KDE or Gnome).
+> 
+> I hope that you can answer me, because i think this is a really problem in
+> the new bluez version.
+> 
+> Thanks for your help,
+> 
+> Best regards,
+> Menno
+> 
 
-If you want to pair devices from the command line you can e.g. use the  
-simple-agent python script (in the test subdirectory of bluez):
-./simple-agent hci0 <remote address>
-It will ask you for the pin on stdin.
+I have the same problem with one of my devices, so I am going to second
+this request.
 
-Johan
+Thanks in advance,
+
+Jelle
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
