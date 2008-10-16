@@ -1,30 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 17 Oct 2008 04:42:22 +0530 (IST)
-From: pavan_savoy@indiatimes.com
-To: <linux-bluetooth@vger.kernel.org>
-Message-ID: <648988494.849661224198742466.JavaMail.root@mbv7.indiatimes.com>
-Subject: one More PAIRING Issue.
+From: Ralph Gillen <Ralph.Gillen@web.de>
+To: linux-bluetooth@vger.kernel.org
+Subject: Pairing and HCI filters
+Date: Thu, 16 Oct 2008 09:55:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain;
+  charset="us-ascii"
+Message-Id: <200810160955.54846.Ralph.Gillen@web.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi all,
 
-I have a ubuntu desktop having BlueZ 3.26, When I connect and want to pair with the Desktop from a Remote device [say a phone], the Desktop pops up a message telling me, that A device is trying to connect.
+I'm running a 2.6.18 kernel on Scientific Linux 5.2 with bluez 3.7 installed, 
+and I'm trying to build a software for a experimental setup in which several 
+bluetooth devices are involved. I just need a RFCOMM connection to each of 
+these devices, and as long as I don't need pairing everything works fine. I 
+read many lines of code to understand how the pairing process works (the same 
+way I learned how to communicate with my devices at all), an here ist what I 
+figured out until now: after a connection request, my device asks for the 
+PIN; this ist noticed by bluez, and via this d-bus interface an agent is 
+called to anser the request (is this - roughly- correct?). After installing 
+kdebluetooth-1.0_beta8, the pairing process works for me if I enter a fixed 
+PIN in the setup file.
 
-But when I try to do that same from another Linux machine, from the command line with no I/O support to enter in the passkey, then it doesn't pop up the message.
+But what I need is to answer the pairing request directly from my program 
+(because there are many different devices and PINs and it should work without 
+user interaction). It seems to me that I have to set a filter on the HCI (but 
+how exactly?) and wait for the incoming request (again: how?) and finally 
+answer it, i.e. I want to catch the request before the whole d-bus/agent 
+stuff becomes involved.
 
+So I'd like to ask the following questions:
 
-Link Mode on Ubuntu when trying from Phone is accept.
+- is this the right mailing list? ;) (I found no other)
 
-Link Mode on Ubuntu when trying from the other lInux machine with no UI, has to be MASTER, If I try to connect as hcitool cc --role=m <..BD_ADDR...>
+- is there any documentation on HCI programming including event filtering I've 
+not found yet?
 
-If the LINK mode is either "none" or "accept", then the hcitool cc --role=s , should always be slave.
+- is my understanding of the process correct?
 
-Can someone explain this ?
+- can anyone point me out a program that does what I need, so that I could 
+learn from the source code?
 
+- does anybody have pieces of code answering a pairing request on HCI level 
+(so, not agents!)?
 
---
-Hyundai to launch the i20 in India. Catch the exclusive preview on ZigWheels.com
-http://www.zigwheels.com/b2cam/newsDetails.action?name=Emb11_20080731&path=/INDT/News/Emb11_20080731&page=1&pagecount=2&utm_source=indmail&utm_medium=footer&utm_content=tracking&utm_campaign=Nletter_07oct2008_ZW
+- or any other hints?
+
+This is a research project, and I'm not at all familiar with bluetooth (which 
+should count for not more than 1% of the project), so please excuse if my 
+questions are not very exact. Any help is appreciated, thank you very much!
+
+Best regards,
+
+Ralph
+
