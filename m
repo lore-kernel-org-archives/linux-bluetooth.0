@@ -1,58 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ralph Gillen <Ralph.Gillen@web.de>
-To: linux-bluetooth@vger.kernel.org
-Subject: Pairing and HCI filters
-Date: Thu, 16 Oct 2008 09:55:54 +0200
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
-Message-Id: <200810160955.54846.Ralph.Gillen@web.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCHes] Add sixpair
+From: Bastien Nocera <hadess@hadess.net>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1224114777.28173.41.camel@californication>
+References: <1224083727.5268.3149.camel@cookie.hadess.net>
+	 <1224114777.28173.41.camel@californication>
+Content-Type: text/plain
+Date: Thu, 16 Oct 2008 01:28:38 +0100
+Message-Id: <1224116918.5268.3845.camel@cookie.hadess.net>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+On Thu, 2008-10-16 at 01:52 +0200, Marcel Holtmann wrote:
+> Hi Bastien,
+> 
+> > Here are the patches to get sixpair support built into BlueZ. It uses
+> > libusb-1.0 as well as a yet to be merged libusb-1.0 patch to allow
+> > re-attaching a driver to a device.
+> 
+> so I applied all patches except the changes for the build system. I am
+> not sure that this is the right way to go.
+> 
+> If we require libusb-1.0, then we should just change our current code
+> that depends on libusb-0.1 and require libusb-1.0 for all of it.
 
-I'm running a 2.6.18 kernel on Scientific Linux 5.2 with bluez 3.7 installed, 
-and I'm trying to build a software for a experimental setup in which several 
-bluetooth devices are involved. I just need a RFCOMM connection to each of 
-these devices, and as long as I don't need pairing everything works fine. I 
-read many lines of code to understand how the pairing process works (the same 
-way I learned how to communicate with my devices at all), an here ist what I 
-figured out until now: after a connection request, my device asks for the 
-PIN; this ist noticed by bluez, and via this d-bus interface an agent is 
-called to anser the request (is this - roughly- correct?). After installing 
-kdebluetooth-1.0_beta8, the pairing process works for me if I enter a fixed 
-PIN in the setup file.
+That'd mean porting:
+- dfutool
+- avctrl
+- bccmd's csr_usb code
+- hid2hci
 
-But what I need is to answer the pairing request directly from my program 
-(because there are many different devices and PINs and it should work without 
-user interaction). It seems to me that I have to set a filter on the HCI (but 
-how exactly?) and wait for the incoming request (again: how?) and finally 
-answer it, i.e. I want to catch the request before the whole d-bus/agent 
-stuff becomes involved.
+The code isn't too complicated, but I wouldn't be able to test any of
+the code (apart from maybe hid2hci). Is this something I can promise to
+do in the future? It's not very complicated, just time consuming.
 
-So I'd like to ask the following questions:
+> > Problems left to solve:
+> > - sixaxis enabler code (as seen in enable_sixaxis() in compat/hidd.c)
+> > seems to have disappeared from the input plugin. Is that done in the
+> > kernel now, or was it just removed?
+> 
+> The kernel is not doing it. Seems to be an oversight.
 
-- is this the right mailing list? ;) (I found no other)
+OK. I'll re-add the code to the input plugin.
 
-- is there any documentation on HCI programming including event filtering I've 
-not found yet?
+> > - After "cable pairing" the device, I need to unplug/replug the adapter,
+> > or restart bluetoothd. Can anyone think of a better way of getting the
+> > list of devices updated?
+> 
+> We could use inotify or SIGUSR2 or something to re-read the database.
 
-- is my understanding of the process correct?
+There's a problem with the current method in that there might be data
+loss if we're adding data from both bluetoothd, and an external program
+(both processes writing the same file at the same time).
 
-- can anyone point me out a program that does what I need, so that I could 
-learn from the source code?
+We could solve the data loss, and update problem by having an internal,
+root only, dbus method available for cable pairing of that sort. For
+example, on org.bluez.Adapter:
+void AddCablePairedDevice (string name,
+                           string address,
+                           unsigned int vendor_id,
+                           unsigned int product_id,
+                           string pnp_record);
 
-- does anybody have pieces of code answering a pairing request on HCI level 
-(so, not agents!)?
+The function would just need to do all the storage work sixpair
+currently does, and create the device internally similarly to
+create_stored_device_from_profiles().
 
-- or any other hints?
+It might also be useful to have an internal (non-dbus) API at the
+manager level for hid proxy dongles (where the adapter wouldn't yet
+exist when we store the to-be-created devices, not sure how to be
+certain those devices will be temporary though).
 
-This is a research project, and I'm not at all familiar with bluetooth (which 
-should count for not more than 1% of the project), so please excuse if my 
-questions are not very exact. Any help is appreciated, thank you very much!
+> > - Some minor niggles in the code itself (use D-Bus instead of parsing
+> > command-line tools)
+> 
+> Of course.
+> 
+> > - udev rule(s) and parsing only the selected device would be necessary
+> > if not required
+> 
+> If we can do this via the HID bus, then we can do it every time and it
+> would not affect the controller itself.
 
-Best regards,
+Unless I misunderstood the feature, when claiming the interface, that
+would actually remove the pad as an input device.
 
-Ralph
-
+Cheers
