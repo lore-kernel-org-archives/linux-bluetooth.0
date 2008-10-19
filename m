@@ -1,38 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48FBB012.40605@gmail.com>
-Date: Mon, 20 Oct 2008 00:09:22 +0200
-From: Jiri Slaby <jirislaby@gmail.com>
-MIME-Version: 1.0
-To: Jiri Kosina <jkosina@suse.cz>
-CC: linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
- Steven Noonan <steven@uplinklabs.net>,
- Justin Mattock <justinmattock@gmail.com>,
- Sven Anders <anders@anduras.de>,
- Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Message-ID: <dd18b0c30810191306t795dbbabq64645d903568c3c9@mail.gmail.com>
+Date: Sun, 19 Oct 2008 13:06:12 -0700
+From: "Justin Mattock" <justinmattock@gmail.com>
+To: "Jiri Kosina" <jkosina@suse.cz>
 Subject: Re: several messages
-References: <1224425749-22652-1-git-send-email-jirislaby@gmail.com> <1224425749-22652-2-git-send-email-jirislaby@gmail.com> <alpine.LNX.1.10.0810192135010.27479@jikos.suse.cz>
+Cc: "Jiri Slaby" <jirislaby@gmail.com>, linux-input@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Steven Noonan" <steven@uplinklabs.net>,
+	"Sven Anders" <anders@anduras.de>,
+	"Marcel Holtmann" <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
 In-Reply-To: <alpine.LNX.1.10.0810192135010.27479@jikos.suse.cz>
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+References: <1224425749-22652-1-git-send-email-jirislaby@gmail.com>
+	 <1224425749-22652-2-git-send-email-jirislaby@gmail.com>
+	 <alpine.LNX.1.10.0810192135010.27479@jikos.suse.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Jiri Kosina napsal(a):
+On Sun, Oct 19, 2008 at 12:40 PM, Jiri Kosina <jkosina@suse.cz> wrote:
 > On Sun, 19 Oct 2008, Jiri Slaby wrote:
-> 
+>
 >> +enum hid_type {
->> +	HID_TYPE_UNKNOWN = 0,
->> +	HID_TYPE_MOUSE,
->> +	HID_TYPE_KEYBOARD
+>> +     HID_TYPE_UNKNOWN = 0,
+>> +     HID_TYPE_MOUSE,
+>> +     HID_TYPE_KEYBOARD
 >> +};
 >> +
-> 
-> Do we really need the HID_TYPE_KEYBOARD at all? It's not used anywhere in 
-> the code. I'd propose to add it when it is actually needed. I.e. have the 
-> enum contain something like HID_TYPE_MOUSE HID_TYPE_OTHER for now, and add 
+>
+> Do we really need the HID_TYPE_KEYBOARD at all? It's not used anywhere in
+> the code. I'd propose to add it when it is actually needed. I.e. have the
+> enum contain something like HID_TYPE_MOUSE HID_TYPE_OTHER for now, and add
 > whatever will become necessary in the future, what do you think?
+>
+>
+> On Sun, 19 Oct 2008, Jiri Slaby wrote:
+>
+>> +/**
+>> + * hid_mouse_ignore_list - mouse devices which must not be held by the hid layer
+>> + */
+>
+> I think a more descriptive comment would be appropriate here. It might not
+> be obvious on the first sight why this needs to be done separately from
+> the generic hid_blacklist. I.e. something like
+>
+> /**
+>  * There are composite devices for which we want to ignore only a certain
+>  * interface. This is a list of devices for which only the mouse interface
+>  * will be ignored.
+>  */
+>
+> maybe?
+>
+> Thanks,
+>
+> --
+> Jiri Kosina
+> SUSE Labs
+>
 
-I would use unknown rather than other, since on bluetooth mouse is unknown
-not other, if you don't mind?
+I can agree with that, whats the point having something
+there if it not being used,(just eating up precious space);
 
-Or did you mean tristate unknown, mouse and other?
-
-Thanks for review.
+-- 
+Justin P. Mattock
