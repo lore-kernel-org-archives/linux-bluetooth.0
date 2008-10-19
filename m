@@ -1,88 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <dd18b0c30810191208p62bc8b1eub53b79de2d2d6261@mail.gmail.com>
-Date: Sun, 19 Oct 2008 12:08:01 -0700
-From: "Justin Mattock" <justinmattock@gmail.com>
-To: "Jiri Slaby" <jirislaby@gmail.com>
-Subject: Re: [PATCH 1/2] HID: add hid_type
-Cc: jkosina@suse.cz, linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Steven Noonan" <steven@uplinklabs.net>,
-	"Sven Anders" <anders@anduras.de>,
-	"Marcel Holtmann" <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <1224425749-22652-1-git-send-email-jirislaby@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <1224425749-22652-1-git-send-email-jirislaby@gmail.com>
+Subject: Re: Add application header support to gwobex
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <D94DFDBF-DAB1-4343-96F0-FFBA05A58373@gmail.com>
+References: <1224404909.9386.29.camel@californication>
+	 <D94DFDBF-DAB1-4343-96F0-FFBA05A58373@gmail.com>
+Content-Type: text/plain
+Date: Sun, 19 Oct 2008 19:00:44 +0200
+Message-Id: <1224435644.9386.33.camel@californication>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Oct 19, 2008 at 7:15 AM, Jiri Slaby <jirislaby@gmail.com> wrote:
-> Add type to the hid structure to distinguish to which device type
-> (mouse/kbd) we are talking to. Needed for per device type ignore
-> list support.
->
-> Note: this patch leaves the type as unknown for bluetooth devices,
-> there is not support for this in the hidp code.
->
-> Signed-off-by: Jiri Slaby <jirislaby@gmail.com>
-> ---
->  drivers/hid/usbhid/hid-core.c |    8 ++++++++
->  include/linux/hid.h           |    7 +++++++
->  2 files changed, 15 insertions(+), 0 deletions(-)
->
-> diff --git a/drivers/hid/usbhid/hid-core.c b/drivers/hid/usbhid/hid-core.c
-> index 1d3b8a3..20617d8 100644
-> --- a/drivers/hid/usbhid/hid-core.c
-> +++ b/drivers/hid/usbhid/hid-core.c
-> @@ -972,6 +972,14 @@ static int hid_probe(struct usb_interface *intf, const struct usb_device_id *id)
->        hid->vendor = le16_to_cpu(dev->descriptor.idVendor);
->        hid->product = le16_to_cpu(dev->descriptor.idProduct);
->        hid->name[0] = 0;
-> +       switch (intf->cur_altsetting->desc.bInterfaceProtocol) {
-> +       case USB_INTERFACE_PROTOCOL_KEYBOARD:
-> +               hid->type = HID_TYPE_KEYBOARD;
-> +               break;
-> +       case USB_INTERFACE_PROTOCOL_MOUSE:
-> +               hid->type = HID_TYPE_MOUSE;
-> +               break;
-> +       }
->
->        if (dev->manufacturer)
->                strlcpy(hid->name, dev->manufacturer, sizeof(hid->name));
-> diff --git a/include/linux/hid.h b/include/linux/hid.h
-> index f13bca2..36a3953 100644
-> --- a/include/linux/hid.h
-> +++ b/include/linux/hid.h
-> @@ -417,6 +417,12 @@ struct hid_input {
->        struct input_dev *input;
->  };
->
-> +enum hid_type {
-> +       HID_TYPE_UNKNOWN = 0,
-> +       HID_TYPE_MOUSE,
-> +       HID_TYPE_KEYBOARD
-> +};
-> +
->  struct hid_driver;
->  struct hid_ll_driver;
->
-> @@ -431,6 +437,7 @@ struct hid_device {                                                 /* device report descriptor */
->        __u32 vendor;                                                   /* Vendor ID */
->        __u32 product;                                                  /* Product ID */
->        __u32 version;                                                  /* HID version */
-> +       enum hid_type type;                                             /* device type (mouse, kbd, ...) */
->        unsigned country;                                               /* HID country */
->        struct hid_report_enum report_enum[HID_REPORT_TYPES];
->
-> --
-> 1.6.0.2
->
->
+Hi Johan,
 
-O.k. reverted the old patch and
-applied the two new ones.
-appletouchpad is working;
-I didn't use patch -p1,
-just manually applied the two.
+> > for the PBAP support, we need to handle the application header and for
+> > our client/test applications, I extended gwobex to allow us to specify
+> > this header. What do you think?
+> 
+> Looks good to me, though the parameter lists to the _get and_put  
+> functions are starting to grow pretty long. In general it'd be nice to  
+> get the same functionality into libopenobex-glib soonish since I'm not  
+> particularly enjoying looking at this ancient code and coding style  
+> that should just die away ;)
 
--- 
-Justin P. Mattock
+I agree on that one, but currently it is more important to get this
+functionality working and then later we can do the cleanups. Main
+problem with libopenobex-glib at the moment is that I based it around
+GObject which does make sense for GTK+ programs, but will not make sense
+for obex-client. So parts of gwobex might be still living a long life.
+
+After actually working with the PBAP details, I realized that besides
+giving the application parameters in the command, so we do have another
+pair of buf+size for the response.
+
+Regards
+
+Marcel
+
+
