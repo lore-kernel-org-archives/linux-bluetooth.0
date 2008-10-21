@@ -1,34 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Daniel Matthes <matthes@ftz.htwk-leipzig.de>
-To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 21 Oct 2008 15:15:41 +0200
-Subject: Establish a SPP Connection between two linux computers
-Message-ID: <09E68493E3CD0D47BF12172B07F527382CC88B2B9C@mail1.ftz.htwk-leipzig.de>
-Content-Type: text/plain; charset="iso-8859-1"
+Message-ID: <48FD8C64.2020501@dtsp.co.nz>
+Date: Tue, 21 Oct 2008 21:01:40 +1300
+From: David Sainty <David.Sainty@dtsp.co.nz>
 MIME-Version: 1.0
+To: =?ISO-8859-1?Q?Rog=E9rio_Brito?= <rbrito@ime.usp.br>
+CC: Andrew Morton <akpm@linux-foundation.org>,
+	linux-bluetooth@vger.kernel.org, bugme-daemon@bugzilla.kernel.org
+Subject: Re: [Bugme-new] [Bug 11779] New: No way to disable bluetooth
+References: <bug-11779-10286@http.bugzilla.kernel.org/> <20081020172426.4e28ba79.akpm@linux-foundation.org> <48FD397F.2020101@dtsp.co.nz> <20081021070056.GA15748@ime.usp.br>
+In-Reply-To: <20081021070056.GA15748@ime.usp.br>
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I want to connect two debian (lenny) systems with two Anycom USB-200 USB Dongles, so I've downloaded the bluez-1.41 driver.
+Rogério Brito wrote:
 
-I want to create a serial connection (by using SPP). 
+> I may test it latter, but I'm scared. And this is what is preventing me
+> from using this notebook (as well as bug
+> http://bugzilla.kernel.org/show_bug.cgi?id=11717).
+>
+> For this latter one I even provided a *video* of me pressing the power
+> button and the machine not waking up from suspend. :-( I can't think of
+> anything else that I can provice, but I'm willing to help here.
+>
+>   
 
-At the beginning, I've tested the driver by connecting a linux operating system with a windows operating system.
+It sounds like you have much worse issues with it than whether the 
+bluetooth adapter is drawing idle current - which should be dwarfed by 
+more heavyweight sinks like the WiFi transceiver.
 
-I run  sdptool browse and I've found:
+Sorry, I don't have any suggestions - though you could try asking the 
+manufacturer for support.
 
-Service Name: Serieller Bluetooth-Anschluss
-.
-Protocol Descriptor List:
-            "L2CAP"  (0x0100)
-            "RFCOMM"  (0x0003)
-                        Channel: 1
-..
-
-After this I run rfcomm bind 0 <bdaddr> 1 and then I could establish with minicom  a connection to the windows system and send data.
-
-In the second turn. I install bluez on the second linux computer. After running sdptool browse, there are no entries for serial support.
-I've also created an entry with sdptool add -channel 1 SP. Afterwards I could browse the serial port entry with the other computer,
-but there was also no way to connect the computers.
-
-So here my question:  How can I connect two linux systems with bluetooth by using the serial port profile.
