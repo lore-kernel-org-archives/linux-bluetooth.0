@@ -1,67 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jiri Slaby <jirislaby@gmail.com>
-To: jkosina@suse.cz
-Cc: linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Steven Noonan" <steven@uplinklabs.net>,
-        "Justin Mattock" <justinmattock@gmail.com>,
-        "Sven Anders" <anders@anduras.de>,
-        Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-        Jiri Slaby <jirislaby@gmail.com>
-Subject: [PATCH 1/4] HID: add hid_type
-Date: Tue, 21 Oct 2008 23:26:02 +0200
-Message-Id: <1224624363-16471-1-git-send-email-jirislaby@gmail.com>
+From: Daniel Matthes <matthes@ftz.htwk-leipzig.de>
+To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 21 Oct 2008 15:15:41 +0200
+Subject: Establish a SPP Connection between two linux computers
+Message-ID: <09E68493E3CD0D47BF12172B07F527382CC88B2B9C@mail1.ftz.htwk-leipzig.de>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add type to the hid structure to distinguish to which device type
-(now only mouse) we are talking to. Needed for per device type ignore
-list support.
+I want to connect two debian (lenny) systems with two Anycom USB-200 USB Dongles, so I've downloaded the bluez-1.41 driver.
 
-Note: this patch leaves the type as unknown for bluetooth devices,
-there is not support for this in the hidp code.
+I want to create a serial connection (by using SPP). 
 
-Signed-off-by: Jiri Slaby <jirislaby@gmail.com>
----
- drivers/hid/usbhid/hid-core.c |    3 +++
- include/linux/hid.h           |    6 ++++++
- 2 files changed, 9 insertions(+), 0 deletions(-)
+At the beginning, I've tested the driver by connecting a linux operating system with a windows operating system.
 
-diff --git a/drivers/hid/usbhid/hid-core.c b/drivers/hid/usbhid/hid-core.c
-index 1d3b8a3..1dc341a 100644
---- a/drivers/hid/usbhid/hid-core.c
-+++ b/drivers/hid/usbhid/hid-core.c
-@@ -972,6 +972,9 @@ static int hid_probe(struct usb_interface *intf, const struct usb_device_id *id)
- 	hid->vendor = le16_to_cpu(dev->descriptor.idVendor);
- 	hid->product = le16_to_cpu(dev->descriptor.idProduct);
- 	hid->name[0] = 0;
-+	if (intf->cur_altsetting->desc.bInterfaceProtocol ==
-+			USB_INTERFACE_PROTOCOL_MOUSE)
-+		hid->type = HID_TYPE_USBMOUSE;
- 
- 	if (dev->manufacturer)
- 		strlcpy(hid->name, dev->manufacturer, sizeof(hid->name));
-diff --git a/include/linux/hid.h b/include/linux/hid.h
-index f13bca2..5355ca4 100644
---- a/include/linux/hid.h
-+++ b/include/linux/hid.h
-@@ -417,6 +417,11 @@ struct hid_input {
- 	struct input_dev *input;
- };
- 
-+enum hid_type {
-+	HID_TYPE_OTHER = 0,
-+	HID_TYPE_USBMOUSE
-+};
-+
- struct hid_driver;
- struct hid_ll_driver;
- 
-@@ -431,6 +436,7 @@ struct hid_device {							/* device report descriptor */
- 	__u32 vendor;							/* Vendor ID */
- 	__u32 product;							/* Product ID */
- 	__u32 version;							/* HID version */
-+	enum hid_type type;						/* device type (mouse, kbd, ...) */
- 	unsigned country;						/* HID country */
- 	struct hid_report_enum report_enum[HID_REPORT_TYPES];
- 
--- 
-1.6.0.2
+I run  sdptool browse and I've found:
+
+Service Name: Serieller Bluetooth-Anschluss
+.
+Protocol Descriptor List:
+            "L2CAP"  (0x0100)
+            "RFCOMM"  (0x0003)
+                        Channel: 1
+..
+
+After this I run rfcomm bind 0 <bdaddr> 1 and then I could establish with minicom  a connection to the windows system and send data.
+
+In the second turn. I install bluez on the second linux computer. After running sdptool browse, there are no entries for serial support.
+I've also created an entry with sdptool add -channel 1 SP. Afterwards I could browse the serial port entry with the other computer,
+but there was also no way to connect the computers.
+
+So here my question:  How can I connect two linux systems with bluetooth by using the serial port profile.
