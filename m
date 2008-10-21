@@ -1,40 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <48FE57C7.4050507@dtsp.co.nz>
-Date: Wed, 22 Oct 2008 11:29:27 +1300
-From: David Sainty <david.sainty@dtsp.co.nz>
+Message-ID: <48FE519F.9070409@richip.dhs.org>
+Date: Tue, 21 Oct 2008 16:03:11 -0600
+From: Richi Plana <richip@richip.dhs.org>
 MIME-Version: 1.0
-To: Richi Plana <richip@richip.dhs.org>
-CC: linux-bluetooth@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org
 Subject: Re: Bluez / Bluetooth Docs
-References: <1224550188.21866.9.camel@richip.dhs.org> <48FE519F.9070409@richip.dhs.org>
-In-Reply-To: <48FE519F.9070409@richip.dhs.org>
+References: <1224550188.21866.9.camel@richip.dhs.org>
+In-Reply-To: <1224550188.21866.9.camel@richip.dhs.org>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Any pointers? Other mailing lists? IRC channels? There's nothing on the 
+bluez website.
+
 Richi Plana wrote:
->> Working under the assumption that one can't bind two BT headsets to one
->> BT adapter (device or whatever the correct term is), I've made available
->> two BT adapters on my notebook (one USB dongle) and am now trying to
->> pair one headset with one device. The problem is I've no idea how this
->> works outside of the automagic that Fedora does (using hcid).
-
-Not that I've tried it, but I expect that this assumption is wrong - you 
-can talk to multiple bluetooth devices with one transceiver, and I don't 
-see any reason to expect headsets to be a special case?
-
-For access via ALSA I have, for my one headset:
-pcm.bluetooth {
-        type bluetooth
-        device "00:13:A9:C2:43:41"
-}
-
-
-You might have some success putting two such entries into your .asoundrc 
-(you might have a pcm.bluetooth1 and pcm.bluetooth2, and obviously you 
-need to enter the two device addresses for your headsets).  I do this 
-under BlueZ 4.x, so it might be different in your case.
-
-Then this kind of thing should work: mplayer -ao alsa:device=bluetooth1 
-play.mp3
+> Hi,
+>
+> My apologies in advance for the slightly off-topic post.
+>
+> Working under the assumption that one can't bind two BT headsets to one
+> BT adapter (device or whatever the correct term is), I've made available
+> two BT adapters on my notebook (one USB dongle) and am now trying to
+> pair one headset with one device. The problem is I've no idea how this
+> works outside of the automagic that Fedora does (using hcid).
+>
+> My question is where can I find documentation that covers the concepts
+> behind bluetooth on linux, specifically the bluez implementation. I've
+> checked out www.bluez.org and downloaded the latest packages, but they
+> don't contain documentation on how things are supposed to work (which
+> daemons or utils do what).
+>
+> Are there official docs available that explains the infrastructure and
+> tools to a newbie? If not official, could someone point me out to a good
+> set of docs that might get me on my way?
+>
+> Thanks.
+> --
+>
+> Richi
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>   
 
