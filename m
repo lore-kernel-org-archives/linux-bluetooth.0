@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <223378410810240218x7c25901fne41220d39549d4ea@mail.gmail.com>
-Date: Fri, 24 Oct 2008 14:48:04 +0530
-From: "rakesh agarwal" <zen.raj@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1224737867.9386.184.camel@californication>
-MIME-Version: 1.0
-References: <1224737867.9386.184.camel@californication>
-Subject: Re: [Bluez-devel] problems with kernel 2.6.23 + bluez 3.36 + SCO
+Date: Wed, 22 Oct 2008 21:28:16 +0200
+From: Andre Roth <lynx@netlabs.org>
+To: bluez-devel@lists.sourceforge.net
+Message-ID: <20081022212816.042575e4@netlabs.org>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Sony Ericsson HBH-610a and bluez git
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,146 +14,149 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2379408171928751153=="
+Content-Type: text/plain; charset="iso-8859-1"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
---===============2379408171928751153==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_4847_1228641.1224839884426"
 
-------=_Part_4847_1228641.1224839884426
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi,
-
-I am using bluez-gnome-1.8 on ububntu-8.04.
-It doesn't seems to work properly.
-when I run the command `bluetooth-wizard` I get the following messages on
-the terminal----
-
-(bluetooth-wizard:6803): Gtk-CRITICAL **:
-gtk_tree_model_filter_set_visible_func:
-assertion `GTK_IS_TREE_MODEL_FILTER (filter)' failed
-
-(bluetooth-wizard:6803): Gtk-CRITICAL **:
-gtk_tree_model_sort_new_with_model: assertion `GTK_IS_TREE_MODEL
-(child_model)' failed
-
-(bluetooth-wizard:6803): Gtk-CRITICAL **:
-gtk_tree_sortable_set_sort_column_id: assertion `GTK_IS_TREE_SORTABLE
-(sortable)' failed
-
-(bluetooth-wizard:6803): GLib-GObject-CRITICAL **: g_object_unref: assertion
-`G_IS_OBJECT (object)' failed
-
-(bluetooth-wizard:6803): GLib-GObject-CRITICAL **: g_object_unref: assertion
-`G_IS_OBJECT (object)' failed
+Hello, =
 
 
-I am using the kernel version 2.6.24.
+I had a bit of success trying to get something out of my headset :)
+I'm using bluez from git, and a bluetooth kernel from git as well.
+
+using arecord, I still get:
+
+$ arecord -D headset -f S16_LE test.wav
+ALSA lib pcm_bluetooth.c:1619:(bluetooth_init) BT_GETCAPABILITIES failed : =
+Input/output error(5)
+arecord: main:564: audio open error: Input/output error
+
+but I found the hstest tool, which connects successfully to my headset
+(I hear it ring) and the records audio:
+
+$ ./hstest record test.raw 00:12:EE:A6:FC:1E 2
+Voice setting: 0x0060
+RFCOMM channel connected
+SCO audio channel connected (handle 45, mtu 64)
+AT+BRSF=3D29
+AT+CIND=3D?
+AT+CIND?
+AT+CMER=3D3,0,0,1
+AT+VGS=3D6
+AT*SEAUDIO=3D4,4014
+AT+CLIP=3D1
+AT+CSCS=3D"UTF-8"
+AT*SEAM=3D"HBH-610a",13
+AT+CLAN?
+^C
+
+but only when I use the channel 2. channel 1 fails to create the rfcomm
+connection.
+
+the test.raw file contains audio, but it's very distorted. I think maybe
+there are samples missing...
+Is it really S16_LE 8 kHz ?
+
+playing the test.raw to the headset didn't show an error, but it didn't
+do something...
+
+bouetoothd shows the following when pairing the device
+with ./simple-agent hci0 00:12:EE:A6:FC:1E :
+
+bluetoothd[8461]: bonding_request_new(00:12:EE:A6:FC:1E) =
+
+bluetoothd[8461]: adapter_get_device(00:12:EE:A6:FC:1E)
+bluetoothd[8461]: Temporary agent registered for hci0/00:12:EE:A6:FC:1E at =
+:1.13:/test/agent
+bluetoothd[8461]: adapter_get_device(00:12:EE:A6:FC:1E)
+bluetoothd[8461]: link_key_request (sba=3D00:02:C7:83:76:CC, dba=3D00:12:EE=
+:A6:FC:1E)
+bluetoothd[8461]: kernel auth requirements =3D 0x04
+bluetoothd[8461]: pin_code_request (sba=3D00:02:C7:83:76:CC, dba=3D00:12:EE=
+:A6:FC:1E)
+bluetoothd[8461]: hcid_dbus_new_auth_request
+bluetoothd[8461]: link_key_notify (sba=3D00:02:C7:83:76:CC, dba=3D00:12:EE:=
+A6:FC:1E)
+bluetoothd[8461]: hcid_dbus_bonding_process_complete: status=3D00
+bluetoothd[8461]: adapter_get_device(00:12:EE:A6:FC:1E)
+bluetoothd[8461]: Releasing agent :1.13, /test/agent
+bluetoothd[8461]: /org/bluez/hci0/dev_00_12_EE_A6_FC_1E: No service update
+bluetoothd[8461]: Accepted new client connection on unix socket (fd=3D22)
+bluetoothd[8461]: Audio API: received BT_GETCAPABILITIES_REQ
+bluetoothd[8461]: Audio API: sending BT_GETCAPABILITIES_RSP
+bluetoothd[8461]: Unix client disconnected (fd=3D22)
+
+does the "No service update" mean something bad ?
+
+when terminating hstest, bluetoothd shows:
+
+bluetoothd[8988]: link_key_request (sba=3D00:02:C7:83:76:CC, dba=3D00:12:EE=
+:A6:FC:1E)
+bluetoothd[8988]: kernel auth requirements =3D 0x04
+bluetoothd[8988]: stored link key type =3D 0x00
+bluetoothd[8988]: No matching connection for handle 45
+
+Is there something I can help debugging/coding ?
+
+regards
+
+ andr=E9
+
+here the output of the bluetoothd file in /var/lib:
+
+/var/lib/bluetooth/00:02:C7:83:76:CC# more *
+::::::::::::::
+config
+::::::::::::::
+class 0x0a010c
+::::::::::::::
+features
+::::::::::::::
+00:12:EE:A6:FC:1E FFFD297818180080
+::::::::::::::
+lastused
+::::::::::::::
+00:12:EE:A6:FC:1E 2008-10-21 21:33:51 GMT
+::::::::::::::
+linkkeys
+::::::::::::::
+00:12:EE:A6:FC:1E 9E6C908BA0FDE751C9C31F25E421D96C 0 4
+::::::::::::::
+manufacturers
+::::::::::::::
+00:12:EE:A6:FC:1E 13 3 3611
+::::::::::::::
+names
+::::::::::::::
+00:12:EE:A6:FC:1E HBH-610a
+::::::::::::::
+profiles
+::::::::::::::
+00:12:EE:A6:FC:1E 8e771301-0000-1000-8000-00805f9b34fb
+::::::::::::::
+sdp
+::::::::::::::
+00:12:EE:A6:FC:1E#00010501 35470900000A0001050109000135051A8E77130109000435=
+0F350619010009F0F935051A8E7703000900053503191002
+090009350735051A8E771302090100250853454D4320484C41
+::::::::::::::
+trusts
+::::::::::::::
+00:12:EE:A6:FC:1E [all]
 
 
-Regards,
-Rakesh Agarwal
+-- =
 
-
-On Thu, Oct 23, 2008 at 10:27 AM, Marcel Holtmann <marcel@holtmann.org>wrote:
-
-> Hi Pierre,
->
-> > We develop an application for our board based on SCO. We use the kernel
-> > version 2.6.23 and the bluez-lib 3.36. However we have a lot of problems
-> and
-> > some "kernel panic". Below this message you will find some of these
-> kernel
-> > messages.
-> > How can we stop it? Have you ever saw that?
->
-> switch to a 2.6.27 kernel.
->
-> Regards
->
-> Marcel
->
->
->
-> -------------------------------------------------------------------------
-> This SF.Net email is sponsored by the Moblin Your Move Developer's
-> challenge
-> Build the coolest Linux based applications with Moblin SDK & win great
-> prizes
-> Grand prize is a trip for two to an Open Source event anywhere in the world
-> http://moblin-contest.org/redirect.php?banner_id=100&url=/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->
-
-------=_Part_4847_1228641.1224839884426
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Hi,<br><br>I am using bluez-gnome-1.8 on ububntu-8.04. <br>It doesn&#39;t seems to work properly.<br>when I run the command `bluetooth-wizard` I get the following messages on the terminal----<br><br>(bluetooth-wizard:6803): Gtk-CRITICAL **: gtk_tree_model_filter_set_<div id=":4f" class="ArwC7c ckChnd">
-visible_func: assertion `GTK_IS_TREE_MODEL_FILTER (filter)&#39; failed<br>
-<br>(bluetooth-wizard:6803): Gtk-CRITICAL **: gtk_tree_model_sort_new_with_model: assertion `GTK_IS_TREE_MODEL (child_model)&#39; failed<br><br>(bluetooth-wizard:6803): Gtk-CRITICAL **: gtk_tree_sortable_set_sort_column_id: assertion `GTK_IS_TREE_SORTABLE (sortable)&#39; failed<br>
-
-<br>(bluetooth-wizard:6803): GLib-GObject-CRITICAL **: g_object_unref: assertion `G_IS_OBJECT (object)&#39; failed<br><br>(bluetooth-wizard:6803): GLib-GObject-CRITICAL **: g_object_unref: assertion `G_IS_OBJECT (object)&#39; failed<br>
-
-<br><br>I am using the kernel version <a href="http://2.6.24./" target="_blank">2.6.24.</a><br><br><br>Regards,<br><font color="#888888">Rakesh Agarwal</font></div><br><br><div class="gmail_quote">On Thu, Oct 23, 2008 at 10:27 AM, Marcel Holtmann <span dir="ltr">&lt;<a href="mailto:marcel@holtmann.org">marcel@holtmann.org</a>&gt;</span> wrote:<br>
-<blockquote class="gmail_quote" style="border-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-left: 1ex;">Hi Pierre,<br>
-<br>
-&gt; We develop an application for our board based on SCO. We use the kernel<br>
-&gt; version 2.6.23 and the bluez-lib 3.36. However we have a lot of problems and<br>
-&gt; some &quot;kernel panic&quot;. Below this message you will find some of these kernel<br>
-&gt; messages.<br>
-&gt; How can we stop it? Have you ever saw that?<br>
-<br>
-switch to a 2.6.27 kernel.<br>
-<br>
-Regards<br>
-<br>
-Marcel<br>
-<br>
-<br>
-<br>
--------------------------------------------------------------------------<br>
-This SF.Net email is sponsored by the Moblin Your Move Developer&#39;s challenge<br>
-Build the coolest Linux based applications with Moblin SDK &amp; win great prizes<br>
-Grand prize is a trip for two to an Open Source event anywhere in the world<br>
-<a href="http://moblin-contest.org/redirect.php?banner_id=100&amp;url=/" target="_blank">http://moblin-contest.org/redirect.php?banner_id=100&amp;url=/</a><br>
-_______________________________________________<br>
-Bluez-devel mailing list<br>
-<a href="mailto:Bluez-devel@lists.sourceforge.net">Bluez-devel@lists.sourceforge.net</a><br>
-<a href="https://lists.sourceforge.net/lists/listinfo/bluez-devel" target="_blank">https://lists.sourceforge.net/lists/listinfo/bluez-devel</a><br>
-</blockquote></div><br>
-
-------=_Part_4847_1228641.1224839884426--
-
-
---===============2379408171928751153==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Andre Roth   | <lynx@netlabs.org>
+GPG: FADF988E| 0959 4D7C F8ED DF4B 90A6  CF71 9EDF 52D1 FADF 988E
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great prizes
+Build the coolest Linux based applications with Moblin SDK & win great priz=
+es
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=100&url=/
---===============2379408171928751153==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---===============2379408171928751153==--
