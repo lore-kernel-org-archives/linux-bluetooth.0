@@ -1,25 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <4900A74C.5030200@dell.com>
-Date: Thu, 23 Oct 2008 11:33:16 -0500
+Message-ID: <4900A67C.2050803@dell.com>
+Date: Thu, 23 Oct 2008 11:29:48 -0500
 From: Mario Limonciello <mario_limonciello@dell.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Quirk for Apple Aluminum Bluetooth  keyboard FN key
-References: <48F50EEB.1060802@dell.com> <1224737771.9386.180.camel@californication>
-In-Reply-To: <1224737771.9386.180.camel@californication>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Run hid2hci after resuming from suspend
+References: <48FF92EB.3050007@dell.com> <1224737041.9386.160.camel@californication>
+In-Reply-To: <1224737041.9386.160.camel@californication>
 Content-Type: multipart/signed; micalg=pgp-sha1;
  protocol="application/pgp-signature";
- boundary="------------enig182B6F5CBAFA1528037465EF"
+ boundary="------------enig3C429FA0D924F1855DDE9830"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig182B6F5CBAFA1528037465EF
-Content-Type: multipart/alternative;
- boundary="------------080406010701050503010106"
+--------------enig3C429FA0D924F1855DDE9830
+Content-Type: multipart/mixed;
+ boundary="------------090303070306010808040607"
 
 This is a multi-part message in MIME format.
---------------080406010701050503010106
+--------------090303070306010808040607
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 
@@ -27,20 +27,17 @@ Hi Marcel:
 
 Marcel Holtmann wrote:
 > Hi Mario,
-> yeah, the Ubuntu kernel team is pretty bad in getting patches back to
-> upstream. However in this case please check with the upstream kernel
-> since the HID bus makes all quirks general to the HID subsystem.
+>
+> we should not install multiple scripts. Lets only install one "bluez"
+> file for pm-utils. So no need for a hid2hci specific script.
 >
 > Regards
 >
 > Marcel
-Yeah, that's what I was thinking should be happening, and a little bit
-shocked that it didn't work properly since I saw a variation of this
-quirk in the hid source files already.  I was a little thrown off though
-since there is already a quirk for the mighty mouse sitting in this
-section that I was patching, so it seemed sensible to add the quirk for
-the keyboard there too.  I'll try to investigate why those quirks aren't
-carrying over properly.
+>  =20
+Attached is an updated patch that will install this as "48bluez" for
+pm-utils.  Of course the only thing in it right now is hid2hci, but
+should that need to change, it's easy to add more.
 
 Regards
 --=20
@@ -48,63 +45,125 @@ Mario Limonciello
 *Dell | Linux Engineering*
 mario_limonciello@dell.com
 
---------------080406010701050503010106
-Content-Type: text/html; charset=ISO-8859-1
+--------------090303070306010808040607
+Content-Type: text/x-patch;
+ name="hid2hci_pm-utils.patch"
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline;
+ filename="hid2hci_pm-utils.patch"
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <meta content=3D"text/html;charset=3DISO-8859-1" http-equiv=3D"Content-=
-Type">
-</head>
-<body bgcolor=3D"#ffffff" text=3D"#000000">
-<font size=3D"-1"><font face=3D"Helvetica, Arial, sans-serif">Hi Marcel:<=
-br>
-</font></font><br>
-Marcel Holtmann wrote:
-<blockquote cite=3D"mid:1224737771.9386.180.camel@californication"
- type=3D"cite">
-  <pre wrap=3D"">Hi Mario,</pre>
-</blockquote>
-<blockquote cite=3D"mid:1224737771.9386.180.camel@californication"
- type=3D"cite">
-  <pre wrap=3D"">
-yeah, the Ubuntu kernel team is pretty bad in getting patches back to
-upstream. However in this case please check with the upstream kernel
-since the HID bus makes all quirks general to the HID subsystem.
+diff -Nur -x '*.orig' -x '*~' bluez-4.12/scripts/bluetooth.pm-utils bluez=
+-4.12.new/scripts/bluetooth.pm-utils
+--- bluez-4.12/scripts/bluetooth.pm-utils	1969-12-31 18:00:00.000000000 -=
+0600
++++ bluez-4.12.new/scripts/bluetooth.pm-utils	2008-10-23 09:24:48.0000000=
+00 -0500
+@@ -0,0 +1,24 @@
++#!/bin/sh
++# Switch all devices that were in a HID mode to HCI mode
++# after a resume
++
++. "${PM_FUNCTIONS}"
++
++[ -f /etc/default/bluetooth ] || exit $NA
++
++. /etc/default/bluetooth
++
++hid2hci()
++{
++	if [ "$HID2HCI_ENABLED" =3D "1" ] && [ -x /usr/sbin/hid2hci ]; then
++		/usr/sbin/hid2hci --tohci
++        fi
++}
++
++case "$1" in
++	thaw|resume)
++		hid2hci
++		;;
++	*) exit $NA
++		;;
++esac
+diff -Nur -x '*.orig' -x '*~' bluez-4.12/scripts/Makefile.am bluez-4.12.n=
+ew/scripts/Makefile.am
+--- bluez-4.12/scripts/Makefile.am	2008-10-07 13:28:29.000000000 -0500
++++ bluez-4.12.new/scripts/Makefile.am	2008-10-23 09:37:16.000000000 -050=
+0
+@@ -9,7 +9,7 @@
+ udev_SCRIPTS =3D bluetooth_serial
+ endif
+=20
+-EXTRA_DIST =3D bluetooth.rules bluetooth_serial bluetooth.init bluetooth=
+=2Edefault
++EXTRA_DIST =3D bluetooth.rules bluetooth_serial bluetooth.init bluetooth=
+=2Edefault bluetooth.pm-utils
+=20
+ MAINTAINERCLEANFILES =3D Makefile.in
+=20
+@@ -24,3 +24,10 @@
+ 	@rm -f $(DESTDIR)$(sysconfdir)/init.d/bluetooth
+ 	@rm -f $(DESTDIR)$(sysconfdir)/default/bluetooth
+ endif
++
++install-data-pm:
++	$(mkinstalldirs) $(DESTDIR)/$(libexecdir)/pm-utils/sleep.d
++	$(INSTALL) -D -m 744 $(srcdir)/bluetooth.pm-utils $(DESTDIR)$(libexecdi=
+r)/pm-utils/sleep.d/48bluez
++
++uninstall-pm:
++	@rm -f $(DESTDIR)$(libexecdir)/pm-utils/sleep.d/48bluez
+diff -Nur -x '*.orig' -x '*~' bluez-4.12/scripts/Makefile.in bluez-4.12.n=
+ew/scripts/Makefile.in
+--- bluez-4.12/scripts/Makefile.in	2008-10-07 13:28:29.000000000 -0500
++++ bluez-4.12.new/scripts/Makefile.in	2008-10-23 09:38:54.000000000 -050=
+0
+@@ -192,7 +192,7 @@
+ @PCMCIARULES_TRUE@rules_DATA =3D bluetooth.rules
+ @PCMCIARULES_TRUE@udevdir =3D $(libexecdir)/udev
+ @PCMCIARULES_TRUE@udev_SCRIPTS =3D bluetooth_serial
+-EXTRA_DIST =3D bluetooth.rules bluetooth_serial bluetooth.init bluetooth=
+=2Edefault
++EXTRA_DIST =3D bluetooth.rules bluetooth_serial bluetooth.init bluetooth=
+=2Edefault hid2hci.pm-utils
+ MAINTAINERCLEANFILES =3D Makefile.in
+ all: all-am
+=20
+@@ -335,6 +335,8 @@
+ 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
+ @INITSCRIPTS_FALSE@uninstall-local:
+ @INITSCRIPTS_FALSE@install-data-local:
++uninstall-pm:
++install-data-pm:
+ clean: clean-am
+=20
+ clean-am: clean-generic clean-libtool mostlyclean-am
+@@ -354,7 +356,7 @@
+ info-am:
+=20
+ install-data-am: install-data-local install-rulesDATA \
+-	install-udevSCRIPTS
++	install-udevSCRIPTS install-data-pm
+=20
+ install-dvi: install-dvi-am
+=20
+@@ -416,6 +418,13 @@
+ @INITSCRIPTS_TRUE@uninstall-local:
+ @INITSCRIPTS_TRUE@	@rm -f $(DESTDIR)$(sysconfdir)/init.d/bluetooth
+ @INITSCRIPTS_TRUE@	@rm -f $(DESTDIR)$(sysconfdir)/default/bluetooth
++
++install-data-pm:
++	$(mkinstalldirs) $(DESTDIR)/$(libexecdir)/pm-utils/sleep.d
++	$(INSTALL) -D -m 744 $(srcdir)/bluetooth.pm-utils $(DESTDIR)$(libexecdi=
+r)/pm-utils/sleep.d/48bluez
++
++uninstall-pm:
++	@rm -f $(DESTDIR)$(libexecdir)/pm-utils/sleep.d/48bluez
+ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+ # Otherwise a system limit (for SysV at least) may be exceeded.
+ .NOEXPORT:
 
-Regards
+--------------090303070306010808040607--
 
-Marcel</pre>
-</blockquote>
-<small><font face=3D"Helvetica, Arial, sans-serif">Yeah, that's what I
-was thinking should be happening, and a little bit shocked that it
-didn't work properly since I saw a variation of this quirk in the hid
-source files already.&nbsp; I was a little thrown off though since there =
-is
-already a quirk for the mighty mouse sitting in this section that I was
-patching, so it seemed sensible to add the quirk for the keyboard there
-too.&nbsp; I'll try to investigate why those quirks aren't carrying over
-properly.<br>
-<br>
-Regards</font></small><br>
-<div class=3D"moz-signature">-- <br>
-<title></title>
-<font face=3D"Helvetica, Arial, sans-serif" size=3D"-2"><font
- color=3D"#999999">Mario Limonciello</font><br>
-<b><font color=3D"#ff0000">Dell</font> | <font color=3D"#666666">Linux
-Engineering</font></b><font color=3D"#666666"><br>
-</font><font color=3D"#666666"><a class=3D"moz-txt-link-abbreviated" href=
-=3D"mailto:mario_limonciello@dell.com">mario_limonciello@dell.com</a></fo=
-nt></font>
-</div>
-</body>
-</html>
-
---------------080406010701050503010106--
-
---------------enig182B6F5CBAFA1528037465EF
+--------------enig3C429FA0D924F1855DDE9830
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -113,9 +172,9 @@ Content-Disposition: attachment; filename="signature.asc"
 Version: GnuPG v1.4.9 (GNU/Linux)
 Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
 
-iEYEARECAAYFAkkAp0wACgkQ2CrZjkA73YuIBACeKh5ElrsQn8F747OgUBFnsrgR
-fMMAoJB7C8Sy8QqBeoSoV4RH8ef2Ct/M
-=feiI
+iEYEARECAAYFAkkApnwACgkQ2CrZjkA73YuVjACfVWPdfYtZ78vcvlhRzmXi85Ee
+fyAAnRzckIXH9ZbZZlPP1msEtHBbmIba
+=YokY
 -----END PGP SIGNATURE-----
 
---------------enig182B6F5CBAFA1528037465EF--
+--------------enig3C429FA0D924F1855DDE9830--
