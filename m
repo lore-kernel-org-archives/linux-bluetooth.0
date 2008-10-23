@@ -1,29 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: how to set passkey in bluez4.X
+Subject: Re: [PATCH] Run hid2hci after resuming from suspend
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Li, Zhigang" <zhigang.li@intel.com>
+To: Mario Limonciello <mario_limonciello@dell.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <722F286E5CF54C459DDA462B750B07CE0C1EC83506@pdsmsx502.ccr.corp.intel.com>
-References: <722F286E5CF54C459DDA462B750B07CE0C1EC83506@pdsmsx502.ccr.corp.intel.com>
+In-Reply-To: <48FF92EB.3050007@dell.com>
+References: <48FF92EB.3050007@dell.com>
 Content-Type: text/plain
-Date: Thu, 23 Oct 2008 06:45:36 +0200
-Message-Id: <1224737136.9386.162.camel@californication>
+Date: Thu, 23 Oct 2008 06:44:01 +0200
+Message-Id: <1224737041.9386.160.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Zhigang,
+Hi Mario,
 
-> Could somebody know how to set passkey in bluez4.X?
-> 
-> In Bluez3.X we can set it in hcid.conf and I tried set passkey in main.conf
-> 
-> I added the passkey at the end of this file. Passkey = "1234"
-> 
-> But it doesn't work.
+> This patch adds support for the hid2hci command to be ran upon resuming
+> from suspend.  At least the USB adapters I've been operating with that
+> need to switch modes need to do so upon resume.
 
-having pin codes in a config file is wrong and insecure. You have to
-have a BlueZ agent running to answer pin requests.
+we should not install multiple scripts. Lets only install one "bluez"
+file for pm-utils. So no need for a hid2hci specific script.
 
 Regards
 
