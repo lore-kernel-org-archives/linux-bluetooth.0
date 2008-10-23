@@ -1,27 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: problems with kernel 2.6.23 + bluez 3.36 + SCO
+Subject: Re: [PATCHes] Better buttons in adapter properties
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Pierre Savary <pierre.savary@kerlink.fr>
-Cc: BlueZ-Dev <bluez-devel@lists.sourceforge.net>,
-	bluez-users@lists.sourceforge.net, linux-bluetooth@vger.kernel.org
-In-Reply-To: <000001c92e07$010874f0$03195ed0$@savary@kerlink.fr>
-References: <000001c92e07$010874f0$03195ed0$@savary@kerlink.fr>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: David Sainty <david.sainty@dtsp.co.nz>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1224108411.5268.3681.camel@cookie.hadess.net>
+References: <1224003756.5268.371.camel@cookie.hadess.net>
+	 <48F523EC.9010007@dtsp.co.nz>
+	 <1224025489.5268.1049.camel@cookie.hadess.net>
+	 <48F52A51.6010506@dtsp.co.nz>
+	 <1224108411.5268.3681.camel@cookie.hadess.net>
 Content-Type: text/plain
-Date: Thu, 23 Oct 2008 06:57:47 +0200
-Message-Id: <1224737867.9386.184.camel@californication>
+Date: Thu, 23 Oct 2008 06:57:18 +0200
+Message-Id: <1224737838.9386.182.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pierre,
+Hi Bastien,
 
-> We develop an application for our board based on SCO. We use the kernel
-> version 2.6.23 and the bluez-lib 3.36. However we have a lot of problems and
-> some "kernel panic". Below this message you will find some of these kernel
-> messages.
-> How can we stop it? Have you ever saw that?
+> > 800x480 full screen.  But the standard window manager decorations on the 
+> > EeePC make anything taller than 422 pixels start to not fit.
+> 
+> I think we can easily reduce the space taken by the visibility and
+> friendly name sections. I'll try to get a patch ready tomorrow.
 
-switch to a 2.6.27 kernel.
+any updates here that I might have missed?
 
 Regards
 
