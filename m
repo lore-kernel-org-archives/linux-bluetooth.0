@@ -1,55 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Daniel Matthes <matthes@ftz.htwk-leipzig.de>
-To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 23 Oct 2008 10:43:14 +0200
-Subject: Re: Establish a SPP Connection between two linux computers
-Message-ID: <09E68493E3CD0D47BF12172B07F527382CC88B2BCE@mail1.ftz.htwk-leipzig.de>
-References: <09E68493E3CD0D47BF12172B07F527382CC88B2B9C@mail1.ftz.htwk-leipzig.de>
-In-Reply-To: <09E68493E3CD0D47BF12172B07F527382CC88B2B9C@mail1.ftz.htwk-leipzig.de>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
+Subject: Re: problems with kernel 2.6.23 + bluez 3.36 + SCO
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Pierre Savary <pierre.savary@kerlink.fr>
+Cc: BlueZ-Dev <bluez-devel@lists.sourceforge.net>,
+	bluez-users@lists.sourceforge.net, linux-bluetooth@vger.kernel.org
+In-Reply-To: <000001c92e07$010874f0$03195ed0$@savary@kerlink.fr>
+References: <000001c92e07$010874f0$03195ed0$@savary@kerlink.fr>
+Content-Type: text/plain
+Date: Thu, 23 Oct 2008 06:57:47 +0200
+Message-Id: <1224737867.9386.184.camel@californication>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Pierre,
 
-Hello again,
+> We develop an application for our board based on SCO. We use the kernel
+> version 2.6.23 and the bluez-lib 3.36. However we have a lot of problems and
+> some "kernel panic". Below this message you will find some of these kernel
+> messages.
+> How can we stop it? Have you ever saw that?
 
-Is somebody able to solve my problem?
+switch to a 2.6.27 kernel.
 
-I'm looking for a solution to connect two linux systems by using the serial port profile. I have so far found no way to solve this problem, because I could not find the serial port service within the bluez driver.
+Regards
 
-Regards Daniel
+Marcel
 
------Ursprüngliche Nachricht-----
-Von: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] Im Auftrag von Daniel Matthes
-Gesendet: Dienstag, 21. Oktober 2008 15:16
-An: 'linux-bluetooth@vger.kernel.org'
-Betreff: Establish a SPP Connection between two linux computers
 
-I want to connect two debian (lenny) systems with two Anycom USB-200 USB Dongles, so I've downloaded the bluez-1.41 driver.
-
-I want to create a serial connection (by using SPP). 
-
-At the beginning, I've tested the driver by connecting a linux operating system with a windows operating system.
-
-I run  sdptool browse and I've found:
-
-Service Name: Serieller Bluetooth-Anschluss
-.
-Protocol Descriptor List:
-            "L2CAP"  (0x0100)
-            "RFCOMM"  (0x0003)
-                        Channel: 1
-..
-
-After this I run rfcomm bind 0 <bdaddr> 1 and then I could establish with minicom  a connection to the windows system and send data.
-
-In the second turn. I install bluez on the second linux computer. After running sdptool browse, there are no entries for serial support.
-I've also created an entry with sdptool add -channel 1 SP. Afterwards I could browse the serial port entry with the other computer,
-but there was also no way to connect the computers.
-
-So here my question:  How can I connect two linux systems with bluetooth by using the serial port profile.
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
