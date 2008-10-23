@@ -1,37 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCHes] Better buttons in adapter properties
-From: Bastien Nocera <hadess@hadess.net>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1224737838.9386.182.camel@californication>
-References: <1224003756.5268.371.camel@cookie.hadess.net>
-	 <48F523EC.9010007@dtsp.co.nz>
-	 <1224025489.5268.1049.camel@cookie.hadess.net>
-	 <48F52A51.6010506@dtsp.co.nz>
-	 <1224108411.5268.3681.camel@cookie.hadess.net>
-	 <1224737838.9386.182.camel@californication>
-Content-Type: text/plain
-Date: Thu, 23 Oct 2008 10:12:12 +0100
-Message-Id: <1224753132.18251.529.camel@cookie.hadess.net>
-Mime-Version: 1.0
+From: Daniel Matthes <matthes@ftz.htwk-leipzig.de>
+To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 23 Oct 2008 10:43:14 +0200
+Subject: Re: Establish a SPP Connection between two linux computers
+Message-ID: <09E68493E3CD0D47BF12172B07F527382CC88B2BCE@mail1.ftz.htwk-leipzig.de>
+References: <09E68493E3CD0D47BF12172B07F527382CC88B2B9C@mail1.ftz.htwk-leipzig.de>
+In-Reply-To: <09E68493E3CD0D47BF12172B07F527382CC88B2B9C@mail1.ftz.htwk-leipzig.de>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2008-10-23 at 06:57 +0200, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > > 800x480 full screen.  But the standard window manager decorations on the 
-> > > EeePC make anything taller than 422 pixels start to not fit.
-> > 
-> > I think we can easily reduce the space taken by the visibility and
-> > friendly name sections. I'll try to get a patch ready tomorrow.
-> 
-> any updates here that I might have missed?
 
-Not since my rant about the discoverable preferences. The patched
-version doesn't take any more space than the current layout, and fixes
-discovery problems with the labels, so I would urge you to merge it.
+Hello again,
 
-I'll try to have a patch ready for squeezing the rest of the UI when
-I've had more of a think about it.
+Is somebody able to solve my problem?
 
-Cheers
+I'm looking for a solution to connect two linux systems by using the serial port profile. I have so far found no way to solve this problem, because I could not find the serial port service within the bluez driver.
+
+Regards Daniel
+
+-----Ursprüngliche Nachricht-----
+Von: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] Im Auftrag von Daniel Matthes
+Gesendet: Dienstag, 21. Oktober 2008 15:16
+An: 'linux-bluetooth@vger.kernel.org'
+Betreff: Establish a SPP Connection between two linux computers
+
+I want to connect two debian (lenny) systems with two Anycom USB-200 USB Dongles, so I've downloaded the bluez-1.41 driver.
+
+I want to create a serial connection (by using SPP). 
+
+At the beginning, I've tested the driver by connecting a linux operating system with a windows operating system.
+
+I run  sdptool browse and I've found:
+
+Service Name: Serieller Bluetooth-Anschluss
+.
+Protocol Descriptor List:
+            "L2CAP"  (0x0100)
+            "RFCOMM"  (0x0003)
+                        Channel: 1
+..
+
+After this I run rfcomm bind 0 <bdaddr> 1 and then I could establish with minicom  a connection to the windows system and send data.
+
+In the second turn. I install bluez on the second linux computer. After running sdptool browse, there are no entries for serial support.
+I've also created an entry with sdptool add -channel 1 SP. Afterwards I could browse the serial port entry with the other computer,
+but there was also no way to connect the computers.
+
+So here my question:  How can I connect two linux systems with bluetooth by using the serial port profile.
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
