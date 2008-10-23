@@ -1,10 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Zhigang" <zhigang.li@intel.com>
-To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
-Date: Thu, 30 Oct 2008 10:07:35 +0800
-Message-ID: <722F286E5CF54C459DDA462B750B07CE0C271BA07F@pdsmsx502.ccr.corp.intel.com>
-MIME-Version: 1.0
-Subject: [Bluez-users] bluetooth audio problem
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+In-Reply-To: <BLU127-W16B80F725862BEFF8D88BF88300@phx.gbl>
+References: <BLU127-W5086F7E6B9F25F84000E5688300@phx.gbl>
+	<1224084214.4764.14.camel@californication>
+	<BLU127-W16B80F725862BEFF8D88BF88300@phx.gbl>
+Date: Thu, 23 Oct 2008 06:52:38 +0200
+Message-Id: <1224737558.9386.173.camel@californication>
+Mime-Version: 1.0
+Subject: Re: [Bluez-users] Is "HCI_Read_Rssi" is the only option
+	to	get	RSSI	value from "Non-discoverable" Device?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -14,25 +19,33 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="gb2312"
+Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-SGkgYWxsLA0KSSBoYXZlIG9uZSBwcm9ibGVtIHdpdGggbXBsYXllcqO6ICAgbXBsYXllciAtYW8g
-YWxzYTpkZXZpY2U9Qmx1ZXRvb3RoIGZpbGUubXAzDQpUaGVyZSBhbHdheXMgZGlzcGxheSB0aGUg
-ZXJyb3JzOg0KW0FPX0FMU0FdIGFsc2EtbGliOiBwY20uYzoyMTQ0OihzbmRfcGNtX29wZW5fbm91
-cGRhdGUpIFVua25vd24gUENNIGJsdWV0b290aA0KW0FPX0FMU0FdIFBsYXliYWNrIG9wZW4gZXJy
-b3I6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkNCkNvdWxkIG5vdCBvcGVuL2luaXRpYWxpemUg
-YXVkaW8gZGV2aWNlIC0+IG5vIHNvdW5kLg0KQXVkaW86IG5vIHNvdW5kDQpWaWRlbzogbm8gdmlk
-ZW8NCg0KDQpCdXQgdGhlIG1wbGF5ZXIgd29yayBmaW5lIA0KDQpBbHNvIEkgY2FuIHVzZSBhcGxh
-eTogIGFwbGF5IHdvcmtzIGZpbmUgd2l0aCBCbHVldG9vdGggaGVhZHNldC4NCg0KUGVyaGFwcyBJ
-IGRpZG4ndCBzZXQgcmlnaHQgY29uZmlndXJhdGlvbiBhbnlib2R5IGhhdmUgdGhlIHNhbWUgcHJv
-YmxlbSBvciBpZGVhPw0KDQpUaGFua3MNCg0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLk5ldCBl
-bWFpbCBpcyBzcG9uc29yZWQgYnkgdGhlIE1vYmxpbiBZb3VyIE1vdmUgRGV2ZWxvcGVyJ3MgY2hh
-bGxlbmdlCkJ1aWxkIHRoZSBjb29sZXN0IExpbnV4IGJhc2VkIGFwcGxpY2F0aW9ucyB3aXRoIE1v
-YmxpbiBTREsgJiB3aW4gZ3JlYXQgcHJpemVzCkdyYW5kIHByaXplIGlzIGEgdHJpcCBmb3IgdHdv
-IHRvIGFuIE9wZW4gU291cmNlIGV2ZW50IGFueXdoZXJlIGluIHRoZSB3b3JsZApodHRwOi8vbW9i
-bGluLWNvbnRlc3Qub3JnL3JlZGlyZWN0LnBocD9iYW5uZXJfaWQ9MTAwJnVybD0vCl9fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxp
-bmcgbGlzdApCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5z
-b3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
+Hi,
+
+> As you pointed out, I went back and read the spec and found that it is absolutly true.
+> 
+> My understanding, Read_RSSI will give the result after compare with the golden recieve power range, instead the Inq_result_with_rssi will just give me the real power recieve in dBm.
+> 
+> I think I would be better off go with the inquiry option. However, my next concern is:
+> 
+> 1.) Can the Non-discoverable mode device response to the inquiry_result_with_rssi of the connected device or not-conected but pair device(Known the address)?
+
+No.
+
+Regards
+
+Marcel
+
+
+
+-------------------------------------------------------------------------
+This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
+Build the coolest Linux based applications with Moblin SDK & win great prizes
+Grand prize is a trip for two to an Open Source event anywhere in the world
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
+_______________________________________________
+Bluez-users mailing list
+Bluez-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-users
