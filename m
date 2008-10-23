@@ -1,31 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Run hid2hci after resuming from suspend
-From: Bastien Nocera <hadess@hadess.net>
-To: Mario Limonciello <mario_limonciello@dell.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <4900A67C.2050803@dell.com>
-References: <48FF92EB.3050007@dell.com>
-	 <1224737041.9386.160.camel@californication>  <4900A67C.2050803@dell.com>
-Content-Type: text/plain
-Date: Fri, 24 Oct 2008 09:06:50 +0100
-Message-Id: <1224835610.2895.858.camel@cookie.hadess.net>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 24 Oct 2008 03:46:39 +0400
+From: Alexander Beregalov <a.beregalov@gmail.com>
+To: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Subject: [PATCH] rfcomm/sock.c: fix warning unused variable
+Message-ID: <20081023234639.GC14519@orion>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2008-10-23 at 11:29 -0500, Mario Limonciello wrote:
-> 
-> +[ -f /etc/default/bluetooth ] || exit $NA
-> +
-> +. /etc/default/bluetooth
+rfcomm/sock.c:795: warning: unused variable 'sk'
 
-Wrong file to source under Fedora.
+Signed-off-by: Alexander Beregalov <a.beregalov@gmail.com>
+---
 
-> +       if [ "$HID2HCI_ENABLED" = "1" ] && [ -x /usr/sbin/hid2hci ];
-> then
+ net/bluetooth/rfcomm/sock.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-$ grep "HID2HCI_ENABLE[D=]" /etc/sysconfig/bluetooth 
-#HID2HCI_ENABLE=true
-
-Cheers
-
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 8a972b6..f35e5de 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -792,7 +792,6 @@ static int rfcomm_sock_getsockopt(struct socket *sock, int level, int optname, c
+ 
+ static int rfcomm_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+ {
+-	struct sock *sk = sock->sk;
+ 	int err;
+ 
+ 	BT_DBG("sk %p cmd %x arg %lx", sk, cmd, arg);
+@@ -801,6 +800,7 @@ static int rfcomm_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned lon
+ 
+ 	if (err == -ENOIOCTLCMD) {
+ #ifdef CONFIG_BT_RFCOMM_TTY
++		struct sock *sk = sock->sk;
+ 		lock_sock(sk);
+ 		err = rfcomm_dev_ioctl(sk, cmd, (void __user *) arg);
+ 		release_sock(sk);
