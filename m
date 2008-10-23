@@ -1,34 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Fix Apple Wireless keyboard pairing?
+Subject: Re: Could you explain how to discover remote devices without
+	periodic inquiry ?
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Mario Limonciello <mario_limonciello@dell.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <48F6639E.40701@dell.com>
-References: <1224032783.5268.1418.camel@cookie.hadess.net>
-	 <48F63904.6090902@dell.com> <1224106339.5268.3642.camel@cookie.hadess.net>
-	 <48F6639E.40701@dell.com>
-Content-Type: text/plain
-Date: Thu, 23 Oct 2008 06:54:58 +0200
-Message-Id: <1224737698.9386.178.camel@californication>
+To: chanyeol.park@samsung.com
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <22696206.256481224054636606.JavaMail.weblogic@epml03>
+References: <22696206.256481224054636606.JavaMail.weblogic@epml03>
+Content-Type: text/plain; charset=utf-8
+Date: Thu, 23 Oct 2008 06:53:30 +0200
+Message-Id: <1224737610.9386.175.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mario,
+Hi,
 
-> Yeah, I'll definitely agree these keyboards are quite finicky to get
-> paired.  I was initially hoping your patch would help that, but then
-> realized it won't affect mine.  It seems that the only way I've gotten
-> them to improve is if I remove any other devices that were paired with
-> them previously from the proximity and try to find a good combination of
-> pressing buttons in the GUI and pressing the power button on the keyboard.
+> Could you explain how to discover remote devices without periodic inquiry ? 
+> When I send dbus command “dbus-send --system --type=method_call  --dest="org.bluez" /org/bluez/hci0 org.bluez.Adapter.StartDiscovery“, Bluetooth module starts periodic search. 
 > 
-> I  think the poster to that bug has the older pre-broadcom series of
-> this hardware, which would explain the similar ID to the mighty mouse.
+> I just want only normal search. Even though I have an experience of Bluez 3.x. it's not easy to use BlueZ 4.x API.  
 
-please do me favor and stop top-posting.
-
-http://www.bluez.org/development/lists/
+there is no real difference in Periodic Inquiry and Inquiry from the
+baseband point of view. Check the Bluetooth specification.
 
 Regards
 
