@@ -1,31 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCHes] Better buttons in adapter properties
+Subject: Re: [PATCH] Quirk for Apple Aluminum Bluetooth  keyboard FN key
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: David Sainty <david.sainty@dtsp.co.nz>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1224108411.5268.3681.camel@cookie.hadess.net>
-References: <1224003756.5268.371.camel@cookie.hadess.net>
-	 <48F523EC.9010007@dtsp.co.nz>
-	 <1224025489.5268.1049.camel@cookie.hadess.net>
-	 <48F52A51.6010506@dtsp.co.nz>
-	 <1224108411.5268.3681.camel@cookie.hadess.net>
+To: Mario Limonciello <mario_limonciello@dell.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <48F50EEB.1060802@dell.com>
+References: <48F50EEB.1060802@dell.com>
 Content-Type: text/plain
-Date: Thu, 23 Oct 2008 06:57:18 +0200
-Message-Id: <1224737838.9386.182.camel@californication>
+Date: Thu, 23 Oct 2008 06:56:11 +0200
+Message-Id: <1224737771.9386.180.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Mario,
 
-> > 800x480 full screen.  But the standard window manager decorations on the 
-> > EeePC make anything taller than 422 pixels start to not fit.
-> 
-> I think we can easily reduce the space taken by the visibility and
-> friendly name sections. I'll try to get a patch ready tomorrow.
+> This patch was present in Ubuntu Hardy, but got dropped by accident in
+> Intrepid and never submitted upstream.  It adds a quirk enabling the FN
+> key on the Apple Aluminum Bluetooth Wireless Keyboard.
 
-any updates here that I might have missed?
+yeah, the Ubuntu kernel team is pretty bad in getting patches back to
+upstream. However in this case please check with the upstream kernel
+since the HID bus makes all quirks general to the HID subsystem.
 
 Regards
 
