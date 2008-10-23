@@ -1,55 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] Add doc for the Icon property
-From: Bastien Nocera <hadess@hadess.net>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="=-opVUxikPHbruIZp9s7XB"
-Date: Thu, 23 Oct 2008 21:59:38 +0100
-Message-Id: <1224795578.2895.165.camel@cookie.hadess.net>
+Subject: Re: [PATCH] first udev rules for running hid2hci
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Mario Limonciello <mario_limonciello@dell.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <4900DBD0.3040108@dell.com>
+References: <4900DBD0.3040108@dell.com>
+Content-Type: text/plain
+Date: Thu, 23 Oct 2008 22:58:12 +0200
+Message-Id: <1224795492.9386.198.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Mario,
 
---=-opVUxikPHbruIZp9s7XB
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+> Attached is a patch that adds another set of udev rules that will run
+> hid2hci, at least for the Dell BT adapters.  Other adapters can get
+> added in too, but I think some more attributes will be needed for them. 
+> I'm doing this as a separate set of udev rules than the PCMCIA rules so
+> that these can be installed by default whereas the PCMCIA ones are
+> normally placed in a different binary package for distros.
 
-As mentioned on IRC.
+I like to have this all in one and that the PCMCIA ones are in a
+different binary package is a distro problem. They don't have to be
+since we don't have the dependency of pcmcia-cs anymore. That is ancient
+2.4 stuff.
 
---=-opVUxikPHbruIZp9s7XB
-Content-Disposition: attachment; filename="0001-Add-doc-for-the-device-Icon-property.patch"
-Content-Type: text/x-patch; name="0001-Add-doc-for-the-device-Icon-property.patch"; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+If you are doing this, then also please modify hid2hci so it can take a
+parameter to select the device you run it for. Currently it would switch
+all of them. Even if you trigger it for only one.
 
->From d07e3ab49f75a2bb37611d3fe1f5320a34987447 Mon Sep 17 00:00:00 2001
-From: Bastien Nocera <hadess@hadess.net>
-Date: Thu, 23 Oct 2008 21:57:06 +0100
-Subject: [PATCH] Add doc for the device Icon property
+And I was actually more thinking to convert hid2hci into a bluetoothd
+plugin so the core daemon has control over it. Think about it.
 
-.
----
- doc/device-api.txt |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
+Regards
 
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index 9e39946..b2010f6 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -169,3 +169,11 @@ Properties	string Address [readonly]
- 		object Adapter [readonly]
- 
- 			The object path of the adpater the device belongs to.
-+
-+		string Icon [readonly]
-+
-+			The icon name for the remote device. The icon name
-+			follows the Icon Naming specification from
-+			freedesktop.org. For unknown, or unrecognised types
-+			of devices, this is simply "bluetooth".
-+
--- 
-1.6.0.3
+Marcel
 
-
---=-opVUxikPHbruIZp9s7XB--
 
