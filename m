@@ -1,24 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Add support for HID->HCI switching on Dell BT365
+Subject: Re: how to set passkey in bluez4.X
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Mario Limonciello <mario_limonciello@dell.com>
+To: "Li, Zhigang" <zhigang.li@intel.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <48FD2C78.7050903@dell.com>
-References: <48FD2C78.7050903@dell.com>
+In-Reply-To: <722F286E5CF54C459DDA462B750B07CE0C1EC83506@pdsmsx502.ccr.corp.intel.com>
+References: <722F286E5CF54C459DDA462B750B07CE0C1EC83506@pdsmsx502.ccr.corp.intel.com>
 Content-Type: text/plain
-Date: Thu, 23 Oct 2008 06:46:42 +0200
-Message-Id: <1224737202.9386.164.camel@californication>
+Date: Thu, 23 Oct 2008 06:45:36 +0200
+Message-Id: <1224737136.9386.162.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mario,
+Hi Zhigang,
 
-> This patch adds the VID/PID for this adapter which uses the same
-> methodology for switching modes as the BT370 and BT410.
+> Could somebody know how to set passkey in bluez4.X?
+> 
+> In Bluez3.X we can set it in hcid.conf and I tried set passkey in main.conf
+> 
+> I added the passkey at the end of this file. Passkey = "1234"
+> 
+> But it doesn't work.
 
-that was my missing patch. This and the Logitech one has been applied
-(and fixed up) and pushed.
+having pin codes in a config file is wrong and insecure. You have to
+have a BlueZ agent running to answer pin requests.
 
 Regards
 
