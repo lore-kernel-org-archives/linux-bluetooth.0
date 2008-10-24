@@ -1,11 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Christian Hoene" <hoene@uni-tuebingen.de>
-To: <bluez-devel@lists.sourceforge.net>
-Date: Mon, 27 Oct 2008 10:54:27 +0100
-Message-ID: <001501c9381a$022b7f40$06827dc0$@de>
-MIME-Version: 1.0
-Cc: 'Frans de Bont' <frans.de.bont@philips.com>
-Subject: [Bluez-devel] Bad encoding performance of Linux SBC audio codec
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <223378410810240218x7c25901fne41220d39549d4ea@mail.gmail.com>
+References: <1224737867.9386.184.camel@californication>
+	<223378410810240218x7c25901fne41220d39549d4ea@mail.gmail.com>
+Date: Fri, 24 Oct 2008 12:22:55 +0200
+Message-Id: <1224843776.7536.54.camel@californication>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] problems with kernel 2.6.23 + bluez 3.36 + SCO
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,40 +17,48 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Hi Rakesh,
 
-I have made some extensive study on the compression performance of Linux's
-SBC audio codec in comparison to the reference implementation.
+> I am using bluez-gnome-1.8 on ububntu-8.04. 
+> It doesn't seems to work properly.
+> when I run the command `bluetooth-wizard` I get the following messages
+> on the terminal----
 
-I am sorry to say that the audio quality of the open source version of SBC
-is far worse than the reference implementation.
+<snip>
 
-Can anybody confirm these results?
-Do you have any idea why the performance is so worse?
+> On Thu, Oct 23, 2008 at 10:27 AM, Marcel Holtmann
+> <marcel@holtmann.org> wrote:
+>         Hi Pierre,
+>         
+>         > We develop an application for our board based on SCO. We use
+>         the kernel
+>         > version 2.6.23 and the bluez-lib 3.36. However we have a lot
+>         of problems and
+>         > some "kernel panic". Below this message you will find some
+>         of these kernel
+>         > messages.
+>         > How can we stop it? Have you ever saw that?
+>         
+>         switch to a 2.6.27 kernel.
 
-With best regards,
+never ever hijack other peoples thread. Follow the rules and be a good
+citizen.
 
- Christian
+Regards
 
-
---------------------------------------------------------
-Dr.-Ing. Christian Hoene
-Computer Networks and Internet, University of T=FCbingen
-Sand 13, 72076 T=FCbingen, Germany, Phone +49 7071 2970532
-http://net.informatik.uni-tuebingen.de/~hoene
+Marcel
 
 
 
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great priz=
-es
+Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
