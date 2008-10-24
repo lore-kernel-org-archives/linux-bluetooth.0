@@ -1,77 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <40aff9180810251901l6ecfa88drd671c08a5ac33821@mail.gmail.com>
-Date: Sun, 26 Oct 2008 03:01:03 +0100
-From: Fiorellino <fiorellino@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: pairing of bluez-utils 3.36-1 with keysonic 340 BT fails (no PIN requested)
-In-Reply-To: <40aff9180810251825w1085c6d6q5ee37406475809cf@mail.gmail.com>
+From: Daniel Matthes <matthes@ftz.htwk-leipzig.de>
+To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 24 Oct 2008 15:23:01 +0200
+Subject: AW: Establish a SPP Connection between two linux computers
+Message-ID: <09E68493E3CD0D47BF12172B07F527382CCB5D1EBF@mail1.ftz.htwk-leipzig.de>
+References: <09E68493E3CD0D47BF12172B07F527382CC88B2B9C@mail1.ftz.htwk-leipzig.de>
+ <09E68493E3CD0D47BF12172B07F527382CC88B2BCE@mail1.ftz.htwk-leipzig.de>
+ <09E68493E3CD0D47BF12172B07F527382CCB5D1EBA@mail1.ftz.htwk-leipzig.de>
+In-Reply-To: <09E68493E3CD0D47BF12172B07F527382CCB5D1EBA@mail1.ftz.htwk-leipzig.de>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <40aff9180810251825w1085c6d6q5ee37406475809cf@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi there,
+Hello everybody, hello Marcel,
 
-I have a keysonic bluetooth keyboard.
-It works perfectly under windows (I know you don't care, but at least
-the keyboard is working fine!) using the embedded BT controller of my
-laptop.
+	
+I need a quick answer to my question, to solve my task. Could someone please answer my question quickly
 
-Now I'd like to use it under Debian lenny/sid in an embedded PC
-(alix3d3) using a Trust Ultra Small Bluetooth 2 USB Adapter.
+Thanks in advance
 
-With "apt-get install" I installed bluez-utils 3.36-1.
+Daniel
+-----Ursprüngliche Nachricht-----
+Von: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] Im Auftrag von Daniel Matthes
+Gesendet: Donnerstag, 23. Oktober 2008 10:43
+An: 'linux-bluetooth@vger.kernel.org'
+Betreff: Re: Establish a SPP Connection between two linux computers
 
-I tried to follow this howto:
-http://www.ubuntugeek.com/howto-setup-bluetooth-keyboard-and-mouse-in-ubuntu.html
 
-Everything seemed pretty promising:
+Hello again,
 
-hcitool scan would find the keyboard
+Is somebody able to solve my problem?
 
-I added the device in /etc/bluetooth/hcid.conf as suggested and now it
-looks like this:
+I'm looking for a solution to connect two linux systems by using the serial port profile. I have so far found no way to solve this problem, because I could not find the serial port service within the bluez driver.
 
-voyage:~# cat /etc/bluetooth/hcid.conf
-options {
-        autoinit yes;
-        security auto;
-        pairing multi;
-        passkey "1234";
-}
-device {
-        name "%h-%d";
-        class 0x000100;
-        iscan enable; pscan enable;
-        lm master;
-        lp rswitch,hold,sniff,park;
-        discovto 0;
-}
-device 00:18:00:00:78:86 {
-        name "BTKB-7886";
-        auth enable;
-        encrypt enable;
-}
+Regards Daniel
 
-I restarted bluez using /etc/init.d/bluetooth restart and tried to
-connect with hidd --search...
+-----Ursprüngliche Nachricht-----
+Von: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] Im Auftrag von Daniel Matthes
+Gesendet: Dienstag, 21. Oktober 2008 15:16
+An: 'linux-bluetooth@vger.kernel.org'
+Betreff: Establish a SPP Connection between two linux computers
 
-I type the passkey and pressed enter on the keyboard. From the linux
-prospective, everything seems fine.
+I want to connect two debian (lenny) systems with two Anycom USB-200 USB Dongles, so I've downloaded the bluez-1.41 driver.
 
-If I show connected BT devices, the keyboard is listed, but the
-pairing led keeps blinking, and the keyboard doesn't work.
+I want to create a serial connection (by using SPP). 
 
-I also trying compiling passkey-agent and have "passkey-agent
---default 1234" in the background, but didn't help.
+At the beginning, I've tested the driver by connecting a linux operating system with a windows operating system.
 
-You can find that other people had the issue:
-http://ubuntuforums.org/showthread.php?t=911262
-http://ubuntuforums.org/showthread.php?t=800863
+I run  sdptool browse and I've found:
 
-Any idea or help is appreciated.
+Service Name: Serieller Bluetooth-Anschluss
+.
+Protocol Descriptor List:
+            "L2CAP"  (0x0100)
+            "RFCOMM"  (0x0003)
+                        Channel: 1
+..
 
-Thank you,
+After this I run rfcomm bind 0 <bdaddr> 1 and then I could establish with minicom  a connection to the windows system and send data.
 
-alfonso
+In the second turn. I install bluez on the second linux computer. After running sdptool browse, there are no entries for serial support.
+I've also created an entry with sdptool add -channel 1 SP. Afterwards I could browse the serial port entry with the other computer,
+but there was also no way to connect the computers.
+
+So here my question:  How can I connect two linux systems with bluetooth by using the serial port profile.
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
