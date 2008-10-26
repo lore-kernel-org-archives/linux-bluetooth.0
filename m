@@ -1,65 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 26 Oct 2008 01:12:13 -0400 (EDT)
-From: "George F. Nemeyer" <tigerwolf@tigerden.com>
+Message-ID: <40aff9180810251901l6ecfa88drd671c08a5ac33821@mail.gmail.com>
+Date: Sun, 26 Oct 2008 03:01:03 +0100
+From: Fiorellino <fiorellino@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: 4.16 Bluez compile failure
-Message-ID: <Pine.LNX.4.53.0810260102170.14544@tiger.tigerden.com>
+Subject: pairing of bluez-utils 3.36-1 with keysonic 340 BT fails (no PIN requested)
+In-Reply-To: <40aff9180810251825w1085c6d6q5ee37406475809cf@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
+References: <40aff9180810251825w1085c6d6q5ee37406475809cf@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Compile of 4.16 package fails with:
+Hi there,
 
-gcc -I../include -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include
--I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I../gdbus
--DPLUGINDIR=\"/usr/lib/bluetooth/plugins\" -O2 -march=i586 -mtune=i686
--D_FORTIFY_SOURCE=2 -fPIC -Wl,--export-dynamic -pie -o .libs/bluetoothd
-main.o security.o sdpd-server.o sdpd-request.o sdpd-service.o
-sdpd-database.o plugin.o storage.o agent.o error.o manager.o adapter.o
-device.o dbus-common.o dbus-hci.o  ../common/libhelper.a
-../gdbus/.libs/libgdbus.a /usr/lib/libglib-2.0.so /usr/lib/libdbus-1.so
-../lib/.libs/libbluetooth.so -ldl
-device.o(.text+0xbb5): In function `disconnect':
-: undefined reference to `g_timeout_add_seconds'
-collect2: ld returned 1 exit status
-make[2]: *** [bluetoothd] Error 1
-make[2]: Leaving directory `/root/Desktop/bluez-4.16/src'
-make[1]: *** [all-recursive] Error 1
-make[1]: Leaving directory `/root/Desktop/bluez-4.16'
-make: *** [all] Error 2
+I have a keysonic bluetooth keyboard.
+It works perfectly under windows (I know you don't care, but at least
+the keyboard is working fine!) using the embedded BT controller of my
+laptop.
 
-Machine info:
-Linux blackwolf.tigerden.net 2.6.20_IBM-600 #2 PREEMPT Thu May 8 01:08:22
-EDT 2008 i686 pentium2 i386 GNU/Linux
+Now I'd like to use it under Debian lenny/sid in an embedded PC
+(alix3d3) using a Trust Ultra Small Bluetooth 2 USB Adapter.
 
-DISTRO:  Vector Linux 5.8 Standard (based on slackware)
+With "apt-get install" I installed bluez-utils 3.36-1.
 
-Machine sees an adapter:
+I tried to follow this howto:
+http://www.ubuntugeek.com/howto-setup-bluetooth-keyboard-and-mouse-in-ubuntu.html
 
-Oct 25 23:41:33 blackwolf kernel: usb 1-1: new full speed USB device
-using uhci_hcd and address 2
-Oct 25 23:41:33 blackwolf kernel: usb 1-1: configuration #1 chosen from 1
-choice
-Oct 25 23:41:34 blackwolf kernel: Bluetooth: Core ver 2.11
-Oct 25 23:41:34 blackwolf kernel: NET: Registered protocol family 31
-Oct 25 23:41:34 blackwolf kernel: Bluetooth: HCI device and connection
-manager initialized
-Oct 25 23:41:34 blackwolf kernel: Bluetooth: HCI socket layer initialized
-Oct 25 23:41:34 blackwolf kernel: Bluetooth: HCI USB driver ver 2.9
-Oct 25 23:41:34 blackwolf kernel: usbcore: registered new interface driver
-hci_usb
+Everything seemed pretty promising:
 
+hcitool scan would find the keyboard
 
-GCC:
-Reading specs from /usr/lib/gcc/i486-slackware-linux/3.4.6/specs
-Configured with: ../gcc-3.4.6/configure --prefix=/usr --enable-shared
---enable-threads=posix --enable-__cxa_atexit --disable-checking
---with-gnu-ld --verbose --target=i486-slackware-linux
---host=i486-slackware-linux
-Thread model: posix
-gcc version 3.4.6
+I added the device in /etc/bluetooth/hcid.conf as suggested and now it
+looks like this:
 
-Any help and cure would be appreciated.
+voyage:~# cat /etc/bluetooth/hcid.conf
+options {
+        autoinit yes;
+        security auto;
+        pairing multi;
+        passkey "1234";
+}
+device {
+        name "%h-%d";
+        class 0x000100;
+        iscan enable; pscan enable;
+        lm master;
+        lp rswitch,hold,sniff,park;
+        discovto 0;
+}
+device 00:18:00:00:78:86 {
+        name "BTKB-7886";
+        auth enable;
+        encrypt enable;
+}
 
-=^_^=  Tigerwolf
+I restarted bluez using /etc/init.d/bluetooth restart and tried to
+connect with hidd --search...
+
+I type the passkey and pressed enter on the keyboard. From the linux
+prospective, everything seems fine.
+
+If I show connected BT devices, the keyboard is listed, but the
+pairing led keeps blinking, and the keyboard doesn't work.
+
+I also trying compiling passkey-agent and have "passkey-agent
+--default 1234" in the background, but didn't help.
+
+You can find that other people had the issue:
+http://ubuntuforums.org/showthread.php?t=911262
+http://ubuntuforums.org/showthread.php?t=800863
+
+Any idea or help is appreciated.
+
+Thank you,
+
+alfonso
