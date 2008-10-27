@@ -1,25 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Missing support in btusb for broadcom dongle 0a5c:2009
-From: Guillaume Bedot <littletux@zarb.org>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain
-Date: Mon, 27 Oct 2008 17:03:52 +0100
-Message-Id: <1225123432.15672.6.camel@localhost>
-Mime-Version: 1.0
+From: Daniel Matthes <matthes@ftz.htwk-leipzig.de>
+To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 27 Oct 2008 15:46:47 +0100
+Subject: Cross-Compile bluez for arm
+Message-ID: <09E68493E3CD0D47BF12172B07F527382CCB5D1EEE@mail1.ftz.htwk-leipzig.de>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hello
 
-It seems this particular dongle needs a quirk that existed in hci_usb,
-but doesn't in btusb.
+Anybody knows about a recent HowTO on cross-compilation of the bluez driver for a ARM-based system
 
-Is it possible to send some command to use this dongle (as hciconfig
-reset can replace the reset quirk) ?
+Regards
 
-Or should the quirk be introduced in btusb too ?
-
-Regards,
-
-Guillaume B.
+Daniel
 
