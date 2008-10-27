@@ -1,32 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Oct 2008 16:14:06 -0400 (EDT)
-From: "George F. Nemeyer" <tigerwolf@tigerden.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: linux-bluetooth@vger.kernel.org
-Subject: Re: 4.16 Bluez compile failure
-In-Reply-To: <1225136805.7157.29.camel@californication>
-Message-ID: <Pine.LNX.4.53.0810271554490.18783@tiger.tigerden.com>
-References: <Pine.LNX.4.53.0810260102170.14544@tiger.tigerden.com>
- <1225136805.7157.29.camel@californication>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [PATCH] Sort devices by type in the treeviews
+From: Marcel Holtmann <marcel@holtmann.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1225137382.3584.115.camel@cookie.hadess.net>
+References: <1225024770.1503.1398.camel@cookie.hadess.net>
+	 <1225136737.7157.26.camel@californication>
+	 <1225137382.3584.115.camel@cookie.hadess.net>
+Content-Type: text/plain
+Date: Mon, 27 Oct 2008 21:03:32 +0100
+Message-Id: <1225137812.7157.39.camel@californication>
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 27 Oct 2008, Marcel Holtmann wrote:
+Hi Bastien,
 
-> you need a GLib version with g_timeout_add_seconds. So it seems that
-> your version of GLib is just too old. Which version are you using?
+> > > Sorting by RSSI means that the devices just around in the treeview
+> > > which is painfully annoying.
+> > 
+> > we want to sort by RSSI to list devices in range first. However we
+> > should extend the sorting to always list already known or paired devices
+> > first. This should stop them from moving around.
+> > 
+> > If it stil jumps too much for you, then we might just improve the
+> > sorting mechanism to be a little bit more resistance for jumping around,
+> > but sorting by type gives us no advantage.
+> 
+> It certainly jumps around far too much. It flickers tens of times a
+> second, switching between a phone and the Mac mini just next to it...
 
-glib-1.2.10-i386-2
-glib2-2.12.10-i586-4vl58
-glibc-2.3.6-i486-6
-glibc-solibs-2.3.6-i486-6
-glibc-i18n-2.3.6-noarch-6
-glibc-zoneinfo-2.3.6-noarch-6
+then we just need to be smart about it. Meaning we only switch positions
+if the RSSI value is a big difference. So that close devices don't jump
+that much.
 
-These are the latest currently available for this distribution.  It's
-currently deployed across about 40 production machines.
+Regards
 
-Regards,
+Marcel
 
-George Nemeyer
+
