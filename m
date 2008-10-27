@@ -1,32 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sun, 26 Oct 2008 23:09:04 -0700 (PDT)
+Message-Id: <20081026.230904.103613855.davem@davemloft.net>
+To: sergio@larces.uece.br
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 Subject: Re: [patch 1/2] btsdio: free sk_buff with kfree_skb
-From: Marcel Holtmann <marcel@holtmann.org>
-To: David Miller <davem@davemloft.net>
-Cc: sergio@larces.uece.br, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-In-Reply-To: <20081026.230904.103613855.davem@davemloft.net>
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <4904194D.1080806@larces.uece.br>
 References: <4904194D.1080806@larces.uece.br>
-	 <20081026.230904.103613855.davem@davemloft.net>
-Content-Type: text/plain
-Date: Mon, 27 Oct 2008 09:37:42 +0100
-Message-Id: <1225096662.7157.7.camel@californication>
 Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
+From: Sergio Luis <sergio@larces.uece.br>
+Date: Sun, 26 Oct 2008 04:16:29 -0300
 
-> > free sk_buff with kfree_skb, instead of kree
-> >  
-> > Signed-off-by: Sergio Luis <sergio@larces.uece.br>
-> 
-> Since this is pretty obvious I'm applying this directly, I hope
-> Marcel doesn't mind :-)
+> free sk_buff with kfree_skb, instead of kree
+>  
+> Signed-off-by: Sergio Luis <sergio@larces.uece.br>
 
-that is fine with me. No need to run this through me.
-
-Regards
-
-Marcel
-
-
+Since this is pretty obvious I'm applying this directly, I hope
+Marcel doesn't mind :-)
