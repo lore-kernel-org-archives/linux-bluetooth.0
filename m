@@ -1,50 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Problems & crash with Bluecore6 and SDIO driver
+Subject: Re: [PATCH] Missing support in btusb for broadcom dongle 0a5c:2009
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Matt Witherspoon <spoon@vt.edu>
-Cc: linux-bluetooth@vger.kernel.org,
-	David Vrabel <david.vrabel@csr.com>
-In-Reply-To: <1225132303.4906090f12442@webmail.vt.edu>
-References: <1225132303.4906090f12442@webmail.vt.edu>
+To: Guillaume Bedot <littletux@zarb.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1225132418.29183.7.camel@localhost>
+References: <1225123432.15672.6.camel@localhost>
+	 <1225130694.7157.12.camel@californication>
+	 <1225132418.29183.7.camel@localhost>
 Content-Type: text/plain
-Date: Mon, 27 Oct 2008 20:40:52 +0100
-Message-Id: <1225136452.7157.20.camel@californication>
+Date: Mon, 27 Oct 2008 20:35:23 +0100
+Message-Id: <1225136123.7157.14.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mark,
+Hi Guillaume,
 
-> > Deep sleep control is done on a per-function basis so you need to write
-> > 0x11 to disable deep sleep on function 1 (the bluetooth function).
+> > > It seems this particular dongle needs a quirk that existed in hci_usb,
+> > > but doesn't in btusb.
+> > > 
+> > > Is it possible to send some command to use this dongle (as hciconfig
+> > > reset can replace the reset quirk) ?
+> > > 
+> > > Or should the quirk be introduced in btusb too ?
+> > 
+> > you can load btusb with reset=1 and that does the same trick, but the
+> > quirk should be added to btusb directly. Send in the lsusb output and
+> > content of /proc/bus/usb/devices for your dongle.
 > 
-> Thanks for the response, David.
+> Sorry I was not clear enough...
 > 
-> Applying Tomas' patch does indeed fix the crash.
-> I put a sdio_f0_writeb(data->func, 0x11, 0xf0, NULL); in btsdio_open(). This
-> register write does seem to have some effect. Without it, idle current was
-> 0.6mA. With the write, idle current is around 2.5mA. However, the BC6 still
-> will not respond to commands after being idle for several seconds. Or, it will
-> respond but with bogus data (like a features bitfield of all 0x00s).
-> 
-> Then, I realized that if I run this command:
-> hciconfig hci0 up ; bccmd psset -s psram -r 0x0229 0
-> along with the register write, everything works great. I appear to have to do
-> both: the register write and the PSKEY setting. One or the other alone is not
-> sufficient.
+> It's a different init quirk that concern only that dongle at the moment.
+> With this patch it should be clearer.
 
-the 0x0229 translates to PSKEY_DEEP_SLEEP_STATE if anybody wonders. So
-for a full support of the BlueCore6 SDIO interface we would have to do a
-little bit more work. I stopped looking into it since the only BlueCore6
-that I have is an engineering release and I haven't checked it for a
-while. Never got updated hardware. Hint hint ;)
-
-> Does this seem correct to you? I can't see how btsdio could work on a BC6
-> without following this process, unless I have a old bad firmware or something.
-
-At the last BlueZ developer meeting, we discussed an init stage for all
-Bluetooth drivers. The init stage then can be used to init hardware with
-hardware specific details like PS settings or firmware download.
+hah. We forgot to port this one over from hci_usb :(
 
 Regards
 
