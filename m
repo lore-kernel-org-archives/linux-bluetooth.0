@@ -1,13 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <001501c9381a$022b7f40$06827dc0$@de>
-References: <001501c9381a$022b7f40$06827dc0$@de>
-Date: Mon, 27 Oct 2008 19:03:43 +0100
-Message-Id: <1225130623.7157.10.camel@californication>
-Mime-Version: 1.0
+From: "Christian Hoene" <hoene@uni-tuebingen.de>
+To: <bluez-devel@lists.sourceforge.net>
+Date: Mon, 27 Oct 2008 10:54:27 +0100
+Message-ID: <001501c9381a$022b7f40$06827dc0$@de>
+MIME-Version: 1.0
 Cc: 'Frans de Bont' <frans.de.bont@philips.com>
-Subject: Re: [Bluez-devel] Bad encoding performance of Linux SBC audio codec
+Subject: [Bluez-devel] Bad encoding performance of Linux SBC audio codec
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,35 +15,40 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="iso-8859-1"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Christian,
+Hello,
 
-> I have made some extensive study on the compression performance of Linux's
-> SBC audio codec in comparison to the reference implementation.
-> 
-> I am sorry to say that the audio quality of the open source version of SBC
-> is far worse than the reference implementation.
-> 
-> Can anybody confirm these results?
-> Do you have any idea why the performance is so worse?
+I have made some extensive study on the compression performance of Linux's
+SBC audio codec in comparison to the reference implementation.
 
-are you talking about the encoder or the decoder. For the encoder, I
-can't see the big difference. For the decoder you can clearly hear that
-we get the volume wrong.
+I am sorry to say that the audio quality of the open source version of SBC
+is far worse than the reference implementation.
 
-Regards
+Can anybody confirm these results?
+Do you have any idea why the performance is so worse?
 
-Marcel
+With best regards,
+
+ Christian
+
+
+--------------------------------------------------------
+Dr.-Ing. Christian Hoene
+Computer Networks and Internet, University of T=FCbingen
+Sand 13, 72076 T=FCbingen, Germany, Phone +49 7071 2970532
+http://net.informatik.uni-tuebingen.de/~hoene
+
 
 
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great prizes
+Build the coolest Linux based applications with Moblin SDK & win great priz=
+es
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=100&url=/
+http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
