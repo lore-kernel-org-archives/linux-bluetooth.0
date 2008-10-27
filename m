@@ -1,11 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300810271213w53d8d179gc3af2f89c37bea47@mail.gmail.com>
-Date: Mon, 27 Oct 2008 13:13:03 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
 In-Reply-To: <001501c9381a$022b7f40$06827dc0$@de>
-MIME-Version: 1.0
 References: <001501c9381a$022b7f40$06827dc0$@de>
+Date: Mon, 27 Oct 2008 19:03:43 +0100
+Message-Id: <1225130623.7157.10.camel@californication>
+Mime-Version: 1.0
+Cc: 'Frans de Bont' <frans.de.bont@philips.com>
 Subject: Re: [Bluez-devel] Bad encoding performance of Linux SBC audio codec
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
@@ -19,18 +20,26 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Christian
+Hi Christian,
 
+> I have made some extensive study on the compression performance of Linux's
+> SBC audio codec in comparison to the reference implementation.
+> 
 > I am sorry to say that the audio quality of the open source version of SBC
 > is far worse than the reference implementation.
+> 
+> Can anybody confirm these results?
+> Do you have any idea why the performance is so worse?
 
-If you are using the standalone "sbc" project at sourceforge, then you
-should try the version inside bluez. The standalone used to simply be
-slower, but we identified & fixed some quality issues too that should
-be backported.
+are you talking about the encoder or the decoder. For the encoder, I
+can't see the big difference. For the decoder you can clearly hear that
+we get the volume wrong.
 
--- 
-Brad Midgley
+Regards
+
+Marcel
+
+
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
