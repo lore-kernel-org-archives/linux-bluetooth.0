@@ -1,38 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Sort devices by type in the treeviews
+Subject: Re: Establish a SPP Connection between two linux computers
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <1225137382.3584.115.camel@cookie.hadess.net>
-References: <1225024770.1503.1398.camel@cookie.hadess.net>
-	 <1225136737.7157.26.camel@californication>
-	 <1225137382.3584.115.camel@cookie.hadess.net>
+To: Daniel Matthes <matthes@ftz.htwk-leipzig.de>
+Cc: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <09E68493E3CD0D47BF12172B07F527382CC88B2B9C@mail1.ftz.htwk-leipzig.de>
+References: <09E68493E3CD0D47BF12172B07F527382CC88B2B9C@mail1.ftz.htwk-leipzig.de>
 Content-Type: text/plain
-Date: Mon, 27 Oct 2008 21:03:32 +0100
-Message-Id: <1225137812.7157.39.camel@californication>
+Date: Mon, 27 Oct 2008 21:01:01 +0100
+Message-Id: <1225137661.7157.36.camel@californication>
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Daniel,
 
-> > > Sorting by RSSI means that the devices just around in the treeview
-> > > which is painfully annoying.
-> > 
-> > we want to sort by RSSI to list devices in range first. However we
-> > should extend the sorting to always list already known or paired devices
-> > first. This should stop them from moving around.
-> > 
-> > If it stil jumps too much for you, then we might just improve the
-> > sorting mechanism to be a little bit more resistance for jumping around,
-> > but sorting by type gives us no advantage.
+> I want to connect two debian (lenny) systems with two Anycom USB-200 USB Dongles, so I've downloaded the bluez-1.41 driver.
 > 
-> It certainly jumps around far too much. It flickers tens of times a
-> second, switching between a phone and the Mac mini just next to it...
+> I want to create a serial connection (by using SPP). 
+> 
+> At the beginning, I've tested the driver by connecting a linux operating system with a windows operating system.
+> 
+> I run  sdptool browse and I've found:
+> 
+> Service Name: Serieller Bluetooth-Anschluss
+> .
+> Protocol Descriptor List:
+>             "L2CAP"  (0x0100)
+>             "RFCOMM"  (0x0003)
+>                         Channel: 1
+> ..
+> 
+> After this I run rfcomm bind 0 <bdaddr> 1 and then I could establish with minicom  a connection to the windows system and send data.
+> 
+> In the second turn. I install bluez on the second linux computer. After running sdptool browse, there are no entries for serial support.
+> I've also created an entry with sdptool add -channel 1 SP. Afterwards I could browse the serial port entry with the other computer,
+> but there was also no way to connect the computers.
+> 
+> So here my question:  How can I connect two linux systems with bluetooth by using the serial port profile.
 
-then we just need to be smart about it. Meaning we only switch positions
-if the RSSI value is a big difference. So that close devices don't jump
-that much.
+the rfcomm listen command might get you somewhere, but also rctest would
+do it. However in the end you have to write your own daemon to do the
+work correctly.
 
 Regards
 
