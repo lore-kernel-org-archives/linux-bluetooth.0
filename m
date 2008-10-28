@@ -1,57 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Pierre Savary" <pierre.savary@kerlink.fr>
-To: "'Marcel Holtmann'" <marcel@holtmann.org>
-Cc: "'BlueZ-Dev'" <bluez-devel@lists.sourceforge.net>,
-	<bluez-users@lists.sourceforge.net>,
-	<linux-bluetooth@vger.kernel.org>
-References: <000001c92e07$010874f0$03195ed0$@savary@kerlink.fr> <1224737867.9386.184.camel@californication>
-In-Reply-To: <1224737867.9386.184.camel@californication>
-Subject: RE: problems with kernel 2.6.23 + bluez 3.36 + SCO
-Date: Wed, 29 Oct 2008 15:49:28 +0100
-Message-ID: <001701c939d5$8b94c590$a2be50b0$@savary@kerlink.fr>
+Message-ID: <8b5debfa0810280816p60f475d4s6f105b0d89f20c80@mail.gmail.com>
+Date: Tue, 28 Oct 2008 20:46:06 +0530
+From: "alok barsode" <alokbarsode@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [Patch]Netlink: adding nlbluetooth.c for netlink support
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
+Content-Type: multipart/mixed;
+	boundary="----=_Part_108210_1693786.1225206966691"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I it possible to update only the bluez stack ???
-Thanks in advance,
-Regards
+------=_Part_108210_1693786.1225206966691
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-Pierre
+Marcel,
 
------Message d'origine-----
-De=A0: linux-bluetooth-owner@vger.kernel.org
-[mailto:linux-bluetooth-owner@vger.kernel.org] De la part de Marcel =
-Holtmann
-Envoy=E9=A0: jeudi 23 octobre 2008 06:58
-=C0=A0: Pierre Savary
-Cc=A0: BlueZ-Dev; bluez-users@lists.sourceforge.net;
-linux-bluetooth@vger.kernel.org
-Objet=A0: Re: problems with kernel 2.6.23 + bluez 3.36 + SCO
+Patch for adding nlbluetooth.c for netlink support .
+let me know if anything needs modification.
 
-Hi Pierre,
+Thanks,
+Alok.
 
-> We develop an application for our board based on SCO. We use the =
-kernel
-> version 2.6.23 and the bluez-lib 3.36. However we have a lot of =
-problems
-and
-> some "kernel panic". Below this message you will find some of these =
-kernel
-> messages.
-> How can we stop it? Have you ever saw that?
+------=_Part_108210_1693786.1225206966691
+Content-Type: text/x-diff;
+ name=0001-Adding-net-bluetooth-nlbluetooth.c-for-netlink-suppo.patch
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_fmuop7l30
+Content-Disposition: attachment;
+ filename=0001-Adding-net-bluetooth-nlbluetooth.c-for-netlink-suppo.patch
 
-switch to a 2.6.27 kernel.
-
-Regards
-
-Marcel
-
-
---
-To unsubscribe from this list: send the line "unsubscribe =
-linux-bluetooth"
-in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+RnJvbSBiYjUwOWU2MmM5MjA5YWYxZTJiMmE4NjI3MjE1NWFmYTY0NTMyNjJlIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBBbG9rIEJhcnNvZGUgPGFsb2suYmFyc29kZUBhemluZ28uY29t
+PgpEYXRlOiBNb24sIDI3IE9jdCAyMDA4IDExOjMwOjQ4ICswNTMwClN1YmplY3Q6IFtQQVRDSF0g
+QWRkaW5nIG5ldC9ibHVldG9vdGgvbmxibHVldG9vdGguYyBmb3IgbmV0bGluayBzdXBwb3J0LgoK
+U2lnbmVkLW9mZi1ieTogQWxvayBCYXJzb2RlIDxhbG9rLmJhcnNvZGVAYXppbmdvLmNvbT4KLS0t
+CiBpbmNsdWRlL25ldC9ibHVldG9vdGgvYmx1ZXRvb3RoLmggfCAgICAzICsrKwogbmV0L2JsdWV0
+b290aC9NYWtlZmlsZSAgICAgICAgICAgIHwgICAgMiArLQogbmV0L2JsdWV0b290aC9hZl9ibHVl
+dG9vdGguYyAgICAgIHwgICAgNiArKysrKysKIG5ldC9ibHVldG9vdGgvbmxibHVldG9vdGguYyAg
+ICAgICB8ICAgMjQgKysrKysrKysrKysrKysrKysrKysrKysrCiA0IGZpbGVzIGNoYW5nZWQsIDM0
+IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb25zKC0pCiBjcmVhdGUgbW9kZSAxMDA2NDQgbmV0L2Js
+dWV0b290aC9ubGJsdWV0b290aC5jCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3Ro
+L2JsdWV0b290aC5oIGIvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2JsdWV0b290aC5oCmluZGV4IDZm
+ODQxOGIuLmIwMmM3YWEgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9ibHVldG9v
+dGguaAorKysgYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvYmx1ZXRvb3RoLmgKQEAgLTE3OCw0ICsx
+NzgsNyBAQCBleHRlcm4gdm9pZCBidF9zeXNmc19jbGVhbnVwKHZvaWQpOwogCiBleHRlcm4gc3Ry
+dWN0IGNsYXNzICpidF9jbGFzczsKIAorZXh0ZXJuIGludCBubGJsdWV0b290aF9pbml0KHZvaWQp
+OworZXh0ZXJuIHZvaWQgbmxibHVldG9vdGhfY2xlYW51cCh2b2lkKTsKKwogI2VuZGlmIC8qIF9f
+QkxVRVRPT1RIX0ggKi8KZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvTWFrZWZpbGUgYi9uZXQv
+Ymx1ZXRvb3RoL01ha2VmaWxlCmluZGV4IGQxZTQzM2YuLmM0OGYxNzYgMTAwNjQ0Ci0tLSBhL25l
+dC9ibHVldG9vdGgvTWFrZWZpbGUKKysrIGIvbmV0L2JsdWV0b290aC9NYWtlZmlsZQpAQCAtMTAs
+NCArMTAsNCBAQCBvYmotJChDT05GSUdfQlRfQk5FUCkJKz0gYm5lcC8KIG9iai0kKENPTkZJR19C
+VF9DTVRQKQkrPSBjbXRwLwogb2JqLSQoQ09ORklHX0JUX0hJRFApCSs9IGhpZHAvCiAKLWJsdWV0
+b290aC1vYmpzIDo9IGFmX2JsdWV0b290aC5vIGhjaV9jb3JlLm8gaGNpX2Nvbm4ubyBoY2lfZXZl
+bnQubyBoY2lfc29jay5vIGhjaV9zeXNmcy5vIGxpYi5vCitibHVldG9vdGgtb2JqcyA6PSBhZl9i
+bHVldG9vdGgubyBoY2lfY29yZS5vIGhjaV9jb25uLm8gaGNpX2V2ZW50Lm8gaGNpX3NvY2subyBo
+Y2lfc3lzZnMubyBsaWIubyBubGJsdWV0b290aC5vCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3Ro
+L2FmX2JsdWV0b290aC5jIGIvbmV0L2JsdWV0b290aC9hZl9ibHVldG9vdGguYwppbmRleCA4OTA3
+ZWZmLi5iNjQ4N2RjIDEwMDY0NAotLS0gYS9uZXQvYmx1ZXRvb3RoL2FmX2JsdWV0b290aC5jCisr
+KyBiL25ldC9ibHVldG9vdGgvYWZfYmx1ZXRvb3RoLmMKQEAgLTQzNiw2ICs0MzYsMTAgQEAgc3Rh
+dGljIGludCBfX2luaXQgYnRfaW5pdCh2b2lkKQogCWlmIChlcnIgPCAwKQogCQlyZXR1cm4gZXJy
+OwogCisJZXJyID0gbmxibHVldG9vdGhfaW5pdCgpOworCWlmIChlcnIgPCAwKQorCQlyZXR1cm4g
+ZXJyOworCiAJZXJyID0gc29ja19yZWdpc3RlcigmYnRfc29ja19mYW1pbHlfb3BzKTsKIAlpZiAo
+ZXJyIDwgMCkgewogCQlidF9zeXNmc19jbGVhbnVwKCk7CkBAIC00NTYsNiArNDYwLDggQEAgc3Rh
+dGljIHZvaWQgX19leGl0IGJ0X2V4aXQodm9pZCkKIAlzb2NrX3VucmVnaXN0ZXIoUEZfQkxVRVRP
+T1RIKTsKIAogCWJ0X3N5c2ZzX2NsZWFudXAoKTsKKworCW5sYmx1ZXRvb3RoX2NsZWFudXAoKTsK
+IH0KIAogc3Vic3lzX2luaXRjYWxsKGJ0X2luaXQpOwpkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290
+aC9ubGJsdWV0b290aC5jIGIvbmV0L2JsdWV0b290aC9ubGJsdWV0b290aC5jCm5ldyBmaWxlIG1v
+ZGUgMTAwNjQ0CmluZGV4IDAwMDAwMDAuLjQ2MDZiYmMKLS0tIC9kZXYvbnVsbAorKysgYi9uZXQv
+Ymx1ZXRvb3RoL25sYmx1ZXRvb3RoLmMKQEAgLTAsMCArMSwyNCBAQAorLyoKKyAqIFRoaXMgaXMg
+dGhlIG5ldGxpbmstYmFzZWQgYmx1ZXRvb3RoIGludGVyZmFjZS4KKyAqCisgKiBDb3B5cmlnaHQg
+MjAwOCBBbG9rIEJhcnNvZGUgPGFsb2suYmFyc29kZUBhemluZ28uY29tPgorICovCisKKyNpbmNs
+dWRlIDxuZXQvZ2VuZXRsaW5rLmg+CisjaW5jbHVkZSA8bGludXgvbW9kdWxlLmg+CisjaW5jbHVk
+ZSA8bGludXgva2VybmVsLmg+CisKKyNpbmNsdWRlIDxuZXQvYmx1ZXRvb3RoL2JsdWV0b290aC5o
+PgorI2luY2x1ZGUgPG5ldC9ibHVldG9vdGgvaGNpX2NvcmUuaD4KKworLyogaW5pdGlhbGlzYXRp
+b24vZXhpdCBmdW5jdGlvbnMgKi8KKworaW50IF9faW5pdCBubGJsdWV0b290aF9pbml0KHZvaWQp
+Cit7CisJcmV0dXJuIDA7Cit9CisKK3ZvaWQgbmxibHVldG9vdGhfY2xlYW51cCh2b2lkKQorewor
+Cit9Ci0tIAoxLjUuNC4zCgo=
+------=_Part_108210_1693786.1225206966691--
