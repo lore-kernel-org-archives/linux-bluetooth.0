@@ -1,81 +1,125 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <8b5debfa0810280816p60f475d4s6f105b0d89f20c80@mail.gmail.com>
-Date: Tue, 28 Oct 2008 20:46:06 +0530
-From: "alok barsode" <alokbarsode@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [Patch]Netlink: adding nlbluetooth.c for netlink support
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_Part_108210_1693786.1225206966691"
+Subject: Re: [PATCH] Allow SCO with Asus WL-BTD202 dongle in btusb
+From: Guillaume Bedot <littletux@zarb.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1225159804.7157.41.camel@californication>
+References: <1225152042.17240.18.camel@localhost>
+	 <1225159804.7157.41.camel@californication>
+Content-Type: multipart/mixed; boundary="=-otYcyLsC0BZn3Tz9CDPO"
+Date: Tue, 28 Oct 2008 05:20:17 +0100
+Message-Id: <1225167617.7998.10.camel@localhost>
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-------=_Part_108210_1693786.1225206966691
-Content-Type: text/plain; charset=ISO-8859-1
+
+--=-otYcyLsC0BZn3Tz9CDPO
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+
+Le mardi 28 octobre 2008 à 03:10 +0100, Marcel Holtmann a écrit : 
+> Hi Guillaume,
+> 
+> > This an other patch that allows my dongle to be configured correctly for
+> > the voice/sco profile.
+> > 
+> > I already sent one for hci_usb some time ago, so it may sound familiar,
+> > but it probably didn't have correct style...
+> 
+> you have to prove this one. Boot a kernel without the patch and call
+> hciconfig hci0 up and then show me the output of hciconfig -a.
+
+The file "hciconfig-...-before" was the output without the patch.
+The file "hciconfig-...-after" is the output with the patch.
+The last file contains some info from "/proc/bus/usb/devices".
+
+Is it just proof that my dongle's firmware is out-of-date ?
+
+Regards,
+
+Guillaume B.
+
+--=-otYcyLsC0BZn3Tz9CDPO
+Content-Disposition: attachment; filename="hciconfig-wl-btd202.before.txt"
+Content-Type: text/plain; name="hciconfig-wl-btd202.before.txt"; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
-Marcel,
+hci0:	Type: USB
+	BD Address: 00:0B:0D:4C:22:92 ACL MTU: 1017:8 SCO MTU: 64:0
+	UP RUNNING 
+	RX bytes:619 acl:0 sco:0 events:13 errors:0
+	TX bytes:44 acl:0 sco:0 commands:13 errors:0
+	Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+	Link policy: 
+	Link mode: SLAVE ACCEPT 
+	Name: 'localhost-0'
+	Class: 0x4a0104
+	Service Classes: Networking, Capturing, Telephony
+	Device Class: Computer, Desktop workstation
+	HCI Ver: 2.0 (0x3) HCI Rev: 0x40eb LMP Ver: 2.0 (0x3) LMP Subver: 0x430e
+	Manufacturer: Broadcom Corporation (15)
 
-Patch for adding nlbluetooth.c for netlink support .
-let me know if anything needs modification.
 
-Thanks,
-Alok.
+--=-otYcyLsC0BZn3Tz9CDPO
+Content-Disposition: attachment; filename="hciconfig-wl-btd202.after.txt"
+Content-Type: text/plain; name="hciconfig-wl-btd202.after.txt"; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-------=_Part_108210_1693786.1225206966691
-Content-Type: text/x-diff;
- name=0001-Adding-net-bluetooth-nlbluetooth.c-for-netlink-suppo.patch
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fmuop7l30
-Content-Disposition: attachment;
- filename=0001-Adding-net-bluetooth-nlbluetooth.c-for-netlink-suppo.patch
+hci0:	Type: USB
+	BD Address: 00:0B:0D:4C:22:92 ACL MTU: 1017:8 SCO MTU: 64:8
+	UP RUNNING PSCAN 
+	RX bytes:4055672 acl:48817 sco:72479 events:22711 errors:0
+	TX bytes:79729659 acl:89869 sco:0 commands:107 errors:0
+	Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+	Link policy: RSWITCH HOLD SNIFF PARK 
+	Link mode: SLAVE ACCEPT 
+	Name: 'localhost-0'
+	Class: 0x4a0104
+	Service Classes: Networking, Capturing, Telephony
+	Device Class: Computer, Desktop workstation
+	HCI Ver: 2.0 (0x3) HCI Rev: 0x40eb LMP Ver: 2.0 (0x3) LMP Subver: 0x430e
+	Manufacturer: Broadcom Corporation (15)
 
-RnJvbSBiYjUwOWU2MmM5MjA5YWYxZTJiMmE4NjI3MjE1NWFmYTY0NTMyNjJlIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBbG9rIEJhcnNvZGUgPGFsb2suYmFyc29kZUBhemluZ28uY29t
-PgpEYXRlOiBNb24sIDI3IE9jdCAyMDA4IDExOjMwOjQ4ICswNTMwClN1YmplY3Q6IFtQQVRDSF0g
-QWRkaW5nIG5ldC9ibHVldG9vdGgvbmxibHVldG9vdGguYyBmb3IgbmV0bGluayBzdXBwb3J0LgoK
-U2lnbmVkLW9mZi1ieTogQWxvayBCYXJzb2RlIDxhbG9rLmJhcnNvZGVAYXppbmdvLmNvbT4KLS0t
-CiBpbmNsdWRlL25ldC9ibHVldG9vdGgvYmx1ZXRvb3RoLmggfCAgICAzICsrKwogbmV0L2JsdWV0
-b290aC9NYWtlZmlsZSAgICAgICAgICAgIHwgICAgMiArLQogbmV0L2JsdWV0b290aC9hZl9ibHVl
-dG9vdGguYyAgICAgIHwgICAgNiArKysrKysKIG5ldC9ibHVldG9vdGgvbmxibHVldG9vdGguYyAg
-ICAgICB8ICAgMjQgKysrKysrKysrKysrKysrKysrKysrKysrCiA0IGZpbGVzIGNoYW5nZWQsIDM0
-IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb25zKC0pCiBjcmVhdGUgbW9kZSAxMDA2NDQgbmV0L2Js
-dWV0b290aC9ubGJsdWV0b290aC5jCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3Ro
-L2JsdWV0b290aC5oIGIvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2JsdWV0b290aC5oCmluZGV4IDZm
-ODQxOGIuLmIwMmM3YWEgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9ibHVldG9v
-dGguaAorKysgYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvYmx1ZXRvb3RoLmgKQEAgLTE3OCw0ICsx
-NzgsNyBAQCBleHRlcm4gdm9pZCBidF9zeXNmc19jbGVhbnVwKHZvaWQpOwogCiBleHRlcm4gc3Ry
-dWN0IGNsYXNzICpidF9jbGFzczsKIAorZXh0ZXJuIGludCBubGJsdWV0b290aF9pbml0KHZvaWQp
-OworZXh0ZXJuIHZvaWQgbmxibHVldG9vdGhfY2xlYW51cCh2b2lkKTsKKwogI2VuZGlmIC8qIF9f
-QkxVRVRPT1RIX0ggKi8KZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvTWFrZWZpbGUgYi9uZXQv
-Ymx1ZXRvb3RoL01ha2VmaWxlCmluZGV4IGQxZTQzM2YuLmM0OGYxNzYgMTAwNjQ0Ci0tLSBhL25l
-dC9ibHVldG9vdGgvTWFrZWZpbGUKKysrIGIvbmV0L2JsdWV0b290aC9NYWtlZmlsZQpAQCAtMTAs
-NCArMTAsNCBAQCBvYmotJChDT05GSUdfQlRfQk5FUCkJKz0gYm5lcC8KIG9iai0kKENPTkZJR19C
-VF9DTVRQKQkrPSBjbXRwLwogb2JqLSQoQ09ORklHX0JUX0hJRFApCSs9IGhpZHAvCiAKLWJsdWV0
-b290aC1vYmpzIDo9IGFmX2JsdWV0b290aC5vIGhjaV9jb3JlLm8gaGNpX2Nvbm4ubyBoY2lfZXZl
-bnQubyBoY2lfc29jay5vIGhjaV9zeXNmcy5vIGxpYi5vCitibHVldG9vdGgtb2JqcyA6PSBhZl9i
-bHVldG9vdGgubyBoY2lfY29yZS5vIGhjaV9jb25uLm8gaGNpX2V2ZW50Lm8gaGNpX3NvY2subyBo
-Y2lfc3lzZnMubyBsaWIubyBubGJsdWV0b290aC5vCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3Ro
-L2FmX2JsdWV0b290aC5jIGIvbmV0L2JsdWV0b290aC9hZl9ibHVldG9vdGguYwppbmRleCA4OTA3
-ZWZmLi5iNjQ4N2RjIDEwMDY0NAotLS0gYS9uZXQvYmx1ZXRvb3RoL2FmX2JsdWV0b290aC5jCisr
-KyBiL25ldC9ibHVldG9vdGgvYWZfYmx1ZXRvb3RoLmMKQEAgLTQzNiw2ICs0MzYsMTAgQEAgc3Rh
-dGljIGludCBfX2luaXQgYnRfaW5pdCh2b2lkKQogCWlmIChlcnIgPCAwKQogCQlyZXR1cm4gZXJy
-OwogCisJZXJyID0gbmxibHVldG9vdGhfaW5pdCgpOworCWlmIChlcnIgPCAwKQorCQlyZXR1cm4g
-ZXJyOworCiAJZXJyID0gc29ja19yZWdpc3RlcigmYnRfc29ja19mYW1pbHlfb3BzKTsKIAlpZiAo
-ZXJyIDwgMCkgewogCQlidF9zeXNmc19jbGVhbnVwKCk7CkBAIC00NTYsNiArNDYwLDggQEAgc3Rh
-dGljIHZvaWQgX19leGl0IGJ0X2V4aXQodm9pZCkKIAlzb2NrX3VucmVnaXN0ZXIoUEZfQkxVRVRP
-T1RIKTsKIAogCWJ0X3N5c2ZzX2NsZWFudXAoKTsKKworCW5sYmx1ZXRvb3RoX2NsZWFudXAoKTsK
-IH0KIAogc3Vic3lzX2luaXRjYWxsKGJ0X2luaXQpOwpkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290
-aC9ubGJsdWV0b290aC5jIGIvbmV0L2JsdWV0b290aC9ubGJsdWV0b290aC5jCm5ldyBmaWxlIG1v
-ZGUgMTAwNjQ0CmluZGV4IDAwMDAwMDAuLjQ2MDZiYmMKLS0tIC9kZXYvbnVsbAorKysgYi9uZXQv
-Ymx1ZXRvb3RoL25sYmx1ZXRvb3RoLmMKQEAgLTAsMCArMSwyNCBAQAorLyoKKyAqIFRoaXMgaXMg
-dGhlIG5ldGxpbmstYmFzZWQgYmx1ZXRvb3RoIGludGVyZmFjZS4KKyAqCisgKiBDb3B5cmlnaHQg
-MjAwOCBBbG9rIEJhcnNvZGUgPGFsb2suYmFyc29kZUBhemluZ28uY29tPgorICovCisKKyNpbmNs
-dWRlIDxuZXQvZ2VuZXRsaW5rLmg+CisjaW5jbHVkZSA8bGludXgvbW9kdWxlLmg+CisjaW5jbHVk
-ZSA8bGludXgva2VybmVsLmg+CisKKyNpbmNsdWRlIDxuZXQvYmx1ZXRvb3RoL2JsdWV0b290aC5o
-PgorI2luY2x1ZGUgPG5ldC9ibHVldG9vdGgvaGNpX2NvcmUuaD4KKworLyogaW5pdGlhbGlzYXRp
-b24vZXhpdCBmdW5jdGlvbnMgKi8KKworaW50IF9faW5pdCBubGJsdWV0b290aF9pbml0KHZvaWQp
-Cit7CisJcmV0dXJuIDA7Cit9CisKK3ZvaWQgbmxibHVldG9vdGhfY2xlYW51cCh2b2lkKQorewor
-Cit9Ci0tIAoxLjUuNC4zCgo=
-------=_Part_108210_1693786.1225206966691--
+
+--=-otYcyLsC0BZn3Tz9CDPO
+Content-Disposition: attachment; filename="wl-btd202.txt"
+Content-Type: text/plain; name="wl-btd202.txt"; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+T:  Bus=04 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  3 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=e0(unk. ) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0b05 ProdID=1715 Rev= 1.00
+S:  Manufacturer=Broadcom Corp
+S:  Product=WL-BTD202
+C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(unk. ) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
+
+--=-otYcyLsC0BZn3Tz9CDPO--
+
