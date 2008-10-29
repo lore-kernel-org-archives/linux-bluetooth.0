@@ -1,38 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Li, Zhigang" <zhigang.li@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 30 Oct 2008 17:46:11 +0800
-Subject: headset doesn't work with mplayer in fc9
-Message-ID: <722F286E5CF54C459DDA462B750B07CE0C273E67E8@pdsmsx502.ccr.corp.intel.com>
-Content-Type: text/plain; charset="gb2312"
+From: "Pierre Savary" <pierre.savary@kerlink.fr>
+To: "'Marcel Holtmann'" <marcel@holtmann.org>
+Cc: "'BlueZ-Dev'" <bluez-devel@lists.sourceforge.net>,
+	<bluez-users@lists.sourceforge.net>,
+	<linux-bluetooth@vger.kernel.org>
+References: <000001c92e07$010874f0$03195ed0$@savary@kerlink.fr> <1224737867.9386.184.camel@californication>
+In-Reply-To: <1224737867.9386.184.camel@californication>
+Subject: RE: problems with kernel 2.6.23 + bluez 3.36 + SCO
+Date: Wed, 29 Oct 2008 15:49:28 +0100
+Message-ID: <001701c939d5$8b94c590$a2be50b0$@savary@kerlink.fr>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain;
+	charset="iso-8859-1"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgYWxsLA0KDQpJIGhhdmUgb25lIHByb2JsZW0gd2l0aCBtcGxheWVyo7ogICBtcGxheWVyIC1h
-byBhbHNhOmRldmljZT1CbHVldG9vdGggZmlsZS5tcDMNCg0KVGhlcmUgYWx3YXlzIGRpc3BsYXkg
-dGhlIGVycm9yczoNCg0KW0FPX0FMU0FdIGFsc2EtbGliOiBwY20uYzoyMTQ0OihzbmRfcGNtX29w
-ZW5fbm91cGRhdGUpIFVua25vd24gUENNIGJsdWV0b290aA0KDQpbQU9fQUxTQV0gUGxheWJhY2sg
-b3BlbiBlcnJvcjogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQ0KDQpDb3VsZCBub3Qgb3Blbi9p
-bml0aWFsaXplIGF1ZGlvIGRldmljZSAtPiBubyBzb3VuZC4NCg0KQXVkaW86IG5vIHNvdW5kDQoN
-ClZpZGVvOiBubyB2aWRlbw0KIA0KDQpCdXQgdGhlIG1wbGF5ZXIgd29yayBmaW5lIA0KDQpBbHNv
-IEkgY2FuIHVzZSBhcGxheTogIGFwbGF5IHdvcmtzIGZpbmUgd2l0aCBCbHVldG9vdGggaGVhZHNl
-dC4NCg0KUGVyaGFwcyBJIGRpZG4ndCBzZXQgcmlnaHQgY29uZmlndXJhdGlvbiBzb21lb25lIGhh
-dmUgdGhlIHNhbWUgcHJvYmxlbSBvciBpZGVhPw0KDQogDQoNCk15IE9TIGlzIEZDOQ0KDQpibHVl
-ei1saWJzLWRldmVsLTMuMzAtMS5mYzkuaTM4Ng0KDQpibHVlei11dGlscy1hbHNhLTMuMzAtMi5m
-YzkuaTM4Ng0KDQpibHVlei11dGlscy1nc3RyZWFtZXItMy4zMC0yLmZjOS5pMzg2DQoNCmJsdWV6
-LWxpYnMtMy4zMC0xLmZjOS5pMzg2DQoNCmJsdWV6LXV0aWxzLTMuMzAtMi5mYzkuaTM4Ng0KDQpi
-bHVlei11dGlscy1jdXBzLTMuMzAtMi5mYzkuaTM4Ng0KDQpibHVlei1nbm9tZS1hbmFseXplci0w
-LjI1LTEuZmM5LmkzODYNCg0KYmx1ZXotZ25vbWUtMC4yNS0xLmZjOS5pMzg2DQoNCmJsdWV6LWhj
-aWR1bXAtMS40MS0xLmZjOS5pMzg2DQoNCiANCg0KYWxzYS10b29scy0xLjAuMTYtMS5mYzkuaTM4
-Ng0KDQphbHNhLWxpYi0xLjAuMTYtMy5mYzkuaTM4Ng0KDQphbHNhLWxpYi1kZXZlbC0xLjAuMTYt
-My5mYzkuaTM4Ng0KDQphbHNhLXV0aWxzLTEuMC4xNi0yLmZjOS5pMzg2DQoNCmFsc2EtcGx1Z2lu
-cy1wdWxzZWF1ZGlvLTEuMC4xNi00LmZjOS5pMzg2DQoNCiANCnB1bHNlYXVkaW8tbW9kdWxlLXgx
-MS0wLjkuMTAtMS5mYzkuaTM4Ng0KDQphbHNhLXBsdWdpbnMtcHVsc2VhdWRpby0xLjAuMTYtNC5m
-YzkuaTM4Ng0KDQpnc3RyZWFtZXItcGx1Z2lucy1wdWxzZS0wLjkuNS0wLjUuc3ZuMjAwNzA5MjQu
-ZmM5LmkzODYNCg0KcHVsc2VhdWRpby0wLjkuMTAtMS5mYzkuaTM4Ng0KDQpwdWxzZWF1ZGlvLW1v
-ZHVsZS1nY29uZi0wLjkuMTAtMS5mYzkuaTM4Ng0KDQpwdWxzZWF1ZGlvLWVzb3VuZC1jb21wYXQt
-MC45LjEwLTEuZmM5LmkzODYNCg0KcHVsc2VhdWRpby1jb3JlLWxpYnMtMC45LjEwLTEuZmM5Lmkz
-ODYNCg0KcHVsc2VhdWRpby11dGlscy0wLjkuMTAtMS5mYzkuaTM4Ng0KDQpwdWxzZWF1ZGlvLWxp
-YnMtMC45LjEwLTEuZmM5LmkzODYNCg0KcHVsc2VhdWRpby1saWJzLWdsaWIyLTAuOS4xMC0xLmZj
-OS5pMzg2DQoNCldoYXQgSSBuZWVkIGRvIGVsc2U/DQpUaGFua3MNCg0KIA0KDQoNCg==
+I it possible to update only the bluez stack ???
+Thanks in advance,
+Regards
+
+Pierre
+
+-----Message d'origine-----
+De=A0: linux-bluetooth-owner@vger.kernel.org
+[mailto:linux-bluetooth-owner@vger.kernel.org] De la part de Marcel =
+Holtmann
+Envoy=E9=A0: jeudi 23 octobre 2008 06:58
+=C0=A0: Pierre Savary
+Cc=A0: BlueZ-Dev; bluez-users@lists.sourceforge.net;
+linux-bluetooth@vger.kernel.org
+Objet=A0: Re: problems with kernel 2.6.23 + bluez 3.36 + SCO
+
+Hi Pierre,
+
+> We develop an application for our board based on SCO. We use the =
+kernel
+> version 2.6.23 and the bluez-lib 3.36. However we have a lot of =
+problems
+and
+> some "kernel panic". Below this message you will find some of these =
+kernel
+> messages.
+> How can we stop it? Have you ever saw that?
+
+switch to a 2.6.27 kernel.
+
+Regards
+
+Marcel
+
+
+--
+To unsubscribe from this list: send the line "unsubscribe =
+linux-bluetooth"
+in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
