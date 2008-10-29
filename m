@@ -1,18 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <2d5a2c100810291527w6d5c4615udcb450d49e68702@mail.gmail.com>
-Date: Wed, 29 Oct 2008 19:27:44 -0300
-From: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <004e01c939db$5c241760$146c4620$@de>
+From: "Christian Hoene" <christian.hoene@gmx.net>
+To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
+References: <003001c939b5$d685da50$83918ef0$@de>
+	<3DECBAF9-9FFA-4267-AA41-9D2DB1EDA0C3@holtmann.org>
+In-Reply-To: <3DECBAF9-9FFA-4267-AA41-9D2DB1EDA0C3@holtmann.org>
+Date: Wed, 29 Oct 2008 20:39:36 +0100
+Message-ID: <006e01c939fe$19bf65a0$4d3e30e0$@hoene@gmx.net>
 MIME-Version: 1.0
-References: <001501c9381a$022b7f40$06827dc0$@de>
-	<d89ddf300810271213w53d8d179gc3af2f89c37bea47@mail.gmail.com>
-	<1225136516.7157.22.camel@californication>
-	<004e01c939db$5c241760$146c4620$@de>
-Cc: Frans de Bont <frans.de.bont@philips.com>
-Subject: Re: [Bluez-devel] REALLY Bad encoding performance of Linux SBC
-	audio codec
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+Cc: ekiga-devel-list@gnome.org
+Subject: Re: [Bluez-devel] Common file "sbc.c" in Ekiga/Opal and Bluez
+Reply-To: hoene@uni-tuebingen.de,
+	BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -21,44 +19,47 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+> can we first talk about you statically linking MPL and LGPL code
+> together. This doesn't look like a good idea to me.
 
-Thanks for doing those tests, we never really have a method for
-testing the sbc codec, so PEAQ could be a good start. By looking the
-results it seems that our decoder is not really in good shape, which
-is not a surprise since we normally only use the encoder part. As for
-comparison with the reference implementation, bluez sbc codec does not
-use floating point as the reference codec seems to be using, so this
-may well be impacting on quality, although we probably gain some
-speed.
+Actually, it is the SBC codec plugin for Opal that is loaded dynamically.
+Does this make things better or worse?
 
-Other points we might need to consider:
-  - Test with different audio source/parameter. (48000hz/mono/28
-bitpool is not that common to be used as reference)
-  - Mono seems to surfer from quality problems which may cause the problem.
-  - Consider working on a gstreamer element for doing live tests based
-on ITU BS.1387 (PEAQ)
-  - Also consider using liboil as alternative for using floating point.
+Regards, 
+ Christian
 
-BTW, don't assume something is bad just because it produces different
-results than the reference, as far I can tell you one cannot really
-notice _any_ difference between bluez sbc codec and logitech freepulse
-e(enhanced)sbc, so on real world we are not that _bad_.
 
--- =
 
-Luiz Augusto von Dentz
-Engenheiro de Computa=E7=E3o
+
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> -----------------------------------------------------------------------
+> --
+> This SF.Net email is sponsored by the Moblin Your Move Developer's
+> challenge
+> Build the coolest Linux based applications with Moblin SDK & win great
+> prizes
+> Grand prize is a trip for two to an Open Source event anywhere in the
+> world
+> http://moblin-contest.org/redirect.php?banner_id=100&url=/
+> _______________________________________________
+> Bluez-devel mailing list
+> Bluez-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great priz=
-es
+Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
