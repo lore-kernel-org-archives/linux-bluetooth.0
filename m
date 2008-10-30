@@ -1,25 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 31 Oct 2008 01:30:22 +0530 (IST)
-From: pavan_savoy@indiatimes.com
-To: <linux-bluetooth@vger.kernel.org>
-Message-ID: <1307132544.125351225396822791.JavaMail.root@mbv7.indiatimes.com>
-Subject: Creation of AF_BLUETOOTH socket with HCI_DEV__REG
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: headset doesn't work with mplayer in fc9
+From: Bastien Nocera <hadess@hadess.net>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Li, Zhigang" <zhigang.li@intel.com>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <0F7448E5-26BB-444D-8851-3FE66705FA28@holtmann.org>
+References: 
+	 <722F286E5CF54C459DDA462B750B07CE0C273E67E8@pdsmsx502.ccr.corp.intel.com>
+	 <0F7448E5-26BB-444D-8851-3FE66705FA28@holtmann.org>
+Content-Type: text/plain
+Date: Thu, 30 Oct 2008 18:08:17 +0000
+Message-Id: <1225390097.3215.2964.camel@cookie.hadess.net>
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Thu, 2008-10-30 at 19:05 +0100, Marcel Holtmann wrote:
+<snip>
+> > My OS is FC9
+> >
+> > bluez-libs-devel-3.30-1.fc9.i386
+> >
+> > bluez-utils-alsa-3.30-2.fc9.i386
+> >
+> > bluez-utils-gstreamer-3.30-2.fc9.i386
+> >
+> > bluez-libs-3.30-1.fc9.i386
+> >
+> > bluez-utils-3.30-2.fc9.i386
+> 
+> and the latest release is bluez-4.17. So you have too many versions  
+> behind what we are currently using and what all new distros are using.  
+> So please re-test with the latest versions please.
 
-Can there be a scenario where an application can do a hci_open_dev and use the Bluetooth Socket, without actually the HCID recieving the HCI_DEV_REG ?
-
-Say a scenario where in only hciattach has been done [UART device] and HCID isn't run at all. Then would any other application make use of the hci_open_dev calls ?
-
-
-Thanks & Regards,
-Pavan Savoy.
-
-
---
-Hyundai to launch the i20 in India. Catch the exclusive preview on ZigWheels.com
-http://www.zigwheels.com/b2cam/newsDetails.action?name=Emb11_20080731&path=/INDT/News/Emb11_20080731&page=1&pagecount=2&utm_source=indmail&utm_medium=footer&utm_content=tracking&utm_campaign=Nletter_07oct2008_ZW
+FWIW, it's 3.36 in the Fedora 9 updates.
