@@ -1,14 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <490A4B92.1050505@postincrement.com>
-Date: Fri, 31 Oct 2008 11:04:34 +1100
-From: Craig Southeren <craigs@postincrement.com>
+Message-ID: <d89ddf300810301148s6afa46a0v2bd8ce1ed844a60e@mail.gmail.com>
+Date: Thu, 30 Oct 2008 12:48:37 -0600
+From: "Brad Midgley" <bmidgley@gmail.com>
+To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1225380052.4626.8.camel@hoene-desktop>
 MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <003001c939b5$d685da50$83918ef0$@de>	<3DECBAF9-9FFA-4267-AA41-9D2DB1EDA0C3@holtmann.org>	<006e01c939fe$19bf65a0$4d3e30e0$@hoene@gmx.net>
-	<FF3DF936-BA45-4C47-9943-B0FD94903747@holtmann.org>
-In-Reply-To: <FF3DF936-BA45-4C47-9943-B0FD94903747@holtmann.org>
-Cc: ekiga-devel-list@gnome.org
-Subject: Re: [Bluez-devel] Common file "sbc.c" in Ekiga/Opal and Bluez
+References: <001d01c93a9f$6f2c8710$4d859530$@de>
+	<1225380052.4626.8.camel@hoene-desktop>
+Subject: Re: [Bluez-devel] FW: REALLY Bad encoding performance of Linux SBC
+	audio codec
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -18,50 +18,33 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Marcel Holtmann wrote:
-> Hi Christian,
-> =
+Christian
 
->>> can we first talk about you statically linking MPL and LGPL code
->>> together. This doesn't look like a good idea to me.
->> Actually, it is the SBC codec plugin for Opal that is loaded  =
+> the sound quality got better. Still, both encoder and decoder are not as
+> good as the reference.
 
->> dynamically.
->> Does this make things better or worse?
-> =
+It would be ideal to have automated tests for codec quality that don't
+require windows and that we could run before commits to track our
+progress. We could prepare some encoding/decoding samples with the
+reference codec and store them in the project or somewhere online. The
+one test we couldn't do this way is to encode with our codec and
+decode with the reference.
 
-> that should be fine, but you need to put LGPL on the parts you wrote  =
+Are there free tools for checking the quality and for comparing
+signal/noise and overall volume? If you can detail the process you use
+that would help.
 
-> to include the SBC routines and make them work.
-
-Is there a library that contains the SBC functions that we can link =
-
-against ?
-
-    Craig
--- =
-
-
------------------------------------------------------------------------
-  Craig Southeren          Post Increment =96 VoIP Consulting and Software
-  craigs@postincrement.com.au                   www.postincrement.com.au
-
-  Phone:  +61 243654666      ICQ: #86852844
-  Fax:    +61 243656905      MSN: craig_southeren@hotmail.com
-  Mobile: +61 417231046      Jabber: craigs@jabber.org
-
-  "Science is the poetry of reality." Richard Dawkins
-
+thanks
+Brad
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great priz=
-es
+Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=3D100&url=3D/
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
