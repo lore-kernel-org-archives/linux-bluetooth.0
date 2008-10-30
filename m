@@ -1,13 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <B1B4C60B-8EAE-4DBD-8818-E25ABE6E5B71@holtmann.org>
+Message-Id: <5F13BEF2-F410-4EF8-B2A4-DBAAE598AE21@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1225380052.4626.8.camel@hoene-desktop>
+In-Reply-To: <1225382844.4626.13.camel@hoene-desktop>
 Mime-Version: 1.0 (Apple Message framework v929.2)
-Date: Thu, 30 Oct 2008 19:03:25 +0100
+Date: Thu, 30 Oct 2008 19:02:15 +0100
 References: <001d01c93a9f$6f2c8710$4d859530$@de>
 	<1225380052.4626.8.camel@hoene-desktop>
-Cc: 'Frans de Bont' <frans.de.bont@philips.com>
+	<2d5a2c100810300846j79b94bf8h4d8974ed50b1ac23@mail.gmail.com>
+	<1225382844.4626.13.camel@hoene-desktop>
+Cc: Frans de Bont <frans.de.bont@philips.com>
 Subject: Re: [Bluez-devel] FW: REALLY Bad encoding performance of Linux
 	SBC	audio codec
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
@@ -24,13 +26,15 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Christian,
 
-> the sound quality got better. Still, both encoder and decoder are  
-> not as
-> good as the reference.
+>> Could you please send it as a real patch, I mean in diff format, or
+>> even better if you could configure a git repository so we could pull
+>> from.
+>>
+>> Thank you for the contribution.
+>
+> patch is attached.
 
-so we do have the sbctester utility in the source code that should be  
-able to be used for the SBC conformance testing according to the A2DP  
-qualification.
+patch has been applied. Thanks.
 
 Regards
 
