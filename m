@@ -1,83 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Guillaume Bedot <littletux@zarb.org>
-To: bluez-devel@lists.sourceforge.net, cooker@mandrivalinux.org
-Content-Type: multipart/mixed; boundary="=-EtBrWx1+Z3vW7VG3bvIo"
-Date: Fri, 03 Oct 2008 14:47:09 +0200
-Message-Id: <1223038029.6671.5.camel@localhost>
-Mime-Version: 1.0
-Subject: [Bluez-devel] User security mode patch
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
-List-Post: <mailto:bluez-devel@lists.sourceforge.net>
-List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
-	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Errors-To: bluez-devel-bounces@lists.sourceforge.net
-
-
---=-EtBrWx1+Z3vW7VG3bvIo
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-
-Hello,
-
-On my cooker box (i still use 3.36 though), with the default hcid.conf
-file, i can't pair with my phone unless i comment out the
-passkey="BlueZ" line, or apply the joined patch.
-
-The documentation says this passkey should be used only in auto security
-mode.
-
-Or am I wrong ?
-
-Regards,
-
-Guillaume B.
-
---=-EtBrWx1+Z3vW7VG3bvIo
-Content-Disposition: attachment;
-	filename*0=bluez-utils-3.36-always-request-pin-in-user-security-mode.pat;
-	filename*1=ch
-Content-Type: text/x-patch;
-	name=bluez-utils-3.36-always-request-pin-in-user-security-mode.patch;
-	charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
---- bluez-utils-3.36.orig/hcid/security.c	2008-10-03 13:37:17.000000000 +0200
-+++ bluez-utils-3.36/hcid/security.c	2008-10-03 13:37:28.000000000 +0200
-@@ -500,7 +500,7 @@
- 	} else if (pairing == HCID_PAIRING_NONE)
- 		goto reject;
- 
--	if (hcid.security == HCID_SEC_AUTO && !ci->out) {
-+	if ((hcid.security == HCID_SEC_AUTO) && !ci->out) {
- 		set_pin_length(sba, hcid.pin_len);
- 		memcpy(pr.pin_code, hcid.pin_code, hcid.pin_len);
- 		pr.pin_len = hcid.pin_len;
-
---=-EtBrWx1+Z3vW7VG3bvIo
-Content-Type: text/plain; charset="us-ascii"
+From: "Li, Zhigang" <zhigang.li@intel.com>
+To: "bluez-users@lists.sourceforge.net" <bluez-users@lists.sourceforge.net>
+Date: Thu, 30 Oct 2008 10:07:35 +0800
+Message-ID: <722F286E5CF54C459DDA462B750B07CE0C271BA07F@pdsmsx502.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Subject: [Bluez-users] bluetooth audio problem
+Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
+List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-users>
+List-Post: <mailto:bluez-users@lists.sourceforge.net>
+List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
+	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="gb2312"
+Errors-To: bluez-users-bounces@lists.sourceforge.net
 
--------------------------------------------------------------------------
-This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-Build the coolest Linux based applications with Moblin SDK & win great prizes
-Grand prize is a trip for two to an Open Source event anywhere in the world
-http://moblin-contest.org/redirect.php?banner_id=100&url=/
---=-EtBrWx1+Z3vW7VG3bvIo
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Bluez-devel mailing list
-Bluez-devel@lists.sourceforge.net
-https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---=-EtBrWx1+Z3vW7VG3bvIo--
+SGkgYWxsLA0KSSBoYXZlIG9uZSBwcm9ibGVtIHdpdGggbXBsYXllcqO6ICAgbXBsYXllciAtYW8g
+YWxzYTpkZXZpY2U9Qmx1ZXRvb3RoIGZpbGUubXAzDQpUaGVyZSBhbHdheXMgZGlzcGxheSB0aGUg
+ZXJyb3JzOg0KW0FPX0FMU0FdIGFsc2EtbGliOiBwY20uYzoyMTQ0OihzbmRfcGNtX29wZW5fbm91
+cGRhdGUpIFVua25vd24gUENNIGJsdWV0b290aA0KW0FPX0FMU0FdIFBsYXliYWNrIG9wZW4gZXJy
+b3I6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkNCkNvdWxkIG5vdCBvcGVuL2luaXRpYWxpemUg
+YXVkaW8gZGV2aWNlIC0+IG5vIHNvdW5kLg0KQXVkaW86IG5vIHNvdW5kDQpWaWRlbzogbm8gdmlk
+ZW8NCg0KDQpCdXQgdGhlIG1wbGF5ZXIgd29yayBmaW5lIA0KDQpBbHNvIEkgY2FuIHVzZSBhcGxh
+eTogIGFwbGF5IHdvcmtzIGZpbmUgd2l0aCBCbHVldG9vdGggaGVhZHNldC4NCg0KUGVyaGFwcyBJ
+IGRpZG4ndCBzZXQgcmlnaHQgY29uZmlndXJhdGlvbiBhbnlib2R5IGhhdmUgdGhlIHNhbWUgcHJv
+YmxlbSBvciBpZGVhPw0KDQpUaGFua3MNCg0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpUaGlzIFNGLk5ldCBl
+bWFpbCBpcyBzcG9uc29yZWQgYnkgdGhlIE1vYmxpbiBZb3VyIE1vdmUgRGV2ZWxvcGVyJ3MgY2hh
+bGxlbmdlCkJ1aWxkIHRoZSBjb29sZXN0IExpbnV4IGJhc2VkIGFwcGxpY2F0aW9ucyB3aXRoIE1v
+YmxpbiBTREsgJiB3aW4gZ3JlYXQgcHJpemVzCkdyYW5kIHByaXplIGlzIGEgdHJpcCBmb3IgdHdv
+IHRvIGFuIE9wZW4gU291cmNlIGV2ZW50IGFueXdoZXJlIGluIHRoZSB3b3JsZApodHRwOi8vbW9i
+bGluLWNvbnRlc3Qub3JnL3JlZGlyZWN0LnBocD9iYW5uZXJfaWQ9MTAwJnVybD0vCl9fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJsdWV6LXVzZXJzIG1haWxp
+bmcgbGlzdApCbHVlei11c2Vyc0BsaXN0cy5zb3VyY2Vmb3JnZS5uZXQKaHR0cHM6Ly9saXN0cy5z
+b3VyY2Vmb3JnZS5uZXQvbGlzdHMvbGlzdGluZm8vYmx1ZXotdXNlcnMK
