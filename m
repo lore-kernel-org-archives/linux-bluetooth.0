@@ -1,16 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <FF3DF936-BA45-4C47-9943-B0FD94903747@holtmann.org>
+Message-Id: <B1B4C60B-8EAE-4DBD-8818-E25ABE6E5B71@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: hoene@uni-tuebingen.de,
-	BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <006e01c939fe$19bf65a0$4d3e30e0$@hoene@gmx.net>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <1225380052.4626.8.camel@hoene-desktop>
 Mime-Version: 1.0 (Apple Message framework v929.2)
-Date: Thu, 30 Oct 2008 19:06:26 +0100
-References: <003001c939b5$d685da50$83918ef0$@de>
-	<3DECBAF9-9FFA-4267-AA41-9D2DB1EDA0C3@holtmann.org>
-	<006e01c939fe$19bf65a0$4d3e30e0$@hoene@gmx.net>
-Cc: ekiga-devel-list@gnome.org
-Subject: Re: [Bluez-devel] Common file "sbc.c" in Ekiga/Opal and Bluez
+Date: Thu, 30 Oct 2008 19:03:25 +0100
+References: <001d01c93a9f$6f2c8710$4d859530$@de>
+	<1225380052.4626.8.camel@hoene-desktop>
+Cc: 'Frans de Bont' <frans.de.bont@philips.com>
+Subject: Re: [Bluez-devel] FW: REALLY Bad encoding performance of Linux
+	SBC	audio codec
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -25,15 +24,13 @@ Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
 Hi Christian,
 
->> can we first talk about you statically linking MPL and LGPL code
->> together. This doesn't look like a good idea to me.
->
-> Actually, it is the SBC codec plugin for Opal that is loaded  
-> dynamically.
-> Does this make things better or worse?
+> the sound quality got better. Still, both encoder and decoder are  
+> not as
+> good as the reference.
 
-that should be fine, but you need to put LGPL on the parts you wrote  
-to include the SBC routines and make them work.
+so we do have the sbctester utility in the source code that should be  
+able to be used for the SBC conformance testing according to the A2DP  
+qualification.
 
 Regards
 
