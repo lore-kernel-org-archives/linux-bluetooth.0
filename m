@@ -1,14 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300810301148s6afa46a0v2bd8ce1ed844a60e@mail.gmail.com>
-Date: Thu, 30 Oct 2008 12:48:37 -0600
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "BlueZ development" <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <1225380052.4626.8.camel@hoene-desktop>
-MIME-Version: 1.0
-References: <001d01c93a9f$6f2c8710$4d859530$@de>
-	<1225380052.4626.8.camel@hoene-desktop>
-Subject: Re: [Bluez-devel] FW: REALLY Bad encoding performance of Linux SBC
-	audio codec
+Message-Id: <FF3DF936-BA45-4C47-9943-B0FD94903747@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: hoene@uni-tuebingen.de,
+	BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <006e01c939fe$19bf65a0$4d3e30e0$@hoene@gmx.net>
+Mime-Version: 1.0 (Apple Message framework v929.2)
+Date: Thu, 30 Oct 2008 19:06:26 +0100
+References: <003001c939b5$d685da50$83918ef0$@de>
+	<3DECBAF9-9FFA-4267-AA41-9D2DB1EDA0C3@holtmann.org>
+	<006e01c939fe$19bf65a0$4d3e30e0$@hoene@gmx.net>
+Cc: ekiga-devel-list@gnome.org
+Subject: Re: [Bluez-devel] Common file "sbc.c" in Ekiga/Opal and Bluez
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,24 +23,22 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Christian
+Hi Christian,
 
-> the sound quality got better. Still, both encoder and decoder are not as
-> good as the reference.
+>> can we first talk about you statically linking MPL and LGPL code
+>> together. This doesn't look like a good idea to me.
+>
+> Actually, it is the SBC codec plugin for Opal that is loaded  
+> dynamically.
+> Does this make things better or worse?
 
-It would be ideal to have automated tests for codec quality that don't
-require windows and that we could run before commits to track our
-progress. We could prepare some encoding/decoding samples with the
-reference codec and store them in the project or somewhere online. The
-one test we couldn't do this way is to encode with our codec and
-decode with the reference.
+that should be fine, but you need to put LGPL on the parts you wrote  
+to include the SBC routines and make them work.
 
-Are there free tools for checking the quality and for comparing
-signal/noise and overall volume? If you can detail the process you use
-that would help.
+Regards
 
-thanks
-Brad
+Marcel
+
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
