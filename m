@@ -1,197 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: [PATCH] NetLink patches.
-From: Alok <alokbarsode@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1224737318.9386.167.camel@californication>
-References: <1224255091.6175.18.camel@greatbear>
-	 <1224737318.9386.167.camel@californication>
-Content-Type: multipart/mixed; boundary="=-a0nTVP+QqV9Grhc1bGKZ"
-Date: Thu, 30 Oct 2008 18:40:13 +0530
-Message-Id: <1225372213.6189.21.camel@greatbear>
-Mime-Version: 1.0
+From: "Li, Zhigang" <zhigang.li@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 30 Oct 2008 17:46:11 +0800
+Subject: headset doesn't work with mplayer in fc9
+Message-ID: <722F286E5CF54C459DDA462B750B07CE0C273E67E8@pdsmsx502.ccr.corp.intel.com>
+Content-Type: text/plain; charset="gb2312"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
---=-a0nTVP+QqV9Grhc1bGKZ
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-
-Marcel,
-
-Attaching 2 patches for netlink support.
-
-1. Adds net/bluetooth/netlink.c for netlink support with initialization
-and exit functions.
-
-2. Registers a generic netlink family "bluetooth".
-
-Let me know if anything needs to be modified.
-
-Thanks,
-Alok.
-
---=-a0nTVP+QqV9Grhc1bGKZ
-Content-Disposition: attachment; filename=0001-Adding-net-bluetooth-netlink.c-for-netlink-support.patch
-Content-Type: application/mbox; name=0001-Adding-net-bluetooth-netlink.c-for-netlink-support.patch
-Content-Transfer-Encoding: 7bit
-
->From c81a88be8536f0369aa4106d2722357c36734a20 Mon Sep 17 00:00:00 2001
-From: Alok Barsode <alok.barsode@azingo.com>
-Date: Thu, 30 Oct 2008 16:50:15 +0530
-Subject: [PATCH] Adding net/bluetooth/netlink.c for netlink support.
-
-Signed-off-by: Alok Barsode <alok.barsode@azingo.com>
----
- include/net/bluetooth/bluetooth.h |    3 +++
- net/bluetooth/Makefile            |    2 +-
- net/bluetooth/af_bluetooth.c      |    6 ++++++
- net/bluetooth/netlink.c           |   24 ++++++++++++++++++++++++
- 4 files changed, 34 insertions(+), 1 deletions(-)
- create mode 100644 net/bluetooth/netlink.c
-
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 6f8418b..b02c7aa 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -178,4 +178,7 @@ extern void bt_sysfs_cleanup(void);
- 
- extern struct class *bt_class;
- 
-+extern int nlbluetooth_init(void);
-+extern void nlbluetooth_cleanup(void);
-+
- #endif /* __BLUETOOTH_H */
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index d1e433f..f014d48 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -10,4 +10,4 @@ obj-$(CONFIG_BT_BNEP)	+= bnep/
- obj-$(CONFIG_BT_CMTP)	+= cmtp/
- obj-$(CONFIG_BT_HIDP)	+= hidp/
- 
--bluetooth-objs := af_bluetooth.o hci_core.o hci_conn.o hci_event.o hci_sock.o hci_sysfs.o lib.o
-+bluetooth-objs := af_bluetooth.o hci_core.o hci_conn.o hci_event.o hci_sock.o hci_sysfs.o lib.o netlink.o
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 8907eff..b6487dc 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -436,6 +436,10 @@ static int __init bt_init(void)
- 	if (err < 0)
- 		return err;
- 
-+	err = nlbluetooth_init();
-+	if (err < 0)
-+		return err;
-+
- 	err = sock_register(&bt_sock_family_ops);
- 	if (err < 0) {
- 		bt_sysfs_cleanup();
-@@ -456,6 +460,8 @@ static void __exit bt_exit(void)
- 	sock_unregister(PF_BLUETOOTH);
- 
- 	bt_sysfs_cleanup();
-+
-+	nlbluetooth_cleanup();
- }
- 
- subsys_initcall(bt_init);
-diff --git a/net/bluetooth/netlink.c b/net/bluetooth/netlink.c
-new file mode 100644
-index 0000000..4606bbc
---- /dev/null
-+++ b/net/bluetooth/netlink.c
-@@ -0,0 +1,24 @@
-+/*
-+ * This is the netlink-based bluetooth interface.
-+ *
-+ * Copyright 2008 Alok Barsode <alok.barsode@azingo.com>
-+ */
-+
-+#include <net/genetlink.h>
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+
-+/* initialisation/exit functions */
-+
-+int __init nlbluetooth_init(void)
-+{
-+	return 0;
-+}
-+
-+void nlbluetooth_cleanup(void)
-+{
-+
-+}
--- 
-1.5.4.3
-
-
---=-a0nTVP+QqV9Grhc1bGKZ
-Content-Disposition: attachment; filename=0002-Registering-general-netlink-family-bluetooth.patch
-Content-Type: application/mbox; name=0002-Registering-general-netlink-family-bluetooth.patch
-Content-Transfer-Encoding: 7bit
-
->From 7c32b72b7e3ba502069fe87754e424d4f7f297e9 Mon Sep 17 00:00:00 2001
-From: Alok Barsode <alok.barsode@azingo.com>
-Date: Mon, 27 Oct 2008 21:01:59 +0530
-Subject: [PATCH] Registering general netlink family - bluetooth.
-
-Signed-off-by: Alok Barsode <alok.barsode@azingo.com>
----
- net/bluetooth/netlink.c |   26 +++++++++++++++++++++++++-
- 1 files changed, 25 insertions(+), 1 deletions(-)
-
-diff --git a/net/bluetooth/netlink.c b/net/bluetooth/netlink.c
-index 4606bbc..fafc6f2 100644
---- a/net/bluetooth/netlink.c
-+++ b/net/bluetooth/netlink.c
-@@ -11,14 +11,38 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- 
-+#define VERSION 1
-+
-+enum nlbluetooth_attr {
-+	NLBLUETOOTH_ATTR_UNSPEC,
-+	__NLBLUETOOTH_ATTR_MAX,
-+};
-+
-+#define NLBLUETOOTH_ATTR_MAX ( __NLBLUETOOTH_ATTR_MAX - 1)
-+
-+/* family definition */
-+static struct genl_family nlbluetooth_fam = {
-+	.id = GENL_ID_GENERATE,
-+	.hdrsize = 0,
-+	.name = "bluetooth",
-+	.version = VERSION,
-+	.maxattr = NLBLUETOOTH_ATTR_MAX
-+};
-+
- /* initialisation/exit functions */
- 
- int __init nlbluetooth_init(void)
- {
-+	int err;
-+
-+	err = genl_register_family(&nlbluetooth_fam);
-+	if (err)
-+		return err;
-+
- 	return 0;
- }
- 
- void nlbluetooth_cleanup(void)
- {
--
-+	genl_unregister_family(&nlbluetooth_fam);
- }
--- 
-1.5.4.3
-
-
---=-a0nTVP+QqV9Grhc1bGKZ--
-
+SGkgYWxsLA0KDQpJIGhhdmUgb25lIHByb2JsZW0gd2l0aCBtcGxheWVyo7ogICBtcGxheWVyIC1h
+byBhbHNhOmRldmljZT1CbHVldG9vdGggZmlsZS5tcDMNCg0KVGhlcmUgYWx3YXlzIGRpc3BsYXkg
+dGhlIGVycm9yczoNCg0KW0FPX0FMU0FdIGFsc2EtbGliOiBwY20uYzoyMTQ0OihzbmRfcGNtX29w
+ZW5fbm91cGRhdGUpIFVua25vd24gUENNIGJsdWV0b290aA0KDQpbQU9fQUxTQV0gUGxheWJhY2sg
+b3BlbiBlcnJvcjogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQ0KDQpDb3VsZCBub3Qgb3Blbi9p
+bml0aWFsaXplIGF1ZGlvIGRldmljZSAtPiBubyBzb3VuZC4NCg0KQXVkaW86IG5vIHNvdW5kDQoN
+ClZpZGVvOiBubyB2aWRlbw0KIA0KDQpCdXQgdGhlIG1wbGF5ZXIgd29yayBmaW5lIA0KDQpBbHNv
+IEkgY2FuIHVzZSBhcGxheTogIGFwbGF5IHdvcmtzIGZpbmUgd2l0aCBCbHVldG9vdGggaGVhZHNl
+dC4NCg0KUGVyaGFwcyBJIGRpZG4ndCBzZXQgcmlnaHQgY29uZmlndXJhdGlvbiBzb21lb25lIGhh
+dmUgdGhlIHNhbWUgcHJvYmxlbSBvciBpZGVhPw0KDQogDQoNCk15IE9TIGlzIEZDOQ0KDQpibHVl
+ei1saWJzLWRldmVsLTMuMzAtMS5mYzkuaTM4Ng0KDQpibHVlei11dGlscy1hbHNhLTMuMzAtMi5m
+YzkuaTM4Ng0KDQpibHVlei11dGlscy1nc3RyZWFtZXItMy4zMC0yLmZjOS5pMzg2DQoNCmJsdWV6
+LWxpYnMtMy4zMC0xLmZjOS5pMzg2DQoNCmJsdWV6LXV0aWxzLTMuMzAtMi5mYzkuaTM4Ng0KDQpi
+bHVlei11dGlscy1jdXBzLTMuMzAtMi5mYzkuaTM4Ng0KDQpibHVlei1nbm9tZS1hbmFseXplci0w
+LjI1LTEuZmM5LmkzODYNCg0KYmx1ZXotZ25vbWUtMC4yNS0xLmZjOS5pMzg2DQoNCmJsdWV6LWhj
+aWR1bXAtMS40MS0xLmZjOS5pMzg2DQoNCiANCg0KYWxzYS10b29scy0xLjAuMTYtMS5mYzkuaTM4
+Ng0KDQphbHNhLWxpYi0xLjAuMTYtMy5mYzkuaTM4Ng0KDQphbHNhLWxpYi1kZXZlbC0xLjAuMTYt
+My5mYzkuaTM4Ng0KDQphbHNhLXV0aWxzLTEuMC4xNi0yLmZjOS5pMzg2DQoNCmFsc2EtcGx1Z2lu
+cy1wdWxzZWF1ZGlvLTEuMC4xNi00LmZjOS5pMzg2DQoNCiANCnB1bHNlYXVkaW8tbW9kdWxlLXgx
+MS0wLjkuMTAtMS5mYzkuaTM4Ng0KDQphbHNhLXBsdWdpbnMtcHVsc2VhdWRpby0xLjAuMTYtNC5m
+YzkuaTM4Ng0KDQpnc3RyZWFtZXItcGx1Z2lucy1wdWxzZS0wLjkuNS0wLjUuc3ZuMjAwNzA5MjQu
+ZmM5LmkzODYNCg0KcHVsc2VhdWRpby0wLjkuMTAtMS5mYzkuaTM4Ng0KDQpwdWxzZWF1ZGlvLW1v
+ZHVsZS1nY29uZi0wLjkuMTAtMS5mYzkuaTM4Ng0KDQpwdWxzZWF1ZGlvLWVzb3VuZC1jb21wYXQt
+MC45LjEwLTEuZmM5LmkzODYNCg0KcHVsc2VhdWRpby1jb3JlLWxpYnMtMC45LjEwLTEuZmM5Lmkz
+ODYNCg0KcHVsc2VhdWRpby11dGlscy0wLjkuMTAtMS5mYzkuaTM4Ng0KDQpwdWxzZWF1ZGlvLWxp
+YnMtMC45LjEwLTEuZmM5LmkzODYNCg0KcHVsc2VhdWRpby1saWJzLWdsaWIyLTAuOS4xMC0xLmZj
+OS5pMzg2DQoNCldoYXQgSSBuZWVkIGRvIGVsc2U/DQpUaGFua3MNCg0KIA0KDQoNCg==
