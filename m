@@ -1,14 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Christian Hoene" <hoene@uni-tuebingen.de>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-References: <001d01c93a9f$6f2c8710$4d859530$@de>	<1225380052.4626.8.camel@hoene-desktop>
-	<d89ddf300810301148s6afa46a0v2bd8ce1ed844a60e@mail.gmail.com>
-In-Reply-To: <d89ddf300810301148s6afa46a0v2bd8ce1ed844a60e@mail.gmail.com>
-Date: Fri, 31 Oct 2008 11:23:20 +0100
-Message-ID: <001701c93b42$b28bb370$17a31a50$@de>
-MIME-Version: 1.0
-Subject: Re: [Bluez-devel] FW: REALLY Bad encoding performance of Linux
-	SBC	audio codec
+Message-Id: <5DB8F782-A06D-4818-9064-BFDFE371036E@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <490A4B92.1050505@postincrement.com>
+Mime-Version: 1.0 (Apple Message framework v929.2)
+Date: Fri, 31 Oct 2008 08:09:17 +0100
+References: <003001c939b5$d685da50$83918ef0$@de>	<3DECBAF9-9FFA-4267-AA41-9D2DB1EDA0C3@holtmann.org>	<006e01c939fe$19bf65a0$4d3e30e0$@hoene@gmx.net>
+	<FF3DF936-BA45-4C47-9943-B0FD94903747@holtmann.org>
+	<490A4B92.1050505@postincrement.com>
+Cc: ekiga-devel-list@gnome.org
+Subject: Re: [Bluez-devel] Common file "sbc.c" in Ekiga/Opal and Bluez
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -21,29 +22,26 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello Brad,
+Hi Craig,
 
-> It would be ideal to have automated tests for codec quality that don't
-> require windows and that we could run before commits to track our
-> progress. 
+>>>> can we first talk about you statically linking MPL and LGPL code
+>>>> together. This doesn't look like a good idea to me.
+>>> Actually, it is the SBC codec plugin for Opal that is loaded
+>>> dynamically.
+>>> Does this make things better or worse?
+>>
+>> that should be fine, but you need to put LGPL on the parts you wrote
+>> to include the SBC routines and make them work.
+>
+> Is there a library that contains the SBC functions that we can link
+> against ?
 
-Wine will be needed for the reference implementation, which is only
-available for Windows.
+not at the moment. We might do this at some point, but first we have  
+to make sure we are not touching the API anymore.
 
-> We could prepare some encoding/decoding samples with the
-> reference codec and store them in the project or somewhere online. The
-> one test we couldn't do this way is to encode with our codec and
-> decode with the reference.
+Regards
 
-> Are there free tools for checking the quality and for comparing
-> signal/noise and overall volume? If you can detail the process you use
-> that would help.
-
-Currently, I use PEAQ, which is quite expensive (6000 EUR). It provides you
-will a couple of parameters regarding the audio quality. I am not aware of a
-good open source implementation of PEAQ.
-
-Christian
+Marcel
 
 
 -------------------------------------------------------------------------
