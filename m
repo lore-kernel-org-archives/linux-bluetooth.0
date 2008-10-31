@@ -1,37 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <D2FA2BC1-0B69-4CF4-8023-36926B8230C2@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: "Li, Zhigang" <zhigang.li@intel.com>
-In-Reply-To: <722F286E5CF54C459DDA462B750B07CE0C273E6AA8@pdsmsx502.ccr.corp.intel.com>
-Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
-Mime-Version: 1.0 (Apple Message framework v929.2)
-Subject: Re: headset doesn't work with mplayer in fc9
-Date: Fri, 31 Oct 2008 09:27:07 +0100
-References: <722F286E5CF54C459DDA462B750B07CE0C273E67E8@pdsmsx502.ccr.corp.intel.com> <0F7448E5-26BB-444D-8851-3FE66705FA28@holtmann.org> <722F286E5CF54C459DDA462B750B07CE0C273E6AA8@pdsmsx502.ccr.corp.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Li, Zhigang" <zhigang.li@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 31 Oct 2008 16:02:14 +0800
+Subject: RE: headset doesn't work with mplayer in fc9
+Message-ID: <722F286E5CF54C459DDA462B750B07CE0C273E6AA8@pdsmsx502.ccr.corp.intel.com>
+References: <722F286E5CF54C459DDA462B750B07CE0C273E67E8@pdsmsx502.ccr.corp.intel.com>
+ <0F7448E5-26BB-444D-8851-3FE66705FA28@holtmann.org>
+In-Reply-To: <0F7448E5-26BB-444D-8851-3FE66705FA28@holtmann.org>
+Content-Type: text/plain; charset="gb2312"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Zhigang,
-
-> Thanks your information.
-
-please don't do any top posting on this mailing list. I know that  
-Outlook sucks, but the rule here is proper inline quoting.
-
-> Do you think I have to upate alsa or pulsaludio version.
-> I wonder the tow part as they are on developing.
-
-I don't know. For ALSA it should just work, but for PulseAudio it  
-might be that it is too late. Except that Lennart pushed some new  
-version to F9 updates.
-
-Also the F10 coming out next month should be fairly recent :)
-
-Don't go for Ubuntu 8.10 right now. I am fighting a lot of issues with  
-properly using that distro. They broke half of my day-to-day tools.
-
-Regards
-
-Marcel
-
+SGksIE1hcmNlbA0KVGhhbmtzIHlvdXIgaW5mb3JtYXRpb24uIA0KRG8geW91IHRoaW5rIEkgaGF2
+ZSB0byB1cGF0ZSBhbHNhIG9yIHB1bHNhbHVkaW8gdmVyc2lvbi4NCkkgd29uZGVyIHRoZSB0b3cg
+cGFydCBhcyB0aGV5IGFyZSBvbiBkZXZlbG9waW5nLg0KDQpUaGFua3MNCiANCg0KLS0tLS1Pcmln
+aW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IGxpbnV4LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5l
+bC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBC
+ZWhhbGYgT2YgTWFyY2VsIEhvbHRtYW5uDQpTZW50OiAyMDA4xOoxMNTCMzHI1SAyOjA1DQpUbzog
+TGksIFpoaWdhbmcNCkNjOiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQpTdWJqZWN0
+OiBSZTogaGVhZHNldCBkb2Vzbid0IHdvcmsgd2l0aCBtcGxheWVyIGluIGZjOQ0KDQpIaSBaaGln
+YW5nLA0KDQo+DQo+IEkgaGF2ZSBvbmUgcHJvYmxlbSB3aXRoIG1wbGF5ZXKjuiAgICANCj4gbXBs
+YXllciAtYW8gYWxzYTpkZXZpY2U9Qmx1ZXRvb3RoIGZpbGUubXAzDQo+DQo+IFRoZXJlIGFsd2F5
+cyBkaXNwbGF5IHRoZSBlcnJvcnM6DQo+DQo+IFtBT19BTFNBXSBhbHNhLWxpYjogcGNtLmM6MjE0
+NDooc25kX3BjbV9vcGVuX25vdXBkYXRlKSBVbmtub3duIFBDTSAgDQo+IGJsdWV0b290aA0KPg0K
+PiBbQU9fQUxTQV0gUGxheWJhY2sgb3BlbiBlcnJvcjogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9y
+eQ0KPg0KPiBDb3VsZCBub3Qgb3Blbi9pbml0aWFsaXplIGF1ZGlvIGRldmljZSAtPiBubyBzb3Vu
+ZC4NCj4NCj4gQXVkaW86IG5vIHNvdW5kDQo+DQo+IFZpZGVvOiBubyB2aWRlbw0KPg0KPg0KPiBC
+dXQgdGhlIG1wbGF5ZXIgd29yayBmaW5lDQo+DQo+IEFsc28gSSBjYW4gdXNlIGFwbGF5OiAgYXBs
+YXkgd29ya3MgZmluZSB3aXRoIEJsdWV0b290aCBoZWFkc2V0Lg0KPg0KPiBQZXJoYXBzIEkgZGlk
+bid0IHNldCByaWdodCBjb25maWd1cmF0aW9uIHNvbWVvbmUgaGF2ZSB0aGUgc2FtZSAgDQo+IHBy
+b2JsZW0gb3IgaWRlYT8NCj4NCj4NCj4NCj4gTXkgT1MgaXMgRkM5DQo+DQo+IGJsdWV6LWxpYnMt
+ZGV2ZWwtMy4zMC0xLmZjOS5pMzg2DQo+DQo+IGJsdWV6LXV0aWxzLWFsc2EtMy4zMC0yLmZjOS5p
+Mzg2DQo+DQo+IGJsdWV6LXV0aWxzLWdzdHJlYW1lci0zLjMwLTIuZmM5LmkzODYNCj4NCj4gYmx1
+ZXotbGlicy0zLjMwLTEuZmM5LmkzODYNCj4NCj4gYmx1ZXotdXRpbHMtMy4zMC0yLmZjOS5pMzg2
+DQoNCmFuZCB0aGUgbGF0ZXN0IHJlbGVhc2UgaXMgYmx1ZXotNC4xNy4gU28geW91IGhhdmUgdG9v
+IG1hbnkgdmVyc2lvbnMgIA0KYmVoaW5kIHdoYXQgd2UgYXJlIGN1cnJlbnRseSB1c2luZyBhbmQg
+d2hhdCBhbGwgbmV3IGRpc3Ryb3MgYXJlIHVzaW5nLiAgDQpTbyBwbGVhc2UgcmUtdGVzdCB3aXRo
+IHRoZSBsYXRlc3QgdmVyc2lvbnMgcGxlYXNlLg0KDQpSZWdhcmRzDQoNCk1hcmNlbA0KDQotLQ0K
+VG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJl
+IGxpbnV4LWJsdWV0b290aCIgaW4NCnRoZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9A
+dmdlci5rZXJuZWwub3JnDQpNb3JlIG1ham9yZG9tbyBpbmZvIGF0ICBodHRwOi8vdmdlci5rZXJu
+ZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwNCg==
