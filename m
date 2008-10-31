@@ -1,10 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 02 Nov 2008 17:44:35 +0400
-From: John Frankish <frankish@dubai.oilfield.slb.com>
+Message-Id: <93FCE176-8E54-4DB1-9F6E-F93FF921E4ED@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Message-id: <0K9P00CTDKUICGC0@gb0135mbx01.mail.slb.com>
-MIME-version: 1.0
-Subject: Re: [Bluez-devel] Pairing with a Headset
+In-Reply-To: <001301c93b42$0366d140$0a3473c0$@de>
+Mime-Version: 1.0 (Apple Message framework v929.2)
+Date: Sat, 1 Nov 2008 00:18:34 +0100
+References: <001301c93b42$0366d140$0a3473c0$@de>
+Cc: 'Frans de Bont' <frans.de.bont@philips.com>
+Subject: Re: [Bluez-devel] Patch to correct SBC gain mismatch and to test
+	the encoding performance
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,66 +21,36 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-At 15:36 12-10-08, you wrote:
->Hi,
->
->I'm using bluez-4.12/bluez-gnome-1.8 and tried out pairing my laptop
->with a SE HBH-610 headset
->
->A couple of questions:
->
->Q1 Using bluetooth-wizard, I got this.
->
->Connecting to null now...
->Please enter the following PIN code: 0000
->
->Since I could not enter anything on the headset, I waited 20-30s and
->then, as per bluetoothd -n, the pairing seemed to work:
->
->bluetoothd[6061]: Discovery session 0xb96d4098 with :1.1 activated
->bluetoothd[6061]: Discovery session 0xb96d4098 with :1.1 deactivated
->bluetoothd[6061]: link_key_request (sba=00:10:C6:56:F4:9F,
->dba=00:12:EE:A6:1D:F4)
->bluetoothd[6061]: pin_code_request (sba=00:10:C6:56:F4:9F,
->dba=00:12:EE:A6:1D:F4)
->bluetoothd[6061]: link_key_notify (sba=00:10:C6:56:F4:9F,
->dba=00:12:EE:A6:1D:F4)
->bluetoothd[6061]: Registered interface org.bluez.Headset on path
->/org/bluez/hci0/dev_00_12_EE_A6_1D_F4
->bluetoothd[6061]: Registered interface org.bluez.Input on path
->/org/bluez/hci0/dev_00_12_EE_A6_1D_F4
->
->If I pair the headset with a phone, I need to enter 0000 on the
->phone, after which there is a beeping in the headset until I press
->the headset  button and the pairing is complete.
->
->Did I miss something in the setup to use a bt headset or is the
->bluez-gnome logic not quite right for a headset?
->
->Q2 My os uses 2.6.26 and I have the following bt modules loaded:
->
->Module                  Size  Used by
->sco                     9472  2
->bnep                   11264  2
->rfcomm                 29328  4
->l2cap                  17920  16 bnep,rfcomm
->hci_usb                13084  3
->bluetooth              42852  11 sco,bnep,rfcomm,l2cap,hci_usb
->
->Do I need to apply the seven bt patches for 2.6.26 or will the
->headset work as is - i.e. is the btusb (?) module required for sco to work?
---------------------------
-To answer my own question, things now work with bluez-4.15, 
-bluez-gnome-1.8 and the hci_usb module - the btusb module freezes my 
-machine on completion of pairing.
+Hi Christian,
 
-Perhaps not a big deal, but I still think bluez-gnome 
-(bluetooth-wizard) could be a bit more user friendly when connecting 
-to a bt headset (or other device where the use cannot enter a pin) - 
-why not give the message "press button on headset" rather than "enter 
-PIN 0000"?
+> attached you will find a patch to correct the following issues.
+>
+> 1.) Gain of the decoder is corrected (before it was 6.02dB or twice  
+> too low)
+> 2.) Gain of the encoder is corrected (empirical gathered values were  
+> used to
+> correct the filter tables)
+> 3.) "sbcenc" supports more command line options.
 
-Anyway, the sound playback/recording quality seems good. 
+it would be nice if you just follow our coding style conventions. I  
+fixed this up for you this time. Please compare the result that I  
+pushed to the repository and your version.
+
+> 4.) A testing procedure for SBC is added including a script to test  
+> and a
+> remote interface to PEAQ. It requires the reference version of SBC
+> (available at the Bluetooth SIG website) and wine. Please note, that  
+> the
+> remote access to PEAQ is restricted and only available by request  
+> for a
+> limited time. Requesty from all unknown IP addresses are blocked by  
+> default.
+
+So what is wrong with using sbctester program?
+
+Regards
+
+Marcel
 
 
 -------------------------------------------------------------------------
