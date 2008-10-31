@@ -1,73 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [Bug 11442] btusb suspend/resume bug...
+Message-Id: <A11C9ACE-5F69-4230-8C29-2D634F20C5C9@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: "Rafael J. Wysocki" <rjw@sisk.pl>
-Cc: David Miller <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	bugme-daemon@bugzilla.kernel.org
-In-Reply-To: <200809302344.42615.rjw@sisk.pl>
-References: <20080916.155123.181085856.davem@davemloft.net>
-	 <200809271541.15963.rjw@sisk.pl>
-	 <1222754141.1825.55.camel@violet.holtmann.net>
-	 <200809302344.42615.rjw@sisk.pl>
-Content-Type: text/plain
-Date: Wed, 01 Oct 2008 00:03:49 +0200
-Message-Id: <1222812229.1825.65.camel@violet.holtmann.net>
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
-List-ID: <linux-bluetooth.vger.kernel.org>
+To: BlueZ development <bluez-devel@lists.sourceforge.net>
+In-Reply-To: <001701c93b42$b28bb370$17a31a50$@de>
+Mime-Version: 1.0 (Apple Message framework v929.2)
+Date: Fri, 31 Oct 2008 19:50:43 +0100
+References: <001d01c93a9f$6f2c8710$4d859530$@de>	<1225380052.4626.8.camel@hoene-desktop>
+	<d89ddf300810301148s6afa46a0v2bd8ce1ed844a60e@mail.gmail.com>
+	<001701c93b42$b28bb370$17a31a50$@de>
+Subject: Re: [Bluez-devel] FW: REALLY Bad encoding performance of Linux
+	SBC	audio codec
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=bluez-devel>
+List-Post: <mailto:bluez-devel@lists.sourceforge.net>
+List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
+	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Rafael,
+Hi Christian,
 
-> > > > >> Rafael, can you pull from my tree and test the changes:
-> > > > >>
-> > > > >> git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/ 
-> > > > >> bluetooth-2.6.git
-> > > > >>
-> > > > >> It would be interesting if these fixes are enough.
-> > > > >
-> > > > > They appear to be enough.  I haven't had any suspend/resume failures  
-> > > > > with them
-> > > > > applied.
-> > > > 
-> > > > so it works _without_ applying patch-btusb-suspend.
-> > > 
-> > > Well, unfortunately I spoke too soon.
-> > > 
-> > > I'm still seeing post-hibernation crashes triggered by the bluetooth user land
-> > > trying to use the device handled by btusb.  They happen every second
-> > > hibernation, more or less, and apparently they are oopses in various code
-> > > paths not directly related to bluetooth, like ext3 (memory corruption or
-> > > what?).
-> > 
-> > I pushed two extra patches to my bluetooth-2.6 repository:
-> > 
-> > git://git.kernel.org/pub/scm/linux/kernel/git/holtmann/bluetooth-2.6.git
-> > 
-> > One is fixing a double-free in the error path. This error path can be
-> > triggered during suspend/resume if the USB core just disconnects the
-> > device. Please check if that fixes it for you.
-> > 
-> > > With patch-btusb-suspend applied I don't see them (actually I have to use
-> > > a slightly modified version of the patch which is appended).
-> > > 
-> > > Interestingly enough, suspend to RAM works without any visible problems.
-> > 
-> > As Oliver said, the USB core should do the right thing when no suspend
-> > and resume callbacks are provided. I looked through the code so many
-> > times now and I am running out of ideas what can happen.
-> > 
-> > Lets try it one last time without the suspend patch, but the double free
-> > fix and see if that works. Otherwise I really give up.
-> 
-> This time I cannot reproduce the hibernation issue without the suspend patch,
-> so it appears that your double-free fix works for me.
+>> It would be ideal to have automated tests for codec quality that  
+>> don't
+>> require windows and that we could run before commits to track our
+>> progress.
+>
+> Wine will be needed for the reference implementation, which is only
+> available for Windows.
 
-great. So I push these for 2.6.27 and then for 2.6.28, we can add full
-suspend and auto-suspend and remote-wakeup support. Thanks for testing.
+with the exception that the reference encoder will run into a busy  
+loop for the first two test samples of the encoding conformance testing.
+
+>> We could prepare some encoding/decoding samples with the
+>> reference codec and store them in the project or somewhere online.  
+>> The
+>> one test we couldn't do this way is to encode with our codec and
+>> decode with the reference.
+>
+>> Are there free tools for checking the quality and for comparing
+>> signal/noise and overall volume? If you can detail the process you  
+>> use
+>> that would help.
+>
+> Currently, I use PEAQ, which is quite expensive (6000 EUR). It  
+> provides you
+> will a couple of parameters regarding the audio quality. I am not  
+> aware of a
+> good open source implementation of PEAQ.
+
+Please look at our sbctester tool. It should do the right thing.
 
 Regards
 
 Marcel
 
 
+-------------------------------------------------------------------------
+This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
+Build the coolest Linux based applications with Moblin SDK & win great prizes
+Grand prize is a trip for two to an Open Source event anywhere in the world
+http://moblin-contest.org/redirect.php?banner_id=100&url=/
+_______________________________________________
+Bluez-devel mailing list
+Bluez-devel@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/bluez-devel
