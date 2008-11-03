@@ -1,74 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <490F795B.5090308@dell.com>
-Date: Mon, 03 Nov 2008 16:21:15 -0600
-From: Mario Limonciello <mario_limonciello@dell.com>
+From: =?iso-8859-15?q?Isa=EDas_Mart=EDnez_Yelmo?= <isaiasmy@gmail.com>
+To: Mario Limonciello <mario_limonciello@dell.com>
+Subject: Re: Dell 365 Bluetooth
+Date: Mon, 3 Nov 2008 23:06:40 +0100
+Cc: linux-bluetooth@vger.kernel.org
+References: <200811031947.40187.isaiasmy@gmail.com>
+	<200811032158.21654.isaiasmy@gmail.com> <490F6861.5060704@dell.com>
+In-Reply-To: <490F6861.5060704@dell.com>
 MIME-Version: 1.0
-To: =?ISO-8859-15?Q?Isa=EDas_Mart=EDnez_Yelmo?= <isaiasmy@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Add reset quirk for Dell 365 Bluetooth
-References: <200811031947.40187.isaiasmy@gmail.com> 	<200811032158.21654.isaiasmy@gmail.com> <490F6861.5060704@dell.com> <200811032306.41166.isaiasmy@gmail.com>
-In-Reply-To: <200811032306.41166.isaiasmy@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig18BA8F5C79059D04A2CE56AC"
+Content-Type: text/plain;
+	charset=iso-8859-15
+Message-Id: <200811032306.41166.isaiasmy@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig18BA8F5C79059D04A2CE56AC
-Content-Type: multipart/mixed;
- boundary="------------070003030507070808090508"
+El Monday 03 November 2008 22:08:49 Mario Limonciello escribió:
+> Isaias:
+>
+> Isaías Martínez Yelmo wrote:
+> > El Monday 03 November 2008 20:03:51 Mario Limonciello escribió:
+> >
+> >
+> > Hello,
+> >
+> > I'm not very sure on how to enable the option that you mention, sorry.
+> > I've include in /etc/modprobe.d/options the next line:
+> >
+> > options btusb=1
+> >
+> > but I don't know if this is right. The dmesg command shows these lines
+> > related with hid2hci:
+> >
+> > [   12.458741] usb 1-1.2: usbfs: process 2746 (hid2hci) did not claim
+> > interface 0 before use
+> > [   24.365796] usb 1-1.2: usbfs: process 5909 (hid2hci) did not claim
+> > interface 0 before use
+> >
+> > Perhaps, it could be relevant.
+> >
+> > Let me know, if I have to enable the option in other way.
+> >
+> > Regards,
+> >
+> > Isaias
+>
+> Sorry, I mistyped before.  The modprobe options should be:
+>
+> options btusb reset=1
+>
+> See if that does your device any good.
+>
+> Regards
 
-This is a multi-part message in MIME format.
---------------070003030507070808090508
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-Since Isa=EDas confirmed that the reset quirk is necessary for supporting=
 
-the Dell BT365, here is a patch to add it.
---=20
-Mario Limonciello
-*Dell | Linux Engineering*
-mario_limonciello@dell.com
+things are going better, the device is detected:
 
---------------070003030507070808090508
-Content-Type: text/x-patch;
- name="btusb.patch"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline;
- filename="btusb.patch"
+[   11.974093] Bluetooth: Core ver 2.13
+[   11.986233] Bluetooth: HCI device and connection manager initialized
+[   11.986235] Bluetooth: HCI socket layer initialized
+[   11.989265] Bluetooth: Generic Bluetooth USB driver ver 0.3
+[   22.193174] Bluetooth: L2CAP ver 2.11
+[   22.193188] Bluetooth: L2CAP socket layer initialized
+[   22.244021] Bluetooth: SCO (Voice Link) ver 0.6
+[   22.244037] Bluetooth: SCO socket layer initialized
+[   22.287679] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[   22.287693] Bluetooth: BNEP filters: protocol multicast
+[   22.393267] Bluetooth: RFCOMM socket layer initialized
+[   22.393300] Bluetooth: RFCOMM TTY layer initialized
+[   22.393305] Bluetooth: RFCOMM ver 1.10
 
-Signed-off-by: Mario Limonciello <Mario_Limonciello@Dell.com>
---- a/drivers/bluetooth/btusb.c.orig	2008-11-03 16:15:33.000000000 -0600
-+++ b/drivers/bluetooth/btusb.c	2008-11-03 16:16:42.000000000 -0600
-@@ -125,6 +125,9 @@
- 	/* Dell laptop with Broadcom chip */
- 	{ USB_DEVICE(0x413c, 0x8126), .driver_info =3D BTUSB_RESET | BTUSB_WRON=
-G_SCO_MTU },
-=20
-+	/* Dell Wireless 365 */
-+	{ USB_DEVICE(0x413c, 0x8160), .driver_info =3D BTUSB_RESET },
-+
- 	/* Dell Wireless 370 */
- 	{ USB_DEVICE(0x413c, 0x8156), .driver_info =3D BTUSB_RESET | BTUSB_WRON=
-G_SCO_MTU },
-=20
+I can pair with my mobilephone, but I cannot see the services between the 
+laptop and the mobilephone or to transfer some file :( I have tried to  look 
+for some thing but I have not found any relevant yet.  Some Idea? Fortunately, 
+at least is recognised :)
 
---------------070003030507070808090508--
+Regards,
 
---------------enig18BA8F5C79059D04A2CE56AC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
-
-iEYEARECAAYFAkkPeVsACgkQ2CrZjkA73YtsVwCeLxbimtHqtCN9WBiddRl135eH
-C9UAn1wEBGM9gXIq3Sbrz5Q2f/ImUXOf
-=HCpJ
------END PGP SIGNATURE-----
-
---------------enig18BA8F5C79059D04A2CE56AC--
+Isaias
+-- 
+Isaías Martínez Yelmo
