@@ -1,11 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <490FCEFE.50302@slackdot.org>
-Date: Mon, 03 Nov 2008 23:26:38 -0500
-From: deker <deker@slackdot.org>
-MIME-Version: 1.0
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Subject: [Bluez-devel] Multiple simultaneous audio streams?
-Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
+From: Valmantas <walmis@gmail.com>
+To: bluez-devel@lists.sourceforge.net
+Date: Mon, 03 Nov 2008 13:49:24 +0200
+Message-Id: <1225712964.6241.44.camel@ubuntu>
+Mime-Version: 1.0
+Subject: [Bluez-devel] Bug: "Connected" device property is always False
+Reply-To: walmis@balticum-tv.lt,
+	BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -17,21 +18,9 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi,
+Done some digging around and it seems
+adapter_search_active_conn_by_bdaddr always returns NULL.
 
- I am working on a project where it would be desirable to have audio 
-streams going to more than one SCO audio device at a time. My quick test 
-today of playing a WAV file with mplayer to two different devices didn't 
-work and bluetoothd was reporting "connection refused" when I tried to 
-get the second stream going. Once the first playback finished, I was 
-able to then play to the second device.
-
-So, I suppose m question is if BlueZ supports audio to multiple SCO 
-devices at the same time? If not, what might be involved in making it work?
-
-Thanks,
-
--d
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
