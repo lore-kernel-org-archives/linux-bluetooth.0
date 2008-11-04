@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49104A5D.1030105@slackdot.org>
-Date: Tue, 04 Nov 2008 08:13:01 -0500
-From: deker <deker@slackdot.org>
-MIME-Version: 1.0
+Message-Id: <D20612F1-393B-484D-B496-51C5521FD47D@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <490FCEFE.50302@slackdot.org>
-	<36FF1F3A-27F8-4681-B70A-7CB81A295D86@holtmann.org>
-In-Reply-To: <36FF1F3A-27F8-4681-B70A-7CB81A295D86@holtmann.org>
-Subject: Re: [Bluez-devel] Multiple simultaneous audio streams?
+In-Reply-To: <fdd96f380811040047h1ec4ab77w8518e807e3c1a55f@mail.gmail.com>
+Mime-Version: 1.0 (Apple Message framework v929.2)
+Date: Tue, 4 Nov 2008 10:06:14 +0100
+References: <fdd96f380811040047h1ec4ab77w8518e807e3c1a55f@mail.gmail.com>
+Subject: Re: [Bluez-devel] BlueZ 4.x APIs documentation
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -20,54 +19,18 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+Hi Mina,
 
-Speech quality is all we need. If I can get 2 8Khz output streams going 
-to 2 devices and 1 8Khz input stream from one device I'll be happy.
+> after changing bluez APIs applications that was using old APIs are  
+> broken. One of them is BlueCove (http://www.bluecove.org)
+> so, please is there a list of changes in APIs or any documentation  
+> for the new APIs?
 
-If somebody can point me in the right direction I'd really appreciate it.
+all documentation can be found in doc/*-api.txt inside the source tree.
 
-Thanks,
+Regards
 
--d
-
-Marcel Holtmann wrote:
-> Hi,
->
->   
->> I am working on a project where it would be desirable to have audio
->> streams going to more than one SCO audio device at a time. My quick  
->> test
->> today of playing a WAV file with mplayer to two different devices  
->> didn't
->> work and bluetoothd was reporting "connection refused" when I tried to
->> get the second stream going. Once the first playback finished, I was
->> able to then play to the second device.
->>
->> So, I suppose m question is if BlueZ supports audio to multiple SCO
->> devices at the same time? If not, what might be involved in making  
->> it work?
->>     
->
-> do you wanna do speech quality or CD quality audio streaming?
->
-> And yes, BlueZ does support it, but there are limitations from the  
-> Bluetooth radio. So you really need to know what you wanna do.
->
-> Regards
->
-> Marcel
->
->
-> -------------------------------------------------------------------------
-> This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-> Build the coolest Linux based applications with Moblin SDK & win great prizes
-> Grand prize is a trip for two to an Open Source event anywhere in the world
-> http://moblin-contest.org/redirect.php?banner_id=100&url=/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->   
+Marcel
 
 
 -------------------------------------------------------------------------
