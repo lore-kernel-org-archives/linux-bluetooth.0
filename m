@@ -1,30 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <b11bec220811050837i4a4a095cqd9c2d27d5bbe3022@mail.gmail.com>
-Date: Wed, 5 Nov 2008 10:37:26 -0600
-From: "Daniel Roesler" <diafygi@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Default PIN for bluez-gnome wizard
+Date: Tue, 4 Nov 2008 15:35:10 -0500 (EST)
+From: "George F. Nemeyer" <tigerwolf@tigerden.com>
+To: Johan Hedberg <johan.hedberg@nokia.com>
+cc: linux-bluetooth@vger.kernel.org
+Subject: compiling text only
+In-Reply-To: <20081104123342.GA20202@localhost>
+Message-ID: <Pine.LNX.4.53.0811041503400.14051@tiger.tigerden.com>
+References: <49104706.2010200@kleiderschrank51.de> <20081104123342.GA20202@localhost>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Howdy all,
+A couple of us have reported issues with compiling on systems with older
+Glib packages.  There's likely quite a few others having the problem, but
+who haven't bothered to join this list to report.
 
-I was wondering if there was a reason for using random numbers between
-1000 and 9999 as the fallback pincode to try when attempting to
-connect to a bluetooth device via the wizard?
+At least on the production systems I'm dealing with, an upgrade to Glib
+isn't really possible.  I looked into it, but it leads to dependency hell,
+and would cause unnecessary bloat for systems which rely only on an
+absolute bare minimum of Gnome.  They're XFCE-based to keep operation
+simple and fast.
 
-http://git.kernel.org/?p=bluetooth/bluez-gnome.git;a=blob_plain;f=wizard/main.c;hb=HEAD
-------LINE 548-------
-target_pincode = g_strdup_printf("%d", g_random_int_range(1000, 9999));
---------------------------
+At least for our application, we don't need *any* graphical interface for
+bluetooth.  The setups could be just as easily done from shell scripts.
+Indeed, since these systems are *NOT* configured by end users, having a
+graphical user interface is not only superfluous, but is something we'd
+rather avoid. (They're in a kiosk-type environment so quite locked down.)
 
-Many devices use "0000" as their default, and I've noticed that "0000"
-is continually being added to the pincode_callback function for
-special devices. Why not set "0000" as the default to catch most of
-the devices that aren't able to customize their own pins?
+Is it possible to have a more backward-compatible (and therefore more
+widely applicable) compile, or is the needed bit from newer Glib really
+critical?  Even a less capable result would be vastly better than a dead
+end.
 
-Avast!
-Daniel Roesler
-diafygi@gmail.com
+If the Gnome parts can't be built at all without the newest Glib, is it
+possible to add a configure option that would allow the basic bluetooth
+interface libs and utilities to be built without Gnome altogether so they
+could be used in a command line environment?
+
+Regards,
+
+George Nemeyer
