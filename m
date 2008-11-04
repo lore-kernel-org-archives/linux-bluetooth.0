@@ -1,43 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 4 Nov 2008 15:35:10 -0500 (EST)
-From: "George F. Nemeyer" <tigerwolf@tigerden.com>
-To: Johan Hedberg <johan.hedberg@nokia.com>
-cc: linux-bluetooth@vger.kernel.org
-Subject: compiling text only
-In-Reply-To: <20081104123342.GA20202@localhost>
-Message-ID: <Pine.LNX.4.53.0811041503400.14051@tiger.tigerden.com>
-References: <49104706.2010200@kleiderschrank51.de> <20081104123342.GA20202@localhost>
+Message-ID: <f86d2a880811040903i3ee0a5e7tdf9b52775108dab0@mail.gmail.com>
+Date: Tue, 4 Nov 2008 12:03:52 -0500
+From: "David Merrill" <dmerrill@media.mit.edu>
+To: linux-bluetooth@vger.kernel.org
+Subject: how to: Inquiry with RSSI?
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A couple of us have reported issues with compiling on systems with older
-Glib packages.  There's likely quite a few others having the problem, but
-who haven't bothered to join this list to report.
+Hello all -
+First, thanks to the developers for creating Bluez - it's so nice to
+have such a useful, open-source Bluetooth option.
 
-At least on the production systems I'm dealing with, an upgrade to Glib
-isn't really possible.  I looked into it, but it leads to dependency hell,
-and would cause unnecessary bloat for systems which rely only on an
-absolute bare minimum of Gnome.  They're XFCE-based to keep operation
-simple and fast.
+I am writing with a question: how can I do an inquiry scan with RSSI,
+and read out the RSSI values? (without making a connection to devices)
+When I run "hciconfig hci0 inqmode" I get the following:
 
-At least for our application, we don't need *any* graphical interface for
-bluetooth.  The setups could be just as easily done from shell scripts.
-Indeed, since these systems are *NOT* configured by end users, having a
-graphical user interface is not only superfluous, but is something we'd
-rather avoid. (They're in a kiosk-type environment so quite locked down.)
+Inquiry mode: Inquiry with RSSI
 
-Is it possible to have a more backward-compatible (and therefore more
-widely applicable) compile, or is the needed bit from newer Glib really
-critical?  Even a less capable result would be vastly better than a dead
-end.
+..so I think the adapter supports this, and is in the correct
+configuration - but when I run "hcitool scan", I only get the HW
+address and name of local adapters - no RSSI. Is there some flag, or
+option that I need to pass to hcitool in order to get RSSI as well?
 
-If the Gnome parts can't be built at all without the newest Glib, is it
-possible to add a configure option that would allow the basic bluetooth
-interface libs and utilities to be built without Gnome altogether so they
-could be used in a command line environment?
-
-Regards,
-
-George Nemeyer
+thanks very much,
+David Merrill
+--
+MIT Media Lab
+dmerrill@media.mit.edu
+http://web.media.mit.edu/~dmerrill/
