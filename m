@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49107496.9030409@slackdot.org>
-Date: Tue, 04 Nov 2008 11:13:10 -0500
-From: deker <deker@slackdot.org>
+Message-ID: <49105E9C.8000605@powercraft.nl>
+Date: Tue, 04 Nov 2008 15:39:24 +0100
+From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <490FCEFE.50302@slackdot.org> <20081104132403.GA22659@localhost>
-In-Reply-To: <20081104132403.GA22659@localhost>
-Subject: Re: [Bluez-devel] Multiple simultaneous audio streams?
+Content-Type: multipart/mixed; boundary="------------030805030507010501050301"
+Subject: [Bluez-devel] dell bluetooth mouse and keyboard do not work after
+ "successful" pairing with simple-agent.py
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -16,104 +16,173 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
+This is a multi-part message in MIME format.
+--------------030805030507010501050301
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-I've changed the MaxConnections setting and now I'm seeing something 
-different (this must mean I'm getting closer :)
+This message contains the following attachment(s):
+information.txt
 
-I'm using the following config/comandline to play audio:
+Hello everybody,
 
-audio.conf:
-[General]
-SCORouting=PCM
-[Headset]
-HFP=False
-MaxConnections=2
+I am trying to get a dell keyboard and mouse working with the
+simple-agent.py but after the connection the devices do not work.
 
-~/.asoundrc:
+Would somebody be able to fix the simple-agent.py so I can connect to my
+keyboard and mouse. I am willing to donate some dutch stroopwafels to
+the person fixing the simple-agent.py
 
-pcm.bluetooth {
-    type bluetooth
-    device 00:0B:2E:D5:27:DA  
-    profile auto
-}
-pcm.bluetooth2 {
-    type bluetooth
-    device 00:0B:2E:D4:EC:31
-    profile auto
-}
+Please see all the debug information in the attachment.
 
-mplayer command lines:
+Kind regard,
 
- mplayer -ao alsa:device=bluetooth test.wav
- mplayer -ao alsa:device=bluetooth2 test.wav
+Jelle
 
-Either execution of mplayer works properly as long as the other isn't 
-streaming to the device. If one is already running, mplayer reports the 
-following:
+--------------030805030507010501050301
+Content-Type: text/plain;
+ name="information.txt"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+ filename="information.txt"
 
-[AO_ALSA] alsa-lib: pcm_bluetooth.c:464:(bluetooth_hsp_hw_params) 
-BT_SETCONFIGURATION failed : Input/output error(5)
-[AO_ALSA] Unable to set hw-parameters: Input/output error
-Could not open/initialize audio device -> no sound.
-Audio: no sound
-Video: no video
-
-
-Exiting... (End of file)
-
-Also, it seems that I'm losing the beginning of the sample in playback. 
-I assume this is due to the delay of setting up the connection to the 
-headset, but I was wondering if there was a way to avoid this.
-
-Thanks,
-
--d
-
-
-
-
-Johan Hedberg wrote:
-> On Mon, Nov 03, 2008, deker wrote:
->   
->>  I am working on a project where it would be desirable to have audio 
->> streams going to more than one SCO audio device at a time. My quick test 
->> today of playing a WAV file with mplayer to two different devices didn't 
->> work and bluetoothd was reporting "connection refused" when I tried to 
->> get the second stream going. Once the first playback finished, I was 
->> able to then play to the second device.
->>
->> So, I suppose m question is if BlueZ supports audio to multiple SCO 
->> devices at the same time? If not, what might be involved in making it work?
->>     
->
-> If you're using BlueZ 4.17 or later you'll need to add something like
-> MaxConnections=2
-> to the [Headset] section in /etc/bluetooth/audio.conf to be able to
-> create a service level connection to more than 1 device.
->
-> Johan
->
-> -------------------------------------------------------------------------
-> This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
-> Build the coolest Linux based applications with Moblin SDK & win great prizes
-> Grand prize is a trip for two to an Open Source event anywhere in the world
-> http://moblin-contest.org/redirect.php?banner_id=100&url=/
-> _______________________________________________
-> Bluez-devel mailing list
-> Bluez-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/bluez-devel
->   
-
+c3VkbyBoY2ljb25maWcKICAgIGhjaTA6ICAgVHlwZTogVVNCCiAgICAgICAgQkQgQWRkcmVz
+czogMDA6MUI6REM6MDA6MzI6NzEgQUNMIE1UVTogMzEwOjEwIFNDTyBNVFU6IDY0OjgKICAg
+ICAgICBVUCBSVU5OSU5HCiAgICAgICAgUlggYnl0ZXM6MTM4NiBhY2w6MCBzY286MCBldmVu
+dHM6ODQgZXJyb3JzOjAKICAgICAgICBUWCBieXRlczo4OTEgYWNsOjAgc2NvOjAgY29tbWFu
+ZHM6ODQgZXJyb3JzOjAKCiAgICBoY2kxOiAgIFR5cGU6IFVTQgogICAgICAgIEJEIEFkZHJl
+c3M6IDAwOjA5OkREOjUwOjM0OjcyIEFDTCBNVFU6IDMxMDoxMCBTQ08gTVRVOiA2NDo4CiAg
+ICAgICAgVVAgUlVOTklORwogICAgICAgIFJYIGJ5dGVzOjIyNTg3NzE0IGFjbDoxMjIgc2Nv
+OjAgZXZlbnRzOjMyMjYyMjkgZXJyb3JzOjAKICAgICAgICBUWCBieXRlczo4OTg2MTkxNzYg
+YWNsOjMyMzI1NDAgc2NvOjAgY29tbWFuZHM6ODQgZXJyb3JzOjAKCiAgICBoY2kyOiAgIFR5
+cGU6IFVTQgogICAgICAgIEJEIEFkZHJlc3M6IDAwOjE1OkFGOkY0OkU5OkUwIEFDTCBNVFU6
+IDEwMjE6OCBTQ08gTVRVOiA2NDoxCiAgICAgICAgVVAgUlVOTklORyBQU0NBTgogICAgICAg
+IFJYIGJ5dGVzOjE0MzMgYWNsOjAgc2NvOjAgZXZlbnRzOjk1IGVycm9yczowCiAgICAgICAg
+VFggYnl0ZXM6ODExMiBhY2w6MCBzY286MCBjb21tYW5kczo5NSBlcnJvcnM6MAoKc3VkbyBo
+Y2l0b29sIC1pIGhjaTAgc2NhbgogICAgU2Nhbm5pbmcgLi4uCiAgICAgICAgMDA6MDc6NjE6
+OEE6NDI6REYgICBEZWxsIEJUIE1vdXNlCgpweXRob24gLnNpbXBsZS1hZ2VudC5weSBoY2kw
+IDAwOjA3OjYxOjhBOjQyOkRGCiAgICBSZXF1ZXN0UGluQ29kZSAoL29yZy9ibHVlei9oY2kw
+L2Rldl8wMF8wN182MV84QV80Ml9ERikKICAgIEVudGVyIFBJTiBDb2RlOiAwMDAwCiAgICBS
+ZWxlYXNlCiAgICBOZXcgZGV2aWNlICgvb3JnL2JsdWV6L2hjaTAvZGV2XzAwXzA3XzYxXzhB
+XzQyX0RGKQoKIyBtb3VzZSBkb2VzIG5vdCB3b3JrLi4uLiBpbmRpY2F0aW9uIGlzIHRoYXQg
+aXQgaXMgbm90IHBhaXJlZAoKc3VkbyBoY2l0b29sIGluZm8gMDA6MDc6NjE6OEE6NDI6REYK
+ICAgIFJlcXVlc3RpbmcgaW5mb3JtYXRpb24gLi4uCiAgICAgICAgQkQgQWRkcmVzczogIDAw
+OjA3OjYxOjhBOjQyOkRGCiAgICAgICAgRGV2aWNlIE5hbWU6IERlbGwgQlQgTW91c2UKICAg
+ICAgICBMTVAgVmVyc2lvbjogMS4yICgweDIpIExNUCBTdWJ2ZXJzaW9uOiAweDU0NQogICAg
+ICAgIE1hbnVmYWN0dXJlcjogQ2FtYnJpZGdlIFNpbGljb24gUmFkaW8gKDEwKQogICAgICAg
+IEZlYXR1cmVzOiAweGZjIDB4ZmYgMHgwZiAweDAwIDB4MDggMHgwOCAweDAwIDB4MDAKICAg
+ICAgICAgICAgPGVuY3J5cHRpb24+IDxzbG90IG9mZnNldD4gPHRpbWluZyBhY2N1cmFjeT4g
+PHJvbGUgc3dpdGNoPgogICAgICAgICAgICA8aG9sZCBtb2RlPiA8c25pZmYgbW9kZT4gPHBh
+cmsgc3RhdGU+IDxSU1NJPiA8Y2hhbm5lbCBxdWFsaXR5PgogICAgICAgICAgICA8U0NPIGxp
+bms+IDxIVjIgcGFja2V0cz4gPEhWMyBwYWNrZXRzPiA8dS1sYXcgbG9nPiA8QS1sYXcgbG9n
+PgogICAgICAgICAgICA8Q1ZTRD4gPHBhZ2luZyBzY2hlbWU+IDxwb3dlciBjb250cm9sPiA8
+dHJhbnNwYXJlbnQgU0NPPgogICAgICAgICAgICA8QUZIIGNhcC4gc2xhdmU+IDxBRkggY2Fw
+LiBtYXN0ZXI+CgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCnN1ZG8gaGNpY29uZmlnCiAgICBoY2kw
+OiAgIFR5cGU6IFVTQgogICAgICAgIEJEIEFkZHJlc3M6IDAwOjFCOkRDOjAwOjMyOjcxIEFD
+TCBNVFU6IDMxMDoxMCBTQ08gTVRVOiA2NDo4CiAgICAgICAgVVAgUlVOTklORwogICAgICAg
+IFJYIGJ5dGVzOjcyMTUgYWNsOjE4OSBzY286MCBldmVudHM6MjYyIGVycm9yczowCiAgICAg
+ICAgVFggYnl0ZXM6Mzk1MCBhY2w6MTMyIHNjbzowIGNvbW1hbmRzOjEwMyBlcnJvcnM6MAoK
+ICAgIGhjaTE6ICAgVHlwZTogVVNCCiAgICAgICAgQkQgQWRkcmVzczogMDA6MDk6REQ6NTA6
+MzQ6NzIgQUNMIE1UVTogMzEwOjEwIFNDTyBNVFU6IDY0OjgKICAgICAgICBVUCBSVU5OSU5H
+CiAgICAgICAgUlggYnl0ZXM6MjI4NTMyMzEgYWNsOjEyMiBzY286MCBldmVudHM6MzI2NDE2
+MCBlcnJvcnM6MAogICAgICAgIFRYIGJ5dGVzOjkwOTE3NTMyMCBhY2w6MzI3MDUxMiBzY286
+MCBjb21tYW5kczo4NCBlcnJvcnM6MAoKICAgIGhjaTI6ICAgVHlwZTogVVNCCiAgICAgICAg
+QkQgQWRkcmVzczogMDA6MTU6QUY6RjQ6RTk6RTAgQUNMIE1UVTogMTAyMTo4IFNDTyBNVFU6
+IDY0OjEKICAgICAgICBVUCBSVU5OSU5HIFBTQ0FOCiAgICAgICAgUlggYnl0ZXM6MTQzMyBh
+Y2w6MCBzY286MCBldmVudHM6OTUgZXJyb3JzOjAKICAgICAgICBUWCBieXRlczo4MTEyIGFj
+bDowIHNjbzowIGNvbW1hbmRzOjk1IGVycm9yczowCgojIHR1cm4gb24gdGhlIGtleWJvYXJk
+IGJ5IG1vdmluZyB0aGUgc3dpdGNoIGZyb20gdGhlIDAgdG8gdGhlIHwgc2lnbgojIHR1cm4g
+b2ZmIHRoZSBtb3VzZSBieSBtb3ZpbmcgdGhlIHN3aXRjaCBmcm9tIHRoZSB8IHRvIHRoZSAw
+IHNpZ24KIyBwcmVzcyB0aGUgYmx1ZXRvb3RoIGNvbm5lY3QgYnV0dG9uIG9uIHRoZSBrZXli
+YW9yZCBmb3IgNSBzZWNvbmRzCgpzdWRvIGhjaXRvb2wgLWkgaGNpMCBzY2FuCiAgICBTY2Fu
+bmluZyAuLi4KICAgICAgICAwMDowNzo2MTo4QToxQTpBQSAgIERlbGwgQlQgS2V5Ym9hcmQK
+CnB5dGhvbiAuc2ltcGxlLWFnZW50LnB5IGhjaTAgMDA6MDc6NjE6OEE6MUE6QUEKICAgIFJl
+cXVlc3RQaW5Db2RlICgvb3JnL2JsdWV6L2hjaTAvZGV2XzAwXzA3XzYxXzhBXzFBX0FBKQog
+ICAgRW50ZXIgUElOIENvZGU6IDAwMDAKICAgIFJlbGVhc2UKICAgIE5ldyBkZXZpY2UgKC9v
+cmcvYmx1ZXovaGNpMC9kZXZfMDBfMDdfNjFfOEFfMUFfQUEpCgojIGtleWJvYXJkIGRvZXMg
+bm90IHdvcmsuLi4uIGluZGljYXRpb24gaXMgdGhhdCBpdCBpcyBub3QgcGFpcmVkCgpzdWRv
+IGhjaXRvb2wgaW5mbyAwMDowNzo2MTo4QToxQTpBQQogICAgUmVxdWVzdGluZyBpbmZvcm1h
+dGlvbiAuLi4KICAgICAgICBCRCBBZGRyZXNzOiAgMDA6MDc6NjE6OEE6MUE6QUEKICAgICAg
+ICBEZXZpY2UgTmFtZTogRGVsbCBCVCBLZXlib2FyZAogICAgICAgIExNUCBWZXJzaW9uOiAx
+LjIgKDB4MikgTE1QIFN1YnZlcnNpb246IDB4NTQ1CiAgICAgICAgTWFudWZhY3R1cmVyOiBD
+YW1icmlkZ2UgU2lsaWNvbiBSYWRpbyAoMTApCiAgICAgICAgRmVhdHVyZXM6IDB4ZmMgMHhm
+ZiAweDBmIDB4MDAgMHgwOCAweDA4IDB4MDAgMHgwMAogICAgICAgICAgICA8ZW5jcnlwdGlv
+bj4gPHNsb3Qgb2Zmc2V0PiA8dGltaW5nIGFjY3VyYWN5PiA8cm9sZSBzd2l0Y2g+CiAgICAg
+ICAgICAgIDxob2xkIG1vZGU+IDxzbmlmZiBtb2RlPiA8cGFyayBzdGF0ZT4gPFJTU0k+IDxj
+aGFubmVsIHF1YWxpdHk+CiAgICAgICAgICAgIDxTQ08gbGluaz4gPEhWMiBwYWNrZXRzPiA8
+SFYzIHBhY2tldHM+IDx1LWxhdyBsb2c+IDxBLWxhdyBsb2c+CiAgICAgICAgICAgIDxDVlNE
+PiA8cGFnaW5nIHNjaGVtZT4gPHBvd2VyIGNvbnRyb2w+IDx0cmFuc3BhcmVudCBTQ08+CiAg
+ICAgICAgICAgIDxBRkggY2FwLiBzbGF2ZT4gPEFGSCBjYXAuIG1hc3Rlcj4KCi0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLQoKYmx1ZXRvb3RoZFszMzg1XTogYm9uZGluZ19yZXF1ZXN0X25ldygwMDow
+Nzo2MTo4QTo0MjpERikKYmx1ZXRvb3RoZFszMzg1XTogYWRhcHRlcl9nZXRfZGV2aWNlKDAw
+OjA3OjYxOjhBOjQyOkRGKQpibHVldG9vdGhkWzMzODVdOiBhZGFwdGVyX2NyZWF0ZV9kZXZp
+Y2UoMDA6MDc6NjE6OEE6NDI6REYpCmJsdWV0b290aGRbMzM4NV06IENyZWF0aW5nIGRldmlj
+ZSAvb3JnL2JsdWV6L2hjaTAvZGV2XzAwXzA3XzYxXzhBXzQyX0RGCmJsdWV0b290aGRbMzM4
+NV06IFRlbXBvcmFyeSBhZ2VudCByZWdpc3RlcmVkIGZvciBoY2kwLzAwOjA3OjYxOjhBOjQy
+OkRGIGF0IDoxLjM5Oi90ZXN0L2FnZW50CmJsdWV0b290aGRbMzM4NV06IGFkYXB0ZXJfZ2V0
+X2RldmljZSgwMDowNzo2MTo4QTo0MjpERikKYmx1ZXRvb3RoZFszMzg1XTogbGlua19rZXlf
+cmVxdWVzdCAoc2JhPTAwOjFCOkRDOjAwOjMyOjcxLCBkYmE9MDA6MDc6NjE6OEE6NDI6REYp
+CmJsdWV0b290aGRbMzM4NV06IGtlcm5lbCBhdXRoIHJlcXVpcmVtZW50cyA9IDB4MDAKYmx1
+ZXRvb3RoZFszMzg1XTogcGluX2NvZGVfcmVxdWVzdCAoc2JhPTAwOjFCOkRDOjAwOjMyOjcx
+LCBkYmE9MDA6MDc6NjE6OEE6NDI6REYpCmJsdWV0b290aGRbMzM4NV06IGhjaWRfZGJ1c19u
+ZXdfYXV0aF9yZXF1ZXN0CmJsdWV0b290aGRbMzM4NV06IGxpbmtfa2V5X25vdGlmeSAoc2Jh
+PTAwOjFCOkRDOjAwOjMyOjcxLCBkYmE9MDA6MDc6NjE6OEE6NDI6REYpCmJsdWV0b290aGRb
+MzM4NV06IGhjaWRfZGJ1c19ib25kaW5nX3Byb2Nlc3NfY29tcGxldGU6IHN0YXR1cz0wMApi
+bHVldG9vdGhkWzMzODVdOiBhZGFwdGVyX2dldF9kZXZpY2UoMDA6MDc6NjE6OEE6NDI6REYp
+CmJsdWV0b290aGRbMzM4NV06IFJlbGVhc2luZyBhZ2VudCA6MS4zOSwgL3Rlc3QvYWdlbnQK
+Ymx1ZXRvb3RoZFszMzg1XTogUHJvYmUgZHJpdmVycyBmb3IgL29yZy9ibHVlei9oY2kwL2Rl
+dl8wMF8wN182MV84QV80Ml9ERgpibHVldG9vdGhkWzMzODVdOiBoaWRfZGV2aWNlX3Byb2Jl
+OiBwYXRoIC9vcmcvYmx1ZXovaGNpMC9kZXZfMDBfMDdfNjFfOEFfNDJfREYKYmx1ZXRvb3Ro
+ZFszMzg1XTogUmVnaXN0ZXJlZCBpbnRlcmZhY2Ugb3JnLmJsdWV6LklucHV0IG9uIHBhdGgg
+L29yZy9ibHVlei9oY2kwL2Rldl8wMF8wN182MV84QV80Ml9ERgpibHVldG9vdGhkWzMzODVd
+OiBhZGFwdGVyX2dldF9kZXZpY2UoMDA6MDc6NjE6OEE6NDI6REYpCmJsdWV0b290aGRbMzM4
+NV06IGJvbmRpbmdfcmVxdWVzdF9uZXcoMDA6MDc6NjE6OEE6MUE6QUEpCmJsdWV0b290aGRb
+MzM4NV06IGFkYXB0ZXJfZ2V0X2RldmljZSgwMDowNzo2MTo4QToxQTpBQSkKYmx1ZXRvb3Ro
+ZFszMzg1XTogYWRhcHRlcl9jcmVhdGVfZGV2aWNlKDAwOjA3OjYxOjhBOjFBOkFBKQpibHVl
+dG9vdGhkWzMzODVdOiBDcmVhdGluZyBkZXZpY2UgL29yZy9ibHVlei9oY2kwL2Rldl8wMF8w
+N182MV84QV8xQV9BQQpibHVldG9vdGhkWzMzODVdOiBUZW1wb3JhcnkgYWdlbnQgcmVnaXN0
+ZXJlZCBmb3IgaGNpMC8wMDowNzo2MTo4QToxQTpBQSBhdCA6MS40MjovdGVzdC9hZ2VudApi
+bHVldG9vdGhkWzMzODVdOiBhZGFwdGVyX2dldF9kZXZpY2UoMDA6MDc6NjE6OEE6MUE6QUEp
+CmJsdWV0b290aGRbMzM4NV06IGxpbmtfa2V5X3JlcXVlc3QgKHNiYT0wMDoxQjpEQzowMDoz
+Mjo3MSwgZGJhPTAwOjA3OjYxOjhBOjFBOkFBKQpibHVldG9vdGhkWzMzODVdOiBrZXJuZWwg
+YXV0aCByZXF1aXJlbWVudHMgPSAweDAwCmJsdWV0b290aGRbMzM4NV06IHBpbl9jb2RlX3Jl
+cXVlc3QgKHNiYT0wMDoxQjpEQzowMDozMjo3MSwgZGJhPTAwOjA3OjYxOjhBOjFBOkFBKQpi
+bHVldG9vdGhkWzMzODVdOiBoY2lkX2RidXNfbmV3X2F1dGhfcmVxdWVzdApibHVldG9vdGhk
+WzMzODVdOiBsaW5rX2tleV9ub3RpZnkgKHNiYT0wMDoxQjpEQzowMDozMjo3MSwgZGJhPTAw
+OjA3OjYxOjhBOjFBOkFBKQpibHVldG9vdGhkWzMzODVdOiBoY2lkX2RidXNfYm9uZGluZ19w
+cm9jZXNzX2NvbXBsZXRlOiBzdGF0dXM9MDAKYmx1ZXRvb3RoZFszMzg1XTogYWRhcHRlcl9n
+ZXRfZGV2aWNlKDAwOjA3OjYxOjhBOjFBOkFBKQpibHVldG9vdGhkWzMzODVdOiBSZWxlYXNp
+bmcgYWdlbnQgOjEuNDIsIC90ZXN0L2FnZW50CmJsdWV0b290aGRbMzM4NV06IFByb2JlIGRy
+aXZlcnMgZm9yIC9vcmcvYmx1ZXovaGNpMC9kZXZfMDBfMDdfNjFfOEFfMUFfQUEKYmx1ZXRv
+b3RoZFszMzg1XTogaGlkX2RldmljZV9wcm9iZTogcGF0aCAvb3JnL2JsdWV6L2hjaTAvZGV2
+XzAwXzA3XzYxXzhBXzFBX0FBCmJsdWV0b290aGRbMzM4NV06IFJlZ2lzdGVyZWQgaW50ZXJm
+YWNlIG9yZy5ibHVlei5JbnB1dCBvbiBwYXRoIC9vcmcvYmx1ZXovaGNpMC9kZXZfMDBfMDdf
+NjFfOEFfMUFfQUEKYmx1ZXRvb3RoZFszMzg1XTogYWRhcHRlcl9nZXRfZGV2aWNlKDAwOjA3
+OjYxOjhBOjFBOkFBKQo=
+--------------030805030507010501050301
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
 Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
+--------------030805030507010501050301
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--------------030805030507010501050301--
