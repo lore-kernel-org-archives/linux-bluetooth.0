@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <491FF345.6050206@powercraft.nl>
-Date: Sun, 16 Nov 2008 11:17:41 +0100
-From: Jelle de Jong <jelledejong@powercraft.nl>
-MIME-Version: 1.0
+References: <490FCEFE.50302@slackdot.org> <20081104132403.GA22659@localhost>
+	<49107496.9030409@slackdot.org> <4910B2CE.5000500@slackdot.org>
+Date: Fri, 7 Nov 2008 09:36:12 -0800 (PST)
+From: Ramesh Jayapal <iingenious@yahoo.com>
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-References: <491079A8.2010403@powercraft.nl> <49107D3D.40906@powercraft.nl>
-In-Reply-To: <49107D3D.40906@powercraft.nl>
-Subject: Re: [Bluez-devel] why do the keyboard en mouse not reconnect on
- startup of bluetoothd (solved)
+MIME-Version: 1.0
+Message-ID: <364707.91691.qm@web45014.mail.sp1.yahoo.com>
+Subject: [Bluez-devel] Need Help. Plz reply.
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -17,64 +16,90 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/mixed; boundary="===============8863027628318325424=="
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Jelle de Jong wrote:
-> Jelle de Jong wrote:
->> Hello everybody,
->>
->> I attached a logfile with hcidump and bluetooth --debug logs
->>
->> I have two trusted devices but the do nor reconnect after staring up
->> bluetoothd. hcidump does show that they are sending information. What is
->> going on here?
->>
->> Kind regards,
->>
->> Jelle
->>
-> 
-> I did some more debugging on this issue, and it seems this is the situation:
-> 
-> when a device is turned on then paired with an running bluetoothd the
-> device works. then you restart your system or the bluetoothd without
-> switching the devices off/on. So the device is still running as before
-> the reboot. hicdump shows it successfully transmits the data, but
-> bluetoothd does not do anything with the data. When turning the device
-> off and then on hcidump shows a disconnect and mode change and after
-> that bluetootd will connect the device again and its working. This means
-> turning off on all devices after bluetoothd restarts. This is kind of a
-> bug in my opinion, what do the developers think?
-> 
-> I am willing to donate some dutch stroopwafels if this can be fixed.
-> 
-> Kind regards,
-> 
-> Jelle
+--===============8863027628318325424==
+Content-Type: multipart/alternative; boundary="0-1274515234-1226079372=:91691"
 
-Some good news,
+--0-1274515234-1226079372=:91691
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-After talking showing the problem to Marcel Holtmann, he pointed out
-that there was some bug with some devices that did not reset there
-connections after reboot. He solved this with the newest kernel but for
-now I had to use a workaround like the below:
+Hi All,=0A=0A        Sorry for interrupting in this mail list.=0A=0A       =
+ But i am really tired on searching the answer for my questions.=0A=0A     =
+   I am trying to develop new applications in Bluetooth (in Bluez).=0A=0A  =
+      i couldn't find any materials how to start it. (i didn't mean how to =
+write the program ans new concepts)=0A=0A        i need the initial configu=
+ration to been done before writing the application.=0A=0A        1. Need to=
+ know which are the packages need to install.=0A        2. how to access th=
+e inbuild api's. (need to clarify i can use the installed stack api's (run =
+time libraries) or to include the source code api's and compile the source =
+while compiling my application code).=0A        3. is there any Environment=
+ variables need to be set.=0A        4. How to compile is there any runtime=
+ libraries need to be included?=0A=0A    If i get any documents / source co=
+de (say for SDP only) and how to compile and test is is very useful for me.=
+=0A=0Aawaiting for the response.=0A=0AThanks in advance,=0Amerameshj=0A=0A=
+=0A      Yahoo! Toolbar is now powered with Search Assist.Download it now!=
+=0Ahttp://sg.toolbar.yahoo.com/
+--0-1274515234-1226079372=:91691
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-cat /etc/modprobe.conf
-options hci_usb reset=1
+<html><head><style type=3D"text/css"><!-- DIV {margin:0px;} --></style></he=
+ad><body><div style=3D"font-family:times new roman,new york,times,serif;fon=
+t-size:12pt">Hi All,<br><br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Sorry for=
+ interrupting in this mail list.<br><br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbs=
+p; But i am really tired on searching the answer for my questions.<br><br>&=
+nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; I am trying to develop new application=
+s in Bluetooth (in Bluez).<br><br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; i c=
+ouldn't find any materials how to start it. (i didn't mean how to write the=
+ program ans new concepts)<br><br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; i n=
+eed the initial configuration to been done before writing the application.<=
+br><br><span style=3D"font-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&n=
+bsp; 1. Need to know which are the packages need to install.</span><br styl=
+e=3D"font-weight: bold;"><span style=3D"font-weight: bold;">&nbsp;&nbsp;&nb=
+sp;
+ &nbsp;&nbsp;&nbsp; 2. how to access the inbuild api's. (need to clarify i =
+can use the installed stack api's (run time libraries) or to include the so=
+urce code api's and compile the source while compiling my application code)=
+..</span><br style=3D"font-weight: bold;"><span style=3D"font-weight: bold;"=
+>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 3. is there any Environment variable=
+s need to be set.</span><br style=3D"font-weight: bold;"><span style=3D"fon=
+t-weight: bold;">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 4. How to compile is=
+ there any runtime libraries need to be included?</span><br style=3D"font-w=
+eight: bold;"><br><span style=3D"font-weight: bold;">&nbsp;&nbsp;&nbsp; If =
+i get any documents / source code (say for SDP only) and how to compile and=
+ test is is very useful for me.</span><br style=3D"font-weight: bold;"><br>=
+awaiting for the response.<br><br>Thanks in advance,<br>merameshj<br><br></=
+div><br>=0A      <hr size=3D1> <a href=3D"http://sg.rd.yahoo.com/sg/mail/do=
+mainchoice/mail/signature/*http://mail.promotions.yahoo.com/newdomains/sg/"=
+> Get your new Email address! </a> <br>=0AGrab the Email name you&#39;ve al=
+ways wanted before someone else does!</body></html>
+--0-1274515234-1226079372=:91691--
 
-Hope this also helps some other people.
 
-Kind regards,
 
-Jelle
+--===============8863027628318325424==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
 Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
+--===============8863027628318325424==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
+
+--===============8863027628318325424==--
