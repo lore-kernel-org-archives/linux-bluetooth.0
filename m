@@ -1,143 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 8 Nov 2008 23:19:36 -0800 (PST)
-From: Damon Hastings <damonhastings@yahoo.com>
-Subject: Possible to send audio to multiple bluetooth headsets at once?
-To: linux-bluetooth@vger.kernel.org
+Date: Fri, 7 Nov 2008 17:37:37 +0100
+From: martin f krafft <madduck@madduck.net>
+To: linux bluetooth mailinglist <linux-bluetooth@vger.kernel.org>
+Subject: Re: btusb+sco: unable to install hw params (set_params:979)
+Message-ID: <20081107163737.GA19970@piper.oerlikon.madduck.net>
+References: <20081107162741.GA8182@piper.oerlikon.madduck.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Message-ID: <393285.15460.qm@web81808.mail.mud.yahoo.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="61jdw2sOBCFtR2d/"
+In-Reply-To: <20081107162741.GA8182@piper.oerlikon.madduck.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi there,
 
-Is it possible to stream audio to multiple bluetooth headsets on the same dongle, simultaneously?  Details of my setup and failed attempts are below if anyone wishes to help -- but honestly, even a one-line response "yes it's possible" would at least tell me I'm not wasting my time!  What I've read elsewhere suggests that what I'm trying to do may not even be possible in Linux.  (In case you're curious, I'll have too many headsets to have a separate dongle for each -- probably dozens of headsets, assuming the Bluetooth band can handle that many, which I'm also unsure about and pretty nervous about too.  Each stream will be 90% silent, with only occasional bursts of speech, but, still.  Oh well, I guess I'll find whether it works *after* I invest tons of coding time into this.)  I don't need to receive any audio from the headsets.
-
-About my setup and my failed attempts:
-
-I'm running Fedora 9 and have tried its built-in bluez (version 3.35) as well as bluez-4.17, and I'm using alsa.  I'm using the Motorola H680 and Jabra BT2040 headsets with an Aluratek ABD2020 dongle.  I can pair both headsets at once, and I can stream audio to one of them at a time just fine.  But if I try streaming to both at once, I get this error from aplay on the second one:
-
-  damon@localhost [/home/damon]> aplay -D bluetooth_mot_h680 bmtl.wav  
-  Playing WAVE '/home/damon/bmtl.wav' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
-  ALSA lib pcm_bluetooth.c:464:(bluetooth_hsp_hw_params) BT_SETCONFIGURATION failed : Input/output error(5)
-  aplay: set_params:1015: Unable to install hw params:
-  ACCESS:  RW_INTERLEAVED
-  FORMAT:  S16_LE
-  SUBFORMAT:  STD
-  SAMPLE_BITS: 16
-  FRAME_BITS: 16
-  CHANNELS: 1
-  RATE: 8000
-  PERIOD_TIME: 125000
-  PERIOD_SIZE: 1000
-  PERIOD_BYTES: 2000
-  PERIODS: 4
-  BUFFER_TIME: 500000
-  BUFFER_SIZE: 4000
-  BUFFER_BYTES: 8000
-  TICK_TIME: [0 0]
-
-I also get this in /var/log/messages (with bluez 3.35):
-
-  Nov  7 21:08:14 scanners hcid[4512]: Audio API: received BT_GETCAPABILITIES_REQ
-  Nov  7 21:08:14 scanners hcid[4512]: Audio API: sending BT_GETCAPABILITIES_RSP
-  Nov  7 21:08:14 scanners hcid[4512]: Audio API: received BT_SETCONFIGURATION_REQ
-  Nov  7 21:08:14 scanners hcid[4512]: config sco - device = 00:1A:0E:82:35:D5 access_mode = 2
-  Nov  7 21:08:14 scanners hcid[4512]: connect: Operation not permitted (1)
-  Nov  7 21:08:14 scanners kernel: hcid[4512]: segfault at 10 ip 003e818f sp bfcb08d0 error 6 in audio.so[3de000+21000]
-
-And for bluez-4.17 I got all fancy and ran bluetoothd (which I take it replaces hcid) manually as root in debug mode.  I got the same error from aplay, and bluetoothd gave me this (note it doesn't segault like hcid did):
-
-  bluetoothd[2925]: Accepted new client connection on unix socket (fd=27)
-  bluetoothd[2925]: Audio API: received BT_GETCAPABILITIES_REQ
-  bluetoothd[2925]: Audio API: sending BT_GETCAPABILITIES_RSP
-  bluetoothd[2925]: Audio API: received BT_SETCONFIGURATION_REQ
-  bluetoothd[2925]: config sco - device = 00:1A:0E:B8:B3:7F access_mode = 2
-  bluetoothd[2925]: connect: Operation not permitted (1)
-  bluetoothd[2925]: config failed
-  bluetoothd[2925]: Audio API: sending BT_SETCONFIGURATION_RSP
-  bluetoothd[2925]: Unix client disconnected (fd=27)
-
-Same result if I don't run as root.  The original headset kept playing just fine, but the second headset remained quiet.  Reversing order of playing makes no difference.  Pairing second while first is already playing makes no difference.
-
-And here's a bunch of info that may or may not be relevant:
-
-My .asoundrc:
-
-  pcm.bluetooth_jab_bt2040 {
-      type bluetooth
-      device 00:1A:45:31:47:69
-      profile "auto"
-  }
-  pcm.bluetooth_mot_h680 {
-      type bluetooth
-      device 00:1A:0E:B8:B3:7F
-      profile "auto"
-  }
-
-My /etc/bluetooth/main.conf (unchanged from defaults):
-
-  [General]
-  Name = %h-%d
-  Class = 0x000100
-  DiscoverableTimeout = 0
-  PageTimeout = 8192
-  OffMode = NoScan
-  DiscoverSchedulerInterval = 0
-
-Hardware info:
-
-  root@localhost [/root]> hciconfig hci0 features
-  hci0:	Type: USB
-  	BD Address: 00:15:83:02:4F:E7 ACL MTU: 310:10 SCO MTU: 64:8
-  	Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
-  		<3-slot packets> <5-slot packets> <encryption> <slot offset> 
-  		<timing accuracy> <role switch> <hold mode> <sniff mode> 
-  		<park state> <RSSI> <channel quality> <SCO link> <HV2 packets> 
-  		<HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme> 
-  		<power control> <transparent SCO> <broadcast encrypt> 
-  		<EDR ACL 2 Mbps> <EDR ACL 3 Mbps> <enhanced iscan> 
-  		<interlaced iscan> <interlaced pscan> <inquiry with RSSI> 
-  		<extended SCO> <EV4 packets> <EV5 packets> <AFH cap. slave> 
-  		<AFH class. slave> <3-slot EDR ACL> <5-slot EDR ACL> 
-  		<AFH cap. master> <AFH class. master> <EDR eSCO 2 Mbps> 
-  		<EDR eSCO 3 Mbps> <3-slot EDR eSCO> <extended features> 
-
-  root@localhost [/root]> hcitool info 00:1A:45:31:47:69 
-  Requesting information ...
-  	BD Address:  00:1A:45:31:47:69
-  	OUI Company: GN Netcom as (00-1A-45)
-  	Device Name: Jabra BT2040
-  	LMP Version: 2.0 (0x3) LMP Subversion: 0xbf9
-  	Manufacturer: Cambridge Silicon Radio (10)
-  	Features: 0xbc 0xfe 0x0f 0x86 0x8b 0xe9 0x00 0x00
-  		<encryption> <slot offset> <timing accuracy> <role switch> 
-  		<sniff mode> <RSSI> <channel quality> <SCO link> <HV2 packets> 
-  		<HV3 packets> <u-law log> <A-law log> <CVSD> <paging scheme> 
-  		<power control> <transparent SCO> <EDR ACL 2 Mbps> 
-  		<EDR ACL 3 Mbps> <extended SCO> <EV4 packets> <EV5 packets> 
-  		<AFH cap. slave> <3-slot EDR ACL> <5-slot EDR ACL> 
-  		<AFH cap. master> <EDR eSCO 2 Mbps> <EDR eSCO 3 Mbps> 
-  		<3-slot EDR eSCO> 
-
-  root@localhost [/root]> hcitool info 00:1A:0E:B8:B3:7F 
-  Requesting information ...
-  	BD Address:  00:1A:0E:B8:B3:7F
-  	OUI Company: Cheng Uei Precision Industry Co.,Ltd (00-1A-0E)
-  	Device Name: Motorola H680
-  	LMP Version: 2.0 (0x3) LMP Subversion: 0x109d
-  	Manufacturer: Cambridge Silicon Radio (10)
-  	Features: 0xfc 0xfc 0x0b 0x80 0x0b 0x88 0x00 0x00
-  		<encryption> <slot offset> <timing accuracy> <role switch> 
-  		<hold mode> <sniff mode> <channel quality> <SCO link> 
-  		<HV2 packets> <HV3 packets> <u-law log> <A-law log> <CVSD> 
-  		<paging scheme> <transparent SCO> <extended SCO> <EV4 packets> 
-  		<EV5 packets> <AFH cap. slave> <AFH cap. master> 
-  		<3-slot EDR eSCO> 
-
-Thanks for any help -- I'm at wits' end!  :-P
-
-Damon Hastings
+--61jdw2sOBCFtR2d/
+Content-Type: multipart/mixed; boundary="EVF5PPMfhYS0aIcm"
+Content-Disposition: inline
 
 
-      
+--EVF5PPMfhYS0aIcm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+also sprach martin f krafft <madduck@madduck.net> [2008.11.07.1727 +0100]:
+>   $ strace -f -o /tmp/arecord.strace arecord -f S16_LE -D bt250 >/tmp/tes=
+t.wav
+>   Recording WAVE 'stdin' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
+
+strace attached, with -tt.
+
+FWIW, I let dbus-monitor run alongside and there was not a single
+event between running the above and seeing the error.
+
+--=20
+martin | http://madduck.net/ | http://two.sentenc.es/
+=20
+=2E   `___
+(o-    (o-    (o-    (o-   (o-    (o-    (o-           /\/| | |
+//\    //\    //\    //\   //\    //\    //\      `  /\/\/l-+-|
+v_/_   v_/_   v_/_   v_/_  v_/_   v_/_   v_/_    .`  /\/\/|_|_|
+=20
+spamtraps: madduck.bogus@madduck.net
+
+--EVF5PPMfhYS0aIcm
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename="arecord.strace.bz2"
+Content-Transfer-Encoding: base64
+
+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
+
+--EVF5PPMfhYS0aIcm--
+
+--61jdw2sOBCFtR2d/
+Content-Type: application/pgp-signature; name="digital_signature_gpg.asc"
+Content-Description: Digital signature (see http://martin-krafft.net/gpg/)
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkkUbtAACgkQIgvIgzMMSnUljQCg6lahZokFaaLbNMGMFsy8GQif
+5joAnRFwFu3+5qxuhhliasZIa2YBP1WE
+=pg8G
+-----END PGP SIGNATURE-----
+
+--61jdw2sOBCFtR2d/--
