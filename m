@@ -1,67 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 10 Nov 2008 10:20:09 +0100
-From: Stefan Seyfried <seife@suse.de>
+Date: Sun, 9 Nov 2008 17:08:50 -0800 (PST)
+From: Damon Hastings <damonhastings@yahoo.com>
+Subject: Re: Possible to send audio to multiple bluetooth headsets at once?
 To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: compat/Makefile.am manpages fix / pand/dund question
-Message-ID: <20081110092009.GD11057@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
+Message-ID: <148506.1963.qm@web81801.mail.mud.yahoo.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+A perhaps more important question: how many bluetooth headsets can be actively receiving audio in the same 200 square foot space at the same time?
 
-pand.1 and dund.1 are always installed. Fix below.
+If the Bluetooth band simply can't handle 20 headsets streaming all at once, then I'm wasting my (and your) time trying to get multiple headsets to work in the first place!  I understand that Bluetooth 2.0 (am I using 2.0?) provides 1 to 2 Mbps of bandwidth, which should be enough to fit 8 to 16 uncompressed 8000Hz 16-bit mono streams, ignoring data redundancy, collision retransmits, and other overhead -- and 8 to 16 isn't good enough.  I can use multiple dongles on multiple computers, but they'd just interfere.
 
-Then some kind of packaging question:
-I got users that request pand and dund. I am under the impression
-that this should be handled by the networking service, however was
-unable to find anything understandable on the WIKI where I can point
-them to.
+Let me break this down into sub-topics...  Don't spend too much time on each if you can't answer it off the top of your head -- the most important question is at the end!
 
-Am I still "allowed" to package pand and dund, e.g. in a "bluez-compat"
-package? I guess that I should not package hidd, no matter how much
-users would like it, though ;-)
+1) I don't need good (or even decent) quality -- how do I configure for lowest bandwidth usage?  My latency requirements are also fairly relaxed -- 100ms or less should be fine.
 
-Thanks,
+2) I'll be sending audio *to* the headsets only; I'd like to make sure no bandwidth is wasted trying to read audio *from* them.
 
-	Stefan
+3) Each audio stream will be absolute digital silence (i.e. a sequence of zeroes) 90% of the time, with short bursts of speech the other 10%.  Can you tell me whether the relevant protocol/profile/whatever is smart enough to compress all those zeroes away before sending them over the air?  Or is there a config change I can make to enable such compression?  I don't think I can afford to just disconnect over the silences and reconnect on speech; the reconnect delay would probably be too long.
 
-diff --git a/compat/Makefile.am b/compat/Makefile.am
-index f3422fc..58254ad 100644
---- a/compat/Makefile.am
-+++ b/compat/Makefile.am
-@@ -20,11 +20,11 @@ bin_PROGRAMS += pand
- pand_SOURCES = pand.c pand.h bnep.c sdp.h sdp.c
- 
- pand_LDADD = $(top_builddir)/common/libhelper.a @BLUEZ_LIBS@
--endif
- 
- if MANPAGES
- man_MANS += pand.1
- endif
-+endif
- 
- if DUND
- bin_PROGRAMS += dund
-@@ -32,11 +32,11 @@ bin_PROGRAMS += dund
- dund_SOURCES = dund.c dund.h lib.h sdp.h sdp.c dun.c msdun.c
- 
- dund_LDADD = $(top_builddir)/common/libhelper.a @BLUEZ_LIBS@
--endif
- 
- if MANPAGES
- man_MANS += dund.1
- endif
-+endif
- 
- AM_CFLAGS = @BLUEZ_CFLAGS@
- 
+And now, the big question:  Given all of the above optimizations, do you think Bluetooth could fit 20 headsets?  40?  100?  I'm not going to hold you to any estimate, of course -- but I just want to know whether now is the time to forget about bluetooth altogether.  If so, then maybe I could look into WiFi headsets or something...?  I'll use wired headsets if necessary, though it would make life much more difficult for the wearers, who need at least some mobility.  Maybe I can find desktop speakers which are capable of outputting highly directional sound in a tight sound cone.  Basically, I plan to have 20 workers in a 200 sq ft space who each need their own isolated audio at their own workstation.  Each worker leaves his workstation very frequently but very briefly to perform other tasks, and he only needs the audio while he is at his workstation.
 
--- 
-Stefan Seyfried
-R&D Team Mobile Devices            |              "Any ideas, John?"
-SUSE LINUX Products GmbH, Nürnberg | "Well, surrounding them's out." 
+Thanks again!  :-)
 
-This footer brought to you by insane German lawmakers:
-SUSE Linux Products GmbH, GF: Markus Rex, HRB 16746 (AG Nürnberg)
+Damon Hastings
+
+
+--- On Sun, 11/9/08, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+
+> From: Johan Hedberg <johan.hedberg@gmail.com>
+> Subject: Re: Possible to send audio to multiple bluetooth headsets at
+once?
+> To: "BlueZ development" <linux-bluetooth@vger.kernel.org>
+> Date: Sunday, November 9, 2008, 1:35 AM
+> Hi Damon,
+> 
+> In theory what you're trying to do should be possible,
+> though you  
+> might run into bandwidth issues (and there's not much
+> BlueZ can do to  
+> help with that). However, you do need some configuration
+> file changes  
+> since the defaults are for one headset only. If you're
+> trying to use  
+> HSP/HFP add MaxConnections=2 to the [Headset] section in
+> /etc/ 
+> bluetooth/audio.conf. If you're trying to use A2DP add
+> SBCSources=2 to  
+> the [A2DP] section of the same file. You might also want to
+> experiment  
+> with forcing BlueZ to use the profile you want in the case
+> of multi- 
+> profile headsets. For HSP/HFP you need profile=voice in
+> your .asoundrc  
+> entries and for A2DP you need profile=hifi.
+> 
+> Johan
+> 
+> --
+> To unsubscribe from this list: send the line
+> "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at 
+> http://vger.kernel.org/majordomo-info.html
+
+
+
+      
