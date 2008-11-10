@@ -1,35 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49191908.1050903@nokia.com>
-Date: Tue, 11 Nov 2008 07:32:56 +0200
-From: Ville Tervo <ville.tervo@nokia.com>
+Message-ID: <491868E6.6000406@parrot.com>
+Date: Mon, 10 Nov 2008 18:01:26 +0100
+From: Matthieu CASTET <matthieu.castet@parrot.com>
 MIME-Version: 1.0
-To: ext Marcel Holtmann <marcel@holtmann.org>
-CC: Bastien Nocera <hadess@hadess.net>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Add support for pairing a few GPS devices
-References: <1224798847.2895.224.camel@cookie.hadess.net> <1225137122.7157.32.camel@californication>
-In-Reply-To: <1225137122.7157.32.camel@californication>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+To: linux-bluetooth@vger.kernel.org
+Subject: btusb and HCI_RAW
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-ext Marcel Holtmann wrote:
-> Hi Bastien,
-> 
->> Add support for hard-coded pincodes for a few GPS devices, one being
->> mine, the other being mentioned by Ralph Loader in
->> https://bugzilla.redhat.com/show_bug.cgi?id=464446
-> 
-> patch has been applied. Thanks.
 
-I have never followed bluez-gnome developement and I might have some
-gaps in knowlegde of made decisions.
+with HCI_RAW, application can bypass the bluez stack and send raw stuff
+to dongle.
 
-Is it really intentional not to have user specified passkey as an
-option? Of course there can be a list of "known pincodes" but frankly
-I don't believe all the codes will be there in some point. At least
-the list should be editable by the user?
+This seems not possible anymore with btusb because it uses
+"hdev->conn_hash" to check if ACLDATA/SCODATA should be send/received.
 
--- 
-Ville
+These checks make the HCI_RAW mode a bit useless (ie not working for acl
+and sco).
+
+Can we make the HCI_RAW work like before with acl and sco data ?
+For example we can ignore theses check in HCI_RAW mode and send a notify
+event when we turn on/off HCI_RAW mode.
+
+
+Matthieu
+
+
+PS : what happen if a dongle receive acl/sco data that aren't collected
+by the host (because urb aren't submitted) ?
+They remain in a FIFO ? There are dropped ?
