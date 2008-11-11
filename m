@@ -1,54 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 11 Nov 2008 14:57:06 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-To: timg@tpi.com (Tim Gardner)
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: Dell Wireless 365 requires reset quirk
-Message-Id: <20081111145706.9bfb4627.akpm@linux-foundation.org>
-In-Reply-To: <20081104162448.A338EF8A65@sepang.rtg.net>
-References: <20081104162448.A338EF8A65@sepang.rtg.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Message-ID: <5a14e9b50811111406m5e9e56c4u598b93506cbb8372@mail.gmail.com>
+Date: Tue, 11 Nov 2008 23:06:55 +0100
+From: "XazZ XazZ" <xazz.xazz@googlemail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Problem with bluez and a bluetooth headset
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue,  4 Nov 2008 09:24:48 -0700 (MST)
-timg@tpi.com (Tim Gardner) wrote:
+good evening everyone
 
-> >From 931ccb629d739aa563347a4e866bc26107e6b545 Mon Sep 17 00:00:00 2001
-> From: Tim Gardner <tim.gardner@canonical.com>
-> Date: Tue, 4 Nov 2008 09:18:06 -0700
-> Subject: [PATCH] Dell Wireless 365 needs BTUSB_RESET quirk.
->  OriginalAuthor: Mario Limonciello <mario_limonciello@dell.com>
-> 
-> Signed-off-by: Tim Gardner <tim.gardner@canonical.com>
-> Cc: stable@kernel.org
-> ---
->  drivers/bluetooth/btusb.c |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index af472e0..051b758 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -125,6 +125,9 @@ static struct usb_device_id blacklist_table[] = {
->  	/* Dell laptop with Broadcom chip */
->  	{ USB_DEVICE(0x413c, 0x8126), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
->  
-> +	/* Dell Wireless 365 */
-> +	{ USB_DEVICE(0x413c, 0x8160), .driver_info = BTUSB_RESET },
-> +
->  	/* Dell Wireless 370 */
->  	{ USB_DEVICE(0x413c, 0x8156), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
->  
+Few days ago I got a new, beautiful bluetooth headset.
+It's a Nokia BH-503
+My PC got an "ID 1131:1001 Integrated System Solution Corp. KY-BT100
+Bluetooth Adapter"
+For the usb dongle part from lsusb -vv check the link at the bottom (lsusb)
 
-I shall assume that this patch was authored by Mario.  This should have
-been communicated by adding his From: line right at the top of the
-changelog.  Mario's signed-off-by: is absent, but that is tolerable
-because we have yours.
+Sadly I'm having some trouble getting my headset to work with my PC.
+Neither I can play music over my headset nor can I record something over it.
 
-The (absent) changelog fails to explain what effect this patch has. 
-_why_ does this driver need this quirk?
+When I'm trying to record sound via `arecord -D plug:bluetooth -f
+S16_LE test.wav` I get the following output:
+Recording WAVE 'test.wav' : Signed 16 bit Little Endian, Rate 8000 Hz,
+Mono
+ALSA lib pcm_bluetooth.c:464:(bluetooth_hsp_hw_params)
+BT_SETCONFIGURATION failed : Input/output error(5)
+arecord: set_params:1022: Unable to install hw params:
+ACCESS:  RW_INTERLEAVED
+FORMAT:  S16_LE
+SUBFORMAT:  STD
+SAMPLE_BITS: 16
+FRAME_BITS: 16
+CHANNELS: 1
+RATE: 8000
+PERIOD_TIME: 125000
+PERIOD_SIZE: 1000
+PERIOD_BYTES: 2000
+PERIODS: 4
+BUFFER_TIME: 500000
+BUFFER_SIZE: 4000
+BUFFER_BYTES: 8000
+TICK_TIME: 0
 
-As it stands, there is insufficient information here for making
-2.6.28-vs-2.6.29 decisions, let alone 2.6.27.x, 2.6.26.x, etc.
+skype tells me:
+ALSA lib pcm_bluetooth.c:1619:(bluetooth_init) BT_GETCAPABILITIES
+failed : Input/output error(5)
+
+I've added a link to bluetoothd's logfile when trying to record via arecord
+(link name is bluetoothd.log)
+I also added bluetoothd's logfile when trying to do the sound
+test in skype (link name is bluetoothd.log.0)
+
+The bluez version I'm running: 4.17
+
+I also tried to get my headset working with bluez 3.32
+with 3.32 I could play music over my headset - but I could NOT record sound.
+I googled and some people came up with the fact that pulseaudio might
+break bluetooth sound: I do not have pulseaudio installed or running
+
+I also tried changing the bluetooth section in my ~/.asoundrc
+I changed profile to: "voice" then to "hifi" and then to "auto" -> it
+never worked
+
+In my dmesg I get "hci_scodata_packet: hci0 SCO packet for unknown
+connection handle 2" and "hci_scodata_packet: hci0 SCO packet for
+unknown connection handle 65398"
+according to jhe from IRC: <jhe> that error sounds like its sending
+SCO packets without having informed the host (bluez) that there's a
+SCO connection
+NOTE: its == my bluetooth dongle
+
+Earlier I also got some stack traces - but I couldn't reproduce those
+on a non-tainted system yet:
+http://nopaste.ch/3992403666920ab.html
+
+As soon as I'm able to reproduce on a non-tainted kernel I'll post an update
+
+If you need more information please feel free to ask - I'll post it as
+soon as I can.
+
+Thanks in advance
+XazZ
+
+dmesg.log: http://nopaste.ch/25dd0e4b29d440a.html
+bluetoothd.log: http://nopaste.ch/e395401980f8100.html
+bluetoothd.log.1: http://nopaste.ch/fe11fe7cbe6a598.html
+lsusb: http://nopaste.ch/408c541369cfd9f.html
