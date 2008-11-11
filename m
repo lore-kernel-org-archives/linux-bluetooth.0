@@ -1,47 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <491A9F2A.6030509@SSpaeth.de>
-Date: Wed, 12 Nov 2008 10:17:30 +0100
-From: Sebastian Spaeth <Sebastian@SSpaeth.de>
+Message-ID: <491A1821.3070103@dell.com>
+Date: Tue, 11 Nov 2008 17:41:21 -0600
+From: Mario Limonciello <mario_limonciello@dell.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: bluez-gnome wizard deficiencies make it mostly useless
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>
+CC: Tim Gardner <timg@tpi.com>, marcel@holtmann.org,
+   linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Dell Wireless 365 requires reset quirk
+References: <20081104162448.A338EF8A65@sepang.rtg.net> <20081111145706.9bfb4627.akpm@linux-foundation.org>
+In-Reply-To: <20081111145706.9bfb4627.akpm@linux-foundation.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enig9A7281E4917ED5A67E8ADC39"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I caused quite a ruckus in this gnome bug yesterday:
-http://bugzilla.gnome.org/show_bug.cgi?id=560315
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig9A7281E4917ED5A67E8ADC39
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-Currently the bluez-gnome connection wizard fails invariably for all BT
-devices that don't have a keyboard and are not special cased in source code.
+Andrew Morton wrote:
+> On Tue,  4 Nov 2008 09:24:48 -0700 (MST)
+> timg@tpi.com (Tim Gardner) wrote:
+>
+>  =20
+>
+> I shall assume that this patch was authored by Mario.  This should have=
 
-In my case this happens:
-I select the "setup new device" from the bluetooth-applet. Select
-"eGPS-397" which is my BT GPS device. Next, the "connecting" page comes
-up with a brief flash of some "type in random PIN" or something. It
-dissappears within a fraction of a second without giving me the chance
-to interact at all, leading to the page "pairing failed". This makes the
-wizard useless for all BT devices that cannot enter PINs and that are
-not special cased.
+> been communicated by adding his From: line right at the top of the
+> changelog.  Mario's signed-off-by: is absent, but that is tolerable
+> because we have yours.
+>
+> The (absent) changelog fails to explain what effect this patch has.=20
+> _why_ does this driver need this quirk?
+>
+> As it stands, there is insufficient information here for making
+> 2.6.28-vs-2.6.29 decisions, let alone 2.6.27.x, 2.6.26.x, etc.
+>  =20
+Hi Andrew:
 
-Bastien Haddess thinks it would be a bad idea to allow users to enter a
-fixed pin (as a second choice to a default random PIN) via dialog and
-asked to enter a new bug for each device to add it as another special
-case. This is the wrong approach IMHO. Tracking all the devices out
-there and their PINs will be a losing battle and bloat the code. With a
-GPS device product lifecycle of a year, those devices will be outdated
-until the code ships in a Linux distribution.
+This patch causes the BT365 to be reset when the driver is loaded.=20
+Without it, you won't be able to connect to other devices or scan for
+devices.
 
-I see 2 solutions and I would like input in what bluez-gnome devs think:
-1) Try to pair with random PIN if that fails try "0000", "1234", "1111".
-This would at least cover about 90% of all devices and only special case
-the rest.
+Regards
 
-2) Prepopulate a Random PIN in a field but allow the user to override
-that PIN. After all he should know best what PIN to use.
-
-Thanks.
-spaetz
+--=20
+Mario Limonciello
+*Dell | Linux Engineering*
+mario_limonciello@dell.com
 
 
+--------------enig9A7281E4917ED5A67E8ADC39
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iEYEARECAAYFAkkaGCIACgkQ2CrZjkA73Yvo0QCgn1Y4ykNNHkJCSKLAAPqQFrvi
+lToAoIJIYRnNL+43IaNF8hDkQ2q6v+rl
+=26pn
+-----END PGP SIGNATURE-----
+
+--------------enig9A7281E4917ED5A67E8ADC39--
