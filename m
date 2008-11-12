@@ -1,89 +1,150 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: bluez-gnome wizard deficiencies make it mostly useless
-From: Bastien Nocera <hadess@hadess.net>
-To: Sebastian Spaeth <Sebastian@SSpaeth.de>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <491AB358.9000209@SSpaeth.de>
-References: <491AB358.9000209@SSpaeth.de>
-Content-Type: text/plain
-Date: Wed, 12 Nov 2008 20:29:57 +0100
-Message-Id: <1226518197.15397.11.camel@snoogens.fab.redhat.com>
-Mime-Version: 1.0
+Message-ID: <37367b3a0811121110i7ab76699mc6ecd32ddd122368@mail.gmail.com>
+Date: Wed, 12 Nov 2008 19:10:25 +0000
+From: "Alan Carvalho de Assis" <acassis@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Problem using CSR module with Bluez
+Cc: "Mark Powell" <Mark.Powell@csr.com>,
+	"David Vrabel" <david.vrabel@csr.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=WINDOWS-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2008-11-12 at 11:43 +0100, Sebastian Spaeth wrote:
-<snip>
-> I caused quite a ruckus in this gnome bug yesterday:
-> http://bugzilla.gnome.org/show_bug.cgi?id=560315
+Hi,
 
-You didn't cause a ruckus, people that don't actually read the comments
-did.
+I am trying to use an iMX31PDK bluetooth module (powered by CSR) and I
+am getting error to use it with Linux bluez.
 
-> Currently the bluez-gnome connection wizard fails invariably for all BT
-> devices that don't have a keyboard and are not special cased in source code.
+Please, follow my steps below:
 
-Mice, tablets, keyboards, headsets, hands-free, phones work. Only GPS
-devices and mice, and headsets that don't use '0000' as the PIN codes
-don't work.
+root@freescale ~$ modprobe hci_uart
+Bluetooth: HCI UART driver ver 2.2
+Bluetooth: HCI H4 protocol initialized
+Bluetooth: HCI BCSP protocol initialized
+Bluetooth: HCILL protocol initialized
 
-That's not very many, and I managed to pair every single one of my
-devices without a problem (and I have quite a lot of them).
+root@freescale ~$ modprobe rfcomm
+Bluetooth: L2CAP ver 2.9
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM TTY layer initialized
+Bluetooth: RFCOMM ver 1.8
 
-> In my case this happens:
-> I select the "setup new device" from the bluetooth-applet. Select
-> "eGPS-397" which is my BT GPS device. Next, the "connecting" page comes
-> up with a brief flash of some "type in random PIN" or something. It
-> dissappears within a fraction of a second without giving me the chance
-> to interact at all, leading to the page "pairing failed". This makes the
-> wizard useless for all BT devices that cannot enter PINs and that are
-> not special cased.
+root@freescale ~$ modprobe mxc_bt
+(note: mxc_bt modules just power-on and reset APM6628 module)
 
-We know about that problem. I have a patch in my tree for your
-particular GPS device, I'm still waiting for you to file a bug with the
-details spelled out.
+root@freescale ~$ hciattach /dev/ttymxc1 bcsp 115200 flow
 
-> Bastien Nocera thinks it would be a bad idea to allow users to enter a
-> fixed pin (as a second choice to a default random PIN) via dialog and
-> asked to enter a new bug for each device to add it as another special
-> case. This is the wrong approach IMHO. Tracking all the devices out
-> there and their PINs will be a losing battle and bloat the code. With a
-> GPS device product lifecycle of a year, those devices will be outdated
-> until the code ships in a Linux distribution.
+root@freescale ~$ hciconfig -a
+hci0:   Type: UART
+        BD Address: 00:00:00:00:00:00 ACL MTU: 0:0 SCO MTU: 0:0
+        DOWN
+        RX bytes:15 acl:0 sco:0 events:0 errors:0
+        TX bytes:8 acl:0 sco:0 commands:0 errors:0
 
-I didn't say it was a bad idea to allow users to enter a fixed PIN, I
-said it would be a bad idea to replace random PINs altogether with
-user-provided PINs.
+root@freescale ~$ hciconfig hci0 up
 
-> I see 2 solutions and I would like input in what bluez-gnome devs think:
-> 1) Try to pair with random PIN if that fails try "0000", "1234", "1111".
-> This would at least cover about 90% of all devices and only special case
-> the rest.
+root@freescale ~$ hciconfig -a
+hci0:   Type: UART
+        BD Address: 00:02:5B:00:A5:A5 ACL MTU: 310:10 SCO MTU: 64:8
+        UP RUNNING
+        RX bytes:519 acl:0 sco:0 events:10 errors:0
+        TX bytes:214 acl:0 sco:0 commands:11 errors:0
+        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy:
+        Link mode: SLAVE ACCEPT
+        Name: 'CSR - bc4'
+        Class: 0x000000
+        Service Classes: Unspecified
+        Device Class: Miscellaneous,
+        HCI Ver: 2.0 (0x3) HCI Rev: 0xc5c LMP Ver: 2.0 (0x3) LMP Subver: 0xc5c
+        Manufacturer: Cambridge Silicon Radio (10)
 
-That wouldn't work, a lot of devices will get out of pairing mode after
-an unsuccesful pairing.
+root@freescale ~$ hcitool scan
+Scanning …
+root@freescale ~$
+(note: it doesn't detect any bluetooth devices around it)
 
-> 2) Prepopulate a Random PIN in a field but allow the user to override
-> that PIN. After all he should know best what PIN to use.
 
-That's as bad as making the user enter the PIN themselves.
+root@freescale ~$ bccmd -t hci psload -r /home/apm6628BT-UART.mx31.psr
+Loading PSKEY_LC_COMBO_DISABLE_PIO_MASK ... done
+Loading PSKEY_LC_COMBO_DOT11_CHANNEL_PIO_BASE ... done
+Loading PSKEY_LC_ENHANCED_POWER_TABLE ... done
+Loading PSKEY_UART_BAUDRATE ... done
+Loading PSKEY_HOST_INTERFACE ... done
+Loading PSKEY_ANA_FREQ ... done
+Loading PSKEY_USE_EXTERNAL_CLOCK ... done
+Loading PSKEY_CLOCK_REQUEST_ENABLE ... done
+Loading PSKEY_CLOCK_REQUEST_FEATURES ... done
+Loading PSKEY_PCM_CONFIG32 ... done
+root@freescale ~$ bcsp_recv: Error in BCSP hdr checksum
 
-My solution would be to have a button at the bottom of the device
-selection page called "PIN options" (or similar). The button would popup
-a dialogue with options:
-[X] Automatic PIN selection
+root@freescale ~$ hciconfig -a
+hci0:   Type: UART
+        BD Address: 00:02:5B:00:A5:A5 ACL MTU: 310:10 SCO MTU: 64:8
+        UP RUNNING
+        RX bytes:1317 acl:0 sco:0 events:24 errors:0
+        TX bytes:759 acl:0 sco:0 commands:28 errors:0
+        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xf9 0x00 0x80
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy:
+        Link mode: SLAVE ACCEPT
+bcsp_recv: Error in BCSP hdr checksum
+bcsp_recv: Short BCSP packet
+bcsp_recv: Short BCSP packet
+Can't read local name on hci0: Connection timed out (110)
+root@freescale ~$ bcsp_recv: Short BCSP packet
+bcsp_recv: Short BCSP packet
+bcsp_recv: Short BCSP packet
+bcsp_recv: Short BCSP packet
+bcsp_recv: Short BCSP packet
+bcsp_recv: Short BCSP packet
+bcsp_recv: Short BCSP packet
+bcsp_recv: Short BCSP packet
+bcsp_recv: Short BCSP packet
+bcsp_recv: Short BCSP packet
 
-[ ] Force a random PIN number
 
-[ ] Use fixed PIN code:
-        [X] '0000' (most headsets, mice and GPS devices)
-        [ ] '1111'
-        [ ] '1234'
-        [ ] Custom: ___________
 
-Wording is obviously up for discussion. The code is probably an
-afternoon's work for somebody comfortable with GTK+, maybe a bit longer
-to get Marcel happy with it ;)
+The i.MX31PDK board uses APM6628 bluetooth module.
+I want to use Bluez because already have some programs developed using
+this API,
+but Freescale is using CSR soft stack on this board. I am using
+bluez-lib and bluez-utils 3.26.
 
-Cheers
+I think it is some error in my PSKEY file, maybe this version doesn't
+match to firmware
+version or some problem on bluez detection.
 
+This is the content of my apm6628BT-UART.mx31.psr file:
+
+// PSKEY_LC_COMBO_DISABLE_PIO_MASK
+&0028 = 0200
+// PSKEY_LC_COMBO_DOT11_CHANNEL_PIO_BASE
+&002a = 0011
+// PSKEY_LC_ENHANCED_POWER_TABLE
+&0031 = 0400 0000 3f00 4500 e800 0900 0000 3f00 4700 ec00 0f00 0000
+3f00 4a00 f000 1600 0000 3f00 4d00 f400 1e00 0000 3f00 5000 f800 2600
+0000 3f00 5500 fc00 2e00 0000 3f00 5b00 0000 5000 0000 3f00 6900 0400
+// PSKEY_UART_BAUDRATE
+&01be = 075f// 460.8 kbaud
+// PSKEY_HOST_INTERFACE
+&01f9 = 0001// BCSP link
+// PSKEY_ANA_FREQ
+&01fe = 4e20
+//PSKEY_USE_EXTERNAL_CLOCK
+&023b = 0001//true
+//PSKEY_CLOCK_REQUEST_ENABLE
+&0246 = 0003
+// PSKEY_CLOCK_REQUEST_FEATURES
+&03b6 = 0000
+// PSKEY_PCM_CONFIG32
+&01b3 = 00c0 0006
+
+Please, can you give me some tips to fix this issue?
+
+Thank you very much,
+
+Alan
