@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <a1c657a80811180050t60170621ibf9f5049f2103682@mail.gmail.com>
-Date: Tue, 18 Nov 2008 16:50:31 +0800
-From: salyer <salyer.hy@gmail.com>
-To: bluez-users@lists.sourceforge.net
+Date: Wed, 12 Nov 2008 17:10:06 -0500
+From: Robert Moskowitz <rgm@htt-consult.com>
+To: BlueZ users <bluez-users@lists.sourceforge.net>
+Message-ID: <491B543E.1000304@htt-consult.com>
 MIME-Version: 1.0
-Subject: [Bluez-users] How to make bluetoothd-service-audio don't record the
-	last headset information
+Subject: [Bluez-users] Tutorial on pans
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -15,60 +14,31 @@ List-Post: <mailto:bluez-users@lists.sourceforge.net>
 List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1805741879479209257=="
+Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
---===============1805741879479209257==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_48781_27004124.1226998231963"
+I am running Centos 5.2 on a number of test systems and want to setup a 
+bluetooth pan for managing these systems (the ethernet and wifi LANs are 
+needed for the testing).  So this is a 'close' pan.  There will be 5 
+systems in the pan; 4 test systems and one monitoring system.
 
-------=_Part_48781_27004124.1226998231963
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Centos has bluez-libs 3.7-1.1 and bluez-utils 3.7-2.2
 
-Dear sir,
-    After i used aplay -D bluetooth /***.wav to play music , i changed the
-headset device address in the /etc/asound.conf and run aplay again, but
-bluez also to
-connected  the old device address , so i can't use the new headset. Is there
-some method to fix this issue, thanks ?
+I don't need NAT or anything else.  I will be putting bluetooth 
+headphones on some of these test systems for SIP testing.
 
--- 
-Best Regards!
-Paul
-
-------=_Part_48781_27004124.1226998231963
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-Dear sir,<br>&nbsp;&nbsp;&nbsp; After i used aplay -D bluetooth /***.wav to play music , i changed the headset device address in the /etc/asound.conf and run aplay again, but bluez also to &nbsp; <br>connected&nbsp; the old device address , so i can&#39;t use the new headset. Is there some method to fix this issue, thanks ?<br>
-<br>-- <br>Best Regards!<br>Paul<br>
-
-------=_Part_48781_27004124.1226998231963--
+Where can I find a tutorial on how to configure pand so as these systems 
+come up the pan starts up, and it is 'secure' (as secure as anything 
+with bluetooth is).
 
 
---===============1805741879479209257==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
 Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
---===============1805741879479209257==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-users mailing list
 Bluez-users@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-users
-
---===============1805741879479209257==--
