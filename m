@@ -1,70 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 Nov 2008 11:11:42 +0100
-From: martin f krafft <madduck@madduck.net>
-To: linux bluetooth mailinglist <linux-bluetooth@vger.kernel.org>
-Subject: Re: btusb+sco: unable to install hw params (set_params:979)
-Message-ID: <20081113101142.GA896@piper.oerlikon.madduck.net>
-References: <20081107162741.GA8182@piper.oerlikon.madduck.net>
+Message-ID: <491BF605.4020203@sspaeth.de>
+Date: Thu, 13 Nov 2008 10:40:21 +0100
+From: Sebastian Spaeth <sebastian@sspaeth.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="VS++wcV0S1rZb1Fb"
-In-Reply-To: <20081107162741.GA8182@piper.oerlikon.madduck.net>
+To: Bastien Nocera <hadess@hadess.net>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: bluez-gnome wizard deficiencies make it mostly useless
+References: <491AB358.9000209@SSpaeth.de> <1226518197.15397.11.camel@snoogens.fab.redhat.com>
+In-Reply-To: <1226518197.15397.11.camel@snoogens.fab.redhat.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Bastien Nocera wrote:
+> You didn't cause a ruckus, people that don't actually read the comments
+> did.
+:-)
 
---VS++wcV0S1rZb1Fb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Mice, tablets, keyboards, headsets, hands-free, phones work. Only GPS
+> devices and mice, and headsets that don't use '0000' as the PIN codes
+> don't work.
 
-also sprach martin f krafft <madduck@madduck.net> [2008.11.07.1727 +0100]:
->   $ strace -f -o /tmp/arecord.strace arecord -f S16_LE -D bt250 >/tmp/tes=
-t.wav
->   Recording WAVE 'stdin' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
+-Nahh, if you read some of the descriptions in the downstream Ubuntu bug
+there are many devices that fail: the Ubuntu bug lists gps, headsets,
+keyboards, modems, printer as failing, so currently it's more than a few
+devices.
 
-On my last try with the voice profile, I found this in the syslog:
+-A whole range of headsets seems to compute a fixed PIN based on their
+serial number, so hardcoding wouldn't work at all.
 
-  hcid[30479]: Audio API: received BT_GETCAPABILITIES_REQ
-  hcid[30479]: Audio API: sending BT_GETCAPABILITIES_RSP
-  hcid[30479]: Audio API: received BT_SETCONFIGURATION_REQ
-  hcid[30479]: config sco - device =3D 00:1A:45:14:EE:D7 access_mode =3D 1
-  hcid[30479]: connect(): Connection timed out (110)
-  hcid[30479]: Unable to lock headset
-  hcid[30479]: config failed
-  hcid[30479]: Audio API: sending BT_SETCONFIGURATION_RSP
+-For some devices the random PIN seems generated on the device: "[my]
+bluetooth headset generates a random PIN code each time it is put in
+pairing mode (has an LCD display)"
 
-If I use the sco profile, I get:
+> We know about that problem. I have a patch in my tree for your
+> particular GPS device, I'm still waiting for you to file a bug with the
+> details spelled out.
 
-  hcid[30479]: Audio API: received BT_GETCAPABILITIES_REQ
-  hcid[30479]: Audio API: sending BT_GETCAPABILITIES_RSP
-  hcid[30479]: Audio API: received BT_SETCONFIGURATION_REQ
-  hcid[30479]: config sco - device =3D 00:1A:45:14:EE:D7 access_mode =3D 1
-  kernel: [600899.137535] hci_scodata_packet: hci0 SCO packet for unknown c=
-onnection handle 42
+This GPS device is a no-brand thing that is 2 years old and probably not
+even sold anymore. Is it really worth adding special cases for such
+niche products? I'd rather this were done in a way that helped all those
+devices rather than just mine. (But yes, I'll file a bug on my device,
+thanks :-))
 
-This last message comes in at a rate of 100/s while the bluetooth
-LED on the headset flashes 1/s, until I remove hci0 or kill hcid.
+> I didn't say it was a bad idea to allow users to enter a fixed PIN, I
+> said it would be a bad idea to replace random PINs altogether with
+> user-provided PINs.
 
---=20
-martin | http://madduck.net/ | http://two.sentenc.es/
-=20
-tempt not a desperate man.
-                                                -- william shakespeare
-=20
-spamtraps: madduck.bogus@madduck.net
+Sorry, I understood your "Because if we don't force users to use random
+PIN codes, they'll always enter
+the same "easy" PIN codes." as 'don't ever allow people to enter
+nonrandom codes'. But I am happy that this was a misunderstanding.
 
---VS++wcV0S1rZb1Fb
-Content-Type: application/pgp-signature; name="digital_signature_gpg.asc"
-Content-Description: Digital signature (see http://martin-krafft.net/gpg/)
-Content-Disposition: inline
+>> I see 2 solutions and I would like input in what bluez-gnome devs think:
+>> 1) Try to pair with random PIN if that fails try "0000", "1234", "1111".
+>> This would at least cover about 90% of all devices and only special case
+>> the rest.
+> That wouldn't work, a lot of devices will get out of pairing mode after
+> an unsuccesful pairing.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
+OK this is not feasible then. I'll happily admit I don't know a lot
+about bluetooth, I just want it to get to work :-)
 
-iEYEARECAAYFAkkb/V4ACgkQIgvIgzMMSnW5BACg28cfPhJMsQAikTYPy+a6wVHA
-5wMAoMgNKJVnNtWcMjM9q184z4xxNj+M
-=1xRI
------END PGP SIGNATURE-----
+> My solution would be to have a button at the bottom of the device
+> selection page called "PIN options" (or similar). The button would popup
+> a dialogue with options:
+> [X] Automatic PIN selection
+> 
+> [ ] Force a random PIN number
+> 
+> [ ] Use fixed PIN code:
+>         [X] '0000' (most headsets, mice and GPS devices)
+>         [ ] '1111'
+>         [ ] '1234'
+>         [ ] Custom: ___________
 
---VS++wcV0S1rZb1Fb--
+This would work just as well for me. I don't think the selection of
+"0000" "1111" "1234" is needed, it makes the dialog quite wordy and
+long. Why not just:
+
+ [X] Automatic PIN selection
+ [ ] Force a random PIN number
+ [ ] Use fixed PIN code: ___________
+     (many devices use 0000 or 1234)
+
+I don't really get the difference between "automatic" and "force
+random". I take it that automatic would include the special casing as is
+done now, while random would only ever do random numbers?
+
+I'd just go for:
+
+ [X] Random PIN
+ [ ] Use fixed PIN code: ___________ (prepopulate with 0000?)
+
+and don't try to keep a list of special cases in code. Yes it does mean
+that everyone needs to enter "0000" the first time the use their headset
+but it makes things easy and transparent.
+
+Will your solution work for above mentioned headsets that generate a PIN
+on the headset and display it there?
+
+> Wording is obviously up for discussion. The code is probably an
+> afternoon's work for somebody comfortable with GTK+, maybe a bit longer
+> to get Marcel happy with it ;)
+
+I've never done anything GTK beyond following the GTK tutorials and my C
+is quite rusty by now. If you want me to, I could try my luck, but I'd
+rather if someone more proficient went for it first :-).
+
+spaetz
