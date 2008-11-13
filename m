@@ -1,113 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <491CCD86.7050904@canonical.com>
-Date: Thu, 13 Nov 2008 17:59:50 -0700
-From: Tim Gardner <tim.gardner@canonical.com>
+Date: Thu, 13 Nov 2008 11:11:42 +0100
+From: martin f krafft <madduck@madduck.net>
+To: linux bluetooth mailinglist <linux-bluetooth@vger.kernel.org>
+Subject: Re: btusb+sco: unable to install hw params (set_params:979)
+Message-ID: <20081113101142.GA896@piper.oerlikon.madduck.net>
+References: <20081107162741.GA8182@piper.oerlikon.madduck.net>
 MIME-Version: 1.0
-To: Andrew Morton <akpm@linux-foundation.org>
-CC: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Mario Limonciello <mario_limonciello@dell.com>
-Subject: Re: Dell Wireless 365 requires reset quirk
-References: <20081104162448.A338EF8A65@sepang.rtg.net> <20081111145706.9bfb4627.akpm@linux-foundation.org>
-In-Reply-To: <20081111145706.9bfb4627.akpm@linux-foundation.org>
-Content-Type: multipart/mixed;
- boundary="------------060909030701010208060209"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="VS++wcV0S1rZb1Fb"
+In-Reply-To: <20081107162741.GA8182@piper.oerlikon.madduck.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------060909030701010208060209
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
 
-Andrew Morton wrote:
-> On Tue,  4 Nov 2008 09:24:48 -0700 (MST)
-> timg@tpi.com (Tim Gardner) wrote:
-> 
->> >From 931ccb629d739aa563347a4e866bc26107e6b545 Mon Sep 17 00:00:00 2001
->> From: Tim Gardner <tim.gardner@canonical.com>
->> Date: Tue, 4 Nov 2008 09:18:06 -0700
->> Subject: [PATCH] Dell Wireless 365 needs BTUSB_RESET quirk.
->>  OriginalAuthor: Mario Limonciello <mario_limonciello@dell.com>
->>
->> Signed-off-by: Tim Gardner <tim.gardner@canonical.com>
->> Cc: stable@kernel.org
->> ---
->>  drivers/bluetooth/btusb.c |    3 +++
->>  1 files changed, 3 insertions(+), 0 deletions(-)
->>
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index af472e0..051b758 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -125,6 +125,9 @@ static struct usb_device_id blacklist_table[] = {
->>  	/* Dell laptop with Broadcom chip */
->>  	{ USB_DEVICE(0x413c, 0x8126), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
->>  
->> +	/* Dell Wireless 365 */
->> +	{ USB_DEVICE(0x413c, 0x8160), .driver_info = BTUSB_RESET },
->> +
->>  	/* Dell Wireless 370 */
->>  	{ USB_DEVICE(0x413c, 0x8156), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
->>  
-> 
-> I shall assume that this patch was authored by Mario.  This should have
-> been communicated by adding his From: line right at the top of the
-> changelog.  Mario's signed-off-by: is absent, but that is tolerable
-> because we have yours.
-> 
-> The (absent) changelog fails to explain what effect this patch has. 
-> _why_ does this driver need this quirk?
-> 
-> As it stands, there is insufficient information here for making
-> 2.6.28-vs-2.6.29 decisions, let alone 2.6.27.x, 2.6.26.x, etc.
-> 
+--VS++wcV0S1rZb1Fb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Is this better (aside from being an attachment) ?
+also sprach martin f krafft <madduck@madduck.net> [2008.11.07.1727 +0100]:
+>   $ strace -f -o /tmp/arecord.strace arecord -f S16_LE -D bt250 >/tmp/tes=
+t.wav
+>   Recording WAVE 'stdin' : Signed 16 bit Little Endian, Rate 8000 Hz, Mono
 
-rtg
--- 
-Tim Gardner tim.gardner@canonical.com
+On my last try with the voice profile, I found this in the syslog:
 
---------------060909030701010208060209
-Content-Type: text/x-patch;
- name="0001--bluetooth-Dell-Wireless-365-needs-BTUSB_RESET-qui.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename*0="0001--bluetooth-Dell-Wireless-365-needs-BTUSB_RESET-qui.patc";
- filename*1="h"
+  hcid[30479]: Audio API: received BT_GETCAPABILITIES_REQ
+  hcid[30479]: Audio API: sending BT_GETCAPABILITIES_RSP
+  hcid[30479]: Audio API: received BT_SETCONFIGURATION_REQ
+  hcid[30479]: config sco - device =3D 00:1A:45:14:EE:D7 access_mode =3D 1
+  hcid[30479]: connect(): Connection timed out (110)
+  hcid[30479]: Unable to lock headset
+  hcid[30479]: config failed
+  hcid[30479]: Audio API: sending BT_SETCONFIGURATION_RSP
 
->From 8da2a85810aa0fb5abbc93d15482846af5d60669 Mon Sep 17 00:00:00 2001
-From: Mario Limonciello <mario_limonciello@dell.com>
-Date: Tue, 4 Nov 2008 09:18:06 -0700
-Subject: [PATCH] bluetooth: Dell Wireless 365 needs BTUSB_RESET quirk.
+If I use the sco profile, I get:
 
-This patch causes the BT365 to be reset when the driver is loaded.
-Without it, you won't be able to connect to other devices or scan for
-devices.
+  hcid[30479]: Audio API: received BT_GETCAPABILITIES_REQ
+  hcid[30479]: Audio API: sending BT_GETCAPABILITIES_RSP
+  hcid[30479]: Audio API: received BT_SETCONFIGURATION_REQ
+  hcid[30479]: config sco - device =3D 00:1A:45:14:EE:D7 access_mode =3D 1
+  kernel: [600899.137535] hci_scodata_packet: hci0 SCO packet for unknown c=
+onnection handle 42
 
-Signed-off-by: Mario Limonciello <mario_limonciello@dell.com>
-Signed-off-by: Tim Gardner <tim.gardner@canonical.com>
-Cc: stable@kernel.org
----
- drivers/bluetooth/btusb.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+This last message comes in at a rate of 100/s while the bluetooth
+LED on the headset flashes 1/s, until I remove hci0 or kill hcid.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index af472e0..051b758 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -125,6 +125,9 @@ static struct usb_device_id blacklist_table[] = {
- 	/* Dell laptop with Broadcom chip */
- 	{ USB_DEVICE(0x413c, 0x8126), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
- 
-+	/* Dell Wireless 365 */
-+	{ USB_DEVICE(0x413c, 0x8160), .driver_info = BTUSB_RESET },
-+
- 	/* Dell Wireless 370 */
- 	{ USB_DEVICE(0x413c, 0x8156), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
- 
--- 
-1.5.6.3
+--=20
+martin | http://madduck.net/ | http://two.sentenc.es/
+=20
+tempt not a desperate man.
+                                                -- william shakespeare
+=20
+spamtraps: madduck.bogus@madduck.net
 
+--VS++wcV0S1rZb1Fb
+Content-Type: application/pgp-signature; name="digital_signature_gpg.asc"
+Content-Description: Digital signature (see http://martin-krafft.net/gpg/)
+Content-Disposition: inline
 
---------------060909030701010208060209--
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkkb/V4ACgkQIgvIgzMMSnW5BACg28cfPhJMsQAikTYPy+a6wVHA
+5wMAoMgNKJVnNtWcMjM9q184z4xxNj+M
+=1xRI
+-----END PGP SIGNATURE-----
+
+--VS++wcV0S1rZb1Fb--
