@@ -1,36 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5a14e9b50811151841i3d84eae3i6c11068cfad1ac01@mail.gmail.com>
-Date: Sun, 16 Nov 2008 03:41:27 +0100
-From: "XazZ XazZ" <xazz.xazz@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Problem with bluez and a bluetooth headset
-In-Reply-To: <5a14e9b50811111229l2addf4aega6e1107320a83026@mail.gmail.com>
+Message-ID: <491CCD86.7050904@canonical.com>
+Date: Thu, 13 Nov 2008 17:59:50 -0700
+From: Tim Gardner <tim.gardner@canonical.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-References: <5a14e9b50811111229l2addf4aega6e1107320a83026@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>
+CC: marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Mario Limonciello <mario_limonciello@dell.com>
+Subject: Re: Dell Wireless 365 requires reset quirk
+References: <20081104162448.A338EF8A65@sepang.rtg.net> <20081111145706.9bfb4627.akpm@linux-foundation.org>
+In-Reply-To: <20081111145706.9bfb4627.akpm@linux-foundation.org>
+Content-Type: multipart/mixed;
+ boundary="------------060909030701010208060209"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-good evening again
+This is a multi-part message in MIME format.
+--------------060909030701010208060209
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-I got one step further after deleting my whole bluetooth-configuration
-and setting everything bluetooth-related up from scratch :)
+Andrew Morton wrote:
+> On Tue,  4 Nov 2008 09:24:48 -0700 (MST)
+> timg@tpi.com (Tim Gardner) wrote:
+> 
+>> >From 931ccb629d739aa563347a4e866bc26107e6b545 Mon Sep 17 00:00:00 2001
+>> From: Tim Gardner <tim.gardner@canonical.com>
+>> Date: Tue, 4 Nov 2008 09:18:06 -0700
+>> Subject: [PATCH] Dell Wireless 365 needs BTUSB_RESET quirk.
+>>  OriginalAuthor: Mario Limonciello <mario_limonciello@dell.com>
+>>
+>> Signed-off-by: Tim Gardner <tim.gardner@canonical.com>
+>> Cc: stable@kernel.org
+>> ---
+>>  drivers/bluetooth/btusb.c |    3 +++
+>>  1 files changed, 3 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>> index af472e0..051b758 100644
+>> --- a/drivers/bluetooth/btusb.c
+>> +++ b/drivers/bluetooth/btusb.c
+>> @@ -125,6 +125,9 @@ static struct usb_device_id blacklist_table[] = {
+>>  	/* Dell laptop with Broadcom chip */
+>>  	{ USB_DEVICE(0x413c, 0x8126), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
+>>  
+>> +	/* Dell Wireless 365 */
+>> +	{ USB_DEVICE(0x413c, 0x8160), .driver_info = BTUSB_RESET },
+>> +
+>>  	/* Dell Wireless 370 */
+>>  	{ USB_DEVICE(0x413c, 0x8156), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
+>>  
+> 
+> I shall assume that this patch was authored by Mario.  This should have
+> been communicated by adding his From: line right at the top of the
+> changelog.  Mario's signed-off-by: is absent, but that is tolerable
+> because we have yours.
+> 
+> The (absent) changelog fails to explain what effect this patch has. 
+> _why_ does this driver need this quirk?
+> 
+> As it stands, there is insufficient information here for making
+> 2.6.28-vs-2.6.29 decisions, let alone 2.6.27.x, 2.6.26.x, etc.
+> 
 
-I got audio output on my headset working.
-Audio input (recording) is sadly still not possible
+Is this better (aside from being an attachment) ?
 
-bluetootd says the following when trying to record audio:
-a2dp_source_cfg: no available SEP found
-config failed
+rtg
+-- 
+Tim Gardner tim.gardner@canonical.com
 
-skype and arecord say the following as soon as I try to record audio:
-ALSA lib pcm_bluetooth.c:712:(bluetooth_a2dp_hw_params)
-BT_SETCONFIGURATION failed : Input/output error(5)
+--------------060909030701010208060209
+Content-Type: text/x-patch;
+ name="0001--bluetooth-Dell-Wireless-365-needs-BTUSB_RESET-qui.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename*0="0001--bluetooth-Dell-Wireless-365-needs-BTUSB_RESET-qui.patc";
+ filename*1="h"
 
-You can get the full bluetoothd log here: http://nopaste.ch/64aa1a77e7813e4.html
+>From 8da2a85810aa0fb5abbc93d15482846af5d60669 Mon Sep 17 00:00:00 2001
+From: Mario Limonciello <mario_limonciello@dell.com>
+Date: Tue, 4 Nov 2008 09:18:06 -0700
+Subject: [PATCH] bluetooth: Dell Wireless 365 needs BTUSB_RESET quirk.
 
-I also noticed that I can neither play nor record something when I set
-profile "voice" in ~/.asoundrc
-When I set it to profile "hifi" audio playback works fine.
+This patch causes the BT365 to be reset when the driver is loaded.
+Without it, you won't be able to connect to other devices or scan for
+devices.
 
-Thanks for any help in advance
+Signed-off-by: Mario Limonciello <mario_limonciello@dell.com>
+Signed-off-by: Tim Gardner <tim.gardner@canonical.com>
+Cc: stable@kernel.org
+---
+ drivers/bluetooth/btusb.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index af472e0..051b758 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -125,6 +125,9 @@ static struct usb_device_id blacklist_table[] = {
+ 	/* Dell laptop with Broadcom chip */
+ 	{ USB_DEVICE(0x413c, 0x8126), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
+ 
++	/* Dell Wireless 365 */
++	{ USB_DEVICE(0x413c, 0x8160), .driver_info = BTUSB_RESET },
++
+ 	/* Dell Wireless 370 */
+ 	{ USB_DEVICE(0x413c, 0x8156), .driver_info = BTUSB_RESET | BTUSB_WRONG_SCO_MTU },
+ 
+-- 
+1.5.6.3
+
+
+--------------060909030701010208060209--
