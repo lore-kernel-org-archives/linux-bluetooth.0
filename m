@@ -1,11 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <491FF761.1060606@powercraft.nl>
-Date: Sun, 16 Nov 2008 11:35:13 +0100
+Message-ID: <491FF345.6050206@powercraft.nl>
+Date: Sun, 16 Nov 2008 11:17:41 +0100
 From: Jelle de Jong <jelledejong@powercraft.nl>
 MIME-Version: 1.0
 To: BlueZ development <bluez-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="------------010506010406010304000200"
-Subject: [Bluez-devel] possible sbc codec bug with audio glitches
+References: <491079A8.2010403@powercraft.nl> <49107D3D.40906@powercraft.nl>
+In-Reply-To: <49107D3D.40906@powercraft.nl>
+Subject: Re: [Bluez-devel] why do the keyboard en mouse not reconnect on
+ startup of bluetoothd (solved)
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -15,106 +17,64 @@ List-Post: <mailto:bluez-devel@lists.sourceforge.net>
 List-Help: <mailto:bluez-devel-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-This is a multi-part message in MIME format.
---------------010506010406010304000200
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Jelle de Jong wrote:
+> Jelle de Jong wrote:
+>> Hello everybody,
+>>
+>> I attached a logfile with hcidump and bluetooth --debug logs
+>>
+>> I have two trusted devices but the do nor reconnect after staring up
+>> bluetoothd. hcidump does show that they are sending information. What is
+>> going on here?
+>>
+>> Kind regards,
+>>
+>> Jelle
+>>
+> 
+> I did some more debugging on this issue, and it seems this is the situation:
+> 
+> when a device is turned on then paired with an running bluetoothd the
+> device works. then you restart your system or the bluetoothd without
+> switching the devices off/on. So the device is still running as before
+> the reboot. hicdump shows it successfully transmits the data, but
+> bluetoothd does not do anything with the data. When turning the device
+> off and then on hcidump shows a disconnect and mode change and after
+> that bluetootd will connect the device again and its working. This means
+> turning off on all devices after bluetoothd restarts. This is kind of a
+> bug in my opinion, what do the developers think?
+> 
+> I am willing to donate some dutch stroopwafels if this can be fixed.
+> 
+> Kind regards,
+> 
+> Jelle
 
-Hello everybody,
+Some good news,
 
-At celinux 2008 this month I talked to Marcel Holtmann and showed him
-some issues I encountered with bluez.
+After talking showing the problem to Marcel Holtmann, he pointed out
+that there was some bug with some devices that did not reset there
+connections after reboot. He solved this with the newest kernel but for
+now I had to use a workaround like the below:
 
-One of my bigger issues is that I got audio glitches when listing to
-high quality audio (dvds) with an sensitive DJ bluetooth headset.
+cat /etc/modprobe.conf
+options hci_usb reset=1
 
-I let Marcel listen to the problem and he also hears them and things it
-may be something with the SBC codec. But since Marcel is no expert on
-the SBC codec part, we would like to ask for the help of others to solve
-this issue.
+Hope this also helps some other people.
 
-The glitches/distortions can be heard on a Motorola Bluetooth S805
-stereo headset and listing to a dvd audio for example intro music of
-Stargate Atlantis.
-
-The strange thing is that I can only hear the glitches on the right side
-of the headset.
-
-I reported my first encounter with the issue on may 2008:
-http://sourceforge.net/mailarchive/message.php?msg_name=4819B1A7.2070702%40powercraft.nl
-
-I hope somebody would be willing/able to help out. I have seen some very
-nice post about the bad performance of the SBC codec, and I hope you
-guys can also have a look at this.
-
-Best regards,
+Kind regards,
 
 Jelle
-
---------------010506010406010304000200
-Content-Type: application/x-sh;
- name="setup-bluetooth-motorola-s805.sh"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="setup-bluetooth-motorola-s805.sh"
-
-#!/bin/bash
-
-echo "setup-bluetooth-motorola-s805.sh"
-
-echo 'pcm.headset {
-    type bluetooth
-    #~ device 00:0D:18:A0:35:70
-    #~ device 00:53:53:FB:7E:9C # Nokia BH-801
-    device 00:0C:55:D1:C9:78 # Motorola S805
-    #~ device 00:0D:FD:18:6E:3C # Motorola S9
-    #~ device 20:07:09:15:A9:5A # Samsung WEP210
-    profile hifi
-    #~ profile voice
-    #profile auto
-}
-pcm.softvol {
-    type softvol
-    slave.pcm headset
-    control.name Headset
-    control.card 0
-}
-pcm.!default {
-    #~ type hw
-    #~ card 0
-    type plug
-    slave.pcm softvol
-}' > ~/.asoundrc
-
-#~ sudo /etc/init.d/bluetooth restart
-#~ sudo /etc/init.d/alsa-utils restart
-
-echo "done, you can close this windows now"
-
-exit
-
---------------010506010406010304000200
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
 Build the coolest Linux based applications with Moblin SDK & win great prizes
 Grand prize is a trip for two to an Open Source event anywhere in the world
 http://moblin-contest.org/redirect.php?banner_id=100&url=/
---------------010506010406010304000200
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
 _______________________________________________
 Bluez-devel mailing list
 Bluez-devel@lists.sourceforge.net
 https://lists.sourceforge.net/lists/listinfo/bluez-devel
-
---------------010506010406010304000200--
