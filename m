@@ -1,50 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <49200DE9.4080606@kaa.org.ua>
-Date: Sun, 16 Nov 2008 14:11:21 +0200
-From: Oleg Kravchenko <oleg@kaa.org.ua>
+Message-ID: <491FA329.5020106@comcast.net>
+Date: Sat, 15 Nov 2008 20:35:53 -0800
+From: Brian Rogers <brian_rogers@comcast.net>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: BCM2045B2
-Content-Type: multipart/mixed;
- boundary="------------080006020701000302070109"
+To: XazZ XazZ <xazz.xazz@googlemail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Problem with bluez and a bluetooth headset
+References: <5a14e9b50811111406m5e9e56c4u598b93506cbb8372@mail.gmail.com>
+In-Reply-To: <5a14e9b50811111406m5e9e56c4u598b93506cbb8372@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------080006020701000302070109
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+XazZ XazZ wrote:
+> good evening everyone
+>
+> Few days ago I got a new, beautiful bluetooth headset.
+> It's a Nokia BH-503
+> My PC got an "ID 1131:1001 Integrated System Solution Corp. KY-BT100
+> Bluetooth Adapter"
+>   
+I've got that same exact dongle on my desktop. It can't talk to my 
+headset either, or my phone, or my laptop, or a Wiimote. I suspect it 
+has issues with the new btusb in 2.6.27. I can list devices, but when I 
+try to pair, it just waits until eventually the following appears in dmesg:
+hci_cmd_task: hci0 command tx timeout
 
-Hello! My hardware:
-Asus P535 details on http://www.kaa.org.ua/asus-p535/hardware.html
-Bluetooth chip BCM2045B2 connected to the pxa internal usb host.
+I had that dongle working in an earlier kernel version. On 2.6.27, my 
+laptop's Bluetooth is working fine.
 
-I think this chip need firmware, because it is can only search
-How I can upload firmware to the this chip?
-
-
-
-
-
-
-
-
-
---------------080006020701000302070109
-Content-Type: text/x-vcard; charset=utf-8;
- name="oleg.vcf"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="oleg.vcf"
-
-YmVnaW46dmNhcmQNCmZuOk9sZWcgS3JhdmNoZW5rbw0KbjpLcmF2Y2hlbmtvO09sZWcNCm9y
-ZztxdW90ZWQtcHJpbnRhYmxlOnd3dy5rYWEub3JnLnVhOz1EMD05Rj1EMT04MD1EMD1CRT1E
-MD1CMz1EMT04MD1EMD1CMD1EMD1CQz1EMD1CRD1EMD1CRT1EMD1CMz1EMD1CRSA9RDA9OTc9
-DQoJPUQwPUIwPUQwPUIxPUQwPUI1PUQwPUI3PUQwPUJGPUQwPUI1PUQxPTg3PUQwPUI1PUQw
-PUJEPUQwPUJEPUQxPThGDQphZHI7cXVvdGVkLXByaW50YWJsZTo7Ozs9RDA9OUE9RDA9Qjg9
-RDE9OTc9RDA9QjI7OztVa3JhaW5lDQplbWFpbDtpbnRlcm5ldDpvbGVnQGthYS5vcmcudWEN
-CnRpdGxlO3F1b3RlZC1wcmludGFibGU6PUQwPTg2PUQwPUJEPUQwPUI2PUQwPUI1PUQwPUJE
-PUQwPUI1PUQxPTgwLT1EMD1CRj1EMT04MD1EMD1CRT1EMD1CMz1EMT04MD0NCgk9RDA9QjA9
-RDA9QkM9RDE9OTY9RDE9ODE9RDE9ODINCngtbW96aWxsYS1odG1sOlRSVUUNCnVybDpodHRw
-Oi8vd3d3LmthYS5vcmcudWENCnZlcnNpb246Mi4xDQplbmQ6dmNhcmQNCg0K
---------------080006020701000302070109--
