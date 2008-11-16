@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Christian Hoene" <christian.hoene@gmx.net>
-To: "'BlueZ development'" <bluez-devel@lists.sourceforge.net>
-Date: Mon, 17 Nov 2008 16:57:48 +0100
-Message-ID: <000801c948cd$41364120$c3a2c360$@hoene@gmx.net>
-MIME-Version: 1.0
-Subject: [Bluez-devel] Bug in SBC
-Reply-To: hoene@uni-tuebingen.de,
-	BlueZ development <bluez-devel@lists.sourceforge.net>
+To: bluez-devel@lists.sourceforge.net
+From: Dick <dick@mrns.nl>
+Date: Sun, 16 Nov 2008 20:08:49 +0000 (UTC)
+Message-ID: <loom.20081116T200553-19@post.gmane.org>
+References: <49105E9C.8000605@powercraft.nl>
+Mime-Version: 1.0
+Subject: Re: [Bluez-devel] dell bluetooth mouse and keyboard do not work
+	after "successful" pairing with simple-agent.py
+Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 	<mailto:bluez-devel-request@lists.sourceforge.net?subject=unsubscribe>
@@ -18,47 +19,50 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hello,
+Hi Jelle,
 
-Let me forward some comments from Frans de Bont, the inventor of SBC. He
-found a bug in the encoder but is not allowed to change the BlueZ
-implementation. Thus, I forward you his error description because these
-weeks I hardly have any time to look at the source code myself and - I have
-to admit - I am getting older and coding lazy.
+Have you tried using hidd --search or hidd --connect?
+If you don't have hidd try the following hidtool.py python script.
 
-With best regards,
- 
- Christian Hoene
+Succes er mee!
 
-PS:
-Here Frans comments:
+#!/usr/bin/python
+import sys
+import getopt
+import dbus
 
-I also have taken a quick look into the filtering part of the encoder. It
-seems that this code does not behave as the reference code. Unfortunately, I
-cannot disclose this part of the reference source code. However, if someone
-wants to correct this, the flow chart in the MPEG-1 Audio standard could be
-taken as an example with slightly difference parameters, i.e. subbands=32
-and filterlength=512.
+bus = dbus.SystemBus()
 
-You can find the referred flow chart in Figure C.4 on page 78 (in my version
-of the ISO/IEC 11172-3 standard). Please note that the decoder flow charts
-in A2DP have been derived from Figure A.2 on page 39.
+bmgr = dbus.Interface(bus.get_object('org.bluez', '/org/bluez'),
+'org.bluez.Manager')
+bus_id = bmgr.ActivateService('input')
 
-You can find ... public version on:
-http://www.mp3-tech.org/programmer/docs/iso11172-3.zip
+imgr = dbus.Interface(bus.get_object(bus_id, '/org/bluez/input'),
+'org.bluez.input.Manager')
 
-For the encoder filterbank, you can find this in annex_c.doc, page 13,
-FIGURE 3-C.2, "Layer I, II encoder flow chart".
-The decoder filterbank is shown in annex_ab.doc, page 2, Figure 3-A.3,
-"Layer III decoder flow chart".
+optlist, args = getopt.getopt(sys.argv[1:], '',
+['list','connect=','disconnect=','help'])
 
-BTW, I noticed that earlier versions of the Bluez SBC codec are indeed based
-on the MPEG-1 flow charts. Probably the conversion from floating-point to
-fixed-point has introduced the quality degradation.
-
-Best regards,
-Frans
-
+for opt,val in optlist:
+	if opt == '--list':
+		for path in imgr.ListDevices():
+			idev = dbus.Interface (bus.get_object(bus_id, path), 'org.bluez.input.Device')
+			print "%s Name: \"%s\" ID: %04x:%04x Connected: %i" % (path, idev.GetName(),
+idev.GetProductId(), idev.GetVendorId(), idev.IsConnected())
+	elif opt == '--connect':
+		path = ''
+		if (val[0] == '/'):
+			path = val
+		else:
+			path = imgr.CreateDevice(val)
+		idev = dbus.Interface (bus.get_object(bus_id, path), 'org.bluez.input.Device')
+		idev.Connect()
+	elif opt == '--disconnect':
+		imgr.RemoveDevice(val)
+	else:
+		print 'usage: ', sys.argv[0], '[ --list, --connect=[XX:XX:XX:XX:XX,
+/org/bluez/input/device0], --disconnect=/org/bluez/input/device0, --help ]'
+		break
 
 
 -------------------------------------------------------------------------
