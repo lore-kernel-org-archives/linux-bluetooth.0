@@ -1,75 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d89ddf300811161715sd0fd511v4371712a27cdd6d3@mail.gmail.com>
-Date: Sun, 16 Nov 2008 18:15:00 -0700
-From: "Brad Midgley" <bmidgley@gmail.com>
-To: "Jelle de Jong" <jelledejong@powercraft.nl>
-Subject: Re: possible sbc codec bug with audio glitches
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <4920929A.30703@powercraft.nl>
+Message-ID: <5a14e9b50811161416u2b0934dcje2c5085c8b1037a6@mail.gmail.com>
+Date: Sun, 16 Nov 2008 23:16:51 +0100
+From: "XazZ XazZ" <xazz.xazz@googlemail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Problem with bluez and a bluetooth headset
+In-Reply-To: <5a14e9b50811151841i3d84eae3i6c11068cfad1ac01@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-References: <4920099A.9030109@powercraft.nl>
-	 <d89ddf300811160629v29a0602cgdfcf25ade32c4cfc@mail.gmail.com>
-	 <4920929A.30703@powercraft.nl>
+Content-Type: text/plain; charset=UTF-8
+References: <5a14e9b50811111229l2addf4aega6e1107320a83026@mail.gmail.com>
+	 <5a14e9b50811151841i3d84eae3i6c11068cfad1ac01@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Jelle,
+Hi
 
-Everything in the codec is symmetrical between the two channels unless
-using joint stereo mode. In joint stereo, if it saves space, we encode
-the difference between and the sum of the channels instead of the
-individual channel content. It's conceivable that an overflow here
-might be manifest differently between the two channels.
+> So BlueZ is trying to connect to A2DP. No wonder recording doesn't work (you
+> need HSP/HFP for that). You can force HSP/HFP by adding a "profile voice"
+> line to your .asoundrc entry.
 
-It looks like you can use a parameter "mode" in the alsa config and
-set it to either "stereo" or "joint"
+Okay, I tried this again.
+As soon as I change "profile hifi" to "profile voice" sound playback
+stops working
 
-If you can narrow down the distortion to one of these cases that would be handy.
+[XazZ@darklight ~]$ hciconfig hci0
+hci0:   Type: USB
+       BD Address: 00:11:67:8F:29:0E ACL MTU: 1021:8 SCO MTU: 48:10
+       UP RUNNING PSCAN
+       RX bytes:2487 acl:33 sco:0 events:110 errors:0
+       TX bytes:2126 acl:36 sco:0 commands:65 errors:0
 
-Do you have an mp3 I could try to hear the problem?
+That suggests that no sco packets have been sent (although there
+should have been one)
+I also get two hci_cmd_task: hci0 command tx timeout in my dmesg as
+Brian Rogers said
 
-Brad
+Again the output of bluetoothd -nd:
+http://nopaste.ch/502c8ee33709a6d.html (I hope it helps)
+Maybe my device needs some quirk?
 
-On Sun, Nov 16, 2008 at 2:37 PM, Jelle de Jong
-<jelledejong@powercraft.nl> wrote:
-> Brad Midgley wrote:
->> Jelle
->>
->>> The strange thing is that I can only hear the glitches on the right side
->>> of the headset.
->>
->> That is very strange it is only on one side. Do you know if you were
->> you using the joint stereo setting in the codec?
->>
->
-> Thank you Brad for taking the time to read and answer to my question,
-> this is really appreciated. I dont exactly know what you mean with joint
-> stereo settings in the code?
->
-> I use the bluez git build on 2008-11-06. The only info I got is from the
-> bluetoothd running in debug mode, please see the attachment for more
-> information.
->
-> I hope the below section is the most relevant?
->
-> config a2dp - device = 00:0C:55:D1:C9:78 access_mode = 2
-> codec sbc - frequency = 1 channel_mode = 1 allocation = 1 subbands = 1
-> blocks = 1 bitpool = 44
-> a2dp_source_config: selected SEP 0xb81b1020
-> avdtp_ref(0xb81acbf0): ref=3
-> setup_ref(0xb81b62a8): ref=1
-> avdtp_set_configuration(0xb81acbf0): int_seid=1, acp_seid=1
->
-> Thanks in advance,
->
-> Jelle
->
+Oh, and I'm using the btusb driver which comes with 2.6.28 rc3 (Brian
+Rogers uses the same driver)
 
-
-
--- 
-Brad Midgley
-Senior Architect
-Surgeworks
-801-272-9800
+XazZ
