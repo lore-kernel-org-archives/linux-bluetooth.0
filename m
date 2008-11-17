@@ -1,38 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5a14e9b50811171025w3eec0b40g6afdfc0ebffdb7b0@mail.gmail.com>
-Date: Mon, 17 Nov 2008 19:25:00 +0100
-From: "XazZ XazZ" <xazz.xazz@googlemail.com>
+Date: Sun, 16 Nov 2008 17:25:09 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: Problem with bluez and a bluetooth headset
-In-Reply-To: <1226940114.10178.3.camel@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-References: <5a14e9b50811111229l2addf4aega6e1107320a83026@mail.gmail.com>
-	 <5a14e9b50811151841i3d84eae3i6c11068cfad1ac01@mail.gmail.com>
-	 <1226940114.10178.3.camel@localhost>
+Cc: bugme-daemon@bugzilla.kernel.org, lupulescud@yahoo.com
+Subject: Re: [Bugme-new] [Bug 12045] New: Bluetooth dongle not work
+Message-Id: <20081116172509.ace524c1.akpm@linux-foundation.org>
+In-Reply-To: <bug-12045-10286@http.bugzilla.kernel.org/>
+References: <bug-12045-10286@http.bugzilla.kernel.org/>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-good evening
 
-> I'd recommend you to try kernel 2.6.27 or later.
-> A fix concerning eSCO fallback is in it.
-> The bug is triggered by using a bluetooth 2 dongle and bluetooth 1
-> headset, for instance.
+(switched to email.  Please respond via emailed reply-to-all, not via the
+bugzilla web interface).
 
-I'm already running a kernel which is newer than 2.6.27 (I'm currently
-running 2.6.28 rc3)
-But something else must be wrong then:
-my USB dongle is a 2.0 one and my headset is also a 2.0 device
+On Sun, 16 Nov 2008 05:09:10 -0800 (PST) bugme-daemon@bugzilla.kernel.org wrote:
 
-[XazZ@darklight ~]$ hciconfig hci0 version | grep HCI
-        HCI Ver: 2.0 (0x3) HCI Rev: 0x2c6 LMP Ver: 2.0 (0x3) LMP Subver: 0x2c6
+> http://bugzilla.kernel.org/show_bug.cgi?id=12045
+> 
+>            Summary: Bluetooth dongle not work
+>            Product: Drivers
+>            Version: 2.5
+>      KernelVersion: 2.6.27.7
+>           Platform: All
+>         OS/Version: Linux
+>               Tree: Mainline
+>             Status: NEW
+>           Severity: normal
+>           Priority: P1
+>          Component: Bluetooth
+>         AssignedTo: drivers_bluetooth@kernel-bugs.osdl.org
+>         ReportedBy: lupulescud@yahoo.com
+> 
+> 
+> Latest working kernel version:
+> Earliest failing kernel version:
+> Distribution:Ubuntu 8.10
+> Hardware Environment:Laptop Hp nx6325
+> Software Environment:Gnome, bluetooth wizard
+> Problem Description:
+> Some bluetooth dongles are not initiatized and does't work. 
+> It's about device:
+> 006: ID 1131:1004 Integrated System Solution Corp. Bluetooth Device
+> Steps to reproduce:
+> Icon is shown in tray but bluetooth doesn't work proper. If dongle is previous
+> initialized by windows it blinks but cannot pair. If dongle is put in or pull
+> aout and than put back in its not initialized (led does't flash), and it's not
+> working.
+> 
 
-that's what my hciconfig says about my dongle
-
->Bluetooth version
->    * Bluetooth version: 2.0 with EDR
-That is directly taken from my headsets manufacturers website (Nokia)
-
-Thanks in advance
-XazZ
