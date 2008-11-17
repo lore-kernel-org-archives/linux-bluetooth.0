@@ -1,37 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <f86d2a880811181148x724e7ff8s474a1821d50c58e3@mail.gmail.com>
-Date: Tue, 18 Nov 2008 14:48:20 -0500
-From: "David Merrill" <dmerrill@media.mit.edu>
+Message-ID: <5a14e9b50811171025w3eec0b40g6afdfc0ebffdb7b0@mail.gmail.com>
+Date: Mon, 17 Nov 2008 19:25:00 +0100
+From: "XazZ XazZ" <xazz.xazz@googlemail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: one "talker" multiple "listeners" possible for inquiry scan with RSSI?
+Subject: Re: Problem with bluez and a bluetooth headset
+In-Reply-To: <1226940114.10178.3.camel@localhost>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
+References: <5a14e9b50811111229l2addf4aega6e1107320a83026@mail.gmail.com>
+	 <5a14e9b50811151841i3d84eae3i6c11068cfad1ac01@mail.gmail.com>
+	 <1226940114.10178.3.camel@localhost>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello everyone -
+good evening
 
-I am getting to know bluez, reading the BT spec, playing with pybluez
-- and I have a multi-adapter question I hope someone may know the
-answer to.
+> I'd recommend you to try kernel 2.6.27 or later.
+> A fix concerning eSCO fallback is in it.
+> The bug is triggered by using a bluetooth 2 dongle and bluetooth 1
+> headset, for instance.
 
-I want to capture the RSSI from a mobile phone from several Bluetooth
-radio dongles on a linux system, so I can try to estimate where the
-mobile phone is. I find that when I have all radios doing inquiry
-scans with RSSI at the same time, it generates a lot of radio traffic,
-and WiFi in the area slows down.
+I'm already running a kernel which is newer than 2.6.27 (I'm currently
+running 2.6.28 rc3)
+But something else must be wrong then:
+my USB dongle is a 2.0 one and my headset is also a 2.0 device
 
-So I'm wondering, can I have one radio initiate the inquiry scan with
-RSSI, and have the other 5 radios just listen for the replies from the
-mobile phone without "talking"? Could this be accomplished just by
-setting the hardware address of the "listeners" to match the address
-of the "talker", then they would receive the replies - or is there
-some hand-shaking / delivery guarantee algorithm that is required that
-would not be possible if the listeners remain quiet?
+[XazZ@darklight ~]$ hciconfig hci0 version | grep HCI
+        HCI Ver: 2.0 (0x3) HCI Rev: 0x2c6 LMP Ver: 2.0 (0x3) LMP Subver: 0x2c6
 
-thanks!
--David Merrill
---
-MIT Media Lab
-dmerrill@media.mit.edu
-http://web.media.mit.edu/~dmerrill/
+that's what my hciconfig says about my dongle
+
+>Bluetooth version
+>    * Bluetooth version: 2.0 with EDR
+That is directly taken from my headsets manufacturers website (Nokia)
+
+Thanks in advance
+XazZ
