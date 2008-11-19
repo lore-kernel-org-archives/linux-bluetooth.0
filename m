@@ -1,128 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <492539BF.5040303@powercraft.nl>
-Date: Thu, 20 Nov 2008 11:19:43 +0100
-From: Jelle de Jong <jelledejong@powercraft.nl>
+Message-ID: <4924548A.5020909@rjmx.net>
+Date: Wed, 19 Nov 2008 13:01:46 -0500
+From: Ron Murray <rjmx@rjmx.net>
 MIME-Version: 1.0
-To: Brad Midgley <bmidgley@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: possible sbc codec bug with audio glitches
-References: <4920099A.9030109@powercraft.nl>	 <d89ddf300811160629v29a0602cgdfcf25ade32c4cfc@mail.gmail.com>	 <4920929A.30703@powercraft.nl> <d89ddf300811161715sd0fd511v4371712a27cdd6d3@mail.gmail.com>
-In-Reply-To: <d89ddf300811161715sd0fd511v4371712a27cdd6d3@mail.gmail.com>
-Content-Type: multipart/mixed;
- boundary="------------020305090808040206010308"
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Subject: bcm203x bluetooth dongle still does not work in kernel 2.6.27.6
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------020305090808040206010308
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Hi.
 
-Brad Midgley wrote:
-> Jelle,
+   I have a couple of boxes that I'm using with (admittedly fairly old)
+Tecon bluetooth devices using the BCM-2033 chipset, and I've been having
+trouble with them since you switched to the workqueue. For quite some
+time I applied the patch referred to in the message below, and that
+worked, but it wouldn't apply on kernel 2.6.27. Rather than fix it, I
+decided to try the kernel driver as-is, with patchy results. Sometimes
+it works, sometimes it doesn't. The symptoms are the same as below: my
+syslog says
+
+Nov 19 12:38:45 rjmx kernel: firmware: requesting BCM2033-MD.hex
+Nov 19 12:38:45 rjmx kernel: firmware: requesting BCM2033-FW.bin
+
+   but nothing seems to happen: an 'lsusb' still gives
+
+Bus 001 Device 004: ID 0a5c:2033 Broadcom Corp. BCM2033 Bluetooth
+
+   ... which is the wrong ID for a device that's had its firmware
+properly loaded. The firmware files themselves seem to be readable, and
+in fact an 'ls -lut' gives me a "last access time" similar to the actual
+time I tried plugging in the device.
+
+   Any suggestions?
+
+Thanks,
+
+ .....Ron Murray
+
+> Subject	Re: [2.6.24] bcm203x bluetooth dongle does not work
+> From	Marcel Holtmann <>
+> Date	Wed, 30 Jan 2008 18:33:52 +0100
 > 
-> Everything in the codec is symmetrical between the two channels unless
-> using joint stereo mode. In joint stereo, if it saves space, we encode
-> the difference between and the sum of the channels instead of the
-> individual channel content. It's conceivable that an overflow here
-> might be manifest differently between the two channels.
+> Hi Florian,
 > 
-> It looks like you can use a parameter "mode" in the alsa config and
-> set it to either "stereo" or "joint"
+>> after trying around with my ancient bcm2033 bluetooth dongle i found it
+>> not working in 2.6.24 - I debugged udev and found it loading the
+>> firmware correctly but the device seems to have problems disconnecting.
+>> 
+>> I found an Ubuntu bug which mentions a patch which supposed to be
+>> 2.6.20 material. It still applies and fixes my problem:
+>> 
+>> Ubuntu Bug:
+>> 	https://bugs.launchpad.net/ubuntu/+source/linux-source-2.6.20/+bug/85247
+>> 
+>> Patch:
+>> 	http://launchpadlibrarian.net/7058766/bcm203x-2.6.20-backport.diff
+>> 
+>> So it seems this patch never went in but most likely should.
 > 
-> If you can narrow down the distortion to one of these cases that would be handy.
+> we moved away from using a timer and using a workqueue now. It wrote the
+> patch to use a workqueue and tested that it works. Starting with 2.6.19
+> we the usage of a workqueue is default. Can you verify that non of the
+> kernels 2.6.19-2.6.23 are working. We might have missed a change inside
+> the USB subsystem within the 2.6.24 timeframe.
 > 
-> Do you have an mp3 I could try to hear the problem?
+> Regards
 > 
-> Brad
+> Marcel
 
-Thank you Brad for taking the time to answer.
 
-I have tried the mode joint and mode stereo [1] for a few days but I
-cant hear any difference and the small glitches are still there.
+-- 
+Ron Murray   (rjmx@rjmx.net)
+http://www.rjmx.net/~ron
+GPG Public Key Fingerprint:
+  F2C1 FC47 5EF7 0317 133C  D66B 8ADA A3C4 D86C 74DE
 
-I posted a small audio segment that has the problem in my first post:
-http://sourceforge.net/mailarchive/message.php?msg_name=4819B1A7.2070702%40powercraft.nl
-http://filebin.ca/pugrs/glitch.wav
-
-Thanks in advance,
-
-Jelle
-
-> On Sun, Nov 16, 2008 at 2:37 PM, Jelle de Jong
-> <jelledejong@powercraft.nl> wrote:
->> Brad Midgley wrote:
->>> Jelle
->>>
->>>> The strange thing is that I can only hear the glitches on the right side
->>>> of the headset.
->>> That is very strange it is only on one side. Do you know if you were
->>> you using the joint stereo setting in the codec?
->>>
->> Thank you Brad for taking the time to read and answer to my question,
->> this is really appreciated. I dont exactly know what you mean with joint
->> stereo settings in the code?
->>
->> I use the bluez git build on 2008-11-06. The only info I got is from the
->> bluetoothd running in debug mode, please see the attachment for more
->> information.
->>
->> I hope the below section is the most relevant?
->>
->> config a2dp - device = 00:0C:55:D1:C9:78 access_mode = 2
->> codec sbc - frequency = 1 channel_mode = 1 allocation = 1 subbands = 1
->> blocks = 1 bitpool = 44
->> a2dp_source_config: selected SEP 0xb81b1020
->> avdtp_ref(0xb81acbf0): ref=3
->> setup_ref(0xb81b62a8): ref=1
->> avdtp_set_configuration(0xb81acbf0): int_seid=1, acp_seid=1
->>
->> Thanks in advance,
->>
->> Jelle
-
---------------020305090808040206010308
-Content-Type: application/x-sh;
- name="setup-bluetooth-motorola-s805.sh"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline;
- filename="setup-bluetooth-motorola-s805.sh"
-
-#!/bin/bash
-
-echo "setup-bluetooth-motorola-s805.sh"
-
-echo 'pcm.headset {
-    type bluetooth
-    #~ device 00:0D:18:A0:35:70
-    #~ device 00:53:53:FB:7E:9C # Nokia BH-801
-    device 00:0C:55:D1:C9:78 # Motorola S805
-    #~ device 00:0D:FD:18:6E:3C # Motorola S9
-    #~ device 20:07:09:15:A9:5A # Samsung WEP210
-    profile hifi
-    #~ profile voice
-    #~ profile auto
-    mode stereo
-    #~ mode joint
-}
-pcm.softvol {
-    type softvol
-    slave.pcm headset
-    control.name Headset
-    control.card 0
-}
-pcm.!default {
-    #~ type hw
-    #~ card 0
-    type plug
-    slave.pcm softvol
-}' > ~/.asoundrc
-
-#~ sudo /etc/init.d/bluetooth restart
-#~ sudo /etc/init.d/alsa-utils restart
-
-echo "done, you can close this windows now"
-
-exit
-
---------------020305090808040206010308--
+Save energy: Drive a smaller shell.
