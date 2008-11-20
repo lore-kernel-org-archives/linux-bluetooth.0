@@ -1,25 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Nov 2008 17:32:58 +0200
-From: Johan Hedberg <johan.hedberg@nokia.com>
-To: linux-bluetooth@vger.kernel.org
+Message-ID: <37367b3a0811200722r33c50f6fme81c28dc0be0ef39@mail.gmail.com>
+Date: Thu, 20 Nov 2008 15:22:38 +0000
+From: "Alan Carvalho de Assis" <acassis@gmail.com>
+To: "Johan Hedberg" <johan.hedberg@nokia.com>
 Subject: Re: Simple-agent in C
-Message-ID: <20081120153258.GA31342@localhost>
-References: <37367b3a0811200516y71890f0es7b1aafaac5ef873b@mail.gmail.com> <20081120133426.GA24814@localhost> <37367b3a0811200722r33c50f6fme81c28dc0be0ef39@mail.gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20081120133426.GA24814@localhost>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <37367b3a0811200722r33c50f6fme81c28dc0be0ef39@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+References: <37367b3a0811200516y71890f0es7b1aafaac5ef873b@mail.gmail.com>
+	 <20081120133426.GA24814@localhost>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Nov 20, 2008, Alan Carvalho de Assis wrote:
-> I noticed this agent.c doesn't use any Glib function, is it right?
+Hi Johan,
 
-Yes.
+On Thu, Nov 20, 2008 at 1:34 PM, Johan Hedberg <johan.hedberg@nokia.com> wrote:
+>
+> There's test/agent.c in the source tree. However, now that I took a
+> quick look at it it's not up-to-date with the latest 4.x API (it e.g.
+> hardcodes "/org/bluez/hci0" and doesn't use the correct Agent method
+> names). You'll still be able to use it as a good starting point though.
+>
 
-> I am comparing agent.c against simple-agent and verified it is very different.
+I noticed this agent.c doesn't use any Glib function, is it right?
 
-Yes, as I said you'll need to fill in the proper agent callbacks (right
-now there's something called "Request" which does not exist in the API)
-as well as make it get the adapter path using e.g. DefaultAdapter().
+I am comparing agent.c against simple-agent and verified it is very different.
 
-Johan
+> Johan
+
+Best Regards,
+
+Alan
