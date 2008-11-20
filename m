@@ -1,63 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <37367b3a0811201545q519404c1y3189a15907e5b2fe@mail.gmail.com>
+Date: Thu, 20 Nov 2008 23:45:11 +0000
+From: "Alan Carvalho de Assis" <acassis@gmail.com>
+To: "Johan Hedberg" <johan.hedberg@nokia.com>
+Subject: Re: Simple-agent in C
+Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20081120153258.GA31342@localhost>
 MIME-Version: 1.0
-Date: Thu, 20 Nov 2008 18:24:00 -0800
-Message-ID: <35c90d960811201824o64e0d814s8cf55ba6ee145517@mail.gmail.com>
-Subject: patch: Respect HCI_UART_DEBUG config in hci_ll.c
-From: Nick Pelly <npelly@google.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=000e0cd50a54f1d55f045c29bccf
+Content-Type: text/plain; charset=ISO-8859-1
+References: <37367b3a0811200516y71890f0es7b1aafaac5ef873b@mail.gmail.com>
+	 <20081120133426.GA24814@localhost>
+	 <37367b3a0811200722r33c50f6fme81c28dc0be0ef39@mail.gmail.com>
+	 <20081120153258.GA31342@localhost>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---000e0cd50a54f1d55f045c29bccf
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Sorry my mistake, I replied onf to Johan...
 
-Author: Nick Pelly <npelly@google.com>
-Date:   Mon Apr 21 12:18:51 2008 -0700
+On Thu, Nov 20, 2008 at 3:32 PM, Johan Hedberg <johan.hedberg@nokia.com> wrote:
+>
+> Yes, as I said you'll need to fill in the proper agent callbacks (right
+> now there's something called "Request" which does not exist in the API)
+> as well as make it get the adapter path using e.g. DefaultAdapter().
 
-    bluetooth: Respect HCI_UART_DEBUG config in hci_ll.c
+All right. Thank you again!
 
-    Following the pattern from hci_*.c, turn off BT_DBG messages unless
-    they have been requested via HCI_UART_DEBUG
+When I run this agent it is reporting here is not org.bluez DBUS
+service, then I verified bluetoothd is is starting correctly:
 
-    Signed-off-by: Brian Swetland <swetland@google.com>
+# bluetoothd -nd
+bluetoothd[1888]: Bluetooth daemon
+bluetoothd[1888]: Enabling debug information
+bluetoothd[1888]: parsing main.conf
+bluetoothd[1888]: offmode=NoScan
+bluetoothd[1888]: discovto=0
+bluetoothd[1888]: pageto=8192
+bluetoothd[1888]: name=%h-%d
+bluetoothd[1888]: class=0x000100
+bluetoothd[1888]: inqmode=0
+bluetoothd[1888]: Unable to get on D-Bus
 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index b91d45a..2d2f66e 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -51,6 +51,11 @@
+This is the very same error reported here:
+https://lists.ubuntu.com/archives/ubuntu-bluetooth/2008-November/002629.html
 
- #include "hci_uart.h"
+I am starting dbus this way:
+# dbus-daemon --system
 
-+#ifndef CONFIG_BT_HCIUART_DEBUG
-+#undef  BT_DBG
-+#define BT_DBG( A... )
-+#endif
-+
- /* HCILL commands */
- #define HCILL_GO_TO_SLEEP_IND  0x30
- #define HCILL_GO_TO_SLEEP_ACK  0x31
+I tried to strace bluetoothd but it doesn't helped much, none suspect
+problem. Is this some specific problem of this version (4.18)?
 
---000e0cd50a54f1d55f045c29bccf
-Content-Type: text/plain; charset=US-ASCII; name="fix_hcill_debug.txt"
-Content-Disposition: attachment; filename="fix_hcill_debug.txt"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_fns7dt0t0
+Some idea about how to solve this problem?
+I think "Unable to get on D-Bus" means bluetoothd are not listening to
+same d-bus socket started by dbus-daemon. Isn't it?
 
-Y29tbWl0IDRjNzAxODFiNzQ5MjI1NTM0ZWFhY2E2YjU3YWM0OGJlNjM5MWMyYjkKQXV0aG9yOiBO
-aWNrIFBlbGx5IDxucGVsbHlAZ29vZ2xlLmNvbT4KRGF0ZTogICBNb24gQXByIDIxIDEyOjE4OjUx
-IDIwMDggLTA3MDAKCiAgICBibHVldG9vdGg6IFJlc3BlY3QgSENJX1VBUlRfREVCVUcgY29uZmln
-IGluIGhjaV9sbC5jCiAgICAKICAgIEZvbGxvd2luZyB0aGUgcGF0dGVybiBmcm9tIGhjaV8qLmMs
-IHR1cm4gb2ZmIEJUX0RCRyBtZXNzYWdlcyB1bmxlc3MKICAgIHRoZXkgaGF2ZSBiZWVuIHJlcXVl
-c3RlZCB2aWEgSENJX1VBUlRfREVCVUcKICAgIAogICAgU2lnbmVkLW9mZi1ieTogQnJpYW4gU3dl
-dGxhbmQgPHN3ZXRsYW5kQGdvb2dsZS5jb20+CgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVldG9v
-dGgvaGNpX2xsLmMgYi9kcml2ZXJzL2JsdWV0b290aC9oY2lfbGwuYwppbmRleCBiOTFkNDVhLi4y
-ZDJmNjZlIDEwMDY0NAotLS0gYS9kcml2ZXJzL2JsdWV0b290aC9oY2lfbGwuYworKysgYi9kcml2
-ZXJzL2JsdWV0b290aC9oY2lfbGwuYwpAQCAtNTEsNiArNTEsMTEgQEAKIAogI2luY2x1ZGUgImhj
-aV91YXJ0LmgiCiAKKyNpZm5kZWYgQ09ORklHX0JUX0hDSVVBUlRfREVCVUcKKyN1bmRlZiAgQlRf
-REJHCisjZGVmaW5lIEJUX0RCRyggQS4uLiApCisjZW5kaWYKKwogLyogSENJTEwgY29tbWFuZHMg
-Ki8KICNkZWZpbmUgSENJTExfR09fVE9fU0xFRVBfSU5ECTB4MzAKICNkZWZpbmUgSENJTExfR09f
-VE9fU0xFRVBfQUNLCTB4MzEK
---000e0cd50a54f1d55f045c29bccf--
+> Johan
+
+Best Regards,
+
+Alan
