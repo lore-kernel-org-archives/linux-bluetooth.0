@@ -1,24 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Nov 2008 15:34:26 +0200
-From: Johan Hedberg <johan.hedberg@nokia.com>
+Message-ID: <37367b3a0811200516y71890f0es7b1aafaac5ef873b@mail.gmail.com>
+Date: Thu, 20 Nov 2008 13:16:19 +0000
+From: "Alan Carvalho de Assis" <acassis@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: Simple-agent in C
-Message-ID: <20081120133426.GA24814@localhost>
-References: <37367b3a0811200516y71890f0es7b1aafaac5ef873b@mail.gmail.com>
+Subject: Simple-agent in C
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <37367b3a0811200516y71890f0es7b1aafaac5ef873b@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alan,
+Hi All,
 
-On Thu, Nov 20, 2008, Alan Carvalho de Assis wrote:
-> Please, can you point me to some simple-agent implemented in C?
+I am looking for a C version of simple-agent application.
 
-There's test/agent.c in the source tree. However, now that I took a
-quick look at it it's not up-to-date with the latest 4.x API (it e.g.
-hardcodes "/org/bluez/hci0" and doesn't use the correct Agent method
-names). You'll still be able to use it as a good starting point though.
+I am developing an embedded system project and don't want to make
+Python a dependence (and Pygobject as well).
 
-Johan
+There is some way to use bluez-4.xx without DBUS? I already compiled
+it to board, but if bluez can works without it will be "better".
+
+Please, can you point me to some simple-agent implemented in C?
+
+Best Regards,
+
+Alan
