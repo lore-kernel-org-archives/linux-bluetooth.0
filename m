@@ -1,26 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 22 Nov 2008 03:23:55 +0530 (IST)
-From: pavan_savoy@indiatimes.com
-To: <linux-bluetooth@vger.kernel.org>, npelly@google.com, marcel@holtmann.org
-Message-ID: <1026773358.244421227304435724.JavaMail.root@mbv7.indiatimes.com>
-Subject: Place-Holder for a driver
+Message-ID: <37367b3a0811210505r67990524gd56ece63eb78d3a5@mail.gmail.com>
+Date: Fri, 21 Nov 2008 13:05:06 +0000
+From: "Alan Carvalho de Assis" <acassis@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Unable to get on D-Bus
+In-Reply-To: <37367b3a0811210328i6820fbd6ufbb8a52f33b7dc70@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=ISO-8859-1
+References: <37367b3a0811210328i6820fbd6ufbb8a52f33b7dc70@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi all,
 
-Hi,
+Good news, I found the problem, see below!
 
-The OMAP Zoom2 board has a bluetooth chip which needs to be enabled to be used. When running on Android, the Bluetooth service of Android uses the rfkill sysfs entry to turn on bluetooth.
+On Fri, Nov 21, 2008 at 11:28 AM, Alan Carvalho de Assis
+<acassis@gmail.com> wrote:
+> Hi all,
+>
+> First I started DBUS:
+>
+> # dbus-daemon --system --print-address
+> unix:path=/var/run/dbus/system_bus_socket,guid=bd671c01bf0366c80869f10000014a47
+>
+> Then tried to start bluetoothd:
+>
+> # bluetoothd -nd
+> bluetoothd[1795]: Bluetooth daemon
+> bluetoothd[1795]: Enabling debug information
+> bluetoothd[1795]: parsing main.conf
+> bluetoothd[1795]: offmode=NoScan
+> bluetoothd[1795]: discovto=0
+> bluetoothd[1795]: pageto=8192
+> bluetoothd[1795]: name=%h-%d
+> bluetoothd[1795]: class=0x000100
+> bluetoothd[1795]: inqmode=0
+> bluetoothd[1795]: Unable to get on D-Bus
 
-So I linked the Bluetooth enable GPIO to the sys-fs entry, Now the question is where should/does this driver fit in ?
+My bluez installation is placing bluetooth.conf at
+/etc/dbus-1/system.d/ but dbus is looking for files at
+/usr/etc/dbus-1/system.d!!!
 
-I've thought of drivers/misc, Any suggestions are welcome.
+I am posting it here because other people can get same problem.
 
-Thanks & Regards,
-Pavan Savoy.
+Best Regards,
 
-
---
-The New Maruti A-Star is here. View pics, videos, read expert opinion and more on ZigWheels.com
-http://images.zigwheels.com/b2cam/a_star.html
+Alan
