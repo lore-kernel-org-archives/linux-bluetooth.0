@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <CD3D79B9-7C76-4B31-8861-C61306B4714E@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: BlueZ development <bluez-devel@lists.sourceforge.net>
-In-Reply-To: <e343e5940811190907h743ce8bbr4eb81b8ef50d1dd4@mail.gmail.com>
-Mime-Version: 1.0 (Apple Message framework v929.2)
-Date: Mon, 24 Nov 2008 03:44:56 +0100
-References: <e343e5940811190907h743ce8bbr4eb81b8ef50d1dd4@mail.gmail.com>
-Subject: Re: [Bluez-devel] Connection proccess
+Message-ID: <2a9506370811210705g3a81a1c5kc772cf5f81a2bbed@mail.gmail.com>
+Date: Fri, 21 Nov 2008 12:05:51 -0300
+From: "Vinicius Gomes" <vinicius.gomes@openbossa.org>
+To: "Li, Zhigang" <zhigang.li@intel.com>
+In-Reply-To: <B94C62E7C2870743865418621F040C1301E82411@pdsmsx502.ccr.corp.intel.com>
+MIME-Version: 1.0
+References: <B94C62E7C2870743865418621F040C1301E82411@pdsmsx502.ccr.corp.intel.com>
+Cc: "bluez-devel@lists.sourceforge.net" <bluez-devel@lists.sourceforge.net>
+Subject: Re: [Bluez-devel] What's the maximum size of file by FTP transfer
 Reply-To: BlueZ development <bluez-devel@lists.sourceforge.net>
 List-Id: BlueZ development <bluez-devel.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
@@ -19,33 +20,47 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-devel>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-devel-bounces@lists.sourceforge.net
 
-Hi Yuriy,
+Hi,
 
-> Can you tell me, please, how many concurrent connections  (i mean  
-> proccess of connection) can be done on one dongle?
+On Fri, Nov 21, 2008 at 5:10 AM, Li, Zhigang <zhigang.li@intel.com> wrote:
+> HI Vinicius,
 >
-> for example:
+> I have one problem for bigger file transfer.
 >
-> hcitool con
-> Connections:
->         < ACL 00:1C:9A:6E:27:4A handle 0 state 5 lm MASTER
->         < ACL 00:16:BC:31:EE:2E handle 0 state 5 lm MASTER
->         < ACL 00:16:B8:AE:75:7E handle 3 state 1 lm MASTER
->         < ACL 00:18:0F:AC:BF:EE handle 2 state 1 lm MASTER
->         < ACL 00:1E:4C:D4:0C:52 handle 1 state 1 lm MASTER
+> I can't transfer 9MB .mp3 file but 1MB file is ok by FTP.
 >
-> Does "handle 0" mean that there is a try of low level connection?
+> I know it's difficult to transfer a bigger file which more than 10MB by
+> Bluetooth.
 >
-> I've not seen "handle 0" more then 3 times.
+> I used latest release version in bluez.org.
+>
+> It even can't open the file, it's not file self problem.
+>
+> fd = open(filename, O_RDONLY);
+>
+> What's the limitation in ftp client side? I saw the size should be 2GB.
+>
 
-decode the state. It is BT_CONNECT. And actually only one connect  
-attempt can be made at a time. Some hardware queues it for you. For  
-others we have to do it and then this should show state BT_CONNECT2.
+As you already said, the only limitation really is the size of the object
+length header (32 bits).
 
-Regards
+> Do you have same problem? Or any idea/
 
-Marcel
+No. I just tested it here, and it worked fine. But if it is failing on the open
+call, it seems it isn't a obex-client issue.
 
+But I would like to know more, perhaps a strace would give more
+information on what might be happening.
+
+>
+> Thanks
+>
+>
+
+Cheers,
+-- 
+Vinicius Gomes
+INdT - Instituto Nokia de Tecnologia
 
 -------------------------------------------------------------------------
 This SF.Net email is sponsored by the Moblin Your Move Developer's challenge
