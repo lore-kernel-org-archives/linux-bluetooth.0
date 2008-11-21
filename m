@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <995FBD61-D646-40B3-BEE9-9DB7AF1FD688@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Fri, 21 Nov 2008 08:52:33 -0600
+From: Robert Moskowitz <rgm@htt-consult.com>
 To: BlueZ users <bluez-users@lists.sourceforge.net>
-In-Reply-To: <a1c657a80811180050t60170621ibf9f5049f2103682@mail.gmail.com>
-Mime-Version: 1.0 (Apple Message framework v929.2)
-Date: Mon, 24 Nov 2008 03:52:22 +0100
-References: <a1c657a80811180050t60170621ibf9f5049f2103682@mail.gmail.com>
-Subject: Re: [Bluez-users] How to make bluetoothd-service-audio don't record
-	the last headset information
+Message-ID: <4926CB31.2060104@htt-consult.com>
+In-Reply-To: <491B543E.1000304@htt-consult.com>
+References: <491B543E.1000304@htt-consult.com>
+MIME-Version: 1.0
+Subject: [Bluez-users] Can't start pand -- is the problem in
+	/etc/rc.d/init.d/pand?
 Reply-To: BlueZ users <bluez-users@lists.sourceforge.net>
 List-Id: BlueZ users <bluez-users.lists.sourceforge.net>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -20,19 +20,52 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 Content-Type: text/plain; charset="us-ascii"
 Errors-To: bluez-users-bounces@lists.sourceforge.net
 
-Hi Paul,
+This is on Centos (RHEL 5, FC6ish):
 
->     After i used aplay -D bluetooth /***.wav to play music , i  
-> changed the headset device address in the /etc/asound.conf and run  
-> aplay again, but bluez also to
-> connected  the old device address , so i can't use the new headset.  
-> Is there some method to fix this issue, thanks ?
+I have been stepping into pand. There is nothing I can find on this list 
+about getting pand working. There are some instructions on 
+wifi.bluez.org that seem to be redhatish, but....
 
-what version of BlueZ are you using?
+I have edited /etc/sysconfig/pand:
 
-Regards
+PANDARGS='--listen --role GN --master'
 
-Marcel
+
+I have created a /etc/sysconfig/network-scripts/ifcfg-bnep0:
+
+DEVICE=bnep0
+BOOTPROTO=none
+ONBOOT=no
+IPADDR=192.168.201.101
+NETMASK=255.255.255.0
+
+
+I run: service pand start
+
+nothing happens.
+
+I look at: /etc/rc.d/init.d/pand and see:
+
+[ -x /etc/bluetooth/pan/system-up ] && /etc/bluetooth/pan/system-up
+
+huh? My system does not have an /etc/bluetooth/pan directory. there is a
+
+/etc/sysconfig/network-scripts/ifup-bnep
+
+So I decided to create an /etc/bluetooth/pan/dev-up file as I found at: 
+http://ph.ubuntuforums.com/showthread.php?t=598890
+
+#!/bin/bash
+ifup bnep0
+
+Still nothing. pand is not starting and there are no messages in 
+/var/log/messages
+
+
+
+what am I missing here?
+
+
 
 
 -------------------------------------------------------------------------
