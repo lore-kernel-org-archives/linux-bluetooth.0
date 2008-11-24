@@ -1,27 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <FE93A0F6-15DB-4F0D-BF59-B719C497E4F3@holtmann.org>
+Message-Id: <97A79091-A35F-4A53-8AAF-DCD527C574DA@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-To: Oleg Kravchenko <oleg@kaa.org.ua>
-In-Reply-To: <49200DE9.4080606@kaa.org.ua>
+To: David Merrill <dmerrill@media.mit.edu>
+In-Reply-To: <f86d2a880811181148x724e7ff8s474a1821d50c58e3@mail.gmail.com>
 Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
 Mime-Version: 1.0 (Apple Message framework v929.2)
-Subject: Re: BCM2045B2
-Date: Mon, 24 Nov 2008 03:53:40 +0100
-References: <49200DE9.4080606@kaa.org.ua>
+Subject: Re: one "talker" multiple "listeners" possible for inquiry scan with RSSI?
+Date: Mon, 24 Nov 2008 03:51:26 +0100
+References: <f86d2a880811181148x724e7ff8s474a1821d50c58e3@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Oleg,
+Hi David,
 
-> Asus P535 details on http://www.kaa.org.ua/asus-p535/hardware.html
-> Bluetooth chip BCM2045B2 connected to the pxa internal usb host.
+> I am getting to know bluez, reading the BT spec, playing with pybluez
+> - and I have a multi-adapter question I hope someone may know the
+> answer to.
 >
-> I think this chip need firmware, because it is can only search
-> How I can upload firmware to the this chip?
+> I want to capture the RSSI from a mobile phone from several Bluetooth
+> radio dongles on a linux system, so I can try to estimate where the
+> mobile phone is. I find that when I have all radios doing inquiry
+> scans with RSSI at the same time, it generates a lot of radio traffic,
+> and WiFi in the area slows down.
+>
+> So I'm wondering, can I have one radio initiate the inquiry scan with
+> RSSI, and have the other 5 radios just listen for the replies from the
+> mobile phone without "talking"? Could this be accomplished just by
+> setting the hardware address of the "listeners" to match the address
+> of the "talker", then they would receive the replies - or is there
+> some hand-shaking / delivery guarantee algorithm that is required that
+> would not be possible if the listeners remain quiet?
 
-no, the chip needs a HCI Reset call. Load btusb with reset=1. And send  
-the output of /proc/bus/usb/devices for this dongle.
+the simple answer is no. It is not how Bluetooth works. For more  
+details you should get a book on Bluetooth that explains how the radio/ 
+baseband actually works.
 
 Regards
 
